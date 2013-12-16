@@ -942,7 +942,7 @@ namespace EPMLiveReportsAdmin
             _DAO.AddParam("@listName", listName);
             _DAO.AddParam("@siteId", _siteId);
             objTableName = _DAO.ExecuteScalar(_DAO.GetClientReportingConnection);
-            return objTableName.ToString();
+            return (objTableName != null) ? objTableName.ToString() : string.Empty;
         }
 
         public virtual string InsertSQL(string sTableName, DataTable dtColumns, SPListItem li, ArrayList arrayList_defaultColumns, ArrayList mandatoryHiddenFlds)
@@ -1533,7 +1533,8 @@ namespace EPMLiveReportsAdmin
             _DAO.Command = "SELECT RPTListID FROM RPTList WHERE ListName=@listName AND siteId=@siteId";
             _DAO.AddParam("@listName", sListName);
             _DAO.AddParam("@siteId", _siteId);
-            return (Guid)_DAO.ExecuteScalar(_DAO.GetClientReportingConnection);
+            object val = _DAO.ExecuteScalar(_DAO.GetClientReportingConnection);
+            return (val != null) ? (Guid)val : Guid.Empty;
         }
 
         protected virtual SqlParameter PopulateDefaultColumnValue(string sColumn, SPListItem li)

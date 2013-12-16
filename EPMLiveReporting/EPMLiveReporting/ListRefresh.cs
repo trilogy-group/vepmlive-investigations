@@ -807,7 +807,11 @@ namespace EPMLiveReportsAdmin
                 }
                 DataRow resultsFinalRow = dtResultsFinal.NewRow();
                 resultsFinalRow["Level"] = iLevel;
-                resultsFinalRow["RPTListId"] = _DAO.GetListId(row["ListName"].ToString());
+                var guid = _DAO.GetListId(row["ListName"].ToString());
+                if (guid != Guid.Empty)
+                {
+                    resultsFinalRow["RPTListId"] = guid;
+                }
                 resultsFinalRow["ListName"] = row["ListName"];
                 resultsFinalRow["ShortMessage"] = shortMessage;
                 resultsFinalRow["LongMessage"] = row["ResultText"];

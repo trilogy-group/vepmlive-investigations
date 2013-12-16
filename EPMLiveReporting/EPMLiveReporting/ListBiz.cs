@@ -192,7 +192,7 @@ namespace EPMLiveReportsAdmin
             }
         }
 
-        public static ListBiz CreateNewMapping(Guid siteId, Guid listId, ListItemCollection fields)
+        public static ListBiz CreateNewMapping(Guid siteId, Guid listId, ListItemCollection fields, bool isAuto)
         {
             SPList spList = null;
             SPUser user = null;
@@ -305,97 +305,97 @@ namespace EPMLiveReportsAdmin
             return exists;
         }
 
-        public static ListBiz CreateNewMapping(Guid siteId, Guid listId)
-        {
-            SPList spList = null;
-            SPUser user = null;
-            using (var site = new SPSite(siteId))
-            {
-                using (var web = site.OpenWeb())
-                {
-                    user = web.CurrentUser;
-                }
-            }
+        //public static ListBiz CreateNewMapping(Guid siteId, Guid listId)
+        //{
+        //    SPList spList = null;
+        //    SPUser user = null;
+        //    using (var site = new SPSite(siteId))
+        //    {
+        //        using (var web = site.OpenWeb())
+        //        {
+        //            user = web.CurrentUser;
+        //        }
+        //    }
 
-            if (user != null)
-            {
-                SPSecurity.RunWithElevatedPrivileges(delegate()
-                {
-                    using (SPSite es = new SPSite(siteId))
-                    {
-                        foreach (SPWeb ew in es.AllWebs)
-                        {
-                            if (ew.DoesUserHavePermissions(user.LoginName, SPBasePermissions.ViewPages))
-                            {
-                                try
-                                {
-                                    spList = ew.Lists[listId];
-                                }
-                                catch { }
-                                finally
-                                {
-                                    if (ew != null)
-                                    {
-                                        ew.Dispose();
-                                    }
-                                }
+        //    if (user != null)
+        //    {
+        //        SPSecurity.RunWithElevatedPrivileges(delegate()
+        //        {
+        //            using (SPSite es = new SPSite(siteId))
+        //            {
+        //                foreach (SPWeb ew in es.AllWebs)
+        //                {
+        //                    if (ew.DoesUserHavePermissions(user.LoginName, SPBasePermissions.ViewPages))
+        //                    {
+        //                        try
+        //                        {
+        //                            spList = ew.Lists[listId];
+        //                        }
+        //                        catch { }
+        //                        finally
+        //                        {
+        //                            if (ew != null)
+        //                            {
+        //                                ew.Dispose();
+        //                            }
+        //                        }
 
-                                if (spList != null)
-                                {
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                });
-            }
+        //                        if (spList != null)
+        //                        {
+        //                            break;
+        //                        }
+        //                    }
+        //                }
+        //            }
+        //        });
+        //    }
 
-            var automatic = ListBiz.AutomaticFields;
-            var required = ListBiz.RequiredResourceFields;
+        //    var automatic = ListBiz.AutomaticFields;
+        //    var required = ListBiz.RequiredResourceFields;
 
-            var lb = new ListBiz();
-            lb._siteId = siteId;
-            lb._listId = listId;
-            lb._listName = spList.Title;
+        //    var lb = new ListBiz();
+        //    lb._siteId = siteId;
+        //    lb._listId = listId;
+        //    lb._listName = spList.Title;
 
-            ColumnDefCollection columns = ColumnDef.GetDefaultColumns();
-            ColumnDefCollection columnsSnapshot = ColumnDef.GetDefaultColumnsSnapshot();
-            var matches = 0;
-            foreach (SPField field in spList.Fields)
-            {
-                if (!field.Hidden &&
-                    field.Type != SPFieldType.Computed &&
-                    !automatic.Contains(field.InternalName) ||
-                    required.Contains(field.InternalName) ||
-                    field.InternalName == "Title")
-                {
-                    columns.AddColumn(field);
-                    columnsSnapshot.AddColumn(field);
-                    if (RequiredResourceFields.Contains(field.InternalName))
-                    {
-                        matches++;
-                    }
-                }
-            }
-            lb._resourceList = (RequiredResourceFields.Count == matches);
+        //    ColumnDefCollection columns = ColumnDef.GetDefaultColumns();
+        //    ColumnDefCollection columnsSnapshot = ColumnDef.GetDefaultColumnsSnapshot();
+        //    var matches = 0;
+        //    foreach (SPField field in spList.Fields)
+        //    {
+        //        if (!field.Hidden &&
+        //            field.Type != SPFieldType.Computed &&
+        //            !automatic.Contains(field.InternalName) ||
+        //            required.Contains(field.InternalName) ||
+        //            field.InternalName == "Title")
+        //        {
+        //            columns.AddColumn(field);
+        //            columnsSnapshot.AddColumn(field);
+        //            if (RequiredResourceFields.Contains(field.InternalName))
+        //            {
+        //                matches++;
+        //            }
+        //        }
+        //    }
+        //    lb._resourceList = (RequiredResourceFields.Count == matches);
 
 
-            //[Fix for:Issue - Resources list sqltable being rename to LST Resourcis in Report Model. Apparently, resources is a reserved word.] by xjh -- START
-            string tableName;
-            if (!spList.Title.ToLower().EndsWith("resources"))
-            {
-                tableName = Resources.ListPrefix + Utility.GetCleanAlphaNumeric(spList.Title);
-            }
-            else
-            {
-                tableName = Resources.ListPrefix + "Resourcepool";
-            }
-            // -- END
+        //    //[Fix for:Issue - Resources list sqltable being rename to LST Resourcis in Report Model. Apparently, resources is a reserved word.] by xjh -- START
+        //    string tableName;
+        //    if (!spList.Title.ToLower().EndsWith("resources"))
+        //    {
+        //        tableName = Resources.ListPrefix + Utility.GetCleanAlphaNumeric(spList.Title);
+        //    }
+        //    else
+        //    {
+        //        tableName = Resources.ListPrefix + "Resourcepool";
+        //    }
+        //    // -- END
 
-            lb.Create(columns, columnsSnapshot, tableName);
-            lb.RegisterEvent();
-            return lb;
-        }
+        //    lb.Create(columns, columnsSnapshot, tableName);
+        //    lb.RegisterEvent();
+        //    return lb;
+        //}
 
         private void Create(ColumnDefCollection columns, List<ColumnDef> columnsSnapshot, string tableName)
         {

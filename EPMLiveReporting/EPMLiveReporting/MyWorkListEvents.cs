@@ -227,7 +227,12 @@ namespace EPMLiveReportsAdmin
 
         private bool SaveWork()
         {   
-            bool blnWorkSaved = true, hasWork = false, hasAssignedTo = false, hasStartDate = false, hasDueDate = false;
+            bool blnWorkSaved = true;
+            bool bHasChangedWork = false;
+            bool bHasChangedAssignedTo = false;
+            bool bHasChangedStartDate = false;
+            bool bHasChangedDueDate = false;
+
             string sErrMsg = string.Empty;
             try
             {
@@ -237,10 +242,11 @@ namespace EPMLiveReportsAdmin
                 object StartDate = DBNull.Value;
                 object DueDate = DBNull.Value;
 
-                if (ItemHasValue(_listItem, "Work"))
+                if (ItemHasValue(_listItem, "Work") &&
+                    _properties.BeforeProperties["Work"].ToString() != _properties.AfterProperties["Work"])
                 {
                     sWork = _listItem["Work"].ToString();
-                    hasWork = true;
+                    bHasChangedWork = true;
                 }
                 else
                 {
@@ -248,10 +254,11 @@ namespace EPMLiveReportsAdmin
                     sErrMsg = "Work";
                 }
 
-                if (ItemHasValue(_listItem, "AssignedTo"))
+                if (ItemHasValue(_listItem, "AssignedTo") &&
+                    _properties.BeforeProperties["AssignedTo"].ToString() != _properties.AfterProperties["AssignedTo"])
                 {
                     sAssignedTo = ReportData.AddLookUpFieldValues(_listItem["AssignedTo"].ToString(), "id");
-                    hasAssignedTo = true;
+                    bHasChangedAssignedTo = true;
                 }
                 else
                 {
@@ -267,10 +274,11 @@ namespace EPMLiveReportsAdmin
                 }
 
 
-                if (ItemHasValue(_listItem, "StartDate"))
+                if (ItemHasValue(_listItem, "StartDate") &&
+                    _properties.BeforeProperties["StartDate"].ToString() != _properties.AfterProperties["StartDate"])
                 {
                     StartDate = _listItem["StartDate"];
-                    hasStartDate = true;
+                    bHasChangedStartDate = true;
                 }
                 else
                 {
@@ -286,10 +294,11 @@ namespace EPMLiveReportsAdmin
                 }
 
 
-                if (ItemHasValue(_listItem, "DueDate"))
+                if (ItemHasValue(_listItem, "DueDate") &&
+                    _properties.BeforeProperties["DueDate"].ToString() != _properties.AfterProperties["DueDate"])
                 {
                     DueDate = _listItem["DueDate"];
-                    hasDueDate = true;
+                    bHasChangedDueDate = true;
                 }
                 else
                 {
@@ -309,9 +318,8 @@ namespace EPMLiveReportsAdmin
                 Guid ItemID = _listItem.UniqueId;
                 // "work" fields -- END
 
-                //Save/Process "work" (a.k.a. assignment) fields
-                if (blnWorkSaved && hasWork && hasAssignedTo && hasStartDate && hasDueDate)
-                {
+                if (blnWorkSaved && bHasChangedWork && bHasChangedAssignedTo && bHasChangedStartDate && bHasChangedDueDate)
+                {  
                     if (!_myWorkReportData.ProcessAssignments(sWork.Replace("'", ""), sAssignedTo, StartDate, DueDate, ListID, SiteID, _listItem.ID, _listItem.ParentList.Title)) // - CAT.NET false-positive: All single quotes are escaped/removed.
                     {
                         _myWorkReportData.LogStatus(string.Empty, string.Empty, "SaveWork() failed.", _myWorkReportData.GetError().Replace("'", ""), 2, 3, string.Empty); // - CAT.NET false-positive: All single quotes are escaped/removed.

@@ -109,8 +109,7 @@ namespace EPMLiveReportsAdmin
 
         public ListBiz CreateListBiz(Guid listId, ListItemCollection fields)
         {
-
-            return ListBiz.CreateNewMapping(_siteId, listId, fields);
+            return ListBiz.CreateNewMapping(_siteId, listId, fields, false);
         }
 
         /// <summary>
@@ -120,7 +119,8 @@ namespace EPMLiveReportsAdmin
         /// <returns></returns>
         public ListBiz CreateListBiz(Guid listId)
         {
-            return ListBiz.CreateNewMapping(_siteId, listId);
+            var fields = new ListItemCollection();
+            return ListBiz.CreateNewMapping(_siteId, listId, fields, true);
         }
 
         public DataRow SAccountInfo(Guid webAppId)

@@ -1256,25 +1256,86 @@ namespace EPMLiveReportsAdmin
 
         public string GetListNames()
         {
-            string sLists = string.Empty;
+            var sLists = string.Empty;
+            var lLists = new List<string>();
             //Command = "SELECT ListName FROM RPTList WHERE SiteId ='" + _siteID + "'";
-            Command = "SELECT ListName FROM RPTList WHERE SiteId =@siteId";
-            AddParam("@siteId", _siteID);
-            DataTable dtLists = GetTable(GetClientReportingConnection);
+            //Command = "SELECT ListName FROM RPTList WHERE SiteId =@siteId";
+            //AddParam("@siteId", _siteID);
+            //DataTable dtLists = GetTable(GetClientReportingConnection);
 
-            if (dtLists != null && dtLists.Rows.Count > 0)
+            //if (dtLists != null && dtLists.Rows.Count > 0)
+            //{
+            //    foreach (DataRow list in dtLists.Rows)
+            //    {
+            //        sLists = sLists + list["ListName"].ToString() + ",";
+            //    }
+            //}
+
+            SPSecurity.RunWithElevatedPrivileges(() =>
             {
-                foreach (DataRow list in dtLists.Rows)
+                using (var s = new SPSite(_siteID))
                 {
-                    sLists = sLists + list["ListName"].ToString() + ",";
+                    foreach (SPWeb w in s.AllWebs)
+                    {
+                        foreach (SPList l in w.Lists)
+                        {
+                            var evts = GetListEvents(l,
+                                                    "EPMLiveReportsAdmin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b90e532f481cf050",
+                                                    "EPMLiveReportsAdmin.ListEvents",
+                                                    new List<SPEventReceiverType> { SPEventReceiverType.ItemAdded, 
+                                                                                    SPEventReceiverType.ItemUpdated, 
+                                                                                    SPEventReceiverType.ItemDeleting });
+
+                            if (evts.Count > 0 && !lLists.Contains(l.Title))
+                            {
+                                lLists.Add(l.Title);
+                                continue;
+                            }
+
+                            var mwEvts = GetListEvents(l,
+                                                    "EPMLiveReportsAdmin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b90e532f481cf050",
+                                                    "EPMLiveReportsAdmin.MyWorkListEvents",
+                                                    new List<SPEventReceiverType> { SPEventReceiverType.ItemAdded, 
+                                                                                    SPEventReceiverType.ItemUpdated, 
+                                                                                    SPEventReceiverType.ItemDeleting });
+
+                            if (mwEvts.Count > 0 && !lLists.Contains(l.Title))
+                            {
+                                lLists.Add(l.Title);
+                            }
+                        }
+
+                        if (w != null)
+                        {
+                            w.Dispose();
+                        }
+                    }
                 }
+            });
+
+            sLists = string.Join(",", lLists.ToArray());
+
+            return sLists;
+        }
+
+        private List<SPEventReceiverDefinition> GetListEvents(SPList list, string assemblyName, string className, List<SPEventReceiverType> types)
+        {
+            List<SPEventReceiverDefinition> evts = new List<SPEventReceiverDefinition>();
+
+            try
+            {
+                evts = (from e in list.EventReceivers.OfType<SPEventReceiverDefinition>()
+                        where e.Assembly.Equals(assemblyName, StringComparison.CurrentCultureIgnoreCase) &&
+                              e.Class.Equals(className, StringComparison.CurrentCultureIgnoreCase) &&
+                              types.Contains(e.Type)
+                        select e).ToList<SPEventReceiverDefinition>();
+            }
+            catch
+            {
+
             }
 
-            if (sLists.EndsWith(","))
-            {
-                sLists = sLists.Remove(sLists.LastIndexOf(","));
-            }
-            return sLists;
+            return evts;
         }
 
         public bool LogStatus(string RPTListID, string sListName, string sShortMsg, string sLongMsg, int iLevel, int iType, string timerjobguid)
