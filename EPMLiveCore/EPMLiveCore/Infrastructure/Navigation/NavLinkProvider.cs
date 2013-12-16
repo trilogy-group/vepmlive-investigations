@@ -30,7 +30,7 @@ namespace EPMLiveCore.Infrastructure.Navigation
             {
                 using (SPWeb spWeb = spSite.OpenWeb(webId))
                 {
-                    RelativeUrl = spWeb.ServerRelativeUrl;
+                    RelativeUrl = spWeb.SafeServerRelativeUrl();
                     Url = spWeb.Url;
                     UserId = spWeb.CurrentUser.ID;
                     Web = spWeb;
