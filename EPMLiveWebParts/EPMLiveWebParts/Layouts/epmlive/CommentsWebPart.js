@@ -920,6 +920,11 @@ function GetData() {
 
                                 setTimeout(function () { $('#aNewCommentReply' + itemId).fadeIn(1500); }, 0);
                             }
+
+                            if ($('#commentsWebPartMainContainer') &&
+                                $('#commentsWebPartMainContainer').height() > 600) {
+                                $('#commentsWebPartMainContainer').slimScroll({ height: defaultHeight, size: '10px', wheelStep: 5 });
+                            }
                         }
                     },
                     error: function (e) {
@@ -1028,6 +1033,11 @@ function GetData() {
                                                        
 
                                     $('#callout_' + responseJson.Result.Comments.PublicCommentItem['@listId'] + '_' + responseJson.Result.Comments.PublicCommentItem['@itemId']).append(newCommentBox);
+                                }
+
+                                if ($('#commentsWebPartMainContainer') &&
+                                $('#commentsWebPartMainContainer').height() > 600) {
+                                    $('#commentsWebPartMainContainer').slimScroll({ height: defaultHeight, size: '10px', wheelStep: 5 });
                                 }
 
                                 var iid = responseJson.Result.Comments.PublicCommentItem['@itemId'];
@@ -1268,11 +1278,15 @@ function GetData() {
             }
 
             $('.commentsWPMainContainer').mouseleave(function () {
-                $(this).siblings('.slimScrollBar').css('display', 'none');
+                $(this).siblings('.slimScrollBar').fadeOut('fast');
             });
 
             $('.commentsWPMainContainer').mouseover(function () {
-                $(this).siblings('.slimScrollBar').css('display', 'block');
+                var divSlim = $(this).siblings('.slimScrollBar');
+                if (divSlim.offsetHeight < divSlim.scrollHeight) {
+                    divSlim.fadeIn('fast');
+                }
+                //$(this).siblings('.slimScrollBar').css('display', 'block');
             });
 
         });
