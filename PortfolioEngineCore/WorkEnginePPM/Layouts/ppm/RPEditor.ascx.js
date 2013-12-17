@@ -997,7 +997,8 @@
                             {
                                 items: [
                                     { type: "text", name: "Show Me:" },
-                                    { type: "select", id: "idViewTab_DisplayedValues", onchange: "dialogEvent('ViewTab_DisplayedValues_Changed');", width: "100px" }
+                                    { type: "select", id: "idViewTab_DisplayedValues", onchange: "dialogEvent('ViewTab_DisplayedValues_Changed');", width: "100px" } //,
+                                    //{ type: "smallbutton", id: "CheckPlan", name: "Check Plan", img: "import.png", tooltip: "Check Plan", onclick: "dialogEvent('EditorTab_CheckPlan');" }
                                 ]
                             }
                         ]
@@ -1813,6 +1814,59 @@
         if (value == null)
             return 0;
         return value;
+    };
+    RPEditor.prototype.ValidatePlanRowPeriodConversion = function (grid, row) {
+        for (var c = 0; c < grid.ColNames[2].length; c++) {
+            var col = grid.ColNames[2][c];
+            var sType = col.substring(0, 1);
+            if (sType == "Q") {
+                if (this.ValidatePeriodConversion(grid, row, col) != true)
+                    return false;
+            }
+        }
+        return true;
+    }
+
+    RPEditor.prototype.CheckValuesEqual = function (v1, v2, diff) {
+        var z = v1 - v2;
+        if (z < -diff || z > diff)
+            return false;
+        return true;
+    }
+    RPEditor.prototype.ValidatePeriodConversion = function (grid, row, col) {
+        var sId = col.substring(1);
+        var ccruid = grid.GetAttribute(row, null, "CCRole_UID");
+        var fteconv = this.GetFTEConv(ccruid, sId);
+        if (fteconv == null) { alert("ValidatePeriodConversion : null fte conversion"); return false; }
+        var valueH = grid.GetAttribute(row, "H" + sId);
+        var valueF = grid.GetAttribute(row, "F" + sId);
+        if (valueH == null || valueF == null) {
+            if (valueH != valueF) {
+                //alert("ValidatePeriodConversion : null H or F value conversion");
+                return false;
+            }
+        }
+        else {
+            if (this.CheckValuesEqual(parseInt(valueF) * fteconv, parseInt(valueH) * 10000, 20000) == false) {
+                //alert("ValidatePeriodConversion : value H does not convert to value F");
+                return false;
+            }
+        }
+        var valueh = grid.GetAttribute(row, "h" + sId);
+        var valuef = grid.GetAttribute(row, "f" + sId);
+        if (valueh == null || valuef == null) {
+            if (valueh != valuef) {
+                //alert("ValidatePeriodConversion : null H or F value conversion");
+                return false;
+            }
+        }
+        else {
+            if (this.CheckValuesEqual(parseInt(valuef) * fteconv, parseInt(valueh) * 10000, 20000) == false) {
+                //alert("ValidatePeriodConversion : value h does not convert to value f");
+                return false;
+            }
+        }
+        return true
     };
     RPEditor.prototype.SetPeriodValue = function (grid, row, col, dbl) {
         var sId = col.substring(1);
@@ -2830,6 +2884,9 @@
                         this.ExecuteJSON(sbd.toString());
                     }
                     break;
+                //case "EditorTab_CheckPlan":
+                //    window.setTimeout(thisID + ".CheckPlanFTEConversions()", 100);
+                //    break;
                 case "EditorTab_Public":
                     if (this.editorTab.isItemDisabled("PublicBtn") == true)
                         alert("A private plan row must be selected");
@@ -4058,6 +4115,7 @@
         return true;
     };
     RPEditor.prototype.CheckPlanResDepts = function () {
+        this.CheckPlanFTEConversions();
         var plangrid = Grids["g_RPE"];
         var planrow = plangrid.GetFirst(null, 0);
         var idSelect = document.getElementById("idSelectPlanResources");
@@ -4087,6 +4145,20 @@
         }
         if (idSelect.options.length > 0)
             this.DisplayDialog(20, 30, 430, 315, "Invalid Resources", "winInvalidResDeptsDlg", "idInvalidResDeptsDlg", true, true);
+    };
+    RPEditor.prototype.CheckPlanFTEConversions = function () {
+        var plangrid = Grids["g_RPE"];
+        var planrow = plangrid.GetFirst(null, 0);
+        var idSelect = document.getElementById("idSelectPlanResources");
+        while (planrow != null) {
+            if (this.ValidatePlanRowPeriodConversion(plangrid, planrow) == false)
+            {
+                alert("Invalid Hours or FTE.\n\nAt least one period value does not match the current FTE Conversion Factor.\n\nPlease report this problem to your System Administrator.");
+                return;
+            }
+            planrow = plangrid.GetNext(planrow);
+        }
+        
     };
     RPEditor.prototype.HasChanges = function () {
         var grid = Grids["g_RPE"];
