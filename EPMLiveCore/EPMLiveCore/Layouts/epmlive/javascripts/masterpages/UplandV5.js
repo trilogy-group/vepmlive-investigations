@@ -200,6 +200,37 @@
             }
         };
 
+        var monitorGridMessages = function() {
+            if (Grids) {
+                try {
+                    Grids.OnDebug = function(grid, level, message) {
+                        if (message[1].indexOf('from different TreeGrid version, it can cause problems or errors. Always use (or modify)') !== -1) {
+                            var clearLog = function() {
+                                var debugWindow = document.getElementById('_TreeGridDebug');
+
+                                if (debugWindow) {
+                                    debugWindow.innerHTML = '';
+                                    debugWindow.style.display = 'none';
+
+                                    document.getElementById('_TreeGridDebugButtons').style.display = 'none';
+                                    Grids.DebugHidden = 1;
+
+                                    console.log(message[1]);
+                                } else {
+                                    window.setTimeout(function() {
+                                        clearLog();
+                                    }, 1);
+                                }
+                            };
+
+                            clearLog();
+                        }
+                    };
+                } catch(e) {
+                }
+            }
+        };
+
         window.fixGridMenus = function() {
             window.setTimeout(function() {
                 $('.js-callout-mainElement').each(function() {
@@ -220,6 +251,10 @@
         configureSearchBox();
         addUpdateProfilePicLink();
         configureTooltips();
+
+        window.setTimeout(function() {
+            monitorGridMessages();
+        }, 2000);
     };
 
     ExecuteOrDelayUntilScriptLoaded(epmLiveTweaks, 'jquery.min.js');
