@@ -173,31 +173,31 @@ function registerEpmLiveResourceGridScript() {
             filteringOn: true,
             groupingOn: true,
 
-            showColumnSelector: function () {
+            showColumnSelector: function() {
                 this.g().ActionShowColumns('Selectable');
             },
 
-            hideRow: function (rowId) {
+            hideRow: function(rowId) {
                 var grid = this.g();
                 grid.HideRow(grid.GetRowById(rowId));
             },
 
-            showRow: function (rowId) {
+            showRow: function(rowId) {
                 var grid = this.g();
                 grid.ShowRow(grid.GetRowById(rowId));
             },
 
-            hideFilters: function () {
+            hideFilters: function() {
                 this.hideRow('Filter');
                 this.filteringOn = false;
             },
 
-            showFilters: function () {
+            showFilters: function() {
                 this.showRow('Filter');
                 this.filteringOn = true;
             },
 
-            hideGrouping: function () {
+            hideGrouping: function() {
                 var grid = this.g();
                 var rowId = null;
 
@@ -219,7 +219,7 @@ function registerEpmLiveResourceGridScript() {
                 }
             },
 
-            showGrouping: function () {
+            showGrouping: function() {
                 var grid = this.g();
                 var rowId = null;
 
@@ -241,49 +241,31 @@ function registerEpmLiveResourceGridScript() {
                 }
             },
 
-            toggleFiltering: function () {
+            toggleFiltering: function() {
                 if (this.filteringOn) {
                     this.hideFilters();
                 } else {
                     this.showFilters();
                 }
 
-                window.setTimeout(function () {
-                    var g = $$.grid.grids[$$.id()];
-                    g.Update();
-                    g.Render();
-                }, 10);
-
                 return this.filteringOn;
             },
 
-            toggleGrouping: function () {
+            toggleGrouping: function() {
                 if (this.groupingOn) {
                     this.hideGrouping();
                 } else {
                     this.showGrouping();
                 }
 
-                window.setTimeout(function () {
-                    var g = $$.grid.grids[$$.id()];
-                    g.Update();
-                    g.Render();
-                }, 10);
-
                 return this.groupingOn;
             },
 
-            removeSorting: function () {
+            removeSorting: function() {
                 this.g().ChangeSort('Title');
-
-                window.setTimeout(function () {
-                    var g = $$.grid.grids[$$.id()];
-                    g.Update();
-                    g.Render();
-                }, 10);
             },
 
-            resetNoDataRow: function () {
+            resetNoDataRow: function() {
                 var gridTable = $('#' + $$.id())[0];
 
                 if (gridTable) {
@@ -299,21 +281,21 @@ function registerEpmLiveResourceGridScript() {
                 }
             },
 
-            reload: function () {
+            reload: function() {
                 var url = window.location.href.replace(new RegExp('&epmrgv=' + $$.epmrgv, 'gi'), '').replace(new RegExp('epmrgv=' + $$.epmrgv, 'gi'), '');
                 url = (url + (url.indexOf('?') !== -1 ? '&' : '?') + 'epmrgv=' + $$.views.currentView.id).replace(new RegExp('&&', 'g'), '&');
                 window.location = url;
             },
 
-            rowsSelected: function () {
+            rowsSelected: function() {
                 try {
                     return $$.grid.grids[$$.id()].GetSelRows().length;
-                } catch (e) {
+                } catch(e) {
                     return 0;
                 }
             },
 
-            resourceUpdated: function (result, target, params) {
+            resourceUpdated: function(result, target, params) {
                 if (result !== 1) return;
 
                 var grid = $$.grid.grids[$$.id()];
@@ -349,7 +331,7 @@ function registerEpmLiveResourceGridScript() {
                     contentType: 'application/json; charset=utf-8',
                     dataType: 'json',
 
-                    success: function (response) {
+                    success: function(response) {
                         if (response.d) {
                             var responseJson = $$$.parseJson(response.d);
 
@@ -359,10 +341,12 @@ function registerEpmLiveResourceGridScript() {
                                 grid.Render();
                                 grid.Update();
 
+                                $$.grid.fixIE();
+
                                 if (changeType === 'Added') {
                                     $$.actions.reIndexResources();
                                 }
-                            } catch (e) {
+                            } catch(e) {
                                 $$$.log(error);
                             }
                         } else {
@@ -370,10 +354,27 @@ function registerEpmLiveResourceGridScript() {
                         }
                     },
 
-                    error: function (error) {
+                    error: function(error) {
                         $$$.log(error);
                     }
                 });
+            },
+
+            fixIE: function() {
+                try {
+                    if ($.browser.msie) {
+                        for (var i = 0; i <= 30; i++) {
+                            window.setTimeout(function() {
+                                var g = $$.grid.g();
+                                g.Update();
+                                
+                                g.SetScrollTop(grid.GetScrollTop() + 2);
+                                g.SetScrollTop(grid.GetScrollTop() - 2);
+                            }, i * 100);
+                        }
+                    }
+                } catch(e) {
+                }
             }
         };
 
@@ -643,13 +644,14 @@ function registerEpmLiveResourceGridScript() {
                         grid.Update();
                     }
 
-                    grid.MoveCol(colName, col.section, 1, 0);
+                    grid.MoveCol(colName, 0, 1, 0);
 
                     allCols.push(colName);
                 }
 
                 grid.Update();
                 grid.Render();
+                grid.Update();
 
                 var groupCols = grid.Group.split(',');
 
@@ -725,8 +727,8 @@ function registerEpmLiveResourceGridScript() {
 
                 grid.DoGrouping(view.grouping || null);
 
-                grid.Update();
                 grid.Render();
+                grid.Update();
 
                 $$.actions.myResourcesOn = false;
 
@@ -745,8 +747,6 @@ function registerEpmLiveResourceGridScript() {
 
                 window.setTimeout(function () {
                     var g = $$.grid.g();
-                    g.Update();
-                    g.Render();
 
                     $('.EPMLiveResourceGridGroup').click(function (event) {
                         try {
@@ -778,6 +778,8 @@ function registerEpmLiveResourceGridScript() {
                         } catch (e) {
                         }
                     });
+                    
+                    $$.grid.fixIE();
                 }, 10);
             },
 
@@ -1166,6 +1168,9 @@ function registerEpmLiveResourceGridScript() {
                                         epmLiveResourceGrid.loaderStopped = true;
                                     }
                                 }
+
+                                $$.grid.fixIE();
+
                             } catch (ex) {
                             }
                         }, 750);
@@ -1592,12 +1597,6 @@ function registerEpmLiveResourceGridScript() {
                     grid.ChangeFilter('IsMyResource', '1', 1, 0, 1, null);
                     $$.actions.myResourcesOn = true;
                 }
-
-                window.setTimeout(function () {
-                    var g = $$.grid.grids[$$.id()];
-                    g.Update();
-                    g.Render();
-                }, 500);
             },
 
             hideEasyScroll: function (refresh) {
@@ -1768,29 +1767,18 @@ function registerEpmLiveResourceGridScript() {
             }
         };
 
-        window.Grids.OnExpand = function (grid, row) {
+        window.Grids.OnExpand = function(grid, row) {
             if ($.browser.msie) {
-            window.setTimeout(function () {
-                    grid.Render();
+                window.setTimeout(function () {
                     grid.Update();
-                    grid.Render();
-
-                    window.setTimeout(function () {
-                        grid.Render();
-                        grid.Update();
-                        grid.Render();
-                        grid.Render();
-
-                        grid.SetScrollTop(grid.GetScrollTop() + 2);
-                        grid.SetScrollTop(grid.GetScrollTop() - 2);
-                    }, 200);
-
-                }, 200);
+                    grid.SetScrollTop(grid.GetScrollTop() + 2);
+                    grid.SetScrollTop(grid.GetScrollTop() - 2);
+                }, 4000);
             }
         };
 
         window.Grids.OnColumnsChanged = function (grid, cols, count) {
-            var lastCol = grid.GetLastCol("1");
+            var lastCol = grid.GetLastCol('0');
 
             for (var col in cols) {
                 if (cols[col]) {
@@ -1872,13 +1860,8 @@ function registerEpmLiveResourceGridScript() {
                 if (newHeight !== 0) {
                     grid.MaxVScroll += newHeight;
                     $$.winHeight = height;
-
-                    grid.Update();
                 }
             });
-
-            grid.Update();
-            grid.Render();
 
             window.setTimeout(function () { $$.actions.loadRibbon(); }, 1500);
 
