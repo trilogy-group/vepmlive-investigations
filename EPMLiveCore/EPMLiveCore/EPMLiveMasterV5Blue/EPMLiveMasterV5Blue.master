@@ -116,7 +116,8 @@
 	         window.open(link);
 	     }
         </script>	
-	
+
+	<link href='/_layouts/15/epmlive/stylesheets/masterpages/upland.icons.min.css' rel='stylesheet' type='text/css'>
 </head>
 <body>
   <SharePoint:ImageLink runat="server"/>
