@@ -341,6 +341,8 @@
 
 <asp:Panel ID="pnlMain" runat="server">
 
+    <%=timerString %>
+
 <script language="javascript">
 
     window.onbeforeunload = LeavePage;

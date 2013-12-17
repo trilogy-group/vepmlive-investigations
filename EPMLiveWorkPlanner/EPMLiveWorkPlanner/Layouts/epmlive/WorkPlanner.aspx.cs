@@ -96,8 +96,18 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
 
         protected string CanLinkExternal = "false";
 
+        protected EPMLiveCore.TimeDebug tb;
+        protected string timerString;
+
+        protected override void OnInit(EventArgs e)
+        {
+            tb = new EPMLiveCore.TimeDebug("WorkPlanner", Request["debug"]);
+        }
+
         protected void getFields(SPWeb web)
         {
+            tb.AddTimer();
+
             SPList lstTaskCenter = web.Lists[sListTaskCenter];
 
             try
@@ -188,12 +198,14 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
 
             sBaselineFields = sbBFields.ToString().Trim(',');
 
+            tb.StopTimer();
         }
 
        
 
         protected void getAttachedLists(SPWeb web, string listid)
         {
+            tb.AddTimer();
             /*foreach(SPList list in web.Lists)
             {
                 foreach(SPField field in list.Fields)
@@ -250,12 +262,12 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
 
             sAttachedLists = sAttachedLists.Trim(',');
             sAttachedDocLibs = sAttachedDocLibs.Trim(',');
-
+            tb.StopTimer();
         }
 
         protected void processRollups(WorkPlannerAPI.PlannerProps props)
         {
-
+            tb.AddTimer();
             PlannerCore.WorkPlannerProperties wps = props.wpFields;
 
             for(int i = 0; i < wps.count(); i++)
@@ -273,10 +285,12 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
             }
             sRollUp = sRollUp.Trim(',');
             sRollDown = sRollDown.Trim(',');
+            tb.StopTimer();
         }
 
         private void setDefault(SPWeb web)
         {
+            tb.AddTimer();
             try
             {
                 SPSecurity.RunWithElevatedPrivileges(delegate()
@@ -307,11 +321,12 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                 });
             }
             catch { }
+            tb.StopTimer();
         }
 
         private bool hasChildParent(SPWeb web, string listid, string itemid)
         {
-
+            tb.AddTimer();
             try
             {
                 SPList list = web.Lists[new Guid(listid)];
@@ -334,11 +349,12 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                 catch { }
             }
             catch { }
+            tb.StopTimer();
             return false;
         }
         private bool checkParentChild(SPWeb web, string listid, string itemid)
         {
-
+            tb.AddTimer();
             bool disable = false;
 
 
@@ -396,9 +412,10 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                     pnlParentChild.Visible = true;
                     sPlannerName = "Choose Item";
                 }
-
+                tb.StopTimer();
                 return isPCItem;
             }
+            tb.StopTimer();
             return false;
         }
 
@@ -410,6 +427,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
 
         private void LoadDefaults(SPList oList)
         {
+            tb.AddTimer();
             if(oList != null && !String.IsNullOrEmpty(sItemID))
             {
                 try
@@ -423,10 +441,12 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                 }
                 catch { }
             }
+            tb.StopTimer();
         }
 
         private bool iCheckParams(SPWeb web, SPWeb lWeb)
         {
+            tb.AddTimer();
             SPList oList = null;
             SPList oTaskList = null;
             sWebId = web.ID.ToString();
@@ -598,7 +618,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                 sListTaskCenter = EPMLiveCore.CoreFunctions.getConfigSetting(lWeb, "EPMLivePlanner" + sPlannerID + "TaskCenter");
             }
 
-
+            tb.StopTimer();
 
             if(!String.IsNullOrEmpty(sPlannerID) && !String.IsNullOrEmpty(sProjectListId) && !String.IsNullOrEmpty(sItemID) && !String.IsNullOrEmpty(sProjectType) && !String.IsNullOrEmpty(sTaskListId))
             {
@@ -668,6 +688,8 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
 
         private bool checkParams(SPWeb web)
         {
+            tb.AddTimer();
+
             switch(Request["Planner"])
             {
                 case "MSProject":
@@ -714,7 +736,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                         }
                     }
                 });
-
+                tb.StopTimer();
                 return check;
 
             }
@@ -869,8 +891,16 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
             return sb;
         }
 
+        protected void GetResourceList(SPWeb web)
+        {
+            tb.AddTimer();
+            sResourceList = PlannerCore.getResourceList("<Team ListId='" + sProjectListId + "' ItemId='" + sItemID + "'><Columns>Title</Columns></Team>", web);
+            tb.StopTimer();
+        }
+
         protected void Page_Load(object sender, EventArgs e)
         {
+            tb.AddTimer();
             EPMLiveCore.Act act = new EPMLiveCore.Act(Web);
 
             activation = act.CheckFeatureLicense(EPMLiveCore.ActFeature.WorkPlanner);
@@ -1203,7 +1233,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                         //    {
                         //        using(SPWeb tWeb = tSite.OpenWeb(web.ID))
                         //        {
-                                    sResourceList = PlannerCore.getResourceList("<Team ListId='" + sProjectListId + "' ItemId='" + sItemID + "'/>", web);
+                        GetResourceList(web);
                         //        }
                         //    }
                         //});
@@ -1278,10 +1308,14 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                     }
                 }
             }
+            tb.StopTimer();
+            if(Request["debug"] == "true")
+                timerString = tb.GetHtml();
         }
 
         protected override void OnPreRender(EventArgs e)
         {
+            tb.AddTimer();
             base.OnPreRender(e);
            
 
@@ -1293,7 +1327,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                 }
                 AddTabEvents();
             }
-
+            tb.StopTimer();
             
         }
 
