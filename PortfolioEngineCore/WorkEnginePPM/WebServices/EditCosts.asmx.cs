@@ -2156,6 +2156,7 @@ Exit_Function:
                 string sName = period.Name;
                 m_xHeader1.CreateStringAttr("P" + sId + "Span", "4");
                 m_xHeader1.CreateStringAttr("P" + sId, " " + sName);
+                m_xHeader1.CreateStringAttr("C" + sId, " " + sName);
 
                 m_xHeader2.CreateStringAttr("P" + sId, "");
                 m_xHeader2.CreateStringAttr("Q" + sId, " Qty ");
@@ -2210,6 +2211,7 @@ Exit_Function:
             {
                 m_xHeader1.CreateStringAttr("PQSpan", "3");
                 m_xHeader1.CreateStringAttr("PQ", " Full Totals");
+                m_xHeader1.CreateStringAttr("TC", " Full Totals");
 
                 m_xHeader2.CreateStringAttr("TQ", " Qty ");
                 m_xHeader2.CreateStringAttr("TC", " Cost ");
