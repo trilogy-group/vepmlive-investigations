@@ -1280,7 +1280,7 @@ namespace EPMLiveCore
         {
             try
             {
-                return Response.Success(ResourceGrid.GetResourcePoolViews(data));
+                return Response.Success(ResourceGrid.GetResourcePoolViews(data, oWeb));
             }
             catch (APIException ex)
             {
@@ -1297,7 +1297,7 @@ namespace EPMLiveCore
         {
             try
             {
-                return Response.Success(ResourceGrid.SaveResourcePoolViews(data));
+                return Response.Success(ResourceGrid.SaveResourcePoolViews(data, oWeb));
             }
             catch (APIException ex)
             {
@@ -1314,7 +1314,7 @@ namespace EPMLiveCore
         {
             try
             {
-                return Response.Success(ResourceGrid.DeleteResourcePoolViews(data));
+                return Response.Success(ResourceGrid.DeleteResourcePoolViews(data, oWeb));
             }
             catch (APIException ex)
             {
@@ -1331,7 +1331,7 @@ namespace EPMLiveCore
         {
             try
             {
-                return Response.Success(ResourceGrid.UpdateResourcePoolViews(data));
+                return Response.Success(ResourceGrid.UpdateResourcePoolViews(data, oWeb));
             }
             catch (APIException ex)
             {

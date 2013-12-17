@@ -758,8 +758,9 @@ namespace EPMLiveCore.API
         ///     Deletes the resource pool views.
         /// </summary>
         /// <param name="data">The data.</param>
+        /// <param name="web"></param>
         /// <returns></returns>
-        internal static string DeleteResourcePoolViews(string data)
+        internal static string DeleteResourcePoolViews(string data, SPWeb web)
         {
             try
             {
@@ -775,6 +776,8 @@ namespace EPMLiveCore.API
                         }
                     }
                 }
+
+                ClearCache(web);
 
                 return "<ResourcePoolViews/>";
             }
@@ -994,34 +997,14 @@ namespace EPMLiveCore.API
         ///     Gets the resource pool views.
         /// </summary>
         /// <param name="data">The data.</param>
+        /// <param name="web"></param>
         /// <returns></returns>
-        internal static string GetResourcePoolViews(string data)
+        internal static string GetResourcePoolViews(string data, SPWeb web)
         {
             try
             {
-                var viewsXml = new XElement("Views");
-
-                using (var gridViewManagerFactory = new GridViewManagerFactory())
-                {
-                    foreach (
-                        GridViewManagerKind gridViewManagerKind in
-                            new[] {GridViewManagerKind.Global, GridViewManagerKind.Personal})
-                    {
-                        using (
-                            IGridViewManager gridViewManager = gridViewManagerFactory.MakeGridViewManager(
-                                COMPONENT_NAME, gridViewManagerKind))
-                        {
-                            gridViewManager.Initialize();
-
-                            foreach (GridView gridView in gridViewManager.List)
-                            {
-                                viewsXml.Add(XDocument.Parse(gridView.Definition).Root);
-                            }
-                        }
-                    }
-                }
-
-                return new XElement("ResourcePoolViews", viewsXml).ToString();
+                return ((byte[]) CacheStore.Current.Get(GetCacheKey(web, "Views"),
+                    new CacheStoreCategory(web).ResourceGrid, () => GetViews().Zip()).Value).Unzip();
             }
             catch (APIException)
             {
@@ -1031,6 +1014,33 @@ namespace EPMLiveCore.API
             {
                 throw new APIException((int) Errors.GetResourcePoolViews, e.Message);
             }
+        }
+
+        private static string GetViews()
+        {
+            var viewsXml = new XElement("Views");
+
+            using (var gridViewManagerFactory = new GridViewManagerFactory())
+            {
+                foreach (
+                    GridViewManagerKind gridViewManagerKind in
+                        new[] {GridViewManagerKind.Global, GridViewManagerKind.Personal})
+                {
+                    using (
+                        IGridViewManager gridViewManager = gridViewManagerFactory.MakeGridViewManager(
+                            COMPONENT_NAME, gridViewManagerKind))
+                    {
+                        gridViewManager.Initialize();
+
+                        foreach (GridView gridView in gridViewManager.List)
+                        {
+                            viewsXml.Add(XDocument.Parse(gridView.Definition).Root);
+                        }
+                    }
+                }
+            }
+
+            return new XElement("ResourcePoolViews", viewsXml).ToString();
         }
 
         /// <summary>
@@ -1095,8 +1105,9 @@ namespace EPMLiveCore.API
         ///     Saves the resource pool views.
         /// </summary>
         /// <param name="data">The data.</param>
+        /// <param name="web"></param>
         /// <returns></returns>
-        internal static string SaveResourcePoolViews(string data)
+        internal static string SaveResourcePoolViews(string data, SPWeb web)
         {
             try
             {
@@ -1118,6 +1129,8 @@ namespace EPMLiveCore.API
                     }
                 }
 
+                ClearCache(web);
+
                 return "<ResourcePoolViews/>";
             }
             catch (APIException)
@@ -1134,8 +1147,9 @@ namespace EPMLiveCore.API
         ///     Updates the resource pool views.
         /// </summary>
         /// <param name="data">The data.</param>
+        /// <param name="web"></param>
         /// <returns></returns>
-        internal static string UpdateResourcePoolViews(string data)
+        internal static string UpdateResourcePoolViews(string data, SPWeb web)
         {
             try
             {
@@ -1151,6 +1165,8 @@ namespace EPMLiveCore.API
                         }
                     }
                 }
+
+                ClearCache(web);
 
                 return "<ResourcePoolViews/>";
             }

@@ -1818,6 +1818,42 @@
                                                                                 window.epmLiveNavigation.addFavoriteWSMenu($p);
                                                                             }
                                                                         });
+                                                                        
+                                                                        var nlId = '#' + nl.id;
+                                                                        
+                                                                        var workspaces = [];
+                                                                        var wsGraph = {};
+                                                                        var $ws;
+                                                                        var ws = $(nlId).text();
+
+                                                                        $($(nlId).parents('ul')[0]).find('li').each(function () {
+                                                                            var $w = $(this);
+                                                                            var w = $w.text();
+
+                                                                            if (w !== ws) {
+                                                                                workspaces.push(w);
+                                                                                wsGraph[w] = $w;
+                                                                            } else {
+                                                                                $ws = $w;
+                                                                            }
+                                                                        });
+
+                                                                        workspaces.sort();
+
+                                                                        var moved = false;
+
+                                                                        for (var i = 0; i < workspaces.length; i++) {
+                                                                            if (!moved) {
+                                                                                var w = workspaces[i];
+
+                                                                                if (w > ws) {
+                                                                                    $ws.insertBefore(wsGraph[w]);
+                                                                                    $ws.removeClass('rtLast');
+                                                                                    $($($ws.parents('ul')[0]).find('li:last')[0]).addClass('rtLast');
+                                                                                    moved = true;
+                                                                                }
+                                                                            }
+                                                                        }
                                                                     }
 
                                                                     break;
