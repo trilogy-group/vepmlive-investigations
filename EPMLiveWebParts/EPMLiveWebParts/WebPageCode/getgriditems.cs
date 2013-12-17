@@ -812,7 +812,7 @@ namespace EPMLiveWebParts
                             if (bUseReporting)
                             {
 
-                                if (field.Type == SPFieldType.User || field.Type == SPFieldType.Lookup)
+                                if (field.Type == SPFieldType.User || field.Type == SPFieldType.Lookup || field.TypeAsString == "FilteredLookup")
                                 {
                                     try
                                     {
@@ -3380,13 +3380,16 @@ namespace EPMLiveWebParts
 
                                 SPField field = getRealField(list.Fields.GetFieldByInternalName(groupby));
                                 //string newgroup = getField(li, groupby, true);
+                                string newgroup = "";
 
-                                if (bUseReporting && (field.Type == SPFieldType.Lookup || field.Type == SPFieldType.User))
+                                if (bUseReporting && (field.Type == SPFieldType.Lookup || field.Type == SPFieldType.User || field.TypeAsString == "FilteredLookup"))
                                 {
-                                    groupby += "Text";
+                                    newgroup = dr[groupby + "Text"].ToString();
                                 }
+                                else if (dr.Table.Columns.Contains(groupby))
+                                    newgroup = dr[groupby].ToString();
 
-                                string newgroup = dr[groupby].ToString();
+                                
                                 try
                                 {
                                     newgroup = formatField(newgroup, groupby, dr, true);
@@ -5634,8 +5637,16 @@ namespace EPMLiveWebParts
                                 else
                                     val += ", " + lv.LookupValue;
                             }
-                            if (val.Length > 2)
-                                val = val.Substring(2);
+                            if (group)
+                            {
+                                if (val.Length > 1)
+                                    val = val.Substring(1);
+                            }
+                            else
+                            {
+                                if (val.Length > 2)
+                                    val = val.Substring(2);
+                            }
                         }
                     }
                     else
@@ -5668,25 +5679,30 @@ namespace EPMLiveWebParts
             switch (spfield.Type)
             {
                 case SPFieldType.User:
-
-                    if (spfield.GetFieldValue(val).GetType().ToString() == "Microsoft.SharePoint.SPFieldUserValue")
+                    if (bUseReporting && group)
                     {
-                        SPFieldUserValue uv = (SPFieldUserValue)spfield.GetFieldValue(val);
-                        val = "";
-                        val += "<a href=\"" + dr["SiteUrl"].ToString() + "/_layouts/userdisp.aspx?ID=" + uv.LookupId.ToString() + "\">" + uv.LookupValue + "</a>";
+                        return val.Replace(",", "\n");
                     }
                     else
                     {
-                        SPFieldUserValueCollection uvc = (SPFieldUserValueCollection)spfield.GetFieldValue(val);
-                        val = "";
-                        foreach (SPFieldUserValue uv in uvc)
+                        if (spfield.GetFieldValue(val).GetType().ToString() == "Microsoft.SharePoint.SPFieldUserValue")
                         {
-                            val += "; <a href=\"" + dr["SiteUrl"].ToString() + "/_layouts/userdisp.aspx?ID=" + uv.LookupId.ToString() + "\">" + uv.LookupValue + "</a>";
+                            SPFieldUserValue uv = (SPFieldUserValue)spfield.GetFieldValue(val);
+                            val = "";
+                            val += "<a href=\"" + dr["SiteUrl"].ToString() + "/_layouts/userdisp.aspx?ID=" + uv.LookupId.ToString() + "\">" + uv.LookupValue + "</a>";
                         }
-                        if (val.Length > 1)
-                            val = val.Substring(2);
+                        else
+                        {
+                            SPFieldUserValueCollection uvc = (SPFieldUserValueCollection)spfield.GetFieldValue(val);
+                            val = "";
+                            foreach (SPFieldUserValue uv in uvc)
+                            {
+                                val += "; <a href=\"" + dr["SiteUrl"].ToString() + "/_layouts/userdisp.aspx?ID=" + uv.LookupId.ToString() + "\">" + uv.LookupValue + "</a>";
+                            }
+                            if (val.Length > 1)
+                                val = val.Substring(2);
+                        }
                     }
-
                     //SPFieldUserValueCollection uvc = new SPFieldUserValueCollection(list.ParentWeb, val);
                     //val = "";
                     //foreach (SPFieldUserValue uv in uvc)
@@ -5814,6 +5830,16 @@ namespace EPMLiveWebParts
                         val = list.Fields[spfield.Id].GetFieldValueAsText(val);
                     break;
                 default:
+                    if (group)
+                    {
+                        if (spfield.TypeAsString == "FilteredLookup")
+                        {
+                            if (bUseReporting && group)
+                            {
+                                return val.Replace(",", "\n");
+                            }
+                        }
+                    }
                     if (spfield.TypeAsString == "TotalRollup")
                     {
                         try

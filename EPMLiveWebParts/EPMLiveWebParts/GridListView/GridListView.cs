@@ -3258,7 +3258,7 @@ namespace EPMLiveWebParts
 
             output.Write("function printgrid" + sFullGridId + "() {var temp = mygrid" + sFullGridId + ".hdr.rows[2];var parent = temp.parentNode;parent.removeChild(temp,true);mygrid" + sFullGridId + ".printView();parent.appendChild(temp);}");
 
-            output.Write("function switchFilterLoad" + sFullGridId + "(){mygrid" + sFullGridId + ".switchFilter();}");
+            output.Write("function switchFilterLoad" + sFullGridId + "(){mygrid" + sFullGridId + ".switchFilter();mygrid" + sFullGridId + ".setSizes();}");
             output.Write("</script>");
 
             output.WriteLine("<script>");
