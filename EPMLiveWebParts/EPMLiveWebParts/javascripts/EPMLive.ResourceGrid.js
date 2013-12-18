@@ -363,13 +363,19 @@ function registerEpmLiveResourceGridScript() {
             fixIE: function() {
                 try {
                     if ($.browser.msie) {
-                        for (var i = 0; i <= 30; i++) {
+                        var fix = function() {
+                            var g = $$.grid.g();
+                            g.Update();
+
+                            g.SetScrollTop(grid.GetScrollTop() + 2);
+                            g.SetScrollTop(grid.GetScrollTop() - 2);
+
+                            g.Update();
+                        };
+                        
+                        for (var i = 0; i <= 50; i++) {
                             window.setTimeout(function() {
-                                var g = $$.grid.g();
-                                g.Update();
-                                
-                                g.SetScrollTop(grid.GetScrollTop() + 2);
-                                g.SetScrollTop(grid.GetScrollTop() - 2);
+                                fix();
                             }, i * 100);
                         }
                     }
@@ -1773,6 +1779,7 @@ function registerEpmLiveResourceGridScript() {
                     grid.Update();
                     grid.SetScrollTop(grid.GetScrollTop() + 2);
                     grid.SetScrollTop(grid.GetScrollTop() - 2);
+                    grid.Update();
                 }, 4000);
             }
         };
