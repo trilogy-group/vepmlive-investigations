@@ -4999,7 +4999,7 @@
             if (parentstatus != const_Project) {
                 var isPrivate = plangrid.GetAttribute(parentplanrow, null, "Private");
                 // if commitment row still private then don't worry about dept match
-                if (isPrivate != 1 || parentstatus != const_Commitment) {
+                if (isPrivate != 1 || parentstatus != const_Commitment || parentIsGeneric == true) {
                     var resdeptUid = resgrid.GetAttribute(resrow, null, "Dept_UID");
                     if (plandeptUid != resdeptUid) {
                         alert("Departments must match");
