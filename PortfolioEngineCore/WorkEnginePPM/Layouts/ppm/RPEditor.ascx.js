@@ -997,8 +997,7 @@
                             {
                                 items: [
                                     { type: "text", name: "Show Me:" },
-                                    { type: "select", id: "idViewTab_DisplayedValues", onchange: "dialogEvent('ViewTab_DisplayedValues_Changed');", width: "100px" } //,
-                                    //{ type: "smallbutton", id: "CheckPlan", name: "Check Plan", img: "import.png", tooltip: "Check Plan", onclick: "dialogEvent('EditorTab_CheckPlan');" }
+                                    { type: "select", id: "idViewTab_DisplayedValues", onchange: "dialogEvent('ViewTab_DisplayedValues_Changed');", width: "100px" }
                                 ]
                             }
                         ]
@@ -1909,12 +1908,6 @@
         grid.SetAttribute(row, null, "Changed", 1, 0, 0);
         if (status == const_Requirement)
             this.CalculateRequirementCellValue(row, sId, 0);
-        else {
-            var reqrow = this.GetParentRequirement(row);
-            if (reqrow != null) {
-                this.CalculateRequirementCellValue(reqrow, sId, 0);
-            }
-        }
     };
     RPEditor.prototype.FormatHours = function (grid, row, col, bFulfillmentMode, bEditMode) {
         var sId = col.substring(1);
@@ -1925,20 +1918,6 @@
             sTotal = NumberToString(total / 100, const_HoursFormat);
             if (bEditMode == true)
                 return sTotal;
-            if (sTotal != "") {
-                var hours = grid.GetAttribute(row, "H" + sId);
-                if (hours != null) {
-                    lhours = parseInt(hours) / 100;
-                    if (lhours != 0) {
-                        sValue = NumberToString(lhours, const_HoursFormat);
-                    }
-                }
-                if (sValue == "")
-                    sValue = sTotal;
-                else
-                    sValue = sTotal + " | " + sValue;
-            }
-            return sValue;
         }
         var lHours = 0;
         var Hours = grid.GetAttribute(row, "H" + sId);
@@ -1958,12 +1937,12 @@
                     sValue += "(" + NumberToString(lHours, const_HoursFormat) + ")";
             }
         }
-        //if (sTotal != "") {
-        //    if (sValue == "")
-        //        sValue = sTotal;
-        //    else
-        //        sValue = sTotal + " | " + sValue;
-        //}
+        if (sTotal != "") {
+            if (sValue == "")
+                sValue = sTotal;
+            else
+                sValue = sTotal + " | " + sValue;
+        }
         return sValue;
     };
     RPEditor.prototype.FormatFTE = function (grid, row, col, bFulfillmentMode, bEditMode) {
@@ -2687,11 +2666,6 @@
             if (resrow != null) this.RefreshResourceRowPeriods(resgrid, resrow, true);
             if (pendingresrow != null) this.RefreshResourceRowPeriods(resgrid, pendingresrow, true);
             plangrid.RefreshRow(planrow);
-            var reqrow = this.GetParentRequirement(planrow);
-            if (reqrow != null) {
-                this.UpdatePlanRowCalculatedValues(reqrow, 0);
-                this.RefreshPlanRowPeriods(plangrid, reqrow, true);
-            }
         }
         catch (e) {
             this.HandleException("CommitPlanRow - " + event, e);
@@ -2884,9 +2858,6 @@
                         this.ExecuteJSON(sbd.toString());
                     }
                     break;
-                //case "EditorTab_CheckPlan":
-                //    window.setTimeout(thisID + ".CheckPlanFTEConversions()", 100);
-                //    break;
                 case "EditorTab_Public":
                     if (this.editorTab.isItemDisabled("PublicBtn") == true)
                         alert("A private plan row must be selected");
@@ -4151,14 +4122,13 @@
         var planrow = plangrid.GetFirst(null, 0);
         var idSelect = document.getElementById("idSelectPlanResources");
         while (planrow != null) {
-            if (this.ValidatePlanRowPeriodConversion(plangrid, planrow) == false)
-            {
+            if (this.ValidatePlanRowPeriodConversion(plangrid, planrow) == false) {
                 alert("Invalid Hours or FTE.\n\nAt least one period value does not match the current FTE Conversion Factor.\n\nPlease report this problem to your System Administrator.");
                 return;
             }
             planrow = plangrid.GetNext(planrow);
         }
-        
+
     };
     RPEditor.prototype.HasChanges = function () {
         var grid = Grids["g_RPE"];
@@ -4311,11 +4281,11 @@
         if (this.HasChanges() == true) {
             this.editorTab.enableItem("SavePlanBtn");
             this.viewTab.enableItem("SavePlanBtn2");
-            //this.dirty = true;
+            this.dirty = true;
         } else {
             this.editorTab.disableItem("SavePlanBtn");
             this.viewTab.disableItem("SavePlanBtn2");
-            //this.dirty = false;
+            this.dirty = false;
         }
 
         var grid = Grids["g_RPE"];
@@ -4486,6 +4456,7 @@
         select.options[select.options.length] = new Option("Hours", 0, true, false);
         select.options[select.options.length] = new Option("FTE", 1, false, false);
         select.options[select.options.length] = new Option("FTE Percent", 2, false, false);
+        //select.options[select.options.length] = new Option("FTE Conversion", 3, false, false);
         this.viewTab.refreshSelect("idViewTab_DisplayedValues");
 
         try { grid.CalcWidth("Res_Names", 0); } catch (e) { }
@@ -5284,26 +5255,16 @@
             if (deleted != 1) {
                 var Value; var value;
                 Value = this.GetIntValue(plangrid.GetAttribute(row, null, "H" + sId), null);
-                if (Value != null) {
-                    if (tH == null) tH = Value; else tH += Value;
-                }
+                if (Value != null) { if (tH == null) tH = Value; else tH += Value; }
                 value = this.GetIntValue(plangrid.GetAttribute(row, null, "h" + sId), null);
-                if (value == null)
-                    value = Value;
-                if (value != null) {
-                    if (th == null) th = value; else th += value;
-                }
+                if (value == null) value = Value;
+                if (value != null) { if (th == null) th = value; else th += value; }
 
                 Value = this.GetIntValue(plangrid.GetAttribute(row, null, "F" + sId), null);
-                if (Value != null) {
-                    if (tF == null) tF = Value; else tF += Value;
-                }
+                if (Value != null) { if (tF == null) tF = Value; else tF += Value; }
                 value = this.GetIntValue(plangrid.GetAttribute(row, null, "f" + sId), null);
-                if (value == null)
-                    value = Value;
-                if (value != null) {
-                    if (tf == null) tf = value; else tf += value;
-                }
+                if (value == null) value = Value;
+                if (value != null) { if (tf == null) tf = value; else tf += value; }
             }
             row = row.nextSibling;
         }
@@ -5311,13 +5272,17 @@
         var F; var f;
         switch (calcMode) {
             case 1: // Initial - calculate the totals. NB there is only one set of totals
-                h = this.GetIntValue(plangrid.GetAttribute(reqrow, null, "H" + sId), null);
+                h = this.GetIntValue(plangrid.GetAttribute(reqrow, null, "h" + sId), null);
+                if (h == null)
+                    h = this.GetIntValue(plangrid.GetAttribute(reqrow, null, "H" + sId), null);
                 var totalHours = h;
-                if (tH != null) totalHours += tH;
+                if (th != null) totalHours += th;
                 plangrid.SetAttribute(reqrow, null, "t" + sId, totalHours, 0, 0);
-                f = this.GetIntValue(plangrid.GetAttribute(reqrow, null, "F" + sId), null);
+                f = this.GetIntValue(plangrid.GetAttribute(reqrow, null, "f" + sId), null);
+                if (f == null)
+                    f = this.GetIntValue(plangrid.GetAttribute(reqrow, null, "F" + sId), null);
                 var totalFTE = f;
-                if (tF != null) totalFTE += tF;
+                if (tf != null) totalFTE += tf;
                 plangrid.SetAttribute(reqrow, null, "u" + sId, totalFTE, 0, 0);
                 break;
             case 2: // Convert commitment to Fulfillment
@@ -5343,7 +5308,6 @@
                 if (tH != null) remHours -= tH;
                 var remhours = reqHours;
                 if (th != null) remhours -= th;
-                
                 plangrid.SetAttribute(reqrow, null, "H" + sId, remHours, 0, 0);
                 plangrid.SetAttribute(reqrow, null, "h" + sId, remhours, 0, 0);
 
@@ -5357,14 +5321,11 @@
                 plangrid.SetAttribute(reqrow, null, "F" + sId, remFte, 0, 0);
                 plangrid.SetAttribute(reqrow, null, "f" + sId, remfte, 0, 0);
 
-                if (!this.CompareIntValues(H, remHours) || !this.CompareIntValues(F, remFte)) {
+                if (H != remHours || h != remhours || F != remFte || f != remfte) {
                     plangrid.SetAttribute(reqrow, null, "Changed", 1, 0, 0);
                 }
                 break;
         }
-    };
-    RPEditor.prototype.CompareIntValues = function (value1, value2) {
-        return (this.GetIntValue(value1, 0) == this.GetIntValue(value2, 0));
     };
     RPEditor.prototype.GetIntValue = function (value, defaultvalue) {
         if (isNaN(value))
@@ -5650,7 +5611,7 @@
         this.ResourcesSelectMode = 0;
         this.initialized = false;
         this.ribbonDataInitialized = false;
-        //this.dirty = false;
+        this.dirty = false;
         this.isLoaded = false;
         this.isClosed = false;
         this.ScrollMasterGridId = null;
