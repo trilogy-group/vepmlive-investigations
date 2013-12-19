@@ -12,28 +12,26 @@
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <TargetOfficeVersion>15.0</TargetOfficeVersion>
     <FileAlignment>512</FileAlignment>
-    <ProjectTypeGuids>{C1CDDADD-2546-481F-9697-4EA41081F2FC};{14822709-B5A1-4724-98CA-57A101D1B079};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <ActiveDeploymentConfiguration>SP 13 Deploy</ActiveDeploymentConfiguration>
+    <ProjectTypeGuids>{BB1F664B-9266-4fd6-B973-E1E44974B511};{14822709-B5A1-4724-98CA-57A101D1B079};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <ActiveDeploymentConfiguration>Default</ActiveDeploymentConfiguration>
     <SandboxedSolution>False</SandboxedSolution>
     <SccProjectName>SAK</SccProjectName>
     <SccLocalPath>SAK</SccLocalPath>
     <SccAuxPath>SAK</SccAuxPath>
     <SccProvider>SAK</SccProvider>
-    <PostDeploymentCommand>
-      "C:\Workspace\Upland\EPM Live\EPM Live Utilities\SPSolutionManager\SPSolutionManager\bin\Debug\SPSolutionManager.exe" -a Install -s EPMLiveCore -p "C:\Workspace\Upland\EPM Live\EPMLive2013\EPMLiveCore\EPMLiveCore\bin\Debug\"
-      "C:\Program Files %28x86%29\Microsoft SDKs\Windows\v8.0A\Bin\NETFX 4.0 Tools\x64\gacutil.exe" /i "C:\Workspace\Upland\EPM Live\EPMLive2013\EPMLiveCore\EPMLiveCore\bin\Debug\EPM Live Core.dll" /f
-      iisreset
-      net stop "WETimer"
-      net start "WETimer"
-    </PostDeploymentCommand>
-    <PreDeploymentCommand>
-      "C:\Workspace\Upland\EPM Live\EPM Live Utilities\SPSolutionManager\SPSolutionManager\bin\Debug\SPSolutionManager.exe" -a Uninstall -s EPMLiveCore
-      "C:\Program Files %28x86%29\Microsoft SDKs\Windows\v8.0A\Bin\NETFX 4.0 Tools\x64\gacutil.exe" /u "EPM Live Core" /f
-    </PreDeploymentCommand>
+    <PostDeploymentCommand>"C:\Workspace\Upland\EPM Live\EPM Live Utilities\SPSolutionManager\SPSolutionManager\bin\Debug\SPSolutionManager.exe" -a Install -s EPMLiveCore -p "C:\Workspace\Upland\EPM Live\EPMLive2013\EPMLiveCore\EPMLiveCore\bin\Debug\"
+"C:\Program Files %28x86%29\Microsoft SDKs\Windows\v8.0A\Bin\NETFX 4.0 Tools\x64\gacutil.exe" /i "C:\Workspace\Upland\EPM Live\EPMLive2013\EPMLiveCore\EPMLiveCore\bin\Debug\EPM Live Core.dll" /f
+iisreset
+net stop "WETimer"
+net start "WETimer"</PostDeploymentCommand>
+    <PreDeploymentCommand>"C:\Workspace\Upland\EPM Live\EPM Live Utilities\SPSolutionManager\SPSolutionManager\bin\Debug\SPSolutionManager.exe" -a Uninstall -s EPMLiveCore
+"C:\Program Files %28x86%29\Microsoft SDKs\Windows\v8.0A\Bin\NETFX 4.0 Tools\x64\gacutil.exe" /u "EPM Live Core" /f</PreDeploymentCommand>
     <ProjectMode>SharePointCustomization</ProjectMode>
-    <FileUpgradeFlags>0</FileUpgradeFlags>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
     <OldToolsVersion>4.0</OldToolsVersion>
-    <UpgradeBackupLocation>C:\Workspace\Upland\EPM Live\EPMLive2013\EPMLiveCore\Backup2\</UpgradeBackupLocation>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <IncludeAssemblyInPackage>True</IncludeAssemblyInPackage>
     <PublishUrl>publish\</PublishUrl>
@@ -108,12 +106,6 @@
     <Reference Include="Microsoft.SharePoint.WorkflowActions, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="Microsoft.Web.CommandUI, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL" />
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>..\..\Libraries\Newtonsoft.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="RestSharp">
-      <HintPath>..\..\Libraries\RestSharp.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
@@ -417,7 +409,6 @@
     <Compile Include="Jobs\EPMLiveUpgrade\Infrastructure\UpgradeStep.cs" />
     <Compile Include="Jobs\EPMLiveUpgrade\Infrastructure\UpgradeUtilities.cs" />
     <Compile Include="Jobs\EPMLiveUpgrade\Steps\44Steps.cs" />
-    <Compile Include="Jobs\EPMLiveUpgrade\Steps\55Steps.cs" />
     <Compile Include="Jobs\EPMLiveUpgrade\Steps\GenericSteps.cs" />
     <Compile Include="Jobs\EPMLiveUpgrade\Steps\OptIn\55Steps.cs" />
     <Compile Include="Jobs\EPMLiveUpgrade\Upgrader.cs" />
@@ -846,13 +837,6 @@
     </Compile>
     <Compile Include="Layouts\epmlive\Integration\gotoremote.aspx.designer.cs">
       <DependentUpon>gotoremote.aspx.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Layouts\epmlive\Integration\gotoremoteframe.aspx.cs">
-      <DependentUpon>gotoremoteframe.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Layouts\epmlive\Integration\gotoremoteframe.aspx.designer.cs">
-      <DependentUpon>gotoremoteframe.aspx.cs</DependentUpon>
     </Compile>
     <Compile Include="Layouts\epmlive\Integration\IntegrationList.aspx.cs">
       <DependentUpon>IntegrationList.aspx</DependentUpon>
@@ -2312,6 +2296,7 @@
     <Content Include="Images\inprogress.png" />
     <Content Include="Images\IssueRisk.png" />
     <Content Include="Images\ITWE.PNG" />
+    <Content Include="Images\ji_viewissue.png" />
     <Content Include="Images\Low Priority.GIF" />
     <Content Include="Images\LTWE.png" />
     <Content Include="Images\menualertsmall.gif" />
@@ -3350,7 +3335,6 @@
     <Content Include="Layouts\epmlive\images\mewa_right.gif" />
     <Content Include="Layouts\epmlive\images\moreoptions.png" />
     <Content Include="Layouts\epmlive\images\navigation\collapse.png" />
-    <Content Include="Layouts\epmlive\images\navigation\expand-collapse-sprite.png" />
     <Content Include="Layouts\epmlive\images\navigation\expand.png" />
     <Content Include="Layouts\epmlive\images\navigation\notch.png" />
     <Content Include="Layouts\epmlive\images\navigation\search-white.png" />
@@ -3381,7 +3365,6 @@
     <Content Include="Layouts\epmlive\images\ribbon16.png" />
     <Content Include="Layouts\epmlive\images\ribbon32.png" />
     <Content Include="Layouts\epmlive\images\right.GIF" />
-    <Content Include="Layouts\epmlive\images\screens.png" />
     <Content Include="Layouts\epmlive\images\scrollto.gif" />
     <Content Include="Layouts\epmlive\images\search.png" />
     <Content Include="Layouts\epmlive\images\settings\Advanced.png" />
@@ -3417,7 +3400,6 @@
     <Content Include="Layouts\epmlive\Integration\Delete.aspx" />
     <Content Include="Layouts\epmlive\Integration\EditFields.aspx" />
     <Content Include="Layouts\epmlive\Integration\gotoremote.aspx" />
-    <Content Include="Layouts\epmlive\Integration\gotoremoteframe.aspx" />
     <Content Include="Layouts\epmlive\Integration\IntegrationList.aspx" />
     <Content Include="Layouts\epmlive\Integration\Log.aspx" />
     <Content Include="Layouts\epmlive\Integration\Manage.aspx" />
@@ -3538,12 +3520,8 @@
     <Content Include="Layouts\epmlive\stylesheets\buttons.css" />
     <Content Include="Layouts\epmlive\stylesheets\controls\navigation\epmnav.chrome.css" />
     <Content Include="Layouts\epmlive\stylesheets\controls\navigation\epmnav.chrome.min.css" />
-    <Content Include="Layouts\epmlive\stylesheets\controls\navigation\epmnav.css">
-      <DependentUpon>epmnav.less</DependentUpon>
-    </Content>
-    <Content Include="Layouts\epmlive\stylesheets\controls\navigation\epmnav.min.css">
-      <DependentUpon>epmnav.less</DependentUpon>
-    </Content>
+    <Content Include="Layouts\epmlive\stylesheets\controls\navigation\epmnav.css" />
+    <Content Include="Layouts\epmlive\stylesheets\controls\navigation\epmnav.min.css" />
     <Content Include="Layouts\epmlive\stylesheets\fonts\FlatUIIcons\Flat-UI-Icons.svg" />
     <Content Include="Layouts\epmlive\stylesheets\fonts\IcoMoon\icomoon-ultimate.svg" />
     <Content Include="Layouts\epmlive\stylesheets\fonts\OpenSans\OpenSans-Light-webfont.svg" />
@@ -3925,7 +3903,6 @@
     <Content Include="UplandV5\Elements.xml" />
     <Content Include="ViewPermissions\Elements.xml" />
     <Content Include="ViewSelectorDelegate\Elements.xml" />
-    <Content Include="Web References\WorkEngineSolutionStoreListSvc\lists.disco" />
     <Content Include="WorkEngineActivation\Elements.xml" />
     <Content Include="WorkEngineApps\Elements.xml" />
     <Content Include="WorkEngineApps\Schema.xml" />
@@ -3937,7 +3914,6 @@
     <Content Include="WorkgroupAdministration\Elements.xml" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Integrations\Jira\" />
     <Folder Include="Layouts\epmlive\TreeGrid\ChartWizard\" />
   </ItemGroup>
   <ItemGroup>
@@ -4075,28 +4051,14 @@
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
   </PropertyGroup>
   <Import Project="$(VSToolsPath)\SharePointTools\Microsoft.VisualStudio.SharePoint.targets" Condition="'$(VSToolsPath)' != ''" />
-  <ProjectExtensions>
-    <VisualStudio>
-      <FlavorProperties GUID="{C1CDDADD-2546-481F-9697-4EA41081F2FC}">
-        <DeploymentConfigurations>
-          <DeploymentConfiguration Name="SP 13 Deploy">
-            <DeploymentSteps>Microsoft.VisualStudio.SharePoint.PreDeploymentCommand;Microsoft.VisualStudio.SharePoint.PostDeploymentCommand</DeploymentSteps>
-            <RetractionSteps>Microsoft.VisualStudio.SharePoint.PreDeploymentCommand</RetractionSteps>
-          </DeploymentConfiguration>
-        </DeploymentConfigurations>
-      </FlavorProperties>
-    </VisualStudio>
-  </ProjectExtensions>
+  <ProjectExtensions />
   <PropertyGroup>
-    <PreBuildEvent>
-      del "$(TargetDir)$(TargetName).XmlSerializers.dll"
-      del "$(ProjectDir)$(TargetName).XmlSerializers.dll"
-    </PreBuildEvent>
+    <PreBuildEvent>del "$(TargetDir)$(TargetName).XmlSerializers.dll"
+del "$(ProjectDir)$(TargetName).XmlSerializers.dll"</PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-    <PostBuildEvent>
-      "C:\Program Files (x86)\Microsoft SDKs\Windows\v8.0A\Bin\NETFX 4.0 Tools\x64\gacutil.exe" /i "C:\Workspace\Upland\EPM Live\EPMLive2013\EPMLiveCore\EPMLiveCore\bin\Debug\EPM Live Core.dll" /f
-      iisreset
-    </PostBuildEvent>
+    <PostBuildEvent>"C:\Program Files (x86)\Microsoft SDKs\Windows\v8.0A\Bin\NETFX 4.0 Tools\x64\gacutil.exe" /i "C:\Workspace\Upland\EPM Live\EPMLive2013\EPMLiveCore\EPMLiveCore\bin\Debug\EPM Live Core.dll" /f
+iisreset
+</PostBuildEvent>
   </PropertyGroup>
 </Project>

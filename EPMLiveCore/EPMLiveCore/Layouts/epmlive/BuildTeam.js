@@ -99,7 +99,7 @@ function AddResource() {
         }
 
 
-        if (tGrid.GetValue(oTRow, "Generic") != "1")
+        if (tGrid.GetValue(oTRow, "Generic") != "1" && tGrid.GetValue(oTRow, "Generic") != "Yes")
             tGrid.SetValue(oTRow, "Permissions", perms.join(';'), 1, 0);
 
         tGrid.SetValue(oTRow, "Title", rGrid.GetValue(oSRow, "Title"), 1, 0);
