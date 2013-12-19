@@ -257,9 +257,9 @@ namespace EPMLiveWebParts.Layouts.epmlive
 
                             ProcessNotifications(web);
                             ProcessTimerJob(web);
-                            ProcessReportingRefreshJob(web);
                             ProcessBackEndLists(web);
                             ProcessGroups(web, w.CurrentUser);
+                            ProcessReportingRefreshJob(web);
                             ProcessExcel(web);
                             ProcessLists(web);
                             ProcessIzenda(web);
