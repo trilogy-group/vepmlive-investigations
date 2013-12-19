@@ -1754,7 +1754,7 @@ namespace EPMLiveWebParts
 
             }
 
-            if (SPContext.Current.ViewContext.View != null && list.ID == SPContext.Current.List.ID)
+            if (SPContext.Current.ViewContext.View != null && list != null && list.ID == SPContext.Current.List.ID)
             {
 
                 AddContextualTab();
