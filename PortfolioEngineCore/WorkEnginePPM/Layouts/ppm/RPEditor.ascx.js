@@ -481,17 +481,18 @@
             var i = 0;
             var cblabel = document.getElementById('idWorkItemLabel_' + i);
             var cb = document.getElementById('idWorkItem_' + i);
+            var projectID = plangrid.GetAttribute(this.planrow, null, "Project_UID");
+            var projectRow = this.FindProjectRow(projectID);
             while (cb != null) {
                 if (cb.checked == true && cblabel.style.display != "none") {
                     var resource = this.importWorkResources[i];
                     var WResID = resource.WResID;
-                    var planrow = this.FindChildPlanRow(this.planrow, resource.WResID);
+                    var planrow = this.FindChildPlanRow(projectRow, resource.WResID);
                     if (planrow == null) {
-                        var projectID = plangrid.GetAttribute(this.planrow, null, "Project_UID");
-                        var projectName = plangrid.GetAttribute(this.planrow, null, "Project_Name");
+                        var projectName = plangrid.GetAttribute(projectRow, null, "Project_Name");
                         var resrows = [];
                         resrows[0] = this.FindResourceRow(WResID);
-                        planrow = this.AddRowsToPlan(this.planrow, resrows, projectID, projectName, false);
+                        planrow = this.AddRowsToPlan(projectRow, resrows, projectID, projectName, false);
                         bChanges = true;
                     }
                     var colhours = [];
