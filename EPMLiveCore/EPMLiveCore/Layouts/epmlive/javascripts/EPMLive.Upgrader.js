@@ -14,7 +14,7 @@
     };
 
     window.upgradeEpmLive = function (version) {
-        if (window.epmLive && window.epmLive.currentWebUrl) {
+        if (window.epmLive && window.epmLive.currentWebUrl !== null) {
             if (window.epmLiveUpgradeEnabled) {
                 var options = { url: window.epmLive.currentWebUrl + '/_layouts/15/epmlive/PerformUpgrade.aspx?V=' + version, width: 500, height: 250, showClose: true };
                 SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
