@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net;
+using EPMLiveCore.Infrastructure;
 using EPMLiveCore.Jobs.EPMLiveUpgrade.Infrastructure;
 using Microsoft.SharePoint;
 
@@ -54,8 +55,10 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
 
                             using (var webClient = new WebClient())
                             {
-                                byte[] bytes = webClient.DownloadData(_storeUrl + "/Upgrade/" + SETTINGS_LIST.ToLower() + ".stp");
-                                SPFile file = catalog.RootFolder.Files.Add(SETTINGS_LIST.Replace(" ", "_") + "_55.stp", bytes, true);
+                                byte[] bytes =
+                                    webClient.DownloadData(_storeUrl + "/Upgrade/" + SETTINGS_LIST.ToLower() + ".stp");
+                                SPFile file = catalog.RootFolder.Files.Add(SETTINGS_LIST.Replace(" ", "_") + "_55.stp",
+                                    bytes, true);
                                 SPListItem li = file.GetListItem();
                                 li["Title"] = TEMPLATE_NAME;
                                 li.SystemUpdate();
@@ -98,6 +101,14 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
             catch (Exception e)
             {
                 LogMessage(e.Message, MessageKind.FAILURE, 2);
+            }
+            finally
+            {
+                try
+                {
+                    CacheStore.Current.RemoveSafely(Web.Url, new CacheStoreCategory(Web).Navigation);
+                }
+                catch { }
             }
 
             return true;
