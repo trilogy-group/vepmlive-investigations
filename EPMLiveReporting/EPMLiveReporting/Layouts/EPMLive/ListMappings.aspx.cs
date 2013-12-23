@@ -11,7 +11,7 @@ using System.Data.SqlClient;
 using System.Collections;
 using EPMLiveReportsAdmin.Properties;
 
-namespace EPMLiveReportsAdmin.Layouts.EPMLive 
+namespace EPMLiveReportsAdmin.Layouts.EPMLive
 {
     public partial class ListMappings : LayoutsPageBase, IPostBackEventHandler
     {
@@ -39,13 +39,25 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
         string _SSlistguid;
         int _SSpctComplete;
         bool _SSqueued;
+        private bool reportingV2Enabled = false;
+        string[] _ArrayListNames;
 
         protected void Page_Init(object sender, EventArgs e)
         {
             try
             {
+                try
+                {
+                    reportingV2Enabled = Convert.ToBoolean(EPMLiveCore.CoreFunctions.getConfigSetting(SPContext.Current.Site.RootWeb, "reportingV2"));
+                }
+                catch (Exception)
+                {
+                    reportingV2Enabled = false;
+                    SPContext.Current.Site.RootWeb.AllowUnsafeUpdates = true;
+                    EPMLiveCore.CoreFunctions.setConfigSetting(SPContext.Current.Site.RootWeb, "reportingV2", "false");
+                }
                 _DAO = new EPMData(SPContext.Current.Site.ID);
-                var rb = new ReportBiz(SPContext.Current.Site.ID);
+                var rb = new ReportBiz(SPContext.Current.Site.ID, SPContext.Current.Web.ID, reportingV2Enabled);
 
                 if (!rb.SiteExists())
                 {
@@ -116,14 +128,14 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
 
             try
             {
-                if(web.CurrentUser.IsSiteAdmin)
+                if (web.CurrentUser.IsSiteAdmin)
                 {
                     SqlCommand cmd = new SqlCommand("SELECT ClientUsername, ClientPassword, DatabaseServer, DatabaseName from RPTDATABASES where SiteId=@SiteId", cn);
                     cmd.Parameters.AddWithValue("@SiteId", web.Site.ID);
                     SqlDataReader dr = cmd.ExecuteReader();
-                    if(dr.Read())
+                    if (dr.Read())
                     {
-                        if(!dr.IsDBNull(0))
+                        if (!dr.IsDBNull(0))
                         {
 
                             string sCn = "Data Source=" + dr.GetString(2) + ";Initial Catalog=" + dr.GetString(3);
@@ -151,14 +163,65 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
             catch { }
         }
 
+        private void LoadLists(DataTable tbl)
+        {
+            int iIndex = 0;
+            _ArrayListNames = new string[tbl.Rows.Count];
+            foreach (DataRow row in tbl.Rows)
+            {
+                _ArrayListNames[iIndex] = row["ListName"].ToString();
+                iIndex++;
+            }
+        }
+        private bool IsReportingList(string sListName)
+        {
+            bool isRep = false;
+            foreach (string s in _ArrayListNames)
+            {
+                if (s.Equals(sListName, StringComparison.CurrentCultureIgnoreCase))
+                {
+                    isRep = true;
+                    break;
+                }
+            }
+            return isRep;
+        }
+
         private void FillData()
         {
+            string reportingListIDs = string.Empty;
             var siteId = SPContext.Current.Site.ID;
+
             var rd = new ReportData(siteId);
-            var mappings = rd.GetListMappings().DefaultView;
-            GridView1.DataSource = mappings;
-            GridView1.DataBind();
-            rd.Dispose();
+            EPMData daoEPMData = new EPMData(siteId);
+            LoadLists(rd.GetListMappings());
+            
+            string defaultLists = daoEPMData.DefaultLists(SPContext.Current.Web);
+            string _DefaultLists = CoreFunctions.getConfigSetting(SPContext.Current.Web, "EPMLiveFixLists").Replace("\r\n", ",");
+
+            DataTable dtReportData = new DataTable();
+            using (var spSite = new SPSite(SPContext.Current.Site.ID))
+            {
+                using (var spweb = spSite.OpenWeb(SPContext.Current.Web.ID))
+                {
+                    SPListCollection lists = spweb.Lists;
+                    foreach (SPList list in lists)
+                    {
+                        if ((!list.Hidden && IsReportingList(list.Title)) || defaultLists.Contains(list.Title) || _DefaultLists.Contains(list.Title))
+                        {
+                            reportingListIDs += "'" + list.ID + "',";
+                        }
+                    }
+
+                    if (!string.IsNullOrEmpty(reportingListIDs))
+                        reportingListIDs = reportingListIDs.Substring(0, reportingListIDs.Length - 1);
+
+                    var mappings = rd.GetListMappings(reportingListIDs).DefaultView;
+                    GridView1.DataSource = mappings;
+                    GridView1.DataBind();
+                    rd.Dispose();
+                }
+            }
         }
 
         protected void AddList_Click(object sender, EventArgs e)
@@ -181,7 +244,7 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
                     break;
 
                 case "delete":
-                    var reportBiz = new ReportBiz(SPContext.Current.Site.ID);
+                    var reportBiz = new ReportBiz(SPContext.Current.Site.ID, SPContext.Current.Web.ID, reportingV2Enabled);
                     Guid listId = new Guid(param);
                     _DAO.Command = "SELECT TableName FROM RPTList WHERE RPTListID=@RPTListID";
                     _DAO.AddParam("@RPTListID", param);

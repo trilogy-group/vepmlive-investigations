@@ -370,7 +370,7 @@ namespace EPMLiveCore.Layouts.epmlive
                     }
 
                     // display reporting section dynamically
-                    ReportBiz reportBiz = new ReportBiz(SPContext.Current.Site.ID);
+                    ReportBiz reportBiz = new ReportBiz(SPContext.Current.Site.ID, SPContext.Current.Web.ID, false);
                     if (reportBiz.SiteExists())
                     {
                         ifsEnableReporting.Visible = true;
@@ -425,7 +425,7 @@ namespace EPMLiveCore.Layouts.epmlive
 
         private Dictionary<string, string> GetAvailableParentSiteLookups(SPList list, GridGanttSettings gSettings)
         {
-            var result = new Dictionary<string, string> {{"None", "None"}};
+            var result = new Dictionary<string, string> { { "None", "None" } };
             string[] LookupArray = gSettings.Lookups.Split('|');
             foreach (string sLookup in LookupArray)
             {

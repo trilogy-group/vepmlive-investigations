@@ -10,8 +10,9 @@ namespace EPMLiveReportsAdmin
     public sealed class ReportBiz
     {
         private readonly Guid _siteId;
+        private readonly Guid _webId;
         private readonly Guid _webAppId;
-
+        private readonly bool _reportingV2Enabled;
         private string _webTitle = string.Empty;
 
         public string WebTitle
@@ -39,6 +40,13 @@ namespace EPMLiveReportsAdmin
         public ReportBiz(Guid siteId)
         {
             _siteId = siteId;
+        }
+
+        public ReportBiz(Guid siteId, Guid webId, bool reportingV2Enabled)
+        {
+            _siteId = siteId;
+            _webId = webId;
+            _reportingV2Enabled = reportingV2Enabled;
         }
 
         public ReportBiz(Guid siteId, Guid webAppId)

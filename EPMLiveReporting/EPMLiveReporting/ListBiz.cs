@@ -194,6 +194,7 @@ namespace EPMLiveReportsAdmin
 
         public static ListBiz CreateNewMapping(Guid siteId, Guid listId, ListItemCollection fields, bool isAuto)
         {
+            string webIdWithoutHyphen = string.Empty;
             SPList spList = null;
             SPUser user = null;
             using (var site = new SPSite(siteId))
@@ -216,6 +217,7 @@ namespace EPMLiveReportsAdmin
                             {
                                 try
                                 {
+                                    webIdWithoutHyphen = ew.ID.ToString().Replace("-", "");
                                     spList = ew.Lists[listId];
                                 }
                                 catch { }
@@ -236,6 +238,8 @@ namespace EPMLiveReportsAdmin
                     }
                 });
             }
+            var automatic = ListBiz.AutomaticFields;
+            var required = ListBiz.RequiredResourceFields;
 
             var lb = new ListBiz();
             lb._siteId = siteId;
@@ -245,6 +249,23 @@ namespace EPMLiveReportsAdmin
             ColumnDefCollection columns = ColumnDef.GetDefaultColumns();
             ColumnDefCollection columnsSnapshot = ColumnDef.GetDefaultColumnsSnapshot();
             var matches = 0;
+
+            foreach (SPField field in spList.Fields)
+            {
+                if (!field.Hidden &&
+                    field.Type != SPFieldType.Computed &&
+                    !automatic.Contains(field.InternalName) ||
+                    required.Contains(field.InternalName) ||
+                    field.InternalName == "Title")
+                {
+                    columns.AddColumn(field);
+                    columnsSnapshot.AddColumn(field);
+                    if (RequiredResourceFields.Contains(field.InternalName))
+                    {
+                        matches++;
+                    }
+                }
+            }
 
             //Adding contenttype field specifically.
             SPField fldExtId = null;
@@ -271,7 +292,6 @@ namespace EPMLiveReportsAdmin
                     matches++;
             }
             lb._resourceList = (RequiredResourceFields.Count == matches);
-
 
             //[Fix for:Issue - Resources list sqltable being rename to LST Resourcis in Report Model. Apparently, resources is a reserved word.] by xjh -- START
             string tableName;
@@ -404,7 +424,7 @@ namespace EPMLiveReportsAdmin
             var rd = new ReportData(_siteId);
 
             var safeTableName = rd.GetSafeTableName(tableName);
-            string tableNameSnapshot = safeTableName + Resources.SnapshotTableSuffix;
+            string tableNameSnapshot = rd.GetSafeTableName(tableName + Resources.SnapshotTableSuffix); 
 
             if (!rd.CreateTable(safeTableName, columns))
             {
@@ -419,14 +439,14 @@ namespace EPMLiveReportsAdmin
             }
 
             // only insert into RPTList table if table created successfully
-            if (success && !rd.InsertList(_listId, safeTableName, tableNameSnapshot, _resourceList))
+            if ((success || (rd.TableExists(safeTableName) && rd.TableExists(tableNameSnapshot))) && !rd.InsertList(_listId, safeTableName, tableNameSnapshot, _resourceList))
             {
                 rd.InsertLog(_listId, _listName, string.Format("Error creating list entry"), string.Format("Error creating list entry"), 2);
                 success = false;
             }
 
             // only insert into RPTColumn table if table created successfully
-            if (success && !rd.InsertListColumns(_listId, columns))
+            if ((success || (rd.TableExists(safeTableName) && rd.TableExists(tableNameSnapshot))) && !rd.InsertListColumns(_listId, columns))
             {
                 rd.InsertLog(_listId, _listName.Replace("'", ""), string.Format("Error creating column entries"), string.Format("Error creating column entries"), 2); // - CAT.NET false-positive: All single quotes are escaped/removed.
                 success = false;

@@ -24,8 +24,11 @@ namespace EPMLiveReportsAdmin
         protected EPMData _DAO;
         protected string _siteName;
         protected string _siteUrl;
-
+        protected readonly Guid _webId;
+        protected bool _isReportingV2Enabled = false;
+        protected bool _isRootWeb = true;
         string _sqlError;
+
         public void CreateTextFile(string sPath)
         {
             _DAO.CreateTextFile(sPath);
@@ -117,11 +120,36 @@ namespace EPMLiveReportsAdmin
 
         public ReportData(Guid siteId)
         {
+            SPWeb web = null;
             _siteId = siteId;
             DataRow SAccountInfo = null;
 
             using (SPSite site = new SPSite(siteId))
             {
+                if (SPContext.Current != null)
+                {
+                    if (SPContext.Current.Web.IsRootWeb)
+                        web = site.OpenWeb();
+                    else
+                        web = site.OpenWeb(SPContext.Current.Web.ID);
+                }
+                else
+                    web = site.OpenWeb();
+
+                _webId = web.ID;
+                _isRootWeb = web.IsRootWeb;
+
+                try
+                {
+                    _isReportingV2Enabled = Convert.ToBoolean(EPMLiveCore.CoreFunctions.getConfigSetting(site.RootWeb, "reportingV2"));
+                }
+                catch (Exception)
+                {
+                    _isReportingV2Enabled = false;
+                    SPContext.Current.Site.RootWeb.AllowUnsafeUpdates = true;
+                    EPMLiveCore.CoreFunctions.setConfigSetting(site.RootWeb, "reportingV2", "false");
+                }
+
                 _epmLiveCs = EPMLiveCore.CoreFunctions.getConnectionString(site.WebApplication.Id);
                 SAccountInfo = EPMData.SAccountInfo(siteId, site.WebApplication.Id);
                 //if(string.IsNullOrEmpty(_epmLiveCs))
@@ -276,16 +304,29 @@ namespace EPMLiveReportsAdmin
 
         public string GetSafeTableName(string tableName)
         {
+            string tblName = string.Empty;
             int iTableCount = GetTableCount();
             if (iTableCount == 0)
             {
-                return tableName;
+                if (_isReportingV2Enabled && !_isRootWeb)
+                {
+                    tblName = tableName + "_" + _webId.ToString().Replace("-", "");
+                    tableName = tblName;
+                }
             }
             else
             {
-                tableName = tableName + iTableCount.ToString();
-                return tableName;
+                if (_isReportingV2Enabled && !_isRootWeb)
+                {
+                    tblName = tableName + iTableCount.ToString() + "_" + _webId.ToString().Replace("-", "");
+                    tableName = tblName;
+                }
+                else
+                {
+                    return tableName + iTableCount.ToString();
+                }
             }
+            return tableName;
         }
 
         public int GetTableCount()
@@ -604,6 +645,12 @@ namespace EPMLiveReportsAdmin
             return _DAO.GetTable(_DAO.GetClientReportingConnection);
         }
 
+        public DataTable GetListMappings(string listIds)
+        {
+            _DAO.Command = string.Format("select * from [{0}] where RPTListID IN (" + listIds + ")", Resources.ListSummaryView.Replace("'", ""));
+            return _DAO.GetTable(_DAO.GetClientReportingConnection);
+        }
+
         public DataRow GetListMapping(Guid listId)
         {
             _DAO.Command = "select * from [" + Resources.ListSummaryView.Replace("'", "") + "] where siteId = @SiteId and rptlistId = @rptListId"; // - CAT.NET false-positive: All single quotes are escaped/removed.
@@ -708,8 +755,8 @@ namespace EPMLiveReportsAdmin
             _DAO.AddParam("@SiteId", _siteId);
             _DAO.AddParam("@TableName", tableName);
             _DAO.AddParam("@TableNameSnapshot", tableNameSnapshot);
-            _DAO.AddParam("@System", false);
-            _DAO.AddParam("@ResourceList", resourceList);
+            _DAO.AddParam("@System", 0); //false
+            _DAO.AddParam("@ResourceList", Convert.ToBoolean(resourceList));
 
             return _DAO.ExecuteNonQuery(_DAO.GetClientReportingConnection);
         }
@@ -937,8 +984,6 @@ namespace EPMLiveReportsAdmin
         {
             object objTableName = null;
             _DAO.Command = "SELECT TableName FROM " + Resources.ListTable.Replace("'", "") + " WHERE ListName=@listName AND SiteId=@siteId"; // - CAT.NET false-positive: All single quotes are escaped/removed.
-            //_DAO.Command = "SELECT TableName FROM @tableName WHERE ListName=@listName AND SiteId=@siteId";
-            //_DAO.AddParam("@tableName", Resources.ListTable);
             _DAO.AddParam("@listName", listName);
             _DAO.AddParam("@siteId", _siteId);
             objTableName = _DAO.ExecuteScalar(_DAO.GetClientReportingConnection);
@@ -1592,7 +1637,7 @@ namespace EPMLiveReportsAdmin
                     param.Direction = ParameterDirection.Input;
                     param.SqlDbType = SqlDbType.NVarChar;
                     param.Size = 8001;
-                    param.ParameterName = "@commenters";                   
+                    param.ParameterName = "@commenters";
                     try
                     {
                         val = li["Commenters"].ToString();
@@ -1608,7 +1653,7 @@ namespace EPMLiveReportsAdmin
                     try
                     {
                         val = li["CommentCount"].ToString();
-                        param.Value = Convert.ToInt32(val); 
+                        param.Value = Convert.ToInt32(val);
                     }
                     catch { param.Value = DBNull.Value; }
                     break;
