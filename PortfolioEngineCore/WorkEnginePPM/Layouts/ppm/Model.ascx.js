@@ -1641,7 +1641,7 @@
 
 	    var cbsel = document.getElementById("idGanttZoom");
 
-	    if (cbBar == true) {
+	    if (cbBar != true) {
 
 
 	//        this.ribbonBar.setButtonStateOff("EnableGrpChk");
