@@ -16,13 +16,14 @@
 	<Toolbar Visible="0" CanHide="0" />
 	<Panel Visible="0" CanHide="0" />
 	<Head>
-		<Header id='Header' WorkTypeField="Work Type" StopWatch='Stop Watch' Color="" Hover="" HoverCell="" HoverColor="" HoverRow=""/>
+		<Header id='Header' ShowLoading="" WorkTypeField="Work Type" StopWatch='Stop Watch' Color="" Hover="" HoverCell="" HoverColor="" HoverRow=""/>
 		<Filter CanHide="0" CanEdit="1" Visible="0"/>
 	</Head>
 	<Solid>
 		<Group CanHide="0" Visible="0" id="Group" />
 	</Solid>
 	<LeftCols>
+		<C Name="ShowLoading" Type="Html" Visible="1" CanFilter="0" CanGroup="0" CanHide="0" />
 		<C Name="ItemTypeID" Visible="0" CanFilter="0" CanGroup="0" CanHide="0" />
 		<C Name="TSEnabled" Visible="0" CanFilter="0" CanGroup="0" CanHide="0" />
 		<C Name="UID" Visible="0" CanFilter="0" CanGroup="0" CanHide="0" />

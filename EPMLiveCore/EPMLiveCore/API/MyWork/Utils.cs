@@ -107,10 +107,10 @@ namespace EPMLiveCore.API
                 case SPFieldType.Choice:
                     values = string.Join("|", ((SPFieldChoice)spField).Choices.Cast<string>().ToArray());
                     break;
+                case SPFieldType.User:
                 case SPFieldType.Lookup:
                     var spFieldLookup = (SPFieldLookup)spField;
                     if (spFieldLookup.AllowMultipleValues) range = 1;
-
                     using (SPWeb web = spSite.OpenWeb(spFieldLookup.LookupWebId))
                     {
                         SPList list = web.Lists[new Guid(spFieldLookup.LookupList)];
@@ -154,15 +154,15 @@ namespace EPMLiveCore.API
                     return "Lines";
                 case SPFieldType.URL:
                     return "Link";
+                case SPFieldType.User:
+                case SPFieldType.Lookup:
+                case SPFieldType.MultiChoice:
                 case SPFieldType.Choice:
                     return "Enum";
                 case SPFieldType.Calculated:
                     return sPField.Description.Equals("Indicator") ? "Icon" : "Html";
                 case SPFieldType.Text:
-                case SPFieldType.User:
                 case SPFieldType.Invalid:
-                case SPFieldType.Lookup:
-                case SPFieldType.MultiChoice:
                     return "Html";
                 default:
                     return "Html";
@@ -398,7 +398,6 @@ namespace EPMLiveCore.API
             switch (sPField.Type)
             {
                 case SPFieldType.Text:
-                case SPFieldType.User:
                 case SPFieldType.Invalid:
                     return "Text";
                 case SPFieldType.Integer:
@@ -414,13 +413,13 @@ namespace EPMLiveCore.API
                     return "Lines";
                 case SPFieldType.URL:
                     return "Link";
+                case SPFieldType.User:
+                case SPFieldType.Lookup:
+                case SPFieldType.MultiChoice:
                 case SPFieldType.Choice:
                     return "Enum";
                 case SPFieldType.Calculated:
                     return sPField.Description.Equals("Indicator") ? "Icon" : "Html";
-                case SPFieldType.Lookup:
-                case SPFieldType.MultiChoice:
-                    return "Html";
                 default:
                     return "Html";
             }

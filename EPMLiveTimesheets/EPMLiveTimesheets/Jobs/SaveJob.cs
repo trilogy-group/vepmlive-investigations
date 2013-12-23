@@ -7,6 +7,8 @@ using System.Xml;
 using System.Data.SqlClient;
 using Microsoft.SharePoint;
 using System.Collections;
+using EPMLiveCore;
+using EPMLiveCore.API;
 
 namespace TimeSheets
 {
@@ -15,7 +17,7 @@ namespace TimeSheets
 
         SPList WorkList;
         private bool Editable = false;
-
+        private string NonUpdatingColumns = "Project,AssignedTo";
         private static string iGetAttribute(XmlNode nd, string attribute)
         {
             try
@@ -36,6 +38,7 @@ namespace TimeSheets
                 {
                     case SPFieldType.Number:
                     case SPFieldType.Currency:
+                    case SPFieldType.DateTime:
                         return li[f.Id].ToString();
                     default:
                         return f.GetFieldValueAsText(li[f.Id].ToString());
@@ -361,6 +364,130 @@ namespace TimeSheets
                                                     if (Editable)
                                                     {
                                                         //PROCESS LI
+                                                        GridGanttSettings gSettings = new GridGanttSettings(list);
+                                                        Dictionary<string, Dictionary<string, string>> fieldProperties = ListDisplayUtils.ConvertFromString(gSettings.DisplaySettings);
+                                                        if (ndRow.Attributes != null)
+                                                        {
+                                                            foreach (XmlAttribute attr in ndRow.Attributes)
+                                                            {
+                                                                if (!NonUpdatingColumns.Contains(attr.Name))
+                                                                {
+                                                                    SPField spField = li.Fields.TryGetFieldByStaticName(attr.Name);
+                                                                    if (spField != null)
+                                                                    {
+                                                                        if (EditableFieldDisplay.isEditable(li, spField, fieldProperties))
+                                                                        {
+                                                                            string newValue = iGetAttribute(ndRow, spField.InternalName);
+
+                                                                            switch (spField.Type)
+                                                                            {
+                                                                                case SPFieldType.Choice:
+                                                                                case SPFieldType.Text:
+                                                                                    if (Convert.ToString(li[spField.InternalName]) != newValue)
+                                                                                    {
+                                                                                        li[spField.InternalName] = newValue;
+                                                                                    }
+                                                                                    break;
+                                                                                case SPFieldType.Boolean:
+                                                                                    if (!String.IsNullOrEmpty(newValue))
+                                                                                    {
+                                                                                        Boolean newBooleanValue = Convert.ToBoolean(newValue);
+                                                                                        if (Convert.ToBoolean(li[spField.InternalName]) != newBooleanValue)
+                                                                                        {
+                                                                                            li[spField.InternalName] = newBooleanValue;
+                                                                                        }
+                                                                                    }
+                                                                                    break;
+                                                                                case SPFieldType.Currency:
+                                                                                    if (!String.IsNullOrEmpty(newValue))
+                                                                                    {
+                                                                                        Double newCurrencyValue = Convert.ToDouble(newValue);
+                                                                                        if (Convert.ToDouble(li[spField.InternalName]) != newCurrencyValue)
+                                                                                        {
+                                                                                            li[spField.InternalName] = newCurrencyValue;
+                                                                                        }
+                                                                                    }
+                                                                                    break;
+                                                                                case SPFieldType.Number:
+                                                                                    if (!String.IsNullOrEmpty(newValue))
+                                                                                    {
+                                                                                        Double newDoubleValue = Convert.ToDouble(newValue);
+                                                                                        if (Convert.ToDouble(li[spField.InternalName]) != newDoubleValue)
+                                                                                        {
+                                                                                            if (((SPFieldNumber)spField).ShowAsPercentage)
+                                                                                            {
+                                                                                                newDoubleValue = newDoubleValue / 100;
+                                                                                            }
+                                                                                            li[spField.InternalName] = newDoubleValue;
+                                                                                        }
+                                                                                    }
+                                                                                    break;
+                                                                                case SPFieldType.DateTime:
+                                                                                    if (!String.IsNullOrEmpty(newValue))
+                                                                                    {
+                                                                                        DateTime newDateTimeValue = Convert.ToDateTime(newValue);
+                                                                                        if (Convert.ToDateTime(li[spField.InternalName]) != newDateTimeValue)
+                                                                                        {
+                                                                                            li[spField.InternalName] = newDateTimeValue;
+                                                                                        }
+                                                                                    }
+                                                                                    break;
+                                                                                case SPFieldType.Integer:
+                                                                                    if (!String.IsNullOrEmpty(newValue))
+                                                                                    {
+                                                                                        Int64 newInt64Value = Convert.ToInt64(newValue);
+                                                                                        if (Convert.ToInt64(li[spField.InternalName]) != newInt64Value)
+                                                                                        {
+                                                                                            li[spField.InternalName] = newInt64Value;
+                                                                                        }
+                                                                                    }
+                                                                                    break;
+                                                                                case SPFieldType.User:
+                                                                                case SPFieldType.Lookup:
+                                                                                    var spFieldLookup = (SPFieldLookup)spField;
+                                                                                    if (spFieldLookup != null && !string.IsNullOrEmpty(spFieldLookup.LookupList))
+                                                                                    {
+                                                                                        SPList spLookuplist = web.Lists[new Guid(spFieldLookup.LookupList)];
+                                                                                        if (spLookuplist != null)
+                                                                                        {
+                                                                                            SPFieldLookupValueCollection spFLVCIds = new SPFieldLookupValueCollection();
+
+                                                                                            foreach (string itemId in newValue.Split(';'))
+                                                                                            {
+                                                                                                Int32 newInt32IdValue;
+                                                                                                if (Int32.TryParse(itemId, out newInt32IdValue))
+                                                                                                {
+                                                                                                    spFLVCIds.Add(new SPFieldLookupValue(newInt32IdValue.ToString()));
+                                                                                                }
+                                                                                            }
+
+                                                                                            li[spField.InternalName] = spFLVCIds;
+                                                                                        }
+                                                                                    }
+                                                                                    break;
+                                                                                case SPFieldType.MultiChoice:
+                                                                                    SPFieldMultiChoiceValue spFMCVIds = new SPFieldMultiChoiceValue();
+                                                                                    foreach (string itemId in newValue.Split(';'))
+                                                                                    {
+                                                                                        spFMCVIds.Add(itemId);
+                                                                                    }
+                                                                                    li[spField.InternalName] = spFMCVIds;
+                                                                                    break;
+                                                                                default:
+                                                                                    break;
+                                                                            }
+                                                                        }
+
+                                                                    }
+                                                                }
+
+                                                            }
+
+
+                                                            li.SystemUpdate();
+                                                        }
+
+
                                                     }
 
                                                     ProcessListFields(id, ndRow, cn, settings, li, true, list);
@@ -372,6 +499,7 @@ namespace TimeSheets
                                                         li.Update();
                                                     else
                                                         li.SystemUpdate();
+
                                                 }
                                             }
                                         }
@@ -558,7 +686,7 @@ namespace TimeSheets
                             cmd.Parameters.AddWithValue("@uid", drDelItem["TS_ITEM_UID"].ToString());
                             cmd.ExecuteNonQuery();
                         }
-                        
+
                         if (liveHours)
                             sErrors += processActualWork(cn, TSUID.ToString(), site, true, false);
 

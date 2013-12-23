@@ -1396,6 +1396,22 @@ namespace TimeSheets
                         attr1.Value = iGetFieldAlign(field);
                         ndCol.Attributes.Append(attr1);
 
+                        if (field.Type == SPFieldType.Number && ((SPFieldNumber)field).ShowAsPercentage)
+                        {
+                            if (sFieldType == "Int")
+                            {
+                                attr1 = docLayout.CreateAttribute("Format");
+                                attr1.Value = @"0";
+                                ndCol.Attributes.Append(attr1);
+                            }
+                            else if (sFieldType == "Float")
+                            {
+                                attr1 = docLayout.CreateAttribute("Format");
+                                attr1.Value = @"0.00";
+                                ndCol.Attributes.Append(attr1);
+                            }
+                        }
+
                         if (sFieldType == "Enum")
                         {
                             attr1 = docLayout.CreateAttribute("IconAlign");
@@ -1539,6 +1555,14 @@ namespace TimeSheets
                 case SPFieldType.Boolean:
                     return "Bool";
                 case SPFieldType.Number:
+                    if (((SPFieldNumber)field).DisplayFormat == SPNumberFormatTypes.NoDecimal)
+                    {
+                        return "Int";
+                    }
+                    else
+                    {
+                        return "Float";
+                    }
                 case SPFieldType.Currency:
                     return "Float";
             }
@@ -1680,6 +1704,10 @@ namespace TimeSheets
             attr1.Value = dr["TS_ITEM_UID"].ToString();
             ndCol.Attributes.Append(attr1);
 
+            attr1 = docData.CreateAttribute("ShowLoading");
+            attr1.Value = @"<img id='MTG_Processing_" + dr["ITEM_ID"].ToString() + "' style='display:none;' src='/_layouts/epmlive/images/mywork/loading16.gif'></img>";
+            ndCol.Attributes.Append(attr1);
+
             attr1 = docData.CreateAttribute("Title");
             attr1.Value = dr["Title"].ToString();
             ndCol.Attributes.Append(attr1);
@@ -1745,7 +1773,14 @@ namespace TimeSheets
                     if (isValidMyWorkColumn(GoodFieldname))
                     {
                         attr1 = docData.CreateAttribute(GoodFieldname);
-                        attr1.Value = result[dc.ColumnName].ToString();
+                        if (GoodFieldname == "PercentComplete")
+                        {
+                            attr1.Value = Convert.ToString(Convert.ToDouble(result[dc.ColumnName].ToString()) * 100);
+                        }
+                        else
+                        {
+                            attr1.Value = result[dc.ColumnName].ToString();
+                        }
                         ndCol.Attributes.Append(attr1);
 
                         if (GoodFieldname == "Timesheet")

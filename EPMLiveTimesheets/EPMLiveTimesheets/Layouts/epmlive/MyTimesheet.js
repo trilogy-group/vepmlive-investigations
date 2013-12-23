@@ -8,6 +8,7 @@ var curGrid;
 var curPop = false;
 var StopWatchRow = null;
 var StopWatchGrid = null;
+var siteId;
 var siteUrl;
 var siteColUrl;
 var sApplyDates = "";
@@ -105,8 +106,238 @@ Grids.OnKeyPress = function (grid, key, event, name, prefix) {
 }
 
 Grids.OnDblClick = function (grid, row, col, x, y, event) {
-    if (curPop)
+    if (curPop) {
         return true;
+    } else {
+        //Regular Work == "1"
+        if (row["ItemTypeID"] == "1") {
+            if (!row['EditMode']) {
+                editSaveRow(grid.id, row.id);
+            }
+        }
+        else {
+            alert("You cannot edit this item.");
+        }
+    }
+}
+
+function editSaveRow(gridId, rowId) {
+    var grid = Grids[gridId];
+    var row = grid.Rows[rowId];
+
+    if (row.Def.Name === 'Header' || row.Def.Name === 'Fixed' || row.Def.Name === 'Group') return;
+
+    if (row['Complete'] == 1) return;
+
+    $('#MTG_Processing_' + row['ItemID']).show();
+    //$('#TSLoader' + grid.id.substr(2)).show();
+    editRow(grid, row);
+}
+function editRow(grid, row) {
+    var listWebSiteId = row['ListID'] + row['WebID'] + siteId;
+
+    if (grid.RowPermissions === undefined) {
+        grid.RowPermissions = new Object();
+    }
+
+    if (grid.RowPermissions[listWebSiteId] === undefined) {
+        var dataXml = '<MyWork><List ID="' + row['ListID'] + '" /><Web ID="' + row['WebID'] + '" /><Site ID="' + siteId + '" URL="' + siteUrl + '" /></MyWork>';
+
+        EPMLiveCore.WorkEngineAPI.Execute("CheckMyWorkListEditPermission", dataXml, function (response) {
+            response = parseJson(response);
+
+            if (responseIsSuccess(response)) {
+                if (response.Result.MyWork.HasEditPermission === 'true') {
+                    grid.RowPermissions[listWebSiteId] = true;
+                } else {
+                    grid.RowPermissions[listWebSiteId] = false;
+                }
+
+                editRowHelper(grid, row);
+            }
+        });
+    } else {
+        editRowHelper(grid, row);
+    }
+}
+function editRowHelper(grid, row) {
+    var cols = grid.ColNames[0];
+    var listWebSiteId = row['ListID'] + row['WebID'] + siteId;
+
+    if (grid.RowPermissions[listWebSiteId]) {
+        if (row['EditMode'] === undefined) {
+            row['EditMode'] = 1;
+        }
+
+        if (grid.TotalRowsInEditMode === undefined) {
+            grid.TotalRowsInEditMode = 0;
+        }
+
+        grid.TotalRowsInEditMode++;
+        row.isBeingEdited = true;
+
+        if (grid.ColTypes == undefined) grid.ColTypes = new Object();
+
+        if (grid.ColTypes[listWebSiteId] == undefined) {
+
+            grid.ColTypes[listWebSiteId] = new Object();
+
+            var dataXml = '<FieldInfo><Item ID="' + row['ItemID'] + '" /><List ID="' + row['ListID'] + '" /><Web ID="' + row['WebID'] + '" /><Site ID="' + siteId + '" URL="'
+                + siteUrl + '" /><Fields>Priority,Title,';
+
+            for (var col in cols) {
+                dataXml += cols[col] + ',';
+            }
+
+            dataXml = dataXml.substring(0, dataXml.length - 1);
+
+            dataXml += '</Fields><GuessOriginalFieldName>True</GuessOriginalFieldName></FieldInfo>';
+
+            EPMLiveCore.WorkEngineAPI.Execute("IsFieldEditable", dataXml, function (response) {
+                response = parseJson(response);
+
+                if (responseIsSuccess(response)) {
+                    var fields = response.Result.FieldInfo.Fields.Field;
+
+                    dataXml = '<MyWork><Item ID="' + row['ItemID'] + '" /><List ID="' + row['ListID'] + '" /><Web ID="' + row['WebID'] + '" /><Site ID="' + siteId
+                        + '" URL="' + siteUrl + '" /><Fields>';
+
+                    for (var f in fields) {
+                        var fieldName = fields[f]["@Name"];
+
+                        if (fields[f]["@Editable"] == "true") {
+                            dataXml += fieldName + ',';
+                        }
+                    }
+
+                    dataXml = dataXml.substring(0, dataXml.length - 1);
+
+                    dataXml += '</Fields><GuessOriginalFieldName>True</GuessOriginalFieldName></MyWork>';
+
+                    EPMLiveCore.WorkEngineAPI.Execute("GetMyWorkGridColType", dataXml, function (response) {
+                        response = parseJson(response);
+
+                        if (responseIsSuccess(response)) {
+                            fields = response.Result.MyWork.Fields.Field;
+
+                            for (var i = 0; i < fields.length; i++) {
+                                var colName = fields[i]["@Name"];
+                                var colType = fields[i]["@Type"];
+
+                                grid.ColTypes[listWebSiteId][colName] = colType;
+
+                                grid.SetAttribute(row, colName, 'Type', colType, true, false);
+
+                                if (colType !== 'Lines') {
+                                    grid.SetAttribute(row, colName, 'CanEdit', 1, true, false);
+                                }
+                            }
+
+                            editRowFinalizer(grid, row, cols, listWebSiteId);
+                        }
+                    });
+                }
+            });
+        } else {
+            for (var col in grid.ColTypes[listWebSiteId]) {
+                var colType = grid.ColTypes[listWebSiteId][col];
+
+                grid.SetAttribute(row, col, 'Type', colType, true, false);
+
+                if (colType !== 'Lines') {
+                    grid.SetAttribute(row, col, 'CanEdit', 1, true, false);
+                }
+            }
+            editRowFinalizer(grid, row, cols, listWebSiteId);
+        }
+    } else {
+        $('#MTG_Processing_' + row['ItemID']).hide();
+        //$('#TSLoader' + grid.id.substr(2)).hide();
+        SP.UI.Notify.addNotification("You do not have permission to edit this item.", false);
+    }
+}
+function editRowFinalizer(grid, row, cols, listWebSiteId) {
+    var currentValues = new Object();
+
+    currentValues['Priority'] = row['Priority'];
+    currentValues['DueDay'] = row['DueDay'];
+    currentValues['Title'] = row['Title'];
+
+    for (var col in cols) {
+        var c = cols[col];
+
+        var value = row[c];
+
+        if (value != undefined) currentValues[c] = value;
+        else currentValues[c] = '';
+    }
+
+    row.currentValues = currentValues;
+
+    var enumFields = '';
+    for (var col in grid.ColTypes[listWebSiteId]) {
+        var colType = grid.ColTypes[listWebSiteId][col];
+
+        if (colType == 'Enum') enumFields += col + ',';
+    }
+
+    if (enumFields != '') {
+        dataXml = '<MyWork><Item ID="' + row['ItemID'] + '" /><List ID="' + row['ListID'] + '" /><Web ID="' + row['WebID'] + '" /><Site ID="' + siteId
+            + '" URL="' + siteUrl + '" /><Fields>' + enumFields;
+        dataXml = dataXml.substring(0, dataXml.length - 1);
+        dataXml += '</Fields><GuessOriginalFieldName>True</GuessOriginalFieldName></MyWork>';
+
+        EPMLiveCore.WorkEngineAPI.Execute("GetMyWorkGridEnum", dataXml, function (response) {
+            response = parseJson(response);
+
+            if (responseIsSuccess(response)) {
+                var fields = response.Result.MyWork.Fields.Field;
+
+                for (var f in fields) {
+                    var fieldName = fields[f]["@Name"];
+
+                    grid.SetAttribute(row, fieldName, 'Enum', fields[f]["@Enum"], true, false);
+                    grid.SetAttribute(row, fieldName, 'EnumKeys', fields[f]["@EnumKeys"], true, false);
+                    grid.SetAttribute(row, fieldName, 'Range', fields[f]["@Range"], true, false);
+                }
+
+                $('#MTG_Processing_' + row['ItemID']).hide();
+                //$('#TSLoader' + grid.id.substr(2)).hide();
+                //MyWorkGrid.rowBeingEdited = row;
+                //MyWorkGrid.isDirty = true;
+            }
+        });
+    } else {
+        $('#MTG_Processing_' + row['ItemID']).hide();
+        //$('#TSLoader' + grid.id.substr(2)).hide();
+        //MyWorkGrid.rowBeingEdited = row;
+    }
+}
+function parseJson(response) {
+    return eval('(' + xml2json(parseXml(response), "") + ')');
+}
+function parseXml(xml) {
+    var dom = null;
+    if (window.DOMParser) {
+        try {
+            dom = (new DOMParser()).parseFromString(xml, "text/xml");
+        } catch (e) {
+            dom = null;
+        }
+    } else if (window.ActiveXObject) {
+        try {
+            dom = new ActiveXObject('Microsoft.XMLDOM');
+            dom.async = false;
+            dom.loadXML(xml);
+        } catch (e) {
+            dom = null;
+        }
+    }
+
+    return dom;
+}
+function responseIsSuccess(response) {
+    return response.Result["@Status"] == 0;
 }
 
 Grids.OnAfterSave = function (grid, result, autoupdate) {
@@ -1469,7 +1700,7 @@ function leavePage() {
         //}
     }
 
-    if(message != "")
+    if (message != "")
         return message;
 }
 

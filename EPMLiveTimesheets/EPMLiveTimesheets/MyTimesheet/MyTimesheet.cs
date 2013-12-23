@@ -43,7 +43,7 @@ namespace TimeSheets
         private string sDelegates = "";
         private string sUserId = "";
         private string sCurrentDelegate = "";
-        private int iEditable = 0;
+        private int iEditable = 1;
         private TimesheetSettings settings;
 
         private int iNextPeriod = 0;
@@ -432,6 +432,7 @@ namespace TimeSheets
                                     TSTypeObject = " + TSTypeObject + @";
                                     TSCols = " + TSCols + @";
                                     TSDCols = " + TSDCols + @";
+                                    siteId = '" + SPContext.Current.Web.ID + @"';
                                     siteUrl = '" + url + @"';
                                     siteColUrl = '" + SPContext.Current.Site.ServerRelativeUrl + @"';
 
