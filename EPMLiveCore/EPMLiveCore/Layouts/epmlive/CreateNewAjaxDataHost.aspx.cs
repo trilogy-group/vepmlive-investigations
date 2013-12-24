@@ -159,22 +159,26 @@ namespace EPMLiveCore
                         {
                             if (list.NavigateForFormsPages)
                             {
-                                onclick = "javascript:window.location.href='" + GetDefaultFormUrl(list, requestUrl) + "'; return false;";
+                                var url = GetDefaultFormUrl(list, requestUrl);
+                                onclick = !string.IsNullOrEmpty(url) ? "javascript:window.location.href='" + url + "'; return false;" : "";
                             }
                             else
                             {
-                                onclick = "javascript:var options = { url:'" + GetDefaultFormUrl(list, requestUrl) + "', title: 'Create', dialogReturnValueCallback: function (dialogResult) { SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.RefreshPage', dialogResult) } }; SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options); return false;";
+                                var url = GetDefaultFormUrl(list, requestUrl);
+                                onclick = !string.IsNullOrEmpty(url) ? "javascript:var options = { url:'" + url + "', title: 'Create', dialogReturnValueCallback: function (dialogResult) { SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.RefreshPage', dialogResult) } }; SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options); return false;" : "";
                             }
                         }
                         else
                         {
                             if (list.NavigateForFormsPages)
                             {
-                                onclick = "javascript:window.location.href='" + GetDefaultFormUrl(list, requestUrl) + "'; return false;";
+                                var url = GetDefaultFormUrl(list, requestUrl);
+                                onclick = !string.IsNullOrEmpty(url) ? "javascript:window.location.href='" + url + "'; return false;" : "";
                             }
                             else
                             {
-                                onclick = "javascript:var options = { url:'" + GetDefaultFormUrl(list, requestUrl) + "', title: 'Create', dialogReturnValueCallback: function (dialogResult) { SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.RefreshPage', dialogResult) } }; SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options); return false;";
+                                var url = GetDefaultFormUrl(list, requestUrl);
+                                onclick = !string.IsNullOrEmpty(url) ? "javascript:var options = { url:'" + url + "', title: 'Create', dialogReturnValueCallback: function (dialogResult) { SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.RefreshPage', dialogResult) } }; SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options); return false;" : "";
                             }
                         }
 
@@ -288,22 +292,26 @@ namespace EPMLiveCore
                             {
                                 if (list.NavigateForFormsPages)
                                 {
-                                    onclick = "javascript:window.location.href='" + GetDefaultFormUrl(list, requestUrl) + "'; return false;";
+                                    var url = GetDefaultFormUrl(list, requestUrl);
+                                    onclick = !string.IsNullOrEmpty(url) ? "javascript:window.location.href='" + url + "'; return false;" : "";
                                 }
                                 else
                                 {
-                                    onclick = "javascript:var options = { url:'" + GetDefaultFormUrl(list, requestUrl) + "', title: 'Create', dialogReturnValueCallback: function (dialogResult) { SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.RefreshPage', dialogResult) } }; SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options); return false;";
+                                    var url = GetDefaultFormUrl(list, requestUrl);
+                                    onclick = !string.IsNullOrEmpty(url) ? "javascript:var options = { url:'" + url + "', title: 'Create', dialogReturnValueCallback: function (dialogResult) { SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.RefreshPage', dialogResult) } }; SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options); return false;" : "";
                                 }
                             }
                             else
                             {
                                 if (list.NavigateForFormsPages)
                                 {
-                                    onclick = "javascript:window.location.href='" + GetDefaultFormUrl(list, requestUrl) + "'; return false;";
+                                    var url = GetDefaultFormUrl(list, requestUrl);
+                                    onclick = !string.IsNullOrEmpty(url) ? "javascript:window.location.href='" + url + "'; return false;" : "";
                                 }
                                 else
                                 {
-                                    onclick = "javascript:var options = { url:'" + GetDefaultFormUrl(list, requestUrl) + "', title: 'Create', dialogReturnValueCallback: function (dialogResult) { SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.RefreshPage', dialogResult) } }; SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options); return false;";
+                                    var url = GetDefaultFormUrl(list, requestUrl);
+                                    onclick = !string.IsNullOrEmpty(url) ? "javascript:var options = { url:'" + url + "', title: 'Create', dialogReturnValueCallback: function (dialogResult) { SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.RefreshPage', dialogResult) } }; SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options); return false;" : "";
                                 }
                             }
 
@@ -321,10 +329,11 @@ namespace EPMLiveCore
 
         private static string GetDefaultFormUrl(SPList list, string requestUrl)
         {
-            var defaultNewFormUrl = string.Empty;
+            //var defaultNewFormUrl = string.Empty;
+            string defaultNewFormUrl = list.DefaultNewFormUrl;
 
-            if (!string.IsNullOrEmpty(list.DefaultNewFormUrl))
-            {
+            //if (!string.IsNullOrEmpty(list.DefaultNewFormUrl))
+            //{
                 if (defaultNewFormUrl.IndexOf('?') == -1)
                 {
                     defaultNewFormUrl += "?source=" + requestUrl;
@@ -333,7 +342,7 @@ namespace EPMLiveCore
                 {
                     defaultNewFormUrl += "&source=" + requestUrl;
                 }
-            }
+            //}
 
             return defaultNewFormUrl;
         }
