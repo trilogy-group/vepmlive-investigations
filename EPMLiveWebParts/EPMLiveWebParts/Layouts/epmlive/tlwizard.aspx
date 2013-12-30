@@ -59,6 +59,7 @@ font-size:16px;
 </script>
 
 
+    <asp:HiddenField ID="hdnStep" Value="1" runat="server"/>
     <asp:Panel ID="pnl1" runat="server">
         <table border="0" cellpadding="0" cellspacing="0" heigh="300" width="100%">
             <tr>

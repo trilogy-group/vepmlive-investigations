@@ -22,7 +22,7 @@ namespace EPMLiveWebParts.Layouts.epmlive
         [DllImport("kernel32.dll", CharSet=CharSet.Auto)]
         public static extern  bool CloseHandle(IntPtr handle);
 
-        static int step = 1;
+        //static int step = 1;
         static string ssrsurl = "";
 
         private void appendclick(System.Web.UI.WebControls.Button btn)
@@ -38,7 +38,7 @@ namespace EPMLiveWebParts.Layouts.epmlive
             
             if (!IsPostBack)
             {
-                step = 1;
+                //step = 1;
                 if (EPMLiveCore.CoreFunctions.getWebAppSetting(SPContext.Current.Site.WebApplication.Id, "ReportsUseIntegrated").ToLower() != "true")
                 {
                     lblReporting.Visible = true;
@@ -129,7 +129,7 @@ namespace EPMLiveWebParts.Layouts.epmlive
 
         protected void btnBack_Click(object sender, EventArgs e)
         {
-            switch (step)
+            switch (int.Parse(hdnStep.Value))
             {
                 case 2:
                     pnl1.Visible = true;
@@ -146,7 +146,7 @@ namespace EPMLiveWebParts.Layouts.epmlive
                     {
                         pnl1.Visible = true;
                         pnl3.Visible = false;
-                        step--;
+                        hdnStep.Value = (int.Parse(hdnStep.Value) - 1).ToString();
                     }
                     break;
                 case 4:
@@ -154,22 +154,22 @@ namespace EPMLiveWebParts.Layouts.epmlive
                     pnlDone.Visible = false;
                     break;
             }
-            step--;
+            hdnStep.Value = (int.Parse(hdnStep.Value) - 1).ToString();
         }
 
         protected void btnSkip_Click(object sender, EventArgs e)
         {
             ssrsurl = "";
-            step++;
+            hdnStep.Value = (int.Parse(hdnStep.Value) + 1).ToString();
             pnl2.Visible = false;
             pnl3.Visible = true;
         }
         protected void btnNext_Click(object sender, EventArgs e)
         {
-            switch (step)
+            switch (int.Parse(hdnStep.Value))
             {
                 case 1:
-                    step++;
+                    hdnStep.Value = (int.Parse(hdnStep.Value) + 1).ToString();
                     if(ssrsurl != "")
                     {
                         pnl1.Visible = false;
@@ -178,7 +178,7 @@ namespace EPMLiveWebParts.Layouts.epmlive
                     }
                     else
                     {
-                        step++;
+                        hdnStep.Value = (int.Parse(hdnStep.Value) + 1).ToString();
                         pnl1.Visible = false;
                         pnl3.Visible = true;
                     }
@@ -194,7 +194,7 @@ namespace EPMLiveWebParts.Layouts.epmlive
                         pnl3.Visible = true;
                         lblReportingError.Visible = false;
                         hdnReportPassword.Value = txtReportPassword.Text;
-                        step++;
+                        hdnStep.Value = (int.Parse(hdnStep.Value) + 1).ToString();
                     }
                     else
                     {
@@ -206,11 +206,11 @@ namespace EPMLiveWebParts.Layouts.epmlive
                 case 3:
                     pnl3.Visible = false;
                     pnlDone.Visible = true;
-                    step++;
+                    hdnStep.Value = (int.Parse(hdnStep.Value) + 1).ToString();
                     break;
                 case 4:
                     btnYes_Click(sender, e);
-                    step++;
+                    hdnStep.Value = (int.Parse(hdnStep.Value) + 1).ToString();
                     break;
             }
             
