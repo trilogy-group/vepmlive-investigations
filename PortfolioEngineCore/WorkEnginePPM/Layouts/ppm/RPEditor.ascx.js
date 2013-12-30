@@ -1200,6 +1200,7 @@
             this.viewTab.Render();
             this.resourcesTab = new Ribbon(resourcesTabData);
             this.resourcesTab.Render();
+            // comment next line to show the Include Pending button
             this.resourcesTab.hideItem('idResourcesTab_IncludePending');
             this.resourcesTab.setButtonStateOn("idResourcesTab_IncludePending");
 
@@ -1462,7 +1463,7 @@
                     this.ApplyGridView(grid.id, selectedView, false);
                 this.ShowHidePeriods(grid);
                 this.ShowSelectedResourceGroup();
-                this.RefreshResourcePeriods(false);
+                this.RefreshResourcePeriods(true);
                 this.viewTab.refreshSelect("idViewTab_FromPeriod");
                 window.setTimeout(thisID + ".HandleAction('OnStart')", 100);
                 window.setTimeout(function () { var gridRPE = Grids["g_RPE"]; gridRPE.Focus(gridRPE.GetFirst(null, 0), "ItemName"); }, 10);
@@ -1600,6 +1601,7 @@
         if (reqrow != null) {
             this.UpdatePlanRowCalculatedValues(reqrow, 0);
             this.RefreshPlanRowPeriods(plangrid, reqrow, true);
+            plangrid.SetAttribute(reqrow, null, "Changed", 1, 0, 0);
         }
         var resuid = plangrid.GetAttribute(planrow, null, "PendingRes_UID");
         if (resuid == null) resuid = plangrid.GetAttribute(planrow, null, "Res_UID");
@@ -1731,6 +1733,7 @@
                         this.CalculateRequirementCellValue(reqrow, periodid, 0);
                         var s = this.GetFormattedPeriodCell(grid, reqrow, col, true, false);
                         grid.SetAttribute(reqrow, null, col, s, 1, 0);
+                        grid.SetAttribute(reqrow, null, "Changed", 1, 0, 0);
                     }
 
                     this.SetStatusAfterValueChanged(grid, row, false);
@@ -1916,9 +1919,10 @@
         var sTotal = "";
         if (bFulfillmentMode == true) {
             var total = this.GetIntValue(grid.GetAttribute(row, "t" + sId), null);
-            sTotal = NumberToString(total / 100, const_HoursFormat);
+            if (total != null)
+                sTotal = NumberToString(total / 100, const_HoursFormat);
             if (bEditMode == true)
-                return sTotal;
+                return (total != null) ? sTotal : "0";
         }
         var lHours = 0;
         var Hours = grid.GetAttribute(row, "H" + sId);
@@ -1952,9 +1956,10 @@
         var sTotal = "";
         if (bFulfillmentMode == true) {
             var total = this.GetIntValue(grid.GetAttribute(row, "u" + sId), null);
-            sTotal = NumberToString(total / 10000, const_FTEFormat);
+            if (total != null)
+                sTotal = NumberToString(total / 10000, const_FTEFormat);
             if (bEditMode == true)
-                return sTotal;
+                return (total != null) ? sTotal : "0";
         }
         var lFte = 0;
         var Fte = grid.GetAttribute(row, "F" + sId);
@@ -1988,9 +1993,10 @@
         var sTotal = "";
         if (bFulfillmentMode == true) {
             var total = this.GetIntValue(grid.GetAttribute(row, "u" + sId), null);
-            sTotal = NumberToString(total / 10000, const_FTEPctFormat);
+            if (total != null)
+                sTotal = NumberToString(total / 10000, const_FTEPctFormat);
             if (bEditMode == true)
-                return sTotal;
+                return (total != null) ? sTotal : "0";
         }
         var lFte = 0;
         var Fte = grid.GetAttribute(row, "F" + sId);
@@ -2318,12 +2324,14 @@
                         this.SetPeriodValue(plangrid, parentplanrow, col, val);
                     }
                 }
+                this.SetStatusAfterValueChanged(plangrid, parentplanrow, false);
                 this.RefreshPlanRowPeriods(plangrid, parentplanrow, true);
                 this.SetPlanRowEditStatus(parentplanrow);
                 plangrid.RefreshRow(parentplanrow);
                 var wresId = plangrid.GetAttribute(parentplanrow, null, "Res_UID");
                 var resrow = this.FindResourceRow(wresId);
                 this.CalculateResourceRowCommitted(wresId, resrow);
+                this.SetStatusColumn(plangrid, parentplanrow, null, null, 1);
             }
 
             if (origwresId > 0) {
@@ -2389,7 +2397,9 @@
                     if (i > 0)
                         return;
                 }
-                else if (i == 1) thisGrid = Grids["g_RPE"]; else thisGrid = Grids["g_Res"];
+                else
+                    if (i == 1) thisGrid = Grids["g_RPE"]; else thisGrid = Grids["g_Res"];
+                thisGrid.Rendering = true;
                 for (var c = 0; c < thisGrid.ColNames[2].length; c++) {
                     var cCol = thisGrid.ColNames[2][c];
                     var visible = thisGrid.GetAttribute(null, cCol, "Visible");
@@ -2406,6 +2416,8 @@
                         }
                     }
                 }
+                thisGrid.Rendering = false;
+                thisGrid.Update();
             }
         }
     };
@@ -2608,6 +2620,7 @@
             if (reqrow != null) {
                 this.UpdatePlanRowCalculatedValues(reqrow, 0);
                 this.RefreshPlanRowPeriods(plangrid, reqrow, true);
+                plangrid.SetAttribute(reqrow, null, "Changed", 1, 0, 0);
             }
         }
         catch (e) {
@@ -2628,6 +2641,7 @@
                 var col = plangrid.ColNames[2][c];
                 var sType = col.substring(0, 1);
                 if (sType == "Q") {
+                    var deltaHours = 0;
                     var sId = col.substring(1);
                     var mode = plangrid.GetAttribute(planrow, "m" + sId);
                     if (mode != null) {
@@ -2636,6 +2650,10 @@
                     }
                     var hours = plangrid.GetAttribute(planrow, "h" + sId);
                     if (hours != null) {
+                        var Hours = plangrid.GetAttribute(planrow, "H" + sId);
+                        if (Hours == null)
+                            Hours = 0;
+                        deltaHours = hours - Hours;
                         if (hours == 0) hours = null;
                         plangrid.SetAttribute(planrow, null, "H" + sId, hours, 0, 0);
                         plangrid.SetAttribute(planrow, null, "h" + sId, null, 0, 0);
@@ -2645,6 +2663,19 @@
                         if (fte == 0) fte = null;
                         plangrid.SetAttribute(planrow, null, "F" + sId, fte, 0, 0);
                         plangrid.SetAttribute(planrow, null, "f" + sId, null, 0, 0);
+                    }
+                    var origH = plangrid.GetAttribute(planrow, null, "H" + sId + "Orig");
+                    if (origH != null) {
+                        plangrid.SetAttribute(planrow, null, "H" + sId + "Orig", null, 0, 0);
+                    }
+                    if (deltaHours != 0) {
+                        if (pendingresrow != null) {
+                            this.CommitResourceRowPeriodValue(resgrid, pendingresrow, sId, deltaHours);
+                        }
+                        else if (resrow != null) {
+                            this.CommitResourceRowPeriodValue(resgrid, resrow, sId, deltaHours);
+                        }
+
                     }
                 }
             }
@@ -2664,8 +2695,12 @@
             this.SetPMStatusColumn(plangrid, planrow, 1);
             this.SetRMStatusColumn(plangrid, planrow, 1);
             this.RefreshPlanRowPeriods(plangrid, planrow, true);
-            if (resrow != null) this.RefreshResourceRowPeriods(resgrid, resrow, true);
-            if (pendingresrow != null) this.RefreshResourceRowPeriods(resgrid, pendingresrow, true);
+            if (pendingresrow != null) {
+                this.RefreshResourceRowPeriods(resgrid, pendingresrow, true);
+            }
+            else if (resrow != null) {
+                this.RefreshResourceRowPeriods(resgrid, resrow, true);
+            }
             plangrid.RefreshRow(planrow);
         }
         catch (e) {
@@ -2784,6 +2819,7 @@
                                         if (reqrow != null) {
                                             this.UpdatePlanRowCalculatedValues(reqrow, 0);
                                             this.RefreshPlanRowPeriods(plangrid, reqrow, true);
+                                            plangrid.SetAttribute(reqrow, null, "Changed", 1, 0, 0);
                                         }
                                         var wresId = plangrid.GetAttribute(row, null, "Res_UID");
                                         var resrow = this.FindResourceRow(wresId);
@@ -3877,6 +3913,7 @@
             if (reqrow != null) {
                 this.UpdatePlanRowCalculatedValues(reqrow, 0);
                 this.RefreshPlanRowPeriods(grid, reqrow, true);
+                grid.SetAttribute(reqrow, null, "Changed", 1, 0, 0);
             }
             this.UpdateButtonsAsync();
         }
@@ -4123,9 +4160,11 @@
         var planrow = plangrid.GetFirst(null, 0);
         var idSelect = document.getElementById("idSelectPlanResources");
         while (planrow != null) {
-            if (this.ValidatePlanRowPeriodConversion(plangrid, planrow) == false) {
-                alert("Invalid Hours or FTE.\n\nAt least one period value does not match the current FTE Conversion Factor.\n\nPlease report this problem to your System Administrator.");
-                return;
+            if (plangrid.GetAttribute(planrow, null, "Status") != const_Requirement) {
+                if (this.ValidatePlanRowPeriodConversion(plangrid, planrow) == false) {
+                    alert("Invalid Hours or FTE.\n\nAt least one period value does not match the current FTE Conversion Factor.\n\nPlease report this problem to your System Administrator.");
+                    return;
+                }
             }
             planrow = plangrid.GetNext(planrow);
         }
@@ -4729,7 +4768,6 @@
     RPEditor.prototype.RefreshPlanPeriods = function (bRefresh) {
         var grid = Grids["g_RPE"];
         var row = grid.GetFirst(null, 0);
-        //var sValue = "";
         while (row != null) {
             this.RefreshPlanRowPeriods(grid, row, bRefresh);
             row = grid.GetNext(row);
@@ -4809,27 +4847,49 @@
     };
     RPEditor.prototype.CalculateResourceRowPeriodCommitted = function (resuid, resrow, periodid, bRefreshCell) {
         var plangrid = this.plangrid;
-        var row = plangrid.GetFirst(null, 0);
+        // "C" + periodid represents all the committed hours for a resource on all projects (including this one)
+        // deltaC is the difference between the committed hours when the plan was opened vs the committed hours now and, optionally, can include pending on this project
         var deltaC = 0;
+        var row = plangrid.GetFirst(null, 0);
         while (row != null) {
             var planresuid = plangrid.GetAttribute(row, null, "PendingRes_UID");
             if (planresuid == null) planresuid = plangrid.GetAttribute(row, null, "Res_UID");
             if (resuid == planresuid) {
-                var origH = plangrid.GetAttribute(row, null, "H" + periodid + "Orig");
+                var lHours = this.GetIntValue(plangrid.GetAttribute(row, null, "H" + periodid), 0);
                 var deleted = plangrid.GetAttribute(row, null, "Deleted");
-                if (deleted == 1 && origH == null) {
-                    deltaC -= this.GetPeriodHoursSpecial(plangrid, row, "H" + periodid);
+                if (deleted == 1) {
+                    if (lHours == 0)
+                        deltaC -= this.GetIntValue(this.GetPeriodHoursSpecial(plangrid, row, "H" + periodid), 0);
+                    else
+                        deltaC -= lHours;
                 }
-                else if (deleted == 1 && origH != null) {
-                    deltaC -= origH;
+                else {
+                    deltaC += this.GetIntValue(this.GetPeriodHoursSpecial(plangrid, row, "H" + periodid), 0) - lHours;
                 }
-                else if (origH != null)
-                    deltaC += this.GetPeriodHoursSpecial(plangrid, row, "H" + periodid) - origH;
             }
             row = plangrid.GetNext(row);
         }
         this.resgrid.SetAttribute(resrow, null, "D" + periodid, deltaC, 0, 0);
         this.RefreshResourceRowPeriod(this.resgrid, resrow, periodid, bRefreshCell);
+    };
+    RPEditor.prototype.CommitResourceRowPeriodValue = function (resuid, resrow, periodid, deltaHours) {
+        if (deltaHours != 0) {
+            var grid = this.resgrid;
+            var committed = grid.GetAttribute(resrow, null, "C" + periodid);
+            if (committed == null)
+                committed = deltaHours;
+            else
+                committed += deltaHours;
+
+            var deltaC = grid.GetAttribute(resrow, null, "D" + periodid);
+            if (deltaC == null) 
+                deltaC = -deltaHours;
+            else
+                deltaC -= deltaHours;
+
+            this.resgrid.SetAttribute(resrow, null, "C" + periodid, committed, 0, 0);
+            this.resgrid.SetAttribute(resrow, null, "D" + periodid, deltaC, 0, 0);
+        }
     };
     RPEditor.prototype.GetPeriodHoursSpecial = function (grid, row, col) {
         var sId = col.substring(1);
@@ -5201,6 +5261,7 @@
             if (reqrow != null) {
                 this.UpdatePlanRowCalculatedValues(reqrow, calcMode);
                 this.RefreshPlanRowPeriods(plangrid, reqrow, true);
+                plangrid.SetAttribute(reqrow, null, "Changed", 1, 0, 0);
             }
         }
         if (firstaddedrow != null && buttonPress == false) {
@@ -5322,9 +5383,9 @@
                 plangrid.SetAttribute(reqrow, null, "F" + sId, remFte, 0, 0);
                 plangrid.SetAttribute(reqrow, null, "f" + sId, remfte, 0, 0);
 
-                if (H != remHours || h != remhours || F != remFte || f != remfte) {
-                    plangrid.SetAttribute(reqrow, null, "Changed", 1, 0, 0);
-                }
+                //if (H != remHours || (h != null && h != remhours) || F != remFte || (f != null && f != remfte)) {
+                //    plangrid.SetAttribute(reqrow, null, "Changed", 1, 0, 0);
+                //}
                 break;
         }
     };
