@@ -6,7 +6,7 @@ using RestSharp.Serializers;
 using System.Collections.Generic;
 using System.IO;
 
-namespace UplandIntegrations.Jira
+namespace UplandIntegrations.Utils
 {
     public class CustomJsonConverter : ISerializer, IDeserializer
     {

@@ -75,7 +75,6 @@
     <Compile Include="FileBound\FileBoundSystem.cs" />
     <Compile Include="Infrastructure\IntObject.cs" />
     <Compile Include="Infrastructure\IntTransactionResult.cs" />
-    <Compile Include="Jira\CustomJsonConverter.cs" />
     <Compile Include="Jira\JiraIntegrator.cs" />
     <Compile Include="Jira\JiraService.cs" />
     <Compile Include="Jira\JiraType.cs" />
@@ -114,6 +113,9 @@
       <DependentUpon>Reference.svcmap</DependentUpon>
     </Compile>
     <Compile Include="Service References\TenroxIntegrationService\Reference.cs" />
+    <Compile Include="ServiceNow\ServiceNowIntegrator.cs" />
+    <Compile Include="ServiceNow\ServiceNowService.cs" />
+    <Compile Include="Utils\CustomJsonConverter.cs" />
     <Compile Include="Web References\IntegrationAPI\Reference.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

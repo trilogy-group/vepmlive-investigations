@@ -7,6 +7,7 @@ using System.Data;
 using System.IO;
 using System.Linq;
 using System.Net;
+using UplandIntegrations.Utils;
 
 namespace UplandIntegrations.Jira
 {
