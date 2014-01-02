@@ -233,7 +233,7 @@ function CommentsCloseClose(loader) {
                         var row = grid.FRow;
                         grid.SetValue(row, sItemData[0], sItemData[1]);
                         grid.RefreshCell(row, "Notifications");
-                    }catch(e){alert(e);}
+                    } catch (e) { alert(e); }
                 }
 
             } else {
@@ -298,7 +298,7 @@ function AddResource() {
         var counter = 0;
 
         for (var oR in enums) {
-            if(enumkeys[oR] != "" && reses[enumkeys[oR]] == null)
+            if (enumkeys[oR] != "" && reses[enumkeys[oR]] == null)
                 select.options[select.options.length] = new Option(enums[oR], enumkeys[oR]);
         }
 
@@ -334,7 +334,7 @@ function AddResourceClose(dialogResult, returnValue) {
                             break;
                         }
                     }
-                    if(!found)
+                    if (!found)
                         assns = assns + ";" + selectBox.options[i].value;
                 }
             }
@@ -360,8 +360,7 @@ function RollDown(Row, Col) {
         while (child != null) {
 
             if (child.Def.Name == "Folder" || child.Def.Name == "Iteration") {
-                if (Grid.GetValue(child, Col) == oldVal)
-                {
+                if (Grid.GetValue(child, Col) == oldVal) {
                     Grid.SetValue(child, Col, Grid.GetValue(Row, Col), 1);
                     if (Col == "StartDate")
                         RollDownColFromParent(Grid, child, "DueDate");
@@ -381,7 +380,7 @@ function RollDown(Row, Col) {
             child = child.nextSibling;
         }
     }
-    
+
 }
 
 function RollDownFromParent(grid, row) {
@@ -408,12 +407,10 @@ function RollDownColFromParent(grid, row, col) {
     }
 }
 
-function FindParentIteration(grid, row)
-{
+function FindParentIteration(grid, row) {
     var parentRow = row.parentNode;
-    if (parentRow && parentRow.Def)
-    {
-        if(parentRow.Def.Name == "Iteration")
+    if (parentRow && parentRow.Def) {
+        if (parentRow.Def.Name == "Iteration")
             return parentRow;
         else
             return FindParentIteration(grid, parentRow);
@@ -427,7 +424,7 @@ function SetProjectInfoFieldsEdit() {
         var col = c;
 
         if (col != "StartDate") {
-            
+
             if (col == "DueDate")
                 col = "Finish";
 
@@ -465,7 +462,7 @@ function GridHasChanges() {
 
     try {
         var sBin = Grids.WorkPlannerGrid.HasChanges().toString(2);
-        if (sBin[sBin.length-1] == "1" || !canPublish)
+        if (sBin[sBin.length - 1] == "1" || !canPublish)
             return false;
         else
             return true;
@@ -600,9 +597,9 @@ function setWBSAndTaskID(Row, force) {
 
 
 function ChangeTaskType(slt) {
-    if(slt[0].selected)
+    if (slt[0].selected)
         Grids.WorkPlannerGrid.SetValue(Grids.WorkPlannerGrid.FRow, "TaskType", "Shared", 1);
-    else if(slt[1].selected)
+    else if (slt[1].selected)
         Grids.WorkPlannerGrid.SetValue(Grids.WorkPlannerGrid.FRow, "TaskType", "Individual", 1);
 
     DoAssignmentRollDown(Grids.WorkPlannerGrid, Grids.WorkPlannerGrid.FRow, 1, "Work");
@@ -615,7 +612,7 @@ function PopulateResourceTable(Row, Force) {
         return;
 
     var grid = Grids.WorkPlannerGrid;
-    
+
     var wp = Grids.WorkPlannerAssignments;
 
     var slt = document.getElementById("slcttasktype");
@@ -651,7 +648,7 @@ function PopulateResourceTable(Row, Force) {
 
         oChild = oChild.nextSibling;
     }
-    
+
 }
 
 function RollupAssignmentFields(row) {
@@ -701,7 +698,7 @@ function RollupAssignments(Row, Col, Type) {
                     if (def == "Assignment") {
 
                         try {
-                            if(grid.GetValue(oChild, Col) < val)
+                            if (grid.GetValue(oChild, Col) < val)
                                 val = grid.GetValue(oChild, Col);
                         } catch (e) { }
                     }
@@ -754,7 +751,7 @@ function RollupAssignments(Row, Col, Type) {
 
                         try {
                             var aWork = grid.GetValue(oChild, "Work");
-                            sum += ((aWork/work) * (grid.GetValue(oChild, Col) / 100)) * 100;
+                            sum += ((aWork / work) * (grid.GetValue(oChild, Col) / 100)) * 100;
                         } catch (e) { }
                     }
 
@@ -777,7 +774,7 @@ function SaveProject() {
 
 function SaveWorkPlan() {
 
-    if(sUpdates != "") {
+    if (sUpdates != "") {
         ShowTDialog("Processing Updates...");
         dhtmlxAjax.post("WorkPlannerAction.aspx", "Action=ProcessUpdates&ID=" + sItemID + "&PlannerID=" + sPlannerID + "&Updates=" + sUpdates, SaveUpdatesClose);
     }
@@ -785,7 +782,7 @@ function SaveWorkPlan() {
         Grids.WorkPlannerGrid.ActionCalcOff();
         setWBSAndTaskID(Grids.WorkPlannerGrid.GetRowById('0'), true);
         Grids.WorkPlannerGrid.ActionCalcOn();
-       ShowTDialog("Saving Project...");
+        ShowTDialog("Saving Project...");
         SaveProject();
     }
 
@@ -809,14 +806,14 @@ function SaveProjectClose(loader) {
 
 
 function SaveMainGrid() {
-    
+
     ShowTDialog("Saving Plan...");
-    
+
     if (bAgile)
         SaveAgileGrid();
 
     Grids.WorkPlannerGrid.Save();
-    
+
 }
 
 function SaveAgileGrid() {
@@ -840,7 +837,7 @@ function SaveUpdatesClose(loader) {
             }
         }
         else
-            alert("Response contains no XML");            
+            alert("Response contains no XML");
     }
 }
 
@@ -870,17 +867,15 @@ function DeleteView() {
     }
 }
 
-function SetDepsGrid(grid, row)
-{
+function SetDepsGrid(grid, row) {
     var deps = grid.GetValue(row, "Descendants");
 
     var sDeps = deps.toString().split(";");
 
     var lGrid = Grids.WorkPlannerLinks;
 
-    for (var R in lGrid.Rows) 
-    {
-        if(R != "Header" && R != "Toolbar")
+    for (var R in lGrid.Rows) {
+        if (R != "Header" && R != "Toolbar")
             lGrid.RemoveRow(lGrid.GetRowById(R));
     }
 
@@ -914,7 +909,7 @@ function SetDepsGrid(grid, row)
                     sType = "FS";
             } catch (e) { sType = "FS"; }
 
-            
+
 
             var newRow = lGrid.AddRow(null, null, true, null, null);
             newRow.NoColor = 1;
@@ -944,13 +939,13 @@ function onDeleteViewCloseResponse(loader) {
 }
 
 function DoNewRow(bAgileGrid) {
-    
+
     var grid = Grids.WorkPlannerGrid;
     var agrid = Grids.AgileGrid;
 
     grid.EndEdit(true);
     try {
-        if(agrid)
+        if (agrid)
             agrid.EndEdit(true);
     } catch (e) { }
 
@@ -978,7 +973,7 @@ function DoNewRow(bAgileGrid) {
 
         }
     }
-    
+
     if (bAgileGrid) {
         newRow = agrid.GetRowById(newRow.id);
 
@@ -1027,7 +1022,7 @@ function DoNewRow(bAgileGrid) {
 }
 
 function SetTaskAssignments(Row) {
-    
+
     if (Row == null)
         return;
 
@@ -1048,14 +1043,13 @@ function SetTaskAssignments(Row) {
     grid.SetValue(Row, "ResourceNames", assignmentsstring, 1, 0);
 
     var oAssns = new Object();
-    
+
     if (assignments != null) {
 
         var oArray = assignments.split(';');
         var oArrayString = assignmentsstring.split(';');
         var counter = 0;
-        for (var assignment in oArray)
-        {
+        for (var assignment in oArray) {
             if (assignment != "") {
                 assignment = oArray[assignment];
                 oAssns[assignment] = oArrayString[counter++];
@@ -1095,7 +1089,7 @@ function SetTaskAssignments(Row) {
                 newrow = grid.AddRow(Row, null, oShowAssignments, Row.id + "." + oAssn, "Assignment");
                 //newrow = grid.CopyRow(Row, Row, null, false, false);
                 grid.ChangeDef(newrow, "Assignment", oShowAssignments, 0);
-                if(!oShowAssignments)
+                if (!oShowAssignments)
                     grid.HideRow(newrow);
 
                 grid.SetValue(newrow, "Title", oAssns[oAssn], 1);
@@ -1122,7 +1116,7 @@ function SetTaskAssignments(Row) {
                             var st = grid.GetValue(Row, "StartDate")
                             var en = grid.GetValue(Row, "DueDate")
                             var diff = grid.DiffGanttDate(st, en, "h");
-                           // SetPlannerFieldValue(Row, "Work", diff, true);
+                            // SetPlannerFieldValue(Row, "Work", diff, true);
                             grid.SetValue(Row, "Work", diff * assignmentcount, 1);
                         }
                     }
@@ -1147,7 +1141,7 @@ function SetTaskAssignments(Row) {
         CalculateAssignmentCosts(grid, Row);
     }
 
-    if(turnoncalc)
+    if (turnoncalc)
         grid.ActionCalcOn();
 }
 
@@ -1160,11 +1154,11 @@ function RollDownAllAssignmentFields(iRow) {
             if (Row.TaskType == "" || Row.TaskType == "Shared")
                 DoAssignmentRollDown(Grids.WorkPlannerGrid, Row, 0, c);
         }
-        else if(c == "Work") {
+        else if (c == "Work") {
             if (Row.TaskType == "" || Row.TaskType == "Shared")
                 DoAssignmentRollDown(Grids.WorkPlannerGrid, Row, 1, "Work");
         }
-        else if(c != "G" && c!= "Panel" && c != "Title" && c != "AssignedTo") {
+        else if (c != "G" && c != "Panel" && c != "Title" && c != "AssignedTo") {
             DoAssignmentRollDown(Grids.WorkPlannerGrid, Row, 0, c);
         }
     }
@@ -1189,7 +1183,7 @@ function DoAssignmentRollDown(Grid, Row, Type, Col) {
     var val = Grid.GetValue(Row, Col);
 
     if (Type == 0) {
-        
+
     }
     else if (Type == 1) {
 
@@ -1197,18 +1191,17 @@ function DoAssignmentRollDown(Grid, Row, Type, Col) {
 
         var oChild = Row.firstChild;
 
-        while (oChild != null)
-        {
+        while (oChild != null) {
             var def = oChild.Def.Name;
 
-            if (def == "Assignment") 
+            if (def == "Assignment")
                 count++;
-            
+
             oChild = oChild.nextSibling;
         }
 
         try {
-            if(count != 0)
+            if (count != 0)
                 val = val / count;
         } catch (e) { }
     }
@@ -1216,8 +1209,7 @@ function DoAssignmentRollDown(Grid, Row, Type, Col) {
 
     var oChild = Row.firstChild;
 
-    while (oChild != null)
-    {
+    while (oChild != null) {
         var def = oChild.Def.Name;
 
         if (def == "Assignment") {
@@ -1280,11 +1272,10 @@ function CheckResources() {
 }
 
 function MoreThan1Selected() {
-    try
-    {
-        if(Grids.WorkPlannerGrid.GetSelRows().length > 1)
+    try {
+        if (Grids.WorkPlannerGrid.GetSelRows().length > 1)
             return true;
-    }catch(e){}
+    } catch (e) { }
     return false;
 }
 
@@ -1298,11 +1289,10 @@ function Just1Selected() {
 }
 
 function MoreThan0Selected() {
-    try
-    {
-        if(Grids.WorkPlannerGrid.GetSelRows().length > 0)
+    try {
+        if (Grids.WorkPlannerGrid.GetSelRows().length > 0)
             return true;
-    }catch(e){}
+    } catch (e) { }
     return false;
 }
 
@@ -1470,7 +1460,7 @@ function iChangeView(view, bHide) {
         } catch (e) { }
     }
 
-    
+
 
     for (var c in grid.Cols) {
         if (oViews[c] == null && lViews[c] == null && c != "G") {
@@ -1503,7 +1493,7 @@ function iChangeView(view, bHide) {
     try {
         if (viewObject[view]["gantt"] == "1")
             grid.ShowCol("G");
-        else if(grid.Cols["G"].Visible)
+        else if (grid.Cols["G"].Visible)
             grid.HideCol("G");
     } catch (e) { }
     //if (viewObject[view]["folders"] == "true" && bUseFolders)
@@ -1522,7 +1512,7 @@ function iChangeView(view, bHide) {
         else
             dhxLayout.cells(allocCell).collapse();
     } catch (e) { }
-    
+
     //================Filters================
     if (viewObject[view]["filters"] == "") {
         grid.ChangeFilter("", "", "", 0, 0, null);
@@ -1536,7 +1526,7 @@ function iChangeView(view, bHide) {
             else
                 grid.HideRow(grid.GetRowById("Filter"));
         } catch (e) { }
-        if(filters[0] == "1")
+        if (filters[0] == "1")
             grid.ChangeFilter(filters[1], filters[2], filters[3], 0, 0, null);
         else
             grid.ActionFilterOff();
@@ -1558,8 +1548,8 @@ function iChangeView(view, bHide) {
 
         grid.DoGrouping(grouping[1]);
     }
-    
-    
+
+
     /*
     try
     {
@@ -1571,11 +1561,11 @@ function iChangeView(view, bHide) {
     grid.HideRow(row);
     }catch(e){}*/
     //=========================================
-    
+
     RefreshCommandUI();
 
     grid.Render();
-    
+
     if (bAgile) {
         ChangeAgileView(view);
         Grids.AgileGrid.ShowCol("id");
@@ -1592,7 +1582,7 @@ function iChangeView(view, bHide) {
         HideShowAssignments();
     } catch (e) { }
 
-    if(bHide)
+    if (bHide)
         HideTDialog();
 }
 
@@ -1618,7 +1608,7 @@ function SaveView() {
             def = true;
         break;
     }
-    
+
     viewNameDiv.firstChild.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling.style.display = "";
 
     if (def)
@@ -1635,7 +1625,7 @@ function SaveView() {
 function onSaveViewClose(dialogResult, returnValue) {
 
     if (dialogResult == SP.UI.DialogResult.OK) {
-        
+
         var vals = returnValue.split("|");
 
         if (checkViewName(vals[0])) {
@@ -1736,7 +1726,7 @@ function onSaveViewClose(dialogResult, returnValue) {
             sm("dlgSavingView", 130, 50);
 
             dhtmlxAjax.post("WorkPlannerAction.aspx", "Action=SaveView&title=" + vals[0] + "&assignments=" + assignments + "&summary=" + summary + "&leftcols=" + leftCols + "&cols=" + cols + "&default=" + vals[1] + "&gantt=" + gantt + "&details=" + details + "&folders=" + folders + "&filters=" + filters + "&sorting=" + sorting + "&grouping=" + grouping + "&allocation=" + allocation + "&PlannerID=" + sPlannerID + GetAgileViewParam(key), onSaveViewCloseResponse);
-            
+
         }
     }
 }
@@ -1850,8 +1840,7 @@ function checkViewName(viewName) {
         alert("You can't overwrite the Default View");
         return false;
     }
-    if (viewObject[viewName] != null)
-    {
+    if (viewObject[viewName] != null) {
         return confirm("Would you like to overwrite that view?");
     }
     //TODO:
@@ -1859,16 +1848,14 @@ function checkViewName(viewName) {
 
 }
 
-function onSaveViewCloseResponse(loader)
-{
-	if(loader.xmlDoc.responseText!=null)
-	{
+function onSaveViewCloseResponse(loader) {
+    if (loader.xmlDoc.responseText != null) {
         hm("dlgSavingView");
         if (loader.xmlDoc.responseText.trim() != "Success")
             alert(loader.xmlDoc.responseText);
-	}
-	else
-		alert("Response contains no XML");
+    }
+    else
+        alert("Response contains no XML");
 }
 
 function DoCreateNew(fieldinfo, hasproject) {
@@ -1893,8 +1880,7 @@ function DoCreateNewPost(ret) {
 
     var ticket = ret.xmlDoc.responseText;
 
-    if(ticket.indexOf("General Error") != 0)
-    {
+    if (ticket.indexOf("General Error") != 0) {
         var listInfo = ticket.split('|');
 
         var weburl = listInfo[0] + "/_layouts/epmlive/gridaction.aspx?action=linkeditems&list=" + listInfo[3] + "&field=" + listInfo[1] + "&LookupFieldList=" + listInfo[2];
@@ -1903,8 +1889,7 @@ function DoCreateNewPost(ret) {
 
         SP.UI.ModalDialog.showModalDialog(options);
     }
-    else
-    {
+    else {
         alert(ticket);
     }
 }
@@ -1946,8 +1931,7 @@ function UpdateAssignments(grid) {
     } catch (e) { }
 }
 
-function PopulateCreateNew()
-{
+function PopulateCreateNew() {
     var sb = new Sys.StringBuilder();
     sb.append('<Menu Id=\'Ribbon.WorkPlanner.CreateNew.Dropdown.Menu\'>');
     sb.append('<MenuSection DisplayMode=\'Menu\' Id=\'Ribbon.WorkPlanner.CreateNew.Dropdown.Menu.Default\' Title=\'Lists\'>');
@@ -1961,7 +1945,7 @@ function PopulateCreateNew()
         sb.append(' Id=\'Ribbon.WorkPlanner.DisplayView.CreateNewItem');
         sb.append('\'');
         sb.append(' Command=\'');
-        if(sAList[1] == "True")
+        if (sAList[1] == "True")
             sb.append('Ribbon.WorkPlanner.DoCreateNew');
         else
             sb.append('Ribbon.WorkPlanner.DoCreateNewNoProject');
@@ -2020,9 +2004,8 @@ function PopulateDisplayView() {
 
     var hasOne = false;
 
-    for (var v in viewObject) 
-    {
-        
+    for (var v in viewObject) {
+
         sb.append('<Button');
         sb.append(' Id=\'Ribbon.WorkPlanner.DisplayView.' + v);
         sb.append('\'');
@@ -2035,7 +2018,7 @@ function PopulateDisplayView() {
         sb.append('/>');
 
         if (!hasOne) {
-            if(curView == "")
+            if (curView == "")
                 curView = viewObject[v].title;
 
             sb.append('</Controls>');
@@ -2062,10 +2045,8 @@ function IsShowGantt() {
     return grid.Cols.G.Visible;
 }
 
-function ZoomIn() 
-{
-    if (CanZoomIn())
-    {
+function ZoomIn() {
+    if (CanZoomIn()) {
         //curZoom++;
 
         Grids.WorkPlannerGrid.ActionZoomIn();
@@ -2076,10 +2057,8 @@ function ZoomIn()
     }
 }
 
-function ZoomOut()
-{
-    if (CanZoomOut())
-    {
+function ZoomOut() {
+    if (CanZoomOut()) {
         //curZoom--;
 
         Grids.WorkPlannerGrid.ActionZoomOut();
@@ -2105,7 +2084,7 @@ function ZoomFit() {
     Grids.AllocationGrid.ActionZoomFit();
 
     RefreshCommandUI();
-    
+
 }
 
 function CanZoomOut() {
@@ -2115,8 +2094,7 @@ function CanZoomOut() {
     return false;
 }
 
-function CanZoomIn()
-{
+function CanZoomIn() {
     try {
         return Grids.WorkPlannerGrid.CanZoomIn();
     } catch (e) { }
@@ -2188,14 +2166,12 @@ function onAddNewLink(dialogResult, returnValue) {
         else {
             alert("You can't link summary rows");
         }
-            
+
     }
 }
 
-function onAddLinkMenu(dialogResult, returnValue)
-{
-    if (dialogResult == SP.UI.DialogResult.OK) 
-    {
+function onAddLinkMenu(dialogResult, returnValue) {
+    if (dialogResult == SP.UI.DialogResult.OK) {
         var vals = returnValue.split('|');
 
         if (AddLinkDirection == "up")
@@ -2247,8 +2223,7 @@ function RemovePred(grid, row, parentid) {
 }
 
 
-function AddPred(grid, row, parentid, type, lag)
-{
+function AddPred(grid, row, parentid, type, lag) {
     var pId = row.Predecessors.toString();
     var pIds = pId.split(";");
     pId = "";
@@ -2298,7 +2273,7 @@ function linkItems(parentid, row, type, lag) {
     }
 
     pId += parentid;
-    if(type != "FS")
+    if (type != "FS")
         pId += type;
 
     if (lag != "") {
@@ -2332,7 +2307,7 @@ function setDefaultDates(grid, row, samedates) {
 
     if (grid.GetValue(row, "StartDate") == "" && !oRollDown["StartDate"])
         grid.SetValue(row, "StartDate", new Date(grid.Cols["G"].GanttBase).valueOf(), 1, 0);
-    
+
     if (samedates && !oRollDown["Duration"]) {
         //grid.SetValue(row, "DueDate", new Date(grid.Cols["G"].GanttBase).valueOf(), 1, 0);
         grid.SetValue(row, "Duration", 0, 1, 0);
@@ -2419,7 +2394,7 @@ function UpdateDependencies(grid) {
 
     Grids.WorkPlannerGrid.SetValue(Grids.WorkPlannerGrid.FRow, "Descendants", deps, 1);
 
-    
+
 
     Grids.WorkPlannerGrid.CorrectDependencies(Grids.WorkPlannerGrid.FRow, "G");
 }
@@ -2434,7 +2409,7 @@ function ShowAssignments() {
         Grids.WorkPlannerGrid.Def["Assignment"].Visible = "1";
     }
 
-    
+
 
     HideShowAssignments();
 }
@@ -2458,8 +2433,7 @@ function ShowSummary() {
 }
 
 function HideShowAssignment(grid, row) {
-    if (row.Def.Name == "Assignment")
-    {
+    if (row.Def.Name == "Assignment") {
         if (oShowAssignments) {
             grid.ShowRow(row);
             return true;
@@ -2484,8 +2458,7 @@ function HideShowAssignments() {
 
     var row = grid.GetFirst();
 
-    while (row && row.id != "BacklogRow")
-    {
+    while (row && row.id != "BacklogRow") {
         HideShowAssignment(grid, row);
 
         row = grid.GetNext(row);
@@ -2588,7 +2561,7 @@ function Unlink() {
             for (var sD in sDs) {
                 var rId = sDs[sD];
                 var iRow = grid.GetRowById(parseFloat(rId));
-                if(iRow)
+                if (iRow)
                     grid.SetValue(iRow, "Predecessors", RemovePred(grid, iRow, rows[i].id), 1);
             }
 
@@ -2599,8 +2572,7 @@ function Unlink() {
     }
 }
 
-function PublishWorkPlan() 
-{
+function PublishWorkPlan() {
 
     sm("divPublish", 130, 50);
 
@@ -2611,10 +2583,10 @@ function PublishWorkPlan()
 function CheckUpdates() {
 
     //if (canPublish)
-        dhtmlxAjax.post("WorkPlannerAction.aspx", "Action=GetUpdateCount&ID=" + sItemID + "&PlannerID=" + sPlannerID, CheckUpdatesClose);
+    dhtmlxAjax.post("WorkPlannerAction.aspx", "Action=GetUpdateCount&ID=" + sItemID + "&PlannerID=" + sPlannerID, CheckUpdatesClose);
     //else {
     //    closeupdateStatusBox();
-        //setTimeout("CheckUpdates()", 60000);
+    //setTimeout("CheckUpdates()", 60000);
     //}
 }
 
@@ -2677,8 +2649,7 @@ function CopyRemainingWork(grid, row) {
     }
 }
 
-function onDoUpdates(dialogResult, returnValue) 
-{
+function onDoUpdates(dialogResult, returnValue) {
     if (dialogResult == SP.UI.DialogResult.OK) {
         sUpdates = returnValue;
 
@@ -2718,8 +2689,7 @@ function DoUpdates() {
     SP.UI.ModalDialog.showModalDialog(options);
 }
 
-function CheckPublishStatus()
-{
+function CheckPublishStatus() {
 
     dhtmlxAjax.post("WorkPlannerAction.aspx", "Action=PublishStatus&ID=" + sItemID + "&PlannerID=" + sPlannerID, CheckPublishStatusClose);
 
@@ -2734,7 +2704,7 @@ function CheckPublishStatusClose(loader) {
             SP.UI.Status.setStatusPriColor(publishStatusBox, 'blue');
             setHeight();
         }
-        
+
         publishStatus = loader.xmlDoc.responseText.trim();
 
         var sPublishStatus = publishStatus.split('|');
@@ -2784,14 +2754,12 @@ function onPublishClose(loader) {
         alert("Response contains no XML");
 }
 
-function Outdent()
-{
+function Outdent() {
     var grid = Grids.WorkPlannerGrid;
     grid.EndEdit(true);
     var orows = grid.GetSelRows();
     grid.ActionCalcOff();
-    for (var i = orows.length - 1; i >= 0; i--) 
-    {
+    for (var i = orows.length - 1; i >= 0; i--) {
         var row = orows[i];
 
         if (row.Def.Name != "Folder" && row.parentNode != null && row.parentNode.Def.Name != "Folder" && row.parentNode.Def.Name != "Iteration") {
@@ -2816,24 +2784,22 @@ function Outdent()
 
             //grid.MoveRow(row, row.parentNode.parentNode, null, 1);
 
-            
+
         }
     }
     grid.ActionCalcOn();
 
 }
 
-function Indent()
-{
+function Indent() {
 
     var grid = Grids.WorkPlannerGrid;
     grid.EndEdit(true);
     var orows = grid.GetSelRows();
     grid.ActionCalcOff();
-    for (var i = 0; i < orows.length; i++) 
-    {
+    for (var i = 0; i < orows.length; i++) {
         var row = grid.GetRowById(orows[i].id);
-        
+
         if (row.Def.Name != "Folder" && row.previousSibling != null && row.previousSibling.Def.Name != "Folder" && row.previousSibling.Def.Name != "Assignment") {
 
             grid.MoveRow(row, row.previousSibling, null, 1);
@@ -2911,8 +2877,7 @@ function NewTask(isSummary, isMilestone, isAbove, bAgileGrid, bIsExternal, bForc
         else
             newrow = grid.AddRow(grid.GetRowById("0"), null, true, newId, taskDef);
     }
-    else
-    {
+    else {
         row = grid.GetRowById(row.id);
         if (row.Def.Name == "Folder" || row.Def.Name == "Iteration") {
             newrow = grid.AddRow(row, row.firstChild, true, newId, taskDef);
@@ -2929,22 +2894,22 @@ function NewTask(isSummary, isMilestone, isAbove, bAgileGrid, bIsExternal, bForc
         grid.SetValue(newrow, "StartDate", new Date(grid.Cols["G"].GanttBase).valueOf(), 1, 0);
     }
     //ApplyDefaults(grid, newrow, isMilestone, isSummary);
-    
+
     setParentDef(grid, newrow);
-    
+
     grid.SetValue(newrow, "Summary", 0, 1, 0);
 
     if (isSummary) {
-        
+
         grid.SetValue(newrow, "Title", "Summary Task 1", 1);
         grid.SetValue(newrow, "Summary", 1, 1, 0);
         newId = grid.GenerateId();
         newrow = grid.AddRow(newrow, null, true, newId, "Task");
         setDefaultDates(grid, newrow);
-        
+
     }
 
-    
+
 
     var hRow = newrow;
 
@@ -2959,27 +2924,24 @@ function NewTask(isSummary, isMilestone, isAbove, bAgileGrid, bIsExternal, bForc
     if (bAgileGrid)
         grid.HideRow(newrow);
 
-    if(!bAgileGrid)
+    if (!bAgileGrid)
         grid.Focus(newrow, 'Title');
-    
+
     return newrow.id;
 }
 
 function GetColor(grid, row, col, r, g, b, edit) {
     if (grid.id == "WorkPlannerGrid") {
-        if(col == "Available" || col == "AvailableWork")
-        {
-            try
-            {
-                if(row.id != "NewTask" && row.id != "0" && row.Def.Name == "Iteration")
-                {
-                
-                        var val = parseFloat(grid.GetValue(row, col));
-                        if(val < 0)
-                            return "#C86363";
-                        else
-                            return "#70B76F";
-                
+        if (col == "Available" || col == "AvailableWork") {
+            try {
+                if (row.id != "NewTask" && row.id != "0" && row.Def.Name == "Iteration") {
+
+                    var val = parseFloat(grid.GetValue(row, col));
+                    if (val < 0)
+                        return "#C86363";
+                    else
+                        return "#70B76F";
+
                 }
             } catch (e) { }
         }
@@ -3024,16 +2986,15 @@ function getHTML(grid, row, col, val) {
 
                     if (row.id == "NewTask" || row.id == "0")
                         return "";
-                
+
                     if (grid.GetValue(row, "Status") == "Completed") {
                         val = "<img src='/_layouts/images/checkmark.gif' alt='Completed'>";
                     }
-                    else if (grid.GetValue(row, "Status") == "Deferred") 
-                    {
+                    else if (grid.GetValue(row, "Status") == "Deferred") {
                         val = "<img src='/_layouts/images/green.gif' alt='On Schedule'>";
                     }
                     else {
-                        if (duedate < todayplus) 
+                        if (duedate < todayplus)
                             val = "<img src='/_layouts/images/red.gif' alt='On Schedule'>";
                         else if (duedate < today)
                             val = "<img src='/_layouts/images/yellow.gif' alt='On Schedule'>";
@@ -3154,16 +3115,14 @@ function ShowTab(tab) {
     } catch (e) { }
 }
 
-function setParentDef(Grid, Row) 
-{
+function setParentDef(Grid, Row) {
     if (Row.parentNode.Def.Name == "Task") {
         Grids.WorkPlannerGrid.ChangeDef(Grids.WorkPlannerGrid.GetRowById(Row.id).parentNode, "Summary", 1, 0);
         Grid.ChangeDef(Row.parentNode, "Summary", 1, 0);
     }
 }
 
-function focusCell(grid, row) 
-{
+function focusCell(grid, row) {
     grid.Focus(row, "Title", null, true);
 }
 
@@ -3186,9 +3145,9 @@ function EditFolder() {
     var grid = Grids.WorkPlannerGrid;
 
     if (grid.FRow.id != "0") {
-        
+
         var folder = prompt('Enter New Folder Name:', grid.FRow.Title);
-        if(folder != null)
+        if (folder != null)
             grid.SetValue(grid.FRow, "Title", folder, 1);
     }
 }
@@ -3200,7 +3159,7 @@ function DeleteFolder() {
         if (confirm("Are you sure you want to delete that folder and all it's tasks?")) {
 
             grid.DeleteRow(grid.FRow, 1);
-            
+
         }
     }
 }
@@ -3294,12 +3253,36 @@ function ResourceInformation() {
 
 function BuildTeam() {
     var options = { url: "buildteam.aspx?listid=" + sProjectListId + "&id=" + sItemID, title: "Build Team", showMaximized: true, dialogReturnValueCallback: RefreshTeam };
-    
+
     //var options = { url: "buildteam.aspx?useteam=" + bUseTeam + "&listid=" + sProjectListId + "&id=" + sItemID + "&nosave=true&currentteam=1", title: "Build Team", showMaximized: true, dialogReturnValueCallback: RefreshTeam };
-    
+
     SP.UI.ModalDialog.showModalDialog(options);
 }
 
+function AddFragment() {
+    var options = { url: "addfragment.aspx?tasklistid=" + sTaskListId, width: 300, height: 125, title: "Add Fragment", showMaximized: false, dialogReturnValueCallback: RefreshTeam };
+
+    //var options = { url: "buildteam.aspx?useteam=" + bUseTeam + "&listid=" + sProjectListId + "&id=" + sItemID + "&nosave=true&currentteam=1", title: "Build Team", showMaximized: true, dialogReturnValueCallback: RefreshTeam };
+
+    SP.UI.ModalDialog.showModalDialog(options);
+}
+
+
+function SaveFragment() {
+    var options = { url: "savefragment.aspx?tasklistid=" + sTaskListId, width: 325, height: 250, title: "Save Fragment", showMaximized: false, dialogReturnValueCallback: RefreshTeam };
+
+    //var options = { url: "buildteam.aspx?useteam=" + bUseTeam + "&listid=" + sProjectListId + "&id=" + sItemID + "&nosave=true&currentteam=1", title: "Build Team", showMaximized: true, dialogReturnValueCallback: RefreshTeam };
+
+    SP.UI.ModalDialog.showModalDialog(options);
+}
+
+function DeleteFragment() {
+    var options = { url: "deletefragment.aspx?tasklistid=" + sTaskListId, width: 450, height: 450, title: "Delete Fragment", showMaximized: false, dialogReturnValueCallback: RefreshTeam };
+
+    //var options = { url: "buildteam.aspx?useteam=" + bUseTeam + "&listid=" + sProjectListId + "&id=" + sItemID + "&nosave=true&currentteam=1", title: "Build Team", showMaximized: true, dialogReturnValueCallback: RefreshTeam };
+
+    SP.UI.ModalDialog.showModalDialog(options);
+}
 function RefreshTeam(dialogResult, returnValue) {
     sm("dlgResource", 130, 50);
     dhtmlxAjax.post("WorkPlannerAction.aspx", "Action=GetTeam&PlannerID=" + sPlannerID + "&itemid=" + sItemID + "&listid=" + sProjectListId, RefreshTeamClose);
@@ -3322,7 +3305,7 @@ function ApplyDefaults(grid, row, isMilestone, isSummary) {
             setDefaultDates(grid, row, true);
             CheckMilestone(row.id);
         }
-        else if(!isSummary)
+        else if (!isSummary)
             setDefaultDates(grid, row);
 
 
@@ -3402,8 +3385,7 @@ function ScrollTo() {
     var row = grid.FRow;
     if (row != null) {
         var sDate = grid.GetValue(row, "StartDate")
-        if(sDate != "")
-        {
+        if (sDate != "") {
             var date = new Date(sDate);
             grid.ScrollToDate(date, "left");
             //Grids.AllocationGrid.ScrollToDate(date, "left");
@@ -3412,16 +3394,15 @@ function ScrollTo() {
 }
 
 function Close() {
-    try
-    {
-    location.href = sSource;
-    }catch(e){}
+    try {
+        location.href = sSource;
+    } catch (e) { }
 }
 
 function UpdateProject() {
 
     curTempDate = new Date();
-    
+
     var options = { url: "SelectDate.aspx", width: 250, height: 280, title: "Update Project", dialogReturnValueCallback: onUpdateProject };
 
     SP.UI.ModalDialog.showModalDialog(options);
@@ -3437,7 +3418,7 @@ function IsCalcEnabled() {
     return false;
 }
 
-function IsRespectLinks() { 
+function IsRespectLinks() {
     try {
         if (Grids.WorkPlannerGrid.Cols["G"].GanttCorrectDependencies == 1)
             return true;
@@ -3465,7 +3446,7 @@ function isActiveRow(Row) {
 }
 
 function CalculateAssignmentCosts(grid, row) {
-   
+
     var child = row.firstChild;
 
     var fTotalWork = 0;
@@ -3532,35 +3513,35 @@ function CalcUsage(grid, row) {
 }
 
 function SetPlannerFieldValue(row, col, val, setVal) {
-    
+
     var grid = Grids.WorkPlannerGrid;
-    
+
     var row = grid.GetRowById(row.id);
 
     if (!row)
         return;
-    
+
     if (setVal)
         grid.SetValue(row, col, val, 1);
-    
+
     if (row.id == "NewTask")
         bNewRowHasChanged = true;
-    
+
     try {
         Grids.WorkPlannerDetail.SetValue(Grids.WorkPlannerDetail.GetRowById(col), "V", val, 1);
     } catch (e) { }
 
     if (col == "AssignedTo" && row.Def.Name != "Assignment") {
-        
+
         if (row.id == "NewTask") {
             row = DoNewRow();
         }
         SetTaskAssignments(row);
-        
+
         PopulateResourceTable(row, false);
-        
+
     }
-    
+
     var rolldowntype = 0;
 
     if (col == "Work") {
@@ -3577,13 +3558,13 @@ function SetPlannerFieldValue(row, col, val, setVal) {
         if (Grids.WorkPlannerGrid.FRow != null && row.id == Grids.WorkPlannerGrid.FRow.id)
             PopulateResourceTable(row, false);
     }
-    
+
     RollupSummaryField(col);
 
     if (col == "Duration") {
         RollupSummaryField("DueDate");
         DoAssignmentRollDown(grid, row, 0, "DueDate");
-        
+
         //if (val == "0")
         //    grid.SetValue(row, "DueDate", grid.GetValue(row, "StartDate"), 1, 0);
 
@@ -3610,7 +3591,7 @@ function SetPlannerFieldValue(row, col, val, setVal) {
     }
 
     if (col == "StartDate") {
-        
+
         RollupSummaryField("DueDate");
         DoAssignmentRollDown(grid, row, 0, "DueDate");
         CalculateAssignmentCosts(grid, row);
@@ -3620,12 +3601,12 @@ function SetPlannerFieldValue(row, col, val, setVal) {
         //    RollDown(row, "DueDate");
         //}
     }
-   
+
     if (col == "Work") {
         CopyRemainingWork(grid, row);
         CalculateAssignmentCosts(grid, row);
     }
-    
+
     if (col == "ActualWork") {
         CalculateAssignmentCosts(grid, row);
     }
@@ -3687,22 +3668,18 @@ function WEStatusCalculateStatus(grid, row, val) {
     _WEStatus_Status = val;
     _WEStatus_PercentComplete = grid.GetValue(row, "PercentComplete");
     ProcessStatus();
-    try
-    {
+    try {
         grid.SetValue(row, "PercentComplete", _WEStatus_PercentComplete, 1, 0);
     } catch (e) { }
-    try
-    {
+    try {
         grid.SetValue(row, "Complete", _WEStatus_Complete, 1, 0);
     } catch (e) { }
 
     if (isActiveRow(row)) {
-        try
-        {
+        try {
             Grids.WorkPlannerDetail.SetValue(Grids.WorkPlannerDetail.GetRowById("PercentComplete", "V", _WEStatus_PercentComplete, 1, 0));
         } catch (e) { }
-        try
-        {
+        try {
             Grids.WorkPlannerDetail.SetValue(Grids.WorkPlannerDetail.GetRowById("Complete", "V", _WEStatus_Complete, 1, 0));
         } catch (e) { }
     }
@@ -3712,20 +3689,17 @@ function WEStatusCalculateComplete(grid, row, val) {
     _WEStatus_Complete = val;
     _WEStatus_PercentComplete = grid.GetValue(row, "PercentComplete");
     ProcessComplete();
-    try
-    {
+    try {
         grid.SetValue(row, "PercentComplete", _WEStatus_PercentComplete, 1, 0);
     } catch (e) { }
-    try
-    {
+    try {
         grid.SetValue(row, "Status", _WEStatus_Status, 1, 0);
     } catch (e) { }
     if (isActiveRow(row)) {
-        try
-        {
+        try {
             Grids.WorkPlannerDetail.SetValue(Grids.WorkPlannerDetail.GetRowById("PercentComplete", "V", _WEStatus_PercentComplete, 1, 0));
-        }catch(e){}
-        try{
+        } catch (e) { }
+        try {
             Grids.WorkPlannerDetail.SetValue(Grids.WorkPlannerDetail.GetRowById("Status", "V", _WEStatus_Status, 1, 0));
         } catch (e) { }
     }
@@ -3735,21 +3709,17 @@ function WEStatusCalculatePercentComplete(grid, row, val) {
     _WEStatus_PercentComplete = val;
     _WEStatus_Status = grid.GetValue(row, "Status");
     ProcessPercentComplete();
-    try
-    {
+    try {
         grid.SetValue(row, "Complete", _WEStatus_Complete, 1, 0);
     } catch (e) { }
-    try
-    {
+    try {
         grid.SetValue(row, "Status", _WEStatus_Status, 1, 0);
     } catch (e) { }
     if (isActiveRow(row)) {
-        try
-        {
+        try {
             Grids.WorkPlannerDetail.SetValue(Grids.WorkPlannerDetail.GetRowById("Complete", "V", _WEStatus_Complete, 1, 0));
         } catch (e) { }
-        try
-        {
+        try {
             Grids.WorkPlannerDetail.SetValue(Grids.WorkPlannerDetail.GetRowById("Status", "V", _WEStatus_Status, 1, 0));
         } catch (e) { }
     }
@@ -3814,7 +3784,7 @@ function RefreshNotifications(row) {
 }
 
 function ShowTDialog(text) {
-    
+
     sm("dlgNormal", 150, 50);
     document.getElementById("dlgNormalText").innerText = text;
 }
@@ -3826,13 +3796,13 @@ function ShowNotes() {
         var options = { url: "NoteEditor.aspx", width: 650, height: 450, title: "Notes", dialogReturnValueCallback: ShowNotesClose };
 
         SP.UI.ModalDialog.showModalDialog(options);
-        
+
         //RTE_GetEditorDocument(sEditorID).body.innerHTML = Grids.WorkPlannerGrid.GetValue(Grids.WorkPlannerGrid.FRow, "Notes");
     }
 }
 
 function ShowNotesClose() {
-    
+
 }
 
 function HideTDialog() {
@@ -3900,10 +3870,10 @@ function DisableCalcClose(loader) {
 }
 
 function Expand(level) {
-    
+
     if (level == "-1")
     { return; }
-    
+
     if (level == "99") {
         Grids.WorkPlannerGrid.ActionExpandAll();
     }
@@ -3929,7 +3899,7 @@ function Expand(level) {
                 }
             }
         }
-        
+
     }
 }
 
@@ -3980,8 +3950,7 @@ function DoClearBaseline() {
 }
 
 
-function SetBaseline() 
-{
+function SetBaseline() {
     if (sBaselineDate == "") {
         ShowTDialog("Setting Baseline...");
         setTimeout("DoSetBaseline()", 100);
@@ -4000,7 +3969,7 @@ function CancelBubbling(obj, evt) {
     if (window.event) {
         e.cancelBubble = true;
     }
-    else {        
+    else {
         e.stopPropagation();
     }
 }
@@ -4012,8 +3981,7 @@ function newtaskfocus(textfield) {
     }
 }
 
-function newtaskblur(textfield)
-{
+function newtaskblur(textfield) {
     if (textfield.value == "") {
         textfield.value = newtasktext;
         textfield.style.color = "#9C9C9C";
@@ -4064,8 +4032,8 @@ function DoSetBaseline() {
             var row = grid.GetRowById(R);
 
             for (var col in oBaselineFields) {
-                
-                grid.SetValue(row, oBaselineFields[col], grid.GetValue(row, col),1);
+
+                grid.SetValue(row, oBaselineFields[col], grid.GetValue(row, col), 1);
 
             }
 
@@ -4079,14 +4047,14 @@ function DoSetBaseline() {
         }
     }
     grid.ActionCalcOn();
-    var dt =new Date();
+    var dt = new Date();
 
     dhtmlxAjax.post("WorkPlannerAction.aspx", "Action=SetProperty&ID=" + sItemID + "&PlannerID=" + sPlannerID + "&Property=BD&Value=" + dt.toLocaleString(), DoSetBaselineClose);
 
     try {
         Grids.ProjectInfo.SetValue(Grids.ProjectInfo.GetRowById(sPlannerID + "BD"), "V", dt.valueOf(), 1, 0);
     } catch (e) { }
-    
+
     setTimeout("DoSetBaselinePJ()", 100);
 
 }
@@ -4121,8 +4089,7 @@ function onUpdateProject(dialogResult, returnValue) {
         for (var R in grid.Rows) {
             if (R != "Header" && R != "Toolbar" && R != "NewTask") {
                 var row = grid.GetRowById(R);
-                if(row.Kind == "Data")
-                {
+                if (row.Kind == "Data") {
                     try {
                         var f = new Date(row.DueDate);
                         var finish = new Date(f.toDateString());
@@ -4167,8 +4134,8 @@ function onMoveProject(dialogResult, returnValue) {
 
 function SetProjectStartDate(idate) {
 
-    var date = new Date(idate).setHours(0,0,0,0);
-    
+    var date = new Date(idate).setHours(0, 0, 0, 0);
+
     date = Grids.WorkPlannerGrid.RoundGanttDate(date.valueOf(), 8);
     //date = new Date(new Date(Date.UTC(date.getYear(), date.getMonth(), date.getDate())).toUTCString());
 
@@ -4298,7 +4265,7 @@ function EditCosts() {
     var FullId = sWebId + "." + sProjectListId + "." + sItemID;
 
     weburl = sWebUrl + "/_layouts/ppm/costs.aspx?itemid=" + FullId + "&listid=" + sProjectListId + "&view=";
-    
+
     var options = { url: weburl, showMaximized: true, showClose: false };
 
     SP.UI.ModalDialog.showModalDialog(options);
@@ -4357,7 +4324,7 @@ function AddExternalTask(dialogResult, returnValue) {
 
         var ntRow = returnValue.Row;
 
-       
+
 
         grid.ActionCalcOff();
 
@@ -4365,10 +4332,10 @@ function AddExternalTask(dialogResult, returnValue) {
         //grid.SetValue(newRow, "DueDate", ntRow["DueDate"], 1, 0);
         //grid.SetValue(newRow, "Title", ntRow["Title"], 1, 0);
         //grid.SetValue(newRow, "Duration", ntRow["Duration"], 1, 0);
-       
+
         for (var c in grid.Cols) {
             if (c != "id") {
-                if(validExternalField(c))
+                if (validExternalField(c))
                     SetPlannerFieldValue(newRow, c, ntRow[c], true);
                 //grid.SetValue(newRow, c, ntRow[c], 1, 0);
             }
@@ -4392,7 +4359,7 @@ function AcceptExternal() {
 
     for (var row in grid.Rows) {
         var orow = grid.Rows[row];
-        
+
 
         if (orow.Reject == "1") {
 
@@ -4412,13 +4379,13 @@ function AcceptExternal() {
         }
     }
 
-    
+
 
 }
 
 function validExternalField(field) {
-    
-    if(field == "ExternalLink" || field == "IsExternal" || field == "Predecessors" || field == "Descendants")
+
+    if (field == "ExternalLink" || field == "IsExternal" || field == "Predecessors" || field == "Descendants")
         return false;
 
     return true;
@@ -4442,7 +4409,7 @@ function InitGantt() {
         var date = new Date(Grids.WorkPlannerGrid.Cols["G"].GanttBase);
         grid.ScrollToDate(date, "left");
     } catch (e) { }
-    
+
 
     try {
         RGrid.ActionZoomFit();
@@ -4450,7 +4417,7 @@ function InitGantt() {
     } catch (e) { }
     //WGrid.HideCol("G");
 
-    
+
 
     if (bAgile) {
         AGrid.SetValue(WGrid.GetRowById("0"), "Title", sProjectName, 1, 0);
@@ -4465,8 +4432,7 @@ function InitGantt() {
     setTimeout("InitStructure()", 100);
 }
 
-function InitStructure()
-{
+function InitStructure() {
     var WGrid = Grids.WorkPlannerGrid;
     SetProjectInfoFieldsEdit();
     setWBSAndTaskID(WGrid.GetRowById("0"));
@@ -4525,7 +4491,7 @@ function InitView() {
 function InitLinked() {
 
     if (CanLinkExternal) {
-        
+
         var grid = Grids.WorkPlannerGrid;
         var row = grid.GetRowById("ExternalTasks");
         if (row) {
@@ -4551,7 +4517,7 @@ function InitLinked() {
 
                     if (linkinfo[0] == "A")
                         tgrid.SetValue(trow, "Action", "Add", 1, 1);
-                    else if(linkinfo[0] == "U")
+                    else if (linkinfo[0] == "U")
                         tgrid.SetValue(trow, "Action", "Update", 1, 1);
 
                     tgrid.SetValue(trow, "puid", r.id);
@@ -4562,7 +4528,8 @@ function InitLinked() {
 
                 var divexternal = document.getElementById("divExternalLinkAccept");
 
-                var options = { html: divexternal, width: 600, height: 400, showClose: false, allowMaximize: false, title: "External Links"
+                var options = {
+                    html: divexternal, width: 600, height: 400, showClose: false, allowMaximize: false, title: "External Links"
                 };
 
                 SP.UI.ModalDialog.showModalDialog(options);
@@ -4639,7 +4606,7 @@ function CloseInit() {
     document.getElementById("divCover").style.display = "none";
     hm("dlgSplash");
     setTimeout("InitLinked()", 100);
-    
+
 }
 
 function HideBacklogRows(grid, row) {
@@ -4657,12 +4624,12 @@ function HideBacklogRows(grid, row) {
 function ShowBacklogRows(grid, row) {
     var child = row.firstChild;
 
-    
+
 
     while (child) {
         ShowBacklogRows(grid, child);
         if (child.Def.Name == "Assignment") {
-            if(oShowAssignments)
+            if (oShowAssignments)
                 grid.ShowRow(child);
         }
         else {

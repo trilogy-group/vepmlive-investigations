@@ -21,7 +21,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
         protected string sPlannerLayoutParam;
         protected string sViewObject;
 
-        
+
         protected string sPlannerID = "";
         protected string sItemID = "";
         protected string sProjectType = "";
@@ -112,39 +112,39 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
 
             try
             {
-                if(lstTaskCenter.Fields.GetFieldByInternalName("IsExternal") != null && lstTaskCenter.Fields.GetFieldByInternalName("ExternalLink") != null)
+                if (lstTaskCenter.Fields.GetFieldByInternalName("IsExternal") != null && lstTaskCenter.Fields.GetFieldByInternalName("ExternalLink") != null)
                 {
                     CanLinkExternal = "true";
                 }
             }
             catch { }
 
-            foreach(SPField oField in lstTaskCenter.Fields)
+            foreach (SPField oField in lstTaskCenter.Fields)
             {
-                if(oField.Type == SPFieldType.User)
+                if (oField.Type == SPFieldType.User)
                     sTaskUserFields += ",'" + oField.InternalName + "'";
                 else
                 {
                     try
                     {
-                        if(!oField.ReadOnlyField)
+                        if (!oField.ReadOnlyField)
                         {
                             XmlDocument docF = new XmlDocument();
                             docF.LoadXml(oField.SchemaXml);
 
                             string sDefault = docF.SelectSingleNode("//Default").InnerText;
-                            if(oField.Type == SPFieldType.DateTime && sDefault == "[today]")
-                            { 
-                                
+                            if (oField.Type == SPFieldType.DateTime && sDefault == "[today]")
+                            {
+
                             }
-                            else if(oField.Type == SPFieldType.Number || oField.Type == SPFieldType.Currency)
+                            else if (oField.Type == SPFieldType.Number || oField.Type == SPFieldType.Currency)
                             {
                                 //if(sDefault != "0" && sDefault != ".00")
-                                    sDefaults += oField.InternalName + ":\"" + sDefault.Replace("\"", "'") + "\",";
+                                sDefaults += oField.InternalName + ":\"" + sDefault.Replace("\"", "'") + "\",";
                             }
-                            else if(oField.Type == SPFieldType.Boolean)
+                            else if (oField.Type == SPFieldType.Boolean)
                             {
-                                if(sDefault != "0")
+                                if (sDefault != "0")
                                     sDefaults += oField.InternalName + ":\"" + sDefault.Replace("\"", "'") + "\",";
                             }
                             else
@@ -160,31 +160,31 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
             sTaskUserFields = sTaskUserFields.Trim(',');
 
             SPList lstProjectCenter = web.Lists[sListProjectCenter];
-            foreach(SPField oField in lstProjectCenter.Fields)
+            foreach (SPField oField in lstProjectCenter.Fields)
             {
-                if(oField.Type == SPFieldType.User)
+                if (oField.Type == SPFieldType.User)
                     sProjectUserFields += ",'" + oField.InternalName + "'";
             }
-            sProjectUserFields = sProjectUserFields.Trim(',');            
+            sProjectUserFields = sProjectUserFields.Trim(',');
             sTaskListId = lstTaskCenter.ID.ToString().ToUpper();
 
             StringBuilder sbBFields = new StringBuilder();
-            
-            foreach(SPField field in lstTaskCenter.Fields)
+
+            foreach (SPField field in lstTaskCenter.Fields)
             {
-                if(!field.Hidden && field.Reorderable)
+                if (!field.Hidden && field.Reorderable)
                 {
                     try
                     {
-                        string fName=field.InternalName;
+                        string fName = field.InternalName;
 
-                        if(fName == "StartDate")
+                        if (fName == "StartDate")
                             fName = "Start";
-                        if(fName == "DueDate")
+                        if (fName == "DueDate")
                             fName = "Finish";
 
                         SPField bField = lstTaskCenter.Fields.GetFieldByInternalName("Baseline" + fName);
-                        if(bField != null)
+                        if (bField != null)
                         {
                             sbBFields.Append(field.InternalName);
                             sbBFields.Append(":\"");
@@ -201,7 +201,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
             tb.StopTimer();
         }
 
-       
+
 
         protected void getAttachedLists(SPWeb web, string listid)
         {
@@ -222,25 +222,25 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                     }
                 }
             }*/
-            foreach(SPList list in web.Lists)
+            foreach (SPList list in web.Lists)
             {
-                if(!list.Hidden)
+                if (!list.Hidden)
                 {
                     EPMLiveCore.GridGanttSettings gSettings = new EPMLiveCore.GridGanttSettings(list);
 
-                    if(gSettings.AssociatedItems && list.Title != sListProjectCenter && list.Title != sListTaskCenter)
+                    if (gSettings.AssociatedItems && list.Title != sListProjectCenter && list.Title != sListTaskCenter)
                     {
                         bool hasProject = false;
                         string sfield = "";
-                        foreach(SPField field in list.Fields)
+                        foreach (SPField field in list.Fields)
                         {
-                            if(field.Type == SPFieldType.Lookup)
+                            if (field.Type == SPFieldType.Lookup)
                             {
                                 XmlDocument doc = new XmlDocument();
                                 doc.LoadXml(field.SchemaXml);
                                 try
                                 {
-                                    if(doc.FirstChild.Attributes["List"].Value.ToLower() == listid.ToLower())
+                                    if (doc.FirstChild.Attributes["List"].Value.ToLower() == listid.ToLower())
                                     {
                                         hasProject = true;
                                         sfield = field.InternalName;
@@ -249,9 +249,9 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                                 catch { }
                             }
                         }
-                        if(hasProject)
+                        if (hasProject)
                         {
-                            if((int)list.BaseType == 1)
+                            if ((int)list.BaseType == 1)
                                 sAttachedDocLibs += "\"" + System.Web.HttpUtility.HtmlEncode(list.Title) + "," + sfield + "." + System.Web.HttpUtility.HtmlEncode(list.Title) + "\",";
                             else
                                 sAttachedLists += "\"" + System.Web.HttpUtility.HtmlEncode(list.Title) + "," + sfield + "." + System.Web.HttpUtility.HtmlEncode(list.Title) + "\",";
@@ -270,11 +270,11 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
             tb.AddTimer();
             PlannerCore.WorkPlannerProperties wps = props.wpFields;
 
-            for(int i = 0; i < wps.count(); i++)
+            for (int i = 0; i < wps.count(); i++)
             {
                 PlannerCore.WorkPlannerProperty wp = wps.GetByIndex(i);
 
-                if(wp.val == "RollDown")
+                if (wp.val == "RollDown")
                 {
                     sRollDown += wp.field + ": \"" + wp.val + "\",";
                 }
@@ -295,15 +295,15 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
             {
                 SPSecurity.RunWithElevatedPrivileges(delegate()
                 {
-                    using(SPSite site = new SPSite(web.Site.ID))
+                    using (SPSite site = new SPSite(web.Site.ID))
                     {
-                        using(SPWeb rweb = site.OpenWeb(web.ID))
+                        using (SPWeb rweb = site.OpenWeb(web.ID))
                         {
                             rweb.AllowUnsafeUpdates = true;
                             SPList list = rweb.Lists[new Guid(Request["listid"])];
                             SPListItem li = list.GetItemById(int.Parse(Request["id"]));
 
-                            if(!list.Fields.ContainsField("DefaultPlanner"))
+                            if (!list.Fields.ContainsField("DefaultPlanner"))
                             {
                                 list.Fields.Add("DefaultPlanner", SPFieldType.Text, false);
                                 SPField fld = list.Fields["DefaultPlanner"];
@@ -333,7 +333,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                 SPListItem li = list.GetItemById(int.Parse(itemid));
                 try
                 {
-                    if(li["ChildItem"].ToString() != "")
+                    if (li["ChildItem"].ToString() != "")
                     {
                         return true;
                     }
@@ -341,7 +341,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                 catch { }
                 try
                 {
-                    if(li["ParentItem"].ToString() != "")
+                    if (li["ParentItem"].ToString() != "")
                     {
                         return true;
                     }
@@ -360,16 +360,16 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
 
             SPSecurity.RunWithElevatedPrivileges(delegate()
             {
-                using(SPSite rsite = new SPSite(web.Site.ID))
+                using (SPSite rsite = new SPSite(web.Site.ID))
                 {
-                    using(SPWeb rweb = Site.OpenWeb(web.ID))
+                    using (SPWeb rweb = Site.OpenWeb(web.ID))
                     {
                         bool.TryParse(EPMLiveCore.CoreFunctions.getLockConfigSetting(rweb, "EPMLivePlanner" + Request["name"] + "DisablePC", false), out disable);
                     }
                 }
             });
 
-            if(!disable)
+            if (!disable)
             {
                 bool isPCItem = false;
 
@@ -379,7 +379,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                     SPListItem li = list.GetItemById(int.Parse(itemid));
                     try
                     {
-                        if(li["ChildItem"].ToString() != "" && String.IsNullOrEmpty(Request["PCSelected"]) && String.IsNullOrEmpty(Request["Planner"]))
+                        if (li["ChildItem"].ToString() != "" && String.IsNullOrEmpty(Request["PCSelected"]) && String.IsNullOrEmpty(Request["Planner"]))
                         {
                             isPCItem = true;
 
@@ -392,7 +392,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                     catch { }
                     try
                     {
-                        if(li["ParentItem"].ToString() != "" && String.IsNullOrEmpty(Request["PCSelected"]) && String.IsNullOrEmpty(Request["Planner"]))
+                        if (li["ParentItem"].ToString() != "" && String.IsNullOrEmpty(Request["PCSelected"]) && String.IsNullOrEmpty(Request["Planner"]))
                         {
                             isPCItem = true;
 
@@ -406,7 +406,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                 }
                 catch { }
 
-                if(isPCItem)
+                if (isPCItem)
                 {
                     pnlMain.Visible = false;
                     pnlParentChild.Visible = true;
@@ -428,7 +428,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
         private void LoadDefaults(SPList oList)
         {
             tb.AddTimer();
-            if(oList != null && !String.IsNullOrEmpty(sItemID))
+            if (oList != null && !String.IsNullOrEmpty(sItemID))
             {
                 try
                 {
@@ -466,9 +466,9 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
 
             LoadDefaults(oList);
 
-            if(String.IsNullOrEmpty(sProjectListId))
+            if (String.IsNullOrEmpty(sProjectListId))
             {
-                if(!String.IsNullOrEmpty(sPlannerID))
+                if (!String.IsNullOrEmpty(sPlannerID))
                 {
                     sListProjectCenter = EPMLiveCore.CoreFunctions.getConfigSetting(lWeb, "EPMLivePlanner" + sPlannerID + "ProjectCenter");
 
@@ -482,15 +482,15 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                 }
             }
 
-            if(String.IsNullOrEmpty(sPlannerID))
+            if (String.IsNullOrEmpty(sPlannerID))
             {
-                if(!String.IsNullOrEmpty(sProjectListId))
+                if (!String.IsNullOrEmpty(sProjectListId))
                 {
                     SortedList slPlanners = WorkPlannerAPI.GetPlannersByProjectList(oList.Title, web);
 
 
 
-                    if(slPlanners.Count == 1)
+                    if (slPlanners.Count == 1)
                     {
                         string sTempPlanner = slPlanners.GetKey(0).ToString();
 
@@ -500,29 +500,29 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                         bool.TryParse(EPMLiveCore.CoreFunctions.getConfigSetting(lWeb, "EPMLivePlanner" + sTempPlanner + "EnableOnline") == "" ? "true" : EPMLiveCore.CoreFunctions.getConfigSetting(lWeb, "EPMLivePlanner" + sTempPlanner + "EnableOnline"), out bOnline);
                         bool.TryParse(EPMLiveCore.CoreFunctions.getConfigSetting(lWeb, "EPMLivePlanner" + sTempPlanner + "EnableProject"), out bProject);
 
-                        if(bOnline && bProject)
+                        if (bOnline && bProject)
                         {
 
                         }
-                        else if(bOnline)
+                        else if (bOnline)
                         {
                             sPlannerID = slPlanners.GetKey(0).ToString();
                             sProjectType = "Online";
                         }
-                        else if(bProject)
+                        else if (bProject)
                         {
                             sPlannerID = slPlanners.GetKey(0).ToString();
                             sProjectType = "Project";
                         }
                     }
                 }
-                if(String.IsNullOrEmpty(sPlannerID))
+                if (String.IsNullOrEmpty(sPlannerID))
                 {
-                    if(!String.IsNullOrEmpty(sTaskListId))
+                    if (!String.IsNullOrEmpty(sTaskListId))
                     {
                         SortedList slPlanners = WorkPlannerAPI.GetPlannersByTaskList(web, oTaskList.Title);
 
-                        if(slPlanners.Count == 1)
+                        if (slPlanners.Count == 1)
                         {
                             string sTempPlanner = slPlanners.GetKey(0).ToString();
 
@@ -533,16 +533,16 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                             bool.TryParse(EPMLiveCore.CoreFunctions.getConfigSetting(lWeb, "EPMLivePlanner" + sTempPlanner + "EnableProject"), out bProject);
 
 
-                            if(bOnline && bProject)
+                            if (bOnline && bProject)
                             {
 
                             }
-                            else if(bOnline)
+                            else if (bOnline)
                             {
                                 sPlannerID = slPlanners.GetKey(0).ToString();
                                 sProjectType = "Online";
                             }
-                            else if(bProject)
+                            else if (bProject)
                             {
                                 sPlannerID = slPlanners.GetKey(0).ToString();
                                 sProjectType = "Project";
@@ -552,7 +552,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                 }
             }
 
-            if(String.IsNullOrEmpty(sProjectType) && !String.IsNullOrEmpty(sPlannerID))
+            if (String.IsNullOrEmpty(sProjectType) && !String.IsNullOrEmpty(sPlannerID))
             {
                 bool bOnline = false;
                 bool bProject = false;
@@ -560,15 +560,15 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                 bool.TryParse(EPMLiveCore.CoreFunctions.getConfigSetting(lWeb, "EPMLivePlanner" + sPlannerID + "EnableOnline") == "" ? "true" : EPMLiveCore.CoreFunctions.getConfigSetting(lWeb, "EPMLivePlanner" + sPlannerID + "EnableOnline"), out bOnline);
                 bool.TryParse(EPMLiveCore.CoreFunctions.getConfigSetting(lWeb, "EPMLivePlanner" + sPlannerID + "EnableProject"), out bProject);
 
-                if(bOnline && bProject)
+                if (bOnline && bProject)
                 {
-                    
+
                 }
-                else if(bOnline)
+                else if (bOnline)
                 {
                     sProjectType = "Online";
                 }
-                else if(bProject)
+                else if (bProject)
                 {
                     sProjectType = "Project";
                 }
@@ -576,24 +576,24 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                     sProjectType = "Online";
             }
 
-            if(String.IsNullOrEmpty(sItemID) && !String.IsNullOrEmpty(sProjectListId))
+            if (String.IsNullOrEmpty(sItemID) && !String.IsNullOrEmpty(sProjectListId))
             {
-                if(oList.Items.Count == 1)
+                if (oList.Items.Count == 1)
                     sItemID = oList.Items[0].ID.ToString();
             }
 
-            if(String.IsNullOrEmpty(sTaskListId))
+            if (String.IsNullOrEmpty(sTaskListId))
             {
-                if(!String.IsNullOrEmpty(sPlannerID))
+                if (!String.IsNullOrEmpty(sPlannerID))
                 {
-                    if(sPlannerID == "MPP")
+                    if (sPlannerID == "MPP")
                     {
                         sListTaskCenter = "Task Center";
 
                         try
                         {
                             SPList tList = web.Lists.TryGetList(sListTaskCenter);
-                            if(tList != null)
+                            if (tList != null)
                                 sTaskListId = tList.ID.ToString();
                         }
                         catch { }
@@ -605,7 +605,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                         try
                         {
                             SPList tList = web.Lists.TryGetList(sListTaskCenter);
-                            if(tList != null)
+                            if (tList != null)
                                 sTaskListId = tList.ID.ToString();
                         }
                         catch { }
@@ -613,14 +613,14 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                 }
             }
 
-            if(!String.IsNullOrEmpty(sPlannerID))
+            if (!String.IsNullOrEmpty(sPlannerID))
             {
                 sListTaskCenter = EPMLiveCore.CoreFunctions.getConfigSetting(lWeb, "EPMLivePlanner" + sPlannerID + "TaskCenter");
             }
 
             tb.StopTimer();
 
-            if(!String.IsNullOrEmpty(sPlannerID) && !String.IsNullOrEmpty(sProjectListId) && !String.IsNullOrEmpty(sItemID) && !String.IsNullOrEmpty(sProjectType) && !String.IsNullOrEmpty(sTaskListId))
+            if (!String.IsNullOrEmpty(sPlannerID) && !String.IsNullOrEmpty(sProjectListId) && !String.IsNullOrEmpty(sItemID) && !String.IsNullOrEmpty(sProjectType) && !String.IsNullOrEmpty(sTaskListId))
             {
                 SPList lstProjectCenter = web.Lists[sListProjectCenter];
 
@@ -628,11 +628,11 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
 
                 sProjectName = liProject.Title;
 
-                if(sProjectType == "Online")
+                if (sProjectType == "Online")
                 {
                     SPFile tFile = WorkPlannerAPI.GetTaskFile(web, sItemID, sPlannerID);
 
-                    if((tFile == null || !tFile.Exists) && PopulateTemplates(web))
+                    if ((tFile == null || !tFile.Exists) && PopulateTemplates(web))
                     {
                         return false;
                     }
@@ -642,18 +642,18 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                 else
                 {
                     string sPlannerIDPath = "";
-                    if(sPlannerID != "MPP")
+                    if (sPlannerID != "MPP")
                         sPlannerIDPath = sPlannerID + "/";
 
                     SPFile tFile = web.GetFile("Project Schedules/" + sPlannerIDPath + sProjectName + ".mpp");
 
-                    if((tFile == null || !tFile.Exists) && sPlannerID != "MPP" && PopulateTemplates(web))
+                    if ((tFile == null || !tFile.Exists) && sPlannerID != "MPP" && PopulateTemplates(web))
                     {
                         return false;
                     }
 
                     return true;
-                    
+
                 }
             }
             else
@@ -665,15 +665,15 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
 
             DataTable dtTemplates = WorkPlannerAPI.GetTemplates(web, sPlannerID, sProjectType);
 
-            if(dtTemplates.Rows.Count == 0)
+            if (dtTemplates.Rows.Count == 0)
             {
-                if(sProjectType == "Project")
+                if (sProjectType == "Project")
                 {
                     WorkPlannerAPI.ApplyNewTemplate(web, "", "", sItemID, sProjectType, sProjectName);
                 }
                 return false;
             }
-            else if(dtTemplates.Rows.Count == 1 && dtTemplates.Rows[0]["ID"].ToString() != "-101")
+            else if (dtTemplates.Rows.Count == 1 && dtTemplates.Rows[0]["ID"].ToString() != "-101")
             {
                 WorkPlannerAPI.ApplyNewTemplate(web, sPlannerID, dtTemplates.Rows[0]["ID"].ToString(), sItemID, sProjectType, sProjectName);
                 return false;
@@ -690,7 +690,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
         {
             tb.AddTimer();
 
-            switch(Request["Planner"])
+            switch (Request["Planner"])
             {
                 case "MSProject":
                 case "MPP":
@@ -698,14 +698,14 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                 case "WEAgilePlanner":
                     return true;
             }
-            
+
             sItemID = Request["ID"];
             sProjectListId = Request["listid"];
             sPlannerID = Request["Planner"];
             sProjectType = Request["PType"];
             sTaskListId = Request["tasklistid"];
 
-            if(hasChildParent(web, Request["listid"], Request["ID"]) && String.IsNullOrEmpty(Request["PCSelected"]))
+            if (hasChildParent(web, Request["listid"], Request["ID"]) && String.IsNullOrEmpty(Request["PCSelected"]))
             {
                 return false;
             }
@@ -716,18 +716,18 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                 SPSecurity.RunWithElevatedPrivileges(delegate()
                 {
 
-                    using(SPSite site = new SPSite(web.Site.ID))
+                    using (SPSite site = new SPSite(web.Site.ID))
                     {
-                        using(SPWeb iweb = site.OpenWeb(web.ID))
+                        using (SPWeb iweb = site.OpenWeb(web.ID))
                         {
                             Guid lockWeb = EPMLiveCore.CoreFunctions.getLockedWeb(iweb);
-                            if(lockWeb == Guid.Empty || lockWeb == web.ID)
+                            if (lockWeb == Guid.Empty || lockWeb == web.ID)
                             {
                                 check = iCheckParams(web, web);
                             }
                             else
                             {
-                                using(SPWeb w = site.OpenWeb(lockWeb))
+                                using (SPWeb w = site.OpenWeb(lockWeb))
                                 {
                                     check = iCheckParams(web, w);
                                 }
@@ -743,12 +743,12 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
 
         }
 
-        private StringBuilder GetViewString(string []props, string []agileprops)
+        private StringBuilder GetViewString(string[] props, string[] agileprops)
         {
             StringBuilder sb = new StringBuilder();
 
-            if(props.Length > 1)
-            {   
+            if (props.Length > 1)
+            {
 
                 sb.Append(GetCleanString(props[0].ToString()));
                 sb.Append(": {");
@@ -779,7 +779,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
 
                 try
                 {
-                    if(props.Length > 9)
+                    if (props.Length > 9)
                     {
                         sb.Append("assignments: \"");
                         sb.Append(props[9]);
@@ -789,7 +789,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                 catch { }
                 try
                 {
-                    if(props.Length > 10)
+                    if (props.Length > 10)
                     {
                         sb.Append("summary: \"");
                         sb.Append(props[10]);
@@ -799,7 +799,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                 catch { }
                 try
                 {
-                    if(props.Length > 11)
+                    if (props.Length > 11)
                     {
                         sb.Append("allocation: \"");
                         sb.Append(props[11]);
@@ -808,11 +808,11 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                 }
                 catch { }
 
-                if(bAgile)
+                if (bAgile)
                 {
                     try
                     {
-                        if(agileprops.Length > 0)
+                        if (agileprops.Length > 0)
                         {
                             sb.Append("agileleft: \"");
                             sb.Append(agileprops[0]);
@@ -823,7 +823,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
 
                     try
                     {
-                        if(agileprops.Length > 1)
+                        if (agileprops.Length > 1)
                         {
                             sb.Append("agilecols: \"");
                             sb.Append(agileprops[1]);
@@ -833,7 +833,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                     catch { }
                     try
                     {
-                        if(agileprops.Length > 2)
+                        if (agileprops.Length > 2)
                         {
                             sb.Append("agilefilters: \"");
                             sb.Append(agileprops[2]);
@@ -843,7 +843,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                     catch { }
                     try
                     {
-                        if(agileprops.Length > 3)
+                        if (agileprops.Length > 3)
                         {
                             sb.Append("agilegrouping: \"");
                             sb.Append(agileprops[3]);
@@ -853,7 +853,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                     catch { }
                     try
                     {
-                        if(agileprops.Length > 4)
+                        if (agileprops.Length > 4)
                         {
                             sb.Append("agilesorting: \"");
                             sb.Append(agileprops[4]);
@@ -863,7 +863,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                     catch { }
                     try
                     {
-                        if(agileprops.Length > 5)
+                        if (agileprops.Length > 5)
                         {
                             sb.Append("agilegantt: \"");
                             sb.Append(agileprops[5]);
@@ -873,7 +873,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                     catch { }
                     try
                     {
-                        if(agileprops.Length > 6)
+                        if (agileprops.Length > 6)
                         {
                             sb.Append("backlog: \"");
                             sb.Append(agileprops[6]);
@@ -905,7 +905,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
 
             activation = act.CheckFeatureLicense(EPMLiveCore.ActFeature.WorkPlanner);
 
-            if(activation != 0)
+            if (activation != 0)
             {
                 pnlMain.Visible = false;
                 lblAct.Text = act.translateStatus(activation);
@@ -922,41 +922,41 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
 
             docLib = web.Lists.TryGetList("Project Schedules");
 
-            if(!String.IsNullOrEmpty(Request["setdefault"]))
+            if (!String.IsNullOrEmpty(Request["setdefault"]))
             {
                 try
                 {
-                    if(bool.Parse(Request["setdefault"]))
+                    if (bool.Parse(Request["setdefault"]))
                         setDefault(web);
                 }
                 catch { }
             }
 
-            if(checkParentChild(web, Request["listid"], Request["ID"]))
+            if (checkParentChild(web, Request["listid"], Request["ID"]))
             {
                 return;
             }
-            if(!checkParams(web))
+            if (!checkParams(web))
             {
                 sPlannerID = "";
                 sPlannerName = "Planner";
                 showPlannerPopup();
                 return;
             }
-            if(sProjectType == "Project" && sPlannerID != "MPP")
+            if (sProjectType == "Project" && sPlannerID != "MPP")
             {
                 pnlProject.Visible = true;
                 pnlMain.Visible = false;
 
                 string planners = EPMLiveCore.CoreFunctions.getLockConfigSetting(SPContext.Current.Web, "EPMLivePlannerPlanners", false);
 
-                foreach(string planner in planners.Split(','))
+                foreach (string planner in planners.Split(','))
                 {
-                    if(planner != "")
+                    if (planner != "")
                     {
                         string[] sPlanner = planner.Split('|');
 
-                        if(sPlanner[0] == sPlannerID)
+                        if (sPlanner[0] == sPlannerID)
                         {
                             sPlannerName = sPlanner[1];
                             sPlannerID = sPlanner[0];
@@ -968,25 +968,25 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                 sListProjectCenter = props.sListProjectCenter;
 
                 SPList lstProjectCenter = web.Lists[sListProjectCenter];
-                
+
                 SPListItem liProject = lstProjectCenter.GetItemById(int.Parse(sItemID));
 
                 sProjectName = liProject.Title;
-                
+
             }
-            else if(Request["Planner"] == "MSProject" || Request["Planner"] == "MPP")
+            else if (Request["Planner"] == "MSProject" || Request["Planner"] == "MPP")
             {
                 SPSecurity.RunWithElevatedPrivileges(delegate()
                 {
-                    using(SPSite site = new SPSite(SPContext.Current.Site.ID))
+                    using (SPSite site = new SPSite(SPContext.Current.Site.ID))
                     {
-                        using(SPWeb rweb = site.OpenWeb(web.ID))
+                        using (SPWeb rweb = site.OpenWeb(web.ID))
                         {
                             SPList list = web.Lists.TryGetList(EPMLiveCore.CoreFunctions.getLockConfigSetting(rweb, "epmlivepub-pc", true));
-                            if(list != null)
+                            if (list != null)
                             {
                                 sProjectListId = list.ID.ToString().ToUpper();
-                                if(String.IsNullOrEmpty(sSource))
+                                if (String.IsNullOrEmpty(sSource))
                                 {
                                     sSource = list.DefaultView.ServerRelativeUrl;
                                 }
@@ -999,21 +999,21 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                 pnlMain.Visible = false;
                 pnlMSProject.Visible = true;
             }
-            else if(Request["Planner"] == "WEWorkPlanner")
+            else if (Request["Planner"] == "WEWorkPlanner")
             {
                 sItemID = Request["ID"];
                 pnlMain.Visible = false;
                 pnlOldPlanner.Visible = true;
                 OldUrl = "tasks";
             }
-            else if(Request["Planner"] == "WEAgilePlanner")
+            else if (Request["Planner"] == "WEAgilePlanner")
             {
                 sItemID = Request["ID"];
                 pnlMain.Visible = false;
                 pnlOldPlanner.Visible = true;
                 OldUrl = "agile/tasks";
             }
-            else if(docLib == null)
+            else if (docLib == null)
             {
                 pnlProjectSchedule.Visible = true;
                 pnlMain.Visible = false;
@@ -1026,13 +1026,13 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
 
                 string planners = EPMLiveCore.CoreFunctions.getLockConfigSetting(SPContext.Current.Web, "EPMLivePlannerPlanners", false);
 
-                foreach(string planner in planners.Split(','))
+                foreach (string planner in planners.Split(','))
                 {
-                    if(planner != "")
+                    if (planner != "")
                     {
                         string[] sPlanner = planner.Split('|');
 
-                        if(sPlanner[0] == sPlannerID)
+                        if (sPlanner[0] == sPlannerID)
                         {
                             sPlannerName = sPlanner[1];
                             sPlannerID = sPlanner[0];
@@ -1041,7 +1041,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                     }
                 }
 
-                if(!found)
+                if (!found)
                 {
                     showPlannerPopup();
                 }
@@ -1072,25 +1072,25 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                     {
                         string menus = "";
                         menus = EPMLiveCore.CoreFunctions.getConfigSetting(Web.Site.RootWeb, "EPK" + lstProjectCenter.Title.Replace(" ", "") + "_menus");
-                        if(menus == "")
+                        if (menus == "")
                             menus = EPMLiveCore.CoreFunctions.getConfigSetting(Web.Site.RootWeb, "EPKMenus");
 
                         ArrayList arrButtons = new ArrayList(menus.Split('|'));
 
                         string noactivex = "";
                         noactivex = EPMLiveCore.CoreFunctions.getConfigSetting(Web.Site.RootWeb, "EPK" + lstProjectCenter.Title.Replace(" ", "") + "_nonactivexs");
-                        if(noactivex == "")
+                        if (noactivex == "")
                             noactivex = EPMLiveCore.CoreFunctions.getConfigSetting(Web.Site.RootWeb, "epknonactivexs");
 
                         ArrayList arrActivex = new ArrayList(menus.Split('|'));
 
-                        if(arrButtons.Contains("costs"))
+                        if (arrButtons.Contains("costs"))
                         {
                             EPKCost = 1;
                         }
-                        if(arrButtons.Contains("resplan"))
+                        if (arrButtons.Contains("resplan"))
                         {
-                            if(arrActivex.Contains("resplan"))
+                            if (arrActivex.Contains("resplan"))
                             {
                                 EPKResPlan = 1;
                             }
@@ -1105,21 +1105,21 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
 
 
                     bool canEdit = false;
-                    if(web.CurrentUser.IsSiteAdmin)
+                    if (web.CurrentUser.IsSiteAdmin)
                         canEdit = true;
                     try
                     {
                         SPFieldLookupValue lv = new SPFieldLookupValue(liProject[lstProjectCenter.Fields.GetFieldByInternalName("Author").Id].ToString());
-                        if(lv.LookupId == web.CurrentUser.ID)
+                        if (lv.LookupId == web.CurrentUser.ID)
                             canEdit = true;
                     }
                     catch { }
                     try
                     {
 
-                       SPList lstDocs = web.Lists["Project Schedules"];
-                            
-                        
+                        SPList lstDocs = web.Lists["Project Schedules"];
+
+
 
                         string uplanners = "";
                         try
@@ -1127,13 +1127,13 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                             uplanners = liProject[lstProjectCenter.Fields.GetFieldByInternalName("Planners").Id].ToString();
                         }
                         catch { }
-                        if(uplanners == "")
+                        if (uplanners == "")
                         {
-                            if(liProject.DoesUserHavePermissions(SPBasePermissions.EditListItems))
+                            if (liProject.DoesUserHavePermissions(SPBasePermissions.EditListItems))
                             {
-                                if(lstTaskCenter.DoesUserHavePermissions(SPBasePermissions.EditListItems))
+                                if (lstTaskCenter.DoesUserHavePermissions(SPBasePermissions.EditListItems))
                                 {
-                                    if(lstDocs.DoesUserHavePermissions(SPBasePermissions.EditListItems))
+                                    if (lstDocs.DoesUserHavePermissions(SPBasePermissions.EditListItems))
                                     {
                                         canEdit = true;
                                     }
@@ -1155,15 +1155,15 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                         else
                         {
                             SPFieldLookupValueCollection lvs = new SPFieldLookupValueCollection(uplanners);
-                            foreach(SPFieldLookupValue lv in lvs)
+                            foreach (SPFieldLookupValue lv in lvs)
                             {
-                                if(lv.LookupId == web.CurrentUser.ID)
+                                if (lv.LookupId == web.CurrentUser.ID)
                                 {
-                                    if(liProject.DoesUserHavePermissions(SPBasePermissions.EditListItems))
+                                    if (liProject.DoesUserHavePermissions(SPBasePermissions.EditListItems))
                                     {
-                                        if(lstTaskCenter.DoesUserHavePermissions(SPBasePermissions.EditListItems))
+                                        if (lstTaskCenter.DoesUserHavePermissions(SPBasePermissions.EditListItems))
                                         {
-                                            if(lstDocs.DoesUserHavePermissions(SPBasePermissions.EditListItems))
+                                            if (lstDocs.DoesUserHavePermissions(SPBasePermissions.EditListItems))
                                             {
                                                 canEdit = true;
                                             }
@@ -1187,7 +1187,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                     }
                     catch { }
 
-                    if(!canEdit)
+                    if (!canEdit)
                     {
                         pnlMain.Visible = false;
                         pnlPerms.Visible = true;
@@ -1203,7 +1203,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                         sProjectListId = lstProjectCenter.ID.ToString().ToUpper();
                         sProjectName = liProject.Title;
 
-                        if(String.IsNullOrEmpty(sSource))
+                        if (String.IsNullOrEmpty(sSource))
                         {
                             sSource = lstProjectCenter.DefaultView.ServerRelativeUrl;
                         }
@@ -1220,7 +1220,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                         sPlannerDataParam = HttpUtility.HtmlEncode(sPlannerDataParam);
                         sPlannerLayoutParam = HttpUtility.HtmlEncode(sPlannerLayoutParam);
 
-                        if(bAgile)
+                        if (bAgile)
                         {
                             agileDiv = Properties.Resources.txtAgileDiv.Replace("<%=sPlannerLayoutParam%>", sPlannerLayoutParam).Replace("<%=sPlannerDataParam%>", sPlannerDataParam);
                         }
@@ -1244,11 +1244,11 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                         processRollups(props);
                         getAttachedLists(web, lstProjectCenter.ID.ToString("B"));
 
-                        if(lstProjectCenter.Fields.ContainsField(sPlannerID + "FSC"))
+                        if (lstProjectCenter.Fields.ContainsField(sPlannerID + "FSC"))
                         {
                             try
                             {
-                                if(liProject[sPlannerID + "FSC"].ToString().ToLower() == "false")
+                                if (liProject[sPlannerID + "FSC"].ToString().ToLower() == "false")
                                     sSummaryRollup = "false";
                                 else
                                     sSummaryRollup = "true";
@@ -1268,7 +1268,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
 
                         StringBuilder sDefaultView = new StringBuilder();
 
-                        for(int i = 0; i < sViewList.Length; i++)
+                        for (int i = 0; i < sViewList.Length; i++)
                         {
                             string[] sViewDataWithAgile = sViewList[i].Split('`');
                             string[] sViewData = sViewDataWithAgile[0].Split('|');
@@ -1279,9 +1279,9 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                             }
                             catch { }
 
-                            if(sViewData.Length > 0)
+                            if (sViewData.Length > 0)
                             {
-                                if(sViewData[0].ToString() == defaultView)
+                                if (sViewData[0].ToString() == defaultView)
                                 {
 
                                     sDefaultView = GetViewString(sViewData, sViewAgileData);
@@ -1297,19 +1297,19 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
 
                         try
                         {
-                            if(sDefaultView.ToString() != "")
+                            if (sDefaultView.ToString() != "")
                                 sViewObject = String.Join(",", new string[] { sDefaultView.ToString(), sb.ToString().Trim(',') }).Trim(',');
                             else
                                 sViewObject = sb.ToString().Trim(',');
                         }
                         catch { }
 
-                        
+
                     }
                 }
             }
             tb.StopTimer();
-            if(Request["debug"] == "true")
+            if (Request["debug"] == "true")
                 timerString = tb.GetHtml();
         }
 
@@ -1317,18 +1317,18 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
         {
             tb.AddTimer();
             base.OnPreRender(e);
-           
 
-            if(activation == 0)
+
+            if (activation == 0)
             {
-                if(!String.IsNullOrEmpty(sItemID) && !String.IsNullOrEmpty(sPlannerID) && pnlMain.Visible)
+                if (!String.IsNullOrEmpty(sItemID) && !String.IsNullOrEmpty(sPlannerID) && pnlMain.Visible)
                 {
                     this.AddRibbonTab();
                 }
                 AddTabEvents();
             }
             tb.StopTimer();
-            
+
         }
 
         private void AddRibbonTab()
@@ -1363,21 +1363,21 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
             ribbon.CommandUIVisible = true;
             const string initialTabId = "Ribbon.WorkPlanner";
 
-            if(!ribbon.IsTabAvailable(initialTabId))
+            if (!ribbon.IsTabAvailable(initialTabId))
                 ribbon.MakeTabAvailable(initialTabId);
 
-            if(!ribbon.IsTabAvailable("Ribbon.Project"))
+            if (!ribbon.IsTabAvailable("Ribbon.Project"))
                 ribbon.MakeTabAvailable("Ribbon.Project");
 
-            if(!ribbon.IsTabAvailable("Ribbon.WorkViews"))
+            if (!ribbon.IsTabAvailable("Ribbon.WorkViews"))
                 ribbon.MakeTabAvailable("Ribbon.WorkViews");
 
-            if(!bEnableLink)
+            if (!bEnableLink)
             {
                 ribbon.TrimById("Ribbon.WorkPlanner.InsertGroup.LinkExternalTask");
             }
 
-            if(bAgile)
+            if (bAgile)
             {
                 ribbon.TrimById("Ribbon.WorkPlanner.InsertGroup.NewSummary");
 
@@ -1391,7 +1391,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                 ribbon.TrimById("Ribbon.WorkPlanner.InsertGroup.ShowBacklog");
             }
 
-            if(Web.Site.Features[new Guid("158c5682-d839-4248-b780-82b4710ee152")] == null)
+            if (Web.Site.Features[new Guid("158c5682-d839-4248-b780-82b4710ee152")] == null)
             {
                 ribbon.TrimById("Ribbon.WorkPlanner.ToolsGroup.EditCosts");
                 ribbon.TrimById("Ribbon.WorkPlanner.ToolsGroup.EditResourcePlan");
@@ -1401,25 +1401,25 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
             ribbon.TrimById("Ribbon.WorkPlanner.ClipGroup.Copy");
             ribbon.TrimById("Ribbon.WorkPlanner.ClipGroup.Paste");
 
-            
+
             ribbon.InitialTabId = initialTabId;
         }
 
         public static string GetCleanString(string str)
-        { 
-            StringBuilder sb = new StringBuilder(); 
-            for(int i = 0; i < str.Length; i++) 
-            { 
-                if((str[i] >= '0' && str[i] <= '9') || (str[i] >= 'A' && str[i] <= 'z' || (str[i] == '.' || str[i] == '_')))                 
-                    sb.Append(str[i]); 
-            } 
-            return sb.ToString(); 
+        {
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < str.Length; i++)
+            {
+                if ((str[i] >= '0' && str[i] <= '9') || (str[i] >= 'A' && str[i] <= 'z' || (str[i] == '.' || str[i] == '_')))
+                    sb.Append(str[i]);
+            }
+            return sb.ToString();
         }
 
         private void AddTabEvents()
         {
             var commands = new List<IRibbonCommand>();
-            
+
             // register the command at the ribbon. Include the callback to the server     // to generate the xml
             commands.Add(new SPRibbonCommand("Ribbon.WorkPlanner.SaveButton", "SaveWorkPlan();", "true"));
             commands.Add(new SPRibbonCommand("Ribbon.WorkPlanner.PublishButton", "PublishWorkPlan();", "GridHasChanges()"));
@@ -1427,7 +1427,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
             commands.Add(new SPRibbonCommand("Ribbon.WorkPlanner.CloseButton", "Close();", "true"));
             commands.Add(new SPRibbonCommand("Ribbon.WorkPlanner.ExcelButton", "ExcelExport();", "true"));
             commands.Add(new SPRibbonCommand("Ribbon.WorkPlanner.PDFButton", "PDFExport();", "true"));
-            
+
             commands.Add(new SPRibbonCommand("Ribbon.WorkPlanner.NewTask", "NewTask(false, false);", "true"));
             commands.Add(new SPRibbonCommand("Ribbon.WorkPlanner.NewSummary", "NewTask(true, false);", "true"));
             commands.Add(new SPRibbonCommand("Ribbon.WorkPlanner.NewIteration", "AgileNewIteration(true, false);", "true"));
@@ -1445,7 +1445,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
             commands.Add(new SPRibbonCommand("Ribbon.WorkPlanner.Permissions", "OpenLocation('user','Permissions');", "canShowDetails"));
             commands.Add(new SPRibbonCommand("Ribbon.WorkPlanner.Attachments", "OpenLocation('attachfile','Attach File');", "canShowDetails"));
             commands.Add(new SPRibbonCommand("Ribbon.WorkPlanner.Workflows", "OpenLocation('workflow','Workflows');", "canShowDetails"));
-            
+
             commands.Add(new SPRibbonCommand("Ribbon.WorkPlanner.Copy", "Copy();", "true"));
             commands.Add(new SPRibbonCommand("Ribbon.WorkPlanner.Paste", "Paste();", "true"));
             commands.Add(new SPRibbonCommand("Ribbon.WorkPlanner.Undo", "Undo();", "CanUndo()"));
@@ -1487,7 +1487,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
             commands.Add(new SPRibbonCommand("Ribbon.WorkPlanner.ClearSort", "ClearSort();", "true"));
             commands.Add(new SPRibbonCommand("Ribbon.WorkPlanner.ShowAssignments", "ShowAssignments();", "true"));
             commands.Add(new SPRibbonCommand("Ribbon.WorkPlanner.ShowSummary", "ShowSummary();", "true"));
-            
+
             commands.Add(new SPRibbonCommand("Ribbon.WorkPlanner.UpdateProject", "UpdateProject();", "true"));
             commands.Add(new SPRibbonCommand("Ribbon.WorkPlanner.UpdateStatus", "DoUpdates();", "true"));
 
@@ -1497,7 +1497,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
             commands.Add(new SPRibbonCommand("Ribbon.WorkPlanner.ClearBaseline", "ClearBaseline();", "true"));
             commands.Add(new SPRibbonCommand("Ribbon.WorkPlanner.MoveProject", "MoveProject();", "true"));
             commands.Add(new SPRibbonCommand("Ribbon.WorkPlanner.RespectLinks", "RespectLinks();", "true"));
-            commands.Add(new SPRibbonCommand("Ribbon.WorkPlanner.SummaryRollup", "SummaryRollup();", "true"));            
+            commands.Add(new SPRibbonCommand("Ribbon.WorkPlanner.SummaryRollup", "SummaryRollup();", "true"));
 
             commands.Add(new SPRibbonCommand("Ribbon.WorkPlanner.CreateNew", "DoCreateNew();", "true"));
 
@@ -1510,10 +1510,46 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
             commands.Add(new SPRibbonCommand("Ribbon.WorkPlanner.EditCosts", "EditCosts();", "EPKEnabled('costs')"));
             commands.Add(new SPRibbonCommand("Ribbon.WorkPlanner.EditResourcePlan", "EditResourcePlan();", "EPKEnabled('resplan')"));
 
+            //Fragment Section
+
+            //Add Fragment option is enabled for all users.
+            commands.Add(new SPRibbonCommand("Ribbon.WorkPlanner.AddFragmentButton", "AddFragment();", "true"));
+
+            //SPBasePermissions.ManageWeb – This is for saving public views
+            //SPBasePermissions.EditListItems – Check this against the PlannerFragments list to see if the user can save fragments. If they have this but not manageweb then they can save private fragments only.
+            //Any other users can’t save fragments, but can read them.
+
+            bool doesUserHasManageWebPermission = false;
+            try
+            {
+                doesUserHasManageWebPermission = SPContext.Current.Web.Lists.TryGetList("PlannerFragments").DoesUserHavePermissions(SPContext.Current.Web.CurrentUser, SPBasePermissions.ManageWeb);
+            }
+            catch (SPException) { }
+
+            if (SPContext.Current.Web.Lists.TryGetList("PlannerFragments") != null &&
+               (SPContext.Current.Web.Lists.TryGetList("PlannerFragments").DoesUserHavePermissions(SPContext.Current.Web.CurrentUser, SPBasePermissions.EditListItems)))
+            {
+                if (doesUserHasManageWebPermission)
+                {
+                    commands.Add(new SPRibbonCommand("Ribbon.WorkPlanner.SaveFragmentButton", "SaveFragment();", "true"));
+                    commands.Add(new SPRibbonCommand("Ribbon.WorkPlanner.DeleteFragmentButton", "DeleteFragment();", "true"));
+                }
+                else
+                {
+                    commands.Add(new SPRibbonCommand("Ribbon.WorkPlanner.SaveFragmentButton", "SaveFragment();", "false"));
+                    commands.Add(new SPRibbonCommand("Ribbon.WorkPlanner.DeleteFragmentButton", "DeleteFragment();", "false"));
+                }
+            }
+            else
+            {
+                commands.Add(new SPRibbonCommand("Ribbon.WorkPlanner.SaveFragmentButton", "SaveFragment();", "false"));
+                commands.Add(new SPRibbonCommand("Ribbon.WorkPlanner.DeleteFragmentButton", "DeleteFragment();", "false"));
+            }
+
             //commands.Add(new SPRibbonCommand("Ribbon.WorkPlanner.DoCreateNew", "DoCreateNew();", "true"));
 
             //commands.Add(new SPRibbonCommand("Ribbon.WorkPlanner.PopulateDisplayView", "PopulateDisplayView();", "true"));
-            
+
             //Register initialize function
             var manager = new SPRibbonScriptManager();
 

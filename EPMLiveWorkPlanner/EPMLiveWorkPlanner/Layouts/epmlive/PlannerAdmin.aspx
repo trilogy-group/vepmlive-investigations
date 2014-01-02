@@ -33,7 +33,7 @@
 	     width="600"
 	     AllowSorting="True"
 	     AllowPaging="True"
-	     PageSize="10">
+	     PageSize="100">
         <Columns>
 	        <SharePoint:SPMenuField HeaderText="Plan Name" TextFields="planname" MenuTemplateId="PropertyNameListMenu" TokenNameAndValueFields="NAME=planinternalname" ></SharePoint:SPMenuField>
 	        <SharePoint:SPBoundField DataField="projectlist" HeaderText="Source List"></SharePoint:SPBoundField>

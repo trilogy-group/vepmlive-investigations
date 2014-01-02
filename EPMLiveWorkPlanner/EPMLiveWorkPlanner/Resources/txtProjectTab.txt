@@ -226,6 +226,22 @@
 				LabelText="Edit Resource Plan"
 				TemplateAlias="oM"/>
 
+				<Button
+					Id="Ribbon.WorkPlanner.ToolsGroup.SaveFragmentButton"
+					Sequence="12"
+					Image16by16="/_layouts/epmlive/images/savetemplate.png"
+					Command="Ribbon.WorkPlanner.SaveFragmentButton"
+					LabelText="Save Fragment"
+					TemplateAlias="oM"/>
+
+					<Button
+					Id="Ribbon.WorkPlanner.ToolsGroup.DeleteFragmentButton"
+					Sequence="20"
+					Image16by16="/_layouts/epmlive/images/deletetask.png"
+					Command="Ribbon.WorkPlanner.DeleteFragmentButton"
+					LabelText="Delete Fragment"
+					TemplateAlias="oM"/>	
+
 			</Controls>
 		</Group>
 
