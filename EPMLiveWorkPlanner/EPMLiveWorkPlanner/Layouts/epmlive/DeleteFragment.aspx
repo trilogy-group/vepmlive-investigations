@@ -10,8 +10,8 @@
 
 <asp:Content ID="PageHead" ContentPlaceHolderID="PlaceHolderAdditionalPageHead" runat="server">
     <script language="javascript" type="text/javascript">
-        function closeWindow() {
-            window.close(); return false;
+        function closeDeleteFragmentPopup() {
+            window.frameElement.commonModalDialogClose(1, 1);
         }
     </script>
 </asp:Content>
@@ -23,15 +23,20 @@
             <td colspan="2">
                 <asp:GridView ID="gridFragments" AutoGenerateColumns="false" CellPadding="5" runat="server" AllowPaging="true" AllowSorting="true" OnPageIndexChanging="gridFragments_PageIndexChanging" EmptyDataText="No planner fragment exists!">
                     <Columns>
+
                         <asp:TemplateField>
                             <ItemTemplate>
                                 <input id="chkSelect" type="checkbox" runat="server" />
                             </ItemTemplate>
                         </asp:TemplateField>
+                        <asp:TemplateField Visible="false">
+                            <ItemTemplate>
+                                <asp:Label ID="lblID" runat="server" Text='<%# Eval("ID") %>' />
+                            </ItemTemplate>
+                        </asp:TemplateField>
 
-                    <asp:BoundField HeaderText="ID" DataField="ID" />
                     <asp:BoundField HeaderText="Fragment Name" DataField="Title" />
-                    <asp:BoundField HeaderText="Scope" DataField="PlannerType" />
+                    <asp:BoundField HeaderText="Scope" DataField="FragmentType" />
                     <asp:BoundField HeaderText="Created By" DataField="Author" />
 
                     </Columns>
@@ -45,7 +50,7 @@
         <br />
 
             <asp:Button ID="btnDelete" runat="server" Text="Delete" OnClick="btnDelete_Click" />
-            <input id="btnClose" type="button" value="Close" onclick="javascript: return closeWindow();" />
+            <asp:Button ID="btnClose" runat="server" Text="Close" OnClientClick="javascript:return closeDeleteFragmentPopup();" />
         
         </center>
 </asp:Content>

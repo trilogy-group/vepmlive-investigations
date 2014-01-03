@@ -1416,6 +1416,58 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
             return sb.ToString();
         }
 
+        private SPList CreatePlannerFragmentList()
+        {
+            //Create New 'PlannerFragments' list with following columns:
+            //Title[PlannerName - Single Line of Text], Description [Multiple Line of Text], FragmentType [Choice], Tag [single Line of Text], FragmentXml [Multiple line of Text]
+
+            SPSite site = SPContext.Current.Site;
+            SPWeb web = SPContext.Current.Web;
+            SPList plannerFragmentList = web.Lists.TryGetList("PlannerFragments");
+
+            if (plannerFragmentList == null)
+            {
+                SPSecurity.RunWithElevatedPrivileges(delegate()
+                {
+                    using (SPSite currentSite = new SPSite(site.ID))
+                    {
+                        using (SPWeb currentWeb = currentSite.OpenWeb(web.ID))
+                        {
+                            currentWeb.AllowUnsafeUpdates = true;
+                            Guid guid = currentWeb.Lists.Add("PlannerFragments", "Planner Fragments List - Used to store Planner Fragment details", SPListTemplateType.GenericList);
+                            plannerFragmentList = currentWeb.Lists[guid];
+                            //plannerFragmentList.Hidden = true; //TODO: Uncomment this while code check-in
+
+                            plannerFragmentList.Fields.Add("Description", SPFieldType.Note, false);
+                            plannerFragmentList.Fields.Add("FragmentType", SPFieldType.Choice, false);
+                            plannerFragmentList.Fields.Add("Tag", SPFieldType.Text, true);
+                            plannerFragmentList.Fields.Add("FragmentXML", SPFieldType.Note, true);
+                            plannerFragmentList.Fields.Add("TaskListID", SPFieldType.Text, false);
+                            plannerFragmentList.Update();
+
+                            //Add Planner Type - Choice Field
+                            SPFieldChoice fragmentTypes = (SPFieldChoice)plannerFragmentList.Fields["FragmentType"];
+                            fragmentTypes.Choices.Add("Private");
+                            fragmentTypes.Choices.Add("Public");
+                            fragmentTypes.DefaultValue = "Private";
+                            fragmentTypes.Update();  //Saves choices to column
+                            plannerFragmentList.Update();
+
+                            SPView view = plannerFragmentList.DefaultView;
+                            view.ViewFields.Add("Description");
+                            view.ViewFields.Add("FragmentType");
+                            view.ViewFields.Add("Tag");
+                            view.Update();
+
+                            plannerFragmentList.Update();
+                            currentWeb.Update();
+                        }
+                    }
+                });
+            }
+            return plannerFragmentList;
+        }
+
         private void AddTabEvents()
         {
             var commands = new List<IRibbonCommand>();
@@ -1522,7 +1574,13 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
             bool doesUserHasManageWebPermission = false;
             try
             {
-                doesUserHasManageWebPermission = SPContext.Current.Web.Lists.TryGetList("PlannerFragments").DoesUserHavePermissions(SPContext.Current.Web.CurrentUser, SPBasePermissions.ManageWeb);
+                if (SPContext.Current.Web.Lists.TryGetList("PlannerFragments") != null)
+                    doesUserHasManageWebPermission = SPContext.Current.Web.Lists.TryGetList("PlannerFragments").DoesUserHavePermissions(SPContext.Current.Web.CurrentUser, SPBasePermissions.ManageWeb);
+                else
+                {
+                    CreatePlannerFragmentList();
+                    doesUserHasManageWebPermission = SPContext.Current.Web.Lists.TryGetList("PlannerFragments").DoesUserHavePermissions(SPContext.Current.Web.CurrentUser, SPBasePermissions.ManageWeb);
+                }
             }
             catch (SPException) { }
 

@@ -26,9 +26,9 @@ namespace EPMLiveCore.Layouts.epmlive
                 if (plannerFragmentList != null)
                 {
                     if (SPContext.Current.Web.CurrentUser.IsSiteAdmin)
-                        qryFilter = "<ViewFields><FieldRef Name='ID' /><FieldRef Name='Title' /><FieldRef Name='PlannerType' /><FieldRef Name='Author' /></ViewFields><OrderBy><FieldRef Name='Title' /></OrderBy>";
+                        qryFilter = "<ViewFields><FieldRef Name='ID' /><FieldRef Name='Title' /><FieldRef Name='FragmentType' /><FieldRef Name='Author' /></ViewFields><OrderBy><FieldRef Name='Title' /></OrderBy>";
                     else
-                        qryFilter = "<ViewFields><FieldRef Name='ID' /><FieldRef Name='Title' /><FieldRef Name='Author' /><FieldRef Name='PlannerType' /></ViewFields><Where><Or><And><Eq><FieldRef Name='PlannerType' /><Value Type='Choice'>Public</Value></Eq><Eq><FieldRef Name='PlannerType' /><Value Type='Choice'>Public</Value></Eq></And><Eq><FieldRef Name='Author' /><Value Type='User'>" + SPContext.Current.Web.CurrentUser.Name + "</Value></Eq></Or></Where><OrderBy><FieldRef Name='Title' /></OrderBy>";
+                        qryFilter = "<ViewFields><FieldRef Name='ID' /><FieldRef Name='Title' /><FieldRef Name='Author' /><FieldRef Name='FragmentType' /></ViewFields><Where><Or><And><Eq><FieldRef Name='FragmentType' /><Value Type='Choice'>Public</Value></Eq><Eq><FieldRef Name='FragmentType' /><Value Type='Choice'>Public</Value></Eq></And><Eq><FieldRef Name='Author' /><Value Type='User'>" + SPContext.Current.Web.CurrentUser.Name + "</Value></Eq></Or></Where><OrderBy><FieldRef Name='Title' /></OrderBy>";
 
                     qryFilterPlanner.Query = qryFilter;
 
@@ -51,6 +51,7 @@ namespace EPMLiveCore.Layouts.epmlive
                 SPListItem fragment = plannerFragmentList.GetItemById(Convert.ToInt32(ddlFragments.SelectedValue));
                 fragmentXml = Convert.ToString(fragment["FragmentXML"]);
             }
+            Page.Response.Write("<script language='javascript' type='text/javascript'>closeAddFragmentPopup();");
         }
     }
 }

@@ -10,33 +10,6 @@ namespace EPMLiveCore.Layouts.epmlive
 {
     public partial class DeleteFragment : LayoutsPageBase
     {
-        private void FillGrid()
-        {
-            SPList plannerFragmentList = SPContext.Current.Web.Lists.TryGetList("PlannerFragments");
-            SPQuery qryFilterPlanner = new SPQuery();
-            string qryFilter = string.Empty;
-
-            if (!Page.IsPostBack)
-            {
-                if (plannerFragmentList != null)
-                {
-                    if (SPContext.Current.Web.CurrentUser.IsSiteAdmin)
-                        qryFilter = "<ViewFields><FieldRef Name='ID' /><FieldRef Name='Title' /><FieldRef Name='PlannerType' /><FieldRef Name='Author' /></ViewFields><OrderBy><FieldRef Name='Author' /><FieldRef Name='PlannerType' /></OrderBy>";
-                    else
-                        qryFilter = "<ViewFields><FieldRef Name='ID' /><FieldRef Name='Title' /><FieldRef Name='PlannerType' /><FieldRef Name='Author' /></ViewFields><OrderBy><FieldRef Name='Author' /><FieldRef Name='PlannerType' /></OrderBy><Where><Eq><FieldRef Name='Author' /><Value Type='User'>" + SPContext.Current.Web.CurrentUser.Name + "</Value></Eq></Where>";
-
-                    qryFilterPlanner.Query = qryFilter;
-
-                    SPListItemCollection fragmentItems = plannerFragmentList.GetItems(qryFilterPlanner);
-                    if (fragmentItems != null && fragmentItems.Count > 0)
-                    {
-                        gridFragments.DataSource = fragmentItems.GetDataTable(); ;
-                        gridFragments.DataBind();
-                    }
-                }
-            }
-        }
-
         protected void Page_Load(object sender, EventArgs e)
         {
             if (!Page.IsPostBack)
@@ -57,15 +30,19 @@ namespace EPMLiveCore.Layouts.epmlive
                         try
                         {
                             SPContext.Current.Web.AllowUnsafeUpdates = true;
-                            Int32 plannerFragmentID = Convert.ToInt32(gvrow.Cells[1].Text);
-                            SPListItem fragment = plannerFragmentList.GetItemById(plannerFragmentID);
-                            fragment.Recycle();
-                            plannerFragmentList.Update();
+                            Label lblID = (Label)gvrow.FindControl("lblID");
+                            if (lblID != null)
+                            {
+                                SPListItem fragment = plannerFragmentList.GetItemById(Convert.ToInt32(lblID.Text));
+                                fragment.Recycle();
+                                plannerFragmentList.Update();
+                            }
                         }
                         catch (Exception) { }
                     }
                 }
             }
+            Page.Response.Write("<script language='javascript' type='text/javascript'>closeDeleteFragmentPopup();");
         }
 
         protected void gridFragments_PageIndexChanging(object sender, GridViewPageEventArgs e)
@@ -73,6 +50,31 @@ namespace EPMLiveCore.Layouts.epmlive
             FillGrid();
             gridFragments.PageIndex = e.NewPageIndex;
             gridFragments.DataBind();
+        }
+
+
+        private void FillGrid()
+        {
+            SPList plannerFragmentList = SPContext.Current.Web.Lists.TryGetList("PlannerFragments");
+            SPQuery qryFilterPlanner = new SPQuery();
+            string qryFilter = string.Empty;
+
+            if (plannerFragmentList != null)
+            {
+                if (SPContext.Current.Web.CurrentUser.IsSiteAdmin)
+                    qryFilter = "<ViewFields><FieldRef Name='ID' /><FieldRef Name='Title' /><FieldRef Name='FragmentType' /><FieldRef Name='Author' /></ViewFields><OrderBy><FieldRef Name='Author' /><FieldRef Name='FragmentType' /></OrderBy>";
+                else
+                    qryFilter = "<ViewFields><FieldRef Name='ID' /><FieldRef Name='Title' /><FieldRef Name='FragmentType' /><FieldRef Name='Author' /></ViewFields><OrderBy><FieldRef Name='Author' /><FieldRef Name='FragmentType' /></OrderBy><Where><Eq><FieldRef Name='Author' /><Value Type='User'>" + SPContext.Current.Web.CurrentUser.Name + "</Value></Eq></Where>";
+
+                qryFilterPlanner.Query = qryFilter;
+
+                SPListItemCollection fragmentItems = plannerFragmentList.GetItems(qryFilterPlanner);
+                if (fragmentItems != null && fragmentItems.Count > 0)
+                {
+                    gridFragments.DataSource = fragmentItems.GetDataTable(); ;
+                    gridFragments.DataBind();
+                }
+            }
         }
     }
 }

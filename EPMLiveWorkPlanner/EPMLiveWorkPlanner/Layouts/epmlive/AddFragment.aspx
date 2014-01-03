@@ -10,8 +10,8 @@
 
 <asp:Content ID="PageHead" ContentPlaceHolderID="PlaceHolderAdditionalPageHead" runat="server">
     <script language="javascript" type="text/javascript">
-        function closeWindow() {
-            window.close(); return false;
+        function closeAddFragmentPopup() {
+            window.frameElement.commonModalDialogClose(1, 1);
         }
     </script>
 </asp:Content>
@@ -27,19 +27,20 @@
                 <asp:DropDownList ID="ddlFragments" runat="server"></asp:DropDownList>
             </td>
         </tr>
-        </table>
-        </br>
+    </table>
 
-        <asp:Button ID="btnImport" runat="server" Text="Import" OnClick="btnImport_Click" />
-        <input id="btnClose" type="button" value="Close" onclick="javascript: return closeWindow();" />
-    
-        </center>
+    <br />
+
+    <asp:Button ID="btnImport" runat="server" Text="Import" OnClick="btnImport_Click" />
+    <asp:Button ID="btnClose" runat="server" Text="Close" OnClientClick="javascript:return closeAddFragmentPopup();" />
+
+    </center>
 </asp:Content>
 
 <asp:Content ID="PageTitle" ContentPlaceHolderID="PlaceHolderPageTitle" runat="server">
-    Import Fragment
+    Add Fragment
 </asp:Content>
 
 <asp:Content ID="PageTitleInTitleArea" ContentPlaceHolderID="PlaceHolderPageTitleInTitleArea" runat="server">
-    Import Fragment
+    Add Fragment
 </asp:Content>

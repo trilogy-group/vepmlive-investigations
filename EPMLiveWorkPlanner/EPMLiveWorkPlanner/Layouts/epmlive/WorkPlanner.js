@@ -3269,7 +3269,7 @@ function AddFragment() {
 
 
 function SaveFragment() {
-    var options = { url: "savefragment.aspx?tasklistid=" + sTaskListId, width: 325, height: 250, title: "Save Fragment", showMaximized: false, dialogReturnValueCallback: RefreshTeam };
+    var options = { url: "savefragment.aspx?tasklistid=" + sTaskListId, width: 325, height: 300, title: "Save Fragment", showMaximized: false, dialogReturnValueCallback: RefreshTeam };
 
     //var options = { url: "buildteam.aspx?useteam=" + bUseTeam + "&listid=" + sProjectListId + "&id=" + sItemID + "&nosave=true&currentteam=1", title: "Build Team", showMaximized: true, dialogReturnValueCallback: RefreshTeam };
 

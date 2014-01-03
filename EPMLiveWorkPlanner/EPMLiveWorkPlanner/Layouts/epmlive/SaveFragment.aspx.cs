@@ -9,58 +9,8 @@ using System.Web;
 
 namespace EPMLiveCore.Layouts.epmlive
 {
-    public partial class ExportFragment : LayoutsPageBase
+    public partial class SaveFragment : LayoutsPageBase
     {
-        private SPList GetPlannerFragmentList()
-        {
-            //Create New 'PlannerFragments' list with following columns:
-            //Title[PlannerName - Single Line of Text], Description [Multiple Line of Text], PlannerType [Choice], Tag [single Line of Text], FragmentXml [Multiple line of Text]
-
-            SPSite site = SPContext.Current.Site;
-            SPWeb web = SPContext.Current.Web;
-            SPList plannerFragmentList = web.Lists.TryGetList("PlannerFragments");
-
-            if (plannerFragmentList == null)
-            {
-                SPSecurity.RunWithElevatedPrivileges(delegate()
-                {
-                    using (SPSite currentSite = new SPSite(site.ID))
-                    {
-                        using (SPWeb currentWeb = currentSite.OpenWeb(web.ID))
-                        {
-                            currentWeb.AllowUnsafeUpdates = true;
-                            Guid guid = currentWeb.Lists.Add("PlannerFragments", "Planner Fragments List - Used to store Planner Fragment details", SPListTemplateType.GenericList);
-                            plannerFragmentList = currentWeb.Lists[guid];
-                            //plannerFragmentList.Hidden = true; //TODO: Uncomment this while code check-in
-
-                            plannerFragmentList.Fields.Add("Description", SPFieldType.Note, false);
-                            plannerFragmentList.Fields.Add("PlannerType", SPFieldType.Choice, false);
-                            plannerFragmentList.Fields.Add("Tag", SPFieldType.Text, false);
-                            plannerFragmentList.Fields.Add("FragmentXML", SPFieldType.Note, false);
-                            plannerFragmentList.Update();
-
-                            //Add Planner Type - Choice Field
-                            SPFieldChoice plannerTypes = (SPFieldChoice)plannerFragmentList.Fields["PlannerType"];
-                            plannerTypes.Choices.Add("Private");
-                            plannerTypes.Choices.Add("Public");
-                            plannerTypes.DefaultValue = "Private";
-                            plannerTypes.Update();  //Saves choices to column
-                            plannerFragmentList.Update();
-
-                            SPView view = plannerFragmentList.DefaultView;
-                            view.ViewFields.Add("Description");
-                            view.ViewFields.Add("PlannerType");
-                            view.ViewFields.Add("Tag");
-                            view.Update();
-
-                            plannerFragmentList.Update();
-                            currentWeb.Update();
-                        }
-                    }
-                });
-            }
-            return plannerFragmentList;
-        }
 
         private void SavePlannerFragments(SPList plannerFragmentList)
         {
@@ -81,9 +31,9 @@ namespace EPMLiveCore.Layouts.epmlive
                                plannerFragmentItem["Title"] = txtFragmentName.Text;
                                plannerFragmentItem["Description"] = txtDescription.Text;
                                plannerFragmentItem["Tag"] = txtTag.Text;
-                               plannerFragmentItem["PlannerType"] = rdoScope.SelectedItem.Text;
+                               plannerFragmentItem["FragmentType"] = rdoScope.SelectedItem.Text;
                                plannerFragmentItem["FragmentXML"] = hdnTaskFragmentXml.Value;
-
+                               plannerFragmentItem["TaskListID"] = Convert.ToString(Request["tasklistid"]);
                                plannerFragmentItem.Update();
                                plannerFragmentList.Update();
                            }
@@ -108,7 +58,8 @@ namespace EPMLiveCore.Layouts.epmlive
             bool doesUserHasManageWebPermission = false;
             try
             {
-                doesUserHasManageWebPermission = SPContext.Current.Web.Lists.TryGetList("PlannerFragments").DoesUserHavePermissions(SPContext.Current.Web.CurrentUser, SPBasePermissions.ManageWeb);
+                if (SPContext.Current.Web.Lists.TryGetList("PlannerFragments") != null)
+                    doesUserHasManageWebPermission = SPContext.Current.Web.Lists.TryGetList("PlannerFragments").DoesUserHavePermissions(SPContext.Current.Web.CurrentUser, SPBasePermissions.ManageWeb);
             }
             catch (SPException) { }
 
@@ -127,8 +78,10 @@ namespace EPMLiveCore.Layouts.epmlive
 
         protected void btnSave_Click(object sender, EventArgs e)
         {
-            SPList plannerFragmentList = GetPlannerFragmentList();
+            SPList plannerFragmentList = SPContext.Current.Web.Lists.TryGetList("PlannerFragments");
             SavePlannerFragments(plannerFragmentList);
+            //Page.ClientScript.RegisterStartupScript(this.GetType(), "closeSaveFragmentPopup", "closeSaveFragmentPopup()", true);
+            Page.Response.Write("<script language='javascript' type='text/javascript'>closeSaveFragmentPopup();");
         }
     }
 }

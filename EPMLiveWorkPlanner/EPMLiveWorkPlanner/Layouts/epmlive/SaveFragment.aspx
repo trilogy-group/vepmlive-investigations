@@ -6,20 +6,20 @@
 <%@ Import Namespace="Microsoft.SharePoint" %>
 <%@ Assembly Name="Microsoft.Web.CommandUI, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
 
-<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="SaveFragment.aspx.cs" Inherits="EPMLiveCore.Layouts.epmlive.ExportFragment" DynamicMasterPageFile="~masterurl/default.master" %>
+<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="SaveFragment.aspx.cs" Inherits="EPMLiveCore.Layouts.epmlive.SaveFragment" DynamicMasterPageFile="~masterurl/default.master" %>
 
 <asp:Content ID="PageHead" ContentPlaceHolderID="PlaceHolderAdditionalPageHead" runat="server">
 
     <script language="javascript" type="text/javascript">
-        function getData() {
+
+        $(function () {
             var xDataXml = window.parent.Grids.WorkPlannerGrid.GetXmlData();
             var hdnTaskFragmentXml = document.getElementById('<%=hdnTaskFragmentXml.ClientID%>');
-            //alert(xDataXml);
             hdnTaskFragmentXml.value = xDataXml;
-            return true;
-        }
-        function closeWindow() {
-            window.close(); return false;
+        });
+
+        function closeSaveFragmentPopup() {
+            window.frameElement.commonModalDialogClose(1, 1);
         }
     </script>
 
@@ -27,32 +27,37 @@
 
 <asp:Content ID="Main" ContentPlaceHolderID="PlaceHolderMain" runat="server">
     <center>
-    <table>
+        <asp:ValidationSummary ID="ValidationSummary1" runat="server" ShowSummary="false"></asp:ValidationSummary>
+    <table width="100%">
         <tr>
             <td>
                 <asp:Label runat="server" ID="lblFragmentName" Text="Fragment Name: " ></asp:Label>
-
             </td>
             <td>
                 <asp:TextBox runat="server" ID="txtFragmentName" Text="" TabIndex="0" Width="200px"></asp:TextBox>
-
+                <asp:RequiredFieldValidator ID="fragmentNameValidate" runat="server" Display="Dynamic" ErrorMessage="Please enter fragment name" ForeColor="Red" ControlToValidate="txtFragmentName" ></asp:RequiredFieldValidator>
             </td>
         </tr>
         <tr>
             <td>
-                <asp:Label runat="server" ID="lblDescription" Text="Description: "></asp:Label></td>
+                <asp:Label runat="server" ID="lblDescription" Text="Description: "></asp:Label>
             </td>
-            <td><asp:TextBox runat="server" ID="txtDescription" Text="" Rows="3" TextMode="MultiLine" Width="200px"></asp:TextBox></td>
+            <td>
+                <asp:TextBox runat="server" ID="txtDescription" Text="" Rows="3" TextMode="MultiLine" Width="200px"></asp:TextBox>
+            </td>
         </tr>
         <tr>
             <td>
-                <asp:Label runat="server" ID="lblTag" Text="Tag: "></asp:Label></td>
+                <asp:Label runat="server" ID="lblTag" Text="Tag: "></asp:Label>
             </td>
-            <td><asp:TextBox runat="server" ID="txtTag" Text="" Width="200px"></asp:TextBox></td>
+            <td>
+                <asp:TextBox runat="server" ID="txtTag" Text="" Width="200px"></asp:TextBox>
+                <asp:RequiredFieldValidator ID="tagValidate" runat="server" Display="Dynamic" ErrorMessage="Please enter tag name for this fragment" ControlToValidate="txtTag" ForeColor="Red"  ></asp:RequiredFieldValidator>
+            </td>
         </tr>
         <tr>
             <td>
-                <asp:Label runat="server" ID="lblScope" Text="Scope: "></asp:Label></td>
+                <asp:Label runat="server" ID="lblScope" Text="Scope: "></asp:Label>
             </td>
             <td>
                 <asp:RadioButtonList ID="rdoScope" runat="server" Width="200px">
@@ -62,17 +67,21 @@
             </td>
         </tr>
         </table>
+
         <br />
-        <asp:Button ID="btnSave" runat="server" Text="Save" OnClientClick="javascript:return getData();" OnClick="btnSave_Click" />
-            <input id="btnClose" type="button" value="Close" onclick="javascript: return closeWindow();" />
+
+        <asp:Button ID="btnSave" runat="server" Text="Save" OnClick="btnSave_Click" />
+        <asp:Button ID="btnClose" runat="server" Text="Close" OnClientClick="javascript:return closeSaveFragmentPopup();" />
         </center>
+
     <asp:HiddenField ID="hdnTaskFragmentXml" runat="server" />
+
 </asp:Content>
 
 <asp:Content ID="PageTitle" ContentPlaceHolderID="PlaceHolderPageTitle" runat="server">
-    Export Fragment
+    Save Fragment
 </asp:Content>
 
 <asp:Content ID="PageTitleInTitleArea" ContentPlaceHolderID="PlaceHolderPageTitleInTitleArea" runat="server">
-    Export Fragment
+    Save Fragment
 </asp:Content>
