@@ -10,9 +10,17 @@
 
 <asp:Content ID="PageHead" ContentPlaceHolderID="PlaceHolderAdditionalPageHead" runat="server">
     <script language="javascript" type="text/javascript">
+
+        $(function () {
+            var xDataXml = window.parent.Grids.WorkPlannerGrid.GetXmlData();
+            var hdnTaskFragmentXml = document.getElementById('<%=hdnTaskFragmentXml.ClientID%>');
+            hdnTaskFragmentXml.value = xDataXml;
+        });
+
         function closeAddFragmentPopup() {
             window.frameElement.commonModalDialogClose(1, 1);
         }
+
     </script>
 </asp:Content>
 
@@ -33,7 +41,7 @@
 
     <asp:Button ID="btnImport" runat="server" Text="Import" OnClick="btnImport_Click" />
     <asp:Button ID="btnClose" runat="server" Text="Close" OnClientClick="javascript:return closeAddFragmentPopup();" />
-
+        <asp:HiddenField ID="hdnTaskFragmentXml" runat="server" />
     </center>
 </asp:Content>
 

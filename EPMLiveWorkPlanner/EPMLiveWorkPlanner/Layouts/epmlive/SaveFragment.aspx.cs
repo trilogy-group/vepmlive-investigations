@@ -80,8 +80,7 @@ namespace EPMLiveCore.Layouts.epmlive
         {
             SPList plannerFragmentList = SPContext.Current.Web.Lists.TryGetList("PlannerFragments");
             SavePlannerFragments(plannerFragmentList);
-            //Page.ClientScript.RegisterStartupScript(this.GetType(), "closeSaveFragmentPopup", "closeSaveFragmentPopup()", true);
-            Page.Response.Write("<script language='javascript' type='text/javascript'>closeSaveFragmentPopup();");
+            Page.Response.Write("<script language='javascript' type='text/javascript'>window.frameElement.commonModalDialogClose(1, 1);</script>");
         }
     }
 }

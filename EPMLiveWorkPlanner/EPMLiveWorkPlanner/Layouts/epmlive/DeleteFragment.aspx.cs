@@ -42,7 +42,7 @@ namespace EPMLiveCore.Layouts.epmlive
                     }
                 }
             }
-            Page.Response.Write("<script language='javascript' type='text/javascript'>closeDeleteFragmentPopup();");
+            Page.Response.Write("<script language='javascript' type='text/javascript'>window.frameElement.commonModalDialogClose(1, 1);</script>");
         }
 
         protected void gridFragments_PageIndexChanging(object sender, GridViewPageEventArgs e)

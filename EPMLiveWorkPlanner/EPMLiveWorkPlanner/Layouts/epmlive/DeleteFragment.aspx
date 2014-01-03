@@ -13,6 +13,24 @@
         function closeDeleteFragmentPopup() {
             window.frameElement.commonModalDialogClose(1, 1);
         }
+
+        function validateCheckBoxes() {
+            var isValid = false;
+            var gridView = document.getElementById('<%= gridFragments.ClientID %>');
+            for (var i = 1; i < gridView.rows.length; i++) {
+                var inputs = gridView.rows[i].getElementsByTagName('input');
+                if (inputs != null) {
+                    if (inputs[0].type == "checkbox") {
+                        if (inputs[0].checked) {
+                            isValid = true;
+                            return true;
+                        }
+                    }
+                }
+            }
+            alert("Please select atleast one fragment.");
+            return false;
+        }
     </script>
 </asp:Content>
 
@@ -41,15 +59,14 @@
 
                     </Columns>
                     <HeaderStyle BackColor="#df5015" BorderWidth="1" Font-Bold="true" ForeColor="White" BorderColor="Black" />
-                </asp:GridView>
-            </td>
+                </asp:GridView></td>
             <td>
             </td>
         </tr>
         </table>
         <br />
 
-            <asp:Button ID="btnDelete" runat="server" Text="Delete" OnClick="btnDelete_Click" />
+            <asp:Button ID="btnDelete" runat="server" Text="Delete" OnClick="btnDelete_Click" OnClientClick="javascript: return validateCheckBoxes();" />
             <asp:Button ID="btnClose" runat="server" Text="Close" OnClientClick="javascript:return closeDeleteFragmentPopup();" />
         
         </center>

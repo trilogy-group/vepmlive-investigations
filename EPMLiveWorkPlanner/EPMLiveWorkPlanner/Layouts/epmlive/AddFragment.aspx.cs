@@ -1,11 +1,8 @@
-﻿using System;
+﻿using EPMLiveCore.ReportingProxy;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.WebControls;
-using System.Xml;
+using System;
 using System.Collections.Generic;
-using System.Reflection;
-using EPMLiveWorkPlanner;
-using System.Data.SqlClient;
 using System.Data;
 using System.Web.UI.WebControls;
 
@@ -13,8 +10,6 @@ namespace EPMLiveCore.Layouts.epmlive
 {
     public partial class AddFragment : LayoutsPageBase
     {
-        DataSet ds = new DataSet();
-
         protected void Page_Load(object sender, EventArgs e)
         {
             SPList plannerFragmentList = SPContext.Current.Web.Lists.TryGetList("PlannerFragments");
@@ -42,16 +37,67 @@ namespace EPMLiveCore.Layouts.epmlive
             }
         }
 
+        private void AddResourceToTeam(List<string> resources)
+        {
+            string resourceToAdd = string.Empty;
+            SPList projectCenter = SPContext.Current.Web.Lists.TryGetList("Project Center");
+            if (projectCenter != null)
+            {
+                SPListItem pItem = projectCenter.GetItemById(Convert.ToInt32(Request["ID"]));
+
+                SPFieldUserValueCollection assignedTo = null;
+                try
+                {
+                    assignedTo = new SPFieldUserValueCollection(SPContext.Current.Web, pItem["AssignedTo"].ToString());
+                }
+                catch { }
+
+                if (assignedTo == null)
+                    assignedTo = new SPFieldUserValueCollection();
+
+                foreach (string resource in resources)
+                {
+                    if (!assignedTo.ToString().Contains(resource))
+                    {
+                        resourceToAdd += "'" + resource + "',";
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(resourceToAdd))
+                {
+                    resourceToAdd = resourceToAdd.Substring(0, resourceToAdd.Length - 1);
+
+                    string sqlGetResources = "SELECT ID, Title, SharePointAccountID, SharePointAccountText FROM LSTResourcepool WHERE Title IN(" + resourceToAdd + ")";
+                    DataTable dtResources = null;
+
+                    try
+                    {
+                        var queryExecutor = new QueryExecutor(SPContext.Current.Web);
+                        dtResources = queryExecutor.ExecuteReportingDBQuery(sqlGetResources, new Dictionary<string, object> { });
+                    }
+                    catch { }
+
+                    if (dtResources != null && dtResources.Rows.Count > 0)
+                    {
+                        for (int row = 0; row < dtResources.Rows.Count; row++)
+                        {
+                            assignedTo.Add(new SPFieldUserValue(SPContext.Current.Web, Convert.ToInt32(dtResources.Rows[row]["SharePointAccountID"]), Convert.ToString(dtResources.Rows[row]["SharePointAccountText"])));
+                        }
+
+                        pItem["AssignedTo"] = assignedTo;
+
+                        SPContext.Current.Web.AllowUnsafeUpdates = true;
+
+                        pItem.Update();
+                        projectCenter.Update();
+                    }
+                }
+            }
+        }
+
         protected void btnImport_Click(object sender, EventArgs e)
         {
-            String fragmentXml = string.Empty;
-            SPList plannerFragmentList = SPContext.Current.Web.Lists.TryGetList("PlannerFragments");
-            if (plannerFragmentList != null)
-            {
-                SPListItem fragment = plannerFragmentList.GetItemById(Convert.ToInt32(ddlFragments.SelectedValue));
-                fragmentXml = Convert.ToString(fragment["FragmentXML"]);
-            }
-            Page.Response.Write("<script language='javascript' type='text/javascript'>closeAddFragmentPopup();");
+            Page.Response.Write("<script language='javascript' type='text/javascript'>window.frameElement.commonModalDialogClose(1, 1);</script>");
         }
     }
 }

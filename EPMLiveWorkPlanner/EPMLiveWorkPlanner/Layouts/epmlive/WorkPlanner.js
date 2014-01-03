@@ -3260,27 +3260,18 @@ function BuildTeam() {
 }
 
 function AddFragment() {
-    var options = { url: "addfragment.aspx?tasklistid=" + sTaskListId, width: 300, height: 125, title: "Add Fragment", showMaximized: false, dialogReturnValueCallback: RefreshTeam };
-
-    //var options = { url: "buildteam.aspx?useteam=" + bUseTeam + "&listid=" + sProjectListId + "&id=" + sItemID + "&nosave=true&currentteam=1", title: "Build Team", showMaximized: true, dialogReturnValueCallback: RefreshTeam };
-
+    var options = { url: "addfragment.aspx?tasklistid=" + sTaskListId + '&listid=' + sProjectListId + "&id=" + sItemID, width: 300, height: 125, title: "Add Fragment", showMaximized: false, dialogReturnValueCallback: RefreshTeam };
     SP.UI.ModalDialog.showModalDialog(options);
 }
 
 
 function SaveFragment() {
     var options = { url: "savefragment.aspx?tasklistid=" + sTaskListId, width: 325, height: 300, title: "Save Fragment", showMaximized: false, dialogReturnValueCallback: RefreshTeam };
-
-    //var options = { url: "buildteam.aspx?useteam=" + bUseTeam + "&listid=" + sProjectListId + "&id=" + sItemID + "&nosave=true&currentteam=1", title: "Build Team", showMaximized: true, dialogReturnValueCallback: RefreshTeam };
-
     SP.UI.ModalDialog.showModalDialog(options);
 }
 
 function DeleteFragment() {
-    var options = { url: "deletefragment.aspx?tasklistid=" + sTaskListId, width: 450, height: 450, title: "Delete Fragment", showMaximized: false, dialogReturnValueCallback: RefreshTeam };
-
-    //var options = { url: "buildteam.aspx?useteam=" + bUseTeam + "&listid=" + sProjectListId + "&id=" + sItemID + "&nosave=true&currentteam=1", title: "Build Team", showMaximized: true, dialogReturnValueCallback: RefreshTeam };
-
+    var options = { url: "deletefragment.aspx?tasklistid=" + sTaskListId, width: 450, height: 500, title: "Delete Fragment", showMaximized: false, dialogReturnValueCallback: RefreshTeam };
     SP.UI.ModalDialog.showModalDialog(options);
 }
 function RefreshTeam(dialogResult, returnValue) {
