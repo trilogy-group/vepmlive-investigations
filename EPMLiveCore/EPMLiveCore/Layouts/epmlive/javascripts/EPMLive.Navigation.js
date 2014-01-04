@@ -437,6 +437,14 @@
                             openMenu();
 
                             $.cookie(selectedTlNodeCookie, _id, cookieOptions);
+                            
+                            for (var n2 in tlNodes) {
+                                var nde2 = tlNodes[n2];
+
+                                if (nde2.id !== _id) {
+                                    $('#' + nde2.id.replace('top', 'sub')).hide();
+                                }
+                            }
                         }
                     });
 
