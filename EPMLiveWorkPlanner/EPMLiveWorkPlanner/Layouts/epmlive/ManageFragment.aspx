@@ -19,26 +19,30 @@
         function validateCheckBoxes() {
             var isValid = false;
             var gridView = document.getElementById('<%= gridFragments.ClientID %>');
+
             for (var i = 1; i < gridView.rows.length; i++) {
                 var inputs = gridView.rows[i].getElementsByTagName('input');
-                if (inputs != null) {
+                if (inputs != null && (inputs[0] != null || inputs[0] != undefined)) {
                     if (inputs[0].type == "checkbox") {
                         if (inputs[0].checked) {
                             isValid = true;
+                            alert(isValid);
                         }
                     }
                 }
             }
-            if (!isValid) {
-                alert("Please select atleast one fragment.");
-                return false;
-            }
-            else {
-                var btn = confirm("Are you sure you want to delete selected fragment(s)");
+
+            if (isValid) {
+                var btn = confirm("Are you sure you want to delete selected fragment(s)?");
+                alert(btn);
                 if (btn == true)
                     return true;
                 else
                     return false;
+            }
+            else {
+                alert("Please select atleast one fragment.");
+                return false;
             }
         }
     </script>
