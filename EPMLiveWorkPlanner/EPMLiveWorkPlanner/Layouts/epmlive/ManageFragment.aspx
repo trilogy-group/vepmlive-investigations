@@ -26,7 +26,6 @@
                     if (inputs[0].type == "checkbox") {
                         if (inputs[0].checked) {
                             isValid = true;
-                            alert(isValid);
                         }
                     }
                 }
@@ -34,7 +33,6 @@
 
             if (isValid) {
                 var btn = confirm("Are you sure you want to delete selected fragment(s)?");
-                alert(btn);
                 if (btn == true)
                     return true;
                 else
