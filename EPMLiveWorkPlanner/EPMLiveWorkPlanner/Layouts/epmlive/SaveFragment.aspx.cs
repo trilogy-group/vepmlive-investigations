@@ -33,7 +33,7 @@ namespace EPMLiveCore.Layouts.epmlive
                                plannerFragmentItem["Tag"] = txtTag.Text;
                                plannerFragmentItem["FragmentType"] = rdoScope.SelectedItem.Text;
                                plannerFragmentItem["FragmentXML"] = hdnTaskFragmentXml.Value;
-                               plannerFragmentItem["TaskListID"] = Convert.ToString(Request["tasklistid"]);
+                               plannerFragmentItem["PlannerID"] = Convert.ToString(Request["PlannerID"]);
                                plannerFragmentItem.Update();
                                plannerFragmentList.Update();
                            }
@@ -80,6 +80,7 @@ namespace EPMLiveCore.Layouts.epmlive
         {
             SPList plannerFragmentList = SPContext.Current.Web.Lists.TryGetList("PlannerFragments");
             SavePlannerFragments(plannerFragmentList);
+            Page.Response.Write("<script language='javascript' type='text/javascript'>javascript:alert('Fragment '" + txtFragmentName.Text + "' saved successfully!');</script>");
             Page.Response.Write("<script language='javascript' type='text/javascript'>window.frameElement.commonModalDialogClose(1, 1);</script>");
         }
     }

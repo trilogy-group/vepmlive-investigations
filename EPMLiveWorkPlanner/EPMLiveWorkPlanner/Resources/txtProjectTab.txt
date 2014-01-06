@@ -235,11 +235,11 @@
 					TemplateAlias="oM"/>
 
 					<Button
-					Id="Ribbon.WorkPlanner.ToolsGroup.DeleteFragmentButton"
+					Id="Ribbon.WorkPlanner.ToolsGroup.ManageFragmentButton"
 					Sequence="20"
-					Image16by16="/_layouts/epmlive/images/deletetask.png"
-					Command="Ribbon.WorkPlanner.DeleteFragmentButton"
-					LabelText="Delete Fragment"
+					Image16by16="/_layouts/epmlive/images/editteam.gif"
+					Command="Ribbon.WorkPlanner.ManageFragmentButton"
+					LabelText="Manage Fragment"
 					TemplateAlias="oM"/>	
 
 			</Controls>

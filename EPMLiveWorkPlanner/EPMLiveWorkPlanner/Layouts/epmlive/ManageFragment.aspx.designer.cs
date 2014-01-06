@@ -10,7 +10,7 @@
 namespace EPMLiveCore.Layouts.epmlive {
     
     
-    public partial class DeleteFragment {
+    public partial class ManageFragment {
         
         /// <summary>
         /// gridFragments control.

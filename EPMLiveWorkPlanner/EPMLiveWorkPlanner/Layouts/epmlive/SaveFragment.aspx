@@ -26,56 +26,56 @@
 </asp:Content>
 
 <asp:Content ID="Main" ContentPlaceHolderID="PlaceHolderMain" runat="server">
-    <center>
-        <asp:ValidationSummary ID="ValidationSummary1" runat="server" ShowSummary="false"></asp:ValidationSummary>
-    <table width="100%">
-        <tr>
-            <td>
-                <asp:Label runat="server" ID="lblFragmentName" Text="Fragment Name: " ></asp:Label>
-            </td>
-            <td>
-                <asp:TextBox runat="server" ID="txtFragmentName" Text="" TabIndex="0" Width="200px"></asp:TextBox>
-                <asp:RequiredFieldValidator ID="fragmentNameValidate" runat="server" Display="Dynamic" ErrorMessage="Please enter fragment name" ForeColor="Red" ControlToValidate="txtFragmentName" ></asp:RequiredFieldValidator>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <asp:Label runat="server" ID="lblDescription" Text="Description: "></asp:Label>
-            </td>
-            <td>
-                <asp:TextBox runat="server" ID="txtDescription" Text="" Rows="3" TextMode="MultiLine" Width="200px"></asp:TextBox>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <asp:Label runat="server" ID="lblTag" Text="Tag: "></asp:Label>
-            </td>
-            <td>
-                <asp:TextBox runat="server" ID="txtTag" Text="" Width="200px"></asp:TextBox>
-                <asp:RequiredFieldValidator ID="tagValidate" runat="server" Display="Dynamic" ErrorMessage="Please enter tag name for this fragment" ControlToValidate="txtTag" ForeColor="Red"  ></asp:RequiredFieldValidator>
-            </td>
-        </tr>
-        <tr>
-            <td>
-                <asp:Label runat="server" ID="lblScope" Text="Scope: "></asp:Label>
-            </td>
-            <td>
-                <asp:RadioButtonList ID="rdoScope" runat="server" Width="200px">
-                    <asp:ListItem Text="Private" Selected="True" Value="true"></asp:ListItem>
-                    <asp:ListItem Text="Public" Selected="False" Value="false"></asp:ListItem>
-                </asp:RadioButtonList>
-            </td>
-        </tr>
+    <div align="center">
+        <asp:ValidationSummary ID="ValidationSummary" runat="server" ShowSummary="false"></asp:ValidationSummary>
+
+        <table width="100%">
+            <tr>
+                <td style="width: 100px">
+                    <asp:Label runat="server" ID="lblFragmentName" Text="Name: "></asp:Label>
+                </td>
+                <td style="width: 200px">
+                    <asp:TextBox runat="server" ID="txtFragmentName" Text="" TabIndex="0" Width="200px"></asp:TextBox>
+                    <asp:RequiredFieldValidator ID="fragmentNameValidate" runat="server" Display="Dynamic" ErrorMessage="Please enter fragment name" ForeColor="Red" ControlToValidate="txtFragmentName"></asp:RequiredFieldValidator>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <asp:Label runat="server" ID="lblDescription" Text="Description: "></asp:Label>
+                </td>
+                <td>
+                    <asp:TextBox runat="server" ID="txtDescription" Text="" Rows="3" TextMode="MultiLine" Width="200px"></asp:TextBox>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <asp:Label runat="server" ID="lblTag" Text="Tag: "></asp:Label>
+                </td>
+                <td>
+                    <asp:TextBox runat="server" ID="txtTag" Text="" Width="200px"></asp:TextBox>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <asp:Label runat="server" ID="lblScope" Text="Scope: "></asp:Label>
+                </td>
+                <td>
+                    <asp:RadioButtonList ID="rdoScope" runat="server" Width="200px" TextAlign="Left">
+                        <asp:ListItem Text="Private" Selected="True" Value="true"></asp:ListItem>
+                        <asp:ListItem Text="Public" Selected="False" Value="false"></asp:ListItem>
+                    </asp:RadioButtonList>
+                </td>
+            </tr>
         </table>
 
-        <br />
+        <p align="center">
+            <asp:Button ID="btnSave" runat="server" Text="Save" OnClick="btnSave_Click" />
+            <asp:Button ID="btnClose" runat="server" Text="Close" OnClientClick="javascript:return closeSaveFragmentPopup();" />
+        </p>
 
-        <asp:Button ID="btnSave" runat="server" Text="Save" OnClick="btnSave_Click" />
-        <asp:Button ID="btnClose" runat="server" Text="Close" OnClientClick="javascript:return closeSaveFragmentPopup();" />
-        </center>
+        <asp:HiddenField ID="hdnTaskFragmentXml" runat="server" />
 
-    <asp:HiddenField ID="hdnTaskFragmentXml" runat="server" />
-
+    </div>
 </asp:Content>
 
 <asp:Content ID="PageTitle" ContentPlaceHolderID="PlaceHolderPageTitle" runat="server">

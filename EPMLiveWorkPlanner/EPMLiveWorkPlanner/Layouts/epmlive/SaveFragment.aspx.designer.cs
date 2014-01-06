@@ -13,13 +13,13 @@ namespace EPMLiveCore.Layouts.epmlive {
     public partial class SaveFragment {
         
         /// <summary>
-        /// ValidationSummary1 control.
+        /// ValidationSummary control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.ValidationSummary ValidationSummary1;
+        protected global::System.Web.UI.WebControls.ValidationSummary ValidationSummary;
         
         /// <summary>
         /// lblFragmentName control.
@@ -83,15 +83,6 @@ namespace EPMLiveCore.Layouts.epmlive {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.TextBox txtTag;
-        
-        /// <summary>
-        /// tagValidate control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.RequiredFieldValidator tagValidate;
         
         /// <summary>
         /// lblScope control.

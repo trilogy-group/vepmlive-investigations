@@ -25,24 +25,22 @@
 </asp:Content>
 
 <asp:Content ID="Main" ContentPlaceHolderID="PlaceHolderMain" runat="server">
-    <center>
-    <table>
-        <tr>
-            <td>
-                <asp:Label runat="server" ID="lblFragmentName" Text="Fragment Name: "></asp:Label>
-            </td>
-            <td>
-                <asp:DropDownList ID="ddlFragments" runat="server"></asp:DropDownList>
-            </td>
-        </tr>
-    </table>
-
-    <br />
-
-    <asp:Button ID="btnImport" runat="server" Text="Import" OnClick="btnImport_Click" />
-    <asp:Button ID="btnClose" runat="server" Text="Close" OnClientClick="javascript:return closeAddFragmentPopup();" />
+    <div align="center">
+        <table>
+            <tr>
+                <td style="width: 150px">
+                    <asp:Label runat="server" ID="lblFragmentName" Text="Select Fragment: "></asp:Label>
+                </td>
+                <td style="width: 250px">
+                    <asp:DropDownList ID="ddlFragments" runat="server" Width="250px"></asp:DropDownList>
+                </td>
+            </tr>
+        </table>
+        <br />
+        <asp:Button ID="btnImport" runat="server" Text="Add" OnClick="btnImport_Click" />
+        <asp:Button ID="btnClose" runat="server" Text="Close" OnClientClick="javascript:return closeAddFragmentPopup();" />
         <asp:HiddenField ID="hdnTaskFragmentXml" runat="server" />
-    </center>
+    </div>
 </asp:Content>
 
 <asp:Content ID="PageTitle" ContentPlaceHolderID="PlaceHolderPageTitle" runat="server">

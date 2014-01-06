@@ -8,7 +8,7 @@ using System.Web.UI.HtmlControls;
 
 namespace EPMLiveCore.Layouts.epmlive
 {
-    public partial class DeleteFragment : LayoutsPageBase
+    public partial class ManageFragment : LayoutsPageBase
     {
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -38,10 +38,15 @@ namespace EPMLiveCore.Layouts.epmlive
                                 plannerFragmentList.Update();
                             }
                         }
-                        catch (Exception) { }
+                        catch (Exception) 
+                        {
+                            Page.Response.Write("<script language='javascript' type='text/javascript'>alert('Error occurred while deleting fragment(s)!');</script>");
+                            return;
+                        }
                     }
                 }
             }
+            Page.Response.Write("<script language='javascript' type='text/javascript'>alert('Fragment(s) deleted successfully!');</script>");
             Page.Response.Write("<script language='javascript' type='text/javascript'>window.frameElement.commonModalDialogClose(1, 1);</script>");
         }
 
@@ -62,9 +67,9 @@ namespace EPMLiveCore.Layouts.epmlive
             if (plannerFragmentList != null)
             {
                 if (SPContext.Current.Web.CurrentUser.IsSiteAdmin)
-                    qryFilter = "<ViewFields><FieldRef Name='ID' /><FieldRef Name='Title' /><FieldRef Name='FragmentType' /><FieldRef Name='Author' /></ViewFields><OrderBy><FieldRef Name='Author' /><FieldRef Name='FragmentType' /></OrderBy>";
+                    qryFilter = "<ViewFields><FieldRef Name='ID' /><FieldRef Name='Title' /><FieldRef Name='FragmentType' /><FieldRef Name='Author' /></ViewFields><OrderBy><FieldRef Name='Author' /><FieldRef Name='FragmentType' /></OrderBy><Where><Eq><FieldRef Name='PlannerID' /><Value Type='Text'>" + Convert.ToString(Request["PlannerID"]) + "</Value></Eq></Where>";
                 else
-                    qryFilter = "<ViewFields><FieldRef Name='ID' /><FieldRef Name='Title' /><FieldRef Name='FragmentType' /><FieldRef Name='Author' /></ViewFields><OrderBy><FieldRef Name='Author' /><FieldRef Name='FragmentType' /></OrderBy><Where><Eq><FieldRef Name='Author' /><Value Type='User'>" + SPContext.Current.Web.CurrentUser.Name + "</Value></Eq></Where>";
+                    qryFilter = "<ViewFields><FieldRef Name='ID' /><FieldRef Name='Title' /><FieldRef Name='FragmentType' /><FieldRef Name='Author' /></ViewFields><OrderBy><FieldRef Name='Author' /><FieldRef Name='FragmentType' /></OrderBy><Where><And><Eq><FieldRef Name='Author' /><Value Type='User'>" + SPContext.Current.Web.CurrentUser.Name + "</Value></Eq><Eq><FieldRef Name='PlannerID' /><Value Type='Text'>ProjectPlanner</Value></Eq></And></Where>";
 
                 qryFilterPlanner.Query = qryFilter;
 

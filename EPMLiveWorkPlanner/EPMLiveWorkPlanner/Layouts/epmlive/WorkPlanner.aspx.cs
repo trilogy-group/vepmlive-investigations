@@ -1420,52 +1420,60 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
         {
             //Create New 'PlannerFragments' list with following columns:
             //Title[PlannerName - Single Line of Text], Description [Multiple Line of Text], FragmentType [Choice], Tag [single Line of Text], FragmentXml [Multiple line of Text]
-
-            SPSite site = SPContext.Current.Site;
-            SPWeb web = SPContext.Current.Web;
-            SPList plannerFragmentList = web.Lists.TryGetList("PlannerFragments");
-
-            if (plannerFragmentList == null)
+            try
             {
-                SPSecurity.RunWithElevatedPrivileges(delegate()
+                SPSite site = SPContext.Current.Site;
+                SPWeb web = SPContext.Current.Web;
+                SPList plannerFragmentList = web.Lists.TryGetList("PlannerFragments");
+
+                if (plannerFragmentList == null)
                 {
-                    using (SPSite currentSite = new SPSite(site.ID))
+                    SPSecurity.RunWithElevatedPrivileges(delegate()
                     {
-                        using (SPWeb currentWeb = currentSite.OpenWeb(web.ID))
+                        using (SPSite currentSite = new SPSite(site.ID))
                         {
-                            currentWeb.AllowUnsafeUpdates = true;
-                            Guid guid = currentWeb.Lists.Add("PlannerFragments", "Planner Fragments List - Used to store Planner Fragment details", SPListTemplateType.GenericList);
-                            plannerFragmentList = currentWeb.Lists[guid];
-                            //plannerFragmentList.Hidden = true; //TODO: Uncomment this while code check-in
+                            using (SPWeb currentWeb = currentSite.OpenWeb(web.ID))
+                            {
+                                currentWeb.AllowUnsafeUpdates = true;
+                                Guid guid = currentWeb.Lists.Add("PlannerFragments", "Planner Fragments List - Used to store Planner Fragment details", SPListTemplateType.GenericList);
+                                plannerFragmentList = currentWeb.Lists[guid];
+                                //plannerFragmentList.Hidden = true; //TODO: Uncomment this while code check-in
 
-                            plannerFragmentList.Fields.Add("Description", SPFieldType.Note, false);
-                            plannerFragmentList.Fields.Add("FragmentType", SPFieldType.Choice, false);
-                            plannerFragmentList.Fields.Add("Tag", SPFieldType.Text, true);
-                            plannerFragmentList.Fields.Add("FragmentXML", SPFieldType.Note, true);
-                            plannerFragmentList.Fields.Add("TaskListID", SPFieldType.Text, false);
-                            plannerFragmentList.Update();
+                                plannerFragmentList.Fields.Add("Description", SPFieldType.Note, false);
+                                plannerFragmentList.Fields.Add("FragmentType", SPFieldType.Choice, false);
+                                plannerFragmentList.Fields.Add("Tag", SPFieldType.Text, false);
+                                plannerFragmentList.Fields.Add("FragmentXML", SPFieldType.Note, true);
+                                plannerFragmentList.Fields.Add("PlannerID", SPFieldType.Text, false);
+                                plannerFragmentList.Update();
 
-                            //Add Planner Type - Choice Field
-                            SPFieldChoice fragmentTypes = (SPFieldChoice)plannerFragmentList.Fields["FragmentType"];
-                            fragmentTypes.Choices.Add("Private");
-                            fragmentTypes.Choices.Add("Public");
-                            fragmentTypes.DefaultValue = "Private";
-                            fragmentTypes.Update();  //Saves choices to column
-                            plannerFragmentList.Update();
+                                //Add Planner Type - Choice Field
+                                SPFieldChoice fragmentTypes = (SPFieldChoice)plannerFragmentList.Fields["FragmentType"];
+                                fragmentTypes.Choices.Add("Private");
+                                fragmentTypes.Choices.Add("Public");
+                                fragmentTypes.DefaultValue = "Private";
+                                fragmentTypes.Update();  //Saves choices to column
+                                plannerFragmentList.Update();
 
-                            SPView view = plannerFragmentList.DefaultView;
-                            view.ViewFields.Add("Description");
-                            view.ViewFields.Add("FragmentType");
-                            view.ViewFields.Add("Tag");
-                            view.Update();
+                                SPView view = plannerFragmentList.DefaultView;
+                                view.ViewFields.Add("Description");
+                                view.ViewFields.Add("FragmentType");
+                                view.ViewFields.Add("Tag");
+                                view.ViewFields.Add("PlannerID");
+                                view.ViewFields.Add("Author");
+                                view.Update();
 
-                            plannerFragmentList.Update();
-                            currentWeb.Update();
+                                plannerFragmentList.Update();
+                                currentWeb.Update();
+                            }
                         }
-                    }
-                });
+                    });
+                }
+                return plannerFragmentList;
             }
-            return plannerFragmentList;
+            catch (Exception)
+            {
+                return null;
+            }
         }
 
         private void AddTabEvents()
@@ -1579,7 +1587,15 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                 else
                 {
                     CreatePlannerFragmentList();
-                    doesUserHasManageWebPermission = SPContext.Current.Web.Lists.TryGetList("PlannerFragments").DoesUserHavePermissions(SPContext.Current.Web.CurrentUser, SPBasePermissions.ManageWeb);
+                    if (SPContext.Current.Web.Lists.TryGetList("PlannerFragments") != null)
+                    {
+                        doesUserHasManageWebPermission = SPContext.Current.Web.Lists.TryGetList("PlannerFragments").DoesUserHavePermissions(SPContext.Current.Web.CurrentUser, SPBasePermissions.ManageWeb);
+                    }
+                    else
+                    {
+                        CreatePlannerFragmentList();
+                        doesUserHasManageWebPermission = SPContext.Current.Web.Lists.TryGetList("PlannerFragments").DoesUserHavePermissions(SPContext.Current.Web.CurrentUser, SPBasePermissions.ManageWeb);
+                    }
                 }
             }
             catch (SPException) { }
@@ -1590,18 +1606,18 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                 if (doesUserHasManageWebPermission)
                 {
                     commands.Add(new SPRibbonCommand("Ribbon.WorkPlanner.SaveFragmentButton", "SaveFragment();", "true"));
-                    commands.Add(new SPRibbonCommand("Ribbon.WorkPlanner.DeleteFragmentButton", "DeleteFragment();", "true"));
+                    commands.Add(new SPRibbonCommand("Ribbon.WorkPlanner.ManageFragmentButton", "ManageFragment();", "true"));
                 }
                 else
                 {
                     commands.Add(new SPRibbonCommand("Ribbon.WorkPlanner.SaveFragmentButton", "SaveFragment();", "false"));
-                    commands.Add(new SPRibbonCommand("Ribbon.WorkPlanner.DeleteFragmentButton", "DeleteFragment();", "false"));
+                    commands.Add(new SPRibbonCommand("Ribbon.WorkPlanner.ManageFragmentButton", "ManageFragment();", "false"));
                 }
             }
             else
             {
                 commands.Add(new SPRibbonCommand("Ribbon.WorkPlanner.SaveFragmentButton", "SaveFragment();", "false"));
-                commands.Add(new SPRibbonCommand("Ribbon.WorkPlanner.DeleteFragmentButton", "DeleteFragment();", "false"));
+                commands.Add(new SPRibbonCommand("Ribbon.WorkPlanner.ManageFragmentButton", "ManageFragment();", "false"));
             }
 
             //commands.Add(new SPRibbonCommand("Ribbon.WorkPlanner.DoCreateNew", "DoCreateNew();", "true"));
