@@ -49,12 +49,30 @@ namespace EPMLiveCore.Layouts.epmlive {
         protected global::System.Web.UI.WebControls.Button btnClose;
         
         /// <summary>
-        /// hdnTaskFragmentXml control.
+        /// hdnSelectedRowID control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.HiddenField hdnTaskFragmentXml;
+        protected global::System.Web.UI.WebControls.HiddenField hdnSelectedRowID;
+        
+        /// <summary>
+        /// hdnNewRowID control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.HiddenField hdnNewRowID;
+        
+        /// <summary>
+        /// hdnPlanXml control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.HiddenField hdnPlanXml;
     }
 }

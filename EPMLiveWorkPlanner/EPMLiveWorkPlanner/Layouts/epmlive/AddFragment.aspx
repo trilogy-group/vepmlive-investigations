@@ -9,12 +9,19 @@
 <%@ Page Language="C#" AutoEventWireup="true" CodeBehind="AddFragment.aspx.cs" Inherits="EPMLiveCore.Layouts.epmlive.AddFragment" DynamicMasterPageFile="~masterurl/default.master" %>
 
 <asp:Content ID="PageHead" ContentPlaceHolderID="PlaceHolderAdditionalPageHead" runat="server">
-    <script language="javascript" type="text/javascript">
+    <script type="text/javascript">
 
         $(function () {
-            var xDataXml = window.parent.Grids.WorkPlannerGrid.GetXmlData();
-            var hdnTaskFragmentXml = document.getElementById('<%=hdnTaskFragmentXml.ClientID%>');
-            hdnTaskFragmentXml.value = xDataXml;
+            var hdnSelectedRowID = document.getElementById('<%=hdnSelectedRowID.ClientID%>');
+            var hdnNewRowID = document.getElementById('<%=hdnNewRowID.ClientID%>');
+            var hdnPlanXml = document.getElementById('<%=hdnPlanXml.ClientID%>');
+
+            if (window.parent.Grids.WorkPlannerGrid.FRow != null) {
+                hdnSelectedRowID.value = window.parent.Grids.WorkPlannerGrid.FRow.id;
+            }
+            hdnNewRowID.value = window.parent.Grids.WorkPlannerGrid.GenerateId();
+            hdnPlanXml.value = window.parent.Grids.WorkPlannerGrid.GetXmlData();
+
         });
 
         function closeAddFragmentPopup() {
@@ -25,21 +32,23 @@
 </asp:Content>
 
 <asp:Content ID="Main" ContentPlaceHolderID="PlaceHolderMain" runat="server">
-    <div align="center">
+    <div style="text-align: center">
         <table>
             <tr>
                 <td style="width: 150px">
                     <asp:Label runat="server" ID="lblFragmentName" Text="Select Fragment: "></asp:Label>
                 </td>
                 <td style="width: 250px">
-                    <asp:DropDownList ID="ddlFragments" runat="server" Width="250px"></asp:DropDownList>
+                    <asp:DropDownList ID="ddlFragments" runat="server"></asp:DropDownList>
                 </td>
             </tr>
         </table>
         <br />
         <asp:Button ID="btnImport" runat="server" Text="Add" OnClick="btnImport_Click" />
         <asp:Button ID="btnClose" runat="server" Text="Close" OnClientClick="javascript:return closeAddFragmentPopup();" />
-        <asp:HiddenField ID="hdnTaskFragmentXml" runat="server" />
+        <asp:HiddenField ID="hdnSelectedRowID" runat="server" />
+        <asp:HiddenField ID="hdnNewRowID" runat="server" />
+        <asp:HiddenField ID="hdnPlanXml" runat="server" />
     </div>
 </asp:Content>
 
