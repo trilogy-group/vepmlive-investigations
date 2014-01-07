@@ -9,76 +9,78 @@
 <%@ Page Language="C#" AutoEventWireup="true" CodeBehind="ManageFragment.aspx.cs" Inherits="EPMLiveCore.Layouts.epmlive.ManageFragment" DynamicMasterPageFile="~masterurl/default.master" %>
 
 <asp:Content ID="PageHead" ContentPlaceHolderID="PlaceHolderAdditionalPageHead" runat="server">
-    <script language="javascript" type="text/javascript">
+    <script type="text/javascript">
 
-
-        function closeManageFragmentPopup() {
+        function closeManageFragmentPopup(message) {
+            if (message != null) {
+                alert(message);
+            }
             window.frameElement.commonModalDialogClose(1, 1);
         }
 
         function validateCheckBoxes() {
             var isValid = false;
-            var gridView = document.getElementById('<%= gridFragments.ClientID %>');
-
-            for (var i = 1; i < gridView.rows.length; i++) {
-                var inputs = gridView.rows[i].getElementsByTagName('input');
-                if (inputs != null && (inputs[0] != null || inputs[0] != undefined)) {
-                    if (inputs[0].type == "checkbox") {
-                        if (inputs[0].checked) {
-                            isValid = true;
-                        }
-                    }
-                }
+            if ($("#<%= gridFragments.ClientID %> input:checked").length == 1) {
+                isValid = true;
             }
 
-            if (isValid) {
-                var btn = confirm("Are you sure you want to delete selected fragment(s)?");
+            if (!isValid) {
+                alert("Please select atleast one fragment.");
+                return false;
+            }
+            else {
+                var btn = confirm("Are you sure you want to delete selected fragment(s)");
                 if (btn == true)
                     return true;
                 else
                     return false;
             }
-            else {
-                alert("Please select atleast one fragment.");
-                return false;
-            }
         }
+
     </script>
 </asp:Content>
 
 <asp:Content ID="Main" ContentPlaceHolderID="PlaceHolderMain" runat="server">
-    <div align="center">
-        <table align="center">
-            <tr>
-                <td colspan="2">
-                    <asp:GridView ID="gridFragments" AutoGenerateColumns="false" CellPadding="5" runat="server" AllowPaging="true" AllowSorting="true" OnPageIndexChanging="gridFragments_PageIndexChanging" EmptyDataText="No planner fragment exists!">
-                        <Columns>
-                            <asp:TemplateField>
-                                <ItemTemplate>
-                                    <input id="chkSelect" type="checkbox" runat="server" />
-                                </ItemTemplate>
-                            </asp:TemplateField>
-                            <asp:TemplateField Visible="false">
-                                <ItemTemplate>
-                                    <asp:Label ID="lblID" runat="server" Text='<%# Eval("ID") %>' />
-                                </ItemTemplate>
-                            </asp:TemplateField>
+    <table width="100%" align="center">
+        <tr>
+            <td colspan="2">
+                <asp:GridView ID="gridFragments" Width="100%" AutoGenerateColumns="false" CellPadding="5" runat="server"
+                    AllowPaging="true" AllowSorting="true" OnPageIndexChanging="gridFragments_PageIndexChanging"
+                    EmptyDataText="No planner fragment exists!" GridLines="Both" BorderWidth="1">
+                    <Columns>
+                        <asp:TemplateField>
+                            <ItemTemplate>
+                                <input id="chkSelect" type="checkbox" runat="server" />
+                            </ItemTemplate>
+                        </asp:TemplateField>
+                        <asp:TemplateField Visible="false">
+                            <ItemTemplate>
+                                <asp:Label ID="lblID" runat="server" Text='<%# Eval("ID") %>' />
+                            </ItemTemplate>
+                        </asp:TemplateField>
 
-                            <asp:BoundField HeaderText="Fragment Name" DataField="Title" />
-                            <asp:BoundField HeaderText="Scope" DataField="FragmentType" />
-                            <asp:BoundField HeaderText="Created By" DataField="Author" />
+                        <asp:BoundField HeaderText="Fragment Name" DataField="Title" />
+                        <asp:BoundField HeaderText="Scope" DataField="FragmentType" />
+                        <asp:BoundField HeaderText="Created By" DataField="Author" />
 
-                        </Columns>
-                        <HeaderStyle BackColor="#0090ca" BorderWidth="1" Font-Bold="true" ForeColor="White" BorderColor="Black" />
-                    </asp:GridView>
-                </td>
-                <td></td>
-            </tr>
-        </table>
-        <br />
-        <asp:Button ID="btnDelete" runat="server" Text="Delete" OnClick="btnDelete_Click" OnClientClick="javascript: return validateCheckBoxes();" />
-        <asp:Button ID="btnClose" runat="server" Text="Close" OnClientClick="javascript:return closeManageFragmentPopup();" />
-    </div>
+                    </Columns>
+                    <HeaderStyle BackColor="#0090ca" Font-Bold="true" ForeColor="White" />
+                </asp:GridView>
+            </td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+        </tr>
+        <tr>
+            <td></td>
+            <td align="center">
+                <asp:Button ID="btnDelete" runat="server" Text="Delete" OnClick="btnDelete_Click" OnClientClick="javascript: return validateCheckBoxes();" />
+                <asp:Button ID="btnClose" runat="server" Text="Close" OnClientClick="javascript:return closeManageFragmentPopup();" />
+            </td>
+        </tr>
+    </table>
 </asp:Content>
 
 <asp:Content ID="PageTitle" ContentPlaceHolderID="PlaceHolderPageTitle" runat="server">

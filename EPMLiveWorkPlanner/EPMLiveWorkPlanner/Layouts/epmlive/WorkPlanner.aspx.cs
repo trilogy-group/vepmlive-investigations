@@ -1416,7 +1416,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
             return sb.ToString();
         }
 
-        private SPList CreatePlannerFragmentList()
+        private SPList CreateOrGetPlannerFragmentList()
         {
             //Create New 'PlannerFragments' list with following columns:
             //Title[PlannerName - Single Line of Text], Description [Multiple Line of Text], FragmentType [Choice], Tag [single Line of Text], FragmentXml [Multiple line of Text]
@@ -1578,50 +1578,17 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
             //SPBasePermissions.ManageWeb – This is for saving public views
             //SPBasePermissions.EditListItems – Check this against the PlannerFragments list to see if the user can save fragments. If they have this but not manageweb then they can save private fragments only.
             //Any other users can’t save fragments, but can read them.
+            bool doesUserHasEditListItemsPermission = false;
+            SPList plannerFragmentsList = CreateOrGetPlannerFragmentList();
 
-            bool doesUserHasManageWebPermission = false;
-            try
+            if (plannerFragmentsList != null)
             {
-                if (SPContext.Current.Web.Lists.TryGetList("PlannerFragments") != null)
-                    doesUserHasManageWebPermission = SPContext.Current.Web.Lists.TryGetList("PlannerFragments").DoesUserHavePermissions(SPContext.Current.Web.CurrentUser, SPBasePermissions.ManageWeb);
-                else
-                {
-                    CreatePlannerFragmentList();
-                    if (SPContext.Current.Web.Lists.TryGetList("PlannerFragments") != null)
-                    {
-                        doesUserHasManageWebPermission = SPContext.Current.Web.Lists.TryGetList("PlannerFragments").DoesUserHavePermissions(SPContext.Current.Web.CurrentUser, SPBasePermissions.ManageWeb);
-                    }
-                    else
-                    {
-                        CreatePlannerFragmentList();
-                        doesUserHasManageWebPermission = SPContext.Current.Web.Lists.TryGetList("PlannerFragments").DoesUserHavePermissions(SPContext.Current.Web.CurrentUser, SPBasePermissions.ManageWeb);
-                    }
-                }
-            }
-            catch (SPException) { }
-
-            if (SPContext.Current.Web.Lists.TryGetList("PlannerFragments") != null &&
-               (SPContext.Current.Web.Lists.TryGetList("PlannerFragments").DoesUserHavePermissions(SPContext.Current.Web.CurrentUser, SPBasePermissions.EditListItems)))
-            {
-                if (doesUserHasManageWebPermission)
-                {
-                    commands.Add(new SPRibbonCommand("Ribbon.WorkPlanner.SaveFragmentButton", "SaveFragment();", "true"));
-                    commands.Add(new SPRibbonCommand("Ribbon.WorkPlanner.ManageFragmentButton", "ManageFragment();", "true"));
-                }
-                else
-                {
-                    commands.Add(new SPRibbonCommand("Ribbon.WorkPlanner.SaveFragmentButton", "SaveFragment();", "false"));
-                    commands.Add(new SPRibbonCommand("Ribbon.WorkPlanner.ManageFragmentButton", "ManageFragment();", "false"));
-                }
-            }
-            else
-            {
-                commands.Add(new SPRibbonCommand("Ribbon.WorkPlanner.SaveFragmentButton", "SaveFragment();", "false"));
-                commands.Add(new SPRibbonCommand("Ribbon.WorkPlanner.ManageFragmentButton", "ManageFragment();", "false"));
+                doesUserHasEditListItemsPermission = plannerFragmentsList.DoesUserHavePermissions(SPContext.Current.Web.CurrentUser, SPBasePermissions.EditListItems);
+                commands.Add(new SPRibbonCommand("Ribbon.WorkPlanner.SaveFragmentButton", "SaveFragment();", doesUserHasEditListItemsPermission.ToString().ToLower()));
+                commands.Add(new SPRibbonCommand("Ribbon.WorkPlanner.ManageFragmentButton", "ManageFragment();", doesUserHasEditListItemsPermission.ToString().ToLower()));
             }
 
             //commands.Add(new SPRibbonCommand("Ribbon.WorkPlanner.DoCreateNew", "DoCreateNew();", "true"));
-
             //commands.Add(new SPRibbonCommand("Ribbon.WorkPlanner.PopulateDisplayView", "PopulateDisplayView();", "true"));
 
             //Register initialize function

@@ -3265,7 +3265,7 @@ function AddFragment() {
 }
 
 function SaveFragment() {
-    var options = { url: "savefragment.aspx?PlannerID=" + sPlannerID, width: 325, height: 275, title: "Save Fragment", showMaximized: false, dialogReturnValueCallback: RefreshTeam };
+    var options = { url: "savefragment.aspx?PlannerID=" + sPlannerID, width: 325, height: 250, title: "Save Fragment", showMaximized: false, dialogReturnValueCallback: RefreshTeam };
     SP.UI.ModalDialog.showModalDialog(options);
 }
 

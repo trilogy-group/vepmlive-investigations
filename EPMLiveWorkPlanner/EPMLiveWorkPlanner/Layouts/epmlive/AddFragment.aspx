@@ -24,7 +24,10 @@
 
         });
 
-        function closeAddFragmentPopup() {
+        function closeAddFragmentPopup(message) {
+            if (message != null) {
+                alert(message);
+            }
             window.frameElement.commonModalDialogClose(1, 1);
         }
 
@@ -32,14 +35,14 @@
 </asp:Content>
 
 <asp:Content ID="Main" ContentPlaceHolderID="PlaceHolderMain" runat="server">
-    <div style="text-align: center">
+    <div style="text-align:center">
         <table>
             <tr>
                 <td style="width: 150px">
                     <asp:Label runat="server" ID="lblFragmentName" Text="Select Fragment: "></asp:Label>
                 </td>
                 <td style="width: 250px">
-                    <asp:DropDownList ID="ddlFragments" runat="server"></asp:DropDownList>
+                    <asp:DropDownList ID="ddlFragments" runat="server" Width="250px"></asp:DropDownList>
                 </td>
             </tr>
         </table>

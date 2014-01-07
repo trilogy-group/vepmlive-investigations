@@ -11,77 +11,65 @@ namespace EPMLiveCore.Layouts.epmlive
 {
     public partial class SaveFragment : LayoutsPageBase
     {
-
         private void SavePlannerFragments(SPList plannerFragmentList)
         {
-            try
-            {
-                SPSite site = SPContext.Current.Site;
-                SPWeb web = SPContext.Current.Web;
+            SPSite site = SPContext.Current.Site;
+            SPWeb web = SPContext.Current.Web;
 
-                SPSecurity.RunWithElevatedPrivileges(delegate()
+            SPSecurity.RunWithElevatedPrivileges(delegate()
+               {
+                   using (SPSite currentSite = new SPSite(site.ID))
                    {
-                       using (SPSite currentSite = new SPSite(site.ID))
+                       using (SPWeb currentWeb = currentSite.OpenWeb(web.ID))
                        {
-                           using (SPWeb currentWeb = currentSite.OpenWeb(web.ID))
-                           {
-                               currentWeb.AllowUnsafeUpdates = true;
-                               SPListItem plannerFragmentItem = plannerFragmentList.Items.Add();
+                           currentWeb.AllowUnsafeUpdates = true;
+                           SPListItem plannerFragmentItem = plannerFragmentList.Items.Add();
 
-                               plannerFragmentItem["Title"] = txtFragmentName.Text;
-                               plannerFragmentItem["Description"] = txtDescription.Text;
-                               plannerFragmentItem["Tag"] = txtTag.Text;
-                               plannerFragmentItem["FragmentType"] = rdoScope.SelectedItem.Text;
-                               plannerFragmentItem["FragmentXML"] = hdnTaskFragmentXml.Value;
-                               plannerFragmentItem["PlannerID"] = Convert.ToString(Request["PlannerID"]);
-                               plannerFragmentItem.Update();
-                               plannerFragmentList.Update();
-                           }
+                           plannerFragmentItem["Title"] = txtFragmentName.Text;
+                           plannerFragmentItem["Description"] = txtDescription.Text;
+                           plannerFragmentItem["Tag"] = txtTag.Text;
+                           plannerFragmentItem["FragmentType"] = rdoScope.SelectedItem.Text;
+                           plannerFragmentItem["FragmentXML"] = hdnTaskFragmentXml.Value;
+                           plannerFragmentItem["PlannerID"] = Convert.ToString(Request["PlannerID"]);
+
+                           plannerFragmentItem.Update();
+                           plannerFragmentList.Update();
                        }
-                   });
-            }
-            catch (Exception ex)
-            {
-
-            }
+                   }
+               });
         }
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            //SPBasePermissions.ManageWeb – This is for saving public views
-            //SPBasePermissions.EditListItems – Check this against the PlannerFragments list to see if the user can save fragments. If they have this but not manageweb then they can save private fragments only.
-            //Any other users can’t save fragments, but can read them.
-
-            rdoScope.Items[0].Enabled = false;
-            rdoScope.Items[1].Enabled = false;
-
-            bool doesUserHasManageWebPermission = false;
             try
             {
-                if (SPContext.Current.Web.Lists.TryGetList("PlannerFragments") != null)
-                    doesUserHasManageWebPermission = SPContext.Current.Web.Lists.TryGetList("PlannerFragments").DoesUserHavePermissions(SPContext.Current.Web.CurrentUser, SPBasePermissions.ManageWeb);
+                bool doesUserHasManageWebPermission = false;                
+                SPList plannerFragmentsList = SPContext.Current.Web.Lists.TryGetList("PlannerFragments");;
+                if (plannerFragmentsList != null)
+                    doesUserHasManageWebPermission = plannerFragmentsList.DoesUserHavePermissions(SPContext.Current.Web.CurrentUser, SPBasePermissions.ManageWeb);
+                rdoScope.Items[1].Enabled = doesUserHasManageWebPermission;
             }
-            catch (SPException) { }
-
-            if (doesUserHasManageWebPermission)
+            catch (Exception ex)
             {
-                rdoScope.Items[0].Enabled = true;
-                rdoScope.Items[1].Enabled = true;
-            }
-            else
-            {
-                rdoScope.Items[0].Enabled = true;
-                rdoScope.Items[0].Selected = true;
-                rdoScope.Items[1].Enabled = false;
+                throw ex;
             }
         }
 
         protected void btnSave_Click(object sender, EventArgs e)
         {
-            SPList plannerFragmentList = SPContext.Current.Web.Lists.TryGetList("PlannerFragments");
-            SavePlannerFragments(plannerFragmentList);
-            Page.Response.Write("<script language='javascript' type='text/javascript'>javascript:alert('Fragment '" + txtFragmentName.Text + "' saved successfully!');</script>");
-            Page.Response.Write("<script language='javascript' type='text/javascript'>window.frameElement.commonModalDialogClose(1, 1);</script>");
+            try
+            {
+                SPList plannerFragmentList = SPContext.Current.Web.Lists.TryGetList("PlannerFragments");
+                if (plannerFragmentList != null)
+                {
+                    SavePlannerFragments(plannerFragmentList);
+                    Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "closeSaveFragmentPopup", "<script language='javascript' type='text/javascript'>closeSaveFragmentPopup('Fragment " + txtFragmentName.Text + " saved successfully!');</script>");
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
     }
 }

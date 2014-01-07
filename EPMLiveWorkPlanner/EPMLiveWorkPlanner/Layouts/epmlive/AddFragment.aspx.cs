@@ -44,7 +44,6 @@ namespace EPMLiveCore.Layouts.epmlive
             {
                 throw ex;
             }
-
         }
 
         protected void btnImport_Click(object sender, EventArgs e)
@@ -56,7 +55,6 @@ namespace EPMLiveCore.Layouts.epmlive
                 XmlNode insertAfterNode = null;
                 List<string> teamToAdd = new List<string>();
                 Int32 planRowSelectedID = string.IsNullOrEmpty(hdnSelectedRowID.Value) ? 0 : Convert.ToInt32(hdnSelectedRowID.Value);
-
 
                 SPList plannerFragmentList = SPContext.Current.Web.Lists.TryGetList("PlannerFragments");
                 if (plannerFragmentList != null)
@@ -94,9 +92,9 @@ namespace EPMLiveCore.Layouts.epmlive
 
                             AddResourceToTeam(teamToAdd);
                         }
-
                     }
                 }
+                Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "closeAddFragmentPopup", "<script language='javascript' type='text/javascript'>closeAddFragmentPopup('Fragment " + ddlFragments.SelectedItem.Text + " added successfully!');</script>");
             }
             catch (Exception ex)
             {
@@ -181,10 +179,7 @@ namespace EPMLiveCore.Layouts.epmlive
                         projectCenter.Update();
                     }
                 }
-
             }
-
-
         }
     }
 }

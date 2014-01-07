@@ -12,22 +12,29 @@ namespace EPMLiveCore.Layouts.epmlive
     {
         protected void Page_Load(object sender, EventArgs e)
         {
-            if (!Page.IsPostBack)
-                FillGrid();
+            try
+            {
+                if (!Page.IsPostBack)
+                    FillGrid();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
 
         protected void btnDelete_Click(object sender, EventArgs e)
         {
-            string fragmentName = string.Empty;
-            SPList plannerFragmentList = SPContext.Current.Web.Lists.TryGetList("PlannerFragments");
-            if (plannerFragmentList != null)
+            try
             {
-                foreach (GridViewRow gvrow in gridFragments.Rows)
+                string fragmentName = string.Empty;
+                SPList plannerFragmentList = SPContext.Current.Web.Lists.TryGetList("PlannerFragments");
+                if (plannerFragmentList != null)
                 {
-                    HtmlInputCheckBox chk = (HtmlInputCheckBox)gvrow.FindControl("chkSelect");
-                    if (chk != null & chk.Checked)
+                    foreach (GridViewRow gvrow in gridFragments.Rows)
                     {
-                        try
+                        HtmlInputCheckBox chk = (HtmlInputCheckBox)gvrow.FindControl("chkSelect");
+                        if (chk != null & chk.Checked)
                         {
                             SPContext.Current.Web.AllowUnsafeUpdates = true;
                             Label lblID = (Label)gvrow.FindControl("lblID");
@@ -38,25 +45,29 @@ namespace EPMLiveCore.Layouts.epmlive
                                 plannerFragmentList.Update();
                             }
                         }
-                        catch (Exception) 
-                        {
-                            Page.Response.Write("<script language='javascript' type='text/javascript'>alert('Error occurred while deleting fragment(s)!');</script>");
-                            return;
-                        }
                     }
                 }
+                Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "closeManageFragmentPopup", "<script language='javascript' type='text/javascript'>closeManageFragmentPopup('Fragment(s) deleted successfully!');</script>");
             }
-            Page.Response.Write("<script language='javascript' type='text/javascript'>alert('Fragment(s) deleted successfully!');</script>");
-            Page.Response.Write("<script language='javascript' type='text/javascript'>window.frameElement.commonModalDialogClose(1, 1);</script>");
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
 
         protected void gridFragments_PageIndexChanging(object sender, GridViewPageEventArgs e)
         {
-            FillGrid();
-            gridFragments.PageIndex = e.NewPageIndex;
-            gridFragments.DataBind();
+            try
+            {
+                FillGrid();
+                gridFragments.PageIndex = e.NewPageIndex;
+                gridFragments.DataBind();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
-
 
         private void FillGrid()
         {
@@ -69,7 +80,7 @@ namespace EPMLiveCore.Layouts.epmlive
                 if (SPContext.Current.Web.CurrentUser.IsSiteAdmin)
                     qryFilter = "<ViewFields><FieldRef Name='ID' /><FieldRef Name='Title' /><FieldRef Name='FragmentType' /><FieldRef Name='Author' /></ViewFields><OrderBy><FieldRef Name='Author' /><FieldRef Name='FragmentType' /></OrderBy><Where><Eq><FieldRef Name='PlannerID' /><Value Type='Text'>" + Convert.ToString(Request["PlannerID"]) + "</Value></Eq></Where>";
                 else
-                    qryFilter = "<ViewFields><FieldRef Name='ID' /><FieldRef Name='Title' /><FieldRef Name='FragmentType' /><FieldRef Name='Author' /></ViewFields><OrderBy><FieldRef Name='Author' /><FieldRef Name='FragmentType' /></OrderBy><Where><And><Eq><FieldRef Name='Author' /><Value Type='User'>" + SPContext.Current.Web.CurrentUser.Name + "</Value></Eq><Eq><FieldRef Name='PlannerID' /><Value Type='Text'>ProjectPlanner</Value></Eq></And></Where>";
+                    qryFilter = "<ViewFields><FieldRef Name='ID' /><FieldRef Name='Title' /><FieldRef Name='FragmentType' /><FieldRef Name='Author' /></ViewFields><OrderBy><FieldRef Name='Author' /><FieldRef Name='FragmentType' /></OrderBy><Where><And><Eq><FieldRef Name='Author' /><Value Type='User'>" + SPContext.Current.Web.CurrentUser.Name + "</Value></Eq><Eq><FieldRef Name='PlannerID' /><Value Type='Text'>" + Convert.ToString(Request["PlannerID"]) + "</Value></Eq></And></Where>";
 
                 qryFilterPlanner.Query = qryFilter;
 
