@@ -1712,5 +1712,26 @@ namespace EPMLiveCore
         }
 
         #endregion
+
+        #region My Work Summary Method
+
+        /// <summary>
+        /// Gets the type of my work grid col.
+        /// </summary>
+        /// <param name="data">The data.</param>
+        /// <returns></returns>
+        public static string GetMyWorkSummary(string data, SPWeb oWeb)
+        {
+            try
+            {
+                return Response.Success(MyWorkSummaryListItems.GetMyWorkSummary(data));
+            }
+            catch (APIException ex)
+            {
+                return Response.Failure(ex.ExceptionNumber, string.Format("Error: {0}", ex.Message));
+            }
+        }
+
+        #endregion
     }
 }
