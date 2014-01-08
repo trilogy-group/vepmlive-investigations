@@ -9,4 +9,26 @@
     <Property Name="ShowStartingNode">False</Property>
     <Property Name="StartingNodeUrl">sid:1025</Property>
   </Control>
+
+  <CustomAction
+ Id="ChangeBrowseTabTitle"
+ Location="CommandUI.Ribbon">
+    <CommandUIExtension>
+      <CommandUIDefinitions>
+        <CommandUIDefinition
+          Location="Ribbon.Read">
+          <Tab
+            Id="Ribbon.Read"
+            Title="Hide"
+            Sequence="100"
+            Command="ReadTab"
+            Description=""
+            CssClass="ms-browseTab">
+            <Scaling Id="Ribbon.Read.Scaling" />
+            <Groups Id="Ribbon.Read.Groups" />
+          </Tab>
+        </CommandUIDefinition>
+      </CommandUIDefinitions>
+    </CommandUIExtension>
+  </CustomAction>
 </Elements>
