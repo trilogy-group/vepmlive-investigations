@@ -19,7 +19,7 @@ namespace EPMLiveCore.API
         /// </summary>
         /// <param name="data">My Work Summary list data param string</param>
         /// <returns></returns>
-        public static string GetWorkItemsByWorkType(string data)
+        public static string GetMyWorkSummary(string data)
         {
             try
             {
