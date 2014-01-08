@@ -123,6 +123,14 @@ iisreset</PostDeploymentCommand>
       <DesignTime>True</DesignTime>
       <DependentUpon>AssociatedItems.ascx</DependentUpon>
     </Compile>
+    <Compile Include="MyWorkSummary\MyWorkSummary.ascx.cs">
+      <DependentUpon>MyWorkSummary.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="MyWorkSummary\MyWorkSummary.ascx.g.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>MyWorkSummary.ascx</DependentUpon>
+    </Compile>
     <Compile Include="BackButton\BackButton.cs" />
     <Compile Include="BuyNow\BuyNow.cs" />
     <Compile Include="ChartControl\ChartControl.cs" />
@@ -445,6 +453,10 @@ iisreset</PostDeploymentCommand>
     <None Include="AssociatedItems\AssociatedItems.webpart" />
     <None Include="AssociatedItems\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{b8018cf5-92b1-456e-8a3d-f694e56a432c}</SharePointProjectItemId>
+    </None>
+    <None Include="MyWorkSummary\MyWorkSummary.webpart" />
+    <None Include="MyWorkSummary\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{6810c665-56ae-4f47-853a-89bf8f9f0cd4}</SharePointProjectItemId>
     </None>
     <None Include="BackButton\BackButton.webpart" />
     <None Include="BackButton\SharePointProjectItem.spdata">
@@ -794,6 +806,11 @@ iisreset</PostDeploymentCommand>
       <LastGenOutput>AssociatedItems.ascx.g.cs</LastGenOutput>
     </Content>
     <Content Include="AssociatedItems\Elements.xml" />
+    <Content Include="MyWorkSummary\MyWorkSummary.ascx">
+      <Generator>SharePointWebPartCodeGenerator</Generator>
+      <LastGenOutput>MyWorkSummary.ascx.g.cs</LastGenOutput>
+    </Content>
+    <Content Include="MyWorkSummary\Elements.xml" />
     <Content Include="BackButton\Elements.xml" />
     <Content Include="BuyNow\Elements.xml" />
     <Content Include="ChartControl\Elements.xml" />
