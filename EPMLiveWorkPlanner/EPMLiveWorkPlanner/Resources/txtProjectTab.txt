@@ -229,7 +229,7 @@
 				<Button
 					Id="Ribbon.WorkPlanner.ToolsGroup.SaveFragmentButton"
 					Sequence="12"
-					Image16by16="/_layouts/epmlive/images/savetemplate.png"
+					Image16by16="/_layouts/epmlive/images/fragment-save.png"
 					Command="Ribbon.WorkPlanner.SaveFragmentButton"
 					LabelText="Save Fragment"
 					TemplateAlias="oM"/>
@@ -237,7 +237,7 @@
 					<Button
 					Id="Ribbon.WorkPlanner.ToolsGroup.ManageFragmentButton"
 					Sequence="20"
-					Image16by16="/_layouts/epmlive/images/editteam.gif"
+					Image16by16="/_layouts/epmlive/images/edit-fragment.png"
 					Command="Ribbon.WorkPlanner.ManageFragmentButton"
 					LabelText="Manage Fragment"
 					TemplateAlias="oM"/>	
