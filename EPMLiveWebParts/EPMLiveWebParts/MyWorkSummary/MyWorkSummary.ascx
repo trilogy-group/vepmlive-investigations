@@ -27,17 +27,17 @@
     });
 
     function fillMyWorkSummaryData() {
-        if (dataXml != '') {
+        if (dataXmlMyWorkSummary != '') {
 
             $("#<%=myWorkSummaryItemsDiv.ClientID%>").hide();
-            $('#divMyWorkSummaryLoad').show();
+            $('#myWorkSummaryLoadDiv').show();
 
-            EPMLiveCore.WorkEngineAPI.Execute("GetMyWorkSummary", dataXml, function (response) {
+            EPMLiveCore.WorkEngineAPI.Execute("GetMyWorkSummary", dataXmlMyWorkSummary, function (response) {
                 var divHTML = response.toString().replace("<Result Status=\"0\">", "").replace("</Result>", "");
                 $("#<%=myWorkSummaryItemsDiv.ClientID%>").html("");
                 $("#<%=myWorkSummaryItemsDiv.ClientID%>").html(divHTML);
 
-                $('#divMyWorkSummaryLoad').hide();
+                $('#myWorkSummaryLoadDiv').hide();
                 $("#<%=myWorkSummaryItemsDiv.ClientID%>").show();
 
             });
@@ -50,7 +50,7 @@
 
 </script>
 
-<div id="divMyWorkSummaryLoad" style="align-content: center">
+<div id="myWorkSummaryLoadDiv" style="align-content: center">
     <img src="../_layouts/15/epmlive/images/mywork/loading16.gif" />
 </div>
 <div id="myWorkSummaryItemsDiv" runat="server" style="float: left;" />

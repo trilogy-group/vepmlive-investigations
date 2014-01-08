@@ -65,7 +65,7 @@ namespace EPMLiveWebParts.MyWorkSummary
             mainDivHtml.Append("<CurrentUser>" + Convert.ToString(SPContext.Current.Web.CurrentUser.Name) + "</CurrentUser>");
             mainDivHtml.Append("</MyWorkItemsbyWorkType>");
 
-            this.Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "dataXml", "<script type=\"text/javascript\">var dataXml='" + mainDivHtml.ToString() + "';</script>");
+            this.Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "MyWorkSummaryDataXml", "<script type=\"text/javascript\">var dataXmlMyWorkSummary='" + mainDivHtml.ToString() + "';</script>");
 
         }
     }

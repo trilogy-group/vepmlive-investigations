@@ -88,15 +88,15 @@ namespace EPMLiveWebParts.MyWorkSummary {
     });
 
     function fillMyWorkSummaryData() {
-        if (dataXml != '') {
+        if (dataXmlMyWorkSummary != '') {
 
             $(""#");
         @__w.Write(myWorkSummaryItemsDiv.ClientID);
 
             @__w.Write(@""").hide();
-            $('#divMyWorkSummaryLoad').show();
+            $('#myWorkSummaryLoadDiv').show();
 
-            EPMLiveCore.WorkEngineAPI.Execute(""GetMyWorkSummary"", dataXml, function (response) {
+            EPMLiveCore.WorkEngineAPI.Execute(""GetMyWorkSummary"", dataXmlMyWorkSummary, function (response) {
                 var divHTML = response.toString().replace(""<Result Status=\""0\"">"", """").replace(""</Result>"", """");
                 $(""#");
             @__w.Write(myWorkSummaryItemsDiv.ClientID);
@@ -104,7 +104,7 @@ namespace EPMLiveWebParts.MyWorkSummary {
             @__w.Write("\").html(\"\");\r\n                $(\"#");
             @__w.Write(myWorkSummaryItemsDiv.ClientID);
 
-            @__w.Write("\").html(divHTML);\r\n\r\n                $(\'#divMyWorkSummaryLoad\').hide();\r\n        " +
+            @__w.Write("\").html(divHTML);\r\n\r\n                $(\'#myWorkSummaryLoadDiv\').hide();\r\n        " +
                     "        $(\"#");
             @__w.Write(myWorkSummaryItemsDiv.ClientID);
 
@@ -120,7 +120,7 @@ namespace EPMLiveWebParts.MyWorkSummary {
 
 </script>
 
-<div id=""divMyWorkSummaryLoad"" style=""align-content: center"">
+<div id=""myWorkSummaryLoadDiv"" style=""align-content: center"">
     <img src=""../_layouts/15/epmlive/images/mywork/loading16.gif"" />
 </div>
 ");
