@@ -10,7 +10,7 @@ namespace EPMLiveReportsAdmin
 {
     public class MyWorkListEvents : SPItemEventReceiver
     {
-        #region Fields (11) 
+        #region Fields (11)
 
         private const string TABLE_NAME = "LSTMyWork";
         private ArrayList _defaultColumns;
@@ -25,9 +25,9 @@ namespace EPMLiveReportsAdmin
         private string _siteName;
         private string _siteUrl;
 
-        #endregion Fields 
+        #endregion Fields
 
-        #region Methods (9) 
+        #region Methods (9)
 
         // Public Methods (3) 
 
@@ -160,7 +160,7 @@ namespace EPMLiveReportsAdmin
 
                 if (populateColumns)
                 {
-                    _defaultColumns = new ArrayList {"siteid", "webid", "listid", "itemid", "weburl"};
+                    _defaultColumns = new ArrayList { "siteid", "webid", "listid", "itemid", "weburl" };
                     _mandatoryHiddenFlds = new ArrayList { "commenters", "commentersread", "commentcount", "workspaceurl" };
                     _listColumns = _myWorkReportData.GetListColumns("My Work");
                     _listColumns = _listColumns.DefaultView.ToTable(true,
@@ -185,7 +185,7 @@ namespace EPMLiveReportsAdmin
 
             if (string.IsNullOrEmpty(sql)) return;
 
-            foreach (var stmt in sql.Split(new[] {"!-x-x-x-x-x-!"}, StringSplitOptions.None).Where(stmt => !_myWorkReportData.InsertListItem(stmt)))
+            foreach (var stmt in sql.Split(new[] { "!-x-x-x-x-x-!" }, StringSplitOptions.None).Where(stmt => !_myWorkReportData.InsertListItem(stmt)))
             {
                 _myWorkReportData.LogStatus(_myWorkReportData.GetListId(_listName), _listName.Replace("'", string.Empty),
                                             "Url:" + _properties.RelativeWebUrl.Replace("'", string.Empty) +
@@ -209,7 +209,7 @@ namespace EPMLiveReportsAdmin
         {
             if (!EventLog.SourceExists(eventSource)) EventLog.CreateEventSource(eventSource, "EPM Live");
 
-            var eventLog = new EventLog("EPM Live", ".", eventSource) {MaximumKilobytes = 32768};
+            var eventLog = new EventLog("EPM Live", ".", eventSource) { MaximumKilobytes = 32768 };
 
             eventLog.WriteEntry(
                 string.Format("Name: {0} Url: {1} ID: {2} : {3} {4}", _siteName, _siteUrl, _siteId, exception.Message,
@@ -226,7 +226,7 @@ namespace EPMLiveReportsAdmin
         }
 
         private bool SaveWork()
-        {   
+        {
             bool blnWorkSaved = true;
             bool bHasChangedWork = false;
             bool bHasChangedAssignedTo = false;
@@ -242,11 +242,27 @@ namespace EPMLiveReportsAdmin
                 object StartDate = DBNull.Value;
                 object DueDate = DBNull.Value;
 
-                if (ItemHasValue(_listItem, "Work") &&
-                    _properties.BeforeProperties["Work"].ToString() != _properties.AfterProperties["Work"])
+                if (ItemHasValue(_listItem, "Work"))
                 {
-                    sWork = _listItem["Work"].ToString();
-                    bHasChangedWork = true;
+                    try
+                    {
+                        if (_properties.EventType == SPEventReceiverType.ItemAdded)
+                        {
+                            sWork = _listItem["Work"].ToString();
+                            bHasChangedWork = true;
+                        }
+                        else if (_properties.EventType == SPEventReceiverType.ItemUpdated)
+                        {
+                            if (_properties.ListItem["Work"] != null &&
+                            Convert.ToInt32(_properties.ListItem["Work"].ToString()) !=
+                            Convert.ToInt32(_properties.AfterProperties["Work"].ToString()))
+                            {
+                                sWork = _listItem["Work"].ToString();
+                                bHasChangedWork = true;
+                            }
+                        }
+                    }
+                    catch { }
                 }
                 else
                 {
@@ -254,11 +270,31 @@ namespace EPMLiveReportsAdmin
                     sErrMsg = "Work";
                 }
 
-                if (ItemHasValue(_listItem, "AssignedTo") &&
-                    _properties.BeforeProperties["AssignedTo"].ToString() != _properties.AfterProperties["AssignedTo"])
+                if (ItemHasValue(_listItem, "AssignedTo"))
                 {
-                    sAssignedTo = ReportData.AddLookUpFieldValues(_listItem["AssignedTo"].ToString(), "id");
-                    bHasChangedAssignedTo = true;
+                    try
+                    {
+                        if (_properties.EventType == SPEventReceiverType.ItemAdded)
+                        {
+                            sAssignedTo = ReportData.AddLookUpFieldValues(_listItem["AssignedTo"].ToString(), "id");
+                            bHasChangedAssignedTo = true;
+                        }
+                        else if (_properties.EventType == SPEventReceiverType.ItemUpdated)
+                        {
+                            if (_properties.ListItem["AssignedTo"] != null)
+                            {
+                                var lookupValBefore = new SPFieldLookupValue(_properties.ListItem["AssignedTo"].ToString());
+                                var lookupValAfter = new SPFieldLookupValue(_properties.AfterProperties["AssignedTo"].ToString());
+
+                                if (lookupValBefore.LookupId != lookupValAfter.LookupId)
+                                {
+                                    sAssignedTo = ReportData.AddLookUpFieldValues(_listItem["AssignedTo"].ToString(), "id");
+                                    bHasChangedAssignedTo = true;
+                                }
+                            }
+                        }
+                    }
+                    catch { }
                 }
                 else
                 {
@@ -274,11 +310,31 @@ namespace EPMLiveReportsAdmin
                 }
 
 
-                if (ItemHasValue(_listItem, "StartDate") &&
-                    _properties.BeforeProperties["StartDate"].ToString() != _properties.AfterProperties["StartDate"])
+                if (ItemHasValue(_listItem, "StartDate"))
                 {
-                    StartDate = _listItem["StartDate"];
-                    bHasChangedStartDate = true;
+                    try
+                    {
+                        if (_properties.EventType == SPEventReceiverType.ItemAdded)
+                        {
+                            StartDate = _listItem["StartDate"];
+                            bHasChangedStartDate = true;
+                        }
+                        else if (_properties.EventType == SPEventReceiverType.ItemUpdated)
+                        {
+                            if (_properties.ListItem["StartDate"] != null)
+                            {
+                                var dateBefore = Convert.ToDateTime(_properties.ListItem["StartDate"].ToString()).ToUniversalTime().Date;
+                                var dateAfter = Convert.ToDateTime(_properties.AfterProperties["StartDate"].ToString()).ToUniversalTime().Date;
+
+                                if (dateBefore != dateAfter)
+                                {
+                                    StartDate = _listItem["StartDate"];
+                                    bHasChangedStartDate = true;
+                                }
+                            }
+                        }
+                    }
+                    catch { }
                 }
                 else
                 {
@@ -294,11 +350,31 @@ namespace EPMLiveReportsAdmin
                 }
 
 
-                if (ItemHasValue(_listItem, "DueDate") &&
-                    _properties.BeforeProperties["DueDate"].ToString() != _properties.AfterProperties["DueDate"])
+                if (ItemHasValue(_listItem, "DueDate"))
                 {
-                    DueDate = _listItem["DueDate"];
-                    bHasChangedDueDate = true;
+                    try
+                    {
+                        if (_properties.EventType == SPEventReceiverType.ItemAdded)
+                        {
+                            DueDate = _listItem["DueDate"];
+                            bHasChangedDueDate = true;
+                        }
+                        else if (_properties.EventType == SPEventReceiverType.ItemUpdated)
+                        {
+                            if (_properties.ListItem["DueDate"] != null)
+                            {
+                                var dueDateBefore = Convert.ToDateTime(_properties.ListItem["DueDate"].ToString()).ToUniversalTime().Date;
+                                var dueDateAfter = Convert.ToDateTime(_properties.AfterProperties["DueDate"].ToString()).ToUniversalTime().Date;
+                                if (dueDateBefore != dueDateAfter)
+                                {
+                                    DueDate = _listItem["DueDate"];
+                                    bHasChangedDueDate = true;
+                                }
+                            }
+                        }
+                        
+                    }
+                    catch { }
                 }
                 else
                 {
@@ -318,8 +394,8 @@ namespace EPMLiveReportsAdmin
                 Guid ItemID = _listItem.UniqueId;
                 // "work" fields -- END
 
-                if (blnWorkSaved && bHasChangedWork && bHasChangedAssignedTo && bHasChangedStartDate && bHasChangedDueDate)
-                {  
+                if (bHasChangedWork || bHasChangedAssignedTo || bHasChangedStartDate || bHasChangedDueDate)
+                {
                     if (!_myWorkReportData.ProcessAssignments(sWork.Replace("'", ""), sAssignedTo, StartDate, DueDate, ListID, SiteID, _listItem.ID, _listItem.ParentList.Title)) // - CAT.NET false-positive: All single quotes are escaped/removed.
                     {
                         _myWorkReportData.LogStatus(string.Empty, string.Empty, "SaveWork() failed.", _myWorkReportData.GetError().Replace("'", ""), 2, 3, string.Empty); // - CAT.NET false-positive: All single quotes are escaped/removed.
@@ -349,7 +425,7 @@ namespace EPMLiveReportsAdmin
             return !string.IsNullOrEmpty(result);
         }
 
-        #endregion Methods 
-       
+        #endregion Methods
+
     }
 }
