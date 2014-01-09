@@ -579,6 +579,15 @@ namespace EPMLiveCore.API
                     string relatedGridType = Utils.GetRelatedGridTypeForReadOnly(spField);
                     string format = Utils.GetFormat(spField);
 
+                    switch (spField.Type)
+                    {
+                        case SPFieldType.User:
+                        case SPFieldType.Lookup:
+                        case SPFieldType.MultiChoice:
+                            relatedGridType = "Html";
+                            break;
+                    }
+
                     var cElement = new XElement("C");
 
                     string gridSafeFieldName = Utils.ToGridSafeFieldName(internalName);

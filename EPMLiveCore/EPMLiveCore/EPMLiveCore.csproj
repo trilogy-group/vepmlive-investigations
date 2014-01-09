@@ -156,6 +156,7 @@ net start "WorkEngine Timer"
     <Compile Include="API\Integration\IntegrationDescriptionTemplate.cs" />
     <Compile Include="API\Integration\SqlIntegration.cs" />
     <Compile Include="API\ListCommands\ListCommands.cs" />
+    <Compile Include="API\MyWorkSummaryListItems\MyWorkSummaryListItems.cs" />
     <Compile Include="API\MyWork\FieldInfo.cs" />
     <Compile Include="API\MyWork\ListItem.cs" />
     <Compile Include="API\MyWork\MyPersonalization.cs" />
