@@ -10,6 +10,8 @@ namespace EPMLiveWebParts.MyWorkSummary
     [ToolboxItemAttribute(false)]
     public partial class MyWorkSummary : WebPart
     {
+        protected string dataXml;
+
         public MyWorkSummary()
         {
         }
@@ -47,7 +49,14 @@ namespace EPMLiveWebParts.MyWorkSummary
         {
             try
             {
-                PrepareMyWorkSummaryListsString();
+                StringBuilder methodParam = new StringBuilder();
+                methodParam.Append("<MyWorkSummaryMethodParam>");
+                methodParam.Append("<SiteUrl>" + SPContext.Current.Site.Url + "</SiteUrl>");
+                methodParam.Append("<SiteID>" + Convert.ToString(SPContext.Current.Site.ID) + "</SiteID>");
+                methodParam.Append("<WebID>" + Convert.ToString(SPContext.Current.Web.ID) + "</WebID>");
+                methodParam.Append("<CurrentUser>" + Convert.ToString(SPContext.Current.Web.CurrentUser.Name) + "</CurrentUser>");
+                methodParam.Append("</MyWorkSummaryMethodParam>");
+                dataXml = methodParam.ToString();
             }
             catch (Exception ex)
             {
@@ -55,18 +64,5 @@ namespace EPMLiveWebParts.MyWorkSummary
             }
         }
 
-        protected void PrepareMyWorkSummaryListsString()
-        {
-            StringBuilder mainDivHtml = new StringBuilder();
-            mainDivHtml.Append("<MyWorkItemsbyWorkType>");
-            mainDivHtml.Append("<SiteUrl>" + SPContext.Current.Site.Url + "</SiteUrl>");
-            mainDivHtml.Append("<SiteID>" + Convert.ToString(SPContext.Current.Site.ID) + "</SiteID>");
-            mainDivHtml.Append("<WebID>" + Convert.ToString(SPContext.Current.Web.ID) + "</WebID>");
-            mainDivHtml.Append("<CurrentUser>" + Convert.ToString(SPContext.Current.Web.CurrentUser.Name) + "</CurrentUser>");
-            mainDivHtml.Append("</MyWorkItemsbyWorkType>");
-
-            this.Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "MyWorkSummaryDataXml", "<script type=\"text/javascript\">var dataXmlMyWorkSummary='" + mainDivHtml.ToString() + "';</script>");
-
-        }
     }
 }

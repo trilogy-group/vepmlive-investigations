@@ -7,12 +7,16 @@
 <%@ Register TagPrefix="WebPartPages" Namespace="Microsoft.SharePoint.WebPartPages" Assembly="Microsoft.SharePoint, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
 <%@ Control Language="C#" AutoEventWireup="true" CodeBehind="MyWorkSummary.ascx.cs" Inherits="EPMLiveWebParts.MyWorkSummary.MyWorkSummary" %>
 <style type="text/css">
-    .pipeSeperator {
+    .mwsPipeSeperator {
         float: left;
         font-size: large;
     }
 
-    .listMainDiv {
+    .mwsMainDiv {
+        float: left;
+    }
+
+    .mwsItemDiv {
         float: left;
         padding: 5px;
         margin-right: 5px;
@@ -23,35 +27,35 @@
 <script type="text/javascript">
 
     $(function () {
-        fillMyWorkSummaryData();
+        MyWorkSummaryClient.fillWebPartData();
     });
 
-    function fillMyWorkSummaryData() {
-        if (dataXmlMyWorkSummary != '') {
+    MyWorkSummaryClient = {
+        dataXml: '<%=dataXml%>',
+        fillWebPartData: function () {
+            if (this.dataXml != '') {
 
-            $("#<%=myWorkSummaryItemsDiv.ClientID%>").hide();
-            $('#myWorkSummaryLoadDiv').show();
+                $("#mwsMainDiv").hide();
+                $("#mwsLoadDiv").show();
 
-            EPMLiveCore.WorkEngineAPI.Execute("GetMyWorkSummary", dataXmlMyWorkSummary, function (response) {
-                var divHTML = response.toString().replace("<Result Status=\"0\">", "").replace("</Result>", "");
-                $("#<%=myWorkSummaryItemsDiv.ClientID%>").html("");
-                $("#<%=myWorkSummaryItemsDiv.ClientID%>").html(divHTML);
+                EPMLiveCore.WorkEngineAPI.Execute("GetMyWorkSummary", this.dataXml, function (response) {
+                    var divHTML = response.toString().replace("<Result Status=\"0\">", "").replace("</Result>", "");
+                    $("#mwsMainDiv").html("");
+                    $("#mwsMainDiv").html(divHTML);
 
-                $('#myWorkSummaryLoadDiv').hide();
-                $("#<%=myWorkSummaryItemsDiv.ClientID%>").show();
-
-            });
+                    $("#mwsLoadDiv").hide();
+                    $("#mwsMainDiv").show();
+                });
+            }
+        },
+        openMyWorkPage: function (siteUrl, listid) {
+            var viewSiteContentUrl = siteUrl + "/_layouts/epmlive/mywork.aspx?listid=" + listid;
+            var options = { url: viewSiteContentUrl, showMaximized: true };
+            SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
         }
     }
-
-    function displayMyWorkItemsByFilter() {
-        alert("This functionality is under development, sorry for inconvenience.");
-    }
-
 </script>
-
-<div id="myWorkSummaryLoadDiv" style="align-content: center">
+<div id="mwsLoadDiv" style="display: none;">
     <img src="../_layouts/15/epmlive/images/mywork/loading16.gif" />
 </div>
-<div id="myWorkSummaryItemsDiv" runat="server" style="float: left;" />
-
+<div id="mwsMainDiv" class="mwsMainDiv" />
