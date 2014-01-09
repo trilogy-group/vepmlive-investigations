@@ -49,7 +49,7 @@ namespace EPMLiveCore.API
                         var queryExecutor = new EPMLiveCore.ReportingProxy.QueryExecutor(spWeb);
                         if (queryExecutor != null)
                         {
-                            sqlquery = "Select WorkType as WORKTYPE,COUNT(WorkType) as WORKTYPECOUNT,ListId as RPTLISTID FROM LSTMyWork where Status != 'Completed' and AssignedToText = '" + currentUser + "' and Siteid = '" + siteId + "'  GROUP BY WorkType,ListId";
+                            sqlquery = string.Format("Select WorkType as WORKTYPE,COUNT(WorkType) as WORKTYPECOUNT,ListId as RPTLISTID FROM LSTMyWork where AssignedToText = '{0}' and Siteid = '{1}' and WebId = '{2}' and (Complete <> 1 or Complete is null) GROUP BY WorkType, ListId Order by WorkType", currentUser, siteId, webID);
                             dtMyWorkSummary = queryExecutor.ExecuteReportingDBQuery(sqlquery, new Dictionary<string, object> { });
                         }
 
@@ -63,10 +63,10 @@ namespace EPMLiveCore.API
                                 string workTypeCount = Convert.ToString(dtMyWorkSummary.Rows[i]["WORKTYPECOUNT"]);
                                 string rptListId = Convert.ToString(dtMyWorkSummary.Rows[i]["RPTLISTID"]);
 
-                                sbListMyWorkSummaryItemsDiv.Append(string.Format("<a href='#' onclick=\"javascript:displayMyWorkItemsByFilter();return false;\"><div id=div_{0} class='listMainDiv'>{1}&nbsp;[{2}]</div></a>", rptListId, workType, workTypeCount));
+                                sbListMyWorkSummaryItemsDiv.Append(string.Format("<a href='#' onclick=\"javascript:MyWorkSummaryClient.openMyWorkPage('{0}','{1}');\"><div class='mwsItemDiv'>{2}&nbsp;[{3}]</div></a>", siteUrl, rptListId, workType, workTypeCount));
 
                                 if (i != dtMyWorkSummary.Rows.Count - 1)
-                                    sbListMyWorkSummaryItemsDiv.Append("<div class='pipeSeperator'>|</div>");
+                                    sbListMyWorkSummaryItemsDiv.Append("<div class='mwsPipeSeperator'>|</div>");
                             }
                         }
 
