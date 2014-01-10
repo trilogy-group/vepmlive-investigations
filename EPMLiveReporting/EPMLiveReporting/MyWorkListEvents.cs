@@ -102,6 +102,28 @@ namespace EPMLiveReportsAdmin
             }
         }
 
+        public override void ItemUpdating(SPItemEventProperties properties)
+        {
+            try
+            {
+                if (Initialize(true, properties))
+                {
+                    if (_myWorkReportData.ListReportsWork(TABLE_NAME))
+                    {
+                        //Save list item "work" field values
+                        SaveWork();
+                    }
+                }
+
+                _myWorkReportData.Dispose();
+            }
+            catch (Exception exception)
+            {
+                SPSecurity.RunWithElevatedPrivileges(
+                    () => LogEvent(exception, 6005, "EPMLive My Work Reporting Item Updating"));
+            }
+        }
+
         // Private Methods (6) 
 
         /// <summary>
@@ -192,10 +214,13 @@ namespace EPMLiveReportsAdmin
                                             " Error: Add item was unsuccessful.", _myWorkReportData.GetError(), 2, 1);
             }
 
-            if (_myWorkReportData.ListReportsWork(TABLE_NAME))
+            if (_properties.EventType != SPEventReceiverType.ItemUpdated)
             {
-                //Save list item "work" field values
-                SaveWork();
+                if (_myWorkReportData.ListReportsWork(TABLE_NAME))
+                {
+                    //Save list item "work" field values
+                    SaveWork();
+                }
             }
         }
 
@@ -251,7 +276,7 @@ namespace EPMLiveReportsAdmin
                             sWork = _listItem["Work"].ToString();
                             bHasChangedWork = true;
                         }
-                        else if (_properties.EventType == SPEventReceiverType.ItemUpdated)
+                        else if (_properties.EventType == SPEventReceiverType.ItemUpdating)
                         {
                             if (_properties.ListItem["Work"] != null &&
                             Convert.ToInt32(_properties.ListItem["Work"].ToString()) !=
@@ -279,7 +304,7 @@ namespace EPMLiveReportsAdmin
                             sAssignedTo = ReportData.AddLookUpFieldValues(_listItem["AssignedTo"].ToString(), "id");
                             bHasChangedAssignedTo = true;
                         }
-                        else if (_properties.EventType == SPEventReceiverType.ItemUpdated)
+                        else if (_properties.EventType == SPEventReceiverType.ItemUpdating)
                         {
                             if (_properties.ListItem["AssignedTo"] != null)
                             {
@@ -319,7 +344,7 @@ namespace EPMLiveReportsAdmin
                             StartDate = _listItem["StartDate"];
                             bHasChangedStartDate = true;
                         }
-                        else if (_properties.EventType == SPEventReceiverType.ItemUpdated)
+                        else if (_properties.EventType == SPEventReceiverType.ItemUpdating)
                         {
                             if (_properties.ListItem["StartDate"] != null)
                             {
@@ -359,7 +384,7 @@ namespace EPMLiveReportsAdmin
                             DueDate = _listItem["DueDate"];
                             bHasChangedDueDate = true;
                         }
-                        else if (_properties.EventType == SPEventReceiverType.ItemUpdated)
+                        else if (_properties.EventType == SPEventReceiverType.ItemUpdating)
                         {
                             if (_properties.ListItem["DueDate"] != null)
                             {
