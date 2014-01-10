@@ -943,10 +943,12 @@ namespace EPMLiveCore.Layouts.epmlive
 
             var spEventReceiverTypes = new[]
                                                {
-                                                   SPEventReceiverType.ItemAdded, SPEventReceiverType.ItemUpdated,
+                                                   SPEventReceiverType.ItemAdded, 
+                                                   SPEventReceiverType.ItemUpdated, 
+                                                   SPEventReceiverType.ItemUpdating,
                                                    SPEventReceiverType.ItemDeleting
                                                };
-
+            
             AddEventReceiverElement(operation, className, assembly, spEventReceiverTypes, new Guid(Request["List"]),
                                     ref dataElement);
 
