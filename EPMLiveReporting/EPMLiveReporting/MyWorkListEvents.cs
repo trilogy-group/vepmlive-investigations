@@ -421,7 +421,7 @@ namespace EPMLiveReportsAdmin
                 result = i[fldName].ToString();
             }
             catch { }
-
+             
             return !string.IsNullOrEmpty(result);
         }
 
