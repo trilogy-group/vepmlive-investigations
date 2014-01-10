@@ -255,7 +255,7 @@ namespace EPMLiveReportsAdmin
                         else if (_properties.EventType == SPEventReceiverType.ItemUpdated)
                         {
                             if (_properties.ListItem["Work"] != null &&
-                                Convert.ToInt32(currentValues["Work"].ToString()) != Convert.ToInt32(_properties.ListItem["Work"].ToString()))
+                                Math.Round(Convert.ToDouble(currentValues["Work"].ToString()), 2) != Math.Round(Convert.ToDouble(_properties.ListItem["Work"].ToString()), 2))
                             {
                                 sWork = _listItem["Work"].ToString();
                                 bHasChangedWork = true;
@@ -283,9 +283,39 @@ namespace EPMLiveReportsAdmin
                         {
                             if (_properties.ListItem["AssignedTo"] != null)
                             {
-                                var lookupValAfter = new SPFieldLookupValue(_properties.ListItem["AssignedTo"].ToString());
+                                List<int> lIdsBefore = new List<int>(currentValues["AssignedToIDs"].ToString().TrimEnd(',').Split(',').Select(int.Parse));
+                                var lookupValAfter = new SPFieldLookupValueCollection(_properties.ListItem["AssignedTo"].ToString());
+                                List<int> lIdsAfter = new List<int>();
+                                foreach (SPFieldLookupValue v in lookupValAfter)
+                                {
+                                    lIdsAfter.Add(v.LookupId);
+                                }
 
-                                if (Convert.ToInt32(currentValues["AssignedToID"].ToString()) != lookupValAfter.LookupId)
+                                bool execute = false;
+                                if (lIdsBefore.Count() != lIdsAfter.Count())
+                                {
+                                    execute = true;
+                                }
+                                else
+                                {
+                                    bool containsAll = true;
+
+                                    foreach (var i in lIdsBefore)
+                                    {
+                                        if (!lIdsAfter.Contains(i))
+                                        {
+                                            containsAll = false;
+                                            break;
+                                        }
+                                    }
+
+                                    if (!containsAll)
+                                    {
+                                        execute = true;
+                                    }
+                                }
+
+                                if (execute)
                                 {
                                     sAssignedTo = ReportData.AddLookUpFieldValues(_listItem["AssignedTo"].ToString(), "id");
                                     bHasChangedAssignedTo = true;
@@ -437,12 +467,35 @@ namespace EPMLiveReportsAdmin
 
             try
             {
-                res.Add("AssignedToID", dt.Rows[0]["AssignedToID"]);
+                res.Add("AssignedToIDs", dt.Rows[0]["AssignedToID"]);
                 res.Add("Work", dt.Rows[0]["Work"]);
                 res.Add("StartDate", dt.Rows[0]["StartDate"]);
                 res.Add("DueDate", dt.Rows[0]["DueDate"]);
             }
             catch { }
+
+            if (dt.Rows.Count > 1)
+            {
+                var sIds = "";
+                foreach (DataRow r in dt.Rows)
+                {
+                    sIds += (r["AssignedToID"].ToString() + ",");
+                }
+                res["AssignedToIDs"] = sIds;
+
+                double sum = 0;
+                foreach (DataRow r in dt.Rows)
+                {
+                    double n = 0;
+                    try
+                    {
+                        n = Convert.ToDouble(r["Work"].ToString());
+                    }
+                    catch { }
+                    sum += n;
+                }
+                res["Work"] = sum.ToString();
+            }
 
             return res;
         }
