@@ -24,7 +24,7 @@ namespace EPMLiveReportsAdmin
         private Guid _siteId;
         private string _siteName;
         private string _siteUrl;
-
+        private Dictionary<string, object> currentValues;
         #endregion Fields
 
         #region Methods (9)
@@ -102,28 +102,6 @@ namespace EPMLiveReportsAdmin
             }
         }
 
-        public override void ItemUpdating(SPItemEventProperties properties)
-        {
-            try
-            {
-                if (Initialize(true, properties))
-                {
-                    if (_myWorkReportData.ListReportsWork(TABLE_NAME))
-                    {
-                        //Save list item "work" field values
-                        SaveWork();
-                    }
-                }
-
-                _myWorkReportData.Dispose();
-            }
-            catch (Exception exception)
-            {
-                SPSecurity.RunWithElevatedPrivileges(
-                    () => LogEvent(exception, 6005, "EPMLive My Work Reporting Item Updating"));
-            }
-        }
-
         // Private Methods (6) 
 
         /// <summary>
@@ -179,6 +157,7 @@ namespace EPMLiveReportsAdmin
                 _siteName = _myWorkReportData.SiteName;
                 _siteUrl = _myWorkReportData.SiteUrl;
 
+                currentValues = GetItemFieldValueFromDB(properties.ListId.ToString(), properties.ListItemId.ToString());
 
                 if (populateColumns)
                 {
@@ -214,13 +193,10 @@ namespace EPMLiveReportsAdmin
                                             " Error: Add item was unsuccessful.", _myWorkReportData.GetError(), 2, 1);
             }
 
-            if (_properties.EventType != SPEventReceiverType.ItemUpdated)
+            if (_myWorkReportData.ListReportsWork(TABLE_NAME))
             {
-                if (_myWorkReportData.ListReportsWork(TABLE_NAME))
-                {
-                    //Save list item "work" field values
-                    SaveWork();
-                }
+                //Save list item "work" field values
+                SaveWork();
             }
         }
 
@@ -276,11 +252,10 @@ namespace EPMLiveReportsAdmin
                             sWork = _listItem["Work"].ToString();
                             bHasChangedWork = true;
                         }
-                        else if (_properties.EventType == SPEventReceiverType.ItemUpdating)
+                        else if (_properties.EventType == SPEventReceiverType.ItemUpdated)
                         {
                             if (_properties.ListItem["Work"] != null &&
-                            Convert.ToInt32(_properties.ListItem["Work"].ToString()) !=
-                            Convert.ToInt32(_properties.AfterProperties["Work"].ToString()))
+                                Convert.ToInt32(currentValues["Work"].ToString()) != Convert.ToInt32(_properties.ListItem["Work"].ToString()))
                             {
                                 sWork = _listItem["Work"].ToString();
                                 bHasChangedWork = true;
@@ -304,14 +279,13 @@ namespace EPMLiveReportsAdmin
                             sAssignedTo = ReportData.AddLookUpFieldValues(_listItem["AssignedTo"].ToString(), "id");
                             bHasChangedAssignedTo = true;
                         }
-                        else if (_properties.EventType == SPEventReceiverType.ItemUpdating)
+                        else if (_properties.EventType == SPEventReceiverType.ItemUpdated)
                         {
                             if (_properties.ListItem["AssignedTo"] != null)
                             {
-                                var lookupValBefore = new SPFieldLookupValue(_properties.ListItem["AssignedTo"].ToString());
-                                var lookupValAfter = new SPFieldLookupValue(_properties.AfterProperties["AssignedTo"].ToString());
+                                var lookupValAfter = new SPFieldLookupValue(_properties.ListItem["AssignedTo"].ToString());
 
-                                if (lookupValBefore.LookupId != lookupValAfter.LookupId)
+                                if (Convert.ToInt32(currentValues["AssignedToID"].ToString()) != lookupValAfter.LookupId)
                                 {
                                     sAssignedTo = ReportData.AddLookUpFieldValues(_listItem["AssignedTo"].ToString(), "id");
                                     bHasChangedAssignedTo = true;
@@ -344,12 +318,12 @@ namespace EPMLiveReportsAdmin
                             StartDate = _listItem["StartDate"];
                             bHasChangedStartDate = true;
                         }
-                        else if (_properties.EventType == SPEventReceiverType.ItemUpdating)
+                        else if (_properties.EventType == SPEventReceiverType.ItemUpdated)
                         {
                             if (_properties.ListItem["StartDate"] != null)
                             {
-                                var dateBefore = Convert.ToDateTime(_properties.ListItem["StartDate"].ToString()).ToUniversalTime().Date;
-                                var dateAfter = Convert.ToDateTime(_properties.AfterProperties["StartDate"].ToString()).ToUniversalTime().Date;
+                                var dateBefore = Convert.ToDateTime(currentValues["StartDate"].ToString()).ToUniversalTime().Date;
+                                var dateAfter = Convert.ToDateTime(_properties.ListItem["StartDate"].ToString()).ToUniversalTime().Date;
 
                                 if (dateBefore != dateAfter)
                                 {
@@ -384,12 +358,13 @@ namespace EPMLiveReportsAdmin
                             DueDate = _listItem["DueDate"];
                             bHasChangedDueDate = true;
                         }
-                        else if (_properties.EventType == SPEventReceiverType.ItemUpdating)
+                        else if (_properties.EventType == SPEventReceiverType.ItemUpdated)
                         {
                             if (_properties.ListItem["DueDate"] != null)
                             {
-                                var dueDateBefore = Convert.ToDateTime(_properties.ListItem["DueDate"].ToString()).ToUniversalTime().Date;
-                                var dueDateAfter = Convert.ToDateTime(_properties.AfterProperties["DueDate"].ToString()).ToUniversalTime().Date;
+                                var dueDateBefore = Convert.ToDateTime(currentValues["DueDate"].ToString()).ToUniversalTime().Date;
+                                var dueDateAfter = Convert.ToDateTime(_properties.ListItem["DueDate"].ToString()).ToUniversalTime().Date;
+
                                 if (dueDateBefore != dueDateAfter)
                                 {
                                     DueDate = _listItem["DueDate"];
@@ -397,7 +372,7 @@ namespace EPMLiveReportsAdmin
                                 }
                             }
                         }
-                        
+
                     }
                     catch { }
                 }
@@ -448,6 +423,28 @@ namespace EPMLiveReportsAdmin
             catch { }
 
             return !string.IsNullOrEmpty(result);
+        }
+
+        private Dictionary<string, object> GetItemFieldValueFromDB(string listId, string itemId)
+        {
+            var res = new Dictionary<string, object>();
+            var dt = _myWorkReportData.ExecuteSql("SELECT * FROM LSTMyWork WHERE [ListId] = '" + listId + "' AND [ItemId] = " + itemId + " AND [AssignedToID] != -99");
+            
+            var sAssignedToID = new object();
+            var sWork = new object();
+            var sStartDate = new object();
+            var sDueDate = new object();
+
+            try
+            {
+                res.Add("AssignedToID", dt.Rows[0]["AssignedToID"]);
+                res.Add("Work", dt.Rows[0]["Work"]);
+                res.Add("StartDate", dt.Rows[0]["StartDate"]);
+                res.Add("DueDate", dt.Rows[0]["DueDate"]);
+            }
+            catch { }
+
+            return res;
         }
 
         #endregion Methods
