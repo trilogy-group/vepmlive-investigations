@@ -945,7 +945,6 @@ namespace EPMLiveCore.Layouts.epmlive
                                                {
                                                    SPEventReceiverType.ItemAdded, 
                                                    SPEventReceiverType.ItemUpdated, 
-                                                   SPEventReceiverType.ItemUpdating,
                                                    SPEventReceiverType.ItemDeleting
                                                };
             
