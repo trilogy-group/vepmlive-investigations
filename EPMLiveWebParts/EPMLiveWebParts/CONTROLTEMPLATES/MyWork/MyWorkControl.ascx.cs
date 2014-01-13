@@ -19,7 +19,7 @@ namespace EPMLiveWebParts.CONTROLTEMPLATES.MyWork
 {
     public partial class MyWorkControl : UserControl
     {
-        #region Fields (15) 
+        #region Fields (15)
 
         protected int DaysAfter;
         protected bool DaysAfterEnabled;
@@ -37,9 +37,9 @@ namespace EPMLiveWebParts.CONTROLTEMPLATES.MyWork
         protected string WebUrl;
         private string _webPartHeight;
 
-        #endregion Fields 
+        #endregion Fields
 
-        #region Properties (20) 
+        #region Properties (20)
 
         protected string CompleteQuery
         {
@@ -92,6 +92,9 @@ namespace EPMLiveWebParts.CONTROLTEMPLATES.MyWork
                 xml.Root.Add(new XElement("DateRange", new XAttribute("From", from.ToString("yyyy-MM-dd HH:mm:ss")),
                                           new XAttribute("To", to.ToString("yyyy-MM-dd HH:mm:ss"))));
 
+                if (!string.IsNullOrEmpty(Request["listid"]))
+                    xml.Root.Add(new XElement("ListId", Convert.ToString(Request["listid"])));
+
                 return HttpUtility.HtmlEncode(HttpUtility.HtmlEncode(xml.ToString()));
             }
         }
@@ -122,9 +125,9 @@ namespace EPMLiveWebParts.CONTROLTEMPLATES.MyWork
 
         public string WebPartPageComponentId { get; set; }
 
-        #endregion Properties 
+        #endregion Properties
 
-        #region Methods (10) 
+        #region Methods (10)
 
         // Protected Methods (3) 
 
@@ -160,8 +163,8 @@ namespace EPMLiveWebParts.CONTROLTEMPLATES.MyWork
 
             if (inDebugMode)
             {
-                var keywords = new[] {"Error", "Problem", "Info", "Check", "IOError", "IO", "Cookie", "Page"};
-                var info = new List<string> {"Error", "Problem"};
+                var keywords = new[] { "Error", "Problem", "Info", "Check", "IOError", "IO", "Cookie", "Page" };
+                var info = new List<string> { "Error", "Problem" };
 
                 foreach (string keyword in epmDebug.Split(',').Select(k => k.ToLower()))
                 {
@@ -262,7 +265,7 @@ namespace EPMLiveWebParts.CONTROLTEMPLATES.MyWork
                     foreach (
                         string list in
                             CoreFunctions.getConfigSetting(configWeb, myworksettings.GeneralSettingsSelectedMyWorkLists)
-                                         .Split(new[] {','}).Where(list => !string.IsNullOrEmpty(list)))
+                                         .Split(new[] { ',' }).Where(list => !string.IsNullOrEmpty(list)))
                     {
                         newItemLists.Add(list);
                         excludedMyWorkLists.RemoveAll(l => l.Name.Equals(list));
@@ -271,7 +274,7 @@ namespace EPMLiveWebParts.CONTROLTEMPLATES.MyWork
                     foreach (
                         string list in
                             CoreFunctions.getConfigSetting(configWeb, myworksettings.GeneralSettingsSelectedLists)
-                                         .Split(new[] {','}).Where(list => !string.IsNullOrEmpty(list)))
+                                         .Split(new[] { ',' }).Where(list => !string.IsNullOrEmpty(list)))
                     {
                         newItemLists.Add(list);
                         excludedMyWorkLists.RemoveAll(l => l.Name.Equals(list));
@@ -433,7 +436,7 @@ namespace EPMLiveWebParts.CONTROLTEMPLATES.MyWork
 
         private void RegisterScripts()
         {
-            foreach (string style in new[] {"MyWorkWebPart.min"})
+            foreach (string style in new[] { "MyWorkWebPart.min" })
             {
                 SPPageContentManager.RegisterStyleFile(LAYOUT_PATH + style + ".css");
             }
@@ -446,7 +449,7 @@ namespace EPMLiveWebParts.CONTROLTEMPLATES.MyWork
             ServicePointManager.ServerCertificateValidationCallback += delegate { return true; };
         }
 
-        #endregion Methods 
+        #endregion Methods
 
         private const string LAYOUT_PATH = "/_layouts/15/epmlive/";
     }

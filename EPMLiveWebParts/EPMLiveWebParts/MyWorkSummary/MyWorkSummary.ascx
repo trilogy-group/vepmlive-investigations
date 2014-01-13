@@ -50,7 +50,7 @@
         },
         openMyWorkPage: function (siteUrl, listid) {
             var viewSiteContentUrl = siteUrl + "/_layouts/epmlive/mywork.aspx?listid=" + listid;
-            var options = { url: viewSiteContentUrl, showMaximized: true };
+            var options = { url: encodeURI(viewSiteContentUrl), showMaximized: true };
             SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
         }
     }
