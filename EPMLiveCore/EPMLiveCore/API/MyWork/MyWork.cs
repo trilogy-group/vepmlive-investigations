@@ -79,7 +79,7 @@ namespace EPMLiveCore.API
 {
     public class MyWork
     {
-        #region Fields (35) 
+        #region Fields (35)
 
         private const string ASSIGNED_TO_FIELD = "AssignedTo";
         private const string COMMENT_COL_WIDTH = "36";
@@ -120,9 +120,9 @@ namespace EPMLiveCore.API
         private const string WORK_TYPE_FIELD = "Work0000Type";
         private const string WORKING_ON_FIELD = "WorkingOn";
 
-        #endregion Fields 
+        #endregion Fields
 
-        #region Methods (56) 
+        #region Methods (56)
 
         // Public Methods (8) 
 
@@ -199,7 +199,7 @@ namespace EPMLiveCore.API
 
                     if (!string.IsNullOrEmpty(serializedGlobalViews))
                     {
-                        var xmlSerializer = new XmlSerializer(typeof (List<MyWorkGridView>));
+                        var xmlSerializer = new XmlSerializer(typeof(List<MyWorkGridView>));
                         return
                             (IEnumerable<MyWorkGridView>)
                                 xmlSerializer.Deserialize(new StringReader(serializedGlobalViews));
@@ -246,7 +246,7 @@ namespace EPMLiveCore.API
 
                         SPSecurity.RunWithElevatedPrivileges(sqlConnection.Open);
 
-                        string fields = ((byte[]) sqlCommand.ExecuteScalar()).SpDecompress();
+                        string fields = ((byte[])sqlCommand.ExecuteScalar()).SpDecompress();
 
                         XDocument xDocument = XDocument.Parse(string.Format("<Fields>{0}</Fields>",
                             fields.Remove(0, fields.IndexOf("<"))));
@@ -581,10 +581,10 @@ namespace EPMLiveCore.API
             List<string> selectedFields, List<string> selectedLists)
         {
             foreach (Guid theWebId in from webId in spWeb.ToTreeList()
-                let archivedWebs = GetArchivedWebs(spSite.ID)
-                let theWebId = webId
-                where !archivedWebs.Exists(wId => wId == theWebId)
-                select theWebId)
+                                      let archivedWebs = GetArchivedWebs(spSite.ID)
+                                      let theWebId = webId
+                                      where !archivedWebs.Exists(wId => wId == theWebId)
+                                      select theWebId)
             {
                 using (SPWeb web = spSite.OpenWeb(theWebId))
                 {
@@ -616,8 +616,7 @@ namespace EPMLiveCore.API
 
                         //WriteToDebugWindow("List: " + spList.Title);
 
-                        var spQuery = new SPQuery
-                        {QueryThrottleMode = SPQueryThrottleOption.Override};
+                        var spQuery = new SPQuery { QueryThrottleMode = SPQueryThrottleOption.Override };
 
                         foreach (string selectedField in selectedFields)
                         {
@@ -729,7 +728,7 @@ namespace EPMLiveCore.API
             List<string> selectedLists, string data)
         {
             const string dateFormat = "yyyy-MM-dd HH:mm:ss";
-
+            Guid listIdQuery = Guid.Empty;
             SqlDateTime from = SqlDateTime.MinValue;
             SqlDateTime to = SqlDateTime.MaxValue;
 
@@ -761,6 +760,12 @@ namespace EPMLiveCore.API
                         DateTime t = DateTime.ParseExact(toAttribute.Value, dateFormat, null);
                         if (t < to.Value) to = t;
                     }
+                }
+
+                XElement listIdXElement = requestXml.Root.Element("ListId");
+                if (listIdXElement != null)
+                {
+                    listIdQuery = new Guid(listIdXElement.Value);
                 }
             }
 
@@ -803,16 +808,24 @@ namespace EPMLiveCore.API
 
                 SPUser currentUser = spWeb.CurrentUser;
 
-                string sql = string.Format(
-                    @"SELECT DISTINCT * FROM dbo.LSTMyWork WHERE ([AssignedToID] = {0})  AND ([Complete] {1} 1 OR [Complete] IS NULL)
+                string sql = "";
+                if (listIdQuery == Guid.Empty)
+                {
+                    sql = string.Format(
+                       @"SELECT DISTINCT * FROM dbo.LSTMyWork WHERE ([AssignedToID] = {0})  AND ([Complete] {1} 1 OR [Complete] IS NULL)
                                 AND [SiteId] = N'{2}'
                                 AND ([DueDate] IS NULL OR ([DueDate] >= '{3}' AND [DueDate] <= '{4}'))
                                 AND ([WorkType] IN ({5})) {6}",
-                    currentUser.ID, getCompletedItems ? "=" : "<>", siteId,
-                    ((DateTime) from).ToString("MM/dd/yyyy HH:mm:ss"),
-                    ((DateTime) to).ToString("MM/dd/yyyy HH:mm:ss"),
-                    queryLists, archivedWebIds);
-
+                       currentUser.ID, getCompletedItems ? "=" : "<>", siteId,
+                       ((DateTime)from).ToString("MM/dd/yyyy HH:mm:ss"),
+                       ((DateTime)to).ToString("MM/dd/yyyy HH:mm:ss"),
+                       queryLists, archivedWebIds);
+                }
+                else
+                {
+                    sql = string.Format(@"SELECT DISTINCT * FROM dbo.LSTMyWork WHERE [SiteId] = N'{0}' AND [WebId] = N'{1}' AND [ListId] = N'{2}' AND [AssignedToID] = {3}  AND ([Complete] != 1 OR [Complete] IS NULL)",
+                        siteId, spWeb.ID, listIdQuery, currentUser.ID);
+                }
                 DataTable dataTable = myWorkReportData.ExecuteSql(sql);
 
                 myWorkDataTable = new DataTable();
@@ -849,7 +862,7 @@ namespace EPMLiveCore.API
                 if (myWorkDataTable.Rows.Count == 0) return tables;
 
                 IEnumerable<string> columns = from DataColumn dataColumn in myWorkDataTable.Columns
-                    select string.Format(@"N'{0}'", dataColumn.ColumnName);
+                                              select string.Format(@"N'{0}'", dataColumn.ColumnName);
 
                 var lists = new List<string>
                 {
@@ -891,7 +904,7 @@ namespace EPMLiveCore.API
                         currentUser.LoginName);
 
                 flagsTable = myWorkReportData.ExecuteEpmLiveSql(sql);
-                flagsTable.PrimaryKey = new[] {flagsTable.Columns["ListId"], flagsTable.Columns["ItemId"]};
+                flagsTable.PrimaryKey = new[] { flagsTable.Columns["ListId"], flagsTable.Columns["ItemId"] };
             }
 
             EnumerableRowCollection<DataRow> myWorkDtRows = myWorkDataTable.AsEnumerable();
@@ -930,16 +943,16 @@ namespace EPMLiveCore.API
 
                 foreach (string field in myWorkFields)
                 {
-                    dataTable.Columns.Add(field, typeof (object));
+                    dataTable.Columns.Add(field, typeof(object));
                 }
 
                 if (!dataTable.Columns.Contains(WORKING_ON_FIELD))
-                    dataTable.Columns.Add(WORKING_ON_FIELD, typeof (object));
+                    dataTable.Columns.Add(WORKING_ON_FIELD, typeof(object));
 
                 string sl = selectedList;
                 EnumerableRowCollection<DataRow> dataRows = from r in myWorkDtRows
-                    where r.Field<string>("WorkType").Equals(sl)
-                    select r;
+                                                            where r.Field<string>("WorkType").Equals(sl)
+                                                            select r;
 
                 foreach (DataRow dataRow in dataRows)
                 {
@@ -1015,7 +1028,7 @@ namespace EPMLiveCore.API
                 dataQuery.Lists = string.Format("<Lists MaxListLimit='0'>{0}</Lists>",
                     listIds);
 
-                var url = (string) spSite.Url.Clone();
+                var url = (string)spSite.Url.Clone();
                 var id = new Guid(spWeb.ID.ToString());
                 SPUserToken spUserToken = spWeb.CurrentUser.UserToken;
 
@@ -1052,7 +1065,7 @@ namespace EPMLiveCore.API
                     }
 
                     eventWaitHandle.Set();
-                }) {Name = theSelectedList, IsBackground = true};
+                }) { Name = theSelectedList, IsBackground = true };
 
                 thread.Start();
             }
@@ -1116,7 +1129,7 @@ namespace EPMLiveCore.API
             SPRegionalSettings spRegionalSettings = context.Web.CurrentUser.RegionalSettings ?? context.RegionalSettings;
 
             string dateSeparator = spRegionalSettings.DateSeparator;
-            var calendarOrderType = (SPCalendarOrderType) spRegionalSettings.DateFormat;
+            var calendarOrderType = (SPCalendarOrderType)spRegionalSettings.DateFormat;
 
             switch (calendarOrderType)
             {
@@ -1274,10 +1287,10 @@ namespace EPMLiveCore.API
                     string sf = myWorkField;
 
                     DataRow field = (from r in fieldsTableRows
-                        where
-                            r.Field<Guid>("ListId") == lstId &&
-                            r.Field<string>("InternalName").Equals(sf)
-                        select r).FirstOrDefault();
+                                     where
+                                         r.Field<Guid>("ListId") == lstId &&
+                                         r.Field<string>("InternalName").Equals(sf)
+                                     select r).FirstOrDefault();
 
                     if (field != null)
                     {
@@ -1320,7 +1333,7 @@ namespace EPMLiveCore.API
             {
                 value = 0;
 
-                DataRow result = flagsTable.Rows.Find(new[] {listId, myWorkDataRow["ItemId"]});
+                DataRow result = flagsTable.Rows.Find(new[] { listId, myWorkDataRow["ItemId"] });
                 if (result != null)
                 {
                     value = result["Value"];
@@ -1503,7 +1516,7 @@ namespace EPMLiveCore.API
 
                                 if (!string.IsNullOrEmpty(serializedPersonalViews))
                                 {
-                                    var xmlSerializer = new XmlSerializer(typeof (List<MyWorkGridView>));
+                                    var xmlSerializer = new XmlSerializer(typeof(List<MyWorkGridView>));
                                     return
                                         (IEnumerable<MyWorkGridView>)
                                             xmlSerializer.Deserialize(new StringReader(serializedPersonalViews));
@@ -1592,7 +1605,7 @@ namespace EPMLiveCore.API
                             xDocument.Element("MyWork").Descendants().ToList().Exists(
                                 e => e.Name.LocalName.Equals("Lists")))
                         {
-                            selectedLists.AddRange(xDocument.Element("MyWork").Element("Lists").Value.Split(new[] {','})
+                            selectedLists.AddRange(xDocument.Element("MyWork").Element("Lists").Value.Split(new[] { ',' })
                                 .Where(list => !string.IsNullOrEmpty(list)));
 
                             listsSupplied = true;
@@ -1603,7 +1616,7 @@ namespace EPMLiveCore.API
                                 e => e.Name.LocalName.Equals("MyWorkLists")))
                         {
                             selectedLists.AddRange(xDocument.Element("MyWork").Element("MyWorkLists").Value.Split(
-                                new[] {','})
+                                new[] { ',' })
                                 .Where(list => !string.IsNullOrEmpty(list)));
 
                             myWorkListsSupplied = true;
@@ -1613,8 +1626,7 @@ namespace EPMLiveCore.API
                             xDocument.Element("MyWork").Descendants().ToList().Exists(
                                 e => e.Name.LocalName.Equals("Fields")))
                         {
-                            selectedFields.AddRange(xDocument.Element("MyWork").Element("Fields").Value.Split(new[]
-                            {','})
+                            selectedFields.AddRange(xDocument.Element("MyWork").Element("Fields").Value.Split(new[] { ',' })
                                 .Where(field => !string.IsNullOrEmpty(field)));
 
                             fieldsSupplied = true;
@@ -1627,7 +1639,7 @@ namespace EPMLiveCore.API
                             if (!string.IsNullOrEmpty(xDocument.Element("MyWork").Element("CrossSiteUrls").Value))
                             {
                                 siteUrls.AddRange(xDocument.Element("MyWork").Element("CrossSiteUrls").Value.Split(
-                                    new[] {','})
+                                    new[] { ',' })
                                     .Where(crossSite => !string.IsNullOrEmpty(crossSite)));
 
                                 siteUrlsSupplied = true;
@@ -1651,17 +1663,16 @@ namespace EPMLiveCore.API
                     if (!listsSupplied)
                         selectedLists.AddRange(
                             CoreFunctions.getConfigSetting(configWeb, GENERAL_SETTINGS_SELECTED_LISTS)
-                                .Split(new[] {','}));
+                                .Split(new[] { ',' }));
 
                     if (!myWorkListsSupplied)
                         selectedLists.AddRange(
                             CoreFunctions.getConfigSetting(configWeb, GENERAL_SETTINGS_SELECTED_MY_WORK_LISTS)
-                                .Split(new[] {','}));
+                                .Split(new[] { ',' }));
 
                     if (!fieldsSupplied)
                         selectedFields.AddRange(
-                            CoreFunctions.getConfigSetting(configWeb, GENERAL_SETTINGS_SELECTED_FIELDS).Split(new[]
-                            {','}));
+                            CoreFunctions.getConfigSetting(configWeb, GENERAL_SETTINGS_SELECTED_FIELDS).Split(new[] { ',' }));
 
                     if (!siteUrlsSupplied)
                     {
@@ -1670,7 +1681,7 @@ namespace EPMLiveCore.API
                                 GENERAL_SETTINGS_CROSS_SITE_URLS)))
                         {
                             siteUrls.AddRange(CoreFunctions.getConfigSetting(configWeb, GENERAL_SETTINGS_CROSS_SITE_URLS)
-                                .Split(new[] {'|'}));
+                                .Split(new[] { '|' }));
                         }
                         else siteUrls.Add(SPContext.Current.Web.Url);
                     }
@@ -1685,7 +1696,7 @@ namespace EPMLiveCore.API
 
                 selectedFields.RemoveAll(string.IsNullOrEmpty);
 
-                var fieldsToRemove = new[] {WORK_TYPE_FIELD, LIST_ID_FIELD, WEB_ID_FIELD, SITE_ID_FIELD, SITE_URL_FIELD};
+                var fieldsToRemove = new[] { WORK_TYPE_FIELD, LIST_ID_FIELD, WEB_ID_FIELD, SITE_ID_FIELD, SITE_URL_FIELD };
                 foreach (string field in fieldsToRemove)
                 {
                     selectedFields.RemoveAll(f => f.ToLower().Equals(field.ToLower()));
@@ -1843,11 +1854,11 @@ namespace EPMLiveCore.API
                             spWeb.Site.ID);
 
                     DataTable table = myWorkReportData.ExecuteSql(query);
-                    table.PrimaryKey = new[] {table.Columns["ListId"], table.Columns["Col"]};
+                    table.PrimaryKey = new[] { table.Columns["ListId"], table.Columns["Col"] };
 
                     object listId = table.Rows[0]["ListId"];
 
-                    DataRow row = table.Rows.Find(new[] {listId, "Complete"});
+                    DataRow row = table.Rows.Find(new[] { listId, "Complete" });
 
                     if (row == null)
                     {
@@ -1859,7 +1870,7 @@ namespace EPMLiveCore.API
                                     SPFieldType.Boolean, SqlDbType.Bit)
                             };
 
-                            myWorkReportData.InsertListColumns((Guid) listId, columnDefs);
+                            myWorkReportData.InsertListColumns((Guid)listId, columnDefs);
                             myWorkReportData.AddColumns("LSTMyWork", columnDefs);
                         }
                         catch
@@ -2049,7 +2060,7 @@ namespace EPMLiveCore.API
             try
             {
                 var stringWriter = new StringWriter();
-                var xmlSerializer = new XmlSerializer(typeof (List<MyWorkGridView>));
+                var xmlSerializer = new XmlSerializer(typeof(List<MyWorkGridView>));
                 xmlSerializer.Serialize(stringWriter, myWorkGridViews);
                 stringWriter.Close();
 
@@ -2118,7 +2129,7 @@ namespace EPMLiveCore.API
                         {
                             try
                             {
-                                var xmlSerializer = new XmlSerializer(typeof (List<MyWorkGridView>));
+                                var xmlSerializer = new XmlSerializer(typeof(List<MyWorkGridView>));
                                 var stringWriter = new StringWriter();
                                 xmlSerializer.Serialize(stringWriter, myWorkGridViews);
 
@@ -2252,7 +2263,7 @@ namespace EPMLiveCore.API
                     throw new Exception("Cannot find View element.");
                 XElement viewElement = myWorkElement.Element("View");
 
-                foreach (string attribute in new[] {"ID", "Personal"}
+                foreach (string attribute in new[] { "ID", "Personal" }
                     .Where(
                         attribute => !viewElement.Attributes().ToList().Exists(a => a.Name.LocalName.Equals(attribute)))
                     )
@@ -2364,7 +2375,7 @@ namespace EPMLiveCore.API
                                                 @"<FieldRef Name='{0}' Nullable='TRUE'/>", selectedField);
                                         }
 
-                                        foreach (string field in new[] {COMPLETED_FIELD, WORKING_ON_FIELD}
+                                        foreach (string field in new[] { COMPLETED_FIELD, WORKING_ON_FIELD }
                                             .Where(field => !selectedFields.Exists(f => f.Equals(field))))
                                         {
                                             dataQuery.ViewFields +=
@@ -2766,7 +2777,7 @@ namespace EPMLiveCore.API
 
                 foreach (string field in selectedFields.Where(field => !fields.Exists(f => f.Name.Equals(field))))
                 {
-                    fields.Add(new MyWorkField {Name = field, DisplayName = field.ToPrettierName(spWeb)});
+                    fields.Add(new MyWorkField { Name = field, DisplayName = field.ToPrettierName(spWeb) });
                 }
 
                 XDocument result = XDocument.Parse(Resources.MyWorkGridLayout);
@@ -2890,8 +2901,8 @@ namespace EPMLiveCore.API
                 {
                     XElement workingOnElement =
                         (from e in result.Descendants("C")
-                            where e.Attribute("Name").Value.Equals(WORKING_ON_FIELD)
-                            select e).FirstOrDefault();
+                         where e.Attribute("Name").Value.Equals(WORKING_ON_FIELD)
+                         select e).FirstOrDefault();
 
                     if (workingOnElement != null)
                     {
@@ -3085,7 +3096,7 @@ namespace EPMLiveCore.API
         /// <returns></returns>
         internal static string GetRelatedGridFormat(string type, string format, SPField spField, SPWeb spWeb)
         {
-            var currencyFormatDictionary = new Dictionary<int, string> {{0, "$n"}, {1, "n$"}, {2, "$ n"}, {3, "n $"}};
+            var currencyFormatDictionary = new Dictionary<int, string> { { 0, "$n" }, { 1, "n$" }, { 2, "$ n" }, { 3, "n $" } };
 
             switch (type)
             {
@@ -3094,12 +3105,12 @@ namespace EPMLiveCore.API
                     {
                         string percentageSign = string.Empty;
 
-                        if (((SPFieldNumber) spField).ShowAsPercentage)
+                        if (((SPFieldNumber)spField).ShowAsPercentage)
                         {
                             percentageSign = @"%";
                         }
 
-                        switch (((SPFieldNumber) spField).DisplayFormat)
+                        switch (((SPFieldNumber)spField).DisplayFormat)
                         {
                             case SPNumberFormatTypes.Automatic:
                                 return ",#0.##########" + percentageSign;
@@ -3119,7 +3130,7 @@ namespace EPMLiveCore.API
                     }
                     else if (spField.Type == SPFieldType.Currency)
                     {
-                        var currenvyCultureInfo = new CultureInfo(((SPFieldCurrency) spField).CurrencyLocaleId);
+                        var currenvyCultureInfo = new CultureInfo(((SPFieldCurrency)spField).CurrencyLocaleId);
                         NumberFormatInfo numberFormatInfo = currenvyCultureInfo.NumberFormat;
 
                         return currencyFormatDictionary[numberFormatInfo.CurrencyPositivePattern]
@@ -3252,7 +3263,7 @@ namespace EPMLiveCore.API
                     throw new Exception("Cannot find View element.");
                 XElement viewElement = myWorkElement.Element("View");
 
-                foreach (string attribute in new[] {"ID", "Name", "Personal"}
+                foreach (string attribute in new[] { "ID", "Name", "Personal" }
                     .Where(
                         attribute => !viewElement.Attributes().ToList().Exists(a => a.Name.LocalName.Equals(attribute)))
                     )
@@ -3447,6 +3458,6 @@ namespace EPMLiveCore.API
             }
         }
 
-        #endregion Methods 
+        #endregion Methods
     }
 }
