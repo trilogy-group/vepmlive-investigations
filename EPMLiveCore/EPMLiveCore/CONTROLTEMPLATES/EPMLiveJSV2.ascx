@@ -55,6 +55,13 @@
                     var s = document.getElementsByTagName('script')[0];
                     s.parentNode.insertBefore(walkme, s);
                 };
+
+                if(typeof MoveSiteTitle==='undefined')
+                {  
+                    MoveSiteTitle = function(value){
+                        return "";
+                    };
+                }
             });
         }
 
