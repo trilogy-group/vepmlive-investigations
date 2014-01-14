@@ -496,7 +496,7 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
                 }
             }
 
-            var weburl = this.$curWebUrl + "/_layouts/epmlive/gridaction.aspx?action=comments&webid=" + webid + "&ListId=" + listid + "&ID=" + itemid + "&Source=" + document.location.href;
+            var weburl = this.$curWebUrl + "/_layouts/epmlive/gridaction.aspx?action=comments&webid=" + webid + "&ListId=" + listid + "&ID=" + itemid + "&Source=" + escape(document.location.href);
             var options = { url: weburl, width: 600, height: 500, dialogReturnValueCallback: this.gridactioncallback };
             SP.UI.ModalDialog.showModalDialog(options);
         }
