@@ -54,14 +54,7 @@
                     walkme.src = '<%= Scheme %>://d3b3ehuo35wzeh.cloudfront.net/users/<%= WalkMeId %>/walkme_<%= WalkMeId %>_https.js';
                     var s = document.getElementsByTagName('script')[0];
                     s.parentNode.insertBefore(walkme, s);
-                };
-
-                if(typeof MoveSiteTitle==='undefined')
-                {  
-                    MoveSiteTitle = function(value){
-                        return "";
-                    };
-                }
+                }               
             });
         }
 
