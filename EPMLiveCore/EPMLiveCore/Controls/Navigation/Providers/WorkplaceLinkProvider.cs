@@ -50,13 +50,9 @@ namespace EPMLiveCore.Controls.Navigation.Providers
                 string[] parts = url.Split(new[] {"_layouts"}, StringSplitOptions.None);
                 url = RelativeUrl + "/_layouts" + string.Join(string.Empty, parts.Skip(1));
             }
-            else if (url.ToLower().Contains("sitepages"))
-            {
-                url = string.Format(@"javascript:SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', {{ url: '{0}', showMaximized: true }});", url);
-            }
             else
             {
-                url = string.Format(@"javascript:OpenCreateWebPageDialog('{0}');", url);
+                url = string.Format(@"javascript:SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', {{ url: '{0}', showMaximized: true }});", url);
             }
 
             return url;
