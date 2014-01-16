@@ -212,7 +212,7 @@ function editRowHelper(grid, row) {
 
                     dataXml = dataXml.substring(0, dataXml.length - 1);
 
-                    dataXml += '</Fields><GuessOriginalFieldName>True</GuessOriginalFieldName></MyWork>';
+                    dataXml += '</Fields><GuessOriginalFieldName>True</GuessOriginalFieldName><IsFromMyTimesheet>True</IsFromMyTimesheet></MyWork>';
 
                     EPMLiveCore.WorkEngineAPI.Execute("GetMyWorkGridColType", dataXml, function (response) {
                         response = parseJson(response);

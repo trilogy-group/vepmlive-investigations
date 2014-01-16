@@ -2488,6 +2488,7 @@ namespace EPMLiveCore.API
                 xElement.Add(new XAttribute("SiteURL", siteUrl));
 
                 bool guessOriginalFieldNameSetting = FieldInfo.GetGuessOriginalFieldNameSetting(myWorkElement);
+                bool isFromMyTimesheet = myWorkElement.Descendants().ToList().Exists(e => e.Name.LocalName.Equals("IsFromMyTimesheet")) && bool.Parse(myWorkElement.Element("IsFromMyTimesheet").Value);
                 using (var spSite = new SPSite(siteUrl))
                 {
                     using (SPWeb spWeb = spSite.OpenWeb(webId))
@@ -2504,10 +2505,7 @@ namespace EPMLiveCore.API
 
                             var element = new XElement("Field");
                             element.Add(new XAttribute("Name", theField));
-                            element.Add(new XAttribute("Type",
-                                Utils.GetRelatedGridType(
-                                    spListItem.Fields.GetFieldByInternalName(theField))));
-
+                            element.Add(new XAttribute("Type", isFromMyTimesheet ? Utils.GetRelatedGridTypeForMyTimesheet(spListItem.Fields.GetFieldByInternalName(theField)) : Utils.GetRelatedGridType(spListItem.Fields.GetFieldByInternalName(theField))));
                             xElement.Add(element);
                         }
                     }

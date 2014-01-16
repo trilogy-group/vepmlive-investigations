@@ -398,6 +398,38 @@ namespace EPMLiveCore.API
             switch (sPField.Type)
             {
                 case SPFieldType.Text:
+                case SPFieldType.User:
+                case SPFieldType.Invalid:
+                    return "Text";
+                case SPFieldType.Integer:
+                    return "Float";
+                case SPFieldType.Number:
+                case SPFieldType.Currency:
+                    return "Float";
+                case SPFieldType.DateTime:
+                    return "Date";
+                case SPFieldType.Boolean:
+                    return "Bool";
+                case SPFieldType.Note:
+                    return "Lines";
+                case SPFieldType.URL:
+                    return "Link";
+                case SPFieldType.Choice:
+                    return "Enum";
+                case SPFieldType.Calculated:
+                    return sPField.Description.Equals("Indicator") ? "Icon" : "Html";
+                case SPFieldType.Lookup:
+                case SPFieldType.MultiChoice:
+                    return "Html";
+                default:
+                    return "Html";
+            }
+        }
+        internal static string GetRelatedGridTypeForMyTimesheet(SPField sPField)
+        {
+            switch (sPField.Type)
+            {
+                case SPFieldType.Text:
                 case SPFieldType.Invalid:
                     return "Text";
                 case SPFieldType.Integer:
