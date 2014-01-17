@@ -3005,27 +3005,26 @@ var MyWorkGrid = {
                 }, 750);
             };
 
-            var pm = SP.Ribbon.PageManager.get_instance();
+            var selectedTab = $('#RibbonContainer_activeTabId').val();
+            if (selectedTab !== 'Ribbon.MyWorkTab' && selectedTab !== 'Ribbon.MyWorkViewsTab') {
+                var pm = SP.Ribbon.PageManager.get_instance();
 
-            var ribbon = null;
+                var ribbon = null;
 
-            try {
-                ribbon = pm.get_ribbon();
-            } catch (e) {
-            }
-
-            if (!ribbon) {
-                if (typeof (window._ribbonStartInit) === 'function') {
-                    selectTab('Ribbon.MyWorkTab');
+                try {
+                    ribbon = pm.get_ribbon();
+                } catch (e) {
                 }
-            } else {
-                var selectedTab = $('#RibbonContainer_activeTabId').val();
-                if (selectedTab !== 'Ribbon.MyWorkTab' && selectedTab !== 'Ribbon.MyWorkViewsTab') {
+                
+                if (!ribbon) {
+                    if (typeof(window._ribbonStartInit) === 'function') {
+                        selectTab('Ribbon.MyWorkTab');
+                    }
+                } else {
                     window.SelectRibbonTab('Ribbon.MyWorkTab', true);
                     window.RefreshCommandUI();
                 }
             }
-
         }, 'sp.ribbon.js');
     }
 };

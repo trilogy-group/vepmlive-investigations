@@ -321,6 +321,10 @@ iisreset</PostDeploymentCommand>
     <Compile Include="ListReportView\ReportingServicesToolPart.cs" />
     <Compile Include="ListSummary\ListSummary.cs" />
     <Compile Include="ListSummary\ListSummaryToolpart.cs" />
+    <Compile Include="MyWorkSummary\MyWorkSummary.ascx.cs">
+      <DependentUpon>MyWorkSummary.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="MyWorkSummary\MyWorkSummary.ascx.g.cs" />
     <Compile Include="MyWorkWebPart\ExtensionMethods.cs" />
     <Compile Include="MyWorkWebPart\MyWorkToolpart.cs" />
     <Compile Include="MyWorkWebPart\MyWorkWebPart.cs" />
@@ -534,6 +538,10 @@ iisreset</PostDeploymentCommand>
     <None Include="ListSummary\ListSummary.dwp" />
     <None Include="ListSummary\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{75a2a3a0-6c8f-4e07-93fc-0f8299f53a5f}</SharePointProjectItemId>
+    </None>
+    <None Include="MyWorkSummary\MyWorkSummary.webpart" />
+    <None Include="MyWorkSummary\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{cb6ae61c-15b0-4e36-8146-296baf20dc07}</SharePointProjectItemId>
     </None>
     <None Include="MyWorkWebPart\MyWorkWebPart.dwp" />
     <None Include="MyWorkWebPart\SharePointProjectItem.spdata">
@@ -1406,6 +1414,8 @@ iisreset</PostDeploymentCommand>
     <Content Include="Layouts\epmlive\xml2json.js" />
     <Content Include="ListReportView\Elements.xml" />
     <Content Include="ListSummary\Elements.xml" />
+    <Content Include="MyWorkSummary\Elements.xml" />
+    <Content Include="MyWorkSummary\MyWorkSummary.ascx" />
     <Content Include="MyWorkWebPart\Elements.xml" />
     <Content Include="ReportingChart\Elements.xml" />
     <Content Include="ReportingFilter\Elements.xml" />
