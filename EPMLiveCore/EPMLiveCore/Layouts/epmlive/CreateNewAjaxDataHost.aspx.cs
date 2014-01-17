@@ -157,29 +157,25 @@ namespace EPMLiveCore
                         // if content management is allowed
                         if (list.AllowContentTypes)
                         {
-                            if (list.NavigateForFormsPages)
-                            {
-                                var url = GetDefaultFormUrl(list, requestUrl);
-                                onclick = !string.IsNullOrEmpty(url) ? "javascript:window.location.href='" + url + "'; return false;" : "";
+                            //if (list.NavigateForFormsPages)
+                            //{
+                                onclick = "javascript:window.location.href='" + GetDefaultFormUrl(list, requestUrl) + "'; return false;";
+                            //}
+                            //else
+                            //{
+                            //    onclick = "javascript:var options = { url:'" + GetDefaultFormUrl(list, requestUrl) + "', title: 'Create', dialogReturnValueCallback: function (dialogResult) { SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.RefreshPage', dialogResult) } }; SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options); return false;";
+                            //}
                             }
                             else
                             {
-                                var url = GetDefaultFormUrl(list, requestUrl);
-                                onclick = !string.IsNullOrEmpty(url) ? "javascript:var options = { url:'" + url + "', title: 'Create', dialogReturnValueCallback: function (dialogResult) { SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.RefreshPage', dialogResult) } }; SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options); return false;" : "";
-                            }
-                        }
-                        else
-                        {
-                            if (list.NavigateForFormsPages)
-                            {
-                                var url = GetDefaultFormUrl(list, requestUrl);
-                                onclick = !string.IsNullOrEmpty(url) ? "javascript:window.location.href='" + url + "'; return false;" : "";
-                            }
-                            else
-                            {
-                                var url = GetDefaultFormUrl(list, requestUrl);
-                                onclick = !string.IsNullOrEmpty(url) ? "javascript:var options = { url:'" + url + "', title: 'Create', dialogReturnValueCallback: function (dialogResult) { SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.RefreshPage', dialogResult) } }; SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options); return false;" : "";
-                            }
+                            //if (list.NavigateForFormsPages)
+                            //{
+                                onclick = "javascript:window.location.href='" + GetDefaultFormUrl(list, requestUrl) + "'; return false;";
+                            //}
+                            //else
+                            //{
+                            //    onclick = "javascript:var options = { url:'" + GetDefaultFormUrl(list, requestUrl) + "', title: 'Create', dialogReturnValueCallback: function (dialogResult) { SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.RefreshPage', dialogResult) } }; SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options); return false;";
+                            //}
                         }
 
                         dict.Add(i, new [] { description, itemText, imageUrl, linkUrl, onclick });
@@ -254,69 +250,69 @@ namespace EPMLiveCore
                     {
                         try
                         {
-                            itemText = list.Title;
-                            itemText = !string.IsNullOrEmpty(gSettings.NewMenuName) ? gSettings.NewMenuName : list.Title;
+                        itemText = list.Title;
+                        itemText = !string.IsNullOrEmpty(gSettings.NewMenuName) ? gSettings.NewMenuName : list.Title;
 
-                            description = list.Description;
-                            imageUrl = list.ImageUrl;
+                        description = list.Description;
+                        imageUrl = list.ImageUrl;
 
-                            string rlists = string.Empty;
-                            rlists = gSettings.RollupLists;
+                        string rlists = string.Empty;
+                        rlists = gSettings.RollupLists;
 
-                            bool disableNewButtonMod = false;
-                            string sDisableNewButtonMod = string.Empty;
-                            disableNewButtonMod = gSettings.DisableNewItemMod;
+                        bool disableNewButtonMod = false;
+                        string sDisableNewButtonMod = string.Empty;
+                        disableNewButtonMod = gSettings.DisableNewItemMod;
 
-                            bool useEnhancedNewMenu = false;
-                            string sUseEnhancedNewMenu = string.Empty;
-                            useEnhancedNewMenu = gSettings.UseNewMenu;
+                        bool useEnhancedNewMenu = false;
+                        string sUseEnhancedNewMenu = string.Empty;
+                        useEnhancedNewMenu = gSettings.UseNewMenu;
 
-                            // if "Use Enhanced New Menu" option is turned on
-                            // use the new create modal dialog
-                            if (useEnhancedNewMenu && !disableNewButtonMod)
-                            {
-                                linkUrl = "#";
-                                string createNewWorkspaceUrl = cWeb.ServerRelativeUrl + "/_layouts/epmlive/createnewworkspace.aspx?list=" + list.ID.ToString("B") + "&type=site&source=" + requestUrl;
-                                onclick = "javascript:var options = { url:'" + createNewWorkspaceUrl + "', width: 800, height:600, title: 'Create', dialogReturnValueCallback : Function.createDelegate(null, HandleCreateNewWorkspaceCreate) }; SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options); return false;";
-                            }
-                            // check for roll up lists
-                            // not a pop up
-                            else if (!string.IsNullOrEmpty(rlists) && !disableNewButtonMod)
-                            {
-                                onclick = "";
-                                string firstListLName = rlists.Split(',')[0];
-                                linkUrl = cWeb.ServerRelativeUrl + "/_layouts/epmlive/newitem.aspx?List=" + firstListLName + "&source=" + requestUrl;
-                            }
-                            // if content management is allowed
-                            else if (list.AllowContentTypes)
-                            {
-                                if (list.NavigateForFormsPages)
-                                {
-                                    var url = GetDefaultFormUrl(list, requestUrl);
-                                    onclick = !string.IsNullOrEmpty(url) ? "javascript:window.location.href='" + url + "'; return false;" : "";
-                                }
-                                else
-                                {
-                                    var url = GetDefaultFormUrl(list, requestUrl);
-                                    onclick = !string.IsNullOrEmpty(url) ? "javascript:var options = { url:'" + url + "', title: 'Create', dialogReturnValueCallback: function (dialogResult) { SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.RefreshPage', dialogResult) } }; SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options); return false;" : "";
-                                }
-                            }
-                            else
-                            {
-                                if (list.NavigateForFormsPages)
-                                {
-                                    var url = GetDefaultFormUrl(list, requestUrl);
-                                    onclick = !string.IsNullOrEmpty(url) ? "javascript:window.location.href='" + url + "'; return false;" : "";
-                                }
-                                else
-                                {
-                                    var url = GetDefaultFormUrl(list, requestUrl);
-                                    onclick = !string.IsNullOrEmpty(url) ? "javascript:var options = { url:'" + url + "', title: 'Create', dialogReturnValueCallback: function (dialogResult) { SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.RefreshPage', dialogResult) } }; SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options); return false;" : "";
-                                }
-                            }
-
-                            dict.Add(i, new[] { description, itemText, imageUrl, linkUrl, onclick });
+                        // if "Use Enhanced New Menu" option is turned on
+                        // use the new create modal dialog
+                        if (useEnhancedNewMenu && !disableNewButtonMod)
+                        {
+                            linkUrl = "#";
+                            string createNewWorkspaceUrl = cWeb.ServerRelativeUrl + "/_layouts/epmlive/createnewworkspace.aspx?list=" + list.ID.ToString("B") + "&type=site&source=" + requestUrl;
+                            onclick = "javascript:var options = { url:'" + createNewWorkspaceUrl + "', width: 800, height:600, title: 'Create', dialogReturnValueCallback : Function.createDelegate(null, HandleCreateNewWorkspaceCreate) }; SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options); return false;";
                         }
+                        // check for roll up lists
+                        // not a pop up
+                        else if (!string.IsNullOrEmpty(rlists) && !disableNewButtonMod)
+                        {
+                            onclick = "";
+                            string firstListLName = rlists.Split(',')[0];
+                            linkUrl = cWeb.ServerRelativeUrl + "/_layouts/epmlive/newitem.aspx?List=" + firstListLName + "&source=" + requestUrl;
+                        }
+                        // if content management is allowed
+                        else if (list.AllowContentTypes)
+                        {
+                            //if (list.NavigateForFormsPages)
+                            //{
+                                    var url = GetDefaultFormUrl(list, requestUrl);
+                                    onclick = !string.IsNullOrEmpty(url) ? "javascript:window.location.href='" + url + "'; return false;" : "";
+                            //}
+                            //else
+                            //{
+                            //        var url = GetDefaultFormUrl(list, requestUrl);
+                            //        onclick = !string.IsNullOrEmpty(url) ? "javascript:var options = { url:'" + url + "', title: 'Create', dialogReturnValueCallback: function (dialogResult) { SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.RefreshPage', dialogResult) } }; SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options); return false;" : "";
+                            //}
+                        }
+                        else
+                        {
+                            //if (list.NavigateForFormsPages)
+                            //{
+                                    var url = GetDefaultFormUrl(list, requestUrl);
+                                    onclick = !string.IsNullOrEmpty(url) ? "javascript:window.location.href='" + url + "'; return false;" : "";
+                            //}
+                            //else
+                            //{
+                            //        var url = GetDefaultFormUrl(list, requestUrl);
+                            //        onclick = !string.IsNullOrEmpty(url) ? "javascript:var options = { url:'" + url + "', title: 'Create', dialogReturnValueCallback: function (dialogResult) { SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.RefreshPage', dialogResult) } }; SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options); return false;" : "";
+                            //}
+                        }
+
+                        dict.Add(i, new[] { description, itemText, imageUrl, linkUrl, onclick });
+                    }
                         catch { }
                     }
                 }
@@ -334,14 +330,14 @@ namespace EPMLiveCore
 
             //if (!string.IsNullOrEmpty(list.DefaultNewFormUrl))
             //{
-                if (defaultNewFormUrl.IndexOf('?') == -1)
-                {
-                    defaultNewFormUrl += "?source=" + requestUrl;
-                }
-                else
-                {
-                    defaultNewFormUrl += "&source=" + requestUrl;
-                }
+            if (defaultNewFormUrl.IndexOf('?') == -1)
+            {
+                defaultNewFormUrl += "?source=" + requestUrl;
+            }
+            else
+            {
+                defaultNewFormUrl += "&source=" + requestUrl;
+            }
             //}
 
             return defaultNewFormUrl;
