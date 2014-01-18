@@ -3013,9 +3013,9 @@ var MyWorkGrid = {
 
                 try {
                     ribbon = pm.get_ribbon();
-                } catch (e) {
+                } catch(e) {
                 }
-                
+
                 if (!ribbon) {
                     if (typeof(window._ribbonStartInit) === 'function') {
                         selectTab('Ribbon.MyWorkTab');
@@ -3024,6 +3024,10 @@ var MyWorkGrid = {
                     window.SelectRibbonTab('Ribbon.MyWorkTab', true);
                     window.RefreshCommandUI();
                 }
+            } else {
+                window.setTimeout(function() {
+                    window.SelectRibbonTab(selectedTab, true);
+                }, 500);
             }
         }, 'sp.ribbon.js');
     }

@@ -123,14 +123,6 @@ iisreset</PostDeploymentCommand>
       <DesignTime>True</DesignTime>
       <DependentUpon>AssociatedItems.ascx</DependentUpon>
     </Compile>
-    <Compile Include="MyWorkSummary\MyWorkSummary.ascx.cs">
-      <DependentUpon>MyWorkSummary.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="MyWorkSummary\MyWorkSummary.ascx.g.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>MyWorkSummary.ascx</DependentUpon>
-    </Compile>
     <Compile Include="BackButton\BackButton.cs" />
     <Compile Include="BuyNow\BuyNow.cs" />
     <Compile Include="ChartControl\ChartControl.cs" />
@@ -458,7 +450,6 @@ iisreset</PostDeploymentCommand>
     <None Include="AssociatedItems\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{b8018cf5-92b1-456e-8a3d-f694e56a432c}</SharePointProjectItemId>
     </None>
-    <None Include="MyWorkSummary\MyWorkSummary.webpart" />
     <None Include="MyWorkSummary\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{6810c665-56ae-4f47-853a-89bf8f9f0cd4}</SharePointProjectItemId>
     </None>
@@ -814,10 +805,6 @@ iisreset</PostDeploymentCommand>
       <LastGenOutput>AssociatedItems.ascx.g.cs</LastGenOutput>
     </Content>
     <Content Include="AssociatedItems\Elements.xml" />
-    <Content Include="MyWorkSummary\MyWorkSummary.ascx">
-      <Generator>SharePointWebPartCodeGenerator</Generator>
-      <LastGenOutput>MyWorkSummary.ascx.g.cs</LastGenOutput>
-    </Content>
     <Content Include="MyWorkSummary\Elements.xml" />
     <Content Include="BackButton\Elements.xml" />
     <Content Include="BuyNow\Elements.xml" />
@@ -1414,7 +1401,6 @@ iisreset</PostDeploymentCommand>
     <Content Include="Layouts\epmlive\xml2json.js" />
     <Content Include="ListReportView\Elements.xml" />
     <Content Include="ListSummary\Elements.xml" />
-    <Content Include="MyWorkSummary\Elements.xml" />
     <Content Include="MyWorkSummary\MyWorkSummary.ascx" />
     <Content Include="MyWorkWebPart\Elements.xml" />
     <Content Include="ReportingChart\Elements.xml" />
