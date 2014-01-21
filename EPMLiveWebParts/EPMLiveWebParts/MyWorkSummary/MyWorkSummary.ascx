@@ -7,20 +7,55 @@
 <%@ Register TagPrefix="WebPartPages" Namespace="Microsoft.SharePoint.WebPartPages" Assembly="Microsoft.SharePoint, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
 <%@ Control Language="C#" AutoEventWireup="true" CodeBehind="MyWorkSummary.ascx.cs" Inherits="EPMLiveWebParts.MyWorkSummary.MyWorkSummary" %>
 <style type="text/css">
-    .mwsPipeSeperator {
-        float: left;
-        font-size: large;
-    }
-
-    .mwsMainDiv {
-        float: left;
-    }
-
-    .mwsItemDiv {
-        float: left;
+    #mwsMainDiv {
+        width: 95%;
+        margin: 10px auto;
         padding: 5px;
-        margin-right: 5px;
+        position: relative;
+        display: inline-block;
+        text-shadow: 0 1px 0 #fff;
     }
+
+        #mwsMainDiv .row {
+            margin: 0;
+            padding: 0;
+        }
+
+        #mwsMainDiv .mwsItemDiv {
+            float: left;
+            color: #777777;
+            margin-right: 20px;
+            cursor: pointer;
+        }
+
+        #mwsMainDiv .icon-wrapper {
+            float: left;
+        }
+
+            #mwsMainDiv .icon-wrapper .icon {
+                font-size: 23px;
+                text-align: center;
+                line-height: 23px;
+            }
+
+                #mwsMainDiv .icon-wrapper .icon .fa {
+                    display: block;
+                }
+
+            #mwsMainDiv .icon-wrapper .text {
+                font-size: 16px;
+                text-align: center;
+                line-height: 20px;
+                color: #999999;
+            }
+
+        #mwsMainDiv .mwsItemDiv .count {
+            font-size: 35px;
+            line-height: 43px;
+            padding-left: 5px;
+            position: relative;
+            display: inline-block;
+        }
 </style>
 
 
@@ -50,12 +85,11 @@
         },
         openMyWorkPage: function (siteUrl, listid) {
             var viewSiteContentUrl = siteUrl + "/_layouts/epmlive/mywork.aspx?listid=" + listid;
-            var options = { url: encodeURI(viewSiteContentUrl), showMaximized: true };
-            SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
+            location.href = viewSiteContentUrl;
         }
     }
 </script>
 <div id="mwsLoadDiv" style="display: none;">
     <img src="../_layouts/15/epmlive/images/mywork/loading16.gif" />
 </div>
-<div id="mwsMainDiv" class="mwsMainDiv" />
+<div id="mwsMainDiv" />

@@ -49,7 +49,7 @@ namespace EPMLiveCore.API
                         var queryExecutor = new EPMLiveCore.ReportingProxy.QueryExecutor(spWeb);
                         if (queryExecutor != null)
                         {
-                            sqlquery = string.Format("Select WorkType as WORKTYPE,COUNT(WorkType) as WORKTYPECOUNT,ListId as RPTLISTID FROM LSTMyWork where AssignedToText = '{0}' and Siteid = '{1}' and WebId = '{2}' and (Complete <> 1 or Complete is null) GROUP BY WorkType, ListId Order by WorkType", currentUser, siteId, webID);
+                            sqlquery = string.Format("Select l1.WorkType as WORKTYPE,COUNT(l1.WorkType) as WORKTYPECOUNT,l1.ListId as RPTLISTID, l2.Icon as RPTLISTICON FROM LSTMyWork l1 inner join RPTListInfo l2 on l1.ListId = l2.listid where l1.AssignedToText = '{0}' and l1.Siteid = '{1}' and l1.WebId = '{2}' and (l1.Complete <> 1 or l1.Complete is null) GROUP BY l1.WorkType, l1.ListId, l2.Icon Order by l1.WorkType", currentUser, siteId, webID);
                             dtMyWorkSummary = queryExecutor.ExecuteReportingDBQuery(sqlquery, new Dictionary<string, object> { });
                         }
 
@@ -62,11 +62,8 @@ namespace EPMLiveCore.API
                                 string workType = Convert.ToString(dtMyWorkSummary.Rows[i]["WORKTYPE"]);
                                 string workTypeCount = Convert.ToString(dtMyWorkSummary.Rows[i]["WORKTYPECOUNT"]);
                                 string rptListId = Convert.ToString(dtMyWorkSummary.Rows[i]["RPTLISTID"]);
-
-                                sbListMyWorkSummaryItemsDiv.Append(string.Format("<a href='#' onclick=\"javascript:MyWorkSummaryClient.openMyWorkPage('{0}','{1}');\"><div class='mwsItemDiv'>{2}&nbsp;[{3}]</div></a>", siteUrl, rptListId, workType, workTypeCount));
-
-                                if (i != dtMyWorkSummary.Rows.Count - 1)
-                                    sbListMyWorkSummaryItemsDiv.Append("<div class='mwsPipeSeperator'>|</div>");
+                                string rptListIcon = Convert.ToString(dtMyWorkSummary.Rows[i]["RPTLISTICON"]);
+                                sbListMyWorkSummaryItemsDiv.Append(string.Format("<a href='#' onclick=\"javascript:MyWorkSummaryClient.openMyWorkPage('{0}','{1}');\"><div class='row'><div class='mwsItemDiv'><div class='icon-wrapper'><div class='icon fa {2}'></div><div class='text'>{3}</div></div><div class='count'>{4}</div></div></div></a>", siteUrl, rptListId, rptListIcon, workType, workTypeCount));
                             }
                         }
 
