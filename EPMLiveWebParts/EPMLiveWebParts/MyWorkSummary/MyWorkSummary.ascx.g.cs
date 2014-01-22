@@ -50,33 +50,26 @@ namespace EPMLiveWebParts.MyWorkSummary {
         
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Never)]
         private void @__Render__control1(System.Web.UI.HtmlTextWriter @__w, System.Web.UI.Control parameterContainer) {
-            @__w.Write(@"
-<style type=""text/css"">
-    .mwsPipeSeperator {
-        float: left;
-        font-size: large;
-    }
-
-    .mwsMainDiv {
-        float: left;
-    }
-
-    .mwsItemDiv {
-        float: left;
-        padding: 5px;
-        margin-right: 5px;
-    }
-</style>
-
-
-<script type=""text/javascript"">
-
-    $(function () {
-        MyWorkSummaryClient.fillWebPartData();
-    });
-
-    MyWorkSummaryClient = {
-        dataXml: '");
+            @__w.Write("\r\n<style type=\"text/css\">\r\n    #mwsMainDiv {\r\n        width: 95%;\r\n        margin" +
+                    ": 10px auto;\r\n        padding: 5px;\r\n        position: relative;\r\n        displa" +
+                    "y: inline-block;\r\n        text-shadow: 0 1px 0 #fff;\r\n    }\r\n\r\n        #mwsMainD" +
+                    "iv .row {\r\n            margin: 0;\r\n            padding: 0;\r\n        }\r\n\r\n       " +
+                    " #mwsMainDiv .mwsItemDiv {\r\n            float: left;\r\n            color: #777777" +
+                    ";\r\n            margin-right: 20px;\r\n            cursor: pointer;\r\n            op" +
+                    "acity:1;\r\n        }\r\n\r\n            #mwsMainDiv .mwsItemDiv:hover {\r\n            " +
+                    "    opacity: 0.5;\r\n            }\r\n\r\n        #mwsMainDiv .icon-wrapper {\r\n       " +
+                    "     float: left;\r\n        }\r\n\r\n            #mwsMainDiv .icon-wrapper .icon {\r\n " +
+                    "               font-size: 23px;\r\n                text-align: center;\r\n          " +
+                    "      line-height: 23px;\r\n            }\r\n\r\n                #mwsMainDiv .icon-wra" +
+                    "pper .icon .fa {\r\n                    display: block;\r\n                }\r\n\r\n    " +
+                    "        #mwsMainDiv .icon-wrapper .text {\r\n                font-size: 16px;\r\n   " +
+                    "             text-align: center;\r\n                line-height: 20px;\r\n          " +
+                    "      color: #999999;\r\n            }\r\n\r\n        #mwsMainDiv .mwsItemDiv .count {" +
+                    "\r\n            font-size: 35px;\r\n            line-height: 43px;\r\n            padd" +
+                    "ing-left: 5px;\r\n            position: relative;\r\n            display: inline-blo" +
+                    "ck;\r\n        }\r\n</style>\r\n\r\n\r\n<script type=\"text/javascript\">\r\n\r\n    $(function " +
+                    "() {\r\n        MyWorkSummaryClient.fillWebPartData();\r\n    });\r\n\r\n    MyWorkSumma" +
+                    "ryClient = {\r\n        dataXml: \'");
           @__w.Write(dataXml);
 
             @__w.Write(@"',
@@ -98,15 +91,14 @@ namespace EPMLiveWebParts.MyWorkSummary {
         },
         openMyWorkPage: function (siteUrl, listid) {
             var viewSiteContentUrl = siteUrl + ""/_layouts/epmlive/mywork.aspx?listid="" + listid;
-            var options = { url: encodeURI(viewSiteContentUrl), showMaximized: true };
-            SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
+            location.href = viewSiteContentUrl;
         }
     }
 </script>
 <div id=""mwsLoadDiv"" style=""display: none;"">
     <img src=""../_layouts/15/epmlive/images/mywork/loading16.gif"" />
 </div>
-<div id=""mwsMainDiv"" class=""mwsMainDiv"" />
+<div id=""mwsMainDiv"" />
 ");
         }
         

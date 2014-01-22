@@ -26,7 +26,12 @@
             color: #777777;
             margin-right: 20px;
             cursor: pointer;
+            opacity:1;
         }
+
+            #mwsMainDiv .mwsItemDiv:hover {
+                opacity: 0.5;
+            }
 
         #mwsMainDiv .icon-wrapper {
             float: left;
