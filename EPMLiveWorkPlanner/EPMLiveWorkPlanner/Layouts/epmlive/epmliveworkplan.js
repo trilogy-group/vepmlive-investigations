@@ -981,6 +981,7 @@ function addRow()
             }
             else
             {
+
                 mygrid.addRow(newId,defaultValues,null,"_SummaryTask_","",false);
                 mygrid.openItem("_SummaryTask_");
             }

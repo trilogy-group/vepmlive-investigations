@@ -67,24 +67,6 @@ namespace EPMLiveCore.Layouts.epmlive {
         protected global::System.Web.UI.WebControls.TextBox txtDescription;
         
         /// <summary>
-        /// lblTag control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lblTag;
-        
-        /// <summary>
-        /// txtTag control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox txtTag;
-        
-        /// <summary>
         /// lblScope control.
         /// </summary>
         /// <remarks>
@@ -94,13 +76,13 @@ namespace EPMLiveCore.Layouts.epmlive {
         protected global::System.Web.UI.WebControls.Label lblScope;
         
         /// <summary>
-        /// rdoScope control.
+        /// chkPrivate control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.RadioButtonList rdoScope;
+        protected global::System.Web.UI.WebControls.CheckBox chkPrivate;
         
         /// <summary>
         /// btnSave control.

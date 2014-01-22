@@ -34,7 +34,7 @@
     <table width="100%">
         <tr>
             <td style="width: 100px">
-                <asp:Label runat="server" ID="lblFragmentName" Text="Name: "></asp:Label>
+                <asp:Label runat="server" ID="lblFragmentName" Text="Title: "></asp:Label>
             </td>
             <td style="width: 200px">
                 <asp:TextBox runat="server" ID="txtFragmentName" Text="" TabIndex="0" Width="200px" MaxLength="30"></asp:TextBox>
@@ -51,24 +51,13 @@
         </tr>
         <tr>
             <td>
-                <asp:Label runat="server" ID="lblTag" Text="Tag: "></asp:Label>
+                <asp:Label runat="server" ID="lblScope" Text="Private: "></asp:Label>
             </td>
             <td>
-                <asp:TextBox runat="server" ID="txtTag" Text="" Width="200px" MaxLength="30"></asp:TextBox>
+                <asp:CheckBox ID="chkPrivate" runat="server" Checked="true" />
             </td>
         </tr>
-        <tr>
-            <td>
-                <asp:Label runat="server" ID="lblScope" Text="Scope: "></asp:Label>
-            </td>
-            <td>
-                <asp:RadioButtonList ID="rdoScope" runat="server" Width="200px" TextAlign="Left" RepeatColumns="2">
-                    <asp:ListItem Text="Private" Selected="True" Value="true"></asp:ListItem>
-                    <asp:ListItem Text="Public" Selected="False" Value="false" Enabled="false"></asp:ListItem>
-                </asp:RadioButtonList>
-            </td>
-        </tr>
-        <tr>
+        <tr align="right">
             <td></td>
             <td>
                 <asp:Button ID="btnSave" runat="server" Text="Save" OnClick="btnSave_Click" />

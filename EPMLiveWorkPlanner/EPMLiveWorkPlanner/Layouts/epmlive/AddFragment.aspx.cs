@@ -12,37 +12,20 @@ namespace EPMLiveCore.Layouts.epmlive
 {
     public partial class AddFragment : LayoutsPageBase
     {
+        #region Events
+
+        protected override void OnPreRender(EventArgs e)
+        {
+            base.OnPreRender(e);
+            ScriptLink.Register(Page, "/epmlive/javascripts/libraries/jquery.min.js", false);
+        }
+
         protected void Page_Load(object sender, EventArgs e)
         {
-            try
+            if (!Page.IsPostBack)
             {
-                if (!Page.IsPostBack)
-                {
-                    SPList plannerFragmentList = SPContext.Current.Web.Lists.TryGetList("PlannerFragments");
-                    SPQuery qryFilterPlanner = new SPQuery();
-                    string qryFilter = string.Empty;
-
-                    if (plannerFragmentList != null)
-                    {
-                        if (SPContext.Current.Web.CurrentUser.IsSiteAdmin)
-                            qryFilter = "<ViewFields><FieldRef Name='ID' /><FieldRef Name='Title' /><FieldRef Name='FragmentType' /><FieldRef Name='Author' /></ViewFields><OrderBy><FieldRef Name='Title' /></OrderBy><Where><Eq><FieldRef Name='PlannerID' /><Value Type='Text'>" + Convert.ToString(Request["PlannerID"]) + "</Value></Eq></Where>";
-                        else
-                            qryFilter = "<ViewFields><FieldRef Name='ID' /><FieldRef Name='Title' /><FieldRef Name='Author' /><FieldRef Name='FragmentType' /></ViewFields><Where><And><Or><And><Eq><FieldRef Name='FragmentType' /><Value Type='Choice'>Public</Value></Eq><Eq><FieldRef Name='FragmentType' /><Value Type='Choice'>Public</Value></Eq></And><Eq><FieldRef Name='Author' /><Value Type='User'>" + SPContext.Current.Web.CurrentUser.Name + "</Value></Eq></Or><Eq><FieldRef Name='PlannerID' /><Value Type='Text'>" + Convert.ToString(Request["PlannerID"]) + "</Value></Eq></And></Where>";
-
-                        qryFilterPlanner.Query = qryFilter;
-
-                        SPListItemCollection fragmentItems = plannerFragmentList.GetItems(qryFilterPlanner);
-                        if (fragmentItems != null && fragmentItems.Count > 0)
-                        {
-                            foreach (SPListItem fragment in fragmentItems)
-                                ddlFragments.Items.Add(new ListItem(Convert.ToString(fragment["Title"]), Convert.ToString(fragment["ID"])));
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                throw ex;
+                FillMyFragmentsGrid();
+                FillPublicFragmentsGrid();
             }
         }
 
@@ -50,21 +33,118 @@ namespace EPMLiveCore.Layouts.epmlive
         {
             try
             {
+                string fragmentName = string.Empty;
+                SPList plannerFragmentList = SPContext.Current.Web.Lists.TryGetList("PlannerFragments");
+                if (plannerFragmentList != null)
+                {
+                    //Processing MyFragments for Importing fragment
+                    foreach (GridViewRow gvrow in gridMyFragments.Rows)
+                    {
+                        RadioButton rdoSelect = (RadioButton)gvrow.Cells[0].FindControl("rdoSelect");
+
+                        if (rdoSelect != null && rdoSelect.Checked)
+                        {
+                            Label lblID = (Label)gvrow.FindControl("lblID");
+                            if (lblID != null)
+                            {
+                                fragmentName = gvrow.Cells[2].Text;
+                                ImportFragmentAndAddResourceToTeam(Convert.ToInt32(lblID.Text));
+                                break;
+                            }
+                        }
+                    }
+
+                    //Processing Public Fragments for Importing fragment
+                    foreach (GridViewRow gvrow in gridPublicFragments.Rows)
+                    {
+                        RadioButton rdoSelect = (RadioButton)gvrow.Cells[0].FindControl("rdoSelect");
+
+                        if (rdoSelect != null && rdoSelect.Checked)
+                        {
+                            Label lblID = (Label)gvrow.FindControl("lblID");
+                            if (lblID != null)
+                            {
+                                fragmentName = gvrow.Cells[2].Text;
+                                ImportFragmentAndAddResourceToTeam(Convert.ToInt32(lblID.Text));
+                                break;
+                            }
+                        }
+                    }
+                }
+                
+                if (!string.IsNullOrEmpty(fragmentName))
+                    Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "closeAddFragmentPopup", "<script language='javascript' type='text/javascript'>closeAddFragmentPopup('Fragment '" + fragmentName + "' imported successfully!');</script>");
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        #endregion
+
+        #region Methods
+
+        private void FillMyFragmentsGrid()
+        {
+            SPList plannerFragmentList = SPContext.Current.Web.Lists.TryGetList("PlannerFragments");
+            SPQuery qryFilterPlanner = new SPQuery();
+
+            string qryFilter = "<ViewFields><FieldRef Name='ID' /><FieldRef Name='Title' /><FieldRef Name='FragmentType' /><FieldRef Name='Author' /></ViewFields><OrderBy><FieldRef Name='Title' /><FieldRef Name='Author' /></OrderBy><Where><And><And><Eq><FieldRef Name='Author' /><Value Type='User'>" + SPContext.Current.Web.CurrentUser.Name + "</Value></Eq><Eq><FieldRef Name='PlannerID' /><Value Type='Text'>" + Convert.ToString(Request["PlannerID"]) + "</Value></Eq></And><Eq><FieldRef Name='FragmentType' /><Value Type='Choice'>Private</Value></Eq></And></Where>";
+
+            if (plannerFragmentList != null)
+            {
+                qryFilterPlanner.Query = qryFilter;
+
+                SPListItemCollection fragmentItems = plannerFragmentList.GetItems(qryFilterPlanner);
+                if (fragmentItems != null && fragmentItems.Count > 0)
+                {
+                    gridMyFragments.DataSource = fragmentItems.GetDataTable();
+                    gridMyFragments.DataBind();
+                }
+            }
+        }
+
+        private void FillPublicFragmentsGrid()
+        {
+            SPList plannerFragmentList = SPContext.Current.Web.Lists.TryGetList("PlannerFragments");
+            SPQuery qryFilterPlanner = new SPQuery();
+            string qryFilter = "<ViewFields><FieldRef Name='ID' /><FieldRef Name='Title' /><FieldRef Name='FragmentType' /><FieldRef Name='Author' /></ViewFields><OrderBy><FieldRef Name='Title' /><FieldRef Name='Author' /></OrderBy><Where><And><Eq><FieldRef Name='FragmentType' /><Value Type='Choice'>Public</Value></Eq><Eq><FieldRef Name='PlannerID' /><Value Type='Text'>" + Convert.ToString(Request["PlannerID"]) + "</Value></Eq></And></Where>";
+
+            if (plannerFragmentList != null)
+            {
+                qryFilterPlanner.Query = qryFilter;
+
+                SPListItemCollection fragmentItems = plannerFragmentList.GetItems(qryFilterPlanner);
+                if (fragmentItems != null && fragmentItems.Count > 0)
+                {
+                    gridPublicFragments.DataSource = fragmentItems.GetDataTable(); ;
+                    gridPublicFragments.DataBind();
+                }
+            }
+        }
+
+        private void ImportFragmentAndAddResourceToTeam(int itemId)
+        {
+            string fragmentName = string.Empty;
+            try
+            {
                 XmlDocument currentPlanXmlDoc = new XmlDocument();
                 XmlDocument fragmentXmlDoc = new XmlDocument();
                 XmlNode insertAfterNode = null;
                 List<string> teamToAdd = new List<string>();
-                Int32 planRowSelectedID = string.IsNullOrEmpty(hdnSelectedRowID.Value) ? 0 : Convert.ToInt32(hdnSelectedRowID.Value);
+                string planRowSelectedID = string.IsNullOrEmpty(hdnSelectedRowID.Value) ? "0" : Convert.ToString(hdnSelectedRowID.Value);
 
                 SPList plannerFragmentList = SPContext.Current.Web.Lists.TryGetList("PlannerFragments");
                 if (plannerFragmentList != null)
                 {
-                    if (!string.IsNullOrEmpty(hdnPlanXml.Value) && !string.IsNullOrEmpty(ddlFragments.SelectedValue))
+                    if (!string.IsNullOrEmpty(hdnPlanXml.Value) && itemId > 0)
                     {
                         currentPlanXmlDoc.LoadXml(hdnPlanXml.Value);
                         insertAfterNode = currentPlanXmlDoc.SelectSingleNode(string.Format("//I[@id='{0}']", planRowSelectedID));
 
-                        SPListItem fragment = plannerFragmentList.GetItemById(Convert.ToInt32(ddlFragments.SelectedValue));
+                        SPListItem fragment = plannerFragmentList.GetItemById(itemId);
+                        fragmentName = fragment.Title;
                         fragmentXmlDoc.LoadXml(Convert.ToString(fragment["FragmentXML"]));
 
                         Int32 rowId = Convert.ToInt32(hdnNewRowID.Value);
@@ -94,17 +174,18 @@ namespace EPMLiveCore.Layouts.epmlive
                         }
                     }
                 }
-                Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "closeAddFragmentPopup", "<script language='javascript' type='text/javascript'>closeAddFragmentPopup('Fragment " + ddlFragments.SelectedItem.Text + " added successfully!');</script>");
             }
             catch (Exception ex)
             {
                 throw ex;
             }
+            Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "closeAddFragmentPopup", "<script language='javascript' type='text/javascript'>closeAddFragmentPopup('Fragment " + fragmentName + " imported successfully!');</script>");
         }
 
         private void UpdateNodes(XmlNode xmlNode, ref List<string> teamToAdd, ref Int32 rowId)
         {
-            xmlNode.Attributes["id"].Value = rowId.ToString();
+            xmlNode.Attributes["id"].Value = "x" + rowId.ToString();
+            //xmlNode.Attributes["id"].Value = rowId.ToString();
             string resourceNames = xmlNode.Attributes["ResourceNames"].Value;
             if (!string.IsNullOrEmpty(resourceNames))
             {
@@ -181,5 +262,7 @@ namespace EPMLiveCore.Layouts.epmlive
                 }
             }
         }
+
+        #endregion
     }
 }

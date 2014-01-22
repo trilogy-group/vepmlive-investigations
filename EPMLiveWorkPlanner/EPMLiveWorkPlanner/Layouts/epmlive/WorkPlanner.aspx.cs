@@ -1441,7 +1441,6 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
 
                                 plannerFragmentList.Fields.Add("Description", SPFieldType.Note, false);
                                 plannerFragmentList.Fields.Add("FragmentType", SPFieldType.Choice, false);
-                                plannerFragmentList.Fields.Add("Tag", SPFieldType.Text, false);
                                 plannerFragmentList.Fields.Add("FragmentXML", SPFieldType.Note, true);
                                 plannerFragmentList.Fields.Add("PlannerID", SPFieldType.Text, false);
                                 plannerFragmentList.Update();
@@ -1457,7 +1456,6 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                                 SPView view = plannerFragmentList.DefaultView;
                                 view.ViewFields.Add("Description");
                                 view.ViewFields.Add("FragmentType");
-                                view.ViewFields.Add("Tag");
                                 view.ViewFields.Add("PlannerID");
                                 view.ViewFields.Add("Author");
                                 view.Update();
@@ -1572,7 +1570,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
 
             //Fragment Section
 
-            //Add Fragment option is enabled for all users.
+            //Insert Fragment option is enabled for all users.
             commands.Add(new SPRibbonCommand("Ribbon.WorkPlanner.AddFragmentButton", "AddFragment();", "true"));
 
             //SPBasePermissions.ManageWeb – This is for saving public views

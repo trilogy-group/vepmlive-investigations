@@ -13,22 +13,40 @@ namespace EPMLiveCore.Layouts.epmlive {
     public partial class AddFragment {
         
         /// <summary>
-        /// lblFragmentName control.
+        /// lblSearch control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Label lblFragmentName;
+        protected global::System.Web.UI.WebControls.Label lblSearch;
         
         /// <summary>
-        /// ddlFragments control.
+        /// Text1 control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.DropDownList ddlFragments;
+        protected global::System.Web.UI.HtmlControls.HtmlInputText Text1;
+        
+        /// <summary>
+        /// gridMyFragments control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.GridView gridMyFragments;
+        
+        /// <summary>
+        /// gridPublicFragments control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.GridView gridPublicFragments;
         
         /// <summary>
         /// btnImport control.

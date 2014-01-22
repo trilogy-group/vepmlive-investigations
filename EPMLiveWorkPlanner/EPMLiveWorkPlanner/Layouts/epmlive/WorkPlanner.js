@@ -3260,12 +3260,12 @@ function BuildTeam() {
 }
 
 function AddFragment() {
-    var options = { url: "addfragment.aspx?PlannerID=" + sPlannerID + '&listid=' + sProjectListId + "&id=" + sItemID, width: 360, height: 100, title: "Add Fragment", showMaximized: false, dialogReturnValueCallback: RefreshTeam };
+    var options = { url: "addfragment.aspx?PlannerID=" + sPlannerID + '&listid=' + sProjectListId + "&id=" + sItemID, width: 450, height: 450, title: "Insert Fragment", showMaximized: false, dialogReturnValueCallback: onDoUpdates };
     SP.UI.ModalDialog.showModalDialog(options);
 }
 
 function SaveFragment() {
-    var options = { url: "savefragment.aspx?PlannerID=" + sPlannerID, width: 325, height: 250, title: "Save Fragment", showMaximized: false, dialogReturnValueCallback: RefreshTeam };
+    var options = { url: "savefragment.aspx?PlannerID=" + sPlannerID, width: 325, height: 195, title: "Save Fragment", showMaximized: false, dialogReturnValueCallback: RefreshTeam };
     SP.UI.ModalDialog.showModalDialog(options);
 }
 
@@ -3329,7 +3329,6 @@ function RefreshResourceObject() {
     //var bRowAdded = false;
     //var bAddedRows = new Array();
     var grid = Grids.WorkPlannerGrid;
-
     for (var oR in oResourceList) {
         enumkeys += "|" + oR.toString().substr(1);
         enums += "|" + oResourceList[oR].Title;

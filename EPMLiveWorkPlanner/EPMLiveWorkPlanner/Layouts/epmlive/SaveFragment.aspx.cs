@@ -27,8 +27,7 @@ namespace EPMLiveCore.Layouts.epmlive
 
                            plannerFragmentItem["Title"] = txtFragmentName.Text;
                            plannerFragmentItem["Description"] = txtDescription.Text;
-                           plannerFragmentItem["Tag"] = txtTag.Text;
-                           plannerFragmentItem["FragmentType"] = rdoScope.SelectedItem.Text;
+                           plannerFragmentItem["FragmentType"] = (chkPrivate.Checked) ? "Private" : "Public";
                            plannerFragmentItem["FragmentXML"] = hdnTaskFragmentXml.Value;
                            plannerFragmentItem["PlannerID"] = Convert.ToString(Request["PlannerID"]);
 
@@ -43,11 +42,11 @@ namespace EPMLiveCore.Layouts.epmlive
         {
             try
             {
-                bool doesUserHasManageWebPermission = false;                
-                SPList plannerFragmentsList = SPContext.Current.Web.Lists.TryGetList("PlannerFragments");;
+                bool doesUserHasManageWebPermission = false;
+                SPList plannerFragmentsList = SPContext.Current.Web.Lists.TryGetList("PlannerFragments"); ;
                 if (plannerFragmentsList != null)
                     doesUserHasManageWebPermission = plannerFragmentsList.DoesUserHavePermissions(SPContext.Current.Web.CurrentUser, SPBasePermissions.ManageWeb);
-                rdoScope.Items[1].Enabled = doesUserHasManageWebPermission;
+                chkPrivate.Enabled = doesUserHasManageWebPermission;
             }
             catch (Exception ex)
             {
