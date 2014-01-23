@@ -9,12 +9,11 @@
 <%@ Page Language="C#" AutoEventWireup="true" CodeBehind="AddFragment.aspx.cs" Inherits="EPMLiveCore.Layouts.epmlive.AddFragment" DynamicMasterPageFile="~masterurl/default.master" %>
 
 <asp:Content ID="PageHead" ContentPlaceHolderID="PlaceHolderAdditionalPageHead" runat="server">
+
     <link rel="stylesheet" type="text/css" href="/_layouts/epmlive/ManageFragments.css" />
     <script type="text/javascript" src="/_layouts/epmlive/javascripts/ManageFragmentsExpand.js"></script>
-    <script type="text/javascript" src="/_layouts/epmlive/workplanner.js"></script>
-
+    <script type="text/javascript" src="/_layouts/epmlive/WorkPlanner.js"></script>
     <script type="text/javascript">
-
         $(function () {
             $("#fragment h3.expand").toggler();
             $("#fragment").expandAll({
@@ -61,15 +60,8 @@
 
             hdnNewRowID.value = window.parent.Grids.WorkPlannerGrid.GenerateId();
             hdnPlanXml.value = window.parent.Grids.WorkPlannerGrid.GetXmlData();
+            
         });
-
-        function closeAddFragmentPopup(message) {
-            if (message != null) {
-                alert(message);
-                window.parent.Grids.WorkPlannerGrid.ReloadBody();
-            }
-            window.frameElement.commonModalDialogClose(1, 1);
-        }
 
         function validateRadioButtonSelection() {
             var isValid = false;
@@ -121,6 +113,20 @@
                     }
                 }
             }
+        }
+        
+        function closeAddFragmentPopup(message) {
+            if (message != null) {
+                window.parent.Grids.WorkPlannerGrid.ReloadBody(HideProjectFolder);
+                HideProjectFolder();
+                alert(message);
+            }
+            window.frameElement.commonModalDialogClose(1, 1);
+        }
+
+        function HideProjectFolder()
+        {
+            window.parent.Grids.WorkPlannerGrid.SetAttribute(window.parent.Grids.WorkPlannerGrid.GetRowById("0"), "Title", "HtmlPrefix", "", 1, 0);
         }
 
     </script>
