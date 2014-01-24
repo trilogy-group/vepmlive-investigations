@@ -6,6 +6,7 @@ namespace UplandIntegrations.Desk
         Companies,
         Customers,
         Cases,
+        Users,
         Integration_URLs
     }
 }

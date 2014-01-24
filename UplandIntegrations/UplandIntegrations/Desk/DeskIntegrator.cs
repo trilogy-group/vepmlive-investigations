@@ -88,6 +88,7 @@ namespace UplandIntegrations.Desk
                 props.Add(DeskType.Companies.ToString(), DeskType.Companies.ToString());
                 props.Add(DeskType.Customers.ToString(), DeskType.Customers.ToString());
                 props.Add(DeskType.Cases.ToString(), DeskType.Cases.ToString());
+                props.Add(DeskType.Users.ToString(), DeskType.Users.ToString());
             }
             return props;
         }
@@ -122,7 +123,7 @@ namespace UplandIntegrations.Desk
                     string spId = item["SPID"].ToString();
                     try
                     {
-                        deskService.DeleteObjectItem((string)WebProps.Properties["Object"], curId);
+                        deskService.DeleteObjectItem((string)WebProps.Properties["Object"], Convert.ToInt64(curId));
                         transactionTable.AddRow(spId, curId, TransactionType.DELETE);
                     }
                     catch (Exception ex)
@@ -163,7 +164,7 @@ namespace UplandIntegrations.Desk
                             }
                             else
                             {
-                                deskService.UpdateObjectItem((string)WebProps.Properties["Object"], item, curId, Items.Columns);
+                                deskService.UpdateObjectItem((string)WebProps.Properties["Object"], item, Convert.ToInt64(curId), Items.Columns);
                                 transactionTable.AddRow(spId, curId, TransactionType.UPDATE);
                             }
                         }
@@ -246,18 +247,24 @@ namespace UplandIntegrations.Desk
             if (!GlobalButtons)
             {
                 CheckWebProps(WebProps, true);
-                return new List<IntegrationControl>
+                DeskType deskType = (DeskType)Enum.Parse(typeof(DeskType), Convert.ToString(WebProps.Properties["Object"]));
+                switch (deskType)
+                {
+                    case DeskType.Cases:
+                        return new List<IntegrationControl>
                         {
                             new IntegrationControl
                             {
-                                Control = string.Format("SN_View{0}",WebProps.Properties["Object"].ToString().Replace(" ", "_").ToLower()) ,
-                                Title = string.Format("View {0}",WebProps.Properties["Object"].ToString()),
-                                Image =string.Format("sn_viewitem.png"),
+                                Control = "DK_ViewCase",
+                                Title = "View Case",
+                                Image = "dk_viewcase.png",
                                 Window = IntegrationControlWindowStyle.FullWindow
                             }
                     
                         };
-
+                    default:
+                        break;
+                }
             }
             return new List<IntegrationControl>();
         }
@@ -273,7 +280,7 @@ namespace UplandIntegrations.Desk
                     GetItem(webProps, log, itemId, itemDataTable);
                     if (itemDataTable != null & itemDataTable.Rows.Count > 0)
                     {
-                        return string.Format("{0}/{1}sys_id={2}", webProps.Properties["ServerUrl"].ToString(), deskService.GetViewUrlResourceByDeskType(control.Replace("SN_View", "").Replace("_", " ")), itemDataTable.Rows[0]["sys_id"]);
+                        return string.Format("{0}/{1}/{2}", webProps.Properties["ServerUrl"].ToString(), deskService.GetViewUrlResourceByDeskType(Convert.ToString(webProps.Properties["Object"])), itemDataTable.Rows[0]["id"]);
                     }
                 }
             }
