@@ -170,11 +170,11 @@ namespace EPMLiveCore.Properties {
         /// <summary>
         ///   Looks up a localized string similar to if not exists (select emailid from EMAILTEMPLATES where emailid = 2)
         ///begin
-        ///    INSERT INTO EMAILTEMPLATES (emailid,title,subject,body) VALUES (2,&apos;Build Team Grant&apos;,&apos;You have been granted access to a WorkEngine site&apos;,&apos;&lt;html&gt;
+        ///    INSERT INTO EMAILTEMPLATES (emailid,title,subject,body) VALUES (2,&apos;Build Team Grant&apos;,&apos;You have been granted access to an EPM Live site&apos;,&apos;&lt;html&gt;
         ///&lt;body&gt;
         ///&lt;table width=&quot;100%&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot;&gt;
         ///&lt;tr&gt;
-        ///&lt;td style=&quot;font-size:20px;color:#666666;font-family:Lucida Grande,Arial Unicode MS,sans-serif&quot;&gt;{CurUser_Name} has granted you access to the &lt;u&gt;&lt;a href=&quot;{SiteUrl}&quot; style=&quot;font-size:20px;color:#3366CC;&quot;&gt;{SiteName}&lt;/a&gt;&lt;/ [rest of string was truncated]&quot;;.
+        ///&lt;td style=&quot;font-size:20px;color:#666666;font-family:Lucida Grande,Arial Unicode MS,sans-serif&quot;&gt;{CurUser_Name} has granted you access to the &lt;u&gt;&lt;a href=&quot;{SiteUrl}&quot; style=&quot;font-size:20px;color:#3366CC;&quot;&gt;{SiteName}&lt;/a&gt;&lt;/u [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string _9Data01 {
             get {
