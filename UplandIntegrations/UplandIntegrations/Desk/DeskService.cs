@@ -927,6 +927,12 @@ namespace UplandIntegrations.Desk
                                             href = href.Substring(lIndxOf + 1, href.Length - lIndxOf - 1);
                                             dataRow[(string.Format("{0}|{1}|{2}", property.Name, subProperty.Name, "id"))] = href;
                                         }
+
+                                        //Company/User dosenot return id so add it from _links|self|id
+                                        if (subProperty.Name.Equals("self") && items.Columns.Contains("id"))
+                                        {
+                                            dataRow["id"] = href;
+                                        }
                                     }
                                 }
                             }
@@ -1046,6 +1052,12 @@ namespace UplandIntegrations.Desk
                                     if (!items.Columns.Contains(string.Format("{0}|{1}|{2}", property.Name, subProperty.Name, "id")))
                                     {
                                         items.Columns.Add(string.Format("{0}|{1}|{2}", property.Name, subProperty.Name, "id"));
+                                    }
+
+                                    //Company/User dosenot return id so add it from _links|self|id
+                                    if (subProperty.Name.Equals("self") && !items.Columns.Contains("id"))
+                                    {
+                                        items.Columns.Add("id");
                                     }
                                 }
                             }
