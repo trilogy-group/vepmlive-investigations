@@ -13,8 +13,22 @@
     <link rel="stylesheet" type="text/css" href="/_layouts/epmlive/ManageFragments.css" />
     <script type="text/javascript" src="/_layouts/epmlive/javascripts/ManageFragmentsExpand.js"></script>
     <script type="text/javascript" src="/_layouts/epmlive/WorkPlanner.js"></script>
+    <script type="text/javascript" src="modal/modal.js"></script>
+
     <script type="text/javascript">
         $(function () {
+
+            var hdnSelectedRowID = document.getElementById('<%=hdnSelectedRowID.ClientID%>');
+            var hdnNewRowID = document.getElementById('<%=hdnNewRowID.ClientID%>');
+            var hdnPlanXml = document.getElementById('<%=hdnPlanXml.ClientID%>');
+
+            if (window.parent.Grids.WorkPlannerGrid.FRow != null) {
+                hdnSelectedRowID.value = window.parent.Grids.WorkPlannerGrid.FRow.id;
+            }
+
+            hdnNewRowID.value = window.parent.Grids.WorkPlannerGrid.GenerateId();
+            hdnPlanXml.value = window.parent.Grids.WorkPlannerGrid.GetXmlData();
+
             $("#fragment h3.expand").toggler();
             $("#fragment").expandAll({
                 trigger: "h3.expand",
@@ -47,21 +61,6 @@
                 }
             });
         }
-
-        $(function () {
-
-            var hdnSelectedRowID = document.getElementById('<%=hdnSelectedRowID.ClientID%>');
-            var hdnNewRowID = document.getElementById('<%=hdnNewRowID.ClientID%>');
-            var hdnPlanXml = document.getElementById('<%=hdnPlanXml.ClientID%>');
-
-            if (window.parent.Grids.WorkPlannerGrid.FRow != null) {
-                hdnSelectedRowID.value = window.parent.Grids.WorkPlannerGrid.FRow.id;
-            }
-
-            hdnNewRowID.value = window.parent.Grids.WorkPlannerGrid.GenerateId();
-            hdnPlanXml.value = window.parent.Grids.WorkPlannerGrid.GetXmlData();
-            
-        });
 
         function validateRadioButtonSelection() {
             var isValid = false;
@@ -114,18 +113,22 @@
                 }
             }
         }
-        
+
         function closeAddFragmentPopup(message) {
             if (message != null) {
-                window.parent.Grids.WorkPlannerGrid.ReloadBody(HideProjectFolder);
-                HideProjectFolder();
-                alert(message);
+                if (!message.startsWith('Error')) {
+                    window.parent.Grids.WorkPlannerGrid.ReloadBody(HideProjectFolder);
+                    HideProjectFolder();
+                    alert(message);
+                }
+                else {
+                    alert(message);
+                }
             }
             window.frameElement.commonModalDialogClose(1, 1);
         }
 
-        function HideProjectFolder()
-        {
+        function HideProjectFolder() {
             window.parent.Grids.WorkPlannerGrid.SetAttribute(window.parent.Grids.WorkPlannerGrid.GetRowById("0"), "Title", "HtmlPrefix", "", 1, 0);
         }
 
@@ -184,9 +187,9 @@
                                     <asp:Label ID="lblID" runat="server" Text='<%# Eval("ID") %>' />
                                 </ItemTemplate>
                             </asp:TemplateField>
-                            <asp:BoundField HeaderText="Title" DataField="Title" ItemStyle-HorizontalAlign="Left" ItemStyle-Width="50%" />
-                            <asp:BoundField HeaderText="Scope" DataField="FragmentType" Visible="false" ItemStyle-Width="40%" />
-                            <asp:BoundField HeaderText="Created By" DataField="Author" ItemStyle-Width="0%" />
+                            <asp:BoundField HeaderText="Title" DataField="Title" ItemStyle-HorizontalAlign="Left" ItemStyle-Width="90%" />
+                            <asp:BoundField HeaderText="Scope" DataField="FragmentType" Visible="false" ItemStyle-Width="0%" />
+                            <asp:BoundField HeaderText="Created By" DataField="Author" Visible="false" ItemStyle-Width="0%" />
                         </Columns>
                         <HeaderStyle BackColor="#0090CA" Font-Bold="true" ForeColor="White" />
                     </asp:GridView>
@@ -198,7 +201,7 @@
     <br />
     <div class="Buttons">
         <asp:Button ID="btnImport" runat="server" Text="Import" OnClick="btnImport_Click" OnClientClick="javascript: return validateRadioButtonSelection();" />
-        <asp:Button ID="btnClose" runat="server" Text="Cancel" OnClientClick="javascript:return closeAddFragmentPopup();" />
+        <asp:Button ID="btnClose" runat="server" Text="Close" OnClientClick="javascript:return closeAddFragmentPopup();" />
     </div>
 
     <asp:HiddenField ID="hdnSelectedRowID" runat="server" />

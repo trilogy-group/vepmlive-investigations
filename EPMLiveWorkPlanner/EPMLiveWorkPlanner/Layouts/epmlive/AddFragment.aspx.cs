@@ -33,6 +33,7 @@ namespace EPMLiveCore.Layouts.epmlive
         {
             try
             {
+                int itemId = 0;
                 string fragmentName = string.Empty;
                 SPList plannerFragmentList = SPContext.Current.Web.Lists.TryGetList("PlannerFragments");
                 if (plannerFragmentList != null)
@@ -48,31 +49,39 @@ namespace EPMLiveCore.Layouts.epmlive
                             if (lblID != null)
                             {
                                 fragmentName = gvrow.Cells[2].Text;
-                                ImportFragmentAndAddResourceToTeam(Convert.ToInt32(lblID.Text));
+                                itemId = Convert.ToInt32(lblID.Text);
                                 break;
                             }
                         }
                     }
 
-                    //Processing Public Fragments for Importing fragment
-                    foreach (GridViewRow gvrow in gridPublicFragments.Rows)
+                    if (itemId > 0)
                     {
-                        RadioButton rdoSelect = (RadioButton)gvrow.Cells[0].FindControl("rdoSelect");
-
-                        if (rdoSelect != null && rdoSelect.Checked)
+                        ImportFragmentAndAddResourceToTeam(itemId);
+                    }
+                    else
+                    {
+                        //Processing Public Fragments for Importing fragment
+                        foreach (GridViewRow gvrow in gridPublicFragments.Rows)
                         {
-                            Label lblID = (Label)gvrow.FindControl("lblID");
-                            if (lblID != null)
+                            RadioButton rdoSelect = (RadioButton)gvrow.Cells[0].FindControl("rdoSelect");
+
+                            if (rdoSelect != null && rdoSelect.Checked)
                             {
-                                fragmentName = gvrow.Cells[2].Text;
-                                ImportFragmentAndAddResourceToTeam(Convert.ToInt32(lblID.Text));
-                                break;
+                                Label lblID = (Label)gvrow.FindControl("lblID");
+                                if (lblID != null)
+                                {
+                                    fragmentName = gvrow.Cells[2].Text;
+                                    itemId = Convert.ToInt32(lblID.Text);
+                                    ImportFragmentAndAddResourceToTeam(itemId);
+                                    break;
+                                }
                             }
                         }
                     }
                 }
-                
-                if (!string.IsNullOrEmpty(fragmentName))
+
+                if (!string.IsNullOrEmpty(fragmentName) && itemId > 0)
                     Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "closeAddFragmentPopup", "<script language='javascript' type='text/javascript'>closeAddFragmentPopup('Fragment '" + fragmentName + "' imported successfully!');</script>");
             }
             catch (Exception ex)
@@ -170,22 +179,23 @@ namespace EPMLiveCore.Layouts.epmlive
 
                             folder.Files.Add(Request["ID"] + ".xml", Encoding.GetEncoding("iso-8859-1").GetBytes(currentPlanXmlDoc.OuterXml), true);
 
-                            AddResourceToTeam(teamToAdd);
+                            if (teamToAdd != null && teamToAdd.Count > 0)
+                                AddResourceToTeam(teamToAdd);
                         }
                     }
                 }
             }
             catch (Exception ex)
             {
-                throw ex;
+                Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "closeAddFragmentPopup", "<script language='javascript' type='text/javascript'>closeAddFragmentPopup('Error: " + ex.Message + "');</script>");
+                return;
             }
             Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "closeAddFragmentPopup", "<script language='javascript' type='text/javascript'>closeAddFragmentPopup('Fragment " + fragmentName + " imported successfully!');</script>");
         }
 
         private void UpdateNodes(XmlNode xmlNode, ref List<string> teamToAdd, ref Int32 rowId)
         {
-            xmlNode.Attributes["id"].Value = "x" + rowId.ToString();
-            //xmlNode.Attributes["id"].Value = rowId.ToString();
+            xmlNode.Attributes["id"].Value = rowId.ToString();
             string resourceNames = xmlNode.Attributes["ResourceNames"].Value;
             if (!string.IsNullOrEmpty(resourceNames))
             {
