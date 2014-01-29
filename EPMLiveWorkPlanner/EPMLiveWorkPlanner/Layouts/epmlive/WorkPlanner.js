@@ -3265,12 +3265,12 @@ function AddFragment() {
 }
 
 function SaveFragment() {
-    var options = { url: "savefragment.aspx?PlannerID=" + sPlannerID, width: 325, height: 195, title: "Save Fragment", showMaximized: false, dialogReturnValueCallback: RefreshTeam };
+    var options = { url: "savefragment.aspx?PlannerID=" + sPlannerID, width: 325, height: 195, title: "Save Fragment", showMaximized: false };
     SP.UI.ModalDialog.showModalDialog(options);
 }
 
 function ManageFragment() {
-    var options = { url: "managefragment.aspx?PlannerID=" + sPlannerID, width: 450, height: 450, title: "Manage Fragment", showMaximized: false, dialogReturnValueCallback: RefreshTeam };
+    var options = { url: "managefragment.aspx?PlannerID=" + sPlannerID, width: 450, height: 450, title: "Manage Fragment", showMaximized: false};
     SP.UI.ModalDialog.showModalDialog(options);
 }
 
