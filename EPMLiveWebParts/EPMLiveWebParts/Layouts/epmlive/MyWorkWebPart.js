@@ -14,7 +14,7 @@ function confirmPageLeave(e) {
                 e.stopPropagation();
                 e.preventDefault();
             }
-        } catch(e) {
+        } catch (e) {
         }
     }
 }
@@ -28,15 +28,15 @@ function configureTitleCol(grid) {
     }
 }
 
-Grids.OnDblClick = function(grid, row, col, x, y, event) {
-    if (grid.id === window.allWorkGridId) {
-        if (!row['EditMode']) {
-            editSaveRow(grid.id, row.id);
-        }
-    }
-};
+//Grids.OnDblClick = function(grid, row, col, x, y, event) {
+//    if (grid.id === window.allWorkGridId) {
+//        if (!row['EditMode']) {
+//            editSaveRow(grid.id, row.id);
+//        }
+//    }
+//};
 
-Grids.OnGetSortValue = function(grid, row, col, val) {
+Grids.OnGetSortValue = function (grid, row, col, val) {
     if (grid.id === window.allWorkGridId) {
         if (col === 'DueDay') {
             return DateToString(row['DueDate'], 'yyyyMMdd');
@@ -87,13 +87,13 @@ Grids.OnReady = function (grid, start) {
     }
 };
 
-Grids.OnRenderFinish = function(grid) {
+Grids.OnRenderFinish = function (grid) {
     if (grid.id === window.allWorkGridId) {
         MyWorkGrid.resetNoDataRow();
     }
 };
 
-Grids.OnFocus = function(grid, row, col, orow, ocol, pagepos) {
+Grids.OnFocus = function (grid, row, col, orow, ocol, pagepos) {
     if (grid.id === window.allWorkGridId) {
         window.RefreshCommandUI();
     }
@@ -121,35 +121,35 @@ Grids.OnClick = function (grid, row, col, x, y, event) {
             }
         }
 
-        var rowBeingEdited = MyWorkGrid.rowBeingEdited;
-        if (rowBeingEdited) {
-            if (row.id !== rowBeingEdited.id) {
-                grid.EndEdit(true);
+        //var rowBeingEdited = MyWorkGrid.rowBeingEdited;
+        //if (rowBeingEdited) {
+        //    if (row.id !== rowBeingEdited.id) {
+        //        grid.EndEdit(true);
 
-                if (grid.HasChanges()) {
-                    saveRow(grid.id, rowBeingEdited.id);
-                } else {
-                    cancelRowEdit(grid.id, rowBeingEdited.id);
-                }
+        //        if (grid.HasChanges()) {
+        //            saveRow(grid.id, rowBeingEdited.id);
+        //        } else {
+        //            cancelRowEdit(grid.id, rowBeingEdited.id);
+        //        }
 
-                MyWorkGrid.rowBeingEdited = null;
-                grid.TotalRowsInEditMode = 0;
-            }
-        }
+        //        MyWorkGrid.rowBeingEdited = null;
+        //        grid.TotalRowsInEditMode = 0;
+        //    }
+        //}
 
-        if (!row['EditMode']) {
-            var cell = row.id + col;
+        //if (!row['EditMode']) {
+        //    var cell = row.id + col;
 
-            if (MyWorkGrid.lastClickedCell === cell) {
-                editSaveRow(grid.id, row.id);
+        //    if (MyWorkGrid.lastClickedCell === cell) {
+        //        editSaveRow(grid.id, row.id);
 
-                if (grid.Cols[col].Type === 'Lines') {
-                    showRichTextBox(grid.id, row.id, col);
-                }
-            }
+        //        if (grid.Cols[col].Type === 'Lines') {
+        //            showRichTextBox(grid.id, row.id, col);
+        //        }
+        //    }
 
-            MyWorkGrid.lastClickedCell = cell;
-        }
+        //    MyWorkGrid.lastClickedCell = cell;
+        //}
 
         if (row.Def.Name === 'Group' && col === 'Title') {
             if (row.Expanded === 1) {
@@ -311,7 +311,7 @@ Grids.OnLoaded = function (grid) {
 
         $('html').click(function () {
             var g = window.Grids[MyWorkGrid.gridId];
-            
+
             var row = MyWorkGrid.rowBeingEdited;
             if (row) {
                 g.EndEdit(true);
@@ -336,7 +336,7 @@ Grids.OnLoaded = function (grid) {
     }
 };
 
-Grids.OnColumnsChanged = function(grid, cols, count) {
+Grids.OnColumnsChanged = function (grid, cols, count) {
     if (grid.id === window.allWorkGridId) {
         var lastCol = grid.GetLastCol("1");
 
@@ -348,7 +348,7 @@ Grids.OnColumnsChanged = function(grid, cols, count) {
     }
 };
 
-window.Grids.OnGetColor = function(grid, row, col, r, g, b, edit) {
+window.Grids.OnGetColor = function (grid, row, col, r, g, b, edit) {
     if (grid.id === window.allWorkGridId) {
         if (col === 'CommentCount') {
             if ((r === 230 || r === 180 || r === 205 || r === 255) && (g === 242 || g === 217 || g === 230 || g === 255) && (b === 251 || b === 243 || b === 247 || b === 255)) {
@@ -386,7 +386,7 @@ function ajaxRequest() {
         for (var i = 0; i < activexmodes.length; i++) {
             try {
                 return new ActiveXObject(activexmodes[i]);
-            } catch(e) {
+            } catch (e) {
                 //suppress error
             }
         }
@@ -451,7 +451,7 @@ function cancelRowEdit(gridId, rowId) {
 
     grid.SetAttribute(row, 'Priority', 'CanEdit', 0, true, false);
     setCellValue(row.currentValues['Priority'], gridId, rowId, 'Priority');
-    
+
     grid.SetAttribute(row, 'Title', 'CanEdit', 0, true, false);
     setCellValue(row.currentValues['Title'], gridId, rowId, 'Title');
 
@@ -613,8 +613,8 @@ function changeCompleteStatus(grid, row, col) {
                         $(row.r0).fadeOut(800);
                         $(row.r1).fadeOut(800);
                     } else {
-                        $(row.r0).find("td").fadeOut(800, function() { $(this).parent().remove(); });
-                        $(row.r1).find("td").fadeOut(800, function() { $(this).parent().remove(); });
+                        $(row.r0).find("td").fadeOut(800, function () { $(this).parent().remove(); });
+                        $(row.r1).find("td").fadeOut(800, function () { $(this).parent().remove(); });
                     }
                 } else if (!completed && MyWorkGrid.showingCompletedItems) {
                     if (!$.browser.msie) {
@@ -679,7 +679,7 @@ function doActionOnItem(gridId, action) {
         if (confirm("Are you sure you want to delete this item?")) {
             var request = new ajaxRequest();
 
-            request.onreadystatechange = function() {
+            request.onreadystatechange = function () {
                 if (request.readyState == 4) {
                     if (request.status == 200) {
                         if (request.responseText.trim() == 'Success') {
@@ -719,7 +719,7 @@ function editRow(grid, row) {
     if (grid.RowPermissions[listWebSiteId] === undefined) {
         var dataXml = '<MyWork><List ID="' + row['ListID'] + '" /><Web ID="' + row['WebID'] + '" /><Site ID="' + row['SiteID'] + '" URL="' + row['SiteURL'] + '" /></MyWork>';
 
-        EPMLiveCore.WorkEngineAPI.Execute("CheckMyWorkListEditPermission", dataXml, function(response) {
+        EPMLiveCore.WorkEngineAPI.Execute("CheckMyWorkListEditPermission", dataXml, function (response) {
             response = parseJson(response);
 
             if (responseIsSuccess(response)) {
@@ -770,7 +770,7 @@ function editRowHelper(grid, row) {
 
             dataXml += '</Fields><GuessOriginalFieldName>True</GuessOriginalFieldName></FieldInfo>';
 
-            EPMLiveCore.WorkEngineAPI.Execute("IsFieldEditable", dataXml, function(response) {
+            EPMLiveCore.WorkEngineAPI.Execute("IsFieldEditable", dataXml, function (response) {
                 response = parseJson(response);
 
                 if (responseIsSuccess(response)) {
@@ -791,7 +791,7 @@ function editRowHelper(grid, row) {
 
                     dataXml += '</Fields><GuessOriginalFieldName>True</GuessOriginalFieldName></MyWork>';
 
-                    EPMLiveCore.WorkEngineAPI.Execute("GetMyWorkGridColType", dataXml, function(response) {
+                    EPMLiveCore.WorkEngineAPI.Execute("GetMyWorkGridColType", dataXml, function (response) {
                         response = parseJson(response);
 
                         if (responseIsSuccess(response)) {
@@ -804,7 +804,7 @@ function editRowHelper(grid, row) {
                                 grid.ColTypes[listWebSiteId][colName] = colType;
 
                                 grid.SetAttribute(row, colName, 'Type', colType, true, false);
-                                
+
                                 if (colType !== 'Lines') {
                                     grid.SetAttribute(row, colName, 'CanEdit', 1, true, false);
                                 }
@@ -820,7 +820,7 @@ function editRowHelper(grid, row) {
                 var colType = grid.ColTypes[listWebSiteId][col];
 
                 grid.SetAttribute(row, col, 'Type', colType, true, false);
-                
+
                 if (colType !== 'Lines') {
                     grid.SetAttribute(row, col, 'CanEdit', 1, true, false);
                 }
@@ -864,7 +864,7 @@ function editRowFinalizer(grid, row, cols, listWebSiteId) {
         dataXml = dataXml.substring(0, dataXml.length - 1);
         dataXml += '</Fields><GuessOriginalFieldName>True</GuessOriginalFieldName></MyWork>';
 
-        EPMLiveCore.WorkEngineAPI.Execute("GetMyWorkGridEnum", dataXml, function(response) {
+        EPMLiveCore.WorkEngineAPI.Execute("GetMyWorkGridEnum", dataXml, function (response) {
             response = parseJson(response);
 
             if (responseIsSuccess(response)) {
@@ -951,7 +951,7 @@ function parseXml(xml) {
     if (window.DOMParser) {
         try {
             dom = (new DOMParser()).parseFromString(xml, "text/xml");
-        } catch(e) {
+        } catch (e) {
             dom = null;
         }
     } else if (window.ActiveXObject) {
@@ -959,7 +959,7 @@ function parseXml(xml) {
             dom = new ActiveXObject('Microsoft.XMLDOM');
             dom.async = false;
             dom.loadXML(xml);
-        } catch(e) {
+        } catch (e) {
             dom = null;
         }
     }
@@ -1014,7 +1014,7 @@ function saveRow(gridId, rowId) {
         if (row.currentValues['Priority'] !== priority) {
             edited = true;
         }
-        
+
         if (row.currentValues['Title'] !== title) {
             edited = true;
         }
@@ -1025,7 +1025,7 @@ function saveRow(gridId, rowId) {
         }
     }
 
-    EPMLiveCore.WorkEngineAPI.Execute("UpdateMyWorkItem", dataXml, function(response) {
+    EPMLiveCore.WorkEngineAPI.Execute("UpdateMyWorkItem", dataXml, function (response) {
         response = parseJson(response);
 
         if (responseIsSuccess(response)) {
@@ -1033,7 +1033,7 @@ function saveRow(gridId, rowId) {
 
             newVal = getFieldValue('Priority', response);
             if (newVal != undefined) setCellValue(newVal, grid.id, row.id, 'Priority');
-            
+
             grid.SetAttribute(row, 'Title', 'CanEdit', 0, true, false);
 
             newVal = getFieldValue('Title', response);
@@ -1143,19 +1143,19 @@ function updateFlag(grid, row, col) {
     var flag = '';
 
     switch (grid.GetValue(row, col)) {
-    case 1:
-        flag = 0;
-        break;
-    case 0:
-    default:
-        flag = 1;
-        break;
+        case 1:
+            flag = 0;
+            break;
+        case 0:
+        default:
+            flag = 1;
+            break;
     }
 
     var dataXml = '<MyPersonalization><Item ID="' + row['ItemID'] + '" /><List ID="' + row['ListID'] + '" /><Web ID="' + row['WebID'] + '" /><Site ID="' + row['SiteID']
         + '" URL="' + row['SiteURL'] + '" /><Personalizations><Personalization Key="Flag" Value="' + flag + '" /></Personalizations></MyPersonalization>';
 
-    EPMLiveCore.WorkEngineAPI.Execute("SetMyPersonalization", dataXml, function(response) {
+    EPMLiveCore.WorkEngineAPI.Execute("SetMyPersonalization", dataXml, function (response) {
         response = parseJson(response);
 
         if (responseIsSuccess(response)) setCellValue(flag, grid.id, row.id, col);
@@ -1899,7 +1899,7 @@ var MyWorkGrid = {
         MyWorkGrid.isDirty = true;
 
         MyWorkGrid.changeToolbarSelection('Completed');
-        
+
         $('#MWG_Pivot_Selector').show();
 
         try {
@@ -2519,7 +2519,7 @@ var MyWorkGrid = {
                     } else {
                         $('.mwg-mi-clear').hide();
                     }
-                    
+
                     var offset = $('#MWG_Pivot_Selector').offset().left;
 
                     if ($('#epm-nav-sub').is(':visible')) {
@@ -2954,7 +2954,7 @@ var MyWorkGrid = {
             }
         });
     },
-    
+
     loadRibbon: function () {
         SP.SOD.executeOrDelayUntilScriptLoaded(function () {
             var selectTab = function (tabId) {
@@ -2965,7 +2965,7 @@ var MyWorkGrid = {
                 window.setTimeout(function () { window.SelectRibbonTab(tabId, true); }, 50);
                 window.setTimeout(function () { window.SelectRibbonTab(tabId, true); }, 100);
                 window.setTimeout(function () { window.SelectRibbonTab(tabId, true); }, 500);
-                
+
                 window.setTimeout(function () {
                     try {
                         var setTabStyle = function () {
@@ -3013,11 +3013,11 @@ var MyWorkGrid = {
 
                 try {
                     ribbon = pm.get_ribbon();
-                } catch(e) {
+                } catch (e) {
                 }
 
                 if (!ribbon) {
-                    if (typeof(window._ribbonStartInit) === 'function') {
+                    if (typeof (window._ribbonStartInit) === 'function') {
                         selectTab('Ribbon.MyWorkTab');
                     }
                 } else {
@@ -3025,7 +3025,7 @@ var MyWorkGrid = {
                     window.RefreshCommandUI();
                 }
             } else {
-                window.setTimeout(function() {
+                window.setTimeout(function () {
                     window.SelectRibbonTab(selectedTab, true);
                 }, 500);
             }
@@ -3038,7 +3038,7 @@ var Base64 = {
     _keyStr: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",
 
     // public method for encoding
-    encode: function(input) {
+    encode: function (input) {
         var output = "";
         var chr1, chr2, chr3, enc1, enc2, enc3, enc4;
         var i = 0;
@@ -3072,7 +3072,7 @@ var Base64 = {
     },
 
     // public method for decoding
-    decode: function(input) {
+    decode: function (input) {
         var output = "";
         var chr1, chr2, chr3;
         var enc1, enc2, enc3, enc4;
@@ -3109,7 +3109,7 @@ var Base64 = {
     },
 
     // private method for UTF-8 encoding
-    _utf8_encode: function(string) {
+    _utf8_encode: function (string) {
         string = string.replace(/\r\n/g, "\n");
         var utftext = "";
 
@@ -3134,7 +3134,7 @@ var Base64 = {
     },
 
     // private method for UTF-8 decoding
-    _utf8_decode: function(utftext) {
+    _utf8_decode: function (utftext) {
         var string = "";
         var i = 0;
         var c = c1 = c2 = 0;

@@ -2588,11 +2588,6 @@ namespace EPMLiveCore.API
                         string name = Utils.ToGridSafeFieldName(field.Attribute("Name").Value);
                         string value = GetGridSafeValue(field);
 
-                        if (name.Equals(DUE_DATE_FIELD) && !string.IsNullOrEmpty(value))
-                        {
-                            i.Add(new XAttribute(DUE_DAY_FIELD, Convert.ToDateTime(value).ToFriendlyDate()));
-                        }
-
                         string type = field.Attribute("Type").Value;
 
                         if (type.Equals("Choice") && !string.IsNullOrEmpty(value))
@@ -2603,7 +2598,20 @@ namespace EPMLiveCore.API
                             i.Add(new XAttribute(string.Format("{0}Range", name), 0));
                         }
 
-                        i.Add(new XAttribute(name, value));
+                        if (name.Equals(TITLE_FIELD) && !string.IsNullOrEmpty(value))
+                        {
+                            i.Add(new XAttribute
+                                (TITLE_FIELD,
+                                string.Format("<a href='#' onclick=\"javascript:OpenCreateWebPageDialog('{0}/_layouts/15/epmlive/redirectionproxy.aspx?action=view&webid={1}&listid={2}&id={3}');\">{4}</a>", siteUrl, webId, listId, itemId,value)));
+                        }
+                        else if (name.Equals(DUE_DATE_FIELD) && !string.IsNullOrEmpty(value))
+                        {
+                            i.Add(new XAttribute(DUE_DAY_FIELD, Convert.ToDateTime(value).ToFriendlyDate()));
+                        }
+                        else
+                        {
+                            i.Add(new XAttribute(name, value));
+                        }
                     }
 
                     i.Add(new XAttribute(WORKING_ON_FIELD, bool.Parse(item.Attribute(WORKING_ON_FIELD).Value) ? 1 : 0));
