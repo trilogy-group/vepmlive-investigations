@@ -271,11 +271,6 @@
 				  PopulateDynamically="true" 
 				  PopulateOnlyOnce="false"
 				  TemplateAlias="THRRWFIXED" />
-		  <TextBox Id="Ribbon_MyWork_Actions_Search"
-				   Width="100px"
-				   Command="MyWork.Cmd.Search"
-				   QueryCommand="MyWork.Cmd.Search.Query"
-				   TemplateAlias="THRRWFIXED" />
 		</Controls>
 	  </Group>
 	</Groups>

@@ -2447,7 +2447,7 @@ var MyWorkGrid = {
         configureSearch();
         configureWorkFilters();
     },
-
+    
     configureToolbar: function () {
         var configureMenu = function () {
             $('#MWG_Pivot').find('.mwg-menuitem').each(function () {
@@ -2558,7 +2558,8 @@ var MyWorkGrid = {
         };
 
         var configureSearch = function () {
-            MyWorkGrid.configureSearch($('#MWG_Search'));
+            //MyWorkGrid.configureSearch($('#MWG_Search'));
+            MyWorkGrid.configureSearch($('#Ribbon_MyWork_Actions_Search'));
         };
 
         configureMenu();
