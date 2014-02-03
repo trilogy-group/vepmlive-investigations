@@ -4397,7 +4397,7 @@ function InitGantt() {
 
     try {
         var date = new Date(Grids.WorkPlannerGrid.Cols["G"].GanttBase);
-        grid.ScrollToDate(date, "left");
+        RGrid.ScrollToDate(date, "left");
     } catch (e) { }
 
 
