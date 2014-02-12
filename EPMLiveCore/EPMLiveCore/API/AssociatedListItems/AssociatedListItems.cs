@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Text;
+using System.Threading;
 using System.Web;
 using System.Xml;
 
@@ -100,6 +101,8 @@ namespace EPMLiveCore.API
                                         DataTable dtListItemCount = null;
                                         try
                                         {
+                                            // Wait for 3 seconds just in-case if reporting database is not updated.
+                                            Thread.Sleep(3000);
                                             var queryExecutor = new QueryExecutor(spWeb);
                                             dtListItemCount = queryExecutor.ExecuteReportingDBQuery(sql, new Dictionary<string, object> { });
                                         }

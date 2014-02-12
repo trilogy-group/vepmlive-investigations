@@ -60,6 +60,9 @@
 
     function fillWebPartData() {
         if (dataXml != '') {
+            $("#<%=associatedItemsDiv.ClientID%>").hide();
+            $("#associatedItemsLoadDiv").show();
+
             EPMLiveCore.WorkEngineAPI.Execute("GetAssociatedItems", dataXml, function (response) {
                 var divHTML = response.toString().replace("<Result Status=\"0\">", "").replace("</Result>", "");
                 $("#<%=associatedItemsDiv.ClientID%>").html("");
@@ -82,6 +85,10 @@
                 $('.associateditemscontextmenu').each(function () {
                     window.epmLiveNavigation.addContextualMenu($(this), null, true);
                 });
+
+                $("#associatedItemsLoadDiv").hide();
+                $("#<%=associatedItemsDiv.ClientID%>").show();
+                
 
             });
         }
@@ -152,5 +159,9 @@
 
 </script>
 
+
+<div id="associatedItemsLoadDiv" style="display: none;">
+    <img src="../_layouts/15/epmlive/images/mywork/loading16.gif" />
+</div>
 <div id="associatedItemsDiv" runat="server" style="float: left;"></div>
 <asp:Label ID="lblError" runat="server" Text="This page is not a display form page. Please add this webpart on a display form page." ForeColor="Red"></asp:Label>
