@@ -171,7 +171,15 @@ namespace EPMLiveCore.API
                                     foreach (SPListItem item in top5AssociatedItems)
                                     {
                                         sbListAssociatedItemsDiv.Append("<tr>");
-                                        sbListAssociatedItemsDiv.Append("<td><a href='#' onclick=\"javascript:showNewForm('" + projectAssociatedList.DefaultDisplayFormUrl + "?ID=" + item.ID + "&Source=" + sourceUrl + "');return false;\">" + item.Title + "</a></td>");
+
+                                        if (item.Title!= null && item.Title.TrimEnd().Length > 25)
+                                        {
+                                            sbListAssociatedItemsDiv.Append("<td><a href='#' alt='" + item.Title + "' title='" + item.Title + "' onclick=\"javascript:showNewForm('" + projectAssociatedList.DefaultDisplayFormUrl + "?ID=" + item.ID + "&Source=" + sourceUrl + "');return false;\">" + item.Title.Substring(0, 25) + "..." + "</a></td>");
+                                        }
+                                        else 
+                                        {
+                                            sbListAssociatedItemsDiv.Append("<td><a href='#' alt='" + item.Title + "' title='" + item.Title + "' onclick=\"javascript:showNewForm('" + projectAssociatedList.DefaultDisplayFormUrl + "?ID=" + item.ID + "&Source=" + sourceUrl + "');return false;\">" + item.Title + "</a></td>");
+                                        }
 
                                         sbListAssociatedItemsDiv.Append("<td>");
                                         sbListAssociatedItemsDiv.Append("<li class='associateditemscontextmenu'>");

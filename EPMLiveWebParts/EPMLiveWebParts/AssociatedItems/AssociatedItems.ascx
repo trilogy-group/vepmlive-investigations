@@ -49,6 +49,7 @@
         list-style: none;
         cursor: pointer;
         position: absolute;
+        right:25px;
     }
 </style>
 
