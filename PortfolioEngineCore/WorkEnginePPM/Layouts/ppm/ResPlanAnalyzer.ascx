@@ -70,7 +70,7 @@
 <div id="ribbonbarEditCapScenDiv"></div>
 <div id="ribbonbarChartDiv"></div>
 <div id="idEditGridDiv" ></div>
-<div id="chart"></div>
+<div id="chart" style="overflow:auto"></div>
 <div id="divLoading" style="z-index:998; display:none; padding-right: 20px; padding-left: 20px; vertical-align: middle; border: 1px solid #ebeef2; white-space: nowrap; position: absolute; background-color: rgb(255, 255, 255);">
 	<img style="margin: 30px 10px; vertical-align: middle" title="Loading..." alt="Loading..." src="../images/PROGRESS-CIRCLE-24.GIF"/>
 	<span style="text-align: center; margin: 30px 10px; white-space: nowrap; color: black; vertical-align: middle; overflow: hidden; font-family:Verdana; font-size:12px; color:#686868;">Loading...</span>
