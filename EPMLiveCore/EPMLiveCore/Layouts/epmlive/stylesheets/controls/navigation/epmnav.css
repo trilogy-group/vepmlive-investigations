@@ -1,4 +1,4 @@
-﻿.link-trans {
+.link-trans {
   -moz-transition: background-color 0.1s ease-in, color 0.1s ease-in;
   -o-transition: background-color 0.1s ease-in, color 0.1s ease-in;
   -webkit-transition: background-color 0.1s ease-in, color 0.1s ease-in;
@@ -58,7 +58,6 @@
   background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAASCAYAAABrXO8xAAAAUklEQVQ4y6XTywkAMAgDUPffy0UcwBXsrSCt3xw8PhBNSESsGmY2VXVDHTSGEUphhkJYoS/soAd2kYMTdOEU4XC9KnQc6B1QAKDIQSGHapUV+QCNF50M5UjTYgAAAABJRU5ErkJggg==') /*../../../images/navigation/notch.png*/;
   *background-image: url(/_layouts/15/epmlive/images/navigation/notch.png);
   /* For IE 6 and 7 */
-
   background-position: 40px 14px;
   background-repeat: no-repeat;
 }
@@ -156,7 +155,6 @@
   background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABcAAAA/CAYAAAAL1VP7AAAAkklEQVRYw+3RIQ7DQAxE0YmUWEu9xNz3Ku8RVjlAtEcI7/0aunJISUMqq7zqDPyy0Zu23m+yiMQZsbb2AICsZdt632WREmeMtbX7Z5vdXVQrjuMp11PWsrl7ed+VrM2qNcxMAMR1kLVsqnWYWQEwvrXf20RQghKUoAQlKEEJSlCCEpSgBCUoQQlKUIISlKB/A/oC07C7ok5v51YAAAAASUVORK5CYII=') /*../../../images/dragger.png*/;
   *background-image: url(/_layouts/15/epmlive/images/dragger.png);
   /* For IE 6 and 7 */
-
   background-repeat: no-repeat;
   cursor: move;
   display: inline-block;
@@ -435,7 +433,6 @@
   background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAABAElEQVQoz2WSOwrCQBRFp9BCXYKCoAhuIx/SidiK7iGL8dNrKRYilqIWWYZgoYiuIYXnyjMMMXDyfvfNvMzEOXvCMKxFUTSADTwN+QPVnP+QaFNYwhFS6Bup5ZbS/MQNWJOcQ105bEeYX4cFmlUQBA3Ha0RwieO46u2YIcq8uEp8wQ4V7GHij0jxRe5VGntKfifnzi5Ngq5Wxpc4x+Zq0k6qQQuuWu0BTYpdK0qUG2rOrKZFb2o4kBiXtlfT30jwHWlE8YyteN+gVYuPTpKkwognab/HimCNnUFxrAj8Y1VtJW1xceBfXI8GkZI/2qW2Xekof7/GFt4I3/KxyhW/xgdIDogikF40/wAAAABJRU5ErkJggg==') /*../../../images/navigation/expand.png*/;
   *background-image: url(/_layouts/15/epmlive/images/navigation/expand.png);
   /* For IE 6 and 7 */
-
   background-position: left center;
   background-repeat: no-repeat;
   display: inline-block;
@@ -446,7 +443,6 @@
   background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAAA7UlEQVQoz42SPQrCQBBGt9BCPYKCRRrxFvkhXZC0onfIYdT0SSkWIpZBLXIMwUIRxEP4PtlIFEQXXmZ25pvZ3ewaY4fneS3f9yNYwtUiP1LO1AeBPokUCkhgaElsLJWmEncgJziHtvkYisECTea6bsfwiZkcgiBoWkFdXDVt4h+wI002MDE/BpopRWs5Z1bpMnHwS7jXDi2/VA56cNSyF+gidGzyjv9WYHNqelLBlsD4ny3Bc0sxRXts49uhwzBssO2dtM/fSiLHzuDbb1Uuk/Z1cVC/uAEdRUK8sJfa/+xUPY0V3BDe5GMVez2NB59Fen3s5n5YAAAAAElFTkSuQmCC') /*../../../images/navigation/collapse.png*/;
   *background-image: url(/_layouts/15/epmlive/images/navigation/collapse.png);
   /* For IE 6 and 7 */
-
 }
 .epm-nav-sub .epm-nav-cat .epm-nav-cat-title {
   position: relative;
@@ -530,7 +526,6 @@
   background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA8AAAAPCAYAAAA71pVKAAAAwklEQVQoz2P4//8/A7kYTFy/fh2G7YF4FxC/AuIbQDwHiEWR5OEYXXMREP8H4idQTeuA+CfUIF18mkGSf4B4IxBzIikyAOIPQHwen+YWqC3YnAhzkRYuzSuA+CE2vwGxB1SzNy7NXVBnY7O5GqrZAJ+f/0MDiQfNz28J+RnZhudAPB+It0Bd8x8aHn74NMPi+QA0hO8B8SKoITADAvFpxobZoN6BGRBCimaYAauRvUCKZnQDJpCqGYSZoQHHBtdMLgYAk6CBgMOtyqoAAAAASUVORK5CYII=') /*../../../images/navigation/search-white.png*/;
   *background-image: url(/_layouts/15/epmlive/images/navigation/search-white.png);
   /* For IE 6 and 7 */
-
   background-repeat: no-repeat;
   background-position: 8px center;
   border: 1px solid #d0d0d0;
@@ -551,7 +546,6 @@
   background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAAQCAYAAABk1z2tAAAAiUlEQVRIx9XVUQrAIAgGYGF39oK9eqeNYA2xzaxt7V/gS4h8WBYR+koprSMxrT4qkJkphy5AwRgFdtWvgFeFo/stYCQ3g2CApWMesCogIsubwNKVHXIAzf75kEQu9F1gZDDcDsIDZ9xBe8T6eHX+Z0A1DLhAPcUa1wV84l1r5VucC0T86v4BRF8bSWOCDyiuVXEAAAAASUVORK5CYII=') !important;
   *background-image: url(../../../images/navigation/expand-collapse-sprite.png) !important;
   /* For IE 6 and 7 */
-
   height: 15px !important;
   width: 15px !important;
   margin-left: -18px;
@@ -710,3 +704,4 @@ li.epm-nav-node-selected ul.epm-nav-contextual-menu li a {
 .js-callout-mainElement {
   z-index: 200 !important;
 }
+/*# sourceMappingURL=epmnav.css.map */

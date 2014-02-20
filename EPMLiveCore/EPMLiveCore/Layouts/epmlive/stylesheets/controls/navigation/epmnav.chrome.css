@@ -1,4 +1,4 @@
-﻿#epm-nav-top,
+#epm-nav-top,
 #epm-nav-sub {
   height: auto !important;
   bottom: 0;
@@ -27,3 +27,4 @@
 .epm-nav-sub .epm-nav-dragger {
   top: .5px;
 }
+/*# sourceMappingURL=epmnav.chrome.css.map */
