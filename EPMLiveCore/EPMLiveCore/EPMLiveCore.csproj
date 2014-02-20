@@ -27,7 +27,7 @@ net start "WETimer"</PostDeploymentCommand>
     <PreDeploymentCommand>"C:\Workspace\Upland\EPM Live\EPM Live Utilities\SPSolutionManager\SPSolutionManager\bin\Debug\SPSolutionManager.exe" -a Uninstall -s EPMLiveCore
 "C:\Program Files %28x86%29\Microsoft SDKs\Windows\v8.0A\Bin\NETFX 4.0 Tools\x64\gacutil.exe" /u "EPM Live Core" /f</PreDeploymentCommand>
     <ProjectMode>SharePointCustomization</ProjectMode>
-    <FileUpgradeFlags>40</FileUpgradeFlags>
+    <FileUpgradeFlags>0</FileUpgradeFlags>
     <OldToolsVersion>4.0</OldToolsVersion>
     <UpgradeBackupLocation>C:\Workspace\Upland\EPM Live\EPMLive2013Release\Release\EPMLiveCore\Backup1\</UpgradeBackupLocation>
     <IsWebBootstrapper>false</IsWebBootstrapper>
@@ -1255,6 +1255,9 @@ net start "WETimer"</PostDeploymentCommand>
     <Compile Include="ResourceTools.cs" />
     <Compile Include="Security.cs" />
     <Compile Include="SiteNavigationRibbonButton.cs" />
+    <Compile Include="SocialEngine\Events\ListEventReceiver\ListEventReceiver.cs" />
+    <Compile Include="SocialEngine\Events\ListItemEventReceiver\ListItemEventReceiver.cs" />
+    <Compile Include="SocialEngine\Events\WebEventReceiver\WebEventReceiver.cs" />
     <Compile Include="SPFields\DaysHoursBreakdownField.cs" />
     <Compile Include="SPFields\DaysHoursBreakdownFieldControl.cs" />
     <Compile Include="StatusingEvent.cs" />
@@ -1616,6 +1619,9 @@ net start "WETimer"</PostDeploymentCommand>
     <None Include="Features\EPMLiveWorkspaceMenus\EPMLiveWorkspaceMenus.feature">
       <FeatureId>{bd45b455-49f0-4bee-989c-867626214618}</FeatureId>
     </None>
+    <None Include="Features\SocialStream\SocialStream.feature">
+      <FeatureId>{b646c1b8-a876-4691-b57c-40234321d01e}</FeatureId>
+    </None>
     <None Include="Features\WorkgroupAdministration\WorkgroupAdministration.feature">
       <FeatureId>{597b4d8e-96e3-4b57-afa6-1aacdf3fb5aa}</FeatureId>
     </None>
@@ -1761,6 +1767,15 @@ net start "WETimer"</PostDeploymentCommand>
     </None>
     <None Include="ResourcePoolEvent\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{949fa534-10f8-4add-998e-6f4ce94cdf2e}</SharePointProjectItemId>
+    </None>
+    <None Include="SocialEngine\Events\ListEventReceiver\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{2e622cd7-441f-4ff2-85c1-8b83df5593f2}</SharePointProjectItemId>
+    </None>
+    <None Include="SocialEngine\Events\ListItemEventReceiver\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{b45c1792-dfeb-453c-b11e-27c8675f0ea6}</SharePointProjectItemId>
+    </None>
+    <None Include="SocialEngine\Events\WebEventReceiver\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{87e901ca-463f-4a14-a4bf-1ddbcfed6f9d}</SharePointProjectItemId>
     </None>
     <None Include="TaskCenterListToolbars\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{49dabf13-4a85-4da0-a0aa-f7c331d7698d}</SharePointProjectItemId>
@@ -2197,6 +2212,9 @@ net start "WETimer"</PostDeploymentCommand>
     </Content>
     <Content Include="Features\EPMLiveWorkspaceMenus\EPMLiveWorkspaceMenus.Template.xml">
       <DependentUpon>EPMLiveWorkspaceMenus.feature</DependentUpon>
+    </Content>
+    <Content Include="Features\SocialStream\SocialStream.Template.xml">
+      <DependentUpon>SocialStream.feature</DependentUpon>
     </Content>
     <Content Include="Features\WorkgroupAdministration\WorkgroupAdministration.Template.xml">
       <DependentUpon>WorkgroupAdministration.feature</DependentUpon>
@@ -3869,6 +3887,9 @@ net start "WETimer"</PostDeploymentCommand>
     <Content Include="Resources\9Data01.sql" />
     <Content Include="Resources\9Data02.sql" />
     <Content Include="Resources\EPMLiveNavigation.txt" />
+    <Content Include="SocialEngine\Events\ListEventReceiver\Elements.xml" />
+    <Content Include="SocialEngine\Events\ListItemEventReceiver\Elements.xml" />
+    <Content Include="SocialEngine\Events\WebEventReceiver\Elements.xml" />
     <Content Include="TaskCenterListToolbars\Elements.xml" />
     <Content Include="TEMPLATE\1033\XML\WEBTEMPWE.XML" />
     <Content Include="TEMPLATE\admin\admin.sitemap.epmlive.xml" />
