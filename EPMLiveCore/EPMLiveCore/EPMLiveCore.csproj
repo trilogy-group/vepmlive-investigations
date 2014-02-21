@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{BB1F664B-9266-4fd6-B973-E1E44974B511}</ProjectGuid>
+    <ProjectGuid>{C773AE44-F066-446A-9CBD-D24AFA794E34}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>EPMLiveCore</RootNamespace>
