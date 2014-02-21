@@ -3,6 +3,7 @@ using Microsoft.TeamFoundation.Framework.Client;
 using Microsoft.TeamFoundation.VersionControl.Client;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Net;
@@ -209,7 +210,7 @@ namespace UplandIntegrations.Tfs
                 throw ex;
             }
         }
-        public Int64 CreateObjectItem(string projectCollection, string objectName, DataRow Item, DataColumnCollection dataColumns)
+        public Int32 CreateObjectItem(string projectCollection, string objectName, DataRow Item, DataColumnCollection dataColumns)
         {
             try
             {
@@ -240,7 +241,7 @@ namespace UplandIntegrations.Tfs
                 throw ex;
             }
         }
-        public void UpdateObjectItem(string projectCollection, string objectName, DataRow Item, Int64 itemId, DataColumnCollection dataColumns)
+        public void UpdateObjectItem(string projectCollection, string objectName, DataRow Item, Int32 itemId, DataColumnCollection dataColumns)
         {
             try
             {
@@ -271,6 +272,36 @@ namespace UplandIntegrations.Tfs
                 throw ex;
             }
         }
+        public void DeleteObjectItem(string projectCollection, string objectName, Int32 itemId)
+        {
+            try
+            {
+                TfsType tfsType = (TfsType)Enum.Parse(typeof(TfsType), objectName);
+                switch (tfsType)
+                {
+                    case TfsType.Bug:
+                    case TfsType.Change_Request:
+                    case TfsType.Feature:
+                    case TfsType.Issue:
+                    case TfsType.Product_Backlog_Item:
+                    case TfsType.Requirement:
+                    case TfsType.Risk:
+                    case TfsType.Shared_Steps:
+                    case TfsType.Task:
+                    case TfsType.Test_Case:
+                    case TfsType.User_Story:
+                        DeleteWorkItem(projectCollection, itemId);
+                        break;
+                    default:
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
         public string GetWorkItemURL(string projectCollection, string workItemType, string id)
         {
             using (TfsTeamProjectCollection tfsTeamProjectCollection = new TfsTeamProjectCollection(new Uri(string.Format("{0}/{1}", tfsConfigurationServer.Uri.AbsoluteUri, projectCollection)), tfsCred))
@@ -308,11 +339,12 @@ namespace UplandIntegrations.Tfs
                 }
             }
         }
+
         #endregion
 
         #region Private
 
-        private Int64 CreateWorkItem(string projectCollection, string workItemType, DataRow item, DataColumnCollection dataColumns)
+        private Int32 CreateWorkItem(string projectCollection, string workItemType, DataRow item, DataColumnCollection dataColumns)
         {
             if (string.IsNullOrEmpty(Convert.ToString(item["Project|Id"])))
             {
@@ -339,7 +371,7 @@ namespace UplandIntegrations.Tfs
                 return workItem.Id;
             }
         }
-        private void UpdateWorkItem(string projectCollection, string workItemType, DataRow item, Int64 itemId, DataColumnCollection dataColumns)
+        private void UpdateWorkItem(string projectCollection, string workItemType, DataRow item, Int32 itemId, DataColumnCollection dataColumns)
         {
             using (TfsTeamProjectCollection tfsTeamProjectCollection = new TfsTeamProjectCollection(new Uri(string.Format("{0}/{1}", tfsConfigurationServer.Uri.AbsoluteUri, projectCollection)), tfsCred))
             {
@@ -356,6 +388,27 @@ namespace UplandIntegrations.Tfs
                 }
             }
         }
+        private void DeleteWorkItem(string projectCollection, Int32 itemId)
+        {
+            List<int> itemIds = new List<int>();
+            itemIds.Add(itemId);
+            using (TfsTeamProjectCollection tfsTeamProjectCollection = new TfsTeamProjectCollection(new Uri(string.Format("{0}/{1}", tfsConfigurationServer.Uri.AbsoluteUri, projectCollection)), tfsCred))
+            {
+                tfsTeamProjectCollection.Authenticate();
+                var workItemStore = tfsTeamProjectCollection.GetService<WorkItemStore>();
+
+                foreach (WorkItemOperationError error in workItemStore.DestroyWorkItems(itemIds.ToArray()))
+                {
+                    if (error != null)
+                    {
+                        throw new Exception(error.Exception.Message);
+                    }
+                }
+                workItemStore.RefreshCache();
+                workItemStore.SyncToCache();
+            }
+        }
+
         private void GetWorkItems(string projectCollection, string workItemType, DataTable items, DateTime lastSyncDateTime, Boolean isOnlyColumns)
         {
             using (TfsTeamProjectCollection tfsTeamProjectCollection = new TfsTeamProjectCollection(new Uri(string.Format("{0}/{1}", tfsConfigurationServer.Uri.AbsoluteUri, projectCollection)), tfsCred))

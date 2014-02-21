@@ -135,27 +135,27 @@ namespace UplandIntegrations.Tfs
 
         public TransactionTable DeleteItems(WebProperties WebProps, DataTable Items, IntegrationLog Log)
         {
-            //CheckWebProps(WebProps, true);
+            CheckWebProps(WebProps, true);
             TransactionTable transactionTable = new TransactionTable();
-            //using (TfsService tfsService = new TfsService(WebProps.Properties["ServerUrl"].ToString(), WebProps.Properties["Username"].ToString(), WebProps.Properties["Password"].ToString()))
-            //{
-            //    foreach (DataRow item in Items.Rows)
-            //    {
-            //        string curId = item["ID"].ToString();
-            //        string spId = item["SPID"].ToString();
-            //        try
-            //        {
-            //            tfsService.DeleteObjectItem((string)WebProps.Properties["Object"], Convert.ToInt64(curId));
-            //            transactionTable.AddRow(spId, curId, TransactionType.DELETE);
-            //        }
-            //        catch (Exception ex)
-            //        {
-            //            transactionTable.AddRow(spId, curId, TransactionType.FAILED);
-            //            Log.LogMessage("Delete items. " + ex.Message, IntegrationLogType.Warning);
-            //        }
-            //    }
-            //}
-            Log.LogMessage("Delete items. Not supported in TFS", IntegrationLogType.Error);
+            using (TfsService tfsService = new TfsService(WebProps.Properties["ServerUrl"].ToString(), WebProps.Properties["Username"].ToString(), WebProps.Properties["Password"].ToString()))
+            {
+                foreach (DataRow item in Items.Rows)
+                {
+                    string curId = item["ID"].ToString();
+                    string spId = item["SPID"].ToString();
+                    try
+                    {
+                        tfsService.DeleteObjectItem((string)WebProps.Properties["TeamProjectCollection"], (string)WebProps.Properties["Object"], Convert.ToInt32(curId));
+                        transactionTable.AddRow(spId, curId, TransactionType.DELETE);
+                    }
+                    catch (Exception ex)
+                    {
+                        transactionTable.AddRow(spId, curId, TransactionType.FAILED);
+                        Log.LogMessage("Delete items. " + ex.Message, IntegrationLogType.Warning);
+                    }
+                }
+            }
+            //Log.LogMessage("Delete items. Not supported in TFS", IntegrationLogType.Error);
             return transactionTable;
         }
         public TransactionTable UpdateItems(WebProperties WebProps, DataTable Items, IntegrationLog Log)
@@ -187,7 +187,7 @@ namespace UplandIntegrations.Tfs
                             }
                             else
                             {
-                                tfsService.UpdateObjectItem((string)WebProps.Properties["TeamProjectCollection"], (string)WebProps.Properties["Object"], item, Convert.ToInt64(curId), Items.Columns);
+                                tfsService.UpdateObjectItem((string)WebProps.Properties["TeamProjectCollection"], (string)WebProps.Properties["Object"], item, Convert.ToInt32(curId), Items.Columns);
                                 transactionTable.AddRow(spId, curId, TransactionType.UPDATE);
                             }
                         }
