@@ -23,7 +23,7 @@ namespace EPMLiveReportsAdmin
             cmd = new SqlCommand("DELETE FROM RPTWEBGROUPS", epmdata.GetClientReportingConnection);
             cmd.ExecuteNonQuery();
 
-            cmd = new SqlCommand("DELETE FROM Webs", epmdata.GetEPMLiveConnection);
+            cmd = new SqlCommand("DELETE FROM Webs WHERE SiteId = '" + site.ID + "'", epmdata.GetEPMLiveConnection);
             cmd.ExecuteNonQuery();
 
             #endregion
