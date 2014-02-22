@@ -11,7 +11,7 @@ namespace EPMLiveReportsAdmin
     {
         public static void CleanTables(SPSite site, EPMData epmdata)
         {
-            #region WIPE DATA FROM ReportListIds, RPTWeb, and RPTWEBGROUPS TABLE
+            #region WIPE DATA FROM ReportListIds, RPTWeb, and RPTWEBGROUPS, epmlive.Webs TABLE
 
             SqlCommand cmd;
             cmd = new SqlCommand("DELETE FROM ReportListIds", epmdata.GetClientReportingConnection);
@@ -23,9 +23,12 @@ namespace EPMLiveReportsAdmin
             cmd = new SqlCommand("DELETE FROM RPTWEBGROUPS", epmdata.GetClientReportingConnection);
             cmd.ExecuteNonQuery();
 
+            cmd = new SqlCommand("DELETE FROM Webs", epmdata.GetEPMLiveConnection);
+            cmd.ExecuteNonQuery();
+
             #endregion
 
-            #region REPOPULATE ReportListIds, RPTWeb, RPTWEBGROUPS, AND FRF-Recent TABLES
+            #region REPOPULATE ReportListIds, RPTWeb, RPTWEBGROUPS, epmlive.Webs AND FRF-Recent TABLES
 
             var listNames = new DataTable();
 
@@ -217,7 +220,7 @@ namespace EPMLiveReportsAdmin
                     }
                     #endregion
 
-                    #region BULK INSERT RPTWeb TABLE
+                    #region BULK INSERT RPTWeb and epmlive.Webs TABLE
                     if (rptWeb.Rows.Count > 0)
                     {
                         SqlTransaction tx = epmdata.GetClientReportingConnection.BeginTransaction();
@@ -245,6 +248,34 @@ namespace EPMLiveReportsAdmin
                             {
                                 hasError = true;
                                 errMsg += e3.Message;
+                            }
+                        }
+
+                        using (var t = epmdata.GetEPMLiveConnection.BeginTransaction())
+                        {
+                            using (var bc = new SqlBulkCopy(epmdata.GetEPMLiveConnection, new SqlBulkCopyOptions(), t))
+                            {
+                                bc.DestinationTableName = "Webs";
+
+                                var dictionary = new Dictionary<string, string>
+                                {
+                                    {"SiteId", "SiteId"},
+                                    {"ItemWebId", "ItemWebId"},
+                                    {"ItemListId", "ItemListId"},
+                                    {"ItemId", "ItemId"},
+                                    {"ParentWebId", "ParentWebId"},
+                                    {"WebId", "Id"},
+                                    {"WebUrl", "URL"},
+                                    {"WebTitle", "Title"}
+                                };
+
+                                foreach (KeyValuePair<string, string> c in dictionary)
+                                {
+                                    bc.ColumnMappings.Add(c.Key, c.Value);
+                                }
+
+                                bc.WriteToServer(rptWeb);
+                                t.Commit();
                             }
                         }
                     }
