@@ -1012,9 +1012,15 @@ namespace EPMLiveCore.API
                 {
                     using (var w = s.OpenWeb(_createdWebId))
                     {
-                        // stamp info on new site
-                        w.AllProperties["ParentItem"] = WebId + "^^" + AttachedItemListId + "^^" + AttachedItemId + "^^" +
-                                                        AttachedItemTitle;
+                        if (AttachedItemId != -1)
+                        {
+                            // stamp info on new site
+                            w.AllProperties["ParentItem"] = WebId + "^^" + AttachedItemListId + "^^" + AttachedItemId +  "^^" + AttachedItemTitle;
+                        }
+                        else
+                        {
+                            w.AllProperties["ParentItem"] = Guid.Empty + "^^" + AttachedItemListId + "^^" + AttachedItemId + "^^" + AttachedItemTitle;
+                        }
 
                         // add deleted event
                         var assemblyName =
