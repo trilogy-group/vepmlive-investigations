@@ -286,7 +286,7 @@
             showHideLoading(true, 'Loading Kanban Planners');
             $.ajax({
                 type: "POST",
-                url: "/_vti_bin/WorkPlanner.asmx/Execute",
+                url: "<%=SPContext.Current.Web.ServerRelativeUrl%>/_vti_bin/WorkPlanner.asmx/Execute",
                 data: "{Functionname : 'GetKanBanPlanners' , Dataxml : '<DataXML><SiteUrl><%=SPContext.Current.Site.Url%></SiteUrl><SiteID><%=SPContext.Current.Site.ID%></SiteID><WebID><%=SPContext.Current.Web.ID%></WebID></DataXML>'}",
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
@@ -325,7 +325,7 @@
                 showHideLoading(true, 'Loading Kanban Filters');
                 $.ajax({
                     type: "POST",
-                    url: "/_vti_bin/WorkPlanner.asmx/Execute",
+                    url: "<%=SPContext.Current.Web.ServerRelativeUrl%>/_vti_bin/WorkPlanner.asmx/Execute",
                     data: "{Functionname : 'GetKanBanFilter1' , Dataxml : '<DataXML><SiteUrl><%=SPContext.Current.Site.Url%></SiteUrl><SiteID><%=SPContext.Current.Site.ID%></SiteID><WebID><%=SPContext.Current.Web.ID%></WebID><KanBanBoardName>" + kanBanBoardName + "</KanBanBoardName><ProjectID><%=strProjectId%></ProjectID></DataXML>'}",
                     contentType: "application/json; charset=utf-8",
                     dataType: "json",
@@ -396,7 +396,7 @@
             showHideLoading(true, 'Loading Kanban Board');
             $.ajax({
                 type: "POST",
-                url: "/_vti_bin/WorkPlanner.asmx/Execute",
+                url: "<%=SPContext.Current.Web.ServerRelativeUrl%>/_vti_bin/WorkPlanner.asmx/Execute",
                 data: "{Functionname : 'GetKanBanBoard' , Dataxml : '<DataXML><SiteUrl><%=SPContext.Current.Site.Url%></SiteUrl><SiteID><%=SPContext.Current.Site.ID%></SiteID><WebID><%=SPContext.Current.Web.ID%></WebID><KanBanBoardName>" + kanBanBoardName + "</KanBanBoardName><KanBanFilter1>" + kanBanFilter1 + "</KanBanFilter1><ProjectID><%=strProjectId%></ProjectID></DataXML>'}",
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
@@ -436,7 +436,7 @@
                                 var data = '<DataXml><data-siteid>' + ui.item.attr("data-siteid") + '</data-siteid><data-webid>' + ui.item.attr("data-webid") + '</data-webid><data-listid>' + ui.item.attr("data-listid") + '</data-listid><data-itemid>' + ui.item.attr("data-itemid") + '</data-itemid><data-userid>' + ui.item.attr("data-userid") + '</data-userid><data-itemtitle>' + ui.item.attr("data-itemtitle") + '</data-itemtitle><data-icon>' + ui.item.attr("data-icon") + '</data-icon><data-type>' + ui.item.attr("data-type") + '</data-type><data-fstring>' + ui.item.attr("data-fstring") + '</data-fstring><data-fdate>' + ui.item.attr("data-fdate") + '</data-fdate><data-fint>' + ui.item.attr("data-fint") + '</data-fint><data-dragged-status>' + ui.item.parent().attr("data-dragged-status") + '</data-dragged-status><data-index-of-item>' + indexOfItem + '</data-index-of-item></DataXml>';
                                 $.ajax({
                                     type: "POST",
-                                    url: "/_vti_bin/WorkPlanner.asmx/Execute",
+                                    url: "<%=SPContext.Current.Web.ServerRelativeUrl%>/_vti_bin/WorkPlanner.asmx/Execute",
                                     data: "{Functionname : 'ReOrderAndSaveItem' , Dataxml : '" + data + "'}",
                                     contentType: "application/json; charset=utf-8",
                                     dataType: "json",

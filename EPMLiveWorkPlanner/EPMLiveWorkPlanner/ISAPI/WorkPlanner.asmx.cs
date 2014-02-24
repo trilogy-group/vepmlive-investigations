@@ -5491,15 +5491,17 @@ namespace EPMLiveWorkPlanner
                                 fIntDataColumn.DefaultValue = 9999;
                                 dtSourceListData.Columns.Add(fIntDataColumn);
                                 //Insert/Update Record to FRF list...
-                                using (SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(spWeb.Site.WebApplication.Id)))
-                                {
-                                    cn.Open();
-                                    SqlCommand cmd = new SqlCommand(string.Format(qryFRFData, siteId, webID, list.ID.ToString(), kanBanBoardName), cn);
-                                    using (SqlDataAdapter dap = new SqlDataAdapter(cmd))
+                                SPSecurity.RunWithElevatedPrivileges(delegate(){
+                                    using (SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(spWeb.Site.WebApplication.Id)))
                                     {
-                                        dap.Fill(dtFRFData);
+                                        cn.Open();
+                                        SqlCommand cmd = new SqlCommand(string.Format(qryFRFData, siteId, webID, list.ID.ToString(), kanBanBoardName), cn);
+                                        using (SqlDataAdapter dap = new SqlDataAdapter(cmd))
+                                        {
+                                            dap.Fill(dtFRFData);
+                                        }
                                     }
-                                }
+                                });
 
                                 if (dtFRFData != null && dtFRFData.Rows.Count > 0)
                                 {
