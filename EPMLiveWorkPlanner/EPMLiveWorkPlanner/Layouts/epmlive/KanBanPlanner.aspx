@@ -287,7 +287,7 @@
             $.ajax({
                 type: "POST",
                 url: "<%=SPContext.Current.Web.ServerRelativeUrl%>/_vti_bin/WorkPlanner.asmx/Execute",
-                data: "{Functionname : 'GetKanBanPlanners' , Dataxml : '<DataXML><SiteUrl><%=SPContext.Current.Site.Url%></SiteUrl><SiteID><%=SPContext.Current.Site.ID%></SiteID><WebID><%=SPContext.Current.Web.ID%></WebID></DataXML>'}",
+                data: "{Functionname : 'GetKanBanPlanners' , Dataxml : '<DataXML></DataXML>'}",
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
                 error: function (xhr, status, error) {
@@ -312,7 +312,7 @@
                     loadKanBanFilter1($("#ddlKanBanPlanners").val());
                 }
             });
-        };
+        }
 
         function loadKanBanFilter1(kanBanBoardName) {
             if (kanBanBoardName == "0") {
@@ -326,7 +326,7 @@
                 $.ajax({
                     type: "POST",
                     url: "<%=SPContext.Current.Web.ServerRelativeUrl%>/_vti_bin/WorkPlanner.asmx/Execute",
-                    data: "{Functionname : 'GetKanBanFilter1' , Dataxml : '<DataXML><SiteUrl><%=SPContext.Current.Site.Url%></SiteUrl><SiteID><%=SPContext.Current.Site.ID%></SiteID><WebID><%=SPContext.Current.Web.ID%></WebID><KanBanBoardName>" + kanBanBoardName + "</KanBanBoardName><ProjectID><%=strProjectId%></ProjectID></DataXML>'}",
+                    data: "{Functionname : 'GetKanBanFilter1' , Dataxml : '<DataXML><KanBanBoardName>" + kanBanBoardName + "</KanBanBoardName><ProjectID><%=strProjectId%></ProjectID></DataXML>'}",
                     contentType: "application/json; charset=utf-8",
                     dataType: "json",
                     error: function (xhr, status, error) {
@@ -397,7 +397,7 @@
             $.ajax({
                 type: "POST",
                 url: "<%=SPContext.Current.Web.ServerRelativeUrl%>/_vti_bin/WorkPlanner.asmx/Execute",
-                data: "{Functionname : 'GetKanBanBoard' , Dataxml : '<DataXML><SiteUrl><%=SPContext.Current.Site.Url%></SiteUrl><SiteID><%=SPContext.Current.Site.ID%></SiteID><WebID><%=SPContext.Current.Web.ID%></WebID><KanBanBoardName>" + kanBanBoardName + "</KanBanBoardName><KanBanFilter1>" + kanBanFilter1 + "</KanBanFilter1><ProjectID><%=strProjectId%></ProjectID></DataXML>'}",
+                data: "{Functionname : 'GetKanBanBoard' , Dataxml : '<DataXML><KanBanBoardName>" + kanBanBoardName + "</KanBanBoardName><KanBanFilter1>" + kanBanFilter1 + "</KanBanFilter1><ProjectID><%=strProjectId%></ProjectID></DataXML>'}",
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
                 error: function (xhr, status, error) {

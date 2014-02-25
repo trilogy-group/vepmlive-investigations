@@ -5211,18 +5211,13 @@ namespace EPMLiveWorkPlanner
         /// <returns></returns>
         public static string GetKanBanPlanners(XmlDocument data, SPWeb oWeb)
         {
-            //Get values from parameter
-            string siteUrl = data.GetElementsByTagName("SiteUrl")[0].InnerText;
-            string siteId = data.GetElementsByTagName("SiteID")[0].InnerText;
-            string webID = data.GetElementsByTagName("WebID")[0].InnerText;
-
             StringBuilder jsonPlanners = new StringBuilder();
             jsonPlanners.Append(string.Format("{{\"id\":\"{0}\",\"text\":\"{1}\"}},", "0", "Select"));
 
             //Using SharePoint Object Model fetching data values
-            using (SPSite spSite = new SPSite(siteUrl))
+            using (SPSite spSite = new SPSite(oWeb.Site.ID))
             {
-                using (SPWeb spWeb = spSite.OpenWeb(new Guid(webID)))
+                using (SPWeb spWeb = spSite.OpenWeb(oWeb.ID))
                 {
                     string planners = EPMLiveCore.CoreFunctions.getConfigSetting(spWeb, "EPMLivePlannerPlanners");
 
@@ -5255,9 +5250,6 @@ namespace EPMLiveWorkPlanner
         public static string GetKanBanFilter1(XmlDocument data, SPWeb oWeb)
         {
             //Get values from parameter...
-            string siteUrl = data.GetElementsByTagName("SiteUrl")[0].InnerText;
-            string siteId = data.GetElementsByTagName("SiteID")[0].InnerText;
-            string webID = data.GetElementsByTagName("WebID")[0].InnerText;
             string kanBanBoardName = data.GetElementsByTagName("KanBanBoardName")[0].InnerText;
             string projectID = data.GetElementsByTagName("ProjectID")[0].InnerText;
 
@@ -5278,9 +5270,9 @@ namespace EPMLiveWorkPlanner
 
             try
             {
-                using (SPSite spSite = new SPSite(siteUrl))
+                using (SPSite spSite = new SPSite(oWeb.Site.ID))
                 {
-                    using (SPWeb spWeb = spSite.OpenWeb(new Guid(webID)))
+                    using (SPWeb spWeb = spSite.OpenWeb(oWeb.ID))
                     {
                         props = WorkPlannerAPI.getSettings(spWeb, kanBanBoardName);
                         SPList sourceList = spWeb.Lists[props.sListTaskCenter];
@@ -5291,7 +5283,7 @@ namespace EPMLiveWorkPlanner
                             dtTableName = queryExecutor.ExecuteReportingDBQuery(string.Format(qryTableName, sourceList.ID.ToString()),
                                 new Dictionary<string, object>
                                 {
-                                    {"@WebId", webID}
+                                    {"@WebId", oWeb.ID}
                                 });
 
                         }
@@ -5306,7 +5298,7 @@ namespace EPMLiveWorkPlanner
                                 dtFilterColumns = queryExecutor.ExecuteReportingDBQuery(string.Format(qryFilterColumns, Convert.ToString(sourceList.ID), props.KanBanFilterColumn),
                                     new Dictionary<string, object>
                                 {
-                                    {"@WebId", webID}
+                                    {"@WebId", oWeb.ID}
                                 });
 
                             }
@@ -5335,7 +5327,7 @@ namespace EPMLiveWorkPlanner
                                     dtFilterColumnValues = queryExecutor.ExecuteReportingDBQuery(qryFilterColumnValues,
                                         new Dictionary<string, object>
                                 {
-                                    {"@WebId", webID}
+                                    {"@WebId", oWeb.ID}
                                 });
 
                                     if (dtFilterColumnValues != null && dtFilterColumnValues.Rows.Count > 0)
@@ -5374,9 +5366,6 @@ namespace EPMLiveWorkPlanner
             #region Read Parameters from data Xml
 
             //Get values from parameter
-            string siteUrl = data.GetElementsByTagName("SiteUrl")[0].InnerText;
-            string siteId = data.GetElementsByTagName("SiteID")[0].InnerText;
-            string webID = data.GetElementsByTagName("WebID")[0].InnerText;
             string kanBanBoardName = DecodeJsonData(data.GetElementsByTagName("KanBanBoardName")[0].InnerText);
             string kanBanFilterColumnSelectedValues = DecodeJsonData(data.GetElementsByTagName("KanBanFilter1")[0].InnerText);
             string projectID = data.GetElementsByTagName("ProjectID")[0].InnerText;
@@ -5409,9 +5398,9 @@ namespace EPMLiveWorkPlanner
             #endregion
 
             //Using SharePoint Object Model fetching data values
-            using (SPSite spSite = new SPSite(siteUrl))
+            using (SPSite spSite = new SPSite(oWeb.Site.ID))
             {
-                using (SPWeb spWeb = spSite.OpenWeb(new Guid(webID)))
+                using (SPWeb spWeb = spSite.OpenWeb(oWeb.ID))
                 {
                     WorkPlannerAPI.PlannerProps props = WorkPlannerAPI.getSettings(spWeb, kanBanBoardName);
 
@@ -5445,7 +5434,7 @@ namespace EPMLiveWorkPlanner
                             dtColumns = queryExecutor.ExecuteReportingDBQuery(string.Format(qryGetColumns, selectedColumnsDBFormat, list.ID.ToString()),
                                 new Dictionary<string, object>
                             {
-                                    {"@WebId", webID}
+                                    {"@WebId", oWeb.ID}
                                 });
 
                         }
@@ -5491,11 +5480,12 @@ namespace EPMLiveWorkPlanner
                                 fIntDataColumn.DefaultValue = 9999;
                                 dtSourceListData.Columns.Add(fIntDataColumn);
                                 //Insert/Update Record to FRF list...
-                                SPSecurity.RunWithElevatedPrivileges(delegate(){
+                                SPSecurity.RunWithElevatedPrivileges(delegate()
+                                {
                                     using (SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(spWeb.Site.WebApplication.Id)))
                                     {
                                         cn.Open();
-                                        SqlCommand cmd = new SqlCommand(string.Format(qryFRFData, siteId, webID, list.ID.ToString(), kanBanBoardName), cn);
+                                        SqlCommand cmd = new SqlCommand(string.Format(qryFRFData, oWeb.Site.ID, oWeb.ID, list.ID.ToString(), kanBanBoardName), cn);
                                         using (SqlDataAdapter dap = new SqlDataAdapter(cmd))
                                         {
                                             dap.Fill(dtFRFData);
@@ -5545,8 +5535,8 @@ namespace EPMLiveWorkPlanner
                                 if (string.IsNullOrEmpty(statusColumnValue) ||
                                     (!selectedStatusColumnValues.Contains(statusColumnValue))) //Add Backlog Items to Left Panel
                                 {
-                                    sbItems.Append("<div class='sortable-item' data-siteid='" + siteId + "' data-webid='" + webID + "' data-listid='" + list.ID + "' data-itemid='" + Convert.ToString(row["ID"]) + "' data-userid='0' data-itemtitle='" + Convert.ToString(row["Title"]) + "' data-icon='' data-type='50' data-fstring='" + kanBanBoardName + "' data-fdate='' data-fint='" + Convert.ToString(row["F_INT"]) + "' id='" + Convert.ToString(row["ID"]) + "'>"); //sortable-item <div> started
-                                    sbItems.Append("<div style='float:right;'><ul style='margin: 0px; width: 20px;'><li class='associateditemscontextmenu'><a data-itemid='" + Convert.ToString(row["ID"]) + "' data-listid='" + list.ID.ToString() + "' data-webid='" + webID + "' data-siteid='" + siteId + "'></a></li></ul></div>");
+                                    sbItems.Append("<div class='sortable-item' data-siteid='" + oWeb.Site.ID + "' data-webid='" + oWeb.ID + "' data-listid='" + list.ID + "' data-itemid='" + Convert.ToString(row["ID"]) + "' data-userid='0' data-itemtitle='" + Convert.ToString(row["Title"]) + "' data-icon='' data-type='50' data-fstring='" + kanBanBoardName + "' data-fdate='' data-fint='" + Convert.ToString(row["F_INT"]) + "' id='" + Convert.ToString(row["ID"]) + "'>"); //sortable-item <div> started
+                                    sbItems.Append("<div style='float:right;'><ul style='margin: 0px; width: 20px;'><li class='associateditemscontextmenu'><a data-itemid='" + Convert.ToString(row["ID"]) + "' data-listid='" + list.ID.ToString() + "' data-webid='" + oWeb.ID + "' data-siteid='" + oWeb.Site.ID + "'></a></li></ul></div>");
                                     foreach (string column in displayColumnsForSourceListData.Split(','))
                                     {
                                         if (!string.IsNullOrEmpty(column))
@@ -5600,8 +5590,8 @@ namespace EPMLiveWorkPlanner
                                             string currentProcessingStatus = Convert.ToString(row[statusFieldName]);
                                             if (currentProcessingStatus.Equals(status, StringComparison.InvariantCultureIgnoreCase))
                                             {
-                                                sbItems.Append("<div class='sortable-item' data-siteid='" + siteId + "' data-webid='" + webID + "' data-listid='" + list.ID + "' data-itemid='" + Convert.ToString(row["ID"]) + "' data-userid='0' data-itemtitle='" + Convert.ToString(row["Title"]) + "' data-icon='' data-type='50' data-fstring='" + kanBanBoardName + "' data-fdate='' data-fint='" + Convert.ToString(row["F_INT"]) + "' id='" + Convert.ToString(row["ID"]) + "'>"); //sortable-item <div> started
-                                                sbItems.Append("<div style='float:right;'><ul style='margin: 0px; width: 20px;'><li class='associateditemscontextmenu'><a data-itemid='" + Convert.ToString(row["ID"]) + "' data-listid='" + list.ID.ToString() + "' data-webid='" + webID + "' data-siteid='" + siteId + "'></a></li></ul></div>");
+                                                sbItems.Append("<div class='sortable-item' data-siteid='" + oWeb.Site.ID + "' data-webid='" + oWeb.ID + "' data-listid='" + list.ID + "' data-itemid='" + Convert.ToString(row["ID"]) + "' data-userid='0' data-itemtitle='" + Convert.ToString(row["Title"]) + "' data-icon='' data-type='50' data-fstring='" + kanBanBoardName + "' data-fdate='' data-fint='" + Convert.ToString(row["F_INT"]) + "' id='" + Convert.ToString(row["ID"]) + "'>"); //sortable-item <div> started
+                                                sbItems.Append("<div style='float:right;'><ul style='margin: 0px; width: 20px;'><li class='associateditemscontextmenu'><a data-itemid='" + Convert.ToString(row["ID"]) + "' data-listid='" + list.ID.ToString() + "' data-webid='" + oWeb.ID + "' data-siteid='" + oWeb.Site.ID + "'></a></li></ul></div>");
 
                                                 foreach (string column in displayColumnsForSourceListData.Split(','))
                                                 {
@@ -5692,44 +5682,49 @@ namespace EPMLiveWorkPlanner
                     web.AllowUnsafeUpdates = false;
 
                     //Insert/Update Record to FRF list...
-                    using (SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(web.Site.WebApplication.Id)))
-                    {
-                        cn.Open();
+                    SPSecurity.RunWithElevatedPrivileges(delegate()
+                                {
+                                    using (SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(web.Site.WebApplication.Id)))
+                                    {
+                                        cn.Open();
 
-                        //Replace userId and Type fields after words...
-                        string frfInsertUpdate = @"IF NOT EXISTS (SELECT 1 FROM FRF WHERE [SITE_ID]=@siteId AND [WEB_ID]=@webId AND [LIST_ID]=@listId AND [ITEM_ID]=@itemId AND [USER_ID]=@userId AND [Type]=@type)
-                        BEGIN
-	                        INSERT INTO FRF ([SITE_ID],[WEB_ID],[LIST_ID],[ITEM_ID],[USER_ID],[Title],[Icon],[Type],[F_String],[F_Date],[F_Int])
-                                    VALUES (@siteId, @webId, @listId, @itemId, @userId, @title, @icon, @type, @fString, @fDate, @dataIndexOfItem)
-                        END
-                        ELSE 
-                        BEGIN
-                            UPDATE FRF SET 
-                            [F_Int] = [F_Int] + 1 
-                            WHERE [SITE_ID]=@siteId AND [WEB_ID]=@webId AND [LIST_ID]=@listId AND [USER_ID]=@userId AND [Type]=@type AND [F_Int] >= @dataIndexOfItem AND [F_Int] <= @fInt 
+                                        //Replace userId and Type fields after words...
+                                        string frfInsertUpdate = @"IF NOT EXISTS (SELECT 1 FROM FRF WHERE [SITE_ID]=@siteId AND [WEB_ID]=@webId AND [LIST_ID]=@listId AND [ITEM_ID]=@itemId AND [USER_ID]=@userId AND [Type]=@type)
+                                                                    BEGIN
+	                                                                    INSERT INTO FRF ([SITE_ID],[WEB_ID],[LIST_ID],[ITEM_ID],[USER_ID],[Title],[Icon],[Type],[F_String],[F_Date],[F_Int])
+                                                                                VALUES (@siteId, @webId, @listId, @itemId, @userId, @title, @icon, @type, @fString, @fDate, @dataIndexOfItem)
+                                                                    END
+                                                                    ELSE 
+                                                                    BEGIN
+                                                                        UPDATE FRF SET 
+                                                                        [F_Int] = [F_Int] + 1 
+                                                                        WHERE [SITE_ID]=@siteId AND [WEB_ID]=@webId AND [LIST_ID]=@listId AND [USER_ID]=@userId AND [Type]=@type AND [F_Int] >= @dataIndexOfItem AND [F_Int] <= @fInt 
 
-                            UPDATE FRF SET 
-                            [Title] = @title, 
-                            [F_Int] = @dataIndexOfItem 
-                            WHERE [SITE_ID]=@siteId AND [WEB_ID]=@webId AND [LIST_ID]=@listId AND [ITEM_ID]=@itemId AND [USER_ID]=@userId AND [Type]=@type 
-                        END";
+                                                                        UPDATE FRF SET 
+                                                                        [Title] = @title, 
+                                                                        [F_Int] = @dataIndexOfItem 
+                                                                        WHERE [SITE_ID]=@siteId AND [WEB_ID]=@webId AND [LIST_ID]=@listId AND [ITEM_ID]=@itemId AND [USER_ID]=@userId AND [Type]=@type 
+                                                                    END";
 
-                        SqlCommand cmd = new SqlCommand(frfInsertUpdate, cn);
-                        cmd.Parameters.AddWithValue("@siteId", siteId);
-                        cmd.Parameters.AddWithValue("@webId", webId);
-                        cmd.Parameters.AddWithValue("@listId", listId);
-                        cmd.Parameters.AddWithValue("@itemId", itemId);
-                        cmd.Parameters.AddWithValue("@userId", USER_ID);
-                        cmd.Parameters.AddWithValue("@title", itemTitle);
-                        cmd.Parameters.AddWithValue("@icon", icon);
-                        cmd.Parameters.AddWithValue("@type", TYPE);
-                        cmd.Parameters.AddWithValue("@fString", fString);
-                        cmd.Parameters.AddWithValue("@fDate", fDate);
-                        cmd.Parameters.AddWithValue("@dataIndexOfItem", dataIndexOfItem);
-                        cmd.Parameters.AddWithValue("@fInt", fInt);
+                                        SqlCommand cmd = new SqlCommand(frfInsertUpdate, cn);
+                                        cmd.Parameters.AddWithValue("@siteId", siteId);
+                                        cmd.Parameters.AddWithValue("@webId", webId);
+                                        cmd.Parameters.AddWithValue("@listId", listId);
+                                        cmd.Parameters.AddWithValue("@itemId", itemId);
+                                        cmd.Parameters.AddWithValue("@userId", USER_ID);
+                                        cmd.Parameters.AddWithValue("@title", itemTitle);
+                                        cmd.Parameters.AddWithValue("@icon", icon);
+                                        cmd.Parameters.AddWithValue("@type", TYPE);
+                                        cmd.Parameters.AddWithValue("@fString", fString);
+                                        cmd.Parameters.AddWithValue("@fDate", fDate);
+                                        cmd.Parameters.AddWithValue("@dataIndexOfItem", dataIndexOfItem);
+                                        cmd.Parameters.AddWithValue("@fInt", fInt);
 
-                        cmd.ExecuteNonQuery();
-                    }
+                                        cmd.ExecuteNonQuery();
+                                    }
+
+                                });
+
                 }
             }
 
