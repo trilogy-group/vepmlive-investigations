@@ -250,34 +250,6 @@ namespace EPMLiveReportsAdmin
                                 errMsg += e3.Message;
                             }
                         }
-
-                        using (var t = epmdata.GetEPMLiveConnection.BeginTransaction())
-                        {
-                            using (var bc = new SqlBulkCopy(epmdata.GetEPMLiveConnection, new SqlBulkCopyOptions(), t))
-                            {
-                                bc.DestinationTableName = "Webs";
-
-                                var dictionary = new Dictionary<string, string>
-                                {
-                                    {"SiteId", "SiteId"},
-                                    {"ItemWebId", "ItemWebId"},
-                                    {"ItemListId", "ItemListId"},
-                                    {"ItemId", "ItemId"},
-                                    {"ParentWebId", "ParentWebId"},
-                                    {"WebId", "Id"},
-                                    {"WebUrl", "URL"},
-                                    {"WebTitle", "Title"}
-                                };
-
-                                foreach (KeyValuePair<string, string> c in dictionary)
-                                {
-                                    bc.ColumnMappings.Add(c.Key, c.Value);
-                                }
-
-                                bc.WriteToServer(rptWeb);
-                                t.Commit();
-                            }
-                        }
                     }
                     #endregion
                 }
