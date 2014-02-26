@@ -38,8 +38,19 @@ namespace UplandIntegrations.Tfs
                 }
 
                 NetworkCredential netCred = new NetworkCredential(userName, password);
-                BasicAuthCredential basicCred = new BasicAuthCredential(netCred);
-                tfsCred = new TfsClientCredentials(basicCred);
+                Uri serverUri = new Uri(serverUrl);
+
+                if (serverUri.Scheme.ToLower().Equals("https"))
+                {
+                    BasicAuthCredential basicCred = new BasicAuthCredential(netCred);
+                    tfsCred = new TfsClientCredentials(basicCred);
+                }
+                else
+                {
+                    WindowsCredential windowsCred = new WindowsCredential(netCred);
+                    tfsCred = new TfsClientCredentials(windowsCred);
+                }
+
                 tfsCred.AllowInteractive = false;
 
                 tfsConfigurationServer = new TfsConfigurationServer(new Uri(serverUrl), tfsCred);
