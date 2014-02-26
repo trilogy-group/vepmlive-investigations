@@ -19,8 +19,8 @@ namespace EPMLiveWebParts.FancyDisplayForm
     {
         #region Variables and Constants
 
-        const int QUICK_DETAILS_SECTION_ONE_FIELD_COUNT = 7;
-        const int QUICK_DETAILS_SECTION_TOTAL_FIELD_COUNT = 14;
+        const int QUICK_DETAILS_SECTION_ONE_FIELD_COUNT = 6;
+        const int QUICK_DETAILS_SECTION_TOTAL_FIELD_COUNT = 12;
         const int NARRATIVE_DETAILS_SECTION_FIELD_COUNT = 2;
         const int PEOPLE_DETAILS_SECTION_FIELD_COUNT = 5;
         const int DATE_DETAILS_SECTION_FIELD_COUNT = 2;
@@ -30,7 +30,6 @@ namespace EPMLiveWebParts.FancyDisplayForm
         int narrativeDetailsFieldsCount = 0;
         int peopleDetailsFieldsCount = 0;
         int datesDetailsFieldsCount = 0;
-        int associatedItemCount = 0;
         int itemId = 0;
 
         StringBuilder sbQuickDetailsContent = new StringBuilder();
@@ -259,8 +258,6 @@ namespace EPMLiveWebParts.FancyDisplayForm
                 }
 
                 FillItemDetailsSection(item);
-
-                FillAssociatedItemsSection(item);
             }
         }
 
@@ -273,7 +270,7 @@ namespace EPMLiveWebParts.FancyDisplayForm
             else if (quickDetailsFieldsCount <= QUICK_DETAILS_SECTION_TOTAL_FIELD_COUNT)
                 sbQuickDetailsContent.Append("</table></td></tr></table>");
             else
-                sbQuickDetailsShowAllRegion.Append("</table>");
+                sbQuickDetailsShowAllRegion.Append("</table></td></tr></table>");
 
             #endregion
 
@@ -431,18 +428,6 @@ namespace EPMLiveWebParts.FancyDisplayForm
             divItemDetailParent.InnerHtml = sbItemDetailsContent.ToString();
 
             #endregion
-
-            #region Show/Hide Associated Items Section
-
-            if (associatedItemCount > 0)
-            {
-                divFancyDispFormParent.Visible = true;
-                divFancyDispFormContent.InnerHtml = sbFancyDispFormContent.ToString();
-            }
-            else
-                divFancyDispFormParent.Visible = false;
-
-            #endregion
         }
 
         #endregion
@@ -464,7 +449,11 @@ namespace EPMLiveWebParts.FancyDisplayForm
             else if (quickDetailsFieldsCount == QUICK_DETAILS_SECTION_TOTAL_FIELD_COUNT)
             {
                 sbQuickDetailsContent.Append("</table></td></tr></table>");
-                sbQuickDetailsShowAllRegion.Append("<table class='fancy-col-table'>");
+                sbQuickDetailsShowAllRegion.Append("<table style='width:100%'><tr><td><table class='fancy-col-table'>");
+            }
+            else if ((quickDetailsFieldsCount == QUICK_DETAILS_SECTION_ONE_FIELD_COUNT * 4))
+            {
+                sbQuickDetailsShowAllRegion.Append("</table></td><td style='vertical-align: top'><table class='fancy-col-table'>");
             }
 
             if (quickDetailsFieldsCount < QUICK_DETAILS_SECTION_TOTAL_FIELD_COUNT)
@@ -706,203 +695,6 @@ namespace EPMLiveWebParts.FancyDisplayForm
             sbItemDetailsContent.Append("<td>Last modified " + ((DateTime)(item[SPBuiltInFieldId.Modified])).ToFriendlyDateAndTime() + " by " + ((SPField)item.Fields[SPBuiltInFieldId.Editor]).GetFieldValueAsHtml(item[SPBuiltInFieldId.Editor]) + "</td>");
             sbItemDetailsContent.Append("</tr>");
             sbItemDetailsContent.Append("</table>");
-        }
-
-        private void FillAssociatedItemsSection(SPListItem item)
-        {
-            string sqlLists = string.Empty;
-            StringBuilder sqlGetListHeaders = new StringBuilder();
-            ArrayList arrAssociatedLists = null;
-            string projectLinkedField = "Project";
-            DataTable dtListName = null;
-            string sourceUrl = string.Empty;
-
-            SPSite spSite = SPContext.Current.Site;
-            SPWeb spWeb = SPContext.Current.Web;
-            SPList list = SPContext.Current.List;
-
-            if (Page.Request["Source"] != null)
-                sourceUrl = Convert.ToString(Page.Request["Source"]);
-            else
-                sourceUrl = SPContext.Current.Web.Url;
-
-            arrAssociatedLists = EPMLiveCore.API.ListCommands.GetAssociatedLists(list);
-
-            if (arrAssociatedLists != null && arrAssociatedLists.Count > 0)
-            {
-                associatedItemCount = arrAssociatedLists.Count;
-
-                #region Prepare DataTable for Associated Items
-
-                //Prepare query to load list whether it is exists in Reporting database or not?!!
-                sqlGetListHeaders.Append("SELECT * FROM (");
-                foreach (EPMLiveCore.API.AssociatedListInfo associatedListItem in arrAssociatedLists)
-                    sqlGetListHeaders.Append("SELECT '" + associatedListItem.Title + "' ListName UNION ");
-
-                sqlLists = sqlGetListHeaders.ToString().Substring(0, sqlGetListHeaders.ToString().Length - 6); //Removing last UNION keyword
-                sqlLists = sqlLists + ") AssociatedItemList LEFT OUTER JOIN RPTList ON AssociatedItemList.ListName = RPTList.ListName";
-
-                #endregion
-
-                try
-                {
-                    var queryExecutor = new QueryExecutor(spWeb);
-                    dtListName = queryExecutor.ExecuteReportingDBQuery(sqlLists, new Dictionary<string, object> { });
-                }
-                catch { }
-
-                #region Load Associated Items (Count)
-
-                #endregion
-
-                if (dtListName != null && dtListName.Rows.Count > 0)
-                {
-                    sbFancyDispFormContent.Append("<table style='width:100%'><tr><td><table class='fancy-col-table'>");
-
-                    for (int i = 0; i < dtListName.Rows.Count; i++)
-                    {
-                        string rptListId = Convert.ToString(dtListName.Rows[i]["RPTListID"]);
-                        string listName = Convert.ToString(dtListName.Rows[i]["ListName"]);
-                        string tableName = Convert.ToString(dtListName.Rows[i]["TableName"]);
-
-                        //Checking if rptListId is Null or not: If Null then use Object Model to load count, database call otherwise
-                        if (!string.IsNullOrEmpty(rptListId))
-                        {
-                            #region Retrieve associated list count from database
-
-                            foreach (EPMLiveCore.API.AssociatedListInfo associatedListItemInfo in arrAssociatedLists)
-                            {
-                                if (associatedListItemInfo.ListId.ToString().Equals(rptListId, StringComparison.InvariantCultureIgnoreCase))
-                                {
-                                    projectLinkedField = associatedListItemInfo.LinkedField;
-                                    break;
-                                }
-                            }
-
-                            string sql = string.Empty;
-                            sql = "SELECT COUNT(*) AS 'Count' FROM " + tableName + " WHERE CONVERT(NVARCHAR(MAX), " + projectLinkedField + "ID) LIKE N'%" + Convert.ToString(SPContext.Current.ItemId) + "%' AND ListId = '" + rptListId + "'";
-
-                            DataTable dtListItemCount = null;
-                            try
-                            {
-                                // Wait for 3 seconds just in-case if reporting database is not updated.
-                                Thread.Sleep(3000);
-                                var queryExecutor = new QueryExecutor(spWeb);
-                                dtListItemCount = queryExecutor.ExecuteReportingDBQuery(sql, new Dictionary<string, object> { });
-                            }
-                            catch { }
-
-                            int FancyDispFormCount = 0;
-                            if (dtListItemCount != null && dtListItemCount.Rows.Count > 0)
-                            {
-                                FancyDispFormCount = Convert.ToInt32(dtListItemCount.Rows[0]["Count"]);
-                            }
-
-                            sbFancyDispFormContent.Append("<tr>");
-                            sbFancyDispFormContent.Append("<td>" + listName + "</td>");
-                            sbFancyDispFormContent.Append("<td class='pill-cell'><span class='badge'><div id='div_" + rptListId + "' class='listMainDiv'>" + Convert.ToString(FancyDispFormCount) + "</span></a>");
-
-                            #endregion
-                        }
-                        else
-                        {
-                            #region Retrieve associated list count using SharePoint Object Model
-
-                            //SharePoint Object Model to Load Record Count
-                            SPList otherList = spWeb.Lists[listName];
-                            SPQuery query = new SPQuery();
-                            rptListId = otherList.ID.ToString();
-
-                            foreach (EPMLiveCore.API.AssociatedListInfo associatedItem in arrAssociatedLists)
-                            {
-                                if (associatedItem.ListId.ToString().Equals(rptListId, StringComparison.InvariantCultureIgnoreCase))
-                                {
-                                    projectLinkedField = associatedItem.LinkedField;
-                                    break;
-                                }
-                            }
-
-                            query.Query = "<Where><Eq><FieldRef Name='" + projectLinkedField + "' LookupId='True' /><Value Type='Lookup'>" + item.ID + "</Value></Eq></Where>";
-                            Int64 itemCount = otherList.GetItems(query).Count;
-
-                            sbFancyDispFormContent.Append("<tr>");
-                            sbFancyDispFormContent.Append("<td>" + listName + "</td>");
-                            sbFancyDispFormContent.Append("<td class='pill-cell'><span class='badge'><div id='div_" + otherList.ID.ToString() + "' class='listMainDiv'>" + Convert.ToString(itemCount) + "</span></a>");
-
-                            #endregion
-                        }
-
-                        #region Load Top-5 Items (Using SharePoint Object Model)
-
-                        //Load Top-5 Items...
-                        SPList projectAssociatedList = spWeb.Lists[listName];
-                        SPQuery qryFancyDispForm = new SPQuery();
-                        qryFancyDispForm.Query = "<Where><Eq><FieldRef Name='" + projectLinkedField + "' LookupId='True' /><Value Type='Lookup'>" + item.ID + "</Value></Eq></Where><QueryOptions></QueryOptions><OrderBy><FieldRef Name='Modified' Ascending='FALSE' /></OrderBy>";
-                        qryFancyDispForm.RowLimit = 5;
-                        SPListItemCollection top5FancyDispForm = projectAssociatedList.GetItems(qryFancyDispForm);
-
-                        sbFancyDispFormContent.Append("<div id='div_items_" + rptListId + "'  class='slidingDiv'>");
-                        sbFancyDispFormContent.Append("<div class='slidingDivHeader'>" + listName + "</div>");
-
-                        if (!EPMLiveCore.API.ListCommands.GetGridGanttSettings(projectAssociatedList).HideNewButton)
-                        {
-                            string newFormUrl = projectAssociatedList.DefaultNewFormUrl + "?LookupField=" + projectLinkedField + "&LookupValue=" + item.ID;
-                            sbFancyDispFormContent.Append("<div class='slidingDivAdd'><a href='#' onclick=\"javascript:FancyDispFormClient.showNewForm('" + newFormUrl + "');return false;\"><img title='Add new " + listName + "' alt='' src='/_layouts/epmlive/images/newitem5.png' class='ms-core-menu-buttonIcon'></img></a></div>");
-                        }
-
-                        sbFancyDispFormContent.Append("<br/>");
-
-                        sbFancyDispFormContent.Append("<div style='clear:both;'></div>");
-                        sbFancyDispFormContent.Append("<table class='fancy-col-table' style='color:black; font-weight:normal;'>");
-
-                        foreach (SPListItem currentListItem in top5FancyDispForm)
-                        {
-                            sbFancyDispFormContent.Append("<tr>");
-
-                            if (currentListItem.Title != null && currentListItem.Title.TrimEnd().Length > 25)
-                            {
-                                sbFancyDispFormContent.Append("<td><a href='#' alt='" + currentListItem.Title + "' title='" + currentListItem.Title + "' onclick=\"javascript:FancyDispFormClient.showNewForm('" + projectAssociatedList.DefaultDisplayFormUrl + "?ID=" + currentListItem.ID + "&Source=" + sourceUrl + "');return false;\">" + currentListItem.Title.Substring(0, 25) + "..." + "</a></td>");
-                            }
-                            else
-                            {
-                                sbFancyDispFormContent.Append("<td><a href='#' alt='" + currentListItem.Title + "' title='" + currentListItem.Title + "' onclick=\"javascript:FancyDispFormClient.showNewForm('" + projectAssociatedList.DefaultDisplayFormUrl + "?ID=" + currentListItem.ID + "&Source=" + sourceUrl + "');return false;\">" + currentListItem.Title + "</a></td>");
-                            }
-
-                            sbFancyDispFormContent.Append("<td>");
-
-                            sbFancyDispFormContent.Append("<li class='fancyDisplayFormAssociatedItemsContextMenu'>");
-                            sbFancyDispFormContent.Append("<a data-itemid='" + currentListItem.ID + "' data-listid='" + projectAssociatedList.ID.ToString() + "' data-webid='" + spWeb.ID + "' data-siteid='" + spSite.ID + "'>");
-                            sbFancyDispFormContent.Append("</a>");
-                            sbFancyDispFormContent.Append("</li>");
-                            sbFancyDispFormContent.Append("</td>");
-
-                            sbFancyDispFormContent.Append("</tr>");
-                        }
-
-                        sbFancyDispFormContent.Append("</table>");
-                        sbFancyDispFormContent.Append("<br/>");
-                        sbFancyDispFormContent.Append("<br/>");
-
-                        qryFancyDispForm = new SPQuery();
-                        qryFancyDispForm.Query = "<Where><Eq><FieldRef Name='" + projectLinkedField + "' LookupId='True' /><Value Type='Lookup'>" + item.ID + "</Value></Eq></Where><QueryOptions></QueryOptions><OrderBy><FieldRef Name='Modified' Ascending='FALSE' /></OrderBy>";
-                        SPListItemCollection otherFancyDispForm = projectAssociatedList.GetItems(qryFancyDispForm);
-
-                        if (otherFancyDispForm.Count > 5)
-                        {
-                            string viewAllItemsUrl = spWeb.Url + "/_layouts/epmlive/gridaction.aspx?action=linkeditemspost&listid=" + list.ID + "&lookups=" + item.Title + "&field=" + projectLinkedField + "&LookupFieldList=" + projectAssociatedList.ID.ToString();// +"&Source=" + sourceUrl;
-                            sbFancyDispFormContent.Append("<a href='#' onclick=\"javascript:FancyDispFormClient.showItemUrl('" + viewAllItemsUrl + "');return false;\">View All " + projectAssociatedList.Title + "</a>");
-                        }
-
-                        sbFancyDispFormContent.Append("</div>"); //div_items_listGuid - Div Ends..
-                        sbFancyDispFormContent.Append("</div></div>"); //div_listGUID - Div Ends..
-                        sbFancyDispFormContent.Append("</td></tr>");
-
-                        #endregion
-                    }
-                }
-                sbFancyDispFormContent.Append("</table></td></tr></table>");
-                //} //Report Admin - if ends...
-            }
         }
 
         #endregion

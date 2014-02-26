@@ -14,7 +14,7 @@
         font-weight: 300;
         color: #555555;
         width: 900px;
-        min-width:500px;
+        /*min-width: 900px;*/
     }
 
     .fancyDisplayForm {
@@ -237,7 +237,7 @@
         },
 
         showNewForm: function (weburl) {
-            var options = { url: weburl, showMaximized: false, dialogReturnValueCallback: function (dialogResult) { fillWebPartData(); } };
+            var options = { url: weburl, showMaximized: false, dialogReturnValueCallback: function (dialogResult) { FancyDispFormClient.fillWebPartData(); } };
             SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
         },
 
@@ -281,34 +281,46 @@
 
             $("#<%=divFancyDispFormContent.ClientID%>").hide();
 
-            $(".slidingDiv").hide();
+            $.ajax({
+                type: "POST",
+                url: "<%=SPContext.Current.Web.Url%>/_vti_bin/WorkEngine.asmx/Execute",
+                data: "{Function : 'GetFancyFormAssociatedItems' , Dataxml: '<FancyFormAssociatedItems><FancyFormListID><%=SPContext.Current.ListId%></FancyFormListID><FancyFormItemID><%=SPContext.Current.ItemId%></FancyFormItemID><FancyFormItemTitle><%=SPContext.Current.ListItem.Title%></FancyFormItemTitle></FancyFormAssociatedItems>'}",
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
 
-            $(".listMainDiv").mouseover(function () {
-                $(".slidingDiv").hide();
-                $(this).find(".slidingDiv").show();
+                    $("#<%=divFancyDispFormContent.ClientID%>").html("");
+                        $("#<%=divFancyDispFormContent.ClientID%>").html(response.d.toString().replace("<Result Status=\"0\">", "").replace("</Result>", ""));
+
+                        $(".slidingDiv").hide();
+
+                        $(".listMainDiv").mouseover(function () {
+                            $(".slidingDiv").hide();
+                            $(this).find(".slidingDiv").show();
+                        });
+
+                        $(".slidingDiv").mouseover(function () {
+                            $(this).show();
+                        });
+
+                        $("#<%=divFancyDispFormContent.ClientID%>").mouseout(function () {
+                            $(".slidingDiv").hide();
+                        });
+
+                        var addContextualMenu = function () {
+                            $(".fancyDisplayFormAssociatedItemsContextMenu").each(function () {
+                                window.epmLiveNavigation.addContextualMenu($(this), null, true);
+                            });
+                        };
+
+                        window.ExecuteOrDelayUntilScriptLoaded(addContextualMenu, 'EPMLive.Navigation.js');
+
+                        $("#<%=divFancyDispFormContent.ClientID%>").show();
+                    }
             });
-
-            $(".slidingDiv").mouseover(function () {
-                $(this).show();
-            });
-
-            $("#<%=divFancyDispFormContent.ClientID%>").mouseout(function () {
-                $(".slidingDiv").hide();
-            });
-
-            var addContextualMenu = function () {
-                $(".fancyDisplayFormAssociatedItemsContextMenu").each(function () {
-                    window.epmLiveNavigation.addContextualMenu($(this), null, true);
-                });
-            };
-
-            window.ExecuteOrDelayUntilScriptLoaded(addContextualMenu, 'EPMLive.Navigation.js');
-
-            $("#<%=divFancyDispFormContent.ClientID%>").show();
         }
     }
 </script>
-
 
 <div style="text-align: right; width: 100%">
     <asp:Button ID="btnCancel1" runat="server" Text="Close" OnClick="btnCancel_Click" />
@@ -326,14 +338,13 @@
             <table border="0" style="width: 100%">
                 <tr>
                     <td id="divQuickDetailsParent" runat="server">
-
                         <div id="divQuickDetailsHeader" class="fancy-display-header">
                             <span>Quick Details</span>
                         </div>
                         <div id="divQuickDetailsContent" runat="server" class="dispFormContent">
                         </div>
-                        <div>
-                            <table border="0" style="width: 63.5%">
+                        <div style="width: 100%">
+                            <table border="0" style="width: 100%">
                                 <tr>
                                     <td>
                                         <div class="dispFormExpandHeader" id="divShowQuickDetailsHeader" runat="server">
@@ -371,7 +382,6 @@
                 </tr>
             </table>
         </div>
-
         <div style="vertical-align: top; display: inline;">
             <table border="0">
                 <tr>
@@ -431,10 +441,11 @@
                 </tr>
             </table>
         </div>
-    </div>
 
-    <div class="dispFormContent" id="divItemDetailParent" runat="server">
     </div>
+</div>
+
+<div class="dispFormContent" id="divItemDetailParent" runat="server">
 </div>
 
 <div style="text-align: right; width: 100%">
