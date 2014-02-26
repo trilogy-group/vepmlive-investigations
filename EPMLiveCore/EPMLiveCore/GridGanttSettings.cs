@@ -33,6 +33,7 @@ namespace EPMLiveCore
         public string AutoCreationTemplateId = "";
         public string WorkspaceParentSiteLookup = "";
         public bool EnableWorkList = false;
+        public bool EnableFancyForms = false;
         public bool SendEmails = false;
         public bool DeleteRequest = false;
         public string RequestList = "";
@@ -162,7 +163,8 @@ namespace EPMLiveCore
             catch { }
             try { ListIcon = settings[38]; }
             catch{}
-
+            try { EnableFancyForms = bool.Parse(settings[39]); }
+            catch { }
         }
 
         private string GetString()
@@ -207,6 +209,7 @@ namespace EPMLiveCore
             data += AutoCreationTemplateId + "\n";
             data += WorkspaceParentSiteLookup + "\n";
             data += ListIcon + "\n";
+            data += EnableFancyForms + "\n";
 
             return data;
         }

@@ -28,6 +28,7 @@ using EPMLiveReportsAdmin;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using EPMLiveCore.Infrastructure;
+using EPMLiveWebParts.FancyDisplayForm;
 
 namespace EPMLiveCore.Layouts.epmlive
 {
@@ -301,6 +302,7 @@ namespace EPMLiveCore.Layouts.epmlive
                     hdnListIcon.Value = string.IsNullOrEmpty(gSettings.ListIcon) ? "icon-square" : gSettings.ListIcon;
 
                     chkWorkListFeat.Checked = gSettings.EnableWorkList;
+                    chkFancyForms.Checked = gSettings.EnableFancyForms;
                     chkEmails.Checked = gSettings.SendEmails;
                     chkDeleteRequest.Checked = gSettings.DeleteRequest;
                     txtRequestList.Text = gSettings.RequestList;
@@ -947,7 +949,7 @@ namespace EPMLiveCore.Layouts.epmlive
                                                    SPEventReceiverType.ItemUpdated, 
                                                    SPEventReceiverType.ItemDeleting
                                                };
-            
+
             AddEventReceiverElement(operation, className, assembly, spEventReceiverTypes, new Guid(Request["List"]),
                                     ref dataElement);
 
@@ -1008,6 +1010,7 @@ namespace EPMLiveCore.Layouts.epmlive
             gSettings.WorkspaceParentSiteLookup = ddlParentSiteLookup.SelectedValue;
             gSettings.ListIcon = hdnListIcon.Value;
             gSettings.EnableWorkList = chkWorkListFeat.Checked;
+            gSettings.EnableFancyForms = chkFancyForms.Checked;
             gSettings.SendEmails = chkEmails.Checked;
             gSettings.DeleteRequest = chkDeleteRequest.Checked;
             gSettings.RequestList = txtRequestList.Text;
@@ -1202,6 +1205,19 @@ namespace EPMLiveCore.Layouts.epmlive
             else
                 API.ListCommands.DisableTimesheets(list, web);
 
+            if (chkFancyForms.Checked)
+                EnableFancyForms(list);
+            else
+            {
+                try
+                {
+                    list.DefaultDisplayFormUrl = string.Format("{0}/{1}/DispForm.aspx", SPContext.Current.Web.Url, list.RootFolder.Url);
+                }
+                catch (ArgumentException)
+                {
+                    list.RootFolder.Files.Add(string.Format("{0}/{1}/DispForm.aspx", SPContext.Current.Web.Url, list.RootFolder.Url), SPTemplateFileType.FormPage);
+                }
+            }
 
             if (chkWorkListFeat.Checked)
             {
@@ -1279,6 +1295,76 @@ namespace EPMLiveCore.Layouts.epmlive
             Infrastructure.CacheStore.Current.RemoveCategory("GridSettings-" + list.ID);
 
             Microsoft.SharePoint.Utilities.SPUtility.Redirect("listedit.aspx?List=" + Request["List"], Microsoft.SharePoint.Utilities.SPRedirectFlags.RelativeToLayoutsPage, HttpContext.Current);
+        }
+
+        private void EnableFancyForms(SPList list)
+        {
+            try
+            {
+                SPSecurity.RunWithElevatedPrivileges(delegate()
+                {
+                    SPWeb web = SPContext.Current.Web;
+                    bool isFancyFormExists = false;
+                    var rootFolder = list.RootFolder;
+
+                    var dispFormUrl = string.Format("{0}/{1}/FancyDispForm.aspx", web.ServerRelativeUrl, rootFolder.Url);
+                    var dispForm = web.GetFile(dispFormUrl);
+
+                    if (dispForm != null && dispForm.Exists)
+                    {
+                        //Delete webparts from existing list
+                        var wpm = dispForm.GetLimitedWebPartManager(System.Web.UI.WebControls.WebParts.PersonalizationScope.Shared);
+                        if (wpm.WebParts != null)
+                        {
+                            for (int i = 0; i < wpm.WebParts.Count; i++)
+                                wpm.DeleteWebPart(wpm.WebParts[i]);
+                        }
+
+                        isFancyFormExists = true;
+                    }
+                    else
+                    {
+                        /* create a new NewForm */
+                        dispForm = rootFolder.Files.Add(dispFormUrl, SPTemplateFileType.FormPage);
+                        isFancyFormExists = true;
+                    }
+
+
+                    //list.DefaultDisplayFormUrl = string.Format("{0}/{1}/FancyDispForm.aspx", web.Url, rootFolder.Url);
+
+                    if (isFancyFormExists)
+                    {
+                        var wpm = dispForm.GetLimitedWebPartManager(System.Web.UI.WebControls.WebParts.PersonalizationScope.Shared);
+
+                        ///* add a listformwebpart instance, configure it for the list */
+                        //var webpart = new ListFormWebPart
+                        //{
+                        //    ListId = list.ID,
+                        //    ListName = list.ID.ToString("B").ToUpper(),
+                        //    PageType = PAGETYPE.PAGE_DISPLAYFORM,
+                        //    Title = list.Title,
+                        //    Description = list.Description,
+                        //    CatalogIconImageUrl = list.ImageUrl,
+                        //    TitleUrl = list.DefaultViewUrl,
+                        //    AllowHide = true,
+                        //    Visible = false,
+                        //    Hidden = true
+                        //    //TemplateName = "SomeCustomRenderingTemplate"
+                        //};
+                        //wpm.AddWebPart(webpart, "Main", 2);
+
+                        FancyDisplayForm fancyDispFormWebPart = new FancyDisplayForm();
+                        fancyDispFormWebPart.Title = "Fancy Display Form";
+                        fancyDispFormWebPart.ChromeState = System.Web.UI.WebControls.WebParts.PartChromeState.Normal;
+                        fancyDispFormWebPart.ChromeType = System.Web.UI.WebControls.WebParts.PartChromeType.None;
+
+                        wpm.AddWebPart(fancyDispFormWebPart, "Main", 0);
+                    }
+
+                    list.DefaultDisplayFormUrl = string.Format("{0}/{1}/FancyDispForm.aspx", web.Url, rootFolder.Url);
+                });
+            }
+            catch { }
         }
 
         protected void AddReportEvent(object sender, EventArgs e)

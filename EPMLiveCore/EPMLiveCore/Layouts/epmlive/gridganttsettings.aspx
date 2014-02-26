@@ -307,6 +307,11 @@
                     <asp:CheckBox ID="chkDisplayRedirect" runat="server" Text="New Form Redirect" />
 				 </Template_Control>
 			</wssuc:InputFormControl>
+            <wssuc:InputFormControl LabelText="" runat="server">
+				 <Template_Control>
+                    <asp:CheckBox ID="chkFancyForms" runat="server" Text="Enable Fancy Forms" />
+				 </Template_Control>
+			</wssuc:InputFormControl>
             
 		</Template_InputFormControls>
 	</wssuc:InputFormSection>
