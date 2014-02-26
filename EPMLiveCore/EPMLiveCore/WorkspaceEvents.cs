@@ -48,9 +48,6 @@ namespace EPMLiveCore
                         {"@webid", properties.WebId}
                     });
 
-                qExec.ExecuteEpmLiveNonQuery("DELETE FROM Webs WHERE Id = @Id",
-                    new Dictionary<string, object> {{"@Id", properties.WebId}});
-
                 qExec.ExecuteReportingDBNonQuery(
                     "DELETE FROM [RPTWEBGROUPS] WHERE [WEBID] NOT IN (SELECT [WebId] FROM [RPTWeb])",
                     new Dictionary<string, object>());
