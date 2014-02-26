@@ -75,12 +75,6 @@ namespace EPMLiveCore.API
                         cmd.Connection = con;
                         cmd.ExecuteNonQuery();
                     }
-
-                    // Add the web in Webs table of epmlive database.
-
-                    PopulateWebsTabel(eSite.WebApplication.Id, siteId, eRootWeb.ID, eRootWeb.ServerRelativeUrl,
-                        eRootWeb.Title, eSite.ID, Guid.Empty, Guid.Empty, Guid.Empty, -1, createdWebId,
-                        createdWebServerRelativeUrl, createdWebTitle, parentWeb.ID, itemWeb.ID, listId, itemId);
                 }
             });
         }
@@ -120,47 +114,8 @@ namespace EPMLiveCore.API
                         cmd.Connection = con;
                         cmd.ExecuteNonQuery();
                     }
-
-                    // Add the web in Webs table of epmlive database.
-
-                    PopulateWebsTabel(eSite.WebApplication.Id, siteId, eRootWeb.ID, eRootWeb.ServerRelativeUrl,
-                        eRootWeb.Title, eSite.ID, Guid.Empty, Guid.Empty, Guid.Empty, -1, createdWebId,
-                        createdWebServerRelativeUrl, createdWebTitle, parentWeb.ID, Guid.Empty, Guid.Empty, -1);
                 }
             });
-        }
-
-        private static void PopulateWebsTabel(Guid webAppId, Guid siteId, Guid rootWebId, string rootWebUrl, string rootWebTitle,
-            Guid rootSiteId, Guid rootParentWebId, Guid rootItemWebId, Guid rootItemListId, int rootItemId, Guid webId,
-            string webUrl, string webTitle, Guid parentWebId, Guid itemWebId, Guid itemListId, int itemId)
-        {
-            using (var con = new SqlConnection(CoreFunctions.getConnectionString(webAppId)))
-            {
-                var cmd = string.Format(@"
-                    IF NOT EXISTS(SELECT Id FROM dbo.Webs WHERE Id = '{0}')
-                    BEGIN
-                        INSERT INTO [dbo].[Webs] ([Id], [URL], [Title], [SiteId], [ParentWebId], [ItemWebId], [ItemListId], [ItemId])
-                                VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}', {7})
-                    END
-
-                    IF EXISTS(SELECT Id FROM dbo.Webs WHERE Id = '{8}')
-                    BEGIN
-                        DELETE FROM dbo.Webs WHERE Id = '{8}'
-                    END
-                      
-                    INSERT INTO [dbo].[Webs] ([Id], [URL], [Title], [SiteId], [ParentWebId], [ItemWebId], [ItemListId], [ItemId])
-                            VALUES ('{8}', '{9}', '{10}', '{11}', '{12}', '{13}', '{14}', {15})
-                ", rootWebId, rootWebUrl, rootWebTitle, rootSiteId, rootParentWebId, rootItemWebId,
-                    rootItemListId, rootItemId, webId, webUrl, webTitle, siteId, parentWebId,
-                    itemWebId, itemListId, itemId);
-
-                con.Open();
-
-                using (var command = new SqlCommand(cmd, con))
-                {
-                    command.ExecuteNonQuery();
-                }
-            }
         }
 
         public static void AddToFRF(Guid siteId, Guid createdWebId, string siteTitle, string createdWebUrl, int userId, int type)
