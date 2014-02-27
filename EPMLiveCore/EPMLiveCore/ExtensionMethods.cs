@@ -1066,6 +1066,25 @@ namespace EPMLiveCore
             }
         }
 
+        public static bool IsGuid(this object obj)
+        {
+            if (obj == null || obj == DBNull.Value) return false;
+            return obj is Guid;
+        }
+
+        public static bool IsNonEmptyString(this object obj)
+        {
+            if (obj == null || obj == DBNull.Value) return false;
+            if (!(obj is string)) return false;
+            return !string.IsNullOrEmpty(obj.ToString());
+        }
+
+        public static bool IsInt(this object obj)
+        {
+            if (obj == null || obj == DBNull.Value) return false;
+            return obj is int;
+        }
+
         #endregion
 
         #region Private Helpers

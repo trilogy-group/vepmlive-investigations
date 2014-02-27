@@ -1,32 +1,47 @@
-﻿using System;
-using System.Security.Permissions;
+﻿using System.Collections.Generic;
+using EPMLiveCore.SocialEngine.Core;
 using Microsoft.SharePoint;
-using Microsoft.SharePoint.Utilities;
-using Microsoft.SharePoint.Workflow;
 
 namespace EPMLiveCore.SocialEngine.Events.WebEventReceiver
 {
     /// <summary>
-    /// Web Events
+    ///     Web Events
     /// </summary>
     public class WebEventReceiver : SPWebEventReceiver
     {
+        #region Methods (2) 
+
+        // Public Methods (2) 
+
         /// <summary>
-        /// A site was deleted.
+        ///     A site is being deleted.
         /// </summary>
-        public override void WebDeleted(SPWebEventProperties properties)
+        public override void WebDeleting(SPWebEventProperties properties)
         {
-            base.WebDeleted(properties);
+            SocialEngine.Current.ProcessActivity(ObjectKind.Workspace, ActivityKind.Deleted,
+                new Dictionary<string, object>
+                {
+                    {"Id", properties.WebId},
+                    {"UserId", properties.Web.CurrentUser.ID}
+                }, properties.Web);
         }
 
         /// <summary>
-        /// A site was provisioned.
+        ///     A site was provisioned.
         /// </summary>
         public override void WebProvisioned(SPWebEventProperties properties)
         {
-            base.WebProvisioned(properties);
+            SocialEngine.Current.ProcessActivity(ObjectKind.Workspace, ActivityKind.Created,
+                new Dictionary<string, object>
+                {
+                    {"Id", properties.WebId},
+                    {"Title", properties.Web.Title},
+                    {"URL", properties.ServerRelativeUrl},
+                    {"SiteId", properties.SiteId},
+                    {"UserId", properties.Web.CurrentUser.ID}
+                }, properties.Web);
         }
 
-
+        #endregion Methods 
     }
 }

@@ -2,8 +2,8 @@
 <Elements xmlns="http://schemas.microsoft.com/sharepoint/">
   <Receivers >
       <Receiver>
-        <Name>WebEventReceiverWebDeleted</Name>
-        <Type>WebDeleted</Type>
+        <Name>WebEventReceiverWebDeleting</Name>
+        <Type>WebDeleting</Type>
         <Assembly>$SharePoint.Project.AssemblyFullName$</Assembly>
         <Class>EPMLiveCore.SocialEngine.Events.WebEventReceiver.WebEventReceiver</Class>
         <SequenceNumber>10000</SequenceNumber>
