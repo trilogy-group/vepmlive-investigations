@@ -23,7 +23,7 @@
 
         #section1 {
             width: auto;
-            height: 75px;
+            height: 100px;
             margin: 5px;
             border: 1px solid black;
         }
@@ -160,8 +160,8 @@
 
         .itemContainer .sortable-item,
         .stageContainer .sortable-item {
-            background-color: #D6ECF2; /*0092CA*/
-            border-left: 5px solid #009CCC;
+            background-color: #B7EBFF; /*0092CA*/
+            border-left: 5px solid #0090CA;
             cursor: pointer;
             display: block;
             color: black;
@@ -187,8 +187,8 @@
             }
 
         .placeholder {
-            background-color: #e6e6e6; /*0092CA*/
-            border-left: 5px solid #009CCC;
+            background-color: #B7EBFF; /*0092CA*/
+            border-left: 5px solid #0090CA;
             border-top: 1px dashed #000;
             border-right: 1px dashed #000;
             border-bottom: 1px dashed #000;
@@ -237,6 +237,11 @@
 
             loadKanBanPlanners();
 
+            $("#lnkNewItem").click(function () {
+                showNewForm($(this).attr('data-newformurl'));
+            });
+
+
             $("#ddlKanBanPlanners").change(function () {
                 loadKanBanFilter1(this.value);
             });
@@ -268,6 +273,7 @@
         function resetControls(reset) {
             if (reset) {
                 //$("#btnApply").show();
+                $("#lnkNewItem").show();
                 $("#lblFilert1").show();
                 $("#ddlKanBanFilter1").show();
                 //$("#mainContainer").show();
@@ -275,11 +281,17 @@
             }
             else {
                 //$("#btnApply").hide();
+                $("#lnkNewItem").hide();
                 $("#lblFilert1").hide();
                 $("#ddlKanBanFilter1").hide();
                 //$("#mainContainer").hide();
                 $("#mainContainer").html('');
             }
+        }
+
+        function showNewForm(weburl) {
+            var options = { url: weburl, showMaximized: false, dialogReturnValueCallback: function (dialogResult) { loadKanBanBoard(); } };
+            SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
         }
 
         function loadKanBanPlanners() {
@@ -347,6 +359,8 @@
                         }
                         else {
                             resetControls(true);
+                            $("#lnkNewItem").attr('data-newformurl', obj.kanbannewitemurl);
+                            $("#lnkNewItem").text(obj.kanbanitemname);
                             $("#lblFilert1").text(obj.kanbanfilter1name);
 
                             $("#ddlKanBanFilter1").children('option').remove();
@@ -495,12 +509,20 @@
         <div style="float: left; padding: 5px;">
             <table>
                 <tr>
-                    <td><b>Select Kanban Board :</b></td>
+                    <td>
+                        <a id="lnkNewItem" href="#">
+                        </a>
+                    </td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>
+                        <b>Select Kanban Board :</b>
+                    </td>
                     <td>
                         <select id="ddlKanBanPlanners">
                         </select>
                     </td>
-                    <td></td>
                 </tr>
                 <tr>
                     <td>
@@ -510,12 +532,11 @@
                         <select id="ddlKanBanFilter1" multiple="multiple">
                         </select>
                     </td>
-                    <td>
-                        <%--<input id="btnApply" type="button" value="Apply" />--%>
-                    </td>
+                    <%--<td>
+                        <input id="btnApply" type="button" value="Apply" />
+                    </td>--%>
                 </tr>
             </table>
-
         </div>
     </div>
 

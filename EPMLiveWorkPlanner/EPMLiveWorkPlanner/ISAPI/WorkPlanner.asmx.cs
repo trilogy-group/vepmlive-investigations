@@ -5264,6 +5264,7 @@ namespace EPMLiveWorkPlanner
             bool isLookupOrUserField = false;
 
             WorkPlannerAPI.PlannerProps props = null;
+            SPList sourceList = null;
             DataTable dtTableName = new DataTable();
             DataTable dtFilterColumns = new DataTable();
             DataTable dtFilterColumnValues = new DataTable();
@@ -5275,7 +5276,7 @@ namespace EPMLiveWorkPlanner
                     using (SPWeb spWeb = spSite.OpenWeb(oWeb.ID))
                     {
                         props = WorkPlannerAPI.getSettings(spWeb, kanBanBoardName);
-                        SPList sourceList = spWeb.Lists[props.sListTaskCenter];
+                        sourceList = spWeb.Lists[props.sListTaskCenter];
 
                         try
                         {
@@ -5358,7 +5359,7 @@ namespace EPMLiveWorkPlanner
             {
                 jsonData = jsonData.Substring(0, jsonData.Length - 1);
             }
-            return string.Format("{{ \"kanbanerror\": \"\", \"kanbanfilter1name\": \"Select {0} :\", \"kanbanfilter1\": [{1}] }}", props.KanBanFilterColumn, jsonData);
+            return string.Format("{{ \"kanbannewitemurl\": \"{0}\", \"kanbanitemname\": \"New {1}\", \"kanbanerror\": \"\", \"kanbanfilter1name\": \"Select {2} :\", \"kanbanfilter1\": [{3}] }}", sourceList.DefaultNewFormUrl, sourceList.Title, props.KanBanFilterColumn, jsonData);
         }
 
         public static string GetKanBanBoard(XmlDocument data, SPWeb oWeb)
