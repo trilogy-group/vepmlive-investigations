@@ -5364,6 +5364,9 @@ namespace EPMLiveWorkPlanner
 
         public static string GetKanBanBoard(XmlDocument data, SPWeb oWeb)
         {
+            //add wait for report db to update
+            Thread.Sleep(2000);
+
             #region Read Parameters from data Xml
 
             //Get values from parameter
