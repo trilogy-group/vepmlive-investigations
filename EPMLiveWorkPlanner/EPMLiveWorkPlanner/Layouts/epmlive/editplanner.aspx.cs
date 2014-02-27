@@ -74,11 +74,11 @@ namespace EPMLiveWorkPlanner
 
                         try
                         {
-                            Cache.Remove("EPMLIVE-WPS");
+                            ViewState.Remove("EPMLIVE-WPS");
                         }
                         catch { }
 
-                        Cache.Add("EPMLIVE-WPS", wps, null, DateTime.Now.AddHours(1), System.Web.Caching.Cache.NoSlidingExpiration, System.Web.Caching.CacheItemPriority.Default, null);
+                        ViewState.Add("EPMLIVE-WPS", wps);
 
                         loadFields(web);
 
@@ -358,7 +358,7 @@ namespace EPMLiveWorkPlanner
                 if (plannerName != "")
                 {
                     EPMLiveCore.CoreFunctions.setConfigSetting(web, "EPMLivePlannerPlanners", newPlanners);
-                    EPMLiveCore.CoreFunctions.setConfigSetting(web, "EPMLivePlanner" + plannerName + "Fields", ((PlannerCore.WorkPlannerProperties)Cache.Get("EPMLIVE-WPS")).ToString());
+                    EPMLiveCore.CoreFunctions.setConfigSetting(web, "EPMLivePlanner" + plannerName + "Fields", ((PlannerCore.WorkPlannerProperties)ViewState["EPMLIVE-WPS"]).ToString());
                     EPMLiveCore.CoreFunctions.setConfigSetting(web, "EPMLivePlanner" + plannerName + "ProjectCenter", ddlProjectCenter.SelectedItem.Text);
                     EPMLiveCore.CoreFunctions.setConfigSetting(web, "EPMLivePlanner" + plannerName + "TaskCenter", ddlTaskCenter.SelectedItem.Text);
                     EPMLiveCore.CoreFunctions.setConfigSetting(web, "EPMLivePlanner" + plannerName + "UseFolders", chkUseFolders.Checked.ToString());
@@ -482,7 +482,7 @@ namespace EPMLiveWorkPlanner
 
             try
             {
-                Cache.Remove("EPMLIVE-WPS");
+                ViewState.Remove("EPMLIVE-WPS");
             }
             catch { }
 
@@ -495,11 +495,11 @@ namespace EPMLiveWorkPlanner
             {
                 SPWeb web = SPContext.Current.Web;
 
-                PlannerCore.WorkPlannerProperties wps = ((PlannerCore.WorkPlannerProperties)Cache.Get("EPMLIVE-WPS"));
+                PlannerCore.WorkPlannerProperties wps = ((PlannerCore.WorkPlannerProperties)ViewState["EPMLIVE-WPS"]);
 
                 wps.delete(e.CommandArgument.ToString());
 
-                Cache["EPMLIVE-WPS"] = wps;
+                ViewState["EPMLIVE-WPS"] = wps;
 
                 loadFields(web);
             }
@@ -530,11 +530,11 @@ namespace EPMLiveWorkPlanner
             catch { }
             SPWeb web = SPContext.Current.Web;
 
-            PlannerCore.WorkPlannerProperties wps = ((PlannerCore.WorkPlannerProperties)Cache.Get("EPMLIVE-WPS"));
+            PlannerCore.WorkPlannerProperties wps = ((PlannerCore.WorkPlannerProperties)ViewState["EPMLIVE-WPS"]);
 
             wps.set(txtAddField.Text.Replace(" ", "_x0020_"), ddlAddCalculation.SelectedValue);
 
-            Cache["EPMLIVE-WPS"] = wps;
+            ViewState["EPMLIVE-WPS"] = wps;
 
             loadTaskCenterFields(SPContext.Current.Web, false);
 
@@ -703,7 +703,7 @@ namespace EPMLiveWorkPlanner
             dt.Columns.Add("calc");
             dt.Columns.Add("item_id");
 
-            PlannerCore.WorkPlannerProperties wps = ((PlannerCore.WorkPlannerProperties)Cache.Get("EPMLIVE-WPS"));
+            PlannerCore.WorkPlannerProperties wps = ((PlannerCore.WorkPlannerProperties)ViewState["EPMLIVE-WPS"]);
 
             for (int i = 0; i < wps.count(); i++)
             {
