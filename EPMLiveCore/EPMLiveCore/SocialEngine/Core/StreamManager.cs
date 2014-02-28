@@ -21,7 +21,11 @@ namespace EPMLiveCore.SocialEngine.Core
         {
             Parallel.ForEach(userIds, userId =>
             {
-                const string SQL = @"INSERT INTO SS_StreamUsers (StreamId, UserId) VALUES (@StreamId, @UserId)";
+                const string SQL = @"
+                    IF NOT EXISTS (SELECT StreamId FROM SS_StreamUsers WHERE StreamId = @StreamId AND UserId = @UserId)
+                    BEGIN
+                        INSERT INTO SS_StreamUsers (StreamId, UserId) VALUES (@StreamId, @UserId)
+                    END";
 
                 using (var sqlCommand = new SqlCommand(SQL, SqlConnection))
                 {

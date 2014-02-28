@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Transactions;
@@ -87,18 +86,27 @@ namespace EPMLiveCore.SocialEngine
                         {
                             using (var activityManager = new ActivityManager(spWeb))
                             {
+                                var args = new ProcessActivityEventArgs(objectKind, activityKind, data, spWeb,
+                                    streamManager, threadManager, activityManager);
+
                                 if (_events.OnValidateActivity != null)
                                 {
-                                    _events.OnValidateActivity(new ProcessActivityEventArgs(objectKind, activityKind,
-                                        data, spWeb,
-                                        streamManager, threadManager, activityManager));
+                                    _events.OnValidateActivity(args);
                                 }
 
-                                if (_events.OnActivityRegistration != null)
+                                if (!args.Cancel)
                                 {
-                                    _events.OnActivityRegistration(
-                                        new ProcessActivityEventArgs(objectKind, activityKind, data, spWeb,
-                                            streamManager, threadManager, activityManager));
+                                    if (_events.OnActivityRegistration != null)
+                                    {
+                                        _events.OnActivityRegistration(args);
+                                    }
+                                }
+                                else
+                                {
+                                    if (!string.IsNullOrEmpty(args.CancellationMessage))
+                                    {
+                                        _logger.Log(objectKind, activityKind, data, spWeb, args.CancellationMessage);
+                                    }
                                 }
                             }
                         }

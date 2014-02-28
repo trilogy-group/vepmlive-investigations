@@ -22,6 +22,7 @@
 
     public enum ObjectKind
     {
-        Workspace
+        Workspace,
+        List
     }
 }

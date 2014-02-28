@@ -50,7 +50,7 @@ namespace EPMLiveCore.SocialEngine.Events
 
         #endregion Constructors 
 
-        #region Properties (7) 
+        #region Properties (9) 
 
         public ActivityKind ActivityKind
         {
@@ -61,6 +61,10 @@ namespace EPMLiveCore.SocialEngine.Events
         {
             get { return _activityManager; }
         }
+
+        public bool Cancel { get; set; }
+
+        public string CancellationMessage { get; set; }
 
         public SPWeb ContextWeb
         {

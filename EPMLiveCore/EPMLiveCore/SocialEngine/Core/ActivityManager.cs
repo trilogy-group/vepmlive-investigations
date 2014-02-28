@@ -45,7 +45,7 @@ namespace EPMLiveCore.SocialEngine.Core
                 sqlCommand.Parameters.AddWithValue("@ActivityKind", activityKind);
                 sqlCommand.Parameters.AddWithValue("@WebId", webId);
                 sqlCommand.Parameters.AddWithValue("@ListId", listId.HasValue ? (object) listId : DBNull.Value);
-                sqlCommand.Parameters.AddWithValue("@ItemId", listId.HasValue ? (object) itemId : DBNull.Value);
+                sqlCommand.Parameters.AddWithValue("@ItemId", itemId.HasValue ? (object) itemId : DBNull.Value);
 
                 object activityCount = sqlCommand.ExecuteScalar();
 

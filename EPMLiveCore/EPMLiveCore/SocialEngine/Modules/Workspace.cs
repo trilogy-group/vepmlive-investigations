@@ -72,9 +72,7 @@ namespace EPMLiveCore.SocialEngine.Modules
             Guid streamId = streamManager.GetGlobalStreamId(webId);
 
             threadManager.AssociateStreams(thread, new[] {streamId});
-
             threadManager.AddUsers(thread, new[] {(int) data["UserId"]});
-            streamManager.AddUsers(streamId, new[] {(int) data["UserId"]});
 
             CoreFunctions.setConfigSetting(contextWeb, CREATED_CONFIG_KEY, true.ToString());
         }
@@ -123,7 +121,6 @@ namespace EPMLiveCore.SocialEngine.Modules
                 {"Id", DataType.Guid},
                 {"Title", DataType.String},
                 {"URL", DataType.String},
-                {"SiteId", DataType.Guid},
                 {"UserId", DataType.Int}
             });
 
@@ -154,8 +151,8 @@ namespace EPMLiveCore.SocialEngine.Modules
 
         public void Initialize(SocialEngineEvents events)
         {
-            events.OnValidateActivity = OnValidateActivity;
-            events.OnActivityRegistration = OnActivityRegistration;
+            events.OnValidateActivity += OnValidateActivity;
+            events.OnActivityRegistration += OnActivityRegistration;
         }
 
         #endregion

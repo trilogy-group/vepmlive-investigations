@@ -25,7 +25,11 @@ namespace EPMLiveCore.SocialEngine.Core
         {
             Parallel.ForEach(userIds, userId =>
             {
-                const string SQL = @"INSERT INTO SS_ThreadUsers (ThreadId, UserId) VALUES (@ThreadId, @UserId)";
+                const string SQL = @"
+                    IF NOT EXISTS (SELECT ThreadId FROM SS_ThreadUsers WHERE ThreadId = @ThreadId AND UserId = @UserId)
+                    BEGIN
+                        INSERT INTO SS_ThreadUsers (ThreadId, UserId) VALUES (@ThreadId, @UserId)
+                    END";
 
                 using (var sqlCommand = new SqlCommand(SQL, SqlConnection))
                 {
@@ -41,7 +45,11 @@ namespace EPMLiveCore.SocialEngine.Core
         {
             Parallel.ForEach(streamIds, streamId =>
             {
-                const string SQL = @"INSERT INTO SS_Streams_Threads (StreamId, ThreadId) VALUES (@StreamId, @ThreadId)";
+                const string SQL = @"
+                    IF NOT EXISTS (SELECT StreamId FROM SS_Streams_Threads WHERE StreamId = @StreamId AND ThreadId = @ThreadId)
+                    BEGIN
+                        INSERT INTO SS_Streams_Threads (StreamId, ThreadId) VALUES (@StreamId, @ThreadId)
+                    END";
 
                 using (var sqlCommand = new SqlCommand(SQL, SqlConnection))
                 {

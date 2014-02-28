@@ -37,7 +37,6 @@ namespace EPMLiveCore.SocialEngine.Events.WebEventReceiver
                     {"Id", properties.WebId},
                     {"Title", properties.Web.Title},
                     {"URL", properties.ServerRelativeUrl},
-                    {"SiteId", properties.SiteId},
                     {"UserId", properties.Web.CurrentUser.ID}
                 }, properties.Web);
         }
