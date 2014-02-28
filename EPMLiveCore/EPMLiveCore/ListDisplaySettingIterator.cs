@@ -31,6 +31,17 @@ namespace EPMLiveCore
         private string lookupField = string.Empty;
         private string lookupValue = string.Empty;
 
+        #region ResourceList
+        List<string> userPanelItems = new List<string>() { "FirstName", "LastName", "Email", "Generic", "Title", "SharePointAccount" };
+        List<string> permissionPanelItems = new List<string>() { "Permissions", "ResourceLevel", "Approved", "TimesheetAdministrator", "Active", "Disable" };
+        StringBuilder userPanelSb = new StringBuilder();
+        HtmlTextWriter userPanel;
+        StringBuilder profilePanelSb = new StringBuilder();
+        HtmlTextWriter profilePanel;
+        StringBuilder permissionPanelSb = new StringBuilder();
+        HtmlTextWriter permissionPanel;
+        #endregion
+
         private Dictionary<string, string> dControls = new Dictionary<string, string>();
 
         int max = 0;
@@ -52,7 +63,7 @@ namespace EPMLiveCore
         private bool bUseTeam = false;
 
         private int ActivationType = 0;
-        
+
         private void FindSaveButtons(Control Parent, ref ArrayList Controls)
         {
             foreach (Control child in Parent.Controls)
@@ -127,7 +138,7 @@ namespace EPMLiveCore
                 exec.ExecuteEpmLiveQuery(queryCreateRecentItem, qParams);
                 ClearCache();
             }
-            catch{}
+            catch { }
         }
 
         private static void ClearCache()
@@ -148,7 +159,7 @@ namespace EPMLiveCore
 
         protected override void OnInit(EventArgs e)
         {
-            
+
 
             Guid siteid = SPContext.Current.Site.ID;
 
@@ -163,8 +174,6 @@ namespace EPMLiveCore
 
             base.OnInit(e);
 
-
-
             if (isFeatureActivated)
             {
 
@@ -177,7 +186,7 @@ namespace EPMLiveCore
                     catch { }
 
                     GridGanttSettings gSettings = new GridGanttSettings(list);
-                    
+
                     DisplayFormRedirect = gSettings.DisplayFormRedirect;
 
                     if (DisplayFormRedirect && ControlMode == SPControlMode.New)
@@ -195,7 +204,7 @@ namespace EPMLiveCore
                     //string[] strGeneral = CoreFunctions.getListSetting(List, "GeneralSettings").Split('\n');
                     if (gSettings.DisplaySettings != "")
                         fieldProperties = ListDisplayUtils.ConvertFromString(gSettings.DisplaySettings);
-                    
+
                     try
                     {
                         isWorkList = gSettings.EnableWorkList;
@@ -362,12 +371,28 @@ namespace EPMLiveCore
 
         public override void RenderControl(System.Web.UI.HtmlTextWriter writer)
         {
-            
+
+            if (isResList)
+            {
+                writer.WriteLine("<style type=\"text/css\">.upcontainer { width: 100%; border: 1px solid #d3d3d3;margin-bottom: 5px;}.upcontainer .upheader {padding: 5px 0px 5px 0px;cursor: pointer; font-weight: bold;border-bottom: 1px solid #d3d3d3;}.upcontainer .upcontent {display: block;padding: 5px 0px 5px 0px;}.hideImage{display:none;}.image_margin {margin: 2px 5px 2px 5px;}</style>");
+                writer.WriteLine(" <script>$(document).ready(function () {$(\".imgArrow\").addClass(\"hideImage\"); $(\".upheader\").click(function () {$header = $(this);$arrowImage = $header.find(\".imgArrow\");$downArrowImage = $header.find(\".imgDownArrow\");$content = $header.next();");
+                writer.Write("$content.slideToggle(500,function (){  if ($arrowImage.hasClass(\"hideImage\")) {$downArrowImage.addClass(\"hideImage\");$arrowImage.removeClass(\"hideImage\");$(\"#onetIDListForm\").attr(\"style\",\"width:95%\");}else {$arrowImage.addClass(\"hideImage\");$downArrowImage.removeClass(\"hideImage\");}});});});</script>");
+
+                userPanel = new HtmlTextWriter(new System.IO.StringWriter(userPanelSb, System.Globalization.CultureInfo.InvariantCulture));
+                userPanel.Write(CreateHtmlPanelText("User"));
+
+                profilePanel = new HtmlTextWriter(new System.IO.StringWriter(profilePanelSb, System.Globalization.CultureInfo.InvariantCulture));
+                profilePanel.Write(CreateHtmlPanelText("Profile"));
+
+                permissionPanel = new HtmlTextWriter(new System.IO.StringWriter(permissionPanelSb, System.Globalization.CultureInfo.InvariantCulture));
+                permissionPanel.Write(CreateHtmlPanelText("Permissions"));
+            }
+
             if (isFeatureActivated)
             {
 
                 bool outofusers = false;
-                
+
                 if (base.ControlMode == SPControlMode.Display)
                 {
                     string editURL = base.List.Forms[PAGETYPE.PAGE_EDITFORM].Url;
@@ -400,7 +425,7 @@ namespace EPMLiveCore
                 //base.RenderControl(writer);
                 //if(arrwpFields.Count > 0)
                 //    writer.Write("<tr><td colspan='2'><font color=\"#007C17\">*</font> indicates a status field set by the administrator</td></tr>");
-                
+
 
                 #region Online
 
@@ -448,7 +473,7 @@ namespace EPMLiveCore
                                     </table><br>
                                     </td></tr>");
                                 }
-                                
+
                             }
                             else
                             {
@@ -462,10 +487,10 @@ namespace EPMLiveCore
 
                 }
                 #endregion
-                
-                
+
+
                 #region processControls
-                
+
                 // add field control to lookups
                 //foreach (SPField f in Fields)
                 //{
@@ -474,67 +499,67 @@ namespace EPMLiveCore
                 //        AddTypeAheadFieldControls(f);
                 //    }
                 //}
-                
+
                 foreach (System.Web.UI.Control tc in base.Controls)
                 {
                     try
                     {
-                        if (((Microsoft.SharePoint.WebControls.FieldLabel)tc.Controls[1].Controls[0].Controls[1]).Field.InternalName == "Due")
+                        SPField field = ((Microsoft.SharePoint.WebControls.FieldLabel)tc.Controls[1].Controls[0].Controls[1]).Field;
+                        Control parentControl = tc.Controls[1].Controls[0];
+                        if (field.InternalName == "Due")
                         {
-                            tc.Controls[0].RenderControl(writer);
-                            for (int i = 0; i < tc.Controls[1].Controls[0].Controls.Count; i++)
+                            AddControlsToWriter(tc.Controls[0], writer, field.InternalName);
+                            for (int i = 0; i < parentControl.Controls.Count; i++)
                             {
-                                if (tc.Controls[1].Controls[0].Controls[i].GetType().ToString() == "Microsoft.SharePoint.WebControls.FormField")
+                                if (parentControl.Controls[i].GetType().ToString() == "Microsoft.SharePoint.WebControls.FormField")
                                 {
                                     writer.Write(CoreFunctions.GetDueField(base.ListItem));
                                 }
                                 else
-                                    tc.Controls[1].Controls[0].Controls[i].RenderControl(writer);
+                                    AddControlsToWriter(parentControl.Controls[i], writer, field.InternalName);
                             }
-                            
-                            tc.Controls[2].RenderControl(writer);
+                            AddControlsToWriter(tc.Controls[2], writer, field.InternalName);
                         }
-                        else if (((Microsoft.SharePoint.WebControls.FieldLabel)tc.Controls[1].Controls[0].Controls[1]).Field.InternalName == "DaysOverdue")
+                        else if (field.InternalName == "DaysOverdue")
                         {
-                            tc.Controls[0].RenderControl(writer);
-                            for (int i = 0; i < tc.Controls[1].Controls[0].Controls.Count; i++)
+                            AddControlsToWriter(tc.Controls[0], writer, field.InternalName);
+                            for (int i = 0; i < parentControl.Controls.Count; i++)
                             {
-                                if (tc.Controls[1].Controls[0].Controls[i].GetType().ToString() == "Microsoft.SharePoint.WebControls.FormField")
+                                if (parentControl.Controls[i].GetType().ToString() == "Microsoft.SharePoint.WebControls.FormField")
                                 {
                                     writer.Write(CoreFunctions.GetDaysOverdueField(base.ListItem));
                                 }
                                 else
-                                    tc.Controls[1].Controls[0].Controls[i].RenderControl(writer);
+                                    AddControlsToWriter(parentControl.Controls[i], writer, field.InternalName);
                             }
-                            tc.Controls[2].RenderControl(writer);
+                            AddControlsToWriter(tc.Controls[2], writer, field.InternalName);
                         }
-                        else if (((Microsoft.SharePoint.WebControls.FieldLabel)tc.Controls[1].Controls[0].Controls[1]).Field.InternalName == "ScheduleStatus")
+                        else if (field.InternalName == "ScheduleStatus")
                         {
-                            tc.Controls[0].RenderControl(writer);
-                            for (int i = 0; i < tc.Controls[1].Controls[0].Controls.Count; i++)
+                            AddControlsToWriter(tc.Controls[0], writer, field.InternalName);
+                            for (int i = 0; i < parentControl.Controls.Count; i++)
                             {
-                                if (tc.Controls[1].Controls[0].Controls[i].GetType().ToString() == "Microsoft.SharePoint.WebControls.FormField")
+                                if (parentControl.Controls[i].GetType().ToString() == "Microsoft.SharePoint.WebControls.FormField")
                                 {
                                     writer.Write(@"<img src=""/_layouts/images/" + CoreFunctions.GetScheduleStatusField(base.ListItem) + @""">");
                                 }
                                 else
-                                    tc.Controls[1].Controls[0].Controls[i].RenderControl(writer);
+                                    AddControlsToWriter(parentControl.Controls[i], writer, field.InternalName);
                             }
-                            tc.Controls[2].RenderControl(writer);
+                            AddControlsToWriter(tc.Controls[2], writer, field.InternalName);
                         }
-                        else if (((Microsoft.SharePoint.WebControls.FieldLabel)tc.Controls[1].Controls[0].Controls[1]).Field.Type == SPFieldType.Calculated)
+                        else if (field.Type == SPFieldType.Calculated)
                         {
-                            //tc.RenderControl(writer);
-                            tc.Controls[0].RenderControl(writer);
-                            for (int i = 0; i < tc.Controls[1].Controls[0].Controls.Count; i++)
+                            AddControlsToWriter(tc.Controls[0], writer, field.InternalName);
+                            for (int i = 0; i < parentControl.Controls.Count; i++)
                             {
-                                if (tc.Controls[1].Controls[0].Controls[i].GetType().ToString() == "Microsoft.SharePoint.WebControls.FormField")
+                                if (parentControl.Controls[i].GetType().ToString() == "Microsoft.SharePoint.WebControls.FormField")
                                 {
-                                    string val = ((Microsoft.SharePoint.WebControls.FormField)tc.Controls[1].Controls[0].Controls[i]).ItemFieldValue.ToString();
+                                    string val = ((Microsoft.SharePoint.WebControls.FormField)parentControl.Controls[i]).ItemFieldValue.ToString();
                                     string sVal = "";
                                     try
                                     {
-                                        sVal = ((Microsoft.SharePoint.WebControls.FieldLabel)tc.Controls[1].Controls[0].Controls[1]).Field.GetFieldValueAsHtml(val);
+                                        sVal = ((Microsoft.SharePoint.WebControls.FieldLabel)parentControl.Controls[1]).Field.GetFieldValueAsHtml(val);
                                     }
                                     catch { }
                                     if (sVal.ToLower().Contains(".gif") || sVal.ToLower().Contains(".jpg"))
@@ -545,12 +570,14 @@ namespace EPMLiveCore
                                         writer.Write(sVal);
                                 }
                                 else
-                                    tc.Controls[1].Controls[0].Controls[i].RenderControl(writer);
+                                    AddControlsToWriter(parentControl.Controls[i], writer, field.InternalName);
                             }
-                            tc.Controls[2].RenderControl(writer);
+
+                            AddControlsToWriter(tc.Controls[2], writer, field.InternalName);
                         }
-                        else if (((Microsoft.SharePoint.WebControls.FieldLabel)tc.Controls[1].Controls[0].Controls[1]).Field.Type == SPFieldType.Lookup)
+                        else if (field.Type == SPFieldType.Lookup)
                         {
+
                             //tc.Controls[0].RenderControl(writer);
 
                             //for (int i = 0; i < tc.Controls[1].Controls[0].Controls.Count; i++)
@@ -579,24 +606,25 @@ namespace EPMLiveCore
                             //{
                             //    tc.Controls[j].RenderControl(writer);
                             //}
-                           
-                            tc.RenderControl(writer);
+                            AddControlsToWriter(tc, writer, field.InternalName);
                         }
-                        else if (arrwpFields.Contains(((Microsoft.SharePoint.WebControls.FieldLabel)tc.Controls[1].Controls[0].Controls[1]).Field.InternalName) && (bool)arrwpFields[((Microsoft.SharePoint.WebControls.FieldLabel)tc.Controls[1].Controls[0].Controls[1]).Field.InternalName])
+                        else if (arrwpFields.Contains(field.InternalName) && (bool)arrwpFields[field.InternalName])
                         {
-                            tc.Controls[0].RenderControl(writer);
-                            for (int i = 0; i < tc.Controls[1].Controls[0].Controls.Count; i++)
+                            AddControlsToWriter(tc.Controls[0], writer, field.InternalName);
+                            for (int i = 0; i < parentControl.Controls.Count; i++)
                             {
-                                if (tc.Controls[1].Controls[0].Controls[i].GetType().ToString() == "Microsoft.SharePoint.WebControls.FieldLabel")
+                                if (parentControl.Controls[i].GetType().ToString() == "Microsoft.SharePoint.WebControls.FieldLabel")
                                 {
-                                    writer.Write(((Microsoft.SharePoint.WebControls.FieldLabel)tc.Controls[1].Controls[0].Controls[1]).Field.Title + " <font color=\"#007C17\">*</font>");
-                                    if (((Microsoft.SharePoint.WebControls.FieldLabel)tc.Controls[1].Controls[0].Controls[1]).Field.Required)
+                                    writer.Write(((Microsoft.SharePoint.WebControls.FieldLabel)parentControl.Controls[1]).Field.Title + " <font color=\"#007C17\">*</font>");
+                                    if (((Microsoft.SharePoint.WebControls.FieldLabel)parentControl.Controls[1]).Field.Required)
                                         writer.Write(" <font class=\"ms-formvalidation\">*</font>");
                                 }
                                 else
-                                    tc.Controls[1].Controls[0].Controls[i].RenderControl(writer);
+                                    //parentControl.Controls[i].RenderControl(writer);
+                                    AddControlsToWriter(parentControl.Controls[i], writer, field.InternalName);
                             }
-                            tc.Controls[2].RenderControl(writer);
+                            AddControlsToWriter(tc.Controls[2], writer, field.InternalName);
+
                         }
                         else
                         {
@@ -606,30 +634,44 @@ namespace EPMLiveCore
                                 SPField f = ((Microsoft.SharePoint.WebControls.CompositeField)tc.Controls[1]).Field;
                                 string fname = f.InternalName + "_" + f.Id.ToString() + "_$" + f.TypeAsString + "Field";
 
-                                if(f.Type == SPFieldType.User)
+                                if (f.Type == SPFieldType.User)
                                     fname = f.InternalName + "_" + f.Id.ToString() + "_$ClientPeoplePicker";
                                 else if (f.TypeAsString == "ResourcePermissions" || f.TypeAsString == "ResourceLevels")
-                                    fname = tc.Controls[1].Controls[0].Controls[9].Controls[0].Controls[0].Controls[1].ClientID;
+                                    fname = parentControl.Controls[9].Controls[0].Controls[0].Controls[1].ClientID;
 
-                                dControls.Add(((Microsoft.SharePoint.WebControls.FieldLabel)tc.Controls[1].Controls[0].Controls[1]).Field.InternalName, fname);
+                                dControls.Add(field.InternalName, fname);
 
                                 //if (((Microsoft.SharePoint.WebControls.FieldLabel)tc.Controls[1].Controls[0].Controls[1]).Field.Type == SPFieldType.Choice)
                                 //    dControls.Add(((Microsoft.SharePoint.WebControls.FieldLabel)tc.Controls[1].Controls[0].Controls[1]).Field.InternalName, tc.Controls[1].Controls[0].Controls[9].Controls[0].Controls[0].ClientID);
                                 //else
                                 //    dControls.Add(((Microsoft.SharePoint.WebControls.FieldLabel)tc.Controls[1].Controls[0].Controls[1]).Field.InternalName, tc.Controls[1].Controls[0].Controls[9].Controls[0].Controls[0].Controls[1].ClientID);
+
+                                AddControlsToWriter(tc, writer, field.InternalName);
                             }
                             catch { }
-
-                            tc.RenderControl(writer);
+                            // tc.RenderControl(writer);
                         }
                     }
                     catch
                     {
-                        tc.RenderControl(writer);
+                        AddControlsToWriter(tc, writer);
                     }
                 }
+
+                if (isResList)
+                {
+                    userPanel.Write("</table></div></div></td></tr>");
+                    writer.Write(userPanelSb.ToString());
+                    profilePanel.Write("</table></div></div></td></tr>");
+                    writer.Write(profilePanelSb.ToString());
+                    permissionPanel.Write("</table></div></div></td></tr>");
+                    writer.Write(permissionPanelSb.ToString());
+                }
+
                 #endregion
-                
+
+
+
                 #region worklist
                 if (isWorkList)
                 {
@@ -854,6 +896,7 @@ namespace EPMLiveCore
                         writer.WriteLine("cleanupfields();");
                         writer.WriteLine("}_spBodyOnLoadFunctionNames.push(\"InitFields\");");
 
+
                         if (isOnline)
                         {
                             if (dControls.ContainsKey("Generic"))
@@ -888,9 +931,42 @@ namespace EPMLiveCore
                 base.RenderControl(writer);
         }
 
+        #region resourcepool methods
+
+        private void AddControlsToWriter(Control control, HtmlTextWriter writer, string internalName = "")
+        {
+            if (isResList)
+            {
+                if (userPanelItems.Contains(internalName))
+                {
+                    control.RenderControl(userPanel);
+                }
+                else if (permissionPanelItems.Contains(internalName))
+                {
+                    control.RenderControl(permissionPanel);
+                }
+                else
+                {
+                    control.RenderControl(profilePanel);
+                }
+            }
+            else
+            {
+                control.RenderControl(writer);
+            }
+
+        }
+
+        private string CreateHtmlPanelText(string panelTitle)
+        {
+            return "<tr><td colspan=\"2\"><div class=\"upcontainer\"><div class=\"upheader\"><img src=\"/_layouts/epmlive/images/Down_Arrow.gif\" class=\"image_margin imgDownArrow\" alt=\"downArrow\" /><img src=\"/_layouts/epmlive/images/Arrow.gif\" class=\"image_margin imgArrow\" alt=\"arrow\" /><span>" + panelTitle + "</span></div><div class=\"upcontent\"><table>";
+        }
+
+        #endregion
+
         protected override void CreateChildControls()
         {
-            
+
             if (isFeatureActivated)
             {
                 try
@@ -952,6 +1028,8 @@ namespace EPMLiveCore
 
                                 SetFieldName(child, field.InternalName);
                                 SetControlMode(child, mode);
+
+
 
                                 ControlTemplate.InstantiateIn(child);
                             }
@@ -1298,7 +1376,7 @@ namespace EPMLiveCore
                         }
 
                         picker.CustomProperty = customValue;
-                        
+
                         FormField ff = this.GetFormFieldByField(fld);
                         if (ff != null)
                         {
@@ -1334,7 +1412,7 @@ namespace EPMLiveCore
                             "</Data>";
 
                             cclrCtrl.CustomProperty = customValue;
-                            
+
                             FormField ff = this.GetFormFieldByField(fld);
                             if (ff != null)
                             {
@@ -1405,13 +1483,13 @@ namespace EPMLiveCore
                         }
 
                         picker.CustomProperty = customValue;
-                        
+
                         FormField ff = this.GetFormFieldByField(fld);
                         if (ff != null)
                         {
                             ff.Parent.Controls.AddAfter(ff, picker);
                         }
-                        
+
 
                         #endregion
                     }
@@ -1442,7 +1520,7 @@ namespace EPMLiveCore
                             "</Data>";
 
                             cclrCtrl.CustomProperty = customValue;
-                            
+
                             FormField ff = this.GetFormFieldByField(fld);
                             if (ff != null)
                             {
@@ -2255,6 +2333,6 @@ namespace EPMLiveCore
         //        }
         //    }
         //}
-        
+
     }
 }
