@@ -1950,7 +1950,7 @@
             epmLiveNavigation.init();
 
             var menuManager = (function () {
-                var _setupMenu = function ($li, defaultCommands, forcePopup) {
+                var _setupMenu = function ($li, defaultCommands, forcePopup, customOptions) {
                     defaultCommands = defaultCommands || [];
 
                     var $menu = $($li.find('.epm-nav-contextual-menu').get(0));
@@ -2029,9 +2029,19 @@
                                     $menu.append($('<li class="seprator"></li>').hide().fadeIn());
                                 }
                             } else {
-                                $menu.append($('<li><span class="epm-nav-cm-icon ' + getIcon(cmd.command) + '">&nbsp;</span><a href="javascript:epmLiveNavigation.handleContextualCommand(\'' + liId + '\',\'' + webId + '\',\'' + $ca.data('listid') + '\',\'' + $ca.data('itemid') + '\',\'' + cmd.command + '\',\'' + cmd.kind + '\');" style="width: 136px !important;">' + cmd.title + '</a></li>').hide().fadeIn());
-
-                                $menu.find('a').click(function() {
+                                var icon = command.icon ? command.icon : getIcon(cmd.command);
+                                
+                                if (!command.callback) {
+                                    $menu.append($('<li><span class="epm-nav-cm-icon ' + icon + '">&nbsp;</span><a href="javascript:epmLiveNavigation.handleContextualCommand(\'' + liId + '\',\'' + webId + '\',\'' + $ca.data('listid') + '\',\'' + $ca.data('itemid') + '\',\'' + cmd.command + '\',\'' + cmd.kind + '\');" style="width: 136px !important;">' + cmd.title + '</a></li>').hide().fadeIn());
+                                } else {
+                                    $menu.append($('<li><span class="epm-nav-cm-icon ' + icon + '">&nbsp;</span><a href="javascript:return false;" style="width: 136px !important;">' + cmd.title + '</a></li>').hide().fadeIn());
+                                    
+                                    $menu.find('a').click(function () {
+                                        command.callback();
+                                    });
+                                }
+                                
+                                $menu.find('a').click(function () {
                                     hideMenu();
                                 });
                             }
@@ -2125,30 +2135,34 @@
 
                         var getMenuItems = function() {
                             if (window.epmLive) {
-                                var data = '<Request><Params><SiteId>' + siteId + '</SiteId><WebId>' + webId + '</WebId><ListId>' + listId + '</ListId><ItemId>' + itemId + '</ItemId><UserId>' + window.epmLive.currentUserId + '</UserId><DebugMode>' + window.epmLive.debugMode + '</DebugMode></Params></Request>';
+                                if (!customOptions) {
+                                    var data = '<Request><Params><SiteId>' + siteId + '</SiteId><WebId>' + webId + '</WebId><ListId>' + listId + '</ListId><ItemId>' + itemId + '</ItemId><UserId>' + window.epmLive.currentUserId + '</UserId><DebugMode>' + window.epmLive.debugMode + '</DebugMode></Params></Request>';
 
-                                epmLiveService.execute('GetContextualMenuItems', data, function (response) {
-                                    var commands = [];
+                                    epmLiveService.execute('GetContextualMenuItems', data, function(response) {
+                                        var commands = [];
 
-                                    if (response.ContextualMenus.Items) {
-                                        var items = response.ContextualMenus.Items.Item;
+                                        if (response.ContextualMenus.Items) {
+                                            var items = response.ContextualMenus.Items.Item;
 
-                                        if (items) {
-                                            if (!items.length) {
-                                                items = [items];
-                                            }
+                                            if (items) {
+                                                if (!items.length) {
+                                                    items = [items];
+                                                }
 
-                                            for (var i = 0; i < items.length; i++) {
-                                                var item = items[i];
-                                                commands.push({ title: item['@Title'], command: item['@Command'], kind: item['@Kind'], imgUrl: item['@ImageUrl'] });
+                                                for (var i = 0; i < items.length; i++) {
+                                                    var item = items[i];
+                                                    commands.push({ title: item['@Title'], command: item['@Command'], kind: item['@Kind'], imgUrl: item['@ImageUrl'] });
+                                                }
                                             }
                                         }
-                                    }
 
-                                    setup(commands, $a);
-                                }, function (response) {
+                                        setup(commands, $a);
+                                    }, function(response) {
+                                        setup([], $a);
+                                    });
+                                } else {
                                     setup([], $a);
-                                });
+                                }
                             } else {
                                 window.setTimeout(function () {
                                     getMenuItems();
