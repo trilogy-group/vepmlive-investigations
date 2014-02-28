@@ -125,6 +125,14 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>AssociatedItems.ascx</DependentUpon>
     </Compile>
+    <Compile Include="FancyDisplayForm\FancyDisplayForm.ascx.cs">
+      <DependentUpon>FancyDisplayForm.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="FancyDisplayForm\FancyDisplayForm.ascx.g.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>FancyDisplayForm.ascx</DependentUpon>
+    </Compile>
     <Compile Include="MyWorkSummary\MyWorkSummary.ascx.cs">
       <DependentUpon>MyWorkSummary.ascx</DependentUpon>
     </Compile>
@@ -455,6 +463,10 @@
     <None Include="AssociatedItems\AssociatedItems.webpart" />
     <None Include="AssociatedItems\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{b8018cf5-92b1-456e-8a3d-f694e56a432c}</SharePointProjectItemId>
+    </None>
+    <None Include="FancyDisplayForm\FancyDisplayForm.webpart" />
+    <None Include="FancyDisplayForm\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{8f09a51a-b52a-4a72-8272-461de0e41e5e}</SharePointProjectItemId>
     </None>
     <None Include="MyWorkSummary\MyWorkSummary.webpart" />
     <None Include="MyWorkSummary\SharePointProjectItem.spdata">
@@ -803,11 +815,17 @@
       <Link>Telerik.Web.UI.Skins.dll</Link>
     </Content>
     <Content Include="ActionBar\Elements.xml" />
+
     <Content Include="AssociatedItems\AssociatedItems.ascx">
       <Generator>SharePointWebPartCodeGenerator</Generator>
       <LastGenOutput>AssociatedItems.ascx.g.cs</LastGenOutput>
     </Content>
     <Content Include="AssociatedItems\Elements.xml" />
+    <Content Include="FancyDisplayForm\Elements.xml" />
+    <Content Include="FancyDisplayForm\FancyDisplayForm.ascx">
+      <Generator>SharePointWebPartCodeGenerator</Generator>
+      <LastGenOutput>FancyDisplayForm.ascx.g.cs</LastGenOutput>
+    </Content>
     <Content Include="MyWorkSummary\MyWorkSummary.ascx">
       <Generator>SharePointWebPartCodeGenerator</Generator>
       <LastGenOutput>MyWorkSummary.ascx.g.cs</LastGenOutput>
