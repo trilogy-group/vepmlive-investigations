@@ -11,6 +11,7 @@
 <asp:Content ID="PageHead" ContentPlaceHolderID="PlaceHolderAdditionalPageHead" runat="server">
 
     <script src="javascripts/kanban/ui.dropdownchecklist-1.4-min.js" type="text/javascript"></script>
+    <%--<script src="javascripts/kanban/jquery.slimscroll.min.js" type="text/javascript"></script>--%>
 
     <meta name="viewport" content="width=device-width; maximum-scale=1; minimum-scale=1;" />
     <style type="text/css">
@@ -295,7 +296,7 @@
         }
 
         function loadKanBanPlanners() {
-            showHideLoading(true, 'Loading Kanban Planners');
+            showHideLoading(true, 'Loading Planners');
             $.ajax({
                 type: "POST",
                 url: "<%=SPContext.Current.Web.ServerRelativeUrl%>/_vti_bin/WorkPlanner.asmx/Execute",
@@ -321,6 +322,18 @@
                     else {
                         $("#ddlKanBanPlanners").val($("#ddlKanBanPlanners option:last-child").val());
                     }
+
+                    if ($("#ddlKanBanPlanners").children('option').length == 2) {
+                        $("#lblKanBanPlanner").text($("#ddlKanBanPlanners option:selected").text());
+                        $("#lblKanBanPlanner").show();
+                        $("#ddlKanBanPlanners").hide();
+                    }
+                    else {
+                        $("#lblKanBanPlanner").text("");
+                        $("#lblKanBanPlanner").hide();
+                        $("#ddlKanBanPlanners").show();
+                    }
+
                     loadKanBanFilter1($("#ddlKanBanPlanners").val());
                 }
             });
@@ -334,7 +347,7 @@
             }
             else {
                 resetControls(true);
-                showHideLoading(true, 'Loading Kanban Filters');
+                showHideLoading(true, 'Loading Filters');
                 $.ajax({
                     type: "POST",
                     url: "<%=SPContext.Current.Web.ServerRelativeUrl%>/_vti_bin/WorkPlanner.asmx/Execute",
@@ -368,6 +381,8 @@
                                 $("#ddlKanBanFilter1").append($("<option></option>").val(value.id).html(value.text));
                             });
 
+                            $('#ddlKanBanFilter1 option').attr('selected', 'selected');
+
                             $("#ddlKanBanFilter1").dropdownchecklist({
                                 width: 200,
                                 forceMultiple: true,
@@ -386,11 +401,14 @@
                                     loadKanBanBoard();
                                 }
                             });
+
+                            loadKanBanBoard();
+
                         }
                     }
                 });
             }
-        };
+        }
 
         //function loadKanBanBoard(kanBanBoardName, kanBanFilter1) {
         function loadKanBanBoard() {
@@ -404,10 +422,13 @@
             });
 
             if (kanBanFilter1 == "") {
-                return;
+                $("#ddlKanBanFilter1 option").each(function () {
+                    if (kanBanFilter1 != "") kanBanFilter1 += ",";
+                    kanBanFilter1 += $(this).val().toString().replace("\\", "\\\\");
+                });
             }
 
-            showHideLoading(true, 'Loading Kanban Board');
+            showHideLoading(true, 'Loading Board');
             $.ajax({
                 type: "POST",
                 url: "<%=SPContext.Current.Web.ServerRelativeUrl%>/_vti_bin/WorkPlanner.asmx/Execute",
@@ -489,6 +510,11 @@
                     $("#mainTR td").css("min-width", per + "%");
                     $("#mainTR td").css("max-width", per + "%");
 
+
+                    //$('#mainContainer .sortable-list').slimScroll({
+                    //    height: '625px'
+                    //});
+
                     var addContextualMenu = function () {
                         $(".associateditemscontextmenu").each(function () {
                             window.epmLiveNavigation.addContextualMenu($(this), null, true);
@@ -510,18 +536,18 @@
             <table>
                 <tr>
                     <td>
-                        <a id="lnkNewItem" href="#">
-                        </a>
+                        <a id="lnkNewItem" href="#"></a>
                     </td>
                     <td></td>
                 </tr>
                 <tr>
                     <td>
-                        <b>Select Kanban Board :</b>
+                        <b>Board:</b>
                     </td>
                     <td>
                         <select id="ddlKanBanPlanners">
                         </select>
+                        <span id="lblKanBanPlanner"></span>
                     </td>
                 </tr>
                 <tr>

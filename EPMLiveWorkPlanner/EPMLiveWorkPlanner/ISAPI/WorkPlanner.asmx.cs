@@ -5359,7 +5359,7 @@ namespace EPMLiveWorkPlanner
             {
                 jsonData = jsonData.Substring(0, jsonData.Length - 1);
             }
-            return string.Format("{{ \"kanbannewitemurl\": \"{0}\", \"kanbanitemname\": \"New {1}\", \"kanbanerror\": \"\", \"kanbanfilter1name\": \"Select {2} :\", \"kanbanfilter1\": [{3}] }}", sourceList.DefaultNewFormUrl, sourceList.Title, props.KanBanFilterColumn, jsonData);
+            return string.Format("{{ \"kanbannewitemurl\": \"{0}\", \"kanbanitemname\": \"New {1}\", \"kanbanerror\": \"\", \"kanbanfilter1name\": \"{2}:\", \"kanbanfilter1\": [{3}] }}", sourceList.DefaultNewFormUrl, sourceList.Title, props.KanBanFilterColumn, jsonData);
         }
 
         public static string GetKanBanBoard(XmlDocument data, SPWeb oWeb)
