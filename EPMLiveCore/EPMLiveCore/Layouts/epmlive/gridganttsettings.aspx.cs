@@ -28,7 +28,6 @@ using EPMLiveReportsAdmin;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using EPMLiveCore.Infrastructure;
-using EPMLiveWebParts.FancyDisplayForm;
 
 namespace EPMLiveCore.Layouts.epmlive
 {
@@ -1317,7 +1316,13 @@ namespace EPMLiveCore.Layouts.epmlive
                         if (wpm.WebParts != null)
                         {
                             for (int i = 0; i < wpm.WebParts.Count; i++)
-                                wpm.DeleteWebPart(wpm.WebParts[i]);
+                            {
+                                try
+                                {
+                                    wpm.DeleteWebPart(wpm.WebParts[i]);
+                                }
+                                catch { }
+                            }
                         }
 
                         isFancyFormExists = true;
@@ -1328,10 +1333,7 @@ namespace EPMLiveCore.Layouts.epmlive
                         dispForm = rootFolder.Files.Add(dispFormUrl, SPTemplateFileType.FormPage);
                         isFancyFormExists = true;
                     }
-
-
-                    //list.DefaultDisplayFormUrl = string.Format("{0}/{1}/FancyDispForm.aspx", web.Url, rootFolder.Url);
-
+                            
                     if (isFancyFormExists)
                     {
                         var wpm = dispForm.GetLimitedWebPartManager(System.Web.UI.WebControls.WebParts.PersonalizationScope.Shared);
@@ -1353,7 +1355,7 @@ namespace EPMLiveCore.Layouts.epmlive
                         //};
                         //wpm.AddWebPart(webpart, "Main", 2);
 
-                        FancyDisplayForm fancyDispFormWebPart = new FancyDisplayForm();
+                        EPMLiveWebParts.FancyDisplayForm.FancyDisplayForm fancyDispFormWebPart = new EPMLiveWebParts.FancyDisplayForm.FancyDisplayForm();
                         fancyDispFormWebPart.Title = "Fancy Display Form";
                         fancyDispFormWebPart.ChromeState = System.Web.UI.WebControls.WebParts.PartChromeState.Normal;
                         fancyDispFormWebPart.ChromeType = System.Web.UI.WebControls.WebParts.PartChromeType.None;
