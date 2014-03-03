@@ -10,226 +10,12 @@
 
 <asp:Content ID="PageHead" ContentPlaceHolderID="PlaceHolderAdditionalPageHead" runat="server">
 
-    <script src="javascripts/kanban/ui.dropdownchecklist-1.4-min.js" type="text/javascript"></script>
-    <%--<script src="javascripts/kanban/jquery.slimscroll.min.js" type="text/javascript"></script>--%>
+    <script type="text/javascript" src="javascripts/kanban/ui.dropdownchecklist-1.4-min.js"></script>
+    <script type="text/javascript" src="javascripts/kanban/jquery.dotdotdot.min.js"></script>
+    <link type="text/css" rel="Stylesheet" href="styles/kanban/kanban.css" />
 
     <meta name="viewport" content="width=device-width; maximum-scale=1; minimum-scale=1;" />
-    <style type="text/css">
-        .itemContainer,
-        .stageContainer {
-            width: 100%;
-            min-height: 625px;
-            float: left;
-        }
 
-        #section1 {
-            width: auto;
-            height: 100px;
-            margin: 5px;
-            border: 1px solid black;
-        }
-
-        #section2 {
-            margin: 5px;
-        }
-
-        #mainContainer {
-        }
-
-            #mainContainer table {
-                border: 1px solid black;
-                width: 100%;
-            }
-
-                #mainContainer table td {
-                    text-align: left;
-                    vertical-align: top;
-                    border-right: 1px dashed black;
-                }
-
-        #loadingDiv {
-            width: 100%;
-            height: 100%;
-            left: 0;
-            top: 0;
-            position: absolute;
-            text-align: center;
-            vertical-align: middle;
-            background: white;
-            padding-top: 300px;
-            -moz-opacity: 0.75;
-            opacity: 0.75;
-            -ms-filter: "progid:DXImageTransform.Microsoft.Alpha"(Opacity=75);
-        }
-
-        /*.itemContainer {
-            width: 300px;
-            height: 625px;
-            float: left;
-            overflow: auto;
-        }*/
-
-        #splitter {
-            float: left;
-            color: #0092CA;
-            font-size: 12px;
-            padding: 5px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        .clear {
-            clear: both;
-        }
-
-        /*.itemContainerTitle {
-            color: black;
-            font-size: 12px;
-            padding: 5px;
-            font-weight: bold;
-            border-bottom: 1px solid black;
-            text-align: center;
-        }
-
-
-
-        .itemContainer .sortable-list {
-            margin: 0;
-            float: left;
-            max-width: 1000px;
-            height: 20px;
-            display: table;
-            border-collapse: separate;
-            border-spacing: 2px;
-        }
-
-        .itemContainer .sortable-item-header {
-            background: #D6ECF2;
-            border: 1px solid #000;
-            cursor: pointer;
-            display: block;
-            color: black;
-            font-size: 12px;
-            font-weight: bold;
-            margin: 1px;
-            padding: 1px;
-            text-align: left;
-            display: table-row;
-        }
-
-        .itemContainer .sortable-item {
-            background: #D6ECF2;
-            border: 1px solid #000;
-            cursor: pointer;
-            display: block;
-            color: black;
-            font-size: 12px;
-            margin: 1px;
-            padding: 1px;
-            text-align: left;
-            display: table-row;
-        }
-
-        .itemContainer .sortable-item-header div {
-            display: table-cell;
-            padding: 2px;
-        }
-
-
-        .itemContainer .sortable-item div {
-            display: table-cell;
-            padding: 2px;
-        }*/
-
-        .itemContainerTitle,
-        .stageContainerTitle {
-            color: black;
-            font-size: 12px;
-            padding: 5px;
-            font-weight: bold;
-            border-bottom: 1px solid black;
-            text-align: center;
-        }
-
-        .itemContainer .sortable-list,
-        .stageContainer .sortable-list {
-            margin: 0;
-            float: left;
-            width: 100%;
-            min-height: 625px;
-        }
-
-        .itemContainer .sortable-item,
-        .stageContainer .sortable-item {
-            background-color: #B7EBFF; /*0092CA*/
-            border-left: 5px solid #0090CA;
-            cursor: pointer;
-            display: block;
-            color: black;
-            font-size: 12px;
-            margin: 2px;
-            padding: 2px;
-            text-align: left;
-            max-width: 115px;
-            min-width: 115px;
-            min-height: 48px;
-            float: left;
-            -webkit-border-radius: 0px 10px 0px 0px;
-            -moz-border-radius: 0px 10px 0px 0px;
-            border-radius: 0px 10px 0px 0px;
-            -webkit-box-shadow: #B3B3B3 2px 2px 2px;
-            -moz-box-shadow: #B3B3B3 2px 2px 2px;
-            box-shadow: #B3B3B3 2px 2px 2px;
-        }
-
-            .itemContainer .sortable-item div:nth-child(2),
-            .stageContainer .sortable-item div:nth-child(2) {
-                font-weight: bold;
-            }
-
-        .placeholder {
-            background-color: #B7EBFF; /*0092CA*/
-            border-left: 5px solid #0090CA;
-            border-top: 1px dashed #000;
-            border-right: 1px dashed #000;
-            border-bottom: 1px dashed #000;
-            cursor: pointer;
-            display: block;
-            color: black;
-            font-size: 12px;
-            margin: 2px;
-            padding: 2px;
-            text-align: left;
-            max-width: 115px;
-            min-width: 115px;
-            min-height: 48px;
-            float: left;
-            -webkit-border-radius: 0px 10px 0px 0px;
-            -moz-border-radius: 0px 10px 0px 0px;
-            border-radius: 0px 10px 0px 0px;
-            -webkit-box-shadow: #B3B3B3 2px 2px 2px;
-            -moz-box-shadow: #B3B3B3 2px 2px 2px;
-            box-shadow: #B3B3B3 2px 2px 2px;
-        }
-
-        .ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default {
-            background: none !important;
-            color: none !important;
-        }
-
-        .associateditemscontextmenu {
-            list-style: none;
-            cursor: pointer;
-            position: absolute;
-        }
-
-        /*#saveprogress {
-            width: 25px;
-            height: 25px;
-            display: none;
-            float: right;
-        }*/
-    </style>
     <script type="text/javascript">
 
         $(function () {
@@ -373,7 +159,8 @@
                         else {
                             resetControls(true);
                             $("#lnkNewItem").attr('data-newformurl', obj.kanbannewitemurl);
-                            $("#lnkNewItem").text(obj.kanbanitemname);
+                            $("#lnkNewItem").html("");
+                            $("#lnkNewItem").html('<span class="icon-plus-2"></span> New ' + obj.kanbanitemname);
                             $("#lblFilert1").text(obj.kanbanfilter1name);
 
                             $("#ddlKanBanFilter1").children('option').remove();
@@ -511,9 +298,19 @@
                     $("#mainTR td").css("max-width", per + "%");
 
 
-                    //$('#mainContainer .sortable-list').slimScroll({
-                    //    height: '625px'
-                    //});
+                    var cardWidth = $("#itemContainerTD").width();
+                    var cardWidth = (cardWidth - 30);
+                    $(".single").attr("style", "width:" + cardWidth + "px");
+                    $(".sortable-item div:nth-child(2)").attr("style", "width:" + (cardWidth - 25) + "px");
+
+                    $('.double').each(function (i, obj) {
+                        if (obj.offsetHeight < obj.scrollHeight ||
+                        obj.offsetWidth < obj.scrollWidth) {
+                            $(obj).dotdotdot({
+                                wrap: 'word'
+                            });
+                        }
+                    });
 
                     var addContextualMenu = function () {
                         $(".associateditemscontextmenu").each(function () {
@@ -521,10 +318,12 @@
                         });
                     };
 
+                    //$('#mainContainer .sortable-list').slimScroll({ height: '625px' });
+
                     ExecuteOrDelayUntilScriptLoaded(addContextualMenu, 'EPMLive.Navigation.js');
                 }
             });
-        };
+        }
 
     </script>
 
@@ -532,37 +331,20 @@
 
 <asp:Content ID="Main" ContentPlaceHolderID="PlaceHolderMain" runat="server">
     <div id="section1">
-        <div style="float: left; padding: 5px;">
-            <table>
-                <tr>
-                    <td>
-                        <a id="lnkNewItem" href="#"></a>
-                    </td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <td>
-                        <b>Board:</b>
-                    </td>
-                    <td>
-                        <select id="ddlKanBanPlanners">
-                        </select>
-                        <span id="lblKanBanPlanner"></span>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <b><span id="lblFilert1"></span></b>
-                    </td>
-                    <td>
-                        <select id="ddlKanBanFilter1" multiple="multiple">
-                        </select>
-                    </td>
-                    <%--<td>
-                        <input id="btnApply" type="button" value="Apply" />
-                    </td>--%>
-                </tr>
-            </table>
+        <div style="float: left">
+            <a id="lnkNewItem" href="#"></a>
+        </div>
+        <div style="float: left">
+            <span id="lblKanBanPlanner"></span>
+            <span id="lblFilert1" class="kanbanLabels"></span>
+            <select id="ddlKanBanFilter1" multiple="multiple">
+            </select>
+            <%--<input id="btnApply" type="button" value="Apply" />--%>
+        </div>
+        <div style="float: right">
+            <span class="kanbanLabels">Board:</span>
+            <select id="ddlKanBanPlanners">
+            </select>
         </div>
     </div>
 

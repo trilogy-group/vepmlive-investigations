@@ -5359,7 +5359,7 @@ namespace EPMLiveWorkPlanner
             {
                 jsonData = jsonData.Substring(0, jsonData.Length - 1);
             }
-            return string.Format("{{ \"kanbannewitemurl\": \"{0}\", \"kanbanitemname\": \"New {1}\", \"kanbanerror\": \"\", \"kanbanfilter1name\": \"{2}:\", \"kanbanfilter1\": [{3}] }}", sourceList.DefaultNewFormUrl, sourceList.Title, props.KanBanFilterColumn, jsonData);
+            return string.Format("{{ \"kanbannewitemurl\": \"{0}\", \"kanbanitemname\": \"{1}\", \"kanbanerror\": \"\", \"kanbanfilter1name\": \"{2}:\", \"kanbanfilter1\": [{3}] }}", sourceList.DefaultNewFormUrl, sourceList.Title, props.KanBanFilterColumn, jsonData);
         }
 
         public static string GetKanBanBoard(XmlDocument data, SPWeb oWeb)
@@ -5545,10 +5545,14 @@ namespace EPMLiveWorkPlanner
                                     {
                                         if (!string.IsNullOrEmpty(column))
                                         {
-                                            Int32 intLenght = Convert.ToString(row[column]).Length;
                                             string strFullText = Convert.ToString(row[column]);
-                                            string strTruncatedText = intLenght > 15 ? strFullText.Substring(0, 15) + "..." : strFullText;
-                                            sbItems.Append("<div " + (column == props.KanBanStatusColumn ? "id='key'" : "") + " title='" + strFullText + "'>" + strTruncatedText + "&nbsp;</div>");
+                                            string strClass = "single";
+                                            SPField spField = list.Fields.TryGetFieldByStaticName(column);
+                                            if (spField != null && (spField.Type == SPFieldType.Text || spField.Type == SPFieldType.Note))
+                                            {
+                                                strClass = "double";
+                                            }
+                                            sbItems.Append("<div class='" + strClass + "' " + (column == props.KanBanStatusColumn ? "id='key'" : "") + " title='" + strFullText + "'>" + strFullText + "&nbsp;</div>");
                                         }
                                     }
                                     //sbItems.Append("<div id='saveprogress'><img alt='Saving Item' src='../images/gears_anv4.gif' /></div>");
@@ -5601,10 +5605,14 @@ namespace EPMLiveWorkPlanner
                                                 {
                                                     if (!string.IsNullOrEmpty(column))
                                                     {
-                                                        Int32 intLenght = Convert.ToString(row[column]).Length;
                                                         string strFullText = Convert.ToString(row[column]);
-                                                        string strTruncatedText = intLenght > 15 ? strFullText.Substring(0, 15) + "..." : strFullText;
-                                                        sbItems.Append("<div " + (column == props.KanBanStatusColumn ? "id='key'" : "") + " title='" + strFullText + "'>" + strTruncatedText + "&nbsp;</div>");
+                                                        string strClass = "single";
+                                                        SPField spField = list.Fields.TryGetFieldByStaticName(column);
+                                                        if (spField != null && (spField.Type == SPFieldType.Text || spField.Type == SPFieldType.Note))
+                                                        {
+                                                            strClass = "double";
+                                                        }
+                                                        sbItems.Append("<div class='" + strClass + "' " + (column == props.KanBanStatusColumn ? "id='key'" : "") + " title='" + strFullText + "'>" + strFullText + "&nbsp;</div>");
                                                     }
                                                 }
                                                 //sbItems.Append("<div id='saveprogress'><img alt='Saving Item' src='../images/gears_anv4.gif' /></div>");
