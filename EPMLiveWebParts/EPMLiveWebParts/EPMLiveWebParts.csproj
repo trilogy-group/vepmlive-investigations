@@ -12,8 +12,8 @@
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <TargetOfficeVersion>15.0</TargetOfficeVersion>
     <FileAlignment>512</FileAlignment>
-    <ProjectTypeGuids>{C1CDDADD-2546-481F-9697-4EA41081F2FC};{14822709-B5A1-4724-98CA-57A101D1B079};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <ActiveDeploymentConfiguration>SP 2013 Deploy</ActiveDeploymentConfiguration>
+    <ProjectTypeGuids>{BB1F664B-9266-4fd6-B973-E1E44974B511};{14822709-B5A1-4724-98CA-57A101D1B079};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <ActiveDeploymentConfiguration>Default</ActiveDeploymentConfiguration>
     <SandboxedSolution>False</SandboxedSolution>
     <SccProjectName>SAK</SccProjectName>
     <SccLocalPath>SAK</SccLocalPath>
@@ -24,8 +24,10 @@
       "C:\Workspace\Upland\EPM Live\EPM Live Utilities\SPSolutionManager\SPSolutionManager\bin\Debug\SPSolutionManager.exe" -a Install -s EPMLiveWebParts -p "C:\Workspace\Upland\EPM Live\EPMLive2013\EPMLiveWebParts\EPMLiveWebParts\bin\Debug\"
       iisreset
     </PostDeploymentCommand>
-    <FileUpgradeFlags>0</FileUpgradeFlags>
-    <UpgradeBackupLocation>C:\Workspace\Upland\EPM Live\EPMLive2013\EPMLiveWebParts\Backup2\</UpgradeBackupLocation>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
     <OldToolsVersion>4.0</OldToolsVersion>
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <ProjectMode>SharePointCustomization</ProjectMode>
@@ -53,6 +55,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <UseVSHostingProcess>false</UseVSHostingProcess>
+    <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -62,6 +65,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <UseVSHostingProcess>false</UseVSHostingProcess>
+    <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
   </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>true</SignAssembly>
@@ -116,31 +120,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\..\CommonAssemblyInfo.cs">
+      <Link>CommonAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="ActionBar\ActionBar.cs" />
     <Compile Include="AssociatedItems\AssociatedItems.ascx.cs">
       <DependentUpon>AssociatedItems.ascx</DependentUpon>
     </Compile>
-    <Compile Include="AssociatedItems\AssociatedItems.ascx.g.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>AssociatedItems.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="FancyDisplayForm\FancyDisplayForm.ascx.cs">
-      <DependentUpon>FancyDisplayForm.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="FancyDisplayForm\FancyDisplayForm.ascx.g.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>FancyDisplayForm.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="MyWorkSummary\MyWorkSummary.ascx.cs">
-      <DependentUpon>MyWorkSummary.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="MyWorkSummary\MyWorkSummary.ascx.g.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>MyWorkSummary.ascx</DependentUpon>
-    </Compile>
+    <Compile Include="AssociatedItems\AssociatedItems.ascx.g.cs" />
     <Compile Include="BackButton\BackButton.cs" />
     <Compile Include="BuyNow\BuyNow.cs" />
     <Compile Include="ChartControl\ChartControl.cs" />
@@ -221,6 +208,10 @@
     <Compile Include="EpmCharting\Mappers\EpmChartUserSettingsToPersonalizationDataMapper.cs" />
     <Compile Include="EpmCharting\Repositories\EpmChartUserSettingsRepository.cs" />
     <Compile Include="EPMLiveQuickLaunchModifier\EPMLiveQuickLaunchModifier.cs" />
+    <Compile Include="FancyDisplayForm\FancyDisplayForm.ascx.cs">
+      <DependentUpon>FancyDisplayForm.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="FancyDisplayForm\FancyDisplayForm.ascx.g.cs" />
     <Compile Include="GridListView\GanttUtilities.cs" />
     <Compile Include="GridListView\GridData.cs">
       <SubType>ASPXCodeBehind</SubType>
@@ -331,6 +322,10 @@
     <Compile Include="ListReportView\ReportingServicesToolPart.cs" />
     <Compile Include="ListSummary\ListSummary.cs" />
     <Compile Include="ListSummary\ListSummaryToolpart.cs" />
+    <Compile Include="MyWorkSummary\MyWorkSummary.ascx.cs">
+      <DependentUpon>MyWorkSummary.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="MyWorkSummary\MyWorkSummary.ascx.g.cs" />
     <Compile Include="MyWorkWebPart\ExtensionMethods.cs" />
     <Compile Include="MyWorkWebPart\MyWorkToolpart.cs" />
     <Compile Include="MyWorkWebPart\MyWorkWebPart.cs" />
@@ -466,7 +461,7 @@
     </None>
     <None Include="FancyDisplayForm\FancyDisplayForm.webpart" />
     <None Include="FancyDisplayForm\SharePointProjectItem.spdata">
-      <SharePointProjectItemId>{8f09a51a-b52a-4a72-8272-461de0e41e5e}</SharePointProjectItemId>
+      <SharePointProjectItemId>{416ad6b5-d22b-4dc5-92fe-f9c9e7c40120}</SharePointProjectItemId>
     </None>
     <None Include="MyWorkSummary\MyWorkSummary.webpart" />
     <None Include="MyWorkSummary\SharePointProjectItem.spdata">
@@ -815,21 +810,10 @@
       <Link>Telerik.Web.UI.Skins.dll</Link>
     </Content>
     <Content Include="ActionBar\Elements.xml" />
-
-    <Content Include="AssociatedItems\AssociatedItems.ascx">
-      <Generator>SharePointWebPartCodeGenerator</Generator>
-      <LastGenOutput>AssociatedItems.ascx.g.cs</LastGenOutput>
-    </Content>
+    <Content Include="AssociatedItems\AssociatedItems.ascx" />
     <Content Include="AssociatedItems\Elements.xml" />
     <Content Include="FancyDisplayForm\Elements.xml" />
-    <Content Include="FancyDisplayForm\FancyDisplayForm.ascx">
-      <Generator>SharePointWebPartCodeGenerator</Generator>
-      <LastGenOutput>FancyDisplayForm.ascx.g.cs</LastGenOutput>
-    </Content>
-    <Content Include="MyWorkSummary\MyWorkSummary.ascx">
-      <Generator>SharePointWebPartCodeGenerator</Generator>
-      <LastGenOutput>MyWorkSummary.ascx.g.cs</LastGenOutput>
-    </Content>
+    <Content Include="FancyDisplayForm\FancyDisplayForm.ascx" />
     <Content Include="MyWorkSummary\Elements.xml" />
     <Content Include="BackButton\Elements.xml" />
     <Content Include="BuyNow\Elements.xml" />
@@ -1239,7 +1223,6 @@
     <Content Include="Layouts\epmlive\MyWorkWebPart.min.js" />
     <Content Include="Layouts\epmlive\ReportViewer.css" />
     <Content Include="Layouts\epmlive\SSRSReportRedirect.aspx" />
-    <Content Include="Layouts\epmlive\Stylesheets\addmenu.css" />
     <Content Include="Layouts\epmlive\ajaxpost.aspx" />
     <Content Include="Layouts\epmlive\AssignmentPlanner.aspx" />
     <Content Include="Layouts\epmlive\Calendar.aspx" />
@@ -1426,6 +1409,7 @@
     <Content Include="Layouts\epmlive\xml2json.js" />
     <Content Include="ListReportView\Elements.xml" />
     <Content Include="ListSummary\Elements.xml" />
+    <Content Include="MyWorkSummary\MyWorkSummary.ascx" />
     <Content Include="MyWorkWebPart\Elements.xml" />
     <Content Include="ReportingChart\Elements.xml" />
     <Content Include="ReportingFilter\Elements.xml" />
@@ -1639,18 +1623,7 @@
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
   </PropertyGroup>
   <Import Project="$(VSToolsPath)\SharePointTools\Microsoft.VisualStudio.SharePoint.targets" Condition="'$(VSToolsPath)' != ''" />
-  <ProjectExtensions>
-    <VisualStudio>
-      <FlavorProperties GUID="{C1CDDADD-2546-481F-9697-4EA41081F2FC}">
-        <DeploymentConfigurations>
-          <DeploymentConfiguration Name="SP 2013 Deploy">
-            <DeploymentSteps>Microsoft.VisualStudio.SharePoint.PreDeploymentCommand;Microsoft.VisualStudio.SharePoint.PostDeploymentCommand</DeploymentSteps>
-            <RetractionSteps>Microsoft.VisualStudio.SharePoint.PreDeploymentCommand</RetractionSteps>
-          </DeploymentConfiguration>
-        </DeploymentConfigurations>
-      </FlavorProperties>
-    </VisualStudio>
-  </ProjectExtensions>
+  <ProjectExtensions />
   <PropertyGroup>
     <PostBuildEvent>
       "C:\Program Files (x86)\Microsoft SDKs\Windows\v8.0A\Bin\NETFX 4.0 Tools\x64\gacutil.exe" /i "C:\dkuo_epmlive2013\EPMLiveWebParts\EPMLiveWebParts\bin\Debug\EPMLiveWebParts.dll" /f

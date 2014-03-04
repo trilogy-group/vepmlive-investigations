@@ -2,7 +2,7 @@
 <webParts>
   <webPart xmlns="http://schemas.microsoft.com/WebPart/v3">
     <metaData>
-      <type name="EPMLiveWebParts.FancyDisplayForm.FancyDisplayForm, $SharePoint.Project.AssemblyFullName$" />
+      <type name="EPMLiveWebParts.FancyDisplayForm, $SharePoint.Project.AssemblyFullName$" />
       <importErrorMessage>$Resources:core,ImportErrorMessage;</importErrorMessage>
     </metaData>
     <data>

@@ -133,7 +133,7 @@ namespace EPMLiveWebParts.Properties {
         ///Id=&quot;Ribbon.List.ViewFormat.Gantt&quot;
         ///Sequence=&quot;20&quot;
         ///Command=&quot;DisplayGanttView&quot;
-        ///Image32by32=&quot;/_layouts/images/ganttview.gif&quot;
+        ///Image32by32=&quot;/_layouts/epmlive/images/ganttview.gif&quot;
         ///LabelText=&quot;Gantt View&quot;
         ///QueryCommand=&quot;QueryDisplayGanttView&quot;
         ///TemplateAlias=&quot;o1&quot;
@@ -477,6 +477,16 @@ namespace EPMLiveWebParts.Properties {
         ///var defaultxml#gridid#;
         ///var minValues#gridid#;
         ///var maxValues#gridid#;
+        ///var curPage#gridid# = 0;
+        ///
+        ///var firstItem#gridid# = 0;
+        ///var lastItem#gridid# = 0;
+        ///var fItemHide#gridid# = 0;
+        ///var sf#gridid#;
+        ///var sv#gridid#;
+        ///var st#gridid#;
+        ///
+        ///var bPageSetup#gridid# = false;
         ///
         ///function selectRow#gridid#(id, ind)
         ///{
@@ -488,16 +498,7 @@ namespace EPMLiveWebParts.Properties {
         ///	if (c.isCheckbox())
         ///	{
         ///		UnCheckAll(curGrid);
-        ///		c.cell.firstChild.checked = true;
-        ///		c.cell.firstChild.display = &quot;&quot;;
-        ///	}
-        ///
-        ///	RefreshCommandUI();
-        ///
-        ///	if(curGrid.getRowById(id)._locked)
-        ///	{
-        ///		var wp2 = document.getElementById(&apos;Ribbon.ListItem-title&apos;);
-        /// [rest of string was truncated]&quot;;.
+        ///		c.cell. [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string txtEditGridJS {
             get {

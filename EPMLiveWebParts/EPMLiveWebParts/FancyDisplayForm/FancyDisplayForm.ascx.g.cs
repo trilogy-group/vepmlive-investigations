@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace EPMLiveWebParts.FancyDisplayForm {
+namespace EPMLiveWebParts {
     using System.Web.UI.WebControls.Expressions;
     using System.Web.UI.HtmlControls;
     using System.Collections;
@@ -545,7 +545,7 @@ namespace EPMLiveWebParts.FancyDisplayForm {
         }
         
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Never)]
-        private void @__BuildControlTree(global::EPMLiveWebParts.FancyDisplayForm.FancyDisplayForm @__ctrl) {
+        private void @__BuildControlTree(global::EPMLiveWebParts.FancyDisplayForm @__ctrl) {
             global::System.Web.UI.WebControls.Button @__ctrl1;
             @__ctrl1 = this.@__BuildControlbtnCancel1();
             System.Web.UI.IParserAccessor @__parser = ((System.Web.UI.IParserAccessor)(@__ctrl));

@@ -12,7 +12,7 @@ using System.Threading;
 using System.Web.UI;
 using System.Web.UI.WebControls.WebParts;
 
-namespace EPMLiveWebParts.FancyDisplayForm
+namespace EPMLiveWebParts
 {
     [ToolboxItemAttribute(false)]
     public partial class FancyDisplayForm : WebPart
