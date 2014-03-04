@@ -1355,7 +1355,7 @@ namespace EPMLiveCore.Layouts.epmlive
                         //};
                         //wpm.AddWebPart(webpart, "Main", 2);
 
-                        EPMLiveWebParts.FancyDisplayForm.FancyDisplayForm fancyDispFormWebPart = new EPMLiveWebParts.FancyDisplayForm.FancyDisplayForm();
+                        EPMLiveWebParts.FancyDisplayForm fancyDispFormWebPart = new EPMLiveWebParts.FancyDisplayForm();
                         fancyDispFormWebPart.Title = "Fancy Display Form";
                         fancyDispFormWebPart.ChromeState = System.Web.UI.WebControls.WebParts.PartChromeState.Normal;
                         fancyDispFormWebPart.ChromeType = System.Web.UI.WebControls.WebParts.PartChromeType.None;
