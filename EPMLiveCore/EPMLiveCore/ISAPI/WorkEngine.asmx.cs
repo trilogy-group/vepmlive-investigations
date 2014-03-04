@@ -173,6 +173,7 @@ namespace EPMLiveCore
     {
         private const string EPMLiveReportingAssembly = "EPMLiveReportsAdmin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b90e532f481cf050";
         private const string EPMLiveTSAssembly = "TimeSheets, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5";
+        private const string EPMLiveWPAssembly = "EPMLiveWebParts, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5";
 
         #region Methods (3)
 
@@ -225,6 +226,12 @@ namespace EPMLiveCore
                     case "personalization":
                         assemblyInstance = Assembly.GetExecutingAssembly();
                         thisClass = assemblyInstance.GetType("EPMLiveCore.API.Personalization", true, true);
+                        m = thisClass.GetMethod(FunctionParts[1], BindingFlags.Public | BindingFlags.Instance);
+                        apiClass = Activator.CreateInstance(thisClass);
+                        break;
+                    case "webparts":
+                        assemblyInstance = Assembly.Load(EPMLiveWPAssembly);
+                        thisClass = assemblyInstance.GetType("EPMLiveWebParts.WPAPI", true, true);
                         m = thisClass.GetMethod(FunctionParts[1], BindingFlags.Public | BindingFlags.Instance);
                         apiClass = Activator.CreateInstance(thisClass);
                         break;
