@@ -80,7 +80,9 @@ namespace EPMLiveCore.SocialEngine.Modules
         private static void RegisterDeletionActivity(Dictionary<string, object> data, ThreadManager threadManager,
             ActivityManager activityManager)
         {
-            Thread thread = threadManager.GetThread((Guid) data["Id"]);
+            var webId = (Guid) data["Id"];
+
+            Thread thread = threadManager.GetThread(webId);
             if (thread == null) return;
 
             threadManager.DeleteThread(thread);
@@ -91,6 +93,9 @@ namespace EPMLiveCore.SocialEngine.Modules
                 UserId = (int) data["UserId"],
                 Thread = thread
             });
+
+            IEnumerable<Guid> threadIds = threadManager.GetThreadIds(webId);
+            threadManager.DeleteThreads(threadIds);
         }
 
         private void RegisterWorkspaceActivity(ActivityKind activityKind, Dictionary<string, object> data,

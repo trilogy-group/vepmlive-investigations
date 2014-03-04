@@ -17,9 +17,9 @@ namespace EPMLiveCore.SocialEngine.Core
 
         #endregion Constructors 
 
-        #region Methods (9) 
+        #region Methods (14) 
 
-        // Public Methods (7) 
+        // Public Methods (12) 
 
         public void AddUsers(Thread thread, int[] userIds)
         {
@@ -72,7 +72,20 @@ namespace EPMLiveCore.SocialEngine.Core
             }
         }
 
-        public Thread GetThread(Guid webId, string[] properties = null,bool bringDeleted=false)
+        public void DeleteThreads(IEnumerable<Guid> threadIds)
+        {
+            const string SQL = @"UPDATE SS_Threads SET Deleted = 1 WHERE Id IN (@Ids)";
+
+            string[] ids = threadIds.Select(threadId => string.Format(@"'{0}'", threadId)).Distinct().ToArray();
+
+            using (var sqlCommand = new SqlCommand(SQL, SqlConnection))
+            {
+                sqlCommand.Parameters.AddWithValue("@Ids", string.Join(",", ids));
+                sqlCommand.ExecuteNonQuery();
+            }
+        }
+
+        public Thread GetThread(Guid webId, string[] properties = null, bool bringDeleted = false)
         {
             return GetThread(webId, null, null, properties, bringDeleted);
         }
@@ -82,7 +95,8 @@ namespace EPMLiveCore.SocialEngine.Core
             return GetThread(webId, listId, null, properties, bringDeleted);
         }
 
-        public Thread GetThread(Guid webId, Guid? listId, int? itemId, string[] properties = null, bool bringDeleted = false)
+        public Thread GetThread(Guid webId, Guid? listId, int? itemId, string[] properties = null,
+            bool bringDeleted = false)
         {
             var columns = new List<string> {"Id"};
 
@@ -158,6 +172,48 @@ namespace EPMLiveCore.SocialEngine.Core
             }
 
             return null;
+        }
+
+        public IEnumerable<Guid> GetThreadIds(Guid webId)
+        {
+            return GetThreadIds(webId, null, null, null);
+        }
+
+        public IEnumerable<Guid> GetThreadIds(Guid webId, Guid listId)
+        {
+            return GetThreadIds(webId, listId, null, null);
+        }
+
+        public IEnumerable<Guid> GetThreadIds(Guid webId, Guid listId, int itemId)
+        {
+            return GetThreadIds(webId, listId, itemId, null);
+        }
+
+        public IEnumerable<Guid> GetThreadIds(Guid webId, Guid? listId, int? itemId, ObjectKind? objectKind)
+        {
+            string sql =
+                @"SELECT Id FROM SS_Threads WHERE WebId = @WebId AND ListId = @ListId AND ItemId = @ItemId AND Kind = @Kind";
+
+            if (!listId.HasValue) sql = sql.Replace("= @ListId", "IS NULL");
+            if (!itemId.HasValue) sql = sql.Replace("= @ItemId", "IS NULL");
+            if (!objectKind.HasValue) sql = sql.Replace(" AND Kind = @Kind", string.Empty);
+
+            using (var sqlCommand = new SqlCommand(sql, SqlConnection))
+            {
+                sqlCommand.Parameters.AddWithValue("@WebId", webId);
+                sqlCommand.Parameters.AddWithValue("@ListId", listId.HasValue ? (object) listId.Value : DBNull.Value);
+                sqlCommand.Parameters.AddWithValue("@ItemId", itemId.HasValue ? (object) itemId.Value : DBNull.Value);
+                sqlCommand.Parameters.AddWithValue("@Kind",
+                    objectKind.HasValue ? (object) objectKind.Value : DBNull.Value);
+
+                using (SqlDataReader sqlDataReader = sqlCommand.ExecuteReader())
+                {
+                    while (sqlDataReader.Read())
+                    {
+                        yield return sqlDataReader.GetGuid(0);
+                    }
+                }
+            }
         }
 
         public Thread SaveThread(Thread thread)
