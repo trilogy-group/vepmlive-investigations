@@ -5493,7 +5493,7 @@ namespace EPMLiveWorkPlanner
                             }
                             catch { }
 
-                            if (dtSourceListData != null && dtSourceListData.Rows.Count > 0)
+                            if (dtSourceListData != null)
                             {
                                 DataColumn fIntDataColumn = new DataColumn("F_INT", typeof(Int32));
                                 fIntDataColumn.DefaultValue = 9999;
