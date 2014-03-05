@@ -12,6 +12,7 @@
 
     <script type="text/javascript" src="javascripts/kanban/ui.dropdownchecklist-1.4-min.js"></script>
     <script type="text/javascript" src="javascripts/kanban/jquery.dotdotdot.min.js"></script>
+    <script type="text/javascript" src="javascripts/kanban/jquery.slimscroll.min.js"></script>
     <link type="text/css" rel="Stylesheet" href="styles/kanban/kanban.css" />
 
     <meta name="viewport" content="width=device-width; maximum-scale=1; minimum-scale=1;" />
@@ -231,12 +232,12 @@
                                 var indexOfItem = $("#" + parentId + " > div").index($("#" + childId));
 
 
-                                if ($("#" + parentId).attr("data-dragged-status") == $(".itemContainer div:nth-child(2)").attr("data-dragged-status")) {
+                                if ($("#" + parentId).attr("data-dragged-status") == $(".itemContainer .sortable-list").attr("data-dragged-status")) {
                                     if ($("#ddlBacklogStatus").children('option').length == 0) {
-                                        saveKanbanTile(ui, parentId, childId, ui.item.parent().attr("data-dragged-status"), indexOfItem, false);
+                                        saveKanbanTile(ui, parentId, childId, ui.item.parent().attr("data-dragged-status"), indexOfItem);
                                     }
                                     else if ($("#ddlBacklogStatus").children('option').length == 1) {
-                                        saveKanbanTile(ui, parentId, childId, $("#ddlBacklogStatus option:last-child").val(), indexOfItem, false);
+                                        saveKanbanTile(ui, parentId, childId, $("#ddlBacklogStatus option:last-child").val(), indexOfItem);
                                     }
                                     else {
                                         $("#dlgBacklogStatus").dialog({
@@ -249,7 +250,7 @@
                                             buttons: {
                                                 "Update": function () {
                                                     $(this).dialog("close");
-                                                    saveKanbanTile(ui, parentId, childId, $("#ddlBacklogStatus option:selected").val(), indexOfItem, false);
+                                                    saveKanbanTile(ui, parentId, childId, $("#ddlBacklogStatus option:selected").val(), indexOfItem);
                                                 }
                                             }
                                         });
@@ -257,7 +258,7 @@
 
                                 }
                                 else {
-                                    saveKanbanTile(ui, parentId, childId, ui.item.parent().attr("data-dragged-status"), indexOfItem, false);
+                                    saveKanbanTile(ui, parentId, childId, ui.item.parent().attr("data-dragged-status"), indexOfItem);
                                 }
                             }
 
@@ -273,7 +274,7 @@
                     var cardWidth = $("#itemContainerTD").width();
                     var cardWidth = (cardWidth - 30);
                     $(".single").attr("style", "width:" + cardWidth + "px");
-                    $(".sortable-item div:nth-child(2)").attr("style", "width:" + (cardWidth - 25) + "px");
+                    $(".itemContainer .sortable-item div:nth-child(2)").attr("style", "width:" + (cardWidth - 25) + "px");
 
                     $('.double').each(function (i, obj) {
                         if (obj.offsetHeight < obj.scrollHeight ||
@@ -290,7 +291,14 @@
                         });
                     };
 
-                    //$('#mainContainer .sortable-list').slimScroll({ height: '625px' });
+                    $('.sortable-item').hover(function () {
+                        $(this).find('.associateditemscontextmenu').show();
+                    }, function () {
+                        $(this).find('.associateditemscontextmenu').hide();
+                        $(this).find('.epm-nav-contextual-menu').hide();
+                    });
+
+                    $('#mainContainer .sortable-list').slimScroll({ height: '650px', width: '100%' });
 
                     ExecuteOrDelayUntilScriptLoaded(addContextualMenu, 'EPMLive.Navigation.js');
                 }

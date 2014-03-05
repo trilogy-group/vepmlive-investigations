@@ -42,13 +42,6 @@
     -ms-filter: "progid:DXImageTransform.Microsoft.Alpha"(Opacity=75);
 }
 
-/*.itemContainer {
-            width: 300px;
-            height: 625px;
-            float: left;
-            overflow: auto;
-        }*/
-
 #splitter {
     float: left;
     cursor: pointer;
@@ -66,69 +59,9 @@
     clear: both;
 }
 
-/*.itemContainerTitle {
-            color: black;
-            font-size: 12px;
-            padding: 5px;
-            font-weight: bold;
-            border-bottom: 1px solid black;
-            text-align: center;
-        }
-
-
-
-        .itemContainer .sortable-list {
-            margin: 0;
-            float: left;
-            max-width: 1000px;
-            height: 20px;
-            display: table;
-            border-collapse: separate;
-            border-spacing: 2px;
-        }
-
-        .itemContainer .sortable-item-header {
-            background: #D6ECF2;
-            border: 1px solid #000;
-            cursor: pointer;
-            display: block;
-            color: black;
-            font-size: 12px;
-            font-weight: bold;
-            margin: 1px;
-            padding: 1px;
-            text-align: left;
-            display: table-row;
-        }
-
-        .itemContainer .sortable-item {
-            background: #D6ECF2;
-            border: 1px solid #000;
-            cursor: pointer;
-            display: block;
-            color: black;
-            font-size: 12px;
-            margin: 1px;
-            padding: 1px;
-            text-align: left;
-            display: table-row;
-        }
-
-        .itemContainer .sortable-item-header div {
-            display: table-cell;
-            padding: 2px;
-        }
-
-
-        .itemContainer .sortable-item div {
-            display: table-cell;
-            padding: 2px;
-        }*/
-
 .itemContainer,
 .stageContainer {
     width: 100%;
-    min-height: 625px;
     float: left;
     border-right: 1px solid #dddddd;
 }
@@ -151,7 +84,7 @@
     margin: 0;
     float: left;
     width: 100%;
-    min-height: 625px;
+    min-height: 650px;
 }
 
 .itemContainer .sortable-item,
@@ -237,6 +170,7 @@
 
 
 .associateditemscontextmenu {
+    display: none;
     list-style: none;
     cursor: pointer;
     position: absolute;
@@ -259,12 +193,20 @@
         opacity: 1;
     }
 
-/*#saveprogress {
-            width: 25px;
-            height: 25px;
-            display: none;
-            float: right;
-        }*/
+.associateditemscontextmenu ul.epm-nav-contextual-menu {
+    left: -150px !important;
+    top: -20px !important;
+}
+
+    .associateditemscontextmenu ul.epm-nav-contextual-menu li a {
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    .associateditemscontextmenu ul.epm-nav-contextual-menu li span.epm-nav-cm-icon {
+        top: 0px !important;
+    }
+
 
 #dlgBacklogStatus {
     display: none;
