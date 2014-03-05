@@ -82,13 +82,13 @@ namespace EPMLiveWebParts {
         
         protected global::System.Web.UI.HtmlControls.HtmlTableCell divDateDetailsParent;
         
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl divFancyDispFormContent;
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl divFancyDispFormAssociatedItemsContent;
         
         protected global::System.Web.UI.HtmlControls.HtmlTableCell divFancyDispFormParent;
         
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl divFancyDisplayForm;
-        
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl divItemDetailParent;
+        
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl divFancyDisplayForm;
         
         protected global::System.Web.UI.WebControls.Button btnCancel2;
         
@@ -450,13 +450,13 @@ namespace EPMLiveWebParts {
         }
         
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Never)]
-        private global::System.Web.UI.HtmlControls.HtmlGenericControl @__BuildControldivFancyDispFormContent() {
+        private global::System.Web.UI.HtmlControls.HtmlGenericControl @__BuildControldivFancyDispFormAssociatedItemsContent() {
             global::System.Web.UI.HtmlControls.HtmlGenericControl @__ctrl;
             @__ctrl = new global::System.Web.UI.HtmlControls.HtmlGenericControl("div");
-            this.divFancyDispFormContent = @__ctrl;
+            this.divFancyDispFormAssociatedItemsContent = @__ctrl;
             ((System.Web.UI.IAttributeAccessor)(@__ctrl)).SetAttribute("class", "dispFormContent");
-            @__ctrl.ID = "divFancyDispFormContent";
-            ((System.Web.UI.IAttributeAccessor)(@__ctrl)).SetAttribute("style", "color: black;");
+            @__ctrl.ID = "divFancyDispFormAssociatedItemsContent";
+            ((System.Web.UI.IAttributeAccessor)(@__ctrl)).SetAttribute("style", "color: #555555;");
             System.Web.UI.IParserAccessor @__parser = ((System.Web.UI.IParserAccessor)(@__ctrl));
             @__parser.AddParsedSubObject(new System.Web.UI.LiteralControl("\r\n                        "));
             return @__ctrl;
@@ -473,9 +473,22 @@ namespace EPMLiveWebParts {
                         ">\r\n                            <span>Associated Items</span>\r\n                  " +
                         "      </div>\r\n                        "));
             global::System.Web.UI.HtmlControls.HtmlGenericControl @__ctrl1;
-            @__ctrl1 = this.@__BuildControldivFancyDispFormContent();
+            @__ctrl1 = this.@__BuildControldivFancyDispFormAssociatedItemsContent();
             @__parser.AddParsedSubObject(@__ctrl1);
             @__parser.AddParsedSubObject(new System.Web.UI.LiteralControl("\r\n                    "));
+            return @__ctrl;
+        }
+        
+        [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Never)]
+        private global::System.Web.UI.HtmlControls.HtmlGenericControl @__BuildControldivItemDetailParent() {
+            global::System.Web.UI.HtmlControls.HtmlGenericControl @__ctrl;
+            @__ctrl = new global::System.Web.UI.HtmlControls.HtmlGenericControl("div");
+            this.divItemDetailParent = @__ctrl;
+            ((System.Web.UI.IAttributeAccessor)(@__ctrl)).SetAttribute("class", "fancyDisplayForm dispFormContent");
+            @__ctrl.ID = "divItemDetailParent";
+            ((System.Web.UI.IAttributeAccessor)(@__ctrl)).SetAttribute("style", "float: right; width: 100%;");
+            System.Web.UI.IParserAccessor @__parser = ((System.Web.UI.IParserAccessor)(@__ctrl));
+            @__parser.AddParsedSubObject(new System.Web.UI.LiteralControl("\r\n    "));
             return @__ctrl;
         }
         
@@ -515,18 +528,11 @@ namespace EPMLiveWebParts {
             global::System.Web.UI.HtmlControls.HtmlTableCell @__ctrl6;
             @__ctrl6 = this.@__BuildControldivFancyDispFormParent();
             @__parser.AddParsedSubObject(@__ctrl6);
-            @__parser.AddParsedSubObject(new System.Web.UI.LiteralControl("\r\n                </tr>\r\n            </table>\r\n        </div>\r\n\r\n    </div>\r\n"));
-            return @__ctrl;
-        }
-        
-        [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Never)]
-        private global::System.Web.UI.HtmlControls.HtmlGenericControl @__BuildControldivItemDetailParent() {
-            global::System.Web.UI.HtmlControls.HtmlGenericControl @__ctrl;
-            @__ctrl = new global::System.Web.UI.HtmlControls.HtmlGenericControl("div");
-            this.divItemDetailParent = @__ctrl;
-            ((System.Web.UI.IAttributeAccessor)(@__ctrl)).SetAttribute("class", "dispFormContent");
-            @__ctrl.ID = "divItemDetailParent";
-            System.Web.UI.IParserAccessor @__parser = ((System.Web.UI.IParserAccessor)(@__ctrl));
+            @__parser.AddParsedSubObject(new System.Web.UI.LiteralControl("\r\n                </tr>\r\n            </table>\r\n        </div>\r\n\r\n    </div>\r\n\r\n  " +
+                        "  "));
+            global::System.Web.UI.HtmlControls.HtmlGenericControl @__ctrl7;
+            @__ctrl7 = this.@__BuildControldivItemDetailParent();
+            @__parser.AddParsedSubObject(@__ctrl7);
             @__parser.AddParsedSubObject(new System.Web.UI.LiteralControl("\r\n"));
             return @__ctrl;
         }
@@ -553,12 +559,9 @@ namespace EPMLiveWebParts {
             global::System.Web.UI.HtmlControls.HtmlGenericControl @__ctrl2;
             @__ctrl2 = this.@__BuildControldivFancyDisplayForm();
             @__parser.AddParsedSubObject(@__ctrl2);
-            global::System.Web.UI.HtmlControls.HtmlGenericControl @__ctrl3;
-            @__ctrl3 = this.@__BuildControldivItemDetailParent();
+            global::System.Web.UI.WebControls.Button @__ctrl3;
+            @__ctrl3 = this.@__BuildControlbtnCancel2();
             @__parser.AddParsedSubObject(@__ctrl3);
-            global::System.Web.UI.WebControls.Button @__ctrl4;
-            @__ctrl4 = this.@__BuildControlbtnCancel2();
-            @__parser.AddParsedSubObject(@__ctrl4);
             @__ctrl.SetRenderMethodDelegate(new System.Web.UI.RenderMethod(this.@__Render__control1));
         }
         
@@ -619,57 +622,60 @@ namespace EPMLiveWebParts {
                     "\n        float: left;\r\n        padding: 5px;\r\n        margin-right: 5px;\r\n    }\r" +
                     "\n\r\n    .fancyDisplayFormAssociatedItemsContextMenu {\r\n        list-style: none;\r" +
                     "\n        cursor: pointer;\r\n        position: absolute;\r\n    }\r\n</style>\r\n\r\n<scri" +
-                    "pt type=\"text/javascript\">\r\n\r\n    $(function () {\r\n\r\n        FancyDispFormClient" +
-                    ".fillWebPartData();\r\n\r\n        window.SP.SOD.notifyScriptLoadedAndExecuteWaiting" +
-                    "Jobs(\'EPMLive.Navigation.js\');\r\n\r\n        $(\".fancy-display-form-wrapper .dispFo" +
-                    "rmExpandHeader\").click(function () {\r\n            $header = $(this);\r\n          " +
-                    "  $content = $header.next();\r\n            $content.slideToggle(100, function () " +
-                    "{\r\n            });\r\n            if ($(this).find(\"span:first\").hasClass(\"icon-pl" +
-                    "us-circle-2\")) {\r\n                $(this).find(\"span:first\").removeClass(\"icon-p" +
-                    "lus-circle-2\").addClass(\"icon-minus-circle-2\");\r\n                $(this).find(\"s" +
-                    "pan:last\").text(\"hide\");\r\n            }\r\n            else {\r\n                $(t" +
-                    "his).find(\"span:first\").removeClass(\"icon-minus-circle-2\").addClass(\"icon-plus-c" +
-                    "ircle-2\");\r\n                $(this).find(\"span:last\").text(\"show\");\r\n           " +
-                    " }\r\n        });\r\n\r\n        $(\".dispFormExpandMore\").click(function () {\r\n       " +
-                    "     $header = $(this);\r\n            $header.closest(\'tr\').next(\'.ShowMoreRow\')." +
-                    "toggle();\r\n        });\r\n    });\r\n\r\n    FancyDispFormClient = {\r\n\r\n        showIt" +
-                    "emUrl: function (weburl) {\r\n            $.ajax({\r\n                type: \"POST\",\r" +
-                    "\n                url: weburl,\r\n                success: function (ticket) {\r\n   " +
-                    "                 if (ticket.indexOf(\"General Error\") != 0) {\r\n                  " +
-                    "      var listInfo = ticket.split(\'|\');\r\n\r\n                        var viewSiteC" +
-                    "ontentUrl = listInfo[0] + \"/_layouts/epmlive/gridaction.aspx?action=FancyDispFor" +
-                    "m&list=\" + listInfo[3] + \"&field=\" + listInfo[1] + \"&LookupFieldList=\" + listInf" +
-                    "o[2] + \"&Source=\" + document.location.href;\r\n                        var options" +
-                    " = { url: viewSiteContentUrl, showMaximized: true };\r\n                        SP" +
-                    ".SOD.execute(\'SP.UI.Dialog.js\', \'SP.UI.ModalDialog.showModalDialog\', options);\r\n" +
-                    "                    }\r\n                    else {\r\n                        alert" +
-                    "(ticket);\r\n                    }\r\n                }\r\n            });\r\n        }," +
-                    "\r\n\r\n        showNewForm: function (weburl) {\r\n            var options = { url: w" +
-                    "eburl, showMaximized: false, dialogReturnValueCallback: function (dialogResult) " +
-                    "{ FancyDispFormClient.fillWebPartData(); } };\r\n            SP.SOD.execute(\'SP.UI" +
-                    ".Dialog.js\', \'SP.UI.ModalDialog.showModalDialog\', options);\r\n        },\r\n\r\n     " +
-                    "   showItemPopup: function (siteurl, webid, listid, itemid) {\r\n            showS" +
-                    "harePointPopup(siteurl + \'/_layouts/epmlive/gridaction.aspx?action=getcontextmen" +
-                    "us&webid=\' + webid +\r\n                \'&listid=\' + listid + \'&ID=\' + itemid, nul" +
-                    "l, false, true, null, {\r\n                    gridId: \"myDiv\",\r\n                 " +
-                    "   rowId: \"myDiv\",\r\n                    col: \"myDiv\"\r\n                }, 300, 40" +
-                    "0);\r\n        },\r\n\r\n        emptyFunction: function () {\r\n        },\r\n\r\n        s" +
-                    "howSharePointPopup: function (url, title, allowMaximize, showClose, func, funcPa" +
-                    "rams, width, height) {\r\n            if (allowMaximize == null) allowMaximize = t" +
-                    "rue;\r\n            if (showClose == null) showClose = true;\r\n            if (func" +
-                    " == null) func = emptyFunction;\r\n\r\n            var options;\r\n\r\n            if (w" +
-                    "idth !== undefined && height !== undefined) {\r\n                options = {\r\n    " +
-                    "                title: title,\r\n                    allowMaximize: allowMaximize," +
-                    "\r\n                    showClose: showClose,\r\n                    url: url,\r\n    " +
-                    "                dialogReturnValueCallback: Function.createCallback(Function.crea" +
-                    "teDelegate(null, func), funcParams),\r\n                    width: width,\r\n       " +
-                    "             height: height\r\n                };\r\n            } else {\r\n         " +
-                    "       options = { title: title, allowMaximize: allowMaximize, showClose: showCl" +
-                    "ose, url: url, dialogReturnValueCallback: Function.createCallback(Function.creat" +
-                    "eDelegate(null, func), funcParams) };\r\n            }\r\n\r\n            SP.UI.ModalD" +
-                    "ialog.showModalDialog(options);\r\n        },\r\n\r\n        fillWebPartData: function" +
-                    " () {\r\n\r\n            $(\"#");
-        @__w.Write(divFancyDispFormContent.ClientID);
+                    "pt type=\"text/javascript\">\r\n\r\n    $(function () {\r\n\r\n        var bodyWidth = $(w" +
+                    "indow).width() - 200;\r\n        $(\".fancy-display-form-wrapper\").width(bodyWidth)" +
+                    ";\r\n\r\n        $(window).resize(function () {\r\n            var bodyWidth = $(windo" +
+                    "w).width();\r\n            $(\".fancy-display-form-wrapper\").width(bodyWidth);\r\n   " +
+                    "     });\r\n\r\n        FancyDispFormClient.fillWebPartData();\r\n\r\n        window.SP." +
+                    "SOD.notifyScriptLoadedAndExecuteWaitingJobs(\'EPMLive.Navigation.js\');\r\n\r\n       " +
+                    " $(\".fancy-display-form-wrapper .dispFormExpandHeader\").click(function () {\r\n   " +
+                    "         $header = $(this);\r\n            $content = $header.next();\r\n           " +
+                    " $content.slideToggle(100, function () {\r\n            });\r\n            if ($(thi" +
+                    "s).find(\"span:first\").hasClass(\"icon-plus-circle-2\")) {\r\n                $(this)" +
+                    ".find(\"span:first\").removeClass(\"icon-plus-circle-2\").addClass(\"icon-minus-circl" +
+                    "e-2\");\r\n                $(this).find(\"span:last\").text(\"hide\");\r\n            }\r\n" +
+                    "            else {\r\n                $(this).find(\"span:first\").removeClass(\"icon" +
+                    "-minus-circle-2\").addClass(\"icon-plus-circle-2\");\r\n                $(this).find(" +
+                    "\"span:last\").text(\"show\");\r\n            }\r\n        });\r\n\r\n        $(\".dispFormEx" +
+                    "pandMore\").click(function () {\r\n            $header = $(this);\r\n            $hea" +
+                    "der.closest(\'tr\').next(\'.ShowMoreRow\').toggle();\r\n        });\r\n    });\r\n\r\n    Fa" +
+                    "ncyDispFormClient = {\r\n\r\n        showItemUrl: function (weburl) {\r\n            $" +
+                    ".ajax({\r\n                type: \"POST\",\r\n                url: weburl,\r\n          " +
+                    "      success: function (ticket) {\r\n                    if (ticket.indexOf(\"Gene" +
+                    "ral Error\") != 0) {\r\n                        var listInfo = ticket.split(\'|\');\r\n" +
+                    "\r\n                        var viewSiteContentUrl = listInfo[0] + \"/_layouts/epml" +
+                    "ive/gridaction.aspx?action=FancyDispForm&list=\" + listInfo[3] + \"&field=\" + list" +
+                    "Info[1] + \"&LookupFieldList=\" + listInfo[2] + \"&Source=\" + document.location.hre" +
+                    "f;\r\n                        var options = { url: viewSiteContentUrl, showMaximiz" +
+                    "ed: true };\r\n                        SP.SOD.execute(\'SP.UI.Dialog.js\', \'SP.UI.Mo" +
+                    "dalDialog.showModalDialog\', options);\r\n                    }\r\n                  " +
+                    "  else {\r\n                        alert(ticket);\r\n                    }\r\n       " +
+                    "         }\r\n            });\r\n        },\r\n\r\n        showNewForm: function (weburl" +
+                    ") {\r\n            var options = { url: weburl, showMaximized: false, dialogReturn" +
+                    "ValueCallback: function (dialogResult) { FancyDispFormClient.fillWebPartData(); " +
+                    "} };\r\n            SP.SOD.execute(\'SP.UI.Dialog.js\', \'SP.UI.ModalDialog.showModal" +
+                    "Dialog\', options);\r\n        },\r\n\r\n        showItemPopup: function (siteurl, webi" +
+                    "d, listid, itemid) {\r\n            showSharePointPopup(siteurl + \'/_layouts/epmli" +
+                    "ve/gridaction.aspx?action=getcontextmenus&webid=\' + webid +\r\n                \'&l" +
+                    "istid=\' + listid + \'&ID=\' + itemid, null, false, true, null, {\r\n                " +
+                    "    gridId: \"myDiv\",\r\n                    rowId: \"myDiv\",\r\n                    c" +
+                    "ol: \"myDiv\"\r\n                }, 300, 400);\r\n        },\r\n\r\n        emptyFunction:" +
+                    " function () {\r\n        },\r\n\r\n        showSharePointPopup: function (url, title," +
+                    " allowMaximize, showClose, func, funcParams, width, height) {\r\n            if (a" +
+                    "llowMaximize == null) allowMaximize = true;\r\n            if (showClose == null) " +
+                    "showClose = true;\r\n            if (func == null) func = emptyFunction;\r\n\r\n      " +
+                    "      var options;\r\n\r\n            if (width !== undefined && height !== undefine" +
+                    "d) {\r\n                options = {\r\n                    title: title,\r\n          " +
+                    "          allowMaximize: allowMaximize,\r\n                    showClose: showClos" +
+                    "e,\r\n                    url: url,\r\n                    dialogReturnValueCallback" +
+                    ": Function.createCallback(Function.createDelegate(null, func), funcParams),\r\n   " +
+                    "                 width: width,\r\n                    height: height\r\n            " +
+                    "    };\r\n            } else {\r\n                options = { title: title, allowMax" +
+                    "imize: allowMaximize, showClose: showClose, url: url, dialogReturnValueCallback:" +
+                    " Function.createCallback(Function.createDelegate(null, func), funcParams) };\r\n  " +
+                    "          }\r\n\r\n            SP.UI.ModalDialog.showModalDialog(options);\r\n        " +
+                    "},\r\n\r\n        fillWebPartData: function () {\r\n\r\n            $(\"#");
+        @__w.Write(divFancyDispFormAssociatedItemsContent.ClientID);
 
             @__w.Write("\").hide();\r\n\r\n            $.ajax({\r\n                type: \"POST\",\r\n              " +
                     "  url: \"");
@@ -688,10 +694,10 @@ namespace EPMLiveWebParts {
             @__w.Write("</FancyFormItemTitle></FancyFormAssociatedItems>\'}\",\r\n                contentType" +
                     ": \"application/json; charset=utf-8\",\r\n                dataType: \"json\",\r\n       " +
                     "         success: function (response) {\r\n\r\n                    $(\"#");
-                @__w.Write(divFancyDispFormContent.ClientID);
+                @__w.Write(divFancyDispFormAssociatedItemsContent.ClientID);
 
             @__w.Write("\").html(\"\");\r\n                        $(\"#");
-                    @__w.Write(divFancyDispFormContent.ClientID);
+                    @__w.Write(divFancyDispFormAssociatedItemsContent.ClientID);
 
             @__w.Write(@""").html(response.d.toString().replace(""<Result Status=\""0\"">"", """").replace(""</Result>"", """"));
 
@@ -707,7 +713,7 @@ namespace EPMLiveWebParts {
                         });
 
                         $(""#");
-                    @__w.Write(divFancyDispFormContent.ClientID);
+                    @__w.Write(divFancyDispFormAssociatedItemsContent.ClientID);
 
             @__w.Write(@""").mouseout(function () {
                             $("".slidingDiv"").hide();
@@ -722,17 +728,15 @@ namespace EPMLiveWebParts {
                         window.ExecuteOrDelayUntilScriptLoaded(addContextualMenu, 'EPMLive.Navigation.js');
 
                         $(""#");
-                    @__w.Write(divFancyDispFormContent.ClientID);
+                    @__w.Write(divFancyDispFormAssociatedItemsContent.ClientID);
 
             @__w.Write("\").show();\r\n                    }\r\n            });\r\n        }\r\n    }\r\n</script>\r\n" +
-                    "\r\n<div style=\"text-align: right; width: 100%\">\r\n    ");
+                    "\r\n<div style=\"text-align: right;\">\r\n    ");
             parameterContainer.Controls[0].RenderControl(@__w);
             @__w.Write("\r\n</div>\r\n\r\n");
             parameterContainer.Controls[1].RenderControl(@__w);
-            @__w.Write("\r\n\r\n");
+            @__w.Write("\r\n\r\n<div style=\"text-align: right; float:right;\">\r\n    ");
             parameterContainer.Controls[2].RenderControl(@__w);
-            @__w.Write("\r\n\r\n<div style=\"text-align: right; width: 100%\">\r\n    ");
-            parameterContainer.Controls[3].RenderControl(@__w);
             @__w.Write("\r\n</div>\r\n");
         }
         

@@ -5,7 +5,7 @@
 <%@ Register TagPrefix="asp" Namespace="System.Web.UI" Assembly="System.Web.Extensions, Version=3.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" %>
 <%@ Import Namespace="Microsoft.SharePoint" %>
 <%@ Register TagPrefix="WebPartPages" Namespace="Microsoft.SharePoint.WebPartPages" Assembly="Microsoft.SharePoint, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
-<%@ Control Language="C#" AutoEventWireup="true" CodeBehind="FancyDisplayForm.ascx.cs" Inherits="EPMLiveWebParts.FancyDisplayForm.FancyDisplayForm" %>
+<%@ Control Language="C#" AutoEventWireup="true" CodeBehind="FancyDisplayForm.ascx.cs" Inherits="EPMLiveWebParts.FancyDisplayForm" %>
 
 <style type="text/css">
     .fancy-display-form-wrapper {
@@ -190,6 +190,14 @@
 
     $(function () {
 
+        var bodyWidth = $(window).width() - 200;
+        $(".fancy-display-form-wrapper").width(bodyWidth);
+
+        $(window).resize(function () {
+            var bodyWidth = $(window).width();
+            $(".fancy-display-form-wrapper").width(bodyWidth);
+        });
+
         FancyDispFormClient.fillWebPartData();
 
         window.SP.SOD.notifyScriptLoadedAndExecuteWaitingJobs('EPMLive.Navigation.js');
@@ -279,7 +287,7 @@
 
         fillWebPartData: function () {
 
-            $("#<%=divFancyDispFormContent.ClientID%>").hide();
+            $("#<%=divFancyDispFormAssociatedItemsContent.ClientID%>").hide();
 
             $.ajax({
                 type: "POST",
@@ -289,8 +297,8 @@
                 dataType: "json",
                 success: function (response) {
 
-                    $("#<%=divFancyDispFormContent.ClientID%>").html("");
-                        $("#<%=divFancyDispFormContent.ClientID%>").html(response.d.toString().replace("<Result Status=\"0\">", "").replace("</Result>", ""));
+                    $("#<%=divFancyDispFormAssociatedItemsContent.ClientID%>").html("");
+                        $("#<%=divFancyDispFormAssociatedItemsContent.ClientID%>").html(response.d.toString().replace("<Result Status=\"0\">", "").replace("</Result>", ""));
 
                         $(".slidingDiv").hide();
 
@@ -303,7 +311,7 @@
                             $(this).show();
                         });
 
-                        $("#<%=divFancyDispFormContent.ClientID%>").mouseout(function () {
+                        $("#<%=divFancyDispFormAssociatedItemsContent.ClientID%>").mouseout(function () {
                             $(".slidingDiv").hide();
                         });
 
@@ -315,14 +323,14 @@
 
                         window.ExecuteOrDelayUntilScriptLoaded(addContextualMenu, 'EPMLive.Navigation.js');
 
-                        $("#<%=divFancyDispFormContent.ClientID%>").show();
+                        $("#<%=divFancyDispFormAssociatedItemsContent.ClientID%>").show();
                     }
             });
         }
     }
 </script>
 
-<div style="text-align: right; width: 100%">
+<div style="text-align: right;">
     <asp:Button ID="btnCancel1" runat="server" Text="Close" OnClick="btnCancel_Click" />
 </div>
 
@@ -435,7 +443,7 @@
                         <div id="divFancyDispForm" class="fancy-display-header">
                             <span>Associated Items</span>
                         </div>
-                        <div class="dispFormContent" id="divFancyDispFormContent" runat="server" style="color: black;">
+                        <div class="dispFormContent" id="divFancyDispFormAssociatedItemsContent" runat="server" style="color: #555555;">
                         </div>
                     </td>
                 </tr>
@@ -443,11 +451,11 @@
         </div>
 
     </div>
+
+    <div class="fancyDisplayForm dispFormContent" id="divItemDetailParent" runat="server" style="float: right; width: 100%;">
+    </div>
 </div>
 
-<div class="dispFormContent" id="divItemDetailParent" runat="server">
-</div>
-
-<div style="text-align: right; width: 100%">
+<div style="text-align: right; float:right;">
     <asp:Button ID="btnCancel2" runat="server" Text="Close" OnClick="btnCancel_Click" />
 </div>

@@ -1,4 +1,5 @@
 ﻿using EPMLiveCore;
+using EPMLiveCore.API;
 using EPMLiveCore.ReportingProxy;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.WebControls;
@@ -108,6 +109,7 @@ namespace EPMLiveWebParts
 
             if (itemId > 0)
             {
+                LoadAssociatedItems();
                 LoadFancyFormData();
                 ManageHTMLOpeningClosing();
                 ShowHideDivs();
@@ -284,6 +286,11 @@ namespace EPMLiveWebParts
             #endregion
 
             #region People Section
+
+            if (peopleDetailsFieldsCount <= PEOPLE_DETAILS_SECTION_FIELD_COUNT)
+                sbPeopleDetailsContent.Append("</table></td></tr></table>");
+            else
+                sbPeopleDetailsShowAllRegion.Append("</table>");
 
             #endregion
 
@@ -609,7 +616,7 @@ namespace EPMLiveWebParts
                                 if (!string.IsNullOrEmpty(imageUrl))
                                     sbPeopleDetailsContent.Append("<img alt='" + userName + "' src='" + imageUrl.Remove(imageUrl.IndexOf(", ")) + "' class='dispFormUserImage' /></td>");
                                 else
-                                    sbPeopleDetailsContent.Append("<img alt='" + userName + "' src='../_layouts/15/images/User.png' class='dispFormUserImage' /></td>");
+                                    sbPeopleDetailsContent.Append("<img alt='" + userName + "' src='../_layouts/images/User.png' class='dispFormUserImage' /></td>");
 
                                 sbPeopleDetailsContent.Append("<td style='vertical-align: middle'>");
                                 sbPeopleDetailsContent.Append("<a class='ms-subtleLink' onclick='GoToLinkOrDialogNewWindow(this);return false;' href='" + SPContext.Current.Web.Url + "/_layouts/15/userdisp.aspx?ID=" + userID + "'>" + userName + "</a>" + "&nbsp;&nbsp;</td>");
@@ -629,7 +636,7 @@ namespace EPMLiveWebParts
                                 if (!string.IsNullOrEmpty(imageUrl))
                                     sbPeopleDetailsShowAllRegion.Append("<img alt='" + userName + "' src='" + imageUrl.Remove(imageUrl.IndexOf(", ")) + "' class='dispFormUserImage' /></td>");
                                 else
-                                    sbPeopleDetailsShowAllRegion.Append("<img alt='" + userName + "' src='../_layouts/15/images/User.png' class='dispFormUserImage' /></td>");
+                                    sbPeopleDetailsShowAllRegion.Append("<img alt='" + userName + "' src='../_layouts/images/User.png' class='dispFormUserImage' /></td>");
 
                                 sbPeopleDetailsShowAllRegion.Append("<td style='vertical-align: middle'>");
                                 sbPeopleDetailsShowAllRegion.Append("<a class'ms-subtleLink' onclick='GoToLinkOrDialogNewWindow(this);return false;' href='" + SPContext.Current.Web.Url + "/_layouts/15/userdisp.aspx?ID=" + userID + "'>" + userName + "</a>" + "&nbsp;&nbsp;</td>");
@@ -695,6 +702,25 @@ namespace EPMLiveWebParts
             sbItemDetailsContent.Append("<td>Last modified " + ((DateTime)(item[SPBuiltInFieldId.Modified])).ToFriendlyDateAndTime() + " by " + ((SPField)item.Fields[SPBuiltInFieldId.Editor]).GetFieldValueAsHtml(item[SPBuiltInFieldId.Editor]) + "</td>");
             sbItemDetailsContent.Append("</tr>");
             sbItemDetailsContent.Append("</table>");
+        }
+
+        private void LoadAssociatedItems()
+        {
+            ArrayList arrAssociatedLists = EPMLiveCore.API.ListCommands.GetAssociatedLists(SPContext.Current.List);
+            StringBuilder sbAssociatedItems = new StringBuilder();
+            if (arrAssociatedLists != null)
+            {
+                sbAssociatedItems.Append("<table style='width:100%'><tr><td><table class='fancy-col-table'>");
+                foreach (AssociatedListInfo item in arrAssociatedLists)
+                {
+                    sbAssociatedItems.Append("<tr>");
+                    sbAssociatedItems.Append("<td>" + item.Title + "</td>");
+                    sbAssociatedItems.Append("<td><a href='#'><div id='div_" + item.ListId + "' class='listMainDiv'><span class='badge'>0</span></a></div>");
+                    sbAssociatedItems.Append("</tr>");
+                }
+                sbAssociatedItems.Append("</table></td></tr></table>");
+                divFancyDispFormAssociatedItemsContent.InnerHtml = sbAssociatedItems.ToString();
+            }
         }
 
         #endregion

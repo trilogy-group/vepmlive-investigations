@@ -810,7 +810,10 @@
       <Link>Telerik.Web.UI.Skins.dll</Link>
     </Content>
     <Content Include="ActionBar\Elements.xml" />
-    <Content Include="AssociatedItems\AssociatedItems.ascx" />
+    <Content Include="AssociatedItems\AssociatedItems.ascx">
+      <Generator>SharePointWebPartCodeGenerator</Generator>
+      <LastGenOutput>AssociatedItems.ascx.g.cs</LastGenOutput>
+    </Content>
     <Content Include="AssociatedItems\Elements.xml" />
     <Content Include="FancyDisplayForm\Elements.xml" />
     <Content Include="FancyDisplayForm\FancyDisplayForm.ascx" />
@@ -1626,7 +1629,8 @@
   <ProjectExtensions />
   <PropertyGroup>
     <PostBuildEvent>
-      "C:\Program Files (x86)\Microsoft SDKs\Windows\v8.0A\Bin\NETFX 4.0 Tools\x64\gacutil.exe" /i "C:\dkuo_epmlive2013\EPMLiveWebParts\EPMLiveWebParts\bin\Debug\EPMLiveWebParts.dll" /f
+      "C:\Program Files (x86)\Microsoft SDKs\Windows\v8.0A\Bin\NETFX 4.0 Tools\x64\gacutil.exe" /i "C:\dkuo_epmlive2013\EPMLiveWebParts\EPMLiveWebParts\bin\Debug
+      \EPMLiveWebParts.dll" /f
       iisreset
     </PostBuildEvent>
   </PropertyGroup>
