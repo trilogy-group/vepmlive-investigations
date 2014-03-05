@@ -462,7 +462,6 @@ function CreateEPMLiveWorkspace(listid, itemid) {
     SP.UI.ModalDialog.showModalDialog(options);
 }
 
-
 function OpenIntegrationPage(controlFull, listid, itemid) {
 
     var t = controlFull.indexOf(".");
@@ -514,3 +513,747 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
 
    
 }
+
+(function (epmToolBar, $) {
+
+    epmToolBar.generateToolBar = function (tagId, cfgs) {
+
+        $(document).click(function (e) {
+            if (e.target.parentElement.id != "toolbar-search-icon") {
+                $('.toolbar-search').css("margin-left", "0px");
+            }
+
+            if (clickedOutsideElementClass('dropdown-menu') && clickedOutsideElementClass('dropdown')) {
+                $('.dropdown-menu').css('display', 'none');
+            }
+        });
+
+        //set properties
+        var ulIds = {};
+        var anchorTagId = tagId;
+        var mainActionBar = $(document.createElement('div'));
+        mainActionBar.addClass('epmliveToolBar');
+        mainActionBar.attr('border-bottom', "1px solid #eeeeee");
+
+        for (var index in cfgs) {
+            var blockContents = cfgs[index];
+            if (blockContents["placement"] == "left") {
+                buildLeftBlockHTML(mainActionBar, blockContents);
+            }
+            else {
+                buildRightBlockHTML(mainActionBar, blockContents);
+            }
+        }
+
+        $('#' + anchorTagId).append(mainActionBar);
+
+        function buildLeftBlockHTML(mainActionBar, blockContents) {
+            var mainActionBar_LeftUl = $(document.createElement('ul'));
+            mainActionBar_LeftUl.addClass('nav navbar-nav');
+            var contents = blockContents["content"];
+            for (var i in contents) {
+                var cfg = contents[i];
+                var cType = cfg['controlType'];
+
+                switch (cType) {
+                    case "button":
+                        createButton(cfg, mainActionBar_LeftUl);
+                        break;
+                    case "dropdown":
+                        createDropDown(cfg, mainActionBar_LeftUl);
+                        break;
+                    default:
+                        break;
+                }
+            }
+            mainActionBar.append(mainActionBar_LeftUl);
+        }
+
+        function buildRightBlockHTML(mainActionBar, blockContents) {
+            var mainActionBar_RightUl = $(document.createElement('ul'));
+            mainActionBar_RightUl.addClass('nav navbar-nav navbar-right');
+            var contents = blockContents["content"];
+
+            for (var i in contents) {
+                var cfg = contents[i];
+                var cType = cfg['controlType'];
+
+                switch (cType) {
+                    case "button":
+                        createButton(cfg, mainActionBar_RightUl);
+                        break;
+                    case "dropdown":
+                        createDropDown(cfg, mainActionBar_RightUl);
+                        break;
+                    case "multiselect":
+                        createMultiSelect(cfg, mainActionBar_RightUl);
+                        break;
+                    case "groupByFields":
+                        createGroupBy(cfg, mainActionBar_RightUl);
+                        break;
+                    case "search":
+                        createSearch(cfg, mainActionBar_RightUl);
+                    default:
+                        break;
+                }
+            }
+
+            mainActionBar.append(mainActionBar_RightUl);
+        }
+
+        function createButton(cfg, ul) {
+            // get props
+            var iconClass = cfg['iconClass'];
+            var title = cfg['title'];
+            var value = cfg['value'];
+            var events = cfg['events'];
+
+            var li = $(document.createElement('li'));
+            var aContainer = $(document.createElement('a'));
+            aContainer.attr('class', 'dropdown-toggle');
+            aContainer.attr('href', 'javascript:void(0)');
+
+            if (iconClass &&
+                (iconClass != 'none')) {
+                var spnImg = $(document.createElement('span'));
+                spnImg.attr('class', iconClass);
+                aContainer.append(spnImg);
+            }
+
+            if (title &&
+                (title.toLowerCase() != 'none')) {
+                var spnLbl = $(document.createElement('span'));
+                spnLbl.addClass('dropdown-label');
+                spnLbl.text(title);
+                aContainer.append(spnLbl);
+            }
+
+            if (value &&
+                (value != 'none')) {
+                var spnLbl = $(document.createElement('span'));
+                spnLbl.text(value);
+                aContainer.append(spnLbl);
+            }
+
+            li.append(aContainer);
+
+            if (events) {
+                attachEvents(aContainer, cfg['events']);
+            }
+
+            ul.append(li);
+        }
+
+        function createDropDown(cfg, ul) {
+            //get properties
+            var controlId = cfg['controlId']
+            var title = cfg['title'];
+            var iconClass = cfg['iconClass'];
+            var value = cfg['value'];
+
+            var li = $(document.createElement('li'));
+            //create anchor
+            var aContainer = $(document.createElement('a'));
+            aContainer.attr('class', 'dropdown-toggle');
+            aContainer.attr('href', 'javascript:void(0)');
+            aContainer.attr('controlId', controlId);
+            //create span image
+            if (iconClass &&
+                (iconClass != 'none')) {
+                var spnImg = $(document.createElement('span'));
+                spnImg.attr('class', iconClass);
+                spnImg.attr('style', 'position: relative;padding-right: 5px;font-size: 0.8em;top: 0px');
+                aContainer.append(spnImg);
+            }
+            //create span label for text
+            if (title &&
+                (title.toLowerCase() != 'none')) {
+                var spnTitle = $(document.createElement('span'));
+                spnTitle.text(title);
+                spnTitle.addClass('dropdown-label');
+                aContainer.append(spnTitle);
+            }
+            //create span lable for value
+            if (value &&
+                (value != 'none')) {
+                var spnValue = $(document.createElement('span'));
+                spnValue.text(value);
+                aContainer.append(spnValue);
+            }
+
+            //create caret
+            if ((iconClass && (iconClass != 'none')) ||
+                (title && (title.toLowerCase() != 'none')) ||
+                (value && (value != 'none'))) {
+
+                var spnCaret = $(document.createElement('b'));
+                spnCaret.attr('class', 'caret');
+                aContainer.append(spnCaret);
+            }
+
+            //bind anchor click event to open menu
+            aContainer.bind('click', function () {
+                $('.dropdown-menu').css('display', 'none');
+                $('#' + getUlId($(this).attr('controlId'))).toggle();
+            });
+
+            li.append(aContainer);
+
+            var genericUl = $(document.createElement('ul'));
+            genericUl.attr('id', getUlId(controlId));
+            genericUl.addClass('dropdown-menu');
+
+            for (var i in cfg['sections']) {
+                var sect = cfg['sections'][i];
+                //add section heading
+                var sHeading = sect['heading'];
+                if (sHeading &&
+                    (sHeading.toLowerCase() != 'none')) {
+                    var liHeading = $(document.createElement('li'));
+                    liHeading.attr('class', 'dropdown-header');
+                    liHeading.text(sHeading);
+                    genericUl.append(liHeading);
+                }
+                //add section divider
+                var sDivider = sect['divider'];
+                if (sDivider &&
+                    sDivider.toLowerCase() != 'no' &&
+                    sDivider.toLowerCase() != 'none') {
+                    var liDivider = $(document.createElement('li'));
+                    liDivider.attr('class', 'divider');
+                    genericUl.append(liDivider);
+                }
+                //add each section
+                for (var j in sect['options']) {
+                    var option = sect['options'][j];
+                    var liOpt = $(document.createElement('li'));
+                    var aContainer = $(document.createElement('a'));
+                    aContainer.attr('href', 'javascript:void(0)');
+                    var optIconClass = option['iconClass'];
+                    var optText = option['text'];
+                    var optEvt = option['events'];
+
+                    if (optIconClass) {
+                        var spnImg = $(document.createElement('span'));
+                        spnImg.attr('class', option['iconClass']);
+                        aContainer.append(spnImg);
+                    }
+
+                    if (optText) {
+                        var spnLbl = $(document.createElement('span'));
+                        spnLbl.text(option['text']);
+                        aContainer.append(spnLbl);
+                    }
+
+                    if (optEvt) {
+                        attachEvents(aContainer, option['events']);
+                    }
+
+                    liOpt.append(aContainer);
+                    genericUl.append(liOpt);
+                }
+            }
+
+            li.append(genericUl);
+            ul.append(li);
+        }
+
+        //START RIGHT SIDE TOOL BAR METHODS
+        function createSearch(cfg, ul) {
+            var li = $(document.createElement('li'));
+            var isCustom = (cfg['custom'].toLowerCase() == 'yes');
+
+            if (isCustom) {
+                var customCtrlId = cfg['controlId'];
+                li.append($('#' + customCtrlId));
+            }
+            else {
+
+                var input = $(document.createElement('input'));
+                input.attr('class', 'toolbar-search');
+                input.attr('type', 'text');
+                input.attr('placeholder', 'Search');
+                input.attr('style', 'margin-left: 0px;');
+                attachEvents(input, cfg['events']);
+                li.append(input);
+
+                var aContainer = $(document.createElement('a'));
+                aContainer.attr('id', 'toolbar-search-icon');
+                aContainer.attr('class', 'nav-icon');
+                aContainer.attr('style', 'font-size:.9em;');
+                aContainer.attr('title', 'Standard View');
+                aContainer.attr('data-placement', 'top');
+                aContainer.attr('href', 'javascript:void(0)');
+                aContainer.click(function () {
+                    if ($(".toolbar-search").css("margin-left") == "0px") {
+                        $(".toolbar-search").css("margin-left", "-160px");
+                        $(".toolbar-search").focus();
+                    }
+                    else {
+                        $(".toolbar-search").css("margin-left", "0px");
+                    }
+                });
+                var spnImg = $(document.createElement('span'));
+                spnImg.attr('class', 'icon-search-3');
+                aContainer.append(spnImg);
+                li.append(aContainer);
+            }
+            ul.append(li);
+        }
+
+        function createGroupBy(cfg, ul) {
+            var li = $(document.createElement('li'));
+            li.attr('class', 'dropdown');
+
+            var aContainer = $(document.createElement('a'));
+            aContainer.attr('id', 'group-dropdown');
+            aContainer.attr('class', 'dropdown-toggle nav-icon');
+            aContainer.attr('title', 'Standard View');
+            aContainer.attr('data-placement', 'top');
+            aContainer.attr('href', 'javascript:void(0)');
+            var spnImg = $(document.createElement('span'));
+            spnImg.attr('class', 'icon-list-3');
+            aContainer.append(spnImg);
+            aContainer.bind('click', function () {
+                $('.dropdown-menu').css('display', 'none');
+                divContainer.toggle();
+            });
+
+            li.append(aContainer);
+
+            var divContainer = $(document.createElement('div'));
+            divContainer.attr('class', 'dropdown-menu no-close grouping-dropdown-menu');
+            var groupbyUl = $(document.createElement('ul'));
+            var groupbyLiHeader = $(document.createElement('li'));
+            groupbyLiHeader.attr('class', 'dropdown-header');
+            groupbyLiHeader.text('Group By');
+            var groupbyLiDivider = $(document.createElement('li'));
+            groupbyLiDivider.attr('class', 'divider');
+            groupbyUl.append(groupbyLiHeader);
+            groupbyUl.append(groupbyLiDivider);
+            divContainer.append(groupbyUl);
+
+            var divGroupingWrapper = $(document.createElement('div'));
+            divGroupingWrapper.attr('class', 'grouping-wrapper');
+
+            var sAvailableGrps = cfg['availableGroups'];
+            var availableGrps = new Array();
+            if (sAvailableGrps) {
+                availableGrps = sAvailableGrps.split(',');
+            }
+
+            if (availableGrps.length == 0) {
+                alert('no choice fields');
+                return;
+            }
+
+            // foreach grouping field we need to render
+            var groups = cfg['groups'];
+            for (var i in groups) {
+                var group = groups[i];
+
+                var divGroupingRow = $(document.createElement('div'));
+                divGroupingRow.attr('class', 'grouping-row');
+
+                var divGroupingNumber = $(document.createElement('div'));
+                divGroupingNumber.attr('class', 'grouping-number');
+                divGroupingNumber.text(parseInt(i) + 1);
+
+                var divGroupingSelect = $(document.createElement('div'));
+                divGroupingSelect.attr('class', 'grouping-select');
+                var select = $(document.createElement('select'));
+                select.addClass('form-control');
+                for (var j in availableGrps) {
+                    var txt = availableGrps[j].split('|')[0];
+                    var val = availableGrps[j].split('|')[1];
+                    select.append('<option value="' + val + '">' + txt + '</option>');
+                }
+                select.val(group['internalName']);
+                divGroupingSelect.append(select);
+
+                var divGroupingDelete = $(document.createElement('div'));
+                divGroupingDelete.attr('class', 'grouping-delete');
+                var aGroupingDelete = $(document.createElement('a'));
+                var spanGroupingDelete = $(document.createElement('span'));
+                spanGroupingDelete.attr('class', 'fui-cross icon-dropdown');
+                aGroupingDelete.append(spanGroupingDelete);
+                aGroupingDelete.bind('click', function () {
+                    $(this).closest('.grouping-row').remove();
+                    var num = 1;
+                    $('.grouping-wrapper').children('.grouping-row').each(function () {
+                        $(this).find('.grouping-number').first().text(num++);
+                    });
+                    var numRows = $('.grouping-wrapper').children('.grouping-row').length;
+                    if (numRows == 0) {
+                        $('#aGroupBySave').attr('class', 'disabledLink');
+                    }
+                    else if (numRows > 0 && numRows < 5) {
+                        $('#aGroupBySave').removeAttr('class');
+                        $('#aAddGrouping').removeAttr('class');
+                    }
+                    else if (numRows > 0 && numRows == 4) {
+                        $('#aGroupBySave').removeAttr('class');
+                        $('#aAddGrouping').attr('class', 'disabledLink');
+                    }
+                });
+                divGroupingDelete.append(aGroupingDelete);
+
+                divGroupingRow.append(divGroupingNumber);
+                divGroupingRow.append(divGroupingSelect);
+                divGroupingRow.append(divGroupingDelete);
+                divGroupingWrapper.append(divGroupingRow);
+            }
+            divContainer.append(divGroupingWrapper);
+
+            var divGroupingFooter = $(document.createElement('div'));
+            divGroupingFooter.attr('class', 'grouping-footer');
+            var ulFooterHeading = $(document.createElement('ul'));
+            var liFooterDivider = $(document.createElement('li'));
+            liFooterDivider.addClass('divider');
+            ulFooterHeading.append(liFooterDivider);
+            divGroupingFooter.append(ulFooterHeading);
+
+            var divFooterAdd = $(document.createElement('div'));
+            divFooterAdd.addClass('grouping-add');
+            var aFooterAdd = $(document.createElement('a'));
+            aFooterAdd.attr('id', 'aAddGrouping');
+            aFooterAdd.attr('href', 'javascript:void(0)');
+            aFooterAdd.text('Add Grouping');
+            aFooterAdd.bind('click', function () {
+                var numRows = $('.grouping-wrapper').children('.grouping-row').length;
+                if (numRows < 4) {
+
+                    if (numRows == 3) {
+                        $(this).attr('class', 'disabledLink');
+                    }
+
+                    var divGroupingWrapper = $('.grouping-wrapper');
+
+                    var divGroupingRow = $(document.createElement('div'));
+                    divGroupingRow.attr('class', 'grouping-row');
+
+                    var divGroupingNumber = $(document.createElement('div'));
+                    divGroupingNumber.attr('class', 'grouping-number');
+                    divGroupingNumber.text(numRows + 1);
+
+                    var divGroupingSelect = $(document.createElement('div'));
+                    divGroupingSelect.attr('class', 'grouping-select');
+                    var select = $(document.createElement('select'));
+                    select.addClass('form-control');
+                    for (var j in availableGrps) {
+                        var txt = availableGrps[j].split('|')[0];
+                        var val = availableGrps[j].split('|')[1];
+                        select.append('<option value="' + val + '">' + txt + '</option>');
+                    }
+                    select.prop('selectedIndex', 0);
+                    divGroupingSelect.append(select);
+
+                    var divGroupingDelete = $(document.createElement('div'));
+                    divGroupingDelete.attr('class', 'grouping-delete');
+                    var aGroupingDelete = $(document.createElement('a'));
+                    var spanGroupingDelete = $(document.createElement('span'));
+                    spanGroupingDelete.attr('class', 'fui-cross icon-dropdown');
+                    aGroupingDelete.append(spanGroupingDelete);
+                    aGroupingDelete.bind('click', function () {
+                        $(this).closest('.grouping-row').remove();
+                        var num = 1;
+                        $('.grouping-wrapper').children('.grouping-row').each(function () {
+                            $(this).find('.grouping-number').first().text(num++);
+                        });
+                        var numRows = $('.grouping-wrapper').children('.grouping-row').length;
+                        if (numRows == 0) {
+                            $('#aGroupBySave').attr('class', 'disabledLink');
+                        }
+                        else if (numRows > 0 && numRows < 5) {
+                            $('#aGroupBySave').removeAttr('class');
+                            $('#aAddGrouping').removeAttr('class');
+                        }
+                        else if (numRows > 0 && numRows == 4) {
+                            $('#aGroupBySave').removeAttr('class');
+                            $('#aAddGrouping').attr('class', 'disabledLink');
+                        }
+                    });
+
+                    divGroupingDelete.append(aGroupingDelete);
+
+                    divGroupingRow.append(divGroupingNumber);
+                    divGroupingRow.append(divGroupingSelect);
+                    divGroupingRow.append(divGroupingDelete);
+                    divGroupingWrapper.append(divGroupingRow);
+
+                    $('#aGroupBySave').removeAttr('class');
+                }
+
+            });
+            divFooterAdd.append(aFooterAdd);
+            divGroupingFooter.append(divFooterAdd);
+
+            var divFooterSave = $(document.createElement('div'));
+            divFooterSave.addClass('grouping-save');
+            var aFooterSave = $(document.createElement('a'));
+            aFooterSave.attr('id', 'aGroupBySave');
+            aFooterSave.attr('href', 'javascript:void(0)');
+            aFooterSave.text('Save');
+            aFooterSave.bind('click', function () {
+                var numGroups = $('.grouping-wrapper').children('.grouping-row').length;
+                if (numGroups > 0) {
+                    var keyVals = [];
+                    $('.grouping-wrapper').children('.grouping-row').each(function () {
+                        var txt = $(this).find('.grouping-select').find('select option:selected').text();
+                        var val = $(this).find('.grouping-select').find('select option:selected').val();
+                        var objTemp = { 'key': txt, 'value': val };
+                        keyVals.push(objTemp);
+                    });
+                    cfg['saveFunction'](keyVals);
+                }
+            });
+            divFooterSave.append(aFooterSave);
+            divGroupingFooter.append(divFooterSave);
+
+            divContainer.append(divGroupingFooter);
+
+            li.append(divContainer);
+            ul.append(li);
+        }
+
+        function createMultiSelect(cfg, ul) {
+            var controlId = cfg['controlId'];
+            var iconClass = cfg['iconClass'];
+
+            var li = $(document.createElement('li'));
+            li.attr('class', 'dropdown');
+            var aContainer = $(document.createElement('a'));
+            aContainer.attr('class', 'dropdown-toggle nav-icon');
+            aContainer.attr('href', 'javascript:void(0)');
+            aContainer.attr('controlId', controlId);
+
+            if (iconClass) {
+                var spnImg = $(document.createElement('span'));
+                spnImg.attr('class', iconClass);
+                aContainer.append(spnImg);
+            }
+
+            aContainer.bind('click', function () {
+                $('.dropdown-menu').css('display', 'none');
+                $('#' + getUlId($(this).attr('controlId'))).toggle();
+            });
+
+            li.append(aContainer);
+
+            var ulColumns = $(document.createElement('ul'));
+            ulColumns.attr('id', getUlId(controlId));
+            ulColumns.attr('class', 'multiselect-container dropdown-menu');
+            ulColumns.attr('style', 'max-height: 400px;overflow-y: auto;overflow-x: hidden;');
+
+            var liSelectAll = $(document.createElement('li'));
+            var aSelectAllChxBx = $(document.createElement('a'));
+            aSelectAllChxBx.attr('href', 'javascript:void(0)');
+            aSelectAllChxBx.addClass('multiselect-all');
+            var lblSelectAllChxBx = $(document.createElement('label'));
+            lblSelectAllChxBx.attr('class', 'checkbox');
+            var inputChxBx = $(document.createElement('input'));
+            inputChxBx.attr('id', 'cbSelectAll');
+            inputChxBx.attr('type', 'checkbox');
+            inputChxBx.attr('value', 'multiselect-all');
+            inputChxBx.bind('change', function () {
+                if ($(this).is(':checked')) {
+                    $(this).closest('li').siblings().each(function () {
+                        $(this).find('input:checkbox').prop('checked', true);
+                    });
+                }
+                else {
+                    $(this).closest('li').siblings().each(function () {
+                        $(this).find('input:checkbox').prop('checked', false);
+                    });
+                }
+
+                if (cfg['onchangeFunction']) {
+                    var checkedColumns = [];
+                    $(this).closest('li').siblings().find(':checked').each(function () {
+                        var col = {
+                            'key': $(this).parent().text(),
+                            'value': $(this).val()
+                        }
+                        checkedColumns.push(col);
+                    });
+                    cfg['onchangeFunction'](checkedColumns);
+                }
+            });
+            lblSelectAllChxBx.append(inputChxBx);
+            lblSelectAllChxBx.append('Select all');
+            aSelectAllChxBx.append(lblSelectAllChxBx);
+            liSelectAll.append(aSelectAllChxBx);
+            ulColumns.append(liSelectAll);
+            //foreach column we add an element, ulColumns.apend(...)
+            var choices = cfg['choices'];
+            for (var index in choices) {
+                //get choice value
+                var text = choices[index]['key'];
+                var value = choices[index]['value'];
+                //create rows
+                var liChoice = $(document.createElement('li'));
+                var a = $(document.createElement('a'));
+                a.attr('href', 'javascript:void(0)');
+                var lbl = $(document.createElement('label'));
+                lbl.attr('class', 'checkbox');
+                var input = $(document.createElement('input'));
+                input.attr('type', 'checkbox');
+                input.attr('class', 'cbColumn');
+                input.attr('value', value);
+
+                input.bind('change', function () {
+                    if ($(this).prop('checked') == false) {
+                        $('#cbSelectAll').prop('checked', false);
+                    }
+                    else {
+                        if ($('.cbColumn:not(:checked)').length == 0) {
+                            $('#cbSelectAll').prop('checked', true);
+                        }
+                    }
+
+                    if (cfg['onchangeFunction']) {
+                        var checkedColumns = [];
+                        if ($(this).is(':checked')) {
+                            var col = {
+                                'key': $(this).parent().text(),
+                                'value': $(this).val()
+                            }
+                            checkedColumns.push(col);
+                        }
+                        $(this).closest('li').siblings().find(':checked').each(function () {
+                            if ($(this).parent().text().toLowerCase() == 'select all') {
+                                return;
+                            }
+                            var col = {
+                                'key': $(this).parent().text(),
+                                'value': $(this).val()
+                            }
+                            checkedColumns.push(col);
+                        });
+                        cfg['onchangeFunction'](checkedColumns);
+                    }
+                });
+
+                lbl.append(input);
+                lbl.append(text);
+                a.append(lbl);
+                liChoice.append(a)
+                ulColumns.append(liChoice);
+            }
+
+            var liDivider = $(document.createElement('li'));
+            liDivider.addClass('divider');
+            ulColumns.append(liDivider);
+
+            var divFooterApply = $(document.createElement('div'));
+            divFooterApply.addClass('grouping-apply');
+            var aFooterApply = $(document.createElement('a'));
+            aFooterApply.attr('href', 'javascript:void(0)');
+            aFooterApply.text(cfg['applyButtonConfig']['text']);
+
+            if (cfg['applyButtonConfig']['function']) {
+                aFooterApply.bind('click', function () {
+                    var checkedColumns = [];
+                    $(this).parent().siblings('li').find(':checked').each(function () {
+                        if ($(this).parent().text().toLowerCase() == 'select all') {
+                            return;
+                        }
+                        var col = {
+                            'key': $(this).parent().text(),
+                            'value': $(this).val()
+                        }
+                        checkedColumns.push(col);
+                    });
+                    cfg['onchangeFunction'](checkedColumns);
+                });
+            }
+
+            divFooterApply.append(aFooterApply);
+            ulColumns.append(divFooterApply);
+
+            li.append(ulColumns);
+            ul.append(li);
+
+        }
+        //END RIGHT SIDE TOOL BAR METHODS
+
+        //START HELPER
+        function attachEvents(element, aEvents) {
+            for (var i in aEvents) {
+                var evt = aEvents[i];
+                element.bind(evt['eventName'], evt['function']);
+            }
+        }
+
+        function clickedOutsideElement(elemId, event) {
+            var theElem = (window.event) ? getEventTarget(window.event) : event.target;
+            while (theElem != null) {
+                if (theElem.id == elemId) {
+                    return false;
+                }
+                else {
+                    theElem = theElem.parentNode;
+                }
+            }
+            return true;
+        }
+
+        function clickedOutsideElementClass(sClass, event) {
+            var theElem = (window.event) ? getEventTarget(window.event) : event.target;
+            while (theElem != null) {
+                if ($(theElem).attr('class') != null && $(theElem).attr('class').indexOf(sClass) != -1) {
+                    return false;
+                }
+                else {
+                    theElem = theElem.parentNode;
+                }
+            }
+            return true;
+        }
+
+        function getEventTarget(evt) {
+            var targ = (evt.target) ? evt.target : evt.srcElement;
+            if (targ != null) {
+                if (targ.nodeType == 3)
+                    targ = targ.parentNode;
+            }
+            return targ;
+        }
+
+        function s4() {
+            return Math.floor((1 + Math.random()) * 0x10000)
+                       .toString(16)
+                       .substring(1);
+        };
+
+        function guid() {
+            return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
+                   s4() + '-' + s4() + s4() + s4();
+        }
+
+        function getSafeTitle(title) {
+            var ret = '';
+            if (title)
+                ret = title.replace(/ /g, '');
+
+            return ret;
+        }
+
+        function getUlId(id) {
+            // get one from storage
+            var ret = '';
+            var oldVal = ulIds[id];
+            if (!oldVal) {
+                // can't find it, so we create one
+                ulIds[id] = id + '_ul_menu';
+                ret = ulIds[id];
+            }
+            else {
+                ret = oldVal;
+            }
+            return ret;
+        }
+
+        //END HELPER
+    };
+})(window.epmLiveGenericToolBar = window.epmLiveGenericToolBar || {}, window.jQuery);
