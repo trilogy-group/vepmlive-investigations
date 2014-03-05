@@ -45,6 +45,7 @@ namespace EPMLiveWorkPlanner
             public string KanBanTitleColumn;
             public string KanBanAdditionalColumns;
             public string KanBanItemStatusFields;
+            public string KanBanItemStatusFieldsAvailable;
             #endregion
 
             public string sListProjectCenter;
@@ -5104,6 +5105,7 @@ namespace EPMLiveWorkPlanner
                 p.KanBanTitleColumn = EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLivePlanner" + planner + "KanBanTitleColumn");
                 p.KanBanAdditionalColumns = EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLivePlanner" + planner + "KanBanAdditionalColumns");
                 p.KanBanItemStatusFields = EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLivePlanner" + planner + "KanBanItemStatusFields");
+                p.KanBanItemStatusFieldsAvailable = EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLivePlanner" + planner + "KanBanItemStatusFieldsAvailable");
                 #endregion
             }
             else
@@ -5259,6 +5261,7 @@ namespace EPMLiveWorkPlanner
             string qryFilterColumnValues = "SELECT DISTINCT {0} FROM {1} WHERE WebId='{2}' AND ListId='{3}' AND ProjectID=" + projectID + " ORDER BY {4}";
 
             StringBuilder jsonFilterColumnValues1 = new StringBuilder();
+            StringBuilder jsonBacklogStatusValues = new StringBuilder();
             string columnName = string.Empty;
             string tableName = string.Empty;
             bool isLookupOrUserField = false;
@@ -5348,18 +5351,30 @@ namespace EPMLiveWorkPlanner
                         }
                         else
                         {
-                            return string.Format("{{ \"kanbanerror\": \"List not configured for reporting. Please contact administrator.\", \"kanbanfilter1name\": \"Select {0} :\", \"kanbanfilter1\": [{1}] }}", props.KanBanFilterColumn, "");
+                            return string.Format("{{ \"kanbannewitemurl\": \"\", \"kanbanitemname\": \"\", \"kanbanstatuscolumn\": \"\", \"kanbanstatusvalues\": [{0}], \"kanbanerror\": \"List not configured for reporting. Please contact administrator.\", \"kanbanfilter1name\": \"{1}:\", \"kanbanfilter1\": [{2}] }}", "", props.KanBanFilterColumn, "");
                         }
                     }
                 }
             }
             catch { }
+
+            foreach (string status in props.KanBanItemStatusFieldsAvailable.Split(','))
+            {
+                jsonBacklogStatusValues.Append(string.Format("{{\"id\":\"{0}\"}},", EncodeJsonData(status)));
+            }
+
+            string jsonBacklogStatus = jsonBacklogStatusValues.ToString();
+            if (jsonBacklogStatus.Length > 1)
+            {
+                jsonBacklogStatus = jsonBacklogStatus.Substring(0, jsonBacklogStatus.Length - 1);
+            }
+
             string jsonData = jsonFilterColumnValues1.ToString();
             if (jsonData.Length > 1)
             {
                 jsonData = jsonData.Substring(0, jsonData.Length - 1);
             }
-            return string.Format("{{ \"kanbannewitemurl\": \"{0}\", \"kanbanitemname\": \"{1}\", \"kanbanerror\": \"\", \"kanbanfilter1name\": \"{2}:\", \"kanbanfilter1\": [{3}] }}", sourceList.DefaultNewFormUrl, sourceList.Title, props.KanBanFilterColumn, jsonData);
+            return string.Format("{{ \"kanbannewitemurl\": \"{0}\", \"kanbanitemname\": \"{1}\", \"kanbanstatuscolumn\": \"{2}\", \"kanbanstatusvalues\": [{3}], \"kanbanerror\": \"\", \"kanbanfilter1name\": \"{4}:\", \"kanbanfilter1\": [{5}] }}", sourceList.DefaultNewFormUrl, sourceList.Title, props.KanBanStatusColumn, jsonBacklogStatus, props.KanBanFilterColumn, jsonData);
         }
 
         public static string GetKanBanBoard(XmlDocument data, SPWeb oWeb)

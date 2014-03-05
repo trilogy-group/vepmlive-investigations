@@ -19,30 +19,15 @@
     <script type="text/javascript">
 
         $(function () {
-
             resetControls(false);
-
             loadKanBanPlanners();
-
             $("#lnkNewItem").click(function () {
                 showNewForm($(this).attr('data-newformurl'));
             });
 
-
             $("#ddlKanBanPlanners").change(function () {
                 loadKanBanFilter1(this.value);
             });
-
-            //$("#btnApply").click(function () {
-            //    var kanBanBoardName = $("#ddlKanBanPlanners").val();
-            //    var kanBanFilter1 = "";
-            //    $("#ddlKanBanFilter1 option:selected").each(function () {
-            //        if (kanBanFilter1 != "") kanBanFilter1 += ",";
-            //        kanBanFilter1 += $(this).val().toString().replace("\\", "\\\\");
-            //    });
-            //    loadKanBanBoard(kanBanBoardName, kanBanFilter1);
-            //});
-
         });
 
 
@@ -59,19 +44,15 @@
 
         function resetControls(reset) {
             if (reset) {
-                //$("#btnApply").show();
                 $("#lnkNewItem").show();
                 $("#lblFilert1").show();
                 $("#ddlKanBanFilter1").show();
-                //$("#mainContainer").show();
                 $("#mainContainer").html('');
             }
             else {
-                //$("#btnApply").hide();
                 $("#lnkNewItem").hide();
                 $("#lblFilert1").hide();
                 $("#ddlKanBanFilter1").hide();
-                //$("#mainContainer").hide();
                 $("#mainContainer").html('');
             }
         }
@@ -163,6 +144,14 @@
                             $("#lnkNewItem").html('<span class="icon-plus-2"></span> New ' + obj.kanbanitemname);
                             $("#lblFilert1").text(obj.kanbanfilter1name);
 
+
+                            $("#lblBacklogStatus").text(obj.kanbanstatuscolumn);
+
+                            $("#ddlBacklogStatus").children('option').remove();
+                            $.each(obj.kanbanstatusvalues, function (key, value) {
+                                $("#ddlBacklogStatus").append($("<option></option>").val(value.id).html(value.id));
+                            });
+
                             $("#ddlKanBanFilter1").children('option').remove();
                             $.each(obj.kanbanfilter1, function (key, value) {
                                 $("#ddlKanBanFilter1").append($("<option></option>").val(value.id).html(value.text));
@@ -176,15 +165,6 @@
                                 firstItemChecksAll: true,
                                 explicitClose: "...Close",
                                 onComplete: function (selector) {
-                                    //var kanBanFilter1 = "";
-                                    //for (i = 0; i < selector.options.length; i++) {
-                                    //    if (selector.options[i].selected && (selector.options[i].value != "")) {
-                                    //        if (kanBanFilter1 != "") kanBanFilter1 += ",";
-                                    //        kanBanFilter1 += selector.options[i].value.toString().replace("\\", "\\\\");
-                                    //    }
-                                    //}
-                                    //loadKanBanBoard($("#ddlKanBanPlanners").val(), kanBanFilter1);
-
                                     loadKanBanBoard();
                                 }
                             });
@@ -197,7 +177,6 @@
             }
         }
 
-        //function loadKanBanBoard(kanBanBoardName, kanBanFilter1) {
         function loadKanBanBoard() {
 
             var kanBanBoardName = $("#ddlKanBanPlanners").val();
@@ -247,48 +226,41 @@
                         items: '.sortable-item',
                         update: function (event, ui) {
                             if (ui.sender == null) {
-                                //showHideLoading(true, 'Saving item...');
                                 var parentId = ui.item.parent().attr("id");
                                 var childId = ui.item.attr("id");
                                 var indexOfItem = $("#" + parentId + " > div").index($("#" + childId));
 
-                                //$("#" + childId + " > div[id^='saveprogress']").show();
-                                $("#" + childId).fadeTo(10, 0.25);
 
-                                var data = '<DataXml><data-siteid>' + ui.item.attr("data-siteid") + '</data-siteid><data-webid>' + ui.item.attr("data-webid") + '</data-webid><data-listid>' + ui.item.attr("data-listid") + '</data-listid><data-itemid>' + ui.item.attr("data-itemid") + '</data-itemid><data-userid>' + ui.item.attr("data-userid") + '</data-userid><data-itemtitle>' + ui.item.attr("data-itemtitle") + '</data-itemtitle><data-icon>' + ui.item.attr("data-icon") + '</data-icon><data-type>' + ui.item.attr("data-type") + '</data-type><data-fstring>' + ui.item.attr("data-fstring") + '</data-fstring><data-fdate>' + ui.item.attr("data-fdate") + '</data-fdate><data-fint>' + ui.item.attr("data-fint") + '</data-fint><data-dragged-status>' + ui.item.parent().attr("data-dragged-status") + '</data-dragged-status><data-index-of-item>' + indexOfItem + '</data-index-of-item></DataXml>';
-                                $.ajax({
-                                    type: "POST",
-                                    url: "<%=SPContext.Current.Web.ServerRelativeUrl%>/_vti_bin/WorkPlanner.asmx/Execute",
-                                    data: "{Functionname : 'ReOrderAndSaveItem' , Dataxml : '" + data + "'}",
-                                    contentType: "application/json; charset=utf-8",
-                                    dataType: "json",
-                                    error: function (xhr, status, error) {
-                                        //showHideLoading(false, '');
-                                        var err = eval("(" + xhr.responseText + ")");
-                                        alert(err.Message);
-                                    },
-                                    success: function (response) {
-                                        //$("#btnApply").click();
-                                        //showHideLoading(false, '');
-                                        //loadKanBanBoard();
-
-                                        //$("#" + childId + " > div[id^='saveprogress']").hide();
-                                        $("#" + childId).fadeTo(10, 1);
-                                        if ($("#" + parentId).attr("data-dragged-status") == $(".itemContainer div:nth-child(2)").attr("data-dragged-status")) {
-                                            $("#" + childId + " > div[id^='key']").html('&nbsp;');
-                                        } else {
-                                            if ($("#" + parentId).attr("data-dragged-status").length > 15) {
-                                                $("#" + childId + " > div[id^='key']").html($("#" + parentId).attr("data-dragged-status").substr(0, 15) + '...');
-                                                $("#" + childId + " > div[id^='key']").attr("title", $("#" + parentId).attr("data-dragged-status").substr(0, 15) + '...');
-                                            }
-                                            else {
-                                                $("#" + childId + " > div[id^='key']").html($("#" + parentId).attr("data-dragged-status"));
-                                                $("#" + childId + " > div[id^='key']").attr("title", $("#" + parentId).attr("data-dragged-status"));
-                                            }
-                                        }
+                                if ($("#" + parentId).attr("data-dragged-status") == $(".itemContainer div:nth-child(2)").attr("data-dragged-status")) {
+                                    if ($("#ddlBacklogStatus").children('option').length == 0) {
+                                        saveKanbanTile(ui, parentId, childId, ui.item.parent().attr("data-dragged-status"), indexOfItem, false);
                                     }
-                                });
+                                    else if ($("#ddlBacklogStatus").children('option').length == 1) {
+                                        saveKanbanTile(ui, parentId, childId, $("#ddlBacklogStatus option:last-child").val(), indexOfItem, false);
+                                    }
+                                    else {
+                                        $("#dlgBacklogStatus").dialog({
+                                            resizable: false,
+                                            closeOnEscape: false,
+                                            modal: true,
+                                            open: function () {
+                                                $(this).dialog("widget").find(".ui-dialog-titlebar").hide();
+                                            },
+                                            buttons: {
+                                                "Update": function () {
+                                                    $(this).dialog("close");
+                                                    saveKanbanTile(ui, parentId, childId, $("#ddlBacklogStatus option:selected").val(), indexOfItem, false);
+                                                }
+                                            }
+                                        });
+                                    }
+
+                                }
+                                else {
+                                    saveKanbanTile(ui, parentId, childId, ui.item.parent().attr("data-dragged-status"), indexOfItem, false);
+                                }
                             }
+
                         }
                     });
 
@@ -325,12 +297,60 @@
             });
         }
 
+
+        function saveKanbanTile(ui, parentId, childId, datadraggedstatus, indexOfItem) {
+            if (ui.sender == null) {
+                $("#" + childId).fadeTo(10, 0.25);
+                var data = '<DataXml><data-siteid>' + ui.item.attr("data-siteid") + '</data-siteid><data-webid>' + ui.item.attr("data-webid") + '</data-webid><data-listid>' + ui.item.attr("data-listid") + '</data-listid><data-itemid>' + ui.item.attr("data-itemid") + '</data-itemid><data-userid>' + ui.item.attr("data-userid") + '</data-userid><data-itemtitle>' + ui.item.attr("data-itemtitle") + '</data-itemtitle><data-icon>' + ui.item.attr("data-icon") + '</data-icon><data-type>' + ui.item.attr("data-type") + '</data-type><data-fstring>' + ui.item.attr("data-fstring") + '</data-fstring><data-fdate>' + ui.item.attr("data-fdate") + '</data-fdate><data-fint>' + ui.item.attr("data-fint") + '</data-fint><data-dragged-status>' + datadraggedstatus + '</data-dragged-status><data-index-of-item>' + indexOfItem + '</data-index-of-item></DataXml>';
+                $.ajax({
+                    type: "POST",
+                    url: "<%=SPContext.Current.Web.ServerRelativeUrl%>/_vti_bin/WorkPlanner.asmx/Execute",
+                    data: "{Functionname : 'ReOrderAndSaveItem' , Dataxml : '" + data + "'}",
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    error: function (xhr, status, error) {
+                        var err = eval("(" + xhr.responseText + ")");
+                        alert(err.Message);
+                    },
+                    success: function (response) {
+                        $("#" + childId).fadeTo(10, 1);
+                        if (datadraggedstatus == "") {
+                            $("#" + childId + " > div[id^='key']").html('&nbsp;');
+                        }
+                        else {
+                            $("#" + childId + " > div[id^='key']").html(datadraggedstatus);
+                            $("#" + childId + " > div[id^='key']").attr("title", datadraggedstatus);
+                        }
+                    },
+                    error: function (response) {
+                        alert("Problem in saving item.");
+                        loadKanBanBoard();
+                    }
+                });
+            }
+        }
+
     </script>
 
 </asp:Content>
 
 <asp:Content ID="Main" ContentPlaceHolderID="PlaceHolderMain" runat="server">
     <div id="section1">
+        <div id="dlgBacklogStatus">
+            <table>
+                <tr>
+                    <td>
+                        <b>Change backlog item  <span id="lblBacklogStatus"></span></b>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <select id="ddlBacklogStatus">
+                        </select>
+                    </td>
+                </tr>
+            </table>
+        </div>
         <div style="float: left">
             <a id="lnkNewItem" href="#"></a>
         </div>
@@ -339,7 +359,6 @@
             <span id="lblFilert1" class="kanbanLabels"></span>
             <select id="ddlKanBanFilter1" multiple="multiple">
             </select>
-            <%--<input id="btnApply" type="button" value="Apply" />--%>
         </div>
         <div style="float: right">
             <span class="kanbanLabels">Board:</span>

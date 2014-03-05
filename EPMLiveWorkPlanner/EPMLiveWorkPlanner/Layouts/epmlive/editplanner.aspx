@@ -184,6 +184,12 @@
             var sList = document.getElementById("<%=ddlKanBanAvailableFields.ClientID %>");
             var tList = document.getElementById("<%=ddlKanBanSelectedFields.ClientID %>");
 
+
+            if (tList.length >= 3) {
+                alert("You can select upto 3 additional fields.");
+                return;
+            }
+
             var sFields = document.getElementById("kanbanAdditionalColumns").value;
             var arrSelected = new Array();
             var count = 0;
@@ -260,6 +266,16 @@
             }
 
             document.getElementById("kanbanItemStatusFields").value = sFields;
+
+
+            sFields = "";
+            for (var i = 0; i < tList.length; i++) {
+                if (sFields == "")
+                    sFields = tList.options[i].value;
+                else
+                    sFields = sFields + "," + tList.options[i].value;
+            }
+            document.getElementById("kanbanItemStatusFieldsAvailable").value = sFields;
         }
 
         function addItemStatusField() {
@@ -300,6 +316,19 @@
             }
 
             document.getElementById("kanbanItemStatusFields").value = sFields;
+
+
+            sFields = "";
+            for (var i = 0; i < sList.length; i++) {
+                if (sList.options[i]) {
+                    if (sFields == "")
+                        sFields = sList.options[i].value;
+                    else
+                        sFields = sFields + "," + sList.options[i].value;
+                }
+            }
+            document.getElementById("kanbanItemStatusFieldsAvailable").value = sFields;
+
         }
 
 
@@ -377,6 +406,7 @@
 
     <input type="hidden" name="statusfields" id="statusfields" value="<%=statusfields%>" />
     <input type="hidden" name="kanbanAdditionalColumns" id="kanbanAdditionalColumns" value="<%=kanbanAdditionalColumns%>" />
+    <input type="hidden" name="kanbanItemStatusFieldsAvailable" id="kanbanItemStatusFieldsAvailable" value="<%=kanbanItemStatusFieldsAvailable%>" />
     <input type="hidden" name="kanbanItemStatusFields" id="kanbanItemStatusFields" value="<%=kanbanItemStatusFields%>" />
 
     <table class="ms-toolbar" width="100%" cellpadding="3" style="height: 10px">
@@ -1087,6 +1117,9 @@
             <wssuc:InputFormSection Title="Additional Columns:"
                 Description=""
                 runat="server" Visible="true">
+                 <template_description>
+	                    Select the values for the additional field for tile items that should be shown in. You can select upto 3 additional fields.
+	                </template_description>
                 <template_inputformcontrols>
 		                        <wssuc:InputFormControl LabelText="" runat="server">
 			                            <Template_Control>

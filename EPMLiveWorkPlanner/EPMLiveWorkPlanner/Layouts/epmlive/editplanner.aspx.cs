@@ -21,10 +21,11 @@ namespace EPMLiveWorkPlanner
         protected DropDownList ddlTaskCenter;
 
         //static PlannerCore.WorkPlannerProperties wps;
-        
+
         protected string statusfields = "";
         protected string kanbanAdditionalColumns = "";
         protected string kanbanItemStatusFields = "";
+        protected string kanbanItemStatusFieldsAvailable = "";
 
         protected string workstart = "0";
         protected string workend = "0";
@@ -56,6 +57,9 @@ namespace EPMLiveWorkPlanner
 
             if (!String.IsNullOrEmpty(Request["kanbanItemStatusFields"]))
                 kanbanItemStatusFields = Request["kanbanItemStatusFields"];
+
+            if (!String.IsNullOrEmpty(Request["kanbanItemStatusFieldsAvailable"]))
+                kanbanItemStatusFieldsAvailable = Request["kanbanItemStatusFieldsAvailable"];
 
             if (!IsPostBack)
             {
@@ -191,7 +195,7 @@ namespace EPMLiveWorkPlanner
                                 }
                             }
                         }
-                        
+
                         filltaskfields(web);
                         loadTaskCenterFields(web, false);
 
@@ -273,6 +277,12 @@ namespace EPMLiveWorkPlanner
                         }
                         catch { }
 
+                        try
+                        {
+                            kanbanItemStatusFieldsAvailable = EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLivePlanner" + Request["name"] + "KanbanItemStatusFieldsAvailable");
+                        }
+                        catch { }
+
                         #endregion
                     }
                 }
@@ -285,6 +295,7 @@ namespace EPMLiveWorkPlanner
             statusfields = "";
             kanbanAdditionalColumns = "";
             kanbanItemStatusFields = "";
+            kanbanItemStatusFieldsAvailable = "";
             SPWeb web = SPContext.Current.Web;
             loadTaskCenterFields(web, true);
             filltaskfields(web);
@@ -299,6 +310,7 @@ namespace EPMLiveWorkPlanner
             statusfields = "";
             kanbanAdditionalColumns = "";
             kanbanItemStatusFields = "";
+            kanbanItemStatusFieldsAvailable = "";
             SPWeb web = SPContext.Current.Web;
             filltasklist(web);
             GetStatusColumns(web);
@@ -353,7 +365,7 @@ namespace EPMLiveWorkPlanner
 
                 newPlanners = newPlanners.Substring(1);
 
-                
+
 
                 if (plannerName != "")
                 {
@@ -384,6 +396,7 @@ namespace EPMLiveWorkPlanner
                     EPMLiveCore.CoreFunctions.setConfigSetting(web, "EPMLivePlanner" + plannerName + "KanBanTitleColumn", ddlKanBanTitleColumn.SelectedValue);
                     EPMLiveCore.CoreFunctions.setConfigSetting(web, "EPMLivePlanner" + plannerName + "KanBanAdditionalColumns", Request["kanbanAdditionalColumns"]);
                     EPMLiveCore.CoreFunctions.setConfigSetting(web, "EPMLivePlanner" + plannerName + "KanBanItemStatusFields", Request["kanbanItemStatusFields"]);
+                    EPMLiveCore.CoreFunctions.setConfigSetting(web, "EPMLivePlanner" + plannerName + "KanbanItemStatusFieldsAvailable", Request["kanbanItemStatusFieldsAvailable"]);
 
                     if (chkAgilePlanner.Checked)
                         EPMLiveCore.CoreFunctions.setConfigSetting(web, "EPMLivePlanner" + plannerName + "AgileIterationField", ddlAgileContentType.SelectedValue);
