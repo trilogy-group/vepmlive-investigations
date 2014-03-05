@@ -1718,6 +1718,24 @@ namespace EPMLiveCore
             }
         }
 
+        /// <summary>
+        /// Gets the type of my work grid col.
+        /// </summary>
+        /// <param name="data">The data.</param>
+        /// <returns></returns>
+        public static string GetFancyFormAssociatedItems(string data, SPWeb oWeb)
+        {
+            try
+            {
+                return Response.Success(AssociatedListItems.GetFancyFormAssociatedItems(data, oWeb));
+            }
+            catch (APIException ex)
+            {
+                return Response.Failure(ex.ExceptionNumber, string.Format("Error: {0}", ex.Message));
+            }
+        }
+
+
         #endregion
 
         #region My Work Summary Method

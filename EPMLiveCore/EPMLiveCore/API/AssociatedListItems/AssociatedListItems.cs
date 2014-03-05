@@ -397,7 +397,7 @@ namespace EPMLiveCore.API
                                     sbListAssociatedItemsDiv.Append("<br/>");
 
                                     sbListAssociatedItemsDiv.Append("<div style='clear:both;'></div>");
-                                    sbListAssociatedItemsDiv.Append("<table class='fancy-col-table' style='color:black; font-weight:normal;'>");
+                                    sbListAssociatedItemsDiv.Append("<table class='fancy-col-table' style='color:#555555; font-weight:normal;'>");
 
                                     foreach (SPListItem item in top5AssociatedItems)
                                     {
