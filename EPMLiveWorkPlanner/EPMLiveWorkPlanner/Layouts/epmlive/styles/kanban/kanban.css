@@ -265,3 +265,9 @@
             display: none;
             float: right;
         }*/
+
+#dlgBacklogStatus {
+    display: none;
+    height: 50px !important;
+    min-height: 50px !important;
+}
