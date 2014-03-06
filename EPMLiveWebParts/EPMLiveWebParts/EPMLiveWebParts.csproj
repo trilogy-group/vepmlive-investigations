@@ -94,12 +94,14 @@
       <HintPath>..\..\..\Users\Administrator\Desktop\CODE\PortfolioEngineCore\PortfolioEngineCore\bin\Debug\PortfolioEngineCore.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.EnterpriseServices" />
     <Reference Include="System.Web" />
+    <Reference Include="System.Web.DynamicData" />
     <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Web.Services" />
     <Reference Include="System.Xml" />
@@ -211,7 +213,11 @@
     <Compile Include="FancyDisplayForm\FancyDisplayForm.ascx.cs">
       <DependentUpon>FancyDisplayForm.ascx</DependentUpon>
     </Compile>
-    <Compile Include="FancyDisplayForm\FancyDisplayForm.ascx.g.cs" />
+    <Compile Include="FancyDisplayForm\FancyDisplayForm.ascx.g.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>FancyDisplayForm.ascx</DependentUpon>
+    </Compile>
     <Compile Include="GridListView\GanttUtilities.cs" />
     <Compile Include="GridListView\GridData.cs">
       <SubType>ASPXCodeBehind</SubType>
@@ -325,7 +331,11 @@
     <Compile Include="MyWorkSummary\MyWorkSummary.ascx.cs">
       <DependentUpon>MyWorkSummary.ascx</DependentUpon>
     </Compile>
-    <Compile Include="MyWorkSummary\MyWorkSummary.ascx.g.cs" />
+    <Compile Include="MyWorkSummary\MyWorkSummary.ascx.g.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>MyWorkSummary.ascx</DependentUpon>
+    </Compile>
     <Compile Include="MyWorkWebPart\ExtensionMethods.cs" />
     <Compile Include="MyWorkWebPart\MyWorkToolpart.cs" />
     <Compile Include="MyWorkWebPart\MyWorkWebPart.cs" />
@@ -448,6 +458,14 @@
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="WorkEngineAccountManagement\WorkEngineAccountManagement.cs" />
+    <Compile Include="WorkSpaceCenter\WorkSpaceCenter.ascx.cs">
+      <DependentUpon>WorkSpaceCenter.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="WorkSpaceCenter\WorkSpaceCenter.ascx.g.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>WorkSpaceCenter.ascx</DependentUpon>
+    </Compile>
     <Compile Include="WorkspaceList\WorkspaceList.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -458,6 +476,9 @@
     <None Include="AssociatedItems\AssociatedItems.webpart" />
     <None Include="AssociatedItems\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{b8018cf5-92b1-456e-8a3d-f694e56a432c}</SharePointProjectItemId>
+    </None>
+    <None Include="MyWorkSummary\MyWorkSummary.webpart">
+      <SubType>Designer</SubType>
     </None>
     <None Include="FancyDisplayForm\FancyDisplayForm.webpart" />
     <None Include="FancyDisplayForm\SharePointProjectItem.spdata">
@@ -791,6 +812,10 @@
       <SharePointProjectItemId>{259203b6-9d8d-48e1-b80d-02a3ed9a153f}</SharePointProjectItemId>
     </None>
     <None Include="WorkEngineAccountManagement\WorkEngineAccountManagement.webpart" />
+    <None Include="WorkSpaceCenter\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{ca4255c7-a004-4cdc-97e5-eca81c60afec}</SharePointProjectItemId>
+    </None>
+    <None Include="WorkSpaceCenter\WorkSpaceCenter.webpart" />
     <None Include="WorkspaceList\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{484c7327-bf5b-46f5-9a16-96318c0a6fff}</SharePointProjectItemId>
     </None>
@@ -817,6 +842,10 @@
     <Content Include="AssociatedItems\Elements.xml" />
     <Content Include="FancyDisplayForm\Elements.xml" />
     <Content Include="FancyDisplayForm\FancyDisplayForm.ascx" />
+    <Content Include="MyWorkSummary\MyWorkSummary.ascx">
+      <Generator>SharePointWebPartCodeGenerator</Generator>
+      <LastGenOutput>MyWorkSummary.ascx.g.cs</LastGenOutput>
+    </Content>
     <Content Include="MyWorkSummary\Elements.xml" />
     <Content Include="BackButton\Elements.xml" />
     <Content Include="BuyNow\Elements.xml" />
@@ -1529,6 +1558,11 @@
     <Content Include="TreeGrid\WorkingOn\whitecheck.png" />
     <Content Include="UserProfileDisplay\Elements.xml" />
     <Content Include="WorkEngineAccountManagement\Elements.xml" />
+    <Content Include="WorkSpaceCenter\Elements.xml" />
+    <Content Include="WorkSpaceCenter\WorkSpaceCenter.ascx">
+      <Generator>SharePointWebPartCodeGenerator</Generator>
+      <LastGenOutput>WorkSpaceCenter.ascx.g.cs</LastGenOutput>
+    </Content>
     <Content Include="WorkspaceList\Elements.xml" />
     <None Include="Resources\txtRibbonScripts.txt" />
     <None Include="Resources\txtResourcePlannerTop.txt" />
