@@ -28,7 +28,8 @@
         rotate: true,
         images: true,
         mouse: 'slide',
-        onChange: function () { return false; }
+        onChange: function () { return false; },
+        gridid: null
     };
     $.fn.draw = function (o, obj, selectedpage) {
         if (o.display > o.count)
@@ -218,7 +219,7 @@
                 _ulwrapdiv.animate({ scrollLeft: left + tmp - _first.parent().width() + 52 + 'px' });
             else
                 _ulwrapdiv.animate({ scrollLeft: left + tmp - _first.parent().width() + 'px' });
-            o.onChange(currval);
+            o.onChange(currval, o.gridid);
         });
 
         var last = _ulwrapdiv.find('li').eq(o.start - 1);
