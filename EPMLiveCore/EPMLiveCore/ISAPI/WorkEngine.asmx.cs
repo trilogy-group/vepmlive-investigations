@@ -235,6 +235,12 @@ namespace EPMLiveCore
                         m = thisClass.GetMethod(FunctionParts[1], BindingFlags.Public | BindingFlags.Instance);
                         apiClass = Activator.CreateInstance(thisClass);
                         break;
+                    case "socialengine":
+                        assemblyInstance = Assembly.GetExecutingAssembly();
+                        thisClass = assemblyInstance.GetType("EPMLiveCore.SocialEngine.API.Gateway", true, true);
+                        m = thisClass.GetMethod(FunctionParts[1], BindingFlags.Public | BindingFlags.Instance);
+                        apiClass = Activator.CreateInstance(thisClass);
+                        break;
                     default:
                         assemblyInstance = Assembly.GetExecutingAssembly();
                         thisClass = assemblyInstance.GetType("EPMLiveCore.WorkEngineAPI", true, true);
