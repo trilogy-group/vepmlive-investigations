@@ -33,7 +33,7 @@
                         'controlId': 'btnInvite',
                         'controlType': 'button',
                         'iconClass': 'fui-plus',
-                        'title': 'Invite',
+                        'value': 'Invite',
                         'events': [
                             {
                                 'eventName': 'click',
@@ -45,8 +45,8 @@
                     {
                         'controlId': 'ddlTools',
                         'controlType': 'dropdown',
-                        'title': 'Tools',
-                        'value': '',
+                        'title': '',
+                        'value': 'Tools',
                         'iconClass': 'icon-tools',
                         'sections': [
                             // Plan section
@@ -146,7 +146,8 @@
                     {
                         'controlId': 'ddlReports',
                         'controlType': 'dropdown',
-                        'title': 'Reporting',
+                        'title': '',
+                        'value': 'Reporting',
                         'iconClass': 'icon-pie-3',
                         'sections': [
                             {
@@ -220,7 +221,7 @@
                                 if (e.keyCode == 13) {
                                     alert('enter key pressed!');
                                 }
-                            }                            
+                            }
                         }]
                     },
                     // filter button
@@ -269,7 +270,15 @@
                                 'internalName': 'Field3',
                                 'id': '333'
                             }
-                        ]
+                        ],
+                        'saveFunction': function (data) {
+                            var txt = '';
+                            for (var i in data) {
+                                var obj = data[i];
+                                txt += ('Key: ' + obj['key'] + '| Value: ' + obj['value'] + ',\r\n');
+                            }
+                            alert(txt);
+                        }
                     },
                     //select columns control
                     {
@@ -278,20 +287,39 @@
                         'title': '',
                         'value': '',
                         'iconClass': 'icon-insert-template',
-                        'choices': [
-                            {'key':'field1', 'value':'1'},
-                            {'key':'field2', 'value':'2'},
-                            {'key':'field3', 'value':'3'},
-                        ],
+                        'choices': {
+                            '1': { 'value': 'field1', 'checked': true },
+                            '2': { 'value': 'field2', 'checked': false },
+                            '3': { 'value': 'field3', 'checked': true },
+                        },
+                        // 'selectedKeys': ['1', '2', '3'],
                         'applyButtonConfig': {
                             'text': 'Apply',
-                            'events': [
-                                {
-                                    'eventName': 'click',
-                                    'function': function () { alert('apply'); }
+                            'function':
+                                // data includes choices and 
+                                // selected keys
+                                function (data) {
+                                    var txt = '';
+                                    for (var i in data['allChoices']) {
+                                        var obj = data['allChoices'][i];
+                                        txt += ('Key: ' + i + '| Display Value: ' + obj['value'] + ',\r\n');
+                                    }
+                                    txt += data['selectedKeys'];
+                                    alert(txt);
                                 }
-                            ]
-                        }
+
+                        },
+                        'onchangeFunction':
+                           function (data) {
+                               var txt = '';
+                               for (var i in data['allChoices']) {
+                                   var obj = data['allChoices'][i];
+                                   txt += ('Key: ' + i + '| Display Value: ' + obj['value'] + ',\r\n');
+                               }
+                               txt += data['selectedKeys'];
+                               alert(txt);
+                           }
+
                     },
                     //view control
                     {
