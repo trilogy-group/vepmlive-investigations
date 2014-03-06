@@ -524,6 +524,7 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
 
         //set properties
         var ulIds = {};
+        var multiSelectMap = {};
         var anchorTagId = tagId;
         var mainActionBar = $(document.createElement('div'));
         mainActionBar.addClass('epmliveToolBar');
@@ -605,6 +606,10 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
             var li = $(document.createElement('li'));
             var aContainer = $(document.createElement('a'));
             aContainer.attr('class', 'dropdown-toggle');
+            if ((title == undefined || title.toLowerCase() == 'none') &&
+                (value == undefined)) {
+                aContainer.addClass('nav-icon');
+            }
             aContainer.attr('href', 'javascript:void(0)');
 
             if (iconClass &&
@@ -1062,15 +1067,20 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
                 }
 
                 if (cfg['onchangeFunction']) {
-                    var checkedColumns = [];
+                    var data = {};
+                    var selectedKeys = [];
+                    if ($(this).is(':checked')) {
+                        selectedKeys.push($(this).val());
+                    }
                     $(this).closest('li').siblings().find(':checked').each(function () {
-                        var col = {
-                            'key': $(this).parent().text(),
-                            'value': $(this).val()
+                        if ($(this).parent().text().toLowerCase() == 'select all') {
+                            return;
                         }
-                        checkedColumns.push(col);
+                        selectedKeys.push($(this).val());
                     });
-                    cfg['onchangeFunction'](checkedColumns);
+                    data['selectedKeys'] = selectedKeys;
+                    data['allChoices'] = choices;
+                    cfg['onchangeFunction'](data);
                 }
             });
             lblSelectAllChxBx.append(inputChxBx);
@@ -1081,9 +1091,11 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
             //foreach column we add an element, ulColumns.apend(...)
             var choices = cfg['choices'];
             for (var index in choices) {
+                var choice = choices[index];
                 //get choice value
-                var text = choices[index]['key'];
-                var value = choices[index]['value'];
+                var text = choice['value'];
+                var value = index;
+                var checked = choice['checked'];
                 //create rows
                 var liChoice = $(document.createElement('li'));
                 var a = $(document.createElement('a'));
@@ -1094,6 +1106,7 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
                 input.attr('type', 'checkbox');
                 input.attr('class', 'cbColumn');
                 input.attr('value', value);
+                input.prop('checked', checked);
 
                 input.bind('change', function () {
                     if ($(this).prop('checked') == false) {
@@ -1106,25 +1119,20 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
                     }
 
                     if (cfg['onchangeFunction']) {
-                        var checkedColumns = [];
+                        var data = {};
+                        var selectedKeys = [];
                         if ($(this).is(':checked')) {
-                            var col = {
-                                'key': $(this).parent().text(),
-                                'value': $(this).val()
-                            }
-                            checkedColumns.push(col);
+                            selectedKeys.push($(this).val());
                         }
                         $(this).closest('li').siblings().find(':checked').each(function () {
                             if ($(this).parent().text().toLowerCase() == 'select all') {
                                 return;
                             }
-                            var col = {
-                                'key': $(this).parent().text(),
-                                'value': $(this).val()
-                            }
-                            checkedColumns.push(col);
+                            selectedKeys.push($(this).val());
                         });
-                        cfg['onchangeFunction'](checkedColumns);
+                        data['selectedKeys'] = selectedKeys;
+                        data['allChoices'] = choices;
+                        cfg['onchangeFunction'](data);
                     }
                 });
 
@@ -1147,18 +1155,18 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
 
             if (cfg['applyButtonConfig']['function']) {
                 aFooterApply.bind('click', function () {
-                    var checkedColumns = [];
+                    var data = {};
+                    var selectedKeys = [];
+
                     $(this).parent().siblings('li').find(':checked').each(function () {
                         if ($(this).parent().text().toLowerCase() == 'select all') {
                             return;
                         }
-                        var col = {
-                            'key': $(this).parent().text(),
-                            'value': $(this).val()
-                        }
-                        checkedColumns.push(col);
+                        selectedKeys.push($(this).val());
                     });
-                    cfg['onchangeFunction'](checkedColumns);
+                    data['selectedKeys'] = selectedKeys;
+                    data['allChoices'] = choices;
+                    cfg['applyButtonConfig']['function'](data);
                 });
             }
 
