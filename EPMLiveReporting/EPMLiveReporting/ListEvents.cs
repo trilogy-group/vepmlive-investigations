@@ -60,6 +60,7 @@ namespace EPMLiveReportsAdmin
             finally
             {
                 ClearResourceGridCache(properties);
+                SocialEngineEvents.ItemAdded(properties);
             }
         }
 
@@ -92,6 +93,7 @@ namespace EPMLiveReportsAdmin
             finally
             {
                 ClearResourceGridCache(properties);
+                SocialEngineEvents.ItemUpdated(properties);
             }
         }
 
@@ -129,6 +131,7 @@ namespace EPMLiveReportsAdmin
             finally
             {
                 ClearResourceGridCache(properties);
+                SocialEngineEvents.ItemDeleting(properties);
             }
         }
 
