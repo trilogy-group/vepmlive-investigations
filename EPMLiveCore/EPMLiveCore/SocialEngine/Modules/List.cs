@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using EPMLiveCore.SocialEngine.Contracts;
 using EPMLiveCore.SocialEngine.Core;
 using EPMLiveCore.SocialEngine.Entities;
@@ -21,41 +20,46 @@ namespace EPMLiveCore.SocialEngine.Modules
 
         // Private Methods (7) 
 
-        private static bool IsIgnoredList(ProcessActivityEventArgs args)
+        private static bool IsIgnoredList(ProcessActivityEventArgs args, Dictionary<string, object> data)
         {
-            string settingValue = CoreFunctions.getConfigSetting(args.ContextWeb, "EPM_SS_Ignored_Lists");
+            var listTitle = (string) data["Title"];
 
-            if (string.IsNullOrEmpty(settingValue)) return false;
+            if (!Core.Utilities.IsIgnoredList(listTitle, args.ContextWeb)) return false;
 
-            foreach (object title in
-                from list in settingValue.Split(',')
-                let title = args.Data["Title"]
-                where list.ToLower().Equals(title)
-                select title)
-            {
-                args.Cancel = true;
-                args.CancellationMessage = title + " is part of ignored Social Stream lists.";
+            args.Cancel = true;
+            args.CancellationMessage = listTitle + " is part of ignored Social Stream lists.";
 
-                return true;
-            }
-
-            return false;
+            return true;
         }
 
         private void OnActivityRegistration(ProcessActivityEventArgs args)
         {
             if (args.ObjectKind != ObjectKind.List) return;
 
-            if (args.ActivityKind == ActivityKind.Created) RegisterCreationActivity(args);
-            if (args.ActivityKind == ActivityKind.Deleted) RegisterDeletionActivity(args);
+            switch (args.ActivityKind)
+            {
+                case ActivityKind.Created:
+                    RegisterCreationActivity(args);
+                    break;
+                case ActivityKind.Deleted:
+                    RegisterDeletionActivity(args);
+                    break;
+            }
         }
 
         private void OnValidateActivity(ProcessActivityEventArgs args)
         {
             if (args.ObjectKind != ObjectKind.List) return;
 
-            if (args.ActivityKind == ActivityKind.Created) ValidateCreationActivity(args);
-            else if (args.ActivityKind == ActivityKind.Deleted) ValidateDeletionActivity(args);
+            switch (args.ActivityKind)
+            {
+                case ActivityKind.Created:
+                    ValidateCreationActivity(args);
+                    break;
+                case ActivityKind.Deleted:
+                    ValidateDeletionActivity(args);
+                    break;
+            }
         }
 
         private void RegisterCreationActivity(ProcessActivityEventArgs args)
@@ -80,7 +84,8 @@ namespace EPMLiveCore.SocialEngine.Modules
             {
                 Kind = args.ActivityKind,
                 UserId = (int) data["UserId"],
-                Thread = thread
+                Thread = thread,
+                Date = (DateTime) data["ActivityTime"]
             });
 
             Guid streamId = streamManager.GetGlobalStreamId(webId);
@@ -91,7 +96,9 @@ namespace EPMLiveCore.SocialEngine.Modules
 
         private void RegisterDeletionActivity(ProcessActivityEventArgs args)
         {
-            Thread thread = args.ThreadManager.GetThread((Guid) args.Data["WebId"], (Guid) args.Data["Id"]);
+            Dictionary<string, object> data = args.Data;
+
+            Thread thread = args.ThreadManager.GetThread((Guid) data["WebId"], (Guid) data["Id"]);
             if (thread == null) return;
 
             args.ThreadManager.DeleteThread(thread);
@@ -99,8 +106,9 @@ namespace EPMLiveCore.SocialEngine.Modules
             args.ActivityManager.RegisterActivity(new Activity
             {
                 Kind = ActivityKind.Deleted,
-                UserId = (int) args.Data["UserId"],
-                Thread = thread
+                UserId = (int) data["UserId"],
+                Thread = thread,
+                Date = (DateTime) data["DeletedAt"]
             });
         }
 
@@ -114,10 +122,11 @@ namespace EPMLiveCore.SocialEngine.Modules
                 {"Title", DataType.String},
                 {"URL", DataType.String},
                 {"WebId", DataType.Guid},
-                {"UserId", DataType.Int}
+                {"UserId", DataType.Int},
+                {"ActivityTime", DataType.DateTime}
             });
 
-            if (IsIgnoredList(args)) return;
+            if (IsIgnoredList(args, data)) return;
 
             if (args.ActivityManager.ActivityExists(ObjectKind.Workspace, ActivityKind.Created,
                 (Guid) data["WebId"], (Guid) data["Id"]))
@@ -131,10 +140,11 @@ namespace EPMLiveCore.SocialEngine.Modules
             new DataValidator(args.Data).Validate(new Dictionary<string, DataType>
             {
                 {"Id", DataType.Guid},
-                {"UserId", DataType.Int}
+                {"UserId", DataType.Int},
+                {"ActivityTime", DataType.DateTime}
             });
 
-            if (IsIgnoredList(args)) return;
+            if (IsIgnoredList(args, args.Data)) return;
 
             if (args.ActivityManager.ActivityExists(ObjectKind.List, ActivityKind.Deleted, (Guid) args.Data["Id"]))
             {

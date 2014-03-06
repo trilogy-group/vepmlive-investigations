@@ -22,25 +22,6 @@
 
             $.getScript('<%= WebUrl %>/_layouts/15/epmlive/javascripts/libraries/knockout-2.2.1.js?v=<%= EPMFileVersion %>', function() {
                 $.getScript('<%= WebUrl %>/_layouts/15/epmlive/javascripts/epmlive<%= DebugMode ? ".min" : string.Empty %>.js?v=<%= EPMFileVersion %>', function() {
-                    epmLive.rootWebId = '<%= RootWebId %>';
-                    epmLive.currentSiteId = '<%= SiteId %>';
-                    epmLive.currentSiteUrl = '<%= SiteUrl %>';
-                    epmLive.currentWebId = '<%= WebId %>';
-                    epmLive.currentWebUrl = '<%= WebUrl %>';
-                    epmLive.currentWebFullUrl = '<%= WebFullUrl %>';
-                    epmLive.currentListId = '<%= ListId %>';
-                    epmLive.currentListIcon = '<%= ListIconClass %>';
-                    epmLive.currentListTitle = '<%= ListTitle %>';
-                    epmLive.currentListViewTitle = '<%= ListViewTitle %>';
-                    epmLive.currentListViewUrl = '<%= ListViewUrl %>';
-                    epmLive.currentFileIsNull = '<%= CurrentFileIsNull %>';
-                    epmLive.currentFileTitle = '<%=CurrentFileTitle %>';
-                    epmLive.currentItemID = '<%= ItemId %>';
-                    epmLive.currentItemTitle = '<%= ItemTitle %>';
-                    epmLive.currentUserId = '<%= CurrentUserId %>';
-                    epmLive.currentUrl = '<%= CurrentUrl %>';
-                    epmLive.fileVersion = '<%= EPMFileVersion %>';
-                    epmLive.debugMode = <%= DebugMode.ToString().ToLower() %>;
                     window.SP.SOD.notifyScriptLoadedAndExecuteWaitingJobs('EPMLive.js');
                 }, !window.isIE8);
             }, !window.isIE8);

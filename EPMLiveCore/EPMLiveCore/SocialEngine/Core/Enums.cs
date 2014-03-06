@@ -11,7 +11,8 @@
     {
         String,
         Int,
-        Guid
+        Guid,
+        DateTime
     }
 
     internal enum LogKind
@@ -23,6 +24,7 @@
     public enum ObjectKind
     {
         Workspace,
-        List
+        List,
+        ListItem
     }
 }

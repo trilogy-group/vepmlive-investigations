@@ -66,7 +66,8 @@ namespace EPMLiveCore.SocialEngine.Modules
             {
                 Kind = activityKind,
                 UserId = (int) data["UserId"],
-                Thread = thread
+                Thread = thread,
+                Date = (DateTime) data["ActivityTime"]
             });
 
             Guid streamId = streamManager.GetGlobalStreamId(webId);
@@ -91,7 +92,8 @@ namespace EPMLiveCore.SocialEngine.Modules
             {
                 Kind = ActivityKind.Deleted,
                 UserId = (int) data["UserId"],
-                Thread = thread
+                Thread = thread,
+                Date = (DateTime) data["ActivityTime"]
             });
 
             IEnumerable<Guid> threadIds = threadManager.GetThreadIds(webId);
@@ -126,7 +128,8 @@ namespace EPMLiveCore.SocialEngine.Modules
                 {"Id", DataType.Guid},
                 {"Title", DataType.String},
                 {"URL", DataType.String},
-                {"UserId", DataType.Int}
+                {"UserId", DataType.Int},
+                {"ActivityTime", DataType.DateTime}
             });
 
             if (activityManager.ActivityExists(ObjectKind.Workspace, ActivityKind.Created, (Guid) data["Id"]))
@@ -140,7 +143,8 @@ namespace EPMLiveCore.SocialEngine.Modules
             new DataValidator(data).Validate(new Dictionary<string, DataType>
             {
                 {"Id", DataType.Guid},
-                {"UserId", DataType.Int}
+                {"UserId", DataType.Int},
+                {"DeletedAt", DataType.Int}
             });
 
             if (activityManager.ActivityExists(ObjectKind.Workspace, ActivityKind.Deleted, (Guid) data["Id"]))

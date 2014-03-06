@@ -104,3 +104,27 @@
 
 <script src="/_layouts/15/epmlive/javascripts/libraries/tooltip.min.js?v=<%= EPMLiveVersion %>" type="text/javascript"> </script>
 <script src="/_layouts/15/IE55UP.JS"></script>
+
+<SharePoint:ScriptBlock runat="server">
+    window.epmLive = window.epmLive || {};
+    
+    window.epmLive.rootWebId = '<%= RootWebId %>';
+    window.epmLive.currentSiteId = '<%= SiteId %>';
+    window.epmLive.currentSiteUrl = '<%= SiteUrl %>';
+    window.epmLive.currentWebId = '<%= WebId %>';
+    window.epmLive.currentWebUrl = '<%= WebUrl %>';
+    window.epmLive.currentWebFullUrl = '<%= WebFullUrl %>';
+    window.epmLive.currentListId = '<%= ListId %>';
+    window.epmLive.currentListIcon = '<%= ListIconClass %>';
+    window.epmLive.currentListTitle = '<%= ListTitle %>';
+    window.epmLive.currentListViewTitle = '<%= ListViewTitle %>';
+    window.epmLive.currentListViewUrl = '<%= ListViewUrl %>';
+    window.epmLive.currentFileIsNull = '<%= CurrentFileIsNull %>';
+    window.epmLive.currentFileTitle = '<%=CurrentFileTitle %>';
+    window.epmLive.currentItemID = '<%= ItemId %>';
+    window.epmLive.currentItemTitle = '<%= ItemTitle %>';
+    window.epmLive.currentUserId = '<%= CurrentUserId %>';
+    window.epmLive.currentUrl = '<%= CurrentUrl %>';
+    window.epmLive.fileVersion = '<%= EPMLiveVersion %>';
+    window.epmLive.debugMode = <%= DebugMode.ToString().ToLower() %>;
+</SharePoint:ScriptBlock>

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using EPMLiveCore.SocialEngine.Core;
 using Microsoft.SharePoint;
 
@@ -27,7 +28,8 @@ namespace EPMLiveCore.SocialEngine.Events.ListEventReceiver
                         {"Title", properties.ListTitle},
                         {"URL", properties.List.DefaultViewUrl},
                         {"WebId", properties.WebId},
-                        {"UserId", properties.Web.CurrentUser.ID}
+                        {"UserId", properties.Web.CurrentUser.ID},
+                        {"ActivityTime", properties.List.Created}
                     }, properties.Web);
             }
         }
@@ -40,11 +42,12 @@ namespace EPMLiveCore.SocialEngine.Events.ListEventReceiver
             if (!properties.List.Hidden)
             {
                 SocialEngine.Current.ProcessActivity(ObjectKind.List, ActivityKind.Deleted,
-                new Dictionary<string, object>
-                {
-                    {"Id", properties.ListId},
-                    {"UserId", properties.Web.CurrentUser.ID}
-                }, properties.Web);
+                    new Dictionary<string, object>
+                    {
+                        {"Id", properties.ListId},
+                        {"UserId", properties.Web.CurrentUser.ID},
+                        {"ActivityTime", DateTime.Now}
+                    }, properties.Web);
             }
         }
 

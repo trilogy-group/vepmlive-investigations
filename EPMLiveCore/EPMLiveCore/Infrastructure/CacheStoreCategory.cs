@@ -33,7 +33,7 @@ namespace EPMLiveCore.Infrastructure
 
         #endregion Constructors 
 
-        #region Properties (2) 
+        #region Properties (3) 
 
         public string Navigation
         {
@@ -43,6 +43,11 @@ namespace EPMLiveCore.Infrastructure
         public string ResourceGrid
         {
             get { return "ResourceGrid_S_" + _siteId; }
+        }
+
+        public string SocialStream
+        {
+            get { return "SocialStream_W_" + _webId; }
         }
 
         #endregion Properties 

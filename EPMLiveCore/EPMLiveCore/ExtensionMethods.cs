@@ -661,6 +661,26 @@ namespace EPMLiveCore
             return Convert.ToInt64((dateTime - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds);
         }
 
+        public static TimeSpan Seconds(this int value)
+        {
+            return new TimeSpan(0, 0, 0, value);
+        }
+
+        public static TimeSpan Minutes(this int value)
+        {
+            return new TimeSpan(0, 0, value, 0);
+        }
+
+        public static TimeSpan Hours(this int value)
+        {
+            return new TimeSpan(0, value, 0, 0);
+        }
+
+        public static TimeSpan Days(this int value)
+        {
+            return new TimeSpan(value, 0, 0, 0);
+        }
+
         #endregion
 
         #region SPListItemCollection Extensions
@@ -1083,6 +1103,12 @@ namespace EPMLiveCore
         {
             if (obj == null || obj == DBNull.Value) return false;
             return obj is int;
+        }
+
+        public static bool IsDateTime(this object obj)
+        {
+            if (obj == null || obj == DBNull.Value) return false;
+            return obj is DateTime;
         }
 
         #endregion

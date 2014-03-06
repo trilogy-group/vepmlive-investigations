@@ -6,8 +6,9 @@ namespace EPMLiveCore.SocialEngine.Core
 {
     internal abstract class BaseManager : IDisposable
     {
-        #region Fields (1) 
+        #region Fields (2) 
 
+        private readonly Guid _webAppId;
         protected SqlConnection SqlConnection;
 
         #endregion Fields 
@@ -16,9 +17,11 @@ namespace EPMLiveCore.SocialEngine.Core
 
         protected BaseManager(SPWeb contextWeb)
         {
+            _webAppId = contextWeb.Site.WebApplication.Id;
+
             SPSecurity.RunWithElevatedPrivileges(() =>
             {
-                string cs = CoreFunctions.getReportingConnectionString(contextWeb.Site.WebApplication.Id, contextWeb.Site.ID);
+                string cs = CoreFunctions.getReportingConnectionString(_webAppId, contextWeb.Site.ID);
 
                 var builder = new SqlConnectionStringBuilder(cs) {ApplicationName = "EPM Live - Social Engine"};
                 cs = builder.ToString();
@@ -34,6 +37,31 @@ namespace EPMLiveCore.SocialEngine.Core
         }
 
         #endregion Constructors 
+
+        #region Properties (1) 
+
+        public SqlConnection EPMLiveSqlConnection
+        {
+            get
+            {
+                SqlConnection sqlConnection = null;
+
+                SPSecurity.RunWithElevatedPrivileges(() =>
+                {
+                    string cs = CoreFunctions.getConnectionString(_webAppId);
+
+                    var builder = new SqlConnectionStringBuilder(cs) {ApplicationName = "EPM Live - Social Engine"};
+                    cs = builder.ToString();
+
+                    sqlConnection = new SqlConnection(cs);
+                    sqlConnection.Open();
+                });
+
+                return sqlConnection;
+            }
+        }
+
+        #endregion Properties 
 
         #region Methods (1) 
 

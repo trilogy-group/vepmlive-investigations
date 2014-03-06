@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using EPMLiveCore.SocialEngine.Modules;
 
 namespace EPMLiveCore.SocialEngine.Core
 {
@@ -43,6 +42,9 @@ namespace EPMLiveCore.SocialEngine.Core
                         break;
                     case DataType.Guid:
                         if (!value.IsGuid()) throw new SocialEngineException(value + " is not a valid GUID.");
+                        break;
+                    case DataType.DateTime:
+                        if (!value.IsDateTime()) throw new SocialEngineException(value + " is not a valid date time.");
                         break;
                 }
             }

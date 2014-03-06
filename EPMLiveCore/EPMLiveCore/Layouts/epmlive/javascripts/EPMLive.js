@@ -1,12 +1,6 @@
 ﻿(function ($$, $, k, undefined) {
     var scrollbarWidth = 0;
 
-    $$.currentSiteId = null;
-    $$.currentSiteUrl = null;
-    $$.currentWebId = null;
-    $$.currentWebUrl = null;
-    $$.currentWebFullUrl = null;
-
     $$.ui = {
         statusbar: {
             collection: k.observableArray(),

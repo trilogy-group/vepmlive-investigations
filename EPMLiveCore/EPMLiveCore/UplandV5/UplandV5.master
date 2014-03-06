@@ -32,6 +32,9 @@
         </SharePoint:PageTitle>
         <!--<SharePoint:SPShortcutIcon runat="server" IconUrl="/_layouts/15/images/favicon.ico?rev=23" />-->
         <SharePoint:ScriptBlock runat="server">
+            window.ENV = window.ENV || {};
+            ENV.EXTEND_PROTOTYPES = false;
+
             var epmLiveMasterPageVersion = 5.5;
         </SharePoint:ScriptBlock>
         <SharePoint:StartScript runat="server" />

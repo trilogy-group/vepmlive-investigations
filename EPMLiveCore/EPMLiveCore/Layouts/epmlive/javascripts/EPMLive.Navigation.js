@@ -423,12 +423,14 @@
                             }
                         } else {
                             for (var n in tlNodes) {
-                                var nde = tlNodes[n];
+                                if (tlNodes.hasOwnProperty(n)) {
+                                    var nde = tlNodes[n];
 
-                                if (nde.id !== _id) {
-                                    if (nde.selected()) {
-                                        nde.select(false);
-                                        nde.close();
+                                    if (nde.id !== _id) {
+                                        if (nde.selected()) {
+                                            nde.select(false);
+                                            nde.close();
+                                        }
                                     }
                                 }
                             }
@@ -439,10 +441,12 @@
                             $.cookie(selectedTlNodeCookie, _id, cookieOptions);
                             
                             for (var n2 in tlNodes) {
-                                var nde2 = tlNodes[n2];
+                                if (tlNodes.hasOwnProperty(n2)) {
+                                    var nde2 = tlNodes[n2];
 
-                                if (nde2.id !== _id) {
-                                    $('#' + nde2.id.replace('top', 'sub')).hide();
+                                    if (nde2.id !== _id) {
+                                        $('#' + nde2.id.replace('top', 'sub')).hide();
+                                    }
                                 }
                             }
                         }
@@ -476,10 +480,12 @@
                 function changePinState(state,remember) {
                     var elements = ['s4-ribbonrow', 's4-workspace'];
                     for (var e in elements) {
-                        var $e = $('#' + elements[e]);
-                        $e.removeClass('epm-nav-pinned');
-                        $e.removeClass('epm-nav-unpinned');
-                        $e.addClass('epm-nav-' + state);
+                        if (elements.hasOwnProperty(e)) {
+                            var $e = $('#' + elements[e]);
+                            $e.removeClass('epm-nav-pinned');
+                            $e.removeClass('epm-nav-unpinned');
+                            $e.addClass('epm-nav-' + state);
+                        }
                     }
 
                     var $pin = $('#epm-nav-pin');
@@ -1207,11 +1213,13 @@
 
                     var clickables = ['suiteBar', 's4-ribbonrow', 's4-workspace'];
                     for (var c in clickables) {
-                        $('#' + clickables[c]).click(function () {
-                            if ($sn.data('pinstate') === 'unpinned') {
-                                hideMenu();
-                            }
-                        });
+                        if (clickables.hasOwnProperty(c)) {
+                            $('#' + clickables[c]).click(function () {
+                                if ($sn.data('pinstate') === 'unpinned') {
+                                    hideMenu();
+                                }
+                            });
+                        }
                     }
 
                     var $pin = $('#epm-nav-pin');
@@ -1490,129 +1498,133 @@
                     var workspacesTitleRegistered = false;
 
                     for (var providerName in response.Nodes) {
-                        var navLink = response.Nodes[providerName].NavLink;
+                        if (response.Nodes.hasOwnProperty(providerName)) {
+                            var navLink = response.Nodes[providerName].NavLink;
 
-                        if (!navLink.length) {
-                            navLink = [navLink];
-                        }
+                            if (!navLink.length) {
+                                navLink = [navLink];
+                            }
 
-                        for (var nl in navLink) {
-                            var lnk = navLink[nl];
+                            for (var nl in navLink) {
+                                if (navLink.hasOwnProperty(nl)) {
+                                    var lnk = navLink[nl];
 
-                            for (var j = 0; j < tlNodes.length; j++) {
-                                var tlNode = tlNodes[j];
+                                    for (var j = 0; j < tlNodes.length; j++) {
+                                        var tlNode = tlNodes[j];
 
-                                if (tlNode.provider === providerName) {
-                                    if (providerName !== 'Workspaces') {
-                                        tlNode.registerLink(window.epmLiveNavigation.buildLink(lnk));
-                                    } else {
-                                        try {
-                                            var workspaceTree = window.epmLiveNavigation.workspaceTree();
-
-                                            workspaceTree.trackChanges();
-
-                                            var title = lnk['@Title'];
-
-                                            if (workspacesTitleRegistered) {
-                                                tlNode.registerWorkspace(window.epmLiveNavigation.buildLink(lnk), workspaceTree);
-                                            } else {
+                                        if (tlNode.provider === providerName) {
+                                            if (providerName !== 'Workspaces') {
                                                 tlNode.registerLink(window.epmLiveNavigation.buildLink(lnk));
+                                            } else {
+                                                try {
+                                                    var workspaceTree = window.epmLiveNavigation.workspaceTree();
 
-                                                if (title === 'All Workspaces') {
-                                                    workspacesTitleRegistered = true;
-                                                    $('#epm-nav-sub-workspaces-static-links').remove().insertBefore('#EPMNavWorkspacesTree');
+                                                    workspaceTree.trackChanges();
+
+                                                    var title = lnk['@Title'];
+
+                                                    if (workspacesTitleRegistered) {
+                                                        tlNode.registerWorkspace(window.epmLiveNavigation.buildLink(lnk), workspaceTree);
+                                                    } else {
+                                                        tlNode.registerLink(window.epmLiveNavigation.buildLink(lnk));
+
+                                                        if (title === 'All Workspaces') {
+                                                            workspacesTitleRegistered = true;
+                                                            $('#epm-nav-sub-workspaces-static-links').remove().insertBefore('#EPMNavWorkspacesTree');
+                                                        }
+                                                    }
+
+                                                    workspaceTree.commitChanges();
+                                                } catch (e) {
                                                 }
                                             }
-
-                                            workspaceTree.commitChanges();
-                                        } catch(e) {
-                                        } 
+                                        }
                                     }
                                 }
                             }
-                        }
 
-                        if (providerName === 'Workspaces') {
-                            window.epmLiveNavigation.resetWorkspaceTree = function () {
-                                try {
-                                    var wsTree = window.epmLiveNavigation.workspaceTree();
+                            if (providerName === 'Workspaces') {
+                                window.epmLiveNavigation.resetWorkspaceTree = function () {
+                                    try {
+                                        var wsTree = window.epmLiveNavigation.workspaceTree();
 
-                                    wsTree.trackChanges();
+                                        wsTree.trackChanges();
 
-                                    var nodes = wsTree.get_allNodes();
-                                    for (var i = 0; i < nodes.length; i++) {
-                                        nodes[i].set_expanded(false);
-                                    }
+                                        var nodes = wsTree.get_allNodes();
+                                        for (var i = 0; i < nodes.length; i++) {
+                                            nodes[i].set_expanded(false);
+                                        }
 
-                                    var expandNode = function (webId) {
-                                        var node = wsTree.findNodeByValue(webId);
+                                        var expandNode = function (webId) {
+                                            var node = wsTree.findNodeByValue(webId);
 
-                                        if (node && node != wsTree) {
-                                            var parent = node.get_parent();
+                                            if (node && node != wsTree) {
+                                                var parent = node.get_parent();
 
-                                            if (parent !== wsTree && !parent.get_expanded()) {
-                                                parent.set_expanded(true);
+                                                if (parent !== wsTree && !parent.get_expanded()) {
+                                                    parent.set_expanded(true);
 
-                                                expandNode(parent.get_value());
+                                                    expandNode(parent.get_value());
+                                                }
                                             }
+                                        };
+
+                                        var wId = window.epmLiveNavigation.currentWebId;
+
+                                        var cNode = wsTree.findNodeByValue(wId);
+
+                                        if (cNode) {
+                                            if (cNode.get_parent() !== wsTree) {
+                                                expandNode(wId);
+                                            } else {
+                                                cNode.set_expanded(true);
+                                            }
+
+                                            cNode.set_selected(true);
                                         }
-                                    };
 
-                                    var wId = window.epmLiveNavigation.currentWebId;
+                                        wsTree.commitChanges();
+                                    } catch (ex) {
+                                    }
+                                };
 
-                                    var cNode = wsTree.findNodeByValue(wId);
+                                var wTree = window.epmLiveNavigation.workspaceTree();
 
-                                    if (cNode) {
-                                        if (cNode.get_parent() !== wsTree) {
-                                            expandNode(wId);
-                                        } else {
-                                            cNode.set_expanded(true);
-                                        }
+                                $('a.rtIn').each(function () {
+                                    var $a = $(this);
 
-                                        cNode.set_selected(true);
+                                    var $parent = $a.parent();
+                                    var text = $a.text();
+
+                                    var webId = wTree.findNodeByText(text).get_value();
+
+                                    $parent.append('<div id="' + webId + '" class="epm-nav-ws-node"></div>');
+                                    $a.remove();
+
+                                    $a.text('');
+                                    $a.append('<span>' + text + '</span>');
+
+                                    if (!window.epmLiveNavigation.wsInfoDict[webId].hasAccess) {
+                                        $a.addClass('epm-nav-ws-disabled');
                                     }
 
-                                    wsTree.commitChanges();
-                                } catch(ex) {
-                                } 
-                            };
+                                    $parent.find('.epm-nav-ws-node').append($a);
+                                });
 
-                            var wTree = window.epmLiveNavigation.workspaceTree();
+                                window.epmLiveNavigation.resetWorkspaceTree();
+                                $('#EPMNavWorkspacesTree').fadeIn(300);
+                            }
+                            else if (providerName === 'Applications') {
+                                $($('#epm-nav-sub-new-static-links').find('.epm-nav-sub-header').get(0)).attr('style', 'padding-top: 0px !important');
+                            } else if (providerName === 'Favorites') {
+                                $($('#epm-nav-sub-favorites-static-links').find('.epm-nav-sub-header').get(0)).attr('style', 'padding-top: 0px !important');
+                            }
 
-                            $('a.rtIn').each(function () {
-                                var $a = $(this);
+                            window.SP.SOD.notifyScriptLoadedAndExecuteWaitingJobs('EPMLiveNavigation_' + providerName);
 
-                                var $parent = $a.parent();
-                                var text = $a.text();
-                                
-                                var webId = wTree.findNodeByText(text).get_value();
-                                
-                                $parent.append('<div id="' + webId + '" class="epm-nav-ws-node"></div>');
-                                $a.remove();
-
-                                $a.text('');
-                                $a.append('<span>' + text + '</span>');
-                                
-                                if (!window.epmLiveNavigation.wsInfoDict[webId].hasAccess) {
-                                    $a.addClass('epm-nav-ws-disabled');
-                                }
-
-                                $parent.find('.epm-nav-ws-node').append($a);
-                            });
-
-                            window.epmLiveNavigation.resetWorkspaceTree();
-                            $('#EPMNavWorkspacesTree').fadeIn(300);
-                        }
-                        else if (providerName === 'Applications') {
-                            $($('#epm-nav-sub-new-static-links').find('.epm-nav-sub-header').get(0)).attr('style', 'padding-top: 0px !important');
-                        } else if (providerName === 'Favorites') {
-                            $($('#epm-nav-sub-favorites-static-links').find('.epm-nav-sub-header').get(0)).attr('style', 'padding-top: 0px !important');
-                        }
-
-                        window.SP.SOD.notifyScriptLoadedAndExecuteWaitingJobs('EPMLiveNavigation_' + providerName);
-
-                        if (providerName !== 'Settings') {
-                            expandNodes(providerName);
+                            if (providerName !== 'Settings') {
+                                expandNodes(providerName);
+                            }
                         }
                     }
                     
@@ -1764,121 +1776,123 @@
                                     var links = response.Nodes.Workspaces.NavLink;
                                     
                                     for (var l in links) {
-                                        var lnk = links[l];
-                                        
-                                        if ($sn.find('#' + lnk['@Id']).length === 0) {
-                                            var title = lnk['@Title'];
+                                        if (links.hasOwnProperty(l)) {
+                                            var lnk = links[l];
 
-                                            if (title !== 'Workspaces' && title !== 'New Workspace' && title !== 'Favorite Workspaces' && title !== 'All Workspaces') {
-                                                var registerWS = function () {
-                                                    var nl = window.epmLiveNavigation.buildLink(lnk);
-                                                    
-                                                    if (window.epmLiveNavigation.buildLink) {
-                                                        var registered = false;
+                                            if ($sn.find('#' + lnk['@Id']).length === 0) {
+                                                var title = lnk['@Title'];
 
-                                                        for (var i = 0; i < registeredLinks.length; i++) {
-                                                            if (registeredLinks[i] === nl.title) {
-                                                                registered = true;
-                                                                break;
-                                                            }
-                                                        }
+                                                if (title !== 'Workspaces' && title !== 'New Workspace' && title !== 'Favorite Workspaces' && title !== 'All Workspaces') {
+                                                    var registerWS = function () {
+                                                        var nl = window.epmLiveNavigation.buildLink(lnk);
 
-                                                        if (!registered) {
-                                                            if (nl.cssClass) {
-                                                                nl.kind = 2;
-                                                                nl.category = null;
+                                                        if (window.epmLiveNavigation.buildLink) {
+                                                            var registered = false;
 
-                                                                window.epmLiveNavigation.registerLink(nl);
-                                                            }
-                                                            
-                                                            registeredLinks.push(nl.title);
-                                                        } else {
-                                                            for (var n = 0; n < tlNodes.length; n++) {
-                                                                var nde = tlNodes[n];
-
-                                                                if (nde.provider === providerName) {
-                                                                    var workspaceTree = window.epmLiveNavigation.workspaceTree();
-                                                                    
-                                                                    if (!workspaceTree.findNodeByText(nl.title)) {
-                                                                        workspaceTree.trackChanges();
-                                                                        nde.registerWorkspace(nl, workspaceTree);
-                                                                        workspaceTree.commitChanges();
-
-                                                                        $('a.rtIn').each(function () {
-                                                                            var $a = $(this);
-                                                                            var text = $a.text();
-
-                                                                            if (text === nl.title) {
-                                                                                var $parent = $a.parent();
-
-                                                                                $parent.append('<div id="' + workspaceTree.findNodeByText(text).get_value() + '" class="epm-nav-ws-node"></div>');
-                                                                                $a.remove();
-
-                                                                                $a.text('');
-                                                                                $a.append('<span>' + text + '</span>');
-                                                                                $parent.find('.epm-nav-ws-node').append($a);
-
-                                                                                var $p = $a.parent();
-
-                                                                                $p.addClass('epm-nav-sortable');
-                                                                                $a.attr('style', 'width:125px !important; position: relative; top: 2px;');
-
-                                                                                window.epmLiveNavigation.addFavoriteWSMenu($p);
-                                                                            }
-                                                                        });
-                                                                        
-                                                                        var nlId = '#' + nl.id;
-                                                                        
-                                                                        var workspaces = [];
-                                                                        var wsGraph = {};
-                                                                        var $ws;
-                                                                        var ws = $(nlId).text();
-
-                                                                        $($(nlId).parents('ul')[0]).find('li').each(function () {
-                                                                            var $w = $(this);
-                                                                            var w = $w.text();
-
-                                                                            if (w !== ws) {
-                                                                                workspaces.push(w);
-                                                                                wsGraph[w] = $w;
-                                                                            } else {
-                                                                                $ws = $w;
-                                                                            }
-                                                                        });
-
-                                                                        workspaces.sort();
-
-                                                                        var moved = false;
-
-                                                                        for (var i = 0; i < workspaces.length; i++) {
-                                                                            if (!moved) {
-                                                                                var w = workspaces[i];
-
-                                                                                if (w > ws) {
-                                                                                    $ws.insertBefore(wsGraph[w]);
-                                                                                    $ws.removeClass('rtLast');
-                                                                                    $($($ws.parents('ul')[0]).find('li:last')[0]).addClass('rtLast');
-                                                                                    moved = true;
-                                                                                }
-                                                                            }
-                                                                        }
-                                                                    }
-
+                                                            for (var i = 0; i < registeredLinks.length; i++) {
+                                                                if (registeredLinks[i] === nl.title) {
+                                                                    registered = true;
                                                                     break;
                                                                 }
                                                             }
 
-                                                            $('#epm-nav-nows-ph').remove();
-                                                            $('#EPMNavWorkspacesTree').fadeIn(300);
-                                                        }
-                                                    } else {
-                                                        window.setTimeout(function () {
-                                                            registerWS();
-                                                        }, 1);
-                                                    }
-                                                };
+                                                            if (!registered) {
+                                                                if (nl.cssClass) {
+                                                                    nl.kind = 2;
+                                                                    nl.category = null;
 
-                                                registerWS();
+                                                                    window.epmLiveNavigation.registerLink(nl);
+                                                                }
+
+                                                                registeredLinks.push(nl.title);
+                                                            } else {
+                                                                for (var n = 0; n < tlNodes.length; n++) {
+                                                                    var nde = tlNodes[n];
+
+                                                                    if (nde.provider === providerName) {
+                                                                        var workspaceTree = window.epmLiveNavigation.workspaceTree();
+
+                                                                        if (!workspaceTree.findNodeByText(nl.title)) {
+                                                                            workspaceTree.trackChanges();
+                                                                            nde.registerWorkspace(nl, workspaceTree);
+                                                                            workspaceTree.commitChanges();
+
+                                                                            $('a.rtIn').each(function () {
+                                                                                var $a = $(this);
+                                                                                var text = $a.text();
+
+                                                                                if (text === nl.title) {
+                                                                                    var $parent = $a.parent();
+
+                                                                                    $parent.append('<div id="' + workspaceTree.findNodeByText(text).get_value() + '" class="epm-nav-ws-node"></div>');
+                                                                                    $a.remove();
+
+                                                                                    $a.text('');
+                                                                                    $a.append('<span>' + text + '</span>');
+                                                                                    $parent.find('.epm-nav-ws-node').append($a);
+
+                                                                                    var $p = $a.parent();
+
+                                                                                    $p.addClass('epm-nav-sortable');
+                                                                                    $a.attr('style', 'width:125px !important; position: relative; top: 2px;');
+
+                                                                                    window.epmLiveNavigation.addFavoriteWSMenu($p);
+                                                                                }
+                                                                            });
+
+                                                                            var nlId = '#' + nl.id;
+
+                                                                            var workspaces = [];
+                                                                            var wsGraph = {};
+                                                                            var $ws;
+                                                                            var ws = $(nlId).text();
+
+                                                                            $($(nlId).parents('ul')[0]).find('li').each(function () {
+                                                                                var $w = $(this);
+                                                                                var w = $w.text();
+
+                                                                                if (w !== ws) {
+                                                                                    workspaces.push(w);
+                                                                                    wsGraph[w] = $w;
+                                                                                } else {
+                                                                                    $ws = $w;
+                                                                                }
+                                                                            });
+
+                                                                            workspaces.sort();
+
+                                                                            var moved = false;
+
+                                                                            for (var i = 0; i < workspaces.length; i++) {
+                                                                                if (!moved) {
+                                                                                    var w = workspaces[i];
+
+                                                                                    if (w > ws) {
+                                                                                        $ws.insertBefore(wsGraph[w]);
+                                                                                        $ws.removeClass('rtLast');
+                                                                                        $($($ws.parents('ul')[0]).find('li:last')[0]).addClass('rtLast');
+                                                                                        moved = true;
+                                                                                    }
+                                                                                }
+                                                                            }
+                                                                        }
+
+                                                                        break;
+                                                                    }
+                                                                }
+
+                                                                $('#epm-nav-nows-ph').remove();
+                                                                $('#EPMNavWorkspacesTree').fadeIn(300);
+                                                            }
+                                                        } else {
+                                                            window.setTimeout(function () {
+                                                                registerWS();
+                                                            }, 1);
+                                                        }
+                                                    };
+
+                                                    registerWS();
+                                                }
                                             }
                                         }
                                     }
@@ -2001,8 +2015,9 @@
                         }
 
                         for (var dc in defaultCommands) {
-                            commands.push(defaultCommands[dc]);
-                        }
+                            if (defaultCommands.hasOenProperty(dc)) {
+                                commands.push(defaultCommands[dc]);
+                            }                        }
 
                         $menu = $($li.find('.epm-nav-contextual-menu').get(0));
 

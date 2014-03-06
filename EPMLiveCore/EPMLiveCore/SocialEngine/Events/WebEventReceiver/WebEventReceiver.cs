@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using EPMLiveCore.SocialEngine.Core;
 using Microsoft.SharePoint;
 
@@ -22,7 +23,8 @@ namespace EPMLiveCore.SocialEngine.Events.WebEventReceiver
                 new Dictionary<string, object>
                 {
                     {"Id", properties.WebId},
-                    {"UserId", properties.Web.CurrentUser.ID}
+                    {"UserId", properties.Web.CurrentUser.ID},
+                    {"ActivityTime", DateTime.Now}
                 }, properties.Web);
         }
 
@@ -37,7 +39,8 @@ namespace EPMLiveCore.SocialEngine.Events.WebEventReceiver
                     {"Id", properties.WebId},
                     {"Title", properties.Web.Title},
                     {"URL", properties.ServerRelativeUrl},
-                    {"UserId", properties.Web.CurrentUser.ID}
+                    {"UserId", properties.Web.CurrentUser.ID},
+                    {"ActivityTime", properties.Web.Created}
                 }, properties.Web);
         }
 
