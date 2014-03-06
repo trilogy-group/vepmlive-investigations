@@ -939,182 +939,191 @@
                         redirectUrl = redirectUrl.split('#')[0];
                     }
 
-                    switch (kind + '') {
-                    case '0':
-                        OpenCreateWebPageDialog(redirectUrl);
-                        break;
-                    case '1':
-                        location.href = redirectUrl;
-                        break;
-                    case '2':
-                        window.open(redirectUrl + '&IsDlg=1', '', 'height=100, width=200, toolbar=no, menubar=no, scrollbars=yes, resizable=yes,location=no, directories=no, status=yes');
-                        break;
-                    case '3':
-                        window.open(redirectUrl + '&IsDlg=1', '', 'width=' + screen.width + ',height=' + screen.height + ',top=0,left=0, toolbar=no, menubar=no, scrollbars=yes, resizable=yes,location=no, directories=no, status=yes');
-                        break;
-                    case '5':
-                        SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', { url: redirectUrl, width: 600, height: 500 });
-                        break;
-                    case '6':
-                        SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', { url: redirectUrl, showMaximized: true });
-                        break;
-                    case '98':
-                        if (command !== 'nav:addToFav') {
-                            if (command !== 'nav:remove' && command !== 'nav:removeFavWS' && command !== 'nav:removeFavRI') {
-                                $.get(redirectUrl).always(function() {
-                                    removeLink(id);
-                                });
-                            } else {
-                                var fKind = null;
+                    window.epmLiveNavigation.tryPerformContextualMenuAction = function(commandKind, gotoUrl) {
+                        switch (commandKind + '') {
+                        case '0':
+                            OpenCreateWebPageDialog(gotoUrl);
+                            return true;
+                        case '1':
+                            location.href = gotoUrl;
+                            return true;
+                        case '2':
+                            window.open(gotoUrl + '&IsDlg=1', '', 'height=100, width=200, toolbar=no, menubar=no, scrollbars=yes, resizable=yes,location=no, directories=no, status=yes');
+                            return true;
+                        case '3':
+                            window.open(gotoUrl + '&IsDlg=1', '', 'width=' + screen.width + ',height=' + screen.height + ',top=0,left=0, toolbar=no, menubar=no, scrollbars=yes, resizable=yes,location=no, directories=no, status=yes');
+                            return true;
+                        case '5':
+                            SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', { url: gotoUrl, width: 600, height: 500 });
+                            return true;
+                        case '6':
+                            SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', { url: gotoUrl, showMaximized: true });
+                            return true;
+                        }
 
-                                if (command === 'nav:removeFavWS') {
-                                    $('#epm-nav-sub-workspaces-static-links').find('a').each(function() {
-                                        var $ws = $(this);
-                                        if ($ws.data('webid') === webId) {
-                                            id = $ws.parent().get(0).id;
-                                        }
+                        return false;
+                    };
+
+                    if (!window.epmLiveNavigation.tryPerformContextualMenuAction(kind, redirectUrl)) {
+                        switch (kind + '') {
+                        case '98':
+                            if (command !== 'nav:addToFav') {
+                                if (command !== 'nav:remove' && command !== 'nav:removeFavWS' && command !== 'nav:removeFavRI') {
+                                    $.get(redirectUrl).always(function() {
+                                        removeLink(id);
                                     });
-                                } else if (command === 'nav:removeFavRI') {
-                                    $('#epm-nav-sub-favorites-static-links').find('a').each(function() {
-                                        var $fa = $(this);
-                                        if ($fa.data('listid') === listId) {
-                                            if ($fa.data('itemid') == itemId) {
-                                                id = $fa.parent().get(0).id;
-                                                fKind = 'RI';
+                                } else {
+                                    var fKind = null;
+
+                                    if (command === 'nav:removeFavWS') {
+                                        $('#epm-nav-sub-workspaces-static-links').find('a').each(function() {
+                                            var $ws = $(this);
+                                            if ($ws.data('webid') === webId) {
+                                                id = $ws.parent().get(0).id;
                                             }
-                                        }
-                                    });
+                                        });
+                                    } else if (command === 'nav:removeFavRI') {
+                                        $('#epm-nav-sub-favorites-static-links').find('a').each(function() {
+                                            var $fa = $(this);
+                                            if ($fa.data('listid') === listId) {
+                                                if ($fa.data('itemid') == itemId) {
+                                                    id = $fa.parent().get(0).id;
+                                                    fKind = 'RI';
+                                                }
+                                            }
+                                        });
+                                    }
+
+                                    removeLink(id, fKind);
+
+                                    if (command === 'nav:remove') {
+                                        var $a = $('#' + id).find('a');
+
+                                        window.Analytics.turnOffFav({
+                                            siteid: $a.data('siteid'),
+                                            webid: $a.data('webid'),
+                                            listid: $a.data('listid'),
+                                            itemid: $a.data('itemid'),
+                                            url: $a.get(0).href
+                                        });
+                                    }
                                 }
-
-                                removeLink(id, fKind);
-
-                                if (command === 'nav:remove') {
-                                    var $a = $('#' + id).find('a');
-
-                                    window.Analytics.turnOffFav({
-                                        siteid: $a.data('siteid'),
-                                        webid: $a.data('webid'),
-                                        listid: $a.data('listid'),
-                                        itemid: $a.data('itemid'),
-                                        url: $a.get(0).href
-                                    });
-                                }
-                            }
-                        } else {
-                            var $link = $($('#' + id).find('a').get(0));
-
-                            var title = $link.text();
-                            var webUrl = $link.attr('href');
-
-                            var _$$ = window.epmLive;
-
-                            listId = listId === 'undefined' ? null : listId;
-                            itemId = itemId === 'undefined' ? null : itemId;
-                            var isItem = itemId === null ? 'False' : 'True';
-
-                            var riFav = false;
-
-                            var data = '<Data><Param key="SiteId">' + _$$.currentSiteId + '</Param><Param key="WebId">' + webId + '</Param><Param key="ListId">' + listId + '</Param><Param key="ListViewUrl"></Param><Param key="ListIconClass"></Param><Param key="ItemId">' + itemId + '</Param><Param key="FString">' + webUrl + '</Param><Param key="Type">4</Param><Param key="UserId">' + _$$.currentUserId + '</Param><Param key="Title">' + title + '</Param><Param key="FileIsNull"></Param><Param key="IsItem">' + isItem + '</Param></Data>';
-
-                            var methodName = 'AddFavoritesWs';
-                            var linkKind = 3;
-                            var icon = null;
-
-                            if ($link.parent().parent().get(0).id === 'epm-nav-sub-recent-static-links') {
-                                methodName = 'AddFavorites';
-                                linkKind = 1;
-
-                                try {
-                                    icon = $($link.parent().find('span').get(0)).attr('class').split(' ')[1];
-                                } catch(e) {
-                                }
-
-                                data = '<Data><Param key="SiteId">' + _$$.currentSiteId + '</Param><Param key="WebId">' + webId + '</Param><Param key="ListId">' + listId + '</Param><Param key="ListViewUrl"></Param><Param key="ListIconClass">' + icon + '</Param><Param key="ItemId">' + itemId + '</Param><Param key="FString"></Param><Param key="Type">2</Param><Param key="UserId">' + _$$.currentUserId + '</Param><Param key="Title">' + title + '</Param><Param key="FileIsNull"></Param><Param key="IsItem">True</Param></Data>';
-
-                                riFav = true;
-                            }
-
-                            var notify = function() {
-                                if (riFav) {
-                                    toastr.options = {
-                                        'closeButton': false,
-                                        'debug': false,
-                                        'positionClass': 'toast-top-right',
-                                        'onclick': null,
-                                        'showDuration': 300,
-                                        'hideDuration': 1000,
-                                        'timeOut': 5000,
-                                        'extendedTimeOut': 1000,
-                                        'showEasing': 'swing',
-                                        'hideEasing': 'linear',
-                                        'showMethod': 'fadeIn',
-                                        'hideMethod': 'fadeOut'
-                                    };
-
-                                    toastr.success('A new item has been added to your favorites list.');
-                                }
-                            };
-
-                            id = new Date().getTime() + '';
-
-                            epmLiveService.execute(methodName, data, function(response) {
-                                window.epmLiveNavigation.registerLink({
-                                    id: id,
-                                    title: title,
-                                    url: webUrl,
-                                    category: null,
-                                    cssClass: icon,
-                                    order: null,
-                                    siteId: _$$.currentSiteId,
-                                    webId: webId,
-                                    listId: listId,
-                                    itemId: itemId,
-                                    external: false,
-                                    visible: true,
-                                    active: true,
-                                    seprator: false,
-                                    kind: linkKind
-                                });
-
-                                notify();
-                            }, function(response) {
-                                window.epmLiveNavigation.registerLink({
-                                    id: id,
-                                    title: title,
-                                    url: webUrl,
-                                    category: null,
-                                    cssClass: null,
-                                    order: null,
-                                    siteId: _$$.currentSiteId,
-                                    webId: webId,
-                                    listId: listId,
-                                    itemId: itemId,
-                                    external: false,
-                                    visible: true,
-                                    active: true,
-                                    seprator: false,
-                                    kind: linkKind
-                                });
-
-                                notify();
-                            });
-                        }
-                        break;
-                    case '99':
-                        if (confirm('Are you sure you want to send the item(s) to the Recycle Bin?')) {
-                            var nId = SP.UI.Notify.addNotification('Deleting Item...', true, '', null);
-                            if (command !== 'nav:remove') {
-                                $.get(redirectUrl).always(function() {
-                                    removeLink(id, nId);
-                                });
                             } else {
-                                removeLink(id, nId);
+                                var $link = $($('#' + id).find('a').get(0));
+
+                                var title = $link.text();
+                                var webUrl = $link.attr('href');
+
+                                var _$$ = window.epmLive;
+
+                                listId = listId === 'undefined' ? null : listId;
+                                itemId = itemId === 'undefined' ? null : itemId;
+                                var isItem = itemId === null ? 'False' : 'True';
+
+                                var riFav = false;
+
+                                var data = '<Data><Param key="SiteId">' + _$$.currentSiteId + '</Param><Param key="WebId">' + webId + '</Param><Param key="ListId">' + listId + '</Param><Param key="ListViewUrl"></Param><Param key="ListIconClass"></Param><Param key="ItemId">' + itemId + '</Param><Param key="FString">' + webUrl + '</Param><Param key="Type">4</Param><Param key="UserId">' + _$$.currentUserId + '</Param><Param key="Title">' + title + '</Param><Param key="FileIsNull"></Param><Param key="IsItem">' + isItem + '</Param></Data>';
+
+                                var methodName = 'AddFavoritesWs';
+                                var linkKind = 3;
+                                var icon = null;
+
+                                if ($link.parent().parent().get(0).id === 'epm-nav-sub-recent-static-links') {
+                                    methodName = 'AddFavorites';
+                                    linkKind = 1;
+
+                                    try {
+                                        icon = $($link.parent().find('span').get(0)).attr('class').split(' ')[1];
+                                    } catch(e) {
+                                    }
+
+                                    data = '<Data><Param key="SiteId">' + _$$.currentSiteId + '</Param><Param key="WebId">' + webId + '</Param><Param key="ListId">' + listId + '</Param><Param key="ListViewUrl"></Param><Param key="ListIconClass">' + icon + '</Param><Param key="ItemId">' + itemId + '</Param><Param key="FString"></Param><Param key="Type">2</Param><Param key="UserId">' + _$$.currentUserId + '</Param><Param key="Title">' + title + '</Param><Param key="FileIsNull"></Param><Param key="IsItem">True</Param></Data>';
+
+                                    riFav = true;
+                                }
+
+                                var notify = function() {
+                                    if (riFav) {
+                                        toastr.options = {
+                                            'closeButton': false,
+                                            'debug': false,
+                                            'positionClass': 'toast-top-right',
+                                            'onclick': null,
+                                            'showDuration': 300,
+                                            'hideDuration': 1000,
+                                            'timeOut': 5000,
+                                            'extendedTimeOut': 1000,
+                                            'showEasing': 'swing',
+                                            'hideEasing': 'linear',
+                                            'showMethod': 'fadeIn',
+                                            'hideMethod': 'fadeOut'
+                                        };
+
+                                        toastr.success('A new item has been added to your favorites list.');
+                                    }
+                                };
+
+                                id = new Date().getTime() + '';
+
+                                epmLiveService.execute(methodName, data, function(response) {
+                                    window.epmLiveNavigation.registerLink({
+                                        id: id,
+                                        title: title,
+                                        url: webUrl,
+                                        category: null,
+                                        cssClass: icon,
+                                        order: null,
+                                        siteId: _$$.currentSiteId,
+                                        webId: webId,
+                                        listId: listId,
+                                        itemId: itemId,
+                                        external: false,
+                                        visible: true,
+                                        active: true,
+                                        seprator: false,
+                                        kind: linkKind
+                                    });
+
+                                    notify();
+                                }, function(response) {
+                                    window.epmLiveNavigation.registerLink({
+                                        id: id,
+                                        title: title,
+                                        url: webUrl,
+                                        category: null,
+                                        cssClass: null,
+                                        order: null,
+                                        siteId: _$$.currentSiteId,
+                                        webId: webId,
+                                        listId: listId,
+                                        itemId: itemId,
+                                        external: false,
+                                        visible: true,
+                                        active: true,
+                                        seprator: false,
+                                        kind: linkKind
+                                    });
+
+                                    notify();
+                                });
                             }
+                            break;
+                        case '99':
+                            if (confirm('Are you sure you want to send the item(s) to the Recycle Bin?')) {
+                                var nId = SP.UI.Notify.addNotification('Deleting Item...', true, '', null);
+                                if (command !== 'nav:remove') {
+                                    $.get(redirectUrl).always(function() {
+                                        removeLink(id, nId);
+                                    });
+                                } else {
+                                    removeLink(id, nId);
+                                }
+                            }
+                            break;
+                        default:
+                            SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', { url: redirectUrl, width: 700 });
+                            break;
                         }
-                        break;
-                    default:
-                        SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', { url: redirectUrl, width: 700 });
-                        break;
                     }
                 }
 
@@ -1964,7 +1973,7 @@
             epmLiveNavigation.init();
 
             var menuManager = (function () {
-                var _setupMenu = function ($li, defaultCommands, forcePopup, customOptions) {
+                var _setupMenu = function ($li, defaultCommands, forcePopup) {
                     defaultCommands = defaultCommands || [];
 
                     var $menu = $($li.find('.epm-nav-contextual-menu').get(0));
@@ -2044,19 +2053,9 @@
                                     $menu.append($('<li class="seprator"></li>').hide().fadeIn());
                                 }
                             } else {
-                                var icon = cmd.icon ? cmd.icon : getIcon(cmd.command);
-                                
-                                if (!cmd.callback) {
-                                    $menu.append($('<li><span class="epm-nav-cm-icon ' + icon + '">&nbsp;</span><a href="javascript:epmLiveNavigation.handleContextualCommand(\'' + liId + '\',\'' + webId + '\',\'' + $ca.data('listid') + '\',\'' + $ca.data('itemid') + '\',\'' + cmd.command + '\',\'' + cmd.kind + '\');" style="width: 136px !important;">' + cmd.title + '</a></li>').hide().fadeIn());
-                                } else {
-                                    $menu.append($('<li><span class="epm-nav-cm-icon ' + icon + '">&nbsp;</span><a href="javascript:return false;" style="width: 136px !important;">' + cmd.title + '</a></li>').hide().fadeIn());
-                                    
-                                    $menu.find('a').click(function () {
-                                        cmd.callback();
-                                    });
-                                }
-                                
-                                $menu.find('a').click(function () {
+                                $menu.append($('<li><span class="epm-nav-cm-icon ' + getIcon(cmd.command) + '">&nbsp;</span><a href="javascript:epmLiveNavigation.handleContextualCommand(\'' + liId + '\',\'' + webId + '\',\'' + $ca.data('listid') + '\',\'' + $ca.data('itemid') + '\',\'' + cmd.command + '\',\'' + cmd.kind + '\');" style="width: 136px !important;">' + cmd.title + '</a></li>').hide().fadeIn());
+
+                                $menu.find('a').click(function() {
                                     hideMenu();
                                 });
                             }
@@ -2150,34 +2149,30 @@
 
                         var getMenuItems = function() {
                             if (window.epmLive) {
-                                if (!customOptions) {
-                                    var data = '<Request><Params><SiteId>' + siteId + '</SiteId><WebId>' + webId + '</WebId><ListId>' + listId + '</ListId><ItemId>' + itemId + '</ItemId><UserId>' + window.epmLive.currentUserId + '</UserId><DebugMode>' + window.epmLive.debugMode + '</DebugMode></Params></Request>';
+                                var data = '<Request><Params><SiteId>' + siteId + '</SiteId><WebId>' + webId + '</WebId><ListId>' + listId + '</ListId><ItemId>' + itemId + '</ItemId><UserId>' + window.epmLive.currentUserId + '</UserId><DebugMode>' + window.epmLive.debugMode + '</DebugMode></Params></Request>';
 
-                                    epmLiveService.execute('GetContextualMenuItems', data, function(response) {
-                                        var commands = [];
+                                epmLiveService.execute('GetContextualMenuItems', data, function (response) {
+                                    var commands = [];
 
-                                        if (response.ContextualMenus.Items) {
-                                            var items = response.ContextualMenus.Items.Item;
+                                    if (response.ContextualMenus.Items) {
+                                        var items = response.ContextualMenus.Items.Item;
 
-                                            if (items) {
-                                                if (!items.length) {
-                                                    items = [items];
-                                                }
+                                        if (items) {
+                                            if (!items.length) {
+                                                items = [items];
+                                            }
 
-                                                for (var i = 0; i < items.length; i++) {
-                                                    var item = items[i];
-                                                    commands.push({ title: item['@Title'], command: item['@Command'], kind: item['@Kind'], imgUrl: item['@ImageUrl'] });
-                                                }
+                                            for (var i = 0; i < items.length; i++) {
+                                                var item = items[i];
+                                                commands.push({ title: item['@Title'], command: item['@Command'], kind: item['@Kind'], imgUrl: item['@ImageUrl'] });
                                             }
                                         }
+                                    }
 
-                                        setup(commands, $a);
-                                    }, function(response) {
-                                        setup([], $a);
-                                    });
-                                } else {
+                                    setup(commands, $a);
+                                }, function (response) {
                                     setup([], $a);
-                                }
+                                });
                             } else {
                                 window.setTimeout(function () {
                                     getMenuItems();
