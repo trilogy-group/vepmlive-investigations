@@ -1,6 +1,6 @@
 ﻿namespace EPMLiveCore.SocialEngine.Core
 {
-    internal enum ActivityKind
+    public enum ActivityKind
     {
         Created,
         Updated,

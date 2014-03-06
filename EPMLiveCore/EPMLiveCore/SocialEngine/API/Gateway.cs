@@ -21,6 +21,18 @@ namespace EPMLiveCore.SocialEngine.API
             }
         }
 
+        public string ProcessActivity(string data, SPWeb spWeb)
+        {
+            try
+            {
+                SocialEngine.Current.ProcessActivity(data, spWeb);
+            }
+            catch (APIException ex)
+            {
+                return Response.Failure(ex.ExceptionNumber, string.Format("Error: {0}", ex.Message));
+            }
+        }
+
         #endregion Methods 
     }
 }
