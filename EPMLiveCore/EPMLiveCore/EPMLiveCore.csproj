@@ -205,6 +205,7 @@ net start "WETimer"</PostDeploymentCommand>
     <Compile Include="API\Template\Template.cs" />
     <Compile Include="API\Timer.cs" />
     <Compile Include="API\ViewManager.cs" />
+    <Compile Include="API\WorkspaceCenter\WorkspaceCenter.cs" />
     <Compile Include="AppNavFixUp.cs" />
     <Compile Include="AppSettingsHelper.cs" />
     <Compile Include="AppsListEvents\AppsListEvents.cs" />
@@ -1163,48 +1164,6 @@ net start "WETimer"</PostDeploymentCommand>
     <Compile Include="Layouts\epmlive\UpgradeResult.aspx.designer.cs">
       <DependentUpon>UpgradeResult.aspx.cs</DependentUpon>
     </Compile>
-    <Compile Include="Layouts\epmlive\Upgraders\OptInUpgrade55.aspx.cs">
-      <DependentUpon>OptInUpgrade55.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Layouts\epmlive\Upgraders\OptInUpgrade55.aspx.designer.cs">
-      <DependentUpon>OptInUpgrade55.aspx.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Layouts\epmlive\Upgraders\proxy.aspx.cs">
-      <DependentUpon>proxy.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Layouts\epmlive\Upgraders\proxy.aspx.designer.cs">
-      <DependentUpon>proxy.aspx.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Layouts\epmlive\Upgraders\Upgrade.aspx.cs">
-      <DependentUpon>Upgrade.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Layouts\epmlive\Upgraders\Upgrade.aspx.designer.cs">
-      <DependentUpon>Upgrade.aspx.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Layouts\epmlive\Upgraders\UpgradeDone.aspx.cs">
-      <DependentUpon>UpgradeDone.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Layouts\epmlive\Upgraders\UpgradeDone.aspx.designer.cs">
-      <DependentUpon>UpgradeDone.aspx.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Layouts\epmlive\Upgraders\WE432Upgrader.aspx.cs">
-      <DependentUpon>WE432Upgrader.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Layouts\epmlive\Upgraders\WE432Upgrader.aspx.designer.cs">
-      <DependentUpon>WE432Upgrader.aspx.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Layouts\epmlive\Upgraders\WE43Upgrader.aspx.cs">
-      <DependentUpon>WE43Upgrader.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Layouts\epmlive\Upgraders\WE43Upgrader.aspx.designer.cs">
-      <DependentUpon>WE43Upgrader.aspx.cs</DependentUpon>
-    </Compile>
     <Compile Include="Layouts\epmlive\viewmessages.aspx.cs">
       <DependentUpon>viewmessages.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -2070,6 +2029,7 @@ net start "WETimer"</PostDeploymentCommand>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
@@ -2114,7 +2074,9 @@ net start "WETimer"</PostDeploymentCommand>
     <Content Include="EPMLiveOutlineCodesList\Elements.xml" />
     <Content Include="EPMLiveOutlineCodesList\Schema.xml" />
     <Content Include="EPMLivePeriodsList\Elements.xml" />
-    <Content Include="EPMLivePeriodsList\Schema.xml" />
+    <Content Include="EPMLivePeriodsList\Schema.xml">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="EPMLiveProjectCenterEvent\Elements.xml" />
     <Content Include="EPMLiveProjectCenterRollup\Elements.xml" />
     <Content Include="EPMLiveProjectCenterRollup\Schema.xml" />
@@ -3804,12 +3766,6 @@ net start "WETimer"</PostDeploymentCommand>
     <Content Include="Layouts\epmlive\unsealfields.aspx" />
     <Content Include="Layouts\epmlive\Upgrade.aspx" />
     <Content Include="Layouts\epmlive\UpgradeResult.aspx" />
-    <Content Include="Layouts\epmlive\Upgraders\OptInUpgrade55.aspx" />
-    <Content Include="Layouts\epmlive\Upgraders\proxy.aspx" />
-    <Content Include="Layouts\epmlive\Upgraders\Upgrade.aspx" />
-    <Content Include="Layouts\epmlive\Upgraders\UpgradeDone.aspx" />
-    <Content Include="Layouts\epmlive\Upgraders\WE432Upgrader.aspx" />
-    <Content Include="Layouts\epmlive\Upgraders\WE43Upgrader.aspx" />
     <Content Include="Layouts\epmlive\viewmessages.aspx" />
     <Content Include="Layouts\epmlive\viewrollup.aspx" />
     <Content Include="Layouts\epmlive\ViewSecurity.aspx" />
@@ -3861,6 +3817,7 @@ net start "WETimer"</PostDeploymentCommand>
     <Content Include="Resources\9Data01.sql" />
     <Content Include="Resources\9Data02.sql" />
     <Content Include="Resources\EPMLiveNavigation.txt" />
+    <None Include="Resources\WorkSpaceCenterLayout.txt" />
     <Content Include="TaskCenterListToolbars\Elements.xml" />
     <Content Include="TEMPLATE\1033\XML\WEBTEMPWE.XML" />
     <Content Include="TEMPLATE\admin\admin.sitemap.epmlive.xml" />
@@ -4045,18 +4002,7 @@ net start "WETimer"</PostDeploymentCommand>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
   </PropertyGroup>
   <Import Project="$(VSToolsPath)\SharePointTools\Microsoft.VisualStudio.SharePoint.targets" Condition="'$(VSToolsPath)' != ''" />
-  <ProjectExtensions>
-    <VisualStudio>
-      <FlavorProperties GUID="{C1CDDADD-2546-481F-9697-4EA41081F2FC}">
-        <DeploymentConfigurations>
-          <DeploymentConfiguration Name="Munjal's Deploy Config">
-            <DeploymentSteps>Microsoft.VisualStudio.SharePoint.PreDeploymentCommand;Microsoft.VisualStudio.SharePoint.PostDeploymentCommand</DeploymentSteps>
-            <RetractionSteps>Microsoft.VisualStudio.SharePoint.PreDeploymentCommand</RetractionSteps>
-          </DeploymentConfiguration>
-        </DeploymentConfigurations>
-      </FlavorProperties>
-    </VisualStudio>
-  </ProjectExtensions>
+  <ProjectExtensions />
   <PropertyGroup>
     <PreBuildEvent>del "$(TargetDir)$(TargetName).XmlSerializers.dll"
 del "$(ProjectDir)$(TargetName).XmlSerializers.dll"</PreBuildEvent>

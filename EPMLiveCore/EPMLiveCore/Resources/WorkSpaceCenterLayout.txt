@@ -1,0 +1,42 @@
+﻿<Grid>
+<Cfg id="gridWorkSpaceCenter"/>
+  <Cfg Code="GTACCNPSQEBSLC" Version="4.4.0.32713"/>
+  <Cfg SuppressCfg="1" Style="GS" />
+  <Cfg MainCol="WebTitle" NameCol="WebTitle" />
+  <Cfg ConstWidth="0" />
+  <Cfg NoVScroll="0" />
+  <Cfg Undo="0" />
+  <Cfg NumberId="1" FullId="0" IdChars="1234567890" AddFocusCol="WebTitle" />
+  <Cfg Searching="1" />
+  <Cfg StaticCursor="1" Dragging="0" SelectingCells="1" SelectClass="0" />
+  <Cfg NoTreeLines="1" DetailOn="0" MinRowHeight="20" MaxRowHeight="20" MidWidth="300" MenuColumnsSort="1" StandardFilter="2" />
+  <Cfg Paging="2" AllPages="1" PageLength="10" MaxPages="20" NoPager="1" ChildParts="2" />
+  <Cfg BorderCursors="1" />
+  <Def>
+    <D Name="R" HoverCell="Color" HoverRow="Color" FocusCell="" FocusRow="Color" />
+  </Def>
+  <Toolbar Visible="0" CanHide="0" />
+  <Panel Visible="0" CanHide="0" />
+  <Head>
+   <Filter Visible="0" CanHide="0" CanEdit="1" />
+  </Head>
+  <Solid>
+    <I id="NoData" Html="There are no workspaces in this view." />
+  </Solid>
+  <Lang>
+    <Text StartErr = "Fatal error! &lt;br/>My Work grid cannot render" />
+  </Lang>
+  <LeftCols>
+    <C Name="WorkSpace" RelWidth="100" MinWidth="100" CanGroup="0" CanHide="0" CaseSensitive="0"  CanEdit="0"/>
+	<C Name="Description"  Width="200" CanGroup="0" CanHide="0" CanEdit="0"/>
+	<C Name="Owner" Width="150" CanGroup="0" CanHide="0" CanEdit="0"/>
+	<C Name="CreateDate" Width="150" CanGroup="0" CanHide="0" CanEdit="0"/>
+	<C Name="ModifiedDate" Width="150" CanGroup="0" CanHide="0" CanEdit="0"/>
+	<C Name="Members" Width="150" CanGroup="0" CanHide="0" CanEdit="0"/>
+  </LeftCols>
+ <Cols/>
+  <RightCols>
+
+  </RightCols>
+  <Header Complete="" Edit="" WorkSpace="WorkSpace" Description="Description" Owner="Owner" CreateDate="CreateDate" ModifiedDate="ModifiedDate" Members="Members" NoEscape="1" SortIcons="2" HoverCell="" HoverRow="" />
+</Grid>

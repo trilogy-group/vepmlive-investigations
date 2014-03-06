@@ -1769,5 +1769,38 @@ namespace EPMLiveCore
         }
 
         #endregion
+
+        #region Workspace Center Method
+
+        /// <summary>
+        /// Gets the type of my work grid col.
+        /// </summary>
+        /// <param name="data">The data.</param>
+        /// <returns></returns>
+        public static string GetWorkspaceCenterGridData(string data, SPWeb oWeb)
+        {
+            try
+            {
+                return Response.Success(WorkspaceCenter.GetWorkspaceCenterGridData(data, oWeb));
+
+            }
+            catch (APIException ex)
+            {
+                return Response.Failure(ex.ExceptionNumber, string.Format("Error: {0}", ex.Message));
+            }
+        }
+        public static string WorkSpaceCenterLayout(string data, SPWeb oWeb)
+        {
+            try
+            {
+                return WorkspaceCenter.GetWorkSpaceCenterLayout(data);
+            }
+            catch (APIException ex)
+            {
+                return Response.Failure(ex.ExceptionNumber, string.Format("Error: {0}", ex.Message));
+            }
+        }
+
+        #endregion
     }
 }

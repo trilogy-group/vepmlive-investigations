@@ -551,5 +551,25 @@ namespace EPMLiveCore.Properties {
                 return ResourceManager.GetString("WorkingOnGridLayout", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;Grid&gt;
+        ///	&lt;Cfg Code=&quot;GTACCNPSQEBSLC&quot; Version=&quot;4.4.0.32713&quot;/&gt;
+        ///	&lt;Cfg SuppressCfg=&quot;1&quot; Style=&quot;GS&quot; /&gt;
+        ///	&lt;Cfg MainCol=&quot;Title&quot; NameCol=&quot;Title&quot; /&gt;
+        ///	&lt;Cfg ConstWidth=&quot;0&quot; /&gt;
+        ///	&lt;Cfg NoVScroll=&quot;0&quot; /&gt;
+        ///	&lt;Cfg Undo=&quot;0&quot; /&gt;
+        ///	&lt;Cfg NumberId=&quot;1&quot; FullId=&quot;0&quot; IdChars=&quot;1234567890&quot; AddFocusCol=&quot;Title&quot; /&gt;
+        ///	&lt;Cfg Searching=&quot;1&quot; /&gt;
+        ///	&lt;Cfg StaticCursor=&quot;1&quot; Dragging=&quot;0&quot; SelectingCells=&quot;1&quot; SelectClass=&quot;0&quot; /&gt;
+        ///	&lt;Cfg NoTreeLines=&quot;1&quot; DetailOn=&quot;0&quot; MinRowHeight=&quot;20&quot; MaxRowHeight=&quot;20&quot; MidWidth=&quot;300&quot; MenuColumnsSort=&quot;1&quot; StandardFilter=&quot;2&quot; /&gt;
+        ///	 [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string WorkSpaceCenterLayout {
+            get {
+                return ResourceManager.GetString("WorkSpaceCenterLayout", resourceCulture);
+            }
+        }
     }
 }
