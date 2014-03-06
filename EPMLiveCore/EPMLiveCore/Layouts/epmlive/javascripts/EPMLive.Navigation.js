@@ -2015,7 +2015,7 @@
                         }
 
                         for (var dc in defaultCommands) {
-                            if (defaultCommands.hasOenProperty(dc)) {
+                            if (defaultCommands.hasOwnProperty(dc)) {
                                 commands.push(defaultCommands[dc]);
                             }                        }
 
@@ -2044,15 +2044,15 @@
                                     $menu.append($('<li class="seprator"></li>').hide().fadeIn());
                                 }
                             } else {
-                                var icon = command.icon ? command.icon : getIcon(cmd.command);
+                                var icon = cmd.icon ? cmd.icon : getIcon(cmd.command);
                                 
-                                if (!command.callback) {
+                                if (!cmd.callback) {
                                     $menu.append($('<li><span class="epm-nav-cm-icon ' + icon + '">&nbsp;</span><a href="javascript:epmLiveNavigation.handleContextualCommand(\'' + liId + '\',\'' + webId + '\',\'' + $ca.data('listid') + '\',\'' + $ca.data('itemid') + '\',\'' + cmd.command + '\',\'' + cmd.kind + '\');" style="width: 136px !important;">' + cmd.title + '</a></li>').hide().fadeIn());
                                 } else {
                                     $menu.append($('<li><span class="epm-nav-cm-icon ' + icon + '">&nbsp;</span><a href="javascript:return false;" style="width: 136px !important;">' + cmd.title + '</a></li>').hide().fadeIn());
                                     
                                     $menu.find('a').click(function () {
-                                        command.callback();
+                                        cmd.callback();
                                     });
                                 }
                                 
