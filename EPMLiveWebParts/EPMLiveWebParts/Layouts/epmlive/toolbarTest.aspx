@@ -287,11 +287,38 @@
                         'title': '',
                         'value': '',
                         'iconClass': 'icon-insert-template',
-                        'choices': {
-                            '1': { 'value': 'field1', 'checked': true },
-                            '2': { 'value': 'field2', 'checked': false },
-                            '3': { 'value': 'field3', 'checked': true },
-                        },
+                        'sections': [
+                            {
+                                'heading': 'Section1',
+                                'divider': 'yes',
+                                'options':
+                                    {
+                                        '1': { 'value': 'field1', 'checked': true },
+                                        '2': { 'value': 'field2', 'checked': false },
+                                        '3': { 'value': 'field3', 'checked': true },
+                                    }
+                            },
+                            {
+                                'heading': 'Section2',
+                                'divider': 'no',
+                                'options':
+                                    {
+                                        '1': { 'value': 'field1', 'checked': false },
+                                        '2': { 'value': 'field2', 'checked': false },
+                                        '3': { 'value': 'field3', 'checked': true },
+                                    }
+                            },
+                            {
+                                'heading': 'none',
+                                'divider': 'yes',
+                                'options':
+                                    {
+                                        '1': { 'value': 'field1', 'checked': true },
+                                        '2': { 'value': 'field2', 'checked': false },
+                                        '3': { 'value': 'field3', 'checked': true },
+                                    }
+                            }
+                        ],
                         // 'selectedKeys': ['1', '2', '3'],
                         'applyButtonConfig': {
                             'text': 'Apply',
@@ -300,9 +327,14 @@
                                 // selected keys
                                 function (data) {
                                     var txt = '';
-                                    for (var i in data['allChoices']) {
-                                        var obj = data['allChoices'][i];
-                                        txt += ('Key: ' + i + '| Display Value: ' + obj['value'] + ',\r\n');
+                                    for (var i in data['sections']) {
+                                        var section = data['sections'][i];
+                                        var sHeading = section['heading'];
+                                        var options = section['options'];
+                                        for (var key in options) {
+                                            var properties = options[key];
+                                            txt += ('Heading: ' + sHeading + '| Key: ' + key + '| Display Value: ' + properties['value'] + ',\r\n');
+                                        }
                                     }
                                     txt += data['selectedKeys'];
                                     alert(txt);
@@ -312,9 +344,14 @@
                         'onchangeFunction':
                            function (data) {
                                var txt = '';
-                               for (var i in data['allChoices']) {
-                                   var obj = data['allChoices'][i];
-                                   txt += ('Key: ' + i + '| Display Value: ' + obj['value'] + ',\r\n');
+                               for (var i in data['sections']) {
+                                   var section = data['sections'][i];
+                                   var sHeading = section['heading'];
+                                   var options = section['options'];
+                                   for (var key in options) {
+                                       var properties = options[key];
+                                       txt += ('Heading: ' + sHeading + '| Key: ' + key + '| Display Value: ' + properties['value'] + ',\r\n');
+                                   }
                                }
                                txt += data['selectedKeys'];
                                alert(txt);
