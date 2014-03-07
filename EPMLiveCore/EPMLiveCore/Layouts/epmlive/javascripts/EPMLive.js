@@ -524,7 +524,7 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
 
         //set properties
         var ulIds = {};
-        var multiSelectMap = {};
+        var multiSelectStorage = {};
         var anchorTagId = tagId;
         var mainActionBar = $(document.createElement('div'));
         mainActionBar.addClass('epmliveToolBar');
@@ -1079,7 +1079,8 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
                         selectedKeys.push($(this).val());
                     });
                     data['selectedKeys'] = selectedKeys;
-                    data['allChoices'] = choices;
+                    var ctrlId = $(this).closest('ul').siblings('a').attr('controlId');
+                    data['sections'] = getUlChoices(ctrlId);
                     cfg['onchangeFunction'](data);
                 }
             });
@@ -1089,58 +1090,83 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
             liSelectAll.append(aSelectAllChxBx);
             ulColumns.append(liSelectAll);
             //foreach column we add an element, ulColumns.apend(...)
-            var choices = cfg['choices'];
-            for (var index in choices) {
-                var choice = choices[index];
-                //get choice value
-                var text = choice['value'];
-                var value = index;
-                var checked = choice['checked'];
-                //create rows
-                var liChoice = $(document.createElement('li'));
-                var a = $(document.createElement('a'));
-                a.attr('href', 'javascript:void(0)');
-                var lbl = $(document.createElement('label'));
-                lbl.attr('class', 'checkbox');
-                var input = $(document.createElement('input'));
-                input.attr('type', 'checkbox');
-                input.attr('class', 'cbColumn');
-                input.attr('value', value);
-                input.prop('checked', checked);
+            var sections = cfg['sections'];
+            setUlChoices(controlId, sections);
+            for (var i in sections) {
+                var section = sections[i];
 
-                input.bind('change', function () {
-                    if ($(this).prop('checked') == false) {
-                        $('#cbSelectAll').prop('checked', false);
-                    }
-                    else {
-                        if ($('.cbColumn:not(:checked)').length == 0) {
-                            $('#cbSelectAll').prop('checked', true);
-                        }
-                    }
+                //add section heading
+                var sHeading = section['heading'];
+                if (sHeading &&
+                    (sHeading.toLowerCase() != 'none')) {
+                    var liHeading = $(document.createElement('li'));
+                    liHeading.attr('class', 'dropdown-header');
+                    liHeading.text(sHeading);
+                    ulColumns.append(liHeading);
+                }
+                //add section divider
+                var sDivider = section['divider'];
+                if (sDivider &&
+                    sDivider.toLowerCase() != 'no' &&
+                    sDivider.toLowerCase() != 'none') {
+                    var liDivider = $(document.createElement('li'));
+                    liDivider.attr('class', 'divider');
+                    ulColumns.append(liDivider);
+                }
 
-                    if (cfg['onchangeFunction']) {
-                        var data = {};
-                        var selectedKeys = [];
-                        if ($(this).is(':checked')) {
-                            selectedKeys.push($(this).val());
+                for (var sIndex in section['options']) {
+                    var option = section['options'][sIndex];
+                    //get choice value
+                    var text = option['value'];
+                    var value = sIndex;
+                    var checked = option['checked'];
+                    //create rows
+                    var liChoice = $(document.createElement('li'));
+                    var a = $(document.createElement('a'));
+                    a.attr('href', 'javascript:void(0)');
+                    var lbl = $(document.createElement('label'));
+                    lbl.attr('class', 'checkbox');
+                    var input = $(document.createElement('input'));
+                    input.attr('type', 'checkbox');
+                    input.attr('class', 'cbColumn');
+                    input.attr('value', value);
+                    input.prop('checked', checked);
+
+                    input.bind('change', function () {
+                        if ($(this).prop('checked') == false) {
+                            $('#cbSelectAll').prop('checked', false);
                         }
-                        $(this).closest('li').siblings().find(':checked').each(function () {
-                            if ($(this).parent().text().toLowerCase() == 'select all') {
-                                return;
+                        else {
+                            if ($('.cbColumn:not(:checked)').length == 0) {
+                                $('#cbSelectAll').prop('checked', true);
                             }
-                            selectedKeys.push($(this).val());
-                        });
-                        data['selectedKeys'] = selectedKeys;
-                        data['allChoices'] = choices;
-                        cfg['onchangeFunction'](data);
-                    }
-                });
+                        }
 
-                lbl.append(input);
-                lbl.append(text);
-                a.append(lbl);
-                liChoice.append(a)
-                ulColumns.append(liChoice);
+                        if (cfg['onchangeFunction']) {
+                            var data = {};
+                            var selectedKeys = [];
+                            if ($(this).is(':checked')) {
+                                selectedKeys.push($(this).val());
+                            }
+                            $(this).closest('li').siblings().find(':checked').each(function () {
+                                if ($(this).parent().text().toLowerCase() == 'select all') {
+                                    return;
+                                }
+                                selectedKeys.push($(this).val());
+                            });
+                            data['selectedKeys'] = selectedKeys;
+                            var ctrlId = $(this).closest('ul').siblings('a').attr('controlId');
+                            data['sections'] = getUlChoices(ctrlId);
+                            cfg['onchangeFunction'](data);
+                        }
+                    });
+
+                    lbl.append(input);
+                    lbl.append(text);
+                    a.append(lbl);
+                    liChoice.append(a)
+                    ulColumns.append(liChoice);
+                }
             }
 
             var liDivider = $(document.createElement('li'));
@@ -1165,7 +1191,8 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
                         selectedKeys.push($(this).val());
                     });
                     data['selectedKeys'] = selectedKeys;
-                    data['allChoices'] = choices;
+                    var ctrlId = $(this).closest('ul').siblings('a').attr('controlId');
+                    data['sections'] = getUlChoices(ctrlId);
                     cfg['applyButtonConfig']['function'](data);
                 });
             }
@@ -1254,6 +1281,14 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
                 ret = oldVal;
             }
             return ret;
+        }
+
+        function setUlChoices(id, objSections) {
+            multiSelectStorage[id] = objSections;
+        }
+
+        function getUlChoices(id) {
+            return multiSelectStorage[id];
         }
 
         //END HELPER
