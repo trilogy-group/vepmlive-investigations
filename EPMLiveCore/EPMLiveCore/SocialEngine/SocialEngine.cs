@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Transactions;
 using System.Xml.Linq;
 using EPMLiveCore.API;
@@ -21,6 +20,7 @@ namespace EPMLiveCore.SocialEngine
         private static readonly object Locker = new Object();
         private readonly SocialEngineEvents _events;
         private readonly Logger _logger;
+        private object _locker;
 
         #endregion Fields 
 
@@ -28,6 +28,7 @@ namespace EPMLiveCore.SocialEngine
 
         private SocialEngine()
         {
+            _locker = new object();
             _logger = new Logger();
             _events = new SocialEngineEvents();
 
@@ -58,12 +59,12 @@ namespace EPMLiveCore.SocialEngine
 
         #endregion Properties 
 
-        #region Methods (4) 
+        #region Methods (5) 
 
-        // Private Methods (2) 
+        // Private Methods (3) 
 
         private void BuildRequestContext(XDocument request, out ObjectKind objectKind, out ActivityKind activityKind,
-            out Dictionary<string, object> data)
+            out Dictionary<string, object> data, out Guid siteId, out Guid webId, out SPUserToken userToken)
         {
             data = new Dictionary<string, object>();
 
@@ -77,6 +78,50 @@ namespace EPMLiveCore.SocialEngine
             if (objKindAttr == null) throw new Exception("Missing ObjectKind attribute on ProcessActivity element");
             if (actKindAttr == null) throw new Exception("Missing Activity attribute on ProcessActivity element");
 
+            XElement context = root.Element("Context");
+            if (context == null) throw new Exception("Missing element: ProcessActivity/Context");
+
+            XAttribute siteIdAttr = context.Attribute("SiteId");
+            XAttribute webIdAttr = context.Attribute("WebId");
+            XAttribute userIdAttr = context.Attribute("UserId");
+
+            if (siteIdAttr == null) throw new Exception("Missing SiteId attribute on Context element");
+            if (webIdAttr == null) throw new Exception("Missing WebId attribute on Context element");
+            if (userIdAttr == null) throw new Exception("Missing UserId attribute on Context element");
+
+            int userId;
+
+            if (!Guid.TryParse(siteIdAttr.Value, out siteId))
+            {
+                throw new Exception(siteIdAttr.Value + " is not a valid Site ID");
+            }
+
+            if (!Guid.TryParse(webIdAttr.Value, out webId))
+            {
+                throw new Exception(webIdAttr.Value + " is not a valid Web ID");
+            }
+
+            if (!int.TryParse(userIdAttr.Value, out userId))
+            {
+                throw new Exception(userIdAttr.Value + " is not a valid User ID");
+            }
+
+            Guid sid = siteId;
+            SPUserToken token = null;
+
+            SPSecurity.RunWithElevatedPrivileges(() =>
+            {
+                using (var spSite = new SPSite(sid))
+                {
+                    using (SPWeb spWeb = spSite.OpenWeb())
+                    {
+                        token = spWeb.AllUsers.GetByID(userId).UserToken;
+                    }
+                }
+            });
+
+            userToken = token;
+
             string objKind = objKindAttr.Value;
             string actKind = actKindAttr.Value;
 
@@ -86,6 +131,9 @@ namespace EPMLiveCore.SocialEngine
             foreach (XElement element in root.Elements())
             {
                 string key = element.Name.LocalName;
+
+                if (key.Equals("Context")) continue;
+
                 object value;
 
                 string val = element.Value;
@@ -111,6 +159,9 @@ namespace EPMLiveCore.SocialEngine
                     case "int32":
                         value = int.Parse(val);
                         break;
+                    case "boolean":
+                        value = bool.Parse(val);
+                        break;
                     default:
                         value = val;
                         break;
@@ -125,18 +176,30 @@ namespace EPMLiveCore.SocialEngine
 
         private void LoadModules()
         {
-            Parallel.ForEach(AssemblyManager.Current.GetTypes(), t =>
+            IEnumerable<Type> types = AssemblyManager.Current.GetTypes();
+
+            foreach (Type t in types)
             {
-                if (t.IsInterface || !t.GetInterfaces().Contains(typeof (ISocialEngineModule))) return;
+                if (t.IsInterface || !t.GetInterfaces().Contains(typeof (ISocialEngineModule))) continue;
 
                 var module = Activator.CreateInstance(t) as ISocialEngineModule;
                 if (module != null) module.Initialize(_events);
-            });
+            }
+        }
+
+        private void LogCancellation(ObjectKind objectKind, ActivityKind activityKind, Dictionary<string, object> data,
+            SPWeb spWeb,
+            ProcessActivityEventArgs args)
+        {
+            if (!string.IsNullOrEmpty(args.CancellationMessage))
+            {
+                _logger.Log(objectKind, activityKind, data, spWeb, args.CancellationMessage);
+            }
         }
 
         // Internal Methods (2) 
 
-        internal void ProcessActivity(string data, SPWeb contextWeb)
+        internal string ProcessActivity(string data)
         {
             try
             {
@@ -146,11 +209,27 @@ namespace EPMLiveCore.SocialEngine
                 ActivityKind activityKind;
                 Dictionary<string, object> dataDict;
 
-                BuildRequestContext(request, out objectKind, out activityKind, out dataDict);
+                Guid siteId;
+                Guid webId;
+                SPUserToken userToken;
 
-                string result = Current.ProcessActivity(objectKind, activityKind, dataDict, contextWeb);
+                BuildRequestContext(request, out objectKind, out activityKind, out dataDict, out siteId, out webId,
+                    out userToken);
 
-                if (string.IsNullOrEmpty(result)) return;
+                string result = null;
+
+                SPSecurity.RunWithElevatedPrivileges(() =>
+                {
+                    using (var spSite = new SPSite(siteId, userToken))
+                    {
+                        using (SPWeb spWeb = spSite.OpenWeb(webId))
+                        {
+                            result = Current.ProcessActivity(objectKind, activityKind, dataDict, spWeb);
+                        }
+                    }
+                });
+
+                if (string.IsNullOrEmpty(result)) return string.Empty;
 
                 bool multiple = result.Contains(",");
 
@@ -167,58 +246,67 @@ namespace EPMLiveCore.SocialEngine
         internal string ProcessActivity(ObjectKind objectKind, ActivityKind activityKind,
             Dictionary<string, object> data, SPWeb spWeb)
         {
-            var correlationIds = new List<Guid>();
-
-            try
+            lock (_locker)
             {
-                using (var transactionScope = new TransactionScope())
+                var correlationIds = new List<Guid>();
+
+                try
                 {
-                    using (var streamManager = new StreamManager(spWeb))
+                    using (var transactionScope = new TransactionScope())
                     {
-                        using (var threadManager = new ThreadManager(spWeb))
+                        using (var streamManager = new StreamManager(spWeb))
                         {
-                            using (var activityManager = new ActivityManager(spWeb))
+                            using (var threadManager = new ThreadManager(spWeb))
                             {
-                                var args = new ProcessActivityEventArgs(objectKind, activityKind, data, spWeb,
-                                    streamManager, threadManager, activityManager);
-
-                                if (_events.OnValidateActivity != null)
+                                using (var activityManager = new ActivityManager(spWeb))
                                 {
-                                    _events.OnValidateActivity(args);
-                                }
+                                    var args = new ProcessActivityEventArgs(objectKind, activityKind, data, spWeb,
+                                        streamManager, threadManager, activityManager);
 
-                                if (!args.Cancel)
-                                {
-                                    if (_events.OnActivityRegistration != null)
+                                    if (_events.OnValidateActivity != null)
                                     {
-                                        _events.OnActivityRegistration(args);
+                                        _events.OnValidateActivity(args);
                                     }
-                                }
-                                else
-                                {
-                                    if (!string.IsNullOrEmpty(args.CancellationMessage))
+
+                                    if (!args.Cancel)
                                     {
-                                        _logger.Log(objectKind, activityKind, data, spWeb, args.CancellationMessage);
+                                        if (_events.OnPreActivityRegistration != null)
+                                        {
+                                            _events.OnPreActivityRegistration(args);
+                                        }
+                                    }
+
+                                    if (!args.Cancel)
+                                    {
+                                        if (_events.OnActivityRegistration != null)
+                                        {
+                                            _events.OnActivityRegistration(args);
+                                        }
+                                    }
+
+                                    if (args.Cancel)
+                                    {
+                                        LogCancellation(objectKind, activityKind, data, spWeb, args);
                                     }
                                 }
                             }
                         }
+
+                        transactionScope.Complete();
                     }
-
-                    transactionScope.Complete();
                 }
-            }
-            catch (AggregateException e)
-            {
-                correlationIds.AddRange(
-                    e.InnerExceptions.Select(i => _logger.Log(objectKind, activityKind, data, spWeb, i)));
-            }
-            catch (Exception exception)
-            {
-                correlationIds.Add(_logger.Log(objectKind, activityKind, data, spWeb, exception));
-            }
+                catch (AggregateException e)
+                {
+                    correlationIds.AddRange(
+                        e.InnerExceptions.Select(i => _logger.Log(objectKind, activityKind, data, spWeb, i)));
+                }
+                catch (Exception exception)
+                {
+                    correlationIds.Add(_logger.Log(objectKind, activityKind, data, spWeb, exception));
+                }
 
-            return string.Join(", ", correlationIds.ToArray());
+                return string.Join(", ", correlationIds.ToArray());
+            }
         }
 
         #endregion Methods 

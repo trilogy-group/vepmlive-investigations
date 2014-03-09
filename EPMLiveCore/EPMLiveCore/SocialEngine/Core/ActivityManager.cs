@@ -58,9 +58,10 @@ namespace EPMLiveCore.SocialEngine.Core
             DateTime relatedActivityTime)
         {
             const string GET_QUEUED_ACTIVITY_SQL = @"
-                SELECT  TOP (1) ActivityQueueId, ItemCount
-                FROM    dbo.ActivityQueue
-                WHERE   (ListId = @ListId) AND (WebId = @WebId) AND (UserId = @UserId) AND (PostTime = @RelatedActivityTime)";
+                SELECT   TOP (1) ActivityQueueId, ItemCount
+                FROM     dbo.ActivityQueue
+                WHERE    (ListId = @ListId) AND (WebId = @WebId) AND (UserId = @UserId) AND (PostTime >= @RelatedActivityTime)
+                ORDER BY PostTime DESC";
 
             Guid queuedActivityId = Guid.Empty;
             int itemCount = 0;
@@ -74,11 +75,15 @@ namespace EPMLiveCore.SocialEngine.Core
                     sqlCommand.Parameters.AddWithValue("@UserId", userId);
                     sqlCommand.Parameters.AddWithValue("@RelatedActivityTime", relatedActivityTime);
 
-                    SqlDataReader reader = sqlCommand.ExecuteReader();
-                    while (reader.Read())
+                    using (SqlDataReader reader = sqlCommand.ExecuteReader())
                     {
-                        queuedActivityId = reader.GetGuid(0);
-                        itemCount = reader.GetInt32(1);
+                        while (reader.Read())
+                        {
+                            queuedActivityId = reader.GetGuid(0);
+                            itemCount = reader.GetInt32(1);
+                        }
+
+                        reader.Close();
                     }
                 }
 
@@ -87,7 +92,7 @@ namespace EPMLiveCore.SocialEngine.Core
                     const string INSERT_SQL =
                         @"INSERT INTO dbo.ActivityQueue (SiteId, WebId, ListId, UserId, PostTime, ItemCount) VALUES (@SiteId, @WebId, @ListId, @UserId, @ActivityTime, 2)";
 
-                    using (var sqlCommand = new SqlCommand(INSERT_SQL, SqlConnection))
+                    using (var sqlCommand = new SqlCommand(INSERT_SQL, sqlConnection))
                     {
                         sqlCommand.Parameters.AddWithValue("@SiteId", siteId);
                         sqlCommand.Parameters.AddWithValue("@WebId", webId);
@@ -101,7 +106,7 @@ namespace EPMLiveCore.SocialEngine.Core
                 else
                 {
                     const string UPDATE_SQL =
-                        @"UPDATE dbo.ActivityQueue SET ItemCount = @ItemCount AND PostTime = @ActivityTime WHERE ActivityQueueId = @Id";
+                        @"UPDATE dbo.ActivityQueue SET ItemCount = @ItemCount, PostTime = @ActivityTime WHERE ActivityQueueId = @Id";
 
                     using (var sqlCommand = new SqlCommand(UPDATE_SQL, sqlConnection))
                     {
@@ -117,30 +122,34 @@ namespace EPMLiveCore.SocialEngine.Core
             }
         }
 
-        public Activity FindRelatedActivity(Guid listId, int itemId, DateTime date, TimeSpan interval)
+        public Activity FindRelatedActivity(Guid listId, int userId, DateTime date, TimeSpan interval)
         {
             const string SQL = @"
-                SELECT TOP (1) dbo.SS_Activities.Id, dbo.SS_Activities.MassOperation, dbo.SS_Activities.Date
-                       FROM    dbo.SS_Threads INNER JOIN dbo.SS_Activities ON dbo.SS_Threads.Id = dbo.SS_Activities.ThreadId
-                       WHERE   (dbo.SS_Threads.ListId = @ListId) AND (dbo.SS_Threads.ItemId = @ItemId) 
-                               AND (dbo.SS_Activities.Date >= @Date) AND (dbo.SS_Activities.Kind < 3)
-                       ORDER BY dbo.SS_Activities.Date DESC";
+                SELECT  TOP (1) dbo.SS_Activities.Id, dbo.SS_Activities.MassOperation, dbo.SS_Activities.Date
+                FROM    dbo.SS_Threads INNER JOIN dbo.SS_Activities ON dbo.SS_Threads.Id = dbo.SS_Activities.ThreadId
+                WHERE   (dbo.SS_Threads.ListId = @ListId) AND (dbo.SS_Activities.Date >= @Date) 
+                            AND (dbo.SS_Activities.Kind < 3) AND (dbo.SS_Activities.UserId = @UserId)
+                ORDER BY dbo.SS_Activities.Date DESC";
 
             using (var sqlCommand = new SqlCommand(SQL, SqlConnection))
             {
                 sqlCommand.Parameters.AddWithValue("@ListId", listId);
-                sqlCommand.Parameters.AddWithValue("@ItemId", itemId);
+                sqlCommand.Parameters.AddWithValue("@UserId", userId);
                 sqlCommand.Parameters.AddWithValue("@Date", date - interval);
 
-                SqlDataReader reader = sqlCommand.ExecuteReader();
-                while (reader.Read())
+                using (SqlDataReader reader = sqlCommand.ExecuteReader())
                 {
-                    return new Activity
+                    while (reader.Read())
                     {
-                        Id = reader.GetGuid(0),
-                        IsMassOperation = reader.GetBoolean(1),
-                        Date = reader.GetDateTime(2)
-                    };
+                        return new Activity
+                        {
+                            Id = reader.GetGuid(0),
+                            IsMassOperation = reader.GetBoolean(1),
+                            Date = reader.GetDateTime(2)
+                        };
+                    }
+
+                    reader.Close();
                 }
             }
 
@@ -161,7 +170,7 @@ namespace EPMLiveCore.SocialEngine.Core
         public Activity RegisterActivity(Activity activity)
         {
             const string SQL =
-                @"INSERT INTO SS_Activities (Id, Data, Kind, Date, UserId, ThreadId) VALUES (@Id, @Data, @Kind, @UserId, @ThreadId)";
+                @"INSERT INTO SS_Activities (Id, Data, Kind, Date, UserId, ThreadId) VALUES (@Id, @Data, @Kind, @Date, @UserId, @ThreadId)";
 
             activity.Id = Guid.NewGuid();
 

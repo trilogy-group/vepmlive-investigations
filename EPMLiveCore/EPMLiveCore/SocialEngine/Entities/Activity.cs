@@ -3,7 +3,7 @@ using EPMLiveCore.SocialEngine.Core;
 
 namespace EPMLiveCore.SocialEngine.Entities
 {
-    internal class Activity
+    public class Activity
     {
         #region Properties (7) 
 

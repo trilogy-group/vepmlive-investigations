@@ -66,9 +66,9 @@ namespace EPMLiveCore.SocialEngine.Modules
                     }
                 }
 
-                CoreFunctions.setConfigSetting(rootWeb, SETTING_KEY, "5");
+                CoreFunctions.setConfigSetting(rootWeb, SETTING_KEY, "10");
 
-                return 5.Seconds();
+                return 10.Seconds();
             }, true).Value;
         }
 
@@ -94,6 +94,7 @@ namespace EPMLiveCore.SocialEngine.Modules
         private void OnPreActivityRegistration(ProcessActivityEventArgs args)
         {
             if (args.ObjectKind != ObjectKind.ListItem) return;
+
             PerformPreRegistrationSteps(args);
         }
 
@@ -109,9 +110,13 @@ namespace EPMLiveCore.SocialEngine.Modules
             Dictionary<string, object> data = args.Data;
             ActivityManager activityManager = args.ActivityManager;
 
-            Activity relatedActivity = activityManager.FindRelatedActivity(
-                (Guid) data["ListId"], (int) data["UserId"], (DateTime) data["ActivityTime"],
-                GetRelatedActivityInterval(args.ContextWeb));
+            TimeSpan interval = GetRelatedActivityInterval(args.ContextWeb);
+            var activityTime = (DateTime) data["ActivityTime"];
+
+            var listId = (Guid) data["ListId"];
+            var userId = (int) data["UserId"];
+
+            Activity relatedActivity = activityManager.FindRelatedActivity(listId, userId, activityTime, interval);
 
             if (relatedActivity == null) return;
 
@@ -120,8 +125,8 @@ namespace EPMLiveCore.SocialEngine.Modules
             if (!args.Data.ContainsKey("IsMassOperation")) args.Data.Add("IsMassOperation", true);
             else args.Data["IsMassOperation"] = true;
 
-            activityManager.EnqueueActivity((Guid) data["SiteId"], (Guid) data["WebId"], (Guid) data["ListId"],
-                (int) data["UserId"], (DateTime) data["ActivityTime"], relatedActivity.Date);
+            activityManager.EnqueueActivity((Guid) data["SiteId"], (Guid) data["WebId"], listId,
+                userId, activityTime, activityTime - interval);
         }
 
         private void RegisterCreationActivity(ProcessActivityEventArgs args)
@@ -174,6 +179,7 @@ namespace EPMLiveCore.SocialEngine.Modules
                 {"Id", DataType.Int},
                 {"Title", DataType.String},
                 {"URL", DataType.String},
+                {"ListTitle", DataType.String},
                 {"ListId", DataType.Guid},
                 {"WebId", DataType.Guid},
                 {"SiteId", DataType.Guid},

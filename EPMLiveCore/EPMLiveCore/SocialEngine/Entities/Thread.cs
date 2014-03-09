@@ -1,11 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
 using EPMLiveCore.SocialEngine.Core;
 
 namespace EPMLiveCore.SocialEngine.Entities
 {
-    internal class Thread
+    public class Thread
     {
-        #region Properties (9) 
+        #region Properties (10) 
+
+        public List<Activity> Activities { get; set; }
 
         public bool Deleted { get; set; }
 

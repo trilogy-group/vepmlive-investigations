@@ -120,10 +120,10 @@ namespace EPMLiveCore.SocialEngine.Core
                 sqlCommand.Parameters.AddWithValue("@ItemId", itemId.HasValue ? (object) itemId : DBNull.Value);
                 sqlCommand.Parameters.AddWithValue("@Deleted", bringDeleted ? 1 : 0);
 
-                using (SqlDataReader dataReader = sqlCommand.ExecuteReader())
+                using (SqlDataReader reader = sqlCommand.ExecuteReader())
                 {
                     var dataTable = new DataTable();
-                    dataTable.Load(dataReader);
+                    dataTable.Load(reader);
 
                     if (dataTable.Rows.Count <= 0) return null;
 
@@ -165,6 +165,8 @@ namespace EPMLiveCore.SocialEngine.Core
                                 if ((int) value == 1) thread.Deleted = true;
                                 break;
                         }
+
+                        reader.Close();
                     }
 
                     return thread;
@@ -206,12 +208,14 @@ namespace EPMLiveCore.SocialEngine.Core
                 sqlCommand.Parameters.AddWithValue("@Kind",
                     objectKind.HasValue ? (object) objectKind.Value : DBNull.Value);
 
-                using (SqlDataReader sqlDataReader = sqlCommand.ExecuteReader())
+                using (SqlDataReader reader = sqlCommand.ExecuteReader())
                 {
-                    while (sqlDataReader.Read())
+                    while (reader.Read())
                     {
-                        yield return sqlDataReader.GetGuid(0);
+                        yield return reader.GetGuid(0);
                     }
+
+                    reader.Close();
                 }
             }
         }

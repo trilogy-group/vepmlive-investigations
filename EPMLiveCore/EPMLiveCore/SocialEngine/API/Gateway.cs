@@ -25,7 +25,7 @@ namespace EPMLiveCore.SocialEngine.API
         {
             try
             {
-                SocialEngine.Current.ProcessActivity(data, spWeb);
+                return EPMLiveCore.SocialEngine.SocialEngine.Current.ProcessActivity(data);
             }
             catch (APIException ex)
             {

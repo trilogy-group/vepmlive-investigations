@@ -19,7 +19,11 @@ namespace EPMLiveCore.SocialEngine
 
             var request = new XElement("ProcessActivity",
                 new XAttribute("ObjectKind", objectKind),
-                new XAttribute("ActivityKind", activityKind));
+                new XAttribute("ActivityKind", activityKind),
+                new XElement("Context",
+                    new XAttribute("SiteId", contextWeb.Site.ID),
+                    new XAttribute("WebId", contextWeb.ID),
+                    new XAttribute("UserId", contextWeb.CurrentUser.ID)));
 
             foreach (var property in data)
             {
