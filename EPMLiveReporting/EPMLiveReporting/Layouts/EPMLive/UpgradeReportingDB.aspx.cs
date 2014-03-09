@@ -17,15 +17,15 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
 {
     public partial class UpgradeReportingDB : LayoutsPageBase
     {
-		#region Fields (1) 
+        #region Fields (1) 
 
         private List<HtmlGenericControl> _messages;
 
-		#endregion Fields 
+        #endregion Fields 
 
-		#region Methods (9) 
+        #region Methods (9) 
 
-		// Public Methods (1) 
+        // Public Methods (1) 
 
         public List<HtmlGenericControl> Upgrade()
         {
@@ -36,7 +36,8 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
 
             return _messages;
         }
-		// Protected Methods (2) 
+
+        // Protected Methods (2) 
 
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -88,7 +89,8 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
                 }
             }
         }
-		// Private Methods (6) 
+
+        // Private Methods (6) 
 
         private void ExecuteUpgradeScripts(EPMData epmData, Guid siteId)
         {
@@ -117,7 +119,7 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
                         foreach (SqlError sqlError in exception.Errors)
                         {
                             LogError(string.Format("Msg {0}, Procedure {1}, Line {2}", sqlError.Number,
-                                                   sqlError.Procedure, sqlError.LineNumber));
+                                sqlError.Procedure, sqlError.LineNumber));
                             LogError(exception.Message);
                         }
                     }
@@ -130,7 +132,7 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
                     using (
                         var sqlCommand =
                             new SqlCommand("SELECT ClientUsername FROM dbo.RPTDATABASES WHERE (SiteId = @SiteId)",
-                                           epmData.GetEPMLiveConnection))
+                                epmData.GetEPMLiveConnection))
                     {
                         sqlCommand.Parameters.AddWithValue("@SiteId", siteId);
                         sqlCommand.CommandType = CommandType.Text;
@@ -161,7 +163,7 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
                             using (
                                 var sqlCommand =
                                     new SqlCommand(query.Replace("@SP", sp).Replace("@Username", username.ToString()),
-                                                   sqlConnection))
+                                        sqlConnection))
                             {
                                 sqlCommand.CommandType = CommandType.Text;
                                 sqlCommand.ExecuteNonQuery();
@@ -172,7 +174,7 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
                             foreach (SqlError sqlError in exception.Errors)
                             {
                                 LogError(string.Format("Msg {0}, Procedure {1}, Line {2}", sqlError.Number,
-                                                       sqlError.Procedure, sqlError.LineNumber));
+                                    sqlError.Procedure, sqlError.LineNumber));
                                 LogError(exception.Message);
                             }
                         }
@@ -222,15 +224,15 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
             DataTable listMappings = reportData.GetListMappings();
 
             foreach (var mappings in (from l in listMappings.AsEnumerable()
-                                      select
-                                          new
-                                              {
-                                                  ListName = l["ListName"],
-                                                  ListId = l["RPTListId"],
-                                                  SiteId = l["SiteId"],
-                                                  Table = l["TableName"],
-                                                  SnapshotTable = l["TableNameSnapshot"]
-                                              })
+                select
+                    new
+                    {
+                        ListName = l["ListName"],
+                        ListId = l["RPTListId"],
+                        SiteId = l["SiteId"],
+                        Table = l["TableName"],
+                        SnapshotTable = l["TableNameSnapshot"]
+                    })
                 .GroupBy(l => l.SiteId))
             {
                 using (var spSite = new SPSite((Guid) mappings.Key))
@@ -251,8 +253,8 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
                                     DataTable listColumns = reportData.GetListColumns(listName);
 
                                     DataRow dataRow = (from c in listColumns.AsEnumerable()
-                                                       where c["InternalName"].Equals("EXTID")
-                                                       select c).FirstOrDefault();
+                                        where c["InternalName"].Equals("EXTID")
+                                        select c).FirstOrDefault();
 
                                     if (dataRow == null)
                                     {
@@ -286,6 +288,6 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
             }
         }
 
-		#endregion Methods 
+        #endregion Methods 
     }
 }

@@ -1,27 +1,23 @@
 ﻿using System;
-using System.Collections;
-using System.Configuration;
 using System.Data;
 using System.Web;
-using System.Web.Security;
 using System.Web.UI;
-using System.Web.UI.HtmlControls;
-using System.Web.UI.WebControls;
-using System.Web.UI.WebControls.WebParts;
-using System.Security.Principal;
-using System.ComponentModel;
-using EPMLiveReportsAdmin.Properties;
-using System.Data.SqlClient;
-using Microsoft.SharePoint.Utilities;
 using Microsoft.SharePoint;
+using Microsoft.SharePoint.Utilities;
 using Microsoft.SharePoint.WebControls;
 
-namespace EPMLiveReportsAdmin.Layouts.EPMLive 
+namespace EPMLiveReportsAdmin.Layouts.EPMLive
 {
     public partial class AllSnapshots : LayoutsPageBase, IPostBackEventHandler
     {
-        EPMData _DAO;
+        private EPMData _DAO;
         protected SPGridView grdVwSnapshots;
+
+        public void RaisePostBackEvent(string snapshotuid)
+        {
+            SPUtility.Redirect("epmlive/Snapshot.aspx?uid=" + snapshotuid, SPRedirectFlags.RelativeToLayoutsPage,
+                HttpContext.Current);
+        }
 
         protected void Page_Init(object sender, EventArgs e)
         {
@@ -31,17 +27,20 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
 
             if (SPContext.Current.Web.ServerRelativeUrl.EndsWith("/"))
             {
-                lnk_createSchedule.HRef = SPContext.Current.Web.ServerRelativeUrl + "_layouts/epmlive/ReportSchedule.aspx";
+                lnk_createSchedule.HRef = SPContext.Current.Web.ServerRelativeUrl +
+                                          "_layouts/epmlive/ReportSchedule.aspx";
             }
             else
             {
-                lnk_createSchedule.HRef = SPContext.Current.Web.ServerRelativeUrl + "/_layouts/epmlive/ReportSchedule.aspx";
+                lnk_createSchedule.HRef = SPContext.Current.Web.ServerRelativeUrl +
+                                          "/_layouts/epmlive/ReportSchedule.aspx";
             }
         }
 
         protected void LoadSnapshots()
         {
-            _DAO.Command = "SELECT Enabled as [Active], Title as [Report Title], PeriodDate as [Reporting Period], DateArchived as [Snapshot Date], ListNames as [Lists],periodid,siteid FROM RPTPeriods";
+            _DAO.Command =
+                "SELECT Enabled as [Active], Title as [Report Title], PeriodDate as [Reporting Period], DateArchived as [Snapshot Date], ListNames as [Lists],periodid,siteid FROM RPTPeriods";
             DataTable dt = _DAO.GetTable(_DAO.GetClientReportingConnection);
             SPBoundField gridColumn;
 
@@ -69,7 +68,9 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
             DataTable dt;
             SPBoundField gridColumn;
 
-            _DAO.Command = "SELECT jobname as [Schedule Name], jobdata as [Lists], siteguid, timerjobuid  FROM TIMERJOBS WHERE siteguid ='" + SPContext.Current.Web.Site.ID + "' AND jobtype=7 AND ScheduleType <> 0";
+            _DAO.Command =
+                "SELECT jobname as [Schedule Name], jobdata as [Lists], siteguid, timerjobuid  FROM TIMERJOBS WHERE siteguid ='" +
+                SPContext.Current.Web.Site.ID + "' AND jobtype=7 AND ScheduleType <> 0";
             dt = _DAO.GetTable(_DAO.GetEPMLiveConnection);
 
             if (!IsPostBack || blnLoadColums)
@@ -90,11 +91,6 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
 
             grdVwSchedules.DataSource = dt;
             grdVwSchedules.DataBind();
-        }
-
-        public void RaisePostBackEvent(string snapshotuid)
-        {
-            SPUtility.Redirect("epmlive/Snapshot.aspx?uid=" + snapshotuid, SPRedirectFlags.RelativeToLayoutsPage, HttpContext.Current);
         }
 
         protected void Page_Load(object sender, EventArgs e)

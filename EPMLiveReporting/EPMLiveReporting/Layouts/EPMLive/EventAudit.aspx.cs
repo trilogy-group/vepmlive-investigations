@@ -1,21 +1,16 @@
 ﻿using System;
-using System.Linq;
-using System.Collections;
-using System.Configuration;
+using System.Collections.Generic;
 using System.Data;
+using System.Drawing;
+using System.Linq;
 using System.Web;
-using System.Web.Security;
 using System.Web.UI;
-using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
-using System.Web.UI.WebControls.WebParts;
-using System.Security.Principal;
-using Microsoft.SharePoint;
-using System.ComponentModel;
 using EPMLiveReportsAdmin.Properties;
+using Microsoft.SharePoint;
 using Microsoft.SharePoint.Utilities;
 using Microsoft.SharePoint.WebControls;
-using System.Collections.Generic;
+using Image = System.Web.UI.WebControls.Image;
 
 namespace EPMLiveReportsAdmin.Layouts.EPMLive
 {
@@ -24,34 +19,31 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
         //protected SPGridView grdVwResults;
         //protected HtmlInputButton save;
 
-        DataTable _dtAuditRecs;
-        Guid _SiteID;
-        string _sListName;
+        private Guid _SiteID;
+        private DataTable _dtAuditRecs;
+        private string _sListName;
 
 
         protected void Page_Init(object sender, EventArgs e)
         {
-            save.ServerClick += new EventHandler(save_ServerClick);
+            save.ServerClick += save_ServerClick;
             AuditLists();
         }
 
-        protected void Page_Load(object sender, EventArgs e)
-        {
+        protected void Page_Load(object sender, EventArgs e) { }
 
-        }
-
-        void save_ServerClick(object sender, EventArgs e)
+        private void save_ServerClick(object sender, EventArgs e)
         {
             foreach (SPGridViewRow row in grdVwResults.Rows)
             {
-                CheckBox cb1 = (CheckBox)row.Cells[3].Controls[1];
+                var cb1 = (CheckBox) row.Cells[3].Controls[1];
                 if (cb1.Checked)
                 {
                     HiddenField hdn;
-                    hdn = (HiddenField)row.Cells[3].Controls[3];
+                    hdn = (HiddenField) row.Cells[3].Controls[3];
                     string sListName = hdn.Value;
 
-                    hdn = (HiddenField)row.Cells[3].Controls[2];
+                    hdn = (HiddenField) row.Cells[3].Controls[2];
                     string sWebUrl = hdn.Value;
 
                     AddEventHandler(sWebUrl, sListName);
@@ -78,29 +70,38 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
                                 spList = spWeb.Lists[sListName];
 
                                 // remove event first to avoid duplicates
-                                List<SPEventReceiverDefinition> evts = GetListEvents(spList, 
-                                                                                     Resources.Assembly, 
-                                                                                     Resources.ClassName, 
-                                                                                     new List<SPEventReceiverType> { SPEventReceiverType.ItemAdded, 
-                                                                                                                     SPEventReceiverType.ItemUpdated, 
-                                                                                                                     SPEventReceiverType.ItemDeleting });
+                                List<SPEventReceiverDefinition> evts = GetListEvents(spList,
+                                    Resources.Assembly,
+                                    Resources.ClassName,
+                                    new List<SPEventReceiverType>
+                                    {
+                                        SPEventReceiverType.ItemAdded,
+                                        SPEventReceiverType.ItemUpdated,
+                                        SPEventReceiverType.ItemDeleting
+                                    });
 
                                 foreach (SPEventReceiverDefinition e in evts)
                                 {
                                     e.Delete();
                                 }
 
-                                spList.EventReceivers.Add(SPEventReceiverType.ItemAdded, Resources.Assembly, Resources.ClassName);
-                                spList.EventReceivers.Add(SPEventReceiverType.ItemUpdated, Resources.Assembly, Resources.ClassName);
-                                spList.EventReceivers.Add(SPEventReceiverType.ItemDeleting, Resources.Assembly, Resources.ClassName);
+                                spList.EventReceivers.Add(SPEventReceiverType.ItemAdded, Resources.Assembly,
+                                    Resources.ClassName);
+                                spList.EventReceivers.Add(SPEventReceiverType.ItemUpdated, Resources.Assembly,
+                                    Resources.ClassName);
+                                spList.EventReceivers.Add(SPEventReceiverType.ItemDeleting, Resources.Assembly,
+                                    Resources.ClassName);
 
-                        
+
                                 List<SPEventReceiverDefinition> newEvts = GetListEvents(spList,
-                                                                                     Resources.Assembly,
-                                                                                     Resources.ClassName,
-                                                                                     new List<SPEventReceiverType> { SPEventReceiverType.ItemAdded, 
-                                                                                                                     SPEventReceiverType.ItemUpdated, 
-                                                                                                                     SPEventReceiverType.ItemDeleting });
+                                    Resources.Assembly,
+                                    Resources.ClassName,
+                                    new List<SPEventReceiverType>
+                                    {
+                                        SPEventReceiverType.ItemAdded,
+                                        SPEventReceiverType.ItemUpdated,
+                                        SPEventReceiverType.ItemDeleting
+                                    });
 
                                 foreach (SPEventReceiverDefinition e in newEvts)
                                 {
@@ -111,27 +112,36 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
                                 if (sWebUrl.ToLower() == spSite.RootWeb.Url.ToLower())
                                 {
                                     List<SPEventReceiverDefinition> delEvts = GetListEvents(spList,
-                                                                                             Resources.Assembly,
-                                                                                             "EPMLiveReportsAdmin.LstEvents",
-                                                                                             new List<SPEventReceiverType> { SPEventReceiverType.FieldDeleting, 
-                                                                                                                             SPEventReceiverType.ListDeleting,
-                                                                                                                             SPEventReceiverType.FieldAdded});
+                                        Resources.Assembly,
+                                        "EPMLiveReportsAdmin.LstEvents",
+                                        new List<SPEventReceiverType>
+                                        {
+                                            SPEventReceiverType.FieldDeleting,
+                                            SPEventReceiverType.ListDeleting,
+                                            SPEventReceiverType.FieldAdded
+                                        });
 
                                     foreach (SPEventReceiverDefinition e in delEvts)
                                     {
                                         e.Delete();
                                     }
 
-                                    spList.EventReceivers.Add(SPEventReceiverType.FieldDeleting, Resources.Assembly, "EPMLiveReportsAdmin.LstEvents");
-                                    spList.EventReceivers.Add(SPEventReceiverType.ListDeleting, Resources.Assembly, "EPMLiveReportsAdmin.LstEvents");
-                                    spList.EventReceivers.Add(SPEventReceiverType.FieldAdded, Resources.Assembly, "EPMLiveReportsAdmin.LstEvents");
+                                    spList.EventReceivers.Add(SPEventReceiverType.FieldDeleting, Resources.Assembly,
+                                        "EPMLiveReportsAdmin.LstEvents");
+                                    spList.EventReceivers.Add(SPEventReceiverType.ListDeleting, Resources.Assembly,
+                                        "EPMLiveReportsAdmin.LstEvents");
+                                    spList.EventReceivers.Add(SPEventReceiverType.FieldAdded, Resources.Assembly,
+                                        "EPMLiveReportsAdmin.LstEvents");
 
                                     List<SPEventReceiverDefinition> newEvts2 = GetListEvents(spList,
-                                                                                             Resources.Assembly,
-                                                                                             "EPMLiveReportsAdmin.LstEvents",
-                                                                                             new List<SPEventReceiverType> { SPEventReceiverType.FieldDeleting, 
-                                                                                                                             SPEventReceiverType.ListDeleting,
-                                                                                                                             SPEventReceiverType.FieldAdded});
+                                        Resources.Assembly,
+                                        "EPMLiveReportsAdmin.LstEvents",
+                                        new List<SPEventReceiverType>
+                                        {
+                                            SPEventReceiverType.FieldDeleting,
+                                            SPEventReceiverType.ListDeleting,
+                                            SPEventReceiverType.FieldAdded
+                                        });
 
                                     foreach (SPEventReceiverDefinition e in newEvts2)
                                     {
@@ -141,38 +151,31 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
                                 }
                                 spList.Update();
                             }
-                            catch (Exception ex)
-                            {
-
-                            }
+                            catch (Exception ex) { }
                             spWeb.AllowUnsafeUpdates = false;
-
                         }
                     });
             }
             catch (Exception ex)
             {
                 //Add logging here....
-
             }
         }
 
-        private List<SPEventReceiverDefinition> GetListEvents(SPList list, string assemblyName, string className, List<SPEventReceiverType> types)
-        {   
-            List<SPEventReceiverDefinition> evts = new List<SPEventReceiverDefinition>();
+        private List<SPEventReceiverDefinition> GetListEvents(SPList list, string assemblyName, string className,
+            List<SPEventReceiverType> types)
+        {
+            var evts = new List<SPEventReceiverDefinition>();
 
             try
             {
                 evts = (from e in list.EventReceivers.OfType<SPEventReceiverDefinition>()
-                        where e.Assembly.Equals(assemblyName, StringComparison.CurrentCultureIgnoreCase) &&
-                              e.Class.Equals(className, StringComparison.CurrentCultureIgnoreCase) &&
-                              types.Contains(e.Type)
-                        select e).ToList<SPEventReceiverDefinition>();
+                    where e.Assembly.Equals(assemblyName, StringComparison.CurrentCultureIgnoreCase) &&
+                          e.Class.Equals(className, StringComparison.CurrentCultureIgnoreCase) &&
+                          types.Contains(e.Type)
+                    select e).ToList<SPEventReceiverDefinition>();
             }
-            catch
-            {
-                
-            }
+            catch { }
 
             return evts;
         }
@@ -188,10 +191,10 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
             }
             else
             {
-                Label lbl = new Label();
+                var lbl = new Label();
                 lbl.Text = "Audit not run. No siteId and/or list name provided.";
                 MasterPage mp = Master;
-                ContentPlaceHolder cph = (ContentPlaceHolder)mp.FindControl("ctl00$PlaceHolderMain");
+                var cph = (ContentPlaceHolder) mp.FindControl("ctl00$PlaceHolderMain");
                 cph.Controls.Add(lbl);
             }
         }
@@ -199,7 +202,7 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
         protected void AuditWebs()
         {
             SPList spList = null;
-            ReportData DAO = new ReportData(_SiteID);
+            var DAO = new ReportData(_SiteID);
             bool blnAddEvent = false;
             bool blnUpdateEvent = false;
             bool blnDeleteEvent = false;
@@ -208,122 +211,125 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
             bool blnColumnAddEvent = false;
 
             SPSecurity.RunWithElevatedPrivileges(
-            delegate
-            {
-                using (SPSite spSite = new SPSite(_SiteID))
+                delegate
                 {
-                    foreach (SPWeb spWeb in spSite.AllWebs)
+                    using (var spSite = new SPSite(_SiteID))
                     {
-                        using (spWeb)
+                        foreach (SPWeb spWeb in spSite.AllWebs)
                         {
-                            spWeb.AllowUnsafeUpdates = true;
-                            spList = null;
-                            try
+                            using (spWeb)
                             {
-                                //List may not always be present. IF NOT PRESENT, error will be caught.
-                                spList = spWeb.Lists[_sListName];
-                            }
-                            catch (Exception ex)
-                            {
-
-                            }
-
-                            if (spList != null)
-                            {
-                                //Reset flags
-                                blnAddEvent = false;
-                                blnDeleteEvent = false;
-                                blnUpdateEvent = false;
-                                blnListDeleteEvent = false;
-                                blnColumnDeleteEvent = false;
-                                blnColumnAddEvent = false;
-
-                                foreach (SPEventReceiverDefinition spEventDef in spList.EventReceivers)
+                                spWeb.AllowUnsafeUpdates = true;
+                                spList = null;
+                                try
                                 {
-                                    if (spEventDef.Type == SPEventReceiverType.ItemAdded && spEventDef.Class.ToLower() == Resources.ClassName.ToLower())
+                                    //List may not always be present. IF NOT PRESENT, error will be caught.
+                                    spList = spWeb.Lists[_sListName];
+                                }
+                                catch (Exception ex) { }
+
+                                if (spList != null)
+                                {
+                                    //Reset flags
+                                    blnAddEvent = false;
+                                    blnDeleteEvent = false;
+                                    blnUpdateEvent = false;
+                                    blnListDeleteEvent = false;
+                                    blnColumnDeleteEvent = false;
+                                    blnColumnAddEvent = false;
+
+                                    foreach (SPEventReceiverDefinition spEventDef in spList.EventReceivers)
                                     {
-                                        blnAddEvent = true;
+                                        if (spEventDef.Type == SPEventReceiverType.ItemAdded &&
+                                            spEventDef.Class.ToLower() == Resources.ClassName.ToLower())
+                                        {
+                                            blnAddEvent = true;
+                                        }
+
+                                        if (spEventDef.Type == SPEventReceiverType.ItemUpdated &&
+                                            spEventDef.Class.ToLower() == Resources.ClassName.ToLower())
+                                        {
+                                            blnUpdateEvent = true;
+                                        }
+
+                                        if (spEventDef.Type == SPEventReceiverType.ItemDeleting &&
+                                            spEventDef.Class.ToLower() == Resources.ClassName.ToLower())
+                                        {
+                                            blnDeleteEvent = true;
+                                        }
+
+                                        //Check for top level rootweb. IF TRUE, THEN check for listdeleting and columndeleting events
+                                        if (spWeb.Url.ToLower() == spSite.RootWeb.Url.ToLower())
+                                        {
+                                            if (spEventDef.Type == SPEventReceiverType.ListDeleting &&
+                                                spEventDef.Class.ToLower() == "EPMLiveReportsAdmin.LstEvents".ToLower())
+                                            {
+                                                blnListDeleteEvent = true;
+                                            }
+
+                                            if (spEventDef.Type == SPEventReceiverType.FieldDeleting &&
+                                                spEventDef.Class.ToLower() == "EPMLiveReportsAdmin.LstEvents".ToLower())
+                                            {
+                                                blnColumnDeleteEvent = true;
+                                            }
+
+                                            if (spEventDef.Type == SPEventReceiverType.FieldAdded &&
+                                                spEventDef.Class.ToLower() == "EPMLiveReportsAdmin.LstEvents".ToLower())
+                                            {
+                                                blnColumnAddEvent = true;
+                                            }
+                                        }
                                     }
 
-                                    if (spEventDef.Type == SPEventReceiverType.ItemUpdated && spEventDef.Class.ToLower() == Resources.ClassName.ToLower())
+                                    if (!blnAddEvent)
                                     {
-                                        blnUpdateEvent = true;
+                                        AddAuditRecord("ItemAdded", _sListName, spWeb.ServerRelativeUrl);
                                     }
 
-                                    if (spEventDef.Type == SPEventReceiverType.ItemDeleting && spEventDef.Class.ToLower() == Resources.ClassName.ToLower())
+                                    if (!blnUpdateEvent)
                                     {
-                                        blnDeleteEvent = true;
+                                        AddAuditRecord("ItemUpdated", _sListName, spWeb.ServerRelativeUrl);
                                     }
 
-                                    //Check for top level rootweb. IF TRUE, THEN check for listdeleting and columndeleting events
+                                    if (!blnDeleteEvent)
+                                    {
+                                        AddAuditRecord("ItemDeleting", _sListName, spWeb.ServerRelativeUrl);
+                                    }
+
+                                    //Check for top level rootweb. 
                                     if (spWeb.Url.ToLower() == spSite.RootWeb.Url.ToLower())
                                     {
-                                        if (spEventDef.Type == SPEventReceiverType.ListDeleting && spEventDef.Class.ToLower() == "EPMLiveReportsAdmin.LstEvents".ToLower())
+                                        if (!blnListDeleteEvent)
                                         {
-                                            blnListDeleteEvent = true;
+                                            AddAuditRecord("ListDeleting", _sListName, spWeb.ServerRelativeUrl);
                                         }
 
-                                        if (spEventDef.Type == SPEventReceiverType.FieldDeleting && spEventDef.Class.ToLower() == "EPMLiveReportsAdmin.LstEvents".ToLower())
+                                        if (!blnColumnDeleteEvent)
                                         {
-                                            blnColumnDeleteEvent = true;
+                                            AddAuditRecord("FieldDeleting", _sListName, spWeb.ServerRelativeUrl);
                                         }
 
-                                        if (spEventDef.Type == SPEventReceiverType.FieldAdded && spEventDef.Class.ToLower() == "EPMLiveReportsAdmin.LstEvents".ToLower())
+                                        if (!blnColumnAddEvent)
                                         {
-                                            blnColumnAddEvent = true;
+                                            AddAuditRecord("FieldAdded", _sListName, spWeb.ServerRelativeUrl);
                                         }
                                     }
                                 }
-
-                                if (!blnAddEvent)
+                                else
                                 {
-                                    AddAuditRecord("ItemAdded", _sListName, spWeb.ServerRelativeUrl);
+                                    //Report "List Not Present" error
+                                    AddAuditRecord("List Not Present.", _sListName, spWeb.ServerRelativeUrl);
                                 }
-
-                                if (!blnUpdateEvent)
-                                {
-                                    AddAuditRecord("ItemUpdated", _sListName, spWeb.ServerRelativeUrl);
-                                }
-
-                                if (!blnDeleteEvent)
-                                {
-                                    AddAuditRecord("ItemDeleting", _sListName, spWeb.ServerRelativeUrl);
-                                }
-
-                                //Check for top level rootweb. 
-                                if (spWeb.Url.ToLower() == spSite.RootWeb.Url.ToLower())
-                                {
-                                    if (!blnListDeleteEvent)
-                                    {
-                                        AddAuditRecord("ListDeleting", _sListName, spWeb.ServerRelativeUrl);
-                                    }
-
-                                    if (!blnColumnDeleteEvent)
-                                    {
-                                        AddAuditRecord("FieldDeleting", _sListName, spWeb.ServerRelativeUrl);
-                                    }
-
-                                    if (!blnColumnAddEvent)
-                                    {
-                                        AddAuditRecord("FieldAdded", _sListName, spWeb.ServerRelativeUrl);
-                                    }
-                                }
+                                spWeb.AllowUnsafeUpdates = false;
                             }
-                            else
-                            {
-                                //Report "List Not Present" error
-                                AddAuditRecord("List Not Present.", _sListName, spWeb.ServerRelativeUrl);
-                            }
-                            spWeb.AllowUnsafeUpdates = false;
                         }
                     }
-                }
-            });
+                });
 
             if (_dtAuditRecs.Rows.Count > 0)
             {
                 grdVwResults.ID = "grdVwResults";
-                grdVwResults.RowCreated += new GridViewRowEventHandler(grdVwResults_RowCreated);
+                grdVwResults.RowCreated += grdVwResults_RowCreated;
                 grdVwResults.DataSource = _dtAuditRecs;
                 grdVwResults.AutoGenerateColumns = false;
                 grdVwResults.DataBind();
@@ -334,41 +340,40 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
             }
             else
             {
-                Label lbl = new Label();
+                var lbl = new Label();
                 lbl.Text = "All webs up to date.";
                 grdVwResults.Visible = false;
                 MasterPage mp = Master;
-                ContentPlaceHolder cph = (ContentPlaceHolder)mp.FindControl("ctl00$PlaceHolderMain");
+                var cph = (ContentPlaceHolder) mp.FindControl("ctl00$PlaceHolderMain");
                 cph.Controls.Add(lbl);
             }
         }
 
-        void grdVwResults_RowCreated(object sender, GridViewRowEventArgs e)
+        private void grdVwResults_RowCreated(object sender, GridViewRowEventArgs e)
         {
-            CheckBox cb_add = new CheckBox();
-            TableCell cell = new TableCell();
+            var cb_add = new CheckBox();
+            var cell = new TableCell();
             HiddenField hdnListName;
             HiddenField hdnWebUrl;
             string sControlId;
-            Image img = new Image();
+            var img = new Image();
 
             if (e.Row.RowType != DataControlRowType.Header && e.Row.RowType != DataControlRowType.Footer)
             {
-
                 cb_add = new CheckBox();
-                e.Row.ID = "row" + e.Row.RowIndex.ToString();
+                e.Row.ID = "row" + e.Row.RowIndex;
 
                 //Initialize control_ids for jsFunc
-                cb_add.ID = "cb_add" + e.Row.RowIndex.ToString();
+                cb_add.ID = "cb_add" + e.Row.RowIndex;
                 cb_add.Checked = false;
 
                 sControlId = "grdVwResults_" + e.Row.ID + "_" + cb_add.ID;
                 cb_add.Text = "Activate";
                 cb_add.Font.Name = "verdana";
                 cb_add.Font.Size = FontUnit.Point(8);
-                cb_add.ForeColor = System.Drawing.Color.Black;
+                cb_add.ForeColor = Color.Black;
                 cb_add.TextAlign = TextAlign.Right;
-                Literal lit = new Literal();
+                var lit = new Literal();
                 lit.Text = "&nbsp;&nbsp;";
                 cell.Controls.Add(lit);
 
@@ -394,7 +399,7 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
                 cb_add.ID = "cb_accept_all";
                 cb_add.Text = "Activate All";
                 cb_add.TextAlign = TextAlign.Right;
-                Literal lit = new Literal();
+                var lit = new Literal();
                 lit.Text = "&nbsp;";
                 e.Row.Cells[3].Controls.Add(lit);
                 e.Row.Cells[3].Controls.Add(cb_add);
@@ -421,7 +426,7 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
 
 
             //grdVwResults = new SPGridView();
-            SPBoundField column = new SPBoundField();
+            var column = new SPBoundField();
             column.HeaderText = "Web url";
             column.DataField = "Web";
             grdVwResults.Columns.Add(column);
@@ -440,7 +445,6 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
             column.HeaderText = "Activate";
             column.DataField = "Activate";
             grdVwResults.Columns.Add(column);
-
         }
     }
 }

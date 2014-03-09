@@ -1,32 +1,25 @@
 ﻿using System;
 using System.Collections;
-using System.Text;
-using EPMLiveReportsAdmin.Properties;
-using Microsoft.SharePoint;
-using System.Data.SqlClient;
-using System.Data;
-using Microsoft.SharePoint.Utilities;
-using Microsoft.SharePoint.WebControls;
-using System.Web.UI.WebControls;
-using EPMLiveCore.Layouts.epmlive;
-using EPMLiveCore;
 using System.Collections.Generic;
+using System.Data;
+using EPMLiveCore;
+using Microsoft.SharePoint;
 
 namespace EPMLiveReportsAdmin
 {
     public class RefreshLists
     {
-        string[] _ArrayListNames;
-        string _sTableName;
-        string _sListNames;
+        private readonly ReportData _DAO;
+        private readonly string _sListNames;
 
-        Guid _siteID;
-        SPWeb _web;
-        ReportData _DAO;
-        DataSet _dsLists;
-        DataSet _dsMyWorkLists;
-        ArrayList _ArrayListTableNames;
-        ArrayList _arrayListdefaultColumns;
+        private readonly SPWeb _web;
+        private string[] _ArrayListNames;
+        private ArrayList _ArrayListTableNames;
+        private ArrayList _arrayListdefaultColumns;
+        private DataSet _dsLists;
+        private DataSet _dsMyWorkLists;
+        private string _sTableName;
+        private Guid _siteID;
 
         public RefreshLists(SPWeb web, string sListNames)
         {
@@ -37,10 +30,7 @@ namespace EPMLiveReportsAdmin
             Initialize(web, sListNames);
         }
 
-        public RefreshLists()
-        {
-
-        }
+        public RefreshLists() { }
 
         private void Initialize(SPWeb web, string sListNames)
         {
@@ -93,6 +83,7 @@ namespace EPMLiveReportsAdmin
                             // we need to refresh work hours 
                             // and resources first because 
                             // SPProcessAssignments depends on data in LSTWorkHours and LSTResources
+
                             #region refresh work hours list
 
                             SPList lworkhours = _web.Lists.TryGetList("Work Hours");
@@ -140,7 +131,8 @@ namespace EPMLiveReportsAdmin
                                             }
                                             else
                                             {
-                                                dr[0]["ResultText"] = dr[0]["ResultText"] + "&nbsp;" + "List not present.";
+                                                dr[0]["ResultText"] = dr[0]["ResultText"] + "&nbsp;" +
+                                                                      "List not present.";
                                             }
                                         }
                                         else
@@ -159,9 +151,7 @@ namespace EPMLiveReportsAdmin
                                 catch (Exception ex)
                                 {
                                     DataRow[] dr = dt.Select("ListName='" + lworkhours.Title + "'");
-                                    if (ex.Message.ToLower().Contains("does not exist at site with url"))
-                                    {
-                                    }
+                                    if (ex.Message.ToLower().Contains("does not exist at site with url")) { }
                                     else
                                     {
                                         if (dr[0]["ResultText"] == null)
@@ -180,6 +170,7 @@ namespace EPMLiveReportsAdmin
                                     _DAO.InsertAllItemsDB(_dsLists, timerjobguid);
                                 }
                             }
+
                             #endregion // refresh work hours list
 
                             #region refresh resources list
@@ -227,7 +218,8 @@ namespace EPMLiveReportsAdmin
                                             }
                                             else
                                             {
-                                                dr[0]["ResultText"] = dr[0]["ResultText"] + "&nbsp;" + "List not present.";
+                                                dr[0]["ResultText"] = dr[0]["ResultText"] + "&nbsp;" +
+                                                                      "List not present.";
                                             }
                                         }
                                         else
@@ -246,9 +238,7 @@ namespace EPMLiveReportsAdmin
                                 catch (Exception ex)
                                 {
                                     DataRow[] dr = dt.Select("ListName='" + lResource.Title + "'");
-                                    if (ex.Message.ToLower().Contains("does not exist at site with url"))
-                                    {
-                                    }
+                                    if (ex.Message.ToLower().Contains("does not exist at site with url")) { }
                                     else
                                     {
                                         if (dr[0]["ResultText"] == null)
@@ -267,12 +257,14 @@ namespace EPMLiveReportsAdmin
                                     _DAO.InsertAllItemsDB(_dsLists, timerjobguid);
                                 }
                             }
+
                             #endregion // refresh work hours list
 
                             #region refresh all
 
-                            List<string> allLists = new List<string>(_sListNames.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries));
-                            List<SPList> allSpLists = new List<SPList>();
+                            var allLists =
+                                new List<string>(_sListNames.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries));
+                            var allSpLists = new List<SPList>();
                             foreach (string l in allLists)
                             {
                                 SPList list = _web.Lists.TryGetList(l);
@@ -290,13 +282,13 @@ namespace EPMLiveReportsAdmin
                                 }
 
                                 _errorListName = list.Title;
-                            
+
                                 //Clear out dataset
                                 _dsLists = new DataSet();
                                 _dsMyWorkLists = new DataSet();
 
                                 // if a mywork list
-                                GridGanttSettings settings = new GridGanttSettings(list);
+                                var settings = new GridGanttSettings(list);
                                 if (settings.EnableWorkList)
                                 {
                                     try
@@ -317,7 +309,8 @@ namespace EPMLiveReportsAdmin
                                                 }
                                                 else
                                                 {
-                                                    dr[0]["ResultText"] = dr[0]["ResultText"] + "&nbsp;" + "List not present.";
+                                                    dr[0]["ResultText"] = dr[0]["ResultText"] + "&nbsp;" +
+                                                                          "List not present.";
                                                 }
                                             }
                                             else
@@ -336,9 +329,7 @@ namespace EPMLiveReportsAdmin
                                     catch (Exception ex)
                                     {
                                         DataRow[] dr = dt.Select("ListName='" + list.Title + "'");
-                                        if (ex.Message.ToLower().Contains("does not exist at site with url"))
-                                        {
-                                        }
+                                        if (ex.Message.ToLower().Contains("does not exist at site with url")) { }
                                         else
                                         {
                                             if (dr[0]["ResultText"] == null)
@@ -384,7 +375,8 @@ namespace EPMLiveReportsAdmin
                                                 }
                                                 else
                                                 {
-                                                    dr[0]["ResultText"] = dr[0]["ResultText"] + "&nbsp;" + "List not present.";
+                                                    dr[0]["ResultText"] = dr[0]["ResultText"] + "&nbsp;" +
+                                                                          "List not present.";
                                                 }
                                             }
                                             else
@@ -399,14 +391,11 @@ namespace EPMLiveReportsAdmin
                                                 }
                                             }
                                         }
-
                                     }
                                     catch (Exception ex)
                                     {
                                         DataRow[] dr = dt.Select("ListName='" + list.Title + "'");
-                                        if (ex.Message.ToLower().Contains("does not exist at site with url"))
-                                        {
-                                        }
+                                        if (ex.Message.ToLower().Contains("does not exist at site with url")) { }
                                         else
                                         {
                                             if (dr[0]["ResultText"] == null)
@@ -425,16 +414,16 @@ namespace EPMLiveReportsAdmin
                                         _DAO.InsertAllItemsDB(_dsLists, timerjobguid);
                                     }
                                 }
-
-
                             }
+
                             #endregion // refresh all lists
 
                             #region refresh security groups for all lists
 
                             try
                             {
-                                ProcessSecurity.ProcessSecurityOnRefreshAll(_web, allSpLists, _DAO.GetClientReportingConnection());
+                                ProcessSecurity.ProcessSecurityOnRefreshAll(_web, allSpLists,
+                                    _DAO.GetClientReportingConnection());
                                 _DAO.LogStatus(
                                     string.Empty,
                                     string.Empty,
@@ -485,7 +474,7 @@ namespace EPMLiveReportsAdmin
                                     _ArrayListTableNames.Add(_sTableName);
 
                                     //Delete items in LSTMyWork associated to this list, then re-add
-                                    GridGanttSettings settings = new GridGanttSettings(spList);
+                                    var settings = new GridGanttSettings(spList);
                                     if (settings.EnableWorkList)
                                     {
                                         _DAO.DeleteMyWork(spList.ID);
@@ -508,7 +497,8 @@ namespace EPMLiveReportsAdmin
                                                     }
                                                     else
                                                     {
-                                                        dr[0]["ResultText"] = dr[0]["ResultText"] + "&nbsp;" + "List not present.";
+                                                        dr[0]["ResultText"] = dr[0]["ResultText"] + "&nbsp;" +
+                                                                              "List not present.";
                                                     }
                                                 }
                                                 else
@@ -527,9 +517,7 @@ namespace EPMLiveReportsAdmin
                                         catch (Exception ex)
                                         {
                                             DataRow[] dr = dt.Select("ListName='" + spList.Title + "'");
-                                            if (ex.Message.ToLower().Contains("does not exist at site with url"))
-                                            {
-                                            }
+                                            if (ex.Message.ToLower().Contains("does not exist at site with url")) { }
                                             else
                                             {
                                                 if (dr[0]["ResultText"] == null)
@@ -570,7 +558,8 @@ namespace EPMLiveReportsAdmin
                                             }
                                             else
                                             {
-                                                dr[0]["ResultText"] = dr[0]["ResultText"] + "&nbsp;" + "List not present.";
+                                                dr[0]["ResultText"] = dr[0]["ResultText"] + "&nbsp;" +
+                                                                      "List not present.";
                                             }
                                         }
                                         else
@@ -585,7 +574,6 @@ namespace EPMLiveReportsAdmin
                                             }
                                         }
                                     }
-
                                 }
                                 catch (Exception ex)
                                 {
@@ -621,15 +609,18 @@ namespace EPMLiveReportsAdmin
                                 {
                                     if (spList != null)
                                     {
-                                        ProcessSecurity.ProcessSecurityOnListRefresh(_web, spList, _DAO.GetClientReportingConnection());
+                                        ProcessSecurity.ProcessSecurityOnListRefresh(_web, spList,
+                                            _DAO.GetClientReportingConnection());
                                         _DAO.LogStatus(
-                                        string.Empty,
-                                        string.Empty,
-                                        "ProcessSecurity processed successfully on list: " + spList.Title + " in web: " + _web.Title,
-                                        "ProcessSecurity processed successfully on list: " + spList.Title + " in web: " + _web.Title,
-                                        0,
-                                        1,
-                                        timerjobguid.ToString());
+                                            string.Empty,
+                                            string.Empty,
+                                            "ProcessSecurity processed successfully on list: " + spList.Title +
+                                            " in web: " + _web.Title,
+                                            "ProcessSecurity processed successfully on list: " + spList.Title +
+                                            " in web: " + _web.Title,
+                                            0,
+                                            1,
+                                            timerjobguid.ToString());
                                     }
                                 }
                                 catch (Exception ex)
@@ -656,12 +647,13 @@ namespace EPMLiveReportsAdmin
                             #endregion
                         }
                     }
-
                 });
             }
             catch (Exception ex)
             {
-                _DAO.LogStatus(string.Empty, string.Empty, "Refresh not completed due to error. Web: " + _web.Title + ". List: " + _errorListName + ". Error: " + ex.Message, ex.StackTrace, 2, 3, timerjobguid.ToString());
+                _DAO.LogStatus(string.Empty, string.Empty,
+                    "Refresh not completed due to error. Web: " + _web.Title + ". List: " + _errorListName + ". Error: " +
+                    ex.Message, ex.StackTrace, 2, 3, timerjobguid.ToString());
             }
 
             _DAO.Dispose();
@@ -684,7 +676,7 @@ namespace EPMLiveReportsAdmin
 
         private void LoadLists()
         {
-            var tbl = _DAO.GetListMappings();
+            DataTable tbl = _DAO.GetListMappings();
             int iIndex = 0;
             _ArrayListNames = new string[tbl.Rows.Count];
             foreach (DataRow row in tbl.Rows)
@@ -697,7 +689,8 @@ namespace EPMLiveReportsAdmin
         private void AddItems(Guid timerjobguid, string sListName, out bool error, out string sErrMsg)
         {
             //init. list datatable
-            DataTable dtList = _DAO.ListItemsDataTable(timerjobguid, _sTableName, _web, sListName, _arrayListdefaultColumns, out error, out sErrMsg);
+            DataTable dtList = _DAO.ListItemsDataTable(timerjobguid, _sTableName, _web, sListName,
+                _arrayListdefaultColumns, out error, out sErrMsg);
             //Assign sql tablename to list
             dtList.TableName = _sTableName;
             //add list to dslists 
@@ -707,7 +700,8 @@ namespace EPMLiveReportsAdmin
         private void AddItems_MyWork(Guid timerjobguid, string sListName, out bool error, out string sErrMsg)
         {
             //init. list datatable
-            DataTable dtList = _DAO.MyWorkListItemsDataTable(timerjobguid, _sTableName, _web, sListName, _arrayListdefaultColumns, out error, out sErrMsg);
+            DataTable dtList = _DAO.MyWorkListItemsDataTable(timerjobguid, _sTableName, _web, sListName,
+                _arrayListdefaultColumns, out error, out sErrMsg);
             //Assign sql tablename to list
             dtList.TableName = _sTableName;
             //add list to _dsMyWorkLists 
@@ -723,7 +717,7 @@ namespace EPMLiveReportsAdmin
             foreach (DataRow dr in dtListResults.Rows)
             {
                 //Select list results from web results by LISTNAME
-                drWebListResult = dtWebResults.Select("ListName='" + dr["ListName"].ToString() + "'");
+                drWebListResult = dtWebResults.Select("ListName='" + dr["ListName"] + "'");
                 sMessage = string.Empty;
 
                 //Checking for any existing error messages for this list from another web.
@@ -736,29 +730,36 @@ namespace EPMLiveReportsAdmin
                 //Check for any list errors (records will ONLY be added to dtWebResults unless there is an error
                 if (drWebListResult != null && drWebListResult.Length > 0)
                 {
-                    if (drWebListResult[0]["ResultText"] != null && drWebListResult[0]["ResultText"].ToString() != string.Empty)
+                    if (drWebListResult[0]["ResultText"] != null &&
+                        drWebListResult[0]["ResultText"].ToString() != string.Empty)
                     {
                         //Adding check here for "Value Does Not Fall Within Expected Range" = List Not Present and is NOT an Level2 Error.
                         if (!drWebListResult[0]["ResultText"].ToString().ToLower().Contains("list not present"))
                         {
                             if (sMessage != string.Empty)
                             {
-                                sMessage = sMessage + "Processing Web: " + webName + " (" + webUrl + ") <br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Failed:<font style='color:red'>" + drWebListResult[0]["ResultText"].ToString() + "</font><br/>";
+                                sMessage = sMessage + "Processing Web: " + webName + " (" + webUrl +
+                                           ") <br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Failed:<font style='color:red'>" +
+                                           drWebListResult[0]["ResultText"] + "</font><br/>";
                             }
                             else
                             {
-                                sMessage = "Processing Web: " + webName + " (" + webUrl + ") <br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Failed:<font style='color:red'>" + drWebListResult[0]["ResultText"].ToString() + "</font><br/>";
+                                sMessage = "Processing Web: " + webName + " (" + webUrl +
+                                           ") <br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Failed:<font style='color:red'>" +
+                                           drWebListResult[0]["ResultText"] + "</font><br/>";
                             }
                         }
                         else
                         {
                             if (sMessage != string.Empty)
                             {
-                                sMessage = sMessage + "Processing Web: " + webName + " (" + webUrl + ") <br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; List not present. <br/>";
+                                sMessage = sMessage + "Processing Web: " + webName + " (" + webUrl +
+                                           ") <br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; List not present. <br/>";
                             }
                             else
                             {
-                                sMessage = "Processing Web: " + webName + " (" + webUrl + ") <br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; List not present. <br/>";
+                                sMessage = "Processing Web: " + webName + " (" + webUrl +
+                                           ") <br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; List not present. <br/>";
                             }
                         }
                     }
@@ -766,11 +767,13 @@ namespace EPMLiveReportsAdmin
                     {
                         if (sMessage != string.Empty)
                         {
-                            sMessage = sMessage + "Processing Web: " + webName + " (" + webUrl + ") <br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; success.<br/>";
+                            sMessage = sMessage + "Processing Web: " + webName + " (" + webUrl +
+                                       ") <br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; success.<br/>";
                         }
                         else
                         {
-                            sMessage = "Processing Web: " + webName + " (" + webUrl + ") <br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; success.<br/>";
+                            sMessage = "Processing Web: " + webName + " (" + webUrl +
+                                       ") <br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; success.<br/>";
                         }
                     }
                     // -- END
@@ -783,7 +786,7 @@ namespace EPMLiveReportsAdmin
 
         public bool SaveResults(DataTable dtResults, Guid timerjobguid)
         {
-            DataTable dtResultsFinal = new DataTable();
+            var dtResultsFinal = new DataTable();
             dtResultsFinal.Columns.Add("RPTListId", Type.GetType("System.Guid"));
             dtResultsFinal.Columns.Add("ListName");
             dtResultsFinal.Columns.Add("ShortMessage");
@@ -795,7 +798,7 @@ namespace EPMLiveReportsAdmin
 
             foreach (DataRow row in dtResults.Rows)
             {
-                int iLevel = GetLevel((string)row["ResultText"]);
+                int iLevel = GetLevel((string) row["ResultText"]);
                 string shortMessage = string.Empty;
                 if (iLevel == 2)
                 {
@@ -807,7 +810,7 @@ namespace EPMLiveReportsAdmin
                 }
                 DataRow resultsFinalRow = dtResultsFinal.NewRow();
                 resultsFinalRow["Level"] = iLevel;
-                var guid = _DAO.GetListId(row["ListName"].ToString());
+                Guid guid = _DAO.GetListId(row["ListName"].ToString());
                 if (guid != Guid.Empty)
                 {
                     resultsFinalRow["RPTListId"] = guid;
@@ -821,7 +824,7 @@ namespace EPMLiveReportsAdmin
                 dtResultsFinal.Rows.Add(resultsFinalRow);
             }
 
-            DataSet ds = new DataSet();
+            var ds = new DataSet();
             dtResultsFinal.TableName = "RPTLog";
             ds.Tables.Add(dtResultsFinal);
             _DAO.BulkInsert(ds, _DAO.GetClientReportingConnection(), timerjobguid);
@@ -835,16 +838,13 @@ namespace EPMLiveReportsAdmin
             {
                 return 2;
             }
-            else
-            {
-                return 0;
-            }
+            return 0;
         }
 
         public DataTable InitializeResultsDT(string sListNames, bool refreshAll)
         {
             DataRow dr;
-            DataTable ListResults = new DataTable();
+            var ListResults = new DataTable();
             List<string> arrayListNames = null;
             ListResults.Columns.Add("ListName");
             ListResults.Columns.Add("ResultText");
@@ -859,8 +859,8 @@ namespace EPMLiveReportsAdmin
                     arrayListNames = new List<string>(sListNames.Split(splitter));
                 }
                 else //Single list
-                {   
-                    arrayListNames = new List<string>{sListNames};
+                {
+                    arrayListNames = new List<string> {sListNames};
                 }
             }
 
@@ -891,15 +891,15 @@ namespace EPMLiveReportsAdmin
         {
             _arrayListdefaultColumns = new ArrayList();
             if (!_arrayListdefaultColumns.Contains("siteid"))
-            _arrayListdefaultColumns.Add("siteid");
+                _arrayListdefaultColumns.Add("siteid");
             if (!_arrayListdefaultColumns.Contains("webid"))
-            _arrayListdefaultColumns.Add("webid");
+                _arrayListdefaultColumns.Add("webid");
             if (!_arrayListdefaultColumns.Contains("listid"))
-            _arrayListdefaultColumns.Add("listid");
+                _arrayListdefaultColumns.Add("listid");
             if (!_arrayListdefaultColumns.Contains("itemid"))
-            _arrayListdefaultColumns.Add("itemid");
+                _arrayListdefaultColumns.Add("itemid");
             if (!_arrayListdefaultColumns.Contains("weburl"))
-            _arrayListdefaultColumns.Add("weburl");
+                _arrayListdefaultColumns.Add("weburl");
         }
     }
 }

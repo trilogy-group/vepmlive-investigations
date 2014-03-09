@@ -1,37 +1,159 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
-using System.Globalization;
+using System.Diagnostics;
 using System.Linq;
-using System.Web.UI.WebControls;
+using System.Reflection;
+using System.Text;
+using System.Web;
+using EPMLiveCore;
 using EPMLiveReportsAdmin.Properties;
 using Microsoft.SharePoint;
-using System.Diagnostics;
-using EPMLiveCore;
-using System.Text;
 
 namespace EPMLiveReportsAdmin
 {
     public class ReportData
     {
         protected readonly string _epmLiveCs;
-        protected SqlParameterCollection _params;
-        protected SqlCommand _cmdWithParams;
         protected readonly Guid _siteId;
-        protected EPMData _DAO;
-        protected string _siteName;
-        protected string _siteUrl;
         protected readonly Guid _webId;
+        protected EPMData _DAO;
+        protected SqlCommand _cmdWithParams;
         protected bool _isReportingV2Enabled = false;
         protected bool _isRootWeb = true;
-        string _sqlError;
+        protected SqlParameterCollection _params;
+        protected string _siteName;
+        protected string _siteUrl;
+        private string _sqlError;
 
-        public void CreateTextFile(string sPath)
+        public ReportData(Guid siteId, Guid webAppId)
         {
-            _DAO.CreateTextFile(sPath);
+            _siteId = siteId;
+            DataRow SAccountInfo = null;
+            _epmLiveCs = CoreFunctions.getConnectionString(webAppId);
+            SAccountInfo = EPMData.SAccountInfo(siteId, webAppId);
+
+            if (SAccountInfo != null)
+            {
+                try
+                {
+                    bool useSA = false;
+                    useSA = (bool) SAccountInfo["SAccount"];
+                    if (useSA) //Use SQL Account
+                    {
+                        _DAO = new EPMData(_siteId, SAccountInfo["DatabaseName"].ToString().Replace("'", ""),
+                            SAccountInfo["DatabaseServer"].ToString().Replace("'", ""), true,
+                            SAccountInfo["Username"].ToString().Replace("'", ""),
+                            EPMData.Decrypt(SAccountInfo["Password"].ToString()).Replace("'", ""));
+                            // - CAT.NET false-positive: All single quotes are escaped/removed.
+                        _siteName = _DAO.SiteName;
+                        _siteUrl = _DAO.SiteUrl;
+                    }
+                    else //Use System Account
+                    {
+                        _DAO = new EPMData(_siteId, webAppId, true);
+                        _siteName = _DAO.SiteName;
+                        _siteUrl = _DAO.SiteUrl;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _DAO = new EPMData(_siteId, webAppId, true);
+                    _siteName = _DAO.SiteName;
+                    _siteUrl = _DAO.SiteUrl;
+                }
+            }
+            else
+            {
+                _DAO = new EPMData(_siteId, webAppId, true);
+                _siteName = _DAO.SiteName;
+                _siteUrl = _DAO.SiteUrl;
+            }
+        }
+
+        public ReportData(Guid siteId)
+        {
+            SPWeb web = null;
+            _siteId = siteId;
+            DataRow SAccountInfo = null;
+
+            using (var site = new SPSite(siteId))
+            {
+                if (SPContext.Current != null)
+                {
+                    if (SPContext.Current.Web.IsRootWeb)
+                        web = site.OpenWeb();
+                    else
+                        web = site.OpenWeb(SPContext.Current.Web.ID);
+                }
+                else
+                    web = site.OpenWeb();
+
+                _webId = web.ID;
+                _isRootWeb = web.IsRootWeb;
+
+                try
+                {
+                    _isReportingV2Enabled =
+                        Convert.ToBoolean(CoreFunctions.getConfigSetting(site.RootWeb, "reportingV2"));
+                }
+                catch (Exception)
+                {
+                    _isReportingV2Enabled = false;
+                    SPContext.Current.Site.RootWeb.AllowUnsafeUpdates = true;
+                    CoreFunctions.setConfigSetting(site.RootWeb, "reportingV2", "false");
+                }
+
+                _epmLiveCs = CoreFunctions.getConnectionString(site.WebApplication.Id);
+                SAccountInfo = EPMData.SAccountInfo(siteId, site.WebApplication.Id);
+                //if(string.IsNullOrEmpty(_epmLiveCs))
+                //_epmLiveCs = ConfigurationManager.ConnectionStrings["epmlive"].ConnectionString.ToString();
+            }
+
+            if (SAccountInfo != null)
+            {
+                try
+                {
+                    bool useSA = false;
+                    useSA = (bool) SAccountInfo["SAccount"];
+                    if (useSA) //Use SQL Account
+                    {
+                        _DAO = new EPMData(_siteId, SAccountInfo["DatabaseName"].ToString().Replace("'", ""),
+                            SAccountInfo["DatabaseServer"].ToString().Replace("'", ""), true,
+                            SAccountInfo["Username"].ToString().Replace("'", ""),
+                            EPMData.Decrypt(SAccountInfo["Password"].ToString()).Replace("'", ""));
+                            // - CAT.NET false-positive: All single quotes are escaped/removed.
+                        _siteName = _DAO.SiteName;
+                        _siteUrl = _DAO.SiteUrl;
+                    }
+                    else //Use System Account
+                    {
+                        _DAO = new EPMData(_siteId);
+                        _siteName = _DAO.SiteName;
+                        _siteUrl = _DAO.SiteUrl;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _DAO = new EPMData(_siteId);
+                    _siteName = _DAO.SiteName;
+                    _siteUrl = _DAO.SiteUrl;
+                }
+            }
+            else
+            {
+                _DAO = new EPMData(_siteId);
+                _siteName = _DAO.SiteName;
+                _siteUrl = _DAO.SiteUrl;
+            }
+        }
+
+        public ReportData(Guid siteId, string name, string server, bool useSAccount, string username, string password)
+        {
+            _siteId = siteId;
+            _DAO = new EPMData(_siteId, name, server, useSAccount, username, password);
         }
 
         public string SiteName
@@ -67,50 +189,20 @@ namespace EPMLiveReportsAdmin
             get { return _siteUrl; }
         }
 
+        public string Command
+        {
+            get { return _DAO.Command; }
+            set { _DAO.Command = value; }
+        }
+
+        public void CreateTextFile(string sPath)
+        {
+            _DAO.CreateTextFile(sPath);
+        }
+
         public void WriteToFile(string sText)
         {
             _DAO.WriteToFile(sText);
-        }
-
-        public ReportData(Guid siteId, Guid webAppId)
-        {
-            _siteId = siteId;
-            DataRow SAccountInfo = null;
-            _epmLiveCs = EPMLiveCore.CoreFunctions.getConnectionString(webAppId);
-            SAccountInfo = EPMData.SAccountInfo(siteId, webAppId);
-
-            if (SAccountInfo != null)
-            {
-                try
-                {
-                    bool useSA = false;
-                    useSA = (bool)SAccountInfo["SAccount"];
-                    if (useSA) //Use SQL Account
-                    {
-                        _DAO = new EPMData(_siteId, SAccountInfo["DatabaseName"].ToString().Replace("'", ""), SAccountInfo["DatabaseServer"].ToString().Replace("'", ""), true, SAccountInfo["Username"].ToString().Replace("'", ""), EPMData.Decrypt(SAccountInfo["Password"].ToString()).Replace("'", "")); // - CAT.NET false-positive: All single quotes are escaped/removed.
-                        _siteName = _DAO.SiteName;
-                        _siteUrl = _DAO.SiteUrl;
-                    }
-                    else //Use System Account
-                    {
-                        _DAO = new EPMData(_siteId, webAppId, true);
-                        _siteName = _DAO.SiteName;
-                        _siteUrl = _DAO.SiteUrl;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    _DAO = new EPMData(_siteId, webAppId, true);
-                    _siteName = _DAO.SiteName;
-                    _siteUrl = _DAO.SiteUrl;
-                }
-            }
-            else
-            {
-                _DAO = new EPMData(_siteId, webAppId, true);
-                _siteName = _DAO.SiteName;
-                _siteUrl = _DAO.SiteUrl;
-            }
         }
 
         public bool DeleteExistingTSData()
@@ -118,88 +210,12 @@ namespace EPMLiveReportsAdmin
             return _DAO.DeleteExistingTSData();
         }
 
-        public ReportData(Guid siteId)
-        {
-            SPWeb web = null;
-            _siteId = siteId;
-            DataRow SAccountInfo = null;
-
-            using (SPSite site = new SPSite(siteId))
-            {
-                if (SPContext.Current != null)
-                {
-                    if (SPContext.Current.Web.IsRootWeb)
-                        web = site.OpenWeb();
-                    else
-                        web = site.OpenWeb(SPContext.Current.Web.ID);
-                }
-                else
-                    web = site.OpenWeb();
-
-                _webId = web.ID;
-                _isRootWeb = web.IsRootWeb;
-
-                try
-                {
-                    _isReportingV2Enabled = Convert.ToBoolean(EPMLiveCore.CoreFunctions.getConfigSetting(site.RootWeb, "reportingV2"));
-                }
-                catch (Exception)
-                {
-                    _isReportingV2Enabled = false;
-                    SPContext.Current.Site.RootWeb.AllowUnsafeUpdates = true;
-                    EPMLiveCore.CoreFunctions.setConfigSetting(site.RootWeb, "reportingV2", "false");
-                }
-
-                _epmLiveCs = EPMLiveCore.CoreFunctions.getConnectionString(site.WebApplication.Id);
-                SAccountInfo = EPMData.SAccountInfo(siteId, site.WebApplication.Id);
-                //if(string.IsNullOrEmpty(_epmLiveCs))
-                //_epmLiveCs = ConfigurationManager.ConnectionStrings["epmlive"].ConnectionString.ToString();
-            }
-
-            if (SAccountInfo != null)
-            {
-                try
-                {
-                    bool useSA = false;
-                    useSA = (bool)SAccountInfo["SAccount"];
-                    if (useSA) //Use SQL Account
-                    {
-                        _DAO = new EPMData(_siteId, SAccountInfo["DatabaseName"].ToString().Replace("'", ""), SAccountInfo["DatabaseServer"].ToString().Replace("'", ""), true, SAccountInfo["Username"].ToString().Replace("'", ""), EPMData.Decrypt(SAccountInfo["Password"].ToString()).Replace("'", "")); // - CAT.NET false-positive: All single quotes are escaped/removed.
-                        _siteName = _DAO.SiteName;
-                        _siteUrl = _DAO.SiteUrl;
-                    }
-                    else //Use System Account
-                    {
-                        _DAO = new EPMData(_siteId);
-                        _siteName = _DAO.SiteName;
-                        _siteUrl = _DAO.SiteUrl;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    _DAO = new EPMData(_siteId);
-                    _siteName = _DAO.SiteName;
-                    _siteUrl = _DAO.SiteUrl;
-                }
-            }
-            else
-            {
-                _DAO = new EPMData(_siteId);
-                _siteName = _DAO.SiteName;
-                _siteUrl = _DAO.SiteUrl;
-            }
-        }
-
-        public ReportData(Guid siteId, string name, string server, bool useSAccount, string username, string password)
-        {
-            _siteId = siteId;
-            _DAO = new EPMData(_siteId, name, server, useSAccount, username, password);
-        }
-
         public DataRow GetSite()
         {
             DataTable dt;
-            _DAO.Command = string.Format("select * from [{0}] where siteid = @SiteId", Resources.DatabaseTable.Replace("'", "")); // - CAT.NET false-positive: All single quotes are escaped/removed.
+            _DAO.Command = string.Format("select * from [{0}] where siteid = @SiteId",
+                Resources.DatabaseTable.Replace("'", ""));
+                // - CAT.NET false-positive: All single quotes are escaped/removed.
             //_DAO.Command = "select * from [@tableName] where siteid = @SiteId";
             //_DAO.AddParam("@tableName", Resources.DatabaseTable);
             _DAO.AddParam("@SiteId", _siteId);
@@ -207,12 +223,6 @@ namespace EPMLiveReportsAdmin
             if (dt.Rows.Count == 0)
                 return null;
             return dt.Rows[0];
-        }
-
-        public string Command
-        {
-            get { return _DAO.Command; }
-            set { _DAO.Command = value; }
         }
 
         public bool ExecuteNonQuery(SqlConnection con)
@@ -230,7 +240,8 @@ namespace EPMLiveReportsAdmin
 
         public bool DatabaseExists()
         {
-            _DAO.Command = string.Format("select db_id('{0}')", _DAO.remoteDbName.Replace("'", "")); // - CAT.NET false-positive: All single quotes are escaped/removed.
+            _DAO.Command = string.Format("select db_id('{0}')", _DAO.remoteDbName.Replace("'", ""));
+                // - CAT.NET false-positive: All single quotes are escaped/removed.
             //_DAO.Command = "select db_id(@dbName)";
             //_DAO.AddParam("@dbName", _DAO.remoteDbName);
             return (_DAO.ExecuteScalar(_DAO.GetMasterDbConnection) != DBNull.Value);
@@ -238,7 +249,11 @@ namespace EPMLiveReportsAdmin
 
         public bool IsReportingDB()
         {
-            string sql = string.Format("IF EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE='BASE TABLE' AND TABLE_NAME='{0}') SELECT 'tablename exists' ELSE SELECT 'tablename does not exist'", Resources.SettingsTable.Replace("'", "")); // - CAT.NET false-positive: All single quotes are escaped/removed.
+            string sql =
+                string.Format(
+                    "IF EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE='BASE TABLE' AND TABLE_NAME='{0}') SELECT 'tablename exists' ELSE SELECT 'tablename does not exist'",
+                    Resources.SettingsTable.Replace("'", ""));
+                // - CAT.NET false-positive: All single quotes are escaped/removed.
             //string sql = "IF EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE='BASE TABLE' AND TABLE_NAME=@tableName) SELECT 'tablename exists' ELSE SELECT 'tablename does not exist'";
             _DAO.Command = sql;
             //_DAO.AddParam("@tableName", Resources.SettingsTable);
@@ -247,15 +262,13 @@ namespace EPMLiveReportsAdmin
             {
                 return true;
             }
-            else
-            {
-                return false;
-            }
+            return false;
         }
 
         public bool TableExists(string tableName)
         {
-            _DAO.Command = string.Format("select object_id('{0}', 'U')", tableName.Replace("'", "")); // - CAT.NET false-positive: All single quotes are escaped/removed.
+            _DAO.Command = string.Format("select object_id('{0}', 'U')", tableName.Replace("'", ""));
+                // - CAT.NET false-positive: All single quotes are escaped/removed.
             //_DAO.Command = "select object_id(@tableName, 'U')";
             //_DAO.AddParam("@tableName", tableName);
             return (_DAO.ExecuteScalar(_DAO.GetClientReportingConnection) != DBNull.Value);
@@ -263,7 +276,8 @@ namespace EPMLiveReportsAdmin
 
         public bool ProcedureExists(string procName)
         {
-            _DAO.Command = string.Format("select object_id('{0}', 'P')", procName.Replace("'", "")); // - CAT.NET false-positive: All single quotes are escaped/removed.
+            _DAO.Command = string.Format("select object_id('{0}', 'P')", procName.Replace("'", ""));
+                // - CAT.NET false-positive: All single quotes are escaped/removed.
             //_DAO.Command = "select object_id(@spName, 'P')";
             //_DAO.AddParam("@spName", procName);
             return (_DAO.ExecuteScalar(_DAO.GetClientReportingConnection) != DBNull.Value);
@@ -276,7 +290,8 @@ namespace EPMLiveReportsAdmin
 
         public bool CreateDatabase()
         {
-            _DAO.Command = string.Format("create database {0}", _DAO.remoteDbName.Replace("'", "")); // - CAT.NET false-positive: All single quotes are escaped/removed.
+            _DAO.Command = string.Format("create database {0}", _DAO.remoteDbName.Replace("'", ""));
+                // - CAT.NET false-positive: All single quotes are escaped/removed.
             //_DAO.Command = "create database @dbName";
             //_DAO.AddParam("@dbName", _DAO.remoteDbName);
             if (_DAO.SqlErrorOccurred)
@@ -296,7 +311,10 @@ namespace EPMLiveReportsAdmin
 
         public DataTable GetTableNames(string tableNameRoot)
         {
-            _DAO.Command = string.Format("select * from INFORMATION_SCHEMA.TABLES where TABLE_NAME like '{0}%' order by TABLE_NAME desc ", tableNameRoot.Replace("'", ""));  // - CAT.NET false-positive: All single quotes are escaped/removed.
+            _DAO.Command =
+                string.Format(
+                    "select * from INFORMATION_SCHEMA.TABLES where TABLE_NAME like '{0}%' order by TABLE_NAME desc ",
+                    tableNameRoot.Replace("'", "")); // - CAT.NET false-positive: All single quotes are escaped/removed.
             //_DAO.Command = "select * from INFORMATION_SCHEMA.TABLES where TABLE_NAME like '[@tableName]%' order by TABLE_NAME desc ";
             //_DAO.AddParam("@tableName", tableNameRoot);
             return _DAO.GetTable(_DAO.GetClientReportingConnection);
@@ -318,12 +336,12 @@ namespace EPMLiveReportsAdmin
             {
                 if (_isReportingV2Enabled && !_isRootWeb)
                 {
-                    tblName = tableName + iTableCount.ToString() + "_" + _webId.ToString().Replace("-", "");
+                    tblName = tableName + iTableCount + "_" + _webId.ToString().Replace("-", "");
                     tableName = tblName;
                 }
                 else
                 {
-                    return tableName + iTableCount.ToString();
+                    return tableName + iTableCount;
                 }
             }
             return tableName;
@@ -335,7 +353,7 @@ namespace EPMLiveReportsAdmin
             //_DAO.Command = "SELECT TableCount FROM RPTSettings WHERE SiteID='" + _siteId.ToString() + "'"; - CAT.NET
             _DAO.Command = "SELECT TableCount FROM RPTSettings WHERE SiteID=@siteId";
             _DAO.AddParam("@siteId", _siteId);
-            iTableCount = (int)_DAO.ExecuteScalar(_DAO.GetClientReportingConnection);
+            iTableCount = (int) _DAO.ExecuteScalar(_DAO.GetClientReportingConnection);
             return iTableCount;
         }
 
@@ -347,7 +365,6 @@ namespace EPMLiveReportsAdmin
 
         public bool CreateTable(string name, List<ColumnDef> columnDefs, bool dropIfExists, out string message)
         {
-
             if (!dropIfExists && TableExists(name))
             {
                 message = "Table already exists.";
@@ -355,7 +372,7 @@ namespace EPMLiveReportsAdmin
             }
 
             var columns = new List<string>();
-            foreach (var columnDef in columnDefs)
+            foreach (ColumnDef columnDef in columnDefs)
             {
                 columns.Add(columnDef.ToString());
             }
@@ -376,14 +393,14 @@ namespace EPMLiveReportsAdmin
             }
             else if (name.ToLower().Equals("lstmyworksnapshot"))
             {
-                foreach (KeyValuePair<string, string> col in new Dictionary<string, string>
-                                                 {
-                                                     {"[WorkType]", "[NVarChar](256) NOT NULL"},
-                                                     {"[DataSource]", "[Int] NULL"},
-                                                     {"[Commenters]", "[NVarChar](MAX) NULL"},
-                                                     {"[CommentersRead]", "[NVarChar](MAX) NULL"},
-                                                     {"[CommentCount]", "[Int] NULL"}
-                                                 }.Where(col => !columns.Exists(c => c.ToLower().StartsWith(col.Key.ToLower()))))
+                foreach (var col in new Dictionary<string, string>
+                {
+                    {"[WorkType]", "[NVarChar](256) NOT NULL"},
+                    {"[DataSource]", "[Int] NULL"},
+                    {"[Commenters]", "[NVarChar](MAX) NULL"},
+                    {"[CommentersRead]", "[NVarChar](MAX) NULL"},
+                    {"[CommentCount]", "[Int] NULL"}
+                }.Where(col => !columns.Exists(c => c.ToLower().StartsWith(col.Key.ToLower()))))
                 {
                     columns.Add(col.Key + col.Value);
                 }
@@ -401,7 +418,8 @@ namespace EPMLiveReportsAdmin
 	                [ListId] ASC,
 	                [ItemId] ASC
                 )WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, 
-                DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]", name, string.Join(", ", columns.ToArray()));
+                DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]", name,
+                    string.Join(", ", columns.ToArray()));
             }
             else if (name.ToLower().EndsWith("snapshot"))
             {
@@ -424,14 +442,14 @@ namespace EPMLiveReportsAdmin
             }
             else if (name.ToLower().Equals("lstmywork"))
             {
-                foreach (KeyValuePair<string, string> col in new Dictionary<string, string>
-                                                 {
-                                                     {"[WorkType]", "[NVarChar](256) NOT NULL"},
-                                                     {"[DataSource]", "[Int] NULL"},
-                                                     {"[Commenters]", "[NVarChar](MAX) NULL"},
-                                                     {"[CommentersRead]", "[NVarChar](MAX) NULL"},
-                                                     {"[CommentCount]", "[Int] NULL"}
-                                                 }.Where(col => !columns.Exists(c => c.ToLower().StartsWith(col.Key.ToLower()))))
+                foreach (var col in new Dictionary<string, string>
+                {
+                    {"[WorkType]", "[NVarChar](256) NOT NULL"},
+                    {"[DataSource]", "[Int] NULL"},
+                    {"[Commenters]", "[NVarChar](MAX) NULL"},
+                    {"[CommentersRead]", "[NVarChar](MAX) NULL"},
+                    {"[CommentCount]", "[Int] NULL"}
+                }.Where(col => !columns.Exists(c => c.ToLower().StartsWith(col.Key.ToLower()))))
                 {
                     columns.Add(col.Key + col.Value);
                 }
@@ -449,7 +467,8 @@ namespace EPMLiveReportsAdmin
 	                [ListId] ASC,
 	                [ItemId] ASC
                 )WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, SORT_IN_TEMPDB = OFF, IGNORE_DUP_KEY = OFF, 
-                DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]", name, string.Join(", ", columns.ToArray()));
+                DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]", name,
+                    string.Join(", ", columns.ToArray()));
             }
             else
             {
@@ -480,7 +499,10 @@ namespace EPMLiveReportsAdmin
 
         public bool DeleteTable(string name)
         {
-            _DAO.Command = string.Format(@"IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[{0}]') AND type in (N'U')) DROP TABLE [{0}] ", name.Replace("'", "")); // - CAT.NET false-positive: All single quotes are escaped/removed.
+            _DAO.Command =
+                string.Format(
+                    @"IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[{0}]') AND type in (N'U')) DROP TABLE [{0}] ",
+                    name.Replace("'", "")); // - CAT.NET false-positive: All single quotes are escaped/removed.
             //_DAO.Command = "IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[@tableName]') AND type in (N'U')) DROP TABLE [@tableName] ";
             //_DAO.AddParam("@tableName", name);
             return _DAO.ExecuteNonQuery(_DAO.GetClientReportingConnection);
@@ -504,7 +526,8 @@ namespace EPMLiveReportsAdmin
                 addcols += columnDef.ToString();
             }
             //epmData.Command = string.Format(@"ALTER TABLE [{0}] ADD {1}", table, addcols);
-            _DAO.Command = string.Format(@"ALTER TABLE [{0}] ADD {1}", table.Replace("'", ""), addcols.Replace("'", "")); // - CAT.NET false-positive: All single quotes are escaped/removed.
+            _DAO.Command = string.Format(@"ALTER TABLE [{0}] ADD {1}", table.Replace("'", ""), addcols.Replace("'", ""));
+                // - CAT.NET false-positive: All single quotes are escaped/removed.
             //_DAO.Command = "ALTER TABLE [@table] ADD {@cols}";
             //_DAO.AddParam("@tableName", table);
             //_DAO.AddParam("@cols", addcols);
@@ -535,7 +558,8 @@ namespace EPMLiveReportsAdmin
                 //}
             }
 
-            _DAO.Command = string.Format(@"ALTER TABLE [{0}] DROP COLUMN {1}", table.Replace("'", ""), addcols.Replace("'", ""));  // - CAT.NET false-positive: All single quotes are escaped/removed.
+            _DAO.Command = string.Format(@"ALTER TABLE [{0}] DROP COLUMN {1}", table.Replace("'", ""),
+                addcols.Replace("'", "")); // - CAT.NET false-positive: All single quotes are escaped/removed.
             //_DAO.Command = "ALTER TABLE [@tableName] DROP COLUMN @cols";
             //_DAO.AddParam("@tableName", table);
             //_DAO.AddParam("@cols", addcols);
@@ -564,7 +588,8 @@ namespace EPMLiveReportsAdmin
                 _DAO.Command = string.Format(
                     @"insert into [{0}]([SiteId],[WebApplicationId],[Url],[DatabaseServer],[DatabaseName], [SAccount]) 
                                       values(@SiteId,@WebApplicationId,@Url,@Server,@Database,@useSAccount)",
-                    Resources.DatabaseTable.Replace("'", "")); // - CAT.NET false-positive: All single quotes are escaped/removed.
+                    Resources.DatabaseTable.Replace("'", ""));
+                    // - CAT.NET false-positive: All single quotes are escaped/removed.
             }
             else
             {
@@ -573,7 +598,8 @@ namespace EPMLiveReportsAdmin
                 _DAO.Command = string.Format(
                     @"insert into [{0}]([SiteId],[WebApplicationId],[Url],[DatabaseServer],[DatabaseName], [SAccount], [UserName], [Password]) 
                                       values(@SiteId,@WebApplicationId,@Url,@Server,@Database,@useSAccount,@username,@password)",
-                    Resources.DatabaseTable.Replace("'", "")); // - CAT.NET false-positive: All single quotes are escaped/removed.
+                    Resources.DatabaseTable.Replace("'", ""));
+                    // - CAT.NET false-positive: All single quotes are escaped/removed.
             }
 
             return _DAO.ExecuteNonQuery(_DAO.GetEPMLiveConnection);
@@ -581,7 +607,9 @@ namespace EPMLiveReportsAdmin
 
         public bool DeleteDbEntry()
         {
-            _DAO.Command = string.Format("delete from [{0}] where SiteId = @SiteId", Resources.DatabaseTable.Replace("'", "")); // - CAT.NET false-positive: All single quotes are escaped/removed.
+            _DAO.Command = string.Format("delete from [{0}] where SiteId = @SiteId",
+                Resources.DatabaseTable.Replace("'", ""));
+                // - CAT.NET false-positive: All single quotes are escaped/removed.
             _DAO.AddParam("@SiteId", _siteId);
             return _DAO.ExecuteNonQuery(_DAO.GetEPMLiveConnection);
         }
@@ -619,26 +647,35 @@ namespace EPMLiveReportsAdmin
 
         public DataTable GetDbMappings()
         {
-            _DAO.Command = string.Format("select distinct * from [{0}]", Resources.DatabaseTable.Replace("'", ""));  // - CAT.NET false-positive: All single quotes are escaped/removed.
+            _DAO.Command = string.Format("select distinct * from [{0}]", Resources.DatabaseTable.Replace("'", ""));
+                // - CAT.NET false-positive: All single quotes are escaped/removed.
             return _DAO.GetTable(_DAO.GetEPMLiveConnection);
         }
 
         public int GetExistingDbCount()
         {
-            _DAO.Command = string.Format(@"select COUNT(r1.SiteId) from [{0}] r1 inner join [{0}] r2 on r1.DatabaseName = r2.DatabaseName and r1.DatabaseServer = r2.DatabaseServer where r2.SiteId = @SiteId", Resources.DatabaseTable.Replace("'", "")); // - CAT.NET false-positive: All single quotes are escaped/removed.
+            _DAO.Command =
+                string.Format(
+                    @"select COUNT(r1.SiteId) from [{0}] r1 inner join [{0}] r2 on r1.DatabaseName = r2.DatabaseName and r1.DatabaseServer = r2.DatabaseServer where r2.SiteId = @SiteId",
+                    Resources.DatabaseTable.Replace("'", ""));
+                // - CAT.NET false-positive: All single quotes are escaped/removed.
             _DAO.AddParam("@SiteId", _siteId);
-            return (int)_DAO.ExecuteScalar(_DAO.GetEPMLiveConnection);
+            return (int) _DAO.ExecuteScalar(_DAO.GetEPMLiveConnection);
         }
 
         public DataTable GetDistinctDbMappings()
         {
-            _DAO.Command = string.Format("select distinct databaseserver, databasename from [{0}]", Resources.DatabaseTable.Replace("'", "")); // - CAT.NET false-positive: All single quotes are escaped/removed.   
+            _DAO.Command = string.Format("select distinct databaseserver, databasename from [{0}]",
+                Resources.DatabaseTable.Replace("'", ""));
+                // - CAT.NET false-positive: All single quotes are escaped/removed.   
             return _DAO.GetTable(_DAO.GetEPMLiveConnection);
         }
 
         public DataTable GetListMappings()
         {
-            _DAO.Command = string.Format("select * from [{0}] where siteId = @SiteId", Resources.ListSummaryView.Replace("'", "")); // - CAT.NET false-positive: All single quotes are escaped/removed.
+            _DAO.Command = string.Format("select * from [{0}] where siteId = @SiteId",
+                Resources.ListSummaryView.Replace("'", ""));
+                // - CAT.NET false-positive: All single quotes are escaped/removed.
             //_DAO.Command = "select * from [@viewName] where siteId = @SiteId";
             //_DAO.AddParam("@viewName", Resources.ListSummaryView);
             _DAO.AddParam("@SiteId", _siteId);
@@ -647,13 +684,16 @@ namespace EPMLiveReportsAdmin
 
         public DataTable GetListMappings(string listIds)
         {
-            _DAO.Command = string.Format("select * from [{0}] where RPTListID IN (" + listIds + ")", Resources.ListSummaryView.Replace("'", ""));
+            _DAO.Command = string.Format("select * from [{0}] where RPTListID IN (" + listIds + ")",
+                Resources.ListSummaryView.Replace("'", ""));
             return _DAO.GetTable(_DAO.GetClientReportingConnection);
         }
 
         public DataRow GetListMapping(Guid listId)
         {
-            _DAO.Command = "select * from [" + Resources.ListSummaryView.Replace("'", "") + "] where siteId = @SiteId and rptlistId = @rptListId"; // - CAT.NET false-positive: All single quotes are escaped/removed.
+            _DAO.Command = "select * from [" + Resources.ListSummaryView.Replace("'", "") +
+                           "] where siteId = @SiteId and rptlistId = @rptListId";
+                // - CAT.NET false-positive: All single quotes are escaped/removed.
             _DAO.AddParam("@SiteId", _siteId);
             _DAO.AddParam("@rptListId", listId);
             return _DAO.GetRow(_DAO.GetClientReportingConnection);
@@ -664,7 +704,7 @@ namespace EPMLiveReportsAdmin
             bool success = false;
             //string sVersion = "''" +  System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString() + "''";
             //string sVersion = "''" + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString() + "''";
-            FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(System.Reflection.Assembly.GetExecutingAssembly().Location);
+            FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location);
             string sVersion = "''" + fvi.FileVersion + "''";
 
             //_DAO.AddParam("@version", sVersion);
@@ -779,7 +819,7 @@ namespace EPMLiveReportsAdmin
             }
             else
             {
-                using (SPSite s = new SPSite(_siteId))
+                using (var s = new SPSite(_siteId))
                 {
                     using (SPWeb w = s.OpenWeb())
                     {
@@ -795,7 +835,8 @@ namespace EPMLiveReportsAdmin
                                        SET [ResourceList] = @ResourceList
                                 WHERE 
                                        RPTListId = @RPTListId
-                            ", Resources.ListTable.Replace("'", "")); // - CAT.NET false-positive: All single quotes are escaped/removed.
+                            ", Resources.ListTable.Replace("'", ""));
+                // - CAT.NET false-positive: All single quotes are escaped/removed.
             if (web != null)
             {
                 web.Close();
@@ -803,12 +844,13 @@ namespace EPMLiveReportsAdmin
             }
 
             return _DAO.ExecuteNonQuery(_DAO.GetClientReportingConnection);
-
         }
 
         public bool DeleteList(Guid listId)
         {
-            _DAO.Command = string.Format("delete from [{0}] where [RPTListId] = @RPTListId ", Resources.ListTable.Replace("'", "")); // - CAT.NET false-positive: All single quotes are escaped/removed.
+            _DAO.Command = string.Format("delete from [{0}] where [RPTListId] = @RPTListId ",
+                Resources.ListTable.Replace("'", ""));
+                // - CAT.NET false-positive: All single quotes are escaped/removed.
             //_DAO.Command = "delete from [@tableName] where [RPTListId] = @RPTListId ";
             _DAO.AddParam("@RPTListId", listId);
             //_DAO.AddParam("@tableName", Resources.ListTable);
@@ -819,7 +861,9 @@ namespace EPMLiveReportsAdmin
         {
             //_DAO.Command = string.Format("delete from [{0}] where [RPTListId] = @RPTListId ", Resources.ColumnTable); - CAT.NET
             //_DAO.AddParam("@tableName", Resources.ColumnTable);
-            _DAO.Command = string.Format("delete from [@tableName] where [RPTListId] = @RPTListId ", Resources.ColumnTable.Replace("'", "")); // - CAT.NET false-positive: All single quotes are escaped/removed.
+            _DAO.Command = string.Format("delete from [@tableName] where [RPTListId] = @RPTListId ",
+                Resources.ColumnTable.Replace("'", ""));
+                // - CAT.NET false-positive: All single quotes are escaped/removed.
             _DAO.AddParam("@RPTListId", listId);
             return _DAO.ExecuteNonQuery(_DAO.GetClientReportingConnection);
         }
@@ -843,7 +887,10 @@ namespace EPMLiveReportsAdmin
                 //}
                 //else
                 //{
-                _DAO.Command = string.Format("delete from [{0}] where [RPTListId] = @RPTListId and ColumnName = @ColumnName ", Resources.ColumnTable.Replace("'", "")); // - CAT.NET false-positive: All single quotes are escaped/removed.               
+                _DAO.Command =
+                    string.Format("delete from [{0}] where [RPTListId] = @RPTListId and ColumnName = @ColumnName ",
+                        Resources.ColumnTable.Replace("'", ""));
+                    // - CAT.NET false-positive: All single quotes are escaped/removed.               
                 _DAO.AddParam("@RPTListId", listId);
                 _DAO.AddParam("@ColumnName", column.SqlColumnName);
                 success = success && _DAO.ExecuteNonQuery(_DAO.GetClientReportingConnection);
@@ -862,7 +909,9 @@ namespace EPMLiveReportsAdmin
 
         public bool DeleteWork(Guid listId)
         {
-            _DAO.Command = string.Format("delete from [{0}] where [ListId] = @ListId ", Resources.WorkTable.Replace("'", "")); // - CAT.NET false-positive: All single quotes are escaped/removed.
+            _DAO.Command = string.Format("delete from [{0}] where [ListId] = @ListId ",
+                Resources.WorkTable.Replace("'", ""));
+                // - CAT.NET false-positive: All single quotes are escaped/removed.
             //_DAO.Command = "delete from [@tableName] where [ListId] = @ListId ";
             _DAO.AddParam("@ListId", listId);
             return _DAO.ExecuteNonQuery(_DAO.GetClientReportingConnection);
@@ -914,7 +963,11 @@ namespace EPMLiveReportsAdmin
 
         public DataTable GetLog(Guid listId, int minimumLevel)
         {
-            _DAO.Command = string.Format("select * from [{0}] where [Type] >= @Level and [RPTListId] = @RPTListId order by TimeStamp desc ", Resources.LogTable.Replace("'", "")); // - CAT.NET false-positive: All single quotes are escaped/removed.
+            _DAO.Command =
+                string.Format(
+                    "select * from [{0}] where [Type] >= @Level and [RPTListId] = @RPTListId order by TimeStamp desc ",
+                    Resources.LogTable.Replace("'", ""));
+                // - CAT.NET false-positive: All single quotes are escaped/removed.
             //_DAO.Command = "select * from [@tableName] where [Type] >= @Level and [RPTListId] = @RPTListId order by TimeStamp desc ";
             //_DAO.AddParam("@tableName", Resources.LogTable);
             _DAO.AddParam("@RPTListId", listId);
@@ -924,16 +977,20 @@ namespace EPMLiveReportsAdmin
 
         public int GetMaximumLogLevel(Guid listId)
         {
-            _DAO.Command = string.Format("select * from [{0}] where [RPTListId] = @RPTListId ", Resources.ListSummaryView.Replace("'", "")); // - CAT.NET false-positive: All single quotes are escaped/removed.
+            _DAO.Command = string.Format("select * from [{0}] where [RPTListId] = @RPTListId ",
+                Resources.ListSummaryView.Replace("'", ""));
+                // - CAT.NET false-positive: All single quotes are escaped/removed.
             //_DAO.Command = "select * from [@viewName] where [RPTListId] = @RPTListId ";
             //_DAO.AddParam("@viewName", Resources.ListSummaryView);
             _DAO.AddParam("@RPTListId", listId);
-            return (int)_DAO.ExecuteScalar(_DAO.GetClientReportingConnection);
+            return (int) _DAO.ExecuteScalar(_DAO.GetClientReportingConnection);
         }
 
         public bool DeleteLog(Guid listId)
         {
-            _DAO.Command = string.Format("delete from [{0}] where [RPTListId] = @RPTListId ", Resources.LogTable.Replace("'", "")); // - CAT.NET false-positive: All single quotes are escaped/removed.
+            _DAO.Command = string.Format("delete from [{0}] where [RPTListId] = @RPTListId ",
+                Resources.LogTable.Replace("'", ""));
+                // - CAT.NET false-positive: All single quotes are escaped/removed.
             //_DAO.Command = "delete from [@tableName] where [RPTListId] = @RPTListId ";
             //_DAO.AddParam("@tableName", Resources.LogTable);
             _DAO.AddParam("@RPTListId", listId);
@@ -942,7 +999,9 @@ namespace EPMLiveReportsAdmin
 
         public bool DeleteLog(Guid listId, int logType)
         {
-            _DAO.Command = string.Format("delete from [{0}] where [RPTListId] = @RPTListId and [Type] = @LogType", Resources.LogTable.Replace("'", "")); // - CAT.NET false-positive: All single quotes are escaped/removed.
+            _DAO.Command = string.Format("delete from [{0}] where [RPTListId] = @RPTListId and [Type] = @LogType",
+                Resources.LogTable.Replace("'", ""));
+                // - CAT.NET false-positive: All single quotes are escaped/removed.
             //_DAO.Command = "delete from [@tableName] where [RPTListId] = @RPTListId and [Type] = @LogType";
             _DAO.AddParam("@RPTListId", listId);
             _DAO.AddParam("@LogType", logType);
@@ -953,7 +1012,9 @@ namespace EPMLiveReportsAdmin
         public string GetTableNameSnapshot(Guid listId)
         {
             object objTableName = null;
-            _DAO.Command = string.Format("SELECT TableNameSnapshot FROM [{0}] WHERE RPTListId= @RPTListId", Resources.ListTable.Replace("'", "")); // - CAT.NET false-positive: All single quotes are escaped/removed.
+            _DAO.Command = string.Format("SELECT TableNameSnapshot FROM [{0}] WHERE RPTListId= @RPTListId",
+                Resources.ListTable.Replace("'", ""));
+                // - CAT.NET false-positive: All single quotes are escaped/removed.
             //_DAO.Command = "SELECT TableNameSnapshot FROM [@tableName] WHERE RPTListId= @RPTListId";
             _DAO.AddParam("@RPTListId", listId);
             //_DAO.AddParam("@tableName", Resources.ListTable);
@@ -971,7 +1032,7 @@ namespace EPMLiveReportsAdmin
 
         public bool InsertTSAllData(DataTable table, out string message)
         {
-            DataSet ds = new DataSet();
+            var ds = new DataSet();
             table.TableName = Resources.TimesheetTable;
             ds.Tables.Add(table);
             _DAO.BulkInsert(ds, _DAO.GetClientReportingConnection, false);
@@ -983,24 +1044,35 @@ namespace EPMLiveReportsAdmin
         public string GetTableName(string listName)
         {
             object objTableName = null;
-            _DAO.Command = "SELECT TableName FROM " + Resources.ListTable.Replace("'", "") + " WHERE ListName=@listName AND SiteId=@siteId"; // - CAT.NET false-positive: All single quotes are escaped/removed.
+            _DAO.Command = "SELECT TableName FROM " + Resources.ListTable.Replace("'", "") +
+                           " WHERE ListName=@listName AND SiteId=@siteId";
+                // - CAT.NET false-positive: All single quotes are escaped/removed.
             _DAO.AddParam("@listName", listName);
             _DAO.AddParam("@siteId", _siteId);
             objTableName = _DAO.ExecuteScalar(_DAO.GetClientReportingConnection);
             return (objTableName != null) ? objTableName.ToString() : string.Empty;
         }
 
-        public virtual string InsertSQL(string sTableName, DataTable dtColumns, SPListItem li, ArrayList arrayList_defaultColumns, ArrayList mandatoryHiddenFlds)
+        public virtual string InsertSQL(string sTableName, DataTable dtColumns, SPListItem li,
+            ArrayList arrayList_defaultColumns, ArrayList mandatoryHiddenFlds)
         {
-            string sSQL = "INSERT INTO " + sTableName.Replace("'", "") + AddColums(li, dtColumns).Replace("'", "") + AddColumnValues(li, dtColumns, arrayList_defaultColumns, mandatoryHiddenFlds, "insert").Replace("'", ""); // - CAT.NET false-positive: All single quotes are escaped/removed.
+            string sSQL = "INSERT INTO " + sTableName.Replace("'", "") + AddColums(li, dtColumns).Replace("'", "") +
+                          AddColumnValues(li, dtColumns, arrayList_defaultColumns, mandatoryHiddenFlds, "insert")
+                              .Replace("'", ""); // - CAT.NET false-positive: All single quotes are escaped/removed.
             return sSQL;
         }
 
-        public virtual string UpdateSQL(string sTableName, DataTable dtColumns, SPListItem li, ArrayList arrayList_defaultColumns, ArrayList mandatoryHiddenFlds)
+        public virtual string UpdateSQL(string sTableName, DataTable dtColumns, SPListItem li,
+            ArrayList arrayList_defaultColumns, ArrayList mandatoryHiddenFlds)
         {
-            string sSQL = "UPDATE " + sTableName.Replace("'", "") + " SET " + AddColumnValues(li, dtColumns, arrayList_defaultColumns, mandatoryHiddenFlds, "update").Replace("'", "") + " WHERE listid='" + li.ParentList.ID.ToString().Replace("'", "") + "' AND itemid=" + li.ID.ToString().Replace("'", "") + " " +
+            string sSQL = "UPDATE " + sTableName.Replace("'", "") + " SET " +
+                          AddColumnValues(li, dtColumns, arrayList_defaultColumns, mandatoryHiddenFlds, "update")
+                              .Replace("'", "") + " WHERE listid='" + li.ParentList.ID.ToString().Replace("'", "") +
+                          "' AND itemid=" + li.ID.ToString().Replace("'", "") + " " +
                           "IF @@ROWCOUNT = 0 " +
-                              "INSERT INTO " + sTableName.Replace("'", "") + AddColums(li, dtColumns).Replace("'", "") + AddColumnValues(li, dtColumns, arrayList_defaultColumns, mandatoryHiddenFlds, "insert").Replace("'", "");
+                          "INSERT INTO " + sTableName.Replace("'", "") + AddColums(li, dtColumns).Replace("'", "") +
+                          AddColumnValues(li, dtColumns, arrayList_defaultColumns, mandatoryHiddenFlds, "insert")
+                              .Replace("'", "");
 
             //string sSQL = "IF EXISTS (SELECT * FROM " + sTableName.Replace("'", "") + "WHERE listid='" + li.ParentList.ID.ToString().Replace("'", "") + "' AND itemid=" + li.ID.ToString().Replace("'", "") + ")" +
             //                "UPDATE " + sTableName.Replace("'", "") + " SET " + AddColumnValues(li, dtColumns, arrayList_defaultColumns, "update").Replace("'", "") + " WHERE listid='" + li.ParentList.ID.ToString().Replace("'", "") + "' AND itemid=" + li.ID.ToString().Replace("'", "") + // - CAT.NET false-positive: All single quotes are escaped/removed.
@@ -1012,18 +1084,20 @@ namespace EPMLiveReportsAdmin
 
         public string DeleteSQL(string sTableName, Guid listid, int itemid)
         {
-            string sSQL = "DELETE FROM " + sTableName.Replace("'", "") + " WHERE listid='" + listid.ToString().Replace("'", "") + "' AND itemid=" + itemid.ToString().Replace("'", ""); // - CAT.NET false-positive: All single quotes are escaped/removed.
+            string sSQL = "DELETE FROM " + sTableName.Replace("'", "") + " WHERE listid='" +
+                          listid.ToString().Replace("'", "") + "' AND itemid=" + itemid.ToString().Replace("'", "");
+                // - CAT.NET false-positive: All single quotes are escaped/removed.
             return sSQL;
         }
 
         public DataTable GetListColumns(string sListName)
         {
-
-            string sSQL = "SELECT dbo.RPTColumn.*, dbo.RPTList.ListName FROM dbo.RPTList INNER JOIN dbo.RPTColumn ON dbo.RPTList.RPTListId = dbo.RPTColumn.RPTListId WHERE (dbo.RPTList.ListName = @listName) AND dbo.RPTList.SiteId=@siteId";
+            string sSQL =
+                "SELECT dbo.RPTColumn.*, dbo.RPTList.ListName FROM dbo.RPTList INNER JOIN dbo.RPTColumn ON dbo.RPTList.RPTListId = dbo.RPTColumn.RPTListId WHERE (dbo.RPTList.ListName = @listName) AND dbo.RPTList.SiteId=@siteId";
             _DAO.Command = sSQL;
             _DAO.AddParam("@listName", sListName);
             _DAO.AddParam("@siteId", _siteId);
-            var dtColumns = _DAO.GetTable(_DAO.GetClientReportingConnection);
+            DataTable dtColumns = _DAO.GetTable(_DAO.GetClientReportingConnection);
             return dtColumns;
         }
 
@@ -1033,32 +1107,37 @@ namespace EPMLiveReportsAdmin
             foreach (DataRow col in columns.Rows)
             {
                 string colName = col["ColumnName"].ToString();
-                string sSQL = "IF (COL_LENGTH ('" + tableName + "', '" + colName + "') IS NOT NULL) BEGIN SELECT 'True' AS [Result] END ELSE BEGIN SELECT 'False' AS [Result] END";
+                string sSQL = "IF (COL_LENGTH ('" + tableName + "', '" + colName +
+                              "') IS NOT NULL) BEGIN SELECT 'True' AS [Result] END ELSE BEGIN SELECT 'False' AS [Result] END";
                 _DAO.Command = sSQL;
                 colExists = bool.Parse(_DAO.ExecuteScalar(_DAO.GetClientReportingConnection).ToString());
 
                 if (!colExists)
                 {
-                    throw new Exception("Column mismatch error: Column " + colName + " exists in RPTColumns table but not in " + tableName + ".");
+                    throw new Exception("Column mismatch error: Column " + colName +
+                                        " exists in RPTColumns table but not in " + tableName + ".");
                 }
             }
         }
 
         public DataTable GetListColumns(Guid listuid)
         {
-
             //string sSQL = "SELECT dbo.RPTColumn.*, dbo.RPTList.ListName FROM dbo.RPTList INNER JOIN dbo.RPTColumn ON dbo.RPTList.RPTListId = dbo.RPTColumn.RPTListId WHERE (dbo.RPTList.RPTListId = '" + listuid.ToString() + "')"; - CAT.NET
-            string sSQL = "SELECT dbo.RPTColumn.*, dbo.RPTList.ListName FROM dbo.RPTList INNER JOIN dbo.RPTColumn ON dbo.RPTList.RPTListId = dbo.RPTColumn.RPTListId WHERE (dbo.RPTList.RPTListId = @listId)"; // - CAT.NET false-positive: All single quotes are escaped/removed.
+            string sSQL =
+                "SELECT dbo.RPTColumn.*, dbo.RPTList.ListName FROM dbo.RPTList INNER JOIN dbo.RPTColumn ON dbo.RPTList.RPTListId = dbo.RPTColumn.RPTListId WHERE (dbo.RPTList.RPTListId = @listId)";
+                // - CAT.NET false-positive: All single quotes are escaped/removed.
             _DAO.Command = sSQL;
             _DAO.AddParam("@listId", listuid);
-            var dtColumns = _DAO.GetTable(_DAO.GetClientReportingConnection);
+            DataTable dtColumns = _DAO.GetTable(_DAO.GetClientReportingConnection);
             return dtColumns;
         }
 
         public bool ListReportsWork(string sTableName)
         {
-            _DAO.Command = "SELECT ResourceList FROM " + Resources.ListTable.Replace("'", "") + " WHERE TableName='" + sTableName.Replace("'", "") + "'"; // - CAT.NET false-positive: All single quotes are escaped/removed.
-            return (bool)_DAO.ExecuteScalar(_DAO.GetClientReportingConnection);
+            _DAO.Command = "SELECT ResourceList FROM " + Resources.ListTable.Replace("'", "") + " WHERE TableName='" +
+                           sTableName.Replace("'", "") + "'";
+                // - CAT.NET false-positive: All single quotes are escaped/removed.
+            return (bool) _DAO.ExecuteScalar(_DAO.GetClientReportingConnection);
         }
 
         public void Dispose()
@@ -1073,7 +1152,8 @@ namespace EPMLiveReportsAdmin
 
         public void ReportError(Guid listid, string sListName, string sErrMsg, string sSection, int iErrType)
         {
-            string sql = "INSERT INTO " + Resources.LogTable.Replace("'", "") + " VALUES(@RPTListID,@ListName,@ShortMsg,@LongMsg,@ErrorType,@Level,@TimeStamp,@timerjobguid)";
+            string sql = "INSERT INTO " + Resources.LogTable.Replace("'", "") +
+                         " VALUES(@RPTListID,@ListName,@ShortMsg,@LongMsg,@ErrorType,@Level,@TimeStamp,@timerjobguid)";
             _DAO.Command = sql;
 
             _DAO.AddParam("@RPTListID", listid);
@@ -1099,12 +1179,14 @@ namespace EPMLiveReportsAdmin
             throw new NotImplementedException();
         }
 
-        public bool LogStatus(string RPTListID, string sListName, string sShortMsg, string sLongMsg, int iLevel, int iType)
+        public bool LogStatus(string RPTListID, string sListName, string sShortMsg, string sLongMsg, int iLevel,
+            int iType)
         {
             return _DAO.LogStatus(RPTListID, sListName, sShortMsg, sLongMsg, iLevel, iType, string.Empty);
         }
 
-        public bool ProcessAssignments(string sWork, string sAssignedTo, object StartDate, object DueDate, Guid ListID, Guid SiteID, int ItemID, string sListName)
+        public bool ProcessAssignments(string sWork, string sAssignedTo, object StartDate, object DueDate, Guid ListID,
+            Guid SiteID, int ItemID, string sListName)
         {
             bool blnProcess = true;
             object objResults = null;
@@ -1185,11 +1267,14 @@ namespace EPMLiveReportsAdmin
             {
                 if (row["SharePointType"] != "Lookup")
                 {
-                    sColums = sColums + "[" + row["ColumnName"].ToString().Replace("'", "") + "],"; // - CAT.NET false-positive: All single quotes are escaped/removed.
+                    sColums = sColums + "[" + row["ColumnName"].ToString().Replace("'", "") + "],";
+                        // - CAT.NET false-positive: All single quotes are escaped/removed.
                 }
                 else
                 {
-                    sColums = sColums + "[" + row["ColumnName"].ToString().Replace("'", "") + "ID], [" + row["ColumnName"].ToString().Replace("'", "") + "Text],"; // - CAT.NET false-positive: All single quotes are escaped/removed.
+                    sColums = sColums + "[" + row["ColumnName"].ToString().Replace("'", "") + "ID], [" +
+                              row["ColumnName"].ToString().Replace("'", "") + "Text],";
+                        // - CAT.NET false-positive: All single quotes are escaped/removed.
                 }
             }
 
@@ -1206,8 +1291,10 @@ namespace EPMLiveReportsAdmin
 
             foreach (DataRow row in dt.Rows)
             {
-                sColumnName = row["ColumnName"].ToString().Replace("'", ""); // - CAT.NET false-positive: All single quotes are escaped/removed.
-                sInternalName = row["InternalName"].ToString().Replace("'", ""); // - CAT.NET false-positive: All single quotes are escaped/removed.
+                sColumnName = row["ColumnName"].ToString().Replace("'", "");
+                    // - CAT.NET false-positive: All single quotes are escaped/removed.
+                sInternalName = row["InternalName"].ToString().Replace("'", "");
+                    // - CAT.NET false-positive: All single quotes are escaped/removed.
 
                 if (item.Fields.ContainsField(sInternalName) ||
                     sColumnName == "SiteId" ||
@@ -1245,12 +1332,14 @@ namespace EPMLiveReportsAdmin
             object objType = null;
             bool blnLookup = false;
             //string sSQL = "SELECT dbo.RPTColumn.SharePointType, dbo.RPTList.ListName FROM dbo.RPTList INNER JOIN dbo.RPTColumn ON dbo.RPTList.RPTListId = dbo.RPTColumn.RPTListId WHERE (dbo.RPTList.ListName = '" + sListName + "') AND (ColumnName='" + sColumnName + "')"; - CAT.NET
-            string sSQL = "SELECT dbo.RPTColumn.SharePointType, dbo.RPTList.ListName FROM dbo.RPTList INNER JOIN dbo.RPTColumn ON dbo.RPTList.RPTListId = dbo.RPTColumn.RPTListId WHERE (dbo.RPTList.ListName = @listName) AND (ColumnName=@colName)";
+            string sSQL =
+                "SELECT dbo.RPTColumn.SharePointType, dbo.RPTList.ListName FROM dbo.RPTList INNER JOIN dbo.RPTColumn ON dbo.RPTList.RPTListId = dbo.RPTColumn.RPTListId WHERE (dbo.RPTList.ListName = @listName) AND (ColumnName=@colName)";
             _DAO.AddParam("@listName", sListName);
             _DAO.AddParam("@colName", sColumnName);
             _DAO.Command = sSQL;
             objType = _DAO.ExecuteScalar(_DAO.GetClientReportingConnection);
-            if (objType.ToString().ToLower() == "lookup" || objType.ToString().ToLower() == "user" || objType.ToString().ToLower() == "multichoice" || objType.ToString().ToLower() == "flookup")
+            if (objType.ToString().ToLower() == "lookup" || objType.ToString().ToLower() == "user" ||
+                objType.ToString().ToLower() == "multichoice" || objType.ToString().ToLower() == "flookup")
             {
                 blnLookup = true;
             }
@@ -1260,19 +1349,20 @@ namespace EPMLiveReportsAdmin
         public static string AddLookUpFieldValues(string sValue, string sValueType)
         {
             string sReturnValue = string.Empty;
-            sValue = System.Web.HttpUtility.HtmlDecode(sValue);
-            SPFieldLookupValueCollection lvc = new SPFieldLookupValueCollection(sValue);
+            sValue = HttpUtility.HtmlDecode(sValue);
+            var lvc = new SPFieldLookupValueCollection(sValue);
             foreach (SPFieldLookupValue lv in lvc)
             {
                 switch (sValueType)
                 {
                     case "id":
-                        sReturnValue += lv.LookupId.ToString() + ",";
+                        sReturnValue += lv.LookupId + ",";
                         break;
                     case "text":
-                        sReturnValue += lv.LookupValue.ToString() + ",";
+                        sReturnValue += lv.LookupValue + ",";
                         break;
-                };
+                }
+                ;
             }
 
             if (sReturnValue == string.Empty && sValueType.ToLower() == "text") //Means lvc conversion failed.
@@ -1306,7 +1396,7 @@ namespace EPMLiveReportsAdmin
                         if (!EventLog.SourceExists("EPMLive Reporting AddLookUpFieldValue"))
                             EventLog.CreateEventSource("EPMLive Reporting AddLookUpFieldValue", "EPM Live");
 
-                        EventLog myLog = new EventLog("EPM Live", ".", "EPMLive Reporting AddLookUpFieldValue");
+                        var myLog = new EventLog("EPM Live", ".", "EPMLive Reporting AddLookUpFieldValue");
                         myLog.MaximumKilobytes = 32768;
                         myLog.WriteEntry(ex.Message + " -- Stack: " + ex.StackTrace, EventLogEntryType.Error, 9000);
                     });
@@ -1327,15 +1417,16 @@ namespace EPMLiveReportsAdmin
 
             try
             {
-                SPFieldMultiChoiceValue mcv = new SPFieldMultiChoiceValue(sValue);
+                var mcv = new SPFieldMultiChoiceValue(sValue);
                 for (int i = 0; i < mcv.Count; i++)
                 {
                     switch (sValueType)
                     {
                         case "text":
-                            sReturnValue += mcv[i].ToString() + ",";
+                            sReturnValue += mcv[i] + ",";
                             break;
-                    };
+                    }
+                    ;
                 }
             }
             catch (Exception ex)
@@ -1345,7 +1436,7 @@ namespace EPMLiveReportsAdmin
                     if (!EventLog.SourceExists("EPMLive Reporting AddMultiChoiceValues"))
                         EventLog.CreateEventSource("EPMLive Reporting AddMultiChoiceValues", "EPM Live");
 
-                    EventLog myLog = new EventLog("EPM Live", ".", "EPMLive Reporting AddMultiChoiceValues");
+                    var myLog = new EventLog("EPM Live", ".", "EPMLive Reporting AddMultiChoiceValues");
                     myLog.MaximumKilobytes = 32768;
                     myLog.WriteEntry(ex.Message + " -- Stack: " + ex.StackTrace, EventLogEntryType.Error, 9000);
                 });
@@ -1359,7 +1450,8 @@ namespace EPMLiveReportsAdmin
             return sReturnValue;
         }
 
-        protected virtual string AddColumnValues(SPListItem li, DataTable dtColumns, ArrayList arrayList_defaultColumns, ArrayList mandatoryHiddenFlds, string sAction)
+        protected virtual string AddColumnValues(SPListItem li, DataTable dtColumns, ArrayList arrayList_defaultColumns,
+            ArrayList mandatoryHiddenFlds, string sAction)
         {
             string sColValues = string.Empty;
             string sColumnName = string.Empty;
@@ -1381,17 +1473,21 @@ namespace EPMLiveReportsAdmin
                 //Create and add parameters for each table column.
                 foreach (DataRow row in dtColumns.Rows)
                 {
-                    sColumnName = row["ColumnName"].ToString().Replace("'", ""); // - CAT.NET false-positive: All single quotes are escaped/removed.
-                    sInternalName = row["InternalName"].ToString().Replace("'", ""); // - CAT.NET false-positive: All single quotes are escaped/removed.
+                    sColumnName = row["ColumnName"].ToString().Replace("'", "");
+                        // - CAT.NET false-positive: All single quotes are escaped/removed.
+                    sInternalName = row["InternalName"].ToString().Replace("'", "");
+                        // - CAT.NET false-positive: All single quotes are escaped/removed.
 
                     //Check for Default Colunms
                     if (arrayList_defaultColumns.Contains(sColumnName.ToLower()))
                     {
-                        param = PopulateDefaultColumnValue(sColumnName.ToLower().Replace("'", ""), li); // - CAT.NET false-positive: All single quotes are escaped/removed.
+                        param = PopulateDefaultColumnValue(sColumnName.ToLower().Replace("'", ""), li);
+                            // - CAT.NET false-positive: All single quotes are escaped/removed.
                     }
                     else if (mandatoryHiddenFlds.Contains(sColumnName.ToLower()))
                     {
-                        param = PopulateMandatoryHiddenFldsColumnValue(sColumnName.ToLower().Replace("'", ""), li); // - CAT.NET false-positive: All single quotes are escaped/removed.
+                        param = PopulateMandatoryHiddenFldsColumnValue(sColumnName.ToLower().Replace("'", ""), li);
+                            // - CAT.NET false-positive: All single quotes are escaped/removed.
                     }
                     else
                     {
@@ -1433,15 +1529,13 @@ namespace EPMLiveReportsAdmin
                                 {
                                     try
                                     {
-                                        param.Value = _DAO.GetCalculatedFieldValue(li, (SPFieldCalculated)field);
+                                        param.Value = _DAO.GetCalculatedFieldValue(li, (SPFieldCalculated) field);
                                     }
                                     catch (Exception ex)
                                     {
                                         param.Value = DBNull.Value;
                                     }
                                 }
-
-
                             }
                             else //Is lookup field and is processed differently.
                             {
@@ -1465,7 +1559,8 @@ namespace EPMLiveReportsAdmin
                                 if (field is SPFieldMultiChoice)
                                 {
                                     //Determine whether it's the "text" or "id" lookup field
-                                    if (sColumnName.ToLower().EndsWith("text") && lookupVal != null) //Means it's the "text" lookup field
+                                    if (sColumnName.ToLower().EndsWith("text") && lookupVal != null)
+                                        //Means it's the "text" lookup field
                                     {
                                         param.Value = AddMultiChoiceValues(lookupVal.ToString(), "text");
                                     }
@@ -1481,7 +1576,8 @@ namespace EPMLiveReportsAdmin
                                 else
                                 {
                                     //Determine whether it's the "text" or "id" lookup field
-                                    if (sColumnName.ToLower().EndsWith("text") && lookupVal != null) //Means it's the "text" lookup field
+                                    if (sColumnName.ToLower().EndsWith("text") && lookupVal != null)
+                                        //Means it's the "text" lookup field
                                     {
                                         param.Value = AddLookUpFieldValues(lookupVal.ToString(), "text");
                                     }
@@ -1504,8 +1600,7 @@ namespace EPMLiveReportsAdmin
                                     li.ParentList.ParentWeb.Site.RootWeb.Lists[li.ParentList.Title].Fields.
                                         GetFieldByInternalName(sInternalName);
                             }
-                            catch
-                            { }
+                            catch { }
 
                             if (field != null)
                             {
@@ -1521,22 +1616,26 @@ namespace EPMLiveReportsAdmin
                     _params.Add(param);
                     if (param.SqlDbType == SqlDbType.Float)
                     {
-                        floatParams = floatParams.Replace("'", "") + param.ParameterName.Replace("'", "") + "=" + param.Value.ToString().Replace("'", "") + "|"; // - CAT.NET false-positive: All single quotes are escaped/removed.
+                        floatParams = floatParams.Replace("'", "") + param.ParameterName.Replace("'", "") + "=" +
+                                      param.Value.ToString().Replace("'", "") + "|";
+                            // - CAT.NET false-positive: All single quotes are escaped/removed.
                     }
 
                     switch (sAction)
                     {
                         case "insert":
                             //Add parameter to sql command text script                
-                            sColValues = sColValues.Replace("'", "") + param.ParameterName.Replace("'", "") + ","; // - CAT.NET false-positive: All single quotes are escaped/removed.
+                            sColValues = sColValues.Replace("'", "") + param.ParameterName.Replace("'", "") + ",";
+                                // - CAT.NET false-positive: All single quotes are escaped/removed.
                             break;
 
                         case "update":
-                            sColValues = sColValues + "[" + sColumnName.Replace("'", "") + "] = " + param.ParameterName.Replace("'", "") + ", "; // - CAT.NET false-positive: All single quotes are escaped/removed.
+                            sColValues = sColValues + "[" + sColumnName.Replace("'", "") + "] = " +
+                                         param.ParameterName.Replace("'", "") + ", ";
+                                // - CAT.NET false-positive: All single quotes are escaped/removed.
                             break;
                     }
                 }
-
             }
             catch (Exception ex)
             {
@@ -1546,9 +1645,11 @@ namespace EPMLiveReportsAdmin
                     if (!EventLog.SourceExists("EPMLive Reporting GetColumnValue"))
                         EventLog.CreateEventSource("EPMLive Reporting GetColumnValue", "EPM Live");
 
-                    EventLog myLog = new EventLog("EPM Live", ".", "EPMLive Reporting GetColumnValue");
+                    var myLog = new EventLog("EPM Live", ".", "EPMLive Reporting GetColumnValue");
                     myLog.MaximumKilobytes = 32768;
-                    myLog.WriteEntry("Name: " + _siteName + " Url: " + _siteUrl + " ID: " + _siteId.ToString() + " : " + ex.Message + " ColumnName: " + sColumnName + " InternalName: " + sInternalName, EventLogEntryType.Error, 9000);
+                    myLog.WriteEntry(
+                        "Name: " + _siteName + " Url: " + _siteUrl + " ID: " + _siteId + " : " + ex.Message +
+                        " ColumnName: " + sColumnName + " InternalName: " + sInternalName, EventLogEntryType.Error, 9000);
                 });
             }
 
@@ -1579,12 +1680,12 @@ namespace EPMLiveReportsAdmin
             _DAO.AddParam("@listName", sListName);
             _DAO.AddParam("@siteId", _siteId);
             object val = _DAO.ExecuteScalar(_DAO.GetClientReportingConnection);
-            return (val != null) ? (Guid)val : Guid.Empty;
+            return (val != null) ? (Guid) val : Guid.Empty;
         }
 
         protected virtual SqlParameter PopulateDefaultColumnValue(string sColumn, SPListItem li)
         {
-            SqlParameter param = new SqlParameter();
+            var param = new SqlParameter();
             switch (sColumn)
             {
                 case "siteid":
@@ -1628,8 +1729,8 @@ namespace EPMLiveReportsAdmin
 
         protected virtual SqlParameter PopulateMandatoryHiddenFldsColumnValue(string sColumn, SPListItem li)
         {
-            SqlParameter param = new SqlParameter();
-            var val = string.Empty;
+            var param = new SqlParameter();
+            string val = string.Empty;
 
             switch (sColumn)
             {
@@ -1643,7 +1744,10 @@ namespace EPMLiveReportsAdmin
                         val = li["Commenters"].ToString();
                         param.Value = val;
                     }
-                    catch { param.Value = DBNull.Value; }
+                    catch
+                    {
+                        param.Value = DBNull.Value;
+                    }
                     break;
 
                 case "commentcount":
@@ -1655,7 +1759,10 @@ namespace EPMLiveReportsAdmin
                         val = li["CommentCount"].ToString();
                         param.Value = Convert.ToInt32(val);
                     }
-                    catch { param.Value = DBNull.Value; }
+                    catch
+                    {
+                        param.Value = DBNull.Value;
+                    }
                     break;
 
                 case "commentersread":
@@ -1668,7 +1775,10 @@ namespace EPMLiveReportsAdmin
                         val = li["CommentersRead"].ToString();
                         param.Value = val;
                     }
-                    catch { param.Value = DBNull.Value; }
+                    catch
+                    {
+                        param.Value = DBNull.Value;
+                    }
                     break;
 
                 case "workspaceurl":
@@ -1681,7 +1791,10 @@ namespace EPMLiveReportsAdmin
                         val = li["WorkspaceUrl"].ToString();
                         param.Value = val;
                     }
-                    catch { param.Value = DBNull.Value; }
+                    catch
+                    {
+                        param.Value = DBNull.Value;
+                    }
                     break;
             }
             return param;
@@ -1689,7 +1802,7 @@ namespace EPMLiveReportsAdmin
 
         public static SqlParameter GetParam(SPField field, string sColumnName)
         {
-            SqlParameter param = new SqlParameter();
+            var param = new SqlParameter();
             SPFieldType type = field.Type;
             string sType = field.TypeAsString.ToLower();
 
@@ -1868,7 +1981,7 @@ namespace EPMLiveReportsAdmin
                     oValue = li.ParentList.ID;
                     blnGuid = true;
                     break;
-                //Old implementation will be removed.
+                    //Old implementation will be removed.
                 case "listid":
                     oValue = li.ParentList.ID;
                     blnGuid = true;
@@ -1885,9 +1998,10 @@ namespace EPMLiveReportsAdmin
             return oValue;
         }
 
-        public DataTable ListItemsDataTable(Guid timerjobguid, string sTableName, SPWeb spWeb, string sListName, ArrayList _arrayListDefaultColumns, out bool error, out string errMsg)
+        public DataTable ListItemsDataTable(Guid timerjobguid, string sTableName, SPWeb spWeb, string sListName,
+            ArrayList _arrayListDefaultColumns, out bool error, out string errMsg)
         {
-            DataTable dtItems = new DataTable();
+            var dtItems = new DataTable();
             DataTable dtColumns = GetListColumns(sListName);
             SPList spList = null;
             DataRow itemRow;
@@ -1948,14 +2062,18 @@ namespace EPMLiveReportsAdmin
                         errColumnName = column["ColumnName"].ToString();
                         if (spList.Fields.ContainsField(column["internalname"].ToString()))
                         {
-                            if (column["SharepointType"].ToString().ToLower() == "lookup" || column["SharepointType"].ToString().ToLower() == "user" || column["SharepointType"].ToString().ToLower() == "multichoice")
+                            if (column["SharepointType"].ToString().ToLower() == "lookup" ||
+                                column["SharepointType"].ToString().ToLower() == "user" ||
+                                column["SharepointType"].ToString().ToLower() == "multichoice")
                             {
                                 if (column["ColumnName"].ToString().ToLower().EndsWith("text"))
                                 {
                                     if (ItemHasValue(item, column["internalname"].ToString()))
-                                    //if (item[column["internalname"].ToString()] != null)
+                                        //if (item[column["internalname"].ToString()] != null)
                                     {
-                                        itemRow[column["ColumnName"].ToString()] = AddLookUpFieldValues(item[column["internalname"].ToString()].ToString(), "text");
+                                        itemRow[column["ColumnName"].ToString()] =
+                                            AddLookUpFieldValues(item[column["internalname"].ToString()].ToString(),
+                                                "text");
                                     }
                                     else
                                     {
@@ -1965,10 +2083,12 @@ namespace EPMLiveReportsAdmin
                                 else if (column["ColumnName"].ToString().ToLower().EndsWith("id"))
                                 {
                                     if (ItemHasValue(item, column["internalname"].ToString()))
-                                    //if (item[column["internalname"].ToString()] != null)
+                                        //if (item[column["internalname"].ToString()] != null)
                                     {
                                         int iResult;
-                                        string sInt = AddLookUpFieldValues(item[column["internalname"].ToString()].ToString(), "id");
+                                        string sInt =
+                                            AddLookUpFieldValues(item[column["internalname"].ToString()].ToString(),
+                                                "id");
                                         if (int.TryParse(sInt, out iResult))
                                         {
                                             itemRow[column["ColumnName"].ToString()] = sInt;
@@ -1986,7 +2106,7 @@ namespace EPMLiveReportsAdmin
                                 {
                                     field = item.Fields.GetFieldByInternalName(column["columnname"].ToString());
                                     if (ItemHasValue(item, field.InternalName))
-                                    //if (item[field.InternalName] != null)
+                                        //if (item[field.InternalName] != null)
                                     {
                                         try
                                         {
@@ -1996,7 +2116,8 @@ namespace EPMLiveReportsAdmin
                                             }
                                             else
                                             {
-                                                itemRow[column["ColumnName"].ToString()] = _DAO.GetCalculatedFieldValue(item, (SPFieldCalculated)field);
+                                                itemRow[column["ColumnName"].ToString()] =
+                                                    _DAO.GetCalculatedFieldValue(item, (SPFieldCalculated) field);
                                             }
                                         }
                                         catch (Exception ex)
@@ -2018,7 +2139,7 @@ namespace EPMLiveReportsAdmin
                             obj = GetDefaultColumnValue(column["ColumnName"].ToString().ToLower(), item, out blnGuid);
                             if (blnGuid && obj != null)
                             {
-                                Guid id = (Guid)obj;
+                                var id = (Guid) obj;
                                 itemRow[column["ColumnName"].ToString()] = id;
                             }
                             else if (obj != null)
@@ -2048,15 +2169,16 @@ namespace EPMLiveReportsAdmin
                 //_DAO.LogStatus(_DAO.GetListId(spList.Title).ToString(), spList.Title, spWeb.Name + " (" + spWeb.ServerRelativeUrl + ") - Processed with errors.", ex.Message + " -- Stack: " + ex.StackTrace, 2, 3, tjb.ToString());
                 //_DAO.LogStatus(_DAO.GetListId(sListName).ToString(), sListName, "Error on Refresh.", ex.Message, 2, 3, timerjobguid.ToString());            
                 error = true;
-                errMsg = ex.Message + "[LOCATION INFO] - ItemTitle: " + errItemTitle + ", ItemId: " + errItemID + ", ColumnName: " + errColumnName + ".";
-
+                errMsg = ex.Message + "[LOCATION INFO] - ItemTitle: " + errItemTitle + ", ItemId: " + errItemID +
+                         ", ColumnName: " + errColumnName + ".";
             }
             return dtItems;
         }
 
-        public DataTable MyWorkListItemsDataTable(Guid timerjobguid, string sTableName, SPWeb spWeb, string sListName, ArrayList _arrayListDefaultColumns, out bool error, out string errMsg)
+        public DataTable MyWorkListItemsDataTable(Guid timerjobguid, string sTableName, SPWeb spWeb, string sListName,
+            ArrayList _arrayListDefaultColumns, out bool error, out string errMsg)
         {
-            DataTable dtItems = new DataTable();
+            var dtItems = new DataTable();
             DataTable dtColumns = GetListColumns("My Work");
             dtColumns = AddMetaInfoCols(dtColumns);
             SPList spList = null;
@@ -2117,15 +2239,15 @@ namespace EPMLiveReportsAdmin
                     if (spFieldCollection.ContainsFieldWithInternalName("AssignedTo") && item["AssignedTo"] != null)
                     {
                         var spFieldUserValueCollection = new SPFieldUserValueCollection(item.Web,
-                                                                                        item["AssignedTo"].ToString());
+                            item["AssignedTo"].ToString());
 
                         int totalAssignedToUsers = spFieldUserValueCollection.Count;
 
                         if (spFieldCollection.ContainsFieldWithInternalName("Work"))
                         {
                             var stringBuilder = new StringBuilder();
-                            var originalWork = item["Work"] == null ? DBNull.Value : item["Work"];
-                            var originalUser = item["AssignedTo"].ToString();
+                            object originalWork = item["Work"] == null ? DBNull.Value : item["Work"];
+                            string originalUser = item["AssignedTo"].ToString();
                             item["AssignedTo"] = "-99;#";
 
                             #region Adding Summary Row
@@ -2139,17 +2261,22 @@ namespace EPMLiveReportsAdmin
                             {
                                 errColumnName = column["ColumnName"].ToString();
                                 if (spList.Fields.ContainsField(column["internalname"].ToString()) &&
-                                    spList.Fields.GetFieldByInternalName(column["internalname"].ToString()).Type.ToString().ToLower() == column["SharepointType"].ToString().ToLower())
+                                    spList.Fields.GetFieldByInternalName(column["internalname"].ToString())
+                                        .Type.ToString()
+                                        .ToLower() == column["SharepointType"].ToString().ToLower())
                                 {
-                                    if (column["SharepointType"].ToString().ToLower() == "lookup" || column["SharepointType"].ToString().ToLower() == "user" || column["SharepointType"].ToString().ToLower() == "multichoice")
+                                    if (column["SharepointType"].ToString().ToLower() == "lookup" ||
+                                        column["SharepointType"].ToString().ToLower() == "user" ||
+                                        column["SharepointType"].ToString().ToLower() == "multichoice")
                                     {
-
                                         if (column["ColumnName"].ToString().ToLower().EndsWith("text"))
                                         {
                                             if (ItemHasValue(item, column["internalname"].ToString()))
-                                            //if (item[column["internalname"].ToString()] != null)
+                                                //if (item[column["internalname"].ToString()] != null)
                                             {
-                                                itemRow[column["ColumnName"].ToString()] = AddLookUpFieldValues(item[column["internalname"].ToString()].ToString(), "text");
+                                                itemRow[column["ColumnName"].ToString()] =
+                                                    AddLookUpFieldValues(
+                                                        item[column["internalname"].ToString()].ToString(), "text");
                                             }
                                             else
                                             {
@@ -2159,9 +2286,11 @@ namespace EPMLiveReportsAdmin
                                         else if (column["ColumnName"].ToString().ToLower().EndsWith("id"))
                                         {
                                             if (ItemHasValue(item, column["internalname"].ToString()))
-                                            //if (item[column["internalname"].ToString()] != null)
+                                                //if (item[column["internalname"].ToString()] != null)
                                             {
-                                                itemRow[column["ColumnName"].ToString()] = AddLookUpFieldValues(item[column["internalname"].ToString()].ToString(), "id");
+                                                itemRow[column["ColumnName"].ToString()] =
+                                                    AddLookUpFieldValues(
+                                                        item[column["internalname"].ToString()].ToString(), "id");
                                             }
                                             else
                                             {
@@ -2171,21 +2300,24 @@ namespace EPMLiveReportsAdmin
                                     }
                                     else
                                     {
-                                        if (!_arrayListDefaultColumns.Contains(column["ColumnName"].ToString().ToLower()))
+                                        if (
+                                            !_arrayListDefaultColumns.Contains(column["ColumnName"].ToString().ToLower()))
                                         {
                                             field = item.Fields.GetFieldByInternalName(column["columnname"].ToString());
                                             if (ItemHasValue(item, field.InternalName))
-                                            //if (item[field.InternalName] != null)
+                                                //if (item[field.InternalName] != null)
                                             {
                                                 try
                                                 {
                                                     if (field.Type != SPFieldType.Calculated)
                                                     {
-                                                        itemRow[column["ColumnName"].ToString()] = item[field.InternalName];
+                                                        itemRow[column["ColumnName"].ToString()] =
+                                                            item[field.InternalName];
                                                     }
                                                     else
                                                     {
-                                                        itemRow[column["ColumnName"].ToString()] = _DAO.GetCalculatedFieldValue(item, (SPFieldCalculated)field);
+                                                        itemRow[column["ColumnName"].ToString()] =
+                                                            _DAO.GetCalculatedFieldValue(item, (SPFieldCalculated) field);
                                                     }
                                                 }
                                                 catch (Exception ex)
@@ -2204,10 +2336,11 @@ namespace EPMLiveReportsAdmin
                                 {
                                     bool blnGuid;
                                     object obj;
-                                    obj = GetDefaultColumnValue(column["ColumnName"].ToString().ToLower(), item, out blnGuid);
+                                    obj = GetDefaultColumnValue(column["ColumnName"].ToString().ToLower(), item,
+                                        out blnGuid);
                                     if (blnGuid && obj != null)
                                     {
-                                        Guid id = (Guid)obj;
+                                        var id = (Guid) obj;
                                         itemRow[column["ColumnName"].ToString()] = id;
                                     }
                                     else if (obj != null)
@@ -2226,7 +2359,7 @@ namespace EPMLiveReportsAdmin
 
                             if (double.TryParse(originalWork.ToString(), out tempHours))
                             {
-                                hours = tempHours / totalAssignedToUsers;
+                                hours = tempHours/totalAssignedToUsers;
                             }
                             else
                             {
@@ -2247,16 +2380,22 @@ namespace EPMLiveReportsAdmin
                                 foreach (DataRow column in dtColumns.Rows)
                                 {
                                     if (spList.Fields.ContainsField(column["internalname"].ToString()) &&
-                                        spList.Fields.GetFieldByInternalName(column["internalname"].ToString()).Type.ToString().ToLower() == column["SharepointType"].ToString().ToLower())
+                                        spList.Fields.GetFieldByInternalName(column["internalname"].ToString())
+                                            .Type.ToString()
+                                            .ToLower() == column["SharepointType"].ToString().ToLower())
                                     {
-                                        if (column["SharepointType"].ToString().ToLower() == "lookup" || column["SharepointType"].ToString().ToLower() == "user" || column["SharepointType"].ToString().ToLower() == "multichoice")
+                                        if (column["SharepointType"].ToString().ToLower() == "lookup" ||
+                                            column["SharepointType"].ToString().ToLower() == "user" ||
+                                            column["SharepointType"].ToString().ToLower() == "multichoice")
                                         {
                                             if (column["ColumnName"].ToString().ToLower().EndsWith("text"))
                                             {
                                                 if (ItemHasValue(item, column["internalname"].ToString()))
-                                                //if (item[column["internalname"].ToString()] != null)
+                                                    //if (item[column["internalname"].ToString()] != null)
                                                 {
-                                                    itemRow[column["ColumnName"].ToString()] = AddLookUpFieldValues(item[column["internalname"].ToString()].ToString(), "text");
+                                                    itemRow[column["ColumnName"].ToString()] =
+                                                        AddLookUpFieldValues(
+                                                            item[column["internalname"].ToString()].ToString(), "text");
                                                 }
                                                 else
                                                 {
@@ -2266,9 +2405,11 @@ namespace EPMLiveReportsAdmin
                                             else if (column["ColumnName"].ToString().ToLower().EndsWith("id"))
                                             {
                                                 if (ItemHasValue(item, column["internalname"].ToString()))
-                                                //if (item[column["internalname"].ToString()] != null)
+                                                    //if (item[column["internalname"].ToString()] != null)
                                                 {
-                                                    itemRow[column["ColumnName"].ToString()] = AddLookUpFieldValues(item[column["internalname"].ToString()].ToString(), "id");
+                                                    itemRow[column["ColumnName"].ToString()] =
+                                                        AddLookUpFieldValues(
+                                                            item[column["internalname"].ToString()].ToString(), "id");
                                                 }
                                                 else
                                                 {
@@ -2278,21 +2419,27 @@ namespace EPMLiveReportsAdmin
                                         }
                                         else
                                         {
-                                            if (!_arrayListDefaultColumns.Contains(column["ColumnName"].ToString().ToLower()))
+                                            if (
+                                                !_arrayListDefaultColumns.Contains(
+                                                    column["ColumnName"].ToString().ToLower()))
                                             {
-                                                field = item.Fields.GetFieldByInternalName(column["columnname"].ToString());
+                                                field =
+                                                    item.Fields.GetFieldByInternalName(column["columnname"].ToString());
                                                 if (ItemHasValue(item, field.InternalName))
-                                                //if (item[field.InternalName] != null)
+                                                    //if (item[field.InternalName] != null)
                                                 {
                                                     try
                                                     {
                                                         if (field.Type != SPFieldType.Calculated)
                                                         {
-                                                            itemRow[column["ColumnName"].ToString()] = item[field.InternalName];
+                                                            itemRow[column["ColumnName"].ToString()] =
+                                                                item[field.InternalName];
                                                         }
                                                         else
                                                         {
-                                                            itemRow[column["ColumnName"].ToString()] = _DAO.GetCalculatedFieldValue(item, (SPFieldCalculated)field);
+                                                            itemRow[column["ColumnName"].ToString()] =
+                                                                _DAO.GetCalculatedFieldValue(item,
+                                                                    (SPFieldCalculated) field);
                                                         }
                                                     }
                                                     catch (Exception ex)
@@ -2311,10 +2458,11 @@ namespace EPMLiveReportsAdmin
                                     {
                                         bool blnGuid;
                                         object obj;
-                                        obj = GetDefaultColumnValue(column["ColumnName"].ToString().ToLower(), item, out blnGuid);
+                                        obj = GetDefaultColumnValue(column["ColumnName"].ToString().ToLower(), item,
+                                            out blnGuid);
                                         if (blnGuid && obj != null)
                                         {
-                                            Guid id = (Guid)obj;
+                                            var id = (Guid) obj;
                                             itemRow[column["ColumnName"].ToString()] = id;
                                         }
                                         else if (obj != null)
@@ -2336,7 +2484,6 @@ namespace EPMLiveReportsAdmin
                         {
                             _DAO.SaveWork(item);
                         }
-
                     }
                 }
             }
@@ -2358,8 +2505,8 @@ namespace EPMLiveReportsAdmin
                 //_DAO.LogStatus(_DAO.GetListId(spList.Title).ToString(), spList.Title, spWeb.Name + " (" + spWeb.ServerRelativeUrl + ") - Processed with errors.", ex.Message + " -- Stack: " + ex.StackTrace, 2, 3, tjb.ToString());
                 //_DAO.LogStatus(_DAO.GetListId(sListName).ToString(), sListName, "Error on Refresh.", ex.Message, 2, 3, timerjobguid.ToString());            
                 error = true;
-                errMsg = ex.Message + "[LOCATION INFO] - ItemTitle: " + errItemTitle + ", ItemId: " + errItemID + ", ColumnName: " + errColumnName + ".";
-
+                errMsg = ex.Message + "[LOCATION INFO] - ItemTitle: " + errItemTitle + ", ItemId: " + errItemID +
+                         ", ColumnName: " + errColumnName + ".";
             }
             return dtItems;
         }
@@ -2372,8 +2519,8 @@ namespace EPMLiveReportsAdmin
                 string listId = dt.Rows[0]["RPTListId"].ToString();
 
                 List<DataRow> dataSourceRows = (from DataRow r in dt.Rows
-                                                where r["ColumnName"].ToString() == "DataSource"
-                                                select r).ToList<DataRow>();
+                    where r["ColumnName"].ToString() == "DataSource"
+                    select r).ToList<DataRow>();
 
                 if (dataSourceRows.Count == 0)
                 {
@@ -2381,8 +2528,8 @@ namespace EPMLiveReportsAdmin
                 }
 
                 List<DataRow> worktypeRows = (from DataRow r in dt.Rows
-                                              where r["ColumnName"].ToString() == "WorkType"
-                                              select r).ToList<DataRow>();
+                    where r["ColumnName"].ToString() == "WorkType"
+                    select r).ToList<DataRow>();
 
                 if (worktypeRows.Count == 0)
                 {
@@ -2390,8 +2537,8 @@ namespace EPMLiveReportsAdmin
                 }
 
                 List<DataRow> commentersRows = (from DataRow r in dt.Rows
-                                                where r["ColumnName"].ToString() == "Commenters"
-                                                select r).ToList<DataRow>();
+                    where r["ColumnName"].ToString() == "Commenters"
+                    select r).ToList<DataRow>();
 
                 if (commentersRows.Count == 0)
                 {
@@ -2399,17 +2546,18 @@ namespace EPMLiveReportsAdmin
                 }
 
                 List<DataRow> commentersReadRows = (from DataRow r in dt.Rows
-                                                    where r["ColumnName"].ToString() == "CommentersRead"
-                                                    select r).ToList<DataRow>();
+                    where r["ColumnName"].ToString() == "CommentersRead"
+                    select r).ToList<DataRow>();
 
                 if (commentersRows.Count == 0)
                 {
-                    result.Rows.Add(listId, "CommentersRead", "NVarChar", "8001", "Text", "CommentersRead", "CommentersRead");
+                    result.Rows.Add(listId, "CommentersRead", "NVarChar", "8001", "Text", "CommentersRead",
+                        "CommentersRead");
                 }
 
                 List<DataRow> commentersCountRows = (from DataRow r in dt.Rows
-                                                     where r["ColumnName"].ToString() == "CommentCount"
-                                                     select r).ToList<DataRow>();
+                    where r["ColumnName"].ToString() == "CommentCount"
+                    select r).ToList<DataRow>();
 
                 if (commentersRows.Count == 0)
                 {
@@ -2440,7 +2588,8 @@ namespace EPMLiveReportsAdmin
             return _DAO.LogStatus(RPTListID.ToString(), sListName, sShortMsg, sLongMsg, iLevel, iType, string.Empty);
         }
 
-        public bool LogStatus(string RPTListID, string sListName, string sShortMsg, string sLongMsg, int iLevel, int iType, string timerjobguid)
+        public bool LogStatus(string RPTListID, string sListName, string sShortMsg, string sLongMsg, int iLevel,
+            int iType, string timerjobguid)
         {
             return _DAO.LogStatus(RPTListID, sListName, sShortMsg, sLongMsg, iLevel, iType, timerjobguid);
         }
@@ -2461,7 +2610,7 @@ namespace EPMLiveReportsAdmin
 
             return !string.IsNullOrEmpty(test);
         }
-        // -- END
 
+        // -- END
     }
 }

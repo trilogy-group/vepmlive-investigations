@@ -1,21 +1,10 @@
 ﻿using System;
-using System.Collections;
-using System.Configuration;
-using System.Diagnostics;
 using System.Data;
+using System.Diagnostics;
 using System.Web;
-using System.Web.Security;
-using System.Web.UI;
-using System.Web.UI.HtmlControls;
-using System.Web.UI.WebControls;
-using System.Web.UI.WebControls.WebParts;
-using System.Security.Principal;
 using Microsoft.SharePoint;
-using System.ComponentModel;
-using EPMLiveReportsAdmin.Properties;
-using Microsoft.SharePoint.WebControls;
-using System.Data.SqlClient;
 using Microsoft.SharePoint.Utilities;
+using Microsoft.SharePoint.WebControls;
 
 namespace EPMLiveReportsAdmin.Layouts.EPMLive
 {
@@ -26,13 +15,13 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
         //protected HtmlInputButton saveBtn;
         //protected DateTimeControl snapShotDate;
         //protected PlaceHolder dtPicker;
-        EPMData _DAO;
+        private EPMData _DAO;
 
         protected void Page_Init(object sender, EventArgs e)
         {
             Response.Cache.SetCacheability(HttpCacheability.NoCache);
             Response.Expires = -1;
-            saveBtn.ServerClick += new EventHandler(save_Click);
+            saveBtn.ServerClick += save_Click;
             //using (SPWeb spWeb = SPContext.Current.Web)
             //{
             snapShotDate.DatePickerFrameUrl = SPContext.Current.Web.Url + "/_layouts/iframe.aspx";
@@ -48,12 +37,12 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
                 }
                 catch (Exception ex)
                 {
-                    SPSecurity.RunWithElevatedPrivileges(delegate()
+                    SPSecurity.RunWithElevatedPrivileges(delegate
                     {
                         if (!EventLog.SourceExists("EPMLive Reporting - Page_Init"))
                             EventLog.CreateEventSource("EPMLive Reporting - Page_Init", "EPM Live");
 
-                        EventLog myLog = new EventLog("EPM Live", ".", "EPMLive Reporting Page_Init");
+                        var myLog = new EventLog("EPM Live", ".", "EPMLive Reporting Page_Init");
                         myLog.MaximumKilobytes = 32768;
                         myLog.WriteEntry(ex.Message + ex.StackTrace, EventLogEntryType.Error, 2060);
                     });
@@ -74,13 +63,14 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
             dt = _DAO.GetTable(_DAO.GetClientReportingConnection);
             snapShotDate.SelectedDate = DateTime.Parse(dt.Rows[0]["PeriodDate"].ToString());
             title.Text = dt.Rows[0]["Title"].ToString();
-            activate.Checked = (bool)dt.Rows[0]["Enabled"];
+            activate.Checked = (bool) dt.Rows[0]["Enabled"];
         }
 
         protected void save_Click(object sender, EventArgs e)
         {
-            Guid id = new Guid(Request.QueryString["uid"].ToString());
-            _DAO.Command = "UPDATE RPTPeriods SET PeriodDate=@periodDate, Title=@title, Enabled=@enabled WHERE periodid=@period";
+            var id = new Guid(Request.QueryString["uid"]);
+            _DAO.Command =
+                "UPDATE RPTPeriods SET PeriodDate=@periodDate, Title=@title, Enabled=@enabled WHERE periodid=@period";
             _DAO.AddParam("@periodDate", snapShotDate.SelectedDate);
             _DAO.AddParam("@title", title.Text);
             _DAO.AddParam("@period", id);

@@ -21,10 +21,11 @@ namespace EPMLiveReportsAdmin
                 {"Id", properties.ListItemId},
                 {"Title", properties.ListItem.Title},
                 {"URL", properties.ListItem.Url},
+                {"ListTitle", properties.ListTitle},
                 {"ListId", properties.ListId},
                 {"WebId", properties.Web.ID},
                 {"SiteId", properties.SiteId},
-                {"UserId", ((SPFieldUserValue) properties.ListItem["Author"]).LookupId},
+                {"UserId", new SPFieldUserValue(properties.Web, (string) properties.ListItem["Author"]).LookupId},
                 {"ActivityTime", properties.ListItem["Created"]}
             };
 
@@ -52,9 +53,9 @@ namespace EPMLiveReportsAdmin
             if (properties.List.Fields.ContainsFieldWithInternalName("AssignedTo"))
             {
                 object assignedToUsers = properties.ListItem["AssignedTo"];
-                if (!string.IsNullOrEmpty(assignedToUsers as string))
+                if (assignedToUsers != null)
                 {
-                    var collection = new SPFieldUserValueCollection(properties.Web, assignedToUsers.ToString());
+                    var collection = (SPFieldUserValueCollection) assignedToUsers;
                     users.AddRange(collection.Select(userValue => userValue.LookupId));
                 }
             }

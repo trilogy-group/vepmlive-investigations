@@ -1,13 +1,9 @@
 ﻿using System;
 using System.Data;
 using System.Web;
-using System.Web.UI;
-using System.Web.UI.WebControls;
 using Microsoft.SharePoint;
-using Microsoft.SharePoint.WebControls;
 using Microsoft.SharePoint.Utilities;
-using System.Globalization;
-using System.Threading;
+using Microsoft.SharePoint.WebControls;
 
 namespace EPMLiveReportsAdmin.Layouts.EPMLive
 {
@@ -15,16 +11,17 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
     {
         //protected GridView grdErrors;
         protected MenuItemTemplate MenuItemTemplate1;
-        protected MenuTemplate mtEventMenu;
         protected ToolBar Toolbar;
         //protected Label lblTitle;
         private Guid _listId;
         private string _logType = "";
+        protected MenuTemplate mtEventMenu;
 
         protected void Page_Load(object sender, EventArgs e)
         {
             if (Request.QueryString["ListId"] == null)
-                SPUtility.Redirect("epmlive/ListMappings.aspx", SPRedirectFlags.RelativeToLayoutsPage, HttpContext.Current);
+                SPUtility.Redirect("epmlive/ListMappings.aspx", SPRedirectFlags.RelativeToLayoutsPage,
+                    HttpContext.Current);
             _listId = new Guid(Request.QueryString["ListId"]);
 
             if (Request.QueryString["LogType"] != null)
@@ -43,10 +40,10 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
         }
 
         private void FillData()
-        {   
-            var siteId = SPContext.Current.Site.ID;
+        {
+            Guid siteId = SPContext.Current.Site.ID;
             var rb = new ReportBiz(siteId);
-            var list = rb.GetListBiz(_listId);
+            ListBiz list = rb.GetListBiz(_listId);
             DataTable dt = list.GetLog(0);
             DataView errors = dt.DefaultView;
             if (_logType != "")
@@ -57,15 +54,12 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
 
         protected void btnClear_Click(object sender, EventArgs e)
         {
-            var siteId = SPContext.Current.Site.ID;
+            Guid siteId = SPContext.Current.Site.ID;
             var rb = new ReportBiz(siteId);
-            var list = rb.GetListBiz(_listId);
+            ListBiz list = rb.GetListBiz(_listId);
             list.ClearLog(_logType);
 
             FillData();
         }
-
-
-
     }
 }

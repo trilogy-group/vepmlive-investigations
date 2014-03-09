@@ -1,26 +1,17 @@
 ﻿<%@ Assembly Name="$SharePoint.Project.AssemblyFullName$" %>
-<%@ Import Namespace="Microsoft.SharePoint.ApplicationPages" %>
-<%@ Register TagPrefix="SharePoint" Namespace="Microsoft.SharePoint.WebControls"
-    Assembly="Microsoft.SharePoint, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
-<%@ Register TagPrefix="Utilities" Namespace="Microsoft.SharePoint.Utilities" Assembly="Microsoft.SharePoint, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
-<%@ Register TagPrefix="asp" Namespace="System.Web.UI" Assembly="System.Web.Extensions, Version=3.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" %>
-<%@ Import Namespace="Microsoft.SharePoint" %>
 <%@ Assembly Name="Microsoft.Web.CommandUI, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
 
 <%@ Page Language="C#" AutoEventWireup="true" CodeBehind="AllSchedules.aspx.cs" Inherits="EPMLiveReportsAdmin.Layouts.EPMLive.AllSchedules"
-    DynamicMasterPageFile="~masterurl/default.master" %>
+         DynamicMasterPageFile="~masterurl/default.master" %>
 
 <%@ Register TagPrefix="wssuc" TagName="ButtonSection" Src="~/_controltemplates/ButtonSection.ascx" %>
 <%@ Register TagPrefix="wssuc" TagName="InputFormControl" Src="~/_controltemplates/InputFormControl.ascx" %>
 <%@ Register TagPrefix="wssuc" TagName="InputFormSection" Src="~/_controltemplates/InputFormSection.ascx" %>
-<%@ Register TagPrefix="wssuc" TagName="ToolBar" Src="~/_controltemplates/ToolBar.ascx" %>
-<%@ Register TagPrefix="wssuc" TagName="ToolBarButton" Src="~/_controltemplates/ToolBarButton.ascx" %>
-<%@ Register TagPrefix="wssawc" Namespace="Microsoft.SharePoint.WebControls" Assembly="Microsoft.SharePoint, Version=12.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
 <asp:Content ID="Content4" ContentPlaceHolderID="PlaceHolderPageTitle" runat="server">
     Report Manager
 </asp:Content>
 <asp:Content ID="Content1" ContentPlaceHolderID="PlaceHolderPageTitleInTitleArea"
-    runat="server">
+             runat="server">
     Report Manager
 </asp:Content>
 <asp:Content ID="Content3" ContentPlaceHolderID="PlaceHolderMain" runat="server">
@@ -28,15 +19,14 @@
         function resize(url) {
             if (window.showModalDialog) {
                 window.showModalDialog(url, 'EPMLIVE - View Log Details', 'dialogWidth:500px;dialogHeight:400px');
-            }
-            else {
+            } else {
                 window.open(url, 'EPMLIVE - View Log Details', 'height=400,width=500,toolbar=no,directories=no,status=no,menubar=no,scrollbars=no,resizable=no ,modal=yes');
             }
         }
     </script>
     <table width="100%">
         <wssuc:InputFormSection ID="InputFormSection1" Title="Reporting Refresh:" Description=""
-            runat="server">
+                                runat="server">
             <Template_Description>
                 Choose a time when the Reporting Refresh will take place. This time should be set
                 to a time when your system will be idle or close to idle.
@@ -93,7 +83,7 @@
             </Template_InputFormControls>
         </wssuc:InputFormSection>
         <br />
-       <wssuc:ButtonSection ID="ButtonSection1" runat="server">
+        <wssuc:ButtonSection ID="ButtonSection1" runat="server">
             <Template_Buttons>
                 <asp:Button UseSubmitBehavior="false" class="ms-ButtonHeightWidth" runat="server" ID="btnRunNow" Text="Run Now" OnClick="RunRefreshNow" />
                 <asp:Button UseSubmitBehavior="false" class="ms-ButtonHeightWidth" runat="server" ID="btnSave" Text="Save" OnClick="SaveSchedule" />

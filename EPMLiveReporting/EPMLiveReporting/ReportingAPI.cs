@@ -11,7 +11,7 @@ namespace EPMLiveReportsAdmin
         // Public Methods (4) 
 
         /// <summary>
-        /// Gets all reports.
+        ///     Gets all reports.
         /// </summary>
         /// <param name="data">The data.</param>
         /// <param name="spWeb">The sp web.</param>
@@ -36,7 +36,7 @@ namespace EPMLiveReportsAdmin
         }
 
         /// <summary>
-        /// Gets my work data.
+        ///     Gets my work data.
         /// </summary>
         /// <param name="data">The data.</param>
         /// <param name="spWeb">The sp web.</param>
@@ -55,7 +55,7 @@ namespace EPMLiveReportsAdmin
         }
 
         /// <summary>
-        /// Gets my work fields.
+        ///     Gets my work fields.
         /// </summary>
         /// <param name="data">The data.</param>
         /// <param name="spWeb">The sp web.</param>
@@ -74,7 +74,7 @@ namespace EPMLiveReportsAdmin
         }
 
         /// <summary>
-        /// Refreshes all.
+        ///     Refreshes all.
         /// </summary>
         /// <param name="data">The data.</param>
         /// <param name="spWeb">The sp web.</param>

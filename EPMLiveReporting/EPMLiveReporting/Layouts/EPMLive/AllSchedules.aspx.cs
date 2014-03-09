@@ -1,30 +1,19 @@
 ﻿using System;
-using System.Collections;
-using System.Configuration;
-using System.Diagnostics;
-using System.Data;
-using System.Web;
-using System.Web.Security;
-using System.Web.UI;
-using System.Web.UI.HtmlControls;
-using System.Web.UI.WebControls;
-using System.Web.UI.WebControls.WebParts;
-using System.Security.Principal;
-using Microsoft.SharePoint;
-using Microsoft.SharePoint.WebControls;
-using System.ComponentModel;
-using EPMLiveReportsAdmin.Properties;
 using System.Data.SqlClient;
-using Microsoft.SharePoint.Utilities;
+using System.Diagnostics;
+using System.Web;
 using EPMLiveCore;
+using Microsoft.SharePoint;
+using Microsoft.SharePoint.Utilities;
+using Microsoft.SharePoint.WebControls;
 
 namespace EPMLiveReportsAdmin.Layouts.EPMLive
 {
     public partial class AllSchedules : LayoutsPageBase
     {
-        EPMData _DAO;
-        protected MenuItemTemplate MenuItemTemplateDelete;
         protected MenuItemTemplate MenuItemTemplate1;
+        protected MenuItemTemplate MenuItemTemplateDelete;
+        private EPMData _DAO;
 
         protected void Page_Init(object sender, EventArgs e)
         {
@@ -38,13 +27,19 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
             {
                 try
                 {
-                    SPSecurity.RunWithElevatedPrivileges(delegate()
+                    SPSecurity.RunWithElevatedPrivileges(delegate
                     {
-                        using (SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(SPContext.Current.Site.WebApplication.Id)))
+                        using (
+                            var cn =
+                                new SqlConnection(
+                                    CoreFunctions.getConnectionString(SPContext.Current.Site.WebApplication.Id)))
                         {
                             cn.Open();
 
-                            SqlCommand cmd = new SqlCommand("select timerjobuid,runtime,percentComplete,status,dtfinished,result from vwQueueTimerLog where siteguid=@siteguid and listguid is null and jobtype=5 and scheduletype = 2", cn);
+                            var cmd =
+                                new SqlCommand(
+                                    "select timerjobuid,runtime,percentComplete,status,dtfinished,result from vwQueueTimerLog where siteguid=@siteguid and listguid is null and jobtype=5 and scheduletype = 2",
+                                    cn);
                             cmd.Parameters.AddWithValue("@siteguid", SPContext.Current.Site.ID);
                             SqlDataReader dr = cmd.ExecuteReader();
 
@@ -85,12 +80,12 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
                 }
                 catch (Exception ex)
                 {
-                    SPSecurity.RunWithElevatedPrivileges(delegate()
+                    SPSecurity.RunWithElevatedPrivileges(delegate
                     {
                         if (!EventLog.SourceExists("EPMLive Reporting - Page_Load"))
                             EventLog.CreateEventSource("EPMLive Reporting - Page_Load", "EPM Live");
 
-                        EventLog myLog = new EventLog("EPM Live", ".", "EPMLive Reporting Page_Load");
+                        var myLog = new EventLog("EPM Live", ".", "EPMLive Reporting Page_Load");
                         myLog.MaximumKilobytes = 32768;
                         myLog.WriteEntry(ex.Message + ex.StackTrace, EventLogEntryType.Error, 2040);
                     });
@@ -113,19 +108,28 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
         {
             try
             {
-                SPSecurity.RunWithElevatedPrivileges(delegate()
+                SPSecurity.RunWithElevatedPrivileges(delegate
                 {
-                    using (SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(SPContext.Current.Site.WebApplication.Id)))
+                    using (
+                        var cn =
+                            new SqlConnection(CoreFunctions.getConnectionString(SPContext.Current.Site.WebApplication.Id))
+                        )
                     {
                         cn.Open();
 
-                        SqlCommand cmd = new SqlCommand("select timerjobuid from timerjobs where siteguid=@siteguid and listguid is null and jobtype=5 and scheduletype = 2", cn);
+                        var cmd =
+                            new SqlCommand(
+                                "select timerjobuid from timerjobs where siteguid=@siteguid and listguid is null and jobtype=5 and scheduletype = 2",
+                                cn);
                         cmd.Parameters.AddWithValue("@siteguid", SPContext.Current.Site.ID.ToString());
                         SqlDataReader dr = cmd.ExecuteReader();
                         if (dr.Read())
                         {
                             dr.Close();
-                            cmd = new SqlCommand("UPDATE TIMERJOBS set runtime = @runtime where siteguid=@siteguid and listguid is null and jobtype=5 and scheduletype = 2", cn);
+                            cmd =
+                                new SqlCommand(
+                                    "UPDATE TIMERJOBS set runtime = @runtime where siteguid=@siteguid and listguid is null and jobtype=5 and scheduletype = 2",
+                                    cn);
                             cmd.Parameters.AddWithValue("@siteguid", SPContext.Current.Site.ID.ToString());
                             cmd.Parameters.AddWithValue("@runtime", DropDownListTimes.SelectedValue);
                             cmd.ExecuteNonQuery();
@@ -133,7 +137,10 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
                         else
                         {
                             dr.Close();
-                            cmd = new SqlCommand("INSERT INTO TIMERJOBS (siteguid, jobtype, jobname, scheduletype, webguid, runtime) VALUES (@siteguid, 5, 'Reporting Refresh All', 2, @webguid, @runtime)", cn);
+                            cmd =
+                                new SqlCommand(
+                                    "INSERT INTO TIMERJOBS (siteguid, jobtype, jobname, scheduletype, webguid, runtime) VALUES (@siteguid, 5, 'Reporting Refresh All', 2, @webguid, @runtime)",
+                                    cn);
                             cmd.Parameters.AddWithValue("@siteguid", SPContext.Current.Site.ID.ToString());
                             cmd.Parameters.AddWithValue("@webguid", SPContext.Current.Web.ID.ToString());
                             cmd.Parameters.AddWithValue("@runtime", DropDownListTimes.SelectedValue);
@@ -144,24 +151,26 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
                     }
                 });
             }
-            catch (Exception ex)
-            {
-
-            }
+            catch (Exception ex) { }
         }
 
         protected void RunRefreshNow(object sender, EventArgs e)
         {
             try
             {
-                SPSecurity.RunWithElevatedPrivileges(delegate()
+                SPSecurity.RunWithElevatedPrivileges(delegate
                 {
-                    using (SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(SPContext.Current.Site.WebApplication.Id)))
+                    using (
+                        var cn =
+                            new SqlConnection(CoreFunctions.getConnectionString(SPContext.Current.Site.WebApplication.Id))
+                        )
                     {
                         cn.Open();
 
                         Guid timerjobuid = Guid.Empty;
-                        SqlCommand cmd = new SqlCommand("select timerjobuid from timerjobs where siteguid=@siteguid and jobtype=5", cn);
+                        var cmd =
+                            new SqlCommand("select timerjobuid from timerjobs where siteguid=@siteguid and jobtype=5",
+                                cn);
                         cmd.Parameters.AddWithValue("@siteguid", SPContext.Current.Site.ID.ToString());
                         object obj = cmd.ExecuteScalar();
                         if (obj != null)
@@ -171,7 +180,10 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
                         else
                         {
                             timerjobuid = Guid.NewGuid();
-                            cmd = new SqlCommand("INSERT INTO TIMERJOBS (timerjobuid, siteguid, jobtype, jobname, scheduletype, webguid) VALUES (@timerjobuid, @siteguid, 5, 'Reporting Refresh', 0, @webguid)", cn);
+                            cmd =
+                                new SqlCommand(
+                                    "INSERT INTO TIMERJOBS (timerjobuid, siteguid, jobtype, jobname, scheduletype, webguid) VALUES (@timerjobuid, @siteguid, 5, 'Reporting Refresh', 0, @webguid)",
+                                    cn);
                             cmd.Parameters.AddWithValue("@timerjobuid", timerjobuid);
                             cmd.Parameters.AddWithValue("@siteguid", SPContext.Current.Site.ID.ToString());
                             cmd.Parameters.AddWithValue("@webguid", SPContext.Current.Web.ID.ToString());
@@ -180,33 +192,29 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
 
                         if (timerjobuid != Guid.Empty)
                         {
-                            EPMLiveCore.CoreFunctions.enqueue(timerjobuid, 0);
+                            CoreFunctions.enqueue(timerjobuid, 0);
                         }
 
                         cn.Close();
                     }
 
-                    Microsoft.SharePoint.Utilities.SPUtility.Redirect("epmlive/AllSchedules.aspx", Microsoft.SharePoint.Utilities.SPRedirectFlags.RelativeToLayoutsPage, HttpContext.Current);
+                    SPUtility.Redirect("epmlive/AllSchedules.aspx", SPRedirectFlags.RelativeToLayoutsPage,
+                        HttpContext.Current);
                 });
-
-
             }
-            catch (Exception ex)
-            {
-
-            }
+            catch (Exception ex) { }
         }
 
         protected void loadData(SPWeb web)
         {
-            SqlConnection cn = new SqlConnection(CoreFunctions.getConnectionString(web.Site.WebApplication.Id));
+            var cn = new SqlConnection(CoreFunctions.getConnectionString(web.Site.WebApplication.Id));
 
-            SPSecurity.RunWithElevatedPrivileges(delegate()
-            {
-                cn.Open();
-            });
+            SPSecurity.RunWithElevatedPrivileges(delegate { cn.Open(); });
 
-            SqlCommand cmd = new SqlCommand("select timerjobuid,runtime,percentComplete,status,dtfinished,result from vwQueueTimerLog where siteguid=@siteguid and jobtype=5", cn);
+            var cmd =
+                new SqlCommand(
+                    "select timerjobuid,runtime,percentComplete,status,dtfinished,result from vwQueueTimerLog where siteguid=@siteguid and jobtype=5",
+                    cn);
             cmd.Parameters.AddWithValue("@siteguid", web.Site.ID);
             SqlDataReader dr = cmd.ExecuteReader();
 
@@ -245,7 +253,10 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
 
                 dr.Close();
 
-                cmd = new SqlCommand("select timerjobuid,runtime,percentComplete,status,dtfinished,result from vwQueueTimerLog where siteguid=@siteguid and jobtype=1", cn);
+                cmd =
+                    new SqlCommand(
+                        "select timerjobuid,runtime,percentComplete,status,dtfinished,result from vwQueueTimerLog where siteguid=@siteguid and jobtype=1",
+                        cn);
                 cmd.Parameters.AddWithValue("@siteguid", web.Site.ID);
                 dr = cmd.ExecuteReader();
 

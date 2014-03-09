@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Web.UI;
+using System.Data;
 using System.Web.UI.HtmlControls;
-using System.Web.UI.WebControls;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.WebControls;
-using System.Data;
 
-namespace EPMLiveReportsAdmin.Layouts.EPMLive  
+namespace EPMLiveReportsAdmin.Layouts.EPMLive
 {
     public partial class SetupReportDatabase : LayoutsPageBase
     {
@@ -46,7 +44,7 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
                 var rb = new ReportBiz(SPContext.Current.Site.ID, webAppId);
                 Dictionary<string, string> databases = rb.GetDistinctDatabaseList();
                 DataRow SAInfo = rb.SAccountInfo(webAppId);
-                if (SAInfo != null && (bool)SAInfo["SAccount"])
+                if (SAInfo != null && (bool) SAInfo["SAccount"])
                 {
                     username.Text = SAInfo["Username"].ToString();
                     password.Text = SAInfo["Password"].ToString();
@@ -67,12 +65,12 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
             {
                 try
                 {
-                    SPSecurity.RunWithElevatedPrivileges(delegate()
+                    SPSecurity.RunWithElevatedPrivileges(delegate
                     {
-                        Guid webAppId = new Guid(Request.QueryString["id"]);
-                        Guid siteId = new Guid(SiteAdministrationSelector1.CurrentId);
+                        var webAppId = new Guid(Request.QueryString["id"]);
+                        var siteId = new Guid(SiteAdministrationSelector1.CurrentId);
                         var rb = new ReportBiz(SPContext.Current.Site.ID, webAppId);
-                        var databases = rb.GetDatabaseMappings();
+                        Dictionary<string, string> databases = rb.GetDatabaseMappings();
                         string dbServer = txtDatabaseServer.Text;
                         string dbName = txtDatabaseName.Text;
                         string un = username.Text;
@@ -82,12 +80,14 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
                         bool processed = false;
                         string statusMsg = string.Empty;
 
-                        EPMData oEPM = new EPMData(siteId);
-                        processed = oEPM.MapDataBase(siteId, webAppId, dbServer, dbName, un, pw, useSA, dbExists, out statusMsg);
+                        var oEPM = new EPMData(siteId);
+                        processed = oEPM.MapDataBase(siteId, webAppId, dbServer, dbName, un, pw, useSA, dbExists,
+                            out statusMsg);
 
                         if (processed)
                         {
-                            Response.Redirect(SPContext.Current.Site.ServerRelativeUrl + "_admin/EPMLive/ReportDatabases.aspx");
+                            Response.Redirect(SPContext.Current.Site.ServerRelativeUrl +
+                                              "_admin/EPMLive/ReportDatabases.aspx");
                         }
                         else
                         {
@@ -96,13 +96,9 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
                             Show(trNew3, false);
                             Show(trNew4, false);
                         }
-
                     });
                 }
-                catch (Exception ex)
-                {
-
-                }
+                catch (Exception ex) { }
             }
         }
 
@@ -266,7 +262,7 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
         private void ShowSiteError(string message)
         {
             lblErrorSite.Text = message;
-            lblErrorSite.Visible = true;            
+            lblErrorSite.Visible = true;
         }
     }
 }

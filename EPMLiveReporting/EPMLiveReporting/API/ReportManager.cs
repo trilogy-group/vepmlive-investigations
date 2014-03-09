@@ -29,9 +29,7 @@ namespace EPMLiveReportsAdmin.API
         /// </summary>
         /// <param name="spWeb">The sp web.</param>
         public ReportManager(SPWeb spWeb)
-            : base(spWeb)
-        {
-        }
+            : base(spWeb) { }
 
         /// <summary>
         ///     Releases unmanaged resources and performs other cleanup operations before the
@@ -144,7 +142,7 @@ namespace EPMLiveReportsAdmin.API
         /// <param name="spDocumentLibrary">The sp document library.</param>
         /// <param name="parentElement">The parent element.</param>
         private void BuildReportTree(SPFolder parentFolder, IEnumerable<SPFolder> spFolders,
-                                     SPDocumentLibrary spDocumentLibrary, ref XElement parentElement)
+            SPDocumentLibrary spDocumentLibrary, ref XElement parentElement)
         {
             var xElement = new XElement("Folder", new XAttribute("Name", parentFolder.Name));
 
@@ -183,8 +181,8 @@ namespace EPMLiveReportsAdmin.API
                 }
 
                 var element = new XElement("Report", new XAttribute("Name", name.Substring(0, name.Length - 4)),
-                                           new XAttribute("Url", url),
-                                           new XAttribute("HasResourcesParam", hasResourcesParam));
+                    new XAttribute("Url", url),
+                    new XAttribute("HasResourcesParam", hasResourcesParam));
 
                 if (!string.IsNullOrEmpty(error))
                 {
@@ -218,7 +216,7 @@ namespace EPMLiveReportsAdmin.API
             if (!ssrsIntegrated)
             {
                 throw new APIException((int) Errors.GetAllReportsNotIntegrated,
-                                       "Reporting API only supports Integrated SSRS setup.");
+                    "Reporting API only supports Integrated SSRS setup.");
             }
 
             if (string.IsNullOrEmpty(reportingServiceUrl))
@@ -240,24 +238,22 @@ namespace EPMLiveReportsAdmin.API
             try
             {
                 _reportingService2006 = new ReportingService2006
-                    {
-                        UseDefaultCredentials = true,
-                        Url = string.Format("{0}/ReportService2006.asmx", reportingServiceUrl)
-                    };
+                {
+                    UseDefaultCredentials = true,
+                    Url = string.Format("{0}/ReportService2006.asmx", reportingServiceUrl)
+                };
 
                 try
                 {
                     HttpCookie authCookie = HttpContext.Current.Request.Cookies["FedAuth"];
                     var fedAuth = new Cookie(authCookie.Name, authCookie.Value, authCookie.Path,
-                                             string.IsNullOrEmpty(authCookie.Domain)
-                                                 ? HttpContext.Current.Request.Url.Host
-                                                 : authCookie.Domain);
+                        string.IsNullOrEmpty(authCookie.Domain)
+                            ? HttpContext.Current.Request.Url.Host
+                            : authCookie.Domain);
                     _reportingService2006.CookieContainer = new CookieContainer();
                     _reportingService2006.CookieContainer.Add(fedAuth);
                 }
-                catch
-                {
-                }
+                catch { }
             }
             catch (Exception)
             {
@@ -273,13 +269,13 @@ namespace EPMLiveReportsAdmin.API
                 int index = reportingServiceUsername.IndexOf("\\", StringComparison.Ordinal);
 
                 _reportingService2006.Credentials = new NetworkCredential(reportingServiceUsername.Substring(index + 1),
-                                                                          reportingServicePassword,
-                                                                          reportingServiceUsername.Substring(0, index));
+                    reportingServicePassword,
+                    reportingServiceUsername.Substring(0, index));
             }
             else
             {
                 _reportingService2006.Credentials = new NetworkCredential(reportingServiceUsername,
-                                                                          reportingServicePassword);
+                    reportingServicePassword);
             }
         }
 

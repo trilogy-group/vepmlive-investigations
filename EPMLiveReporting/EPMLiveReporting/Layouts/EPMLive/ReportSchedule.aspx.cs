@@ -1,73 +1,53 @@
 ﻿using System;
-using Microsoft.SharePoint;
-using Microsoft.SharePoint.WebControls;
 using System.Collections;
-using System.Configuration;
 using System.Data;
 using System.Web;
-using System.Web.Security;
-using System.Web.UI;
-using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
-using System.Web.UI.WebControls.WebParts;
-using System.Security.Principal;
-using System.ComponentModel;
-using EPMLiveReportsAdmin.Properties;
-using System.Data.SqlClient;
+using Microsoft.SharePoint;
+using Microsoft.SharePoint.WebControls;
 
-namespace EPMLiveReportsAdmin.Layouts.EPMLive 
+namespace EPMLiveReportsAdmin.Layouts.EPMLive
 {
     public partial class ReportSchedule : LayoutsPageBase
     {
-        public string strTitle;
-        public string strTemplate;
         public static Hashtable desc;
-        protected Panel pnlAdmin;
-        protected ListBox lstNotificationUsers;
-        protected ListBox lstSiteUsers;
-        protected CheckBox chkTask;
-        protected CheckBox chkAdmin;
-        protected TextBox Lists;
-        //protected CheckBoxList CheckBoxList_days;
-
-        //protected InputFormControl FrequencyOptions;
-
-        protected DropDownList FixTimes;
         //protected DropDownList DropDownListScheduleType;
         //protected DropDownList DropDownListDays;
         protected DropDownList DropDownListSnapshotTime;
+        protected DropDownList FixTimes;
+        protected ListBox ListBoxLists;
+        protected TextBox Lists;
+        private EPMData _DAO;
+        protected Button btnRunNow;
+        protected CheckBox chkAdmin;
+        protected CheckBox chkTask;
+        protected string disabled;
 
-        protected Panel pnlSaveResults;
-        protected Label lblPropertyEPMLiveFixLists;
-        protected TextBox txtPropertyEPMLiveFixListsValue;
-        protected Label lblPropertyEPMLiveFixTime;
-        protected Label lblPropertyEPMLiveFixTimeValue;
-        protected Panel pnlTL;
-        protected Panel pnlMain;
         protected HyperLink hlAdmin;
+        protected Label lblLastResResult;
+        protected Label lblLastResRun;
         protected Label lblLastRun;
 
-        //protected ListBox ListBox_lists;
-        protected TextBox txtScheduleTitle;
-
-        protected Label lblLastResRun;
-        protected Label lblLastResResult;
-
-        protected Label lblNotEnabled;
-        protected TextBox txtResPlannerLists;
         protected Label lblMessages;
+        protected Label lblNotEnabled;
+        protected Label lblPropertyEPMLiveFixLists;
+        protected Label lblPropertyEPMLiveFixTime;
+        protected Label lblPropertyEPMLiveFixTimeValue;
         protected Label lblResLog;
-
-        protected ListBox ListBoxLists;
-
-        protected Button btnRunNow;
-
-        protected string disabled;
+        protected ListBox lstNotificationUsers;
+        protected ListBox lstSiteUsers;
+        protected Panel pnlAdmin;
+        protected Panel pnlMain;
+        protected Panel pnlSaveResults;
+        protected Panel pnlTL;
 
         protected string siteUrl;
         protected string siteid;
-
-        EPMData _DAO;
+        public string strTemplate;
+        public string strTitle;
+        protected TextBox txtPropertyEPMLiveFixListsValue;
+        protected TextBox txtResPlannerLists;
+        protected TextBox txtScheduleTitle;
 
         protected void Page_Init(object sender, EventArgs e)
         {
@@ -77,17 +57,17 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
 
             _DAO = new EPMData(SPContext.Current.Web.Site.ID);
             _DAO.OpenClientReportingConnection = _DAO.remoteCs;
-            DropDownListScheduleType.SelectedIndexChanged += new EventHandler(DropDownListScheduleType_SelectedIndexChanged);
+            DropDownListScheduleType.SelectedIndexChanged += DropDownListScheduleType_SelectedIndexChanged;
 
             try
             {
                 //using (SPWeb web = SPContext.Current.Web)
                 //{
-                    if (!IsPostBack)
-                    {
-                        PopulateLists();
-                        loadData(SPContext.Current.Web);
-                    }
+                if (!IsPostBack)
+                {
+                    PopulateLists();
+                    loadData(SPContext.Current.Web);
+                }
                 //}
             }
             catch (Exception ex)
@@ -96,14 +76,13 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
             }
         }
 
-        void DropDownListScheduleType_SelectedIndexChanged(object sender, EventArgs e)
+        private void DropDownListScheduleType_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (DropDownListScheduleType.SelectedValue == "3")
             {
                 DropDownListDays.Visible = true;
                 CheckBoxList_days.Visible = false;
                 //FrequencyOptions.LabelText = "Day of Month";
-                
             }
             else
             {
@@ -123,13 +102,13 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
 
             //using (SPContext.Current.Web)
             //{
-                foreach (DataRow row in dt.Rows)
-                {
-                    ListItem item = new ListItem();
-                    item.Text = row["ListName"].ToString();
-                    item.Value = row["ListName"].ToString();
-                    ListBoxLists.Items.Add(item);
-                }
+            foreach (DataRow row in dt.Rows)
+            {
+                var item = new ListItem();
+                item.Text = row["ListName"].ToString();
+                item.Value = row["ListName"].ToString();
+                ListBoxLists.Items.Add(item);
+            }
             //}
         }
 
@@ -140,7 +119,7 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
                 DataTable dtReport;
                 //_DAO.Command = "SELECT * FROM TIMERJOBS WHERE timerjobuid='" + Request.QueryString["uid"] + "'"; - CAT.NET
                 _DAO.Command = "SELECT * FROM TIMERJOBS WHERE timerjobuid=@uid";
-                _DAO.AddParam("@uid", Request.QueryString["uid"]); 
+                _DAO.AddParam("@uid", Request.QueryString["uid"]);
                 dtReport = _DAO.GetTable(_DAO.GetEPMLiveConnection);
 
                 txtScheduleTitle.Text = dtReport.Rows[0]["jobname"].ToString();
@@ -213,7 +192,6 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
 
         protected bool ScheduleValid()
         {
-
             if (txtScheduleTitle.Text == string.Empty)
             {
                 return false;
@@ -244,8 +222,8 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
         protected void Button1_Click(object sender, EventArgs e)
         {
             try
-            {                
-                saveSettings(SPContext.Current.Site.RootWeb);                
+            {
+                saveSettings(SPContext.Current.Site.RootWeb);
                 string url = SPContext.Current.Web.ServerRelativeUrl;
                 if (url.EndsWith("/"))
                 {
@@ -264,10 +242,9 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
 
         private void saveSettings(SPWeb currWeb)
         {
-
             if (ScheduleValid())
             {
-                string sTime = DropDownListSnapshotTime.SelectedValue.ToString();
+                string sTime = DropDownListSnapshotTime.SelectedValue;
                 string sTitle = txtScheduleTitle.Text;
                 int iTime = 0;
 
@@ -281,8 +258,9 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
                 if (Request.QueryString["uid"] == null) //ADD NEW JOB
                 {
                     Guid timerjobuid = Guid.NewGuid();
-                    _DAO.Command = "INSERT INTO TIMERJOBS ([timerjobuid],[jobname],[siteguid],[webguid],[listguid],[jobtype],[enabled],[runtime],[scheduletype],[days],[jobdata],[lastqueuecheck],[parentjobuid]) " +
-                                   " VALUES(@timejobuid,@jobname,@siteguid,@webguid,@listguid,@jobtype,@enabled,@runtime,@scheduletype,@days,@jobdata,@lastqueuecheck,@parentjobuid)";
+                    _DAO.Command =
+                        "INSERT INTO TIMERJOBS ([timerjobuid],[jobname],[siteguid],[webguid],[listguid],[jobtype],[enabled],[runtime],[scheduletype],[days],[jobdata],[lastqueuecheck],[parentjobuid]) " +
+                        " VALUES(@timejobuid,@jobname,@siteguid,@webguid,@listguid,@jobtype,@enabled,@runtime,@scheduletype,@days,@jobdata,@lastqueuecheck,@parentjobuid)";
                     _DAO.AddParam("@timejobuid", timerjobuid);
                     _DAO.AddParam("@jobname", sTitle);
                     _DAO.AddParam("@siteguid", currWeb.Site.ID);
@@ -300,7 +278,8 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
                 }
                 else //Udate Existing Job
                 {
-                    _DAO.Command = "UPDATE TIMERJOBS SET jobname=@jobname,enabled=@enabled,scheduletype=@scheduletype,runtime=@runtime,days=@days,jobdata=@jobdata WHERE timerjobuid=@timerjobuid";
+                    _DAO.Command =
+                        "UPDATE TIMERJOBS SET jobname=@jobname,enabled=@enabled,scheduletype=@scheduletype,runtime=@runtime,days=@days,jobdata=@jobdata WHERE timerjobuid=@timerjobuid";
                     _DAO.AddParam("@jobname", sTitle);
                     _DAO.AddParam("@timerjobuid", Request.QueryString["uid"]);
                     _DAO.AddParam("@enabled", true);
@@ -313,7 +292,8 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
 
                 if (_DAO.SqlErrorOccurred)
                 {
-                    _DAO.LogStatus(string.Empty, string.Empty, "Error Saving Schedule", _DAO.SqlError, 2, 1, string.Empty);
+                    _DAO.LogStatus(string.Empty, string.Empty, "Error Saving Schedule", _DAO.SqlError, 2, 1,
+                        string.Empty);
                 }
 
                 lblErrorSite.Visible = false;

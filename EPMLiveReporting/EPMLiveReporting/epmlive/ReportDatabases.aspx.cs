@@ -1,28 +1,27 @@
 ﻿using System;
-using System.Web.UI;
-using System.Web.UI.WebControls;
-using System.Web.UI.HtmlControls;
-using Microsoft.SharePoint;
-using Microsoft.SharePoint.WebControls;
-using Microsoft.SharePoint.Administration;
 using System.Data;
+using System.Web.UI.WebControls;
+using EPMLiveCore;
+using Microsoft.SharePoint;
+using Microsoft.SharePoint.Administration;
+using Microsoft.SharePoint.WebControls;
 
 namespace EPMLiveReportsAdmin.Layouts.EPMLive
 {
     public partial class ReportDatabases : LayoutsPageBase
     {
+        protected ToolBarButton AddMapping;
+        protected Content Content3;
         protected GridView GridView1;
-        protected MenuTemplate mtEventMenu;
         protected MenuItemTemplate MenuItemTemplate1;
+        protected WebApplicationSelector WebApplicationSelector1;
         protected HiddenField hdnUserId;
         protected Label lblError;
         protected Label lblSuccess;
         protected Label lblTitle;
-        protected ToolBarButton AddMapping;
-        protected string version;
-        protected WebApplicationSelector WebApplicationSelector1;
-        protected Content Content3;
         protected Label message;
+        protected MenuTemplate mtEventMenu;
+        protected string version;
 
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -32,8 +31,8 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
                 {
                     var webAppId = new Guid(Request["WebAppId"]);
                     var siteId = new Guid(Request["DeleteId"]);
-                    var rb = new ReportBiz(siteId,webAppId);
-                    var canDeleteDb = rb.RemoveDatabaseMapping();
+                    var rb = new ReportBiz(siteId, webAppId);
+                    bool canDeleteDb = rb.RemoveDatabaseMapping();
                 }
                 FillData();
             }
@@ -43,7 +42,7 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
         {
             if (WebApplicationSelector1.CurrentId != null)
             {
-                Guid webAppId = new Guid(WebApplicationSelector1.CurrentId);
+                var webAppId = new Guid(WebApplicationSelector1.CurrentId);
                 var epmData = new ReportData(SPContext.Current.Site.ID, webAppId);
 
                 if (epmData.EPMLiveConOpen)
@@ -62,7 +61,7 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
                     GridView1.DataSource = mappings;
                     GridView1.DataBind();
                     epmData.Dispose();
-                    string constr = EPMLiveCore.CoreFunctions.getConnectionString(webAppId);
+                    string constr = CoreFunctions.getConnectionString(webAppId);
                     if (constr == "")
                     {
                         AddMapping.Visible = false;
@@ -85,7 +84,8 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
             if (currentWebApp != null)
             {
                 Guid id = currentWebApp.Id;
-                Response.Redirect(SPContext.Current.Site.ServerRelativeUrl + "_admin/EPMLive/SetupReportDatabase.aspx?Id=" + id);
+                Response.Redirect(SPContext.Current.Site.ServerRelativeUrl +
+                                  "_admin/EPMLive/SetupReportDatabase.aspx?Id=" + id);
             }
             FillData();
         }

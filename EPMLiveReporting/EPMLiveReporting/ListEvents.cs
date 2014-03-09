@@ -1,34 +1,27 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Text;
-using Microsoft.SharePoint;
-using System.Diagnostics;
-using System.Security.Principal;
-using System.Xml;
-using System.Web;
-using System.Configuration;
 using System.Collections;
 using System.Data;
 using System.Data.SqlClient;
+using System.Diagnostics;
+using EPMLiveCore.API;
+using Microsoft.SharePoint;
 
 namespace EPMLiveReportsAdmin
 {
-    class ListEvents : SPItemEventReceiver
+    internal class ListEvents : SPItemEventReceiver
     {
-        DataTable _dtColumns;
-        ReportData _DAO;
-        Guid _SiteID;
-        Guid _ListID;
-        SPListItem _item;
-        SPItemEventProperties _properties;
-        ArrayList _arrayList_defaultColumns;
-        ArrayList _mandatoryHiddenFlds;
-
-        string _TableName;
-        string _ListName;
-        string _SiteName;
-        string _SiteUrl;
+        private ReportData _DAO;
+        private Guid _ListID;
+        private string _ListName;
+        private Guid _SiteID;
+        private string _SiteName;
+        private string _SiteUrl;
+        private string _TableName;
+        private ArrayList _arrayList_defaultColumns;
+        private DataTable _dtColumns;
+        private SPListItem _item;
+        private ArrayList _mandatoryHiddenFlds;
+        private SPItemEventProperties _properties;
 
         public override void ItemAdded(SPItemEventProperties properties)
         {
@@ -45,15 +38,15 @@ namespace EPMLiveReportsAdmin
             }
             catch (Exception ex)
             {
-                SPSecurity.RunWithElevatedPrivileges(delegate()
+                SPSecurity.RunWithElevatedPrivileges(delegate
                 {
                     if (!EventLog.SourceExists("EPMLive Reporting Item Added"))
                         EventLog.CreateEventSource("EPMLive Reporting Item Added", "EPM Live");
 
-                    EventLog myLog = new EventLog("EPM Live", ".", "EPMLive Reporting Item Added");
+                    var myLog = new EventLog("EPM Live", ".", "EPMLive Reporting Item Added");
                     myLog.MaximumKilobytes = 32768;
                     myLog.WriteEntry(
-                        "Name: " + _SiteName + " Url: " + _SiteUrl + " ID: " + _SiteID.ToString() + " : " + ex.Message +
+                        "Name: " + _SiteName + " Url: " + _SiteUrl + " ID: " + _SiteID + " : " + ex.Message +
                         ex.StackTrace, EventLogEntryType.Error, 2001);
                 });
             }
@@ -80,14 +73,16 @@ namespace EPMLiveReportsAdmin
             }
             catch (Exception ex)
             {
-                SPSecurity.RunWithElevatedPrivileges(delegate()
+                SPSecurity.RunWithElevatedPrivileges(delegate
                 {
                     if (!EventLog.SourceExists("EPMLive Reporting Item Updated"))
                         EventLog.CreateEventSource("EPMLive Reporting Item Updated", "EPM Live");
 
-                    EventLog myLog = new EventLog("EPM Live", ".", "EPMLive Reporting Item Updated");
+                    var myLog = new EventLog("EPM Live", ".", "EPMLive Reporting Item Updated");
                     myLog.MaximumKilobytes = 32768;
-                    myLog.WriteEntry("Name: " + _SiteName + " Url: " + _SiteUrl + " ID: " + _SiteID.ToString() + " : " + ex.Message + ex.StackTrace, EventLogEntryType.Error, 2002);
+                    myLog.WriteEntry(
+                        "Name: " + _SiteName + " Url: " + _SiteUrl + " ID: " + _SiteID + " : " + ex.Message +
+                        ex.StackTrace, EventLogEntryType.Error, 2002);
                 });
             }
             finally
@@ -123,9 +118,11 @@ namespace EPMLiveReportsAdmin
                     if (!EventLog.SourceExists("EPMLive Reporting Item Deleting"))
                         EventLog.CreateEventSource("EPMLive Reporting Item Deleting", "EPM Live");
 
-                    EventLog myLog = new EventLog("EPM Live", ".", "EPMLive Reporting Item Deleting");
+                    var myLog = new EventLog("EPM Live", ".", "EPMLive Reporting Item Deleting");
                     myLog.MaximumKilobytes = 32768;
-                    myLog.WriteEntry("Name: " + _SiteName + " Url: " + _SiteUrl + " ID: " + _SiteID.ToString() + " : " + ex.Message + ex.StackTrace, EventLogEntryType.Error, 2003);
+                    myLog.WriteEntry(
+                        "Name: " + _SiteName + " Url: " + _SiteUrl + " ID: " + _SiteID + " : " + ex.Message +
+                        ex.StackTrace, EventLogEntryType.Error, 2003);
                 });
             }
             finally
@@ -150,45 +147,54 @@ namespace EPMLiveReportsAdmin
             }
             else
             {
-                _DAO.LogStatus(_DAO.GetListId(_ListName), _ListName.Replace("'", ""), "Url:" + _properties.RelativeWebUrl.Replace("'", "") + " Error: Add item was unsuccessful.", _DAO.GetError(), 2, 1); // - CAT.NET false-positive: All single quotes are escaped/removed.
+                _DAO.LogStatus(_DAO.GetListId(_ListName), _ListName.Replace("'", ""),
+                    "Url:" + _properties.RelativeWebUrl.Replace("'", "") + " Error: Add item was unsuccessful.",
+                    _DAO.GetError(), 2, 1); // - CAT.NET false-positive: All single quotes are escaped/removed.
             }
         }
 
         private void ProcessSecurity(SPItemEventProperties properties, SqlConnection cn)
         {
-            SPSecurity.RunWithElevatedPrivileges(delegate()
+            SPSecurity.RunWithElevatedPrivileges(delegate
             {
                 try
                 {
-                    using(SPSite site = new SPSite(properties.SiteId))
+                    using (var site = new SPSite(properties.SiteId))
                     {
-                        using(SPWeb web = site.OpenWeb(properties.Web.ID))
+                        using (SPWeb web = site.OpenWeb(properties.Web.ID))
                         {
                             SPList list = web.Lists[properties.ListId];
                             SPListItem li = list.GetItemById(properties.ListItemId);
 
-                            SqlCommand cmd = new SqlCommand("DELETE RPTITEMGROUPS where siteid=@siteid and listid=@listid and itemid=@itemid", cn);
+                            var cmd =
+                                new SqlCommand(
+                                    "DELETE RPTITEMGROUPS where siteid=@siteid and listid=@listid and itemid=@itemid",
+                                    cn);
                             cmd.Parameters.AddWithValue("@siteid", properties.SiteId);
                             cmd.Parameters.AddWithValue("@listid", properties.ListId);
                             cmd.Parameters.AddWithValue("@itemid", properties.ListItemId);
                             cmd.ExecuteNonQuery();
 
-                            foreach(SPRoleAssignment ra in li.RoleAssignments)
+                            foreach (SPRoleAssignment ra in li.RoleAssignments)
                             {
                                 int type = 0;
-                                if(ra.Member.GetType() == typeof(SPGroup))
+                                if (ra.Member.GetType() == typeof (SPGroup))
                                 {
                                     type = 1;
                                 }
                                 bool found = false;
-                                foreach(SPRoleDefinition def in ra.RoleDefinitionBindings)
+                                foreach (SPRoleDefinition def in ra.RoleDefinitionBindings)
                                 {
-                                    if((def.BasePermissions & SPBasePermissions.ViewListItems) == SPBasePermissions.ViewListItems)
+                                    if ((def.BasePermissions & SPBasePermissions.ViewListItems) ==
+                                        SPBasePermissions.ViewListItems)
                                         found = true;
                                 }
-                                if(found)
+                                if (found)
                                 {
-                                    cmd = new SqlCommand("INSERT INTO RPTITEMGROUPS (SITEID, LISTID, ITEMID, GROUPID, SECTYPE) VALUES (@siteid, @listid, @itemid, @groupid, @sectype)", cn);
+                                    cmd =
+                                        new SqlCommand(
+                                            "INSERT INTO RPTITEMGROUPS (SITEID, LISTID, ITEMID, GROUPID, SECTYPE) VALUES (@siteid, @listid, @itemid, @groupid, @sectype)",
+                                            cn);
                                     cmd.Parameters.AddWithValue("@siteid", properties.SiteId);
                                     cmd.Parameters.AddWithValue("@listid", properties.ListId);
                                     cmd.Parameters.AddWithValue("@itemid", properties.ListItemId);
@@ -198,7 +204,10 @@ namespace EPMLiveReportsAdmin
                                 }
                             }
 
-                            cmd = new SqlCommand("INSERT INTO RPTITEMGROUPS (SITEID, LISTID, ITEMID, GROUPID, SECTYPE) VALUES (@siteid, @listid, @itemid, @groupid, @sectype)", cn);
+                            cmd =
+                                new SqlCommand(
+                                    "INSERT INTO RPTITEMGROUPS (SITEID, LISTID, ITEMID, GROUPID, SECTYPE) VALUES (@siteid, @listid, @itemid, @groupid, @sectype)",
+                                    cn);
                             cmd.Parameters.AddWithValue("@siteid", properties.SiteId);
                             cmd.Parameters.AddWithValue("@listid", properties.ListId);
                             cmd.Parameters.AddWithValue("@itemid", properties.ListItemId);
@@ -210,11 +219,10 @@ namespace EPMLiveReportsAdmin
                 }
                 catch { }
             });
-
         }
 
         private void UpdateItem(SPItemEventProperties properties)
-        {   
+        {
             //InsertListItem record into DB
             if (_DAO.UpdateListItem(GetSql("update")))
             {
@@ -228,9 +236,10 @@ namespace EPMLiveReportsAdmin
             }
             else
             {
-                _DAO.LogStatus(_DAO.GetListId(_ListName), _ListName.Replace("'", ""), "Url:" + _properties.RelativeWebUrl.Replace("'", "") + " Error: Update item was unsuccessful.", _DAO.GetError(), 2, 1); // - CAT.NET false-positive: All single quotes are escaped/removed.
+                _DAO.LogStatus(_DAO.GetListId(_ListName), _ListName.Replace("'", ""),
+                    "Url:" + _properties.RelativeWebUrl.Replace("'", "") + " Error: Update item was unsuccessful.",
+                    _DAO.GetError(), 2, 1); // - CAT.NET false-positive: All single quotes are escaped/removed.
             }
-
         }
 
         private void DeleteItem()
@@ -300,7 +309,8 @@ namespace EPMLiveReportsAdmin
 
         private void PopulateColumns()
         {
-            _dtColumns = _DAO.GetListColumns(_ListName.Replace("'", "")); // - CAT.NET false-positive: All single quotes are escaped/removed.
+            _dtColumns = _DAO.GetListColumns(_ListName.Replace("'", ""));
+                // - CAT.NET false-positive: All single quotes are escaped/removed.
         }
 
         private string GetSql(string sAction)
@@ -309,15 +319,18 @@ namespace EPMLiveReportsAdmin
             switch (sAction)
             {
                 case "insert":
-                    sSQL = _DAO.InsertSQL(_TableName.Replace("'", ""), _dtColumns, _item, _arrayList_defaultColumns, _mandatoryHiddenFlds); // - CAT.NET false-positive: All single quotes are escaped/removed.
+                    sSQL = _DAO.InsertSQL(_TableName.Replace("'", ""), _dtColumns, _item, _arrayList_defaultColumns,
+                        _mandatoryHiddenFlds); // - CAT.NET false-positive: All single quotes are escaped/removed.
                     break;
 
                 case "update":
-                    sSQL = _DAO.UpdateSQL(_TableName.Replace("'", ""), _dtColumns, _item, _arrayList_defaultColumns, _mandatoryHiddenFlds); // - CAT.NET false-positive: All single quotes are escaped/removed.
+                    sSQL = _DAO.UpdateSQL(_TableName.Replace("'", ""), _dtColumns, _item, _arrayList_defaultColumns,
+                        _mandatoryHiddenFlds); // - CAT.NET false-positive: All single quotes are escaped/removed.
                     break;
 
                 case "delete":
-                    sSQL = _DAO.DeleteSQL(_TableName.Replace("'", ""), _ListID, _item.ID); // - CAT.NET false-positive: All single quotes are escaped/removed.
+                    sSQL = _DAO.DeleteSQL(_TableName.Replace("'", ""), _ListID, _item.ID);
+                        // - CAT.NET false-positive: All single quotes are escaped/removed.
                     break;
             }
             return sSQL;
@@ -327,11 +340,11 @@ namespace EPMLiveReportsAdmin
         {
             try
             {
-                var listName = properties.ListTitle.ToLower();
+                string listName = properties.ListTitle.ToLower();
 
                 if (listName.Equals("resources") || listName.Equals("departments"))
                 {
-                    EPMLiveCore.API.ResourceGrid.ClearCache(properties.Web);
+                    ResourceGrid.ClearCache(properties.Web);
                 }
             }
             catch { }

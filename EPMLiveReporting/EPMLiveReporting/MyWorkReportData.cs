@@ -18,17 +18,11 @@ namespace EPMLiveReportsAdmin
         #region Constructors (3) 
 
         public MyWorkReportData(Guid siteId, string name, string server, bool useSAccount, string username,
-                                string password) : base(siteId, name, server, useSAccount, username, password)
-        {
-        }
+            string password) : base(siteId, name, server, useSAccount, username, password) { }
 
-        public MyWorkReportData(Guid siteId, Guid webAppId) : base(siteId, webAppId)
-        {
-        }
+        public MyWorkReportData(Guid siteId, Guid webAppId) : base(siteId, webAppId) { }
 
-        public MyWorkReportData(Guid siteId) : base(siteId)
-        {
-        }
+        public MyWorkReportData(Guid siteId) : base(siteId) { }
 
         #endregion Constructors 
 
@@ -37,7 +31,7 @@ namespace EPMLiveReportsAdmin
         // Public Methods (5) 
 
         /// <summary>
-        /// Executes the epm live SQL.
+        ///     Executes the epm live SQL.
         /// </summary>
         /// <param name="sql">The SQL.</param>
         /// <returns></returns>
@@ -52,7 +46,7 @@ namespace EPMLiveReportsAdmin
         }
 
         /// <summary>
-        /// Executes the SQL.
+        ///     Executes the SQL.
         /// </summary>
         /// <param name="sql">The SQL.</param>
         /// <returns></returns>
@@ -67,14 +61,14 @@ namespace EPMLiveReportsAdmin
         }
 
         /// <summary>
-        /// Gets the data.
+        ///     Gets the data.
         /// </summary>
         /// <param name="filterValues">The filter values.</param>
         /// <param name="reportingScope">The reporting scope.</param>
         /// <param name="spWeb">The sp web.</param>
         /// <returns></returns>
         public DataTable GetData(Dictionary<string, IEnumerable<object>> filterValues, ReportingScope reportingScope,
-                                 SPWeb spWeb)
+            SPWeb spWeb)
         {
             string sql = BuildSelectSql(filterValues, reportingScope, spWeb);
 
@@ -87,7 +81,7 @@ namespace EPMLiveReportsAdmin
         }
 
         /// <summary>
-        /// Gets the fields.
+        ///     Gets the fields.
         /// </summary>
         /// <returns></returns>
         public List<string> GetFields()
@@ -95,7 +89,7 @@ namespace EPMLiveReportsAdmin
             var fields = new List<string>();
 
             string sql = string.Format(@"SELECT DISTINCT InternalName FROM RPTColumn WHERE RPTListId = N'{0}'",
-                                       _DAO.GetListId("My Work"));
+                _DAO.GetListId("My Work"));
 
             _cmdWithParams = new SqlCommand(sql, _DAO.GetClientReportingConnection);
 
@@ -110,7 +104,7 @@ namespace EPMLiveReportsAdmin
         }
 
         /// <summary>
-        /// Inserts the SQL.
+        ///     Inserts the SQL.
         /// </summary>
         /// <param name="tableName">Name of the table.</param>
         /// <param name="listName">Name of the list.</param>
@@ -119,7 +113,7 @@ namespace EPMLiveReportsAdmin
         /// <param name="defaultColumns">The default columns.</param>
         /// <returns></returns>
         public string InsertSQL(string tableName, string listName, DataTable columns, SPListItem spListItem,
-                                ArrayList defaultColumns, ArrayList mandatoryHiddenFlds)
+            ArrayList defaultColumns, ArrayList mandatoryHiddenFlds)
         {
             string sql = string.Empty;
             _cmdWithParams = null;
@@ -134,9 +128,7 @@ namespace EPMLiveReportsAdmin
                 {
                     fldAssignedTo = spListItem["AssignedTo"];
                 }
-                catch
-                {
-                }
+                catch { }
 
                 if (fldAssignedTo != null)
                 {
@@ -160,7 +152,9 @@ namespace EPMLiveReportsAdmin
                 SPListItem item = spListItem;
                 item["AssignedTo"] = "-99;#";
 
-                string allValues = AddColumnValues(item, columns, defaultColumns, mandatoryHiddenFlds, "insert").Replace("'", string.Empty);
+                string allValues =
+                    AddColumnValues(item, columns, defaultColumns, mandatoryHiddenFlds, "insert")
+                        .Replace("'", string.Empty);
 
                 AddMetaInfoCols(listName, item, ref allCols, ref allValues);
 
@@ -175,9 +169,7 @@ namespace EPMLiveReportsAdmin
                     {
                         hours = double.Parse(originalWork.ToString())/totalAssignedToUsers;
                     }
-                    catch
-                    {
-                    }
+                    catch { }
 
                     foreach (SPFieldUserValue spFieldUserValue in spFieldUserValueCollection)
                     {
@@ -187,7 +179,8 @@ namespace EPMLiveReportsAdmin
                         listItem["Work"] = hours;
                         listItem["AssignedTo"] = spFieldUserValue;
 
-                        string rvalues = AddColumnValues(listItem, columns, defaultColumns, mandatoryHiddenFlds, "insert")
+                        string rvalues = AddColumnValues(listItem, columns, defaultColumns, mandatoryHiddenFlds,
+                            "insert")
                             .Replace("'", string.Empty);
 
                         AddMetaInfoCols(listName, listItem, ref rcols, ref rvalues);
@@ -202,7 +195,7 @@ namespace EPMLiveReportsAdmin
                 }
                 else
                 {
-                    sql= stringBuilder.ToString();
+                    sql = stringBuilder.ToString();
                 }
             }
 
@@ -210,12 +203,12 @@ namespace EPMLiveReportsAdmin
             {
                 var stringBuilder = new StringBuilder();
 
-                var stmts = sql.Split(new[] {"\r\n", "\n"}, StringSplitOptions.None);
-                var totalParams = 0;
+                string[] stmts = sql.Split(new[] {"\r\n", "\n"}, StringSplitOptions.None);
+                int totalParams = 0;
 
-                foreach (var stmt in stmts)
+                foreach (string stmt in stmts)
                 {
-                    var paramCount = stmt.TakeWhile(c => c == '@').Count();
+                    int paramCount = stmt.TakeWhile(c => c == '@').Count();
 
                     if (totalParams + paramCount > 2000)
                     {
@@ -239,15 +232,16 @@ namespace EPMLiveReportsAdmin
         // Protected Methods (4) 
 
         /// <summary>
-        /// Adds the column values.
+        ///     Adds the column values.
         /// </summary>
         /// <param name="spListItem">The sp list item.</param>
         /// <param name="columns">The columns.</param>
         /// <param name="defaultColumns">The default columns.</param>
         /// <param name="operation">The operation.</param>
         /// <returns></returns>
-        protected override string AddColumnValues(SPListItem spListItem, DataTable columns, ArrayList defaultColumns, ArrayList mandatoryHiddenFlds,
-                                                  string operation)
+        protected override string AddColumnValues(SPListItem spListItem, DataTable columns, ArrayList defaultColumns,
+            ArrayList mandatoryHiddenFlds,
+            string operation)
         {
             string colValues = string.Empty;
             string columnName = string.Empty;
@@ -276,11 +270,11 @@ namespace EPMLiveReportsAdmin
                     if (defaultColumns.Contains(columnName.ToLower()))
                     {
                         param = PopulateDefaultColumnValue(columnName.ToLower().Replace("'", string.Empty), spListItem);
-                       
                     }
                     else if (mandatoryHiddenFlds.Contains(columnName.ToLower()))
                     {
-                        param = PopulateMandatoryHiddenFldsColumnValue(columnName.ToLower().Replace("'", string.Empty), spListItem);
+                        param = PopulateMandatoryHiddenFldsColumnValue(columnName.ToLower().Replace("'", string.Empty),
+                            spListItem);
                     }
                     else
                     {
@@ -294,22 +288,22 @@ namespace EPMLiveReportsAdmin
                                 param = GetParam(field, columnName);
 
                                 param.ParameterName = string.Format("@{0}_{1}",
-                                                                    field.InternalName.Replace("'", string.Empty),
-                                                                    identifier);
+                                    field.InternalName.Replace("'", string.Empty),
+                                    identifier);
 
                                 if (field.Type != SPFieldType.Calculated)
                                 {
                                     param.Value = field.Type != SPFieldType.DateTime
-                                                      ? (spListItem[field.InternalName] != null
-                                                             ? (object)spListItem[field.InternalName].ToString()
-                                                             : DBNull.Value)
-                                                      : (spListItem[field.InternalName] ?? DBNull.Value);
+                                        ? (spListItem[field.InternalName] != null
+                                            ? (object) spListItem[field.InternalName].ToString()
+                                            : DBNull.Value)
+                                        : (spListItem[field.InternalName] ?? DBNull.Value);
                                 }
                                 else
                                 {
                                     try
                                     {
-                                        param.Value = _DAO.GetCalculatedFieldValue(spListItem, (SPFieldCalculated)field);
+                                        param.Value = _DAO.GetCalculatedFieldValue(spListItem, (SPFieldCalculated) field);
                                     }
                                     catch (Exception)
                                     {
@@ -324,8 +318,8 @@ namespace EPMLiveReportsAdmin
                                 param = GetParam(field, columnName);
 
                                 param.ParameterName = string.Format("@{0}_{1}",
-                                                                    columnName.Replace("'", string.Empty),
-                                                                    identifier);
+                                    columnName.Replace("'", string.Empty),
+                                    identifier);
 
                                 if (columnName.ToLower().EndsWith("text") && spListItem[field.InternalName] != null)
                                 {
@@ -346,8 +340,8 @@ namespace EPMLiveReportsAdmin
                             param = new SqlParameter
                             {
                                 ParameterName = string.Format("@{0}_{1}",
-                                                              columnName.Replace("'", string.Empty),
-                                                              identifier),
+                                    columnName.Replace("'", string.Empty),
+                                    identifier),
                                 Value = DBNull.Value
                             };
                         }
@@ -385,7 +379,8 @@ namespace EPMLiveReportsAdmin
                 SPSecurity.RunWithElevatedPrivileges(() => LogError(internalName, ex, columnName));
             }
 
-            colValues = colValues.Remove(colValues.LastIndexOf(",", StringComparison.Ordinal)).Replace("'", string.Empty);
+            colValues = colValues.Remove(colValues.LastIndexOf(",", StringComparison.Ordinal))
+                .Replace("'", string.Empty);
             switch (operation)
             {
                 case "insert":
@@ -397,14 +392,14 @@ namespace EPMLiveReportsAdmin
         }
 
         /// <summary>
-        /// Builds the select SQL.
+        ///     Builds the select SQL.
         /// </summary>
         /// <param name="filterValues">The filter values.</param>
         /// <param name="reportingScope">The reporting scope.</param>
         /// <param name="spWeb">The sp web.</param>
         /// <returns></returns>
         protected string BuildSelectSql(Dictionary<string, IEnumerable<object>> filterValues,
-                                        ReportingScope reportingScope, SPWeb spWeb)
+            ReportingScope reportingScope, SPWeb spWeb)
         {
             var filters = new List<string>();
 
@@ -453,7 +448,7 @@ namespace EPMLiveReportsAdmin
                 if (values.Count == 0)
                 {
                     throw new ApplicationException(string.Format("No valid filter values specified for the column: {0}",
-                                                                 columnName));
+                        columnName));
                 }
 
                 filters.Add(string.Format("[{0}] IN ({1})", columnName, string.Join(",", values.ToArray())));
@@ -497,18 +492,19 @@ namespace EPMLiveReportsAdmin
 
             filters.Add(
                 string.Format("([StartDate] <= '{0:yyyy-MM-dd HH:mm:ss}' AND [DueDate] >= '{1:yyyy-MM-dd HH:mm:ss}')",
-                              dueDate, startDate));
+                    dueDate, startDate));
 
-            return string.Format(@"SELECT DISTINCT * FROM [LSTMyWork] WHERE {0}", string.Join(" AND ", filters.ToArray()));
+            return string.Format(@"SELECT DISTINCT * FROM [LSTMyWork] WHERE {0}",
+                string.Join(" AND ", filters.ToArray()));
         }
 
         /// <summary>
-        /// Determines whether [is look up field] [the specified list name].
+        ///     Determines whether [is look up field] [the specified list name].
         /// </summary>
         /// <param name="listName">Name of the list.</param>
         /// <param name="columnName">Name of the column.</param>
         /// <returns>
-        ///   <c>true</c> if [is look up field] [the specified list name]; otherwise, <c>false</c>.
+        ///     <c>true</c> if [is look up field] [the specified list name]; otherwise, <c>false</c>.
         /// </returns>
         protected override bool IsLookUpField(string listName, string columnName)
         {
@@ -527,7 +523,7 @@ namespace EPMLiveReportsAdmin
         }
 
         /// <summary>
-        /// Populates the default column value.
+        ///     Populates the default column value.
         /// </summary>
         /// <param name="sColumn">The s column.</param>
         /// <param name="li">The li.</param>
@@ -582,8 +578,8 @@ namespace EPMLiveReportsAdmin
         protected override SqlParameter PopulateMandatoryHiddenFldsColumnValue(string sColumn, SPListItem li)
         {
             string identifier = DateTime.Now.Ticks.ToString(CultureInfo.InvariantCulture);
-            SqlParameter param = new SqlParameter();
-            var val = string.Empty;
+            var param = new SqlParameter();
+            string val = string.Empty;
             switch (sColumn)
             {
                 case "commenters":
@@ -596,19 +592,25 @@ namespace EPMLiveReportsAdmin
                         val = li["Commenters"].ToString();
                         param.Value = val;
                     }
-                    catch { param.Value = DBNull.Value; }
+                    catch
+                    {
+                        param.Value = DBNull.Value;
+                    }
                     break;
 
                 case "commentcount":
                     param.Direction = ParameterDirection.Input;
                     param.SqlDbType = SqlDbType.Int;
-                    param.ParameterName = "@commentcount_" + identifier;                
+                    param.ParameterName = "@commentcount_" + identifier;
                     try
                     {
                         val = li["CommentCount"].ToString();
                         param.Value = Convert.ToInt32(val);
                     }
-                    catch { param.Value = DBNull.Value; }
+                    catch
+                    {
+                        param.Value = DBNull.Value;
+                    }
                     break;
 
                 case "commentersread":
@@ -621,7 +623,10 @@ namespace EPMLiveReportsAdmin
                         val = li["CommentersRead"].ToString();
                         param.Value = val;
                     }
-                    catch { param.Value = DBNull.Value; }
+                    catch
+                    {
+                        param.Value = DBNull.Value;
+                    }
                     break;
 
                 case "workspaceurl":
@@ -634,7 +639,10 @@ namespace EPMLiveReportsAdmin
                         val = li["WorkspaceUrl"].ToString();
                         param.Value = val;
                     }
-                    catch { param.Value = DBNull.Value; }
+                    catch
+                    {
+                        param.Value = DBNull.Value;
+                    }
                     break;
             }
             return param;
@@ -643,7 +651,7 @@ namespace EPMLiveReportsAdmin
         // Private Methods (3) 
 
         /// <summary>
-        /// Adds the meta info cols.
+        ///     Adds the meta info cols.
         /// </summary>
         /// <param name="listName">Name of the list.</param>
         /// <param name="spListItem">The sp list item.</param>
@@ -661,9 +669,9 @@ namespace EPMLiveReportsAdmin
 
             cols = cols.Replace(")", ",[WorkType],[DataSource])");
             values = values.Replace(")",
-                                    string.Format(
-                                        ",@WorkType_{0},@DataSource_{0})",
-                                        identifier));
+                string.Format(
+                    ",@WorkType_{0},@DataSource_{0})",
+                    identifier));
 
             if (_cmdWithParams == null) _cmdWithParams = new SqlCommand();
 
@@ -682,20 +690,20 @@ namespace EPMLiveReportsAdmin
             //}
 
             _cmdWithParams.Parameters.Add(new SqlParameter
-                                              {
-                                                  ParameterName = string.Format("@WorkType_{0}", identifier),
-                                                  Value = listName
-                                              });
+            {
+                ParameterName = string.Format("@WorkType_{0}", identifier),
+                Value = listName
+            });
 
             _cmdWithParams.Parameters.Add(new SqlParameter
-                                              {
-                                                  ParameterName = string.Format("@DataSource_{0}", identifier),
-                                                  Value = 1
-                                              });
+            {
+                ParameterName = string.Format("@DataSource_{0}", identifier),
+                Value = 1
+            });
         }
 
         /// <summary>
-        /// Gets the type of the column.
+        ///     Gets the type of the column.
         /// </summary>
         /// <param name="columnName">Name of the column.</param>
         /// <returns></returns>
@@ -716,7 +724,7 @@ namespace EPMLiveReportsAdmin
         }
 
         /// <summary>
-        /// Logs the error.
+        ///     Logs the error.
         /// </summary>
         /// <param name="internalName">Name of the internal.</param>
         /// <param name="ex">The ex.</param>
@@ -729,7 +737,7 @@ namespace EPMLiveReportsAdmin
             }
 
             var errorLog = new EventLog("EPM Live", ".", "EPMLive My Work Reporting GetColumnValue")
-                               {MaximumKilobytes = 32768};
+            {MaximumKilobytes = 32768};
 
             errorLog.WriteEntry(
                 "Name: " + _siteName + " Url: " + _siteUrl + " ID: " + _siteId + " : " + ex.Message +

@@ -2,9 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Linq.Expressions;
 using System.Data.SqlClient;
+using System.Linq;
 using System.Text.RegularExpressions;
 using Microsoft.SharePoint;
 
@@ -12,19 +11,13 @@ namespace EPMLiveReportsAdmin
 {
     public class ColumnDefCollection : List<ColumnDef>
     {
-        public ColumnDefCollection()
-        {
-        }
+        public ColumnDefCollection() { }
 
         public ColumnDefCollection(int capacity)
-            : base(capacity)
-        {
-        }
+            : base(capacity) { }
 
         public ColumnDefCollection(IEnumerable<ColumnDef> collection)
-            : base(collection)
-        {
-        }
+            : base(collection) { }
 
         public ColumnDefCollection(DataColumnCollection columns)
         {
@@ -39,10 +32,12 @@ namespace EPMLiveReportsAdmin
             //Add(new ColumnDef(field));
             ColumnDef.AddColumn(this, field);
         }
+
         public void AddColumn(DataColumn column)
         {
             Add(new ColumnDef(column));
         }
+
         public ColumnDefCollection DiffColumns(List<ColumnDef> newSet)
         {
             return DiffColumns(this, newSet);
@@ -51,7 +46,7 @@ namespace EPMLiveReportsAdmin
         public string GetSqlColumnDefs()
         {
             var columns = new List<string>();
-            foreach (var columnDef in this)
+            foreach (ColumnDef columnDef in this)
             {
                 columns.Add(columnDef.ToString());
             }
@@ -67,7 +62,7 @@ namespace EPMLiveReportsAdmin
         {
             if (Count == 0)
                 return "None";
-            var s = "";
+            string s = "";
             ForEach(cd => s += string.Format("[{0}] ", cd.DisplayName));
             return s;
         }
@@ -85,17 +80,17 @@ namespace EPMLiveReportsAdmin
             }
             return diff;
         }
-
     }
 
     public class ColumnDef
     {
+        private static Hashtable _dbTypeTable;
         private readonly string _displayName;
         private readonly string _internalName;
+        private readonly bool _isLookup;
         private readonly string _sqlColumnName;
         private readonly int _sqlColumnSize;
         private readonly SqlDbType _sqlColumnType;
-        private readonly bool _isLookup;
 
         public ColumnDef(SPField spField)
         {
@@ -119,40 +114,14 @@ namespace EPMLiveReportsAdmin
             {
                 _isLookup = true;
             }
-            
         }
 
-        private SPFieldType GetInvalidFieldType(SPField field)
-        {
-            string sType = field.TypeAsString.ToLower();
-            SPFieldType type = SPFieldType.Invalid;
-            switch (sType)
-            {
-                case "filteredlookup":
-                    type = SPFieldType.Lookup;
-                    break;
+        public ColumnDef(string sqlColumnName, string internalName, string displayName, SPFieldType spFieldType,
+            SqlDbType sqlDbType)
+            : this(sqlColumnName, internalName, displayName, spFieldType, sqlDbType, 0) { }
 
-                case "totalrollup":
-                    type = SPFieldType.Integer;
-                    break;
-
-                case "resourcepermissions":
-                    type = SPFieldType.Note;
-                    break;
-
-                default:
-                    type = SPFieldType.Text;
-                    break;
-            }
-            return type;
-        }
-
-        public ColumnDef(string sqlColumnName, string internalName, string displayName, SPFieldType spFieldType, SqlDbType sqlDbType)
-            : this(sqlColumnName, internalName, displayName, spFieldType, sqlDbType, 0)
-        {
-        }
-
-        public ColumnDef(string sqlColumnName, string internalName, string displayName, SPFieldType spFieldType, SqlDbType sqlDbType, int size)
+        public ColumnDef(string sqlColumnName, string internalName, string displayName, SPFieldType spFieldType,
+            SqlDbType sqlDbType, int size)
         {
             _sqlColumnName = sqlColumnName;
             ColumnType = spFieldType;
@@ -167,14 +136,14 @@ namespace EPMLiveReportsAdmin
             _sqlColumnName = row["ColumnName"].ToString();
             _internalName = row["InternalName"].ToString();
             _displayName = row["DisplayName"].ToString();
-            _sqlColumnSize = (int)row["ColumnSize"];
+            _sqlColumnSize = (int) row["ColumnSize"];
         }
 
         public ColumnDef(DataColumn column)
         {
             _sqlColumnName = column.ColumnName;
-            _sqlColumnType = ConvertDbTypeToSqlDbType(column.DataType);            
-            _sqlColumnSize = column.MaxLength;          
+            _sqlColumnType = ConvertDbTypeToSqlDbType(column.DataType);
+            _sqlColumnSize = column.MaxLength;
             _internalName = _sqlColumnName;
             _displayName = _sqlColumnName;
         }
@@ -211,8 +180,33 @@ namespace EPMLiveReportsAdmin
             get { return _isLookup; }
         }
 
+        private SPFieldType GetInvalidFieldType(SPField field)
+        {
+            string sType = field.TypeAsString.ToLower();
+            var type = SPFieldType.Invalid;
+            switch (sType)
+            {
+                case "filteredlookup":
+                    type = SPFieldType.Lookup;
+                    break;
+
+                case "totalrollup":
+                    type = SPFieldType.Integer;
+                    break;
+
+                case "resourcepermissions":
+                    type = SPFieldType.Note;
+                    break;
+
+                default:
+                    type = SPFieldType.Text;
+                    break;
+            }
+            return type;
+        }
+
         /// <summary>
-        /// Get Sql column definition in the form [NAME] [TYPE] (SIZE) NULL
+        ///     Get Sql column definition in the form [NAME] [TYPE] (SIZE) NULL
         /// </summary>
         /// <returns></returns>
         public override string ToString()
@@ -223,29 +217,20 @@ namespace EPMLiveReportsAdmin
                 colSize = "MAX";
             }
 
-            if (_sqlColumnName.ToLower() != "webid" && _sqlColumnName.ToLower() != "itemid" && _sqlColumnName.ToLower() != "periodid" && _sqlColumnName.ToLower() != "rpttsduid")
+            if (_sqlColumnName.ToLower() != "webid" && _sqlColumnName.ToLower() != "itemid" &&
+                _sqlColumnName.ToLower() != "periodid" && _sqlColumnName.ToLower() != "rpttsduid")
             {
-
-
                 return
-
-
                     string.Format("[{0}] [{1}]{2} NULL",
-                                     _sqlColumnName,
-                                     _sqlColumnType,
-                                     _sqlColumnSize > 0 ? string.Format("({0})", colSize) : "");
+                        _sqlColumnName,
+                        _sqlColumnType,
+                        _sqlColumnSize > 0 ? string.Format("({0})", colSize) : "");
             }
-            else
-            {
-                return
-
-
-                   string.Format("[{0}] [{1}]{2} NOT NULL",
-                                    _sqlColumnName,
-                                    _sqlColumnType,
-                                    _sqlColumnSize > 0 ? string.Format("({0})", colSize) : "");
-
-            }
+            return
+                string.Format("[{0}] [{1}]{2} NOT NULL",
+                    _sqlColumnName,
+                    _sqlColumnType,
+                    _sqlColumnSize > 0 ? string.Format("({0})", colSize) : "");
         }
 
         /* Static Methods */
@@ -258,24 +243,26 @@ namespace EPMLiveReportsAdmin
         public static ColumnDefCollection GetDefaultColumns()
         {
             var columns = new ColumnDefCollection
-                              {
-                                  new ColumnDef("SiteId", "SiteId", "SiteId", SPFieldType.Guid, SqlDbType.UniqueIdentifier),
-                                  new ColumnDef("WebId", "WebId", "WebId", SPFieldType.Guid, SqlDbType.UniqueIdentifier),
-                                  new ColumnDef("ListId", "ListId", "ListId", SPFieldType.Guid, SqlDbType.UniqueIdentifier),
-                                  new ColumnDef("ItemId", "ItemId", "ItemId", SPFieldType.Integer, SqlDbType.Int),
-                                  new ColumnDef("WebUrl", "WebUrl", "WebUrl", SPFieldType.Text, SqlDbType.VarChar, 256),
-                                  new ColumnDef("Commenters", "Commenters", "Commenters", SPFieldType.Note, SqlDbType.NVarChar, 8001),
-                                  new ColumnDef("CommentersRead", "CommentersRead", "CommentersRead", SPFieldType.Note, SqlDbType.NVarChar, 8001),
-                                  new ColumnDef("CommentCount", "CommentCount", "CommentCount", SPFieldType.Number, SqlDbType.Int),
-                                  new ColumnDef("WorkspaceUrl", "WorkspaceUrl", "WorkspaceUrl", SPFieldType.Text, SqlDbType.NVarChar, 8001)
-                              };
+            {
+                new ColumnDef("SiteId", "SiteId", "SiteId", SPFieldType.Guid, SqlDbType.UniqueIdentifier),
+                new ColumnDef("WebId", "WebId", "WebId", SPFieldType.Guid, SqlDbType.UniqueIdentifier),
+                new ColumnDef("ListId", "ListId", "ListId", SPFieldType.Guid, SqlDbType.UniqueIdentifier),
+                new ColumnDef("ItemId", "ItemId", "ItemId", SPFieldType.Integer, SqlDbType.Int),
+                new ColumnDef("WebUrl", "WebUrl", "WebUrl", SPFieldType.Text, SqlDbType.VarChar, 256),
+                new ColumnDef("Commenters", "Commenters", "Commenters", SPFieldType.Note, SqlDbType.NVarChar, 8001),
+                new ColumnDef("CommentersRead", "CommentersRead", "CommentersRead", SPFieldType.Note, SqlDbType.NVarChar,
+                    8001),
+                new ColumnDef("CommentCount", "CommentCount", "CommentCount", SPFieldType.Number, SqlDbType.Int),
+                new ColumnDef("WorkspaceUrl", "WorkspaceUrl", "WorkspaceUrl", SPFieldType.Text, SqlDbType.NVarChar, 8001)
+            };
             return columns;
         }
 
         public static ColumnDefCollection GetDefaultColumnsSnapshot()
         {
             var columns = new ColumnDefCollection(GetDefaultColumns());
-            columns.Insert(0, new ColumnDef("PeriodId", "PeriodId", "PeriodId", SPFieldType.Guid, SqlDbType.UniqueIdentifier));
+            columns.Insert(0,
+                new ColumnDef("PeriodId", "PeriodId", "PeriodId", SPFieldType.Guid, SqlDbType.UniqueIdentifier));
             return columns;
         }
 
@@ -297,13 +284,16 @@ namespace EPMLiveReportsAdmin
                 case SPFieldType.User:
                     if (sType != "lookupmulti" && sType != "usermulti" && sType != "multichoice")
                     {
-                        columns.Add(new ColumnDef(field.InternalName + "ID", field.InternalName, field.Title, field.Type, SqlDbType.Int));
+                        columns.Add(new ColumnDef(field.InternalName + "ID", field.InternalName, field.Title, field.Type,
+                            SqlDbType.Int));
                     }
                     else
                     {
-                        columns.Add(new ColumnDef(field.InternalName + "ID", field.InternalName, field.Title, field.Type, p.SqlDbType, p.Size));
+                        columns.Add(new ColumnDef(field.InternalName + "ID", field.InternalName, field.Title, field.Type,
+                            p.SqlDbType, p.Size));
                     }
-                    columns.Add(new ColumnDef(field.InternalName + "Text", field.InternalName, field.Title, field.Type, SqlDbType.NVarChar, 8001));
+                    columns.Add(new ColumnDef(field.InternalName + "Text", field.InternalName, field.Title, field.Type,
+                        SqlDbType.NVarChar, 8001));
                     //columns.Add(new ColumnDef(field.InternalName + "Text", field.InternalName, field.Title, field.Type, SqlDbType.NText));
                     break;
 
@@ -311,8 +301,10 @@ namespace EPMLiveReportsAdmin
                     switch (sType)
                     {
                         case "filteredlookup":
-                            columns.Add(new ColumnDef(field.InternalName + "ID", field.InternalName, field.Title, SPFieldType.Lookup, SqlDbType.Int));
-                            columns.Add(new ColumnDef(field.InternalName + "Text", field.InternalName, field.Title, SPFieldType.Lookup, SqlDbType.NVarChar, 256));
+                            columns.Add(new ColumnDef(field.InternalName + "ID", field.InternalName, field.Title,
+                                SPFieldType.Lookup, SqlDbType.Int));
+                            columns.Add(new ColumnDef(field.InternalName + "Text", field.InternalName, field.Title,
+                                SPFieldType.Lookup, SqlDbType.NVarChar, 256));
                             break;
 
                         default:
@@ -332,30 +324,28 @@ namespace EPMLiveReportsAdmin
             columns.Add(new ColumnDef(column));
         }
 
-        private static Hashtable _dbTypeTable;
-
         public static SqlDbType ConvertDbTypeToSqlDbType(Type dbType)
         {
             if (_dbTypeTable == null)
             {
                 _dbTypeTable = new Hashtable
-                                   {
-                                       {typeof (Boolean), SqlDbType.Bit},
-                                       {typeof (Int16), SqlDbType.SmallInt},
-                                       {typeof (Int32), SqlDbType.Int},
-                                       {typeof (Int64), SqlDbType.BigInt},
-                                       {typeof (Double), SqlDbType.Float},
-                                       {typeof (Decimal), SqlDbType.Decimal},
-                                       {typeof (String), SqlDbType.VarChar},
-                                       {typeof (DateTime), SqlDbType.DateTime},
-                                       {typeof (Byte[]), SqlDbType.VarBinary},
-                                       {typeof (Guid), SqlDbType.UniqueIdentifier}
-                                   };
+                {
+                    {typeof (Boolean), SqlDbType.Bit},
+                    {typeof (Int16), SqlDbType.SmallInt},
+                    {typeof (Int32), SqlDbType.Int},
+                    {typeof (Int64), SqlDbType.BigInt},
+                    {typeof (Double), SqlDbType.Float},
+                    {typeof (Decimal), SqlDbType.Decimal},
+                    {typeof (String), SqlDbType.VarChar},
+                    {typeof (DateTime), SqlDbType.DateTime},
+                    {typeof (Byte[]), SqlDbType.VarBinary},
+                    {typeof (Guid), SqlDbType.UniqueIdentifier}
+                };
             }
             SqlDbType dbtype;
             try
             {
-                dbtype = (SqlDbType)_dbTypeTable[dbType];
+                dbtype = (SqlDbType) _dbTypeTable[dbType];
             }
             catch
             {
@@ -366,7 +356,7 @@ namespace EPMLiveReportsAdmin
 
         public static SqlParameter GetParameterFromSPField(SPField field)
         {
-            SqlParameter param = new SqlParameter();
+            var param = new SqlParameter();
             SPFieldType type = field.Type;
             string sType = field.TypeAsString.ToLower();
 

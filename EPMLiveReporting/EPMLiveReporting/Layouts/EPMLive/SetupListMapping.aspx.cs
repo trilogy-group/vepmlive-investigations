@@ -1,20 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Web;
 using System.Web.UI;
-using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
 using Microsoft.SharePoint;
-using Microsoft.SharePoint.WebControls;
 using Microsoft.SharePoint.Utilities;
-using System.Diagnostics;
+using Microsoft.SharePoint.WebControls;
 
-namespace EPMLiveReportsAdmin.Layouts.EPMLive 
+namespace EPMLiveReportsAdmin.Layouts.EPMLive
 {
     public partial class SetupListMapping : LayoutsPageBase
     {
-       protected Panel pnlListSelect;
         //protected InputFormCheckBox chkResource;
         //protected InputFormCheckBoxList cblFields;
         //protected CheckBoxList cblResources;
@@ -24,6 +22,7 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
         //protected HtmlGenericControl pDescription2;
         private bool _existing;
         private Guid _existingListId;
+        protected Panel pnlListSelect;
 
         protected override void OnInit(EventArgs e)
         {
@@ -38,7 +37,7 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
             {
                 if (_existing)
                 {
-                    var list = PopulateFieldList();
+                    SPList list = PopulateFieldList();
                     ddlLists.Items.Add(new ListItem(list.Title));
                     ddlLists.Enabled = false;
                 }
@@ -47,9 +46,7 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
             }
         }
 
-        protected void Page_Load(object sender, EventArgs e)
-        {
-        }
+        protected void Page_Load(object sender, EventArgs e) { }
 
         private void PopulateControls()
         {
@@ -87,12 +84,14 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
 
         protected void Cancel_Click(object sender, EventArgs e)
         {
-            SPUtility.Redirect(SPContext.Current.Web.Url + "/_layouts/epmlive/listmappings.aspx?Source=" + SPContext.Current.Web.Url + "/_layouts/epmlive/settings.aspx", SPRedirectFlags.Static, HttpContext.Current);
+            SPUtility.Redirect(
+                SPContext.Current.Web.Url + "/_layouts/epmlive/listmappings.aspx?Source=" + SPContext.Current.Web.Url +
+                "/_layouts/epmlive/settings.aspx", SPRedirectFlags.Static, HttpContext.Current);
         }
 
         protected void Submit_Click(object sender, EventArgs e)
         {
-            var fields = new ListItemCollection();            
+            var fields = new ListItemCollection();
             fields = cblAutomatic.Items;
 
             // Read selected fields
@@ -124,24 +123,24 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
             {
                 var listId = new Guid(ddlLists.SelectedValue);
                 rb.CreateListBiz(listId, fields);
-            }                      
+            }
 
             try
             {
                 //FOREIGN IMPLEMENTATION -- START
-                EPMData DAO = new EPMData(SPContext.Current.Site.ID);
+                var DAO = new EPMData(SPContext.Current.Site.ID);
                 rb.UpdateForeignKeys(DAO);
                 DAO.Dispose();
                 // -- END
             }
             catch (Exception ex)
             {
-                SPSecurity.RunWithElevatedPrivileges(delegate()
+                SPSecurity.RunWithElevatedPrivileges(delegate
                 {
                     if (!EventLog.SourceExists("EPMLive Reporting - UpdateForeignKeys"))
                         EventLog.CreateEventSource("EPMLive Reporting - UpdateForeignKeys", "EPM Live");
 
-                    EventLog myLog = new EventLog("EPM Live", ".", "EPMLive Reporting - UpdateForeignKeys");
+                    var myLog = new EventLog("EPM Live", ".", "EPMLive Reporting - UpdateForeignKeys");
                     myLog.MaximumKilobytes = 32768;
                     myLog.WriteEntry(ex.Message + ex.StackTrace, EventLogEntryType.Error, 4001);
                 });
@@ -157,15 +156,14 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
 
         private SPList PopulateFieldList()
         {
-
             //Reset checkboxlists
             cblFields.Items.Clear();
             cblAutomatic.Items.Clear();
             cblResources.Items.Clear();
 
             Guid listId = _existing
-                              ? _existingListId
-                              : new Guid(ddlLists.SelectedValue);
+                ? _existingListId
+                : new Guid(ddlLists.SelectedValue);
 
             SPList selectedList = null;
             var mappedFields = new List<string>();
@@ -210,8 +208,8 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
                 chkResource.Enabled = true;
             }
 
-            var required = ListBiz.RequiredResourceFields;
-            var automatic = ListBiz.AutomaticFields;
+            Collection<string> required = ListBiz.RequiredResourceFields;
+            Collection<string> automatic = ListBiz.AutomaticFields;
 
             // Get all fields in List - and sort them
             var fields = new List<SPField>();
@@ -235,7 +233,7 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
             // Create Checkbox List
             //      automatic: always selected
             //      required: optional but necessary for resource reporting
-           
+
             int insertReq = 0; // Position in list to insert required items (top)
             int insertChecked = 0;
             //var resourceItems = new ListItemCollection();
@@ -309,19 +307,19 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
         }
 
         /// <summary>
-        /// Create javascript function to toggle resource checkboxes
+        ///     Create javascript function to toggle resource checkboxes
         /// </summary>
         /// <remarks>
-        /// Assumes 4 checkboxes from 1-4, not 0. First checkbox is always 'Title'.
+        ///     Assumes 4 checkboxes from 1-4, not 0. First checkbox is always 'Title'.
         /// </remarks>
         private void WriteJS(InputFormCheckBoxList cbl)
         {
             chkResource.InputAttributes.Add("onclick", "Toggle()");
 
-            var cdef = "";
-            var cdis = "";
-            var cena = "";
-            var cchk = "";
+            string cdef = "";
+            string cdis = "";
+            string cena = "";
+            string cchk = "";
             for (int j = 1; j < 5; j++)
             {
                 cdef += string.Format(" var c{0} = document.getElementById('{1}_{0}'); ", j, cbl.ClientID);
@@ -329,8 +327,8 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
                 cdis += string.Format(" c{0}.disabled = true; c{0}.parentNode.disabled = true;", j);
                 cena += string.Format(" c{0}.disabled = false; c{0}.parentNode.disabled = false;", j);
             }
-            var script = string.Format(
-            @"
+            string script = string.Format(
+                @"
             <script type='text/javascript'>
             function Toggle() {{
                 var master = document.getElementById('{0}');
@@ -349,7 +347,7 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
             </script>
             ", chkResource.ClientID, cdef, cchk, cdis, cena);
 
-            ClientScript.RegisterStartupScript(typeof(Page), "EPMReportsScript", script);
+            ClientScript.RegisterStartupScript(typeof (Page), "EPMReportsScript", script);
         }
-    }    
+    }
 }

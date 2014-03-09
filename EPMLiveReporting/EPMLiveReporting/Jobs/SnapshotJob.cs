@@ -1,29 +1,25 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Data;
+using EPMLiveCore.API;
 using Microsoft.SharePoint;
-using System.Data;
-using System.Data.SqlClient;
-using System.Collections;
 
 namespace EPMLiveReportsAdmin.Jobs
 {
-    public class SnapshotJob : EPMLiveCore.API.BaseJob
+    public class SnapshotJob : BaseJob
     {
         public void execute(SPSite site, SPWeb web, string data)
         {
-            EPMLiveReportsAdmin.EPMData epmdata = new EPMLiveReportsAdmin.EPMData(site.ID);
+            var epmdata = new EPMData(site.ID);
 
             epmdata.SnapshotLists(base.JobUid, site.ID, data);
 
             DataTable dt = epmdata.GetSnapshotResults(base.JobUid);
 
-            foreach(DataRow dr in dt.Rows)
+            foreach (DataRow dr in dt.Rows)
             {
-                sErrors += "Processing List (" + dr["ListName"].ToString() + ")";
-                if(dr["level"].ToString() == "2")
+                sErrors += "Processing List (" + dr["ListName"] + ")";
+                if (dr["level"].ToString() == "2")
                 {
-                    sErrors += " Failed: " + dr["ShortMessage"].ToString();
+                    sErrors += " Failed: " + dr["ShortMessage"];
                     bErrors = true;
                 }
                 else

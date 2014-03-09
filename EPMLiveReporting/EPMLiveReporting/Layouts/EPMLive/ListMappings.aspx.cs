@@ -1,15 +1,13 @@
 ﻿using System;
-using Microsoft.SharePoint;
-using Microsoft.SharePoint.WebControls;
+using System.Data;
+using System.Data.SqlClient;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-using Microsoft.SharePoint.Utilities;
 using EPMLiveCore;
-using System.Data;
-using System.Data.SqlClient;
-using System.Collections;
-using EPMLiveReportsAdmin.Properties;
+using Microsoft.SharePoint;
+using Microsoft.SharePoint.Utilities;
+using Microsoft.SharePoint.WebControls;
 
 namespace EPMLiveReportsAdmin.Layouts.EPMLive
 {
@@ -18,29 +16,63 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
         //protected GridView GridView1;
         //protected MenuItemTemplate MenuItemTemplate1;
         //protected MenuItemTemplate MenuItemTemplate2;
-        protected HiddenField hdnUserId;
-        //protected Label lblError;
-        protected SPMenuField ListOptions;
-
-        protected ToolBar toolbar;
         protected ToolBarButton AddList;
+        protected SPMenuField ListOptions;
+        private string[] _ArrayListNames;
         //protected Panel pnlActionsMenu;
         //protected Panel pnlSettingsMenu;
-        protected string version;
 
         private EPMData _DAO;
 
-        int _RFstatus;
-        string _RFlistguid;
-        int _RFpctComplete;
-        bool _RFqueued;
+        private string _RFlistguid;
+        private int _RFpctComplete;
+        private bool _RFqueued;
+        private int _RFstatus;
 
-        int _SSstatus;
-        string _SSlistguid;
-        int _SSpctComplete;
-        bool _SSqueued;
-        private bool reportingV2Enabled = false;
-        string[] _ArrayListNames;
+        private string _SSlistguid;
+        private int _SSpctComplete;
+        private bool _SSqueued;
+        private int _SSstatus;
+        protected HiddenField hdnUserId;
+        private bool reportingV2Enabled;
+        protected ToolBar toolbar;
+        protected string version;
+
+        public void RaisePostBackEvent(string sAction)
+        {
+            string param = sAction.Remove(sAction.LastIndexOf("_"));
+            sAction = sAction.Substring(sAction.LastIndexOf("_") + 1);
+            switch (sAction)
+            {
+                case "cleanup":
+                    CleanupLists(param);
+                    break;
+
+                case "snapshot":
+                    SnapshotLists(param);
+                    break;
+
+                case "delete":
+                    var reportBiz = new ReportBiz(SPContext.Current.Site.ID, SPContext.Current.Web.ID,
+                        reportingV2Enabled);
+                    var listId = new Guid(param);
+                    _DAO.Command = "SELECT TableName FROM RPTList WHERE RPTListID=@RPTListID";
+                    _DAO.AddParam("@RPTListID", param);
+                    string sTableName = _DAO.ExecuteScalar(_DAO.GetClientReportingConnection).ToString();
+                    DataTable refTables = reportBiz.GetReferencingTables(_DAO, sTableName);
+                    if (refTables.Rows.Count == 0)
+                    {
+                        reportBiz.GetListBiz(new Guid(param)).Delete();
+                    }
+                    else
+                    {
+                        SPUtility.Redirect("epmlive/ListMappings.aspx?delete=true&id=" + param + "&name=" + sTableName,
+                            SPRedirectFlags.RelativeToLayoutsPage, HttpContext.Current);
+                    }
+                    break;
+            }
+            SPUtility.Redirect("epmlive/ListMappings.aspx?", SPRedirectFlags.RelativeToLayoutsPage, HttpContext.Current);
+        }
 
         protected void Page_Init(object sender, EventArgs e)
         {
@@ -48,20 +80,22 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
             {
                 try
                 {
-                    reportingV2Enabled = Convert.ToBoolean(EPMLiveCore.CoreFunctions.getConfigSetting(SPContext.Current.Site.RootWeb, "reportingV2"));
+                    reportingV2Enabled =
+                        Convert.ToBoolean(CoreFunctions.getConfigSetting(SPContext.Current.Site.RootWeb, "reportingV2"));
                 }
                 catch (Exception)
                 {
                     reportingV2Enabled = false;
                     SPContext.Current.Site.RootWeb.AllowUnsafeUpdates = true;
-                    EPMLiveCore.CoreFunctions.setConfigSetting(SPContext.Current.Site.RootWeb, "reportingV2", "false");
+                    CoreFunctions.setConfigSetting(SPContext.Current.Site.RootWeb, "reportingV2", "false");
                 }
                 _DAO = new EPMData(SPContext.Current.Site.ID);
                 var rb = new ReportBiz(SPContext.Current.Site.ID, SPContext.Current.Web.ID, reportingV2Enabled);
 
                 if (!rb.SiteExists())
                 {
-                    string msg = "<p>This site is not currently configured to allow list mapping. A Site Collection Administrator must first map this site to a database.</p>";
+                    string msg =
+                        "<p>This site is not currently configured to allow list mapping. A Site Collection Administrator must first map this site to a database.</p>";
                     lblError.Text = msg;
                     lblError.Visible = true;
                     BuildMenu(false);
@@ -87,7 +121,7 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
         protected void ShowAlert()
         {
             var reportBiz = new ReportBiz(SPContext.Current.Site.ID);
-            Guid listId = new Guid(Request.QueryString["id"]);
+            var listId = new Guid(Request.QueryString["id"]);
 
             _DAO.Command = "SELECT TableName FROM RPTList WHERE RPTListID=@RPTListID";
             _DAO.AddParam("@RPTListID", listId);
@@ -103,9 +137,11 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
             }
 
             redirectURL = redirectURL + "_layouts/epmlive/ListMappings.aspx";
-            string sAlert = "<script language='javascript' type='text/javascript'> if (confirm('Before this list can be deleted the following lists must be deleted first: " + sLists + "'))"
-             + "{ window.location.href ='" + redirectURL + "'; }" +
-            "else { window.location.href = '" + redirectURL + "';}  </script>";
+            string sAlert =
+                "<script language='javascript' type='text/javascript'> if (confirm('Before this list can be deleted the following lists must be deleted first: " +
+                sLists + "'))"
+                + "{ window.location.href ='" + redirectURL + "'; }" +
+                "else { window.location.href = '" + redirectURL + "';}  </script>";
             ClientScript.RegisterStartupScript(GetType(), "EPMLiveWarning", sAlert);
         }
 
@@ -119,27 +155,25 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
         {
             SPWeb web = SPContext.Current.Web;
 
-            SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(web.Site.WebApplication.Id));
+            var cn = new SqlConnection(CoreFunctions.getConnectionString(web.Site.WebApplication.Id));
 
-            SPSecurity.RunWithElevatedPrivileges(delegate()
-            {
-                cn.Open();
-            });
+            SPSecurity.RunWithElevatedPrivileges(delegate { cn.Open(); });
 
             try
             {
                 if (web.CurrentUser.IsSiteAdmin)
                 {
-                    SqlCommand cmd = new SqlCommand("SELECT ClientUsername, ClientPassword, DatabaseServer, DatabaseName from RPTDATABASES where SiteId=@SiteId", cn);
+                    var cmd =
+                        new SqlCommand(
+                            "SELECT ClientUsername, ClientPassword, DatabaseServer, DatabaseName from RPTDATABASES where SiteId=@SiteId",
+                            cn);
                     cmd.Parameters.AddWithValue("@SiteId", web.Site.ID);
                     SqlDataReader dr = cmd.ExecuteReader();
                     if (dr.Read())
                     {
                         if (!dr.IsDBNull(0))
                         {
-
                             string sCn = "Data Source=" + dr.GetString(2) + ";Initial Catalog=" + dr.GetString(3);
-
 
 
                             string sText = "<br><br><b>Reporting Database Information:</b><br>";
@@ -173,6 +207,7 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
                 iIndex++;
             }
         }
+
         private bool IsReportingList(string sListName)
         {
             bool isRep = false;
@@ -190,24 +225,26 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
         private void FillData()
         {
             string reportingListIDs = string.Empty;
-            var siteId = SPContext.Current.Site.ID;
+            Guid siteId = SPContext.Current.Site.ID;
 
             var rd = new ReportData(siteId);
-            EPMData daoEPMData = new EPMData(siteId);
+            var daoEPMData = new EPMData(siteId);
             LoadLists(rd.GetListMappings());
-            
-            string defaultLists = daoEPMData.DefaultLists(SPContext.Current.Web);
-            string _DefaultLists = CoreFunctions.getConfigSetting(SPContext.Current.Web, "EPMLiveFixLists").Replace("\r\n", ",");
 
-            DataTable dtReportData = new DataTable();
+            string defaultLists = daoEPMData.DefaultLists(SPContext.Current.Web);
+            string _DefaultLists =
+                CoreFunctions.getConfigSetting(SPContext.Current.Web, "EPMLiveFixLists").Replace("\r\n", ",");
+
+            var dtReportData = new DataTable();
             using (var spSite = new SPSite(SPContext.Current.Site.ID))
             {
-                using (var spweb = spSite.OpenWeb(SPContext.Current.Web.ID))
+                using (SPWeb spweb = spSite.OpenWeb(SPContext.Current.Web.ID))
                 {
                     SPListCollection lists = spweb.Lists;
                     foreach (SPList list in lists)
                     {
-                        if ((!list.Hidden && IsReportingList(list.Title)) || defaultLists.Contains(list.Title) || _DefaultLists.Contains(list.Title))
+                        if ((!list.Hidden && IsReportingList(list.Title)) || defaultLists.Contains(list.Title) ||
+                            _DefaultLists.Contains(list.Title))
                         {
                             reportingListIDs += "'" + list.ID + "',";
                         }
@@ -216,7 +253,7 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
                     if (!string.IsNullOrEmpty(reportingListIDs))
                         reportingListIDs = reportingListIDs.Substring(0, reportingListIDs.Length - 1);
 
-                    var mappings = rd.GetListMappings(reportingListIDs).DefaultView;
+                    DataView mappings = rd.GetListMappings(reportingListIDs).DefaultView;
                     GridView1.DataSource = mappings;
                     GridView1.DataBind();
                     rd.Dispose();
@@ -226,41 +263,8 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
 
         protected void AddList_Click(object sender, EventArgs e)
         {
-            SPUtility.Redirect("/epmlive/SetupListMapping.aspx", SPRedirectFlags.RelativeToLayoutsPage, HttpContext.Current);
-        }
-
-        public void RaisePostBackEvent(string sAction)
-        {
-            string param = sAction.Remove(sAction.LastIndexOf("_"));
-            sAction = sAction.Substring(sAction.LastIndexOf("_") + 1);
-            switch (sAction)
-            {
-                case "cleanup":
-                    CleanupLists(param);
-                    break;
-
-                case "snapshot":
-                    SnapshotLists(param);
-                    break;
-
-                case "delete":
-                    var reportBiz = new ReportBiz(SPContext.Current.Site.ID, SPContext.Current.Web.ID, reportingV2Enabled);
-                    Guid listId = new Guid(param);
-                    _DAO.Command = "SELECT TableName FROM RPTList WHERE RPTListID=@RPTListID";
-                    _DAO.AddParam("@RPTListID", param);
-                    string sTableName = _DAO.ExecuteScalar(_DAO.GetClientReportingConnection).ToString();
-                    DataTable refTables = reportBiz.GetReferencingTables(_DAO, sTableName);
-                    if (refTables.Rows.Count == 0)
-                    {
-                        reportBiz.GetListBiz(new Guid(param)).Delete();
-                    }
-                    else
-                    {
-                        SPUtility.Redirect("epmlive/ListMappings.aspx?delete=true&id=" + param + "&name=" + sTableName, SPRedirectFlags.RelativeToLayoutsPage, HttpContext.Current);
-                    }
-                    break;
-            }
-            SPUtility.Redirect("epmlive/ListMappings.aspx?", SPRedirectFlags.RelativeToLayoutsPage, HttpContext.Current);
+            SPUtility.Redirect("/epmlive/SetupListMapping.aspx", SPRedirectFlags.RelativeToLayoutsPage,
+                HttpContext.Current);
         }
 
         private string GetRefLists(DataTable refTables)
@@ -285,9 +289,9 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
             {
                 using (SPWeb web = SPContext.Current.Web)
                 {
-
                     Guid listId = _DAO.GetListId(sLists);
-                    _DAO.Command = "select timerjobuid from timerjobs where siteguid=@siteguid and listguid = @listguid and jobtype=7";
+                    _DAO.Command =
+                        "select timerjobuid from timerjobs where siteguid=@siteguid and listguid = @listguid and jobtype=7";
                     _DAO.AddParam("@siteguid", site.ID.ToString());
                     _DAO.AddParam("@listguid", listId.ToString());
                     object oResult = _DAO.ExecuteScalar(_DAO.GetEPMLiveConnection);
@@ -295,12 +299,13 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
                     Guid timerjobuid = Guid.Empty;
                     if (oResult != null)
                     {
-                        timerjobuid = (Guid)oResult;
+                        timerjobuid = (Guid) oResult;
                     }
                     else
                     {
                         timerjobuid = Guid.NewGuid();
-                        _DAO.Command = "INSERT INTO TIMERJOBS (timerjobuid, siteguid, jobtype, jobname, scheduletype, webguid, listguid, jobdata) VALUES (@timerjobuid, @siteguid, 7, 'Reporting Snapshot', 0, @webguid, @listguid, @jobdata)";
+                        _DAO.Command =
+                            "INSERT INTO TIMERJOBS (timerjobuid, siteguid, jobtype, jobname, scheduletype, webguid, listguid, jobdata) VALUES (@timerjobuid, @siteguid, 7, 'Reporting Snapshot', 0, @webguid, @listguid, @jobdata)";
                         _DAO.AddParam("@siteguid", site.ID.ToString());
                         _DAO.AddParam("@webguid", web.ID.ToString());
                         _DAO.AddParam("@listguid", listId.ToString());
@@ -310,7 +315,7 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
                     }
 
                     if (timerjobuid != Guid.Empty)
-                        EPMLiveCore.CoreFunctions.enqueue(timerjobuid, 0);
+                        CoreFunctions.enqueue(timerjobuid, 0);
                 }
             }
             //END
@@ -323,14 +328,14 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
             {
                 using (SPWeb web = SPContext.Current.Web)
                 {
-
                     Guid listID = _DAO.GetListId(sLists);
 
                     //DELETE WORK
                     _DAO.DeleteWork(listID, -1);
                     //END
 
-                    _DAO.Command = "select timerjobuid from timerjobs where siteguid=@siteguid and listguid = @listguid and jobtype=6";
+                    _DAO.Command =
+                        "select timerjobuid from timerjobs where siteguid=@siteguid and listguid = @listguid and jobtype=6";
                     _DAO.AddParam("@siteguid", site.ID.ToString());
                     _DAO.AddParam("@listguid", listID.ToString());
                     object oResult = _DAO.ExecuteScalar(_DAO.GetEPMLiveConnection);
@@ -339,23 +344,23 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
 
                     if (oResult != null)
                     {
-                        timerjobuid = (Guid)oResult;
+                        timerjobuid = (Guid) oResult;
                     }
                     else
                     {
                         timerjobuid = Guid.NewGuid();
-                        _DAO.Command = "INSERT INTO TIMERJOBS (timerjobuid, siteguid, jobtype, jobname, scheduletype, webguid, listguid, jobdata) VALUES (@timerjobuid, @siteguid, 6, 'List Data Cleanup', 0, @webguid, @listguid, @jobdata)";
+                        _DAO.Command =
+                            "INSERT INTO TIMERJOBS (timerjobuid, siteguid, jobtype, jobname, scheduletype, webguid, listguid, jobdata) VALUES (@timerjobuid, @siteguid, 6, 'List Data Cleanup', 0, @webguid, @listguid, @jobdata)";
                         _DAO.AddParam("@siteguid", site.ID.ToString());
                         _DAO.AddParam("@webguid", web.ID.ToString());
                         _DAO.AddParam("@listguid", listID.ToString());
                         _DAO.AddParam("@jobdata", sLists);
                         _DAO.AddParam("@timerjobuid", timerjobuid);
                         _DAO.ExecuteNonQuery(_DAO.GetEPMLiveConnection);
-
                     }
 
                     if (timerjobuid != Guid.Empty)
-                        EPMLiveCore.CoreFunctions.enqueue(timerjobuid, 0);
+                        CoreFunctions.enqueue(timerjobuid, 0);
                 }
             }
             //--End
@@ -364,15 +369,16 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
         private void BuildMenu(bool enabled)
         {
             var actionsMenu = new EPMMenu("Actions");
-            actionsMenu.Items.Add(new EPMMenuItem("epm01_AddList", "/_layouts/images/newitem.gif", "javascript:location.href='setuplistmapping.aspx'; return false", "Add List", "100", enabled));
+            actionsMenu.Items.Add(new EPMMenuItem("epm01_AddList", "/_layouts/images/newitem.gif",
+                "javascript:location.href='setuplistmapping.aspx'; return false", "Add List", "100", enabled));
             if (!_SSqueued)
             {
-                actionsMenu.Items.Add(new EPMMenuItem("epm02_SnapshotAll", "images/EPMSnapshot.gif", "submit('SnapshotAll'); return false", "Snapshot All", "100", enabled));
+                actionsMenu.Items.Add(new EPMMenuItem("epm02_SnapshotAll", "images/EPMSnapshot.gif",
+                    "submit('SnapshotAll'); return false", "Snapshot All", "100", enabled));
             }
 
             if (!_RFqueued)
             {
-
                 //actionsMenu.Items.Add(new EPMMenuItem("epm03_CleanupAll", "images/EPMRefresh.gif", "submit('CleanupAll'); return false", "Cleanup All", "100", enabled));
                 actionsMenu.Items.Add(
                     new EPMMenuItem(
@@ -386,8 +392,10 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
             actionsMenu.Render(pnlActionsMenu);
 
             var settingsMenu = new EPMMenu("Settings");
-            settingsMenu.Items.Add(new EPMMenuItem("epm11_Snapshots", "images/EPMSnapshot.gif", "javascript:location.href='allsnapshots.aspx'; return false", "Snapshot Management", "200", enabled));
-            settingsMenu.Items.Add(new EPMMenuItem("epm12_Schedule", "/_layouts/images/calendar.gif", "javascript:location.href='allschedules.aspx'; return false", "Refresh Schedule", "200", enabled));
+            settingsMenu.Items.Add(new EPMMenuItem("epm11_Snapshots", "images/EPMSnapshot.gif",
+                "javascript:location.href='allsnapshots.aspx'; return false", "Snapshot Management", "200", enabled));
+            settingsMenu.Items.Add(new EPMMenuItem("epm12_Schedule", "/_layouts/images/calendar.gif",
+                "javascript:location.href='allschedules.aspx'; return false", "Refresh Schedule", "200", enabled));
             settingsMenu.Render(pnlSettingsMenu);
         }
 
@@ -405,49 +413,46 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
 
         protected string ShowSnapshot(string listId)
         {
-            if (_SSlistguid == listId.ToString())
+            if (_SSlistguid == listId)
             {
                 return "false";
             }
-            else
-            {
-                return "true";
-            }
+            return "true";
         }
 
         protected string GetIconLink(int type)
         {
             string iconLink = string.Empty;
             int itm;
-            var typeMax = Eval(string.Format("Type{0}Max", type));
-            var typeLatest = Eval(string.Format("Type{0}Latest", type));
+            object typeMax = Eval(string.Format("Type{0}Max", type));
+            object typeLatest = Eval(string.Format("Type{0}Latest", type));
 
-            var success = int.TryParse(typeMax.ToString(), out itm);
+            bool success = int.TryParse(typeMax.ToString(), out itm);
 
             switch (type)
             {
                 case 1:
                     iconLink = (!success || itm < 0)
-                           ? "<img src='images/iconOK.gif' alt='OK' style='border:0' />"
-                           : string.Format(
-                                 "<a style='color:{0}' href='ReportLog.aspx?ListId={1}&LogType={2}'><img src='images/icon{3}.png' alt='Level{3}' style='border:0' /></a>",
-                                 "Black",
-                                 Eval("RPTListId"),
-                                 type,
-                                 typeMax);
+                        ? "<img src='images/iconOK.gif' alt='OK' style='border:0' />"
+                        : string.Format(
+                            "<a style='color:{0}' href='ReportLog.aspx?ListId={1}&LogType={2}'><img src='images/icon{3}.png' alt='Level{3}' style='border:0' /></a>",
+                            "Black",
+                            Eval("RPTListId"),
+                            type,
+                            typeMax);
                     break;
 
                 case 2:
                     if (!_SSqueued)
                     {
                         iconLink = (!success || itm < 0)
-                               ? "<img src='images/iconOK.gif' alt='OK' style='border:0' />"
-                               : string.Format(
-                                     "<a style='color:{0}' href='ReportLog.aspx?ListId={1}&LogType={2}'><img src='images/icon{3}.png' alt='Level{3}' style='border:0' /></a>",
-                                     "Black",
-                                     Eval("RPTListId"),
-                                     type,
-                                     typeLatest);
+                            ? "<img src='images/iconOK.gif' alt='OK' style='border:0' />"
+                            : string.Format(
+                                "<a style='color:{0}' href='ReportLog.aspx?ListId={1}&LogType={2}'><img src='images/icon{3}.png' alt='Level{3}' style='border:0' /></a>",
+                                "Black",
+                                Eval("RPTListId"),
+                                type,
+                                typeLatest);
                     }
                     else if (_SSlistguid == null || _SSlistguid == string.Empty) // Snapshot All
                     {
@@ -458,18 +463,19 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
                                 break;
 
                             case 1:
-                                iconLink = "Processing(" + _SSpctComplete + "% complete)"; ;
+                                iconLink = "Processing(" + _SSpctComplete + "% complete)";
+                                ;
                                 break;
 
                             case 2:
                                 iconLink = (!success || itm < 0)
-                                ? "<img src='images/iconOK.gif' alt='OK' style='border:0' />"
-                                : string.Format(
-                                "<a style='color:{0}' href='ReportLog.aspx?ListId={1}&LogType={2}'><img src='images/icon{3}.png' alt='Level{3}' style='border:0' /></a>",
-                                "Black",
-                                Eval("RPTListId"),
-                                type,
-                                typeLatest);
+                                    ? "<img src='images/iconOK.gif' alt='OK' style='border:0' />"
+                                    : string.Format(
+                                        "<a style='color:{0}' href='ReportLog.aspx?ListId={1}&LogType={2}'><img src='images/icon{3}.png' alt='Level{3}' style='border:0' /></a>",
+                                        "Black",
+                                        Eval("RPTListId"),
+                                        type,
+                                        typeLatest);
                                 break;
                         }
                     }
@@ -485,26 +491,27 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
                                     break;
 
                                 case 1:
-                                    iconLink = "Processing(" + _SSpctComplete + "% complete)"; ;
+                                    iconLink = "Processing(" + _SSpctComplete + "% complete)";
+                                    ;
                                     break;
 
                                 case 2:
                                     iconLink = (!success || itm < 0)
-                                    ? "<img src='images/iconOK.gif' alt='OK' style='border:0' />"
-                                    : string.Format(
-                                    "<a style='color:{0}' href='ReportLog.aspx?ListId={1}&LogType={2}'><img src='images/icon{3}.png' alt='Level{3}' style='border:0' /></a>",
-                                    "Black",
-                                    Eval("RPTListId"),
-                                    type,
-                                    typeLatest);
+                                        ? "<img src='images/iconOK.gif' alt='OK' style='border:0' />"
+                                        : string.Format(
+                                            "<a style='color:{0}' href='ReportLog.aspx?ListId={1}&LogType={2}'><img src='images/icon{3}.png' alt='Level{3}' style='border:0' /></a>",
+                                            "Black",
+                                            Eval("RPTListId"),
+                                            type,
+                                            typeLatest);
                                     break;
                             }
                         }
                         else
                         {
                             iconLink = (!success || itm < 0)
-                              ? "<img src='images/iconOK.gif' alt='OK' style='border:0' />"
-                              : string.Format(
+                                ? "<img src='images/iconOK.gif' alt='OK' style='border:0' />"
+                                : string.Format(
                                     "<a style='color:{0}' href='ReportLog.aspx?ListId={1}&LogType={2}'><img src='images/icon{3}.png' alt='Level{3}' style='border:0' /></a>",
                                     "Black",
                                     Eval("RPTListId"),
@@ -518,13 +525,13 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
                     if (!_RFqueued)
                     {
                         iconLink = (!success || itm < 0)
-                               ? "<img src='images/iconOK.gif' alt='OK' style='border:0' />"
-                               : string.Format(
-                                     "<a style='color:{0}' href='ReportLog.aspx?ListId={1}&LogType={2}'><img src='images/icon{3}.png' alt='Level{3}' style='border:0' /></a>",
-                                     "Black",
-                                     Eval("RPTListId"),
-                                     type,
-                                     typeLatest);
+                            ? "<img src='images/iconOK.gif' alt='OK' style='border:0' />"
+                            : string.Format(
+                                "<a style='color:{0}' href='ReportLog.aspx?ListId={1}&LogType={2}'><img src='images/icon{3}.png' alt='Level{3}' style='border:0' /></a>",
+                                "Black",
+                                Eval("RPTListId"),
+                                type,
+                                typeLatest);
                     }
                     else if (_RFlistguid == null || _RFlistguid == string.Empty) // Snapshot All
                     {
@@ -535,18 +542,19 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
                                 break;
 
                             case 1:
-                                iconLink = "Processing(" + _RFpctComplete + "% complete)"; ;
+                                iconLink = "Processing(" + _RFpctComplete + "% complete)";
+                                ;
                                 break;
 
                             case 2:
                                 iconLink = (!success || itm < 0)
-                                ? "<img src='images/iconOK.gif' alt='OK' style='border:0' />"
-                                : string.Format(
-                                "<a style='color:{0}' href='ReportLog.aspx?ListId={1}&LogType={2}'><img src='images/icon{3}.png' alt='Level{3}' style='border:0' /></a>",
-                                "Black",
-                                Eval("RPTListId"),
-                                type,
-                                typeLatest);
+                                    ? "<img src='images/iconOK.gif' alt='OK' style='border:0' />"
+                                    : string.Format(
+                                        "<a style='color:{0}' href='ReportLog.aspx?ListId={1}&LogType={2}'><img src='images/icon{3}.png' alt='Level{3}' style='border:0' /></a>",
+                                        "Black",
+                                        Eval("RPTListId"),
+                                        type,
+                                        typeLatest);
                                 break;
                         }
                     }
@@ -562,26 +570,27 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
                                     break;
 
                                 case 1:
-                                    iconLink = "Processing(" + _RFpctComplete + "% complete)"; ;
+                                    iconLink = "Processing(" + _RFpctComplete + "% complete)";
+                                    ;
                                     break;
 
                                 case 2:
                                     iconLink = (!success || itm < 0)
-                                    ? "<img src='images/iconOK.gif' alt='OK' style='border:0' />"
-                                    : string.Format(
-                                    "<a style='color:{0}' href='ReportLog.aspx?ListId={1}&LogType={2}'><img src='images/icon{3}.png' alt='Level{3}' style='border:0' /></a>",
-                                    "Black",
-                                    Eval("RPTListId"),
-                                    type,
-                                    typeLatest);
+                                        ? "<img src='images/iconOK.gif' alt='OK' style='border:0' />"
+                                        : string.Format(
+                                            "<a style='color:{0}' href='ReportLog.aspx?ListId={1}&LogType={2}'><img src='images/icon{3}.png' alt='Level{3}' style='border:0' /></a>",
+                                            "Black",
+                                            Eval("RPTListId"),
+                                            type,
+                                            typeLatest);
                                     break;
                             }
                         }
                         else
                         {
                             iconLink = (!success || itm < 0)
-                              ? "<img src='images/iconOK.gif' alt='OK' style='border:0' />"
-                              : string.Format(
+                                ? "<img src='images/iconOK.gif' alt='OK' style='border:0' />"
+                                : string.Format(
                                     "<a style='color:{0}' href='ReportLog.aspx?ListId={1}&LogType={2}'><img src='images/icon{3}.png' alt='Level{3}' style='border:0' /></a>",
                                     "Black",
                                     Eval("RPTListId"),

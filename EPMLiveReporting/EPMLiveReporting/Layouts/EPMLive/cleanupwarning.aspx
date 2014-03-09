@@ -1,12 +1,6 @@
 ﻿<%@ Assembly Name="$SharePoint.Project.AssemblyFullName$" %>
-<%@ Import Namespace="Microsoft.SharePoint.ApplicationPages" %>
-<%@ Register Tagprefix="SharePoint" Namespace="Microsoft.SharePoint.WebControls" Assembly="Microsoft.SharePoint, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
-<%@ Register Tagprefix="Utilities" Namespace="Microsoft.SharePoint.Utilities" Assembly="Microsoft.SharePoint, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
-<%@ Register Tagprefix="asp" Namespace="System.Web.UI" Assembly="System.Web.Extensions, Version=3.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" %>
-<%@ Import Namespace="Microsoft.SharePoint" %>
 <%@ Assembly Name="Microsoft.Web.CommandUI, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
 <%@ Register TagPrefix="wssuc" TagName="ButtonSection" Src="~/_controltemplates/ButtonSection.ascx" %>
-<%@ Register TagPrefix="wssuc" TagName="InputFormSection" Src="~/_controltemplates/InputFormSection.ascx" %>
 <%@ Page Language="C#" AutoEventWireup="true" CodeBehind="cleanupwarning.aspx.cs" Inherits="EPMLiveReportsAdmin.Layouts.EPMLive.cleanupwarning" DynamicMasterPageFile="~masterurl/default.master" %>
 
 <asp:Content ID="PageHead" ContentPlaceHolderID="PlaceHolderAdditionalPageHead" runat="server">
@@ -25,8 +19,8 @@
         </tr>
         <wssuc:ButtonSection id="ButtonSection1" runat="server" ShowStandardCancelButton="false">
             <Template_buttons>
-                <asp:Button runat="server" UseSubmitBehavior="false" class="ms-ButtonHeightWidth" Text="Cleanup" OnClientClick="parent.SP.UI.ModalDialog.commonModalDialogClose(1, 'cleanup'); return false;" />
-                <asp:Button runat="server" UseSubmitBehavior="false" class="ms-ButtonHeightWidth" Text="Cancel" OnClientClick="parent.SP.UI.ModalDialog.commonModalDialogClose(0, 'cancel'); return false;" />
+                <asp:Button runat="server" UseSubmitBehavior="false" class="ms-ButtonHeightWidth" Text="Cleanup" OnClientClick=" parent.SP.UI.ModalDialog.commonModalDialogClose(1, 'cleanup'); return false; " />
+                <asp:Button runat="server" UseSubmitBehavior="false" class="ms-ButtonHeightWidth" Text="Cancel" OnClientClick=" parent.SP.UI.ModalDialog.commonModalDialogClose(0, 'cancel'); return false; " />
             </Template_buttons>
         </wssuc:ButtonSection>
     </table>

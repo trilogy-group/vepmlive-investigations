@@ -1,9 +1,9 @@
-﻿using Microsoft.SharePoint;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
+using Microsoft.SharePoint;
 
 namespace EPMLiveReportsAdmin
 {
@@ -18,7 +18,7 @@ namespace EPMLiveReportsAdmin
 
             users = users.Trim();
 
-            var sUsers = users.Split(',');
+            string[] sUsers = users.Split(',');
 
             SqlCommand cmd;
 
@@ -41,21 +41,21 @@ namespace EPMLiveReportsAdmin
 
             if (users != "")
             {
-                foreach (var sUser in sUsers.Where(sUser => sUser != ""))
+                foreach (string sUser in sUsers.Where(sUser => sUser != ""))
                 {
                     cmd = new SqlCommand("DELETE FROM RPTGROUPUSER where SITEID=@siteid and userid=@userid", cn);
                     cmd.Parameters.AddWithValue("@siteid", site.ID);
                     cmd.Parameters.AddWithValue("@userid", sUser);
                     cmd.ExecuteNonQuery();
 
-                    var user = site.RootWeb.SiteUsers.GetByID(int.Parse(sUser));
+                    SPUser user = site.RootWeb.SiteUsers.GetByID(int.Parse(sUser));
                     foreach (SPGroup group in user.Groups)
                     {
-                        dt.Rows.Add(new object[] { Guid.NewGuid(), site.ID, @group.ID, user.ID });
+                        dt.Rows.Add(new object[] {Guid.NewGuid(), site.ID, @group.ID, user.ID});
                     }
 
                     if (user.IsSiteAdmin)
-                        dt.Rows.Add(new object[] { Guid.NewGuid(), site.ID, 999999, user.ID });
+                        dt.Rows.Add(new object[] {Guid.NewGuid(), site.ID, 999999, user.ID});
                 }
             }
             else
@@ -64,13 +64,13 @@ namespace EPMLiveReportsAdmin
                 {
                     foreach (SPUser u in group.Users)
                     {
-                        dt.Rows.Add(new object[] { Guid.NewGuid(), site.ID, group.ID, u.ID });
+                        dt.Rows.Add(new object[] {Guid.NewGuid(), site.ID, group.ID, u.ID});
                     }
                 }
 
-                foreach (var u in from SPUser u in site.RootWeb.SiteUsers where u.IsSiteAdmin select u)
+                foreach (SPUser u in from SPUser u in site.RootWeb.SiteUsers where u.IsSiteAdmin select u)
                 {
-                    dt.Rows.Add(new object[] { Guid.NewGuid(), site.ID, 999999, u.ID });
+                    dt.Rows.Add(new object[] {Guid.NewGuid(), site.ID, 999999, u.ID});
                 }
             }
 
@@ -107,25 +107,34 @@ namespace EPMLiveReportsAdmin
             SPSecurity.RunWithElevatedPrivileges(delegate
             {
                 using (var site = new SPSite(w.Site.ID))
-                {   
+                {
                     var cmd = new SqlCommand("DELETE RPTITEMGROUPS where siteid=@siteid and listid=@listid", cn);
                     cmd.Parameters.AddWithValue("@siteid", site.ID);
                     cmd.Parameters.AddWithValue("@listid", list.ID);
                     cmd.ExecuteNonQuery();
 
-                    var liCol = list.Items;
+                    SPListItemCollection liCol = list.Items;
 
                     foreach (SPListItem li in liCol)
                     {
-                        foreach (var ra in from SPRoleAssignment ra in li.RoleAssignments 
-                                let found = ra.RoleDefinitionBindings.Cast<SPRoleDefinition>().Any(def => (def.BasePermissions & SPBasePermissions.ViewListItems) == SPBasePermissions.ViewListItems) 
-                                where found select ra)
+                        foreach (SPRoleAssignment ra in from SPRoleAssignment ra in li.RoleAssignments
+                            let found =
+                                ra.RoleDefinitionBindings.Cast<SPRoleDefinition>()
+                                    .Any(
+                                        def =>
+                                            (def.BasePermissions & SPBasePermissions.ViewListItems) ==
+                                            SPBasePermissions.ViewListItems)
+                            where found
+                            select ra)
                         {
-                            dt.Rows.Add(new object[] { Guid.NewGuid(), site.ID, list.ID, li.ID, 
-                                ra.Member.ID, ((ra.Member is SPGroup) ? 1 : 0) });
+                            dt.Rows.Add(new object[]
+                            {
+                                Guid.NewGuid(), site.ID, list.ID, li.ID,
+                                ra.Member.ID, ((ra.Member is SPGroup) ? 1 : 0)
+                            });
                         }
 
-                        dt.Rows.Add(new object[] { Guid.NewGuid(), site.ID, list.ID, li.ID, 999999, 1 });
+                        dt.Rows.Add(new object[] {Guid.NewGuid(), site.ID, list.ID, li.ID, 999999, 1});
                     }
 
                     using (var bulkCopy = new SqlBulkCopy(cn))
@@ -137,7 +146,6 @@ namespace EPMLiveReportsAdmin
                     }
                 }
             });
-
         }
 
         public static void ProcessSecurityOnRefreshAll(SPWeb w, List<SPList> liCol, SqlConnection cn)
@@ -147,35 +155,34 @@ namespace EPMLiveReportsAdmin
                 return;
             }
 
-            SPSecurity.RunWithElevatedPrivileges(delegate()
+            SPSecurity.RunWithElevatedPrivileges(delegate
             {
                 using (var site = new SPSite(w.Site.ID))
                 {
-                    using (var web = site.OpenWeb(w.ID))
-                    { 
-                        foreach (var li in liCol)
+                    using (SPWeb web = site.OpenWeb(w.ID))
+                    {
+                        foreach (SPList li in liCol)
                         {
                             ProcessSecurityOnListRefresh(web, li, cn);
                         }
                     }
                 }
             });
-
         }
 
         private static bool SecurityTablesExist(SqlConnection cn)
         {
-            var exists = false;
+            bool exists = false;
             try
             {
-                var cmd = new SqlCommand("IF (EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND  TABLE_NAME = 'RPTGROUPUSER')) BEGIN SELECT 1 END ELSE BEGIN SELECT 0 END", cn);
+                var cmd =
+                    new SqlCommand(
+                        "IF (EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND  TABLE_NAME = 'RPTGROUPUSER')) BEGIN SELECT 1 END ELSE BEGIN SELECT 0 END",
+                        cn);
                 exists = Convert.ToInt32(cmd.ExecuteScalar()) == 1;
             }
-            catch
-            {
-            }
+            catch { }
             return exists;
         }
-
     }
 }

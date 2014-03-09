@@ -31,7 +31,7 @@ namespace EPMLiveReportsAdmin
         public string Render()
         {
             string items = "";
-            foreach (var item in _items)
+            foreach (EPMMenuItem item in _items)
             {
                 items += item.Render();
             }
@@ -46,19 +46,24 @@ namespace EPMLiveReportsAdmin
 
     public class EPMMenuItem
     {
-        private const string FormatString = "<ie:menuitem id=\"{0}\" type=\"option\" iconSrc=\"{1}\" onMenuClick=\"{2}\" text=\"{3}\" menuGroupId=\"{4}\"></ie:menuitem>";
+        private const string FormatString =
+            "<ie:menuitem id=\"{0}\" type=\"option\" iconSrc=\"{1}\" onMenuClick=\"{2}\" text=\"{3}\" menuGroupId=\"{4}\"></ie:menuitem>";
+
+        private bool _enabled;
+
         private string _groupId;
         private string _icon;
         private string _id;
         private string _onMenuClick;
         private string _text;
-        private bool _enabled;
 
         public EPMMenuItem(string id, string icon, string onMenuClick, string text, string groupId, bool enabled)
         {
             _id = id;
             _icon = icon;
-            _onMenuClick = enabled ? onMenuClick : "javascript:alert('This site is not currently configured to allow list mapping');return false;";
+            _onMenuClick = enabled
+                ? onMenuClick
+                : "javascript:alert('This site is not currently configured to allow list mapping');return false;";
             _text = text;
             _groupId = groupId;
             _enabled = enabled;

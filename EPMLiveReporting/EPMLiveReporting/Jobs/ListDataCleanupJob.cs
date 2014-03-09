@@ -1,29 +1,26 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Microsoft.SharePoint;
+using System.Collections;
 using System.Data;
 using System.Data.SqlClient;
-using System.Collections;
-using System.Reflection;
-
+using EPMLiveCore.API;
+using Microsoft.SharePoint;
 
 namespace EPMLiveReportsAdmin.Jobs
 {
     /// <summary>
-    /// This job takes care of deleting and repopulating 
-    /// sharepoint list item data into DB
+    ///     This job takes care of deleting and repopulating
+    ///     sharepoint list item data into DB
     /// </summary>
-    public class ListDataCleanupJob : EPMLiveCore.API.BaseJob
+    public class ListDataCleanupJob : BaseJob
     {
-        private void setRPTSettings(EPMLiveReportsAdmin.EPMData epmdata, SPSite site)
+        private void setRPTSettings(EPMData epmdata, SPSite site)
         {
             int hours = 0;
             string workdays = " ";
-            SPSecurity.RunWithElevatedPrivileges(delegate()
+            SPSecurity.RunWithElevatedPrivileges(delegate
             {
-                int startHour = site.RootWeb.RegionalSettings.WorkDayStartHour / 60;
-                int endHour = site.RootWeb.RegionalSettings.WorkDayEndHour / 60;
+                int startHour = site.RootWeb.RegionalSettings.WorkDayStartHour/60;
+                int endHour = site.RootWeb.RegionalSettings.WorkDayEndHour/60;
                 hours = endHour - startHour - 1;
 
                 int work = site.RootWeb.RegionalSettings.WorkDays;
@@ -46,7 +43,10 @@ namespace EPMLiveReportsAdmin.Jobs
             string sCn = "";
             try
             {
-                SqlCommand cmd = new SqlCommand("SELECT Username, Password, DatabaseServer, DatabaseName from RPTDATABASES where SiteId=@SiteId", cn);
+                var cmd =
+                    new SqlCommand(
+                        "SELECT Username, Password, DatabaseServer, DatabaseName from RPTDATABASES where SiteId=@SiteId",
+                        cn);
                 cmd.Parameters.AddWithValue("@SiteId", web.Site.ID);
                 SqlDataReader dr = cmd.ExecuteReader();
                 if (dr.Read())
@@ -68,10 +68,10 @@ namespace EPMLiveReportsAdmin.Jobs
             float webCount = 0;
             base.totalCount = site.AllWebs.Count;
 
-            Hashtable hshMessages = new Hashtable();
+            var hshMessages = new Hashtable();
             bool refreshAll = (string.IsNullOrEmpty(data) ? true : false);
 
-            EPMLiveReportsAdmin.EPMData epmdata = new EPMLiveReportsAdmin.EPMData(site.ID);
+            var epmdata = new EPMData(site.ID);
 
             if (data == null || data == "")
             {
@@ -113,7 +113,7 @@ namespace EPMLiveReportsAdmin.Jobs
                     hshMessages.Add(list, "");
             }
 
-            DataTable dtListResults = new EPMLiveReportsAdmin.RefreshLists().InitializeResultsDT(data, refreshAll);
+            DataTable dtListResults = new RefreshLists().InitializeResultsDT(data, refreshAll);
 
             foreach (SPWeb w in site.AllWebs)
             {
@@ -123,8 +123,8 @@ namespace EPMLiveReportsAdmin.Jobs
                     sErrors += "Processing Web: " + w.Title + " (" + w.ServerRelativeUrl + ")<br>";
 
                     //Call Reporting Code
-                    EPMLiveReportsAdmin.RefreshLists rf = new EPMLiveReportsAdmin.RefreshLists(w, data);
-                    DataTable dt = new DataTable();
+                    var rf = new RefreshLists(w, data);
+                    var dt = new DataTable();
 
                     rf.StartRefresh(base.JobUid, out dt, refreshAll);
                     rf.AppendStatus(w.Title, w.ServerRelativeUrl, dtListResults, dt);
@@ -143,7 +143,9 @@ namespace EPMLiveReportsAdmin.Jobs
                             {
                                 if (drMessage["ResultText"].ToString() != "")
                                 {
-                                    msg += "<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color=\"red\">" + drMessage["ResultText"].ToString() + "</font>";
+                                    msg +=
+                                        "<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color=\"red\">" +
+                                        drMessage["ResultText"] + "</font>";
                                     bErrors = true;
                                     lFailed = true;
                                 }
@@ -171,7 +173,7 @@ namespace EPMLiveReportsAdmin.Jobs
                 }
             }
 
-            EPMLiveReportsAdmin.RefreshLists refreshLists = new EPMLiveReportsAdmin.RefreshLists(web, "");
+            var refreshLists = new RefreshLists(web, "");
             refreshLists.SaveResults(dtListResults, base.JobUid);
             finishJob();
         }

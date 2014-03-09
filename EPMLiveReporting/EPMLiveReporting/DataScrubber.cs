@@ -64,23 +64,22 @@ namespace EPMLiveReportsAdmin
                     foreach (SPWeb w in es.AllWebs)
                     {
                         #region GATHER WEB INFO
-                        var sParentItem = string.Empty;
+
+                        string sParentItem = string.Empty;
                         try
                         {
                             sParentItem = w.AllProperties["ParentItem"].ToString();
                         }
-                        catch
-                        {
-                        }
+                        catch { }
 
-                        var r = rptWeb.Rows.Add();
+                        DataRow r = rptWeb.Rows.Add();
                         if (!string.IsNullOrEmpty(sParentItem))
                         {
-                            var sa = sParentItem.Split(new[] {"^^"}, StringSplitOptions.RemoveEmptyEntries);
-                            var sItemWebId = sa[0];
-                            var sItemListId = sa[1];
-                            var sItemId = sa[2];
-                            
+                            string[] sa = sParentItem.Split(new[] {"^^"}, StringSplitOptions.RemoveEmptyEntries);
+                            string sItemWebId = sa[0];
+                            string sItemListId = sa[1];
+                            string sItemId = sa[2];
+
                             r["SiteId"] = es.ID;
                             r["ItemWebId"] = !string.IsNullOrEmpty(sItemWebId) ? new Guid(sItemWebId) : Guid.Empty;
                             r["ItemListId"] = !string.IsNullOrEmpty(sItemListId) ? new Guid(sItemListId) : Guid.Empty;
@@ -91,7 +90,7 @@ namespace EPMLiveReportsAdmin
                             r["WebTitle"] = w.Title;
                         }
                         else
-                        {   
+                        {
                             r["SiteId"] = es.ID;
                             r["ItemWebId"] = Guid.Empty;
                             r["ItemListId"] = Guid.Empty;
@@ -101,6 +100,7 @@ namespace EPMLiveReportsAdmin
                             r["WebUrl"] = w.ServerRelativeUrl;
                             r["WebTitle"] = w.Title;
                         }
+
                         #endregion
 
                         #region  POPULATE RPTWEBGROUPS
@@ -108,32 +108,37 @@ namespace EPMLiveReportsAdmin
                         try
                         {
                             var dt = new DataTable();
-                            var dc = new DataColumn("RPTWEBGROUPS") { DataType = System.Type.GetType("System.Guid") };
+                            var dc = new DataColumn("RPTWEBGROUPS") {DataType = Type.GetType("System.Guid")};
                             dt.Columns.Add(dc);
-                            dc = new DataColumn("SITEID") { DataType = System.Type.GetType("System.Guid") };
+                            dc = new DataColumn("SITEID") {DataType = Type.GetType("System.Guid")};
                             dt.Columns.Add(dc);
-                            dc = new DataColumn("WEBID") { DataType = System.Type.GetType("System.Guid") };
+                            dc = new DataColumn("WEBID") {DataType = Type.GetType("System.Guid")};
                             dt.Columns.Add(dc);
-                            dc = new DataColumn("GROUPID") { DataType = System.Type.GetType("System.Int32") };
+                            dc = new DataColumn("GROUPID") {DataType = Type.GetType("System.Int32")};
                             dt.Columns.Add(dc);
-                            dc = new DataColumn("SECTYPE") { DataType = System.Type.GetType("System.Int32") };
+                            dc = new DataColumn("SECTYPE") {DataType = Type.GetType("System.Int32")};
                             dt.Columns.Add(dc);
 
                             foreach (SPRoleAssignment ra in w.RoleAssignments)
                             {
-                                var type = 0;
+                                int type = 0;
                                 if (ra.Member is SPGroup)
                                 {
                                     type = 1;
                                 }
-                                var found = ra.RoleDefinitionBindings.Cast<SPRoleDefinition>().Any(def => (def.BasePermissions & SPBasePermissions.ViewListItems) == SPBasePermissions.ViewListItems);
+                                bool found =
+                                    ra.RoleDefinitionBindings.Cast<SPRoleDefinition>()
+                                        .Any(
+                                            def =>
+                                                (def.BasePermissions & SPBasePermissions.ViewListItems) ==
+                                                SPBasePermissions.ViewListItems);
                                 if (found)
                                 {
-                                    dt.Rows.Add(new object[] { Guid.NewGuid(), es.ID, w.ID, ra.Member.ID, type });
+                                    dt.Rows.Add(new object[] {Guid.NewGuid(), es.ID, w.ID, ra.Member.ID, type});
                                 }
                             }
 
-                            dt.Rows.Add(new object[] { Guid.NewGuid(), es.ID, w.ID, 999999, 1 });
+                            dt.Rows.Add(new object[] {Guid.NewGuid(), es.ID, w.ID, 999999, 1});
 
                             using (var bulkCopy = new SqlBulkCopy(epmdata.GetClientReportingConnection))
                             {
@@ -152,6 +157,7 @@ namespace EPMLiveReportsAdmin
                         #endregion
 
                         #region GATHER VALID LISTS
+
                         // IGNORE SPDispose 130, Web is being disposed
                         try
                         {
@@ -165,9 +171,7 @@ namespace EPMLiveReportsAdmin
                                     {
                                         sName = row["ListName"].ToString();
                                     }
-                                    catch
-                                    {
-                                    }
+                                    catch { }
 
                                     if (!string.IsNullOrEmpty(sName))
                                     {
@@ -186,6 +190,7 @@ namespace EPMLiveReportsAdmin
                             hasError = true;
                             errMsg += e1.Message;
                         }
+
                         #endregion
 
                         if (w != null)
@@ -195,6 +200,7 @@ namespace EPMLiveReportsAdmin
                     }
 
                     #region BULK INSERT ReportListIds TABLE
+
                     if (listIds.Rows.Count > 0)
                     {
                         SqlTransaction tx = epmdata.GetClientReportingConnection.BeginTransaction();
@@ -218,9 +224,11 @@ namespace EPMLiveReportsAdmin
                             }
                         }
                     }
+
                     #endregion
 
                     #region BULK INSERT RPTWeb and epmlive.Webs TABLE
+
                     if (rptWeb.Rows.Count > 0)
                     {
                         SqlTransaction tx = epmdata.GetClientReportingConnection.BeginTransaction();
@@ -251,6 +259,7 @@ namespace EPMLiveReportsAdmin
                             }
                         }
                     }
+
                     #endregion
                 }
 
@@ -281,9 +290,7 @@ namespace EPMLiveReportsAdmin
                     {
                         tableName = r["TableName"].ToString();
                     }
-                    catch
-                    {
-                    }
+                    catch { }
 
                     if (!string.IsNullOrEmpty(tableName))
                     {
@@ -344,10 +351,11 @@ namespace EPMLiveReportsAdmin
                         0, 1, "");
                 }
 
-                var lsListIds = (from id in listIdsTest.AsEnumerable() select id["Id"].ToString()).ToList();
-                var lsWebIds = (from webid in rptWebTest.AsEnumerable() select webid["WebId"].ToString()).ToList();
+                List<string> lsListIds = (from id in listIdsTest.AsEnumerable() select id["Id"].ToString()).ToList();
+                List<string> lsWebIds =
+                    (from webid in rptWebTest.AsEnumerable() select webid["WebId"].ToString()).ToList();
 
-                var results = (from r in recent.AsEnumerable()
+                List<DataRow> results = (from r in recent.AsEnumerable()
                     where lsListIds.Contains(r["LIST_ID"].ToString()) && lsWebIds.Contains(r["WEB_ID"].ToString())
                     select r).ToList<DataRow>();
 
@@ -361,9 +369,10 @@ namespace EPMLiveReportsAdmin
                 #endregion
 
                 #region BULK INSERT FRF - Recent items
+
                 if (finalRecent.Rows.Count > 0)
                 {
-                    var tx = epmdata.GetEPMLiveConnection.BeginTransaction();
+                    SqlTransaction tx = epmdata.GetEPMLiveConnection.BeginTransaction();
                     using (var sbc = new SqlBulkCopy(epmdata.GetEPMLiveConnection, new SqlBulkCopyOptions(), tx))
                     {
                         try
@@ -396,13 +405,11 @@ namespace EPMLiveReportsAdmin
                         }
                     }
                 }
-                #endregion
 
+                #endregion
             });
 
             #endregion
-
-            
         }
     }
 }

@@ -1,29 +1,30 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using EPMLiveCore.Infrastructure;
-using Microsoft.SharePoint;
+using System.Collections;
 using System.Data;
 using System.Data.SqlClient;
-using System.Collections;
 using System.Reflection;
+using EPMLiveCore;
+using EPMLiveCore.API;
+using EPMLiveCore.Infrastructure;
+using EPMLiveReportsAdmin.Properties;
+using Microsoft.SharePoint;
 
 namespace EPMLiveReportsAdmin.Jobs
 {
     /// <summary>
-    /// This job takes care of deleting and re-populating
-    /// Timesheet, PFE, and Security data in DB.
+    ///     This job takes care of deleting and re-populating
+    ///     Timesheet, PFE, and Security data in DB.
     /// </summary>
-    public class CollectJob : EPMLiveCore.API.BaseJob
+    public class CollectJob : BaseJob
     {
-        private void setRPTSettings(EPMLiveReportsAdmin.EPMData epmdata, SPSite site)
+        private void setRPTSettings(EPMData epmdata, SPSite site)
         {
             int hours = 0;
             string workdays = " ";
-            SPSecurity.RunWithElevatedPrivileges(delegate()
+            SPSecurity.RunWithElevatedPrivileges(delegate
             {
-                int startHour = site.RootWeb.RegionalSettings.WorkDayStartHour / 60;
-                int endHour = site.RootWeb.RegionalSettings.WorkDayEndHour / 60;
+                int startHour = site.RootWeb.RegionalSettings.WorkDayStartHour/60;
+                int endHour = site.RootWeb.RegionalSettings.WorkDayEndHour/60;
                 hours = endHour - startHour - 1;
 
                 int work = site.RootWeb.RegionalSettings.WorkDays;
@@ -38,7 +39,6 @@ namespace EPMLiveReportsAdmin.Jobs
 
             string sResults = "";
             epmdata.UpdateRPTSettings(workdays, hours, out sResults);
-
         }
 
         private string getReportingConnection(SPWeb web)
@@ -47,21 +47,20 @@ namespace EPMLiveReportsAdmin.Jobs
             string sCn = "";
             try
             {
-
-                SqlCommand cmd = new SqlCommand("SELECT Username, Password, DatabaseServer, DatabaseName from RPTDATABASES where SiteId=@SiteId", cn);
+                var cmd =
+                    new SqlCommand(
+                        "SELECT Username, Password, DatabaseServer, DatabaseName from RPTDATABASES where SiteId=@SiteId",
+                        cn);
                 cmd.Parameters.AddWithValue("@SiteId", web.Site.ID);
                 SqlDataReader dr = cmd.ExecuteReader();
                 if (dr.Read())
                 {
-
                     sCn = "Data Source=" + dr.GetString(2) + ";Initial Catalog=" + dr.GetString(3);
                     if (!dr.IsDBNull(0) && dr.GetString(0) != "")
                         sCn += ";User ID=" + dr.GetString(0) + ";Password=" + EPMData.Decrypt(dr.GetString(1));
                     else
                         sCn += ";Trusted_Connection=True";
-
                 }
-
             }
             catch { }
             cn.Close();
@@ -72,7 +71,9 @@ namespace EPMLiveReportsAdmin.Jobs
         {
             if (cn.State != ConnectionState.Open) cn.Open();
 
-            SqlCommand cmd = new SqlCommand("select * from information_schema.routines where SPECIFIC_NAME = 'spUpdateStatusFields'", cn);
+            var cmd =
+                new SqlCommand(
+                    "select * from information_schema.routines where SPECIFIC_NAME = 'spUpdateStatusFields'", cn);
             bool found = false;
             SqlDataReader dr = cmd.ExecuteReader();
             if (dr.Read())
@@ -81,21 +82,20 @@ namespace EPMLiveReportsAdmin.Jobs
 
             if (!found)
             {
-                cmd = new SqlCommand(Properties.Resources.spUpdateStatusFields, cn);
+                cmd = new SqlCommand(Resources.spUpdateStatusFields, cn);
                 cmd.ExecuteNonQuery();
             }
 
-            cmd = new SqlCommand(Properties.Resources.spGetReportListData, cn);
+            cmd = new SqlCommand(Resources.spGetReportListData, cn);
             cmd.ExecuteNonQuery();
         }
 
         public void execute(SPSite site, SPWeb web, string data)
         {
             base.totalCount = site.AllWebs.Count;
-            Hashtable hshMessages = new Hashtable();
+            var hshMessages = new Hashtable();
             bool refreshAll = (string.IsNullOrEmpty(data) ? true : false);
-            EPMLiveReportsAdmin.EPMData epmdata = new EPMLiveReportsAdmin.EPMData(site.ID);
-
+            var epmdata = new EPMData(site.ID);
 
             #region Process security
 
@@ -107,7 +107,8 @@ namespace EPMLiveReportsAdmin.Jobs
             catch (Exception ex)
             {
                 bErrors = true;
-                sErrors += "<font color=\"red\">Error processing security on site: " + site.Url + ". Error: " + ex.Message + "</font><br>";
+                sErrors += "<font color=\"red\">Error processing security on site: " + site.Url + ". Error: " +
+                           ex.Message + "</font><br>";
             }
 
             if (string.IsNullOrEmpty(data))
@@ -175,6 +176,7 @@ namespace EPMLiveReportsAdmin.Jobs
             #endregion
 
             #region Process TimeSheet Data
+
             try
             {
                 string err = "";
@@ -202,17 +204,28 @@ namespace EPMLiveReportsAdmin.Jobs
                 {
                     SPWeb rootWeb = site.RootWeb;
 
-                    string basePath = EPMLiveCore.CoreFunctions.getConfigSetting(rootWeb, "epkbasepath");
-                    string ppmId = EPMLiveCore.CoreFunctions.getConfigSetting(rootWeb, "ppmpid");
-                    string ppmCompany = EPMLiveCore.CoreFunctions.getConfigSetting(rootWeb, "ppmcompany");
-                    string ppmDbConn = EPMLiveCore.CoreFunctions.getConfigSetting(rootWeb, "ppmdbconn");
+                    string basePath = CoreFunctions.getConfigSetting(rootWeb, "epkbasepath");
+                    string ppmId = CoreFunctions.getConfigSetting(rootWeb, "ppmpid");
+                    string ppmCompany = CoreFunctions.getConfigSetting(rootWeb, "ppmcompany");
+                    string ppmDbConn = CoreFunctions.getConfigSetting(rootWeb, "ppmdbconn");
 
-                    Assembly assemblyInstance = Assembly.Load("PortfolioEngineCore, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5");
+                    Assembly assemblyInstance =
+                        Assembly.Load(
+                            "PortfolioEngineCore, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5");
                     Type thisClass = assemblyInstance.GetType("PortfolioEngineCore.WEIntegration.WEIntegration");
-                    object classObject = Activator.CreateInstance(thisClass, new object[] { basePath, site.WebApplication.ApplicationPool.Username, ppmId, ppmCompany, ppmDbConn, false });
+                    object classObject = Activator.CreateInstance(thisClass,
+                        new object[]
+                        {basePath, site.WebApplication.ApplicationPool.Username, ppmId, ppmCompany, ppmDbConn, false});
 
                     MethodInfo m = thisClass.GetMethod("ExecuteReportExtract");
-                    string message = (string)m.Invoke(classObject, new object[] { "<ExecuteReportExtract><Params /><Data><ReportExtract Connection=\"" + getReportingConnection(web) + "\" Execute=\"1\" /></Data></ExecuteReportExtract>" });
+                    var message =
+                        (string)
+                            m.Invoke(classObject,
+                                new object[]
+                                {
+                                    "<ExecuteReportExtract><Params /><Data><ReportExtract Connection=\"" +
+                                    getReportingConnection(web) + "\" Execute=\"1\" /></Data></ExecuteReportExtract>"
+                                });
 
                     sErrors += "Processed PfE Reporting: " + message + "<br>";
                 }
@@ -226,11 +239,13 @@ namespace EPMLiveReportsAdmin.Jobs
             #endregion Process PFE Data
 
             #region Database checks
-            SPSecurity.RunWithElevatedPrivileges(delegate()
-            {   
+
+            SPSecurity.RunWithElevatedPrivileges(delegate
+            {
                 CheckReqSP(epmdata.GetClientReportingConnection);
                 CheckSchema(epmdata.GetClientReportingConnection);
             });
+
             #endregion
 
             #region Clean Data
@@ -249,7 +264,7 @@ namespace EPMLiveReportsAdmin.Jobs
                     {
                         try
                         {
-                            SqlCommand cmd2 = new SqlCommand("spUpdateStatusFields", epmdata.GetClientReportingConnection);
+                            var cmd2 = new SqlCommand("spUpdateStatusFields", epmdata.GetClientReportingConnection);
                             cmd2.CommandType = CommandType.StoredProcedure;
                             cmd2.Parameters.AddWithValue("@listname", list);
 
@@ -258,7 +273,8 @@ namespace EPMLiveReportsAdmin.Jobs
                         catch (Exception ex)
                         {
                             bErrors = true;
-                            sErrors += "<font color=\"red\">Error running schedule field update for (" + list + "): " + ex.Message + "</font><br>";
+                            sErrors += "<font color=\"red\">Error running schedule field update for (" + list + "): " +
+                                       ex.Message + "</font><br>";
                         }
                         if (!hshMessages.Contains(list))
                             hshMessages.Add(list, "");
@@ -266,7 +282,6 @@ namespace EPMLiveReportsAdmin.Jobs
                 }
 
                 sErrors += "<br>Updated Status Fields<br>";
-
             }
             catch (Exception ex)
             {
@@ -283,17 +298,16 @@ namespace EPMLiveReportsAdmin.Jobs
 
         private void CheckSchema(SqlConnection cn)
         {
-            var cmd = new SqlCommand(Properties.Resources.CheckSchema, cn);
+            var cmd = new SqlCommand(Resources.CheckSchema, cn);
             cmd.CommandType = CommandType.Text;
             cmd.ExecuteNonQuery();
         }
 
         private void CheckReqSP(SqlConnection cn)
         {
-            var cmd = new SqlCommand(Properties.Resources.CheckReqSP, cn);
+            var cmd = new SqlCommand(Resources.CheckReqSP, cn);
             cmd.CommandType = CommandType.Text;
             cmd.ExecuteNonQuery();
         }
-
     }
 }

@@ -1,12 +1,8 @@
 ﻿<%@ Assembly Name="$SharePoint.Project.AssemblyFullName$" %>
-<%@ Import Namespace="Microsoft.SharePoint.ApplicationPages" %>
 <%@ Register TagPrefix="wssuc" TagName="ButtonSection" Src="~/_controltemplates/ButtonSection.ascx" %>
 <%@ Register TagPrefix="wssuc" TagName="InputFormControl" Src="~/_controltemplates/InputFormControl.ascx" %>
 <%@ Register TagPrefix="wssuc" TagName="InputFormSection" Src="~/_controltemplates/InputFormSection.ascx" %>
 <%@ Register Tagprefix="SharePoint" Namespace="Microsoft.SharePoint.WebControls" Assembly="Microsoft.SharePoint, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
-<%@ Register Tagprefix="Utilities" Namespace="Microsoft.SharePoint.Utilities" Assembly="Microsoft.SharePoint, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
-<%@ Register Tagprefix="asp" Namespace="System.Web.UI" Assembly="System.Web.Extensions, Version=3.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" %>
-<%@ Import Namespace="Microsoft.SharePoint" %>
 <%@ Assembly Name="Microsoft.Web.CommandUI, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
 <%@ Page Language="C#" AutoEventWireup="true" CodeBehind="SetupReportDatabase.aspx.cs" Inherits="EPMLiveReportsAdmin.Layouts.EPMLive.SetupReportDatabase" DynamicMasterPageFile="~masterurl/default.master" %>
 
@@ -23,15 +19,14 @@
     <script type="text/javascript">
         function toggleSAccount(show) {
             if (show) {
-                document.getElementById('<%=trNew3.ClientID %>').style.display = 'block';
-                document.getElementById('<%=trNew4.ClientID %>').style.display = 'block';
-            }
-            else {
-                document.getElementById('<%=trNew3.ClientID %>').style.display = 'none';
-                document.getElementById('<%=trNew4.ClientID %>').style.display = 'none';
+                document.getElementById('<%= trNew3.ClientID %>').style.display = 'block';
+                document.getElementById('<%= trNew4.ClientID %>').style.display = 'block';
+            } else {
+                document.getElementById('<%= trNew3.ClientID %>').style.display = 'none';
+                document.getElementById('<%= trNew4.ClientID %>').style.display = 'none';
             }
         }
-</script>
+    </script>
 
     <table border="0" cellpadding="0" cellspacing="0" width="100%">
         <tr><td colspan="2"><table class="ms-toolbar" width="100%" cellpadding="3"><tr><td class="ms-viewlsts" colspan="2"><h3 class="ms-standardheader">Mapping Configuration</h3></td></tr></table></td></tr>
@@ -44,10 +39,10 @@
             </template_description>
             <template_inputformcontrols>
                 <wssuc:InputFormControl LabelText="" runat="server" >
-                     <Template_Control>
-                	    <SharePoint:SiteAdministrationSelector runat="server" ID="SiteAdministrationSelector1" CssClass="ms-viewselector" AllowAdministrationWebApplication="false" NoSelectionText="Select Site Collection" AllowChange="true" /> 
-                            <asp:Label ID="lblErrorSite" runat="server" ForeColor="Red" Visible="false"></asp:Label>
-                     </Template_Control>
+                    <Template_Control>
+                        <SharePoint:SiteAdministrationSelector runat="server" ID="SiteAdministrationSelector1" CssClass="ms-viewselector" AllowAdministrationWebApplication="false" NoSelectionText="Select Site Collection" AllowChange="true" /> 
+                        <asp:Label ID="lblErrorSite" runat="server" ForeColor="Red" Visible="false"></asp:Label>
+                    </Template_Control>
                 </wssuc:InputFormControl>
             </template_inputformcontrols>
         </wssuc:InputFormSection>
@@ -60,40 +55,40 @@
             <template_inputformcontrols>
                 
                 <wssuc:InputFormControl LabelText="Database Server" runat="server">
-                     <Template_Control>
+                    <Template_Control>
                         <table>
-                        <tr id="trSelect" runat="server"><td class="ms-authoringcontrols" colspan="2">
-                            Existing <input type="radio" name="group1" runat="server" id="btnExisting" /> 
-                            New      <input type="radio" name="group1" runat="server" id="btnNew" /> 
-                        </td></tr>
+                            <tr id="trSelect" runat="server"><td class="ms-authoringcontrols" colspan="2">
+                                                                 Existing <input type="radio" name="group1" runat="server" id="btnExisting" /> 
+                                                                 New      <input type="radio" name="group1" runat="server" id="btnNew" /> 
+                                                             </td></tr>
                         
-                        <tr id="trNew1" runat="server">
-                            <td class="ms-authoringcontrols">Server</td>
-                            <td class="ms-authoringcontrols"><asp:TextBox runat="server" ID="txtDatabaseServer" Width="120px"></asp:TextBox></td>
-                        </tr>
+                            <tr id="trNew1" runat="server">
+                                <td class="ms-authoringcontrols">Server</td>
+                                <td class="ms-authoringcontrols"><asp:TextBox runat="server" ID="txtDatabaseServer" Width="120px"></asp:TextBox></td>
+                            </tr>
                         
                                                
-                        <tr id="trNew2" runat="server">
-                            <td class="ms-authoringcontrols">Database Name</td>
-                            <td class="ms-authoringcontrols"><asp:TextBox runat="server" ID="txtDatabaseName" Width="120px"></asp:TextBox></td>
-                        </tr>
-                         <tr id="tr1" runat="server">
-                            <td class="ms-authoringcontrols">Use SQL Account</td>
-                            <td class="ms-authoringcontrols" width="200"><asp:CheckBox runat="server" ID="sacccount" onclick="toggleSAccount(this.checked)" /></td>
-                        </tr>
-                         <tr id="trNew3" runat="server" style="display:none;">
-                            <td class="ms-authoringcontrols">User Name</td>
-                            <td class="ms-authoringcontrols"><asp:TextBox runat="server" ID="username" Width="120px"></asp:TextBox></td>
-                        </tr>
-                         <tr id="trNew4" runat="server" style="display:none;">
-                            <td class="ms-authoringcontrols">Password</td>
-                            <td class="ms-authoringcontrols"><asp:TextBox runat="server" ID="password" TextMode="Password" Width="120px"></asp:TextBox></td>
-                        </tr>
-                        <tr><td class="ms-authoringcontrols" colspan="2">
-                            <asp:Label ID="lblErrorDatabase" runat="server" ForeColor="Red" Visible="false"></asp:Label>
-                        </td></tr>
+                            <tr id="trNew2" runat="server">
+                                <td class="ms-authoringcontrols">Database Name</td>
+                                <td class="ms-authoringcontrols"><asp:TextBox runat="server" ID="txtDatabaseName" Width="120px"></asp:TextBox></td>
+                            </tr>
+                            <tr id="tr1" runat="server">
+                                <td class="ms-authoringcontrols">Use SQL Account</td>
+                                <td class="ms-authoringcontrols" width="200"><asp:CheckBox runat="server" ID="sacccount" onclick="toggleSAccount(this.checked)" /></td>
+                            </tr>
+                            <tr id="trNew3" runat="server" style="display: none;">
+                                <td class="ms-authoringcontrols">User Name</td>
+                                <td class="ms-authoringcontrols"><asp:TextBox runat="server" ID="username" Width="120px"></asp:TextBox></td>
+                            </tr>
+                            <tr id="trNew4" runat="server" style="display: none;">
+                                <td class="ms-authoringcontrols">Password</td>
+                                <td class="ms-authoringcontrols"><asp:TextBox runat="server" ID="password" TextMode="Password" Width="120px"></asp:TextBox></td>
+                            </tr>
+                            <tr><td class="ms-authoringcontrols" colspan="2">
+                                    <asp:Label ID="lblErrorDatabase" runat="server" ForeColor="Red" Visible="false"></asp:Label>
+                                </td></tr>
                         </table>
-                     </Template_Control>
+                    </Template_Control>
                 </wssuc:InputFormControl>                         
             </template_inputformcontrols>
         </wssuc:InputFormSection>
@@ -108,10 +103,9 @@
         
         <SharePoint:FormDigest ID="FormDigest1" runat="server" />
 
-    <asp:TextBox runat="server" ID="txtMessage" CssClass="ms-long" TextMode="MultiLine"
-        Rows="10" Visible="false"></asp:TextBox>
+        <asp:TextBox runat="server" ID="txtMessage" CssClass="ms-long" TextMode="MultiLine"
+                     Rows="10" Visible="false"></asp:TextBox>
         
     </table>
 
 </asp:Content>
-

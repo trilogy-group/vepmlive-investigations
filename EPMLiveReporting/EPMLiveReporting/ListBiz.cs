@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Linq;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
-using System.Diagnostics;
+using System.Linq;
 using System.Web.UI.WebControls;
 using EPMLiveReportsAdmin.Properties;
 using Microsoft.SharePoint;
@@ -12,8 +11,23 @@ namespace EPMLiveReportsAdmin
 {
     public class ListBiz
     {
-        public static Collection<string> AutomaticFields = new Collection<string> { "Title", "Author", "Editor", "Created", "Modified" };
-        public static Collection<string> RequiredResourceFields = new Collection<string> { "Work", "AssignedTo", "DueDate", "StartDate" };
+        public static Collection<string> AutomaticFields = new Collection<string>
+        {
+            "Title",
+            "Author",
+            "Editor",
+            "Created",
+            "Modified"
+        };
+
+        public static Collection<string> RequiredResourceFields = new Collection<string>
+        {
+            "Work",
+            "AssignedTo",
+            "DueDate",
+            "StartDate"
+        };
+
         private Guid _listId;
         private string _listName;
         private bool _resourceList;
@@ -22,9 +36,7 @@ namespace EPMLiveReportsAdmin
         private string _tableName;
         private string _tableNameSnapshot;
 
-        private ListBiz()
-        {
-        }
+        private ListBiz() { }
 
         public ListBiz(Guid listId, Guid siteId)
         {
@@ -36,15 +48,6 @@ namespace EPMLiveReportsAdmin
                 return;
             //throw new Exception(string.Format("List not found. ListId: {0}, SiteId: {1} ", _listId, _siteId));
             PopulateInstance(row);
-        }
-
-        private void PopulateInstance(DataRow row)
-        {
-            _listName = row["ListName"].ToString().Replace("'", ""); // - CAT.NET false-positive: All single quotes are escaped/removed.
-            _tableName = row["TableName"].ToString().Replace("'", ""); // - CAT.NET false-positive: All single quotes are escaped/removed.
-            _tableNameSnapshot = row["TableNameSnapshot"].ToString().Replace("'", ""); // - CAT.NET false-positive: All single quotes are escaped/removed.
-            _system = (bool)row["System"];
-            _resourceList = (bool)row["ResourceList"];
         }
 
         public bool ResourceList
@@ -62,13 +65,25 @@ namespace EPMLiveReportsAdmin
             get { return _listName; }
         }
 
+        private void PopulateInstance(DataRow row)
+        {
+            _listName = row["ListName"].ToString().Replace("'", "");
+                // - CAT.NET false-positive: All single quotes are escaped/removed.
+            _tableName = row["TableName"].ToString().Replace("'", "");
+                // - CAT.NET false-positive: All single quotes are escaped/removed.
+            _tableNameSnapshot = row["TableNameSnapshot"].ToString().Replace("'", "");
+                // - CAT.NET false-positive: All single quotes are escaped/removed.
+            _system = (bool) row["System"];
+            _resourceList = (bool) row["ResourceList"];
+        }
+
         public void UpdateListMapping(ListItemCollection fields)
         {
             SPList spList = null;
             SPUser user = null;
             using (var site = new SPSite(_siteId))
             {
-                using (var web = site.OpenWeb())
+                using (SPWeb web = site.OpenWeb())
                 {
                     user = web.CurrentUser;
                 }
@@ -76,9 +91,9 @@ namespace EPMLiveReportsAdmin
 
             if (user != null)
             {
-                SPSecurity.RunWithElevatedPrivileges(delegate()
+                SPSecurity.RunWithElevatedPrivileges(delegate
                 {
-                    using (SPSite es = new SPSite(_siteId))
+                    using (var es = new SPSite(_siteId))
                     {
                         foreach (SPWeb ew in es.AllWebs)
                         {
@@ -109,7 +124,7 @@ namespace EPMLiveReportsAdmin
 
             ColumnDefCollection columns = ColumnDef.GetDefaultColumns();
             ColumnDefCollection columnsSnapshot = ColumnDef.GetDefaultColumnsSnapshot();
-            var matches = 0;
+            int matches = 0;
             foreach (ListItem field in fields)
             {
                 SPField spField = spList.Fields[new Guid(field.Value)];
@@ -124,7 +139,7 @@ namespace EPMLiveReportsAdmin
         }
 
         /// <summary>
-        /// Updates list mapping with the new field
+        ///     Updates list mapping with the new field
         /// </summary>
         /// <param name="newfieldId"></param>
         public void UpdateListMapping(Guid newfieldId)
@@ -133,7 +148,7 @@ namespace EPMLiveReportsAdmin
             SPUser user = null;
             using (var site = new SPSite(_siteId))
             {
-                using (var web = site.OpenWeb())
+                using (SPWeb web = site.OpenWeb())
                 {
                     user = web.CurrentUser;
                 }
@@ -141,9 +156,9 @@ namespace EPMLiveReportsAdmin
 
             if (user != null)
             {
-                SPSecurity.RunWithElevatedPrivileges(delegate()
+                SPSecurity.RunWithElevatedPrivileges(delegate
                 {
-                    using (SPSite es = new SPSite(_siteId))
+                    using (var es = new SPSite(_siteId))
                     {
                         foreach (SPWeb ew in es.AllWebs)
                         {
@@ -176,7 +191,7 @@ namespace EPMLiveReportsAdmin
             {
                 ColumnDefCollection columns = ColumnDef.GetDefaultColumns();
                 ColumnDefCollection columnsSnapshot = ColumnDef.GetDefaultColumnsSnapshot();
-                var matches = 0;
+                int matches = 0;
 
                 SPField spField = spList.Fields[newfieldId];
                 columns.AddColumn(spField);
@@ -199,7 +214,7 @@ namespace EPMLiveReportsAdmin
             SPUser user = null;
             using (var site = new SPSite(siteId))
             {
-                using (var web = site.OpenWeb())
+                using (SPWeb web = site.OpenWeb())
                 {
                     user = web.CurrentUser;
                 }
@@ -207,9 +222,9 @@ namespace EPMLiveReportsAdmin
 
             if (user != null)
             {
-                SPSecurity.RunWithElevatedPrivileges(delegate()
+                SPSecurity.RunWithElevatedPrivileges(delegate
                 {
-                    using (SPSite es = new SPSite(siteId))
+                    using (var es = new SPSite(siteId))
                     {
                         foreach (SPWeb ew in es.AllWebs)
                         {
@@ -238,8 +253,8 @@ namespace EPMLiveReportsAdmin
                     }
                 });
             }
-            var automatic = ListBiz.AutomaticFields;
-            var required = ListBiz.RequiredResourceFields;
+            Collection<string> automatic = AutomaticFields;
+            Collection<string> required = RequiredResourceFields;
 
             var lb = new ListBiz();
             lb._siteId = siteId;
@@ -248,7 +263,7 @@ namespace EPMLiveReportsAdmin
 
             ColumnDefCollection columns = ColumnDef.GetDefaultColumns();
             ColumnDefCollection columnsSnapshot = ColumnDef.GetDefaultColumnsSnapshot();
-            var matches = 0;
+            int matches = 0;
 
             foreach (SPField field in spList.Fields)
             {
@@ -277,14 +292,14 @@ namespace EPMLiveReportsAdmin
 
             if (fldExtId != null && !FieldExistsInCollection(fields, "extid"))
             {
-                ListItem listField = new ListItem();
+                var listField = new ListItem();
                 listField.Text = fldExtId.Title;
                 listField.Value = fldExtId.Id.ToString();
                 fields.Add(listField);
             }
 
             foreach (ListItem field in fields)
-            {   
+            {
                 SPField spField = spList.Fields[new Guid(field.Value)];
                 columns.AddColumn(spField);
                 columnsSnapshot.AddColumn(spField);
@@ -423,39 +438,50 @@ namespace EPMLiveReportsAdmin
             string error = string.Empty;
             var rd = new ReportData(_siteId);
 
-            var safeTableName = rd.GetSafeTableName(tableName);
-            string tableNameSnapshot = rd.GetSafeTableName(tableName + Resources.SnapshotTableSuffix); 
+            string safeTableName = rd.GetSafeTableName(tableName);
+            string tableNameSnapshot = rd.GetSafeTableName(tableName + Resources.SnapshotTableSuffix);
 
             if (!rd.CreateTable(safeTableName, columns))
             {
-                rd.InsertLog(_listId, _listName, "Error creating table.", string.Format("Error creating table {0}", safeTableName), 2);
+                rd.InsertLog(_listId, _listName, "Error creating table.",
+                    string.Format("Error creating table {0}", safeTableName), 2);
                 success = false;
             }
 
             if (!rd.CreateTable(tableNameSnapshot, columnsSnapshot))
             {
-                rd.InsertLog(_listId, _listName, "Error creating table.", string.Format("Error creating table {0}", tableNameSnapshot), 2);
+                rd.InsertLog(_listId, _listName, "Error creating table.",
+                    string.Format("Error creating table {0}", tableNameSnapshot), 2);
                 success = false;
             }
 
             // only insert into RPTList table if table created successfully
-            if ((success || (rd.TableExists(safeTableName) && rd.TableExists(tableNameSnapshot))) && !rd.InsertList(_listId, safeTableName, tableNameSnapshot, _resourceList))
+            if ((success || (rd.TableExists(safeTableName) && rd.TableExists(tableNameSnapshot))) &&
+                !rd.InsertList(_listId, safeTableName, tableNameSnapshot, _resourceList))
             {
-                rd.InsertLog(_listId, _listName, string.Format("Error creating list entry"), string.Format("Error creating list entry"), 2);
+                rd.InsertLog(_listId, _listName, string.Format("Error creating list entry"),
+                    string.Format("Error creating list entry"), 2);
                 success = false;
             }
 
             // only insert into RPTColumn table if table created successfully
-            if ((success || (rd.TableExists(safeTableName) && rd.TableExists(tableNameSnapshot))) && !rd.InsertListColumns(_listId, columns))
+            if ((success || (rd.TableExists(safeTableName) && rd.TableExists(tableNameSnapshot))) &&
+                !rd.InsertListColumns(_listId, columns))
             {
-                rd.InsertLog(_listId, _listName.Replace("'", ""), string.Format("Error creating column entries"), string.Format("Error creating column entries"), 2); // - CAT.NET false-positive: All single quotes are escaped/removed.
+                rd.InsertLog(_listId, _listName.Replace("'", ""), string.Format("Error creating column entries"),
+                    string.Format("Error creating column entries"), 2);
+                    // - CAT.NET false-positive: All single quotes are escaped/removed.
                 success = false;
             }
 
             if (success)
-                rd.InsertLog(_listId, _listName.Replace("'", ""), "Created list mappings.", string.Format("Created list mapping: Columns {0}", columns), 0); // - CAT.NET false-positive: All single quotes are escaped/removed.
+                rd.InsertLog(_listId, _listName.Replace("'", ""), "Created list mappings.",
+                    string.Format("Created list mapping: Columns {0}", columns), 0);
+                    // - CAT.NET false-positive: All single quotes are escaped/removed.
             else
-                rd.InsertLog(_listId, _listName.Replace("'", ""), "An error occurred while creating list mapping.", string.Format("Errors occurred while creating list mapping: Columns: {0}", columns), 1); // - CAT.NET false-positive: All single quotes are escaped/removed.
+                rd.InsertLog(_listId, _listName.Replace("'", ""), "An error occurred while creating list mapping.",
+                    string.Format("Errors occurred while creating list mapping: Columns: {0}", columns), 1);
+                    // - CAT.NET false-positive: All single quotes are escaped/removed.
         }
 
         private void Update(ColumnDefCollection columns)
@@ -469,52 +495,66 @@ namespace EPMLiveReportsAdmin
             var rd = new ReportData(_siteId);
             if (!rd.AddColumns(_tableName, newColumns))
             {
-                rd.InsertLog(_listId, _listName.Replace("'", ""), "An error occurred while adding columns.", string.Format("Error adding columns to table {0}", _tableName), 2); // - CAT.NET false-positive: All single quotes are escaped/removed.
+                rd.InsertLog(_listId, _listName.Replace("'", ""), "An error occurred while adding columns.",
+                    string.Format("Error adding columns to table {0}", _tableName), 2);
+                    // - CAT.NET false-positive: All single quotes are escaped/removed.
                 success = false;
-
             }
 
             if (!rd.AddColumns(_tableNameSnapshot, newColumns))
             {
-                rd.InsertLog(_listId, _listName.Replace("'", ""), "An error occurred while adding columns to table.", string.Format("Error adding columns to table {0}", _tableNameSnapshot), 2); // - CAT.NET false-positive: All single quotes are escaped/removed.
+                rd.InsertLog(_listId, _listName.Replace("'", ""), "An error occurred while adding columns to table.",
+                    string.Format("Error adding columns to table {0}", _tableNameSnapshot), 2);
+                    // - CAT.NET false-positive: All single quotes are escaped/removed.
                 success = false;
-
             }
 
             if (!rd.DeleteColumns(_tableName, oldColumns))
             {
-                rd.InsertLog(_listId, _listName.Replace("'", ""), "An error occurred while deleting columns.", string.Format("Error deleting columns from table {0}", _tableName), 2); // - CAT.NET false-positive: All single quotes are escaped/removed.
+                rd.InsertLog(_listId, _listName.Replace("'", ""), "An error occurred while deleting columns.",
+                    string.Format("Error deleting columns from table {0}", _tableName), 2);
+                    // - CAT.NET false-positive: All single quotes are escaped/removed.
                 success = false;
-
             }
 
             if (!rd.DeleteColumns(_tableNameSnapshot, oldColumns))
             {
-                rd.InsertLog(_listId, _listName.Replace("'", ""), "An error occurred while deleting columns.", string.Format("Error deleting columns from table {0}", _tableNameSnapshot), 2); // - CAT.NET false-positive: All single quotes are escaped/removed.
+                rd.InsertLog(_listId, _listName.Replace("'", ""), "An error occurred while deleting columns.",
+                    string.Format("Error deleting columns from table {0}", _tableNameSnapshot), 2);
+                    // - CAT.NET false-positive: All single quotes are escaped/removed.
                 success = false;
-
             }
 
             if (!rd.InsertListColumns(_listId, newColumns))
             {
-                rd.InsertLog(_listId, _listName.Replace("'", ""), "Error creating column entries", string.Format("Error creating column entries"), 2); // - CAT.NET false-positive: All single quotes are escaped/removed.
+                rd.InsertLog(_listId, _listName.Replace("'", ""), "Error creating column entries",
+                    string.Format("Error creating column entries"), 2);
+                    // - CAT.NET false-positive: All single quotes are escaped/removed.
                 success = false;
             }
             if (!rd.DeleteListColumns(_listId, oldColumns))
             {
-                rd.InsertLog(_listId, _listName.Replace("'", ""), "Error deleting column entries.", string.Format("Error deleting column entries"), 2); // - CAT.NET false-positive: All single quotes are escaped/removed.
+                rd.InsertLog(_listId, _listName.Replace("'", ""), "Error deleting column entries.",
+                    string.Format("Error deleting column entries"), 2);
+                    // - CAT.NET false-positive: All single quotes are escaped/removed.
                 success = false;
             }
 
             if (!rd.UpdateList(_listId, _resourceList))
             {
-                rd.InsertLog(_listId, _listName.Replace("'", ""), string.Format("Error updating list entry"), string.Format("Error updating list entry"), 2); // - CAT.NET false-positive: All single quotes are escaped/removed.
+                rd.InsertLog(_listId, _listName.Replace("'", ""), string.Format("Error updating list entry"),
+                    string.Format("Error updating list entry"), 2);
+                    // - CAT.NET false-positive: All single quotes are escaped/removed.
                 success = false;
             }
             if (success)
-                rd.InsertLog(_listId, _listName.Replace("'", ""), "Updated list mapping.", string.Format("Updated list mapping: Added {0}, Deleted {1}", newColumns, oldColumns), 0); // - CAT.NET false-positive: All single quotes are escaped/removed.
+                rd.InsertLog(_listId, _listName.Replace("'", ""), "Updated list mapping.",
+                    string.Format("Updated list mapping: Added {0}, Deleted {1}", newColumns, oldColumns), 0);
+                    // - CAT.NET false-positive: All single quotes are escaped/removed.
             else
-                rd.InsertLog(_listId, _listName.Replace("'", ""), "Errors occurred while updating list mapping.", string.Format("Errors occurred while updating list mapping: Adding {0}, Deleting {1}", newColumns, oldColumns), 1); // - CAT.NET false-positive: All single quotes are escaped/removed.
+                rd.InsertLog(_listId, _listName.Replace("'", ""), "Errors occurred while updating list mapping.",
+                    string.Format("Errors occurred while updating list mapping: Adding {0}, Deleting {1}", newColumns,
+                        oldColumns), 1); // - CAT.NET false-positive: All single quotes are escaped/removed.
         }
 
         public bool Delete()
@@ -522,13 +562,15 @@ namespace EPMLiveReportsAdmin
             var rd = new ReportData(_siteId);
             RemoveEvent();
 
-            if (rd.DeleteTable(_tableName.Replace("'", "")) // - CAT.NET false-positive: All single quotes are escaped/removed.
-                && rd.DeleteTable(_tableNameSnapshot.Replace("'", ""))) // - CAT.NET false-positive: All single quotes are escaped/removed.
+            if (rd.DeleteTable(_tableName.Replace("'", ""))
+                // - CAT.NET false-positive: All single quotes are escaped/removed.
+                && rd.DeleteTable(_tableNameSnapshot.Replace("'", "")))
+                // - CAT.NET false-positive: All single quotes are escaped/removed.
                 return
                     //rd.DeleteAllListColumns(_listId) && 
-                        rd.DeleteList(_listId)
-                       && rd.DeleteLog(_listId)
-                       && rd.DeleteWork(_listId);
+                    rd.DeleteList(_listId)
+                    && rd.DeleteLog(_listId)
+                    && rd.DeleteWork(_listId);
             return false;
         }
 
@@ -542,7 +584,7 @@ namespace EPMLiveReportsAdmin
         {
             var rd = new ReportData(_siteId);
             int it;
-            var success = int.TryParse(type.ToString(), out it);
+            bool success = int.TryParse(type.ToString(), out it);
             if (success)
                 rd.DeleteLog(_listId, it);
             else
@@ -590,23 +632,26 @@ namespace EPMLiveReportsAdmin
             var rd = new ReportData(_siteId);
             bool success = rd.SnapshotLists(_listName.Replace("'", ""));
             if (success)
-                rd.InsertLog(_listId, _listName.Replace("'", ""), "Snapshot completed.", "Manual snapshot completed", 0); // - CAT.NET false-positive: All single quotes are escaped/removed.
+                rd.InsertLog(_listId, _listName.Replace("'", ""), "Snapshot completed.", "Manual snapshot completed", 0);
+                    // - CAT.NET false-positive: All single quotes are escaped/removed.
             else
-                rd.InsertLog(_listId, _listName.Replace("'", ""), "Error taking snapshot.", "Error taking manual snapshot", 2); // - CAT.NET false-positive: All single quotes are escaped/removed.
+                rd.InsertLog(_listId, _listName.Replace("'", ""), "Error taking snapshot.",
+                    "Error taking manual snapshot", 2);
+                    // - CAT.NET false-positive: All single quotes are escaped/removed.
             return success;
         }
 
         private void RegisterEvent()
         {
             SPList spList = null;
-            ReportData DAO = new ReportData(_siteId);
+            var DAO = new ReportData(_siteId);
 
             try
             {
                 SPSecurity.RunWithElevatedPrivileges(
                     delegate
                     {
-                        using (SPSite spSite = new SPSite(_siteId))
+                        using (var spSite = new SPSite(_siteId))
                         {
                             spList = null;
                             foreach (SPWeb spWeb in spSite.AllWebs)
@@ -629,11 +674,14 @@ namespace EPMLiveReportsAdmin
 
                                         // remove existing event receivers first
                                         List<SPEventReceiverDefinition> evts = GetListEvents(spList,
-                                                                                             Resources.Assembly,
-                                                                                             Resources.ClassName,
-                                                                                             new List<SPEventReceiverType> { SPEventReceiverType.ItemAdded, 
-                                                                                                                             SPEventReceiverType.ItemUpdated, 
-                                                                                                                             SPEventReceiverType.ItemDeleting });
+                                            Resources.Assembly,
+                                            Resources.ClassName,
+                                            new List<SPEventReceiverType>
+                                            {
+                                                SPEventReceiverType.ItemAdded,
+                                                SPEventReceiverType.ItemUpdated,
+                                                SPEventReceiverType.ItemDeleting
+                                            });
 
                                         foreach (SPEventReceiverDefinition e in evts)
                                         {
@@ -641,16 +689,22 @@ namespace EPMLiveReportsAdmin
                                         }
 
                                         // then add event receivers
-                                        spList.EventReceivers.Add(SPEventReceiverType.ItemAdded, Resources.Assembly, Resources.ClassName);
-                                        spList.EventReceivers.Add(SPEventReceiverType.ItemUpdated, Resources.Assembly, Resources.ClassName);
-                                        spList.EventReceivers.Add(SPEventReceiverType.ItemDeleting, Resources.Assembly, Resources.ClassName);
+                                        spList.EventReceivers.Add(SPEventReceiverType.ItemAdded, Resources.Assembly,
+                                            Resources.ClassName);
+                                        spList.EventReceivers.Add(SPEventReceiverType.ItemUpdated, Resources.Assembly,
+                                            Resources.ClassName);
+                                        spList.EventReceivers.Add(SPEventReceiverType.ItemDeleting, Resources.Assembly,
+                                            Resources.ClassName);
 
                                         List<SPEventReceiverDefinition> newEvts = GetListEvents(spList,
-                                                                                             Resources.Assembly,
-                                                                                             Resources.ClassName,
-                                                                                             new List<SPEventReceiverType> { SPEventReceiverType.ItemAdded, 
-                                                                                                                             SPEventReceiverType.ItemUpdated, 
-                                                                                                                             SPEventReceiverType.ItemDeleting });
+                                            Resources.Assembly,
+                                            Resources.ClassName,
+                                            new List<SPEventReceiverType>
+                                            {
+                                                SPEventReceiverType.ItemAdded,
+                                                SPEventReceiverType.ItemUpdated,
+                                                SPEventReceiverType.ItemDeleting
+                                            });
 
                                         foreach (SPEventReceiverDefinition e in newEvts)
                                         {
@@ -665,11 +719,14 @@ namespace EPMLiveReportsAdmin
                                         //{
                                         // remove existing event receivers first
                                         List<SPEventReceiverDefinition> delEvts = GetListEvents(spList,
-                                                                                         Resources.Assembly,
-                                                                                         "EPMLiveReportsAdmin.LstEvents",
-                                                                                         new List<SPEventReceiverType> { SPEventReceiverType.ListDeleting, 
-                                                                                                                             SPEventReceiverType.FieldDeleting,
-                                                                                                                             SPEventReceiverType.FieldAdded});
+                                            Resources.Assembly,
+                                            "EPMLiveReportsAdmin.LstEvents",
+                                            new List<SPEventReceiverType>
+                                            {
+                                                SPEventReceiverType.ListDeleting,
+                                                SPEventReceiverType.FieldDeleting,
+                                                SPEventReceiverType.FieldAdded
+                                            });
 
                                         foreach (SPEventReceiverDefinition e in delEvts)
                                         {
@@ -677,16 +734,22 @@ namespace EPMLiveReportsAdmin
                                         }
 
                                         // then add event receivers
-                                        spList.EventReceivers.Add(SPEventReceiverType.ListDeleting, Resources.Assembly, "EPMLiveReportsAdmin.LstEvents");
-                                        spList.EventReceivers.Add(SPEventReceiverType.FieldDeleting, Resources.Assembly, "EPMLiveReportsAdmin.LstEvents");
-                                        spList.EventReceivers.Add(SPEventReceiverType.FieldAdded, Resources.Assembly, "EPMLiveReportsAdmin.LstEvents");
+                                        spList.EventReceivers.Add(SPEventReceiverType.ListDeleting, Resources.Assembly,
+                                            "EPMLiveReportsAdmin.LstEvents");
+                                        spList.EventReceivers.Add(SPEventReceiverType.FieldDeleting, Resources.Assembly,
+                                            "EPMLiveReportsAdmin.LstEvents");
+                                        spList.EventReceivers.Add(SPEventReceiverType.FieldAdded, Resources.Assembly,
+                                            "EPMLiveReportsAdmin.LstEvents");
 
                                         List<SPEventReceiverDefinition> newEvts2 = GetListEvents(spList,
-                                                                                        Resources.Assembly,
-                                                                                        "EPMLiveReportsAdmin.LstEvents",
-                                                                                        new List<SPEventReceiverType> { SPEventReceiverType.ListDeleting, 
-                                                                                                                             SPEventReceiverType.FieldDeleting,
-                                                                                                                             SPEventReceiverType.FieldAdded});
+                                            Resources.Assembly,
+                                            "EPMLiveReportsAdmin.LstEvents",
+                                            new List<SPEventReceiverType>
+                                            {
+                                                SPEventReceiverType.ListDeleting,
+                                                SPEventReceiverType.FieldDeleting,
+                                                SPEventReceiverType.FieldAdded
+                                            });
                                         foreach (SPEventReceiverDefinition e in newEvts2)
                                         {
                                             e.SequenceNumber = 11000;
@@ -697,7 +760,11 @@ namespace EPMLiveReportsAdmin
                                     catch (Exception ex)
                                     {
                                         //Report "List Not Present" error
-                                        DAO.LogStatus(_listId, _listName, spWeb.ServerRelativeUrl + " - Event registration issue.", "Warning: " + _listName.Replace("'", "") + " list not present. On site:" + spWeb.ServerRelativeUrl, 0, 1); // - CAT.NET false-positive: All single quotes are escaped/removed.
+                                        DAO.LogStatus(_listId, _listName,
+                                            spWeb.ServerRelativeUrl + " - Event registration issue.",
+                                            "Warning: " + _listName.Replace("'", "") + " list not present. On site:" +
+                                            spWeb.ServerRelativeUrl, 0, 1);
+                                            // - CAT.NET false-positive: All single quotes are escaped/removed.
                                     }
                                     spWeb.AllowUnsafeUpdates = false;
                                 }
@@ -711,29 +778,30 @@ namespace EPMLiveReportsAdmin
             {
                 var rd = new ReportData(_siteId);
                 if (spList != null)
-                    rd.InsertLog(spList.ID, spList.Title.Replace("'", ""), "Created Mapping", "Created Mapping", 0); // - CAT.NET false-positive: All single quotes are escaped/removed.
+                    rd.InsertLog(spList.ID, spList.Title.Replace("'", ""), "Created Mapping", "Created Mapping", 0);
+                        // - CAT.NET false-positive: All single quotes are escaped/removed.
                 else
                     rd.InsertLog(Guid.Empty, "Unknown", "An error occurred while registering event.",
-                                 string.Format("Can't register event on site {0} - Exception: {1}", _siteId, ex.Message.Replace("'", "")), 2); // - CAT.NET false-positive: All single quotes are escaped/removed.
+                        string.Format("Can't register event on site {0} - Exception: {1}", _siteId,
+                            ex.Message.Replace("'", "")), 2);
+                        // - CAT.NET false-positive: All single quotes are escaped/removed.
             }
         }
 
-        private List<SPEventReceiverDefinition> GetListEvents(SPList list, string assemblyName, string className, List<SPEventReceiverType> types)
+        private List<SPEventReceiverDefinition> GetListEvents(SPList list, string assemblyName, string className,
+            List<SPEventReceiverType> types)
         {
-            List<SPEventReceiverDefinition> evts = new List<SPEventReceiverDefinition>();
+            var evts = new List<SPEventReceiverDefinition>();
 
             try
             {
                 evts = (from e in list.EventReceivers.OfType<SPEventReceiverDefinition>()
-                        where e.Assembly.Equals(assemblyName, StringComparison.CurrentCultureIgnoreCase) &&
-                              e.Class.Equals(className, StringComparison.CurrentCultureIgnoreCase) &&
-                              types.Contains(e.Type)
-                        select e).ToList<SPEventReceiverDefinition>();
+                    where e.Assembly.Equals(assemblyName, StringComparison.CurrentCultureIgnoreCase) &&
+                          e.Class.Equals(className, StringComparison.CurrentCultureIgnoreCase) &&
+                          types.Contains(e.Type)
+                    select e).ToList<SPEventReceiverDefinition>();
             }
-            catch
-            {
-
-            }
+            catch { }
 
             return evts;
         }
@@ -743,14 +811,14 @@ namespace EPMLiveReportsAdmin
             SPEventReceiverDefinitionCollection spEventCollection = null;
             SPEventReceiverDefinition spEventDef;
             SPList spList = null;
-            ReportData DAO = new ReportData(_siteId);
+            var DAO = new ReportData(_siteId);
 
             try
             {
                 SPSecurity.RunWithElevatedPrivileges(
                     delegate
                     {
-                        using (SPSite spSite = new SPSite(_siteId))
+                        using (var spSite = new SPSite(_siteId))
                         {
                             foreach (SPWeb spWeb in spSite.AllWebs)
                             {
@@ -763,16 +831,16 @@ namespace EPMLiveReportsAdmin
                                         spList = spWeb.Lists[_listName];
                                         spEventCollection = spList.EventReceivers;
                                     }
-                                    catch (Exception)
-                                    { }
+                                    catch (Exception) { }
 
                                     if (spList != null)
                                     {
-                                        List<SPEventReceiverDefinition> delEvents = new List<SPEventReceiverDefinition>();
+                                        var delEvents = new List<SPEventReceiverDefinition>();
 
                                         foreach (SPEventReceiverDefinition def in spEventCollection)
                                         {
-                                            if (def.Class.Equals(Resources.ClassName, StringComparison.CurrentCultureIgnoreCase))
+                                            if (def.Class.Equals(Resources.ClassName,
+                                                StringComparison.CurrentCultureIgnoreCase))
                                             {
                                                 delEvents.Add(def);
                                             }
@@ -786,7 +854,11 @@ namespace EPMLiveReportsAdmin
                                     else
                                     {
                                         //Report "List Not Present" error
-                                        DAO.ReportError(_listId, _listName.Replace("'", ""), _listName.Replace("'", "") + ": Unable to delete event handlers. List not present.", spWeb.ServerRelativeUrl, 1); // - CAT.NET false-positive: All single quotes are escaped/removed.
+                                        DAO.ReportError(_listId, _listName.Replace("'", ""),
+                                            _listName.Replace("'", "") +
+                                            ": Unable to delete event handlers. List not present.",
+                                            spWeb.ServerRelativeUrl, 1);
+                                            // - CAT.NET false-positive: All single quotes are escaped/removed.
                                     }
                                     spWeb.AllowUnsafeUpdates = false;
                                 }
@@ -804,7 +876,7 @@ namespace EPMLiveReportsAdmin
                     rd.InsertLog(spList.ID, spList.Title, "Created Mapping", "Created Mapping", 0);
                 else
                     rd.InsertLog(Guid.Empty, "Unknown", "An error occurred while registering event handlers.",
-                                 string.Format("Can't register event on site {0} - Exception: {1}", _siteId, ex.Message), 2);
+                        string.Format("Can't register event on site {0} - Exception: {1}", _siteId, ex.Message), 2);
             }
             //SPSecurity.RunWithElevatedPrivileges(delegate { c_spSite = new SPSite(_siteId); });
 

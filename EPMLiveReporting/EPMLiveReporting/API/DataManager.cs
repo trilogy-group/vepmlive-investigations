@@ -17,13 +17,11 @@ namespace EPMLiveReportsAdmin.API
         #region Constructors (1) 
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DataManager"/> class.
+        ///     Initializes a new instance of the <see cref="DataManager" /> class.
         /// </summary>
         /// <param name="spWeb">The sp web.</param>
         public DataManager(SPWeb spWeb)
-            : base(spWeb)
-        {
-        }
+            : base(spWeb) { }
 
         #endregion Constructors 
 
@@ -32,7 +30,7 @@ namespace EPMLiveReportsAdmin.API
         // Public Methods (3) 
 
         /// <summary>
-        /// Gets my work data.
+        ///     Gets my work data.
         /// </summary>
         /// <param name="data">The data.</param>
         /// <exception cref="APIException"></exception>
@@ -50,10 +48,10 @@ namespace EPMLiveReportsAdmin.API
                 DateTime dueDate;
 
                 ParseMyWorkDataResourceData(data, out resourcePoolIds, out badResourcePoolIds, out returnAll,
-                                            out startDate, out dueDate);
+                    out startDate, out dueDate);
 
                 Dictionary<int, string> mappedResources = MapResourcePoolIdToSPUser(resourcePoolIds,
-                                                                                    ref badResourcePoolIds, returnAll);
+                    ref badResourcePoolIds, returnAll);
 
                 var resourceIdDict = new Dictionary<int, int>();
 
@@ -75,7 +73,7 @@ namespace EPMLiveReportsAdmin.API
                     if (dueDate == DateTime.MaxValue) dueDate = dateTime.AddDays(30);
 
                     DataTable dataTable = GetMyWorkDataForResources(spUsers, ParseMyWorkReportingScope(data), startDate,
-                                                                    dueDate);
+                        dueDate);
 
                     BuildMyWorkDataResponse(dataTable, resourceIdDict, ref dataElement);
                 }
@@ -89,10 +87,10 @@ namespace EPMLiveReportsAdmin.API
                 string dDate = SPUtility.CreateISO8601DateTimeFromSystemDateTime(dueDate);
 
                 return new XElement("GetMyWorkData", new XElement("Params",
-                                                                  new XElement("DateRange",
-                                                                               new XAttribute("StartDate", sDate),
-                                                                               new XAttribute("DueDate", dDate))),
-                                    dataElement).ToString();
+                    new XElement("DateRange",
+                        new XAttribute("StartDate", sDate),
+                        new XAttribute("DueDate", dDate))),
+                    dataElement).ToString();
             }
             catch (APIException)
             {
@@ -105,7 +103,7 @@ namespace EPMLiveReportsAdmin.API
         }
 
         /// <summary>
-        /// Gets my work fields.
+        ///     Gets my work fields.
         /// </summary>
         /// <param name="data">The data.</param>
         /// <returns></returns>
@@ -140,7 +138,7 @@ namespace EPMLiveReportsAdmin.API
         }
 
         /// <summary>
-        /// Refreshes all.
+        ///     Refreshes all.
         /// </summary>
         /// <returns></returns>
         public string RefreshAll()
@@ -194,28 +192,28 @@ namespace EPMLiveReportsAdmin.API
         // Private Methods (6) 
 
         /// <summary>
-        /// Adds the bad resource error.
+        ///     Adds the bad resource error.
         /// </summary>
         /// <param name="badResourcePoolId">The bad resource pool id.</param>
         /// <param name="dataElement">The data element.</param>
         private static void AddBadResourceError(string badResourcePoolId, ref XElement dataElement)
         {
             dataElement.Add(new XElement("Resource", new XAttribute("Id", badResourcePoolId),
-                                         new XElement("Result", new XAttribute("Status", 1),
-                                                      new XCData(
-                                                          string.Format(
-                                                              "{0} is not a valid Resource Pool Resource ID.",
-                                                              badResourcePoolId)))));
+                new XElement("Result", new XAttribute("Status", 1),
+                    new XCData(
+                        string.Format(
+                            "{0} is not a valid Resource Pool Resource ID.",
+                            badResourcePoolId)))));
         }
 
         /// <summary>
-        /// Builds my work data response.
+        ///     Builds my work data response.
         /// </summary>
         /// <param name="dataTable">The data table.</param>
         /// <param name="resourceIdDict">The resource id dict.</param>
         /// <param name="dataElement">The data element.</param>
         private void BuildMyWorkDataResponse(DataTable dataTable, Dictionary<int, int> resourceIdDict,
-                                             ref XElement dataElement)
+            ref XElement dataElement)
         {
             DataColumnCollection dataColumnCollection = dataTable.Columns;
 
@@ -226,10 +224,10 @@ namespace EPMLiveReportsAdmin.API
                 foreach (DataRow dataRow in dataTable.Select(string.Format("AssignedToId = {0}", keyValuePair.Key)))
                 {
                     var itemElement = new XElement("Item", new XAttribute("Id", dataRow["ItemId"]),
-                                                   new XAttribute("ListId", dataRow["ListId"]),
-                                                   new XAttribute("WebId", dataRow["WebId"]),
-                                                   new XAttribute("SiteId", dataRow["SiteId"]),
-                                                   new XAttribute("WebUrl", dataRow["WebUrl"]));
+                        new XAttribute("ListId", dataRow["ListId"]),
+                        new XAttribute("WebId", dataRow["WebId"]),
+                        new XAttribute("SiteId", dataRow["SiteId"]),
+                        new XAttribute("WebUrl", dataRow["WebUrl"]));
 
                     foreach (DataColumn dataColumn in dataColumnCollection)
                     {
@@ -244,19 +242,19 @@ namespace EPMLiveReportsAdmin.API
                         }
 
                         itemElement.Add(new XElement("Field", new XAttribute("Name", dataColumn.ColumnName),
-                                                     new XAttribute("Type", dataType), new XCData(stringValue)));
+                            new XAttribute("Type", dataType), new XCData(stringValue)));
                     }
 
                     resourceDataElement.Add(itemElement);
                 }
 
                 dataElement.Add(new XElement("Resource", new XAttribute("Id", keyValuePair.Value),
-                                             new XElement("Result", new XAttribute("Status", 0)), resourceDataElement));
+                    new XElement("Result", new XAttribute("Status", 0)), resourceDataElement));
             }
         }
 
         /// <summary>
-        /// Gets my work data for resources.
+        ///     Gets my work data for resources.
         /// </summary>
         /// <param name="resources">The resources.</param>
         /// <param name="reportingScope">The reporting scope.</param>
@@ -264,8 +262,8 @@ namespace EPMLiveReportsAdmin.API
         /// <param name="dueDate">The due date.</param>
         /// <returns></returns>
         private DataTable GetMyWorkDataForResources(IEnumerable<SPFieldUserValue> resources,
-                                                    ReportingScope reportingScope,
-                                                    DateTime startDate, DateTime dueDate)
+            ReportingScope reportingScope,
+            DateTime startDate, DateTime dueDate)
         {
             DataTable dataTable;
 
@@ -273,25 +271,25 @@ namespace EPMLiveReportsAdmin.API
             {
                 dataTable =
                     myWorkReportData.GetData(new Dictionary<string, IEnumerable<object>>
-                                                 {
-                                                     {"AssignedToId", from r in resources select (object) r.LookupId},
-                                                     {"StartDate", new[] {(object) startDate}},
-                                                     {"DueDate", new[] {(object) dueDate}},
-                                                 }, reportingScope, Web);
+                    {
+                        {"AssignedToId", from r in resources select (object) r.LookupId},
+                        {"StartDate", new[] {(object) startDate}},
+                        {"DueDate", new[] {(object) dueDate}},
+                    }, reportingScope, Web);
             }
 
             return dataTable;
         }
 
         /// <summary>
-        /// Maps the resource pool id to SP user id.
+        ///     Maps the resource pool id to SP user id.
         /// </summary>
         /// <param name="resourcePoolIds">The resource pool ids.</param>
         /// <param name="badResourcePoolIds">The bad resource pool ids.</param>
         /// <param name="returnAll">if set to <c>true</c> [return all].</param>
         /// <returns></returns>
         private Dictionary<int, string> MapResourcePoolIdToSPUser(IEnumerable<int> resourcePoolIds,
-                                                                  ref IList<string> badResourcePoolIds, bool returnAll)
+            ref IList<string> badResourcePoolIds, bool returnAll)
         {
             var resourceIdDictionary = new Dictionary<int, string>();
 
@@ -332,7 +330,7 @@ namespace EPMLiveReportsAdmin.API
         }
 
         /// <summary>
-        /// Parses my work data resource data.
+        ///     Parses my work data resource data.
         /// </summary>
         /// <param name="data">The data.</param>
         /// <param name="resourcePoolIds">The resource pool ids.</param>
@@ -341,8 +339,8 @@ namespace EPMLiveReportsAdmin.API
         /// <param name="startDate">The start date.</param>
         /// <param name="dueDate">The due date.</param>
         private void ParseMyWorkDataResourceData(string data, out IList<int> resourcePoolIds,
-                                                 out IList<string> badResourcePoolIds, out bool returnAll,
-                                                 out DateTime startDate, out DateTime dueDate)
+            out IList<string> badResourcePoolIds, out bool returnAll,
+            out DateTime startDate, out DateTime dueDate)
         {
             returnAll = false;
 
@@ -357,7 +355,7 @@ namespace EPMLiveReportsAdmin.API
             if (requestDocument.Root == null)
             {
                 throw new APIException((int) Errors.ParseMyWorkDataNoRootElement,
-                                       "Cannot find the root element: GetMyWorkReportingData");
+                    "Cannot find the root element: GetMyWorkReportingData");
             }
 
             XElement paramsElement = requestDocument.Root.Element("Params");
@@ -365,7 +363,7 @@ namespace EPMLiveReportsAdmin.API
             if (paramsElement == null)
             {
                 throw new APIException((int) Errors.ParseMyWorkDataNoParamsElement,
-                                       @"Cannot find the GetMyWorkReportingData\Params element");
+                    @"Cannot find the GetMyWorkReportingData\Params element");
             }
 
             XElement resourcesElement = paramsElement.Element("Resources");
@@ -373,7 +371,7 @@ namespace EPMLiveReportsAdmin.API
             if (resourcesElement == null)
             {
                 throw new APIException((int) Errors.ParseMyWorkDataNoResourcesElement,
-                                       @"Cannot find the GetMyWorkReportingData\Params\Resources element");
+                    @"Cannot find the GetMyWorkReportingData\Params\Resources element");
             }
 
             XElement dateRangeAttribute = paramsElement.Element("DateRange");
@@ -408,7 +406,7 @@ namespace EPMLiveReportsAdmin.API
         }
 
         /// <summary>
-        /// Parses my work reporting scope.
+        ///     Parses my work reporting scope.
         /// </summary>
         /// <param name="data">The data.</param>
         /// <returns></returns>
@@ -425,9 +423,9 @@ namespace EPMLiveReportsAdmin.API
                 if (!Enum.IsDefined(typeof (ReportingScope), scope))
                 {
                     throw new APIException((int) Errors.InvalidReportingScope,
-                                           string.Format(
-                                               "{0} is not a valid Reporting Scope. Valid scopes are: Site, Web and Recursive",
-                                               scope));
+                        string.Format(
+                            "{0} is not a valid Reporting Scope. Valid scopes are: Site, Web and Recursive",
+                            scope));
                 }
 
                 return (ReportingScope) Enum.Parse(typeof (ReportingScope), scope);

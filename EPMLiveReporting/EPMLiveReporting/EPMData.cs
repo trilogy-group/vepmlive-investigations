@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
+using System.Web.UI.WebControls;
 using EPMLiveCore;
 using EPMLiveReportsAdmin.Properties;
 using Microsoft.SharePoint;
-using System.Web.UI.WebControls;
-using System.Configuration;
-using System.IO;
 
 namespace EPMLiveReportsAdmin
 {
@@ -17,52 +18,29 @@ namespace EPMLiveReportsAdmin
     {
         private readonly Guid _siteID;
         private readonly Guid _webAppId;
+        private string _DefaultLists;
         private string _command;
         private CommandType _commandType = CommandType.Text;
         private SqlConnection _conClientReporting;
         private SqlConnection _conEPMLive;
         private SqlConnection _conMaster;
-        private string _siteName;
-        private string _siteUrl;
 
         private string _databaseName;
         private string _databaseServer;
-        private string _username;
-        private string _password;
-        private bool _useSAccount;
 
         private DataTable _dtStatusLog;
+        private bool _epmLiveConOpen;
         private string _masterCs;
         private List<SqlParameter> _params = new List<SqlParameter>();
+        private string _password;
         private string _remoteCs;
+        private string _sTextFilePath;
+        private string _siteName;
+        private string _siteUrl;
         private string _sqlError;
         private bool _sqlErrorOccurred;
-        private string _DefaultLists;
-        private string _sTextFilePath;
-        private bool _epmLiveConOpen;
-
-        public string UserName
-        {
-            get { return _username; }
-            set { _username = value; }
-        }
-
-        public string Password
-        {
-            get { return _password; }
-            set { _password = value; }
-        }
-
-        public bool UseSqlAccount
-        {
-            get { return _useSAccount; }
-            set { _useSAccount = value; }
-        }
-
-        public Guid SiteId
-        {
-            get { return _siteID; }
-        }
+        private bool _useSAccount;
+        private string _username;
 
         public EPMData(Guid siteID)
         {
@@ -71,7 +49,7 @@ namespace EPMLiveReportsAdmin
             {
                 using (var spSite = new SPSite(siteID))
                 {
-                    OpenEPMLiveConnection = EPMLiveCore.CoreFunctions.getConnectionString(spSite.WebApplication.Id);
+                    OpenEPMLiveConnection = CoreFunctions.getConnectionString(spSite.WebApplication.Id);
                     using (SPWeb rootweb = spSite.OpenWeb())
                     {
                         _siteUrl = rootweb.ServerRelativeUrl;
@@ -96,7 +74,7 @@ namespace EPMLiveReportsAdmin
             using (var spSite = new SPSite(siteID))
             {
                 OpenEPMLiveConnection = CoreFunctions.getConnectionString(webAppId);
-                using (var rootweb = spSite.OpenWeb())
+                using (SPWeb rootweb = spSite.OpenWeb())
                 {
                     {
                         _siteUrl = rootweb.ServerRelativeUrl;
@@ -118,13 +96,398 @@ namespace EPMLiveReportsAdmin
         {
             _siteID = siteID;
             _webAppId = webAppId;
-            OpenEPMLiveConnection = EPMLiveCore.CoreFunctions.getConnectionString(webAppId);
+            OpenEPMLiveConnection = CoreFunctions.getConnectionString(webAppId);
             if (_epmLiveConOpen)
             {
                 PopulateInstanceFromData();
                 PopulateConnectionStrings();
             }
         }
+
+        public EPMData(Guid siteID, string sDbName, string sServerName, bool useSAccount, string username,
+            string password)
+        {
+            _siteID = siteID;
+            _databaseName = sDbName;
+            _databaseServer = sServerName;
+            _useSAccount = useSAccount;
+            _username = username;
+            _password = password;
+
+            SPSecurity.RunWithElevatedPrivileges(delegate()
+            {
+                using (var spSite = new SPSite(siteID))
+                {
+                    OpenEPMLiveConnection = CoreFunctions.getConnectionString(spSite.WebApplication.Id);
+                }
+            });
+
+
+            if (_epmLiveConOpen)
+            {
+                PopulateConnectionStrings();
+            }
+        }
+
+        public string UserName
+        {
+            get { return _username; }
+            set { _username = value; }
+        }
+
+        public string Password
+        {
+            get { return _password; }
+            set { _password = value; }
+        }
+
+        public bool UseSqlAccount
+        {
+            get { return _useSAccount; }
+            set { _useSAccount = value; }
+        }
+
+        public Guid SiteId
+        {
+            get { return _siteID; }
+        }
+
+        public string Command
+        {
+            get { return _command; }
+            set { _command = value; }
+        }
+
+        public bool EPMLiveConOpen
+        {
+            get { return _epmLiveConOpen; }
+        }
+
+        public CommandType CommandType
+        {
+            get { return _commandType; }
+            set { _commandType = value; }
+        }
+
+        public List<SqlParameter> Params
+        {
+            get { return _params; }
+            set { _params = value; }
+        }
+
+        public string SqlError
+        {
+            get { return _sqlError; }
+        }
+
+        public bool SqlErrorOccurred
+        {
+            get { return _sqlErrorOccurred; }
+        }
+
+        public string SiteName
+        {
+            get { return _siteName; }
+        }
+
+        public string SiteUrl
+        {
+            get { return _siteUrl; }
+        }
+
+        /// <summary>
+        /// </summary>
+        public SqlConnection GetEPMLiveConnection
+        {
+            get
+            {
+                if (_conEPMLive.State == ConnectionState.Open)
+                    return _conEPMLive;
+                try
+                {
+                    _conEPMLive.Open();
+                    _epmLiveConOpen = true;
+                }
+                catch (Exception ex)
+                {
+                    _epmLiveConOpen = false;
+                    SPSecurity.RunWithElevatedPrivileges(delegate()
+                    {
+                        if (!EventLog.SourceExists("EPMLive Reporting - GetEPMLiveConnection"))
+                            EventLog.CreateEventSource("EPMLive Reporting - GetEPMLiveConnection", "EPM Live");
+
+                        var myLog = new EventLog("EPM Live", ".", "EPMLive Reporting GetEPMLiveConnection");
+                        myLog.MaximumKilobytes = 32768;
+                        myLog.WriteEntry(
+                            "Name: " + _siteName + " Url: " + _siteUrl + " ID: " + _siteID.ToString() + " : " +
+                            ex.Message + ex.StackTrace, EventLogEntryType.Error, 2040);
+                    });
+                }
+                return _conEPMLive;
+            }
+        }
+
+        /// <summary>
+        /// </summary>
+        public SqlConnection GetClientReportingConnection
+        {
+            get
+            {
+                if (_conClientReporting != null && _conClientReporting.State == ConnectionState.Open)
+                    return _conClientReporting;
+                try
+                {
+                    OpenClientReportingConnection = _remoteCs;
+                }
+                catch (Exception ex)
+                {
+                    SPSecurity.RunWithElevatedPrivileges(delegate()
+                    {
+                        if (!EventLog.SourceExists("EPMLive Reporting - GetClientReportingConnection"))
+                            EventLog.CreateEventSource("EPMLive Reporting - GetClientReportingConnection", "EPM Live");
+
+                        var myLog = new EventLog("EPM Live", ".", "EPMLive Reporting GetClientReportingConnection");
+                        myLog.MaximumKilobytes = 32768;
+                        myLog.WriteEntry(
+                            "Name: " + _siteName + " Url: " + _siteUrl + " ID: " + _siteID.ToString() + " : " +
+                            ex.Message + ex.StackTrace, EventLogEntryType.Error, 2040);
+                    });
+                }
+                return _conClientReporting;
+            }
+        }
+
+        /// <summary>
+        /// </summary>
+        public SqlConnection GetMasterDbConnection
+        {
+            get
+            {
+                if (_conMaster != null && _conMaster.State == ConnectionState.Open)
+                    return _conMaster;
+                try
+                {
+                    OpenMasterDbConnection = _masterCs;
+                }
+                catch (Exception ex)
+                {
+                    _sqlError = ex.Message;
+                    SPSecurity.RunWithElevatedPrivileges(delegate()
+                    {
+                        if (!EventLog.SourceExists("EPMLive Reporting - GetMasterDbConnection"))
+                            EventLog.CreateEventSource("EPMLive Reporting - GetMasterDbConnection", "EPM Live");
+
+                        var myLog = new EventLog("EPM Live", ".", "EPMLive Reporting GetMasterDbConnection");
+                        myLog.MaximumKilobytes = 32768;
+                        myLog.WriteEntry(
+                            "Name: " + _siteName + " Url: " + _siteUrl + " ID: " + _siteID.ToString() + " : " +
+                            ex.Message + ex.StackTrace, EventLogEntryType.Error, 2020);
+                    });
+                }
+                return _conMaster;
+            }
+        }
+
+        /// <summary>
+        /// </summary>
+        public string OpenEPMLiveConnection
+        {
+            set
+            {
+                _conEPMLive = new SqlConnection(value);
+                try
+                {
+                    SPSecurity.RunWithElevatedPrivileges(delegate
+                    {
+                        if (_conEPMLive.State == ConnectionState.Closed)
+                        {
+                            _conEPMLive.Open();
+                            _epmLiveConOpen = true;
+                        }
+                    });
+                }
+                catch (Exception ex)
+                {
+                    _epmLiveConOpen = false;
+                    SPSecurity.RunWithElevatedPrivileges(delegate()
+                    {
+                        if (!EventLog.SourceExists("EPMLive Reporting - OpenEPMLiveConnection"))
+                            EventLog.CreateEventSource("EPMLive Reporting - OpenEPMLiveConnection", "EPM Live");
+
+                        var myLog = new EventLog("EPM Live", ".", "EPMLive Reporting OpenEPMLiveConnection");
+                        myLog.MaximumKilobytes = 32768;
+                        myLog.WriteEntry(
+                            "Name: " + _siteName + " Url: " + _siteUrl + " ID: " + _siteID.ToString() + " : " +
+                            ex.Message + ex.StackTrace, EventLogEntryType.Error, 2010);
+                    });
+                }
+            }
+        }
+
+        /// <summary>
+        /// </summary>
+        public string OpenClientReportingConnection
+        {
+            set
+            {
+                _conClientReporting = new SqlConnection(value);
+                try
+                {
+                    if (_databaseName != null && _databaseName != string.Empty)
+                    {
+                        if (!_useSAccount)
+                        {
+                            SPSecurity.RunWithElevatedPrivileges(delegate
+                            {
+                                if (_conClientReporting.State == ConnectionState.Closed)
+                                {
+                                    _conClientReporting.Open();
+                                }
+                            });
+                        }
+                        else
+                        {
+                            if (_conClientReporting.State == ConnectionState.Closed)
+                            {
+                                _conClientReporting.Open();
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    if (_databaseName != null && _databaseName != string.Empty)
+                    {
+                        SPSecurity.RunWithElevatedPrivileges(delegate()
+                        {
+                            if (!EventLog.SourceExists("EPMLive Reporting - OpenClientReportingConnection"))
+                                EventLog.CreateEventSource("EPMLive Reporting - OpenClientReportingConnection",
+                                    "EPM Live");
+
+                            var myLog = new EventLog("EPM Live", ".", "EPMLive Reporting OpenClientReportingConnection");
+                            myLog.MaximumKilobytes = 32768;
+                            myLog.WriteEntry(
+                                "Name: " + _siteName + " Url: " + _siteUrl + " ID: " + _siteID.ToString() + " : " +
+                                ex.Message + ex.StackTrace, EventLogEntryType.Error, 2010);
+                        });
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// </summary>
+        public string OpenMasterDbConnection
+        {
+            set
+            {
+                _conMaster = new SqlConnection(value);
+                try
+                {
+                    if (!_useSAccount)
+                    {
+                        SPSecurity.RunWithElevatedPrivileges(delegate
+                        {
+                            if (_conMaster.State == ConnectionState.Closed)
+                            {
+                                _conMaster.Open();
+                            }
+                        });
+                    }
+                    else
+                    {
+                        if (_conMaster.State == ConnectionState.Closed)
+                        {
+                            _conMaster.Open();
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _sqlError = ex.Message;
+                    if (_masterCs != null && _masterCs != string.Empty)
+                    {
+                        SPSecurity.RunWithElevatedPrivileges(delegate()
+                        {
+                            if (!EventLog.SourceExists("EPMLive Reporting - OpenMasterDbConnection"))
+                                EventLog.CreateEventSource("EPMLive Reporting - OpenMasterDbConnection", "EPM Live");
+
+                            var myLog = new EventLog("EPM Live", ".", "EPMLive Reporting OpenMasterDbConnection");
+                            myLog.MaximumKilobytes = 32768;
+                            myLog.WriteEntry(
+                                "Name: " + _siteName + " Url: " + _siteUrl + " ID: " + _siteID.ToString() + " : " +
+                                ex.Message + ex.StackTrace, EventLogEntryType.Error, 2030);
+                        });
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// </summary>
+        public string remoteCs
+        {
+            get { return _remoteCs; }
+        }
+
+        /// <summary>
+        /// </summary>
+        public string masterCs
+        {
+            get { return _masterCs; }
+        }
+
+        /// <summary>
+        /// </summary>
+        public string remoteDbName
+        {
+            get { return _databaseName; }
+        }
+
+        /// <summary>
+        /// </summary>
+        public string remoteServerName
+        {
+            get { return _databaseServer; }
+        }
+
+        #region IDisposable Members
+
+        public void Dispose()
+        {
+            SPSecurity.RunWithElevatedPrivileges(delegate
+            {
+                if (_conEPMLive != null)
+                {
+                    if (_conEPMLive.State == ConnectionState.Open)
+                    {
+                        _conEPMLive.Close();
+                    }
+                }
+            });
+            SPSecurity.RunWithElevatedPrivileges(delegate
+            {
+                if (_conClientReporting != null)
+                {
+                    if (_conClientReporting.State == ConnectionState.Open)
+                    {
+                        _conClientReporting.Close();
+                    }
+                }
+            });
+            SPSecurity.RunWithElevatedPrivileges(delegate
+            {
+                if (_conMaster != null)
+                {
+                    if (_conMaster.State == ConnectionState.Open)
+                    {
+                        _conMaster.Close();
+                    }
+                }
+            });
+        }
+
+        #endregion
 
         public string DefaultLists(SPWeb rootWeb)
         {
@@ -145,10 +508,7 @@ namespace EPMLiveReportsAdmin
                 _sTextFilePath = sPath;
                 SW.Close();
             }
-            catch (Exception ex)
-            {
-
-            }
+            catch (Exception ex) { }
         }
 
         public void WriteToFile(string sText)
@@ -166,10 +526,7 @@ namespace EPMLiveReportsAdmin
                     tw.Close();
                 }
             }
-            catch (Exception ex)
-            {
-
-            }
+            catch (Exception ex) { }
         }
 
         public bool DeleteWork(Guid listid, int itemid)
@@ -248,8 +605,8 @@ namespace EPMLiveReportsAdmin
             bool blnPassed = false;
             char[] splitter = ",".ToCharArray();
             Array lists = sListNames.Split(splitter[0]);
-            ListItemCollection fields = new ListItemCollection();
-            SPSite spSite = new SPSite(_siteID);
+            var fields = new ListItemCollection();
+            var spSite = new SPSite(_siteID);
             SPList spList = null;
 
             using (spSite)
@@ -271,7 +628,7 @@ namespace EPMLiveReportsAdmin
                         if (spList != null && !ListMappedAlready(spList.Title, _siteID))
                         {
                             fields = GetListFields(spList);
-                            ReportBiz oMapList = new ReportBiz(_siteID);
+                            var oMapList = new ReportBiz(_siteID);
                             oMapList.CreateListBiz(spList.ID, fields);
                         }
                     }
@@ -282,8 +639,8 @@ namespace EPMLiveReportsAdmin
             try
             {
                 //FOREIGN IMPLEMENTATION -- START
-                EPMData DAO = new EPMData(_siteID);
-                ReportBiz rb = new ReportBiz(_siteID);
+                var DAO = new EPMData(_siteID);
+                var rb = new ReportBiz(_siteID);
                 rb.UpdateForeignKeys(DAO);
                 DAO.Dispose();
                 // -- END
@@ -295,10 +652,12 @@ namespace EPMLiveReportsAdmin
                     if (!EventLog.SourceExists("EPMLive Reporting - UpdateForeignKeys"))
                         EventLog.CreateEventSource("EPMLive Reporting - UpdateForeignKeys", "EPM Live");
 
-                    EventLog myLog = new EventLog("EPM Live", ".", "EPMLive Reporting - UpdateForeignKeys");
+                    var myLog = new EventLog("EPM Live", ".", "EPMLive Reporting - UpdateForeignKeys");
                     myLog.ModifyOverflowPolicy(OverflowAction.OverwriteAsNeeded, 1);
                     myLog.MaximumKilobytes = 32768;
-                    myLog.WriteEntry("Name: " + _siteName + " Url: " + _siteUrl + " ID: " + _siteID.ToString() + " : " + ex.Message + ex.StackTrace, EventLogEntryType.Error, 4001);
+                    myLog.WriteEntry(
+                        "Name: " + _siteName + " Url: " + _siteUrl + " ID: " + _siteID.ToString() + " : " + ex.Message +
+                        ex.StackTrace, EventLogEntryType.Error, 4001);
                 });
                 blnPassed = false;
             }
@@ -308,10 +667,9 @@ namespace EPMLiveReportsAdmin
 
         private ListItemCollection GetListFields(SPList spList)
         {
-
-            ListItemCollection fields = new ListItemCollection();
+            var fields = new ListItemCollection();
             ListItem listField;
-            ListBiz ListDefaults = new ListBiz(spList.ID, _siteID);
+            var ListDefaults = new ListBiz(spList.ID, _siteID);
 
             foreach (SPField field in spList.Fields)
             {
@@ -338,8 +696,8 @@ namespace EPMLiveReportsAdmin
                     }
 
                     if (!field.Hidden
-                       && field.Type != SPFieldType.Computed
-                       )
+                        && field.Type != SPFieldType.Computed
+                        )
                     {
                         listField = new ListItem();
                         listField.Text = field.Title;
@@ -347,10 +705,7 @@ namespace EPMLiveReportsAdmin
                         fields.Add(listField);
                     }
                 }
-                catch (Exception ex)
-                {
-
-                }
+                catch (Exception ex) { }
             }
 
             return fields;
@@ -372,7 +727,10 @@ namespace EPMLiveReportsAdmin
 
 
             //DELETE TIMESHEET DATA -- START
-            string script = string.Format(@"IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[{0}]') AND type in (N'U')) DROP TABLE [{0}]", name.Replace("'", "''")); // - CAT.NET false-positive: All single quotes are escaped/removed.
+            string script =
+                string.Format(
+                    @"IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[{0}]') AND type in (N'U')) DROP TABLE [{0}]",
+                    name.Replace("'", "''")); // - CAT.NET false-positive: All single quotes are escaped/removed.
             //string script = "IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[@tableName]') AND type in (N'U')) DROP TABLE [@tableName]";
             //AddParam("@tableName", name);
             Command = script;
@@ -382,70 +740,34 @@ namespace EPMLiveReportsAdmin
         }
 
 
-
         public bool RefreshDefaultLists(string sListNames)
         {
             try
             {
-                using (SPSite site = new SPSite(_siteID))
+                using (var site = new SPSite(_siteID))
                 {
                     using (SPWeb web = site.OpenWeb())
                     {
-
                         Guid timerjobuid = Guid.NewGuid();
-                        Command = "INSERT INTO TIMERJOBS (siteguid, jobtype, jobname, scheduletype, webguid, timerjobuid) VALUES (@siteguid, 5, 'Reporting Refresh All', 2, @webguid, @timerjobuid)";
+                        Command =
+                            "INSERT INTO TIMERJOBS (siteguid, jobtype, jobname, scheduletype, webguid, timerjobuid) VALUES (@siteguid, 5, 'Reporting Refresh All', 2, @webguid, @timerjobuid)";
                         AddParam("@siteguid", site.ID);
                         AddParam("@webguid", web.ID.ToString());
                         AddParam("@timerjobuid", timerjobuid);
                         ExecuteNonQuery(GetEPMLiveConnection);
 
                         if (timerjobuid != Guid.Empty)
-                            EPMLiveCore.CoreFunctions.enqueue(timerjobuid, 0, site);
+                            CoreFunctions.enqueue(timerjobuid, 0, site);
                     }
-
                 }
                 return true;
             }
             catch (Exception ex)
             {
-                LogStatus(string.Empty, sListNames, "List data cleanup not completed due errors." + ex.Message, ex.StackTrace, 2, 3, string.Empty);
+                LogStatus(string.Empty, sListNames, "List data cleanup not completed due errors." + ex.Message,
+                    ex.StackTrace, 2, 3, string.Empty);
                 return false;
             }
-        }
-
-        public EPMData(Guid siteID, string sDbName, string sServerName, bool useSAccount, string username, string password)
-        {
-            _siteID = siteID;
-            _databaseName = sDbName;
-            _databaseServer = sServerName;
-            _useSAccount = useSAccount;
-            _username = username;
-            _password = password;
-
-            SPSecurity.RunWithElevatedPrivileges(delegate()
-            {
-                using (var spSite = new SPSite(siteID))
-                {
-                    OpenEPMLiveConnection = EPMLiveCore.CoreFunctions.getConnectionString(spSite.WebApplication.Id);
-                }
-            });
-
-
-            if (_epmLiveConOpen)
-            {
-                PopulateConnectionStrings();
-            }
-        }
-
-        public string Command
-        {
-            get { return _command; }
-            set { _command = value; }
-        }
-
-        public bool EPMLiveConOpen
-        {
-            get { return _epmLiveConOpen; }
         }
 
         private string GetDefaultLists(SPWeb rootWeb)
@@ -455,14 +777,19 @@ namespace EPMLiveReportsAdmin
                 // ORIGINAL CODE
                 //_DefaultLists = CoreFunctions.getConfigSetting(rootWeb, "EPMLiveFixLists").Replace("\r\n", ",");
                 // get lists that have reporting events
-                
-                const string sAssembly = "EPMLiveReportsAdmin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b90e532f481cf050";
+
+                const string sAssembly =
+                    "EPMLiveReportsAdmin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b90e532f481cf050";
                 const string sClass = "EPMLiveReportsAdmin.ListEvents";
 
                 var dLists = new List<string>();
-                foreach (var l in from SPList l in rootWeb.Lists let e = (from SPEventReceiverDefinition erd in l.EventReceivers
-                    where erd.Assembly == sAssembly && erd.Class == sClass
-                    select erd).ToList() where e.Count > 0 where !dLists.Contains(l.Title) select l)
+                foreach (SPList l in from SPList l in rootWeb.Lists
+                    let e = (from SPEventReceiverDefinition erd in l.EventReceivers
+                        where erd.Assembly == sAssembly && erd.Class == sClass
+                        select erd).ToList()
+                    where e.Count > 0
+                    where !dLists.Contains(l.Title)
+                    select l)
                 {
                     dLists.Add(l.Title);
                 }
@@ -470,7 +797,8 @@ namespace EPMLiveReportsAdmin
                 _DefaultLists = string.Join(",", dLists);
             }
 
-            string resourceList = EPMLiveCore.CoreFunctions.getConfigSetting(rootWeb, "EPMLiveResourcePool").Replace("\r\n", ",").ToString();
+            string resourceList =
+                CoreFunctions.getConfigSetting(rootWeb, "EPMLiveResourcePool").Replace("\r\n", ",").ToString();
             if (resourceList != string.Empty)
             {
                 _DefaultLists = _DefaultLists + "," + resourceList;
@@ -480,50 +808,16 @@ namespace EPMLiveReportsAdmin
 
             //Adding User Information List && Team
             _DefaultLists = _DefaultLists + "," + "User Information List" + ","
-                                                + "Team" + ","
-                                                + "Holidays" + ","
-                                                + "Holiday Schedules" + ","
-                                                + "My Work" + ","
-                                                + "Work Hours" + ","
-                                                + "Time Off";
-
+                            + "Team" + ","
+                            + "Holidays" + ","
+                            + "Holiday Schedules" + ","
+                            + "My Work" + ","
+                            + "Work Hours" + ","
+                            + "Time Off";
 
 
             return _DefaultLists;
         }
-
-        public CommandType CommandType
-        {
-            get { return _commandType; }
-            set { _commandType = value; }
-        }
-
-        public List<SqlParameter> Params
-        {
-            get { return _params; }
-            set { _params = value; }
-        }
-
-        public string SqlError
-        {
-            get { return _sqlError; }
-        }
-
-        public bool SqlErrorOccurred
-        {
-            get { return _sqlErrorOccurred; }
-        }
-
-        #region IDisposable Members
-
-        public void Dispose()
-        {
-            SPSecurity.RunWithElevatedPrivileges(delegate { if (_conEPMLive != null) { if (_conEPMLive.State == ConnectionState.Open) { _conEPMLive.Close(); } } });
-            SPSecurity.RunWithElevatedPrivileges(delegate { if (_conClientReporting != null) { if (_conClientReporting.State == ConnectionState.Open) { _conClientReporting.Close(); } } });
-            SPSecurity.RunWithElevatedPrivileges(delegate { if (_conMaster != null) { if (_conMaster.State == ConnectionState.Open) { _conMaster.Close(); } } });
-        }
-
-        #endregion
 
         public void AddParam(string name, object value)
         {
@@ -559,7 +853,8 @@ namespace EPMLiveReportsAdmin
             try
             {
                 object value;
-                using (var command = new SqlCommand { CommandType = _commandType, CommandText = _command, Connection = con })
+                using (
+                    var command = new SqlCommand {CommandType = _commandType, CommandText = _command, Connection = con})
                 {
                     command.CommandTimeout = 3600; // 1hour
                     command.Parameters.AddRange(_params.ToArray());
@@ -574,7 +869,7 @@ namespace EPMLiveReportsAdmin
                     if (!EventLog.SourceExists("EPMLive Reporting - ExecuteScalar"))
                         EventLog.CreateEventSource("EPMLive Reporting - ExecuteScalar", "EPM Live");
 
-                    EventLog myLog = new EventLog("EPM Live", ".", "EPMLive Reporting ExecuteScalar");
+                    var myLog = new EventLog("EPM Live", ".", "EPMLive Reporting ExecuteScalar");
                     myLog.MaximumKilobytes = 32768;
                     string cmdDetails = "Command: " + _command;
                     string cmdParams = " Params: ";
@@ -583,7 +878,8 @@ namespace EPMLiveReportsAdmin
                     {
                         if (param.Value != DBNull.Value)
                         {
-                            cmdParams = cmdParams + "[Name:" + param.ParameterName + " Value:" + param.Value.ToString() + "],";
+                            cmdParams = cmdParams + "[Name:" + param.ParameterName + " Value:" + param.Value.ToString() +
+                                        "],";
                         }
                         else
                         {
@@ -591,7 +887,9 @@ namespace EPMLiveReportsAdmin
                         }
                     }
 
-                    myLog.WriteEntry("Name: " + _siteName + " Url: " + _siteUrl + " ID: " + _siteID.ToString() + " : " + ex.Message + cmdDetails + cmdParams, EventLogEntryType.Error, 2050);
+                    myLog.WriteEntry(
+                        "Name: " + _siteName + " Url: " + _siteUrl + " ID: " + _siteID.ToString() + " : " + ex.Message +
+                        cmdDetails + cmdParams, EventLogEntryType.Error, 2050);
                 });
                 _sqlErrorOccurred = true;
                 _sqlError = ex.Message;
@@ -609,7 +907,13 @@ namespace EPMLiveReportsAdmin
         {
             try
             {
-                using (var command = new SqlCommand { CommandType = _commandType, CommandText = (_command), Connection = con })
+                using (
+                    var command = new SqlCommand
+                    {
+                        CommandType = _commandType,
+                        CommandText = (_command),
+                        Connection = con
+                    })
                 {
                     command.CommandTimeout = 3600; // 1hour
                     command.Parameters.AddRange(_params.ToArray());
@@ -623,7 +927,7 @@ namespace EPMLiveReportsAdmin
                     if (!EventLog.SourceExists("EPMLive Reporting - ExecuteNonQuery"))
                         EventLog.CreateEventSource("EPMLive Reporting - ExecuteNonQuery", "EPM Live");
 
-                    EventLog myLog = new EventLog("EPM Live", ".", "EPMLive Reporting ExecuteNonQuery");
+                    var myLog = new EventLog("EPM Live", ".", "EPMLive Reporting ExecuteNonQuery");
                     string cmdDetails = "Command: " + _command;
                     string cmdParams = " Params: ";
 
@@ -631,7 +935,8 @@ namespace EPMLiveReportsAdmin
                     {
                         if (param.Value != DBNull.Value)
                         {
-                            cmdParams = cmdParams + "[Name:" + param.ParameterName + " Value:" + param.Value.ToString() + "],";
+                            cmdParams = cmdParams + "[Name:" + param.ParameterName + " Value:" + param.Value.ToString() +
+                                        "],";
                         }
                         else
                         {
@@ -639,7 +944,9 @@ namespace EPMLiveReportsAdmin
                         }
                     }
 
-                    myLog.WriteEntry("Name: " + _siteName + " Url: " + _siteUrl + " ID: " + _siteID.ToString() + " : " + ex.Message + cmdDetails + cmdParams, EventLogEntryType.Error, 2050);
+                    myLog.WriteEntry(
+                        "Name: " + _siteName + " Url: " + _siteUrl + " ID: " + _siteID.ToString() + " : " + ex.Message +
+                        cmdDetails + cmdParams, EventLogEntryType.Error, 2050);
                 });
                 _sqlErrorOccurred = true;
                 _sqlError = ex.Message;
@@ -656,7 +963,7 @@ namespace EPMLiveReportsAdmin
 
         public bool ExecuteNonQuery(SqlCommand command, SqlParameterCollection paramCollection, SqlConnection con)
         {
-            var sql = command.CommandText;
+            string sql = command.CommandText;
             var sqlCommand = new SqlCommand(command.CommandText);
 
             try
@@ -664,7 +971,7 @@ namespace EPMLiveReportsAdmin
                 if (command.Parameters.Count > 2000)
                 {
                     var parameters = new List<SqlParameter>();
-                    foreach (var parameter in command.Parameters)
+                    foreach (object parameter in command.Parameters)
                     {
                         parameters.Add((SqlParameter) parameter);
                     }
@@ -683,10 +990,10 @@ namespace EPMLiveReportsAdmin
                 }
                 else
                 {
-                command.CommandTimeout = 3600; // 1hour
-                command.Connection = con;
-                command.ExecuteNonQuery();
-            }
+                    command.CommandTimeout = 3600; // 1hour
+                    command.Connection = con;
+                    command.ExecuteNonQuery();
+                }
             }
             catch (SqlException ex)
             {
@@ -696,7 +1003,7 @@ namespace EPMLiveReportsAdmin
                     if (!EventLog.SourceExists("EPMLive Reporting - ExecuteNonQuery"))
                         EventLog.CreateEventSource("EPMLive Reporting - ExecuteNonQuery", "EPM Live");
 
-                    EventLog myLog = new EventLog("EPM Live", ".", "EPMLive Reporting ExecuteNonQuery");
+                    var myLog = new EventLog("EPM Live", ".", "EPMLive Reporting ExecuteNonQuery");
                     myLog.MaximumKilobytes = 32768;
                     string cmdDetails = "Command: " + sql;
                     string cmdParams = " Params: ";
@@ -705,7 +1012,8 @@ namespace EPMLiveReportsAdmin
                     {
                         if (param.Value != DBNull.Value)
                         {
-                            cmdParams = cmdParams + "[Name:" + param.ParameterName + " Value:" + param.Value.ToString() + "],";
+                            cmdParams = cmdParams + "[Name:" + param.ParameterName + " Value:" + param.Value.ToString() +
+                                        "],";
                         }
                         else
                         {
@@ -713,7 +1021,9 @@ namespace EPMLiveReportsAdmin
                         }
                     }
 
-                    myLog.WriteEntry("Name: " + _siteName + " Url: " + _siteUrl + " ID: " + _siteID.ToString() + " : " + ex.Message + cmdDetails + cmdParams, EventLogEntryType.Error, 2050);
+                    myLog.WriteEntry(
+                        "Name: " + _siteName + " Url: " + _siteUrl + " ID: " + _siteID.ToString() + " : " + ex.Message +
+                        cmdDetails + cmdParams, EventLogEntryType.Error, 2050);
                 });
                 _sqlErrorOccurred = true;
                 _sqlError = ex.Message;
@@ -744,7 +1054,8 @@ namespace EPMLiveReportsAdmin
             try
             {
                 SqlDataAdapter da;
-                using (var command = new SqlCommand { CommandType = _commandType, CommandText = _command, Connection = con })
+                using (
+                    var command = new SqlCommand {CommandType = _commandType, CommandText = _command, Connection = con})
                 {
                     command.CommandTimeout = 3600; // 1hour
                     command.Parameters.AddRange(_params.ToArray());
@@ -764,7 +1075,7 @@ namespace EPMLiveReportsAdmin
                     if (!EventLog.SourceExists("EPMLive Reporting - GetTable"))
                         EventLog.CreateEventSource("EPMLive Reporting - GetTable", "EPM Live");
 
-                    EventLog myLog = new EventLog("EPM Live", ".", "EPMLive Reporting GetTable");
+                    var myLog = new EventLog("EPM Live", ".", "EPMLive Reporting GetTable");
                     myLog.MaximumKilobytes = 32768;
 
                     string cmdDetails = "Command: " + _command;
@@ -773,7 +1084,8 @@ namespace EPMLiveReportsAdmin
                     {
                         if (param.Value != DBNull.Value)
                         {
-                            cmdParams = cmdParams + "[Name:" + param.ParameterName + " Value:" + param.Value.ToString() + "],";
+                            cmdParams = cmdParams + "[Name:" + param.ParameterName + " Value:" + param.Value.ToString() +
+                                        "],";
                         }
                         else
                         {
@@ -781,7 +1093,9 @@ namespace EPMLiveReportsAdmin
                         }
                     }
 
-                    myLog.WriteEntry("Name: " + _siteName + " Url: " + _siteUrl + " ID: " + _siteID.ToString() + " : " + ex.Message + cmdDetails + cmdParams, EventLogEntryType.Error, 2050);
+                    myLog.WriteEntry(
+                        "Name: " + _siteName + " Url: " + _siteUrl + " ID: " + _siteID.ToString() + " : " + ex.Message +
+                        cmdDetails + cmdParams, EventLogEntryType.Error, 2050);
                 });
 
                 _sqlErrorOccurred = true;
@@ -805,7 +1119,9 @@ namespace EPMLiveReportsAdmin
             //AddParam("@tableName", Resources.DatabaseTable);
 
             DataTable dt;
-            Command = string.Format("select * from [{0}] where siteid = @SiteId", Resources.DatabaseTable.Replace("'", "")); // - CAT.NET false-positive: All single quotes are escaped/removed.
+            Command = string.Format("select * from [{0}] where siteid = @SiteId",
+                Resources.DatabaseTable.Replace("'", ""));
+                // - CAT.NET false-positive: All single quotes are escaped/removed.
             AddParam("@SiteId", _siteID);
             dt = GetTable(GetEPMLiveConnection);
 
@@ -819,8 +1135,10 @@ namespace EPMLiveReportsAdmin
             DataRow siteDataRow = GetSite();
             if (siteDataRow == null)
                 return;
-            _databaseName = siteDataRow["DatabaseName"].ToString().Replace("'", ""); // - CAT.NET false-positive: All single quotes are escaped/removed.
-            _databaseServer = siteDataRow["DatabaseServer"].ToString().Replace("'", ""); // - CAT.NET false-positive: All single quotes are escaped/removed.
+            _databaseName = siteDataRow["DatabaseName"].ToString().Replace("'", "");
+                // - CAT.NET false-positive: All single quotes are escaped/removed.
+            _databaseServer = siteDataRow["DatabaseServer"].ToString().Replace("'", "");
+                // - CAT.NET false-positive: All single quotes are escaped/removed.
 
             if (siteDataRow["SAccount"] == DBNull.Value)
             {
@@ -828,13 +1146,15 @@ namespace EPMLiveReportsAdmin
             }
             else
             {
-                _useSAccount = (bool)siteDataRow["SAccount"];
+                _useSAccount = (bool) siteDataRow["SAccount"];
             }
 
             if (_useSAccount)
             {
-                _username = siteDataRow["Username"].ToString().Replace("'", ""); // - CAT.NET false-positive: All single quotes are escaped/removed.
-                _password = siteDataRow["Password"].ToString().Replace("'", ""); // - CAT.NET false-positive: All single quotes are escaped/removed.
+                _username = siteDataRow["Username"].ToString().Replace("'", "");
+                    // - CAT.NET false-positive: All single quotes are escaped/removed.
+                _password = siteDataRow["Password"].ToString().Replace("'", "");
+                    // - CAT.NET false-positive: All single quotes are escaped/removed.
             }
         }
 
@@ -842,13 +1162,24 @@ namespace EPMLiveReportsAdmin
         {
             if (!_useSAccount)
             {
-                _remoteCs = string.Format("Data Source={0};Initial Catalog={1};Integrated Security=SSPI", _databaseServer, _databaseName).Replace("'", ""); // - CAT.NET false-positive: All single quotes are escaped/removed.
-                _masterCs = string.Format("Data Source={0};Initial Catalog=master;Integrated Security=SSPI", _databaseServer).Replace("'", ""); // - CAT.NET false-positive: All single quotes are escaped/removed.
+                _remoteCs =
+                    string.Format("Data Source={0};Initial Catalog={1};Integrated Security=SSPI", _databaseServer,
+                        _databaseName).Replace("'", "");
+                    // - CAT.NET false-positive: All single quotes are escaped/removed.
+                _masterCs =
+                    string.Format("Data Source={0};Initial Catalog=master;Integrated Security=SSPI", _databaseServer)
+                        .Replace("'", ""); // - CAT.NET false-positive: All single quotes are escaped/removed.
             }
             else
             {
-                _remoteCs = string.Format("Data Source={0};Initial Catalog={1};User Id={2};Password={3};", _databaseServer, _databaseName, _username, Decrypt(_password)).Replace("'", ""); // - CAT.NET false-positive: All single quotes are escaped/removed.
-                _masterCs = string.Format("Data Source={0};Initial Catalog={1};User Id={2};Password={3};", _databaseServer, "master", _username, Decrypt(_password)).Replace("'", ""); // - CAT.NET false-positive: All single quotes are escaped/removed.
+                _remoteCs =
+                    string.Format("Data Source={0};Initial Catalog={1};User Id={2};Password={3};", _databaseServer,
+                        _databaseName, _username, Decrypt(_password)).Replace("'", "");
+                    // - CAT.NET false-positive: All single quotes are escaped/removed.
+                _masterCs =
+                    string.Format("Data Source={0};Initial Catalog={1};User Id={2};Password={3};", _databaseServer,
+                        "master", _username, Decrypt(_password)).Replace("'", "");
+                    // - CAT.NET false-positive: All single quotes are escaped/removed.
             }
         }
 
@@ -871,12 +1202,12 @@ namespace EPMLiveReportsAdmin
             }
         }
 
-        static public DataRow SAccountInfo(Guid siteId, Guid webAppId)
+        public static DataRow SAccountInfo(Guid siteId, Guid webAppId)
         {
             try
             {
-                SqlCommand cmd = new SqlCommand();
-                SqlConnection con = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(webAppId));
+                var cmd = new SqlCommand();
+                var con = new SqlConnection(CoreFunctions.getConnectionString(webAppId));
                 con.Open();
                 //cmd.CommandText = "SELECT * FROM RPTDatabases WHERE WebApplicationId = @webAppId";
                 //cmd.Parameters.AddWithValue("@webAppId", webAppId);
@@ -903,7 +1234,7 @@ namespace EPMLiveReportsAdmin
             }
         }
 
-        static private DataTable GetTable(SqlCommand cmd)
+        private static DataTable GetTable(SqlCommand cmd)
         {
             SqlDataAdapter da;
             var dt = new DataTable();
@@ -913,39 +1244,23 @@ namespace EPMLiveReportsAdmin
                 da.Fill(dt);
                 da.Dispose();
             }
-            catch (Exception ex)
-            {
-
-            }
-            finally
-            {
-
-            }
+            catch (Exception ex) { }
+            finally { }
 
             return dt;
         }
 
-        public string SiteName
-        {
-            get { return _siteName; }
-        }
-
-        public string SiteUrl
-        {
-            get { return _siteUrl; }
-        }
-
         /// <summary>
-        ///  Returns the value of an calculated field as an object type. Return type can be NULL.
+        ///     Returns the value of an calculated field as an object type. Return type can be NULL.
         /// </summary>
         /// <param name="li">
-        ///  The corresponding list item for the list field/column.
+        ///     The corresponding list item for the list field/column.
         /// </param>
         /// <param name="field">
-        ///  The calculated field whose value you want.
+        ///     The calculated field whose value you want.
         /// </param>
         /// <returns>
-        ///  An object type.
+        ///     An object type.
         /// </returns>
         public object GetCalculatedFieldValue(SPListItem li, SPFieldCalculated field)
         {
@@ -972,9 +1287,26 @@ namespace EPMLiveReportsAdmin
             switch (sResultType)
             {
                 case "currency":
-                    if (field.GetFieldValueAsText(li[field.InternalName]).Replace("$", "").Replace("#VALUE!", "").Replace("<(", "").Replace(")>", "").Replace("%", "").Replace("(", "-").Replace(")", "") != string.Empty)
+                    if (
+                        field.GetFieldValueAsText(li[field.InternalName])
+                            .Replace("$", "")
+                            .Replace("#VALUE!", "")
+                            .Replace("<(", "")
+                            .Replace(")>", "")
+                            .Replace("%", "")
+                            .Replace("(", "-")
+                            .Replace(")", "") != string.Empty)
                     {
-                        oValue = float.Parse(field.GetFieldValueAsText(li[field.InternalName]).Replace("$", "").Replace("#VALUE!", "").Replace("<(", "").Replace(")>", "").Replace("%", "").Replace("(", "-").Replace(")", ""));
+                        oValue =
+                            float.Parse(
+                                field.GetFieldValueAsText(li[field.InternalName])
+                                    .Replace("$", "")
+                                    .Replace("#VALUE!", "")
+                                    .Replace("<(", "")
+                                    .Replace(")>", "")
+                                    .Replace("%", "")
+                                    .Replace("(", "-")
+                                    .Replace(")", ""));
                     }
                     else
                     {
@@ -983,9 +1315,26 @@ namespace EPMLiveReportsAdmin
                     break;
 
                 case "number":
-                    if (field.GetFieldValueAsText(li[field.InternalName]).Replace("$", "").Replace("#VALUE!", "").Replace("<(", "").Replace(")>", "").Replace("%", "").Replace("(", "-").Replace(")", "") != string.Empty)
+                    if (
+                        field.GetFieldValueAsText(li[field.InternalName])
+                            .Replace("$", "")
+                            .Replace("#VALUE!", "")
+                            .Replace("<(", "")
+                            .Replace(")>", "")
+                            .Replace("%", "")
+                            .Replace("(", "-")
+                            .Replace(")", "") != string.Empty)
                     {
-                        oValue = float.Parse(field.GetFieldValueAsText(li[field.InternalName]).Replace("$", "").Replace("#VALUE!", "").Replace("<(", "").Replace(")>", "").Replace("%", "").Replace("(", "-").Replace(")", ""));
+                        oValue =
+                            float.Parse(
+                                field.GetFieldValueAsText(li[field.InternalName])
+                                    .Replace("$", "")
+                                    .Replace("#VALUE!", "")
+                                    .Replace("<(", "")
+                                    .Replace(")>", "")
+                                    .Replace("%", "")
+                                    .Replace("(", "-")
+                                    .Replace(")", ""));
                     }
                     else
                     {
@@ -1026,7 +1375,10 @@ namespace EPMLiveReportsAdmin
 
                     if (li[field.InternalName].ToString().Contains("#"))
                     {
-                        oValue = li[field.InternalName].ToString().Substring(li[field.InternalName].ToString().IndexOf("#")).Replace("#", "");
+                        oValue =
+                            li[field.InternalName].ToString()
+                                .Substring(li[field.InternalName].ToString().IndexOf("#"))
+                                .Replace("#", "");
                     }
                     else
                     {
@@ -1047,11 +1399,11 @@ namespace EPMLiveReportsAdmin
 
             if (dt != null && dt.Rows.Count > 0)
             {
-                status = (int)dt.Rows[0]["status"];
+                status = (int) dt.Rows[0]["status"];
                 listguid = dt.Rows[0]["listguid"].ToString();
                 try
                 {
-                    pctComplete = (int)dt.Rows[0]["percentComplete"];
+                    pctComplete = (int) dt.Rows[0]["percentComplete"];
                 }
                 catch (Exception ex)
                 {
@@ -1079,11 +1431,11 @@ namespace EPMLiveReportsAdmin
 
             if (dt != null && dt.Rows.Count > 0)
             {
-                status = (int)dt.Rows[0]["status"];
+                status = (int) dt.Rows[0]["status"];
                 listguid = dt.Rows[0]["listguid"].ToString();
                 try
                 {
-                    pctComplete = (int)dt.Rows[0]["percentComplete"];
+                    pctComplete = (int) dt.Rows[0]["percentComplete"];
                 }
                 catch (Exception ex)
                 {
@@ -1103,7 +1455,8 @@ namespace EPMLiveReportsAdmin
         public bool BulkInsert(DataSet dsLists, SqlConnection con, bool blnLogStatus)
         {
             var sbcOptions = new SqlBulkCopyOptions();
-            bool blnSuccess = false; ;
+            bool blnSuccess = false;
+            ;
             string sListName = string.Empty;
             SqlTransaction tx = null;
 
@@ -1148,7 +1501,10 @@ namespace EPMLiveReportsAdmin
                         {
                             tx.Dispose();
                             //Log status
-                            LogStatus(string.Empty, string.Empty, "Refresh not completed due errors." + ex.Message.Replace("'", ""), ex.StackTrace.Replace("'", ""), 2, 3, string.Empty); // - CAT.NET false-positive: All single quotes are escaped/removed.
+                            LogStatus(string.Empty, string.Empty,
+                                "Refresh not completed due errors." + ex.Message.Replace("'", ""),
+                                ex.StackTrace.Replace("'", ""), 2, 3, string.Empty);
+                                // - CAT.NET false-positive: All single quotes are escaped/removed.
                         }
                     }
                 }
@@ -1162,9 +1518,7 @@ namespace EPMLiveReportsAdmin
                     tx.Rollback();
                     tx.Dispose();
                 }
-                catch (Exception ex1)
-                {
-                }
+                catch (Exception ex1) { }
             }
 
             if (con.State == ConnectionState.Open)
@@ -1178,7 +1532,8 @@ namespace EPMLiveReportsAdmin
         public bool BulkInsert(DataSet dsLists, SqlConnection con, Guid timerjobguid)
         {
             var sbcOptions = new SqlBulkCopyOptions();
-            bool blnSuccess = false; ;
+            bool blnSuccess = false;
+            ;
             string sListName = string.Empty;
 
             SqlTransaction tx = null;
@@ -1220,13 +1575,14 @@ namespace EPMLiveReportsAdmin
 
                             tx.Commit();
                             tx.Dispose();
-
-
                         }
                         catch (Exception ex)
                         {
                             tx.Dispose();
-                            LogStatus(string.Empty, string.Empty, "Refresh not completed due errors." + ex.Message.Replace("'", ""), ex.StackTrace.Replace("'", ""), 2, 3, timerjobguid.ToString()); // - CAT.NET false-positive: All single quotes are escaped/removed.
+                            LogStatus(string.Empty, string.Empty,
+                                "Refresh not completed due errors." + ex.Message.Replace("'", ""),
+                                ex.StackTrace.Replace("'", ""), 2, 3, timerjobguid.ToString());
+                                // - CAT.NET false-positive: All single quotes are escaped/removed.
                         }
                     }
                 }
@@ -1240,10 +1596,10 @@ namespace EPMLiveReportsAdmin
                     tx.Rollback();
                     tx.Dispose();
                 }
-                catch (Exception ex1)
-                {
-                }
-                LogStatus(string.Empty, string.Empty, "Refresh not completed due errors." + ex.Message.Replace("'", ""), ex.StackTrace.Replace("'", ""), 2, 3, timerjobguid.ToString()); // - CAT.NET false-positive: All single quotes are escaped/removed.
+                catch (Exception ex1) { }
+                LogStatus(string.Empty, string.Empty, "Refresh not completed due errors." + ex.Message.Replace("'", ""),
+                    ex.StackTrace.Replace("'", ""), 2, 3, timerjobguid.ToString());
+                    // - CAT.NET false-positive: All single quotes are escaped/removed.
             }
 
             if (con.State == ConnectionState.Open)
@@ -1256,7 +1612,7 @@ namespace EPMLiveReportsAdmin
 
         public string GetListNames()
         {
-            var sLists = string.Empty;
+            string sLists = string.Empty;
             var lLists = new List<string>();
             //Command = "SELECT ListName FROM RPTList WHERE SiteId ='" + _siteID + "'";
             //Command = "SELECT ListName FROM RPTList WHERE SiteId =@siteId";
@@ -1279,12 +1635,15 @@ namespace EPMLiveReportsAdmin
                     {
                         foreach (SPList l in w.Lists)
                         {
-                            var evts = GetListEvents(l,
-                                                    "EPMLiveReportsAdmin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b90e532f481cf050",
-                                                    "EPMLiveReportsAdmin.ListEvents",
-                                                    new List<SPEventReceiverType> { SPEventReceiverType.ItemAdded, 
-                                                                                    SPEventReceiverType.ItemUpdated, 
-                                                                                    SPEventReceiverType.ItemDeleting });
+                            List<SPEventReceiverDefinition> evts = GetListEvents(l,
+                                "EPMLiveReportsAdmin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b90e532f481cf050",
+                                "EPMLiveReportsAdmin.ListEvents",
+                                new List<SPEventReceiverType>
+                                {
+                                    SPEventReceiverType.ItemAdded,
+                                    SPEventReceiverType.ItemUpdated,
+                                    SPEventReceiverType.ItemDeleting
+                                });
 
                             if (evts.Count > 0 && !lLists.Contains(l.Title))
                             {
@@ -1292,12 +1651,15 @@ namespace EPMLiveReportsAdmin
                                 continue;
                             }
 
-                            var mwEvts = GetListEvents(l,
-                                                    "EPMLiveReportsAdmin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b90e532f481cf050",
-                                                    "EPMLiveReportsAdmin.MyWorkListEvents",
-                                                    new List<SPEventReceiverType> { SPEventReceiverType.ItemAdded, 
-                                                                                    SPEventReceiverType.ItemUpdated, 
-                                                                                    SPEventReceiverType.ItemDeleting });
+                            List<SPEventReceiverDefinition> mwEvts = GetListEvents(l,
+                                "EPMLiveReportsAdmin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b90e532f481cf050",
+                                "EPMLiveReportsAdmin.MyWorkListEvents",
+                                new List<SPEventReceiverType>
+                                {
+                                    SPEventReceiverType.ItemAdded,
+                                    SPEventReceiverType.ItemUpdated,
+                                    SPEventReceiverType.ItemDeleting
+                                });
 
                             if (mwEvts.Count > 0 && !lLists.Contains(l.Title))
                             {
@@ -1318,36 +1680,36 @@ namespace EPMLiveReportsAdmin
             return sLists;
         }
 
-        private List<SPEventReceiverDefinition> GetListEvents(SPList list, string assemblyName, string className, List<SPEventReceiverType> types)
+        private List<SPEventReceiverDefinition> GetListEvents(SPList list, string assemblyName, string className,
+            List<SPEventReceiverType> types)
         {
-            List<SPEventReceiverDefinition> evts = new List<SPEventReceiverDefinition>();
+            var evts = new List<SPEventReceiverDefinition>();
 
             try
             {
                 evts = (from e in list.EventReceivers.OfType<SPEventReceiverDefinition>()
-                        where e.Assembly.Equals(assemblyName, StringComparison.CurrentCultureIgnoreCase) &&
-                              e.Class.Equals(className, StringComparison.CurrentCultureIgnoreCase) &&
-                              types.Contains(e.Type)
-                        select e).ToList<SPEventReceiverDefinition>();
+                    where e.Assembly.Equals(assemblyName, StringComparison.CurrentCultureIgnoreCase) &&
+                          e.Class.Equals(className, StringComparison.CurrentCultureIgnoreCase) &&
+                          types.Contains(e.Type)
+                    select e).ToList<SPEventReceiverDefinition>();
             }
-            catch
-            {
-
-            }
+            catch { }
 
             return evts;
         }
 
-        public bool LogStatus(string RPTListID, string sListName, string sShortMsg, string sLongMsg, int iLevel, int iType, string timerjobguid)
+        public bool LogStatus(string RPTListID, string sListName, string sShortMsg, string sLongMsg, int iLevel,
+            int iType, string timerjobguid)
         {
             bool blnStatus = false;
             try
             {
-                _command = "INSERT INTO RPTLog VALUES(@RPTList,@ListName,@ShortMsg,@LongMsg,@Level,@Type,getdate(),@timerjobguid)";
+                _command =
+                    "INSERT INTO RPTLog VALUES(@RPTList,@ListName,@ShortMsg,@LongMsg,@Level,@Type,getdate(),@timerjobguid)";
 
                 if (RPTListID != string.Empty)
                 {
-                    Guid lguid = new Guid(RPTListID);
+                    var lguid = new Guid(RPTListID);
                     AddParam("@RPTList", RPTListID);
                 }
                 else
@@ -1363,7 +1725,7 @@ namespace EPMLiveReportsAdmin
 
                 if (timerjobguid != null && timerjobguid != string.Empty)
                 {
-                    Guid jobguid = new Guid(timerjobguid);
+                    var jobguid = new Guid(timerjobguid);
                     AddParam("@timerjobguid", jobguid);
                 }
                 else
@@ -1406,13 +1768,13 @@ namespace EPMLiveReportsAdmin
             _dtStatusLog = dtStatusLog;
         }
 
-        public bool LogRefreshStatus(Guid RPTListID, string listName, Guid timerjobguid, string webName, string message, int level)
+        public bool LogRefreshStatus(Guid RPTListID, string listName, Guid timerjobguid, string webName, string message,
+            int level)
         {
             return LogStatus(RPTListID.ToString(), listName, message, string.Empty, level, 3, timerjobguid.ToString());
         }
 
         /// <summary>
-        /// 
         /// </summary>
         /// <param name="timerjobguid"></param>
         /// <returns></returns>
@@ -1425,7 +1787,6 @@ namespace EPMLiveReportsAdmin
         }
 
         /// <summary>
-        /// 
         /// </summary>
         /// <param name="timerjobguid"></param>
         /// <param name="siteId"></param>
@@ -1433,7 +1794,6 @@ namespace EPMLiveReportsAdmin
         /// <returns></returns>
         public bool SnapshotLists(Guid timerjobguid, Guid siteId, string sLists)
         {
-
             bool status = true;
             try
             {
@@ -1449,85 +1809,29 @@ namespace EPMLiveReportsAdmin
 
                     if (_sqlErrorOccurred)
                     {
-                        LogStatus(string.Empty, string.Empty, "Snapshot Error", SqlError.Replace("'", ""), 2, 2, timerjobguid.ToString().Replace("'", "")); // - CAT.NET false-positive: All single quotes are escaped/removed.
+                        LogStatus(string.Empty, string.Empty, "Snapshot Error", SqlError.Replace("'", ""), 2, 2,
+                            timerjobguid.ToString().Replace("'", ""));
+                            // - CAT.NET false-positive: All single quotes are escaped/removed.
                     }
                 }
             }
             catch (Exception ex)
             {
-                LogStatus(string.Empty, string.Empty, "Snapshot Error", "Error:" + ex.Message.Replace("'", "") + " -- " + ex.StackTrace.Replace("'", ""), 2, 2, timerjobguid.ToString().Replace("'", "")); // - CAT.NET false-positive: All single quotes are escaped/removed.
+                LogStatus(string.Empty, string.Empty, "Snapshot Error",
+                    "Error:" + ex.Message.Replace("'", "") + " -- " + ex.StackTrace.Replace("'", ""), 2, 2,
+                    timerjobguid.ToString().Replace("'", ""));
+                    // - CAT.NET false-positive: All single quotes are escaped/removed.
                 status = false;
             }
             return status;
         }
 
         /// <summary>
-        /// 
         /// </summary>
         /// <returns></returns>
         public DataTable GetStatusLog()
         {
             return _dtStatusLog;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public SqlConnection GetEPMLiveConnection
-        {
-            get
-            {
-                if (_conEPMLive.State == ConnectionState.Open)
-                    return _conEPMLive;
-                try
-                {
-                    _conEPMLive.Open();
-                    _epmLiveConOpen = true;
-                }
-                catch (Exception ex)
-                {
-                    _epmLiveConOpen = false;
-                    SPSecurity.RunWithElevatedPrivileges(delegate()
-                    {
-                        if (!EventLog.SourceExists("EPMLive Reporting - GetEPMLiveConnection"))
-                            EventLog.CreateEventSource("EPMLive Reporting - GetEPMLiveConnection", "EPM Live");
-
-                        EventLog myLog = new EventLog("EPM Live", ".", "EPMLive Reporting GetEPMLiveConnection");
-                        myLog.MaximumKilobytes = 32768;
-                        myLog.WriteEntry("Name: " + _siteName + " Url: " + _siteUrl + " ID: " + _siteID.ToString() + " : " + ex.Message + ex.StackTrace, EventLogEntryType.Error, 2040);
-                    });
-                }
-                return _conEPMLive;
-            }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public SqlConnection GetClientReportingConnection
-        {
-            get
-            {
-                if (_conClientReporting != null && _conClientReporting.State == ConnectionState.Open)
-                    return _conClientReporting;
-                try
-                {
-                    OpenClientReportingConnection = _remoteCs;
-                }
-                catch (Exception ex)
-                {
-                    SPSecurity.RunWithElevatedPrivileges(delegate()
-                    {
-                        if (!EventLog.SourceExists("EPMLive Reporting - GetClientReportingConnection"))
-                            EventLog.CreateEventSource("EPMLive Reporting - GetClientReportingConnection", "EPM Live");
-
-                        EventLog myLog = new EventLog("EPM Live", ".", "EPMLive Reporting GetClientReportingConnection");
-                        myLog.MaximumKilobytes = 32768;
-                        myLog.WriteEntry("Name: " + _siteName + " Url: " + _siteUrl + " ID: " + _siteID.ToString() + " : " + ex.Message + ex.StackTrace, EventLogEntryType.Error, 2040);
-                    });
-                }
-                return _conClientReporting;
-            }
         }
 
         //Module Added On: 3/20/2011
@@ -1539,18 +1843,21 @@ namespace EPMLiveReportsAdmin
                 Command = "Select * FROM RPTDatabases Where siteId = @siteId";
                 AddParam("@siteId", siteId);
                 dt = GetTable(GetEPMLiveConnection);
-                bool useSA = (bool)dt.Rows[0]["SAccount"];
+                var useSA = (bool) dt.Rows[0]["SAccount"];
                 string conStr = string.Empty;
                 if (useSA)
                 {
-                    conStr = "Data Source=" + dt.Rows[0]["DatabaseServer"].ToString() + " ;Initial Catalog=" + dt.Rows[0]["DatabaseName"].ToString() + ";User Id=" + dt.Rows[0]["UserName"].ToString() + ";Password=" + Decrypt(dt.Rows[0]["Password"].ToString()) + ";";
+                    conStr = "Data Source=" + dt.Rows[0]["DatabaseServer"].ToString() + " ;Initial Catalog=" +
+                             dt.Rows[0]["DatabaseName"].ToString() + ";User Id=" + dt.Rows[0]["UserName"].ToString() +
+                             ";Password=" + Decrypt(dt.Rows[0]["Password"].ToString()) + ";";
                 }
                 else
                 {
-                    conStr = "Data Source=" + dt.Rows[0]["DatabaseServer"].ToString() + ";Initial Catalog=" + dt.Rows[0]["DatabaseName"].ToString() + ";Integrated Security=SSPI;";
+                    conStr = "Data Source=" + dt.Rows[0]["DatabaseServer"].ToString() + ";Initial Catalog=" +
+                             dt.Rows[0]["DatabaseName"].ToString() + ";Integrated Security=SSPI;";
                 }
 
-                SqlConnection con = new SqlConnection(conStr);
+                var con = new SqlConnection(conStr);
                 con.Open();
                 return con;
             }
@@ -1559,211 +1866,21 @@ namespace EPMLiveReportsAdmin
                 SPSecurity.RunWithElevatedPrivileges(delegate()
                 {
                     if (!EventLog.SourceExists("EPMLive Reporting - GetClientReportingConnection(Guid siteId)"))
-                        EventLog.CreateEventSource("EPMLive Reporting - GetClientReportingConnection(Guid siteId)", "EPM Live");
+                        EventLog.CreateEventSource("EPMLive Reporting - GetClientReportingConnection(Guid siteId)",
+                            "EPM Live");
 
-                    EventLog myLog = new EventLog("EPM Live", ".", "EPMLive Reporting GetClientReportingConnection(Guid siteId)");
+                    var myLog = new EventLog("EPM Live", ".",
+                        "EPMLive Reporting GetClientReportingConnection(Guid siteId)");
                     myLog.MaximumKilobytes = 32768;
-                    myLog.WriteEntry("Name: " + _siteName + " Url: " + _siteUrl + " ID: " + _siteID.ToString() + " : " + ex.Message + ex.StackTrace, EventLogEntryType.Error, 2040);
+                    myLog.WriteEntry(
+                        "Name: " + _siteName + " Url: " + _siteUrl + " ID: " + _siteID.ToString() + " : " + ex.Message +
+                        ex.StackTrace, EventLogEntryType.Error, 2040);
                 });
             }
             return _conClientReporting;
         }
 
         /// <summary>
-        /// 
-        /// </summary>
-        public SqlConnection GetMasterDbConnection
-        {
-            get
-            {
-                if (_conMaster != null && _conMaster.State == ConnectionState.Open)
-                    return _conMaster;
-                try
-                {
-                    OpenMasterDbConnection = _masterCs;
-                }
-                catch (Exception ex)
-                {
-                    _sqlError = ex.Message;
-                    SPSecurity.RunWithElevatedPrivileges(delegate()
-                    {
-                        if (!EventLog.SourceExists("EPMLive Reporting - GetMasterDbConnection"))
-                            EventLog.CreateEventSource("EPMLive Reporting - GetMasterDbConnection", "EPM Live");
-
-                        EventLog myLog = new EventLog("EPM Live", ".", "EPMLive Reporting GetMasterDbConnection");
-                        myLog.MaximumKilobytes = 32768;
-                        myLog.WriteEntry("Name: " + _siteName + " Url: " + _siteUrl + " ID: " + _siteID.ToString() + " : " + ex.Message + ex.StackTrace, EventLogEntryType.Error, 2020);
-                    });
-                }
-                return _conMaster;
-            }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public string OpenEPMLiveConnection
-        {
-            set
-            {
-                _conEPMLive = new SqlConnection(value);
-                try
-                {
-                    SPSecurity.RunWithElevatedPrivileges(delegate
-                    {
-                        if (_conEPMLive.State == ConnectionState.Closed)
-                        {
-                            _conEPMLive.Open();
-                            _epmLiveConOpen = true;
-                        }
-                    });
-                }
-                catch (Exception ex)
-                {
-                    _epmLiveConOpen = false;
-                    SPSecurity.RunWithElevatedPrivileges(delegate()
-                    {
-                        if (!EventLog.SourceExists("EPMLive Reporting - OpenEPMLiveConnection"))
-                            EventLog.CreateEventSource("EPMLive Reporting - OpenEPMLiveConnection", "EPM Live");
-
-                        EventLog myLog = new EventLog("EPM Live", ".", "EPMLive Reporting OpenEPMLiveConnection");
-                        myLog.MaximumKilobytes = 32768;
-                        myLog.WriteEntry("Name: " + _siteName + " Url: " + _siteUrl + " ID: " + _siteID.ToString() + " : " + ex.Message + ex.StackTrace, EventLogEntryType.Error, 2010);
-                    });
-                }
-            }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public string OpenClientReportingConnection
-        {
-            set
-            {
-                _conClientReporting = new SqlConnection(value);
-                try
-                {
-                    if (_databaseName != null && _databaseName != string.Empty)
-                    {
-                        if (!_useSAccount)
-                        {
-                            SPSecurity.RunWithElevatedPrivileges(delegate
-                            {
-                                if (_conClientReporting.State == ConnectionState.Closed)
-                                {
-                                    _conClientReporting.Open();
-                                }
-                            });
-                        }
-                        else
-                        {
-                            if (_conClientReporting.State == ConnectionState.Closed)
-                            {
-                                _conClientReporting.Open();
-                            }
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    if (_databaseName != null && _databaseName != string.Empty)
-                    {
-                        SPSecurity.RunWithElevatedPrivileges(delegate()
-                        {
-                            if (!EventLog.SourceExists("EPMLive Reporting - OpenClientReportingConnection"))
-                                EventLog.CreateEventSource("EPMLive Reporting - OpenClientReportingConnection", "EPM Live");
-
-                            EventLog myLog = new EventLog("EPM Live", ".", "EPMLive Reporting OpenClientReportingConnection");
-                            myLog.MaximumKilobytes = 32768;
-                            myLog.WriteEntry("Name: " + _siteName + " Url: " + _siteUrl + " ID: " + _siteID.ToString() + " : " + ex.Message + ex.StackTrace, EventLogEntryType.Error, 2010);
-                        });
-                    }
-                }
-            }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public string OpenMasterDbConnection
-        {
-            set
-            {
-                _conMaster = new SqlConnection(value);
-                try
-                {
-                    if (!_useSAccount)
-                    {
-                        SPSecurity.RunWithElevatedPrivileges(delegate
-                        {
-                            if (_conMaster.State == ConnectionState.Closed)
-                            {
-                                _conMaster.Open();
-                            }
-                        });
-                    }
-                    else
-                    {
-                        if (_conMaster.State == ConnectionState.Closed)
-                        {
-                            _conMaster.Open();
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    _sqlError = ex.Message;
-                    if (_masterCs != null && _masterCs != string.Empty)
-                    {
-                        SPSecurity.RunWithElevatedPrivileges(delegate()
-                        {
-                            if (!EventLog.SourceExists("EPMLive Reporting - OpenMasterDbConnection"))
-                                EventLog.CreateEventSource("EPMLive Reporting - OpenMasterDbConnection", "EPM Live");
-
-                            EventLog myLog = new EventLog("EPM Live", ".", "EPMLive Reporting OpenMasterDbConnection");
-                            myLog.MaximumKilobytes = 32768;
-                            myLog.WriteEntry("Name: " + _siteName + " Url: " + _siteUrl + " ID: " + _siteID.ToString() + " : " + ex.Message + ex.StackTrace, EventLogEntryType.Error, 2030);
-                        });
-                    }
-                }
-            }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public string remoteCs
-        {
-            get { return _remoteCs; }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public string masterCs
-        {
-            get { return _masterCs; }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public string remoteDbName
-        {
-            get { return _databaseName; }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public string remoteServerName
-        {
-            get { return _databaseServer; }
-        }
-
-        /// <summary>
-        /// 
         /// </summary>
         /// <param name="sListNames"></param>
         /// <returns></returns>
@@ -1804,7 +1921,8 @@ namespace EPMLiveReportsAdmin
 
                     if (TableExists(sTableName, GetClientReportingConnection))
                     {
-                        sSQL = sSQL + " DELETE " + sTableName.Replace("'", "") + " WHERE SiteId =@siteID"; // - CAT.NET false-positive: All single quotes are escaped/removed.
+                        sSQL = sSQL + " DELETE " + sTableName.Replace("'", "") + " WHERE SiteId =@siteID";
+                            // - CAT.NET false-positive: All single quotes are escaped/removed.
                     }
                 }
                 AddParam("@siteID", _siteID);
@@ -1826,7 +1944,9 @@ namespace EPMLiveReportsAdmin
                 iListCounter = 0; //updated/added during CAT.NET fix iteration
                 foreach (string sTableName in tableNames)
                 {
-                    sSQL = sSQL + " DELETE FROM RPTWork WHERE SiteId=@siteId AND ListId='" + listIds[iListCounter].Replace("'", "") + "'"; // - CAT.NET false-positive: All single quotes are escaped/removed.
+                    sSQL = sSQL + " DELETE FROM RPTWork WHERE SiteId=@siteId AND ListId='" +
+                           listIds[iListCounter].Replace("'", "") + "'";
+                        // - CAT.NET false-positive: All single quotes are escaped/removed.
                 }
                 AddParam("@siteId", _siteID);
                 Command = sSQL;
@@ -1835,19 +1955,24 @@ namespace EPMLiveReportsAdmin
             }
             catch (Exception ex)
             {
-                LogStatus(string.Empty, sListNames, "Batch delete not completed due errors." + ex.Message.Replace("'", ""), ex.StackTrace.Replace("'", ""), 2, 3, string.Empty); // - CAT.NET false-positive: All single quotes are escaped/removed.
+                LogStatus(string.Empty, sListNames,
+                    "Batch delete not completed due errors." + ex.Message.Replace("'", ""),
+                    ex.StackTrace.Replace("'", ""), 2, 3, string.Empty);
+                    // - CAT.NET false-positive: All single quotes are escaped/removed.
                 return false;
             }
         }
 
         /// <summary>
-        /// 
         /// </summary>
         /// <param name="tableNameRoot"></param>
         /// <returns></returns>
         public DataTable GetTableNames(string tableNameRoot)
         {
-            Command = string.Format("select * from INFORMATION_SCHEMA.TABLES where TABLE_NAME like '{0}%' order by TABLE_NAME desc ", tableNameRoot.Replace("'", "")); // - CAT.NET false-positive: All single quotes are escaped/removed.
+            Command =
+                string.Format(
+                    "select * from INFORMATION_SCHEMA.TABLES where TABLE_NAME like '{0}%' order by TABLE_NAME desc ",
+                    tableNameRoot.Replace("'", "")); // - CAT.NET false-positive: All single quotes are escaped/removed.
             //Command = "select * from INFORMATION_SCHEMA.TABLES where TABLE_NAME like '[@tableName]%' order by TABLE_NAME desc ";
             //AddParam("@tableName", tableNameRoot);
             return GetTable(GetClientReportingConnection);
@@ -1855,29 +1980,27 @@ namespace EPMLiveReportsAdmin
 
         public bool TableExists(string tableName, SqlConnection cn)
         {
-
             bool exists = false;
             try
             {
-                SqlCommand cmd = new SqlCommand("IF (EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND  TABLE_NAME = '" + tableName + "')) BEGIN SELECT 1 END ELSE BEGIN SELECT 0 END", cn);
+                var cmd =
+                    new SqlCommand(
+                        "IF (EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE' AND  TABLE_NAME = '" +
+                        tableName + "')) BEGIN SELECT 1 END ELSE BEGIN SELECT 0 END", cn);
                 exists = Convert.ToInt32(cmd.ExecuteScalar()) == 1;
             }
-            catch
-            {
-
-            }
+            catch { }
 
             return exists;
         }
 
         /// <summary>
-        /// 
         /// </summary>
         /// <param name="tableName"></param>
         /// <returns></returns>
         public string GetSafeTableName(string tableName)
         {
-            var dt = GetTableNames(tableName);
+            DataTable dt = GetTableNames(tableName);
             if (dt.Rows.Count == 0)
             {
                 return tableName;
@@ -1913,7 +2036,6 @@ namespace EPMLiveReportsAdmin
         }
 
         /// <summary>
-        /// 
         /// </summary>
         /// <returns></returns>
         public int GetTableCount()
@@ -1922,15 +2044,10 @@ namespace EPMLiveReportsAdmin
             //Command = "SELECT TableCount FROM RPTSettings WHERE SiteID='" + _siteID.ToString() + "'"; - CAT.NET
             Command = "SELECT TableCount FROM RPTSettings WHERE SiteID=@siteId";
             AddParam("@siteId", _siteID);
-            iTableCount = (int)ExecuteScalar(GetClientReportingConnection);
+            iTableCount = (int) ExecuteScalar(GetClientReportingConnection);
             return iTableCount;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sListNames"></param>
-        /// <returns></returns>
         //public string UpdateListNames(string sListNames)
         //{
         //    string sSQL = string.Empty;
@@ -1939,7 +2056,6 @@ namespace EPMLiveReportsAdmin
         //    string[] listNamesIN = null;
         //    string sListName = string.Empty;
         //    Guid RPTListID = Guid.Empty;
-
         //    try
         //    {
         //        //ListNames IN -- START
@@ -1953,7 +2069,6 @@ namespace EPMLiveReportsAdmin
         //            listNamesIN[0] = sListNames;
         //        }
         //        // -- END
-
         //        //listNamesOUT = new string[listNamesIN.Length];
         //        int iListCounter = 0;
         //        using (SPSite site = new SPSite(_siteID))
@@ -1964,7 +2079,6 @@ namespace EPMLiveReportsAdmin
         //                {
         //                    RPTListID = GetListId(listNamesIN[iListCounter]);
         //                    sListName = web.Lists[RPTListID].Title;
-
         //                    if (sListName.Trim().ToLower() != listNamesIN[iListCounter].Trim().ToLower())
         //                    {
         //                        if (UpdateListName(RPTListID, sListName))
@@ -1989,16 +2103,17 @@ namespace EPMLiveReportsAdmin
         //    {
         //        LogStatus(string.Empty, sListNames, "Error processing UpdateListNames() -- " + ex.Message.Replace("'", ""), ex.StackTrace.Replace("'", ""), 2, 3, string.Empty); // - CAT.NET false-positive: All single quotes are escaped/removed.
         //    }
-
         //    if (listNamesOUT.IndexOf(",") == 0)
         //    {
         //        listNamesOUT = listNamesOUT.Remove(0, 1);
         //    }
         //    return listNamesOUT;
         //}
-
         /// <summary>
-        /// 
+        /// </summary>
+        /// <param name="sListNames"></param>
+        /// <returns></returns>
+        /// <summary>
         /// </summary>
         /// <param name="RPTListID"></param>
         /// <param name="sListName"></param>
@@ -2012,13 +2127,12 @@ namespace EPMLiveReportsAdmin
         }
 
         /// <summary>
-        /// 
         /// </summary>
         /// <param name="sListName"></param>
         /// <returns></returns>
         public Guid GetListId(string sListName)
         {
-            using (SPSite site = new SPSite(_siteID))
+            using (var site = new SPSite(_siteID))
             {
                 using (SPWeb spWeb = site.OpenWeb())
                 {
@@ -2028,7 +2142,7 @@ namespace EPMLiveReportsAdmin
                     }
                     catch (Exception ex)
                     {
-                        Guid listID = new Guid();
+                        var listID = new Guid();
                         return listID;
                     }
                 }
@@ -2036,14 +2150,14 @@ namespace EPMLiveReportsAdmin
         }
 
         /// <summary>
-        /// 
         /// </summary>
         /// <param name="listName"></param>
         /// <returns></returns>
         public string GetTableName(string listName)
         {
             object objTableName = null;
-            Command = "SELECT TableName FROM " + Resources.ListTable.Replace("'", "") + " WHERE ListName=@listName AND SiteId=@siteID";
+            Command = "SELECT TableName FROM " + Resources.ListTable.Replace("'", "") +
+                      " WHERE ListName=@listName AND SiteId=@siteID";
             AddParam("@listName", listName);
             AddParam("@siteID", _siteID);
             objTableName = ExecuteScalar(GetClientReportingConnection);
@@ -2051,32 +2165,31 @@ namespace EPMLiveReportsAdmin
         }
 
         /// <summary>
-        /// 
         /// </summary>
         /// <param name="tableName"></param>
         /// <returns></returns>
         public string GetListName(string tableName)
         {
             object objTableName = null;
-            Command = "SELECT ListName FROM " + Resources.ListTable.Replace("'", "") + " WHERE TableName='" + tableName.Replace("'", "") + "' AND SiteId=@siteID"; // - CAT.NET false-positive: All single quotes are escaped/removed.
+            Command = "SELECT ListName FROM " + Resources.ListTable.Replace("'", "") + " WHERE TableName='" +
+                      tableName.Replace("'", "") + "' AND SiteId=@siteID";
+                // - CAT.NET false-positive: All single quotes are escaped/removed.
             AddParam("@siteID", _siteID);
             objTableName = ExecuteScalar(GetClientReportingConnection);
             return objTableName.ToString();
         }
 
         /// <summary>
-        /// 
         /// </summary>
         /// <param name="sMessage"></param>
         /// <returns></returns>
         public bool RefreshTimesheets(out string sMessage, Guid jobUid)
         {
-            ReportBiz oTimeSheet = new ReportBiz(_siteID);
+            var oTimeSheet = new ReportBiz(_siteID);
             return oTimeSheet.RefreshTimesheet(out sMessage, jobUid);
         }
 
         /// <summary>
-        /// 
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
@@ -2127,10 +2240,7 @@ namespace EPMLiveReportsAdmin
                         StartDate = DateTime.Parse(item["StartDate"].ToString());
                         hasStartDate = true;
                     }
-                    catch (Exception ex)
-                    {
-
-                    }
+                    catch (Exception ex) { }
                 }
                 else
                 {
@@ -2152,10 +2262,7 @@ namespace EPMLiveReportsAdmin
                         DueDate = DateTime.Parse(item["DueDate"].ToString());
                         hasDueDate = true;
                     }
-                    catch (Exception ex)
-                    {
-
-                    }
+                    catch (Exception ex) { }
                 }
                 else
                 {
@@ -2177,26 +2284,28 @@ namespace EPMLiveReportsAdmin
                 //Save/Process "work" (a.k.a. assignment) fields
                 if (blnWorkSaved && hasWork && hasAssignedTo && hasStartDate && hasDueDate)
                 {
-                    if (!ProcessAssignments(sWork, sAssignedTo, StartDate, DueDate, ListID, _siteID, item.ID, item.ParentList.Title))
+                    if (
+                        !ProcessAssignments(sWork, sAssignedTo, StartDate, DueDate, ListID, _siteID, item.ID,
+                            item.ParentList.Title))
                     {
-                        LogStatus(string.Empty, string.Empty, "SaveWork() failed.", SqlError.Replace("'", ""), 2, 3, string.Empty); // - CAT.NET false-positive: All single quotes are escaped/removed.
+                        LogStatus(string.Empty, string.Empty, "SaveWork() failed.", SqlError.Replace("'", ""), 2, 3,
+                            string.Empty); // - CAT.NET false-positive: All single quotes are escaped/removed.
                         blnWorkSaved = false;
                     }
                 }
                 // don't do anything if missing value
                 // NOTE: Discussed with JB and we are assumeing values are missing because user intended to NOT submit work
-              
             }
             catch (Exception ex)
             {
-                LogStatus(string.Empty, string.Empty, "SaveWork() failed.", ex.Message.Replace("'", ""), 2, 3, string.Empty); // - CAT.NET false-positive: All single quotes are escaped/removed.
+                LogStatus(string.Empty, string.Empty, "SaveWork() failed.", ex.Message.Replace("'", ""), 2, 3,
+                    string.Empty); // - CAT.NET false-positive: All single quotes are escaped/removed.
                 blnWorkSaved = false;
             }
             return blnWorkSaved;
         }
 
         /// <summary>
-        /// 
         /// </summary>
         /// <param name="sWork"></param>
         /// <param name="sAssignedTo"></param>
@@ -2207,7 +2316,8 @@ namespace EPMLiveReportsAdmin
         /// <param name="ItemID"></param>
         /// <param name="sListName"></param>
         /// <returns></returns>
-        public bool ProcessAssignments(string sWork, string sAssignedTo, object StartDate, object DueDate, Guid ListID, Guid SiteID, int ItemID, string sListName)
+        public bool ProcessAssignments(string sWork, string sAssignedTo, object StartDate, object DueDate, Guid ListID,
+            Guid SiteID, int ItemID, string sListName)
         {
             bool blnProcess = true;
             object objResults = null;
@@ -2231,27 +2341,24 @@ namespace EPMLiveReportsAdmin
         private int GetDbVersion()
         {
             int version = 2005;
-            string sql = "DECLARE @version int, @versionString nvarchar(100) SET @version = CONVERT(int,SUBSTRING(CONVERT(nvarchar(100),SERVERPROPERTY('productversion')),1,1))" +
-                         "SET @versionString = CONVERT(nvarchar(100),SERVERPROPERTY('productversion')) SELECT @version";
+            string sql =
+                "DECLARE @version int, @versionString nvarchar(100) SET @version = CONVERT(int,SUBSTRING(CONVERT(nvarchar(100),SERVERPROPERTY('productversion')),1,1))" +
+                "SET @versionString = CONVERT(nvarchar(100),SERVERPROPERTY('productversion')) SELECT @version";
             try
             {
                 Command = sql;
-                version = (int)ExecuteScalar(GetClientReportingConnection);
+                version = (int) ExecuteScalar(GetClientReportingConnection);
 
                 if (version == 1)
                     version = 2010;
                 else
                     version = 2005;
             }
-            catch (Exception ex)
-            {
-
-            }
+            catch (Exception ex) { }
             return version;
         }
 
         /// <summary>
-        /// 
         /// </summary>
         /// <param name="siteId"></param>
         /// <param name="webId"></param>
@@ -2263,10 +2370,11 @@ namespace EPMLiveReportsAdmin
         /// <param name="dbExists"></param>
         /// <param name="status"></param>
         /// <returns></returns>
-        public bool MapDataBase(Guid siteId, Guid webId, string serverName, string dataBaseName, string un, string pw, bool useSA, bool dbExists, out string status)
+        public bool MapDataBase(Guid siteId, Guid webId, string serverName, string dataBaseName, string un, string pw,
+            bool useSA, bool dbExists, out string status)
         {
             Guid webAppId = webId;
-            var selectedSiteId = siteId;
+            Guid selectedSiteId = siteId;
             ReportBiz rb = null;
             Dictionary<string, string> databases;
 
@@ -2302,9 +2410,9 @@ namespace EPMLiveReportsAdmin
             else
             {
                 var reportData = new ReportData(
-                new Guid(siteId.ToString()),
-                dbName,
-                dbServer, useSA, un, EPMData.Encrypt(pw));
+                    new Guid(siteId.ToString()),
+                    dbName,
+                    dbServer, useSA, un, Encrypt(pw));
                 if (!reportData.CheckServerConnection())
                 {
                     status = reportData.GetError();
@@ -2319,7 +2427,8 @@ namespace EPMLiveReportsAdmin
                 {
                     if (reportData.DatabaseExists())
                     {
-                        status = "The database already exists. If this is an existing valid EPM Reporting database, please check 'Existing' and select it from the list above.";
+                        status =
+                            "The database already exists. If this is an existing valid EPM Reporting database, please check 'Existing' and select it from the list above.";
                         return false;
                     }
                     if (!reportData.CreateDatabase())
@@ -2361,7 +2470,7 @@ namespace EPMLiveReportsAdmin
                 if (useSA && un != string.Empty && pw != string.Empty)
                 {
                     reportData.UserName = un;
-                    reportData.Password = EPMData.Encrypt(pw);
+                    reportData.Password = Encrypt(pw);
                     reportData.UseSqlAccount = true;
                 }
                 else
@@ -2382,7 +2491,7 @@ namespace EPMLiveReportsAdmin
                     EPMData DAO;
                     if (useSA)
                     {
-                        DAO = new EPMData(new Guid(siteId.ToString()), dbName, serverName, true, un, EPMData.Encrypt(pw));
+                        DAO = new EPMData(new Guid(siteId.ToString()), dbName, serverName, true, un, Encrypt(pw));
                     }
                     else
                     {
@@ -2390,7 +2499,7 @@ namespace EPMLiveReportsAdmin
                     }
 
                     string defaultLists = string.Empty;
-                    using (SPSite spSite = new SPSite(new Guid(siteId.ToString())))
+                    using (var spSite = new SPSite(new Guid(siteId.ToString())))
                     {
                         defaultLists = DAO.DefaultLists(spSite.RootWeb);
                     }
@@ -2430,7 +2539,8 @@ namespace EPMLiveReportsAdmin
             int version = GetDbVersion();
             if (version == 2005)
             {
-                sql = "BEGIN BEGIN TRANSACTION BEGIN TRY IF NOT EXISTS (select * from sys.sysusers where name=@userName)";
+                sql =
+                    "BEGIN BEGIN TRANSACTION BEGIN TRY IF NOT EXISTS (select * from sys.sysusers where name=@userName)";
                 sql = sql + " exec sp_grantdbaccess @userName, @userName";
                 sql = sql + " exec sp_addrolemember db_owner,@userName";
                 sql = sql + " COMMIT TRANSACTION END TRY BEGIN CATCH BEGIN ROLLBACK TRANSACTION; END END CATCH END";
@@ -2473,7 +2583,6 @@ namespace EPMLiveReportsAdmin
         //}
 
         /// <summary>
-        /// 
         /// </summary>
         /// <param name="sListName"></param>
         /// <param name="siteId"></param>
@@ -2486,7 +2595,7 @@ namespace EPMLiveReportsAdmin
             AddParam("@listName", sListName);
             object oResult = ExecuteScalar(GetClientReportingConnection);
 
-            if (oResult != null && (int)oResult != 0)
+            if (oResult != null && (int) oResult != 0)
             {
                 return true;
             }
@@ -2497,7 +2606,6 @@ namespace EPMLiveReportsAdmin
         }
 
         /// <summary>
-        /// 
         /// </summary>
         /// <param name="nonWorkingDays"></param>
         /// <param name="workHrs"></param>
@@ -2512,16 +2620,17 @@ namespace EPMLiveReportsAdmin
 
             object oResult = ExecuteScalar(GetClientReportingConnection);
 
-            if ((int)oResult == 0)
+            if ((int) oResult == 0)
             {
                 Command = "INSERT INTO RPTSettings VALUES(@siteID,@nonWorkingDays,@workHrs,@SiteName,@SiteUrl)";
             }
             else
             {
-                Command = "UPDATE RPTSettings SET NonWorkingDays=@nonWorkingDays, WorkHours=@workHrs WHERE SiteID=@siteID";
+                Command =
+                    "UPDATE RPTSettings SET NonWorkingDays=@nonWorkingDays, WorkHours=@workHrs WHERE SiteID=@siteID";
             }
 
-            using (SPSite site = new SPSite(_siteID))
+            using (var site = new SPSite(_siteID))
             {
                 using (SPWeb web = site.OpenWeb())
                 {
@@ -2548,44 +2657,45 @@ namespace EPMLiveReportsAdmin
         }
 
         /// <summary>
-        /// Encrypts string value using the HASH MD5 cryptoservice provider.
+        ///     Encrypts string value using the HASH MD5 cryptoservice provider.
         /// </summary>
         /// <param name="Plaintext"></param>
         /// <returns></returns>
-        static public string Encrypt(string Plaintext)
+        public static string Encrypt(string Plaintext)
         {
-            byte[] Buffer = new byte[0];
+            var Buffer = new byte[0];
             string Key = "EPMLIVE";
-            System.Security.Cryptography.TripleDESCryptoServiceProvider DES = new System.Security.Cryptography.TripleDESCryptoServiceProvider();
-            System.Security.Cryptography.MD5CryptoServiceProvider hashMD5 = new System.Security.Cryptography.MD5CryptoServiceProvider();
-            DES.Key = hashMD5.ComputeHash(System.Text.ASCIIEncoding.ASCII.GetBytes(Key));
-            DES.Mode = System.Security.Cryptography.CipherMode.ECB;
-            System.Security.Cryptography.ICryptoTransform DESEncrypt = DES.CreateEncryptor();
-            Buffer = System.Text.ASCIIEncoding.ASCII.GetBytes(Plaintext);
+            var DES = new TripleDESCryptoServiceProvider();
+            var hashMD5 = new MD5CryptoServiceProvider();
+            DES.Key = hashMD5.ComputeHash(ASCIIEncoding.ASCII.GetBytes(Key));
+            DES.Mode = CipherMode.ECB;
+            ICryptoTransform DESEncrypt = DES.CreateEncryptor();
+            Buffer = ASCIIEncoding.ASCII.GetBytes(Plaintext);
 
             string TripleDES = Convert.ToBase64String(DESEncrypt.TransformFinalBlock(Buffer, 0, Buffer.Length));
             return TripleDES;
         }
 
         /// <summary>
-        /// Decrpyts string value using key.
+        ///     Decrpyts string value using key.
         /// </summary>
         /// <param name="base64Text"></param>
         /// <returns></returns>
-        static public string Decrypt(string base64Text)
+        public static string Decrypt(string base64Text)
         {
             try
             {
-                byte[] Buffer = new byte[0];
+                var Buffer = new byte[0];
                 string Key = "EPMLIVE";
-                System.Security.Cryptography.TripleDESCryptoServiceProvider DES = new System.Security.Cryptography.TripleDESCryptoServiceProvider();
-                System.Security.Cryptography.MD5CryptoServiceProvider hashMD5 = new System.Security.Cryptography.MD5CryptoServiceProvider();
-                DES.Key = hashMD5.ComputeHash(System.Text.ASCIIEncoding.ASCII.GetBytes(Key));
-                DES.Mode = System.Security.Cryptography.CipherMode.ECB;
-                System.Security.Cryptography.ICryptoTransform DESDecrypt = DES.CreateDecryptor();
+                var DES = new TripleDESCryptoServiceProvider();
+                var hashMD5 = new MD5CryptoServiceProvider();
+                DES.Key = hashMD5.ComputeHash(ASCIIEncoding.ASCII.GetBytes(Key));
+                DES.Mode = CipherMode.ECB;
+                ICryptoTransform DESDecrypt = DES.CreateDecryptor();
                 Buffer = Convert.FromBase64String(base64Text);
 
-                string DecTripleDES = System.Text.ASCIIEncoding.ASCII.GetString(DESDecrypt.TransformFinalBlock(Buffer, 0, Buffer.Length));
+                string DecTripleDES =
+                    ASCIIEncoding.ASCII.GetString(DESDecrypt.TransformFinalBlock(Buffer, 0, Buffer.Length));
                 return DecTripleDES;
             }
             catch (Exception ex)
@@ -2593,7 +2703,6 @@ namespace EPMLiveReportsAdmin
                 return base64Text;
             }
         }
-        //Modules created by xjh -- end
 
         #region HELPER METHODS
 
@@ -2610,5 +2719,7 @@ namespace EPMLiveReportsAdmin
         }
 
         #endregion
+
+        //Modules created by xjh -- end
     }
 }

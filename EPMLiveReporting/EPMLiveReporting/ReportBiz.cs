@@ -9,33 +9,11 @@ namespace EPMLiveReportsAdmin
 {
     public sealed class ReportBiz
     {
-        private readonly Guid _siteId;
-        private readonly Guid _webId;
-        private readonly Guid _webAppId;
         private readonly bool _reportingV2Enabled;
+        private readonly Guid _siteId;
+        private readonly Guid _webAppId;
+        private readonly Guid _webId;
         private string _webTitle = string.Empty;
-
-        public string WebTitle
-        {
-            get
-            {
-                if (string.IsNullOrEmpty(_webTitle))
-                {
-                    using (SPSite s = new SPSite(_siteId))
-                    {
-                        using (SPWeb w = s.OpenWeb())
-                        {
-                            if (w.Exists)
-                            {
-                                _webTitle = w.Title;
-                            }
-                        }
-                    }
-                }
-
-                return _webTitle;
-            }
-        }
 
         public ReportBiz(Guid siteId)
         {
@@ -53,6 +31,28 @@ namespace EPMLiveReportsAdmin
         {
             _siteId = siteId;
             _webAppId = webAppId;
+        }
+
+        public string WebTitle
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(_webTitle))
+                {
+                    using (var s = new SPSite(_siteId))
+                    {
+                        using (SPWeb w = s.OpenWeb())
+                        {
+                            if (w.Exists)
+                            {
+                                _webTitle = w.Title;
+                            }
+                        }
+                    }
+                }
+
+                return _webTitle;
+            }
         }
 
         public bool SiteExists()
@@ -121,7 +121,7 @@ namespace EPMLiveReportsAdmin
         }
 
         /// <summary>
-        /// Maps a new list to reporting DB with all columns added.
+        ///     Maps a new list to reporting DB with all columns added.
         /// </summary>
         /// <param name="listId"></param>
         /// <returns></returns>
@@ -133,7 +133,7 @@ namespace EPMLiveReportsAdmin
 
         public DataRow SAccountInfo(Guid webAppId)
         {
-            EPMData DAO = new EPMData(_siteId, webAppId);
+            var DAO = new EPMData(_siteId, webAppId);
             return DAO.SAccountInfo();
         }
 
@@ -216,25 +216,25 @@ namespace EPMLiveReportsAdmin
             string sTableName = rd.GetSafeTableName("RPTTSData");
 
             rd.LogStatus("",
-               "TimeSheet",
-               "Recreating RPTTSData for web: " + WebTitle,
-               "Recreating RPTTSData for web: " + WebTitle,
-               0, 1, jobUid.ToString());
+                "TimeSheet",
+                "Recreating RPTTSData for web: " + WebTitle,
+                "Recreating RPTTSData for web: " + WebTitle,
+                0, 1, jobUid.ToString());
             if (!rd.CreateTable(sTableName, columns, true, out message))
             {
                 rd.Dispose();
                 hasErrors = true;
                 rd.LogStatus("",
-              "TimeSheet",
-              "Error occured while recreating RPTTSData for web: " + WebTitle + ".",
-              message,
-              0, 1, jobUid.ToString());
+                    "TimeSheet",
+                    "Error occured while recreating RPTTSData for web: " + WebTitle + ".",
+                    message,
+                    0, 1, jobUid.ToString());
             }
             rd.LogStatus("",
-               "TimeSheet",
-               "Finished recreating RPTTSData for web: " + WebTitle,
-               "Finished recreating RPTTSData for web: " + WebTitle,
-               0, 1, jobUid.ToString());
+                "TimeSheet",
+                "Finished recreating RPTTSData for web: " + WebTitle,
+                "Finished recreating RPTTSData for web: " + WebTitle,
+                0, 1, jobUid.ToString());
 
             rd.LogStatus("", "TimeSheet",
                 "Inserting data to RPTTSData for web: " + WebTitle,
@@ -268,7 +268,7 @@ namespace EPMLiveReportsAdmin
         public DataTable GetAllForeignKeys(EPMData DAO)
         {
             //Initialize return value DataTable (will hold all FK update scripts for both live and snapshot tables)
-            DataTable AllForeignKeysByTable = new DataTable();
+            var AllForeignKeysByTable = new DataTable();
             AllForeignKeysByTable.Columns.Add("TABLE_NAME");
             AllForeignKeysByTable.Columns.Add("SNAPSHOT_TABLE_NAME");
             AllForeignKeysByTable.Columns.Add("FK_TABLE_SCRIPT");
@@ -281,9 +281,10 @@ namespace EPMLiveReportsAdmin
             DataTable AllMappedLists = DAO.GetTable(DAO.GetClientReportingConnection);
 
             //Get All lookup fields for ALL mapped lists 
-            string sql = "SELECT dbo.RPTColumn.RPTListId,  dbo.RPTList.ListName, dbo.RPTList.TableName, dbo.RPTList.TableNameSnapshot, dbo.RPTColumn.InternalName , dbo.RPTColumn.ColumnName" +
-            " FROM dbo.RPTList INNER JOIN dbo.RPTColumn ON dbo.RPTList.RPTListId = dbo.RPTColumn.RPTListId " +
-            "WHERE dbo.RPTList.SiteId=@siteId AND (dbo.RPTColumn.SharePointType = N'lookup') AND ColumnType = 'Int'";
+            string sql =
+                "SELECT dbo.RPTColumn.RPTListId,  dbo.RPTList.ListName, dbo.RPTList.TableName, dbo.RPTList.TableNameSnapshot, dbo.RPTColumn.InternalName , dbo.RPTColumn.ColumnName" +
+                " FROM dbo.RPTList INNER JOIN dbo.RPTColumn ON dbo.RPTList.RPTListId = dbo.RPTColumn.RPTListId " +
+                "WHERE dbo.RPTList.SiteId=@siteId AND (dbo.RPTColumn.SharePointType = N'lookup') AND ColumnType = 'Int'";
             DAO.Command = sql;
             DAO.AddParam("@siteId", _siteId);
             DataTable AllListsLookupFields = DAO.GetTable(DAO.GetClientReportingConnection);
@@ -292,7 +293,7 @@ namespace EPMLiveReportsAdmin
             SPWeb web = null;
             SPSite site = null;
 
-            SPSecurity.RunWithElevatedPrivileges(delegate()
+            SPSecurity.RunWithElevatedPrivileges(delegate
             {
                 site = new SPSite(_siteId);
                 web = site.OpenWeb(); //IGNORE SPDispose 110, web is being disposed outside scope
@@ -304,7 +305,7 @@ namespace EPMLiveReportsAdmin
                 foreach (DataRow list in AllMappedLists.Rows)
                 {
                     //Init. Lookup fields for list
-                    DataRow[] lookupFields = AllListsLookupFields.Select("RPTListId='" + list["RPTListId"].ToString() + "'");
+                    DataRow[] lookupFields = AllListsLookupFields.Select("RPTListId='" + list["RPTListId"] + "'");
 
                     //Check for lookup fields for this list
                     if (lookupFields != null && lookupFields.Length > 0)
@@ -339,8 +340,11 @@ namespace EPMLiveReportsAdmin
                         //Loop thru all list lookup fields
                         foreach (DataRow lookupField in lookupFields)
                         {
-                            SPFieldLookup field = (SPFieldLookup)childList.Fields.GetFieldByInternalName(lookupField["InternalName"].ToString());
-                            if (field.TypeAsString.ToLower() != "filteredlookup" && field.LookupList != null && field.LookupList != string.Empty)
+                            var field =
+                                (SPFieldLookup)
+                                    childList.Fields.GetFieldByInternalName(lookupField["InternalName"].ToString());
+                            if (field.TypeAsString.ToLower() != "filteredlookup" && field.LookupList != null &&
+                                field.LookupList != string.Empty)
                             {
                                 string listuid = field.LookupList;
                                 SPList parentList = null;
@@ -349,13 +353,17 @@ namespace EPMLiveReportsAdmin
                                     parentList = web.Lists[new Guid(listuid)];
                                 }
                                 catch { }
-                                DataRow[] childListInfo = AllMappedLists.Select("ListName='" + childList.Title.Replace("'", "") + "'"); // - CAT.NET false-positive: All single quotes are escaped/removed.
+                                DataRow[] childListInfo =
+                                    AllMappedLists.Select("ListName='" + childList.Title.Replace("'", "") + "'");
+                                    // - CAT.NET false-positive: All single quotes are escaped/removed.
                                 DataRow[] parentListInfo = null;
                                 if (parentList != null)
                                 {
                                     try
                                     {
-                                        parentListInfo = AllMappedLists.Select("ListName='" + parentList.Title.Replace("'", "") + "'"); // - CAT.NET false-positive: All single quotes are escaped/removed.
+                                        parentListInfo =
+                                            AllMappedLists.Select("ListName='" + parentList.Title.Replace("'", "") + "'");
+                                            // - CAT.NET false-positive: All single quotes are escaped/removed.
                                     }
                                     catch { }
                                 }
@@ -370,28 +378,44 @@ namespace EPMLiveReportsAdmin
 
                                     //Init. LST_XXXX_Table FK SCRIPT
                                     string LST_TABLE_FK_SCRIPT =
-                                           "IF (EXISTS(SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = \'" + childTableName + "\')) " +
-                                               "BEGIN " +
-                                                   "ALTER TABLE [dbo].[" + childTableName + "] WITH NOCHECK " +
-                                                   "ADD CONSTRAINT [FK_EPMLIVE_" + lookupField["InternalName"].ToString() + "_" + childTableName.ToUpper() + "_" + parentTableName.ToUpper() + "] FOREIGN KEY([webid], [" + lookupField["ColumnName"].ToString() + "]) REFERENCES [dbo].[" + parentTableName + "] ([WebId], [ItemId]) NOT FOR REPLICATION " +
-                                                   "ALTER TABLE [dbo].[" + childTableName + "] NOCHECK CONSTRAINT [FK_EPMLIVE_" + lookupField["InternalName"].ToString() + "_" + childTableName.ToUpper() + "_" + parentTableName.ToUpper() + "] " +
-                                               "END ";
+                                        "IF (EXISTS(SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = \'" +
+                                        childTableName + "\')) " +
+                                        "BEGIN " +
+                                        "ALTER TABLE [dbo].[" + childTableName + "] WITH NOCHECK " +
+                                        "ADD CONSTRAINT [FK_EPMLIVE_" + lookupField["InternalName"] + "_" +
+                                        childTableName.ToUpper() + "_" + parentTableName.ToUpper() +
+                                        "] FOREIGN KEY([webid], [" + lookupField["ColumnName"] + "]) REFERENCES [dbo].[" +
+                                        parentTableName + "] ([WebId], [ItemId]) NOT FOR REPLICATION " +
+                                        "ALTER TABLE [dbo].[" + childTableName + "] NOCHECK CONSTRAINT [FK_EPMLIVE_" +
+                                        lookupField["InternalName"] + "_" + childTableName.ToUpper() + "_" +
+                                        parentTableName.ToUpper() + "] " +
+                                        "END ";
 
                                     //Init. LST_XXXX_Snapshot_Table FK SCRIPT
                                     string LST_SNAPSHOT_TABLE_FK_SCRIPT =
-                                        "IF (EXISTS(SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = \'" + childTableSnapShotName + "\')) " +
-                                            "BEGIN " +
-                                                "ALTER TABLE [dbo].[" + childTableSnapShotName + "] WITH NOCHECK " +
-                                                "ADD CONSTRAINT [FK_EPMLIVE_" + lookupField["InternalName"].ToString() + "_" + childTableSnapShotName.ToUpper() + "_" + parentTableName.ToUpper() + "] FOREIGN KEY([webid], [" + lookupField["ColumnName"].ToString() + "]) REFERENCES [dbo].[" + parentTableName + "] ([WebId], [ItemId]) NOT FOR REPLICATION " +
-                                                "ALTER TABLE [dbo].[" + childTableSnapShotName.ToUpper() + "] NOCHECK CONSTRAINT [FK_EPMLIVE_" + lookupField["InternalName"].ToString() + "_" + childTableSnapShotName.ToUpper() + "_" + parentTableName.ToUpper() + "] " +
-                                            "END ";
+                                        "IF (EXISTS(SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = \'" +
+                                        childTableSnapShotName + "\')) " +
+                                        "BEGIN " +
+                                        "ALTER TABLE [dbo].[" + childTableSnapShotName + "] WITH NOCHECK " +
+                                        "ADD CONSTRAINT [FK_EPMLIVE_" + lookupField["InternalName"] + "_" +
+                                        childTableSnapShotName.ToUpper() + "_" + parentTableName.ToUpper() +
+                                        "] FOREIGN KEY([webid], [" + lookupField["ColumnName"] + "]) REFERENCES [dbo].[" +
+                                        parentTableName + "] ([WebId], [ItemId]) NOT FOR REPLICATION " +
+                                        "ALTER TABLE [dbo].[" + childTableSnapShotName.ToUpper() +
+                                        "] NOCHECK CONSTRAINT [FK_EPMLIVE_" + lookupField["InternalName"] + "_" +
+                                        childTableSnapShotName.ToUpper() + "_" + parentTableName.ToUpper() + "] " +
+                                        "END ";
 
                                     //Add FK SCRIPTS
                                     DataRow row = AllForeignKeysByTable.NewRow();
-                                    row["TABLE_NAME"] = childTableName.Replace("'", "''"); // - CAT.NET false-positive: All single quotes are escaped/removed.
-                                    row["FK_TABLE_SCRIPT"] = LST_TABLE_FK_SCRIPT; //.Replace("'", "''"); // - CAT.NET false-positive: All single quotes are escaped/removed.
-                                    row["SNAPSHOT_TABLE_NAME"] = childTableSnapShotName.Replace("'", "''"); // - CAT.NET false-positive: All single quotes are escaped/removed.
-                                    row["FK_SNAPSHOT_TABLE_SCRIPT"] = LST_SNAPSHOT_TABLE_FK_SCRIPT; //.Replace("'", "''"); // - CAT.NET false-positive: All single quotes are escaped/removed.
+                                    row["TABLE_NAME"] = childTableName.Replace("'", "''");
+                                        // - CAT.NET false-positive: All single quotes are escaped/removed.
+                                    row["FK_TABLE_SCRIPT"] = LST_TABLE_FK_SCRIPT;
+                                        //.Replace("'", "''"); // - CAT.NET false-positive: All single quotes are escaped/removed.
+                                    row["SNAPSHOT_TABLE_NAME"] = childTableSnapShotName.Replace("'", "''");
+                                        // - CAT.NET false-positive: All single quotes are escaped/removed.
+                                    row["FK_SNAPSHOT_TABLE_SCRIPT"] = LST_SNAPSHOT_TABLE_FK_SCRIPT;
+                                        //.Replace("'", "''"); // - CAT.NET false-positive: All single quotes are escaped/removed.
                                     AllForeignKeysByTable.Rows.Add(row);
                                 }
                             }
@@ -451,45 +475,49 @@ namespace EPMLiveReportsAdmin
                 //DELETE EXISTING FK's from list table
                 DAO.Command =
                     "BEGIN TRY " +
-                        "WHILE EXISTS(select * from INFORMATION_SCHEMA.CONSTRAINT_COLUMN_USAGE where CONSTRAINT_NAME like 'FK_EPMLIVE_%' AND TABLE_NAME=@tableName) " +
-                            "BEGIN " +
-                                "DECLARE @cName nvarchar(Max) " +
-                                "SELECT @cName = (SELECT TOP 1 [CONSTRAINT_NAME] FROM INFORMATION_SCHEMA.CONSTRAINT_COLUMN_USAGE WHERE CONSTRAINT_NAME LIKE 'FK_EPMLIVE_%' AND TABLE_NAME=@tableName) " +
-                                "DECLARE @sql nvarchar(Max) " +
-                                "SELECT @sql = 'ALTER TABLE ' + @tableName + ' DROP CONSTRAINT ' + @cName " +
-                                "EXEC sp_executesql @sql " +
-                            "END " +
+                    "WHILE EXISTS(select * from INFORMATION_SCHEMA.CONSTRAINT_COLUMN_USAGE where CONSTRAINT_NAME like 'FK_EPMLIVE_%' AND TABLE_NAME=@tableName) " +
+                    "BEGIN " +
+                    "DECLARE @cName nvarchar(Max) " +
+                    "SELECT @cName = (SELECT TOP 1 [CONSTRAINT_NAME] FROM INFORMATION_SCHEMA.CONSTRAINT_COLUMN_USAGE WHERE CONSTRAINT_NAME LIKE 'FK_EPMLIVE_%' AND TABLE_NAME=@tableName) " +
+                    "DECLARE @sql nvarchar(Max) " +
+                    "SELECT @sql = 'ALTER TABLE ' + @tableName + ' DROP CONSTRAINT ' + @cName " +
+                    "EXEC sp_executesql @sql " +
+                    "END " +
                     "END TRY " +
                     "BEGIN CATCH " +
-                        "PRINT 'Error Detected' " +
+                    "PRINT 'Error Detected' " +
                     "END CATCH";
-                DAO.AddParam("@tableName", AllListForeignKeys["TABLE_NAME"].ToString()); // - CAT.NET false-positive: All single quotes are escaped/removed.
+                DAO.AddParam("@tableName", AllListForeignKeys["TABLE_NAME"].ToString());
+                    // - CAT.NET false-positive: All single quotes are escaped/removed.
                 DAO.ExecuteNonQuery(DAO.GetClientReportingConnection);
 
                 //DELETE EXISTING FK's from list snapshot table
                 DAO.Command =
                     "BEGIN TRY " +
-                        "WHILE EXISTS(select * from INFORMATION_SCHEMA.CONSTRAINT_COLUMN_USAGE where CONSTRAINT_NAME like 'FK_EPMLIVE_%' AND TABLE_NAME=@tableName) " +
-                            "BEGIN " +
-                                "DECLARE @cName nvarchar(Max) " +
-                                "SELECT @cName = (SELECT TOP 1 [CONSTRAINT_NAME] FROM INFORMATION_SCHEMA.CONSTRAINT_COLUMN_USAGE WHERE CONSTRAINT_NAME LIKE 'FK_EPMLIVE_%' AND TABLE_NAME=@tableName) " +
-                                "DECLARE @sql nvarchar(Max) " +
-                                "SELECT @sql = 'ALTER TABLE ' + @tableName + ' DROP CONSTRAINT ' + @cName " +
-                                "EXEC sp_executesql @sql " +
-                            "END " +
+                    "WHILE EXISTS(select * from INFORMATION_SCHEMA.CONSTRAINT_COLUMN_USAGE where CONSTRAINT_NAME like 'FK_EPMLIVE_%' AND TABLE_NAME=@tableName) " +
+                    "BEGIN " +
+                    "DECLARE @cName nvarchar(Max) " +
+                    "SELECT @cName = (SELECT TOP 1 [CONSTRAINT_NAME] FROM INFORMATION_SCHEMA.CONSTRAINT_COLUMN_USAGE WHERE CONSTRAINT_NAME LIKE 'FK_EPMLIVE_%' AND TABLE_NAME=@tableName) " +
+                    "DECLARE @sql nvarchar(Max) " +
+                    "SELECT @sql = 'ALTER TABLE ' + @tableName + ' DROP CONSTRAINT ' + @cName " +
+                    "EXEC sp_executesql @sql " +
+                    "END " +
                     "END TRY " +
                     "BEGIN CATCH " +
-                        "PRINT 'Error Detected' " +
+                    "PRINT 'Error Detected' " +
                     "END CATCH";
-                DAO.AddParam("@tableName", AllListForeignKeys["SNAPSHOT_TABLE_NAME"].ToString()); // - CAT.NET false-positive: All single quotes are escaped/removed.
+                DAO.AddParam("@tableName", AllListForeignKeys["SNAPSHOT_TABLE_NAME"].ToString());
+                    // - CAT.NET false-positive: All single quotes are escaped/removed.
                 DAO.ExecuteNonQuery(DAO.GetClientReportingConnection);
 
                 //ADD FK's to list table
-                DAO.Command = AllListForeignKeys["FK_TABLE_SCRIPT"].ToString(); // - CAT.NET false-positive: All single quotes are escaped/removed.
+                DAO.Command = AllListForeignKeys["FK_TABLE_SCRIPT"].ToString();
+                    // - CAT.NET false-positive: All single quotes are escaped/removed.
                 DAO.ExecuteNonQuery(DAO.GetClientReportingConnection);
 
                 //ADD FK's to list snapshot table
-                DAO.Command = AllListForeignKeys["FK_SNAPSHOT_TABLE_SCRIPT"].ToString(); // - CAT.NET false-positive: All single quotes are escaped/removed.
+                DAO.Command = AllListForeignKeys["FK_SNAPSHOT_TABLE_SCRIPT"].ToString();
+                    // - CAT.NET false-positive: All single quotes are escaped/removed.
                 DAO.ExecuteNonQuery(DAO.GetClientReportingConnection);
             }
             return true;
@@ -497,12 +525,14 @@ namespace EPMLiveReportsAdmin
 
         public DataTable GetReferencingTables(EPMData DAO, string sTableName)
         {
-            string sql = string.Format("EXEC sp_MSdependencies N'{0}', null, 1315327", sTableName.Replace("'", ""));// - CAT.NET false-positive: All single quotes are escaped/removed.
+            string sql = string.Format("EXEC sp_MSdependencies N'{0}', null, 1315327", sTableName.Replace("'", ""));
+                // - CAT.NET false-positive: All single quotes are escaped/removed.
             //string sql = "EXEC sp_MSdependencies N'{0}', null, 1315327";
             DAO.Command = sql;
             //DAO.AddParam("@tableName", sTableName);
             return DAO.GetTable(DAO.GetClientReportingConnection);
         }
+
         //Modules created by xjh -- END
     }
 }
