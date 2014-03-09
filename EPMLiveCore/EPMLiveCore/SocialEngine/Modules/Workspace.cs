@@ -59,7 +59,8 @@ namespace EPMLiveCore.SocialEngine.Modules
                 Title = (string) data["Title"],
                 Url = (string) data["URL"],
                 Kind = ObjectKind.Workspace,
-                WebId = webId
+                WebId = webId,
+                Users = new[] { new User { Id = (int) data["UserId"], Role = UserRole.Creator } }
             });
 
             activityManager.RegisterActivity(new Activity
@@ -73,7 +74,7 @@ namespace EPMLiveCore.SocialEngine.Modules
             Guid streamId = streamManager.GetGlobalStreamId(webId);
 
             threadManager.AssociateStreams(thread, new[] {streamId});
-            threadManager.AddUsers(thread, new[] {(int) data["UserId"]});
+            threadManager.AddUsers(thread);
 
             CoreFunctions.setConfigSetting(contextWeb, CREATED_CONFIG_KEY, true.ToString());
         }

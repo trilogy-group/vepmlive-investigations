@@ -6,7 +6,7 @@ namespace EPMLiveCore.SocialEngine.Entities
 {
     public class Thread
     {
-        #region Properties (10) 
+        #region Properties (11) 
 
         public List<Activity> Activities { get; set; }
 
@@ -25,6 +25,8 @@ namespace EPMLiveCore.SocialEngine.Entities
         public string Title { get; set; }
 
         public string Url { get; set; }
+
+        public User[] Users { get; set; }
 
         public Guid? WebId { get; set; }
 

@@ -21,24 +21,44 @@ namespace EPMLiveCore.SocialEngine.Core
 
         // Public Methods (12) 
 
-        public void AddUsers(Thread thread, int[] userIds)
+        public void AddUsers(Thread thread)
         {
-            Parallel.ForEach(userIds, userId =>
+            foreach (User user in thread.Users)
             {
-                const string SQL = @"
-                    IF NOT EXISTS (SELECT ThreadId FROM SS_ThreadUsers WHERE ThreadId = @ThreadId AND UserId = @UserId)
-                    BEGIN
-                        INSERT INTO SS_ThreadUsers (ThreadId, UserId) VALUES (@ThreadId, @UserId)
-                    END";
+                bool userExists = false;
+                var existingRole = UserRole.None;
+
+                const string SQL =
+                    @"SELECT TOP (1) Role FROM SS_ThreadUsers WHERE ThreadId = @ThreadId AND UserId = @UserId";
 
                 using (var sqlCommand = new SqlCommand(SQL, SqlConnection))
                 {
                     sqlCommand.Parameters.AddWithValue("@ThreadId", thread.Id);
-                    sqlCommand.Parameters.AddWithValue("@UserId", userId);
+                    sqlCommand.Parameters.AddWithValue("@UserId", user.Id);
+
+                    object er = sqlCommand.ExecuteScalar();
+                    if (er != null && er != DBNull.Value)
+                    {
+                        userExists = true;
+                        existingRole = (UserRole) Enum.Parse(typeof(UserRole), er.ToString(), false);
+                    }
+                }
+
+                if (userExists && existingRole == user.Role) continue;
+
+                string sql = !userExists
+                    ? @"INSERT INTO SS_ThreadUsers (ThreadId, UserId, Role) VALUES (@ThreadId, @UserId, @Role)"
+                    : @"UPDATE SS_ThreadUsers SET Role = @Role WHERE ThreadId = @ThreadId AND UserId = @UserId";
+
+                using (var sqlCommand = new SqlCommand(sql, SqlConnection))
+                {
+                    sqlCommand.Parameters.AddWithValue("@ThreadId", thread.Id);
+                    sqlCommand.Parameters.AddWithValue("@UserId", user.Id);
+                    sqlCommand.Parameters.AddWithValue("@Role", !userExists ? user.Role : existingRole | user.Role);
 
                     sqlCommand.ExecuteNonQuery();
                 }
-            });
+            }
         }
 
         public void AssociateStreams(Thread thread, Guid[] streamIds)

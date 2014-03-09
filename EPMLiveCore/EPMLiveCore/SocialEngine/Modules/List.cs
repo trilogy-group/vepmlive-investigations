@@ -77,7 +77,8 @@ namespace EPMLiveCore.SocialEngine.Modules
                 Url = (string) data["URL"],
                 Kind = ObjectKind.List,
                 WebId = webId,
-                ListId = (Guid) data["Id"]
+                ListId = (Guid) data["Id"],
+                Users = new[] { new User { Id = (int) data["UserId"], Role = UserRole.Creator } }
             });
 
             activityManager.RegisterActivity(new Activity
@@ -91,7 +92,7 @@ namespace EPMLiveCore.SocialEngine.Modules
             Guid streamId = streamManager.GetGlobalStreamId(webId);
 
             threadManager.AssociateStreams(thread, new[] {streamId});
-            threadManager.AddUsers(thread, new[] {(int) data["UserId"]});
+            threadManager.AddUsers(thread);
         }
 
         private void RegisterDeletionActivity(ProcessActivityEventArgs args)

@@ -20,31 +20,42 @@ namespace EPMLiveCore.SocialEngine.Modules
 
         #endregion Fields 
 
-        #region Methods (9) 
+        #region Methods (11) 
 
-        // Private Methods (9) 
+        // Private Methods (11) 
 
         private static void AddThreadUsers(Dictionary<string, object> data, ThreadManager threadManager, Thread thread)
         {
-            var users = new List<int> {(int) data["UserId"]};
+            var users=new List<User> {new User {Id = (int) data["UserId"], Role = UserRole.Creator}};
 
             if (data.ContainsKey("AssignedTo"))
             {
                 var assignedToUsers = data["AssignedTo"] as string;
                 if (!string.IsNullOrEmpty(assignedToUsers))
                 {
-                    Parallel.ForEach(assignedToUsers.Split(','), user =>
+                    string[] asu = assignedToUsers.Split(',');
+
+                    foreach (string user in asu)
                     {
                         int userId;
-                        if (int.TryParse(user.Trim(), out userId))
+                        if (!int.TryParse(user.Trim(), out userId)) continue;
+
+                        User tu = (from u in users where u.Id == userId select u).FirstOrDefault();
+
+                        if (tu == null)
                         {
-                            users.Add(userId);
+                            users.Add(new User {Id = userId, Role = UserRole.Assignee});
                         }
-                    });
+                        else
+                        {
+                            tu.Role |= UserRole.Assignee;
+                        }
+                    }
                 }
             }
 
-            threadManager.AddUsers(thread, users.AsParallel().Distinct().ToArray());
+            thread.Users = users.AsParallel().Distinct().ToArray();
+            threadManager.AddUsers(thread);
         }
 
         private TimeSpan GetRelatedActivityInterval(SPWeb contextWeb)
@@ -72,7 +83,7 @@ namespace EPMLiveCore.SocialEngine.Modules
             }, true).Value;
         }
 
-        private static bool IsIgnoredList(ProcessActivityEventArgs args, Dictionary<string, object> data)
+        private static bool EnsureNotIgnoredList(ProcessActivityEventArgs args, Dictionary<string, object> data)
         {
             var listTitle = (string) data["ListTitle"];
 
@@ -103,6 +114,8 @@ namespace EPMLiveCore.SocialEngine.Modules
             if (args.ObjectKind != ObjectKind.ListItem) return;
 
             if (args.ActivityKind == ActivityKind.Created) ValidateCreationActivity(args);
+            else if (args.ActivityKind == ActivityKind.Updated) ValidateUpdationActivity(args);
+            else if (args.ActivityKind == ActivityKind.Deleted) ValidateDeletionActivity(args);
         }
 
         private void PerformPreRegistrationSteps(ProcessActivityEventArgs args)
@@ -187,13 +200,37 @@ namespace EPMLiveCore.SocialEngine.Modules
                 {"ActivityTime", DataType.DateTime}
             });
 
-            if (IsIgnoredList(args, data)) return;
+            if (EnsureNotIgnoredList(args, data)) return;
 
             if (args.ActivityManager.ActivityExists(ObjectKind.ListItem, ActivityKind.Created,
                 (Guid) data["WebId"], (Guid) data["ListId"], (int) data["Id"]))
             {
                 throw new SocialEngineException(ALREADY_CREATED_EXCEPTION_MESSAGE, LogKind.Info);
             }
+        }
+
+        private void ValidateDeletionActivity(ProcessActivityEventArgs args)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void ValidateUpdationActivity(ProcessActivityEventArgs args)
+        {
+            Dictionary<string, object> data = args.Data;
+
+            new DataValidator(data).Validate(new Dictionary<string, DataType>
+            {
+                {"Id", DataType.Int},
+                {"Title", DataType.String},
+                {"ListId", DataType.Guid},
+                {"WebId", DataType.Guid},
+                {"SiteId", DataType.Guid},
+                {"UserId", DataType.Int},
+                {"ChangedProperties", DataType.String},
+                {"ActivityTime", DataType.DateTime}
+            });
+
+            EnsureNotIgnoredList(args, data);
         }
 
         #endregion Methods 
