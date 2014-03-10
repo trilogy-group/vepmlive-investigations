@@ -150,6 +150,8 @@
     padding: 4px 5px 6px 6px;
     text-align: left;
     width: 90%;
+    opacity: .4;
+    border: 2px dashed #0090CA;
 }
 
 .ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default {
