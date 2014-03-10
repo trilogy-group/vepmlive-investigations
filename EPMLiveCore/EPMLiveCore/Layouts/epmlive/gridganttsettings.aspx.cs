@@ -1318,7 +1318,9 @@ namespace EPMLiveCore.Layouts.epmlive
                                         wpm.CloseWebPart(wpm.WebParts[i]);
                                         wpm.SaveChanges(wpm.WebParts[i]);
                                     }
-                                    else if (wpm.WebParts[i].Title.Equals(list.Title, StringComparison.InvariantCultureIgnoreCase) || (string.IsNullOrEmpty(wpm.WebParts[i].Title)))
+                                    else if (wpm.WebParts[i].ToString() == "Microsoft.SharePoint.WebPartPages.XsltListViewWebPart" ||
+                                        wpm.WebParts[i].ToString() == "Microsoft.SharePoint.WebPartPages.ListFormWebPart" ||
+                                        wpm.WebParts[i].ToString() == "Microsoft.SharePoint.WebPartPages.ListViewWebPart")
                                     {
                                         wpm.OpenWebPart(wpm.WebParts[i]);
                                         wpm.SaveChanges(wpm.WebParts[i]);
@@ -1381,7 +1383,9 @@ namespace EPMLiveCore.Layouts.epmlive
                                         wpm.OpenWebPart(wpm.WebParts[i]);
                                         wpm.SaveChanges(wpm.WebParts[i]);
                                     }
-                                    else if (wpm.WebParts[i].Title.Equals(list.Title, StringComparison.InvariantCultureIgnoreCase) || (string.IsNullOrEmpty(wpm.WebParts[i].Title)))
+                                    else if (wpm.WebParts[i].ToString() == "Microsoft.SharePoint.WebPartPages.XsltListViewWebPart" ||
+                                            wpm.WebParts[i].ToString() == "Microsoft.SharePoint.WebPartPages.ListFormWebPart" ||
+                                            wpm.WebParts[i].ToString() == "Microsoft.SharePoint.WebPartPages.ListViewWebPart")
                                     {
                                         wpm.CloseWebPart(wpm.WebParts[i]);
                                         wpm.SaveChanges(wpm.WebParts[i]);
@@ -1396,7 +1400,7 @@ namespace EPMLiveCore.Layouts.epmlive
                         /* create a new NewForm */
                         dispForm = rootFolder.Files.Add(dispFormUrl, SPTemplateFileType.FormPage);
                     }
-                            
+
                     if (!isFancyFormWPExist)
                     {
                         var wpm = dispForm.GetLimitedWebPartManager(System.Web.UI.WebControls.WebParts.PersonalizationScope.Shared);
