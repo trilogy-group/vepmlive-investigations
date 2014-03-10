@@ -11,6 +11,7 @@ var StopWatchGrid = null;
 var siteId;
 var siteUrl;
 var siteColUrl;
+var periodId;
 var sApplyDates = "";
 var curStoppingRow;
 var curStoppingGrid;
@@ -84,7 +85,13 @@ function esGrid() {
     }
 }
 
-Grids.OnRenderFinish = function (grid) { showribbon(); };
+Grids.OnRenderFinish = function (grid) {
+    showribbon();
+
+    $(".TS_Comments").click(function () {
+        showComments(grid.id);
+    });
+};
 
 Grids.OnClick = function (grid, row, col, x, y, event) {
     setTimeout('showribbon()', 100);
@@ -1706,3 +1713,33 @@ function leavePage() {
 
 window.onbeforeunload = leavePage;
 
+$(function () {
+    ExecuteOrDelayUntilScriptLoaded(ShowApprovalNotification, 'sp.js');
+});
+
+
+function ShowApprovalNotification() {
+    EPMLiveCore.WorkEngineAPI.set_path(siteUrl + '/_vti_bin/WorkEngine.asmx');
+    EPMLiveCore.WorkEngineAPI.ExecuteJSON("timesheet_ShowApprovalNotification", "<ApprovalNotification PeriodId='" + periodId + "' />", function (response) {
+        var oResp = eval("(" + response + ")");
+        if (oResp.ApprovalNotification.Status == "0" && oResp.ApprovalNotification.Text != "0") {
+            updateStatusBox = SP.UI.Status.addStatus('Notification:', 'You have ' + oResp.ApprovalNotification.Text + ' timesheet(s) pending for approval <a href=\'#\' onclick=\'Javascript:DoTmAprrovals();\'>[Timesheet Manager]</a>', true);
+        }
+    });
+}
+
+function DoTmAprrovals() {
+    var surl = siteColUrl + "/Lists/My%20Timesheet/Timesheet%20Managers%20Approval.aspx";
+    var options = { url: surl, showMaximized: true, title: "Approvals", autoSize: false };
+    SP.UI.ModalDialog.showModalDialog(options);
+}
+
+
+
+function showComments(gridId) {
+    var grid = Grids[gridId];
+    var row = grid.ARow;
+    var sUrl = siteUrl + '/_layouts/epmlive/gridaction.aspx?action=comments&webid=' + row['WebID'] + '&listid=' + row['ListID'] + '&ID=' + row['ItemID'];
+    var options = { title: "Comments", allowMaximize: true, showClose: true, url: sUrl };
+    SP.UI.ModalDialog.showModalDialog(options);
+}

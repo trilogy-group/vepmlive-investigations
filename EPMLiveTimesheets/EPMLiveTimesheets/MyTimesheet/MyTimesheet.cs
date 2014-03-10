@@ -397,7 +397,6 @@ namespace TimeSheets
                 counter++;
             }
 
-
             curUrl = curUrl.Trim('&').Trim('?');
             System.Globalization.CultureInfo cInfo = new System.Globalization.CultureInfo(1033);
                     IFormatProvider culture = new System.Globalization.CultureInfo(cInfo.Name, true);
@@ -425,7 +424,7 @@ namespace TimeSheets
                                     TSObject" + sFullGridId + @".Views = " + views.ToJSON() + @";
                                     TSObject" + sFullGridId + @".CurrentView = '" + sCurrentView + @"';
                                     TSObject" + sFullGridId + @".CurrentViewId = '" + sCurrentViewId + @"';
-                                    TSObject" + sFullGridId + @".CanEditViews = " + bCanEditViews.ToString().ToLower() + @";
+                                    TSObject" + sFullGridId + @".CanEditViews = " + bCanEditViews.ToString().ToLower() + @";                                    
 
                                     TSColType = " + TSColType + @";
                                     TSNotes = " + TSNotes + @";
@@ -435,6 +434,7 @@ namespace TimeSheets
                                     siteId = '" + SPContext.Current.Web.ID + @"';
                                     siteUrl = '" + url + @"';
                                     siteColUrl = '" + SPContext.Current.Site.ServerRelativeUrl + @"';
+                                    periodId = '" + sPeriodId + @"';
 
                                     curServerDate = (new Date()).getTime() - (new Date('" + DateTime.Now.ToString("MMMM dd, yyyy H:mm:ss", culture) + @"')).getTime();
 
@@ -444,7 +444,7 @@ namespace TimeSheets
             
 
             output.WriteLine(@"<div align=""center"" id=""TSLoader" + sFullGridId + @""" width=""100%""><img style=""vertical-align:middle;"" src=""/_layouts/images/gears_anv4.gif""/>&nbsp;Loading Items...</div>");
-            
+
             output.WriteLine("<div style=\"width:100%\">");
             output.WriteLine(@"<treegrid Data_Url=""" + url + @"/_vti_bin/WorkEngine.asmx"" Data_Timeout=""0"" Data_Method=""Soap"" Data_Function=""Execute"" Data_Namespace=""workengine.com"" Data_Param_Function=""timesheet_GetTimesheetGrid"" Data_Param_Dataxml=""" + sDataParam + @""" 
                                 Layout_Url=""" + url + @"/_vti_bin/WorkEngine.asmx"" Layout_Timeout=""0"" Layout_Method=""Soap"" Layout_Function=""Execute"" Layout_Namespace=""workengine.com"" Layout_Param_Function=""timesheet_GetTimesheetGridLayout"" Layout_Param_Dataxml=""" + sLayoutParam + @""" 

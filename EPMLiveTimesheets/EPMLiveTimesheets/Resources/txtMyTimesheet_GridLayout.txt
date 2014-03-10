@@ -9,7 +9,7 @@
 	<Cfg StaticCursor="1" Dragging="0" SelectingCells="1" SelectClass="0" Selecting="0"/>
 	<Cfg NoTreeLines="1" DetailOn="0" MinRowHeight="25" MaxRowHeight="25" MenuColumnsSort="1" StandardFilter="2"/>
 	<Cfg Paging="2" NoPager="1" ChildParts="2" InEditMode ="2" ShowDeleted="0"/>
-	<Def>
+	<Def>		
 		<D GroupEmpty="0" Name="R" Calculated="1" Wrap="0" HoverCell="0" HoverRow="Class" FocusCell="Border" FocusRow="0" ShowHint="0" NoColorState="1" CanEdit="0" CalcOrder="TSTotals,Progress,ProgressHtmlPrefix" />
 		<D TitleGroupEmpty="0" GroupEmpty="0" Name="Group" Calculated="1" CanFilter="2" Class="TSBold" CalcOrder="TSTotals" Expanded="1" />
 	</Def>
@@ -30,8 +30,9 @@
 		<C Name="ItemID" Visible="0" CanFilter="0" CanGroup="0" CanHide="0" />
 		<C Name="ListID" Visible="0" CanFilter="0" CanGroup="0" CanHide="0" />
 		<C Name="WebID" Visible="0" CanFilter="0" CanGroup="0" CanHide="0" />
-		<C Name="SiteID" Visible="0" CanFilter="0" CanGroup="0" CanHide="0" />
-		<C Name="TSOtherHours" Visible="0" CanFilter="0" CanGroup="0" CanHide="0" Type="Float" />
+		<C Name="SiteID" Visible="0" CanFilter="0" CanGroup="0" CanHide="0" />		
+		<C Name="TSOtherHours" Visible="0" CanFilter="0" CanGroup="0" CanHide="0" Type="Float" />		
+		<C Name="Comments" Type="Html" Width="70" CanFilter="0" CanGroup="0" CanResize="0" CanSort="0" />
 		<C Name="Title" Type="Html" RelWidth="100" MinWidth="100" CanGroup="0" CanHide="0" GroupEmpty="0"/>
 		<C Name="WorkTypeField" Type="Html" GroupEmpty="0" />
 	</LeftCols>

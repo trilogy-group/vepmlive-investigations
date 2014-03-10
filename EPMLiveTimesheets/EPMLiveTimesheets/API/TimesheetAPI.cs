@@ -7,6 +7,7 @@ using System.Data.SqlClient;
 using System.Xml;
 using System.Data;
 using System.Collections;
+using EPMLiveCore.ReportingProxy;
 
 namespace TimeSheets
 {
@@ -840,6 +841,81 @@ namespace TimeSheets
             {
                 return "<StopWatch Status=\"1\">Error: " + ex.Message + "</StopWatch>";
             }
+        }
+
+        public static string ShowApprovalNotification(string data, SPWeb oWeb)
+        {
+            try
+            {
+                XmlDocument doc = new XmlDocument();
+                doc.LoadXml(data);
+
+                string userId = "";
+                string periodId = "";
+
+                periodId = doc.FirstChild.Attributes["PeriodId"].Value;
+
+                SPUser user = GetUser(oWeb, userId);
+
+                string sql_getUserIDs = string.Empty;
+                string sql_getApprovalCount = string.Empty;
+                DataTable dtUserID = null;
+                int approvalCount = 0;
+
+
+                sql_getUserIDs = "select SharePointAccountID from LSTResourcepool where TimesheetManagerID = " + user.ID;
+
+                var queryExecutor = new QueryExecutor(oWeb);
+                dtUserID = queryExecutor.ExecuteReportingDBQuery(sql_getUserIDs, new Dictionary<string, object> { });
+
+
+                if (dtUserID != null && dtUserID.Rows.Count > 0)
+                {
+                    SqlConnection cn = null;
+                    StringBuilder sharePointAccountIDs = new StringBuilder();
+                    String userIDs;
+
+                    SPSecurity.RunWithElevatedPrivileges(delegate()
+                    {
+                        cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id));
+                        cn.Open();
+                    });
+
+                    foreach (DataRow row in dtUserID.Rows)
+                    {
+                        sharePointAccountIDs.Append(string.Format("{0},", row["SharePointAccountID"]));
+                    }
+
+                    if (sharePointAccountIDs.Length > 0)
+                    {
+                        userIDs = sharePointAccountIDs.ToString().Substring(0, sharePointAccountIDs.ToString().Length - 1);
+
+                        sql_getApprovalCount = "select count(*) as ApprovalCount from TSTIMESHEET where TSUSER_UID in (select TSUSERUID from TSUSER where USER_ID in (" + @userIDs + ") and SUBMITTED = @submitted and APPROVAL_STATUS = @approvalStatus and PERIOD_ID <= @periodId)";
+
+                        using (SqlCommand cmd = new SqlCommand(sql_getApprovalCount, cn))
+                        {
+                            cmd.Parameters.AddWithValue("@userIDs", userIDs);
+                            cmd.Parameters.AddWithValue("@submitted", 1);
+                            cmd.Parameters.AddWithValue("@approvalStatus", 0);
+                            cmd.Parameters.AddWithValue("@periodId", periodId);
+                            var obj = cmd.ExecuteScalar();
+                            approvalCount = Convert.ToInt32(obj);
+                        }
+
+                        cn.Close();
+
+                    }
+
+                }
+
+                return "<ApprovalNotification Status=\"0\">" + approvalCount + "</ApprovalNotification>";
+
+            }
+            catch (Exception ex)
+            {
+                return "<ApprovalNotification Status=\"1\">Error: " + ex.Message + "</ApprovalNotification>";
+            }
+
         }
 
         public static string ApplyHours(string data, SPWeb oWeb)
@@ -1710,6 +1786,10 @@ namespace TimeSheets
 
             attr1 = docData.CreateAttribute("Title");
             attr1.Value = dr["Title"].ToString();
+            ndCol.Attributes.Append(attr1);
+
+            attr1 = docData.CreateAttribute("Comments");
+            attr1.Value = string.Format("<img class='TS_Comments' src='/_layouts/epmlive/images/comment.png' alt='Click here to add comments'/>");
             ndCol.Attributes.Append(attr1);
 
             attr1 = docData.CreateAttribute("WebID");

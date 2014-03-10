@@ -64,3 +64,12 @@ border-color:#92C0E0;
     background-color: #92C0E0;
     cursor:pointer;
 }
+
+img.TS_Comments {
+    background-repeat: no-repeat;
+    height: 20px;
+    line-height: 20px;
+    text-align: center;
+    width: 30px;
+    cursor: pointer;
+}
