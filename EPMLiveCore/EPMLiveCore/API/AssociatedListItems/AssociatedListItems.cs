@@ -251,7 +251,7 @@ namespace EPMLiveCore.API
                 //Set values from parameter
                 Guid listId = new Guid(xDoc.GetElementsByTagName("FancyFormListID")[0].InnerText);
                 string itemId = xDoc.GetElementsByTagName("FancyFormItemID")[0].InnerText;
-                string itemTitle = xDoc.GetElementsByTagName("FancyFormItemTitle")[0].InnerText;
+                string itemTitle = string.Empty;
                 string sourceUrl = HttpUtility.UrlEncode(HttpContext.Current.Request.UrlReferrer.ToString());
 
                 #endregion
@@ -262,6 +262,8 @@ namespace EPMLiveCore.API
                     using (SPWeb spWeb = spSite.OpenWeb(oWeb.ID))
                     {
                         SPList list = spWeb.Lists[listId];
+                        SPListItem currListItem = list.GetItemById(Convert.ToInt32(itemId));
+                        itemTitle = currListItem.Title;
 
                         arrAssociatedLists = EPMLiveCore.API.ListCommands.GetAssociatedLists(list);
 
