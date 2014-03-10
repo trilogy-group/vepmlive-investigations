@@ -250,7 +250,7 @@
                 outsidewidth_tmp = this.offsetLeft + this.offsetWidth;
             }
 
-            insidewidth += Math.round(this.getBoundingClientRect().width * 100) / 100;
+            insidewidth += Math.ceil(this.getBoundingClientRect().width * 100) / 100;
 
 
         })
