@@ -1,4 +1,4 @@
-﻿<%@ Assembly Name="$SharePoint.Project.AssemblyFullName$" %>
+<%@ Assembly Name="$SharePoint.Project.AssemblyFullName$" %>
 <%@ Assembly Name="Microsoft.Web.CommandUI, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
 <%@ Register TagPrefix="SharePoint" Namespace="Microsoft.SharePoint.WebControls" Assembly="Microsoft.SharePoint, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
 <%@ Register TagPrefix="Utilities" Namespace="Microsoft.SharePoint.Utilities" Assembly="Microsoft.SharePoint, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
@@ -13,7 +13,9 @@
         font-size: 13px;
         font-weight: 300;
         color: #555555;
-        width: 900px;
+        width: 100%;
+        height: 100%;
+        /*width: 900px;*/
         /*min-width: 900px;*/
     }
 
@@ -59,6 +61,7 @@
         .fancy-col-table tr td {
             font-size: 1em;
             padding-bottom: 5px;
+            width: 150px;
         }
 
     .fancyDisplayForm .dispFormContent {
@@ -190,14 +193,6 @@
 
     $(function () {
 
-        var bodyWidth = $(window).width() - 200;
-        $(".fancy-display-form-wrapper").width(bodyWidth);
-
-        $(window).resize(function () {
-            var bodyWidth = $(window).width();
-            $(".fancy-display-form-wrapper").width(bodyWidth);
-        });
-
         FancyDispFormClient.fillWebPartData();
 
         window.SP.SOD.notifyScriptLoadedAndExecuteWaitingJobs('EPMLive.Navigation.js');
@@ -287,54 +282,50 @@
 
         fillWebPartData: function () {
 
-            $("#<%=divFancyDispFormAssociatedItemsContent.ClientID%>").hide();
-
             $.ajax({
                 type: "POST",
                 url: "<%=SPContext.Current.Web.Url%>/_vti_bin/WorkEngine.asmx/Execute",
-                data: "{Function : 'GetFancyFormAssociatedItems' , Dataxml: '<FancyFormAssociatedItems><FancyFormListID><%=SPContext.Current.ListId%></FancyFormListID><FancyFormItemID><%=SPContext.Current.ItemId%></FancyFormItemID><FancyFormItemTitle><%=SPContext.Current.ListItem.Title%></FancyFormItemTitle></FancyFormAssociatedItems>'}",
+                data: "{Function : 'GetFancyFormAssociatedItems' , Dataxml: '<FancyFormAssociatedItems><FancyFormListID><%=SPContext.Current.ListId%></FancyFormListID><FancyFormItemID><%=SPContext.Current.ItemId%></FancyFormItemID></FancyFormAssociatedItems>'}",
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
                 success: function (response) {
 
                     $("#<%=divFancyDispFormAssociatedItemsContent.ClientID%>").html("");
-                        $("#<%=divFancyDispFormAssociatedItemsContent.ClientID%>").html(response.d.toString().replace("<Result Status=\"0\">", "").replace("</Result>", ""));
+                    $("#<%=divFancyDispFormAssociatedItemsContent.ClientID%>").html(response.d.toString().replace("<Result Status=\"0\">", "").replace("</Result>", ""));
 
+                    $(".slidingDiv").hide();
+
+                    $(".listMainDiv").mouseover(function () {
                         $(".slidingDiv").hide();
+                        $(this).find(".slidingDiv").show();
+                    });
 
-                        $(".listMainDiv").mouseover(function () {
-                            $(".slidingDiv").hide();
-                            $(this).find(".slidingDiv").show();
+                    $(".slidingDiv").mouseover(function () {
+                        $(this).show();
+                    });
+
+                    $("#<%=divFancyDispFormAssociatedItemsContent.ClientID%>").mouseout(function () {
+                        $(".slidingDiv").hide();
+                    });
+
+                    var addContextualMenu = function () {
+                        $(".fancyDisplayFormAssociatedItemsContextMenu").each(function () {
+                            window.epmLiveNavigation.addContextualMenu($(this), null, true);
                         });
+                    };
 
-                        $(".slidingDiv").mouseover(function () {
-                            $(this).show();
-                        });
-
-                        $("#<%=divFancyDispFormAssociatedItemsContent.ClientID%>").mouseout(function () {
-                            $(".slidingDiv").hide();
-                        });
-
-                        var addContextualMenu = function () {
-                            $(".fancyDisplayFormAssociatedItemsContextMenu").each(function () {
-                                window.epmLiveNavigation.addContextualMenu($(this), null, true);
-                            });
-                        };
-
-                        window.ExecuteOrDelayUntilScriptLoaded(addContextualMenu, 'EPMLive.Navigation.js');
-
-                        $("#<%=divFancyDispFormAssociatedItemsContent.ClientID%>").show();
-                    }
+                    window.ExecuteOrDelayUntilScriptLoaded(addContextualMenu, 'EPMLive.Navigation.js');
+                }
             });
         }
     }
 </script>
 
-<div style="text-align: right;">
-    <asp:Button ID="btnCancel1" runat="server" Text="Close" OnClick="btnCancel_Click" />
-</div>
+<div class="fancy-display-form-wrapper" id="divFancyDisplayForm" runat="server" style="width: 100%">
 
-<div class="fancy-display-form-wrapper" id="divFancyDisplayForm" runat="server">
+    <div style="text-align: right; float: right;">
+        <asp:Button ID="btnCancel1" runat="server" Text="Close" OnClick="btnCancel_Click" />
+    </div>
 
     <div class="dispFormFancyTitle">
         <asp:Label ID="lblItemTitle" runat="server" CssClass="dispFormFancyTitle" Text=""></asp:Label>
@@ -454,8 +445,9 @@
 
     <div class="fancyDisplayForm dispFormContent" id="divItemDetailParent" runat="server" style="float: right; width: 100%;">
     </div>
-</div>
 
-<div style="text-align: right; float:right;">
-    <asp:Button ID="btnCancel2" runat="server" Text="Close" OnClick="btnCancel_Click" />
+    <div style="text-align: right; float: right;">
+        <asp:Button ID="btnCancel2" runat="server" Text="Close" OnClick="btnCancel_Click" />
+    </div>
+
 </div>

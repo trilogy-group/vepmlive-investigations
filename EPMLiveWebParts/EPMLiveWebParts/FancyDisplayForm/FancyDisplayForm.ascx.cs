@@ -20,10 +20,10 @@ namespace EPMLiveWebParts
     {
         #region Variables and Constants
 
-        const int QUICK_DETAILS_SECTION_ONE_FIELD_COUNT = 6;
-        const int QUICK_DETAILS_SECTION_TOTAL_FIELD_COUNT = 12;
+        const int QUICK_DETAILS_SECTION_ONE_FIELD_COUNT = 8;
+        const int QUICK_DETAILS_SECTION_TOTAL_FIELD_COUNT = 16;
         const int NARRATIVE_DETAILS_SECTION_FIELD_COUNT = 2;
-        const int PEOPLE_DETAILS_SECTION_FIELD_COUNT = 5;
+        const int PEOPLE_DETAILS_SECTION_FIELD_COUNT = 3;
         const int DATE_DETAILS_SECTION_FIELD_COUNT = 2;
         const int NUMBER_OF_PEOPLE_PER_FIELD_DISPLAY = 3;
 
@@ -155,6 +155,7 @@ namespace EPMLiveWebParts
             if (list != null && item != null)
             {
                 lblItemTitle.Text = Convert.ToString(item["Title"]);
+
                 GridGanttSettings gSettings = new GridGanttSettings(list);
 
                 if (gSettings.DisplaySettings != "")
@@ -558,6 +559,27 @@ namespace EPMLiveWebParts
             string userName = string.Empty;
             string userID = string.Empty;
 
+            if (peopleDetailsFieldsCount == 0)
+            {
+                sbPeopleDetailsContent.Append("<table style='width: 100%'><tr><td><table class='fancy-col-table'>");
+            }
+            else if (peopleDetailsFieldsCount == PEOPLE_DETAILS_SECTION_FIELD_COUNT)
+            {
+                sbPeopleDetailsContent.Append("</table></td></tr></table>");
+                sbPeopleDetailsShowAllRegion.Append("<table class='fancy-col-table'>");
+            }
+
+            if (peopleDetailsFieldsCount < PEOPLE_DETAILS_SECTION_FIELD_COUNT)
+            {
+                sbPeopleDetailsContent.Append("<tr>");
+                sbPeopleDetailsContent.Append("<td>" + fieldName + "</td>");
+            }
+            else
+            {
+                sbPeopleDetailsShowAllRegion.Append("<tr>");
+                sbPeopleDetailsShowAllRegion.Append("<td>" + fieldName + "</td>");
+            }
+
             if (!string.IsNullOrEmpty(fieldValue) && fieldValue.Contains(";#"))
             {
                 int i = 0; //13;#Bhavdip Shah;#48;#Dhaval Upadyay;#2;#WSS - Retrieve only user id...
@@ -582,27 +604,6 @@ namespace EPMLiveWebParts
 
                     if (dtUserDetails != null && dtUserDetails.Rows.Count > 0)
                     {
-                        if (peopleDetailsFieldsCount == 0)
-                        {
-                            sbPeopleDetailsContent.Append("<table style='width: 100%'><tr><td><table class='fancy-col-table'>");
-                        }
-                        else if (peopleDetailsFieldsCount == PEOPLE_DETAILS_SECTION_FIELD_COUNT)
-                        {
-                            sbPeopleDetailsContent.Append("</table></td></tr></table>");
-                            sbPeopleDetailsShowAllRegion.Append("<table class='fancy-col-table'>");
-                        }
-
-                        if (peopleDetailsFieldsCount < PEOPLE_DETAILS_SECTION_FIELD_COUNT)
-                        {
-                            sbPeopleDetailsContent.Append("<tr>");
-                            sbPeopleDetailsContent.Append("<td>" + fieldName + "</td>");
-                        }
-                        else
-                        {
-                            sbPeopleDetailsShowAllRegion.Append("<tr>");
-                            sbPeopleDetailsShowAllRegion.Append("<td>" + fieldName + "</td>");
-                        }
-
                         for (int user = 0; user < dtUserDetails.Rows.Count; user++)
                         {
                             imageUrl = Convert.ToString(dtUserDetails.Rows[user]["Picture"]);
@@ -614,9 +615,9 @@ namespace EPMLiveWebParts
                                 sbPeopleDetailsContent.Append("<td style='text-align: right'>");
 
                                 if (!string.IsNullOrEmpty(imageUrl))
-                                    sbPeopleDetailsContent.Append("<img alt='" + userName + "' src='" + imageUrl.Remove(imageUrl.IndexOf(", ")) + "' class='dispFormUserImage' /></td>");
+                                    sbPeopleDetailsContent.Append("<img alt='' src='" + imageUrl.Remove(imageUrl.IndexOf(", ")) + "' class='dispFormUserImage' /></td>");
                                 else
-                                    sbPeopleDetailsContent.Append("<img alt='" + userName + "' src='../_layouts/images/User.png' class='dispFormUserImage' /></td>");
+                                    sbPeopleDetailsContent.Append("<img alt='' src='" + SPContext.Current.Web.Url + "/_layouts/images/User.png' class='dispFormUserImage' /></td>");
 
                                 sbPeopleDetailsContent.Append("<td style='vertical-align: middle'>");
                                 sbPeopleDetailsContent.Append("<a class='ms-subtleLink' onclick='GoToLinkOrDialogNewWindow(this);return false;' href='" + SPContext.Current.Web.Url + "/_layouts/15/userdisp.aspx?ID=" + userID + "'>" + userName + "</a>" + "&nbsp;&nbsp;</td>");
@@ -634,9 +635,9 @@ namespace EPMLiveWebParts
                                 sbPeopleDetailsShowAllRegion.Append("<td style='text-align: right'>");
 
                                 if (!string.IsNullOrEmpty(imageUrl))
-                                    sbPeopleDetailsShowAllRegion.Append("<img alt='" + userName + "' src='" + imageUrl.Remove(imageUrl.IndexOf(", ")) + "' class='dispFormUserImage' /></td>");
+                                    sbPeopleDetailsShowAllRegion.Append("<img alt='' src='" + imageUrl.Remove(imageUrl.IndexOf(", ")) + "' class='dispFormUserImage' /></td>");
                                 else
-                                    sbPeopleDetailsShowAllRegion.Append("<img alt='" + userName + "' src='../_layouts/images/User.png' class='dispFormUserImage' /></td>");
+                                    sbPeopleDetailsShowAllRegion.Append("<img alt='' src='" + SPContext.Current.Web.Url + "/_layouts/images/User.png' class='dispFormUserImage' /></td>");
 
                                 sbPeopleDetailsShowAllRegion.Append("<td style='vertical-align: middle'>");
                                 sbPeopleDetailsShowAllRegion.Append("<a class'ms-subtleLink' onclick='GoToLinkOrDialogNewWindow(this);return false;' href='" + SPContext.Current.Web.Url + "/_layouts/15/userdisp.aspx?ID=" + userID + "'>" + userName + "</a>" + "&nbsp;&nbsp;</td>");
@@ -650,14 +651,45 @@ namespace EPMLiveWebParts
                                 }
                             }
                         }
-
+                    }
+                    else
+                    {
                         if (peopleDetailsFieldsCount < PEOPLE_DETAILS_SECTION_FIELD_COUNT)
+                        {
+                            sbPeopleDetailsContent.Append("<td>&nbsp;</td>");
+                            sbPeopleDetailsContent.Append("<td>&nbsp;</td>");
                             sbPeopleDetailsContent.Append("</tr>");
+                            if ((peopleDetailsFieldsCount) == NUMBER_OF_PEOPLE_PER_FIELD_DISPLAY)
+                            {
+                                sbPeopleDetailsContent.Append("</tr>");
+                                sbPeopleDetailsContent.Append("<tr class='ShowMoreRow' style='display: none'>");
+                                sbPeopleDetailsContent.Append("<td>&nbsp;</td>");
+                                sbPeopleDetailsContent.Append("</tr>");
+                            }
+                        }
                         else
+                        {
+                            sbPeopleDetailsShowAllRegion.Append("<td>&nbsp;</td>");
+                            sbPeopleDetailsShowAllRegion.Append("<td>&nbsp;</td>");
                             sbPeopleDetailsShowAllRegion.Append("</tr>");
 
-                        peopleDetailsFieldsCount++;
+                            if ((peopleDetailsFieldsCount) == NUMBER_OF_PEOPLE_PER_FIELD_DISPLAY)
+                            {
+                                sbPeopleDetailsShowAllRegion.Append("</tr>");
+                                sbPeopleDetailsShowAllRegion.Append("<tr class='ShowMoreRow' style='display: none'>");
+                                sbPeopleDetailsShowAllRegion.Append("<td>&nbsp;</td>");
+                                sbPeopleDetailsShowAllRegion.Append("</tr>");
+                            }
+                        }
                     }
+
+                    if (peopleDetailsFieldsCount < PEOPLE_DETAILS_SECTION_FIELD_COUNT)
+                        sbPeopleDetailsContent.Append("</tr>");
+                    else
+                        sbPeopleDetailsShowAllRegion.Append("</tr>");
+
+                    peopleDetailsFieldsCount++;
+
                 }
             }
         }

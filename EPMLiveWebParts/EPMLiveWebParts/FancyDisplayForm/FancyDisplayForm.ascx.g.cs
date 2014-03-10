@@ -88,9 +88,9 @@ namespace EPMLiveWebParts {
         
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl divItemDetailParent;
         
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl divFancyDisplayForm;
-        
         protected global::System.Web.UI.WebControls.Button btnCancel2;
+        
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl divFancyDisplayForm;
         
         public static implicit operator global::System.Web.UI.TemplateControl(FancyDisplayForm target) 
         {
@@ -493,51 +493,6 @@ namespace EPMLiveWebParts {
         }
         
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Never)]
-        private global::System.Web.UI.HtmlControls.HtmlGenericControl @__BuildControldivFancyDisplayForm() {
-            global::System.Web.UI.HtmlControls.HtmlGenericControl @__ctrl;
-            @__ctrl = new global::System.Web.UI.HtmlControls.HtmlGenericControl("div");
-            this.divFancyDisplayForm = @__ctrl;
-            ((System.Web.UI.IAttributeAccessor)(@__ctrl)).SetAttribute("class", "fancy-display-form-wrapper");
-            @__ctrl.ID = "divFancyDisplayForm";
-            System.Web.UI.IParserAccessor @__parser = ((System.Web.UI.IParserAccessor)(@__ctrl));
-            @__parser.AddParsedSubObject(new System.Web.UI.LiteralControl("\r\n\r\n    <div class=\"dispFormFancyTitle\">\r\n        "));
-            global::System.Web.UI.WebControls.Label @__ctrl1;
-            @__ctrl1 = this.@__BuildControllblItemTitle();
-            @__parser.AddParsedSubObject(@__ctrl1);
-            @__parser.AddParsedSubObject(new System.Web.UI.LiteralControl("\r\n    </div>\r\n\r\n    <div class=\"fancyDisplayForm\" style=\"width: 100%; vertical-al" +
-                        "ign: top;\">\r\n\r\n        <div id=\"first-table\">\r\n            <table border=\"0\" sty" +
-                        "le=\"width: 100%\">\r\n                <tr>\r\n                    "));
-            global::System.Web.UI.HtmlControls.HtmlTableCell @__ctrl2;
-            @__ctrl2 = this.@__BuildControldivQuickDetailsParent();
-            @__parser.AddParsedSubObject(@__ctrl2);
-            @__parser.AddParsedSubObject(new System.Web.UI.LiteralControl("\r\n                </tr>\r\n                <tr>\r\n                    "));
-            global::System.Web.UI.HtmlControls.HtmlTableCell @__ctrl3;
-            @__ctrl3 = this.@__BuildControldivNarrativeDetailsParent();
-            @__parser.AddParsedSubObject(@__ctrl3);
-            @__parser.AddParsedSubObject(new System.Web.UI.LiteralControl("\r\n                </tr>\r\n            </table>\r\n        </div>\r\n        <div style" +
-                        "=\"vertical-align: top; display: inline;\">\r\n            <table border=\"0\">\r\n     " +
-                        "           <tr>\r\n                    "));
-            global::System.Web.UI.HtmlControls.HtmlTableCell @__ctrl4;
-            @__ctrl4 = this.@__BuildControldivPeopleDetailsParent();
-            @__parser.AddParsedSubObject(@__ctrl4);
-            @__parser.AddParsedSubObject(new System.Web.UI.LiteralControl("\r\n                </tr>\r\n                <tr>\r\n                    "));
-            global::System.Web.UI.HtmlControls.HtmlTableCell @__ctrl5;
-            @__ctrl5 = this.@__BuildControldivDateDetailsParent();
-            @__parser.AddParsedSubObject(@__ctrl5);
-            @__parser.AddParsedSubObject(new System.Web.UI.LiteralControl("\r\n                </tr>\r\n                <tr>\r\n                    "));
-            global::System.Web.UI.HtmlControls.HtmlTableCell @__ctrl6;
-            @__ctrl6 = this.@__BuildControldivFancyDispFormParent();
-            @__parser.AddParsedSubObject(@__ctrl6);
-            @__parser.AddParsedSubObject(new System.Web.UI.LiteralControl("\r\n                </tr>\r\n            </table>\r\n        </div>\r\n\r\n    </div>\r\n\r\n  " +
-                        "  "));
-            global::System.Web.UI.HtmlControls.HtmlGenericControl @__ctrl7;
-            @__ctrl7 = this.@__BuildControldivItemDetailParent();
-            @__parser.AddParsedSubObject(@__ctrl7);
-            @__parser.AddParsedSubObject(new System.Web.UI.LiteralControl("\r\n"));
-            return @__ctrl;
-        }
-        
-        [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Never)]
         private global::System.Web.UI.WebControls.Button @__BuildControlbtnCancel2() {
             global::System.Web.UI.WebControls.Button @__ctrl;
             @__ctrl = new global::System.Web.UI.WebControls.Button();
@@ -551,17 +506,65 @@ namespace EPMLiveWebParts {
         }
         
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Never)]
-        private void @__BuildControlTree(global::EPMLiveWebParts.FancyDisplayForm @__ctrl) {
+        private global::System.Web.UI.HtmlControls.HtmlGenericControl @__BuildControldivFancyDisplayForm() {
+            global::System.Web.UI.HtmlControls.HtmlGenericControl @__ctrl;
+            @__ctrl = new global::System.Web.UI.HtmlControls.HtmlGenericControl("div");
+            this.divFancyDisplayForm = @__ctrl;
+            ((System.Web.UI.IAttributeAccessor)(@__ctrl)).SetAttribute("class", "fancy-display-form-wrapper");
+            @__ctrl.ID = "divFancyDisplayForm";
+            ((System.Web.UI.IAttributeAccessor)(@__ctrl)).SetAttribute("style", "width: 100%");
+            System.Web.UI.IParserAccessor @__parser = ((System.Web.UI.IParserAccessor)(@__ctrl));
+            @__parser.AddParsedSubObject(new System.Web.UI.LiteralControl("\r\n\r\n    <div style=\"text-align: right; float: right;\">\r\n        "));
             global::System.Web.UI.WebControls.Button @__ctrl1;
             @__ctrl1 = this.@__BuildControlbtnCancel1();
+            @__parser.AddParsedSubObject(@__ctrl1);
+            @__parser.AddParsedSubObject(new System.Web.UI.LiteralControl("\r\n    </div>\r\n\r\n    <div class=\"dispFormFancyTitle\">\r\n        "));
+            global::System.Web.UI.WebControls.Label @__ctrl2;
+            @__ctrl2 = this.@__BuildControllblItemTitle();
+            @__parser.AddParsedSubObject(@__ctrl2);
+            @__parser.AddParsedSubObject(new System.Web.UI.LiteralControl("\r\n    </div>\r\n\r\n    <div class=\"fancyDisplayForm\" style=\"width: 100%; vertical-al" +
+                        "ign: top;\">\r\n\r\n        <div id=\"first-table\">\r\n            <table border=\"0\" sty" +
+                        "le=\"width: 100%\">\r\n                <tr>\r\n                    "));
+            global::System.Web.UI.HtmlControls.HtmlTableCell @__ctrl3;
+            @__ctrl3 = this.@__BuildControldivQuickDetailsParent();
+            @__parser.AddParsedSubObject(@__ctrl3);
+            @__parser.AddParsedSubObject(new System.Web.UI.LiteralControl("\r\n                </tr>\r\n                <tr>\r\n                    "));
+            global::System.Web.UI.HtmlControls.HtmlTableCell @__ctrl4;
+            @__ctrl4 = this.@__BuildControldivNarrativeDetailsParent();
+            @__parser.AddParsedSubObject(@__ctrl4);
+            @__parser.AddParsedSubObject(new System.Web.UI.LiteralControl("\r\n                </tr>\r\n            </table>\r\n        </div>\r\n        <div style" +
+                        "=\"vertical-align: top; display: inline;\">\r\n            <table border=\"0\">\r\n     " +
+                        "           <tr>\r\n                    "));
+            global::System.Web.UI.HtmlControls.HtmlTableCell @__ctrl5;
+            @__ctrl5 = this.@__BuildControldivPeopleDetailsParent();
+            @__parser.AddParsedSubObject(@__ctrl5);
+            @__parser.AddParsedSubObject(new System.Web.UI.LiteralControl("\r\n                </tr>\r\n                <tr>\r\n                    "));
+            global::System.Web.UI.HtmlControls.HtmlTableCell @__ctrl6;
+            @__ctrl6 = this.@__BuildControldivDateDetailsParent();
+            @__parser.AddParsedSubObject(@__ctrl6);
+            @__parser.AddParsedSubObject(new System.Web.UI.LiteralControl("\r\n                </tr>\r\n                <tr>\r\n                    "));
+            global::System.Web.UI.HtmlControls.HtmlTableCell @__ctrl7;
+            @__ctrl7 = this.@__BuildControldivFancyDispFormParent();
+            @__parser.AddParsedSubObject(@__ctrl7);
+            @__parser.AddParsedSubObject(new System.Web.UI.LiteralControl("\r\n                </tr>\r\n            </table>\r\n        </div>\r\n\r\n    </div>\r\n\r\n  " +
+                        "  "));
+            global::System.Web.UI.HtmlControls.HtmlGenericControl @__ctrl8;
+            @__ctrl8 = this.@__BuildControldivItemDetailParent();
+            @__parser.AddParsedSubObject(@__ctrl8);
+            @__parser.AddParsedSubObject(new System.Web.UI.LiteralControl("\r\n\r\n    <div style=\"text-align: right; float: right;\">\r\n        "));
+            global::System.Web.UI.WebControls.Button @__ctrl9;
+            @__ctrl9 = this.@__BuildControlbtnCancel2();
+            @__parser.AddParsedSubObject(@__ctrl9);
+            @__parser.AddParsedSubObject(new System.Web.UI.LiteralControl("\r\n    </div>\r\n\r\n"));
+            return @__ctrl;
+        }
+        
+        [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Never)]
+        private void @__BuildControlTree(global::EPMLiveWebParts.FancyDisplayForm @__ctrl) {
+            global::System.Web.UI.HtmlControls.HtmlGenericControl @__ctrl1;
+            @__ctrl1 = this.@__BuildControldivFancyDisplayForm();
             System.Web.UI.IParserAccessor @__parser = ((System.Web.UI.IParserAccessor)(@__ctrl));
             @__parser.AddParsedSubObject(@__ctrl1);
-            global::System.Web.UI.HtmlControls.HtmlGenericControl @__ctrl2;
-            @__ctrl2 = this.@__BuildControldivFancyDisplayForm();
-            @__parser.AddParsedSubObject(@__ctrl2);
-            global::System.Web.UI.WebControls.Button @__ctrl3;
-            @__ctrl3 = this.@__BuildControlbtnCancel2();
-            @__parser.AddParsedSubObject(@__ctrl3);
             @__ctrl.SetRenderMethodDelegate(new System.Web.UI.RenderMethod(this.@__Render__control1));
         }
         
@@ -570,115 +573,110 @@ namespace EPMLiveWebParts {
             @__w.Write("\r\n\r\n<style type=\"text/css\">\r\n    .fancy-display-form-wrapper {\r\n        font-fami" +
                     "ly: \"Open Sans\",\"Segoe UI\",\"Segoe\",Tahoma,Helvetica,Arial,sans-serif;\r\n        f" +
                     "ont-size: 13px;\r\n        font-weight: 300;\r\n        color: #555555;\r\n        wid" +
-                    "th: 900px;\r\n        /*min-width: 900px;*/\r\n    }\r\n\r\n    .fancyDisplayForm {\r\n   " +
-                    "     background-color: #ffffff;\r\n        vertical-align: middle;\r\n        outlin" +
-                    "e: none;\r\n        resize: none;\r\n        display: inline-block;\r\n        -webkit" +
-                    "-font-smoothing: antialiased;\r\n        -moz-osx-font-smoothing: grayscale;\r\n    " +
-                    "    width: 100%;\r\n    }\r\n\r\n        .fancyDisplayForm #first-table {\r\n           " +
-                    " vertical-align: top;\r\n            float: left;\r\n            margin-right: 20px;" +
-                    "\r\n            width: 63.5%;\r\n        }\r\n\r\n    .fancy-display-header {\r\n        b" +
-                    "order-bottom: 1px solid #EEEEEE;\r\n        cursor: auto;\r\n        font-size: 1.4e" +
-                    "m;\r\n        padding-bottom: 5px;\r\n        padding-top: 5px;\r\n        font-weight" +
-                    ": 400;\r\n    }\r\n\r\n        .fancy-display-header span {\r\n            color: #55555" +
-                    "5;\r\n        }\r\n\r\n    .fancy-col-table {\r\n    }\r\n\r\n        .fancy-col-table tr td" +
-                    ":first-child {\r\n            width: 150px;\r\n            font-weight: 400;\r\n      " +
-                    "  }\r\n\r\n        .fancy-col-table tr td {\r\n            font-size: 1em;\r\n          " +
-                    "  padding-bottom: 5px;\r\n        }\r\n\r\n    .fancyDisplayForm .dispFormContent {\r\n " +
-                    "       display: block;\r\n        width: 100%;\r\n        padding-top: 5px;\r\n    }\r\n" +
-                    "\r\n    .fancy-display-form-wrapper .dispFormExpandHeader {\r\n        cursor: point" +
-                    "er;\r\n        display: inline-block;\r\n        padding-bottom: 5px;\r\n        color" +
-                    ": #0090CA;\r\n    }\r\n\r\n        .fancy-display-form-wrapper .dispFormExpandHeader s" +
-                    "pan:first-child {\r\n            color: #0090CA;\r\n            padding-right: 5px;\r" +
-                    "\n            position: relative;\r\n            top: 1px;\r\n            font-size: " +
-                    ".9em;\r\n        }\r\n\r\n    .fancy-display-form-wrapper .dispFormFancyTitle {\r\n     " +
-                    "   display: inline-block;\r\n        padding-bottom: 5px;\r\n    }\r\n\r\n        .fancy" +
-                    "-display-form-wrapper .dispFormFancyTitle span {\r\n            font-size: 2em;\r\n " +
-                    "       }\r\n\r\n    .fancy-display-form-wrapper .dispFormUserImage {\r\n        fit-po" +
-                    "sition: slice;\r\n        height: 22px;\r\n        width: 23px;\r\n        text-align:" +
-                    " center;\r\n    }\r\n\r\n    .fancy-display-form-wrapper .dispFormExpandMore {\r\n      " +
-                    "  cursor: pointer;\r\n        display: inline-block;\r\n        color: #0090CA;\r\n   " +
-                    "     font-size: 12px;\r\n        padding-top: 7px;\r\n    }\r\n\r\n    .badge {\r\n       " +
-                    " display: inline-block;\r\n        min-width: 14px;\r\n        padding: 2px 8px;\r\n  " +
-                    "      font-size: 12px;\r\n        font-weight: 700;\r\n        color: #fff;\r\n       " +
-                    " line-height: 1;\r\n        vertical-align: baseline;\r\n        white-space: nowrap" +
-                    ";\r\n        text-align: center;\r\n        background-color: #999;\r\n        border-" +
-                    "radius: 10px;\r\n    }\r\n\r\n        .badge:hover {\r\n            background-color: #0" +
-                    "090CA;\r\n        }\r\n\r\n\r\n    /* Small devices */\r\n    @media (max-width: 768px) {\r" +
-                    "\n        .fancyDisplayForm #first-table {\r\n            float: none;\r\n        }\r\n" +
-                    "\r\n        .fancyDisplayForm #first-table {\r\n            width: 100%;\r\n        }\r" +
-                    "\n    }\r\n\r\n    .fancy-display-form-wrapper .slidingDiv {\r\n        width: 100%;\r\n " +
-                    "       padding: 20px;\r\n        border: 1px thin black;\r\n        -webkit-box-shad" +
-                    "ow: 0px 3px 20px rgba(50, 50, 50, 0.8);\r\n        -moz-box-shadow: 0px 3px 20px r" +
-                    "gba(50, 50, 50, 0.8);\r\n        box-shadow: 0px 3px 20px rgba(50, 50, 50, 0.8);\r\n" +
-                    "        position: absolute;\r\n        width: 200px;\r\n        background-color: wh" +
-                    "ite;\r\n        text-align: left;\r\n        z-index: 1503;\r\n    }\r\n\r\n    .fancy-dis" +
-                    "play-form-wrapper .slidingDivClose {\r\n        float: right;\r\n        font-size: " +
-                    "large;\r\n    }\r\n\r\n    .fancy-display-form-wrapper .slidingDivHeader {\r\n        bo" +
-                    "rder-bottom: 1px solid #EEEEEE;\r\n        cursor: auto;\r\n        font-size: 1.4em" +
-                    ";\r\n        padding-bottom: 5px;\r\n        padding-top: 5px;\r\n        font-weight:" +
-                    " 400;\r\n        color: #555555;\r\n    }\r\n\r\n    .fancy-display-form-wrapper .slidin" +
-                    "gDivAdd {\r\n        float: right;\r\n        left: 173px;\r\n        position: inheri" +
-                    "t;\r\n        top: 21px;\r\n    }\r\n\r\n    .fancy-display-form-wrapper .listMainDiv {\r" +
-                    "\n        float: left;\r\n        padding: 5px;\r\n        margin-right: 5px;\r\n    }\r" +
-                    "\n\r\n    .fancyDisplayFormAssociatedItemsContextMenu {\r\n        list-style: none;\r" +
-                    "\n        cursor: pointer;\r\n        position: absolute;\r\n    }\r\n</style>\r\n\r\n<scri" +
-                    "pt type=\"text/javascript\">\r\n\r\n    $(function () {\r\n\r\n        var bodyWidth = $(w" +
-                    "indow).width() - 200;\r\n        $(\".fancy-display-form-wrapper\").width(bodyWidth)" +
-                    ";\r\n\r\n        $(window).resize(function () {\r\n            var bodyWidth = $(windo" +
-                    "w).width();\r\n            $(\".fancy-display-form-wrapper\").width(bodyWidth);\r\n   " +
-                    "     });\r\n\r\n        FancyDispFormClient.fillWebPartData();\r\n\r\n        window.SP." +
-                    "SOD.notifyScriptLoadedAndExecuteWaitingJobs(\'EPMLive.Navigation.js\');\r\n\r\n       " +
-                    " $(\".fancy-display-form-wrapper .dispFormExpandHeader\").click(function () {\r\n   " +
-                    "         $header = $(this);\r\n            $content = $header.next();\r\n           " +
-                    " $content.slideToggle(100, function () {\r\n            });\r\n            if ($(thi" +
-                    "s).find(\"span:first\").hasClass(\"icon-plus-circle-2\")) {\r\n                $(this)" +
-                    ".find(\"span:first\").removeClass(\"icon-plus-circle-2\").addClass(\"icon-minus-circl" +
-                    "e-2\");\r\n                $(this).find(\"span:last\").text(\"hide\");\r\n            }\r\n" +
-                    "            else {\r\n                $(this).find(\"span:first\").removeClass(\"icon" +
-                    "-minus-circle-2\").addClass(\"icon-plus-circle-2\");\r\n                $(this).find(" +
-                    "\"span:last\").text(\"show\");\r\n            }\r\n        });\r\n\r\n        $(\".dispFormEx" +
-                    "pandMore\").click(function () {\r\n            $header = $(this);\r\n            $hea" +
-                    "der.closest(\'tr\').next(\'.ShowMoreRow\').toggle();\r\n        });\r\n    });\r\n\r\n    Fa" +
-                    "ncyDispFormClient = {\r\n\r\n        showItemUrl: function (weburl) {\r\n            $" +
-                    ".ajax({\r\n                type: \"POST\",\r\n                url: weburl,\r\n          " +
-                    "      success: function (ticket) {\r\n                    if (ticket.indexOf(\"Gene" +
-                    "ral Error\") != 0) {\r\n                        var listInfo = ticket.split(\'|\');\r\n" +
-                    "\r\n                        var viewSiteContentUrl = listInfo[0] + \"/_layouts/epml" +
-                    "ive/gridaction.aspx?action=FancyDispForm&list=\" + listInfo[3] + \"&field=\" + list" +
-                    "Info[1] + \"&LookupFieldList=\" + listInfo[2] + \"&Source=\" + document.location.hre" +
-                    "f;\r\n                        var options = { url: viewSiteContentUrl, showMaximiz" +
-                    "ed: true };\r\n                        SP.SOD.execute(\'SP.UI.Dialog.js\', \'SP.UI.Mo" +
-                    "dalDialog.showModalDialog\', options);\r\n                    }\r\n                  " +
-                    "  else {\r\n                        alert(ticket);\r\n                    }\r\n       " +
-                    "         }\r\n            });\r\n        },\r\n\r\n        showNewForm: function (weburl" +
-                    ") {\r\n            var options = { url: weburl, showMaximized: false, dialogReturn" +
-                    "ValueCallback: function (dialogResult) { FancyDispFormClient.fillWebPartData(); " +
-                    "} };\r\n            SP.SOD.execute(\'SP.UI.Dialog.js\', \'SP.UI.ModalDialog.showModal" +
-                    "Dialog\', options);\r\n        },\r\n\r\n        showItemPopup: function (siteurl, webi" +
-                    "d, listid, itemid) {\r\n            showSharePointPopup(siteurl + \'/_layouts/epmli" +
-                    "ve/gridaction.aspx?action=getcontextmenus&webid=\' + webid +\r\n                \'&l" +
-                    "istid=\' + listid + \'&ID=\' + itemid, null, false, true, null, {\r\n                " +
-                    "    gridId: \"myDiv\",\r\n                    rowId: \"myDiv\",\r\n                    c" +
-                    "ol: \"myDiv\"\r\n                }, 300, 400);\r\n        },\r\n\r\n        emptyFunction:" +
-                    " function () {\r\n        },\r\n\r\n        showSharePointPopup: function (url, title," +
-                    " allowMaximize, showClose, func, funcParams, width, height) {\r\n            if (a" +
-                    "llowMaximize == null) allowMaximize = true;\r\n            if (showClose == null) " +
-                    "showClose = true;\r\n            if (func == null) func = emptyFunction;\r\n\r\n      " +
-                    "      var options;\r\n\r\n            if (width !== undefined && height !== undefine" +
-                    "d) {\r\n                options = {\r\n                    title: title,\r\n          " +
-                    "          allowMaximize: allowMaximize,\r\n                    showClose: showClos" +
-                    "e,\r\n                    url: url,\r\n                    dialogReturnValueCallback" +
-                    ": Function.createCallback(Function.createDelegate(null, func), funcParams),\r\n   " +
-                    "                 width: width,\r\n                    height: height\r\n            " +
-                    "    };\r\n            } else {\r\n                options = { title: title, allowMax" +
-                    "imize: allowMaximize, showClose: showClose, url: url, dialogReturnValueCallback:" +
-                    " Function.createCallback(Function.createDelegate(null, func), funcParams) };\r\n  " +
-                    "          }\r\n\r\n            SP.UI.ModalDialog.showModalDialog(options);\r\n        " +
-                    "},\r\n\r\n        fillWebPartData: function () {\r\n\r\n            $(\"#");
-        @__w.Write(divFancyDispFormAssociatedItemsContent.ClientID);
-
-            @__w.Write("\").hide();\r\n\r\n            $.ajax({\r\n                type: \"POST\",\r\n              " +
-                    "  url: \"");
+                    "th: 100%;\r\n        height: 100%;\r\n        /*width: 900px;*/\r\n        /*min-width" +
+                    ": 900px;*/\r\n    }\r\n\r\n    .fancyDisplayForm {\r\n        background-color: #ffffff;" +
+                    "\r\n        vertical-align: middle;\r\n        outline: none;\r\n        resize: none;" +
+                    "\r\n        display: inline-block;\r\n        -webkit-font-smoothing: antialiased;\r\n" +
+                    "        -moz-osx-font-smoothing: grayscale;\r\n        width: 100%;\r\n    }\r\n\r\n    " +
+                    "    .fancyDisplayForm #first-table {\r\n            vertical-align: top;\r\n        " +
+                    "    float: left;\r\n            margin-right: 20px;\r\n            width: 63.5%;\r\n  " +
+                    "      }\r\n\r\n    .fancy-display-header {\r\n        border-bottom: 1px solid #EEEEEE" +
+                    ";\r\n        cursor: auto;\r\n        font-size: 1.4em;\r\n        padding-bottom: 5px" +
+                    ";\r\n        padding-top: 5px;\r\n        font-weight: 400;\r\n    }\r\n\r\n        .fancy" +
+                    "-display-header span {\r\n            color: #555555;\r\n        }\r\n\r\n    .fancy-col" +
+                    "-table {\r\n    }\r\n\r\n        .fancy-col-table tr td:first-child {\r\n            wid" +
+                    "th: 150px;\r\n            font-weight: 400;\r\n        }\r\n\r\n        .fancy-col-table" +
+                    " tr td {\r\n            font-size: 1em;\r\n            padding-bottom: 5px;\r\n       " +
+                    "     width: 150px;\r\n        }\r\n\r\n    .fancyDisplayForm .dispFormContent {\r\n     " +
+                    "   display: block;\r\n        width: 100%;\r\n        padding-top: 5px;\r\n    }\r\n\r\n  " +
+                    "  .fancy-display-form-wrapper .dispFormExpandHeader {\r\n        cursor: pointer;\r" +
+                    "\n        display: inline-block;\r\n        padding-bottom: 5px;\r\n        color: #0" +
+                    "090CA;\r\n    }\r\n\r\n        .fancy-display-form-wrapper .dispFormExpandHeader span:" +
+                    "first-child {\r\n            color: #0090CA;\r\n            padding-right: 5px;\r\n   " +
+                    "         position: relative;\r\n            top: 1px;\r\n            font-size: .9em" +
+                    ";\r\n        }\r\n\r\n    .fancy-display-form-wrapper .dispFormFancyTitle {\r\n        d" +
+                    "isplay: inline-block;\r\n        padding-bottom: 5px;\r\n    }\r\n\r\n        .fancy-dis" +
+                    "play-form-wrapper .dispFormFancyTitle span {\r\n            font-size: 2em;\r\n     " +
+                    "   }\r\n\r\n    .fancy-display-form-wrapper .dispFormUserImage {\r\n        fit-positi" +
+                    "on: slice;\r\n        height: 22px;\r\n        width: 23px;\r\n        text-align: cen" +
+                    "ter;\r\n    }\r\n\r\n    .fancy-display-form-wrapper .dispFormExpandMore {\r\n        cu" +
+                    "rsor: pointer;\r\n        display: inline-block;\r\n        color: #0090CA;\r\n       " +
+                    " font-size: 12px;\r\n        padding-top: 7px;\r\n    }\r\n\r\n    .badge {\r\n        dis" +
+                    "play: inline-block;\r\n        min-width: 14px;\r\n        padding: 2px 8px;\r\n      " +
+                    "  font-size: 12px;\r\n        font-weight: 700;\r\n        color: #fff;\r\n        lin" +
+                    "e-height: 1;\r\n        vertical-align: baseline;\r\n        white-space: nowrap;\r\n " +
+                    "       text-align: center;\r\n        background-color: #999;\r\n        border-radi" +
+                    "us: 10px;\r\n    }\r\n\r\n        .badge:hover {\r\n            background-color: #0090C" +
+                    "A;\r\n        }\r\n\r\n\r\n    /* Small devices */\r\n    @media (max-width: 768px) {\r\n   " +
+                    "     .fancyDisplayForm #first-table {\r\n            float: none;\r\n        }\r\n\r\n  " +
+                    "      .fancyDisplayForm #first-table {\r\n            width: 100%;\r\n        }\r\n   " +
+                    " }\r\n\r\n    .fancy-display-form-wrapper .slidingDiv {\r\n        width: 100%;\r\n     " +
+                    "   padding: 20px;\r\n        border: 1px thin black;\r\n        -webkit-box-shadow: " +
+                    "0px 3px 20px rgba(50, 50, 50, 0.8);\r\n        -moz-box-shadow: 0px 3px 20px rgba(" +
+                    "50, 50, 50, 0.8);\r\n        box-shadow: 0px 3px 20px rgba(50, 50, 50, 0.8);\r\n    " +
+                    "    position: absolute;\r\n        width: 200px;\r\n        background-color: white;" +
+                    "\r\n        text-align: left;\r\n        z-index: 1503;\r\n    }\r\n\r\n    .fancy-display" +
+                    "-form-wrapper .slidingDivClose {\r\n        float: right;\r\n        font-size: larg" +
+                    "e;\r\n    }\r\n\r\n    .fancy-display-form-wrapper .slidingDivHeader {\r\n        border" +
+                    "-bottom: 1px solid #EEEEEE;\r\n        cursor: auto;\r\n        font-size: 1.4em;\r\n " +
+                    "       padding-bottom: 5px;\r\n        padding-top: 5px;\r\n        font-weight: 400" +
+                    ";\r\n        color: #555555;\r\n    }\r\n\r\n    .fancy-display-form-wrapper .slidingDiv" +
+                    "Add {\r\n        float: right;\r\n        left: 173px;\r\n        position: inherit;\r\n" +
+                    "        top: 21px;\r\n    }\r\n\r\n    .fancy-display-form-wrapper .listMainDiv {\r\n   " +
+                    "     float: left;\r\n        padding: 5px;\r\n        margin-right: 5px;\r\n    }\r\n\r\n " +
+                    "   .fancyDisplayFormAssociatedItemsContextMenu {\r\n        list-style: none;\r\n   " +
+                    "     cursor: pointer;\r\n        position: absolute;\r\n    }\r\n</style>\r\n\r\n<script t" +
+                    "ype=\"text/javascript\">\r\n\r\n    $(function () {\r\n\r\n        FancyDispFormClient.fil" +
+                    "lWebPartData();\r\n\r\n        window.SP.SOD.notifyScriptLoadedAndExecuteWaitingJobs" +
+                    "(\'EPMLive.Navigation.js\');\r\n\r\n        $(\".fancy-display-form-wrapper .dispFormEx" +
+                    "pandHeader\").click(function () {\r\n            $header = $(this);\r\n            $c" +
+                    "ontent = $header.next();\r\n            $content.slideToggle(100, function () {\r\n " +
+                    "           });\r\n            if ($(this).find(\"span:first\").hasClass(\"icon-plus-c" +
+                    "ircle-2\")) {\r\n                $(this).find(\"span:first\").removeClass(\"icon-plus-" +
+                    "circle-2\").addClass(\"icon-minus-circle-2\");\r\n                $(this).find(\"span:" +
+                    "last\").text(\"hide\");\r\n            }\r\n            else {\r\n                $(this)" +
+                    ".find(\"span:first\").removeClass(\"icon-minus-circle-2\").addClass(\"icon-plus-circl" +
+                    "e-2\");\r\n                $(this).find(\"span:last\").text(\"show\");\r\n            }\r\n" +
+                    "        });\r\n\r\n        $(\".dispFormExpandMore\").click(function () {\r\n           " +
+                    " $header = $(this);\r\n            $header.closest(\'tr\').next(\'.ShowMoreRow\').togg" +
+                    "le();\r\n        });\r\n    });\r\n\r\n    FancyDispFormClient = {\r\n\r\n        showItemUr" +
+                    "l: function (weburl) {\r\n            $.ajax({\r\n                type: \"POST\",\r\n   " +
+                    "             url: weburl,\r\n                success: function (ticket) {\r\n       " +
+                    "             if (ticket.indexOf(\"General Error\") != 0) {\r\n                      " +
+                    "  var listInfo = ticket.split(\'|\');\r\n\r\n                        var viewSiteConte" +
+                    "ntUrl = listInfo[0] + \"/_layouts/epmlive/gridaction.aspx?action=FancyDispForm&li" +
+                    "st=\" + listInfo[3] + \"&field=\" + listInfo[1] + \"&LookupFieldList=\" + listInfo[2]" +
+                    " + \"&Source=\" + document.location.href;\r\n                        var options = {" +
+                    " url: viewSiteContentUrl, showMaximized: true };\r\n                        SP.SOD" +
+                    ".execute(\'SP.UI.Dialog.js\', \'SP.UI.ModalDialog.showModalDialog\', options);\r\n    " +
+                    "                }\r\n                    else {\r\n                        alert(tic" +
+                    "ket);\r\n                    }\r\n                }\r\n            });\r\n        },\r\n\r\n" +
+                    "        showNewForm: function (weburl) {\r\n            var options = { url: webur" +
+                    "l, showMaximized: false, dialogReturnValueCallback: function (dialogResult) { Fa" +
+                    "ncyDispFormClient.fillWebPartData(); } };\r\n            SP.SOD.execute(\'SP.UI.Dia" +
+                    "log.js\', \'SP.UI.ModalDialog.showModalDialog\', options);\r\n        },\r\n\r\n        s" +
+                    "howItemPopup: function (siteurl, webid, listid, itemid) {\r\n            showShare" +
+                    "PointPopup(siteurl + \'/_layouts/epmlive/gridaction.aspx?action=getcontextmenus&w" +
+                    "ebid=\' + webid +\r\n                \'&listid=\' + listid + \'&ID=\' + itemid, null, f" +
+                    "alse, true, null, {\r\n                    gridId: \"myDiv\",\r\n                    r" +
+                    "owId: \"myDiv\",\r\n                    col: \"myDiv\"\r\n                }, 300, 400);\r" +
+                    "\n        },\r\n\r\n        emptyFunction: function () {\r\n        },\r\n\r\n        showS" +
+                    "harePointPopup: function (url, title, allowMaximize, showClose, func, funcParams" +
+                    ", width, height) {\r\n            if (allowMaximize == null) allowMaximize = true;" +
+                    "\r\n            if (showClose == null) showClose = true;\r\n            if (func == " +
+                    "null) func = emptyFunction;\r\n\r\n            var options;\r\n\r\n            if (width" +
+                    " !== undefined && height !== undefined) {\r\n                options = {\r\n        " +
+                    "            title: title,\r\n                    allowMaximize: allowMaximize,\r\n  " +
+                    "                  showClose: showClose,\r\n                    url: url,\r\n        " +
+                    "            dialogReturnValueCallback: Function.createCallback(Function.createDe" +
+                    "legate(null, func), funcParams),\r\n                    width: width,\r\n           " +
+                    "         height: height\r\n                };\r\n            } else {\r\n             " +
+                    "   options = { title: title, allowMaximize: allowMaximize, showClose: showClose," +
+                    " url: url, dialogReturnValueCallback: Function.createCallback(Function.createDel" +
+                    "egate(null, func), funcParams) };\r\n            }\r\n\r\n            SP.UI.ModalDialo" +
+                    "g.showModalDialog(options);\r\n        },\r\n\r\n        fillWebPartData: function () " +
+                    "{\r\n\r\n            $.ajax({\r\n                type: \"POST\",\r\n                url: \"" +
+                    "");
               @__w.Write(SPContext.Current.Web.Url);
 
             @__w.Write("/_vti_bin/WorkEngine.asmx/Execute\",\r\n                data: \"{Function : \'GetFancy" +
@@ -688,56 +686,50 @@ namespace EPMLiveWebParts {
             @__w.Write("</FancyFormListID><FancyFormItemID>");
                                                                                                                                                                                 @__w.Write(SPContext.Current.ItemId);
 
-            @__w.Write("</FancyFormItemID><FancyFormItemTitle>");
-                                                                                                                                                                                                                                                   @__w.Write(SPContext.Current.ListItem.Title);
-
-            @__w.Write("</FancyFormItemTitle></FancyFormAssociatedItems>\'}\",\r\n                contentType" +
-                    ": \"application/json; charset=utf-8\",\r\n                dataType: \"json\",\r\n       " +
-                    "         success: function (response) {\r\n\r\n                    $(\"#");
+            @__w.Write("</FancyFormItemID></FancyFormAssociatedItems>\'}\",\r\n                contentType: \"" +
+                    "application/json; charset=utf-8\",\r\n                dataType: \"json\",\r\n          " +
+                    "      success: function (response) {\r\n\r\n                    $(\"#");
                 @__w.Write(divFancyDispFormAssociatedItemsContent.ClientID);
 
-            @__w.Write("\").html(\"\");\r\n                        $(\"#");
-                    @__w.Write(divFancyDispFormAssociatedItemsContent.ClientID);
+            @__w.Write("\").html(\"\");\r\n                    $(\"#");
+                @__w.Write(divFancyDispFormAssociatedItemsContent.ClientID);
 
             @__w.Write(@""").html(response.d.toString().replace(""<Result Status=\""0\"">"", """").replace(""</Result>"", """"));
 
+                    $("".slidingDiv"").hide();
+
+                    $("".listMainDiv"").mouseover(function () {
                         $("".slidingDiv"").hide();
+                        $(this).find("".slidingDiv"").show();
+                    });
 
-                        $("".listMainDiv"").mouseover(function () {
-                            $("".slidingDiv"").hide();
-                            $(this).find("".slidingDiv"").show();
-                        });
+                    $("".slidingDiv"").mouseover(function () {
+                        $(this).show();
+                    });
 
-                        $("".slidingDiv"").mouseover(function () {
-                            $(this).show();
-                        });
-
-                        $(""#");
-                    @__w.Write(divFancyDispFormAssociatedItemsContent.ClientID);
+                    $(""#");
+                @__w.Write(divFancyDispFormAssociatedItemsContent.ClientID);
 
             @__w.Write(@""").mouseout(function () {
-                            $("".slidingDiv"").hide();
+                        $("".slidingDiv"").hide();
+                    });
+
+                    var addContextualMenu = function () {
+                        $("".fancyDisplayFormAssociatedItemsContextMenu"").each(function () {
+                            window.epmLiveNavigation.addContextualMenu($(this), null, true);
                         });
+                    };
 
-                        var addContextualMenu = function () {
-                            $("".fancyDisplayFormAssociatedItemsContextMenu"").each(function () {
-                                window.epmLiveNavigation.addContextualMenu($(this), null, true);
-                            });
-                        };
+                    window.ExecuteOrDelayUntilScriptLoaded(addContextualMenu, 'EPMLive.Navigation.js');
+                }
+            });
+        }
+    }
+</script>
 
-                        window.ExecuteOrDelayUntilScriptLoaded(addContextualMenu, 'EPMLive.Navigation.js');
-
-                        $(""#");
-                    @__w.Write(divFancyDispFormAssociatedItemsContent.ClientID);
-
-            @__w.Write("\").show();\r\n                    }\r\n            });\r\n        }\r\n    }\r\n</script>\r\n" +
-                    "\r\n<div style=\"text-align: right;\">\r\n    ");
+");
             parameterContainer.Controls[0].RenderControl(@__w);
-            @__w.Write("\r\n</div>\r\n\r\n");
-            parameterContainer.Controls[1].RenderControl(@__w);
-            @__w.Write("\r\n\r\n<div style=\"text-align: right; float:right;\">\r\n    ");
-            parameterContainer.Controls[2].RenderControl(@__w);
-            @__w.Write("\r\n</div>\r\n");
+            @__w.Write("\r\n");
         }
         
         private void InitializeControl() {
