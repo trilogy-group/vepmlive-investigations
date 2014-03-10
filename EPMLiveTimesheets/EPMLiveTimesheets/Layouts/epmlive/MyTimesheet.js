@@ -1743,3 +1743,51 @@ function showComments(gridId) {
     var options = { title: "Comments", allowMaximize: true, showClose: true, url: sUrl };
     SP.UI.ModalDialog.showModalDialog(options);
 }
+
+function previousPeriodCommand(tsURL, previousPeriod, delegateId)
+{
+    if (previousPeriod != "0") {
+        var url = tsURL;
+        if (url.indexOf("?") > 0) {
+            url += "&NewPeriod=" + previousPeriod;
+        }
+        else
+            url += "?NewPeriod=" + previousPeriod;
+        if (delegateId != "") {
+            url += "&Delegate=" + delegateId;
+        }
+        location.href = url;
+    }
+}
+
+
+function nextPeriodCommand(tsURL, nextPeriod, delegateId) {
+
+    if (nextPeriod != "0") {
+        var url = tsURL;
+        if (url.indexOf("?") > 0) {
+            url += "&NewPeriod=" + nextPeriod;
+        }
+        else
+            url += "?NewPeriod=" + nextPeriod;
+        if (delegateId != "") {
+            url += "&Delegate=" + delegateId;
+        }
+        location.href = url;
+    }
+}
+
+function changePeriodCommand(tsURL, sel, delegateId)
+{
+    var url = tsURL;
+    var sPeriodId = sel.options[sel.selectedIndex].value;
+    if (url.indexOf("?") > 0) {
+        url += "&NewPeriod=" + sPeriodId;
+    }
+    else
+        url += "?NewPeriod=" + sPeriodId;
+    if (delegateId != "") {
+        url += "&Delegate=" + delegateId;
+    }
+    location.href = url;
+}

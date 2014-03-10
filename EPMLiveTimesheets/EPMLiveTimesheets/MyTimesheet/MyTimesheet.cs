@@ -15,6 +15,7 @@ using System.Data.SqlClient;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Text;
 
 namespace TimeSheets
 {
@@ -66,7 +67,7 @@ namespace TimeSheets
             act = new EPMLiveCore.Act(SPContext.Current.Web);
             activation = act.CheckFeatureLicense(EPMLiveCore.ActFeature.Timesheets);
 
-            if(activation != 0)
+            if (activation != 0)
                 return;
 
             if (SPContext.Current.ViewContext.View != null)
@@ -93,7 +94,7 @@ namespace TimeSheets
                 sUserId = Page.Request["Delegate"].ToString();
             }
             catch { }
-            
+
             ///
 
             SPWeb web = SPContext.Current.Web;
@@ -117,17 +118,17 @@ namespace TimeSheets
                 DataTable dtPeriods = ds.Tables[0];
 
                 DataRow[] drCur = dtPeriods.Select("CurPeriod='1'");
-                if(drCur.Length > 0)
+                if (drCur.Length > 0)
                 {
                     iCurPeriodId = int.Parse(drCur[0]["period_id"].ToString());
                     sCurPeriodName = ((DateTime)drCur[0]["period_start"]).ToShortDateString() + " - " + ((DateTime)drCur[0]["period_end"]).ToShortDateString();
                 }
-                if(dtPeriods.Rows.Count > 0)
+                if (dtPeriods.Rows.Count > 0)
                 {
-                    if(sPeriodId == "")
+                    if (sPeriodId == "")
                     {
                         DataRow[] dr = dtPeriods.Select("CurPeriod='1'");
-                        if(dr.Length > 0)
+                        if (dr.Length > 0)
                         {
                             sPeriodId = dr[0]["period_id"].ToString();
                             sPeriodName = ((DateTime)dr[0]["period_start"]).ToShortDateString() + " - " + ((DateTime)dr[0]["period_end"]).ToShortDateString();
@@ -142,12 +143,12 @@ namespace TimeSheets
                     else
                     {
                         DataRow[] dr = ds.Tables[0].Select("period_id='" + sPeriodId + "'");
-                        if(dr.Length > 0)
+                        if (dr.Length > 0)
                         {
                             sPeriodName = ((DateTime)dr[0]["period_start"]).ToShortDateString() + " - " + ((DateTime)dr[0]["period_end"]).ToShortDateString();
                             try
                             {
-                                if(dr[0]["curPeriod"].ToString() == "1")
+                                if (dr[0]["curPeriod"].ToString() == "1")
                                     bIsCurrentTimesheetPeriod = true;
                             }
                             catch { }
@@ -155,7 +156,7 @@ namespace TimeSheets
                         else
                         {
                             DataRow[] dr2 = ds.Tables[0].Select("CurPeriod='1'");
-                            if(dr2.Length > 0)
+                            if (dr2.Length > 0)
                             {
                                 sPeriodId = dr2[0]["period_id"].ToString();
                                 sPeriodName = ((DateTime)dr2[0]["period_start"]).ToShortDateString() + " - " + ((DateTime)dr2[0]["period_end"]).ToShortDateString();
@@ -172,20 +173,20 @@ namespace TimeSheets
                     string itmpprev = "";
                     bool bNext = false;
 
-                    foreach(DataRow dr in dtPeriods.Rows)
+                    foreach (DataRow dr in dtPeriods.Rows)
                     {
                         sPeriodList += "," + dr["period_id"].ToString() + "|" + ((DateTime)dr["period_start"]).ToShortDateString() + " - " + ((DateTime)dr["period_end"]).ToShortDateString();
 
-                        if(bNext)
+                        if (bNext)
                         {
                             bNext = false;
 
                             iNextPeriod = int.Parse(dr["period_id"].ToString());
                         }
 
-                        if(dr["period_id"].ToString() == sPeriodId)
+                        if (dr["period_id"].ToString() == sPeriodId)
                         {
-                            if(itmpprev != "")
+                            if (itmpprev != "")
                                 iPreviousPeriod = int.Parse(itmpprev);
                             bNext = true;
                         }
@@ -202,7 +203,7 @@ namespace TimeSheets
                     cmd.Parameters.AddWithValue("@siteid", web.Site.ID);
 
                     SqlDataReader drTypes = cmd.ExecuteReader();
-                    while(drTypes.Read())
+                    while (drTypes.Read())
                     {
                         int id = drTypes.GetInt32(0);
 
@@ -218,12 +219,12 @@ namespace TimeSheets
 
                     ArrayList arrPeriods = TimesheetAPI.GetPeriodDaysArray(cn, settings, web, sPeriodId);
 
-                    foreach(DateTime dtStart in arrPeriods)
+                    foreach (DateTime dtStart in arrPeriods)
                     {
                         TSCols += "\"P" + dtStart.Ticks + "\": true,";
                     }
 
-                    foreach(DateTime dtStart in arrPeriods)
+                    foreach (DateTime dtStart in arrPeriods)
                     {
                         TSDCols += "\"P" + dtStart.Ticks + "\": \"" + settings.DayDef.Split('|')[(int)dtStart.DayOfWeek * 3 + 1] + "|" + settings.DayDef.Split('|')[(int)dtStart.DayOfWeek * 3 + 2] + "\",";
                     }
@@ -237,22 +238,22 @@ namespace TimeSheets
                     cmd.Parameters.AddWithValue("@username", web.CurrentUser.LoginName);
 
                     SqlDataReader drTS = cmd.ExecuteReader();
-                    if(drTS.Read())
+                    if (drTS.Read())
                     {
                         //Locked
-                        if(drTS.GetBoolean(2))
+                        if (drTS.GetBoolean(2))
                             bTsLocked = true;
 
                         //Submitted
-                        if(drTS.GetBoolean(0))
+                        if (drTS.GetBoolean(0))
                         {
-                            if(drTS.GetInt32(1) == 1)
+                            if (drTS.GetInt32(1) == 1)
                             {
                                 sStatus = "Approved";
-                                if(!settings.DisableApprovals)
+                                if (!settings.DisableApprovals)
                                     bTsLocked = true;
                             }
-                            else if(drTS.GetInt32(1) == 2)
+                            else if (drTS.GetInt32(1) == 2)
                             {
                                 sStatus = "Rejected";
                             }
@@ -271,7 +272,7 @@ namespace TimeSheets
                 }
             });
 
-            
+
 
             sDataParam = "<Param GridId=\"" + sFullGridId + "\" Period=\"" + sPeriodId + "\" UserId=\"" + sUserId + "\"/>";
             sLayoutParam = "<Param GridId=\"" + sFullGridId + "\" Period=\"" + sPeriodId + "\" UserId=\"" + sUserId + "\" Editable=\"" + iEditable + "\"/>";
@@ -283,9 +284,9 @@ namespace TimeSheets
 
             DataTable dtTsDelegates = EPMLiveCore.API.APITeam.GetResourcePool("<Resources FilterField=\"TimesheetDelegates\" FilterFieldValue=\"" + web.CurrentUser.Name + "\" ><Columns>SimpleColumns</Columns></Resources>", web);
 
-            foreach(DataRow dr in dtTsDelegates.Rows)
+            foreach (DataRow dr in dtTsDelegates.Rows)
             {
-                if(sUserId == dr["SPID"].ToString())
+                if (sUserId == dr["SPID"].ToString())
                     sCurrentDelegate = dr["Title"].ToString();
 
                 sDelegates += dr["SPID"].ToString() + "|" + dr["Title"].ToString() + "^";
@@ -299,7 +300,7 @@ namespace TimeSheets
 
             ScriptManager scriptManager = ScriptManager.GetCurrent(Page);
 
-            if(scriptManager != null) scriptManager.Services.Add(new ServiceReference(serviceUrl));
+            if (scriptManager != null) scriptManager.Services.Add(new ServiceReference(serviceUrl));
             else
             {
                 scriptManager = new ScriptManager();
@@ -348,7 +349,7 @@ namespace TimeSheets
                 return;
             }
 
-            if(!bHasPeriods)
+            if (!bHasPeriods)
             {
                 output.WriteLine("There are no periods setup for this TimeSheet. Please contact your system administrator");
                 return;
@@ -356,7 +357,7 @@ namespace TimeSheets
 
             string sUserId = "";
 
-            if(!string.IsNullOrEmpty(Page.Request["Delegate"]))
+            if (!string.IsNullOrEmpty(Page.Request["Delegate"]))
             {
                 SPUser user = TimesheetAPI.GetUser(SPContext.Current.Web, Page.Request["Delegate"]);
                 sUserId = user.ID.ToString();
@@ -365,16 +366,16 @@ namespace TimeSheets
             bCanEditViews = SPContext.Current.Web.DoesUserHavePermissions(SPBasePermissions.ManageWeb);
 
             string url = SPContext.Current.Web.Url;
-            if(url == "/") url = "";
+            if (url == "/") url = "";
 
             string curUrl = Page.Request.RawUrl.ToString();
 
-            if(curUrl.Contains("?"))
+            if (curUrl.Contains("?"))
                 curUrl = curUrl.Substring(0, curUrl.IndexOf("?") + 1);
-            
-            foreach(string key in Page.Request.QueryString.AllKeys)
+
+            foreach (string key in Page.Request.QueryString.AllKeys)
             {
-                if(key.ToString().ToLower() != "newperiod" && key.ToString().ToLower() != "delegate")
+                if (key.ToString().ToLower() != "newperiod" && key.ToString().ToLower() != "delegate")
                 {
                     curUrl += key + "=" + Page.Request.QueryString[key] + "&";
                 }
@@ -382,12 +383,12 @@ namespace TimeSheets
 
             int counter = 0;
 
-            foreach(KeyValuePair<string, Dictionary<string, string>> key in views.Views)
+            foreach (KeyValuePair<string, Dictionary<string, string>> key in views.Views)
             {
                 try
                 {
-                    
-                    if(key.Value["Default"].ToLower() == "true")
+
+                    if (key.Value["Default"].ToLower() == "true")
                     {
                         sCurrentView = key.Key;
                         sCurrentViewId = "V" + counter;
@@ -399,7 +400,7 @@ namespace TimeSheets
 
             curUrl = curUrl.Trim('&').Trim('?');
             System.Globalization.CultureInfo cInfo = new System.Globalization.CultureInfo(1033);
-                    IFormatProvider culture = new System.Globalization.CultureInfo(cInfo.Name, true);
+            IFormatProvider culture = new System.Globalization.CultureInfo(cInfo.Name, true);
             output.WriteLine(@"<script language=""javascript"">
                                     var TSObject" + sFullGridId + @" = new Object();
                                     TSObject" + sFullGridId + @".canSave = true;
@@ -441,9 +442,41 @@ namespace TimeSheets
                                     
                             </script>
                             ");
-            
+
 
             output.WriteLine(@"<div align=""center"" id=""TSLoader" + sFullGridId + @""" width=""100%""><img style=""vertical-align:middle;"" src=""/_layouts/images/gears_anv4.gif""/>&nbsp;Loading Items...</div>");
+
+            StringBuilder sb = new StringBuilder("<select onchange=\"changePeriodCommand('" + curUrl + "',this,'" + Page.Request["Delegate"] + "')\">");
+
+            var arrPeriods = sPeriodList.Split(',');
+            for (var i = 0; i < arrPeriods.Length; i++)
+            {
+                var arrPeriod = arrPeriods[i].Split('|');
+                if (arrPeriod[1] != sPeriodName)
+                {
+                    sb.Append("<option value=" + arrPeriod[0] + ">" + arrPeriod[1] + "</option>");
+                }
+                else
+                {
+                    sb.Append("<option value=" + arrPeriod[0] + " selected>" + arrPeriod[1] + "</option>");
+                }
+            }
+            sb.Append("</select>");
+
+            var str = new HtmlString(sb.ToString());
+
+            output.WriteLine(@"<div style=""display:width:200;padding:10px"">
+                <b>Status:</b>&nbsp;" + sStatus + @"&nbsp;&nbsp;
+                <b>Current Period:</b>
+                <span class='ms-cui-img-16by16 ms-cui-img-cont-float' unselectable='on'>
+                <img style=""top: -128px; left: -176px;"" src=""/_layouts/1033/images/formatmap16x16.png"" onclick=""javascript:previousPeriodCommand('" + curUrl + "','" + iPreviousPeriod + "','" + Page.Request["Delegate"] + @"')""/>
+                </span>");
+            output.WriteLine(str.ToHtmlString());
+            output.WriteLine(@"<span class='ms-cui-img-16by16 ms-cui-img-cont-float' unselectable='on'>
+                <img style=""top: -32px; left: -160px;"" src=""/_layouts/1033/images/formatmap16x16.png"" onclick=""javascript:nextPeriodCommand('" + curUrl + "','" + iNextPeriod + "','" + Page.Request["Delegate"] + @"')""/>
+                </span>");
+            output.WriteLine("</div>");
+
 
             output.WriteLine("<div style=\"width:100%\">");
             output.WriteLine(@"<treegrid Data_Url=""" + url + @"/_vti_bin/WorkEngine.asmx"" Data_Timeout=""0"" Data_Method=""Soap"" Data_Function=""Execute"" Data_Namespace=""workengine.com"" Data_Param_Function=""timesheet_GetTimesheetGrid"" Data_Param_Dataxml=""" + sDataParam + @""" 
@@ -454,7 +487,7 @@ namespace TimeSheets
 
 
             output.WriteLine(@"<div align=""center"" id=""divMessage" + sFullGridId + @""" width=""100%"" class=""dialog""><img style=""vertical-align:middle;"" src=""/_layouts/images/gears_anv4.gif""/>&nbsp;<span id=""spnMessage" + sFullGridId + @""">Saving Timesheet...</span></div>");
-            
+
             output.WriteLine(@"<div id=""viewNameDiv"" style=""display:none;width:200;padding:10px"">
 
                 View Name:<br />
@@ -466,9 +499,11 @@ namespace TimeSheets
     
             </div>");
 
+
+
             output.WriteLine(@"<script language=""javascript"">");
             output.WriteLine("initmb();");
-            
+
             output.WriteLine("function clickTab(){");
             output.WriteLine("SelectRibbonTab('Ribbon.MyTimesheetTab', true);");
             //output.WriteLine("var wp = document.getElementById('MSOZoneCell_WebPart" + this.Qualifier + "');");
@@ -512,7 +547,7 @@ namespace TimeSheets
         {
             SPRibbon spRibbon = SPRibbon.GetCurrent(Page);
 
-            if(spRibbon == null) return;
+            if (spRibbon == null) return;
 
             var ribbonExtensions = new XmlDocument();
 
@@ -523,25 +558,25 @@ namespace TimeSheets
             spRibbon.RegisterDataExtension(ribbonExtensions.FirstChild, "Ribbon.Templates._children");
 
 
-//            ribbonExtensions = new XmlDocument();
-//            ribbonExtensions.LoadXml(@"<Label
-//						Id=""Ribbon.Timesheet.ActionsGroup.StatusLabel2""
-//						Sequence=""11""
-//						Command=""Ribbon.MyTimesheet.StatusLabel1""
-//						LabelText=""" + sStatus + @"""
-//                        Image16by16=""/_layouts/epmlive/images/tss_" + sStatus + @".png""
-//						TemplateAlias=""oM""
-//						/> ");
-//            spRibbon.RegisterDataExtension(ribbonExtensions.FirstChild, "Ribbon.MyTimesheet.ActionsGroup.Controls._children");
+            //            ribbonExtensions = new XmlDocument();
+            //            ribbonExtensions.LoadXml(@"<Label
+            //						Id=""Ribbon.Timesheet.ActionsGroup.StatusLabel2""
+            //						Sequence=""11""
+            //						Command=""Ribbon.MyTimesheet.StatusLabel1""
+            //						LabelText=""" + sStatus + @"""
+            //                        Image16by16=""/_layouts/epmlive/images/tss_" + sStatus + @".png""
+            //						TemplateAlias=""oM""
+            //						/> ");
+            //            spRibbon.RegisterDataExtension(ribbonExtensions.FirstChild, "Ribbon.MyTimesheet.ActionsGroup.Controls._children");
 
 
-            if(sDelegates == "")
+            if (sDelegates == "")
             {
                 spRibbon.TrimById("Ribbon.MyTimesheet.DelegateGroup");
             }
 
 
-            if(sCurrentDelegate != "")
+            if (sCurrentDelegate != "")
             {
                 ribbonExtensions = new XmlDocument();
                 ribbonExtensions.LoadXml(@"<Label

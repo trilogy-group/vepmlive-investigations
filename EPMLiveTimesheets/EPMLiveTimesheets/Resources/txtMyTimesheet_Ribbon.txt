@@ -45,24 +45,6 @@
 						Image32by32="/_layouts/epmlive/images/mytsunsubmit.png" 
 		                TemplateAlias="oL"/>
 
-					<Label
-						Id="Ribbon.Timesheet.ActionsGroup.StatusLabel1"
-						Sequence="10"
-						Command="Ribbon.MyTimesheet.StatusLabel1"
-						LabelText="Status:"
-						TemplateAlias="oM"
-						/> 
-
-					<Label
-						Id="Ribbon.Timesheet.ActionsGroup.StatusLabel2"
-						Sequence="10"
-						Command="Ribbon.MyTimesheet.StatusLabel1"
-						QueryCommand="Ribbon.MyTimesheet.QueryStatus"
-						LabelText=""
-						TemplateAlias="oM"
-						/> 
-						
-
 				</Controls>
 			</Group>
 
@@ -115,44 +97,6 @@
 			<Group Id="Ribbon.MyTimesheet.ViewPeriodGroup" Title="View" Sequence="20" Template="Ribbon.Templates.MyTimesheetTemplate">
 				<Controls Id="Ribbon.MyTimesheet.ViewPeriodGroup.Controls">
 				
-					<Label
-						Id="Ribbon.Timesheet.ViewPeriodGroup.CurrentPeriodLabel"
-						Sequence="10"
-						Command="Ribbon.MyTimesheet.CurrentPeriodLabel"
-						LabelText="Current Period:"
-						TemplateAlias="row1control"
-						/> 
-
-					<Button
-						Id="Ribbon.Timesheet.ViewPeriodGroup.PreviousPeriod"
-						Sequence="11"
-						Command="Ribbon.MyTimesheet.PreviousPeriod"
-						Image16by16="/_layouts/#language#/images/formatmap16x16.png" Image16by16Top="-128" Image16by16Left="-176"
-						LabelText="Previous Period"
-						TemplateAlias="previousPage"
-						/>
-
-					<DropDown
-						Id="Ribbon.Timesheet.ViewPeriodGroup.DisplayPeriod"
-						Sequence="12"
-						Command="Ribbon.MyTimesheet.CurrentPeriod"
-						PopulateDynamically="true"
-						PopulateOnlyOnce="true"
-						PopulateQueryCommand="Ribbon.MyTimesheet.PopulatePeriodDropDown"
-						QueryCommand="Ribbon.MyTimesheet.QueryCurrentPeriod"
-						Width="150px"
-						TemplateAlias="currentPage">
-					</DropDown> 
-
-					<Button
-						Id="Ribbon.Timesheet.ViewPeriodGroup.NextPeriod"
-						Sequence="13"
-						Command="Ribbon.MyTimesheet.NextPeriod"
-						Image16by16="/_layouts/#language#/images/formatmap16x16.png" Image16by16Top="-32" Image16by16Left="-160"
-						LabelText="Next Period"
-						TemplateAlias="nextPage"
-						/>          
-
 					<Label
 						Id="Ribbon.Timesheet.ViewPeriodGroup.CurrentViewLabel"
 						Sequence="20"
