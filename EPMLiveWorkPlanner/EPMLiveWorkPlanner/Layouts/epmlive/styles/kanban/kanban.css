@@ -90,7 +90,7 @@
 
 .itemContainer .sortable-item,
 .stageContainer .sortable-item {
-    background-color: #B7EBFF;
+    background-color: #D8F4FF;
     border-left: 5px solid #0090CA;
     cursor: move;
     display: block;
@@ -138,7 +138,7 @@
 }
 
 .placeholder {
-    background-color: #B7EBFF;
+    background-color: #D8F4FF;
     border-left: 5px solid #0090CA;
     cursor: move;
     display: block;
