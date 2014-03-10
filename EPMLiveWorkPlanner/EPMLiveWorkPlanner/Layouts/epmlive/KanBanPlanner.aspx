@@ -66,7 +66,7 @@
             };
 
             var showNewForm = function (weburl) {
-                var options = { url: weburl, showMaximized: false, dialogReturnValueCallback: function (dialogResult) { loadKanBanBoard(); } };
+                var options = { url: weburl, showMaximized: false, dialogReturnValueCallback: function (dialogResult) { if (dialogResult == 1) { loadKanBanBoard(); } } };
                 SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
             };
 
@@ -293,6 +293,15 @@
                         });
 
                         var addContextualMenu = function () {
+                            window.epmLiveNavigation.tryPerformContextualMenuAction = function (commandKind, gotoUrl) {
+                                switch (commandKind + '') {
+                                    case '0':
+                                        var options = { url: gotoUrl, showMaximized: false, dialogReturnValueCallback: function (dialogResult) { if (dialogResult == 1 || command == 'delete') { KanbanClient.loadKanBanBoard(); } } };
+                                        SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
+                                        return true;
+                                }
+                                return false;
+                            };
                             $(".associateditemscontextmenu").each(function () {
                                 window.epmLiveNavigation.addContextualMenu($(this), null, true);
                             });
@@ -348,7 +357,8 @@
             return {
                 bindEvents: bindEvents,
                 resetControls: resetControls,
-                loadKanBanPlanners: loadKanBanPlanners
+                loadKanBanPlanners: loadKanBanPlanners,
+                loadKanBanBoard: loadKanBanBoard
             };
 
         })();
