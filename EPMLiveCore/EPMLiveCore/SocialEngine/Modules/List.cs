@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Web.Script.Serialization;
 using EPMLiveCore.SocialEngine.Contracts;
 using EPMLiveCore.SocialEngine.Core;
 using EPMLiveCore.SocialEngine.Entities;
@@ -12,13 +13,13 @@ namespace EPMLiveCore.SocialEngine.Modules
         #region Fields (1) 
 
         private const string ALREADY_CREATED_EXCEPTION_MESSAGE =
-            "Cannot register more than one List Created activity on the same list.";
+            "Cannot register more than one created activity on the same list.";
 
         #endregion Fields 
 
-        #region Methods (7) 
+        #region Methods (9) 
 
-        // Private Methods (7) 
+        // Private Methods (9) 
 
         private static bool IsIgnoredList(ProcessActivityEventArgs args, Dictionary<string, object> data)
         {
@@ -44,6 +45,9 @@ namespace EPMLiveCore.SocialEngine.Modules
                 case ActivityKind.Deleted:
                     RegisterDeletionActivity(args);
                     break;
+                case ActivityKind.BulkOperation:
+                    RegisterBulkOperationActivity(args);
+                    break;
             }
         }
 
@@ -59,7 +63,42 @@ namespace EPMLiveCore.SocialEngine.Modules
                 case ActivityKind.Deleted:
                     ValidateDeletionActivity(args);
                     break;
+                case ActivityKind.BulkOperation:
+                    ValidateBulkOperationActivity(args);
+                    break;
             }
+        }
+
+        private void RegisterBulkOperationActivity(ProcessActivityEventArgs args)
+        {
+            Dictionary<string, object> data = args.Data;
+            ThreadManager threadManager = args.ThreadManager;
+            ActivityManager activityManager = args.ActivityManager;
+            StreamManager streamManager = args.StreamManager;
+
+            var webId = (Guid) data["WebId"];
+
+            Thread thread = threadManager.SaveThread(new Thread
+            {
+                Kind = ObjectKind.List,
+                WebId = webId,
+                ListId = (Guid) data["Id"],
+                Users = new[] { new User { Id = (int) data["UserId"], Role = UserRole.Author } }
+            });
+
+            activityManager.RegisterActivity(new Activity
+            {
+                Kind = args.ActivityKind,
+                UserId = (int) data["UserId"],
+                Thread = thread,
+                Date = (DateTime) data["ActivityTime"],
+                Data = new JavaScriptSerializer().Serialize(new {totalActivities = data["TotalActivities"]})
+            });
+
+            Guid streamId = streamManager.GetGlobalStreamId(webId);
+
+            threadManager.AssociateStreams(thread, new[] { streamId });
+            threadManager.UpdateUsers(thread);
         }
 
         private void RegisterCreationActivity(ProcessActivityEventArgs args)
@@ -78,7 +117,7 @@ namespace EPMLiveCore.SocialEngine.Modules
                 Kind = ObjectKind.List,
                 WebId = webId,
                 ListId = (Guid) data["Id"],
-                Users = new[] { new User { Id = (int) data["UserId"], Role = UserRole.Creator } }
+                Users = new[] {new User {Id = (int) data["UserId"], Role = UserRole.Author}}
             });
 
             activityManager.RegisterActivity(new Activity
@@ -113,6 +152,23 @@ namespace EPMLiveCore.SocialEngine.Modules
             });
         }
 
+        private void ValidateBulkOperationActivity(ProcessActivityEventArgs args)
+        {
+            Dictionary<string, object> data = args.Data;
+
+            new DataValidator(data).Validate(new Dictionary<string, DataType>
+            {
+                {"Id", DataType.Guid},
+                {"WebId", DataType.Guid},
+                {"SiteId", DataType.Guid},
+                {"UserId", DataType.Int},
+                {"TotalActivities", DataType.Int},
+                {"ActivityTime", DataType.DateTime}
+            });
+
+            IsIgnoredList(args, data);
+        }
+
         private void ValidateCreationActivity(ProcessActivityEventArgs args)
         {
             Dictionary<string, object> data = args.Data;
@@ -138,19 +194,23 @@ namespace EPMLiveCore.SocialEngine.Modules
 
         private void ValidateDeletionActivity(ProcessActivityEventArgs args)
         {
-            new DataValidator(args.Data).Validate(new Dictionary<string, DataType>
+            Dictionary<string, object> data = args.Data;
+
+            new DataValidator(data).Validate(new Dictionary<string, DataType>
             {
                 {"Id", DataType.Guid},
+                {"WebId", DataType.Guid},
                 {"UserId", DataType.Int},
                 {"ActivityTime", DataType.DateTime}
             });
 
-            if (IsIgnoredList(args, args.Data)) return;
+            if (IsIgnoredList(args, data)) return;
 
-            if (args.ActivityManager.ActivityExists(ObjectKind.List, ActivityKind.Deleted, (Guid) args.Data["Id"]))
+            if (args.ActivityManager.ActivityExists(ObjectKind.List, ActivityKind.Deleted, (Guid) data["WebId"],
+                (Guid) data["Id"]))
             {
                 throw new SocialEngineException(
-                    "Cannot register more than one List Deleted activity on the same list.", LogKind.Info);
+                    "Cannot register more than one deleted activity on the same list.", LogKind.Info);
             }
         }
 

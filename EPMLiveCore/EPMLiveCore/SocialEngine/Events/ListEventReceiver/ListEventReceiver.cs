@@ -45,6 +45,7 @@ namespace EPMLiveCore.SocialEngine.Events.ListEventReceiver
                     new Dictionary<string, object>
                     {
                         {"Id", properties.ListId},
+                        {"WebId", properties.WebId},
                         {"UserId", properties.Web.CurrentUser.ID},
                         {"ActivityTime", DateTime.Now}
                     }, properties.Web);

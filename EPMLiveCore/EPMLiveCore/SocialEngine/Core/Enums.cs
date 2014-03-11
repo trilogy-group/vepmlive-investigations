@@ -6,7 +6,8 @@ namespace EPMLiveCore.SocialEngine.Core
     {
         Created,
         Updated,
-        Deleted
+        Deleted,
+        BulkOperation
     }
 
     internal enum DataType
@@ -34,10 +35,9 @@ namespace EPMLiveCore.SocialEngine.Core
     public enum UserRole
     {
         None        = 0x0000,
-        Creator     = 0x0001,
-        Editor      = 0x0002,
-        Commenter   = 0x0004,
-        Assignee    = 0x0008,
-        Follower    = 0x0016
+        Author      = 0x0001,
+        Commenter   = 0x0002,
+        Assignee    = 0x0004,
+        Liker       = 0x0008
     }
 }

@@ -13,7 +13,7 @@ namespace EPMLiveCore.SocialEngine.Modules
         #region Fields (2) 
 
         private const string ALREADY_CREATED_EXCEPTION_MESSAGE =
-            "Cannot register more than one Workspace Created activity on the same workspace.";
+            "Cannot register more than one created activity on the same workspace.";
 
         private const string CREATED_CONFIG_KEY = "EPM_SE_WC_Processed";
 
@@ -60,7 +60,7 @@ namespace EPMLiveCore.SocialEngine.Modules
                 Url = (string) data["URL"],
                 Kind = ObjectKind.Workspace,
                 WebId = webId,
-                Users = new[] { new User { Id = (int) data["UserId"], Role = UserRole.Creator } }
+                Users = new[] { new User { Id = (int) data["UserId"], Role = UserRole.Author } }
             });
 
             activityManager.RegisterActivity(new Activity
@@ -151,7 +151,7 @@ namespace EPMLiveCore.SocialEngine.Modules
             if (activityManager.ActivityExists(ObjectKind.Workspace, ActivityKind.Deleted, (Guid) data["Id"]))
             {
                 throw new SocialEngineException(
-                    "Cannot register more than one Workspace Deleted activity on the same workspace.", LogKind.Info);
+                    "Cannot register more than one deleted activity on the same workspace.", LogKind.Info);
             }
         }
 
