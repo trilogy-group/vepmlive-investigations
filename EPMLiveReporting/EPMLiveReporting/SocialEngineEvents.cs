@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using EPMLiveCore;
 using EPMLiveCore.SocialEngine;
 using EPMLiveCore.SocialEngine.Core;
@@ -13,7 +12,13 @@ namespace EPMLiveReportsAdmin
     {
         #region Methods (5) 
 
-        // Public Methods (3) 
+        // Public Methods (4) 
+
+        public static bool AreEqualObjects(object obj1, object obj2)
+        {
+            if (obj1 == null) return obj2 == null;
+            return obj2 != null && obj1.ToString().Equals(obj2.ToString());
+        }
 
         public static void ItemAdded(SPItemEventProperties properties)
         {
@@ -37,7 +42,18 @@ namespace EPMLiveReportsAdmin
 
         public static void ItemDeleting(SPItemEventProperties properties)
         {
-            throw new NotImplementedException();
+            SocialEngineProxy.ProcessActivity(ObjectKind.ListItem, ActivityKind.Deleted, new Dictionary<string, object>
+            {
+                {"Id", properties.ListItemId},
+                {"Title", properties.ListItem.Title},
+                {"URL", properties.ListItem.Url},
+                {"ListTitle", properties.ListTitle},
+                {"ListId", properties.ListId},
+                {"WebId", properties.Web.ID},
+                {"SiteId", properties.SiteId},
+                {"UserId", properties.Web.CurrentUser.ID},
+                {"ActivityTime", DateTime.Now}
+            }, properties.Web);
         }
 
         public static void ItemUpdated(SPItemEventProperties properties)
@@ -55,23 +71,16 @@ namespace EPMLiveReportsAdmin
                 {"ActivityTime", properties.ListItem["Modified"]}
             };
 
-            var tasks = new List<Task>
-            {
-                Task.Factory.StartNew(() => GetAssignedToUsers(properties, data)),
-                Task.Factory.StartNew(() => GetChangedProperties(properties, data))
-            };
-
-            Task.WaitAll(tasks.ToArray());
+            GetAssignedToUsers(properties, data);
 
             SocialEngineProxy.ProcessActivity(ObjectKind.ListItem, ActivityKind.Updated, data, properties.Web);
         }
 
-        // Private Methods (2) 
+        // Private Methods (1) 
 
         private static void GetAssignedToUsers(SPItemEventProperties properties, Dictionary<string, object> data)
         {
             var users = new List<int>();
-            var oldUsers = new List<int>();
 
             if (properties.List.Fields.ContainsFieldWithInternalName("AssignedTo"))
             {
@@ -84,19 +93,6 @@ namespace EPMLiveReportsAdmin
             }
 
             data.Add("AssignedTo", string.Join(",", users.AsParallel().Distinct().ToArray()));
-        }
-
-        private static void GetChangedProperties(SPItemEventProperties properties, Dictionary<string, object> data)
-        {
-            SPFieldCollection collection = properties.List.Fields;
-
-            List<string> changedProperties = (from SPField spField in collection
-                where !spField.Hidden && !spField.ReadOnlyField
-                let internalName = spField.InternalName
-                where properties.ListItem[internalName] != properties.BeforeProperties[internalName]
-                select spField.Title).ToList();
-
-            data.Add("ChangedProperties", string.Join(",", changedProperties.ToArray()));
         }
 
         #endregion Methods 
