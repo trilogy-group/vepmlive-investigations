@@ -517,7 +517,7 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
                 $('.toolbar-search').css("margin-left", "0px");
             }
 
-            if (clickedOutsideElementClass('dropdown-menu') && clickedOutsideElementClass('dropdown')) {
+            if (clickedOutsideElementClass('dropdown-menu', e) && clickedOutsideElementClass('dropdown', e)) {
                 $('.dropdown-menu').css('display', 'none');
             }
         });
@@ -601,9 +601,18 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
             var iconClass = cfg['iconClass'];
             var title = cfg['title'];
             var value = cfg['value'];
+            var toolTip = cfg['toolTip'];
             var events = cfg['events'];
 
             var li = $(document.createElement('li'));
+
+            if (toolTip) {
+                li.attr('title', toolTip);
+            }
+            else if (title) {
+                li.attr('title', title);
+            }
+
             var aContainer = $(document.createElement('a'));
             aContainer.attr('class', 'dropdown-toggle');
             if ((title == undefined || title.toLowerCase() == 'none') &&
@@ -648,9 +657,17 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
             var controlId = cfg['controlId']
             var title = cfg['title'];
             var iconClass = cfg['iconClass'];
+            var toolTip = cfg['toolTip'];
             var value = cfg['value'];
 
+
             var li = $(document.createElement('li'));
+            if (toolTip) {
+                li.attr('title', toolTip);
+            }
+            else if (title) {
+                li.attr('title', title);
+            }
             //create anchor
             var aContainer = $(document.createElement('a'));
             aContainer.attr('class', 'dropdown-toggle');
@@ -760,6 +777,7 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
         //START RIGHT SIDE TOOL BAR METHODS
         function createSearch(cfg, ul) {
             var li = $(document.createElement('li'));
+            li.attr('title', 'Search');
             var isCustom = (cfg['custom'].toLowerCase() == 'yes');
 
             if (isCustom) {
@@ -780,7 +798,6 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
                 aContainer.attr('id', 'toolbar-search-icon');
                 aContainer.attr('class', 'nav-icon');
                 aContainer.attr('style', 'font-size:.9em;');
-                aContainer.attr('title', 'Standard View');
                 aContainer.attr('data-placement', 'top');
                 aContainer.attr('href', 'javascript:void(0)');
                 aContainer.click(function () {
@@ -803,11 +820,11 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
         function createGroupBy(cfg, ul) {
             var li = $(document.createElement('li'));
             li.attr('class', 'dropdown');
+            li.attr('title', 'Group by');
 
             var aContainer = $(document.createElement('a'));
             aContainer.attr('id', 'group-dropdown');
             aContainer.attr('class', 'dropdown-toggle nav-icon');
-            aContainer.attr('title', 'Standard View');
             aContainer.attr('data-placement', 'top');
             aContainer.attr('href', 'javascript:void(0)');
             var spnImg = $(document.createElement('span'));
@@ -992,7 +1009,7 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
             var aFooterSave = $(document.createElement('a'));
             aFooterSave.attr('id', 'aGroupBySave');
             aFooterSave.attr('href', 'javascript:void(0)');
-            aFooterSave.text('Save');
+            aFooterSave.text('Apply');
             aFooterSave.bind('click', function () {
                 var numGroups = $('.grouping-wrapper').children('.grouping-row').length;
                 if (numGroups > 0) {
@@ -1018,9 +1035,19 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
         function createMultiSelect(cfg, ul) {
             var controlId = cfg['controlId'];
             var iconClass = cfg['iconClass'];
+            var title = cfg['title'];
+            var toolTip = cfg['toolTip'];
 
             var li = $(document.createElement('li'));
             li.attr('class', 'dropdown');
+
+            if (toolTip) {
+                li.attr('title', toolTip);
+            }
+            else if (title) {
+                li.attr('title', title);
+            }
+
             var aContainer = $(document.createElement('a'));
             aContainer.attr('class', 'dropdown-toggle nav-icon');
             aContainer.attr('href', 'javascript:void(0)');
@@ -1089,6 +1116,8 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
             aSelectAllChxBx.append(lblSelectAllChxBx);
             liSelectAll.append(aSelectAllChxBx);
             ulColumns.append(liSelectAll);
+
+            var divChoicesContainer = $(document.createElement('div'));
             //foreach column we add an element, ulColumns.apend(...)
             var sections = cfg['sections'];
             setUlChoices(controlId, sections);
@@ -1102,7 +1131,7 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
                     var liHeading = $(document.createElement('li'));
                     liHeading.attr('class', 'dropdown-header');
                     liHeading.text(sHeading);
-                    ulColumns.append(liHeading);
+                    divChoicesContainer.append(liHeading);
                 }
                 //add section divider
                 var sDivider = section['divider'];
@@ -1111,7 +1140,7 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
                     sDivider.toLowerCase() != 'none') {
                     var liDivider = $(document.createElement('li'));
                     liDivider.attr('class', 'divider');
-                    ulColumns.append(liDivider);
+                    divChoicesContainer.append(liDivider);
                 }
 
                 for (var sIndex in section['options']) {
@@ -1165,9 +1194,11 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
                     lbl.append(text);
                     a.append(lbl);
                     liChoice.append(a)
-                    ulColumns.append(liChoice);
+                    divChoicesContainer.append(liChoice);
                 }
             }
+
+            ulColumns.append(divChoicesContainer);
 
             var liDivider = $(document.createElement('li'));
             liDivider.addClass('divider');
@@ -1194,6 +1225,8 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
                     var ctrlId = $(this).closest('ul').siblings('a').attr('controlId');
                     data['sections'] = getUlChoices(ctrlId);
                     cfg['applyButtonConfig']['function'](data);
+
+                    $('#' + getUlId($(this).closest('ul').siblings('a').attr('controlId'))).toggle();
                 });
             }
 
