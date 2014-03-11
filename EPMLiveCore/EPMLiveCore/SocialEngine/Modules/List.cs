@@ -80,10 +80,12 @@ namespace EPMLiveCore.SocialEngine.Modules
 
             Thread thread = threadManager.SaveThread(new Thread
             {
+                Title = string.Empty,
+                Url = string.Empty,
                 Kind = ObjectKind.List,
                 WebId = webId,
                 ListId = (Guid) data["Id"],
-                Users = new[] { new User { Id = (int) data["UserId"], Role = UserRole.Author } }
+                Users = new[] {new User {Id = (int) data["UserId"], Role = UserRole.Author}}
             });
 
             activityManager.RegisterActivity(new Activity
@@ -148,7 +150,7 @@ namespace EPMLiveCore.SocialEngine.Modules
                 Kind = ActivityKind.Deleted,
                 UserId = (int) data["UserId"],
                 Thread = thread,
-                Date = (DateTime) data["DeletedAt"]
+                Date = (DateTime) data["ActivityTime"]
             });
         }
 
@@ -165,8 +167,6 @@ namespace EPMLiveCore.SocialEngine.Modules
                 {"TotalActivities", DataType.Int},
                 {"ActivityTime", DataType.DateTime}
             });
-
-            IsIgnoredList(args, data);
         }
 
         private void ValidateCreationActivity(ProcessActivityEventArgs args)
