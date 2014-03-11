@@ -939,33 +939,29 @@
                         redirectUrl = redirectUrl.split('#')[0];
                     }
 
-                    window.epmLiveNavigation.tryPerformContextualMenuAction = function(commandKind, gotoUrl) {
-                        switch (commandKind + '') {
+                    switch (kind + '') {
+                        case '-1':
+                            var options = { url: redirectUrl, showMaximized: false, dialogReturnValueCallback: function (dialogResult) { if (dialogResult == 1 || command == 'delete') { KanbanClient.loadKanBanBoard(); } } };
+                            SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
+                            return true;
                         case '0':
-                            OpenCreateWebPageDialog(gotoUrl);
+                            OpenCreateWebPageDialog(redirectUrl);
                             return true;
                         case '1':
-                            location.href = gotoUrl;
+                            location.href = redirectUrl;
                             return true;
                         case '2':
-                            window.open(gotoUrl + '&IsDlg=1', '', 'height=100, width=200, toolbar=no, menubar=no, scrollbars=yes, resizable=yes,location=no, directories=no, status=yes');
+                            window.open(redirectUrl + '&IsDlg=1', '', 'height=100, width=200, toolbar=no, menubar=no, scrollbars=yes, resizable=yes,location=no, directories=no, status=yes');
                             return true;
                         case '3':
-                            window.open(gotoUrl + '&IsDlg=1', '', 'width=' + screen.width + ',height=' + screen.height + ',top=0,left=0, toolbar=no, menubar=no, scrollbars=yes, resizable=yes,location=no, directories=no, status=yes');
+                            window.open(redirectUrl + '&IsDlg=1', '', 'width=' + screen.width + ',height=' + screen.height + ',top=0,left=0, toolbar=no, menubar=no, scrollbars=yes, resizable=yes,location=no, directories=no, status=yes');
                             return true;
                         case '5':
-                            SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', { url: gotoUrl, width: 600, height: 500 });
+                            SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', { url: redirectUrl, width: 600, height: 500 });
                             return true;
                         case '6':
-                            SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', { url: gotoUrl, showMaximized: true });
+                            SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', { url: redirectUrl, showMaximized: true });
                             return true;
-                        }
-
-                        return false;
-                    };
-
-                    if (!window.epmLiveNavigation.tryPerformContextualMenuAction(kind, redirectUrl)) {
-                        switch (kind + '') {
                         case '98':
                             if (command !== 'nav:addToFav') {
                                 if (command !== 'nav:remove' && command !== 'nav:removeFavWS' && command !== 'nav:removeFavRI') {
@@ -1123,8 +1119,8 @@
                         default:
                             SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', { url: redirectUrl, width: 700 });
                             break;
-                        }
                     }
+
                 }
 
                 function registerEvents() {
@@ -1973,7 +1969,7 @@
             epmLiveNavigation.init();
 
             var menuManager = (function () {
-                var _setupMenu = function ($li, defaultCommands, forcePopup) {
+                var _setupMenu = function ($li, defaultCommands, forcePopup, customOverrideKind) {
                     defaultCommands = defaultCommands || [];
 
                     var $menu = $($li.find('.epm-nav-contextual-menu').get(0));
@@ -2037,6 +2033,9 @@
 
                             if (forcePopup) {
                                 cmd.kind = 0;
+                            }
+                            if (customOverrideKind) {
+                                cmd.kind = customOverrideKind;
                             }
 
                             var webId = $ca.data('webid');
@@ -2164,7 +2163,11 @@
 
                                             for (var i = 0; i < items.length; i++) {
                                                 var item = items[i];
-                                                commands.push({ title: item['@Title'], command: item['@Command'], kind: item['@Kind'], imgUrl: item['@ImageUrl'] });
+                                                if (customOverrideKind) {
+                                                    commands.push({ title: item['@Title'], command: item['@Command'], kind: customOverrideKind, imgUrl: item['@ImageUrl'] });
+                                                } else {
+                                                    commands.push({ title: item['@Title'], command: item['@Command'], kind: item['@Kind'], imgUrl: item['@ImageUrl'] });
+                                                }
                                             }
                                         }
                                     }
@@ -2191,11 +2194,11 @@
                 };
             })();
 
-            window.epmLiveNavigation.addContextualMenu = function($li, defaultCommands, forcePopup) {
+            window.epmLiveNavigation.addContextualMenu = function ($li, defaultCommands, forcePopup, customOverrideKind) {
                 $li.append('<span class="epm-menu-btn"><span class="icon-ellipsis-horizontal"></span></span>');
 
                 $($li.find('.epm-menu-btn').get(0)).click(function () {
-                    menuManager.setupMenu($li, defaultCommands, forcePopup);
+                    menuManager.setupMenu($li, defaultCommands, forcePopup, customOverrideKind);
                 });
             };
 
