@@ -284,6 +284,14 @@ namespace EPMLiveCore.SocialEngine
                                         }
                                     }
 
+                                    if (!args.Cancel)
+                                    {
+                                        if (_events.OnPostActivityRegistration != null)
+                                        {
+                                            _events.OnPostActivityRegistration(args);
+                                        }
+                                    }
+
                                     if (args.Cancel)
                                     {
                                         LogCancellation(objectKind, activityKind, data, spWeb, args);

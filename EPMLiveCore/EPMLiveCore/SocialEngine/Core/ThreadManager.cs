@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Globalization;
 using System.Linq;
-using System.Threading.Tasks;
 using EPMLiveCore.SocialEngine.Entities;
 using Microsoft.SharePoint;
 
@@ -17,53 +17,13 @@ namespace EPMLiveCore.SocialEngine.Core
 
         #endregion Constructors 
 
-        #region Methods (14) 
+        #region Methods (19) 
 
-        // Public Methods (12) 
-
-        public void AddUsers(Thread thread)
-        {
-            foreach (User user in thread.Users)
-            {
-                bool userExists = false;
-                var existingRole = UserRole.None;
-
-                const string SQL =
-                    @"SELECT TOP (1) Role FROM SS_ThreadUsers WHERE ThreadId = @ThreadId AND UserId = @UserId";
-
-                using (var sqlCommand = new SqlCommand(SQL, SqlConnection))
-                {
-                    sqlCommand.Parameters.AddWithValue("@ThreadId", thread.Id);
-                    sqlCommand.Parameters.AddWithValue("@UserId", user.Id);
-
-                    object er = sqlCommand.ExecuteScalar();
-                    if (er != null && er != DBNull.Value)
-                    {
-                        userExists = true;
-                        existingRole = (UserRole) Enum.Parse(typeof(UserRole), er.ToString(), false);
-                    }
-                }
-
-                if (userExists && existingRole == user.Role) continue;
-
-                string sql = !userExists
-                    ? @"INSERT INTO SS_ThreadUsers (ThreadId, UserId, Role) VALUES (@ThreadId, @UserId, @Role)"
-                    : @"UPDATE SS_ThreadUsers SET Role = @Role WHERE ThreadId = @ThreadId AND UserId = @UserId";
-
-                using (var sqlCommand = new SqlCommand(sql, SqlConnection))
-                {
-                    sqlCommand.Parameters.AddWithValue("@ThreadId", thread.Id);
-                    sqlCommand.Parameters.AddWithValue("@UserId", user.Id);
-                    sqlCommand.Parameters.AddWithValue("@Role", !userExists ? user.Role : existingRole | user.Role);
-
-                    sqlCommand.ExecuteNonQuery();
-                }
-            }
-        }
+        // Public Methods (13) 
 
         public void AssociateStreams(Thread thread, Guid[] streamIds)
         {
-            Parallel.ForEach(streamIds, streamId =>
+            foreach (Guid streamId in streamIds)
             {
                 const string SQL = @"
                     IF NOT EXISTS (SELECT StreamId FROM SS_Streams_Threads WHERE StreamId = @StreamId AND ThreadId = @ThreadId)
@@ -78,7 +38,7 @@ namespace EPMLiveCore.SocialEngine.Core
 
                     sqlCommand.ExecuteNonQuery();
                 }
-            });
+            }
         }
 
         public void DeleteThread(Thread thread)
@@ -192,8 +152,6 @@ namespace EPMLiveCore.SocialEngine.Core
                     return thread;
                 }
             }
-
-            return null;
         }
 
         public IEnumerable<Guid> GetThreadIds(Guid webId)
@@ -240,12 +198,81 @@ namespace EPMLiveCore.SocialEngine.Core
             }
         }
 
+        public void RemoveUserRoles(Guid threadId, Dictionary<int, UserRole> rolesToRemove)
+        {
+            foreach (var user in rolesToRemove)
+            {
+                int userId = user.Key;
+
+                UserRole? existingRole = GetUserRole(threadId, userId);
+
+                if (!existingRole.HasValue || !existingRole.Value.Has(user.Value)) continue;
+
+                UserRole role = existingRole.Value.Remove(user.Value);
+                UpdateUserRole(threadId, userId, role, true);
+            }
+        }
+
         public Thread SaveThread(Thread thread)
         {
             return thread.Id != Guid.Empty ? UpdateThread(thread) : CreateThread(thread);
         }
 
-        // Private Methods (2) 
+        public void UpdateUsers(Thread thread)
+        {
+            var assignees = new List<int>();
+
+            foreach (User user in thread.Users)
+            {
+                if (user.Role.Has(UserRole.Assignee)) assignees.Add(user.Id);
+
+                UserRole? existingRole = GetUserRole(thread.Id, user.Id);
+
+                bool userExists = existingRole.HasValue;
+
+                if (userExists && existingRole.Value.Has(user.Role)) continue;
+
+                user.Role = !userExists ? user.Role : existingRole.Value | user.Role;
+                UpdateUserRole(thread.Id, user.Id, user.Role, userExists);
+            }
+
+            CleanupAssignees(thread.Id, assignees);
+        }
+
+        // Private Methods (6) 
+
+        private void CleanupAssignees(Guid threadId, List<int> assignees)
+        {
+            var rolesToRemove = new Dictionary<int, UserRole>();
+
+            const string SQL = @"SELECT Role, UserId FROM SS_ThreadUsers WHERE ThreadId = @ThreadId AND Role >= @Role";
+
+            var dt = new DataTable();
+
+            using (var sqlCommand = new SqlCommand(SQL, SqlConnection))
+            {
+                sqlCommand.Parameters.AddWithValue("@ThreadId", threadId);
+                sqlCommand.Parameters.AddWithValue("@Role", UserRole.Assignee);
+
+                dt.Load(sqlCommand.ExecuteReader());
+            }
+
+            EnumerableRowCollection<DataRow> roles = dt.AsEnumerable();
+
+            foreach (var userId in from r in roles
+                let role = (UserRole) Enum.Parse(typeof (UserRole), r["Role"].ToString(), false)
+                where role.Has(UserRole.Assignee)
+                select (int) r["UserId"]
+                into userId
+                where !assignees.Contains(userId)
+                where !rolesToRemove.ContainsKey(userId)
+                select userId)
+            {
+                rolesToRemove.Add(userId, UserRole.Assignee);
+            }
+
+            if (rolesToRemove.Count > 0) RemoveUserRoles(threadId, rolesToRemove);
+        }
 
         private Thread CreateThread(Thread thread)
         {
@@ -272,9 +299,42 @@ namespace EPMLiveCore.SocialEngine.Core
             return thread;
         }
 
+        private UserRole? GetUserRole(Guid threadId, int userId)
+        {
+            const string SQL =
+                @"SELECT TOP (1) Role FROM SS_ThreadUsers WHERE ThreadId = @ThreadId AND UserId = @UserId";
+
+            using (var sqlCommand = new SqlCommand(SQL, SqlConnection))
+            {
+                sqlCommand.Parameters.AddWithValue("@ThreadId", threadId);
+                sqlCommand.Parameters.AddWithValue("@UserId", userId);
+
+                object er = sqlCommand.ExecuteScalar();
+                if (er != null && er != DBNull.Value)
+                {
+                    return (UserRole) Enum.Parse(typeof (UserRole), er.ToString(), false);
+                }
+            }
+
+            return null;
+        }
+
+        private void RemoveThreadUser(Guid threadId, int userId)
+        {
+            const string SQL = @"DELETE FROM SS_ThreadUsers WHERE ThreadId = @ThreadId AND UserId = @UserId";
+
+            using (var sqlCommand = new SqlCommand(SQL, SqlConnection))
+            {
+                sqlCommand.Parameters.AddWithValue("@ThreadId", threadId);
+                sqlCommand.Parameters.AddWithValue("@UserId", userId);
+
+                sqlCommand.ExecuteNonQuery();
+            }
+        }
+
         private Thread UpdateThread(Thread thread)
         {
-            const string SQL = @"UPDATE INTO SS_Threads SET Title = @Title, SET URL = @URL WHERE Id = @Id";
+            const string SQL = @"UPDATE SS_Threads SET Title = @Title, URL = @URL WHERE Id = @Id";
 
             using (var sqlCommand = new SqlCommand(SQL, SqlConnection))
             {
@@ -286,6 +346,28 @@ namespace EPMLiveCore.SocialEngine.Core
             }
 
             return thread;
+        }
+
+        private void UpdateUserRole(Guid threadId, int userId, UserRole role, bool userExists)
+        {
+            if (userExists && role.Is(UserRole.None))
+            {
+                RemoveThreadUser(threadId, userId);
+                return;
+            }
+
+            string sql = !userExists
+                ? @"INSERT INTO SS_ThreadUsers (ThreadId, UserId, Role) VALUES (@ThreadId, @UserId, @Role)"
+                : @"UPDATE SS_ThreadUsers SET Role = @Role WHERE ThreadId = @ThreadId AND UserId = @UserId";
+
+            using (var sqlCommand = new SqlCommand(sql, SqlConnection))
+            {
+                sqlCommand.Parameters.AddWithValue("@ThreadId", threadId);
+                sqlCommand.Parameters.AddWithValue("@UserId", userId);
+                sqlCommand.Parameters.AddWithValue("@Role", role);
+
+                sqlCommand.ExecuteNonQuery();
+            }
         }
 
         #endregion Methods 

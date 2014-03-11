@@ -92,7 +92,7 @@ namespace EPMLiveCore.SocialEngine.Modules
             Guid streamId = streamManager.GetGlobalStreamId(webId);
 
             threadManager.AssociateStreams(thread, new[] {streamId});
-            threadManager.AddUsers(thread);
+            threadManager.UpdateUsers(thread);
         }
 
         private void RegisterDeletionActivity(ProcessActivityEventArgs args)

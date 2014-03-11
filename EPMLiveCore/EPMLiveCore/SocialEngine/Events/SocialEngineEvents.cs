@@ -9,9 +9,11 @@ namespace EPMLiveCore.SocialEngine.Events
 
     internal class SocialEngineEvents
     {
-        #region Properties (3) 
+        #region Properties (4) 
 
         public SocialEngineModuleDelegate<ProcessActivityEventArgs> OnActivityRegistration { get; set; }
+
+        public SocialEngineModuleDelegate<ProcessActivityEventArgs> OnPostActivityRegistration { get; set; }
 
         public SocialEngineModuleDelegate<ProcessActivityEventArgs> OnPreActivityRegistration { get; set; }
 

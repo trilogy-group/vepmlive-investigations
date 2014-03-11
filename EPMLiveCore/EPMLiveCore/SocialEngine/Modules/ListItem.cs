@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
+using System.Web.Script.Serialization;
 using EPMLiveCore.Infrastructure;
 using EPMLiveCore.SocialEngine.Contracts;
 using EPMLiveCore.SocialEngine.Core;
@@ -20,42 +20,20 @@ namespace EPMLiveCore.SocialEngine.Modules
 
         #endregion Fields 
 
-        #region Methods (11) 
+        #region Methods (14) 
 
-        // Private Methods (11) 
+        // Private Methods (14) 
 
-        private static void AddThreadUsers(Dictionary<string, object> data, ThreadManager threadManager, Thread thread)
+        private static bool EnsureNotIgnoredList(ProcessActivityEventArgs args, Dictionary<string, object> data)
         {
-            var users=new List<User> {new User {Id = (int) data["UserId"], Role = UserRole.Creator}};
+            var listTitle = (string) data["ListTitle"];
 
-            if (data.ContainsKey("AssignedTo"))
-            {
-                var assignedToUsers = data["AssignedTo"] as string;
-                if (!string.IsNullOrEmpty(assignedToUsers))
-                {
-                    string[] asu = assignedToUsers.Split(',');
+            if (!Core.Utilities.IsIgnoredList(listTitle, args.ContextWeb)) return false;
 
-                    foreach (string user in asu)
-                    {
-                        int userId;
-                        if (!int.TryParse(user.Trim(), out userId)) continue;
+            args.Cancel = true;
+            args.CancellationMessage = listTitle + " is part of ignored Social Stream lists.";
 
-                        User tu = (from u in users where u.Id == userId select u).FirstOrDefault();
-
-                        if (tu == null)
-                        {
-                            users.Add(new User {Id = userId, Role = UserRole.Assignee});
-                        }
-                        else
-                        {
-                            tu.Role |= UserRole.Assignee;
-                        }
-                    }
-                }
-            }
-
-            thread.Users = users.AsParallel().Distinct().ToArray();
-            threadManager.AddUsers(thread);
+            return true;
         }
 
         private TimeSpan GetRelatedActivityInterval(SPWeb contextWeb)
@@ -83,23 +61,19 @@ namespace EPMLiveCore.SocialEngine.Modules
             }, true).Value;
         }
 
-        private static bool EnsureNotIgnoredList(ProcessActivityEventArgs args, Dictionary<string, object> data)
-        {
-            var listTitle = (string) data["ListTitle"];
-
-            if (!Core.Utilities.IsIgnoredList(listTitle, args.ContextWeb)) return false;
-
-            args.Cancel = true;
-            args.CancellationMessage = listTitle + " is part of ignored Social Stream lists.";
-
-            return true;
-        }
-
         private void OnActivityRegistration(ProcessActivityEventArgs args)
         {
             if (args.ObjectKind != ObjectKind.ListItem) return;
 
             if (args.ActivityKind == ActivityKind.Created) RegisterCreationActivity(args);
+            else if (args.ActivityKind == ActivityKind.Updated) RegisterUpdationActivity(args);
+        }
+
+        private void OnPostActivityRegistration(ProcessActivityEventArgs args)
+        {
+            if (args.ObjectKind != ObjectKind.ListItem) return;
+
+            PerformPostRegistrationSteps(args);
         }
 
         private void OnPreActivityRegistration(ProcessActivityEventArgs args)
@@ -113,9 +87,43 @@ namespace EPMLiveCore.SocialEngine.Modules
         {
             if (args.ObjectKind != ObjectKind.ListItem) return;
 
-            if (args.ActivityKind == ActivityKind.Created) ValidateCreationActivity(args);
-            else if (args.ActivityKind == ActivityKind.Updated) ValidateUpdationActivity(args);
-            else if (args.ActivityKind == ActivityKind.Deleted) ValidateDeletionActivity(args);
+            switch (args.ActivityKind)
+            {
+                case ActivityKind.Created:
+                    ValidateCreationActivity(args);
+                    break;
+                case ActivityKind.Updated:
+                    ValidateUpdationActivity(args);
+                    break;
+                case ActivityKind.Deleted:
+                    ValidateDeletionActivity(args);
+                    break;
+            }
+        }
+
+        private void PerformPostRegistrationSteps(ProcessActivityEventArgs args)
+        {
+            Dictionary<string, object> data = args.Data;
+
+            ThreadManager threadManager = args.ThreadManager;
+            ActivityManager activityManager = args.ActivityManager;
+            StreamManager streamManager = args.StreamManager;
+
+            var activity = (Activity) data["#!Activity"];
+            var thread = (Thread) data["#!Thread"];
+
+            if (data.ContainsKey("IsMassOperation"))
+            {
+                if ((bool) data["IsMassOperation"])
+                {
+                    activityManager.FlagMassOperation(activity.Id);
+                }
+            }
+
+            Guid streamId = streamManager.GetGlobalStreamId((Guid) data["WebId"]);
+            threadManager.AssociateStreams(thread, new[] {streamId});
+
+            UpdateThreadUsers(data, threadManager, thread);
         }
 
         private void PerformPreRegistrationSteps(ProcessActivityEventArgs args)
@@ -147,7 +155,6 @@ namespace EPMLiveCore.SocialEngine.Modules
             Dictionary<string, object> data = args.Data;
             ThreadManager threadManager = args.ThreadManager;
             ActivityManager activityManager = args.ActivityManager;
-            StreamManager streamManager = args.StreamManager;
 
             var webId = (Guid) data["WebId"];
 
@@ -169,18 +176,90 @@ namespace EPMLiveCore.SocialEngine.Modules
                 Date = (DateTime) data["ActivityTime"]
             });
 
-            if (data.ContainsKey("IsMassOperation"))
+            data.Add("#!Thread", thread);
+            data.Add("#!Activity", activity);
+        }
+
+        private void RegisterUpdationActivity(ProcessActivityEventArgs args)
+        {
+            Dictionary<string, object> data = args.Data;
+            ThreadManager threadManager = args.ThreadManager;
+            ActivityManager activityManager = args.ActivityManager;
+            StreamManager streamManager = args.StreamManager;
+
+            Thread thread = threadManager.GetThread((Guid) data["WebId"], (Guid) data["ListId"], (int) data["Id"]) ??
+                            new Thread();
+
+            thread.Title = (string) data["Title"];
+            thread.Url = (string) data["URL"];
+            thread.Kind = args.ObjectKind;
+            thread.WebId = (Guid) data["WebId"];
+            thread.ListId = (Guid) data["ListId"];
+            thread.ItemId = (int) data["Id"];
+
+            thread = threadManager.SaveThread(thread);
+
+            string metaData = null;
+
+            var changedProperties = data["ChangedProperties"] as string;
+            if (!string.IsNullOrEmpty(changedProperties))
             {
-                if ((bool) data["IsMassOperation"])
+                bool renamed = changedProperties.Split(',').Any(p => p.Trim().ToLower().Equals("title"));
+
+                var serializer = new JavaScriptSerializer();
+                metaData = serializer.Serialize(new
                 {
-                    activityManager.FlagMassOperation(activity.Id);
+                    changedProperties,
+                    renamed
+                });
+            }
+
+            Activity activity = activityManager.RegisterActivity(new Activity
+            {
+                Kind = args.ActivityKind,
+                UserId = (int) data["UserId"],
+                Thread = thread,
+                Date = (DateTime) data["ActivityTime"],
+                Data = metaData
+            });
+
+            data.Add("#!Thread", thread);
+            data.Add("#!Activity", activity);
+        }
+
+        private static void UpdateThreadUsers(Dictionary<string, object> data, ThreadManager threadManager,
+            Thread thread)
+        {
+            var users = new List<User> {new User {Id = (int) data["UserId"], Role = UserRole.Creator}};
+
+            if (data.ContainsKey("AssignedTo"))
+            {
+                var assignedToUsers = data["AssignedTo"] as string;
+                if (!string.IsNullOrEmpty(assignedToUsers))
+                {
+                    string[] asu = assignedToUsers.Split(',');
+
+                    foreach (string user in asu)
+                    {
+                        int userId;
+                        if (!int.TryParse(user.Trim(), out userId)) continue;
+
+                        User tu = (from u in users where u.Id == userId select u).FirstOrDefault();
+
+                        if (tu == null)
+                        {
+                            users.Add(new User {Id = userId, Role = UserRole.Assignee});
+                        }
+                        else
+                        {
+                            tu.Role |= UserRole.Assignee;
+                        }
+                    }
                 }
             }
 
-            Guid streamId = streamManager.GetGlobalStreamId(webId);
-            threadManager.AssociateStreams(thread, new[] {streamId});
-
-            AddThreadUsers(data, threadManager, thread);
+            thread.Users = users.AsParallel().Distinct().ToArray();
+            threadManager.UpdateUsers(thread);
         }
 
         private void ValidateCreationActivity(ProcessActivityEventArgs args)
@@ -222,6 +301,8 @@ namespace EPMLiveCore.SocialEngine.Modules
             {
                 {"Id", DataType.Int},
                 {"Title", DataType.String},
+                {"URL", DataType.String},
+                {"ListTitle", DataType.String},
                 {"ListId", DataType.Guid},
                 {"WebId", DataType.Guid},
                 {"SiteId", DataType.Guid},
@@ -242,6 +323,7 @@ namespace EPMLiveCore.SocialEngine.Modules
             events.OnValidateActivity += OnValidateActivity;
             events.OnPreActivityRegistration += OnPreActivityRegistration;
             events.OnActivityRegistration += OnActivityRegistration;
+            events.OnPostActivityRegistration += OnPostActivityRegistration;
         }
 
         #endregion
