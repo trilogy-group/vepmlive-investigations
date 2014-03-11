@@ -53,13 +53,12 @@ namespace EPMLiveCore.SocialEngine.Core
 
         public void DeleteThreads(IEnumerable<Guid> threadIds)
         {
-            const string SQL = @"UPDATE SS_Threads SET Deleted = 1 WHERE Id IN (@Ids)";
-
             string[] ids = threadIds.Select(threadId => string.Format(@"'{0}'", threadId)).Distinct().ToArray();
 
-            using (var sqlCommand = new SqlCommand(SQL, SqlConnection))
+            string sql = @"UPDATE SS_Threads SET Deleted = 1 WHERE Id IN (" + string.Join(",", ids) + ")";
+
+            using (var sqlCommand = new SqlCommand(sql, SqlConnection))
             {
-                sqlCommand.Parameters.AddWithValue("@Ids", string.Join(",", ids));
                 sqlCommand.ExecuteNonQuery();
             }
         }

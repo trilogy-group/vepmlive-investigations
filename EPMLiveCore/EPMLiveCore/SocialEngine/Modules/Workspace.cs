@@ -60,7 +60,7 @@ namespace EPMLiveCore.SocialEngine.Modules
                 Url = (string) data["URL"],
                 Kind = ObjectKind.Workspace,
                 WebId = webId,
-                Users = new[] { new User { Id = (int) data["UserId"], Role = UserRole.Author } }
+                Users = new[] {new User {Id = (int) data["UserId"], Role = UserRole.Author}}
             });
 
             activityManager.RegisterActivity(new Activity
@@ -80,12 +80,30 @@ namespace EPMLiveCore.SocialEngine.Modules
         }
 
         private static void RegisterDeletionActivity(Dictionary<string, object> data, ThreadManager threadManager,
-            ActivityManager activityManager)
+            ActivityManager activityManager, StreamManager streamManager, SPWeb contextWeb)
         {
             var webId = (Guid) data["Id"];
 
             Thread thread = threadManager.GetThread(webId);
-            if (thread == null) return;
+
+            if (thread == null)
+            {
+                thread = threadManager.SaveThread(new Thread
+                {
+                    Title = (string) data["Title"],
+                    Url = (string) data["URL"],
+                    Kind = ObjectKind.Workspace,
+                    WebId = webId,
+                    Users = new[] {new User {Id = (int) data["UserId"], Role = UserRole.Author}},
+                });
+
+                Guid streamId = streamManager.GetGlobalStreamId(webId);
+
+                threadManager.AssociateStreams(thread, new[] {streamId});
+                threadManager.UpdateUsers(thread);
+
+                CoreFunctions.setConfigSetting(contextWeb, CREATED_CONFIG_KEY, true.ToString());
+            }
 
             threadManager.DeleteThread(thread);
 
@@ -111,7 +129,7 @@ namespace EPMLiveCore.SocialEngine.Modules
             }
             else
             {
-                RegisterDeletionActivity(data, threadManager, activityManager);
+                RegisterDeletionActivity(data, threadManager, activityManager, streamManager, contextWeb);
             }
         }
 
@@ -144,8 +162,10 @@ namespace EPMLiveCore.SocialEngine.Modules
             new DataValidator(data).Validate(new Dictionary<string, DataType>
             {
                 {"Id", DataType.Guid},
+                {"Title", DataType.String},
+                {"URL", DataType.String},
                 {"UserId", DataType.Int},
-                {"DeletedAt", DataType.Int}
+                {"ActivityTime", DataType.DateTime}
             });
 
             if (activityManager.ActivityExists(ObjectKind.Workspace, ActivityKind.Deleted, (Guid) data["Id"]))

@@ -23,6 +23,8 @@ namespace EPMLiveCore.SocialEngine.Events.WebEventReceiver
                 new Dictionary<string, object>
                 {
                     {"Id", properties.WebId},
+                    {"Title", properties.Web.Title},
+                    {"URL", properties.ServerRelativeUrl},
                     {"UserId", properties.Web.CurrentUser.ID},
                     {"ActivityTime", DateTime.Now}
                 }, properties.Web);

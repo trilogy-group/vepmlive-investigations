@@ -20,9 +20,9 @@ namespace EPMLiveCore.SocialEngine.Modules
 
         #endregion Fields 
 
-        #region Methods (15) 
+        #region Methods (16) 
 
-        // Private Methods (15) 
+        // Private Methods (16) 
 
         private static bool EnsureNotIgnoredList(ProcessActivityEventArgs args, Dictionary<string, object> data)
         {
@@ -34,6 +34,22 @@ namespace EPMLiveCore.SocialEngine.Modules
             args.CancellationMessage = listTitle + " is part of ignored Social Stream lists.";
 
             return true;
+        }
+
+        private static void EnsureValideData(Dictionary<string, object> data)
+        {
+            new DataValidator(data).Validate(new Dictionary<string, DataType>
+            {
+                {"Id", DataType.Int},
+                {"Title", DataType.String},
+                {"URL", DataType.String},
+                {"ListTitle", DataType.String},
+                {"ListId", DataType.Guid},
+                {"WebId", DataType.Guid},
+                {"SiteId", DataType.Guid},
+                {"UserId", DataType.Int},
+                {"ActivityTime", DataType.DateTime}
+            });
         }
 
         private TimeSpan GetRelatedActivityInterval(SPWeb contextWeb)
@@ -108,6 +124,8 @@ namespace EPMLiveCore.SocialEngine.Modules
                 case ActivityKind.Deleted:
                     ValidateDeletionActivity(args);
                     break;
+                default:
+                    throw new SocialEngineException("This activity cannot be performed on a list item.", LogKind.Info);
             }
         }
 
@@ -133,7 +151,7 @@ namespace EPMLiveCore.SocialEngine.Modules
             Guid streamId = streamManager.GetGlobalStreamId((Guid) data["WebId"]);
             threadManager.AssociateStreams(thread, new[] {streamId});
 
-            UpdateThreadUsers(args.ActivityKind, data, threadManager, thread);
+            UpdateThreadUsers(data, threadManager, thread);
         }
 
         private void PerformPreRegistrationSteps(ProcessActivityEventArgs args)
@@ -193,19 +211,20 @@ namespace EPMLiveCore.SocialEngine.Modules
         private void RegisterDeletionActivity(ProcessActivityEventArgs args)
         {
             Dictionary<string, object> data = args.Data;
+            ThreadManager threadManager = args.ThreadManager;
 
-            Thread thread = args.ThreadManager.GetThread((Guid) data["WebId"], (Guid) data["ListId"], (int) data["Id"]) ?? new Thread();
+            Thread thread = threadManager.GetThread((Guid) data["WebId"], (Guid) data["ListId"], (int) data["Id"]) ??
+                            threadManager.SaveThread(new Thread
+                            {
+                                Title = (string) data["Title"],
+                                Url = (string) data["URL"],
+                                Kind = args.ObjectKind,
+                                WebId = (Guid) data["WebId"],
+                                ListId = (Guid) data["ListId"],
+                                ItemId = (int) data["Id"]
+                            });
 
-            thread.Title = (string) data["Title"];
-            thread.Url = (string) data["URL"];
-            thread.Kind = args.ObjectKind;
-            thread.WebId = (Guid) data["WebId"];
-            thread.ListId = (Guid) data["ListId"];
-            thread.ItemId = (int) data["Id"];
-
-            thread = args.ThreadManager.SaveThread(thread);
-
-            args.ThreadManager.DeleteThread(thread);
+            threadManager.DeleteThread(thread);
 
             Activity activity = args.ActivityManager.RegisterActivity(new Activity
             {
@@ -226,16 +245,15 @@ namespace EPMLiveCore.SocialEngine.Modules
             ActivityManager activityManager = args.ActivityManager;
 
             Thread thread = threadManager.GetThread((Guid) data["WebId"], (Guid) data["ListId"], (int) data["Id"]) ??
-                            new Thread();
-
-            thread.Title = (string) data["Title"];
-            thread.Url = (string) data["URL"];
-            thread.Kind = args.ObjectKind;
-            thread.WebId = (Guid) data["WebId"];
-            thread.ListId = (Guid) data["ListId"];
-            thread.ItemId = (int) data["Id"];
-
-            thread = threadManager.SaveThread(thread);
+                            threadManager.SaveThread(new Thread
+                            {
+                                Title = (string) data["Title"],
+                                Url = (string) data["URL"],
+                                Kind = args.ObjectKind,
+                                WebId = (Guid) data["WebId"],
+                                ListId = (Guid) data["ListId"],
+                                ItemId = (int) data["Id"]
+                            });
 
             string metaData = null;
 
@@ -261,14 +279,15 @@ namespace EPMLiveCore.SocialEngine.Modules
                 UserId = (int) data["UserId"],
                 Thread = thread,
                 Date = (DateTime) data["ActivityTime"],
-                Data = metaData
+                RawData = metaData
             });
 
             data.Add("#!Thread", thread);
             data.Add("#!Activity", activity);
         }
 
-        private static void UpdateThreadUsers(ActivityKind activityKind,Dictionary<string, object> data, ThreadManager threadManager, Thread thread)
+        private static void UpdateThreadUsers(Dictionary<string, object> data, ThreadManager threadManager,
+            Thread thread)
         {
             var users = new List<User> {new User {Id = (int) data["UserId"], Role = UserRole.Author}};
 
@@ -337,22 +356,6 @@ namespace EPMLiveCore.SocialEngine.Modules
 
             EnsureValideData(data);
             EnsureNotIgnoredList(args, data);
-        }
-
-        private static void EnsureValideData(Dictionary<string, object> data)
-        {
-            new DataValidator(data).Validate(new Dictionary<string, DataType>
-            {
-                {"Id", DataType.Int},
-                {"Title", DataType.String},
-                {"URL", DataType.String},
-                {"ListTitle", DataType.String},
-                {"ListId", DataType.Guid},
-                {"WebId", DataType.Guid},
-                {"SiteId", DataType.Guid},
-                {"UserId", DataType.Int},
-                {"ActivityTime", DataType.DateTime}
-            });
         }
 
         #endregion Methods 

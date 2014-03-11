@@ -1,13 +1,14 @@
 ﻿using System;
+using System.Web.Script.Serialization;
 using EPMLiveCore.SocialEngine.Core;
 
 namespace EPMLiveCore.SocialEngine.Entities
 {
     public class Activity
     {
-        #region Properties (7) 
+        #region Properties (8) 
 
-        public string Data { get; set; }
+        public string Data { get; private set; }
 
         public DateTime Date { get; set; }
 
@@ -16,6 +17,13 @@ namespace EPMLiveCore.SocialEngine.Entities
         public bool IsMassOperation { get; set; }
 
         public ActivityKind Kind { get; set; }
+
+        public dynamic RawData
+        {
+            get { return new JavaScriptSerializer().Deserialize<dynamic>(Data); }
+
+            set { Data = new JavaScriptSerializer().Serialize(value); }
+        }
 
         public Thread Thread { get; set; }
 

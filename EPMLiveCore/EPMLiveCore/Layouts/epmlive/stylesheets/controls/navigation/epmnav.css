@@ -1,4 +1,4 @@
-﻿.link-trans {
+.link-trans {
   -moz-transition: background-color 0.1s ease-in, color 0.1s ease-in;
   -o-transition: background-color 0.1s ease-in, color 0.1s ease-in;
   -webkit-transition: background-color 0.1s ease-in, color 0.1s ease-in;
@@ -639,8 +639,7 @@ ul.epm-nav-contextual-menu {
   display: none;
   padding: 0;
   margin: 0;
-  padding-top: 2.5px;
-  padding-bottom: 2.5px;
+  padding: 5px 0;
   background: #ffffff;
   position: relative;
   z-index: 160;
@@ -650,19 +649,30 @@ ul.epm-nav-contextual-menu {
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
 }
 ul.epm-nav-contextual-menu li {
-  padding: 0 0 0 10px !important;
-  margin: 5px 0 !important;
-  width: 159px !important;
+  height: 18px !important;
+  padding: 5px !important;
+  margin-left: 5px !important;
+  margin-right: 5px !important;
+  width: 149px !important;
   color: #999999 !important;
   list-style: none outside none;
+  border-radius: 3px;
 }
 ul.epm-nav-contextual-menu li:hover {
-  background: #E6F2FB !important;
+  background: #0090CA !important;
+  color: #ffffff !important;
+}
+ul.epm-nav-contextual-menu li:hover .epm-nav-cm-icon {
+  color: #ffffff !important;
+}
+ul.epm-nav-contextual-menu li:hover a {
+  color: #ffffff !important;
 }
 ul.epm-nav-contextual-menu li span.epm-nav-cm-icon {
-  margin-right: 5px;
+  margin-right: 4px;
+  padding-right: 5px;
   position: relative;
-  top: -3.5px;
+  top: -3px;
 }
 ul.epm-nav-contextual-menu li span.epm-nav-cm-blank {
   margin-right: 17px !important;
@@ -670,15 +680,29 @@ ul.epm-nav-contextual-menu li span.epm-nav-cm-blank {
 ul.epm-nav-contextual-menu li a {
   color: #999999 !important;
   padding: 0 !important;
+  height: 18px !important;
+  line-height: 18px !important;
+  position: relative !important;
+  top: -1px !important;
+  font-size: 13px !important;
 }
 ul.epm-nav-contextual-menu li a:hover {
-  background: #E6F2FB !important;
-  color: #999999 !important;
+  background: #0090CA !important;
+  color: #ffffff !important;
 }
 ul.epm-nav-contextual-menu li.seprator {
-  height: 0 !important;
-  border-bottom: 1px solid #E9E9E9;
+  background-color: #EEEEEE;
+  height: 1px !important;
+  margin-bottom: 5px;
+  margin-left: 10px;
+  margin-top: 5px;
+  overflow: hidden;
+  padding-bottom: 0 !important;
+  padding-top: 0 !important;
   width: 149px !important;
+}
+ul.epm-nav-contextual-menu li.seprator:hover {
+  background-color: #EEEEEE !important;
 }
 li.epm-nav-node-selected ul.epm-nav-contextual-menu li span.epm-nav-cm-icon {
   margin-right: 2px;

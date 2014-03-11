@@ -44,7 +44,6 @@ namespace EPMLiveCore.Services
                                 new Activity
                                 {
                                     Id = Guid.NewGuid(),
-                                    Data = string.Empty,
                                     Date = DateTime.Now,
                                     IsMassOperation = false,
                                     Kind = ActivityKind.Created,
@@ -72,7 +71,6 @@ namespace EPMLiveCore.Services
                                 new Activity
                                 {
                                     Id = Guid.NewGuid(),
-                                    Data = string.Empty,
                                     Date = DateTime.Now,
                                     IsMassOperation = false,
                                     Kind = ActivityKind.Created,

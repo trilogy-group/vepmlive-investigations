@@ -66,6 +66,8 @@ namespace EPMLiveCore.SocialEngine.Modules
                 case ActivityKind.BulkOperation:
                     ValidateBulkOperationActivity(args);
                     break;
+                default:
+                    throw new SocialEngineException("This activity cannot be performed on a list.", LogKind.Info);
             }
         }
 
@@ -94,12 +96,12 @@ namespace EPMLiveCore.SocialEngine.Modules
                 UserId = (int) data["UserId"],
                 Thread = thread,
                 Date = (DateTime) data["ActivityTime"],
-                Data = new JavaScriptSerializer().Serialize(new {totalActivities = data["TotalActivities"]})
+                RawData = new JavaScriptSerializer().Serialize(new {totalActivities = data["TotalActivities"]})
             });
 
             Guid streamId = streamManager.GetGlobalStreamId(webId);
 
-            threadManager.AssociateStreams(thread, new[] { streamId });
+            threadManager.AssociateStreams(thread, new[] {streamId});
             threadManager.UpdateUsers(thread);
         }
 
@@ -140,10 +142,30 @@ namespace EPMLiveCore.SocialEngine.Modules
         {
             Dictionary<string, object> data = args.Data;
 
-            Thread thread = args.ThreadManager.GetThread((Guid) data["WebId"], (Guid) data["Id"]);
-            if (thread == null) return;
+            ThreadManager threadManager = args.ThreadManager;
+            var webId = (Guid) data["WebId"];
 
-            args.ThreadManager.DeleteThread(thread);
+            Thread thread = threadManager.GetThread(webId, (Guid) data["Id"]);
+
+            if (thread == null)
+            {
+                thread = threadManager.SaveThread(new Thread
+                {
+                    Title = (string) data["Title"],
+                    Url = (string) data["URL"],
+                    Kind = ObjectKind.List,
+                    WebId = webId,
+                    ListId = (Guid) data["Id"],
+                    Users = new[] { new User { Id = (int) data["UserId"], Role = UserRole.Author } }
+                });
+
+                Guid streamId = args.StreamManager.GetGlobalStreamId(webId);
+
+                threadManager.AssociateStreams(thread, new[] { streamId });
+                threadManager.UpdateUsers(thread);
+            }
+
+            threadManager.DeleteThread(thread);
 
             args.ActivityManager.RegisterActivity(new Activity
             {
@@ -199,6 +221,8 @@ namespace EPMLiveCore.SocialEngine.Modules
             new DataValidator(data).Validate(new Dictionary<string, DataType>
             {
                 {"Id", DataType.Guid},
+                {"Title", DataType.String},
+                {"URL", DataType.String},
                 {"WebId", DataType.Guid},
                 {"UserId", DataType.Int},
                 {"ActivityTime", DataType.DateTime}

@@ -772,8 +772,7 @@ ul.epm-nav-contextual-menu {
     display: none;
     padding: 0;
     margin: 0;
-    padding-top: 2.5px;
-    padding-bottom: 2.5px;
+    padding: 5px 0;
     background: #ffffff;
     position: relative;
     z-index: @base-z-index + 10;
@@ -781,20 +780,33 @@ ul.epm-nav-contextual-menu {
     .box-shadow(@y: 2px, @blur: 5px, @color: rgba(0, 0, 0, 0.15));
 
     li {
-        padding: 0 0 0 10px !important;
-        margin: 5px 0 !important;
-        width: @menu-width + 2px !important;
+        height: 18px !important;
+        padding: 5px !important;
+        margin-left: 5px !important;
+        margin-right: 5px !important;
+        width: @menu-width - 8px !important;
         color: @menu-color !important;
         list-style: none outside none;
+        border-radius: 3px;
 
         &:hover {
-            background: #E6F2FB !important;
+            background: #0090CA !important;
+            color: #ffffff !important;
+
+            .epm-nav-cm-icon {
+                color: #ffffff !important;
+            }
+
+            a {
+                color: #ffffff !important;
+            }
         }
 
         span.epm-nav-cm-icon {
-            margin-right: @menu-img-offset;
+            margin-right: @menu-img-offset - 1;
+            padding-right: @menu-img-offset;
             position: relative;
-            top: -3.5px;
+            top: -3px;
         }
 
         span.epm-nav-cm-blank {
@@ -804,18 +816,33 @@ ul.epm-nav-contextual-menu {
         a {
             color: @menu-color !important;
             padding: 0 !important;
+            height: 18px !important;
+            line-height: 18px !important;
+            position: relative !important;
+            top: -1px !important;
+            font-size: 13px !important;
 
             &:hover {
-                background: #E6F2FB !important;
-                color: @menu-color !important;
+                background: #0090CA !important;
+                color: #ffffff !important;
             }
         }
     }
 
         li.seprator {
-            height: 0 !important;
-            border-bottom: 1px solid #E9E9E9;
+            background-color: #EEEEEE;
+            height: 1px !important;
+            margin-bottom: 5px;
+            margin-left: 10px;
+            margin-top: 5px;
+            overflow: hidden;
+            padding-bottom: 0 !important;
+            padding-top: 0 !important;
             width: @menu-width - 8px !important;
+
+            &:hover {
+                background-color: #EEEEEE !important;
+            }
         }
 }
 
