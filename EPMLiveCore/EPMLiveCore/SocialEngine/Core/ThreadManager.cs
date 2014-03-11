@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using System.Globalization;
 using System.Linq;
 using EPMLiveCore.SocialEngine.Entities;
 using Microsoft.SharePoint;
@@ -259,7 +258,7 @@ namespace EPMLiveCore.SocialEngine.Core
 
             EnumerableRowCollection<DataRow> roles = dt.AsEnumerable();
 
-            foreach (var userId in from r in roles
+            foreach (int userId in from r in roles
                 let role = (UserRole) Enum.Parse(typeof (UserRole), r["Role"].ToString(), false)
                 where role.Has(UserRole.Assignee)
                 select (int) r["UserId"]
