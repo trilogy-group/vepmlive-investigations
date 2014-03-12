@@ -10,7 +10,7 @@ namespace EPMLiveReportsAdmin
 {
     internal static class SocialEngineEvents
     {
-        #region Methods (5) 
+        #region Methods (6) 
 
         // Public Methods (4) 
 
@@ -36,13 +36,14 @@ namespace EPMLiveReportsAdmin
             };
 
             GetAssignedToUsers(properties, data);
+            GetAssociatedListItems(properties, data);
 
             SocialEngineProxy.ProcessActivity(ObjectKind.ListItem, ActivityKind.Created, data, properties.Web);
         }
 
         public static void ItemDeleting(SPItemEventProperties properties)
         {
-            SocialEngineProxy.ProcessActivity(ObjectKind.ListItem, ActivityKind.Deleted, new Dictionary<string, object>
+            var data = new Dictionary<string, object>
             {
                 {"Id", properties.ListItemId},
                 {"Title", properties.ListItem.Title},
@@ -53,7 +54,11 @@ namespace EPMLiveReportsAdmin
                 {"SiteId", properties.SiteId},
                 {"UserId", properties.Web.CurrentUser.ID},
                 {"ActivityTime", DateTime.Now}
-            }, properties.Web);
+            };
+
+            GetAssociatedListItems(properties, data);
+
+            SocialEngineProxy.ProcessActivity(ObjectKind.ListItem, ActivityKind.Deleted, data, properties.Web);
         }
 
         public static void ItemUpdated(SPItemEventProperties properties)
@@ -72,11 +77,12 @@ namespace EPMLiveReportsAdmin
             };
 
             GetAssignedToUsers(properties, data);
+            GetAssociatedListItems(properties, data);
 
             SocialEngineProxy.ProcessActivity(ObjectKind.ListItem, ActivityKind.Updated, data, properties.Web);
         }
 
-        // Private Methods (1) 
+        // Private Methods (2) 
 
         private static void GetAssignedToUsers(SPItemEventProperties properties, Dictionary<string, object> data)
         {
@@ -93,6 +99,36 @@ namespace EPMLiveReportsAdmin
             }
 
             data.Add("AssignedTo", string.Join(",", users.AsParallel().Distinct().ToArray()));
+        }
+
+        private static void GetAssociatedListItems(SPItemEventProperties properties, Dictionary<string, object> data)
+        {
+            var dict = new Dictionary<Guid, int>();
+
+            SPFieldCollection fields = properties.List.Fields;
+
+            foreach (SPField field in fields)
+            {
+                if (field.Type != SPFieldType.Lookup) continue;
+
+                object value = properties.ListItem[field.InternalName];
+
+                if (value == null) continue;
+
+                var lookup = ((SPFieldLookup) field);
+
+                if (lookup.AllowMultipleValues) continue;
+
+                var listId = Guid.Parse(lookup.LookupList);
+                var lookupValue = ((SPFieldLookupValue) value);
+
+                if (!dict.ContainsKey(listId)) dict.Add(listId, lookupValue.LookupId);
+                else dict[listId] = lookupValue.LookupId;
+            }
+
+            List<string> list = dict.Select(lv => string.Format(@"{0}|{1}", lv.Key, lv.Value)).ToList();
+
+            data.Add("AssociatedListItems", string.Join(",", list.Distinct().ToArray()));
         }
 
         #endregion Methods 
