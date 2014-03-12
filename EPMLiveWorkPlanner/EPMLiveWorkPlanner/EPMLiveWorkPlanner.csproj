@@ -85,6 +85,13 @@
     <Compile Include="Jobs\ListImportJob.cs" />
     <Compile Include="Jobs\PublishJob.cs" />
     <Compile Include="Jobs\XLSImportJob.cs" />
+    <Compile Include="Layouts\epmlive\AddFragment.aspx.cs">
+      <DependentUpon>AddFragment.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\AddFragment.aspx.designer.cs">
+      <DependentUpon>AddFragment.aspx.cs</DependentUpon>
+    </Compile>
     <Compile Include="Layouts\epmlive\editplanner.aspx.cs">
       <DependentUpon>editplanner.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -126,6 +133,13 @@
     </Compile>
     <Compile Include="Layouts\epmlive\KanBanPlanner.aspx.designer.cs">
       <DependentUpon>KanBanPlanner.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\ManageFragment.aspx.cs">
+      <DependentUpon>ManageFragment.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\ManageFragment.aspx.designer.cs">
+      <DependentUpon>ManageFragment.aspx.cs</DependentUpon>
     </Compile>
     <Compile Include="Layouts\epmlive\NoteEditor.aspx.cs">
       <DependentUpon>NoteEditor.aspx</DependentUpon>
@@ -175,6 +189,13 @@
     </Compile>
     <Compile Include="Layouts\epmlive\SaveAgilePlanner.aspx.designer.cs">
       <DependentUpon>SaveAgilePlanner.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\SaveFragment.aspx.cs">
+      <DependentUpon>SaveFragment.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\SaveFragment.aspx.designer.cs">
+      <DependentUpon>SaveFragment.aspx.cs</DependentUpon>
     </Compile>
     <Compile Include="Layouts\epmlive\SaveWorkPlanner.aspx.cs">
       <DependentUpon>SaveWorkPlanner.aspx</DependentUpon>
@@ -306,6 +327,7 @@
     <Content Include="ISAPI\WorkPlanner.asmx" />
     <Content Include="ISAPI\WorkPlannerdisco.aspx" />
     <Content Include="ISAPI\WorkPlannerwsdl.aspx" />
+    <Content Include="Layouts\epmlive\AddFragment.aspx" />
     <Content Include="Layouts\epmlive\BlankTable.xml" />
     <Content Include="Layouts\epmlive\edititem.aspx" />
     <Content Include="Layouts\epmlive\editplanner.aspx" />
@@ -313,6 +335,7 @@
     <Content Include="Layouts\epmlive\getmenu.aspx" />
     <Content Include="Layouts\epmlive\gettasks.aspx" />
     <Content Include="Layouts\epmlive\images\accept.gif" />
+    <Content Include="Layouts\epmlive\images\add-fragment.png" />
     <Content Include="Layouts\epmlive\images\addmilestone.gif" />
     <Content Include="Layouts\epmlive\images\addresource.gif" />
     <Content Include="Layouts\epmlive\images\addsummary.gif" />
@@ -334,6 +357,7 @@
     <Content Include="Layouts\epmlive\images\details16.gif" />
     <Content Include="Layouts\epmlive\images\disablecalc.gif" />
     <Content Include="Layouts\epmlive\images\disablefilter.gif" />
+    <Content Include="Layouts\epmlive\images\edit-fragment.png" />
     <Content Include="Layouts\epmlive\images\editfolder.gif" />
     <Content Include="Layouts\epmlive\images\editfolder16.gif" />
     <Content Include="Layouts\epmlive\images\edittask.gif" />
@@ -345,6 +369,7 @@
     <Content Include="Layouts\epmlive\images\externallink.png" />
     <Content Include="Layouts\epmlive\images\Filter.png" />
     <Content Include="Layouts\epmlive\images\FOLDER.GIF" />
+    <Content Include="Layouts\epmlive\images\fragment-save.png" />
     <Content Include="Layouts\epmlive\images\grouping.gif" />
     <Content Include="Layouts\epmlive\images\link.gif" />
     <Content Include="Layouts\epmlive\images\linkdown.gif" />
@@ -389,11 +414,13 @@
     <Content Include="Layouts\epmlive\ImportExcel.aspx" />
     <Content Include="Layouts\epmlive\ImportExcelFinish.aspx" />
     <Content Include="Layouts\epmlive\ImportList.aspx" />
+    <Content Include="Layouts\epmlive\javascripts\Fragment.js" />
     <Content Include="Layouts\epmlive\javascripts\kanban\jquery-1.9.1.js" />
     <Content Include="Layouts\epmlive\javascripts\kanban\jquery-ui.js" />
     <Content Include="Layouts\epmlive\javascripts\kanban\ui.dropdownchecklist-1.4-min.js" />
     <Content Include="Layouts\epmlive\javascripts\kanban\ui.dropdownchecklist.js" />
     <Content Include="Layouts\epmlive\KanBanPlanner.aspx" />
+    <Content Include="Layouts\epmlive\ManageFragment.aspx" />
     <Content Include="Layouts\epmlive\NoteEditor.aspx" />
     <Content Include="Layouts\epmlive\openmpp.aspx" />
     <Content Include="Layouts\epmlive\PlannerAdmin.aspx" />
@@ -403,10 +430,14 @@
     <Content Include="Layouts\epmlive\PublishLog.aspx" />
     <Content Include="Layouts\epmlive\ResourceInformation.aspx" />
     <Content Include="Layouts\epmlive\SaveAgilePlanner.aspx" />
+    <Content Include="Layouts\epmlive\SaveFragment.aspx" />
     <Content Include="Layouts\epmlive\SaveWorkPlanner.aspx" />
     <Content Include="Layouts\epmlive\SelectDate.aspx" />
     <Content Include="Layouts\epmlive\showerror.aspx" />
     <Content Include="Layouts\epmlive\showgantt.aspx" />
+    <Content Include="Layouts\epmlive\styles\fragments.css" />
+    <Content Include="Layouts\epmlive\styles\icomoon-style.css" />
+    <Content Include="Layouts\epmlive\styles\kanban\kanban.css" />
     <Content Include="Layouts\epmlive\tasks.aspx" />
     <Content Include="Layouts\epmlive\updatetask.aspx" />
     <Content Include="Layouts\epmlive\WorkPlanLinkTask.aspx" />

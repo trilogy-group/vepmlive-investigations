@@ -1,15 +1,14 @@
 ﻿using System;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.WebControls;
-using System.Data.SqlClient;
-using System.Data;
 using System.Web.UI.WebControls;
-using System.Web.UI.HtmlControls;
+using System.Web.UI;
 
 namespace EPMLiveCore.Layouts.epmlive
 {
     public partial class ManageFragment : LayoutsPageBase
     {
+        public bool _isPrivate;
         protected override void OnPreRender(EventArgs e)
         {
             base.OnPreRender(e);
@@ -32,57 +31,6 @@ namespace EPMLiveCore.Layouts.epmlive
             }
         }
 
-        protected void btnDelete_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                string fragmentName = string.Empty;
-                SPList plannerFragmentList = SPContext.Current.Web.Lists.TryGetList("PlannerFragments");
-                if (plannerFragmentList != null)
-                {
-                    foreach (GridViewRow gvrow in gridMyFragments.Rows)
-                    {
-                        HtmlInputCheckBox chk = (HtmlInputCheckBox)gvrow.FindControl("chkSelect");
-                        if (chk != null && chk.Checked)
-                        {
-                            SPContext.Current.Web.AllowUnsafeUpdates = true;
-                            Label lblID = (Label)gvrow.FindControl("lblID");
-                            if (lblID != null)
-                            {
-                                SPListItem fragment = plannerFragmentList.GetItemById(Convert.ToInt32(lblID.Text));
-                                fragment.Recycle();
-                                plannerFragmentList.Update();
-                            }
-                        }
-                    }
-
-                    if (SPContext.Current.Web.CurrentUser.IsSiteAdmin)
-                    {
-                        foreach (GridViewRow gvrow in gridPublicFragments.Rows)
-                        {
-                            HtmlInputCheckBox chk = (HtmlInputCheckBox)gvrow.FindControl("chkSelect");
-                            if (chk != null && chk.Checked)
-                            {
-                                SPContext.Current.Web.AllowUnsafeUpdates = true;
-                                Label lblID = (Label)gvrow.FindControl("lblID");
-                                if (lblID != null)
-                                {
-                                    SPListItem fragment = plannerFragmentList.GetItemById(Convert.ToInt32(lblID.Text));
-                                    fragment.Recycle();
-                                    plannerFragmentList.Update();
-                                }
-                            }
-                        }
-                    }
-                }
-                Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "closeManageFragmentPopup", "<script language='javascript' type='text/javascript'>closeManageFragmentPopup('Fragment(s) deleted successfully!');</script>");
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
         private void FillMyFragmentsGrid()
         {
             SPList plannerFragmentList = SPContext.Current.Web.Lists.TryGetList("PlannerFragments");
@@ -93,13 +41,9 @@ namespace EPMLiveCore.Layouts.epmlive
             if (plannerFragmentList != null)
             {
                 qryFilterPlanner.Query = qryFilter;
-
                 SPListItemCollection fragmentItems = plannerFragmentList.GetItems(qryFilterPlanner);
-                if (fragmentItems != null && fragmentItems.Count > 0)
-                {
-                    gridMyFragments.DataSource = fragmentItems.GetDataTable();
-                    gridMyFragments.DataBind();
-                }
+                gridMyFragments.DataSource = fragmentItems.GetDataTable();
+                gridMyFragments.DataBind();
             }
         }
 
@@ -119,11 +63,153 @@ namespace EPMLiveCore.Layouts.epmlive
                 qryFilterPlanner.Query = qryFilter;
 
                 SPListItemCollection fragmentItems = plannerFragmentList.GetItems(qryFilterPlanner);
-                if (fragmentItems != null && fragmentItems.Count > 0)
+                gridPublicFragments.DataSource = fragmentItems.GetDataTable(); ;
+                gridPublicFragments.DataBind();
+            }
+        }
+
+        private void UpdatingGrid(GridView gridView, int rowInd, out SPListItem outFragment)
+        {
+            string fragmentName = string.Empty;
+            SPList plannerFragmentList = SPContext.Current.Web.Lists.TryGetList("PlannerFragments");
+            Label lblId = (Label)gridView.Rows[rowInd].FindControl("lblID");
+            SPListItem fragment;
+            if (lblId != null)
+            {
+                fragment = plannerFragmentList.GetItemById(Convert.ToInt32(lblId.Text));
+                fragment["Title"] = ((TextBox)gridView.Rows[rowInd].Cells[1].Controls[0]).Text;
+                bool isPrivate = ((CheckBox)gridView.Rows[rowInd].FindControl("chkPrivate")).Checked;
+                if (isPrivate)
                 {
-                    gridPublicFragments.DataSource = fragmentItems.GetDataTable(); ;
-                    gridPublicFragments.DataBind();
+                    fragment["FragmentType"] = "Private";
                 }
+                else
+                {
+                    fragment["FragmentType"] = "Public";
+                }
+
+                fragment.Update();
+                plannerFragmentList.Update();
+                gridView.EditIndex = -1;
+                outFragment = fragment;
+            }
+            else
+            {
+                outFragment = null;
+            }
+        }
+
+        protected void lnkdelete_Click(object sender, EventArgs e)
+        {
+            string fragmentName = string.Empty;
+            LinkButton lnkbtn = sender as LinkButton;
+            //getting particular row linkbutton
+            GridViewRow gvrow = lnkbtn.NamingContainer as GridViewRow;
+            GridView gv = gvrow.Parent.NamingContainer as GridView;
+
+            SPList plannerFragmentList = SPContext.Current.Web.Lists.TryGetList("PlannerFragments");
+            Label lblId = (Label)gv.Rows[gvrow.RowIndex].FindControl("lblID");
+            if (lblId != null)
+            {
+                SPListItem fragment = plannerFragmentList.GetItemById(Convert.ToInt32(lblId.Text));
+                fragment.Recycle();
+                plannerFragmentList.Update();
+                if (gv.ID == "gridMyFragments")
+                {
+                    FillMyFragmentsGrid();
+                }
+                else
+                {
+                    FillPublicFragmentsGrid();
+                }
+            }
+        }
+
+        protected void grid_RowDataBound(object sender, GridViewRowEventArgs e)
+        {
+            if (e.Row.RowType == DataControlRowType.DataRow)
+            {
+                //getting username from particular row
+                string fragment = Convert.ToString(DataBinder.Eval(e.Row.DataItem, "Title"));
+                //identifying the control in gridview
+                LinkButton lnkDelete = (LinkButton)e.Row.FindControl("lnkdelete");
+                string author = Convert.ToString(DataBinder.Eval(e.Row.DataItem, "Author"));
+                if (string.Compare(author, SPContext.Current.Web.CurrentUser.Name) != 0)
+                {
+                    LinkButton lnkEdit = (LinkButton)e.Row.FindControl("lnkEdit");
+                    lnkEdit.Visible = false;
+                    lnkDelete.Visible = false;
+                }
+                else
+                {
+                    //raising javascript confirmationbox whenver user clicks on link button
+                    lnkDelete.Attributes.Add("onclick", "javascript:return ConfirmationBox('" + fragment + "')");
+                }
+            }
+        }
+
+        protected void lnkEdit_Click(object sender, EventArgs e)
+        {
+            LinkButton lnkbtn = sender as LinkButton;
+            //getting particular row linkbutton
+            GridViewRow gvrow = lnkbtn.NamingContainer as GridViewRow;
+            GridView gv = gvrow.Parent.NamingContainer as GridView;
+            Label lblScope = (Label)gv.Rows[gvrow.RowIndex].FindControl("lblScope");
+            if (lblScope.Text == "(private)")
+            {
+                _isPrivate = true;
+            }
+            gv.EditIndex = gvrow.RowIndex;
+            if (gv.ID == "gridMyFragments")
+            {
+                FillMyFragmentsGrid();
+            }
+            else
+            {
+                FillPublicFragmentsGrid();
+            }
+        }
+
+        protected void lnkUpdate_Click(object sender, EventArgs e)
+        {
+            LinkButton lnkbtn = sender as LinkButton;
+            //getting particular row linkbutton
+            GridViewRow gvrow = lnkbtn.NamingContainer as GridViewRow;
+            GridView gv = gvrow.Parent.NamingContainer as GridView;
+            SPListItem outFragment;
+            if (gv.ID == "gridMyFragments")
+            {
+                UpdatingGrid(gridMyFragments, gvrow.RowIndex, out outFragment);
+                FillMyFragmentsGrid();
+                if (string.Compare(Convert.ToString(outFragment["FragmentType"]), "Public") == 0)
+                {
+                    FillPublicFragmentsGrid();
+                }
+            }
+            else
+            {
+                UpdatingGrid(gridPublicFragments, gvrow.RowIndex, out outFragment);
+                FillPublicFragmentsGrid();
+                if (string.Compare(Convert.ToString(outFragment["FragmentType"]), "Private") == 0)
+                {
+                    FillMyFragmentsGrid();
+                }
+            }
+        }
+
+        protected void lnkCancel_Click(object sender, EventArgs e)
+        {
+            LinkButton lnkbtn = sender as LinkButton;
+            GridView gv = lnkbtn.NamingContainer.Parent.NamingContainer as GridView;
+            if (gv.ID == "gridMyFragments")
+            {
+                gv.EditIndex = -1;
+                FillMyFragmentsGrid();
+            }
+            else
+            {
+                gridPublicFragments.EditIndex = -1;
+                FillPublicFragmentsGrid();
             }
         }
     }

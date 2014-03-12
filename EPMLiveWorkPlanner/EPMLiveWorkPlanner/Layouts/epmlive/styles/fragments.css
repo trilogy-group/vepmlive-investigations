@@ -1,0 +1,84 @@
+#fragments-wrapper {
+    margin: 20px;
+}
+
+table.myfragments > tbody > tr:first-child > td:first-child {
+    border-top: none !important;
+}
+
+table.myfragments > tbody > tr > td:first-child {
+    padding-left: 10px !important;
+}
+
+.icon-wrapper a:last-child span {
+    padding-right: 10px;
+}
+
+.table > tbody > tr > td {
+    border-top: none !important;
+}
+
+#gridMyFragments {
+    border-top: 1px solid #eeeeee !important;
+}
+
+
+table.myfragments > tbody > tr > td {
+    padding-left: 0px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+table.row-select > tbody > tr:hover {
+    cursor: pointer;
+}
+
+.modal-body {
+    padding: 10px 20px 20px !important;
+    border-top: #e5e5e5 1px solid;
+}
+
+.highlight {
+    background-color: #eaeaea !important;
+}
+
+.modal-icon {
+    top: 3px;
+    position: relative;
+    color: #cccccc;
+    padding-left: 15px;
+}
+
+.icon-wrapper {
+    visibility: hidden;
+    position: relative;
+    text-align: right;
+}
+
+.private {
+    padding-left: 10px;
+    color: #A8A8A8;
+}
+
+.manageFragmentContainer {
+    width: 98%;
+    border-top: #eeeeee 1px solid;
+    font-family: "Open Sans", Helvetica, Arial, sans-serif;
+    height: 300px;
+    overflow: auto;
+}
+
+#divIFLoading {
+    top: 50%;
+    left: 50%;
+    z-index: 11;
+    display: none;
+    position: absolute;
+}
+
+.Buttons {
+    bottom: 5px;
+    position: fixed;
+    text-align: right;
+    width: 98%;
+}

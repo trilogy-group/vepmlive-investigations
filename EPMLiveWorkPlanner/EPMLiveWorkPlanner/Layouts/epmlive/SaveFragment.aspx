@@ -24,8 +24,20 @@
             }
             window.frameElement.commonModalDialogClose(1, 1);
         }
+        function refreshControl() {
+            $("#divIFLoading").show();
+        }
 
     </script>
+    <style type="text/css">
+           #divIFLoading {
+            top: 50%;
+            left: 50%;
+            z-index: 11;
+            display: none;
+            position:absolute;
+        }
+    </style>
 
 </asp:Content>
 
@@ -60,12 +72,21 @@
         <tr align="right">
             <td></td>
             <td>
-                <asp:Button ID="btnSave" runat="server" Text="Save" OnClick="btnSave_Click" />
+                <asp:Button ID="btnSave" runat="server" Text="Save" OnClientClick="javascript:refreshControl()" OnClick="btnSave_Click" />
                 <asp:Button ID="btnClose" runat="server" Text="Close" OnClientClick="javascript:return closeSaveFragmentPopup();" />
             </td>
         </tr>
     </table>
     <asp:HiddenField ID="hdnTaskFragmentXml" runat="server" />
+     <div id="divIFLoading">
+        <table width="100%">
+            <tr>
+                <td align="center" class="ms-sectionheader">
+                    <img src="../images/GEARS_ANv4.GIF" alt="Inserting Fragment..." style="vertical-align: middle;" /><br />
+                </td>
+            </tr>
+        </table>
+    </div>
 </asp:Content>
 
 <asp:Content ID="PageTitle" ContentPlaceHolderID="PlaceHolderPageTitle" runat="server">
