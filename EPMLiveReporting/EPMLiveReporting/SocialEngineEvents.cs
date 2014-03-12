@@ -109,7 +109,7 @@ namespace EPMLiveReportsAdmin
 
             foreach (SPField field in fields)
             {
-                if (field.Type != SPFieldType.Lookup) continue;
+                if (field.Hidden || field.Type != SPFieldType.Lookup) continue;
 
                 object value = properties.ListItem[field.InternalName];
 
@@ -119,8 +119,13 @@ namespace EPMLiveReportsAdmin
 
                 if (lookup.AllowMultipleValues) continue;
 
-                var listId = Guid.Parse(lookup.LookupList);
-                var lookupValue = ((SPFieldLookupValue) value);
+                Guid listId;
+                if (!Guid.TryParse(lookup.LookupList, out listId)) continue;
+
+                var val = value as string;
+                if (string.IsNullOrEmpty(val)) continue;
+
+                var lookupValue = new SPFieldLookupValue(val);
 
                 if (!dict.ContainsKey(listId)) dict.Add(listId, lookupValue.LookupId);
                 else dict[listId] = lookupValue.LookupId;
