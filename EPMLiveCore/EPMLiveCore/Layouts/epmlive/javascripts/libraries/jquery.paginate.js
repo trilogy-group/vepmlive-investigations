@@ -97,13 +97,20 @@
         else {
             if (o.background_color == 'none') var a_css = { 'color': o.text_color, 'border': '1px solid ' + o.border_color };
             else var a_css = { 'color': o.text_color, 'background-color': o.background_color, 'border': '1px solid ' + o.border_color };
-            if (o.background_hover_color == 'none') var hover_css = { 'color': o.text_hover_color, 'border': '1px solid ' + o.border_hover_color };
-            else var hover_css = { 'color': o.text_hover_color, 'background-color': o.background_hover_color, 'border': '1px solid ' + o.border_hover_color };
+            if (o.background_hover_color == 'none') var hover_css = {
+                'color': o.text_hover_color, 'border': '1px solid ' +
+    o.border_hover_color
+            };
+            else var hover_css = {
+                'color': o.text_hover_color, 'background-color': o.background_hover_color, 'border': '1px solid ' +
+    o.border_hover_color
+            };
         }
 
         $.fn.applystyle(o, $this, a_css, hover_css, _first, _ul, _ulwrapdiv, _divwrapright);
         //calculate width of the ones displayed:
         var outsidewidth = outsidewidth_tmp - _first.parent().width() - 3;
+
         if (ver == 'ie7') {
             _ulwrapdiv.css('width', outsidewidth + 72 + 'px');
             _divwrapright.css('left', outsidewidth_tmp + 6 + 72 + 'px');
@@ -112,12 +119,14 @@
             _ulwrapdiv.css('width', outsidewidth + 'px');
             //_divwrapright.css('left',outsidewidth_tmp+6+'px');
             if ($(".jPag-pages").width() >= 301) {
-                _divwrapright.css('left', 347 + 'px');
+                _divwrapright.css('left', 297 + 'px');
             }
             else {
-                _divwrapright.css('left', $(".jPag-pages").width() + 50 + 'px');
+                _divwrapright.css('left', $(".jPag-pages").width() + 47 + 'px');
             }
         }
+
+        $this.css('width', $this.width() + 'px');
 
         if (o.rotate) {
             _rotright.hover(
