@@ -9,23 +9,11 @@ namespace EPMLiveCore.SocialEngine.API
 
         // Public Methods (1) 
 
-        public string GetActivities(string data, SPWeb spWeb)
-        {
-            try
-            {
-                return Response.Success(data);
-            }
-            catch (APIException ex)
-            {
-                return Response.Failure(ex.ExceptionNumber, string.Format("Error: {0}", ex.Message));
-            }
-        }
-
         public string ProcessActivity(string data, SPWeb spWeb)
         {
             try
             {
-                return EPMLiveCore.SocialEngine.SocialEngine.Current.ProcessActivity(data);
+                return SocialEngine.Current.ProcessActivity(data);
             }
             catch (APIException ex)
             {
