@@ -20,7 +20,7 @@ namespace EPMLiveCore.SocialEngine
         private static readonly object Locker = new Object();
         private readonly SocialEngineEvents _events;
         private readonly Logger _logger;
-        private object _locker;
+        private readonly object _locker;
 
         #endregion Fields 
 
