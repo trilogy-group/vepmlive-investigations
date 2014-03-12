@@ -6,6 +6,7 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Diagrams", "Diagrams", "{B8A0FE5E-3214-4D05-8E5A-68A468AF700B}"
 	ProjectSection(SolutionItems) = preProject
 		Nurun UI Navigation.dgml = Nurun UI Navigation.dgml
+		SocialEngine.dgml = SocialEngine.dgml
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EPMLiveCore", "EPMLiveCore\EPMLiveCore.csproj", "{C773AE44-F066-446A-9CBD-D24AFA794E34}"
