@@ -6,13 +6,13 @@ namespace EPMLiveWorkPlanner
 {
     public partial class KanBanPlanner : LayoutsPageBase
     {
-        #region Fields (1) 
+        #region Fields (1)
 
         private const string LAYOUT_PATH = "/_layouts/15/epmlive/";
 
-        #endregion Fields 
+        #endregion Fields
 
-        #region Properties (2) 
+        #region Properties (2)
 
         public string strPlanner
         {
@@ -24,9 +24,9 @@ namespace EPMLiveWorkPlanner
             get { return Convert.ToString(Request["ID"]); }
         }
 
-        #endregion Properties 
+        #endregion Properties
 
-        #region Methods (2) 
+        #region Methods (2)
 
         // Protected Methods (2) 
 
@@ -34,17 +34,20 @@ namespace EPMLiveWorkPlanner
         {
             base.OnPreRender(e);
 
+            SPPageContentManager.RegisterStyleFile(LAYOUT_PATH + "styles/kanban/kanban.css");
+
             EPMLiveScriptManager.RegisterScript(Page, new[]
             {
-                "libraries/jquery.min", "libraries/jquery-ui", "@EPMLive.Navigation",
-                "kanban/ui.dropdownchecklist-1.4-min"
+                "libraries/jquery.min", "libraries/jquery-ui", "libraries/slimScroll", "@EPMLive.Navigation",
+                "kanban/ui.dropdownchecklist-1.4-min","kanban/jquery.dotdotdot.min"
             });
         }
 
-        protected void Page_Load(object sender, EventArgs e) {
+        protected void Page_Load(object sender, EventArgs e)
+        {
             try
             {
-               
+
             }
             catch (Exception ex)
             {
@@ -53,6 +56,6 @@ namespace EPMLiveWorkPlanner
 
         }
 
-        #endregion Methods 
+        #endregion Methods
     }
 }

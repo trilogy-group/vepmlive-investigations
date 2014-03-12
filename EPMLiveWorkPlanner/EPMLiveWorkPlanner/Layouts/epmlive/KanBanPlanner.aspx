@@ -10,11 +10,6 @@
 
 <asp:Content ID="PageHead" ContentPlaceHolderID="PlaceHolderAdditionalPageHead" runat="server">
 
-    <script type="text/javascript" src="javascripts/kanban/ui.dropdownchecklist-1.4-min.js"></script>
-    <script type="text/javascript" src="javascripts/kanban/jquery.dotdotdot.min.js"></script>
-    <script type="text/javascript" src="javascripts/kanban/jquery.slimscroll.min.js"></script>
-    <link type="text/css" rel="Stylesheet" href="styles/kanban/kanban.css" />
-
     <meta name="viewport" content="width=device-width; maximum-scale=1; minimum-scale=1;" />
 
     <script type="text/javascript">
