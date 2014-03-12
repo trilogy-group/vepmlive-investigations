@@ -1215,10 +1215,10 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
                     var data = {};
                     var selectedKeys = [];
 
-                    $(this).parent().siblings('li').find(':checked').each(function () {
-                        if ($(this).parent().text().toLowerCase() == 'select all') {
-                            return;
-                        }
+                    $(this).parent().siblings('div').first().children('li').find(':checked').each(function () {
+                        //if ($(this).parent().text().toLowerCase() == 'select all') {
+                        //    return;
+                        //}
                         selectedKeys.push($(this).val());
                     });
                     data['selectedKeys'] = selectedKeys;
