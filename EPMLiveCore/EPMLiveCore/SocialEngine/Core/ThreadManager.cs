@@ -222,7 +222,9 @@ namespace EPMLiveCore.SocialEngine.Core
                 IF NOT EXISTS (SELECT Id FROM SS_AssociatedThreads WHERE ThreadId = @ThreadId AND ListId = @ListId)
                 BEGIN
                     INSERT INTO SS_AssociatedThreads (ThreadId, ListId, ItemId) VALUES (@ThreadId, @ListId, @ItemId)
+                END
                 ELSE
+                BEGIN
                     UPDATE SS_AssociatedThreads SET ItemId = @ItemId WHERE ThreadId = @ThreadId AND ListId = @ListId
                 END
             ";
