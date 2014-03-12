@@ -160,7 +160,7 @@ var EPM;
             Loader.prototype.showLoading = function (element) {
                 if (this.elementIsRegistered(element)) {
                     var offset = element.loader.height() / -4;
-                    element.loader.find('td').append($('<span style="position:relative;top:' + offset + 'px">Loading...</span>'));
+                    element.loader.find('td').append($('<div style="position:relative;top:' + offset + 'px">Loading<span class="ellipsis-wrapper"><span class="ellipsis">...</span></span></div>'));
                 }
             };
             return Loader;

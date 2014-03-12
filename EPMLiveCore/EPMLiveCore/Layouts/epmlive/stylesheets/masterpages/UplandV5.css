@@ -184,6 +184,48 @@ span.ms-welcome-hover > span.ms-core-menu-arrow {
     text-align: center;
 }
 
+.epm-loader td div .ellipsis-wrapper {
+    display: inline-block;
+    text-align: left;
+    width: 15px;
+}
+
+.epm-loader td div .ellipsis-wrapper .ellipsis {
+    overflow: hidden;
+    display: inline-block;
+    vertical-align: bottom;
+    -webkit-animation: ellipsis 1.5s infinite;
+    -moz-animation: ellipsis 1.5s infinite;
+    -o-animation: ellipsis 1.5s infinite;
+    animation: ellipsis 1.5s infinite;
+}
+
+@-webkit-keyframes ellipsis {
+    from {
+        width: 2px;
+    }
+    to {
+        width: 13px;
+    }
+}
+@-moz-keyframes ellipsis {
+    from {
+        width: 2px;
+    }
+    to {
+        width: 13px;
+    }
+}
+
+@keyframes ellipsis {
+    from {
+        width: 2px;
+    }
+    to {
+        width: 13px;
+    }
+}
+
 .ms-dlgLoadingTextDiv .ms-core-pageTitle {
     color: #0072C6 !important;
     position: relative;
