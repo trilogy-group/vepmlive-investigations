@@ -101,26 +101,7 @@ div.epmliveToolBar .nav > li > a {
   padding: 10px 15px;
   position: relative;
 }
-div.epmliveToolBar .nav > li > a.nav-icon {
-  background-color: #FFFFFF;
-  padding-left: 8px;
-  padding-right: 8px;
-}
-div.epmliveToolBar a {
-  color: #0090CA;
-  text-decoration: none;
-}
-div.epmliveToolBar a:hover,
-div.epmliveToolBar a:focus {
-  color: #007AAA;
-}
-div.epmliveToolBar .icon-dropdown {
-  color: #CCCCCC;
-  font-size: 12px;
-  padding-right: 15px;
-}
-div.epmliveToolBar .dropdown-menu > li > a,
-div.epmliveToolBar .dropdown-menu > div > li > a {
+div.epmliveToolBar .dropdown-menu > li > a {
   clear: both;
   color: #666666;
   display: block;
@@ -131,27 +112,25 @@ div.epmliveToolBar .dropdown-menu > div > li > a {
   padding: 5px 10px;
   white-space: nowrap;
 }
+div.epmliveToolBar a {
+  color: #0090CA;
+  text-decoration: none;
+}
+div.epmliveToolBar a:hover,
+div.epmliveToolBar a:focus {
+  color: #007AAA;
+}
 div.epmliveToolBar .dropdown-menu > li > a:hover,
-div.epmliveToolBar .dropdown-menu > li > a:focus,
-div.epmliveToolBar .dropdown-menu > div > li > a:hover,
-div.epmliveToolBar .dropdown-menu > div > li > a:focus {
+div.epmliveToolBar .dropdown-menu > li > a:focus {
   text-decoration: none;
   color: #ffffff;
   background-color: #0090CA;
   border-radius: 3px;
 }
-div.epmliveToolBar .dropdown-menu > li > a:hover .icon-dropdown,
-div.epmliveToolBar .dropdown-menu > div > li > a:hover .icon-dropdown {
-  color: #ffffff;
-}
 div.epmliveToolBar .navbar-nav > li > .dropdown-menu {
   border-top-left-radius: 0;
   border-top-right-radius: 0;
   margin-top: 0;
-}
-div.epmliveToolBar .navbar-nav > li > .dropdown-menu > div {
-  max-height: 300px;
-  overflow: auto;
 }
 div.epmliveToolBar .open > .dropdown-menu {
   display: block;
@@ -203,6 +182,11 @@ div.epmliveToolBar .dropdown-header {
   font-weight: 300;
   line-height: 1.42857;
   padding: 3px 20px;
+}
+div.epmliveToolBar .icon-dropdown {
+  color: #CCCCCC;
+  font-size: 12px;
+  padding-right: 15px;
 }
 div.epmliveToolBar .grouping-dropdown-menu .grouping-wrapper {
   display: inline-block;
@@ -304,8 +288,7 @@ div.epmliveToolBar .multiselect-all {
 div.epmliveToolBar .multiselect-container > li > a.multiselect-all label {
   font-weight: bold;
 }
-div.epmliveToolBar .multiselect-container > li > a > label,
-div.epmliveToolBar .multiselect-container > div > li > a > label {
+div.epmliveToolBar .multiselect-container > li > a > label {
   margin: 0;
   height: 100%;
   cursor: pointer;
@@ -321,13 +304,10 @@ div.epmliveToolBar .checkbox {
   vertical-align: middle;
 }
 div.epmliveToolBar .multiselect-container > li > a > label.radio,
-div.epmliveToolBar .multiselect-container > li > a > label.checkbox,
-div.epmliveToolBar .multiselect-container > div > li > a > label.radio,
-div.epmliveToolBar .multiselect-container > div > li > a > label.checkbox {
+div.epmliveToolBar .multiselect-container > li > a > label.checkbox {
   margin: 0;
 }
-div.epmliveToolBar .multiselect-container > li > a > label > input[type="checkbox"],
-div.epmliveToolBar .multiselect-container > div > li > a > label > input[type="checkbox"] {
+div.epmliveToolBar .multiselect-container > li > a > label > input[type="checkbox"] {
   margin-bottom: 5px;
 }
 div.epmliveToolBar .radio input[type="radio"],
