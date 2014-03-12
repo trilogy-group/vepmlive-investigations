@@ -76,7 +76,11 @@ namespace EPMLiveCore.SocialEngine.Core
 
             foreach (var d in data)
             {
-                details.Add(new XElement(d.Key, new XCData((d.Value ?? string.Empty).ToString())));
+                try
+                {
+                    details.Add(new XElement(d.Key, new XCData((d.Value ?? string.Empty).ToString())));
+                }
+                catch { }
             }
 
             return details;
