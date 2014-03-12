@@ -546,14 +546,14 @@ namespace EPMLiveWebParts
             {
                 sbNarrativeDetailsContent.Append("<tr>");
                 sbNarrativeDetailsContent.Append("<td>" + fieldName + "</td>");
-                sbNarrativeDetailsContent.Append("<td>" + fieldValue + "</td>");
+                sbNarrativeDetailsContent.Append("<td style='width:auto;'>" + fieldValue + "</td>");
                 sbNarrativeDetailsContent.Append("</tr>");
             }
             else
             {
                 sbNarrativeDetailsShowAllRegion.Append("<tr>");
                 sbNarrativeDetailsShowAllRegion.Append("<td>" + fieldName + "</td>");
-                sbNarrativeDetailsShowAllRegion.Append("<td>" + fieldValue + "</td>");
+                sbNarrativeDetailsShowAllRegion.Append("<td style='width:auto;'>" + fieldValue + "</td>");
                 sbNarrativeDetailsShowAllRegion.Append("</tr>");
             }
             narrativeDetailsFieldsCount++;

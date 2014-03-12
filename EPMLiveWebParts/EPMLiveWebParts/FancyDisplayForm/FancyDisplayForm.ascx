@@ -9,9 +9,7 @@
 
 <style type="text/css">
     .fancy-display-form-wrapper {
-        font-family: "Open Sans","Segoe UI","Segoe",Tahoma,Helvetica,Arial,sans-serif;
-        font-size: 13px;
-        font-weight: 300;
+        font-family: Open Sans Light !important;
         color: #555555;
         width: 100%;
         height: 100%;
@@ -43,7 +41,7 @@
         font-size: 1.4em;
         padding-bottom: 5px;
         padding-top: 5px;
-        font-weight: 400;
+        font-family: Open Sans Regular !important;
     }
 
         .fancy-display-header span {
@@ -55,7 +53,7 @@
 
         .fancy-col-table tr td:first-child {
             width: 150px;
-            font-weight: 400;
+            font-family: Open Sans Regular !important;
         }
 
         .fancy-col-table tr td {
@@ -114,7 +112,7 @@
         min-width: 14px;
         padding: 2px 8px;
         font-size: 12px;
-        font-weight: 700;
+        font-family: Open Sans Bold !important;
         color: #fff;
         line-height: 1;
         vertical-align: baseline;
@@ -165,7 +163,7 @@
         font-size: 1.4em;
         padding-bottom: 5px;
         padding-top: 5px;
-        font-weight: 400;
+        font-family: Open Sans Regular !important;
         color: #555555;
     }
 
@@ -187,6 +185,8 @@
         cursor: pointer;
         position: absolute;
     }
+
+
 </style>
 
 <script type="text/javascript">
