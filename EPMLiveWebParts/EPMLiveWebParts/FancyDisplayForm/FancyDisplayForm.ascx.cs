@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Text;
-using System.Threading;
+using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls.WebParts;
 
@@ -128,6 +128,15 @@ namespace EPMLiveWebParts
 
         protected void btnCancel_Click(object sender, EventArgs e)
         {
+            HttpContext context = HttpContext.Current;
+            if (HttpContext.Current.Request.QueryString["IsDlg"] != null)
+            {
+                context.Response.Write("<script type='text/javascript'>window.frameElement.commitPopup()</script>");
+                context.Response.Flush();
+                context.Response.End();
+                return;
+            }
+
             if (Page.Request["Source"] != null)
                 Page.Response.Redirect(Convert.ToString(Page.Request["Source"]));
             else
@@ -742,16 +751,22 @@ namespace EPMLiveWebParts
             StringBuilder sbAssociatedItems = new StringBuilder();
             if (arrAssociatedLists != null)
             {
-                sbAssociatedItems.Append("<table style='width:100%'><tr><td><table class='fancy-col-table'>");
-                foreach (AssociatedListInfo item in arrAssociatedLists)
+                if (arrAssociatedLists.Count > 0)
                 {
-                    sbAssociatedItems.Append("<tr>");
-                    sbAssociatedItems.Append("<td>" + item.Title + "</td>");
-                    sbAssociatedItems.Append("<td><a href='#'><div id='div_" + item.ListId + "' class='listMainDiv'><span class='badge'>0</span></a></div>");
-                    sbAssociatedItems.Append("</tr>");
+                    divFancyDispFormParent.Visible = true;
+                    sbAssociatedItems.Append("<table style='width:100%'><tr><td><table class='fancy-col-table'>");
+                    foreach (AssociatedListInfo item in arrAssociatedLists)
+                    {
+                        sbAssociatedItems.Append("<tr>");
+                        sbAssociatedItems.Append("<td>" + item.Title + "</td>");
+                        sbAssociatedItems.Append("<td><a href='#'><div id='div_" + item.ListId + "' class='listMainDiv'><span class='badge'>0</span></a></div>");
+                        sbAssociatedItems.Append("</tr>");
+                    }
+                    sbAssociatedItems.Append("</table></td></tr></table>");
+                    divFancyDispFormAssociatedItemsContent.InnerHtml = sbAssociatedItems.ToString();
                 }
-                sbAssociatedItems.Append("</table></td></tr></table>");
-                divFancyDispFormAssociatedItemsContent.InnerHtml = sbAssociatedItems.ToString();
+                else
+                    divFancyDispFormParent.Visible = false;
             }
         }
 
