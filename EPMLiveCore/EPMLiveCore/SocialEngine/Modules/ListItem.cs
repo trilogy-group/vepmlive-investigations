@@ -20,9 +20,27 @@ namespace EPMLiveCore.SocialEngine.Modules
 
         #endregion Fields 
 
-        #region Methods (16) 
+        #region Methods (17) 
 
-        // Private Methods (16) 
+        // Private Methods (17) 
+
+        private void AddAssociatedThreads(string associatedListItems, Thread thread, ThreadManager threadManager)
+        {
+            var dictionary = new Dictionary<Guid, int>();
+
+            foreach (string li in associatedListItems.Split(','))
+            {
+                string[] values = li.Split('|');
+
+                Guid listId = Guid.Parse(values[0]);
+                int itemId = int.Parse(values[1]);
+
+                if (!dictionary.ContainsKey(listId)) dictionary.Add(listId, itemId);
+                else dictionary[listId] = itemId;
+            }
+
+            threadManager.UpdateAssociatedThreads(thread.Id, dictionary);
+        }
 
         private static bool EnsureNotIgnoredList(ProcessActivityEventArgs args, Dictionary<string, object> data)
         {
@@ -48,6 +66,7 @@ namespace EPMLiveCore.SocialEngine.Modules
                 {"WebId", DataType.Guid},
                 {"SiteId", DataType.Guid},
                 {"UserId", DataType.Int},
+                {"AssociatedListItems", DataType.String},
                 {"ActivityTime", DataType.DateTime}
             });
         }
@@ -152,6 +171,7 @@ namespace EPMLiveCore.SocialEngine.Modules
             threadManager.AssociateStreams(thread, new[] {streamId});
 
             UpdateThreadUsers(data, threadManager, thread);
+            AddAssociatedThreads((string) data["AssociatedListItems"], thread, threadManager);
         }
 
         private void PerformPreRegistrationSteps(ProcessActivityEventArgs args)

@@ -16,9 +16,9 @@ namespace EPMLiveCore.SocialEngine.Core
 
         #endregion Constructors 
 
-        #region Methods (19) 
+        #region Methods (20) 
 
-        // Public Methods (13) 
+        // Public Methods (14) 
 
         public void AssociateStreams(Thread thread, Guid[] streamIds)
         {
@@ -214,6 +214,30 @@ namespace EPMLiveCore.SocialEngine.Core
         public Thread SaveThread(Thread thread)
         {
             return thread.Id != Guid.Empty ? UpdateThread(thread) : CreateThread(thread);
+        }
+
+        public void UpdateAssociatedThreads(Guid threadId, Dictionary<Guid, int> associatedListItems)
+        {
+            const string SQL = @"
+                IF NOT EXISTS (SELECT Id FROM SS_AssociatedThreads WHERE ThreadId = @ThreadId AND ListId = @ListId)
+                BEGIN
+                    INSERT INTO SS_AssociatedThreads (ThreadId, ListId, ItemId) VALUES (@ThreadId, @ListId, @ItemId)
+                ELSE
+                    UPDATE SS_AssociatedThreads SET ItemId = @ItemId WHERE ThreadId = @ThreadId AND ListId = @ListId
+                END
+            ";
+
+            foreach (var pair in associatedListItems)
+            {
+                using (var sqlCommand = new SqlCommand(SQL, SqlConnection))
+                {
+                    sqlCommand.Parameters.AddWithValue("@ThreadId", threadId);
+                    sqlCommand.Parameters.AddWithValue("@ListId", pair.Key);
+                    sqlCommand.Parameters.AddWithValue("@ItemId", pair.Value);
+
+                    sqlCommand.ExecuteNonQuery();
+                }
+            }
         }
 
         public void UpdateUsers(Thread thread)
