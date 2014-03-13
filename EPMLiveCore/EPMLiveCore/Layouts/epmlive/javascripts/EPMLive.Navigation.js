@@ -2635,7 +2635,7 @@
                     var $li = $(this).parent();
 
                     $li.addClass('epm-nav-sortable');
-                    $($li.find('a').get(0)).attr('style', 'width:125px !important; position: relative; top: 2px;');
+                    $($li.find('a').get(0)).attr('style', 'width:124px !important; position: relative; top: 2px;');
 
                     workspacesManager.addDragger($li);
                     workspacesManager.addMenu($li);
