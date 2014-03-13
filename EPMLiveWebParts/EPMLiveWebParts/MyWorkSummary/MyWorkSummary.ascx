@@ -78,6 +78,8 @@
                 $("#mwsMainDiv").hide();
                 $("#mwsLoadDiv").show();
 
+                var siteUrl = $(this.dataXml).find("SiteUrl").text();
+                EPMLiveCore.WorkEngineAPI.set_path(siteUrl + '/_vti_bin/WorkEngine.asmx');
                 EPMLiveCore.WorkEngineAPI.Execute("GetMyWorkSummary", this.dataXml, function (response) {
                     var divHTML = response.toString().replace("<Result Status=\"0\">", "").replace("</Result>", "");
                     $("#mwsMainDiv").html("");
