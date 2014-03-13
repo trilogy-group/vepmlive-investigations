@@ -388,7 +388,7 @@ namespace EPMLiveCore.API
                                     SPListItemCollection top5AssociatedItems = projectAssociatedList.GetItems(qryAssociatedItems);
 
                                     sbListAssociatedItemsDiv.Append("<div id='div_items_" + rptListId + "' class='slidingDiv'>");
-                                    sbListAssociatedItemsDiv.Append("<div class='slidingDivHeader'>" + listName + "</div>");
+                                    sbListAssociatedItemsDiv.Append("<div class='fancy-display-form-wrapper slidingDivHeader'>" + listName + "</div>");
 
                                     if (!EPMLiveCore.API.ListCommands.GetGridGanttSettings(projectAssociatedList).HideNewButton)
                                     {
@@ -407,7 +407,7 @@ namespace EPMLiveCore.API
 
                                         if (item.Title != null && item.Title.TrimEnd().Length > 20)
                                         {
-                                            sbListAssociatedItemsDiv.Append("<td><a href='#' alt='" + item.Title + "' title='" + item.Title + "' onclick=\"javascript:FancyDispFormClient.showNewForm('" + projectAssociatedList.DefaultDisplayFormUrl + "?ID=" + item.ID + "&Source=" + sourceUrl + "');return false;\">" + item.Title.Substring(0, 20) + "..." + "</a></td>");
+                                            sbListAssociatedItemsDiv.Append("<td><a href='#' alt='" + item.Title + "' title='" + item.Title + "' onclick=\"javascript:FancyDispFormClient.showNewForm('" + projectAssociatedList.DefaultDisplayFormUrl + "?ID=" + item.ID + "&Source=" + sourceUrl + "');return false;\">" + item.Title.Substring(0, 25) + "..." + "</a></td>");
                                         }
                                         else
                                         {
