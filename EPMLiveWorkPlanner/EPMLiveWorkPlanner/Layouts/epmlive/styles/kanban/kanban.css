@@ -179,7 +179,7 @@
     position: absolute;
 }
 
-    .associateditemscontextmenu .icon-ellipsis-horizontal:after {
+    .sortable-item .associateditemscontextmenu .icon-ellipsis-horizontal:after {
         content: '...';
         position: relative;
         top: -20px;
