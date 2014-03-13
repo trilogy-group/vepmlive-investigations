@@ -52,8 +52,9 @@
     }
 
         .fancy-col-table tr td:first-child {
-            width: 150px;
+            width: 175px;
             font-family: Open Sans Regular !important;
+            vertical-align: top;
         }
 
         .fancy-col-table tr td {
@@ -73,6 +74,7 @@
         display: inline-block;
         padding-bottom: 5px;
         color: #0090CA;
+        vertical-align: top;
     }
 
         .fancy-display-form-wrapper .dispFormExpandHeader span:first-child {
@@ -185,8 +187,6 @@
         cursor: pointer;
         position: absolute;
     }
-
-
 </style>
 
 <script type="text/javascript">

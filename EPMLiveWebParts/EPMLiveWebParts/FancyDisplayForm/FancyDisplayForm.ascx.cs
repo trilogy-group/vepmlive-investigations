@@ -20,11 +20,11 @@ namespace EPMLiveWebParts
     {
         #region Variables and Constants
 
-        const int QUICK_DETAILS_SECTION_ONE_FIELD_COUNT = 8;
-        const int QUICK_DETAILS_SECTION_TOTAL_FIELD_COUNT = 16;
+        const int QUICK_DETAILS_SECTION_ONE_FIELD_COUNT = 7;
+        const int QUICK_DETAILS_SECTION_TOTAL_FIELD_COUNT = 14;
         const int NARRATIVE_DETAILS_SECTION_FIELD_COUNT = 2;
-        const int PEOPLE_DETAILS_SECTION_FIELD_COUNT = 3;
-        const int DATE_DETAILS_SECTION_FIELD_COUNT = 2;
+        const int PEOPLE_DETAILS_SECTION_FIELD_COUNT = 5;
+        const int DATE_DETAILS_SECTION_FIELD_COUNT = 5;
         const int NUMBER_OF_PEOPLE_PER_FIELD_DISPLAY = 3;
 
         int quickDetailsFieldsCount = 0;
@@ -701,6 +701,8 @@ namespace EPMLiveWebParts
 
                 }
             }
+            else
+                peopleDetailsFieldsCount++;
         }
 
         private void FillDateDetailsSection(string fieldName, string fieldValue)

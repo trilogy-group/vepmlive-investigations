@@ -584,99 +584,99 @@ namespace EPMLiveWebParts {
                     "padding-top: 5px;\r\n        font-family: Open Sans Regular !important;\r\n    }\r\n\r\n" +
                     "        .fancy-display-header span {\r\n            color: #555555;\r\n        }\r\n\r\n" +
                     "    .fancy-col-table {\r\n    }\r\n\r\n        .fancy-col-table tr td:first-child {\r\n " +
-                    "           width: 150px;\r\n            font-family: Open Sans Regular !important;" +
-                    "\r\n        }\r\n\r\n        .fancy-col-table tr td {\r\n            font-size: 1em;\r\n  " +
-                    "          padding-bottom: 5px;\r\n            width: 150px;\r\n        }\r\n\r\n    .fan" +
-                    "cyDisplayForm .dispFormContent {\r\n        display: block;\r\n        width: 100%;\r" +
-                    "\n        padding-top: 5px;\r\n    }\r\n\r\n    .fancy-display-form-wrapper .dispFormEx" +
-                    "pandHeader {\r\n        cursor: pointer;\r\n        display: inline-block;\r\n        " +
-                    "padding-bottom: 5px;\r\n        color: #0090CA;\r\n    }\r\n\r\n        .fancy-display-f" +
-                    "orm-wrapper .dispFormExpandHeader span:first-child {\r\n            color: #0090CA" +
-                    ";\r\n            padding-right: 5px;\r\n            position: relative;\r\n           " +
-                    " top: 1px;\r\n            font-size: .9em;\r\n        }\r\n\r\n    .fancy-display-form-w" +
-                    "rapper .dispFormFancyTitle {\r\n        display: inline-block;\r\n        padding-bo" +
-                    "ttom: 5px;\r\n    }\r\n\r\n        .fancy-display-form-wrapper .dispFormFancyTitle spa" +
-                    "n {\r\n            font-size: 2em;\r\n        }\r\n\r\n    .fancy-display-form-wrapper ." +
-                    "dispFormUserImage {\r\n        fit-position: slice;\r\n        height: 22px;\r\n      " +
-                    "  width: 23px;\r\n        text-align: center;\r\n    }\r\n\r\n    .fancy-display-form-wr" +
-                    "apper .dispFormExpandMore {\r\n        cursor: pointer;\r\n        display: inline-b" +
-                    "lock;\r\n        color: #0090CA;\r\n        font-size: 12px;\r\n        padding-top: 7" +
-                    "px;\r\n    }\r\n\r\n    .badge {\r\n        display: inline-block;\r\n        min-width: 1" +
-                    "4px;\r\n        padding: 2px 8px;\r\n        font-size: 12px;\r\n        font-family: " +
-                    "Open Sans Bold !important;\r\n        color: #fff;\r\n        line-height: 1;\r\n     " +
-                    "   vertical-align: baseline;\r\n        white-space: nowrap;\r\n        text-align: " +
-                    "center;\r\n        background-color: #999;\r\n        border-radius: 10px;\r\n    }\r\n\r" +
-                    "\n        .badge:hover {\r\n            background-color: #0090CA;\r\n        }\r\n\r\n\r\n" +
-                    "    /* Small devices */\r\n    @media (max-width: 768px) {\r\n        .fancyDisplayF" +
-                    "orm #first-table {\r\n            float: none;\r\n        }\r\n\r\n        .fancyDisplay" +
-                    "Form #first-table {\r\n            width: 100%;\r\n        }\r\n    }\r\n\r\n    .fancy-di" +
-                    "splay-form-wrapper .slidingDiv {\r\n        width: 100%;\r\n        padding: 20px;\r\n" +
-                    "        border: 1px thin black;\r\n        -webkit-box-shadow: 0px 3px 20px rgba(5" +
-                    "0, 50, 50, 0.8);\r\n        -moz-box-shadow: 0px 3px 20px rgba(50, 50, 50, 0.8);\r\n" +
-                    "        box-shadow: 0px 3px 20px rgba(50, 50, 50, 0.8);\r\n        position: absol" +
-                    "ute;\r\n        width: 200px;\r\n        background-color: white;\r\n        text-alig" +
-                    "n: left;\r\n        z-index: 1503;\r\n    }\r\n\r\n    .fancy-display-form-wrapper .slid" +
-                    "ingDivClose {\r\n        float: right;\r\n        font-size: large;\r\n    }\r\n\r\n    .f" +
-                    "ancy-display-form-wrapper .slidingDivHeader {\r\n        border-bottom: 1px solid " +
-                    "#EEEEEE;\r\n        cursor: auto;\r\n        font-size: 1.4em;\r\n        padding-bott" +
-                    "om: 5px;\r\n        padding-top: 5px;\r\n        font-family: Open Sans Regular !imp" +
-                    "ortant;\r\n        color: #555555;\r\n    }\r\n\r\n    .fancy-display-form-wrapper .slid" +
-                    "ingDivAdd {\r\n        float: right;\r\n        left: 173px;\r\n        position: inhe" +
-                    "rit;\r\n        top: 21px;\r\n    }\r\n\r\n    .fancy-display-form-wrapper .listMainDiv " +
-                    "{\r\n        float: left;\r\n        padding: 5px;\r\n        margin-right: 5px;\r\n    " +
-                    "}\r\n\r\n    .fancyDisplayFormAssociatedItemsContextMenu {\r\n        list-style: none" +
-                    ";\r\n        cursor: pointer;\r\n        position: absolute;\r\n    }\r\n\r\n\r\n</style>\r\n\r" +
-                    "\n<script type=\"text/javascript\">\r\n\r\n    $(function () {\r\n\r\n        FancyDispForm" +
-                    "Client.fillWebPartData();\r\n\r\n        window.SP.SOD.notifyScriptLoadedAndExecuteW" +
-                    "aitingJobs(\'EPMLive.Navigation.js\');\r\n\r\n        $(\".fancy-display-form-wrapper ." +
-                    "dispFormExpandHeader\").click(function () {\r\n            $header = $(this);\r\n    " +
-                    "        $content = $header.next();\r\n            $content.slideToggle(100, functi" +
-                    "on () {\r\n            });\r\n            if ($(this).find(\"span:first\").hasClass(\"i" +
-                    "con-plus-circle-2\")) {\r\n                $(this).find(\"span:first\").removeClass(\"" +
-                    "icon-plus-circle-2\").addClass(\"icon-minus-circle-2\");\r\n                $(this).f" +
-                    "ind(\"span:last\").text(\"hide\");\r\n            }\r\n            else {\r\n             " +
-                    "   $(this).find(\"span:first\").removeClass(\"icon-minus-circle-2\").addClass(\"icon-" +
-                    "plus-circle-2\");\r\n                $(this).find(\"span:last\").text(\"show\");\r\n     " +
-                    "       }\r\n        });\r\n\r\n        $(\".dispFormExpandMore\").click(function () {\r\n " +
-                    "           $header = $(this);\r\n            $header.closest(\'tr\').next(\'.ShowMore" +
-                    "Row\').toggle();\r\n        });\r\n    });\r\n\r\n    FancyDispFormClient = {\r\n\r\n        " +
-                    "showItemUrl: function (weburl) {\r\n            $.ajax({\r\n                type: \"P" +
-                    "OST\",\r\n                url: weburl,\r\n                success: function (ticket) " +
-                    "{\r\n                    if (ticket.indexOf(\"General Error\") != 0) {\r\n            " +
-                    "            var listInfo = ticket.split(\'|\');\r\n\r\n                        var vie" +
-                    "wSiteContentUrl = listInfo[0] + \"/_layouts/epmlive/gridaction.aspx?action=FancyD" +
-                    "ispForm&list=\" + listInfo[3] + \"&field=\" + listInfo[1] + \"&LookupFieldList=\" + l" +
-                    "istInfo[2] + \"&Source=\" + document.location.href;\r\n                        var o" +
-                    "ptions = { url: viewSiteContentUrl, showMaximized: true };\r\n                    " +
-                    "    SP.SOD.execute(\'SP.UI.Dialog.js\', \'SP.UI.ModalDialog.showModalDialog\', optio" +
-                    "ns);\r\n                    }\r\n                    else {\r\n                       " +
-                    " alert(ticket);\r\n                    }\r\n                }\r\n            });\r\n    " +
-                    "    },\r\n\r\n        showNewForm: function (weburl) {\r\n            var options = { " +
-                    "url: weburl, showMaximized: false, dialogReturnValueCallback: function (dialogRe" +
-                    "sult) { FancyDispFormClient.fillWebPartData(); } };\r\n            SP.SOD.execute(" +
-                    "\'SP.UI.Dialog.js\', \'SP.UI.ModalDialog.showModalDialog\', options);\r\n        },\r\n\r" +
-                    "\n        showItemPopup: function (siteurl, webid, listid, itemid) {\r\n           " +
-                    " showSharePointPopup(siteurl + \'/_layouts/epmlive/gridaction.aspx?action=getcont" +
-                    "extmenus&webid=\' + webid +\r\n                \'&listid=\' + listid + \'&ID=\' + itemi" +
-                    "d, null, false, true, null, {\r\n                    gridId: \"myDiv\",\r\n           " +
-                    "         rowId: \"myDiv\",\r\n                    col: \"myDiv\"\r\n                }, 3" +
-                    "00, 400);\r\n        },\r\n\r\n        emptyFunction: function () {\r\n        },\r\n\r\n   " +
-                    "     showSharePointPopup: function (url, title, allowMaximize, showClose, func, " +
-                    "funcParams, width, height) {\r\n            if (allowMaximize == null) allowMaximi" +
-                    "ze = true;\r\n            if (showClose == null) showClose = true;\r\n            if" +
-                    " (func == null) func = emptyFunction;\r\n\r\n            var options;\r\n\r\n           " +
-                    " if (width !== undefined && height !== undefined) {\r\n                options = {" +
-                    "\r\n                    title: title,\r\n                    allowMaximize: allowMax" +
-                    "imize,\r\n                    showClose: showClose,\r\n                    url: url," +
-                    "\r\n                    dialogReturnValueCallback: Function.createCallback(Functio" +
-                    "n.createDelegate(null, func), funcParams),\r\n                    width: width,\r\n " +
-                    "                   height: height\r\n                };\r\n            } else {\r\n   " +
-                    "             options = { title: title, allowMaximize: allowMaximize, showClose: " +
-                    "showClose, url: url, dialogReturnValueCallback: Function.createCallback(Function" +
-                    ".createDelegate(null, func), funcParams) };\r\n            }\r\n\r\n            SP.UI." +
-                    "ModalDialog.showModalDialog(options);\r\n        },\r\n\r\n        fillWebPartData: fu" +
-                    "nction () {\r\n\r\n            $.ajax({\r\n                type: \"POST\",\r\n            " +
-                    "    url: \"");
+                    "           width: 175px;\r\n            font-family: Open Sans Regular !important;" +
+                    "\r\n            vertical-align: top;\r\n        }\r\n\r\n        .fancy-col-table tr td " +
+                    "{\r\n            font-size: 1em;\r\n            padding-bottom: 5px;\r\n            wi" +
+                    "dth: 150px;\r\n        }\r\n\r\n    .fancyDisplayForm .dispFormContent {\r\n        disp" +
+                    "lay: block;\r\n        width: 100%;\r\n        padding-top: 5px;\r\n    }\r\n\r\n    .fanc" +
+                    "y-display-form-wrapper .dispFormExpandHeader {\r\n        cursor: pointer;\r\n      " +
+                    "  display: inline-block;\r\n        padding-bottom: 5px;\r\n        color: #0090CA;\r" +
+                    "\n        vertical-align: top;\r\n    }\r\n\r\n        .fancy-display-form-wrapper .dis" +
+                    "pFormExpandHeader span:first-child {\r\n            color: #0090CA;\r\n            p" +
+                    "adding-right: 5px;\r\n            position: relative;\r\n            top: 1px;\r\n    " +
+                    "        font-size: .9em;\r\n        }\r\n\r\n    .fancy-display-form-wrapper .dispForm" +
+                    "FancyTitle {\r\n        display: inline-block;\r\n        padding-bottom: 5px;\r\n    " +
+                    "}\r\n\r\n        .fancy-display-form-wrapper .dispFormFancyTitle span {\r\n           " +
+                    " font-size: 2em;\r\n        }\r\n\r\n    .fancy-display-form-wrapper .dispFormUserImag" +
+                    "e {\r\n        fit-position: slice;\r\n        height: 22px;\r\n        width: 23px;\r\n" +
+                    "        text-align: center;\r\n    }\r\n\r\n    .fancy-display-form-wrapper .dispFormE" +
+                    "xpandMore {\r\n        cursor: pointer;\r\n        display: inline-block;\r\n        c" +
+                    "olor: #0090CA;\r\n        font-size: 12px;\r\n        padding-top: 7px;\r\n    }\r\n\r\n  " +
+                    "  .badge {\r\n        display: inline-block;\r\n        min-width: 14px;\r\n        pa" +
+                    "dding: 2px 8px;\r\n        font-size: 12px;\r\n        font-family: Open Sans Bold !" +
+                    "important;\r\n        color: #fff;\r\n        line-height: 1;\r\n        vertical-alig" +
+                    "n: baseline;\r\n        white-space: nowrap;\r\n        text-align: center;\r\n       " +
+                    " background-color: #999;\r\n        border-radius: 10px;\r\n    }\r\n\r\n        .badge:" +
+                    "hover {\r\n            background-color: #0090CA;\r\n        }\r\n\r\n\r\n    /* Small dev" +
+                    "ices */\r\n    @media (max-width: 768px) {\r\n        .fancyDisplayForm #first-table" +
+                    " {\r\n            float: none;\r\n        }\r\n\r\n        .fancyDisplayForm #first-tabl" +
+                    "e {\r\n            width: 100%;\r\n        }\r\n    }\r\n\r\n    .fancy-display-form-wrapp" +
+                    "er .slidingDiv {\r\n        width: 100%;\r\n        padding: 20px;\r\n        border: " +
+                    "1px thin black;\r\n        -webkit-box-shadow: 0px 3px 20px rgba(50, 50, 50, 0.8);" +
+                    "\r\n        -moz-box-shadow: 0px 3px 20px rgba(50, 50, 50, 0.8);\r\n        box-shad" +
+                    "ow: 0px 3px 20px rgba(50, 50, 50, 0.8);\r\n        position: absolute;\r\n        wi" +
+                    "dth: 200px;\r\n        background-color: white;\r\n        text-align: left;\r\n      " +
+                    "  z-index: 1503;\r\n    }\r\n\r\n    .fancy-display-form-wrapper .slidingDivClose {\r\n " +
+                    "       float: right;\r\n        font-size: large;\r\n    }\r\n\r\n    .fancy-display-for" +
+                    "m-wrapper .slidingDivHeader {\r\n        border-bottom: 1px solid #EEEEEE;\r\n      " +
+                    "  cursor: auto;\r\n        font-size: 1.4em;\r\n        padding-bottom: 5px;\r\n      " +
+                    "  padding-top: 5px;\r\n        font-family: Open Sans Regular !important;\r\n       " +
+                    " color: #555555;\r\n    }\r\n\r\n    .fancy-display-form-wrapper .slidingDivAdd {\r\n   " +
+                    "     float: right;\r\n        left: 173px;\r\n        position: inherit;\r\n        to" +
+                    "p: 21px;\r\n    }\r\n\r\n    .fancy-display-form-wrapper .listMainDiv {\r\n        float" +
+                    ": left;\r\n        padding: 5px;\r\n        margin-right: 5px;\r\n    }\r\n\r\n    .fancyD" +
+                    "isplayFormAssociatedItemsContextMenu {\r\n        list-style: none;\r\n        curso" +
+                    "r: pointer;\r\n        position: absolute;\r\n    }\r\n</style>\r\n\r\n<script type=\"text/" +
+                    "javascript\">\r\n\r\n    $(function () {\r\n\r\n        FancyDispFormClient.fillWebPartDa" +
+                    "ta();\r\n\r\n        window.SP.SOD.notifyScriptLoadedAndExecuteWaitingJobs(\'EPMLive." +
+                    "Navigation.js\');\r\n\r\n        $(\".fancy-display-form-wrapper .dispFormExpandHeader" +
+                    "\").click(function () {\r\n            $header = $(this);\r\n            $content = $" +
+                    "header.next();\r\n            $content.slideToggle(100, function () {\r\n           " +
+                    " });\r\n            if ($(this).find(\"span:first\").hasClass(\"icon-plus-circle-2\"))" +
+                    " {\r\n                $(this).find(\"span:first\").removeClass(\"icon-plus-circle-2\")" +
+                    ".addClass(\"icon-minus-circle-2\");\r\n                $(this).find(\"span:last\").tex" +
+                    "t(\"hide\");\r\n            }\r\n            else {\r\n                $(this).find(\"spa" +
+                    "n:first\").removeClass(\"icon-minus-circle-2\").addClass(\"icon-plus-circle-2\");\r\n  " +
+                    "              $(this).find(\"span:last\").text(\"show\");\r\n            }\r\n        })" +
+                    ";\r\n\r\n        $(\".dispFormExpandMore\").click(function () {\r\n            $header =" +
+                    " $(this);\r\n            $header.closest(\'tr\').next(\'.ShowMoreRow\').toggle();\r\n   " +
+                    "     });\r\n    });\r\n\r\n    FancyDispFormClient = {\r\n\r\n        showItemUrl: functio" +
+                    "n (weburl) {\r\n            $.ajax({\r\n                type: \"POST\",\r\n             " +
+                    "   url: weburl,\r\n                success: function (ticket) {\r\n                 " +
+                    "   if (ticket.indexOf(\"General Error\") != 0) {\r\n                        var list" +
+                    "Info = ticket.split(\'|\');\r\n\r\n                        var viewSiteContentUrl = li" +
+                    "stInfo[0] + \"/_layouts/epmlive/gridaction.aspx?action=FancyDispForm&list=\" + lis" +
+                    "tInfo[3] + \"&field=\" + listInfo[1] + \"&LookupFieldList=\" + listInfo[2] + \"&Sourc" +
+                    "e=\" + document.location.href;\r\n                        var options = { url: view" +
+                    "SiteContentUrl, showMaximized: true };\r\n                        SP.SOD.execute(\'" +
+                    "SP.UI.Dialog.js\', \'SP.UI.ModalDialog.showModalDialog\', options);\r\n              " +
+                    "      }\r\n                    else {\r\n                        alert(ticket);\r\n   " +
+                    "                 }\r\n                }\r\n            });\r\n        },\r\n\r\n        sh" +
+                    "owNewForm: function (weburl) {\r\n            var options = { url: weburl, showMax" +
+                    "imized: false, dialogReturnValueCallback: function (dialogResult) { FancyDispFor" +
+                    "mClient.fillWebPartData(); } };\r\n            SP.SOD.execute(\'SP.UI.Dialog.js\', \'" +
+                    "SP.UI.ModalDialog.showModalDialog\', options);\r\n        },\r\n\r\n        showItemPop" +
+                    "up: function (siteurl, webid, listid, itemid) {\r\n            showSharePointPopup" +
+                    "(siteurl + \'/_layouts/epmlive/gridaction.aspx?action=getcontextmenus&webid=\' + w" +
+                    "ebid +\r\n                \'&listid=\' + listid + \'&ID=\' + itemid, null, false, true" +
+                    ", null, {\r\n                    gridId: \"myDiv\",\r\n                    rowId: \"myD" +
+                    "iv\",\r\n                    col: \"myDiv\"\r\n                }, 300, 400);\r\n        }" +
+                    ",\r\n\r\n        emptyFunction: function () {\r\n        },\r\n\r\n        showSharePointP" +
+                    "opup: function (url, title, allowMaximize, showClose, func, funcParams, width, h" +
+                    "eight) {\r\n            if (allowMaximize == null) allowMaximize = true;\r\n        " +
+                    "    if (showClose == null) showClose = true;\r\n            if (func == null) func" +
+                    " = emptyFunction;\r\n\r\n            var options;\r\n\r\n            if (width !== undef" +
+                    "ined && height !== undefined) {\r\n                options = {\r\n                  " +
+                    "  title: title,\r\n                    allowMaximize: allowMaximize,\r\n            " +
+                    "        showClose: showClose,\r\n                    url: url,\r\n                  " +
+                    "  dialogReturnValueCallback: Function.createCallback(Function.createDelegate(nul" +
+                    "l, func), funcParams),\r\n                    width: width,\r\n                    h" +
+                    "eight: height\r\n                };\r\n            } else {\r\n                options" +
+                    " = { title: title, allowMaximize: allowMaximize, showClose: showClose, url: url," +
+                    " dialogReturnValueCallback: Function.createCallback(Function.createDelegate(null" +
+                    ", func), funcParams) };\r\n            }\r\n\r\n            SP.UI.ModalDialog.showModa" +
+                    "lDialog(options);\r\n        },\r\n\r\n        fillWebPartData: function () {\r\n\r\n     " +
+                    "       $.ajax({\r\n                type: \"POST\",\r\n                url: \"");
               @__w.Write(SPContext.Current.Web.Url);
 
             @__w.Write("/_vti_bin/WorkEngine.asmx/Execute\",\r\n                data: \"{Function : \'GetFancy" +
