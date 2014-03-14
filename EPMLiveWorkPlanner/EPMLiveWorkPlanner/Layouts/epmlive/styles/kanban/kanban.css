@@ -1,24 +1,35 @@
 ﻿#section1 {
     width: auto;
 }
-
-#section2 {
-    margin: 5px;
+.epmliveToolBar {
+    border-bottom:none;
 }
-
+#section2 {
+    
+}
+#kanbanToolbar {
+    height:40px;
+}
+#kanbanToolbar .navbar-nav:first-child li:first-child a {
+    padding-right: 40px;
+}
 #mainContainer {
 }
 
     #mainContainer table {
         width: 100%;
+        border-spacing:0;
     }
 
         #mainContainer table td {
             text-align: left;
             vertical-align: top;
-            padding: 0px;
+            padding: 0;
+            border-right: 1px solid #dddddd;
         }
-
+        #mainContainer table td:last-child {
+            border-right: none;
+        }
 .kanbanLabels {
     font-weight: bold;
     vertical-align: top;
@@ -57,16 +68,11 @@
     clear: both;
 }
 
-.itemContainer,
-.stageContainer {
-    width: 100%;
-    float: left;
-    border-right: 1px solid #dddddd;
-}
+
 
 .itemContainerTitle,
 .stageContainerTitle {
-    font-size: 1.3em;
+    font-size: 1.2em;
     padding: 5px;
     border-bottom: 1px solid #dddddd;
     text-align: center;
