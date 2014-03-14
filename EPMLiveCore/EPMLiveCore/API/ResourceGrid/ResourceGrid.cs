@@ -8,6 +8,8 @@ using System.Xml.Linq;
 using EPMLiveCore.Infrastructure;
 using EPMLiveCore.Properties;
 using Microsoft.SharePoint;
+using System.Text;
+using System.Text.RegularExpressions;
 
 namespace EPMLiveCore.API
 {
@@ -200,6 +202,17 @@ namespace EPMLiveCore.API
                 iElement.Add(new XAttribute(string.Format("{0}EnumKeys", gridSafeFieldName),
                     string.Format("|{0}", enumKeys)));
                 iElement.Add(new XAttribute(string.Format("{0}Range", gridSafeFieldName), enumRange));
+            }
+
+            if (type.Equals("Lookup"))
+            {
+                var sVal = string.Empty;
+                try{
+                    sVal = new SPFieldLookupValue(dataElement.Value).LookupId.ToString();
+                }
+                catch{}
+
+                value = sVal;
             }
 
             iElement.Add(new XAttribute(gridSafeFieldName, value));
@@ -482,8 +495,65 @@ namespace EPMLiveCore.API
                     bElement.Add(iElement);
                 }
 
-                // ReSharper restore PossibleNullReferenceException
+                gridElement.Add(new XElement("Cols"));
+                XElement colsElement = gridElement.Element("Cols");
 
+                // build enum value rules for treegrid
+                foreach (var kv in gridFields)
+                {
+                    if (kv.Value.Type == SPFieldType.Lookup)
+                    {
+                        var cElement = new XElement("C");
+                        string gridSafeFieldName = Utils.ToGridSafeFieldName(kv.Value.InternalName);
+                        cElement.Add(new XAttribute("Name", gridSafeFieldName));
+                        cElement.Add(new XAttribute("Type", "Enum"));
+
+                        // build enum choices
+                        var lEnum = new List<string>();
+                        var lEnumKeys = new List<string>();
+                        foreach (XNode n in bElement.DescendantNodes())
+                        {
+                            if (n is XElement)
+                            {
+                                XElement ele = (XElement)n;
+                                if (ele.Name.LocalName.Equals("I"))
+                                {
+                                    var sRaw = (string)ele.Attribute(gridSafeFieldName);
+                                    var mCol = Regex.Matches(sRaw, @"<a [^>]*>(.*?)</a>");
+                                    var sEnum = string.Empty;
+                                    var sEnumKey = string.Empty;
+                                    if (mCol.Count > 0)
+                                    {
+                                        try
+                                        {
+                                            sEnum = mCol[0].Groups[1].Value;
+                                            sEnumKey = mCol[0].Value;
+                                        }
+                                        catch { }
+                                    }
+
+                                    if (sEnum != null && !lEnum.Contains(sEnum))
+                                    {
+                                        lEnum.Add(sEnum);
+                                    }
+
+                                    if (sEnumKey != null && !lEnumKeys.Contains(sEnumKey))
+                                    {
+                                        lEnumKeys.Add(sEnumKey);
+                                    }
+                                }
+                            }
+                        }
+
+                        cElement.Add(new XAttribute("Enum", (lEnum.Count > 0 ? ("|" + string.Join("|", lEnum.ToArray())) : "")));
+                        cElement.Add(new XAttribute("EnumKeys", (lEnumKeys.Count > 0 ? ("|" + string.Join("|", lEnumKeys.ToArray())) : "")));
+                        cElement.Add(new XAttribute("Range", "1"));
+                        cElement.Add(new XAttribute("FilterEnumKeys", "1"));
+                        colsElement.Add(cElement);
+                    }
+                }
+
+                // ReSharper restore PossibleNullReferenceException
                 return resultXml.ToString();
             }
         }
@@ -582,7 +652,7 @@ namespace EPMLiveCore.API
                     switch (spField.Type)
                     {
                         case SPFieldType.User:
-                        case SPFieldType.Lookup:
+                        //case SPFieldType.Lookup:
                         case SPFieldType.MultiChoice:
                             relatedGridType = "Html";
                             break;
@@ -607,6 +677,10 @@ namespace EPMLiveCore.API
                     else if (relatedGridType.Equals("Date"))
                     {
                         cElement.Add(new XAttribute("Format", shortDatePattern));
+                    }
+                    else if (relatedGridType.Equals("Enum"))
+                    {
+
                     }
                     else if (!string.IsNullOrEmpty(format))
                     {
@@ -692,9 +766,9 @@ namespace EPMLiveCore.API
             cfgElement.Add(new XAttribute("id", idElement.Value));
 
             cfgElement.Add(new XAttribute("CSS",
-                string.Format("{0}/_layouts/epmlive/treegrid/resourcegrid/grid.css",
+                string.Format("{0}/_layouts/epmlive/treegrid/grid/grid.css",
                     SPContext.Current.Web.SafeServerRelativeUrl())),
-                new XAttribute("Style", "GS"));
+                new XAttribute("Style", "GM"));
 
             resultRootElement.Add(cfgElement);
         }
