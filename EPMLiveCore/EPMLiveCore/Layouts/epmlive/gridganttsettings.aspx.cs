@@ -1320,7 +1320,8 @@ namespace EPMLiveCore.Layouts.epmlive
                                     }
                                     else if (wpm.WebParts[i].ToString() == "Microsoft.SharePoint.WebPartPages.XsltListViewWebPart" ||
                                         wpm.WebParts[i].ToString() == "Microsoft.SharePoint.WebPartPages.ListFormWebPart" ||
-                                        wpm.WebParts[i].ToString() == "Microsoft.SharePoint.WebPartPages.ListViewWebPart")
+                                        wpm.WebParts[i].ToString() == "Microsoft.SharePoint.WebPartPages.ListViewWebPart" ||
+                                        wpm.WebParts[i].ToString() == "Microsoft.SharePoint.WebPartPages.DataFormWebPart")
                                     {
                                         wpm.OpenWebPart(wpm.WebParts[i]);
                                         wpm.SaveChanges(wpm.WebParts[i]);
@@ -1377,7 +1378,7 @@ namespace EPMLiveCore.Layouts.epmlive
                             {
                                 try
                                 {
-                                    if ((!string.IsNullOrEmpty(wpm.WebParts[i].Title)) && (wpm.WebParts[i].Title.Equals("Fancy Display Form", StringComparison.InvariantCultureIgnoreCase)))
+                                    if ((!string.IsNullOrEmpty(wpm.WebParts[i].Title)) && (wpm.WebParts[i].Title.Equals("Fancy Display Form", StringComparison.InvariantCultureIgnoreCase)) && !isFancyFormWPExist)
                                     {
                                         isFancyFormWPExist = true;
                                         wpm.OpenWebPart(wpm.WebParts[i]);
@@ -1385,7 +1386,8 @@ namespace EPMLiveCore.Layouts.epmlive
                                     }
                                     else if (wpm.WebParts[i].ToString() == "Microsoft.SharePoint.WebPartPages.XsltListViewWebPart" ||
                                             wpm.WebParts[i].ToString() == "Microsoft.SharePoint.WebPartPages.ListFormWebPart" ||
-                                            wpm.WebParts[i].ToString() == "Microsoft.SharePoint.WebPartPages.ListViewWebPart")
+                                            wpm.WebParts[i].ToString() == "Microsoft.SharePoint.WebPartPages.ListViewWebPart" ||
+                                            wpm.WebParts[i].ToString() == "Microsoft.SharePoint.WebPartPages.DataFormWebPart")
                                     {
                                         wpm.CloseWebPart(wpm.WebParts[i]);
                                         wpm.SaveChanges(wpm.WebParts[i]);
