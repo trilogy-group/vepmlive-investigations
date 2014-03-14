@@ -12,16 +12,12 @@ namespace EPMLiveReportsAdmin
     {
         #region Methods (6) 
 
-        // Public Methods (4) 
-
-        public static bool AreEqualObjects(object obj1, object obj2)
-        {
-            if (obj1 == null) return obj2 == null;
-            return obj2 != null && obj1.ToString().Equals(obj2.ToString());
-        }
+        // Public Methods (3) 
 
         public static void ItemAdded(SPItemEventProperties properties)
         {
+            if (InTransaction(properties)) return;
+
             var data = new Dictionary<string, object>
             {
                 {"Id", properties.ListItemId},
@@ -43,6 +39,8 @@ namespace EPMLiveReportsAdmin
 
         public static void ItemDeleting(SPItemEventProperties properties)
         {
+            if (InTransaction(properties)) return;
+
             var data = new Dictionary<string, object>
             {
                 {"Id", properties.ListItemId},
@@ -63,6 +61,8 @@ namespace EPMLiveReportsAdmin
 
         public static void ItemUpdated(SPItemEventProperties properties)
         {
+            if (InTransaction(properties)) return;
+
             var data = new Dictionary<string, object>
             {
                 {"Id", properties.ListItemId},
@@ -82,7 +82,7 @@ namespace EPMLiveReportsAdmin
             SocialEngineProxy.ProcessActivity(ObjectKind.ListItem, ActivityKind.Updated, data, properties.Web);
         }
 
-        // Private Methods (2) 
+        // Private Methods (3) 
 
         private static void GetAssignedToUsers(SPItemEventProperties properties, Dictionary<string, object> data)
         {
@@ -134,6 +134,19 @@ namespace EPMLiveReportsAdmin
             List<string> list = dict.Select(lv => string.Format(@"{0}|{1}", lv.Key, lv.Value)).ToList();
 
             data.Add("AssociatedListItems", string.Join(",", list.Distinct().ToArray()));
+        }
+
+        private static bool InTransaction(SPItemEventProperties properties)
+        {
+            Guid transaction = SocialEngineProxy.GetTransaction(properties.Web.ID, properties.ListId,
+                properties.ListItemId,
+                properties.Web);
+
+            if (transaction == Guid.Empty) return false;
+
+            SocialEngineProxy.ClearTransaction(transaction, properties.Web);
+
+            return true;
         }
 
         #endregion Methods 
