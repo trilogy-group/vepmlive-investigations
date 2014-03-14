@@ -73,6 +73,8 @@ namespace EPMLiveWebParts
         {
             base.OnPreRender(e);
             ScriptLink.Register(Page, "/epmlive/javascripts/libraries/jquery.min.js", false);
+
+            SPContext.Current.FormContext.FormMode = SPControlMode.Display;
         }
 
         protected override void CreateChildControls()
@@ -96,6 +98,11 @@ namespace EPMLiveWebParts
 
                 Page.Form.Controls.Add(scriptManager);
             }
+        }
+
+        protected override void Render(HtmlTextWriter writer)
+        {
+            base.Render(writer);
         }
 
         #endregion
