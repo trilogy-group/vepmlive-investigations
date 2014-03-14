@@ -512,6 +512,10 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
 
     epmToolBar.generateToolBar = function (tagId, cfgs) {
 
+        if ($('#contentRow').length > 0) {
+            $('#contentRow').css('padding-top', '0');
+        }
+
         $(document).click(function (e) {
             if (e.target.parentElement.id != "toolbar-search-icon") {
                 $('.toolbar-search').css("margin-left", "0px");
@@ -1323,7 +1327,6 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
         function getUlChoices(id) {
             return multiSelectStorage[id];
         }
-
         //END HELPER
     };
 })(window.epmLiveGenericToolBar = window.epmLiveGenericToolBar || {}, window.jQuery);
