@@ -152,6 +152,7 @@
         background-color: white;
         text-align: left;
         z-index: 1503;
+        right:17%;
     }
 
     .fancy-display-form-wrapper .slidingDivClose {
@@ -171,9 +172,9 @@
 
     .fancy-display-form-wrapper .slidingDivAdd {
         float: right;
-        left: 173px;
+        left: 190px;
         position: inherit;
-        top: 21px;
+        top: 25px;
     }
 
     .fancy-display-form-wrapper .listMainDiv {
