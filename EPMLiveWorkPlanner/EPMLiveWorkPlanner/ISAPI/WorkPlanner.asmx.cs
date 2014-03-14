@@ -5535,7 +5535,7 @@ namespace EPMLiveWorkPlanner
                         if (dtSourceListDataRows != null && dtSourceListDataRows.Length > 0)
                         {
                             //Actual Logic Started...
-                            sbItems.Append("<table>");
+                            sbItems.Append("<table cellpadding='0' cellspacing='0'>");
                             sbItems.Append("<tbody>");
                             sbItems.Append("<tr id='mainTR'>");
 
