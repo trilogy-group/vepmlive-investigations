@@ -1315,7 +1315,11 @@ namespace EPMLiveCore.Layouts.epmlive
                                     if ((!string.IsNullOrEmpty(wpm.WebParts[i].Title)) && (wpm.WebParts[i].Title.Equals("Fancy Display Form", StringComparison.InvariantCultureIgnoreCase)))
                                     {
                                         isFancyFormWPExist = true;
-                                        wpm.CloseWebPart(wpm.WebParts[i]);
+                                        //wpm.CloseWebPart(wpm.WebParts[i]);
+                                        //wpm.SaveChanges(wpm.WebParts[i]);
+                                        wpm.WebParts[i].AllowHide = true;
+                                        wpm.WebParts[i].Hidden = true;
+                                        //wpm.WebParts[i].Visible = false;
                                         wpm.SaveChanges(wpm.WebParts[i]);
                                     }
                                     else if (wpm.WebParts[i].ToString() == "Microsoft.SharePoint.WebPartPages.XsltListViewWebPart" ||
@@ -1323,7 +1327,11 @@ namespace EPMLiveCore.Layouts.epmlive
                                         wpm.WebParts[i].ToString() == "Microsoft.SharePoint.WebPartPages.ListViewWebPart" ||
                                         wpm.WebParts[i].ToString() == "Microsoft.SharePoint.WebPartPages.DataFormWebPart")
                                     {
-                                        wpm.OpenWebPart(wpm.WebParts[i]);
+                                        //wpm.OpenWebPart(wpm.WebParts[i]);
+                                        //wpm.SaveChanges(wpm.WebParts[i]);
+                                        wpm.WebParts[i].AllowHide = false;
+                                        wpm.WebParts[i].Hidden = false;
+                                        //wpm.WebParts[i].Visible = true;
                                         wpm.SaveChanges(wpm.WebParts[i]);
                                     }
                                 }
@@ -1345,8 +1353,11 @@ namespace EPMLiveCore.Layouts.epmlive
                         fancyDispFormWebPart.Title = "Fancy Display Form";
                         fancyDispFormWebPart.ChromeState = System.Web.UI.WebControls.WebParts.PartChromeState.Normal;
                         fancyDispFormWebPart.ChromeType = System.Web.UI.WebControls.WebParts.PartChromeType.None;
-
+                        fancyDispFormWebPart.AllowHide = true;
+                        fancyDispFormWebPart.Hidden = true;
+                        //wpm.WebParts[i].Visible = false;
                         wpm.AddWebPart(fancyDispFormWebPart, "Main", 0);
+                        wpm.SaveChanges(fancyDispFormWebPart);
                     }
                 });
             }
@@ -1381,16 +1392,24 @@ namespace EPMLiveCore.Layouts.epmlive
                                     if ((!string.IsNullOrEmpty(wpm.WebParts[i].Title)) && (wpm.WebParts[i].Title.Equals("Fancy Display Form", StringComparison.InvariantCultureIgnoreCase)) && !isFancyFormWPExist)
                                     {
                                         isFancyFormWPExist = true;
-                                        wpm.OpenWebPart(wpm.WebParts[i]);
+                                        wpm.WebParts[i].AllowHide = false;
+                                        wpm.WebParts[i].Hidden = false;
+                                        //wpm.WebParts[i].Visible = true;
                                         wpm.SaveChanges(wpm.WebParts[i]);
+                                        //wpm.OpenWebPart(wpm.WebParts[i]);
+                                        //wpm.SaveChanges(wpm.WebParts[i]);
                                     }
                                     else if (wpm.WebParts[i].ToString() == "Microsoft.SharePoint.WebPartPages.XsltListViewWebPart" ||
                                             wpm.WebParts[i].ToString() == "Microsoft.SharePoint.WebPartPages.ListFormWebPart" ||
                                             wpm.WebParts[i].ToString() == "Microsoft.SharePoint.WebPartPages.ListViewWebPart" ||
                                             wpm.WebParts[i].ToString() == "Microsoft.SharePoint.WebPartPages.DataFormWebPart")
                                     {
-                                        wpm.CloseWebPart(wpm.WebParts[i]);
+                                        wpm.WebParts[i].AllowHide = true;
+                                        wpm.WebParts[i].Hidden = true;
+                                        //wpm.WebParts[i].Visible = false;
                                         wpm.SaveChanges(wpm.WebParts[i]);
+                                        //wpm.CloseWebPart(wpm.WebParts[i]);
+                                        //wpm.SaveChanges(wpm.WebParts[i]);
                                     }
                                 }
                                 catch { }
