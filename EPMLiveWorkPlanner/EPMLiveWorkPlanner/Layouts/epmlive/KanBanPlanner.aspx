@@ -16,22 +16,62 @@
 
         $(function () {
             KanbanClient.resetControls(false);
-            KanbanClient.loadKanBanPlanners();
-            KanbanClient.bindEvents();
-
+            ExecuteOrDelayUntilScriptLoaded(KanbanClient.loadKanBanPlanners(), 'EPMLive.js');
         });
 
 
         var KanbanClient = (function () {
 
-            var bindEvents = function (show, message) {
-                $("#lnkNewItem").click(function () {
-                    showNewForm($(this).attr('data-newformurl'));
-                });
+            var selectedKanbanPlanner;
+            var selectedKanbanFilter1;
+            var kanbanPlanners;
+            var kanbanFilter1;
 
-                $("#ddlKanBanPlanners").change(function () {
-                    loadKanBanFilter1(this.value);
-                });
+            var reGenerateToolBar = function (btnNewItemText, btnNewItemDataNewFormUrl) {
+
+                $("#kanbanToolbar").html("");
+
+                var newItemButtonCfg = '';
+                var kanbanPlannersDropdownCfg = '';
+                var kanbanPlannersDropdownOptionsCfg = '';
+                var kanbanFilter1MultiselectCfg = '';
+                var kanbanFilter1OptionsCfg = '';
+
+                if (btnNewItemText) {
+                    // new item button
+                    var newItemButtonCfg = '"controlId": "btnNewItem", "controlType": "button", "iconClass": "fui-plus", "value": "' + btnNewItemText + '", "events": [{ "eventName": "click", "function": function () { showNewForm(\'' + btnNewItemDataNewFormUrl + '\'); }  }] ';
+                }
+
+                // kanban planners dropdown
+                if (kanbanPlanners) {
+                    $.each(kanbanPlanners, function (key, value) {
+                        kanbanPlannersDropdownOptionsCfg = kanbanPlannersDropdownOptionsCfg + '{ "iconClass": "", "value" : "' + value.id + '" ,"text": "' + value.text + '", "events": [{ "eventName": "click", "function": function () { loadKanBanFilter1(\'' + value.id + '\') } }] },';
+                    });
+                    if (kanbanPlannersDropdownOptionsCfg.length > 1)
+                        kanbanPlannersDropdownOptionsCfg = kanbanPlannersDropdownOptionsCfg.substring(0, kanbanPlannersDropdownOptionsCfg.length - 1);
+                    kanbanPlannersDropdownCfg = '"controlId": "ddlKanbanPlanners", "controlType": "dropdown", "title": "Board:", "value": "' + selectedKanbanPlanner + '", "iconClass": "none", "sections": [{ "heading": "none", "divider": "no", "options": [' + kanbanPlannersDropdownOptionsCfg + '] }]';
+                }
+
+                // kanban filter1 multiselect
+                if (kanbanFilter1) {
+                    $.each(kanbanFilter1, function (key, value) {
+                        kanbanFilter1OptionsCfg = kanbanFilter1OptionsCfg + '"' + value.id + '": { "value": "' + value.text + '", "checked": true },';
+                    });
+                    if (kanbanFilter1OptionsCfg.length > 1)
+                        kanbanFilter1OptionsCfg = kanbanFilter1OptionsCfg.substring(0, kanbanFilter1OptionsCfg.length - 1);
+                    kanbanFilter1MultiselectCfg = '"controlId": "msKanbanFilter1", "controlType": "multiselect", "title": "", "value": "", "iconClass": "icon-insert-template", "sections": [ {"heading": "none", "divider": "no", "options": { ' + kanbanFilter1OptionsCfg + ' }  } ],"applyButtonConfig": { "text": "Apply", "function": function (data) { loadKanBanBoard(data); } }';
+                }
+
+                //placement left content
+                var placementLeftContentCfg = '{ "placement": "left", "content": [{' + newItemButtonCfg + '}]' + '}';
+
+                //placement right content
+                var placementRightContentCfg = '{ "placement": "right", "content": [{' + kanbanFilter1MultiselectCfg + '},{' + kanbanPlannersDropdownCfg + '}]' + '}';
+
+                //main toolbar content
+                var cfg = "[" + placementLeftContentCfg + "," + placementRightContentCfg + "]";
+
+                epmLiveGenericToolBar.generateToolBar('kanbanToolbar', eval(cfg));
             };
 
             var showHideLoading = function (show, message) {
@@ -47,21 +87,20 @@
 
             var resetControls = function (reset) {
                 if (reset) {
-                    $("#lnkNewItem").show();
-                    $("#lblFilert1").show();
-                    $("#ddlKanBanFilter1").show();
                     $("#mainContainer").html('');
                 }
                 else {
-                    $("#lnkNewItem").hide();
-                    $("#lblFilert1").hide();
-                    $("#ddlKanBanFilter1").hide();
                     $("#mainContainer").html('');
                 }
             };
 
+            var raiseKanbanFilter1ApplyClick = function () {
+                $('.grouping-apply a').click();
+                $('#msKanbanFilter1_ul_menu').hide();
+            }
+
             var showNewForm = function (weburl) {
-                var options = { url: weburl, showMaximized: false, dialogReturnValueCallback: function (dialogResult) { if (dialogResult == 1) { loadKanBanBoard(); } } };
+                var options = { url: weburl, showMaximized: false, dialogReturnValueCallback: function (dialogResult) { if (dialogResult == 1) { KanbanClient.raiseKanbanFilter1ApplyClick(); } } };
                 SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
             };
 
@@ -81,36 +120,26 @@
                     success: function (response) {
                         showHideLoading(false, '');
                         var obj = jQuery.parseJSON(response.d);
-                        $("#ddlKanBanPlanners").children('option').remove();
                         $.each(obj.kanbanplanners, function (key, value) {
-                            $("#ddlKanBanPlanners").append($("<option></option>").val(value.id).html(value.text));
+                            if (value.id == '<%=strPlanner%>') {
+                                selectedKanbanPlanner = value.id;
+                                return false;
+                            }
+                            else {
+                                selectedKanbanPlanner = value.id;
+                            }
                         });
 
-                        if ($("#ddlKanBanPlanners option[value='<%=strPlanner%>']").length > 0) {
-                            $("#ddlKanBanPlanners").val('<%=strPlanner%>');
-                        }
-                        else {
-                            $("#ddlKanBanPlanners").val($("#ddlKanBanPlanners option:last-child").val());
-                        }
+                        kanbanPlanners = obj.kanbanplanners;
 
-                        if ($("#ddlKanBanPlanners").children('option').length == 2) {
-                            $("#lblKanBanPlanner").text($("#ddlKanBanPlanners option:selected").text());
-                            $("#lblKanBanPlanner").show();
-                            $("#ddlKanBanPlanners").hide();
-                        }
-                        else {
-                            $("#lblKanBanPlanner").text("");
-                            $("#lblKanBanPlanner").hide();
-                            $("#ddlKanBanPlanners").show();
-                        }
-
-                        loadKanBanFilter1($("#ddlKanBanPlanners").val());
+                        loadKanBanFilter1(selectedKanbanPlanner);
                     }
                 });
             };
 
-            var loadKanBanFilter1 = function (kanBanBoardName) {
-                if (kanBanBoardName == "0") {
+            var loadKanBanFilter1 = function (kanbanPlanner) {
+                selectedKanbanPlanner = kanbanPlanner;
+                if (selectedKanbanPlanner == "0") {
                     resetControls(false);
                     $("span[id^='ddcl-']").remove();
                     $("div[id^='ddcl-']").remove();
@@ -121,7 +150,7 @@
                     $.ajax({
                         type: "POST",
                         url: "<%=SPContext.Current.Web.ServerRelativeUrl%>/_vti_bin/WorkPlanner.asmx/Execute",
-                        data: "{Functionname : 'GetKanBanFilter1' , Dataxml : '<DataXML><KanBanBoardName>" + kanBanBoardName + "</KanBanBoardName><ProjectID><%=strProjectId%></ProjectID></DataXML>'}",
+                        data: "{Functionname : 'GetKanBanFilter1' , Dataxml : '<DataXML><KanBanBoardName>" + selectedKanbanPlanner + "</KanBanBoardName><ProjectID><%=strProjectId%></ProjectID></DataXML>'}",
                         contentType: "application/json; charset=utf-8",
                         dataType: "json",
                         error: function (xhr, status, error) {
@@ -142,66 +171,40 @@
                             }
                             else {
                                 resetControls(true);
-                                $("#lnkNewItem").attr('data-newformurl', obj.kanbannewitemurl);
-                                $("#lnkNewItem").html("");
-                                $("#lnkNewItem").html('<span class="icon-plus-2"></span> New ' + obj.kanbanitemname);
-                                $("#lblFilert1").text(obj.kanbanfilter1name);
-
-
                                 $("#lblBacklogStatus").text(obj.kanbanstatuscolumn);
-
                                 $("#ddlBacklogStatus").children('option').remove();
                                 $.each(obj.kanbanstatusvalues, function (key, value) {
                                     $("#ddlBacklogStatus").append($("<option></option>").val(value.id).html(value.id));
                                 });
 
-                                $("#ddlKanBanFilter1").children('option').remove();
-                                $.each(obj.kanbanfilter1, function (key, value) {
-                                    $("#ddlKanBanFilter1").append($("<option></option>").val(value.id).html(value.text));
-                                });
+                                kanbanFilter1 = obj.kanbanfilter1;
 
-                                $('#ddlKanBanFilter1 option').attr('selected', 'selected');
+                                reGenerateToolBar('New ' + obj.kanbanitemname, obj.kanbannewitemurl);
 
-                                $("#ddlKanBanFilter1").dropdownchecklist({
-                                    width: 200,
-                                    forceMultiple: true,
-                                    firstItemChecksAll: true,
-                                    explicitClose: "...Close",
-                                    onComplete: function (selector) {
-                                        loadKanBanBoard();
-                                    }
-                                });
-
-                                loadKanBanBoard();
-
+                                raiseKanbanFilter1ApplyClick();
                             }
                         }
                     });
                 }
             };
 
-            var loadKanBanBoard = function () {
+            var loadKanBanBoard = function (kanBanFilter1Data) {
 
-                var kanBanBoardName = $("#ddlKanBanPlanners").val();
-                var kanBanFilter1 = "";
-
-                $("#ddlKanBanFilter1 option:selected").each(function () {
-                    if (kanBanFilter1 != "") kanBanFilter1 += ",";
-                    kanBanFilter1 += $(this).val().toString().replace("\\", "\\\\");
-                });
-
-                if (kanBanFilter1 == "") {
-                    $("#ddlKanBanFilter1 option").each(function () {
-                        if (kanBanFilter1 != "") kanBanFilter1 += ",";
-                        kanBanFilter1 += $(this).val().toString().replace("\\", "\\\\");
-                    });
+                selectedKanbanFilter1 = "";
+                for (var i in kanBanFilter1Data['sections']) {
+                    var section = kanBanFilter1Data['sections'][i];
+                    var options = section['options'];
+                    for (var key in options) {
+                        if (selectedKanbanFilter1 != "") selectedKanbanFilter1 += ",";
+                        selectedKanbanFilter1 += key.toString().replace("\\", "\\\\");;
+                    }
                 }
 
                 showHideLoading(true, 'Loading Board');
                 $.ajax({
                     type: "POST",
                     url: "<%=SPContext.Current.Web.ServerRelativeUrl%>/_vti_bin/WorkPlanner.asmx/Execute",
-                    data: "{Functionname : 'GetKanBanBoard' , Dataxml : '<DataXML><KanBanBoardName>" + kanBanBoardName + "</KanBanBoardName><KanBanFilter1>" + kanBanFilter1 + "</KanBanFilter1><ProjectID><%=strProjectId%></ProjectID></DataXML>'}",
+                    data: "{Functionname : 'GetKanBanBoard' , Dataxml : '<DataXML><KanBanBoardName>" + selectedKanbanPlanner + "</KanBanBoardName><KanBanFilter1>" + selectedKanbanFilter1 + "</KanBanFilter1><ProjectID><%=strProjectId%></ProjectID></DataXML>'}",
                     contentType: "application/json; charset=utf-8",
                     dataType: "json",
                     error: function (xhr, status, error) {
@@ -334,17 +337,17 @@
                         },
                         error: function (response) {
                             alert("Problem in saving item.");
-                            loadKanBanBoard();
+                            loadKanBanBoard(selectedKanbanFilter1);
                         }
                     });
                 }
             };
 
             return {
-                bindEvents: bindEvents,
                 resetControls: resetControls,
                 loadKanBanPlanners: loadKanBanPlanners,
-                loadKanBanBoard: loadKanBanBoard
+                loadKanBanBoard: loadKanBanBoard,
+                raiseKanbanFilter1ApplyClick: raiseKanbanFilter1ApplyClick
             };
 
         })();
@@ -355,6 +358,8 @@
 
 <asp:Content ID="Main" ContentPlaceHolderID="PlaceHolderMain" runat="server">
     <div id="section1">
+        <div id="kanbanToolbar" style="width: 100%">
+        </div>
         <div id="dlgBacklogStatus">
             <table>
                 <tr>
@@ -369,20 +374,6 @@
                     </td>
                 </tr>
             </table>
-        </div>
-        <div style="float: left">
-            <a id="lnkNewItem" href="#"></a>
-        </div>
-        <div style="float: left">
-            <span id="lblKanBanPlanner"></span>
-            <span id="lblFilert1" class="kanbanLabels"></span>
-            <select id="ddlKanBanFilter1" multiple="multiple">
-            </select>
-        </div>
-        <div style="float: right">
-            <span class="kanbanLabels">Board:</span>
-            <select id="ddlKanBanPlanners">
-            </select>
         </div>
     </div>
 

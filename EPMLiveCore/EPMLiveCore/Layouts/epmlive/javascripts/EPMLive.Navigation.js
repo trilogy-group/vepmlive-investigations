@@ -941,7 +941,7 @@
 
                     switch (kind + '') {
                         case '-1':
-                            var options = { url: redirectUrl, showMaximized: false, dialogReturnValueCallback: function (dialogResult) { if (dialogResult == 1 || command == 'delete') { KanbanClient.loadKanBanBoard(); } } };
+                            var options = { url: redirectUrl, showMaximized: false, dialogReturnValueCallback: function (dialogResult) { if (dialogResult == 1 || command == 'delete') { KanbanClient.raiseKanbanFilter1ApplyClick(); } } };
                             SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
                             return true;
                         case '0':

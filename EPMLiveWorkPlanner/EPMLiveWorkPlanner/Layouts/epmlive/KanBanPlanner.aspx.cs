@@ -35,10 +35,11 @@ namespace EPMLiveWorkPlanner
             base.OnPreRender(e);
 
             SPPageContentManager.RegisterStyleFile(LAYOUT_PATH + "styles/kanban/kanban.css");
+            SPPageContentManager.RegisterStyleFile(LAYOUT_PATH + "Stylesheets/EPMLiveToolBar.min.css");
 
             EPMLiveScriptManager.RegisterScript(Page, new[]
             {
-                "libraries/jquery.min", "libraries/jquery-ui", "libraries/slimScroll", "@EPMLive.Navigation",
+                "libraries/jquery.min", "libraries/jquery-ui", "libraries/slimScroll", "@EPMLive.Navigation", "EPMLive.min",
                 "kanban/ui.dropdownchecklist-1.4-min","kanban/jquery.dotdotdot.min"
             });
         }
