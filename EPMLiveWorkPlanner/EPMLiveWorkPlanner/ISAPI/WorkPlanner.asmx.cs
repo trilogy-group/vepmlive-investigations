@@ -5214,7 +5214,7 @@ namespace EPMLiveWorkPlanner
         public static string GetKanBanPlanners(XmlDocument data, SPWeb oWeb)
         {
             StringBuilder jsonPlanners = new StringBuilder();
-            jsonPlanners.Append(string.Format("{{\"id\":\"{0}\",\"text\":\"{1}\"}},", "0", "Select"));
+            //jsonPlanners.Append(string.Format("{{\"id\":\"{0}\",\"text\":\"{1}\"}},", "0", "Select"));
 
             //Using SharePoint Object Model fetching data values
             using (SPSite spSite = new SPSite(oWeb.Site.ID))
@@ -5336,7 +5336,7 @@ namespace EPMLiveWorkPlanner
 
                                     if (dtFilterColumnValues != null && dtFilterColumnValues.Rows.Count > 0)
                                     {
-                                        jsonFilterColumnValues1.Append(string.Format("{{\"id\":\"{0}\",\"text\":\"{1}\"}},", "0", "(All)"));
+                                        //jsonFilterColumnValues1.Append(string.Format("{{\"id\":\"{0}\",\"text\":\"{1}\"}},", "0", "(All)"));
                                         for (int row = 0; row < dtFilterColumnValues.Rows.Count; row++)
                                         {
                                             if (isLookupOrUserField)
