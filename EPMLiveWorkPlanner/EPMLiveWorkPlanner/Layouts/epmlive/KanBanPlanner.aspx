@@ -39,7 +39,7 @@
 
                 if (btnNewItemText) {
                     // new item button
-                    var newItemButtonCfg = '"controlId": "btnNewItem", "controlType": "button", "iconClass": "fui-plus", "value": "' + btnNewItemText + '", "events": [{ "eventName": "click", "function": function () { showNewForm(\'' + btnNewItemDataNewFormUrl + '\'); }  }] ';
+                    var newItemButtonCfg = '"controlId": "btnNewItem", "controlType": "button", "iconClass": "icon-plus-2", "value": "' + btnNewItemText + '", "events": [{ "eventName": "click", "function": function () { showNewForm(\'' + btnNewItemDataNewFormUrl + '\'); }  }] ';
                 }
 
                 // kanban planners dropdown
