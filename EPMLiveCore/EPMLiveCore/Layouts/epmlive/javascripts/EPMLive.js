@@ -1177,10 +1177,10 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
                             if ($(this).is(':checked')) {
                                 selectedKeys.push($(this).val());
                             }
-                            $(this).closest('li').siblings().find(':checked').each(function () {
-                                if ($(this).parent().text().toLowerCase() == 'select all') {
-                                    return;
-                                }
+                            $(this).parent().siblings('div').first().children('li').find(':checked').each(function () {
+                                //if ($(this).parent().text().toLowerCase() == 'select all') {
+                                //    return;
+                                //}
                                 selectedKeys.push($(this).val());
                             });
                             data['selectedKeys'] = selectedKeys;
