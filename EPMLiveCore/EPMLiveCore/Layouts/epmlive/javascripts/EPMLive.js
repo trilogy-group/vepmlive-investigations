@@ -1061,6 +1061,7 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
             if (iconClass) {
                 var spnImg = $(document.createElement('span'));
                 spnImg.attr('class', iconClass);
+                spnImg.attr('style', 'position:relative;top:1px');
                 aContainer.append(spnImg);
             }
 
