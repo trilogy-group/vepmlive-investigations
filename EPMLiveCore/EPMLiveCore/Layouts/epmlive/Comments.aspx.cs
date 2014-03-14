@@ -5,6 +5,7 @@ using System.Net;
 using System.Text;
 using System.Web;
 using System.Web.UI;
+using EPMLiveCore.SocialEngine;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.Utilities;
 using Microsoft.SharePoint.WebControls;
@@ -500,6 +501,9 @@ namespace EPMLiveCore
 
                                 originListItem[originList.Fields.GetFieldByInternalName("CommentersRead").Id] = s1;
                             }
+
+                            SocialEngineProxy.SetTransaction(originListItem.Web.ID, originListItem.ParentList.ID,
+                                originListItem.ID, "Comments", originListItem.Web);
 
                             originListItem.SystemUpdate();
                         }

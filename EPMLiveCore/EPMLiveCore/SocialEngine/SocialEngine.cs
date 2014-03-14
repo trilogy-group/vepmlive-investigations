@@ -9,18 +9,20 @@ using EPMLiveCore.SocialEngine.Contracts;
 using EPMLiveCore.SocialEngine.Core;
 using EPMLiveCore.SocialEngine.Events;
 using Microsoft.SharePoint;
+using Transaction = EPMLiveCore.SocialEngine.Core.Transaction;
+using TransactionManager = EPMLiveCore.SocialEngine.Core.TransactionManager;
 
 namespace EPMLiveCore.SocialEngine
 {
     internal sealed class SocialEngine
     {
-        #region Fields (4) 
+        #region Fields (6) 
 
         private static volatile SocialEngine _instance;
         private static readonly object Locker = new Object();
         private readonly SocialEngineEvents _events;
-        private readonly Logger _logger;
         private readonly object _locker;
+        private readonly Logger _logger;
 
         #endregion Fields 
 
@@ -29,6 +31,7 @@ namespace EPMLiveCore.SocialEngine
         private SocialEngine()
         {
             _locker = new object();
+
             _logger = new Logger();
             _events = new SocialEngineEvents();
 
@@ -59,7 +62,7 @@ namespace EPMLiveCore.SocialEngine
 
         #endregion Properties 
 
-        #region Methods (5) 
+        #region Methods (8) 
 
         // Private Methods (3) 
 
@@ -197,7 +200,9 @@ namespace EPMLiveCore.SocialEngine
             }
         }
 
-        // Internal Methods (2) 
+        // Internal Methods (5) 
+
+        
 
         internal string ProcessActivity(string data)
         {
@@ -316,6 +321,8 @@ namespace EPMLiveCore.SocialEngine
                 return string.Join(", ", correlationIds.ToArray());
             }
         }
+
+        
 
         #endregion Methods 
     }

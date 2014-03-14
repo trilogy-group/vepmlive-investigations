@@ -7,7 +7,10 @@ namespace EPMLiveCore.SocialEngine.Core
         Created,
         Updated,
         Deleted,
-        BulkOperation
+        BulkOperation,
+        CommentAdded,
+        CommentUpdated,
+        CommentRemoved
     }
 
     internal enum DataType

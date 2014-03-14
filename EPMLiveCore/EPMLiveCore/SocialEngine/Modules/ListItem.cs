@@ -16,13 +16,13 @@ namespace EPMLiveCore.SocialEngine.Modules
         #region Fields (1) 
 
         private const string ALREADY_CREATED_EXCEPTION_MESSAGE =
-            "Cannot register more than one List Item Created activity on the same list item.";
+            "Cannot register more than one created activity on the same list item.";
 
         #endregion Fields 
 
-        #region Methods (17) 
+        #region Methods (24) 
 
-        // Private Methods (17) 
+        // Private Methods (24) 
 
         private void AddAssociatedThreads(string associatedListItems, Thread thread, ThreadManager threadManager)
         {
@@ -66,7 +66,6 @@ namespace EPMLiveCore.SocialEngine.Modules
                 {"WebId", DataType.Guid},
                 {"SiteId", DataType.Guid},
                 {"UserId", DataType.Int},
-                {"AssociatedListItems", DataType.String},
                 {"ActivityTime", DataType.DateTime}
             });
         }
@@ -96,6 +95,60 @@ namespace EPMLiveCore.SocialEngine.Modules
             }, true).Value;
         }
 
+        private static void ManageCommentUsers(ProcessActivityEventArgs args, Thread thread)
+        {
+            Dictionary<string, object> data = args.Data;
+            var users = new List<User> {new User {Id = (int) data["UserId"], Role = UserRole.Commenter}};
+
+            if (data.ContainsKey("Commenters"))
+            {
+                var commenters = data["Commenters"] as string;
+
+                if (!string.IsNullOrEmpty(commenters))
+                {
+                    string[] cu = commenters.Split(',');
+
+                    foreach (string user in cu)
+                    {
+                        int userId;
+                        if (!int.TryParse(user.Trim(), out userId)) continue;
+
+                        User tu = (from u in users where u.Id == userId select u).FirstOrDefault();
+
+                        if (tu == null)
+                        {
+                            users.Add(new User {Id = userId, Role = UserRole.Commenter});
+                        }
+                        else
+                        {
+                            tu.Role |= UserRole.Commenter;
+                        }
+                    }
+                }
+            }
+
+            thread.Users = users.AsParallel().Distinct().ToArray();
+            args.ThreadManager.UpdateCommenters(thread);
+
+            var validCommenters = new List<int>();
+
+            IEnumerable<Activity> activities = args.ActivityManager.GetActivities(thread,
+                new[] {ActivityKind.CommentAdded, ActivityKind.CommentUpdated});
+
+            foreach (Activity activity in activities)
+            {
+                try
+                {
+                    string[] cu = ((string) ((dynamic) activity).GetData().commenters).Split(',');
+
+                    validCommenters.AddRange(cu.Select(int.Parse));
+                }
+                catch { }
+            }
+
+            args.ThreadManager.CleanupCommenters(thread, validCommenters.AsParallel().Distinct());
+        }
+
         private void OnActivityRegistration(ProcessActivityEventArgs args)
         {
             if (args.ObjectKind != ObjectKind.ListItem) return;
@@ -111,6 +164,15 @@ namespace EPMLiveCore.SocialEngine.Modules
                 case ActivityKind.Deleted:
                     RegisterDeletionActivity(args);
                     break;
+                case ActivityKind.CommentAdded:
+                    RegisterCommentCreationActivity(args);
+                    break;
+                case ActivityKind.CommentUpdated:
+                    RegisterCommentUpdationActivity(args);
+                    break;
+                case ActivityKind.CommentRemoved:
+                    RegisterCommentDeletionActivity(args);
+                    break;
             }
         }
 
@@ -124,6 +186,14 @@ namespace EPMLiveCore.SocialEngine.Modules
         private void OnPreActivityRegistration(ProcessActivityEventArgs args)
         {
             if (args.ObjectKind != ObjectKind.ListItem) return;
+
+            switch (args.ActivityKind)
+            {
+                case ActivityKind.CommentAdded:
+                case ActivityKind.CommentUpdated:
+                case ActivityKind.CommentRemoved:
+                    return;
+            }
 
             PerformPreRegistrationSteps(args);
         }
@@ -143,6 +213,15 @@ namespace EPMLiveCore.SocialEngine.Modules
                 case ActivityKind.Deleted:
                     ValidateDeletionActivity(args);
                     break;
+                case ActivityKind.CommentAdded:
+                    ValidateCommentCreationActivity(args);
+                    break;
+                case ActivityKind.CommentUpdated:
+                    ValidateCommentUpdationActivity(args);
+                    break;
+                case ActivityKind.CommentRemoved:
+                    ValidateCommentDeletionActivity(args);
+                    break;
                 default:
                     throw new SocialEngineException("This activity cannot be performed on a list item.", LogKind.Info);
             }
@@ -156,13 +235,13 @@ namespace EPMLiveCore.SocialEngine.Modules
             ActivityManager activityManager = args.ActivityManager;
             StreamManager streamManager = args.StreamManager;
 
-            var activity = (Activity) data["#!Activity"];
             var thread = (Thread) data["#!Thread"];
 
             if (data.ContainsKey("IsMassOperation"))
             {
                 if ((bool) data["IsMassOperation"])
                 {
+                    var activity = (Activity) data["#!Activity"];
                     activityManager.FlagMassOperation(activity.Id);
                 }
             }
@@ -170,8 +249,16 @@ namespace EPMLiveCore.SocialEngine.Modules
             Guid streamId = streamManager.GetGlobalStreamId((Guid) data["WebId"]);
             threadManager.AssociateStreams(thread, new[] {streamId});
 
-            UpdateThreadUsers(data, threadManager, thread);
-            AddAssociatedThreads((string) data["AssociatedListItems"], thread, threadManager);
+            UpdateThreadUsers(args, thread);
+
+            if (!data.ContainsKey("AssociatedListItems")) return;
+
+            var associatedListItems = (string) (data["AssociatedListItems"] ?? string.Empty);
+
+            if (!string.IsNullOrEmpty(associatedListItems))
+            {
+                AddAssociatedThreads(associatedListItems, thread, threadManager);
+            }
         }
 
         private void PerformPreRegistrationSteps(ProcessActivityEventArgs args)
@@ -198,6 +285,69 @@ namespace EPMLiveCore.SocialEngine.Modules
                 userId, activityTime, activityTime - interval);
         }
 
+        private void RegisterCommentCreationActivity(ProcessActivityEventArgs args)
+        {
+            var data = args.Data;
+
+            var thread = args.ThreadManager.GetThread((Guid) data["WebId"], (Guid) data["ListId"], (int) data["Id"]);
+
+            if (thread == null)
+            {
+                RegisterCreationActivity(args);
+                thread = (Thread) data["#!Thread"];
+            }
+            else
+            {
+                data["#!Thread"] = thread;
+            }
+
+            var act = new Activity
+            {
+                Kind = args.ActivityKind,
+                UserId = (int) data["UserId"],
+                Thread = thread,
+                Date = (DateTime) data["ActivityTime"],
+                Key = data["CommentId"].ToString()
+            };
+
+            act.SetData(new {comment = data["Comment"], commenters = data["Commenters"]});
+
+            Activity activity = args.ActivityManager.RegisterActivity(act);
+
+            data.Add("#!Activity", activity);
+        }
+
+        private void RegisterCommentDeletionActivity(ProcessActivityEventArgs args)
+        {
+            RegisterDeletionActivity(args);
+
+            args.ActivityManager.DeleteActivity(new Dictionary<string, object>
+            {
+                {"ActivityKey", args.Data["CommentId"].ToString().ToUpper()}
+            });
+        }
+
+        private void RegisterCommentUpdationActivity(ProcessActivityEventArgs args)
+        {
+            RegisterUpdationActivity(args);
+
+            Dictionary<string, object> data = args.Data;
+
+            args.ActivityManager.UpdateActivity(new Dictionary<string, object>
+            {
+                {
+                    "Data", new JavaScriptSerializer().Serialize(new
+                    {
+                        comment = data["Comment"],
+                        commenters = data["Commenters"]
+                    })
+                }
+            }, new Dictionary<string, object>
+            {
+                {"ActivityKey", data["CommentId"].ToString().ToUpper()}
+            });
+        }
+
         private void RegisterCreationActivity(ProcessActivityEventArgs args)
         {
             Dictionary<string, object> data = args.Data;
@@ -216,6 +366,10 @@ namespace EPMLiveCore.SocialEngine.Modules
                 ItemId = (int) data["Id"]
             });
 
+            data.Add("#!Thread", thread);
+
+            if (args.ActivityKind != ActivityKind.Created) return;
+
             Activity activity = activityManager.RegisterActivity(new Activity
             {
                 Kind = args.ActivityKind,
@@ -224,7 +378,6 @@ namespace EPMLiveCore.SocialEngine.Modules
                 Date = (DateTime) data["ActivityTime"]
             });
 
-            data.Add("#!Thread", thread);
             data.Add("#!Activity", activity);
         }
 
@@ -244,6 +397,10 @@ namespace EPMLiveCore.SocialEngine.Modules
                                 ItemId = (int) data["Id"]
                             });
 
+            data.Add("#!Thread", thread);
+
+            if (args.ActivityKind != ActivityKind.Deleted) return;
+
             threadManager.DeleteThread(thread);
 
             Activity activity = args.ActivityManager.RegisterActivity(new Activity
@@ -254,7 +411,6 @@ namespace EPMLiveCore.SocialEngine.Modules
                 Date = (DateTime) data["ActivityTime"]
             });
 
-            data.Add("#!Thread", thread);
             data.Add("#!Activity", activity);
         }
 
@@ -293,22 +449,36 @@ namespace EPMLiveCore.SocialEngine.Modules
                 }
             }
 
-            Activity activity = activityManager.RegisterActivity(new Activity
+            data.Add("#!Thread", thread);
+
+            if (args.ActivityKind != ActivityKind.Updated) return;
+
+            var act = new Activity
             {
                 Kind = args.ActivityKind,
                 UserId = (int) data["UserId"],
                 Thread = thread,
-                Date = (DateTime) data["ActivityTime"],
-                RawData = metaData
-            });
+                Date = (DateTime) data["ActivityTime"]
+            };
 
-            data.Add("#!Thread", thread);
+            act.SetData(metaData);
+
+            Activity activity = activityManager.RegisterActivity(act);
+
             data.Add("#!Activity", activity);
         }
 
-        private static void UpdateThreadUsers(Dictionary<string, object> data, ThreadManager threadManager,
-            Thread thread)
+        private static void UpdateThreadUsers(ProcessActivityEventArgs args, Thread thread)
         {
+            if (args.ActivityKind == ActivityKind.CommentAdded ||
+                args.ActivityKind == ActivityKind.CommentUpdated ||
+                args.ActivityKind == ActivityKind.CommentRemoved)
+            {
+                ManageCommentUsers(args, thread);
+                return;
+            }
+
+            Dictionary<string, object> data = args.Data;
             var users = new List<User> {new User {Id = (int) data["UserId"], Role = UserRole.Author}};
 
             if (data.ContainsKey("AssignedTo"))
@@ -338,7 +508,70 @@ namespace EPMLiveCore.SocialEngine.Modules
             }
 
             thread.Users = users.AsParallel().Distinct().ToArray();
-            threadManager.UpdateUsers(thread);
+            args.ThreadManager.UpdateUsers(thread);
+        }
+
+        private void ValidateCommentCreationActivity(ProcessActivityEventArgs args)
+        {
+            ValidateCreationActivity(args);
+
+            Dictionary<string, object> data = args.Data;
+
+            if (EnsureNotIgnoredList(args, data)) return;
+
+            new DataValidator(data).Validate(new Dictionary<string, DataType>
+            {
+                {"CommentId", DataType.Guid},
+                {"Comment", DataType.String}
+            });
+
+            if (args.ActivityManager.ActivityExists(ObjectKind.ListItem, args.ActivityKind,
+                (Guid) data["WebId"], (Guid) data["ListId"], (int) data["Id"], data["CommentId"].ToString()))
+            {
+                throw new SocialEngineException("Cannot register creation activity on the same comment more than once",
+                    LogKind.Info);
+            }
+        }
+
+        private void ValidateCommentDeletionActivity(ProcessActivityEventArgs args)
+        {
+            ValidateDeletionActivity(args);
+
+            Dictionary<string, object> data = args.Data;
+
+            if (EnsureNotIgnoredList(args, data)) return;
+
+            new DataValidator(data).Validate(new Dictionary<string, DataType>
+            {
+                {"CommentId", DataType.Guid}
+            });
+
+            if (!args.ActivityManager.ActivityExists(ObjectKind.ListItem, ActivityKind.CommentAdded,
+                (Guid) data["WebId"], (Guid) data["ListId"], (int) data["Id"], data["CommentId"].ToString().ToUpper()))
+            {
+                throw new SocialEngineException("Cannot delete a comment that has not been registerd", LogKind.Info);
+            }
+        }
+
+        private void ValidateCommentUpdationActivity(ProcessActivityEventArgs args)
+        {
+            ValidateUpdationActivity(args);
+
+            Dictionary<string, object> data = args.Data;
+
+            if (EnsureNotIgnoredList(args, data)) return;
+
+            new DataValidator(data).Validate(new Dictionary<string, DataType>
+            {
+                {"CommentId", DataType.Guid},
+                {"Comment", DataType.String}
+            });
+
+            if (!args.ActivityManager.ActivityExists(ObjectKind.ListItem, ActivityKind.CommentAdded,
+                (Guid) data["WebId"], (Guid) data["ListId"], (int) data["Id"], data["CommentId"].ToString().ToUpper()))
+            {
+                throw new SocialEngineException("Cannot update a comment that has not been registerd", LogKind.Info);
+            }
         }
 
         private void ValidateCreationActivity(ProcessActivityEventArgs args)
@@ -347,6 +580,8 @@ namespace EPMLiveCore.SocialEngine.Modules
 
             EnsureValideData(data);
             if (EnsureNotIgnoredList(args, data)) return;
+
+            if (args.ActivityKind != ActivityKind.Created) return;
 
             if (args.ActivityManager.ActivityExists(ObjectKind.ListItem, ActivityKind.Created,
                 (Guid) data["WebId"], (Guid) data["ListId"], (int) data["Id"]))
@@ -361,6 +596,8 @@ namespace EPMLiveCore.SocialEngine.Modules
 
             EnsureValideData(data);
             if (EnsureNotIgnoredList(args, data)) return;
+
+            if (args.ActivityKind != ActivityKind.Deleted) return;
 
             if (args.ActivityManager.ActivityExists(ObjectKind.List, ActivityKind.Deleted, (Guid) data["WebId"],
                 (Guid) data["ListId"], (int) data["Id"]))

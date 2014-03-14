@@ -90,14 +90,17 @@ namespace EPMLiveCore.SocialEngine.Modules
                 Users = new[] {new User {Id = (int) data["UserId"], Role = UserRole.Author}}
             });
 
-            activityManager.RegisterActivity(new Activity
+            var activity = new Activity
             {
                 Kind = args.ActivityKind,
                 UserId = (int) data["UserId"],
                 Thread = thread,
-                Date = (DateTime) data["ActivityTime"],
-                RawData = new JavaScriptSerializer().Serialize(new {totalActivities = data["TotalActivities"]})
-            });
+                Date = (DateTime) data["ActivityTime"]
+            };
+
+            activity.SetData(new {totalActivities = data["TotalActivities"]});
+
+            activityManager.RegisterActivity(activity);
 
             Guid streamId = streamManager.GetGlobalStreamId(webId);
 

@@ -42,7 +42,7 @@ namespace EPMLiveCore.SocialEngine.Events.WebEventReceiver
                     {"Title", properties.Web.Title},
                     {"URL", properties.ServerRelativeUrl},
                     {"UserId", properties.Web.CurrentUser.ID},
-                    {"ActivityTime", properties.Web.Created}
+                    {"ActivityTime", DateTime.Now}
                 }, properties.Web);
         }
 

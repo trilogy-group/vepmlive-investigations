@@ -8,9 +8,15 @@ namespace EPMLiveCore.SocialEngine.Core
 {
     internal class Logger
     {
-        #region Methods (4) 
+        #region Methods (5) 
 
-        // Public Methods (2) 
+        // Public Methods (3) 
+
+        public Guid Log(SPWeb contextWeb, Exception exception)
+        {
+            XElement details = GetDetails(new Dictionary<string, object>());
+            return AddLog(contextWeb, exception.Message, exception.StackTrace, details, LogKind.Error, null, null);
+        }
 
         public Guid Log(ObjectKind objectKind, ActivityKind activityKind,
             Dictionary<string, object> data, SPWeb spWeb, Exception exception)
@@ -27,20 +33,31 @@ namespace EPMLiveCore.SocialEngine.Core
             var socialEngineException = exception as SocialEngineException;
             if (socialEngineException != null) kind = socialEngineException.LogKind;
 
-            return AddLog(spWeb, exception.Message, exception.StackTrace, details, kind);
+            return AddLog(spWeb, exception.Message, exception.StackTrace, details, kind, objectKind, activityKind);
         }
 
         public Guid Log(ObjectKind objectKind, ActivityKind activityKind, Dictionary<string, object> data, SPWeb spWeb,
             string message)
         {
-            return AddLog(spWeb, message, null, GetDetails(data), LogKind.Info);
+            return AddLog(spWeb, message, null, GetDetails(data), LogKind.Info, objectKind, activityKind);
         }
 
         // Private Methods (2) 
 
-        private static Guid AddLog(SPWeb spWeb, string message, string stackTrace, XElement details, LogKind kind)
+        private static Guid AddLog(SPWeb spWeb, string message, string stackTrace, XElement details, LogKind kind,
+            ObjectKind? objectKind, ActivityKind? activityKind)
         {
             Guid id = Guid.NewGuid();
+
+            if (objectKind.HasValue)
+            {
+                details.Add(new XElement("ObjectKind", objectKind.Value.ToString()));
+            }
+
+            if (activityKind.HasValue)
+            {
+                details.Add(new XElement("ActivityKind", activityKind.Value.ToString()));
+            }
 
             const string SQL =
                 @"INSERT INTO SS_Logs (Id, Message, StackTrace, Details, Kind, WebId, UserId) VALUES (@Id, @Message, @StackTrace, @Details, @Kind, @WebId, @UserId)";

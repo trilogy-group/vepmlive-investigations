@@ -29,7 +29,7 @@ namespace EPMLiveCore.SocialEngine.Events.ListEventReceiver
                         {"URL", properties.List.DefaultViewUrl},
                         {"WebId", properties.WebId},
                         {"UserId", properties.Web.CurrentUser.ID},
-                        {"ActivityTime", properties.List.Created}
+                        {"ActivityTime", DateTime.Now}
                     }, properties.Web);
             }
         }

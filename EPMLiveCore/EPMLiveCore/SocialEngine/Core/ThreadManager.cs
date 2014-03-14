@@ -16,9 +16,9 @@ namespace EPMLiveCore.SocialEngine.Core
 
         #endregion Constructors 
 
-        #region Methods (20) 
+        #region Methods (22) 
 
-        // Public Methods (14) 
+        // Public Methods (16) 
 
         public void AssociateStreams(Thread thread, Guid[] streamIds)
         {
@@ -36,6 +36,37 @@ namespace EPMLiveCore.SocialEngine.Core
                     sqlCommand.Parameters.AddWithValue("@ThreadId", thread.Id);
 
                     sqlCommand.ExecuteNonQuery();
+                }
+            }
+        }
+
+        public void CleanupCommenters(Thread thread, IEnumerable<int> validCommenters)
+        {
+            int[] commenters = validCommenters.ToArray();
+
+            const string SQL = @"SELECT UserId, Role FROM SS_ThreadUsers WHERE ThreadId = @ThreadId";
+
+            using (var sqlCommand = new SqlCommand(SQL, SqlConnection))
+            {
+                sqlCommand.Parameters.AddWithValue("@ThreadId", thread.Id);
+
+                var dt = new DataTable();
+                dt.Load(sqlCommand.ExecuteReader());
+
+                EnumerableRowCollection<DataRow> userRoles = dt.AsEnumerable();
+
+                foreach (DataRow r in userRoles)
+                {
+                    var userId = (int) r["UserId"];
+
+                    if (commenters.Contains(userId)) continue;
+
+                    var role = (UserRole) Enum.Parse(typeof (UserRole), r["Role"].ToString(), false);
+
+                    if (role.Has(UserRole.Commenter))
+                    {
+                        UpdateUserRole(thread.Id, userId, role.Remove(UserRole.Commenter), true);
+                    }
                 }
             }
         }
@@ -216,6 +247,27 @@ namespace EPMLiveCore.SocialEngine.Core
             return thread.Id != Guid.Empty ? UpdateThread(thread) : CreateThread(thread);
         }
 
+        public void UpdateUsers(Thread thread)
+        {
+            var assignees = new List<int>();
+
+            foreach (User user in thread.Users)
+            {
+                if (user.Role.Has(UserRole.Assignee)) assignees.Add(user.Id);
+
+                UserRole? existingRole = GetUserRole(thread.Id, user.Id);
+
+                bool userExists = existingRole.HasValue;
+
+                if (userExists && existingRole.Value.Has(user.Role)) continue;
+
+                user.Role = !userExists ? user.Role : existingRole.Value | user.Role;
+                UpdateUserRole(thread.Id, user.Id, user.Role, userExists);
+            }
+
+            CleanupAssignees(thread.Id, assignees);
+        }
+
         public void UpdateAssociatedThreads(Guid threadId, Dictionary<Guid, int> associatedListItems)
         {
             const string SQL = @"
@@ -242,13 +294,13 @@ namespace EPMLiveCore.SocialEngine.Core
             }
         }
 
-        public void UpdateUsers(Thread thread)
+        public void UpdateCommenters(Thread thread)
         {
-            var assignees = new List<int>();
+            var commenters = new List<int>();
 
             foreach (User user in thread.Users)
             {
-                if (user.Role.Has(UserRole.Assignee)) assignees.Add(user.Id);
+                if (user.Role.Has(UserRole.Commenter)) commenters.Add(user.Id);
 
                 UserRole? existingRole = GetUserRole(thread.Id, user.Id);
 
@@ -259,8 +311,6 @@ namespace EPMLiveCore.SocialEngine.Core
                 user.Role = !userExists ? user.Role : existingRole.Value | user.Role;
                 UpdateUserRole(thread.Id, user.Id, user.Role, userExists);
             }
-
-            CleanupAssignees(thread.Id, assignees);
         }
 
         // Private Methods (6) 
