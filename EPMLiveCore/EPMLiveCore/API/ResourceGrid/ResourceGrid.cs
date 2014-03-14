@@ -15,14 +15,14 @@ namespace EPMLiveCore.API
 {
     public sealed class ResourceGrid
     {
-        #region Fields (2) 
+        #region Fields (2)
 
         private const string COMPONENT_NAME = "ResourceGrid";
         private static readonly Dictionary<string, string> _resourceDictionary = new Dictionary<string, string>();
 
-        #endregion Fields 
+        #endregion Fields
 
-        #region Enums (1) 
+        #region Enums (1)
 
         internal enum Errors
         {
@@ -62,9 +62,9 @@ namespace EPMLiveCore.API
             ExportResources
         }
 
-        #endregion Enums 
+        #endregion Enums
 
-        #region Methods (22) 
+        #region Methods (22)
 
         // Public Methods (1) 
 
@@ -90,9 +90,9 @@ namespace EPMLiveCore.API
                 childRows.Remove(childRows.FirstOrDefault(childRow => childRow["IdClean"].Equals(currentRow["IdClean"])));
 
                 DataRow row = dataTable.Select(String.Format("IdClean = '{0}'", dataRow["IdClean"])).First();
-                var children = (List<string>) row["Children"];
+                var children = (List<string>)row["Children"];
 
-                foreach (string child in childRows.Select(childRow => (string) childRow["Id"]).ToList()
+                foreach (string child in childRows.Select(childRow => (string)childRow["Id"]).ToList()
                     .Where(child => !children.Contains(child)))
                 {
                     children.Add(child);
@@ -100,7 +100,7 @@ namespace EPMLiveCore.API
                     DataRow[] parents = dataTable.Select(string.Format("IdClean = '{0}'", dataRow["ParentIdClean"]));
                     if (!parents.Any()) continue;
 
-                    var siblings = (List<string>) parents[0]["Children"];
+                    var siblings = (List<string>)parents[0]["Children"];
                     if (!siblings.Contains(child))
                     {
                         siblings.Add(child);
@@ -207,10 +207,11 @@ namespace EPMLiveCore.API
             if (type.Equals("Lookup"))
             {
                 var sVal = string.Empty;
-                try{
+                try
+                {
                     sVal = new SPFieldLookupValue(dataElement.Value).LookupId.ToString();
                 }
-                catch{}
+                catch { }
 
                 value = sVal;
             }
@@ -246,28 +247,28 @@ namespace EPMLiveCore.API
             XElement rootXml = dataXml.Root;
             if (rootXml == null)
             {
-                throw new APIException((int) Errors.DeleteResourceNoRootEle,
+                throw new APIException((int)Errors.DeleteResourceNoRootEle,
                     "Cannot find the DeleteResourcePoolResource element.");
             }
 
             XElement resourceElement = rootXml.Element("Resource");
             if (resourceElement == null)
             {
-                throw new APIException((int) Errors.DeleteResourceNoResourceEle,
+                throw new APIException((int)Errors.DeleteResourceNoResourceEle,
                     @"Cannot find the DeleteResourcePoolResource\Resource element.");
             }
 
             XAttribute idAttribute = resourceElement.Attribute("Id");
             if (idAttribute == null)
             {
-                throw new APIException((int) Errors.DeleteResourceNoIdAttr,
+                throw new APIException((int)Errors.DeleteResourceNoIdAttr,
                     @"Cannot find the DeleteResourcePoolResource\Resource Id attribute.");
             }
 
             string id = idAttribute.Value;
             if (!int.TryParse(id, out resourceId))
             {
-                throw new APIException((int) Errors.DeleteResourceBadId,
+                throw new APIException((int)Errors.DeleteResourceBadId,
                     string.Format("{0} is not a valid Resource Pool Id.", id));
             }
 
@@ -295,16 +296,16 @@ namespace EPMLiveCore.API
 
             var dataTable = new DataTable("Managers");
 
-            dataTable.Columns.Add("Id", typeof (string));
-            dataTable.Columns.Add("IdClean", typeof (string));
-            dataTable.Columns.Add("ParentId", typeof (string));
-            dataTable.Columns.Add("ParentIdClean", typeof (string));
-            dataTable.Columns.Add("Managers", typeof (object));
-            dataTable.Columns.Add("Children", typeof (List<string>));
+            dataTable.Columns.Add("Id", typeof(string));
+            dataTable.Columns.Add("IdClean", typeof(string));
+            dataTable.Columns.Add("ParentId", typeof(string));
+            dataTable.Columns.Add("ParentIdClean", typeof(string));
+            dataTable.Columns.Add("Managers", typeof(object));
+            dataTable.Columns.Add("Children", typeof(List<string>));
 
             if (departmentsXml.Root == null)
             {
-                throw new APIException((int) Errors.CantGetDepts, "Unable to query departments.");
+                throw new APIException((int)Errors.CantGetDepts, "Unable to query departments.");
             }
 
             foreach (XElement departmentElement in departmentsXml.Root.Elements("Department"))
@@ -320,7 +321,7 @@ namespace EPMLiveCore.API
 
                     if (fieldAttribute == null)
                     {
-                        throw new APIException((int) Errors.CantFindFieldAttr, "The Field attribute was not found.");
+                        throw new APIException((int)Errors.CantFindFieldAttr, "The Field attribute was not found.");
                     }
 
                     switch (fieldAttribute.Value)
@@ -330,7 +331,7 @@ namespace EPMLiveCore.API
 
                             if (idAttribute == null)
                             {
-                                throw new APIException((int) Errors.CantFindIdAttr, "ID attribute was not found.");
+                                throw new APIException((int)Errors.CantFindIdAttr, "ID attribute was not found.");
                             }
 
                             idClean = idAttribute.Value;
@@ -373,10 +374,10 @@ namespace EPMLiveCore.API
 
             foreach (DataRow dataRow in dataTable.Rows)
             {
-                dataRow["Managers"] = string.Join(",", ((List<string>) dataRow["Managers"]).ToArray());
+                dataRow["Managers"] = string.Join(",", ((List<string>)dataRow["Managers"]).ToArray());
 
-                var children = ((List<string>) dataRow["Children"]);
-                children.Add((string) dataRow["Id"]);
+                var children = ((List<string>)dataRow["Children"]);
+                children.Add((string)dataRow["Id"]);
             }
 
             SPUser currentUser = SPContext.Current.Web.CurrentUser;
@@ -385,7 +386,7 @@ namespace EPMLiveCore.API
             var departments = new List<string>();
 
             foreach (string department in dataTable.Select(string.Format("Managers LIKE '%{0}%'", username))
-                .SelectMany(dataRow => ((List<string>) dataRow["Children"]),
+                .SelectMany(dataRow => ((List<string>)dataRow["Children"]),
                     (dataRow, department) => department.Split(';')[0])
                 .Where(department => !departments.Contains(department)))
             {
@@ -394,7 +395,7 @@ namespace EPMLiveCore.API
 
             if (resultXml.Root == null)
             {
-                throw new APIException((int) Errors.CantFindResultRoot, "The Resources Root element was not found.");
+                throw new APIException((int)Errors.CantFindResultRoot, "The Resources Root element was not found.");
             }
 
             foreach (XElement resourceElement in resultXml.Root.Elements())
@@ -456,7 +457,7 @@ namespace EPMLiveCore.API
                 if (arrResourceElements.Any())
                 {
                     dtUserInfo = spWeb.Site.RootWeb.SiteUserInfoList.Items.GetDataTable();
-                    dtUserInfo.PrimaryKey = new[] {dtUserInfo.Columns["ID"]};
+                    dtUserInfo.PrimaryKey = new[] { dtUserInfo.Columns["ID"] };
                 }
 
                 foreach (XElement resourceElement in arrResourceElements)
@@ -519,27 +520,54 @@ namespace EPMLiveCore.API
                                 if (ele.Name.LocalName.Equals("I"))
                                 {
                                     var sRaw = (string)ele.Attribute(gridSafeFieldName);
-                                    var mCol = Regex.Matches(sRaw, @"<a [^>]*>(.*?)</a>");
-                                    var sEnum = string.Empty;
-                                    var sEnumKey = string.Empty;
-                                    if (mCol.Count > 0)
+                                    var ID = (int)ele.Attribute("ID");
+                                    SPListItem item = null;
+
+                                    try
+                                    {
+                                        item = resourcesList.GetItemById(ID);
+                                    }
+                                    catch { }
+
+                                    SPFieldLookupValueCollection lookupValCols = new SPFieldLookupValueCollection();
+
+                                    if (item != null)
                                     {
                                         try
                                         {
-                                            sEnum = mCol[0].Groups[1].Value;
-                                            sEnumKey = mCol[0].Value;
+                                            lookupValCols = new SPFieldLookupValueCollection(item[kv.Value.InternalName].ToString());
                                         }
                                         catch { }
                                     }
 
-                                    if (sEnum != null && !lEnum.Contains(sEnum))
+                                    var sEnum = string.Empty;
+                                    var sEnumKey = string.Empty;
+
+                                    if (lookupValCols.Count > 0)
                                     {
-                                        lEnum.Add(sEnum);
+                                        foreach (var lookupVal in lookupValCols)
+                                        {
+                                            sEnum += (lookupVal.LookupValue + ";");
+                                            sEnumKey += (lookupVal.LookupId.ToString() + ";");
+                                        }
                                     }
 
-                                    if (sEnumKey != null && !lEnumKeys.Contains(sEnumKey))
+                                    if (!string.IsNullOrEmpty(sEnum.Trim()))
                                     {
-                                        lEnumKeys.Add(sEnumKey);
+                                        sEnum = sEnum.TrimEnd(new[] { ';' });
+                                        if (!lEnum.Contains(sEnum))
+                                        {
+                                            lEnum.Add(sEnum);
+                                        }
+                                    }
+
+                                    if (!string.IsNullOrEmpty(sEnumKey.Trim()))
+                                    {
+                                        sEnumKey = sEnumKey.TrimEnd(new[] { ';' });
+                                        if (!lEnumKeys.Contains(sEnumKey))
+                                        {
+                                            lEnumKeys.Add(sEnumKey);
+                                        }
                                     }
                                 }
                             }
@@ -567,7 +595,7 @@ namespace EPMLiveCore.API
 
             if (resultRootElement == null)
             {
-                throw new APIException((int) Errors.LayoutGridCNFRootElement,
+                throw new APIException((int)Errors.LayoutGridCNFRootElement,
                     "Cannot find the Root element of the grid layout.");
             }
 
@@ -577,7 +605,7 @@ namespace EPMLiveCore.API
 
             if (leftColsElement == null)
             {
-                throw new APIException((int) Errors.LayoutGridCNFLeftColsElement,
+                throw new APIException((int)Errors.LayoutGridCNFLeftColsElement,
                     "Cannot find the LeftCols element of the grid layout.");
             }
 
@@ -585,7 +613,7 @@ namespace EPMLiveCore.API
 
             if (colsElement == null)
             {
-                throw new APIException((int) Errors.LayoutGridCNFColElement,
+                throw new APIException((int)Errors.LayoutGridCNFColElement,
                     "Cannot find the Col element of the grid layout.");
             }
 
@@ -593,7 +621,7 @@ namespace EPMLiveCore.API
 
             if (headerElement == null)
             {
-                throw new APIException((int) Errors.LayoutGridCNFHeaderElement,
+                throw new APIException((int)Errors.LayoutGridCNFHeaderElement,
                     "Cannot find the Header element of the grid layout.");
             }
 
@@ -604,7 +632,7 @@ namespace EPMLiveCore.API
             {
                 if (colName == null)
                 {
-                    throw new APIException((int) Errors.LayoutGridCNFColNameInCols,
+                    throw new APIException((int)Errors.LayoutGridCNFColNameInCols,
                         "Cannot find the column name in the grid layout.");
                 }
 
@@ -616,7 +644,7 @@ namespace EPMLiveCore.API
             {
                 if (colName == null)
                 {
-                    throw new APIException((int) Errors.LayoutGridCNFColNameInLeftCols,
+                    throw new APIException((int)Errors.LayoutGridCNFColNameInLeftCols,
                         "Cannot find the column name in the grid layout.");
                 }
 
@@ -629,7 +657,7 @@ namespace EPMLiveCore.API
                 SPRegionalSettings spRegionalSettings = spWeb.CurrentUser.RegionalSettings ??
                                                         spWeb.Site.RootWeb.RegionalSettings;
 
-                var cultureInfo = new CultureInfo((int) spRegionalSettings.LocaleId);
+                var cultureInfo = new CultureInfo((int)spRegionalSettings.LocaleId);
 
                 string currencyFormat = string.Format("{0}#.00", cultureInfo.NumberFormat.CurrencySymbol);
                 string shortDatePattern = cultureInfo.DateTimeFormat.ShortDatePattern;
@@ -746,19 +774,19 @@ namespace EPMLiveCore.API
         {
             if (dataXml == null)
             {
-                throw new APIException((int) Errors.RegisterIdCssLayoutDataNull, "Layout data cannot be null.");
+                throw new APIException((int)Errors.RegisterIdCssLayoutDataNull, "Layout data cannot be null.");
             }
 
             if (dataXml.Root == null)
             {
-                throw new APIException((int) Errors.RegisterIdCssCNFRootElement,
+                throw new APIException((int)Errors.RegisterIdCssCNFRootElement,
                     "Cannot find the Root element of the layout data.");
             }
 
             XElement idElement = dataXml.Root.Element("Id");
             if (idElement == null)
             {
-                throw new APIException((int) Errors.RegisterIdCssCNFIdElement,
+                throw new APIException((int)Errors.RegisterIdCssCNFIdElement,
                     "Cannot find the Id element of the layout data.");
             }
 
@@ -793,7 +821,7 @@ namespace EPMLiveCore.API
                 {
                     if (!resourceManager.ItemExists(resourceId))
                     {
-                        throw new APIException((int) Errors.DeleteResourceInvalidId,
+                        throw new APIException((int)Errors.DeleteResourceInvalidId,
                             string.Format("{0} is not a valid Resource Pool Id.", resourceId));
                     }
 
@@ -817,7 +845,7 @@ namespace EPMLiveCore.API
                     {
                         if (exception.Message.Contains("|||"))
                         {
-                            string[] message = exception.Message.Split(new[] {"|||"}, StringSplitOptions.None);
+                            string[] message = exception.Message.Split(new[] { "|||" }, StringSplitOptions.None);
 
                             resourceElement.Add(new XAttribute("Status", message[0].Equals("NO") ? 1 : 2),
                                 new XCData(message[1]));
@@ -833,7 +861,7 @@ namespace EPMLiveCore.API
             }
             catch (Exception e)
             {
-                throw new APIException((int) Errors.DeleteResourcePoolResource, e.Message);
+                throw new APIException((int)Errors.DeleteResourcePoolResource, e.Message);
             }
         }
 
@@ -870,7 +898,7 @@ namespace EPMLiveCore.API
             }
             catch (Exception e)
             {
-                throw new APIException((int) Errors.DeleteResourcePoolViews, e.Message);
+                throw new APIException((int)Errors.DeleteResourcePoolViews, e.Message);
             }
         }
 
@@ -898,7 +926,7 @@ namespace EPMLiveCore.API
             }
             catch (Exception e)
             {
-                throw new APIException((int) Errors.ExportResources, e.Message);
+                throw new APIException((int)Errors.ExportResources, e.Message);
             }
         }
 
@@ -911,7 +939,7 @@ namespace EPMLiveCore.API
         {
             try
             {
-                return ((byte[]) CacheStore.Current.Get(GetCacheKey(web, "Data"), 
+                return ((byte[])CacheStore.Current.Get(GetCacheKey(web, "Data"),
                     new CacheStoreCategory(web).ResourceGrid, () => GetDataGrid(data, web).Zip()).Value).Unzip();
             }
             catch (APIException)
@@ -920,7 +948,7 @@ namespace EPMLiveCore.API
             }
             catch (Exception e)
             {
-                throw new APIException((int) Errors.GetResourcePoolDataGrid, e.Message);
+                throw new APIException((int)Errors.GetResourcePoolDataGrid, e.Message);
             }
         }
 
@@ -993,7 +1021,7 @@ namespace EPMLiveCore.API
                 if (spListItems.Count > 0)
                 {
                     dtUserInfo = spWeb.Site.RootWeb.SiteUserInfoList.Items.GetDataTable();
-                    dtUserInfo.PrimaryKey = new[] {dtUserInfo.Columns["ID"]};
+                    dtUserInfo.PrimaryKey = new[] { dtUserInfo.Columns["ID"] };
                 }
 
                 var gridSafeFields = new Dictionary<string, string>();
@@ -1050,7 +1078,7 @@ namespace EPMLiveCore.API
             }
             catch (Exception e)
             {
-                throw new APIException((int) Errors.GetResourcePoolDataGridChanges, e.Message);
+                throw new APIException((int)Errors.GetResourcePoolDataGridChanges, e.Message);
             }
         }
 
@@ -1063,7 +1091,7 @@ namespace EPMLiveCore.API
         {
             try
             {
-                return ((byte[]) CacheStore.Current.Get(GetCacheKey(web, "Layout"),
+                return ((byte[])CacheStore.Current.Get(GetCacheKey(web, "Layout"),
                     new CacheStoreCategory(web).ResourceGrid, () => GetLayoutGrid(data).Zip()).Value).Unzip();
             }
             catch (APIException)
@@ -1072,7 +1100,7 @@ namespace EPMLiveCore.API
             }
             catch (Exception e)
             {
-                throw new APIException((int) Errors.GetResourcePoolLayoutGrid, e.Message);
+                throw new APIException((int)Errors.GetResourcePoolLayoutGrid, e.Message);
             }
         }
 
@@ -1086,7 +1114,7 @@ namespace EPMLiveCore.API
         {
             try
             {
-                return ((byte[]) CacheStore.Current.Get(GetCacheKey(web, "Views"),
+                return ((byte[])CacheStore.Current.Get(GetCacheKey(web, "Views"),
                     new CacheStoreCategory(web).ResourceGrid, () => GetViews().Zip()).Value).Unzip();
             }
             catch (APIException)
@@ -1095,7 +1123,7 @@ namespace EPMLiveCore.API
             }
             catch (Exception e)
             {
-                throw new APIException((int) Errors.GetResourcePoolViews, e.Message);
+                throw new APIException((int)Errors.GetResourcePoolViews, e.Message);
             }
         }
 
@@ -1107,7 +1135,7 @@ namespace EPMLiveCore.API
             {
                 foreach (
                     GridViewManagerKind gridViewManagerKind in
-                        new[] {GridViewManagerKind.Global, GridViewManagerKind.Personal})
+                        new[] { GridViewManagerKind.Global, GridViewManagerKind.Personal })
                 {
                     using (
                         IGridViewManager gridViewManager = gridViewManagerFactory.MakeGridViewManager(
@@ -1150,7 +1178,7 @@ namespace EPMLiveCore.API
                         XElement rootElement = dataDocument.Root;
                         if (rootElement == null)
                         {
-                            throw new APIException((int) Errors.GetResourcesRootElementNofFound,
+                            throw new APIException((int)Errors.GetResourcesRootElementNofFound,
                                 @"The ""Root"" element is not specified.");
                         }
 
@@ -1180,7 +1208,7 @@ namespace EPMLiveCore.API
             }
             catch (Exception e)
             {
-                throw new APIException((int) Errors.GetResources, e.GetBaseException().Message);
+                throw new APIException((int)Errors.GetResources, e.GetBaseException().Message);
             }
         }
 
@@ -1222,7 +1250,7 @@ namespace EPMLiveCore.API
             }
             catch (Exception e)
             {
-                throw new APIException((int) Errors.SaveResourcePoolViews, e.Message);
+                throw new APIException((int)Errors.SaveResourcePoolViews, e.Message);
             }
         }
 
@@ -1259,10 +1287,10 @@ namespace EPMLiveCore.API
             }
             catch (Exception e)
             {
-                throw new APIException((int) Errors.UpdateResourcePoolViews, e.Message);
+                throw new APIException((int)Errors.UpdateResourcePoolViews, e.Message);
             }
         }
 
-        #endregion Methods 
+        #endregion Methods
     }
 }
