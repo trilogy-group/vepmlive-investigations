@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Transactions;
 using System.Xml.Linq;
@@ -9,14 +10,12 @@ using EPMLiveCore.SocialEngine.Contracts;
 using EPMLiveCore.SocialEngine.Core;
 using EPMLiveCore.SocialEngine.Events;
 using Microsoft.SharePoint;
-using Transaction = EPMLiveCore.SocialEngine.Core.Transaction;
-using TransactionManager = EPMLiveCore.SocialEngine.Core.TransactionManager;
 
 namespace EPMLiveCore.SocialEngine
 {
     internal sealed class SocialEngine
     {
-        #region Fields (6) 
+        #region Fields (5) 
 
         private static volatile SocialEngine _instance;
         private static readonly object Locker = new Object();
@@ -62,7 +61,7 @@ namespace EPMLiveCore.SocialEngine
 
         #endregion Properties 
 
-        #region Methods (8) 
+        #region Methods (6) 
 
         // Private Methods (3) 
 
@@ -200,9 +199,33 @@ namespace EPMLiveCore.SocialEngine
             }
         }
 
-        // Internal Methods (5) 
+        // Internal Methods (3) 
 
-        
+        internal DataTable GetActivities(SPWeb contextWeb, DateTime? minDate, DateTime? maxDate, int? page, int? limit)
+        {
+            try
+            {
+                using (var activityManager = new ActivityManager(contextWeb))
+                {
+                    return activityManager.GetActivities(contextWeb.CurrentUser.ID, contextWeb.ServerRelativeUrl,
+                        minDate, maxDate, page, limit);
+                }
+            }
+            catch (AggregateException e)
+            {
+                foreach (Exception exception in e.InnerExceptions)
+                {
+                    _logger.Log(contextWeb, exception);
+                }
+
+                throw e.Flatten();
+            }
+            catch (Exception exception)
+            {
+                _logger.Log(contextWeb, exception);
+                throw;
+            }
+        }
 
         internal string ProcessActivity(string data)
         {
@@ -321,8 +344,6 @@ namespace EPMLiveCore.SocialEngine
                 return string.Join(", ", correlationIds.ToArray());
             }
         }
-
-        
 
         #endregion Methods 
     }

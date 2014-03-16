@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
+using EPMLiveCore.API.Integration;
 using EPMLiveCore.SocialEngine.Entities;
 using Microsoft.SharePoint;
 
@@ -16,9 +17,9 @@ namespace EPMLiveCore.SocialEngine.Core
 
         #endregion Constructors 
 
-        #region Methods (11) 
+        #region Methods (12) 
 
-        // Public Methods (11) 
+        // Public Methods (12) 
 
         public bool ActivityExists(ObjectKind objectKind, ActivityKind activityKind, Guid webId)
         {
@@ -58,7 +59,8 @@ namespace EPMLiveCore.SocialEngine.Core
                 sqlCommand.Parameters.AddWithValue("@WebId", webId);
                 sqlCommand.Parameters.AddWithValue("@ListId", listId.HasValue ? (object) listId : DBNull.Value);
                 sqlCommand.Parameters.AddWithValue("@ItemId", itemId.HasValue ? (object) itemId : DBNull.Value);
-                sqlCommand.Parameters.AddWithValue("@Key", string.IsNullOrEmpty(activityKey) ? DBNull.Value : (object) activityKey);
+                sqlCommand.Parameters.AddWithValue("@Key",
+                    string.IsNullOrEmpty(activityKey) ? DBNull.Value : (object) activityKey);
 
                 object activityCount = sqlCommand.ExecuteScalar();
 
@@ -244,6 +246,26 @@ namespace EPMLiveCore.SocialEngine.Core
                 {
                     yield return null;
                 }
+            }
+        }
+
+        public DataTable GetActivities(int userId, string webUrl, DateTime? minDate,DateTime? maxDate, int? page, int? limit)
+        {
+            using (var sqlCommand = new SqlCommand("SS_GetActivities", SqlConnection))
+            {
+                sqlCommand.Parameters.AddWithValue("@UserId", userId);
+                sqlCommand.Parameters.AddWithValue("@WebUrl", webUrl);
+                sqlCommand.Parameters.AddWithValue("@MinDate", minDate.HasValue ? (object) minDate.Value : DBNull.Value);
+                sqlCommand.Parameters.AddWithValue("@MaxDate", maxDate.HasValue ? (object) maxDate.Value : DBNull.Value);
+                sqlCommand.Parameters.AddWithValue("@Page", page.HasValue ? (object) page.Value : DBNull.Value);
+                sqlCommand.Parameters.AddWithValue("@Limit", limit.HasValue ? (object) limit.Value : DBNull.Value);
+
+                sqlCommand.CommandType = CommandType.StoredProcedure;
+
+                var dataTable = new DataTable();
+                dataTable.Load(sqlCommand.ExecuteReader());
+
+                return dataTable;
             }
         }
 

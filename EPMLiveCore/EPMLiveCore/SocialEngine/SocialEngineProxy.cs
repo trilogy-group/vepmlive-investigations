@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Xml.Linq;
 using EPMLiveCore.SocialEngine.Core;
 using EPMLiveCore.WorkEngineService;
@@ -15,9 +16,9 @@ namespace EPMLiveCore.SocialEngine
 
         #endregion Fields 
 
-        #region Methods (4) 
+        #region Methods (5) 
 
-        // Public Methods (4) 
+        // Public Methods (5) 
 
         public static void ClearTransaction(Guid transactionId, SPWeb contextWeb)
         {
@@ -35,6 +36,12 @@ namespace EPMLiveCore.SocialEngine
             {
                 new Logger().Log(contextWeb, exception);
             }
+        }
+
+        public static DataTable GetActivities(SPWeb contextWeb, DateTime? minDate = null, 
+            DateTime? maxDate = null, int? page = null, int? limit = null)
+        {
+            return SocialEngine.Current.GetActivities(contextWeb, minDate, maxDate, page, limit);
         }
 
         public static Guid GetTransaction(Guid webId, Guid listId, int itemId, SPWeb contextWeb)
