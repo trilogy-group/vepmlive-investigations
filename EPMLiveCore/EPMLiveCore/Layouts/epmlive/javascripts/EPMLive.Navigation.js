@@ -1839,7 +1839,7 @@
                                                                                     var $p = $a.parent();
 
                                                                                     $p.addClass('epm-nav-sortable');
-                                                                                    $a.attr('style', 'width:125px !important; position: relative; top: 2px;');
+                                                                                    $a.attr('style', 'width:124px !important; position: relative; top: 2px;');
 
                                                                                     window.epmLiveNavigation.addFavoriteWSMenu($p);
                                                                                 }
@@ -2052,7 +2052,7 @@
                                     $menu.append($('<li class="seprator"></li>').hide().fadeIn());
                                 }
                             } else {
-                                $menu.append($('<li><span class="epm-nav-cm-icon ' + getIcon(cmd.command) + '">&nbsp;</span><a href="javascript:epmLiveNavigation.handleContextualCommand(\'' + liId + '\',\'' + webId + '\',\'' + $ca.data('listid') + '\',\'' + $ca.data('itemid') + '\',\'' + cmd.command + '\',\'' + cmd.kind + '\');" style="width: 125px !important;">' + cmd.title + '</a></li>').hide().fadeIn());
+                                $menu.append($('<li><span class="epm-nav-cm-icon ' + getIcon(cmd.command) + '">&nbsp;</span><a href="javascript:epmLiveNavigation.handleContextualCommand(\'' + liId + '\',\'' + webId + '\',\'' + $ca.data('listid') + '\',\'' + $ca.data('itemid') + '\',\'' + cmd.command + '\',\'' + cmd.kind + '\');" style="width: 124px !important;">' + cmd.title + '</a></li>').hide().fadeIn());
 
                                 $menu.find('a').click(function() {
                                     hideMenu();
