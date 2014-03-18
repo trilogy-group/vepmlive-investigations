@@ -18,6 +18,15 @@
 
 /* ------------- Base tags ------------- */
 
+.GMClassSelected td {
+    background-color: #EEEEEE !important;
+}
+.GMDataRow:hover td {
+    background-color: #FAFAFA !important;
+}
+.GMClassSelected:hover td {
+    background-color: #EEEEEE !important;
+}
 
 .GMImage { padding-bottom:256px; }
 .GMNone { display:none; }
