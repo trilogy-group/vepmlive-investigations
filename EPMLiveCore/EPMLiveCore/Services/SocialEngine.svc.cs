@@ -159,11 +159,15 @@ namespace EPMLiveCore.Services
 
             if (!listsProcessed.Contains(lId))
             {
+                var icon = r["ListIcon"];
+                if (icon == null || icon == DBNull.Value) icon = null;
+
                 var list = new DailyActivities.ItemList
                 {
                     id = lId,
                     name = GetListName(r["ListName"] as string, (Guid) r["WebId"], lId),
                     url = GetListUrl((Guid) r["WebId"], lId),
+                    icon = icon as string,
                     threads = new List<Guid> {threadId}
                 };
 

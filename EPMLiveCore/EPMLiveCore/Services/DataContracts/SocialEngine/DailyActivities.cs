@@ -66,6 +66,8 @@ namespace EPMLiveCore.Services.DataContracts.SocialEngine
 
             public string name { get; set; }
 
+            public string icon { get; set; }
+
             public List<Guid> threads { get; set; }
 
             public string url { get; set; }
