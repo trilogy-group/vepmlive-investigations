@@ -94,7 +94,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
 
             string icon = EPMLiveCore.CoreFunctions.getConfigSetting(lWeb, "EPMLivePlanner" + sPlannerID + "Fields");
             if (icon == "")
-                icon = "/_layouts/epmlive/images/planner32.png";
+                icon = "/_layouts/epmlive/images/planner_online.png";
             string desc = EPMLiveCore.CoreFunctions.getConfigSetting(lWeb, "EPMLivePlanner" + plannerid + "Description");
 
             bool bOnline = false;
