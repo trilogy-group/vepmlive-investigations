@@ -37,7 +37,11 @@
     {{#if singleActivityThread}}
         {{partial 'single-activity'}}
     {{else}}
-        {{render 'activities' activities}}
+        {{#if isComment}}
+            {{partial 'single-comment-thread'}}
+        {{else}}
+            {{render 'activities' activities}}
+        {{/if}}
     {{/if}}
 </script>
 
@@ -51,40 +55,57 @@
     {{time}}
 </script>
 
+<script type="text/x-handlebars" data-template-name="_single-comment-thread">
+    <div class="header">{{thread-info thread=this classNames='thread-info'}}</div>
+    <div class="user">
+        {{user-avatar user=firstActivity.user classNames='avatar'}}
+    </div>
+    {{partial 'activity-info'}}
+</script>
+
 <script type="text/x-handlebars" data-template-name="_single-activity">
-    {{partial 'user'}} <div class="action">{{firstActivity.kind}}</div> {{partial 'object-info'}} {{partial 'activity-info'}}
+    {{partial 'user'}} <div class="action">{{firstActivity.kind}}</div> {{thread-info thread=this classNames='thread-info'}} {{partial 'activity-info'}}
+
 </script>
 
 <script type="text/x-handlebars" data-template-name="_user">
-    <div class="avatar">
-        {{#if firstActivity.user.hasAvatar}}
-            <img {{bind-attr src='firstActivity.user.avatar'}} />
-        {{/if}}
+    <div class="user">
+        {{user-avatar user=firstActivity.user classNames='avatar'}}
+        {{user-info user=firstActivity.user classNames='info'}}
     </div>
-    <a {{bind-attr href='firstActivity.user.profileUrl'}} class="user" target="_blank">{{firstActivity.user.displayName}}</a>
-</script>
-
-<script type="text/x-handlebars" data-template-name="_object-info">
-    {{#if web.isNotCurrentWorkspace}}
-        <div class="workspace"><a {{bind-attr href='web.url'}} target="_blank">{{web.title}}</a></div>
-    {{/if}}
-    
-    {{#if hasList}}
-        <div class="list">
-            {{#if web.isNotCurrentWorkspace}}
-                <span>&nbsp;-&nbsp;</span>
-            {{/if}}
-            <a {{bind-attr href='list.url'}} target="_blank">{{list.name}}</a>
-        </div>
-    {{/if}}
-    
-    {{#if hasItem}}
-        <div class="item"><span>:&nbsp;</span><a {{bind-attr href='url'}} target="_blank">{{title}}</a></div>
-    {{/if}}
 </script>
 
 <script type="text/x-handlebars" data-template-name="_activity-info">
     <div class="activity-info">
-        <span class="date"  {{action 'showDate' on='mouseEnter' target='view'}} data-toggle="tooltip" data-placement="top" {{bind-attr title='firstActivity.fullDateTime'}}>{{firstActivity.date}}</span>
+        <span class="date" {{action 'showDate' on='mouseEnter' target='view'}} data-toggle="tooltip" data-placement="top" {{bind-attr title='firstActivity.fullDateTime'}}>{{firstActivity.date}}</span>
     </div>
+</script>
+
+<script type="text/x-handlebars" data-template-name="components/thread-info">
+    {{#if thread.web.isNotCurrentWorkspace}}
+        <div class="workspace"><a {{bind-attr href='thread.web.url'}} target="_blank">{{thread.web.title}}</a></div>
+    {{/if}}
+    
+    {{#if thread.hasList}}
+        <div class="list">
+            {{#if thread.web.isNotCurrentWorkspace}}
+                <span>&nbsp;-&nbsp;</span>
+            {{/if}}
+            <a {{bind-attr href='thread.list.url'}} target="_blank">{{thread.list.name}}</a>
+        </div>
+    {{/if}}
+    
+    {{#if thread.hasItem}}
+        <div class="item"><span>:&nbsp;</span><a {{bind-attr href='thread.activityUrl'}} target="_blank">{{thread.title}}</a></div>
+    {{/if}}
+</script>
+
+<script type="text/x-handlebars" data-template-name="components/user-avatar">
+    {{#if user.hasAvatar}}
+        <img {{bind-attr src='user.avatar'}} />
+    {{/if}}
+</script>
+
+<script type="text/x-handlebars" data-template-name="components/user-info">
+    <a {{bind-attr href='user.profileUrl'}} class="user" target="_blank" {{action 'showName' on='mouseEnter'}} data-toggle="tooltip" data-placement="top" {{bind-attr title='user.name'}}>{{user.displayName}}</a>
 </script>

@@ -1,4 +1,17 @@
-﻿#epm-social-stream {
+﻿.clearfix:after {
+  content: ".";
+  visibility: hidden;
+  display: block;
+  height: 0;
+  clear: both;
+}
+.info-position {
+  height: 20px;
+  line-height: 20px;
+  position: relative;
+  top: 12.5px;
+}
+#epm-social-stream {
   width: 100%;
   font-family: "Open Sans Regular", Helvetica, Arial !important;
 }
@@ -49,6 +62,13 @@
   color: #555555;
   border-radius: 3px;
 }
+#epm-social-stream ul.days li.day ul.threads li.thread div.header {
+  border-bottom: 1px solid #EEEEEE;
+  height: 40px;
+  line-height: 40px;
+  margin-bottom: 0;
+  width: 100%;
+}
 #epm-social-stream ul.days li.day ul.threads li.thread span,
 #epm-social-stream ul.days li.day ul.threads li.thread div,
 #epm-social-stream ul.days li.day ul.threads li.thread a {
@@ -84,11 +104,12 @@
 #epm-social-stream ul.days li.day ul.threads li.thread div.activity-info .tooltip {
   width: 225px;
 }
-#epm-social-stream ul.days li.day ul.threads li.single-activity-thread {
+#epm-social-stream ul.days li.day ul.threads li.thread div.user {
   height: 45px;
   line-height: 45px;
+  margin-right: 0;
 }
-#epm-social-stream ul.days li.day ul.threads li.single-activity-thread div.avatar {
+#epm-social-stream ul.days li.day ul.threads li.thread div.user div.avatar {
   width: 36px;
   height: 36px;
   position: relative;
@@ -105,8 +126,30 @@
   margin-right: 10px;
   border-radius: 50%;
 }
-#epm-social-stream ul.days li.day ul.threads li.single-activity-thread div.avatar img {
+#epm-social-stream ul.days li.day ul.threads li.thread div.user div.avatar img {
   width: 36px;
   border-radius: 50%;
+}
+#epm-social-stream ul.days li.day ul.threads li.thread div.user div.info {
+  height: 20px;
+  line-height: 20px;
+  position: relative;
+  top: 12.5px;
+}
+#epm-social-stream ul.days li.day ul.threads li.thread div.user div.info .tooltip-inner {
+  white-space: nowrap;
+}
+#epm-social-stream ul.days li.day ul.threads li.single-activity-thread {
+  height: 45px;
+  line-height: 45px;
+}
+#epm-social-stream ul.days li.day ul.threads li.single-activity-thread span,
+#epm-social-stream ul.days li.day ul.threads li.single-activity-thread div,
+#epm-social-stream ul.days li.day ul.threads li.single-activity-thread a {
+  float: left;
+}
+#epm-social-stream ul.days li.day ul.threads li.single-activity-thread div,
+#epm-social-stream ul.days li.day ul.threads li.single-activity-thread a {
+  margin-right: 4px;
 }
 /*# sourceMappingURL=SocialStream.css.map */

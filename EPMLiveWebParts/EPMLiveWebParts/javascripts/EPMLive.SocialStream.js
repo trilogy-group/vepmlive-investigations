@@ -44,12 +44,8 @@
             list: DS.belongsTo('list'),
             activities: DS.hasMany('activity'),
 
-            hasList: function() {
-                return this.get('list') !== null;
-            }.property(),
-
-            hasItem: function() {
-                return this.get('itemId') !== null;
+            activityUrl: function() {
+                return window.epmLive.currentWebUrl + '/' + this.get('url');
             }.property()
         });
 
@@ -152,9 +148,11 @@
 
         SE.ThreadView = Ember.View.extend({
             tagName: 'li',
-            classNames: ['thread'],
-            classNameBindings: ['singleActivityThread'],
+            classNames: ['thread', 'clearfix'],
+            classNameBindings: ['singleActivityThread', 'isComment'],
+            
             singleActivityThread: Ember.computed.alias('controller.singleActivityThread'),
+            isComment: Ember.computed.alias('controller.isComment'),
             
             actions: {
                 showDate: function () {
@@ -174,13 +172,33 @@
         });
 
         SE.ThreadController = Ember.ObjectController.extend({
-            singleActivityThread: function() {
-                return this.get('activities').get('length') === 1;
-            }.property('activities.@each'),
+            hasList: function() {
+                return this.get('list') !== null;
+            }.property(),
 
+            hasItem: function() {
+                return this.get('itemId') !== null;
+            }.property(),
+            
             firstActivity: function() {
                 return this.get('activities').get('firstObject');
-            }.property('activities.@each')
+            }.property('activities.@each'),
+            
+            isComment: function () {
+                return this.get('firstActivity').get('kind') === 'COMMENTADDED' && this.get('activities').get('length') === 1;
+            }.property('firstActivity'),
+            
+            singleActivityThread: function () {
+                return !this.get('isComment') && this.get('activities').get('length') === 1;
+            }.property('isComment', 'activities.@each')
+        });
+
+        SE.UserInfoComponent = Ember.Component.extend({            
+            actions: {
+                showName:function() {
+                    this.$().find('a.user').tooltip('show');
+                }
+            }
         });
     };
 
