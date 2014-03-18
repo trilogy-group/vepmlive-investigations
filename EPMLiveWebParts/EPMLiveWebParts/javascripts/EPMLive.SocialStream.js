@@ -12,6 +12,7 @@
 
         SE.Day = DS.Model.extend({
             threads: DS.hasMany('thread'),
+            
             day: function() {
                 return moment(this.get('id')).calendar();
             }.property()
@@ -26,7 +27,15 @@
             day: DS.belongsTo('day'),
             web: DS.belongsTo('web'),
             list: DS.belongsTo('list'),
-            activities: DS.hasMany('activity')
+            activities: DS.hasMany('activity'),
+
+            hasList: function() {
+                return this.get('list') !== null;
+            }.property(),
+
+            hasItem: function() {
+                return this.get('itemId') !== null;
+            }.property()
         });
 
         SE.Activity = DS.Model.extend({
@@ -42,7 +51,11 @@
         SE.Web = DS.Model.extend({
             title: DS.attr(),
             url: DS.attr(),
-            threads: DS.hasMany('thread')
+            threads: DS.hasMany('thread'),
+
+            isNotCurrentWorkspace: function () {
+                return this.get('id').toLowerCase() !== window.epmLive.currentWebId.toLowerCase();
+            }.property()
         });
 
         SE.List = DS.Model.extend({
@@ -56,15 +69,26 @@
             account: DS.attr(),
             avatar: DS.attr(),
             activities: DS.hasMany('activity'),
-            hasAvatar:function() {
-                return this.get('avatar') !== '';
-            }
+
+            hasAvatar: function() {
+                return this.get('avatar') !== null;
+            }.property(),
+
+            displayName: function() {
+                if (this.get('id') === window.epmLive.currentUserId) return 'You';
+                return this.get('name').split(' ')[0];
+            }.property(),
+
+            profileUrl: function() {
+                return window.epmLive.currentWebUrl + '/_layouts/15/userdisp.aspx?ID=' + this.get('id');
+            }.property()
         });
 
         SE.IndexRoute = Ember.Route.extend({
             model: function() {
                 return this.store.find('activity');
             },
+            
             setupController: function(controller, model) {
                 controller.set('content', model);
                 controller.set('days', this.store.all('day'));
@@ -115,7 +139,7 @@
     };
 
     var loadSocialEngine = function() {
-        if (window.epmLive && window.epmLive.currentWebUrl) {
+        if (window.epmLive) {
             Function.prototype.property = function () {
                 var ret = Ember.computed(this);
                 return ret.property.apply(ret, arguments);

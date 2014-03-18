@@ -52,33 +52,33 @@
 </script>
 
 <script type="text/x-handlebars" data-template-name="_single-activity">
-    {{partial 'user'}}<div class="title">{{title}}</div>
+    {{partial 'user'}} <div class="action">{{firstActivity.kind}}</div> {{partial 'object-info'}}
 </script>
 
 <script type="text/x-handlebars" data-template-name="_user">
     <div class="avatar">
         {{#if firstActivity.user.hasAvatar}}
-        <img {{bind-attr src='firstActivity.user.avatar'}} />
+            <img {{bind-attr src='firstActivity.user.avatar'}} />
         {{/if}}
     </div>
+    <a {{bind-attr href='firstActivity.user.profileUrl'}} class="user" target="_blank">{{firstActivity.user.displayName}}</a>
 </script>
 
-<%--
-
-<script type="text/x-handlebars" data-template-name="_threads">
-    {{#each day in controller}}
-        <div class="date">{{ date }}</div>
-        {{#each thread in threads}}
-            <div class="thread">
-                <div class="head">{{ title }}</div>
-                <div class="activities">{{ partial "activities" }}</div>
-            </div>
-        {{/each}}
-    {{/each}}
+<script type="text/x-handlebars" data-template-name="_object-info">
+    {{#if web.isNotCurrentWorkspace}}
+        <div class="workspace"><a {{bind-attr href='web.url'}} target="_blank">{{web.title}}</a></div>
+    {{/if}}
+    
+    {{#if hasList}}
+        <div class="list">
+            {{#if web.isNotCurrentWorkspace}}
+                <span>&nbsp;-&nbsp;</span>
+            {{/if}}
+            <a {{bind-attr href='list.url'}} target="_blank">{{list.name}}</a>
+        </div>
+    {{/if}}
+    
+    {{#if hasItem}}
+        <div class="item"><span>:&nbsp;</span><a {{bind-attr href='url'}} target="_blank">{{title}}</a></div>
+    {{/if}}
 </script>
-
-<script type="text/x-handlebars" data-template-name="_activities">
-    {{#each activity in activities}}
-        <div class="activity">{{ title }}</div>
-    {{/each}}
-</script>--%>
