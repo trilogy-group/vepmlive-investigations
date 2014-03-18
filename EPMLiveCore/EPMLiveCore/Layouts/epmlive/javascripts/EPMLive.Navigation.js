@@ -1972,7 +1972,14 @@
                 var _setupMenu = function ($li, defaultCommands, forcePopup, customOverrideKind) {
                     defaultCommands = defaultCommands || [];
 
-                    var $menu = $($li.find('.epm-nav-contextual-menu').get(0));
+                    var $a = $($li.find('a').get(0));
+                    var siteId = $a.data('siteid');
+                    var webId = $a.data('webid');
+                    var listId = $a.data('listid');
+                    var listIdd = listId.replace(/-/g,"");
+                    var itemId = $a.data('itemid');
+                    //var $menu = $($li.find('.epm-nav-contextual-menu').get(0));
+                    var $menu = $('#menu' + listIdd + itemId);
 
                     var setup = function (commands, $ca) {
                         var getIcon = function (command) {
@@ -2024,7 +2031,8 @@
                                 commands.push(defaultCommands[dc]);
                             }                        }
 
-                        $menu = $($li.find('.epm-nav-contextual-menu').get(0));
+                        //$menu = $($li.find('.epm-nav-contextual-menu').get(0));
+                        $menu = $('#menu' + listIdd + itemId);
 
                         $($menu.find('.epm-nav-cm-loading').get(0)).remove();
 
@@ -2074,6 +2082,18 @@
                             window.epmNavHoveredNode = liId;
                         });
 
+                        $menu.mouseleave(function () {
+
+                            window.epmNavHoveredNode = null;
+
+                            window.setTimeout(function () {
+                                if (window.epmNavHoveredNode == null) {
+                                    hideMenu();
+                                }
+                            }, 200);
+                        });
+
+
                         $('.epm-nav-node, .epm-nav-ws-node').hover(function () {
                             var id = this.id;
                             window.epmNavHoveredNode = id;
@@ -2101,10 +2121,29 @@
                         $(document).on('click', '.epm-nav-dragger', function() {
                             hideMenu();
                         });
+
+                        if ($menu.offset().top + $menu.height() > $(window).height()) {
+                            $menu.css('top', $menu.offset().top - $menu.height() - 30);
+                        }
                     };
 
                     var showMenu = function () {
+                        window.epmNavHoveredNode = null;
+
+                        $menu.css('top', ($li.offset().top + 20));
+                        $menu.css('left', $li.offset().left);
+
+                        if ($menu.offset().top + $menu.height() > $(window).height()) {
+                            $menu.css('top', $menu.offset().top - $menu.height() - 30);
+                        }
+
                         $menu.fadeIn(200);
+
+                        window.setTimeout(function () {
+                            if (window.epmNavHoveredNode === null) {
+                                hideMenu();
+                            }
+                        }, 2000);
                     };
 
                     var hideMenu = function () {
@@ -2119,17 +2158,25 @@
                         }
                     };
 
-                    if ($li.find('.epm-nav-contextual-menu').length === 0) {
-                        $li.append('<ul class="epm-nav-contextual-menu"><li class="epm-nav-cm-loading"><span>Loading...</span></li></ul>');
-                        $menu = $($li.find('.epm-nav-contextual-menu').get(0));
+                    if (window.epmNavSelectNode != listIdd + itemId && window.epmNavSelectNode != null)
+                    {
+                        $('#menu' + window.epmNavSelectNode).fadeOut(200);
+                    }
+
+                    window.epmNavSelectNode = listIdd + itemId;
+                    //if($('body').find('.epm-nav-contextual-menu').length > 0)
+                    //    $('body').find('.epm-nav-contextual-menu').get(0).remove();
+                   
+                    
+
+                    //if ($li.find('.epm-nav-contextual-menu').length === 0) {
+                    if ($('body').find('#menu' + listIdd + itemId).length === 0) {
+
+                        $('body').append('<ul class="epm-nav-contextual-menu"  id="menu' + listIdd + itemId + '" style="display:block;position:absolute;top:' + ($li.offset().top + 20) + 'px;left:' + $li.offset().left + 'px;"><li class="epm-nav-cm-loading"><span>Loading...</span></li></ul>');
+                        //$menu = $($li.find('.epm-nav-contextual-menu').get(0));
+                        $menu = $('#menu' + listIdd + itemId);
                         showMenu();
                         
-                        var $a = $($li.find('a').get(0));
-                        
-                        var siteId = $a.data('siteid');
-                        var webId = $a.data('webid');
-                        var listId = $a.data('listid');
-                        var itemId = $a.data('itemid');
                         
                         if (!siteId) {
                             webId = $li.get(0).id;
