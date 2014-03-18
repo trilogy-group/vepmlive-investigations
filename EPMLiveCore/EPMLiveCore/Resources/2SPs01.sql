@@ -1022,7 +1022,52 @@ end
 exec(@sql)
 ')
  
+if not exists (select routine_name from INFORMATION_SCHEMA.routines where routine_name = 'spTSGetQueue')
+begin
+    Print 'Creating Stored Procedure spTSGetQueue'
+    SET @createoralter = 'CREATE'
+end
+else
+begin
+    Print 'Updating Stored Procedure spTSGetQueue'
+    SET @createoralter = 'ALTER'
+end
+exec(@createoralter + ' PROCEDURE [dbo].[spTSGetQueue]
 
+@servername varchar(255),
+@maxthreads varchar(2)
+
+AS
+BEGIN
+
+declare @sql varchar(MAX)
+
+set @sql = '';WITH CTE AS 
+( 
+SELECT TOP '' + @maxthreads + '' TSQUEUE_ID, QUEUE, STATUS, JOBTYPE_ID, DTSTARTED
+FROM TSQUEUE 
+WHERE QUEUE is null and status=0 and JOBTYPE_ID = 32
+order by DTCREATED
+) 
+UPDATE CTE SET QUEUE='''''' + @servername + '''''', status=1;
+
+WITH CTE2 AS 
+( 
+SELECT TOP 200 TSQUEUE_ID, QUEUE, STATUS, JOBTYPE_ID, DTSTARTED
+FROM TSQUEUE 
+WHERE QUEUE is null and status=0 and (JOBTYPE_ID = 30 OR JOBTYPE_ID = 31)
+order by DTCREATED
+) 
+UPDATE CTE2 SET QUEUE='''''' + @servername + '''''', status=1
+''
+
+exec(@sql)
+
+SELECT * FROM TSQUEUE WHERE QUEUE = @servername and STATUS = 1
+UPDATE TSQUEUE SET STATUS = 2 WHERE QUEUE = @servername and STATUS = 1
+
+END
+')
 
 if not exists (select routine_name from INFORMATION_SCHEMA.routines where routine_name = 'spTSGetApprovedTimesheets')
 begin

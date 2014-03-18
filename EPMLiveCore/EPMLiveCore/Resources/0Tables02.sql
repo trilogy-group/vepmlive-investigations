@@ -305,6 +305,13 @@ else
 			ADD [PERCENTCOMPLETE] [int] NULL
 		end
 
+		if not exists (select column_name FROM INFORMATION_SCHEMA.COLUMNS where table_name = 'TSQUEUE' and column_name = 'QUEUE')
+		begin
+			Print '     Add Column Username'
+			ALTER TABLE TSQUEUE
+			ADD [QUEUE] [nvarchar](255) NULL
+		end
+
 		ALTER TABLE TSQUEUE
 		ALTER COLUMN JOBDATA ntext
 			

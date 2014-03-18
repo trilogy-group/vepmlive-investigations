@@ -118,6 +118,14 @@ else
 begin
     UPDATE TIMERJOBTYPES SET NetAssembly='TimeSheets, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5', NetClass='TimeSheets.ApprovalJob', [Title]='Timesheet Approval', Priority=0 where jobtype_id=30
 end
+if not exists (select jobtype_id from TIMERJOBTYPES where jobtype_id = 32)
+begin
+    INSERT INTO TIMERJOBTYPES (jobtype_id,NetAssembly,NetClass,[Title],priority) VALUES (32,'TimeSheets, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5','TimeSheets.SaveDataJob','Timesheet Save Data',0)
+end
+else
+begin
+    UPDATE TIMERJOBTYPES SET NetAssembly='TimeSheets, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5', NetClass='TimeSheets.SaveDataJob', [Title]='Timesheet Approval', Priority=0 where jobtype_id=32
+end
 if not exists (select jobtype_id from TIMERJOBTYPES where jobtype_id = 80)
 begin
     INSERT INTO TIMERJOBTYPES (jobtype_id,NetAssembly,NetClass,[Title],priority) VALUES (80,'WorkEnginePPM, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5','WorkEnginePPM.Jobs.InstallWorkEvents','InstallWorkEvents',5)
