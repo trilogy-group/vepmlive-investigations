@@ -178,7 +178,8 @@ namespace TimerService
 
                 bw.RunWorkerAsync(dr);
 
-                workingThreads.add(bw);
+                if(dr.dr["JOBTYPE_ID"].ToString() != "32")
+                    workingThreads.add(bw);
 
                 return true;
             }
@@ -263,7 +264,7 @@ namespace TimerService
             }
             catch(Exception ex)
             {
-                //TODO: Log Error
+                
             }
         }
 
