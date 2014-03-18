@@ -113,7 +113,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                 sb.Append(plannerid);
                 sb.Append("|Online')\" class=\"btn btn-large\"><TABLE border=0 cellSpacing=0 cellPadding=0 width=\"100%\" height=\"100%\"><tr>");
                 sb.Append("<td style=\"vertical-align:middle; text-align:center\" width=\"80px\" valign=\"center\" align=\"center\">");
-                sb.Append("<img src=\"");
+                sb.Append("<img style=\"margin-top:3px;width:60px;\" src=\"");
                 sb.Append(((Web.ServerRelativeUrl == "/") ? "" : Web.ServerRelativeUrl));
                 sb.Append(icon);
                 sb.Append("\"></td>");
@@ -136,9 +136,9 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                 sb.Append(plannerid);
                 sb.Append("|Project')\" class=\"btn btn-large\"><TABLE border=0 cellSpacing=0 cellPadding=0 width=\"100%\" height=\"100%\"><tr>");
                 sb.Append("<td style=\"vertical-align:middle; text-align:center\" width=\"80px\" valign=\"center\" align=\"center\">");
-                sb.Append("<img src=\"");
+                sb.Append("<img style=\"margin-top:3px;width:60px;\" src=\"");
                 sb.Append(((Web.ServerRelativeUrl == "/") ? "" : Web.ServerRelativeUrl));
-                sb.Append("/_layouts/images/Project2007Logo.gif\"></td>");
+                sb.Append("/_layouts/images/planner_project.png\"></td>");
                 sb.Append("<td class=\"titletd\"><b>");
                 sb.Append(plannername);
                 if (plannername == "Microsoft Project" || plannerid == "MPP")
@@ -159,9 +159,9 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
             {
                 sb.Append("<a href=\"javascript:void(0);\" onclick=\"javascript:window.top.location.href='KanBanPlanner.aspx?ID=" + Request["ID"] + "&planner=" + plannerid + "'\" class=\"btn btn-large\"><TABLE border=0 cellSpacing=0 cellPadding=0 width=\"100%\" height=\"100%\"><tr>");
                 sb.Append("<td style=\"vertical-align:middle; text-align:center\" width=\"80px\" valign=\"center\" align=\"center\">");
-                sb.Append("<img src=\"");
+                sb.Append("<img style=\"margin-top:3px;width:60px;\" src=\"");
                 sb.Append(((Web.ServerRelativeUrl == "/") ? "" : Web.ServerRelativeUrl));
-                sb.Append("/_layouts/images/Project2007Logo.gif\"></td>");
+                sb.Append("/_layouts/images/planner_kanban.png\"></td>");
                 sb.Append("<td class=\"titletd\"><b>");
                 sb.Append(plannername);
                 sb.Append("</b>");
