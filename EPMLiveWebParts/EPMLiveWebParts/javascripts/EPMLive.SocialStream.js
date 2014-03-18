@@ -10,6 +10,21 @@
             namespace: window.epmLive.currentWebUrl.slice(1) + '/_vti_bin/SocialEngine.svc'
         });
 
+        SE.ConfigureMoment = function() {
+            moment.lang('en', {
+                calendar: {
+                    lastDay: '[Yesterday -]  MMMM D',
+                    sameDay: '[Today -] MMMM D',
+                    nextDay: '[Tomorrow -] MMMM D',
+                    lastWeek: '[Last] dddd [-] MMMM D',
+                    nextWeek: 'dddd [-] MMMM D',
+                    sameElse: 'MMMM D YYYY'
+                }
+            });
+        };
+
+        SE.ConfigureMoment();
+
         SE.Day = DS.Model.extend({
             threads: DS.hasMany('thread'),
             
@@ -45,7 +60,32 @@
             kind: DS.attr(),
             isMassOperation: DS.attr(),
             user: DS.belongsTo('user'),
-            thread: DS.belongsTo('thread')
+            thread: DS.belongsTo('thread'),
+
+            date: function() {
+                var date = moment(this.get('time'));
+
+                moment.lang('en', {
+                    calendar: {
+                        lastDay: '[Yesterday]  MMM D',
+                        sameDay: '[Today] MMM D',
+                        nextDay: '[Tomorrow] MMM D',
+                        lastWeek: '[Last] ddd MMM D',
+                        nextWeek: 'ddd MMM D',
+                        sameElse: 'MMMM D YYYY'
+                    }
+                });
+
+                date = date.calendar();
+
+                SE.ConfigureMoment();
+
+                return date;
+            }.property(),
+
+            fullDateTime: function() {
+                return moment(this.get('time')).format('LLLL');
+            }.property()
         });
 
         SE.Web = DS.Model.extend({
@@ -114,7 +154,13 @@
             tagName: 'li',
             classNames: ['thread'],
             classNameBindings: ['singleActivityThread'],
-            singleActivityThread: Ember.computed.alias('controller.singleActivityThread')
+            singleActivityThread: Ember.computed.alias('controller.singleActivityThread'),
+            
+            actions: {
+                showDate: function () {
+                    this.$().find('span.date').tooltip('show');
+                }
+            }
         });
         
         SE.ActivitiesView = Ember.View.extend({
@@ -144,17 +190,6 @@
                 var ret = Ember.computed(this);
                 return ret.property.apply(ret, arguments);
             };
-            
-            moment.lang('en', {
-                calendar: {
-                    lastDay: '[Yesterday -]  MMMM D',
-                    sameDay: '[Today -] MMMM D',
-                    nextDay: '[Tomorrow -] MMMM D',
-                    lastWeek: '[Last] dddd [-] MMMM D',
-                    nextWeek: 'dddd [-] MMMM D',
-                    sameElse: 'MMMM D YYYY'
-                }
-            });
             
             SocialEngine();
         } else {

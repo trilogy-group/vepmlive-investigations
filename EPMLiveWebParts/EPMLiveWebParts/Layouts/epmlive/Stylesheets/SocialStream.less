@@ -1,6 +1,8 @@
 ﻿@day-header-height: 30px;
 @single-thread-height: 45px;
+@activity-info-height: @single-thread-height - 25;
 @avatar-size: 36px;
+@section-bottom-margin: 20px;
 @font: "Open Sans Regular", Helvetica, Arial;
 
 .border-radius(@radius: 3px) {
@@ -30,8 +32,10 @@
 
         ul.days {
             li.day {
+                margin-bottom: @section-bottom-margin;
+
                 div.header {
-                    margin-bottom: 20px;
+                    margin-bottom: @section-bottom-margin;
                     height: @day-header-height;
                     text-align: center;
                     line-height: @day-header-height;
@@ -87,6 +91,24 @@
 
                                 a {
                                     margin-right: 0;
+                                }
+                            }
+
+                            div.activity-info {
+                                float: right;
+                                height: @activity-info-height;
+                                line-height: @activity-info-height;
+                                position: relative;
+                                top: (@single-thread-height - @activity-info-height) / 2;
+
+                                span.date {
+                                    color: #CCCCCC;
+                                    font-size: 0.8em;
+                                    font-weight: 300;
+                                }
+
+                                .tooltip {
+                                    width: 225px;
                                 }
                             }
                     }

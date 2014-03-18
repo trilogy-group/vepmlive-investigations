@@ -10,6 +10,9 @@
   padding: 0;
   list-style: none;
 }
+#epm-social-stream ul.days li.day {
+  margin-bottom: 20px;
+}
 #epm-social-stream ul.days li.day div.header {
   margin-bottom: 20px;
   height: 30px;
@@ -65,6 +68,21 @@
 #epm-social-stream ul.days li.day ul.threads li.thread div.workspace a,
 #epm-social-stream ul.days li.day ul.threads li.thread div.list a {
   margin-right: 0;
+}
+#epm-social-stream ul.days li.day ul.threads li.thread div.activity-info {
+  float: right;
+  height: 20px;
+  line-height: 20px;
+  position: relative;
+  top: 12.5px;
+}
+#epm-social-stream ul.days li.day ul.threads li.thread div.activity-info span.date {
+  color: #CCCCCC;
+  font-size: 0.8em;
+  font-weight: 300;
+}
+#epm-social-stream ul.days li.day ul.threads li.thread div.activity-info .tooltip {
+  width: 225px;
 }
 #epm-social-stream ul.days li.day ul.threads li.single-activity-thread {
   height: 45px;

@@ -52,7 +52,7 @@
 </script>
 
 <script type="text/x-handlebars" data-template-name="_single-activity">
-    {{partial 'user'}} <div class="action">{{firstActivity.kind}}</div> {{partial 'object-info'}}
+    {{partial 'user'}} <div class="action">{{firstActivity.kind}}</div> {{partial 'object-info'}} {{partial 'activity-info'}}
 </script>
 
 <script type="text/x-handlebars" data-template-name="_user">
@@ -81,4 +81,10 @@
     {{#if hasItem}}
         <div class="item"><span>:&nbsp;</span><a {{bind-attr href='url'}} target="_blank">{{title}}</a></div>
     {{/if}}
+</script>
+
+<script type="text/x-handlebars" data-template-name="_activity-info">
+    <div class="activity-info">
+        <span class="date"  {{action 'showDate' on='mouseEnter' target='view'}} data-toggle="tooltip" data-placement="top" {{bind-attr title='firstActivity.fullDateTime'}}>{{firstActivity.date}}</span>
+    </div>
 </script>
