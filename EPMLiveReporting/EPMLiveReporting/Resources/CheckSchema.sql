@@ -199,3 +199,20 @@ BEGIN
 		CONSTRAINT [PK_SS_Transactions] PRIMARY KEY CLUSTERED ([Id] ASC)
 	);
 END
+
+---------------TABLE: SS_AssociatedThreads----------------------
+
+IF NOT EXISTS (SELECT TABLE_NAME FROM INFORMATION_SCHEMA.tables WHERE TABLE_NAME = 'RPTListInfo')
+BEGIN
+	PRINT 'Creating Table RPTListInfo'
+
+	CREATE TABLE [dbo].[RPTListInfo](
+		[Listid] [uniqueidentifier] NOT NULL,
+		[Icon] [varchar](255) NOT NULL
+	) ON [PRIMARY]
+END
+
+ALTER TABLE RPTList ALTER COLUMN ListName NVARCHAR(500) NOT NULL
+ALTER TABLE RPTList ALTER COLUMN TableName NVARCHAR(500) NOT NULL
+ALTER TABLE RPTList ALTER COLUMN TableNameSnapshot NVARCHAR(500) NOT NULL
+
