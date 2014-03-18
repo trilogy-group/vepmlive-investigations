@@ -69,6 +69,9 @@
   margin-bottom: 0;
   width: 100%;
 }
+#epm-social-stream ul.days li.day ul.threads li.thread div.header span.icon-wrap span.icon {
+  line-height: 35px;
+}
 #epm-social-stream ul.days li.day ul.threads li.thread span,
 #epm-social-stream ul.days li.day ul.threads li.thread div,
 #epm-social-stream ul.days li.day ul.threads li.thread a {
@@ -77,6 +80,16 @@
 #epm-social-stream ul.days li.day ul.threads li.thread div,
 #epm-social-stream ul.days li.day ul.threads li.thread a {
   margin-right: 4px;
+}
+#epm-social-stream ul.days li.day ul.threads li.thread div.activity-detail {
+  font-size: 13px;
+}
+#epm-social-stream ul.days li.day ul.threads li.thread div.activity-detail a {
+  color: #555555 !important;
+  font-weight: 400;
+}
+#epm-social-stream ul.days li.day ul.threads li.thread div.activity-detail .detail {
+  font-weight: 300 !important;
 }
 #epm-social-stream ul.days li.day ul.threads li.thread div.action {
   text-transform: lowercase;
@@ -90,24 +103,33 @@
   margin-right: 0;
 }
 #epm-social-stream ul.days li.day ul.threads li.thread div.activity-info {
+  color: #CCCCCC;
   float: right;
   height: 20px;
   line-height: 20px;
   position: relative;
   top: 12.5px;
+  margin-right: 0;
 }
 #epm-social-stream ul.days li.day ul.threads li.thread div.activity-info span.date {
-  color: #CCCCCC;
   font-size: 0.8em;
   font-weight: 300;
 }
 #epm-social-stream ul.days li.day ul.threads li.thread div.activity-info .tooltip {
   width: 225px;
 }
+#epm-social-stream ul.days li.day ul.threads li.thread span.icon-wrap {
+  float: right;
+  margin-right: 0;
+  color: #CCCCCC;
+}
+#epm-social-stream ul.days li.day ul.threads li.thread span.icon-wrap span.icon {
+  font-size: 1.3em;
+  margin-left: 10px;
+}
 #epm-social-stream ul.days li.day ul.threads li.thread div.user {
   height: 45px;
   line-height: 45px;
-  margin-right: 0;
 }
 #epm-social-stream ul.days li.day ul.threads li.thread div.user div.avatar {
   width: 36px;
@@ -135,6 +157,10 @@
   line-height: 20px;
   position: relative;
   top: 12.5px;
+  margin-right: 0;
+}
+#epm-social-stream ul.days li.day ul.threads li.thread div.user div.info a.user {
+  margin-right: 0;
 }
 #epm-social-stream ul.days li.day ul.threads li.thread div.user div.info .tooltip-inner {
   white-space: nowrap;

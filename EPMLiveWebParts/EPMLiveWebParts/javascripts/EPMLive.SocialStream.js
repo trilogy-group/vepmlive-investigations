@@ -79,8 +79,31 @@
                 return date;
             }.property(),
 
+            icon: function() {
+                var icon = null;
+
+                if (this.get('kind') === 'COMMENTADDED') {
+                    icon = 'icon-bubble-12';
+                } else {
+                    var list = this.get('thread').get('list');
+
+                    if (list) {
+                        icon = list.get('icon');
+                    }
+                }
+
+                return 'icon ' + (icon || 'icon-square');
+            }.property(),
+
             fullDateTime: function() {
                 return moment(this.get('time')).format('LLLL');
+            }.property(),
+
+            comment: function() {
+                if (this.get('kind') !== 'COMMENTADDED') return '';
+
+                var metaData = $.parseJSON(this.get('metaData'));
+                return metaData.comment || '';
             }.property()
         });
 
@@ -97,6 +120,7 @@
         SE.List = DS.Model.extend({
             name: DS.attr(),
             url: DS.attr(),
+            icon: DS.attr('string', { defaultValue: 'icon-square' }),
             threads: DS.hasMany('thread')
         });
 
@@ -152,13 +176,7 @@
             classNameBindings: ['singleActivityThread', 'isComment'],
             
             singleActivityThread: Ember.computed.alias('controller.singleActivityThread'),
-            isComment: Ember.computed.alias('controller.isComment'),
-            
-            actions: {
-                showDate: function () {
-                    this.$().find('span.date').tooltip('show');
-                }
-            }
+            isComment: Ember.computed.alias('controller.isComment')
         });
         
         SE.ActivitiesView = Ember.View.extend({
@@ -191,6 +209,14 @@
             singleActivityThread: function () {
                 return !this.get('isComment') && this.get('activities').get('length') === 1;
             }.property('isComment', 'activities.@each')
+        });
+
+        SE.ActivityTimeComponent = Ember.Component.extend({            
+            actions: {
+                showDate: function () {
+                    this.$().find('span.date').tooltip('show');
+                }
+            }
         });
 
         SE.UserInfoComponent = Ember.Component.extend({            

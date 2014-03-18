@@ -56,16 +56,20 @@
 </script>
 
 <script type="text/x-handlebars" data-template-name="_single-comment-thread">
-    <div class="header">{{thread-info thread=this classNames='thread-info'}}</div>
+    <div class="header">{{thread-info thread=this classNames='thread-info'}}{{activity-icon activity=firstActivity classNames='icon-wrap' tagName='span'}}</div>
     <div class="user">
         {{user-avatar user=firstActivity.user classNames='avatar'}}
     </div>
-    {{partial 'activity-info'}}
+    <div class="activity-detail">
+        <a {{bind-attr href='firstActivity.user.profileUrl'}} class="user" target="_blank">{{firstActivity.user.displayName}}</a> <span>&nbsp;-&nbsp;</span> <div class="details">{{{firstActivity.comment}}}</div>
+    </div>
+    <div class="activity-info">
+        {{activity-time activity=firstActivity classNames='time-wrap' tagName='span'}}
+    </div>
 </script>
 
 <script type="text/x-handlebars" data-template-name="_single-activity">
     {{partial 'user'}} <div class="action">{{firstActivity.kind}}</div> {{thread-info thread=this classNames='thread-info'}} {{partial 'activity-info'}}
-
 </script>
 
 <script type="text/x-handlebars" data-template-name="_user">
@@ -77,8 +81,17 @@
 
 <script type="text/x-handlebars" data-template-name="_activity-info">
     <div class="activity-info">
-        <span class="date" {{action 'showDate' on='mouseEnter' target='view'}} data-toggle="tooltip" data-placement="top" {{bind-attr title='firstActivity.fullDateTime'}}>{{firstActivity.date}}</span>
+        {{activity-time activity=firstActivity classNames='time-wrap' tagName='span'}}
+        {{activity-icon activity=firstActivity classNames='icon-wrap' tagName='span'}}
     </div>
+</script>
+
+<script type="text/x-handlebars" data-template-name="components/activity-time">
+    <span class="date" {{action 'showDate' on='mouseEnter' target='view'}} data-toggle="tooltip" data-placement="top" {{bind-attr title='activity.fullDateTime'}}>{{activity.date}}</span>
+</script>
+
+<script type="text/x-handlebars" data-template-name="components/activity-icon">
+    <span {{bind-attr class='activity.icon'}}></span>
 </script>
 
 <script type="text/x-handlebars" data-template-name="components/thread-info">
@@ -98,6 +111,7 @@
     {{#if thread.hasItem}}
         <div class="item"><span>:&nbsp;</span><a {{bind-attr href='thread.activityUrl'}} target="_blank">{{thread.title}}</a></div>
     {{/if}}
+
 </script>
 
 <script type="text/x-handlebars" data-template-name="components/user-avatar">
