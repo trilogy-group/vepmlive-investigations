@@ -173,31 +173,31 @@ function registerEpmLiveResourceGridScript() {
             filteringOn: true,
             groupingOn: true,
 
-            showColumnSelector: function() {
+            showColumnSelector: function () {
                 this.g().ActionShowColumns('Selectable');
             },
 
-            hideRow: function(rowId) {
+            hideRow: function (rowId) {
                 var grid = this.g();
                 grid.HideRow(grid.GetRowById(rowId));
             },
 
-            showRow: function(rowId) {
+            showRow: function (rowId) {
                 var grid = this.g();
                 grid.ShowRow(grid.GetRowById(rowId));
             },
 
-            hideFilters: function() {
+            hideFilters: function () {
                 this.hideRow('Filter');
                 this.filteringOn = false;
             },
 
-            showFilters: function() {
+            showFilters: function () {
                 this.showRow('Filter');
                 this.filteringOn = true;
             },
 
-            hideGrouping: function() {
+            hideGrouping: function () {
                 var grid = this.g();
                 var rowId = null;
 
@@ -219,7 +219,7 @@ function registerEpmLiveResourceGridScript() {
                 }
             },
 
-            showGrouping: function() {
+            showGrouping: function () {
                 var grid = this.g();
                 var rowId = null;
 
@@ -241,7 +241,7 @@ function registerEpmLiveResourceGridScript() {
                 }
             },
 
-            toggleFiltering: function() {
+            toggleFiltering: function () {
                 if (this.filteringOn) {
                     this.hideFilters();
                 } else {
@@ -251,7 +251,7 @@ function registerEpmLiveResourceGridScript() {
                 return this.filteringOn;
             },
 
-            toggleGrouping: function() {
+            toggleGrouping: function () {
                 if (this.groupingOn) {
                     this.hideGrouping();
                 } else {
@@ -261,11 +261,11 @@ function registerEpmLiveResourceGridScript() {
                 return this.groupingOn;
             },
 
-            removeSorting: function() {
+            removeSorting: function () {
                 this.g().ChangeSort('Title');
             },
 
-            resetNoDataRow: function() {
+            resetNoDataRow: function () {
                 var gridTable = $('#' + $$.id())[0];
 
                 if (gridTable) {
@@ -281,21 +281,21 @@ function registerEpmLiveResourceGridScript() {
                 }
             },
 
-            reload: function() {
+            reload: function () {
                 var url = window.location.href.replace(new RegExp('&epmrgv=' + $$.epmrgv, 'gi'), '').replace(new RegExp('epmrgv=' + $$.epmrgv, 'gi'), '');
                 url = (url + (url.indexOf('?') !== -1 ? '&' : '?') + 'epmrgv=' + $$.views.currentView.id).replace(new RegExp('&&', 'g'), '&');
                 window.location = url;
             },
 
-            rowsSelected: function() {
+            rowsSelected: function () {
                 try {
                     return $$.grid.grids[$$.id()].GetSelRows().length;
-                } catch(e) {
+                } catch (e) {
                     return 0;
                 }
             },
 
-            resourceUpdated: function(result, target, params) {
+            resourceUpdated: function (result, target, params) {
                 if (result !== 1) return;
 
                 var grid = $$.grid.grids[$$.id()];
@@ -331,7 +331,7 @@ function registerEpmLiveResourceGridScript() {
                     contentType: 'application/json; charset=utf-8',
                     dataType: 'json',
 
-                    success: function(response) {
+                    success: function (response) {
                         if (response.d) {
                             var responseJson = $$$.parseJson(response.d);
 
@@ -346,7 +346,7 @@ function registerEpmLiveResourceGridScript() {
                                 if (changeType === 'Added') {
                                     $$.actions.reIndexResources();
                                 }
-                            } catch(e) {
+                            } catch (e) {
                                 $$$.log(error);
                             }
                         } else {
@@ -354,16 +354,16 @@ function registerEpmLiveResourceGridScript() {
                         }
                     },
 
-                    error: function(error) {
+                    error: function (error) {
                         $$$.log(error);
                     }
                 });
             },
 
-            fixIE: function() {
+            fixIE: function () {
                 try {
                     if ($.browser.msie) {
-                        var fix = function() {
+                        var fix = function () {
                             var g = $$.grid.g();
                             g.Update();
 
@@ -372,14 +372,14 @@ function registerEpmLiveResourceGridScript() {
 
                             g.Update();
                         };
-                        
+
                         for (var i = 0; i <= 50; i++) {
-                            window.setTimeout(function() {
+                            window.setTimeout(function () {
                                 fix();
                             }, i * 100);
                         }
                     }
-                } catch(e) {
+                } catch (e) {
                 }
             }
         };
@@ -784,7 +784,7 @@ function registerEpmLiveResourceGridScript() {
                         } catch (e) {
                         }
                     });
-                    
+
                     $$.grid.fixIE();
                 }, 10);
             },
@@ -824,7 +824,7 @@ function registerEpmLiveResourceGridScript() {
                             if (theView.hasOwnProperty(v)) {
                                 var key = v.replace(/@/, '').toLowerCase();
                                 var value = theView[v];
-                                
+
                                 if (key.toLowerCase() === 'name') {
                                     value = unescape(value);
                                 }
@@ -930,6 +930,7 @@ function registerEpmLiveResourceGridScript() {
                                 $$.views.totalViews = 0;
                                 register(result.ResourcePoolViews.Views.View);
                                 $$.views.apply();
+                                $$.actions.createToolBar('test');
                             } else {
                                 $$$.logFailure(result);
                             }
@@ -1140,9 +1141,9 @@ function registerEpmLiveResourceGridScript() {
 
                         window.setTimeout(function () {
                             window.clearInterval(intervalId);
-                            
+
                             try {
-                                var setTabStyle = function() {
+                                var setTabStyle = function () {
                                     var tabs = [$(document.getElementById('Ribbon.ResourceGridTab-title')), $(document.getElementById('Ribbon.ResourceGridViewTab-title'))];
 
                                     for (var tab in tabs) {
@@ -1156,8 +1157,8 @@ function registerEpmLiveResourceGridScript() {
                                                 t.attr('style', 'height: 33px !important; margin-top: -3px !important');
                                             }
 
-                                            t.click(function() {
-                                                window.setTimeout(function() {
+                                            t.click(function () {
+                                                window.setTimeout(function () {
                                                     setTabStyle();
                                                 }, 100);
                                             });
@@ -1166,7 +1167,7 @@ function registerEpmLiveResourceGridScript() {
                                 };
 
                                 setTabStyle();
-                                
+
                                 if (window.epmLiveMasterPageVersion >= 5.5) {
                                     if (!epmLiveResourceGrid.loaderStopped) {
                                         $(document.getElementById("s4-ribbonrow")).height(126);
@@ -1547,7 +1548,7 @@ function registerEpmLiveResourceGridScript() {
                         ribbonButton = document.getElementById('Ribbon.ResourceGrid.Actions.Find-Small');
                     }
 
-                    if (ribbonButton) {
+                    if (ribbonButton && $('.epmliveToolBar').length == 0) {
                         var rButton = $(ribbonButton);
                         var offset = rButton.offset();
 
@@ -1719,6 +1720,496 @@ function registerEpmLiveResourceGridScript() {
 
             canImport: function () {
                 return !$$.importInProgress && $$.userIsSiteAdmin;
+            },
+
+            createToolBar: function (divId) {
+                if ($('#resourcePoolToolBar').length > 0) {
+                    $('#resourcePoolToolBar').remove();
+                }
+
+                var grid = window.Grids[window.epmLive.resourceGridId];
+                var cols = grid.Cols;
+                var sAvailableFlds = '';
+                for (var c in cols) {
+                    if (cols.hasOwnProperty(c) &&
+                        c.toLowerCase() != 'panel') {
+                        if (grid.Header[cols[c].Name].trim()) {
+                            sAvailableFlds += (grid.Header[cols[c].Name] + '|' + cols[c].Name + ',');
+                        }
+                    }
+                }
+
+                var aAvailableCols = {};
+                var aViewCols = [];
+                for (var c in $$.views.currentView.cols) {
+                    aViewCols.push($$.views.currentView.cols[c].name)
+                }
+                var i = 1;
+                for (var c in cols) {
+                    if (cols.hasOwnProperty(c) &&
+                        c.toLowerCase() != 'panel') {
+                        if (grid.Header[cols[c].Name].trim()) {
+                            sAvailableFlds += (grid.Header[cols[c].Name] + '|' + cols[c].Name + ',');
+                            aAvailableCols[i++] = {
+                                'value': cols[c].Name,
+                                'checked': ($.inArray(cols[c].Name, aViewCols) != -1)
+                            };
+                        }
+                    }
+                }
+
+                var viewSectionTemplate = {
+                    'heading': 'none',
+                    'divider': 'no',
+                    'options': []
+                };
+
+                var views = $$.views.collection;
+                for (var v in views) {
+                    var view = views[v];
+
+                    var opt = {
+                        'text': view.name,
+                        'events': [
+                            {
+                                'eventName': 'click',
+                                'function': function () {
+                                    $$.views.apply($(this).attr('viewId'));
+                                    $(this).closest('ul').toggle();
+                                    $(this).closest('ul').siblings('a').eq(0).children('span').eq(1).text($$.views.currentView.name);
+                                    $(this).closest('li').siblings().each(function () {
+                                        $(this).css('display', '');
+                                    });
+                                    $(this).closest('li').css('display', 'none');
+                                }
+                                //add a callback method
+                            }
+                        ],
+                        'properties': {
+                            'viewId': view.id
+                        }
+                    }
+                    viewSectionTemplate["options"].push(opt);
+                }
+
+
+                var cfgs = [
+                    { 'id': 'resourcePoolToolBar' },
+                    {
+                        'placement': 'left',
+                        'content': [
+                        // invite button
+                        {
+                            'controlId': 'btnInvite',
+                            'controlType': 'button',
+                            'iconClass': 'fui-plus',
+                            'toolTip': 'Invite',
+                            'value': 'Invite',
+                            'events': [
+                                {
+                                    'eventName': 'click',
+                                    'function': function () { alert('hello'); }
+                                }
+                            ]
+                        },
+                        // tools menu
+                        {
+                            'controlId': 'ddlTools',
+                            'controlType': 'dropdown',
+                            'title': '',
+                            'value': 'Tools',
+                            'iconClass': 'icon-tools',
+                            'toolTip': 'Tools',
+                            'sections': [
+                                // Plan section
+                                {
+                                    'heading': 'Plan',
+                                    'divider': 'yes',
+                                    'options': [
+                                        {
+                                            'iconClass': 'icon-pie-3 icon-dropdown',
+                                            'text': 'Resource Planner',
+                                            'events': [
+                                                {
+                                                    'eventName': 'click',
+                                                    'function': function () { alert('Plan something...'); }
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            'iconClass': 'icon-flag-5 icon-dropdown',
+                                            'text': 'Assignment Planner',
+                                            'events': [
+                                                {
+                                                    'eventName': 'click',
+                                                    'function': function () { alert('Plan something...'); }
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                },
+                                // Analyze section
+                                {
+                                    'heading': 'Analyze',
+                                    'divider': 'yes',
+                                    'options': [
+                                        {
+                                            'iconClass': 'icon-filter-4 icon-dropdown',
+                                            'text': 'Analyzer',
+                                            'events': [
+                                                {
+                                                    'eventName': 'click',
+                                                    'function': function () { alert('analyzing something...'); }
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            'iconClass': 'icon-filter-4 icon-dropdown',
+                                            'text': 'Work vs. Capacity',
+                                            'events': [
+                                                {
+                                                    'eventName': 'click',
+                                                    'function': function () { alert('report something...'); }
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                },
+                                // Non Header section
+                                {
+                                    'heading': 'none',
+                                    'divider': 'yes',
+                                    'options': [
+                                        {
+                                            'iconClass': 'icon-filter-4 icon-dropdown',
+                                            'text': 'Send Notification',
+                                            'events': [
+                                                {
+                                                    'eventName': 'click',
+                                                    'function': function () { alert('notify something...'); }
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            'iconClass': 'icon-filter-4 icon-dropdown',
+                                            'text': 'Export Excel',
+                                            'events': [
+                                                {
+                                                    'eventName': 'click',
+                                                    'function': function () { alert('export something...'); }
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            'iconClass': 'icon-filter-4 icon-dropdown',
+                                            'text': 'Import Excel',
+                                            'events': [
+                                                {
+                                                    'eventName': 'click',
+                                                    'function': function () { alert('import something...'); }
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        // reports
+                        {
+                            'controlId': 'ddlReports',
+                            'controlType': 'dropdown',
+                            'title': '',
+                            'value': 'Reporting',
+                            'iconClass': 'icon-pie-3',
+                            'toolTip': 'Reports',
+                            'sections': [
+                                {
+                                    'heading': 'none',
+                                    'divider': 'no',
+                                    'options': [
+                                        {
+                                            'iconClass': 'icon-pie-3 icon-dropdown',
+                                            'text': 'Available vs. Planner by Dept',
+                                            'events': [
+                                                {
+                                                    'eventName': 'click',
+                                                    'function': function () { alert('report something'); }
+                                                }
+                                            ]
+
+                                        },
+                                        {
+                                            'iconClass': 'icon-flag-5 icon-dropdown',
+                                            'text': 'Capacity Heat Map',
+                                            'events': [
+                                                {
+                                                    'eventName': 'click',
+                                                    'function': function () { alert('report something'); }
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            'iconClass': 'icon-filter-4 icon-dropdown',
+                                            'text': 'Comments',
+                                            'events': [
+                                                {
+                                                    'eventName': 'click',
+                                                    'function': function () { alert('report something'); }
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            'iconClass': 'icon-filter-4 icon-dropdown',
+                                            'text': 'Requirements',
+                                            'events': [
+                                                {
+                                                    'eventName': 'click',
+                                                    'function': function () { alert('report something'); }
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }]
+                    },
+                    {
+                        'placement': 'right',
+                        'content': [
+                        //search control
+                        {
+                            'controlId': 'genericId',
+                            'controlType': 'search',
+                            'toolTip': 'Search',
+                            'custom': 'yes',
+                            'customControlId': ''
+                        },
+                        //search control
+                        {
+                            'controlId': 'genericId',
+                            'controlType': 'search',
+                            'toolTip': 'Search',
+                            'custom': 'no',
+                            'events': [{
+                                'eventName': 'keypress',
+                                'function': function (e) {
+                                    if (e.keyCode == 13) {
+                                        alert('enter key pressed!');
+                                    }
+                                }
+                            }]
+                        },
+                        // filter button
+                        {
+                            'controlId': 'btnFilter',
+                            'controlType': 'button',
+                            'iconClass': 'icon-filter',
+                            'toolTip': 'Filter',
+                            'title': 'none',
+                            'events': [
+                                {
+                                    'eventName': 'click',
+                                    'function': function () { $$.grid.toggleFiltering(); }
+                                }
+                            ]
+                        },
+                        // default sort button
+                        {
+                            'controlId': 'btnDefaultSort',
+                            'controlType': 'button',
+                            'iconClass': 'icon-sort',
+                            'toolTip': 'Default sort',
+                            'title': 'none',
+                            'events': [
+                                {
+                                    'eventName': 'click',
+                                    'function': function () { $$.grid.removeSorting(); }
+                                }
+                            ]
+                        },
+                        //group by fields
+                        {
+                            'controlType': 'groupByFields',
+                            //'availableGroups': 'Field1|Field1|111,Field2|Field2|222,Field3|Field3|333,Field4|Field4|444,Field5|Field5|555',
+                            'availableGroups': sAvailableFlds,
+                            'saveFunction': function (data) {
+                                var grpVals = '';
+                                for (var i in data) {
+                                    var obj = data[i];
+                                    //txt += ('Key: ' + obj['key'] + '| Value: ' + obj['value'] + ',\r\n');
+                                    grpVals += (obj['value'] + ',');
+                                }
+                                grpVals = grpVals.substring(0, grpVals.length - 1);
+
+                                if (grpVals) {
+                                    window.Grids[window.epmLive.resourceGridId].DoGrouping(grpVals);
+                                }
+                            }
+                        },
+                        //select columns control
+                        {
+                            'controlId': 'msColumns',
+                            'controlType': 'multiselect',
+                            'title': 'test',
+                            'value': 'test',
+                            'iconClass': 'icon-insert-template',
+                            'toolTip': 'Select columns',
+                            'sections': [
+                                {
+                                    'heading': 'none',
+                                    'divider': 'no',
+                                    'options': aAvailableCols
+                                }
+                                //{
+                                //    'heading': 'Section2',
+                                //    'divider': 'no',
+                                //    'options':
+                                //        {
+                                //            '1': { 'value': 'field1', 'checked': false },
+                                //            '2': { 'value': 'field2', 'checked': false },
+                                //            '3': { 'value': 'field3', 'checked': true },
+                                //        }
+                                //},
+                                //{
+                                //    'heading': 'none',
+                                //    'divider': 'yes',
+                                //    'options':
+                                //        {
+                                //            '1': { 'value': 'field1', 'checked': true },
+                                //            '2': { 'value': 'field2', 'checked': false },
+                                //            '3': { 'value': 'field3', 'checked': true },
+                                //        }
+                                //}
+                            ],
+                            // 'selectedKeys': ['1', '2', '3'],
+                            'applyButtonConfig': {
+                                'text': 'Apply',
+                                'function':
+                                    // data includes choices and 
+                                    // selected keys
+                                    function (data) {
+                                        //var txt = '';
+                                        //for (var i in data['sections']) {
+                                        //    var section = data['sections'][i];
+                                        //    var sHeading = section['heading'];
+                                        //    var options = section['options'];
+                                        //    for (var key in options) {
+                                        //        var properties = options[key];
+                                        //        txt += ('Heading: ' + sHeading + '| Key: ' + key + '| Display Value: ' + properties['value'] + ',\r\n');
+                                        //    }
+                                        //}
+                                        //txt += data['selectedKeys'];
+                                        //alert(txt);
+
+                                        var keys = data['selectedKeys'];                                      
+
+                                        for (var i in data['sections']) {
+                                            var section = data['sections'][i];
+                                            var options = section['options'];
+                                            for (var key in options) {
+                                                var properties = options[key];
+                                                if ($.inArray(key, keys) != -1) {
+                                                    grid.SetAttribute(null, properties['value'], 'Visible', '1', 0);
+                                                }
+                                                else {
+                                                    grid.SetAttribute(null, properties['value'], 'Visible', '0', 0);
+                                                }
+                                            }
+                                        }
+
+                                        grid.Rerender();
+                                    }
+
+                            },
+                            'onchangeFunction':
+                               function (data) {
+                                   //var txt = '';
+                                   //for (var i in data['sections']) {
+                                   //    var section = data['sections'][i];
+                                   //    var sHeading = section['heading'];
+                                   //    var options = section['options'];
+                                   //    for (var key in options) {
+                                   //        var properties = options[key];
+                                   //        txt += ('Heading: ' + sHeading + '| Key: ' + key + '| Display Value: ' + properties['value'] + ',\r\n');
+                                   //    }
+                                   //}
+                                   //txt += data['selectedKeys'];
+                                   //alert(txt);
+                                   var keys = data['selectedKeys'];
+
+                                   for (var i in data['sections']) {
+                                       var section = data['sections'][i];
+                                       var options = section['options'];
+                                       for (var key in options) {
+                                           var properties = options[key];
+                                           if ($.inArray(key, keys) != -1) {
+                                               grid.SetAttribute(null, properties['value'], 'Visible', '1', 0);
+                                           }
+                                           else {
+                                               grid.SetAttribute(null, properties['value'], 'Visible', '0', 0);
+                                           }
+                                       }
+                                   }
+
+                                   grid.Rerender();
+                               }
+
+                        },
+                        //view control
+                        {
+                            'controlId': 'ddlViewControl',
+                            'controlType': 'dropdown',
+                            'title': 'View:',
+                            'value': $$.views.currentView.name,
+                            'iconClass': 'none',
+                            'toolTip': 'Current view',
+                            'sections': [
+                                viewSectionTemplate,
+                                {
+                                    'heading': 'none',
+                                    'divider': 'yes',
+                                    'options': [
+                                        {
+                                            'iconClass': 'icon-pencil icon-dropdown',
+                                            'text': 'Rename View',
+                                            'events': [
+                                                {
+                                                    'eventName': 'click',
+                                                    'function': function () { alert('rename'); }
+                                                    //add a callback method
+                                                }
+                                            ]
+
+                                        },
+                                        {
+                                            'iconClass': 'icon-disk icon-dropdown',
+                                            'text': 'Save View',
+                                            'events': [
+                                                {
+                                                    'eventName': 'click',
+                                                    'function': function () { alert('save'); }
+                                                }
+                                            ]
+                                        },
+                                        {
+                                            'iconClass': 'fui-cross icon-dropdown',
+                                            'text': 'Delete View',
+                                            'events': [
+                                                {
+                                                    'eventName': 'click',
+                                                    'function': function () { alert('delete'); }
+                                                }
+                                            ]
+                                        }
+
+                                    ]
+                                }
+                            ]
+                        }
+                        ]
+                    }
+                ];
+                window.epmLiveGenericToolBar.generateToolBar(divId, cfgs);
             }
         };
 
@@ -1773,7 +2264,7 @@ function registerEpmLiveResourceGridScript() {
             }
         };
 
-        window.Grids.OnExpand = function(grid, row) {
+        window.Grids.OnExpand = function (grid, row) {
             if ($.browser.msie) {
                 window.setTimeout(function () {
                     grid.Update();
@@ -1810,10 +2301,11 @@ function registerEpmLiveResourceGridScript() {
         };
 
         window.Grids.OnReady = function (grid, start) {
+            window.epmLive.resourceGridId = grid.id;
             $$.id(grid.id);
-
             $$.views.load();
             $$.reports.load();
+            //$$.actions.createToolBar('test');
         };
 
         window.Grids.OnUpdated = function (grid) {
