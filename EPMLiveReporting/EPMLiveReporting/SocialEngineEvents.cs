@@ -22,7 +22,7 @@ namespace EPMLiveReportsAdmin
             {
                 {"Id", properties.ListItemId},
                 {"Title", properties.ListItem.Title},
-                {"URL", properties.ListItem.Url},
+                {"URL", properties.List.Forms[PAGETYPE.PAGE_DISPLAYFORM].Url + "?" + properties.ListItemId},
                 {"ListTitle", properties.ListTitle},
                 {"ListId", properties.ListId},
                 {"WebId", properties.Web.ID},
@@ -45,7 +45,7 @@ namespace EPMLiveReportsAdmin
             {
                 {"Id", properties.ListItemId},
                 {"Title", properties.ListItem.Title},
-                {"URL", properties.ListItem.Url},
+                {"URL", properties.List.Forms[PAGETYPE.PAGE_DISPLAYFORM].Url + "?" + properties.ListItemId},
                 {"ListTitle", properties.ListTitle},
                 {"ListId", properties.ListId},
                 {"WebId", properties.Web.ID},
@@ -67,7 +67,7 @@ namespace EPMLiveReportsAdmin
             {
                 {"Id", properties.ListItemId},
                 {"Title", properties.ListItem.Title},
-                {"URL", properties.ListItem.Url},
+                {"URL", properties.List.Forms[PAGETYPE.PAGE_DISPLAYFORM].Url + "?" + properties.ListItemId},
                 {"ListTitle", properties.ListTitle},
                 {"ListId", properties.ListId},
                 {"WebId", properties.Web.ID},
