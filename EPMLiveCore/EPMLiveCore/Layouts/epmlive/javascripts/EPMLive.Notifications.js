@@ -168,7 +168,7 @@
                     } else if (this.newGeneralNotifications().length > 0) {
                         return '#26C6F4';
                     } else {
-                        return '#666666';
+                        return '#00668E';
                     }
                 }
 
