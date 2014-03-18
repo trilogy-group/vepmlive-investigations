@@ -18,7 +18,8 @@ namespace TimerService
         private static BackgroundWorker bwTimerJobs;
         private static BackgroundWorker bwNotificationsJobs;
         private static BackgroundWorker bwIntegrationJobs;
-        
+        private static BackgroundWorker bwActivity;
+
         public bool startTimer()
         {
             try
@@ -92,8 +93,18 @@ namespace TimerService
 
                 bwNotificationsJobs.RunWorkerAsync();
 
+                //================Run Activity
+                bwActivity = new BackgroundWorker();
+                bwActivity.WorkerReportsProgress = true;
+                bwActivity.WorkerSupportsCancellation = true;
 
-                //================Run Notifications
+                bwActivity.DoWork += bwActivity_DoWork;
+                //bw.ProgressChanged += bw_ProgressChanged;
+                //bwActivity.RunWorkerCompleted += bwNotificationsJobs_RunWorkerCompleted;
+
+                bwActivity.RunWorkerAsync();
+
+                //================Run Integrations
                 bwIntegrationJobs = new BackgroundWorker();
                 bwIntegrationJobs.WorkerReportsProgress = true;
                 bwIntegrationJobs.WorkerSupportsCancellation = true;
@@ -333,6 +344,91 @@ namespace TimerService
         static void bwTimerJobs_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
 
+        }
+
+        static void bwActivity_DoWork(object sender, DoWorkEventArgs e)
+        {
+            int interval = 5;
+
+            DateTime dt = DateTime.Now;
+
+            StreamWriter swLog = new StreamWriter(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + "\\LOGS\\ACTIVITY_" + dt.Year + dt.Month + dt.Day + ".log", true);
+
+            swLog.WriteLine(DateTime.Now.ToString() + "\tINFO\tACTIVITY\tSTARTED");
+
+            swLog.Close();
+
+            while (true)
+            {
+                try
+                {
+                    foreach (SPWebApplication webApp in SPWebService.ContentService.WebApplications)
+                    {
+                        string sConn = EPMLiveCore.CoreFunctions.getConnectionString(webApp.Id);
+                        if (sConn != "")
+                        {
+                            SqlConnection cn = new SqlConnection(sConn);
+                            cn.Open();
+
+                            SqlCommand cmd = new SqlCommand(@"select * from ActivityQueue where DATEDIFF(s, PostTime, GETDATE ()) > 10", cn);
+
+                            DataSet ds = new DataSet();
+                            SqlDataAdapter da = new SqlDataAdapter(cmd);
+                            da.Fill(ds);
+
+                            foreach (DataRow dr in ds.Tables[0].Rows)
+                            {
+                                try
+                                {
+                                    using (SPSite site = new SPSite(new Guid(dr["SiteId"].ToString())))
+                                    {
+                                        using (SPWeb web = site.OpenWeb(new Guid(dr["WebId"].ToString())))
+                                        {
+
+                                            SPList list = web.Lists[new Guid(dr["ListId"].ToString())];
+
+                                            //Call Activity Add
+
+                                        }
+                                    }
+                                }
+                                catch (Exception ex)
+                                {
+                                    dt = DateTime.Now;
+
+                                    swLog = new StreamWriter(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + "\\LOGS\\ACTIVITY_" + dt.Year + dt.Month + dt.Day + ".log", true);
+
+                                    swLog.WriteLine(DateTime.Now.ToString() + "\tERRO\tACTIVITY\t" + ex.Message);
+
+                                    swLog.Close();
+                                }
+                            }
+
+                            cn.Close();
+                        }
+                    }
+
+                    if (bw.CancellationPending)
+                    {
+                        e.Cancel = true;
+                        return;
+                    }
+                    GC.Collect();
+
+                    Thread.Sleep(10000);
+                }
+                catch (Exception ex)
+                {
+                    dt = DateTime.Now;
+
+                    swLog = new StreamWriter(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + "\\LOGS\\ACTIVITY_" + dt.Year + dt.Month + dt.Day + ".log", true);
+
+                    swLog.WriteLine(DateTime.Now.ToString() + "\tERRO\tACTIVITY\t" + ex.Message);
+
+                    swLog.Close();
+                }
+
+            }
         }
 
         static void bwNotificationsJobs_DoWork(object sender, DoWorkEventArgs e)

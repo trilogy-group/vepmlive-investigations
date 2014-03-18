@@ -123,7 +123,12 @@ namespace TimerService
                         {
                             SqlConnection cn = new SqlConnection(sConn);
                             cn.Open();
-                            SqlCommand cmd = new SqlCommand("SELECT TOP " + maxThreads + " * from vwTSQueue where status=0 order by dtcreated asc", cn);
+
+                            SqlCommand cmd = new SqlCommand("spTSGetQueue", cn);
+                            cmd.CommandType = CommandType.StoredProcedure;
+                            cmd.Parameters.AddWithValue("@servername", System.Environment.MachineName);
+                            cmd.Parameters.AddWithValue("@maxthreads", maxThreads);
+
                             DataSet ds = new DataSet();
                             SqlDataAdapter da = new SqlDataAdapter(cmd);
                             da.Fill(ds);
@@ -135,9 +140,9 @@ namespace TimerService
                                 rd.dr = dr;
                                 if (startProcess(rd))
                                 {
-                                    cmd = new SqlCommand("UPDATE TSqueue set status=1,dtstarted = GETDATE() where tsqueue_id=@id", cn);
-                                    cmd.Parameters.AddWithValue("@id", dr["tsqueue_id"].ToString());
-                                    cmd.ExecuteNonQuery();
+                                    //cmd = new SqlCommand("UPDATE TSqueue set status=1,dtstarted = GETDATE() where tsqueue_id=@id", cn);
+                                    //cmd.Parameters.AddWithValue("@id", dr["tsqueue_id"].ToString());
+                                    //cmd.ExecuteNonQuery();
                                 }
                             }
 
