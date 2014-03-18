@@ -18,8 +18,13 @@ namespace EPMLiveCore.SocialEngine.Core
                 (string) CacheStore.Current.Get(SETTING_KEY, new CacheStoreCategory(contextWeb).SocialStream,
                     () => CoreFunctions.getConfigSetting(contextWeb, SETTING_KEY), true).Value;
 
-            return !string.IsNullOrEmpty(settingValue) &&
-                   settingValue.Split(',').Any(list => list.Trim().ToLower().Equals(listTitle.ToLower()));
+            if (!string.IsNullOrEmpty(settingValue))
+                return settingValue.Split(',').Any(list => list.Trim().ToLower().Equals(listTitle.ToLower()));
+
+            CacheStore.Current.Set(SETTING_KEY, "EPMLiveFileStore,User Information List",
+                new CacheStoreCategory(contextWeb).SocialStream, true);
+
+            return false;
         }
 
         #endregion Methods 

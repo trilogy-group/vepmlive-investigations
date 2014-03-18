@@ -28,7 +28,7 @@ namespace EPMLiveCore.Services.DataContracts.SocialEngine
         {
             #region Properties (8) 
 
-            public string data { get; set; }
+            public string metaData { get; set; }
 
             public Guid id { get; set; }
 
@@ -36,11 +36,11 @@ namespace EPMLiveCore.Services.DataContracts.SocialEngine
 
             public string key { get; set; }
 
-            public ActivityKind kind { get; set; }
+            public string kind { get; set; }
 
             public Guid thread { get; set; }
 
-            public DateTime time { get; set; }
+            public string time { get; set; }
 
             public int user { get; set; }
 
@@ -51,18 +51,9 @@ namespace EPMLiveCore.Services.DataContracts.SocialEngine
         {
             #region Properties (2) 
 
-            public DateTime date { get; set; }
-
             public List<Guid> threads { get; set; }
 
-            #endregion Properties 
-        }
-
-        public class Item
-        {
-            #region Properties (1) 
-
-            public int? id { get; set; }
+            public string id { get; set; }
 
             #endregion Properties 
         }
@@ -88,17 +79,15 @@ namespace EPMLiveCore.Services.DataContracts.SocialEngine
 
             public List<Guid> activities { get; set; }
 
-            public DateTime day { get; set; }
+            public string day { get; set; }
 
             public Guid id { get; set; }
 
-            public bool isDeleted { get; set; }
+            public int? itemId { get; set; }
 
-            public Item item { get; set; }
+            public string kind { get; set; }
 
-            public ObjectKind kind { get; set; }
-
-            public DateTime lastActivityOn { get; set; }
+            public string lastActivityOn { get; set; }
 
             public Guid? list { get; set; }
 

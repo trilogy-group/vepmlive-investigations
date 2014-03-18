@@ -51,7 +51,7 @@ namespace EPMLiveCore.Services
                 users = new List<DailyActivities.User>()
             };
 
-            var daysProcessed = new List<DateTime>();
+            var daysProcessed = new List<string>();
             var threadsProcessed = new List<Guid>();
             var websProcessed = new List<Guid>();
             var listsProcessed = new List<Guid>();
@@ -71,7 +71,7 @@ namespace EPMLiveCore.Services
                 var userId = (int) t["UserId"];
                 var webUrl = (string) t["WebUrl"];
                 object dateTime = t["ActivityDate"];
-                DateTime activityDay = ((DateTime) dateTime).Date;
+                var activityDay = (((DateTime) dateTime).Date).ToString("s");
 
                 DailyActivities.Thread thread = BuildThread(threadId, activityDay, webId, listId, t);
 
@@ -112,10 +112,10 @@ namespace EPMLiveCore.Services
                 {
                     id = (Guid) a["ActivityId"],
                     key = a["ActivityKey"] as string,
-                    data = a["ActivityData"] as string,
-                    kind = (ActivityKind) a["ActivityKind"],
+                    metaData = a["ActivityData"] as string,
+                    kind = ((ActivityKind) a["ActivityKind"]).ToString().ToUpper(),
                     isMassOperation = (bool) a["IsMassOperation"],
-                    time = (DateTime) dateTime,
+                    time = ((DateTime) dateTime).ToString("s"),
                     user = userId,
                     thread = threadId
                 };
@@ -124,19 +124,25 @@ namespace EPMLiveCore.Services
             return null;
         }
 
-        private static void BuildDay(List<DateTime> daysProcessed, DateTime activityDay, Guid threadId,
+        private static void BuildDay(List<string> daysProcessed, string activityDay, Guid threadId,
             DailyActivities dailyActivities)
         {
             if (!daysProcessed.Contains(activityDay))
             {
-                var day = new DailyActivities.Day {date = activityDay, threads = new List<Guid> {threadId}};
+                var day = new DailyActivities.Day
+                {
+                    id = activityDay,
+                    threads = new List<Guid> {threadId}
+                };
 
                 dailyActivities.days.Add(day);
                 daysProcessed.Add(activityDay);
             }
             else
             {
-                foreach (DailyActivities.Day day in dailyActivities.days.Where(day => day.date == activityDay))
+                foreach (DailyActivities.Day day in dailyActivities.days
+                    .Where(day => day.id.Equals(activityDay))
+                    .Where(day => !day.threads.Contains(threadId)))
                 {
                     day.threads.Add(threadId);
                     break;
@@ -174,7 +180,7 @@ namespace EPMLiveCore.Services
             }
         }
 
-        private static DailyActivities.Thread BuildThread(Guid threadId, DateTime activityDay, Guid webId, object listId,
+        private static DailyActivities.Thread BuildThread(Guid threadId, string activityDay, Guid webId, object listId,
             DataRow r)
         {
             var thread = new DailyActivities.Thread
@@ -182,13 +188,12 @@ namespace EPMLiveCore.Services
                 id = threadId,
                 title = r["ThreadTitle"] as string,
                 url = r["ThreadUrl"] as string,
-                kind = (ObjectKind) r["ThreadKind"],
-                isDeleted = (bool) r["ThreadDeleted"],
-                lastActivityOn = (DateTime) r["ThreadLastActivityOn"],
+                kind = ((ObjectKind) r["ThreadKind"]).ToString().ToUpper(),
+                lastActivityOn = ((DateTime) r["ThreadLastActivityOn"]).ToString("s"),
                 day = activityDay,
                 web = webId,
                 list = listId as Guid?,
-                item = new DailyActivities.Item {id = r["ItemId"] as int?},
+                itemId = r["ItemId"] as int?,
                 activities = new List<Guid>()
             };
 
@@ -200,12 +205,23 @@ namespace EPMLiveCore.Services
         {
             if (!usersProcessed.Contains(userId))
             {
+                var avatar = r["UserPicture"] as string;
+
+                if (!string.IsNullOrEmpty(avatar))
+                {
+                    try
+                    {
+                        avatar = (avatar.Split(',')[1]).Trim();
+                    }
+                    catch { }
+                }
+
                 var user = new DailyActivities.User
                 {
                     id = userId,
                     name = (string) r["UserDisplayName"],
                     account = (string) r["UserAccount"],
-                    avatar = r["UserPicture"] as string,
+                    avatar = avatar,
                     activities = new List<Guid>()
                 };
 
