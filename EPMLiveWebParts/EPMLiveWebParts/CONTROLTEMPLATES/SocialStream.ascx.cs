@@ -27,7 +27,8 @@ namespace EPMLiveWebParts.CONTROLTEMPLATES
 
             EPMLiveScriptManager.RegisterScript(Page, new[]
             {
-                "libraries/jquery.min", "libraries/handlebars-v1.3.0", "libraries/ember.min", "@EPMLive.SocialStream"
+                "libraries/jquery.min", "libraries/handlebars-v1.3.0", "libraries/ember",
+                "libraries/ember-data", "libraries/moment.min", "EPMLive.SocialStream"
             });
         }
 
