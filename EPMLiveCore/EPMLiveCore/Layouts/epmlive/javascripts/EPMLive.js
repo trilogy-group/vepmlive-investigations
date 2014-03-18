@@ -632,7 +632,6 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
                 (iconClass != 'none')) {
                 var spnImg = $(document.createElement('span'));
                 spnImg.attr('class', iconClass);
-                spnImg.attr('style', 'position: relative;padding-right: 8px;font-size: 0.8em;top: 0px');
                 aContainer.append(spnImg);
             }
 
@@ -756,6 +755,7 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
                     var optIconClass = option['iconClass'];
                     var optText = option['text'];
                     var optEvt = option['events'];
+                    var optProps = option['properties'];
 
                     if (optIconClass) {
                         var spnImg = $(document.createElement('span'));
@@ -771,6 +771,10 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
 
                     if (optEvt) {
                         attachEvents(aContainer, option['events']);
+                    }
+
+                    if (optProps) {
+                        attachProps(aContainer, option['properties']);
                     }
 
                     liOpt.append(aContainer);
@@ -799,7 +803,35 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
                 input.attr('type', 'text');
                 input.attr('placeholder', 'Search');
                 input.attr('style', 'margin-left: 0px;');
+                input.attr('id', 'toolBarResGridSelector');
                 attachEvents(input, cfg['events']);
+
+                input.autocomplete({
+                    source: function (request, response) {
+                        var results = $.ui.autocomplete.filter(window.epmLiveResourceGrid.actions.myResourcesOn ? window.epmLiveResourceGrid.myResources : window.epmLiveResourceGrid.resources, request.term);
+
+                        response(results);
+                    },
+
+                    select: function (event, ui) {
+                        var grid = window.Grids[window.epmLive.resourceGridId];
+                        var rowId = window.epmLiveResourceGrid.resourceDictionary[ui.item.value];
+
+                        if (rowId) {
+                            var theRow = grid.Rows[rowId];
+
+                            grid.ExpandParents(theRow);
+
+                            grid.ActionClearSelection();
+                            grid.SelectRow(theRow, true);
+
+                            grid.SetScrollTop(grid.GetRowTop(theRow));
+                        }
+
+                        window.epmLiveResourceGrid.actions.toggleEasyScroll();
+                        window.setTimeout(function () { window.RefreshCommandUI(); }, 100);
+                    }
+                });
                 li.append(input);
 
                 var aContainer = $(document.createElement('a'));
@@ -996,6 +1028,18 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
                             $('#aGroupBySave').removeAttr('class');
                             $('#aAddGrouping').attr('class', 'disabledLink');
                         }
+
+                        var keyVals = [];
+                        $('.grouping-wrapper').children('.grouping-row').each(function () {
+                            //var txt = $(this).find('.grouping-select').find('select option:selected').text();
+                            var val = $(this).find('.grouping-select').find('select option:selected').val();
+                            //var objTemp = { 'key': txt, 'value': val };
+                            keyVals.push(val);
+                        });
+
+                        var sCols = keyVals.join(',');
+                        var grid = window.Grids[window.epmLive.resourceGridId];
+                        grid.DoGrouping(sCols);
                     });
 
                     divGroupingDelete.append(aGroupingDelete);
@@ -1068,7 +1112,6 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
                 (iconClass != 'none')) {
                 var spnImg = $(document.createElement('span'));
                 spnImg.attr('class', iconClass);
-                spnImg.attr('style', 'position:relative;top:1px');
                 aContainer.append(spnImg);
             }
 
@@ -1205,10 +1248,7 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
                             if ($(this).is(':checked')) {
                                 selectedKeys.push($(this).val());
                             }
-                            $(this).parent().siblings('div').first().children('li').find(':checked').each(function () {
-                                //if ($(this).parent().text().toLowerCase() == 'select all') {
-                                //    return;
-                                //}
+                            $(this).closest('li').siblings('li').find(':checked').each(function () {
                                 selectedKeys.push($(this).val());
                             });
                             data['selectedKeys'] = selectedKeys;
@@ -1244,9 +1284,6 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
                     var selectedKeys = [];
 
                     $(this).parent().siblings('div').first().children('li').find(':checked').each(function () {
-                        //if ($(this).parent().text().toLowerCase() == 'select all') {
-                        //    return;
-                        //}
                         selectedKeys.push($(this).val());
                     });
                     data['selectedKeys'] = selectedKeys;
@@ -1272,6 +1309,13 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
             for (var i in aEvents) {
                 var evt = aEvents[i];
                 element.bind(evt['eventName'], evt['function']);
+            }
+        }
+
+        function attachProps(element, aProps) {
+            for (var p in aProps) {
+                var propVal = aProps[p];
+                element.attr(p, propVal);
             }
         }
 
