@@ -23,9 +23,6 @@ namespace EPMLiveReportsAdmin
             cmd = new SqlCommand("DELETE FROM RPTWEBGROUPS", epmdata.GetClientReportingConnection);
             cmd.ExecuteNonQuery();
 
-            cmd = new SqlCommand("DELETE FROM Webs WHERE SiteId = '" + site.ID + "'", epmdata.GetEPMLiveConnection);
-            cmd.ExecuteNonQuery();
-
             #endregion
 
             #region REPOPULATE ReportListIds, RPTWeb, RPTWEBGROUPS, epmlive.Webs AND FRF-Recent TABLES
