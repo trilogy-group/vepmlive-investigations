@@ -138,7 +138,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                 sb.Append("<td style=\"vertical-align:middle; text-align:center\" width=\"80px\" valign=\"center\" align=\"center\">");
                 sb.Append("<img style=\"margin-top:2px;width:60px;\" src=\"");
                 sb.Append(((Web.ServerRelativeUrl == "/") ? "" : Web.ServerRelativeUrl));
-                sb.Append("/_layouts/images/planner_project.png\"></td>");
+                sb.Append("/_layouts/epmlive/images/planner_project.png\"></td>");
                 sb.Append("<td class=\"titletd\"><span>");
                 sb.Append(plannername);
                 if (plannername == "Microsoft Project" || plannerid == "MPP")
@@ -161,7 +161,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                 sb.Append("<td style=\"vertical-align:middle; text-align:center\" width=\"80px\" valign=\"center\" align=\"center\">");
                 sb.Append("<img style=\"margin-top:2px;width:60px;\" src=\"");
                 sb.Append(((Web.ServerRelativeUrl == "/") ? "" : Web.ServerRelativeUrl));
-                sb.Append("/_layouts/images/planner_kanban.png\"></td>");
+                sb.Append("/_layouts/epmlive/images/planner_kanban.png\"></td>");
                 sb.Append("<td class=\"titletd\"><span>");
                 sb.Append(plannername);
                 sb.Append("</span>");
