@@ -265,7 +265,7 @@ namespace EPMLiveReportsAdmin
                 _SiteUrl = _DAO.SiteUrl;
 
                 //Init. list sql table name
-                _TableName = _DAO.GetTableName(_ListName);
+                _TableName = _DAO.GetTableName(_ListID);
 
                 if (_TableName == null || _TableName == string.Empty)
                 {
@@ -309,7 +309,8 @@ namespace EPMLiveReportsAdmin
 
         private void PopulateColumns()
         {
-            _dtColumns = _DAO.GetListColumns(_ListName.Replace("'", ""));
+            //_dtColumns = _DAO.GetListColumns(_ListName.Replace("'", ""));
+            _dtColumns = _DAO.GetListColumns(_ListID);
                 // - CAT.NET false-positive: All single quotes are escaped/removed.
         }
 

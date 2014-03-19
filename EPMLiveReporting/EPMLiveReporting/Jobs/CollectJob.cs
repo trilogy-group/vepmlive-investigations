@@ -21,24 +21,38 @@ namespace EPMLiveReportsAdmin.Jobs
         {
             int hours = 0;
             string workdays = " ";
-            SPSecurity.RunWithElevatedPrivileges(delegate
+            try
             {
-                int startHour = site.RootWeb.RegionalSettings.WorkDayStartHour/60;
-                int endHour = site.RootWeb.RegionalSettings.WorkDayEndHour/60;
-                hours = endHour - startHour - 1;
-
-                int work = site.RootWeb.RegionalSettings.WorkDays;
-                for (byte x = 0; x < 7; x++)
+                SPSecurity.RunWithElevatedPrivileges(delegate
                 {
-                    workdays = ((((work >> x) & 0x01) == 0x01) ? "" : "," + (7 - x)) + workdays;
+                    int startHour = site.RootWeb.RegionalSettings.WorkDayStartHour / 60;
+                    int endHour = site.RootWeb.RegionalSettings.WorkDayEndHour / 60;
+                    hours = endHour - startHour - 1;
+
+                    int work = site.RootWeb.RegionalSettings.WorkDays;
+                    for (byte x = 0; x < 7; x++)
+                    {
+                        workdays = ((((work >> x) & 0x01) == 0x01) ? "" : "," + (7 - x)) + workdays;
+                    }
+                });
+
+                if (workdays.Length > 1)
+                    workdays = workdays.Substring(1);
+
+                string sResults = "";
+                epmdata.UpdateRPTSettings(workdays, hours, out sResults);
+
+                if (!sResults.Equals("success"))
+                {
+                    bErrors = true;
+                    sErrors += "<font color=\"red\">Error Updating RPTSettings: " + sResults + "</font><br>";
                 }
-            });
-
-            if (workdays.Length > 1)
-                workdays = workdays.Substring(1);
-
-            string sResults = "";
-            epmdata.UpdateRPTSettings(workdays, hours, out sResults);
+            }
+            catch (Exception ex)
+            {
+                bErrors = true;
+                sErrors += "<font color=\"red\">Error Updating RPTSettings: " + ex.Message + "</font><br>";
+            }
         }
 
         private string getReportingConnection(SPWeb web)
@@ -62,32 +76,60 @@ namespace EPMLiveReportsAdmin.Jobs
                         sCn += ";Trusted_Connection=True";
                 }
             }
-            catch { }
+            catch (Exception ex)
+            {
+                bErrors = true;
+                sErrors += "<font color=\"red\">Error: " + ex.Message + "</font><br>";
+            }
             cn.Close();
             return sCn;
         }
 
         private void CheckSP(SqlConnection cn)
         {
-            if (cn.State != ConnectionState.Open) cn.Open();
-
-            var cmd =
-                new SqlCommand(
-                    "select * from information_schema.routines where SPECIFIC_NAME = 'spUpdateStatusFields'", cn);
-            bool found = false;
-            SqlDataReader dr = cmd.ExecuteReader();
-            if (dr.Read())
-                found = true;
-            dr.Close();
-
-            if (!found)
+            try
             {
-                cmd = new SqlCommand(Resources.spUpdateStatusFields, cn);
-                cmd.ExecuteNonQuery();
-            }
+                if (cn.State != ConnectionState.Open) cn.Open();
 
-            cmd = new SqlCommand(Resources.spGetReportListData, cn);
-            cmd.ExecuteNonQuery();
+                var cmd =
+                    new SqlCommand(
+                        "select * from information_schema.routines where SPECIFIC_NAME = 'spUpdateStatusFields'", cn);
+                bool found = false;
+                SqlDataReader dr = cmd.ExecuteReader();
+                if (dr.Read())
+                    found = true;
+                dr.Close();
+
+                if (!found)
+                {
+                    try
+                    {
+                        cmd = new SqlCommand(Resources.spUpdateStatusFields, cn);
+                        cmd.ExecuteNonQuery();
+                    }
+                    catch (Exception sqlEx)
+                    {
+                        bErrors = true;
+                        sErrors += "<font color=\"red\">Error: " + sqlEx.Message + "</font><br>";
+                    }
+                }
+
+                try
+                {
+                    cmd = new SqlCommand(Resources.spGetReportListData, cn);
+                    cmd.ExecuteNonQuery();
+                }
+                catch (Exception sqlExeQry)
+                {
+                    bErrors = true;
+                    sErrors += "<font color=\"red\">Error: " + sqlExeQry.Message + "</font><br>";
+                }
+            }
+            catch (Exception ex)
+            {
+                bErrors = true;
+                sErrors += "<font color=\"red\">Error: " + ex.Message + "</font><br>";
+            }
         }
 
         public void execute(SPSite site, SPWeb web, string data)
@@ -113,7 +155,16 @@ namespace EPMLiveReportsAdmin.Jobs
 
             if (string.IsNullOrEmpty(data))
             {
-                data = epmdata.GetListNames();
+                try
+                {
+                    data = epmdata.GetListNames();
+                }
+                catch (Exception exData)
+                {
+                    bErrors = true;
+                    sErrors += "<font color=\"red\">Error while retrieving list names: " + exData.Message + "</font><br>";
+                }
+
                 try
                 {
                     setRPTSettings(epmdata, site);
@@ -214,8 +265,7 @@ namespace EPMLiveReportsAdmin.Jobs
                             "PortfolioEngineCore, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5");
                     Type thisClass = assemblyInstance.GetType("PortfolioEngineCore.WEIntegration.WEIntegration");
                     object classObject = Activator.CreateInstance(thisClass,
-                        new object[]
-                        {basePath, site.WebApplication.ApplicationPool.Username, ppmId, ppmCompany, ppmDbConn, false});
+                        new object[] { basePath, site.WebApplication.ApplicationPool.Username, ppmId, ppmCompany, ppmDbConn, false });
 
                     MethodInfo m = thisClass.GetMethod("ExecuteReportExtract");
                     var message =
@@ -242,15 +292,40 @@ namespace EPMLiveReportsAdmin.Jobs
 
             SPSecurity.RunWithElevatedPrivileges(delegate
             {
-                CheckReqSP(epmdata.GetClientReportingConnection);
-                CheckSchema(epmdata.GetClientReportingConnection);
+                try
+                {
+                    CheckReqSP(epmdata.GetClientReportingConnection);
+                }
+                catch (Exception exReqSP)
+                {
+                    bErrors = true;
+                    sErrors += "<font color=\"red\">Error while checking SPRequirement: " + exReqSP.Message + "</font><br>";
+                }
+
+                try
+                {
+                    CheckSchema(epmdata.GetClientReportingConnection);
+                }
+                catch (Exception exSchema)
+                {
+                    bErrors = true;
+                    sErrors += "<font color=\"red\">Error while checking schema: " + exSchema.Message + "</font><br>";
+                }
             });
 
             #endregion
 
             #region Clean Data
 
-            DataScrubber.CleanTables(site, epmdata);
+            try
+            {
+                DataScrubber.CleanTables(site, epmdata);
+            }
+            catch (Exception ex)
+            {
+                bErrors = true;
+                sErrors += "<font color=\"red\">Error while clean tables: " + ex.Message + "</font><br>";
+            }
 
             #endregion
 

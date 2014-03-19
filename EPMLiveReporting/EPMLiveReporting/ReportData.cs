@@ -769,7 +769,7 @@ namespace EPMLiveReportsAdmin
             }
 
             _DAO.Command = string.Format(@"
-                            IF NOT EXISTS (SELECT 1 FROM RPTList WHERE [ListName] = @ListName)
+                            IF NOT EXISTS (SELECT 1 FROM RPTList WHERE [RPTListId] = @RPTListId)
                             BEGIN
                                 INSERT INTO [{0}]
                                    ([RPTListId]
@@ -1038,6 +1038,19 @@ namespace EPMLiveReportsAdmin
             _DAO.BulkInsert(ds, _DAO.GetClientReportingConnection, false);
             message = "Success assumed";
             return true;
+        }
+
+        //Modules created by XJH -- START
+        public string GetTableName(Guid listId)
+        {
+            object objTableName = null;
+            _DAO.Command = "SELECT TableName FROM " + Resources.ListTable.Replace("'", "") +
+                           " WHERE RPTListId=@RPTListId AND SiteId=@siteId";
+            // - CAT.NET false-positive: All single quotes are escaped/removed.
+            _DAO.AddParam("@RPTListId", listId);
+            _DAO.AddParam("@siteId", _siteId);
+            objTableName = _DAO.ExecuteScalar(_DAO.GetClientReportingConnection);
+            return (objTableName != null) ? objTableName.ToString() : string.Empty;
         }
 
         //Modules created by XJH -- START
@@ -1492,7 +1505,7 @@ namespace EPMLiveReportsAdmin
                     else
                     {
                         //Check for field on list
-                        if (li.Fields.ContainsField(sInternalName))
+                        if (li.Fields.ContainsField(sInternalName))    
                         {
                             //Check for lookupfield type
                             if (!IsLookUpField(li.ParentList.Title, sColumnName))

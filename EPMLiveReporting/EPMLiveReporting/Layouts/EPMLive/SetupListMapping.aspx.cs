@@ -53,7 +53,8 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
             SPSite site = SPContext.Current.Site;
 
             var rb = new ReportBiz(site.ID);
-            Collection<string> existingLists = rb.GetMappedLists();
+            //Collection<string> existingLists = rb.GetMappedLists();
+            Collection<string> existingLists = rb.GetMappedListsIds();
 
             using (SPWeb web = site.OpenWeb())
             {
@@ -66,7 +67,7 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
                     }
 
                     var item = new ListItem(list.Title, list.ID.ToString());
-                    if (existingLists.Contains(list.Title))
+                    if (existingLists.Contains(list.ID.ToString()))
                         continue;
 
                     ddlLists.Items.Add(item);
