@@ -16,7 +16,7 @@ namespace EPMLiveCore
         public bool Executive = false;
         public string Information = "";
         public string ItemLink = "";
-        public string RibbonBehaviour = "";
+        public string RibbonBehavior = "";
         public string RollupLists = "";
         public string RollupSites = "";
         public bool ShowViewToolbar = true;
@@ -166,7 +166,7 @@ namespace EPMLiveCore
             catch{}
             try { EnableFancyForms = bool.Parse(settings[39]); }
             catch { }
-            try { RibbonBehaviour = settings[40]; }
+            try { RibbonBehavior = settings[40]; }
             catch { }
 
         }
@@ -214,7 +214,7 @@ namespace EPMLiveCore
             data += WorkspaceParentSiteLookup + "\n";
             data += ListIcon + "\n";
             data += EnableFancyForms + "\n";
-            data += RibbonBehaviour + "\n";
+            data += RibbonBehavior + "\n";
 
             return data;
         }

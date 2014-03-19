@@ -313,7 +313,7 @@ namespace EPMLiveCore.Layouts.epmlive
                     chkContentReporting.Checked = gSettings.EnableContentReporting;
                     chkResTools.Checked = gSettings.EnableResourcePlan;
                     chkDisplayRedirect.Checked = gSettings.DisplayFormRedirect;
-                    ddlRibbonBehaviour.SelectedValue = gSettings.RibbonBehaviour;
+                    ddlRibbonBehavior.SelectedValue = gSettings.RibbonBehavior;
 
                     //if ((uint)list.BaseTemplate == 10115 || (uint)list.BaseTemplate == 10702 || (uint)list.BaseTemplate == 10701)
                     {
@@ -992,7 +992,7 @@ namespace EPMLiveCore.Layouts.epmlive
             gSettings.Executive = chkExecutive.Checked;
             gSettings.Information = ddlInformation.SelectedValue;
             gSettings.ItemLink = ddlItemLink.SelectedValue;
-            gSettings.RibbonBehaviour = ddlRibbonBehaviour.SelectedValue;
+            gSettings.RibbonBehavior = ddlRibbonBehavior.SelectedValue;
             gSettings.RollupLists = txtRollupLists.Text.Replace(",", "|").Replace("\r\n", ",");
             gSettings.RollupSites = txtRollupSites.Text.Replace("\r\n", ",");
             gSettings.ShowViewToolbar = chkShowViewToolbar.Checked;
