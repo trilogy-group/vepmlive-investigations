@@ -14,7 +14,7 @@
 }
 
 .GMSectionFF3 th:nth-child(3) {  
-  width:15px !important;
+  width:24px !important;
 }
 
 /* ------------- Base tags ------------- */
@@ -536,12 +536,12 @@ u.GMNL { padding-left:21px; }
 /* ------------- Panel img ------------- */
 
 .GMPanelImage,.GMPanelMove,.GMPanelMoveOff,.GMPanelSelect,.GMPanelSelectOn,.GMPanelSelectOff,.GMPanelDelete,.GMPanelDeleteOff,.GMPanelCopy,.GMPanelCopyOff,.GMPanelEmpty {
-   font-size:10px; padding-left:14px; background-image:url(Panel.gif); background-repeat:no-repeat;
+   font-size:10px; padding-left:15px; background-image:url(Panel.gif); background-repeat:no-repeat;
    }
 .GMPanelEmpty { background:none; }   
 .GMPanelMove { background-position: 0px 0px; }
 .GMPanelMoveOff { background-position: -50px 0px; }
-.GMPanelSelect { background-image: url("checkbox-sprite.png");background-position: -24px 5px;left: -8px;position: relative;}
+.GMPanelSelect { background-image: url("checkbox-sprite.png");background-position: -24px 5px;position: relative;}
 .GMPanelSelectOn { background-position: -150px 0px; }
 .GMPanelSelectOff { background-position: -200px 0px; }
 .GMPanelDelete { background-position: -250px 0px; }
@@ -587,8 +587,8 @@ u.GMNL { padding-left:21px; }
 .GMP0200 { background-position:-1760px 0px; }
 .GMP0000 { background-position:-1840px 0px; }
 
-.GMPx111,.GMPx11x,.GMPx1xx { background-image: url("checkbox-sprite.png");background-position: -24px 10px; }
-.GMPx211,.GMPx21x,.GMPx2xx { background-image: url("checkbox-sprite.png");background-position: 0px 10px; }
+.GMPx111,.GMPx11x,.GMPx1xx { background-image: url("checkbox-sprite.png");background-position: -16px 10px; }
+.GMPx211,.GMPx21x,.GMPx2xx { background-image: url("checkbox-sprite.png");background-position: 8px 10px; }
 .GMPx011,.GMPx01x,.GMPx0xx { background-position:-173px 0px; }
 .GMPx101,.GMPx10x { background-position:-253px 0px; }
 .GMPx201,.GMPx20x { background-position:-333px 0px; }
@@ -649,7 +649,7 @@ u.GMNL { padding-left:21px; }
 .GMP0xx1 { background-position:-1760px 0px; }
 .GMP0xx0 { background-position:-1840px 0px; }
 
-.GMPSpace1 { padding-left:14px; }
+.GMPSpace1 { padding-left:25px; }
 .GMPSpace2 { padding-left:25px; }
 .GMPSpace3 { padding-left:38px; }
 .GMPSpace4 { padding-left:51px; }
@@ -809,7 +809,7 @@ u.GMFilter0,u.GMFilter1 { padding-left:13px; }
 .GMFilter0 { background-position:center -750px; }
 .GMFilter1 { background-position:center -1000px; }
 .GMGroup0 { background-image: url("checkbox-sprite.png");background-position: 0 10px;}
-.GMGroup1 { background-image: url("checkbox-sprite.png");background-position: -24px 10px;}
+.GMGroup1 { background-image: url("checkbox-sprite.png");background-position: -16px 10px;}
 .GMSearch0 { background-position:center -750px; }
 .GMSearch1 { background-position:center -1000px; }
 .GMBoolInput { margin-top:0px; margin-bottom:0px; padding:0px; margin-top:-4px!IE;margin-bottom:-4px!IE; }
