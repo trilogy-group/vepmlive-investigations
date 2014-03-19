@@ -371,8 +371,15 @@ namespace EPMLiveCore.Layouts.epmlive
                         chkTimesheet.Checked = true;
                     }
 
+                    bool isReportingV2Enabled = false;
+                    try
+                    {
+                        isReportingV2Enabled = Convert.ToBoolean(CoreFunctions.getConfigSetting(rootWeb, "ReportingV2"));
+                    }
+                    catch { }
+
                     // display reporting section dynamically
-                    ReportBiz reportBiz = new ReportBiz(SPContext.Current.Site.ID, SPContext.Current.Web.ID, false);
+                    ReportBiz reportBiz = new ReportBiz(SPContext.Current.Site.ID, SPContext.Current.Web.ID, isReportingV2Enabled);
                     if (reportBiz.SiteExists())
                     {
                         ifsEnableReporting.Visible = true;
@@ -381,8 +388,32 @@ namespace EPMLiveCore.Layouts.epmlive
                         bool isMapped = mappedLists.Contains(list.Title);
                         bool isMaster = mappedListIds.Contains(list.ID.ToString().ToLower());
 
-                        cbEnableReporting.Checked = isMapped;
-                        cbEnableReporting.Enabled = (isMaster || !isMapped);
+                        if (!isReportingV2Enabled)
+                        {
+                            cbEnableReporting.Checked = isMapped;
+                            cbEnableReporting.Enabled = (isMaster || !isMapped);
+                        }
+                        else
+                        {
+                            if (isMapped)
+                            {
+                                if (isMaster)
+                                {
+                                    cbEnableReporting.Checked = true; 
+                                    cbEnableReporting.Enabled = false;
+                                }
+                                else
+                                {
+                                    cbEnableReporting.Checked = false;
+                                    cbEnableReporting.Enabled = true;
+                                }
+                            }
+                            else
+                            {
+                                cbEnableReporting.Checked = false;
+                                cbEnableReporting.Enabled = true;
+                            }
+                        }
 
                         List<SPEventReceiverDefinition> evts = GetListEvents(list,
                                                                             "EPMLiveReportsAdmin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b90e532f481cf050",
