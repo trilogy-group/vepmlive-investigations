@@ -81,11 +81,13 @@ namespace EPMLiveCore.Services
 
                 foreach (var a in threadActivities)
                 {
-                    var activity = BuildActivity(a, threadId, dateTime, userId);
-                    if (activity == null) continue;
+                    var time = a["ActivityDate"];
 
-                    var day = (((DateTime) a["ActivityDate"]).Date).ToString("s");
+                    var day = (((DateTime) time).Date).ToString("s");
                     if (!thread.days.Contains(day)) thread.days.Add(day);
+
+                    var activity = BuildActivity(a, threadId, time, userId);
+                    if (activity == null) continue;
 
                     dailyActivities.activities.Add(activity);
 
