@@ -76,17 +76,22 @@ namespace EPMLiveCore.Services
                 DailyActivities.Thread thread = BuildThread(threadId, activityDay, webId, listId, t);
 
                 OrderedParallelQuery<DataRow> threadActivities = activityRows.AsParallel()
-                    .OrderByDescending(a => a["ActivityDate"]);
+                    .Where(a => (Guid) a["ThreadId"] == threadId)
+                    .OrderBy(a => a["ActivityDate"]);
 
-                foreach (DailyActivities.Activity activity in threadActivities
-                    .Select(a => BuildActivity(a, threadId, dateTime, userId))
-                    .Where(activity => activity != null))
+                foreach (var a in threadActivities)
                 {
+                    var activity = BuildActivity(a, threadId, dateTime, userId);
+                    if (activity == null) continue;
+
+                    var day = (((DateTime) a["ActivityDate"]).Date).ToString("s");
+                    if (!thread.days.Contains(day)) thread.days.Add(day);
+
                     dailyActivities.activities.Add(activity);
 
                     thread.activities.Add(activity.id);
 
-                    BuildDay(daysProcessed, activityDay, threadId, dailyActivities);
+                    BuildDay(daysProcessed, day, threadId, dailyActivities);
 
                     BuildWeb(websProcessed, webId, webUrl, threadId, dailyActivities, t);
 
@@ -194,7 +199,7 @@ namespace EPMLiveCore.Services
                 url = r["ThreadUrl"] as string,
                 kind = ((ObjectKind) r["ThreadKind"]).ToString().ToUpper(),
                 lastActivityOn = ((DateTime) r["ThreadLastActivityOn"]).ToString("s"),
-                day = activityDay,
+                days = new List<string> { activityDay },
                 web = webId,
                 list = listId as Guid?,
                 itemId = r["ItemId"] as int?,

@@ -81,7 +81,7 @@ namespace EPMLiveCore.Services.DataContracts.SocialEngine
 
             public List<Guid> activities { get; set; }
 
-            public string day { get; set; }
+            public List<string> days { get; set; }
 
             public Guid id { get; set; }
 
