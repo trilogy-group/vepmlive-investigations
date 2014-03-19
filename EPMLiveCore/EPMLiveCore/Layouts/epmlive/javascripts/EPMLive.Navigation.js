@@ -766,7 +766,7 @@
                     addTooltip();
                 }
 
-                function handleContextualCommand(id, webId, listId, itemId, command, kind) {
+                function handleContextualCommand(id, webId, listId, itemId, command, kind, callBackFunction) {
                     var removeLink = function(linkId, notifId) {
                         var remove = function(lid, nid) {
                             var $item = $('#' + lid);
@@ -1108,11 +1108,17 @@
                             if (confirm('Are you sure you want to send the item(s) to the Recycle Bin?')) {
                                 var nId = SP.UI.Notify.addNotification('Deleting Item...', true, '', null);
                                 if (command !== 'nav:remove') {
-                                    $.get(redirectUrl).always(function() {
-                                        removeLink(id, nId);
+                                    $.get(redirectUrl).always(function () {
+                                        if (callBackFunction != '')
+                                            eval(callBackFunction + '(' + id + ')');
+                                        else
+                                            removeLink(id, nId);
                                     });
                                 } else {
-                                    removeLink(id, nId);
+                                    if (callBackFunction != '')
+                                        eval(callBackFunction + '(' + id + ')');
+                                    else
+                                        removeLink(id, nId);
                                 }
                             }
                             break;
@@ -1205,8 +1211,8 @@
                         toggleNode(data, x, elNav, y, elNodes);
                     };
 
-                    window.epmLiveNavigation.handleContextualCommand = function (id, webId, listId, itemId, command, kind) {
-                        handleContextualCommand(id, webId, listId, itemId, command, kind);
+                    window.epmLiveNavigation.handleContextualCommand = function (id, webId, listId, itemId, command, kind, callBackFunction) {
+                        handleContextualCommand(id, webId, listId, itemId, command, kind, callBackFunction);
                     };
 
                     $('td.epm-nav-node-root').click(function () {
@@ -1969,7 +1975,7 @@
             epmLiveNavigation.init();
 
             var menuManager = (function () {
-                var _setupMenu = function ($li, defaultCommands, forcePopup, customOverrideKind) {
+                var _setupMenu = function ($li, defaultCommands, forcePopup, customOverrideKind, callBackFunctions) {
                     defaultCommands = defaultCommands || [];
 
                     var $a = $($li.find('a').get(0));
@@ -2060,7 +2066,14 @@
                                     $menu.append($('<li class="seprator"></li>').hide().fadeIn());
                                 }
                             } else {
-                                $menu.append($('<li><span class="epm-nav-cm-icon ' + getIcon(cmd.command) + '">&nbsp;</span><a href="javascript:epmLiveNavigation.handleContextualCommand(\'' + liId + '\',\'' + webId + '\',\'' + $ca.data('listid') + '\',\'' + $ca.data('itemid') + '\',\'' + cmd.command + '\',\'' + cmd.kind + '\');" style="width: 124px !important;">' + cmd.title + '</a></li>').hide().fadeIn());
+
+                                var callbackfunction = '';
+                                if (callBackFunctions)
+                                {
+                                    callbackfunction = callBackFunctions[cmd.command];
+                                }
+
+                                $menu.append($('<li><span class="epm-nav-cm-icon ' + getIcon(cmd.command) + '">&nbsp;</span><a href="javascript:epmLiveNavigation.handleContextualCommand(\'' + liId + '\',\'' + webId + '\',\'' + $ca.data('listid') + '\',\'' + $ca.data('itemid') + '\',\'' + cmd.command + '\',\'' + cmd.kind + '\',\'' + callbackfunction + '\');" style="width: 124px !important;">' + cmd.title + '</a></li>').hide().fadeIn());
 
                                 $menu.find('a').click(function() {
                                     hideMenu();
@@ -2241,11 +2254,11 @@
                 };
             })();
 
-            window.epmLiveNavigation.addContextualMenu = function ($li, defaultCommands, forcePopup, customOverrideKind) {
+            window.epmLiveNavigation.addContextualMenu = function ($li, defaultCommands, forcePopup, customOverrideKind, customCallbackFunctions) {
                 $li.append('<span class="epm-menu-btn"><span class="icon-ellipsis-horizontal"></span></span>');
 
                 $($li.find('.epm-menu-btn').get(0)).click(function () {
-                    menuManager.setupMenu($li, defaultCommands, forcePopup, customOverrideKind);
+                    menuManager.setupMenu($li, defaultCommands, forcePopup, customOverrideKind, customCallbackFunctions);
                 });
             };
 
