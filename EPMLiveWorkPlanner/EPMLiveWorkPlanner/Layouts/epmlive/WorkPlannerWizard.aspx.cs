@@ -144,7 +144,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                 if (plannername == "Microsoft Project" || plannerid == "MPP")
                     sb.Append("</span>");
                 else
-                    sb.Append(" for Microsoft Project</b>");
+                    sb.Append(" for Microsoft Project</span>");
                 if (desc != "")
                 {
                     sb.Append("<div style=\"padding-top: 5px;padding-bottom:10px;padding-right:5px;work-wrap:break-word;\">");
