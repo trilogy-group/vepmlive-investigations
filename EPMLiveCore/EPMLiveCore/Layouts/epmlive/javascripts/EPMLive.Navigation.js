@@ -1977,7 +1977,7 @@
             var menuManager = (function () {
                 var _setupMenu = function ($li, defaultCommands, forcePopup, customOverrideKind, callBackFunctions) {
                     defaultCommands = defaultCommands || [];
-
+                     
                     var $a = $($li.find('a').get(0));
                     var siteId = $a.data('siteid');
                     var webId = $a.data('webid');
