@@ -26,16 +26,14 @@ namespace TimeSheets
 
             //foreach(string tsuidData in tsuids)
             {
-                SqlCommand cmd = new SqlCommand("update TSTIMESHEET set approval_status=1,approval_notes=@notes,approval_date=GETDATE() where ts_uid=@ts_uid", cn);
-                cmd.Parameters.AddWithValue("@ts_uid", base.TSUID);
-                cmd.Parameters.AddWithValue("@notes", data);
-
-                cmd.ExecuteNonQuery();
+                
 
                 //if (actualWork != "")
                 //{
-                if(!liveHours)
+                if (!liveHours)
+                {
                     sErrors += SharedFunctions.processActualWork(cn, TSUID.ToString(), site, true, true);
+                }
                 //}
             }
 

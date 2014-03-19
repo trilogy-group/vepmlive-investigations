@@ -361,7 +361,7 @@ namespace TimeSheets
                                                     if (WorkList != null)
                                                         ProcessTimesheetFields(id, ndRow, cn, settings);
 
-                                                    if (Editable)
+                                                    /*if (Editable)
                                                     {
                                                         //PROCESS LI
                                                         GridGanttSettings gSettings = new GridGanttSettings(list);
@@ -488,17 +488,21 @@ namespace TimeSheets
                                                         }
 
 
-                                                    }
+                                                    }*/
 
                                                     ProcessListFields(id, ndRow, cn, settings, li, true, list);
 
-                                                    if (liveHours)
-                                                        processLiveHours(li, list.ID);
+                                                    
 
-                                                    if (Editable)
-                                                        li.Update();
-                                                    else
-                                                        li.SystemUpdate();
+
+
+                                                    //if (liveHours)
+                                                    //    processLiveHours(li, list.ID);
+
+                                                    //if (Editable)
+                                                    //    li.Update();
+                                                    //else
+                                                    //    li.SystemUpdate();
 
                                                 }
                                             }
@@ -687,8 +691,8 @@ namespace TimeSheets
                             cmd.ExecuteNonQuery();
                         }
 
-                        if (liveHours)
-                            sErrors += processActualWork(cn, TSUID.ToString(), site, true, false);
+                        //if (liveHours)
+                        //    sErrors += processActualWork(cn, TSUID.ToString(), site, true, false);
 
                         cmd = new SqlCommand("update TSQUEUE set percentcomplete=99 where TSQUEUE_ID=@QueueUid", cn);
                         cmd.Parameters.AddWithValue("@queueuid", QueueUid);
@@ -702,6 +706,14 @@ namespace TimeSheets
                     bErrors = true;
                     sErrors = "Timesheet does not exist";
                 }
+
+                cmd = new SqlCommand("INSERT INTO TSQUEUE (TS_UID, STATUS, JOBTYPE_ID, USERID, JOBDATA) VALUES (@tsuid, 0, 32, @userid, @jobdata)", cn);
+                cmd.Parameters.AddWithValue("@tsuid", TSUID);
+                cmd.Parameters.AddWithValue("@userid", userid);
+                cmd.Parameters.AddWithValue("@jobdata", data);
+
+                cmd.ExecuteNonQuery();
+
                 cn.Close();
 
                 if (SaveAndSubmit)
@@ -714,233 +726,8 @@ namespace TimeSheets
             }
         }
 
-        public static string processActualWork(SqlConnection cn, string tsuid, SPSite site, bool bApprovalScreen, bool bApproved)
-        {
-            string error = "";
-            //SPSecurity.RunWithElevatedPrivileges(delegate()
-            //{
-            //using (SPSite site = new SPSite(s.ID, s.SystemAccount.UserToken))
-            {
-                //string sql = "SELECT * FROM vwTSItemHoursByTS where ts_uid=@ts_uid order by web_uid,list_uid";
-                //if(!bApprovalScreen)
-                //    sql = "SELECT * FROM vwTSItemHoursByMyTS where ts_uid=@ts_uid order by web_uid,list_uid";
+        
 
-
-                SqlCommand cmd = new SqlCommand("spTSGetProjectsHours", cn);
-                cmd.Parameters.AddWithValue("@TSUID", tsuid);
-                cmd.Parameters.AddWithValue("@approved", bApproved);
-                cmd.CommandType = CommandType.StoredProcedure;
-                DataSet dsProjects = new DataSet();
-                SqlDataAdapter da = new SqlDataAdapter(cmd);
-                da.Fill(dsProjects);
-
-                //cmd = new SqlCommand(sql, cn);
-                //cmd.Parameters.AddWithValue("@TS_UID", tsuid);
-                //SqlDataReader dr = cmd.ExecuteReader();
-
-                Guid webGuid = new Guid();
-                Guid listGuid = new Guid();
-                SPWeb iWeb = null;
-                SPList iList = null;
-                /*while (dr.Read())
-                {
-                    try
-                    {
-                        Guid wGuid = new Guid(dr["WEB_UID"].ToString());
-                        Guid lGuid = new Guid(dr["LIST_UID"].ToString());
-
-                        if (webGuid != wGuid)
-                        {
-                            try
-                            {
-                                if (iWeb != null)
-                                {
-                                    iWeb.Close();
-                                    iWeb = site.OpenWeb(wGuid);
-                                }
-                                else
-                                    iWeb = site.OpenWeb(wGuid);
-                                webGuid = iWeb.ID;
-                            }
-                            catch { }
-                        }
-                        if (iWeb != null)
-                        {
-                            if (listGuid != lGuid)
-                            {
-                                iList = iWeb.Lists[lGuid];
-                                listGuid = iList.ID;
-                            }
-                            iWeb.AllowUnsafeUpdates = true;
-                            SPListItem li = null;
-                            try
-                            {
-                                li = iList.GetItemById(int.Parse(dr["ITEM_ID"].ToString()));
-                            }
-                            catch { }
-                            if (li != null)
-                            {
-                                //If the project server feature is not active and it is in approval mode then process actual work.
-                                if (iWeb.Features[new Guid("ebc3f0dc-533c-4c72-8773-2aaf3eac1055")] == null && bApprovalScreen)
-                                {
-                                    SPField f = null;
-                                    try
-                                    {
-                                        f = iList.Fields.GetFieldByInternalName("TimesheetHours");
-                                    }
-                                    catch { }
-                                    if (f != null)
-                                    {
-                                        li[f.Id] = dr["TotalHours"].ToString();
-
-                                        li.Update();
-
-                                        //processProject(dsProjects, wGuid, iWeb);
-                                        
-                                    }
-                                }
-                                else
-                                {
-                                    SPField f = null;
-                                    try
-                                    {
-                                        f = iList.Fields.GetFieldByInternalName("TimesheetHours");
-                                    }
-                                    catch { }
-                                    if (f != null)
-                                    {
-                                        string taskuid = "";
-                                        try
-                                        {
-                                            taskuid = li["taskuid"].ToString();
-                                        }
-                                        catch { }
-                                        //if the item has a taskuid (Meaning this item is a Project Task)
-                                        if (taskuid != "" && taskuid.Contains("."))
-                                        {
-                                            string login = "";
-                                            try
-                                            {
-                                                SPFieldUserValueCollection uvc = (SPFieldUserValueCollection)li[iList.Fields.GetFieldByInternalName("AssignedTo").Id];
-                                                if (uvc.Count > 0)
-                                                {
-                                                    login = uvc[0].User.LoginName.ToLower();
-                                                }
-                                            }
-                                            catch { }
-                                            if (login != "")//if we found a user
-                                            {
-                                                if (login == SPContext.Current.Web.CurrentUser.LoginName.ToLower())
-                                                {
-                                                    li[f.Id] = dr["SubmittedHours"].ToString();
-                                                    li.Update();
-                                                    //processProject(dsProjects, wGuid, iWeb);
-                                                }
-                                            }
-                                        }
-                                        else if (bApprovalScreen)//otherwise it must be in approval mode
-                                        {
-                                            li[f.Id] = dr["TotalHours"].ToString();
-                                            li.Update();
-                                            //processProject(dsProjects, wGuid, iWeb);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        
-                    }
-                    catch (Exception exception)
-                    {
-                        error += "Error: " + exception.Message + "<br>SharePoint User: " + iWeb.CurrentUser.Name + "<br><br><br>";
-                    }
-                }
-
-
-                dr.Close();
-                */
-                foreach (DataRow drProject in dsProjects.Tables[0].Rows)
-                {
-                    try
-                    {
-                        if (drProject["PROJECT_LIST_UID"].ToString() != "")
-                        {
-                            Guid wGuid = new Guid(drProject["WEB_UID"].ToString());
-                            Guid lGuid = new Guid(drProject["PROJECT_LIST_UID"].ToString());
-
-                            if (webGuid != wGuid)
-                            {
-                                try
-                                {
-                                    if (iWeb != null)
-                                    {
-                                        iWeb.Close();
-                                        iWeb = site.OpenWeb(wGuid);
-                                    }
-                                    else
-                                        iWeb = site.OpenWeb(wGuid);
-                                    webGuid = iWeb.ID;
-                                }
-                                catch { }
-                            }
-                            if (iWeb != null)
-                            {
-                                if (listGuid != lGuid)
-                                {
-                                    iList = iWeb.Lists[lGuid];
-                                    listGuid = iList.ID;
-                                }
-                                iWeb.AllowUnsafeUpdates = true;
-                                string project = drProject["Project_id"].ToString();
-                                if (project != "0")
-                                {
-                                    try
-                                    {
-                                        SPListItem liProject = iList.GetItemById(int.Parse(project));
-                                        liProject["TimesheetHours"] = drProject["Hours"].ToString();
-                                        liProject.SystemUpdate();
-                                    }
-                                    catch { }
-                                }
-                            }
-                        }
-                    }
-                    catch (Exception exception)
-                    {
-                        error += "Error: " + exception.Message + "<br>SharePoint User: " + iWeb.CurrentUser.Name + "<br><br><br>";
-                    }
-                }
-
-            }
-            //});\
-            return error;
-        }
-
-        private void processLiveHours(SPListItem li, Guid listguid)
-        {
-
-            double hours = 0;
-            try
-            {
-
-                if (li != null)
-                {
-                    cn.Open();
-                    SqlCommand cmdHours = new SqlCommand("select cast(sum(hours) as float) from vwTSHoursByTask where list_uid=@listuid and item_id = @itemid", cn);
-                    cmdHours.Parameters.AddWithValue("@listuid", listguid);
-                    cmdHours.Parameters.AddWithValue("@itemid", li.ID);
-                    SqlDataReader dr1 = cmdHours.ExecuteReader();
-                    if (dr1.Read())
-                        if (!dr1.IsDBNull(0))
-                            hours = dr1.GetDouble(0);
-                    dr1.Close();
-
-                    li["TimesheetHours"] = hours;
-                    li.SystemUpdate();
-                    cn.Close();
-                }
-            }
-            catch { }
-        }
+        
     }
 }

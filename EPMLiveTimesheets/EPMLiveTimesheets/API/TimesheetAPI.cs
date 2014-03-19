@@ -507,7 +507,7 @@ namespace TimeSheets
 
                 if (!submitted)
                 {
-                    int status = 2;
+                    int status = 3;
 
                     cmd = new SqlCommand("SELECT status,jobtype_id FROM TSQUEUE where TS_UID=@tsuid and JOBTYPE_ID=31", cn);
                     cmd.Parameters.AddWithValue("@tsuid", tsuid);
@@ -519,7 +519,7 @@ namespace TimeSheets
                     }
                     dr.Close();
 
-                    if (status == 2)
+                    if (status == 3)
                     {
                         cmd = new SqlCommand("DELETE FROM TSQUEUE where TS_UID=@tsuid and JOBTYPE_ID=31", cn);
                         cmd.Parameters.AddWithValue("@tsuid", tsuid);
@@ -967,13 +967,17 @@ namespace TimeSheets
                     });
 
                     outData = "<Approve>";
+                    
+                    bool liveHours = false;
+
+                    bool.TryParse(EPMLiveCore.CoreFunctions.getConfigSetting(oWeb.Site.RootWeb, "EPMLiveTSLiveHours"), out liveHours);
 
                     if (cn != null && cn.State == System.Data.ConnectionState.Open)
                     {
 
                         string[] tsUids = ndTS.InnerText.Split(',');
 
-                        int status = 2;
+                        int status = 3;
 
                         foreach (string tsUid in tsUids)
                         {
@@ -981,39 +985,45 @@ namespace TimeSheets
                             {
                                 try
                                 {
-                                    SqlCommand cmd = new SqlCommand("SELECT status,jobtype_id FROM TSQUEUE where TS_UID=@tsuid and JOBTYPE_ID=30", cn);
-                                    cmd.Parameters.AddWithValue("@tsuid", tsUid);
-
-                                    SqlDataReader dr = cmd.ExecuteReader();
-                                    if (dr.Read())
-                                    {
-                                        status = dr.GetInt32(0);
-                                    }
-                                    dr.Close();
-
                                     string[] tsData = tsUid.Split('|');
 
-                                    if (status == 2)
-                                    {
-                                        cmd = new SqlCommand("DELETE FROM TSQUEUE where TS_UID=@tsuid and JOBTYPE_ID=30", cn);
-                                        cmd.Parameters.AddWithValue("@tsuid", tsUid);
-                                        cmd.ExecuteNonQuery();
+                                    SqlCommand cmd = new SqlCommand("update TSTIMESHEET set approval_status=1,approval_notes=@notes,approval_date=GETDATE() where ts_uid=@ts_uid", cn);
+                                    cmd.Parameters.AddWithValue("@ts_uid", tsData[0]);
+                                    cmd.Parameters.AddWithValue("@notes", data);
+                                    cmd.ExecuteNonQuery();
 
-                                        cmd = new SqlCommand("INSERT INTO TSQUEUE (TS_UID,STATUS,JOBTYPE_ID,USERID,JOBDATA) VALUES(@tsuid,0,30,@USERID,@JOBDATA)", cn);
+                                    if (!liveHours)
+                                    {
+                                        cmd = new SqlCommand("SELECT status,jobtype_id FROM TSQUEUE where TS_UID=@tsuid and JOBTYPE_ID=30", cn);
                                         cmd.Parameters.AddWithValue("@tsuid", tsData[0]);
-                                        cmd.Parameters.AddWithValue("@USERID", oWeb.CurrentUser.ID);
-                                        if (tsData.Length > 1)
-                                            cmd.Parameters.AddWithValue("@JOBDATA", tsData[1]);
-                                        else
-                                            cmd.Parameters.AddWithValue("@JOBDATA", "");
-                                        cmd.ExecuteNonQuery();
 
-                                        outData += "<TS ID='" + tsData[0] + "' Status=\"0\"/>";
+                                        SqlDataReader dr = cmd.ExecuteReader();
+                                        if (dr.Read())
+                                        {
+                                            status = dr.GetInt32(0);
+                                        }
+                                        dr.Close();
+
+                                        if (status == 3)
+                                        {
+                                            cmd = new SqlCommand("DELETE FROM TSQUEUE where TS_UID=@tsuid and JOBTYPE_ID=30", cn);
+                                            cmd.Parameters.AddWithValue("@tsuid", tsData[0]);
+                                            cmd.ExecuteNonQuery();
+
+                                            cmd = new SqlCommand("INSERT INTO TSQUEUE (TS_UID,STATUS,JOBTYPE_ID,USERID,JOBDATA) VALUES(@tsuid,0,30,@USERID,@JOBDATA)", cn);
+                                            cmd.Parameters.AddWithValue("@tsuid", tsData[0]);
+                                            cmd.Parameters.AddWithValue("@USERID", oWeb.CurrentUser.ID);
+                                            if (tsData.Length > 1)
+                                                cmd.Parameters.AddWithValue("@JOBDATA", tsData[1]);
+                                            else
+                                                cmd.Parameters.AddWithValue("@JOBDATA", "");
+                                            cmd.ExecuteNonQuery();
+
+                                        }
+                                        
                                     }
-                                    else
-                                    {
-                                        outData += "<TS ID='" + tsData[0] + "' Status=\"1\">Item is already being processed</TS>";
-                                    }
+
+                                    outData += "<TS ID='" + tsData[0] + "' Status=\"0\"/>";
                                 }
                                 catch (Exception ex)
                                 {

@@ -378,12 +378,12 @@ function CheckSaveStatus(gridid) {
 
             if (oResponse.SaveStatus.Status == "0")
                 status = "Queued";
-            else if (oResponse.SaveStatus.Status == "1")
-                status = "Processing (" + oResponse.SaveStatus.PercentComplete + "%)";
             else if (oResponse.SaveStatus.Status == "2")
+                status = "Processing (" + oResponse.SaveStatus.PercentComplete + "%)";
+            else if (oResponse.SaveStatus.Status == "3")
                 status = "Completed";
 
-            if (oResponse.SaveStatus.Status == "2") {
+            if (oResponse.SaveStatus.Status == "3") {
 
                 if (oResponse.SaveStatus.ErrorResult == "No Errors") {
                     if (TSStatusMessage != null) {
