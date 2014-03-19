@@ -1,9 +1,11 @@
-﻿using Microsoft.SharePoint;
+﻿using EPMLiveCore.Infrastructure;
+using Microsoft.SharePoint;
 using Microsoft.SharePoint.WebControls;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Net;
 using System.Web.UI;
 using System.Web.UI.WebControls.WebParts;
 
@@ -11,14 +13,15 @@ namespace EPMLiveWebParts.WorkSpaceCenter
 {
     [ToolboxItemAttribute(false)]
     public partial class WorkSpaceCenter : WebPart
-    {  
+    {
         #region Fields (3)
 
         protected string WebUrl;
         protected string DebugTag;
         protected string SiteId;
+        private const string LAYOUT_PATH = "/_layouts/15/epmlive/";
 
-        #endregion Fields 
+        #endregion Fields
         // Uncomment the following SecurityPermission attribute only when doing Performance Profiling on a farm solution
         // using the Instrumentation method, and then remove the SecurityPermission attribute when the code is ready
         // for production. Because the SecurityPermission attribute bypasses the security check for callers of
@@ -32,7 +35,17 @@ namespace EPMLiveWebParts.WorkSpaceCenter
         {
             base.OnInit(e);
             InitializeControl();
-            ScriptLink.Register(Page, "/epmlive/javascripts/libraries/jquery.min.js", false);
+        }
+
+        protected override void OnPreRender(EventArgs e)
+        {
+            //SPPageContentManager.RegisterStyleFile(LAYOUT_PATH + "Stylesheets/EPMLiveToolBar.min.css");
+
+            EPMLiveScriptManager.RegisterScript(Page, new[]
+            {
+                "/treegrid/GridE","libraries/jquery.min","libraries/jquery-ui","EPMLive.min"
+            });
+            ServicePointManager.ServerCertificateValidationCallback += delegate { return true; };
         }
         protected override void CreateChildControls()
         {
@@ -84,26 +97,28 @@ namespace EPMLiveWebParts.WorkSpaceCenter
 
             WebUrl = SPContext.Current.Web.Url;
 
-            using (SPSite site = new SPSite(SPContext.Current.Site.ID))
-            {
-                using (SPWeb web = site.OpenWeb(SPContext.Current.Web.ID))
-                {
-                    string _templateResourceUrl = EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLiveTemplateGalleryURL", true, false);
+            //Below code is required to set SiteId if we want to make workspace like workspace gallary
 
-                    try
-                    {
-                        using (SPSite tsite = new SPSite(_templateResourceUrl))
-                        {
-                            using (SPWeb tweb = tsite.OpenWeb())
-                            {
-                                SPList tlist = tweb.Lists.TryGetList("Template Gallery");
-                                SiteId = tlist.ID.ToString();
-                            }
-                        }
-                    }
-                    catch { }
-                }
-            }
+            //using (SPSite site = new SPSite(SPContext.Current.Site.ID))
+            //{
+            //    using (SPWeb web = site.OpenWeb(SPContext.Current.Web.ID))
+            //    {
+            //        string _templateResourceUrl = EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLiveTemplateGalleryURL", true, false);
+
+            //        try
+            //        {
+            //            using (SPSite tsite = new SPSite(_templateResourceUrl))
+            //            {
+            //                using (SPWeb tweb = tsite.OpenWeb())
+            //                {
+            //                    SPList tlist = tweb.Lists.TryGetList("Template Gallery");
+            //                    SiteId = tlist.ID.ToString();
+            //                }
+            //            }
+            //        }
+            //        catch { }
+            //    }
+            //}
         }
     }
 }

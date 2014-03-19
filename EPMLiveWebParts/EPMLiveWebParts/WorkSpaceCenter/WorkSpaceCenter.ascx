@@ -6,89 +6,228 @@
 <%@ Import Namespace="Microsoft.SharePoint" %> 
 <%@ Register Tagprefix="WebPartPages" Namespace="Microsoft.SharePoint.WebPartPages" Assembly="Microsoft.SharePoint, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
 <%@ Control Language="C#" AutoEventWireup="true" CodeBehind="WorkSpaceCenter.ascx.cs" Inherits="EPMLiveWebParts.WorkSpaceCenter.WorkSpaceCenter" %>
-<script type="text/javascript" src="../_layouts/15/epmlive/TreeGrid/GridE.js"></script>
+<%--<script type="text/javascript" src="../_layouts/15/epmlive/TreeGrid/GridE.js"></script>--%>
+<link href="../_layouts/15/epmlive/Stylesheets/EPMLiveToolBar.css" rel="Stylesheet" type="text/css" />
+<%--<script type="text/javascript" src="../_layouts/15/epmlive/javascripts/EPMLive.js"></script>--%>
 <style type="text/css">
-      #EPMWorkspaceCenterGrid {
+    #EPMWorkspaceCenterGrid {
         margin: 10px auto;
         padding: 5px;
         position: relative;
         display: inline-block;
     }
-    #DDLView {
-       text-align:right;
-       padding-right:7px;
+
+    .workspacecentercontextmenu {
+        list-style: none;
+        cursor: pointer;
+        position: absolute;
     }
 
+        .workspacecentercontextmenu .icon-ellipsis-horizontal:after {
+            content: '...';
+            position: relative;
+            top: -10px;
+            left: 0px;
+        }
 
-</style>
-<script type="text/javascript">
-    function changeView() {
-        $("#myWorkSpace_Search").val('');
-        var source = Grids[0].Source;
-        source.Data.url = '<%= WebUrl %>/_vti_bin/WorkEngine.asmx';
-        source.Data.Function = 'Execute';
-        source.Data.Param.Function = 'GetWorkspaceCenterGridData';
-        source.Data.Param.Dataxml = $("#<%=ddWorkspaceCenterView.ClientID%>").val();
-        Grids["gridWorkSpaceCenter"].Reload(source, null, false);
-    }
+        .workspacecentercontextmenu .epm-menu-btn span {
+            font-size: 2em;
+            color: #0090CA;
+            opacity: .6;
+        }
 
-    $(document).ready(function () {
-        $("#myWorkSpace_Search").keyup(function (e) {
-            var query = $(this).val();
-            var count = GetGrids();
-            var grid = Grids["gridWorkSpaceCenter"];
-            if (query.length > 0) {
-                grid.ChangeFilter('WorkSpace', query.toLowerCase(), 11, 0, 1, null);
+            .workspacecentercontextmenu .epm-menu-btn span:hover {
+                opacity: 1;
             }
-            else {
-                grid.ChangeFilter('WorkSpace', query.toLowerCase(), 12, 0, 1, null);
+
+        .workspacecentercontextmenu ul.epm-nav-contextual-menu {
+            right: -20px !important;
+            top: -20px !important;
+        }
+
+            .workspacecentercontextmenu ul.epm-nav-contextual-menu li {
+                height: 23px;
+                line-height: 23px;
             }
-            grid.Update();
-            grid.Render();
-        });
-    });
-    function createNewWorkspace() {
-        var createNewWorkspaceUrl = "<%= WebUrl %>/_layouts/epmlive/QueueCreateWorkspace.aspx";
-        var options = {
-            url: createNewWorkspaceUrl, width: 1000, height: 600, title: 'Create', dialogReturnValueCallback: function (dialogResult, returnValue) {
-                if (dialogResult === 1) {
-                    toastr.options = {
-                        'private closeButton': false,
-                        'debug': false,
-                        'positionClass': 'toast-top-right',
-                        'onclick': null,
-                        'showDuration': '300',
-                        'hideDuration': '1000',
-                        'timeOut': '5000',
-                        'extendedTimeOut': '1000',
-                        'showEasing': 'swing',
-                        'hideEasing': 'linear',
-                        'showMethod': 'fadeIn',
-                        'hideMethod': 'fadeOut'
-                    }
-                    toastr.info('Your workspace is being created - we will notify you when it is ready.');
+
+                .workspacecentercontextmenu ul.epm-nav-contextual-menu li a {
+                    text-decoration: none;
+                    display: inline-block;
                 }
-            }
-        };
-        SP.UI.ModalDialog.showModalDialog(options);
+
+                .workspacecentercontextmenu ul.epm-nav-contextual-menu li span.epm-nav-cm-icon {
+                    top: 0px !important;
+                }
+</style>
+
+<script type="text/javascript">
+    // Start Toolbar Menu
+    $(function () {
+        ExecuteOrDelayUntilScriptLoaded(WorkspaceCenterClient.toolbarCfg(), 'EPMLive.min.js');
+    });
+
+    WorkspaceCenterClient = {
+
+        toolbarCfg: function () {
+            var cfgs = [
+                {
+                    'placement': 'left',
+                    'content': [
+                    // invite button
+                    {
+                        'controlId': 'btnNew',
+                        'controlType': 'button',
+                        'iconClass': 'fui-plus',
+                        'title': 'new item',
+                        'events': [
+                            {
+                                'eventName': 'click',
+                                'function': function () { WorkspaceCenterClient.createNewWorkspace(); },
+                            }
+                        ]
+                    }
+                    ]
+                },
+                {
+                    'placement': 'right',
+                    'content': [
+                    //search control
+                    {
+                        'controlId': 'genericId',
+                        'controlType': 'search',
+                        'custom': 'yes',
+                        'customControlId': ''
+                    },
+                    //search control
+                    {
+                        'controlId': 'myWorkSpace_Search1',
+                        'controlType': 'search',
+                        'custom': 'no',
+                        'events': [{
+                            'eventName': 'keyup',
+                            'function': function (e) {
+                                var query = $(this).val();
+                                var count = GetGrids();
+                                var grid = Grids["gridWorkSpaceCenter"];
+                                if (query.length > 0) {
+                                    grid.ChangeFilter('WorkSpace', query.toLowerCase(), 11, 0, 1, null);
+                                }
+                                else {
+                                    grid.ChangeFilter('WorkSpace', query.toLowerCase(), 12, 0, 1, null);
+                                }
+                                grid.Update();
+                                grid.Render();
+                            }
+                        }
+                        ]
+                    },
+                    //view control
+                    {
+                        'controlId': 'ddWorkspaceCenterView1',
+                        'controlType': 'dropdown',
+                        'title': 'View:',
+                        'value': 'All Items',
+                        'iconClass': 'none',
+                        'sections': [
+                            {
+                                'heading': 'none',
+                                'divider': 'yes',
+                                'options': [
+                                    {
+                                        'iconClass': 'none',
+                                        'text': 'All Items',
+                                        'events': [
+                                            {
+                                                'eventName': 'click',
+                                                'function': function () { WorkspaceCenterClient.changeView("AllItems"); }
+                                            }
+                                        ]
+
+                                    },
+                                    {
+                                        'iconClass': 'none',
+                                        'text': 'My Workspace',
+                                        'events': [
+                                            {
+                                                'eventName': 'click',
+                                                'function': function () { WorkspaceCenterClient.changeView("MyWorkspace"); }
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        'iconClass': 'none',
+                                        'text': 'My Favorite',
+                                        'events': [
+                                            {
+                                                'eventName': 'click',
+                                                'function': function () { WorkspaceCenterClient.changeView("MyFavorite"); }
+                                            }
+                                        ]
+                                    }
+
+                                ]
+                            }
+                        ]
+                    }
+                    ]
+                }
+            ];
+            alert("ToolbarTest1");
+            epmLiveGenericToolBar.generateToolBar('WorkSpacecenterToolbarMenu', cfgs);
+        },
+        changeView: function (currentView) {
+            //$("#myWorkSpace_Search").val('');
+            var source = Grids["gridWorkSpaceCenter"].Source;
+            source.Data.url = '<%= WebUrl %>/_vti_bin/WorkEngine.asmx';
+            source.Data.Function = 'Execute';
+            source.Data.Param.Function = 'GetWorkspaceCenterGridData';
+            source.Data.Param.Dataxml = currentView;
+            Grids["gridWorkSpaceCenter"].Reload(source, null, false);
+
+        },
+        createNewWorkspace: function () {
+            var createNewWorkspaceUrl = "<%= WebUrl %>/_layouts/epmlive/QueueCreateWorkspace.aspx";
+            var options = {
+                url: createNewWorkspaceUrl, width: 1000, height: 600, title: 'Create', dialogReturnValueCallback: function (dialogResult, returnValue) {
+                    if (dialogResult === 1) {
+                        toastr.options = {
+                            'private closeButton': false,
+                            'debug': false,
+                            'positionClass': 'toast-top-right',
+                            'onclick': null,
+                            'showDuration': '300',
+                            'hideDuration': '1000',
+                            'timeOut': '5000',
+                            'extendedTimeOut': '1000',
+                            'showEasing': 'swing',
+                            'hideEasing': 'linear',
+                            'showMethod': 'fadeIn',
+                            'hideMethod': 'fadeOut'
+                        }
+                        toastr.info('Your workspace is being created - we will notify you when it is ready.');
+                    }
+                }
+            };
+            SP.UI.ModalDialog.showModalDialog(options);
+        }
     }
+    Grids.OnRenderFinish = function (loadWorkspaceCenterGrid) {
+        var addContextualMenu = function () {
+            $(".workspacecentercontextmenu").each(function () {
+                window.epmLiveNavigation.addContextualMenu($(this), null, true);
+            });
+
+            $('.workspacecentercontextmenu').hover(function () {
+            }, function () {
+                $(this).find('.epm-nav-contextual-menu').hide();
+            });
+        };
+
+        ExecuteOrDelayUntilScriptLoaded(addContextualMenu, 'EPMLive.Navigation.js');
+    };
 </script>
 <div id="EPMWorkspaceCenter" style="width: 100%;">
-    <div id="btnNew">
-          <a href="javascript:createNewWorkspace();" class="ms-core-menu-root ms-textXLarge">
-              <img title="Add new" alt="" src="/_layouts/epmlive/images/newitem5.png"/>
-              new item
-          </a>
-    </div>
-    <div id="DDLView">
-        <input type="text" id="myWorkSpace_Search" class="ms-cui-tb mwg-watermark" style="width: 100px;">
-        <asp:Label ID="lblView" Text="View :" runat="server"></asp:Label>
-        <asp:DropDownList ID="ddWorkspaceCenterView" runat="server" onchange="changeView()">
-            <asp:ListItem Text="All Items" Value="AllItems" Selected="True"></asp:ListItem>
-            <asp:ListItem Text="My Workspace" Value="MyWorkspace"></asp:ListItem>
-            <asp:ListItem Text="My Favorite" Value="MyFavorite"></asp:ListItem>
-        </asp:DropDownList>
-
+    <div id="WorkSpacecenterToolbarMenu" style="width: 100%">
     </div>
     <div id="EPMWorkspaceCenterGrid" style="width: 100%; height: 400px;">
         <SharePoint:ScriptBlock ID="workspaceCenterScriptBlock1" runat="server">
