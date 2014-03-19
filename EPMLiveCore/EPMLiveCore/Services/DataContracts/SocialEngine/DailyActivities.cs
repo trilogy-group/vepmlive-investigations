@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using EPMLiveCore.SocialEngine.Core;
 
 namespace EPMLiveCore.Services.DataContracts.SocialEngine
 {
     public class DailyActivities
     {
-        #region Properties (6) 
+        #region Properties (7) 
 
         public List<Activity> activities { get; set; }
+
+        public List<ActivityThread> activityThreads { get; set; }
 
         public List<Day> days { get; set; }
 
@@ -28,8 +29,6 @@ namespace EPMLiveCore.Services.DataContracts.SocialEngine
         {
             #region Properties (8) 
 
-            public string metaData { get; set; }
-
             public Guid id { get; set; }
 
             public bool isMassOperation { get; set; }
@@ -37,6 +36,8 @@ namespace EPMLiveCore.Services.DataContracts.SocialEngine
             public string key { get; set; }
 
             public string kind { get; set; }
+
+            public string metaData { get; set; }
 
             public Guid thread { get; set; }
 
@@ -47,26 +48,47 @@ namespace EPMLiveCore.Services.DataContracts.SocialEngine
             #endregion Properties 
         }
 
-        public class Day
+        public class ActivityThread
         {
-            #region Properties (2) 
+            #region Properties (6) 
 
-            public List<Guid> threads { get; set; }
+            public string day { get; set; }
 
             public string id { get; set; }
+
+            public List<Guid> newerActivities { get; set; }
+
+            public List<Guid> previousActivities { get; set; }
+
+            public Guid thread { get; set; }
+
+            public List<Guid> todaysActivities { get; set; }
+
+            #endregion Properties 
+        }
+
+        public class Day
+        {
+            #region Properties (3) 
+
+            public List<string> activityThreads { get; set; }
+
+            public string id { get; set; }
+
+            public List<Guid> threads { get; set; }
 
             #endregion Properties 
         }
 
         public class ItemList
         {
-            #region Properties (4) 
+            #region Properties (5) 
+
+            public string icon { get; set; }
 
             public Guid id { get; set; }
 
             public string name { get; set; }
-
-            public string icon { get; set; }
 
             public List<Guid> threads { get; set; }
 
@@ -80,6 +102,8 @@ namespace EPMLiveCore.Services.DataContracts.SocialEngine
             #region Properties (11) 
 
             public List<Guid> activities { get; set; }
+
+            public List<string> activityThreads { get; set; }
 
             public List<string> days { get; set; }
 

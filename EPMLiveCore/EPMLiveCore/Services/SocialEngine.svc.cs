@@ -19,7 +19,7 @@ namespace EPMLiveCore.Services
     [AspNetCompatibilityRequirements(RequirementsMode = AspNetCompatibilityRequirementsMode.Allowed)]
     public class SocialEngine
     {
-        #region Methods (12) 
+        #region Methods (13) 
 
         // Public Methods (1) 
 
@@ -48,7 +48,8 @@ namespace EPMLiveCore.Services
                 activities = new List<DailyActivities.Activity>(),
                 webs = new List<DailyActivities.Web>(),
                 lists = new List<DailyActivities.ItemList>(),
-                users = new List<DailyActivities.User>()
+                users = new List<DailyActivities.User>(),
+                activityThreads = new List<DailyActivities.ActivityThread>()
             };
 
             var daysProcessed = new List<string>();
@@ -71,7 +72,7 @@ namespace EPMLiveCore.Services
                 var userId = (int) t["UserId"];
                 var webUrl = (string) t["WebUrl"];
                 object dateTime = t["ActivityDate"];
-                var activityDay = (((DateTime) dateTime).Date).ToString("s");
+                string activityDay = (((DateTime) dateTime).Date).ToString("s");
 
                 DailyActivities.Thread thread = BuildThread(threadId, activityDay, webId, listId, t);
 
@@ -79,14 +80,14 @@ namespace EPMLiveCore.Services
                     .Where(a => (Guid) a["ThreadId"] == threadId)
                     .OrderBy(a => a["ActivityDate"]);
 
-                foreach (var a in threadActivities)
+                foreach (DataRow a in threadActivities)
                 {
-                    var time = a["ActivityDate"];
+                    object time = a["ActivityDate"];
 
-                    var day = (((DateTime) time).Date).ToString("s");
+                    string day = (((DateTime) time).Date).ToString("s");
                     if (!thread.days.Contains(day)) thread.days.Add(day);
 
-                    var activity = BuildActivity(a, threadId, time, userId);
+                    DailyActivities.Activity activity = BuildActivity(a, threadId, time, userId);
                     if (activity == null) continue;
 
                     dailyActivities.activities.Add(activity);
@@ -106,10 +107,18 @@ namespace EPMLiveCore.Services
                 threadsProcessed.Add(threadId);
             }
 
+            OrderedParallelQuery<KeyValuePair<DateTime, List<DailyActivities.ActivityThread>>> dict =
+                BuildActivityThreads(dailyActivities);
+
+            foreach (DailyActivities.ActivityThread activityThread in dict.SelectMany(at => at.Value))
+            {
+                dailyActivities.activityThreads.Add(activityThread);
+            }
+
             return dailyActivities;
         }
 
-        // Private Methods (11) 
+        // Private Methods (12) 
 
         private static DailyActivities.Activity BuildActivity(DataRow a, Guid threadId, object dateTime, int userId)
         {
@@ -131,6 +140,69 @@ namespace EPMLiveCore.Services
             return null;
         }
 
+        private static OrderedParallelQuery<KeyValuePair<DateTime, List<DailyActivities.ActivityThread>>>
+            BuildActivityThreads(DailyActivities dailyActivities)
+        {
+            var dictionary = new Dictionary<DateTime, List<DailyActivities.ActivityThread>>();
+            var locker = new object();
+
+            Parallel.ForEach(dailyActivities.days, day =>
+            {
+                DateTime date = DateTime.Parse(day.id).Date;
+
+                foreach (Guid threadId in day.threads)
+                {
+                    var activityThread = new DailyActivities.ActivityThread
+                    {
+                        id = (threadId.ToString() + day.id).Md5(),
+                        day = day.id,
+                        thread = threadId,
+                        todaysActivities = new List<Guid>(),
+                        previousActivities = new List<Guid>(),
+                        newerActivities = new List<Guid>()
+                    };
+
+                    foreach (DailyActivities.Activity activity in dailyActivities.activities)
+                    {
+                        if (activity.thread != threadId) continue;
+
+                        DateTime activityTime = DateTime.Parse(activity.time).Date;
+
+                        if (activityTime == date)
+                        {
+                            activityThread.todaysActivities.Add(activity.id);
+                        }
+                        else if (activityTime < date)
+                        {
+                            activityThread.previousActivities.Add(activity.id);
+                        }
+                        else
+                        {
+                            activityThread.newerActivities.Add(activity.id);
+                        }
+                    }
+
+                    lock (locker)
+                    {
+                        if (!dictionary.ContainsKey(date))
+                        {
+                            dictionary.Add(date, new List<DailyActivities.ActivityThread> {activityThread});
+                        }
+                        else
+                        {
+                            dictionary[date].Add(activityThread);
+                        }
+
+                        day.activityThreads.Add(activityThread.id);
+                    }
+                }
+            });
+
+            OrderedParallelQuery<KeyValuePair<DateTime, List<DailyActivities.ActivityThread>>> dict =
+                dictionary.AsParallel().OrderByDescending(at => at.Key);
+            return dict;
+        }
+
         private static void BuildDay(List<string> daysProcessed, string activityDay, Guid threadId,
             DailyActivities dailyActivities)
         {
@@ -139,7 +211,8 @@ namespace EPMLiveCore.Services
                 var day = new DailyActivities.Day
                 {
                     id = activityDay,
-                    threads = new List<Guid> {threadId}
+                    threads = new List<Guid> {threadId},
+                    activityThreads = new List<string>()
                 };
 
                 dailyActivities.days.Add(day);
@@ -166,7 +239,7 @@ namespace EPMLiveCore.Services
 
             if (!listsProcessed.Contains(lId))
             {
-                var icon = r["ListIcon"];
+                object icon = r["ListIcon"];
                 if (icon == null || icon == DBNull.Value) icon = null;
 
                 var list = new DailyActivities.ItemList
@@ -185,7 +258,7 @@ namespace EPMLiveCore.Services
             {
                 foreach (DailyActivities.ItemList list in dailyActivities.lists.Where(list => list.id == lId))
                 {
-                    list.threads.Add(threadId);
+                    if (!list.threads.Contains(threadId)) list.threads.Add(threadId);
                     break;
                 }
             }
@@ -201,7 +274,7 @@ namespace EPMLiveCore.Services
                 url = r["ThreadUrl"] as string,
                 kind = ((ObjectKind) r["ThreadKind"]).ToString().ToUpper(),
                 lastActivityOn = ((DateTime) r["ThreadLastActivityOn"]).ToString("s"),
-                days = new List<string> { activityDay },
+                days = new List<string> {activityDay},
                 web = webId,
                 list = listId as Guid?,
                 itemId = r["ItemId"] as int?,
@@ -248,7 +321,8 @@ namespace EPMLiveCore.Services
             {
                 foreach (DailyActivities.User user in dailyActivities.users.Where(user => user.id == userId))
                 {
-                    foreach (Guid id in thread.activities)
+                    DailyActivities.User usr = user;
+                    foreach (Guid id in thread.activities.Where(id => !usr.activities.Contains(id)))
                     {
                         user.activities.Add(id);
                     }
@@ -278,7 +352,7 @@ namespace EPMLiveCore.Services
             {
                 foreach (DailyActivities.Web web in dailyActivities.webs.Where(web => web.id == webId))
                 {
-                    web.threads.Add(threadId);
+                    if (!web.threads.Contains(threadId)) web.threads.Add(threadId);
                     break;
                 }
             }
