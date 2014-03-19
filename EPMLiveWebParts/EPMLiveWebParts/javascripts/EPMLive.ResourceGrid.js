@@ -1802,7 +1802,7 @@ function registerEpmLiveResourceGridScript() {
                         {
                             'controlId': 'btnInvite',
                             'controlType': 'button',
-                            'iconClass': 'fui-plus',
+                            'iconClass': 'icon-plus-2',
                             'toolTip': 'Invite',
                             'value': 'Invite',
                             'events': [
