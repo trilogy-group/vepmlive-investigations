@@ -1718,7 +1718,7 @@ table .span12 {
     border-radius: 3px;
     margin-left: .3em;
     background-image: linear-gradient(top, #ffffff, #e6e6e6);
-    min-height: 70px;
+    min-height: 60px;
     width: 355px;
 }
 .btn:hover,
