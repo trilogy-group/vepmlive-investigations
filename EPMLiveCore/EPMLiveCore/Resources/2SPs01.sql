@@ -1021,7 +1021,8 @@ end
 
 exec(@sql)
 ')
- 
+
+
 if not exists (select routine_name from INFORMATION_SCHEMA.routines where routine_name = 'spTSGetQueue')
 begin
     Print 'Creating Stored Procedure spTSGetQueue'
@@ -1063,11 +1064,22 @@ UPDATE CTE2 SET QUEUE='''''' + @servername + '''''', status=1
 
 exec(@sql)
 
-SELECT * FROM TSQUEUE WHERE QUEUE = @servername and STATUS = 1
-UPDATE TSQUEUE SET STATUS = 2 WHERE QUEUE = @servername and STATUS = 1
+SELECT     dbo.TSTIMESHEET.USERNAME, dbo.TSTIMESHEET.RESOURCENAME, dbo.TSTIMESHEET.PERIOD_ID, dbo.TSTIMESHEET.LOCKED, dbo.TSTIMESHEET.SITE_UID, 
+                      dbo.TSTIMESHEET.SUBMITTED, dbo.TSTIMESHEET.APPROVAL_STATUS, dbo.TSTIMESHEET.TSUSER_UID, dbo.TSTIMESHEET.APPROVAL_DATE, 
+                      dbo.TIMERJOBTYPES.NetAssembly, dbo.TIMERJOBTYPES.NetClass, dbo.TSQUEUE.TSQUEUE_ID, dbo.TSQUEUE.TS_UID, dbo.TSQUEUE.STATUS, 
+                      dbo.TSQUEUE.QUEUE, dbo.TSQUEUE.JOBTYPE_ID, dbo.TSQUEUE.RESULTTEXT, dbo.TSQUEUE.RESULT, 
+                      dbo.TSQUEUE.USERID, dbo.TSQUEUE.DTCREATED, dbo.TSQUEUE.DTSTARTED, 
+                      dbo.TSQUEUE.DTFINISHED, dbo.TSQUEUE.JOBDATA, dbo.TSQUEUE.PERCENTCOMPLETE, dbo.TSQUEUE.GRIDDATA
+FROM         dbo.TSQUEUE INNER JOIN
+                      dbo.TSTIMESHEET ON dbo.TSQUEUE.TS_UID = dbo.TSTIMESHEET.TS_UID INNER JOIN
+                      dbo.TIMERJOBTYPES ON dbo.TSQUEUE.JOBTYPE_ID = dbo.TIMERJOBTYPES.JOBTYPE_ID
+WHERE QUEUE = @servername and STATUS = 1
+
+UPDATE TSQUEUE SET STATUS = 2,PERCENTCOMPLETE=0 WHERE QUEUE = @servername and STATUS = 1
 
 END
 ')
+ 
 
 if not exists (select routine_name from INFORMATION_SCHEMA.routines where routine_name = 'spTSGetApprovedTimesheets')
 begin
