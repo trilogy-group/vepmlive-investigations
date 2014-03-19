@@ -38,6 +38,9 @@
 		padding-right:5px;
 		text-align:left;
 	}
+    .titletd span {
+        font-family:"Open Sans Semi Bold",Helvetica,Arial;        
+    }
     .btn
     {
         height: 100% !important;
@@ -229,7 +232,7 @@ font-family: Open Sans Regular, Helvetica;
             <input type="checkbox" value="setdefault" id="chkDefault" name="chkDefault" /><label for="chkDefault"></label>
 	    <font style="position:relative;top:-1px;color:#666666;">Use as default planner</font>
         </div><br />
-        <div style="text-align:center;max-height:600px;overflow:auto" class="wizardBoxes">
+        <div style="text-align:center;max-height:600px;overflow:auto;font-family:'Open Sans Regular',Helvetica,Arial;" class="wizardBoxes">
             <%=sOutputHtml %>
         </div>
         

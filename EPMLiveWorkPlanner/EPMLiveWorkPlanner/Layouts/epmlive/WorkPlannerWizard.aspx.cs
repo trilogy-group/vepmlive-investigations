@@ -117,9 +117,9 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                 sb.Append(((Web.ServerRelativeUrl == "/") ? "" : Web.ServerRelativeUrl));
                 sb.Append(icon);
                 sb.Append("\"></td>");
-                sb.Append("<td class=\"titletd\"><b>");
+                sb.Append("<td class=\"titletd\"><span>");
                 sb.Append(plannername);
-                sb.Append("</b>");
+                sb.Append("</span>");
                 if (desc != "")
                 {
                     sb.Append("<div style=\"padding-top: 5px;padding-bottom:10px;padding-right:5px;work-wrap:break-word;\">");
@@ -139,10 +139,10 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                 sb.Append("<img style=\"margin-top:2px;width:60px;\" src=\"");
                 sb.Append(((Web.ServerRelativeUrl == "/") ? "" : Web.ServerRelativeUrl));
                 sb.Append("/_layouts/images/planner_project.png\"></td>");
-                sb.Append("<td class=\"titletd\"><b>");
+                sb.Append("<td class=\"titletd\"><span>");
                 sb.Append(plannername);
                 if (plannername == "Microsoft Project" || plannerid == "MPP")
-                    sb.Append("</b>");
+                    sb.Append("</span>");
                 else
                     sb.Append(" for Microsoft Project</b>");
                 if (desc != "")
@@ -162,9 +162,9 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                 sb.Append("<img style=\"margin-top:2px;width:60px;\" src=\"");
                 sb.Append(((Web.ServerRelativeUrl == "/") ? "" : Web.ServerRelativeUrl));
                 sb.Append("/_layouts/images/planner_kanban.png\"></td>");
-                sb.Append("<td class=\"titletd\"><b>");
+                sb.Append("<td class=\"titletd\"><span>");
                 sb.Append(plannername);
-                sb.Append("</b>");
+                sb.Append("</span>");
                 if (desc != "")
                 {
                     sb.Append("<div style=\"padding-top: 5px;padding-bottom:10px;padding-right:5px;work-wrap:break-word;\">");
