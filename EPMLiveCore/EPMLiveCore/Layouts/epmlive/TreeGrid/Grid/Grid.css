@@ -42,7 +42,7 @@
 .GMHeaderRow:hover { background-color: #FFF; }
 
 .gridmenuspan {margin-left:-160px; text-align:right;width:170px;}
-.GMDataRow .GMRightHtml .epm-menu-btn { display: none; }
+
 .GMDataRow:hover .GMRightHtml .epm-menu-btn { display: inline-block; }
 
 .epm-nav-contextual-menu { text-align:left; }
@@ -103,7 +103,7 @@ top:4px;
 .GMCell,.GMCellPanel,.GMCellFilter,.GMCellFilterPanel,.GMCellHeaderPanel,.GMCellFilterPanel,
 .GMHeaderDrag,.GMHeaderGroup,.GMCellUser,.GMCellEmpty,.GMCellHeaderEmpty { 
 	border-top:0px solid #ffffff; border-bottom:1px solid #FAFAFA; border-left:0px solid #ffffff; border-right:0px solid #B1B5BA;
-	vertical-align:top; white-space:nowrap; overflow:hidden; overflow:auto!IE; height:auto; padding: 8px;
+	vertical-align:top; white-space:nowrap; overflow:hidden; overflow:auto!IE; height:auto; padding: 8px; position:relative;
 	}
 .GMCellHeaderPanel { padding-top:2px; }
 
@@ -151,8 +151,8 @@ top:4px;
 /* ------------- Inside cell ------------- */
 
 .GMHtml,.GMText,.GMLines,.GMPass,.GMInt,.GMFloat,.GMDate,.GMLink,.GMImg,.GMRadio,.GMRadioText,.GMList,.GMEnum,.GMDropCols,.GMAbs,.GMPagerEdit,.GMUser,.GMGantt {
-   font-size:14px; "Open Sans Light", Helvetica, Arial, sans-serif; white-space:nowrap;
-   padding-left:3px; padding-right:3px; padding-top:8px; padding-bottom:8px;height: 20px;line-height: 20px;
+   font-size:14px; "Open Sans", Helvetica, Arial, sans-serif; white-space:nowrap;
+   padding-left:3px; padding-right:3px; padding-top:8px; padding-bottom:8px;height: 20px;line-height: 20px;position:relative
 color: #555
    }
 .GMInt,.GMFloat,.GMDate { text-align:right; }
@@ -177,7 +177,7 @@ color: #555
    padding-top:2px; padding-bottom:1px; border:0px none;
    }
 .GMRightButton { font:10px "Times New Roman"; padding:0px; height:17px; width:19px; margin:0px; }
-.GMRightHtml { font:12px "Times New Roman"; }
+.GMRightHtml { font:12px "Times New Roman"; overflow:visible !important; }
 .GMRightImg { font:12px "Times New Roman"; }
 .GMMergedCellH { padding:0px; padding-right:5px; }
 .GMMergedCellV { padding:0px; padding-bottom:1px; }
