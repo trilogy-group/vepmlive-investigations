@@ -262,6 +262,12 @@
             Persistent Search: When this is turned on the search functionality will apply to all views during your session in a list.<br /><br />
             Associated Items: When enabled, the ribbon will contain a link to associated lists.<br /><br />
             New Form Redirect: When enabled, users will be redirected to the display form when they submit a new item.<br /><br />
+            Ribbon Behaviour:  The Ribbon Behaviour will determine how the list view ribbon is displayed in the views of this List. <br />
+            <ul>
+            <li>Automatic - This option will allow ribbon to behave like it currenlty does.<br /><br /></li>
+            <li>Manual - This option will hide the ribbon by default and it can be seen using show button in the upper left hand corner of the view.<br /><br /></li>
+            <li>Hidden - This option will hide the ribbon and will not be able to be shown.<br /><br /></li>            
+            </ul>
 		</Template_Description>
 		<Template_InputFormControls>
 		    <wssuc:InputFormControl LabelText="Item Link Type" runat="server">
@@ -313,6 +319,15 @@
 				 </Template_Control>
 			</wssuc:InputFormControl>
             
+             <wssuc:InputFormControl LabelText="Ribbon Behaviour" runat="server">
+				 <Template_Control>
+                    <asp:DropDownList ID="ddlRibbonBehaviour" runat="server">
+                        <asp:ListItem Text="Automatic" Value="0"></asp:ListItem>
+                        <asp:ListItem Text="Manual" Value="1"></asp:ListItem>
+                        <asp:ListItem Text="Hidden" Value="2"></asp:ListItem>
+                    </asp:DropDownList>
+				 </Template_Control>
+			</wssuc:InputFormControl>
 		</Template_InputFormControls>
 	</wssuc:InputFormSection>
 
