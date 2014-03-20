@@ -5,6 +5,13 @@ BEGIN
 	CREATE TABLE [dbo].[ReportListIds] ( Id uniqueidentifier )
 END
 
+IF NOT EXISTS (SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'ReportListIds' AND COLUMN_NAME = 'ListIcon')
+BEGIN
+	PRINT 'Add Column ListIcon'
+	ALTER TABLE [dbo].[ReportListIds]
+	ADD [ListIcon] [NVARCHAR](100) NULL
+END
+
 ---------------TABLE: RPTWeb----------------------
 IF NOT EXISTS (SELECT TABLE_NAME FROM INFORMATION_SCHEMA.tables WHERE TABLE_NAME = 'RPTWeb')
 BEGIN

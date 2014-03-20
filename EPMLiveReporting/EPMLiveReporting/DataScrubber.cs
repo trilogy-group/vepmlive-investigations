@@ -4,6 +4,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using Microsoft.SharePoint;
+using EPMLiveCore;
 
 namespace EPMLiveReportsAdmin
 {
@@ -30,7 +31,8 @@ namespace EPMLiveReportsAdmin
             var listNames = new DataTable();
 
             var listIds = new DataTable();
-            listIds.Columns.Add(new DataColumn("Id", typeof (Guid)));
+            listIds.Columns.Add(new DataColumn("Id", typeof(Guid)));
+            listIds.Columns.Add(new DataColumn("ListIcon", typeof(String)));
 
             var rptWeb = new DataTable();
             rptWeb.Columns.Add(new DataColumn("SiteId", typeof (Guid)));
@@ -173,10 +175,12 @@ namespace EPMLiveReportsAdmin
                                     if (!string.IsNullOrEmpty(sName))
                                     {
                                         SPList tempList = w.Lists.TryGetList(sName);
+                                        var gSettings = new GridGanttSettings(tempList);
                                         if (tempList != null)
                                         {
                                             DataRow dr = listIds.Rows.Add();
                                             dr["Id"] = tempList.ID;
+                                            dr["ListIcon"] = gSettings.ListIcon;
                                         }
                                     }
                                 }
@@ -209,6 +213,7 @@ namespace EPMLiveReportsAdmin
                             {
                                 sbc.DestinationTableName = "ReportListIds";
                                 sbc.ColumnMappings.Add("Id", "Id");
+                                sbc.ColumnMappings.Add("ListIcon", "ListIcon");
                                 sbc.WriteToServer(listIds);
                                 sbc.Close();
                                 tx.Commit();
