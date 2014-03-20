@@ -72,7 +72,7 @@ namespace EPMLiveCore.SocialEngine.Core
                     {
                         sqlCommand.Parameters.AddWithValue("@Id", id);
                         sqlCommand.Parameters.AddWithValue("@Message", message);
-                        sqlCommand.Parameters.AddWithValue("@StackTrace", stackTrace);
+                        sqlCommand.Parameters.AddWithValue("@StackTrace", stackTrace ?? string.Empty);
                         sqlCommand.Parameters.AddWithValue("@Details", details.ToString());
                         sqlCommand.Parameters.AddWithValue("@Kind", kind);
                         sqlCommand.Parameters.AddWithValue("@WebId", spWeb.ID);
