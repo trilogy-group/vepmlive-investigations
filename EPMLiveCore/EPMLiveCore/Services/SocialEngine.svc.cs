@@ -38,18 +38,9 @@ namespace EPMLiveCore.Services
 
             GetActivities(activityRows, spWeb, minDate.Value, maxDate, PAGE, LIMIT);
 
-            if (!activityRows.Any()) return null;
+            var dailyActivities = new DailyActivities();
 
-            var dailyActivities = new DailyActivities
-            {
-                days = new List<DailyActivities.Day>(),
-                threads = new List<DailyActivities.Thread>(),
-                activities = new List<DailyActivities.Activity>(),
-                webs = new List<DailyActivities.Web>(),
-                lists = new List<DailyActivities.ItemList>(),
-                users = new List<DailyActivities.User>(),
-                activityThreads = new List<DailyActivities.ActivityThread>()
-            };
+            if (!activityRows.Any()) return dailyActivities;
 
             var daysProcessed = new List<string>();
             var threadsProcessed = new List<Guid>();
@@ -256,11 +247,15 @@ namespace EPMLiveCore.Services
                 object icon = r["ListIcon"];
                 if (icon == null || icon == DBNull.Value) icon = null;
 
+                var listUrl =
+                    string.Format("{0}/_layouts/15/epmlive/redirectionproxy.aspx?action=gotolist&webid={1}&listid={2}",
+                        r["WebUrl"], r["WebId"], lId);
+
                 var list = new DailyActivities.ItemList
                 {
                     id = lId,
                     name = r["ListName"] as string,
-                    url = r["ListUrl"] as string,
+                    url = listUrl,
                     icon = icon as string,
                     threads = new List<Guid> {threadId}
                 };

@@ -160,6 +160,9 @@ namespace EPMLiveCore.SocialEngine.Core
                                 if (value != null && value != DBNull.Value)
                                     thread.LastActivityDateTime = (DateTime) value;
                                 break;
+                            case "FirstActivityDateTime":
+                                thread.FirstActivityDateTime = (DateTime) value;
+                                break;
                             case "WebId":
                                 thread.WebId = (Guid?) value;
                                 break;
@@ -352,7 +355,8 @@ namespace EPMLiveCore.SocialEngine.Core
             thread.Id = Guid.NewGuid();
 
             const string SQL =
-                @"INSERT INTO SS_Threads (Id, Title, URL, Kind, WebId, ListId, ItemId) VALUES (@Id, @Title, @URL, @Kind, @WebId, @ListId, @ItemId)";
+                @"INSERT INTO SS_Threads (Id, Title, URL, Kind, FirstActivityDateTime, WebId, ListId, ItemId) 
+                                    VALUES (@Id, @Title, @URL, @Kind, @FirstActivityDateTime, @WebId, @ListId, @ItemId)";
 
             using (SqlCommand sqlCommand = GetSqlCommand(SQL))
             {
@@ -360,6 +364,7 @@ namespace EPMLiveCore.SocialEngine.Core
                 sqlCommand.Parameters.AddWithValue("@Title", thread.Title);
                 sqlCommand.Parameters.AddWithValue("@URL", thread.Url);
                 sqlCommand.Parameters.AddWithValue("@Kind", thread.Kind);
+                sqlCommand.Parameters.AddWithValue("@FirstActivityDateTime", thread.FirstActivityDateTime);
                 sqlCommand.Parameters.AddWithValue("@WebId", thread.WebId);
                 sqlCommand.Parameters.AddWithValue("@ListId",
                     thread.ListId.HasValue ? (object) thread.ListId : DBNull.Value);

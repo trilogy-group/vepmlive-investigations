@@ -11,6 +11,8 @@
 <script type="text/x-handlebars" data-template-name="index">
     {{#each controller.days}}
         {{render 'day' this}}
+    {{else}}
+        You do not have any activities yet!
     {{/each}}
 </script>
 

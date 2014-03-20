@@ -358,11 +358,14 @@ namespace EPMLiveCore.SocialEngine.Modules
 
             var webId = (Guid) data["WebId"];
 
+            var activityDateTime = (DateTime) data["ActivityTime"];
+
             Thread thread = threadManager.SaveThread(new Thread
             {
                 Title = (string) data["Title"],
                 Url = (string) data["URL"],
                 Kind = ObjectKind.ListItem,
+                FirstActivityDateTime = activityDateTime,
                 WebId = webId,
                 ListId = (Guid) data["ListId"],
                 ItemId = (int) data["Id"]
@@ -377,7 +380,7 @@ namespace EPMLiveCore.SocialEngine.Modules
                 Kind = args.ActivityKind,
                 UserId = (int) data["UserId"],
                 Thread = thread,
-                Date = (DateTime) data["ActivityTime"]
+                Date = activityDateTime
             });
 
             data.Add("#!Activity", activity);

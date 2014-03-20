@@ -54,11 +54,14 @@ namespace EPMLiveCore.SocialEngine.Modules
         {
             var webId = (Guid) data["Id"];
 
+            var activityDateTime = (DateTime) data["ActivityTime"];
+
             Thread thread = threadManager.SaveThread(new Thread
             {
                 Title = (string) data["Title"],
                 Url = (string) data["URL"],
                 Kind = ObjectKind.Workspace,
+                FirstActivityDateTime = activityDateTime,
                 WebId = webId,
                 Users = new[] {new User {Id = (int) data["UserId"], Role = UserRole.Author}}
             });
@@ -68,7 +71,7 @@ namespace EPMLiveCore.SocialEngine.Modules
                 Kind = activityKind,
                 UserId = (int) data["UserId"],
                 Thread = thread,
-                Date = (DateTime) data["ActivityTime"]
+                Date = activityDateTime
             });
 
             Guid streamId = streamManager.GetGlobalStreamId(webId);

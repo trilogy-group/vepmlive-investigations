@@ -6,11 +6,13 @@ namespace EPMLiveCore.SocialEngine.Entities
 {
     public class Thread
     {
-        #region Properties (11) 
+        #region Properties (12) 
 
         public List<Activity> Activities { get; set; }
 
         public bool Deleted { get; set; }
+
+        public DateTime FirstActivityDateTime { get; set; }
 
         public Guid Id { get; set; }
 

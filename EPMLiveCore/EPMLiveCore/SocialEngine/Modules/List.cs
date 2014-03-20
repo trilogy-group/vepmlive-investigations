@@ -79,6 +79,8 @@ namespace EPMLiveCore.SocialEngine.Modules
 
             var webId = (Guid) data["WebId"];
 
+            var activityDateTime = (DateTime) data["ActivityTime"];
+
             Thread thread = threadManager.SaveThread(new Thread
             {
                 Title = string.Empty,
@@ -86,6 +88,7 @@ namespace EPMLiveCore.SocialEngine.Modules
                 Kind = ObjectKind.List,
                 WebId = webId,
                 ListId = (Guid) data["Id"],
+                FirstActivityDateTime = activityDateTime,
                 Users = new[] {new User {Id = (int) data["UserId"], Role = UserRole.Author}}
             });
 
@@ -94,7 +97,7 @@ namespace EPMLiveCore.SocialEngine.Modules
                 Kind = args.ActivityKind,
                 UserId = (int) data["UserId"],
                 Thread = thread,
-                Date = (DateTime) data["ActivityTime"]
+                Date = activityDateTime
             };
 
             activity.SetData(new {totalActivities = data["TotalActivities"]});
@@ -116,11 +119,14 @@ namespace EPMLiveCore.SocialEngine.Modules
 
             var webId = (Guid) data["WebId"];
 
+            var activityDateTime = (DateTime) data["ActivityTime"];
+
             Thread thread = threadManager.SaveThread(new Thread
             {
                 Title = (string) data["Title"],
                 Url = (string) data["URL"],
                 Kind = ObjectKind.List,
+                FirstActivityDateTime = activityDateTime,
                 WebId = webId,
                 ListId = (Guid) data["Id"],
                 Users = new[] {new User {Id = (int) data["UserId"], Role = UserRole.Author}}
@@ -131,7 +137,7 @@ namespace EPMLiveCore.SocialEngine.Modules
                 Kind = args.ActivityKind,
                 UserId = (int) data["UserId"],
                 Thread = thread,
-                Date = (DateTime) data["ActivityTime"]
+                Date = activityDateTime
             });
 
             Guid streamId = streamManager.GetGlobalStreamId(webId);

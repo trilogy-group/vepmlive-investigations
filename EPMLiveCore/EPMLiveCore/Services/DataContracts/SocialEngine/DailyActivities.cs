@@ -5,6 +5,21 @@ namespace EPMLiveCore.Services.DataContracts.SocialEngine
 {
     public class DailyActivities
     {
+        #region Constructors (1) 
+
+        public DailyActivities()
+        {
+            activities = new List<Activity>();
+            activityThreads = new List<ActivityThread>();
+            days = new List<Day>();
+            lists = new List<ItemList>();
+            threads = new List<Thread>();
+            users = new List<User>();
+            webs = new List<Web>();
+        }
+
+        #endregion Constructors 
+
         #region Properties (7) 
 
         public List<Activity> activities { get; set; }
