@@ -77,7 +77,7 @@ namespace EPMLiveCore.Services
                     string day = (((DateTime) time).Date).ToString("s");
                     if (!thread.days.Contains(day)) thread.days.Add(day);
 
-                    DailyActivities.Activity activity = BuildActivity(a, threadId, time, userId);
+                    DailyActivities.Activity activity = BuildActivity(a, threadId, time, (int) a["UserId"]);
                     if (activity == null) continue;
 
                     dailyActivities.activities.Add(activity);
