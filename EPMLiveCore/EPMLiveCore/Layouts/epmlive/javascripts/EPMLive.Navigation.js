@@ -1982,7 +1982,7 @@
                     var siteId = $a.data('siteid');
                     var webId = $a.data('webid');
                     var listId = $a.data('listid');
-                    var listIdd = listId.replace(/-/g,"");
+                    var listIdd = (listId || '').replace(/-/g, '');
                     var itemId = $a.data('itemid');
                     //var $menu = $($li.find('.epm-nav-contextual-menu').get(0));
                     var $menu = $('#menu' + listIdd + itemId);
