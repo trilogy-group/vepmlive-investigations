@@ -94,7 +94,7 @@
         {{user-avatar user=activity.user classNames='avatar'}}
     </div>
     <div class="activity-detail">
-        <a {{bind-attr href='activity.user.profileUrl'}} class="user" target="_blank">{{activity.user.displayName}}</a> <span>&nbsp;-&nbsp;</span> <div class="details">{{{activity.comment}}}</div>
+        <a {{bind-attr href='activity.user.profileUrl'}} class="user" target="_blank">{{activity.user.displayName}}</a>&nbsp;-&nbsp;{{{activity.comment}}}
     </div>
     <div class="activity-info">
         {{activity-time activity=activity classNames='time-wrap' tagName='span'}}
