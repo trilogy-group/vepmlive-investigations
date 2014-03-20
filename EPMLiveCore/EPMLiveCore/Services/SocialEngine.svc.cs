@@ -284,6 +284,7 @@ namespace EPMLiveCore.Services
                 web = webId,
                 list = listId as Guid?,
                 itemId = r["ItemId"] as int?,
+                isMassOperation = (bool) r["IsMassOperation"],
                 activities = new List<Guid>(),
                 activityThreads = new List<string>()
             };
@@ -385,9 +386,9 @@ namespace EPMLiveCore.Services
                     }
                     else
                     {
-                        if (rows.AsParallel().Any(
-                            x => !((bool) x["IsMassOperation"]) &&
-                                 (int) x["ActivityKind"] != (int) ActivityKind.BulkOperation))
+                        if (rows.AsParallel()
+                            .Count(x => !((bool) x["IsMassOperation"]) && x["ThreadId"] == r["ThreadId"] &&
+                                        (int) x["ActivityKind"] != (int) ActivityKind.BulkOperation) > 1)
                         {
                             activityRows.Add(r);
                         }

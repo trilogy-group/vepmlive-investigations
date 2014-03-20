@@ -99,7 +99,7 @@ namespace EPMLiveCore.Services.DataContracts.SocialEngine
 
         public class Thread
         {
-            #region Properties (11) 
+            #region Properties (12) 
 
             public List<Guid> activities { get; set; }
 
@@ -108,6 +108,8 @@ namespace EPMLiveCore.Services.DataContracts.SocialEngine
             public List<string> days { get; set; }
 
             public Guid id { get; set; }
+
+            public bool isMassOperation { get; set; }
 
             public int? itemId { get; set; }
 
