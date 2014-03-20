@@ -19,7 +19,9 @@ namespace EPMLiveCore.SocialEngine.Events.WebEventReceiver
         /// </summary>
         public override void WebDeleting(SPWebEventProperties properties)
         {
-            SocialEngine.Current.ProcessActivity(ObjectKind.Workspace, ActivityKind.Deleted,
+            try
+            {
+                SocialEngine.Current.ProcessActivity(ObjectKind.Workspace, ActivityKind.Deleted,
                 new Dictionary<string, object>
                 {
                     {"Id", properties.WebId},
@@ -28,6 +30,8 @@ namespace EPMLiveCore.SocialEngine.Events.WebEventReceiver
                     {"UserId", properties.Web.CurrentUser.ID},
                     {"ActivityTime", DateTime.Now}
                 }, properties.Web);
+            }
+            catch { }
         }
 
         /// <summary>
@@ -35,7 +39,9 @@ namespace EPMLiveCore.SocialEngine.Events.WebEventReceiver
         /// </summary>
         public override void WebProvisioned(SPWebEventProperties properties)
         {
-            SocialEngine.Current.ProcessActivity(ObjectKind.Workspace, ActivityKind.Created,
+            try
+            {
+                SocialEngine.Current.ProcessActivity(ObjectKind.Workspace, ActivityKind.Created,
                 new Dictionary<string, object>
                 {
                     {"Id", properties.WebId},
@@ -44,6 +50,8 @@ namespace EPMLiveCore.SocialEngine.Events.WebEventReceiver
                     {"UserId", properties.Web.CurrentUser.ID},
                     {"ActivityTime", DateTime.Now}
                 }, properties.Web);
+            }
+            catch { }
         }
 
         #endregion Methods 

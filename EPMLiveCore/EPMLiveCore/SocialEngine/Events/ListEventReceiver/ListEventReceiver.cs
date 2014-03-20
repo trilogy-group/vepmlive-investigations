@@ -19,10 +19,12 @@ namespace EPMLiveCore.SocialEngine.Events.ListEventReceiver
         /// </summary>
         public override void ListAdded(SPListEventProperties properties)
         {
-            if (!properties.List.Hidden)
+            try
             {
-                SocialEngine.Current.ProcessActivity(ObjectKind.List, ActivityKind.Created,
-                    new Dictionary<string, object>
+                if (!properties.List.Hidden)
+                {
+                    SocialEngine.Current.ProcessActivity(ObjectKind.List, ActivityKind.Created,
+                        new Dictionary<string, object>
                     {
                         {"Id", properties.ListId},
                         {"Title", properties.ListTitle},
@@ -31,7 +33,9 @@ namespace EPMLiveCore.SocialEngine.Events.ListEventReceiver
                         {"UserId", properties.Web.CurrentUser.ID},
                         {"ActivityTime", DateTime.Now}
                     }, properties.Web);
+                }
             }
+            catch { }
         }
 
         /// <summary>
@@ -39,10 +43,12 @@ namespace EPMLiveCore.SocialEngine.Events.ListEventReceiver
         /// </summary>
         public override void ListDeleting(SPListEventProperties properties)
         {
-            if (!properties.List.Hidden)
+            try
             {
-                SocialEngine.Current.ProcessActivity(ObjectKind.List, ActivityKind.Deleted,
-                    new Dictionary<string, object>
+                if (!properties.List.Hidden)
+                {
+                    SocialEngine.Current.ProcessActivity(ObjectKind.List, ActivityKind.Deleted,
+                        new Dictionary<string, object>
                     {
                         {"Id", properties.ListId},
                         {"Title", properties.ListTitle},
@@ -51,7 +57,9 @@ namespace EPMLiveCore.SocialEngine.Events.ListEventReceiver
                         {"UserId", properties.Web.CurrentUser.ID},
                         {"ActivityTime", DateTime.Now}
                     }, properties.Web);
+                }
             }
+            catch { }
         }
 
         #endregion Methods 
