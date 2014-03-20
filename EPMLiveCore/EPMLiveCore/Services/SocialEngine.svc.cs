@@ -85,13 +85,14 @@ namespace EPMLiveCore.Services
                     thread.activities.Add(activity.id);
 
                     DataRow th = t;
+                    DataRow ac = a;
 
                     var tasks = new[]
                     {
                         Task.Factory.StartNew(() => BuildDay(daysProcessed, day, threadId, dailyActivities)),
                         Task.Factory.StartNew(() => BuildWeb(websProcessed, webId, webUrl, threadId, dailyActivities, th)),
                         Task.Factory.StartNew(() => BuildList(listId, listsProcessed, threadId, dailyActivities, th)),
-                        Task.Factory.StartNew(() => BuildUser(usersProcessed, userId, thread, dailyActivities, th))
+                        Task.Factory.StartNew(() => BuildUser(usersProcessed, userId, thread, dailyActivities, ac))
                     };
 
                     Task.WaitAll(tasks);
