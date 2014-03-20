@@ -49,7 +49,7 @@ namespace EPMLiveCore.API
                         var queryExecutor = new EPMLiveCore.ReportingProxy.QueryExecutor(spWeb);
                         if (queryExecutor != null)
                         {
-                            sqlquery = string.Format("Select l1.WorkType as WORKTYPE,COUNT(l1.WorkType) as WORKTYPECOUNT,l1.ListId as RPTLISTID, isnull(l2.Icon,'') as RPTLISTICON FROM LSTMyWork l1 left join RPTListInfo l2 on l1.ListId = l2.listid where l1.AssignedToText = '{0}' and l1.Siteid = '{1}' and l1.WebId = '{2}' and (l1.Complete <> 1 or l1.Complete is null) GROUP BY l1.WorkType, l1.ListId, l2.Icon Order by l1.WorkType", currentUser, siteId, webID);
+                            sqlquery = string.Format("Select l1.WorkType as WORKTYPE,COUNT(l1.WorkType) as WORKTYPECOUNT,l1.ListId as RPTLISTID, isnull(l2.ListIcon,'') as RPTLISTICON FROM LSTMyWork l1 left join ReportListIds l2 on l1.ListId = l2.id where l1.AssignedToText = '{0}' and l1.Siteid = '{1}' and l1.WebId = '{2}' and (l1.Complete <> 1 or l1.Complete is null) GROUP BY l1.WorkType, l1.ListId, l2.ListIcon Order by l1.WorkType", currentUser, siteId, webID);
                             dtMyWorkSummary = queryExecutor.ExecuteReportingDBQuery(sqlquery, new Dictionary<string, object> { });
                         }
 
