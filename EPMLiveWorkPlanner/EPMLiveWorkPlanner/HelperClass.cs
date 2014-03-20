@@ -52,6 +52,7 @@ namespace EPMLiveWorkPlanner
             public string val;
         }
 
+        [Serializable]
         public class WorkPlannerProperties
         {
 
