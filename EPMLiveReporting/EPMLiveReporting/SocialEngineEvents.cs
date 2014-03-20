@@ -16,70 +16,82 @@ namespace EPMLiveReportsAdmin
 
         public static void ItemAdded(SPItemEventProperties properties)
         {
-            if (InTransaction(properties)) return;
-
-            var data = new Dictionary<string, object>
+            try
             {
-                {"Id", properties.ListItemId},
-                {"Title", properties.ListItem.Title},
-                {"URL", properties.List.Forms[PAGETYPE.PAGE_DISPLAYFORM].Url + "?ID=" + properties.ListItemId},
-                {"ListTitle", properties.ListTitle},
-                {"ListId", properties.ListId},
-                {"WebId", properties.Web.ID},
-                {"SiteId", properties.SiteId},
-                {"UserId", new SPFieldUserValue(properties.Web, (string) properties.ListItem["Author"]).LookupId},
-                {"ActivityTime", properties.ListItem["Created"]}
-            };
+                if (InTransaction(properties)) return;
 
-            GetAssignedToUsers(properties, data);
-            GetAssociatedListItems(properties, data);
+                var data = new Dictionary<string, object>
+                {
+                    {"Id", properties.ListItemId},
+                    {"Title", properties.ListItem.Title},
+                    {"URL", properties.List.Forms[PAGETYPE.PAGE_DISPLAYFORM].Url + "?ID=" + properties.ListItemId},
+                    {"ListTitle", properties.ListTitle},
+                    {"ListId", properties.ListId},
+                    {"WebId", properties.Web.ID},
+                    {"SiteId", properties.SiteId},
+                    {"UserId", new SPFieldUserValue(properties.Web, (string) properties.ListItem["Author"]).LookupId},
+                    {"ActivityTime", properties.ListItem["Created"]}
+                };
 
-            SocialEngineProxy.ProcessActivity(ObjectKind.ListItem, ActivityKind.Created, data, properties.Web);
+                GetAssignedToUsers(properties, data);
+                GetAssociatedListItems(properties, data);
+
+                SocialEngineProxy.ProcessActivity(ObjectKind.ListItem, ActivityKind.Created, data, properties.Web);
+            }
+            catch { }
         }
 
         public static void ItemDeleting(SPItemEventProperties properties)
         {
-            if (InTransaction(properties)) return;
-
-            var data = new Dictionary<string, object>
+            try
             {
-                {"Id", properties.ListItemId},
-                {"Title", properties.ListItem.Title},
-                {"URL", properties.List.Forms[PAGETYPE.PAGE_DISPLAYFORM].Url + "?ID=" + properties.ListItemId},
-                {"ListTitle", properties.ListTitle},
-                {"ListId", properties.ListId},
-                {"WebId", properties.Web.ID},
-                {"SiteId", properties.SiteId},
-                {"UserId", properties.Web.CurrentUser.ID},
-                {"ActivityTime", DateTime.Now}
-            };
+                if (InTransaction(properties)) return;
 
-            GetAssociatedListItems(properties, data);
+                var data = new Dictionary<string, object>
+                {
+                    {"Id", properties.ListItemId},
+                    {"Title", properties.ListItem.Title},
+                    {"URL", properties.List.Forms[PAGETYPE.PAGE_DISPLAYFORM].Url + "?ID=" + properties.ListItemId},
+                    {"ListTitle", properties.ListTitle},
+                    {"ListId", properties.ListId},
+                    {"WebId", properties.Web.ID},
+                    {"SiteId", properties.SiteId},
+                    {"UserId", properties.Web.CurrentUser.ID},
+                    {"ActivityTime", DateTime.Now}
+                };
 
-            SocialEngineProxy.ProcessActivity(ObjectKind.ListItem, ActivityKind.Deleted, data, properties.Web);
+                GetAssociatedListItems(properties, data);
+
+                SocialEngineProxy.ProcessActivity(ObjectKind.ListItem, ActivityKind.Deleted, data, properties.Web);
+            }
+            catch { }
         }
 
         public static void ItemUpdated(SPItemEventProperties properties)
         {
-            if (InTransaction(properties)) return;
-
-            var data = new Dictionary<string, object>
+            try
             {
-                {"Id", properties.ListItemId},
-                {"Title", properties.ListItem.Title},
-                {"URL", properties.List.Forms[PAGETYPE.PAGE_DISPLAYFORM].Url + "?ID=" + properties.ListItemId},
-                {"ListTitle", properties.ListTitle},
-                {"ListId", properties.ListId},
-                {"WebId", properties.Web.ID},
-                {"SiteId", properties.SiteId},
-                {"UserId", new SPFieldUserValue(properties.Web, (string) properties.ListItem["Editor"]).LookupId},
-                {"ActivityTime", properties.ListItem["Modified"]}
-            };
+                if (InTransaction(properties)) return;
 
-            GetAssignedToUsers(properties, data);
-            GetAssociatedListItems(properties, data);
+                var data = new Dictionary<string, object>
+                {
+                    {"Id", properties.ListItemId},
+                    {"Title", properties.ListItem.Title},
+                    {"URL", properties.List.Forms[PAGETYPE.PAGE_DISPLAYFORM].Url + "?ID=" + properties.ListItemId},
+                    {"ListTitle", properties.ListTitle},
+                    {"ListId", properties.ListId},
+                    {"WebId", properties.Web.ID},
+                    {"SiteId", properties.SiteId},
+                    {"UserId", new SPFieldUserValue(properties.Web, (string) properties.ListItem["Editor"]).LookupId},
+                    {"ActivityTime", properties.ListItem["Modified"]}
+                };
 
-            SocialEngineProxy.ProcessActivity(ObjectKind.ListItem, ActivityKind.Updated, data, properties.Web);
+                GetAssignedToUsers(properties, data);
+                GetAssociatedListItems(properties, data);
+
+                SocialEngineProxy.ProcessActivity(ObjectKind.ListItem, ActivityKind.Updated, data, properties.Web);
+            }
+            catch { }
         }
 
         // Private Methods (3) 
