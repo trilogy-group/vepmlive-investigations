@@ -7,7 +7,6 @@ using System.ServiceModel;
 using System.ServiceModel.Activation;
 using System.ServiceModel.Web;
 using System.Threading.Tasks;
-using EPMLiveCore.Infrastructure;
 using EPMLiveCore.Services.DataContracts.SocialEngine;
 using EPMLiveCore.SocialEngine;
 using EPMLiveCore.SocialEngine.Core;
@@ -19,7 +18,7 @@ namespace EPMLiveCore.Services
     [AspNetCompatibilityRequirements(RequirementsMode = AspNetCompatibilityRequirementsMode.Allowed)]
     public class SocialEngine
     {
-        #region Methods (13) 
+        #region Methods (9) 
 
         // Public Methods (1) 
 
@@ -58,8 +57,8 @@ namespace EPMLiveCore.Services
             var listsProcessed = new List<Guid>();
             var usersProcessed = new List<int>();
 
-            OrderedParallelQuery<DataRow> activityThreads =
-                activityRows.AsParallel().OrderByDescending(r => r["ThreadLastActivityOn"]);
+            List<DataRow> activityThreads =
+                activityRows.AsParallel().OrderByDescending(r => r["ThreadLastActivityOn"]).ToList();
 
             foreach (DataRow t in activityThreads)
             {
@@ -76,9 +75,9 @@ namespace EPMLiveCore.Services
 
                 DailyActivities.Thread thread = BuildThread(threadId, activityDay, webId, listId, t);
 
-                OrderedParallelQuery<DataRow> threadActivities = activityRows.AsParallel()
+                List<DataRow> threadActivities = activityRows.AsParallel()
                     .Where(a => (Guid) a["ThreadId"] == threadId)
-                    .OrderBy(a => a["ActivityDate"]);
+                    .OrderBy(a => a["ActivityDate"]).ToList();
 
                 foreach (DataRow a in threadActivities)
                 {
@@ -94,23 +93,28 @@ namespace EPMLiveCore.Services
 
                     thread.activities.Add(activity.id);
 
-                    BuildDay(daysProcessed, day, threadId, dailyActivities);
+                    DataRow th = t;
 
-                    BuildWeb(websProcessed, webId, webUrl, threadId, dailyActivities, t);
+                    var tasks = new[]
+                    {
+                        Task.Factory.StartNew(() => BuildDay(daysProcessed, day, threadId, dailyActivities)),
+                        Task.Factory.StartNew(() => BuildWeb(websProcessed, webId, webUrl, threadId, dailyActivities, th)),
+                        Task.Factory.StartNew(() => BuildList(listId, listsProcessed, threadId, dailyActivities, th)),
+                        Task.Factory.StartNew(() => BuildUser(usersProcessed, userId, thread, dailyActivities, th))
+                    };
 
-                    BuildList(listId, listsProcessed, threadId, dailyActivities, t);
-
-                    BuildUser(usersProcessed, userId, thread, dailyActivities, t);
+                    Task.WaitAll(tasks);
                 }
 
                 dailyActivities.threads.Add(thread);
                 threadsProcessed.Add(threadId);
             }
 
-            OrderedParallelQuery<KeyValuePair<DateTime, List<DailyActivities.ActivityThread>>> dict =
-                BuildActivityThreads(dailyActivities);
+            List<KeyValuePair<DateTime, List<DailyActivities.ActivityThread>>> dict =
+                BuildActivityThreads(dailyActivities).ToList();
+            IEnumerable<DailyActivities.ActivityThread> atList = dict.SelectMany(at => at.Value);
 
-            foreach (DailyActivities.ActivityThread activityThread in dict.SelectMany(at => at.Value))
+            foreach (DailyActivities.ActivityThread activityThread in atList)
             {
                 dailyActivities.activityThreads.Add(activityThread);
             }
@@ -118,7 +122,7 @@ namespace EPMLiveCore.Services
             return dailyActivities;
         }
 
-        // Private Methods (12) 
+        // Private Methods (8) 
 
         private static DailyActivities.Activity BuildActivity(DataRow a, Guid threadId, object dateTime, int userId)
         {
@@ -196,7 +200,11 @@ namespace EPMLiveCore.Services
                         day.activityThreads.Add(activityThread.id);
 
                         Guid id = threadId;
-                        foreach (var thread in dailyActivities.threads.Where(thread => thread.id == id))
+
+                        List<DailyActivities.Thread> threads =
+                            dailyActivities.threads.Where(thread => thread.id == id).ToList();
+
+                        foreach (DailyActivities.Thread thread in threads)
                         {
                             thread.activityThreads.Add(activityThread.id);
                         }
@@ -204,9 +212,7 @@ namespace EPMLiveCore.Services
                 }
             });
 
-            OrderedParallelQuery<KeyValuePair<DateTime, List<DailyActivities.ActivityThread>>> dict =
-                dictionary.AsParallel().OrderByDescending(at => at.Key);
-            return dict;
+            return dictionary.AsParallel().OrderByDescending(at => at.Key);
         }
 
         private static void BuildDay(List<string> daysProcessed, string activityDay, Guid threadId,
@@ -226,9 +232,11 @@ namespace EPMLiveCore.Services
             }
             else
             {
-                foreach (DailyActivities.Day day in dailyActivities.days
+                List<DailyActivities.Day> days = dailyActivities.days
                     .Where(day => day.id.Equals(activityDay))
-                    .Where(day => !day.threads.Contains(threadId)))
+                    .Where(day => !day.threads.Contains(threadId)).ToList();
+
+                foreach (DailyActivities.Day day in days)
                 {
                     day.threads.Add(threadId);
                     break;
@@ -251,8 +259,8 @@ namespace EPMLiveCore.Services
                 var list = new DailyActivities.ItemList
                 {
                     id = lId,
-                    name = GetListName(r["ListName"] as string, (Guid) r["WebId"], lId),
-                    url = GetListUrl((Guid) r["WebId"], lId),
+                    name = r["ListName"] as string,
+                    url = r["ListUrl"] as string,
                     icon = icon as string,
                     threads = new List<Guid> {threadId}
                 };
@@ -262,7 +270,8 @@ namespace EPMLiveCore.Services
             }
             else
             {
-                foreach (DailyActivities.ItemList list in dailyActivities.lists.Where(list => list.id == lId))
+                List<DailyActivities.ItemList> itemLists = dailyActivities.lists.Where(list => list.id == lId).ToList();
+                foreach (DailyActivities.ItemList list in itemLists)
                 {
                     if (!list.threads.Contains(threadId)) list.threads.Add(threadId);
                     break;
@@ -330,7 +339,8 @@ namespace EPMLiveCore.Services
                 foreach (DailyActivities.User user in dailyActivities.users.Where(user => user.id == userId))
                 {
                     DailyActivities.User usr = user;
-                    foreach (Guid id in thread.activities.Where(id => !usr.activities.Contains(id)))
+                    List<Guid> users = thread.activities.Where(id => !usr.activities.Contains(id)).ToList();
+                    foreach (Guid id in users)
                     {
                         user.activities.Add(id);
                     }
@@ -358,7 +368,8 @@ namespace EPMLiveCore.Services
             }
             else
             {
-                foreach (DailyActivities.Web web in dailyActivities.webs.Where(web => web.id == webId))
+                List<DailyActivities.Web> webs = dailyActivities.webs.Where(web => web.id == webId).ToList();
+                foreach (DailyActivities.Web web in webs)
                 {
                     if (!web.threads.Contains(threadId)) web.threads.Add(threadId);
                     break;
@@ -395,69 +406,6 @@ namespace EPMLiveCore.Services
                     }
                 });
             }
-        }
-
-        private static Dictionary<Guid, Tuple<string, string>> GetListDict()
-        {
-            var dict =
-                (Dictionary<Guid, Tuple<string, string>>)
-                    CacheStore.Current.Get("SS_Lists", new CacheStoreCategory().SocialStream,
-                        () => new Dictionary<Guid, Tuple<string, string>>(), true).Value;
-            return dict;
-        }
-
-        private string GetListName(string listName, Guid webId, Guid listId)
-        {
-            if (!string.IsNullOrEmpty(listName)) return listName;
-
-            Dictionary<Guid, Tuple<string, string>> dict = GetListDict();
-
-            if (dict.ContainsKey(listId))
-            {
-                return dict[listId].Item1;
-            }
-
-            SPList list = SetListDict(webId, listId, dict);
-
-            return list == null ? null : list.Title;
-        }
-
-        private string GetListUrl(Guid webId, Guid listId)
-        {
-            Dictionary<Guid, Tuple<string, string>> dict = GetListDict();
-
-            if (dict.ContainsKey(listId))
-            {
-                return dict[listId].Item2;
-            }
-
-            SPList list = SetListDict(webId, listId, dict);
-
-            return list == null ? null : list.DefaultDisplayFormUrl;
-        }
-
-        private static SPList SetListDict(Guid webId, Guid listId, Dictionary<Guid, Tuple<string, string>> dict)
-        {
-            SPList list = null;
-
-            try
-            {
-                using (var spSite = new SPSite(SPContext.Current.Site.ID))
-                {
-                    using (SPWeb spWeb = spSite.OpenWeb(webId))
-                    {
-                        SPList spList = spWeb.Lists.GetList(listId, false);
-                        dict.Add(listId, new Tuple<string, string>(spList.Title, spList.DefaultDisplayFormUrl));
-
-                        CacheStore.Current.Set("SS_List", dict, new CacheStoreCategory().SocialStream, true);
-
-                        list = spList;
-                    }
-                }
-            }
-            catch { }
-
-            return list;
         }
 
         #endregion Methods 
