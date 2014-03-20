@@ -92,11 +92,19 @@
                 return moment(this.get('time')).format('LLLL');
             }.property(),
 
+            activityData: function() {
+                return $.parseJSON(this.get('metaData'));
+            }.property(),
+
             comment: function() {
                 if (this.get('kind') !== 'COMMENTADDED') return '';
 
-                var metaData = $.parseJSON(this.get('metaData'));
+                var metaData = this.get('activityData');
                 return metaData.comment || '';
+            }.property(),
+
+            isBulkOperation: function() {
+                return this.get('kind') === 'BULKOPERATION';
             }.property()
         });
 
@@ -227,7 +235,19 @@
                 }
 
                 return 'icon ' + (icon || 'icon-square');
-            }.property('isComment')
+            }.property('isComment'),
+
+            activityKind: function() {
+                var activity = this.get('firstActivity');
+
+                var kind = activity.get('kind');
+
+                if (kind === 'BULKOPERATION') {
+                    kind = 'updated ' + activity.get('activityData').totalActivities;
+                }
+
+                return kind;
+            }.property()
         });
 
         SE.ActivityController = Ember.ObjectController.extend({

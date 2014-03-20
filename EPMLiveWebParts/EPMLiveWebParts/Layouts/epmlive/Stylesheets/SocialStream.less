@@ -113,6 +113,10 @@
                             }
                         }
 
+                        .tooltip-inner {
+                            white-space: nowrap;
+                        }
+
                         span, div, a {
                             float: left;
                         }
@@ -165,10 +169,6 @@
                                 font-size: 0.8em;
                                 font-weight: 300;
                             }
-
-                            .tooltip {
-                                width: 225px;
-                            }
                         }
 
                         span.icon-wrap {
@@ -210,10 +210,6 @@
 
                                 .info-position;
                                 margin-right: 0;
-
-                                .tooltip-inner {
-                                    white-space: nowrap;
-                                }
                             }
                         }
 
@@ -249,6 +245,13 @@
 
                         div, a {
                             margin-right: @right-margin;
+                        }
+
+                        .time-wrap {
+                            height: @info-height;
+                            line-height: @info-height;
+                            position: relative;
+                            top: (@single-thread-height - @info-height) / 2;
                         }
                     }
                 }

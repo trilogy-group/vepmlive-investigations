@@ -77,6 +77,9 @@
 #epm-social-stream ul.days li.day ul.threads li.thread div.header span.icon-wrap span.icon {
   line-height: 35px;
 }
+#epm-social-stream ul.days li.day ul.threads li.thread .tooltip-inner {
+  white-space: nowrap;
+}
 #epm-social-stream ul.days li.day ul.threads li.thread span,
 #epm-social-stream ul.days li.day ul.threads li.thread div,
 #epm-social-stream ul.days li.day ul.threads li.thread a {
@@ -125,9 +128,6 @@
   font-size: 0.8em;
   font-weight: 300;
 }
-#epm-social-stream ul.days li.day ul.threads li.thread div.activity-info .tooltip {
-  width: 225px;
-}
 #epm-social-stream ul.days li.day ul.threads li.thread span.icon-wrap {
   float: right;
   color: #CCCCCC;
@@ -171,9 +171,6 @@
 #epm-social-stream ul.days li.day ul.threads li.thread div.user div.info a.user {
   margin-right: 0;
 }
-#epm-social-stream ul.days li.day ul.threads li.thread div.user div.info .tooltip-inner {
-  white-space: nowrap;
-}
 #epm-social-stream ul.days li.day ul.threads li.thread ul.activities li.activity {
   margin-top: 10px;
 }
@@ -202,5 +199,11 @@
 #epm-social-stream ul.days li.day ul.threads li.single-activity-thread div,
 #epm-social-stream ul.days li.day ul.threads li.single-activity-thread a {
   margin-right: 4px;
+}
+#epm-social-stream ul.days li.day ul.threads li.single-activity-thread .time-wrap {
+  height: 20px;
+  line-height: 20px;
+  position: relative;
+  top: 12.5px;
 }
 /*# sourceMappingURL=SocialStream.css.map */
