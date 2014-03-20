@@ -179,7 +179,7 @@
   width: 36px;
   color: #555555;
   font-size: 0.7em;
-  margin-right: 14px;
+  margin-right: 10px;
   margin-top: 5px;
 }
 #epm-social-stream ul.days li.day ul.threads li.thread div.comment-activity,
@@ -199,6 +199,7 @@
 }
 #epm-social-stream ul.days li.day ul.threads li.thread div.comment-activity div.activity-detail {
   width: 100%;
+  padding-right: 4px;
 }
 #epm-social-stream ul.days li.day ul.threads li.thread div.comment-activity div.activity-info {
   white-space: nowrap;
