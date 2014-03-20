@@ -26,8 +26,8 @@
         SE.ConfigureMoment();
 
         SE.Day = DS.Model.extend({
-            threads: DS.hasMany('thread'),
-            
+            activityThreads: DS.hasMany('activityThread'),
+
             day: function() {
                 return moment(this.get('id')).calendar();
             }.property()
@@ -39,13 +39,22 @@
             kind: DS.attr(),
             itemId: DS.attr(),
             lastActivityOn: DS.attr(),
-            day: DS.belongsTo('day'),
+            isMassOperation: DS.attr(),
             web: DS.belongsTo('web'),
             list: DS.belongsTo('list'),
             activities: DS.hasMany('activity'),
+            activityThreads: DS.hasMany('activityThread'),
 
             activityUrl: function() {
                 return window.epmLive.currentWebUrl + '/' + this.get('url');
+            }.property(),
+            
+            hasList: function () {
+                return this.get('list') !== null;
+            }.property(),
+
+            hasItem: function () {
+                return this.get('itemId') !== null;
             }.property()
         });
 
@@ -77,22 +86,6 @@
                 SE.ConfigureMoment();
 
                 return date;
-            }.property(),
-
-            icon: function() {
-                var icon = null;
-
-                if (this.get('kind') === 'COMMENTADDED') {
-                    icon = 'icon-bubble-12';
-                } else {
-                    var list = this.get('thread').get('list');
-
-                    if (list) {
-                        icon = list.get('icon');
-                    }
-                }
-
-                return 'icon ' + (icon || 'icon-square');
             }.property(),
 
             fullDateTime: function() {
@@ -144,12 +137,20 @@
             }.property()
         });
 
+        SE.ActivityThread = DS.Model.extend({
+            day: DS.belongsTo('day'),
+            thread: DS.belongsTo('thread'),
+            newerActivities: DS.hasMany('activity'),
+            todaysActivities: DS.hasMany('activity'),
+            perviousActivities: DS.hasMany('activity')
+        });
+
         SE.IndexRoute = Ember.Route.extend({
-            model: function() {
+            model: function () {
                 return this.store.find('activity');
             },
             
-            setupController: function(controller, model) {
+            setupController: function (controller, model) {
                 controller.set('content', model);
                 controller.set('days', this.store.all('day'));
             }
@@ -165,12 +166,12 @@
             classNames: ['day']
         });
 
-        SE.ThreadsView = Ember.View.extend({
+        SE.ActivityThreadsView = Ember.View.extend({
             tagName: 'ul',
             classNames: ['threads']
         });
 
-        SE.ThreadView = Ember.View.extend({
+        SE.ActivityThreadView = Ember.View.extend({
             tagName: 'li',
             classNames: ['thread', 'clearfix'],
             classNameBindings: ['singleActivityThread', 'isComment'],
@@ -186,29 +187,79 @@
         
         SE.ActivityView = Ember.View.extend({
             tagName: 'li',
-            classNames: ['activity']
+            classNames: ['activity', 'clearfix']
         });
 
-        SE.ThreadController = Ember.ObjectController.extend({
-            hasList: function() {
-                return this.get('list') !== null;
+        SE.ActivityThreadController = Ember.ObjectController.extend({
+            generalActivities: function() {
+                return this.get('thread').get('activities').filter(function(activity) {
+                    return activity.get('kind') !== 'COMMENTADDED';
+                });
             }.property(),
 
-            hasItem: function() {
-                return this.get('itemId') !== null;
+            commentActivities: function() {
+                return this.get('thread').get('activities').filterBy('kind', 'COMMENTADDED');
             }.property(),
-            
+
             firstActivity: function() {
-                return this.get('activities').get('firstObject');
-            }.property('activities.@each'),
-            
-            isComment: function () {
-                return this.get('firstActivity').get('kind') === 'COMMENTADDED' && this.get('activities').get('length') === 1;
+                return this.get('thread').get('activities').get('firstObject');
+            }.property('thread.activities.@each'),
+
+            isComment: function() {
+                return this.get('firstActivity').get('kind') === 'COMMENTADDED' && this.get('thread').get('activities').get('length') === 1;
             }.property('firstActivity'),
-            
-            singleActivityThread: function () {
-                return !this.get('isComment') && this.get('activities').get('length') === 1;
-            }.property('isComment', 'activities.@each')
+
+            singleActivityThread: function() {
+                return !this.get('isComment') && this.get('thread').get('activities').get('length') === 1;
+            }.property('isComment', 'thread.activities.@each'),
+
+            icon: function() {
+                var icon = null;
+
+                if (this.get('isComment')) {
+                    icon = 'icon-bubble-12';
+                } else {
+                    var list = this.get('thread').get('list');
+
+                    if (list) {
+                        icon = list.get('icon');
+                    }
+                }
+
+                return 'icon ' + (icon || 'icon-square');
+            }.property('isComment')
+        });
+
+        SE.ActivityController = Ember.ObjectController.extend({
+            isComment: function() {
+                return this.get('kind') === 'COMMENTADDED';
+            }.property(),
+
+            icon: function() {
+                var icon = null;
+
+                switch (this.get('kind')) {
+                case 'CREATED':
+                    icon = 'icon-plus-2';
+                    break;
+                case 'UPDATED':
+                    icon = 'icon-pencil';
+                    break;
+                }
+
+                return 'activity-icon ' + (icon || '');
+            }.property(),
+
+            details: function () {
+                switch (this.get('kind')) {
+                    case 'CREATED':
+                        return 'created this item';
+                    case 'UPDATED':
+                        return 'made an update';
+                }
+
+                return this.get('kind').toLowerCase();
+            }.property()
         });
 
         SE.ActivityTimeComponent = Ember.Component.extend({            

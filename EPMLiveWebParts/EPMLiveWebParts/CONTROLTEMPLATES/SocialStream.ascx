@@ -22,25 +22,27 @@
 <script type="text/x-handlebars" data-template-name="day">
     <div class="header">
         <hr />
-        <h1>{{day}}</h1>
+        <h1 {{bind-attr data-id='id'}}>{{day}}</h1>
     </div>
-    {{render 'threads' threads}}
+    {{render 'activity-threads' activityThreads}}
 </script>
 
-<script type="text/x-handlebars" data-template-name="threads">
+<script type="text/x-handlebars" data-template-name="activity-threads">
     {{#each}}
-        {{render 'thread' this}}
+        {{render 'activity-thread' this}}
     {{/each}}
 </script>
 
-<script type="text/x-handlebars" data-template-name="thread">
+<script type="text/x-handlebars" data-template-name="activity-thread">
     {{#if singleActivityThread}}
         {{partial 'single-activity'}}
     {{else}}
+        <div class="header">{{thread-info thread=this.thread classNames='thread-info'}}{{thread-icon thread=this.thread classNames='icon-wrap' tagName='span'}}</div>
         {{#if isComment}}
-            {{partial 'single-comment-thread'}}
+            {{comment-activity activity=firstActivity classNames='comment-activity' tagName='div'}}
         {{else}}
-            {{render 'activities' activities}}
+            {{render 'activities' generalActivities}}
+            {{render 'activities' commentActivities}}
         {{/if}}
     {{/if}}
 </script>
@@ -52,24 +54,23 @@
 </script>
 
 <script type="text/x-handlebars" data-template-name="activity">
-    {{time}}
-</script>
-
-<script type="text/x-handlebars" data-template-name="_single-comment-thread">
-    <div class="header">{{thread-info thread=this classNames='thread-info'}}{{activity-icon activity=firstActivity classNames='icon-wrap' tagName='span'}}</div>
-    <div class="user">
-        {{user-avatar user=firstActivity.user classNames='avatar'}}
-    </div>
-    <div class="activity-detail">
-        <a {{bind-attr href='firstActivity.user.profileUrl'}} class="user" target="_blank">{{firstActivity.user.displayName}}</a> <span>&nbsp;-&nbsp;</span> <div class="details">{{{firstActivity.comment}}}</div>
-    </div>
-    <div class="activity-info">
-        {{activity-time activity=firstActivity classNames='time-wrap' tagName='span'}}
-    </div>
+    {{#if isComment}}
+        {{comment-activity activity=this classNames='comment-activity'}}
+    {{else}}
+        <div class="general-activity">
+            <span {{bind-attr class='icon'}}></span>
+            <div class="activity-detail">
+                <a {{bind-attr href='user.profileUrl'}} class="user" target="_blank">{{user.displayName}}</a> <div class="details">{{details}}</div>
+            </div>
+            <div class="activity-info">
+                {{activity-time activity=this classNames='time-wrap' tagName='span'}}
+            </div>
+        </div>
+    {{/if}}
 </script>
 
 <script type="text/x-handlebars" data-template-name="_single-activity">
-    {{partial 'user'}} <div class="action">{{firstActivity.kind}}</div> {{thread-info thread=this classNames='thread-info'}} {{partial 'activity-info'}}
+    {{partial 'user'}} <div class="action">{{firstActivity.kind}}</div> {{thread-info thread=thread classNames='thread-info'}} {{partial 'activity-info'}}
 </script>
 
 <script type="text/x-handlebars" data-template-name="_user">
@@ -82,7 +83,19 @@
 <script type="text/x-handlebars" data-template-name="_activity-info">
     <div class="activity-info">
         {{activity-time activity=firstActivity classNames='time-wrap' tagName='span'}}
-        {{activity-icon activity=firstActivity classNames='icon-wrap' tagName='span'}}
+        {{thread-icon thread=thread classNames='icon-wrap' tagName='span'}}
+    </div>
+</script>
+
+<script type="text/x-handlebars" data-template-name="components/comment-activity">
+    <div class="user">
+        {{user-avatar user=activity.user classNames='avatar'}}
+    </div>
+    <div class="activity-detail">
+        <a {{bind-attr href='activity.user.profileUrl'}} class="user" target="_blank">{{activity.user.displayName}}</a> <span>&nbsp;-&nbsp;</span> <div class="details">{{{activity.comment}}}</div>
+    </div>
+    <div class="activity-info">
+        {{activity-time activity=activity classNames='time-wrap' tagName='span'}}
     </div>
 </script>
 
@@ -90,8 +103,8 @@
     <span class="date" {{action 'showDate' on='mouseEnter' target='view'}} data-toggle="tooltip" data-placement="top" {{bind-attr title='activity.fullDateTime'}}>{{activity.date}}</span>
 </script>
 
-<script type="text/x-handlebars" data-template-name="components/activity-icon">
-    <span {{bind-attr class='activity.icon'}}></span>
+<script type="text/x-handlebars" data-template-name="components/thread-icon">
+    <span {{bind-attr class='thread.icon'}}></span>
 </script>
 
 <script type="text/x-handlebars" data-template-name="components/thread-info">

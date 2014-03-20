@@ -4,6 +4,8 @@
 @avatar-size: 36px;
 @section-bottom-margin: 20px;
 @font: "Open Sans Regular", Helvetica, Arial;
+@activity-color: #555555;
+@right-margin: 4px;
 
 .border-radius(@radius: 3px) {
     border-radius: @radius;
@@ -80,13 +82,20 @@
                 }
 
                 ul.threads {
+                    li.single-activity-thread {
+                        span.icon-wrap {
+                            position: relative;
+                            top: 12px;
+                        }
+                    }
+
                     li.thread {
                         margin-top: 12px;
                         padding: 5px 10px;
                         border: 1px solid #EEEEEE;
-                        font-size: 14px;
+                        font-size: 1@right-margin;
                         font-weight: 400;
-                        color: #555555;
+                        color: @activity-color;
                         .border-radius;
 
                         div.header {
@@ -95,6 +104,7 @@
                             line-height: @day-header-height + 10;
                             margin-bottom: 0;
                             width: 100%;
+                            float: none !important;
 
                             span.icon-wrap {
                                 span.icon {
@@ -108,14 +118,14 @@
                         }
 
                         div, a {
-                            margin-right: 4px;
+                            margin-right: @right-margin;
                         }
 
                             div.activity-detail {
                                 font-size: 13px;
 
                                 a {
-                                    color: #555555 !important;
+                                    color: @activity-color !important;
                                     font-weight: 400;
                                 }
 
@@ -124,37 +134,45 @@
                                 }
                             }
 
-                            div.action {
-                                text-transform: lowercase;
-                            }
-
-                            div.workspace, div.list {
-                                margin-right: 0;
-
-                                a {
-                                    margin-right: 0;
-                                }
+                        .comment-activity {
+                            div.activity-detail {
+                                margin-top: 5px;
                             }
 
                             div.activity-info {
-                                color: #CCCCCC;
-                                float: right;
                                 .info-position;
-                                margin-right: 0;
-
-                                span.date {
-                                    font-size: 0.8em;
-                                    font-weight: 300;
-                                }
-
-                                .tooltip {
-                                    width: 225px;
-                                }
                             }
+                        }
+
+                        div.action {
+                            text-transform: lowercase;
+                        }
+
+                        div.workspace, div.list {
+                            margin-right: 0;
+
+                            a {
+                                margin-right: 0;
+                            }
+                        }
+
+                        div.activity-info {
+                            color: #CCCCCC;
+                            float: right;
+                            margin-right: 0;
+
+                            span.date {
+                                font-size: 0.8em;
+                                font-weight: 300;
+                            }
+
+                            .tooltip {
+                                width: 225px;
+                            }
+                        }
 
                         span.icon-wrap {
                             float: right;
-                            margin-right: 0;
                             color: #CCCCCC;
 
                             span.icon {
@@ -198,6 +216,27 @@
                                 }
                             }
                         }
+
+                        ul.activities {
+                            li.activity {
+                                margin-top: 10px;
+
+                                span.activity-icon {
+                                    text-align: center;
+                                    width: @avatar-size;
+                                    color: @activity-color;
+                                    font-size: 0.7em;
+                                    margin-right: @right-margin + 10;
+                                    margin-top: 5px;
+                                }
+                            }
+                        }
+
+                        div.comment-activity,
+                        div.general-activity {
+                            float: none !important;
+                            margin-right: 0;
+                        }
                     }
 
                     li.single-activity-thread {
@@ -209,7 +248,7 @@
                         }
 
                         div, a {
-                            margin-right: 4px;
+                            margin-right: @right-margin;
                         }
                     }
                 }

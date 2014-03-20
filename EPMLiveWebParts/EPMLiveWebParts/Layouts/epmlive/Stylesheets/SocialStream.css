@@ -53,11 +53,15 @@
   margin: 0;
   border-top-color: #eeeeee;
 }
+#epm-social-stream ul.days li.day ul.threads li.single-activity-thread span.icon-wrap {
+  position: relative;
+  top: 12px;
+}
 #epm-social-stream ul.days li.day ul.threads li.thread {
   margin-top: 12px;
   padding: 5px 10px;
   border: 1px solid #EEEEEE;
-  font-size: 14px;
+  font-size: 1 4px;
   font-weight: 400;
   color: #555555;
   border-radius: 3px;
@@ -68,6 +72,7 @@
   line-height: 40px;
   margin-bottom: 0;
   width: 100%;
+  float: none !important;
 }
 #epm-social-stream ul.days li.day ul.threads li.thread div.header span.icon-wrap span.icon {
   line-height: 35px;
@@ -91,6 +96,15 @@
 #epm-social-stream ul.days li.day ul.threads li.thread div.activity-detail .detail {
   font-weight: 300 !important;
 }
+#epm-social-stream ul.days li.day ul.threads li.thread .comment-activity div.activity-detail {
+  margin-top: 5px;
+}
+#epm-social-stream ul.days li.day ul.threads li.thread .comment-activity div.activity-info {
+  height: 20px;
+  line-height: 20px;
+  position: relative;
+  top: 12.5px;
+}
 #epm-social-stream ul.days li.day ul.threads li.thread div.action {
   text-transform: lowercase;
 }
@@ -105,10 +119,6 @@
 #epm-social-stream ul.days li.day ul.threads li.thread div.activity-info {
   color: #CCCCCC;
   float: right;
-  height: 20px;
-  line-height: 20px;
-  position: relative;
-  top: 12.5px;
   margin-right: 0;
 }
 #epm-social-stream ul.days li.day ul.threads li.thread div.activity-info span.date {
@@ -120,7 +130,6 @@
 }
 #epm-social-stream ul.days li.day ul.threads li.thread span.icon-wrap {
   float: right;
-  margin-right: 0;
   color: #CCCCCC;
 }
 #epm-social-stream ul.days li.day ul.threads li.thread span.icon-wrap span.icon {
@@ -164,6 +173,22 @@
 }
 #epm-social-stream ul.days li.day ul.threads li.thread div.user div.info .tooltip-inner {
   white-space: nowrap;
+}
+#epm-social-stream ul.days li.day ul.threads li.thread ul.activities li.activity {
+  margin-top: 10px;
+}
+#epm-social-stream ul.days li.day ul.threads li.thread ul.activities li.activity span.activity-icon {
+  text-align: center;
+  width: 36px;
+  color: #555555;
+  font-size: 0.7em;
+  margin-right: 14px;
+  margin-top: 5px;
+}
+#epm-social-stream ul.days li.day ul.threads li.thread div.comment-activity,
+#epm-social-stream ul.days li.day ul.threads li.thread div.general-activity {
+  float: none !important;
+  margin-right: 0;
 }
 #epm-social-stream ul.days li.day ul.threads li.single-activity-thread {
   height: 45px;
