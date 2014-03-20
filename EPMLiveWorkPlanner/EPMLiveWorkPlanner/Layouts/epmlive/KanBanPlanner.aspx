@@ -304,6 +304,7 @@
                         });
 
                         $('#mainContainer .sortable-list').slimScroll({ height: '650px', width: '100%' });
+                        $('#mainContainer .slimScrollDiv').css({ "overflow": "visible" });
 
                         ExecuteOrDelayUntilScriptLoaded(addContextualMenu, 'EPMLive.Navigation.js');
                     }
