@@ -70,6 +70,27 @@ namespace EPMLiveWebParts
             }
         }
 
+        protected string NewFormUrl
+        {
+            get
+            {
+                SPList resourcesList = null;
+                var url = string.Empty;
+                try
+                {
+                    resourcesList = SPContext.Current.Web.Lists.TryGetList("Resources");
+                }
+                catch { }
+
+                if (resourcesList != null)
+                {
+                    url = resourcesList.Forms[PAGETYPE.PAGE_NEWFORM].Url;
+                }
+
+                return url;
+            }
+        }
+
         /// <summary>
         ///     Gets the debug tag.
         /// </summary>

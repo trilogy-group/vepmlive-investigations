@@ -74,7 +74,7 @@ function registerEpmLiveResourceGridScript() {
 
                 var queryString = '';
 
-                if ($$.reports.collection[reportId].hasResourcesParam) {
+                //if ($$.reports.collection[reportId].hasResourcesParam) {
                     for (var j = 0; j < selRows.length; j++) {
                         var sr = selRows[j];
 
@@ -82,7 +82,7 @@ function registerEpmLiveResourceGridScript() {
                             queryString += '&rp:Resources=' + sr.ResourceID;
                         }
                     }
-                }
+                //}
 
                 $$.reports.opened = true;
 
@@ -158,10 +158,12 @@ function registerEpmLiveResourceGridScript() {
                         } else {
                             $$$.log('response.d: ' + response.d);
                         }
+                        $$.actions.areReportsLoaded = true;
                     },
 
                     error: function (error) {
                         $$$.log(error);
+                        $$.actions.areReportsLoaded = true;
                     }
                 });
             }
@@ -930,17 +932,19 @@ function registerEpmLiveResourceGridScript() {
                                 $$.views.totalViews = 0;
                                 register(result.ResourcePoolViews.Views.View);
                                 $$.views.apply();
-                                $$.actions.createToolBar('test');
                             } else {
                                 $$$.logFailure(result);
                             }
                         } else {
                             $$$.log('response.d: ' + response.d);
                         }
+
+                        $$.actions.isViewApplied = true;
                     },
 
                     error: function (error) {
                         $$$.log(error);
+                        $$.actions.isViewApplied = true;
                     }
                 });
             },
@@ -1723,6 +1727,10 @@ function registerEpmLiveResourceGridScript() {
             },
 
             createToolBar: function (divId) {
+                //wait for views and reports to load
+                (function wait() {
+                    if ($$.actions.isViewApplied && $$.actions.areReportsLoaded) {
+
                 if ($('#resourcePoolToolBar').length > 0) {
                     $('#resourcePoolToolBar').remove();
                 }
@@ -1750,8 +1758,8 @@ function registerEpmLiveResourceGridScript() {
                         c.toLowerCase() != 'panel') {
                         if (grid.Header[cols[c].Name].trim()) {
                             sAvailableFlds += (grid.Header[cols[c].Name] + '|' + cols[c].Name + ',');
-                            aAvailableCols[i++] = {
-                                'value': cols[c].Name,
+                                    aAvailableCols[cols[c].Name] = {
+                                        'value': grid.Header[cols[c].Name],
                                 'checked': ($.inArray(cols[c].Name, aViewCols) != -1)
                             };
                         }
@@ -1792,6 +1800,62 @@ function registerEpmLiveResourceGridScript() {
                     viewSectionTemplate["options"].push(opt);
                 }
 
+                        var reports = $$.reports.collection;
+                        var reportsColl = [];
+                        for (var r in reports) {
+                            var report = reports[r];
+                            //{
+                            //    'iconClass': 'icon-pie-3 icon-dropdown',
+                            //    'text': 'Available vs. Planner by Dept',
+                            //    'events': [
+                            //        {
+                            //            'eventName': 'click',
+                            //            'function': function () { alert('report something'); }
+                            //        }
+                            //    ]
+
+                            //}
+                            var reportConfig = {
+                                'iconClass': '',
+                                'text': report.name,
+                                'events': [
+                                    {
+                                        'eventName': 'click',
+                                        'function': function () { window.open($(this).attr('reportUrl'), '_blank'); }
+                                    }
+                                ],
+                                'properties': {
+                                    'reportUrl': report.url
+                                }
+                            };
+
+                            reportsColl.push(reportConfig);
+                        }
+
+                        //'options': [
+                        //    {
+                        //        'iconClass': 'icon-pie-3 icon-dropdown',
+                        //        'text': 'Resource Planner',
+                        //        'events': [
+                        //            {
+                        //                'eventName': 'click',
+                        //                'function': function () { alert('Plan something...'); }
+                        //            }
+                        //        ]
+                        //    },
+                        //    {
+                        //        'iconClass': 'icon-flag-5 icon-dropdown',
+                        //        'text': 'Assignment Planner',
+                        //        'events': [
+                        //            {
+                        //                'eventName': 'click',
+                        //                'function': function () { alert('Plan something...'); }
+                        //            }
+                        //        ]
+                        //    }
+                        //]
+
+
 
                 var cfgs = [
                     { 'id': 'resourcePoolToolBar' },
@@ -1808,7 +1872,7 @@ function registerEpmLiveResourceGridScript() {
                             'events': [
                                 {
                                     'eventName': 'click',
-                                    'function': function () { alert('hello'); }
+                                            'function': function () { $$.actions.displayPopUp($$.actions.getNewFormUrl, 'Test', false, true, null, null); }
                                 }
                             ]
                         },
@@ -1832,7 +1896,7 @@ function registerEpmLiveResourceGridScript() {
                                             'events': [
                                                 {
                                                     'eventName': 'click',
-                                                    'function': function () { alert('Plan something...'); }
+                                                            'function': function () { $$.actions.loadResourcePlanner(); }
                                                 }
                                             ]
                                         },
@@ -1842,7 +1906,7 @@ function registerEpmLiveResourceGridScript() {
                                             'events': [
                                                 {
                                                     'eventName': 'click',
-                                                    'function': function () { alert('Plan something...'); }
+                                                            'function': function () { $$.actions.loadAssignmentPlanner(); }
                                                 }
                                             ]
                                         }
@@ -1855,11 +1919,11 @@ function registerEpmLiveResourceGridScript() {
                                     'options': [
                                         {
                                             'iconClass': 'icon-filter-4 icon-dropdown',
-                                            'text': 'Analyzer',
+                                                    'text': 'Resource Analyzer',
                                             'events': [
                                                 {
                                                     'eventName': 'click',
-                                                    'function': function () { alert('analyzing something...'); }
+                                                            'function': function () { $$.actions.analyzeResources(); }
                                                 }
                                             ]
                                         },
@@ -1869,7 +1933,7 @@ function registerEpmLiveResourceGridScript() {
                                             'events': [
                                                 {
                                                     'eventName': 'click',
-                                                    'function': function () { alert('report something...'); }
+                                                            'function': function () { $$.reports.open('workvscapacity'); }
                                                 }
                                             ]
                                         }
@@ -1886,7 +1950,7 @@ function registerEpmLiveResourceGridScript() {
                                             'events': [
                                                 {
                                                     'eventName': 'click',
-                                                    'function': function () { alert('notify something...'); }
+                                                            'function': function () { $$.actions.redirect('sendnotification'); }
                                                 }
                                             ]
                                         },
@@ -1896,7 +1960,7 @@ function registerEpmLiveResourceGridScript() {
                                             'events': [
                                                 {
                                                     'eventName': 'click',
-                                                    'function': function () { alert('export something...'); }
+                                                            'function': function () { $$.actions.exportResources(); }
                                                 }
                                             ]
                                         },
@@ -1906,7 +1970,7 @@ function registerEpmLiveResourceGridScript() {
                                             'events': [
                                                 {
                                                     'eventName': 'click',
-                                                    'function': function () { alert('import something...'); }
+                                                            'function': function () { $$.actions.importResources(); }
                                                 }
                                             ]
                                         }
@@ -1926,49 +1990,50 @@ function registerEpmLiveResourceGridScript() {
                                 {
                                     'heading': 'none',
                                     'divider': 'no',
-                                    'options': [
-                                        {
-                                            'iconClass': 'icon-pie-3 icon-dropdown',
-                                            'text': 'Available vs. Planner by Dept',
-                                            'events': [
-                                                {
-                                                    'eventName': 'click',
-                                                    'function': function () { alert('report something'); }
-                                                }
-                                            ]
+                                            'options': reportsColl
+                                                //[
+                                                //{
+                                                //    'iconClass': 'icon-pie-3 icon-dropdown',
+                                                //    'text': 'Available vs. Planner by Dept',
+                                                //    'events': [
+                                                //        {
+                                                //            'eventName': 'click',
+                                                //            'function': function () { alert('report something'); }
+                                                //        }
+                                                //    ]
 
-                                        },
-                                        {
-                                            'iconClass': 'icon-flag-5 icon-dropdown',
-                                            'text': 'Capacity Heat Map',
-                                            'events': [
-                                                {
-                                                    'eventName': 'click',
-                                                    'function': function () { alert('report something'); }
-                                                }
-                                            ]
-                                        },
-                                        {
-                                            'iconClass': 'icon-filter-4 icon-dropdown',
-                                            'text': 'Comments',
-                                            'events': [
-                                                {
-                                                    'eventName': 'click',
-                                                    'function': function () { alert('report something'); }
-                                                }
-                                            ]
-                                        },
-                                        {
-                                            'iconClass': 'icon-filter-4 icon-dropdown',
-                                            'text': 'Requirements',
-                                            'events': [
-                                                {
-                                                    'eventName': 'click',
-                                                    'function': function () { alert('report something'); }
-                                                }
-                                            ]
-                                        }
-                                    ]
+                                                //},
+                                                //{
+                                                //    'iconClass': 'icon-flag-5 icon-dropdown',
+                                                //    'text': 'Capacity Heat Map',
+                                                //    'events': [
+                                                //        {
+                                                //            'eventName': 'click',
+                                                //            'function': function () { alert('report something'); }
+                                                //        }
+                                                //    ]
+                                                //},
+                                                //{
+                                                //    'iconClass': 'icon-filter-4 icon-dropdown',
+                                                //    'text': 'Comments',
+                                                //    'events': [
+                                                //        {
+                                                //            'eventName': 'click',
+                                                //            'function': function () { alert('report something'); }
+                                                //        }
+                                                //    ]
+                                                //},
+                                                //{
+                                                //    'iconClass': 'icon-filter-4 icon-dropdown',
+                                                //    'text': 'Requirements',
+                                                //    'events': [
+                                                //        {
+                                                //            'eventName': 'click',
+                                                //            'function': function () { alert('report something'); }
+                                                //        }
+                                                //    ]
+                                                //}
+                                                //]
                                 }
                             ]
                         }]
@@ -2033,25 +2098,29 @@ function registerEpmLiveResourceGridScript() {
                             //'availableGroups': 'Field1|Field1|111,Field2|Field2|222,Field3|Field3|333,Field4|Field4|444,Field5|Field5|555',
                             'availableGroups': sAvailableFlds,
                             'saveFunction': function (data) {
-                                var grpVals = '';
+                                        var sCols = null;
+                                        var grpVals = [];
+
+                                        if (data.length > 0) {
                                 for (var i in data) {
                                     var obj = data[i];
                                     //txt += ('Key: ' + obj['key'] + '| Value: ' + obj['value'] + ',\r\n');
-                                    grpVals += (obj['value'] + ',');
+                                                grpVals.push(obj['value']);
+                                            }
+                                            if (grpVals.length > 0) {
+                                                sCols = grpVals.join(',');
+                                            }
                                 }
-                                grpVals = grpVals.substring(0, grpVals.length - 1);
 
-                                if (grpVals) {
-                                    window.Grids[window.epmLive.resourceGridId].DoGrouping(grpVals);
-                                }
+                                        window.Grids[window.epmLive.resourceGridId].DoGrouping(sCols);
                             }
                         },
                         //select columns control
                         {
                             'controlId': 'msColumns',
                             'controlType': 'multiselect',
-                            'title': 'test',
-                            'value': 'test',
+                                    'title': '',
+                                    'value': '',
                             'iconClass': 'icon-insert-template',
                             'toolTip': 'Select columns',
                             'sections': [
@@ -2109,10 +2178,10 @@ function registerEpmLiveResourceGridScript() {
                                             for (var key in options) {
                                                 var properties = options[key];
                                                 if ($.inArray(key, keys) != -1) {
-                                                    grid.SetAttribute(null, properties['value'], 'Visible', '1', 0);
+                                                            grid.SetAttribute(null, key, 'Visible', '1', 0);
                                                 }
                                                 else {
-                                                    grid.SetAttribute(null, properties['value'], 'Visible', '0', 0);
+                                                            grid.SetAttribute(null, key, 'Visible', '0', 0);
                                                 }
                                             }
                                         }
@@ -2135,23 +2204,6 @@ function registerEpmLiveResourceGridScript() {
                                    //}
                                    //txt += data['selectedKeys'];
                                    //alert(txt);
-                                   var keys = data['selectedKeys'];
-
-                                   for (var i in data['sections']) {
-                                       var section = data['sections'][i];
-                                       var options = section['options'];
-                                       for (var key in options) {
-                                           var properties = options[key];
-                                           if ($.inArray(key, keys) != -1) {
-                                               grid.SetAttribute(null, properties['value'], 'Visible', '1', 0);
-                                           }
-                                           else {
-                                               grid.SetAttribute(null, properties['value'], 'Visible', '0', 0);
-                                           }
-                                       }
-                                   }
-
-                                   grid.Rerender();
                                }
 
                         },
@@ -2175,7 +2227,7 @@ function registerEpmLiveResourceGridScript() {
                                             'events': [
                                                 {
                                                     'eventName': 'click',
-                                                    'function': function () { alert('rename'); }
+                                                            'function': function () { $$.views.showRenameDialog(); }
                                                     //add a callback method
                                                 }
                                             ]
@@ -2187,7 +2239,7 @@ function registerEpmLiveResourceGridScript() {
                                             'events': [
                                                 {
                                                     'eventName': 'click',
-                                                    'function': function () { alert('save'); }
+                                                            'function': function () { $$.views.showSaveDialog(); }
                                                 }
                                             ]
                                         },
@@ -2197,7 +2249,7 @@ function registerEpmLiveResourceGridScript() {
                                             'events': [
                                                 {
                                                     'eventName': 'click',
-                                                    'function': function () { alert('delete'); }
+                                                            'function': function () { $$.views.remove(); }
                                                 }
                                             ]
                                         }
@@ -2209,8 +2261,18 @@ function registerEpmLiveResourceGridScript() {
                         ]
                     }
                 ];
+
                 window.epmLiveGenericToolBar.generateToolBar(divId, cfgs);
             }
+                    else {
+                        setTimeout(wait, 500);
+                    }
+                }());
+            },
+
+            getNewFormUrl: '',
+            isViewApplied: false,
+            areReportsLoaded: false
         };
 
         window.Grids.OnClick = function (grid, row, col, x, y, evt) {
@@ -2305,7 +2367,7 @@ function registerEpmLiveResourceGridScript() {
             $$.id(grid.id);
             $$.views.load();
             $$.reports.load();
-            //$$.actions.createToolBar('test');
+            $$.actions.createToolBar('test');
         };
 
         window.Grids.OnUpdated = function (grid) {
