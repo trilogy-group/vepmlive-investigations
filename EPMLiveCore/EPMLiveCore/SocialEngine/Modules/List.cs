@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Web.Script.Serialization;
 using EPMLiveCore.SocialEngine.Contracts;
 using EPMLiveCore.SocialEngine.Core;
 using EPMLiveCore.SocialEngine.Entities;
@@ -159,12 +158,12 @@ namespace EPMLiveCore.SocialEngine.Modules
                     Kind = ObjectKind.List,
                     WebId = webId,
                     ListId = (Guid) data["Id"],
-                    Users = new[] { new User { Id = (int) data["UserId"], Role = UserRole.Author } }
+                    Users = new[] {new User {Id = (int) data["UserId"], Role = UserRole.Author}}
                 });
 
                 Guid streamId = args.StreamManager.GetGlobalStreamId(webId);
 
-                threadManager.AssociateStreams(thread, new[] { streamId });
+                threadManager.AssociateStreams(thread, new[] {streamId});
                 threadManager.UpdateUsers(thread);
             }
 

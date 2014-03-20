@@ -4,7 +4,6 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using EPMLiveCore.SocialEngine.Entities;
-using Microsoft.SharePoint;
 
 namespace EPMLiveCore.SocialEngine.Core
 {
@@ -12,7 +11,7 @@ namespace EPMLiveCore.SocialEngine.Core
     {
         #region Constructors (1) 
 
-        public ThreadManager(SPWeb contextWeb) : base(contextWeb) { }
+        public ThreadManager(DBConnectionManager dbConnectionManager) : base(dbConnectionManager) { }
 
         #endregion Constructors 
 
@@ -30,7 +29,7 @@ namespace EPMLiveCore.SocialEngine.Core
                         INSERT INTO SS_Streams_Threads (StreamId, ThreadId) VALUES (@StreamId, @ThreadId)
                     END";
 
-                using (var sqlCommand = new SqlCommand(SQL, SqlConnection))
+                using (SqlCommand sqlCommand = GetSqlCommand(SQL))
                 {
                     sqlCommand.Parameters.AddWithValue("@StreamId", streamId);
                     sqlCommand.Parameters.AddWithValue("@ThreadId", thread.Id);
@@ -46,7 +45,7 @@ namespace EPMLiveCore.SocialEngine.Core
 
             const string SQL = @"SELECT UserId, Role FROM SS_ThreadUsers WHERE ThreadId = @ThreadId";
 
-            using (var sqlCommand = new SqlCommand(SQL, SqlConnection))
+            using (SqlCommand sqlCommand = GetSqlCommand(SQL))
             {
                 sqlCommand.Parameters.AddWithValue("@ThreadId", thread.Id);
 
@@ -75,7 +74,7 @@ namespace EPMLiveCore.SocialEngine.Core
         {
             const string SQL = @"UPDATE SS_Threads SET Deleted = 1 WHERE Id = @Id";
 
-            using (var sqlCommand = new SqlCommand(SQL, SqlConnection))
+            using (SqlCommand sqlCommand = GetSqlCommand(SQL))
             {
                 sqlCommand.Parameters.AddWithValue("@Id", thread.Id);
                 sqlCommand.ExecuteNonQuery();
@@ -88,7 +87,7 @@ namespace EPMLiveCore.SocialEngine.Core
 
             string sql = @"UPDATE SS_Threads SET Deleted = 1 WHERE Id IN (" + string.Join(",", ids) + ")";
 
-            using (var sqlCommand = new SqlCommand(sql, SqlConnection))
+            using (SqlCommand sqlCommand = GetSqlCommand(sql))
             {
                 sqlCommand.ExecuteNonQuery();
             }
@@ -122,7 +121,7 @@ namespace EPMLiveCore.SocialEngine.Core
             if (!listId.HasValue) sql = sql.Replace("= @ListId", "IS NULL");
             if (!itemId.HasValue) sql = sql.Replace("= @ItemId", "IS NULL");
 
-            using (var sqlCommand = new SqlCommand(sql, SqlConnection))
+            using (SqlCommand sqlCommand = GetSqlCommand(sql))
             {
                 sqlCommand.Parameters.AddWithValue("@WebId", webId);
                 sqlCommand.Parameters.AddWithValue("@ListId", listId.HasValue ? (object) listId : DBNull.Value);
@@ -207,7 +206,7 @@ namespace EPMLiveCore.SocialEngine.Core
             if (!itemId.HasValue) sql = sql.Replace("= @ItemId", "IS NULL");
             if (!objectKind.HasValue) sql = sql.Replace(" AND Kind = @Kind", string.Empty);
 
-            using (var sqlCommand = new SqlCommand(sql, SqlConnection))
+            using (SqlCommand sqlCommand = GetSqlCommand(sql))
             {
                 sqlCommand.Parameters.AddWithValue("@WebId", webId);
                 sqlCommand.Parameters.AddWithValue("@ListId", listId.HasValue ? (object) listId.Value : DBNull.Value);
@@ -247,27 +246,6 @@ namespace EPMLiveCore.SocialEngine.Core
             return thread.Id != Guid.Empty ? UpdateThread(thread) : CreateThread(thread);
         }
 
-        public void UpdateUsers(Thread thread)
-        {
-            var assignees = new List<int>();
-
-            foreach (User user in thread.Users)
-            {
-                if (user.Role.Has(UserRole.Assignee)) assignees.Add(user.Id);
-
-                UserRole? existingRole = GetUserRole(thread.Id, user.Id);
-
-                bool userExists = existingRole.HasValue;
-
-                if (userExists && existingRole.Value.Has(user.Role)) continue;
-
-                user.Role = !userExists ? user.Role : existingRole.Value | user.Role;
-                UpdateUserRole(thread.Id, user.Id, user.Role, userExists);
-            }
-
-            CleanupAssignees(thread.Id, assignees);
-        }
-
         public void UpdateAssociatedThreads(Guid threadId, Dictionary<Guid, int> associatedListItems)
         {
             const string SQL = @"
@@ -283,7 +261,7 @@ namespace EPMLiveCore.SocialEngine.Core
 
             foreach (var pair in associatedListItems)
             {
-                using (var sqlCommand = new SqlCommand(SQL, SqlConnection))
+                using (SqlCommand sqlCommand = GetSqlCommand(SQL))
                 {
                     sqlCommand.Parameters.AddWithValue("@ThreadId", threadId);
                     sqlCommand.Parameters.AddWithValue("@ListId", pair.Key);
@@ -313,6 +291,27 @@ namespace EPMLiveCore.SocialEngine.Core
             }
         }
 
+        public void UpdateUsers(Thread thread)
+        {
+            var assignees = new List<int>();
+
+            foreach (User user in thread.Users)
+            {
+                if (user.Role.Has(UserRole.Assignee)) assignees.Add(user.Id);
+
+                UserRole? existingRole = GetUserRole(thread.Id, user.Id);
+
+                bool userExists = existingRole.HasValue;
+
+                if (userExists && existingRole.Value.Has(user.Role)) continue;
+
+                user.Role = !userExists ? user.Role : existingRole.Value | user.Role;
+                UpdateUserRole(thread.Id, user.Id, user.Role, userExists);
+            }
+
+            CleanupAssignees(thread.Id, assignees);
+        }
+
         // Private Methods (6) 
 
         private void CleanupAssignees(Guid threadId, List<int> assignees)
@@ -323,7 +322,7 @@ namespace EPMLiveCore.SocialEngine.Core
 
             var dt = new DataTable();
 
-            using (var sqlCommand = new SqlCommand(SQL, SqlConnection))
+            using (SqlCommand sqlCommand = GetSqlCommand(SQL))
             {
                 sqlCommand.Parameters.AddWithValue("@ThreadId", threadId);
                 sqlCommand.Parameters.AddWithValue("@Role", UserRole.Assignee);
@@ -355,7 +354,7 @@ namespace EPMLiveCore.SocialEngine.Core
             const string SQL =
                 @"INSERT INTO SS_Threads (Id, Title, URL, Kind, WebId, ListId, ItemId) VALUES (@Id, @Title, @URL, @Kind, @WebId, @ListId, @ItemId)";
 
-            using (var sqlCommand = new SqlCommand(SQL, SqlConnection))
+            using (SqlCommand sqlCommand = GetSqlCommand(SQL))
             {
                 sqlCommand.Parameters.AddWithValue("@Id", thread.Id);
                 sqlCommand.Parameters.AddWithValue("@Title", thread.Title);
@@ -378,7 +377,7 @@ namespace EPMLiveCore.SocialEngine.Core
             const string SQL =
                 @"SELECT TOP (1) Role FROM SS_ThreadUsers WHERE ThreadId = @ThreadId AND UserId = @UserId";
 
-            using (var sqlCommand = new SqlCommand(SQL, SqlConnection))
+            using (SqlCommand sqlCommand = GetSqlCommand(SQL))
             {
                 sqlCommand.Parameters.AddWithValue("@ThreadId", threadId);
                 sqlCommand.Parameters.AddWithValue("@UserId", userId);
@@ -397,7 +396,7 @@ namespace EPMLiveCore.SocialEngine.Core
         {
             const string SQL = @"DELETE FROM SS_ThreadUsers WHERE ThreadId = @ThreadId AND UserId = @UserId";
 
-            using (var sqlCommand = new SqlCommand(SQL, SqlConnection))
+            using (SqlCommand sqlCommand = GetSqlCommand(SQL))
             {
                 sqlCommand.Parameters.AddWithValue("@ThreadId", threadId);
                 sqlCommand.Parameters.AddWithValue("@UserId", userId);
@@ -410,7 +409,7 @@ namespace EPMLiveCore.SocialEngine.Core
         {
             const string SQL = @"UPDATE SS_Threads SET Title = @Title, URL = @URL WHERE Id = @Id";
 
-            using (var sqlCommand = new SqlCommand(SQL, SqlConnection))
+            using (SqlCommand sqlCommand = GetSqlCommand(SQL))
             {
                 sqlCommand.Parameters.AddWithValue("@Id", thread.Id);
                 sqlCommand.Parameters.AddWithValue("@Title", thread.Title);
@@ -434,7 +433,7 @@ namespace EPMLiveCore.SocialEngine.Core
                 ? @"INSERT INTO SS_ThreadUsers (ThreadId, UserId, Role) VALUES (@ThreadId, @UserId, @Role)"
                 : @"UPDATE SS_ThreadUsers SET Role = @Role WHERE ThreadId = @ThreadId AND UserId = @UserId";
 
-            using (var sqlCommand = new SqlCommand(sql, SqlConnection))
+            using (SqlCommand sqlCommand = GetSqlCommand(sql))
             {
                 sqlCommand.Parameters.AddWithValue("@ThreadId", threadId);
                 sqlCommand.Parameters.AddWithValue("@UserId", userId);

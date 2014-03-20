@@ -1,91 +1,33 @@
-﻿using System;
-using System.Data.SqlClient;
-using Microsoft.SharePoint;
+﻿using System.Data.SqlClient;
 
 namespace EPMLiveCore.SocialEngine.Core
 {
-    internal abstract class BaseManager : IDisposable
+    internal abstract class BaseManager
     {
-        #region Fields (2) 
+        #region Fields (1) 
 
-        private readonly Guid _webAppId;
-        protected SqlConnection SqlConnection;
+        private readonly DBConnectionManager _dbConnectionManager;
 
         #endregion Fields 
 
-        #region Constructors (2) 
+        #region Constructors (1) 
 
-        protected BaseManager(SPWeb contextWeb)
+        protected BaseManager(DBConnectionManager dbConnectionManager)
         {
-            _webAppId = contextWeb.Site.WebApplication.Id;
-
-            SPSecurity.RunWithElevatedPrivileges(() =>
-            {
-                string cs = CoreFunctions.getReportingConnectionString(_webAppId, contextWeb.Site.ID);
-
-                var builder = new SqlConnectionStringBuilder(cs) {ApplicationName = "EPM Live - Social Engine"};
-                cs = builder.ToString();
-
-                SqlConnection = new SqlConnection(cs);
-                SqlConnection.Open();
-            });
-        }
-
-        ~BaseManager()
-        {
-            Dispose(false);
+            _dbConnectionManager = dbConnectionManager;
         }
 
         #endregion Constructors 
-
-        #region Properties (1) 
-
-        public SqlConnection EPMLiveSqlConnection
-        {
-            get
-            {
-                SqlConnection sqlConnection = null;
-
-                SPSecurity.RunWithElevatedPrivileges(() =>
-                {
-                    string cs = CoreFunctions.getConnectionString(_webAppId);
-
-                    var builder = new SqlConnectionStringBuilder(cs) {ApplicationName = "EPM Live - Social Engine"};
-                    cs = builder.ToString();
-
-                    sqlConnection = new SqlConnection(cs);
-                    sqlConnection.Open();
-                });
-
-                return sqlConnection;
-            }
-        }
-
-        #endregion Properties 
 
         #region Methods (1) 
 
         // Protected Methods (1) 
 
-        protected void Dispose(bool disposing)
+        protected SqlCommand GetSqlCommand(string sql)
         {
-            if (!disposing) return;
-            if (SqlConnection == null) return;
-
-            SqlConnection.Close();
-            SqlConnection.Dispose();
-            SqlConnection = null;
+            return new SqlCommand(sql, _dbConnectionManager.SqlConnection);
         }
 
         #endregion Methods 
-
-        #region Implementation of IDisposable
-
-        public void Dispose()
-        {
-            Dispose(true);
-        }
-
-        #endregion
     }
 }

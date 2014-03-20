@@ -194,6 +194,12 @@ namespace EPMLiveCore.Services
                         }
 
                         day.activityThreads.Add(activityThread.id);
+
+                        Guid id = threadId;
+                        foreach (var thread in dailyActivities.threads.Where(thread => thread.id == id))
+                        {
+                            thread.activityThreads.Add(activityThread.id);
+                        }
                     }
                 }
             });
@@ -278,7 +284,8 @@ namespace EPMLiveCore.Services
                 web = webId,
                 list = listId as Guid?,
                 itemId = r["ItemId"] as int?,
-                activities = new List<Guid>()
+                activities = new List<Guid>(),
+                activityThreads = new List<string>()
             };
 
             return thread;

@@ -54,7 +54,7 @@ namespace EPMLiveCore.SocialEngine.Events
 
         #endregion Constructors 
 
-        #region Properties (9) 
+        #region Properties (11) 
 
         public ActivityKind ActivityKind
         {
@@ -80,6 +80,8 @@ namespace EPMLiveCore.SocialEngine.Events
             get { return _data; }
         }
 
+        public bool EcecuteUntransactionedOperation { get; set; }
+
         public ObjectKind ObjectKind
         {
             get { return _objectKind; }
@@ -94,6 +96,8 @@ namespace EPMLiveCore.SocialEngine.Events
         {
             get { return _threadManager; }
         }
+
+        public Action UntransactionedOperation { get; set; }
 
         #endregion Properties 
     }

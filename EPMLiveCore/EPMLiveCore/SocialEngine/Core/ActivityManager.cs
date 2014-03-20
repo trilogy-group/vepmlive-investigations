@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
-using EPMLiveCore.API.Integration;
 using EPMLiveCore.SocialEngine.Entities;
 using Microsoft.SharePoint;
 
@@ -13,7 +12,7 @@ namespace EPMLiveCore.SocialEngine.Core
     {
         #region Constructors (1) 
 
-        public ActivityManager(SPWeb contextWeb) : base(contextWeb) { }
+        public ActivityManager(DBConnectionManager dbConnectionManager) : base(dbConnectionManager) { }
 
         #endregion Constructors 
 
@@ -52,7 +51,7 @@ namespace EPMLiveCore.SocialEngine.Core
             if (!itemId.HasValue) sql = sql.Replace("= @ItemId", "IS NULL");
             if (string.IsNullOrEmpty(activityKey)) sql = sql.Replace("= @Key", "IS NULL");
 
-            using (var sqlCommand = new SqlCommand(sql, SqlConnection))
+            using (SqlCommand sqlCommand = GetSqlCommand(sql))
             {
                 sqlCommand.Parameters.AddWithValue("@ObjectKind", objectKind);
                 sqlCommand.Parameters.AddWithValue("@ActivityKind", activityKind);
@@ -74,7 +73,7 @@ namespace EPMLiveCore.SocialEngine.Core
             IEnumerable<string> where = filters.Keys.Select(key => string.Format(@"{0} = @{0}", key));
             string sql = string.Format(@"DELETE FROM SS_Activities WHERE {0}", string.Join(" AND ", where));
 
-            using (var sqlCommand = new SqlCommand(sql, SqlConnection))
+            using (SqlCommand sqlCommand = GetSqlCommand(sql))
             {
                 foreach (var pair in filters)
                 {
@@ -85,8 +84,8 @@ namespace EPMLiveCore.SocialEngine.Core
             }
         }
 
-        public void EnqueueActivity(Guid siteId, Guid webId, Guid listId, int userId, DateTime activityTime,
-            DateTime relatedActivityTime)
+        public static void EnqueueActivity(Guid siteId, Guid webId, Guid listId, int userId, DateTime activityTime,
+            DateTime relatedActivityTime, SPWeb contextWeb)
         {
             const string GET_QUEUED_ACTIVITY_SQL = @"
                 SELECT   TOP (1) ActivityQueueId, ItemCount
@@ -97,7 +96,7 @@ namespace EPMLiveCore.SocialEngine.Core
             Guid queuedActivityId = Guid.Empty;
             int itemCount = 0;
 
-            using (SqlConnection sqlConnection = EPMLiveSqlConnection)
+            using (SqlConnection sqlConnection = new DBConnectionManager(contextWeb, false).EPMLiveSqlConnection)
             {
                 using (var sqlCommand = new SqlCommand(GET_QUEUED_ACTIVITY_SQL, sqlConnection))
                 {
@@ -162,7 +161,7 @@ namespace EPMLiveCore.SocialEngine.Core
                             AND (dbo.SS_Activities.Kind < 3) AND (dbo.SS_Activities.UserId = @UserId)
                 ORDER BY dbo.SS_Activities.Date DESC";
 
-            using (var sqlCommand = new SqlCommand(SQL, SqlConnection))
+            using (SqlCommand sqlCommand = GetSqlCommand(SQL))
             {
                 sqlCommand.Parameters.AddWithValue("@ListId", listId);
                 sqlCommand.Parameters.AddWithValue("@UserId", userId);
@@ -191,7 +190,7 @@ namespace EPMLiveCore.SocialEngine.Core
         {
             const string SQL = @"UPDATE SS_Activities SET MassOperation = 1 WHERE Id = @Id";
 
-            using (var sqlCommand = new SqlCommand(SQL, SqlConnection))
+            using (SqlCommand sqlCommand = GetSqlCommand(SQL))
             {
                 sqlCommand.Parameters.AddWithValue("@Id", id);
                 sqlCommand.ExecuteNonQuery();
@@ -203,7 +202,7 @@ namespace EPMLiveCore.SocialEngine.Core
             string sql = string.Format(@"SELECT * FROM SS_Activities WHERE ThreadId = @ThreadId AND Kind IN ({0})",
                 string.Join(",", activityKinds.Select(ak => (int) ak).ToArray()));
 
-            using (var sqlCommand = new SqlCommand(sql, SqlConnection))
+            using (SqlCommand sqlCommand = GetSqlCommand(sql))
             {
                 sqlCommand.Parameters.AddWithValue("@ThreadId", thread.Id);
 
@@ -249,9 +248,10 @@ namespace EPMLiveCore.SocialEngine.Core
             }
         }
 
-        public DataTable GetActivities(int userId, string webUrl, DateTime? minDate,DateTime? maxDate, int? page, int? limit)
+        public DataTable GetActivities(int userId, string webUrl, DateTime? minDate, DateTime? maxDate, int? page,
+            int? limit)
         {
-            using (var sqlCommand = new SqlCommand("SS_GetActivities", SqlConnection))
+            using (SqlCommand sqlCommand = GetSqlCommand("SS_GetActivities"))
             {
                 sqlCommand.Parameters.AddWithValue("@UserId", userId);
                 sqlCommand.Parameters.AddWithValue("@WebUrl", webUrl);
@@ -276,7 +276,7 @@ namespace EPMLiveCore.SocialEngine.Core
 
             activity.Id = Guid.NewGuid();
 
-            using (var sqlCommand = new SqlCommand(SQL, SqlConnection))
+            using (SqlCommand sqlCommand = GetSqlCommand(SQL))
             {
                 sqlCommand.Parameters.AddWithValue("@Id", activity.Id);
                 sqlCommand.Parameters.AddWithValue("@Key", (object) activity.Key ?? DBNull.Value);
@@ -300,7 +300,7 @@ namespace EPMLiveCore.SocialEngine.Core
             string sql = string.Format(@"UPDATE SS_Activities SET {0} WHERE {1}",
                 string.Join(",", values), string.Join(" AND ", where));
 
-            using (var sqlCommand = new SqlCommand(sql, SqlConnection))
+            using (SqlCommand sqlCommand = GetSqlCommand(sql))
             {
                 foreach (var pair in data)
                 {

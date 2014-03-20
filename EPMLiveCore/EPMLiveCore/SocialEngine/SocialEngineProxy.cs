@@ -26,8 +26,9 @@ namespace EPMLiveCore.SocialEngine
             {
                 lock (Locker)
                 {
-                    using (var transactionManager = new TransactionManager(contextWeb))
+                    using (var dbConnectionManager = new DBConnectionManager(contextWeb))
                     {
+                        var transactionManager = new TransactionManager(dbConnectionManager);
                         transactionManager.ClearTransaction(transactionId);
                     }
                 }
@@ -38,7 +39,7 @@ namespace EPMLiveCore.SocialEngine
             }
         }
 
-        public static DataTable GetActivities(SPWeb contextWeb, DateTime? minDate = null, 
+        public static DataTable GetActivities(SPWeb contextWeb, DateTime? minDate = null,
             DateTime? maxDate = null, int? page = null, int? limit = null)
         {
             return SocialEngine.Current.GetActivities(contextWeb, minDate, maxDate, page, limit);
@@ -48,8 +49,9 @@ namespace EPMLiveCore.SocialEngine
         {
             try
             {
-                using (var transactionManager = new TransactionManager(contextWeb))
+                using (var dbConnectionManager = new DBConnectionManager(contextWeb))
                 {
+                    var transactionManager = new TransactionManager(dbConnectionManager);
                     return transactionManager.GetTransaction(webId, listId, itemId).Id;
                 }
             }
@@ -104,8 +106,9 @@ namespace EPMLiveCore.SocialEngine
             {
                 lock (Locker)
                 {
-                    using (var transactionManager = new TransactionManager(contextWeb))
+                    using (var dbConnectionManager = new DBConnectionManager(contextWeb))
                     {
+                        var transactionManager = new TransactionManager(dbConnectionManager);
                         return transactionManager.SetTransaction(webId, listId, itemId, componentName).Id;
                     }
                 }

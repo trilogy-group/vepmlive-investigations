@@ -205,20 +205,29 @@ namespace EPMLiveCore.SocialEngine
         {
             try
             {
-                using (var activityManager = new ActivityManager(contextWeb))
+                using (var dbConnectionManager = new DBConnectionManager(contextWeb))
                 {
-                    return activityManager.GetActivities(contextWeb.CurrentUser.ID, contextWeb.ServerRelativeUrl,
-                        minDate, maxDate, page, limit);
-                }
-            }
-            catch (AggregateException e)
-            {
-                foreach (Exception exception in e.InnerExceptions)
-                {
-                    _logger.Log(contextWeb, exception);
-                }
+                    try
+                    {
+                        var activityManager = new ActivityManager(dbConnectionManager);
+                        return activityManager.GetActivities(contextWeb.CurrentUser.ID, contextWeb.ServerRelativeUrl,
+                            minDate, maxDate, page, limit);
+                    }
+                    catch (AggregateException e)
+                    {
+                        foreach (Exception exception in e.InnerExceptions)
+                        {
+                            _logger.Log(contextWeb, exception);
+                        }
 
-                throw e.Flatten();
+                        throw e.Flatten();
+                    }
+                    catch (Exception exception)
+                    {
+                        _logger.Log(contextWeb, exception);
+                        throw;
+                    }
+                }
             }
             catch (Exception exception)
             {
@@ -280,61 +289,71 @@ namespace EPMLiveCore.SocialEngine
 
                 try
                 {
-                    using (var transactionScope = new TransactionScope())
+                    using (var dbConnectionManager = new DBConnectionManager(spWeb))
                     {
-                        using (var streamManager = new StreamManager(spWeb))
+                        try
                         {
-                            using (var threadManager = new ThreadManager(spWeb))
+                            var streamManager = new StreamManager(dbConnectionManager);
+                            var threadManager = new ThreadManager(dbConnectionManager);
+                            var activityManager = new ActivityManager(dbConnectionManager);
+
+                            var args = new ProcessActivityEventArgs(objectKind, activityKind, data, spWeb,
+                                streamManager, threadManager, activityManager);
+
+                            using (var transactionScope = new TransactionScope())
                             {
-                                using (var activityManager = new ActivityManager(spWeb))
+                                if (_events.OnValidateActivity != null)
                                 {
-                                    var args = new ProcessActivityEventArgs(objectKind, activityKind, data, spWeb,
-                                        streamManager, threadManager, activityManager);
+                                    _events.OnValidateActivity(args);
+                                }
 
-                                    if (_events.OnValidateActivity != null)
+                                if (!args.Cancel)
+                                {
+                                    if (_events.OnPreActivityRegistration != null)
                                     {
-                                        _events.OnValidateActivity(args);
-                                    }
-
-                                    if (!args.Cancel)
-                                    {
-                                        if (_events.OnPreActivityRegistration != null)
-                                        {
-                                            _events.OnPreActivityRegistration(args);
-                                        }
-                                    }
-
-                                    if (!args.Cancel)
-                                    {
-                                        if (_events.OnActivityRegistration != null)
-                                        {
-                                            _events.OnActivityRegistration(args);
-                                        }
-                                    }
-
-                                    if (!args.Cancel)
-                                    {
-                                        if (_events.OnPostActivityRegistration != null)
-                                        {
-                                            _events.OnPostActivityRegistration(args);
-                                        }
-                                    }
-
-                                    if (args.Cancel)
-                                    {
-                                        LogCancellation(objectKind, activityKind, data, spWeb, args);
+                                        _events.OnPreActivityRegistration(args);
                                     }
                                 }
+
+                                if (!args.Cancel)
+                                {
+                                    if (_events.OnActivityRegistration != null)
+                                    {
+                                        _events.OnActivityRegistration(args);
+                                    }
+                                }
+
+                                if (!args.Cancel)
+                                {
+                                    if (_events.OnPostActivityRegistration != null)
+                                    {
+                                        _events.OnPostActivityRegistration(args);
+                                    }
+                                }
+
+                                if (args.Cancel)
+                                {
+                                    LogCancellation(objectKind, activityKind, data, spWeb, args);
+                                }
+
+                                transactionScope.Complete();
+                            }
+
+                            if (!args.Cancel && args.EcecuteUntransactionedOperation)
+                            {
+                                args.UntransactionedOperation();
                             }
                         }
-
-                        transactionScope.Complete();
+                        catch (AggregateException e)
+                        {
+                            correlationIds.AddRange(
+                                e.InnerExceptions.Select(i => _logger.Log(objectKind, activityKind, data, spWeb, i)));
+                        }
+                        catch (Exception exception)
+                        {
+                            correlationIds.Add(_logger.Log(objectKind, activityKind, data, spWeb, exception));
+                        }
                     }
-                }
-                catch (AggregateException e)
-                {
-                    correlationIds.AddRange(
-                        e.InnerExceptions.Select(i => _logger.Log(objectKind, activityKind, data, spWeb, i)));
                 }
                 catch (Exception exception)
                 {

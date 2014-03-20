@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using System.Linq;
-using Microsoft.SharePoint;
 
 namespace EPMLiveCore.SocialEngine.Core
 {
@@ -11,7 +8,7 @@ namespace EPMLiveCore.SocialEngine.Core
     {
         #region Constructors (1) 
 
-        public TransactionManager(SPWeb contextWeb) : base(contextWeb) { }
+        public TransactionManager(DBConnectionManager dbConnectionManager) : base(dbConnectionManager) { }
 
         #endregion Constructors 
 
@@ -23,7 +20,7 @@ namespace EPMLiveCore.SocialEngine.Core
         {
             const string SQL = @"DELETE FROM SS_Transactions WHERE Id = @Id";
 
-            using (var sqlCommand = new SqlCommand(SQL, SqlConnection))
+            using (SqlCommand sqlCommand = GetSqlCommand(SQL))
             {
                 sqlCommand.Parameters.AddWithValue("@Id", transactionId);
                 sqlCommand.ExecuteNonQuery();
@@ -35,7 +32,7 @@ namespace EPMLiveCore.SocialEngine.Core
             const string SQL =
                 @"SELECT TOP(1) * FROM SS_Transactions WHERE WebId = @WebId AND ListId = @ListId AND ItemId = @ItemId";
 
-            using (var sqlCommand = new SqlCommand(SQL, SqlConnection))
+            using (SqlCommand sqlCommand = GetSqlCommand(SQL))
             {
                 sqlCommand.Parameters.AddWithValue("@WebId", webId);
                 sqlCommand.Parameters.AddWithValue("@ListId", listId);
@@ -66,7 +63,7 @@ namespace EPMLiveCore.SocialEngine.Core
             const string SQL =
                 @"INSERT INTO SS_Transactions (Id, WebId, ListId, ItemId, Component, Time) VALUES (@Id, @WebId, @ListId, @ItemId, @Component, @Time)";
 
-            using (var sqlCommand = new SqlCommand(SQL, SqlConnection))
+            using (SqlCommand sqlCommand = GetSqlCommand(SQL))
             {
                 sqlCommand.Parameters.AddWithValue("@Id", transaction.Id);
                 sqlCommand.Parameters.AddWithValue("@WebId", transaction.WebId);

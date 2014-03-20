@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
-using Microsoft.SharePoint;
 
 namespace EPMLiveCore.SocialEngine.Core
 {
@@ -9,7 +8,7 @@ namespace EPMLiveCore.SocialEngine.Core
     {
         #region Constructors (1) 
 
-        public StreamManager(SPWeb contextWeb) : base(contextWeb) { }
+        public StreamManager(DBConnectionManager dbConnectionManager) : base(dbConnectionManager) { }
 
         #endregion Constructors 
 
@@ -27,7 +26,7 @@ namespace EPMLiveCore.SocialEngine.Core
                         INSERT INTO SS_StreamUsers (StreamId, UserId) VALUES (@StreamId, @UserId)
                     END";
 
-                using (var sqlCommand = new SqlCommand(SQL, SqlConnection))
+                using (SqlCommand sqlCommand = GetSqlCommand(SQL))
                 {
                     sqlCommand.Parameters.AddWithValue("@StreamId", streamId);
                     sqlCommand.Parameters.AddWithValue("@UserId", userId);
@@ -53,7 +52,7 @@ namespace EPMLiveCore.SocialEngine.Core
         {
             const string SQL = @"INSERT INTO SS_Streams (WebId) VALUES (@WebId)";
 
-            using (var sqlCommand = new SqlCommand(SQL, SqlConnection))
+            using (SqlCommand sqlCommand = GetSqlCommand(SQL))
             {
                 sqlCommand.Parameters.AddWithValue("@WebId", webId);
                 sqlCommand.ExecuteNonQuery();
@@ -64,7 +63,7 @@ namespace EPMLiveCore.SocialEngine.Core
         {
             const string SQL = @"SELECT Id FROM SS_Streams WHERE WebId = @WebId AND ListId IS NULL";
 
-            using (var sqlCommand = new SqlCommand(SQL, SqlConnection))
+            using (SqlCommand sqlCommand = GetSqlCommand(SQL))
             {
                 sqlCommand.Parameters.AddWithValue("@WebId", webId);
 

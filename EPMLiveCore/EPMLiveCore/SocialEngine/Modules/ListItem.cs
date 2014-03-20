@@ -281,15 +281,17 @@ namespace EPMLiveCore.SocialEngine.Modules
             if (!args.Data.ContainsKey("IsMassOperation")) args.Data.Add("IsMassOperation", true);
             else args.Data["IsMassOperation"] = true;
 
-            activityManager.EnqueueActivity((Guid) data["SiteId"], (Guid) data["WebId"], listId,
-                userId, activityTime, activityTime - interval);
+            args.EcecuteUntransactionedOperation = true;
+            args.UntransactionedOperation =
+                () => ActivityManager.EnqueueActivity((Guid) data["SiteId"], (Guid) data["WebId"], listId,
+                    userId, activityTime, activityTime - interval, args.ContextWeb);
         }
 
         private void RegisterCommentCreationActivity(ProcessActivityEventArgs args)
         {
-            var data = args.Data;
+            Dictionary<string, object> data = args.Data;
 
-            var thread = args.ThreadManager.GetThread((Guid) data["WebId"], (Guid) data["ListId"], (int) data["Id"]);
+            Thread thread = args.ThreadManager.GetThread((Guid) data["WebId"], (Guid) data["ListId"], (int) data["Id"]);
 
             if (thread == null)
             {
