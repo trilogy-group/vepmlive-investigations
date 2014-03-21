@@ -386,7 +386,7 @@ namespace EPMLiveCore.Services
         private static void GetActivities(List<DataRow> activityRows, SPWeb spWeb, DateTime minDate, DateTime maxDate,
             int page, int limit)
         {
-            while (activityRows.Count <= limit)
+            while (activityRows.Count < limit)
             {
                 DataTable dataTable = SocialEngineProxy.GetActivities(spWeb, minDate, maxDate, page++, limit);
                 if (dataTable.Rows.Count == 0) break;
