@@ -239,7 +239,7 @@
 					Sequence="20"
 					Image16by16="/_layouts/epmlive/images/edit-fragment.png"
 					Command="Ribbon.WorkPlanner.ManageFragmentButton"
-					LabelText="Manage Fragment"
+					LabelText="Manage Fragments"
 					TemplateAlias="oM"/>	
 
 			</Controls>

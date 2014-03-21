@@ -3270,7 +3270,7 @@ function SaveFragment() {
 }
 
 function ManageFragment() {
-    var options = { url: "managefragment.aspx?PlannerID=" + sPlannerID, width: 450, height: 450, title: "Manage Fragment", showMaximized: false};
+    var options = { url: "managefragment.aspx?PlannerID=" + sPlannerID, width: 450, height: 450, title: "Manage Fragments", showMaximized: false};
     SP.UI.ModalDialog.showModalDialog(options);
 }
 
