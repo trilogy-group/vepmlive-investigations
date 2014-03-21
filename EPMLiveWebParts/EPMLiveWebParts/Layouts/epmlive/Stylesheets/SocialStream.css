@@ -17,6 +17,10 @@
 }
 #epm-social-stream a {
   color: #0090CA !important;
+  cursor: pointer !important;
+}
+#epm-social-stream a.user span:hover {
+  text-decoration: underline;
 }
 #epm-social-stream ul {
   margin: 0;

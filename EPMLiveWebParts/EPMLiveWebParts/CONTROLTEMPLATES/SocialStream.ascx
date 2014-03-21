@@ -57,7 +57,7 @@
         <div class="general-activity">
             <span {{bind-attr class='icon'}}></span>
             <div class="activity-detail">
-                <a {{bind-attr href='user.profileUrl'}} class="user" target="_blank">{{user.displayName}}</a> <div class="details">{{details}}</div>
+                <a class="user" {{action 'goToUserProfile' on='click'}}><span {{action 'showName' on='mouseEnter' target='view'}} data-toggle="tooltip" data-placement="top" {{bind-attr title='user.name'}}>{{user.displayName}}</span></a> <div class="details">{{details}}</div>
             </div>
             <div class="activity-info">
                 {{activity-time activity=this classNames='time-wrap' tagName='span'}}
@@ -94,7 +94,7 @@
         {{user-avatar user=activity.user classNames='avatar'}}
     </div>
     <div class="activity-detail">
-        <a {{bind-attr href='activity.user.profileUrl'}} class="user" target="_blank">{{activity.user.displayName}}</a>&nbsp;-&nbsp;{{{activity.comment}}}
+        <a class="user" {{action 'goToUserProfile' on='click'}}><span {{action 'showName' on='mouseEnter'}} data-toggle="tooltip" data-placement="top" {{bind-attr title='activity.user.name'}}>{{activity.user.displayName}}</span></a>&nbsp;-&nbsp;{{{activity.comment}}}
     </div>
     <div class="activity-info">
         {{activity-time activity=activity classNames='time-wrap' tagName='span'}}
@@ -119,12 +119,12 @@
             {{#if thread.web.isNotCurrentWorkspace}}
                 <span>&nbsp;-&nbsp;</span>
             {{/if}}
-            <a {{bind-attr href='thread.list.url'}} target="_blank">{{thread.list.name}}</a>
+            <a {{action 'goToList' on='click'}}>{{thread.list.name}}</a>
         </div>
     {{/if}}
     
     {{#if thread.hasItem}}
-        <div class="item"><span>:&nbsp;</span><a {{bind-attr href='thread.activityUrl'}} target="_blank">{{thread.title}}</a></div>
+        <div class="item"><span>:&nbsp;</span><a {{action 'goToItem' on='click'}}>{{thread.title}}</a></div>
     {{/if}}
 </script>
 
@@ -135,5 +135,7 @@
 </script>
 
 <script type="text/x-handlebars" data-template-name="components/user-info">
-    <a {{bind-attr href='user.profileUrl'}} class="user" target="_blank" {{action 'showName' on='mouseEnter'}} data-toggle="tooltip" data-placement="top" {{bind-attr title='user.name'}}>{{user.displayName}}</a>
+    <a class="user" {{action 'goToUserProfile' on='click'}}>
+        <span {{action 'showName' on='mouseEnter'}} data-toggle="tooltip" data-placement="top" {{bind-attr title='user.name'}}>{{user.displayName}}</span>
+    </a>
 </script>
