@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Data;
 using System.Data.SqlTypes;
 using System.Linq;
 using System.ServiceModel;
 using System.ServiceModel.Activation;
+using System.ServiceModel.Channels;
 using System.ServiceModel.Web;
 using System.Threading.Tasks;
+using System.Web;
 using EPMLiveCore.Services.DataContracts.SocialEngine;
 using EPMLiveCore.SocialEngine;
 using EPMLiveCore.SocialEngine.Core;
@@ -18,7 +21,7 @@ namespace EPMLiveCore.Services
     [AspNetCompatibilityRequirements(RequirementsMode = AspNetCompatibilityRequirementsMode.Allowed)]
     public class SocialEngine
     {
-        #region Methods (9) 
+        #region Methods (10) 
 
         // Public Methods (1) 
 
@@ -28,15 +31,17 @@ namespace EPMLiveCore.Services
         [OperationContract]
         public DailyActivities GetActivities()
         {
-            const int LIMIT = 20;
+            int limit;
             const int PAGE = 1;
             SqlDateTime minDate = SqlDateTime.MinValue;
-            DateTime maxDate = DateTime.Now;
+            DateTime maxDate;
+
+            ParseMetaData(out limit, out maxDate);
 
             SPWeb spWeb = SPContext.Current.Web;
             var activityRows = new List<DataRow>();
 
-            GetActivities(activityRows, spWeb, minDate.Value, maxDate, PAGE, LIMIT);
+            GetActivities(activityRows, spWeb, minDate.Value, maxDate, PAGE, limit);
 
             var dailyActivities = new DailyActivities();
 
@@ -77,7 +82,9 @@ namespace EPMLiveCore.Services
                     string day = (((DateTime) time).Date).ToString("s");
                     if (!thread.days.Contains(day)) thread.days.Add(day);
 
-                    DailyActivities.Activity activity = BuildActivity(a, threadId, time, (int) a["UserId"]);
+                    var activityUserId = (int) a["UserId"];
+
+                    DailyActivities.Activity activity = BuildActivity(a, threadId, time, activityUserId);
                     if (activity == null) continue;
 
                     dailyActivities.activities.Add(activity);
@@ -92,7 +99,7 @@ namespace EPMLiveCore.Services
                         Task.Factory.StartNew(() => BuildDay(daysProcessed, day, threadId, dailyActivities)),
                         Task.Factory.StartNew(() => BuildWeb(websProcessed, webId, webUrl, threadId, dailyActivities, th)),
                         Task.Factory.StartNew(() => BuildList(listId, listsProcessed, threadId, dailyActivities, th)),
-                        Task.Factory.StartNew(() => BuildUser(usersProcessed, userId, thread, dailyActivities, ac))
+                        Task.Factory.StartNew(() => BuildUser(usersProcessed, activityUserId, thread, dailyActivities, ac))
                     };
 
                     Task.WaitAll(tasks);
@@ -111,10 +118,13 @@ namespace EPMLiveCore.Services
                 dailyActivities.activityThreads.Add(activityThread);
             }
 
+            var dateOffset = (DateTime) activityThreads.AsParallel().Min(t => t["ActivityDate"]);
+            dailyActivities.meta.offset = dateOffset.ToString("s");
+
             return dailyActivities;
         }
 
-        // Private Methods (8) 
+        // Private Methods (9) 
 
         private static DailyActivities.Activity BuildActivity(DataRow a, Guid threadId, object dateTime, int userId)
         {
@@ -248,7 +258,7 @@ namespace EPMLiveCore.Services
                 object icon = r["ListIcon"];
                 if (icon == null || icon == DBNull.Value) icon = null;
 
-                var listUrl =
+                string listUrl =
                     string.Format("{0}/_layouts/15/epmlive/redirectionproxy.aspx?action=gotolist&webid={1}&listid={2}",
                         r["WebUrl"], r["WebId"], lId);
 
@@ -401,6 +411,33 @@ namespace EPMLiveCore.Services
                         }
                     }
                 });
+            }
+        }
+
+        private void ParseMetaData(out int limit, out DateTime maxDate)
+        {
+            limit = 20;
+            maxDate = DateTime.Now;
+
+            OperationContext context = OperationContext.Current;
+            MessageProperties properties = context.IncomingMessageProperties;
+            var request = properties[HttpRequestMessageProperty.Name] as HttpRequestMessageProperty;
+
+            if (request == null) return;
+
+            string queryString = request.QueryString;
+            if (string.IsNullOrEmpty(queryString)) return;
+
+            NameValueCollection parameters = HttpUtility.ParseQueryString(queryString);
+
+            if (parameters.AllKeys.Contains("limit"))
+            {
+                int.TryParse(parameters["limit"], out limit);
+            }
+
+            if (parameters.AllKeys.Contains("offset"))
+            {
+                DateTime.TryParse(parameters["offset"], out maxDate);
             }
         }
 

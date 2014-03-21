@@ -14,6 +14,14 @@
     {{else}}
         You do not have any activities yet!
     {{/each}}
+
+    <div id="epm-se-pagination">
+        {{#if hasMore}}
+            {{#if loadingMore}}
+              Loading more...
+            {{/if}}
+        {{/if}}
+    </div>
 </script>
 
 <script type="text/x-handlebars" data-template-name="day">

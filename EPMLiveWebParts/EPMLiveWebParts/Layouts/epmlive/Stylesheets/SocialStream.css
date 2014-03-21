@@ -31,10 +31,10 @@
   margin-bottom: 20px;
 }
 #epm-social-stream ul.days li.day div.header {
-  margin-bottom: 20px;
-  height: 30px;
+  margin-bottom: 10px;
+  height: 40px;
   text-align: center;
-  line-height: 30px;
+  line-height: 40px;
 }
 #epm-social-stream ul.days li.day div.header h1 {
   position: relative;
@@ -42,109 +42,128 @@
   z-index: 2;
   display: inline-block;
   padding: 0 10px;
-  height: 30px;
+  height: 40px;
   background: #FFFFFF;
   color: #bbbbbb;
   text-transform: uppercase;
   font-weight: 500;
   font-size: 12px;
   font-family: "Open Sans Regular", Helvetica, Arial !important;
-  line-height: 30px;
+  line-height: 40px;
 }
 #epm-social-stream ul.days li.day div.header hr {
   position: relative;
-  top: 15px;
+  top: 20px;
   margin: 0;
   border-top-color: #eeeeee;
 }
-#epm-social-stream ul.days li.day ul.threads li.single-activity-thread span.icon-wrap {
-  position: relative;
-  top: 12px;
+#epm-social-stream li.single-activity-thread {
+  height: 45px;
+  line-height: 45px;
 }
-#epm-social-stream ul.days li.day ul.threads li.thread {
-  margin-top: 12px;
-  padding: 5px 10px;
-  border: 1px solid #EEEEEE;
-  font-size: 1 4px;
-  font-weight: 400;
-  color: #555555;
-  border-radius: 3px;
-}
-#epm-social-stream ul.days li.day ul.threads li.thread div.header {
-  border-bottom: 1px solid #EEEEEE;
-  height: 40px;
-  line-height: 40px;
-  margin-bottom: 0;
-  width: 100%;
-  float: none !important;
-}
-#epm-social-stream ul.days li.day ul.threads li.thread div.header span.icon-wrap span.icon {
-  line-height: 35px;
-}
-#epm-social-stream ul.days li.day ul.threads li.thread .tooltip-inner {
-  white-space: nowrap;
-}
-#epm-social-stream ul.days li.day ul.threads li.thread span,
-#epm-social-stream ul.days li.day ul.threads li.thread div,
-#epm-social-stream ul.days li.day ul.threads li.thread a {
+#epm-social-stream li.single-activity-thread span,
+#epm-social-stream li.single-activity-thread div,
+#epm-social-stream li.single-activity-thread a {
   float: left;
 }
-#epm-social-stream ul.days li.day ul.threads li.thread div,
-#epm-social-stream ul.days li.day ul.threads li.thread a {
+#epm-social-stream li.single-activity-thread div,
+#epm-social-stream li.single-activity-thread a {
   margin-right: 4px;
 }
-#epm-social-stream ul.days li.day ul.threads li.thread div.activity-detail {
-  font-size: 13px;
-}
-#epm-social-stream ul.days li.day ul.threads li.thread div.activity-detail a {
-  color: #555555 !important;
-  font-weight: 400;
-}
-#epm-social-stream ul.days li.day ul.threads li.thread div.activity-detail .detail {
-  font-weight: 300 !important;
-}
-#epm-social-stream ul.days li.day ul.threads li.thread .comment-activity div.activity-detail {
-  margin-top: 5px;
-}
-#epm-social-stream ul.days li.day ul.threads li.thread .comment-activity div.activity-info {
+#epm-social-stream li.single-activity-thread .time-wrap {
   height: 20px;
   line-height: 20px;
   position: relative;
   top: 12.5px;
 }
-#epm-social-stream ul.days li.day ul.threads li.thread div.action {
+#epm-social-stream li.single-activity-thread span.icon-wrap {
+  position: relative;
+  top: 12px;
+}
+#epm-social-stream li.thread {
+  margin-top: 12px;
+  padding: 5px 10px;
+  border: 1px solid #EEEEEE;
+  font-size: 14px;
+  font-weight: 400;
+  color: #555555;
+  border-radius: 3px;
+}
+#epm-social-stream li.thread div.header {
+  border-bottom: 1px solid #EEEEEE;
+  height: 50px;
+  line-height: 50px;
+  margin-bottom: 0;
+  width: 100%;
+  float: none !important;
+}
+#epm-social-stream li.thread div.header span.icon-wrap span.icon {
+  line-height: 40px;
+}
+#epm-social-stream li.thread .tooltip-inner {
+  white-space: nowrap;
+}
+#epm-social-stream li.thread span,
+#epm-social-stream li.thread div,
+#epm-social-stream li.thread a {
+  float: left;
+}
+#epm-social-stream li.thread div,
+#epm-social-stream li.thread a {
+  margin-right: 4px;
+}
+#epm-social-stream li.thread div.activity-detail {
+  font-size: 13px;
+}
+#epm-social-stream li.thread div.activity-detail a {
+  color: #555555 !important;
+  font-weight: 400;
+}
+#epm-social-stream li.thread div.activity-detail .detail {
+  font-weight: 300 !important;
+}
+#epm-social-stream li.thread .comment-activity div.activity-detail {
+  margin-top: 5px;
+}
+#epm-social-stream li.thread .comment-activity div.activity-info {
+  height: 20px;
+  line-height: 20px;
+  position: relative;
+  top: 12.5px;
+}
+#epm-social-stream li.thread div.action {
   text-transform: lowercase;
 }
-#epm-social-stream ul.days li.day ul.threads li.thread div.workspace,
-#epm-social-stream ul.days li.day ul.threads li.thread div.list {
+#epm-social-stream li.thread div.workspace,
+#epm-social-stream li.thread div.list {
   margin-right: 0;
 }
-#epm-social-stream ul.days li.day ul.threads li.thread div.workspace a,
-#epm-social-stream ul.days li.day ul.threads li.thread div.list a {
+#epm-social-stream li.thread div.workspace a,
+#epm-social-stream li.thread div.list a {
   margin-right: 0;
 }
-#epm-social-stream ul.days li.day ul.threads li.thread div.activity-info {
+#epm-social-stream li.thread div.activity-info {
   color: #CCCCCC;
   float: right;
   margin-right: 0;
 }
-#epm-social-stream ul.days li.day ul.threads li.thread div.activity-info span.date {
+#epm-social-stream li.thread div.activity-info span.date {
   font-size: 0.8em;
   font-weight: 300;
 }
-#epm-social-stream ul.days li.day ul.threads li.thread span.icon-wrap {
+#epm-social-stream li.thread span.icon-wrap {
   float: right;
   color: #CCCCCC;
 }
-#epm-social-stream ul.days li.day ul.threads li.thread span.icon-wrap span.icon {
+#epm-social-stream li.thread span.icon-wrap span.icon {
   font-size: 1.3em;
   margin-left: 10px;
 }
-#epm-social-stream ul.days li.day ul.threads li.thread div.user {
+#epm-social-stream li.thread div.user {
   height: 45px;
   line-height: 45px;
 }
-#epm-social-stream ul.days li.day ul.threads li.thread div.user div.avatar {
+#epm-social-stream li.thread div.user div.avatar {
   width: 36px;
   height: 36px;
   position: relative;
@@ -161,24 +180,24 @@
   margin-right: 10px;
   border-radius: 50%;
 }
-#epm-social-stream ul.days li.day ul.threads li.thread div.user div.avatar img {
+#epm-social-stream li.thread div.user div.avatar img {
   width: 36px;
   border-radius: 50%;
 }
-#epm-social-stream ul.days li.day ul.threads li.thread div.user div.info {
+#epm-social-stream li.thread div.user div.info {
   height: 20px;
   line-height: 20px;
   position: relative;
   top: 12.5px;
   margin-right: 0;
 }
-#epm-social-stream ul.days li.day ul.threads li.thread div.user div.info a.user {
+#epm-social-stream li.thread div.user div.info a.user {
   margin-right: 0;
 }
-#epm-social-stream ul.days li.day ul.threads li.thread ul.activities li.activity {
+#epm-social-stream li.thread ul.activities li.activity {
   margin-top: 10px;
 }
-#epm-social-stream ul.days li.day ul.threads li.thread ul.activities li.activity span.activity-icon {
+#epm-social-stream li.thread ul.activities li.activity span.activity-icon {
   text-align: center;
   width: 36px;
   color: #555555;
@@ -186,49 +205,30 @@
   margin-right: 10px;
   margin-top: 5px;
 }
-#epm-social-stream ul.days li.day ul.threads li.thread div.comment-activity,
-#epm-social-stream ul.days li.day ul.threads li.thread div.general-activity {
+#epm-social-stream li.thread div.comment-activity,
+#epm-social-stream li.thread div.general-activity {
   float: none !important;
   margin-right: 0;
 }
-#epm-social-stream ul.days li.day ul.threads li.thread div.comment-activity div.user,
-#epm-social-stream ul.days li.day ul.threads li.thread div.comment-activity div.activity-detail,
-#epm-social-stream ul.days li.day ul.threads li.thread div.comment-activity div.activity-info {
+#epm-social-stream li.thread div.comment-activity div.user,
+#epm-social-stream li.thread div.comment-activity div.activity-detail,
+#epm-social-stream li.thread div.comment-activity div.activity-info {
   display: table-cell;
   float: none !important;
 }
-#epm-social-stream ul.days li.day ul.threads li.thread div.comment-activity div.user {
+#epm-social-stream li.thread div.comment-activity div.user {
   width: 45px;
   vertical-align: top;
 }
-#epm-social-stream ul.days li.day ul.threads li.thread div.comment-activity div.activity-detail {
+#epm-social-stream li.thread div.comment-activity div.activity-detail {
   width: 100%;
   padding-right: 4px;
 }
-#epm-social-stream ul.days li.day ul.threads li.thread div.comment-activity div.activity-info {
+#epm-social-stream li.thread div.comment-activity div.activity-info {
   white-space: nowrap;
 }
-#epm-social-stream ul.days li.day ul.threads li.thread div.comment-activity div.activity-info span.time-wrap {
+#epm-social-stream li.thread div.comment-activity div.activity-info span.time-wrap {
   position: relative;
   top: 5px;
-}
-#epm-social-stream ul.days li.day ul.threads li.single-activity-thread {
-  height: 45px;
-  line-height: 45px;
-}
-#epm-social-stream ul.days li.day ul.threads li.single-activity-thread span,
-#epm-social-stream ul.days li.day ul.threads li.single-activity-thread div,
-#epm-social-stream ul.days li.day ul.threads li.single-activity-thread a {
-  float: left;
-}
-#epm-social-stream ul.days li.day ul.threads li.single-activity-thread div,
-#epm-social-stream ul.days li.day ul.threads li.single-activity-thread a {
-  margin-right: 4px;
-}
-#epm-social-stream ul.days li.day ul.threads li.single-activity-thread .time-wrap {
-  height: 20px;
-  line-height: 20px;
-  position: relative;
-  top: 12.5px;
 }
 /*# sourceMappingURL=SocialStream.css.map */

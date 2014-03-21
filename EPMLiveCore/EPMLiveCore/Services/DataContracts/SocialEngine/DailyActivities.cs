@@ -16,11 +16,12 @@ namespace EPMLiveCore.Services.DataContracts.SocialEngine
             threads = new List<Thread>();
             users = new List<User>();
             webs = new List<Web>();
+            meta = new MetaData();
         }
 
         #endregion Constructors 
 
-        #region Properties (7) 
+        #region Properties (8) 
 
         public List<Activity> activities { get; set; }
 
@@ -29,6 +30,8 @@ namespace EPMLiveCore.Services.DataContracts.SocialEngine
         public List<Day> days { get; set; }
 
         public List<ItemList> lists { get; set; }
+
+        public MetaData meta { get; set; }
 
         public List<Thread> threads { get; set; }
 
@@ -176,5 +179,14 @@ namespace EPMLiveCore.Services.DataContracts.SocialEngine
         }
 
         #endregion Nested Classes 
+    }
+
+    public class MetaData
+    {
+        #region Properties (1) 
+
+        public string offset { get; set; }
+
+        #endregion Properties 
     }
 }
