@@ -1799,7 +1799,7 @@ namespace TimeSheets
             ndCol.Attributes.Append(attr1);
 
             attr1 = docData.CreateAttribute("Comments");
-            attr1.Value = string.Format("<img class='TS_Comments' src='/_layouts/epmlive/images/comment.png' alt='Click here to add comments'/>");
+            attr1.Value = string.Format("<img class='TS_Comments' src='/_layouts/epmlive/images/mywork/comment.png' alt='Click here to add comments'/>");
             ndCol.Attributes.Append(attr1);
 
             attr1 = docData.CreateAttribute("WebID");
