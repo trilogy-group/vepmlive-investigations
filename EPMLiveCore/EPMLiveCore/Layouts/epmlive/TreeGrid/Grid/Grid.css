@@ -938,8 +938,8 @@ u.GMSort0Right,u.GMSort1Right,u.GMSort2Right,u.GMSort3Right,u.GMSort4Right,u.GMS
 
 .GMColorAlternate { background-color:#EBFFFF; }
 
-.GMColorSelected { background-color:#EEE; }
-.GMClassSelected { color:#444444;background-color:#EEE; }
+.GMColorSelected { background-color:#f2f2f2; }
+.GMClassSelected { color:#444444;background-color:#f2f2f2; }
 
 .GMColorError { background-color:#FF6969; }
 .GMColorDeleted { background-color:#FFFFFF; }
@@ -992,13 +992,13 @@ u.GMSort0Right,u.GMSort1Right,u.GMSort2Right,u.GMSort3Right,u.GMSort4Right,u.GMS
 
 /* --------------- Hover, focus, edit cursors ----------------- */
 .GMHoverPanelBackground { }
-.GMHoverRowBackground { opacity:0.1; filter:alpha(opacity=10); background:#EEE; }
+.GMHoverRowBackground { opacity:0.1; filter:alpha(opacity=10); background:#f2f2f2; }
 .GMHoverRowBorder { z-index:1; border-top:1px solid #BBF; border-bottom:1px solid #BBF; cursor:default; }
 .GMHoverCellBorder { z-index:3; padding:1px; border:1px solid #A0A0F0; background:white; }
 .GMFocusPanelBackground { }
 .GMFocusRowBackground { opacity:0.1; filter:alpha(opacity=10); background:#0000; }
 .GMFocusRowBorder { z-index:2; border:0px solid black; }
-.GMFocusCellBorder,.GMEditCellBorder { z-index:4; border:0px solid #6666FF; background: #EEE }
+.GMFocusCellBorder,.GMEditCellBorder { z-index:4; border:0px solid #6666FF; background: #f2f2f2 }
 .GMFocusCellSpaceBorder,.GMEditCellSpaceBorder { z-index:4; }
 .GMEditCellBorder { border-color:#FF6666; }
 .GMEditCellInput { position:relative; border:1px solid #BBB; overflow:hidden; z-index:2; }
@@ -1413,7 +1413,7 @@ overflow:hidden; width:0px; height:0px; }
 .GMMouseOrig { background:yellow!important; opacity:0.5; filter:alpha(opacity=50); }
 .GMMouseDragObject { position:absolute; z-index:260; background:#888; opacity:0.5; filter:alpha(opacity=50); }
 
-.GMFocus { border:1px solid #AAF; border-top:1px solid #00F; border-left:1px solid #00F; background-color:#EEE; } 
+.GMFocus { border:1px solid #AAF; border-top:1px solid #00F; border-left:1px solid #00F; background-color:#f2f2f2; } 
 
 .GMFocus { border:1px solid blue; background-color:white; }    
 
