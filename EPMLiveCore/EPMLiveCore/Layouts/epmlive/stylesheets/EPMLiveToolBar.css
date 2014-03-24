@@ -112,9 +112,9 @@ div.epmliveToolBar .nav > li > a.nav-icon span {
   position: relative;
   top: 0;
 }
-div.epmliveToolBar .nav > li > a.nav-icon-title span {
+div.epmliveToolBar .nav > li > a.nav-icon-title span:first-of-type {
   padding-right: 8px;
-  font-size: .8em;
+  font-size: 12px;
   position: relative;
   top: 0;
 }
