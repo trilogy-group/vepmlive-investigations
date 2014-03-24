@@ -509,7 +509,6 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
 }
 
 (function (epmToolBar, $) {
-
     epmToolBar.generateToolBar = function (tagId, cfgs) {
 
         if ($('#contentRow').length > 0) {
@@ -1399,4 +1398,5 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
         }
         //END HELPER
     };
+    window.SP.SOD.notifyScriptLoadedAndExecuteWaitingJobs('EPMLiveToolbar.js');
 })(window.epmLiveGenericToolBar = window.epmLiveGenericToolBar || {}, window.jQuery);
