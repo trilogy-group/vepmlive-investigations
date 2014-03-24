@@ -6,9 +6,7 @@
 <%@ Import Namespace="Microsoft.SharePoint" %> 
 <%@ Register Tagprefix="WebPartPages" Namespace="Microsoft.SharePoint.WebPartPages" Assembly="Microsoft.SharePoint, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
 <%@ Control Language="C#" AutoEventWireup="true" CodeBehind="WorkSpaceCenter.ascx.cs" Inherits="EPMLiveWebParts.WorkSpaceCenter.WorkSpaceCenter" %>
-<%--<script type="text/javascript" src="../_layouts/15/epmlive/TreeGrid/GridE.js"></script>--%>
 <link href="../_layouts/15/epmlive/Stylesheets/EPMLiveToolBar.css" rel="Stylesheet" type="text/css" />
-<%--<script type="text/javascript" src="../_layouts/15/epmlive/javascripts/EPMLive.js"></script>--%>
 <style type="text/css">
     #EPMWorkspaceCenterGrid {
         margin: 10px auto;
@@ -176,7 +174,6 @@
             epmLiveGenericToolBar.generateToolBar('WorkSpacecenterToolbarMenu', cfgs);
         },
         changeView: function (currentView) {
-            //$("#myWorkSpace_Search").val('');
             var source = Grids["gridWorkSpaceCenter"].Source;
             source.Data.url = '<%= WebUrl %>/_vti_bin/WorkEngine.asmx';
             source.Data.Function = 'Execute';
@@ -212,9 +209,10 @@
         }
     }
     Grids.OnRenderFinish = function (loadWorkspaceCenterGrid) {
-        var addContextualMenu = function () {
+        var addFavoriteWSMenu = function () {
             $(".workspacecentercontextmenu").each(function () {
-                window.epmLiveNavigation.addContextualMenu($(this), null, true);
+                //window.epmLiveNavigation.addContextualMenu($(this), null, true);
+                window.epmLiveNavigation.addFavoriteWSMenu($(this));
             });
 
             $('.workspacecentercontextmenu').hover(function () {
@@ -223,7 +221,7 @@
             });
         };
 
-        ExecuteOrDelayUntilScriptLoaded(addContextualMenu, 'EPMLive.Navigation.js');
+        ExecuteOrDelayUntilScriptLoaded(addFavoriteWSMenu, 'EPMLive.Navigation.js');
     };
 </script>
 <div id="EPMWorkspaceCenter" style="width: 100%;">
