@@ -21,7 +21,9 @@ table.myfragments > tbody > tr > td:first-child {
 #gridMyFragments {
     border-top: 1px solid #eeeeee !important;
 }
-
+#gridMyFragments a {
+    text-decoration:none !important;
+}
 
 table.myfragments > tbody > tr > td {
     padding-left: 0px;
@@ -34,8 +36,7 @@ table.row-select > tbody > tr:hover {
 }
 
 .modal-body {
-    padding: 10px 20px 20px !important;
-    border-top: #e5e5e5 1px solid;
+    
 }
 
 .highlight {
@@ -43,10 +44,10 @@ table.row-select > tbody > tr:hover {
 }
 
 .modal-icon {
-    top: 3px;
+    top: 2px;
     position: relative;
     color: #cccccc;
-    padding-left: 15px;
+    padding-right: 15px;
 }
 
 .icon-wrapper {
@@ -62,10 +63,11 @@ table.row-select > tbody > tr:hover {
 
 .manageFragmentContainer {
     width: 98%;
-    border-top: #eeeeee 1px solid;
-    font-family: "Open Sans", Helvetica, Arial, sans-serif;
+    font-family: "Open Sans Light", Helvetica, Arial, sans-serif;
     height: 300px;
     overflow: auto;
+    color:#555555;
+    font-size:14px;
 }
 
 #divIFLoading {
@@ -81,4 +83,21 @@ table.row-select > tbody > tr:hover {
     position: fixed;
     text-align: right;
     width: 98%;
+}
+.modal-body .form-control  {
+height:34px;
+font-size:14px;
+}
+.form-control::-moz-placeholder {
+    color: #DDDDDD;
+    opacity: 1;
+}
+.form-control::-webkit-input-placeholder {
+    color: #DDDDDD;
+    opacity: 1;
+}
+
+.form-control:-ms-input-placeholder {  
+    color: #DDDDDD;
+    opacity: 1;
 }
