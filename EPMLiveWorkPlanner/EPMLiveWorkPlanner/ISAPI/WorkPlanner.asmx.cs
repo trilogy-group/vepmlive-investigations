@@ -5555,7 +5555,7 @@ namespace EPMLiveWorkPlanner
                                     (!selectedStatusColumnValues.Contains(statusColumnValue))) //Add Backlog Items to Left Panel
                                 {
                                     sbItems.Append("<div class='sortable-item' data-siteid='" + oWeb.Site.ID + "' data-webid='" + oWeb.ID + "' data-listid='" + list.ID + "' data-itemid='" + Convert.ToString(row["ID"]) + "' data-userid='0' data-itemtitle='" + Convert.ToString(row["Title"]) + "' data-icon='' data-type='50' data-fstring='" + kanBanBoardName + "' data-fdate='' data-fint='" + Convert.ToString(row["F_INT"]) + "' id='" + Convert.ToString(row["ID"]) + "'>"); //sortable-item <div> started
-                                    sbItems.Append("<div style='float:right;'><ul style='margin: 0px; width: 20px;'><li class='associateditemscontextmenu'><a data-itemid='" + Convert.ToString(row["ID"]) + "' data-listid='" + list.ID.ToString() + "' data-webid='" + oWeb.ID + "' data-siteid='" + oWeb.Site.ID + "'></a></li></ul></div>");
+                                    sbItems.Append("<div style='float:right;'><ul style='margin: 0px; width: 20px;'><li id='" + Convert.ToString(row["ID"]) + "' class='associateditemscontextmenu'><a data-itemid='" + Convert.ToString(row["ID"]) + "' data-listid='" + list.ID.ToString() + "' data-webid='" + oWeb.ID + "' data-siteid='" + oWeb.Site.ID + "'></a></li></ul></div>");
                                     foreach (string column in displayColumnsForSourceListData.Split(','))
                                     {
                                         if (!string.IsNullOrEmpty(column))
@@ -5614,7 +5614,7 @@ namespace EPMLiveWorkPlanner
                                             if (currentProcessingStatus.Equals(status, StringComparison.InvariantCultureIgnoreCase))
                                             {
                                                 sbItems.Append("<div class='sortable-item' data-siteid='" + oWeb.Site.ID + "' data-webid='" + oWeb.ID + "' data-listid='" + list.ID + "' data-itemid='" + Convert.ToString(row["ID"]) + "' data-userid='0' data-itemtitle='" + Convert.ToString(row["Title"]) + "' data-icon='' data-type='50' data-fstring='" + kanBanBoardName + "' data-fdate='' data-fint='" + Convert.ToString(row["F_INT"]) + "' id='" + Convert.ToString(row["ID"]) + "'>"); //sortable-item <div> started
-                                                sbItems.Append("<div style='float:right;'><ul style='margin: 0px; width: 20px;'><li class='associateditemscontextmenu'><a data-itemid='" + Convert.ToString(row["ID"]) + "' data-listid='" + list.ID.ToString() + "' data-webid='" + oWeb.ID + "' data-siteid='" + oWeb.Site.ID + "'></a></li></ul></div>");
+                                                sbItems.Append("<div style='float:right;'><ul style='margin: 0px; width: 20px;'><li  id='" + Convert.ToString(row["ID"]) + "' class='associateditemscontextmenu'><a data-itemid='" + Convert.ToString(row["ID"]) + "' data-listid='" + list.ID.ToString() + "' data-webid='" + oWeb.ID + "' data-siteid='" + oWeb.Site.ID + "'></a></li></ul></div>");
 
                                                 foreach (string column in displayColumnsForSourceListData.Split(','))
                                                 {
@@ -5758,6 +5758,199 @@ namespace EPMLiveWorkPlanner
             return string.Empty;
         }
 
+        //public static string GetKanBanNewItemAdded(XmlDocument data, SPWeb oWeb)
+        //{
+        //    //add wait for report db to update
+        //    Thread.Sleep(2000);
+
+        //    #region Read Parameters from data Xml
+
+        //    //Get values from parameter
+        //    string kanBanBoardName = DecodeJsonData(data.GetElementsByTagName("KanBanBoardName")[0].InnerText);
+        //    string kanBanFilterColumnSelectedValues = DecodeJsonData(data.GetElementsByTagName("KanBanFilter1")[0].InnerText);
+        //    string projectID = data.GetElementsByTagName("ProjectID")[0].InnerText;
+        //    Boolean isForEdit = Convert.ToBoolean(data.GetElementsByTagName("IsForEdit")[0].InnerText);
+
+        //    bool isNullValueIncluded = kanBanFilterColumnSelectedValues.Contains("(Blank)");
+
+        //    kanBanFilterColumnSelectedValues = kanBanFilterColumnSelectedValues.Replace("0,(Blank),", "");
+        //    #endregion
+
+        //    #region Variable Declaration
+
+        //    bool splitterLoaded = false;
+        //    StringBuilder sbItems = new StringBuilder();
+        //    StringBuilder filterRecords = new StringBuilder();
+
+        //    string tableName = string.Empty;
+        //    string columnName = string.Empty;
+        //    string filterColumnValues = string.Empty;
+        //    string selectedColumns = string.Empty;
+        //    string selectedColumnsDBFormat = string.Empty;
+        //    string displayColumnsForSourceListData = string.Empty;
+
+        //    string qryGetColumns = "SELECT ColumnName, SharePointType FROM RPTColumn WHERE InternalName IN({0}) AND RPTListId='{1}'";
+        //    string qryFRFData = "SELECT * FROM FRF WHERE SITE_ID = '{0}' AND WEB_ID = '{1}' AND LIST_ID = '{2}' AND F_String = '{3}' ORDER BY ITEM_ID";
+
+        //    DataTable dtSourceListData = new DataTable();
+        //    DataTable dtColumns = new DataTable();
+        //    DataTable dtFRFData = new DataTable();
+
+        //    #endregion
+
+        //    //Using SharePoint Object Model fetching data values
+        //    using (SPSite spSite = new SPSite(oWeb.Site.ID))
+        //    {
+        //        using (SPWeb spWeb = spSite.OpenWeb(oWeb.ID))
+        //        {
+        //            WorkPlannerAPI.PlannerProps props = WorkPlannerAPI.getSettings(spWeb, kanBanBoardName);
+
+        //            SPList list = spWeb.Lists[props.sListTaskCenter];
+
+        //            if (list != null)
+        //            {
+        //                SPField field = list.Fields.GetField(props.KanBanFilterColumn);
+
+        //                switch (field.Type)
+        //                {
+        //                    case SPFieldType.User:
+        //                    case SPFieldType.Lookup:
+        //                        columnName = field.InternalName + "Text";
+        //                        break;
+        //                    default:
+        //                        columnName = field.InternalName;
+        //                        break;
+        //                }
+
+        //                selectedColumns += props.KanBanTitleColumn + ",";
+        //                if (!string.IsNullOrEmpty(props.KanBanAdditionalColumns))
+        //                    selectedColumns += props.KanBanAdditionalColumns;
+
+        //                selectedColumnsDBFormat = "'" + selectedColumns.Replace(",", "','") + "'";
+
+        //                try
+        //                {
+        //                    //Title, Project, AssignedTo, Status => Title, ProjectID, ProjectText, AssignedToID, AssignedToText, Status
+        //                    var queryExecutor = new QueryExecutor(spWeb);
+        //                    dtColumns = queryExecutor.ExecuteReportingDBQuery(string.Format(qryGetColumns, selectedColumnsDBFormat, list.ID.ToString()),
+        //                        new Dictionary<string, object>
+        //                    {
+        //                            {"@WebId", oWeb.ID}
+        //                        });
+
+        //                }
+        //                catch { }
+
+        //                if (dtColumns != null && dtColumns.Rows.Count > 0)
+        //                {
+        //                    for (int i = 0; i < dtColumns.Rows.Count; i++)
+        //                    {
+        //                        string colName = Convert.ToString(dtColumns.Rows[i]["ColumnName"]);
+        //                        string colType = Convert.ToString(dtColumns.Rows[i]["SharePointType"]);
+
+        //                        if ((colType.ToLower().Equals("lookup") || colType.ToLower().Equals("user")) && colName.ToLower().EndsWith("id"))
+        //                        {
+        //                            continue;
+        //                        }
+        //                        else
+        //                        {
+        //                            displayColumnsForSourceListData += Convert.ToString(dtColumns.Rows[i]["ColumnName"]);
+        //                            if (i < dtColumns.Rows.Count - 1)
+        //                                displayColumnsForSourceListData += ",";
+        //                        }
+        //                    }
+        //                }
+
+        //                if (!string.IsNullOrEmpty(kanBanFilterColumnSelectedValues))
+        //                {
+        //                    filterColumnValues = "'" + kanBanFilterColumnSelectedValues.Replace(",", "','") + "'";
+        //                }
+
+        //                if (!string.IsNullOrEmpty(filterColumnValues))
+        //                {
+        //                    try
+        //                    {
+        //                        string qryWhereClause = string.Format(" {0} in ({1}) {2} AND ProjectID={3}", columnName, filterColumnValues, isNullValueIncluded ? " or " + columnName + " is null " : "", projectID);
+        //                        dtSourceListData = EPMLiveCore.ReportingData.GetReportingData(spWeb, list.Title, false, qryWhereClause, props.KanBanStatusColumn);
+        //                    }
+        //                    catch { }
+
+        //                    if (dtSourceListData != null)
+        //                    {
+        //                        DataColumn fIntDataColumn = new DataColumn("F_INT", typeof(Int32));
+        //                        fIntDataColumn.DefaultValue = 9999;
+        //                        dtSourceListData.Columns.Add(fIntDataColumn);
+        //                        //Insert/Update Record to FRF list...
+        //                        SPSecurity.RunWithElevatedPrivileges(delegate()
+        //                        {
+        //                            using (SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(spWeb.Site.WebApplication.Id)))
+        //                            {
+        //                                cn.Open();
+        //                                SqlCommand cmd = new SqlCommand(string.Format(qryFRFData, oWeb.Site.ID, oWeb.ID, list.ID.ToString(), kanBanBoardName), cn);
+        //                                using (SqlDataAdapter dap = new SqlDataAdapter(cmd))
+        //                                {
+        //                                    dap.Fill(dtFRFData);
+        //                                }
+        //                            }
+        //                        });
+
+        //                        if (dtFRFData != null && dtFRFData.Rows.Count > 0)
+        //                        {
+        //                            foreach (DataRow dr in dtSourceListData.Rows)
+        //                            {
+        //                                DataRow[] fIntDataRow = dtFRFData.Select("ITEM_ID = " + dr["ID"]);
+        //                                if (fIntDataRow != null && fIntDataRow.Length > 0)
+        //                                {
+        //                                    dr["F_INT"] = fIntDataRow[0]["F_INT"];
+        //                                }
+        //                            }
+        //                        }
+        //                    }
+        //                }
+        //                else
+        //                {
+        //                    return string.Empty;
+        //                }
+
+        //                string sortOrder = "";
+        //                if (isForEdit)
+        //                {
+        //                    sortOrder = "Modified DESC";
+        //                }
+        //                else
+        //                {
+        //                    sortOrder = "Created DESC";
+        //                }
+        //                DataRow dtSourceListDataRows = dtSourceListData.Select("", sortOrder)[0];
+
+        //                if (dtSourceListDataRows != null)
+        //                {
+        //                    #region Load BackLog Status Items
+
+        //                    sbItems.Append("<div class='sortable-item' data-plugid='" + dtSourceListDataRows[props.KanBanStatusColumn].ToString().Replace(" ", "") + "' data-siteid='" + oWeb.Site.ID + "' data-webid='" + oWeb.ID + "' data-listid='" + list.ID + "' data-itemid='" + Convert.ToString(dtSourceListDataRows["ID"]) + "' data-userid='0' data-itemtitle='" + Convert.ToString(dtSourceListDataRows["Title"]) + "' data-icon='' data-type='50' data-fstring='" + kanBanBoardName + "' data-fdate='' data-fint='" + Convert.ToString(dtSourceListDataRows["F_INT"]) + "' id='" + Convert.ToString(dtSourceListDataRows["ID"]) + "'>");
+        //                    sbItems.Append("<div style='float:right;'><ul style='margin: 0px; width: 20px;'><li  id='" + Convert.ToString(dtSourceListDataRows["ID"]) + "' class='associateditemscontextmenu'><a data-itemid='" + Convert.ToString(dtSourceListDataRows["ID"]) + "' data-listid='" + list.ID.ToString() + "' data-webid='" + oWeb.ID + "' data-siteid='" + oWeb.Site.ID + "'></a></li></ul></div>");
+        //                    foreach (string column in displayColumnsForSourceListData.Split(','))
+        //                    {
+        //                        if (!string.IsNullOrEmpty(column))
+        //                        {
+        //                            string strFullText = Convert.ToString(dtSourceListDataRows[column]);
+        //                            string strClass = "single";
+        //                            SPField spField = list.Fields.TryGetFieldByStaticName(column);
+        //                            if (spField != null && (spField.Type == SPFieldType.Text || spField.Type == SPFieldType.Note))
+        //                            {
+        //                                strClass = "double";
+        //                            }
+        //                            sbItems.Append("<div class='" + strClass + "' " + (column == props.KanBanStatusColumn ? "id='key'" : "") + " title='" + strFullText + "'>" + strFullText + "&nbsp;</div>");
+        //                        }
+        //                    }
+        //                    sbItems.Append("</div>");
+        //                    #endregion
+        //                }
+        //            }
+        //        }
+        //    }
+        //    return sbItems.ToString();
+        //}
         #endregion
     }
 }

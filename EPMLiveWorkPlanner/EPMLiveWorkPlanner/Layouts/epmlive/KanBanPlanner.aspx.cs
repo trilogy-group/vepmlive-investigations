@@ -39,7 +39,7 @@ namespace EPMLiveWorkPlanner
 
             EPMLiveScriptManager.RegisterScript(Page, new[]
             {
-                "libraries/jquery.min", "libraries/jquery-ui", "libraries/slimScroll", "@EPMLive.Navigation", "EPMLive.min",
+                "libraries/jquery.min", "libraries/jquery-ui", "libraries/slimScroll",
                 "kanban/ui.dropdownchecklist-1.4-min","kanban/jquery.dotdotdot.min"
             });
         }

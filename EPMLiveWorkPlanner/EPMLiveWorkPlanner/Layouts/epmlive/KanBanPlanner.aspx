@@ -24,10 +24,12 @@
 
             var selectedKanbanPlanner;
             var selectedKanbanFilter1;
+            var kanbanItemName;
+            var kanbanItemNewFromUrl;
             var kanbanPlanners;
             var kanbanFilter1;
 
-            var reGenerateToolBar = function (btnNewItemText, btnNewItemDataNewFormUrl) {
+            var reGenerateToolBar = function () {
 
                 $("#kanbanToolbar").html("");
 
@@ -37,9 +39,9 @@
                 var kanbanFilter1MultiselectCfg = '';
                 var kanbanFilter1OptionsCfg = '';
 
-                if (btnNewItemText) {
+                if (kanbanItemName) {
                     // new item button
-                    var newItemButtonCfg = '"controlId": "btnNewItem", "controlType": "button", "iconClass": "icon-plus-2", "value": "' + btnNewItemText + '", "events": [{ "eventName": "click", "function": function () { showNewForm(\'' + btnNewItemDataNewFormUrl + '\'); }  }] ';
+                    var newItemButtonCfg = '"controlId": "btnNewItem", "controlType": "button", "iconClass": "icon-plus-2", "value": "New ' + kanbanItemName + '", "events": [{ "eventName": "click", "function": function () { showNewForm(\'' + kanbanItemNewFromUrl + '\'); }  }] ';
                 }
 
                 // kanban planners dropdown
@@ -101,8 +103,88 @@
 
             var showNewForm = function (weburl) {
                 var options = { url: weburl, showMaximized: false, dialogReturnValueCallback: function (dialogResult) { if (dialogResult == 1) { KanbanClient.raiseKanbanFilter1ApplyClick(); } } };
+                //var options = { url: weburl, showMaximized: false, dialogReturnValueCallback: function (dialogResult) { if (dialogResult == 1) { kanbanTileCreated(); } } };
                 SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
-            };
+            }
+
+            var kanbanTileCreated = function () {
+                $.ajax({
+                    type: "POST",
+                    url: "<%=SPContext.Current.Web.ServerRelativeUrl%>/_vti_bin/WorkPlanner.asmx/Execute",
+                    data: "{Functionname : 'GetKanBanNewItemAdded' , Dataxml : '<DataXML><KanBanBoardName>" + selectedKanbanPlanner + "</KanBanBoardName><KanBanFilter1>" + selectedKanbanFilter1 + "</KanBanFilter1><ProjectID><%=strProjectId%></ProjectID><IsForEdit>0</IsForEdit></DataXML>'}",
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    error: function (xhr, status, error) {
+                        var err = eval("(" + xhr.responseText + ")");
+                        alert(err.Message);
+                    },
+                    success: function (response) {
+                        var newItemDiv = $(response.d);
+                        var divId = $(newItemDiv).attr('id');
+                        var sortableList = $(newItemDiv).attr('data-plugid');
+
+                        if ($('#' + sortableList)) {
+                            $('#' + sortableList).append(response.d);
+                        }
+                        else {
+                            $('#' + kanbanItemName).append(response.d);
+                        }
+
+                        setupKanbanTiles();
+                    }
+                });
+            }
+
+            var kanbanTileEdited = function (liid) {
+                if (liid) {
+                    $.ajax({
+                        type: "POST",
+                        url: "<%=SPContext.Current.Web.ServerRelativeUrl%>/_vti_bin/WorkPlanner.asmx/Execute",
+                        data: "{Functionname : 'GetKanBanNewItemAdded' , Dataxml : '<DataXML><KanBanBoardName>" + selectedKanbanPlanner + "</KanBanBoardName><KanBanFilter1>" + selectedKanbanFilter1 + "</KanBanFilter1><ProjectID><%=strProjectId%></ProjectID><IsForEdit>1</IsForEdit></DataXML>'}",
+                        contentType: "application/json; charset=utf-8",
+                        dataType: "json",
+                        error: function (xhr, status, error) {
+                            var err = eval("(" + xhr.responseText + ")");
+                            alert(err.Message);
+                        },
+                        success: function (response) {
+                            var oldItemDiv = $('#' + liid);
+                            var oldDivId = $(oldItemDiv).attr('id');
+                            var oldSortableList = $(oldItemDiv).attr('data-plugid');
+
+                            var newItemDiv = $(response.d);
+                            var newDivId = $(newItemDiv).attr('id');
+                            var newSortableList = $(newItemDiv).attr('data-plugid');
+
+
+                            if (oldSortableList == newSortableList) {
+                                $(oldItemDiv).replaceWith(newItemDiv)
+                            }
+                            else {
+                                $(oldItemDiv).remove();
+                                if ($('#' + sortableList)) {
+                                    $('#' + sortableList).append(response.d);
+                                }
+                                else {
+                                    $('#' + kanbanItemName).append(response.d);
+                                }
+                            }
+
+                            setupKanbanTiles();
+
+                        }
+                    });
+                }
+            }
+
+            var kanbanTileDeleted = function (liid) {
+                if (liid) {
+                    var tileToRemove = $('#mainContainer .stageContainer .sortable-list').find('#' + liid);
+                    if ($(tileToRemove)) {
+                        $(tileToRemove).remove();
+                    }
+                }
+            }
 
             var loadKanBanPlanners = function () {
                 showHideLoading(true, 'Loading Planners');
@@ -177,9 +259,11 @@
                                     $("#ddlBacklogStatus").append($("<option></option>").val(value.id).html(value.id));
                                 });
 
+                                kanbanItemName = obj.kanbanitemname;
+                                kanbanItemNewFromUrl = obj.kanbannewitemurl;
                                 kanbanFilter1 = obj.kanbanfilter1;
 
-                                reGenerateToolBar('New ' + obj.kanbanitemname, obj.kanbannewitemurl);
+                                reGenerateToolBar();
 
                                 raiseKanbanFilter1ApplyClick();
                             }
@@ -191,12 +275,21 @@
             var loadKanBanBoard = function (kanBanFilter1Data) {
 
                 selectedKanbanFilter1 = "";
-                for (var i in kanBanFilter1Data['sections']) {
-                    var section = kanBanFilter1Data['sections'][i];
-                    var options = section['options'];
-                    for (var key in options) {
+                var selectedKeys = kanBanFilter1Data['selectedKeys'];
+                if (selectedKeys.length != 0) {
+                    for (var key in selectedKeys) {
                         if (selectedKanbanFilter1 != "") selectedKanbanFilter1 += ",";
-                        selectedKanbanFilter1 += key.toString().replace("\\", "\\\\");;
+                        selectedKanbanFilter1 += selectedKeys[key].toString().replace("\\", "\\\\");
+                    }
+                }
+                else {
+                    for (var i in kanBanFilter1Data['sections']) {
+                        var section = kanBanFilter1Data['sections'][i];
+                        var options = section['options'];
+                        for (var key in options) {
+                            if (selectedKanbanFilter1 != "") selectedKanbanFilter1 += ",";
+                            selectedKanbanFilter1 += key.toString().replace("\\", "\\\\");;
+                        }
                     }
                 }
 
@@ -275,7 +368,6 @@
                         $("#mainTR td").css("min-width", per + "%");
                         $("#mainTR td").css("max-width", per + "%");
 
-
                         var cardWidth = $("#itemContainerTD").width();
                         var cardWidth = (cardWidth - 30);
                         $(".single").attr("style", "width:" + cardWidth + "px");
@@ -292,7 +384,7 @@
 
                         var addContextualMenu = function () {
                             $(".associateditemscontextmenu").each(function () {
-                                window.epmLiveNavigation.addContextualMenu($(this), null, true, '-1');
+                                window.epmLiveNavigation.addContextualMenu($(this), null, true, '-1', { "delete": "KanbanClient.kanbanTileDeleted" });
                             });
                         };
 
@@ -303,13 +395,79 @@
                             $(this).find('.epm-nav-contextual-menu').hide();
                         });
 
-                        $('#mainContainer .sortable-list').slimScroll({ height: '650px', width: '100%' });
+                        $('#mainContainer .sortable-list').slimScroll({ height: (GetPageHeight() - 200) + 'px', width: '100%' });
                         $('#mainContainer .slimScrollDiv').css({ "overflow": "visible" });
 
+                        $('#mainContainer .stageContainer .sortable-list').css({ 'height': (GetPageHeight() - 200) + 'px' });
+                        $('#mainContainer .stageContainer .sortable-list').on('scroll', function () {
+                            $('#mainContainer .stageContainer .sortable-item').find('.associateditemscontextmenu').hide();
+                            $('#mainContainer .stageContainer .sortable-item').find('.epm-nav-contextual-menu').hide();
+                        });
+
                         ExecuteOrDelayUntilScriptLoaded(addContextualMenu, 'EPMLive.Navigation.js');
+                        
                     }
                 });
             };
+
+            var setupKanbanTiles = function () {
+                var cardWidth = $("#itemContainerTD").width();
+                var cardWidth = (cardWidth - 30);
+                $(".single").attr("style", "width:" + cardWidth + "px");
+                $(".itemContainer .sortable-item div:nth-child(2)").attr("style", "width:" + (cardWidth - 25) + "px");
+
+                $('.double').each(function (i, obj) {
+                    if (obj.offsetHeight < obj.scrollHeight ||
+                    obj.offsetWidth < obj.scrollWidth) {
+                        $(obj).dotdotdot({
+                            wrap: 'word'
+                        });
+                    }
+                });
+
+                var addContextualMenu = function () {
+                    $(".associateditemscontextmenu").each(function () {
+                        window.epmLiveNavigation.addContextualMenu($(this), null, true, '-1', { "edit": "KanbanClient.kanbanTileEdited", "delete": "KanbanClient.kanbanTileDeleted" });
+                    });
+                };
+
+                $('.sortable-item').hover(function () {
+                    $(this).find('.associateditemscontextmenu').show();
+                }, function () {
+                    $(this).find('.associateditemscontextmenu').hide();
+                    $(this).find('.epm-nav-contextual-menu').hide();
+                });
+
+                $('#mainContainer .sortable-list').slimScroll({ height: (GetPageHeight() - 200) + 'px', width: '100%' });
+                $('#mainContainer .slimScrollDiv').css({ "overflow": "visible" });
+
+                $('#mainContainer .stageContainer .sortable-list').css({ 'height': (GetPageHeight() - 200) + 'px' });
+                $('#mainContainer .stageContainer .sortable-list').on('scroll', function () {
+                    $('#mainContainer .stageContainer .sortable-item').find('.associateditemscontextmenu').hide();
+                    $('#mainContainer .stageContainer .sortable-item').find('.epm-nav-contextual-menu').hide();
+                });
+
+                ExecuteOrDelayUntilScriptLoaded(addContextualMenu, 'EPMLive.Navigation.js');
+            }
+
+            var GetPageHeight = function () {
+                var scnHei;
+                if (self.innerHeight) // all except Explorer
+                {
+                    //scnWid = self.innerWidth;
+                    scnHei = self.innerHeight;
+                }
+                else if (document.documentElement && document.documentElement.clientHeight) {
+                    //scnWid = document.documentElement.clientWidth;
+                    scnHei = document.documentElement.clientHeight;
+                }
+                else if (document.body) // other Explorers
+                {
+                    //scnWid = document.body.clientWidth;
+                    scnHei = document.body.clientHeight;
+                }
+                return scnHei;
+            }
 
 
             var saveKanbanTile = function (ui, parentId, childId, datadraggedstatus, indexOfItem) {
@@ -348,7 +506,9 @@
                 resetControls: resetControls,
                 loadKanBanPlanners: loadKanBanPlanners,
                 loadKanBanBoard: loadKanBanBoard,
-                raiseKanbanFilter1ApplyClick: raiseKanbanFilter1ApplyClick
+                raiseKanbanFilter1ApplyClick: raiseKanbanFilter1ApplyClick,
+                kanbanTileDeleted: kanbanTileDeleted,
+                kanbanTileEdited: kanbanTileEdited
             };
 
         })();

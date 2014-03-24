@@ -941,8 +941,28 @@
 
                     switch (kind + '') {
                         case '-1':
-                            var options = { url: redirectUrl, showMaximized: false, dialogReturnValueCallback: function (dialogResult) { if (dialogResult == 1 || command == 'delete') { KanbanClient.raiseKanbanFilter1ApplyClick(); } } };
-                            SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
+                            if (command == 'delete') {
+                                if (confirm('Are you sure you want to send the item(s) to the Recycle Bin?')) {
+                                    var nId = SP.UI.Notify.addNotification('Deleting Item...', true, '', null);
+                                    if (command !== 'nav:remove') {
+                                        $.get(redirectUrl).always(function () {
+                                            if (callBackFunction != '')
+                                                eval(callBackFunction + '(' + id + ')');
+                                            else
+                                                removeLink(id, nId);
+                                        });
+                                    } else {
+                                        if (callBackFunction != '')
+                                            eval(callBackFunction + '(' + id + ')');
+                                        else
+                                            removeLink(id, nId);
+                                    }
+                                }
+                            }
+                            else {
+                                var options = { url: redirectUrl, showMaximized: false, dialogReturnValueCallback: function (dialogResult) { if (dialogResult == 1) { KanbanClient.raiseKanbanFilter1ApplyClick(); } } };
+                                SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
+                            }
                             return true;
                         case '0':
                             OpenCreateWebPageDialog(redirectUrl);
