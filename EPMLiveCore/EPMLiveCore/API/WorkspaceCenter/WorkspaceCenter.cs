@@ -29,9 +29,11 @@ namespace EPMLiveCore.API
                 string sqlquery = string.Empty;
                 DataTable dtWorkspacecenterData = null;
                 DataTable dtFRFData = null;
-                 DataTable dtRPTWebData = null;
+                DataTable dtRPTWebData = null;
                 var result = new XDocument();
                 #endregion
+
+                
                 using (SPSite spSite = new SPSite(oWeb.Site.ID))
                 {
                     using (SPWeb spWeb = spSite.OpenWeb(oWeb.ID))
@@ -59,7 +61,7 @@ namespace EPMLiveCore.API
                                                              into tempDelete
                                                              where tempDelete.Count() > 0
                                                              select rptWebRow).CopyToDataTable();
-                                   
+
                                 }
                             }
                             else
@@ -117,7 +119,9 @@ namespace EPMLiveCore.API
                                                  }).FirstOrDefault();
                                     CDate = dates.CreatedDate.ToShortDateString();
                                     UDate = dates.ModifiedDate.ToShortDateString();
-                                    string WebTitle = Convert.ToString(dtWorkspacecenterData.Rows[i]["WebTitle"]);
+                                    //string WebTitle = Convert.ToString(dtWorkspacecenterData.Rows[i]["WebTitle"]);
+                                    //string WebTitle = "<div> <div style='float:left;'>" + Convert.ToString(dtWorkspacecenterData.Rows[i]["WebTitle"] + "</div><div style='float:right;'><ul style='margin: 0px; width: 20px;'><li class='workspacecentercontextmenu'><a data-itemid='20'data-listid= '70045944-8348-4D19-A846-1911DF213FFA' data-webid='" + oWeb.ID + "' data-siteid='" + oWeb.Site.ID + "'></a></li></ul></div> </div>");
+                                    string WebTitle = "<div> <div style='float:left;'>" + Convert.ToString(dtWorkspacecenterData.Rows[i]["WebTitle"] + "</div><div style='float:right;'><ul style='margin: 0px; width: 20px;'><li class='workspacecentercontextmenu'><a data-webid='" + oWeb.ID + "' data-siteid='" + oWeb.Site.ID + "'></a></li></ul></div> </div>");
                                     string Description = Convert.ToString(dtWorkspacecenterData.Rows[i]["Description"]);
                                     string Members = Convert.ToString(dtWorkspacecenterData.Rows[i]["Members"]);
                                     string Owner = Convert.ToString(dtWorkspacecenterData.Rows[i]["SharePointAccountText"]);
