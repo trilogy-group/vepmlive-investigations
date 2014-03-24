@@ -939,7 +939,7 @@ u.GMSort0Right,u.GMSort1Right,u.GMSort2Right,u.GMSort3Right,u.GMSort4Right,u.GMS
 .GMColorAlternate { background-color:#EBFFFF; }
 
 .GMColorSelected { background-color:#EEE; }
-.GMClassSelected { color:black;background-color:#EEE; }
+.GMClassSelected { color:#444444;background-color:#EEE; }
 
 .GMColorError { background-color:#FF6969; }
 .GMColorDeleted { background-color:#FFFFFF; }
