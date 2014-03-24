@@ -17,6 +17,10 @@
   width:15px !important;
 }
 
+.GMPage {
+    border-top: none !important;
+}
+
 /* ------------- Base tags ------------- 
 
 .GMClassSelected td {
