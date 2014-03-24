@@ -625,13 +625,15 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
                 (value == undefined)) {
                 aContainer.addClass('nav-icon');
             }
+            else {
+                aContainer.addClass('nav-icon-title');
+            }
             aContainer.attr('href', 'javascript:void(0)');
 
             if (iconClass &&
                 (iconClass != 'none')) {
                 var spnImg = $(document.createElement('span'));
                 spnImg.attr('class', iconClass);
-                spnImg.attr('style', 'position: relative;padding-right: 8px;font-size: 0.8em;top: 0px');
                 aContainer.append(spnImg);
             }
 
@@ -685,7 +687,6 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
                 (iconClass != 'none')) {
                 var spnImg = $(document.createElement('span'));
                 spnImg.attr('class', iconClass);
-                spnImg.attr('style', 'position: relative;padding-right: 5px;font-size: 0.8em;top: 0px');
                 aContainer.append(spnImg);
             }
             //create span label for text
@@ -1112,7 +1113,6 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
                 (iconClass != 'none')) {
                 var spnImg = $(document.createElement('span'));
                 spnImg.attr('class', iconClass);
-                spnImg.attr('style', 'position:relative;top:1px');
                 aContainer.append(spnImg);
             }
 
