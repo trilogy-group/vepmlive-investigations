@@ -168,7 +168,14 @@ namespace EPMLiveCore.Layouts.epmlive
                                 if (nodeToCopy != null)
                                 {
                                     UpdateNodes(nodeToCopy, ref teamToAdd, ref rowId);
-                                    insertAfterNode.ParentNode.InsertAfter(nodeToCopy, insertAfterNode);
+                                    if (planRowSelectedID == "0" && insertAfterNode.Attributes["id"].Value == "0")
+                                    {
+                                        insertAfterNode.AppendChild(nodeToCopy);
+                                    }
+                                    else
+                                    {
+                                        insertAfterNode.ParentNode.InsertAfter(nodeToCopy, insertAfterNode);
+                                    }
                                     insertAfterNode = nodeToCopy;
                                 }
                             }
