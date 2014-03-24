@@ -202,6 +202,47 @@
 					</Menu>
               </FlyoutAnchor>
 
+
+			  <FlyoutAnchor
+					Id="Ribbon.WorkPlanner.ToolsGroup.Fragment"
+					Sequence="20"
+					Command="Ribbon.WorkPlanner.Fragment"
+					Image16by16="/_layouts/epmlive/images/edit-fragment.png"
+					LabelText="Fragments"
+					TemplateAlias="oM">
+					<Menu Id="Ribbon.WorkPlanner.ToolsGroup.Fragment.Menu">
+					  <MenuSection Id="Ribbon.WorkPlanner.ToolsGroup.Fragment.Menu.Scope" Sequence="20" DisplayMode="Menu16">
+						<Controls Id="Ribbon.WorkPlanner.ToolsGroup.Fragment.Menu.Scope.Controls">
+
+							<Button
+							Id="Ribbon.WorkPlanner.ToolsGroup.AddFragmentButton"
+							Sequence="30"
+							Image16by16="/_layouts/epmlive/images/add-fragment.png"
+							Command="Ribbon.WorkPlanner.AddFragmentButton"
+							LabelText="Insert Fragment"
+							TemplateAlias="oM"/>
+
+							<Button
+							Id="Ribbon.WorkPlanner.ToolsGroup.SaveFragmentButton"
+							Sequence="12"
+							Image16by16="/_layouts/epmlive/images/fragment-save.png"
+							Command="Ribbon.WorkPlanner.SaveFragmentButton"
+							LabelText="Save Fragment"
+							TemplateAlias="oM"/>
+
+							<Button
+							Id="Ribbon.WorkPlanner.ToolsGroup.ManageFragmentButton"
+							Sequence="20"
+							Image16by16="/_layouts/epmlive/images/edit-fragment.png"
+							Command="Ribbon.WorkPlanner.ManageFragmentButton"
+							LabelText="Manage Fragments"
+							TemplateAlias="oM"/>	
+
+						</Controls>
+					  </MenuSection>
+					</Menu>
+              </FlyoutAnchor>
+
 			  <Button
 				Id="Ribbon.WorkPlanner.ToolsGroup.SaveTemplate"
 				Sequence="12"
@@ -225,22 +266,6 @@
 				Image16by16="/_layouts/1033/images/formatmap16x16.png" Image16by16Top="-64" Image16by16Left="-128"
 				LabelText="Edit Resource Plan"
 				TemplateAlias="oM"/>
-
-				<Button
-					Id="Ribbon.WorkPlanner.ToolsGroup.SaveFragmentButton"
-					Sequence="12"
-					Image16by16="/_layouts/epmlive/images/fragment-save.png"
-					Command="Ribbon.WorkPlanner.SaveFragmentButton"
-					LabelText="Save Fragment"
-					TemplateAlias="oM"/>
-
-					<Button
-					Id="Ribbon.WorkPlanner.ToolsGroup.ManageFragmentButton"
-					Sequence="20"
-					Image16by16="/_layouts/epmlive/images/edit-fragment.png"
-					Command="Ribbon.WorkPlanner.ManageFragmentButton"
-					LabelText="Manage Fragments"
-					TemplateAlias="oM"/>	
 
 			</Controls>
 		</Group>

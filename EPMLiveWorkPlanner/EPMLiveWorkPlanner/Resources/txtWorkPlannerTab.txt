@@ -124,13 +124,7 @@
 					LabelText="External Task"
 					TemplateAlias="oM"/>
 
-				<Button
-					Id="Ribbon.WorkPlanner.InsertGroup.AddFragmentButton"
-					Sequence="30"
-					Image16by16="/_layouts/epmlive/images/add-fragment.png"
-					Command="Ribbon.WorkPlanner.AddFragmentButton"
-					LabelText="Insert Fragment"
-					TemplateAlias="oM"/>
+				
 
 			</Controls>
 		</Group>

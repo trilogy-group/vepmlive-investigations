@@ -1571,6 +1571,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
             //Fragment Section
 
             //Insert Fragment option is enabled for all users.
+            commands.Add(new SPRibbonCommand("Ribbon.WorkPlanner.Fragment", "", "true"));
             commands.Add(new SPRibbonCommand("Ribbon.WorkPlanner.AddFragmentButton", "AddFragment();", "true"));
 
             //SPBasePermissions.ManageWeb – This is for saving public views
