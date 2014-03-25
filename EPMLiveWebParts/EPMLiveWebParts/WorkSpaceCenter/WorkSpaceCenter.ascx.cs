@@ -39,7 +39,7 @@ namespace EPMLiveWebParts.WorkSpaceCenter
 
         protected override void OnPreRender(EventArgs e)
         {
-            //SPPageContentManager.RegisterStyleFile(LAYOUT_PATH + "Stylesheets/EPMLiveToolBar.min.css");
+            SPPageContentManager.RegisterStyleFile(LAYOUT_PATH + "Stylesheets/EPMLiveToolBar.min.css");
 
             EPMLiveScriptManager.RegisterScript(Page, new[]
             {

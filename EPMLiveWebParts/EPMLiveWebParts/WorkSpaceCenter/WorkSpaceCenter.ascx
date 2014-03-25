@@ -6,7 +6,7 @@
 <%@ Import Namespace="Microsoft.SharePoint" %> 
 <%@ Register Tagprefix="WebPartPages" Namespace="Microsoft.SharePoint.WebPartPages" Assembly="Microsoft.SharePoint, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
 <%@ Control Language="C#" AutoEventWireup="true" CodeBehind="WorkSpaceCenter.ascx.cs" Inherits="EPMLiveWebParts.WorkSpaceCenter.WorkSpaceCenter" %>
-<link href="../_layouts/15/epmlive/Stylesheets/EPMLiveToolBar.css" rel="Stylesheet" type="text/css" />
+
 <style type="text/css">
     #EPMWorkspaceCenterGrid {
         margin: 10px auto;
@@ -170,17 +170,18 @@
                     ]
                 }
             ];
-            alert("ToolbarTest1");
+            alert("Toolbar Problem");
             epmLiveGenericToolBar.generateToolBar('WorkSpacecenterToolbarMenu', cfgs);
         },
         changeView: function (currentView) {
-            var source = Grids["gridWorkSpaceCenter"].Source;
-            source.Data.url = '<%= WebUrl %>/_vti_bin/WorkEngine.asmx';
-            source.Data.Function = 'Execute';
-            source.Data.Param.Function = 'GetWorkspaceCenterGridData';
-            source.Data.Param.Dataxml = currentView;
-            Grids["gridWorkSpaceCenter"].Reload(source, null, false);
-
+            if (Grids.count > 0) {
+                var source = Grids["gridWorkSpaceCenter"].Source;
+                source.Data.url = '<%= WebUrl %>/_vti_bin/WorkEngine.asmx';
+                source.Data.Function = 'Execute';
+                source.Data.Param.Function = 'GetWorkspaceCenterGridData';
+                source.Data.Param.Dataxml = currentView;
+                Grids["gridWorkSpaceCenter"].Reload(source, null, false);
+            }
         },
         createNewWorkspace: function () {
             var createNewWorkspaceUrl = "<%= WebUrl %>/_layouts/epmlive/QueueCreateWorkspace.aspx";
@@ -211,13 +212,7 @@
     Grids.OnRenderFinish = function (loadWorkspaceCenterGrid) {
         var addFavoriteWSMenu = function () {
             $(".workspacecentercontextmenu").each(function () {
-                //window.epmLiveNavigation.addContextualMenu($(this), null, true);
                 window.epmLiveNavigation.addFavoriteWSMenu($(this));
-            });
-
-            $('.workspacecentercontextmenu').hover(function () {
-            }, function () {
-                $(this).find('.epm-nav-contextual-menu').hide();
             });
         };
 
