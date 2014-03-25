@@ -63,7 +63,7 @@
 
 <script id="_epm-se-comment-thread" type="text/x-handlebars-template">
     <div class="epm-se-header epm-se-comment-thread">
-        <div class="epm-se-user-info"><a data-url="{{user.url}}" class="epm-se-link-user">{{user.displayName}}</a></div>
+        <div class="epm-se-user-info"><a data-url="{{user.url}}" class="epm-se-link-user" href="{{user.url}}" target="_blank">{{user.displayName}}</a></div>
         <div class="epm-se-thread-info">made a comment...</div>
         <div class="epm-se-activity-info"><span class="epm-se-thread-icon icon-bubble-12"></span></div>
     </div>
@@ -78,10 +78,10 @@
 
 <script id="_epm-se-thread-info" type="text/x-handlebars-template">
     {{#unless web.isCurrentWorkspace}}
-        <a href="{{web.url}}" target="_blank">{{web.title}}</a>:&nbsp;
+        <a href="{{web.url}}" href="{{web.url}}" target="_blank">{{web.title}}</a>:&nbsp;
     {{/unless}}
-    <a data-url="{{list.url}}" class="epm-se-link-list">{{list.name}}</a>&nbsp;-&nbsp;
-    <a data-url="{{url}}" class="epm-se-link-item"><h2>{{title}}</h2></a>
+    <a data-url="{{list.url}}" class="epm-se-link-list" href="{{list.url}}" target="_blank">{{list.name}}</a>&nbsp;-&nbsp;
+    <a data-url="{{url}}" class="epm-se-link-item" href="{{url}}" target="_blank"><h2>{{title}}</h2></a>
 </script>
 
 <script id="_epm-se-avatar" type="text/x-handlebars-template">
@@ -93,11 +93,11 @@
 </script>
 
 <script id="_epm-se-user" type="text/x-handlebars-template">
-    <a data-url="{{user.url}}" class="epm-se-link-user epm-se-has-tooltip" title="{{user.name}}" data-placement="top" data-toggle="tooltip">{{user.displayName}}</a>
+    <a data-url="{{user.url}}" class="epm-se-link-user epm-se-has-tooltip" title="{{user.name}}" data-placement="top" data-toggle="tooltip" href="{{user.url}}" target="_blank">{{user.displayName}}</a>
 </script>
 
 <script id="_epm-se-user-plain" type="text/x-handlebars-template">
-    <a data-url="{{user.url}}" class="epm-se-link-user">{{user.displayName}}</a>
+    <a data-url="{{user.url}}" class="epm-se-link-user" href="{{user.url}}" target="_blank">{{user.displayName}}</a>
 </script>
 
 <script id="_epm-se-time" type="text/x-handlebars-template">
