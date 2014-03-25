@@ -734,7 +734,8 @@ namespace EPMLiveCore.API.Integration
                     }
                 }
 
-                li.SystemUpdate();
+                //li.SystemUpdate();
+                li.Update();
             }
             catch (Exception ex)
             {
