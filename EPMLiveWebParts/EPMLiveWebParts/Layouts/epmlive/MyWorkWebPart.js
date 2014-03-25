@@ -36,22 +36,22 @@ function configureTitleCol(grid) {
 //    }
 //};
 
-Grids.OnGetSortValue = function (grid, row, col, val) {
-    if (grid.id === window.allWorkGridId) {
-        if (col === 'DueDay') {
-            return DateToString(row['DueDate'], 'yyyyMMdd');
-        } else if (grid.GetAttribute(row, col, 'Type') === 'Date') {
-            return DateToString(row[col], 'yyyyMMdd');
-        } else if (val === undefined || val === '') {
-            return 999999999999999;
-        } else {
-            return val;
-        }
-    }
-};
 
-Grids.OnReady = function (grid, start) {
+
+function MyWorkOnReady (grid, start) {
+    
     if (grid.id === window.allWorkGridId) {
+    
+        TGSetEvent("OnRenderFinish", grid.id, MyWorkOnRenderFinish);
+        TGSetEvent("OnFocus", grid.id, MyWorkOnFocus);
+        TGSetEvent("OnClick", grid.id, MyWorkOnClick);
+        TGSetEvent("OnGetHtmlValue", grid.id, MyWorkOnGetHtmlValue);
+        TGSetEvent("OnLoaded", grid.id, MyWorkOnLoaded);
+        TGSetEvent("OnColumnsChanged", grid.id, MyWorkOnColumnsChanged);
+        TGSetEvent("OnGetColor", grid.id, MyWorkOnGetColor);
+        TGSetEvent("OnGroup", grid.id, MyWorkOnGroup);
+        TGSetEvent("OnGetSortValue", grid.id, MyWorkOnGetSortValue);
+
         EPMLiveCore.WorkEngineAPI.set_path(siteUrl + '/_vti_bin/WorkEngine.asmx');
 
         if (window.epmLiveMasterPageVersion >= 5.5) {
@@ -87,19 +87,35 @@ Grids.OnReady = function (grid, start) {
     }
 };
 
-Grids.OnRenderFinish = function (grid) {
+function MyWorkOnGetSortValue(grid, row, col, val) {
     if (grid.id === window.allWorkGridId) {
+        if (col === 'DueDay') {
+            return DateToString(row['DueDate'], 'yyyyMMdd');
+        } else if (grid.GetAttribute(row, col, 'Type') === 'Date') {
+            return DateToString(row[col], 'yyyyMMdd');
+        } else if (val === undefined || val === '') {
+            return 999999999999999;
+        } else {
+            return val;
+        }
+    }
+};
+
+function MyWorkOnRenderFinish (grid) {
+    
+    if (grid.id === window.allWorkGridId) {
+        
         MyWorkGrid.resetNoDataRow();
     }
 };
 
-Grids.OnFocus = function (grid, row, col, orow, ocol, pagepos) {
+function MyWorkOnFocus (grid, row, col, orow, ocol, pagepos) {
     if (grid.id === window.allWorkGridId) {
         window.RefreshCommandUI();
     }
 };
 
-Grids.OnClick = function (grid, row, col, x, y, event) {
+function MyWorkOnClick(grid, row, col, x, y, event) {
     if (grid.id === window.allWorkGridId) {
         MyWorkGrid.loadRibbon();
 
@@ -170,7 +186,7 @@ Grids.OnClick = function (grid, row, col, x, y, event) {
     }
 };
 
-Grids.OnGetHtmlValue = function (grid, row, col, val) {
+function MyWorkOnGetHtmlValue(grid, row, col, val) {
     if (grid.id === window.allWorkGridId) {
         if (col === 'CommentCount' || col === 'Priority' || col === 'Flag' || col === 'Title' || col === 'WorkingOn') {
             if (row.Def.Name !== 'Header' && row.Def.Name !== 'Fixed' && row.Def.Name !== 'Group') {
@@ -269,7 +285,7 @@ Grids.OnGetHtmlValue = function (grid, row, col, val) {
     }
 };
 
-Grids.OnLoaded = function (grid) {
+function MyWorkOnLoaded(grid) {
     if (grid.id === window.allWorkGridId) {
         var maxHeight = window.mwWebPartHeight;
 
@@ -336,7 +352,7 @@ Grids.OnLoaded = function (grid) {
     }
 };
 
-Grids.OnColumnsChanged = function (grid, cols, count) {
+function MyWorkOnColumnsChanged(grid, cols, count) {
     if (grid.id === window.allWorkGridId) {
         var lastCol = grid.GetLastCol("1");
 
@@ -348,7 +364,7 @@ Grids.OnColumnsChanged = function (grid, cols, count) {
     }
 };
 
-window.Grids.OnGetColor = function (grid, row, col, r, g, b, edit) {
+function MyWorkOnGetColor(grid, row, col, r, g, b, edit) {
     if (grid.id === window.allWorkGridId) {
         if (col === 'CommentCount') {
             if ((r === 230 || r === 180 || r === 205 || r === 255) && (g === 242 || g === 217 || g === 230 || g === 255) && (b === 251 || b === 243 || b === 247 || b === 255)) {
@@ -370,7 +386,7 @@ window.Grids.OnGetColor = function (grid, row, col, r, g, b, edit) {
     }
 };
 
-window.Grids.OnGroup = function (grid, group) {
+function MyWorkOnGroup(grid, group) {
     if (grid.id === window.allWorkGridId) {
         window.setTimeout(function () {
             var g = Grids[MyWorkGrid.gridId];
