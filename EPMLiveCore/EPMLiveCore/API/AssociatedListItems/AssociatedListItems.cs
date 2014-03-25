@@ -405,7 +405,7 @@ namespace EPMLiveCore.API
                                     {
                                         sbListAssociatedItemsDiv.Append("<tr>");
 
-                                        if (item.Title != null && item.Title.TrimEnd().Length > 20)
+                                        if (item.Title != null && item.Title.TrimEnd().Length > 25)
                                         {
                                             sbListAssociatedItemsDiv.Append("<td><a href='#' alt='" + item.Title + "' title='" + item.Title + "' onclick=\"javascript:FancyDispFormClient.showNewForm('" + projectAssociatedList.DefaultDisplayFormUrl + "?ID=" + item.ID + "&Source=" + sourceUrl + "');return false;\">" + item.Title.Substring(0, 25) + "..." + "</a></td>");
                                         }
