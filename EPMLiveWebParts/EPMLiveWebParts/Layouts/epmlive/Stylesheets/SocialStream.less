@@ -10,6 +10,7 @@
 @activity-info-font-size:0.8em;
 @icon-font-size:1.5em;
 @activity-info-size:@header-height/2;
+@border-color: #EEEEEE;
 
 #epm-social-stream {
     width: 100%;
@@ -66,6 +67,7 @@
     li.epm-se-day {
         div.epm-se-header {
             margin-bottom: @section-bottom-margin - 10;
+            margin-top: @section-bottom-margin - 10;
             height: @header-height;
             text-align: center;
             line-height: @header-height;
@@ -110,7 +112,7 @@
             -moz-border-left-colors: none;
             -moz-border-right-colors: none;
             -moz-border-top-colors: none;
-            border-color: -moz-use-text-color -moz-use-text-color #EEEEEE;
+            border-color: -moz-use-text-color -moz-use-text-color @border-color;
             border-style: none none solid;
             border-width: medium medium 1px;
             margin-bottom: 6px;
@@ -144,6 +146,45 @@
 
         ul.epm-se-newer-activities, ul.epm-se-older-activities {
             display: none;
+        }
+
+        ul.epm-se-older-activities {
+            border-bottom: 1px solid @border-color;
+            margin-bottom: 5px !important;
+            padding-bottom: 10px;
+        }
+
+        ul.epm-se-newer-activities {
+            border-top: 1px solid @border-color;
+            margin-top: 5px !important;
+            padding-top: 10px;
+        }
+
+        div.epm-se-show-older, div.epm-se-show-newer {
+            color: #BBBBBB;
+            display: none;
+            font-size: 0.8em;
+            font-weight: 300;
+            line-height: 20px;
+            cursor: pointer;
+
+            span {
+                color: #CCCCCC;
+                font-size: 0.8em;
+                margin-right: 8px;
+            }
+        }
+
+        div.epm-se-show-older {
+            border-bottom: 1px solid @border-color;
+            margin-bottom: 5px;
+            padding-bottom: 5px;
+        }
+
+        div.epm-se-show-newer {
+            border-top: 1px solid @border-color;
+            margin-top: 10px;
+            padding-top: 5px;
         }
     }
 

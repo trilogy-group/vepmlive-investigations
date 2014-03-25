@@ -30,6 +30,20 @@
                     limit: 10,
                     offset: null,
                     isLoading: false
+                },
+                ui: {
+                    classes: {
+                        upArrow: 'icon-arrow-up-16',
+                        downArrow: 'icon-arrow-down-16',
+                        expanded: 'epm-se-expanded'
+                    },
+
+                    selectors: {
+                        newer: 'ul.epm-se-newer-activities',
+                        older: 'ul.epm-se-older-activities',
+                        showNewer: 'div.epm-se-show-newer',
+                        showOlder: 'div.epm-se-show-older',
+                    }
                 }
             };
 
@@ -83,11 +97,18 @@
                     actions.paginate();
                 });
 
-                var linkables = ['.epm-se-link-list', '.epm-se-link-item', '.epm-se-link-user'];
+                var linkables = ['a.epm-se-link-list', 'a.epm-se-link-item', 'a.epm-se-link-user'];
                 for (var i = 0; i < linkables.length; i++) {
                     $el.root.on('click', linkables[i], function (event) {
                         actions.navigate($(this));
                         event.preventDefault();
+                    });
+                }
+                
+                var loadables = [config.ui.selectors.showOlder, config.ui.selectors.showNewer];
+                for (var j = 0; j < loadables.length; j++) {
+                    $el.root.on('click', loadables[j], function () {
+                        actions.loadMore($(this));
                     });
                 }
             };
@@ -235,25 +256,25 @@
 
                 var getIcon = function(activity) {
                     switch (activity.kind) {
-                    case 'CREATED':
-                        return 'icon-plus-2';
-                    case 'UPDATED':
-                        return 'icon-pencil';
-                    default:
-                        return null;
+                        case 'CREATED':
+                            return 'icon-plus-2';
+                        case 'UPDATED':
+                            return 'icon-pencil';
+                        default:
+                            return null;
                     }
                 };
 
                 var getText = function(activity) {
                     switch (activity.kind) {
-                    case 'CREATED':
-                        return 'created this item';
-                    case 'UPDATED':
-                        return 'made an update';
-                    case 'COMMENTADDED':
-                        return eval('(' + activity.metaData + ')').comment;
-                    default:
-                        return null;
+                        case 'CREATED':
+                            return 'created this item';
+                        case 'UPDATED':
+                            return 'made an update';
+                        case 'COMMENTADDED':
+                            return eval('(' + activity.metaData + ')').comment;
+                        default:
+                            return null;
                     }
                 };
 
@@ -272,7 +293,10 @@
                     return activity;
                 };
 
-                var _renderActivities = function(activityThread, thread, data, $thread) {
+                var _renderActivities = function (activityThread, thread, data, $thread) {
+                    var hasOlder = false;
+                    var hasNewer = false;
+                    
                     for (var i = 0; i < activityThread.todaysActivities.length; i++) {
                         var ta = activityThread.todaysActivities[i];
                         var taDomId = 'ul.epm-se-todays-activities li#epm-se-' + ta;
@@ -284,27 +308,34 @@
                         }
                     }
 
+                    for (var k = 0; k < activityThread.previousActivities.length; k++) {
+                        hasOlder = true;
+
+                        var pa = activityThread.previousActivities[k];
+                        var paDomId = 'ul.epm-se-previous-activities li#epm-se-' + pa;
+
+                        var $paLi = $thread.find(paDomId);
+                        if (!$paLi.length) {
+                            var paActivity = buildActivity(pa, data);
+                            $thread.find(config.ui.selectors.older).append(templates.activity(paActivity));
+                        }
+                    }
+
                     for (var j = 0; j < activityThread.newerActivities.length; j++) {
+                        hasNewer = true;
+                        
                         var na = activityThread.newerActivities[j];
                         var naDomId = 'ul.epm-se-newer-activities li#epm-se-' + na;
 
                         var $naLi = $thread.find(naDomId);
                         if (!$naLi.length) {
                             var naActivity = buildActivity(na, data);
-                            $thread.find('ul.epm-se-newer-activities').append(templates.activity(naActivity));
+                            $thread.find(config.ui.selectors.newer).append(templates.activity(naActivity));
                         }
                     }
 
-                    for (var k = 0; k < activityThread.newerActivities.length; k++) {
-                        var pa = activityThread.newerActivities[k];
-                        var paDomId = 'ul.epm-se-previous-activities li#epm-se-' + pa;
-
-                        var $paLi = $thread.find(paDomId);
-                        if (!$paLi.length) {
-                            var paActivity = buildActivity(pa, data);
-                            $thread.find('ul.epm-se-previous-activities').append(templates.activity(paActivity));
-                        }
-                    }
+                    if (hasOlder) $thread.find(config.ui.selectors.showOlder).show();
+                    if (hasNewer) $thread.find(config.ui.selectors.showNewer).show();
                 };
 
                 return {
@@ -395,10 +426,30 @@
                     }
                 };
 
+                var _loadMore = function($ele) {
+                    var classes = config.ui.classes;
+                    var selectors = config.ui.selectors;
+
+                    var action = $ele.data('action');
+                    var $parent = $ele.parent();
+                    var $ul = action === 'newer' ? $parent.find(selectors.newer) : $parent.find(selectors.older);
+
+                    if ($ele.hasClass(classes.expanded)) {
+                        $ele.find('span').removeClass(classes.upArrow).addClass(classes.downArrow);
+                        $ele.removeClass(classes.expanded);
+                        $ul.slideUp(300);
+                    } else {
+                        $ele.find('span').removeClass(classes.downArrow).addClass(classes.upArrow);
+                        $ele.addClass(classes.expanded);
+                        $ul.slideDown(300);
+                    }
+                };
+
                 return {
                     showTooltip: _showTooltip,
                     navigate: _navigate,
-                    paginate: _paginate
+                    paginate: _paginate,
+                    loadMore: _loadMore
                 };
             })();
 
