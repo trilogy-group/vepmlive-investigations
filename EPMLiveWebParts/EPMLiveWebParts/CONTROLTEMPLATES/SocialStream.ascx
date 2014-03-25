@@ -38,13 +38,15 @@
     <li id="epm-se-{{id}}" class="epm-se-activity clearfix">
         {{#if notComment}}
             <div class="epm-se-activity-icon"><span class="epm-se-activity-icon {{icon}}"></span></div>
-            <div class="epm-se-user-info">{{> user}}&nbsp;</div>
+            <div class="epm-se-user-info">{{> user-plain}}&nbsp;</div>
             <div class="epm-se-activity-text">{{{text}}}</div>
         {{else}}
             <div class="epm-se-user-info">{{> avatar}}</div>
-            <div class="epm-se-activity-text">{{> user}}&nbsp;-&nbsp;{{{text}}}</div>
+            <div class="epm-se-activity-text">{{> user-plain}}&nbsp;-&nbsp;{{{text}}}</div>
         {{/if}}
-        <div class="epm-se-activity-info"><span data-time="{{time}}" class="epm-se-activity-time">{{displayTime}}</span></div>
+        <div class="epm-se-activity-info">
+            <span class="epm-se-activity-time epm-se-has-tooltip" title="{{longDateTime}}" data-placement="top" data-toggle="tooltip">{{displayTime}}</span>
+        </div>
     </li>
 </script>
 
@@ -61,7 +63,7 @@
 
 <script id="_epm-se-comment-thread" type="text/x-handlebars-template">
     <div class="epm-se-header epm-se-comment-thread">
-        <div class="epm-se-user-info"><a data-id="{{user.id}}" class="epm-se-link-user">{{user.displayName}}</a></div>
+        <div class="epm-se-user-info"><a data-url="{{user.url}}" class="epm-se-link-user">{{user.displayName}}</a></div>
         <div class="epm-se-thread-info">made a comment...</div>
         <div class="epm-se-activity-info"><span class="epm-se-thread-icon icon-bubble-12"></span></div>
     </div>
@@ -78,8 +80,8 @@
     {{#unless web.isCurrentWorkspace}}
         <a href="{{web.url}}" target="_blank">{{web.title}}</a>:&nbsp;
     {{/unless}}
-    <a data-webId="{{web.id}}" data-listId="{{list.id}}" class="epm-se-link-list">{{list.name}}</a>&nbsp;-&nbsp;
-    <a data-webId="{{web.id}}" data-listId="{{list.id}}" data-itemId="{{itemId}}" class="epm-se-link-item"><h2>{{title}}</h2></a>
+    <a data-url="{{list.url}}" class="epm-se-link-list">{{list.name}}</a>&nbsp;-&nbsp;
+    <a data-url="{{url}}" class="epm-se-link-item"><h2>{{title}}</h2></a>
 </script>
 
 <script id="_epm-se-avatar" type="text/x-handlebars-template">
@@ -91,11 +93,15 @@
 </script>
 
 <script id="_epm-se-user" type="text/x-handlebars-template">
-    <a data-id="{{user.id}}" data-name="{{user.name}}" class="epm-se-link-user">{{user.displayName}}</a>
+    <a data-url="{{user.url}}" class="epm-se-link-user epm-se-has-tooltip" title="{{user.name}}" data-placement="top" data-toggle="tooltip">{{user.displayName}}</a>
+</script>
+
+<script id="_epm-se-user-plain" type="text/x-handlebars-template">
+    <a data-url="{{user.url}}" class="epm-se-link-user">{{user.displayName}}</a>
 </script>
 
 <script id="_epm-se-time" type="text/x-handlebars-template">
-    <span data-time="{{activity.time}}" class="epm-se-activity-time">{{activity.displayTime}}</span>
+    <span class="epm-se-activity-time epm-se-has-tooltip" title="{{activity.longDateTime}}" data-placement="top" data-toggle="tooltip">{{activity.displayTime}}</span>
 </script>
 
 <script id="_epm-se-thread-icon" type="text/x-handlebars-template">

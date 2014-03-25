@@ -290,17 +290,28 @@ namespace EPMLiveCore.Services
         private static DailyActivities.Thread BuildThread(Guid threadId, string activityDay, Guid webId, object listId,
             DataRow r)
         {
+            var itemId = r["ItemId"] as int?;
+            var url = r["ThreadUrl"] as string;
+
+            if (itemId.HasValue && itemId.Value != 0)
+            {
+                url =
+                    string.Format(
+                        "{0}/_layouts/15/epmlive/redirectionproxy.aspx?action=view&webid={1}&listid={2}&id={3}",
+                        r["WebUrl"], r["WebId"], r["ListId"], itemId.Value);
+            }
+
             var thread = new DailyActivities.Thread
             {
                 id = threadId,
                 title = r["ThreadTitle"] as string,
-                url = r["ThreadUrl"] as string,
+                url = url,
                 kind = ((ObjectKind) r["ThreadKind"]).ToString().ToUpper(),
                 lastActivityOn = ((DateTime) r["ThreadLastActivityOn"]).ToString("s"),
                 days = new List<string> {activityDay},
                 web = webId,
                 list = listId as Guid?,
-                itemId = r["ItemId"] as int?,
+                itemId = itemId,
                 isMassOperation = (bool) r["IsMassOperation"],
                 activities = new List<Guid>(),
                 activityThreads = new List<string>()

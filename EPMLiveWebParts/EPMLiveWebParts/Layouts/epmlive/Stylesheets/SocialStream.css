@@ -175,4 +175,7 @@
   font-size: 1.5em;
   min-width: 20px;
 }
+#epm-social-stream .epm-se-has-tooltip {
+  cursor: pointer;
+}
 /*# sourceMappingURL=SocialStream.css.map */
