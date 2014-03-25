@@ -291,7 +291,9 @@ if not exists (select table_name from INFORMATION_SCHEMA.tables where table_name
 			[DTCREATED] [datetime] NULL,
 			[DTSTARTED] [datetime] NULL,
 			[DTFINISHED] [datetime] NULL,
-			[JOBDATA] ntext NULL
+			[JOBDATA] ntext NULL,
+			[GRIDDATA] ntext NULL,
+			[PERCENTCOMPLETE] [int] NULL
 		) ON [PRIMARY]
 	end
 else
@@ -311,6 +313,14 @@ else
 			ALTER TABLE TSQUEUE
 			ADD [QUEUE] [nvarchar](255) NULL
 		end
+
+		if not exists (select column_name FROM INFORMATION_SCHEMA.COLUMNS where table_name = 'TSQUEUE' and column_name = 'GRIDDATA')
+		begin
+			Print '     Add Column Username'
+			ALTER TABLE TSQUEUE
+			ADD GRIDDATA ntext NULL
+		end
+
 
 		ALTER TABLE TSQUEUE
 		ALTER COLUMN JOBDATA ntext
