@@ -121,6 +121,8 @@ namespace EPMLiveCore.Services
             var dateOffset = (DateTime) activityThreads.AsParallel().Min(t => t["ActivityDate"]);
             dailyActivities.meta.offset = dateOffset.ToString("s");
 
+            dailyActivities.days = dailyActivities.days.AsParallel().OrderByDescending(d => d.id).ToList();
+
             return dailyActivities;
         }
 
