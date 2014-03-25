@@ -19,11 +19,11 @@
     <SccLocalPath>SAK</SccLocalPath>
     <SccAuxPath>SAK</SccAuxPath>
     <SccProvider>SAK</SccProvider>
- <PreDeploymentCommand>"C:\Workspace\Upland\EPM Live\EPM Live Utilities\SPSolutionManager\SPSolutionManager\bin\Debug\SPSolutionManager.exe" -a Uninstall -s EPMLiveWebParts</PreDeploymentCommand>
+    <PreDeploymentCommand>"C:\Workspace\Upland\EPM Live\EPM Live Utilities\SPSolutionManager\SPSolutionManager\bin\Debug\SPSolutionManager.exe" -a Uninstall -s EPMLiveWebParts</PreDeploymentCommand>
     <PostDeploymentCommand>
       "C:\Workspace\Upland\EPM Live\EPM Live Utilities\SPSolutionManager\SPSolutionManager\bin\Debug\SPSolutionManager.exe" -a Install -s EPMLiveWebParts -p "C:\Workspace\Upland\EPM Live\EPMLive2013\EPMLiveWebParts\EPMLiveWebParts\bin\Debug\"
       iisreset
-    </PostDeploymentCommand>
+</PostDeploymentCommand>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
     <UpgradeBackupLocation>
@@ -78,6 +78,10 @@
     <Reference Include="EPM Live Core">
       <HintPath>..\..\EPMLiveCore\EPMLiveCore\bin\Debug\EPM Live Core.dll</HintPath>
     </Reference>
+    <Reference Include="EPMLiveIntegration, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\EPMLiveIntegration\EPMLiveIntegration\bin\Debug\EPMLiveIntegration.dll</HintPath>
+    </Reference>
     <Reference Include="EPMLiveReportsAdmin">
       <HintPath>..\..\EPMLiveReporting\EPMLiveReporting\bin\Debug\EPMLiveReportsAdmin.dll</HintPath>
     </Reference>
@@ -129,7 +133,11 @@
     <Compile Include="AssociatedItems\AssociatedItems.ascx.cs">
       <DependentUpon>AssociatedItems.ascx</DependentUpon>
     </Compile>
-    <Compile Include="AssociatedItems\AssociatedItems.ascx.g.cs" />
+    <Compile Include="AssociatedItems\AssociatedItems.ascx.g.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>AssociatedItems.ascx</DependentUpon>
+    </Compile>
     <Compile Include="BackButton\BackButton.cs" />
     <Compile Include="BuyNow\BuyNow.cs" />
     <Compile Include="ChartControl\ChartControl.cs" />

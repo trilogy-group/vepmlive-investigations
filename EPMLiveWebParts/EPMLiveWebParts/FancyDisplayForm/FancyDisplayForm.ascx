@@ -197,6 +197,7 @@
         FancyDispFormClient.fillWebPartData();
 
         window.SP.SOD.notifyScriptLoadedAndExecuteWaitingJobs('EPMLive.Navigation.js');
+        window.SP.SOD.notifyScriptLoadedAndExecuteWaitingJobs('EPMLive.js');
 
         $(".fancy-display-form-wrapper .dispFormExpandHeader").click(function () {
             $header = $(this);
@@ -311,7 +312,7 @@
 
                     var addContextualMenu = function () {
                         $(".fancyDisplayFormAssociatedItemsContextMenu").each(function () {
-                            window.epmLiveNavigation.addContextualMenu($(this), null, true);
+                            window.epmLiveNavigation.addContextualMenu($(this), null, true, '-1', { "delete": "FancyDispFormClient.fillWebPartData" });
                         });
                     };
 

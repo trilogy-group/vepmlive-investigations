@@ -83,8 +83,8 @@
 
                 window.SP.SOD.notifyScriptLoadedAndExecuteWaitingJobs('EPMLive.Navigation.js');
 
-                $('.associateditemscontextmenu').each(function () {
-                    window.epmLiveNavigation.addContextualMenu($(this), null, true);
+                $(".associateditemscontextmenu").each(function () {
+                    window.epmLiveNavigation.addContextualMenu($(this), null, true, '-1', { "delete": "fillWebPartData" });
                 });
 
                 $("#associatedItemsLoadDiv").hide();
