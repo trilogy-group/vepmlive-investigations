@@ -4,7 +4,9 @@
     var SocialEngine = function() {
         var SE = (function() {
             var $el = {
-                root: $('#epm-social-stream')
+                root: $('#epm-social-stream'),
+                content: $(document.getElementById('s4-workspace')),
+                pagination: $('#epm-social-stream div#epm-se-pagination span')
             };
 
             var templates = {
@@ -20,6 +22,15 @@
                 _userPlain: $('script#_epm-se-user-plain').html(),
                 _time: $('script#_epm-se-time').html(),
                 _threadIcon: $('script#_epm-se-thread-icon').html()
+            };
+
+            var config = {
+                apiUrl: '/' + window.epmLive.currentWebUrl.slice(1) + '/_vti_bin/SocialEngine.svc/activities',
+                pagination: {
+                    limit: 10,
+                    offset: null,
+                    isLoading: false
+                }
             };
 
             var configureMoment = function() {
@@ -68,6 +79,10 @@
                     actions.showTooltip($(this));
                 });
 
+                $el.content.scroll(function() {
+                    actions.paginate();
+                });
+
                 var linkables = ['.epm-se-link-list', '.epm-se-link-item', '.epm-se-link-user'];
                 for (var i = 0; i < linkables.length; i++) {
                     $el.root.on('click', linkables[i], function (event) {
@@ -83,8 +98,10 @@
                 attachEvents();
             };
 
-            var _load = function(query) {
-                var apiUrl = '/' + window.epmLive.currentWebUrl.slice(1) + '/_vti_bin/SocialEngine.svc/activities';
+            var _load = function (query) {
+                config.pagination.isLoading = true;
+
+                var apiUrl = config.apiUrl;
 
                 if (query) {
                     apiUrl += '?';
@@ -100,8 +117,13 @@
                     apiUrl += params.join('&');
                 }
 
-                $.getJSON(apiUrl).then(function(response) {
+                $.getJSON(apiUrl).then(function (response) {
+                    $el.pagination.hide();
+                    
                     _.publish('se.dataLoaded', response);
+                    
+                    config.pagination.offset = response.meta.offset;
+                    config.pagination.isLoading = false;
                 });
             };
 
@@ -348,18 +370,35 @@
                 };
             })();
 
-            var actions = (function () {
+            var actions = (function() {
                 var _showTooltip = function($ele) {
                     $ele.tooltip('show');
                 };
 
-                var _navigate = function ($ele) {
+                var _navigate = function($ele) {
                     OpenCreateWebPageDialog($ele.data('url'));
+                };
+
+                var _paginate = function () {
+                    if ($('#epm-social-stream div#epm-se-pagination').offset().top < $(window).height()) {
+                        var settings = config.pagination;
+
+                        if (settings.isLoading) return;
+                        if (!settings.offset) return;
+
+                        $el.pagination.show();
+
+                        _load({
+                            limit: settings.limit,
+                            offset: settings.offset
+                        });
+                    }
                 };
 
                 return {
                     showTooltip: _showTooltip,
-                    navigate: _navigate
+                    navigate: _navigate,
+                    paginate: _paginate
                 };
             })();
 

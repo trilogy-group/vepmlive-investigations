@@ -178,4 +178,7 @@
 #epm-social-stream .epm-se-has-tooltip {
   cursor: pointer;
 }
+#epm-social-stream div#epm-se-pagination span {
+  display: none;
+}
 /*# sourceMappingURL=SocialStream.css.map */

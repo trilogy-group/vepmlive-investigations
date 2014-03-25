@@ -4,6 +4,7 @@
 
 <div id="epm-social-stream">
     <ul id="epm-se-days"></ul>
+    <div id="epm-se-pagination"><span>Loading more...</span></div>
 </div>
 
 <script id="epm-se-day-template" type="text/x-handlebars-template">
