@@ -73,3 +73,85 @@ img.TS_Comments {
     width: 30px;
     cursor: pointer;
 }
+
+/*Toolbar CSS*/
+
+.dropdown-label {
+    color: #A3A3A3;
+    padding-bottom: 15px;
+    padding-top: 15px;
+}
+
+.nav-btn a span {
+font-size:.8em;
+padding-right:10px;
+}
+
+.select2-container-multi {
+width:400px !important;
+}
+
+.invite-input-img {
+display:inline-block;
+vertical-align: top;
+}
+
+.navbar-default {
+    background-color: #fff !important;
+    border-color: #fff !important;
+}
+
+.nav-text-wrapper {
+padding-top:15px;
+padding-bottom:15px;
+margin-left:15px;
+}
+
+.nopad {
+padding-top:15px;
+padding-bottom:0px;
+}
+
+.nav-text-wrapper .nav-select {
+position:relative;
+display:inline-block;
+top:-7px;
+}
+
+.nav-text-wrapper .icon {
+position:relative;
+top:-7px;
+color:#777;
+}
+
+.nav-text-wrapper .icon:first-of-type {
+padding-right:1px;
+}
+
+.nav-text-wrapper .disabled{
+color:#e4e4e4;
+}
+
+.nav-text-wrapper .disabled:hover{
+color:#e4e4e4 !important;
+cursor:auto !important;
+}
+
+.nav-text-wrapper .icon:hover {
+cursor:pointer;
+color:#555555;
+}
+
+.nav-text-wrapper:first-of-type {
+margin-left:0px;
+}
+
+.nav-text-wrapper .nav-label {
+float:left;
+color:#A3A3A3;
+padding-right:8px;
+}
+
+.nav-text-wrapper .text {
+float:right;
+}

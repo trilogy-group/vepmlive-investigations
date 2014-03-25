@@ -446,7 +446,7 @@ namespace TimeSheets
 
             output.WriteLine(@"<div align=""center"" id=""TSLoader" + sFullGridId + @""" width=""100%""><img style=""vertical-align:middle;"" src=""/_layouts/images/gears_anv4.gif""/>&nbsp;Loading Items...</div>");
 
-            StringBuilder sb = new StringBuilder("<select onchange=\"changePeriodCommand('" + curUrl + "',this,'" + Page.Request["Delegate"] + "')\">");
+            StringBuilder sb = new StringBuilder("<select class=\"form-control\" onchange=\"changePeriodCommand('" + curUrl + "',this,'" + Page.Request["Delegate"] + "')\">");
 
             var arrPeriods = sPeriodList.Split(',');
             for (var i = 0; i < arrPeriods.Length; i++)
@@ -465,26 +465,37 @@ namespace TimeSheets
 
             var str = new HtmlString(sb.ToString());
 
-            output.WriteLine(@"<div style=""display:width:200;padding:10px"">
-                <b>Status:</b>&nbsp;" + sStatus + @"&nbsp;&nbsp;
-                <b>Current Period:</b>
-                <span class='ms-cui-img-16by16 ms-cui-img-cont-float' unselectable='on'>
-                <img style=""top: -128px; left: -176px;"" src=""/_layouts/1033/images/formatmap16x16.png"" onclick=""javascript:previousPeriodCommand('" + curUrl + "','" + iPreviousPeriod + "','" + Page.Request["Delegate"] + @"')""/>
-                </span>");
-            output.WriteLine(str.ToHtmlString());
-            output.WriteLine(@"<span class='ms-cui-img-16by16 ms-cui-img-cont-float' unselectable='on'>
-                <img style=""top: -32px; left: -160px;"" src=""/_layouts/1033/images/formatmap16x16.png"" onclick=""javascript:nextPeriodCommand('" + curUrl + "','" + iNextPeriod + "','" + Page.Request["Delegate"] + @"')""/>
-                </span>");
-            output.WriteLine("</div>");
-
-
+            output.WriteLine(@"
+                <div>
+                    <nav class=""navbar navbar-default navbar-static"" role=""navigation"">
+                        <div>
+                            <div class=""collapse navbar-collapse"">
+                                <ul class=""nav navbar-nav"">
+                                    <li class=""nav-btn nav-text-wrapper"">
+                                        <div class=""nav-label"">Status:</div>
+                                            <div class=""text"">" + sStatus + @"</div>
+                                    </li>
+                                    <li class=""nav-btn nav-text-wrapper"">
+                                        <div class=""nav-label"">Current Period:
+                                        </div>
+                                        <span class=""icon-arrow-left-17 icon"" onclick=""javascript:previousPeriodCommand('" + curUrl + "','" + iPreviousPeriod + "','" + Page.Request["Delegate"] + @"')"">
+                                        </span>
+                                        <div class=""nav-select"">" + str.ToHtmlString() + @"    
+                                        </div>
+                                        <span class=""icon-arrow-right-17 icon"" onclick=""javascript:nextPeriodCommand('" + curUrl + "','" + iNextPeriod + "','" + Page.Request["Delegate"] + @"')"">
+                                        </span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </nav>
+                </div>");    
             output.WriteLine("<div style=\"width:100%\">");
             output.WriteLine(@"<treegrid Data_Url=""" + url + @"/_vti_bin/WorkEngine.asmx"" Data_Timeout=""0"" Data_Method=""Soap"" Data_Function=""Execute"" Data_Namespace=""workengine.com"" Data_Param_Function=""timesheet_GetTimesheetGrid"" Data_Param_Dataxml=""" + sDataParam + @""" 
                                 Layout_Url=""" + url + @"/_vti_bin/WorkEngine.asmx"" Layout_Timeout=""0"" Layout_Method=""Soap"" Layout_Function=""Execute"" Layout_Namespace=""workengine.com"" Layout_Param_Function=""timesheet_GetTimesheetGridLayout"" Layout_Param_Dataxml=""" + sLayoutParam + @""" 
                                 Check_Url=""" + url + @"/_vti_bin/WorkEngine.asmx"" Check_Timeout=""0"" Check_Method=""Soap"" Check_Function=""Execute"" Check_Namespace=""workengine.com"" Check_Param_Function=""timesheet_GetTimesheetUpdates"" Check_Param_Dataxml=""" + sLayoutParam + @""" Check_Interval=""0"" Check_Repeat=""0""
                                 Upload_Url=""" + url + @"/_layouts/epmlive/savemytimesheet.aspx"" Upload_Type=""Body,Cfg"" Upload_Flags=""AllCols,Accepted"" Debug="""" ></treegrid>");
             output.WriteLine("</div>");
-
 
             output.WriteLine(@"<div align=""center"" id=""divMessage" + sFullGridId + @""" width=""100%"" class=""dialog""><img style=""vertical-align:middle;"" src=""/_layouts/images/gears_anv4.gif""/>&nbsp;<span id=""spnMessage" + sFullGridId + @""">Saving Timesheet...</span></div>");
 
