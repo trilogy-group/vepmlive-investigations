@@ -8,13 +8,22 @@
 
 <%@ Page Language="C#" AutoEventWireup="true" CodeBehind="ManageFragment.aspx.cs" Inherits="EPMLiveCore.Layouts.epmlive.ManageFragment" DynamicMasterPageFile="~masterurl/default.master" %>
 
-<asp:Content ID="PageHead" ContentPlaceHolderID="PlaceHolderAdditionalPageHead" runat="server">
+<asp:content id="PageHead" contentplaceholderid="PlaceHolderAdditionalPageHead" runat="server">
     <link href="styles/icomoon-style.css" rel='stylesheet' type='text/css' />
     <link href="styles/fragments.css" rel='stylesheet' type='text/css' type='text/css' rel='stylesheet' />
     <link href='http://www.uplandux.com/styleguide/css/bootstrap.css' type='text/css' rel='stylesheet' />
     <script type="text/javascript" src="javascripts/Fragment.js"></script>
     <script type="text/javascript">
 
+        function OpenPopupToEditFragment(itemid) {
+            var options = { url: "SaveFragment.aspx?ID=" + itemid, height: 200, width: 300, showMaximized: false, dialogReturnValueCallback: function (dialogResult) { if (dialogResult == 1) { refreshFragments(); } } };
+            SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
+        }
+
+        function refreshFragments() {
+            this.refreshControl();
+            location.reload(false);
+        }
 
         function closeManageFragmentPopup(message) {
             if (message != null) {
@@ -48,9 +57,9 @@
         });
 
     </script>
-</asp:Content>
+</asp:content>
 
-<asp:Content ID="Main" ContentPlaceHolderID="PlaceHolderMain" runat="server">
+<asp:content id="Main" contentplaceholderid="PlaceHolderMain" runat="server">
     <div class="modal-body">
         <input type="text" placeholder="Search..." style="border: none;" id="Text1" onkeyup="Filter(this,0);" class="form-control" />
         <div class="manageFragmentContainer row-select">
@@ -78,12 +87,8 @@
                     <asp:BoundField HeaderText="Created By" DataField="Author" Visible="false" ItemStyle-Width="0%" />
                     <asp:TemplateField ItemStyle-Width="15%">
                         <ItemTemplate>
-                            <asp:LinkButton ID="lnkEdit" runat="server" Text="<div class='icon-wrapper'><span class='icon-pencil modal-icon'></span></div>" OnClientClick="javascript:refreshControl()" OnClick="lnkEdit_Click"></asp:LinkButton>
+                                                        <a href="#" onclick="javascript:OpenPopupToEditFragment(<%# Eval("ID") %>);"><div class='icon-wrapper'><span class='icon-pencil modal-icon'></span></div></a>
                         </ItemTemplate>
-                        <EditItemTemplate>
-                            <asp:LinkButton ID="lnkUpdate" runat="server" Text="<div style='float:left' class='icon-wrapper'><img src='../images/SAVE.GIF'></div>" OnClientClick="javascript:refreshControl()" OnClick="lnkUpdate_Click"></asp:LinkButton>
-                            <asp:LinkButton ID="lnkCancel" runat="server" Text="<div style='float:left' class='icon-wrapper'><img src='../images/Cancelled.GIF'></div>" OnClientClick="javascript:refreshControl()" OnClick="lnkCancel_Click"></asp:LinkButton>
-                        </EditItemTemplate>
                     </asp:TemplateField>
                     <asp:TemplateField ItemStyle-Width="5%">
                         <ItemTemplate>
@@ -116,12 +121,8 @@
                     <asp:BoundField HeaderText="Created By" DataField="Author" Visible="false" ItemStyle-Width="0%" />
                     <asp:TemplateField ItemStyle-Width="15%">
                         <ItemTemplate>
-                            <asp:LinkButton ID="lnkEdit" runat="server" Text="<div class='icon-wrapper'><span class='icon-pencil modal-icon'></span></div>" OnClientClick="javascript:refreshControl()" OnClick="lnkEdit_Click"></asp:LinkButton>
+                              <a href="#" onclick="javascript:OpenPopupToEditFragment(<%# Eval("ID") %>);"><div class='icon-wrapper'><span class='icon-pencil modal-icon'></span></div></a>
                         </ItemTemplate>
-                        <EditItemTemplate>
-                            <asp:LinkButton ID="lnkUpdate" runat="server" Text="<div style='float:left' class='icon-wrapper'><img src='../images/SAVE.GIF'></div>" OnClientClick="javascript:refreshControl()" OnClick="lnkUpdate_Click"></asp:LinkButton>
-                            <asp:LinkButton ID="lnkCancel" runat="server" Text="<div style='float:left' class='icon-wrapper'><img src='../images/Cancelled.GIF'></div>" OnClientClick="javascript:refreshControl()" OnClick="lnkCancel_Click"></asp:LinkButton>
-                        </EditItemTemplate>
                     </asp:TemplateField>
                     <asp:TemplateField ItemStyle-Width="5%">
                         <ItemTemplate>
@@ -145,12 +146,12 @@
     <div class="modal-footer Buttons">
         <asp:Button ID="btnClose" runat="server" Text="Close" OnClientClick="javascript:return closeManageFragmentPopup();" />
     </div>
-</asp:Content>
+</asp:content>
 
-<asp:Content ID="PageTitle" ContentPlaceHolderID="PlaceHolderPageTitle" runat="server">
+<asp:content id="PageTitle" contentplaceholderid="PlaceHolderPageTitle" runat="server">
     Manage Fragments
-</asp:Content>
+</asp:content>
 
-<asp:Content ID="PageTitleInTitleArea" ContentPlaceHolderID="PlaceHolderPageTitleInTitleArea" runat="server">
+<asp:content id="PageTitleInTitleArea" contentplaceholderid="PlaceHolderPageTitleInTitleArea" runat="server">
     Manage Fragments
-</asp:Content>
+</asp:content>

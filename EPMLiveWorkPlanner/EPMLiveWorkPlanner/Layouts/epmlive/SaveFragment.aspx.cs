@@ -23,13 +23,25 @@ namespace EPMLiveCore.Layouts.epmlive
                        using (SPWeb currentWeb = currentSite.OpenWeb(web.ID))
                        {
                            currentWeb.AllowUnsafeUpdates = true;
-                           SPListItem plannerFragmentItem = plannerFragmentList.Items.Add();
+                           SPListItem plannerFragmentItem = null;
 
-                           plannerFragmentItem["Title"] = txtFragmentName.Text;
-                           plannerFragmentItem["Description"] = txtDescription.Text;
-                           plannerFragmentItem["FragmentType"] = (chkPrivate.Checked) ? "Private" : "Public";
-                           plannerFragmentItem["FragmentXML"] = hdnTaskFragmentXml.Value;
-                           plannerFragmentItem["PlannerID"] = Convert.ToString(Request["PlannerID"]);
+                           int itemId = Convert.ToInt32(Request["ID"]);
+                           if (itemId > 0)
+                           {
+                               plannerFragmentItem = plannerFragmentList.GetItemById(itemId);
+                               plannerFragmentItem["Title"] = txtFragmentName.Text;
+                               plannerFragmentItem["Description"] = txtDescription.Text;
+                               plannerFragmentItem["FragmentType"] = (chkPrivate.Checked) ? "Private" : "Public";
+                           }
+                           else
+                           {
+                               plannerFragmentItem = plannerFragmentList.Items.Add();
+                               plannerFragmentItem["Title"] = txtFragmentName.Text;
+                               plannerFragmentItem["Description"] = txtDescription.Text;
+                               plannerFragmentItem["FragmentType"] = (chkPrivate.Checked) ? "Private" : "Public";
+                               plannerFragmentItem["FragmentXML"] = hdnTaskFragmentXml.Value;
+                               plannerFragmentItem["PlannerID"] = Convert.ToString(Request["PlannerID"]);
+                           }
 
                            plannerFragmentItem.Update();
                            plannerFragmentList.Update();
@@ -42,11 +54,31 @@ namespace EPMLiveCore.Layouts.epmlive
         {
             try
             {
-                bool doesUserHasManageWebPermission = false;
-                SPList plannerFragmentsList = SPContext.Current.Web.Lists.TryGetList("PlannerFragments"); ;
-                if (plannerFragmentsList != null)
-                    doesUserHasManageWebPermission = plannerFragmentsList.DoesUserHavePermissions(SPContext.Current.Web.CurrentUser, SPBasePermissions.ManageWeb);
-                chkPrivate.Enabled = doesUserHasManageWebPermission;
+                if (!Page.IsPostBack)
+                {
+                    bool doesUserHasManageWebPermission = false;
+                    SPList plannerFragmentsList = SPContext.Current.Web.Lists.TryGetList("PlannerFragments"); ;
+                    if (plannerFragmentsList != null)
+                        doesUserHasManageWebPermission = plannerFragmentsList.DoesUserHavePermissions(SPContext.Current.Web.CurrentUser, SPBasePermissions.ManageWeb);
+                    chkPrivate.Enabled = doesUserHasManageWebPermission;
+
+                    try
+                    {
+                        int itemId = Convert.ToInt32(Request["ID"]);
+                        if (itemId > 0)
+                        {
+                            //Load item
+                            SPListItem fragmentItem = plannerFragmentsList.GetItemById(itemId);
+                            txtFragmentName.Text = Convert.ToString(fragmentItem["Title"]);
+                            txtDescription.Text = Convert.ToString(fragmentItem["Description"]);
+                            if (Convert.ToString(fragmentItem["FragmentType"]).Equals("private", StringComparison.CurrentCultureIgnoreCase))
+                                chkPrivate.Checked = true;
+                            else
+                                chkPrivate.Checked = false;
+                        }
+                    }
+                    catch { }
+                }
             }
             catch (Exception ex)
             {
@@ -62,7 +94,12 @@ namespace EPMLiveCore.Layouts.epmlive
                 if (plannerFragmentList != null)
                 {
                     SavePlannerFragments(plannerFragmentList);
-                    Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "closeSaveFragmentPopup", "<script language='javascript' type='text/javascript'>closeSaveFragmentPopup('Fragment " + txtFragmentName.Text + " saved successfully!');</script>");
+                    
+                    int itemId = Convert.ToInt32(Request["ID"]);
+                    if (itemId > 0)
+                        Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "closeSaveFragmentPopup", "<script language='javascript' type='text/javascript'>closeSaveFragmentPopup('Fragment " + txtFragmentName.Text + " updated successfully!');</script>");
+                    else
+                        Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "closeSaveFragmentPopup", "<script language='javascript' type='text/javascript'>closeSaveFragmentPopup('Fragment " + txtFragmentName.Text + " saved successfully!');</script>");
                 }
             }
             catch (Exception ex)
