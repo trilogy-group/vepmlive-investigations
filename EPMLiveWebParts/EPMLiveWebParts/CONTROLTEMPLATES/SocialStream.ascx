@@ -28,8 +28,8 @@
                 {{> general-thread}}
             {{/if}}
             <hr />
-            <ul class="epm-se-older-activities"></ul>
             <div class="epm-se-show-older" data-threadId="{{id}}" data-action="older"><span class="icon-arrow-down-16"></span>show older activities</div>
+            <ul class="epm-se-older-activities"></ul>
             <ul class="epm-se-todays-activities"></ul>
             <div class="epm-se-show-newer" data-threadId="{{id}}" data-action="newer"><span class="icon-arrow-down-16"></span>show newer activities</div>
             <ul class="epm-se-newer-activities"></ul>

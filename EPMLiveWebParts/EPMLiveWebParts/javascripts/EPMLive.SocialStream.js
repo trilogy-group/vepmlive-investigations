@@ -32,12 +32,6 @@
                     isLoading: false
                 },
                 ui: {
-                    classes: {
-                        upArrow: 'icon-arrow-up-16',
-                        downArrow: 'icon-arrow-down-16',
-                        expanded: 'epm-se-expanded'
-                    },
-
                     selectors: {
                         newer: 'ul.epm-se-newer-activities',
                         older: 'ul.epm-se-older-activities',
@@ -427,22 +421,14 @@
                 };
 
                 var _loadMore = function($ele) {
-                    var classes = config.ui.classes;
                     var selectors = config.ui.selectors;
 
                     var action = $ele.data('action');
                     var $parent = $ele.parent();
                     var $ul = action === 'newer' ? $parent.find(selectors.newer) : $parent.find(selectors.older);
 
-                    if ($ele.hasClass(classes.expanded)) {
-                        $ele.find('span').removeClass(classes.upArrow).addClass(classes.downArrow);
-                        $ele.removeClass(classes.expanded);
-                        $ul.slideUp(300);
-                    } else {
-                        $ele.find('span').removeClass(classes.downArrow).addClass(classes.upArrow);
-                        $ele.addClass(classes.expanded);
-                        $ul.slideDown(300);
-                    }
+                    $ele.fadeOut('fast').remove();
+                    $ul.fadeIn('fast');
                 };
 
                 return {

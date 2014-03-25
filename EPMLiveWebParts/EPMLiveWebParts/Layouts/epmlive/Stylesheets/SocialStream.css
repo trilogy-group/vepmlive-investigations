@@ -103,16 +103,6 @@
 #epm-social-stream li.epm-se-thread ul.epm-se-older-activities {
   display: none;
 }
-#epm-social-stream li.epm-se-thread ul.epm-se-older-activities {
-  border-bottom: 1px solid #eeeeee;
-  margin-bottom: 5px !important;
-  padding-bottom: 10px;
-}
-#epm-social-stream li.epm-se-thread ul.epm-se-newer-activities {
-  border-top: 1px solid #eeeeee;
-  margin-top: 5px !important;
-  padding-top: 10px;
-}
 #epm-social-stream li.epm-se-thread div.epm-se-show-older,
 #epm-social-stream li.epm-se-thread div.epm-se-show-newer {
   color: #BBBBBB;
