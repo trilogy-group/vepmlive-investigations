@@ -254,7 +254,11 @@
             })();
 
             var activityManager = (function() {
-                var _getAction = function(activity) {
+                var _getAction = function (activity) {
+                    if (activity.kind === 'BULKOPERATION') {
+                        return 'updated ' + eval('(' + activity.metaData + ')').totalActivities;
+                    }
+                    
                     return activity.kind.toLowerCase();
                 };
 
@@ -415,6 +419,7 @@
 
                     t.isCommentThread = !t.list && !t.activity.itemId;
                     t.isSingleNonCommentThread = !t.isCommentThread && t.activities.length === 1 && t.activity.kind !== 'COMMENTADDED';
+                    t.isBulkOperationThread = t.activity.kind === 'BULKOPERATION';
 
                     t.activity.action = activityManager.getAction(t.activity);
                     t.activity.displayTime = activityManager.getDisplayTime(t.activity);

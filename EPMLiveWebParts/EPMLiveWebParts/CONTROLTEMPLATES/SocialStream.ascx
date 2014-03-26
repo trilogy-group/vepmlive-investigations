@@ -84,7 +84,12 @@
     {{#unless web.isCurrentWorkspace}}
         <a href="{{web.url}}" href="{{web.url}}" target="_blank">{{web.title}}</a>:&nbsp;
     {{/unless}}
-    <a data-url="{{list.url}}" class="epm-se-link-list" href="{{list.url}}" target="_blank">{{list.name}}</a>&nbsp;-&nbsp;
+    <a data-url="{{list.url}}" class="epm-se-link-list" href="{{list.url}}" target="_blank">{{list.name}}</a>
+    {{#unless isBulkOperationThread}}
+        &nbsp;-&nbsp;
+    {{else}}
+        &nbsp;items
+    {{/unless}}
     <a data-url="{{url}}" class="epm-se-link-item" href="{{url}}" target="_blank"><h2>{{title}}</h2></a>
 </script>
 
