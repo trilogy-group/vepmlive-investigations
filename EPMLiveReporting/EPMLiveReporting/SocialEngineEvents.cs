@@ -150,13 +150,13 @@ namespace EPMLiveReportsAdmin
 
         private static bool InTransaction(SPItemEventProperties properties)
         {
-            Guid transaction = SocialEngineProxy.GetTransaction(properties.Web.ID, properties.ListId,
+            Guid? transaction = SocialEngineProxy.GetTransaction(properties.Web.ID, properties.ListId,
                 properties.ListItemId,
                 properties.Web);
 
-            if (transaction == Guid.Empty) return false;
+            if (!transaction.HasValue) return false;
 
-            SocialEngineProxy.ClearTransaction(transaction, properties.Web);
+            SocialEngineProxy.ClearTransaction(transaction.Value, properties.Web);
 
             return true;
         }

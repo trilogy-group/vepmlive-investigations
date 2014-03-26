@@ -395,7 +395,8 @@ namespace EPMLiveCore.Services
 
                 List<DataRow> threadActivities = activityRows.AsParallel()
                     .Where(a => (Guid) a["ThreadId"] == threadId)
-                    .OrderBy(a => a["ActivityDate"]).ToList();
+                    .OrderBy(a => a["ActivityDate"])
+                    .ThenBy(a => a["ActivityKind"]).ToList();
 
                 foreach (DataRow a in threadActivities)
                 {

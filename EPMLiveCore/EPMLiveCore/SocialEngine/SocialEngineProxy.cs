@@ -45,14 +45,16 @@ namespace EPMLiveCore.SocialEngine
             return SocialEngine.Current.GetActivities(contextWeb, minDate, maxDate, page, limit, threadId);
         }
 
-        public static Guid GetTransaction(Guid webId, Guid listId, int itemId, SPWeb contextWeb)
+        public static Guid? GetTransaction(Guid webId, Guid listId, int itemId, SPWeb contextWeb)
         {
             try
             {
                 using (var dbConnectionManager = new DBConnectionManager(contextWeb))
                 {
                     var transactionManager = new TransactionManager(dbConnectionManager);
-                    return transactionManager.GetTransaction(webId, listId, itemId).Id;
+                    var transaction = transactionManager.GetTransaction(webId, listId, itemId);
+
+                    return transaction != null ? (Guid?) transaction.Id : null;
                 }
             }
             catch (Exception exception)
