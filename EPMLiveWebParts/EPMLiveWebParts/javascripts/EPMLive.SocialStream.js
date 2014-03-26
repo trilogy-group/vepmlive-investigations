@@ -150,6 +150,7 @@
                     
                     config.pagination.offset = response.meta.offset;
                     config.pagination.isLoading = false;
+                    config.firstTimeLoad = false;
                 });
             };
 
@@ -169,8 +170,6 @@
                 apiUrl += params.join('&');
 
                 $.getJSON(apiUrl).then(function (response) {
-                    config.firstTimeLoad = false;
-                    
                     activityManager.addMore(response, elements.list, query.maxDate ? 'older' : 'newer');
 
                     elements.loader.fadeOut('fast').remove();
@@ -334,9 +333,9 @@
                             var activity = buildActivity(a, data);
 
                             if (kind === 'older') {
-                                $ul.prepend(templates.activity(activity));
+                                $ul.prepend(templates.activity(activity)).fadeIn('fast');
                             } else {
-                                $ul.append(templates.activity(activity));
+                                $ul.append(templates.activity(activity)).fadeIn('fast');
                             }
                         }
                     }
@@ -345,7 +344,13 @@
                 var _renderActivities = function (activityThread, thread, data, $thread) {
                     var hasOlder = false;
                     var hasNewer = false;
-                    
+
+                    var taHtml = '';
+                    var paHtml = '';
+
+                    var $ta = $thread.find('ul.epm-se-todays-activities');
+                    var $pa = $thread.find(config.ui.selectors.older);
+
                     for (var i = 0; i < activityThread.todaysActivities.length; i++) {
                         var ta = activityThread.todaysActivities[i];
                         var taDomId = 'ul.epm-se-todays-activities li#epm-se-' + ta;
@@ -353,14 +358,7 @@
                         var $taLi = $thread.find(taDomId);
                         if (!$taLi.length) {
                             var taActivity = buildActivity(ta, data);
-                            
-                            var $ta = $thread.find('ul.epm-se-todays-activities');
-
-                            if (config.firstTimeLoad) {
-                                $ta.append(templates.activity(taActivity));
-                            } else {
-                                $ta.prepend(templates.activity(taActivity));
-                            }
+                            taHtml += templates.activity(taActivity);
                         }
                     }
 
@@ -373,13 +371,7 @@
                         var $paLi = $thread.find(paDomId);
                         if (!$paLi.length) {
                             var paActivity = buildActivity(pa, data);
-                            var $pa = $thread.find(config.ui.selectors.older);
-                            
-                            if (config.firstTimeLoad) {
-                                $pa.append(templates.activity(paActivity));
-                            } else {
-                                $pa.prepend(templates.activity(paActivity));
-                            }
+                            paHtml += templates.activity(paActivity);
                         }
                     }
 
@@ -392,12 +384,20 @@
                         var $naLi = $thread.find(naDomId);
                         if (!$naLi.length) {
                             var naActivity = buildActivity(na, data);
-                            $thread.find(config.ui.selectors.newer).append(templates.activity(naActivity));
+                            $thread.find(config.ui.selectors.newer).append(templates.activity(naActivity)).fadeIn('fast');
                         }
                     }
 
-                    if (hasOlder) $thread.find(config.ui.selectors.showOlder).show();
-                    if (hasNewer) $thread.find(config.ui.selectors.showNewer).show();
+                    if (config.firstTimeLoad) {
+                        $ta.append(taHtml).fadeIn('fast');
+                        $pa.append(paHtml).fadeIn('fast');
+                    } else {
+                        $ta.prepend(taHtml);
+                        $ta.prepend(paHtml);
+                    }
+
+                    if (hasOlder) $thread.find(config.ui.selectors.showOlder).fadeIn('fast');
+                    if (hasNewer) $thread.find(config.ui.selectors.showNewer).fadeIn('fast');
                 };
 
                 return {
@@ -444,7 +444,7 @@
                     } else {
                         thread = buildThread(thread, data);
 
-                        $day.find('ul.epm-se-threads').append(templates.thread(thread));
+                        $day.find('ul.epm-se-threads').append(templates.thread(thread)).fadeIn('fast');
 
                         _.publish('se.threadRendered', at, thread, data, $day.find(thread.domId));
                     }
@@ -479,7 +479,7 @@
 
                         if (settings.isLoading) return;
                         if (!settings.offset) return;
-
+                        
                         $el.pagination.show();
 
                         _load({
@@ -490,8 +490,6 @@
                 };
 
                 var _loadMoreActivities = function ($ele) {
-                    config.firstTimeLoad = false;
-                    
                     var threadId = $ele.data('threadid');
                     var selectors = config.ui.selectors;
 
