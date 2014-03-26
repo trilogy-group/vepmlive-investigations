@@ -3260,7 +3260,7 @@ function BuildTeam() {
 }
 
 function AddFragment() {
-    var options = { url: "addfragment.aspx?PlannerID=" + sPlannerID + '&listid=' + sProjectListId + "&id=" + sItemID, width: 450, height: 450, title: "Insert Fragment", showMaximized: false, dialogReturnValueCallback: RefreshTeam };
+    var options = { url: "addfragment.aspx?PlannerID=" + sPlannerID + '&listid=' + sProjectListId + "&id=" + sItemID, width: 450, height: 450, title: "Insert Fragment", showMaximized: false };
     SP.UI.ModalDialog.showModalDialog(options);
 }
 

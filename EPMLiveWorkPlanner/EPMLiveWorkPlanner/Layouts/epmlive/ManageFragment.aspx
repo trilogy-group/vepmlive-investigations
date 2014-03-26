@@ -21,7 +21,7 @@
         }
 
         function refreshFragments() {
-            this.refreshControl();
+            //this.refreshControl();
             location.reload(false);
         }
 
@@ -43,9 +43,9 @@
             }
         }
 
-        function refreshControl() {
-            $("#divIFLoading").show();
-        }
+        //function refreshControl() {
+        //    $("#divIFLoading").show();
+        //}
 
         $(function () {
 
@@ -133,7 +133,7 @@
             </asp:GridView>
         </div>
     </div>
-    <div id="divIFLoading">
+    <%--<div id="divIFLoading">
         <table width="100%">
             <tr>
                 <td align="center" class="ms-sectionheader">
@@ -142,7 +142,7 @@
             </tr>
 
         </table>
-    </div>
+    </div>--%>
     <div class="modal-footer Buttons">
         <asp:Button ID="btnClose" runat="server" Text="Close" OnClientClick="javascript:return closeManageFragmentPopup();" />
     </div>

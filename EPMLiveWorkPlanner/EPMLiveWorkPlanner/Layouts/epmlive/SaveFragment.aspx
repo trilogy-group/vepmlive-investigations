@@ -24,12 +24,12 @@
             }
             window.frameElement.commonModalDialogClose(1, 1);
         }
-        function refreshControl() {
-            $("#divIFLoading").show();
-        }
+        //function refreshControl() {
+        //    $("#divIFLoading").show();
+        //}
 
     </script>
-    <style type="text/css">
+    <%--<style type="text/css">
            #divIFLoading {
             top: 50%;
             left: 50%;
@@ -37,7 +37,7 @@
             display: none;
             position:absolute;
         }
-    </style>
+    </style>--%>
 
 </asp:Content>
 
@@ -72,13 +72,13 @@
         <tr align="right">
             <td></td>
             <td>
-                <asp:Button ID="btnSave" runat="server" Text="Save" OnClientClick="javascript:refreshControl()" OnClick="btnSave_Click" />
+                <asp:Button ID="btnSave" runat="server" Text="Save"  OnClick="btnSave_Click" />
                 <asp:Button ID="btnClose" runat="server" Text="Close" OnClientClick="javascript:return closeSaveFragmentPopup();" />
             </td>
         </tr>
     </table>
     <asp:HiddenField ID="hdnTaskFragmentXml" runat="server" />
-     <div id="divIFLoading">
+    <%-- <div id="divIFLoading">
         <table width="100%">
             <tr>
                 <td align="center" class="ms-sectionheader">
@@ -86,7 +86,7 @@
                 </td>
             </tr>
         </table>
-    </div>
+    </div>--%>
 </asp:Content>
 
 <asp:Content ID="PageTitle" ContentPlaceHolderID="PlaceHolderPageTitle" runat="server">
