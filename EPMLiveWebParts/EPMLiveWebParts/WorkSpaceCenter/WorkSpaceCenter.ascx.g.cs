@@ -87,91 +87,90 @@ namespace EPMLiveWebParts.WorkSpaceCenter {
         
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Never)]
         private void @__Render__control1(System.Web.UI.HtmlTextWriter @__w, System.Web.UI.Control parameterContainer) {
-            @__w.Write("\r\n<link href=\"../_layouts/15/epmlive/Stylesheets/EPMLiveToolBar.css\" rel=\"Stylesh" +
-                    "eet\" type=\"text/css\" />\r\n<style type=\"text/css\">\r\n    #EPMWorkspaceCenterGrid {\r" +
-                    "\n        margin: 10px auto;\r\n        padding: 5px;\r\n        position: relative;\r" +
-                    "\n        display: inline-block;\r\n    }\r\n\r\n    .workspacecentercontextmenu {\r\n   " +
-                    "     list-style: none;\r\n        cursor: pointer;\r\n        position: absolute;\r\n " +
-                    "   }\r\n\r\n        .workspacecentercontextmenu .icon-ellipsis-horizontal:after {\r\n " +
-                    "           content: \'...\';\r\n            position: relative;\r\n            top: -1" +
-                    "0px;\r\n            left: 0px;\r\n        }\r\n\r\n        .workspacecentercontextmenu ." +
-                    "epm-menu-btn span {\r\n            font-size: 2em;\r\n            color: #0090CA;\r\n " +
-                    "           opacity: .6;\r\n        }\r\n\r\n            .workspacecentercontextmenu .e" +
-                    "pm-menu-btn span:hover {\r\n                opacity: 1;\r\n            }\r\n\r\n        " +
-                    ".workspacecentercontextmenu ul.epm-nav-contextual-menu {\r\n            right: -20" +
-                    "px !important;\r\n            top: -20px !important;\r\n        }\r\n\r\n            .wo" +
-                    "rkspacecentercontextmenu ul.epm-nav-contextual-menu li {\r\n                height" +
-                    ": 23px;\r\n                line-height: 23px;\r\n            }\r\n\r\n                .w" +
-                    "orkspacecentercontextmenu ul.epm-nav-contextual-menu li a {\r\n                   " +
-                    " text-decoration: none;\r\n                    display: inline-block;\r\n           " +
-                    "     }\r\n\r\n                .workspacecentercontextmenu ul.epm-nav-contextual-menu" +
-                    " li span.epm-nav-cm-icon {\r\n                    top: 0px !important;\r\n          " +
-                    "      }\r\n</style>\r\n\r\n<script type=\"text/javascript\">\r\n    // Start Toolbar Menu\r" +
-                    "\n    $(function () {\r\n        ExecuteOrDelayUntilScriptLoaded(WorkspaceCenterCli" +
-                    "ent.toolbarCfg(), \'EPMLive.min.js\');\r\n    });\r\n\r\n    WorkspaceCenterClient = {\r\n" +
-                    "\r\n        toolbarCfg: function () {\r\n            var cfgs = [\r\n                {" +
-                    "\r\n                    \'placement\': \'left\',\r\n                    \'content\': [\r\n  " +
-                    "                  // invite button\r\n                    {\r\n                     " +
-                    "   \'controlId\': \'btnNew\',\r\n                        \'controlType\': \'button\',\r\n   " +
-                    "                     \'iconClass\': \'fui-plus\',\r\n                        \'title\': " +
-                    "\'new item\',\r\n                        \'events\': [\r\n                            {\r" +
-                    "\n                                \'eventName\': \'click\',\r\n                        " +
-                    "        \'function\': function () { WorkspaceCenterClient.createNewWorkspace(); }," +
-                    "\r\n                            }\r\n                        ]\r\n                    " +
-                    "}\r\n                    ]\r\n                },\r\n                {\r\n               " +
-                    "     \'placement\': \'right\',\r\n                    \'content\': [\r\n                  " +
-                    "  //search control\r\n                    {\r\n                        \'controlId\': " +
-                    "\'genericId\',\r\n                        \'controlType\': \'search\',\r\n                " +
-                    "        \'custom\': \'yes\',\r\n                        \'customControlId\': \'\'\r\n       " +
-                    "             },\r\n                    //search control\r\n                    {\r\n  " +
-                    "                      \'controlId\': \'myWorkSpace_Search1\',\r\n                     " +
-                    "   \'controlType\': \'search\',\r\n                        \'custom\': \'no\',\r\n          " +
-                    "              \'events\': [{\r\n                            \'eventName\': \'keyup\',\r\n " +
-                    "                           \'function\': function (e) {\r\n                         " +
-                    "       var query = $(this).val();\r\n                                var count = G" +
-                    "etGrids();\r\n                                var grid = Grids[\"gridWorkSpaceCente" +
-                    "r\"];\r\n                                if (query.length > 0) {\r\n                 " +
-                    "                   grid.ChangeFilter(\'WorkSpace\', query.toLowerCase(), 11, 0, 1," +
-                    " null);\r\n                                }\r\n                                else" +
-                    " {\r\n                                    grid.ChangeFilter(\'WorkSpace\', query.toL" +
-                    "owerCase(), 12, 0, 1, null);\r\n                                }\r\n               " +
-                    "                 grid.Update();\r\n                                grid.Render();\r" +
-                    "\n                            }\r\n                        }\r\n                     " +
-                    "   ]\r\n                    },\r\n                    //view control\r\n              " +
-                    "      {\r\n                        \'controlId\': \'ddWorkspaceCenterView1\',\r\n       " +
-                    "                 \'controlType\': \'dropdown\',\r\n                        \'title\': \'V" +
-                    "iew:\',\r\n                        \'value\': \'All Items\',\r\n                        \'" +
-                    "iconClass\': \'none\',\r\n                        \'sections\': [\r\n                    " +
-                    "        {\r\n                                \'heading\': \'none\',\r\n                 " +
-                    "               \'divider\': \'yes\',\r\n                                \'options\': [\r\n" +
-                    "                                    {\r\n                                        \'" +
-                    "iconClass\': \'none\',\r\n                                        \'text\': \'All Items\'" +
-                    ",\r\n                                        \'events\': [\r\n                        " +
-                    "                    {\r\n                                                \'eventNam" +
-                    "e\': \'click\',\r\n                                                \'function\': functi" +
-                    "on () { WorkspaceCenterClient.changeView(\"AllItems\"); }\r\n                       " +
-                    "                     }\r\n                                        ]\r\n\r\n           " +
-                    "                         },\r\n                                    {\r\n            " +
-                    "                            \'iconClass\': \'none\',\r\n                              " +
-                    "          \'text\': \'My Workspace\',\r\n                                        \'even" +
-                    "ts\': [\r\n                                            {\r\n                         " +
-                    "                       \'eventName\': \'click\',\r\n                                  " +
-                    "              \'function\': function () { WorkspaceCenterClient.changeView(\"MyWork" +
-                    "space\"); }\r\n                                            }\r\n                     " +
-                    "                   ]\r\n                                    },\r\n                  " +
-                    "                  {\r\n                                        \'iconClass\': \'none\'" +
-                    ",\r\n                                        \'text\': \'My Favorite\',\r\n             " +
-                    "                           \'events\': [\r\n                                        " +
-                    "    {\r\n                                                \'eventName\': \'click\',\r\n  " +
-                    "                                              \'function\': function () { Workspac" +
-                    "eCenterClient.changeView(\"MyFavorite\"); }\r\n                                     " +
-                    "       }\r\n                                        ]\r\n                           " +
-                    "         }\r\n\r\n                                ]\r\n                            }\r\n" +
-                    "                        ]\r\n                    }\r\n                    ]\r\n       " +
-                    "         }\r\n            ];\r\n            alert(\"ToolbarTest1\");\r\n            epmL" +
-                    "iveGenericToolBar.generateToolBar(\'WorkSpacecenterToolbarMenu\', cfgs);\r\n        " +
-                    "},\r\n        changeView: function (currentView) {\r\n            var source = Grids" +
-                    "[\"gridWorkSpaceCenter\"].Source;\r\n            source.Data.url = \'");
+            @__w.Write("\r\n\r\n<style type=\"text/css\">\r\n    #EPMWorkspaceCenterGrid {\r\n        margin: 10px " +
+                    "auto;\r\n        padding: 5px;\r\n        position: relative;\r\n        display: inli" +
+                    "ne-block;\r\n    }\r\n\r\n    .workspacecentercontextmenu {\r\n        list-style: none;" +
+                    "\r\n        cursor: pointer;\r\n        position: absolute;\r\n    }\r\n\r\n        .works" +
+                    "pacecentercontextmenu .icon-ellipsis-horizontal:after {\r\n            content: \'." +
+                    "..\';\r\n            position: relative;\r\n            top: -10px;\r\n            left" +
+                    ": 0px;\r\n        }\r\n\r\n        .workspacecentercontextmenu .epm-menu-btn span {\r\n " +
+                    "           font-size: 2em;\r\n            color: #0090CA;\r\n            opacity: .6" +
+                    ";\r\n        }\r\n\r\n            .workspacecentercontextmenu .epm-menu-btn span:hover" +
+                    " {\r\n                opacity: 1;\r\n            }\r\n\r\n        .workspacecentercontex" +
+                    "tmenu ul.epm-nav-contextual-menu {\r\n            right: -20px !important;\r\n      " +
+                    "      top: -20px !important;\r\n        }\r\n\r\n            .workspacecentercontextme" +
+                    "nu ul.epm-nav-contextual-menu li {\r\n                height: 23px;\r\n             " +
+                    "   line-height: 23px;\r\n            }\r\n\r\n                .workspacecentercontextm" +
+                    "enu ul.epm-nav-contextual-menu li a {\r\n                    text-decoration: none" +
+                    ";\r\n                    display: inline-block;\r\n                }\r\n\r\n            " +
+                    "    .workspacecentercontextmenu ul.epm-nav-contextual-menu li span.epm-nav-cm-ic" +
+                    "on {\r\n                    top: 0px !important;\r\n                }\r\n</style>\r\n\r\n<" +
+                    "script type=\"text/javascript\">\r\n    // Start Toolbar Menu\r\n    $(function () {\r\n" +
+                    "        ExecuteOrDelayUntilScriptLoaded(WorkspaceCenterClient.toolbarCfg(), \'EPM" +
+                    "Live.min.js\');\r\n    });\r\n\r\n    WorkspaceCenterClient = {\r\n\r\n        toolbarCfg: " +
+                    "function () {\r\n            var cfgs = [\r\n                {\r\n                    " +
+                    "\'placement\': \'left\',\r\n                    \'content\': [\r\n                    // i" +
+                    "nvite button\r\n                    {\r\n                        \'controlId\': \'btnNe" +
+                    "w\',\r\n                        \'controlType\': \'button\',\r\n                        \'" +
+                    "iconClass\': \'fui-plus\',\r\n                        \'title\': \'new item\',\r\n         " +
+                    "               \'events\': [\r\n                            {\r\n                     " +
+                    "           \'eventName\': \'click\',\r\n                                \'function\': fu" +
+                    "nction () { WorkspaceCenterClient.createNewWorkspace(); },\r\n                    " +
+                    "        }\r\n                        ]\r\n                    }\r\n                   " +
+                    " ]\r\n                },\r\n                {\r\n                    \'placement\': \'rig" +
+                    "ht\',\r\n                    \'content\': [\r\n                    //search control\r\n  " +
+                    "                  {\r\n                        \'controlId\': \'genericId\',\r\n        " +
+                    "                \'controlType\': \'search\',\r\n                        \'custom\': \'yes" +
+                    "\',\r\n                        \'customControlId\': \'\'\r\n                    },\r\n     " +
+                    "               //search control\r\n                    {\r\n                        " +
+                    "\'controlId\': \'myWorkSpace_Search1\',\r\n                        \'controlType\': \'sea" +
+                    "rch\',\r\n                        \'custom\': \'no\',\r\n                        \'events\'" +
+                    ": [{\r\n                            \'eventName\': \'keyup\',\r\n                       " +
+                    "     \'function\': function (e) {\r\n                                var query = $(t" +
+                    "his).val();\r\n                                var count = GetGrids();\r\n          " +
+                    "                      var grid = Grids[\"gridWorkSpaceCenter\"];\r\n                " +
+                    "                if (query.length > 0) {\r\n                                    gri" +
+                    "d.ChangeFilter(\'WorkSpace\', query.toLowerCase(), 11, 0, 1, null);\r\n             " +
+                    "                   }\r\n                                else {\r\n                  " +
+                    "                  grid.ChangeFilter(\'WorkSpace\', query.toLowerCase(), 12, 0, 1, " +
+                    "null);\r\n                                }\r\n                                grid." +
+                    "Update();\r\n                                grid.Render();\r\n                     " +
+                    "       }\r\n                        }\r\n                        ]\r\n                " +
+                    "    },\r\n                    //view control\r\n                    {\r\n             " +
+                    "           \'controlId\': \'ddWorkspaceCenterView1\',\r\n                        \'cont" +
+                    "rolType\': \'dropdown\',\r\n                        \'title\': \'View:\',\r\n              " +
+                    "          \'value\': \'All Items\',\r\n                        \'iconClass\': \'none\',\r\n " +
+                    "                       \'sections\': [\r\n                            {\r\n           " +
+                    "                     \'heading\': \'none\',\r\n                                \'divide" +
+                    "r\': \'yes\',\r\n                                \'options\': [\r\n                      " +
+                    "              {\r\n                                        \'iconClass\': \'none\',\r\n " +
+                    "                                       \'text\': \'All Items\',\r\n                   " +
+                    "                     \'events\': [\r\n                                            {\r" +
+                    "\n                                                \'eventName\': \'click\',\r\n        " +
+                    "                                        \'function\': function () { WorkspaceCente" +
+                    "rClient.changeView(\"AllItems\"); }\r\n                                            }" +
+                    "\r\n                                        ]\r\n\r\n                                 " +
+                    "   },\r\n                                    {\r\n                                  " +
+                    "      \'iconClass\': \'none\',\r\n                                        \'text\': \'My " +
+                    "Workspace\',\r\n                                        \'events\': [\r\n              " +
+                    "                              {\r\n                                               " +
+                    " \'eventName\': \'click\',\r\n                                                \'functio" +
+                    "n\': function () { WorkspaceCenterClient.changeView(\"MyWorkspace\"); }\r\n          " +
+                    "                                  }\r\n                                        ]\r\n" +
+                    "                                    },\r\n                                    {\r\n " +
+                    "                                       \'iconClass\': \'none\',\r\n                   " +
+                    "                     \'text\': \'My Favorite\',\r\n                                   " +
+                    "     \'events\': [\r\n                                            {\r\n               " +
+                    "                                 \'eventName\': \'click\',\r\n                        " +
+                    "                        \'function\': function () { WorkspaceCenterClient.changeVi" +
+                    "ew(\"MyFavorite\"); }\r\n                                            }\r\n            " +
+                    "                            ]\r\n                                    }\r\n\r\n        " +
+                    "                        ]\r\n                            }\r\n                      " +
+                    "  ]\r\n                    }\r\n                    ]\r\n                }\r\n          " +
+                    "  ];\r\n            alert(\"Toolbar Problem\");\r\n            epmLiveGenericToolBar.g" +
+                    "enerateToolBar(\'WorkSpacecenterToolbarMenu\', cfgs);\r\n        },\r\n        changeV" +
+                    "iew: function (currentView) {\r\n            var source = Grids[\"gridWorkSpaceCent" +
+                    "er\"].Source;\r\n            source.Data.url = \'");
                        @__w.Write( WebUrl );
 
             @__w.Write(@"/_vti_bin/WorkEngine.asmx';
@@ -179,7 +178,6 @@ namespace EPMLiveWebParts.WorkSpaceCenter {
             source.Data.Param.Function = 'GetWorkspaceCenterGridData';
             source.Data.Param.Dataxml = currentView;
             Grids[""gridWorkSpaceCenter""].Reload(source, null, false);
-
         },
         createNewWorkspace: function () {
             var createNewWorkspaceUrl = """);
@@ -201,17 +199,11 @@ namespace EPMLiveWebParts.WorkSpaceCenter {
                     "ng created - we will notify you when it is ready.\');\r\n                    }\r\n   " +
                     "             }\r\n            };\r\n            SP.UI.ModalDialog.showModalDialog(op" +
                     "tions);\r\n        }\r\n    }\r\n    Grids.OnRenderFinish = function (loadWorkspaceCen" +
-                    "terGrid) {\r\n        var addFavoriteWSMenu = function () {\r\n            $(\".works" +
-                    "pacecentercontextmenu\").each(function () {\r\n                //window.epmLiveNavi" +
-                    "gation.addContextualMenu($(this), null, true);\r\n                window.epmLiveNa" +
-                    "vigation.addFavoriteWSMenu($(this));\r\n            });\r\n\r\n            $(\'.workspa" +
-                    "cecentercontextmenu\').hover(function () {\r\n            }, function () {\r\n       " +
-                    "         $(this).find(\'.epm-nav-contextual-menu\').hide();\r\n            });\r\n    " +
-                    "    };\r\n\r\n        ExecuteOrDelayUntilScriptLoaded(addFavoriteWSMenu, \'EPMLive.Na" +
-                    "vigation.js\');\r\n    };\r\n</script>\r\n<div id=\"EPMWorkspaceCenter\" style=\"width: 10" +
-                    "0%;\">\r\n    <div id=\"WorkSpacecenterToolbarMenu\" style=\"width: 100%\">\r\n    </div>" +
-                    "\r\n    <div id=\"EPMWorkspaceCenterGrid\" style=\"width: 100%; height: 400px;\">\r\n   " +
-                    "     ");
+                    "terGrid) {\r\n        $(\".workspacecentercontextmenu\").each(function () {\r\n       " +
+                    "     window.epmLiveNavigation.addFavoriteWSMenu($(this));\r\n        });\r\n    };\r\n" +
+                    "</script>\r\n<div id=\"EPMWorkspaceCenter\" style=\"width: 100%;\">\r\n    <div id=\"Work" +
+                    "SpacecenterToolbarMenu\" style=\"width: 100%\">\r\n    </div>\r\n    <div id=\"EPMWorksp" +
+                    "aceCenterGrid\" style=\"width: 100%; height: 400px;\">\r\n        ");
             parameterContainer.Controls[0].RenderControl(@__w);
             @__w.Write("\r\n    </div>\r\n</div>\r\n");
         }

@@ -176,10 +176,10 @@
         changeView: function (currentView) {
             var source = Grids["gridWorkSpaceCenter"].Source;
             source.Data.url = '<%= WebUrl %>/_vti_bin/WorkEngine.asmx';
-                source.Data.Function = 'Execute';
-                source.Data.Param.Function = 'GetWorkspaceCenterGridData';
-                source.Data.Param.Dataxml = currentView;
-                Grids["gridWorkSpaceCenter"].Reload(source, null, false);
+            source.Data.Function = 'Execute';
+            source.Data.Param.Function = 'GetWorkspaceCenterGridData';
+            source.Data.Param.Dataxml = currentView;
+            Grids["gridWorkSpaceCenter"].Reload(source, null, false);
         },
         createNewWorkspace: function () {
             var createNewWorkspaceUrl = "<%= WebUrl %>/_layouts/epmlive/QueueCreateWorkspace.aspx";
