@@ -479,7 +479,7 @@
                     
                     if (action === 'newer') {
                         $ul = $parent.find(selectors.newer);
-                        query.minDate = date;
+                        query.minDate = moment(date).add('days', 1).format('YYYY-MM-DDT00:00:00');
                     } else {
                         $ul = $parent.find(selectors.older);
                         query.maxDate = date;
