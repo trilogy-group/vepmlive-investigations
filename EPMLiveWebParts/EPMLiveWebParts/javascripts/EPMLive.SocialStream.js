@@ -43,7 +43,8 @@
                     }
                 },
                 moreActivityRequests: [],
-                threadsWithAllActivities: []
+                threadsWithAllActivities: [],
+                firstTimeLoad: true
             };
 
             var configureMoment = function() {
@@ -90,7 +91,7 @@
                 });
                 
                 _.subscribe('se.threadRendered', function (activityThread, thread, data, $thread) {
-                    commentManager.configureBox($thread);
+                    //commentManager.configureBox($thread);
                 });
 
                 $el.root.on('mouseenter', '.epm-se-has-tooltip', function() {
@@ -167,7 +168,9 @@
 
                 apiUrl += params.join('&');
 
-                $.getJSON(apiUrl).then(function(response) {
+                $.getJSON(apiUrl).then(function (response) {
+                    config.firstTimeLoad = false;
+                    
                     activityManager.addMore(response, elements.list, query.maxDate ? 'older' : 'newer');
 
                     elements.loader.fadeOut('fast').remove();
@@ -350,7 +353,14 @@
                         var $taLi = $thread.find(taDomId);
                         if (!$taLi.length) {
                             var taActivity = buildActivity(ta, data);
-                            $thread.find('ul.epm-se-todays-activities').append(templates.activity(taActivity));
+                            
+                            var $ta = $thread.find('ul.epm-se-todays-activities');
+
+                            if (config.firstTimeLoad) {
+                                $ta.append(templates.activity(taActivity));
+                            } else {
+                                $ta.prepend(templates.activity(taActivity));
+                            }
                         }
                     }
 
@@ -363,7 +373,13 @@
                         var $paLi = $thread.find(paDomId);
                         if (!$paLi.length) {
                             var paActivity = buildActivity(pa, data);
-                            $thread.find(config.ui.selectors.older).append(templates.activity(paActivity));
+                            var $pa = $thread.find(config.ui.selectors.older);
+                            
+                            if (config.firstTimeLoad) {
+                                $pa.append(templates.activity(paActivity));
+                            } else {
+                                $pa.prepend(templates.activity(paActivity));
+                            }
                         }
                     }
 
@@ -474,6 +490,8 @@
                 };
 
                 var _loadMoreActivities = function ($ele) {
+                    config.firstTimeLoad = false;
+                    
                     var threadId = $ele.data('threadid');
                     var selectors = config.ui.selectors;
 

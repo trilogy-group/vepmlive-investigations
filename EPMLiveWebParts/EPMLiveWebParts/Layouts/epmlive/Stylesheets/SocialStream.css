@@ -74,7 +74,8 @@
   border-radius: 3px;
 }
 #epm-social-stream li.epm-se-thread hr {
-  border: 1px solid #eeeeee;
+  border: none;
+  border-bottom: 1px solid #eeeeee;
 }
 #epm-social-stream li.epm-se-thread div.epm-se-header {
   text-align: left;
