@@ -1,4 +1,5 @@
-﻿@font-face {
+﻿@charset "UTF-8";
+@font-face {
     font-family: "Flat-UI-Icons";
     src: url("/_layouts/15/epmlive/stylesheets/fonts/FlatUIIcons/Flat-UI-Icons.eot");
     src: url("/_layouts/15/epmlive/stylesheets/fonts/FlatUIIcons/Flat-UI-Icons.eot?#iefix") format("embedded-opentype"), 

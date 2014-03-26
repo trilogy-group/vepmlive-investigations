@@ -35,7 +35,6 @@
 }
 #epm-social-stream li.epm-se-day div.epm-se-header {
   margin-bottom: 10px;
-  margin-top: 10px;
   height: 40px;
   text-align: center;
   line-height: 40px;
@@ -55,7 +54,10 @@
   font-family: "Open Sans Regular", Helvetica, Arial !important;
   line-height: 40px;
 }
-#epm-social-stream li.epm-se-day > div.epm-se-header > hr {
+#epm-social-stream li.epm-se-day > div.epm-se-header {
+  margin-top: 10px;
+}
+#epm-social-stream li.epm-se-day > div.epm-se-header hr {
   position: relative;
   top: 20px;
   margin: 0;

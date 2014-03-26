@@ -67,7 +67,6 @@
     li.epm-se-day {
         div.epm-se-header {
             margin-bottom: @section-bottom-margin - 10;
-            margin-top: @section-bottom-margin - 10;
             height: @header-height;
             text-align: center;
             line-height: @header-height;
@@ -90,11 +89,15 @@
         }
     }
 
-        li.epm-se-day > div.epm-se-header > hr {
-            position: relative;
-            top: @header-height/2;
-            margin: 0;
-            border-top-color: #eeeeee;
+        li.epm-se-day > div.epm-se-header {
+            margin-top: @section-bottom-margin - 10;
+
+            hr {
+                position: relative;
+                top: @header-height/2;
+                margin: 0;
+                border-top-color: @border-color;
+            }
         }
 
     li.epm-se-thread {
