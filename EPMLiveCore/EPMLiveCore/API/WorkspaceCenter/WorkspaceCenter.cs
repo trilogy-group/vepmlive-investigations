@@ -45,12 +45,12 @@ namespace EPMLiveCore.API
                             {
                                 sqlquery = string.Format("select WEB_ID from FRF where [TYPE] = 4 and USER_ID ={0}", SPContext.Current.Web.CurrentUser.ID);
                                 dtFRFData = queryExecutor.ExecuteEpmLiveQuery(sqlquery, new Dictionary<string, object> { });
-                                dtRPTWebData = queryExecutor.ExecuteReportingDBStoredProc("spGetAllWebs",
+                                dtRPTWebData = queryExecutor.ExecuteReportingDBStoredProc("spGetWorkspaces",
                                    new Dictionary<string, object>
                             {
                                 {"@SiteId", oWeb.Site.ID},
                                 {"@UserId", spWeb.CurrentUser.ID},
-                                {"@Data","AllItems"}
+                                {"@View","AllItems"}
                             });
                                 if (dtRPTWebData != null && dtRPTWebData.Rows.Count > 0)
                                 {
@@ -66,12 +66,12 @@ namespace EPMLiveCore.API
                             }
                             else
                             {
-                                dtWorkspacecenterData = queryExecutor.ExecuteReportingDBStoredProc("spGetAllWebs",
+                                dtWorkspacecenterData = queryExecutor.ExecuteReportingDBStoredProc("spGetWorkspaces",
                                     new Dictionary<string, object>
                             {
                                 {"@SiteId", oWeb.Site.ID},
                                 {"@UserId", spWeb.CurrentUser.ID},
-                                {"@Data",data}
+                                {"@View",data}
                             });
                             }
                         }
