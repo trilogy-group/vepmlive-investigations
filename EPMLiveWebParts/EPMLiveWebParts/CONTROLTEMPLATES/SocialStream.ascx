@@ -8,10 +8,10 @@
 </div>
 
 <script id="epm-se-day-template" type="text/x-handlebars-template">
-    <li id="epm-se-{{domId}}" class="epm-se-day">
+    <li id="epm-se-{{domId}}" class="epm-se-day" data-date="{{id}}">
         <div class="epm-se-header">
             <hr />
-            <h1 data-date="{{id}}">{{day}}</h1>
+            <h1>{{day}}</h1>
         </div>
         <ul class="epm-se-threads"></ul>
     </li>

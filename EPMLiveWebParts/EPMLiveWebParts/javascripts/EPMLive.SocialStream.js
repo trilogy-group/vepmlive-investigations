@@ -25,7 +25,7 @@
             };
 
             var config = {
-                apiUrl: '/' + window.epmLive.currentWebUrl.slice(1) + '/_vti_bin/SocialEngine.svc/activities',
+                apiUrl: '/' + window.epmLive.currentWebUrl.slice(1) + '/_vti_bin/SocialEngine.svc',
                 pagination: {
                     limit: 10,
                     offset: null,
@@ -37,8 +37,11 @@
                         older: 'ul.epm-se-older-activities',
                         showNewer: 'div.epm-se-show-newer',
                         showOlder: 'div.epm-se-show-older',
+                        day: 'div.epm-se-header h1'
                     }
-                }
+                },
+                moreActivityRequests: [],
+                threadsWithAllActivities: []
             };
 
             var configureMoment = function() {
@@ -116,7 +119,7 @@
             var _load = function (query) {
                 config.pagination.isLoading = true;
 
-                var apiUrl = config.apiUrl;
+                var apiUrl = config.apiUrl + '/activities';
 
                 if (query) {
                     apiUrl += '?';
@@ -139,6 +142,29 @@
                     
                     config.pagination.offset = response.meta.offset;
                     config.pagination.isLoading = false;
+                });
+            };
+
+            var loadMore = function(query, elements) {
+                elements.loader.text('loading...');
+                
+                var apiUrl = config.apiUrl + '/thread/' + query.threadId + '?';
+
+                var params = [];
+
+                for (var p in query) {
+                    if (query.hasOwnProperty(p)) {
+                        if (p !== 'threadId') params.push(p + '=' + query[p]);
+                    }
+                }
+
+                apiUrl += params.join('&');
+
+                $.getJSON(apiUrl).then(function(response) {
+                    activityManager.addMore(response, elements.list, query.maxDate ? 'older' : 'newer');
+
+                    elements.loader.fadeOut('fast').remove();
+                    elements.list.fadeIn('fast');
                 });
             };
 
@@ -273,7 +299,8 @@
                 };
 
                 var buildActivity = function(a, data) {
-                    var activity = entityManager.getById(a, data.activities);
+                    var activity = a;
+                    if (!activity.id) activity = entityManager.getById(a, data.activities);
 
                     activity.text = getText(activity);
                     activity.icon = getIcon(activity);
@@ -285,6 +312,24 @@
                     activity.notComment = activity.kind !== 'COMMENTADDED';
 
                     return activity;
+                };
+
+                var _addMore = function (data, $ul, kind) {
+                    var $parent = $ul.parent();
+                    
+                    for (var i = 0; i < data.activities.length; i++) {
+                        var a = data.activities[i];
+
+                        if (!$parent.find('li#epm-se-' + a.id).length) {
+                            var activity = buildActivity(a, data);
+
+                            if (kind === 'older') {
+                                $ul.prepend(templates.activity(activity));
+                            } else {
+                                $ul.append(templates.activity(activity));
+                            }
+                        }
+                    }
                 };
 
                 var _renderActivities = function (activityThread, thread, data, $thread) {
@@ -336,7 +381,8 @@
                     render: _renderActivities,
                     getAction: _getAction,
                     getDisplayTime: _getDisplayTime,
-                    getLongTime: _getLongTime
+                    getLongTime: _getLongTime,
+                    addMore: _addMore
                 };
             })();
 
@@ -420,22 +466,36 @@
                     }
                 };
 
-                var _loadMore = function($ele) {
+                var _loadMoreActivities = function ($ele) {
+                    var threadId = $ele.data('threadid');
                     var selectors = config.ui.selectors;
 
                     var action = $ele.data('action');
                     var $parent = $ele.parent();
-                    var $ul = action === 'newer' ? $parent.find(selectors.newer) : $parent.find(selectors.older);
+                    var date = $parent.parent().parent().data('date');
+                    var $ul;
 
-                    $ele.fadeOut('fast').remove();
-                    $ul.fadeIn('fast');
+                    var query = { threadId: threadId };
+                    
+                    if (action === 'newer') {
+                        $ul = $parent.find(selectors.newer);
+                        query.minDate = date;
+                    } else {
+                        $ul = $parent.find(selectors.older);
+                        query.maxDate = date;
+                    }
+
+                    loadMore(query, {
+                        list: $ul,
+                        loader: $ele
+                    });
                 };
 
                 return {
                     showTooltip: _showTooltip,
                     navigate: _navigate,
                     paginate: _paginate,
-                    loadMore: _loadMore
+                    loadMore: _loadMoreActivities
                 };
             })();
 

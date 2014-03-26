@@ -248,8 +248,7 @@ namespace EPMLiveCore.SocialEngine.Core
             }
         }
 
-        public DataTable GetActivities(int userId, string webUrl, DateTime? minDate, DateTime? maxDate, int? page,
-            int? limit)
+        public DataTable GetActivities(int userId, string webUrl, DateTime? minDate, DateTime? maxDate, int? page, int? limit, Guid? threadId)
         {
             using (SqlCommand sqlCommand = GetSqlCommand("SS_GetActivities"))
             {
@@ -259,6 +258,7 @@ namespace EPMLiveCore.SocialEngine.Core
                 sqlCommand.Parameters.AddWithValue("@MaxDate", maxDate.HasValue ? (object) maxDate.Value : DBNull.Value);
                 sqlCommand.Parameters.AddWithValue("@Page", page.HasValue ? (object) page.Value : DBNull.Value);
                 sqlCommand.Parameters.AddWithValue("@Limit", limit.HasValue ? (object) limit.Value : DBNull.Value);
+                sqlCommand.Parameters.AddWithValue("@ThreadId", threadId.HasValue ? (object) threadId.Value : DBNull.Value);
 
                 sqlCommand.CommandType = CommandType.StoredProcedure;
 

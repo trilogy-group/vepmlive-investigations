@@ -201,7 +201,7 @@ namespace EPMLiveCore.SocialEngine
 
         // Internal Methods (3) 
 
-        internal DataTable GetActivities(SPWeb contextWeb, DateTime? minDate, DateTime? maxDate, int? page, int? limit)
+        internal DataTable GetActivities(SPWeb contextWeb, DateTime? minDate, DateTime? maxDate, int? page, int? limit, Guid? threadId)
         {
             try
             {
@@ -211,7 +211,7 @@ namespace EPMLiveCore.SocialEngine
                     {
                         var activityManager = new ActivityManager(dbConnectionManager);
                         return activityManager.GetActivities(contextWeb.CurrentUser.ID, contextWeb.ServerRelativeUrl,
-                            minDate, maxDate, page, limit);
+                            minDate, maxDate, page, limit, threadId);
                     }
                     catch (AggregateException e)
                     {

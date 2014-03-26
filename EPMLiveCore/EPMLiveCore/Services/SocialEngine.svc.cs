@@ -21,9 +21,9 @@ namespace EPMLiveCore.Services
     [AspNetCompatibilityRequirements(RequirementsMode = AspNetCompatibilityRequirementsMode.Allowed)]
     public class SocialEngine
     {
-        #region Methods (10) 
+        #region Methods (12) 
 
-        // Public Methods (1) 
+        // Public Methods (2) 
 
         [WebGet(BodyStyle = WebMessageBodyStyle.Bare,
             ResponseFormat = WebMessageFormat.Json,
@@ -33,100 +33,31 @@ namespace EPMLiveCore.Services
         {
             int limit;
             const int PAGE = 1;
-            SqlDateTime minDate = SqlDateTime.MinValue;
+            DateTime minDate;
             DateTime maxDate;
 
-            ParseMetaData(out limit, out maxDate);
+            ParseMetaData(out limit, out maxDate, out minDate);
 
-            SPWeb spWeb = SPContext.Current.Web;
-            var activityRows = new List<DataRow>();
-
-            GetActivities(activityRows, spWeb, minDate.Value, maxDate, PAGE, limit);
-
-            var dailyActivities = new DailyActivities();
-
-            if (!activityRows.Any()) return dailyActivities;
-
-            var daysProcessed = new List<string>();
-            var threadsProcessed = new List<Guid>();
-            var websProcessed = new List<Guid>();
-            var listsProcessed = new List<Guid>();
-            var usersProcessed = new List<int>();
-
-            List<DataRow> activityThreads =
-                activityRows.AsParallel().OrderByDescending(r => r["ThreadLastActivityOn"]).ToList();
-
-            foreach (DataRow t in activityThreads)
-            {
-                var threadId = (Guid) t["ThreadId"];
-
-                if (threadsProcessed.Contains(threadId)) continue;
-
-                var webId = (Guid) t["WebId"];
-                object listId = t["ListId"];
-                var userId = (int) t["UserId"];
-                var webUrl = (string) t["WebUrl"];
-                object dateTime = t["ActivityDate"];
-                string activityDay = (((DateTime) dateTime).Date).ToString("s");
-
-                DailyActivities.Thread thread = BuildThread(threadId, activityDay, webId, listId, t);
-
-                List<DataRow> threadActivities = activityRows.AsParallel()
-                    .Where(a => (Guid) a["ThreadId"] == threadId)
-                    .OrderBy(a => a["ActivityDate"]).ToList();
-
-                foreach (DataRow a in threadActivities)
-                {
-                    object time = a["ActivityDate"];
-
-                    string day = (((DateTime) time).Date).ToString("s");
-                    if (!thread.days.Contains(day)) thread.days.Add(day);
-
-                    var activityUserId = (int) a["UserId"];
-
-                    DailyActivities.Activity activity = BuildActivity(a, threadId, time, activityUserId);
-                    if (activity == null) continue;
-
-                    dailyActivities.activities.Add(activity);
-
-                    thread.activities.Add(activity.id);
-
-                    DataRow th = t;
-                    DataRow ac = a;
-
-                    var tasks = new[]
-                    {
-                        Task.Factory.StartNew(() => BuildDay(daysProcessed, day, threadId, dailyActivities)),
-                        Task.Factory.StartNew(() => BuildWeb(websProcessed, webId, webUrl, threadId, dailyActivities, th)),
-                        Task.Factory.StartNew(() => BuildList(listId, listsProcessed, threadId, dailyActivities, th)),
-                        Task.Factory.StartNew(() => BuildUser(usersProcessed, activityUserId, thread, dailyActivities, ac))
-                    };
-
-                    Task.WaitAll(tasks);
-                }
-
-                dailyActivities.threads.Add(thread);
-                threadsProcessed.Add(threadId);
-            }
-
-            List<KeyValuePair<DateTime, List<DailyActivities.ActivityThread>>> dict =
-                BuildActivityThreads(dailyActivities).ToList();
-            IEnumerable<DailyActivities.ActivityThread> atList = dict.SelectMany(at => at.Value);
-
-            foreach (DailyActivities.ActivityThread activityThread in atList)
-            {
-                dailyActivities.activityThreads.Add(activityThread);
-            }
-
-            var dateOffset = (DateTime) activityThreads.AsParallel().Min(t => t["ActivityDate"]);
-            dailyActivities.meta.offset = dateOffset.ToString("s");
-
-            dailyActivities.days = dailyActivities.days.AsParallel().OrderByDescending(d => d.id).ToList();
-
-            return dailyActivities;
+            return GetDailyActivities(minDate, maxDate, PAGE, limit);
         }
 
-        // Private Methods (9) 
+        [WebGet(BodyStyle = WebMessageBodyStyle.Bare,
+            ResponseFormat = WebMessageFormat.Json,
+            UriTemplate = "/thread/{threadId}")]
+        [OperationContract]
+        public DailyActivities GetActivitiesForThread(string threadId)
+        {
+            int limit;
+            const int PAGE = 1;
+            DateTime maxDate;
+            DateTime minDate;
+
+            ParseMetaData(out limit, out maxDate, out minDate);
+
+            return GetDailyActivities(minDate, maxDate, PAGE, 1000000, Guid.Parse(threadId));
+        }
+
+        // Private Methods (10) 
 
         private static DailyActivities.Activity BuildActivity(DataRow a, Guid threadId, object dateTime, int userId)
         {
@@ -396,12 +327,11 @@ namespace EPMLiveCore.Services
             }
         }
 
-        private static void GetActivities(List<DataRow> activityRows, SPWeb spWeb, DateTime minDate, DateTime maxDate,
-            int page, int limit)
+        private static void GetActivities(List<DataRow> activityRows, SPWeb spWeb, DateTime minDate, DateTime maxDate, int page, int limit, Guid? threadId)
         {
             while (activityRows.Count < limit)
             {
-                DataTable dataTable = SocialEngineProxy.GetActivities(spWeb, minDate, maxDate, page++, limit);
+                DataTable dataTable = SocialEngineProxy.GetActivities(spWeb, minDate, maxDate, page++, limit, threadId);
                 if (dataTable.Rows.Count == 0) break;
 
                 EnumerableRowCollection<DataRow> rows = dataTable.AsEnumerable();
@@ -427,10 +357,104 @@ namespace EPMLiveCore.Services
             }
         }
 
-        private void ParseMetaData(out int limit, out DateTime maxDate)
+        private DailyActivities GetDailyActivities(SqlDateTime minDate, DateTime maxDate, int page, int limit,
+            Guid? requestedThreadId = null)
+        {
+            SPWeb spWeb = SPContext.Current.Web;
+            var activityRows = new List<DataRow>();
+
+            GetActivities(activityRows, spWeb, minDate.Value, maxDate, page, limit, requestedThreadId);
+
+            var dailyActivities = new DailyActivities();
+
+            if (!activityRows.Any()) return dailyActivities;
+
+            var daysProcessed = new List<string>();
+            var threadsProcessed = new List<Guid>();
+            var websProcessed = new List<Guid>();
+            var listsProcessed = new List<Guid>();
+            var usersProcessed = new List<int>();
+
+            List<DataRow> activityThreads =
+                activityRows.AsParallel().OrderByDescending(r => r["ThreadLastActivityOn"]).ToList();
+
+            foreach (DataRow t in activityThreads)
+            {
+                var threadId = (Guid) t["ThreadId"];
+
+                if (threadsProcessed.Contains(threadId)) continue;
+
+                var webId = (Guid) t["WebId"];
+                object listId = t["ListId"];
+                var userId = (int) t["UserId"];
+                var webUrl = (string) t["WebUrl"];
+                object dateTime = t["ActivityDate"];
+                string activityDay = (((DateTime) dateTime).Date).ToString("s");
+
+                DailyActivities.Thread thread = BuildThread(threadId, activityDay, webId, listId, t);
+
+                List<DataRow> threadActivities = activityRows.AsParallel()
+                    .Where(a => (Guid) a["ThreadId"] == threadId)
+                    .OrderBy(a => a["ActivityDate"]).ToList();
+
+                foreach (DataRow a in threadActivities)
+                {
+                    object time = a["ActivityDate"];
+
+                    string day = (((DateTime) time).Date).ToString("s");
+                    if (!thread.days.Contains(day)) thread.days.Add(day);
+
+                    var activityUserId = (int) a["UserId"];
+
+                    DailyActivities.Activity activity = BuildActivity(a, threadId, time, activityUserId);
+                    if (activity == null) continue;
+
+                    dailyActivities.activities.Add(activity);
+
+                    thread.activities.Add(activity.id);
+
+                    DataRow th = t;
+                    DataRow ac = a;
+
+                    var tasks = new[]
+                    {
+                        Task.Factory.StartNew(() => BuildDay(daysProcessed, day, threadId, dailyActivities)),
+                        Task.Factory.StartNew(
+                            () => BuildWeb(websProcessed, webId, webUrl, threadId, dailyActivities, th)),
+                        Task.Factory.StartNew(() => BuildList(listId, listsProcessed, threadId, dailyActivities, th)),
+                        Task.Factory.StartNew(
+                            () => BuildUser(usersProcessed, activityUserId, thread, dailyActivities, ac))
+                    };
+
+                    Task.WaitAll(tasks);
+                }
+
+                dailyActivities.threads.Add(thread);
+                threadsProcessed.Add(threadId);
+            }
+
+            List<KeyValuePair<DateTime, List<DailyActivities.ActivityThread>>> dict =
+                BuildActivityThreads(dailyActivities).ToList();
+            IEnumerable<DailyActivities.ActivityThread> atList = dict.SelectMany(at => at.Value);
+
+            foreach (DailyActivities.ActivityThread activityThread in atList)
+            {
+                dailyActivities.activityThreads.Add(activityThread);
+            }
+
+            var dateOffset = (DateTime) activityThreads.AsParallel().Min(t => t["ActivityDate"]);
+            dailyActivities.meta.offset = dateOffset.ToString("s");
+
+            dailyActivities.days = dailyActivities.days.AsParallel().OrderByDescending(d => d.id).ToList();
+
+            return dailyActivities;
+        }
+
+        private void ParseMetaData(out int limit, out DateTime maxDate, out DateTime minDate)
         {
             limit = 20;
             maxDate = DateTime.Now;
+            minDate = SqlDateTime.MinValue.Value;
 
             OperationContext context = OperationContext.Current;
             MessageProperties properties = context.IncomingMessageProperties;
@@ -451,6 +475,16 @@ namespace EPMLiveCore.Services
             if (parameters.AllKeys.Contains("offset"))
             {
                 DateTime.TryParse(parameters["offset"], out maxDate);
+            }
+
+            if (parameters.AllKeys.Contains("maxDate"))
+            {
+                DateTime.TryParse(parameters["maxDate"], out maxDate);
+            }
+
+            if (parameters.AllKeys.Contains("minDate"))
+            {
+                DateTime.TryParse(parameters["minDate"], out minDate);
             }
         }
 

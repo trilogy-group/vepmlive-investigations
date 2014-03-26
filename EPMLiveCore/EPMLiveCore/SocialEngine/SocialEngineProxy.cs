@@ -39,10 +39,10 @@ namespace EPMLiveCore.SocialEngine
             }
         }
 
-        public static DataTable GetActivities(SPWeb contextWeb, DateTime? minDate = null,
-            DateTime? maxDate = null, int? page = null, int? limit = null)
+        public static DataTable GetActivities(SPWeb contextWeb, DateTime? minDate = null, DateTime? maxDate = null,
+            int? page = null, int? limit = null, Guid? threadId = null)
         {
-            return SocialEngine.Current.GetActivities(contextWeb, minDate, maxDate, page, limit);
+            return SocialEngine.Current.GetActivities(contextWeb, minDate, maxDate, page, limit, threadId);
         }
 
         public static Guid GetTransaction(Guid webId, Guid listId, int itemId, SPWeb contextWeb)
