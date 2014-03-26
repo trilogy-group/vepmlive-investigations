@@ -62,6 +62,11 @@ namespace EPMLiveCore.CONTROLTEMPLATES
                 }
             }
             catch { }
+
+            EPMLiveScriptManager.RegisterScript(Page, new[]
+            {
+                "@masterpages/uplandv5.master"
+            });
         }
 
         protected void Page_Load(object sender, EventArgs e)

@@ -40,8 +40,6 @@
         content: "\e005";
     }
 </Sharepoint:StyleBlock>
-        
-<script src="/_layouts/15/epmlive/javascripts/uplandV5.master.min.js?v=<%= EPMLiveVersion %>" type="text/javascript"> </script>
 
 <script src="/_layouts/15/IE55UP.JS"></script>
 

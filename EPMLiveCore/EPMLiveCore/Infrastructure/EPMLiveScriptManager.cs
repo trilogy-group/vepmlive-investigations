@@ -62,6 +62,11 @@ namespace EPMLiveCore.Infrastructure
             }
             catch { }
 
+            var bundledScripts = new[]
+            {
+                "jquery", "jquery-ui", "UplandV5", "jquery.cookie", "tooltip", "bindWithDelay", "EPM"
+            };
+
             foreach (string script in from script in scripts
                 where !string.IsNullOrEmpty(script)
                 select script.Trim().ToLower()
@@ -72,7 +77,22 @@ namespace EPMLiveCore.Infrastructure
                 where !script.Equals("@/")
                 select script)
             {
-                bool defer = !script.Equals("libraries/jquery.min");
+                string scrpt = script.Replace("@", string.Empty);
+
+                if ((from bundledScript in bundledScripts
+                    select bundledScript.ToLower()
+                    into s
+                    select new[] {s, s + ".js", s + ".min", s + ".min.js", s + ".debug.js"}
+                    into variations
+                    let pieces = scrpt.Split('/')
+                    let currentScript = pieces[pieces.Length - 1]
+                    where variations.Any(v => v.Equals(currentScript))
+                    select variations).Any())
+                {
+                    continue;
+                }
+
+                bool defer = !scrpt.Equals("masterpages/uplandv5.master");
                 SPPageContentManager.RegisterScriptFile(page, GetScript(script, debugMode), localizable, defer, "javascript", null);
             }
         }
