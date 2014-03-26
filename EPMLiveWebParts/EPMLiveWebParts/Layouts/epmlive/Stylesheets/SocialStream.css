@@ -74,15 +74,7 @@
   border-radius: 3px;
 }
 #epm-social-stream li.epm-se-thread hr {
-  -moz-border-bottom-colors: none;
-  -moz-border-left-colors: none;
-  -moz-border-right-colors: none;
-  -moz-border-top-colors: none;
-  border-color: -moz-use-text-color -moz-use-text-color #eeeeee;
-  border-style: none none solid;
-  border-width: medium medium 1px;
-  margin-bottom: 6px;
-  margin-top: 0;
+  border: 1px solid #eeeeee;
 }
 #epm-social-stream li.epm-se-thread div.epm-se-header {
   text-align: left;
