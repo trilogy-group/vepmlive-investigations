@@ -384,16 +384,16 @@
                         var $naLi = $thread.find(naDomId);
                         if (!$naLi.length) {
                             var naActivity = buildActivity(na, data);
-                            $thread.find(config.ui.selectors.newer).append(templates.activity(naActivity)).fadeIn('fast');
+                            $thread.find(config.ui.selectors.newer).append(templates.activity(naActivity));
                         }
                     }
 
                     if (config.firstTimeLoad) {
                         $ta.append(taHtml).fadeIn('fast');
-                        $pa.append(paHtml).fadeIn('fast');
+                        $pa.append(paHtml);
                     } else {
-                        $ta.prepend(taHtml);
-                        $ta.prepend(paHtml);
+                        $ta.prepend(taHtml).fadeIn('fast');
+                        $pa.prepend(paHtml);
                     }
 
                     if (hasOlder) $thread.find(config.ui.selectors.showOlder).fadeIn('fast');
