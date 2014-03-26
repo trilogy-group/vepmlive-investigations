@@ -34,6 +34,7 @@
             <div class="epm-se-show-newer" data-threadId="{{id}}" data-action="newer"><span class="icon-arrow-down-16"></span>show newer activities</div>
             <ul class="epm-se-newer-activities"></ul>
         {{/if}}
+        {{> comment-box}}
     </li>
 </script>
 
@@ -109,4 +110,11 @@
 
 <script id="_epm-se-thread-icon" type="text/x-handlebars-template">
     <span class="epm-se-thread-icon {{icon}}"></span>
+</script>
+
+<script id="_epm-se-comment-box" type="text/x-handlebars-template">
+    <div data-threadId="{{id}}" class="epm-se-comment-box">
+        <div class="epm-se-comment-input"></div>
+        <button class="epm-se-comment-post">Post</button>
+    </div>
 </script>

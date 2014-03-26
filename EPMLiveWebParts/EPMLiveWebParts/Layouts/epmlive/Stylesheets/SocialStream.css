@@ -162,6 +162,17 @@
   color: #555555;
   font-family: "Open Sans Regular", Helvetica, Arial !important;
 }
+#epm-social-stream div.epm-se-comment-box {
+  display: none;
+}
+#epm-social-stream div.epm-se-comment-box div {
+  float: left;
+  width: 85%;
+}
+#epm-social-stream div.epm-se-comment-box button {
+  float: right;
+  width: 50px;
+}
 #epm-social-stream div.epm-se-user-info {
   margin-right: 4px;
 }

@@ -633,7 +633,7 @@
 .icon-ellipsis-horizontal:after {
   content: '•••';
   position: relative;
-  top: 0px;
+  top: -1px;
 }
 ul.epm-nav-contextual-menu {
   display: none;
@@ -661,7 +661,6 @@ ul.epm-nav-contextual-menu li {
 ul.epm-nav-contextual-menu li:hover {
   background: #0090CA !important;
   color: #ffffff !important;
-  text-decoration: none !important;
 }
 ul.epm-nav-contextual-menu li:hover .epm-nav-cm-icon {
   color: #ffffff !important;
@@ -673,7 +672,7 @@ ul.epm-nav-contextual-menu li span.epm-nav-cm-icon {
   margin-right: 4px;
   padding-right: 5px;
   position: relative;
-  top: 0px;
+  top: -3px;
 }
 ul.epm-nav-contextual-menu li span.epm-nav-cm-blank {
   margin-right: 17px !important;

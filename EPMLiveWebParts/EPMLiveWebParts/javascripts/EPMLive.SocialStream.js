@@ -21,7 +21,8 @@
                 _user: $('script#_epm-se-user').html(),
                 _userPlain: $('script#_epm-se-user-plain').html(),
                 _time: $('script#_epm-se-time').html(),
-                _threadIcon: $('script#_epm-se-thread-icon').html()
+                _threadIcon: $('script#_epm-se-thread-icon').html(),
+                _commentBox: $('script#_epm-se-comment-box').html()
             };
 
             var config = {
@@ -37,7 +38,8 @@
                         older: 'ul.epm-se-older-activities',
                         showNewer: 'div.epm-se-show-newer',
                         showOlder: 'div.epm-se-show-older',
-                        day: 'div.epm-se-header h1'
+                        day: 'div.epm-se-header h1',
+                        commentBox: 'div.epm-se-comment-input'
                     }
                 },
                 moreActivityRequests: [],
@@ -67,6 +69,7 @@
                 $$.registerPartial('user-plain', templates._userPlain);
                 $$.registerPartial('time', templates._time);
                 $$.registerPartial('thread-icon', templates._threadIcon);
+                $$.registerPartial('comment-box', templates._commentBox);
             };
 
             var attachEvents = function() {
@@ -84,6 +87,10 @@
 
                 _.subscribe('se.threadRendered', function(activityThread, thread, data, $thread) {
                     activityManager.render(activityThread, thread, data, $thread);
+                });
+                
+                _.subscribe('se.threadRendered', function (activityThread, thread, data, $thread) {
+                    commentManager.configureBox($thread);
                 });
 
                 $el.root.on('mouseenter', '.epm-se-has-tooltip', function() {

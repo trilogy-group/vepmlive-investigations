@@ -23,13 +23,12 @@ namespace EPMLiveWebParts.CONTROLTEMPLATES
         {
             string layoutPath = SPContext.Current.Web.SafeServerRelativeUrl() + "/_layouts/15/epmlive/";
 
-            SPPageContentManager.RegisterStyleFile(layoutPath + "stylesheets/libraries/jquery.notebook.min.css");
             SPPageContentManager.RegisterStyleFile(layoutPath + "stylesheets/SocialStream.min.css");
 
             EPMLiveScriptManager.RegisterScript(Page, new[]
             {
                 "libraries/jquery.min", "libraries/handlebars-v1.3.0", "@libraries/amplify", "libraries/moment.min",
-                "@libraries/jquery.notebook", "@EPMLive.SocialStream"
+                "@EPMLive.SocialStream"
             });
         }
 

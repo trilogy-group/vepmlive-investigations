@@ -12,30 +12,6 @@
                     urls: ['/_layouts/15/epmlive/stylesheets/masterpages/opensans.ie.min.css']
                 }
             };
-
-            var styles = [];
-
-            var url = (window.location.href + '').toLowerCase();
-            if (url.indexOf('isdlg') === -1) {
-                styles.push('masterpages/upland.icons');
-                styles.push('libraries/jquery-ui');
-            } else {
-                if (url.indexOf('/ppm/') === -1) {
-                    styles.push('libraries/jquery-ui');
-                }
-            }
-
-            var head = document.getElementsByTagName('head')[0];
-
-            for (var i = 0; i < styles.length; i++) {
-                var style = document.createElement('link');
-
-                style.type = 'text/css';
-                style.rel = 'stylesheet';
-                style.href = '/_layouts/15/epmlive/stylesheets/' + styles[i] + '.min.css?v=<%= EPMLiveVersion %>';
-
-                head.appendChild(style);
-            }
         })();
     </SharePoint:ScriptBlock>
     <SharePoint:StyleBlock runat="server">
@@ -46,38 +22,6 @@
         }
     </SharePoint:StyleBlock>
 <![endif]-->
-
-<!--[if IE 9]>
-    <link href='/_layouts/15/epmlive/stylesheets/masterpages/opensans.min.css?v=<%= EPMLiveVersion %>' rel='stylesheet' type='text/css'>
-    <link href='/_layouts/15/epmlive/stylesheets/masterpages/upland.icons.min.css?v=<%= EPMLiveVersion %>' rel='stylesheet' type='text/css'>
-    
-    <SharePoint:ScriptBlock runat="server">
-        (function() {
-            var styles = [];
-
-            var url = (window.location.href + '').toLowerCase();
-            if (url.indexOf('isdlg') === -1) {
-                styles.push('libraries/jquery-ui');
-            } else {
-                if (url.indexOf('/ppm/') === -1) {
-                    styles.push('libraries/jquery-ui');
-                }
-            }
-
-            var head = document.getElementsByTagName('head')[0];
-
-            for (var i = 0; i < styles.length; i++) {
-                var style = document.createElement('link');
-
-                style.type = 'text/css';
-                style.rel = 'stylesheet';
-                style.href = '/_layouts/15/epmlive/stylesheets/' + styles[i] + '.min.css?v=<%= EPMLiveVersion %>';
-
-                head.appendChild(style);
-            }
-        })();
-    </SharePoint:ScriptBlock>
-<![endif]-->
         
 <!--[if !IE]><!-->
 
@@ -87,9 +31,7 @@
         }
     </SharePoint:StyleBlock>
 
-    <link href='/_layouts/15/epmlive/stylesheets/masterpages/opensans.min.css?v=<%= EPMLiveVersion %>' rel='stylesheet' type='text/css'>
-    <link href='/_layouts/15/epmlive/stylesheets/masterpages/upland.icons.min.css?v=<%= EPMLiveVersion %>' rel='stylesheet' type='text/css'>
-    <link href="/_layouts/15/epmlive/stylesheets/libraries/jquery-ui.css?v=<%= EPMLiveVersion %>" rel="stylesheet" type="text/css" />
+    <link href='/_layouts/15/epmlive/stylesheets/uplandv5.master.min.css?v=<%= EPMLiveVersion %>' rel='stylesheet' type='text/css'>
 <!--<![endif]-->
 
 <Sharepoint:StyleBlock runat="server">
@@ -99,10 +41,8 @@
     }
 </Sharepoint:StyleBlock>
         
-<link href="/_layouts/15/epmlive/stylesheets/masterpages/UplandV5.min.css?v=<%= EPMLiveVersion %>" rel="stylesheet" type="text/css" />
-<script src="/_layouts/15/epmlive/javascripts/masterpages/UplandV5.min.js?v=<%= EPMLiveVersion %>" type="text/javascript"> </script>
+<script src="/_layouts/15/epmlive/javascripts/uplandV5.master.min.js?v=<%= EPMLiveVersion %>" type="text/javascript"> </script>
 
-<script src="/_layouts/15/epmlive/javascripts/libraries/tooltip.min.js?v=<%= EPMLiveVersion %>" type="text/javascript"> </script>
 <script src="/_layouts/15/IE55UP.JS"></script>
 
 <SharePoint:ScriptBlock runat="server">
