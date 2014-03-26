@@ -137,11 +137,12 @@
 
         </div>
     </div>
-    <div id="divIFLoading">
+    <div id="divIFLoading" style="left:31%; top:50%; position:absolute;flex-align:center;">
         <table width="100%">
             <tr>
                 <td align="center" class="ms-sectionheader">
                     <img src="../images/GEARS_ANv4.GIF" alt="Inserting Fragment..." style="vertical-align: middle;" /><br />
+                    <H4 class="ms-standardheader">Inserting Fragment...</H4><br />
                 </td>
             </tr>
         </table>
