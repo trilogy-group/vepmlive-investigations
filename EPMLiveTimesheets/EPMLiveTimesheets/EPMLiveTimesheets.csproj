@@ -142,6 +142,9 @@
     <Compile Include="TimesheetReports\TimesheetReports.cs" />
     <Compile Include="TimesheetSettings.cs" />
     <Compile Include="Timesheet\Timesheet.cs" />
+    <Compile Include="WebPageCode\timesheetapprovalpage.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <Compile Include="WebPageCode\dotsaction.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
@@ -195,6 +198,9 @@
     <None Include="Features\TimeSheets\TimeSheets.feature">
       <FeatureId>{9773496d-0cc9-45f0-8f89-5b8f12d220db}</FeatureId>
     </None>
+    <None Include="Layouts\epmlive\javascripts\MyTimesheet.min.js.map">
+      <DependentUpon>MyTimesheet.js</DependentUpon>
+    </None>
     <None Include="Layouts\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{f966bf5e-82ce-4d71-a20c-414a15de250d}</SharePointProjectItemId>
     </None>
@@ -235,6 +241,14 @@
     <Content Include="Features\TimeSheets\TimeSheets.Template.xml">
       <DependentUpon>TimeSheets.feature</DependentUpon>
     </Content>
+    <Content Include="Layouts\epmlive\images\ts\approved.png" />
+    <Content Include="Layouts\epmlive\images\ts\Rejected.png" />
+    <Content Include="Layouts\epmlive\images\ts\submitted.png" />
+    <Content Include="Layouts\epmlive\javascripts\MyTimesheet.min.js">
+      <DependentUpon>MyTimesheet.js</DependentUpon>
+    </Content>
+    <Content Include="Layouts\epmlive\MyTimesheetApprovalsContextualTabPageComponent.js" />
+    <Content Include="Layouts\epmlive\timesheetapprovalpage.aspx" />
     <Content Include="Layouts\epmlive\dotsaction.aspx" />
     <Content Include="Layouts\epmlive\getpmapprovals.aspx" />
     <Content Include="Layouts\epmlive\gettimesheet.aspx" />
@@ -284,7 +298,7 @@
     <Content Include="Layouts\epmlive\images\unsubmittime.gif" />
     <Content Include="Layouts\epmlive\MyTimesheet.aspx" />
     <Content Include="Layouts\epmlive\MyTimesheet.css" />
-    <Content Include="Layouts\epmlive\MyTimesheet.js" />
+    <Content Include="Layouts\epmlive\javascripts\MyTimesheet.js" />
     <Content Include="Layouts\epmlive\MyTimesheetAddWork.aspx" />
     <Content Include="Layouts\epmlive\MyTimesheetAddWork.js" />
     <Content Include="Layouts\epmlive\MyTimesheetContextualTabPageComponent.js" />
@@ -300,6 +314,8 @@
     <Content Include="MyTimesheet\Elements.xml" />
     <Content Include="PMApprovals\Elements.xml" />
     <None Include="Resources\flexible2.txt" />
+    <None Include="Resources\txtTSApprovalRibbon.txt" />
+    <None Include="Resources\txtMyTimesheetApprovals_DelayScript.txt" />
     <Content Include="TEMPLATE\XML\fldtypes_WorkLog.xml" />
     <Content Include="TimesheetApprovals\Elements.xml" />
     <Content Include="TimesheetReports\Elements.xml" />

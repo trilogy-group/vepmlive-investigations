@@ -66,11 +66,7 @@ border-color:#92C0E0;
 }
 
 img.TS_Comments {
-    background-repeat: no-repeat;
-    height: 20px;
-    line-height: 20px;
-    text-align: center;
-    width: 30px;
+
     cursor: pointer;
 }
 
@@ -154,4 +150,8 @@ padding-right:8px;
 
 .nav-text-wrapper .text {
 float:right;
+}
+
+navbar-nav {
+    padding-left:0px;
 }

@@ -1,0 +1,39 @@
+<ContextualGroup Id="Ribbon.MyTimesheetApprovalsContextualTabGroup" Color="Green" Title="{title}" Command="MyTimesheetApprovalsContextualTab.EnableContextualGroup" Sequence="502" ContextualGroupId="MyTimesheetContextualTabGroup">
+	<Tab Id="Ribbon.MyTimesheetApprovalsTab" Title="Timesheet Approvals" Command="MyTimesheetApprovalsContextualTab.EnableMyTimesheetTab" Sequence="100">
+		<Scaling Id="Ribbon.MyTimesheet.Scaling">
+			<MaxSize Id="Ribbon.MyTimesheet.ActionsGroup.MaxSize" GroupId="Ribbon.MyTimesheet.ActionsGroup" Size="LargeMediumSmall"/>
+			<Scale Id="Ribbon.MyTimesheet.ActionsGroup.Scaling.CustomTabScaling" GroupId="Ribbon.MyTimesheet.ActionsGroup" Size="LargeMediumSmall" />
+		</Scaling>
+		<Groups Id="Ribbon.MyTimesheet.Groups">
+			<Group Id="Ribbon.MyTimesheet.ActionsGroup" Title="Actions" Sequence="10" Template="Ribbon.Templates.MyTimesheetTemplate">
+				<Controls Id="Ribbon.MyTimesheet.ActionsGroup.Controls">
+				
+					<Button
+					Id="Ribbon.MyTimesheet.ActionsGroup.Approve"
+					Sequence="10"
+					Command="Ribbon.MyTimesheet.Approve"
+					Image32by32="/_layouts/epmlive/images/approve.png"
+					LabelText="Approve/Lock"
+					TemplateAlias="oL"/>
+
+					<Button 
+						Id="Ribbon.MyTimesheet.ActionsGroup.Unlock" 
+						Command="Ribbon.MyTimesheet.Unlock" 
+						Sequence="11" 
+						LabelText="Unlock"
+						Image32by32="/_layouts/epmlive/images/unlock.png" 
+						TemplateAlias="oL"/>
+
+					<Button 
+		                Id="Ribbon.MyTimesheet.ActionsGroup.Reject" 
+		                Command="Ribbon.MyTimesheet.Reject" 
+		                Sequence="12" 
+		                LabelText="Reject"
+						Image32by32="/_layouts/epmlive/images/reject.png" 
+		                TemplateAlias="oL"/>
+
+				</Controls>
+			</Group>
+		</Groups>
+	</Tab>
+</ContextualGroup>

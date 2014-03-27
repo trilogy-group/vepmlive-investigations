@@ -446,11 +446,9 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
 
             curGrid = grid;
 
-            var surl = siteColUrl + "/Lists/My%20Timesheet/Timesheet%20Managers%20Approval.aspx";
+            var surl = siteColUrl + "/_layouts/15/epmlive/mytimesheet.aspx?Approvals=true";
 
-            var options = { url: surl, showMaximized: true, title: "Approvals", autoSize: false };
-
-            SP.UI.ModalDialog.showModalDialog(options);
+            location.href = surl;
         }
 
         return true;

@@ -931,8 +931,15 @@ namespace TimeSheets
                 doc.LoadXml(data);
 
                 //XmlNode ndPeriod = doc.FirstChild.SelectSingleNode("//Period");
-                XmlNode ndTS = doc.FirstChild.SelectSingleNode("//TSIDS");
+                XmlNodeList ndTS = doc.FirstChild.SelectNodes("//TS");
 
+                string ApprovalStatus = "1";
+                try
+                {
+                    ApprovalStatus = doc.FirstChild.Attributes["ApproveStatus"].Value;
+                }
+                catch { }
+                
                 string outData = "";
                 bool errors = false;
 
@@ -941,7 +948,7 @@ namespace TimeSheets
                 //    throw new EPMLiveCore.API.APIException(900001, "No Period Provided");
                 //}
                 //else 
-                if (ndTS == null)
+                if (ndTS.Count <= 0)
                 {
                     throw new EPMLiveCore.API.APIException(900002, "No Timesheets Provided");
                 }
@@ -975,27 +982,28 @@ namespace TimeSheets
                     if (cn != null && cn.State == System.Data.ConnectionState.Open)
                     {
 
-                        string[] tsUids = ndTS.InnerText.Split(',');
+                        //string[] tsUids = ndTS.InnerText.Split(',');
 
                         int status = 3;
 
-                        foreach (string tsUid in tsUids)
+                        foreach (XmlNode TS in ndTS)
                         {
-                            if (tsUid != "")
+                            //if (tsUid != "")
                             {
                                 try
                                 {
-                                    string[] tsData = tsUid.Split('|');
+                                    //string[] tsData = tsUid.Split('|');
 
-                                    SqlCommand cmd = new SqlCommand("update TSTIMESHEET set approval_status=1,approval_notes=@notes,approval_date=GETDATE() where ts_uid=@ts_uid", cn);
-                                    cmd.Parameters.AddWithValue("@ts_uid", tsData[0]);
-                                    cmd.Parameters.AddWithValue("@notes", data);
+                                    SqlCommand cmd = new SqlCommand("update TSTIMESHEET set approval_status=@status,approval_notes=@notes,approval_date=GETDATE() where ts_uid=@ts_uid", cn);
+                                    cmd.Parameters.AddWithValue("@ts_uid", TS.Attributes["id"].Value);
+                                    cmd.Parameters.AddWithValue("@notes", TS.InnerText);
+                                    cmd.Parameters.AddWithValue("@status", ApprovalStatus);
                                     cmd.ExecuteNonQuery();
 
                                     if (!liveHours)
                                     {
                                         cmd = new SqlCommand("SELECT status,jobtype_id FROM TSQUEUE where TS_UID=@tsuid and JOBTYPE_ID=30", cn);
-                                        cmd.Parameters.AddWithValue("@tsuid", tsData[0]);
+                                        cmd.Parameters.AddWithValue("@tsuid", TS.Attributes["id"].Value);
 
                                         SqlDataReader dr = cmd.ExecuteReader();
                                         if (dr.Read())
@@ -1007,15 +1015,15 @@ namespace TimeSheets
                                         if (status == 3)
                                         {
                                             cmd = new SqlCommand("DELETE FROM TSQUEUE where TS_UID=@tsuid and JOBTYPE_ID=30", cn);
-                                            cmd.Parameters.AddWithValue("@tsuid", tsData[0]);
+                                            cmd.Parameters.AddWithValue("@tsuid", TS.Attributes["id"].Value);
                                             cmd.ExecuteNonQuery();
 
                                             cmd = new SqlCommand("INSERT INTO TSQUEUE (TS_UID,STATUS,JOBTYPE_ID,USERID,JOBDATA) VALUES(@tsuid,0,30,@USERID,@JOBDATA)", cn);
-                                            cmd.Parameters.AddWithValue("@tsuid", tsData[0]);
+                                            cmd.Parameters.AddWithValue("@tsuid", TS.Attributes["id"].Value);
                                             cmd.Parameters.AddWithValue("@USERID", oWeb.CurrentUser.ID);
-                                            if (tsData.Length > 1)
-                                                cmd.Parameters.AddWithValue("@JOBDATA", tsData[1]);
-                                            else
+                                           // if (tsData.Length > 1)
+                                            //    cmd.Parameters.AddWithValue("@JOBDATA", tsData[1]);
+                                            //else
                                                 cmd.Parameters.AddWithValue("@JOBDATA", "");
                                             cmd.ExecuteNonQuery();
 
@@ -1023,12 +1031,12 @@ namespace TimeSheets
                                         
                                     }
 
-                                    outData += "<TS ID='" + tsData[0] + "' Status=\"0\"/>";
+                                    outData += "<TS id='" + TS.Attributes["id"].Value + "' Status=\"0\"/>";
                                 }
                                 catch (Exception ex)
                                 {
                                     errors = true;
-                                    outData += "<TS ID='" + tsUid + "' Status=\"2\">" + ex.Message + "</TS>";
+                                    outData += "<TS id='" + TS.Attributes["id"].Value + "' Status=\"2\">" + ex.Message + "</TS>";
                                 }
                             }
                         }
@@ -1062,6 +1070,8 @@ namespace TimeSheets
                 XmlDocument doc = new XmlDocument();
                 doc.LoadXml(data);
 
+
+                int iGridType = int.Parse(doc.FirstChild.Attributes["GridType"].Value);
                 string sPeriod = doc.FirstChild.Attributes["Period"].Value;
                 string sGridId = doc.FirstChild.Attributes["GridId"].Value;
                 string Editable = "0";
@@ -1094,6 +1104,7 @@ namespace TimeSheets
 
 
                 XmlNode ndRightCols = docLayout.FirstChild.SelectSingleNode("//RightCols");
+                XmlNode ndLeftCols = docLayout.FirstChild.SelectSingleNode("//LeftCols");
                 XmlNode ndFooter = docLayout.FirstChild.SelectSingleNode("//Foot/I[@id='-1']");
                 XmlNode ndHeader = docLayout.FirstChild.SelectSingleNode("//Head/Header[@id='Header']");
                 XmlNode ndGroupDef = docLayout.FirstChild.SelectSingleNode("//Def/D[@Name='Group']");
@@ -1107,7 +1118,7 @@ namespace TimeSheets
 
                 XmlNode ndSW = docLayout.FirstChild.SelectSingleNode("//RightCols/C[@Name='StopWatch']");
 
-                if (settings.AllowStopWatch)
+                if (settings.AllowStopWatch && iGridType == 0)
                 {
                     RightWidth += int.Parse(ndSW.Attributes["Width"].Value);
                 }
@@ -1115,7 +1126,7 @@ namespace TimeSheets
                 {
                     ndSW.Attributes["Visible"].Value = "0";
                 }
-
+                
                 string TotalColumnCalc = "";
 
                 Dictionary<string, string> viewInfo = new Dictionary<string, string>();
@@ -1240,26 +1251,27 @@ namespace TimeSheets
 
                     cn.Close();
 
-
-                    using (SPSite rsite = new SPSite(web.Site.ID))
+                    if (iGridType == 0)
                     {
-                        using (SPWeb rweb = rsite.OpenWeb(web.ID))
+                        using (SPSite rsite = new SPSite(web.Site.ID))
                         {
-                            Guid lWebGuid = EPMLiveCore.CoreFunctions.getLockedWeb(rweb);
-                            if (lWebGuid != rweb.ID)
+                            using (SPWeb rweb = rsite.OpenWeb(web.ID))
                             {
-                                using (SPWeb lweb = rsite.OpenWeb(lWebGuid))
+                                Guid lWebGuid = EPMLiveCore.CoreFunctions.getLockedWeb(rweb);
+                                if (lWebGuid != rweb.ID)
                                 {
-                                    PopulateTimesheetGridLayout(lweb, ref docLayout, settings, ref MidWidth, viewInfo, false, "My Work");
+                                    using (SPWeb lweb = rsite.OpenWeb(lWebGuid))
+                                    {
+                                        PopulateTimesheetGridLayout(lweb, ref docLayout, settings, ref MidWidth, viewInfo, false, "My Work");
+                                    }
                                 }
-                            }
-                            else
-                            {
-                                PopulateTimesheetGridLayout(rweb, ref docLayout, settings, ref MidWidth, viewInfo, false, "My Work");
+                                else
+                                {
+                                    PopulateTimesheetGridLayout(rweb, ref docLayout, settings, ref MidWidth, viewInfo, false, "My Work");
+                                }
                             }
                         }
                     }
-
                 });
 
 
@@ -1384,7 +1396,103 @@ namespace TimeSheets
                     ndFooter.Attributes["LeftHtml"].Value = "<div align=\"right\"><b>Total:&nbsp;</b></div>";
                 }
 
+                if (iGridType == 1)
+                {
+                    ndFooter.ParentNode.RemoveChild(ndFooter);
 
+                    XmlNode ndNewCol = docLayout.CreateNode(XmlNodeType.Element, "C", docLayout.NamespaceURI);
+                    attr2 = docLayout.CreateAttribute("Name");
+                    attr2.Value = "PMApproval";
+                    ndNewCol.Attributes.Append(attr2);
+
+                    attr2 = docLayout.CreateAttribute("Type");
+                    attr2.Value = "Html";
+                    ndNewCol.Attributes.Append(attr2);
+
+                    attr2 = docLayout.CreateAttribute("Width");
+                    attr2.Value = "40";
+                    ndNewCol.Attributes.Append(attr2);
+
+                    attr2 = docLayout.CreateAttribute("CanSort");
+                    attr2.Value = "0";
+                    ndNewCol.Attributes.Append(attr2);
+
+                    ndLeftCols.PrependChild(ndNewCol);
+
+
+                    ndNewCol = docLayout.CreateNode(XmlNodeType.Element, "C", docLayout.NamespaceURI);
+                    attr2 = docLayout.CreateAttribute("Name");
+                    attr2.Value = "TMApproval";
+                    ndNewCol.Attributes.Append(attr2);
+
+                    attr2 = docLayout.CreateAttribute("Type");
+                    attr2.Value = "Html";
+                    ndNewCol.Attributes.Append(attr2);
+
+                    attr2 = docLayout.CreateAttribute("Width");
+                    attr2.Value = "40";
+                    ndNewCol.Attributes.Append(attr2);
+
+                    attr2 = docLayout.CreateAttribute("CanSort");
+                    attr2.Value = "0";
+                    ndNewCol.Attributes.Append(attr2);
+
+                    ndLeftCols.PrependChild(ndNewCol);
+
+
+
+                    ndNewCol = docLayout.CreateNode(XmlNodeType.Element, "C", docLayout.NamespaceURI);
+                    attr2 = docLayout.CreateAttribute("Name");
+                    attr2.Value = "ApprovalNotes";
+                    ndNewCol.Attributes.Append(attr2);
+
+                    attr2 = docLayout.CreateAttribute("CanSort");
+                    attr2.Value = "0";
+                    ndNewCol.Attributes.Append(attr2);
+
+                    ndLeftCols.PrependChild(ndNewCol);
+
+                    
+                    attr2 = docLayout.CreateAttribute("ChildPaging");
+                    attr2.Value = "3";
+                    ndCfg.Attributes.Append(attr2);
+
+                    try
+                    {
+                        ndCfg.Attributes.Remove(ndCfg.Attributes["Group"]);
+                    }
+                    catch { }
+
+
+
+                    ndNewCol = docLayout.CreateNode(XmlNodeType.Element, "C", docLayout.NamespaceURI);
+                    attr2 = docLayout.CreateAttribute("Name");
+                    attr2.Value = "Work";
+                    ndNewCol.Attributes.Append(attr2);
+
+                    attr2 = docLayout.CreateAttribute("Type");
+                    attr2.Value = "Float";
+                    ndNewCol.Attributes.Append(attr2);
+
+                    attr2 = docLayout.CreateAttribute("Visible");
+                    attr2.Value = "0";
+                    ndNewCol.Attributes.Append(attr2);
+
+                    ndLeftCols.AppendChild(ndNewCol);
+
+                    try
+                    {
+                        docLayout.FirstChild.SelectSingleNode("//Panel").Attributes["Visible"].Value = "1";
+                    }
+                    catch { }
+                    try
+                    {
+                        docLayout.FirstChild.SelectSingleNode("//D[@Name='R']").Attributes["CanSelect"].Value = "0";
+                    }
+                    catch { }
+
+                     
+                }
 
                 return docLayout.OuterXml;
             }
@@ -1675,6 +1783,222 @@ namespace TimeSheets
                     return false;
             }
             return true;
+        }
+
+        public static string GetTimesheetApprovalsGridPage(string data, SPWeb web, string sPeriod)
+        {
+            XmlDocument doc = new XmlDocument();
+            doc.LoadXml(System.Web.HttpUtility.HtmlDecode(data));
+
+            
+
+            SqlConnection cn = null;
+            SPSecurity.RunWithElevatedPrivileges(delegate()
+            {
+                cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(SPContext.Current.Web.Site.WebApplication.Id));
+                cn.Open();
+            });
+
+            XmlNode ndB = doc.FirstChild.SelectSingleNode("//B");
+
+
+            string tsuid = ndB.Attributes["id"].Value;
+
+            XmlDocument docOut = new XmlDocument();
+            docOut.LoadXml("<Grid><Body><B id=\"" + tsuid + "\"/></Body></Grid>");
+            ndB = docOut.FirstChild.SelectSingleNode("//B");
+            EPMLiveReportsAdmin.MyWorkReportData rptData = new EPMLiveReportsAdmin.MyWorkReportData(web.Site.ID);
+
+            DataSet dsTS = iiGetTSData(cn, web, sPeriod, new Guid(tsuid), rptData);
+            TimesheetSettings settings = new TimesheetSettings(web);
+            ArrayList arrPeriods = GetPeriodDaysArray(cn, settings, web, sPeriod);
+            ArrayList arrLookups = new ArrayList();
+            SPList lstMyWork = web.Site.RootWeb.Lists.TryGetList("My Work");
+
+            if (lstMyWork != null)
+            {
+                foreach (SPField field in lstMyWork.Fields)
+                {
+                    if (field.Type == SPFieldType.Lookup)
+                    {
+
+                        arrLookups.Add(field.InternalName + "Text");
+
+                    }
+                }
+            }
+            foreach (DataRow dr in dsTS.Tables[2].Rows)
+            {
+                ndB.AppendChild(CreateTSRow(ref docOut, dsTS, dr, arrLookups, arrPeriods, settings, false));
+            }
+
+            
+
+            cn.Close();
+
+            return docOut.OuterXml;
+        }
+
+        public static string GetTimesheetApprovalsGrid(string data, SPWeb web)
+        {
+            try
+            {
+                XmlDocument doc = new XmlDocument();
+                doc.LoadXml(data);
+
+                string sPeriod = doc.FirstChild.Attributes["Period"].Value;
+                string sGridId = doc.FirstChild.Attributes["GridId"].Value;
+
+                XmlDocument docData = new XmlDocument();
+                docData.LoadXml("<Grid><Cfg TimesheetUID=\"\"/><Body><B></B></Body></Grid>");
+
+                XmlNode ndB = docData.SelectSingleNode("//B");
+
+                TimesheetSettings settings = new TimesheetSettings(web);
+
+                EPMLiveReportsAdmin.MyWorkReportData rptData = new EPMLiveReportsAdmin.MyWorkReportData(web.Site.ID);
+
+                string sql = string.Format(@"SELECT * FROM dbo.LSTResourcePool WHERE (',' + TimesheetManagerID + ',' LIKE '%,{0},%') and Generic=0", web.CurrentUser.ID);
+                DataTable dtMyResources = rptData.ExecuteSql(sql);
+
+                string sResList = "";
+
+                foreach (DataRow dr in dtMyResources.Rows)
+                {
+                    sResList += ";#" + dr["SharePointAccountID"].ToString();
+                }
+                sResList = sResList.Trim(';').Trim('#');
+
+                SqlConnection cn = null;
+                SPSecurity.RunWithElevatedPrivileges(delegate()
+                {
+                    cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(web.Site.WebApplication.Id));
+                    cn.Open();
+                });
+
+                DataSet ds = new DataSet();
+                SqlCommand cmd = new SqlCommand("spTSGetMyApprovals", cn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@siteid", web.Site.ID);
+                cmd.Parameters.AddWithValue("@periodid", sPeriod);
+                cmd.Parameters.AddWithValue("@resources", sResList);
+                SqlDataAdapter da = new SqlDataAdapter(cmd);
+                da.Fill(ds);
+                
+                ArrayList arrPeriods = GetPeriodDaysArray(cn, settings, web, sPeriod);
+
+                cn.Close();
+
+                
+
+
+                foreach (DataRow dr in dtMyResources.Rows)
+                {
+                    DataRow[] drTimesheets = ds.Tables[0].Select("USER_ID='" + dr["SharePointAccountId"].ToString() + "'");
+                    DataRow drTimesheet = null;
+                    string tsuid = "";
+
+                    if (drTimesheets.Length > 0)
+                    {
+                        drTimesheet = drTimesheets[0];
+                        tsuid = drTimesheet["TS_UID"].ToString();
+                    }
+
+                    iGetApprovalRow(dr, drTimesheet, ds.Tables[1], ref docData, ndB, arrPeriods, tsuid);
+                }
+
+                return docData.OuterXml;
+            }
+            catch (Exception ex)
+            {
+                return "<Grid><Body><B><I Title=\"Error: " + ex.Message  + "\"/></B></Body></Grid>";
+            }
+        }
+
+        private static void iGetApprovalRow(DataRow drResource, DataRow drTimesheet, DataTable dtHours, ref XmlDocument docData, XmlNode ndB, ArrayList arrPeriods, string tsuid)
+        {
+            XmlNode ndRow = docData.CreateNode(XmlNodeType.Element, "I", docData.NamespaceURI);
+
+            XmlAttribute attr1;
+            
+            attr1 = docData.CreateAttribute("Def");
+            attr1.Value = "Resource";
+            ndRow.Attributes.Append(attr1);
+
+            
+
+            if (drTimesheet != null)
+            {
+                attr1 = docData.CreateAttribute("id");
+                attr1.Value = drTimesheet["TS_UID"].ToString();
+                ndRow.Attributes.Append(attr1);
+
+
+                attr1 = docData.CreateAttribute("TMApproval");
+                if (drTimesheet["APPROVAL_STATUS"].ToString() == "1")
+                    attr1.Value = "<img src=\"/_layouts/15/epmlive/images/ts/approved.png\" alt=\"Approved\">";
+                else if (drTimesheet["APPROVAL_STATUS"].ToString() == "2")
+                    attr1.Value = "<img src=\"/_layouts/15/epmlive/images/ts/rejected.png\" alt=\"Rejected\">";
+                else if (drTimesheet["SUBMITTED"].ToString() == "True")
+                    attr1.Value = "<img src=\"/_layouts/15/epmlive/images/ts/submitted.png\" alt=\"Submitted\">";
+                else
+                {
+                    attr1 = docData.CreateAttribute("ApprovalNotesCanEdit");
+                    attr1.Value = "0";
+                    ndRow.Attributes.Append(attr1);
+
+                    attr1 = docData.CreateAttribute("CanSelect");
+                    attr1.Value = "0";
+
+                }
+                ndRow.Attributes.Append(attr1);
+
+
+
+                attr1 = docData.CreateAttribute("ApprovalNotes");
+                attr1.Value = drTimesheet["APPROVAL_NOTES"].ToString();
+                ndRow.Attributes.Append(attr1);
+
+                attr1 = docData.CreateAttribute("Count");
+                attr1.Value = "1";
+                ndRow.Attributes.Append(attr1);
+
+                foreach (DateTime dtStart in arrPeriods)
+                {
+                    DataRow []drDayHour = dtHours.Select("TS_ITEM_DATE='" + dtStart.ToString() + "' AND TS_UID='" + tsuid + "'");
+                    if (drDayHour.Length > 0)
+                    {
+                        attr1 = docData.CreateAttribute("P" + dtStart.Ticks);
+                        attr1.Value = drDayHour[0]["Hours"].ToString();
+                        ndRow.Attributes.Append(attr1);
+                    }
+                }
+                
+            }
+            else
+            {
+                attr1 = docData.CreateAttribute("CanSelect");
+                attr1.Value = "0";
+                ndRow.Attributes.Append(attr1);
+
+                attr1 = docData.CreateAttribute("ApprovalNotesCanEdit");
+                attr1.Value = "0";
+                ndRow.Attributes.Append(attr1);
+
+                attr1 = docData.CreateAttribute("id");
+                attr1.Value = drResource["SharePointAccountId"].ToString();
+                ndRow.Attributes.Append(attr1);
+
+            }
+
+            attr1 = docData.CreateAttribute("Title");
+            attr1.Value = drResource["Title"].ToString();
+            ndRow.Attributes.Append(attr1);
+
+
+
+
+            ndB.AppendChild(ndRow);
         }
 
         public static string GetTimesheetGrid(string data, SPWeb web)
@@ -2298,7 +2622,12 @@ namespace TimeSheets
             cmd.Parameters.AddWithValue("@uid", userid);
             cmd.ExecuteNonQuery();
 
-            cmd = new SqlCommand("spTSGetTimesheet", cn);
+            return iiGetTSData(cn, web, sPeriod, tsuid, rptData);
+        }
+
+        private static DataSet iiGetTSData(SqlConnection cn, SPWeb web, string sPeriod, Guid tsuid, EPMLiveReportsAdmin.MyWorkReportData rptData)
+        {
+            SqlCommand cmd = new SqlCommand("spTSGetTimesheet", cn);
             cmd.CommandType = CommandType.StoredProcedure;
             cmd.Parameters.AddWithValue("@tsuid", tsuid);
 
@@ -2345,8 +2674,6 @@ namespace TimeSheets
             }
 
             ds.Tables[myworktableid].PrimaryKey = new[] { ds.Tables[myworktableid].Columns["ListId"], ds.Tables[myworktableid].Columns["ItemId"] };
-
-
 
             return ds;
         }

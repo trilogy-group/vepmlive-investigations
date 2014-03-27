@@ -34,7 +34,7 @@ Grids.OnRenderStart = function (grid) {
         if (newobj) {
             grid.TSObject = newobj;
 
-            document.getElementById("TSLoader" + newgridid).style.display = "none";
+            //document.getElementById("TSLoader" + newgridid).style.display = "none";
         }
 
         for (var R in grid.Rows) {
@@ -51,16 +51,93 @@ Grids.OnRenderStart = function (grid) {
     }
 }
 
-Grids.OnRenderFinish = function (grid) {
-    curGrid = grid;
-    if (grid.id.substr(0, 2) == "TS") {
-        RefreshStopWatch();
-        CheckSaveStatus(grid.id);
-        StartCheckApproveStatus(grid.id);
+function Approve(gridid) {
+    ProcessApprovals(gridid, "1");
+}
 
+function Reject(gridid) {
+    ProcessApprovals(gridid, "2");
+}
 
+function Unlock(gridid) {
+    ProcessApprovals(gridid, "0");
+}
+
+function ProcessApprovals(gridid, status) {
+    var grid = Grids["TS" + gridid];
+    var rows = grid.GetSelRows();
+
+    if (rows.length <= 0) {
+        alert('You must select 1 or more rows');
+    }
+    else {
+        var rowstring = "";
+        for (var row in rows) {
+            rowstring += "<TS id=\"" + rows[row].id + "\">" + grid.GetValue(rows[row], "ApprovalNotes") + "</TS>";
+        }
+
+        ShowMessage(grid.id, "Processing Timesheets...", 200, 50);
+
+        EPMLiveCore.WorkEngineAPI.Execute("timesheet_ApproveTimesheets", "<Approve ApproveStatus=\"" + status + "\">" + rowstring + "</Approve>", function (response) {
+            response = parseJson(response);
+
+            var img = "";
+            if (status == "1")
+                img = "Approved";
+            else if (status == "2")
+                img = "Rejected";
+            else if (status == "0")
+                img = "Submitted";
+
+            if (response.Result['@Status'] == "0") {
+                for (var row in rows) {
+                    grid.SetValue(rows[row], "TMApproval", "<img src=\"/_layouts/15/epmlive/images/ts/" + img + ".png\" alt=\"" + img + "\">", 1);
+                }
+            }
+            else {
+                alert("Error: " + response.Result.Errors);
+            }
+            HideMessage(grid.id);
+        });
     }
 }
+
+
+function GetTSGridId(grid) {
+    return grid.id.substr(2);
+}
+
+function LoadTSGrid(gridid) {
+    
+    EPM.UI.Loader.current().startLoading({ id: 'WebPart' + eval("TSObject" + gridid + ".Qualifier") });
+}
+
+
+function TSRenderFinish(grid)
+{
+    var gridid = GetTSGridId(grid);
+
+    EPM.UI.Loader.current().stopLoading('WebPart' + eval("TSObject" + gridid + ".Qualifier"));
+
+    curGrid = grid;
+    if (GridType == "0") {
+        if (grid.id.substr(0, 2) == "TS") {
+            RefreshStopWatch();
+            CheckSaveStatus(grid.id);
+            StartCheckApproveStatus(grid.id);
+
+            $(".TS_Comments").click(function () {
+                showComments(grid.id);
+            });
+        }
+    }
+    else {
+        eval("loadMenu" + grid.id.substr(2) +"()");
+    }
+}
+
+
+
 
 Grids.OnScroll = function (grid) {
     if (curRow && curRow.Kind == "Data" && curRow.id != "-1" && curCol && TSCols[curCol]) {
@@ -85,17 +162,10 @@ function esGrid() {
     }
 }
 
-Grids.OnRenderFinish = function (grid) {
-    showribbon();
 
-    $(".TS_Comments").click(function () {
-        showComments(grid.id);
-    });
-};
-
-Grids.OnClick = function (grid, row, col, x, y, event) {
-    setTimeout('showribbon()', 100);
-}
+//Grids.OnClick = function (grid, row, col, x, y, event) {
+//    setTimeout('showribbon()', 100);
+//}
 function showribbon() {
     var wp2 = document.getElementById('Ribbon.MyTimesheetTab-title');
     if (wp2)
@@ -113,6 +183,8 @@ Grids.OnKeyPress = function (grid, key, event, name, prefix) {
 }
 
 Grids.OnDblClick = function (grid, row, col, x, y, event) {
+    if (GridType != "0")
+        return;
     if (curPop) {
         return true;
     } else {
@@ -451,8 +523,6 @@ function UnSubmitTimesheet(gridid) {
 
             newobj.Status = "Unsubmitted";
 
-            document.getElementById("mytimesheetstatus").innerHTML = "Unsubmitted";
-
             EnableAllRows(grid);
 
             HideMessage(gridid);
@@ -499,8 +569,6 @@ function SubmitTimesheet(gridid) {
                     var newobj = eval("TSObject" + newgridid);
 
                     newobj.Status = "Submitted";
-
-                    document.getElementById("mytimesheetstatus").innerHTML = "Submitted";
 
                     DisableAllRows(grid);
 
@@ -898,6 +966,11 @@ Grids.OnFocus = function (grid, row, col, x, y, event) {
 
     DoPopUp(grid, row, col);
 
+    if (row.ItemID) {
+        grid.ActionClearSelection();
+        grid.SelectRow(row);
+    }
+
     RefreshCommandUI();
 }
 
@@ -907,6 +980,19 @@ Grids.OnClick = function (grid, row, col, x, y, event) {
         DoPopUp(grid, row, col);
 
 }
+
+function OpenPMApprovals(gridid) {
+    var grid = Grids["TS" + gridid];
+
+    curGrid = grid;
+
+    var surl = siteColUrl + "/Lists/My%20Timesheet/Project%20Manager%20Approval.aspx";
+
+    var options = { url: surl, showMaximized: true, title: "Approvals", autoSize: false };
+
+    SP.UI.ModalDialog.showModalDialog(options);
+}
+
 
 function AutoAddWork(grid) {
 
@@ -985,7 +1071,7 @@ function DoPopUp(grid, row, col) {
 
                     grid.EndEdit(true);
 
-                    var strDivTag = "<div style='position: absolute; margin-left: 65px; cursor:pointer' onMouseDown=\"stopProp(event);\" onClick=\"showNotes(event);\"><img id=\"notesimg\" class=\"transparentnotes\" src=\"/_layouts/epmlive/images/" + image + ".png\"></div><div id='NotesDiv' style='position: absolute; margin-left: 65px; display:none; width:150px;height:100px;border: 1px solid black;background-color:#FFFFFF;cursor:pointer' onClick=\"stopProp(event);\"><textarea id='txtNotes' style='width:140px;height:60px;border:0px;margin-bottom:5px' onkeyup=\"stopProp(event);\" onclick=\"stopProp(event);\" onkeypress=\"stopProp(event);\"";
+                    var strDivTag = "<div style='position: absolute; margin-left: 65px; cursor:pointer; z-index: 999;' onMouseDown=\"stopProp(event);\" onClick=\"showNotes(event);\"><img id=\"notesimg\" class=\"transparentnotes\" src=\"/_layouts/epmlive/images/" + image + ".png\"></div><div id='NotesDiv' style='z-index:999;position: absolute; margin-left: 65px; display:none; width:150px;height:100px;border: 1px solid black;background-color:#FFFFFF;cursor:pointer' onClick=\"stopProp(event);\"><textarea id='txtNotes' style='z-index:999;width:140px;height:60px;border:0px;margin-bottom:5px' onkeyup=\"stopProp(event);\" onclick=\"stopProp(event);\" onkeypress=\"stopProp(event);\"";
 
                     if (bLocked)
                         strDivTag += " disabled=\"disabled\"";

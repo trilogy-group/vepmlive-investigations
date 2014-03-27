@@ -61,6 +61,8 @@ namespace TimeSheets
 
         private EPMLiveCore.TimeDebug tb;
 
+        int GridType = 0;
+
         protected override void CreateChildControls()
         {
             tb.AddTimer();
@@ -232,37 +234,39 @@ namespace TimeSheets
                     TSCols = "{" + TSCols.Trim(',') + "}";
                     TSDCols = "{" + TSDCols.Trim(',') + "}";
 
-                    cmd = new SqlCommand("SELECT submitted, approval_status, locked FROM TSTIMESHEET where SITE_UID=@siteid and period_id=@period and username=@username", cn);
-                    cmd.Parameters.AddWithValue("@siteid", web.Site.ID);
-                    cmd.Parameters.AddWithValue("@period", sPeriodId);
-                    cmd.Parameters.AddWithValue("@username", web.CurrentUser.LoginName);
-
-                    SqlDataReader drTS = cmd.ExecuteReader();
-                    if (drTS.Read())
+                    if (GridType == 0)
                     {
-                        //Locked
-                        if (drTS.GetBoolean(2))
-                            bTsLocked = true;
+                        cmd = new SqlCommand("SELECT submitted, approval_status, locked FROM TSTIMESHEET where SITE_UID=@siteid and period_id=@period and username=@username", cn);
+                        cmd.Parameters.AddWithValue("@siteid", web.Site.ID);
+                        cmd.Parameters.AddWithValue("@period", sPeriodId);
+                        cmd.Parameters.AddWithValue("@username", web.CurrentUser.LoginName);
 
-                        //Submitted
-                        if (drTS.GetBoolean(0))
+                        SqlDataReader drTS = cmd.ExecuteReader();
+                        if (drTS.Read())
                         {
-                            if (drTS.GetInt32(1) == 1)
-                            {
-                                sStatus = "Approved";
-                                if (!settings.DisableApprovals)
-                                    bTsLocked = true;
-                            }
-                            else if (drTS.GetInt32(1) == 2)
-                            {
-                                sStatus = "Rejected";
-                            }
-                            else
-                                sStatus = "Submitted";
-                        }
-                    }
-                    drTS.Close();
+                            //Locked
+                            if (drTS.GetBoolean(2))
+                                bTsLocked = true;
 
+                            //Submitted
+                            if (drTS.GetBoolean(0))
+                            {
+                                if (drTS.GetInt32(1) == 1)
+                                {
+                                    sStatus = "Approved";
+                                    if (!settings.DisableApprovals)
+                                        bTsLocked = true;
+                                }
+                                else if (drTS.GetInt32(1) == 2)
+                                {
+                                    sStatus = "Rejected";
+                                }
+                                else
+                                    sStatus = "Submitted";
+                            }
+                        }
+                        drTS.Close();
+                    }
 
 
 
@@ -274,9 +278,9 @@ namespace TimeSheets
 
 
 
-            sDataParam = "<Param GridId=\"" + sFullGridId + "\" Period=\"" + sPeriodId + "\" UserId=\"" + sUserId + "\"/>";
-            sLayoutParam = "<Param GridId=\"" + sFullGridId + "\" Period=\"" + sPeriodId + "\" UserId=\"" + sUserId + "\" Editable=\"" + iEditable + "\"/>";
-
+                sDataParam = "<Param GridId=\"" + sFullGridId + "\" Period=\"" + sPeriodId + "\" UserId=\"" + sUserId + "\"/>";
+                sLayoutParam = "<Param GridId=\"" + sFullGridId + "\" Period=\"" + sPeriodId + "\" UserId=\"" + sUserId + "\" Editable=\"" + iEditable + "\" GridType=\"" + GridType + "\"/>";
+            
             sDataParam = System.Web.HttpUtility.HtmlEncode(System.Web.HttpUtility.HtmlEncode(sDataParam));
             sLayoutParam = System.Web.HttpUtility.HtmlEncode(System.Web.HttpUtility.HtmlEncode(sLayoutParam));
             ///
@@ -318,6 +322,10 @@ namespace TimeSheets
         protected override void OnInit(EventArgs e)
         {
             tb = new EPMLiveCore.TimeDebug("Timesheet", Page.Request["debug"]);
+            if (Page.Request["Approvals"] == "true")
+            {
+                GridType = 1;
+            }
         }
 
         protected override void OnLoad(EventArgs e)
@@ -325,9 +333,116 @@ namespace TimeSheets
             sFullGridId = this.ZoneIndex + this.ZoneID;
         }
 
+        private void RenderApprovalToolbar(HtmlTextWriter output)
+        {
+
+            output.WriteLine("<div id=\"actionmenu" + sFullGridId + "\" style=\"width:100%\"></div>");
+
+            output.WriteLine(@"<script language=""javascript"">
+
+            function loadMenu" + sFullGridId + @"()
+            {
+                    var cfgs = 
+                    [
+                        {
+                            'placement': 'left',
+                            'content': 
+                            [
+                                {
+                                    'controlId': 'btnApprove',
+                                    'controlType': 'button',
+                                    'iconClass': 'fui-approve',
+                                    'title': 'Approve',
+                                    'events': [
+                                        {
+                                            'eventName': 'click',
+                                            'function': function () { Approve('" + sFullGridId + @"'); }
+                                        }
+                                    ]
+                                },
+                                {
+                                    'controlId': 'btnUnlock',
+                                    'controlType': 'button',
+                                    'iconClass': 'fui-unlock',
+                                    'title': 'Unlock',
+                                    'events': [
+                                        {
+                                            'eventName': 'click',
+                                            'function': function () { Unlock('" + sFullGridId + @"'); }
+                                        }
+                                    ]
+                                },
+                                {
+                                    'controlId': 'btnReject',
+                                    'controlType': 'button',
+                                    'iconClass': 'fui-reject',
+                                    'title': 'Reject',
+                                    'events': [
+                                        {
+                                            'eventName': 'click',
+                                            'function': function () { Reject('" + sFullGridId + @"'); }
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            'placement': 'right',
+                            'content': 
+                            [
+                                {
+                                    'controlId': 'ddlViewControl',
+                                    'controlType': 'dropdown',
+                                    'title': 'View: ',
+                                    'value': 'Timesheet Approvals',
+                                    'iconClass': 'none',
+                                    'sections': 
+                                    [
+                                        {
+                                            'heading': 'none',
+                                            'options': [
+                                                {'iconClass': '','text': 'My Timesheet','events': [{'eventName': 'click','function': function () { location.href=window.epmLive.currentWebUrl + '/_layouts/15/epmlive/mytimesheet.aspx'; }}]}
+                                            ]
+                                        },
+                                        {
+                                            'heading': 'none',
+                                            'options': [
+                                                {'iconClass': '','text': 'Project Manager Approvals','events': [{'eventName': 'click','function': function () { OpenPMApprovals('" + sFullGridId + @"'); }}]},
+                                                {'iconClass': '','text': 'Timesheet Manager Approvals','events': [{'eventName': 'click','function': function () { location.href=window.epmLive.currentWebUrl + '/_layouts/15/epmlive/mytimesheet.aspx?Approvals=true'; }}]}
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                    
+                epmLiveGenericToolBar.generateToolBar('actionmenu" + sFullGridId + @"', cfgs);
+            }          
+        </script>");
+
+        }
+
+        private string GetViews()
+        {
+            string sViews = "";
+            foreach (KeyValuePair<string, Dictionary<string, string>> key in views.Views)
+            {
+                if (key.Key == "Default View" && views.Views.Count == 1)
+                {
+                    sViews = "{'iconClass': '','text': 'My Timesheet','events': [{'eventName': 'click','function': function () { location.href=window.epmLive.currentWebUrl + '/_layouts/15/epmlive/mytimesheet.aspx?Approvals=true'; }}]}";
+                }
+            }
+            return sViews;
+        }
+
+
         protected override void RenderWebPart(HtmlTextWriter output)
         {
             tb.AddTimer();
+
+
+
             if (SPContext.Current.ViewContext.View != null)
             {
                 foreach (System.Web.UI.WebControls.WebParts.WebPart wp in WebPartManager.WebParts)
@@ -354,6 +469,38 @@ namespace TimeSheets
                 output.WriteLine("There are no periods setup for this TimeSheet. Please contact your system administrator");
                 return;
             }
+
+            output.WriteLine(@"<style>
+                .GMBodyRight
+                {
+	                border-right: 1px solid #DDD!important;	
+                }
+                .GMBodyRight .GMCell
+                {
+	                border-left: 1px solid #DDD!important;
+	                border-bottom: 1px solid #DDD!important;
+                    overflow: visible;
+                }
+
+                .GMCellHeader, .GMCellHeaderPanel, .GMCell, .GMCellPanel
+                {
+                    border-bottom: 1px solid #DDD!important;
+                }
+                .Totals 
+                {
+                    font-weight: bold;
+                }
+                .GMFootRight
+                {
+                    border-left: 2px solid #ccc
+                }
+                .GMFootRight .GMCell
+                {
+	                border-left: 1px solid #DDD!important;
+	                border-bottom: 1px solid #DDD!important;
+                }
+
+                </style>");
 
             string sUserId = "";
 
@@ -424,6 +571,7 @@ namespace TimeSheets
                                     TSObject" + sFullGridId + @".DelegateId = '" + Page.Request["Delegate"] + @"';
                                     TSObject" + sFullGridId + @".Views = " + views.ToJSON() + @";
                                     TSObject" + sFullGridId + @".CurrentView = '" + sCurrentView + @"';
+                                    TSObject" + sFullGridId + @".Qualifier = '" + Qualifier + @"';
                                     TSObject" + sFullGridId + @".CurrentViewId = '" + sCurrentViewId + @"';
                                     TSObject" + sFullGridId + @".CanEditViews = " + bCanEditViews.ToString().ToLower() + @";                                    
 
@@ -436,15 +584,16 @@ namespace TimeSheets
                                     siteUrl = '" + url + @"';
                                     siteColUrl = '" + SPContext.Current.Site.ServerRelativeUrl + @"';
                                     periodId = '" + sPeriodId + @"';
+                                    GridType = '" + GridType + @"';
 
                                     curServerDate = (new Date()).getTime() - (new Date('" + DateTime.Now.ToString("MMMM dd, yyyy H:mm:ss", culture) + @"')).getTime();
 
-                                    
+                                    TGSetEvent('OnRenderFinish', 'TS" + sFullGridId + @"', TSRenderFinish);
                             </script>
                             ");
 
 
-            output.WriteLine(@"<div align=""center"" id=""TSLoader" + sFullGridId + @""" width=""100%""><img style=""vertical-align:middle;"" src=""/_layouts/images/gears_anv4.gif""/>&nbsp;Loading Items...</div>");
+            //output.WriteLine(@"<div align=""center"" id=""TSLoader" + sFullGridId + @""" width=""100%""><img style=""vertical-align:middle;"" src=""/_layouts/images/gears_anv4.gif""/>&nbsp;Loading Items...</div>");
 
             StringBuilder sb = new StringBuilder("<select class=\"form-control\" onchange=\"changePeriodCommand('" + curUrl + "',this,'" + Page.Request["Delegate"] + "')\">");
 
@@ -465,7 +614,14 @@ namespace TimeSheets
 
             var str = new HtmlString(sb.ToString());
 
-            output.WriteLine(@"
+            
+
+
+            if (GridType == 0)
+            {
+
+
+                output.WriteLine(@"
                 <div>
                     <nav class=""navbar navbar-default navbar-static"" role=""navigation"">
                         <div>
@@ -489,13 +645,50 @@ namespace TimeSheets
                             </div>
                         </div>
                     </nav>
-                </div>");    
-            output.WriteLine("<div style=\"width:100%\">");
-            output.WriteLine(@"<treegrid Data_Url=""" + url + @"/_vti_bin/WorkEngine.asmx"" Data_Timeout=""0"" Data_Method=""Soap"" Data_Function=""Execute"" Data_Namespace=""workengine.com"" Data_Param_Function=""timesheet_GetTimesheetGrid"" Data_Param_Dataxml=""" + sDataParam + @""" 
+                </div>");
+
+                output.WriteLine("<div style=\"width:100%\">");
+                output.WriteLine(@"<treegrid Data_Url=""" + url + @"/_vti_bin/WorkEngine.asmx"" Data_Timeout=""0"" Data_Method=""Soap"" Data_Function=""Execute"" Data_Namespace=""workengine.com"" Data_Param_Function=""timesheet_GetTimesheetGrid"" Data_Param_Dataxml=""" + sDataParam + @""" 
                                 Layout_Url=""" + url + @"/_vti_bin/WorkEngine.asmx"" Layout_Timeout=""0"" Layout_Method=""Soap"" Layout_Function=""Execute"" Layout_Namespace=""workengine.com"" Layout_Param_Function=""timesheet_GetTimesheetGridLayout"" Layout_Param_Dataxml=""" + sLayoutParam + @""" 
                                 Check_Url=""" + url + @"/_vti_bin/WorkEngine.asmx"" Check_Timeout=""0"" Check_Method=""Soap"" Check_Function=""Execute"" Check_Namespace=""workengine.com"" Check_Param_Function=""timesheet_GetTimesheetUpdates"" Check_Param_Dataxml=""" + sLayoutParam + @""" Check_Interval=""0"" Check_Repeat=""0""
-                                Upload_Url=""" + url + @"/_layouts/epmlive/savemytimesheet.aspx"" Upload_Type=""Body,Cfg"" Upload_Flags=""AllCols,Accepted"" Debug="""" ></treegrid>");
-            output.WriteLine("</div>");
+                                Upload_Url=""" + url + @"/_layouts/epmlive/savemytimesheet.aspx"" Upload_Type=""Body,Cfg"" Upload_Flags=""AllCols,Accepted"" Debug="""" SuppressMessage=""3""></treegrid>");
+                output.WriteLine("</div>");
+            }
+            else if (GridType == 1)
+            {
+                RenderApprovalToolbar(output);
+
+                output.WriteLine(@"
+                <div>
+                    <nav class=""navbar navbar-default navbar-static"" role=""navigation"">
+                        <div>
+                            <div class=""collapse navbar-collapse"">
+                                <ul class=""nav navbar-nav"">
+                                    <li class=""nav-btn nav-text-wrapper"">
+                                        <div class=""nav-label"">Current Period:
+                                        </div>
+                                        <span class=""icon-arrow-left-17 icon"" onclick=""javascript:previousPeriodCommand('" + curUrl + "','" + iPreviousPeriod + "','" + Page.Request["Delegate"] + @"')"">
+                                        </span>
+                                        <div class=""nav-select"">" + str.ToHtmlString() + @"    
+                                        </div>
+                                        <span class=""icon-arrow-right-17 icon"" onclick=""javascript:nextPeriodCommand('" + curUrl + "','" + iNextPeriod + "','" + Page.Request["Delegate"] + @"')"">
+                                        </span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </nav>
+                </div>");
+
+                output.WriteLine("<div style=\"width:100%\">");
+                output.WriteLine(@"<treegrid Data_Url=""" + url + @"/_vti_bin/WorkEngine.asmx"" Data_Timeout=""0"" Data_Method=""Soap"" Data_Function=""Execute"" Data_Namespace=""workengine.com"" Data_Param_Function=""timesheet_GetTimesheetApprovalsGrid"" Data_Param_Dataxml=""" + sDataParam + @""" 
+                                Layout_Url=""" + url + @"/_vti_bin/WorkEngine.asmx"" Layout_Timeout=""0"" Layout_Method=""Soap"" Layout_Function=""Execute"" Layout_Namespace=""workengine.com"" Layout_Param_Function=""timesheet_GetTimesheetGridLayout"" Layout_Param_Dataxml=""" + sLayoutParam + @""" 
+                                Page_Url=""" + url + @"/_layouts/15/epmlive/timesheetapprovalpage.aspx?Period=" + sPeriodId + @""" SuppressMessage=""3""
+                                 ></treegrid>");
+                output.WriteLine("</div>");
+            }
+
+
 
             output.WriteLine(@"<div align=""center"" id=""divMessage" + sFullGridId + @""" width=""100%"" class=""dialog""><img style=""vertical-align:middle;"" src=""/_layouts/images/gears_anv4.gif""/>&nbsp;<span id=""spnMessage" + sFullGridId + @""">Saving Timesheet...</span></div>");
 
@@ -510,9 +703,13 @@ namespace TimeSheets
     
             </div>");
 
-
-
+            
             output.WriteLine(@"<script language=""javascript"">");
+            
+            output.WriteLine("function LoadTSGrid" + sFullGridId + "(){ LoadTSGrid('" + sFullGridId + "');}");
+
+            output.WriteLine("SP.SOD.executeOrDelayUntilScriptLoaded(LoadTSGrid" + sFullGridId + ", 'EPMLive.js');");
+
             output.WriteLine("initmb();");
 
             output.WriteLine("function clickTab(){");
@@ -534,24 +731,51 @@ namespace TimeSheets
             tb.AddTimer();
             if (bHasPeriods)
             {
-                AddContextualTab();
-
+                if (GridType == 0)
+                {
+                    AddContextualTab();
+                }
+                else
+                {
+                    AddApprovalContextualTab();
+                }
+                      
                 ClientScriptManager clientScriptManager = Page.ClientScript;
                 clientScriptManager.RegisterClientScriptBlock(GetType(), "MyTimesheet", DelayScript.Replace("{webPartPageComponentId}", SPRibbon.GetWebPartPageComponentId(this)).Replace("{TSOBJECT}", "TSObject" + sFullGridId));
 
                 CssRegistration.Register("/_layouts/epmlive/MyTimesheet.css");
                 CssRegistration.Register("/_layouts/epmlive/modal/modal.css");
 
-                ScriptLink.Register(Page, "/_layouts/epmlive/treegrid/GridE.js", false);
                 ScriptLink.Register(Page, "/_layouts/epmlive/modal/modal.js", false);
                 ScriptLink.Register(Page, "/_layouts/epmlive/dhtml/xgrid/dhtmlxcommon.js", false);
 
-                ScriptLink.Register(Page, "/_layouts/epmlive/MyTimesheet.js", false);
+                EPMLiveCore.Infrastructure.EPMLiveScriptManager.RegisterScript(Page, new[]
+                {
+                    "/treegrid/GridE", "MyTimesheet"
+                });
+
+                //ScriptLink.Register(Page, "/_layouts/epmlive/MyTimesheet.js", false);
 
                 ServicePointManager.ServerCertificateValidationCallback += delegate { return true; };
             }
             base.OnPreRender(e);
             tb.StopTimer();
+        }
+
+        private void AddApprovalContextualTab()
+        {
+            SPRibbon spRibbon = SPRibbon.GetCurrent(Page);
+
+            if (spRibbon == null) return;
+
+            var ribbonExtensions = new XmlDocument();
+
+            ribbonExtensions.LoadXml(Properties.Resources.txtTSApprovalRibbon.Replace("{title}", DisplayTitle).Replace("#language#", SPContext.Current.Web.Language.ToString()));
+            spRibbon.RegisterDataExtension(ribbonExtensions.FirstChild, "Ribbon.ContextualTabs._children");
+
+            ribbonExtensions.LoadXml(Properties.Resources.txtMyTimesheet_Template);
+            spRibbon.RegisterDataExtension(ribbonExtensions.FirstChild, "Ribbon.Templates._children");
+            
         }
 
         private void AddContextualTab()
@@ -614,36 +838,65 @@ namespace TimeSheets
 
         public string DelayScript
         {
-            get { return Properties.Resources.txtMyTimesheet_DelayScript; }
+            get { 
+                if(GridType == 0)
+                    return Properties.Resources.txtMyTimesheet_DelayScript; 
+                else
+                    return Properties.Resources.txtMyTimesheetApprovals_DelayScript; 
+            }
         }
 
         public WebPartContextualInfo WebPartContextualInfo
         {
             get
             {
-                var webPartContextualInfo = new WebPartContextualInfo();
-                var webPartRibbonContextualGroup = new WebPartRibbonContextualGroup();
-                var webPartRibbonTab = new WebPartRibbonTab();
+                if (GridType == 0)
+                {
+                    var webPartContextualInfo = new WebPartContextualInfo();
+                    var webPartRibbonContextualGroup = new WebPartRibbonContextualGroup();
+                    var webPartRibbonTab = new WebPartRibbonTab();
 
-                webPartRibbonContextualGroup.Id = "Ribbon.MyTimesheetContextualTabGroup";
-                webPartRibbonContextualGroup.Command = "MyTimesheetContextualTab.EnableContextualGroup";
-                webPartRibbonContextualGroup.VisibilityContext = "MyTimesheetContextualTab.CustomVisibilityContext";
+                    webPartRibbonContextualGroup.Id = "Ribbon.MyTimesheetContextualTabGroup";
+                    webPartRibbonContextualGroup.Command = "MyTimesheetContextualTab.EnableContextualGroup";
+                    webPartRibbonContextualGroup.VisibilityContext = "MyTimesheetContextualTab.CustomVisibilityContext";
 
-                webPartRibbonTab.Id = InitialTabId;
-                webPartRibbonTab.VisibilityContext = "MyTimesheetContextualTab.CustomVisibilityContext";
+                    webPartRibbonTab.Id = InitialTabId;
+                    webPartRibbonTab.VisibilityContext = "MyTimesheetContextualTab.CustomVisibilityContext";
 
-                webPartContextualInfo.ContextualGroups.Add(webPartRibbonContextualGroup);
-                webPartContextualInfo.Tabs.Add(webPartRibbonTab);
+                    webPartContextualInfo.ContextualGroups.Add(webPartRibbonContextualGroup);
+                    webPartContextualInfo.Tabs.Add(webPartRibbonTab);
 
 
-                var webPartRibbonTab2 = new WebPartRibbonTab();
-                webPartRibbonTab2.Id = "Ribbon.MyTimesheetViewsTab";
-                webPartRibbonTab2.VisibilityContext = "MyTimesheetContextualTab.CustomVisibilityContext";
-                webPartContextualInfo.Tabs.Add(webPartRibbonTab2);
+                    var webPartRibbonTab2 = new WebPartRibbonTab();
+                    webPartRibbonTab2.Id = "Ribbon.MyTimesheetViewsTab";
+                    webPartRibbonTab2.VisibilityContext = "MyTimesheetContextualTab.CustomVisibilityContext";
+                    webPartContextualInfo.Tabs.Add(webPartRibbonTab2);
 
-                webPartContextualInfo.PageComponentId = SPRibbon.GetWebPartPageComponentId(this);
+                    webPartContextualInfo.PageComponentId = SPRibbon.GetWebPartPageComponentId(this);
 
-                return webPartContextualInfo;
+                    return webPartContextualInfo;
+                }
+                else
+                {
+                    var webPartContextualInfo = new WebPartContextualInfo();
+                    var webPartRibbonContextualGroup = new WebPartRibbonContextualGroup();
+                    var webPartRibbonTab = new WebPartRibbonTab();
+
+                    webPartRibbonContextualGroup.Id = "Ribbon.MyTimesheetApprovalsContextualTabGroup";
+                    webPartRibbonContextualGroup.Command = "MyTimesheetApprovalsContextualTab.EnableContextualGroup";
+                    webPartRibbonContextualGroup.VisibilityContext = "MyTimesheetContextualTab.CustomVisibilityContext";
+
+                    webPartRibbonTab.Id = InitialTabId;
+                    webPartRibbonTab.VisibilityContext = "MyTimesheetContextualTab.CustomVisibilityContext";
+
+                    webPartContextualInfo.ContextualGroups.Add(webPartRibbonContextualGroup);
+                    webPartContextualInfo.Tabs.Add(webPartRibbonTab);
+                   
+                    webPartContextualInfo.PageComponentId = SPRibbon.GetWebPartPageComponentId(this);
+
+                    return webPartContextualInfo;
+
+                }
             }
         }
     }

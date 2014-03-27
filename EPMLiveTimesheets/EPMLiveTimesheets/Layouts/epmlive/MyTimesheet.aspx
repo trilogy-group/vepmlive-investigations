@@ -17,6 +17,12 @@
             display: none !important;
         }
 
+        .ms-WPBorder {
+            border: none !important;
+        }
+        
+
+
     </style>
 
 </asp:Content>

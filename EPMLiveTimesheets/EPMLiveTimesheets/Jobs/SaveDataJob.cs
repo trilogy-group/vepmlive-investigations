@@ -52,12 +52,12 @@ namespace TimeSheets
                 }
                 dr.Close();
 
-                bool SaveAndSubmit = false;
-                try
-                {
-                    SaveAndSubmit = bool.Parse(docTimesheet.FirstChild.Attributes["SaveAndSubmit"].Value);
-                }
-                catch { }
+                //bool SaveAndSubmit = false;
+                //try
+                //{
+                //    SaveAndSubmit = bool.Parse(docTimesheet.FirstChild.Attributes["SaveAndSubmit"].Value);
+                //}
+                //catch { }
 
                 bool liveHours = false;
 
