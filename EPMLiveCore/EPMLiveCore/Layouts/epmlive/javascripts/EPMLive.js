@@ -688,6 +688,7 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
                 var spnImg = $(document.createElement('span'));
                 spnImg.attr('class', iconClass);
                 aContainer.append(spnImg);
+                aContainer.addClass('nav-icon-title');
             }
             //create span label for text
             if (title &&
