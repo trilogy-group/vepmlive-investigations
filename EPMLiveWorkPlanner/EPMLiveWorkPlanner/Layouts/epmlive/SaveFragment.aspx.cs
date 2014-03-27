@@ -97,9 +97,9 @@ namespace EPMLiveCore.Layouts.epmlive
                     
                     int itemId = Convert.ToInt32(Request["ID"]);
                     if (itemId > 0)
-                        Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "closeSaveFragmentPopup", "<script language='javascript' type='text/javascript'>closeSaveFragmentPopup('Fragment " + txtFragmentName.Text + " updated successfully!');</script>");
+                        Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "closeSaveFragmentPopup", "<script language='javascript' type='text/javascript'>closeSaveFragmentPopup('Fragment " + txtFragmentName.Text + " updated successfully');</script>");
                     else
-                        Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "closeSaveFragmentPopup", "<script language='javascript' type='text/javascript'>closeSaveFragmentPopup('Fragment " + txtFragmentName.Text + " saved successfully!');</script>");
+                        Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "closeSaveFragmentPopup", "<script language='javascript' type='text/javascript'>closeSaveFragmentPopup('Fragment " + txtFragmentName.Text + " saved successfully');</script>");
                 }
             }
             catch (Exception ex)
