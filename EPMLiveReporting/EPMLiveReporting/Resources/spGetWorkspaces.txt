@@ -11,7 +11,7 @@ BEGIN
     
 	IF @View = 'MyWorkspace'
 	BEGIN  
-		SELECT DISTINCT dbo.RPTWeb.SiteId,dbo.RPTWeb.Webtitle,dbo.RPTWeb.Description,dbo.RPTWeb.WebId,dbo.RPTWeb.Members,dbo.LSTResourcepool.SharePointAccountText,
+		SELECT DISTINCT dbo.RPTWeb.SiteId,dbo.RPTWeb.Webtitle,dbo.RPTWeb.WebDescription,dbo.RPTWeb.WebId,dbo.RPTWeb.Members,dbo.LSTResourcepool.SharePointAccountText,
 			CASE 
 				WHEN @UserId = 1073741823 THEN 1 
 				WHEN (dbo.RPTWeb.WebId IN (SELECT WEBID FROM dbo.RPTWEBGROUPS 
@@ -19,12 +19,12 @@ BEGIN
 				OR (SECTYPE = 0) AND (GROUPID = @UserId))) THEN 1
 			ELSE 0 
 			END AS HasAccess
-		FROM dbo.RPTWeb INNER JOIN dbo.LSTResourcepool ON dbo.RPTWeb.OwnerId = dbo.LSTResourcepool.SharePointAccountID 
-		WHERE dbo.RPTWeb.SiteId = @SiteId AND dbo.RPTWeb.OwnerId= @UserId order by dbo.RPTWeb.WebTitle
+		FROM dbo.RPTWeb INNER JOIN dbo.LSTResourcepool ON dbo.RPTWeb.WebOwnerId = dbo.LSTResourcepool.SharePointAccountID 
+		WHERE dbo.RPTWeb.SiteId = @SiteId AND dbo.RPTWeb.WebOwnerId= @UserId order by dbo.RPTWeb.WebTitle
 	END
 	ELSE IF @View = 'AllItems'
 	BEGIN
-		SELECT DISTINCT dbo.RPTWeb.SiteId,dbo.RPTWeb.Webtitle,dbo.RPTWeb.Description,dbo.RPTWeb.WebId,dbo.RPTWeb.Members,dbo.LSTResourcepool.SharePointAccountText,
+		SELECT DISTINCT dbo.RPTWeb.SiteId,dbo.RPTWeb.Webtitle,dbo.RPTWeb.WebDescription,dbo.RPTWeb.WebId,dbo.RPTWeb.Members,dbo.LSTResourcepool.SharePointAccountText,
 			CASE 
 				WHEN @UserId = 1073741823 THEN 1 
 				WHEN (dbo.RPTWeb.WebId IN (SELECT WEBID FROM dbo.RPTWEBGROUPS 
@@ -33,7 +33,7 @@ BEGIN
 			ELSE 0 
 			END AS HasAccess
 		FROM dbo.RPTWeb 
-		INNER JOIN dbo.LSTResourcepool ON dbo.RPTWeb.OwnerId = dbo.LSTResourcepool.SharePointAccountID 
+		INNER JOIN dbo.LSTResourcepool ON dbo.RPTWeb.WebOwnerId = dbo.LSTResourcepool.SharePointAccountID 
 		WHERE dbo.RPTWeb.SiteId = @SiteId order by dbo.RPTWeb.WebTitle
 	END   
 END

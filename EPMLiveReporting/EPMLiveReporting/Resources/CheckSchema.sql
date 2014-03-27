@@ -19,6 +19,27 @@ BEGIN
 	CREATE TABLE [dbo].[RPTWeb] ([SiteId] uniqueidentifier, [ItemWebId] uniqueidentifier, [ItemListId] uniqueidentifier, [ItemId] int, [ParentWebId] uniqueidentifier, [WebId] uniqueidentifier, [WebUrl] varchar(max), [WebTitle] varchar(max))
 END
 
+IF NOT EXISTS (SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'RPTWeb' AND COLUMN_NAME = 'WebOwnerId')
+BEGIN
+	PRINT 'Add Column WebOwnerId'
+	ALTER TABLE [dbo].[RPTWeb]
+	ADD [WebOwnerId] int NULL
+END
+
+IF NOT EXISTS (SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'RPTWeb' AND COLUMN_NAME = 'WebDescription')
+BEGIN
+	PRINT 'Add Column WebDescription'
+	ALTER TABLE [dbo].[RPTWeb]
+	ADD [WebDescription] varchar(max) NULL
+END
+
+IF NOT EXISTS (SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'RPTWeb' AND COLUMN_NAME = 'Members')
+BEGIN
+	PRINT 'Add Column Members'
+	ALTER TABLE [dbo].[RPTWeb]
+	ADD [Members] int NULL
+END
+
 ---------------TABLE: RPTWEBGROUPS----------------------
 IF NOT EXISTS (SELECT TABLE_NAME FROM INFORMATION_SCHEMA.tables WHERE TABLE_NAME = 'RPTWEBGROUPS')
 BEGIN
