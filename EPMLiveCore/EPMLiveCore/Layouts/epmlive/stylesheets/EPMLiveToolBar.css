@@ -1,10 +1,9 @@
 ﻿div.epmliveToolBar {
   color: #555555;
-  font-family: "Open Sans", Helvetica, Arial, sans-serif;
+  font-family: "Open Sans Regular", Helvetica, Arial, sans-serif;
   font-size: 14px;
   font-weight: 400;
   line-height: 1.42857;
-  /*border-bottom: 1px solid #EEEEEE;*/
   display: inline-block;
   width: 100%;
   /*@media (min-width: 768px) {
@@ -106,6 +105,17 @@ div.epmliveToolBar .nav > li > a.nav-icon {
   background-color: #FFFFFF;
   padding-left: 8px;
   padding-right: 8px;
+}
+div.epmliveToolBar .nav > li > a.nav-icon span {
+  padding-right: 8px;
+  position: relative;
+  top: 0;
+}
+div.epmliveToolBar .nav > li > a.nav-icon-title span:first-of-type {
+  padding-right: 8px;
+  font-size: 12px;
+  position: relative;
+  top: 0;
 }
 div.epmliveToolBar a {
   color: #0090CA;
