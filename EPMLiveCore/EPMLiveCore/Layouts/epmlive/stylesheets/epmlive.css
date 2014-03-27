@@ -1,0 +1,36 @@
+.upcontainer {
+    width: 100%;
+    border: 1px solid #d3d3d3;
+    margin-bottom: 5px;
+}
+
+    .upcontainer .upheader {
+        padding: 5px 0px 5px 0px;
+        cursor: pointer;
+        font-weight: bold;
+        border-bottom: 1px solid #d3d3d3;
+    }
+
+    .upcontainer .upcontent {
+        display: block;
+        padding: 5px 0px 5px 0px;
+    }
+
+.hideImage {
+    display: none;
+}
+
+.image_margin {
+    margin: 2px 5px 2px 5px;
+}
+
+.tblResourceWarningMessages {
+    border-left-style: solid;
+    border-left-width: 1px;
+    border-right: 1px solid #C0C0C0;
+    border-top-style: solid;
+    border-top-width: 1px;
+    border-bottom: 1px solid #C0C0C0;
+    background-color: #FFFF76;
+    width: 100%;
+}

@@ -374,7 +374,7 @@ namespace EPMLiveCore
 
             if (isResList)
             {
-                writer.WriteLine("<style type=\"text/css\">.upcontainer { width: 100%; border: 1px solid #d3d3d3;margin-bottom: 5px;}.upcontainer .upheader {padding: 5px 0px 5px 0px;cursor: pointer; font-weight: bold;border-bottom: 1px solid #d3d3d3;}.upcontainer .upcontent {display: block;padding: 5px 0px 5px 0px;}.hideImage{display:none;}.image_margin {margin: 2px 5px 2px 5px;}</style>");
+                writer.WriteLine("<link rel=\"stylesheet\" href=\"" + base.Web.Url + "/_layouts/15/epmlive/Stylesheets/epmlive.css\" type=\"text/css\" />");
                 writer.WriteLine(" <script>$(document).ready(function () {$(\".imgArrow\").addClass(\"hideImage\"); $(\".upheader\").click(function () {$header = $(this);$arrowImage = $header.find(\".imgArrow\");$downArrowImage = $header.find(\".imgDownArrow\");$content = $header.next();");
                 writer.Write("$content.slideToggle(500,function (){  if ($arrowImage.hasClass(\"hideImage\")) {$downArrowImage.addClass(\"hideImage\");$arrowImage.removeClass(\"hideImage\");$(\"#onetIDListForm\").attr(\"style\",\"width:95%\");}else {$arrowImage.addClass(\"hideImage\");$downArrowImage.removeClass(\"hideImage\");}});});});</script>");
 
@@ -441,7 +441,7 @@ namespace EPMLiveCore
                     if (!isadmin && !disablerequests)
                     {
                         writer.Write(@"<tr><td colspan='2'>
-                        <table cellpadding=""5"" id=""divuCount"" cellspacing=""0"" width=""100%"" bgcolor=""#FFFF76"" style=""border-left-style:solid;border-left-width:1px;border-right: 1px solid #C0C0C0;border-top-style: solid;border-top-width: 1px;border-bottom: 1px solid #C0C0C0;"">
+                        <table cellpadding=""5"" id=""divuCount"" cellspacing=""0"" class=""tblResourceWarningMessages"">
                         <tr>
                         <td>Once you fill out this form the resource will be requested and must be approved by an administrator before the user can login.</td>
                         </tr>
@@ -456,7 +456,7 @@ namespace EPMLiveCore
                             {
                                 if (EPMLiveCore.CoreFunctions.GetRealUserName(SPContext.Current.Web.CurrentUser.LoginName).ToLower() == ownerusername.ToLower())
                                 {
-                                    writer.Write(@"<tr><td colspan='2'><table cellpadding=""5"" id=""divuCount"" cellspacing=""0"" width=""100%"" bgcolor=""#FFFF76"" style=""border-left-style:solid;border-left-width:1px;border-right: 1px solid #C0C0C0;border-top-style: solid;border-top-width: 1px;border-bottom: 1px solid #C0C0C0;"">
+                                    writer.Write(@"<tr><td colspan='2'><table cellpadding=""5"" id=""divuCount"" cellspacing=""0"" class=""tblResourceWarningMessages"">
                                     <tr>
                                     <td>You cannot create a new user that has login access because your account limit of " + max + @" has been reached.  Purchasing additional accounts is easy, just click <a href=""" + ((SPContext.Current.Web.ServerRelativeUrl == "/") ? "" : SPContext.Current.Web.ServerRelativeUrl) + @"/_layouts/epmlive/purchase.aspx?accountid=" + accountid + @""">Purchase Accounts</a>.</tr>
                                     </table><br></td></tr>");
@@ -464,7 +464,7 @@ namespace EPMLiveCore
                                 else
                                 {
                                     writer.Write(@"<tr><td colspan='2'>
-                                    <table cellpadding=""5"" id=""divuCount"" cellspacing=""0"" width=""100%"" bgcolor=""#FFFF76"" style=""border-left-style:solid;border-left-width:1px;border-right: 1px solid #C0C0C0;border-top-style: solid;border-top-width: 1px;border-bottom: 1px solid #C0C0C0;"">
+                                    <table cellpadding=""5"" id=""divuCount"" cellspacing=""0"" class=""tblResourceWarningMessages"">
                                     <tr>
                                     <td>The account limit of " + max + @" has been reached.  Until the Account Owner (" + ownername + @")
                                     purchases additional accounts, creating user accounts with login access
