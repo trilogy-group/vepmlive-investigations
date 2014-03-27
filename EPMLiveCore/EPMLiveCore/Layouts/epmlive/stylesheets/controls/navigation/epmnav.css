@@ -633,7 +633,7 @@
 .icon-ellipsis-horizontal:after {
   content: '•••';
   position: relative;
-  top: -1px;
+  top: 0px;
 }
 ul.epm-nav-contextual-menu {
   display: none;
@@ -661,6 +661,7 @@ ul.epm-nav-contextual-menu li {
 ul.epm-nav-contextual-menu li:hover {
   background: #0090CA !important;
   color: #ffffff !important;
+  text-decoration: none !important;
 }
 ul.epm-nav-contextual-menu li:hover .epm-nav-cm-icon {
   color: #ffffff !important;
@@ -672,7 +673,7 @@ ul.epm-nav-contextual-menu li span.epm-nav-cm-icon {
   margin-right: 4px;
   padding-right: 5px;
   position: relative;
-  top: -3px;
+  top: 0px;
 }
 ul.epm-nav-contextual-menu li span.epm-nav-cm-blank {
   margin-right: 17px !important;
@@ -689,6 +690,7 @@ ul.epm-nav-contextual-menu li a {
 ul.epm-nav-contextual-menu li a:hover {
   background: #0090CA !important;
   color: #ffffff !important;
+  text-decoration: none !important;
 }
 ul.epm-nav-contextual-menu li.seprator {
   background-color: #EEEEEE;
