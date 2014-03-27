@@ -1,13 +1,13 @@
 ﻿<%@ Assembly Name="$SharePoint.Project.AssemblyFullName$" %>
-<%@ Assembly Name="Microsoft.Web.CommandUI, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %> 
-<%@ Register Tagprefix="SharePoint" Namespace="Microsoft.SharePoint.WebControls" Assembly="Microsoft.SharePoint, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %> 
-<%@ Register Tagprefix="Utilities" Namespace="Microsoft.SharePoint.Utilities" Assembly="Microsoft.SharePoint, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
-<%@ Register Tagprefix="asp" Namespace="System.Web.UI" Assembly="System.Web.Extensions, Version=3.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" %>
+<%@ Assembly Name="Microsoft.Web.CommandUI, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
+<%@ Register TagPrefix="SharePoint" Namespace="Microsoft.SharePoint.WebControls" Assembly="Microsoft.SharePoint, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
+<%@ Register TagPrefix="Utilities" Namespace="Microsoft.SharePoint.Utilities" Assembly="Microsoft.SharePoint, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
+<%@ Register TagPrefix="asp" Namespace="System.Web.UI" Assembly="System.Web.Extensions, Version=3.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" %>
 <%@ Import Namespace="System.Collections.Generic" %>
 <%@ Import Namespace="System.Globalization" %>
 <%@ Import Namespace="EPMLiveCore" %>
-<%@ Import Namespace="Microsoft.SharePoint" %> 
-<%@ Register Tagprefix="WebPartPages" Namespace="Microsoft.SharePoint.WebPartPages" Assembly="Microsoft.SharePoint, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
+<%@ Import Namespace="Microsoft.SharePoint" %>
+<%@ Register TagPrefix="WebPartPages" Namespace="Microsoft.SharePoint.WebPartPages" Assembly="Microsoft.SharePoint, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
 <%@ Control Language="C#" AutoEventWireup="true" CodeBehind="ResourceGridUserControl.ascx.cs" Inherits="EPMLiveWebParts.ResourceGridUserControl" %>
 
 <asp:Panel ID="pnlGrid" runat="server">
@@ -16,6 +16,10 @@
             display: none !important;
         }
         
+        body #s4-ribbonrow{
+        height:auto !important;
+        }
+
         .rg-clear-fix:after {
             content: ".";
             display: block;
@@ -196,21 +200,22 @@
         .s4-wpTopTable {
             border: none !important;
         }
+
     </SharePoint:StyleBlock>
-    
-    <div id="test" ></div>
+
+    <div id="test"></div>
     <link rel="stylesheet" href="../../_layouts/15/epmlive/Stylesheets/epmliveToolBar.css" type="text/css" />
     <script src="../../_layouts/15/epmlive/javascripts/EPMLiveToolBar.js"></script>
-    
+
     <div id="ResourceGridLoader" class="ms-dlgContent" tabindex="-1" style="z-index: 1505; display: none; width: 367px; height: 146px; left: 775.5px; top: 269px;">
         <div class="ms-dlgBorder" style="width: 365px; height: 144px;">
             <input type="button" value="Wrap focus to the end of the dialog" class="ms-accessible">
             <div class="ms-hidden">
                 <span id="dlgTitleBtns" class="ms-dlgTitleBtns">
                     <a class="ms-dlgCloseBtn" title="Maximize" href="javascript:;">
-                        <span style="padding:8px;height:16px;width:16px;display:inline-block">
-                            <span class="s4-clust" style="height:16px;width:16px;position:relative;display:inline-block;overflow:hidden;">
-                                <img class="ms-dlgCloseBtnImg" style="left:-0px !important;top:-661px !important;position:absolute;" alt="Maximize" src="/_layouts/15/images/fgimg.png?rev=23">
+                        <span style="padding: 8px; height: 16px; width: 16px; display: inline-block">
+                            <span class="s4-clust" style="height: 16px; width: 16px; position: relative; display: inline-block; overflow: hidden;">
+                                <img class="ms-dlgCloseBtnImg" style="left: -0px !important; top: -661px !important; position: absolute;" alt="Maximize" src="/_layouts/15/images/fgimg.png?rev=23">
                             </span>
                         </span>
                     </a>
@@ -235,14 +240,14 @@
     </div>
 
     <div class="callout border-callout">
-        <input id="EPMLiveResourceGridSelector" type="text"/>
+        <input id="EPMLiveResourceGridSelector" type="text" />
         <b class="border-notch notch"></b>
         <b class="notch"></b>
     </div>
-    
-    <div id="EPMResourceGrid" class="rg-clear-fix" style="width:100%;height:800px;">
+
+    <div id="EPMResourceGrid" class="rg-clear-fix" style="width: 100%; height: 800px;">
         <SharePoint:ScriptBlock runat="server">
-             function initializeResourceGridWP() {
+            function initializeResourceGridWP() {
                 if (window.epmLiveMasterPageVersion >= 5.5) {
                     function showLoadingV2() {
                         var url = document.location.href.toLowerCase();
@@ -283,31 +288,37 @@
                     epmLiveResourceGrid.reports.wcReportId = '<%= WcReportId %>';
                     epmLiveResourceGrid.userIsSiteAdmin = <%= SPContext.Current.Web.CurrentUser.IsSiteAdmin.ToString().ToLower() %>;
 
-                    window.TreeGrid('<treegrid Data_Url="<%= WebUrl %>/_vti_bin/WorkEngine.asmx" Data_Timeout="0" Data_Method="Soap" Data_Function="Execute" Data_Namespace="workengine.com" Data_Param_Function="GetResourcePoolDataGrid" Data_Param_Dataxml="<%= DataXml %>" Layout_Url="<%= WebUrl %>/_vti_bin/WorkEngine.asmx" Layout_Timeout="0" Layout_Method="Soap" Layout_Function="Execute" Layout_Namespace="workengine.com" Layout_Param_Function="GetResourcePoolLayoutGrid" Layout_Param_Dataxml="<%= LayoutXml %>" SuppressMessage="3" <%= DebugTag %>></treegrid>', 'EPMResourceGrid');
+                    window.TreeGrid('<treegrid data_url="<%= WebUrl %>/_vti_bin/WorkEngine.asmx" data_timeout="0" data_method="Soap" data_function="Execute" data_namespace="workengine.com" data_param_function="GetResourcePoolDataGrid" data_param_dataxml="<%= DataXml %>" layout_url="<%= WebUrl %>/_vti_bin/WorkEngine.asmx" layout_timeout="0" layout_method="Soap" layout_function="Execute" layout_namespace="workengine.com" layout_param_function="GetResourcePoolLayoutGrid" layout_param_dataxml="<%= LayoutXml %>" suppressmessage="3" <%= DebugTag %>></treegrid>', 'EPMResourceGrid');
                 }, true);
 
                 window.epmLiveResourceGrid.actions.getNewFormUrl = epmLive.currentWebFullUrl + '/' + '<%=NewFormUrl %>';
             }
 
             SP.SOD.executeOrDelayUntilScriptLoaded(initializeResourceGridWP, "EPMLive.ResourceGrid.js");
-         </SharePoint:ScriptBlock>
+        </SharePoint:ScriptBlock>
     </div>
 
     <script id="RWPSaveView-<%= WebPartId %>" type="text/html">
-        <div style="padding:10px;">
-          Name: <input id="RWPSaveView-Name-<%= WebPartId %>" type="text" /><br />
-          <input id="RWPSaveView-Default-<%= WebPartId %>" type="checkbox" />Default View<br />
-          <input id="RWPSaveView-Personal-<%= WebPartId %>" type="checkbox" <%= !CurrentUserHasDesignerPermission ? "checked=\"yes\" disabled" : string.Empty %> />Personal View<br /><br />
-          <input class="ms-ButtonHeightWidth" type="button" onclick="SP.UI.ModalDialog.commonModalDialogClose(SP.UI.DialogResult.OK, epmLiveResourceGrid.views.save({name: $($(this).parent().find('input')[0]).val(), isdefault: $($(this).parent().find('input')[1]).is(':checked'), ispersonal: $($(this).parent().find('input')[2]).is(':checked')})); return false;" value="OK" style="float:left;width:90px;margin-right:5px;" />
-          <input class="ms-ButtonHeightWidth" type="button" onclick="SP.UI.ModalDialog.commonModalDialogClose(SP.UI.DialogResult.cancel); return false;" value="Cancel" style="float:left;width:90px;" />
+        <div style="padding: 10px;">
+            Name:
+            <input id="RWPSaveView-Name-<%= WebPartId %>" type="text" /><br />
+            <input id="RWPSaveView-Default-<%= WebPartId %>" type="checkbox" />Default View<br />
+            <input id="RWPSaveView-Personal-<%= WebPartId %>" type="checkbox" <%= !CurrentUserHasDesignerPermission ? "checked=\"yes\" disabled" : string.Empty %> />Personal View<br />
+            <br />
+            <input class="ms-ButtonHeightWidth" type="button" onclick="SP.UI.ModalDialog.commonModalDialogClose(SP.UI.DialogResult.OK, epmLiveResourceGrid.views.save({ name: $($(this).parent().find('input')[0]).val(), isdefault: $($(this).parent().find('input')[1]).is(':checked'), ispersonal: $($(this).parent().find('input')[2]).is(':checked') })); return false;" value="OK" style="float: left; width: 90px; margin-right: 5px;" />
+            <input class="ms-ButtonHeightWidth" type="button" onclick="SP.UI.ModalDialog.commonModalDialogClose(SP.UI.DialogResult.cancel); return false;" value="Cancel" style="float: left; width: 90px;" />
         </div>
     </script>
     <script id="RWPRenameView-<%= WebPartId %>" type="text/html">
-        <div style="padding:10px;">
-          Current name: <b><span id="RWPRenameView-CurrentName-<%= WebPartId %>"></span></b><br /><br />
-          New name: <input id="RWPRenameView-NewName-<%= WebPartId %>" type="text" /><br /><br />
-          <input class="ms-ButtonHeightWidth" type="button" onclick="SP.UI.ModalDialog.commonModalDialogClose(SP.UI.DialogResult.OK, epmLiveResourceGrid.views.rename($($(this).parent().find('input')[0]).val())); return false;" value="OK" style="float:left;width:90px;margin-right:5px;" />
-          <input class="ms-ButtonHeightWidth" type="button" onclick="SP.UI.ModalDialog.commonModalDialogClose(SP.UI.DialogResult.cancel); return false;" value="Cancel" style="float:left;width:90px;" />
+        <div style="padding: 10px;">
+            Current name: <b><span id="RWPRenameView-CurrentName-<%= WebPartId %>"></span></b>
+            <br />
+            <br />
+            New name:
+            <input id="RWPRenameView-NewName-<%= WebPartId %>" type="text" /><br />
+            <br />
+            <input class="ms-ButtonHeightWidth" type="button" onclick="SP.UI.ModalDialog.commonModalDialogClose(SP.UI.DialogResult.OK, epmLiveResourceGrid.views.rename($($(this).parent().find('input')[0]).val())); return false;" value="OK" style="float: left; width: 90px; margin-right: 5px;" />
+            <input class="ms-ButtonHeightWidth" type="button" onclick="SP.UI.ModalDialog.commonModalDialogClose(SP.UI.DialogResult.cancel); return false;" value="Cancel" style="float: left; width: 90px;" />
         </div>
     </script>
 </asp:Panel>

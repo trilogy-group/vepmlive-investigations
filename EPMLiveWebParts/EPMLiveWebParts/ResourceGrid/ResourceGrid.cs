@@ -6,6 +6,7 @@ using System.Xml.Serialization;
 using EPMLiveWebParts.Properties;
 using Microsoft.SharePoint.WebControls;
 using WebPart = Microsoft.SharePoint.WebPartPages.WebPart;
+using Microsoft.SharePoint;
 
 namespace EPMLiveWebParts
 {
@@ -14,18 +15,20 @@ namespace EPMLiveWebParts
     [XmlRoot(Namespace = "ResourceGrid")]
     public class ResourceGrid : WebPart, IWebPartPageComponentProvider
     {
-        #region Fields (6) 
+        #region Fields (6)
 
         private const string ASCX_PATH = @"~/_CONTROLTEMPLATES/ResourceGridUserControl.ascx";
+        private const string HIDE_TAB = "Ribbon.Read";
+        private const string PAGE_TAB = "Ribbon.WebPartPage";
         private const string MANAGE_TAB = "Ribbon.ResourceGridTab";
         private const string VIEWS_TAB = "Ribbon.ResourceGridViewTab";
         private const string VISIBILITY_CONTEXT = "ResourceGridContextualTab.CustomVisibilityContext";
         private readonly string _contextualTab = Resources.ResourceGrid_ContextualTab;
         private readonly string _contextualTabTemplate = Resources.ResourceGrid_ContextualTabTemplate;
 
-        #endregion Fields 
+        #endregion Fields
 
-        #region Properties (1) 
+        #region Properties (1)
 
         /// <summary>
         /// Gets the delay script.
@@ -35,9 +38,9 @@ namespace EPMLiveWebParts
             get { return Resources.ResourceGrid_DelayScript; }
         }
 
-        #endregion Properties 
+        #endregion Properties
 
-        #region Methods (2) 
+        #region Methods (2)
 
         // Protected Methods (1) 
 
@@ -55,6 +58,8 @@ namespace EPMLiveWebParts
             {
                 AddContextualTab();
 
+                CheckRibbonBehavior();
+
                 ClientScriptManager clientScriptManager = Page.ClientScript;
 
                 string script = DelayScript
@@ -64,7 +69,7 @@ namespace EPMLiveWebParts
                 clientScriptManager.RegisterClientScriptBlock(GetType(), "ResourceGridWebPart", script);
             }
 
-            var control = (ResourceGridUserControl) Page.LoadControl(ASCX_PATH);
+            var control = (ResourceGridUserControl)Page.LoadControl(ASCX_PATH);
 
             control.WebPartId = webPartId;
             control.AutoFocus = WebPartManager.WebParts.Count == 1;
@@ -72,6 +77,30 @@ namespace EPMLiveWebParts
             control.WebPartHeight = Height;
 
             Controls.Add(control);
+        }
+
+        private void CheckRibbonBehavior()
+        {
+            SPRibbon spRibbon = SPRibbon.GetCurrent(Page);
+
+            if (spRibbon == null) return;
+
+            //Ribbon Behaviour:
+            SPList list = SPContext.Current.Web.Lists.TryGetList("Resources");
+            EPMLiveCore.GridGanttSettings gSettings = new EPMLiveCore.GridGanttSettings(list);
+            string resourceRibbonBehavior = gSettings.RibbonBehavior;
+
+            switch (resourceRibbonBehavior)
+            {
+                case "2":
+                    {
+                        spRibbon.TrimById(HIDE_TAB);
+                        spRibbon.TrimById(PAGE_TAB);
+                        spRibbon.TrimById(MANAGE_TAB);
+                        spRibbon.TrimById(VIEWS_TAB);
+                    }
+                    break;
+            }
         }
 
         // Private Methods (1) 
@@ -100,7 +129,7 @@ namespace EPMLiveWebParts
                 spRibbon.MakeTabAvailable(MANAGE_TAB);
         }
 
-        #endregion Methods 
+        #endregion Methods
 
         #region Implementation of IWebPartPageComponentProvider
 
