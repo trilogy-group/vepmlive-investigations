@@ -130,9 +130,9 @@ top:4px;
 .GMCellHeader,.GMCellHeaderEmpty { padding-top:5px; background-color:#FFFFFF; border-top:0px solid #ffffff; padding-bottom:5px }
 .GMCellPanel,.GMCellHeaderPanel { background-color:#FFFFFF; }
 .GMCellHeader:hover,.GMCellHeaderEmpty:hover { background-color:#FFF; }
-.GMCellPanel:hover,.GMCellHeaderPanel:hover { background-color:#FFF; }
+.GMCellPanel:hover,.GMCellHeaderPanel:hover { background-color:#FAFAFA; }
 .GMCellFilterPanel { padding-left:1px; }
-.GMCellUser { background-color:#F0F0E0; }
+.GMCellUser { background-color:#FFF; }
 .GMCellEmpty { background:#F0F0E0; border:0px none; }
 .GMCellHeaderEmpty { border:0px none; border-top:1px solid #ffffff; }
 .GMCellHidden { background:transparent!important; border-top:none!important; border-bottom:none!important; }
@@ -565,7 +565,7 @@ u.GMNL { padding-left:21px; }
 .GMPx11x,.GMPx21x,.GMPx01x,.GMPx10x,.GMPx20x,.GMPx00x,
 .GMPxx11,.GMPxx10,.GMPxx01,.GMPxx00, 
 .GMPxxx1,.GMPxxx0,.GMPxx1x,.GMPxx0x,.GMPx2xx,.GMPx1xx,.GMPx0xx,.GMP1xxx,.GMP0xxx {
-   font-size:10px; background-image:url(FastPanel1.gif); background-repeat:no-repeat;
+   font-size:10px; background-image:url("checkbox-sprite.png"); background-repeat:no-repeat;
    }
 .GMP1111,.GMP111x,.GMP11xx,.GMP1xxx { background-position:0px 0px; }
 .GMP1211,.GMP121x,.GMP12xx { background-position:-80px 0px; }
@@ -594,7 +594,7 @@ u.GMNL { padding-left:21px; }
 
 .GMPx111,.GMPx11x,.GMPx1xx { background-image: url("checkbox-sprite.png");background-position: -24px 10px; }
 .GMPx211,.GMPx21x,.GMPx2xx { background-image: url("checkbox-sprite.png");background-position: 0px 10px; }
-.GMPx011,.GMPx01x,.GMPx0xx { background-position:-173px 0px; }
+.GMPx011,.GMPx01x,.GMPx0xx { background-position:-24px 10px; opacity:0.3}
 .GMPx101,.GMPx10x { background-position:-253px 0px; }
 .GMPx201,.GMPx20x { background-position:-333px 0px; }
 .GMPx001,.GMPx00x { background-position:-413px 0px; }
@@ -939,8 +939,8 @@ u.GMSort0Right,u.GMSort1Right,u.GMSort2Right,u.GMSort3Right,u.GMSort4Right,u.GMS
 
 .GMColorAlternate { background-color:#EBFFFF; }
 
-.GMColorSelected { background-color:#f2f2f2; }
-.GMClassSelected { color:#444444;background-color:#f2f2f2; }
+.GMColorSelected { background-color:#EEE; }
+.GMClassSelected { background-color:#EEE; }
 
 .GMColorError { background-color:#FF6969; }
 .GMColorDeleted { background-color:#FFFFFF; }
@@ -993,13 +993,13 @@ u.GMSort0Right,u.GMSort1Right,u.GMSort2Right,u.GMSort3Right,u.GMSort4Right,u.GMS
 
 /* --------------- Hover, focus, edit cursors ----------------- */
 .GMHoverPanelBackground { }
-.GMHoverRowBackground { opacity:0.1; filter:alpha(opacity=10); background:#f2f2f2; }
+.GMHoverRowBackground { opacity:0.1; filter:alpha(opacity=10); background:#EEE; }
 .GMHoverRowBorder { z-index:1; border-top:1px solid #BBF; border-bottom:1px solid #BBF; cursor:default; }
 .GMHoverCellBorder { z-index:3; padding:1px; border:1px solid #A0A0F0; background:white; }
 .GMFocusPanelBackground { }
 .GMFocusRowBackground { opacity:0.1; filter:alpha(opacity=10); background:#0000; }
 .GMFocusRowBorder { z-index:2; border:0px solid black; }
-.GMFocusCellBorder,.GMEditCellBorder { z-index:4; border:0px solid #6666FF; background: #f2f2f2 }
+.GMFocusCellBorder,.GMEditCellBorder { z-index:4; border:0px solid #6666FF; background: #EEE }
 .GMFocusCellSpaceBorder,.GMEditCellSpaceBorder { z-index:4; }
 .GMEditCellBorder { border-color:#FF6666; }
 .GMEditCellInput { position:relative; border:1px solid #BBB; overflow:hidden; z-index:2; }
@@ -1414,7 +1414,7 @@ overflow:hidden; width:0px; height:0px; }
 .GMMouseOrig { background:yellow!important; opacity:0.5; filter:alpha(opacity=50); }
 .GMMouseDragObject { position:absolute; z-index:260; background:#888; opacity:0.5; filter:alpha(opacity=50); }
 
-.GMFocus { border:1px solid #AAF; border-top:1px solid #00F; border-left:1px solid #00F; background-color:#f2f2f2; } 
+.GMFocus { border:1px solid #AAF; border-top:1px solid #00F; border-left:1px solid #00F; background-color:#EEE; } 
 
 .GMFocus { border:1px solid blue; background-color:white; }    
 
