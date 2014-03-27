@@ -30,7 +30,7 @@ namespace EPMLiveReportsAdmin
                     {"WebId", properties.Web.ID},
                     {"SiteId", properties.SiteId},
                     {"UserId", new SPFieldUserValue(properties.Web, (string) properties.ListItem["Author"]).LookupId},
-                    {"ActivityTime", properties.ListItem["Created"]}
+                    {"ActivityTime", ((DateTime) properties.ListItem["Created"]).ToUniversalTime()}
                 };
 
                 GetAssignedToUsers(properties, data);
@@ -57,7 +57,7 @@ namespace EPMLiveReportsAdmin
                     {"WebId", properties.Web.ID},
                     {"SiteId", properties.SiteId},
                     {"UserId", properties.Web.CurrentUser.ID},
-                    {"ActivityTime", DateTime.Now}
+                    {"ActivityTime", DateTime.UtcNow}
                 };
 
                 GetAssociatedListItems(properties, data);
@@ -83,7 +83,7 @@ namespace EPMLiveReportsAdmin
                     {"WebId", properties.Web.ID},
                     {"SiteId", properties.SiteId},
                     {"UserId", new SPFieldUserValue(properties.Web, (string) properties.ListItem["Editor"]).LookupId},
-                    {"ActivityTime", properties.ListItem["Modified"]}
+                    {"ActivityTime", ((DateTime) properties.ListItem["Modified"]).ToUniversalTime()}
                 };
 
                 GetAssignedToUsers(properties, data);

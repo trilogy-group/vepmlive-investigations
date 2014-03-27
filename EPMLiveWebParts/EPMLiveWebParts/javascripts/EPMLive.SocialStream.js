@@ -6,7 +6,8 @@
             var $el = {
                 root: $('#epm-social-stream'),
                 content: $(document.getElementById('s4-workspace')),
-                pagination: $('#epm-social-stream div#epm-se-pagination span')
+                pagination: $('#epm-social-stream div#epm-se-pagination span'),
+                noActivity: $('#epm-social-stream div#epm-se-no-activity')
             };
 
             var templates = {
@@ -150,6 +151,11 @@
                     
                     config.pagination.offset = response.meta.offset;
                     config.pagination.isLoading = false;
+                    
+                    if (config.firstTimeLoad && response.activities.length === 0) {
+                        $el.noActivity.fadeIn('fast');
+                    }
+
                     config.firstTimeLoad = false;
                 });
             };

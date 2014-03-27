@@ -31,7 +31,7 @@ namespace EPMLiveCore.SocialEngine.Events.ListEventReceiver
                         {"URL", properties.List.DefaultViewUrl},
                         {"WebId", properties.WebId},
                         {"UserId", properties.Web.CurrentUser.ID},
-                        {"ActivityTime", DateTime.Now}
+                        {"ActivityTime", DateTime.UtcNow}
                     }, properties.Web);
                 }
             }
@@ -55,7 +55,7 @@ namespace EPMLiveCore.SocialEngine.Events.ListEventReceiver
                         {"URL", properties.List.DefaultViewUrl},
                         {"WebId", properties.WebId},
                         {"UserId", properties.Web.CurrentUser.ID},
-                        {"ActivityTime", DateTime.Now}
+                        {"ActivityTime", DateTime.UtcNow}
                     }, properties.Web);
                 }
             }

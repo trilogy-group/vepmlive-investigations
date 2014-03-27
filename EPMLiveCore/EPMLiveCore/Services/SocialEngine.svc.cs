@@ -454,8 +454,8 @@ namespace EPMLiveCore.Services
         private void ParseMetaData(out int limit, out DateTime maxDate, out DateTime minDate)
         {
             limit = 20;
-            maxDate = DateTime.Now;
-            minDate = SqlDateTime.MinValue.Value;
+            maxDate = DateTime.UtcNow;
+            minDate = new DateTime(2000, 1, 1);
 
             OperationContext context = OperationContext.Current;
             MessageProperties properties = context.IncomingMessageProperties;

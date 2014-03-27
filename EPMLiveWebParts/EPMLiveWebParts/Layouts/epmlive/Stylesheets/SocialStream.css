@@ -213,4 +213,7 @@
 #epm-social-stream div#epm-se-pagination span {
   display: none;
 }
+#epm-social-stream div#epm-se-no-activity {
+  display: none;
+}
 /*# sourceMappingURL=SocialStream.css.map */

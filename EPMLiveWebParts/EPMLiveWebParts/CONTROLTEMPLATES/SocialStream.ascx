@@ -1,9 +1,20 @@
 ﻿<%@ Assembly Name="$SharePoint.Project.AssemblyFullName$" %>
 <%@ Assembly Name="Microsoft.Web.CommandUI, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
+<%@ Register Tagprefix="SharePoint" Namespace="Microsoft.SharePoint.WebControls" Assembly="Microsoft.SharePoint, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
 <%@ Control Language="C#" AutoEventWireup="true" CodeBehind="SocialStream.ascx.cs" Inherits="EPMLiveWebParts.CONTROLTEMPLATES.SocialStream" %>
+
+<SharePoint:ScriptBlock runat="server">
+    (function() {
+        'use strict';
+        
+        window.epmLive = window.epmLive || {};
+        window.currentUserTimeZone = <%= CurrentUserTimeZone %>;
+    })();
+</SharePoint:ScriptBlock>
 
 <div id="epm-social-stream">
     <ul id="epm-se-days"></ul>
+    <div id="epm-se-no-activity">You do not have any activities, yet!</div>
     <div id="epm-se-pagination"><span>Loading more...</span></div>
 </div>
 
