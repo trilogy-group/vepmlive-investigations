@@ -805,6 +805,7 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
 
         //START RIGHT SIDE TOOL BAR METHODS
         function createSearch(cfg, ul) {
+            var toolTip = cfg['toolTip'];
             var li = $(document.createElement('li'));
             li.attr('title', 'Search');
             var isCustom = (cfg['custom'].toLowerCase() == 'yes');
@@ -856,12 +857,7 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
                 aContainer.attr('class', 'nav-icon');
                 aContainer.attr('style', 'font-size:.9em;');
                 aContainer.attr('href', 'javascript:void(0)');
-                if (toolTip) {
-                    aContainer.attr('data-toggle', 'tooltip');
-                    aContainer.attr('data-placement', 'top');
-                    aContainer.attr('data-delay', '200');
-                    aContainer.attr('title', toolTip);
-                }
+                
                 aContainer.click(function () {
                     if ($(".toolbar-search").css("margin-left") == "0px") {
                         $(".toolbar-search").css("margin-left", "-160px");
@@ -880,6 +876,7 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
         }
 
         function createGroupBy(cfg, ul) {
+            var toolTip = cfg['toolTip'];
             var li = $(document.createElement('li'));
             li.attr('class', 'dropdown');
             li.attr('title', 'Group by');
