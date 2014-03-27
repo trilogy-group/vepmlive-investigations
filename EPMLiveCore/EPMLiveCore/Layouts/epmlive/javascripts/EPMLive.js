@@ -855,8 +855,13 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
                 aContainer.attr('id', 'toolbar-search-icon');
                 aContainer.attr('class', 'nav-icon');
                 aContainer.attr('style', 'font-size:.9em;');
-                aContainer.attr('data-placement', 'top');
                 aContainer.attr('href', 'javascript:void(0)');
+                if (toolTip) {
+                    aContainer.attr('data-toggle', 'tooltip');
+                    aContainer.attr('data-placement', 'top');
+                    aContainer.attr('data-delay', '200');
+                    aContainer.attr('title', toolTip);
+                }
                 aContainer.click(function () {
                     if ($(".toolbar-search").css("margin-left") == "0px") {
                         $(".toolbar-search").css("margin-left", "-160px");
@@ -882,8 +887,13 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
             var aContainer = $(document.createElement('a'));
             aContainer.attr('id', 'group-dropdown');
             aContainer.attr('class', 'dropdown-toggle nav-icon');
-            aContainer.attr('data-placement', 'top');
             aContainer.attr('href', 'javascript:void(0)');
+            if (toolTip) {
+                aContainer.attr('data-toggle', 'tooltip');
+                aContainer.attr('data-placement', 'top');
+                aContainer.attr('data-delay', '200');
+                aContainer.attr('title', toolTip);
+            }
             var spnImg = $(document.createElement('span'));
             spnImg.attr('class', 'icon-list-3');
             aContainer.append(spnImg);
@@ -1124,6 +1134,13 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
             aContainer.attr('class', 'dropdown-toggle nav-icon');
             aContainer.attr('href', 'javascript:void(0)');
             aContainer.attr('controlId', controlId);
+
+            if (toolTip) {
+                aContainer.attr('data-toggle', 'tooltip');
+                aContainer.attr('data-placement', 'top');
+                aContainer.attr('data-delay', '200');
+                aContainer.attr('title', toolTip);
+            }
 
             if (iconClass &&
                 (iconClass != 'none')) {
