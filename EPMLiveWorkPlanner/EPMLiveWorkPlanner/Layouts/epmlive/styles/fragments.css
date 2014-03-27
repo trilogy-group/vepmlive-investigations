@@ -89,15 +89,15 @@ height:34px;
 font-size:14px;
 }
 .form-control::-moz-placeholder {
-    color: #DDDDDD;
+    color: #cccccc;
     opacity: 1;
 }
 .form-control::-webkit-input-placeholder {
-    color: #DDDDDD;
+    color: #cccccc;
     opacity: 1;
 }
 
 .form-control:-ms-input-placeholder {  
-    color: #DDDDDD;
+    color: #cccccc;
     opacity: 1;
 }
