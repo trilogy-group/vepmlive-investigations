@@ -18,7 +18,7 @@
 	<Toolbar Visible="0" CanHide="0" />
 	<Panel Delete="0" Visible="0" CanHide="0" />
 	<Head>
-		<Header id='Header' ShowLoading="" WorkTypeField="Work Type" StopWatch='Stop Watch' Color="" Hover="" HoverCell="" HoverColor="" HoverRow="" ApprovalNotes="Notes" TMApproval="TM" PMApproval="PM" Approve=""/>
+		<Header id='Header' ShowLoading="" WorkTypeField="Work Type" Comments="" StopWatch='Stop Watch' Color="" Hover="" HoverCell="" HoverColor="" HoverRow="" ApprovalNotes="Notes" TMApproval="TM" PMApproval="PM" Approve=""/>
 		<Filter CanHide="0" CanEdit="1" Visible="0" />
 	</Head>
 	<Solid>
@@ -35,7 +35,7 @@
 		<C Name="WebID" Visible="0" CanFilter="0" CanGroup="0" CanHide="0" />
 		<C Name="SiteID" Visible="0" CanFilter="0" CanGroup="0" CanHide="0" />		
 		<C Name="TSOtherHours" Visible="0" CanFilter="0" CanGroup="0" CanHide="0" Type="Float" />		
-		<C Name="Comments" Type="Html" Width="50" CanFilter="0" CanGroup="0" CanResize="0" CanSort="0" />
+		<C Name="Comments" Type="Html" Width="40" CanFilter="0" CanGroup="0" CanResize="0" CanSort="0" />
 		<C Name="Title" Type="Html" RelWidth="100" MinWidth="100" CanGroup="0" CanHide="0" GroupEmpty="0"/>
 		<C Name="WorkTypeField" Type="Html" GroupEmpty="0" />
 	</LeftCols>

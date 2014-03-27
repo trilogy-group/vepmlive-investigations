@@ -2114,6 +2114,15 @@ namespace TimeSheets
             attr1.Value = dr["TS_ITEM_UID"].ToString();
             ndCol.Attributes.Append(attr1);
 
+            attr1 = docData.CreateAttribute("PMApproval");
+            if (dr["APPROVAL_STATUS"].ToString() == "1")
+                attr1.Value = "<img src=\"/_layouts/epmlive/images/ts/approved.png\">";
+            else if (dr["APPROVAL_STATUS"].ToString() == "2")
+                attr1.Value = "<img src=\"/_layouts/epmlive/images/ts/rejected.png\">";
+            else
+                attr1.Value = "";
+            ndCol.Attributes.Append(attr1);
+
             attr1 = docData.CreateAttribute("ShowLoading");
             attr1.Value = @"<img id='MTG_Processing_" + dr["ITEM_ID"].ToString() + "' style='display:none;' src='/_layouts/epmlive/images/mywork/loading16.gif'></img>";
             ndCol.Attributes.Append(attr1);

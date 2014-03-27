@@ -119,6 +119,8 @@ function TSRenderFinish(grid)
 
     EPM.UI.Loader.current().stopLoading('WebPart' + eval("TSObject" + gridid + ".Qualifier"));
 
+    document.getElementById("tsnav").style.display = "";
+
     curGrid = grid;
     if (GridType == "0") {
         if (grid.id.substr(0, 2) == "TS") {

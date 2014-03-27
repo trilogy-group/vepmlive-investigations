@@ -622,16 +622,16 @@ namespace TimeSheets
 
 
                 output.WriteLine(@"
-                <div>
+                <div id=""tsnav"" style=""display:none"">
                     <nav class=""navbar navbar-default navbar-static"" role=""navigation"">
                         <div>
                             <div class=""collapse navbar-collapse"">
-                                <ul class=""nav navbar-nav"">
-                                    <li class=""nav-btn nav-text-wrapper"">
+                                <ul class=""nav navbar-nav"" style=""list-style-type: none;padding: 0px; margin:0px"">
+                                    <li class=""nav-btn nav-text-wrapper"" style=""float:left;padding-right:20px;padding: 0px"">
                                         <div class=""nav-label"">Status:</div>
                                             <div class=""text"" id=""mytimesheetstatus"">" + sStatus + @"</div>
                                     </li>
-                                    <li class=""nav-btn nav-text-wrapper"">
+                                    <li class=""nav-btn nav-text-wrapper"" style=""padding: 0px; float:left"">
                                         <div class=""nav-label"">Current Period:
                                         </div>
                                         <span class=""icon-arrow-left-17 icon"" onclick=""javascript:previousPeriodCommand('" + curUrl + "','" + iPreviousPeriod + "','" + Page.Request["Delegate"] + @"')"">
@@ -659,12 +659,12 @@ namespace TimeSheets
                 RenderApprovalToolbar(output);
 
                 output.WriteLine(@"
-                <div>
+                <div id=""tsnav"" style=""display:none"">
                     <nav class=""navbar navbar-default navbar-static"" role=""navigation"">
                         <div>
                             <div class=""collapse navbar-collapse"">
-                                <ul class=""nav navbar-nav"">
-                                    <li class=""nav-btn nav-text-wrapper"">
+                                <ul class=""nav navbar-nav"" style=""list-style-type: none;padding: 0px; margin:0px;padding: 0px; "">
+                                    <li class=""nav-btn nav-text-wrapper"" style=""float:left;padding: 0px; "">
                                         <div class=""nav-label"">Current Period:
                                         </div>
                                         <span class=""icon-arrow-left-17 icon"" onclick=""javascript:previousPeriodCommand('" + curUrl + "','" + iPreviousPeriod + "','" + Page.Request["Delegate"] + @"')"">
