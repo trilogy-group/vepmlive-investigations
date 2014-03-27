@@ -1223,7 +1223,6 @@ namespace EPMLiveCore
                 {"Asia/Baku", "Azerbaijan Standard Time"},
                 {"Asia/Bangkok", "SE Asia Standard Time"},
                 {"Asia/Beirut", "Middle East Standard Time"},
-                {"Asia/Calcutta", "India Standard Time"},
                 {"Asia/Colombo", "Sri Lanka Standard Time"},
                 {"Asia/Damascus", "Syria Standard Time"},
                 {"Asia/Dhaka", "Bangladesh Standard Time"},

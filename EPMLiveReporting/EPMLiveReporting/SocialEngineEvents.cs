@@ -30,7 +30,7 @@ namespace EPMLiveReportsAdmin
                     {"WebId", properties.Web.ID},
                     {"SiteId", properties.SiteId},
                     {"UserId", new SPFieldUserValue(properties.Web, (string) properties.ListItem["Author"]).LookupId},
-                    {"ActivityTime", ((DateTime) properties.ListItem["Created"]).ToUniversalTime()}
+                    {"ActivityTime",GetActivityTime(properties, "Created")}
                 };
 
                 GetAssignedToUsers(properties, data);
@@ -39,6 +39,12 @@ namespace EPMLiveReportsAdmin
                 SocialEngineProxy.ProcessActivity(ObjectKind.ListItem, ActivityKind.Created, data, properties.Web);
             }
             catch { }
+        }
+
+        private static DateTime GetActivityTime(SPItemEventProperties properties, string fieldName)
+        {
+            var regionalSettings = properties.Web.CurrentUser.RegionalSettings ?? properties.Web.RegionalSettings;
+            return regionalSettings.TimeZone.LocalTimeToUTC((DateTime) properties.ListItem[fieldName]);
         }
 
         public static void ItemDeleting(SPItemEventProperties properties)
@@ -83,7 +89,7 @@ namespace EPMLiveReportsAdmin
                     {"WebId", properties.Web.ID},
                     {"SiteId", properties.SiteId},
                     {"UserId", new SPFieldUserValue(properties.Web, (string) properties.ListItem["Editor"]).LookupId},
-                    {"ActivityTime", ((DateTime) properties.ListItem["Modified"]).ToUniversalTime()}
+                    {"ActivityTime", GetActivityTime(properties, "Modified")}
                 };
 
                 GetAssignedToUsers(properties, data);

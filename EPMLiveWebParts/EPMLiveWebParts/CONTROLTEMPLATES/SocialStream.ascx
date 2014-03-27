@@ -8,7 +8,7 @@
         'use strict';
         
         window.epmLive = window.epmLive || {};
-        window.currentUserTimeZone = <%= CurrentUserTimeZone %>;
+        window.epmLive.currentUserTimeZone = <%= CurrentUserTimeZone %>;
     })();
 </SharePoint:ScriptBlock>
 
