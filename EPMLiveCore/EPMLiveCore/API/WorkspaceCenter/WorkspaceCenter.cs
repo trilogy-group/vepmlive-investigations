@@ -122,7 +122,7 @@ namespace EPMLiveCore.API
                                     //string WebTitle = Convert.ToString(dtWorkspacecenterData.Rows[i]["WebTitle"]);
                                     //string WebTitle = "<div> <div style='float:left;'>" + Convert.ToString(dtWorkspacecenterData.Rows[i]["WebTitle"] + "</div><div style='float:right;'><ul style='margin: 0px; width: 20px;'><li class='workspacecentercontextmenu'><a data-itemid='20'data-listid= '70045944-8348-4D19-A846-1911DF213FFA' data-webid='" + oWeb.ID + "' data-siteid='" + oWeb.Site.ID + "'></a></li></ul></div> </div>");
                                     string WebTitle = "<div> <div style='float:left;'>" + Convert.ToString(dtWorkspacecenterData.Rows[i]["WebTitle"] + "</div><div style='float:right;'><ul style='margin: 0px; width: 20px;'><li class='workspacecentercontextmenu' id='" + oWeb.ID + "'><a data-webid='" + oWeb.ID + "' data-siteid='" + oWeb.Site.ID + "'></a></li></ul></div> </div>");
-                                    string Description = Convert.ToString(dtWorkspacecenterData.Rows[i]["Description"]);
+                                    string Description = Convert.ToString(dtWorkspacecenterData.Rows[i]["WebDescription"]);
                                     string Members = Convert.ToString(dtWorkspacecenterData.Rows[i]["Members"]);
                                     string Owner = Convert.ToString(dtWorkspacecenterData.Rows[i]["SharePointAccountText"]);
 
