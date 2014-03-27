@@ -718,7 +718,7 @@ namespace TimeSheets
             //output.WriteLine("fireEvent(wp, 'mouseup');");
             output.WriteLine("}");
 
-            output.Write("SP.SOD.executeOrDelayUntilScriptLoaded(clickTab, \"MyTimesheetContextualTabPageComponent.js\");");
+            //output.Write("SP.SOD.executeOrDelayUntilScriptLoaded(clickTab, \"MyTimesheetContextualTabPageComponent.js\");");
             output.WriteLine(@"var viewNameDiv = document.getElementById(""viewNameDiv"");");
             output.WriteLine("</script>");
 
@@ -734,15 +734,10 @@ namespace TimeSheets
                 if (GridType == 0)
                 {
                     AddContextualTab();
-                }
-                else
-                {
-                    AddApprovalContextualTab();
-                }
-                      
-                ClientScriptManager clientScriptManager = Page.ClientScript;
-                clientScriptManager.RegisterClientScriptBlock(GetType(), "MyTimesheet", DelayScript.Replace("{webPartPageComponentId}", SPRibbon.GetWebPartPageComponentId(this)).Replace("{TSOBJECT}", "TSObject" + sFullGridId));
 
+                    ClientScriptManager clientScriptManager = Page.ClientScript;
+                    clientScriptManager.RegisterClientScriptBlock(GetType(), "MyTimesheet", DelayScript.Replace("{webPartPageComponentId}", SPRibbon.GetWebPartPageComponentId(this)).Replace("{TSOBJECT}", "TSObject" + sFullGridId));
+                }
                 CssRegistration.Register("/_layouts/epmlive/MyTimesheet.css");
                 CssRegistration.Register("/_layouts/epmlive/modal/modal.css");
 
@@ -760,22 +755,6 @@ namespace TimeSheets
             }
             base.OnPreRender(e);
             tb.StopTimer();
-        }
-
-        private void AddApprovalContextualTab()
-        {
-            SPRibbon spRibbon = SPRibbon.GetCurrent(Page);
-
-            if (spRibbon == null) return;
-
-            var ribbonExtensions = new XmlDocument();
-
-            ribbonExtensions.LoadXml(Properties.Resources.txtTSApprovalRibbon.Replace("{title}", DisplayTitle).Replace("#language#", SPContext.Current.Web.Language.ToString()));
-            spRibbon.RegisterDataExtension(ribbonExtensions.FirstChild, "Ribbon.ContextualTabs._children");
-
-            ribbonExtensions.LoadXml(Properties.Resources.txtMyTimesheet_Template);
-            spRibbon.RegisterDataExtension(ribbonExtensions.FirstChild, "Ribbon.Templates._children");
-            
         }
 
         private void AddContextualTab()
@@ -838,11 +817,11 @@ namespace TimeSheets
 
         public string DelayScript
         {
-            get { 
-                if(GridType == 0)
-                    return Properties.Resources.txtMyTimesheet_DelayScript; 
+            get {
+                if (GridType == 0)
+                    return Properties.Resources.txtMyTimesheet_DelayScript;
                 else
-                    return Properties.Resources.txtMyTimesheetApprovals_DelayScript; 
+                    return "";
             }
         }
 
@@ -877,26 +856,7 @@ namespace TimeSheets
                     return webPartContextualInfo;
                 }
                 else
-                {
-                    var webPartContextualInfo = new WebPartContextualInfo();
-                    var webPartRibbonContextualGroup = new WebPartRibbonContextualGroup();
-                    var webPartRibbonTab = new WebPartRibbonTab();
-
-                    webPartRibbonContextualGroup.Id = "Ribbon.MyTimesheetApprovalsContextualTabGroup";
-                    webPartRibbonContextualGroup.Command = "MyTimesheetApprovalsContextualTab.EnableContextualGroup";
-                    webPartRibbonContextualGroup.VisibilityContext = "MyTimesheetContextualTab.CustomVisibilityContext";
-
-                    webPartRibbonTab.Id = InitialTabId;
-                    webPartRibbonTab.VisibilityContext = "MyTimesheetContextualTab.CustomVisibilityContext";
-
-                    webPartContextualInfo.ContextualGroups.Add(webPartRibbonContextualGroup);
-                    webPartContextualInfo.Tabs.Add(webPartRibbonTab);
-                   
-                    webPartContextualInfo.PageComponentId = SPRibbon.GetWebPartPageComponentId(this);
-
-                    return webPartContextualInfo;
-
-                }
+                    return null;
             }
         }
     }

@@ -124,6 +124,7 @@ function TSRenderFinish(grid)
     curGrid = grid;
     if (GridType == "0") {
         if (grid.id.substr(0, 2) == "TS") {
+            clickTab();
             RefreshStopWatch();
             CheckSaveStatus(grid.id);
             StartCheckApproveStatus(grid.id);

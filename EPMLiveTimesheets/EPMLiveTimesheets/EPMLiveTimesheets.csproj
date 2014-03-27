@@ -247,7 +247,6 @@
     <Content Include="Layouts\epmlive\javascripts\MyTimesheet.min.js">
       <DependentUpon>MyTimesheet.js</DependentUpon>
     </Content>
-    <Content Include="Layouts\epmlive\MyTimesheetApprovalsContextualTabPageComponent.js" />
     <Content Include="Layouts\epmlive\timesheetapprovalpage.aspx" />
     <Content Include="Layouts\epmlive\dotsaction.aspx" />
     <Content Include="Layouts\epmlive\getpmapprovals.aspx" />

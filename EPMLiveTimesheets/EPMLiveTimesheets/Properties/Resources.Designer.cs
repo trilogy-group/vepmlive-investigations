@@ -146,14 +146,14 @@ namespace TimeSheets.Properties {
         /// <summary>
         ///   Looks up a localized string similar to &lt;Grid&gt;
         ///	&lt;Cfg Code=&quot;GTACCNPSQEBSLC&quot; Version=&quot;4.0&quot; /&gt;
-        ///	&lt;Cfg SuppressCfg=&quot;1&quot;  Style=&quot;GM&quot;  CSS=&quot;/_layouts/epmlive/treegrid/myts/grid.css&quot;/&gt;
+        ///	&lt;Cfg SuppressCfg=&quot;1&quot;  Style=&quot;GM&quot;  CSS=&quot;/_layouts/15/epmlive/treegrid/grid/grid.css&quot;/&gt;
         ///	&lt;Cfg MainCol=&quot;Title&quot; NameCol=&quot;Title&quot; /&gt;
         ///	&lt;Cfg ConstHeight=&quot;0&quot; ConstWidth=&quot;1&quot; NoVScroll =&quot;1&quot;/&gt;
         ///	&lt;Cfg Undo=&quot;0&quot; /&gt;
         ///	&lt;Cfg NumberId=&quot;1&quot; FullId=&quot;0&quot; IdChars=&quot;1234567890&quot; AddFocusCol=&quot;Title&quot; SortIcons=&quot;1&quot;/&gt;
         ///	&lt;Cfg Searching=&quot;1&quot; /&gt;
-        ///	&lt;Cfg StaticCursor=&quot;1&quot; Dragging=&quot;0&quot; SelectingCells=&quot;1&quot; SelectClass=&quot;0&quot; Selecting=&quot;0&quot;/&gt;
-        ///	&lt;Cfg NoTreeLines=&quot;1&quot; DetailOn=&quot;0&quot; MinRowHeight=&quot;25&quot; MaxR [rest of string was truncated]&quot;;.
+        ///	&lt;Cfg StaticCursor=&quot;1&quot; Dragging=&quot;0&quot; SelectingCells=&quot;0&quot; SelectClass=&quot;0&quot; Selecting=&quot;1&quot;/&gt;
+        ///	&lt;Cfg NoTreeLines=&quot;1&quot; DetailOn=&quot;0&quot; MinRowHeight=&quot;25&quot; M [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string txtMyTimesheet_GridLayout {
             get {
@@ -439,19 +439,6 @@ namespace TimeSheets.Properties {
         internal static string txtTimesheetTemplate {
             get {
                 return ResourceManager.GetString("txtTimesheetTemplate", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to &lt;ContextualGroup Id=&quot;Ribbon.MyTimesheetContextualTabGroup&quot; Color=&quot;Green&quot; Title=&quot;{title}&quot; Command=&quot;MyTimesheetContextualTab.EnableContextualGroup&quot; Sequence=&quot;502&quot; ContextualGroupId=&quot;MyTimesheetContextualTabGroup&quot;&gt;
-        ///	&lt;Tab Id=&quot;Ribbon.MyTimesheetTab&quot; Title=&quot;My Timesheet&quot; Command=&quot;MyTimesheetContextualTab.EnableMyTimesheetTab&quot; Sequence=&quot;100&quot;&gt;
-        ///		&lt;Scaling Id=&quot;Ribbon.MyTimesheet.Scaling&quot;&gt;
-        ///			&lt;MaxSize Id=&quot;Ribbon.MyTimesheet.ActionsGroup.MaxSize&quot; GroupId=&quot;Ribbon.MyTimesheet.ActionsGroup&quot; Size=&quot;LargeMediumSmall&quot;/&gt;
-        ///	 [rest of string was truncated]&quot;;.
-        /// </summary>
-        internal static string txtTSApprovalRibbon {
-            get {
-                return ResourceManager.GetString("txtTSApprovalRibbon", resourceCulture);
             }
         }
         
