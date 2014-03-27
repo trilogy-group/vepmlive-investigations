@@ -451,6 +451,8 @@ function UnSubmitTimesheet(gridid) {
 
             newobj.Status = "Unsubmitted";
 
+            document.getElementById("mytimesheetstatus").innerHTML = "Unsubmitted";
+
             EnableAllRows(grid);
 
             HideMessage(gridid);
@@ -497,6 +499,8 @@ function SubmitTimesheet(gridid) {
                     var newobj = eval("TSObject" + newgridid);
 
                     newobj.Status = "Submitted";
+
+                    document.getElementById("mytimesheetstatus").innerHTML = "Submitted";
 
                     DisableAllRows(grid);
 

@@ -473,7 +473,7 @@ namespace TimeSheets
                                 <ul class=""nav navbar-nav"">
                                     <li class=""nav-btn nav-text-wrapper"">
                                         <div class=""nav-label"">Status:</div>
-                                            <div class=""text"">" + sStatus + @"</div>
+                                            <div class=""text"" id=""mytimesheetstatus"">" + sStatus + @"</div>
                                     </li>
                                     <li class=""nav-btn nav-text-wrapper"">
                                         <div class=""nav-label"">Current Period:
