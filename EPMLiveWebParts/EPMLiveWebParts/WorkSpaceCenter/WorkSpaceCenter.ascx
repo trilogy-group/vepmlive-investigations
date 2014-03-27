@@ -59,14 +59,19 @@
 </style>
 
 <script type="text/javascript">
-    // Start Toolbar Menu
+
     $(function () {
-        ExecuteOrDelayUntilScriptLoaded(WorkspaceCenterClient.toolbarCfg(), 'EPMLive.min.js');
+        ExecuteOrDelayUntilScriptLoaded(WorkspaceCenterClient.init(), 'EPMLive.Navigation.js');
     });
 
-    WorkspaceCenterClient = {
+    var WorkspaceCenterClient = (function () {
 
-        toolbarCfg: function () {
+        var init = function () {
+            loadWorkspaceCenterGrid();
+            toolbarCfg();
+        };
+
+        var toolbarCfg = function () {
             var cfgs = [
                 {
                     'placement': 'left',
@@ -170,18 +175,19 @@
                     ]
                 }
             ];
-            alert("Toolbar Problem");
             epmLiveGenericToolBar.generateToolBar('WorkSpacecenterToolbarMenu', cfgs);
-        },
-        changeView: function (currentView) {
+        };
+
+        var changeView = function (currentView) {
             var source = Grids["gridWorkSpaceCenter"].Source;
             source.Data.url = '<%= WebUrl %>/_vti_bin/WorkEngine.asmx';
             source.Data.Function = 'Execute';
             source.Data.Param.Function = 'GetWorkspaceCenterGridData';
             source.Data.Param.Dataxml = currentView;
             Grids["gridWorkSpaceCenter"].Reload(source, null, false);
-        },
-        createNewWorkspace: function () {
+        };
+
+        var createNewWorkspace = function () {
             var createNewWorkspaceUrl = "<%= WebUrl %>/_layouts/epmlive/QueueCreateWorkspace.aspx";
             var options = {
                 url: createNewWorkspaceUrl, width: 1000, height: 600, title: 'Create', dialogReturnValueCallback: function (dialogResult, returnValue) {
@@ -205,26 +211,29 @@
                 }
             };
             SP.UI.ModalDialog.showModalDialog(options);
+        };
+
+        var loadWorkspaceCenterGrid = function () {
+            window.TreeGrid('<treegrid data_url="<%= WebUrl %>/_vti_bin/WorkEngine.asmx" data_timeout="0" data_method="Soap" data_function="Execute" data_namespace="workengine.com" data_param_function="GetWorkspaceCenterGridData" data_param_dataxml="AllItems" layout_url="<%= WebUrl %>/_vti_bin/WorkEngine.asmx" layout_timeout="0" layout_method="Soap" layout_function="Execute" layout_namespace="workengine.com" layout_param_function="WorkSpaceCenterLayout" suppressmessage="3" <%= DebugTag %>></treegrid>', 'EPMWorkspaceCenterGrid');
+        };
+
+        return {
+            init: init
+        };
+
+    })();
+
+    Grids.OnRenderFinish = function (grid) {
+        if (grid.id == 'gridWorkSpaceCenter') {
+            $(".workspacecentercontextmenu").each(function () {
+                window.epmLiveNavigation.addFavoriteWSMenu($(this));
+            });
         }
-    }
-    Grids.OnRenderFinish = function (loadWorkspaceCenterGrid) {
-        $(".workspacecentercontextmenu").each(function () {
-            window.epmLiveNavigation.addFavoriteWSMenu($(this));
-        });
     };
 </script>
 <div id="EPMWorkspaceCenter" style="width: 100%;">
     <div id="WorkSpacecenterToolbarMenu" style="width: 100%">
     </div>
     <div id="EPMWorkspaceCenterGrid" style="width: 100%; height: 400px;">
-        <SharePoint:ScriptBlock ID="workspaceCenterScriptBlock1" runat="server">
-            $(function () {
-                var loadWorkspaceCenterGrid = function () {
-                    window.TreeGrid('<treegrid data_url="<%= WebUrl %>/_vti_bin/WorkEngine.asmx" data_timeout="0" data_method="Soap" data_function="Execute" data_namespace="workengine.com" data_param_function="GetWorkspaceCenterGridData" data_param_dataxml="AllItems" layout_url="<%= WebUrl %>/_vti_bin/WorkEngine.asmx" layout_timeout="0" layout_method="Soap" layout_function="Execute" layout_namespace="workengine.com" layout_param_function="WorkSpaceCenterLayout" suppressmessage="3" <%= DebugTag %>></treegrid>', 'EPMWorkspaceCenterGrid');
-                };
-                ExecuteOrDelayUntilScriptLoaded(loadWorkspaceCenterGrid, 'EPMLive.js');
-            });
-          
-        </SharePoint:ScriptBlock>
     </div>
 </div>

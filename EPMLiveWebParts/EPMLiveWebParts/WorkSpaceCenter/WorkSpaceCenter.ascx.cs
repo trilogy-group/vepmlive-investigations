@@ -44,7 +44,7 @@ namespace EPMLiveWebParts.WorkSpaceCenter
 
             EPMLiveScriptManager.RegisterScript(Page, new[]
             {
-                "/treegrid/GridE","libraries/jquery.min","libraries/jquery-ui",
+                "libraries/jquery.min","libraries/jquery-ui","/treegrid/GridE"
             });
             ServicePointManager.ServerCertificateValidationCallback += delegate { return true; };
         }
