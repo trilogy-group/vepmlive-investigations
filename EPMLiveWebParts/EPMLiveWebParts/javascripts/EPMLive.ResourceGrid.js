@@ -1888,7 +1888,6 @@ function registerEpmLiveResourceGridScript() {
                                     'controlId': 'btnInvite',
                                     'controlType': 'button',
                                     'iconClass': 'icon-plus-2',
-                                    'toolTip': 'Invite',
                                     'value': 'Invite',
                                     'events': [
                                         {
@@ -1904,7 +1903,7 @@ function registerEpmLiveResourceGridScript() {
                                     'title': '',
                                     'value': '',
                                     'iconClass': 'icon-insert-template',
-                                    'toolTip': 'Select columns',
+                                    'toolTip': 'select columns',
                                     'sections': [
                                         {
                                             'heading': 'none',
@@ -1975,7 +1974,6 @@ function registerEpmLiveResourceGridScript() {
                                     'title': '',
                                     'value': 'Tools',
                                     'iconClass': 'icon-tools',
-                                    'toolTip': 'Tools',
                                     'sections': [
                                         // Plan section
                                         {
@@ -2077,7 +2075,6 @@ function registerEpmLiveResourceGridScript() {
                                     'title': '',
                                     'value': 'Reporting',
                                     'iconClass': 'icon-pie-3',
-                                    'toolTip': 'Reports',
                                     'sections': [
                                         {
                                             'heading': 'none',
@@ -2137,7 +2134,7 @@ function registerEpmLiveResourceGridScript() {
                                 {
                                     'controlId': 'genericId',
                                     'controlType': 'search',
-                                    'toolTip': 'Search',
+                                    'toolTip': 'search',
                                     'custom': 'yes',
                                     'customControlId': ''
                                 },
@@ -2145,7 +2142,7 @@ function registerEpmLiveResourceGridScript() {
                                 {
                                     'controlId': 'genericId',
                                     'controlType': 'search',
-                                    'toolTip': 'Search',
+                                    'toolTip': 'search',
                                     'custom': 'no',
                                     'events': [{
                                         'eventName': 'keypress',
@@ -2161,7 +2158,7 @@ function registerEpmLiveResourceGridScript() {
                                     'controlId': 'btnFilter',
                                     'controlType': 'button',
                                     'iconClass': 'icon-filter',
-                                    'toolTip': 'Filter',
+                                    'toolTip': 'toggle filters',
                                     'title': 'none',
                                     'events': [
                                         {
@@ -2175,7 +2172,7 @@ function registerEpmLiveResourceGridScript() {
                                     'controlId': 'btnDefaultSort',
                                     'controlType': 'button',
                                     'iconClass': 'icon-sort',
-                                    'toolTip': 'Default sort',
+                                    'toolTip': 'default sort',
                                     'title': 'none',
                                     'events': [
                                         {
@@ -2188,6 +2185,7 @@ function registerEpmLiveResourceGridScript() {
                                 {
                                     'controlType': 'groupByFields',
                                     //'availableGroups': 'Field1|Field1|111,Field2|Field2|222,Field3|Field3|333,Field4|Field4|444,Field5|Field5|555',
+                                    'toolTip': 'manage grouping',
                                     'availableGroups': sAvailableFlds,
                                     'saveFunction': function (data) {
                                         var sCols = null;
@@ -2214,7 +2212,7 @@ function registerEpmLiveResourceGridScript() {
                                     'title': '',
                                     'value': '',
                                     'iconClass': 'icon-insert-template',
-                                    'toolTip': 'Select columns',
+                                    'toolTip': 'select columns',
                                     'sections': [
                                         {
                                             'heading': 'none',
@@ -2285,7 +2283,6 @@ function registerEpmLiveResourceGridScript() {
                                     'title': 'View:',
                                     'value': $$.views.currentView.name,
                                     'iconClass': 'none',
-                                    'toolTip': 'Current view',
                                     'sections': [
                                         viewSectionTemplate,
                                         {
