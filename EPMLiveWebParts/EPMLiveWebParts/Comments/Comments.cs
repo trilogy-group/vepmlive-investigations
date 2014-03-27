@@ -136,7 +136,7 @@ namespace EPMLiveWebParts.Comments
             base.OnPreRender(e);
             EnsureCommentsListExist();
             EnsurePublicCommentsListExist();
-            ScriptLink.Register(Page, "/epmlive/javascripts/libraries/jquery.min.js", false);
+            //ScriptLink.Register(Page, "/epmlive/javascripts/libraries/jquery.min.js", false);
             //ScriptLink.Register(Page, "/epmlive/slimScroll.js", false);
             //ScriptLink.Register(Page, "/epmlive/TextBoxAutoGrow.js", false);
             ScriptLink.Register(Page, "/epmlive/CommentsWebPart.js", false);
