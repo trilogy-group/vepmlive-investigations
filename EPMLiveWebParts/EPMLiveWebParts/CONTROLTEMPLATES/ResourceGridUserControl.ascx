@@ -204,8 +204,6 @@
     </SharePoint:StyleBlock>
 
     <div id="test"></div>
-    <link rel="stylesheet" href="../../_layouts/15/epmlive/Stylesheets/epmliveToolBar.css" type="text/css" />
-    
     <div id="ResourceGridLoader" class="ms-dlgContent" tabindex="-1" style="z-index: 1505; display: none; width: 367px; height: 146px; left: 775.5px; top: 269px;">
         <div class="ms-dlgBorder" style="width: 365px; height: 144px;">
             <input type="button" value="Wrap focus to the end of the dialog" class="ms-accessible">
