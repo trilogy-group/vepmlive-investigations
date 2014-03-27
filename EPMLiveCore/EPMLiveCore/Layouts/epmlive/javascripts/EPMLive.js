@@ -630,6 +630,13 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
             }
             aContainer.attr('href', 'javascript:void(0)');
 
+            if (toolTip) {
+                aContainer.attr('data-toggle', 'tooltip');
+                aContainer.attr('data-placement', 'top');
+                aContainer.attr('data-delay', '200');
+                aContainer.attr('title', toolTip);
+            }
+
             if (iconClass &&
                 (iconClass != 'none')) {
                 var spnImg = $(document.createElement('span'));
@@ -682,6 +689,14 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
             aContainer.attr('class', 'dropdown-toggle');
             aContainer.attr('href', 'javascript:void(0)');
             aContainer.attr('controlId', controlId);
+
+            if (toolTip) {
+                aContainer.attr('data-toggle', 'tooltip');
+                aContainer.attr('data-placement', 'top');
+                aContainer.attr('data-delay', '200');
+                aContainer.attr('title', toolTip);
+            }
+
             //create span image
             if (iconClass &&
                 (iconClass != 'none')) {
