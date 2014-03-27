@@ -3,8 +3,9 @@
 .SummaryTask { font-weight: bold; }
 .EPMLiveResourceGridGroupTitle {
     cursor: pointer;
-    font-weight: bold;
+    font-weight:400;
     height: 22px;
+    font-family:"Open Sans Semi Bold";
     padding-bottom: 3px;
     padding-top: 7px !important;
     background-color:#ffffff !important;
@@ -894,11 +895,11 @@ u.GMSort0Right,u.GMSort1Right,u.GMSort2Right,u.GMSort3Right,u.GMSort4Right,u.GMS
 .GMSort5Left { background-position:left -1246px; }
 .GMSort6Left { background-position:left -1496px; }
 .GMSort0Right { background-position:right -14px; }   
-.GMSort1Right { background-position:right -246px; }
+.GMSort1Right { background-position:-2px -246px; }
 .GMSort2Right { background-position:right -496px; }
 .GMSort3Right { background-position:right -696px; }
 .GMSort4Right { background-position:right -996px; }
-.GMSort5Right { background-position:right -1246px; }
+.GMSort5Right { background-position:-2px -1246px; }
 .GMSort6Right { background-position:right -1496px; }
 
 /* -------------- Pager ------------------ */
