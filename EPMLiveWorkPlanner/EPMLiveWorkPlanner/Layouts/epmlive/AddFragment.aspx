@@ -10,7 +10,6 @@
 
 <asp:Content ID="PageHead" ContentPlaceHolderID="PlaceHolderAdditionalPageHead" runat="server">
     <link href="styles/fragments.css" rel='stylesheet' type='text/css' type='text/css' rel='stylesheet' />
-    <link href='http://www.uplandux.com/styleguide/css/bootstrap.css' type='text/css' rel='stylesheet' />
     <style type="text/css">
         .hdnRadio {
             display:none;
