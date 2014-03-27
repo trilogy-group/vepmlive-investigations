@@ -157,8 +157,7 @@ top:4px;
 
 .GMHtml,.GMText,.GMLines,.GMPass,.GMInt,.GMFloat,.GMDate,.GMLink,.GMImg,.GMRadio,.GMRadioText,.GMList,.GMEnum,.GMDropCols,.GMAbs,.GMPagerEdit,.GMUser,.GMGantt {
    font-size:14px; "Open Sans", Helvetica, Arial, sans-serif; white-space:nowrap;
-   padding-left:3px; padding-right:3px; padding-top:8px; padding-bottom:8px;height: 20px;line-height: 20px;position:relative
-color: #555
+  padding-left:3px; padding-right:3px; padding-top:8px; padding-bottom:8px;height: 20px;line-height: 20px;position:relative; color: #555
    }
 .GMInt,.GMFloat,.GMDate { text-align:right; }
 .GMLines,.GMRadio,.GMHtml,.GMList { white-space:normal; }	
@@ -176,7 +175,7 @@ color: #555
 .GMHiddenSpace { display:none; }
 .GMHeaderText { font-family: "Open Sans Regular", Helvetica, Arial, sans-serif; font-size: 14px; font-weight: 400; padding-left:3px; padding-right:3px; height: 20px;line-height: 20px; color: #555555 }
 .GMAbs { padding:0px; }
-.GMUser { padding:0px; }
+.GMUser { }
 .GMPagerEdit {
    vertical-align:top; text-align:center; background:white;
    padding-top:2px; padding-bottom:1px; border:0px none;
