@@ -44,7 +44,8 @@
                     },
 
                     classes: {
-                        commentPlaceholder: 'epm-se-placeholder'
+                        placeholder: 'epm-se-placeholder',
+                        expanded: 'epm-se-expanded',
                     }
                 },
                 moreActivityRequests: [],
@@ -198,28 +199,33 @@
 
             var commentManager = (function () {
                 var addPlaceholder = function (settings) {
-                    settings.input.addClass(config.ui.classes.commentPlaceholder);
+                    settings.input.addClass(config.ui.classes.placeholder);
                     settings.input.html(settings.placeholder);
                 };
 
                 var removePlaceholder = function(settings) {
-                    settings.input.removeClass(config.ui.classes.commentPlaceholder);
+                    settings.input.removeClass(config.ui.classes.placeholder);
                     settings.input.html('');
                 };
 
                 var attahEvents = function (settings) {
                     settings.input.focus(function () {
                         if ($(this).html() === settings.placeholder) removePlaceholder(settings);
+                        settings.input.addClass(config.ui.classes.expanded);
+                        settings.button.show();
                     });
 
                     settings.input.blur(function () {
                         var html = $(this).html();
                         if (html === '' || html === '<br>') addPlaceholder(settings);
+                        settings.input.removeClass(config.ui.classes.expanded);
+                        settings.button.hide();
                     });
                 };
                 
                 var _configureInput = function (settings) {
                     settings.input = settings.element.find(config.ui.selectors.commentBox);
+                    settings.button = settings.element.find('button');
                     
                     addPlaceholder(settings);
                     attahEvents(settings);

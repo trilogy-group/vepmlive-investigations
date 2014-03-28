@@ -36,6 +36,37 @@
         background-size: @size;
     }
 
+    .btn-sm {
+        font-size: 12px;
+        line-height: 1.5;
+        padding: 5px 10px;
+    }
+
+    .btn-default {
+        background-color: #FFFFFF;
+        border-color: #CCCCCC;
+        color: #444444;
+    }
+
+    .btn {
+        -moz-user-select: none;
+        -ms-user-select: none;
+        -webkit-user-select: none;
+        user-select: none;
+        background-image: none;
+        border: 1px solid rgba(0, 0, 0, 0);
+        .border-radius(2px);
+        cursor: pointer;
+        display: inline-block;
+        font-size: 14px;
+        line-height: 1.42857;
+        margin-bottom: 0;
+        padding: 6px 12px;
+        text-align: center;
+        vertical-align: middle;
+        white-space: nowrap;
+    }
+
     h1, h2 {
         font-family: @font !important;
     }
@@ -104,7 +135,7 @@
     li.epm-se-thread {
         text-align: left;
         margin-top: 12px;
-        padding: 5px 10px;
+        padding: 5px 10px 10px 10px;
         border: 1px solid @border-color;
         border-bottom-color: #EEEEEE;
         font-size: 14px;
@@ -160,18 +191,6 @@
                 margin-right: 8px;
             }
         }
-
-        div.epm-se-show-older {
-            border-bottom: 1px solid @border-color;
-            margin-bottom: 5px;
-            padding-bottom: 5px;
-        }
-
-        div.epm-se-show-newer {
-            border-top: 1px solid @border-color;
-            margin-top: 10px;
-            padding-top: 5px;
-        }
     }
 
     li.epm-se-activity {
@@ -217,12 +236,20 @@
             padding: 7px 10px;
         }
 
-            div.epm-se-comment-input.epm-se-placeholder {
-                color: #cccccc;
-            }
-
         button {
+            float: right;
+            .btn;
+            .btn-default;
+            .btn-sm;
             display: none;
+        }
+
+        div.epm-se-comment-input.epm-se-placeholder {
+            color: #cccccc;
+        }
+
+        div.epm-se-comment-input.epm-se-expanded {
+            min-height: 75px;
         }
     }
 

@@ -38,7 +38,6 @@
             {{else}}
                 {{> general-thread}}
             {{/if}}
-            <hr />
             <div class="epm-se-show-older" data-threadId="{{id}}" data-action="older"><span class="icon-arrow-down-16"></span>show older activities</div>
             <ul class="epm-se-older-activities"></ul>
             <ul class="epm-se-todays-activities"></ul>
@@ -129,7 +128,7 @@
 </script>
 
 <script id="_epm-se-comment-box" type="text/x-handlebars-template">
-    <div data-threadId="{{id}}" class="epm-se-comment-box">
+    <div data-threadId="{{id}}" class="epm-se-comment-box clearfix">
         <div class="epm-se-comment-input" contenteditable="true"></div>
         <button class="epm-se-comment-post">Post</button>
     </div>
