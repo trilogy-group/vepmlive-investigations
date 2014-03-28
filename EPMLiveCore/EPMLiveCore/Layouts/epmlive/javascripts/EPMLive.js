@@ -548,6 +548,9 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
 
         $('#' + anchorTagId).append(mainActionBar);
 
+        //initiate toolbar tooltips
+        $('.epmliveToolBar a[data-toggle=tooltip]').tooltip('show');
+
         function buildLeftBlockHTML(mainActionBar, blockContents) {
             var mainActionBar_LeftUl = $(document.createElement('ul'));
             mainActionBar_LeftUl.addClass('nav navbar-nav');
@@ -1428,9 +1431,7 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
         }
         //END HELPER
 
-        //initiate toolbar tooltips
-        $('.epmliveToolBar a[data-toggle=tooltip]').tooltip();
+      
     };
-
     window.SP.SOD.notifyScriptLoadedAndExecuteWaitingJobs('EPMLiveToolbar.js');
 })(window.epmLiveGenericToolBar = window.epmLiveGenericToolBar || {}, window.jQuery);
