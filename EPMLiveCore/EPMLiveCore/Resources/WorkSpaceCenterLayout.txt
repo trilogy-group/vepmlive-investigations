@@ -27,16 +27,16 @@
     <Text StartErr = "Fatal error! &lt;br/>My Work grid cannot render" />
   </Lang>
   <LeftCols>
-    <C Name="WorkSpace" Type="Html" Width="200" CanGroup="0" CanHide="0" CaseSensitive="0"  CanEdit="0"/>
-	<C Name="Description"  Width="200" CanGroup="0" CanHide="0" CanEdit="0"/>
-	<C Name="Owner" Width="150" CanGroup="0" CanHide="0" CanEdit="0"/>
-	<C Name="CreateDate" Width="100" CanGroup="0" CanHide="0" CanEdit="0"/>
-	<C Name="ModifiedDate" Width="100" CanGroup="0" CanHide="0" CanEdit="0"/>
-	<C Name="Members" Width="100" CanGroup="0" CanHide="0" CanEdit="0"/>
+    <C Name="WorkSpace" Type="Html" RelWidth="1" CanGroup="0" CanHide="0" CanEdit="0"/>
+	<C Name="Description" Type="Text" RelWidth="1" CanGroup="0" CanHide="0" CanEdit="0"/>
+	<C Name="Owner" Type="Text" RelWidth="1" CanGroup="0" CanHide="0" CanEdit="0"/>
+	<C Name="CreateDate" Type="Text" RelWidth="1" CanGroup="0" CanHide="0" CanEdit="0"/>
+	<C Name="ModifiedDate" Type="Text" RelWidth="1" CanGroup="0" CanHide="0" CanEdit="0"/>
+	<C Name="Members" Type="Text" RelWidth="1" CanGroup="0" CanHide="0" CanEdit="0"/>
   </LeftCols>
  <Cols/>
   <RightCols>
 
   </RightCols>
-  <Header Complete="" Edit="" WorkSpace="WorkSpace" Description="Description" Owner="Owner" CreateDate="CreateDate" ModifiedDate="ModifiedDate" Members="Members" NoEscape="1" SortIcons="2" HoverCell="" HoverRow="" />
+  <Header Complete="" Edit="" WorkSpace="Workspace" Description="Description" Owner="Owner" CreateDate="CreateDate" ModifiedDate="ModifiedDate" Members="Members" NoEscape="1" SortIcons="2" HoverCell="" HoverRow="" />
 </Grid>
