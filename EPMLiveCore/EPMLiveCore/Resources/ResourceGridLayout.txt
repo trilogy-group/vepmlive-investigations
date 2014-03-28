@@ -7,7 +7,7 @@
 	<Cfg NumberId="1" FullId="0" IdChars="1234567890" AddFocusCol="Title" />
 	<Cfg Searching="1" Selecting="1" Deleting="0" />
 	<Cfg StaticCursor="1" Dragging="0" SelectingCells="1" SelectClass="0" />
-	<Cfg NoTreeLines="1" DetailOn="0" MinRowHeight="20" MaxRowHeight="20" MidWidth="300" MenuColumnsSort="1" StandardFilter="2" />
+	<Cfg NoTreeLines="1" DetailOn="0" MinRowHeight="10" MaxRowHeight="15" MidWidth="300" MenuColumnsSort="1" StandardFilter="2" />
 	<Cfg Paging="2" AllPages="1" PageLength="10" MaxPages="20" NoPager="1" ChildParts="2" />
 	<Cfg Editing="0" />
 	<Cfg NoVScroll="0" />
