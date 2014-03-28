@@ -69,72 +69,71 @@ namespace EPMLiveWebParts.WorkSpaceCenter {
                     "    .workspacecentercontextmenu ul.epm-nav-contextual-menu li span.epm-nav-cm-ic" +
                     "on {\r\n                    top: 0px !important;\r\n                }\r\n</style>\r\n\r\n<" +
                     "script type=\"text/javascript\">\r\n\r\n    $(function () {\r\n        ExecuteOrDelayUnt" +
-                    "ilScriptLoaded(WorkspaceCenterClient.init(), \'EPMLive.Navigation.js\');\r\n    });\r" +
-                    "\n\r\n    var WorkspaceCenterClient = (function () {\r\n\r\n        var init = function" +
-                    " () {\r\n            loadWorkspaceCenterGrid();\r\n            toolbarCfg();\r\n      " +
-                    "  };\r\n\r\n        var toolbarCfg = function () {\r\n            var cfgs = [\r\n      " +
-                    "          {\r\n                    \'placement\': \'left\',\r\n                    \'cont" +
-                    "ent\': [\r\n                    // invite button\r\n                    {\r\n          " +
-                    "              \'controlId\': \'btnNew\',\r\n                        \'controlType\': \'bu" +
-                    "tton\',\r\n                        \'iconClass\': \'fui-plus\',\r\n                      " +
-                    "  \'title\': \'new item\',\r\n                        \'events\': [\r\n                   " +
-                    "         {\r\n                                \'eventName\': \'click\',\r\n             " +
-                    "                   \'function\': function () { WorkspaceCenterClient.createNewWork" +
-                    "space(); },\r\n                            }\r\n                        ]\r\n         " +
-                    "           }\r\n                    ]\r\n                },\r\n                {\r\n    " +
-                    "                \'placement\': \'right\',\r\n                    \'content\': [\r\n       " +
+                    "ilScriptLoaded(WorkspaceCenterClient.init, \'EPMLive.js\');\r\n    });\r\n\r\n    var Wo" +
+                    "rkspaceCenterClient = (function () {\r\n\r\n        var init = function () {\r\n      " +
+                    "      loadWorkspaceCenterGrid();\r\n            toolbarCfg();\r\n        };\r\n\r\n     " +
+                    "   var toolbarCfg = function () {\r\n            var cfgs = [\r\n                {\r\n" +
+                    "                    \'placement\': \'left\',\r\n                    \'content\': [\r\n    " +
+                    "                // invite button\r\n                    {\r\n                       " +
+                    " \'controlId\': \'btnNew\',\r\n                        \'controlType\': \'button\',\r\n     " +
+                    "                   \'iconClass\': \'fui-plus\',\r\n                        \'title\': \'n" +
+                    "ew item\',\r\n                        \'events\': [\r\n                            {\r\n " +
+                    "                               \'eventName\': \'click\',\r\n                          " +
+                    "      \'function\': function () { createNewWorkspace(); },\r\n                      " +
+                    "      }\r\n                        ]\r\n                    }\r\n                    ]" +
+                    "\r\n                },\r\n                {\r\n                    \'placement\': \'right" +
+                    "\',\r\n                    \'content\': [\r\n                    //search control\r\n    " +
+                    "                {\r\n                        \'controlId\': \'genericId\',\r\n          " +
+                    "              \'controlType\': \'search\',\r\n                        \'custom\': \'yes\'," +
+                    "\r\n                        \'customControlId\': \'\'\r\n                    },\r\n       " +
                     "             //search control\r\n                    {\r\n                        \'c" +
-                    "ontrolId\': \'genericId\',\r\n                        \'controlType\': \'search\',\r\n     " +
-                    "                   \'custom\': \'yes\',\r\n                        \'customControlId\': " +
-                    "\'\'\r\n                    },\r\n                    //search control\r\n              " +
-                    "      {\r\n                        \'controlId\': \'myWorkSpace_Search1\',\r\n          " +
-                    "              \'controlType\': \'search\',\r\n                        \'custom\': \'no\',\r" +
-                    "\n                        \'events\': [{\r\n                            \'eventName\': " +
-                    "\'keyup\',\r\n                            \'function\': function (e) {\r\n              " +
-                    "                  var query = $(this).val();\r\n                                va" +
-                    "r count = GetGrids();\r\n                                var grid = Grids[\"gridWor" +
-                    "kSpaceCenter\"];\r\n                                if (query.length > 0) {\r\n      " +
-                    "                              grid.ChangeFilter(\'WorkSpace\', query.toLowerCase()" +
-                    ", 11, 0, 1, null);\r\n                                }\r\n                         " +
-                    "       else {\r\n                                    grid.ChangeFilter(\'WorkSpace\'" +
-                    ", query.toLowerCase(), 12, 0, 1, null);\r\n                                }\r\n    " +
-                    "                            grid.Update();\r\n                                grid" +
-                    ".Render();\r\n                            }\r\n                        }\r\n          " +
-                    "              ]\r\n                    },\r\n                    //view control\r\n   " +
-                    "                 {\r\n                        \'controlId\': \'ddWorkspaceCenterView1" +
-                    "\',\r\n                        \'controlType\': \'dropdown\',\r\n                        " +
-                    "\'title\': \'View:\',\r\n                        \'value\': \'All Items\',\r\n              " +
-                    "          \'iconClass\': \'none\',\r\n                        \'sections\': [\r\n         " +
-                    "                   {\r\n                                \'heading\': \'none\',\r\n      " +
-                    "                          \'divider\': \'yes\',\r\n                                \'op" +
-                    "tions\': [\r\n                                    {\r\n                              " +
-                    "          \'iconClass\': \'none\',\r\n                                        \'text\': " +
-                    "\'All Items\',\r\n                                        \'events\': [\r\n             " +
-                    "                               {\r\n                                              " +
-                    "  \'eventName\': \'click\',\r\n                                                \'functi" +
-                    "on\': function () { WorkspaceCenterClient.changeView(\"AllItems\"); }\r\n            " +
-                    "                                }\r\n                                        ]\r\n\r\n" +
-                    "                                    },\r\n                                    {\r\n " +
-                    "                                       \'iconClass\': \'none\',\r\n                   " +
-                    "                     \'text\': \'My Workspace\',\r\n                                  " +
-                    "      \'events\': [\r\n                                            {\r\n              " +
-                    "                                  \'eventName\': \'click\',\r\n                       " +
-                    "                         \'function\': function () { WorkspaceCenterClient.changeV" +
-                    "iew(\"MyWorkspace\"); }\r\n                                            }\r\n          " +
-                    "                              ]\r\n                                    },\r\n       " +
-                    "                             {\r\n                                        \'iconCla" +
-                    "ss\': \'none\',\r\n                                        \'text\': \'My Favorite\',\r\n  " +
-                    "                                      \'events\': [\r\n                             " +
-                    "               {\r\n                                                \'eventName\': \'" +
-                    "click\',\r\n                                                \'function\': function ()" +
-                    " { WorkspaceCenterClient.changeView(\"MyFavorite\"); }\r\n                          " +
-                    "                  }\r\n                                        ]\r\n                " +
-                    "                    }\r\n\r\n                                ]\r\n                    " +
-                    "        }\r\n                        ]\r\n                    }\r\n                   " +
-                    " ]\r\n                }\r\n            ];\r\n            epmLiveGenericToolBar.generat" +
-                    "eToolBar(\'WorkSpacecenterToolbarMenu\', cfgs);\r\n        };\r\n\r\n        var changeV" +
-                    "iew = function (currentView) {\r\n            var source = Grids[\"gridWorkSpaceCen" +
-                    "ter\"].Source;\r\n            source.Data.url = \'");
+                    "ontrolId\': \'myWorkSpace_Search1\',\r\n                        \'controlType\': \'searc" +
+                    "h\',\r\n                        \'custom\': \'no\',\r\n                        \'events\': " +
+                    "[{\r\n                            \'eventName\': \'keyup\',\r\n                         " +
+                    "   \'function\': function (e) {\r\n                                var query = $(thi" +
+                    "s).val();\r\n                                var count = GetGrids();\r\n            " +
+                    "                    var grid = Grids[\"gridWorkSpaceCenter\"];\r\n                  " +
+                    "              if (query.length > 0) {\r\n                                    grid." +
+                    "ChangeFilter(\'WorkSpace\', query.toLowerCase(), 11, 0, 1, null);\r\n               " +
+                    "                 }\r\n                                else {\r\n                    " +
+                    "                grid.ChangeFilter(\'WorkSpace\', query.toLowerCase(), 12, 0, 1, nu" +
+                    "ll);\r\n                                }\r\n                                grid.Up" +
+                    "date();\r\n                                grid.Render();\r\n                       " +
+                    "     }\r\n                        }\r\n                        ]\r\n                  " +
+                    "  },\r\n                    //view control\r\n                    {\r\n               " +
+                    "         \'controlId\': \'ddWorkspaceCenterView1\',\r\n                        \'contro" +
+                    "lType\': \'dropdown\',\r\n                        \'title\': \'View:\',\r\n                " +
+                    "        \'value\': \'All Items\',\r\n                        \'iconClass\': \'none\',\r\n   " +
+                    "                     \'sections\': [\r\n                            {\r\n             " +
+                    "                   \'heading\': \'none\',\r\n                                \'divider\'" +
+                    ": \'yes\',\r\n                                \'options\': [\r\n                        " +
+                    "            {\r\n                                        \'iconClass\': \'none\',\r\n   " +
+                    "                                     \'text\': \'All Items\',\r\n                     " +
+                    "                   \'events\': [\r\n                                            {\r\n " +
+                    "                                               \'eventName\': \'click\',\r\n          " +
+                    "                                      \'function\': function () { changeView(\"AllI" +
+                    "tems\"); }\r\n                                            }\r\n                      " +
+                    "                  ]\r\n\r\n                                    },\r\n                 " +
+                    "                   {\r\n                                        \'iconClass\': \'none" +
+                    "\',\r\n                                        \'text\': \'My Workspace\',\r\n           " +
+                    "                             \'events\': [\r\n                                      " +
+                    "      {\r\n                                                \'eventName\': \'click\',\r\n" +
+                    "                                                \'function\': function () { change" +
+                    "View(\"MyWorkspace\"); }\r\n                                            }\r\n         " +
+                    "                               ]\r\n                                    },\r\n      " +
+                    "                              {\r\n                                        \'iconCl" +
+                    "ass\': \'none\',\r\n                                        \'text\': \'My Favorite\',\r\n " +
+                    "                                       \'events\': [\r\n                            " +
+                    "                {\r\n                                                \'eventName\': " +
+                    "\'click\',\r\n                                                \'function\': function (" +
+                    ") { changeView(\"MyFavorite\"); }\r\n                                            }\r\n" +
+                    "                                        ]\r\n                                    }" +
+                    "\r\n\r\n                                ]\r\n                            }\r\n          " +
+                    "              ]\r\n                    }\r\n                    ]\r\n                }" +
+                    "\r\n            ];\r\n            epmLiveGenericToolBar.generateToolBar(\'WorkSpacece" +
+                    "nterToolbarMenu\', cfgs);\r\n        };\r\n\r\n        var changeView = function (curre" +
+                    "ntView) {\r\n            var source = Grids[\"gridWorkSpaceCenter\"].Source;\r\n      " +
+                    "      source.Data.url = \'");
                        @__w.Write( WebUrl );
 
             @__w.Write(@"/_vti_bin/WorkEngine.asmx';

@@ -61,7 +61,7 @@
 <script type="text/javascript">
 
     $(function () {
-        ExecuteOrDelayUntilScriptLoaded(WorkspaceCenterClient.init(), 'EPMLive.Navigation.js');
+        ExecuteOrDelayUntilScriptLoaded(WorkspaceCenterClient.init, 'EPMLive.js');
     });
 
     var WorkspaceCenterClient = (function () {
@@ -85,7 +85,7 @@
                         'events': [
                             {
                                 'eventName': 'click',
-                                'function': function () { WorkspaceCenterClient.createNewWorkspace(); },
+                                'function': function () { createNewWorkspace(); },
                             }
                         ]
                     }
@@ -142,7 +142,7 @@
                                         'events': [
                                             {
                                                 'eventName': 'click',
-                                                'function': function () { WorkspaceCenterClient.changeView("AllItems"); }
+                                                'function': function () { changeView("AllItems"); }
                                             }
                                         ]
 
@@ -153,7 +153,7 @@
                                         'events': [
                                             {
                                                 'eventName': 'click',
-                                                'function': function () { WorkspaceCenterClient.changeView("MyWorkspace"); }
+                                                'function': function () { changeView("MyWorkspace"); }
                                             }
                                         ]
                                     },
@@ -163,7 +163,7 @@
                                         'events': [
                                             {
                                                 'eventName': 'click',
-                                                'function': function () { WorkspaceCenterClient.changeView("MyFavorite"); }
+                                                'function': function () { changeView("MyFavorite"); }
                                             }
                                         ]
                                     }
