@@ -41,6 +41,10 @@
                         showOlder: 'div.epm-se-show-older',
                         day: 'div.epm-se-header h1',
                         commentBox: 'div.epm-se-comment-input'
+                    },
+
+                    classes: {
+                        commentPlaceholder: 'epm-se-placeholder'
                     }
                 },
                 moreActivityRequests: [],
@@ -92,7 +96,10 @@
                 });
                 
                 _.subscribe('se.threadRendered', function (activityThread, thread, data, $thread) {
-                    //commentManager.configureBox($thread);
+                    commentManager.configureBox({
+                        element: $thread.parent().find("div.epm-se-comment-box[data-threadId='" + thread.id + "']"),
+                        placeholder: 'Share something...'
+                    });
                 });
 
                 $el.root.on('mouseenter', '.epm-se-has-tooltip', function() {
@@ -188,6 +195,40 @@
                     _.publish('se.dayLoaded', data.days[i], data);
                 }
             };
+
+            var commentManager = (function () {
+                var addPlaceholder = function (settings) {
+                    settings.input.addClass(config.ui.classes.commentPlaceholder);
+                    settings.input.html(settings.placeholder);
+                };
+
+                var removePlaceholder = function(settings) {
+                    settings.input.removeClass(config.ui.classes.commentPlaceholder);
+                    settings.input.html('');
+                };
+
+                var attahEvents = function (settings) {
+                    settings.input.focus(function () {
+                        if ($(this).html() === settings.placeholder) removePlaceholder(settings);
+                    });
+
+                    settings.input.blur(function () {
+                        var html = $(this).html();
+                        if (html === '' || html === '<br>') addPlaceholder(settings);
+                    });
+                };
+                
+                var _configureInput = function (settings) {
+                    settings.input = settings.element.find(config.ui.selectors.commentBox);
+                    
+                    addPlaceholder(settings);
+                    attahEvents(settings);
+                };
+                
+                return {
+                    configureBox: _configureInput
+                };
+            })();
 
             var entityManager = (function() {
                 var _getById = function(id, entities) {

@@ -6,11 +6,12 @@
 @avatar-size: 36px;
 @right-margin: 4px;
 @link-color: #0090CA;
-@activity-info-color:#CCCCCC;
-@activity-info-font-size:0.8em;
+@activity-info-color: #CCCCCC;
+@activity-info-font-size: 0.8em;
 @icon-font-size:1.5em;
-@activity-info-size:@header-height/2;
-@border-color: #EEEEEE;
+@activity-info-size: @header-height/2;
+@border-color: #DDDDDD;
+@comment-height: 20px;
 
 #epm-social-stream {
     width: 100%;
@@ -104,11 +105,12 @@
         text-align: left;
         margin-top: 12px;
         padding: 5px 10px;
-        border: 1px solid #EEEEEE;
+        border: 1px solid @border-color;
+        border-bottom-color: #EEEEEE;
         font-size: 14px;
         font-weight: 400;
         color: @activity-color;
-        .border-radius;
+        .border-radius(3px 3px 0 0);
 
         hr {
             border: none;
@@ -207,16 +209,20 @@
     }
 
     div.epm-se-comment-box {
-        display: none;
-
-        div {
-            float: left;
-            width: 85%;
+        div.epm-se-comment-input {
+            border: 1px solid @border-color;
+            border-top: none;
+            margin-bottom: 10px;
+            min-height: @comment-height;
+            padding: 7px 10px;
         }
 
+            div.epm-se-comment-input.epm-se-placeholder {
+                color: #cccccc;
+            }
+
         button {
-            float: right;
-            width: 50px;
+            display: none;
         }
     }
 

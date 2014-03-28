@@ -38,8 +38,8 @@ namespace EPMLiveWebParts.CONTROLTEMPLATES
 
             EPMLiveScriptManager.RegisterScript(Page, new[]
             {
-                "libraries/jquery.min", "libraries/handlebars-v1.3.0", "@libraries/amplify", "@libraries/bundles/moment",
-                "@EPMLive.SocialStream"
+                "libraries/jquery.min", "libraries/handlebars-v1.3.0", "@libraries/amplify",
+                "@libraries/bundles/moment", "@EPMLive.SocialStream"
             });
 
             SetTimeZone(web, context);

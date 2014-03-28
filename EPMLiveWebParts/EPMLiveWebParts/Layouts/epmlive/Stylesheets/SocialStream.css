@@ -61,21 +61,22 @@
   position: relative;
   top: 20px;
   margin: 0;
-  border-top-color: #eeeeee;
+  border-top-color: #dddddd;
 }
 #epm-social-stream li.epm-se-thread {
   text-align: left;
   margin-top: 12px;
   padding: 5px 10px;
-  border: 1px solid #EEEEEE;
+  border: 1px solid #dddddd;
+  border-bottom-color: #EEEEEE;
   font-size: 14px;
   font-weight: 400;
   color: #555555;
-  border-radius: 3px;
+  border-radius: 3px 3px 0 0;
 }
 #epm-social-stream li.epm-se-thread hr {
   border: none;
-  border-bottom: 1px solid #eeeeee;
+  border-bottom: 1px solid #dddddd;
 }
 #epm-social-stream li.epm-se-thread div.epm-se-header {
   text-align: left;
@@ -114,12 +115,12 @@
   margin-right: 8px;
 }
 #epm-social-stream li.epm-se-thread div.epm-se-show-older {
-  border-bottom: 1px solid #eeeeee;
+  border-bottom: 1px solid #dddddd;
   margin-bottom: 5px;
   padding-bottom: 5px;
 }
 #epm-social-stream li.epm-se-thread div.epm-se-show-newer {
-  border-top: 1px solid #eeeeee;
+  border-top: 1px solid #dddddd;
   margin-top: 10px;
   padding-top: 5px;
 }
@@ -155,16 +156,18 @@
   color: #555555;
   font-family: "Open Sans Regular", Helvetica, Arial !important;
 }
-#epm-social-stream div.epm-se-comment-box {
-  display: none;
+#epm-social-stream div.epm-se-comment-box div.epm-se-comment-input {
+  border: 1px solid #dddddd;
+  border-top: none;
+  margin-bottom: 10px;
+  min-height: 20px;
+  padding: 7px 10px;
 }
-#epm-social-stream div.epm-se-comment-box div {
-  float: left;
-  width: 85%;
+#epm-social-stream div.epm-se-comment-box div.epm-se-comment-input.epm-se-placeholder {
+  color: #cccccc;
 }
 #epm-social-stream div.epm-se-comment-box button {
-  float: right;
-  width: 50px;
+  display: none;
 }
 #epm-social-stream div.epm-se-user-info {
   margin-right: 4px;
