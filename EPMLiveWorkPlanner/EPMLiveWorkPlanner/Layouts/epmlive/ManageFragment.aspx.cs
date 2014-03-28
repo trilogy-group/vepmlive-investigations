@@ -89,7 +89,6 @@ namespace EPMLiveCore.Layouts.epmlive
                 }
 
                 fragment.Update();
-                plannerFragmentList.Update();
                 gridView.EditIndex = -1;
                 outFragment = fragment;
             }
@@ -113,7 +112,6 @@ namespace EPMLiveCore.Layouts.epmlive
             {
                 SPListItem fragment = plannerFragmentList.GetItemById(Convert.ToInt32(lblId.Text));
                 fragment.Recycle();
-                plannerFragmentList.Update();
                 if (gv.ID == "gridMyFragments")
                 {
                     FillMyFragmentsGrid();

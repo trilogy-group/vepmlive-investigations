@@ -44,7 +44,6 @@ namespace EPMLiveCore.Layouts.epmlive
                            }
 
                            plannerFragmentItem.Update();
-                           plannerFragmentList.Update();
                        }
                    }
                });
