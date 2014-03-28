@@ -302,6 +302,11 @@ namespace EPMLiveCore.SocialEngine
 
                             using (var transactionScope = new TransactionScope())
                             {
+                                if (_events.OnActivityRegistrationRequest != null)
+                                {
+                                    _events.OnActivityRegistrationRequest(args);
+                                }
+
                                 if (_events.OnValidateActivity != null)
                                 {
                                     _events.OnValidateActivity(args);
