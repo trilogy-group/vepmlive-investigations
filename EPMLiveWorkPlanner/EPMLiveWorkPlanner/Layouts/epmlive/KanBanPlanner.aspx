@@ -16,7 +16,7 @@
 
         $(function () {
             KanbanClient.resetControls(false);
-            ExecuteOrDelayUntilScriptLoaded(KanbanClient.loadKanBanPlanners(), 'EPMLive.js');
+            ExecuteOrDelayUntilScriptLoaded(KanbanClient.loadKanBanPlanners, 'EPMLive.js');
         });
 
 
