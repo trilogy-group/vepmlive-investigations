@@ -11,6 +11,12 @@ namespace EPMLiveWebParts.CONTROLTEMPLATES
 {
     public partial class SocialStream : UserControl
     {
+        #region Properties (1) 
+
+        public string CurrentUserTimeZone { get; private set; }
+
+        #endregion Properties 
+
         #region Methods (1) 
 
         // Protected Methods (1) 
@@ -23,8 +29,8 @@ namespace EPMLiveWebParts.CONTROLTEMPLATES
 
         protected override void OnPreRender(EventArgs e)
         {
-            var context = SPContext.Current;
-            var web = context.Web;
+            SPContext context = SPContext.Current;
+            SPWeb web = context.Web;
 
             string layoutPath = web.SafeServerRelativeUrl() + "/_layouts/15/epmlive/";
 
@@ -36,13 +42,19 @@ namespace EPMLiveWebParts.CONTROLTEMPLATES
                 "@EPMLive.SocialStream"
             });
 
+            SetTimeZone(web, context);
+        }
+
+        private void SetTimeZone(SPWeb web, SPContext context)
+        {
             CurrentUserTimeZone = "null";
 
             try
             {
-                var spTimeZone = (web.CurrentUser.RegionalSettings ?? context.RegionalSettings).TimeZone;
+                SPTimeZone spTimeZone = (web.CurrentUser.RegionalSettings ?? context.RegionalSettings).TimeZone;
 
-                var timeZone = TimeZoneInfo.GetSystemTimeZones().First(t => t.DisplayName.Equals(spTimeZone.Description));
+                TimeZoneInfo timeZone =
+                    TimeZoneInfo.GetSystemTimeZones().First(t => t.DisplayName.Equals(spTimeZone.Description));
 
                 var timeZoneInfo = new
                 {
@@ -61,7 +73,5 @@ namespace EPMLiveWebParts.CONTROLTEMPLATES
         }
 
         #endregion
-
-        public string CurrentUserTimeZone { get; private set; }
     }
 }
