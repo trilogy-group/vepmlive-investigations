@@ -415,8 +415,7 @@
     <Content Include="Layouts\epmlive\ImportExcelFinish.aspx" />
     <Content Include="Layouts\epmlive\ImportList.aspx" />
     <Content Include="Layouts\epmlive\javascripts\Fragment.js" />
-    <Content Include="Layouts\epmlive\javascripts\kanban\jquery-1.9.1.js" />
-    <Content Include="Layouts\epmlive\javascripts\kanban\jquery-ui.js" />
+    <Content Include="Layouts\epmlive\javascripts\kanban\jquery.dotdotdot.min.js" />
     <Content Include="Layouts\epmlive\javascripts\kanban\ui.dropdownchecklist-1.4-min.js" />
     <Content Include="Layouts\epmlive\javascripts\kanban\ui.dropdownchecklist.js" />
     <Content Include="Layouts\epmlive\KanBanPlanner.aspx" />
