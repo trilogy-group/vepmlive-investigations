@@ -43,7 +43,7 @@
 		
 	</Cols>
 	<RightCols>
-		<C Name="StopWatch" Visible="1" CanFilter="0" CanGroup="0" CanHide="0" CanSort="0" Width="80" Type="Html" CanEdit="0" CanResize="0" Align="Center"/>
+		<C Name="StopWatch" Visible="1" CanFilter="0" CanGroup="0" CanHide="0" CanSort="0" Width="80" Type="Html" CanEdit="0" CanResize="0" />
 	</RightCols>
 	<Foot>
 		<I id="-1" Def="Group" Calculated="1" LeftHtml="" MidHtml="" Class="Totals" Progress=""/>
