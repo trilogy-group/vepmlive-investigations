@@ -278,9 +278,9 @@ namespace TimeSheets
 
 
 
-                sDataParam = "<Param GridId=\"" + sFullGridId + "\" Period=\"" + sPeriodId + "\" UserId=\"" + sUserId + "\"/>";
-                sLayoutParam = "<Param GridId=\"" + sFullGridId + "\" Period=\"" + sPeriodId + "\" UserId=\"" + sUserId + "\" Editable=\"" + iEditable + "\" GridType=\"" + GridType + "\"/>";
-            
+            sDataParam = "<Param GridId=\"" + sFullGridId + "\" Period=\"" + sPeriodId + "\" UserId=\"" + sUserId + "\"/>";
+            sLayoutParam = "<Param GridId=\"" + sFullGridId + "\" Period=\"" + sPeriodId + "\" UserId=\"" + sUserId + "\" Editable=\"" + iEditable + "\" GridType=\"" + GridType + "\"/>";
+
             sDataParam = System.Web.HttpUtility.HtmlEncode(System.Web.HttpUtility.HtmlEncode(sDataParam));
             sLayoutParam = System.Web.HttpUtility.HtmlEncode(System.Web.HttpUtility.HtmlEncode(sLayoutParam));
             ///
@@ -614,7 +614,7 @@ namespace TimeSheets
 
             var str = new HtmlString(sb.ToString());
 
-            
+
 
 
             if (GridType == 0)
@@ -633,19 +633,41 @@ namespace TimeSheets
                                     </li>
                                     <li class=""nav-btn nav-text-wrapper"" style=""padding: 0px; float:left"">
                                         <div class=""nav-label"">Current Period:
-                                        </div>
-                                        <span class=""icon-arrow-left-17 icon"" onclick=""javascript:previousPeriodCommand('" + curUrl + "','" + iPreviousPeriod + "','" + Page.Request["Delegate"] + @"')"">
-                                        </span>
-                                        <div class=""nav-select"">" + str.ToHtmlString() + @"    
-                                        </div>
-                                        <span class=""icon-arrow-right-17 icon"" onclick=""javascript:nextPeriodCommand('" + curUrl + "','" + iNextPeriod + "','" + Page.Request["Delegate"] + @"')"">
-                                        </span>
-                                    </li>
-                                </ul>
-                            </div>
+                                        </div>");
+                if (iPreviousPeriod != 0)
+                {
+                    output.WriteLine(@"
+                <span class=""icon-arrow-left-17 icon"" onclick=""javascript:previousPeriodCommand('" + curUrl + "','" + iPreviousPeriod + "','" + Page.Request["Delegate"] + @"')""></span>                
+                ");
+                }
+                else
+                {
+                    output.WriteLine(@"
+                <span class=""icon-arrow-left-17 icon disabled""></span>                
+                ");
+                }
+
+                output.WriteLine(@"<div class=""nav-select"">" + str.ToHtmlString() + @" </div>");
+
+
+                if (iNextPeriod != 0)
+                {
+                    output.WriteLine(@"
+                <span class=""icon-arrow-right-17 icon"" onclick=""javascript:nextPeriodCommand('" + curUrl + "','" + iNextPeriod + "','" + Page.Request["Delegate"] + @"')""></span>                
+                ");
+                }
+                else
+                {
+                    output.WriteLine(@"
+                <span class=""icon-arrow-right-17 icon disabled""></span>                
+                ");
+                }
+                output.WriteLine(@"</li>
+                            </ul>
                         </div>
-                    </nav>
-                </div>");
+                    </div>
+                </nav>
+            </div>");
 
                 output.WriteLine("<div style=\"width:100%\">");
                 output.WriteLine(@"<treegrid Data_Url=""" + url + @"/_vti_bin/WorkEngine.asmx"" Data_Timeout=""0"" Data_Method=""Soap"" Data_Function=""Execute"" Data_Namespace=""workengine.com"" Data_Param_Function=""timesheet_GetTimesheetGrid"" Data_Param_Dataxml=""" + sDataParam + @""" 
@@ -666,19 +688,41 @@ namespace TimeSheets
                                 <ul class=""nav navbar-nav"" style=""list-style-type: none;padding: 0px; margin:0px;padding: 0px; "">
                                     <li class=""nav-btn nav-text-wrapper"" style=""float:left;padding: 0px; "">
                                         <div class=""nav-label"">Current Period:
-                                        </div>
-                                        <span class=""icon-arrow-left-17 icon"" onclick=""javascript:previousPeriodCommand('" + curUrl + "','" + iPreviousPeriod + "','" + Page.Request["Delegate"] + @"')"">
-                                        </span>
-                                        <div class=""nav-select"">" + str.ToHtmlString() + @"    
-                                        </div>
-                                        <span class=""icon-arrow-right-17 icon"" onclick=""javascript:nextPeriodCommand('" + curUrl + "','" + iNextPeriod + "','" + Page.Request["Delegate"] + @"')"">
-                                        </span>
-                                    </li>
-                                </ul>
-                            </div>
+                                        </div>");
+                if (iPreviousPeriod != 0)
+                {
+                    output.WriteLine(@"
+                <span class=""icon-arrow-left-17 icon"" onclick=""javascript:previousPeriodCommand('" + curUrl + "','" + iPreviousPeriod + "','" + Page.Request["Delegate"] + @"')""></span>                
+                ");
+                }
+                else
+                {
+                    output.WriteLine(@"
+                <span class=""icon-arrow-left-17 icon disabled""></span>                
+                ");
+                }
+
+                output.WriteLine(@"<div class=""nav-select"">" + str.ToHtmlString() + @" </div>");
+
+
+                if (iNextPeriod != 0)
+                {
+                    output.WriteLine(@"
+                <span class=""icon-arrow-right-17 icon"" onclick=""javascript:nextPeriodCommand('" + curUrl + "','" + iNextPeriod + "','" + Page.Request["Delegate"] + @"')""></span>                
+                ");
+                }
+                else
+                {
+                    output.WriteLine(@"
+                <span class=""icon-arrow-right-17 icon disabled""></span>                
+                ");
+                }
+                output.WriteLine(@"</li>
+                            </ul>
                         </div>
-                    </nav>
-                </div>");
+                    </div>
+                </nav>
+            </div>");
 
                 output.WriteLine("<div style=\"width:100%\">");
                 output.WriteLine(@"<treegrid Data_Url=""" + url + @"/_vti_bin/WorkEngine.asmx"" Data_Timeout=""0"" Data_Method=""Soap"" Data_Function=""Execute"" Data_Namespace=""workengine.com"" Data_Param_Function=""timesheet_GetTimesheetApprovalsGrid"" Data_Param_Dataxml=""" + sDataParam + @""" 
@@ -703,9 +747,9 @@ namespace TimeSheets
     
             </div>");
 
-            
+
             output.WriteLine(@"<script language=""javascript"">");
-            
+
             output.WriteLine("function LoadTSGrid" + sFullGridId + "(){ LoadTSGrid('" + sFullGridId + "');}");
 
             output.WriteLine("SP.SOD.executeOrDelayUntilScriptLoaded(LoadTSGrid" + sFullGridId + ", 'EPMLive.js');");
@@ -817,7 +861,8 @@ namespace TimeSheets
 
         public string DelayScript
         {
-            get {
+            get
+            {
                 if (GridType == 0)
                     return Properties.Resources.txtMyTimesheet_DelayScript;
                 else
