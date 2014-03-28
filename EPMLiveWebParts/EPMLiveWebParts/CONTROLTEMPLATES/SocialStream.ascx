@@ -14,7 +14,7 @@
 
 <div id="epm-social-stream">
     <ul id="epm-se-days"></ul>
-    <div id="epm-se-no-activity">You do not have any activities, yet!</div>
+    <div id="epm-se-no-activity">Get to work! Once you start working in the system, items will appear here in the stream.</div>
     <div id="epm-se-pagination"><span>Loading more...</span></div>
 </div>
 
