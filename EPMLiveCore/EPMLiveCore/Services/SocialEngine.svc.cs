@@ -21,7 +21,13 @@ namespace EPMLiveCore.Services
     [AspNetCompatibilityRequirements(RequirementsMode = AspNetCompatibilityRequirementsMode.Allowed)]
     public class SocialEngine
     {
-        #region Methods (12) 
+        #region Fields (1) 
+
+        private const string DATE_FORMAT = "s";
+
+        #endregion Fields 
+
+        #region Methods (13) 
 
         // Public Methods (2) 
 
@@ -57,26 +63,23 @@ namespace EPMLiveCore.Services
             return GetDailyActivities(minDate, maxDate, PAGE, 1000000, Guid.Parse(threadId));
         }
 
-        // Private Methods (10) 
+        // Private Methods (11) 
 
         private static DailyActivities.Activity BuildActivity(DataRow a, Guid threadId, object dateTime, int userId)
         {
-            if ((Guid) a["ThreadId"] == threadId)
-            {
-                return new DailyActivities.Activity
-                {
-                    id = (Guid) a["ActivityId"],
-                    key = a["ActivityKey"] as string,
-                    metaData = a["ActivityData"] as string,
-                    kind = ((ActivityKind) a["ActivityKind"]).ToString().ToUpper(),
-                    isMassOperation = (bool) a["IsMassOperation"],
-                    time = ((DateTime) dateTime).ToString("s"),
-                    user = userId,
-                    thread = threadId
-                };
-            }
+            if ((Guid) a["ThreadId"] != threadId) return null;
 
-            return null;
+            return new DailyActivities.Activity
+            {
+                id = (Guid) a["ActivityId"],
+                key = a["ActivityKey"] as string,
+                metaData = a["ActivityData"] as string,
+                kind = ((ActivityKind) a["ActivityKind"]).ToString().ToUpper(),
+                isMassOperation = (bool) a["IsMassOperation"],
+                time = ((DateTime) dateTime).ToString(DATE_FORMAT),
+                user = userId,
+                thread = threadId
+            };
         }
 
         private static OrderedParallelQuery<KeyValuePair<DateTime, List<DailyActivities.ActivityThread>>>
@@ -238,7 +241,7 @@ namespace EPMLiveCore.Services
                 title = r["ThreadTitle"] as string,
                 url = url,
                 kind = ((ObjectKind) r["ThreadKind"]).ToString().ToUpper(),
-                lastActivityOn = ((DateTime) r["ThreadLastActivityOn"]).ToString("s"),
+                lastActivityOn = ((DateTime) r["ThreadLastActivityOn"]).ToString(DATE_FORMAT),
                 days = new List<string> {activityDay},
                 web = webId,
                 list = listId as Guid?,
@@ -327,7 +330,8 @@ namespace EPMLiveCore.Services
             }
         }
 
-        private static void GetActivities(List<DataRow> activityRows, SPWeb spWeb, DateTime minDate, DateTime maxDate, int page, int limit, Guid? threadId)
+        private static void GetActivities(List<DataRow> activityRows, SPWeb spWeb, DateTime minDate, DateTime maxDate,
+            int page, int limit, Guid? threadId)
         {
             while (activityRows.Count < limit)
             {
@@ -369,6 +373,8 @@ namespace EPMLiveCore.Services
 
             if (!activityRows.Any()) return dailyActivities;
 
+            UpdateDateTimesToLocal(activityRows, spWeb);
+
             var daysProcessed = new List<string>();
             var threadsProcessed = new List<Guid>();
             var websProcessed = new List<Guid>();
@@ -389,7 +395,8 @@ namespace EPMLiveCore.Services
                 var userId = (int) t["UserId"];
                 var webUrl = (string) t["WebUrl"];
                 object dateTime = t["ActivityDate"];
-                string activityDay = (((DateTime) dateTime).Date).ToString("s");
+
+                string activityDay = (((DateTime) dateTime).Date).ToString(DATE_FORMAT);
 
                 DailyActivities.Thread thread = BuildThread(threadId, activityDay, webId, listId, t);
 
@@ -402,7 +409,8 @@ namespace EPMLiveCore.Services
                 {
                     object time = a["ActivityDate"];
 
-                    string day = (((DateTime) time).Date).ToString("s");
+                    string day = (((DateTime) time).Date).ToString(DATE_FORMAT);
+
                     if (!thread.days.Contains(day)) thread.days.Add(day);
 
                     var activityUserId = (int) a["UserId"];
@@ -444,7 +452,7 @@ namespace EPMLiveCore.Services
             }
 
             var dateOffset = (DateTime) activityThreads.AsParallel().Min(t => t["ActivityDate"]);
-            dailyActivities.meta.offset = dateOffset.ToString("s");
+            dailyActivities.meta.offset = dateOffset.ToString(DATE_FORMAT);
 
             dailyActivities.days = dailyActivities.days.AsParallel().OrderByDescending(d => d.id).ToList();
 
@@ -454,8 +462,8 @@ namespace EPMLiveCore.Services
         private void ParseMetaData(out int limit, out DateTime maxDate, out DateTime minDate)
         {
             limit = 20;
-            maxDate = DateTime.UtcNow;
-            minDate = new DateTime(2000, 1, 1);
+            maxDate = DateTime.MaxValue;
+            minDate = DateTime.MinValue;
 
             OperationContext context = OperationContext.Current;
             MessageProperties properties = context.IncomingMessageProperties;
@@ -487,6 +495,60 @@ namespace EPMLiveCore.Services
             {
                 DateTime.TryParse(parameters["minDate"], out minDate);
             }
+
+            var regionalSettings = SPContext.Current.RegionalSettings;
+
+            maxDate = maxDate == DateTime.MaxValue
+                ? DateTime.UtcNow
+                : regionalSettings.TimeZone.LocalTimeToUTC(maxDate);
+
+            minDate = minDate == DateTime.MinValue
+                ? new DateTime(2000, 1, 1)
+                : regionalSettings.TimeZone.LocalTimeToUTC(minDate);
+        }
+
+        private static void UpdateDateTimesToLocal(List<DataRow> activityRows, SPWeb spWeb)
+        {
+            var locker = new object();
+            var utcTimeDict = new Dictionary<DateTime, DateTime>();
+
+            DataColumnCollection columns = activityRows.First().Table.Columns;
+            List<string> dateColumns = (columns.Cast<DataColumn>().AsParallel()
+                .Where(column => column.DataType == typeof (DateTime) || column.DataType == typeof (SqlDateTime))
+                .Select(column => column.ColumnName)).ToList();
+
+            SPRegionalSettings regionalSettings = spWeb.CurrentUser.RegionalSettings ?? spWeb.RegionalSettings;
+
+            Parallel.ForEach(activityRows, row =>
+            {
+                foreach (string column in dateColumns)
+                {
+                    try
+                    {
+                        var value = (DateTime) row[column];
+
+                        if (utcTimeDict.ContainsKey(value))
+                        {
+                            row[column] = utcTimeDict[value];
+                        }
+                        else
+                        {
+                            DateTime result = regionalSettings.TimeZone.UTCToLocalTime(value);
+                            row[column] = result;
+
+                            lock (locker)
+                            {
+                                try
+                                {
+                                    utcTimeDict.Add(value, result);
+                                }
+                                catch { }
+                            }
+                        }
+                    }
+                    catch { }
+                }
+            });
         }
 
         #endregion Methods 
