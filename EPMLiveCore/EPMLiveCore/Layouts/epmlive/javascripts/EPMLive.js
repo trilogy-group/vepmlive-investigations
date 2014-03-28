@@ -1427,7 +1427,8 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
             return multiSelectStorage[id];
         }
         //END HELPER
+
+        $('.epmliveToolBar a[data-toggle=tooltip]').tooltip();
     };
-    $('.epmliveToolBar a[data-toggle=tooltip]').tooltip();
     window.SP.SOD.notifyScriptLoadedAndExecuteWaitingJobs('EPMLiveToolbar.js');
 })(window.epmLiveGenericToolBar = window.epmLiveGenericToolBar || {}, window.jQuery);
