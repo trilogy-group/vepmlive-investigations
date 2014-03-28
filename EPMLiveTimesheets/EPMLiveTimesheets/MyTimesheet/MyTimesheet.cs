@@ -499,7 +499,10 @@ namespace TimeSheets
 	                border-left: 1px solid #DDD!important;
 	                border-bottom: 1px solid #DDD!important;
                 }
-
+                .HideCol0StopWatch
+                {
+	                background-position: center center !important;
+                }
                 </style>");
 
             string sUserId = "";
@@ -589,6 +592,7 @@ namespace TimeSheets
                                     curServerDate = (new Date()).getTime() - (new Date('" + DateTime.Now.ToString("MMMM dd, yyyy H:mm:ss", culture) + @"')).getTime();
 
                                     TGSetEvent('OnRenderFinish', 'TS" + sFullGridId + @"', TSRenderFinish);
+                                    TGSetEvent('OnReady', 'TS" + sFullGridId + @"', TSReady);
                             </script>
                             ");
 

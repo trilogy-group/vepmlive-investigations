@@ -112,6 +112,18 @@ function LoadTSGrid(gridid) {
     EPM.UI.Loader.current().startLoading({ id: 'WebPart' + eval("TSObject" + gridid + ".Qualifier") });
 }
 
+function TSReady(grid) {
+    var gridid = GetTSGridId(grid);
+    if (GridType == "0") {
+
+    }
+    else
+    {
+        
+        
+    }
+    TGSetEvent("OnGetHtmlValue", grid.id, MYTSOnGetHtmlValue);
+}
 
 function TSRenderFinish(grid)
 {
@@ -132,10 +144,16 @@ function TSRenderFinish(grid)
             $(".TS_Comments").click(function () {
                 showComments(grid.id);
             });
+            try{
+                $("#tssw").tooltip();
+            } catch (e) { }
         }
     }
     else {
-        eval("loadMenu" + grid.id.substr(2) +"()");
+        eval("loadMenu" + grid.id.substr(2) + "()");
+        try {
+            $("#tsan").tooltip();
+        } catch (e) { }
     }
 }
 
@@ -151,6 +169,8 @@ Grids.OnScroll = function (grid) {
 
 
 Grids.OnKeyDown = function (grid, key, event, name, prefix) {
+    if (curPop)
+        return true;
     if (key == 46) {
         return true;
     }
@@ -1073,7 +1093,8 @@ function DoPopUp(grid, row, col) {
                     }
 
                     grid.EndEdit(true);
-
+                    grid.Focus(row, col);
+                    grid.StartEdit();
                     var strDivTag = "<div style='position: absolute; margin-left: 65px; cursor:pointer; z-index: 999;' onMouseDown=\"stopProp(event);\" onClick=\"showNotes(event);\"><img id=\"notesimg\" class=\"transparentnotes\" src=\"/_layouts/epmlive/images/" + image + ".png\"></div><div id='NotesDiv' style='z-index:999;position: absolute; margin-left: 65px; display:none; width:150px;height:100px;border: 1px solid black;background-color:#FFFFFF;cursor:pointer' onClick=\"stopProp(event);\"><textarea id='txtNotes' style='z-index:999;width:140px;height:60px;border:0px;margin-bottom:5px' onkeyup=\"stopProp(event);\" onclick=\"stopProp(event);\" onkeypress=\"stopProp(event);\"";
 
                     if (bLocked)
@@ -1468,32 +1489,77 @@ function StartStopWatch(grid, row) {
     }
 }
 
-Grids.OnGetHtmlValue = function (grid, row, col, val) {
+
+function ShowApprovalNotes(gridid, rowid, img) {
+    var grid = Grids[gridid];
+    var row = grid.GetRowById(rowid);
+
+    var oimg = $("#" + img.id);
+
+    curPop = true;
+
+    $('body').append("<div id='divanotes" + rowid.replace(/-/g, '') + "' style='width:150px;height:100px;position:absolute;left:" + oimg.offset().left + "px;top:" + oimg.offset().top + "px;border:1px solid #DDD;background-color:#FFF' onMouseDown=\"stopProp(event);\" ><textarea id=\"anotestxt" + rowid.replace(/-/g, '') + "\" style='width:140px;height:60px;border:none;resize: none;' onkeyup=\"stopProp(event);\" onclick=\"stopProp(event);\" onkeypress=\"stopProp(event);\">" + grid.GetValue(row, "ApprovalNotes") + "</textarea><input type=\"button\" style=\"float:right\" value=\"Ok\" onclick=\"CloseApprovalNotes('" + grid.id + "','" + row.id + "');\"></div>");
+}
+
+function CloseApprovalNotes(gridid, rowid)
+{
+    var grid = Grids[gridid];
+    var row = grid.GetRowById(rowid);
+
+    var otxt = $("#anotestxt" + rowid.replace(/-/g, ''));
+    grid.SetValue(row, "ApprovalNotes", otxt.get(0).value, 1);
+
+    $("#divanotes" + rowid.replace(/-/g, '')).remove();
+
+    curPop = false;
+}
+
+
+
+
+function MYTSOnGetHtmlValue(grid, row, col, val) {
     if (grid.id.substr(0, 2) == "TS") {
+        if (row.Def.Name == "Resource") {
+            if (col == "ApprovalNotes") {
+                var img = "tsnonotes";
+                if (grid.GetValue(row, col) != "") {
+                    img = "tsnotes"
+                }
 
-        if (col == "StopWatch") {
-            if (StopWatchRow && row.UID == StopWatchRow.UID) {
-
-                var dt = new Date(val);
-
-                var dtNow = new Date(new Date().getTime() - curServerDate);
-
-                var diff = dtNow.getTime() - dt.getTime();
-
-                if (diff < 0)
-                    return "0m";
-                else
-                    return GetTimeDisplay(diff);
-
+                return "<img src=\"/_layouts/15/epmlive/images/" + img + ".png\" onclick=\"ShowApprovalNotes('" + grid.id + "','" + row.id + "', this)\" id=\"ANote" + row.id + "\">";
             }
         }
-        else if (TSCols[col] || col == "TSTotals") {
-            if (val == "0" || val == "")
-                return "";
-            return getFormattedNumber(val.toLocaleString());
-        }
-    }
+        else {
+            if (col == "StopWatch") {
+                if (StopWatchRow && row.UID == StopWatchRow.UID) {
 
+                    var dt = new Date(val);
+
+                    var dtNow = new Date(new Date().getTime() - curServerDate);
+
+                    var diff = dtNow.getTime() - dt.getTime();
+
+                    if (diff < 0)
+                        return "0m";
+                    else
+                        return GetTimeDisplay(diff);
+
+                }
+            }
+            else if (TSCols[col] || col == "TSTotals") {
+                if (val == "0" || val == "")
+                    return "";
+                return getFormattedNumber(val.toLocaleString());
+            }
+            else if (col == "Progress" && row.Def.Name=="R") {
+                try {
+                    return (parseFloat(val) * 100).toFixed(0) + "%";
+                } catch (e) { return "0%"; }
+            }
+        }
+       
+    }
+    return val;
 }
 
 function getFormattedNumber(Amount) {

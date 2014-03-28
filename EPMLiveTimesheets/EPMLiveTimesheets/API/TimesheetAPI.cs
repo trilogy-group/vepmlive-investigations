@@ -1450,6 +1450,22 @@ namespace TimeSheets
                     attr2.Value = "0";
                     ndNewCol.Attributes.Append(attr2);
 
+                    attr2 = docLayout.CreateAttribute("CanEdit");
+                    attr2.Value = "0";
+                    ndNewCol.Attributes.Append(attr2);
+
+                    attr2 = docLayout.CreateAttribute("Width");
+                    attr2.Value = "30";
+                    ndNewCol.Attributes.Append(attr2);
+
+                    attr2 = docLayout.CreateAttribute("Align");
+                    attr2.Value = "Center";
+                    ndNewCol.Attributes.Append(attr2);
+
+                    attr2 = docLayout.CreateAttribute("Type");
+                    attr2.Value = "Html";
+                    ndNewCol.Attributes.Append(attr2);
+
                     ndLeftCols.PrependChild(ndNewCol);
 
                     
