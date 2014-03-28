@@ -10,9 +10,9 @@ namespace EPMLiveReportsAdmin
 {
     internal static class SocialEngineEvents
     {
-        #region Methods (6) 
+		#region Methods (6) 
 
-        // Public Methods (3) 
+		// Public Methods (3) 
 
         public static void ItemAdded(SPItemEventProperties properties)
         {
@@ -30,7 +30,7 @@ namespace EPMLiveReportsAdmin
                     {"WebId", properties.Web.ID},
                     {"SiteId", properties.SiteId},
                     {"UserId", new SPFieldUserValue(properties.Web, (string) properties.ListItem["Author"]).LookupId},
-                    {"ActivityTime",GetActivityTime(properties, "Created")}
+                    {"ActivityTime",properties.ListItem["Created"]}
                 };
 
                 GetAssignedToUsers(properties, data);
@@ -39,12 +39,6 @@ namespace EPMLiveReportsAdmin
                 SocialEngineProxy.ProcessActivity(ObjectKind.ListItem, ActivityKind.Created, data, properties.Web);
             }
             catch { }
-        }
-
-        private static DateTime GetActivityTime(SPItemEventProperties properties, string fieldName)
-        {
-            var regionalSettings = properties.Web.CurrentUser.RegionalSettings ?? properties.Web.RegionalSettings;
-            return regionalSettings.TimeZone.LocalTimeToUTC((DateTime) properties.ListItem[fieldName]);
         }
 
         public static void ItemDeleting(SPItemEventProperties properties)
@@ -89,7 +83,7 @@ namespace EPMLiveReportsAdmin
                     {"WebId", properties.Web.ID},
                     {"SiteId", properties.SiteId},
                     {"UserId", new SPFieldUserValue(properties.Web, (string) properties.ListItem["Editor"]).LookupId},
-                    {"ActivityTime", GetActivityTime(properties, "Modified")}
+                    {"ActivityTime", properties.ListItem["Modified"]}
                 };
 
                 GetAssignedToUsers(properties, data);
@@ -99,8 +93,7 @@ namespace EPMLiveReportsAdmin
             }
             catch { }
         }
-
-        // Private Methods (3) 
+		// Private Methods (3) 
 
         private static void GetAssignedToUsers(SPItemEventProperties properties, Dictionary<string, object> data)
         {
@@ -167,6 +160,6 @@ namespace EPMLiveReportsAdmin
             return true;
         }
 
-        #endregion Methods 
+		#endregion Methods 
     }
 }
