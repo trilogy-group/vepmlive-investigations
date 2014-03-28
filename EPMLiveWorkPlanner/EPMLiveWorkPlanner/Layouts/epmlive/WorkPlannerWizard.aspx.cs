@@ -113,7 +113,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                 sb.Append(plannerid);
                 sb.Append("|Online')\" class=\"btn btn-large\"><TABLE border=0 cellSpacing=0 cellPadding=0 width=\"100%\" height=\"100%\"><tr>");
                 sb.Append("<td style=\"vertical-align:middle; text-align:center\" width=\"80px\" valign=\"center\" align=\"center\">");
-                sb.Append("<img style=\"margin-top:2px;width:60px;\" src=\"");
+                sb.Append("<img style=\"margin-top:2px;width:56px;\" src=\"");
                 sb.Append(((Web.ServerRelativeUrl == "/") ? "" : Web.ServerRelativeUrl));
                 sb.Append(icon);
                 sb.Append("\"></td>");
@@ -122,7 +122,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                 sb.Append("</span>");
                 if (desc != "")
                 {
-                    sb.Append("<div style=\"padding-top: 5px;padding-bottom:10px;padding-right:5px;work-wrap:break-word;\">");
+                    sb.Append("<div style=\"padding-top: 5px;padding-bottom:10px;padding-right:5px;min-height:35px;work-wrap:break-word;\">");
                     sb.Append(desc);
                     sb.Append("</div>");
                 }
@@ -136,7 +136,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                 sb.Append(plannerid);
                 sb.Append("|Project')\" class=\"btn btn-large\"><TABLE border=0 cellSpacing=0 cellPadding=0 width=\"100%\" height=\"100%\"><tr>");
                 sb.Append("<td style=\"vertical-align:middle; text-align:center\" width=\"80px\" valign=\"center\" align=\"center\">");
-                sb.Append("<img style=\"margin-top:2px;width:60px;\" src=\"");
+                sb.Append("<img style=\"margin-top:2px;width:56px;\" src=\"");
                 sb.Append(((Web.ServerRelativeUrl == "/") ? "" : Web.ServerRelativeUrl));
                 sb.Append("/_layouts/epmlive/images/planner_project.png\"></td>");
                 sb.Append("<td class=\"titletd\"><span>");
@@ -147,7 +147,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                     sb.Append(" for Microsoft Project</span>");
                 if (desc != "")
                 {
-                    sb.Append("<div style=\"padding-top: 5px;padding-bottom:10px;padding-right:5px;work-wrap:break-word;\">");
+                    sb.Append("<div style=\"padding-top: 5px;padding-bottom:10px;padding-right:5px;min-height:35px;work-wrap:break-word;\">");
                     sb.Append(desc);
                     sb.Append("</div>");
                 }
@@ -159,7 +159,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
             {
                 sb.Append("<a href=\"javascript:void(0);\" onclick=\"javascript:window.top.location.href='KanBanPlanner.aspx?ID=" + Request["ID"] + "&planner=" + plannerid + "'\" class=\"btn btn-large\"><TABLE border=0 cellSpacing=0 cellPadding=0 width=\"100%\" height=\"100%\"><tr>");
                 sb.Append("<td style=\"vertical-align:middle; text-align:center\" width=\"80px\" valign=\"center\" align=\"center\">");
-                sb.Append("<img style=\"margin-top:2px;width:60px;\" src=\"");
+                sb.Append("<img style=\"margin-top:2px;width:56px;\" src=\"");
                 sb.Append(((Web.ServerRelativeUrl == "/") ? "" : Web.ServerRelativeUrl));
                 sb.Append("/_layouts/epmlive/images/planner_kanban.png\"></td>");
                 sb.Append("<td class=\"titletd\"><span>");
@@ -167,7 +167,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                 sb.Append("</span>");
                 if (desc != "")
                 {
-                    sb.Append("<div style=\"padding-top: 5px;padding-bottom:10px;padding-right:5px;work-wrap:break-word;\">");
+                    sb.Append("<div style=\"padding-top: 5px;padding-bottom:10px;padding-right:5px;min-height:35px;work-wrap:break-word;\">");
                     sb.Append(desc);
                     sb.Append("</div>");
                 }
