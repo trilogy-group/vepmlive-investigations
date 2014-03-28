@@ -1431,5 +1431,6 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
         //initiate toolbar tooltips
         $('.epmliveToolBar a[data-toggle=tooltip]').tooltip();
     };
+
     window.SP.SOD.notifyScriptLoadedAndExecuteWaitingJobs('EPMLiveToolbar.js');
 })(window.epmLiveGenericToolBar = window.epmLiveGenericToolBar || {}, window.jQuery);
