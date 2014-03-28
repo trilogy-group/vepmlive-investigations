@@ -247,7 +247,7 @@
                     if ($li.length) {
                         _.publish('se.dayRendered', day, data, $li);
                     } else {
-                        day.day = actions.getLocalTime(day.id).calendar();
+                        day.day = actions.moment(day.id).calendar();
 
                         $days.append(templates.day(day));
 
@@ -269,7 +269,7 @@
                 };
 
                 var _getDisplayTime = function(activity) {
-                    var date = actions.getLocalTime(activity.time);
+                    var date = actions.moment(activity.time);
 
                     moment.lang('en', {
                         calendar: {
@@ -290,7 +290,7 @@
                 };
 
                 var _getLongTime = function(activity) {
-                    return actions.getLocalTime(activity.time).format('LLLL');
+                    return actions.moment(activity.time).format('LLLL');
                 };
 
                 var getIcon = function(activity) {
@@ -525,28 +525,11 @@
                     });
                 };
 
-                var _getLocalTime = function(dateTime) {
-                    var dt = moment(dateTime);
-
-                    if (window.epmLive.currentUserTimeZone) {
-                        try {
-                            dt = dt.tz(window.epmLive.currentUserTimeZone.olsonName);
-                        } catch (e) {
-                            if (window.epmLive.debugMode) {
-                                console.log(e.message);
-                            }
-                        }
-                    }
-
-                    return dt;
-                };
-
                 return {
                     showTooltip: _showTooltip,
                     navigate: _navigate,
                     paginate: _paginate,
-                    loadMore: _loadMoreActivities,
-                    getLocalTime:_getLocalTime
+                    loadMore: _loadMoreActivities
                 };
             })();
 
