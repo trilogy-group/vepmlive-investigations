@@ -412,7 +412,7 @@ function CreateEPMLiveWorkspace(listid, itemid) {
         title: 'Create Workspace',
         dialogReturnValueCallback: function (dialogResult, returnValue) {
             if (dialogResult === 1) {
-                
+
                 toastr.options = {
                     "closeButton": false,
                     "debug": false,
@@ -505,7 +505,7 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
         location.href = tUrl;
     }
 
-   
+
 }
 
 (function (epmToolBar, $) {
@@ -548,8 +548,7 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
 
         $('#' + anchorTagId).append(mainActionBar);
 
-        //initiate toolbar tooltips
-        $('.epmliveToolBar a[data-toggle=tooltip]').tooltip('show');
+        $('.epmliveToolBar a[data-toggle=tooltip]').tooltip();
 
         function buildLeftBlockHTML(mainActionBar, blockContents) {
             var mainActionBar_LeftUl = $(document.createElement('ul'));
@@ -637,6 +636,7 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
                 aContainer.attr('data-toggle', 'tooltip');
                 aContainer.attr('data-placement', 'top');
                 aContainer.attr('data-delay', '200');
+                aContainer.attr('data-container', 'body');
                 aContainer.attr('title', toolTip);
             }
 
@@ -696,6 +696,7 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
             if (toolTip) {
                 aContainer.attr('data-toggle', 'tooltip');
                 aContainer.attr('data-placement', 'top');
+                aContainer.attr('data-container', 'body');
                 aContainer.attr('data-delay', '200');
                 aContainer.attr('title', toolTip);
             }
@@ -860,7 +861,15 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
                 aContainer.attr('class', 'nav-icon');
                 aContainer.attr('style', 'font-size:.9em;');
                 aContainer.attr('href', 'javascript:void(0)');
-                
+
+                if (toolTip) {
+                    aContainer.attr('data-toggle', 'tooltip');
+                    aContainer.attr('data-placement', 'top');
+                    aContainer.attr('data-container', 'body');
+                    aContainer.attr('data-delay', '200');
+                    aContainer.attr('title', toolTip);
+                }
+
                 aContainer.click(function () {
                     if ($(".toolbar-search").css("margin-left") == "0px") {
                         $(".toolbar-search").css("margin-left", "-160px");
@@ -891,6 +900,7 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
             if (toolTip) {
                 aContainer.attr('data-toggle', 'tooltip');
                 aContainer.attr('data-placement', 'top');
+                aContainer.attr('data-container', 'body');
                 aContainer.attr('data-delay', '200');
                 aContainer.attr('title', toolTip);
             }
@@ -1138,6 +1148,7 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
             if (toolTip) {
                 aContainer.attr('data-toggle', 'tooltip');
                 aContainer.attr('data-placement', 'top');
+                aContainer.attr('data-container', 'body');
                 aContainer.attr('data-delay', '200');
                 aContainer.attr('title', toolTip);
             }
@@ -1430,8 +1441,7 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
             return multiSelectStorage[id];
         }
         //END HELPER
-
-      
     };
+
     window.SP.SOD.notifyScriptLoadedAndExecuteWaitingJobs('EPMLiveToolbar.js');
 })(window.epmLiveGenericToolBar = window.epmLiveGenericToolBar || {}, window.jQuery);
