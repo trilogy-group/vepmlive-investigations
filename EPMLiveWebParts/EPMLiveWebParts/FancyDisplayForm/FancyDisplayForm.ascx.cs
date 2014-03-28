@@ -195,13 +195,13 @@ namespace EPMLiveWebParts
                                     switch (field.Type)
                                     {
                                         case SPFieldType.DateTime:
-                                            FillDateDetailsSection(field.Title, field.GetFieldValueAsHtml(item[field.Title]));
+                                            FillDateDetailsSection(field.Title, field.GetFieldValueAsHtml(item[field.InternalName]));
                                             break;
                                         case SPFieldType.User:
-                                            FillPeopleDetailsSection(field.Title, Convert.ToString(item[field.Title]));
+                                            FillPeopleDetailsSection(field.Title, Convert.ToString(item[field.InternalName]));
                                             break;
                                         case SPFieldType.Note:
-                                            FillNarrativeDetailsSection(field.Title, field.GetFieldValueAsHtml(item[field.Title]));
+                                            FillNarrativeDetailsSection(field.Title, field.GetFieldValueAsHtml(item[field.InternalName]));
                                             break;
                                         default:
                                             FillQuickDetailsSection(field, item);
@@ -232,13 +232,13 @@ namespace EPMLiveWebParts
                                         switch (field.Type)
                                         {
                                             case SPFieldType.DateTime:
-                                                FillDateDetailsSection(field.Title, field.GetFieldValueAsText(item[field.Title]));
+                                                FillDateDetailsSection(field.Title, field.GetFieldValueAsText(item[field.InternalName]));
                                                 break;
                                             case SPFieldType.User:
-                                                FillPeopleDetailsSection(field.Title, Convert.ToString(item[field.Title]));
+                                                FillPeopleDetailsSection(field.Title, Convert.ToString(item[field.InternalName]));
                                                 break;
                                             case SPFieldType.Note:
-                                                FillNarrativeDetailsSection(field.Title, field.GetFieldValueAsText(item[field.Title]));
+                                                FillNarrativeDetailsSection(field.Title, field.GetFieldValueAsText(item[field.InternalName]));
                                                 break;
                                             default:
                                                 FillQuickDetailsSection(field, item);
@@ -260,13 +260,13 @@ namespace EPMLiveWebParts
                             switch (field.Type)
                             {
                                 case SPFieldType.DateTime:
-                                    FillDateDetailsSection(field.Title, field.GetFieldValueAsHtml(item[field.Title]));
+                                    FillDateDetailsSection(field.Title, field.GetFieldValueAsHtml(item[field.InternalName]));
                                     break;
                                 case SPFieldType.User:
-                                    FillPeopleDetailsSection(field.Title, Convert.ToString(item[field.Title]));
+                                    FillPeopleDetailsSection(field.Title, Convert.ToString(item[field.InternalName]));
                                     break;
                                 case SPFieldType.Note:
-                                    FillNarrativeDetailsSection(field.Title, field.GetFieldValueAsHtml(item[field.Title]));
+                                    FillNarrativeDetailsSection(field.Title, field.GetFieldValueAsHtml(item[field.InternalName]));
                                     break;
                                 default:
                                     FillQuickDetailsSection(field, item);
@@ -460,7 +460,7 @@ namespace EPMLiveWebParts
 
         private void FillQuickDetailsSection(SPField field, SPListItem item)
         {
-            string fieldValue = field.GetFieldValueAsHtml(item[field.Title]);
+            string fieldValue = field.GetFieldValueAsHtml(item[field.InternalName]);
 
             if (quickDetailsFieldsCount == 0)
             {
