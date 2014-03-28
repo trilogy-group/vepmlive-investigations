@@ -5413,6 +5413,7 @@ namespace EPMLiveWorkPlanner
             DataTable dtSourceListData = new DataTable();
             DataTable dtColumns = new DataTable();
             DataTable dtFRFData = new DataTable();
+            DataRow[] dtSourceListDataRows = null;
 
             #endregion
 
@@ -5525,29 +5526,30 @@ namespace EPMLiveWorkPlanner
                                 }
                             }
                         }
-                        else
+
+                        if (dtSourceListData != null && dtSourceListData.Rows.Count > 0)
                         {
-                            return string.Empty;
+                            dtSourceListDataRows = dtSourceListData.Select("", string.Format("{0},{1}", props.KanBanStatusColumn, "F_INT"));
                         }
 
-                        DataRow[] dtSourceListDataRows = dtSourceListData.Select("", string.Format("{0},{1}", props.KanBanStatusColumn, "F_INT"));
+
+
+                        //Actual Logic Started...
+                        sbItems.Append("<table cellpadding='0' cellspacing='0'>");
+                        sbItems.Append("<tbody>");
+                        sbItems.Append("<tr id='mainTR'>");
+
+                        sbItems.Append("<td id='itemContainerTD'>");
+                        sbItems.Append("<div id='itemContainer' class='itemContainer'>"); //itemContainer <div> started
+                        sbItems.Append("<div class='itemContainerTitle'>Backlog " + list.Title + " Items</div>"); //itemContainerTitle <div> completed
+                        sbItems.Append("<div class='sortable-list' data-dragged-status='" + list.Title + "' id='" + Regex.Replace(list.Title, "[^a-zA-Z_]+", "").Replace(" ", "") + "'>");
+
+                        string selectedStatusColumnValues = EPMLiveCore.CoreFunctions.getConfigSetting(spWeb, "EPMLivePlanner" + kanBanBoardName + "KanBanItemStatusFields");
+
+                        #region Load BackLog Status Items
 
                         if (dtSourceListDataRows != null && dtSourceListDataRows.Length > 0)
                         {
-                            //Actual Logic Started...
-                            sbItems.Append("<table cellpadding='0' cellspacing='0'>");
-                            sbItems.Append("<tbody>");
-                            sbItems.Append("<tr id='mainTR'>");
-
-                            sbItems.Append("<td id='itemContainerTD'>");
-                            sbItems.Append("<div id='itemContainer' class='itemContainer'>"); //itemContainer <div> started
-                            sbItems.Append("<div class='itemContainerTitle'>Backlog " + list.Title + " Items</div>"); //itemContainerTitle <div> completed
-                            sbItems.Append("<div class='sortable-list' data-dragged-status='" + list.Title + "' id='" + Regex.Replace(list.Title, "[^a-zA-Z_]+", "").Replace(" ", "") + "'>");
-
-                            string selectedStatusColumnValues = EPMLiveCore.CoreFunctions.getConfigSetting(spWeb, "EPMLivePlanner" + kanBanBoardName + "KanBanItemStatusFields");
-
-                            #region Load BackLog Status Items
-
                             foreach (DataRow row in dtSourceListDataRows)
                             {
                                 string statusColumnValue = Convert.ToString(row[props.KanBanStatusColumn]);
@@ -5575,39 +5577,41 @@ namespace EPMLiveWorkPlanner
                                     sbItems.Append("</div>"); //sortable-item <div> completed
                                 }
                             }
+                        }
+                        sbItems.Append("</div>"); //sortable-list <div> completed
+                        sbItems.Append("</div>");//itemContainer <div> Completed
+                        sbItems.Append("</td>");
 
-                            sbItems.Append("</div>"); //sortable-list <div> completed
-                            sbItems.Append("</div>");//itemContainer <div> Completed
-                            sbItems.Append("</td>");
+                        #endregion
 
-                            #endregion
+                        #region Load Stages
 
-                            #region Load Stages
+                        //Load All Stages - Based on Status Column Selection
+                        string statusFieldName = EPMLiveCore.CoreFunctions.getConfigSetting(spWeb, "EPMLivePlanner" + kanBanBoardName + "KanBanStatusColumn");
+                        SPFieldChoice choiceField = list.Fields.GetField(statusFieldName) as SPFieldChoice;
+                        StringCollection statusValues = choiceField.Choices;
 
-                            //Load All Stages - Based on Status Column Selection
-                            string statusFieldName = EPMLiveCore.CoreFunctions.getConfigSetting(spWeb, "EPMLivePlanner" + kanBanBoardName + "KanBanStatusColumn");
-                            SPFieldChoice choiceField = list.Fields.GetField(statusFieldName) as SPFieldChoice;
-                            StringCollection statusValues = choiceField.Choices;
-
-                            if (statusValues.Count > 0)
+                        if (statusValues.Count > 0)
+                        {
+                            foreach (string status in statusValues)
                             {
-                                foreach (string status in statusValues)
+                                if (selectedStatusColumnValues.Contains(status))
                                 {
-                                    if (selectedStatusColumnValues.Contains(status))
+                                    sbItems.Append("<td>");
+                                    sbItems.Append("<div class='stageContainer'>"); //stageContainer <div> started
+
+                                    //Load Splitter...
+                                    if (!splitterLoaded)
                                     {
-                                        sbItems.Append("<td>");
-                                        sbItems.Append("<div class='stageContainer'>"); //stageContainer <div> started
+                                        sbItems.Append("<div id='splitter'><<</div>");
+                                        splitterLoaded = true;
+                                    }
 
-                                        //Load Splitter...
-                                        if (!splitterLoaded)
-                                        {
-                                            sbItems.Append("<div id='splitter'><<</div>");
-                                            splitterLoaded = true;
-                                        }
+                                    sbItems.Append("<div class='stageContainerTitle'>" + status + "</div>");
+                                    sbItems.Append("<div class='sortable-list' data-dragged-status='" + status + "' id='" + Regex.Replace(status, "[^a-zA-Z_]+", "").Replace(" ", "") + "'>");
 
-                                        sbItems.Append("<div class='stageContainerTitle'>" + status + "</div>");
-                                        sbItems.Append("<div class='sortable-list' data-dragged-status='" + status + "' id='" + Regex.Replace(status, "[^a-zA-Z_]+", "").Replace(" ", "") + "'>");
-
+                                    if (dtSourceListDataRows != null && dtSourceListDataRows.Length > 0)
+                                    {
                                         foreach (DataRow row in dtSourceListDataRows)
                                         {
                                             string currentProcessingStatus = Convert.ToString(row[statusFieldName]);
@@ -5635,20 +5639,21 @@ namespace EPMLiveWorkPlanner
                                                 sbItems.Append("</div>");//sortable-item <div> Completed
                                             }
                                         }
-
-                                        sbItems.Append("</div>"); //sortable-list <div> completed
-                                        sbItems.Append("</div>"); //stageContainer <div> completed
-                                        sbItems.Append("</td>");
                                     }
+
+                                    sbItems.Append("</div>"); //sortable-list <div> completed
+                                    sbItems.Append("</div>"); //stageContainer <div> completed
+                                    sbItems.Append("</td>");
                                 }
                             }
-
-                            sbItems.Append("</tr>");
-                            sbItems.Append("</tbody>");
-                            sbItems.Append("</table>");
-
-                            #endregion
                         }
+
+                        sbItems.Append("</tr>");
+                        sbItems.Append("</tbody>");
+                        sbItems.Append("</table>");
+
+                        #endregion
+
                     }
                 }
             }

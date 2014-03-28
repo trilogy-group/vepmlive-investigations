@@ -46,12 +46,16 @@
 
                 // kanban planners dropdown
                 if (kanbanPlanners) {
+                    var selectedKanbanPlannerText;
                     $.each(kanbanPlanners, function (key, value) {
+                        if (value.id == selectedKanbanPlanner) {
+                            selectedKanbanPlannerText = value.text;
+                        }
                         kanbanPlannersDropdownOptionsCfg = kanbanPlannersDropdownOptionsCfg + '{ "iconClass": "", "value" : "' + value.id + '" ,"text": "' + value.text + '", "events": [{ "eventName": "click", "function": function () { loadKanBanFilter1(\'' + value.id + '\') } }] },';
                     });
                     if (kanbanPlannersDropdownOptionsCfg.length > 1)
                         kanbanPlannersDropdownOptionsCfg = kanbanPlannersDropdownOptionsCfg.substring(0, kanbanPlannersDropdownOptionsCfg.length - 1);
-                    kanbanPlannersDropdownCfg = '"controlId": "ddlKanbanPlanners", "controlType": "dropdown", "title": "Board:", "value": "' + selectedKanbanPlanner + '", "iconClass": "none", "sections": [{ "heading": "none", "divider": "no", "options": [' + kanbanPlannersDropdownOptionsCfg + '] }]';
+                    kanbanPlannersDropdownCfg = '"controlId": "ddlKanbanPlanners", "controlType": "dropdown", "title": "Board:", "value": "' + selectedKanbanPlannerText + '", "iconClass": "none", "sections": [{ "heading": "none", "divider": "no", "options": [' + kanbanPlannersDropdownOptionsCfg + '] }]';
                 }
 
                 // kanban filter1 multiselect
