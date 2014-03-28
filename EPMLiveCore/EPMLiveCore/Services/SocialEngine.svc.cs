@@ -373,7 +373,7 @@ namespace EPMLiveCore.Services
 
             if (!activityRows.Any()) return dailyActivities;
 
-            UpdateDateTimesToLocal(activityRows, spWeb);
+            UpdateDateTimesToLocal(activityRows);
 
             var daysProcessed = new List<string>();
             var threadsProcessed = new List<Guid>();
@@ -507,7 +507,7 @@ namespace EPMLiveCore.Services
                 : regionalSettings.TimeZone.LocalTimeToUTC(minDate);
         }
 
-        private static void UpdateDateTimesToLocal(List<DataRow> activityRows, SPWeb spWeb)
+        private void UpdateDateTimesToLocal(List<DataRow> activityRows)
         {
             var locker = new object();
             var utcTimeDict = new Dictionary<DateTime, DateTime>();
@@ -517,7 +517,7 @@ namespace EPMLiveCore.Services
                 .Where(column => column.DataType == typeof (DateTime) || column.DataType == typeof (SqlDateTime))
                 .Select(column => column.ColumnName)).ToList();
 
-            SPRegionalSettings regionalSettings = spWeb.CurrentUser.RegionalSettings ?? spWeb.RegionalSettings;
+            SPRegionalSettings regionalSettings = SPContext.Current.RegionalSettings;
 
             Parallel.ForEach(activityRows, row =>
             {

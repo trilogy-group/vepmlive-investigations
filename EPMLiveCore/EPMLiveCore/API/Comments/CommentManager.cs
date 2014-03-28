@@ -78,7 +78,7 @@ namespace EPMLiveCore.API
                 cWeb.AllowUnsafeUpdates = true;
                 SPListItem currentItem = commentsList.Items.Add();
 
-                var time = DateTime.Now;
+                var time = GetCurrentLocalTime();
 
                 string genericTitle = cWeb.CurrentUser.Name + " made a new comment at " + time.ToString();
                 currentItem[commentsList.Fields.GetFieldByInternalName("Title").Id] = genericTitle;
@@ -547,7 +547,7 @@ namespace EPMLiveCore.API
                 int commentItemId = Convert.ToInt32(dataMgr.GetPropVal("CommentItemId"));
                 var comment = HttpUtility.HtmlDecode(dataMgr.GetPropVal("Comment"));
                 List<int> laCommenters = new List<int>();
-                var time = DateTime.Now;
+                var time = GetCurrentLocalTime();
                 SPListItem originListItem = null;
                 SPListItem targetComment = null;
 
@@ -678,6 +678,12 @@ namespace EPMLiveCore.API
             }
 
             return retVal;
+        }
+
+        private static DateTime GetCurrentLocalTime()
+        {
+            var regionalSettings = SPContext.Current.RegionalSettings;
+            return regionalSettings.TimeZone.UTCToLocalTime(DateTime.UtcNow);
         }
 
         public static string DeleteComment(string data)
@@ -874,7 +880,7 @@ namespace EPMLiveCore.API
                     {"ListTitle", listTitle},
                     {"URL", url},
                     {"UserId", currentWeb.CurrentUser.ID},
-                    {"ActivityTime", DateTime.Now}
+                    {"ActivityTime", GetCurrentLocalTime()}
                 }, currentWeb);
         }
 

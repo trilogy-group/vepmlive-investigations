@@ -38,7 +38,7 @@ namespace EPMLiveWebParts.CONTROLTEMPLATES
 
             EPMLiveScriptManager.RegisterScript(Page, new[]
             {
-                "libraries/jquery.min", "libraries/handlebars-v1.3.0", "@libraries/amplify", "libraries/moment.min",
+                "libraries/jquery.min", "libraries/handlebars-v1.3.0", "@libraries/amplify", "@libraries/bundles/moment",
                 "@EPMLive.SocialStream"
             });
 
@@ -52,9 +52,12 @@ namespace EPMLiveWebParts.CONTROLTEMPLATES
             try
             {
                 SPTimeZone spTimeZone = (web.CurrentUser.RegionalSettings ?? context.RegionalSettings).TimeZone;
+                var spTzName = spTimeZone.Description.Replace(" and ", " & ");
 
-                TimeZoneInfo timeZone =
-                    TimeZoneInfo.GetSystemTimeZones().First(t => t.DisplayName.Equals(spTimeZone.Description));
+                TimeZoneInfo timeZone = (from tz in TimeZoneInfo.GetSystemTimeZones()
+                    let tzName = tz.DisplayName.Replace(" and ", " & ")
+                    where tzName.Equals(spTzName)
+                    select tz).First();
 
                 var timeZoneInfo = new
                 {
