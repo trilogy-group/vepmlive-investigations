@@ -58,6 +58,7 @@ function registerCreateWorkspace2Script() {
             self.parentWebUrl = ko.observable();
             self.uniquePermission = ko.observable(w.uniquePerm);
             self.workspaceTitle = ko.observable(w.workspaceTitle);
+            self.workspaceDescription = ko.observable(w.workspaceDescription);
             self.itemId = ko.observable(w.itemId);
             self.templateItemId = ko.observable(-1);
             self.listGuid = ko.observable(w.listGuid);
@@ -99,6 +100,7 @@ function registerCreateWorkspace2Script() {
                             "<Param key=\"TemplateItemId\">" + self.templateItemId() + "</Param>" +
                             "<Param key=\"IncludeContent\">True</Param>" +
                             "<Param key=\"SiteTitle\">" + self.workspaceTitle().replace(/[^a-zA-Z 0-9]+/g, '').trim() + "</Param>" +
+                            "<Param key=\"SiteDescription\">" + self.workspaceDescription().replace(/[^a-zA-Z 0-9]+/g, '').trim() + "</Param>" +
                             "<Param key=\"SolutionName\">" + self.solutionName() + "</Param>" +
                             "<Param key=\"UniquePermission\">" + self.uniquePermission() + "</Param>" +
                             "<Param key=\"AttachedItemId\">" + self.itemId() + "</Param>" +

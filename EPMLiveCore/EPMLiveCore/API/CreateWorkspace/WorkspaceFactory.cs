@@ -690,7 +690,10 @@ namespace EPMLiveCore.API
             web.Site.AllowUnsafeUpdates = true;
 
             string siteTitle = _xmlDataMgr.GetPropVal("SiteTitle");
+            string siteDescription = _xmlDataMgr.GetPropVal("SiteDescription");
+            string creatorId = _xmlDataMgr.GetPropVal("CreatorId");
             siteTitle = GetSafeTitle(siteTitle);
+            siteDescription = GetSafeTitle(siteDescription);
             string siteUrl = siteTitle;
             string templateName = _xmlDataMgr.GetPropVal("TemplateName");
             bool isStandAlone = bool.Parse(_xmlDataMgr.GetPropVal("IsStandAlone"));
@@ -912,11 +915,11 @@ namespace EPMLiveCore.API
                 if (AttachedItemId != -1)
                 {
                     WorkspaceData.SendCompletedSignalsToDB(SiteId, web, parentWeb, AttachedItemListId, AttachedItemId,
-                        _createdWebId, _createdWebServerRelativeUrl, _createdWebTitle);
+                        _createdWebId, _createdWebServerRelativeUrl, _createdWebTitle, creatorId, siteDescription);
                 }
                 else
                 {
-                    WorkspaceData.SendCompletedSignalsToDB(SiteId, parentWeb, _createdWebId, _createdWebServerRelativeUrl, _createdWebTitle);
+                    WorkspaceData.SendCompletedSignalsToDB(SiteId, parentWeb, _createdWebId, _createdWebServerRelativeUrl, _createdWebTitle, creatorId, siteDescription);
                 }
             }
             if (parentWeb != null && !parentWeb.ID.Equals(web.ID))

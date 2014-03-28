@@ -489,6 +489,7 @@ namespace EPMLiveCore.API
             XmlDocument docOut = new XmlDocument();
             docOut.LoadXml("<Team/>");
 
+            int teamMemberCount = 0;
             try
             {
                 string modifiedUsers = "";
@@ -662,7 +663,23 @@ namespace EPMLiveCore.API
                         ndNew.Attributes.Append(nattr);
 
                         docOut.FirstChild.AppendChild(ndNew);
+
+                        teamMemberCount++;
                     }
+
+                    SPSecurity.RunWithElevatedPrivileges(() =>
+                    {
+                        using (SPSite eSite = new SPSite(oWeb.Site.ID))
+                        {
+                            using (SqlConnection con = new SqlConnection(CoreFunctions.getReportingConnectionString(eSite.WebApplication.Id, eSite.ID)))
+                            {
+                                con.Open();
+                                var cmd = new SqlCommand(@"Update [dbo].[RPTWeb] Set [Members] = " + teamMemberCount + " WHERE [SiteId] = '" + oWeb.Site.ID + "' AND [WebId] = '" + oWeb.ID + "'");
+                                cmd.Connection = con;
+                                cmd.ExecuteNonQuery();
+                            }
+                        }
+                    });
 
                     if (dt != null)
                     {
@@ -1849,15 +1866,15 @@ namespace EPMLiveCore.API
                     {"@WebId", spWeb.ID}
                 });
 
-                spGroups.AddRange(from DataRow row in dataTable.Rows select spWeb.Groups.GetByID((int) row["Id"]));
+                spGroups.AddRange(from DataRow row in dataTable.Rows select spWeb.Groups.GetByID((int)row["Id"]));
             }
             catch
             {
                 spGroups.AddRange(from SPGroup spGroup in spWeb.Groups
-                    let roles = spGroup.Roles
-                    let canUse = roles.Cast<SPRole>().Any(role => role.PermissionMask != (SPRights) 134287360)
-                    where spGroup.CanCurrentUserEditMembership && canUse
-                    select spGroup);
+                                  let roles = spGroup.Roles
+                                  let canUse = roles.Cast<SPRole>().Any(role => role.PermissionMask != (SPRights)134287360)
+                                  where spGroup.CanCurrentUserEditMembership && canUse
+                                  select spGroup);
             }
 
             return spGroups;

@@ -25,6 +25,7 @@
         var compLvls = '<%=_compLevels%>';
         var workEngineSvcUrl = '<%=_workEngineSvcUrl%>';
         var workspaceTitle = '<%=_workspaceTitle%>';
+        var workspaceDescription = '';
         var listGuid = '<%=_lstGuid%>';
         var listName = '<%=_listName%>';
         var itemId = '<%=_itemId%>';
@@ -49,6 +50,11 @@
                     What is the title of this Workspace?
 	            </label>  
 	            <input type="textbox" id="tbWsName" name="tbWsName" class="titleInput" data-bind="value: workspaceTitle, valueUpdate: 'afterkeydown', event: { keydown: PreventNonAlphaNumeric }" />
+	            <br><br>
+                <label style="font-family:Open Sans Regular;font-size:15px;padding-right:10px;">
+                    What is the description of this Workspace?
+	            </label>  
+	            <input type="textbox" id="tbWsDescription" name="tbWsDescription" class="titleInput" data-bind="value: workspaceDescription, valueUpdate: 'afterkeydown', event: { keydown: PreventNonAlphaNumeric }" />
 	            <br><br>
 	            <label style="font-family:Open Sans Regular;font-size:15px;">
                     Permissions

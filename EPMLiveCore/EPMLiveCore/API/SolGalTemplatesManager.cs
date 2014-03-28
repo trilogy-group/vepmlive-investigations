@@ -959,7 +959,7 @@ namespace EPMLiveCore.API
                     cEWeb.AllowUnsafeUpdates = true;
                     cEWeb.Update();
 
-                    err = CoreFunctions.createSite(siteTitle, siteUrl, templateName, siteOwnerName, uniquePermission, inheritTopLink, cEWeb, 
+                    err = CoreFunctions.createSite(siteTitle, siteUrl, templateName, siteOwnerName, uniquePermission, inheritTopLink, cEWeb,
                         out createdWebId, out sCreatedWebUrl, out sCreatedWebRelativeUrl, out sCreatedWebTitle);
                 }
                 else
@@ -1024,8 +1024,8 @@ namespace EPMLiveCore.API
                     {
                         sResultWebId = w.ID.ToString();
                         sResultWebUrl = w.Url;
-                        
-                        WorkspaceData.SendCompletedSignalsToDB(w.Site.ID, parentWeb, w.ID, w.ServerRelativeUrl, w.Title);
+
+                        WorkspaceData.SendCompletedSignalsToDB(w.Site.ID, parentWeb, w.ID, w.ServerRelativeUrl, w.Title, "", "0");
                         CacheStore.Current.RemoveCategory(new CacheStoreCategory(w).Navigation);
                         WorkspaceData.AddWsPermission(w.Site.ID, createdWebId);
 
@@ -1339,7 +1339,7 @@ namespace EPMLiveCore.API
                 if (originalRequestList != null)
                 {
                     oldItem = originalRequestList.GetItemById(Convert.ToInt32(originItemId));
-                 
+
                     foreach (SPField fld in originalRequestList.Fields)
                     {
                         if (fld.Reorderable)
@@ -1366,7 +1366,7 @@ namespace EPMLiveCore.API
                             }
                         }
                     }
-    
+
                     newItem.Update();
 
                     if (!string.IsNullOrEmpty(doNotDelRequest) && !bool.Parse(doNotDelRequest))

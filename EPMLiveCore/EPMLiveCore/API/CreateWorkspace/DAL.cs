@@ -40,7 +40,7 @@ namespace EPMLiveCore.API
             return iRecs == 0;
         }
 
-        public static void SendCompletedSignalsToDB(Guid siteId, SPWeb itemWeb, SPWeb parentWeb, Guid listId, int itemId, Guid createdWebId, string createdWebServerRelativeUrl, string createdWebTitle)
+        public static void SendCompletedSignalsToDB(Guid siteId, SPWeb itemWeb, SPWeb parentWeb, Guid listId, int itemId, Guid createdWebId, string createdWebServerRelativeUrl, string createdWebTitle, string creatorId, string createdWebDescription)
         {
             SPSecurity.RunWithElevatedPrivileges(() =>
             {
@@ -64,13 +64,13 @@ namespace EPMLiveCore.API
                                                             DELETE FROM [dbo].[RPTWeb] WHERE [WebId] = '" + createdWebId + @"'  
                                                         END 
 
-                                                        INSERT INTO [dbo].[RPTWeb] ([SiteId], [ItemWebId], [ItemListId], [ItemId], [ParentWebId], [WebId], [WebUrl], [WebTitle]) VALUES ('" + siteId + @"', '" + itemWeb.ID + @"', '" + listId + @"', " + itemId + @", '" + parentWeb.ID + @"', '" + createdWebId + @"', '" + createdWebServerRelativeUrl + @"', '" + createdWebTitle + @"') 
+                                                        INSERT INTO [dbo].[RPTWeb] ([SiteId], [ItemWebId], [ItemListId], [ItemId], [ParentWebId], [WebId], [WebUrl], [WebTitle], [WebOwnerId], [WebDescription]) VALUES ('" + siteId + @"', '" + itemWeb.ID + @"', '" + listId + @"', " + itemId + @", '" + parentWeb.ID + @"', '" + createdWebId + @"', '" + createdWebServerRelativeUrl + @"', '" + createdWebTitle + @"', " + creatorId + @", '" + createdWebDescription + @"') 
                                                     END 
                                                     ELSE 
                                                     BEGIN 
-                                                        CREATE TABLE [dbo].[RPTWeb] ([SiteId] uniqueidentifier, [ItemWebId] uniqueidentifier, [ItemListId] uniqueidentifier, [ItemId] int, [ParentWebId] uniqueidentifier, [WebId] uniqueidentifier, [WebUrl] varchar(max), [WebTitle] varchar(max))
+                                                        CREATE TABLE [dbo].[RPTWeb] ([SiteId] uniqueidentifier, [ItemWebId] uniqueidentifier, [ItemListId] uniqueidentifier, [ItemId] int, [ParentWebId] uniqueidentifier, [WebId] uniqueidentifier, [WebUrl] varchar(max), [WebTitle] varchar(max), [WebOwnerId] int null, [WebDescription] varchar(max) null, [Members] int null)
                                                         INSERT INTO [dbo].[RPTWeb] ([SiteId], [ItemWebId], [ItemListId], [ItemId], [ParentWebId], [WebId], [WebUrl], [WebTitle]) VALUES ('" + eSite.ID + @"', '" + Guid.Empty + @"', '" + Guid.Empty + @"', " + (-1) + @", '" + Guid.Empty + @"', '" + eRootWeb.ID + @"', '" + eRootWeb.ServerRelativeUrl + @"', '" + eRootWeb.Title + @"') 
-                                                        INSERT INTO [dbo].[RPTWeb] ([SiteId], [ItemWebId], [ItemListId], [ItemId], [ParentWebId], [WebId], [WebUrl], [WebTitle]) VALUES ('" + siteId + @"', '" + itemWeb.ID + @"', '" + listId + @"', " + itemId + @", '" + parentWeb.ID + @"', '" + createdWebId + @"', '" + createdWebServerRelativeUrl + @"', '" + createdWebTitle + @"') 
+                                                        INSERT INTO [dbo].[RPTWeb] ([SiteId], [ItemWebId], [ItemListId], [ItemId], [ParentWebId], [WebId], [WebUrl], [WebTitle], [WebOwnerId], [WebDescription]) VALUES ('" + siteId + @"', '" + itemWeb.ID + @"', '" + listId + @"', " + itemId + @", '" + parentWeb.ID + @"', '" + createdWebId + @"', '" + createdWebServerRelativeUrl + @"', '" + createdWebTitle + @"', " + creatorId + @", '" + createdWebDescription + @"') 
                                                     END");
                         cmd.Connection = con;
                         cmd.ExecuteNonQuery();
@@ -79,7 +79,7 @@ namespace EPMLiveCore.API
             });
         }
 
-        public static void SendCompletedSignalsToDB(Guid siteId, SPWeb parentWeb, Guid createdWebId, string createdWebServerRelativeUrl, string createdWebTitle)
+        public static void SendCompletedSignalsToDB(Guid siteId, SPWeb parentWeb, Guid createdWebId, string createdWebServerRelativeUrl, string createdWebTitle, string creatorId, string createdWebDescription)
         {
             SPSecurity.RunWithElevatedPrivileges(() =>
             {
@@ -103,13 +103,13 @@ namespace EPMLiveCore.API
                                                             DELETE FROM [dbo].[RPTWeb] WHERE [WebId] = '" + createdWebId + @"'  
                                                         END 
 
-                                                        INSERT INTO [dbo].[RPTWeb] ([SiteId], [ItemWebId], [ItemListId], [ItemId], [ParentWebId], [WebId], [WebUrl], [WebTitle]) VALUES ('" + siteId + @"', '" + Guid.Empty + @"', '" + Guid.Empty + @"', " + (-1) + @", '" + parentWeb.ID + @"', '" + createdWebId + @"', '" + createdWebServerRelativeUrl + @"', '" + createdWebTitle + @"') 
+                                                        INSERT INTO [dbo].[RPTWeb] ([SiteId], [ItemWebId], [ItemListId], [ItemId], [ParentWebId], [WebId], [WebUrl], [WebTitle], [WebOwnerId], [WebDescription]) VALUES ('" + siteId + @"', '" + Guid.Empty + @"', '" + Guid.Empty + @"', " + (-1) + @", '" + parentWeb.ID + @"', '" + createdWebId + @"', '" + createdWebServerRelativeUrl + @"', '" + createdWebTitle + @"', " + creatorId + @", '" + createdWebDescription + @"') 
                                                     END 
                                                     ELSE 
                                                     BEGIN 
-                                                        CREATE TABLE [dbo].[RPTWeb] ([SiteId] uniqueidentifier, [ItemWebId] uniqueidentifier, [ItemListId] uniqueidentifier, [ItemId] int, [ParentWebId] uniqueidentifier, [WebId] uniqueidentifier, [WebUrl] varchar(max), [WebTitle] varchar(max))
+                                                        CREATE TABLE [dbo].[RPTWeb] ([SiteId] uniqueidentifier, [ItemWebId] uniqueidentifier, [ItemListId] uniqueidentifier, [ItemId] int, [ParentWebId] uniqueidentifier, [WebId] uniqueidentifier, [WebUrl] varchar(max), [WebTitle] varchar(max), [WebOwnerId] int null, [WebDescription] varchar(max) null, [Members] int null)
                                                         INSERT INTO [dbo].[RPTWeb] ([SiteId], [ItemWebId], [ItemListId], [ItemId], [ParentWebId], [WebId], [WebUrl], [WebTitle]) VALUES ('" + eSite.ID + @"', '" + Guid.Empty + @"', '" + Guid.Empty + @"', " + (-1) + @", '" + Guid.Empty + @"', '" + eRootWeb.ID + @"', '" + eRootWeb.ServerRelativeUrl + @"', '" + eRootWeb.Title + @"') 
-                                                        INSERT INTO [dbo].[RPTWeb] ([SiteId], [ItemWebId], [ItemListId], [ItemId], [ParentWebId], [WebId], [WebUrl], [WebTitle]) VALUES ('" + siteId + @"', '" + Guid.Empty + @"', '" + Guid.Empty + @"', " + (-1) + @", '" + parentWeb.ID + @"', '" + createdWebId + @"', '" + createdWebServerRelativeUrl + @"', '" + createdWebTitle + @"') 
+                                                        INSERT INTO [dbo].[RPTWeb] ([SiteId], [ItemWebId], [ItemListId], [ItemId], [ParentWebId], [WebId], [WebUrl], [WebTitle], [WebOwnerId], [WebDescription]) VALUES ('" + siteId + @"', '" + Guid.Empty + @"', '" + Guid.Empty + @"', " + (-1) + @", '" + parentWeb.ID + @"', '" + createdWebId + @"', '" + createdWebServerRelativeUrl + @"', '" + createdWebTitle + @"', " + creatorId + @", '" + createdWebDescription + @"') 
                                                     END");
                         cmd.Connection = con;
                         cmd.ExecuteNonQuery();
