@@ -48,6 +48,12 @@
         color: #444444;
     }
 
+    .btn-primary {
+        background-color: #0090CA;
+        border-color: #357EBD;
+        color: #FFFFFF;
+    }
+
     .btn {
         -moz-user-select: none;
         -ms-user-select: none;
@@ -65,6 +71,7 @@
         text-align: center;
         vertical-align: middle;
         white-space: nowrap;
+        font-family: @font !important;
     }
 
     h1, h2 {
@@ -250,6 +257,10 @@
 
         div.epm-se-comment-input.epm-se-expanded {
             min-height: 75px;
+        }
+
+        button.epm-se-active {
+            .btn-primary;
         }
     }
 

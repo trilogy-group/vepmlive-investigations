@@ -46,6 +46,7 @@
                     classes: {
                         placeholder: 'epm-se-placeholder',
                         expanded: 'epm-se-expanded',
+                        active: 'epm-se-active'
                     }
                 },
                 moreActivityRequests: [],
@@ -99,7 +100,8 @@
                 _.subscribe('se.threadRendered', function (activityThread, thread, data, $thread) {
                     commentManager.configureBox({
                         element: $thread.parent().find("div.epm-se-comment-box[data-threadId='" + thread.id + "']"),
-                        placeholder: 'Share something...'
+                        placeholder: 'Share something...',
+                        thread: thread
                     });
                 });
 
@@ -220,6 +222,21 @@
                         if (html === '' || html === '<br>') addPlaceholder(settings);
                         settings.input.removeClass(config.ui.classes.expanded);
                         settings.button.hide();
+                    });
+
+                    settings.input.keyup(function() {
+                        var html = $(this).html();
+                        if (html !== '' && html !== '<br>' && html !== settings.placeholder) {
+                            settings.button.addClass(config.ui.classes.active);
+                        } else {
+                            settings.button.removeClass(config.ui.classes.active);
+                        }
+                    });
+
+                    settings.button.click(function() {
+                        if (!$(this).hasClass(config.ui.classes.active)) return;
+                        
+
                     });
                 };
                 
