@@ -14,7 +14,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
         protected void Page_Load(object sender, EventArgs e)
         {
 
-            switch(Request["Action"])
+            switch (Request["Action"])
             {
                 case "SaveTemplate":
                     SaveTemplate();
@@ -73,7 +73,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                     string newid = "";
 
                     SPListItemCollection lic = list.GetItems(query);
-                    if(lic.Count > 0)
+                    if (lic.Count > 0)
                     {
                         newid = lic[0].ID.ToString();
                     }
@@ -82,14 +82,14 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
 
                     SPSecurity.RunWithElevatedPrivileges(delegate()
                     {
-                        using(SPSite site = new SPSite(web.Site.ID))
+                        using (SPSite site = new SPSite(web.Site.ID))
                         {
-                            using(SPWeb oweb = site.OpenWeb(web.ID))
+                            using (SPWeb oweb = site.OpenWeb(web.ID))
                             {
                                 url = EPMLiveCore.CoreFunctions.getConfigSetting(oweb, "EPMLiveResourceURL");
                             }
                         }
-                        if(url == "/")
+                        if (url == "/")
                             url = "";
                     });
                     url += "/_layouts/epmlive/checkresgantt.aspx?showgantt=1&startdate=" + Request["startdate"] + "&enddate=" + Request["enddate"] + "&work=" + Request["work"] + "&resources=" + Request["resources"] + "&title=" + Request["title"] + "&listid=" + Request["listid"] + "&itemid=" + newid + "&callback=SetCheckDates&useResPool=true";
@@ -101,7 +101,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                     output = "Error: Invalid Command";
                     break;
             }
-            
+
         }
 
         private void SaveTemplate()
@@ -126,13 +126,13 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
 
             doc.LoadXml(result);
 
-            if(doc.FirstChild.Attributes["Status"].Value != "0")
+            if (doc.FirstChild.Attributes["Status"].Value != "0")
             {
                 output = doc.FirstChild.InnerXml;
             }
             else
             {
-                output  = "Success";
+                output = "Success";
             }
 
         }
@@ -145,7 +145,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
 
             SPSecurity.RunWithElevatedPrivileges(delegate()
             {
-                using(SPSite site = new SPSite(web.Site.ID))
+                using (SPSite site = new SPSite(web.Site.ID))
                 {
                     SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(site.WebApplication.Id));
                     cn.Open();
@@ -154,17 +154,17 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                     cmd.Parameters.AddWithValue("@timerjobuid", Request["jobuid"]);
 
                     SqlDataReader dr = cmd.ExecuteReader();
-                    if(dr.Read())
+                    if (dr.Read())
                     {
                         output = dr.GetInt32(0).ToString() + "|";
                         output += dr.GetInt32(2).ToString() + "|";
-                        
-                        if(!dr.IsDBNull(4))
+
+                        if (!dr.IsDBNull(4))
                             output += dr.GetString(4);
 
                         output += "|";
 
-                        if(!dr.IsDBNull(5))
+                        if (!dr.IsDBNull(5))
                             output += dr.GetString(5);
                     }
                     else
@@ -176,7 +176,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                 }
             });
         }
-        
+
         private void ApplyTemplate()
         {
             try
@@ -185,17 +185,17 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
 
                 output = "Success";
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 output = "Error: " + ex.Message;
             }
         }
-        
+
         private void GoToList()
         {
             SPWeb web = SPContext.Current.Web;
             SPList list = web.Lists.TryGetList(Request["list"]);
-            if(list != null)
+            if (list != null)
             {
 
                 PlannerProps p = getSettings(web, Request["PlannerID"]);
@@ -221,7 +221,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
         {
             PlannerProps p = new PlannerProps();
             Guid lockWeb = EPMLiveCore.CoreFunctions.getLockedWeb(web);
-            if(lockWeb == Guid.Empty || lockWeb == web.ID)
+            if (lockWeb == Guid.Empty || lockWeb == web.ID)
             {
                 p.sListProjectCenter = EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLivePlanner" + planner + "ProjectCenter");
                 p.sListTaskCenter = EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLivePlanner" + planner + "TaskCenter");
@@ -235,7 +235,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                 p.wpFields = EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLivePlanner" + planner + "Fields");
 
                 int work = web.RegionalSettings.WorkDays;
-                for(byte x = 0; x < 7; x++)
+                for (byte x = 0; x < 7; x++)
                 {
                     p.sWorkDays = ((((work >> x) & 0x01) == 0x01) ? "1" : "0") + "," + p.sWorkDays;
                     //if(!(((work >> x) & 0x01) == 0x01))
@@ -252,7 +252,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
             {
                 SPSite site = SPContext.Current.Site;
                 {
-                    using(SPWeb w = site.OpenWeb(lockWeb))
+                    using (SPWeb w = site.OpenWeb(lockWeb))
                     {
                         p.sListProjectCenter = EPMLiveCore.CoreFunctions.getConfigSetting(w, "EPMLivePlanner" + planner + "ProjectCenter");
                         p.sListTaskCenter = EPMLiveCore.CoreFunctions.getConfigSetting(w, "EPMLivePlanner" + planner + "TaskCenter");
@@ -266,7 +266,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                         p.wpFields = EPMLiveCore.CoreFunctions.getConfigSetting(w, "EPMLivePlanner" + planner + "Fields");
 
                         int work = w.RegionalSettings.WorkDays;
-                        for(byte x = 0; x < 7; x++)
+                        for (byte x = 0; x < 7; x++)
                         {
                             p.sWorkDays = ((((work >> x) & 0x01) == 0x01) ? "1" : "0") + "," + p.sWorkDays;
                             //if(!(((work >> x) & 0x01) == 0x01))
@@ -297,7 +297,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
             XmlDocument docProject = new XmlDocument();
             docProject.LoadXml(Request["pjData"]);
 
-            foreach(XmlNode nd in docProject.FirstChild.SelectNodes("//B/I"))
+            foreach (XmlNode nd in docProject.FirstChild.SelectNodes("//B/I"))
             {
                 XmlNode ndNew = doc.CreateNode(XmlNodeType.Element, "Field", doc.NamespaceURI);
 
@@ -307,13 +307,14 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
 
                 ndNew.InnerText = nd.Attributes["V"].Value;
 
-                doc.FirstChild.AppendChild(ndNew);
+                if (!String.IsNullOrEmpty(ndNew.InnerText))
+                    doc.FirstChild.AppendChild(ndNew);
             }
 
             XmlDocument docRes = new XmlDocument();
             docRes.LoadXml(WorkPlannerAPI.SaveProject(doc, SPContext.Current.Web));
 
-            if(docRes.FirstChild.Attributes["Status"].Value == "0")
+            if (docRes.FirstChild.Attributes["Status"].Value == "0")
             {
                 output = "Success";
             }
@@ -336,7 +337,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
             XmlDocument docRes = new XmlDocument();
             docRes.LoadXml(WorkPlannerAPI.SaveProject(doc, SPContext.Current.Web));
 
-            if(docRes.FirstChild.Attributes["Status"].Value == "0")
+            if (docRes.FirstChild.Attributes["Status"].Value == "0")
             {
                 output = "Success";
             }
@@ -351,7 +352,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
             WorkPlannerAPI.PlannerProps props = WorkPlannerAPI.getSettings(SPContext.Current.Web, Request["PlannerID"]);
 
             //if(props.bUseTeam)
-                output = PlannerCore.getResourceList("<Team ListId='" + Request["listid"] + "' ItemId='" + Request["itemid"] + "'/>", SPContext.Current.Web);
+            output = PlannerCore.getResourceList("<Team ListId='" + Request["listid"] + "' ItemId='" + Request["itemid"] + "'/>", SPContext.Current.Web);
             //else
             //    output = PlannerCore.getResourceList("", SPContext.Current.Web);
         }
@@ -368,7 +369,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
             XmlDocument docRes = new XmlDocument();
             docRes.LoadXml(EPMLiveCore.WorkEngineAPI.ProcessUpdates(doc.OuterXml, SPContext.Current.Web));
 
-            if(docRes.FirstChild.Attributes["Status"].Value == "0")
+            if (docRes.FirstChild.Attributes["Status"].Value == "0")
             {
                 output = "Success";
             }
@@ -388,7 +389,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
             XmlDocument docRes = new XmlDocument();
             docRes.LoadXml(EPMLiveCore.WorkEngineAPI.GetUpdateCount(doc.OuterXml, SPContext.Current.Web));
 
-            if(docRes.FirstChild.Attributes["Status"].Value == "0")
+            if (docRes.FirstChild.Attributes["Status"].Value == "0")
             {
                 output = docRes.FirstChild.InnerText;
             }
@@ -408,16 +409,16 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
             XmlDocument docRes = new XmlDocument();
             docRes.LoadXml(EPMLiveCore.WorkEngineAPI.PublishStatus(doc.OuterXml, SPContext.Current.Web));
 
-            if(docRes.FirstChild.Attributes["Status"].Value == "0")
+            if (docRes.FirstChild.Attributes["Status"].Value == "0")
             {
-                if(docRes.FirstChild.FirstChild.Attributes["Status"] != null)
+                if (docRes.FirstChild.FirstChild.Attributes["Status"] != null)
                 {
                     string pubStatus = docRes.FirstChild.FirstChild.Attributes["Status"].Value;
                     string result = docRes.FirstChild.FirstChild.Attributes["Result"].Value;
                     string pct = docRes.FirstChild.FirstChild.Attributes["PercentComplete"].Value;
                     string time = docRes.FirstChild.FirstChild.Attributes["TimeFinished"].Value;
 
-                    switch(pubStatus)
+                    switch (pubStatus)
                     {
                         case "Queued":
                             output = "false|false|Queued";
@@ -426,7 +427,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                             output = "false|false|Processing (" + pct + "%)";
                             break;
                         case "Complete":
-                            if(result != "No Errors")
+                            if (result != "No Errors")
                                 output = "true|true|Last Published at: " + time + " with errors. <a href=\"Javascript:PublishLog();\">[View Log]</a>";
                             else
                                 output = "true|false|Last Published at: " + time + ". <a href=\"Javascript:PublishLog();\">[View Log]</a>";
@@ -454,7 +455,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
             XmlDocument docRes = new XmlDocument();
             docRes.LoadXml(WorkPlannerAPI.Publish(doc, SPContext.Current.Web));
 
-            if(docRes.FirstChild.Attributes["Status"].Value == "0")
+            if (docRes.FirstChild.Attributes["Status"].Value == "0")
                 output = "Success";
             else
                 output = "Error: " + docRes.FirstChild.InnerText;
@@ -463,20 +464,20 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
         private void DeleteView()
         {
             SPWeb sweb = SPContext.Current.Web;
-            if(EPMLiveCore.CoreFunctions.DoesCurrentUserHaveFullControl(sweb))
+            if (EPMLiveCore.CoreFunctions.DoesCurrentUserHaveFullControl(sweb))
             {
                 SPSecurity.RunWithElevatedPrivileges(delegate()
                 {
 
-                    using(SPSite site = new SPSite(sweb.Site.ID))
+                    using (SPSite site = new SPSite(sweb.Site.ID))
                     {
-                        using(SPWeb web = site.OpenWeb(sweb.ID))
+                        using (SPWeb web = site.OpenWeb(sweb.ID))
                         {
                             EPMLiveCore.API.PropertyHash props = new EPMLiveCore.API.PropertyHash(EPMLiveCore.CoreFunctions.getConfigSetting(SPContext.Current.Web, "EPMLivePlanner" + Request["PlannerID"] + "Views"));
 
-                            for(int i = 0; i < props.Count; i++)
+                            for (int i = 0; i < props.Count; i++)
                             {
-                                if(props[i][0].ToString().ToLower() == Request["title"].ToLower())
+                                if (props[i][0].ToString().ToLower() == Request["title"].ToLower())
                                 {
                                     props.Remove(i);
                                 }
@@ -516,14 +517,14 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
 
                 SPListItemCollection lic = list.GetItems(query);
 
-                if(lic.Count > 0)
+                if (lic.Count > 0)
                 {
                     output = "Success:CommentCount|" + getFieldValue(lic[0], "CommentCount") + ",Attachments|" + getFieldValue(lic[0], "Attachments");
                 }
             }
-            catch {  }
+            catch { }
 
-            
+
         }
 
         private void RenameView()
@@ -532,11 +533,11 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
 
             EPMLiveCore.API.PropertyHash props = new EPMLiveCore.API.PropertyHash(EPMLiveCore.CoreFunctions.getConfigSetting(SPContext.Current.Web, "EPMLivePlanner" + Request["PlannerID"] + "Views"));
 
-            for(int i = 0; i < props.Count; i++)
+            for (int i = 0; i < props.Count; i++)
             {
-                if(props[i][0].ToString().ToLower() == Request["oldtitle"].ToLower())
+                if (props[i][0].ToString().ToLower() == Request["oldtitle"].ToLower())
                 {
-                    props[i][0] = Request["newtitle"].Replace(" ","");
+                    props[i][0] = Request["newtitle"].Replace(" ", "");
                 }
             }
 
@@ -550,14 +551,14 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
         {
             SPWeb sweb = SPContext.Current.Web;
 
-            if(EPMLiveCore.CoreFunctions.DoesCurrentUserHaveFullControl(sweb))
+            if (EPMLiveCore.CoreFunctions.DoesCurrentUserHaveFullControl(sweb))
             {
                 SPSecurity.RunWithElevatedPrivileges(delegate()
                 {
 
-                    using(SPSite site = new SPSite(sweb.Site.ID))
+                    using (SPSite site = new SPSite(sweb.Site.ID))
                     {
-                        using(SPWeb web = site.OpenWeb(sweb.ID))
+                        using (SPWeb web = site.OpenWeb(sweb.ID))
                         {
                             StringBuilder sb = new StringBuilder();
                             sb.Append(Request["title"]);
@@ -584,7 +585,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                             sb.Append("|");
                             sb.Append(Request["allocation"]);
 
-                            if(!String.IsNullOrEmpty(Request["agileleft"]))
+                            if (!String.IsNullOrEmpty(Request["agileleft"]))
                             {
                                 sb.Append("`");
                                 sb.Append(Request["agileleft"]);
@@ -606,11 +607,11 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
 
                             bool found = false;
 
-                            for(int i = 0; i < props.Count; i++)
+                            for (int i = 0; i < props.Count; i++)
                             {
-                                if(props[i].Count > 0)
+                                if (props[i].Count > 0)
                                 {
-                                    if(props[i][0].ToString().ToLower() == Request["title"].ToLower())
+                                    if (props[i][0].ToString().ToLower() == Request["title"].ToLower())
                                     {
                                         props.Update(i, sb.ToString());
 
@@ -620,7 +621,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                                 }
                             }
 
-                            if(!found)
+                            if (!found)
                             {
                                 props.Add(sb.ToString());
                             }
@@ -628,7 +629,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                             web.AllowUnsafeUpdates = true;
                             EPMLiveCore.CoreFunctions.setConfigSetting(web, "EPMLivePlanner" + Request["PlannerID"] + "Views", props.ToString());
 
-                            if(Request["Default"] == "true")
+                            if (Request["Default"] == "true")
                                 EPMLiveCore.CoreFunctions.setConfigSetting(web, "EPMLivePlanner" + Request["PlannerID"] + "ViewsDefault", Request["title"]);
                         }
                     }
