@@ -420,7 +420,7 @@ function StopEditGridRow(grid, row) {
 
 function LoadGrid(gridid)
 {
-    var gUrl = _spPageContextInfo.webServerRelativeUrl + "/_layouts/epmlive/getganttitems.aspx?data=" + eval("mygrid" + gridid + ".Params") + eval("mygrid" + gridid + ".Searcher");
+    var gUrl = _spPageContextInfo.webServerRelativeUrl + "/_layouts/15/epmlive/getganttitems.aspx?data=" + eval("mygrid" + gridid + ".Params") + eval("mygrid" + gridid + ".Searcher");
 
     if (epmdebug)
         gUrl += "&epmdebug=true";
