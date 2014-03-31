@@ -37,6 +37,7 @@
                     selectors: {
                         newer: 'ul.epm-se-newer-activities',
                         older: 'ul.epm-se-older-activities',
+                        latest: 'ul.epm-se-newest-activities',
                         showNewer: 'div.epm-se-show-newer',
                         showOlder: 'div.epm-se-show-older',
                         day: 'div.epm-se-header h1',
@@ -101,7 +102,8 @@
                     commentManager.configureBox({
                         element: $thread.parent().find("div.epm-se-comment-box[data-threadId='" + thread.id + "']"),
                         placeholder: 'Share something...',
-                        thread: thread
+                        thread: thread,
+                        $thread: $thread
                     });
                 });
 
@@ -210,6 +212,12 @@
                     settings.input.html('');
                 };
 
+                var closeCommentBox = function(settings) {
+                    settings.input.removeClass(config.ui.classes.expanded);
+                    settings.button.hide();
+                    settings.button.removeClass(config.ui.classes.active);
+                };
+
                 var attahEvents = function (settings) {
                     settings.input.focus(function () {
                         if ($(this).html() === settings.placeholder) removePlaceholder(settings);
@@ -220,8 +228,8 @@
                     settings.input.blur(function () {
                         var html = $(this).html();
                         if (html === '' || html === '<br>') addPlaceholder(settings);
-                        settings.input.removeClass(config.ui.classes.expanded);
-                        settings.button.hide();
+
+                        if (config.lastClickedElement.id !== settings.button.get(0).id) closeCommentBox(settings);
                     });
 
                     settings.input.keyup(function() {
@@ -233,10 +241,23 @@
                         }
                     });
 
-                    settings.button.click(function() {
-                        if (!$(this).hasClass(config.ui.classes.active)) return;
+                    settings.button.click(function (event) {
+                        event.preventDefault();
                         
+                        if (!$(this).hasClass(config.ui.classes.active)) return;
 
+                        activityManager.addComment({
+                            text: settings.input.html(),
+                            thread: settings.thread,
+                            $thread: settings.$thread
+                        });
+                        
+                        addPlaceholder(settings);
+                        closeCommentBox(settings);
+                    });
+
+                    $el.root.mousedown(function (event) {
+                        config.lastClickedElement = event.target;
                     });
                 };
                 
@@ -332,8 +353,8 @@
                     return activity.kind.toLowerCase();
                 };
 
-                var _getDisplayTime = function(activity) {
-                    var date = actions.getLocalTime(activity.time);
+                var _getDisplayTime = function(activity, isLocalTime) {
+                    var date = isLocalTime ? activity.time : actions.getLocalTime(activity.time);
 
                     moment.lang('en', {
                         calendar: {
@@ -474,12 +495,33 @@
                     if (hasNewer) $thread.find(config.ui.selectors.showNewer).fadeIn('fast');
                 };
 
+                var _addComment = function(data) {
+                    var time = moment().tz(window.epmLive.currentUserTimeZone.olsonName);
+                    
+                    var activity = {
+                        text: data.text,
+                        notComment: false,
+                        time:time,
+                        longDateTime: time.format('LLLL'),
+                        user: {
+                            displayName: window.epmLive.currentUserDisplayName,
+                            avatar: window.epmLive.currentUserAvatar,
+                            url: window.epmLive.currentWebUrl + '/_layouts/15/userdisp.aspx?ID=' + window.epmLive.currentUserId
+                        }
+                    };
+
+                    activity.displayTime = _getDisplayTime(activity, true);
+
+                    data.$thread.find(config.ui.selectors.latest).append(templates.activity(activity));
+                };
+
                 return {
                     render: _renderActivities,
                     getAction: _getAction,
                     getDisplayTime: _getDisplayTime,
                     getLongTime: _getLongTime,
-                    addMore: _addMore
+                    addMore: _addMore,
+                    addComment:_addComment
                 };
             })();
 

@@ -14,6 +14,8 @@ namespace EPMLiveWebParts.CONTROLTEMPLATES
         #region Properties (1) 
 
         public string CurrentUserTimeZone { get; private set; }
+        public string CurrentUserDisplayName { get; private set; }
+        public string CurrentUserAvatar { get; private set; }
 
         #endregion Properties 
 
@@ -43,6 +45,15 @@ namespace EPMLiveWebParts.CONTROLTEMPLATES
             });
 
             SetTimeZone(web, context);
+
+            CurrentUserDisplayName = web.CurrentUser.Name;
+
+            try
+            {
+                var picture = (string) (web.SiteUserInfoList.Items.GetItemById(web.CurrentUser.ID)["Picture"] ?? string.Empty);
+                CurrentUserAvatar = string.IsNullOrEmpty(picture) ? string.Empty : picture.Split(',')[0].Trim();
+            }
+            catch { }
         }
 
         private void SetTimeZone(SPWeb web, SPContext context)

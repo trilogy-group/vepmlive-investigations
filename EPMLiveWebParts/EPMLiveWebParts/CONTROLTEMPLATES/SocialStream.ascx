@@ -9,6 +9,8 @@
         
         window.epmLive = window.epmLive || {};
         window.epmLive.currentUserTimeZone = <%= CurrentUserTimeZone %>;
+        window.epmLive.currentUserDisplayName = '<%= CurrentUserDisplayName %>';
+        window.epmLive.currentUserAvatar = '<%= CurrentUserAvatar %>';
     })();
 </SharePoint:ScriptBlock>
 
@@ -43,6 +45,7 @@
             <ul class="epm-se-todays-activities"></ul>
             <div class="epm-se-show-newer" data-threadId="{{id}}" data-action="newer"><span class="icon-arrow-down-16"></span>show newer activities</div>
             <ul class="epm-se-newer-activities"></ul>
+            <ul class="epm-se-newest-activities"></ul>
         {{/if}}
     </li>
     {{> comment-box}}
@@ -130,6 +133,6 @@
 <script id="_epm-se-comment-box" type="text/x-handlebars-template">
     <div data-threadId="{{id}}" class="epm-se-comment-box clearfix">
         <div class="epm-se-comment-input" contenteditable="true"></div>
-        <button class="epm-se-comment-post">Post</button>
+        <button id="epm-se-comment-post-{{id}}" class="epm-se-comment-post">Post</button>
     </div>
 </script>
