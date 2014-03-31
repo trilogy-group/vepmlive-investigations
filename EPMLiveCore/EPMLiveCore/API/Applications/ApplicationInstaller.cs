@@ -2411,7 +2411,15 @@ namespace EPMLiveCore.API
                                 {
                                     try
                                     {
-                                        var rb = new EPMLiveReportsAdmin.ReportBiz(oList.ParentWeb.Site.ID);
+                                        bool reportingV2Enabled = false;
+                                        try
+                                        {
+                                            reportingV2Enabled =
+                                                Convert.ToBoolean(CoreFunctions.getConfigSetting(SPContext.Current.Site.RootWeb, "reportingV2"));
+                                        }
+                                        catch{}
+
+                                        var rb = new EPMLiveReportsAdmin.ReportBiz(oList.ParentWeb.Site.ID, oList.ParentWeb.ID, reportingV2Enabled);
                                         EPMLiveReportsAdmin.ListBiz lb = rb.GetListBiz(oList.ID);
 
                                         if (string.IsNullOrEmpty(lb.ListName))
