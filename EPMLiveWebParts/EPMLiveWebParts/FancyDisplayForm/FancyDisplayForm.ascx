@@ -196,9 +196,6 @@
 
         FancyDispFormClient.fillWebPartData();
 
-        window.SP.SOD.notifyScriptLoadedAndExecuteWaitingJobs('EPMLive.Navigation.js');
-        window.SP.SOD.notifyScriptLoadedAndExecuteWaitingJobs('EPMLive.js');
-
         $(".fancy-display-form-wrapper .dispFormExpandHeader").click(function () {
             $header = $(this);
             $content = $header.next();

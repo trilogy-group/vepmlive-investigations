@@ -72,7 +72,6 @@ namespace EPMLiveWebParts
         protected override void OnPreRender(EventArgs e)
         {
             base.OnPreRender(e);
-            ScriptLink.Register(Page, "/epmlive/javascripts/libraries/jquery.min.js", false);
 
             SPContext.Current.FormContext.FormMode = SPControlMode.Display;
         }
