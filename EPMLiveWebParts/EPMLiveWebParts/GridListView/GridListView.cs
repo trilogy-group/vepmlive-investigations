@@ -27,6 +27,7 @@ using System.Reflection;
 using ReportFiltering;
 
 using System.Data.SqlClient;
+using EPMLiveCore.Infrastructure;
 
 namespace EPMLiveWebParts
 {
@@ -170,6 +171,10 @@ namespace EPMLiveWebParts
         bool bUsePopUp = false;
 
         bool? bContentReporting;
+
+        bool OnlyGrid = false;
+
+        GridViewSession gvs;
 
         #region Gantt Properties
 
@@ -1732,10 +1737,17 @@ namespace EPMLiveWebParts
                     buildParams();
                 });
             }
-            if (newGridMode.ToLower() == "gantt")
+
+            
+
+            //if (newGridMode.ToLower() == "gantt")
             {
-                ScriptLink.Register(Page, "/_layouts/epmlive/treegrid/GridE.js", false);
-                ScriptLink.Register(Page, "/_layouts/epmlive/GanttGrid.js", false);
+                //ScriptLink.Register(Page, "/_layouts/15/epmlive/treegrid/GridE.js", false);    
+                EPMLiveScriptManager.RegisterScript(Page, new[]
+                {
+                    "/treegrid/GridE", "GanttGrid"
+                });
+                //ScriptLink.Register(Page, "/_layouts/15/, false);
             }
 
             base.OnPreRender(e);
@@ -2184,6 +2196,9 @@ namespace EPMLiveWebParts
             try
             {
                 HideListView();
+                
+                if(view != null)
+                    gvs = new GridViewSession(view.ID);
 
                 if (activation != 0)
                 {
@@ -2287,7 +2302,7 @@ namespace EPMLiveWebParts
 
                     if (list != null && view != null)
                     {
-                        if (BOOLShowViewBar)
+                        if (BOOLShowViewBar && false)
                         {
                             SPContext context = SPContext.GetContext(this.Context, view.ID, list.ID, web);
                             toolbar.RenderContext = context;
@@ -2351,14 +2366,18 @@ namespace EPMLiveWebParts
                             output.WriteLine("}");
                             output.WriteLine("</script>");
                         }
+                        
+                        RenderActionMenu(output);
 
                         if (newGridMode != "")
                         {
                             switch (newGridMode)
                             {
                                 case "datasheet":
-                                case "grid":
                                     renderGrid(output, web);
+                                    break;
+                                case "grid":
+                                    renderGantt(output, web);
                                     addNewButton(output, web);
                                     break;
                                 case "gantt":
@@ -2404,10 +2423,403 @@ namespace EPMLiveWebParts
 
         }
 
+        private ArrayList GetGroups()
+        {
+            XmlDocument querydoc = new XmlDocument();
+            querydoc.LoadXml("<Query>" + view.Query + "</Query>");
+
+            ArrayList arrTempGroups = new ArrayList();
+
+            XmlNode ndGroupBy = querydoc.SelectSingleNode("//GroupBy");
+
+            if (ndGroupBy != null)
+            {
+                foreach (XmlNode nd in ndGroupBy.ChildNodes)
+                {
+                    string groupfield = nd.Attributes["Name"].Value;
+                    arrTempGroups.Add(groupfield);
+                }
+            }
+            foreach (string additionalgroup in getAdditionalGroupings().Split('|'))
+            {
+                if (additionalgroup.Trim() != "")
+                    arrTempGroups.Add(additionalgroup);
+            }
+
+            return arrTempGroups;
+        }
+
+        private void RenderActionMenu(HtmlTextWriter output)
+        {
+            if (!BOOLShowViewBar)
+                return;
+
+            ArrayList arrFields = new ArrayList();
+            ArrayList arrGroups = new ArrayList();
+
+            
+
+
+
+            if (string.IsNullOrEmpty(gvs.Columns))
+            {
+                foreach (string field in view.ViewFields)
+                {
+                    //SPField oField = list.Fields.GetFieldByInternalName(field);
+                    //arrFields.Add(getRealField(oField).InternalName);
+                    arrFields.Add(field);
+                }
+            }
+            else
+            {
+                foreach (string field in gvs.Columns.Split(','))
+                {
+                    //SPField oField = list.Fields.GetFieldByInternalName(field);
+                    //arrFields.Add(getRealField(oField).InternalName);
+                    arrFields.Add(field);
+                }
+            }
+
+            if (newGridMode == "gantt")
+                arrFields.Add("Gantt");
+            try
+            {
+                if (Page.Request["gridmode"] == "grid")
+                {
+                    arrFields.Remove("Gantt");
+                }
+            }
+            catch { }
+
+            gvs.Columns = string.Join(",", (string[])arrFields.ToArray(Type.GetType("System.String")));
+
+            if (string.IsNullOrEmpty(gvs.Groups))
+            {
+
+                arrGroups = GetGroups();
+
+            }
+            else
+            {
+                foreach (string field in gvs.Groups.Split(','))
+                {
+                    arrGroups.Add(field);
+                }
+            }
+
+            string fields = "";
+
+            SortedList sl = new SortedList();
+            ArrayList arrLookups = new ArrayList();
+
+            string AllGroupFields = "";
+
+            foreach (SPField field in list.Fields)
+            {
+
+                if (!field.Hidden)
+                {
+                    if (!field.ShowInDisplayForm.HasValue || field.ShowInDisplayForm.Value)
+                    {
+                        sl.Add(field.Title + field.InternalName, field);
+
+                        if (field.Type == SPFieldType.Lookup)
+                        {
+                            arrLookups.Add(field);
+                        }
+                    }
+                }
+            }
+
+            AllGroupFields = AllGroupFields.Trim(',');
+
+            foreach (DictionaryEntry de in sl)
+            {
+                SPField field = (SPField)de.Value;
+                fields += "'" + field.InternalName + "': { 'value': '" + System.Web.HttpUtility.HtmlEncode(field.Title) + "', 'checked':" + arrFields.Contains(field.InternalName).ToString().ToLower() + "},";
+                AllGroupFields += System.Web.HttpUtility.HtmlEncode(field.Title) + "|" + field.InternalName + "|" + field.Id + ",";
+            }
+
+            sl.Clear();
+            //TODO: remove this and make lookup joins work.
+            arrLookups.Clear();
+            if (gSettings.EnableContentReporting)
+            {
+                foreach (SPField field in arrLookups)
+                {
+                    try
+                    {
+                        SPFieldLookup lField = (SPFieldLookup)field;
+
+                        Guid glist = new Guid(lField.LookupList);
+
+                        if (glist != list.ID)
+                        {
+                            SPList llist = list.ParentWeb.Lists[glist];
+
+                            foreach (SPField lfield in llist.Fields)
+                            {
+                                if (lfield.Reorderable && !lfield.Hidden)
+                                {
+                                    sl.Add(lfield.Title, lfield);
+                                }
+                            }
+
+                            foreach (DictionaryEntry de in sl)
+                            {
+                                SPField ofield = (SPField)de.Value;
+                                fields += "'" + glist + "_" + ofield.InternalName + "': { 'value': '" + llist.Title + ": " + System.Web.HttpUtility.HtmlEncode(ofield.Title) + "', 'checked': false},";
+                            }
+                        }
+                    }
+                    catch { }
+                }
+            }
+            fields = fields.Trim(',');
+
+
+            string sGroups = "";
+
+            foreach(string group in arrGroups)
+            {
+                if (group != "")
+                {
+                    SPField field = list.Fields.GetFieldByInternalName(group);
+                    sGroups += @"{
+                    'displayName': '" + System.Web.HttpUtility.HtmlEncode(field.Title) + @"',
+                    'internalName': '" + group + @"',
+                    'id': '" + field.Id + @"'
+                },";
+                }
+            }
+
+
+            sGroups = sGroups.Trim(',');
+
+            output.WriteLine("<div id=\"actionmenu" + sFullGridId + "\" style=\"width:100%\"></div>");
+
+            output.WriteLine(@"<script language=""javascript"">
+
+            MenuLoaded" + sFullGridId + @" = false;
+            function loadMenu" + sFullGridId + @"()
+            {
+                if(MenuLoaded" + sFullGridId + @")
+                    return;
+                MenuLoaded" + sFullGridId + @" = true;");
+            if(BOOLShowViewBar)
+            {
+            output.WriteLine(@"var cfgs = [");
+                if(!hideNew)
+                {
+                    output.WriteLine(@"
+                    {
+                        'placement': 'left',
+                        'content': [
+                        {
+                            'controlId': 'btnNew',
+                            'controlType': 'button',
+                            'iconClass': 'fui-plus',
+                            'title': 'New Item',
+                            'events': [
+                                {
+                                    'eventName': 'click',
+                                    'function': function () { newItem" + sFullGridId + @"(true); }
+                                }
+                            ]
+                        }
+                    
+                        ]
+                    },");
+                }
+                output.WriteLine(@"{
+                    'placement': 'right',
+                    'content': [
+                    //search control
+                    {
+                        'controlId': 'btnSearch',
+                        'controlType': 'button',
+                        'iconClass': 'icon-search-3',
+                        'title': 'none',
+                        'events': [
+                            {
+                                'eventName': 'click',
+                                'function': function () { GridHideShowSearch(Grids[""GanttGrid" + sFullGridId + @"""]); }
+                            }
+                        ]
+                    },
+                    // filter button
+                    {
+                        'controlId': 'btnFilter',
+                        'controlType': 'button',
+                        'iconClass': 'icon-filter',
+                        'title': 'none',
+                        'events': [
+                            {
+                                'eventName': 'click',
+                                'function': function () { GridHideShowFilter(Grids[""GanttGrid" + sFullGridId + @"""]); }
+                            }
+                        ]
+                    },
+                    // default sort button
+                    {
+                        'controlId': 'btnDefaultSort',
+                        'controlType': 'button',
+                        'iconClass': 'icon-sort',
+                        'title': 'none',
+                        'events': [
+                            {
+                                'eventName': 'click',
+                                'function': function () { GridSort(Grids[""GanttGrid" + sFullGridId + @"""]); }
+                            }
+                        ]
+                    },
+                    //group by fields
+                    {
+                        'controlType': 'groupByFields',
+                        'availableGroups': '" + AllGroupFields + @"',
+                        
+                        'groups': [" + sGroups + @"],
+                        'saveFunction': function (data) { return ChangeGroups('" + sFullGridId + @"', data) }
+                    },
+                    //select columns control
+                    {
+                        'controlId': 'msColumns',
+                        'controlType': 'multiselect',
+                        'title': '',
+                        'value': '',
+                        'iconClass': 'icon-insert-template',
+                        'sections': [
+                            {
+                                'heading': 'Current List',
+                                'divider': 'no',
+                                'options':
+                                    {
+                                     " + fields + @"
+                                    }
+                            },
+                            {
+                                'heading': 'Special Columns',
+                                'divider': 'no',
+                                'options':
+                                    {
+                                        'Gantt': { 'value': 'Gantt Chart', 'checked':" + arrFields.Contains("Gantt").ToString().ToLower() + @"}
+                                    }
+                            }
+                        ],
+                        'applyButtonConfig': {
+                            'text': 'Apply',
+                            'function': function(data) { return ChangeColumns('" + sFullGridId + @"', data) }
+                        },
+                        'onchangeFunction': function(data) {}
+                    },
+                    //view control
+                    {
+                        'controlId': 'ddlViewControl',
+                        'controlType': 'dropdown',
+                        'title': 'View: ',
+                        'value': '" + view.Title + @"',
+                        'iconClass': 'none',
+                        'sections': [
+                            {
+                                'heading': 'none',
+                                'options': [
+                                " + GetViews() + @"
+                                ]
+                            }");
+                        if (list.DoesUserHavePermissions(SPBasePermissions.ManageLists, true))
+                        {
+                            output.WriteLine(@",
+                                    {
+                                        'heading': 'none',
+                                        'divider': 'yes',
+                                        'options': [
+                                            {
+                                                'iconClass': 'icon-pencil icon-dropdown',
+                                                'text': 'Edit View',
+                                                'events': [
+                                                    {
+                                                        'eventName': 'click',
+                                                        'function': function () { return GridListEditView('" + list.ID + @"','" + view.ID + @"'); }
+                                                        //add a callback method
+                                                    }
+                                                ]
+
+                                            },
+                                            {
+                                                'iconClass': 'icon-plus-2 icon-dropdown',
+                                                'text': 'Create View',
+                                                'events': [
+                                                    {
+                                                        'eventName': 'click',
+                                                        'function': function () { return GridListCreateView('" + list.ID + @"'); }
+                                                    }
+                                                ]
+                                            }
+
+                                        ]
+                                    }");
+                        }
+
+                        output.WriteLine(@"]
+                    }");
+
+            if(list.DoesUserHavePermissions(SPBasePermissions.ManageLists, true))
+            {
+                    output.WriteLine(@",
+                    {
+                        'controlId': 'btnSettings',
+                        'controlType': 'button',
+                        'iconClass': 'icon-cog-2 ',
+                        'title': 'none',
+                        'events': [
+                            {
+                                'eventName': 'click',
+                                'function': function () { GridListSettings('" + list.ID + @"'); }
+                            }
+                        ]
+                    }");
+            }
+            output.WriteLine(@"]
+                }
+            ];
+                epmLiveGenericToolBar.generateToolBar('actionmenu" + sFullGridId + @"', cfgs);");
+
+            }
+            output.WriteLine(@"}
+
+            //ExecuteOrDelayUntilScriptLoaded(loadMenu" + sFullGridId + @", 'EPMLive.js');            
+        </script>");
+        }
+
+        private string GetViews()
+        {
+            StringBuilder sb = new StringBuilder();
+
+            foreach (SPView view in list.Views)
+            {
+
+                sb.Append("{");
+                sb.Append("'iconClass': '',");
+                sb.Append("'text': '" + view.Title + "',");
+                sb.Append("'events': [");
+                sb.Append("{");
+                sb.Append("'eventName': 'click',");
+                sb.Append("'function': function () { location.href='" + view.ServerRelativeUrl + Page.Request.Url.Query  + "'; }");
+                sb.Append("}");
+                sb.Append("]");
+                sb.Append("},");
+            }
+
+
+            return sb.ToString().Trim(',');
+        }
+
         private void HideListView()
         {
             if (SPContext.Current.ViewContext.View != null)
             {
+                bool bHasListView = false;
+
                 foreach (System.Web.UI.WebControls.WebParts.WebPart wp in WebPartManager.WebParts)
                 {
                     try
@@ -2417,11 +2829,15 @@ namespace EPMLiveWebParts
                             Microsoft.SharePoint.WebPartPages.XsltListViewWebPart wp2 = (Microsoft.SharePoint.WebPartPages.XsltListViewWebPart)wp;
                             wp2.XmlDefinition = wp2.XmlDefinition.Replace("<Toolbar Type=\"Standard\"/>", "<Toolbar Type=\"Standard\" ShowAlways=\"TRUE\"/>");
                             wp.Visible = false;
+                            bHasListView = true;
                             break;
                         }
                     }
                     catch { }
                 }
+
+                if (WebPartManager.WebParts.Count <= 2 && SPContext.Current.ViewContext.View != null && bHasListView)
+                    OnlyGrid = true;
             }
         }
 
@@ -2539,10 +2955,261 @@ namespace EPMLiveWebParts
             output.WriteLine("</script>");
         }
 
+        private void RenderSearch(HtmlTextWriter output, SPWeb web)
+        {
+            if (bShowSearch && !bHasSearchResults)
+                output.WriteLine("<div id=\"searchload" + sFullGridId + "\" style=\"\">");
+            else
+                output.WriteLine("<div id=\"searchload" + sFullGridId + "\" style=\"display:none\">");
+
+            if (sSearchField != "" || bShowSearch)
+                output.WriteLine("<div id=\"searchdiv" + sFullGridId + "\" style=\"\">");
+            else
+                output.WriteLine("<div id=\"searchdiv" + sFullGridId + "\" style=\"display:none\">");
+            {
+                string fieldlist = "";
+                string jsonfields = "";
+                SortedList slFields = new SortedList();
+
+                if (sSearchField == "")
+                    sSearchField = "Title";
+
+                if (sSearchType == "")
+                    sSearchType = "1";
+
+                foreach (SPField field in list.Fields)
+                {
+                    if (field.Reorderable && !field.Hidden)
+                    {
+                        slFields.Add(field.Title, field.InternalName);
+
+
+                        if (field.Type == SPFieldType.Choice)
+                        {
+                            jsonfields += field.InternalName + ": [";
+                            SPFieldChoice c = (SPFieldChoice)field;
+                            foreach (string choice in c.Choices)
+                            {
+                                jsonfields += "\"" + choice + "\",";
+                            }
+                            jsonfields = jsonfields.TrimEnd(',') + "],";
+                        }
+                        if (field.Type == SPFieldType.Boolean)
+                        {
+                            jsonfields += field.InternalName + ": [ \"Yes\", \"No\" ],";
+                        }
+                    }
+                }
+
+                foreach (DictionaryEntry de in slFields)
+                {
+                    if (sSearchField == de.Value.ToString())
+                        fieldlist += "<option value=\"" + de.Value + "\" selected>" + de.Key.ToString() + "</option>";
+                    else
+                        fieldlist += "<option value=\"" + de.Value + "\">" + de.Key.ToString() + "</option>";
+                }
+
+                output.WriteLine("<script language=\"javascript\">");
+                output.WriteLine("var searchfields" + sFullGridId + " = {" + jsonfields.TrimEnd(',') + "};");
+                output.WriteLine("function switchsearch" + sFullGridId + "()");
+                output.WriteLine("{");
+                output.WriteLine("var searcher = document.getElementById('search" + sFullGridId + "');");
+                output.WriteLine("var searchtext = document.getElementById('searchtext" + sFullGridId + "');");
+                output.WriteLine("var searchchoice = document.getElementById('searchchoice" + sFullGridId + "');");
+                output.WriteLine("var searchtypechoice = document.getElementById('searchtype" + sFullGridId + "');");
+                output.WriteLine("var searchfield = searcher.options[searcher.selectedIndex].value;");
+                output.WriteLine("var sList = searchfields" + sFullGridId + "[searchfield];");
+                output.WriteLine("if(sList){");
+                output.WriteLine("searchtext.style.display='none';");
+                output.WriteLine("searchchoice.style.display='';");
+                output.WriteLine("searchchoice.options.length = 0;");
+                output.WriteLine("searchtypechoice.options[2].selected = true;");
+                output.WriteLine("searchtypechoice.disabled = true;");
+                output.WriteLine("for(var i=0; i < sList.length; i++) {     var d = sList[i];     searchchoice.options.add(new Option(d, d)); if(d=='" + sSearchValue + "'){searchchoice.options[searchchoice.options.length-1].selected = true;} } ");
+
+                output.WriteLine("}else{");
+                output.WriteLine("searchtext.style.display='';");
+                output.WriteLine("searchchoice.style.display='none';");
+                output.WriteLine("searchtypechoice.disabled = false;");
+                output.WriteLine("}");
+                output.WriteLine("}");
+
+                output.WriteLine("function unSearch" + sFullGridId + "(){");
+                
+                output.WriteLine("var unsearch = document.getElementById('unsearch" + sFullGridId + "');");
+                output.WriteLine("unsearch.style.display=\"none\";");
+                output.WriteLine("var searchtext = document.getElementById('searchtext" + sFullGridId + "');");
+                output.WriteLine("searchtext.value = '';");
+                if (bLockSearch)
+                {
+                    System.Collections.Specialized.NameValueCollection nv = Page.Request.QueryString;
+                    StringBuilder sbUrl = new StringBuilder();
+
+                    string fListId = list.ID.ToString("N");
+
+                    foreach (string key in nv.AllKeys)
+                    {
+                        if (key != fListId + "_searchvalue" && key != fListId + "_searchfield" && key != fListId + "_searchtype")
+                        {
+                            sbUrl.Append("&");
+                            sbUrl.Append(key);
+                            sbUrl.Append("=");
+                            sbUrl.Append(HttpUtility.UrlEncode(nv[key]));
+                        }
+                    }
+
+                    string urlParams = sbUrl.ToString().TrimStart('&');
+                    if (!String.IsNullOrEmpty(urlParams))
+                        urlParams = "?" + urlParams;
+
+                    string curUrl = Page.Request.Url.ToString();
+
+                    try
+                    {
+                        curUrl = curUrl.Remove(curUrl.IndexOf("?"));
+                    }
+                    catch { }
+
+                    output.WriteLine("var url = '" + curUrl + urlParams + "';");
+
+                    output.WriteLine("location.href= url;");
+                }
+                else
+                {
+                    output.WriteLine("GridUnSearch('" + sFullGridId + "');");
+                }
+                output.WriteLine("}");
+
+                output.WriteLine("function doSearch" + sFullGridId + "(){");
+                
+                //output.WriteLine("var searchbut = document.getElementById('searchbutton" + sFullGridId + "');");
+                //output.WriteLine("searchbut.disabled = true;");
+                output.WriteLine("var searcher = document.getElementById('search" + sFullGridId + "');");
+
+                output.WriteLine("var unsearch = document.getElementById('unsearch" + sFullGridId + "');");
+                output.WriteLine("unsearch.style.display=\"table-cell\";");
+                output.WriteLine("var searchchoice = document.getElementById('searchchoice" + sFullGridId + "');");
+                output.WriteLine("var searchtext = document.getElementById('searchtext" + sFullGridId + "');");
+                output.WriteLine("var searchtypechoice = document.getElementById('searchtype" + sFullGridId + "');");
+                output.WriteLine("var searchfield = searcher.options[searcher.selectedIndex].value;");
+                output.WriteLine("var searchtype = searchtypechoice.options[searchtypechoice.selectedIndex].value;");
+                output.WriteLine("var sList = searchfields" + sFullGridId + "[searchfield];");
+                output.WriteLine("var searchvalue = \"\";");
+                output.WriteLine("if(sList){");
+                output.WriteLine("searchvalue = searchchoice.options[searchchoice.selectedIndex].value;");
+                output.WriteLine("}else{");
+                output.WriteLine("searchvalue = searchtext.value;");
+                output.WriteLine("}");
+
+                if (bLockSearch)
+                {
+                    System.Collections.Specialized.NameValueCollection nv = Page.Request.QueryString;
+                    StringBuilder sbUrl = new StringBuilder();
+
+                    string fListId = list.ID.ToString("N");
+
+                    foreach (string key in nv.AllKeys)
+                    {
+                        if (key != fListId + "_searchvalue" && key != fListId + "_searchfield" && key != fListId + "_searchtype")
+                        {
+                            sbUrl.Append("&");
+                            sbUrl.Append(key);
+                            sbUrl.Append("=");
+                            sbUrl.Append(HttpUtility.UrlEncode(nv[key]));
+                        }
+                    }
+
+                    string urlParams = sbUrl.ToString().TrimStart('&');
+                    if (!String.IsNullOrEmpty(urlParams))
+                        urlParams = "?" + urlParams;
+
+                    string curUrl = Page.Request.Url.ToString();
+
+                    try
+                    {
+                        curUrl = curUrl.Remove(curUrl.IndexOf("?"));
+                    }
+                    catch { }
+
+                    output.WriteLine("var url = '" + curUrl + urlParams + "';");
+                    output.WriteLine("if(url.indexOf('?') > 0){url = url + '&';}else{url = url + '?';}");
+                    output.WriteLine("url = url + '" + fListId + "_searchfield=' + searchfield + '&" + fListId + "_searchvalue=' + searchvalue + '&" + fListId + "_searchtype=' + searchtype;");
+                    output.WriteLine("location.href= url;");
+
+                }
+                else
+                {
+
+                    output.WriteLine("GridSearch('" + sFullGridId + "', searcher.options[searcher.selectedIndex].value, searchvalue, searchtype);");
+                }
+
+                output.WriteLine("}");
+
+                output.WriteLine("function enablesearcher" + sFullGridId + "(){");
+                //output.WriteLine("var searchbut = document.getElementById('searchbutton" + sFullGridId + "');");
+                //output.WriteLine("searchbut.disabled = false;");
+                output.WriteLine("}");
+
+                output.WriteLine("</script>");
+
+                output.Write("<div id=\"search" + this.ID + "\" style=\"width:100%; height:40px;");
+                //if (!bShowSearch)
+                //    output.Write(";display:none");
+                output.WriteLine("\" class=\"ms-listviewtable\"><table><tr><td style=\"color: #A3A3A3; font-family: \"Open Sans\", Helvetica, Arial, sans-serif; font-size: 14px;\">");
+                output.Write("Search: ");
+                output.Write("<select id=\"search" + sFullGridId + "\" onChange=\"switchsearch" + sFullGridId + "();\" class=\"form-control\">");
+                output.WriteLine(fieldlist);
+                output.Write("</select>&nbsp;&nbsp;");
+
+                output.WriteLine("<select id=\"searchtype" + sFullGridId + "\" class=\"form-control\">");
+                output.WriteLine(typeoption("1", "Contains"));
+                output.WriteLine(typeoption("8", "Begins With"));
+                output.WriteLine(typeoption("2", "Equals"));
+                output.WriteLine(typeoption("3", "Does Not Equal"));
+                output.WriteLine(typeoption("4", "Greater Than"));
+                output.WriteLine(typeoption("5", "Greater Than or Equal"));
+                output.WriteLine(typeoption("6", "Less Than"));
+                output.WriteLine(typeoption("7", "Less Than or Equal"));
+
+                output.WriteLine("</select>&nbsp;&nbsp;");
+                output.WriteLine("</td><td>");
+                output.WriteLine(@"<div style=""border: 1px solid #CCC;width: 200px;height: 30px;"">
+                    <div id=""unsearch" + sFullGridId + @""" class="""" style=""padding-left:4px;display: " + ((sSearchField == "") ? "none":"table-cell") + @";min-width: 12px;align:top"">
+                        <img alt=""Clear Search"" src=""/_layouts/epmlive/images/unsearch.png"" style=""padding-bottom:2px"" onclick=""unSearch" + sFullGridId + @"()""/>
+                    </div>
+                    <div style=""display: table-cell"">
+                        <input type=""text"" id=""searchtext" + sFullGridId + @""" value=""" + sSearchValue + @""" style=""border: 0px; width:100%; margin-top:-5px; height:24px; font-family: 'Segoe UI','Segoe',Tahoma,Helvetica,Arial,sans-serif;font-size:13px""/>
+                        <select id=""searchchoice" + sFullGridId + @""" style=""border: 0px; width:100%"">
+                        </select>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    </div>
+                    <div class="""" style=""padding-right:2px; padding-left:10px;padding-top:5px;display: table-cell;min-width: 10px;cursor:pointer"">
+                        <img onclick=""doSearch" + sFullGridId + @"()"" src=""/_layouts/epmlive/images/find_icon.png""/>
+                    </div>
+                </div>");
+
+                //                output.Write("<input type=\"button\" id=\"searchbutton" + sFullGridId + "\" onclick=\"doSearch" + sFullGridId + "()\" value=\"Search\">");
+                output.WriteLine("</td></tr></table>");
+                output.WriteLine("</div>");
+
+                output.WriteLine("<script language=\"javascript\">switchsearch" + sFullGridId + "();</script>");
+
+            }
+            output.WriteLine("</div>");
+            output.WriteLine("</div>");
+        }
+
         private void renderGantt(HtmlTextWriter output, SPWeb web)
         {
             //ganttControl.RenderControl(output);
 
+            var sCols = "";
+
+            foreach (string field in view.ViewFields)
+            {
+                sCols += "," + field;
+            }
+
+            sCols = sCols.Trim(',');
 
             output.Write("<script type=\"text/javascript\" src=\"_layouts/epmlive/modal/modal.js\"></script> ");
 
@@ -2564,92 +3231,165 @@ namespace EPMLiveWebParts
                 catch { }
             }
 
-            if (BOOLShowViewBar)
-                iHeight -= 45;
-
-            if ((!hideNew && SPContext.Current.ViewContext.View != null) || (BOOLShowViewBar && !hideNew) || (!hideNew && bIsFormWebpart))
-            {
-                iHeight -= 30;
-            }
-
             string sHeight = "";
             if (iHeight != 0)
-                sHeight = "height: " + iHeight.ToString() + suffix;
+            {
+                if (BOOLShowViewBar)
+                    iHeight -= 45;
 
-            output.Write("<table><tr><td>");
+                if ((!hideNew && SPContext.Current.ViewContext.View != null) || (BOOLShowViewBar && !hideNew) || (!hideNew && bIsFormWebpart))
+                {
+                    iHeight -= 30;
+                }
+
+                sHeight = "height: " + iHeight.ToString() + suffix;
+            }
+            else
+                sHeight = "height: 300px;";
+
+            
+            output.Write("<table id=pagetable" + sFullGridId + "><tr><td>");
             if (view.RowLimit > 0)
             {
                 if (gSettings.EnableContentReporting)
+                {
                     output.Write("<div style=\"display:inline-block;margin:5px 0 5px 0;\"><div id=\"pagediv" + sFullGridId + "\"></div>");
+                    output.Write("</td><td><div id=\"viewalldiv" + sFullGridId + "\" style=\"display:none;margin:0px 3px 0 0;\" class=\"jPaginate\"><a onclick=\"ViewAllPages('" + sFullGridId + "');\" style=\"color: rgb(102, 102, 102); background-color: rgb(255, 255, 255); border: 1px solid rgb(219, 219, 219);\">View All</a></div></td></tr></table>");
+                }
                 else
+                {
                     output.Write("<div id=\"pagediv" + sFullGridId + "\" style=\"display:none;margin:5px 0 5px 0;\"><div id=\"PagePrevious" + sFullGridId + "\" style=\"height:18px;width:70px;border:1px solid #CACACA;float:left;padding-left:5px;background-color:#EFEFEF\" onClick=\"javascript:PreviousPage" + sFullGridId + "()\"><a href=\"javascript:void(0);\" style=\"text-decoration:none;color:#666\">&lt; Previous</a></div> <div id=\"PageNext" + sFullGridId + "\" style=\"height:18px;width:70px;border:1px solid #CACACA;float:left;margin-left:10px;padding-right:5px;text-align:right;background-color:#EFEFEF\" onClick=\"javascript:NextPage" + sFullGridId + "()\"><a style=\"text-decoration:none;color:#666\" href=\"javascript:void(0);\">Next &gt;</a></div></div>");
+                    output.Write("</td></tr></table>");
+                }
             }
-            output.Write("</td></tr></table>");
 
-            output.WriteLine("<div id=\"griddiv" + sFullGridId + "\" style=\"width:100%;" + sHeight + "\"><treegrid Data_Url=\"" + web.Url + "/_layouts/epmlive/getganttitems.aspx?data=" + sFullParamList + "\" Debug=\"\"/></div>");
+            RenderSearch(output, web);
 
-            output.Write("<div  width=\"100%\" id=\"loadinggrid" + this.ID + "\" align=\"center\">");
-            output.Write("<img src=\"_layouts/images/gears_anv4.gif\" style=\"vertical-align: middle;\"/> Loading Items...");
+            output.Write("<div  width=\"100%\" id=\"loadinggrid" + sFullGridId + "\" align=\"center\">");
+            //output.Write("<img src=\"_layouts/images/gears_anv4.gif\" style=\"vertical-align: middle;\"/> Loading Items...");
             output.Write("</div>");
 
+            string sSearcher = "";
+
+            if (bHasSearchResults)
+            {
+                sSearcher = "&searchfield=" + sSearchField + "&searchvalue=" + sSearchValue + "&searchtype=" + sSearchType;
+            }
+
+            output.Write("<div style=\"" + sHeight + "overflow:hidden;\" id=\"gridouter" + sFullGridId + "\">");
+            output.WriteLine("<div id=\"griddiv" + sFullGridId + "\" style=\"width:100%;height:100%\">");
+            //if (!bShowSearch || bHasSearchResults)
+            //    output.WriteLine("<treegrid SuppressMessage=\"3\" Data_Url=\"" + web.Url + "/_layouts/epmlive/getganttitems.aspx?data=" + sFullParamList + sSearcher + "\"/>");
+            output.WriteLine("</div>");
+
+            output.Write("</div>");
+
+            
+
             output.WriteLine("<script language=\"javascript\">");
+            if (Page.Request["epmdebug"] == "true")
+                output.WriteLine("epmdebug=true");
+            else
+                output.WriteLine("epmdebug=false");
+
+
+            output.WriteLine("function LoadGrid" + sFullGridId + "(){ LoadGrid('" + sFullGridId + "');}");
+
+            if (!bShowSearch || bHasSearchResults)
+            {
+                //output.WriteLine("EPM.UI.Loader.current().startLoading({ id: 'loadinggrid" + sFullGridId + "' });");
+                //output.WriteLine("EPM.UI.Loader.current().startLoading({ id: 'WebPart" + Qualifier + "' });");
+                output.WriteLine("SP.SOD.executeOrDelayUntilScriptLoaded(LoadGrid" + sFullGridId + ", 'EPMLive.js');");
+            }
+            else
+            {
+                
+                output.WriteLine("SP.SOD.executeOrDelayUntilScriptLoaded(loadMenu" + sFullGridId + ", 'EPMLive.js');");
+            }
+            
+            
 
             output.WriteLine("function NextPage" + sFullGridId + "(){");
-            output.WriteLine("if(lastItem" + sFullGridId + " != 0){");
-            output.WriteLine("Grids[\"GanttGrid" + sFullGridId + "\"].Data.Data.Url = DataUrl" + sFullGridId + " + '&Page=' + lastItem" + sFullGridId + ";");
+            output.WriteLine("if(mygrid" + sFullGridId + ".PAGElastItem != 0){");
+            output.WriteLine("Grids[\"GanttGrid" + sFullGridId + "\"].Data.Data.Url = DataUrl" + sFullGridId + " + '&Page=' + mygrid" + sFullGridId + ".PAGElastItem;");
             output.WriteLine("Grids[\"GanttGrid" + sFullGridId + "\"].Reload();");
 
             output.WriteLine("}}");
 
             output.WriteLine("function PreviousPage" + sFullGridId + "(){");
-            output.WriteLine("if(fItemHide" + sFullGridId + " != firstItem" + sFullGridId + "){");
+            output.WriteLine("if(mygrid" + sFullGridId + ".PAGEfItemHide != mygrid" + sFullGridId + ".PAGEfirstItem){");
 
-            output.WriteLine("Grids[\"GanttGrid" + sFullGridId + "\"].Data.Data.Url = DataUrl" + sFullGridId + " + '&Page=' + firstItem" + sFullGridId + ";");
+            output.WriteLine("Grids[\"GanttGrid" + sFullGridId + "\"].Data.Data.Url = DataUrl" + sFullGridId + " + '&Page=' + mygrid" + sFullGridId + ".PAGEfirstItem;");
             output.WriteLine("Grids[\"GanttGrid" + sFullGridId + "\"].Reload();");
             output.WriteLine("}}");
-            output.WriteLine("DataUrl" + sFullGridId + " = '" + web.Url + "/_layouts/epmlive/getganttitems.aspx?data=" + sFullParamList + "'");
-            output.WriteLine(@"Grids.OnRenderFinish = function(grid){
+
+            output.WriteLine("TGSetEvent(\"OnRenderFinish\", \"GanttGrid" + sFullGridId + "\", GridOnRenderFinish);");
+                output.WriteLine("DataUrl" + sFullGridId + " = '" + web.Url + "/_layouts/epmlive/getganttitems.aspx?data=" + sFullParamList + "'");
+            /*output.WriteLine(@"Grids.OnRenderFinish = function(grid){
                                
                                 grid.ActionZoomFit();
 
 
-                        };");
-            output.WriteLine("Grids.OnReady = function(grid, start)  { document.getElementById('loadinggrid" + this.ID + "').style.display = 'none'; }");
-            output.WriteLine(@"Grids.OnRenderFinish = function(grid)  { 
-                    clickTab();
-                    grid.ScrollToDate(new Date(), 'Left'); 
+                        };");*/
+            //output.WriteLine("mygrid" + sFullGridId + ".Columns = '" + sCols + "';");
+            output.WriteLine("OnlyGrid = " + OnlyGrid.ToString().ToLower() + ";");
+            
+            /*output.WriteLine(@"Grids.OnRenderFinish = function(grid)  { 
+                    //clickTab();
+                    //grid.ScrollToDate(new Date(), 'Left'); 
                     if(ArrGantts.indexOf(grid.id) > -1)
                         setupPage" + sFullGridId + @"(grid.PagInfo, " + gSettings.EnableContentReporting.ToString().ToLower() + @", grid.PagSize);
+                    addcontext();
                 }");
             output.WriteLine(@"Grids.OnReload = function(grid)  { 
-                    if(ArrGantts.indexOf(grid.id) > -1)
-                        setupPage" + sFullGridId + @"(grid.PagInfo, " + gSettings.EnableContentReporting.ToString().ToLower() + @", grid.PagSize);
-                }");
-            output.WriteLine(@"Grids.OnClick = function(grid, row, col, x, y, event) 
-                                {
-                                    SelectRibbonTab('Ribbon.ListItem', true);
-                                    //var wp = document.getElementById('MSOZoneCell_WebPart" + this.Qualifier + @"');
-                                    //fireEvent(wp, 'mouseup');
-                                    //setTimeout('showribbon()', 100);
-                                    
-                                };
-                                function showribbon()
-                                {
-                                var wp2 = document.getElementById('Ribbon.ListItem-title');
-		                                                            if(wp2)
-			                                                            fireEvent(wp2.firstChild, 'click'); 
-                                }");
+                    
+                }");*/
+//            output.WriteLine(@"Grids.OnClick = function(grid, row, col, x, y, event) 
+//                                {
+//                                    //SelectRibbonTab('Ribbon.ListItem', true);
+//                                    //var wp = document.getElementById('MSOZoneCell_WebPart" + this.Qualifier + @"');
+//                                    //fireEvent(wp, 'mouseup');
+//                                    //setTimeout('showribbon()', 100);
+//                                    
+//                                };
+//                                function showribbon()
+//                                {
+//                                var wp2 = document.getElementById('Ribbon.ListItem-title');
+//		                                                            if(wp2)
+//			                                                            fireEvent(wp2.firstChild, 'click'); 
+//                                }");
 
-            output.WriteLine("function ChangePage" + sFullGridId + "(pg){");
-            output.WriteLine("Grids[\"GanttGrid" + sFullGridId + "\"].Data.Data.Url = DataUrl" + sFullGridId + " + '&Page=' + pg;");
-            output.WriteLine("Grids[\"GanttGrid" + sFullGridId + "\"].ReloadBody();");
-            output.WriteLine("}");
+            
 
             output.WriteLine("ArrGantts.push('GanttGrid" + sFullGridId + "');");
             output.WriteLine("mygrid" + sFullGridId + " = new Object();");
+
+            if (bHasSearchResults)
+            {
+                output.WriteLine("mygrid" + sFullGridId + ".Searcher='" + sSearcher + "';");
+            }
+            else
+                output.WriteLine("mygrid" + sFullGridId + ".Searcher='';");
+
+            output.WriteLine("mygrid" + sFullGridId + ".Qualifier='" + Qualifier + "';");
+
+            if (bShowSearch || bHasSearchResults)
+                output.WriteLine("mygrid" + sFullGridId + ".ForceSearch=true;");
+
+            output.WriteLine("mygrid" + sFullGridId + ".loaded = false");
+            if(gvs.Page == 0)
+                if (gSettings.EnableContentReporting)
+                    output.WriteLine("mygrid" + sFullGridId + ".CurPage = 1;");
+                else
+                    output.WriteLine("mygrid" + sFullGridId + ".CurPage = 0;");
+            else
+                output.WriteLine("mygrid" + sFullGridId + ".CurPage = " + gvs.Page + ";");
+
+            output.WriteLine("mygrid" + sFullGridId + ".Cols = ''");
+
             output.WriteLine("var myDataProcessor" + sFullGridId + " = new Object();");
 
-            output.WriteLine("mygrid" + sFullGridId + "._singleItemUrl = \"" + web.Url + "/_layouts/epmlive/getsingleitem.aspx?data=" + sFullParamList + "&edit=" + inEditMode.ToString().ToLower() + "\";");
+            output.WriteLine("mygrid" + sFullGridId + ".Params = \"" + sFullParamList + "\";");
 
             //CUSTOM PROPERTIES
 
@@ -2692,10 +3432,10 @@ namespace EPMLiveWebParts
                                                                                     try{
                                                                                     var grid = Grids.GanttGrid" + sFullGridId + @";
 
-                                                                                    var row = grid.FRow;
-                                                                                    //for(var sRow in sRows)
+                                                                                    var sRows = grid.GetSelRows();
+                                                                                    for(var sRow in sRows)
                                                                                     {
-                                                                                        //var row = sRows[sRow];
+                                                                                        var row = sRows[sRow];
     
                                                                                         if(row.itemid != """")
                                                                                         {
@@ -2839,6 +3579,14 @@ namespace EPMLiveWebParts
             */
             output.Write("</script>");
 
+
+            if (OnlyGrid)
+            {
+                output.WriteLine(@"<style>
+                                #MSOZoneCell_WebPartWPQ2{display:none !important;}
+                                .ms-webpartzone-cell {margin: auto !important}
+                                </style>");
+            }
         }
 
         private string typeoption(string id, string display)
@@ -2853,6 +3601,70 @@ namespace EPMLiveWebParts
 
         private void renderGrid(HtmlTextWriter output, SPWeb web)
         {
+            //var sCols = "";
+
+            //foreach (string field in view.ViewFields)
+            //{
+            //    sCols += "," + field;
+            //}
+
+            //sCols = sCols.Trim(',');
+
+            //int iHeight = 0;
+
+            //string suffix = "";
+
+            //if (!string.IsNullOrEmpty(this.Height))
+            //{
+            //    MatchCollection mc = Regex.Matches(this.Height, @"^\d+");
+
+            //    iHeight = int.Parse(mc[0].Value);
+
+            //    try
+            //    {
+            //        suffix = Regex.Matches(this.Height.Substring(mc[0].Value.Length), @"\w+")[0].Value;
+            //    }
+            //    catch { }
+            //}
+
+            //if (BOOLShowViewBar)
+            //    iHeight -= 45;
+
+            //if ((!hideNew && SPContext.Current.ViewContext.View != null) || (BOOLShowViewBar && !hideNew) || (!hideNew && bIsFormWebpart))
+            //{
+            //    iHeight -= 30;
+            //}
+
+            //string sHeight = "";
+            //if (iHeight != 0)
+            //    sHeight = "height: " + iHeight.ToString() + suffix;
+
+
+
+            //output.Write("<table><tr><td>");
+            //if (view.RowLimit > 0)
+            //{
+            //    if (gSettings.EnableContentReporting)
+            //        output.Write("<div style=\"display:inline-block;margin:5px 0 5px 0;\"><div id=\"pagediv" + sFullGridId + "\"></div>");
+            //    else
+            //        output.Write("<div id=\"pagediv" + sFullGridId + "\" style=\"display:none;margin:5px 0 5px 0;\"><div id=\"PagePrevious" + sFullGridId + "\" style=\"height:18px;width:70px;border:1px solid #CACACA;float:left;padding-left:5px;background-color:#EFEFEF\" onClick=\"javascript:PreviousPage" + sFullGridId + "()\"><a href=\"javascript:void(0);\" style=\"text-decoration:none;color:#666\">&lt; Previous</a></div> <div id=\"PageNext" + sFullGridId + "\" style=\"height:18px;width:70px;border:1px solid #CACACA;float:left;margin-left:10px;padding-right:5px;text-align:right;background-color:#EFEFEF\" onClick=\"javascript:NextPage" + sFullGridId + "()\"><a style=\"text-decoration:none;color:#666\" href=\"javascript:void(0);\">Next &gt;</a></div></div>");
+            //}
+            //output.Write("</td></tr></table>");
+
+            //output.WriteLine("<div id=\"griddiv" + sFullGridId + "\" style=\"width:100%;" + sHeight + "\"></div>");
+
+            //output.WriteLine("<script language=\"javascript\">");
+            ////output.WriteLine("GridProperties[Grid" + sFullGridId + "] = new 
+            //output.WriteLine(@"GridProperties[""Grid" + sFullGridId + @"""] = """ + sCols + @""";");
+
+            ////output.WriteLine(@"TreeGrid( { Data:{ Url:""" + (web.ServerRelativeUrl == "/" ? "": web.ServerRelativeUrl) + @"/_vti_bin/WorkEngine.asmx"", Method:""Soap"",Function:""Execute"",Namespace:""workengine.com"",Param:{Function:""webparts_GetGrid"",Dataxml:""" + sFullParamList + @""" } }, SuppressMessage:2, Debug:""}, ""griddiv" + sFullGridId + @"\"" );");
+            //output.WriteLine(@"TreeGrid( { Data:{ Url:""" + (web.ServerRelativeUrl == "/" ? "" : web.ServerRelativeUrl) + @"/_vti_bin/WorkEngine.asmx"", Method:""Soap"",Function:""Execute"",Namespace:""workengine.com"",Param:{Function:""webparts_GetGrid"",Dataxml:""" + sFullParamList + "|" + sCols + @""" } } }, ""griddiv" + sFullGridId + @""" );");
+
+            //output.WriteLine("</script>");
+
+
+
+            //return;
 
             output.Write("<style>");
             output.Write(".ms-usereditor { width:200px; }");
@@ -3183,7 +3995,7 @@ namespace EPMLiveWebParts
                         </select>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                     </div>
                     <div class="""" style=""padding-right:2px; padding-left:5px;padding-top:2px;display: table-cell;min-width: 10px;cursor:pointer"">
-                        <img onclick=""doSearch" + sFullGridId + @"()"" src=""/_layouts/epmlive/images/find_icon.png""/>
+                        <img onclick=""GridSearch('" + sFullGridId + @"')"" src=""/_layouts/epmlive/images/find_icon.png""/>
                     </div>
                 </div>");
 
@@ -4296,8 +5108,8 @@ namespace EPMLiveWebParts
                 view = list.Views[PropView];
             }
             catch { }
-
-
+        
+            
             if (SPContext.Current.ListItem != null && list != null)
             {
                 foreach (SPField field in list.Fields)

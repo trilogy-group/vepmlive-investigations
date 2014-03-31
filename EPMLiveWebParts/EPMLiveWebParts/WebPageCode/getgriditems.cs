@@ -48,6 +48,11 @@ namespace EPMLiveWebParts
         protected bool showCheckboxes;
         protected int iPageSize = 0;
         protected int iPage = 0;
+        protected string DifferentColumns = "";
+        protected string DifferentGroups = "";
+        protected ArrayList aViewFields = new ArrayList();
+        protected ArrayList aHiddenViewFields = new ArrayList();
+        protected bool bWorkspaceUrl = false;
         protected string WPID = "";
 
         protected string expanded;
@@ -75,6 +80,8 @@ namespace EPMLiveWebParts
         protected string ReportID = "";
 
         private bool bUseReporting = false;
+
+        
 
         private struct PlannerMenus
         {
@@ -123,6 +130,11 @@ namespace EPMLiveWebParts
         protected string DueDateField = "";
         protected string ProgressField = "";
         protected string InfoField = "";
+
+        protected bool bShowGantt = false;
+
+        protected EPMLiveCore.TimeDebug tb;
+        protected string epmdebug = "";
 
         protected virtual void outputXml()
         {
@@ -184,6 +196,10 @@ namespace EPMLiveWebParts
 
         protected void Page_Load(object sender, EventArgs e)
         {
+            epmdebug = Page.Request["epmdebug"];
+            tb = new EPMLiveCore.TimeDebug("NewGrid", Page.Request["epmdebug"]);
+            tb.AddTimer();
+
             Response.Cache.SetCacheability(HttpCacheability.NoCache);
             Response.Expires = -1;
 
@@ -198,10 +214,54 @@ namespace EPMLiveWebParts
             SPWeb curWeb = SPContext.Current.Web;
             {
                 curWeb.Site.CatchAccessDeniedException = false;
-
+                
                 getParams(curWeb);
 
+                if (!string.IsNullOrEmpty(DifferentColumns))
+                {
+                    ArrayList arrCurFields = new ArrayList(aViewFields);
 
+                    foreach (string sField in DifferentColumns.Split(','))
+                    {
+
+                        if (!aViewFields.Contains(sField))
+                            aViewFields.Add(sField);
+
+                        if (arrCurFields.Contains(sField))
+                            arrCurFields.Remove(sField);
+                    }
+
+                    foreach (string sField in arrCurFields)
+                    {
+                        if (aViewFields.Contains(sField))
+                            aViewFields.Remove(sField);
+                    }
+                }
+
+                if (aViewFields.Contains("Gantt"))
+                {
+                    bShowGantt = true;
+                    aViewFields.Remove("Gantt");
+
+                    if(!aViewFields.Contains(StartDateField))
+                    {
+                        aViewFields.Add(StartDateField);
+                        aHiddenViewFields.Add(StartDateField);
+                    }
+                    if (!aViewFields.Contains(DueDateField))
+                    {
+                        aViewFields.Add(DueDateField);
+                        aHiddenViewFields.Add(DueDateField);
+                    }
+                    if (!aViewFields.Contains(ProgressField))
+                    {
+                        aViewFields.Add(ProgressField);
+                        aHiddenViewFields.Add(ProgressField);
+                    }
+
+                }
+
+                
 
                 docXml = new XmlDocument();
                 docXml.LoadXml("<rows></rows>");
@@ -369,6 +429,7 @@ namespace EPMLiveWebParts
                     ndParam.InnerXml = "<![CDATA[" + ndParam.InnerText + "]]>";
                 }
             }
+            tb.StopTimer();
             outputXml();
         }
 
@@ -777,8 +838,9 @@ namespace EPMLiveWebParts
                 XmlNode ndNewCell = docXml.CreateNode(XmlNodeType.Element, "cell", docXml.NamespaceURI);
                 ndNewItem.AppendChild(ndNewCell);
             }
-            SPViewFieldCollection vfc = view.ViewFields;
-            for (int i = 0; i < vfc.Count; i++)
+            //SPViewFieldCollection vfc = aViewFields.Count;
+            string[] vfc = (string[])aViewFields.ToArray(typeof(string));
+            for (int i = 0; i < vfc.Length; i++)
             {
                 string val = "";
                 string displayValue = "";
@@ -1112,6 +1174,19 @@ namespace EPMLiveWebParts
                                         break;
                                     case SPFieldType.User:
                                         displayValue = oField.GetFieldValueAsHtml(val);
+                                        break;
+                                    case SPFieldType.Lookup:
+                                        if(val != "")
+                                        {
+                                            displayValue = val;
+                                            break;
+                                            SPFieldLookupValueCollection lvc = new SPFieldLookupValueCollection(val);
+                                            foreach (SPFieldLookupValue lv in lvc)
+                                            {
+                                                displayValue += ";" + lv.LookupValue.Replace(";", "");
+                                            }
+                                            displayValue = displayValue.Trim(';');
+                                        }
                                         break;
                                     default:
                                         displayValue = val;
@@ -1795,13 +1870,14 @@ namespace EPMLiveWebParts
                 ndNewCell.InnerXml = "<![CDATA[<input type=\"checkbox\" style=\"display:none;\" onClick=\"(arguments[0]||event).cancelBubble=true;CheckBoxSelectRow(this);\">]]>";
                 ndNewItem.AppendChild(ndNewCell);
             }
-            SPViewFieldCollection vfc = view.ViewFields;
+            //SPViewFieldCollection vfc = view.ViewFields;
+            string[] vfc = (string[])aViewFields.ToArray(typeof(string));
             if (!titleFieldFound)
             {
                 XmlNode ndNewCell = docXml.CreateNode(XmlNodeType.Element, "cell", docXml.NamespaceURI);
                 ndNewItem.AppendChild(ndNewCell);
             }
-            for (int i = 0; i < vfc.Count; i++)
+            for (int i = 0; i < vfc.Length; i++)
             {
                 string val = "";
                 string displayValue = "";
@@ -2074,7 +2150,8 @@ namespace EPMLiveWebParts
                                 }
                                 catch { }
 
-                                if (!vfc.Exists("WorkspaceUrl"))
+                                //if (!vfc.Exists("WorkspaceUrl"))
+                                if(bWorkspaceUrl)
                                 {
                                     try
                                     {
@@ -3460,6 +3537,7 @@ namespace EPMLiveWebParts
 
         public virtual void addGroups(SPWeb web, string spquery, SortedList arrGTemp)
         {
+            tb.AddTimer();
             if (bUseReporting)
             {
                 string orderby = "";
@@ -3784,6 +3862,7 @@ namespace EPMLiveWebParts
             //        w.Close();
             //    }
             //}
+            tb.StopTimer();
         }
 
         private void setInitialAggs(string grouping)
@@ -4135,46 +4214,55 @@ namespace EPMLiveWebParts
 
             XmlDocument querydoc = new XmlDocument();
             querydoc.LoadXml("<Query>" + query + "</Query>");
-            XmlNode ndGroupBy = querydoc.SelectSingleNode("//GroupBy");
-            int counter = 0;
-            ArrayList arrTempGroups = new ArrayList();
-            if (ndGroupBy != null)
-            {
-                foreach (XmlNode nd in ndGroupBy.ChildNodes)
-                {
-                    string groupfield = nd.Attributes["Name"].Value;
-                    arrTempGroups.Add(groupfield);
-                }
-            }
-            foreach (string additionalgroup in additionalgroups.Split('|'))
-            {
-                if (additionalgroup.Trim() != "")
-                    arrTempGroups.Add(additionalgroup);
-            }
-
-
-
+            
             XmlDocument xmlQuery = new XmlDocument();
             xmlQuery.LoadXml("<Query>" + query + "</Query>");
+            ArrayList arrTempGroups = new ArrayList();
 
-            ndGroupBy = xmlQuery.SelectSingleNode("//GroupBy");
-            if (ndGroupBy != null)
+            if (string.IsNullOrEmpty(DifferentGroups))
             {
-                xmlQuery.ChildNodes[0].RemoveChild(ndGroupBy);
-            }
+                XmlNode ndGroupBy = querydoc.SelectSingleNode("//GroupBy");
 
+                if (ndGroupBy != null)
+                {
+                    foreach (XmlNode nd in ndGroupBy.ChildNodes)
+                    {
+                        string groupfield = nd.Attributes["Name"].Value;
+                        arrTempGroups.Add(groupfield);
+                    }
+                }
+                foreach (string additionalgroup in additionalgroups.Split('|'))
+                {
+                    if (additionalgroup.Trim() != "")
+                        arrTempGroups.Add(additionalgroup);
+                }
+
+                ndGroupBy = xmlQuery.SelectSingleNode("//GroupBy");
+                if (ndGroupBy != null)
+                {
+                    xmlQuery.ChildNodes[0].RemoveChild(ndGroupBy);
+                }
+
+                
+            }
+            else
+            {
+                arrTempGroups = new ArrayList(DifferentGroups.Split(','));
+
+                Session[view.ID.ToString() + "G"] = DifferentGroups;
+
+                XmlNode ndGroupBy = xmlQuery.SelectSingleNode("//GroupBy");
+                if (ndGroupBy != null)
+                {
+                    xmlQuery.ChildNodes[0].RemoveChild(ndGroupBy);
+                }
+            }
 
             appendLookupQuery(ref xmlQuery, ref arrTempGroups);
+            
+            arrGroupFields = (string[])arrTempGroups.ToArray(typeof(string));
 
             
-
-
-            arrGroupFields = new string[arrTempGroups.Count];
-            foreach (string s in arrTempGroups)
-            {
-                arrGroupFields[counter++] = s;
-            }
-
 
             SortedList arrGTemp = new SortedList();
 
@@ -4283,7 +4371,7 @@ namespace EPMLiveWebParts
                             newCell.InnerText = newItem;
                         newNode.AppendChild(newCell);
                     }
-                    foreach (string f in view.ViewFields)
+                    foreach (string f in aViewFields)
                     {
                         SPField field = getRealField(list.Fields.GetFieldByInternalName(f));
                         if (field.InternalName == "Title" || field.InternalName == "URL" || field.InternalName == "FileLeafRef")
@@ -4329,7 +4417,7 @@ namespace EPMLiveWebParts
 
         private void addHeader()
         {
-
+            tb.AddTimer();
             float inWidth = 1000;
             try
             {
@@ -4426,20 +4514,27 @@ namespace EPMLiveWebParts
 
             int fieldcounter = 0;
 
-            foreach (string field in view.ViewFields)
+            foreach (string field in aViewFields)
             {
-                SPField f = getRealField(list.Fields.GetFieldByInternalName(field));
-                if (f.InternalName == "Title" || f.InternalName == "FileLeafRef" || f.InternalName == "URL")
+                SPField f = null;
+                try
                 {
-                    titleFieldFound = true;
-                }
-                if (f.InternalName == "Edit" || f.InternalName == "DocIcon" || f.InternalName == "WorkspaceUrl")
+                    f = getRealField(list.Fields.GetFieldByInternalName(field));
+                }catch{}
+                if (f != null)
                 {
-                    inWidth -= 60;
-                }
-                else
-                {
-                    fieldcounter++;
+                    if (f.InternalName == "Title" || f.InternalName == "FileLeafRef" || f.InternalName == "URL")
+                    {
+                        titleFieldFound = true;
+                    }
+                    if (f.InternalName == "Edit" || f.InternalName == "DocIcon" || f.InternalName == "WorkspaceUrl")
+                    {
+                        inWidth -= 60;
+                    }
+                    else
+                    {
+                        fieldcounter++;
+                    }
                 }
             }
 
@@ -4479,7 +4574,7 @@ namespace EPMLiveWebParts
                 filterfield += ",&nbsp;";
             }
 
-            foreach (string field in view.ViewFields)
+            foreach (string field in aViewFields)
             {
 
                 tooltips += ",true";
@@ -5038,6 +5133,7 @@ namespace EPMLiveWebParts
                 callNode.InnerXml = "<param>" + tooltips + "</param>";
                 ndBeforeInit.AppendChild(callNode);
             }
+            tb.StopTimer();
         }
 
         private SPField getRealField(SPField field)
@@ -5267,6 +5363,7 @@ namespace EPMLiveWebParts
                     bUseReporting = bool.Parse(hshParams["UseReporting"].ToString());
                 }
                 catch { }
+                GridViewSession gvs = new GridViewSession(view.ID);
                 try
                 {
                     iPageSize = int.Parse(hshParams["PageSize"].ToString());
@@ -5275,6 +5372,51 @@ namespace EPMLiveWebParts
                 try
                 {
                     iPage = int.Parse(Request["Page"].ToString());
+                    if (bUseReporting)
+                    {
+                        gvs.Page = iPage;
+                    }
+                }
+                catch { }
+                if (iPage == 0)
+                    iPage = gvs.Page;
+
+                try
+                {
+                    DifferentColumns = Request["Cols"].ToString();
+                }
+                catch { }
+                try
+                {
+                    if (string.IsNullOrEmpty(DifferentColumns))
+                        DifferentColumns = gvs.Columns;
+                    else
+                        gvs.Columns = DifferentColumns;
+                }
+                catch { }
+
+
+                try
+                {
+                    DifferentGroups = Request["GB"].ToString();
+                }
+                catch { }
+                try
+                {
+                    if (string.IsNullOrEmpty(DifferentGroups))
+                        DifferentGroups = gvs.Groups;
+                    else
+                        gvs.Groups = DifferentGroups;
+                }
+                catch { }
+
+
+                try
+                {
+                    if (Request["NP"].ToString() == "true")
+                    {
+                        iPageSize = 0;
+                    }
                 }
                 catch { }
                 try
@@ -5285,6 +5427,15 @@ namespace EPMLiveWebParts
             }
             catch { }
 
+            foreach (string field in view.ViewFields)
+            {
+                aViewFields.Add(field);
+                if (field == "WorkspaceUrl")
+                    bWorkspaceUrl = true;
+            }
+
+            
+            
         }
         public string getField(SPListItem li, string field, bool group)
         {

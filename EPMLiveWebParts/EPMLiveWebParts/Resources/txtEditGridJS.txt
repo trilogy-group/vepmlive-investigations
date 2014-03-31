@@ -214,6 +214,7 @@ dhtmlXGridObject.prototype.setuppaging=function(records){
 	var prev = document.getElementById("PagePrevious"+ this._gridid);
 	var next = document.getElementById("PageNext"+ this._gridid);
 	var pagediv = document.getElementById("pagediv"+ this._gridid);
+	var pagetable = document.getElementById("pagetable"+ this._gridid);
 
 	if(this.UseReporting)
 	{
@@ -240,11 +241,13 @@ dhtmlXGridObject.prototype.setuppaging=function(records){
 		else
 		{
 			pagediv.style.display = "none";
+			pagetable.style.display = "none";
 		}
 	}
 	else
 	{
 		pagediv.style.display = "inline-block";
+		pagetable.style.display = "";
 
 		var rec = records.split('|');
 		firstItem#gridid# = parseInt(rec[2]) * -1;
@@ -274,6 +277,7 @@ dhtmlXGridObject.prototype.setuppaging=function(records){
 		if(rec[3] != "true" && rec[0] == "0")
 		{
 			pagediv.style.display = "none";
+			pagetable.style.display = "none";
 		}
 	}
 };

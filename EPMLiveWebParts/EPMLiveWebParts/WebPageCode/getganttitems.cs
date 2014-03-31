@@ -13,10 +13,15 @@ namespace EPMLiveWebParts
     {
         private ArrayList arrHidden = new ArrayList();
 
+        private Hashtable hshLookupEnums = new Hashtable();
+        private Hashtable hshLookupEnumKeys = new Hashtable();
+
         private int curId = 0;
 
+        
         public override void getParams(SPWeb curWeb)
         {
+            tb.AddTimer();
             base.getParams(curWeb);
             ArrayList arrFields = new ArrayList();
 
@@ -88,10 +93,12 @@ namespace EPMLiveWebParts
 
             inEditMode = true;
             bCleanValues = true;
+            tb.StopTimer();
         }
 
         protected override void outputXml()
         {
+            tb.AddTimer();
 
             XmlDocument doc = new XmlDocument();
             doc.LoadXml(Properties.Resources.txtGanttLayout.Replace("#gridid#", base.gridname));
@@ -101,9 +108,14 @@ namespace EPMLiveWebParts
 
             //XmlNode ndLeftCols = doc.FirstChild.SelectSingleNode("//LeftCols");
 
+            if (showCheckboxes)
+            {
+                doc.FirstChild.SelectSingleNode("//Panel").Attributes["Visible"].Value = "1";
+            }
+
             ArrayList arrFields = new ArrayList();
 
-            foreach (string field in view.ViewFields)
+            foreach (string field in aViewFields)
             {
                 try
                 {
@@ -115,8 +127,6 @@ namespace EPMLiveWebParts
                     XmlAttribute attr = doc.CreateAttribute("Name");
                     attr.Value = oField.InternalName;
                     ndNew.Attributes.Append(attr);
-
-
 
                     XmlDocument oDoc = new XmlDocument();
                     oDoc.LoadXml(oField.SchemaXml);
@@ -133,10 +143,24 @@ namespace EPMLiveWebParts
                         ndNew.Attributes.Append(attr);
                     }
 
-                    if (oField.InternalName == "Title")
+                    if (oField.InternalName == "Edit")
                     {
                         attr = doc.CreateAttribute("Width");
-                        attr.Value = "300";
+                        attr.Value = "50";
+                        ndNew.Attributes.Append(attr);
+                    }
+                    else if (oField.InternalName == "Title")
+                    {
+                        attr = doc.CreateAttribute("MinWidth");
+                        attr.Value = "300"; 
+                        ndNew.Attributes.Append(attr);
+
+                        attr = doc.CreateAttribute("Button");
+                        attr.Value = "Html";
+                        ndNew.Attributes.Append(attr);
+
+                        attr = doc.CreateAttribute("RelWidth");
+                        attr.Value = "1";
                         ndNew.Attributes.Append(attr);
                     }
                     else if (oField.InternalName == "WorkspaceUrl")
@@ -203,12 +227,63 @@ namespace EPMLiveWebParts
                                 }
                                 break;
                             case SPFieldType.Choice:
+
+                                sType = "Enum";
+                                {
+                                    string senum = "";
+
+                                    SPFieldChoice oCField = (SPFieldChoice)oField;
+                                    foreach (string sChoice in oCField.Choices)
+                                        senum += ";" + sChoice.Replace(";", "");
+
+                                    attr = doc.CreateAttribute("Enum");
+                                    attr.Value = senum;
+                                    ndNew.Attributes.Append(attr);
+
+                                    //attr = doc.CreateAttribute("Range");
+                                    //attr.Value = "1";
+                                    //ndNew.Attributes.Append(attr);
+                                }
                                 sWidth = "150";
                                 break;
                             case SPFieldType.Lookup:
                                 sWidth = "150";
+
+                                sType = "Enum";
+
+                                attr = doc.CreateAttribute("Enum");
+                                attr.Value = "";
+                                ndNew.Attributes.Append(attr);
+
+                                attr = doc.CreateAttribute("EnumKeys");
+                                attr.Value = "";
+                                ndNew.Attributes.Append(attr);
+
+                                //attr = doc.CreateAttribute("Range");
+                                //attr.Value = "1";
+                                //ndNew.Attributes.Append(attr);
+
+                                hshLookupEnums.Add(oField.InternalName, new ArrayList());
+                                hshLookupEnumKeys.Add(oField.InternalName, new ArrayList());
+
                                 break;
                             case SPFieldType.MultiChoice:
+                                {
+                                    string senum = "";
+
+                                    SPFieldMultiChoice oCField = (SPFieldMultiChoice)oField;
+                                    foreach (string sChoice in oCField.Choices)
+                                        senum += ";" + sChoice.Replace(";", "");
+
+                                    attr = doc.CreateAttribute("Enum");
+                                    attr.Value = senum;
+                                    ndNew.Attributes.Append(attr);
+
+                                    attr = doc.CreateAttribute("Range");
+                                    attr.Value = "1";
+                                    ndNew.Attributes.Append(attr);
+                                }
+                                sType = "Enum";
                                 sWidth = "150";
                                 break;
                             case SPFieldType.Note:
@@ -232,10 +307,14 @@ namespace EPMLiveWebParts
                                 break;
                         }
 
-                        attr = doc.CreateAttribute("Width");
+                        attr = doc.CreateAttribute("MinWidth");
                         attr.Value = sWidth;
                         ndNew.Attributes.Append(attr);
                     }
+
+                    attr = doc.CreateAttribute("Wrap");
+                    attr.Value = "0";
+                    ndNew.Attributes.Append(attr);
 
                     attr = doc.CreateAttribute("Type");
                     attr.Value = sType;
@@ -260,9 +339,8 @@ namespace EPMLiveWebParts
                     }
                 }
                 catch { }
+
             }
-
-
 
             XmlNode ndGantt = doc.FirstChild.SelectSingleNode("//RightCols/C[@Name='G']");
             ndGantt.Attributes["GanttStart"].Value = StartDateField;
@@ -270,15 +348,14 @@ namespace EPMLiveWebParts
             ndGantt.Attributes["GanttComplete"].Value = ProgressField;
             ndGantt.Attributes["GanttText"].Value = InfoField;
 
+            if (bShowGantt)
+                ndGantt.Attributes["Visible"].Value = "1";
 
             XmlNodeList ndRows = docXml.FirstChild.SelectNodes("row");
             XmlNode ndParent = doc.FirstChild.SelectSingleNode("//B");
 
             XmlNodeList ndOldCols = docXml.FirstChild.SelectNodes("//head/column");
             XmlNode ndSummary = doc.FirstChild.SelectSingleNode("//Def/D[@Name='Summary']");
-
-
-
 
             if (StartDateField != "")
             {
@@ -300,8 +377,6 @@ namespace EPMLiveWebParts
                 attr.Value = "ganttpercent()";
                 ndSummary.Attributes.Append(attr);
             }
-
-
             //PercentCompleteFormula="ganttpercent('StartDate','DueDate','d')" 
 
             foreach (XmlNode ndRow in ndRows)
@@ -311,6 +386,26 @@ namespace EPMLiveWebParts
             {
                 processPredecessors(ndRow, doc);
             }
+
+
+            foreach(DictionaryEntry de in hshLookupEnums)
+            {
+                XmlNode nd = doc.FirstChild.SelectSingleNode("//C[@Name='" + de.Key.ToString() + "']");
+                if (nd != null)
+                {
+                    nd.Attributes["EnumKeys"].Value = ";" + string.Join(";", (int[])((ArrayList)de.Value).ToArray(Type.GetType("System.Int32")));
+                }
+            }
+
+            foreach (DictionaryEntry de in hshLookupEnumKeys)
+            {
+                XmlNode nd = doc.FirstChild.SelectSingleNode("//C[@Name='" + de.Key.ToString() + "']");
+                if (nd != null)
+                {
+                    nd.Attributes["Enum"].Value = ";" + string.Join(";", (string[])((ArrayList)de.Value).ToArray(Type.GetType("System.String")));
+                }
+            }
+
 
             XmlNode ndPag = docXml.SelectSingleNode("//call[@command='setuppaging']");
 
@@ -330,6 +425,20 @@ namespace EPMLiveWebParts
                 
                 ndCfg.Attributes.Append(attr);
             }
+
+            tb.StopTimers();
+
+            if (epmdebug != null && epmdebug == "true")
+            {
+                XmlNode ndNew = doc.CreateNode(XmlNodeType.Element, "I", doc.NamespaceURI);
+
+                XmlAttribute attr = doc.CreateAttribute("Title");
+                attr.Value = tb.GetHtml();
+                ndNew.Attributes.Append(attr);
+
+                doc.FirstChild.SelectSingleNode("//B").AppendChild(ndNew);
+            }
+
             data = doc.OuterXml;
         }
 
@@ -554,11 +663,48 @@ namespace EPMLiveWebParts
                         ndNew.Attributes.Append(attr);
 
                     }
-                    else
+                    else if (fieldName == "Title")
                     {
                         XmlAttribute attr = doc.CreateAttribute(fieldName);
                         attr.Value = val;
                         ndNew.Attributes.Append(attr);
+
+                        attr = doc.CreateAttribute(fieldName + "ButtonText");
+                        if (ndRow.SelectSingleNode("userdata[@name='itemid']") != null && ndRow.SelectSingleNode("userdata[@name='itemid']").InnerText != "")
+                        {
+                            //attr.Value = "<div class=\"gridmenuspan\" style=\"position:relative;\"><a data-itemid=\"" + ndRow.SelectSingleNode("userdata[@name='itemid']").InnerText + "\" data-listid=\"" + ndRow.SelectSingleNode("userdata[@name='listid']").InnerText + "\" data-webid=\"" + ndRow.SelectSingleNode("userdata[@name='webid']").InnerText + "\" data-siteid=\"" + ndRow.SelectSingleNode("userdata[@name='siteid']").InnerText + "\" ></a></div>";
+                        }
+                        ndNew.Attributes.Append(attr);
+                    }
+                    else
+                    {
+                        if (hshLookupEnums.Contains(fieldName))
+                        {
+                            string newval = "";
+                            if (val != "")
+                            {
+                                SPFieldLookupValueCollection lvc = new SPFieldLookupValueCollection(val);
+
+                                foreach (SPFieldLookupValue lv in lvc)
+                                {
+                                    if (!((ArrayList)hshLookupEnums[fieldName]).Contains(lv.LookupId))
+                                    {
+                                        ((ArrayList)hshLookupEnums[fieldName]).Add(lv.LookupId);
+                                        ((ArrayList)hshLookupEnumKeys[fieldName]).Add(lv.LookupValue.Replace(";", ""));
+                                        
+                                    }
+
+                                    newval += ";" + lv.LookupId;
+                                }
+                            }
+
+                            val = newval.Trim(';');
+                        }
+
+                        XmlAttribute attr = doc.CreateAttribute(fieldName);
+                        attr.Value = val;
+                        ndNew.Attributes.Append(attr);
+
                     }
                 }
                 catch { }

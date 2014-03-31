@@ -1,19 +1,19 @@
 <Grid>
-	<Cfg id='GanttGrid#gridid#' SuppressCfg='1' DateStrings='2' ConstWidth="1" NoVScroll="0"/>
-	<Cfg MainCol='Title' NameCol='Title' Style='GM' CSS="/_layouts/epmlive/treegrid/grid/grid.css"/>
-	<Cfg Undo='1' Paging='2' PageLength='30'/>
+	<Cfg id='Grid#gridid#' SuppressCfg='1' DateStrings='2' ConstWidth="1" NoVScroll="1"/>
+	<Cfg MainCol='Title' NameCol='Title' Style='GM' CSS="/_layouts/epmlive/treegrid/mywork/grid.css"/>
+	<Cfg Undo='1'/>
 	<Cfg ExportType='Expanded,Outline'/>
 	<Cfg ChildParts='0'/>
 	<Cfg PrintCols='1'/>
 	<Cfg ExportCols='1'/>
 	<Cfg ShowDeleted='0' Calculated='0'/>
 	<Cfg FullId='0'/>
-	<Cfg SelectingCells="1" SelectClass="0" NoPager="1"/>
+	<Cfg SelectingCells="1" SelectClass="0" />
 	<Cfg Searching='1'/>
 	<Toolbar Visible='0'></Toolbar>
-
-	<Cfg NoTreeLines='1' DetailOn='0' MidWidth="400" StandardFilter='2' MenuColumnsSort="0" StaticCursor="1"/>
-	<Cfg Code="GTACCNPSQEBSLC" CanDrag="0" PrintLocation="1" />
+	<Panel Visible='0' />
+	<Cfg NoTreeLines='1' DetailOn='0' MinRowHeight='15' MaxRowHeight='15' StandardFilter='2' MenuColumnsSort="0" StaticCursor="1"/>
+	<Cfg Code="GTACCNPSQEBSLC" CanDrag="0" PrintLocation="1"/>
 	<LeftCols>
 		
 	</LeftCols>
@@ -25,27 +25,20 @@
 		<C Name="itemid" Visible="0" CanPrint="0"/>
 		<C Name="SiteUrl" Visible="0" CanPrint="0"/>
 		<C Name="viewMenus" Visible="0" CanPrint="0"/>
-		<C Name="Descendants" Visible="0" CanPrint="0"/>
 
 	</Cols>
 	<RightCols>
 		
-		<C Name="G" Type="Gantt" GanttStart="StartDate" GanttStrict="0" GanttEnd="DueDate" GanttComplete="PercentComplete" GanttText="" Visible="0"
-		GanttHideExclude="0" GanttChartRound="w" GanttHeader1="w#dddddd MMMM yyyy" GanttHeader2="d#ddddd"
-		GanttZoom="weeks and days" GanttEndLast="0" CanExport="0" CanEdit="1" GanttMin="1/1/1990" GanttMax="1/1/2100" GanttDescendants="Descendants" GanttEdit="Main,Dependency"/>
-
 	</RightCols>
 	<Def>
-		<D Name="Summary" Expanded="1" Calculated="1" CanSelect="1" /> 
+		<D Name="Summary" Expanded="1" Calculated="1" CanSelect="0" /> 
 		<D Name="Summary" GGanttIcons="1" GGanttClass="GanttG" GGanttEdit="0" GGanttHover="0" DurationFormula="ganttduration('G')" Class="SummaryTask" CanEdit="0" CanDrag="0"/> 
 
-		<D Name="R" Calculated='0' CanDrag="0" CanSelect="1" CanEdit="0" HoverRow="Color" HoverCell="Color" FocusCell="" FocusRow="Color" ShowHint="0" GGanttEdit="0" Height="37"/>
-
-		<D Name="GridType" Title="Gantt"/>
+		<D Name="R" Calculated='0' CanEdit="0" CanDrag="0" CanSelect="1" HoverCell="Color" HoverRow="Color" FocusCell="" FocusRow="Color" ShowHint="0" GGanttEdit="0" />
 	</Def>
-	<Panel Delete="0" Visible="0" CanHide="0" HoverCell="Color" HoverRow="Color" />
-	<Header Visible='1' G='Gantt' GNoColor='0' Notifications="" HoverRow="Color" HoverColor="#FFFFFF"/>
-	
+
+	<Header Visible='1' Title='Task Name' G='Gantt' GNoColor='0' Notifications=""/>
+
 	<Zoom>
 
 		<Z Name="z1" GanttUnits="M6" GanttChartRound="y" GanttWidth="18" GanttWidthEx="76" GanttBackground=";y#1/1/2008" GanttHeader1="y#yyyy" GanttHeader2="M6#MMMMMM" /> 
@@ -56,11 +49,12 @@
 		<Z Name="z6" GanttUnits="d" GanttChartRound="w" GanttWidth="18" GanttWidthEx="76" GanttHeader1="w#'week 'ddddddd' ' MMMM yyyy" GanttHeader2="d#%d" GanttHeader3="d#ddddd" /> 
 		<Z Name="days and hours" GanttUnits="h" GanttChartRound="d" GanttWidth="18" GanttWidthEx="76" GanttHeader1="d#dddd dddddd MMMM yyyy" GanttHeader2="h#HH"/>
 	</Zoom>
-	<Head>
-		<I Kind='Filter' Visible='0' id='Filter' Height='20' CanEdit='1'/>
-	</Head>
+
 	<Body>
 		<B>
+
+			
+
 		</B>
 	</Body>
 </Grid>
