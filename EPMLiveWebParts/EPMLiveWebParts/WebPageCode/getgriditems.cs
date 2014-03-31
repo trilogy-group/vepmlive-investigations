@@ -1173,7 +1173,11 @@ namespace EPMLiveWebParts
                                             displayValue = val;
                                         break;
                                     case SPFieldType.User:
-                                        displayValue = oField.GetFieldValueAsHtml(val);
+                                        displayValue = oField.GetFieldValueAsHtml(val).Replace("class='ms-vb'", "class='ms-vb' style='display:inline-block;padding-right:5px'");
+                                        if (displayValue.IndexOf("<div", 4) > 0)
+                                        {
+                                            displayValue = displayValue.Replace("</div>", ";</div>");
+                                        }
                                         break;
                                     case SPFieldType.Lookup:
                                         if(val != "")
