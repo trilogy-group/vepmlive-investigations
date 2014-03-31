@@ -237,8 +237,8 @@ namespace EPMLiveCore
                     case "webparts":
                         assemblyInstance = Assembly.Load(EPMLiveWPAssembly);
                         thisClass = assemblyInstance.GetType("EPMLiveWebParts.WPAPI", true, true);
-                        m = thisClass.GetMethod(FunctionParts[1], BindingFlags.Public | BindingFlags.Instance);
-                        apiClass = Activator.CreateInstance(thisClass);
+                        m = thisClass.GetMethod(FunctionParts[1]);
+                        //apiClass = Activator.CreateInstance(thisClass);
                         break;
                     case "socialengine":
                         assemblyInstance = Assembly.GetExecutingAssembly();
