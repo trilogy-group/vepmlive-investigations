@@ -133,7 +133,7 @@ top:4px;
 .GMCellPanel:hover,.GMCellHeaderPanel:hover { background-color:#FAFAFA; }
 .GMCellFilterPanel { padding-left:1px; }
 .GMCellUser { background-color:#FFF; }
-.GMCellEmpty { background:#F0F0E0; border:0px none; }
+.GMCellEmpty { background:#ffffff; border:0px none; }
 .GMCellHeaderEmpty { border:0px none; border-top:1px solid #ffffff; }
 .GMCellHidden { background:transparent!important; border-top:none!important; border-bottom:none!important; }
 
