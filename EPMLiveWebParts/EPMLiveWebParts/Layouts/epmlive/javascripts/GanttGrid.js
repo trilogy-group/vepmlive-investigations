@@ -253,7 +253,7 @@ function GridSearch(gridid, searchfield, searchvalue, searchtype) {
 function GridOnMouseOverOutside(grid, row, col, event) {
     if (grid.CurHoverRow)
         grid.SetAttribute(grid.GetRowById(grid.CurHoverRow), "Title", "ButtonText", ' ', 1);
-    grid.CurHoverRow = "0";
+    grid.CurHoverRow = "";
 
 }
 
@@ -262,7 +262,7 @@ function GridOnMouseOverRow(grid, row, col, event) {
         grid.CurHoverRow = row.id;
         CurrentGrid = grid;
         if (grid.GetValue(row, "itemid") != "") {
-            grid.SetAttribute(row, "Title", "ButtonText", '<div class="gridmenuspan" style="position:absolute;overflow:visible" id=\"' + row.id + '\"><a data-itemid="' + grid.GetValue(row, "itemid") + '" data-listid="' + grid.GetValue(row, "listid") + '" data-webid="' + grid.GetValue(row, "webid") + '" data-siteid="' + grid.GetValue(row, "siteid") + '" ></a></div>', 1);
+            grid.SetAttribute(row, "Title", "ButtonText", '<div class="gridmenuspan" style="position:absolute;overflow:visible;" id=\"' + row.id + '\"><a data-itemid="' + grid.GetValue(row, "itemid") + '" data-listid="' + grid.GetValue(row, "listid") + '" data-webid="' + grid.GetValue(row, "webid") + '" data-siteid="' + grid.GetValue(row, "siteid") + '" ></a></div>', 1);
             window.epmLiveNavigation.addContextualMenu($('#' + row.id), [], false, false, { "delete": "GridGanttDeleteRow" });
         }
     }
