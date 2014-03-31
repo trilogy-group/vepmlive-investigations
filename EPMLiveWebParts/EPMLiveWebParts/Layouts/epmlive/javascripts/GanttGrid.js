@@ -272,7 +272,7 @@ function GridOnSelect(grid, row, deselect) {
     if (grid.id.substr(0, 9) == "GanttGrid") {
         if (row.Kind == "Data") {
             if (!row.itemid) {
-                grid.SelectRange(row.firstChild, null, grid.lastChild, null, !deselect, 0);
+                grid.SelectRange(row.firstChild, null, row.lastChild, null, !deselect, 0);
             }
         }
         RefreshCommandUI();
