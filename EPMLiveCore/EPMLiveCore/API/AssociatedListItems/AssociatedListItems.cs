@@ -336,11 +336,11 @@ namespace EPMLiveCore.API
                                         //Display ListName [ItemCount] on UI
                                         //sbListAssociatedItemsDiv.Append("<div id='div_" + rptListId + "' class='listMainDiv'>" + listName + " [" + Convert.ToString(associatedItemsCount) + "]");
 
-                                        string viewAllItemsUrl = oWeb.Url + "/_layouts/epmlive/gridaction.aspx?action=linkeditemspost&listid=" + listId + "&lookups=" + itemTitle + "&field=" + projectLinkedField + "&LookupFieldList=" + rptListId;// +"&Source=" + sourceUrl;
+                                        //string viewAllItemsUrl = oWeb.Url + "/_layouts/epmlive/gridaction.aspx?action=linkeditemspost&listid=" + listId + "&lookups=" + itemTitle + "&field=" + projectLinkedField + "&LookupFieldList=" + rptListId;// +"&Source=" + sourceUrl;
 
                                         sbListAssociatedItemsDiv.Append("<tr>");
                                         sbListAssociatedItemsDiv.Append("<td>" + listName + "</td>");
-                                        sbListAssociatedItemsDiv.Append("<td><a href='#'  onclick=\"javascript:FancyDispFormClient.showItemUrl('" + viewAllItemsUrl + "');return true;\"><div id='div_" + rptListId + "' class='listMainDiv'><span class='badge'>" + Convert.ToString(associatedItemsCount) + "</span></a>");
+                                        sbListAssociatedItemsDiv.Append("<td><a href='#' onclick=\"javascript:FancyDispFormClient.emptyFunction('');\"><div id='div_" + rptListId + "' class='listMainDiv'><span class='badge'>" + Convert.ToString(associatedItemsCount) + "</span></a>");
                                         //sbListAssociatedItemsDiv.Append("</tr>");
 
                                         #endregion
@@ -367,11 +367,11 @@ namespace EPMLiveCore.API
                                         Int64 itemCount = otherList.GetItems(query).Count;
 
                                         //sbListAssociatedItemsDiv.Append("<div id='div_" + rptListId + "' class='listMainDiv'>" + listName + " [" + Convert.ToString(itemCount) + "]");
-                                        string viewAllItemsUrl = oWeb.Url + "/_layouts/epmlive/gridaction.aspx?action=linkeditemspost&listid=" + listId + "&lookups=" + itemTitle + "&field=" + projectLinkedField + "&LookupFieldList=" + otherList.ID.ToString();// +"&Source=" + sourceUrl;
+                                        //string viewAllItemsUrl = oWeb.Url + "/_layouts/epmlive/gridaction.aspx?action=linkeditemspost&listid=" + listId + "&lookups=" + itemTitle + "&field=" + projectLinkedField + "&LookupFieldList=" + otherList.ID.ToString();// +"&Source=" + sourceUrl;
 
                                         sbListAssociatedItemsDiv.Append("<tr>");
                                         sbListAssociatedItemsDiv.Append("<td>" + listName + "</td>");
-                                        sbListAssociatedItemsDiv.Append("<td><a href='#' onclick=\"javascript:FancyDispFormClient.showItemUrl('" + viewAllItemsUrl + "');return true;\"> <div id='div_" + rptListId + "' class='listMainDiv'><span class='badge'>" + Convert.ToString(itemCount) + "</span></a>");
+                                        sbListAssociatedItemsDiv.Append("<td><a href='#' onclick=\"javascript:FancyDispFormClient.emptyFunction('');\"> <div id='div_" + rptListId + "' class='listMainDiv'><span class='badge'>" + Convert.ToString(itemCount) + "</span></a>");
                                         //sbListAssociatedItemsDiv.Append("</tr><tr><td>");
 
 
