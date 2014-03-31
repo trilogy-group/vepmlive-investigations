@@ -351,7 +351,7 @@ namespace TimeSheets
                                 {
                                     'controlId': 'btnApprove',
                                     'controlType': 'button',
-                                    'iconClass': 'fui-approve',
+                                    'iconClass': 'icon-checkmark-circle-2',
                                     'title': 'Approve',
                                     'events': [
                                         {
@@ -363,7 +363,7 @@ namespace TimeSheets
                                 {
                                     'controlId': 'btnUnlock',
                                     'controlType': 'button',
-                                    'iconClass': 'fui-unlock',
+                                    'iconClass': 'icon-unlocked-2',
                                     'title': 'Unlock',
                                     'events': [
                                         {
@@ -375,7 +375,7 @@ namespace TimeSheets
                                 {
                                     'controlId': 'btnReject',
                                     'controlType': 'button',
-                                    'iconClass': 'fui-reject',
+                                    'iconClass': 'icon-cancel-circle-2',
                                     'title': 'Reject',
                                     'events': [
                                         {
@@ -501,7 +501,7 @@ namespace TimeSheets
                 }
                 .HideCol0StopWatch
                 {
-	                background-position: center center !important;
+	                background-position: 0px center !important;
                 }
                 </style>");
 

@@ -106,7 +106,7 @@ namespace TimeSheets
                         {
                             if (!rows.Contains(dr["TS_ITEM_UID"].ToString()))
                             {
-                                XmlNode nd = CreateTSRow(ref docRet, dsTS, dr, arrLookups, arrPeriods, settings, bCanEdit);
+                                XmlNode nd = CreateTSRow(ref docRet, dsTS, dr, arrLookups, arrPeriods, settings, bCanEdit, oWeb);
 
                                 XmlAttribute attr = docRet.CreateAttribute("Added");
                                 attr.Value = "1";
@@ -1845,7 +1845,7 @@ namespace TimeSheets
             }
             foreach (DataRow dr in dsTS.Tables[2].Rows)
             {
-                ndB.AppendChild(CreateTSRow(ref docOut, dsTS, dr, arrLookups, arrPeriods, settings, false));
+                ndB.AppendChild(CreateTSRow(ref docOut, dsTS, dr, arrLookups, arrPeriods, settings, false, web));
             }
 
             
@@ -1952,11 +1952,11 @@ namespace TimeSheets
 
                 attr1 = docData.CreateAttribute("TMApproval");
                 if (drTimesheet["APPROVAL_STATUS"].ToString() == "1")
-                    attr1.Value = "<img src=\"/_layouts/15/epmlive/images/ts/approved.png\" alt=\"Approved\">";
+                    attr1.Value = "<span class=\"icon-checkmark-circle-2\" style=\"color:#5BB75B\">";
                 else if (drTimesheet["APPROVAL_STATUS"].ToString() == "2")
-                    attr1.Value = "<img src=\"/_layouts/15/epmlive/images/ts/rejected.png\" alt=\"Rejected\">";
+                    attr1.Value = "<span class=\"icon-cancel-circle-2\" style=\"color:#D9534F\">";
                 else if (drTimesheet["SUBMITTED"].ToString() == "True")
-                    attr1.Value = "<img src=\"/_layouts/15/epmlive/images/ts/submitted.png\" alt=\"Submitted\">";
+                    attr1.Value = "<span class=\"icon-redo\" style=\"color:#888\">";
                 else
                 {
                     attr1 = docData.CreateAttribute("ApprovalNotesCanEdit");
@@ -2091,7 +2091,7 @@ namespace TimeSheets
 
                 foreach (DataRow dr in dsTS.Tables[2].Rows)
                 {
-                    ndB.AppendChild(CreateTSRow(ref docData, dsTS, dr, arrLookups, arrPeriods, settings, bCanEdit));
+                    ndB.AppendChild(CreateTSRow(ref docData, dsTS, dr, arrLookups, arrPeriods, settings, bCanEdit, web));
                 }
 
                 docData.SelectSingleNode("//Cfg").Attributes["TimesheetUID"].Value = dsTS.Tables[0].Rows[0]["tsuid"].ToString();
@@ -2115,7 +2115,7 @@ namespace TimeSheets
             return docData.OuterXml;
         }
 
-        private static XmlNode CreateTSRow(ref XmlDocument docData, DataSet dsTS, DataRow dr, ArrayList arrLookups, ArrayList arrPeriods, TimesheetSettings settings, bool bCanEdit)
+        private static XmlNode CreateTSRow(ref XmlDocument docData, DataSet dsTS, DataRow dr, ArrayList arrLookups, ArrayList arrPeriods, TimesheetSettings settings, bool bCanEdit, SPWeb web)
         {
             DataRow result = null;
             try
@@ -2132,9 +2132,9 @@ namespace TimeSheets
 
             attr1 = docData.CreateAttribute("PMApproval");
             if (dr["APPROVAL_STATUS"].ToString() == "1")
-                attr1.Value = "<img src=\"/_layouts/epmlive/images/ts/approved.png\">";
+                attr1.Value = "<span class=\"icon-checkmark-circle-2\" style=\"color:#5BB75B\">";
             else if (dr["APPROVAL_STATUS"].ToString() == "2")
-                attr1.Value = "<img src=\"/_layouts/epmlive/images/ts/rejected.png\">";
+                attr1.Value = "<span class=\"icon-cancel-circle-2\" style=\"color:#D9534F\">";
             else
                 attr1.Value = "";
             ndCol.Attributes.Append(attr1);
@@ -2149,6 +2149,10 @@ namespace TimeSheets
 
             attr1 = docData.CreateAttribute("Comments");
             attr1.Value = string.Format("<img class='TS_Comments' src='/_layouts/epmlive/images/mywork/comment.png' alt='Click here to add comments'/>");
+            ndCol.Attributes.Append(attr1);
+
+            attr1 = docData.CreateAttribute("SiteID");
+            attr1.Value = web.Site.ID.ToString();
             ndCol.Attributes.Append(attr1);
 
             attr1 = docData.CreateAttribute("WebID");

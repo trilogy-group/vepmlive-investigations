@@ -83,15 +83,15 @@ function ProcessApprovals(gridid, status) {
 
             var img = "";
             if (status == "1")
-                img = "Approved";
+                img = "<span class=\"icon-checkmark-circle-2\" style=\"color:#5BB75B\">";
             else if (status == "2")
-                img = "Rejected";
+                img = "<span class=\"icon-cancel-circle-2\" style=\"color:#D9534F\">";
             else if (status == "0")
-                img = "Submitted";
+                img = "<span class=\"icon-redo\" style=\"color:#888\">"
 
             if (response.Result['@Status'] == "0") {
                 for (var row in rows) {
-                    grid.SetValue(rows[row], "TMApproval", "<img src=\"/_layouts/15/epmlive/images/ts/" + img + ".png\" alt=\"" + img + "\">", 1);
+                    grid.SetValue(rows[row], "TMApproval", img, 1);
                 }
             }
             else {
@@ -115,14 +115,113 @@ function LoadTSGrid(gridid) {
 function TSReady(grid) {
     var gridid = GetTSGridId(grid);
     if (GridType == "0") {
-
+        TGSetEvent("OnDblClickRow", grid.id, TSDoubleClick);
+        TGSetEvent("OnFocus", grid.id, TSOnFocus);
     }
     else
     {
         
-        
+        TGSetEvent("OnFocus", grid.id, TSAOnFocus);
     }
     TGSetEvent("OnGetHtmlValue", grid.id, MYTSOnGetHtmlValue);
+    TGSetEvent("OnMouseOutRow", grid.id, TSOnMouseOutRow);
+    TGSetEvent("OnMouseOverOutside", grid.id, TSOnMouseOverOutside);
+    TGSetEvent("OnMouseOverRow", grid.id, TSOnMouseOverRow);
+}
+
+
+function TSOnFocus (grid, row, col, x, y, event) {
+
+    if (!curRow)
+        curRow = row;
+
+    DoPopUp(grid, row, col);
+
+    if (row.ItemID) {
+        grid.ActionClearSelection();
+        grid.SelectRow(row);
+    }
+
+    RefreshCommandUI();
+}
+
+function TSAOnFocus(grid, row, col, x, y, event) {
+
+    if (!curRow)
+        curRow = row;
+
+    DoPopUp(grid, row, col);
+}
+
+function TSOnMouseOverOutside(grid, row, col, event) {
+    if (grid.CurHoverRow)
+        grid.SetAttribute(grid.GetRowById(grid.CurHoverRow), "Title", "ButtonText", ' ', 1);
+    grid.CurHoverRow = "0";
+
+}
+
+function TSOnMouseOverRow(grid, row, col, event) {
+    if (grid.CurHoverRow != row.id) {
+        grid.CurHoverRow = row.id;
+        CurrentGrid = grid;
+        if (grid.GetValue(row, "ItemID") != "") {
+            grid.SetAttribute(row, "Title", "ButtonText", '<div class="gridmenuspan" style="position:absolute;overflow:visible" id=\"' + row.id + '\"><a data-itemid="' + grid.GetValue(row, "ItemID") + '" data-listid="' + grid.GetValue(row, "ListID") + '" data-webid="' + grid.GetValue(row, "WebID") + '" data-siteid="' + grid.GetValue(row, "SiteID") + '" ></a></div>', 1);
+            window.epmLiveNavigation.addContextualMenu($('#' + row.id), [], false, true, { "delete": "GridGanttDeleteRow" });
+        }
+    }
+}
+
+function TSOnMouseOutRow(grid, row, col, event) {
+    grid.SetAttribute(row, "Title", "ButtonText", ' ', 1);
+}
+
+function TSDoubleClick(grid, row, col, x, y, event)
+{
+    EditGridRow(grid, row, col);
+}
+
+function EditGridRow(grid, row, col) {
+
+    if (row.ItemID && grid.GetValue(row, "Edited") != "1") {
+        var webUrl = window.epmLiveNavigation.currentWebUrl;
+
+        var cols = "";
+
+        for (var c in grid.Cols)
+            cols += "," + c;
+
+        cols = cols.substr(1);
+
+        var data = "<Row id=\"" + row.id + "\" siteid=\"" + row.SiteID + "\" webid=\"" + row.WebID + "\" listid=\"" + row.ListID + "\" itemid=\"" + row.ItemID + "\" Cols=\"" + cols + "\"/>";
+
+        grid.SetAttribute(row, "Title", "HtmlPrefix", "<img src='/_layouts/15/epmlive/images/mywork/loading16.gif'>", 1);
+
+        $.ajax({
+            type: 'POST',
+            url: (webUrl + '/_vti_bin/WorkEngine.asmx/ExecuteJSON').replace(/\/\//g, '/'),
+            data: "{ Function: 'webparts_GetGridRowEdit', Dataxml: '" + data + "' }",
+            contentType: 'application/json; charset=utf-8',
+            dataType: 'json',
+            success: function (response) {
+                var oResp = eval("(" + response.d + ")");
+                if (oResp.Result.Status == "0") {
+                    grid.EditRow = row.id;
+                    grid.AddDataFromServer(oResp.Result.InnerText);
+                    grid.SetAttribute(row, "Title", "HtmlPrefix", "", 1);
+                    grid.StartEdit();
+                    grid.SetValue(row, "Edited", "1");
+                }
+                else
+                    alert(oResp.Result.Error.Text);
+
+            },
+            error: function (response) {
+                alert("Error: " + response);
+            }
+        });
+
+
+    }
 }
 
 function TSRenderFinish(grid)
@@ -205,7 +304,7 @@ Grids.OnKeyPress = function (grid, key, event, name, prefix) {
 
 }
 
-Grids.OnDblClick = function (grid, row, col, x, y, event) {
+/*Grids.OnDblClick = function (grid, row, col, x, y, event) {
     if (GridType != "0")
         return;
     if (curPop) {
@@ -221,7 +320,7 @@ Grids.OnDblClick = function (grid, row, col, x, y, event) {
             alert("You cannot edit this item.");
         }
     }
-}
+}*/
 
 function editSaveRow(gridId, rowId) {
     var grid = Grids[gridId];
@@ -982,20 +1081,7 @@ function CheckApproveStatus(gridid) {
 
 
 
-Grids.OnFocus = function (grid, row, col, x, y, event) {
 
-    if (!curRow)
-        curRow = row;
-
-    DoPopUp(grid, row, col);
-
-    if (row.ItemID) {
-        grid.ActionClearSelection();
-        grid.SelectRow(row);
-    }
-
-    RefreshCommandUI();
-}
 
 Grids.OnClick = function (grid, row, col, x, y, event) {
 
@@ -1498,7 +1584,7 @@ function ShowApprovalNotes(gridid, rowid, img) {
 
     curPop = true;
 
-    $('body').append("<div id='divanotes" + rowid.replace(/-/g, '') + "' style='width:150px;height:100px;position:absolute;left:" + oimg.offset().left + "px;top:" + oimg.offset().top + "px;border:1px solid #DDD;background-color:#FFF' onMouseDown=\"stopProp(event);\" ><textarea id=\"anotestxt" + rowid.replace(/-/g, '') + "\" style='width:140px;height:60px;border:none;resize: none;' onkeyup=\"stopProp(event);\" onclick=\"stopProp(event);\" onkeypress=\"stopProp(event);\">" + grid.GetValue(row, "ApprovalNotes") + "</textarea><input type=\"button\" style=\"float:right\" value=\"Ok\" onclick=\"CloseApprovalNotes('" + grid.id + "','" + row.id + "');\"></div>");
+    $('body').append("<div id='divanotes" + rowid.replace(/-/g, '') + "' style='width:150px;height:100px;position:absolute;left:" + oimg.offset().left + "px;top:" + oimg.offset().top + "px;border:1px solid #DDD;background-color:#FFF' onMouseDown=\"stopProp(event);\" ><textarea id=\"anotestxt" + rowid.replace(/-/g, '') + "\" style='width:140px;height:60px;border:none;resize: none;outline:none' onkeyup=\"stopProp(event);\" onclick=\"stopProp(event);\" onkeypress=\"stopProp(event);\">" + grid.GetValue(row, "ApprovalNotes") + "</textarea><input type=\"button\" style=\"float:right\" value=\"Ok\" onclick=\"CloseApprovalNotes('" + grid.id + "','" + row.id + "');\"></div>");
 }
 
 function CloseApprovalNotes(gridid, rowid)
@@ -1521,12 +1607,12 @@ function MYTSOnGetHtmlValue(grid, row, col, val) {
     if (grid.id.substr(0, 2) == "TS") {
         if (row.Def.Name == "Resource") {
             if (col == "ApprovalNotes") {
-                var img = "tsnonotes";
+                var img = "DDD";
                 if (grid.GetValue(row, col) != "") {
-                    img = "tsnotes"
+                    img = "888"
                 }
 
-                return "<img src=\"/_layouts/15/epmlive/images/" + img + ".png\" onclick=\"ShowApprovalNotes('" + grid.id + "','" + row.id + "', this)\" id=\"ANote" + row.id + "\">";
+                return "<a onclick=\"ShowApprovalNotes('" + grid.id + "','" + row.id + "', this)\" id=\"ANote" + row.id + "\" style=\"text-decoration:none;\"><span class='icon-file-3' style='color:#" + img + ";text-decoration:none'></a>";
             }
         }
         else {
