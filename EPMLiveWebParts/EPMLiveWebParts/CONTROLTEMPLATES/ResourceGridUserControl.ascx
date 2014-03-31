@@ -16,10 +16,6 @@
             display: none !important;
         }
         
-        body #s4-ribbonrow{
-        height:auto !important;
-        }
-
         .rg-clear-fix:after {
             content: ".";
             display: block;
