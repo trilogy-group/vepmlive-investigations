@@ -629,7 +629,9 @@ namespace EPMLiveWebParts
                             {
                                 sbPeopleDetailsContent.Append("<td style='text-align: right'>");
 
-                                if (!string.IsNullOrEmpty(imageUrl))
+                                if (!string.IsNullOrEmpty(imageUrl) && !imageUrl.Contains(", "))
+                                    sbPeopleDetailsContent.Append("<img alt='' src='" + imageUrl + "' class='dispFormUserImage' /></td>");
+                                else if (!string.IsNullOrEmpty(imageUrl) && imageUrl.Contains(", "))
                                     sbPeopleDetailsContent.Append("<img alt='' src='" + imageUrl.Remove(imageUrl.IndexOf(", ")) + "' class='dispFormUserImage' /></td>");
                                 else
                                     sbPeopleDetailsContent.Append("<img alt='' src='" + SPContext.Current.Web.Url + "/_layouts/images/User.png' class='dispFormUserImage' /></td>");
@@ -649,7 +651,9 @@ namespace EPMLiveWebParts
                             {
                                 sbPeopleDetailsShowAllRegion.Append("<td style='text-align: right'>");
 
-                                if (!string.IsNullOrEmpty(imageUrl))
+                                if (!string.IsNullOrEmpty(imageUrl) && !imageUrl.Contains(", "))
+                                    sbPeopleDetailsShowAllRegion.Append("<img alt='' src='" + imageUrl + "' class='dispFormUserImage' /></td>");
+                                else if (!string.IsNullOrEmpty(imageUrl) && imageUrl.Contains(", "))
                                     sbPeopleDetailsShowAllRegion.Append("<img alt='' src='" + imageUrl.Remove(imageUrl.IndexOf(", ")) + "' class='dispFormUserImage' /></td>");
                                 else
                                     sbPeopleDetailsShowAllRegion.Append("<img alt='' src='" + SPContext.Current.Web.Url + "/_layouts/images/User.png' class='dispFormUserImage' /></td>");
