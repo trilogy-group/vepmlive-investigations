@@ -30,12 +30,12 @@ namespace EPMLiveWebParts
                 arrFields.Add(field);
             }
 
-            if (!arrFields.Contains(StartDateField))
+            if (!arrFields.Contains(StartDateField) && StartDateField != "")
             {
                 arrHidden.Add(StartDateField);
                 view.ViewFields.Add(StartDateField);
             }
-            if (!arrFields.Contains(DueDateField))
+            if (!arrFields.Contains(DueDateField) && DueDateField != "")
             {
                 arrHidden.Add(DueDateField);
                 view.ViewFields.Add(DueDateField);
