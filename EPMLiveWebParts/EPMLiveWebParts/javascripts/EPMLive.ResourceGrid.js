@@ -2394,6 +2394,28 @@ function registerEpmLiveResourceGridScript() {
             }
         };
 
+        window.Grids.OnMouseOutRow = function(grid, row, col, event) {
+            grid.SetAttribute(row, "Title", "ButtonText", ' ', 1);
+        }
+
+        window.Grids.OnMouseOverOutside = function(grid, row, col, event) {
+            if (grid.CurHoverRow)
+                grid.SetAttribute(grid.GetRowById(grid.CurHoverRow), "Title", "ButtonText", ' ', 1);
+            grid.CurHoverRow = "0";
+
+        }
+
+        window.Grids.OnMouseOverRow = function(grid, row, col, event) {
+            if (grid.CurHoverRow != row.id) {
+                grid.CurHoverRow = row.id;
+                CurrentGrid = grid;
+                if (grid.GetValue(row, "itemid") != "") {
+                    grid.SetAttribute(row, "Title", "ButtonText", '<div class="gridmenuspan" style="position:absolute;overflow:visible" id=\"' + row.id + '\"><a data-itemid="' + grid.GetValue(row, "itemid") + '" data-listid="' + grid.GetValue(row, "listid") + '" data-webid="' + grid.GetValue(row, "webid") + '" data-siteid="' + grid.GetValue(row, "siteid") + '" ></a></div>', 1);
+                    window.epmLiveNavigation.addContextualMenu($('#' + row.id), [], false, false, { "delete": "GridGanttDeleteRow" });
+                }
+            }
+        }
+
         window.Grids.OnExpand = function (grid, row) {
             if ($.browser.msie) {
                 window.setTimeout(function () {
