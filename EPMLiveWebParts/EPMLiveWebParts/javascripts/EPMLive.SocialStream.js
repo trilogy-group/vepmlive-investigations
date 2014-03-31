@@ -28,6 +28,7 @@
 
             var config = {
                 apiUrl: '/' + window.epmLive.currentWebUrl.slice(1) + '/_vti_bin/SocialEngine.svc',
+                commentServiceUrl: '/' + window.epmLive.currentWebUrl.slice(1) + '/_layouts/15/epmlive/CommentsProxy.aspx',
                 pagination: {
                     limit: 10,
                     offset: null,
@@ -218,6 +219,20 @@
                     settings.button.removeClass(config.ui.classes.active);
                 };
 
+                var postComment = function(data) {
+                    $.post(config.commentServiceUrl, {
+                        command: 'CreateComment',
+                        comment: data.text,
+                        newcomment: null,
+                        itemId: data.thread.itemId,
+                        listId: data.thread.list.id,
+                        userId: window.epmLive.currentUserId,
+                        commentItemId: data.thread.itemId
+                    }).then(function(response) {
+                        console.log(response);
+                    });
+                };
+
                 var attahEvents = function (settings) {
                     settings.input.focus(function () {
                         if ($(this).html() === settings.placeholder) removePlaceholder(settings);
@@ -246,14 +261,20 @@
                         
                         if (!$(this).hasClass(config.ui.classes.active)) return;
 
-                        activityManager.addComment({
-                            text: settings.input.html(),
+                        var data = {
+                            text: $.trim(settings.input.text()),
                             thread: settings.thread,
                             $thread: settings.$thread
-                        });
+                        };
+
+                        if (data.text.length === 0) return;
+
+                        activityManager.addComment(data);
                         
                         addPlaceholder(settings);
                         closeCommentBox(settings);
+
+                        postComment(data);
                     });
 
                     $el.root.mousedown(function (event) {
@@ -504,7 +525,7 @@
                         time:time,
                         longDateTime: time.format('LLLL'),
                         user: {
-                            displayName: window.epmLive.currentUserDisplayName,
+                            displayName: 'You',
                             avatar: window.epmLive.currentUserAvatar,
                             url: window.epmLive.currentWebUrl + '/_layouts/15/userdisp.aspx?ID=' + window.epmLive.currentUserId
                         }

@@ -59,7 +59,7 @@
             <div class="epm-se-activity-text">{{{text}}}</div>
         {{else}}
             <div class="epm-se-user-info">{{> avatar}}</div>
-            <div class="epm-se-activity-text">{{> user-plain}}&nbsp;-&nbsp;{{{text}}}</div>
+            <div class="epm-se-activity-text">{{> user-plain}}&nbsp;-&nbsp;<span class="epm-se-comment">{{{text}}}</span></div>
         {{/if}}
         <div class="epm-se-activity-info">
             <span class="epm-se-activity-time epm-se-has-tooltip" title="{{longDateTime}}" data-placement="top" data-toggle="tooltip">{{displayTime}}</span>
