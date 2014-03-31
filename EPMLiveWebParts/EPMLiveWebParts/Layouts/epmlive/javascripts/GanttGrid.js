@@ -27,7 +27,8 @@ function setupPage(records, UseReporting, PageSize, grid, startpage) {
     var prev = document.getElementById("PagePrevious" + gridid);
     var next = document.getElementById("PageNext" + gridid);
     var pagediv = document.getElementById("pagediv" + gridid);
-    var pagetable = document.getElementById("viewalldiv" + gridid);
+    var viewalldiv = document.getElementById("viewalldiv" + gridid);
+    var pagetable = document.getElementById("pagetable" + gridid);
 
 
     if (UseReporting) {
@@ -55,10 +56,11 @@ function setupPage(records, UseReporting, PageSize, grid, startpage) {
                 });
 
             }
+            viewalldiv.style.display = "";
             pagetable.style.display = "";
         }
         else {
-            //pagediv.style.display = "none";
+            viewalldiv.style.display = "none";
             pagetable.style.display = "none";
         }
     }
@@ -90,7 +92,7 @@ function setupPage(records, UseReporting, PageSize, grid, startpage) {
         }
 
         if (rec[3] != "true" && rec[0] == "0") {
-            pagediv.style.display = "none";
+            pagetable.style.display = "none";
         }
     }
 }
@@ -156,7 +158,7 @@ function SetGridSize(grid) {
         } catch (e) { }
 
         //document.getElementById("griddiv" + gridid).style.height = (height - top) + "px";
-        outer.style.height = (height - top - pagerheight) + "px";
+        outer.style.height = (height - top - 35) + "px";
         //document.getElementById("MSOZoneCell_WebPart").style.height = "400px";
     }
 }

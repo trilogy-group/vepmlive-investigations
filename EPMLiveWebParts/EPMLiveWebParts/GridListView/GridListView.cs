@@ -1903,21 +1903,21 @@ namespace EPMLiveWebParts
                 if(list != null)
                     buildParams();
 
-                if (BOOLShowViewBar && view != null && list != null)
-                {
-                    if (PropMyDefaultControl == "Gantt")
-                        toolbar.TemplateName = "GanttViewToolBar";
+                //if (BOOLShowViewBar && view != null && list != null)
+                //{
+                //    if (PropMyDefaultControl == "Gantt")
+                //        toolbar.TemplateName = "GanttViewToolBar";
 
-                    SPContext context = SPContext.GetContext(this.Context, view.ID, list.ID, web);
-                    toolbar.RenderContext = context;
+                //    SPContext context = SPContext.GetContext(this.Context, view.ID, list.ID, web);
+                //    toolbar.RenderContext = context;
 
-                    Controls.Add(toolbar);
+                //    Controls.Add(toolbar);
 
-                    foreach (Control control in toolbar.Controls)
-                    {
-                        processControls(control, list.Title, list.ID.ToString(), view.ID.ToString(), PropMyDefaultControl, this.ID, sFullGridId, hideNew);
-                    }
-                }
+                //    foreach (Control control in toolbar.Controls)
+                //    {
+                //        processControls(control, list.Title, list.ID.ToString(), view.ID.ToString(), PropMyDefaultControl, this.ID, sFullGridId, hideNew);
+                //    }
+                //}
 
                 //if(newGridMode.ToLower() == "gantt")
                 //{
@@ -3155,7 +3155,7 @@ namespace EPMLiveWebParts
                 output.Write("<div id=\"search" + this.ID + "\" style=\"width:100%; height:40px;");
                 //if (!bShowSearch)
                 //    output.Write(";display:none");
-                output.WriteLine("\" class=\"ms-listviewtable\"><table><tr><td style=\"color: #A3A3A3; font-family: \"Open Sans\", Helvetica, Arial, sans-serif; font-size: 14px;\">");
+                output.WriteLine("\" class=\"ms-listviewtable\"><table><tr><td style=\"color: #A3A3A3; font-family: 'Open Sans', Helvetica, Arial, sans-serif; font-size: 14px;\">");
                 output.Write("Search: ");
                 output.Write("<select id=\"search" + sFullGridId + "\" onChange=\"switchsearch" + sFullGridId + "();\" class=\"form-control\">");
                 output.WriteLine(fieldlist);
@@ -3253,7 +3253,7 @@ namespace EPMLiveWebParts
             {
                 if (gSettings.EnableContentReporting)
                 {
-                    output.Write("<div style=\"display:inline-block;margin:5px 0 5px 0;\"><div id=\"pagediv" + sFullGridId + "\"></div>");
+                    output.Write("<div style=\"display:inline-block;margin:0px;\"><div id=\"pagediv" + sFullGridId + "\"></div>");
                     output.Write("</td><td><div id=\"viewalldiv" + sFullGridId + "\" style=\"display:none;margin:0px 3px 0 0;\" class=\"jPaginate\"><a onclick=\"ViewAllPages('" + sFullGridId + "');\" style=\"color: rgb(102, 102, 102); background-color: rgb(255, 255, 255); border: 1px solid rgb(219, 219, 219);\">View All</a></div></td></tr></table>");
                 }
                 else
