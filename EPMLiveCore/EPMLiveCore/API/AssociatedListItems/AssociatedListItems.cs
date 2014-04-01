@@ -172,11 +172,11 @@ namespace EPMLiveCore.API
                                     {
                                         sbListAssociatedItemsDiv.Append("<tr>");
 
-                                        if (item.Title!= null && item.Title.TrimEnd().Length > 20)
+                                        if (item.Title != null && item.Title.TrimEnd().Length > 20)
                                         {
                                             sbListAssociatedItemsDiv.Append("<td><a href='#' alt='" + item.Title + "' title='" + item.Title + "' onclick=\"javascript:showNewForm('" + projectAssociatedList.DefaultDisplayFormUrl + "?ID=" + item.ID + "&Source=" + sourceUrl + "');return false;\">" + item.Title.Substring(0, 20) + "..." + "</a></td>");
                                         }
-                                        else 
+                                        else
                                         {
                                             sbListAssociatedItemsDiv.Append("<td><a href='#' alt='" + item.Title + "' title='" + item.Title + "' onclick=\"javascript:showNewForm('" + projectAssociatedList.DefaultDisplayFormUrl + "?ID=" + item.ID + "&Source=" + sourceUrl + "');return false;\">" + item.Title + "</a></td>");
                                         }
@@ -321,7 +321,7 @@ namespace EPMLiveCore.API
                                         try
                                         {
                                             // Wait for 3 seconds just in-case if reporting database is not updated.
-                                            Thread.Sleep(3000);
+                                            // Thread.Sleep(3000);
                                             var queryExecutor = new QueryExecutor(spWeb);
                                             dtListItemCount = queryExecutor.ExecuteReportingDBQuery(sql, new Dictionary<string, object> { });
                                         }
