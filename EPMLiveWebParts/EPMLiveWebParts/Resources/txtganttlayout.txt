@@ -1,6 +1,6 @@
 <Grid>
 	<Cfg id='GanttGrid#gridid#' SuppressCfg='1' DateStrings='2' ConstWidth="1" NoVScroll="0"/>
-	<Cfg MainCol='Title' NameCol='Title' Style='GM' CSS="/_layouts/15/epmlive/treegrid/grid/grid.css"/>
+	<Cfg MainCol='Title' NameCol='Title' Style='GM' CSS="/_layouts/15/epmlive/treegrid/grid/grid.min.css"/>
 	<Cfg Undo='1' Paging='2' PageLength='30'/>
 	<Cfg ExportType='Expanded,Outline'/>
 	<Cfg ChildParts='0'/>
