@@ -652,30 +652,33 @@ namespace EPMLiveWebParts {
                     "               }\r\n                    else {\r\n                        alert(tick" +
                     "et);\r\n                    }\r\n                }\r\n            });\r\n        },\r\n\r\n " +
                     "       showNewForm: function (weburl) {\r\n            var options = { url: weburl" +
-                    ", showMaximized: false, dialogReturnValueCallback: function (dialogResult) { Fan" +
-                    "cyDispFormClient.fillWebPartData(); } };\r\n            SP.SOD.execute(\'SP.UI.Dial" +
-                    "og.js\', \'SP.UI.ModalDialog.showModalDialog\', options);\r\n        },\r\n\r\n        sh" +
-                    "owItemPopup: function (siteurl, webid, listid, itemid) {\r\n            showShareP" +
-                    "ointPopup(siteurl + \'/_layouts/epmlive/gridaction.aspx?action=getcontextmenus&we" +
-                    "bid=\' + webid +\r\n                \'&listid=\' + listid + \'&ID=\' + itemid, null, fa" +
-                    "lse, true, null, {\r\n                    gridId: \"myDiv\",\r\n                    ro" +
-                    "wId: \"myDiv\",\r\n                    col: \"myDiv\"\r\n                }, 300, 400);\r\n" +
-                    "        },\r\n\r\n        emptyFunction: function () {\r\n        },\r\n\r\n        showSh" +
-                    "arePointPopup: function (url, title, allowMaximize, showClose, func, funcParams," +
-                    " width, height) {\r\n            if (allowMaximize == null) allowMaximize = true;\r" +
-                    "\n            if (showClose == null) showClose = true;\r\n            if (func == n" +
-                    "ull) func = emptyFunction;\r\n\r\n            var options;\r\n\r\n            if (width " +
-                    "!== undefined && height !== undefined) {\r\n                options = {\r\n         " +
-                    "           title: title,\r\n                    allowMaximize: allowMaximize,\r\n   " +
-                    "                 showClose: showClose,\r\n                    url: url,\r\n         " +
-                    "           dialogReturnValueCallback: Function.createCallback(Function.createDel" +
-                    "egate(null, func), funcParams),\r\n                    width: width,\r\n            " +
-                    "        height: height\r\n                };\r\n            } else {\r\n              " +
-                    "  options = { title: title, allowMaximize: allowMaximize, showClose: showClose, " +
-                    "url: url, dialogReturnValueCallback: Function.createCallback(Function.createDele" +
-                    "gate(null, func), funcParams) };\r\n            }\r\n\r\n            SP.UI.ModalDialog" +
-                    ".showModalDialog(options);\r\n        },\r\n\r\n        fillWebPartData: function () {" +
-                    "\r\n\r\n            $.ajax({\r\n                type: \"POST\",\r\n                url: \"");
+                    ", showMaximized: false, dialogReturnValueCallback: function (dialogResult) { if " +
+                    "(dialogResult == 1) { FancyDispFormClient.reFillWebPartData(); } } };\r\n         " +
+                    "   SP.SOD.execute(\'SP.UI.Dialog.js\', \'SP.UI.ModalDialog.showModalDialog\', option" +
+                    "s);\r\n        },\r\n\r\n        showItemPopup: function (siteurl, webid, listid, item" +
+                    "id) {\r\n            showSharePointPopup(siteurl + \'/_layouts/epmlive/gridaction.a" +
+                    "spx?action=getcontextmenus&webid=\' + webid +\r\n                \'&listid=\' + listi" +
+                    "d + \'&ID=\' + itemid, null, false, true, null, {\r\n                    gridId: \"my" +
+                    "Div\",\r\n                    rowId: \"myDiv\",\r\n                    col: \"myDiv\"\r\n  " +
+                    "              }, 300, 400);\r\n        },\r\n\r\n        emptyFunction: function () {\r" +
+                    "\n        },\r\n\r\n        showSharePointPopup: function (url, title, allowMaximize," +
+                    " showClose, func, funcParams, width, height) {\r\n            if (allowMaximize ==" +
+                    " null) allowMaximize = true;\r\n            if (showClose == null) showClose = tru" +
+                    "e;\r\n            if (func == null) func = emptyFunction;\r\n\r\n            var optio" +
+                    "ns;\r\n\r\n            if (width !== undefined && height !== undefined) {\r\n         " +
+                    "       options = {\r\n                    title: title,\r\n                    allow" +
+                    "Maximize: allowMaximize,\r\n                    showClose: showClose,\r\n           " +
+                    "         url: url,\r\n                    dialogReturnValueCallback: Function.crea" +
+                    "teCallback(Function.createDelegate(null, func), funcParams),\r\n                  " +
+                    "  width: width,\r\n                    height: height\r\n                };\r\n       " +
+                    "     } else {\r\n                options = { title: title, allowMaximize: allowMax" +
+                    "imize, showClose: showClose, url: url, dialogReturnValueCallback: Function.creat" +
+                    "eCallback(Function.createDelegate(null, func), funcParams) };\r\n            }\r\n\r\n" +
+                    "            SP.UI.ModalDialog.showModalDialog(options);\r\n        },\r\n\r\n        r" +
+                    "eFillWebPartData: function () {\r\n            window.setTimeout(\'FancyDispFormCli" +
+                    "ent.fillWebPartData()\', 2000);\r\n        },\r\n\r\n        fillWebPartData: function " +
+                    "() {\r\n            $.ajax({\r\n                type: \"POST\",\r\n                url: " +
+                    "\"");
               @__w.Write(SPContext.Current.Web.Url);
 
             @__w.Write("/_vti_bin/WorkEngine.asmx/Execute\",\r\n                data: \"{Function : \'GetFancy" +
@@ -687,7 +690,8 @@ namespace EPMLiveWebParts {
 
             @__w.Write("</FancyFormItemID></FancyFormAssociatedItems>\'}\",\r\n                contentType: \"" +
                     "application/json; charset=utf-8\",\r\n                dataType: \"json\",\r\n          " +
-                    "      success: function (response) {\r\n\r\n                    $(\"#");
+                    "      success: function (response) {\r\n                    \r\n                    " +
+                    "$(\"#");
                 @__w.Write(divFancyDispFormAssociatedItemsContent.ClientID);
 
             @__w.Write("\").html(\"\");\r\n                    $(\"#");
@@ -715,7 +719,7 @@ namespace EPMLiveWebParts {
 
                     var addContextualMenu = function () {
                         $("".fancyDisplayFormAssociatedItemsContextMenu"").each(function () {
-                            window.epmLiveNavigation.addContextualMenu($(this), null, true, '-1', { ""delete"": ""FancyDispFormClient.fillWebPartData"" });
+                            window.epmLiveNavigation.addContextualMenu($(this), null, true, '-1', { ""delete"": ""FancyDispFormClient.reFillWebPartData""});
                         });
                     };
 

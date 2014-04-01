@@ -239,7 +239,7 @@
         },
 
         showNewForm: function (weburl) {
-            var options = { url: weburl, showMaximized: false, dialogReturnValueCallback: function (dialogResult) { FancyDispFormClient.fillWebPartData(); } };
+            var options = { url: weburl, showMaximized: false, dialogReturnValueCallback: function (dialogResult) { if (dialogResult == 1) { FancyDispFormClient.reFillWebPartData(); } } };
             SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
         },
 
@@ -279,8 +279,11 @@
             SP.UI.ModalDialog.showModalDialog(options);
         },
 
-        fillWebPartData: function () {
+        reFillWebPartData: function () {
+            window.setTimeout('FancyDispFormClient.fillWebPartData()', 2000);
+        },
 
+        fillWebPartData: function () {
             $.ajax({
                 type: "POST",
                 url: "<%=SPContext.Current.Web.Url%>/_vti_bin/WorkEngine.asmx/Execute",
@@ -288,7 +291,7 @@
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
                 success: function (response) {
-
+                    
                     $("#<%=divFancyDispFormAssociatedItemsContent.ClientID%>").html("");
                     $("#<%=divFancyDispFormAssociatedItemsContent.ClientID%>").html(response.d.toString().replace("<Result Status=\"0\">", "").replace("</Result>", ""));
 
@@ -309,7 +312,7 @@
 
                     var addContextualMenu = function () {
                         $(".fancyDisplayFormAssociatedItemsContextMenu").each(function () {
-                            window.epmLiveNavigation.addContextualMenu($(this), null, true, '-1', { "delete": "FancyDispFormClient.fillWebPartData" });
+                            window.epmLiveNavigation.addContextualMenu($(this), null, true, '-1', { "delete": "FancyDispFormClient.reFillWebPartData"});
                         });
                     };
 
