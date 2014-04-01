@@ -28,6 +28,7 @@
             var kanbanItemNewFromUrl;
             var kanbanPlanners;
             var kanbanFilter1;
+            var kanbanFilter1Name;
 
             var reGenerateToolBar = function () {
 
@@ -65,7 +66,7 @@
                     });
                     if (kanbanFilter1OptionsCfg.length > 1)
                         kanbanFilter1OptionsCfg = kanbanFilter1OptionsCfg.substring(0, kanbanFilter1OptionsCfg.length - 1);
-                    kanbanFilter1MultiselectCfg = '"controlId": "msKanbanFilter1", "controlType": "multiselect", "title": "", "value": "", "iconClass": "icon-insert-template", "sections": [ {"heading": "none", "divider": "no", "options": { ' + kanbanFilter1OptionsCfg + ' }  } ],"applyButtonConfig": { "text": "Apply", "function": function (data) { loadKanBanBoard(data); } }';
+                    kanbanFilter1MultiselectCfg = '"controlId": "msKanbanFilter1", "controlType": "multiselect", "title": "' + kanbanFilter1Name + '", "value": "", "iconClass": "icon-insert-template", "sections": [ {"heading": "none", "divider": "no", "options": { ' + kanbanFilter1OptionsCfg + ' }  } ],"applyButtonConfig": { "text": "Apply", "function": function (data) { loadKanBanBoard(data); } }';
                 }
 
                 //placement left content
@@ -266,6 +267,7 @@
                                 kanbanItemName = obj.kanbanitemname;
                                 kanbanItemNewFromUrl = obj.kanbannewitemurl;
                                 kanbanFilter1 = obj.kanbanfilter1;
+                                kanbanFilter1Name = obj.kanbanfilter1name;
 
                                 reGenerateToolBar();
 
@@ -409,7 +411,7 @@
                         });
 
                         ExecuteOrDelayUntilScriptLoaded(addContextualMenu, 'EPMLive.Navigation.js');
-                        
+
                     }
                 });
             };

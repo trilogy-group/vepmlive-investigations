@@ -5351,7 +5351,7 @@ namespace EPMLiveWorkPlanner
                         }
                         else
                         {
-                            return string.Format("{{ \"kanbannewitemurl\": \"\", \"kanbanitemname\": \"\", \"kanbanstatuscolumn\": \"\", \"kanbanstatusvalues\": [{0}], \"kanbanerror\": \"List not configured for reporting. Please contact administrator.\", \"kanbanfilter1name\": \"{1}:\", \"kanbanfilter1\": [{2}] }}", "", props.KanBanFilterColumn, "");
+                            return string.Format("{{ \"kanbannewitemurl\": \"\", \"kanbanitemname\": \"\", \"kanbanstatuscolumn\": \"\", \"kanbanstatusvalues\": [{0}], \"kanbanerror\": \"List not configured for reporting. Please contact administrator.\", \"kanbanfilter1name\": \"{1}\", \"kanbanfilter1\": [{2}] }}", "", props.KanBanFilterColumn, "");
                         }
                     }
                 }
@@ -5374,7 +5374,7 @@ namespace EPMLiveWorkPlanner
             {
                 jsonData = jsonData.Substring(0, jsonData.Length - 1);
             }
-            return string.Format("{{ \"kanbannewitemurl\": \"{0}\", \"kanbanitemname\": \"{1}\", \"kanbanstatuscolumn\": \"{2}\", \"kanbanstatusvalues\": [{3}], \"kanbanerror\": \"\", \"kanbanfilter1name\": \"{4}:\", \"kanbanfilter1\": [{5}] }}", sourceList.DefaultNewFormUrl, sourceList.Title, props.KanBanStatusColumn, jsonBacklogStatus, props.KanBanFilterColumn, jsonData);
+            return string.Format("{{ \"kanbannewitemurl\": \"{0}\", \"kanbanitemname\": \"{1}\", \"kanbanstatuscolumn\": \"{2}\", \"kanbanstatusvalues\": [{3}], \"kanbanerror\": \"\", \"kanbanfilter1name\": \"{4}\", \"kanbanfilter1\": [{5}] }}", sourceList.DefaultNewFormUrl, sourceList.Title, props.KanBanStatusColumn, jsonBacklogStatus, props.KanBanFilterColumn, jsonData);
         }
 
         public static string GetKanBanBoard(XmlDocument data, SPWeb oWeb)
