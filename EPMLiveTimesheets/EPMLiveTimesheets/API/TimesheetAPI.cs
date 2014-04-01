@@ -863,7 +863,7 @@ namespace TimeSheets
                 int approvalCount = 0;
 
 
-                sql_getUserIDs = "select SharePointAccountID from LSTResourcepool where TimesheetManagerID = " + user.ID;
+                sql_getUserIDs = string.Format("select SharePointAccountID from LSTResourcepool WHERE (',' + TimesheetManagerID + ',' LIKE '%,{0},%') and Generic=0 ", user.ID);
 
                 var queryExecutor = new QueryExecutor(oWeb);
                 dtUserID = queryExecutor.ExecuteReportingDBQuery(sql_getUserIDs, new Dictionary<string, object> { });
