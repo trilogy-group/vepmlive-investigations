@@ -18,7 +18,7 @@
 	<Toolbar Visible="0" CanHide="0" />
 	<Panel Delete="0" Visible="0" CanHide="0" />
 	<Head>
-		<Header id='Header' StopWatchType="Html" StopWatch="&lt;a id='tssw' data-delay='100' data-toggle='tooltip' data-placement='top' title='Stop Watch'&gt;&lt;img src='/_layouts/15/epmlive/images/tstimeroff.png' style='padding-top:4px;padding-left:4px'&gt;&lt;/a&gt;" ShowLoading="" WorkTypeField="Work Type" Comments="" Color="" Hover="" HoverCell="" HoverColor="" HoverRow="" TMApproval="TM" PMApproval="PM" Approve="" ApprovalNotes="&lt;a id='tsan' data-delay='100' data-toggle='tooltip' data-placement='top' title='Approval Notes' style='padding-top:10px;padding-left:4px'&gt;&lt;img src='/_layouts/15/epmlive/images/tsnonotes.png' &gt;&lt;/a&gt;"/>
+		<Header id='Header' StopWatchType="Html" StopWatch="&lt;a id='tssw' data-delay='100' data-toggle='tooltip' data-placement='top' title='Stop Watch'&gt;&lt;img src='/_layouts/15/epmlive/images/tstimeroff.png' style='padding-top:4px;padding-left:4px'&gt;&lt;/a&gt;" WorkTypeField="Work Type" Comments="" Color="" Hover="" HoverCell="" HoverColor="" HoverRow="" TMApproval="TM" PMApproval="PM" Approve="" ApprovalNotes="&lt;a id='tsan' data-delay='100' data-toggle='tooltip' data-placement='top' title='Approval Notes' style='padding-top:10px;padding-left:4px'&gt;&lt;img src='/_layouts/15/epmlive/images/tsnonotes.png' &gt;&lt;/a&gt;"/>
 		<Filter CanHide="0" CanEdit="1" Visible="0" />
 	</Head>
 	<Solid>
@@ -26,7 +26,7 @@
 	</Solid>
 	<LeftCols>
 		<C Name="Edited" Type="Bool" Visible="0" CanFilter="0" CanGroup="0" CanHide="0" />
-		<C Name="ShowLoading" Type="Html" Visible="1" CanFilter="0" CanGroup="0" CanHide="0" />
+		
 		<C Name="ItemTypeID" Visible="0" CanFilter="0" CanGroup="0" CanHide="0" />
 		<C Name="TSEnabled" Visible="0" CanFilter="0" CanGroup="0" CanHide="0" />
 		<C Name="UID" Visible="0" CanFilter="0" CanGroup="0" CanHide="0" />

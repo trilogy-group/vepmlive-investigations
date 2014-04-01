@@ -17,9 +17,9 @@
     border-bottom: none !important;
 }
 
-.GMSectionFF3 th:nth-child(3) {  
+/*.GMSectionFF3 th:nth-child(3) {  
   width:15px !important;
-}
+}*/
 
 .GMPage {
     border-top: none !important;
@@ -537,8 +537,6 @@ u.GMND0,u.GMND1,u.GMND2,u.GMND3,u.GMNC,u.GMNE,u.GMNCR,u.GMNER { padding-left:26p
 .GMND3 { background-position: -150px 0px; }
 .GMNC { background-position: right -40px;}
 .GMNE { background-position: right 11px;}
-.GMCellBorderFF3.GMNC { background-position: 0px -40px;}
-.GMCellBorderFF3.GMNE { background-position: 0px 11px;}
 .GMNCR { background-position:-205px -50px;}
 .GMNER { background-position:-205px -2000px;}
 u.GMNL { padding-left:21px; }

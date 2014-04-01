@@ -2139,9 +2139,9 @@ namespace TimeSheets
                 attr1.Value = "";
             ndCol.Attributes.Append(attr1);
 
-            attr1 = docData.CreateAttribute("ShowLoading");
-            attr1.Value = @"<img id='MTG_Processing_" + dr["ITEM_ID"].ToString() + "' style='display:none;' src='/_layouts/epmlive/images/mywork/loading16.gif'></img>";
-            ndCol.Attributes.Append(attr1);
+            //attr1 = docData.CreateAttribute("ShowLoading");
+            //attr1.Value = @"<img id='MTG_Processing_" + dr["ITEM_ID"].ToString() + "' style='display:none;' src='/_layouts/epmlive/images/mywork/loading16.gif'></img>";
+            //ndCol.Attributes.Append(attr1);
 
             attr1 = docData.CreateAttribute("Title");
             attr1.Value = dr["Title"].ToString();
