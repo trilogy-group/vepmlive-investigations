@@ -535,8 +535,8 @@ u.GMND0,u.GMND1,u.GMND2,u.GMND3,u.GMNC,u.GMNE,u.GMNCR,u.GMNER { padding-left:26p
 .GMND1 { background-position: -50px 0px; }
 .GMND2 { background-position: -100px 0px; }
 .GMND3 { background-position: -150px 0px; }
-.GMNC { background-position: 10px -40px;}
-.GMNE { background-position: 10px 11px;}
+.GMNC { background-position: 7px -40px;}
+.GMNE { background-position: 7px 11px;}
 .GMNCR { background-position:-205px -50px;}
 .GMNER { background-position:-205px -2000px;}
 u.GMNL { padding-left:21px; }
