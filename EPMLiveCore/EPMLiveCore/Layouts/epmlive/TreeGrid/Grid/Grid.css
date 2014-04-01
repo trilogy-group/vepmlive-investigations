@@ -177,7 +177,7 @@ top:4px;
 .GMIcon { background-repeat:no-repeat; }
 .GMHidden { }
 .GMHiddenSpace { display:none; }
-.GMHeaderText { font-family: "Open Sans Regular", Helvetica, Arial, sans-serif; font-size: 14px; font-weight: 400; padding-left:3px; padding-right:3px; height: 20px;line-height: 20px; color: #555555 }
+.GMHeaderText { font-family: "Open Sans Regular", Helvetica, Arial, sans-serif; font-size: 13px; font-weight: 400; padding-left:3px; padding-right:3px; height: 20px;line-height: 20px; color: #555555 }
 .GMAbs { padding:0px; }
 .GMUser { }
 .GMPagerEdit {
