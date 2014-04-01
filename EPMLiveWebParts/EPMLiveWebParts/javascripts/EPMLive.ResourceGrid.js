@@ -369,8 +369,8 @@ function registerEpmLiveResourceGridScript() {
                             var g = $$.grid.g();
                             g.Update();
 
-                            g.SetScrollTop(grid.GetScrollTop() + 2);
-                            g.SetScrollTop(grid.GetScrollTop() - 2);
+                            g.SetScrollTop(g.GetScrollTop() + 2);
+                            g.SetScrollTop(g.GetScrollTop() - 2);
 
                             g.Update();
                         };
