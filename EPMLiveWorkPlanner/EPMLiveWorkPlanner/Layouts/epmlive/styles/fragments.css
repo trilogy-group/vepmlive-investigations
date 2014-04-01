@@ -21,9 +21,10 @@ table.myfragments > tbody > tr > td:first-child {
 #gridMyFragments {
     border-top: 1px solid #eeeeee !important;
 }
-#gridMyFragments a {
-    text-decoration:none !important;
-}
+
+    #gridMyFragments a {
+        text-decoration: none !important;
+    }
 
 table.myfragments > tbody > tr > td {
     padding-left: 0px;
@@ -36,7 +37,6 @@ table.row-select > tbody > tr:hover {
 }
 
 .modal-body {
-    
 }
 
 .highlight {
@@ -66,8 +66,8 @@ table.row-select > tbody > tr:hover {
     font-family: "Open Sans Light", Helvetica, Arial, sans-serif;
     height: 300px;
     overflow: auto;
-    color:#555555;
-    font-size:14px;
+    color: #555555;
+    font-size: 14px;
 }
 
 #divIFLoading {
@@ -84,20 +84,27 @@ table.row-select > tbody > tr:hover {
     text-align: right;
     width: 98%;
 }
-.modal-body .form-control  {
-height:34px;
-font-size:14px;
+
+.modal-body .form-control {
+    height: 34px;
+    font-size: 14px;
 }
+
 .form-control::-moz-placeholder {
     color: #cccccc;
     opacity: 1;
 }
+
 .form-control::-webkit-input-placeholder {
     color: #cccccc;
     opacity: 1;
 }
 
-.form-control:-ms-input-placeholder {  
+.form-control:-ms-input-placeholder {
     color: #cccccc;
     opacity: 1;
+}
+
+.hdnRadio {
+    display: none;
 }

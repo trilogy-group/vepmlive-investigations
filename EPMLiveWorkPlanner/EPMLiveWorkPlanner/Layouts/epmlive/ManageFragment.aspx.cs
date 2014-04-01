@@ -3,16 +3,26 @@ using Microsoft.SharePoint;
 using Microsoft.SharePoint.WebControls;
 using System.Web.UI.WebControls;
 using System.Web.UI;
+using EPMLiveCore.Infrastructure;
 
 namespace EPMLiveCore.Layouts.epmlive
 {
     public partial class ManageFragment : LayoutsPageBase
     {
         public bool _isPrivate;
+        private const string LAYOUT_PATH = "/_layouts/15/epmlive/";
+
         protected override void OnPreRender(EventArgs e)
         {
             base.OnPreRender(e);
-            ScriptLink.Register(Page, "/epmlive/javascripts/libraries/jquery.min.js", false);
+
+            SPPageContentManager.RegisterStyleFile(LAYOUT_PATH + "styles/fragments.css");
+
+            EPMLiveScriptManager.RegisterScript(Page, new[]
+            {
+                "/javascripts/libraries/jquery.min.js", 
+                "/javascripts/Fragment.js"
+            });
         }
 
         protected void Page_Load(object sender, EventArgs e)
@@ -68,7 +78,7 @@ namespace EPMLiveCore.Layouts.epmlive
             }
         }
 
-        private void UpdatingGrid(GridView gridView, int rowInd, out SPListItem outFragment)
+        private void UpdatingGrid(System.Web.UI.WebControls.GridView gridView, int rowInd, out SPListItem outFragment)
         {
             string fragmentName = string.Empty;
             SPList plannerFragmentList = SPContext.Current.Web.Lists.TryGetList("PlannerFragments");
@@ -104,7 +114,7 @@ namespace EPMLiveCore.Layouts.epmlive
             LinkButton lnkbtn = sender as LinkButton;
             //getting particular row linkbutton
             GridViewRow gvrow = lnkbtn.NamingContainer as GridViewRow;
-            GridView gv = gvrow.Parent.NamingContainer as GridView;
+            System.Web.UI.WebControls.GridView gv = gvrow.Parent.NamingContainer as System.Web.UI.WebControls.GridView;
 
             SPList plannerFragmentList = SPContext.Current.Web.Lists.TryGetList("PlannerFragments");
             Label lblId = (Label)gv.Rows[gvrow.RowIndex].FindControl("lblID");

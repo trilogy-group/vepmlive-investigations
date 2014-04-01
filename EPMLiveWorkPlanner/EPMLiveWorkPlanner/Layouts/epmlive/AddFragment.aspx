@@ -9,13 +9,7 @@
 <%@ Page Language="C#" AutoEventWireup="true" CodeBehind="AddFragment.aspx.cs" Inherits="EPMLiveCore.Layouts.epmlive.AddFragment" DynamicMasterPageFile="~masterurl/default.master" %>
 
 <asp:Content ID="PageHead" ContentPlaceHolderID="PlaceHolderAdditionalPageHead" runat="server">
-    <link href="styles/fragments.css" rel='stylesheet' type='text/css' type='text/css' rel='stylesheet' />
-    <style type="text/css">
-        .hdnRadio {
-            display:none;
-        }
-    </style>
-    <script type="text/javascript" src="javascripts/Fragment.js"></script>
+    
     <script type="text/javascript">
         $(function () {
 

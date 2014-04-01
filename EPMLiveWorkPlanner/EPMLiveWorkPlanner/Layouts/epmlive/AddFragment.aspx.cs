@@ -1,4 +1,5 @@
-﻿using EPMLiveCore.ReportingProxy;
+﻿using EPMLiveCore.Infrastructure;
+using EPMLiveCore.ReportingProxy;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.WebControls;
 using System;
@@ -14,10 +15,20 @@ namespace EPMLiveCore.Layouts.epmlive
     {
         #region Events
 
+        private const string LAYOUT_PATH = "/_layouts/15/epmlive/";
+
         protected override void OnPreRender(EventArgs e)
         {
             base.OnPreRender(e);
-            ScriptLink.Register(Page, "/epmlive/javascripts/libraries/jquery.min.js", false);
+
+            SPPageContentManager.RegisterStyleFile(LAYOUT_PATH + "styles/fragments.css");
+
+            EPMLiveScriptManager.RegisterScript(Page, new[]
+            {
+                "/javascripts/libraries/jquery.min.js", 
+                "/javascripts/Fragment.js"
+
+            });
         }
 
         protected void Page_Load(object sender, EventArgs e)

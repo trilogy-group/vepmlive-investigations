@@ -10,9 +10,9 @@
 
 <asp:content id="PageHead" contentplaceholderid="PlaceHolderAdditionalPageHead" runat="server">
     <link href="styles/icomoon-style.css" rel='stylesheet' type='text/css' />
-    <link href="styles/fragments.css" rel='stylesheet' type='text/css' type='text/css' rel='stylesheet' />
+    
     <link href='http://www.uplandux.com/styleguide/css/bootstrap.css' type='text/css' rel='stylesheet' />
-    <script type="text/javascript" src="javascripts/Fragment.js"></script>
+    
     <script type="text/javascript">
 
         function OpenPopupToEditFragment(itemid) {
@@ -21,7 +21,6 @@
         }
 
         function refreshFragments() {
-            //this.refreshControl();
             location.reload(false);
         }
 
@@ -42,10 +41,6 @@
                 return false;
             }
         }
-
-        //function refreshControl() {
-        //    $("#divIFLoading").show();
-        //}
 
         $(function () {
 

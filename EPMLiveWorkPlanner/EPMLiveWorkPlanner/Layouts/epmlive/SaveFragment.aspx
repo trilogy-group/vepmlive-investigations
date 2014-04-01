@@ -24,21 +24,8 @@
             }
             window.frameElement.commonModalDialogClose(1, 1);
         }
-        //function refreshControl() {
-        //    $("#divIFLoading").show();
-        //}
 
     </script>
-    <%--<style type="text/css">
-           #divIFLoading {
-            top: 50%;
-            left: 50%;
-            z-index: 11;
-            display: none;
-            position:absolute;
-        }
-    </style>--%>
-
 </asp:Content>
 
 <asp:Content ID="Main" ContentPlaceHolderID="PlaceHolderMain" runat="server">
