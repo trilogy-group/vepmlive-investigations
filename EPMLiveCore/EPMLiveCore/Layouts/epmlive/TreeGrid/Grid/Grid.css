@@ -1,6 +1,9 @@
 .Assignment { font-style:italic; }
 .NewTask { color: #F0F0F0; }
-.SummaryTask { font-weight: bold; }
+.SummaryTask { 
+    font-weight:500;
+    font-family:"Open Sans Semi Bold",Helvetica, Arial; 
+}
 .EPMLiveResourceGridGroupTitle {
     cursor: pointer;
     font-weight:400;
@@ -157,7 +160,7 @@ top:4px;
 /* ------------- Inside cell ------------- */
 
 .GMHtml,.GMText,.GMLines,.GMPass,.GMInt,.GMFloat,.GMDate,.GMLink,.GMImg,.GMRadio,.GMRadioText,.GMList,.GMEnum,.GMDropCols,.GMAbs,.GMPagerEdit,.GMUser,.GMGantt {
-   font-size:14px; "Open Sans", Helvetica, Arial, sans-serif; white-space:nowrap;
+   font-size:13px; "Open Sans Regular", Helvetica, Arial, sans-serif; white-space:nowrap;
   padding-left:3px; padding-right:3px; padding-top:8px; padding-bottom:8px;height: 20px;line-height: 20px;position:relative; color: #555
    }
 .GMInt,.GMFloat,.GMDate { text-align:right; }
