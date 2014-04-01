@@ -773,7 +773,7 @@ u.GMPSpace4 { padding-left:49px; background-position-x:18px; }
 .GMBoolXSpace,.GMBoolXSpaceRO,.GMBool0Space,.GMBool1Space,.GMBool0SpaceRO,.GMBool1SpaceRO,
 .GMBoolX,.GMBoolXRO,.GMBool0,.GMBool1,.GMBool0RO,.GMBool1RO,.GMBool2,.GMBool3,.GMBool2RO,.GMBool3RO,
 .GMFilter0,.GMFilter1,.GMGroup0,.GMGroup1,.GMSearch0,.GMSearch1 {
-   font-size:11px; background-image:url(Button.png); background-repeat:no-repeat;height: 20px;line-height: 20px; }
+   font-size:12px; background-image:url(Button.png); background-repeat:no-repeat;height: 20px;line-height: 20px; }
 .GMDateLeft,.GMDefaultsLeft,.GMDefaultsSpaceLeft { padding-left:20px; }
 .GMDateRight,.GMDefaultsRight,.GMDefaultsSpaceRight { padding-right:20px; }
 u.GMDateRight,u.GMDefaultsRight,u.GMDefaultsSpaceRight { padding-right:0px; padding-left:17px; }
@@ -1107,10 +1107,10 @@ overflow:hidden; width:0px; height:0px; }
 
 .GMMenuMain { position:absolute; left:0px; top:0px; z-index:258; }
 .GMMenuStatic { }
-.GMMenuOuter { overflow:hidden; border:1px solid black; padding:1px; background:white; }
+.GMMenuOuter { overflow:hidden; border: 1px solid #999; padding:1px; background:white;border-radius: 0px 0px 3px 3px; }
 .GMMenuHeader {
    overflow:hidden; position:absolute; z-index:258;
-   border:1px solid #b0b0c0; background:white; cursor:pointer; _cursor:hand;
+   border:1px solid #999999; background:white; cursor:pointer; _cursor:hand;border-radius: 3px 3px 0px 0px;
    }
 .GMMenuHead {
    background:#183873 url(Backgrounds.gif) repeat-x 0px -2px;
@@ -1125,6 +1125,7 @@ overflow:hidden; width:0px; height:0px; }
 .GMMenuShadow {
    position:absolute; margin-left:3px; margin-top:3px; z-index:257;
    background:#888; opacity:0.5; filter:alpha(opacity=50);
+   display:none;
    }
 
 .GMMenuCheckedIconLeft { background:url(Menu.gif) no-repeat -2px -51px; padding-left:17px; }
@@ -1135,7 +1136,7 @@ overflow:hidden; width:0px; height:0px; }
 .GMMenuCheckedRadioRight { background:url(Menu.gif) no-repeat right -751px; padding-right:17px; }
 .GMMenuUncheckedRadioLeft { background:url(Menu.gif) no-repeat -2px -701px; padding-left:17px; }
 .GMMenuUncheckedRadioRight { background:url(Menu.gif) no-repeat right -701px; padding-right:17px; }
-.GMMenuCursorIcon { background:url(Menu.gif) no-repeat -6px -150px; }
+.GMMenuCursorIcon { background:url(Menu.gif) no-repeat -6px -150px;display:none; }
 .GMMenuHoverIcon { background:url(Menu.gif) no-repeat -6px -100px; }   
 .GMMenuCursorIconRtl { background:url(Menu.gif) no-repeat right -1000px; }
 .GMMenuHoverIconRtl { background:url(Menu.gif) no-repeat right -950px; }   
@@ -1144,7 +1145,7 @@ overflow:hidden; width:0px; height:0px; }
 .GMMenuNextIcon { background:url(Menu.gif) no-repeat right -300px; padding-right:10px; }
 .GMMenuNextIconRtl { background:url(Menu.gif) no-repeat left -900px; padding-left:10px; }
 
-.GMMenuItemText,.GMMenuItemIcon,.GMMenuEnum,.GMMenuEnumHeader,.GMMenuEdit { font:11px "Microsoft Sans Serif",Arial; white-space:nowrap; }
+.GMMenuItemText,.GMMenuItemIcon,.GMMenuEnum,.GMMenuEnumHeader,.GMMenuEdit { font:11px "Open Sans Regular",Arial; white-space:nowrap; }
 .GMMenuItemDisabled { opacity:0.50; filter:alpha(opacity=30); overflow:hidden; }
 .GMMenuLevel { color:blue; text-align:center; }  
 .GMMenuEnumParent,.GMMenuEditParent { padding-left:5px; padding-right:2px;}
@@ -1173,17 +1174,17 @@ overflow:hidden; width:0px; height:0px; }
 
 .GMMenuItem { padding-top:2px; padding-bottom:2px; padding-left:2px; padding-right:2px; background:white; }   
 .GMMenuItemHover {
-   margin-left:1px; margin-right:1px; padding-top:1px; padding-bottom:1px; 
-   background:#ffeeaa; border:1px solid #aaaadd;
+   margin-left:1px; margin-right:1px; padding-top:4px; padding-bottom:4px; 
+   background:#0090CA; border:1px solid #0090CA;
    }
 .GMMenuFocus {
-   margin-left:1px; margin-right:1px; padding-top:1px; padding-bottom:1px;
-   border:1px solid #aaaadd;
-   background:#CAE1F3 url(Backgrounds.gif) repeat-x 0px -1250px;
+   margin-left:1px; margin-right:1px; padding-top:4px; padding-bottom:4px;
+   border:1px solid #ffffff;
+   background:none;
    }
 .GMMenuFocusHover {
-   margin-left:1px; margin-right:1px; padding-top:1px; padding-bottom:1px;
-   background:#CAE1F3; border:1px solid black;
+   margin-left:1px; margin-right:1px; padding-top:4px; padding-bottom:4px;
+   background:#0090CA; border:1px solid #0090CA;
    }
 .GMMenuSeparator {
    margin-top:1px; margin-right:3px; margin-left:3px; height:1px;   
@@ -1216,7 +1217,13 @@ overflow:hidden; width:0px; height:0px; }
 /* ------------------- Calendar, TGLib ------------------- */
 
 .GMPickMain { position:absolute; left:0px; top:0px; z-index:258; }
-.GMPickOuter { overflow:hidden; background:white; padding:1px; border:1px solid #426b8c; }
+.GMPickOuter { 
+    overflow: hidden;
+background: white;
+padding: 1px;
+border: 1px solid #999999;
+border-radius: 3px 3px 3px 3px;
+}
 .GMPickHeader {
    overflow:hidden; position:absolute; z-index:258;
    border:1px solid black; background:white; cursor:pointer; _cursor:hand;
@@ -1256,7 +1263,7 @@ overflow:hidden; width:0px; height:0px; }
 
 .GMPickTable { }
 .GMPickRow { background:white; }
-.GMPickRowW { background:url(Backgrounds.gif) repeat-x 0px -1350px; }
+.GMPickRowW { background:none;background-color:#eeeeee; }
 .GMPickCell { padding-left:3px; padding-right:3px; padding-top:2px; padding-bottom:2px; width:16px; }
 .GMPickWDN {
    background:transparent; color:#333333;
@@ -1272,9 +1279,13 @@ overflow:hidden; width:0px; height:0px; }
 .GMPickWD { background-color:#ffffff;   }
 .GMPickSa { background-color:#ffffff;   }
 .GMPickSu { background-color:#ffffff;   }
-.GMPickSel { background-color:#fbea54; border:1px solid #dad1d1;}
+.GMPickSel { background-color: #0090CA;border: 1px solid #0090CA;color: #ffffff;}
 .GMPickSelNE { background-color:#fbea54; border:1px solid #dad1d1;}
-.GMPickNow { background-color:#c0f3ff; border:1px solid #dad1d1;}
+.GMPickNow { 
+    background-color: #26C6F4;
+border: 1px solid #26C6F4;
+color: #ffffff;
+}
 .GMPickNowNE { background-color:#c0f3ff; border:1px solid #dad1d1;}
 .GMPickHover { background-color:#DDD; border:1px solid white; }
 .GMPickSelHover { background-color:#eeee77; border:1px solid white;}
@@ -1333,10 +1344,10 @@ overflow:hidden; width:0px; height:0px; }
 .GMEditParent { position:absolute; z-index:258; overflow:hidden; }
 
 .GMEnumHeaderLeft,.GMEnumHeaderRight,.GMEnumHeaderNone {
-   background:white; font:11px "Microsoft Sans Serif",Arial; cursor:pointer; _cursor:hand;
-   padding-left:2px; padding-right:4px; padding-top:2px; padding-bottom:2px;
+   background:white; font-size:12px;font-family:"Open Sans Regular",Arial;cursor:pointer; _cursor:hand;
+   padding-left:2px; padding-right:4px; padding-top:10px; padding-bottom:2px;
    }
-.GMEnumHeaderLeft { background:white url(Menu.gif) no-repeat 1px -798px; padding-left:17px; }
+.GMEnumHeaderLeft { background:none; padding-left:17px; }
 .GMEnumHeaderRight { background:white url(Menu.gif) no-repeat right -798px; padding-right:17px;}
 .GMEnumMenuHeader { background:white; }
 
