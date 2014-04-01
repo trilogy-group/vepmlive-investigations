@@ -288,13 +288,22 @@ div.epmliveToolBar .grouping-dropdown-menu {
 }
 div.epmliveToolBar .grouping-dropdown-menu ul {
   padding: 0;
+  margin: 0;
+}
+div.epmliveToolBar .grouping-footer {
+  line-height: 9px;
 }
 div.epmliveToolBar .grouping-footer ul {
   padding-bottom: 5px !important;
 }
-div.epmliveToolBar .grouping-add {
+div.epmliveToolBar .grouping-footer .grouping-add {
   float: left;
   padding-left: 12px;
+  padding-top: 3px;
+}
+div.epmliveToolBar .grouping-footer a {
+  font-size: 1.1em;
+  font-weight: 400;
 }
 div.epmliveToolBar .grouping-save,
 div.epmliveToolBar .grouping-apply {
@@ -306,10 +315,6 @@ div.epmliveToolBar .grouping-apply {
 div.epmliveToolBar .grouping-delete span {
   font-size: 1.2em;
   padding: 0;
-}
-div.epmliveToolBar .grouping-footer a {
-  font-size: 1.1em;
-  font-weight: 400;
 }
 div.epmliveToolBar .multiselect-all {
   border-bottom: 1px solid #eeeeee;
