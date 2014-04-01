@@ -246,6 +246,8 @@ function TSRenderFinish(grid)
             try{
                 $("#tssw").tooltip();
             } catch (e) { }
+
+            ShowApprovalNotification();
         }
     }
     else {
@@ -1957,10 +1959,6 @@ function leavePage() {
 }
 
 window.onbeforeunload = leavePage;
-
-$(function () {
-    ExecuteOrDelayUntilScriptLoaded(ShowApprovalNotification, 'sp.js');
-});
 
 
 function ShowApprovalNotification() {

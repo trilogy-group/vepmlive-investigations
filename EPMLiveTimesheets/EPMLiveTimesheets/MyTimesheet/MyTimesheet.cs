@@ -630,7 +630,7 @@ namespace TimeSheets
                     <nav class=""navbar navbar-default navbar-static"" role=""navigation"">
                         <div>
                             <div class=""collapse navbar-collapse"">
-                                <ul class=""nav navbar-nav"" style=""list-style-type: none;padding: 0px; margin:0px"">
+                                <ul class=""nav navbar-nav"" style=""list-style-type: none;padding-top: 10px; margin:0px"">
                                     <li class=""nav-btn nav-text-wrapper"" style=""float:left;padding-right:20px;padding: 0px"">
                                         <div class=""nav-label"">Status:</div>
                                             <div class=""text"" id=""mytimesheetstatus"">" + sStatus + @"</div>
@@ -689,7 +689,7 @@ namespace TimeSheets
                     <nav class=""navbar navbar-default navbar-static"" role=""navigation"">
                         <div>
                             <div class=""collapse navbar-collapse"">
-                                <ul class=""nav navbar-nav"" style=""list-style-type: none;padding: 0px; margin:0px;padding: 0px; "">
+                                <ul class=""nav navbar-nav"" style=""list-style-type: none;padding-top: 10px; margin:0px;padding: 0px; "">
                                     <li class=""nav-btn nav-text-wrapper"" style=""float:left;padding: 0px; "">
                                         <div class=""nav-label"">Current Period:
                                         </div>");
