@@ -51,8 +51,8 @@
 
 .gridmenuspan {margin-left:-160px; text-align:right;width:170px;}
 
-.GMDataRow:hover .GMRightHtml .epm-menu-btn { display: inline-block; }
-
+.GMDataRow:hover .GMRightHtml .epm-menu-btn { display: inline-block; width: 15px; }
+.icon-ellipsis-horizontal { padding-right:2px }
 .epm-nav-contextual-menu { text-align:left; }
 
 .GMDataRow .icon-ellipsis-horizontal:after

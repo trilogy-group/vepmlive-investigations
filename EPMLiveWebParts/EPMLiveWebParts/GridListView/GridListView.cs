@@ -3233,6 +3233,7 @@ namespace EPMLiveWebParts
             }
 
             string sHeight = "";
+            string sGridHeight = "400";
             if (iHeight != 0)
             {
                 if (BOOLShowViewBar)
@@ -3242,11 +3243,14 @@ namespace EPMLiveWebParts
                 {
                     iHeight -= 30;
                 }
+                sGridHeight = iHeight.ToString();
 
                 sHeight = "height: " + iHeight.ToString() + suffix;
             }
             else
-                sHeight = "height: 300px;";
+            {
+                sHeight = "height: 100px;";
+            }
 
             
             output.Write("<table id=pagetable" + sFullGridId + "><tr><td>");
@@ -3365,6 +3369,7 @@ namespace EPMLiveWebParts
             output.WriteLine("ArrGantts.push('GanttGrid" + sFullGridId + "');");
             output.WriteLine("mygrid" + sFullGridId + " = new Object();");
 
+            output.WriteLine("mygrid" + sFullGridId + ".GridHeight=" + sGridHeight + ";");
             if (bHasSearchResults)
             {
                 output.WriteLine("mygrid" + sFullGridId + ".Searcher='" + sSearcher + "';");
@@ -3487,7 +3492,7 @@ namespace EPMLiveWebParts
 
 	                                    if(usepopup)
 	                                    {
-		                                    function NewItemCallback(dialogResult, returnValue){if(dialogResult){window.location.href=window.location.href;}}
+		                                    function NewItemCallback(dialogResult, returnValue){if(dialogResult){ReloadGridWithNewParams('" + sFullGridId + @"');}}
 
 		                                    var options = { url: wurl, width: 700, dialogReturnValueCallback:NewItemCallback };
 

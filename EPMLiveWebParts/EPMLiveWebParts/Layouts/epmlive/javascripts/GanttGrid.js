@@ -138,8 +138,11 @@ $(window).resize(function () {
 
 
 function SetGridSize(grid) {
+
+    var gridid = GetGridId(grid);
+
     if (OnlyGrid) {
-        var gridid = GetGridId(grid);
+        
 
         var outer = document.getElementById("gridouter" + gridid);
 
@@ -160,6 +163,22 @@ function SetGridSize(grid) {
         //document.getElementById("griddiv" + gridid).style.height = (height - top) + "px";
         outer.style.height = (height - top - 35) + "px";
         //document.getElementById("MSOZoneCell_WebPart").style.height = "400px";
+    }
+    else
+    {
+        var bodyheight = grid.GetBodyScrollHeight() + 60;
+        var gridid = GetGridId(grid);
+        var divOuter = document.getElementById("gridouter" + gridid);
+
+        if (bodyheight > parseInt(eval("mygrid" + gridid + ".GridHeight")))
+        {
+            divOuter.style.height = eval("mygrid" + gridid + ".GridHeight") + "px";
+        }
+        else
+            divOuter.style.height = bodyheight + "px";
+
+        
+
     }
 }
 
