@@ -2272,14 +2272,14 @@ namespace EPMLiveWebParts
                     //        error = "Error Saving Personalization: " + ex.Message;
                     //    }
                     //}
-                    if (BOOLShowViewBar && view != null && list != null)
-                    {
-                        this.Controls.Add(toolbar);
-                        if (PropMyDefaultControl == "Gantt")
-                            toolbar.TemplateName = "GanttViewToolBar";
-                        else
-                            toolbar.TemplateName = "GridViewToolBar";
-                    }
+                    //if (BOOLShowViewBar && view != null && list != null)
+                    //{
+                    //    this.Controls.Add(toolbar);
+                    //    if (PropMyDefaultControl == "Gantt")
+                    //        toolbar.TemplateName = "GanttViewToolBar";
+                    //    else
+                    //        toolbar.TemplateName = "GridViewToolBar";
+                    //}
 
 
                     //if (rollupLists != "")
@@ -2290,58 +2290,58 @@ namespace EPMLiveWebParts
                     //================================================================
                     web.Site.CatchAccessDeniedException = false;
                     //EnsureChildControls();
-                    output.WriteLine("<style>");
-                    output.WriteLine(".ms-menutoolbar {display:; border-bottom: #FFFFFF 1px solid !important; height: 25px !important; padding-bottom: 15px}");
-                    output.WriteLine(".ms-menutoolbar .ms-splitbuttontext { padding-left: 0px !important}");
-                    output.WriteLine(".ms-splitbuttonhover {  }");
-                    output.WriteLine(".ms-splitbuttonhover .ms-splitbuttondropdown { border: none !important; padding-right: 2px !important;}");
-                    output.WriteLine(".ms-splitbuttonhover .ms-splitbuttontext { border: none !important; border-bottom: #FFFFFF 1px solid !important; padding-left: 0px !important; padding-right: 7px !important; }");
-                    output.WriteLine(".ms-list-addnew-imgSpan20 { width: 23px !important; height: 24px !important}");
+                    //output.WriteLine("<style>");
+                    //output.WriteLine(".ms-menutoolbar {display:; border-bottom: #FFFFFF 1px solid !important; height: 25px !important; padding-bottom: 15px}");
+                    //output.WriteLine(".ms-menutoolbar .ms-splitbuttontext { padding-left: 0px !important}");
+                    //output.WriteLine(".ms-splitbuttonhover {  }");
+                    //output.WriteLine(".ms-splitbuttonhover .ms-splitbuttondropdown { border: none !important; padding-right: 2px !important;}");
+                    //output.WriteLine(".ms-splitbuttonhover .ms-splitbuttontext { border: none !important; border-bottom: #FFFFFF 1px solid !important; padding-left: 0px !important; padding-right: 7px !important; }");
+                    //output.WriteLine(".ms-list-addnew-imgSpan20 { width: 23px !important; height: 24px !important}");
 
-                    output.WriteLine("</style>");
+                    //output.WriteLine("</style>");
 
                     if (list != null && view != null)
                     {
-                        if (BOOLShowViewBar && false)
-                        {
-                            SPContext context = SPContext.GetContext(this.Context, view.ID, list.ID, web);
-                            toolbar.RenderContext = context;
+                    //    if (BOOLShowViewBar && false)
+                    //    {
+                    //        //SPContext context = SPContext.GetContext(this.Context, view.ID, list.ID, web);
+                    //        //toolbar.RenderContext = context;
 
-                            Controls.Add(toolbar);
+                    //        //Controls.Add(toolbar);
 
-                            //if (PropRollupList != "")
-                            try
-                            {
-                                //foreach (Control control in toolbar.Controls)
-                                //{
-                                //    processControls(control, list.Title, list.ID.ToString(), view.ID.ToString(), PropMyDefaultControl, this.ID, sFullGridId, hideNew);
-                                //}
-                                if (inEditMode && PropMyDefaultControl != "Gantt")
-                                {
-                                    Panel pnl = new Panel();
-                                    pnl.Controls.Add(new LiteralControl("<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\"><tr><td class=\"ms-toolbar\" valign=\"center\" nowrap><div class=\"ms-buttoninactivehover\" onmouseover=\"this.className='ms-buttonactivehover'\" onmouseout=\"this.className='ms-buttoninactivehover'\" onclick=\"javascript:saveGrid" + sFullGridId + "();\">"));
-                                    pnl.Controls.Add(new LiteralControl("<a><img src=\"_layouts/images/SAVEITEM.GIF\" border=\"0\" align=\"absmiddle\"> Save Data</a>"));
-                                    pnl.Controls.Add(new LiteralControl("</div></td></tr></table>"));
+                    //        //if (PropRollupList != "")
+                    //        try
+                    //        {
+                    //            //foreach (Control control in toolbar.Controls)
+                    //            //{
+                    //            //    processControls(control, list.Title, list.ID.ToString(), view.ID.ToString(), PropMyDefaultControl, this.ID, sFullGridId, hideNew);
+                    //            //}
+                    //            if (inEditMode && PropMyDefaultControl != "Gantt")
+                    //            {
+                    //                Panel pnl = new Panel();
+                    //                pnl.Controls.Add(new LiteralControl("<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\"><tr><td class=\"ms-toolbar\" valign=\"center\" nowrap><div class=\"ms-buttoninactivehover\" onmouseover=\"this.className='ms-buttonactivehover'\" onmouseout=\"this.className='ms-buttoninactivehover'\" onclick=\"javascript:saveGrid" + sFullGridId + "();\">"));
+                    //                pnl.Controls.Add(new LiteralControl("<a><img src=\"_layouts/images/SAVEITEM.GIF\" border=\"0\" align=\"absmiddle\"> Save Data</a>"));
+                    //                pnl.Controls.Add(new LiteralControl("</div></td></tr></table>"));
 
-                                    toolbar.Controls[0].Controls[1].Controls[0].Controls.AddAt(toolbar.Controls[0].Controls[1].Controls[0].Controls.Count - 1, pnl);
-                                }
-                                if (PropMyDefaultControl.ToLower() == "grid")
-                                {
-                                    Panel pnl = new Panel();
-                                    pnl.Controls.Add(new LiteralControl("<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\"><tr><td class=\"ms-toolbar\" style=\"height:100%\" valign=\"center\" nowrap><div class=\"ms-buttoninactivehover\" onmouseover=\"this.className='ms-buttonactivehover'\" onmouseout=\"this.className='ms-buttoninactivehover'\" onclick=\"javascript:mygrid" + sFullGridId + ".toggleSearch();\">"));
-                                    //pnl.Controls.Add(new LiteralControl("<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\"><tr><td class=\"ms-toolbar\" style=\"height:100%\" valign=\"center\" nowrap><div class=\"ms-buttoninactivehover\" onmouseover=\"this.className='ms-buttonactivehover'\" onmouseout=\"this.className='ms-buttoninactivehover'\" onclick=\"javascript:mygrid" + sFullGridId + ".switchFilter('fA" + sFullGridId + "');\">"));
-                                    pnl.Controls.Add(new LiteralControl("<a id=\"fA" + sFullGridId + "\"><img src=\"/_layouts/epmlive/images/gridfilter.png\" border=\"0\" align=\"absmiddle\" ></a>"));
-                                    //pnl.Controls.Add(new LiteralControl("<a id=\"fA" + sFullGridId + "\"><img src=\"/_layouts/epmlive/images/gridfilter.gif\" border=\"0\" align=\"absmiddle\" > Show Search</a>"));
-                                    pnl.Controls.Add(new LiteralControl("</div></td></tr></table>"));
+                    //                toolbar.Controls[0].Controls[1].Controls[0].Controls.AddAt(toolbar.Controls[0].Controls[1].Controls[0].Controls.Count - 1, pnl);
+                    //            }
+                    //            if (PropMyDefaultControl.ToLower() == "grid")
+                    //            {
+                    //                Panel pnl = new Panel();
+                    //                pnl.Controls.Add(new LiteralControl("<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\"><tr><td class=\"ms-toolbar\" style=\"height:100%\" valign=\"center\" nowrap><div class=\"ms-buttoninactivehover\" onmouseover=\"this.className='ms-buttonactivehover'\" onmouseout=\"this.className='ms-buttoninactivehover'\" onclick=\"javascript:mygrid" + sFullGridId + ".toggleSearch();\">"));
+                    //                //pnl.Controls.Add(new LiteralControl("<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\"><tr><td class=\"ms-toolbar\" style=\"height:100%\" valign=\"center\" nowrap><div class=\"ms-buttoninactivehover\" onmouseover=\"this.className='ms-buttonactivehover'\" onmouseout=\"this.className='ms-buttoninactivehover'\" onclick=\"javascript:mygrid" + sFullGridId + ".switchFilter('fA" + sFullGridId + "');\">"));
+                    //                pnl.Controls.Add(new LiteralControl("<a id=\"fA" + sFullGridId + "\"><img src=\"/_layouts/epmlive/images/gridfilter.png\" border=\"0\" align=\"absmiddle\" ></a>"));
+                    //                //pnl.Controls.Add(new LiteralControl("<a id=\"fA" + sFullGridId + "\"><img src=\"/_layouts/epmlive/images/gridfilter.gif\" border=\"0\" align=\"absmiddle\" > Show Search</a>"));
+                    //                pnl.Controls.Add(new LiteralControl("</div></td></tr></table>"));
 
-                                    toolbar.Controls[0].Controls[1].Controls[0].Controls.AddAt(toolbar.Controls[0].Controls[1].Controls[0].Controls.Count - 1, pnl);
-                                }
-                                //<asp:Panel runat="server" id="pnlFilter"><table border="0" cellpadding="0" cellspacing="0"><tr><td class="ms-toolbar" nowrap="true"><div class="ms-buttoninactivehover" onmouseover="this.className='ms-buttonactivehover'" onmouseout="this.className='ms-buttoninactivehover'"><asp:Label id="lblFilter" runat="server"/><img align='absmiddle' alt="" src="/_layouts/images/filter.gif" style='border-width:0px;'>&nbsp;<asp:Label id="lblFilterText" runat="server" Text="Show Filters"/></a></div></td></tr></table></asp:Panel>
+                    //                toolbar.Controls[0].Controls[1].Controls[0].Controls.AddAt(toolbar.Controls[0].Controls[1].Controls[0].Controls.Count - 1, pnl);
+                    //            }
+                    //            //<asp:Panel runat="server" id="pnlFilter"><table border="0" cellpadding="0" cellspacing="0"><tr><td class="ms-toolbar" nowrap="true"><div class="ms-buttoninactivehover" onmouseover="this.className='ms-buttonactivehover'" onmouseout="this.className='ms-buttoninactivehover'"><asp:Label id="lblFilter" runat="server"/><img align='absmiddle' alt="" src="/_layouts/images/filter.gif" style='border-width:0px;'>&nbsp;<asp:Label id="lblFilterText" runat="server" Text="Show Filters"/></a></div></td></tr></table></asp:Panel>
 
-                                toolbar.RenderControl(output);
-                            }
-                            catch { }
-                        }
+                    //            toolbar.RenderControl(output);
+                    //        }
+                    //        catch { }
+                    //    }
 
                         if (hasList)
                         {
@@ -2367,7 +2367,8 @@ namespace EPMLiveWebParts
                             output.WriteLine("</script>");
                         }
                         
-                        RenderActionMenu(output);
+
+                            RenderActionMenu(output);
 
                         if (newGridMode != "")
                         {

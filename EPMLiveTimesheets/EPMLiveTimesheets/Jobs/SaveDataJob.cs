@@ -186,7 +186,7 @@ namespace TimeSheets
                                         {
                                             try
                                             {
-                                                li = list.Items.GetItemById(int.Parse(itemid));
+                                                li = list.GetItemById(int.Parse(itemid));
                                             }
                                             catch { }
 
