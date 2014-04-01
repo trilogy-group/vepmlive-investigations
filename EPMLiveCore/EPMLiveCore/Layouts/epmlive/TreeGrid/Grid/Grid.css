@@ -955,7 +955,7 @@ u.GMSort0Right,u.GMSort1Right,u.GMSort2Right,u.GMSort3Right,u.GMSort4Right,u.GMS
 .GMColorMoved1 { background-color:#FFFFFF; }
 .GMColorMoved2 { background-color:#FFFFFF; }
 .GMColorChanged { background-color:#FFFFFF; }
-.GMColorChangedCell { background-color:#E1E1FF; }
+.GMColorChangedCell { background-color:#FFFFFF; }
 .GMClassChangedCell { font-weight:bold; }
 
 .GMColorMaxChildren { background-color:#FFFFF0; }
