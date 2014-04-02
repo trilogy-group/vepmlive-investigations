@@ -19,6 +19,7 @@ function registerEpmLiveResourceGridScript() {
         $$.webpartHeight = false;
         $$.userIsSiteAdmin = false;
         $$.allSelected = false;
+        $$.ribbonBehavior = 0;
 
         $$.reports = {
             wcReportId: null,
@@ -1139,7 +1140,9 @@ function registerEpmLiveResourceGridScript() {
 
                         var intervalId = window.setInterval(function () {
                             if (!document.getElementById('Ribbon.ResourceGridTab')) {
-                                window.SelectRibbonTab(tabId, true);
+                                if ($$.ribbonBehavior == 0) {
+                                    window.SelectRibbonTab(tabId, true);
+                                }
                             }
                         }, 1);
 
@@ -1174,7 +1177,12 @@ function registerEpmLiveResourceGridScript() {
 
                                 if (window.epmLiveMasterPageVersion >= 5.5) {
                                     if (!epmLiveResourceGrid.loaderStopped) {
-                                        $(document.getElementById("s4-ribbonrow")).height(126);
+                                        if ($$.ribbonBehavior == 0) {
+                                            $(document.getElementById("s4-ribbonrow")).height(126);
+                                        }
+                                        else {
+                                            $(document.getElementById("s4-ribbonrow")).height(35);
+                                        }
                                         window.EPM.UI.Loader.current().stopLoading('WebPart' + $$.webpartQualifier);
                                         epmLiveResourceGrid.loaderStopped = true;
                                     }
@@ -2344,7 +2352,10 @@ function registerEpmLiveResourceGridScript() {
         };
 
         window.Grids.OnClick = function (grid, row, col, x, y, evt) {
-            window.SelectRibbonTab('Ribbon.ResourceGridTab', true);
+
+            if ($$.ribbonBehavior == 0)
+                window.SelectRibbonTab('Ribbon.ResourceGridTab', true);
+
             $$.actions.hideEasyScroll(true);
 
             if (row.Kind === 'Data' && row.Def.Name === 'R') {
@@ -2517,7 +2528,8 @@ function registerEpmLiveResourceGridScript() {
             window.setTimeout(function () { $$.actions.loadRibbon(); }, 1500);
 
             $('#s4-workspace').click(function () {
-                window.SelectRibbonTab('Ribbon.ResourceGridTab', true);
+                if ($$.ribbonBehavior == 0)
+                    window.SelectRibbonTab('Ribbon.ResourceGridTab', true);
             });
         };
 
