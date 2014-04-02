@@ -953,7 +953,7 @@ u.GMSort0Right,u.GMSort1Right,u.GMSort2Right,u.GMSort3Right,u.GMSort4Right,u.GMS
 .GMColorMoved1 { background-color:#FFFFFF; }
 .GMColorMoved2 { background-color:#FFFFFF; }
 .GMColorChanged { background-color:#FFFFFF; }
-.GMColorChangedCell { background-color:#FFFFFF; }
+.GMColorChangedCell { background-color:#E1E1FF; }
 .GMClassChangedCell { font-weight:bold; }
 
 .GMColorMaxChildren { background-color:#FFFFF0; }
@@ -1194,10 +1194,10 @@ overflow:hidden; width:0px; height:0px; }
 
 .GMMenuFoot { border-top:none; text-align:center; background:url(Backgrounds.gif) repeat-x 0px -1367px; }  
 .GMMenuButton {
-   font-size:11px;background:#dcecf8; text-align:center; border:1px solid #8a8fb5; 
+   font-size:11px;background:#fff; text-align:center; border:1px solid #ccc; 
    width:48px; margin:2px; margin-top:5px; margin-bottom:4px; white-space:nowrap; padding-left:0px; padding-right:0px;
    }
-.GMMenuButton:hover { background:#ffeeaa; border:1px solid #aaaadd; }
+.GMMenuButton:hover { background-color:#eee; border:1px solid #cccccc; }
 
 /*--------------- Grid configuration menus ----------------- */
 
@@ -1248,8 +1248,8 @@ border-radius: 3px 3px 3px 3px;
    background:url(Backgrounds.gif) repeat-x 0px -1367px;
    }
 .GMPickMY {
-   background:#183873 url(Backgrounds.gif) repeat-x 0px -2px;
-   font:10px Verdana,Arial; color:white; cursor:default;
+   background:none;
+   font:10px Verdana,Arial; color:#999999; cursor:default;
    text-align:center; padding-top:2px; padding-bottom:4px;
    }   
 .GMPickMYDown { padding-right:13px; background:url(Menu.gif) no-repeat right -400px; cursor:pointer; _cursor:hand; }
