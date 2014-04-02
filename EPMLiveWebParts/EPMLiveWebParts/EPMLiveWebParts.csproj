@@ -222,8 +222,9 @@
       <DependentUpon>FancyDisplayForm.ascx</DependentUpon>
     </Compile>
     <Compile Include="FancyDisplayForm\FancyDisplayForm.ascx.g.cs">
-      <AutoGen>True</AutoGen>
+      <SubType>Code</SubType>
       <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
       <DependentUpon>FancyDisplayForm.ascx</DependentUpon>
     </Compile>
     <Compile Include="GridListView\GanttUtilities.cs" />
@@ -853,6 +854,7 @@
       <Generator>SharePointWebPartCodeGenerator</Generator>
       <LastGenOutput>FancyDisplayForm.ascx.g.cs</LastGenOutput>
     </Content>
+    <Content Include="Layouts\epmlive\images\User.png" />
     <Content Include="MyWorkSummary\MyWorkSummary.ascx">
       <Generator>SharePointWebPartCodeGenerator</Generator>
       <LastGenOutput>MyWorkSummary.ascx.g.cs</LastGenOutput>
@@ -1280,7 +1282,7 @@
     <Content Include="Layouts\epmlive\epmlivegrid.js" />
     <Content Include="Layouts\epmlive\EpmLiveRollup.js" />
     <Content Include="Layouts\epmlive\ExPrintCab.CAB" />
-    <Content Include="Layouts\epmlive\GanttGrid.js" />
+<Content Include="Layouts\epmlive\GanttGrid.js" />
     <Content Include="Layouts\epmlive\getedititem.aspx" />
     <Content Include="Layouts\epmlive\getganttitems.aspx" />
     <Content Include="Layouts\epmlive\getgantttasks.aspx" />
