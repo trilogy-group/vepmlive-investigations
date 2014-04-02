@@ -1192,7 +1192,7 @@ overflow:hidden; width:0px; height:0px; }
 .GMMenuVSeparator { border-right:1px solid #DDD; }
 .GMMenuSection  { }
 
-.GMMenuFoot { border-top:none; text-align:center; background:url(Backgrounds.gif) repeat-x 0px -1367px; }  
+.GMMenuFoot { border-top:none; text-align:center; background:none; }  
 .GMMenuButton {
    font-size:11px;background:#fff; text-align:center; border:1px solid #ccc; 
    width:48px; margin:2px; margin-top:5px; margin-bottom:4px; white-space:nowrap; padding-left:0px; padding-right:0px;
