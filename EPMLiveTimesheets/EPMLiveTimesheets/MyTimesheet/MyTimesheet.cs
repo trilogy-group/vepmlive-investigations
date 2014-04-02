@@ -236,10 +236,12 @@ namespace TimeSheets
 
                     if (GridType == 0)
                     {
+                        SPUser user = TimesheetAPI.GetUser(web, sUserId);
+
                         cmd = new SqlCommand("SELECT submitted, approval_status, locked FROM TSTIMESHEET where SITE_UID=@siteid and period_id=@period and username=@username", cn);
                         cmd.Parameters.AddWithValue("@siteid", web.Site.ID);
                         cmd.Parameters.AddWithValue("@period", sPeriodId);
-                        cmd.Parameters.AddWithValue("@username", web.CurrentUser.LoginName);
+                        cmd.Parameters.AddWithValue("@username", user.LoginName);
 
                         SqlDataReader drTS = cmd.ExecuteReader();
                         if (drTS.Read())

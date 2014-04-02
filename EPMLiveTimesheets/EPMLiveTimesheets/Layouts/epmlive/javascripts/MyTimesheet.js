@@ -1125,7 +1125,7 @@ function AutoAddWork(grid) {
     if (rows.length > 0)
         rows = rows.substr(1);
 
-    EPMLiveCore.WorkEngineAPI.ExecuteJSON("timesheet_AutoAddWork", "<Timesheet ID=\"" + grid.TimesheetUID + "\" Rows=\"" + rows + "\" />", function (response) {
+    EPMLiveCore.WorkEngineAPI.ExecuteJSON("timesheet_AutoAddWork", "<Timesheet ID=\"" + grid.TimesheetUID + "\" Rows=\"" + rows + "\"  UserId=\"" + newobj.UserId + "\"/>", function (response) {
 
         var oResponse = eval("(" + response + ")");
 

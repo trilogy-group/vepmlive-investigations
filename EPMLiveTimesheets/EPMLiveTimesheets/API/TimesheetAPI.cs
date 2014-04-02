@@ -2034,7 +2034,7 @@ namespace TimeSheets
             SPUser user = GetUser(web, sUserId);
             sUserId = user.ID.ToString();
             //string sUsername = EPMLiveCore.CoreFunctions.GetRealUserName(web.CurrentUser.LoginName, web.Site);
-            string sUsername = web.CurrentUser.LoginName;
+            //string sUsername = web.CurrentUser.LoginName;
 
             XmlDocument docData = new XmlDocument();
             docData.LoadXml("<Grid><Cfg TimesheetUID=\"\"/><Body><B></B></Body></Grid>");
@@ -2460,6 +2460,13 @@ namespace TimeSheets
             }
             dr.Close();
 
+            string sUserId = "";
+            try
+            {
+                sUserId = docTimesheet.FirstChild.Attributes["UserId"].Value;
+            }
+            catch { }
+
             cmd = new SqlCommand("SELECT period_start,period_end FROM TSPERIOD WHERE SITE_ID=@siteid and PERIOD_ID=@periodid", cn);
             cmd.Parameters.AddWithValue("@siteid", oWeb.Site.ID);
             cmd.Parameters.AddWithValue("@periodid", period);
@@ -2508,8 +2515,9 @@ namespace TimeSheets
                 }
                 catch { }
 
+                SPUser user = GetUser(oWeb, sUserId);
 
-                DataTable dtWork = rptData.ExecuteSql("SELECT * FROM lstmywork where Timesheet=1 and StartDate < '" + fn.ToString("s") + "' AND DueDate > '" + st.ToString("s") + "' AND AssignedToID='" + oWeb.CurrentUser.ID + "'");
+                DataTable dtWork = rptData.ExecuteSql("SELECT * FROM lstmywork where Timesheet=1 and StartDate < '" + fn.ToString("s") + "' AND DueDate > '" + st.ToString("s") + "' AND AssignedToID='" + user.ID + "'");
 
                 foreach (DataRow drWork in dtWork.Rows)
                 {
