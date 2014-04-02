@@ -83,12 +83,14 @@
 
             var showHideLoading = function (show, message) {
                 if (show) {
-                    $("#loadingDiv").show();
-                    $("#loadingDiv div").html(message);
+                    //$("#loadingDiv").show();
+                    //$("#loadingDiv div").html(message);
+                    EPM.UI.Loader.current().startLoading({ id: 'DeltaPlaceHolderMain' });
                 }
                 else {
-                    $("#loadingDiv").hide();
-                    $("#loadingDiv div").html('');
+                    //$("#loadingDiv").hide();
+                    //$("#loadingDiv div").html('');
+                    EPM.UI.Loader.current().stopLoading('DeltaPlaceHolderMain');
                 }
             };
 
@@ -524,6 +526,8 @@
 </asp:Content>
 
 <asp:Content ID="Main" ContentPlaceHolderID="PlaceHolderMain" runat="server">
+    
+
     <div id="section1">
         <div id="kanbanToolbar" style="width: 100%">
         </div>
@@ -552,10 +556,7 @@
         <div class="clear"></div>
     </div>
 
-    <div id="loadingDiv" style="display: none">
-        <div>Loading</div>
-        <img alt="Loading" src="../images/gears_an.gif" />
-    </div>
+    
 </asp:Content>
 
 <asp:Content ID="PageTitle" ContentPlaceHolderID="PlaceHolderPageTitle" runat="server">
