@@ -833,8 +833,14 @@ namespace EPMLiveWebParts
 
             get
             {
+
                 if(SPContext.Current.ViewContext.View != null && (SPContext.Current.List.Forms[PAGETYPE.PAGE_DISPLAYFORM].Url == PropList || PropList == ""))
                 {
+                    EPMLiveCore.GridGanttSettings gset = EPMLiveCore.API.ListCommands.GetGridGanttSettings(SPContext.Current.List);
+
+                    if (gset.RibbonBehavior == "2")
+                        return null;
+
                     string webPartPageComponentId = SPRibbon.GetWebPartPageComponentId(this);
 
                     WebPartContextualInfo info = new WebPartContextualInfo();
@@ -1766,7 +1772,7 @@ namespace EPMLiveWebParts
 
             }
 
-            if (SPContext.Current.ViewContext.View != null && list != null && list.ID == SPContext.Current.List.ID)
+            if (SPContext.Current.ViewContext.View != null && list != null && list.ID == SPContext.Current.List.ID && gSettings.RibbonBehavior != "2")
             {
 
                 AddContextualTab();
@@ -1859,6 +1865,8 @@ namespace EPMLiveWebParts
                     catch { }
                     try
                     {
+
+
                         gSettings = (EPMLiveCore.GridGanttSettings)EPMLiveCore.Infrastructure.CacheStore.Current.Get("GGS", "GridSettings-" + list.ID.ToString(), () =>
                         {
                             return new EPMLiveCore.GridGanttSettings(list);
@@ -3368,7 +3376,7 @@ namespace EPMLiveWebParts
 
             output.WriteLine("ArrGantts.push('GanttGrid" + sFullGridId + "');");
             output.WriteLine("mygrid" + sFullGridId + " = new Object();");
-
+            output.WriteLine("mygrid" + sFullGridId + ".RibbonBehavior='" + gSettings.RibbonBehavior + "';");
             output.WriteLine("mygrid" + sFullGridId + ".GridHeight=" + sGridHeight + ";");
             if (bHasSearchResults)
             {
@@ -3486,11 +3494,11 @@ namespace EPMLiveWebParts
             //output.WriteLine("mygrid" + sFullGridId + @".canHandleCommand = function(this.$Grid, commandId){return fnCanHandleCommand(this.$Grid, commandId);};");
             //output.WriteLine("mygrid" + sFullGridId + @".addFocusedCommands = function($arr){return fnFocusedCommands($arr);};");
             //output.WriteLine("mygrid" + sFullGridId + @".JSGridEvents = function(name){return fnJSGridEvents(name);};");
-            output.WriteLine(@"function newItem" + sFullGridId + @"(usepopup)
+            output.WriteLine(@"function newItem" + sFullGridId + @"()
                                     {
 	                                    var wurl = mygrid" + sFullGridId + @"._newitemurl;
 
-	                                    if(usepopup)
+	                                    if(" + bUsePopUp.ToString().ToLower() + @")
 	                                    {
 		                                    function NewItemCallback(dialogResult, returnValue){if(dialogResult){ReloadGridWithNewParams('" + sFullGridId + @"');}}
 
