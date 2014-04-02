@@ -890,10 +890,11 @@ namespace TimeSheets
                     {
                         userIDs = sharePointAccountIDs.ToString().Substring(0, sharePointAccountIDs.ToString().Length - 1);
 
-                        sql_getApprovalCount = "select count(*) as ApprovalCount from TSTIMESHEET where TSUSER_UID in (select TSUSERUID from TSUSER where USER_ID in (" + @userIDs + ") and SUBMITTED = @submitted and APPROVAL_STATUS = @approvalStatus and PERIOD_ID <= @periodId)";
+                        sql_getApprovalCount = "select count(*) as ApprovalCount from TSTIMESHEET where SITE_UID = @siteID and TSUSER_UID in (select TSUSERUID from TSUSER where USER_ID in (" + @userIDs + ") and SUBMITTED = @submitted and APPROVAL_STATUS = @approvalStatus and PERIOD_ID <= @periodId)";
 
                         using (SqlCommand cmd = new SqlCommand(sql_getApprovalCount, cn))
                         {
+                            cmd.Parameters.AddWithValue("@siteID", oWeb.Site.ID);
                             cmd.Parameters.AddWithValue("@userIDs", userIDs);
                             cmd.Parameters.AddWithValue("@submitted", 1);
                             cmd.Parameters.AddWithValue("@approvalStatus", 0);
