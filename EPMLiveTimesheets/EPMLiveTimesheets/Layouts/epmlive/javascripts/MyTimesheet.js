@@ -505,9 +505,7 @@ function editRowFinalizer(grid, row, cols, listWebSiteId) {
         //MyWorkGrid.rowBeingEdited = row;
     }
 }
-function parseJson(response) {
-    return eval('(' + xml2json(parseXml(response), "") + ')');
-}
+
 function parseXml(xml) {
     var dom = null;
     if (window.DOMParser) {
@@ -532,6 +530,9 @@ function responseIsSuccess(response) {
     return response.Result["@Status"] == 0;
 }
 */
+function parseJson(response) {
+    return eval('(' + xml2json(parseXml(response), "") + ')');
+}
 Grids.OnAfterSave = function (grid, result, autoupdate) {
     if (grid.id.substr(0, 2) == "TS") {
 
@@ -1124,6 +1125,8 @@ function AutoAddWork(grid) {
 
     if (rows.length > 0)
         rows = rows.substr(1);
+
+    var newobj = eval("TSObject" + newgridid);
 
     EPMLiveCore.WorkEngineAPI.ExecuteJSON("timesheet_AutoAddWork", "<Timesheet ID=\"" + grid.TimesheetUID + "\" Rows=\"" + rows + "\"  UserId=\"" + newobj.UserId + "\"/>", function (response) {
 
