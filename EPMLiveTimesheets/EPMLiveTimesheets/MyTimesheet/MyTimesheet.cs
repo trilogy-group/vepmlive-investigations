@@ -503,6 +503,10 @@ namespace TimeSheets
                 {
 	                background-position: 0px center !important;
                 }
+                .TSBold 
+                {
+                    font-weight: bold !important;
+                }
                 </style>");
 
             string sUserId = "";
@@ -739,6 +743,12 @@ namespace TimeSheets
 
 
             output.WriteLine(@"<div align=""center"" id=""divMessage" + sFullGridId + @""" width=""100%"" class=""dialog""><img style=""vertical-align:middle;"" src=""/_layouts/images/gears_anv4.gif""/>&nbsp;<span id=""spnMessage" + sFullGridId + @""">Saving Timesheet...</span></div>");
+
+            output.Write("<div id='NotesDiv' style='z-index:999;position: absolute; margin-left: 65px; display:none; width:150px;height:110px;border: 1px solid #666;background-color:#FFFFFF;cursor:pointer' onClick='stopProp(event);'><textarea id='txtNotes' style='z-index:999;width:140px;height:60px;border:0px;margin-bottom:5px;resize: none; outline: 0;' onkeyup='stopProp(event);' onclick='stopProp(event);' onkeypress='stopProp(event);'");
+            if(bTsLocked)
+                output.Write(" disabled='disabled'");
+
+            output.Write("></textarea><br><input type=\"button\" value=\"OK\" onCLick=\"SaveNotes(event);stopProp(event);\" style=\"float:right\"></div>");
 
             output.WriteLine(@"<div id=""viewNameDiv"" style=""display:none;width:200;padding:10px"">
 

@@ -26,6 +26,8 @@ var iApproveInterval;
 var curServerDate;
 var spnMsg = null;
 var bSaveAndSubmit = false;
+var updateStatusBox;
+var NotesOut = false;
 
 Grids.OnRenderStart = function (grid) {
     if (grid.id.substr(0, 2) == "TS") {
@@ -259,6 +261,15 @@ function TSRenderFinish(grid)
 }
 
 
+Grids.OnStartEdit = function (grid, row, col)
+{
+    if (NotesOut)
+    {
+        NotesOut = false;
+        var notesDiv = document.getElementById("NotesDiv");
+        notesDiv.style.display = "none";
+    }
+}
 
 
 Grids.OnScroll = function (grid) {
@@ -286,10 +297,6 @@ function esGrid() {
     }
 }
 
-
-//Grids.OnClick = function (grid, row, col, x, y, event) {
-//    setTimeout('showribbon()', 100);
-//}
 function showribbon() {
     var wp2 = document.getElementById('Ribbon.MyTimesheetTab-title');
     if (wp2)
@@ -305,25 +312,7 @@ Grids.OnEnterEdit = function (grid, row, col) {
 Grids.OnKeyPress = function (grid, key, event, name, prefix) {
 
 }
-
-/*Grids.OnDblClick = function (grid, row, col, x, y, event) {
-    if (GridType != "0")
-        return;
-    if (curPop) {
-        return true;
-    } else {
-        //Regular Work == "1"
-        if (row["ItemTypeID"] == "1") {
-            if (!row['EditMode']) {
-                editSaveRow(grid.id, row.id);
-            }
-        }
-        else {
-            alert("You cannot edit this item.");
-        }
-    }
-}*/
-
+/*
 function editSaveRow(gridId, rowId) {
     var grid = Grids[gridId];
     var row = grid.Rows[rowId];
@@ -542,7 +531,7 @@ function parseXml(xml) {
 function responseIsSuccess(response) {
     return response.Result["@Status"] == 0;
 }
-
+*/
 Grids.OnAfterSave = function (grid, result, autoupdate) {
     if (grid.id.substr(0, 2) == "TS") {
 
@@ -1081,11 +1070,26 @@ function CheckApproveStatus(gridid) {
     });
 }
 
+Grids.OnClickOutside = function (grid, row, col, x, y, event) {
 
+    if (NotesOut) {
+        NotesOut = false;
+        curPop = false;
+        var notesDiv = document.getElementById("NotesDiv");
+        notesDiv.style.display = "none";
+    }
+}
 
 
 
 Grids.OnClick = function (grid, row, col, x, y, event) {
+
+    if (NotesOut && curCol != col) {
+        NotesOut = false;
+        curPop = false;
+        var notesDiv = document.getElementById("NotesDiv");
+        notesDiv.style.display = "none";
+    }
 
     if (!curPop)
         DoPopUp(grid, row, col);
@@ -1142,6 +1146,35 @@ function AutoAddWork(grid) {
 
 }
 
+function ShowNotes(gridid, rowid, col, odiv, event) {
+
+    NotesOut = true;
+
+    var grid = Grids[gridid];
+    var row = grid.GetRowById(rowid);
+
+    curGrid = grid;
+    curRow = row;
+    curCol = col;
+
+    var notesDiv = document.getElementById("NotesDiv");
+    notesDiv.style.display = "";
+
+    var notes = document.getElementById("txtNotes");
+    notes.value = grid.GetValue(row, "TS" + col);
+    notes.focus();
+
+    $("#NotesDiv").appendTo($('body'));
+
+    var oNotePage = $("#notesimg");
+
+    notesDiv.style.top = oNotePage.offset().top + "px";
+    notesDiv.style.left = oNotePage.offsetParent().offsetParent().offset().left + "px";
+
+    stopProp(event);
+}
+
+
 function DoPopUp(grid, row, col) {
     if (curRow != row || curCol != col || (!curPop && TSColType == 2)) {
 
@@ -1183,24 +1216,19 @@ function DoPopUp(grid, row, col) {
                     grid.EndEdit(true);
                     grid.Focus(row, col);
                     grid.StartEdit();
-                    var strDivTag = "<div style='position: absolute; margin-left: 65px; cursor:pointer; z-index: 999;' onMouseDown=\"stopProp(event);\" onClick=\"showNotes(event);\"><img id=\"notesimg\" class=\"transparentnotes\" src=\"/_layouts/epmlive/images/" + image + ".png\"></div><div id='NotesDiv' style='z-index:999;position: absolute; margin-left: 65px; display:none; width:150px;height:100px;border: 1px solid black;background-color:#FFFFFF;cursor:pointer' onClick=\"stopProp(event);\"><textarea id='txtNotes' style='z-index:999;width:140px;height:60px;border:0px;margin-bottom:5px' onkeyup=\"stopProp(event);\" onclick=\"stopProp(event);\" onkeypress=\"stopProp(event);\"";
-
-                    if (bLocked)
-                        strDivTag += " disabled=\"disabled\"";
-
-                    strDivTag += ">" + pVal + "</textarea><br><input type=\"button\" value=\"OK\" onCLick=\"SaveNotes(event);stopProp(event);\"></div>";
-
-
+                    var strDivTag = "<div style='position: absolute; margin-left: 65px; cursor:pointer; z-index: 999;' onMouseDown=\"stopProp(event);\" onClick=\"ShowNotes('" + grid.id + "','" + row.id + "','" + col + "',this,event);\"><img id=\"notesimg\" class=\"transparentnotes\" src=\"/_layouts/epmlive/images/" + image + ".png\"></div>";
 
                     grid.SetAttribute(row, col, "HtmlPrefix", strDivTag, true, false);
 
                 }
             }
             else if (TSColType == 2) {
-
+                try{
+                    $("#TypeDivOuter").remove();
+                }catch(e){}
                 curPop = true;
 
-                var strTypeDiv = "<div id='TypeDivOuter' style='position: absolute; margin-top: 20px; margin-left: 2px; cursor:default; width:156px; background-color: #EAEAEA; text-align:left;border: 1px solid gray; padding:3px;' onClick=\"stopProp(event);\"><table border=\"0\" cellspacing=\"3\" cellpadding=\"0\">";
+                var strTypeDiv = "<div id='TypeDivOuter' style='position: absolute; margin-top: 20px; margin-left: 2px;z-index:999; cursor:default; width:156px; background-color: #F8F8F8; text-align:left;border: 1px solid #AAA; border-radius: 5px; padding:3px;' onClick=\"stopProp(event);\"><table border=\"0\" cellspacing=\"3\" cellpadding=\"0\">";
 
                 var pVal = grid.GetValue(row, "TS" + col);
                 if (pVal == "")
@@ -1211,7 +1239,7 @@ function DoPopUp(grid, row, col) {
                 for (var iType in TSTypeObject) {
                     var oType = TSTypeObject[iType];
 
-                    strTypeDiv += "<tr><td>" + oType + ":</td><td align=\"right\"><input type=\"text\" class=\"epmliveinput\" onkeydown=\"stopProp(event);\" onkeyup=\"stopProp(event);\" onkeypress=\"stopProp(event);\" onmousedown=\"this.focus();this.select();stopProp(event);\" onmouseup=\"this.focus();this.select();stopProp(event);\" onClick=\"this.focus();this.select();stopProp(event);\" style=\"width:25px\" id=\"" + iType + "TypeValue\" Value=\"";
+                    strTypeDiv += "<tr><td>" + oType + ":</td><td align=\"right\"><input type=\"text\" class=\"epmliveinput\" onkeydown=\"stopProp(event);\" onkeyup=\"stopProp(event);\" onkeypress=\"stopProp(event);\" onClick=\"this.select();stopProp(event);\" style=\"width:25px\" id=\"" + iType + "TypeValue\" Value=\"";
 
                     try {
                         if (oVal[iType]) {
@@ -1237,7 +1265,7 @@ function DoPopUp(grid, row, col) {
                         notes = unescape(notes).replace(/<br>/g, "\r\n");
                     }
 
-                    strTypeDiv += "<tr><td colspan=\"2\"><textarea class=\"epmliveinput\" id='txtNotes' style='width:140px;height:75px;' ondblclick=\"stopProp(event);\" onkeydown=\"stopProp(event);\" onkeyup=\"stopProp(event);\" onclick=\"stopProp(event);\" onkeypress=\"stopProp(event);\"";
+                    strTypeDiv += "<tr><td colspan=\"2\"><textarea class=\"epmliveinput\" id='txtTNotes' style='width:140px;height:75px;outline:0;resize:none' ondblclick=\"stopProp(event);\" onkeydown=\"stopProp(event);\" onkeyup=\"stopProp(event);\" onclick=\"stopProp(event);\" onkeypress=\"stopProp(event);\"";
 
                     if (bLocked)
                         strTypeDiv += " disabled=\"disabled\"";
@@ -1251,7 +1279,15 @@ function DoPopUp(grid, row, col) {
 
                 strTypeDiv += "<input type=\"button\" value=\"Cancel\" class=\"tsOK\" onClick=\"CloseTypes(event);\"></td></tr></table></div><div style='position: absolute; margin-top: -10px; margin-left: -9px '><img src='/_layouts/epmlive/images/tsoutline.png'></div>";
 
-                grid.SetAttribute(row, col, "HtmlPrefix", strTypeDiv, true, false);
+                grid.SetAttribute(row, col, "HtmlPrefix", "<div id='typedivlocation'>", true, false);
+
+                $('body').append(strTypeDiv);
+
+                var oDiv = $("#TypeDivOuter").get(0);
+                var oLocDiv = $("#typedivlocation");
+
+                oDiv.style.top = (oLocDiv.offset().top - 28) + "px";
+                oDiv.style.left = (oLocDiv.offset().left - 5) + "px";
 
                 setTimeout("curGrid.StartEdit()", 100);
             }
@@ -1726,6 +1762,8 @@ function CloseTypes(event) {
 
     curPop = false;
 
+    $("#TypeDivOuter").remove();
+
     stopProp(event);
 }
 
@@ -1752,7 +1790,7 @@ function SaveTypes(event) {
     }
 
     if (TSNotes) {
-        newTypeVal += ",Notes: \"" + escape(document.getElementById("txtNotes").value.replace(/\r\n/g, "<br>")) + "\"";
+        newTypeVal += ",Notes: \"" + escape(document.getElementById("txtTNotes").value.replace(/\r\n/g, "<br>")) + "\"";
     }
 
     if (newTypeVal.length > 0)
@@ -1765,10 +1803,14 @@ function SaveTypes(event) {
     curGrid.SetValue(curRow, "TS" + curCol, newTypeVal, 0, 0);
     curPop = false;
 
+    $("#TypeDivOuter").remove();
+
     stopProp(event);
 }
 
 function SaveNotes(event) {
+
+    NotesOut = false;
 
     var notes = document.getElementById("txtNotes").value;
 
@@ -1798,6 +1840,7 @@ function stopProp(event) {
     }
 }
 
+/*
 function showNotes(event) {
 
 
@@ -1810,7 +1853,7 @@ function showNotes(event) {
     stopProp(event);
 
 
-}
+}*/
 
 
 
@@ -1966,7 +2009,12 @@ function ShowApprovalNotification() {
     EPMLiveCore.WorkEngineAPI.ExecuteJSON("timesheet_ShowApprovalNotification", "<ApprovalNotification PeriodId='" + periodId + "' />", function (response) {
         var oResp = eval("(" + response + ")");
         if (oResp.ApprovalNotification.Status == "0" && oResp.ApprovalNotification.Text != "0") {
-            updateStatusBox = SP.UI.Status.addStatus('Notification:', 'You have ' + oResp.ApprovalNotification.Text + ' timesheet(s) pending for approval <a href=\'#\' onclick=\'Javascript:DoTmAprrovals();\'>[Timesheet Manager]</a>', true);
+            if (updateStatusBox)
+                SP.UI.Status.updateStatus(updateStatusBox, 'You have ' + oResp.ApprovalNotification.Text + ' timesheet(s) pending for approval <a href=\'#\' onclick=\'Javascript:DoTmAprrovals();\'>[Timesheet Manager]</a>');
+            else
+                updateStatusBox = SP.UI.Status.addStatus('Notification:', 'You have ' + oResp.ApprovalNotification.Text + ' timesheet(s) pending for approval <a href=\'#\' onclick=\'Javascript:DoTmAprrovals();\'>[Timesheet Manager]</a>', true);
+        } else if (oResp.ApprovalNotification.Text != "0") {
+            SP.UI.Status.removeStatus(updateStatusBox);
         }
     });
 }

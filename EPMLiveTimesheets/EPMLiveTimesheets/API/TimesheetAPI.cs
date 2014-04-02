@@ -2373,7 +2373,7 @@ namespace TimeSheets
 
                     if (drNotes.Length > 0)
                     {
-                        hoursString += "Notes: \"" + System.Web.HttpUtility.UrlEncode(drNotes[0]["TS_ITEM_NOTES"].ToString()) + "\",";
+                        hoursString += "Notes: \"" + System.Web.HttpUtility.HtmlEncode(drNotes[0]["TS_ITEM_NOTES"].ToString()) + "\",";
                     }
 
                     hoursString = "{" + hoursString.Trim(',') + "}";
