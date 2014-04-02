@@ -171,6 +171,11 @@ namespace EPMLiveWebParts
         /// </value>
         public string WebPartQualifier { get; set; }
 
+        /// <summary>
+        /// Get/Set Ribbon Behaviour
+        /// </summary>
+        public int RibbonBehavior { get; set; }
+
         #endregion Properties 
 
         #region Methods (4) 
@@ -208,6 +213,8 @@ namespace EPMLiveWebParts
                 pnlGrid.Visible = false;
                 pnlError.Visible = true;
             }
+            EPMLiveCore.GridGanttSettings gSettings = new EPMLiveCore.GridGanttSettings(resourcesList);
+            this.RibbonBehavior = Convert.ToInt16(gSettings.RibbonBehavior);
         }
 
         /// <summary>

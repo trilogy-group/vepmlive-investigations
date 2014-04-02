@@ -92,7 +92,7 @@ namespace EPMLiveWebParts
 
             switch (resourceRibbonBehavior)
             {
-                case "2":
+                case "2":  //Hidden
                     {
                         spRibbon.TrimById(HIDE_TAB);
                         spRibbon.TrimById(PAGE_TAB);

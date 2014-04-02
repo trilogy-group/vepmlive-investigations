@@ -241,7 +241,7 @@
     <div id="EPMResourceGrid" class="rg-clear-fix" style="width: 100%; height: 800px;">
         <SharePoint:ScriptBlock runat="server">
             function initializeResourceGridWP() {
-                if (window.epmLiveMasterPageVersion >= 5.5) {
+            if (window.epmLiveMasterPageVersion >= 5.5) {
                     function showLoadingV2() {
                         var url = document.location.href.toLowerCase();
                         if (url.indexOf('resource%20pool.aspx') !== -1 || url.indexOf('_layouts') !== -1) {
@@ -280,6 +280,7 @@
                     epmLiveResourceGrid.pfeInstalled = <%= PFEInstalled.ToString(CultureInfo.InvariantCulture).ToLower() %>;
                     epmLiveResourceGrid.reports.wcReportId = '<%= WcReportId %>';
                     epmLiveResourceGrid.userIsSiteAdmin = <%= SPContext.Current.Web.CurrentUser.IsSiteAdmin.ToString().ToLower() %>;
+                    epmLiveResourceGrid.ribbonBehavior = <%=RibbonBehavior %>;
 
                     window.TreeGrid('<treegrid data_url="<%= WebUrl %>/_vti_bin/WorkEngine.asmx" data_timeout="0" data_method="Soap" data_function="Execute" data_namespace="workengine.com" data_param_function="GetResourcePoolDataGrid" data_param_dataxml="<%= DataXml %>" layout_url="<%= WebUrl %>/_vti_bin/WorkEngine.asmx" layout_timeout="0" layout_method="Soap" layout_function="Execute" layout_namespace="workengine.com" layout_param_function="GetResourcePoolLayoutGrid" layout_param_dataxml="<%= LayoutXml %>" suppressmessage="3" <%= DebugTag %>></treegrid>', 'EPMResourceGrid');
                 }, true);
