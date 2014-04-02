@@ -3496,11 +3496,14 @@ namespace EPMLiveWebParts
             //output.WriteLine("mygrid" + sFullGridId + @".JSGridEvents = function(name){return fnJSGridEvents(name);};");
             output.WriteLine(@"function newItem" + sFullGridId + @"()
                                     {
-	                                    var wurl = mygrid" + sFullGridId + @"._newitemurl;
+	                                    var wurl = mygrid" + sFullGridId + @"._newitemurl + '?GetLastID=true';
 
 	                                    if(" + bUsePopUp.ToString().ToLower() + @")
 	                                    {
-		                                    function NewItemCallback(dialogResult, returnValue){if(dialogResult){ReloadGridWithNewParams('" + sFullGridId + @"');}}
+		                                    function NewItemCallback(dialogResult, returnValue)
+                                            {
+                                                if(dialogResult){GridNewItem('" + sFullGridId  + @"',returnValue);}
+                                            }
 
 		                                    var options = { url: wurl, width: 700, dialogReturnValueCallback:NewItemCallback };
 

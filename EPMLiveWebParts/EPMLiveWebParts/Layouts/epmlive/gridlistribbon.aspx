@@ -668,9 +668,9 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
 
             weburl = this.$curWebUrl + "/_layouts/epmlive/getpsproject.aspx?listID=" + cmdData[0] + "&ID=" + cmdData[1];
             
-            function NewItemCallback(dialogResult, returnValue){}
+            function NewItemCallback2(dialogResult, returnValue){}
 
-        	var options = { url: weburl, width: 300, dialogReturnValueCallback:NewItemCallback };
+        	var options = { url: weburl, width: 300, dialogReturnValueCallback:NewItemCallback2 };
 
         	SP.UI.ModalDialog.showModalDialog(options);
         }
@@ -683,9 +683,9 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
 
             weburl = this.$curWebUrl + "/_layouts/epmlive/gridaction.aspx?action=getpsproject&webid=" + webid + "&ListId=" + listid + "&ID=" + itemid + "&Source=" + document.location.href;
 
-            function NewItemCallback(dialogResult, returnValue){}
+            function NewItemCallback3(dialogResult, returnValue){}
 
-        	var options = { url: weburl, width: 300, dialogReturnValueCallback:NewItemCallback };
+        	var options = { url: weburl, width: 300, dialogReturnValueCallback:NewItemCallback3 };
 
         	SP.UI.ModalDialog.showModalDialog(options);
         }
@@ -915,20 +915,19 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
 
             wurl += "ContentTypeId=" + ct;
 
-            function NewItemCallback(dialogResult, returnValue){if(dialogResult){window.location.href=window.location.href;}}
+            curGrid = this.$Grid;
 
-        	var options = { url: wurl, width: 600, dialogReturnValueCallback:NewItemCallback };
+        	var options = { url: wurl + "?GetLastID=true", width: 600, dialogReturnValueCallback:NewItemCallback };
 
         	SP.UI.ModalDialog.showModalDialog(options);
         }
         else if(commandId === 'NewDefaultListItem')
         {
+            curGrid = this.$Grid;
             if(this.$Grid._newmenumode == '0')
             {
-                var wurl = this.$Grid._newitemurl;
-
-                function NewItemCallback(dialogResult, returnValue){if(dialogResult){window.location.href=window.location.href;}}
-
+                var wurl = this.$Grid._newitemurl + "?GetLastID=true";
+                
             	var options = { url: wurl, width: 600, dialogReturnValueCallback:NewItemCallback };
 
             	SP.UI.ModalDialog.showModalDialog(options);
@@ -951,11 +950,10 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
         }
         else if(commandId === 'NewItem')
         {
-            var wurl = this.$Grid._newitemurl;
-
+            var wurl = this.$Grid._newitemurl + "?GetLastID=true";
+            curGrid = this.$Grid;
             if(this.$Grid._usepopup)
             {
-                function NewItemCallback(dialogResult, returnValue){if(dialogResult){window.location.href=window.location.href;}}
 
         	    var options = { url: wurl, width: 600, dialogReturnValueCallback:NewItemCallback };
 

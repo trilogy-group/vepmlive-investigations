@@ -20,6 +20,60 @@ namespace EPMLiveWebParts
             return grid.ToString();
 
         }
+        public static string GetGridRow(string data, SPWeb web)
+        {
+            XmlDocument DocIn = new XmlDocument();
+            DocIn.LoadXml(data);
+
+            XmlDocument doc = new XmlDocument();
+            doc.LoadXml("<Grid><Changes><I id=\"" + DocIn.FirstChild.Attributes["id"].Value + "\"/></Changes></Grid>");
+
+            Guid SiteId = new Guid(DocIn.FirstChild.Attributes["siteid"].Value);
+            Guid WebId = new Guid(DocIn.FirstChild.Attributes["webid"].Value);
+                
+
+            try
+            {
+                    
+                if (SiteId != web.Site.ID)
+                {
+                    using (SPSite oSite = new SPSite(SiteId))
+                    {
+                        using (SPWeb oWeb = oSite.OpenWeb(WebId))
+                        {
+                            iGetGridRow(ref doc, oWeb, DocIn);
+                        }
+                    }
+                }
+                else if (WebId != web.ID)
+                {
+                    using (SPWeb oWeb = web.Site.OpenWeb(WebId))
+                    {
+                        iGetGridRow(ref doc, oWeb, DocIn);
+                    }
+                }
+                else
+                    iGetGridRow(ref doc, web, DocIn);
+
+                return "<Result Status=\"0\"><![CDATA[" + doc.OuterXml + "]]></Result>";
+            }
+            catch (Exception ex)
+            {
+                return "<Result Status=\"1\"><Error ID=\"9003\">Error (9003): " + ex.Message + "</Error></Result>";
+            }
+        }
+
+        private static void iGetGridRow(ref XmlDocument doc, SPWeb oWeb, XmlDocument DocIn)
+        {
+            Guid ListId = new Guid(DocIn.FirstChild.Attributes["listid"].Value);
+            int itemid = int.Parse(DocIn.FirstChild.Attributes["itemid"].Value);
+
+            SPList list = oWeb.Lists[ListId];
+            SPListItem li = list.GetItemById(itemid);
+
+
+            iGetRowValue(ref doc, oWeb, DocIn, list, li);
+        }
 
         public static string SetGridRowEdit(string data, SPWeb web)
         {
