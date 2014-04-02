@@ -99,15 +99,7 @@
             border-bottom: 1px solid #ABABAB;
         }
         
-        .EPMLiveResourceGridGroupTitle {
-            padding-top: 14px;
-            font-weight: bold;
-            font-weight: bold;
-            height: 22px;
-            padding-bottom: 3px;
-            cursor: pointer;
-            cursor: hand;
-        }
+        
         
         .EPMLiveResourceGridGroupTitle > a {
             color: #444444 !important;
