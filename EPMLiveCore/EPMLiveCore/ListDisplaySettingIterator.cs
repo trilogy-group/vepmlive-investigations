@@ -371,6 +371,7 @@ namespace EPMLiveCore
 
         public override void RenderControl(System.Web.UI.HtmlTextWriter writer)
         {
+            string sRelUrl = ((base.Web.ServerRelativeUrl == "/") ? "" : base.Web.ServerRelativeUrl);
 
             if (isResList)
             {
@@ -406,7 +407,7 @@ namespace EPMLiveCore
 
                     writer.WriteLine("<script language=\"javascript\">");
                     writer.WriteLine("WETitle = \"" + base.ListItem.Title.Replace("\"", "&quot;") + "\";");
-                    writer.WriteLine("WEWebUrl = '" + ((base.Web.ServerRelativeUrl == "/") ? "" : base.Web.ServerRelativeUrl) + "';");
+                    writer.WriteLine("WEWebUrl = '" + sRelUrl + "';");
                     writer.WriteLine("WEWebId = '" + Web.ID + "';");
                     writer.WriteLine("WEEditForm = '" + editURL + "';");
                     writer.WriteLine("WEExtraParams = '" + extraParams.Trim('&') + "';");
@@ -926,6 +927,49 @@ namespace EPMLiveCore
                 }
 
                 #endregion
+
+                string newLocation = "";
+                bool bDialog = false;
+                if(Page.Request["IsDlg"] == "1")
+                    bDialog = true;
+
+
+                if (DisplayFormRedirect)
+                {
+                    if (bDialog)
+                    {
+                        newLocation = list.Forms[PAGETYPE.PAGE_DISPLAYFORM].ServerRelativeUrl;
+                    }
+                }
+                else if (Page.Request["GetLastID"] == "true")
+                {
+                    if (bDialog)
+                        newLocation = "close";
+                    else
+                        newLocation = Page.Request["Source"];
+                }
+
+                if (!string.IsNullOrEmpty(newLocation))
+                {
+                    writer.WriteLine(@"<script>
+
+                        $(document).ready(function() {
+                            var button = $('input[id$=SaveItem]');
+                            button.removeAttr('onclick');
+                            button.click(function() {
+                                var elementName = $(this).attr('name');
+                                var aspForm = $('#aspnetForm');
+
+                                var newPostbackUrl = '" + Web.Url + "/" + list.Forms[PAGETYPE.PAGE_NEWFORM].Url + "?Source=" + System.Web.HttpUtility.UrlEncode(Web.Url + "/_layouts/15/epmlive/getlastid.aspx?BackTo=" + System.Web.HttpUtility.UrlEncode(newLocation) + "&listid=" + list.ID + ((bDialog) ? "&isdlg=1" : "")) + @"';
+
+                                if (!PreSaveItem()) return false;
+                                if (SPClientForms.ClientFormManager.SubmitClientForm('WPQ2')) return false;
+
+                                WebForm_DoPostBackWithOptions(new WebForm_PostBackOptions(elementName, '', true, '', newPostbackUrl, false, true));
+                            });
+                        });
+                         </script>");
+                }
             }
             else
                 base.RenderControl(writer);

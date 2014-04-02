@@ -3,26 +3,35 @@
 /// <reference path="file://C:/Program Files/Common Files/Microsoft Shared/Web Server Extensions/14/TEMPLATE/LAYOUTS/SP.debug.js" />
 /// <reference path="file://C:/Program Files/Common Files/Microsoft Shared/Web Server Extensions/14/TEMPLATE/LAYOUTS/epmlive/dhtml/xgrid/dhtmlxcommon.js" />
 
+var ResToolsSet = false;
+var ResToolsEnabled = false;
+
 function getResToolsEnabled() {
 
-    var url = SP.PageContextInfo.get_webServerRelativeUrl()
-    if (url == "/")
-        url = "";
 
-    var $v_0 = new Sys.StringBuilder();
-    $v_0.append(url);
-    $v_0.append("/_layouts/epmlive/getGeneralSetting.aspx?listid=");
-    $v_0.append(SP.PageContextInfo.get_pageListId());
-    $v_0.append("&setting=EnableResourcePlan");
+    if (!ResToolsSet) {
+        var url = SP.PageContextInfo.get_webServerRelativeUrl()
+        if (url == "/")
+            url = "";
 
-    var data = dhtmlxAjax.getSync($v_0);
-    var dataText = data.xmlDoc.responseText.trim();
+        var $v_0 = new Sys.StringBuilder();
+        $v_0.append(url);
+        $v_0.append("/_layouts/15/epmlive/getGeneralSetting.aspx?listid=");
+        $v_0.append(SP.PageContextInfo.get_pageListId());
+        $v_0.append("&setting=EnableResourcePlan");
 
-    if (dataText == "True")
-        return true;
+        var data = dhtmlxAjax.getSync($v_0);
+        var dataText = data.xmlDoc.responseText.trim();
+
+        if (dataText == "True")
+            ResToolsEnabled = true;
+        else
+            ResToolsEnabled = false;
+
+        ResToolsSet = true;
+    }
     
-
-    return false;
+    return ResToolsEnabled;
 }
 
 function findResource() {
