@@ -15,7 +15,7 @@ namespace EPMLiveWebParts
 {
     public partial class ResourceGridUserControl : UserControl
     {
-        #region Fields (5) 
+        #region Fields (5)
 
         private const string LAYOUT_PATH = "/_layouts/15/epmlive/";
         protected string WcReportId = "Resource Work vs. Capacity".Md5();
@@ -23,9 +23,9 @@ namespace EPMLiveWebParts
         private string _debugTag;
         private string _webPartHeight;
 
-        #endregion Fields 
+        #endregion Fields
 
-        #region Properties (10) 
+        #region Properties (10)
 
         /// <summary>
         ///     Gets or sets a value indicating whether [auto focus].
@@ -176,9 +176,9 @@ namespace EPMLiveWebParts
         /// </summary>
         public int RibbonBehavior { get; set; }
 
-        #endregion Properties 
+        #endregion Properties
 
-        #region Methods (4) 
+        #region Methods (4)
 
         // Protected Methods (2) 
 
@@ -194,7 +194,7 @@ namespace EPMLiveWebParts
 
             if (resourcesList != null)
             {
-                foreach (string style in new[] {"libraries/jquery-ui"})
+                foreach (string style in new[] { "libraries/jquery-ui" })
                 {
                     SPPageContentManager.RegisterStyleFile(LAYOUT_PATH + "stylesheets/" + style + ".css");
                 }
@@ -214,7 +214,10 @@ namespace EPMLiveWebParts
                 pnlError.Visible = true;
             }
             EPMLiveCore.GridGanttSettings gSettings = new EPMLiveCore.GridGanttSettings(resourcesList);
-            this.RibbonBehavior = Convert.ToInt16(gSettings.RibbonBehavior);
+            if (string.IsNullOrEmpty(gSettings.RibbonBehavior))
+                this.RibbonBehavior = 0;
+            else
+                this.RibbonBehavior = Convert.ToInt16(gSettings.RibbonBehavior);
         }
 
         /// <summary>
@@ -233,8 +236,8 @@ namespace EPMLiveWebParts
 
             if (!inDebugMode) return;
 
-            var keywords = new[] {"Error", "Problem", "Info", "Check", "IOError", "IO", "Cookie", "Page", "Event"};
-            var info = new List<string> {"Error", "Problem"};
+            var keywords = new[] { "Error", "Problem", "Info", "Check", "IOError", "IO", "Cookie", "Page", "Event" };
+            var info = new List<string> { "Error", "Problem" };
 
             foreach (string keyword in epmDebug.Split(',').Select(k => k.ToLower()))
             {
@@ -264,6 +267,6 @@ namespace EPMLiveWebParts
             return !string.IsNullOrEmpty(epmDebug);
         }
 
-        #endregion Methods 
+        #endregion Methods
     }
 }
