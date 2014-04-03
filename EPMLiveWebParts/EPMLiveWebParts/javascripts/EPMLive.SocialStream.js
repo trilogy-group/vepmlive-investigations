@@ -187,6 +187,7 @@
                         return false;
                     }
 
+                    var commentActivity = false;
                     var actionActivity;
 
                     if (activity.time > comment.time) {
@@ -194,6 +195,7 @@
 
                     } else {
                         actionActivity = comment;
+                        commentActivity = true;
                     }
                     
                     thread.user = entityManager.getById(actionActivity.userId, data.users);
@@ -210,7 +212,9 @@
                         }
                     }
 
-                    thread.hasMoreActivities = thread.totalActivities > se.pagination.activityLimit;
+                    if (commentActivity) thread.hasMoreActivities = thread.totalActivities >= se.pagination.activityLimit;
+                    else thread.hasMoreActivities = thread.totalActivities > se.pagination.activityLimit;
+                    
                     thread.hasMoreComments = thread.totalComments > se.pagination.commentLimit;
                     thread.hasComments = thread.totalComments > 0;
 
