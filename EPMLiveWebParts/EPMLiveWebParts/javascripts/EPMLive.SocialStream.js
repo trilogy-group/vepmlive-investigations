@@ -2,7 +2,9 @@
     'use strict';
 
     var SocialEngine = function() {
-        var SE = (function () {
+        var SE = (function() {
+            var baseUrl = window.epmLive.currentWebUrl.slice(1);
+
             var se = {
                 pagination: {
                     isLoading: false,
@@ -12,9 +14,23 @@
                     activityLimit: 1,
                     commentLimit: 2
                 },
-                apiUrl: '/' + window.epmLive.currentWebUrl.slice(1) + '/_vti_bin/SocialEngine.svc'
+                ui: {
+                    selectors: {
+                        comments: 'div.epm-se-comments',
+                        commentBox: 'div.epm-se-comment-input',
+                        latestComments: 'ul.epm-se-latest-comments'
+                    },
+                    classes: {
+                        placeholder: 'epm-se-placeholder',
+                        expanded: 'epm-se-expanded',
+                        active: 'epm-se-active',
+                        hidden: 'epm-se-hidden'
+                    }
+                },
+                apiUrl: '/' + baseUrl + '/_vti_bin/SocialEngine.svc',
+                commentServiceUrl: '/' + baseUrl + '/_layouts/15/epmlive/CommentsProxy.aspx',
             };
-            
+
             var $el = {
                 root: $('#epm-social-stream'),
                 content: $(document.getElementById('s4-workspace')),
@@ -35,15 +51,16 @@
                 _userInfo: _.compile($('script#_epm-se-user-info-template').html()),
                 _activityInfo: _.compile($('script#_epm-se-activity-info-template').html()),
                 _activityTime: _.compile($('script#_epm-se-activity-time-template').html()),
-                _objectInfo: _.compile($('script#_epm-se-object-info-template').html())
+                _objectInfo: _.compile($('script#_epm-se-object-info-template').html()),
+                _commentBox: _.compile($('script#_epm-se-comment-box-template').html())
             };
 
-            var helpers = (function () {
+            var helpers = (function() {
                 function getLocalTime(time) {
                     if (window.epmLive.currentUserTimeZone) {
                         try {
                             return moment.tz(time, window.epmLive.currentUserTimeZone.olsonName);
-                        } catch (e) {
+                        } catch(e) {
                             if (window.epmLive.debugMode) {
                                 console.log(e.message);
                             }
@@ -52,7 +69,7 @@
 
                     return time;
                 }
-                
+
                 var _getFriendlyTime = function(time, isLocalTime) {
                     var date = isLocalTime ? time : getLocalTime(time);
 
@@ -88,7 +105,7 @@
 
                 var _sortComments = function(comments) {
                     if (comments.length) {
-                        comments.sort(function (c1, c2) {
+                        comments.sort(function(c1, c2) {
                             if (c1 && c2) {
                                 return c1.time > c2.time;
                             }
@@ -129,7 +146,7 @@
                     $ele.parent().find('ul.epm-se-older-' + kind).show();
                     $ele.remove();
 
-                    $.getJSON(apiUrl).then(function (response) {
+                    $.getJSON(apiUrl).then(function(response) {
                         if (response.threads[0][kind].length) {
                             $$.publish('se.older' + kind + 'Loaded', response);
                         }
@@ -155,8 +172,8 @@
                 };
             })();
 
-            var entityManager = (function () {
-                var _getById = function (id, entities) {
+            var entityManager = (function() {
+                var _getById = function(id, entities) {
                     for (var i = 0; i < entities.length; i++) {
                         var e = entities[i];
                         if (e.id === id) {
@@ -180,19 +197,20 @@
                 };
             })();
 
-            var threadManager = (function () {
+            var threadManager = (function() {
+
                 function build(thread, data) {
                     var baseTime = '1986-11-06T13:03:00';
-                    
+
                     var activity = { time: baseTime };
                     var comment = { time: baseTime };
-                    
+
                     if (thread.activities.length) {
                         activity = thread.activities[0];
                     }
-                    
+
                     if (thread.comments.length) {
-                        comment = thread.comments[0];
+                        comment = thread.comments[thread.comments.length - 1];
                     }
 
                     if (activity.time === baseTime && comment.time === baseTime) {
@@ -209,16 +227,16 @@
                         actionActivity = comment;
                         commentActivity = true;
                     }
-                    
+
                     thread.user = entityManager.getById(actionActivity.userId, data.users);
-                    
+
                     if (thread.kind === 'Workspace') {
                         thread.icon = 'icon-tree-2';
                     } else {
                         thread.list = entityManager.getById(thread.listId, data.lists);
                         thread.list.icon = thread.list.icon || 'icon-square';
                         thread.icon = thread.list.icon;
-                        
+
                         if (window.epmLive.currentWebId !== thread.webId) {
                             activity.web = entityManager.getById(thread.webId, data.webs);
                         }
@@ -226,9 +244,9 @@
 
                     if (commentActivity) thread.hasMoreActivities = thread.totalActivities >= se.pagination.activityLimit;
                     else thread.hasMoreActivities = thread.totalActivities > se.pagination.activityLimit;
-                    
+
                     thread.hasMoreComments = thread.totalComments > se.pagination.commentLimit;
-                    thread.hasComments = thread.totalComments > 0;
+                    thread.commentsHidden = thread.totalComments > 0 ? '' : 'epm-se-hidden';
 
                     if (thread.activities.length) thread.earliestActivityTime = thread.activities[thread.activities.length - 1].time;
                     if (thread.comments.length) thread.earliestCommentTime = thread.comments[0].time;
@@ -238,9 +256,9 @@
 
                 var _render = function(thread, data) {
                     var selector = 'li#epm-se-thread-' + thread.id;
-                    
+
                     var $thread = $el.threads.find(selector);
-                    
+
                     if (!$thread.length) {
                         helpers.sortComments(thread.comments);
 
@@ -252,16 +270,17 @@
                         $$.publish('se.threadRendered', thread, $thread, data);
                     }
                 };
-                
+
                 return {
-                    render:_render
+                    render: _render
                 };
             })();
 
-            var activityManager = (function () {
+            var activityManager = (function() {
+
                 function buildFirstActivity(activity, thread, data) {
                     if (thread.comments.length) {
-                        var comment = thread.comments[0];
+                        var comment = thread.comments[thread.comments.length - 1];
 
                         if (comment.time > activity.time) {
                             activity = comment;
@@ -269,7 +288,7 @@
                             activity.action = 'made a comment';
                         }
                     }
-                    
+
                     if (!activity.icon) {
                         activity = _setIconAndAction(activity, thread);
                     }
@@ -279,7 +298,7 @@
 
                     return activity;
                 }
-                
+
                 function build(activity, thread, data) {
                     activity = _setIconAndAction(activity, thread);
                     activity = _setUser(activity, data);
@@ -304,18 +323,18 @@
                         $$.publish('se.firstActivityRendered', activity, $activity, data);
                     }
                 }
-                
+
                 function renderOlderActivities(thread, $thread, data) {
                     for (var i = 0; i < thread.activities.length; i++) {
                         var activity = thread.activities[i];
-                        
+
                         var selector = 'ul.epm-se-activities li#epm-se-activity-' + activity.id;
                         var $activity = $thread.find(selector);
 
                         if (!$activity.length) {
                             selector = 'ul.epm-se-older-activities li#epm-se-activity-' + activity.id;
                             $activity = $thread.find(selector);
-                            
+
                             if (!$activity.length) {
                                 if (activity = build(activity, thread, data)) {
                                     $thread.find('ul.epm-se-older-activities').append(templates.activity(activity));
@@ -339,32 +358,32 @@
                     renderOlderActivities(thread, $thread, data);
                 };
 
-                var _setIconAndAction = function (activity, thread) {
+                var _setIconAndAction = function(activity, thread) {
                     var object = (thread.kind === 'ListItem' ? 'item' : thread.kind).toLowerCase();
-                    
+
                     switch (activity.kind) {
-                        case 'Created':
-                            activity.icon = 'icon-plus-2';
-                            activity.action = 'created this ' + object;
-                            break;
-                        case 'Updated':
-                            activity.icon = 'icon-pencil';
-                            activity.action = 'made an update';
-                            break;
+                    case 'Created':
+                        activity.icon = 'icon-plus-2';
+                        activity.action = 'created this ' + object;
+                        break;
+                    case 'Updated':
+                        activity.icon = 'icon-pencil';
+                        activity.action = 'made an update';
+                        break;
                     }
 
                     return activity;
                 };
-                
-                var _setUser = function (activity, data) {
+
+                var _setUser = function(activity, data) {
                     activity.user = entityManager.getById(activity.userId, data.users);
                     activity.user.friendlyName = helpers.getUserFriendlyName(activity.user);
                     activity.user.profileUrl = helpers.getUserProfileUrl(activity.user);
 
                     return activity;
                 };
-                
-                var _setTime = function (activity) {
+
+                var _setTime = function(activity) {
                     activity.friendlyTime = helpers.getFriendlyTime(activity.time);
                     activity.longTime = helpers.getLongTime(activity.time);
 
@@ -381,7 +400,6 @@
             })();
 
             var commentManager = (function() {
-
                 function build(comment, thread, data) {
                     comment = activityManager.setIconAndAction(comment, thread);
                     comment = activityManager.setUser(comment, data);
@@ -391,10 +409,10 @@
 
                     return comment;
                 }
-                
+
                 function renderComments(thread, $thread, data, isOlder) {
                     helpers.sortComments(thread.comments);
-                    
+
                     for (var i = 0; i < thread.comments.length; i++) {
                         var comment = thread.comments[i];
 
@@ -413,19 +431,126 @@
                     }
                 }
 
+                function addPlaceholder(settings) {
+                    settings.input.addClass(se.ui.classes.placeholder);
+                    settings.input.html(settings.placeholder);
+                }
+
+                function removePlaceholder(settings) {
+                    settings.input.removeClass(se.ui.classes.placeholder);
+                    settings.input.html('');
+                }
+
+                function closeCommentBox(settings) {
+                    settings.input.removeClass(se.ui.classes.expanded);
+                    settings.button.hide();
+                    settings.button.removeClass(se.ui.classes.active);
+                }
+
+                function addComment(data) {
+                    var time = moment().tz(window.epmLive.currentUserTimeZone.olsonName);
+
+                    var comment = {
+                        id: new Date().getTime(),
+                        text: data.text,
+                        friendlyTime: helpers.getFriendlyTime(time, true),
+                        longTime: time.format('LLLL'),
+                        user: {
+                            friendlyName: 'You',
+                            picture: window.epmLive.currentUserAvatar,
+                            profileUrl: window.epmLive.currentWebUrl + '/_layouts/15/userdisp.aspx?ID=' + window.epmLive.currentUserId
+                        }
+                    };
+                    
+                    data.$thread.find(se.ui.selectors.latestComments).append(templates.comment(comment));
+                    data.$thread.find(se.ui.selectors.comments).removeClass(se.ui.classes.hidden);
+                }
+
+                function postComment(data) {
+                    $.post(se.commentServiceUrl, {
+                        command: 'CreateComment',
+                        comment: data.text,
+                        newcomment: null,
+                        itemId: data.thread.itemId,
+                        listId: data.thread.list.id,
+                        userId: window.epmLive.currentUserId,
+                        commentItemId: data.thread.itemId
+                    }).then(function(response) {
+                        console.log(response);
+                    });
+                }
+
+                function attahEvents(settings) {
+                    settings.input.focus(function() {
+                        if ($(this).html() === settings.placeholder) removePlaceholder(settings);
+                        settings.input.addClass(se.ui.classes.expanded);
+                        settings.button.show();
+                    });
+
+                    settings.input.blur(function() {
+                        var html = $(this).html();
+                        if (html === '' || html === '<br>') addPlaceholder(settings);
+
+                        if (se.lastClickedElement.id !== settings.button.get(0).id) closeCommentBox(settings);
+                    });
+
+                    settings.input.keyup(function() {
+                        var html = $(this).html();
+                        if (html !== '' && html !== '<br>' && html !== settings.placeholder) {
+                            settings.button.addClass(se.ui.classes.active);
+                        } else {
+                            settings.button.removeClass(se.ui.classes.active);
+                        }
+                    });
+
+                    settings.button.click(function(event) {
+                        event.preventDefault();
+
+                        if (!$(this).hasClass(se.ui.classes.active)) return;
+
+                        var data = {
+                            text: $.trim(settings.input.text()),
+                            thread: settings.thread,
+                            $thread: settings.$thread
+                        };
+
+                        if (data.text.length === 0) return;
+
+                        addComment(data);
+
+                        addPlaceholder(settings);
+                        closeCommentBox(settings);
+
+                        postComment(data);
+                    });
+
+                    $el.root.mousedown(function(event) {
+                        se.lastClickedElement = event.target;
+                    });
+                }
+
                 var _render = function(thread, $thread, data) {
                     renderComments(thread, $thread, data);
                 };
-                
-                var _renderOlder = function (data) {
+
+                var _renderOlder = function(data) {
                     var thread = data.threads[0];
                     var $thread = $('li#epm-se-thread-' + thread.id);
                     renderComments(thread, $thread, data, true);
                 };
 
+                var _configureBox = function(settings) {
+                    settings.input = settings.element.find(se.ui.selectors.commentBox);
+                    settings.button = settings.element.find('button');
+
+                    addPlaceholder(settings);
+                    attahEvents(settings);
+                };
+
                 return {
                     render: _render,
-                    renderOlder: _renderOlder
+                    renderOlder: _renderOlder,
+                    configureBox: _configureBox
                 };
             })();
 
@@ -452,6 +577,7 @@
                 _.registerPartial('activity-info', templates._activityInfo);
                 _.registerPartial('activity-time', templates._activityTime);
                 _.registerPartial('object-info', templates._objectInfo);
+                _.registerPartial('comment-box', templates._commentBox);
             }
 
             function render(data) {
@@ -461,53 +587,59 @@
             }
 
             function attachEvents() {
-                $$.subscribe('se.dataLoaded', function (data) {
+                $$.subscribe('se.dataLoaded', function(data) {
                     render(data);
                 });
-                
-                $$.subscribe('se.threadLoaded', function (thread, data) {
+
+                $$.subscribe('se.threadLoaded', function(thread, data) {
                     threadManager.render(thread, data);
                 });
-                
-                $$.subscribe('se.threadRendered', function (thread, $thread, data) {
+
+                $$.subscribe('se.threadRendered', function(thread, $thread, data) {
                     activityManager.render(thread, $thread, data);
                     commentManager.render(thread, $thread, data);
+                    commentManager.configureBox({
+                        element: $thread.parent().find("div.epm-se-comment-box[data-threadId='" + thread.id + "']"),
+                        placeholder: 'Add a comment...',
+                        thread: thread,
+                        $thread: $thread
+                    });
                 });
-                
-                $$.subscribe('se.olderactivitiesLoaded', function (data) {
+
+                $$.subscribe('se.olderactivitiesLoaded', function(data) {
                     activityManager.renderOlder(data);
                 });
-                
-                $$.subscribe('se.oldercommentsLoaded', function (data) {
+
+                $$.subscribe('se.oldercommentsLoaded', function(data) {
                     commentManager.renderOlder(data);
                 });
-                
-                $el.root.on('mouseenter', '.epm-se-has-tooltip', function () {
+
+                $el.root.on('mouseenter', '.epm-se-has-tooltip', function() {
                     actions.showTooltip($(this));
                 });
-                
-                $el.root.on('click', 'a.epm-se-link', function (event) {
+
+                $el.root.on('click', 'a.epm-se-link', function(event) {
                     actions.navigate($(this), event);
                 });
 
                 $el.root.on('click', '.epm-show-older', function() {
                     actions.showOlder($(this));
                 });
-                
-                $el.content.scroll(function () {
+
+                $el.content.scroll(function() {
                     actions.paginate();
                 });
             }
 
-            var _configure = function () {
+            var _configure = function() {
                 configureMoment();
                 configureUI();
                 attachEvents();
             };
 
-            var _load = function (query) {
+            var _load = function(query) {
                 if (se.pagination.page === 0) return;
-                
+
                 query = query || {
                     page: se.pagination.page,
                     limit: se.pagination.limit,
@@ -529,7 +661,7 @@
 
                 apiUrl += params.join('&');
 
-                $.getJSON(apiUrl).then(function (response) {
+                $.getJSON(apiUrl).then(function(response) {
                     $el.pagination.hide();
 
                     if (response.threads.length) {

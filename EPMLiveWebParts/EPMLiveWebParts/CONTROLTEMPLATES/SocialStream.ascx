@@ -28,17 +28,17 @@
         <ul class="epm-se-activities"></ul>
         <ul class="epm-se-older-activities"></ul>
         {{#if hasMoreActivities}}
-            <div class="epm-show-older" data-kind="activities" data-threadid="{{id}}" data-offset="{{earliestActivityTime}}"><span class="icon-arrow-up-16"></span>show older activities</div>
+            <div class="epm-show-older" data-kind="activities" data-threadId="{{id}}" data-offset="{{earliestActivityTime}}"><span class="icon-arrow-up-16"></span>show older activities</div>
         {{/if}}
-        {{#if hasComments}}
-            <div class="epm-se-comments">
-                {{#if hasMoreComments}}
-                    <div class="epm-show-older" data-kind="comments" data-threadid="{{id}}" data-offset="{{earliestCommentTime}}"><span class="icon-arrow-down-16"></span>show older comments</div>
-                {{/if}}
-                <ul class="epm-se-older-comments"></ul>
-                <ul class="epm-se-comments"></ul>
-            </div>
-        {{/if}}
+        <div class="epm-se-comments {{commentsHidden}}">
+            {{#if hasMoreComments}}
+                <div class="epm-show-older" data-kind="comments" data-threadId="{{id}}" data-offset="{{earliestCommentTime}}"><span class="icon-arrow-down-16"></span>show older comments</div>
+            {{/if}}
+            <ul class="epm-se-older-comments"></ul>
+            <ul class="epm-se-comments"></ul>
+            <ul class="epm-se-latest-comments"></ul>
+        </div>
+        <div class="epm-se-comment-box" data-threadId="{{id}}">{{> comment-box}}</div>
     </li>
 </script>
 
@@ -111,4 +111,9 @@
             <a href="{{list.url}}" target="_blank" class="epm-se-link">{{list.name}}</a>
         {{/if}}
     </span>
+</script>
+
+<script id="_epm-se-comment-box-template" type="text/x-handlebars-template">
+    <div class="epm-se-comment-input" contenteditable="true"></div>
+    <button id="epm-se-comment-post-{{id}}">Post</button>
 </script>
