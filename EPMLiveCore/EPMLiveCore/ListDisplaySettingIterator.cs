@@ -1002,7 +1002,7 @@ namespace EPMLiveCore
 
         private string CreateHtmlPanelText(string panelTitle)
         {
-            return "<tr><td colspan=\"2\"><div class=\"upcontainer\"><div class=\"upheader\"><img src=\"/_layouts/epmlive/images/Down_Arrow.gif\" class=\"image_margin imgDownArrow\" alt=\"downArrow\" /><img src=\"/_layouts/epmlive/images/Arrow.gif\" class=\"image_margin imgArrow\" alt=\"arrow\" /><span>" + panelTitle + "</span></div><div class=\"upcontent\"><table>";
+            return "<tr><td colspan=\"2\"><div class=\"upcontainer\"><div class=\"upheader\"><img src=\"/_layouts/15/epmlive/images/navigation/collapse.png\" class=\"image_margin imgDownArrow\" alt=\"downArrow\" /><img src=\"/_layouts/15/epmlive/images/navigation/expand.png\" class=\"image_margin imgArrow\" alt=\"arrow\" /><span>" + panelTitle + "</span></div><div class=\"upcontent\"><table>";
         }
 
         #endregion
