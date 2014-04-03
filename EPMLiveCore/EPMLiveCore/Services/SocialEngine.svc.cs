@@ -44,15 +44,29 @@ namespace EPMLiveCore.Services
         {
             var activities = new SEActivities();
 
-            int limit;
-            int page;
-            int activityLimit;
-            int commentLimit;
-            DateTime offset;
+            try
+            {
+                int limit;
+                int page;
+                int activityLimit;
+                int commentLimit;
+                DateTime offset;
 
-            ParseMetaData(out page, out limit, out activityLimit, out commentLimit, out offset);
+                ParseMetaData(out page, out limit, out activityLimit, out commentLimit, out offset);
 
-            GetData(page, limit, activityLimit, commentLimit, activities);
+                GetData(page, limit, activityLimit, commentLimit, activities);
+
+                return activities;
+            }
+            catch (Exception exception)
+            {
+                activities.error = new SEActivities.Error
+                {
+                    message = exception.Message,
+                    stackTrace = exception.StackTrace,
+                    kind = typeof (Exception).ToString()
+                };
+            }
 
             return activities;
         }
@@ -65,15 +79,27 @@ namespace EPMLiveCore.Services
         {
             var activities = new SEActivities();
 
-            int limit;
-            int page;
-            int activityLimit;
-            int commentLimit;
-            DateTime offset;
+            try
+            {
+                int limit;
+                int page;
+                int activityLimit;
+                int commentLimit;
+                DateTime offset;
 
-            ParseMetaData(out page, out limit, out activityLimit, out commentLimit, out offset);
+                ParseMetaData(out page, out limit, out activityLimit, out commentLimit, out offset);
 
-            GetData(activities, new Guid(threadId), kind, offset);
+                GetData(activities, new Guid(threadId), kind, offset);
+            }
+            catch (Exception exception)
+            {
+                activities.error = new SEActivities.Error
+                {
+                    message = exception.Message,
+                    stackTrace = exception.StackTrace,
+                    kind = typeof(Exception).ToString()
+                };
+            }
 
             return activities;
         }

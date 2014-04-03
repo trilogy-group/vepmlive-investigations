@@ -17,7 +17,9 @@ namespace EPMLiveCore.Services.DataContracts.SocialEngine
 
         #endregion Constructors 
 
-        #region Properties (4) 
+        #region Properties (5) 
+
+        public Error error { get; set; }
 
         public List<ItemList> lists { get; set; }
 
@@ -29,7 +31,20 @@ namespace EPMLiveCore.Services.DataContracts.SocialEngine
 
         #endregion Properties 
 
-        #region Nested Classes (4) 
+        #region Nested Classes (5) 
+
+        public class Error
+        {
+            #region Properties (3) 
+
+            public string kind { get; set; }
+
+            public string message { get; set; }
+
+            public string stackTrace { get; set; }
+
+            #endregion Properties 
+        }
 
         public class ItemList
         {
