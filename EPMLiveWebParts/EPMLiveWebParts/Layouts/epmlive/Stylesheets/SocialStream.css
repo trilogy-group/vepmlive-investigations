@@ -197,6 +197,15 @@
   width: 30px;
   height: 30px;
 }
+#epm-social-stream li.epm-se-thread div.epm-se-comments li.epm-se-comment {
+  margin: 10px 0;
+}
+#epm-social-stream li.epm-se-thread div.epm-se-comments li.epm-se-comment div.epm-se-user,
+#epm-social-stream li.epm-se-thread div.epm-se-comments li.epm-se-comment div.epm-se-comment-details {
+  display: table-cell;
+  float: none;
+  vertical-align: top;
+}
 #epm-social-stream li.epm-se-thread div.epm-se-comments div.epm-se-comment-text {
   color: #777777;
 }

@@ -32,9 +32,9 @@ namespace EPMLiveCore.Services
 
         #endregion Fields 
 
-        #region Methods (12) 
+        #region Methods (16) 
 
-        // Public Methods (1) 
+        // Public Methods (2) 
 
         [WebGet(BodyStyle = WebMessageBodyStyle.Bare,
             ResponseFormat = WebMessageFormat.Json,
@@ -48,37 +48,37 @@ namespace EPMLiveCore.Services
             int page;
             int activityLimit;
             int commentLimit;
+            DateTime offset;
 
-            ParseMetaData(out page, out limit, out activityLimit, out commentLimit);
+            ParseMetaData(out page, out limit, out activityLimit, out commentLimit, out offset);
 
-            SPWeb web = SPContext.Current.Web;
-            int userId = web.CurrentUser.ID;
-
-            _regionalSettings = SPContext.Current.RegionalSettings;
-
-            using (var connectionManager = new DBConnectionManager(web))
-            {
-                DBConnectionManager manager = connectionManager;
-
-                List<DataRow> threadRows = GetThreads(manager, userId, web, page, limit).AsEnumerable().ToList();
-
-                List<SEActivities.Thread> threads =
-                    threadRows.Select(tr => BuildThread(tr, manager, userId, activityLimit, commentLimit, activities)).ToList();
-                foreach (SEActivities.Thread thread in threads)
-                {
-                    activities.threads.Add(thread);
-                }
-            }
-
-            Parallel.ForEach(activities.threads,
-                thread => { thread.activities = thread.activities.OrderByDescending(a => a.time).ToList(); });
-
-            activities.threads = activities.threads.OrderByDescending(t => t.lastActivityOn).ToList();
+            GetData(page, limit, activityLimit, commentLimit, activities);
 
             return activities;
         }
 
-        // Private Methods (11) 
+        [WebGet(BodyStyle = WebMessageBodyStyle.Bare,
+            ResponseFormat = WebMessageFormat.Json,
+            UriTemplate = "/thread/{threadId}/{kind}")]
+        [OperationContract]
+        public SEActivities GetItemsForThread(string threadId, string kind)
+        {
+            var activities = new SEActivities();
+
+            int limit;
+            int page;
+            int activityLimit;
+            int commentLimit;
+            DateTime offset;
+
+            ParseMetaData(out page, out limit, out activityLimit, out commentLimit, out offset);
+
+            GetData(activities, new Guid(threadId), kind, offset);
+
+            return activities;
+        }
+
+        // Private Methods (14) 
 
         private void AddList(SEActivities.Thread thread, SEActivities activities, DataRow tr)
         {
@@ -195,8 +195,8 @@ namespace EPMLiveCore.Services
             });
         }
 
-        private SEActivities.Thread BuildThread(DataRow tr, DBConnectionManager manager, int userId,
-            int activityLimit, int commentLimit, SEActivities activities)
+        private SEActivities.Thread BuildThread(DataRow tr, DBConnectionManager manager, int userId, int activityLimit,
+            int commentLimit, SEActivities activities, DateTime? offset, string kind = null)
         {
             foreach (string column in _threadDateTimeColumns)
             {
@@ -209,14 +209,32 @@ namespace EPMLiveCore.Services
             var totalActivities = (int) tr["TotalActivities"];
             var totalComments = (int) tr["TotalComments"];
 
-            if (totalActivities > 0)
+            if (!string.IsNullOrEmpty(kind))
             {
-                activityRows = GetThreadActivities(manager, userId, 0, 3, activityLimit, tr).AsEnumerable().ToList();
-            }
+                kind = kind.ToLower();
 
-            if (totalComments > 0)
+                if (kind.Equals("activities"))
+                {
+                    activityRows =
+                        GetThreadActivities(manager, userId, 0, 3, activityLimit, tr, offset).AsEnumerable().ToList();
+                }
+                else if (kind.Equals("comments"))
+                {
+                    commentRows =
+                        GetThreadActivities(manager, userId, 4, 4, commentLimit, tr, offset).AsEnumerable().ToList();
+                }
+            }
+            else
             {
-                commentRows = GetThreadActivities(manager, userId, 4, 4, commentLimit, tr).AsEnumerable().ToList();
+                if (totalActivities > 0)
+                {
+                    activityRows = GetThreadActivities(manager, userId, 0, 3, activityLimit, tr, null).AsEnumerable().ToList();
+                }
+
+                if (totalComments > 0)
+                {
+                    commentRows = GetThreadActivities(manager, userId, 4, 4, commentLimit, tr, null).AsEnumerable().ToList();
+                }
             }
 
             var webId = (Guid) tr["WebId"];
@@ -255,11 +273,73 @@ namespace EPMLiveCore.Services
             };
 
             Task.WaitAll(threadTasks);
+
+            thread.activities = thread.activities.Distinct().ToList();
+            thread.comments = thread.comments.Distinct().ToList();
+
             return thread;
         }
 
+        private void GetData(SEActivities activities, Guid threadId, string kind, DateTime offset)
+        {
+            SPWeb web = SPContext.Current.Web;
+            int userId = web.CurrentUser.ID;
+
+            _regionalSettings = SPContext.Current.RegionalSettings;
+
+            using (var connectionManager = new DBConnectionManager(web))
+            {
+                DBConnectionManager manager = connectionManager;
+
+                List<DataRow> threadRows = GetThreads(manager, userId, web, 0, 0, threadId).AsEnumerable().ToList();
+
+                List<SEActivities.Thread> threads =
+                    threadRows.Select(tr => BuildThread(tr, manager, userId, 0, 0, activities, offset, kind))
+                        .ToList();
+
+                foreach (SEActivities.Thread thread in threads)
+                {
+                    activities.threads.Add(thread);
+                }
+            }
+
+            SortThreadActivities(activities);
+        }
+
+        private void GetData(int page, int limit, int activityLimit, int commentLimit, SEActivities activities)
+        {
+            SPWeb web = SPContext.Current.Web;
+            int userId = web.CurrentUser.ID;
+
+            _regionalSettings = SPContext.Current.RegionalSettings;
+
+            using (var connectionManager = new DBConnectionManager(web))
+            {
+                DBConnectionManager manager = connectionManager;
+
+                List<DataRow> threadRows = GetThreads(manager, userId, web, page, limit, null).AsEnumerable().ToList();
+
+                List<SEActivities.Thread> threads =
+                    threadRows.Select(
+                        tr => BuildThread(tr, manager, userId, activityLimit, commentLimit, activities, null))
+                        .ToList();
+
+                foreach (SEActivities.Thread thread in threads)
+                {
+                    activities.threads.Add(thread);
+                }
+            }
+
+            activities.threads = activities.threads.Distinct().ToList();
+            activities.webs = activities.webs.Distinct().ToList();
+            activities.lists = activities.lists.Distinct().ToList();
+            activities.users = activities.users.Distinct().ToList();
+
+            SortThreadActivities(activities);
+        }
+
         private DataTable GetThreadActivities(DBConnectionManager manager, int userId, int kindMin, int kindMax,
-            int activityLimit, DataRow tr)
+            int activityLimit, DataRow tr, DateTime? offset)
         {
             var dataTable = new DataTable();
 
@@ -276,7 +356,8 @@ namespace EPMLiveCore.Services
                     sqlCommand.Parameters.AddWithValue("@ItemId", tr["ItemId"]);
                     sqlCommand.Parameters.AddWithValue("@KindMin", kindMin);
                     sqlCommand.Parameters.AddWithValue("@KindMax", kindMax);
-                    sqlCommand.Parameters.AddWithValue("@Limit", activityLimit);
+                    if (activityLimit > 0) sqlCommand.Parameters.AddWithValue("@Limit", activityLimit);
+                    if (offset.HasValue) sqlCommand.Parameters.AddWithValue("@Offset", offset.Value);
 
                     SqlDataReader reader = sqlCommand.ExecuteReader();
                     dataTable.Load(reader);
@@ -287,7 +368,8 @@ namespace EPMLiveCore.Services
             return dataTable;
         }
 
-        private DataTable GetThreads(DBConnectionManager connectionManager, int userId, SPWeb web, int page, int limit)
+        private DataTable GetThreads(DBConnectionManager connectionManager, int userId, SPWeb web, int page, int limit,
+            Guid? threadId)
         {
             var dataTable = new DataTable();
 
@@ -297,8 +379,10 @@ namespace EPMLiveCore.Services
 
                 sqlCommand.Parameters.AddWithValue("@UserId", userId);
                 sqlCommand.Parameters.AddWithValue("@WebUrl", web.ServerRelativeUrl);
-                sqlCommand.Parameters.AddWithValue("@Page", page);
-                sqlCommand.Parameters.AddWithValue("@Limit", limit);
+
+                if (page > 0) sqlCommand.Parameters.AddWithValue("@Page", page);
+                if (limit > 0) sqlCommand.Parameters.AddWithValue("@Limit", limit);
+                if (threadId.HasValue) sqlCommand.Parameters.AddWithValue("@ThreadId", threadId.Value);
 
                 SqlDataReader reader = sqlCommand.ExecuteReader();
                 dataTable.Load(reader);
@@ -307,12 +391,14 @@ namespace EPMLiveCore.Services
             return dataTable;
         }
 
-        private void ParseMetaData(out int page, out int limit, out int activityLimit, out int commentLimit)
+        private void ParseMetaData(out int page, out int limit, out int activityLimit, out int commentLimit,
+            out DateTime offset)
         {
             page = 1;
             limit = 10;
             activityLimit = 1;
             commentLimit = 2;
+            offset = DateTime.UtcNow;
 
             OperationContext context = OperationContext.Current;
             MessageProperties properties = context.IncomingMessageProperties;
@@ -344,6 +430,12 @@ namespace EPMLiveCore.Services
             {
                 int.TryParse(parameters["commentLimit"], out activityLimit);
             }
+
+            if (parameters.AllKeys.Contains("offset"))
+            {
+                SPRegionalSettings regionalSettings = SPContext.Current.RegionalSettings;
+                offset = regionalSettings.TimeZone.LocalTimeToUTC(DateTime.Parse(parameters["offset"]));
+            }
         }
 
         private void SetLocalDateTime(DataRow tr, string column, Dictionary<DateTime, DateTime> utcTimeDict,
@@ -373,6 +465,14 @@ namespace EPMLiveCore.Services
                 }
             }
             catch { }
+        }
+
+        private static void SortThreadActivities(SEActivities activities)
+        {
+            Parallel.ForEach(activities.threads,
+                thread => { thread.activities = thread.activities.OrderByDescending(a => a.time).ToList(); });
+
+            activities.threads = activities.threads.OrderByDescending(t => t.lastActivityOn).ToList();
         }
 
         #endregion Methods 

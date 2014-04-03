@@ -28,12 +28,12 @@
         <ul class="epm-se-activities"></ul>
         <ul class="epm-se-older-activities"></ul>
         {{#if hasMoreActivities}}
-            <div class="epm-show-older"><span class="icon-arrow-up-16"></span>show older activities</div>
+            <div class="epm-show-older" data-kind="activities" data-threadid="{{id}}" data-offset="{{earliestActivityTime}}"><span class="icon-arrow-up-16"></span>show older activities</div>
         {{/if}}
         {{#if hasComments}}
             <div class="epm-se-comments">
                 {{#if hasMoreComments}}
-                    <div class="epm-show-older"><span class="icon-arrow-down-16"></span>show older comments</div>
+                    <div class="epm-show-older" data-kind="comments" data-threadid="{{id}}" data-offset="{{earliestCommentTime}}"><span class="icon-arrow-down-16"></span>show older comments</div>
                 {{/if}}
                 <ul class="epm-se-older-comments"></ul>
                 <ul class="epm-se-comments"></ul>
@@ -49,8 +49,8 @@
 </script>
 
 <script id="epm-se-comment-template" type="text/x-handlebars-template">
-    <li id="epm-se-comment-{{id}}" class="epm-se-activity clearfix">
-        {{> user-avatar}}
+    <li id="epm-se-comment-{{id}}" class="epm-se-comment">
+        <div class="epm-se-user">{{> user-avatar}}</div>
         <div class="epm-se-comment-details">
             <div class="epm-se-comment-header">{{> user-info}}{{> activity-time}}</div>
             <div class="epm-se-comment-text">{{{text}}}</div>
@@ -89,7 +89,9 @@
 </script>
 
 <script id="_epm-se-user-info-template" type="text/x-handlebars-template">
-    <span class="epm-se-user-info"><a href="{{user.profileUrl}}" target="_blank" class="epm-se-link">{{user.friendlyName}}</a></span>
+    <span class="epm-se-user-info">
+        <a href="{{user.profileUrl}}" target="_blank" class="epm-se-link">{{user.friendlyName}}</a>
+    </span>
 </script>
 
 <script id="_epm-se-activity-info-template" type="text/x-handlebars-template">
@@ -97,7 +99,7 @@
 </script>
 
 <script id="_epm-se-activity-time-template" type="text/x-handlebars-template">
-    <span class="epm-se-activity-time">{{friendlyTime}}</span>
+    <span class="epm-se-activity-time epm-se-has-tooltip" title="{{longTime}}" data-toggle="tooltip" data-placement="top">{{friendlyTime}}</span>
 </script>
 
 <script id="_epm-se-object-info-template" type="text/x-handlebars-template">

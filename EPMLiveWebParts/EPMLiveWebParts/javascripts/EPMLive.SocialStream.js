@@ -74,22 +74,36 @@
                     return date;
                 };
 
+                var _getLongTime = function(time) {
+                    return getLocalTime(time).format('LLLL');
+                };
+
                 var _getUserFriendlyName = function(user) {
-                    if (parseInt(window.epmLive.currentUserId) === user.id) {
-                        return 'You';
-                    } else {
-                        return user.displayName.split(' ')[0];
-                    }
+                    return parseInt(window.epmLive.currentUserId) === user.id ? 'You' : user.displayName;
                 };
 
                 var _getUserProfileUrl = function(user) {
                     return window.epmLive.currentWebUrl + '/_layouts/15/userdisp.aspx?ID=' + user.id;
                 };
 
+                var _sortComments = function(comments) {
+                    if (comments.length) {
+                        comments.sort(function (c1, c2) {
+                            if (c1 && c2) {
+                                return c1.time > c2.time;
+                            }
+
+                            return true;
+                        });
+                    }
+                };
+
                 return {
                     getFriendlyTime: _getFriendlyTime,
+                    getLongTime: _getLongTime,
                     getUserFriendlyName: _getUserFriendlyName,
-                    getUserProfileUrl: _getUserProfileUrl
+                    getUserProfileUrl: _getUserProfileUrl,
+                    sortComments: _sortComments
                 };
             })();
 
@@ -103,8 +117,29 @@
                     }
                 };
 
+                var _showTooltip = function($ele) {
+                    $ele.tooltip('show');
+                };
+
+                var _showOlder = function($ele) {
+                    var kind = $ele.data('kind');
+
+                    var apiUrl = se.apiUrl + '/thread/' + $ele.data('threadid') + '/' + kind + '?offset=' + $ele.data('offset');
+
+                    $ele.parent().find('ul.epm-se-older-' + kind).show();
+                    $ele.remove();
+
+                    $.getJSON(apiUrl).then(function (response) {
+                        if (response.threads[0][kind].length) {
+                            $$.publish('se.older' + kind + 'Loaded', response);
+                        }
+                    });
+                };
+
                 return {
-                    navigate: _navigate
+                    navigate: _navigate,
+                    showTooltip: _showTooltip,
+                    showOlder: _showOlder
                 };
             })();
 
@@ -177,7 +212,10 @@
 
                     thread.hasMoreActivities = thread.totalActivities > se.pagination.activityLimit;
                     thread.hasMoreComments = thread.totalComments > se.pagination.commentLimit;
-                    thread.hasComments = thread.totalComments > 0;                    
+                    thread.hasComments = thread.totalComments > 0;
+
+                    if (thread.activities.length) thread.earliestActivityTime = thread.activities[thread.activities.length - 1].time;
+                    if (thread.comments.length) thread.earliestCommentTime = thread.comments[0].time;
 
                     return thread;
                 }
@@ -188,6 +226,8 @@
                     var $thread = $el.threads.find(selector);
                     
                     if (!$thread.length) {
+                        helpers.sortComments(thread.comments);
+
                         if (thread = build(thread, data)) {
                             $el.threads.append(templates.thread(thread));
                             $$.publish('se.threadRendered', thread, $el.threads.find(selector), data);
@@ -276,7 +316,13 @@
                     renderFirstActivity(thread, $thread, data);
                     renderOlderActivities(thread, $thread, data);
                 };
-                
+
+                var _renderOlder = function(data) {
+                    var thread = data.threads[0];
+                    var $thread = $('li#epm-se-thread-' + thread.id);
+                    renderOlderActivities(thread, $thread, data);
+                };
+
                 var _setIconAndAction = function (activity, thread) {
                     var object = (thread.kind === 'ListItem' ? 'item' : thread.kind).toLowerCase();
                     
@@ -304,19 +350,22 @@
                 
                 var _setTime = function (activity) {
                     activity.friendlyTime = helpers.getFriendlyTime(activity.time);
+                    activity.longTime = helpers.getLongTime(activity.time);
 
                     return activity;
                 };
-                
+
                 return {
                     render: _render,
+                    renderOlder: _renderOlder,
                     setIconAndAction: _setIconAndAction,
                     setUser: _setUser,
                     setTime: _setTime
                 };
             })();
 
-            var commentManager = (function () {
+            var commentManager = (function() {
+
                 function build(comment, thread, data) {
                     comment = activityManager.setIconAndAction(comment, thread);
                     comment = activityManager.setUser(comment, data);
@@ -326,27 +375,41 @@
 
                     return comment;
                 }
-
-                var _render = function(thread, $thread, data) {
+                
+                function renderComments(thread, $thread, data, isOlder) {
+                    helpers.sortComments(thread.comments);
+                    
                     for (var i = 0; i < thread.comments.length; i++) {
                         var comment = thread.comments[i];
-                        
+
                         var selector = 'ul.epm-se-comments li#epm-se-comment-' + comment.id;
                         var $comment = $thread.find(selector);
-                        
+
                         if (!comment.length) {
                             if (comment = build(comment, thread, data)) {
-                                $thread.find('ul.epm-se-comments').append(templates.comment(comment));
+                                $thread.find(isOlder ? 'ul.epm-se-older-comments' : 'ul.epm-se-comments').append(templates.comment(comment));
+
                                 $$.publish('se.commentRendered', comment, $thread.find(selector), data);
                             }
                         } else {
                             $$.publish('se.commentRendered', comment, $comment, data);
                         }
                     }
+                }
+
+                var _render = function(thread, $thread, data) {
+                    renderComments(thread, $thread, data);
                 };
                 
+                var _renderOlder = function (data) {
+                    var thread = data.threads[0];
+                    var $thread = $('li#epm-se-thread-' + thread.id);
+                    renderComments(thread, $thread, data, true);
+                };
+
                 return {
-                    render: _render
+                    render: _render,
+                    renderOlder: _renderOlder
                 };
             })();
 
@@ -395,12 +458,24 @@
                     commentManager.render(thread, $thread, data);
                 });
                 
+                $$.subscribe('se.olderactivitiesLoaded', function (data) {
+                    activityManager.renderOlder(data);
+                });
+                
+                $$.subscribe('se.oldercommentsLoaded', function (data) {
+                    commentManager.renderOlder(data);
+                });
+                
                 $el.root.on('mouseenter', '.epm-se-has-tooltip', function () {
                     actions.showTooltip($(this));
                 });
                 
                 $el.root.on('click', 'a.epm-se-link', function (event) {
                     actions.navigate($(this), event);
+                });
+
+                $el.root.on('click', '.epm-show-older', function() {
+                    actions.showOlder($(this));
                 });
             }
 
