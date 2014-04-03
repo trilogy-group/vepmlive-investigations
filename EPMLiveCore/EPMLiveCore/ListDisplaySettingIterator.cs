@@ -375,7 +375,6 @@ namespace EPMLiveCore
 
             if (isResList)
             {
-                writer.WriteLine("<link rel=\"stylesheet\" href=\"" + base.Web.Url + "/_layouts/15/epmlive/Stylesheets/epmlive.css\" type=\"text/css\" />");
                 writer.WriteLine(" <script>$(document).ready(function () {$(\".imgArrow\").addClass(\"hideImage\"); $(\".upheader\").click(function () {$header = $(this);$arrowImage = $header.find(\".imgArrow\");$downArrowImage = $header.find(\".imgDownArrow\");$content = $header.next();");
                 writer.Write("$content.slideToggle(500,function (){  if ($arrowImage.hasClass(\"hideImage\")) {$downArrowImage.addClass(\"hideImage\");$arrowImage.removeClass(\"hideImage\");$(\"#onetIDListForm\").attr(\"style\",\"width:95%\");}else {$arrowImage.addClass(\"hideImage\");$downArrowImage.removeClass(\"hideImage\");}});});});</script>");
 
