@@ -15,124 +15,98 @@
 </SharePoint:ScriptBlock>
 
 <div id="epm-social-stream">
-    <ul id="epm-se-days"></ul>
+    <ul id="epm-se-threads"></ul>
     <div id="epm-se-no-activity">Get to work! Once you start working in the system, items will appear here in the stream.</div>
     <div id="epm-se-pagination"><span>Loading more...</span></div>
 </div>
 
-<script id="epm-se-day-template" type="text/x-handlebars-template">
-    <li id="epm-se-{{domId}}" class="epm-se-day" data-date="{{id}}">
-        <div class="epm-se-header">
-            <hr />
-            <h1>{{day}}</h1>
-        </div>
-        <ul class="epm-se-threads"></ul>
-    </li>
-</script>
-
 <script id="epm-se-thread-template" type="text/x-handlebars-template">
-    <li id="epm-se-{{id}}" class="epm-se-thread clearfix">
-        {{#if isSingleNonCommentThread}}
-            {{> single-non-comment-thread}}
-        {{else}}
-            {{#if isCommentThread}}
-                {{> comment-thread}}
-            {{else}}
-                {{> general-thread}}
-            {{/if}}
-            <div class="epm-se-show-older" data-threadId="{{id}}" data-action="older"><span class="icon-arrow-down-16"></span>show older activities</div>
-            <ul class="epm-se-older-activities"></ul>
-            <ul class="epm-se-todays-activities"></ul>
-            <div class="epm-se-show-newer" data-threadId="{{id}}" data-action="newer"><span class="icon-arrow-down-16"></span>show newer activities</div>
-            <ul class="epm-se-newer-activities"></ul>
-            <ul class="epm-se-newest-activities"></ul>
+    <li id="epm-se-thread-{{id}}" class="epm-se-thread clearfix">
+        <div class="epm-se-thread-header clearfix">
+            {{> user-avatar}}{{> thread-info}}{{> object-info}}
+        </div>
+        <ul class="epm-se-activities"></ul>
+        <ul class="epm-se-older-activities"></ul>
+        {{#if hasMoreActivities}}
+            <div class="epm-show-older"><span class="icon-arrow-up-16"></span>show older activities</div>
+        {{/if}}
+        {{#if hasComments}}
+            <div class="epm-se-comments">
+                {{#if hasMoreComments}}
+                    <div class="epm-show-older"><span class="icon-arrow-down-16"></span>show older comments</div>
+                {{/if}}
+                <ul class="epm-se-older-comments"></ul>
+                <ul class="epm-se-comments"></ul>
+            </div>
         {{/if}}
     </li>
-    {{> comment-box}}
 </script>
 
 <script id="epm-se-activity-template" type="text/x-handlebars-template">
-    <li id="epm-se-{{id}}" class="epm-se-activity clearfix">
-        {{#if notComment}}
-            <div class="epm-se-activity-icon"><span class="epm-se-activity-icon {{icon}}"></span></div>
-            <div class="epm-se-user-info">{{> user-plain}}&nbsp;</div>
-            <div class="epm-se-activity-text">{{{text}}}</div>
-        {{else}}
-            <div class="epm-se-user-info">{{> avatar}}</div>
-            <div class="epm-se-activity-text">{{> user-plain}}&nbsp;-&nbsp;<span class="epm-se-comment">{{{text}}}</span></div>
-        {{/if}}
-        <div class="epm-se-activity-info">
-            <span class="epm-se-activity-time epm-se-has-tooltip" title="{{longDateTime}}" data-placement="top" data-toggle="tooltip">{{displayTime}}</span>
+    <li id="epm-se-activity-{{id}}" class="epm-se-activity clearfix">
+        {{> activity-icon}}{{> user-info}}{{> activity-info}}{{> activity-time}}
+    </li>
+</script>
+
+<script id="epm-se-comment-template" type="text/x-handlebars-template">
+    <li id="epm-se-comment-{{id}}" class="epm-se-activity clearfix">
+        {{> user-avatar}}
+        <div class="epm-se-comment-details">
+            <div class="epm-se-comment-header">{{> user-info}}{{> activity-time}}</div>
+            <div class="epm-se-comment-text">{{{text}}}</div>
         </div>
     </li>
 </script>
 
-<script id="_epm-se-single-non-comment-thread" type="text/x-handlebars-template">
-    <div class="epm-se-header epm-se-single-non-comment-thread">
-        <div class="epm-se-user-info">{{> avatar}}{{> user}}</div>
-        <div class="epm-se-thread-info">
-            <span class="epm-se-action">{{activity.action}}</span>
-            {{> thread-info}}
-        </div>
-        <div class="epm-se-activity-info">{{> time}}{{> thread-icon}}</div>
-    </div>
-</script>
-
-<script id="_epm-se-comment-thread" type="text/x-handlebars-template">
-    <div class="epm-se-header epm-se-comment-thread">
-        <div class="epm-se-user-info"><a data-url="{{user.url}}" class="epm-se-link-user" href="{{user.url}}" target="_blank">{{user.displayName}}</a></div>
-        <div class="epm-se-thread-info">made a comment...</div>
-        <div class="epm-se-activity-info"><span class="epm-se-thread-icon icon-bubble-12"></span></div>
-    </div>
-</script>
-
-<script id="_epm-se-general-thread" type="text/x-handlebars-template">
-    <div class="epm-se-header epm-se-general-thread">
-        <div class="epm-se-thread-info">{{> thread-info}}</div>
-        <div class="epm-se-activity-info">{{> thread-icon}}</div>
-    </div>
-</script>
-
-<script id="_epm-se-thread-info" type="text/x-handlebars-template">
-    {{#unless web.isCurrentWorkspace}}
-        <a href="{{web.url}}" href="{{web.url}}" target="_blank">{{web.title}}</a>:&nbsp;
-    {{/unless}}
-    <a data-url="{{list.url}}" class="epm-se-link-list" href="{{list.url}}" target="_blank">{{list.name}}</a>
-    {{#unless isBulkOperationThread}}
-        &nbsp;-&nbsp;
-    {{else}}
-        &nbsp;items
-    {{/unless}}
-    <a data-url="{{url}}" class="epm-se-link-item" href="{{url}}" target="_blank"><h2>{{title}}</h2></a>
-</script>
-
-<script id="_epm-se-avatar" type="text/x-handlebars-template">
+<script id="_epm-se-user-avatar-template" type="text/x-handlebars-template">
     <div class="epm-se-user-avatar">
-        {{#if user.avatar}}
-            <img src="{{user.avatar}}" />
+        {{#if user.picture}}
+            <img src="{{user.picture}}" />
         {{/if}}
     </div>
 </script>
 
-<script id="_epm-se-user" type="text/x-handlebars-template">
-    <a data-url="{{user.url}}" class="epm-se-link-user epm-se-has-tooltip" title="{{user.name}}" data-placement="top" data-toggle="tooltip" href="{{user.url}}" target="_blank">{{user.displayName}}</a>
+<script id="_epm-se-thread-info-template" type="text/x-handlebars-template">
+    <div class="epm-se-thread-info clearfix">{{> thread-icon}}{{> thread-title}}</div>
 </script>
 
-<script id="_epm-se-user-plain" type="text/x-handlebars-template">
-    <a data-url="{{user.url}}" class="epm-se-link-user" href="{{user.url}}" target="_blank">{{user.displayName}}</a>
-</script>
-
-<script id="_epm-se-time" type="text/x-handlebars-template">
-    <span class="epm-se-activity-time epm-se-has-tooltip" title="{{activity.longDateTime}}" data-placement="top" data-toggle="tooltip">{{activity.displayTime}}</span>
-</script>
-
-<script id="_epm-se-thread-icon" type="text/x-handlebars-template">
+<script id="_epm-se-thread-icon-template" type="text/x-handlebars-template">
     <span class="epm-se-thread-icon {{icon}}"></span>
 </script>
 
-<script id="_epm-se-comment-box" type="text/x-handlebars-template">
-    <div data-threadId="{{id}}" class="epm-se-comment-box clearfix">
-        <div class="epm-se-comment-input" contenteditable="true"></div>
-        <button id="epm-se-comment-post-{{id}}" class="epm-se-comment-post">Post</button>
-    </div>
+<script id="_epm-se-thread-title-template" type="text/x-handlebars-template">
+    <h2>
+        {{#if url}}
+            <a href="{{url}}" class="epm-se-link" target="_blank" data-kind="{{kind}}">{{title}}</a>
+        {{else}}
+            {{title}}
+        {{/if}}
+    </h2>
+</script>
+
+<script id="_epm-se-activity-icon-template" type="text/x-handlebars-template">
+    <span class="epm-se-activity-icon {{icon}}"></span>
+</script>
+
+<script id="_epm-se-user-info-template" type="text/x-handlebars-template">
+    <span class="epm-se-user-info"><a href="{{user.profileUrl}}" target="_blank" class="epm-se-link">{{user.friendlyName}}</a></span>
+</script>
+
+<script id="_epm-se-activity-info-template" type="text/x-handlebars-template">
+    <span class="epm-se-activity-info">{{action}}</span>
+</script>
+
+<script id="_epm-se-activity-time-template" type="text/x-handlebars-template">
+    <span class="epm-se-activity-time">{{friendlyTime}}</span>
+</script>
+
+<script id="_epm-se-object-info-template" type="text/x-handlebars-template">
+    <span class="epm-se-object-info">
+        {{#if web}}
+            <span class="epm-se-workspace"><a href="{{web.url}}" target="_blank">{{web.title}}</a></span>
+        {{/if}}
+        {{#if list}}
+            <a href="{{list.url}}" target="_blank" class="epm-se-link">{{list.name}}</a>
+        {{/if}}
+    </span>
 </script>
