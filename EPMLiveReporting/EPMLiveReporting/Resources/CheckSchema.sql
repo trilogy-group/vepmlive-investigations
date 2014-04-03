@@ -278,24 +278,22 @@ BEGIN
 	END'
 END
 
----------------SP: fnCheckUserAccess----------------------
+---------------SP: SS_GetLatestThreads----------------------
 
-PRINT 'Creating SP SS_GetActivities'
+PRINT 'Creating SP SS_GetLatestThreads'
 
-IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[SS_GetActivities]') AND type in (N'P', N'PC'))
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[SS_GetLatestThreads]') AND type in (N'P', N'PC'))
 BEGIN
-	DROP PROCEDURE [dbo].[SS_GetActivities]
+	DROP PROCEDURE [dbo].[SS_GetLatestThreads]
 END
 
 EXEC sp_executesql N'
-CREATE PROCEDURE [dbo].[SS_GetActivities] 
-	@UserId		INT,
-	@WebUrl		NVARCHAR(MAX),
-	@MinDate	DATETIME2 = NULL,
-	@MaxDate	DATETIME2 = NULL,
-	@Page		INT = 1,
-	@Limit		INT = 1000000,
-	@ThreadId	UNIQUEIDENTIFIER = NULL
+CREATE PROCEDURE [dbo].[SS_GetLatestThreads] 
+	@UserId INT, 
+	@WebUrl NVARCHAR(MAX),
+	@Page	INT = 1,
+	@Limit	INT = 1000000,
+	@ThreadId UNIQUEIDENTIFIER = NULL
 AS
 BEGIN
 	SET NOCOUNT ON;
@@ -306,45 +304,86 @@ BEGIN
 	SET @End =   (@Page * @Limit + 1)
 	
 	SET @WebUrlSuffix = ''/''
-	
 	IF @WebUrl = ''/'' SET @WebUrlSuffix = ''''
 	
-	IF @MinDate IS NULL SET @MinDate = CAST(''1753-1-1'' AS DATETIME2)
-	IF @MaxDate IS NULL SET @MaxDate = GETDATE()
-		
 	IF @Limit > 1000000 SET @Limit = 1000000;
 	
 	WITH Result AS (
-		SELECT ROW_NUMBER() OVER (ORDER BY dbo.SS_Activities.Date DESC) AS RowNum,
-				dbo.SS_Activities.Id AS ActivityId, dbo.SS_Activities.ActivityKey, dbo.SS_Activities.Data AS ActivityData, dbo.SS_Activities.Kind AS ActivityKind, 
-						dbo.SS_Activities.Date AS ActivityDate, dbo.SS_Activities.MassOperation AS IsMassOperation, dbo.SS_Threads.Id AS ThreadId, dbo.SS_Threads.Title AS ThreadTitle, 
-						dbo.SS_Threads.URL AS ThreadURL, dbo.SS_Threads.Kind AS ThreadKind, dbo.SS_Threads.Deleted AS ThreadDeleted, 
-						dbo.SS_Threads.LastActivityDateTime AS ThreadLastActivityOn, dbo.SS_Threads.FirstActivityDateTime AS ThreadFirstActivityOn, 
-						dbo.SS_Threads.WebId, dbo.RPTWeb.WebTitle, dbo.RPTWeb.WebUrl, dbo.SS_Threads.ListId, 
-						dbo.RPTList.ListName, dbo.ReportListIds.ListIcon AS ListIcon, dbo.SS_Threads.ItemId, dbo.SS_Activities.UserId, 
-						dbo.LSTUserInformationList.Title AS UserDisplayName, dbo.LSTUserInformationList.Name AS UserAccount, dbo.LSTUserInformationList.Picture AS UserPicture, 
-						dbo.fnCheckUserAccess(@UserId, dbo.SS_Threads.WebId, dbo.SS_Threads.ListId, dbo.SS_Threads.ItemId) AS HasAccess
-		FROM	dbo.SS_Activities INNER JOIN
-				dbo.SS_Threads ON dbo.SS_Activities.ThreadId = dbo.SS_Threads.Id INNER JOIN
-						dbo.RPTWeb ON dbo.SS_Threads.WebId = dbo.RPTWeb.WebId INNER JOIN
-						dbo.LSTUserInformationList ON dbo.SS_Activities.UserId = dbo.LSTUserInformationList.ID LEFT OUTER JOIN
-						dbo.ReportListIds ON dbo.SS_Threads.ListId = dbo.ReportListIds.Id LEFT OUTER JOIN
-						dbo.RPTList ON dbo.SS_Threads.ListId = dbo.RPTList.RPTListId
-		WHERE   (NOT (dbo.SS_Threads.ListId IS NOT NULL)) OR (NOT (dbo.RPTList.ListName IS NULL))
-						AND dbo.SS_Threads.Deleted = 0 AND dbo.SS_Activities.Date > @MinDate AND dbo.SS_Activities.Date < @MaxDate 
-						AND (dbo.RPTWeb.WebUrl = @WebUrl OR dbo.RPTWeb.WebUrl LIKE @WebUrl + @WebUrlSuffix + ''%'')
-						AND (dbo.SS_Threads.Id = @ThreadId OR @ThreadId IS NULL)
-	) SELECT TOP (@End - 1) 
-		ActivityId, ActivityKey, ActivityData, ActivityKind, ActivityDate, IsMassOperation, 
-		ThreadId, ThreadTitle, ThreadUrl, ThreadKind, ThreadDeleted, ThreadLastActivityOn, ThreadFirstActivityOn,
-		WebId, WebTitle, WebUrl, ListId, ListName, ListIcon, ItemId, UserId, UserDisplayName, UserAccount, UserPicture
-	FROM Result WHERE HasAccess = 1 AND RowNum > @Start AND RowNum < @End
-	ORDER BY ActivityDate DESC
-
-	SET NOCOUNT OFF;
+		SELECT ROW_NUMBER() OVER (ORDER BY ThreadLastActivityOn DESC) AS RowNum,
+			ThreadId, ThreadTitle, ThreadUrl, ThreadKind, ThreadLastActivityOn, ThreadFirstActivityOn, WebId, WebTitle, WebUrl, ListId, 
+			ListName, ListIcon, ItemId, TotalActivities, TotalComments
+			FROM    (SELECT	dbo.SS_Threads.Id AS ThreadId, dbo.SS_Threads.Title AS ThreadTitle, dbo.SS_Threads.URL AS ThreadUrl, 
+							dbo.SS_Threads.Kind AS ThreadKind, dbo.SS_Threads.LastActivityDateTime AS ThreadLastActivityOn, 
+							dbo.SS_Threads.FirstActivityDateTime AS ThreadFirstActivityOn, dbo.SS_Threads.WebId, dbo.RPTWeb.WebTitle, 
+							dbo.RPTWeb.WebUrl, dbo.SS_Threads.ListId, dbo.RPTList.ListName, dbo.ReportListIds.ListIcon AS ListIcon, 
+							dbo.SS_Threads.ItemId, 
+							(SELECT	COUNT(Id) FROM dbo.SS_Activities WHERE (Kind <> 4) AND (ThreadId = dbo.SS_Threads.Id)) AS TotalActivities,
+                            (SELECT COUNT(Id) FROM dbo.SS_Activities WHERE (Kind = 4) AND (ThreadId = dbo.SS_Threads.Id)) AS TotalComments, 
+							dbo.fnCheckUserAccess(@UserId, dbo.SS_Threads.WebId, dbo.SS_Threads.ListId, dbo.SS_Threads.ItemId) AS HasAccess
+					FROM	dbo.SS_Threads INNER JOIN dbo.RPTWeb ON dbo.SS_Threads.WebId = dbo.RPTWeb.WebId LEFT OUTER JOIN
+							dbo.RPTList ON dbo.SS_Threads.ListId = dbo.RPTList.RPTListId INNER JOIN
+							dbo.ReportListIds ON dbo.SS_Threads.ListId = dbo.ReportListIds.Id
+					WHERE   (dbo.SS_Threads.Deleted = 0) AND (dbo.SS_Threads.Id = @ThreadId OR @ThreadId IS NULL) 
+							AND (dbo.RPTWeb.WebUrl = @WebUrl OR dbo.RPTWeb.WebUrl LIKE @WebUrl + @WebUrlSuffix + ''%'')) AS DT1
+			WHERE   (HasAccess = 1)
+	) SELECT TOP (@End - 1) ThreadId, ThreadTitle, ThreadUrl, ThreadKind, ThreadLastActivityOn, ThreadFirstActivityOn, WebId, WebTitle, 
+							WebUrl, ListId, ListName, ListIcon, ItemId, TotalActivities, TotalComments
+	  FROM Result WHERE RowNum > @Start AND RowNum < @End
+	  ORDER BY ThreadLastActivityOn DESC
 END'
 
+---------------SP: SS_GetLatestActivities----------------------
 
+PRINT 'Creating SP SS_GetLatestActivities'
+
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[SS_GetLatestActivities]') AND type in (N'P', N'PC'))
+BEGIN
+	DROP PROCEDURE [dbo].[SS_GetLatestActivities]
+END
+
+EXEC sp_executesql N'
+CREATE PROCEDURE [dbo].[SS_GetLatestActivities]
+	@UserId INT,
+	@ThreadId UNIQUEIDENTIFIER,
+	@WebId UNIQUEIDENTIFIER,
+	@ListId UNIQUEIDENTIFIER,
+	@ItemId INT,
+	@KindMin INT = 0,
+	@KindMax INT = 100,
+	@Page INT = 1,
+	@Limit INT = 1000000,
+	@Offset DATETIME = NULL
+AS
+BEGIN
+	SET NOCOUNT ON;
+	
+	IF @Offset IS NULL SET @Offset = GETUTCDATE()
+
+	DECLARE @Start INT, @End INT
+	
+	SET @Start = (@Page - 1) * @Limit
+	SET @End =   (@Page * @Limit + 1);
+
+	WITH Result AS (
+		SELECT ROW_NUMBER() OVER (ORDER BY ActivityDate DESC) AS RowNum,
+			ActivityId, ActivityKey, ActivityData, ActivityKind, ActivityDate, ActivityIsMassOperation, ThreadId, 
+			UserId, UserDisplayName, UserName, UserPicture
+			FROM    (SELECT	 dbo.SS_Activities.Id AS ActivityId, dbo.SS_Activities.ActivityKey, dbo.SS_Activities.Data AS ActivityData, 
+                     dbo.SS_Activities.Kind AS ActivityKind, dbo.SS_Activities.Date AS ActivityDate, 
+                     dbo.SS_Activities.MassOperation AS ActivityIsMassOperation, 
+                     dbo.SS_Activities.ThreadId, dbo.SS_Activities.UserId, dbo.LSTUserInformationList.Title AS UserDisplayName, 
+                     dbo.LSTUserInformationList.Name AS UserName, dbo.LSTUserInformationList.Picture AS UserPicture, 
+                     dbo.fnCheckUserAccess(@UserId, @WebId, @ListId, @ItemId) AS HasAccess
+            FROM	 dbo.SS_Activities INNER JOIN dbo.LSTUserInformationList ON dbo.SS_Activities.UserId = dbo.LSTUserInformationList.ID
+            WHERE	 dbo.SS_Activities.ThreadId = @ThreadId AND dbo.SS_Activities.Date < @Offset AND
+					 dbo.SS_Activities.Kind >= @KindMin AND dbo.SS_Activities.Kind <= @KindMax) 
+					 AS DT1
+			WHERE   (HasAccess = 1)
+	) SELECT TOP (@End - 1) ActivityId, ActivityKey, ActivityData, ActivityKind, ActivityDate, ActivityIsMassOperation, ThreadId, 
+							UserId, UserDisplayName, UserName, UserPicture
+	  FROM Result WHERE RowNum > @Start AND RowNum < @End
+	  ORDER BY ActivityDate DESC
+END'
 
 ---------------SP: spGetWorkspaces----------------------
 
