@@ -1134,8 +1134,8 @@ overflow:hidden; width:0px; height:0px; }
 .GMMenuCheckedRadioRight { background:url(Menu.gif) no-repeat right -751px; padding-right:17px; }
 .GMMenuUncheckedRadioLeft { background:url(Menu.gif) no-repeat -2px -701px; padding-left:17px; }
 .GMMenuUncheckedRadioRight { background:url(Menu.gif) no-repeat right -701px; padding-right:17px; }
-.GMMenuCursorIcon { background:url(Menu.gif) no-repeat -6px -150px;display:none; }
-.GMMenuHoverIcon { background:url(Menu.gif) no-repeat -6px -100px; }   
+.GMMenuCursorIcon { background:none; }
+.GMMenuHoverIcon { background:none; }   
 .GMMenuCursorIconRtl { background:url(Menu.gif) no-repeat right -1000px; }
 .GMMenuHoverIconRtl { background:url(Menu.gif) no-repeat right -950px; }   
 .GMMenuExpandedIcon { background:url(Menu.gif) no-repeat -6px -200px; }
@@ -1143,7 +1143,7 @@ overflow:hidden; width:0px; height:0px; }
 .GMMenuNextIcon { background:url(Menu.gif) no-repeat right -300px; padding-right:10px; }
 .GMMenuNextIconRtl { background:url(Menu.gif) no-repeat left -900px; padding-left:10px; }
 
-.GMMenuItemText,.GMMenuItemIcon,.GMMenuEnum,.GMMenuEnumHeader,.GMMenuEdit { font:11px "Open Sans Regular",Arial; white-space:nowrap; }
+.GMMenuItemText,.GMMenuItemIcon,.GMMenuEnum,.GMMenuEnumHeader,.GMMenuEdit { font:12px "Open Sans Regular",Arial; white-space:nowrap; }
 .GMMenuItemDisabled { opacity:0.50; filter:alpha(opacity=30); overflow:hidden; }
 .GMMenuLevel { color:blue; text-align:center; }  
 .GMMenuEnumParent,.GMMenuEditParent { padding-left:5px; padding-right:2px;}
@@ -1170,19 +1170,20 @@ overflow:hidden; width:0px; height:0px; }
 .GMMenuEditText { }
 .GMMenuEditMulti { white-space:normal; }
 
-.GMMenuItem { padding-top:2px; padding-bottom:2px; padding-left:2px; padding-right:2px; background:white; }   
+.GMMenuItem { padding:4px; background:white; }   
 .GMMenuItemHover {
-   margin-left:1px; margin-right:1px; padding-top:4px; padding-bottom:4px; 
+    padding:4px;
    background:#0090CA; border:1px solid #0090CA;
+   color:#ffffff;
    }
 .GMMenuFocus {
-   margin-left:1px; margin-right:1px; padding-top:4px; padding-bottom:4px;
+   padding:4px;
    border:1px solid #ffffff;
    background:none;
    }
 .GMMenuFocusHover {
-   margin-left:1px; margin-right:1px; padding-top:4px; padding-bottom:4px;
-   background:#0090CA; border:1px solid #0090CA;
+   padding:4px;
+   background:#0090CA; border:1px solid #0090CA;color:#ffffff;
    }
 .GMMenuSeparator {
    margin-top:1px; margin-right:3px; margin-left:3px; height:1px;   
