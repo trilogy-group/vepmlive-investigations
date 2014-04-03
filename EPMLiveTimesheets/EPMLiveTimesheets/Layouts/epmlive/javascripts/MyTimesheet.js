@@ -525,13 +525,33 @@ function parseXml(xml) {
     }
 
     return dom;
-}
+}*/
 function responseIsSuccess(response) {
     return response.Result["@Status"] == 0;
 }
-*/
+
 function parseJson(response) {
     return eval('(' + xml2json(parseXml(response), "") + ')');
+}
+function parseXml(xml) {
+    var dom = null;
+    if (window.DOMParser) {
+        try {
+            dom = (new DOMParser()).parseFromString(xml, "text/xml");
+        } catch (e) {
+            dom = null;
+        }
+    } else if (window.ActiveXObject) {
+        try {
+            dom = new ActiveXObject('Microsoft.XMLDOM');
+            dom.async = false;
+            dom.loadXML(xml);
+        } catch (e) {
+            dom = null;
+        }
+    }
+
+    return dom;
 }
 Grids.OnAfterSave = function (grid, result, autoupdate) {
     if (grid.id.substr(0, 2) == "TS") {
