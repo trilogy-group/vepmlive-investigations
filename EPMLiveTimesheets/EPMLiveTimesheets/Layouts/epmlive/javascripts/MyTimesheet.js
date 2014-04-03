@@ -2038,8 +2038,10 @@ function ShowApprovalNotification() {
         if (oResp.ApprovalNotification.Status == "0" && oResp.ApprovalNotification.Text != "0") {
             if (updateStatusBox)
                 SP.UI.Status.updateStatus(updateStatusBox, 'You have ' + oResp.ApprovalNotification.Text + ' timesheet(s) pending for approval <a href=\'#\' onclick=\'Javascript:DoTmAprrovals();\'>[Timesheet Manager]</a>');
-            else
+            else {
                 updateStatusBox = SP.UI.Status.addStatus('Notification:', 'You have ' + oResp.ApprovalNotification.Text + ' timesheet(s) pending for approval <a href=\'#\' onclick=\'Javascript:DoTmAprrovals();\'>[Timesheet Manager]</a>', true);
+                SP.UI.Status.setStatusPriColor(updateStatusBox, 'blue');
+            }
         } else if (oResp.ApprovalNotification.Text != "0") {
             SP.UI.Status.removeStatus(updateStatusBox);
         }
