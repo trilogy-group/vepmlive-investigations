@@ -11,6 +11,7 @@ using EPMLiveCore.Infrastructure;
 using EPMLiveCore.SSRS2006;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.Utilities;
+using System.Xml;
 
 namespace EPMLiveReportsAdmin.API
 {
@@ -63,7 +64,7 @@ namespace EPMLiveReportsAdmin.API
 
                 try
                 {
-                    spDocumentLibrary = (SPDocumentLibrary) Web.Lists["Report Library"];
+                    spDocumentLibrary = (SPDocumentLibrary)Web.Lists["Report Library"];
                 }
                 catch (Exception)
                 {
@@ -83,7 +84,42 @@ namespace EPMLiveReportsAdmin.API
             }
             catch (Exception exception)
             {
-                throw new APIException((int) Errors.GetAllReports, exception.GetBaseException().Message);
+                throw new APIException((int)Errors.GetAllReports, exception.GetBaseException().Message);
+            }
+        }
+
+        public string GetReportsByFolder(string data)
+        {
+            try
+            {
+                XmlDocument dataDoc = new XmlDocument();
+                dataDoc.LoadXml(data);
+                string folderName = dataDoc.GetElementsByTagName("Folder")[0].InnerText;
+                var dataElement = new XElement("Data");
+                SPDocumentLibrary spDocumentLibrary;
+                try
+                {
+                    spDocumentLibrary = (SPDocumentLibrary)Web.Lists["Report Library"];
+
+                    SPFolder spFolder = (from SPListItem spListItem in spDocumentLibrary.Folders where spListItem.Folder.Url.Equals(folderName) select spListItem.Folder).FirstOrDefault();
+
+                    if (spFolder != null)
+                        BuildReportTree(spFolder, spDocumentLibrary, ref dataElement);
+                }
+                catch (Exception)
+                {
+                    throw new Exception("Document Library 'Report Library' does not exist.");
+                }
+
+                return new XElement("GetReportsByFolder", new XElement("Params"), dataElement).ToString();
+            }
+            catch (APIException)
+            {
+                throw;
+            }
+            catch (Exception exception)
+            {
+                throw new APIException((int)Errors.GetAllReports, exception.GetBaseException().Message);
             }
         }
 
@@ -203,6 +239,43 @@ namespace EPMLiveReportsAdmin.API
             parentElement.Add(xElement);
         }
 
+        private void BuildReportTree(SPFolder spFolder, SPDocumentLibrary spDocumentLibrary, ref XElement parentElement)
+        {
+            var xElement = new XElement("Folder", new XAttribute("Name", spFolder.Name));
+            foreach (SPListItem spListItem in spDocumentLibrary.GetItemsInFolder(spDocumentLibrary.DefaultView, spFolder))
+            {
+                if (spListItem.FileSystemObjectType == SPFileSystemObjectType.Folder)
+                {
+                    BuildReportTree(spListItem.Folder, spDocumentLibrary, ref xElement);
+                }
+                else if (spListItem.FileSystemObjectType == SPFileSystemObjectType.File && spListItem.File.Name.ToLower().EndsWith(".rdl"))
+                {
+                    SPFile spFile = spListItem.File;
+                    string name = spFile.Name;
+
+                    string url = string.Empty;
+                    string hasResourcesParam = string.Empty;
+
+                    try
+                    {
+                        var web = SPContext.Current.Web.Site.RootWeb;
+                        var sServerReelativeUrl = (web.ServerRelativeUrl == "/") ? "" : web.ServerRelativeUrl;
+
+                        url = sServerReelativeUrl + "/_layouts/epmlive/SSRSReportRedirect.aspx?weburl=" + HttpUtility.UrlEncode(Web.Url) +
+                             "&itemurl=" + HttpUtility.UrlEncode(spListItem.Url);
+                    }
+                    catch (Exception ex) { }
+
+                    var element = new XElement("Report", new XAttribute("Name", name.Substring(0, name.Length - 4)),
+                        new XAttribute("Url", url),
+                        new XAttribute("HasResourcesParam", hasResourcesParam));
+
+                    xElement.Add(element);
+                }
+            }
+            parentElement.Add(xElement);
+        }
+
         /// <summary>
         ///     Configures the reporting service.
         /// </summary>
@@ -215,13 +288,13 @@ namespace EPMLiveReportsAdmin.API
 
             if (!ssrsIntegrated)
             {
-                throw new APIException((int) Errors.GetAllReportsNotIntegrated,
+                throw new APIException((int)Errors.GetAllReportsNotIntegrated,
                     "Reporting API only supports Integrated SSRS setup.");
             }
 
             if (string.IsNullOrEmpty(reportingServiceUrl))
             {
-                throw new APIException((int) Errors.GetAllReportsNoRSUrl, "ReportingServicesURL has not been set.");
+                throw new APIException((int)Errors.GetAllReportsNoRSUrl, "ReportingServicesURL has not been set.");
             }
 
             string reportingServiceUsername = string.Empty;

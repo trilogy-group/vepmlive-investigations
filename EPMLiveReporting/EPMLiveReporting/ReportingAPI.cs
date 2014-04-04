@@ -35,6 +35,25 @@ namespace EPMLiveReportsAdmin
             }
         }
 
+        public string GetReportsByFolder(string data, SPWeb spWeb)
+        {
+            try
+            {
+                string allReports;
+
+                using (var reportManager = new ReportManager(spWeb))
+                {
+                    allReports = reportManager.GetReportsByFolder(data);
+                }
+
+                return Response.Success(allReports);
+            }
+            catch (APIException ex)
+            {
+                return Response.Failure(ex.ExceptionNumber, string.Format("Error: {0}", ex.Message));
+            }
+        }
+
         /// <summary>
         ///     Gets my work data.
         /// </summary>
