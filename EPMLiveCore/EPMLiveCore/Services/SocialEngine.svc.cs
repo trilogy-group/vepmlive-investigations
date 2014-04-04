@@ -235,6 +235,9 @@ namespace EPMLiveCore.Services
             var totalActivities = (int) tr["TotalActivities"];
             var totalComments = (int) tr["TotalComments"];
 
+            var threadKind = (ObjectKind) tr["ThreadKind"];
+            var ignoreAccess = threadKind == ObjectKind.StatusUpdate;
+
             if (!string.IsNullOrEmpty(kind))
             {
                 kind = kind.ToLower();
@@ -242,24 +245,24 @@ namespace EPMLiveCore.Services
                 if (kind.Equals("activities"))
                 {
                     activityRows =
-                        GetThreadActivities(manager, userId, 0, 3, activityLimit, tr, offset).AsEnumerable().ToList();
+                        GetThreadActivities(manager, userId, 0, 3, activityLimit, tr, offset, ignoreAccess).AsEnumerable().ToList();
                 }
                 else if (kind.Equals("comments"))
                 {
                     commentRows =
-                        GetThreadActivities(manager, userId, 4, 4, commentLimit, tr, offset).AsEnumerable().ToList();
+                        GetThreadActivities(manager, userId, 4, 4, commentLimit, tr, offset, ignoreAccess).AsEnumerable().ToList();
                 }
             }
             else
             {
                 if (totalActivities > 0)
                 {
-                    activityRows = GetThreadActivities(manager, userId, 0, 3, activityLimit, tr, null).AsEnumerable().ToList();
+                    activityRows = GetThreadActivities(manager, userId, 0, 3, activityLimit, tr, null, ignoreAccess).AsEnumerable().ToList();
                 }
 
                 if (totalComments > 0)
                 {
-                    commentRows = GetThreadActivities(manager, userId, 4, 4, commentLimit, tr, null).AsEnumerable().ToList();
+                    commentRows = GetThreadActivities(manager, userId, 4, 4, commentLimit, tr, null, ignoreAccess).AsEnumerable().ToList();
                 }
             }
 
@@ -364,8 +367,7 @@ namespace EPMLiveCore.Services
             SortThreadActivities(activities);
         }
 
-        private DataTable GetThreadActivities(DBConnectionManager manager, int userId, int kindMin, int kindMax,
-            int activityLimit, DataRow tr, DateTime? offset)
+        private DataTable GetThreadActivities(DBConnectionManager manager, int userId, int kindMin, int kindMax, int activityLimit, DataRow tr, DateTime? offset, bool ignoreAccess)
         {
             var dataTable = new DataTable();
 
@@ -382,6 +384,7 @@ namespace EPMLiveCore.Services
                     sqlCommand.Parameters.AddWithValue("@ItemId", tr["ItemId"]);
                     sqlCommand.Parameters.AddWithValue("@KindMin", kindMin);
                     sqlCommand.Parameters.AddWithValue("@KindMax", kindMax);
+                    sqlCommand.Parameters.AddWithValue("@IgnoreAccess", ignoreAccess);
                     if (activityLimit > 0) sqlCommand.Parameters.AddWithValue("@Limit", activityLimit);
                     if (offset.HasValue) sqlCommand.Parameters.AddWithValue("@Offset", offset.Value);
 

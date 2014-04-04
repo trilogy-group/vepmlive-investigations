@@ -36,7 +36,8 @@
                 content: $(document.getElementById('s4-workspace')),
                 pagination: $('#epm-social-stream div#epm-se-pagination span'),
                 noActivity: $('#epm-social-stream div#epm-se-no-activity'),
-                threads: $('#epm-social-stream ul#epm-se-threads')
+                threads: $('#epm-social-stream ul#epm-se-threads'),
+                statusUpdateBox: $('#epm-social-stream div#epm-se-status-update-box'),
             };
 
             var templates = {
@@ -198,7 +199,6 @@
             })();
 
             var threadManager = (function() {
-
                 function build(thread, data) {
                     var baseTime = '1986-11-06T13:03:00';
 
@@ -232,6 +232,8 @@
 
                     if (thread.kind === 'Workspace') {
                         thread.icon = 'icon-tree-2';
+                    } else if (thread.kind==='StatusUpdate') {
+                        thread.icon = 'icon-bubble-12';
                     } else {
                         thread.list = entityManager.getById(thread.listId, data.lists);
                         thread.list.icon = thread.list.icon || 'icon-square';
@@ -251,6 +253,8 @@
                     if (thread.activities.length) thread.earliestActivityTime = thread.activities[thread.activities.length - 1].time;
                     if (thread.comments.length) thread.earliestCommentTime = thread.comments[0].time;
 
+                    thread.title = $('<div/>').html($('<div/>').html(thread.title).text()).text();
+
                     return thread;
                 }
 
@@ -263,7 +267,8 @@
                         helpers.sortComments(thread.comments);
 
                         if (thread = build(thread, data)) {
-                            $el.threads.append(templates.thread(thread));
+                            if (data.statusUpdate) $el.threads.prepend(templates.thread(thread));
+                            else $el.threads.append(templates.thread(thread));
                             $$.publish('se.threadRendered', thread, $el.threads.find(selector), data);
                         }
                     } else {
@@ -317,10 +322,7 @@
                     if (!$activity.length) {
                         if (activity = buildFirstActivity(activity, thread, data)) {
                             $thread.find('ul.epm-se-activities').append(templates.activity(activity));
-                            $$.publish('se.firstActivityRendered', activity, $thread.find(selector), data);
                         }
-                    } else {
-                        $$.publish('se.firstActivityRendered', activity, $activity, data);
                     }
                 }
 
@@ -338,10 +340,7 @@
                             if (!$activity.length) {
                                 if (activity = build(activity, thread, data)) {
                                     $thread.find('ul.epm-se-older-activities').append(templates.activity(activity));
-                                    $$.publish('se.olderActivityRendered', activity, $thread.find(selector), data);
                                 }
-                            } else {
-                                $$.publish('se.olderActivityRendered', activity, $activity, data);
                             }
                         }
                     }
@@ -359,17 +358,22 @@
                 };
 
                 var _setIconAndAction = function(activity, thread) {
-                    var object = (thread.kind === 'ListItem' ? 'item' : thread.kind).toLowerCase();
-
-                    switch (activity.kind) {
-                    case 'Created':
-                        activity.icon = 'icon-plus-2';
-                        activity.action = 'created this ' + object;
-                        break;
-                    case 'Updated':
-                        activity.icon = 'icon-pencil';
-                        activity.action = 'made an update';
-                        break;
+                    if (thread.kind === 'StatusUpdate') {
+                        activity.icon = 'icon-bubble-12';
+                        activity.action = 'made a comment';
+                    } else {
+                        var object = (thread.kind === 'ListItem' ? 'item' : thread.kind).toLowerCase();
+                        
+                        switch (activity.kind) {
+                            case 'Created':
+                                activity.icon = 'icon-plus-2';
+                                activity.action = 'created this ' + object;
+                                break;
+                            case 'Updated':
+                                activity.icon = 'icon-pencil';
+                                activity.action = 'made an update';
+                                break;
+                        }
                     }
 
                     return activity;
@@ -419,14 +423,10 @@
                         var selector = 'ul.epm-se-comments li#epm-se-comment-' + comment.id;
                         var $comment = $thread.find(selector);
 
-                        if (!comment.length) {
+                        if (!$comment.length) {
                             if (comment = build(comment, thread, data)) {
                                 $thread.find(isOlder ? 'ul.epm-se-older-comments' : 'ul.epm-se-comments').append(templates.comment(comment));
-
-                                $$.publish('se.commentRendered', comment, $thread.find(selector), data);
                             }
-                        } else {
-                            $$.publish('se.commentRendered', comment, $comment, data);
                         }
                     }
                 }
@@ -462,19 +462,36 @@
                         }
                     };
                     
-                    data.$thread.find(se.ui.selectors.latestComments).append(templates.comment(comment));
-                    data.$thread.find(se.ui.selectors.comments).removeClass(se.ui.classes.hidden);
+                    if (data.$thread) {
+                        data.$thread.find(se.ui.selectors.latestComments).append(templates.comment(comment));
+                        data.$thread.find(se.ui.selectors.comments).removeClass(se.ui.classes.hidden);
+                    }
                 }
 
                 function postComment(data) {
+                    var itemId = 0;
+                    var listId = null;
+                    
+                    if (data.thread) {
+                        itemId = data.thread.itemId;
+                    }
+
+                    if (itemId !== 0) {
+                        listId = data.thread.listId;
+                    } else {
+                        itemId = null;
+                    }
+
                     $.post(se.commentServiceUrl, {
                         command: 'CreateComment',
                         comment: data.text,
                         newcomment: null,
-                        itemId: data.thread.itemId,
-                        listId: data.thread.list.id,
+                        itemId: itemId,
+                        listId: listId,
                         userId: window.epmLive.currentUserId,
-                        commentItemId: data.thread.itemId
+                        commentItemId: itemId,
+                        kind: data.thread.kind,
+                        suid: data.thread.activities[0].key
                     }).then(function(response) {
                         console.log(response);
                     });
@@ -578,6 +595,11 @@
                 _.registerPartial('activity-time', templates._activityTime);
                 _.registerPartial('object-info', templates._objectInfo);
                 _.registerPartial('comment-box', templates._commentBox);
+                
+                commentManager.configureBox({
+                    element: $el.statusUpdateBox,
+                    placeholder: 'Share something...'
+                });
             }
 
             function render(data) {

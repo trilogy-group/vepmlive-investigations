@@ -31,7 +31,8 @@ namespace EPMLiveCore.SocialEngine.Core
     {
         Workspace,
         List,
-        ListItem
+        ListItem,
+        StatusUpdate
     }
 
     [Flags]

@@ -17,6 +17,8 @@ namespace EPMLiveCore
         string _comment;
         string _newComment;
         string _commentItemId;
+        private bool _statusUpdate;
+        private string _statusUpdateId;
         #endregion
 
         private void CreateComment()
@@ -28,6 +30,8 @@ namespace EPMLiveCore
                              "<Param key=\"ListId\">" + _listId.ToString("D") + "</Param>" +
                              "<Param key=\"ItemId\">" + _itemId + "</Param>" +
                              "<Param key=\"Comment\"><![CDATA[" + _comment + "]]></Param>" +
+                             "<Param key=\"StatusUpdate\"><![CDATA[" + _statusUpdate + "]]></Param>" +
+                             "<Param key=\"StatusUpdateId\"><![CDATA[" + _statusUpdateId + "]]></Param>" +
                              "</Data>";
 
             string svcCallResult = string.Empty;
@@ -52,6 +56,8 @@ namespace EPMLiveCore
                              "<Param key=\"ItemId\">" + _itemId + "</Param>" +
                              "<Param key=\"CommentItemId\">" + _commentItemId + "</Param>" +
                              "<Param key=\"Comment\"><![CDATA[" + _newComment + "]]></Param>" +
+                             "<Param key=\"StatusUpdate\"><![CDATA[" + _statusUpdate + "]]></Param>" +
+                             "<Param key=\"StatusUpdateId\"><![CDATA[" + _statusUpdateId + "]]></Param>" +
                              "</Data>";
 
             string svcCallResult = string.Empty;
@@ -78,6 +84,8 @@ namespace EPMLiveCore
                              "<Param key=\"ListId\">" + _listId.ToString("D") + "</Param>" +
                              "<Param key=\"ItemId\">" + _itemId + "</Param>" +
                              "<Param key=\"CommentItemId\">" + _commentItemId + "</Param>" +
+                             "<Param key=\"StatusUpdate\"><![CDATA[" + _statusUpdate + "]]></Param>" +
+                             "<Param key=\"StatusUpdateId\"><![CDATA[" + _statusUpdateId + "]]></Param>" +
                              "</Data>";
 
             string svcCallResult = string.Empty;
@@ -105,6 +113,8 @@ namespace EPMLiveCore
                              "<Param key=\"ListId\">" + _listId.ToString("D") + "</Param>" +
                              "<Param key=\"ItemId\">" + _itemId + "</Param>" +
                              "<Param key=\"CommentItemId\">" + _commentItemId + "</Param>" +
+                             "<Param key=\"StatusUpdate\"><![CDATA[" + _statusUpdate + "]]></Param>" +
+                             "<Param key=\"StatusUpdateId\"><![CDATA[" + _statusUpdateId + "]]></Param>" +
                              "</Data>";
 
             string svcCallResult = string.Empty;
@@ -141,6 +151,12 @@ namespace EPMLiveCore
 
             s = Request["userId"];
             _userId = !string.IsNullOrEmpty(s) ? s : string.Empty;
+
+            s = Request["kind"];
+            _statusUpdate = (s ?? string.Empty).ToLower().Equals("statusupdate");
+
+            s = Request["suid"];
+            _statusUpdateId = !string.IsNullOrEmpty(s) ? s : string.Empty;
 
             if (!string.IsNullOrEmpty(Request["listId"]))
             {

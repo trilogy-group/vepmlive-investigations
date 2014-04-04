@@ -11,11 +11,15 @@ namespace EPMLiveWebParts.CONTROLTEMPLATES
 {
     public partial class SocialStream : UserControl
     {
-        #region Properties (1) 
+        #region Properties (4) 
+
+        public string CurrentUserAvatar { get; private set; }
+
+        public string CurrentUserDisplayName { get; private set; }
 
         public string CurrentUserTimeZone { get; private set; }
-        public string CurrentUserDisplayName { get; private set; }
-        public string CurrentUserAvatar { get; private set; }
+
+        public Guid SEID { get; private set; }
 
         #endregion Properties 
 
@@ -34,6 +38,8 @@ namespace EPMLiveWebParts.CONTROLTEMPLATES
             SPContext context = SPContext.Current;
             SPWeb web = context.Web;
 
+            SEID = Guid.NewGuid();
+
             string layoutPath = web.SafeServerRelativeUrl() + "/_layouts/15/epmlive/";
 
             SPPageContentManager.RegisterStyleFile(layoutPath + "stylesheets/SocialStream.min.css");
@@ -50,7 +56,8 @@ namespace EPMLiveWebParts.CONTROLTEMPLATES
 
             try
             {
-                var picture = (string) (web.SiteUserInfoList.Items.GetItemById(web.CurrentUser.ID)["Picture"] ?? string.Empty);
+                var picture =
+                    (string) (web.SiteUserInfoList.Items.GetItemById(web.CurrentUser.ID)["Picture"] ?? string.Empty);
                 CurrentUserAvatar = string.IsNullOrEmpty(picture) ? string.Empty : picture.Split(',')[0].Trim();
             }
             catch { }
@@ -63,7 +70,7 @@ namespace EPMLiveWebParts.CONTROLTEMPLATES
             try
             {
                 SPTimeZone spTimeZone = (web.CurrentUser.RegionalSettings ?? context.RegionalSettings).TimeZone;
-                var spTzName = spTimeZone.Description.Replace(" and ", " & ");
+                string spTzName = spTimeZone.Description.Replace(" and ", " & ");
 
                 TimeZoneInfo timeZone = (from tz in TimeZoneInfo.GetSystemTimeZones()
                     let tzName = tz.DisplayName.Replace(" and ", " & ")

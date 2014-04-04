@@ -354,18 +354,22 @@ namespace EPMLiveCore.SocialEngine.Core
         {
             thread.Id = Guid.NewGuid();
 
-            const string SQL =
-                @"INSERT INTO SS_Threads (Id, Title, URL, Kind, FirstActivityDateTime, WebId, ListId, ItemId) 
-                                    VALUES (@Id, @Title, @URL, @Kind, @FirstActivityDateTime, @WebId, @ListId, @ItemId)";
+            var sql = @"INSERT INTO SS_Threads (Id, Title, URL, Kind, FirstActivityDateTime, WebId, ListId, ItemId) 
+                        VALUES (@Id, @Title, @URL, @Kind, @FirstActivityDateTime, @WebId, @ListId, @ItemId)";
 
-            using (SqlCommand sqlCommand = GetSqlCommand(SQL))
+            if (string.IsNullOrEmpty(thread.Url))
+            {
+                sql = sql.Replace(", URL", string.Empty).Replace("@URL, ", string.Empty);
+            }
+
+            using (SqlCommand sqlCommand = GetSqlCommand(sql))
             {
                 sqlCommand.Parameters.AddWithValue("@Id", thread.Id);
                 sqlCommand.Parameters.AddWithValue("@Title", thread.Title);
-                sqlCommand.Parameters.AddWithValue("@URL", thread.Url);
                 sqlCommand.Parameters.AddWithValue("@Kind", thread.Kind);
                 sqlCommand.Parameters.AddWithValue("@FirstActivityDateTime", thread.FirstActivityDateTime);
                 sqlCommand.Parameters.AddWithValue("@WebId", thread.WebId);
+                if (!string.IsNullOrEmpty(thread.Url)) sqlCommand.Parameters.AddWithValue("@URL", thread.Url);
                 sqlCommand.Parameters.AddWithValue("@ListId",
                     thread.ListId.HasValue ? (object) thread.ListId : DBNull.Value);
                 sqlCommand.Parameters.AddWithValue("@ItemId",
@@ -412,13 +416,18 @@ namespace EPMLiveCore.SocialEngine.Core
 
         private Thread UpdateThread(Thread thread)
         {
-            const string SQL = @"UPDATE SS_Threads SET Title = @Title, URL = @URL WHERE Id = @Id";
+            var sql = @"UPDATE SS_Threads SET Title = @Title, URL = @URL WHERE Id = @Id";
 
-            using (SqlCommand sqlCommand = GetSqlCommand(SQL))
+            if (string.IsNullOrEmpty(sql))
+            {
+                sql = sql.Replace(", URL = @URL", string.Empty);
+            }
+
+            using (SqlCommand sqlCommand = GetSqlCommand(sql))
             {
                 sqlCommand.Parameters.AddWithValue("@Id", thread.Id);
                 sqlCommand.Parameters.AddWithValue("@Title", thread.Title);
-                sqlCommand.Parameters.AddWithValue("@URL", thread.Url);
+                if (!string.IsNullOrEmpty(thread.Url)) sqlCommand.Parameters.AddWithValue("@URL", thread.Url);
 
                 sqlCommand.ExecuteNonQuery();
             }

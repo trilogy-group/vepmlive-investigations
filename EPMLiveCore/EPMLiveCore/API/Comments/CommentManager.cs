@@ -79,6 +79,9 @@ namespace EPMLiveCore.API
                 SPListItem currentItem = commentsList.Items.Add();
 
                 var time = GetCurrentLocalTime();
+                bool statusUpdate;
+                bool.TryParse(dataMgr.GetPropVal("StatusUpdate"), out statusUpdate);
+                var statusUpdateId = dataMgr.GetPropVal("StatusUpdateId");
 
                 string genericTitle = cWeb.CurrentUser.Name + " made a new comment at " + time.ToString();
                 currentItem[commentsList.Fields.GetFieldByInternalName("Title").Id] = genericTitle;
@@ -213,8 +216,23 @@ namespace EPMLiveCore.API
                 {
                     try
                     {
-                        SyncToSocialStream(currentItem.UniqueId, comment, originListItem.ParentList.ID, originListItem.ID, originListItem.Title,
-                            originListItem.ParentList.Title, originListItem.Url, laCommenters, time, cWeb, "ADD");
+                        if (!statusUpdate)
+                        {
+                            SyncToSocialStream(currentItem.UniqueId, comment, originListItem.ParentList.ID,
+                                originListItem.ID, originListItem.Title,
+                                originListItem.ParentList.Title, originListItem.Url, laCommenters, time, cWeb, "ADD");
+                        }
+                        else
+                        {
+                            var sId = new Guid(statusUpdateId);
+
+                            var statusItem = currentItem.ParentList.GetItemByUniqueId(sId);
+
+                            SyncStatusUpdateToSocialStream(sId, comment,
+                                new Guid(currentItem["ListId"].ToString()),
+                                int.Parse(currentItem["ItemId"].ToString()), (DateTime) statusItem["Created"], cWeb,
+                                "COMMENT", (DateTime?) currentItem["Created"], currentItem.UniqueId);
+                        }
                     }
                     catch { }
                 }
@@ -253,6 +271,34 @@ namespace EPMLiveCore.API
                     {"SiteId", spWeb.Site.ID},
                     {"UserId", spWeb.CurrentUser.ID},
                     {"ActivityTime", time}
+                }, spWeb);
+        }
+
+        private static void SyncStatusUpdateToSocialStream(Guid id, string status, Guid listId, int itemId,
+            DateTime time, SPWeb spWeb, string operation, DateTime? commentTime = null, Guid? commentId = null)
+        {
+            var wId = spWeb.ID;
+
+            ActivityKind activityKind;
+
+            if (operation.Equals("ADD")) activityKind = ActivityKind.Created;
+            else if (operation.Equals("UPDATE")) activityKind = ActivityKind.Updated;
+            else if (operation.Equals("COMMENT")) activityKind = ActivityKind.CommentAdded;
+            else return;
+
+            SocialEngine.SocialEngine.Current.ProcessActivity(ObjectKind.StatusUpdate, activityKind,
+                new Dictionary<string, object>
+                {
+                    {"Id", id},
+                    {"Status", status},
+                    {"Comment", status},
+                    {"ItemId", itemId},
+                    {"ListId", listId},
+                    {"WebId", wId},
+                    {"UserId", spWeb.CurrentUser.ID},
+                    {"ActivityTime", time},
+                    {"CommentTime", commentTime},
+                    {"CommentId", commentId}
                 }, spWeb);
         }
 
@@ -297,7 +343,9 @@ namespace EPMLiveCore.API
                 currentItem[commentsList.Fields.GetFieldByInternalName("Title").Id] = genericTitle;
                 currentItem[commentsList.Fields.GetFieldByInternalName("ListId").Id] = dataMgr.GetPropVal("ListId");
                 currentItem[commentsList.Fields.GetFieldByInternalName("ItemId").Id] = dataMgr.GetPropVal("ItemId");
-                currentItem[commentsList.Fields.GetFieldByInternalName("Comment").Id] = dataMgr.GetPropVal("Comment");
+                var comment = dataMgr.GetPropVal("Comment");
+
+                currentItem[commentsList.Fields.GetFieldByInternalName("Comment").Id] = comment;
                 //currentItem[commentsList.Fields.GetFieldByInternalName("Comment").Id] = Uri.UnescapeDataString(dataMgr.GetPropVal("Comment"));
                 SetSocialEngineTransaction(currentItem);
                 currentItem.Update();
@@ -309,7 +357,7 @@ namespace EPMLiveCore.API
                                                          .Replace("##itemId##", currentItem.ID.ToString())
                                                          .Replace("##itemTitle##", currentItem.Title)
                                                          .Replace("##createdDate##", ((DateTime)currentItem["Created"]).ToFriendlyDateAndTime())
-                                                         .Replace("##comment##", GetXMLSafeVersion((string)(HttpUtility.HtmlDecode(dataMgr.GetPropVal("Comment") ?? string.Empty)))));
+                                                         .Replace("##comment##", GetXMLSafeVersion((string)(HttpUtility.HtmlDecode(comment ?? string.Empty)))));
                 sbResult.Append(XML_RESPONSE_COMMENT_ITEM_CLOSE);
                 sbResult.Append(XML_RESPONSE_COMMENT_SECTION_FOOTER);
                 sbResult.Append(XML_RESPONSE_COMMENT_FOOTER);
@@ -377,7 +425,7 @@ namespace EPMLiveCore.API
                                 if (authorObj != null && originalUser.ID != authorObj.ID)
                                 {
                                     emailSentIDs.Add(authorObj.ID);
-                                    SendEmailNotification(authorObj.ID, dataMgr.GetPropVal("ListId"), dataMgr.GetPropVal("ItemId"), dataMgr.GetPropVal("Comment"), "created");
+                                    SendEmailNotification(authorObj.ID, dataMgr.GetPropVal("ListId"), dataMgr.GetPropVal("ItemId"), comment, "created");
                                 }
 
                                 // send email to assigned to people
@@ -390,7 +438,7 @@ namespace EPMLiveCore.API
                                         if (int.TryParse(val, out id) && !id.Equals(originalUser.ID) && !emailSentIDs.Contains(id))
                                         {
                                             emailSentIDs.Add(id);
-                                            SendEmailNotification(id, dataMgr.GetPropVal("ListId"), dataMgr.GetPropVal("ItemId"), dataMgr.GetPropVal("Comment"), "created");
+                                            SendEmailNotification(id, dataMgr.GetPropVal("ListId"), dataMgr.GetPropVal("ItemId"), comment, "created");
                                         }
                                     }
                                 }
@@ -404,7 +452,7 @@ namespace EPMLiveCore.API
                                     if ((id != originalUser.ID) && !emailSentIDs.Contains(id))
                                     {
                                         emailSentIDs.Add(id);
-                                        SendEmailNotification(id, dataMgr.GetPropVal("ListId"), dataMgr.GetPropVal("ItemId"), dataMgr.GetPropVal("Comment"), "created");
+                                        SendEmailNotification(id, dataMgr.GetPropVal("ListId"), dataMgr.GetPropVal("ItemId"), comment, "created");
                                     }
                                 }
                             }
@@ -416,6 +464,19 @@ namespace EPMLiveCore.API
                         }
                     }
                 });
+
+                try
+                {
+                    if (!string.IsNullOrEmpty(comment))
+                    {
+                        comment = comment.Trim();
+
+                        SyncStatusUpdateToSocialStream(currentItem.UniqueId, comment, new Guid(currentItem["ListId"].ToString()),
+                            int.Parse(currentItem["ItemId"].ToString()), (DateTime) currentItem["Created"], cWeb, "ADD");
+                    }
+                }
+                catch { }
+
             }
             else
             {
