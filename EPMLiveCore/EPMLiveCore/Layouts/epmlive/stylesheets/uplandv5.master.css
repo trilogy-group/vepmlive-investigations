@@ -5854,7 +5854,7 @@ div.epmliveToolBar .dropdown-label {
 }
 div.epmliveToolBar .nav > li > a {
   display: block;
-  padding: 10px 15px 10px 2px;
+  padding: 10px 15px 10px 3px;
   position: relative;
 }
 div.epmliveToolBar .navbar-nav > li:first-of-type > a {
