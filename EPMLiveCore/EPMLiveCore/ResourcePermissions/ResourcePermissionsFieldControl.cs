@@ -94,7 +94,17 @@ namespace EPMLiveCore
                     i.Selected = true;
                 }
             }
-            
+
+            if (ControlMode == SPControlMode.New)
+            {
+                foreach (ListItem i in chkPerms.Items)
+                {
+                    if (i.Text == "Team Members")
+                    {
+                        i.Selected = true;
+                    }
+                }
+            }
         }
 
         public override void UpdateFieldValueInItem()
