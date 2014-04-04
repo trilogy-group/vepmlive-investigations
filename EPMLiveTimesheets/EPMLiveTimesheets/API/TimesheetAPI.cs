@@ -3030,6 +3030,10 @@ namespace TimeSheets
                         attr.Value = dr["Title"].ToString();
                         ndRow.Attributes.Append(attr);
 
+                        attr = docOut.CreateAttribute("SiteID");
+                        attr.Value = oWeb.Site.ID.ToString();
+                        ndRow.Attributes.Append(attr);
+
                         attr = docOut.CreateAttribute("WebID");
                         attr.Value = dr["WebID"].ToString();
                         ndRow.Attributes.Append(attr);
