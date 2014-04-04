@@ -25,11 +25,6 @@ function registerEpmLiveResourceGridScript() {
             wcReportId: null,
             opened: false,
             collection: {
-                workvscapacity: {
-                    name: 'Resource Work vs. Capacity',
-                    hasResourcesParam: true,
-                    url: '{0}/_layouts/ReportServer/RSViewerPage.aspx?rv:RelativeReportUrl={1}/Report Library/Resource Work vs. Capacity.rdl&rp:SiteId={2}&rp:URL={1}&rv:HeaderArea=none'.format($$$.currentWebFullUrl, $$$.currentWebUrl, $$$.currentSiteId)
-                }
             },
 
             getXmlForRibbon: function () {
@@ -96,42 +91,21 @@ function registerEpmLiveResourceGridScript() {
 
             load: function () {
                 function register(folders) {
-                    if (!folders.length) {
-                        folders = [folders];
-                    }
-
                     for (var i = 0; i < folders.length; i++) {
-                        var folder = folders[i];
+                        var fld = folders[i];
+                        if (fld.Report.length > 0) {
+                            for (var m = 0; m < fld.Report.length; m++) {
+                                var report = fld.Report[m];
+                                var name = report['@Name'];
 
-                        if (folder['@Name'] === 'epmlivetl') {
-                            if (!folder.Folder.length) {
-                                folder.Folder = [folder.Folder];
+                                $$.reports.collection[$$$.md5(name)] = { name: name, url: report['@Url'], hasResourcesParam: report['@HasResourcesParam'] === 'True' };
                             }
-
-                            for (var j = 0; j < folder.Folder.length; j++) {
-                                var fldr = folder.Folder[j];
-
-                                if (fldr['@Name'] === '(2) Resource' || fldr['@Name'] === 'Resources') {
-                                    if (!fldr.Folder || !fldr.Folder.length) {
-                                        fldr.Folder = [fldr];
-                                    }
-
-                                    for (var l = 0; l < fldr.Folder.length; l++) {
-                                        var fld = fldr.Folder[l];
-
-                                        for (var m = 0; m < fld.Report.length; m++) {
-                                            var report = fld.Report[m];
-                                            var name = report['@Name'];
-
-                                            $$.reports.collection[$$$.md5(name)] = { name: name, url: report['@Url'], hasResourcesParam: report['@HasResourcesParam'] === 'True' };
-                                        }
-                                    }
-
-                                    break;
-                                }
+                        } else {
+                            if (fld.Report) {
+                                var report = fld.Report;
+                                var name = report['@Name'];
+                                $$.reports.collection[$$$.md5(name)] = { name: name, url: report['@Url'], hasResourcesParam: report['@HasResourcesParam'] === 'True' };
                             }
-
-                            break;
                         }
                     }
                 };
@@ -139,7 +113,7 @@ function registerEpmLiveResourceGridScript() {
                 $.ajax({
                     type: 'POST',
                     url: $$$.currentWebUrl + '/_vti_bin/WorkEngine.asmx/Execute',
-                    data: "{ Function: 'Reporting_GetAllReports', Dataxml: '<Reports/>' }",
+                    data: "{ Function: 'Reporting_GetReportsByFolder', Dataxml: '<Reports><Folder>Report Library/epmlivetl/Resources</Folder></Reports>' }",
                     contentType: 'application/json; charset=utf-8',
                     dataType: 'json',
 
@@ -150,8 +124,8 @@ function registerEpmLiveResourceGridScript() {
                             var result = responseJson.Result;
 
                             if ($$$.responseIsSuccess(result)) {
-                                if (result.GetAllReports.Data.Folder && result.GetAllReports.Data.Folder.Folder) {
-                                    register(result.GetAllReports.Data.Folder.Folder);
+                                if (result.GetReportsByFolder.Data.Folder && result.GetReportsByFolder.Data.Folder.Folder) {
+                                    register(result.GetReportsByFolder.Data.Folder.Folder);
                                 }
                             } else {
                                 $$$.logFailure(result);
@@ -2405,18 +2379,18 @@ function registerEpmLiveResourceGridScript() {
             }
         };
 
-        window.Grids.OnMouseOutRow = function(grid, row, col, event) {
+        window.Grids.OnMouseOutRow = function (grid, row, col, event) {
             grid.SetAttribute(row, "Title", "ButtonText", ' ', 1);
         }
 
-        window.Grids.OnMouseOverOutside = function(grid, row, col, event) {
+        window.Grids.OnMouseOverOutside = function (grid, row, col, event) {
             if (grid.CurHoverRow)
                 grid.SetAttribute(grid.GetRowById(grid.CurHoverRow), "Title", "ButtonText", ' ', 1);
             grid.CurHoverRow = "0";
 
         }
 
-        window.Grids.OnMouseOverRow = function(grid, row, col, event) {
+        window.Grids.OnMouseOverRow = function (grid, row, col, event) {
             if (grid.CurHoverRow != row.id) {
                 grid.CurHoverRow = row.id;
                 CurrentGrid = grid;
