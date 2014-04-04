@@ -167,6 +167,8 @@ function SetGridSize(grid) {
     else
     {
         var bodyheight = grid.GetBodyScrollHeight() + 60;
+        if (bodyheight < 100)
+            bodyheight = 100;
         var gridid = GetGridId(grid);
         var divOuter = document.getElementById("gridouter" + gridid);
 
@@ -339,7 +341,7 @@ function GridOnFocus(grid, row, col, orow, ocol, pagepos) {
             }
         }
     }
-
+    RefreshCommandUI();
 }
 
 

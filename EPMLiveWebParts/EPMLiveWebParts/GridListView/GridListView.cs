@@ -3430,8 +3430,8 @@ namespace EPMLiveWebParts
                                                                             }
                                                                         }
 
-                                                                        if(fRow)
-                                                                            titles += "","" + fRow.Title;
+                                                                        //if(fRow)
+                                                                        //    titles += "","" + fRow.Title;
 
                                                                         if(titles != """" && titles[0] == ',')
                                                                             titles = titles.substring(1);
