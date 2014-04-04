@@ -476,6 +476,7 @@ function StopEditGridRow(grid, row) {
         {
             for (var col in grid.Cols) {
                 grid.SetAttribute(row, col, "CanEdit", "0", 1);
+                grid.SetAttribute(row, "Title", "HtmlPrefix", "", 1);
             }
         }
         grid.EditRowChanged = false;
@@ -564,7 +565,7 @@ function EditGridRow(grid, row, col) {
                 if (oResp.Result.Status == "0") {
                     grid.EditRow = row.id;
                     grid.AddDataFromServer(oResp.Result.InnerText);
-                    grid.SetAttribute(row, "Title", "HtmlPrefix", "", 1);
+                    grid.SetAttribute(row, "Title", "HtmlPrefix", "<span class=\"icon-pencil\" style=\"color: #CCC;padding-right:5px\"></span>", 1);
                     grid.StartEdit();
                 }
                 else
