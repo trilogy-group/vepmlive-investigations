@@ -121,9 +121,10 @@
         }
         
         .EPMLiveResourceGridPicture > img {
-            padding: 2.5px;
+            padding: 1px;
             border: 1px solid #CCCCCC;
             background-color: #ffffff;
+            width:30px;
         }
         
         .EPMLiveResourceGridPanelHovered {
