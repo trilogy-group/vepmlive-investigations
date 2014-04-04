@@ -917,7 +917,12 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
 
             curGrid = this.$Grid;
 
-        	var options = { url: wurl + "?GetLastID=true", width: 600, dialogReturnValueCallback:NewItemCallback };
+            if(wurl.indexOf('?') > 0)
+                wurl = wurl + "&GetLastID=true";
+            else
+                wurl = wurl + "?GetLastID=true";
+
+        	var options = { url: wurl, width: 600, dialogReturnValueCallback:NewItemCallback };
 
         	SP.UI.ModalDialog.showModalDialog(options);
         }
@@ -926,8 +931,13 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
             curGrid = this.$Grid;
             if(this.$Grid._newmenumode == '0')
             {
-                var wurl = this.$Grid._newitemurl + "?GetLastID=true";
+                var wurl = this.$Grid._newitemurl;
                 
+                if(wurl.indexOf('?') > 0)
+                    wurl = wurl + "&GetLastID=true";
+                else
+                    wurl = wurl + "?GetLastID=true";
+
             	var options = { url: wurl, width: 600, dialogReturnValueCallback:NewItemCallback };
 
             	SP.UI.ModalDialog.showModalDialog(options);
@@ -950,7 +960,13 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
         }
         else if(commandId === 'NewItem')
         {
-            var wurl = this.$Grid._newitemurl + "?GetLastID=true";
+            var wurl = this.$Grid._newitemurl;
+
+            if(wurl.indexOf('?') > 0)
+                wurl = wurl + "&GetLastID=true";
+            else
+                wurl = wurl + "?GetLastID=true";
+
             curGrid = this.$Grid;
             if(this.$Grid._usepopup)
             {
