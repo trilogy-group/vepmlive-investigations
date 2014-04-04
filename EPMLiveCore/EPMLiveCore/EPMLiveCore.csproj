@@ -84,15 +84,14 @@ net start "WETimer"</PostDeploymentCommand>
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\EPMLiveIntegration\EPMLiveIntegration\bin\Debug\EPMLiveIntegration.dll</HintPath>
     </Reference>
-    <Reference Include="EPMLiveReportsAdmin">
+    <Reference Include="EPMLiveReportsAdmin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b90e532f481cf050, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\EPMLiveReporting\EPMLiveReporting\bin\Debug\EPMLiveReportsAdmin.dll</HintPath>
     </Reference>
     <Reference Include="EPMLiveWebParts">
       <HintPath>..\..\EPMLiveWebParts\EPMLiveWebParts\bin\Debug\EPMLiveWebParts.dll</HintPath>
     </Reference>
-    <Reference Include="EPMLiveWorkPlanner">
-      <HintPath>..\..\EPMLiveWorkPlanner\EPMLiveWorkPlanner\bin\Debug\EPMLiveWorkPlanner.dll</HintPath>
-    </Reference>
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="Microsoft.SharePoint.Client, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\Program Files\Common Files\Microsoft Shared\Web Server Extensions\15\ISAPI\Microsoft.SharePoint.Client.dll</HintPath>
@@ -115,10 +114,14 @@ net start "WETimer"</PostDeploymentCommand>
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
     <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Data.Services" />
     <Reference Include="System.DirectoryServices" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.EnterpriseServices" />
     <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.ServiceModel.Web" />
+    <Reference Include="System.Transactions" />
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Web.Services" />
@@ -758,6 +761,13 @@ net start "WETimer"</PostDeploymentCommand>
     <Compile Include="Layouts\epmlive\GenericEntityTypeAheadAjaxHandler.aspx.designer.cs">
       <DependentUpon>GenericEntityTypeAheadAjaxHandler.aspx.cs</DependentUpon>
     </Compile>
+    <Compile Include="Layouts\epmlive\GetLastID.aspx.cs">
+      <DependentUpon>GetLastID.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\GetLastID.aspx.designer.cs">
+      <DependentUpon>GetLastID.aspx.cs</DependentUpon>
+    </Compile>
     <Compile Include="Layouts\epmlive\GetWorkspaceListTree.aspx.cs">
       <DependentUpon>GetWorkspaceListTree.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -1164,6 +1174,41 @@ net start "WETimer"</PostDeploymentCommand>
     <Compile Include="Layouts\epmlive\UpgradeResult.aspx.designer.cs">
       <DependentUpon>UpgradeResult.aspx.cs</DependentUpon>
     </Compile>
+    <Compile Include="Layouts\epmlive\Upgraders\proxy.aspx.cs">
+      <DependentUpon>proxy.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\Upgraders\proxy.aspx.designer.cs">
+      <DependentUpon>proxy.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\Upgraders\Upgrade.aspx.cs">
+      <DependentUpon>Upgrade.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\Upgraders\Upgrade.aspx.designer.cs">
+      <DependentUpon>Upgrade.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\Upgraders\UpgradeDone.aspx.cs">
+      <DependentUpon>UpgradeDone.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\Upgraders\UpgradeDone.aspx.designer.cs">
+      <DependentUpon>UpgradeDone.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\Upgraders\WE432Upgrader.aspx.cs">
+      <DependentUpon>WE432Upgrader.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\Upgraders\WE432Upgrader.aspx.designer.cs">
+      <DependentUpon>WE432Upgrader.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\Upgraders\WE43Upgrader.aspx.cs">
+      <DependentUpon>WE43Upgrader.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\Upgraders\WE43Upgrader.aspx.designer.cs">
+      <DependentUpon>WE43Upgrader.aspx.cs</DependentUpon>
+    </Compile>
     <Compile Include="Layouts\epmlive\viewmessages.aspx.cs">
       <DependentUpon>viewmessages.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -1205,6 +1250,7 @@ net start "WETimer"</PostDeploymentCommand>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="ReflectionMethods.cs" />
     <Compile Include="ReportAuth.cs" />
     <Compile Include="ReportingData.cs" />
     <Compile Include="ReportingProxy\QueryExecutor.cs" />
@@ -1215,7 +1261,38 @@ net start "WETimer"</PostDeploymentCommand>
     <Compile Include="ResourcePoolEvent\ResourcePoolEvent.cs" />
     <Compile Include="ResourceTools.cs" />
     <Compile Include="Security.cs" />
+    <Compile Include="Services\DataContracts\SocialEngine\DailyActivities.cs" />
+    <Compile Include="Services\DataContracts\SocialEngine\SEActivities.cs" />
+    <Compile Include="Services\SocialEngine.svc.cs">
+      <DependentUpon>SocialEngine.svc</DependentUpon>
+    </Compile>
     <Compile Include="SiteNavigationRibbonButton.cs" />
+    <Compile Include="SocialEngine\API\Gateway.cs" />
+    <Compile Include="SocialEngine\Contracts\ISocialEngineModule.cs" />
+    <Compile Include="SocialEngine\Core\ActivityManager.cs" />
+    <Compile Include="SocialEngine\Core\BaseManager.cs" />
+    <Compile Include="SocialEngine\Core\DataValidator.cs" />
+    <Compile Include="SocialEngine\Core\DBConnectionManager.cs" />
+    <Compile Include="SocialEngine\Core\Enums.cs" />
+    <Compile Include="SocialEngine\Core\Logger.cs" />
+    <Compile Include="SocialEngine\Core\SocialEngineException.cs" />
+    <Compile Include="SocialEngine\Core\StreamManager.cs" />
+    <Compile Include="SocialEngine\Core\ThreadManager.cs" />
+    <Compile Include="SocialEngine\Core\Transaction.cs" />
+    <Compile Include="SocialEngine\Core\TransactionManager.cs" />
+    <Compile Include="SocialEngine\Core\Utilities.cs" />
+    <Compile Include="SocialEngine\Entities\Activity.cs" />
+    <Compile Include="SocialEngine\Entities\Thread.cs" />
+    <Compile Include="SocialEngine\Entities\User.cs" />
+    <Compile Include="SocialEngine\Events\ListEventReceiver\ListEventReceiver.cs" />
+    <Compile Include="SocialEngine\Events\SocialEngineEvents.cs" />
+    <Compile Include="SocialEngine\Events\WebEventReceiver\WebEventReceiver.cs" />
+    <Compile Include="SocialEngine\Modules\DataDecorator.cs" />
+    <Compile Include="SocialEngine\Modules\List.cs" />
+    <Compile Include="SocialEngine\Modules\ListItem.cs" />
+    <Compile Include="SocialEngine\Modules\Workspace.cs" />
+    <Compile Include="SocialEngine\SocialEngine.cs" />
+    <Compile Include="SocialEngine\SocialEngineProxy.cs" />
     <Compile Include="SPFields\DaysHoursBreakdownField.cs" />
     <Compile Include="SPFields\DaysHoursBreakdownFieldControl.cs" />
     <Compile Include="StatusingEvent.cs" />
@@ -1577,6 +1654,9 @@ net start "WETimer"</PostDeploymentCommand>
     <None Include="Features\EPMLiveWorkspaceMenus\EPMLiveWorkspaceMenus.feature">
       <FeatureId>{bd45b455-49f0-4bee-989c-867626214618}</FeatureId>
     </None>
+    <None Include="Features\SocialStream\SocialStream.feature">
+      <FeatureId>{41772821-ddd2-4ea4-9150-bb95eae4f875}</FeatureId>
+    </None>
     <None Include="Features\WorkgroupAdministration\WorkgroupAdministration.feature">
       <FeatureId>{597b4d8e-96e3-4b57-afa6-1aacdf3fb5aa}</FeatureId>
     </None>
@@ -1653,11 +1733,16 @@ net start "WETimer"</PostDeploymentCommand>
     <None Include="Layouts\epmlive\javascripts\icomoon-ie7.min.js.map" />
     <None Include="Layouts\epmlive\javascripts\libraries\bindWithDelay.min.js.map" />
     <None Include="Layouts\epmlive\javascripts\libraries\jquery.cookie.min.js.map" />
+    <None Include="Layouts\epmlive\javascripts\masterpages\uplandv5.master.js.bundle" />
+    <None Include="Layouts\epmlive\javascripts\masterpages\uplandv5.master.min.js.map" />
     <None Include="Layouts\epmlive\javascripts\masterpages\UplandV5.min.js.map" />
     <None Include="Layouts\epmlive\javascripts\Notifications.min.js.map" />
     <None Include="Layouts\epmlive\Project1.mpp" />
     <None Include="Layouts\epmlive\stylesheets\controls\navigation\epmnav.chrome.less" />
     <None Include="Layouts\epmlive\stylesheets\controls\navigation\epmnav.less" />
+    <None Include="Layouts\epmlive\stylesheets\epmlive.less" />
+    <None Include="Layouts\epmlive\stylesheets\epmliveToolBar.css.map" />
+    <None Include="Layouts\epmlive\stylesheets\epmliveToolBar.less" />
     <None Include="Layouts\epmlive\stylesheets\fonts\FlatUIIcons\Flat-UI-Icons.eot" />
     <None Include="Layouts\epmlive\stylesheets\fonts\FlatUIIcons\Flat-UI-Icons.ttf" />
     <None Include="Layouts\epmlive\stylesheets\fonts\FlatUIIcons\Flat-UI-Icons.woff" />
@@ -1673,6 +1758,7 @@ net start "WETimer"</PostDeploymentCommand>
     <None Include="Layouts\epmlive\stylesheets\fonts\OpenSans\OpenSans-Semibold-webfont.eot" />
     <None Include="Layouts\epmlive\stylesheets\fonts\OpenSans\OpenSans-Semibold-webfont.ttf" />
     <None Include="Layouts\epmlive\stylesheets\fonts\OpenSans\OpenSans-Semibold-webfont.woff" />
+    <None Include="Layouts\epmlive\stylesheets\uplandv5.master.css.bundle" />
     <None Include="Layouts\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{4ac6e44b-916f-4550-98aa-fba67f5cc363}</SharePointProjectItemId>
     </None>
@@ -1716,6 +1802,15 @@ net start "WETimer"</PostDeploymentCommand>
     </None>
     <None Include="ResourcePoolEvent\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{949fa534-10f8-4add-998e-6f4ce94cdf2e}</SharePointProjectItemId>
+    </None>
+    <None Include="Services\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{993aa118-2bcd-4ab2-b10c-70f20862bc79}</SharePointProjectItemId>
+    </None>
+    <None Include="SocialEngine\Events\ListEventReceiver\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{235ce08d-2d56-4a82-b208-323e39fd45bb}</SharePointProjectItemId>
+    </None>
+    <None Include="SocialEngine\Events\WebEventReceiver\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{830f3c01-9ca9-4857-8b14-7517914bd593}</SharePointProjectItemId>
     </None>
     <None Include="TaskCenterListToolbars\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{49dabf13-4a85-4da0-a0aa-f7c331d7698d}</SharePointProjectItemId>
@@ -2029,7 +2124,6 @@ net start "WETimer"</PostDeploymentCommand>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
@@ -2074,9 +2168,7 @@ net start "WETimer"</PostDeploymentCommand>
     <Content Include="EPMLiveOutlineCodesList\Elements.xml" />
     <Content Include="EPMLiveOutlineCodesList\Schema.xml" />
     <Content Include="EPMLivePeriodsList\Elements.xml" />
-    <Content Include="EPMLivePeriodsList\Schema.xml">
-      <SubType>Designer</SubType>
-    </Content>
+    <Content Include="EPMLivePeriodsList\Schema.xml" />
     <Content Include="EPMLiveProjectCenterEvent\Elements.xml" />
     <Content Include="EPMLiveProjectCenterRollup\Elements.xml" />
     <Content Include="EPMLiveProjectCenterRollup\Schema.xml" />
@@ -2155,6 +2247,9 @@ net start "WETimer"</PostDeploymentCommand>
     </Content>
     <Content Include="Features\EPMLiveWorkspaceMenus\EPMLiveWorkspaceMenus.Template.xml">
       <DependentUpon>EPMLiveWorkspaceMenus.feature</DependentUpon>
+    </Content>
+    <Content Include="Features\SocialStream\SocialStream.Template.xml">
+      <DependentUpon>SocialStream.feature</DependentUpon>
     </Content>
     <Content Include="Features\WorkgroupAdministration\WorkgroupAdministration.Template.xml">
       <DependentUpon>WorkgroupAdministration.feature</DependentUpon>
@@ -3220,6 +3315,7 @@ net start "WETimer"</PostDeploymentCommand>
     <Content Include="Layouts\epmlive\GenericEntityPickerStyle.css" />
     <Content Include="Layouts\epmlive\GenericEntityTypeAheadAjaxHandler.aspx" />
     <Content Include="Layouts\epmlive\getGeneralSetting.aspx" />
+    <Content Include="Layouts\epmlive\GetLastID.aspx" />
     <Content Include="Layouts\epmlive\getproject.aspx" />
     <Content Include="Layouts\epmlive\GetWorkspaceListTree.aspx" />
     <Content Include="Layouts\epmlive\getworkspacexml.aspx" />
@@ -3251,6 +3347,7 @@ net start "WETimer"</PostDeploymentCommand>
     <Content Include="Layouts\epmlive\images\delete.GIF" />
     <Content Include="Layouts\epmlive\images\deleteteam.png" />
     <Content Include="Layouts\epmlive\images\down.gif" />
+    <Content Include="Layouts\epmlive\images\Down_Arrow.gif" />
     <Content Include="Layouts\epmlive\images\dragger.png" />
     <Content Include="Layouts\epmlive\images\dropdown2.gif" />
     <Content Include="Layouts\epmlive\images\dropdown2.png" />
@@ -3408,6 +3505,8 @@ net start "WETimer"</PostDeploymentCommand>
     <Content Include="Layouts\epmlive\javascripts\libraries\tooltip.min.js" />
     <Content Include="Layouts\epmlive\javascripts\libraries\WalkMe.js" />
     <Content Include="Layouts\epmlive\javascripts\masterpages\UplandV5.js" />
+    <Content Include="Layouts\epmlive\javascripts\masterpages\uplandv5.master.js" />
+    <Content Include="Layouts\epmlive\javascripts\masterpages\uplandv5.master.min.js" />
     <Content Include="Layouts\epmlive\javascripts\masterpages\UplandV5.min.js" />
     <Content Include="Layouts\epmlive\javascripts\masterpages\webfont.js" />
     <Content Include="Layouts\epmlive\javascripts\Notifications.js" />
@@ -3479,6 +3578,10 @@ net start "WETimer"</PostDeploymentCommand>
     <Content Include="Layouts\epmlive\stylesheets\controls\navigation\epmnav.chrome.min.css" />
     <Content Include="Layouts\epmlive\stylesheets\controls\navigation\epmnav.css" />
     <Content Include="Layouts\epmlive\stylesheets\controls\navigation\epmnav.min.css" />
+    <Content Include="Layouts\epmlive\stylesheets\epmlive.css" />
+    <Content Include="Layouts\epmlive\stylesheets\epmlive.min.css" />
+    <Content Include="Layouts\epmlive\stylesheets\EPMLiveToolBar.css" />
+    <Content Include="Layouts\epmlive\stylesheets\epmliveToolBar.min.css" />
     <Content Include="Layouts\epmlive\stylesheets\fonts\FlatUIIcons\Flat-UI-Icons.svg" />
     <Content Include="Layouts\epmlive\stylesheets\fonts\IcoMoon\icomoon-ultimate.svg" />
     <Content Include="Layouts\epmlive\stylesheets\fonts\OpenSans\OpenSans-Light-webfont.svg" />
@@ -3530,6 +3633,8 @@ net start "WETimer"</PostDeploymentCommand>
     <Content Include="Layouts\epmlive\stylesheets\tooltip.min.css" />
     <Content Include="Layouts\epmlive\stylesheets\upgrader.css" />
     <Content Include="Layouts\epmlive\stylesheets\upgrader.min.css" />
+    <Content Include="Layouts\epmlive\stylesheets\uplandv5.master.css" />
+    <Content Include="Layouts\epmlive\stylesheets\uplandv5.master.min.css" />
     <Content Include="Layouts\epmlive\synchperiods.aspx" />
     <Content Include="Layouts\epmlive\TemplateGalleryRedirect.aspx" />
     <Content Include="Layouts\epmlive\timersettings.aspx" />
@@ -3591,6 +3696,34 @@ net start "WETimer"</PostDeploymentCommand>
     <Content Include="Layouts\epmlive\TreeGrid\Folder\TreeN.gif" />
     <Content Include="Layouts\epmlive\TreeGrid\GridE.js" />
     <Content Include="Layouts\epmlive\TreeGrid\GridEOnDemand.js" />
+    <Content Include="Layouts\epmlive\TreeGrid\Grid\Backgrounds.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Grid\BackgroundsOLD.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Grid\Button.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Grid\Button.png" />
+    <Content Include="Layouts\epmlive\TreeGrid\Grid\checkbox-sprite.png" />
+    <Content Include="Layouts\epmlive\TreeGrid\Grid\critgantt.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Grid\critganttpct.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Grid\expand-collapse-sprite-vertical.png" />
+    <Content Include="Layouts\epmlive\TreeGrid\Grid\expand-collapse-sprite.png" />
+    <Content Include="Layouts\epmlive\TreeGrid\Grid\FastPanel1.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Grid\FastPanel2.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Grid\Filter.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Grid\Gantt.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Grid\Grid.css" />
+    <Content Include="Layouts\epmlive\TreeGrid\Grid\Grid.min.css" />
+    <Content Include="Layouts\epmlive\TreeGrid\Grid\HScroll.png" />
+    <Content Include="Layouts\epmlive\TreeGrid\Grid\Menu.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Grid\MenuOLD.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Grid\Panel.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Grid\Sort.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Grid\summarygantt.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Grid\summaryganttpct.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Grid\taskgantt.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Grid\taskganttpct.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Grid\Toolbar.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Grid\Tree.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Grid\TreeN.gif" />
+    <Content Include="Layouts\epmlive\TreeGrid\Grid\VScroll.gif" />
     <Content Include="Layouts\epmlive\TreeGrid\Help.html" />
     <Content Include="Layouts\epmlive\TreeGrid\Light\Backgrounds.gif" />
     <Content Include="Layouts\epmlive\TreeGrid\Light\Button.gif" />
@@ -3766,6 +3899,11 @@ net start "WETimer"</PostDeploymentCommand>
     <Content Include="Layouts\epmlive\unsealfields.aspx" />
     <Content Include="Layouts\epmlive\Upgrade.aspx" />
     <Content Include="Layouts\epmlive\UpgradeResult.aspx" />
+    <Content Include="Layouts\epmlive\Upgraders\proxy.aspx" />
+    <Content Include="Layouts\epmlive\Upgraders\Upgrade.aspx" />
+    <Content Include="Layouts\epmlive\Upgraders\UpgradeDone.aspx" />
+    <Content Include="Layouts\epmlive\Upgraders\WE432Upgrader.aspx" />
+    <Content Include="Layouts\epmlive\Upgraders\WE43Upgrader.aspx" />
     <Content Include="Layouts\epmlive\viewmessages.aspx" />
     <Content Include="Layouts\epmlive\viewrollup.aspx" />
     <Content Include="Layouts\epmlive\ViewSecurity.aspx" />
@@ -3817,7 +3955,10 @@ net start "WETimer"</PostDeploymentCommand>
     <Content Include="Resources\9Data01.sql" />
     <Content Include="Resources\9Data02.sql" />
     <Content Include="Resources\EPMLiveNavigation.txt" />
-    <None Include="Resources\WorkSpaceCenterLayout.txt" />
+    <Content Include="Resources\WorkSpaceCenterLayout.txt" />
+    <Content Include="Services\SocialEngine.svc" />
+    <Content Include="SocialEngine\Events\ListEventReceiver\Elements.xml" />
+    <Content Include="SocialEngine\Events\WebEventReceiver\Elements.xml" />
     <Content Include="TaskCenterListToolbars\Elements.xml" />
     <Content Include="TEMPLATE\1033\XML\WEBTEMPWE.XML" />
     <Content Include="TEMPLATE\admin\admin.sitemap.epmlive.xml" />
