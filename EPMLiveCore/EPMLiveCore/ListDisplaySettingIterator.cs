@@ -229,7 +229,7 @@ namespace EPMLiveCore
                         {
                             using (SPWeb web = rsite.OpenWeb(SPContext.Current.Web.ID))
                             {
-                                arrwpFields = EPMLiveWorkPlanner.PlannerCore.getWorkPlannerStatusFields(web, list.Title);
+                                arrwpFields = ReflectionMethods.GetWorkPlannerStatusFields(web, list.Title);
                             }
                         }
                         try
