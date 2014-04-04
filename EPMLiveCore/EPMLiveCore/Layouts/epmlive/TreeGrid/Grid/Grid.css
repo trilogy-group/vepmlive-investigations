@@ -953,8 +953,8 @@ u.GMSort0Right,u.GMSort1Right,u.GMSort2Right,u.GMSort3Right,u.GMSort4Right,u.GMS
 .GMColorMoved1 { background-color:#FFFFFF; }
 .GMColorMoved2 { background-color:#FFFFFF; }
 .GMColorChanged { background-color:#FFFFFF; }
-.GMColorChangedCell { background-color:#E1E1FF; }
-.GMClassChangedCell { font-weight:bold; }
+.GMColorChangedCell { background-color:#FFFFFF; }
+
 
 .GMColorMaxChildren { background-color:#FFFFF0; }
 
@@ -1173,17 +1173,18 @@ overflow:hidden; width:0px; height:0px; }
 .GMMenuItem { padding:4px; background:white; }   
 .GMMenuItemHover {
     padding:4px;
-   background:#0090CA; border:1px solid #0090CA;
+   background:#0090CA; 
+   
    color:#ffffff;
    }
 .GMMenuFocus {
    padding:4px;
-   border:1px solid #ffffff;
    background:none;
    }
 .GMMenuFocusHover {
    padding:4px;
-   background:#0090CA; border:1px solid #0090CA;color:#ffffff;
+   background:#0090CA;
+   color:#ffffff;
    }
 .GMMenuSeparator {
    margin-top:1px; margin-right:3px; margin-left:3px; height:1px;   
