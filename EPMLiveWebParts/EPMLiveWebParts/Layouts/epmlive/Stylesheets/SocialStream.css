@@ -99,6 +99,7 @@
 }
 #epm-social-stream li.epm-se-thread .epm-se-user-info a {
   color: #555555;
+  font-family: "Open Sans Semi Bold", Helvetica, Arial;
 }
 #epm-social-stream li.epm-se-thread div.epm-se-user-avatar {
   float: left;
