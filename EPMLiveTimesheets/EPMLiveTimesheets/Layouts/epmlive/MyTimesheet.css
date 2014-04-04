@@ -14,6 +14,15 @@
     height:20px !important;
 }
 
+.ts-nav-list {
+list-style-type: none;
+padding-top: 10px; 
+margin:0;
+display: inline;
+position: relative;
+font-family: "Open Sans Regular";
+font-size: 14px;
+}
 
 .epmliveinput
 {
@@ -111,12 +120,12 @@ padding-bottom:0px;
 .nav-text-wrapper .nav-select {
 position:relative;
 display:inline-block;
-top:-7px;
+top:-4px;
 }
 
 .nav-text-wrapper .icon {
 position:relative;
-top:-7px;
+top:-2px;
 color:#777;
 }
 
