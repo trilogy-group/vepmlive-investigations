@@ -80,7 +80,7 @@ namespace EPMLiveCore
                 {
                     using(SPWeb web = site.OpenWeb(properties.Web.ID))
                     {
-                        string method = EPMLiveWorkPlanner.PlannerCore.getStatusMethod(web, properties.ListTitle);
+                        string method = ReflectionMethods.GetStatusMethod(web, properties.ListTitle);
 
                         if(method == "1") 
                         {
