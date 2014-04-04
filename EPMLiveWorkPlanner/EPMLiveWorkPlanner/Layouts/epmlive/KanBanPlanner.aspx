@@ -16,8 +16,11 @@
 
         $(function () {
             KanbanClient.resetControls(false);
-            ExecuteOrDelayUntilScriptLoaded(KanbanClient.loadKanBanPlanners, 'EPMLive.js'); 
-        }); 
+            $(window).resize(function () {
+                KanbanClient.resizeKanbanBoard();
+            });
+            ExecuteOrDelayUntilScriptLoaded(KanbanClient.loadKanBanPlanners, 'EPMLive.js');
+        });
 
 
         var KanbanClient = (function () {
@@ -186,7 +189,7 @@
 
             var kanbanTileDeleted = function (liid) {
                 if (liid) {
-                    var tileToRemove = $('#mainContainer .stageContainer .sortable-list').find('#' + liid);
+                    var tileToRemove = $('#mainContainer .sortable-list').find('#' + liid);
                     if ($(tileToRemove)) {
                         $(tileToRemove).remove();
                     }
@@ -418,6 +421,13 @@
                 });
             };
 
+            var resizeKanbanBoard = function () {
+                if ($('#mainContainer .sortable-list')) {
+                    $('#mainContainer .slimScrollDiv').css({ 'height': (GetPageHeight() - 200) + 'px' });
+                    $('#mainContainer .sortable-list').css({ 'height': (GetPageHeight() - 200) + 'px' });
+                }
+            };
+
             var setupKanbanTiles = function () {
                 var cardWidth = $("#itemContainerTD").width();
                 var cardWidth = (cardWidth - 30);
@@ -516,7 +526,8 @@
                 loadKanBanBoard: loadKanBanBoard,
                 raiseKanbanFilter1ApplyClick: raiseKanbanFilter1ApplyClick,
                 kanbanTileDeleted: kanbanTileDeleted,
-                kanbanTileEdited: kanbanTileEdited
+                kanbanTileEdited: kanbanTileEdited,
+                resizeKanbanBoard: resizeKanbanBoard
             };
 
         })();
@@ -526,7 +537,7 @@
 </asp:Content>
 
 <asp:Content ID="Main" ContentPlaceHolderID="PlaceHolderMain" runat="server">
-    
+
 
     <div id="section1">
         <div id="kanbanToolbar" style="width: 100%">
@@ -556,7 +567,7 @@
         <div class="clear"></div>
     </div>
 
-    
+
 </asp:Content>
 
 <asp:Content ID="PageTitle" ContentPlaceHolderID="PlaceHolderPageTitle" runat="server">
