@@ -6,10 +6,13 @@
 	width:100%;
 }
 jPag-first {
+
+}
+.jPag-first {
 border-radius:15px;
 padding:1px 7px !important;
 }
-jPag-last {
+.jPag-last {
 border-radius:15px;
 padding:1px 7px !important;
 }
@@ -51,16 +54,17 @@ ul.jPag-pages li a{
     padding:2px 5px;
 }
 span.jPag-current{
-    cursor:default;
-    font-weight:normal;
-    line-height:16px;
-    height:16px;
-    color:#ffffff !important;
-    background-color:#0090CA !important;
-    border-radius:3px;
-    padding:1px 5px;
+    background-color: #0090CA !important;
+    border: 1px solid #0090CA !important;
+    border-radius: 3px;
+    color: #FFFFFF !important;
+    cursor: default;
+    float: left;
+    font-weight: normal;
+    height: 16px;
+    line-height: 16px;
     margin: 2px 0 0;
-    float:left;
+    padding: 1px 5px;
 }
 ul.jPag-pages li span.jPag-previous,
 ul.jPag-pages li span.jPag-next,
