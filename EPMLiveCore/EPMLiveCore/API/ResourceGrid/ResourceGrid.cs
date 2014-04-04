@@ -493,6 +493,11 @@ namespace EPMLiveCore.API
                     iElement.Add(new XAttribute("IsMyResource",
                         resourceElement.Attribute("IsMyResource").Value.ToBool() ? 1 : 0));
 
+                    iElement.Add(new XAttribute("itemid", resourceElement.Attribute("ID").Value));
+                    iElement.Add(new XAttribute("listid", resourcesList.ID));
+                    iElement.Add(new XAttribute("webid", web.ID));
+                    iElement.Add(new XAttribute("siteid", web.Site.ID));
+
                     bElement.Add(iElement);
                 }
 
@@ -1064,6 +1069,11 @@ namespace EPMLiveCore.API
 															  <img src=""{0}"" height=""30""/>
 														  </div>",
                             profilePic)));
+
+                    iElement.Add(new XAttribute("itemid", resourceId));
+                    iElement.Add(new XAttribute("listid", resourcesList.ID));
+                    iElement.Add(new XAttribute("webid", spWeb.ID));
+                    iElement.Add(new XAttribute("siteid", spWeb.Site.ID));
 
                     changesXml.Add(iElement);
                 }
