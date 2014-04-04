@@ -215,17 +215,17 @@
 #epm-social-stream li.epm-se-thread div.epm-se-comments div.epm-se-comment-text {
   color: #777777;
 }
-#epm-social-stream li.epm-se-thread div.epm-se-comment-box {
+#epm-social-stream div.epm-se-comment-box {
   margin: 15px 0 0 25px;
 }
-#epm-social-stream li.epm-se-thread div.epm-se-comment-box div.epm-se-comment-input {
+#epm-social-stream div.epm-se-comment-box div.epm-se-comment-input {
   border: 1px solid #eeeeee;
   border-radius: 3px;
   margin-bottom: 10px;
   min-height: 20px;
   padding: 7px 10px;
 }
-#epm-social-stream li.epm-se-thread div.epm-se-comment-box button {
+#epm-social-stream div.epm-se-comment-box button {
   float: right;
   -moz-user-select: none;
   -ms-user-select: none;
@@ -252,15 +252,19 @@
   padding: 5px 10px;
   display: none;
 }
-#epm-social-stream li.epm-se-thread div.epm-se-comment-box div.epm-se-comment-input.epm-se-placeholder {
+#epm-social-stream div.epm-se-comment-box div.epm-se-comment-input.epm-se-placeholder {
   color: #cccccc;
 }
-#epm-social-stream li.epm-se-thread div.epm-se-comment-box div.epm-se-comment-input.epm-se-expanded {
+#epm-social-stream div.epm-se-comment-box div.epm-se-comment-input.epm-se-expanded {
   min-height: 75px;
 }
-#epm-social-stream li.epm-se-thread div.epm-se-comment-box button.epm-se-active {
+#epm-social-stream div.epm-se-comment-box button.epm-se-active {
   background-color: #0090CA;
   border-color: #357EBD;
   color: #FFFFFF;
+}
+#epm-social-stream div#epm-se-status-update-box {
+  margin-left: 0;
+  margin-top: 0;
 }
 /*# sourceMappingURL=SocialStream.css.map */
