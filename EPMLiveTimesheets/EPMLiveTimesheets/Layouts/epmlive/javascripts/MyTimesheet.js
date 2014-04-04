@@ -250,6 +250,8 @@ function TSRenderFinish(grid)
             } catch (e) { }
 
             ShowApprovalNotification();
+
+            window.onbeforeunload = leavePage;
         }
     }
     else {
@@ -2030,7 +2032,7 @@ function leavePage() {
         return message;
 }
 
-window.onbeforeunload = leavePage;
+
 
 
 function ShowApprovalNotification() {
