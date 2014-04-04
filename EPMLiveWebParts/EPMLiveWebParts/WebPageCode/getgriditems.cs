@@ -398,7 +398,7 @@ namespace EPMLiveWebParts
                                                 }
                                                 break;
                                         };
-                                        if (arrAggregationDef[arrColumns[i]].ToString() == "COUNT" || bCleanValues)
+                                        if (arrAggregationDef[arrColumns[i]].ToString() == "COUNT")
                                             cellValue = val;
                                         else
                                             cellValue = formatField(val, arrColumns[i].ToString(), false, true, null);
