@@ -93,6 +93,17 @@ namespace EPMLiveCore
 
                             ddlLevels.Items.Add(li);
                         }
+
+                        if (ControlMode == SPControlMode.New)
+                        {
+                            foreach (ListItem li in ddlLevels.Items)
+                            {
+                                if (li.Value.ToString() == "1" && li.Enabled)
+                                {
+                                    li.Selected = true;
+                                }
+                            }
+                        }
                     }
                 }
             }
