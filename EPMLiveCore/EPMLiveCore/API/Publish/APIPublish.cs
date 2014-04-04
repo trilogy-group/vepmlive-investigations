@@ -967,7 +967,7 @@ namespace EPMLiveCore.API
 
             Dictionary<string, Dictionary<string, string>> fieldProperties = ListDisplayUtils.ConvertFromString(gSettings.DisplaySettings);
 
-            SortedList arrWPFields = EPMLiveWorkPlanner.PlannerCore.getWorkPlannerStatusFields(oTaskCenter.ParentWeb, oTaskCenter.Title);
+            SortedList arrWPFields = ReflectionMethods.GetWorkPlannerStatusFields(oTaskCenter.ParentWeb, oTaskCenter.Title);
 
             StringBuilder sb = new StringBuilder();
 
