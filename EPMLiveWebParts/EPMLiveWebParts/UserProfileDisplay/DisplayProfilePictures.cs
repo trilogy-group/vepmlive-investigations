@@ -28,7 +28,7 @@ namespace EPMLiveWebParts
     [XmlRoot(Namespace = "MyDisplayProfilePictures")]
     public class DisplayProfilePictures : WebPart
     {
-        private const string DefaultProfilePicturePath = "_layouts/images/person.gif";
+        private const string DefaultProfilePicturePath = "_layouts/epmlive/images/defaultprofilepic.png";
 
         [Category("Profile View Properties")]
         [WebPartStorage(Storage.Shared)]
