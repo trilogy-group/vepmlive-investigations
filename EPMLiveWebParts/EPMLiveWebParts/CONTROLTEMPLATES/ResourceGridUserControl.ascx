@@ -122,7 +122,7 @@
         
         .EPMLiveResourceGridPicture > img {
             padding: 1px;
-            border: 1px solid #CCCCCC;
+            border: 1px solid #eeeeee;
             background-color: #ffffff;
             width:30px;
         }
