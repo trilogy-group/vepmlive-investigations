@@ -6,14 +6,7 @@
             var baseUrl = window.epmLive.currentWebUrl.slice(1);
 
             var se = {
-                pagination: {
-                    isLoading: false,
-                    firstTimeLoad: true,
-                    page: 1,
-                    limit: 10,
-                    activityLimit: 1,
-                    commentLimit: 2
-                },
+                pagination: null,
                 ui: {
                     selectors: {
                         comments: 'div.epm-se-comments',
@@ -29,6 +22,7 @@
                 },
                 apiUrl: '/' + baseUrl + '/_vti_bin/SocialEngine.svc',
                 commentServiceUrl: '/' + baseUrl + '/_layouts/15/epmlive/CommentsProxy.aspx',
+                statusUpdateServiceUrl: '/' + baseUrl + '/_vti_bin/WorkEngine.asmx/Execute',
             };
 
             var $el = {
@@ -116,12 +110,24 @@
                     }
                 };
 
+                var _resetpagination = function() {
+                    se.pagination = {
+                        isLoading: false,
+                        firstTimeLoad: true,
+                        page: 1,
+                        limit: 10,
+                        activityLimit: 1,
+                        commentLimit: 2
+                    };
+                };
+
                 return {
                     getFriendlyTime: _getFriendlyTime,
                     getLongTime: _getLongTime,
                     getUserFriendlyName: _getUserFriendlyName,
                     getUserProfileUrl: _getUserProfileUrl,
-                    sortComments: _sortComments
+                    sortComments: _sortComments,
+                    resetPagination: _resetpagination
                 };
             })();
 
@@ -234,6 +240,7 @@
                         thread.icon = 'icon-tree-2';
                     } else if (thread.kind==='StatusUpdate') {
                         thread.icon = 'icon-bubble-12';
+                        thread.url = null;
                     } else {
                         thread.list = entityManager.getById(thread.listId, data.lists);
                         thread.list.icon = thread.list.icon || 'icon-square';
@@ -253,7 +260,7 @@
                     if (thread.activities.length) thread.earliestActivityTime = thread.activities[thread.activities.length - 1].time;
                     if (thread.comments.length) thread.earliestCommentTime = thread.comments[0].time;
 
-                    thread.title = $('<div/>').html($('<div/>').html(thread.title).text()).text();
+                    thread.title = $('<div/>').html($('<div/>').html(thread.title).text()).text()
 
                     return thread;
                 }
@@ -267,7 +274,7 @@
                         helpers.sortComments(thread.comments);
 
                         if (thread = build(thread, data)) {
-                            if (data.statusUpdate) $el.threads.prepend(templates.thread(thread));
+                            if (data.newStatusUpdate) $el.threads.prepend(templates.thread(thread));
                             else $el.threads.append(templates.thread(thread));
                             $$.publish('se.threadRendered', thread, $el.threads.find(selector), data);
                         }
@@ -315,13 +322,15 @@
                 function renderFirstActivity(thread, $thread, data) {
                     var activity = thread.activities[0];
 
-                    var selector = 'ul.epm-se-activities li#epm-se-activity-' + activity.id;
+                    if (activity) {
+                        var selector = 'ul.epm-se-activities li#epm-se-activity-' + activity.id;
 
-                    var $activity = $thread.find(selector);
+                        var $activity = $thread.find(selector);
 
-                    if (!$activity.length) {
-                        if (activity = buildFirstActivity(activity, thread, data)) {
-                            $thread.find('ul.epm-se-activities').append(templates.activity(activity));
+                        if (!$activity.length) {
+                            if (activity = buildFirstActivity(activity, thread, data)) {
+                                $thread.find('ul.epm-se-activities').append(templates.activity(activity));
+                            }
                         }
                     }
                 }
@@ -446,6 +455,45 @@
                     settings.button.hide();
                     settings.button.removeClass(se.ui.classes.active);
                 }
+                
+                function addNewStatusUpdate(data) {
+                    var userId = parseInt(window.epmLive.currentUserId);
+                    var webId = window.epmLive.currentWebId;
+
+                    var payload = {
+                        lists: [],
+                        threads: [{
+                            activities: [{
+                                data: null,
+                                id: new Date().getTime(),
+                                isBulkOperation: false,
+                                key: new Date().getTime(),
+                                kind: 'Created',
+                                time: new Date().toUTCString(),
+                                userId: userId
+                            }],
+                            comments: [],
+                            id: new Date().getTime(),
+                            kind: 'StatusUpdate',
+                            title: data.text,
+                            totalActivities: 1,
+                            totalComments: 0,
+                            webId: webId
+                        }],
+                        users: [{
+                            displayName: window.epmLive.currentUserDisplayName,
+                            id: userId,
+                            picture: window.epmLive.currentUserAvatar
+                        }],
+                        webs: [{
+                            id: webId,
+                            url: window.epmLive.currentWebUrl
+                        }],
+                        newStatusUpdate: true
+                    };
+
+                    $$.publish('se.dataLoaded', payload);
+                }
 
                 function addComment(data) {
                     var time = moment().tz(window.epmLive.currentUserTimeZone.olsonName);
@@ -465,6 +513,8 @@
                     if (data.$thread) {
                         data.$thread.find(se.ui.selectors.latestComments).append(templates.comment(comment));
                         data.$thread.find(se.ui.selectors.comments).removeClass(se.ui.classes.hidden);
+                    } else {
+                        //addNewStatusUpdate(data);
                     }
                 }
 
@@ -482,19 +532,42 @@
                         itemId = null;
                     }
 
-                    $.post(se.commentServiceUrl, {
-                        command: 'CreateComment',
-                        comment: data.text,
-                        newcomment: null,
-                        itemId: itemId,
-                        listId: listId,
-                        userId: window.epmLive.currentUserId,
-                        commentItemId: itemId,
-                        kind: data.thread.kind,
-                        suid: data.thread.activities[0].key
-                    }).then(function(response) {
-                        console.log(response);
-                    });
+                    if (data.thread) {
+                        $.post(se.commentServiceUrl, {
+                            command: 'CreateComment',
+                            comment: data.text,
+                            newcomment: null,
+                            itemId: itemId,
+                            listId: listId,
+                            userId: window.epmLive.currentUserId,
+                            commentItemId: itemId,
+                            kind: data.thread.kind,
+                            suid: data.thread.activities[0].key
+                        }).then(function(response) {
+                            if (window.epmLive.debugMode) console.log(response);
+                        });
+                    } else {
+                        var comment = data.text.replace(/'/g, '&apos;').replace(/"/g, '&quot;');
+                        
+                        $.ajax({                            
+                            url: se.statusUpdateServiceUrl,
+                            type: 'POST',
+                            contentType: 'application/json; charset=utf-8',
+                            dataType: 'json',
+                            data: "{ Function: 'CreatePublicComment', Dataxml: '<Data><Param key=\"Comment\"><![CDATA[" + comment + "]]></Param></Data>' }"
+                        }).then(function (response) {
+                            if (response.d) {
+                                var code = response.d.match(/<Result Status="(\d)">/);
+                                if (code.length && 0 === parseInt(code[1])) {
+                                    window.setTimeout(function() {
+                                        helpers.resetPagination();
+                                        _load(null, true);
+                                    }, 500);
+                                }
+                            }
+                            if (window.epmLive.debugMode) console.log(response);
+                        });
+                    }
                 }
 
                 function attahEvents(settings) {
@@ -653,13 +726,15 @@
                 });
             }
 
-            var _configure = function() {
+            var _configure = function () {
+                helpers.resetPagination();
+                
                 configureMoment();
                 configureUI();
                 attachEvents();
             };
 
-            var _load = function(query) {
+            var _load = function(query, isReload) {
                 if (se.pagination.page === 0) return;
 
                 query = query || {
@@ -687,6 +762,7 @@
                     $el.pagination.hide();
 
                     if (response.threads.length) {
+                        if (isReload) $el.threads.html('');
                         $$.publish('se.dataLoaded', response);
                         se.pagination.page++;
                     } else {

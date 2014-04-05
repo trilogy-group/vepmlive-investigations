@@ -46,9 +46,6 @@
     </li>
 </script>
 
-<script id="epm-se-status-update-template" type="text/x-handlebars-template">
-</script>
-
 <script id="epm-se-activity-template" type="text/x-handlebars-template">
     <li id="epm-se-activity-{{id}}" class="epm-se-activity clearfix">
         {{> activity-icon}}{{> user-info}}{{> activity-info}}{{> activity-time}}
