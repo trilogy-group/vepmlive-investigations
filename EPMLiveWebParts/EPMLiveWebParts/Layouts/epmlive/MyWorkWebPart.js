@@ -56,7 +56,7 @@ function MyWorkOnReady (grid, start) {
 
         if (window.epmLiveMasterPageVersion >= 5.5) {
             var url = (document.location.href + '').toLowerCase().replace('%20', '').replace(' ', '');
-            if (url.indexOf('mywork.aspx') === -1) {
+            if (url.indexOf('mywork.aspx') !== -1) {
                 window.EPM.UI.Loader.current().stopLoading('WebPart' + window.myWorkWebPartQualifier);
             }
         } else {
