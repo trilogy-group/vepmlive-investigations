@@ -734,8 +734,18 @@
                 attachEvents();
             };
 
-            var _load = function(query, isReload) {
+            var _load = function(query, isReload, tries) {
                 if (se.pagination.page === 0) return;
+                if (tries > 5) {
+                    $el.pagination.hide();
+                    se.pagination.page = 0;
+                    se.pagination.isLoading = false;
+                    $el.noActivity.fadeIn('fast');
+                    
+                    return;
+                }
+
+                tries = tries || 0;
 
                 query = query || {
                     page: se.pagination.page,
@@ -758,7 +768,15 @@
 
                 apiUrl += params.join('&');
 
-                $.getJSON(apiUrl).then(function(response) {
+                $.getJSON(apiUrl).success(function (response) {
+                    if (response.error) {
+                        window.setTimeout(function () {
+                            _load(query, isReload, ++tries);
+                        });
+
+                        return;
+                    }
+                    
                     $el.pagination.hide();
 
                     if (response.threads.length) {
@@ -776,6 +794,14 @@
                     }
 
                     se.pagination.firstTimeLoad = false;
+                }).error(function(response) {
+                    if (window.epmLive.debugMode) {
+                        console.log(response);
+                    }
+
+                    window.setTimeout(function() {
+                        _load(query, isReload, ++tries);
+                    });
                 });
             };
 
