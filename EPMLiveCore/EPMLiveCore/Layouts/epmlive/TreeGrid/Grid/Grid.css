@@ -129,7 +129,7 @@ top:4px;
 .GMCellSpaceAbove { border-top:1px solid #e0e0ff; }
 .GMCellSpaceBelow { border-bottom:1px solid #e0e0ff; }
 
-.GMCellFilterPanel { background-color:#F0F0E0; text-align:center; padding-top:0px; }
+.GMCellFilterPanel { background-color:#ffffff; text-align:center; padding-top:0px; }
 .GMCellHeader,.GMCellHeaderEmpty { padding-top:5px; background-color:#FFFFFF; border-top:0px solid #ffffff; padding-bottom:5px }
 .GMCellPanel,.GMCellHeaderPanel { background-color:#FFFFFF; }
 .GMCellHeader:hover,.GMCellHeaderEmpty:hover { background-color:#FFF; }
