@@ -1,16 +1,14 @@
-﻿using System;
-using System.ComponentModel;
-using System.Web.UI.WebControls.WebParts;
-using WebPart = Microsoft.SharePoint.WebPartPages.WebPart;
+﻿using System.ComponentModel;
+using Microsoft.SharePoint.WebPartPages;
 
 namespace EPMLiveWebParts
 {
     [ToolboxItem(false)]
     public class SocialStream : WebPart
     {
-		#region Methods (1) 
+        #region Methods (1) 
 
-		// Protected Methods (1) 
+        // Protected Methods (1) 
 
         protected override void CreateChildControls()
         {
@@ -18,14 +16,6 @@ namespace EPMLiveWebParts
             Controls.Add(control);
         }
 
-		#endregion Methods 
-
-
-
-        #region Overrides of WebPart
-
-       
-
-        #endregion
+        #endregion Methods 
     }
 }
