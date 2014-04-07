@@ -5647,6 +5647,11 @@ button.toast-close-button {
     background-color: #FFFF76;
     width: 100%;
 }
+.ms-webpart-titleText.ms-webpart-titleText, .ms-webpart-titleText > a {
+    color: #0090CA;
+ border-bottom: 1px solid #EEEEEE;
+ padding-bottom:10px;
+}
 /*!
  * Bootstrap v3.1.1 (http://getbootstrap.com)
  * Copyright 2011-2014 Twitter, Inc.
