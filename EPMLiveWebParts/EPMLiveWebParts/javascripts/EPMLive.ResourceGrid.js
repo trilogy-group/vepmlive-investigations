@@ -1987,7 +1987,7 @@ function registerEpmLiveResourceGridScript() {
                                             'divider': 'yes',
                                             'options': [
                                                 {
-                                                    'iconClass': 'icon-pie-3 icon-dropdown',
+                                                    'iconClass': 'icon-users-5 icon-dropdown',
                                                     'text': 'Resource Planner',
                                                     'events': [
                                                         {
@@ -1997,7 +1997,7 @@ function registerEpmLiveResourceGridScript() {
                                                     ]
                                                 },
                                                 {
-                                                    'iconClass': 'icon-flag-5 icon-dropdown',
+                                                    'iconClass': 'icon-calendar-5 icon-dropdown',
                                                     'text': 'Assignment Planner',
                                                     'events': [
                                                         {
@@ -2014,7 +2014,7 @@ function registerEpmLiveResourceGridScript() {
                                             'divider': 'yes',
                                             'options': [
                                                 {
-                                                    'iconClass': 'icon-filter-4 icon-dropdown',
+                                                    'iconClass': 'icon-stats-3 icon-dropdown',
                                                     'text': 'Resource Analyzer',
                                                     'events': [
                                                         {
@@ -2024,7 +2024,7 @@ function registerEpmLiveResourceGridScript() {
                                                     ]
                                                 },
                                                 {
-                                                    'iconClass': 'icon-filter-4 icon-dropdown',
+                                                    'iconClass': 'icon-bars-4 icon-dropdown',
                                                     'text': 'Work vs. Capacity',
                                                     'events': [
                                                         {
@@ -2041,7 +2041,7 @@ function registerEpmLiveResourceGridScript() {
                                             'divider': 'yes',
                                             'options': [
                                                 {
-                                                    'iconClass': 'icon-filter-4 icon-dropdown',
+                                                    'iconClass': 'icon-envelop icon-dropdown',
                                                     'text': 'Send Notification',
                                                     'events': [
                                                         {
@@ -2051,7 +2051,7 @@ function registerEpmLiveResourceGridScript() {
                                                     ]
                                                 },
                                                 {
-                                                    'iconClass': 'icon-filter-4 icon-dropdown',
+                                                    'iconClass': 'icon-download-6 icon-dropdown',
                                                     'text': 'Export Excel',
                                                     'events': [
                                                         {
@@ -2061,7 +2061,7 @@ function registerEpmLiveResourceGridScript() {
                                                     ]
                                                 },
                                                 {
-                                                    'iconClass': 'icon-filter-4 icon-dropdown',
+                                                    'iconClass': 'icon-upload-6 icon-dropdown',
                                                     'text': 'Import Excel',
                                                     'events': [
                                                         {
