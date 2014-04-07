@@ -8,9 +8,9 @@ namespace EPMLiveWebParts
     [ToolboxItem(false)]
     public class SocialStream : WebPart
     {
-        #region Methods (1) 
+		#region Methods (1) 
 
-        // Protected Methods (1) 
+		// Protected Methods (1) 
 
         protected override void CreateChildControls()
         {
@@ -18,14 +18,13 @@ namespace EPMLiveWebParts
             Controls.Add(control);
         }
 
-        #endregion Methods 
+		#endregion Methods 
+
+
 
         #region Overrides of WebPart
 
-        protected override void OnPreRender(EventArgs e)
-        {
-            ChromeType = PartChromeType.None;
-        }
+       
 
         #endregion
     }
