@@ -337,6 +337,30 @@ function registerEpmLiveResourceGridScript() {
                 });
             },
 
+            contextMenuResourceChanged: function (liid) {
+                var grid = $$.grid.grids[$$.id()];
+                if (liid) {
+                    var selRows = grid.GetSelRows();
+                    var selRow = selRows[0];
+                    if (!selRow) {
+                        selRow = grid.GetRowById(liid);
+                    }
+                    $$.grid.resourceUpdated(1, null, { row: selRow, changeType: 'Changed' });
+                }
+            },
+
+            contextMenuResourceDelete: function (liid) {
+                var grid = $$.grid.grids[$$.id()];
+                if (liid) {
+                    var selRows = grid.GetSelRows();
+                    var selRow = selRows[0];
+                    if (!selRow) {
+                        selRow = grid.GetRowById(liid);
+                    }
+                    $$.grid.resourceUpdated(1, null, { row: selRow, changeType: 'Deleted' });
+                }
+            },
+
             fixIE: function () {
                 try {
                     if ($.browser.msie) {
@@ -2396,7 +2420,7 @@ function registerEpmLiveResourceGridScript() {
                 CurrentGrid = grid;
                 if (grid.GetValue(row, "itemid") != "") {
                     grid.SetAttribute(row, "Title", "ButtonText", '<div class="gridmenuspan" style="position:absolute;overflow:visible" id=\"' + row.id + '\"><a data-itemid="' + grid.GetValue(row, "itemid") + '" data-listid="' + grid.GetValue(row, "listid") + '" data-webid="' + grid.GetValue(row, "webid") + '" data-siteid="' + grid.GetValue(row, "siteid") + '" ></a></div>', 1);
-                    window.epmLiveNavigation.addContextualMenu($('#' + row.id), [], false, false, { "delete": "GridGanttDeleteRow" });
+                    window.epmLiveNavigation.addContextualMenu($('#' + row.id), [], false, false, { "edit": "window.epmLiveResourceGrid.grid.contextMenuResourceChanged", "delete": "window.epmLiveResourceGrid.grid.contextMenuResourceDelete" });
                 }
             }
         }
