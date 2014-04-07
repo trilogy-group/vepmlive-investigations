@@ -54,7 +54,7 @@
         .fancy-col-table tr td:first-child {
             width: 175px;
             font-family: Open Sans Regular !important;
-            vertical-align: top;
+            vertical-align: middle;
         }
 
         .fancy-col-table tr td {
@@ -97,8 +97,9 @@
     .fancy-display-form-wrapper .dispFormUserImage {
         fit-position: slice;
         height: 22px;
-        width: 23px;
         text-align: center;
+        border-radius:50%;
+        vertical-align:bottom;
     }
 
     .fancy-display-form-wrapper .dispFormExpandMore {
@@ -114,9 +115,9 @@
         min-width: 14px;
         padding: 2px 8px;
         font-size: 12px;
-        font-family: Open Sans Bold !important;
+        font-family: "Open Sans Semi Bold" !important;
         color: #fff;
-        line-height: 1;
+        line-height: 13px;
         vertical-align: baseline;
         white-space: nowrap;
         text-align: center;
@@ -179,7 +180,6 @@
 
     .fancy-display-form-wrapper .listMainDiv {
         float: left;
-        padding: 5px;
         margin-right: 5px;
     }
 
