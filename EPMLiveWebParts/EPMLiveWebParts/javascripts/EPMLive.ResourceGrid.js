@@ -1898,7 +1898,7 @@ function registerEpmLiveResourceGridScript() {
                                     'events': [
                                         {
                                             'eventName': 'click',
-                                            'function': function () { $$.actions.displayPopUp($$.actions.getNewFormUrl, 'Test', false, true, null, null); }
+                                            'function': function () { $$.actions.displayPopUp($$.actions.getNewFormUrl, 'Add User', false, true, $$.grid.resourceUpdated, { row: null, changeType: 'Added' }); }
                                         }
                                     ]
                                 },
