@@ -32,11 +32,11 @@
         <ul class="epm-se-activities"></ul>
         <ul class="epm-se-older-activities"></ul>
         {{#if hasMoreActivities}}
-            <div class="epm-show-older" data-kind="activities" data-threadId="{{id}}" data-offset="{{earliestActivityTime}}"><span class="icon-arrow-up-16"></span>show older activities</div>
+            <div class="epm-show-older" data-kind="activities" data-threadId="{{id}}" data-offset="{{earliestActivityTime}}">show older activities</div>
         {{/if}}
         <div class="epm-se-comments {{commentsHidden}}">
             {{#if hasMoreComments}}
-                <div class="epm-show-older" data-kind="comments" data-threadId="{{id}}" data-offset="{{earliestCommentTime}}"><span class="icon-arrow-down-16"></span>show older comments</div>
+                <div class="epm-show-older" data-kind="comments" data-threadId="{{id}}" data-offset="{{earliestCommentTime}}">show older comments</div>
             {{/if}}
             <ul class="epm-se-older-comments"></ul>
             <ul class="epm-se-comments"></ul>

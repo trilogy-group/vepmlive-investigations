@@ -80,9 +80,11 @@
   color: #cccccc;
   font-size: 11px;
 }
-#epm-social-stream div.epm-show-older span {
-  font-size: 8px;
+#epm-social-stream div.epm-show-older:before {
+  content: "•••";
   margin-right: 5px;
+  position: relative;
+  top: 1px;
 }
 #epm-social-stream div#epm-se-pagination span {
   display: none;
@@ -142,6 +144,9 @@
   display: inline-block;
   height: 40px;
   line-height: 40px;
+}
+#epm-social-stream li.epm-se-thread span.epm-se-object-info a:hover {
+  text-decoration: none;
 }
 #epm-social-stream li.epm-se-thread span.epm-se-activity-time,
 #epm-social-stream li.epm-se-thread span.epm-se-object-info {

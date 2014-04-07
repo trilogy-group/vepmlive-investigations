@@ -110,9 +110,11 @@
         color: @info-color;
         font-size: @info-font-size;
 
-        span {
-            font-size: 8px;
+        &:before {
+            content: "•••";
             margin-right: 5px;
+            position: relative;
+            top: 1px;
         }
     }
 
@@ -182,6 +184,12 @@
             display: inline-block;
             height: @avatar-size;
             line-height: @avatar-size;
+
+            a {
+                &:hover {
+                    text-decoration: none;
+                }
+            }
         }
 
         span.epm-se-activity-time,
