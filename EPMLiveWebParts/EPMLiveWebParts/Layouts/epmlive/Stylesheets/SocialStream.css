@@ -90,11 +90,12 @@
   display: none;
 }
 #epm-social-stream div#epm-se-no-activity {
-  display: none;
-  color: #bbbbbb;
-  max-width: 400px;
+  color: #CCCCCC;
+  font-family: "Open Sans Light", Helvetica, Arial;
+  font-size: 20px;
+  margin: 0 auto;
   text-align: center;
-  padding: 10px;
+  display: none;
 }
 #epm-social-stream li.epm-se-thread {
   margin-bottom: 20px;

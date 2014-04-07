@@ -20,7 +20,7 @@
         <button id="epm-se-comment-post-<%= SEID %>">Post</button>
     </div>
     <ul id="epm-se-threads"></ul>
-    <div id="epm-se-no-activity">Get to work! Once you start working in the system, items will appear here in the stream.</div>
+    <div id="epm-se-no-activity">Get to work! - once you do, you'll see activity here.</div>
     <div id="epm-se-pagination"><span>Loading more...</span></div>
 </div>
 
