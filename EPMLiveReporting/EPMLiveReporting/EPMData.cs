@@ -18,6 +18,8 @@ namespace EPMLiveReportsAdmin
     {
         private readonly Guid _siteID;
         private readonly Guid _webAppId;
+        private Guid _webId;
+
         private string _DefaultLists;
         private string _command;
         private CommandType _commandType = CommandType.Text;
@@ -54,6 +56,33 @@ namespace EPMLiveReportsAdmin
                     {
                         _siteUrl = rootweb.ServerRelativeUrl;
                         _siteName = rootweb.Name;
+                        _webId = rootweb.ID;
+                    }
+                }
+            });
+
+
+            //OpenEPMLiveConnection = ConfigurationManager.ConnectionStrings["epmlive"].ToString();
+            if (_epmLiveConOpen)
+            {
+                PopulateInstanceFromData();
+                PopulateConnectionStrings();
+            }
+        }
+
+        public EPMData(bool tmp, Guid siteID, Guid webId)
+        {
+            _siteID = siteID;
+            SPSecurity.RunWithElevatedPrivileges(delegate()
+            {
+                using (var spSite = new SPSite(siteID))
+                {
+                    OpenEPMLiveConnection = CoreFunctions.getConnectionString(spSite.WebApplication.Id);
+                    using (SPWeb rootweb = spSite.OpenWeb(webId))
+                    {
+                        _siteUrl = rootweb.ServerRelativeUrl;
+                        _siteName = rootweb.Name;
+                        _webId = rootweb.ID;
                     }
                 }
             });
@@ -79,6 +108,7 @@ namespace EPMLiveReportsAdmin
                     {
                         _siteUrl = rootweb.ServerRelativeUrl;
                         _siteName = rootweb.Name;
+                        _webId = rootweb.ID;
                     }
                 }
             }
@@ -119,6 +149,7 @@ namespace EPMLiveReportsAdmin
                 using (var spSite = new SPSite(siteID))
                 {
                     OpenEPMLiveConnection = CoreFunctions.getConnectionString(spSite.WebApplication.Id);
+                    _webId = spSite.OpenWeb().ID;
                 }
             });
 
@@ -1547,13 +1578,7 @@ namespace EPMLiveReportsAdmin
                     {
                         try
                         {
-                            //Clear list name
-                            sListName = string.Empty;
-
-                            //Init. list name
-                            sListName = dtList.TableName.ToLower().Replace("lst", "");
-
-
+                          
                             //Datatable name MUST be the SAME as the sqltable name.
                             sbc.DestinationTableName = dtList.TableName;
 
@@ -1908,7 +1933,8 @@ namespace EPMLiveReportsAdmin
                 int iListCounter = 0;
                 while (iListCounter < listNames.Length)
                 {
-                    tableNames[iListCounter] = GetTableName(listNames[iListCounter]);
+                    Guid lstId = GetListId(Convert.ToString(listNames[iListCounter]), _webId);//GetTableName(listNames[iListCounter]);
+                    tableNames[iListCounter] = GetTableName(lstId);
                     iListCounter++;
                 }
 
@@ -1937,7 +1963,7 @@ namespace EPMLiveReportsAdmin
                 iListCounter = 0;
                 while (iListCounter < listNames.Length)
                 {
-                    listIds[iListCounter] = GetListId(listNames[iListCounter]).ToString();
+                    listIds[iListCounter] = GetListId(Convert.ToString(listNames[iListCounter]), _webId).ToString();
                     iListCounter++;
                 }
 
@@ -2133,7 +2159,7 @@ namespace EPMLiveReportsAdmin
         public Guid GetListId(string sListName)
         {
             using (var site = new SPSite(_siteID))
-            {
+            {                                
                 using (SPWeb spWeb = site.OpenWeb())
                 {
                     try
@@ -2147,6 +2173,41 @@ namespace EPMLiveReportsAdmin
                     }
                 }
             }
+        }
+
+        public Guid GetListId(string sListName, Guid webId)
+        {
+            using (var site = new SPSite(_siteID))
+            {
+                using (SPWeb spWeb = site.OpenWeb(webId))
+                {
+                    try
+                    {
+                        return spWeb.Lists[sListName].ID;
+                    }
+                    catch (Exception ex)
+                    {
+                        var listID = new Guid();
+                        return listID;
+                    }
+                }
+            }
+        }
+
+
+        /// <summary>
+        /// </summary>
+        /// <param name="listName"></param>
+        /// <returns></returns>
+        public string GetTableName(Guid listId)
+        {
+            object objTableName = null;
+            Command = "SELECT TableName FROM " + Resources.ListTable.Replace("'", "") +
+                      " WHERE RPTListId=@RPTListId AND SiteId=@siteID";
+            AddParam("@RPTListId", listId);
+            AddParam("@siteID", _siteID);
+            objTableName = ExecuteScalar(GetClientReportingConnection);
+            return objTableName.ToString();
         }
 
         /// <summary>

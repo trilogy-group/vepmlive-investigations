@@ -81,7 +81,7 @@ namespace EPMLiveReportsAdmin
                 var rd = new ReportData(properties.SiteId);
                 var cols = new ColumnDefCollection();
                 //ColumnDef cd = new ColumnDef(properties.Field);
-                tableName = rd.GetTableName(properties.ListTitle);
+                tableName = rd.GetTableName(properties.ListId);
                 ssTableName = rd.GetTableNameSnapshot(properties.ListId);
                 cols.AddColumn(properties.Field);
                 rd.DeleteColumns(tableName, cols);
@@ -137,7 +137,7 @@ namespace EPMLiveReportsAdmin
             {
                 var rd = new ReportData(properties.SiteId);
                 var cols = new ColumnDefCollection();
-                tableName = rd.GetTableName(properties.ListTitle);
+                tableName = rd.GetTableName(properties.ListId);
                 ssTableName = rd.GetTableNameSnapshot(properties.ListId);
                 cols.AddColumn(properties.Field);
                 rd.AddColumns(tableName, cols);

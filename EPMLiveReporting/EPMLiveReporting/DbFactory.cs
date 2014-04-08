@@ -280,9 +280,8 @@ namespace EPMLiveReportsAdmin
             switch (field.Type)
             {
                 case SPFieldType.Lookup:
-                case SPFieldType.MultiChoice:
                 case SPFieldType.User:
-                    if (sType != "lookupmulti" && sType != "usermulti" && sType != "multichoice")
+                    if (sType != "lookupmulti" && sType != "usermulti")
                     {
                         columns.Add(new ColumnDef(field.InternalName + "ID", field.InternalName, field.Title, field.Type,
                             SqlDbType.Int));

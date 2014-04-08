@@ -71,7 +71,7 @@ namespace EPMLiveReportsAdmin.Jobs
             var hshMessages = new Hashtable();
             bool refreshAll = (string.IsNullOrEmpty(data) ? true : false);
 
-            var epmdata = new EPMData(site.ID);
+            var epmdata = new EPMData(true, site.ID, web.ID);
 
             if (data == null || data == "")
             {

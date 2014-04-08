@@ -289,7 +289,7 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
             {
                 using (SPWeb web = SPContext.Current.Web)
                 {
-                    Guid listId = _DAO.GetListId(sLists);
+                    Guid listId = _DAO.GetListId(sLists, web.ID);
                     _DAO.Command =
                         "select timerjobuid from timerjobs where siteguid=@siteguid and listguid = @listguid and jobtype=7";
                     _DAO.AddParam("@siteguid", site.ID.ToString());
@@ -326,9 +326,9 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
             //Prod -- Start
             using (SPSite site = SPContext.Current.Site)
             {
-                using (SPWeb web = SPContext.Current.Web)
+                using (SPWeb web = SPContext.Current.Web)          
                 {
-                    Guid listID = _DAO.GetListId(sLists);
+                    Guid listID = _DAO.GetListId(sLists, web.ID);
 
                     //DELETE WORK
                     _DAO.DeleteWork(listID, -1);

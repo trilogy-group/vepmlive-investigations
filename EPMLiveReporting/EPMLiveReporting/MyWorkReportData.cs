@@ -519,7 +519,7 @@ namespace EPMLiveReportsAdmin
             object objType = _DAO.ExecuteScalar(_DAO.GetClientReportingConnection);
 
             return objType.ToString().ToLower().Equals("lookup") || objType.ToString().ToLower().Equals("user") ||
-                   objType.ToString().ToLower().Equals("multichoice") || objType.ToString().ToLower().Equals("flookup");
+                   objType.ToString().ToLower().Equals("flookup");
         }
 
         /// <summary>

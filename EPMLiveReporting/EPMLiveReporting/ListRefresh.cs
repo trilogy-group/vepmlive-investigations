@@ -111,7 +111,7 @@ namespace EPMLiveReportsAdmin
                                     _dsMyWorkLists = new DataSet();
 
                                     spList = null;
-                                    _sTableName = _DAO.GetTableName(lworkhours.Title);
+                                    _sTableName = _DAO.GetTableName(lworkhours.ID);
                                     _siteID = _web.ID;
                                     //Add sSiteIdListName string to array, that will be used to create dyn. sql to do a batch delete
                                     _ArrayListTableNames.Add(_sTableName);
@@ -355,7 +355,7 @@ namespace EPMLiveReportsAdmin
                                     try
                                     {
                                         spList = null;
-                                        _sTableName = _DAO.GetTableName(list.Title);
+                                        _sTableName = _DAO.GetTableName(list.ID);
                                         _siteID = _web.ID;
                                         //Add sSiteIdListName string to array, that will be used to create dyn. sql to do a batch delete
                                         _ArrayListTableNames.Add(_sTableName);
@@ -465,7 +465,7 @@ namespace EPMLiveReportsAdmin
                                     spList = _web.Lists[sListName];
 
                                     //Init. list sqltable name
-                                    _sTableName = _DAO.GetTableName(sListName);
+                                    _sTableName = _DAO.GetTableName(spList.ID);//_DAO.GetTableName(sListName);
 
                                     //Init. web id
                                     _siteID = _web.ID;
@@ -541,7 +541,7 @@ namespace EPMLiveReportsAdmin
 
                                     bool error;
                                     string sErrMsg;
-                                    _sTableName = _DAO.GetTableName(sListName);
+                                    _sTableName = _DAO.GetTableName(spList.ID);
                                     AddItems(timerjobguid, sListName, out error, out sErrMsg);
 
                                     //Add all current list items to the database (from the corresponding sharepoint list)
