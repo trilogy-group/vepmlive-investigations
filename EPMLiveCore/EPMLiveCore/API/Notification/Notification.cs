@@ -139,7 +139,7 @@ namespace EPMLiveCore.API
 
                 epmNotification.CreatedAtDateString = dateTime.ToString(cultureInfo.DateTimeFormat.ShortDatePattern);
 
-                epmNotification.CreatorThumbnail = string.Format("{0}/_layouts/images/person.gif",
+                epmNotification.CreatorThumbnail = string.Format("{0}/_layouts/15/epmlive/images/default-avatar.png",
                                                                  spWeb.SafeServerRelativeUrl());
 
                 epmNotification.CreatorName = "System";
