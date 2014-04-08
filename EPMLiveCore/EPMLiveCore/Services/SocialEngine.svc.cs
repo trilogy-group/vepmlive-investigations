@@ -281,7 +281,7 @@ namespace EPMLiveCore.Services
             var thread = new SEActivities.Thread
             {
                 id = (Guid) tr["ThreadId"],
-                title = (string) tr["ThreadTitle"],
+                title = HttpUtility.HtmlDecode(HttpUtility.HtmlDecode((string) tr["ThreadTitle"])),
                 url = url,
                 kind = ((ObjectKind) tr["ThreadKind"]).ToString(),
                 lastActivityOn = ((DateTime) tr["ThreadLastActivityOn"]).ToString(DATE_FORMAT),

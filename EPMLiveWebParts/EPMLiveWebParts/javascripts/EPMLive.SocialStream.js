@@ -277,8 +277,6 @@
                     if (thread.activities.length) thread.earliestActivityTime = thread.activities[thread.activities.length - 1].time;
                     if (thread.comments.length) thread.earliestCommentTime = thread.comments[0].time;
 
-                    thread.title = $('<div/>').html($('<div/>').html(thread.title).text()).text();
-
                     return thread;
                 }
 
@@ -617,7 +615,7 @@
                         if (!$(this).hasClass(se.ui.classes.active)) return;
 
                         var data = {
-                            text: $.trim(settings.input.text()),
+                            text: $.trim(settings.input.html()),
                             thread: settings.thread,
                             $thread: settings.$thread
                         };

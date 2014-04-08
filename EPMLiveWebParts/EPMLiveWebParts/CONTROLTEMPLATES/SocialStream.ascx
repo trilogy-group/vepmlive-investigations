@@ -84,7 +84,7 @@
         {{#if url}}
             <a href="{{url}}" class="epm-se-link" target="_blank" data-kind="{{kind}}">{{title}}</a>
         {{else}}
-            {{title}}
+            {{{title}}}
         {{/if}}
     </h2>
 </script>
