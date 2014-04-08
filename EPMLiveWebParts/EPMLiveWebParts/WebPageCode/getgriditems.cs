@@ -5663,6 +5663,8 @@ namespace EPMLiveWebParts
                 case SPFieldType.Number:
                 case SPFieldType.Currency:
                     //val = double.Parse(val, providerEn).ToString();
+                    if (bCleanValues)
+                        return val;
                     val = spfield.GetFieldValueAsText(val);
                     break;
                 case SPFieldType.Boolean:
