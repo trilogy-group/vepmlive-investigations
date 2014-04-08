@@ -104,7 +104,7 @@
 </script>
 
 <script id="_epm-se-activity-time-template" type="text/x-handlebars-template">
-    <span class="epm-se-activity-time epm-se-has-tooltip" title="{{longTime}}" data-toggle="tooltip" data-placement="top" data-delay='{"show":500, "hide":100}'>{{friendlyTime}}</span>
+    <span class="epm-se-activity-time epm-se-has-tooltip" title="{{longTime}}" data-toggle="tooltip" data-placement="top">{{friendlyTime}}</span>
 </script>
 
 <script id="_epm-se-object-info-template" type="text/x-handlebars-template">

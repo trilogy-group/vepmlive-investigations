@@ -161,10 +161,6 @@
                     }
                 };
 
-                var _showTooltip = function($ele) {
-                    $ele.tooltip('show');
-                };
-
                 var _showOlder = function($ele) {
                     var kind = $ele.data('kind');
 
@@ -193,7 +189,6 @@
 
                 return {
                     navigate: _navigate,
-                    showTooltip: _showTooltip,
                     showOlder: _showOlder,
                     paginate: _paginate
                 };
@@ -637,6 +632,11 @@
                     $el.root.mousedown(function(event) {
                         se.lastClickedElement = event.target;
                     });
+
+                    $('body').tooltip({
+                        selector: 'span.epm-se-has-tooltip',
+                        delay: { show: 500, hide: 100 }
+                    });
                 }
 
                 var _render = function(thread, $thread, data) {
@@ -727,10 +727,6 @@
 
                 $$.subscribe('se.oldercommentsLoaded', function(data) {
                     commentManager.renderOlder(data);
-                });
-
-                $el.root.on('mouseenter', '.epm-se-has-tooltip', function() {
-                    actions.showTooltip($(this));
                 });
 
                 $el.root.on('click', 'a.epm-se-link', function(event) {
