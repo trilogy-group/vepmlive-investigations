@@ -124,17 +124,17 @@
 
                 var _startLoader = function() {
                     var seId = $el.root.get(0).id;
-                    
+
                     window.EPM.UI.Loader.current().startLoading({ id: seId });
                     se.loaderStarted = true;
-                    
+
                     var loader = $('#' + seId + '_epm_loader');
                     loader.css('margin-left', '-10px');
                     loader.width(loader.width() + 10);
                     loader.css('height', '100%');
                 };
 
-                var _stopLoader = function () {
+                var _stopLoader = function() {
                     $el.statusUpdateBox.show();
                     window.EPM.UI.Loader.current().stopLoading($el.root.get(0).id);
                     se.loaderStarted = false;
@@ -221,6 +221,7 @@
             })();
 
             var threadManager = (function() {
+
                 function build(thread, data) {
                     var baseTime = '1986-11-06T13:03:00';
 
@@ -254,7 +255,7 @@
 
                     if (thread.kind === 'Workspace') {
                         thread.icon = 'icon-tree-2';
-                    } else if (thread.kind==='StatusUpdate') {
+                    } else if (thread.kind === 'StatusUpdate') {
                         thread.icon = 'icon-bubble-12';
                         thread.url = null;
                     } else {
@@ -276,7 +277,7 @@
                     if (thread.activities.length) thread.earliestActivityTime = thread.activities[thread.activities.length - 1].time;
                     if (thread.comments.length) thread.earliestCommentTime = thread.comments[0].time;
 
-                    thread.title = $('<div/>').html($('<div/>').html(thread.title).text()).text()
+                    thread.title = $('<div/>').html($('<div/>').html(thread.title).text()).text();
 
                     return thread;
                 }
@@ -388,16 +389,16 @@
                         activity.action = 'made a comment';
                     } else {
                         var object = (thread.kind === 'ListItem' ? 'item' : thread.kind).toLowerCase();
-                        
+
                         switch (activity.kind) {
-                            case 'Created':
-                                activity.icon = 'icon-plus-2';
-                                activity.action = 'created this ' + object;
-                                break;
-                            case 'Updated':
-                                activity.icon = 'icon-pencil';
-                                activity.action = 'made an update';
-                                break;
+                        case 'Created':
+                            activity.icon = 'icon-plus-2';
+                            activity.action = 'created this ' + object;
+                            break;
+                        case 'Updated':
+                            activity.icon = 'icon-pencil';
+                            activity.action = 'made an update';
+                            break;
                         }
                     }
 
@@ -429,6 +430,7 @@
             })();
 
             var commentManager = (function() {
+
                 function build(comment, thread, data) {
                     comment = activityManager.setIconAndAction(comment, thread);
                     comment = activityManager.setUser(comment, data);
@@ -471,7 +473,7 @@
                     settings.button.hide();
                     settings.button.removeClass(se.ui.classes.active);
                 }
-                
+
                 function addNewStatusUpdate(data) {
                     var userId = parseInt(window.epmLive.currentUserId);
                     var webId = window.epmLive.currentWebId;
@@ -525,7 +527,7 @@
                             profileUrl: window.epmLive.currentWebUrl + '/_layouts/15/userdisp.aspx?ID=' + window.epmLive.currentUserId
                         }
                     };
-                    
+
                     if (data.$thread) {
                         data.$thread.find(se.ui.selectors.latestComments).append(templates.comment(comment));
                         data.$thread.find(se.ui.selectors.comments).removeClass(se.ui.classes.hidden);
@@ -537,7 +539,7 @@
                 function postComment(data) {
                     var itemId = 0;
                     var listId = null;
-                    
+
                     if (data.thread) {
                         itemId = data.thread.itemId;
                     }
@@ -564,14 +566,14 @@
                         });
                     } else {
                         var comment = data.text.replace(/'/g, '&apos;').replace(/"/g, '&quot;');
-                        
-                        $.ajax({                            
+
+                        $.ajax({
                             url: se.statusUpdateServiceUrl,
                             type: 'POST',
                             contentType: 'application/json; charset=utf-8',
                             dataType: 'json',
                             data: "{ Function: 'CreatePublicComment', Dataxml: '<Data><Param key=\"Comment\"><![CDATA[" + comment + "]]></Param></Data>' }"
-                        }).then(function (response) {
+                        }).then(function(response) {
                             if (response.d) {
                                 var code = response.d.match(/<Result Status="(\d)">/);
                                 if (code.length && 0 === parseInt(code[1])) {
@@ -689,7 +691,7 @@
                 _.registerPartial('activity-time', templates._activityTime);
                 _.registerPartial('object-info', templates._objectInfo);
                 _.registerPartial('comment-box', templates._commentBox);
-                
+
                 commentManager.configureBox({
                     element: $el.statusUpdateBox,
                     placeholder: 'Share something...'
@@ -743,10 +745,10 @@
                 });
             }
 
-            var _configure = function () {
+            var _configure = function() {
                 helpers.startLoader();
                 helpers.resetPagination();
-                
+
                 configureMoment();
                 configureUI();
                 attachEvents();
@@ -759,7 +761,7 @@
                     se.pagination.page = 0;
                     se.pagination.isLoading = false;
                     $el.noActivity.fadeIn('fast');
-                    
+
                     return;
                 }
 
@@ -786,15 +788,15 @@
 
                 apiUrl += params.join('&') + '&v=' + new Date().getTime();
 
-                $.getJSON(apiUrl).success(function (response) {
+                $.getJSON(apiUrl).success(function(response) {
                     if (response.error) {
-                        window.setTimeout(function () {
+                        window.setTimeout(function() {
                             _load(query, isReload, ++tries);
                         });
 
                         return;
                     }
-                    
+
                     $el.pagination.hide();
 
                     if (response.threads.length) {
@@ -812,7 +814,7 @@
                     }
 
                     se.pagination.firstTimeLoad = false;
-                    
+
                     if (se.loaderStarted) {
                         helpers.stopLoader();
                     }
