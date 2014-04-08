@@ -747,6 +747,8 @@ function registerEpmLiveResourceGridScript() {
 
                 window.RefreshCommandUI();
 
+                $$.actions.createToolBar('test');
+
                 if ($$.firstLoad) {
                     $$.actions.resetEasyScroll();
                     window.setTimeout(function () { $$.firstLoad = false; }, 2000);
