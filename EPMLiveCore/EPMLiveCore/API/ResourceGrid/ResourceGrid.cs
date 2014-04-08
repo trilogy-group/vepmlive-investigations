@@ -465,7 +465,7 @@ namespace EPMLiveCore.API
                     var iElement = new XElement("I");
 
                     int resourceId = 0;
-                    string profilePic = string.Format("{0}/_layouts/images/person.gif",
+                    string profilePic = string.Format("{0}/_layouts/15/epmlive/images/default-avatar.png",
                         spWeb.SafeServerRelativeUrl());
 
                     foreach (XElement dataElement in resourceElement.Elements())
