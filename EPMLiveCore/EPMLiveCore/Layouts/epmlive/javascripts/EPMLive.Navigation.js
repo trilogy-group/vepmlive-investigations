@@ -1143,7 +1143,14 @@
                             }
                             break;
                         default:
-                            SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', { url: redirectUrl, width: 700 });
+                            var options;
+                            if (callBackFunction != '' && callBackFunction != 'undefined') {
+                                callBackFunction = eval(callBackFunction);
+                                options = { url: redirectUrl, width: 700, dialogReturnValueCallback: Function.createCallback(Function.createDelegate(null, callBackFunction), id) };
+                            } else {
+                                options = { url: redirectUrl, width: 700 };
+                            }
+                            SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
                             break;
                     }
 

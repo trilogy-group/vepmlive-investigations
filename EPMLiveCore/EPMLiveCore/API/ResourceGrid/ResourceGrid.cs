@@ -1070,7 +1070,7 @@ namespace EPMLiveCore.API
 														  </div>",
                             profilePic)));
 
-                    iElement.Add(new XAttribute("itemid", resourceId));
+                    iElement.Add(new XAttribute("itemid", spListItem.ID));
                     iElement.Add(new XAttribute("listid", resourcesList.ID));
                     iElement.Add(new XAttribute("webid", spWeb.ID));
                     iElement.Add(new XAttribute("siteid", spWeb.Site.ID));
