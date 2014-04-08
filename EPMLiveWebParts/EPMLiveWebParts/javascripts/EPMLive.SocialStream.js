@@ -51,6 +51,7 @@
             };
 
             var helpers = (function() {
+
                 function getLocalTime(time) {
                     if (window.epmLive.currentUserTimeZone) {
                         try {
@@ -121,13 +122,32 @@
                     };
                 };
 
+                var _startLoader = function() {
+                    var seId = $el.root.get(0).id;
+                    
+                    window.EPM.UI.Loader.current().startLoading({ id: seId });
+                    se.loaderStarted = true;
+                    
+                    var loader = $('#' + seId + '_epm_loader');
+                    loader.css('margin-left', '-10px');
+                    loader.width(loader.width() + 10);
+                    loader.css('height', '100%');
+                };
+
+                var _stopLoader = function () {
+                    window.EPM.UI.Loader.current().stopLoading($el.root.get(0).id);
+                    se.loaderStarted = false;
+                };
+
                 return {
                     getFriendlyTime: _getFriendlyTime,
                     getLongTime: _getLongTime,
                     getUserFriendlyName: _getUserFriendlyName,
                     getUserProfileUrl: _getUserProfileUrl,
                     sortComments: _sortComments,
-                    resetPagination: _resetpagination
+                    resetPagination: _resetpagination,
+                    startLoader: _startLoader,
+                    stopLoader: _stopLoader
                 };
             })();
 
@@ -148,7 +168,7 @@
                 var _showOlder = function($ele) {
                     var kind = $ele.data('kind');
 
-                    var apiUrl = se.apiUrl + '/thread/' + $ele.data('threadid') + '/' + kind + '?offset=' + $ele.data('offset');
+                    var apiUrl = se.apiUrl + '/thread/' + $ele.data('threadid') + '/' + kind + '?offset=' + $ele.data('offset') + '&v=' + new Date().getTime();
 
                     $ele.parent().find('ul.epm-se-older-' + kind).show();
                     $ele.remove();
@@ -727,6 +747,7 @@
             }
 
             var _configure = function () {
+                helpers.startLoader();
                 helpers.resetPagination();
                 
                 configureMoment();
@@ -766,7 +787,7 @@
                     }
                 }
 
-                apiUrl += params.join('&');
+                apiUrl += params.join('&') + '&v=' + new Date().getTime();
 
                 $.getJSON(apiUrl).success(function (response) {
                     if (response.error) {
@@ -794,6 +815,10 @@
                     }
 
                     se.pagination.firstTimeLoad = false;
+                    
+                    if (se.loaderStarted) {
+                        helpers.stopLoader();
+                    }
                 }).error(function(response) {
                     if (window.epmLive.debugMode) {
                         console.log(response);
