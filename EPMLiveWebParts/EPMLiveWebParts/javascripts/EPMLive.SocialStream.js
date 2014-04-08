@@ -135,6 +135,7 @@
                 };
 
                 var _stopLoader = function () {
+                    $el.statusUpdateBox.show();
                     window.EPM.UI.Loader.current().stopLoading($el.root.get(0).id);
                     se.loaderStarted = false;
                 };

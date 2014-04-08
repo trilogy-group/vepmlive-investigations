@@ -270,6 +270,7 @@
   color: #FFFFFF;
 }
 #epm-social-stream div#epm-se-status-update-box {
+  display: none;
   margin: 0 0 20px 0;
 }
 #epm-social-stream div#epm-se-status-update-box div.epm-se-comment-input {
