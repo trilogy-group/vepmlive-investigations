@@ -2627,7 +2627,7 @@ namespace EPMLiveWebParts
                         {
                             'controlId': 'btnNew',
                             'controlType': 'button',
-                            'iconClass': 'fui-plus',
+                            'iconClass': 'icon-plus-2',
                             'title': 'New Item',
                             'events': [
                                 {
