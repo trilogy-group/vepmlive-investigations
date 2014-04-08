@@ -1037,7 +1037,7 @@ namespace EPMLiveCore.API
                     var iElement = new XElement("I", new XAttribute(changeType, 1));
 
                     int resourceId = 0;
-                    string profilePic = string.Format("{0}/_layouts/images/person.gif", spWeb.SafeServerRelativeUrl());
+                    string profilePic = string.Format("{0}/_layouts/15/epmlive/images/default-avatar.png", spWeb.SafeServerRelativeUrl());
 
                     foreach (SPField spField in spListItem.Fields)
                     {
