@@ -2181,7 +2181,7 @@ function registerEpmLiveResourceGridScript() {
                                 {
                                     'controlId': 'btnDefaultSort',
                                     'controlType': 'button',
-                                    'iconClass': 'icon-sort',
+                                    'iconClass': 'icon-menu-2',
                                     'toolTip': 'default sort',
                                     'title': 'none',
                                     'events': [
