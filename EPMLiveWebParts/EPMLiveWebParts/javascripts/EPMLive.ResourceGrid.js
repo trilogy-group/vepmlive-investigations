@@ -1946,10 +1946,12 @@ function registerEpmLiveResourceGridScript() {
                                                     for (var key in options) {
                                                         var properties = options[key];
                                                         if ($.inArray(key, keys) != -1) {
-                                                            grid.SetAttribute(null, key, 'Visible', '1', 0);
+                                                            //grid.SetAttribute(null, key, 'Visible', '1', 0);
+                                                            grid.ShowCol(key)
                                                         }
                                                         else {
-                                                            grid.SetAttribute(null, key, 'Visible', '0', 0);
+                                                            //grid.SetAttribute(null, key, 'Visible', '0', 0);
+                                                            grid.HideCol(key)
                                                         }
                                                     }
                                                 }
@@ -2255,10 +2257,12 @@ function registerEpmLiveResourceGridScript() {
                                                     for (var key in options) {
                                                         var properties = options[key];
                                                         if ($.inArray(key, keys) != -1) {
-                                                            grid.SetAttribute(null, key, 'Visible', '1', 0);
+                                                            //grid.SetAttribute(null, key, 'Visible', '1', 0);
+                                                            grid.ShowCol(key)
                                                         }
                                                         else {
-                                                            grid.SetAttribute(null, key, 'Visible', '0', 0);
+                                                            //grid.SetAttribute(null, key, 'Visible', '0', 0);
+                                                            grid.HideCol(key)
                                                         }
                                                     }
                                                 }
