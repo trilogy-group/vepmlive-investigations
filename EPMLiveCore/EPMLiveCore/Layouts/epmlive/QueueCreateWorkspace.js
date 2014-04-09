@@ -445,7 +445,7 @@ function registerCreateWorkspace2Script() {
                     self.AutosizeDialog();
                 }
 
-                w.setTimeout(function () { $('.titleInput').focus(); }, 10);
+                w.setTimeout(function () { $('#tbWsName').focus(); }, 10);
             };
 
             self.pageInit();
