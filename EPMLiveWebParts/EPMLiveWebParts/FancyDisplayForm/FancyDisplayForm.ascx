@@ -316,6 +316,19 @@
                         windowHeight = $(window).height() + $(window).scrollTop();
                     });
 
+                    $(document).click(function (e) {
+                        var classAttr = $(e.target).attr('class');
+                        if (classAttr != 'fancyDisplayFormAssociatedItemsContextMenu' && classAttr != 'epm-menu-btn' && classAttr != 'icon-ellipsis-horizontal') {
+                            $(".slidingDiv").hide();
+                        }
+                    });
+
+                    $('#first-table').mouseenter(
+                        function () {
+                            $(".slidingDiv").hide();
+                        }
+                    );
+
                     $('.listMainDiv .badge').mouseenter(
                         function () {
                             $(".slidingDiv").hide();
@@ -350,24 +363,8 @@
                                 popupTop = 0;
 
                             currentSlidingDiv.offset({ top: popupTop, left: popupLeft });
-
-                            currentSlidingDiv.mouseenter(function () {
-                                currentSlidingDiv.show();
-                            });
-
-                            currentSlidingDiv.mouseleave(function () {
-                                window.setTimeout(function () {
-                                    currentSlidingDiv.hide();
-                                }, 2000);
-                            });
                         }
                     );
-
-                    $("#<%=divFancyDispFormAssociatedItemsContent.ClientID%>").mouseleave(function () {
-                        window.setTimeout(function () {
-                            $(".slidingDiv").hide();
-                        }, 2000);
-                    });
 
                     var addContextualMenu = function () {
                         $(".fancyDisplayFormAssociatedItemsContextMenu").each(function () {

@@ -709,55 +709,41 @@ namespace EPMLiveWebParts {
                     "            if (mouseY < 0)\r\n                            mouseY = 0;\r\n\r\n        " +
                     "                windowWidth = $(window).width() + $(window).scrollLeft();\r\n     " +
                     "                   windowHeight = $(window).height() + $(window).scrollTop();\r\n " +
-                    "                   });\r\n\r\n                    $(\'.listMainDiv .badge\').mouseente" +
-                    "r(\r\n                        function () {\r\n                            $(\".slidi" +
-                    "ngDiv\").hide();\r\n\r\n                            var currentSlidingDiv = $(this).p" +
-                    "arent().parent().find(\".slidingDiv\");\r\n                            currentSlidin" +
-                    "gDiv.show();\r\n\r\n                            var popupWidth = currentSlidingDiv.o" +
-                    "uterWidth();\r\n                            var popupHeight = currentSlidingDiv.ou" +
-                    "terHeight();\r\n\r\n                            if (mouseX + popupWidth > windowWidt" +
-                    "h)\r\n                                popupLeft = mouseX - popupWidth;\r\n          " +
-                    "                  else\r\n                                popupLeft = mouseX;\r\n\r\n " +
-                    "                           if (mouseY + popupHeight > windowHeight)\r\n           " +
-                    "                     popupTop = mouseY - popupHeight;\r\n                         " +
-                    "   else\r\n                                popupTop = mouseY;\r\n\r\n                 " +
-                    "           if (popupLeft < $(window).scrollLeft()) {\r\n                          " +
-                    "      popupLeft = $(window).scrollLeft();\r\n                            }\r\n\r\n    " +
-                    "                        if (popupTop < $(window).scrollTop()) {\r\n               " +
-                    "                 popupTop = $(window).scrollTop();\r\n                            " +
-                    "}\r\n\r\n                            if (popupLeft < 0 || popupLeft == undefined)\r\n " +
-                    "                               popupLeft = 0;\r\n                            if (p" +
-                    "opupTop < 0 || popupTop == undefined)\r\n                                popupTop " +
-                    "= 0;\r\n\r\n                            currentSlidingDiv.offset({ top: popupTop, le" +
-                    "ft: popupLeft });\r\n\r\n                            currentSlidingDiv.mouseenter(fu" +
-                    "nction () {\r\n                                currentSlidingDiv.show();\r\n        " +
-                    "                    });\r\n\r\n                            currentSlidingDiv.mousele" +
-                    "ave(function () {\r\n                                window.setTimeout(function ()" +
-                    " {\r\n                                    currentSlidingDiv.hide();\r\n             " +
-                    "                   }, 2000);\r\n                            });\r\n                 " +
-                    "       }\r\n                    );\r\n\r\n                    $(\"#");
-                @__w.Write(divFancyDispFormAssociatedItemsContent.ClientID);
-
-            @__w.Write(@""").mouseleave(function () {
-                        window.setTimeout(function () {
-                            $("".slidingDiv"").hide();
-                        }, 2000);
-                    });
-
-                    var addContextualMenu = function () {
-                        $("".fancyDisplayFormAssociatedItemsContextMenu"").each(function () {
-                            window.epmLiveNavigation.addContextualMenu($(this), null, true, '-1', { ""delete"": ""FancyDispFormClient.reFillWebPartData"" });
-                        });
-                    };
-
-                    window.ExecuteOrDelayUntilScriptLoaded(addContextualMenu, 'EPMLive.Navigation.js');
-                }
-            });
-        }
-    }
-</script>
-
-");
+                    "                   });\r\n\r\n                    $(document).click(function (e) {\r\n" +
+                    "                        var classAttr = $(e.target).attr(\'class\');\r\n            " +
+                    "            if (classAttr != \'fancyDisplayFormAssociatedItemsContextMenu\' && cla" +
+                    "ssAttr != \'epm-menu-btn\' && classAttr != \'icon-ellipsis-horizontal\') {\r\n        " +
+                    "                    $(\".slidingDiv\").hide();\r\n                        }\r\n       " +
+                    "             });\r\n\r\n                    $(\'#first-table\').mouseenter(\r\n         " +
+                    "               function () {\r\n                            $(\".slidingDiv\").hide(" +
+                    ");\r\n                        }\r\n                    );\r\n\r\n                    $(\'" +
+                    ".listMainDiv .badge\').mouseenter(\r\n                        function () {\r\n      " +
+                    "                      $(\".slidingDiv\").hide();\r\n\r\n                            va" +
+                    "r currentSlidingDiv = $(this).parent().parent().find(\".slidingDiv\");\r\n          " +
+                    "                  currentSlidingDiv.show();\r\n\r\n                            var p" +
+                    "opupWidth = currentSlidingDiv.outerWidth();\r\n                            var pop" +
+                    "upHeight = currentSlidingDiv.outerHeight();\r\n\r\n                            if (m" +
+                    "ouseX + popupWidth > windowWidth)\r\n                                popupLeft = m" +
+                    "ouseX - popupWidth;\r\n                            else\r\n                         " +
+                    "       popupLeft = mouseX;\r\n\r\n                            if (mouseY + popupHeig" +
+                    "ht > windowHeight)\r\n                                popupTop = mouseY - popupHei" +
+                    "ght;\r\n                            else\r\n                                popupTop" +
+                    " = mouseY;\r\n\r\n                            if (popupLeft < $(window).scrollLeft()" +
+                    ") {\r\n                                popupLeft = $(window).scrollLeft();\r\n      " +
+                    "                      }\r\n\r\n                            if (popupTop < $(window)." +
+                    "scrollTop()) {\r\n                                popupTop = $(window).scrollTop()" +
+                    ";\r\n                            }\r\n\r\n                            if (popupLeft < " +
+                    "0 || popupLeft == undefined)\r\n                                popupLeft = 0;\r\n  " +
+                    "                          if (popupTop < 0 || popupTop == undefined)\r\n          " +
+                    "                      popupTop = 0;\r\n\r\n                            currentSlidin" +
+                    "gDiv.offset({ top: popupTop, left: popupLeft });\r\n                        }\r\n   " +
+                    "                 );\r\n\r\n                    var addContextualMenu = function () {" +
+                    "\r\n                        $(\".fancyDisplayFormAssociatedItemsContextMenu\").each(" +
+                    "function () {\r\n                            window.epmLiveNavigation.addContextua" +
+                    "lMenu($(this), null, true, \'-1\', { \"delete\": \"FancyDispFormClient.reFillWebPartD" +
+                    "ata\" });\r\n                        });\r\n                    };\r\n\r\n               " +
+                    "     window.ExecuteOrDelayUntilScriptLoaded(addContextualMenu, \'EPMLive.Navigati" +
+                    "on.js\');\r\n                }\r\n            });\r\n        }\r\n    }\r\n</script>\r\n\r\n");
             parameterContainer.Controls[0].RenderControl(@__w);
             @__w.Write("\r\n");
         }
