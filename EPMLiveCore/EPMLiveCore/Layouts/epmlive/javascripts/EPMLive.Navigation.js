@@ -2012,27 +2012,30 @@
                     var listId = $a.data('listid');
                     
                     var liDomId = $li.get(0).id;
-                    
-                    if (!itemId) {
-                        var info = window.epmLiveNavigation.wsInfoDict[liDomId];
-                        if (info) {
-                            siteId = info.siteId;
-                            webId = liDomId;
-                            listId = info.listId;
-                            itemId = info.itemId;
+
+                    try {
+                        if (!itemId) {
+                            var info = window.epmLiveNavigation.wsInfoDict[liDomId];
+                            if (info) {
+                                siteId = info.siteId;
+                                webId = liDomId;
+                                listId = info.listId;
+                                itemId = info.itemId;
+                            }
+                        } else if (itemId.indexOf('.') !== -1) {
+                            var inf = itemId.split('.');
+
+                            webId = inf[0];
+                            listId = inf[1];
+                            itemId = inf[2];
                         }
-                    } else if (itemId.indexOf('.') !== -1) {
-                        var inf = itemId.split('.');
-                        
-                        webId = inf[0];
-                        listId = inf[1];
-                        itemId = inf[2];
+                    } catch(e) {
                     }
 
                     var listIdd = (listId || '').replace(/-/g, '');
-                    
-                    //var $menu = $($li.find('.epm-nav-contextual-menu').get(0));
-                    var $menu = $('#menu' + listIdd + itemId);
+
+                        //var $menu = $($li.find('.epm-nav-contextual-menu').get(0));
+                    var $menu = $('#menu' + listIdd +itemId);
 
                     var setup = function (commands, $ca) {
                         var getIcon = function (command) {
@@ -2070,22 +2073,23 @@
                                     return 'fui-ext-project';
                                 default:
                                     return 'epm-nav-cm-blank';
-                            }
-                        };
+                        }
+                    };
 
                         var liId = liDomId;
 
                         if (commands.length) {
                             commands.push({ title: '--SEP--' });
-                        }
+                    }
 
                         for (var dc in defaultCommands) {
                             if (defaultCommands.hasOwnProperty(dc)) {
                                 commands.push(defaultCommands[dc]);
-                            }                        }
+                        }
+                    }
 
                         //$menu = $($li.find('.epm-nav-contextual-menu').get(0));
-                        $menu = $('#menu' + listIdd + itemId);
+                        $menu = $('#menu' + listIdd +itemId);
 
                         $($menu.find('.epm-nav-cm-loading').get(0)).remove();
 
@@ -2094,48 +2098,47 @@
 
                             if (forcePopup) {
                                 cmd.kind = 0;
-                            }
+                        }
                             if (customOverrideKind) {
                                 cmd.kind = customOverrideKind;
-                            }
+                        }
 
                             var webId = $ca.data('webid');
 
                             if (!webId || webId === 'undefined') {
                                 try {
                                     webId = $ca.parent().get(0).id;
-                                } catch(e) {
-                                } 
-                            }
-
-                            if (cmd.title === '--SEP--') {
-                                if (i !== commands.length - 1) {
-                                    $menu.append($('<li class="seprator"></li>').hide().fadeIn());
-                                }
-                            } else {
-
-                                var callbackfunction = '';
-                                if (callBackFunctions)
-                                {
-                                    callbackfunction = callBackFunctions[cmd.command];
-                                }
-
-                                $menu.append($('<li><span class="epm-nav-cm-icon ' + getIcon(cmd.command) + '">&nbsp;</span><a href="javascript:epmLiveNavigation.handleContextualCommand(\'' + liId + '\',\'' + webId + '\',\'' + $ca.data('listid') + '\',\'' + $ca.data('itemid') + '\',\'' + cmd.command + '\',\'' + cmd.kind + '\',\'' + callbackfunction + '\');" style="width: 122px !important; display: inline-block;">' + cmd.title + '</a></li>').hide().fadeIn());
-
-                                $menu.find('a').click(function() {
-                                    hideMenu();
-                                });
+                            } catch (e) {
                             }
                         }
 
-                        $menu.find('a').click(function() {
+                            if (cmd.title === '--SEP--') {
+                                if (i !== commands.length -1) {
+                                    $menu.append($('<li class="seprator"></li>').hide().fadeIn());
+                            }
+                            } else {
+
+                                var callbackfunction = '';
+                                if (callBackFunctions) {
+                                    callbackfunction = callBackFunctions[cmd.command];
+                            }
+
+                                $menu.append($('<li><span class="epm-nav-cm-icon ' + getIcon(cmd.command) + '">&nbsp;</span><a href="javascript:epmLiveNavigation.handleContextualCommand(\'' + liId + '\',\'' + webId + '\',\'' + $ca.data('listid') + '\',\'' + $ca.data('itemid') + '\',\'' + cmd.command + '\',\'' + cmd.kind + '\',\'' + callbackfunction + '\');" style="width: 122px !important; display: inline-block;">' + cmd.title + '</a></li>').hide().fadeIn());
+
+                                $menu.find('a').click(function () {
+                                    hideMenu();
+                                });
+                        }
+                    }
+
+                        $menu.find('a').click(function () {
                             var $at = $(this);
                             if ($at.parent().find('.icon-star-6').length) {
-                                $menu.hover(function() {
-                                }, function() {
+                                $menu.hover(function () {
+                                }, function () {
                                     $menu.remove();
                                 });
-                            }
+                        }
                         });
 
                         $menu.hover(function () {
@@ -2149,7 +2152,7 @@
                             window.setTimeout(function () {
                                 if (window.epmNavHoveredNode == null) {
                                     hideMenu();
-                                }
+                            }
                             }, 200);
                         });
 
@@ -2162,9 +2165,9 @@
                                 window.setTimeout(function () {
                                     if (window.epmNavHoveredNode === id) {
                                         hideMenu();
-                                    }
+                                }
                                 }, 200);
-                            }
+                        }
                         });
 
                         $('.epm-nav-links, #EPMNavWorkspacesTree').hover(function () {
@@ -2174,17 +2177,17 @@
                             window.setTimeout(function () {
                                 if (window.epmNavHoveredNode === null) {
                                     hideMenu();
-                                }
+                            }
                             }, 200);
                         });
 
-                        $(document).on('click', '.epm-nav-dragger', function() {
+                        $(document).on('click', '.epm-nav-dragger', function () {
                             hideMenu();
                         });
 
                         if ($menu.offset().top + $menu.height() > $(window).height()) {
-                            $menu.css('top', $menu.offset().top - $menu.height() - 30);
-                        }
+                            $menu.css('top', $menu.offset().top - $menu.height() -30);
+                    }
                     };
 
                     var showMenu = function () {
@@ -2194,15 +2197,15 @@
                         $menu.css('left', $li.offset().left);
 
                         if ($menu.offset().top + $menu.height() > $(window).height()) {
-                            $menu.css('top', $menu.offset().top - $menu.height() - 30);
-                        }
+                            $menu.css('top', $menu.offset().top - $menu.height() -30);
+                    }
 
                         $menu.fadeIn(200);
 
                         window.setTimeout(function () {
                             if (window.epmNavHoveredNode === null) {
                                 hideMenu();
-                            }
+                        }
                         }, 2000);
                     };
 
@@ -2215,34 +2218,33 @@
                             hideMenu();
                         } else {
                             showMenu();
-                        }
+                    }
                     };
 
-                    if (window.epmNavSelectNode != listIdd + itemId && window.epmNavSelectNode != null)
-                    {
+                    if (window.epmNavSelectNode != listIdd + itemId && window.epmNavSelectNode != null) {
                         $('#menu' + window.epmNavSelectNode).fadeOut(200);
                     }
 
-                    window.epmNavSelectNode = listIdd + itemId;
-                    //if($('body').find('.epm-nav-contextual-menu').length > 0)
-                    //    $('body').find('.epm-nav-contextual-menu').get(0).remove();
-                   
-                    
+                    window.epmNavSelectNode = listIdd +itemId;
+                        //if($('body').find('.epm-nav-contextual-menu').length > 0)
+                        //    $('body').find('.epm-nav-contextual-menu').get(0).remove();
 
-                    //if ($li.find('.epm-nav-contextual-menu').length === 0) {
-                    if ($('body').find('#menu' + listIdd + itemId).length === 0) {
+
+
+                        //if ($li.find('.epm-nav-contextual-menu').length === 0) {
+                    if ($('body').find('#menu' + listIdd +itemId).length === 0) {
 
                         $('body').append('<ul class="epm-nav-contextual-menu"  id="menu' + listIdd + itemId + '" style="display:block;position:absolute;top:' + ($li.offset().top + 20) + 'px;left:' + $li.offset().left + 'px;"><li class="epm-nav-cm-loading"><span>Loading...</span></li></ul>');
                         //$menu = $($li.find('.epm-nav-contextual-menu').get(0));
-                        $menu = $('#menu' + listIdd + itemId);
+                        $menu = $('#menu' + listIdd +itemId);
                         showMenu();
-                        
-                        
+
+
                         if (!siteId) {
                             webId = liDomId;
-                            
+
                             var wsInfoDict = window.epmLiveNavigation.wsInfoDict[webId];
-                            
+
                             siteId = wsInfoDict.siteId;
                             listId = wsInfoDict.listId;
                             itemId = wsInfoDict.itemId;
@@ -2251,9 +2253,9 @@
                             $a.data('webid', webId);
                             $a.data('listid', listId);
                             $a.data('itemid', itemId);
-                        }
+                    }
 
-                        var getMenuItems = function() {
+                        var getMenuItems = function () {
                             if (window.epmLive) {
                                 var data = '<Request><Params><SiteId>' + siteId + '</SiteId><WebId>' + webId + '</WebId><ListId>' + listId + '</ListId><ItemId>' + itemId + '</ItemId><UserId>' + window.epmLive.currentUserId + '</UserId><DebugMode>' + window.epmLive.debugMode + '</DebugMode></Params></Request>';
 
@@ -2266,18 +2268,18 @@
                                         if (items) {
                                             if (!items.length) {
                                                 items = [items];
-                                            }
+                                        }
 
                                             for (var i = 0; i < items.length; i++) {
                                                 var item = items[i];
                                                 if (customOverrideKind) {
-                                                    commands.push({ title: item['@Title'], command: item['@Command'], kind: customOverrideKind, imgUrl: item['@ImageUrl'] });
+                                                    commands.push({ title: item['@Title'], command: item['@Command'], kind: customOverrideKind, imgUrl: item['@ImageUrl']});
                                                 } else {
-                                                    commands.push({ title: item['@Title'], command: item['@Command'], kind: item['@Kind'], imgUrl: item['@ImageUrl'] });
-                                                }
+                                                    commands.push({ title: item['@Title'], command: item['@Command'], kind: item['@Kind'], imgUrl: item['@ImageUrl']});
                                             }
                                         }
                                     }
+                                }
 
                                     setup(commands, $a);
                                 }, function (response) {
@@ -2287,8 +2289,8 @@
                                 window.setTimeout(function () {
                                     getMenuItems();
                                 }, 1);
-                            }
-                        };
+                        }
+                    };
 
                         getMenuItems();
                     } else {
