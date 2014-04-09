@@ -29,6 +29,9 @@ var bSaveAndSubmit = false;
 var updateStatusBox;
 var NotesOut = false;
 
+var TimesheetHoursEdited = false;
+var TimesheetItemEdited = false;
+
 Grids.OnRenderStart = function (grid) {
     if (grid.id.substr(0, 2) == "TS") {
         var newgridid = grid.id.substr(2);
@@ -129,6 +132,94 @@ function TSReady(grid) {
     TGSetEvent("OnMouseOutRow", grid.id, TSOnMouseOutRow);
     TGSetEvent("OnMouseOverOutside", grid.id, TSOnMouseOverOutside);
     TGSetEvent("OnMouseOverRow", grid.id, TSOnMouseOverRow);
+    TGSetEvent("OnClick", grid.id, TSGridClick);
+    TGSetEvent("OnAfterValueChanged", grid.id, TSGridOnAfterValueChanged);
+}
+
+
+function TSGridClick(grid, row, col, x, y, event) {
+    if (grid.EditRow)
+        StopEditGridRow(grid, row);
+
+    if (NotesOut && curCol != col) {
+        NotesOut = false;
+        curPop = false;
+        var notesDiv = document.getElementById("NotesDiv");
+        notesDiv.style.display = "none";
+    }
+
+    if (!curPop)
+        DoPopUp(grid, row, col);
+}
+
+function TSGridOnAfterValueChanged(grid, row, col, val) {
+    if (grid.Cols[col].Sec == 0)
+        TimesheetItemEdited = true;
+    else
+        TimesheetHoursEdited = true;
+}
+
+function StopEditCols(grid, row)
+{
+    for (var col in grid.Cols) {
+        if(grid.Cols[col].Sec==0)
+            grid.SetAttribute(row, col, "CanEdit", "0", 1);
+    }
+    grid.EditRow = "";
+    TimesheetItemEdited = false;
+}
+
+function StopEditGridRow(grid, row) {
+    if (row.id != grid.EditRow) {
+        var row = grid.GetRowById(grid.EditRow);
+        grid.EditRow = null;
+        grid.EndEdit(true);
+        if (TimesheetItemEdited) {
+            grid.SetAttribute(row, "Title", "HtmlPrefix", "<img src='/_layouts/15/epmlive/images/mywork/loading16.gif'>", 1);
+
+            var Values = "";
+            var cols = "";
+
+            for (var col in grid.Cols) {
+                if (grid.Cols[col].Sec == 0) {
+                    if (grid.GetAttribute(row, col, "CanEdit") == "1" && col != "G" && col != "Timesheet") {
+                        Values += "<Field Name=\"" + col + "\">" + grid.GetValue(row, col) + "</Field>";
+                    }
+
+                    cols += "," + col;
+                }
+            }
+
+            var data = "<Row id=\"" + row.id + "\" siteid=\"" + row.SiteID + "\" webid=\"" + row.WebID + "\" listid=\"" + row.ListID + "\" itemid=\"" + row.ItemID + "\" Cols=\"" + cols + "\">" + Values + "</Row>";
+
+            var webUrl = window.epmLiveNavigation.currentWebUrl;
+
+            $.ajax({
+                type: 'POST',
+                url: (webUrl + '/_vti_bin/WorkEngine.asmx/ExecuteJSON').replace(/\/\//g, '/'),
+                data: "{ Function: 'webparts_SetGridRowEdit', Dataxml: '" + data + "' }",
+                contentType: 'application/json; charset=utf-8',
+                dataType: 'json',
+                success: function (response) {
+                    var oResp = eval("(" + response.d + ")");
+                    if (oResp.Result.Status == "0") {
+                        grid.AddDataFromServer(oResp.Result.InnerText);
+                    }
+                    else
+                        alert(oResp.Result.Error.Text);
+                    grid.SetAttribute(row, "Title", "HtmlPrefix", "", 1);
+                    StopEditCols(grid, row);
+                },
+                error: function (response) {
+                    alert("Error: " + response);
+                    grid.SetAttribute(row, "Title", "HtmlPrefix", "", 1);
+                }
+            });
+        }
+        else {
+            StopEditCols(grid, row);
+        }
+    }
 }
 
 
@@ -184,7 +275,7 @@ function TSDoubleClick(grid, row, col, x, y, event)
 
 function EditGridRow(grid, row, col) {
 
-    if (row.ItemID && grid.GetValue(row, "Edited") != "1") {
+    if (row.ItemID) {
         var webUrl = window.epmLiveNavigation.currentWebUrl;
 
         var cols = "";
@@ -211,7 +302,6 @@ function EditGridRow(grid, row, col) {
                     grid.AddDataFromServer(oResp.Result.InnerText);
                     grid.SetAttribute(row, "Title", "HtmlPrefix", "", 1);
                     grid.StartEdit();
-                    grid.SetValue(row, "Edited", "1");
                 }
                 else
                     alert(oResp.Result.Error.Text);
@@ -684,13 +774,13 @@ function SubmitTimesheet(gridid) {
 
         var grid = Grids[gridid];
 
-        if (grid.HasChanges()) {
+        if (TimesheetHoursEdited) {
             ShowMessage(gridid, "Saving and Submitting...", 180, 30);
             grid.SaveAndSubmit = 'true';
             bSaveAndSubmit = true;
             DisableAllRows(grid);
             grid.Save();
-            grid.AcceptChanges();
+            TimesheetHoursEdited = false;
             HideMessage(grid.id);
             AfterSubmit(grid);
             RefreshCommandUI();
@@ -1111,19 +1201,6 @@ Grids.OnClickOutside = function (grid, row, col, x, y, event) {
 
 
 
-Grids.OnClick = function (grid, row, col, x, y, event) {
-
-    if (NotesOut && curCol != col) {
-        NotesOut = false;
-        curPop = false;
-        var notesDiv = document.getElementById("NotesDiv");
-        notesDiv.style.display = "none";
-    }
-
-    if (!curPop)
-        DoPopUp(grid, row, col);
-
-}
 
 function OpenPMApprovals(gridid) {
     var grid = Grids["TS" + gridid];
@@ -2019,7 +2096,7 @@ function leavePage() {
 
     var message = "";
 
-    if (curGrid.HasChanges() > 2) {
+    if (TimesheetHoursEdited) {
         //if (!e) e = window.event;
         message = 'You have unsaved changes.';
         //e.returnValue = message;
