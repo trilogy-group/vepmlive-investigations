@@ -408,7 +408,7 @@ BEGIN
     
 	IF @View = ''MyWorkspace''
 	BEGIN  
-		SELECT DISTINCT dbo.RPTWeb.SiteId,dbo.RPTWeb.Webtitle,dbo.RPTWeb.WebDescription,dbo.RPTWeb.WebId,dbo.RPTWeb.Members,dbo.LSTResourcepool.SharePointAccountText,
+		SELECT DISTINCT dbo.RPTWeb.SiteId,dbo.RPTWeb.Webtitle,dbo.RPTWeb.WebDescription,dbo.RPTWeb.WebId,dbo.RPTWeb.Members,dbo.RPTWeb.WebUrl,dbo.LSTResourcepool.SharePointAccountText,
 			CASE 
 				WHEN @UserId = 1073741823 THEN 1 
 				WHEN (dbo.RPTWeb.WebId IN (SELECT WEBID FROM dbo.RPTWEBGROUPS 
@@ -421,7 +421,7 @@ BEGIN
 	END
 	ELSE IF @View = ''AllItems''
 	BEGIN
-		SELECT DISTINCT dbo.RPTWeb.SiteId,dbo.RPTWeb.Webtitle,dbo.RPTWeb.WebDescription,dbo.RPTWeb.WebId,dbo.RPTWeb.Members,dbo.LSTResourcepool.SharePointAccountText,
+		SELECT DISTINCT dbo.RPTWeb.SiteId,dbo.RPTWeb.Webtitle,dbo.RPTWeb.WebDescription,dbo.RPTWeb.WebId,dbo.RPTWeb.Members,dbo.RPTWeb.WebUrl,dbo.LSTResourcepool.SharePointAccountText,
 			CASE 
 				WHEN @UserId = 1073741823 THEN 1 
 				WHEN (dbo.RPTWeb.WebId IN (SELECT WEBID FROM dbo.RPTWEBGROUPS 
