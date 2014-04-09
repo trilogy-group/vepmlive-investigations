@@ -152,8 +152,7 @@
         width: 200px;
         background-color: white;
         text-align: left;
-        z-index: 1503;
-        right:17%;
+        z-index: 100;
     }
 
     .fancy-display-form-wrapper .slidingDivClose {
@@ -291,28 +290,88 @@
                 contentType: "application/json; charset=utf-8",
                 dataType: "json",
                 success: function (response) {
-                    
+
                     $("#<%=divFancyDispFormAssociatedItemsContent.ClientID%>").html("");
                     $("#<%=divFancyDispFormAssociatedItemsContent.ClientID%>").html(response.d.toString().replace("<Result Status=\"0\">", "").replace("</Result>", ""));
 
                     $(".slidingDiv").hide();
 
-                    $(".listMainDiv").mouseover(function () {
-                        $(".slidingDiv").hide();
-                        $(this).find(".slidingDiv").show();
+                    var mouseX, mouseY, windowWidth, windowHeight;
+                    var popupLeft, popupTop;
+                    $(document).mousemove(function (e) {
+                        mouseX = e.pageX;
+                        mouseY = e.pageY;
+                        //To Get the relative position
+                        if (this.offsetLeft != undefined)
+                            mouseX = e.pageX - this.offsetLeft;
+                        if (this.offsetTop != undefined)
+                            mouseY = e.pageY; -this.offsetTop;
+
+                        if (mouseX < 0)
+                            mouseX = 0;
+                        if (mouseY < 0)
+                            mouseY = 0;
+
+                        windowWidth = $(window).width() + $(window).scrollLeft();
+                        windowHeight = $(window).height() + $(window).scrollTop();
                     });
 
-                    $(".slidingDiv").mouseover(function () {
-                        $(this).show();
-                    });
+                    $('.listMainDiv .badge').mouseenter(
+                        function () {
+                            $(".slidingDiv").hide();
 
-                    $("#<%=divFancyDispFormAssociatedItemsContent.ClientID%>").mouseout(function () {
-                        $(".slidingDiv").hide();
+                            var currentSlidingDiv = $(this).parent().parent().find(".slidingDiv");
+                            currentSlidingDiv.show();
+
+                            var popupWidth = currentSlidingDiv.outerWidth();
+                            var popupHeight = currentSlidingDiv.outerHeight();
+
+                            if (mouseX + popupWidth > windowWidth)
+                                popupLeft = mouseX - popupWidth;
+                            else
+                                popupLeft = mouseX;
+
+                            if (mouseY + popupHeight > windowHeight)
+                                popupTop = mouseY - popupHeight;
+                            else
+                                popupTop = mouseY;
+
+                            if (popupLeft < $(window).scrollLeft()) {
+                                popupLeft = $(window).scrollLeft();
+                            }
+
+                            if (popupTop < $(window).scrollTop()) {
+                                popupTop = $(window).scrollTop();
+                            }
+
+                            if (popupLeft < 0 || popupLeft == undefined)
+                                popupLeft = 0;
+                            if (popupTop < 0 || popupTop == undefined)
+                                popupTop = 0;
+
+                            currentSlidingDiv.offset({ top: popupTop, left: popupLeft });
+
+                            currentSlidingDiv.mouseenter(function () {
+                                currentSlidingDiv.show();
+                            });
+
+                            currentSlidingDiv.mouseleave(function () {
+                                window.setTimeout(function () {
+                                    currentSlidingDiv.hide();
+                                }, 2000);
+                            });
+                        }
+                    );
+
+                    $("#<%=divFancyDispFormAssociatedItemsContent.ClientID%>").mouseleave(function () {
+                        window.setTimeout(function () {
+                            $(".slidingDiv").hide();
+                        }, 2000);
                     });
 
                     var addContextualMenu = function () {
                         $(".fancyDisplayFormAssociatedItemsContextMenu").each(function () {
-                            window.epmLiveNavigation.addContextualMenu($(this), null, true, '-1', { "delete": "FancyDispFormClient.reFillWebPartData"});
+                            window.epmLiveNavigation.addContextualMenu($(this), null, true, '-1', { "delete": "FancyDispFormClient.reFillWebPartData" });
                         });
                     };
 
