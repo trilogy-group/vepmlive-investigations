@@ -997,9 +997,8 @@ namespace EPMLiveCore.API
         {
             try
             {
-                //return ((byte[])CacheStore.Current.Get(GetCacheKey(web, "Data"),
-                //    new CacheStoreCategory(web).ResourceGrid, () => GetDataGrid(data, web).Zip()).Value).Unzip();
-                return GetDataGrid(data, web);
+                return ((byte[])CacheStore.Current.Get(GetCacheKey(web, "Data"),
+                    new CacheStoreCategory(web).ResourceGrid, () => GetDataGrid(data, web).Zip()).Value).Unzip();
             }
             catch (APIException)
             {
