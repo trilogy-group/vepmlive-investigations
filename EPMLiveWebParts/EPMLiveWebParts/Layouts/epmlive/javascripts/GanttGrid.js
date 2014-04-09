@@ -237,6 +237,7 @@ function GridSearch(gridid, searchfield, searchvalue, searchtype) {
     if (grid.id.substr(0, 9) == "GanttGrid") {
 
         TGSetEvent("OnClick", grid.id, GridClick);
+        TGSetEvent("OnClickOutside", grid.id, GridClickOutside);
         TGSetEvent("OnMouseOutRow", grid.id, GridOnMouseOutRow);
         TGSetEvent("OnMouseOverOutside", grid.id, GridOnMouseOverOutside);
         TGSetEvent("OnMouseOverRow", grid.id, GridOnMouseOverRow);
@@ -441,14 +442,17 @@ function GridGanttDeleteRow(liid) {
     CurrentGrid.RemoveRow(CurrentGrid.GetRowById(liid), 1);
 }
 
+function GridClickOutside(grid, row, col, x, y, event) {
+    if (grid.EditRow)
+        StopEditGridRow(grid, grid.GetRowById("Header"));
+}
 
 function GridClick(grid, row, col, x, y, event) {
-    if (grid.id.substr(0, 9) == "GanttGrid") {
-        if (grid.EditRow)
-            StopEditGridRow(grid, row);
-        if (col == "Edit")
-            EditGridRow(grid, row, "");
-    }
+    if (grid.EditRow)
+        StopEditGridRow(grid, row);
+    if (col == "Edit")
+        EditGridRow(grid, row, "");
+
 }
 
 function NewItemCallback(dialogResult, returnValue) {
