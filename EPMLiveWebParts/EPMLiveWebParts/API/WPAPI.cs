@@ -166,14 +166,19 @@ namespace EPMLiveWebParts
                 switch(oField.Type)
                 {
                     case SPFieldType.User:
-                        string[] sUVals = nd.InnerText.Split(';');
-                        SPFieldUserValueCollection uvc = new SPFieldUserValueCollection();
-                        foreach (string sVal in sUVals)
+                        if (nd.InnerText != "")
                         {
-                            SPFieldUserValue lv = new SPFieldUserValue(oWeb, sVal);
-                            uvc.Add(lv);
+                            string[] sUVals = nd.InnerText.Split(';');
+                            SPFieldUserValueCollection uvc = new SPFieldUserValueCollection();
+                            foreach (string sVal in sUVals)
+                            {
+                                SPFieldUserValue lv = new SPFieldUserValue(oWeb, sVal);
+                                uvc.Add(lv);
+                            }
+                            li[oField.Id] = uvc;
                         }
-                        li[oField.Id] = uvc;
+                        else
+                            li[oField.Id] = null;
                         break;
                     case SPFieldType.Lookup:
                         string[] sVals = nd.InnerText.Split(';');
