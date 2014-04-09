@@ -474,6 +474,7 @@ function StopEditGridRow(grid, row) {
         }
         else
         {
+            grid.EditRow = "";
             for (var col in grid.Cols) {
                 grid.SetAttribute(row, col, "CanEdit", "0", 1);
                 grid.SetAttribute(row, "Title", "HtmlPrefix", "", 1);
