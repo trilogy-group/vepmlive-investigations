@@ -3338,7 +3338,11 @@ namespace EPMLiveWebParts
             output.WriteLine("Grids[\"GanttGrid" + sFullGridId + "\"].Reload();");
             output.WriteLine("}}");
 
-            output.WriteLine("TGSetEvent(\"OnRenderFinish\", \"GanttGrid" + sFullGridId + "\", GridOnRenderFinish);");
+
+            output.WriteLine("TGSetEvent(\"OnReady\", \"GanttGrid" + sFullGridId + "\", GridOnReady);");
+
+           
+
                 output.WriteLine("DataUrl" + sFullGridId + " = '" + web.Url + "/_layouts/epmlive/getganttitems.aspx?data=" + sFullParamList + "'");
             /*output.WriteLine(@"Grids.OnRenderFinish = function(grid){
                                

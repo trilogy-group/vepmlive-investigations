@@ -150,6 +150,76 @@ namespace EPMLiveWebParts
                     }
                 }
             }
+
+            XmlAttribute attr2 = doc.CreateAttribute("HasComments");
+            attr2.Value = GetHasComments(li);
+            nd.Attributes.Append(attr2);
+        }
+
+        private static string GetHasComments(SPListItem li)
+        {
+            string HasComments = "";
+
+            try
+            {
+                string scomments = li["CommentCount"].ToString();
+                double comments = 0;
+                double.TryParse(scomments, out comments);
+                if (comments > 0)
+                {
+                    if (li.ParentList.Fields.ContainsFieldWithStaticName("Commenters") && li.ParentList.Fields.ContainsFieldWithStaticName("CommentersRead"))
+                    {
+                        ArrayList commenters = new ArrayList();
+                        int authorid = 0;
+                        try
+                        {
+                            commenters = new ArrayList(li["Commenters"].ToString().Split(','));
+                        }
+                        catch { }
+                        try
+                        {
+                            SPFieldUserValue uv = new SPFieldUserValue(li.ParentList.ParentWeb, li["Author"].ToString());
+                            authorid = uv.LookupId;
+                        }
+                        catch { }
+                        bool isAssigned = false;
+                        try
+                        {
+                            SPFieldUserValueCollection uvc = new SPFieldUserValueCollection(li.ParentList.ParentWeb, li["AssignedTo"].ToString());
+                            foreach (SPFieldUserValue uv in uvc)
+                            {
+                                if (uv.LookupId == li.ParentList.ParentWeb.CurrentUser.ID)
+                                {
+                                    isAssigned = true;
+                                    break;
+                                }
+                            }
+                        }
+                        catch { }
+                        if (commenters.Contains(li.ParentList.ParentWeb.CurrentUser.ID.ToString()) || authorid == li.ParentList.ParentWeb.CurrentUser.ID || isAssigned)
+                        {
+                            ArrayList commentersread = new ArrayList();
+                            try
+                            {
+                                commentersread = new ArrayList(li["CommentersRead"].ToString().Split(','));
+                            }
+                            catch { }
+                            if (commentersread.Contains(li.ParentList.ParentWeb.CurrentUser.ID.ToString()))
+                            {
+                                HasComments += "1";
+                            }
+                            else
+                            {
+                                HasComments += "2";
+                            }
+                        }
+                        else
+                            HasComments += "1";
+                    }
+                }
+            }
+            catch { }
+            return HasComments;
         }
 
         private static void iSetGridRowEdit(ref XmlDocument doc, SPWeb oWeb, XmlDocument DocIn)

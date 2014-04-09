@@ -2,6 +2,7 @@
 var GridProperties = {};
 var OnlyGrid = false;
 var CurrentGrid;
+var CurrentRow;
 
 if (!Array.prototype.indexOf) {
     Array.prototype.indexOf = function (needle) {
@@ -230,22 +231,38 @@ function GridSearch(gridid, searchfield, searchvalue, searchtype) {
 
 }
 
+function GridOnReady(grid) {
+
+    TGSetEvent("OnRenderFinish", grid.id, GridOnRenderFinish);
+    TGSetEvent("OnGetHtmlValue", grid.id, GridOnGetHtmlValue);
+    TGSetEvent("OnClick", grid.id, GridClick);
+    TGSetEvent("OnClickOutside", grid.id, GridClickOutside);
+    TGSetEvent("OnMouseOutRow", grid.id, GridOnMouseOutRow);
+    TGSetEvent("OnMouseOverOutside", grid.id, GridOnMouseOverOutside);
+    TGSetEvent("OnMouseOverRow", grid.id, GridOnMouseOverRow);
+    TGSetEvent("OnSelect", grid.id, GridOnSelect);
+    TGSetEvent("OnFocus", grid.id, GridOnFocus);
+    TGSetEvent("OnDblClick", grid.id, GridOnDblClick);
+    
+    var gridid = GetGridId(grid);
+
+    var LinkType = eval("mygrid" + gridid + ".LinkType");
+
+    if (LinkType == "") {
+        if (grid.LinkTitleField == "LinkTitle")
+            eval("mygrid" + gridid + ".LinkType='edit'");
+        else if (grid.LinkTitleField == "LinkTitleNoMenu")
+            eval("mygrid" + gridid + ".LinkType='view'");
+    }
+}
 
 
  function GridOnRenderFinish(grid) {
 
     if (grid.id.substr(0, 9) == "GanttGrid") {
 
-        TGSetEvent("OnClick", grid.id, GridClick);
-        TGSetEvent("OnClickOutside", grid.id, GridClickOutside);
-        TGSetEvent("OnMouseOutRow", grid.id, GridOnMouseOutRow);
-        TGSetEvent("OnMouseOverOutside", grid.id, GridOnMouseOverOutside);
-        TGSetEvent("OnMouseOverRow", grid.id, GridOnMouseOverRow);
-        TGSetEvent("OnSelect", grid.id, GridOnSelect);
-        TGSetEvent("OnFocus", grid.id, GridOnFocus);
-        TGSetEvent("OnDblClick", grid.id, GridOnDblClick);
         TGSetEvent("OnAfterValueChanged", grid.id, GridOnAfterValueChanged);
-        TGSetEvent("OnGetHtmlValue", grid.id, GridOnGetHtmlValue);
+        
         
         grid.EditRow = 0;
         var gridid = GetGridId(grid);
@@ -287,18 +304,7 @@ function GridSearch(gridid, searchfield, searchvalue, searchtype) {
         document.getElementById("searchload" + grid.id.substr(9)).style.display = "";
 
         var ribbon = eval("mygrid" + gridid + ".RibbonBehavior");
-
         
-
-        var LinkType = eval("mygrid" + gridid + ".LinkType");
-
-        if (LinkType == "")
-        {
-            if(grid.LinkTitleField == "LinkTitle")
-                eval("mygrid" + gridid + ".LinkType='edit'");
-            else if (grid.LinkTitleField == "LinkTitleNoMenu")
-                eval("mygrid" + gridid + ".LinkType='view'");
-        }
 
     }
  }
@@ -310,17 +316,52 @@ function GridOnGetHtmlValue(grid, row, col, val) {
          {
              var gridid = GetGridId(grid);
              if (eval("mygrid" + gridid + ".LinkType") != "")
-                 return "<a href=\"javascript:GridGoToItem('" + grid.id + "','" + row.id + "');\">" + val + "</a>";
-             else
-                 return val;
+                 val = "<a href=\"javascript:GridGoToItem('" + grid.id + "','" + row.id + "');\">" + val + "</a>";
+             
+             if (grid.GetValue(row, "HasComments") == "1")
+             {
+                 val = val + "&nbsp;<a href=\"javascript:GridComments('" + grid.id + "','" + row.id + "');return false;\"><img src=\"/_layouts/15/epmlive/images/mywork/comment-small.png\" border=\"0\"></a>";
+             }
+             else if (grid.GetValue(row, "HasComments") == "2")
+             {
+                 val = val + "&nbsp;<a href=\"javascript:GridComments('" + grid.id + "','" + row.id + "');return false;\"><img src=\"/_layouts/15/epmlive/images/mywork/commentsnew-small.png\" border=\"0\"></a>";
+             }
+
+             return val;
          }
      }
  }
 
+function GridComments(gridid, rowid) {
+    var grid = Grids[gridid];
+    var row = grid.GetRowById(rowid);
+    CurrentGrid = grid;
+    CurrentRow = row;
+
+    gridid = GetGridId(grid);
+
+    var url = window.epmLiveNavigation.currentWebUrl + "/_layouts/epmlive/gridaction.aspx?action=comments&webid=" + row.webid + "&listid=" + row.listid + "&ID=" + row.itemid + "&Source=" + escape(location.href);
+
+    var options = window.SP.UI.$create_DialogOptions();
+
+    options.url = url;
+    options.width = 600;
+    options.allowMaximize = false;
+    options.showClose = true;
+    window.SP.UI.ModalDialog.showModalDialog(options);
+    
+}
+
+function GridCommentsCallBack()
+{
+    GetRowData(CurrentGrid, CurrentRow);
+}
+
 function GridGoToItem(gridid, rowid) {
     var grid = Grids[gridid];
     var row = grid.GetRowById(rowid);
-
+    CurrentGrid = grid;
+    CurrentRow = row;
     gridid = GetGridId(grid);
 
     var LinkType = eval("mygrid" + gridid + ".LinkType");
@@ -335,7 +376,7 @@ function GridGoToItem(gridid, rowid) {
         options.width = 700;
         options.allowMaximize = false;
         options.showClose = true;
-
+        options.dialogReturnValueCallback = GridCommentsCallBack;
         window.SP.UI.ModalDialog.showModalDialog(options);
     }
     else
@@ -356,7 +397,9 @@ function GridOnMouseOverRow(grid, row, col, event) {
         CurrentGrid = grid;
         if (grid.GetValue(row, "itemid") != "") {
             grid.SetAttribute(row, "Title", "ButtonText", '<div class="gridmenuspan" style="position:absolute;overflow:visible;margin-right:5px" id=\"' + row.id + '\"><a data-itemid="' + grid.GetValue(row, "itemid") + '" data-listid="' + grid.GetValue(row, "listid") + '" data-webid="' + grid.GetValue(row, "webid") + '" data-siteid="' + grid.GetValue(row, "siteid") + '" ></a></div>', 1);
-            window.epmLiveNavigation.addContextualMenu($('#' + row.id), [], false, false, { "delete": "GridGanttDeleteRow" });
+            CurrentGrid = grid;
+            CurrentRow = row;
+            window.epmLiveNavigation.addContextualMenu($('#' + row.id), [], false, false, { "delete": "GridGanttDeleteRow", "comments": "GridCommentsCallBack", "edit": "GridCommentsCallBack" });
         }
     }
 }
@@ -546,6 +589,8 @@ function GetRowData(grid, row)
     for (var col in grid.Cols) {
         cols += "," + col;
     }
+
+    grid.SetAttribute(row, "Title", "HtmlPrefix", "<img src='/_layouts/15/epmlive/images/mywork/loading16.gif'>", 1);
 
     var data = "<Row id=\"" + row.id + "\" siteid=\"" + row.siteid + "\" webid=\"" + row.webid + "\" listid=\"" + row.listid + "\" itemid=\"" + row.itemid + "\" Cols=\"" + cols + "\"></Row>";
 

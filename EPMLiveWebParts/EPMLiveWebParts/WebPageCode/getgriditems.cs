@@ -798,6 +798,78 @@ namespace EPMLiveWebParts
                 }
                 catch { }
             }
+            //============Comments===================
+            {
+                try
+                {
+                    string HasComments = "";
+
+                    string scomments = dr["CommentCount"].ToString();
+                    double comments = 0;
+                    double.TryParse(scomments, out comments);
+                    if (comments > 0)
+                    {
+                        if (list.Fields.ContainsFieldWithStaticName("Commenters") && list.Fields.ContainsFieldWithStaticName("CommentersRead"))
+                        {
+                            ArrayList commenters = new ArrayList();
+                            int authorid = 0;
+                            try
+                            {
+                                commenters = new ArrayList(dr["Commenters"].ToString().Split(','));
+                            }
+                            catch { }
+                            try
+                            {
+                                SPFieldUserValue uv = new SPFieldUserValue(list.ParentWeb, dr["Author"].ToString());
+                                authorid = uv.LookupId;
+                            }
+                            catch { }
+                            bool isAssigned = false;
+                            try
+                            {
+                                SPFieldUserValueCollection uvc = new SPFieldUserValueCollection(list.ParentWeb, dr["AssignedTo"].ToString());
+                                foreach (SPFieldUserValue uv in uvc)
+                                {
+                                    if (uv.LookupId == list.ParentWeb.CurrentUser.ID)
+                                    {
+                                        isAssigned = true;
+                                        break;
+                                    }
+                                }
+                            }
+                            catch { }
+                            if (commenters.Contains(list.ParentWeb.CurrentUser.ID.ToString()) || authorid == list.ParentWeb.CurrentUser.ID || isAssigned)
+                            {
+                                ArrayList commentersread = new ArrayList();
+                                try
+                                {
+                                    commentersread = new ArrayList(dr["CommentersRead"].ToString().Split(','));
+                                }
+                                catch { }
+                                if (commentersread.Contains(list.ParentWeb.CurrentUser.ID.ToString()))
+                                {
+                                    HasComments += "1";
+                                }
+                                else
+                                {
+                                    HasComments += "2";
+                                }
+                            }
+                            else
+                                HasComments += "1";
+                        }
+                    }
+
+
+                    XmlNode ndSiteUrl = docXml.CreateNode(XmlNodeType.Element, "userdata", docXml.NamespaceURI);
+                    XmlAttribute attrName = docXml.CreateAttribute("name");
+                    attrName.Value = "HasComments";
+                    ndSiteUrl.Attributes.Append(attrName);
+                    ndSiteUrl.InnerText = HasComments;
+                    ndNewItem.AppendChild(ndSiteUrl);
+                }
+                catch { }
+            }
             //===========
 
             try

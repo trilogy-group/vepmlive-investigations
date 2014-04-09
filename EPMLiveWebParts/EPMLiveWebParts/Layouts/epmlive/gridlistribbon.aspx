@@ -495,6 +495,8 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
                     itemid = newids[2];
                 }
             }
+            CurrentGrid = Grids["GanttGrid" + this.$Grid._gridid];
+            CurrentRow = CurrentGrid.GetRowById(rowId);
 
             var weburl = this.$curWebUrl + "/_layouts/epmlive/gridaction.aspx?action=comments&webid=" + webid + "&ListId=" + listid + "&ID=" + itemid + "&Source=" + escape(document.location.href);
             var options = { url: weburl, width: 600, height: 500, dialogReturnValueCallback: this.gridactioncallback };
@@ -1238,6 +1240,9 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
                     break;
             }
 
+            CurrentGrid = Grids["GanttGrid" + this.$Grid._gridid];
+            CurrentRow = CurrentGrid.GetRowById(rowId);
+
             weburl = this.$Grid._webrelurl + "/_layouts/ppm/" + epkcontrol + ".aspx?itemid=" + FullId + "&epkurl=" + epkurl + "&view=" + view + "&listid=" + listid;
 
             //function myCallback(dialogResult, returnValue){}
@@ -1251,7 +1256,7 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
 
             weburl = this.$Grid._webrelurl + "/_layouts/ppm/prioritize.aspx?epkurl=" + epkurl;
 
-        	var options = { url: weburl, width: 800, height: 600, showClose: false, dialogReturnValueCallback:this.gridactioncallback };
+        	var options = { url: weburl, width: 800, height: 600, showClose: false };
 
         	SP.UI.ModalDialog.showModalDialog(options);
 
@@ -1371,6 +1376,8 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
     
     gridactioncallback: function(dialogResult, returnValue)
 	{
+        GridCommentsCallBack();
+        return;
 		//if(dialogResult == 1)
 		{
 			var weburl = curGrid.getUserData(curRow,"SiteUrl");
@@ -1422,6 +1429,10 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
         	    var options = { url: weburl, width: w, dialogReturnValueCallback:this.gridactioncallback };
                 curGrid = this.$Grid;
                 curRow = rowId;
+
+                CurrentGrid = Grids["GanttGrid" + this.$Grid._gridid];
+                CurrentRow = CurrentGrid.GetRowById(rowId);
+
         	    SP.UI.ModalDialog.showModalDialog(options);
             }
             else

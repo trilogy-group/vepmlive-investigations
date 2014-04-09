@@ -645,6 +645,13 @@ namespace EPMLiveWebParts
             catch { }
             try
             {
+                XmlAttribute attr = doc.CreateAttribute("HasComments");
+                attr.Value = ndRow.SelectSingleNode("userdata[@name='HasComments']").InnerText;
+                ndNew.Attributes.Append(attr);
+            }
+            catch { }
+            try
+            {
                 XmlAttribute attr = doc.CreateAttribute("id");
                 attr.Value = (curId++).ToString();
                 ndNew.Attributes.Append(attr);
