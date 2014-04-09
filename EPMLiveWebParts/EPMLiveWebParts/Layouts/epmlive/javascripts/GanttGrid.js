@@ -259,6 +259,21 @@ function GridSearch(gridid, searchfield, searchvalue, searchtype) {
             eval("mygrid" + gridid + ".Groups=''");
             eval("mygrid" + gridid + ".Cols=''");
             eval("mygrid" + gridid + ".NoPage=''");
+
+            if (ribbon == "1") {
+
+            }
+            else if (ribbon == "2") {
+
+            }
+            else {
+                var wp = document.getElementById('MSOZoneCell_WebPart' + eval("mygrid" + gridid + ".Qualifier"));
+
+                fireEvent(wp, 'mouseup');
+
+                SelectRibbonTab("Ribbon.ListItem", true);
+
+            }
         }
 
         if (ArrGantts.indexOf(grid.id) > -1)
@@ -272,23 +287,7 @@ function GridSearch(gridid, searchfield, searchvalue, searchtype) {
 
         var ribbon = eval("mygrid" + gridid + ".RibbonBehavior");
 
-        if (ribbon == "1" )
-        {
-            
-        }
-        else if (ribbon == "2")
-        {
-            
-        }
-        else
-        {
-            var wp = document.getElementById('MSOZoneCell_WebPart' + eval("mygrid" + gridid + ".Qualifier"));
-
-            fireEvent(wp, 'mouseup');
-
-            SelectRibbonTab("Ribbon.ListItem", true);
-            
-        }
+        
 
         var LinkType = eval("mygrid" + gridid + ".LinkType");
 
