@@ -64,15 +64,15 @@ namespace TimeSheets
                 //    sql = "SELECT * FROM vwTSItemHoursByMyTS where ts_uid=@ts_uid order by web_uid,list_uid";
 
 
-                SqlCommand cmd = new SqlCommand("spTSGetProjectsHours", cn);
-                cmd.Parameters.AddWithValue("@TSUID", tsuid);
-                cmd.Parameters.AddWithValue("@approved", bApproved);
-                cmd.CommandType = CommandType.StoredProcedure;
-                DataSet dsProjects = new DataSet();
-                SqlDataAdapter da = new SqlDataAdapter(cmd);
-                da.Fill(dsProjects);
+                //SqlCommand cmd = new SqlCommand("spTSGetProjectsHours", cn);
+                //cmd.Parameters.AddWithValue("@TSUID", tsuid);
+                //cmd.Parameters.AddWithValue("@approved", bApproved);
+                //cmd.CommandType = CommandType.StoredProcedure;
+                //DataSet dsProjects = new DataSet();
+                //SqlDataAdapter da = new SqlDataAdapter(cmd);
+                //da.Fill(dsProjects);
 
-                cmd = new SqlCommand(sql, cn);
+                SqlCommand cmd = new SqlCommand(sql, cn);
                 cmd.Parameters.AddWithValue("@TS_UID", tsuid);
                 SqlDataReader dr = cmd.ExecuteReader();
 
@@ -133,7 +133,7 @@ namespace TimeSheets
 
                                         li.Update();
 
-                                        processProject(dsProjects, wGuid, iWeb);
+                                        //processProject(dsProjects, wGuid, iWeb);
                                         
                                     }
                                 }
@@ -172,7 +172,7 @@ namespace TimeSheets
                                                 {
                                                     li[f.Id] = dr["SubmittedHours"].ToString();
                                                     li.Update();
-                                                    processProject(dsProjects, wGuid, iWeb);
+                                                    //processProject(dsProjects, wGuid, iWeb);
                                                 }
                                             }
                                         }
@@ -180,7 +180,7 @@ namespace TimeSheets
                                         {
                                             li[f.Id] = dr["TotalHours"].ToString();
                                             li.Update();
-                                            processProject(dsProjects, wGuid, iWeb);
+                                            //processProject(dsProjects, wGuid, iWeb);
                                         }
                                     }
                                 }
@@ -197,8 +197,95 @@ namespace TimeSheets
                 dr.Close();
             }
             //});\
+            return error + processProjectWork(cn, tsuid, site, bApprovalScreen, bApprovalScreen);
+        }
+
+        public static string processProjectWork(SqlConnection cn, string tsuid, SPSite site, bool bApprovalScreen, bool bApproved)
+        {
+            string error = "";
+            //SPSecurity.RunWithElevatedPrivileges(delegate()
+            //{
+            //using (SPSite site = new SPSite(s.ID, s.SystemAccount.UserToken))
+            {
+                //string sql = "SELECT * FROM vwTSItemHoursByTS where ts_uid=@ts_uid order by web_uid,list_uid";
+                //if(!bApprovalScreen)
+                //    sql = "SELECT * FROM vwTSItemHoursByMyTS where ts_uid=@ts_uid order by web_uid,list_uid";
+
+
+                SqlCommand cmd = new SqlCommand("spTSGetProjectsHours", cn);
+                cmd.Parameters.AddWithValue("@TSUID", tsuid);
+                cmd.Parameters.AddWithValue("@approved", bApproved);
+                cmd.CommandType = CommandType.StoredProcedure;
+                DataSet dsProjects = new DataSet();
+                SqlDataAdapter da = new SqlDataAdapter(cmd);
+                da.Fill(dsProjects);
+
+                //cmd = new SqlCommand(sql, cn);
+                //cmd.Parameters.AddWithValue("@TS_UID", tsuid);
+                //SqlDataReader dr = cmd.ExecuteReader();
+
+                Guid webGuid = new Guid();
+                Guid listGuid = new Guid();
+                SPWeb iWeb = null;
+                SPList iList = null;
+
+                foreach (DataRow drProject in dsProjects.Tables[0].Rows)
+                {
+                    try
+                    {
+                        if (drProject["PROJECT_LIST_UID"].ToString() != "")
+                        {
+                            Guid wGuid = new Guid(drProject["WEB_UID"].ToString());
+                            Guid lGuid = new Guid(drProject["PROJECT_LIST_UID"].ToString());
+
+                            if (webGuid != wGuid)
+                            {
+                                try
+                                {
+                                    if (iWeb != null)
+                                    {
+                                        iWeb.Close();
+                                        iWeb = site.OpenWeb(wGuid);
+                                    }
+                                    else
+                                        iWeb = site.OpenWeb(wGuid);
+                                    webGuid = iWeb.ID;
+                                }
+                                catch { }
+                            }
+                            if (iWeb != null)
+                            {
+                                if (listGuid != lGuid)
+                                {
+                                    iList = iWeb.Lists[lGuid];
+                                    listGuid = iList.ID;
+                                }
+                                iWeb.AllowUnsafeUpdates = true;
+                                string project = drProject["Project_id"].ToString();
+                                if (project != "0")
+                                {
+                                    try
+                                    {
+                                        SPListItem liProject = iList.GetItemById(int.Parse(project));
+                                        liProject["TimesheetHours"] = drProject["Hours"].ToString();
+                                        liProject.SystemUpdate();
+                                    }
+                                    catch { }
+                                }
+                            }
+                        }
+                    }
+                    catch (Exception exception)
+                    {
+                        error += "Error: " + exception.Message + "<br>SharePoint User: " + iWeb.CurrentUser.Name + "<br><br><br>";
+                    }
+                }
+
+            }
+            //});\
             return error;
         }
+
 
         public static SPList getProjectCenterList(SPList taskList)
         {
