@@ -1112,7 +1112,8 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
                     cfg['saveFunction'](keyVals);
                 }
 
-                $(this).parent('.grouping-dropdown-menu').toggle();
+                //$(this).parent('.grouping-dropdown-menu').toggle();
+                $(".grouping-dropdown-menu").toggle();
             });
             divFooterSave.append(aFooterSave);
             divGroupingFooter.append(divFooterSave);
@@ -1335,8 +1336,8 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
                     var ctrlId = $(this).closest('ul').siblings('a').attr('controlId');
                     data['sections'] = getUlChoices(ctrlId);
                     cfg['applyButtonConfig']['function'](data);
-
-                    $('#' + ctrlId).toggle();
+                    
+                    $('#' + ctrlId +"_ul_menu").toggle();
                 });
             }
 
