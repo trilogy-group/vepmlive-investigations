@@ -231,6 +231,7 @@
   margin-bottom: 10px;
   min-height: 20px;
   padding: 7px 10px;
+  outline: none;
 }
 #epm-social-stream div.epm-se-comment-box button {
   float: right;
