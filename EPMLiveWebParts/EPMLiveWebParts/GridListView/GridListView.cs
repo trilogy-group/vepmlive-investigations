@@ -2813,7 +2813,7 @@ namespace EPMLiveWebParts
                 sb.Append("'events': [");
                 sb.Append("{");
                 sb.Append("'eventName': 'click',");
-                sb.Append("'function': function () { location.href='" + view.ServerRelativeUrl + Page.Request.Url.Query  + "'; }");
+                sb.Append("'function': function () { $('#ddlViewControl_ul_menu').toggle(); location.href='" + view.ServerRelativeUrl + Page.Request.Url.Query + "'; }");
                 sb.Append("}");
                 sb.Append("]");
                 sb.Append("},");
