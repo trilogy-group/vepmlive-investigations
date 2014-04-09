@@ -127,7 +127,7 @@ namespace TimeSheets
                         }
 
                         if (liveHours)
-                            sErrors += processActualWork(cn, TSUID.ToString(), site, true, false);
+                            sErrors += processProjectWork(cn, TSUID.ToString(), site, true, false);
                     }
                 }
                 else
@@ -413,7 +413,7 @@ namespace TimeSheets
             catch { }
         }
 
-        public static string processActualWork(SqlConnection cn, string tsuid, SPSite site, bool bApprovalScreen, bool bApproved)
+        public static string processProjectWork(SqlConnection cn, string tsuid, SPSite site, bool bApprovalScreen, bool bApproved)
         {
             string error = "";
             //SPSecurity.RunWithElevatedPrivileges(delegate()
