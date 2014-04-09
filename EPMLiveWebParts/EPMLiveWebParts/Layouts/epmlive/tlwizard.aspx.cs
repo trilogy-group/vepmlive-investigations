@@ -259,12 +259,14 @@ namespace EPMLiveWebParts.Layouts.epmlive
                             ProcessTimerJob(web);
                             ProcessBackEndLists(web);
                             ProcessGroups(web, w.CurrentUser);
-                            ProcessReportingRefreshJob(web);
+                            Guid TimerJobID = ProcessReportingRefreshJob(web);
                             ProcessExcel(web);
                             ProcessLists(web);
                             ProcessIzenda(web);
 
                             ClearNavigationCache(web);
+
+                            CoreFunctions.enqueue(TimerJobID, 0);
 
                             if (rdoYes.Checked)
                             {
@@ -380,7 +382,7 @@ namespace EPMLiveWebParts.Layouts.epmlive
             }
             catch { }
         }
-        private void ProcessReportingRefreshJob(SPWeb web)
+        private Guid ProcessReportingRefreshJob(SPWeb web)
         {
             SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(web.Site.WebApplication.Id));
 
@@ -414,6 +416,8 @@ namespace EPMLiveWebParts.Layouts.epmlive
             }
 
             cn.Close();
+
+            return timerjobguid;
         }
 
         private void ProcessGroups(SPWeb web, SPUser user)
