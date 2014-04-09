@@ -244,7 +244,7 @@ function GridSearch(gridid, searchfield, searchvalue, searchtype) {
         TGSetEvent("OnFocus", grid.id, GridOnFocus);
         TGSetEvent("OnDblClick", grid.id, GridOnDblClick);
         TGSetEvent("OnAfterValueChanged", grid.id, GridOnAfterValueChanged);
-        
+        TGSetEvent("OnGetHtmlValue", grid.id, GridOnGetHtmlValue);
         
         grid.EditRow = 0;
         var gridid = GetGridId(grid);
@@ -272,7 +272,7 @@ function GridSearch(gridid, searchfield, searchvalue, searchtype) {
 
         var ribbon = eval("mygrid" + gridid + ".RibbonBehavior");
 
-        if (ribbon == "1")
+        if (ribbon == "1" )
         {
             
         }
@@ -289,9 +289,59 @@ function GridSearch(gridid, searchfield, searchvalue, searchtype) {
             SelectRibbonTab("Ribbon.ListItem", true);
             
         }
-    }
-}
 
+        var LinkType = eval("mygrid" + gridid + ".LinkType");
+
+        if (LinkType == "")
+        {
+            if(grid.LinkTitleField == "LinkTitle")
+                eval("mygrid" + gridid + ".LinkType='edit'");
+            else if (grid.LinkTitleField == "LinkTitleNoMenu")
+                eval("mygrid" + gridid + ".LinkType='view'");
+        }
+
+    }
+ }
+
+function GridOnGetHtmlValue(grid, row, col, val) {
+     if (row.Def.Name == 'R')
+     {
+         if (col == "Title")
+         {
+             var gridid = GetGridId(grid);
+             if (eval("mygrid" + gridid + ".LinkType") != "")
+                 return "<a href=\"javascript:GridGoToItem('" + grid.id + "','" + row.id + "');\">" + val + "</a>";
+             else
+                 return val;
+         }
+     }
+ }
+
+function GridGoToItem(gridid, rowid) {
+    var grid = Grids[gridid];
+    var row = grid.GetRowById(rowid);
+
+    gridid = GetGridId(grid);
+
+    var LinkType = eval("mygrid" + gridid + ".LinkType");
+
+    var url = window.epmLiveNavigation.currentWebUrl + "/_layouts/epmlive/gridaction.aspx?action=" + LinkType + "&webid=" + row.webid + "&listid=" + row.listid + "&ID=" + row.itemid + "&Source=" + escape(location.href);
+
+    if (eval("mygrid" + gridid + "._usepopup")) {
+
+        var options = window.SP.UI.$create_DialogOptions();
+
+        options.url = url;
+        options.width = 700;
+        options.allowMaximize = false;
+        options.showClose = true;
+
+        window.SP.UI.ModalDialog.showModalDialog(options);
+    }
+    else
+        location.href = url;
+}
+ 
 
 function GridOnMouseOverOutside(grid, row, col, event) {
     if (grid.CurHoverRow)

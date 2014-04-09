@@ -91,7 +91,7 @@ namespace EPMLiveWebParts
                 catch { }
             }
 
-            inEditMode = true;
+            //inEditMode = true;
             bCleanValues = true;
             tb.StopTimer();
         }
@@ -115,11 +115,17 @@ namespace EPMLiveWebParts
 
             ArrayList arrFields = new ArrayList();
 
+            string sTitleField = "Title";
+
             foreach (string field in aViewFields)
             {
                 try
                 {
+
                     SPField oField = getRealField(list.Fields.GetFieldByInternalName(field));
+
+                    if (oField.InternalName == "Title")
+                        sTitleField = field;
 
                     arrFields.Add(oField.InternalName);
 
@@ -342,6 +348,8 @@ namespace EPMLiveWebParts
 
             }
 
+            
+
             XmlNode ndGantt = doc.FirstChild.SelectSingleNode("//RightCols/C[@Name='G']");
             ndGantt.Attributes["GanttStart"].Value = StartDateField;
             ndGantt.Attributes["GanttEnd"].Value = DueDateField;
@@ -408,10 +416,12 @@ namespace EPMLiveWebParts
 
 
             XmlNode ndPag = docXml.SelectSingleNode("//call[@command='setuppaging']");
+            
+            XmlNode ndCfg = doc.SelectSingleNode("//Cfg");
 
             if (ndPag != null)
             {
-                XmlNode ndCfg = doc.SelectSingleNode("//Cfg");
+                
 
                 XmlAttribute attr = doc.CreateAttribute("PagInfo");
                 attr.Value = ndPag.InnerText;
@@ -425,6 +435,10 @@ namespace EPMLiveWebParts
                 
                 ndCfg.Attributes.Append(attr);
             }
+
+            XmlAttribute attrT = doc.CreateAttribute("LinkTitleField");
+            attrT.Value = sTitleField;
+            ndCfg.Attributes.Append(attrT);
 
             tb.StopTimers();
 

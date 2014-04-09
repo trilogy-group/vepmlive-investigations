@@ -1009,6 +1009,10 @@ namespace EPMLiveWebParts
                         }
                         else if (field.InternalName == "Title")
                         {
+                            if (bCleanValues)
+                                displayValue = val;
+                            else
+                            {
                             if (hshColumnSelectFilter.Contains("Title"))
                             {
                                 addFilterItems("Title", val);
@@ -1154,6 +1158,7 @@ namespace EPMLiveWebParts
 
                                 displayValue = val;
                             }
+                                }
                         }
                         else
                         {
@@ -1191,6 +1196,9 @@ namespace EPMLiveWebParts
                                             }
                                             displayValue = displayValue.Trim(';');
                                         }
+                                        break;
+                                    case SPFieldType.MultiChoice:
+                                        displayValue = val.Replace(";#", ";");
                                         break;
                                     default:
                                         displayValue = val;
@@ -5980,8 +5988,8 @@ namespace EPMLiveWebParts
                 case SPFieldType.MultiChoice:
                     if (group)
                     {
-                        if (val != "" && val[0] == ';' && val[1] == '#')
-                            val = val.Substring(2, val.Length - 4).Replace(";#", "\n");
+                        //if (val != "" && val[0] == ';' && val[1] == '#')
+                            val = val.Replace(";#", "\n");
                     }
                     else
                         val = list.Fields[spfield.Id].GetFieldValueAsText(val);

@@ -176,6 +176,8 @@ namespace EPMLiveWebParts
 
         GridViewSession gvs;
 
+        string LinkType = "";
+
         #region Gantt Properties
 
         [ConnectionConsumer("Report ID Consumer", "ReportIDConsumer")]
@@ -3401,6 +3403,8 @@ namespace EPMLiveWebParts
 
             output.WriteLine("mygrid" + sFullGridId + ".Cols = ''");
 
+            output.WriteLine("mygrid" + sFullGridId + ".LinkType = '" + LinkType + "'");
+
             output.WriteLine("var myDataProcessor" + sFullGridId + " = new Object();");
 
             output.WriteLine("mygrid" + sFullGridId + ".Params = \"" + sFullParamList + "\";");
@@ -5181,6 +5185,7 @@ namespace EPMLiveWebParts
                     appendParam("Executive", (gSettings.Executive ? "on" : ""));
                     appendParam("Info", gSettings.Information);
                     appendParam("LType", gSettings.ItemLink);
+                    LinkType = gSettings.ItemLink;
                     if (!bIsFormWebpart)
                     {
                         appendParam("RLists", gSettings.RollupLists);
@@ -5208,7 +5213,7 @@ namespace EPMLiveWebParts
 
                     appendParam("AllowEdit", gSettings.AllowEdit.ToString());
                     allowEditToggle = gSettings.AllowEdit;
-
+                    
                     appendParam("EditDefault", gSettings.EditDefault.ToString());
                     inEditMode = gSettings.EditDefault;
 
@@ -5250,6 +5255,8 @@ namespace EPMLiveWebParts
                 appendParam("Executive", PropExecView);
                 appendParam("Info", PropInformation);
                 appendParam("LType", PropLinkType);
+                LinkType = PropLinkType;
+
                 if (!bIsFormWebpart)
                 {
 

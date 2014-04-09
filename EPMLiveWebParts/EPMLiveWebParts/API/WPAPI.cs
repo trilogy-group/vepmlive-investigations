@@ -7,6 +7,7 @@ using Microsoft.SharePoint;
 using System.Xml;
 using System.Globalization;
 using System.Data;
+using System.Collections;
 
 namespace EPMLiveWebParts
 {
@@ -497,7 +498,7 @@ namespace EPMLiveWebParts
                         {
                             SPFieldUserValueCollection lvc = new SPFieldUserValueCollection(oWeb, val);
                             val = "";
-                            foreach(SPFieldUserValue lv in lvc)
+                            foreach (SPFieldUserValue lv in lvc)
                             {
                                 val += ";" + lv.LookupId;
                             }
@@ -511,7 +512,7 @@ namespace EPMLiveWebParts
                         {
                             SPFieldLookupValueCollection lvc = new SPFieldLookupValueCollection(val);
                             val = "";
-                            foreach(SPFieldLookupValue lv in lvc)
+                            foreach (SPFieldLookupValue lv in lvc)
                             {
                                 val += ";" + lv.LookupId;
                             }
@@ -542,17 +543,18 @@ namespace EPMLiveWebParts
                         }
                         else
                         {
-
+                            val = val.Substring(val.IndexOf(";#") + 2);
                         }
                         break;
                     default:
 
                         if (bEditMode)
-                            val =  li[oField.Id].ToString();
+                            val = li[oField.Id].ToString();
                         else
                             val = oField.GetFieldValueAsText(li[oField.Id].ToString());
                         break;
                 }
+                
             }
             return val;
         }
