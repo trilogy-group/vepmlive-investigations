@@ -98,8 +98,8 @@
         fit-position: slice;
         height: 22px;
         text-align: center;
-        border-radius:50%;
-        vertical-align:bottom;
+        border-radius: 50%;
+        vertical-align: bottom;
     }
 
     .fancy-display-form-wrapper .dispFormExpandMore {
