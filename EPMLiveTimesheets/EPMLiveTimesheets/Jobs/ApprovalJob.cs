@@ -27,13 +27,11 @@ namespace TimeSheets
 
             //foreach(string tsuidData in tsuids)
             {
-                
-
                 //if (actualWork != "")
                 //{
                 if (!liveHours)
                 {
-                    sErrors += SharedFunctions.processActualWork(cn, TSUID.ToString(), site, true, true);
+                    sErrors = SharedFunctions.processActualWork(cn, TSUID.ToString(), site, true, true);
                 }
                 //}
             }
