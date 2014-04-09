@@ -15,7 +15,7 @@
 </SharePoint:ScriptBlock>
 
 <div id="epm-social-stream">
-    <div id="epm-se-status-update-box" class="epm-se-comment-box">
+    <div id="epm-se-status-update-box" class="epm-se-comment-box clearfix">
         <div class="epm-se-comment-input" contenteditable="true"></div>
         <button id="epm-se-comment-post-<%= SEID %>">Post</button>
     </div>

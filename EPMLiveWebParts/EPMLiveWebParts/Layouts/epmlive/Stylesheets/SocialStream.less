@@ -279,6 +279,19 @@
         }
     }
 
+    li.epm-se-disabled {
+        div.epm-se-overlay {
+            background-color: #555555;
+            -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=15)";
+            filter: alpha(opacity=15);
+            -moz-opacity: 0.15;
+            -khtml-opacity: 0.15;
+            opacity: 0.15;
+            border-radius: 3px;
+            margin-left: -10px;
+        }
+    }
+
     div.epm-se-comment-box {
         margin: 15px 0 0 (@avatar-size + 10) / 2;
 
@@ -286,6 +299,7 @@
             border: 1px solid @border-color;
             border-radius: 3px;
             margin-bottom: 10px;
+            margin-right: 10px;
             min-height: 20px;
             padding: 7px 10px;
             outline: none;
@@ -297,6 +311,7 @@
             .btn-default;
             .btn-sm;
             display: none;
+            margin-right: 10px;
         }
 
         div.epm-se-comment-input.epm-se-placeholder {

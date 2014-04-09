@@ -17,7 +17,9 @@
                         placeholder: 'epm-se-placeholder',
                         expanded: 'epm-se-expanded',
                         active: 'epm-se-active',
-                        hidden: 'epm-se-hidden'
+                        hidden: 'epm-se-hidden',
+                        overlay: 'epm-se-overlay',
+                        disabled: 'epm-se-disabled'
                     }
                 },
                 apiUrl: '/' + baseUrl + '/_vti_bin/SocialEngine.svc',
@@ -658,7 +660,16 @@
                     if (!settings.disabled) attahEvents(settings);
                     else {
                         settings.input.attr('contenteditable', false);
-                        settings.input.addClass('epm-se-disabled');
+                        settings.$thread.addClass(se.ui.classes.disabled);
+
+                        var height = settings.$thread.height() + 10;
+                        
+                        var $overlay = $('<div></div>');
+                        $overlay.addClass(se.ui.classes.overlay);
+                        $overlay.height(height);
+                        $overlay.css('margin-top', '-' + height + 'px');
+
+                        settings.$thread.append($overlay);
                     }
                 };
 
