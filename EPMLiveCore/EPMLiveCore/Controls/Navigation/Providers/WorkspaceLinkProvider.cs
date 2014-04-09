@@ -170,7 +170,7 @@ namespace EPMLiveCore.Controls.Navigation.Providers
                         {
                             using (SPWeb spWeb = spSite.OpenWeb(new Guid(cWebId)))
                             {
-                                if (spWeb.Features[new Guid("84520a2b-8e2b-4ada-8f48-60b138923d01")] == null)
+                                if (spWeb.Features[WEFeatures.BuildTeam.Id] == null)
                                 {
                                     itemId = "X";
                                 }

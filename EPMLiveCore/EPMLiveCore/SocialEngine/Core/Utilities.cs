@@ -21,8 +21,11 @@ namespace EPMLiveCore.SocialEngine.Core
             if (!string.IsNullOrEmpty(settingValue))
                 return settingValue.Split(',').Any(list => list.Trim().ToLower().Equals(listTitle.ToLower()));
 
-            CacheStore.Current.Set(SETTING_KEY, "EPMLiveFileStore,User Information List",
-                new CacheStoreCategory(contextWeb).SocialStream, true);
+            const string IGNORED_LISTS = "EPMLiveFileStore,User Information List";
+
+            CoreFunctions.setConfigSetting(contextWeb, SETTING_KEY, IGNORED_LISTS);
+
+            CacheStore.Current.Set(SETTING_KEY, IGNORED_LISTS, new CacheStoreCategory(contextWeb).SocialStream, true);
 
             return false;
         }

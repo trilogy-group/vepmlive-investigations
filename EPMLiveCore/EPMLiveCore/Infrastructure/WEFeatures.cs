@@ -4,9 +4,13 @@ namespace EPMLiveCore.Infrastructure
 {
     public static class WEFeatures
     {
-        #region Fields (1) 
+        #region Fields (2) 
 
-        public static readonly Feature WEWebParts = new Feature(new Guid("b0af9b25-76d3-419d-9cfb-12e3b33fac2a"), "Work Engine Web Parts", Scope.Site);
+        public static readonly Feature BuildTeam = new Feature(new Guid("84520a2b-8e2b-4ada-8f48-60b138923d01"),
+            "Build Team", Scope.Web);
+
+        public static readonly Feature WEWebParts = new Feature(new Guid("b0af9b25-76d3-419d-9cfb-12e3b33fac2a"),
+            "Work Engine Web Parts", Scope.Site);
 
         #endregion Fields 
 
