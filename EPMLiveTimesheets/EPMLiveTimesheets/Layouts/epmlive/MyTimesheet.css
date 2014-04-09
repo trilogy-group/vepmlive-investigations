@@ -106,6 +106,16 @@ vertical-align: top;
     border-color: #fff !important;
 }
 
+.navbar-default ul {
+    margin:0;
+    padding:0;
+    display:inline-block;    
+}
+
+.navbar-default ul li {
+    display:inline;    
+}
+
 .nav-text-wrapper {
 padding-top:15px;
 padding-bottom:15px;
