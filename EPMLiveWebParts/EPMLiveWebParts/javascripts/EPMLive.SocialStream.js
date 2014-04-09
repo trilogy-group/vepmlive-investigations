@@ -530,7 +530,7 @@
                         data.$thread.find(se.ui.selectors.latestComments).append(templates.comment(comment));
                         data.$thread.find(se.ui.selectors.comments).removeClass(se.ui.classes.hidden);
                     } else {
-                        //addNewStatusUpdate(data);
+                       addNewStatusUpdate(data);
                     }
                 }
 
@@ -655,7 +655,11 @@
                     settings.button = settings.element.find('button');
 
                     addPlaceholder(settings);
-                    attahEvents(settings);
+                    if (!settings.disabled) attahEvents(settings);
+                    else {
+                        settings.input.attr('contenteditable', false);
+                        settings.input.addClass('epm-se-disabled');
+                    }
                 };
 
                 return {
@@ -718,7 +722,8 @@
                         element: $thread.parent().find("div.epm-se-comment-box[data-threadId='" + thread.id + "']"),
                         placeholder: 'Add a comment...',
                         thread: thread,
-                        $thread: $thread
+                        $thread: $thread,
+                        disabled: data.newStatusUpdate
                     });
                 });
 
