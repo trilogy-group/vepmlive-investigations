@@ -88,12 +88,12 @@
                 if (show) {
                     //$("#loadingDiv").show();
                     //$("#loadingDiv div").html(message);
-                    EPM.UI.Loader.current().startLoading({ id: 'DeltaPlaceHolderMain' });
+                    EPM.UI.Loader.current().startLoading({ id: 'kanbanLoadingDiv' });
                 }
                 else {
                     //$("#loadingDiv").hide();
                     //$("#loadingDiv div").html('');
-                    EPM.UI.Loader.current().stopLoading('DeltaPlaceHolderMain');
+                    EPM.UI.Loader.current().stopLoading('kanbanLoadingDiv');
                 }
             };
 
@@ -556,37 +556,32 @@
 </asp:Content>
 
 <asp:Content ID="Main" ContentPlaceHolderID="PlaceHolderMain" runat="server">
-
-
-    <div id="section1">
-        <div id="kanbanToolbar" style="width: 100%">
+    <div id="kanbanLoadingDiv">
+        <div id="section1">
+            <div id="kanbanToolbar" style="width: 100%">
+            </div>
+            <div id="dlgBacklogStatus">
+                <table>
+                    <tr>
+                        <td>
+                            <b>Change backlog item  <span id="lblBacklogStatus"></span></b>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <select id="ddlBacklogStatus">
+                            </select>
+                        </td>
+                    </tr>
+                </table>
+            </div>
         </div>
-        <div id="dlgBacklogStatus">
-            <table>
-                <tr>
-                    <td>
-                        <b>Change backlog item  <span id="lblBacklogStatus"></span></b>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <select id="ddlBacklogStatus">
-                        </select>
-                    </td>
-                </tr>
-            </table>
+        <div id="section2">
+            <div id="mainContainer">
+            </div>
+            <div class="clear"></div>
         </div>
     </div>
-
-    <div id="section2">
-
-        <div id="mainContainer">
-        </div>
-
-        <div class="clear"></div>
-    </div>
-
-
 </asp:Content>
 
 <asp:Content ID="PageTitle" ContentPlaceHolderID="PlaceHolderPageTitle" runat="server">
