@@ -587,6 +587,17 @@
                         });
                     }
                 }
+                
+                function addOverlay(settings) {
+                    var height = settings.$thread.height() + 10;
+
+                    var $overlay = $('<div></div>');
+                    $overlay.addClass(se.ui.classes.overlay);
+                    $overlay.height(height);
+                    $overlay.css('margin-top', '-' + height + 'px');
+
+                    settings.$thread.append($overlay);
+                }
 
                 function attahEvents(settings) {
                     settings.input.focus(function() {
@@ -661,15 +672,7 @@
                     else {
                         settings.input.attr('contenteditable', false);
                         settings.$thread.addClass(se.ui.classes.disabled);
-
-                        var height = settings.$thread.height() + 10;
-                        
-                        var $overlay = $('<div></div>');
-                        $overlay.addClass(se.ui.classes.overlay);
-                        $overlay.height(height);
-                        $overlay.css('margin-top', '-' + height + 'px');
-
-                        settings.$thread.append($overlay);
+                        addOverlay(settings);
                     }
                 };
 
