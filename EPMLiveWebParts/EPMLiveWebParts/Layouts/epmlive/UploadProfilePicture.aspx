@@ -76,6 +76,10 @@
         </div>
     </asp:Panel>
     <asp:Panel id="ResizePanel" Visible="False" runat="server">
+        
+        <script src="/_layouts/15/epmlive/javascripts/libraries/jquery.min.js"></script>
+        <script src="/_layouts/15/epmlive/javascripts/libraries/jquery.imgareaselect.pack.js"></script>
+
         <div id="pic-frame">
             <img id="profile-pic" src="<%= string.Format(@"{0}/EPMLiveFileStore/{1}", Web.Url, FileNameField.Value) %>"/>
         </div>

@@ -69,11 +69,6 @@ namespace EPMLiveWebParts.Layouts.epmlive
             {
                 SPPageContentManager.RegisterStyleFile(LAYOUT_PATH + "stylesheets/" + style + ".css");
             }
-
-            EPMLiveScriptManager.RegisterScript(Page, new[]
-            {
-                "libraries/jquery.min", "libraries/jquery.imgareaselect.pack.js"
-            });
         }
 
         protected void UploadPictureButton_Click(object sender, EventArgs e)
