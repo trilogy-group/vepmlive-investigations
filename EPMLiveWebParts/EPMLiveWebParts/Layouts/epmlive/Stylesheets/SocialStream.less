@@ -1,5 +1,5 @@
 ﻿@font: "Open Sans Regular", Helvetica, Arial;
-@font-bold:"Open Sans Semi Bold", Helvetica, Arial;
+@font-bold: "Open Sans Semi Bold", Helvetica, Arial;
 @font-light: "Open Sans Light", Helvetica, Arial;
 @text-color: #555555;
 @blue: #0090CA;
@@ -25,7 +25,6 @@
     .bg-size(@size) {
         -moz-background-size: @size;
         -o-background-size: @size;
-        -webkit-background-size: @size;
         background-size: @size;
     }
 
@@ -178,6 +177,9 @@
 
             h2 {
                 font-size: 14px;
+                height: auto;
+                line-height: 15px;
+                margin-top: 12px;
             }
         }
 
@@ -222,13 +224,13 @@
                 line-height: 20px;
             }
 
-                span.epm-se-activity-icon {
-                    width: @avatar-size;
-                    margin-right: 5px;
-                    text-align: right;
-                    font-size: 10px;
-                    color: @activity-icon;
-                }
+            span.epm-se-activity-icon {
+                width: @avatar-size;
+                margin-right: 5px;
+                text-align: right;
+                font-size: 10px;
+                color: @activity-icon;
+            }
         }
 
         ul.epm-se-older-activities,
