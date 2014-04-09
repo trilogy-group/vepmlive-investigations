@@ -2006,11 +2006,31 @@
                     defaultCommands = defaultCommands || [];
                      
                     var $a = $($li.find('a').get(0));
+                    var itemId = $a.data('itemid');
                     var siteId = $a.data('siteid');
                     var webId = $a.data('webid');
                     var listId = $a.data('listid');
+                    
+                    var liDomId = $li.get(0).id;
+                    
+                    if (!itemId) {
+                        var info = window.epmLiveNavigation.wsInfoDict[liDomId];
+                        if (info) {
+                            siteId = info.siteId;
+                            webId = liDomId;
+                            listId = info.listId;
+                            itemId = info.itemId;
+                        }
+                    } else if (itemId.indexOf('.') !== -1) {
+                        var inf = itemId.split('.');
+                        
+                        webId = inf[0];
+                        listId = inf[1];
+                        itemId = inf[2];
+                    }
+
                     var listIdd = (listId || '').replace(/-/g, '');
-                    var itemId = $a.data('itemid');
+                    
                     //var $menu = $($li.find('.epm-nav-contextual-menu').get(0));
                     var $menu = $('#menu' + listIdd + itemId);
 
@@ -2053,7 +2073,7 @@
                             }
                         };
 
-                        var liId = $li.get(0).id;
+                        var liId = liDomId;
 
                         if (commands.length) {
                             commands.push({ title: '--SEP--' });
@@ -2219,7 +2239,7 @@
                         
                         
                         if (!siteId) {
-                            webId = $li.get(0).id;
+                            webId = liDomId;
                             
                             var wsInfoDict = window.epmLiveNavigation.wsInfoDict[webId];
                             
