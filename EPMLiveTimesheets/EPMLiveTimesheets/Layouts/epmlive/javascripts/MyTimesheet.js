@@ -559,6 +559,7 @@ Grids.OnAfterSave = function (grid, result, autoupdate) {
     if (grid.id.substr(0, 2) == "TS") {
 
         if (grid.IO.Result == "0" || grid.IO.Result == "2") {
+            
             bTSSaving = true;
             RefreshCommandUI();
             CheckSaveStatus(grid.id);
@@ -689,6 +690,7 @@ function SubmitTimesheet(gridid) {
             bSaveAndSubmit = true;
             DisableAllRows(grid);
             grid.Save();
+            grid.AcceptChanges();
             HideMessage(grid.id);
             AfterSubmit(grid);
             RefreshCommandUI();
@@ -2017,7 +2019,7 @@ function leavePage() {
 
     var message = "";
 
-    if (curGrid.HasChanges()) {
+    if (curGrid.HasChanges() > 2) {
         //if (!e) e = window.event;
         message = 'You have unsaved changes.';
         //e.returnValue = message;
