@@ -935,7 +935,7 @@ namespace EPMLiveCore
 
                 if (DisplayFormRedirect)
                 {
-                    if (bDialog)
+                    if (bDialog && ControlMode == SPControlMode.New)
                     {
                         newLocation = list.Forms[PAGETYPE.PAGE_DISPLAYFORM].ServerRelativeUrl;
                     }
