@@ -191,6 +191,8 @@
         }
 
     </SharePoint:StyleBlock>
+    <link rel="stylesheet" href="<%=WebUrl%>/_layouts/15/epmlive/Stylesheets/epmliveToolBar.css" type="text/css" />
+    <script src="<%=WebUrl%>/_layouts/15/epmlive/javascripts/EPMLiveGenericToolBar.js"></script>
 
     <div id="test"></div>
     <div id="ResourceGridLoader" class="ms-dlgContent" tabindex="-1" style="z-index: 1505; display: none; width: 367px; height: 146px; left: 775.5px; top: 269px;">
@@ -274,6 +276,10 @@
                     epmLiveResourceGrid.reports.wcReportId = '<%= WcReportId %>';
                     epmLiveResourceGrid.userIsSiteAdmin = <%= SPContext.Current.Web.CurrentUser.IsSiteAdmin.ToString().ToLower() %>;
                     epmLiveResourceGrid.ribbonBehavior = <%=RibbonBehavior %>;
+                    epmLiveResourceGrid.IsRootWeb = <%= SPContext.Current.Web.IsRootWeb.ToString().ToLower() %>;
+                    epmLiveResourceGrid.WebId='<%=_reqWebId%>';
+                    epmLiveResourceGrid.ListId='<%=_reqListId%>';
+                    epmLiveResourceGrid.ItemId='<%=_reqId%>';
 
                     window.TreeGrid('<treegrid data_url="<%= WebUrl %>/_vti_bin/WorkEngine.asmx" data_timeout="0" data_method="Soap" data_function="Execute" data_namespace="workengine.com" data_param_function="GetResourcePoolDataGrid" data_param_dataxml="<%= DataXml %>" layout_url="<%= WebUrl %>/_vti_bin/WorkEngine.asmx" layout_timeout="0" layout_method="Soap" layout_function="Execute" layout_namespace="workengine.com" layout_param_function="GetResourcePoolLayoutGrid" layout_param_dataxml="<%= LayoutXml %>" suppressmessage="3" <%= DebugTag %>></treegrid>', 'EPMResourceGrid');
                 }, true);

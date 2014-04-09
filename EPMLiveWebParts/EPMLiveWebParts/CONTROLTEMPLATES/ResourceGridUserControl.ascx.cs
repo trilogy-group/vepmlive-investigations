@@ -10,6 +10,7 @@ using EPMLiveCore.Infrastructure;
 using EPMLiveWebParts.Properties;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.WebControls;
+using System.Xml;
 
 namespace EPMLiveWebParts
 {
@@ -22,6 +23,10 @@ namespace EPMLiveWebParts
         protected string WebUrl = SPContext.Current.Web.SafeServerRelativeUrl();
         private string _debugTag;
         private string _webPartHeight;
+        public string _reqListId;
+        public string _reqId;
+        public string _reqWebId;
+        SPWeb _currentWeb;
 
         #endregion Fields
 
@@ -65,8 +70,38 @@ namespace EPMLiveWebParts
         {
             get
             {
-                return GetGridParam(XDocument.Parse(Resources.ResourceGrid_DataXml))
-                    .Replace(Environment.NewLine, string.Empty).Replace(@"\t", string.Empty);
+                if (_currentWeb.IsRootWeb && string.IsNullOrEmpty(Request["listId"]) && string.IsNullOrEmpty(Request["id"]))
+                {
+                    return GetGridParam(XDocument.Parse(Resources.ResourceGrid_DataXml))
+                        .Replace(Environment.NewLine, string.Empty).Replace(@"\t", string.Empty);
+                }
+                else
+                {
+                    SPWeb web = _currentWeb;
+                    bool inheritedWeb = web.Permissions.Inherited;
+                    while (inheritedWeb)
+                    {
+                        _currentWeb = web.ParentWeb;
+                        inheritedWeb = web.Permissions.Inherited;
+                    }
+
+                    XmlDocument doc = new XmlDocument();
+                    doc.LoadXml(Resources.ResourceGrid_DataXml);
+
+                    XmlAttribute attr = doc.CreateAttribute("WebId");
+                    attr.Value = web.ID.ToString();
+                    doc.FirstChild.Attributes.Append(attr);
+
+                    attr = doc.CreateAttribute("ListId");
+                    attr.Value = Request["listid"];
+                    doc.FirstChild.Attributes.Append(attr);
+
+                    attr = doc.CreateAttribute("ItemId");
+                    attr.Value = Request["id"];
+                    doc.FirstChild.Attributes.Append(attr);
+
+                    return GetGridParam(XDocument.Parse(doc.OuterXml)).Replace(Environment.NewLine, string.Empty).Replace(@"\t", string.Empty);
+                }
             }
         }
 
@@ -76,15 +111,16 @@ namespace EPMLiveWebParts
             {
                 SPList resourcesList = null;
                 var url = string.Empty;
-                try
-                {
-                    resourcesList = SPContext.Current.Web.Lists.TryGetList("Resources");
-                }
-                catch { }
+                _currentWeb = SPContext.Current.Web;
 
-                if (resourcesList != null)
+                if (_currentWeb.IsRootWeb && string.IsNullOrEmpty(Request["listId"]) && string.IsNullOrEmpty(Request["id"]))
                 {
+                    resourcesList = _currentWeb.Lists.TryGetList("Resources");
                     url = resourcesList.Forms[PAGETYPE.PAGE_NEWFORM].Url;
+                }
+                else
+                {
+                    url = "/_layouts/epmlive/BuildTeam.aspx?listid=" + Request["listid"] + "&id=" + Request["id"];
                 }
 
                 return url;
@@ -110,6 +146,7 @@ namespace EPMLiveWebParts
                 if (xDocument.Root != null) xDocument.Root.Add(new XElement("Id", WebPartId));
 
                 return GetGridParam(xDocument).Replace(Environment.NewLine, string.Empty).Replace(@"\t", string.Empty);
+
             }
         }
 
@@ -190,7 +227,19 @@ namespace EPMLiveWebParts
         /// </param>
         protected override void OnPreRender(EventArgs e)
         {
-            SPList resourcesList = SPContext.Current.Web.Lists.TryGetList("Resources");
+            _currentWeb = SPContext.Current.Web;
+            _reqWebId = Convert.ToString(_currentWeb.ID);
+
+            SPList resourcesList;
+
+            if (_currentWeb.IsRootWeb && string.IsNullOrEmpty(Request["listId"]) && string.IsNullOrEmpty(Request["id"]))
+            {
+                resourcesList = _currentWeb.Lists.TryGetList("Resources");
+            }
+            else
+            {
+                resourcesList = _currentWeb.Lists.TryGetList("Team");
+            }
 
             if (resourcesList != null)
             {
@@ -230,6 +279,8 @@ namespace EPMLiveWebParts
         protected void Page_Load(object sender, EventArgs e)
         {
             _debugTag = string.Empty;
+            _reqListId = Convert.ToString(Request["listId"]);
+            _reqId = Convert.ToString(Request["id"]);
 
             string epmDebug;
             bool inDebugMode = IsInDebugMode(out epmDebug);

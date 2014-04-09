@@ -6,7 +6,7 @@
 	Location="Microsoft.SharePoint.SiteSettings"
 	Sequence="10"
 	Title="Build Team">
-		<UrlAction Url="_layouts/epmlive/buildteam.aspx" />
+		<UrlAction Url="_layouts/epmlive/People.aspx" />
 	</CustomAction>
 
 	<CustomAction

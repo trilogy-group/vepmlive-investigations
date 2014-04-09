@@ -4,7 +4,7 @@ namespace EPMLiveCore.Infrastructure
 {
     public sealed class DepartmentManager : SPListItemManager
     {
-        #region Constructors (1) 
+        #region Constructors (1)
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ResourcePoolManager"/> class.
@@ -14,6 +14,11 @@ namespace EPMLiveCore.Infrastructure
         {
         }
 
-        #endregion Constructors 
+        public DepartmentManager(SPWeb web)
+            : base("Departments", web.ID, web.Site.ID, "Departments", "Department")
+        {
+        }
+
+        #endregion Constructors
     }
 }

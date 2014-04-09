@@ -10,6 +10,7 @@ using EPMLiveCore.Properties;
 using Microsoft.SharePoint;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Xml;
 
 namespace EPMLiveCore.API
 {
@@ -289,7 +290,7 @@ namespace EPMLiveCore.API
         {
             XDocument departmentsXml;
 
-            using (var departmentManager = new DepartmentManager())
+            using (var departmentManager = new DepartmentManager(SPContext.Current.Site.RootWeb))
             {
                 departmentsXml = departmentManager.GetAll();
             }
@@ -424,13 +425,63 @@ namespace EPMLiveCore.API
 
         private static string GetDataGrid(string data, SPWeb web)
         {
-            using (var resourceManager = new ResourcePoolManager())
+            using (var resourceManager = new ResourcePoolManager(SPContext.Current.Site.RootWeb))
             {
                 SPList resourcesList = resourceManager.ParentList;
-                SPWeb spWeb = resourcesList.ParentWeb;
+
+                bool inheritedWeb = web.Permissions.Inherited;
+                while (inheritedWeb)
+                {
+                    web = web.ParentWeb;
+                    inheritedWeb = web.Permissions.Inherited;
+                }
+
+                Guid webId = Guid.Empty;
+                Guid listid = Guid.Empty;
+                int itemid = 0;
+                XmlDocument docQuery = new XmlDocument();
+                docQuery.LoadXml(data);
+
+                try
+                {
+                    webId = new Guid(docQuery.FirstChild.Attributes["WebId"].Value);
+                }
+                catch { }
+
+                try
+                {
+                    listid = new Guid(docQuery.FirstChild.Attributes["ListId"].Value);
+                }
+                catch { }
+                try
+                {
+                    itemid = int.Parse(docQuery.FirstChild.Attributes["ItemId"].Value);
+                }
+                catch { }
 
                 XDocument resourceXml =
-                    XDocument.Parse(GetResources(HttpUtility.HtmlDecode(HttpUtility.HtmlDecode(data)), web));
+                  XDocument.Parse(GetResources(HttpUtility.HtmlDecode(HttpUtility.HtmlDecode(data)), SPContext.Current.Site.RootWeb));
+
+                XDocument resourceTeam = new XDocument();
+                if (web.IsRootWeb && listid == Guid.Empty && itemid == 0)
+                {
+                    resourceTeam = resourceXml;
+                }
+                else
+                {
+                    XDocument teamXml = XDocument.Parse(APITeam.GetTeam(data, web));
+                    XElement res = new XElement("Resources");
+                    foreach (XElement ele in teamXml.Root.Elements("Member"))
+                    {
+                        XElement element = resourceXml.Root.Elements("Resource").FirstOrDefault(r => r.Attribute("ID").Value == ele.Attribute("ID").Value);
+                        if (element != null)
+                        {
+                            res.Add(element);
+                        }
+                    }
+
+                    resourceTeam.Add(res);
+                }
 
                 var resultXml = new XDocument();
                 resultXml.Add(new XElement("Grid"));
@@ -449,14 +500,14 @@ namespace EPMLiveCore.API
                 var gridSafeFields = new Dictionary<string, string>();
                 var gridFields = new Dictionary<string, SPField>();
 
-                IEnumerable<XElement> resourceElements = resourceXml.Root.Elements("Resource");
+                IEnumerable<XElement> resourceElements = resourceTeam.Root.Elements("Resource");
 
                 var dtUserInfo = new DataTable();
 
                 XElement[] arrResourceElements = resourceElements as XElement[] ?? resourceElements.ToArray();
                 if (arrResourceElements.Any())
                 {
-                    dtUserInfo = spWeb.Site.RootWeb.SiteUserInfoList.Items.GetDataTable();
+                    dtUserInfo = web.Site.RootWeb.SiteUserInfoList.Items.GetDataTable();
                     dtUserInfo.PrimaryKey = new[] { dtUserInfo.Columns["ID"] };
                 }
 
@@ -466,7 +517,7 @@ namespace EPMLiveCore.API
 
                     int resourceId = 0;
                     string profilePic = string.Format("{0}/_layouts/15/epmlive/images/default-avatar.png",
-                        spWeb.SafeServerRelativeUrl());
+                        web.SafeServerRelativeUrl());
 
                     foreach (XElement dataElement in resourceElement.Elements())
                     {
@@ -478,7 +529,7 @@ namespace EPMLiveCore.API
                         string type = dataElement.Attribute("Type").Value;
 
                         BuildIElement(gridFields, resourcesList, gridSafeFields, type, value,
-                            spWeb, field, iElement, dtUserInfo, dataElement, ref profilePic,
+                            web, field, iElement, dtUserInfo, dataElement, ref profilePic,
                             ref resourceId);
                     }
 
@@ -656,9 +707,11 @@ namespace EPMLiveCore.API
                 existingCols.Add(colName.Value);
             }
 
-            using (var resourceManager = new ResourcePoolManager())
+            SPWeb spGetWeb = SPContext.Current.Site.RootWeb;
+
+            using (var resourceManager = new ResourcePoolManager(spGetWeb))
             {
-                SPWeb spWeb = SPContext.Current.Web;
+                SPWeb spWeb = spGetWeb;
                 SPRegionalSettings spRegionalSettings = spWeb.CurrentUser.RegionalSettings ??
                                                         spWeb.Site.RootWeb.RegionalSettings;
 
@@ -732,7 +785,6 @@ namespace EPMLiveCore.API
 
                     headerElement.Add(new XAttribute(gridSafeFieldName, spField.Title));
                 }
-
                 return resultXml.ToString();
             }
         }
@@ -746,7 +798,8 @@ namespace EPMLiveCore.API
         {
             if (value.Equals("0;#")) return new List<string>();
 
-            SPList spList = SPContext.Current.Web.Lists["Resources"];
+            SPWeb currentWeb = SPContext.Current.Site.RootWeb;
+            SPList spList = currentWeb.Lists["Resources"];
 
             var resources = new List<string>();
 
@@ -944,8 +997,9 @@ namespace EPMLiveCore.API
         {
             try
             {
-                return ((byte[])CacheStore.Current.Get(GetCacheKey(web, "Data"),
-                    new CacheStoreCategory(web).ResourceGrid, () => GetDataGrid(data, web).Zip()).Value).Unzip();
+                //return ((byte[])CacheStore.Current.Get(GetCacheKey(web, "Data"),
+                //    new CacheStoreCategory(web).ResourceGrid, () => GetDataGrid(data, web).Zip()).Value).Unzip();
+                return GetDataGrid(data, web);
             }
             catch (APIException)
             {

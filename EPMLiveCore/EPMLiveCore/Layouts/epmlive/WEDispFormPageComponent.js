@@ -212,7 +212,7 @@ WEDispFormPageComponent.PageComponent.prototype = {
             }
         }
         else if (commandId === 'Ribbon.ListForm.Display.Manage.BuildTeam') {
-            var options = { url: WEWebUrl + "/_layouts/epmlive/buildteam.aspx?listid=" + WEListId + "&id=" + WEItemId, title: "Build Team", showMaximized: true, dialogReturnValueCallback: this.NewItemCallback };
+            var options = { url: WEWebUrl + "/_layouts/epmlive/People.aspx?listid=" + WEListId + "&id=" + WEItemId, title: "Build Team", showMaximized: true, dialogReturnValueCallback: this.NewItemCallback };
 
             SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
         }

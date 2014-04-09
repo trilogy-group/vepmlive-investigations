@@ -5,7 +5,7 @@
         url = "";
 
     var options = SP.UI.$create_DialogOptions();
-    options.url = url + "/_layouts/epmlive/buildteam.aspx";
+    options.url = url + "/_layouts/epmlive/People.aspx";
     options.showMaximized = true;
     SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
 }

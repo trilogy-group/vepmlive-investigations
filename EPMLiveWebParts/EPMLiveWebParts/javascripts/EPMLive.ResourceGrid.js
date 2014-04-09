@@ -20,6 +20,10 @@ function registerEpmLiveResourceGridScript() {
         $$.userIsSiteAdmin = false;
         $$.allSelected = false;
         $$.ribbonBehavior = 0;
+        $$.IsRootWeb = false;
+        $$.WebId = null;
+        $$.ListId = null;
+        $$.ItemId = null;
 
         $$.reports = {
             wcReportId: null,
@@ -381,6 +385,15 @@ function registerEpmLiveResourceGridScript() {
                         }
                     }
                 } catch (e) {
+                }
+            },
+             
+            teamUpdated: function (result, target, params) {
+                if ($$.IsRootWeb && $$.ListId == "" && $$.ItemId == "") {
+                    $$.grid.resourceUpdated(result, target, params)
+                }
+                else {
+                    $$.grid.reload();
                 }
             }
         };
@@ -1900,7 +1913,7 @@ function registerEpmLiveResourceGridScript() {
                                     'events': [
                                         {
                                             'eventName': 'click',
-                                            'function': function () { $$.actions.displayPopUp($$.actions.getNewFormUrl, 'Add User', false, true, $$.grid.resourceUpdated, { row: null, changeType: 'Added' }); }
+                                            'function': function () { $$.actions.displayPopUp($$.actions.getNewFormUrl, 'Add User', false, true, $$.grid.teamUpdated, { row: null, changeType: 'Added' }); }
                                         }
                                     ]
                                 },

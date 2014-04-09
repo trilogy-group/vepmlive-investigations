@@ -111,7 +111,7 @@ namespace EPMLiveCore.Layouts.epmlive.Integration
                     break;
                 case "team":
                     {
-                        Microsoft.SharePoint.Utilities.SPUtility.Redirect("epmlive/buildteam.aspx?ListId=" + li.ParentList.ID + "&id=" + li.ID + "&CloseMethod=3&isdlg=1", Microsoft.SharePoint.Utilities.SPRedirectFlags.RelativeToLayoutsPage, System.Web.HttpContext.Current);
+                        Microsoft.SharePoint.Utilities.SPUtility.Redirect("epmlive/People.aspx?ListId=" + li.ParentList.ID + "&id=" + li.ID + "&CloseMethod=3&isdlg=1", Microsoft.SharePoint.Utilities.SPRedirectFlags.RelativeToLayoutsPage, System.Web.HttpContext.Current);
                     }
                     break;
                 case "comments":
