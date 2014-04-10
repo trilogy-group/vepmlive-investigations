@@ -15,6 +15,7 @@ using EPMLiveCore.Infrastructure.Navigation;
 using EPMLiveCore.Services.DataContracts.SocialEngine;
 using EPMLiveCore.SocialEngine.Core;
 using Microsoft.SharePoint;
+using SEUtils = EPMLiveCore.SocialEngine.Core.Utilities;
 
 namespace EPMLiveCore.Services
 {
@@ -97,7 +98,8 @@ namespace EPMLiveCore.Services
 
                 var tasks = new[]
                 {
-                    Task.Factory.StartNew(() => BuildCreatables(applicationsLinkProvider, creatables)),
+                    Task.Factory.StartNew(
+                        () => BuildCreatables(applicationsLinkProvider, creatables, contextWeb.Url, contextWeb.ID)),
                     Task.Factory.StartNew(() => GetReportingListLibs(reportingLists, contextWeb))
                 };
 
@@ -108,12 +110,14 @@ namespace EPMLiveCore.Services
 
                 Parallel.ForEach(creatables.collection, c =>
                 {
-                    bool found = false;
+                    bool keep = false;
 
-                    foreach (DataRow row in Enumerable.Where(listLibs, r => r["Id"].ToString().ToLower()
-                        .Equals(c.id.ToLower())))
+                    foreach (
+                        DataRow row in
+                            Enumerable.Where(listLibs, row => row["Id"].ToString().ToLower().Equals(c.id.ToLower())
+                                                              && !SEUtils.IsIgnoredList(c.name, contextWeb)))
                     {
-                        found = true;
+                        keep = true;
 
                         object icon = row["icon"];
                         if (icon != DBNull.Value && icon != null) c.icon = icon as string;
@@ -121,7 +125,7 @@ namespace EPMLiveCore.Services
                         break;
                     }
 
-                    if (!found) toRemove.Add(c);
+                    if (!keep) toRemove.Add(c);
                 });
 
                 foreach (Creatables.Creatable creatable in toRemove.Distinct())
@@ -302,7 +306,8 @@ namespace EPMLiveCore.Services
             });
         }
 
-        private static void BuildCreatables(ApplicationsLinkProvider applicationsLinkProvider, Creatables creatables)
+        private static void BuildCreatables(ApplicationsLinkProvider applicationsLinkProvider, Creatables creatables,
+            string webUrl, Guid webId)
         {
             foreach (NavLink navLink in applicationsLinkProvider.GetLinks().Cast<NavLink>()
                 .Where(navLink => !string.IsNullOrEmpty(navLink.ObjectId)))
@@ -310,7 +315,9 @@ namespace EPMLiveCore.Services
                 creatables.collection.Add(new Creatables.Creatable
                 {
                     id = navLink.ObjectId,
-                    title = navLink.Title
+                    name = navLink.Title,
+                    url = string.Format("{0}/{1}?action=new&webid={2}&listid={3}",
+                        webUrl, PROXY_URL, webId, navLink.ObjectId)
                 });
             }
         }
@@ -366,7 +373,7 @@ namespace EPMLiveCore.Services
                 }
             }
 
-            var totalActivities = activityRows.Count;
+            int totalActivities = activityRows.Count;
 
             var webId = (Guid) tr["WebId"];
             var listId = tr["ListId"] as Guid?;

@@ -33,6 +33,7 @@
                 pagination: $('#epm-social-stream div#epm-se-pagination span'),
                 noActivity: $('#epm-social-stream div#epm-se-no-activity'),
                 threads: $('#epm-social-stream ul#epm-se-threads'),
+                toolbarItems: $('#epm-social-stream ul#epm-se-toolbar-items'),
                 statusUpdateBox: $('#epm-social-stream div#epm-se-status-update-box'),
             };
 
@@ -40,6 +41,7 @@
                 thread: _.compile($('script#epm-se-thread-template').html()),
                 activity: _.compile($('script#epm-se-activity-template').html()),
                 comment: _.compile($('script#epm-se-comment-template').html()),
+                toolbarItem: _.compile($('script#epm-se-toolbar-item-template').html()),
                 _userAvatar: _.compile($('script#_epm-se-user-avatar-template').html()),
                 _threadIcon: _.compile($('script#_epm-se-thread-icon-template').html()),
                 _threadTitle: _.compile($('script#_epm-se-thread-title-template').html()),
@@ -113,7 +115,7 @@
                     }
                 };
 
-                var _resetpagination = function() {
+                var _resetPagination = function () {
                     se.pagination = {
                         isLoading: false,
                         firstTimeLoad: true,
@@ -122,6 +124,11 @@
                         activityLimit: 1,
                         commentLimit: 2
                     };
+                };
+
+                var _reload = function() {
+                    _resetPagination();
+                    _load(null, true);
                 };
 
                 var _startLoader = function() {
@@ -148,19 +155,29 @@
                     getUserFriendlyName: _getUserFriendlyName,
                     getUserProfileUrl: _getUserProfileUrl,
                     sortComments: _sortComments,
-                    resetPagination: _resetpagination,
+                    reload: _reload,
+                    resetPagination: _resetPagination,
                     startLoader: _startLoader,
                     stopLoader: _stopLoader
                 };
             })();
 
             var actions = (function() {
-                var _navigate = function($a, event) {
+                var _navigate = function ($a, event) {
+                    event.preventDefault();
+                    
                     var kind = $a.data('kind');
-
-                    if (kind !== 'Workspace') {
-                        event.preventDefault();
-                        OpenCreateWebPageDialog($a.attr('href'));
+                    var url = $a.attr('href');
+                    
+                    if (kind !== 'Workspace' && kind !== 'creatable') {
+                        OpenCreateWebPageDialog(url);
+                    } else if (kind === 'creatable') {
+                        var options = {
+                            url: url,
+                            dialogReturnValueCallback: Function.createCallback(Function.createDelegate(null, toolbarManager.handleCreationAction))
+                        };
+                        
+                        window.SP.UI.ModalDialog.showModalDialog(options);
                     }
                 };
 
@@ -578,8 +595,7 @@
                                 var code = response.d.match(/<Result Status="(\d)">/);
                                 if (code.length && 0 === parseInt(code[1])) {
                                     window.setTimeout(function() {
-                                        helpers.resetPagination();
-                                        _load(null, true);
+                                        helpers.reload();
                                     }, 500);
                                 }
                             }
@@ -683,6 +699,41 @@
                 };
             })();
 
+            var toolbarManager = (function () {
+                var _init = function() {
+                    $.get(se.apiUrl + '/creatables?v=' + new Date().getTime()).then(function(response) {
+                        if (response.error) return;
+
+                        for (var i = 0; i < response.collection.length; i++) {
+                            var creatable = response.collection[i];
+                            creatable.icon = creatable.icon || 'icon-square';
+                            
+                            $$.publish('se.creatableLoaded', creatable);
+                        }
+
+                        $el.toolbarItems.parent().fadeIn('fast');
+                    });
+                };
+
+                var _addCreatable = function (creatable) {
+                    $el.toolbarItems.append(templates.toolbarItem(creatable));
+                };
+
+                var _handleCreationAction = function(result) {
+                    if (result === 1) {
+                        window.setTimeout(function () {
+                            helpers.reload();
+                        }, 500);
+                    }
+                };
+
+                return {
+                    initialize: _init,
+                    addCreatable: _addCreatable,
+                    handleCreationAction: _handleCreationAction
+                };
+            })();
+
             function configureMoment() {
                 moment.lang('en', {
                     calendar: {
@@ -708,6 +759,8 @@
                 _.registerPartial('object-info', templates._objectInfo);
                 _.registerPartial('comment-box', templates._commentBox);
 
+                toolbarManager.initialize();
+
                 commentManager.configureBox({
                     element: $el.statusUpdateBox,
                     placeholder: 'Share something...'
@@ -721,6 +774,10 @@
             }
 
             function attachEvents() {
+                $$.subscribe('se.creatableLoaded', function(creatable) {
+                    toolbarManager.addCreatable(creatable);
+                });
+
                 $$.subscribe('se.dataLoaded', function(data) {
                     render(data);
                 });

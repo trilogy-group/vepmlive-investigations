@@ -15,6 +15,10 @@
 </SharePoint:ScriptBlock>
 
 <div id="epm-social-stream">
+    <div id="epm-se-toolbar" class="clearfix">
+        <h3>CREATE</h3>
+        <ul id="epm-se-toolbar-items"></ul>
+    </div>
     <div id="epm-se-status-update-box" class="epm-se-comment-box clearfix">
         <div class="epm-se-comment-input" contenteditable="true"></div>
         <button id="epm-se-comment-post-<%= SEID %>">Post</button>
@@ -50,7 +54,6 @@
     <li id="epm-se-activity-{{id}}" class="epm-se-activity clearfix">
         {{> activity-icon}}{{> user-info}}{{> activity-info}}{{> activity-time}}
     </li>
-
 </script>
 
 <script id="epm-se-comment-template" type="text/x-handlebars-template">
@@ -63,12 +66,17 @@
     </li>
 </script>
 
+<script id="epm-se-toolbar-item-template" type="text/x-handlebars-template">
+    <li id="epm-se-toolbar-item-{{id}}" class="epm-se-toolbar-item"><span class="{{icon}}"></span><a class="epm-se-link" href="{{url}}" data-kind="creatable">{{name}}</a></li>
+</script>
+
 <script id="_epm-se-user-avatar-template" type="text/x-handlebars-template">
     <div class="epm-se-user-avatar">
         {{#if user.picture}}
             <img src="{{user.picture}}" />
         {{/if}}
     </div>
+
 </script>
 
 <script id="_epm-se-thread-info-template" type="text/x-handlebars-template">

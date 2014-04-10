@@ -25,13 +25,15 @@ namespace EPMLiveCore.Services.DataContracts.SocialEngine
 
         public class Creatable
         {
-            #region Properties (3) 
+            #region Properties (4) 
 
             public string icon { get; set; }
 
             public string id { get; set; }
 
-            public string title { get; set; }
+            public string name { get; set; }
+
+            public string url { get; set; }
 
             #endregion Properties 
         }
