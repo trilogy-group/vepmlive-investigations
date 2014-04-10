@@ -434,3 +434,254 @@ BEGIN
 		WHERE dbo.RPTWeb.SiteId = @SiteId order by dbo.RPTWeb.WebTitle
 	END   
 END'
+
+declare @createoralter varchar(10)
+if not exists (select routine_name from INFORMATION_SCHEMA.routines where routine_name = 'spGetReportListData')
+begin
+    Print 'Creating Function spGetReportListData'
+    SET @createoralter = 'CREATE'
+end
+else
+begin
+    Print 'Updating Function spGetReportListData'
+    SET @createoralter = 'ALTER'
+end
+exec(@createoralter + '  PROCEDURE [dbo].[spGetReportListData]
+
+@siteid uniqueidentifier,
+@webid uniqueidentifier,
+@weburl varchar(255),
+@userid	int,
+@rollup bit,
+@list varchar(255),
+@query varchar(5000),
+@orderby varchar(5000) = '''',
+@page int = 0,
+@pagesize int = 0,
+@listid uniqueidentifier = null
+
+AS
+BEGIN
+
+	declare @sql varchar(MAX)
+	declare @table varchar(MAX)
+	set @table = null
+
+	set @list = REPLACE(@list, '' '', '''')
+	if @list = ''Resources'' 
+	begin
+		set @list = ''ResourcePool''
+	end
+	else
+	begin
+		if @listid is null
+		begin
+			set @table = ''lst'' + @list
+		end
+		else
+		begin
+			select @table = tablename from rptlist where rptlistid=@listid
+			if @table is null
+			begin
+				set @table = ''lst'' + @list
+			end
+		end
+	end
+
+	declare @sca varchar(255)
+	set @sca = ''''
+	if @userid = 1073741823
+	begin
+	
+		set @sca = ''insert into #groups (groupid, sectype) VALUES (999999, 1)''
+	
+	end
+
+	if @rollup = 1
+		begin
+
+			declare @tquery varchar(5000)
+
+                  if @weburl = ''/''
+                  begin 
+                        set @tquery = '' AND (RPTITEMGROUPS.siteid='''''' + CAST(@siteid as varchar(255)) + '''''')''
+                  end
+                  else
+                  begin
+                        set @tquery = '' AND (weburl='''''' + @weburl + '''''' or weburl like '''''' + @weburl + ''/%'''')''
+                  end
+      
+                  if @query != ''''
+                  begin
+                        set @query = @tquery + '' AND '' + @query
+                  end
+                  else
+                  begin
+                        set @query = @tquery 
+                  end
+
+		end
+	else
+		begin
+
+			if @query != ''''
+				begin
+					set @query = '' AND webid='''''' + convert(varchar(50), @webid) + '''''' AND '' + @query
+				end
+			else
+				begin
+					set @query = '' AND webid='''''' + convert(varchar(50), @webid) + ''''''''
+				end
+
+			
+		end
+
+		set @sql = ''from lst'' + @table + '' where cast(listid as varchar(40)) + cast(itemid as varchar(20)) in (
+		SELECT     CAST(dbo.RPTITEMGROUPS.LISTID AS varchar(40)) + CAST(dbo.RPTITEMGROUPS.ITEMID AS varchar(20)) AS Expr1
+		FROM         dbo.RPTITEMGROUPS INNER JOIN
+                      #Groups as gps ON gps.GROUPID = rptitemgroups.GROUPID
+		
+		) '' + @query
+
+		if @pagesize <> 0 
+		begin
+
+			if @page = 0
+			begin
+				set @page = 1
+			end
+
+			if @orderby = '''' begin
+				set @orderby = ''itemid''
+			end
+
+			declare @topval int
+			set @topval = @page * @pagesize
+
+			
+
+			set @sql = ''
+			CREATE TABLE #Groups (GroupId INT, sectype int)
+			
+			INSERT INTO #Groups (GroupId, sectype) SELECT GROUPID, 1 FROM dbo.RPTGROUPUSER WHERE (USERID = '''''' + convert(varchar(10), @userid) + '''''') AND (SITEID = '''''' + CAST(@siteid as varchar(255)) + '''''')
+			
+			insert into #groups (groupid, sectype) VALUES ('''''' + convert(varchar(10), @userid) + '''''', 0)
+			
+			select * INTO #tmp '' + @sql + '';
+			
+			'' + @sca + ''
+			
+			WITH MyCTE AS (
+				SELECT top '' + convert(varchar(15),@topval) + '' ROW_NUMBER () OVER  (order by '' + @orderby + '') as RowID,*
+				from #tmp
+			)
+			SELECT *
+			FROM MyCTE
+			WHERE RowID BETWEEN '' + convert(varchar(15),(@page - 1) * @pagesize + 1) + '' and '' + convert(varchar(15),@topval) 
+			+ ''select count(*) from #tmp''
+		end
+		else
+		begin
+			set @sql = ''CREATE TABLE #Groups (GroupId INT, sectype int)
+			
+			INSERT INTO #Groups (GroupId, sectype) SELECT GROUPID, 1 FROM dbo.RPTGROUPUSER WHERE (USERID = '''''' + convert(varchar(10), @userid) + '''''') AND (SITEID = '''''' + CAST(@siteid as varchar(255)) + '''''')
+			
+			insert into #groups (groupid, sectype) VALUES ('''''' + convert(varchar(10), @userid) + '''''', 0)
+			
+			'' + @sca + ''
+			
+			select * '' + @sql;
+		
+			if @orderby <> '''' begin
+			
+				set @sql = @sql + '' order by '' + @orderby
+			
+			end
+		end
+		
+		print @sql
+		
+	exec(@sql)
+
+	
+
+ENd
+')
+
+
+if not exists (select routine_name from INFORMATION_SCHEMA.routines where routine_name = 'spUpdateStatusFields')
+begin
+    Print 'Creating Function spUpdateStatusFields'
+    SET @createoralter = 'CREATE'
+end
+else
+begin
+    Print 'Updating Function spUpdateStatusFields'
+    SET @createoralter = 'ALTER'
+end
+exec(@createoralter + ' PROCEDURE spUpdateStatusFields
+
+@listtable varchar(255),
+@yellow int = 0,
+@red int = 30
+
+AS
+BEGIN
+
+
+declare @cols as bit
+set @cols = 1
+declare @sql as varchar(MAX)
+
+if exists (select column_name FROM INFORMATION_SCHEMA.COLUMNS where table_name = @listtable and column_name = ''DueDate'')
+begin
+      ----------------------Days Overdue------------
+      if exists (select column_name FROM INFORMATION_SCHEMA.COLUMNS where table_name = @listtable and column_name = ''DaysOverdue'')
+      begin
+            
+            set @sql = ''update '' + @listtable + '' set daysoverdue = case when duedate > GETDATE() then 0 else DATEDIFF(d, duedate, GETDATE()) end''
+            
+            exec (@sql)
+            
+      end
+      
+      
+      ----------------------Due------------
+      if exists (select column_name FROM INFORMATION_SCHEMA.COLUMNS where table_name = @listtable and column_name = ''Due'') AND  exists (select column_name FROM INFORMATION_SCHEMA.COLUMNS where table_name = @listtable and column_name = ''Status'')
+      begin
+            
+            set @sql = ''update '' + @listtable + '' set due = 
+                              case 
+                              when status = ''''Completed'''' then ''''Completed'''' 
+                              when duedate is null then ''''No Due Date''''
+                              when DATEDIFF(d, duedate, GETDATE()) > 0 then ''''(1) Overdue''''
+                              when DATEDIFF(d, duedate, GETDATE()) = 0 then ''''(2) Due Today''''
+                              when DATEDIFF(d, duedate, GETDATE()) = -1 then ''''(3) Due Tomorrow''''
+                              when DATEPART(yyyy, duedate) = DATEPART(yyyy, GETDATE()) AND DATEPART(ww, duedate) = DATEPART(ww, GETDATE()) then ''''(4) Due This Week''''
+                              when DATEDIFF(d, DATEADD (d , (DATEPART(dw,GETDATE()) - 1) * -1 , GETDATE()), duedate ) < 14 then ''''(5) Due Next Week''''
+                              when DATEPART(yyyy, duedate) = DATEPART(yyyy, GETDATE()) AND DATEPART(m, duedate) = DATEPART(m, GETDATE()) then ''''(6) Due This Month''''
+                              else ''''(7) Future''''
+                              end''
+            
+            exec (@sql)
+            
+      end
+      
+      ----------------------Schedule Status------------
+      if exists (select column_name FROM INFORMATION_SCHEMA.COLUMNS where table_name = @listtable and column_name = ''ScheduleStatus'')
+      begin
+            
+            set @sql = ''update '' + @listtable + '' set ScheduleStatus =        
+                              case 
+                              when duedate IS NULL then ''''GREEN.GIF''''
+                              when DATEDIFF(d, duedate, GETDATE()) > '' + CONVERT(varchar(5), @red) + '' then ''''RED.GIF''''
+                              when DATEDIFF(d, duedate, GETDATE()) > '' + CONVERT(varchar(5), @yellow) + '' then ''''YELLOW.GIF''''                      
+                              else ''''GREEN.GIF''''
+                              end''
+            exec (@sql)
+
+      end
+end
+
+
+END')

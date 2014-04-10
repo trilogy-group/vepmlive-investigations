@@ -85,52 +85,6 @@ namespace EPMLiveReportsAdmin.Jobs
             return sCn;
         }
 
-        private void CheckSP(SqlConnection cn)
-        {
-            try
-            {
-                if (cn.State != ConnectionState.Open) cn.Open();
-
-                var cmd =
-                    new SqlCommand(
-                        "select * from information_schema.routines where SPECIFIC_NAME = 'spUpdateStatusFields'", cn);
-                bool found = false;
-                SqlDataReader dr = cmd.ExecuteReader();
-                if (dr.Read())
-                    found = true;
-                dr.Close();
-
-                if (!found)
-                {
-                    try
-                    {
-                        cmd = new SqlCommand(Resources.spUpdateStatusFields, cn);
-                        cmd.ExecuteNonQuery();
-                    }
-                    catch (Exception sqlEx)
-                    {
-                        bErrors = true;
-                        sErrors += "<font color=\"red\">Error: " + sqlEx.Message + "</font><br>";
-                    }
-                }
-
-                try
-                {
-                    cmd = new SqlCommand(Resources.spGetReportListData, cn);
-                    cmd.ExecuteNonQuery();
-                }
-                catch (Exception sqlExeQry)
-                {
-                    bErrors = true;
-                    sErrors += "<font color=\"red\">Error: " + sqlExeQry.Message + "</font><br>";
-                }
-            }
-            catch (Exception ex)
-            {
-                bErrors = true;
-                sErrors += "<font color=\"red\">Error: " + ex.Message + "</font><br>";
-            }
-        }
 
         public void execute(SPSite site, SPWeb web, string data)
         {
@@ -309,7 +263,7 @@ namespace EPMLiveReportsAdmin.Jobs
                 catch (Exception exSchema)
                 {
                     bErrors = true;
-                    sErrors += "<font color=\"red\">Error while checking schema: " + exSchema.Message + "</font><br>";
+                    sErrors += "<font color=\"red\">Error while updating schema: " + exSchema.Message + "</font><br>";
                 }
             });
 
@@ -331,7 +285,7 @@ namespace EPMLiveReportsAdmin.Jobs
 
             try
             {
-                CheckSP(epmdata.GetClientReportingConnection);
+                
 
                 if (string.IsNullOrEmpty(data))
                 {
