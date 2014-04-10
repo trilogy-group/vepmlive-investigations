@@ -2,9 +2,11 @@
 {
     public class NavLink : NavObject
     {
-        #region Properties (3) 
+        #region Properties (4) 
 
         public string Category { get; set; }
+
+        public string ObjectId { get; set; }
 
         public int Order { get; set; }
 

@@ -10,6 +10,8 @@ using System.ServiceModel.Channels;
 using System.ServiceModel.Web;
 using System.Threading.Tasks;
 using System.Web;
+using EPMLiveCore.Controls.Navigation.Providers;
+using EPMLiveCore.Infrastructure.Navigation;
 using EPMLiveCore.Services.DataContracts.SocialEngine;
 using EPMLiveCore.SocialEngine.Core;
 using Microsoft.SharePoint;
@@ -32,9 +34,9 @@ namespace EPMLiveCore.Services
 
         #endregion Fields 
 
-        #region Methods (16) 
+        #region Methods (19) 
 
-        // Public Methods (2) 
+        // Public Methods (3) 
 
         [WebGet(BodyStyle = WebMessageBodyStyle.Bare,
             ResponseFormat = WebMessageFormat.Json,
@@ -60,7 +62,12 @@ namespace EPMLiveCore.Services
             }
             catch (Exception exception)
             {
-                activities.error = new SEActivities.Error
+                if (exception is AggregateException)
+                {
+                    exception = ((AggregateException) exception).Flatten();
+                }
+
+                activities.error = new Error
                 {
                     message = exception.Message,
                     stackTrace = exception.StackTrace,
@@ -69,6 +76,75 @@ namespace EPMLiveCore.Services
             }
 
             return activities;
+        }
+
+        [WebGet(BodyStyle = WebMessageBodyStyle.Bare,
+            ResponseFormat = WebMessageFormat.Json,
+            UriTemplate = "/creatables")]
+        public Creatables GetCreatables()
+        {
+            var creatables = new Creatables();
+
+            try
+            {
+                SPWeb contextWeb = SPContext.Current.Web;
+
+                var applicationsLinkProvider = new ApplicationsLinkProvider(SPContext.Current.Site.ID,
+                    contextWeb.ID,
+                    contextWeb.CurrentUser.LoginName);
+
+                var reportingLists = new DataTable();
+
+                var tasks = new[]
+                {
+                    Task.Factory.StartNew(() => BuildCreatables(applicationsLinkProvider, creatables)),
+                    Task.Factory.StartNew(() => GetReportingListLibs(reportingLists, contextWeb))
+                };
+
+                Task.WaitAll(tasks);
+
+                var toRemove = new List<Creatables.Creatable>();
+                EnumerableRowCollection<DataRow> listLibs = reportingLists.AsEnumerable();
+
+                Parallel.ForEach(creatables.collection, c =>
+                {
+                    bool found = false;
+
+                    foreach (DataRow row in Enumerable.Where(listLibs, r => r["Id"].ToString().ToLower()
+                        .Equals(c.id.ToLower())))
+                    {
+                        found = true;
+
+                        object icon = row["icon"];
+                        if (icon != DBNull.Value && icon != null) c.icon = icon as string;
+
+                        break;
+                    }
+
+                    if (!found) toRemove.Add(c);
+                });
+
+                foreach (Creatables.Creatable creatable in toRemove.Distinct())
+                {
+                    creatables.collection.Remove(creatable);
+                }
+            }
+            catch (Exception exception)
+            {
+                if (exception is AggregateException)
+                {
+                    exception = ((AggregateException) exception).Flatten();
+                }
+
+                creatables.error = new Error
+                {
+                    message = exception.Message,
+                    stackTrace = exception.StackTrace,
+                    kind = typeof (Exception).ToString()
+                };
+            }
+
+            return creatables;
         }
 
         [WebGet(BodyStyle = WebMessageBodyStyle.Bare,
@@ -93,18 +169,23 @@ namespace EPMLiveCore.Services
             }
             catch (Exception exception)
             {
-                activities.error = new SEActivities.Error
+                if (exception is AggregateException)
+                {
+                    exception = ((AggregateException) exception).Flatten();
+                }
+
+                activities.error = new Error
                 {
                     message = exception.Message,
                     stackTrace = exception.StackTrace,
-                    kind = typeof(Exception).ToString()
+                    kind = typeof (Exception).ToString()
                 };
             }
 
             return activities;
         }
 
-        // Private Methods (14) 
+        // Private Methods (16) 
 
         private void AddList(SEActivities.Thread thread, SEActivities activities, DataRow tr)
         {
@@ -221,6 +302,19 @@ namespace EPMLiveCore.Services
             });
         }
 
+        private static void BuildCreatables(ApplicationsLinkProvider applicationsLinkProvider, Creatables creatables)
+        {
+            foreach (NavLink navLink in applicationsLinkProvider.GetLinks().Cast<NavLink>()
+                .Where(navLink => !string.IsNullOrEmpty(navLink.ObjectId)))
+            {
+                creatables.collection.Add(new Creatables.Creatable
+                {
+                    id = navLink.ObjectId,
+                    title = navLink.Title
+                });
+            }
+        }
+
         private SEActivities.Thread BuildThread(DataRow tr, DBConnectionManager manager, int userId, int activityLimit,
             int commentLimit, SEActivities activities, DateTime? offset, string kind = null)
         {
@@ -236,7 +330,7 @@ namespace EPMLiveCore.Services
             var totalComments = (int) tr["TotalComments"];
 
             var threadKind = (ObjectKind) tr["ThreadKind"];
-            var ignoreAccess = threadKind == ObjectKind.StatusUpdate;
+            bool ignoreAccess = threadKind == ObjectKind.StatusUpdate;
 
             if (!string.IsNullOrEmpty(kind))
             {
@@ -245,24 +339,34 @@ namespace EPMLiveCore.Services
                 if (kind.Equals("activities"))
                 {
                     activityRows =
-                        GetThreadActivities(manager, userId, 0, 3, activityLimit, tr, offset, ignoreAccess).AsEnumerable().ToList();
+                        GetThreadActivities(manager, userId, 0, 3, activityLimit, tr, offset, ignoreAccess)
+                            .AsEnumerable()
+                            .ToList();
                 }
                 else if (kind.Equals("comments"))
                 {
                     commentRows =
-                        GetThreadActivities(manager, userId, 4, 4, commentLimit, tr, offset, ignoreAccess).AsEnumerable().ToList();
+                        GetThreadActivities(manager, userId, 4, 4, commentLimit, tr, offset, ignoreAccess)
+                            .AsEnumerable()
+                            .ToList();
                 }
             }
             else
             {
                 if (totalActivities > 0)
                 {
-                    activityRows = GetThreadActivities(manager, userId, 0, 3, activityLimit, tr, null, ignoreAccess).AsEnumerable().ToList();
+                    activityRows =
+                        GetThreadActivities(manager, userId, 0, 3, activityLimit, tr, null, ignoreAccess)
+                            .AsEnumerable()
+                            .ToList();
                 }
 
                 if (totalComments > 0)
                 {
-                    commentRows = GetThreadActivities(manager, userId, 4, 4, commentLimit, tr, null, ignoreAccess).AsEnumerable().ToList();
+                    commentRows =
+                        GetThreadActivities(manager, userId, 4, 4, commentLimit, tr, null, ignoreAccess)
+                            .AsEnumerable()
+                            .ToList();
                 }
             }
 
@@ -367,7 +471,22 @@ namespace EPMLiveCore.Services
             SortThreadActivities(activities);
         }
 
-        private DataTable GetThreadActivities(DBConnectionManager manager, int userId, int kindMin, int kindMax, int activityLimit, DataRow tr, DateTime? offset, bool ignoreAccess)
+        private static void GetReportingListLibs(DataTable reportingLists, SPWeb contextWeb)
+        {
+            using (var manager = new DBConnectionManager(contextWeb))
+            {
+                const string SQL = @"
+                        SELECT  dbo.RPTList.RPTListId AS Id, dbo.RPTList.ListName AS Name, dbo.ReportListIds.ListIcon AS Icon
+                        FROM    dbo.RPTList LEFT OUTER JOIN dbo.ReportListIds ON dbo.RPTList.RPTListId = dbo.ReportListIds.Id";
+
+                var sqlCommand = new SqlCommand(SQL, manager.SqlConnection);
+                SqlDataReader reader = sqlCommand.ExecuteReader();
+                reportingLists.Load(reader);
+            }
+        }
+
+        private DataTable GetThreadActivities(DBConnectionManager manager, int userId, int kindMin, int kindMax,
+            int activityLimit, DataRow tr, DateTime? offset, bool ignoreAccess)
         {
             var dataTable = new DataTable();
 

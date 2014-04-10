@@ -134,7 +134,8 @@ namespace EPMLiveCore.Controls.Navigation.Providers
                 links.AddRange(lists.Select(list => list.Value).Select(l => new NavLink
                 {
                     Title = l[1],
-                    Url = GetUrl(l)
+                    Url = GetUrl(l),
+                    ObjectId = l[5]
                 }));
             }
             else
@@ -157,7 +158,8 @@ namespace EPMLiveCore.Controls.Navigation.Providers
                 links.AddRange(libraries.Select(lib => lib.Value).Select(l => new NavLink
                 {
                     Title = l[1],
-                    Url = GetUrl(l)
+                    Url = GetUrl(l),
+                    ObjectId = l[5]
                 }));
             }
             else

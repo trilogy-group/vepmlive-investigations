@@ -98,6 +98,7 @@ namespace EPMLiveCore
                 string imageUrl = string.Empty;
                 string linkUrl = string.Empty;
                 string onclick = string.Empty;
+                string listId = string.Empty;
                 bool hideNewBtn = true;
 
                 GridGanttSettings gSettings = new GridGanttSettings(list);
@@ -126,6 +127,7 @@ namespace EPMLiveCore
 
                         description = list.Description;
                         imageUrl = list.ImageUrl;
+                        listId = list.ID.ToString();
 
                         //string rlists = string.Empty;
                         //rlists = gSettings.RollupLists;
@@ -178,7 +180,7 @@ namespace EPMLiveCore
                             //}
                         }
 
-                        dict.Add(i, new [] { description, itemText, imageUrl, linkUrl, onclick });
+                        dict.Add(i, new[] {description, itemText, imageUrl, linkUrl, onclick, listId});
                     }
                 }
             }
@@ -230,6 +232,7 @@ namespace EPMLiveCore
                 string imageUrl = string.Empty;
                 string linkUrl = string.Empty;
                 string onclick = string.Empty;
+                string libId = string.Empty;
                 bool hideNewBtn = true;
 
                 GridGanttSettings gSettings = new GridGanttSettings(list);
@@ -255,6 +258,7 @@ namespace EPMLiveCore
 
                         description = list.Description;
                         imageUrl = list.ImageUrl;
+                        libId = list.ID.ToString();
 
                         string rlists = string.Empty;
                         rlists = gSettings.RollupLists;
@@ -311,8 +315,8 @@ namespace EPMLiveCore
                             //}
                         }
 
-                        dict.Add(i, new[] { description, itemText, imageUrl, linkUrl, onclick });
-                    }
+                            dict.Add(i, new[] {description, itemText, imageUrl, linkUrl, onclick, libId});
+                        }
                         catch { }
                     }
                 }
