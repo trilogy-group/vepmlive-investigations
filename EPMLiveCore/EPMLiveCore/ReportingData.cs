@@ -19,6 +19,8 @@ namespace EPMLiveCore
 
             if (rb.SiteExists())
             {
+                SPList oList = web.Lists[list];
+
                 EPMLiveReportsAdmin.EPMData data = new EPMLiveReportsAdmin.EPMData(web.Site.ID);
 
                 SqlConnection cn = data.GetClientReportingConnection;
@@ -41,6 +43,8 @@ namespace EPMLiveCore
                 cmd.Parameters.AddWithValue("@query", query);
                 cmd.Parameters.AddWithValue("@pagesize", pagesize);
                 cmd.Parameters.AddWithValue("@page", page);
+                cmd.Parameters.AddWithValue("@listid", oList.ID);
+                
                 if (borderby)
                     cmd.Parameters.AddWithValue("@orderby", orderby);
 
