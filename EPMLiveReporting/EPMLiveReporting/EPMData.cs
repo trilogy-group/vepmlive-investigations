@@ -631,7 +631,84 @@ namespace EPMLiveReportsAdmin
         //    return true;
         //}
 
-        private bool MapDefaultLists(string sListNames)
+        public bool MapLists(List<Guid> sListNames, Guid webId)
+        {
+            bool blnPassed = false;
+            char[] splitter = ",".ToCharArray();
+            //Array lists = sListNames.Split(splitter[0]);
+            var fields = new ListItemCollection();
+            var spSite = new SPSite(_siteID);
+            SPList spList = null;
+            bool isReportingV2Enabled = false;
+
+            using (spSite)
+            {
+                using (SPWeb spWeb = spSite.OpenWeb(webId))
+                {
+                    try
+                    {
+                        isReportingV2Enabled = Convert.ToBoolean(CoreFunctions.getConfigSetting(spWeb.Site.OpenWeb(), "reportingV2"));
+                    }
+                    catch (Exception)
+                    {
+                        isReportingV2Enabled = false;
+                    }
+
+                    if (isReportingV2Enabled)
+                    {
+                        foreach (Guid listId in sListNames)
+                        {
+                            try
+                            {
+                                spList = null;
+                                spList = spWeb.Lists[listId];
+                            }
+                            catch (Exception ex)
+                            {
+                                //Add Logging here...
+                            }
+
+                            if (spList != null && !ListMappedAlready(spList.ID))
+                            {
+                                fields = GetListFields(spList);
+                                var oMapList = new ReportBiz(_siteID, spWeb.ID, isReportingV2Enabled);
+                                oMapList.CreateListBiz(spList.ID, spWeb.ID, fields);
+                            }
+                        }
+                    }
+                }
+            }
+
+            try
+            {
+                //FOREIGN IMPLEMENTATION -- START
+                var DAO = new EPMData(_siteID);
+                var rb = new ReportBiz(_siteID);
+                rb.UpdateForeignKeys(DAO);
+                DAO.Dispose();
+                // -- END
+            }
+            catch (Exception ex)
+            {
+                SPSecurity.RunWithElevatedPrivileges(delegate()
+                {
+                    if (!EventLog.SourceExists("EPMLive Reporting - UpdateForeignKeys"))
+                        EventLog.CreateEventSource("EPMLive Reporting - UpdateForeignKeys", "EPM Live");
+
+                    var myLog = new EventLog("EPM Live", ".", "EPMLive Reporting - UpdateForeignKeys");
+                    myLog.ModifyOverflowPolicy(OverflowAction.OverwriteAsNeeded, 1);
+                    myLog.MaximumKilobytes = 32768;
+                    myLog.WriteEntry(
+                        "Name: " + _siteName + " Url: " + _siteUrl + " ID: " + _siteID.ToString() + " : " + ex.Message +
+                        ex.StackTrace, EventLogEntryType.Error, 4001);
+                });
+                blnPassed = false;
+            }
+
+            return blnPassed;
+        }
+
+        public bool MapDefaultLists(string sListNames)
         {
             bool blnPassed = false;
             char[] splitter = ",".ToCharArray();
@@ -815,12 +892,12 @@ namespace EPMLiveReportsAdmin
 
                 var dLists = new List<string>();
                 foreach (SPList l in from SPList l in rootWeb.Lists
-                    let e = (from SPEventReceiverDefinition erd in l.EventReceivers
-                        where erd.Assembly == sAssembly && erd.Class == sClass
-                        select erd).ToList()
-                    where e.Count > 0
-                    where !dLists.Contains(l.Title)
-                    select l)
+                                     let e = (from SPEventReceiverDefinition erd in l.EventReceivers
+                                              where erd.Assembly == sAssembly && erd.Class == sClass
+                                              select erd).ToList()
+                                     where e.Count > 0
+                                     where !dLists.Contains(l.Title)
+                                     select l)
                 {
                     dLists.Add(l.Title);
                 }
@@ -885,7 +962,7 @@ namespace EPMLiveReportsAdmin
             {
                 object value;
                 using (
-                    var command = new SqlCommand {CommandType = _commandType, CommandText = _command, Connection = con})
+                    var command = new SqlCommand { CommandType = _commandType, CommandText = _command, Connection = con })
                 {
                     command.CommandTimeout = 3600; // 1hour
                     command.Parameters.AddRange(_params.ToArray());
@@ -1004,7 +1081,7 @@ namespace EPMLiveReportsAdmin
                     var parameters = new List<SqlParameter>();
                     foreach (object parameter in command.Parameters)
                     {
-                        parameters.Add((SqlParameter) parameter);
+                        parameters.Add((SqlParameter)parameter);
                     }
 
                     foreach (SqlParameter sqlParameter in parameters)
@@ -1086,7 +1163,7 @@ namespace EPMLiveReportsAdmin
             {
                 SqlDataAdapter da;
                 using (
-                    var command = new SqlCommand {CommandType = _commandType, CommandText = _command, Connection = con})
+                    var command = new SqlCommand { CommandType = _commandType, CommandText = _command, Connection = con })
                 {
                     command.CommandTimeout = 3600; // 1hour
                     command.Parameters.AddRange(_params.ToArray());
@@ -1152,7 +1229,7 @@ namespace EPMLiveReportsAdmin
             DataTable dt;
             Command = string.Format("select * from [{0}] where siteid = @SiteId",
                 Resources.DatabaseTable.Replace("'", ""));
-                // - CAT.NET false-positive: All single quotes are escaped/removed.
+            // - CAT.NET false-positive: All single quotes are escaped/removed.
             AddParam("@SiteId", _siteID);
             dt = GetTable(GetEPMLiveConnection);
 
@@ -1167,9 +1244,9 @@ namespace EPMLiveReportsAdmin
             if (siteDataRow == null)
                 return;
             _databaseName = siteDataRow["DatabaseName"].ToString().Replace("'", "");
-                // - CAT.NET false-positive: All single quotes are escaped/removed.
+            // - CAT.NET false-positive: All single quotes are escaped/removed.
             _databaseServer = siteDataRow["DatabaseServer"].ToString().Replace("'", "");
-                // - CAT.NET false-positive: All single quotes are escaped/removed.
+            // - CAT.NET false-positive: All single quotes are escaped/removed.
 
             if (siteDataRow["SAccount"] == DBNull.Value)
             {
@@ -1177,15 +1254,15 @@ namespace EPMLiveReportsAdmin
             }
             else
             {
-                _useSAccount = (bool) siteDataRow["SAccount"];
+                _useSAccount = (bool)siteDataRow["SAccount"];
             }
 
             if (_useSAccount)
             {
                 _username = siteDataRow["Username"].ToString().Replace("'", "");
-                    // - CAT.NET false-positive: All single quotes are escaped/removed.
+                // - CAT.NET false-positive: All single quotes are escaped/removed.
                 _password = siteDataRow["Password"].ToString().Replace("'", "");
-                    // - CAT.NET false-positive: All single quotes are escaped/removed.
+                // - CAT.NET false-positive: All single quotes are escaped/removed.
             }
         }
 
@@ -1196,7 +1273,7 @@ namespace EPMLiveReportsAdmin
                 _remoteCs =
                     string.Format("Data Source={0};Initial Catalog={1};Integrated Security=SSPI", _databaseServer,
                         _databaseName).Replace("'", "");
-                    // - CAT.NET false-positive: All single quotes are escaped/removed.
+                // - CAT.NET false-positive: All single quotes are escaped/removed.
                 _masterCs =
                     string.Format("Data Source={0};Initial Catalog=master;Integrated Security=SSPI", _databaseServer)
                         .Replace("'", ""); // - CAT.NET false-positive: All single quotes are escaped/removed.
@@ -1206,11 +1283,11 @@ namespace EPMLiveReportsAdmin
                 _remoteCs =
                     string.Format("Data Source={0};Initial Catalog={1};User Id={2};Password={3};", _databaseServer,
                         _databaseName, _username, Decrypt(_password)).Replace("'", "");
-                    // - CAT.NET false-positive: All single quotes are escaped/removed.
+                // - CAT.NET false-positive: All single quotes are escaped/removed.
                 _masterCs =
                     string.Format("Data Source={0};Initial Catalog={1};User Id={2};Password={3};", _databaseServer,
                         "master", _username, Decrypt(_password)).Replace("'", "");
-                    // - CAT.NET false-positive: All single quotes are escaped/removed.
+                // - CAT.NET false-positive: All single quotes are escaped/removed.
             }
         }
 
@@ -1430,11 +1507,11 @@ namespace EPMLiveReportsAdmin
 
             if (dt != null && dt.Rows.Count > 0)
             {
-                status = (int) dt.Rows[0]["status"];
+                status = (int)dt.Rows[0]["status"];
                 listguid = dt.Rows[0]["listguid"].ToString();
                 try
                 {
-                    pctComplete = (int) dt.Rows[0]["percentComplete"];
+                    pctComplete = (int)dt.Rows[0]["percentComplete"];
                 }
                 catch (Exception ex)
                 {
@@ -1462,11 +1539,11 @@ namespace EPMLiveReportsAdmin
 
             if (dt != null && dt.Rows.Count > 0)
             {
-                status = (int) dt.Rows[0]["status"];
+                status = (int)dt.Rows[0]["status"];
                 listguid = dt.Rows[0]["listguid"].ToString();
                 try
                 {
-                    pctComplete = (int) dt.Rows[0]["percentComplete"];
+                    pctComplete = (int)dt.Rows[0]["percentComplete"];
                 }
                 catch (Exception ex)
                 {
@@ -1535,7 +1612,7 @@ namespace EPMLiveReportsAdmin
                             LogStatus(string.Empty, string.Empty,
                                 "Refresh not completed due errors." + ex.Message.Replace("'", ""),
                                 ex.StackTrace.Replace("'", ""), 2, 3, string.Empty);
-                                // - CAT.NET false-positive: All single quotes are escaped/removed.
+                            // - CAT.NET false-positive: All single quotes are escaped/removed.
                         }
                     }
                 }
@@ -1578,7 +1655,7 @@ namespace EPMLiveReportsAdmin
                     {
                         try
                         {
-                          
+
                             //Datatable name MUST be the SAME as the sqltable name.
                             sbc.DestinationTableName = dtList.TableName;
 
@@ -1607,7 +1684,7 @@ namespace EPMLiveReportsAdmin
                             LogStatus(string.Empty, string.Empty,
                                 "Refresh not completed due errors." + ex.Message.Replace("'", ""),
                                 ex.StackTrace.Replace("'", ""), 2, 3, timerjobguid.ToString());
-                                // - CAT.NET false-positive: All single quotes are escaped/removed.
+                            // - CAT.NET false-positive: All single quotes are escaped/removed.
                         }
                     }
                 }
@@ -1624,7 +1701,7 @@ namespace EPMLiveReportsAdmin
                 catch (Exception ex1) { }
                 LogStatus(string.Empty, string.Empty, "Refresh not completed due errors." + ex.Message.Replace("'", ""),
                     ex.StackTrace.Replace("'", ""), 2, 3, timerjobguid.ToString());
-                    // - CAT.NET false-positive: All single quotes are escaped/removed.
+                // - CAT.NET false-positive: All single quotes are escaped/removed.
             }
 
             if (con.State == ConnectionState.Open)
@@ -1713,10 +1790,10 @@ namespace EPMLiveReportsAdmin
             try
             {
                 evts = (from e in list.EventReceivers.OfType<SPEventReceiverDefinition>()
-                    where e.Assembly.Equals(assemblyName, StringComparison.CurrentCultureIgnoreCase) &&
-                          e.Class.Equals(className, StringComparison.CurrentCultureIgnoreCase) &&
-                          types.Contains(e.Type)
-                    select e).ToList<SPEventReceiverDefinition>();
+                        where e.Assembly.Equals(assemblyName, StringComparison.CurrentCultureIgnoreCase) &&
+                              e.Class.Equals(className, StringComparison.CurrentCultureIgnoreCase) &&
+                              types.Contains(e.Type)
+                        select e).ToList<SPEventReceiverDefinition>();
             }
             catch { }
 
@@ -1836,7 +1913,7 @@ namespace EPMLiveReportsAdmin
                     {
                         LogStatus(string.Empty, string.Empty, "Snapshot Error", SqlError.Replace("'", ""), 2, 2,
                             timerjobguid.ToString().Replace("'", ""));
-                            // - CAT.NET false-positive: All single quotes are escaped/removed.
+                        // - CAT.NET false-positive: All single quotes are escaped/removed.
                     }
                 }
             }
@@ -1845,7 +1922,7 @@ namespace EPMLiveReportsAdmin
                 LogStatus(string.Empty, string.Empty, "Snapshot Error",
                     "Error:" + ex.Message.Replace("'", "") + " -- " + ex.StackTrace.Replace("'", ""), 2, 2,
                     timerjobguid.ToString().Replace("'", ""));
-                    // - CAT.NET false-positive: All single quotes are escaped/removed.
+                // - CAT.NET false-positive: All single quotes are escaped/removed.
                 status = false;
             }
             return status;
@@ -1868,7 +1945,7 @@ namespace EPMLiveReportsAdmin
                 Command = "Select * FROM RPTDatabases Where siteId = @siteId";
                 AddParam("@siteId", siteId);
                 dt = GetTable(GetEPMLiveConnection);
-                var useSA = (bool) dt.Rows[0]["SAccount"];
+                var useSA = (bool)dt.Rows[0]["SAccount"];
                 string conStr = string.Empty;
                 if (useSA)
                 {
@@ -1948,7 +2025,7 @@ namespace EPMLiveReportsAdmin
                     if (TableExists(sTableName, GetClientReportingConnection))
                     {
                         sSQL = sSQL + " DELETE " + sTableName.Replace("'", "") + " WHERE SiteId =@siteID";
-                            // - CAT.NET false-positive: All single quotes are escaped/removed.
+                        // - CAT.NET false-positive: All single quotes are escaped/removed.
                     }
                 }
                 AddParam("@siteID", _siteID);
@@ -1972,7 +2049,7 @@ namespace EPMLiveReportsAdmin
                 {
                     sSQL = sSQL + " DELETE FROM RPTWork WHERE SiteId=@siteId AND ListId='" +
                            listIds[iListCounter].Replace("'", "") + "'";
-                        // - CAT.NET false-positive: All single quotes are escaped/removed.
+                    // - CAT.NET false-positive: All single quotes are escaped/removed.
                 }
                 AddParam("@siteId", _siteID);
                 Command = sSQL;
@@ -1984,7 +2061,7 @@ namespace EPMLiveReportsAdmin
                 LogStatus(string.Empty, sListNames,
                     "Batch delete not completed due errors." + ex.Message.Replace("'", ""),
                     ex.StackTrace.Replace("'", ""), 2, 3, string.Empty);
-                    // - CAT.NET false-positive: All single quotes are escaped/removed.
+                // - CAT.NET false-positive: All single quotes are escaped/removed.
                 return false;
             }
         }
@@ -2070,7 +2147,7 @@ namespace EPMLiveReportsAdmin
             //Command = "SELECT TableCount FROM RPTSettings WHERE SiteID='" + _siteID.ToString() + "'"; - CAT.NET
             Command = "SELECT TableCount FROM RPTSettings WHERE SiteID=@siteId";
             AddParam("@siteId", _siteID);
-            iTableCount = (int) ExecuteScalar(GetClientReportingConnection);
+            iTableCount = (int)ExecuteScalar(GetClientReportingConnection);
             return iTableCount;
         }
 
@@ -2159,7 +2236,7 @@ namespace EPMLiveReportsAdmin
         public Guid GetListId(string sListName)
         {
             using (var site = new SPSite(_siteID))
-            {                                
+            {
                 using (SPWeb spWeb = site.OpenWeb())
                 {
                     try
@@ -2234,7 +2311,7 @@ namespace EPMLiveReportsAdmin
             object objTableName = null;
             Command = "SELECT ListName FROM " + Resources.ListTable.Replace("'", "") + " WHERE TableName='" +
                       tableName.Replace("'", "") + "' AND SiteId=@siteID";
-                // - CAT.NET false-positive: All single quotes are escaped/removed.
+            // - CAT.NET false-positive: All single quotes are escaped/removed.
             AddParam("@siteID", _siteID);
             objTableName = ExecuteScalar(GetClientReportingConnection);
             return objTableName.ToString();
@@ -2408,7 +2485,7 @@ namespace EPMLiveReportsAdmin
             try
             {
                 Command = sql;
-                version = (int) ExecuteScalar(GetClientReportingConnection);
+                version = (int)ExecuteScalar(GetClientReportingConnection);
 
                 if (version == 1)
                     version = 2010;
@@ -2648,6 +2725,28 @@ namespace EPMLiveReportsAdmin
         /// <param name="sListName"></param>
         /// <param name="siteId"></param>
         /// <returns></returns>
+        public bool ListMappedAlready(Guid listId)
+        {
+            //Command = string.Format("SELECT COUNT(*) as ListCount FROM RPTList WHERE siteId='{0}' AND ListName='{1}'", _siteID, sListName); - CAT.NET
+            Command = "SELECT COUNT(*) as ListCount FROM RPTList WHERE RPTListId=@RPTListId";
+            AddParam("@RPTListId", listId);
+            object oResult = ExecuteScalar(GetClientReportingConnection);
+
+            if (oResult != null && (int)oResult != 0)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// </summary>
+        /// <param name="sListName"></param>
+        /// <param name="siteId"></param>
+        /// <returns></returns>
         public bool ListMappedAlready(string sListName, Guid siteId)
         {
             //Command = string.Format("SELECT COUNT(*) as ListCount FROM RPTList WHERE siteId='{0}' AND ListName='{1}'", _siteID, sListName); - CAT.NET
@@ -2656,7 +2755,7 @@ namespace EPMLiveReportsAdmin
             AddParam("@listName", sListName);
             object oResult = ExecuteScalar(GetClientReportingConnection);
 
-            if (oResult != null && (int) oResult != 0)
+            if (oResult != null && (int)oResult != 0)
             {
                 return true;
             }
@@ -2681,7 +2780,7 @@ namespace EPMLiveReportsAdmin
 
             object oResult = ExecuteScalar(GetClientReportingConnection);
 
-            if ((int) oResult == 0)
+            if ((int)oResult == 0)
             {
                 Command = "INSERT INTO RPTSettings VALUES(@siteID,@nonWorkingDays,@workHrs,@SiteName,@SiteUrl)";
             }

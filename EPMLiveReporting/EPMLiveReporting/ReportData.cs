@@ -28,6 +28,83 @@ namespace EPMLiveReportsAdmin
         protected string _siteUrl;
         private string _sqlError;
 
+        public ReportData(bool tmp, Guid siteId, Guid webId)
+        {
+            SPWeb web = null;
+            _siteId = siteId;
+            DataRow SAccountInfo = null;
+
+            using (var site = new SPSite(siteId))
+            {
+                if (SPContext.Current != null)
+                {
+                    if (SPContext.Current.Web.IsRootWeb)
+                        web = site.OpenWeb();
+                    else
+                        web = site.OpenWeb(webId);
+                }
+                else
+                    web = site.OpenWeb(webId);
+
+                _webId = web.ID;
+                _isRootWeb = web.IsRootWeb;
+
+                try
+                {
+                    _isReportingV2Enabled =
+                        Convert.ToBoolean(CoreFunctions.getConfigSetting(site.RootWeb, "reportingV2"));
+                }
+                catch (Exception)
+                {
+                    _isReportingV2Enabled = false;
+                    SPContext.Current.Site.RootWeb.AllowUnsafeUpdates = true;
+                    CoreFunctions.setConfigSetting(site.RootWeb, "reportingV2", "false");
+                }
+
+                _epmLiveCs = CoreFunctions.getConnectionString(site.WebApplication.Id);
+                SAccountInfo = EPMData.SAccountInfo(siteId, site.WebApplication.Id);
+                //if(string.IsNullOrEmpty(_epmLiveCs))
+                //_epmLiveCs = ConfigurationManager.ConnectionStrings["epmlive"].ConnectionString.ToString();
+            }
+
+            if (SAccountInfo != null)
+            {
+                try
+                {
+                    bool useSA = false;
+                    useSA = (bool)SAccountInfo["SAccount"];
+                    if (useSA) //Use SQL Account
+                    {
+                        _DAO = new EPMData(_siteId, SAccountInfo["DatabaseName"].ToString().Replace("'", ""),
+                            SAccountInfo["DatabaseServer"].ToString().Replace("'", ""), true,
+                            SAccountInfo["Username"].ToString().Replace("'", ""),
+                            EPMData.Decrypt(SAccountInfo["Password"].ToString()).Replace("'", ""));
+                        // - CAT.NET false-positive: All single quotes are escaped/removed.
+                        _siteName = _DAO.SiteName;
+                        _siteUrl = _DAO.SiteUrl;
+                    }
+                    else //Use System Account
+                    {
+                        _DAO = new EPMData(_siteId);
+                        _siteName = _DAO.SiteName;
+                        _siteUrl = _DAO.SiteUrl;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _DAO = new EPMData(_siteId);
+                    _siteName = _DAO.SiteName;
+                    _siteUrl = _DAO.SiteUrl;
+                }
+            }
+            else
+            {
+                _DAO = new EPMData(_siteId);
+                _siteName = _DAO.SiteName;
+                _siteUrl = _DAO.SiteUrl;
+            }
+        }
+
         public ReportData(Guid siteId, Guid webAppId)
         {
             _siteId = siteId;

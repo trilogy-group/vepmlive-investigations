@@ -226,38 +226,41 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
         {
             string reportingListIDs = string.Empty;
             Guid siteId = SPContext.Current.Site.ID;
-
+            SPWeb spweb = null;
             var rd = new ReportData(siteId);
             var daoEPMData = new EPMData(siteId);
             LoadLists(rd.GetListMappings());
+            using (var spSite = new SPSite(siteId))
+            {
+                if (reportingV2Enabled)
+                    spweb = SPContext.Current.Web;
+                else
+                    spweb = spSite.OpenWeb();
+            }
 
-            string defaultLists = daoEPMData.DefaultLists(SPContext.Current.Web);
-            string _DefaultLists =
-                CoreFunctions.getConfigSetting(SPContext.Current.Web, "EPMLiveFixLists").Replace("\r\n", ",");
+            string defaultLists = daoEPMData.DefaultLists(spweb);
+            string _DefaultLists = CoreFunctions.getConfigSetting(spweb, "EPMLiveFixLists").Replace("\r\n", ",");
 
             var dtReportData = new DataTable();
-            using (var spSite = new SPSite(SPContext.Current.Site.ID))
+            using (var spSite = new SPSite(siteId))
             {
-                using (SPWeb spweb = spSite.OpenWeb(SPContext.Current.Web.ID))
+                SPListCollection lists = spweb.Lists;
+                foreach (SPList list in lists)
                 {
-                    SPListCollection lists = spweb.Lists;
-                    foreach (SPList list in lists)
+                    if ((!list.Hidden && IsReportingList(list.Title)) || defaultLists.Contains(list.Title) ||
+                        _DefaultLists.Contains(list.Title))
                     {
-                        if ((!list.Hidden && IsReportingList(list.Title)) || defaultLists.Contains(list.Title) ||
-                            _DefaultLists.Contains(list.Title))
-                        {
-                            reportingListIDs += "'" + list.ID + "',";
-                        }
+                        reportingListIDs += "'" + list.ID + "',";
                     }
-
-                    if (!string.IsNullOrEmpty(reportingListIDs))
-                        reportingListIDs = reportingListIDs.Substring(0, reportingListIDs.Length - 1);
-
-                    DataView mappings = rd.GetListMappings(reportingListIDs).DefaultView;
-                    GridView1.DataSource = mappings;
-                    GridView1.DataBind();
-                    rd.Dispose();
                 }
+
+                if (!string.IsNullOrEmpty(reportingListIDs))
+                    reportingListIDs = reportingListIDs.Substring(0, reportingListIDs.Length - 1);
+
+                DataView mappings = rd.GetListMappings(reportingListIDs).DefaultView;
+                GridView1.DataSource = mappings;
+                GridView1.DataBind();
+                rd.Dispose();
             }
         }
 
@@ -299,7 +302,7 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
                     Guid timerjobuid = Guid.Empty;
                     if (oResult != null)
                     {
-                        timerjobuid = (Guid) oResult;
+                        timerjobuid = (Guid)oResult;
                     }
                     else
                     {
@@ -326,7 +329,7 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
             //Prod -- Start
             using (SPSite site = SPContext.Current.Site)
             {
-                using (SPWeb web = SPContext.Current.Web)          
+                using (SPWeb web = SPContext.Current.Web)
                 {
                     Guid listID = _DAO.GetListId(sLists, web.ID);
 
@@ -344,7 +347,7 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
 
                     if (oResult != null)
                     {
-                        timerjobuid = (Guid) oResult;
+                        timerjobuid = (Guid)oResult;
                     }
                     else
                     {

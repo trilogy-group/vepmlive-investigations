@@ -2014,7 +2014,7 @@ namespace EPMLiveCore
                                 strEPMLiveGroupsPermAssignments = CoreFunctions.getConfigSetting(w,
                                     "EPMLiveGroupsPermAssignments");
                                 List<SPEventReceiverDefinition> evts = null;
-                                List<string> listsToBeMapped = new List<string>();
+                                List<Guid> listsToBeMapped = new List<Guid>();
                                 string EPMLiveReportingAssembly =
                                     "EPMLiveReportsAdmin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b90e532f481cf050";
                                 foreach (SPList l in w.Lists)
@@ -2032,9 +2032,9 @@ namespace EPMLiveCore
                                         });
 
                                     if (evts.Count > 0 &&
-                                        !listsToBeMapped.Contains(l.Title))
+                                        !listsToBeMapped.Contains(l.ID))
                                     {
-                                        listsToBeMapped.Add(l.Title);
+                                        listsToBeMapped.Add(l.ID);
                                         continue;
                                     }
                                 }
@@ -2050,21 +2050,17 @@ namespace EPMLiveCore
                                     {
                                         assemblyInstance = Assembly.Load(EPMLiveReportingAssembly);
                                         thisClass = assemblyInstance.GetType("EPMLiveReportsAdmin.EPMData", true, true);
-                                        m = thisClass.GetMethod("MapDefaultList",
-                                            BindingFlags.Public | BindingFlags.Instance);
-                                        apiClass = Activator.CreateInstance(thisClass,
-                                            new object[] { SPContext.Current.Site.ID });
+                                        m = thisClass.GetMethod("MapLists", BindingFlags.Public | BindingFlags.Instance);
+                                        apiClass = Activator.CreateInstance(thisClass, new object[] { true, s.ID, w.ID });
                                     }
-                                    catch
-                                    {
-                                    }
+                                    catch { }
 
                                     if (m != null &&
                                         assemblyInstance != null &&
                                         thisClass != null &&
                                         apiClass != null)
                                     {
-                                        m.Invoke(apiClass, new object[] { string.Join(",", listsToBeMapped) });
+                                        m.Invoke(apiClass, new object[] { listsToBeMapped, w.ID });
                                     }
                                 }
                             }

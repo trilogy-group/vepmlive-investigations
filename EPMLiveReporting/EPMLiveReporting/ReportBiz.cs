@@ -120,6 +120,11 @@ namespace EPMLiveReportsAdmin
             return ListBiz.CreateNewMapping(_siteId, listId, fields, false);
         }
 
+        public ListBiz CreateListBiz(Guid listId, Guid webId, ListItemCollection fields)
+        {
+            return ListBiz.CreateNewMapping(_siteId, listId, webId, fields);
+        }
+
         /// <summary>
         ///     Maps a new list to reporting DB with all columns added.
         /// </summary>

@@ -68,13 +68,13 @@ namespace EPMLiveReportsAdmin
         private void PopulateInstance(DataRow row)
         {
             _listName = row["ListName"].ToString().Replace("'", "");
-                // - CAT.NET false-positive: All single quotes are escaped/removed.
+            // - CAT.NET false-positive: All single quotes are escaped/removed.
             _tableName = row["TableName"].ToString().Replace("'", "");
-                // - CAT.NET false-positive: All single quotes are escaped/removed.
+            // - CAT.NET false-positive: All single quotes are escaped/removed.
             _tableNameSnapshot = row["TableNameSnapshot"].ToString().Replace("'", "");
-                // - CAT.NET false-positive: All single quotes are escaped/removed.
-            _system = (bool) row["System"];
-            _resourceList = (bool) row["ResourceList"];
+            // - CAT.NET false-positive: All single quotes are escaped/removed.
+            _system = (bool)row["System"];
+            _resourceList = (bool)row["ResourceList"];
         }
 
         public void UpdateListMapping(ListItemCollection fields)
@@ -210,6 +210,7 @@ namespace EPMLiveReportsAdmin
         public static ListBiz CreateNewMapping(Guid siteId, Guid listId, ListItemCollection fields, bool isAuto)
         {
             string webIdWithoutHyphen = string.Empty;
+            bool isReportingV2Enabled = false;
             SPList spList = null;
             SPUser user = null;
             using (var site = new SPSite(siteId))
@@ -246,6 +247,14 @@ namespace EPMLiveReportsAdmin
 
                                 if (spList != null)
                                 {
+                                    try
+                                    {
+                                        isReportingV2Enabled = Convert.ToBoolean(EPMLiveCore.CoreFunctions.getConfigSetting(es.OpenWeb(), "reportingV2"));
+                                    }
+                                    catch (Exception)
+                                    {
+                                        isReportingV2Enabled = false;
+                                    }
                                     break;
                                 }
                             }
@@ -321,6 +330,125 @@ namespace EPMLiveReportsAdmin
             // -- END
 
             lb.Create(columns, columnsSnapshot, tableName);
+            lb.RegisterEvent();
+            return lb;
+        }
+
+        public static ListBiz CreateNewMapping(Guid siteId, Guid listId, Guid webId, ListItemCollection fields)
+        {
+            string webIdWithoutHyphen = string.Empty;
+            bool isReportingV2Enabled = false;
+            SPList spList = null;
+            SPUser user = null;
+
+            SPSecurity.RunWithElevatedPrivileges(delegate
+            {
+                using (var es = new SPSite(siteId))
+                {
+                    using (var web = es.OpenWeb(webId))
+                    {
+                        user = web.CurrentUser;
+
+                        if (web.DoesUserHavePermissions(user.LoginName, SPBasePermissions.ViewPages))
+                        {
+                            try
+                            {
+                                webIdWithoutHyphen = web.ID.ToString().Replace("-", "");
+                                spList = web.Lists[listId];
+                            }
+                            catch { }
+                            finally
+                            {
+                                if (web != null)
+                                {
+                                    web.Dispose();
+                                }
+                            }
+
+                            if (spList != null)
+                            {
+                                try
+                                {
+                                    isReportingV2Enabled = Convert.ToBoolean(EPMLiveCore.CoreFunctions.getConfigSetting(es.OpenWeb(), "reportingV2"));
+                                }
+                                catch (Exception)
+                                {
+                                    isReportingV2Enabled = false;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            Collection<string> automatic = AutomaticFields;
+            Collection<string> required = RequiredResourceFields;
+
+            var lb = new ListBiz();
+            lb._siteId = siteId;
+            lb._listId = listId;
+            lb._listName = spList.Title;
+
+            ColumnDefCollection columns = ColumnDef.GetDefaultColumns();
+            ColumnDefCollection columnsSnapshot = ColumnDef.GetDefaultColumnsSnapshot();
+            int matches = 0;
+
+            foreach (SPField field in spList.Fields)
+            {
+                if (!field.Hidden &&
+                    field.Type != SPFieldType.Computed &&
+                    !automatic.Contains(field.InternalName) ||
+                    required.Contains(field.InternalName) ||
+                    field.InternalName == "Title")
+                {
+                    columns.AddColumn(field);
+                    columnsSnapshot.AddColumn(field);
+                    if (RequiredResourceFields.Contains(field.InternalName))
+                    {
+                        matches++;
+                    }
+                }
+            }
+
+            //Adding contenttype field specifically.
+            SPField fldExtId = null;
+            try
+            {
+                fldExtId = spList.Fields.TryGetFieldByStaticName("EXTID");
+            }
+            catch { }
+
+            if (fldExtId != null && !FieldExistsInCollection(fields, "extid"))
+            {
+                var listField = new ListItem();
+                listField.Text = fldExtId.Title;
+                listField.Value = fldExtId.Id.ToString();
+                fields.Add(listField);
+            }
+
+            foreach (ListItem field in fields)
+            {
+                SPField spField = spList.Fields[new Guid(field.Value)];
+                columns.AddColumn(spField);
+                columnsSnapshot.AddColumn(spField);
+                if (RequiredResourceFields.Contains(spField.InternalName))
+                    matches++;
+            }
+            lb._resourceList = (RequiredResourceFields.Count == matches);
+
+            //[Fix for:Issue - Resources list sqltable being rename to LST Resourcis in Report Model. Apparently, resources is a reserved word.] by xjh -- START
+            string tableName;
+            if (!spList.Title.ToLower().EndsWith("resources"))
+            {
+                tableName = Resources.ListPrefix + Utility.GetCleanAlphaNumeric(spList.Title);
+            }
+            else
+            {
+                tableName = Resources.ListPrefix + "Resourcepool";
+            }
+            // -- END
+
+            lb.Create(columns, columnsSnapshot, tableName, webId);
             lb.RegisterEvent();
             return lb;
         }
@@ -470,18 +598,70 @@ namespace EPMLiveReportsAdmin
             {
                 rd.InsertLog(_listId, _listName.Replace("'", ""), string.Format("Error creating column entries"),
                     string.Format("Error creating column entries"), 2);
-                    // - CAT.NET false-positive: All single quotes are escaped/removed.
+                // - CAT.NET false-positive: All single quotes are escaped/removed.
                 success = false;
             }
 
             if (success)
                 rd.InsertLog(_listId, _listName.Replace("'", ""), "Created list mappings.",
                     string.Format("Created list mapping: Columns {0}", columns), 0);
-                    // - CAT.NET false-positive: All single quotes are escaped/removed.
+            // - CAT.NET false-positive: All single quotes are escaped/removed.
             else
                 rd.InsertLog(_listId, _listName.Replace("'", ""), "An error occurred while creating list mapping.",
                     string.Format("Errors occurred while creating list mapping: Columns: {0}", columns), 1);
-                    // - CAT.NET false-positive: All single quotes are escaped/removed.
+            // - CAT.NET false-positive: All single quotes are escaped/removed.
+        }
+
+        private void Create(ColumnDefCollection columns, List<ColumnDef> columnsSnapshot, string tableName, Guid webId)
+        {
+            bool success = true;
+            string error = string.Empty;
+            var rd = new ReportData(true, _siteId, webId);
+
+            string safeTableName = rd.GetSafeTableName(tableName);
+            string tableNameSnapshot = rd.GetSafeTableName(tableName + Resources.SnapshotTableSuffix);
+
+            if (!rd.CreateTable(safeTableName, columns))
+            {
+                rd.InsertLog(_listId, _listName, "Error creating table.",
+                    string.Format("Error creating table {0}", safeTableName), 2);
+                success = false;
+            }
+
+            if (!rd.CreateTable(tableNameSnapshot, columnsSnapshot))
+            {
+                rd.InsertLog(_listId, _listName, "Error creating table.",
+                    string.Format("Error creating table {0}", tableNameSnapshot), 2);
+                success = false;
+            }
+
+            // only insert into RPTList table if table created successfully
+            if ((success || (rd.TableExists(safeTableName) && rd.TableExists(tableNameSnapshot))) &&
+                !rd.InsertList(_listId, safeTableName, tableNameSnapshot, _resourceList))
+            {
+                rd.InsertLog(_listId, _listName, string.Format("Error creating list entry"),
+                    string.Format("Error creating list entry"), 2);
+                success = false;
+            }
+
+            // only insert into RPTColumn table if table created successfully
+            if ((success || (rd.TableExists(safeTableName) && rd.TableExists(tableNameSnapshot))) &&
+                !rd.InsertListColumns(_listId, columns))
+            {
+                rd.InsertLog(_listId, _listName.Replace("'", ""), string.Format("Error creating column entries"),
+                    string.Format("Error creating column entries"), 2);
+                // - CAT.NET false-positive: All single quotes are escaped/removed.
+                success = false;
+            }
+
+            if (success)
+                rd.InsertLog(_listId, _listName.Replace("'", ""), "Created list mappings.",
+                    string.Format("Created list mapping: Columns {0}", columns), 0);
+            // - CAT.NET false-positive: All single quotes are escaped/removed.
+            else
+                rd.InsertLog(_listId, _listName.Replace("'", ""), "An error occurred while creating list mapping.",
+                    string.Format("Errors occurred while creating list mapping: Columns: {0}", columns), 1);
+            // - CAT.NET false-positive: All single quotes are escaped/removed.
         }
 
         private void Update(ColumnDefCollection columns)
@@ -497,7 +677,7 @@ namespace EPMLiveReportsAdmin
             {
                 rd.InsertLog(_listId, _listName.Replace("'", ""), "An error occurred while adding columns.",
                     string.Format("Error adding columns to table {0}", _tableName), 2);
-                    // - CAT.NET false-positive: All single quotes are escaped/removed.
+                // - CAT.NET false-positive: All single quotes are escaped/removed.
                 success = false;
             }
 
@@ -505,7 +685,7 @@ namespace EPMLiveReportsAdmin
             {
                 rd.InsertLog(_listId, _listName.Replace("'", ""), "An error occurred while adding columns to table.",
                     string.Format("Error adding columns to table {0}", _tableNameSnapshot), 2);
-                    // - CAT.NET false-positive: All single quotes are escaped/removed.
+                // - CAT.NET false-positive: All single quotes are escaped/removed.
                 success = false;
             }
 
@@ -513,7 +693,7 @@ namespace EPMLiveReportsAdmin
             {
                 rd.InsertLog(_listId, _listName.Replace("'", ""), "An error occurred while deleting columns.",
                     string.Format("Error deleting columns from table {0}", _tableName), 2);
-                    // - CAT.NET false-positive: All single quotes are escaped/removed.
+                // - CAT.NET false-positive: All single quotes are escaped/removed.
                 success = false;
             }
 
@@ -521,7 +701,7 @@ namespace EPMLiveReportsAdmin
             {
                 rd.InsertLog(_listId, _listName.Replace("'", ""), "An error occurred while deleting columns.",
                     string.Format("Error deleting columns from table {0}", _tableNameSnapshot), 2);
-                    // - CAT.NET false-positive: All single quotes are escaped/removed.
+                // - CAT.NET false-positive: All single quotes are escaped/removed.
                 success = false;
             }
 
@@ -529,14 +709,14 @@ namespace EPMLiveReportsAdmin
             {
                 rd.InsertLog(_listId, _listName.Replace("'", ""), "Error creating column entries",
                     string.Format("Error creating column entries"), 2);
-                    // - CAT.NET false-positive: All single quotes are escaped/removed.
+                // - CAT.NET false-positive: All single quotes are escaped/removed.
                 success = false;
             }
             if (!rd.DeleteListColumns(_listId, oldColumns))
             {
                 rd.InsertLog(_listId, _listName.Replace("'", ""), "Error deleting column entries.",
                     string.Format("Error deleting column entries"), 2);
-                    // - CAT.NET false-positive: All single quotes are escaped/removed.
+                // - CAT.NET false-positive: All single quotes are escaped/removed.
                 success = false;
             }
 
@@ -544,13 +724,13 @@ namespace EPMLiveReportsAdmin
             {
                 rd.InsertLog(_listId, _listName.Replace("'", ""), string.Format("Error updating list entry"),
                     string.Format("Error updating list entry"), 2);
-                    // - CAT.NET false-positive: All single quotes are escaped/removed.
+                // - CAT.NET false-positive: All single quotes are escaped/removed.
                 success = false;
             }
             if (success)
                 rd.InsertLog(_listId, _listName.Replace("'", ""), "Updated list mapping.",
                     string.Format("Updated list mapping: Added {0}, Deleted {1}", newColumns, oldColumns), 0);
-                    // - CAT.NET false-positive: All single quotes are escaped/removed.
+            // - CAT.NET false-positive: All single quotes are escaped/removed.
             else
                 rd.InsertLog(_listId, _listName.Replace("'", ""), "Errors occurred while updating list mapping.",
                     string.Format("Errors occurred while updating list mapping: Adding {0}, Deleting {1}", newColumns,
@@ -633,11 +813,11 @@ namespace EPMLiveReportsAdmin
             bool success = rd.SnapshotLists(_listName.Replace("'", ""));
             if (success)
                 rd.InsertLog(_listId, _listName.Replace("'", ""), "Snapshot completed.", "Manual snapshot completed", 0);
-                    // - CAT.NET false-positive: All single quotes are escaped/removed.
+            // - CAT.NET false-positive: All single quotes are escaped/removed.
             else
                 rd.InsertLog(_listId, _listName.Replace("'", ""), "Error taking snapshot.",
                     "Error taking manual snapshot", 2);
-                    // - CAT.NET false-positive: All single quotes are escaped/removed.
+            // - CAT.NET false-positive: All single quotes are escaped/removed.
             return success;
         }
 
@@ -764,7 +944,7 @@ namespace EPMLiveReportsAdmin
                                             spWeb.ServerRelativeUrl + " - Event registration issue.",
                                             "Warning: " + _listName.Replace("'", "") + " list not present. On site:" +
                                             spWeb.ServerRelativeUrl, 0, 1);
-                                            // - CAT.NET false-positive: All single quotes are escaped/removed.
+                                        // - CAT.NET false-positive: All single quotes are escaped/removed.
                                     }
                                     spWeb.AllowUnsafeUpdates = false;
                                 }
@@ -779,12 +959,12 @@ namespace EPMLiveReportsAdmin
                 var rd = new ReportData(_siteId);
                 if (spList != null)
                     rd.InsertLog(spList.ID, spList.Title.Replace("'", ""), "Created Mapping", "Created Mapping", 0);
-                        // - CAT.NET false-positive: All single quotes are escaped/removed.
+                // - CAT.NET false-positive: All single quotes are escaped/removed.
                 else
                     rd.InsertLog(Guid.Empty, "Unknown", "An error occurred while registering event.",
                         string.Format("Can't register event on site {0} - Exception: {1}", _siteId,
                             ex.Message.Replace("'", "")), 2);
-                        // - CAT.NET false-positive: All single quotes are escaped/removed.
+                // - CAT.NET false-positive: All single quotes are escaped/removed.
             }
         }
 
@@ -796,10 +976,10 @@ namespace EPMLiveReportsAdmin
             try
             {
                 evts = (from e in list.EventReceivers.OfType<SPEventReceiverDefinition>()
-                    where e.Assembly.Equals(assemblyName, StringComparison.CurrentCultureIgnoreCase) &&
-                          e.Class.Equals(className, StringComparison.CurrentCultureIgnoreCase) &&
-                          types.Contains(e.Type)
-                    select e).ToList<SPEventReceiverDefinition>();
+                        where e.Assembly.Equals(assemblyName, StringComparison.CurrentCultureIgnoreCase) &&
+                              e.Class.Equals(className, StringComparison.CurrentCultureIgnoreCase) &&
+                              types.Contains(e.Type)
+                        select e).ToList<SPEventReceiverDefinition>();
             }
             catch { }
 
@@ -858,7 +1038,7 @@ namespace EPMLiveReportsAdmin
                                             _listName.Replace("'", "") +
                                             ": Unable to delete event handlers. List not present.",
                                             spWeb.ServerRelativeUrl, 1);
-                                            // - CAT.NET false-positive: All single quotes are escaped/removed.
+                                        // - CAT.NET false-positive: All single quotes are escaped/removed.
                                     }
                                     spWeb.AllowUnsafeUpdates = false;
                                 }
