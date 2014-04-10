@@ -223,12 +223,12 @@
   color: #777777;
 }
 #epm-social-stream li.epm-se-disabled div.epm-se-overlay {
-  background-color: #555555;
-  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=15)";
-  filter: alpha(opacity=15);
-  -moz-opacity: 0.15;
-  -khtml-opacity: 0.15;
-  opacity: 0.15;
+  background-color: #ffffff;
+  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=50)";
+  filter: alpha(opacity=50);
+  -moz-opacity: 0.50;
+  -khtml-opacity: 0.50;
+  opacity: 0.50;
   border-radius: 3px;
   margin-left: -10px;
 }
