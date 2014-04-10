@@ -1,22 +1,12 @@
 CREATE PROCEDURE spUpdateStatusFields
 
-@listname varchar(255),
+@listtable varchar(255),
 @yellow int = 0,
 @red int = 30
 
 AS
 BEGIN
 
-declare @listtable as varchar(260)
-
-if @listname = 'Resources'
-begin
-      set @listtable = 'LstResourcepool'
-end
-else
-begin
-      set @listtable = 'LST' + @listname
-end
 
 declare @cols as bit
 set @cols = 1
