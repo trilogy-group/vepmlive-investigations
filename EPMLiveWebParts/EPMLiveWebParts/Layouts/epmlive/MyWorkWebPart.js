@@ -58,6 +58,7 @@ function MyWorkOnReady (grid, start) {
             var url = (document.location.href + '').toLowerCase().replace('%20', '').replace(' ', '');
             if (url.indexOf('mywork.aspx') !== -1) {
                 window.EPM.UI.Loader.current().stopLoading('WebPart' + window.myWorkWebPartQualifier);
+                $('#s4-ribbonrow').height(35);
             }
         } else {
             if (window.myWorkLoader) {
@@ -3012,6 +3013,7 @@ var MyWorkGrid = {
                             if (!MyWorkGrid.loaderStopped) {
                                 $(document.getElementById("s4-ribbonrow")).height(126);
                                 window.EPM.UI.Loader.current().stopLoading('WebPart' + window.myWorkWebPartQualifier);
+                                $('#s4-ribbonrow').height(35);
                                 MyWorkGrid.loaderStopped = true;
                             }
                         }
