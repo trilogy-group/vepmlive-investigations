@@ -326,7 +326,6 @@ namespace EPMLiveCore.Services
             var activityRows = new List<DataRow>();
             var commentRows = new List<DataRow>();
 
-            var totalActivities = (int) tr["TotalActivities"];
             var totalComments = (int) tr["TotalComments"];
 
             var threadKind = (ObjectKind) tr["ThreadKind"];
@@ -353,13 +352,10 @@ namespace EPMLiveCore.Services
             }
             else
             {
-                if (totalActivities > 0)
-                {
-                    activityRows =
-                        GetThreadActivities(manager, userId, 0, 3, activityLimit, tr, null, ignoreAccess)
-                            .AsEnumerable()
-                            .ToList();
-                }
+                activityRows =
+                    GetThreadActivities(manager, userId, 0, 3, activityLimit, tr, null, ignoreAccess)
+                        .AsEnumerable()
+                        .ToList();
 
                 if (totalComments > 0)
                 {
@@ -369,6 +365,8 @@ namespace EPMLiveCore.Services
                             .ToList();
                 }
             }
+
+            var totalActivities = activityRows.Count;
 
             var webId = (Guid) tr["WebId"];
             var listId = tr["ListId"] as Guid?;
