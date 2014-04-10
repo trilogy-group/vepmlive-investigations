@@ -410,9 +410,9 @@
                         $('#mainContainer .slimScrollDiv').css({ "overflow": "visible" });
                         resizeKanbanBoard();
 
-                        $('#mainContainer .stageContainer .sortable-list').on('scroll', function () {
-                            $('#mainContainer .stageContainer .sortable-item').find('.associateditemscontextmenu').hide();
-                            $('#mainContainer .stageContainer .sortable-item').find('.epm-nav-contextual-menu').hide();
+                        $('#mainContainer .sortable-list').on('scroll', function () {
+                            $('.associateditemscontextmenu').hide();
+                            $('.epm-nav-contextual-menu').hide();
                         });
 
                         ExecuteOrDelayUntilScriptLoaded(addContextualMenu, 'EPMLive.Navigation.js');
@@ -463,9 +463,9 @@
                 $('#mainContainer .slimScrollDiv').css({ "overflow": "visible" });
                 resizeKanbanBoard();
 
-                $('#mainContainer .stageContainer .sortable-list').on('scroll', function () {
-                    $('#mainContainer .stageContainer .sortable-item').find('.associateditemscontextmenu').hide();
-                    $('#mainContainer .stageContainer .sortable-item').find('.epm-nav-contextual-menu').hide();
+                $('#mainContainer .sortable-list').on('scroll', function () {
+                    $('.associateditemscontextmenu').hide();
+                    $('.epm-nav-contextual-menu').hide();
                 });
 
                 ExecuteOrDelayUntilScriptLoaded(addContextualMenu, 'EPMLive.Navigation.js');
