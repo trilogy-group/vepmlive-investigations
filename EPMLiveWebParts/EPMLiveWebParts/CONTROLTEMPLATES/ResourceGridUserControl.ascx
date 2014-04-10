@@ -11,6 +11,7 @@
 <%@ Control Language="C#" AutoEventWireup="true" CodeBehind="ResourceGridUserControl.ascx.cs" Inherits="EPMLiveWebParts.ResourceGridUserControl" %>
 
 <asp:Panel ID="pnlGrid" runat="server">
+
     <SharePoint:StyleBlock runat="server">
         input[type=text]::-ms-clear {
             display: none !important;
@@ -191,9 +192,6 @@
         }
 
     </SharePoint:StyleBlock>
-    <link rel="stylesheet" href="<%=WebUrl%>/_layouts/15/epmlive/Stylesheets/epmliveToolBar.css" type="text/css" />
-    <script src="<%=WebUrl%>/_layouts/15/epmlive/javascripts/EPMLiveGenericToolBar.js"></script>
-
     <div id="test"></div>
     <div id="ResourceGridLoader" class="ms-dlgContent" tabindex="-1" style="z-index: 1505; display: none; width: 367px; height: 146px; left: 775.5px; top: 269px;">
         <div class="ms-dlgBorder" style="width: 365px; height: 144px;">
@@ -232,10 +230,9 @@
         <b class="border-notch notch"></b>
         <b class="notch"></b>
     </div>
-
-    <div id="EPMResourceGrid" class="rg-clear-fix" style="width: 100%; height: 800px;">
-        <SharePoint:ScriptBlock runat="server">
-            function initializeResourceGridWP() {
+        <div id="EPMResourceGrid" class="rg-clear-fix" style="width: 100%; height: 500px;">
+            <SharePoint:ScriptBlock runat="server">
+                function initializeResourceGridWP() {
             if (window.epmLiveMasterPageVersion >= 5.5) {
                     function showLoadingV2() {
                         var url = document.location.href.toLowerCase();
@@ -288,9 +285,8 @@
             }
 
             SP.SOD.executeOrDelayUntilScriptLoaded(initializeResourceGridWP, "EPMLive.ResourceGrid.js");
-        </SharePoint:ScriptBlock>
-    </div>
-
+            </SharePoint:ScriptBlock>
+        </div>
     <script id="RWPSaveView-<%= WebPartId %>" type="text/html">
         <div style="padding: 10px;">
             Name:

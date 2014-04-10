@@ -387,7 +387,7 @@ function registerEpmLiveResourceGridScript() {
                 } catch (e) {
                 }
             },
-             
+
             teamUpdated: function (result, target, params) {
                 if ($$.IsRootWeb && $$.ListId == "" && $$.ItemId == "") {
                     $$.grid.resourceUpdated(result, target, params)
@@ -1155,6 +1155,7 @@ function registerEpmLiveResourceGridScript() {
                             if (!document.getElementById('Ribbon.ResourceGridTab')) {
                                 if ($$.ribbonBehavior == 0) {
                                     window.SelectRibbonTab(tabId, true);
+                                    SetGridSize();
                                 }
                             }
                         }, 1);
@@ -1200,7 +1201,7 @@ function registerEpmLiveResourceGridScript() {
                                         epmLiveResourceGrid.loaderStopped = true;
                                     }
                                 }
-
+                                SetGridSize();
                                 $$.grid.fixIE();
 
                             } catch (ex) {
@@ -1545,6 +1546,7 @@ function registerEpmLiveResourceGridScript() {
                             if (parent) {
                                 if ($(parent)[0].id.indexOf('Ribbon.ResourceGrid.Actions.Find') !== -1) {
                                     hide = false;
+                                    SetGridSize();
                                     break;
                                 }
                             }
@@ -1553,6 +1555,7 @@ function registerEpmLiveResourceGridScript() {
 
                     if (hide) {
                         $$.actions.hideEasyScroll(true);
+                        SetGridSize();
                     }
                 });
             },
@@ -2511,44 +2514,90 @@ function registerEpmLiveResourceGridScript() {
                 }
             }
 
-            grid.MaxVScroll = maxHeight;
-
+            //grid.MaxVScroll = maxHeight;
             if (!webPartHeight) {
                 $('#MSOZoneCell_WebPart' + $$.webpartQualifier).height(maxHeight);
                 $('#WebPart' + $$.webpartQualifier).height(maxHeight);
             }
 
+
             var win = $(window);
 
             $$.winHeight = win.height();
 
-            win.resize(function () {
-                var height = $(this).height();
-                var winHeight = $$.winHeight;
+            // win.resize(function () {
+            //var height = $(this).height();
+            //var winHeight = $$.winHeight;
 
-                var newHeight;
+            //var newHeight;
 
-                if (height < winHeight) {
-                    newHeight = -(winHeight - height);
-                } else {
-                    newHeight = height - winHeight;
-                }
+            //if (height < winHeight) {
+            //    newHeight = -(winHeight - height);
+            //} else {
+            //    newHeight = height - winHeight;
+            //}
 
-                newHeight += 100;
-
-                if (newHeight !== 0) {
-                    grid.MaxVScroll += newHeight;
-                    $$.winHeight = height;
-                }
-            });
+            //newHeight += 100;
+            //alert(newHeight);
+            //if (newHeight !== 0) {
+            //    grid.MaxVScroll += newHeight;
+            //    $$.winHeight = height;
+            //}
+            // $('#EPMResourceGrid').height($('#s4-workspace').height() - 130);
+            // });
 
             window.setTimeout(function () { $$.actions.loadRibbon(); }, 1500);
 
             $('#s4-workspace').click(function () {
                 if ($$.ribbonBehavior == 0)
                     window.SelectRibbonTab('Ribbon.ResourceGridTab', true);
+                SetGridSize();
             });
+            
         };
+        //resize added
+
+        $(window).resize(function () {
+            SetGridSize();
+        });
+
+        function SetGridSize() {
+            var outer = document.getElementById("EPMResourceGrid");
+            var height = GetPageHeight();
+            var top = GetItemTop(outer);
+            outer.style.height = (height - top - 35) + "px";
+        }
+
+        function GetPageHeight() {
+            var scnHei;
+            if (self.innerHeight) // all except Explorer
+            {
+                scnHei = self.innerHeight;
+            }
+            else if (document.documentElement && document.documentElement.clientHeight) {
+                scnHei = document.documentElement.clientHeight;
+            }
+            else if (document.body) // other Explorers
+            {
+                scnHei = document.body.clientHeight;
+            }
+            return scnHei;
+        }
+
+        function GetItemTop(obj) {
+            var posY = obj.offsetTop;
+
+            while (obj.offsetParent) {
+                posY = posY + obj.offsetParent.offsetTop;
+                if (obj == document.getElementsByTagName('body')[0]) { break }
+                else { obj = obj.offsetParent; }
+            }
+
+            return posY;
+        }
+
+        //resize completed
+
 
         window.Grids.OnGetHtmlValue = function (grid, row, col, val) {
             if (row.Def.Name === 'Group') {
@@ -2595,3 +2644,4 @@ console.error = console.error || function () {
 
 console.log = console.log || function () {
 };
+
