@@ -78,13 +78,10 @@ namespace EPMLiveWebParts
                 else
                 {
                     SPWeb web = _currentWeb;
-                    bool inheritedWeb = web.Permissions.Inherited;
-                    while (inheritedWeb)
+                    while (web.Features[WEFeatures.BuildTeam.Id] == null) //Inherit | Open
                     {
-                        _currentWeb = web.ParentWeb;
-                        inheritedWeb = web.Permissions.Inherited;
+                        web = web.ParentWeb;
                     }
-
                     XmlDocument doc = new XmlDocument();
                     doc.LoadXml(Resources.ResourceGrid_DataXml);
 
@@ -99,7 +96,6 @@ namespace EPMLiveWebParts
                     attr = doc.CreateAttribute("ItemId");
                     attr.Value = Request["id"];
                     doc.FirstChild.Attributes.Append(attr);
-
                     return GetGridParam(XDocument.Parse(doc.OuterXml)).Replace(Environment.NewLine, string.Empty).Replace(@"\t", string.Empty);
                 }
             }

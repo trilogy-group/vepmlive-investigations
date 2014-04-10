@@ -429,11 +429,9 @@ namespace EPMLiveCore.API
             {
                 SPList resourcesList = resourceManager.ParentList;
 
-                bool inheritedWeb = web.Permissions.Inherited;
-                while (inheritedWeb)
+                while (web.Features[WEFeatures.BuildTeam.Id] == null) //Inherit | Open
                 {
                     web = web.ParentWeb;
-                    inheritedWeb = web.Permissions.Inherited;
                 }
 
                 Guid webId = Guid.Empty;
@@ -479,7 +477,6 @@ namespace EPMLiveCore.API
                             res.Add(element);
                         }
                     }
-
                     resourceTeam.Add(res);
                 }
 

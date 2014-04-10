@@ -1913,7 +1913,7 @@ function registerEpmLiveResourceGridScript() {
                                     'events': [
                                         {
                                             'eventName': 'click',
-                                            'function': function () { $$.actions.displayPopUp($$.actions.getNewFormUrl, 'Add User', false, true, $$.grid.teamUpdated, { row: null, changeType: 'Added' }); }
+                                            'function': function () { $$.actions.displayPopUp($$.actions.getNewFormUrl, 'Add User', false, true, $$.grid.teamUpdated, { row: null, changeType: 'Added' },700,700); }
                                         }
                                     ]
                                 },
