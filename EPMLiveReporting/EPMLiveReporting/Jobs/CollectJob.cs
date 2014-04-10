@@ -155,15 +155,15 @@ namespace EPMLiveReportsAdmin.Jobs
 
             if (string.IsNullOrEmpty(data))
             {
-                try
-                {
-                    data = epmdata.GetListNames();
-                }
-                catch (Exception exData)
-                {
-                    bErrors = true;
-                    sErrors += "<font color=\"red\">Error while retrieving list names: " + exData.Message + "</font><br>";
-                }
+                //try
+                //{
+                //    data = epmdata.GetListNames();
+                //}
+                //catch (Exception exData)
+                //{
+                //    bErrors = true;
+                //    sErrors += "<font color=\"red\">Error while retrieving list names: " + exData.Message + "</font><br>";
+                //}
 
                 try
                 {
@@ -333,6 +333,69 @@ namespace EPMLiveReportsAdmin.Jobs
             {
                 CheckSP(epmdata.GetClientReportingConnection);
 
+                if (string.IsNullOrEmpty(data))
+                {
+                    try
+                    {
+                        DataSet ds = new DataSet();
+                        var cmd2 = new SqlCommand("SELECT TABLENAME FROM RPTList", epmdata.GetClientReportingConnection);
+                        SqlDataAdapter da = new SqlDataAdapter(cmd2);
+                        da.Fill(ds);
+
+                        foreach (DataRow dr in ds.Tables[0].Rows)
+                        {
+                            cmd2 = new SqlCommand("spUpdateStatusFields", epmdata.GetClientReportingConnection);
+                            cmd2.CommandType = CommandType.StoredProcedure;
+                            cmd2.Parameters.AddWithValue("@listtable", dr[0].ToString());
+
+                            cmd2.ExecuteNonQuery();
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        bErrors = true;
+                        sErrors += "<font color=\"red\">Error updating status fields: " + ex.Message + "</font><br>";
+                    }
+                }
+                else
+                {
+                    try
+                    {
+                        foreach(string sList in data.Split(','))
+                        {
+                            if (sList != "")
+                            {
+                                try
+                                {
+                                    SPList list = web.Lists[sList];
+
+                                    DataSet ds = new DataSet();
+                                    var cmd2 = new SqlCommand("SELECT TABLENAME FROM RPTList where listid=@listid", epmdata.GetClientReportingConnection);
+                                    cmd2.Parameters.AddWithValue("@listid", list.ID);
+                                    SqlDataAdapter da = new SqlDataAdapter(cmd2);
+                                    da.Fill(ds);
+
+                                    cmd2 = new SqlCommand("spUpdateStatusFields", epmdata.GetClientReportingConnection);
+                                    cmd2.CommandType = CommandType.StoredProcedure;
+                                    cmd2.Parameters.AddWithValue("@listtable", ds.Tables[0].Rows[0][0].ToString());
+
+                                    cmd2.ExecuteNonQuery();
+                                }
+                                catch (Exception ex)
+                                {
+                                    bErrors = true;
+                                    sErrors += "<font color=\"red\">Error updating status fields (" + sList + "): " + ex.Message + "</font><br>";
+                                }
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        bErrors = true;
+                        sErrors += "<font color=\"red\">Error updating status fields: " + ex.Message + "</font><br>";
+                    }
+                    
+                }
                 foreach (string list in data.Split(','))
                 {
                     if (list != "")
@@ -341,7 +404,7 @@ namespace EPMLiveReportsAdmin.Jobs
                         {
                             var cmd2 = new SqlCommand("spUpdateStatusFields", epmdata.GetClientReportingConnection);
                             cmd2.CommandType = CommandType.StoredProcedure;
-                            cmd2.Parameters.AddWithValue("@listname", list);
+                            cmd2.Parameters.AddWithValue("@listtable", list);
 
                             cmd2.ExecuteNonQuery();
                         }
