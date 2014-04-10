@@ -760,7 +760,9 @@
                     });
 
                     $('#epm-nav-top li').click(function () {
-                        addTooltip();
+                        window.setTimeout(function() {
+                            addTooltip();
+                        }, 200);
                     });
 
                     addTooltip();
