@@ -375,7 +375,7 @@ BEGIN
                      dbo.LSTUserInformationList.Name AS UserName, dbo.LSTUserInformationList.Picture AS UserPicture, 
                      dbo.fnCheckUserAccess(@UserId, @WebId, @ListId, @ItemId) AS HasAccess
             FROM	 dbo.SS_Activities INNER JOIN dbo.LSTUserInformationList ON dbo.SS_Activities.UserId = dbo.LSTUserInformationList.ID
-            WHERE	 dbo.SS_Activities.ThreadId = @ThreadId AND dbo.SS_Activities.Date < @Offset AND MassOperation = 0 AND
+            WHERE	 dbo.SS_Activities.ThreadId = @ThreadId AND dbo.SS_Activities.Date < @Offset AND
 					 dbo.SS_Activities.Kind >= @KindMin AND dbo.SS_Activities.Kind <= @KindMax AND dbo.SS_Activities.Kind <> 3) 
 					 AS DT1
 			WHERE   (HasAccess = 1) OR (@IgnoreAccess = 1 AND HasAccess = 0)
