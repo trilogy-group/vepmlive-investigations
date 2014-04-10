@@ -31,8 +31,7 @@
             //Grids.OnGroup = GridsOnGroupDelegate;
             //Grids.OnGroupFinish = GridsOnGroupFinishDelegate;
 
-            if ((this.params.TicketVal == "" && this.params.WEPID == ""))
-            {
+            if ((this.params.TicketVal == "" && this.params.WEPID == "")) {
                 var sbDataxml = new StringBuilder();
                 sbDataxml.append('<Execute Function="GetPIList">');
                 sbDataxml.append('</Execute>');
@@ -1002,7 +1001,7 @@
                                 ]
                             }
                         ]
-	                },
+                    },
                     {
                         name: "Share",
                         tooltip: "Share",
@@ -1010,12 +1009,12 @@
                            {
                                items: [
                                     { type: "bigbutton", id: "idExportExcelTop", name: "Export to<br/> Excel", img: "formatmap32x32.png", style: "top: -352px; left: 0px;position:relative;", tooltip: "Export Details to Excel", onclick: "dialogEvent('EditorTab_Export');" }
-                                ]
+                               ]
                            },
                            {
                                items: [
                                     { type: "bigbutton", id: "idPrintTop", name: "Print", img: "ps32x32.png", style: "top: -287px; left: -128px;position:relative;", tooltip: "Print", onclick: "dialogEvent('PrintTopBtn');" }
-                                ]
+                               ]
                            }
                         ]
                     }
@@ -1086,13 +1085,13 @@
                                 {
                                     items: [
                                     { type: "text", name: " ", width: "10px" }
-                                ]
+                                    ]
                                 },
                                 {
                                     items: [
                                     { type: "text", name: "To Period:" },
                                     { type: "select", id: "idViewTab_ToPeriod", onchange: "dialogEvent('ViewTab_ToPeriod_Changed');", width: "100px" }
-                                ]
+                                    ]
                                 }
                         ]
                     }
@@ -1416,7 +1415,7 @@
             if (grid.id == "g_RPE") {
                 this.InitialisePlanGrid();
                 var selectedView = this.GetSelectedView();
-                if (selectedView != null) 
+                if (selectedView != null)
                     this.ApplyGridView(grid.id, selectedView, false);
                 this.ShowHidePeriods(grid);
                 this.RefreshPlanPeriods(false);
@@ -1459,7 +1458,7 @@
                 //grid.ActionSortOff();
                 this.InitialiseResourceGrid();
                 var selectedView = this.GetSelectedView();
-                if (selectedView != null) 
+                if (selectedView != null)
                     this.ApplyGridView(grid.id, selectedView, false);
                 this.ShowHidePeriods(grid);
                 this.ShowSelectedResourceGroup();
@@ -2708,9 +2707,9 @@
         }
     };
     RPEditor.prototype.dialogCallback = function (dialogResult, returnValue) {
-//        if (dialogResult) {
-//            window.location.href = window.location.href;
-//        }
+        //        if (dialogResult) {
+        //            window.location.href = window.location.href;
+        //        }
     };
     RPEditor.prototype.externalEvent = function (event) {
         try {
@@ -2962,6 +2961,10 @@
                     var selectView = document.getElementById("idViewTab_SelView");
                     if (selectView != null && selectView.selectedIndex >= 0) {
                         var selectedItem = selectView.options[selectView.selectedIndex];
+                        if (selectedItem.value == '-1') {
+                            alert('There is no view to delete');
+                            break;
+                        }
                         document.getElementById("id_DeleteView_Name").value = selectedItem.text;
                     }
                     this.DisplayDialog(20, 30, 280, 150, "Delete View", "winDeleteViewDlg", "idDeleteViewDlg", true, false);
@@ -3277,7 +3280,7 @@
         row = resgrid.GetFirst(null, 0);
         if (this.initialized == true) {
             //resgrid.DoFilter();
-            if (resgrid.Group!= "")
+            if (resgrid.Group != "")
                 resgrid.DoGrouping(resgrid.Group);
             else
                 resgrid.RenderBody();
@@ -3290,12 +3293,12 @@
             var plangrid = grid;
             var planrow = row;
             var status = plangrid.GetAttribute(planrow, null, "Status");
-//            switch (status) {
-//                case const_Project:
-//                    return true;
-//                case const_Requirement:
-//                    return true;
-//            }
+            //            switch (status) {
+            //                case const_Project:
+            //                    return true;
+            //                case const_Requirement:
+            //                    return true;
+            //            }
             return show;
         }
         if (grid.id != "g_Res")
@@ -3343,10 +3346,10 @@
     //        if (grid.id != "g_Res")
     //            return;
     //    };
-//    RPEditor.prototype.GridsOnGroupFinish = function (grid) {
-//        if (grid.id != "g_Res")
-//            return;
-//    };
+    //    RPEditor.prototype.GridsOnGroupFinish = function (grid) {
+    //        if (grid.id != "g_Res")
+    //            return;
+    //    };
     RPEditor.prototype.GridsOnFilter = function (grid, type) {
         if (grid.id != "g_Res")
             return false;
@@ -4882,7 +4885,7 @@
                 committed += deltaHours;
 
             var deltaC = grid.GetAttribute(resrow, null, "D" + periodid);
-            if (deltaC == null) 
+            if (deltaC == null)
                 deltaC = -deltaHours;
             else
                 deltaC -= deltaHours;
@@ -5571,7 +5574,7 @@
             var dlg = wins.createWindow(idWindow, left, top, width, height);
             if (dlg != null) {
                 dlg.clearIcon();
-                    dlg.button("minmax1").hide();
+                dlg.button("minmax1").hide();
                 if (bResize == false) {
                     dlg.denyResize();
                 } else {
@@ -5792,25 +5795,25 @@ function HideUnusedGroupRows(grid, row, level) {
     var childrenvisible = false;
     while (row != null) {
         //if (row.Visible == 1) {
-            var stype = row.id.toString();
-            if (stype.substr(0, 2) === "GR") {
-                var childrow = row.firstChild;
-                if (HideUnusedGroupRows(grid, childrow, level + 1) == false) {
-                    grid.HideRow(row);
-                    row.Visible = 0;
-                    //var itemName = grid.GetAttribute(row, null, "ItemName");
-                    //alert("hiding '" + itemName + "'");
-                }
-                else {
-                    childrenvisible = true;
-                    if (row.Visible == 0) {
-                        grid.ShowRow(row);
-                        row.Visible = 1;
-                    }
+        var stype = row.id.toString();
+        if (stype.substr(0, 2) === "GR") {
+            var childrow = row.firstChild;
+            if (HideUnusedGroupRows(grid, childrow, level + 1) == false) {
+                grid.HideRow(row);
+                row.Visible = 0;
+                //var itemName = grid.GetAttribute(row, null, "ItemName");
+                //alert("hiding '" + itemName + "'");
+            }
+            else {
+                childrenvisible = true;
+                if (row.Visible == 0) {
+                    grid.ShowRow(row);
+                    row.Visible = 1;
                 }
             }
-            else if (row.Visible == 1)
-                childrenvisible = true;
+        }
+        else if (row.Visible == 1)
+            childrenvisible = true;
         //}
         row = row.nextSibling;
     }
