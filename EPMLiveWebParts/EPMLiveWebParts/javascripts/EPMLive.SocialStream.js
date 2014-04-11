@@ -291,7 +291,7 @@
                     else thread.hasMoreActivities = thread.totalActivities > se.pagination.activityLimit;
 
                     thread.hasMoreComments = thread.totalComments > se.pagination.commentLimit;
-                    thread.commentsHidden = thread.totalComments > 0 ? '' : 'epm-se-hidden';
+                    thread.commentsHidden = thread.comments.length > 0 ? '' : 'epm-se-hidden';
 
                     if (thread.activities.length) thread.earliestActivityTime = thread.activities[thread.activities.length - 1].time;
                     if (thread.comments.length) thread.earliestCommentTime = thread.comments[0].time;
