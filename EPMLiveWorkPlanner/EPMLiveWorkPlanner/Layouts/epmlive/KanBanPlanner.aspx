@@ -526,14 +526,10 @@
                                 $("#" + childId + " > div[id^='key']").html(datadraggedstatus);
                                 $("#" + childId + " > div[id^='key']").attr("title", datadraggedstatus);
                             }
-                            $('.associateditemscontextmenu').hide();
-                            $('.epm-nav-contextual-menu').hide();
                         },
                         error: function (response) {
                             alert("Problem in saving item.");
                             loadKanBanBoard(selectedKanbanFilter1);
-                            $('.associateditemscontextmenu').hide();
-                            $('.epm-nav-contextual-menu').hide();
                         }
                     });
                 }
