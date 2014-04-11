@@ -324,6 +324,8 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
                     return false;
             case "GoToWorkspace":
                 var rowId = this.$Grid.getSelectedRowId();
+                if(!rowId)
+                    return false;
             	var wsurl = this.$Grid.getUserData(rowId,"wsurl");
                 if(wsurl && wsurl.trim() != "")
                 {
@@ -1512,12 +1514,14 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
     	if(this.$Grid == null)
     		return false;
 
+
+
         if(this.$Grid.getUserData(this.$Grid.getSelectedRowId(),"itemid") == "")
             return false;
 
         var ids = this.$Grid.getCheckedIds().split(',');
 
-        if(ids.length > 1)
+        if(ids.length > 1 || (ids.length > 0 && ids[0] == ""))
             return false;
 
 
