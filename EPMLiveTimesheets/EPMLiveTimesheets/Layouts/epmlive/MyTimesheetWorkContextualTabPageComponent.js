@@ -216,7 +216,7 @@ MyTimesheetWorkPageComponent.PageComponent.prototype = {
             var newobj = eval("parent.TSObject" + newgridid);
 
             parent.ChangeView(pGrid, newobj.CurrentViewId);
-            
+            parent.TimesheetHoursEdited = true;
             window.frameElement.commitPopup();
 
 //            if(items != "")

@@ -236,6 +236,7 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
                 if (confirm("Are you sure you want to remove that item from your timesheet?")) {
 
                     grid.DeleteRow(grid.FRow, 2);
+                    TimesheetHoursEdited = true;
                     //grid.HideRow(grid.FRow);
                 }
             }

@@ -300,7 +300,7 @@ function EditGridRow(grid, row, col) {
                 if (oResp.Result.Status == "0") {
                     grid.EditRow = row.id;
                     grid.AddDataFromServer(oResp.Result.InnerText);
-                    grid.SetAttribute(row, "Title", "HtmlPrefix", "", 1);
+                    grid.SetAttribute(row, "Title", "HtmlPrefix", "<span class=\"icon-pencil\" style=\"color: #CCC;padding-right:5px\"></span>", 1);
                     grid.StartEdit();
                 }
                 else
@@ -708,6 +708,7 @@ function CheckSaveStatus(gridid) {
                     var newobj = eval("TSObject" + newgridid);
 
                     newobj.Status = "Submitted";
+                    document.getElementById("mytimesheetstatus").innerHTML = "Submitted";
                     RefreshCommandUI();
                 }
 
@@ -1153,9 +1154,11 @@ function CheckApproveStatus(gridid) {
 
                 if (oResponse.ApproveStatus.ApprovalStatus == "1") {
                     newobj.Status = 'Approved';
+                    document.getElementById("mytimesheetstatus").innerHTML = "Approved";
                 }
                 else if (oResponse.ApproveStatus.ApprovalStatus == "2") {
                     newobj.Status = 'Rejected';
+                    document.getElementById("mytimesheetstatus").innerHTML = "Rejected";
                 }
 
                 if (bTSApproving) {
@@ -1168,6 +1171,7 @@ function CheckApproveStatus(gridid) {
                     bTSApproving = true;
 
                     newobj.Status = 'Approving';
+                    document.getElementById("mytimesheetstatus").innerHTML = "Approving";
                     RefreshCommandUI();
                 }
 
@@ -1910,6 +1914,10 @@ function SaveTypes(event) {
 
     curGrid.SetAttribute(curRow, curCol, "HtmlPrefix", "", true, false);
     curGrid.SetValue(curRow, curCol, fTotal, 1, 0);
+
+    if (curGrid.GetValue(curRow, "TS" + curCol) != newTypeVal)
+        TimesheetHoursEdited = true;
+
     curGrid.SetValue(curRow, "TS" + curCol, newTypeVal, 0, 0);
     curPop = false;
 
