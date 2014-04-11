@@ -130,12 +130,14 @@ BEGIN
 		[Message]    NVARCHAR (MAX)   NULL,
 		[StackTrace] NVARCHAR (MAX)   NULL,
 		[Details]    NVARCHAR (MAX)   NULL,
-		[Kind]       BIT              CONSTRAINT [DF_SS_Logs_Kind] DEFAULT ((0)) NOT NULL,
+		[Kind]       INT              CONSTRAINT [DF_SS_Logs_Kind] DEFAULT ((0)) NOT NULL,
 		[WebId]      UNIQUEIDENTIFIER NULL,
 		[UserId]     INT              NULL,
 		[DateTime]   DATETIME2 (7)    CONSTRAINT [DF_SS_Logs_DateTime] DEFAULT (getdate()) NULL
 	);
 END
+
+ALTER TABLE dbo.SS_Logs ALTER COLUMN Kind INT
 
 ---------------TABLE: SS_Streams----------------------
 
