@@ -4,33 +4,33 @@ using System.Linq;
 using System.Net;
 using System.Web;
 using System.Web.UI;
+using System.Xml;
 using System.Xml.Linq;
 using EPMLiveCore;
 using EPMLiveCore.Infrastructure;
 using EPMLiveWebParts.Properties;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.WebControls;
-using System.Xml;
 
 namespace EPMLiveWebParts
 {
     public partial class ResourceGridUserControl : UserControl
     {
-        #region Fields (5)
+        #region Fields (9) 
 
         private const string LAYOUT_PATH = "/_layouts/15/epmlive/";
         protected string WcReportId = "Resource Work vs. Capacity".Md5();
         protected string WebUrl = SPContext.Current.Web.SafeServerRelativeUrl();
+        private SPWeb _currentWeb;
         private string _debugTag;
-        private string _webPartHeight;
-        public string _reqListId;
         public string _reqId;
+        public string _reqListId;
         public string _reqWebId;
-        SPWeb _currentWeb;
+        private string _webPartHeight;
 
-        #endregion Fields
+        #endregion Fields 
 
-        #region Properties (10)
+        #region Properties (12) 
 
         /// <summary>
         ///     Gets or sets a value indicating whether [auto focus].
@@ -70,63 +70,46 @@ namespace EPMLiveWebParts
         {
             get
             {
-                if (_currentWeb.IsRootWeb && string.IsNullOrEmpty(Request["webid"]) && string.IsNullOrEmpty(Request["listId"]) && string.IsNullOrEmpty(Request["id"]))
+                if (_currentWeb.IsRootWeb && string.IsNullOrEmpty(Request["webid"]) &&
+                    string.IsNullOrEmpty(Request["listId"]) && string.IsNullOrEmpty(Request["id"]))
                 {
                     return GetGridParam(XDocument.Parse(Resources.ResourceGrid_DataXml))
                         .Replace(Environment.NewLine, string.Empty).Replace(@"\t", string.Empty);
                 }
-                else
+
+                SPWeb web = string.IsNullOrEmpty(Request["webid"]) ? _currentWeb : SPContext.Current.Site.OpenWeb(new Guid(Request["webid"]));
+
+                while (web.Features[WEFeatures.BuildTeam.Id] == null) //Inherit | Open
                 {
-                    SPWeb web = null;
-                    if (string.IsNullOrEmpty(Request["webid"]))
-                        web = _currentWeb;
-                    else
-                        web = SPContext.Current.Site.OpenWeb(new Guid(Request["webid"]));
+                    if (web.IsRootWeb)
+                        break;
+                    
+                    //using (web = web.ParentWeb) { }
 
-                    while (web.Features[WEFeatures.BuildTeam.Id] == null) //Inherit | Open
-                    {
-                        if (web.IsRootWeb)
-                            break;
-                        using (web = web.ParentWeb) { };
-                    }
-                    XmlDocument doc = new XmlDocument();
-                    doc.LoadXml(Resources.ResourceGrid_DataXml);
-
-                    XmlAttribute attr = doc.CreateAttribute("WebId");
-                    attr.Value = web.ID.ToString();
-                    doc.FirstChild.Attributes.Append(attr);
-
-                    attr = doc.CreateAttribute("ListId");
-                    attr.Value = Request["listid"];
-                    doc.FirstChild.Attributes.Append(attr);
-
-                    attr = doc.CreateAttribute("ItemId");
-                    attr.Value = Request["id"];
-                    doc.FirstChild.Attributes.Append(attr);
-                    return GetGridParam(XDocument.Parse(doc.OuterXml)).Replace(Environment.NewLine, string.Empty).Replace(@"\t", string.Empty);
-                }
-            }
-        }
-
-        protected string NewFormUrl
-        {
-            get
-            {
-                SPList resourcesList = null;
-                var url = string.Empty;
-                _currentWeb = SPContext.Current.Web;
-
-                if (_currentWeb.IsRootWeb && string.IsNullOrEmpty(Request["listId"]) && string.IsNullOrEmpty(Request["id"]))
-                {
-                    resourcesList = _currentWeb.Lists.TryGetList("Resources");
-                    url = resourcesList.Forms[PAGETYPE.PAGE_NEWFORM].Url;
-                }
-                else
-                {
-                    url = "/_layouts/epmlive/BuildTeam.aspx?listid=" + Request["listid"] + "&id=" + Request["id"];
+                    // ** You do not need to dispose any web object that was not explicitly opened like: spSite.OpenWeb(webId)
+                    // Moreover, the code above should not have worked on lower level workspace since the the newly assigned web object gets disposed right away.
+                    
+                    web = web.ParentWeb;
                 }
 
-                return url;
+                var doc = new XmlDocument();
+                doc.LoadXml(Resources.ResourceGrid_DataXml);
+
+                XmlAttribute attr = doc.CreateAttribute("WebId");
+                attr.Value = web.ID.ToString();
+                doc.FirstChild.Attributes.Append(attr);
+
+                attr = doc.CreateAttribute("ListId");
+                attr.Value = Request["listid"];
+                doc.FirstChild.Attributes.Append(attr);
+
+                attr = doc.CreateAttribute("ItemId");
+                attr.Value = Request["id"];
+                doc.FirstChild.Attributes.Append(attr);
+
+                return GetGridParam(XDocument.Parse(doc.OuterXml))
+                        .Replace(Environment.NewLine, string.Empty)
+                        .Replace(@"\t", string.Empty);
             }
         }
 
@@ -149,7 +132,6 @@ namespace EPMLiveWebParts
                 if (xDocument.Root != null) xDocument.Root.Add(new XElement("Id", WebPartId));
 
                 return GetGridParam(xDocument).Replace(Environment.NewLine, string.Empty).Replace(@"\t", string.Empty);
-
             }
         }
 
@@ -166,6 +148,29 @@ namespace EPMLiveWebParts
             }
         }
 
+        protected string NewFormUrl
+        {
+            get
+            {
+                SPList resourcesList = null;
+                string url = string.Empty;
+                _currentWeb = SPContext.Current.Web;
+
+                if (_currentWeb.IsRootWeb && string.IsNullOrEmpty(Request["listId"]) &&
+                    string.IsNullOrEmpty(Request["id"]))
+                {
+                    resourcesList = _currentWeb.Lists.TryGetList("Resources");
+                    url = resourcesList.Forms[PAGETYPE.PAGE_NEWFORM].Url;
+                }
+                else
+                {
+                    url = "/_layouts/epmlive/BuildTeam.aspx?listid=" + Request["listid"] + "&id=" + Request["id"];
+                }
+
+                return url;
+            }
+        }
+
         /// <summary>
         ///     Gets a value indicating whether [PFE installed].
         /// </summary>
@@ -176,6 +181,11 @@ namespace EPMLiveWebParts
         {
             get { return SPContext.Current.Site.Features[new Guid("158c5682-d839-4248-b780-82b4710ee152")] != null; }
         }
+
+        /// <summary>
+        ///     Get/Set Ribbon Behaviour
+        /// </summary>
+        public int RibbonBehavior { get; set; }
 
         /// <summary>
         ///     Gets or sets the height of the web part.
@@ -211,14 +221,9 @@ namespace EPMLiveWebParts
         /// </value>
         public string WebPartQualifier { get; set; }
 
-        /// <summary>
-        /// Get/Set Ribbon Behaviour
-        /// </summary>
-        public int RibbonBehavior { get; set; }
+        #endregion Properties 
 
-        #endregion Properties
-
-        #region Methods (4)
+        #region Methods (4) 
 
         // Protected Methods (2) 
 
@@ -246,7 +251,7 @@ namespace EPMLiveWebParts
 
             if (resourcesList != null)
             {
-                foreach (string style in new[] { "libraries/jquery-ui" })
+                foreach (string style in new[] {"libraries/jquery-ui"})
                 {
                     SPPageContentManager.RegisterStyleFile(LAYOUT_PATH + "stylesheets/" + style + ".css");
                 }
@@ -265,11 +270,11 @@ namespace EPMLiveWebParts
                 pnlGrid.Visible = false;
                 pnlError.Visible = true;
             }
-            EPMLiveCore.GridGanttSettings gSettings = new EPMLiveCore.GridGanttSettings(resourcesList);
+            var gSettings = new GridGanttSettings(resourcesList);
             if (string.IsNullOrEmpty(gSettings.RibbonBehavior))
-                this.RibbonBehavior = 0;
+                RibbonBehavior = 0;
             else
-                this.RibbonBehavior = Convert.ToInt16(gSettings.RibbonBehavior);
+                RibbonBehavior = Convert.ToInt16(gSettings.RibbonBehavior);
         }
 
         /// <summary>
@@ -290,8 +295,8 @@ namespace EPMLiveWebParts
 
             if (!inDebugMode) return;
 
-            var keywords = new[] { "Error", "Problem", "Info", "Check", "IOError", "IO", "Cookie", "Page", "Event" };
-            var info = new List<string> { "Error", "Problem" };
+            var keywords = new[] {"Error", "Problem", "Info", "Check", "IOError", "IO", "Cookie", "Page", "Event"};
+            var info = new List<string> {"Error", "Problem"};
 
             foreach (string keyword in epmDebug.Split(',').Select(k => k.ToLower()))
             {
@@ -321,6 +326,6 @@ namespace EPMLiveWebParts
             return !string.IsNullOrEmpty(epmDebug);
         }
 
-        #endregion Methods
+        #endregion Methods 
     }
 }
