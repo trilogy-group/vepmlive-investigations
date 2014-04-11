@@ -189,7 +189,7 @@ namespace EPMLiveCore
 
                     DisplayFormRedirect = gSettings.DisplayFormRedirect;
 
-                    if (DisplayFormRedirect && ControlMode == SPControlMode.New)
+                    if (DisplayFormRedirect && ControlMode == SPControlMode.New && Page.Request["IsDlg"] != "1")
                     {
                         SPContext.Current.FormContext.OnSaveHandler += new EventHandler(CustomHandler);
                     }
@@ -933,14 +933,15 @@ namespace EPMLiveCore
                     bDialog = true;
 
 
-                if (DisplayFormRedirect)
-                {
-                    if (bDialog && ControlMode == SPControlMode.New)
-                    {
-                        newLocation = list.Forms[PAGETYPE.PAGE_DISPLAYFORM].ServerRelativeUrl;
-                    }
-                }
-                else if (Page.Request["GetLastID"] == "true")
+                //if (DisplayFormRedirect)
+                //{
+                //    if (bDialog && ControlMode == SPControlMode.New)
+                //    {
+                //        newLocation = list.Forms[PAGETYPE.PAGE_DISPLAYFORM].ServerRelativeUrl;
+                //    }
+                //}
+                //else 
+                if (Page.Request["GetLastID"] == "true")
                 {
                     if (bDialog)
                         newLocation = "close";
