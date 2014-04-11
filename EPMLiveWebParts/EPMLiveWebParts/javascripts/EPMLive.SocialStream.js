@@ -873,7 +873,17 @@
 
                     $el.pagination.hide();
 
-                    if (response.threads.length) {
+                    var hasActivities = false;
+
+                    for (var i = 0; i < response.threads.length; i++) {
+                        var thread = response.threads[i];
+                        if (thread.activities.length || thread.comments.length) {
+                            hasActivities = true;
+                            break;
+                        }
+                    }
+
+                    if (hasActivities) {
                         if (isReload) $el.threads.html('');
                         $$.publish('se.dataLoaded', response);
                         se.pagination.page++;
@@ -883,7 +893,7 @@
 
                     se.pagination.isLoading = false;
 
-                    if (se.pagination.firstTimeLoad && response.threads.length === 0) {
+                    if (se.pagination.firstTimeLoad && !hasActivities) {
                         $el.noActivity.fadeIn('fast');
                     }
 
