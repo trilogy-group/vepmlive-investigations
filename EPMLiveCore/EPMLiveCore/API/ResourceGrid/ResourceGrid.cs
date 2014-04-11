@@ -423,17 +423,19 @@ namespace EPMLiveCore.API
             return "ResourceGrid_" + kind + "_W_" + web.ID + "_U_" + web.CurrentUser.ID;
         }
 
+
         private static string GetDataGrid(string data, SPWeb web)
         {
             using (var resourceManager = new ResourcePoolManager(SPContext.Current.Site.RootWeb))
             {
                 SPList resourcesList = resourceManager.ParentList;
 
+
                 while (web.Features[WEFeatures.BuildTeam.Id] == null) //Inherit | Open
                 {
                     if (web.IsRootWeb)
                         break;
-                    using (web = web.ParentWeb) { };
+                    web = web.ParentWeb;
                 }
 
                 Guid webId = Guid.Empty;
