@@ -935,14 +935,20 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
             {
                 var wurl = this.$Grid._newitemurl;
                 
-                if(wurl.indexOf('?') > 0)
-                    wurl = wurl + "&GetLastID=true";
+
+                if(this.$Grid._usepopup)
+                {
+                    if(wurl.indexOf('?') > 0)
+                        wurl = wurl + "&GetLastID=true";
+                    else
+                        wurl = wurl + "?GetLastID=true";
+
+            	    var options = { url: wurl, width: 600, dialogReturnValueCallback:NewItemCallback };
+
+            	    SP.UI.ModalDialog.showModalDialog(options);
+                }
                 else
-                    wurl = wurl + "?GetLastID=true";
-
-            	var options = { url: wurl, width: 600, dialogReturnValueCallback:NewItemCallback };
-
-            	SP.UI.ModalDialog.showModalDialog(options);
+                    location.href = wurl;
             }
             else if(this.$Grid._newmenumode == '2')
             {
