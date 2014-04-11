@@ -197,7 +197,7 @@
             }
 
             var loadKanBanPlanners = function () {
-                showHideLoading(true, 'Loading Planners');
+                //showHideLoading(true, 'Loading Planners');
                 $.ajax({
                     type: "POST",
                     url: "<%=SPContext.Current.Web.ServerRelativeUrl%>/_vti_bin/WorkPlanner.asmx/Execute",
@@ -205,12 +205,12 @@
                     contentType: "application/json; charset=utf-8",
                     dataType: "json",
                     error: function (xhr, status, error) {
-                        showHideLoading(false, '');
+                        //showHideLoading(false, '');
                         var err = eval("(" + xhr.responseText + ")");
                         alert(err.Message);
                     },
                     success: function (response) {
-                        showHideLoading(false, '');
+                        //showHideLoading(false, '');
                         var obj = jQuery.parseJSON(response.d);
                         $.each(obj.kanbanplanners, function (key, value) {
                             if (value.id == '<%=strPlanner%>') {
@@ -238,7 +238,7 @@
                 }
                 else {
                     resetControls(true);
-                    showHideLoading(true, 'Loading Filters');
+                    //showHideLoading(true, 'Loading Filters');
                     $.ajax({
                         type: "POST",
                         url: "<%=SPContext.Current.Web.ServerRelativeUrl%>/_vti_bin/WorkPlanner.asmx/Execute",
@@ -246,12 +246,12 @@
                         contentType: "application/json; charset=utf-8",
                         dataType: "json",
                         error: function (xhr, status, error) {
-                            showHideLoading(false, '');
+                            //showHideLoading(false, '');
                             var err = eval("(" + xhr.responseText + ")");
                             alert(err.Message);
                         },
                         success: function (response) {
-                            showHideLoading(false, '');
+                            //showHideLoading(false, '');
                             var obj = jQuery.parseJSON(response.d);
 
                             $("span[id^='ddcl-']").remove();
