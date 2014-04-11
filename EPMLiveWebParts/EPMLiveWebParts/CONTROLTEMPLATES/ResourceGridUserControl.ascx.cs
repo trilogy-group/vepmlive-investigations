@@ -70,17 +70,24 @@ namespace EPMLiveWebParts
         {
             get
             {
-                if (_currentWeb.IsRootWeb && string.IsNullOrEmpty(Request["listId"]) && string.IsNullOrEmpty(Request["id"]))
+                if (_currentWeb.IsRootWeb && string.IsNullOrEmpty(Request["webid"]) && string.IsNullOrEmpty(Request["listId"]) && string.IsNullOrEmpty(Request["id"]))
                 {
                     return GetGridParam(XDocument.Parse(Resources.ResourceGrid_DataXml))
                         .Replace(Environment.NewLine, string.Empty).Replace(@"\t", string.Empty);
                 }
                 else
                 {
-                    SPWeb web = _currentWeb;
+                    SPWeb web = null;
+                    if (string.IsNullOrEmpty(Request["webid"]))
+                        web = _currentWeb;
+                    else
+                        web = SPContext.Current.Site.OpenWeb(new Guid(Request["webid"]));
+
                     while (web.Features[WEFeatures.BuildTeam.Id] == null) //Inherit | Open
                     {
-                        web = web.ParentWeb;
+                        if (web.IsRootWeb)
+                            break;
+                        using (web = web.ParentWeb) { };
                     }
                     XmlDocument doc = new XmlDocument();
                     doc.LoadXml(Resources.ResourceGrid_DataXml);

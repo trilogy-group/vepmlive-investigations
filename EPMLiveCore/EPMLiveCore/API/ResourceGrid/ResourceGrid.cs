@@ -431,7 +431,9 @@ namespace EPMLiveCore.API
 
                 while (web.Features[WEFeatures.BuildTeam.Id] == null) //Inherit | Open
                 {
-                    web = web.ParentWeb;
+                    if (web.IsRootWeb)
+                        break;
+                    using (web = web.ParentWeb) { };
                 }
 
                 Guid webId = Guid.Empty;
