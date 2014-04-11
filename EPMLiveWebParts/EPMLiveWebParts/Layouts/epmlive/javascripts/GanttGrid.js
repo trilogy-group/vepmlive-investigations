@@ -259,41 +259,47 @@ function GridOnReady(grid) {
 
  function GridOnRenderFinish(grid) {
 
-    if (grid.id.substr(0, 9) == "GanttGrid") {
+     if (grid.id.substr(0, 9) == "GanttGrid") {
 
-        TGSetEvent("OnAfterValueChanged", grid.id, GridOnAfterValueChanged);
+         TGSetEvent("OnAfterValueChanged", grid.id, GridOnAfterValueChanged);
         
         
-        grid.EditRow = 0;
-        var gridid = GetGridId(grid);
+         grid.EditRow = 0;
+         var gridid = GetGridId(grid);
 
-        if (!eval("mygrid" + gridid + ".loadedmenu")) {
-            eval("mygrid" + gridid + ".loadedmenu = true;");
-            grid.bPageSetup = false;
+         if (!eval("mygrid" + gridid + ".loadedmenu")) {
+             eval("mygrid" + gridid + ".loadedmenu = true;");
+             grid.bPageSetup = false;
 
-            try {
-                eval("loadMenu" + gridid + "();");
-            } catch (e) { }
-            eval("mygrid" + gridid + ".Groups=''");
-            eval("mygrid" + gridid + ".Cols=''");
-            eval("mygrid" + gridid + ".NoPage=''");
+             try {
+                 eval("loadMenu" + gridid + "();");
+             } catch (e) { }
+             eval("mygrid" + gridid + ".Groups=''");
+             eval("mygrid" + gridid + ".Cols=''");
+             eval("mygrid" + gridid + ".NoPage=''");
 
-            var ribbon = eval("mygrid" + gridid + ".RibbonBehavior");
+             var ribbon = eval("mygrid" + gridid + ".RibbonBehavior");
 
-            if (ribbon == "1") {
+             if (OnlyGrid)
+             {
+                 if (ribbon == "1") {
 
-            }
-            else if (ribbon == "2") {
+                     var wp = document.getElementById('MSOZoneCell_WebPart' + eval("mygrid" + gridid + ".Qualifier"));
 
-            }
-            else {
-                var wp = document.getElementById('MSOZoneCell_WebPart' + eval("mygrid" + gridid + ".Qualifier"));
+                     fireEvent(wp, 'mouseup');
+                 }
+                 else if (ribbon == "2") {
 
-                fireEvent(wp, 'mouseup');
+                 }
+                 else {
+                     var wp = document.getElementById('MSOZoneCell_WebPart' + eval("mygrid" + gridid + ".Qualifier"));
 
-                SelectRibbonTab("Ribbon.ListItem", true);
+                     fireEvent(wp, 'mouseup');
 
-            }
+                     SelectRibbonTab("Ribbon.ListItem", true);
+
+                 }
+             }
         }
 
         if (ArrGantts.indexOf(grid.id) > -1)
