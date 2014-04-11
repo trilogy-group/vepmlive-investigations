@@ -505,7 +505,7 @@
                     
                     if(RibbonIsMinimized()==false)
                     { 
-                  		var adjHeight = $("#s4-workspace").height() + 90 + "px";
+                  		var adjHeight = $("#s4-workspace").height() + 92 + "px";
                         $("#s4-workspace").css("height",adjHeight);  
                     }
                     
