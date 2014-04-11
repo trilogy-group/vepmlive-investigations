@@ -418,10 +418,7 @@ function GridOnSelect(grid, row, deselect) {
             if (!row.itemid) {
                 grid.SelectRange(row.firstChild, null, row.lastChild, null, !deselect, 0);
             }
-            else if (deselect)
-            {
-                grid.Focus(null, null, null, true);
-            }
+
         }
         setTimeout("RefreshCommandUI()", 200);
     }
@@ -446,7 +443,7 @@ function GridOnFocus(grid, row, col, orow, ocol, pagepos) {
             }
         }
     }
-    RefreshCommandUI();
+    //RefreshCommandUI();
 }
 
 
@@ -533,6 +530,7 @@ function GridNewItem(gridid, newid)
 }
 
 function StopEditGridRow(grid, row) {
+    
     if (row.id != grid.EditRow) {
         var row = grid.GetRowById(grid.EditRow);
         grid.EditRow = null;
