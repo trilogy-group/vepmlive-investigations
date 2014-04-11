@@ -887,6 +887,8 @@
                         if (isReload) $el.threads.html('');
                         $$.publish('se.dataLoaded', response);
                         se.pagination.page++;
+                        
+                        if ($el.noActivity.is(':visible')) $el.noActivity.fadeOut('fast');
                     } else {
                         se.pagination.page = 0;
                     }
