@@ -405,6 +405,17 @@ BEGIN
 
 	CREATE TABLE #Groups (GroupId INT)
 	INSERT INTO #Groups (GroupId) SELECT GROUPID FROM dbo.RPTGROUPUSER WHERE (USERID = @UserId) AND (SITEID = @SiteId)
+  
+	Declare @TmpUserId AS INT
+	IF @UserId = 1073741823
+	BEGIN
+		SET @TmpUserId = 1
+	END
+	ELSE
+	BEGIN
+		SET @TmpUserId = @UserId
+	END
+	
     
 	IF @View = ''MyWorkspace''
 	BEGIN  
@@ -417,7 +428,7 @@ BEGIN
 			ELSE 0 
 			END AS HasAccess
 		FROM dbo.RPTWeb INNER JOIN dbo.LSTResourcepool ON dbo.RPTWeb.WebOwnerId = dbo.LSTResourcepool.SharePointAccountID 
-		WHERE dbo.RPTWeb.SiteId = @SiteId AND dbo.RPTWeb.WebOwnerId= @UserId order by dbo.RPTWeb.WebTitle
+		WHERE dbo.RPTWeb.SiteId = @SiteId AND dbo.RPTWeb.WebOwnerId= @TmpUserId order by dbo.RPTWeb.WebTitle
 	END
 	ELSE IF @View = ''AllItems''
 	BEGIN

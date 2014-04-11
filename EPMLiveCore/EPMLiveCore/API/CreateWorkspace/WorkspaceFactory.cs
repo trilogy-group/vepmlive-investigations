@@ -680,7 +680,7 @@ namespace EPMLiveCore.API
         }
 
         public void BaseProvision(SPSite site, SPWeb web, SPSite cESite, SPWeb cEWeb)
-        {   
+        {
             string sResultWebUrl = string.Empty;
             SPWeb parentWeb = site.OpenWeb(ParentWebId);
 
@@ -691,7 +691,7 @@ namespace EPMLiveCore.API
 
             string siteTitle = _xmlDataMgr.GetPropVal("SiteTitle");
             string siteDescription = _xmlDataMgr.GetPropVal("SiteDescription");
-            string creatorId = _xmlDataMgr.GetPropVal("CreatorId");
+
             siteTitle = GetSafeTitle(siteTitle);
             siteDescription = GetSafeTitle(siteDescription);
             string siteUrl = siteTitle;
@@ -906,12 +906,21 @@ namespace EPMLiveCore.API
                     }
                 }
                 else
-                {   
+                {
                     throw new Exception(err.Substring(2));
                 }
             }
             else
             {
+                string creatorId;
+                if (CreatorId == 1073741823)
+                {
+                    creatorId = "1";
+                }
+                else
+                {
+                    creatorId = Convert.ToString(CreatorId);
+                }
                 if (AttachedItemId != -1)
                 {
                     WorkspaceData.SendCompletedSignalsToDB(SiteId, web, parentWeb, AttachedItemListId, AttachedItemId,
@@ -1018,7 +1027,7 @@ namespace EPMLiveCore.API
                         if (AttachedItemId != -1)
                         {
                             // stamp info on new site
-                            w.AllProperties["ParentItem"] = WebId + "^^" + AttachedItemListId + "^^" + AttachedItemId +  "^^" + AttachedItemTitle;
+                            w.AllProperties["ParentItem"] = WebId + "^^" + AttachedItemListId + "^^" + AttachedItemId + "^^" + AttachedItemTitle;
                         }
                         else
                         {
