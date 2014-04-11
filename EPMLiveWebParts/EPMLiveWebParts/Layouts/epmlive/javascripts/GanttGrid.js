@@ -418,8 +418,12 @@ function GridOnSelect(grid, row, deselect) {
             if (!row.itemid) {
                 grid.SelectRange(row.firstChild, null, row.lastChild, null, !deselect, 0);
             }
+            else if (deselect)
+            {
+                grid.Focus(null, null, null, true);
+            }
         }
-        RefreshCommandUI();
+        setTimeout("RefreshCommandUI()", 200);
     }
 }
 
