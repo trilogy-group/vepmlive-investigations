@@ -203,7 +203,7 @@ namespace EPMLiveWebParts.WorkSpaceCenter {
         }
     };
 </script>
-<div id=""EPMWorkspaceCenter"" style=""width: 100%;"">
+<div id=""EPMWorkspaceCenter"">
     <div id=""WorkSpacecenterToolbarMenu"" style=""width: 99%"">
     </div>
     <div id=""EPMWorkspaceCenterGrid"" style=""width: 100%; height: 400px;"">
