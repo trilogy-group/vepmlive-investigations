@@ -536,7 +536,7 @@ BEGIN
 			
 		end
 
-		set @sql = ''from lst'' + @table + '' where cast(listid as varchar(40)) + cast(itemid as varchar(20)) in (
+		set @sql = ''from '' + @table + '' where cast(listid as varchar(40)) + cast(itemid as varchar(20)) in (
 		SELECT     CAST(dbo.RPTITEMGROUPS.LISTID AS varchar(40)) + CAST(dbo.RPTITEMGROUPS.ITEMID AS varchar(20)) AS Expr1
 		FROM         dbo.RPTITEMGROUPS INNER JOIN
                       #Groups as gps ON gps.GROUPID = rptitemgroups.GROUPID
