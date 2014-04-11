@@ -305,7 +305,7 @@ function GridOnReady(grid) {
 
         var ribbon = eval("mygrid" + gridid + ".RibbonBehavior");
         
-
+        RefreshCommandUI();
     }
  }
 
