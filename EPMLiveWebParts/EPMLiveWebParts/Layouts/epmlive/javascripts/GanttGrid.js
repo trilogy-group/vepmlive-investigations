@@ -278,6 +278,8 @@ function GridOnReady(grid) {
             eval("mygrid" + gridid + ".Cols=''");
             eval("mygrid" + gridid + ".NoPage=''");
 
+            var ribbon = eval("mygrid" + gridid + ".RibbonBehavior");
+
             if (ribbon == "1") {
 
             }
@@ -303,7 +305,7 @@ function GridOnReady(grid) {
 
         document.getElementById("searchload" + grid.id.substr(9)).style.display = "";
 
-        var ribbon = eval("mygrid" + gridid + ".RibbonBehavior");
+        
         
         RefreshCommandUI();
     }
