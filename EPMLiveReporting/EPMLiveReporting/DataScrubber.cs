@@ -296,8 +296,8 @@ namespace EPMLiveReportsAdmin
 
                     if (!string.IsNullOrEmpty(tableName))
                     {
-                        sDelSql += "DELETE FROM " + tableName +
-                                   " WHERE [ListID] NOT IN (SELECT Id FROM ReportListIds) ";
+                        sDelSql += "DELETE FROM [" + tableName +
+                                   "] WHERE [ListID] NOT IN (SELECT Id FROM ReportListIds) ";
                     }
                 }
 

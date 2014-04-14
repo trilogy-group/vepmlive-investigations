@@ -1657,7 +1657,7 @@ namespace EPMLiveReportsAdmin
                         {
 
                             //Datatable name MUST be the SAME as the sqltable name.
-                            sbc.DestinationTableName = dtList.TableName;
+                            sbc.DestinationTableName = "[" + dtList.TableName + "]";
 
                             //Recommended MAX batchsize is 500 to avoid timeout issues.
                             sbc.BatchSize = 500;
@@ -2024,7 +2024,7 @@ namespace EPMLiveReportsAdmin
 
                     if (TableExists(sTableName, GetClientReportingConnection))
                     {
-                        sSQL = sSQL + " DELETE " + sTableName.Replace("'", "") + " WHERE SiteId =@siteID";
+                        sSQL = sSQL + " DELETE [" + sTableName.Replace("'", "") + "] WHERE SiteId =@siteID";
                         // - CAT.NET false-positive: All single quotes are escaped/removed.
                     }
                 }

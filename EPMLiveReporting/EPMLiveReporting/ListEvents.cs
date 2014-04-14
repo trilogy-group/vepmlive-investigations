@@ -260,7 +260,7 @@ namespace EPMLiveReportsAdmin
                 _ListName = properties.ListTitle;
 
                 //Init. Data Access Object
-                _DAO = new ReportData(_SiteID);
+                _DAO = new ReportData(true, _SiteID, properties.Web.ID);
                 _SiteName = _DAO.SiteName;
                 _SiteUrl = _DAO.SiteUrl;
 
@@ -268,9 +268,9 @@ namespace EPMLiveReportsAdmin
                 _TableName = _DAO.GetTableName(_ListID);
 
                 if (_TableName == null || _TableName == string.Empty)
-                {
                     return false;
-                }
+                else
+                    _TableName = "[" + _TableName + "]";
 
                 //IF item DELETED no need to populate columns
                 if (blnPopulateCols)

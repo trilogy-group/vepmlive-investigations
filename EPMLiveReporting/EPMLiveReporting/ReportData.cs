@@ -19,6 +19,7 @@ namespace EPMLiveReportsAdmin
         protected readonly string _epmLiveCs;
         protected readonly Guid _siteId;
         protected readonly Guid _webId;
+        protected string webTitle = string.Empty;
         protected EPMData _DAO;
         protected SqlCommand _cmdWithParams;
         protected bool _isReportingV2Enabled = false;
@@ -48,6 +49,7 @@ namespace EPMLiveReportsAdmin
 
                 _webId = web.ID;
                 _isRootWeb = web.IsRootWeb;
+                webTitle = web.Title;
 
                 try
                 {
@@ -170,6 +172,7 @@ namespace EPMLiveReportsAdmin
 
                 _webId = web.ID;
                 _isRootWeb = web.IsRootWeb;
+                webTitle = web.Title;
 
                 try
                 {
@@ -405,7 +408,7 @@ namespace EPMLiveReportsAdmin
             {
                 if (_isReportingV2Enabled && !_isRootWeb)
                 {
-                    tblName = tableName + "_" + _webId.ToString().Replace("-", "");
+                    tblName = webTitle + "_" +  tableName + "_" + _webId.ToString().Replace("-", "");
                     tableName = tblName;
                 }
             }
@@ -413,7 +416,7 @@ namespace EPMLiveReportsAdmin
             {
                 if (_isReportingV2Enabled && !_isRootWeb)
                 {
-                    tblName = tableName + iTableCount + "_" + _webId.ToString().Replace("-", "");
+                    tblName = webTitle + "_" + tableName + iTableCount + "_" + _webId.ToString().Replace("-", "");
                     tableName = tblName;
                 }
                 else
