@@ -747,7 +747,7 @@ namespace EPMLiveWebParts
                 }
                 try
                 {
-                    if (Request["action"].ToLower() != "workspace" && Request["isDlg"] == "1" || HttpContext.Current.Request.UrlReferrer.OriginalString.ToLower().Contains("&isdlg=1"))
+                    if (Request["action"].ToLower() != "workspace" && (Request["isDlg"] == "1" || HttpContext.Current.Request.UrlReferrer.OriginalString.ToLower().Contains("&isdlg=1")))
                         url += "&IsDlg=1";
                 }
                 catch { }
