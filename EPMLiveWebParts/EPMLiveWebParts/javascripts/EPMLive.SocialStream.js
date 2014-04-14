@@ -777,53 +777,53 @@
                             type: 'GET',
                             headers: { accept: 'application/json;odata=verbose' },
                         }).then(function(response) {
-                            if (response && response.d && response.d.results && response.d.results.length) {
-                                var item = response.d.results[0];
+                            if (!response || !response.d || !response.d.results || !response.d.results.length) return;
+                            
+                            var item = response.d.results[0];
 
-                                var data = {
-                                    lists: [{
-                                        icon: listInfo.icon,
-                                        id: listInfo.id,
-                                        name: listInfo.name,
-                                        url: listInfo.url
-                                    }],
-                                    threads: [{
-                                        activities: [{
-                                            data: null,
-                                            id: new Date().getTime(),
-                                            isBulkOperation: false,
-                                            key: null,
-                                            kind: 'Created',
-                                            time: item.Created,
-                                            userId: window.epmLive.currentUserId
-                                        }],
-                                        comments: [],
-                                        firstActivityOn: item.Created,
+                            var data = {
+                                lists: [{
+                                    icon: listInfo.icon,
+                                    id: listInfo.id,
+                                    name: listInfo.name,
+                                    url: listInfo.url
+                                }],
+                                threads: [{
+                                    activities: [{
+                                        data: null,
                                         id: new Date().getTime(),
-                                        itemId: item.ID,
-                                        kind: 'ListItem',
-                                        lastActivityOn: item.Created,
-                                        listId: listInfo.id,
-                                        title: item.Title,
-                                        totalActivities: 1,
-                                        totalComments: 0,
-                                        url: window.epmLive.currentWebUrl + '/_layouts/15/epmlive/redirectionproxy.aspx?action=view&webid=' + window.epmLive.currentWebId + '&listid=' + listInfo.id + '&id=' + item.ID,
-                                        webId: window.epmLive.currentWebId
+                                        isBulkOperation: false,
+                                        key: null,
+                                        kind: 'Created',
+                                        time: item.Created,
+                                        userId: window.epmLive.currentUserId
                                     }],
-                                    users: [{
-                                        displayName: window.epmLive.currentUserDisplayName,
-                                        id: window.epmLive.currentUserId,
-                                        picture: window.epmLive.currentUserAvatar
-                                    }],
-                                    webs: [{
-                                        id: window.epmLive.currentWebId,
-                                        url: window.epmLive.currentWebUrl
-                                    }],
-                                    newItem: true
-                                };
+                                    comments: [],
+                                    firstActivityOn: item.Created,
+                                    id: new Date().getTime(),
+                                    itemId: item.ID,
+                                    kind: 'ListItem',
+                                    lastActivityOn: item.Created,
+                                    listId: listInfo.id,
+                                    title: item.Title,
+                                    totalActivities: 1,
+                                    totalComments: 0,
+                                    url: window.epmLive.currentWebUrl + '/_layouts/15/epmlive/redirectionproxy.aspx?action=view&webid=' + window.epmLive.currentWebId + '&listid=' + listInfo.id + '&id=' + item.ID,
+                                    webId: window.epmLive.currentWebId
+                                }],
+                                users: [{
+                                    displayName: window.epmLive.currentUserDisplayName,
+                                    id: window.epmLive.currentUserId,
+                                    picture: window.epmLive.currentUserAvatar
+                                }],
+                                webs: [{
+                                    id: window.epmLive.currentWebId,
+                                    url: window.epmLive.currentWebUrl
+                                }],
+                                newItem: true
+                            };
 
-                                $$.publish('se.dataLoaded', data);
-                            }
+                            $$.publish('se.dataLoaded', data);
                         });
                     }
                 };
