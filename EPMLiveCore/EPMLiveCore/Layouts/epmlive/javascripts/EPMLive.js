@@ -929,6 +929,11 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
             var divGroupingWrapper = $(document.createElement('div'));
             divGroupingWrapper.attr('class', 'grouping-wrapper');
 
+            var divGroupingWrapperEmptyText = $(document.createElement('div'));
+            divGroupingWrapperEmptyText.attr('class', 'dropdown-header');
+            divGroupingWrapperEmptyText.text('No Grouping Added');
+            divGroupingWrapper.append(divGroupingWrapperEmptyText);
+
             var sAvailableGrps = cfg['availableGroups'];
             var availableGrps = new Array();
             if (sAvailableGrps) {
@@ -942,6 +947,9 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
 
             // foreach grouping field we need to render
             var groups = cfg['groups'];
+            if (groups != null && groups.length > 0) {
+                divGroupingWrapperEmptyText.text('');
+            }
             for (var i in groups) {
                 var group = groups[i];
 
@@ -978,6 +986,7 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
                     });
                     var numRows = $('.grouping-wrapper').children('.grouping-row').length;
                     if (numRows == 0) {
+                        divGroupingWrapperEmptyText.text('No Grouping Added');
                         $('#aGroupBySave').attr('class', 'disabledLink');
                     }
                     else if (numRows > 0 && numRows < 5) {
@@ -1013,6 +1022,7 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
             aFooterAdd.attr('href', 'javascript:void(0)');
             aFooterAdd.text('Add Grouping');
             aFooterAdd.bind('click', function () {
+                divGroupingWrapperEmptyText.text('');
                 var numRows = $('.grouping-wrapper').children('.grouping-row').length;
                 if (numRows < 4) {
 
@@ -1055,6 +1065,7 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
                         });
                         var numRows = $('.grouping-wrapper').children('.grouping-row').length;
                         if (numRows == 0) {
+                            divGroupingWrapperEmptyText.text('No Grouping Added');
                             $('#aGroupBySave').attr('class', 'disabledLink');
                         }
                         else if (numRows > 0 && numRows < 5) {
@@ -1336,7 +1347,7 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
                     var ctrlId = $(this).closest('ul').siblings('a').attr('controlId');
                     data['sections'] = getUlChoices(ctrlId);
                     cfg['applyButtonConfig']['function'](data);
-                    
+
                     $('#' + ctrlId +"_ul_menu").toggle();
                 });
             }
