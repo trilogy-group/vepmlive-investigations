@@ -35,9 +35,9 @@ namespace EPMLiveCore.Services
 
         #endregion Fields 
 
-        #region Methods (19) 
+        #region Methods (21) 
 
-        // Public Methods (3) 
+        // Public Methods (5) 
 
         [WebGet(BodyStyle = WebMessageBodyStyle.Bare,
             ResponseFormat = WebMessageFormat.Json,
@@ -170,6 +170,159 @@ namespace EPMLiveCore.Services
                 ParseMetaData(out page, out limit, out activityLimit, out commentLimit, out offset);
 
                 GetData(activities, new Guid(threadId), kind, offset);
+            }
+            catch (Exception exception)
+            {
+                if (exception is AggregateException)
+                {
+                    exception = ((AggregateException) exception).Flatten();
+                }
+
+                activities.error = new Error
+                {
+                    message = exception.Message,
+                    stackTrace = exception.StackTrace,
+                    kind = typeof (Exception).ToString()
+                };
+            }
+
+            return activities;
+        }
+
+        [WebGet(BodyStyle = WebMessageBodyStyle.Bare,
+            ResponseFormat = WebMessageFormat.Json,
+            UriTemplate = "/logs")]
+        [OperationContract]
+        public Logs GetLogs()
+        {
+            var logs = new Logs();
+
+            try
+            {
+                SPWeb contextWeb = SPContext.Current.Web;
+
+                if (!contextWeb.CurrentUser.IsSiteAdmin &&
+                    !contextWeb.DoesUserHavePermissions(SPBasePermissions.FullMask))
+                {
+                    throw new UnauthorizedAccessException("You need to be either Web or Site Collection Administrator.");
+                }
+
+                const string SQL = @"
+                    SELECT  dbo.SS_Logs.Id, dbo.SS_Logs.Message, dbo.SS_Logs.StackTrace, dbo.SS_Logs.Details, dbo.SS_Logs.Kind, dbo.SS_Logs.DateTime, 
+                            dbo.SS_Logs.UserId, dbo.LSTUserInformationList.Title AS UserName, dbo.LSTUserInformationList.Name AS UserAccount, dbo.SS_Logs.WebId, 
+                            dbo.RPTWeb.WebTitle, dbo.RPTWeb.WebUrl
+                    FROM    dbo.SS_Logs LEFT OUTER JOIN dbo.RPTWeb ON dbo.SS_Logs.WebId = dbo.RPTWeb.WebId LEFT OUTER JOIN
+                            dbo.LSTUserInformationList ON dbo.SS_Logs.UserId = dbo.LSTUserInformationList.ID 
+                    WHERE   (dbo.RPTWeb.WebUrl = @WebUrl) OR (dbo.RPTWeb.WebUrl LIKE @WebUrl + '/')
+                    ORDER BY dbo.SS_Logs.DateTime DESC";
+
+                var ssLogs = new DataTable();
+
+                using (var manager = new DBConnectionManager(contextWeb))
+                {
+                    var sqlCommand = new SqlCommand(SQL, manager.SqlConnection);
+                    sqlCommand.Parameters.AddWithValue("@WebUrl", contextWeb.SafeServerRelativeUrl());
+
+                    SqlDataReader reader = sqlCommand.ExecuteReader();
+                    ssLogs.Load(reader);
+                }
+
+                SPRegionalSettings regionalSettings = SPContext.Current.RegionalSettings;
+
+                foreach (DataRow row in ssLogs.Rows)
+                {
+                    var log = new Logs.Log
+                    {
+                        id = (Guid) row["Id"],
+                        message = row["Message"] as string,
+                        stackTrace = row["StackTrace"] as string,
+                        details = row["Details"] as string,
+                        kind = ((LogKind) row["Kind"]).ToString(),
+                        time = regionalSettings.TimeZone.UTCToLocalTime((DateTime) row["DateTime"])
+                    };
+
+                    object userId = row["UserId"];
+                    if (userId != null && userId != DBNull.Value)
+                    {
+                        log.user = (int) userId;
+
+                        if (logs.users.All(u => u.id != log.user))
+                        {
+                            logs.users.Add(new SEActivities.User
+                            {
+                                id = (int) userId,
+                                displayName = row["UserName"] as string,
+                                name = row["UserAccount"] as string
+                            });
+                        }
+                    }
+
+                    object webId = row["WebId"];
+                    if (webId != null && webId != DBNull.Value)
+                    {
+                        log.web = (Guid) webId;
+
+                        if (logs.webs.All(w => w.id != log.web))
+                        {
+                            logs.webs.Add(new SEActivities.Web
+                            {
+                                id = (Guid) webId,
+                                title = row["WebTitle"] as string,
+                                url = row["WebUrl"] as string
+                            });
+                        }
+                    }
+
+                    logs.collection.Add(log);
+                }
+            }
+            catch (Exception exception)
+            {
+                if (exception is AggregateException)
+                {
+                    exception = ((AggregateException) exception).Flatten();
+                }
+
+                logs.error = new Error
+                {
+                    message = exception.Message,
+                    stackTrace = exception.StackTrace,
+                    kind = typeof (Exception).ToString()
+                };
+            }
+
+            return logs;
+        }
+
+        [WebGet(BodyStyle = WebMessageBodyStyle.Bare,
+            ResponseFormat = WebMessageFormat.Json,
+            UriTemplate = "/suid/{listId}/{itemId}")]
+        [OperationContract]
+        public SEActivities GetSUId(string listId, string itemId)
+        {
+            var activities = new SEActivities();
+
+            try
+            {
+                var lId = new Guid(listId);
+                int iId = int.Parse(itemId);
+
+                const string SQL = @"
+                    SELECT    TOP (1) dbo.SS_Activities.ActivityKey 
+                    FROM      dbo.SS_Threads INNER JOIN dbo.SS_Activities ON dbo.SS_Threads.Id = dbo.SS_Activities.ThreadId
+                    WHERE     (dbo.SS_Threads.Deleted = 0) AND (dbo.SS_Threads.ListId = @ListId) AND 
+                              (dbo.SS_Threads.ItemId = @ItemId) AND (dbo.SS_Activities.Kind = 0)";
+
+                using (var connectionManager = new DBConnectionManager(SPContext.Current.Web))
+                {
+                    using (var sqlCommand = new SqlCommand(SQL, connectionManager.SqlConnection))
+                    {
+                        sqlCommand.Parameters.AddWithValue("@ListId", lId);
+                        sqlCommand.Parameters.AddWithValue("@ItemId", iId);
+
+                        activities.suid = new Guid(sqlCommand.ExecuteScalar().ToString());
+                    }
+                }
             }
             catch (Exception exception)
             {

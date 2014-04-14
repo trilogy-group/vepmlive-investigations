@@ -21,7 +21,7 @@ namespace EPMLiveCore.SocialEngine.Core
         DateTime
     }
 
-    internal enum LogKind
+    public enum LogKind
     {
         Error,
         Info

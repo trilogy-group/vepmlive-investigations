@@ -17,11 +17,13 @@ namespace EPMLiveCore.Services.DataContracts.SocialEngine
 
         #endregion Constructors 
 
-        #region Properties (5) 
+        #region Properties (6) 
 
         public Error error { get; set; }
 
         public List<ItemList> lists { get; set; }
+
+        public Guid suid { get; set; }
 
         public List<Thread> threads { get; set; }
 

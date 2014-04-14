@@ -126,11 +126,6 @@
                     };
                 };
 
-                var _reload = function() {
-                    _resetPagination();
-                    _load(null, true);
-                };
-
                 var _startLoader = function() {
                     var seId = $el.root.get(0).id;
 
@@ -155,7 +150,6 @@
                     getUserFriendlyName: _getUserFriendlyName,
                     getUserProfileUrl: _getUserProfileUrl,
                     sortComments: _sortComments,
-                    reload: _reload,
                     resetPagination: _resetPagination,
                     startLoader: _startLoader,
                     stopLoader: _stopLoader
@@ -524,8 +518,11 @@
                             id: webId,
                             url: window.epmLive.currentWebUrl
                         }],
-                        newStatusUpdate: true
+                        newStatusUpdate: true,
+                        disabled: true
                     };
+
+                    data.payload = payload;
 
                     $$.publish('se.dataLoaded', payload);
                 }
@@ -594,11 +591,53 @@
                             if (response.d) {
                                 var code = response.d.match(/<Result Status="(\d)">/);
                                 if (code.length && 0 === parseInt(code[1])) {
-                                    window.setTimeout(function() {
-                                        helpers.reload();
-                                    }, 500);
+                                    var ids = response.d.match(/<PublicCommentItem listId="(.*?)" itemId="(\d+)" \/>/);
+
+                                    if (ids.length === 3) {
+                                        var _tries = 0;
+                                        
+                                        var tryReload = function(tries) {
+                                            if (tries > 10) return;
+                                            
+                                            $.get(se.apiUrl + '/suid/' + ids[1] + '/' + ids[2] + '?v=' + new Date().getTime()).then(function (resp) {
+                                                if (resp.error) {
+                                                    window.setTimeout(function() {
+                                                        tryReload(++tries);
+                                                    }, 500);
+                                                    return;
+                                                } else {
+                                                    var time = moment.utc().format();
+
+                                                    data.payload.lists = [{
+                                                        icon: null,
+                                                        id: ids[1],
+                                                        name: null,
+                                                        url: null
+                                                    }];
+
+                                                    var tempThreadId = data.payload.threads[0].id;
+
+                                                    data.payload.threads[0].id = resp.suid;
+                                                    data.payload.threads[0].listId = ids[1];
+                                                    data.payload.threads[0].itemId = parseInt(ids[2]);
+                                                    data.payload.threads[0].firstActivityOn = time;
+                                                    data.payload.threads[0].lastActivityOn = time;
+                                                    data.payload.threads[0].activities[0].time = time;
+                                                    data.payload.threads[0].activities[0].key = resp.suid;
+
+                                                    data.payload.disabled = false;
+
+                                                    $el.threads.find('li#epm-se-thread-' + tempThreadId).remove();
+                                                    $$.publish('se.dataLoaded', data.payload);
+                                                }
+                                            });
+                                        };
+
+                                        tryReload(++_tries);
+                                    }
                                 }
                             }
+                            
                             if (window.epmLive.debugMode) console.log(response);
                         });
                     }
@@ -684,8 +723,9 @@
                     settings.button = settings.element.find('button');
 
                     addPlaceholder(settings);
-                    if (!settings.disabled) attahEvents(settings);
-                    else {
+                    attahEvents(settings);
+
+                    if (settings.disabled) {
                         settings.input.attr('contenteditable', false);
                         settings.$thread.addClass(se.ui.classes.disabled);
                         addOverlay(settings);
@@ -721,9 +761,7 @@
 
                 var _handleCreationAction = function(result) {
                     if (result === 1) {
-                        window.setTimeout(function () {
-                            helpers.reload();
-                        }, 500);
+                        console.log('update thread');
                     }
                 };
 
@@ -794,7 +832,7 @@
                         placeholder: 'Add a comment...',
                         thread: thread,
                         $thread: $thread,
-                        disabled: data.newStatusUpdate
+                        disabled: data.disabled
                     });
                 });
 
@@ -828,7 +866,7 @@
                 attachEvents();
             };
 
-            var _load = function(query, isReload, tries) {
+            var _load = function(query, tries) {
                 if (se.pagination.page === 0) return;
                 if (tries > 5) {
                     $el.pagination.hide();
@@ -865,7 +903,7 @@
                 $.getJSON(apiUrl).success(function(response) {
                     if (response.error) {
                         window.setTimeout(function() {
-                            _load(query, isReload, ++tries);
+                            _load(query, ++tries);
                         });
 
                         return;
@@ -884,7 +922,6 @@
                     }
 
                     if (hasActivities) {
-                        if (isReload) $el.threads.html('');
                         $$.publish('se.dataLoaded', response);
                         se.pagination.page++;
                         
@@ -910,7 +947,7 @@
                     }
 
                     window.setTimeout(function() {
-                        _load(query, isReload, ++tries);
+                        _load(query, ++tries);
                     });
                 });
             };
