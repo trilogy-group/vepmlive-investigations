@@ -324,7 +324,7 @@
     function addResourcesDlg_DialogEvent(action) { rpeditor.addResourcesDlg_DialogEvent(action); }
     function dialogEvent(action) { rpeditor.externalEvent(action); }
     function NotesDialogEvent(action) { rpeditor.NotesDialogEvent(action); }
-
+    amountCheck('idSpreadAmount');
     var params = {};
     try {
         params.ClientID = '<%=ClientID%>';
@@ -338,6 +338,33 @@
     }
     catch (e) {
         alert("RPEditor ascx Initialization : " + e.toString());
+    }
+
+    function amountCheck(txtID) {
+        $("[id='" + txtID + "']").keypress(function (event) {
+            var charCode = (event.which) ? event.which : event.keyCode;
+            if (event.which == 0)//common keys
+                return true;
+            var value = $(this).val();
+            if (charCode == 46 && value.indexOf('.') != -1)
+                return false;
+            else if (charCode != 46 && charCode > 31 && (charCode < 48 || charCode > 57))
+                return false;
+            return true;
+        });
+        $("[id='" + txtID + "']").keyup(function (event) {
+            var value = $(this).val();
+            if (value < 0 && value.indexOf('.') == -1) {
+                $(this).val('');
+            }
+        });
+        $("[id='" + txtID + "']").change(function (event) {
+            var value = $(this).val();
+            if (value.indexOf('.') == 0) {
+                value = '0' + value;
+                $(this).val(value);
+            }
+        });
     }
 
 </script>
