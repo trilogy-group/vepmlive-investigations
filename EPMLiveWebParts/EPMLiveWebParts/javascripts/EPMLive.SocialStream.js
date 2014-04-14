@@ -864,7 +864,7 @@
 
                 commentManager.configureBox({
                     element: $el.statusUpdateBox,
-                    placeholder: 'Share something...'
+                    placeholder: 'What are you working on?'
                 });
             }
 
