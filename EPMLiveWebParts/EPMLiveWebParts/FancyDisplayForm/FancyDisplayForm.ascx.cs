@@ -8,6 +8,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Globalization;
 using System.Text;
 using System.Web;
 using System.Web.UI;
@@ -194,7 +195,7 @@ namespace EPMLiveWebParts
                                     switch (field.Type)
                                     {
                                         case SPFieldType.DateTime:
-                                            FillDateDetailsSection(field.Title, field.GetFieldValueAsHtml(item[field.InternalName]));
+                                            FillDateDetailsSection(field.Title, GetFormattedDate(Convert.ToDateTime(Convert.ToString(item[field.InternalName]))));
                                             break;
                                         case SPFieldType.User:
                                             FillPeopleDetailsSection(field.Title, Convert.ToString(item[field.InternalName]));
@@ -231,7 +232,7 @@ namespace EPMLiveWebParts
                                         switch (field.Type)
                                         {
                                             case SPFieldType.DateTime:
-                                                FillDateDetailsSection(field.Title, field.GetFieldValueAsText(item[field.InternalName]));
+                                                FillDateDetailsSection(field.Title, GetFormattedDate(Convert.ToDateTime(Convert.ToString(item[field.InternalName]))));
                                                 break;
                                             case SPFieldType.User:
                                                 FillPeopleDetailsSection(field.Title, Convert.ToString(item[field.InternalName]));
@@ -259,7 +260,7 @@ namespace EPMLiveWebParts
                             switch (field.Type)
                             {
                                 case SPFieldType.DateTime:
-                                    FillDateDetailsSection(field.Title, field.GetFieldValueAsHtml(item[field.InternalName]));
+                                    FillDateDetailsSection(field.Title, GetFormattedDate(Convert.ToDateTime(Convert.ToString(item[field.InternalName]))));
                                     break;
                                 case SPFieldType.User:
                                     FillPeopleDetailsSection(field.Title, Convert.ToString(item[field.InternalName]));
@@ -783,5 +784,18 @@ namespace EPMLiveWebParts
         }
 
         #endregion
+
+        #region Other Methods
+
+        private string GetFormattedDate(DateTime dateTime)
+        {
+            return
+                dateTime.ToString(
+                    new CultureInfo((int)(SPContext.Current.Web.CurrentUser.RegionalSettings ?? SPContext.Current.Web.RegionalSettings).LocaleId).
+                        DateTimeFormat.ShortDatePattern);
+        }
+
+        #endregion
+
     }
 }
