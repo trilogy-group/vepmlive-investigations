@@ -64,10 +64,10 @@ namespace EPMLiveCore.API
                             //Prepare query to load list whether it is exists in Reporting database or not?!!
                             sqlGetListHeaders.Append("SELECT * FROM (");
                             foreach (EPMLiveCore.API.AssociatedListInfo item in arrAssociatedLists)
-                                sqlGetListHeaders.Append("SELECT '" + item.Title + "' ListName UNION ");
+                                sqlGetListHeaders.Append("SELECT '" + item.Title + "' ListID UNION ");
 
-                            sqlLists = sqlGetListHeaders.ToString().Substring(0, sqlGetListHeaders.ToString().Length - 6); //Removing last UNION keyword
-                            sqlLists = sqlLists + ") AssociatedItemList LEFT OUTER JOIN RPTList ON AssociatedItemList.ListName = RPTList.ListName";
+                            sqlLists = sqlGetListHeaders.ToString().Substring(0, sqlGetListHeaders.ToString().Length - 7); //Removing last UNION keyword
+                            sqlLists = sqlLists + ") AssociatedItemList LEFT OUTER JOIN RPTList ON AssociatedItemList.ListID = RPTList.RPTListId ORDER BY RPTList.ListName";
 
                             #endregion
 
@@ -274,10 +274,10 @@ namespace EPMLiveCore.API
                             //Prepare query to load list whether it is exists in Reporting database or not?!!
                             sqlGetListHeaders.Append("SELECT * FROM (");
                             foreach (EPMLiveCore.API.AssociatedListInfo item in arrAssociatedLists)
-                                sqlGetListHeaders.Append("SELECT '" + item.Title + "' ListName UNION ");
+                                sqlGetListHeaders.Append("SELECT '" + item.ListId + "' ListID UNION ");
 
-                            sqlLists = sqlGetListHeaders.ToString().Substring(0, sqlGetListHeaders.ToString().Length - 6); //Removing last UNION keyword
-                            sqlLists = sqlLists + ") AssociatedItemList LEFT OUTER JOIN RPTList ON AssociatedItemList.ListName = RPTList.ListName";
+                            sqlLists = sqlGetListHeaders.ToString().Substring(0, sqlGetListHeaders.ToString().Length - 7); //Removing last UNION keyword
+                            sqlLists = sqlLists + ") AssociatedItemList LEFT OUTER JOIN RPTList ON AssociatedItemList.ListID = RPTList.RPTListId ORDER BY RPTList.ListName";
 
                             #endregion
 
