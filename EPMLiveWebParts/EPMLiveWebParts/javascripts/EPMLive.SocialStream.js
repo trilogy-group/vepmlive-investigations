@@ -166,12 +166,23 @@
                     if (kind !== 'Workspace' && kind !== 'creatable') {
                         OpenCreateWebPageDialog(url);
                     } else if (kind === 'creatable') {
-                        var options = {
-                            url: url,
-                            dialogReturnValueCallback: Function.createCallback(Function.createDelegate(null, toolbarManager.handleCreationAction))
-                        };
+                        var ids = url.match(/listid=(.*?)$/i);
                         
-                        window.SP.UI.ModalDialog.showModalDialog(options);
+                        if (ids.length === 2) {
+                            var listInfo = {
+                                id: ids[1],
+                                url: window.epmLive.currentWebUrl + '/_layouts/15/epmlive/redirectionproxy.aspx?action=gotolist&webid=' + window.epmLive.currentWebId + '&listid=' + ids[1],
+                                name: $a.text(),
+                                icon: $a.parent().find('span').attr('class')
+                            };
+
+                            var options = {
+                                url: url,
+                                dialogReturnValueCallback: Function.createCallback(Function.createDelegate(null, toolbarManager.handleCreationAction), listInfo)
+                            };
+
+                            window.SP.UI.ModalDialog.showModalDialog(options);
+                        }
                     }
                 };
 
@@ -302,7 +313,7 @@
                         helpers.sortComments(thread.comments);
 
                         if (thread = build(thread, data)) {
-                            if (data.newStatusUpdate) $el.threads.prepend(templates.thread(thread));
+                            if (data.newItem) $el.threads.prepend(templates.thread(thread));
                             else $el.threads.append(templates.thread(thread));
                             $$.publish('se.threadRendered', thread, $el.threads.find(selector), data);
                         }
@@ -518,7 +529,7 @@
                             id: webId,
                             url: window.epmLive.currentWebUrl
                         }],
-                        newStatusUpdate: true,
+                        newItem: true,
                         disabled: true
                     };
 
@@ -597,7 +608,7 @@
                                         var _tries = 0;
                                         
                                         var tryReload = function(tries) {
-                                            if (tries > 10) return;
+                                            if (tries > 20) return;
                                             
                                             $.get(se.apiUrl + '/suid/' + ids[1] + '/' + ids[2] + '?v=' + new Date().getTime()).then(function (resp) {
                                                 if (resp.error) {
@@ -759,9 +770,61 @@
                     $el.toolbarItems.append(templates.toolbarItem(creatable));
                 };
 
-                var _handleCreationAction = function(result) {
+                var _handleCreationAction = function(result, target, listInfo) {
                     if (result === 1) {
-                        console.log('update thread');
+                        $.ajax({
+                            url: _spPageContextInfo.webAbsoluteUrl + "/_api/web/lists/getbyid('" + listInfo.id + "')/Items?$select=ID,Title,Created&$orderby=Created desc&$top=1",
+                            type: 'GET',
+                            headers: { accept: 'application/json;odata=verbose' },
+                        }).then(function(response) {
+                            if (response && response.d && response.d.results && response.d.results.length) {
+                                var item = response.d.results[0];
+
+                                var data = {
+                                    lists: [{
+                                        icon: listInfo.icon,
+                                        id: listInfo.id,
+                                        name: listInfo.name,
+                                        url: listInfo.url
+                                    }],
+                                    threads: [{
+                                        activities: [{
+                                            data: null,
+                                            id: new Date().getTime(),
+                                            isBulkOperation: false,
+                                            key: null,
+                                            kind: 'Created',
+                                            time: item.Created,
+                                            userId: window.epmLive.currentUserId
+                                        }],
+                                        comments: [],
+                                        firstActivityOn: item.Created,
+                                        id: new Date().getTime(),
+                                        itemId: item.ID,
+                                        kind: 'ListItem',
+                                        lastActivityOn: item.Created,
+                                        listId: listInfo.id,
+                                        title: item.Title,
+                                        totalActivities: 1,
+                                        totalComments: 0,
+                                        url: window.epmLive.currentWebUrl + '/_layouts/15/epmlive/redirectionproxy.aspx?action=view&webid=' + window.epmLive.currentWebId + '&listid=' + listInfo.id + '&id=' + item.ID,
+                                        webId: window.epmLive.currentWebId
+                                    }],
+                                    users: [{
+                                        displayName: window.epmLive.currentUserDisplayName,
+                                        id: window.epmLive.currentUserId,
+                                        picture: window.epmLive.currentUserAvatar
+                                    }],
+                                    webs: [{
+                                        id: window.epmLive.currentWebId,
+                                        url: window.epmLive.currentWebUrl
+                                    }],
+                                    newItem: true
+                                };
+
+                                $$.publish('se.dataLoaded', data);
+                            }
+                        });
                     }
                 };
 
