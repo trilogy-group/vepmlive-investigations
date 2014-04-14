@@ -877,6 +877,7 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
                     }
                     else {
                         $(".toolbar-search").css("margin-left", "0px");
+                        $(".toolbar-search").val('');
                     }
                 });
                 var spnImg = $(document.createElement('span'));

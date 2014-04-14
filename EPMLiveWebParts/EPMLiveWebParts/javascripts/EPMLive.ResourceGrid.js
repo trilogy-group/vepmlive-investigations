@@ -2173,9 +2173,6 @@ function registerEpmLiveResourceGridScript() {
                                     'events': [{
                                         'eventName': 'keypress',
                                         'function': function (e) {
-                                            if (e.keyCode == 13) {
-                                                alert('enter key pressed!');
-                                            }
                                         }
                                     }]
                                 },
