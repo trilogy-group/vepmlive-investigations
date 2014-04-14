@@ -132,9 +132,8 @@ WEDispFormPageComponent.PageComponent.prototype = {
 
                 var weburl = WEWebUrl + "/_layouts/epmlive/gridaction.aspx?action=GoToTaskPlanner&webid=" + WEWebId + "&listid=" + WEListId + "&id=" + WEItemId + "&Source=" + WESource;
 
-                if (document.location.href.toLowerCase().indexOf("&isdlg=1") > 0)
-                {
-                    window.open(weburl, '', config='width=' + screen.width + ',height=' + screen.height + ',top=0,left=0')
+                if (document.location.href.toLowerCase().indexOf("&isdlg=1") > 0) {
+                    window.open(weburl, '', config = 'width=' + screen.width + ',height=' + screen.height + ',top=0,left=0')
                 }
                 else
                     location.href = weburl;
@@ -158,7 +157,7 @@ WEDispFormPageComponent.PageComponent.prototype = {
         }
         else if (commandId === 'Ribbon.ListForm.Display.Actions.Favorite') {
             if (!($('a[id="Ribbon.ListItem.EPMLive.FavoriteStatus-Large"]').find('img').attr('src') === '_layouts/epmlive/images/star-filled32.png')) {
-                
+
                 var viewDiv = document.createElement('div');
                 viewDiv.innerHTML = '<div>' +
                                         '<div style="width: 250px; padding: 5px;"> Title:&nbsp;' +
@@ -184,8 +183,8 @@ WEDispFormPageComponent.PageComponent.prototype = {
                     }
                 };
 
-                SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options); 
-                
+                SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
+
                 //$(function () {
                 //    var myVar = setTimeout(function () { setFocus(); }, 100);
                 //    function setFocus() {
@@ -198,17 +197,17 @@ WEDispFormPageComponent.PageComponent.prototype = {
                 //        }
                 //    }
                 //});
-                
+
             } else {
                 window.Analytics.removeItemFav();
             }
         }
         else if (commandId === 'Ribbon.ListForm.Display.Manage.GoToWorkspace') {
             if (parent) {
-                parent.location.href = "gridaction.aspx?action=workspace&webid" + WEWebId;
+                parent.location.href = WEWebUrl + "/_layouts/epmlive/gridaction.aspx?action=workspace&webid=" + WEWebId + "&listid=" + WEListId + "&id=" + WEItemId;
             }
             else {
-                location.href = "gridaction.aspx?action=workspace&webid" + WEWebId;
+                location.href = WEWebUrl + "/_layouts/epmlive/gridaction.aspx?action=workspace&webid=" + WEWebId + "&listid=" + WEListId + "&id=" + WEItemId;
             }
         }
         else if (commandId === 'Ribbon.ListForm.Display.Manage.BuildTeam') {
@@ -237,10 +236,9 @@ WEDispFormPageComponent.PageComponent.prototype = {
         else if (commandId === 'Ribbon.ListForm.Display.Manage.EPKRPM') {
             this.epkmulti('rpeditor');
         }
-        else if (commandId === 'Ribbon.ListForm.Display.Manage.EPMINT')
-        {
+        else if (commandId === 'Ribbon.ListForm.Display.Manage.EPMINT') {
             OpenIntegrationPage(properties.SourceControlId.replace("EPMINT.", ""), WEListId, WEItemId);
-            
+
         }
         else {
             return handleCommand(commandId, properties, sequence);

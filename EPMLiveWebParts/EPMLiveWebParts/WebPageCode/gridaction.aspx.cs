@@ -368,7 +368,7 @@ namespace EPMLiveWebParts
                     {
                         case "buildteam":
                             w = site.OpenWeb(new Guid(Request["webid"]));
-                            url = ((w.ServerRelativeUrl == "/") ? "" : w.ServerRelativeUrl) + "/_layouts/epmlive/buildteam.aspx?listid=" + Request["listid"] + "&id=" + Request["id"];
+                            url = ((w.ServerRelativeUrl == "/") ? "" : w.ServerRelativeUrl) + "/_layouts/epmlive/People.aspx?listid=" + Request["listid"] + "&id=" + Request["id"];
                             w.Close();
                             break;
                         case "linkeditemspost":
@@ -747,7 +747,7 @@ namespace EPMLiveWebParts
                 }
                 try
                 {
-                    if(Request["isDlg"] == "1" || HttpContext.Current.Request.UrlReferrer.OriginalString.ToLower().Contains("&isdlg=1"))
+                    if (Request["action"].ToLower() != "workspace" && Request["isDlg"] == "1" || HttpContext.Current.Request.UrlReferrer.OriginalString.ToLower().Contains("&isdlg=1"))
                         url += "&IsDlg=1";
                 }
                 catch { }
