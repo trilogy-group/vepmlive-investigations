@@ -1916,7 +1916,14 @@ function registerEpmLiveResourceGridScript() {
                                     'events': [
                                         {
                                             'eventName': 'click',
-                                            'function': function () { $$.actions.displayPopUp($$.actions.getNewFormUrl, 'Add User', false, true, $$.grid.teamUpdated, { row: null, changeType: 'Added' },700,700); }
+                                            'function': function () {
+                                                if ($$.IsRootWeb && $$.ListId == "" && $$.ItemId == "") {
+                                                    $$.actions.displayPopUp($$.actions.getNewFormUrl, 'Add User', true, true, $$.grid.teamUpdated, { row: null, changeType: 'Added' });
+                                                }
+                                                else {
+                                                    $$.actions.displayPopUp($$.actions.getNewFormUrl, 'Add User', true, true, $$.grid.teamUpdated, { row: null, changeType: 'Added' }, 800, 700);
+                                                }
+                                            }
                                         }
                                     ]
                                 },
@@ -2550,7 +2557,7 @@ function registerEpmLiveResourceGridScript() {
                     window.SelectRibbonTab('Ribbon.ResourceGridTab', true);
                 SetGridSize();
             });
-            
+
         };
         //resize added
 
