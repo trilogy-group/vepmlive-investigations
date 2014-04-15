@@ -5556,13 +5556,13 @@ namespace EPMLiveWorkPlanner
                                 if (string.IsNullOrEmpty(statusColumnValue) ||
                                     (!selectedStatusColumnValues.Contains(statusColumnValue))) //Add Backlog Items to Left Panel
                                 {
-                                    sbItems.Append("<div class='sortable-item' data-siteid='" + oWeb.Site.ID + "' data-webid='" + oWeb.ID + "' data-listid='" + list.ID + "' data-itemid='" + Convert.ToString(row["ID"]) + "' data-userid='0' data-itemtitle='" + Convert.ToString(row["Title"]) + "' data-icon='' data-type='50' data-fstring='" + kanBanBoardName + "' data-fdate='' data-fint='" + Convert.ToString(row["F_INT"]) + "' id='" + Convert.ToString(row["ID"]) + "'>"); //sortable-item <div> started
+                                    sbItems.Append("<div class='sortable-item' data-siteid='" + oWeb.Site.ID + "' data-webid='" + oWeb.ID + "' data-listid='" + list.ID + "' data-itemid='" + Convert.ToString(row["ID"]) + "' data-userid='0' data-icon='' data-type='50' data-fstring='" + kanBanBoardName + "' data-fdate='' data-fint='" + Convert.ToString(row["F_INT"]) + "' id='" + Convert.ToString(row["ID"]) + "'>"); //sortable-item <div> started
                                     sbItems.Append("<div style='float:right;'><ul style='margin: 0px; width: 20px;'><li id='" + Convert.ToString(row["ID"]) + "' class='associateditemscontextmenu'><a data-itemid='" + Convert.ToString(row["ID"]) + "' data-listid='" + list.ID.ToString() + "' data-webid='" + oWeb.ID + "' data-siteid='" + oWeb.Site.ID + "'></a></li></ul></div>");
                                     foreach (string column in displayColumnsForSourceListData.Split(','))
                                     {
                                         if (!string.IsNullOrEmpty(column))
                                         {
-                                            string strFullText = Convert.ToString(row[column]);
+                                            string strFullText = System.Web.HttpUtility.HtmlEncode(Convert.ToString(row[column]));
                                             string strClass = "single";
                                             SPField spField = list.Fields.TryGetFieldByStaticName(column);
                                             if (spField != null && (spField.Type == SPFieldType.Text || spField.Type == SPFieldType.Note))
@@ -5617,14 +5617,14 @@ namespace EPMLiveWorkPlanner
                                             string currentProcessingStatus = Convert.ToString(row[statusFieldName]);
                                             if (currentProcessingStatus.Equals(status, StringComparison.InvariantCultureIgnoreCase))
                                             {
-                                                sbItems.Append("<div class='sortable-item' data-siteid='" + oWeb.Site.ID + "' data-webid='" + oWeb.ID + "' data-listid='" + list.ID + "' data-itemid='" + Convert.ToString(row["ID"]) + "' data-userid='0' data-itemtitle='" + Convert.ToString(row["Title"]) + "' data-icon='' data-type='50' data-fstring='" + kanBanBoardName + "' data-fdate='' data-fint='" + Convert.ToString(row["F_INT"]) + "' id='" + Convert.ToString(row["ID"]) + "'>"); //sortable-item <div> started
+                                                sbItems.Append("<div class='sortable-item' data-siteid='" + oWeb.Site.ID + "' data-webid='" + oWeb.ID + "' data-listid='" + list.ID + "' data-itemid='" + Convert.ToString(row["ID"]) + "' data-userid='0' data-icon='' data-type='50' data-fstring='" + kanBanBoardName + "' data-fdate='' data-fint='" + Convert.ToString(row["F_INT"]) + "' id='" + Convert.ToString(row["ID"]) + "'>"); //sortable-item <div> started
                                                 sbItems.Append("<div style='float:right;'><ul style='margin: 0px; width: 20px;'><li  id='" + Convert.ToString(row["ID"]) + "' class='associateditemscontextmenu'><a data-itemid='" + Convert.ToString(row["ID"]) + "' data-listid='" + list.ID.ToString() + "' data-webid='" + oWeb.ID + "' data-siteid='" + oWeb.Site.ID + "'></a></li></ul></div>");
 
                                                 foreach (string column in displayColumnsForSourceListData.Split(','))
                                                 {
                                                     if (!string.IsNullOrEmpty(column))
                                                     {
-                                                        string strFullText = Convert.ToString(row[column]);
+                                                        string strFullText = System.Web.HttpUtility.HtmlEncode(Convert.ToString(row[column]));
                                                         string strClass = "single";
                                                         SPField spField = list.Fields.TryGetFieldByStaticName(column);
                                                         if (spField != null && (spField.Type == SPFieldType.Text || spField.Type == SPFieldType.Note))
@@ -5681,7 +5681,6 @@ namespace EPMLiveWorkPlanner
             string listId = data.GetElementsByTagName("data-listid")[0].InnerText;
             string itemId = data.GetElementsByTagName("data-itemid")[0].InnerText;
             string userId = data.GetElementsByTagName("data-userid")[0].InnerText;
-            string itemTitle = data.GetElementsByTagName("data-itemtitle")[0].InnerText;
             string icon = data.GetElementsByTagName("data-icon")[0].InnerText;
             string type = data.GetElementsByTagName("data-type")[0].InnerText;
             string fString = data.GetElementsByTagName("data-fstring")[0].InnerText; //Name of the Board
@@ -5710,18 +5709,18 @@ namespace EPMLiveWorkPlanner
                             item.Update();
                         }
                         catch { }
-                    }
-                    web.AllowUnsafeUpdates = false;
 
-                    //Insert/Update Record to FRF list...
-                    SPSecurity.RunWithElevatedPrivileges(delegate()
-                                {
-                                    using (SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(web.Site.WebApplication.Id)))
+                        web.AllowUnsafeUpdates = false;
+
+                        //Insert/Update Record to FRF list...
+                        SPSecurity.RunWithElevatedPrivileges(delegate()
                                     {
-                                        cn.Open();
+                                        using (SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(web.Site.WebApplication.Id)))
+                                        {
+                                            cn.Open();
 
-                                        //Replace userId and Type fields after words...
-                                        string frfInsertUpdate = @"IF NOT EXISTS (SELECT 1 FROM FRF WHERE [SITE_ID]=@siteId AND [WEB_ID]=@webId AND [LIST_ID]=@listId AND [ITEM_ID]=@itemId AND [USER_ID]=@userId AND [Type]=@type)
+                                            //Replace userId and Type fields after words...
+                                            string frfInsertUpdate = @"IF NOT EXISTS (SELECT 1 FROM FRF WHERE [SITE_ID]=@siteId AND [WEB_ID]=@webId AND [LIST_ID]=@listId AND [ITEM_ID]=@itemId AND [USER_ID]=@userId AND [Type]=@type)
                                                                     BEGIN
 	                                                                    INSERT INTO FRF ([SITE_ID],[WEB_ID],[LIST_ID],[ITEM_ID],[USER_ID],[Title],[Icon],[Type],[F_String],[F_Date],[F_Int])
                                                                                 VALUES (@siteId, @webId, @listId, @itemId, @userId, @title, @icon, @type, @fString, @fDate, @dataIndexOfItem)
@@ -5738,24 +5737,26 @@ namespace EPMLiveWorkPlanner
                                                                         WHERE [SITE_ID]=@siteId AND [WEB_ID]=@webId AND [LIST_ID]=@listId AND [ITEM_ID]=@itemId AND [USER_ID]=@userId AND [Type]=@type 
                                                                     END";
 
-                                        SqlCommand cmd = new SqlCommand(frfInsertUpdate, cn);
-                                        cmd.Parameters.AddWithValue("@siteId", siteId);
-                                        cmd.Parameters.AddWithValue("@webId", webId);
-                                        cmd.Parameters.AddWithValue("@listId", listId);
-                                        cmd.Parameters.AddWithValue("@itemId", itemId);
-                                        cmd.Parameters.AddWithValue("@userId", USER_ID);
-                                        cmd.Parameters.AddWithValue("@title", itemTitle);
-                                        cmd.Parameters.AddWithValue("@icon", icon);
-                                        cmd.Parameters.AddWithValue("@type", TYPE);
-                                        cmd.Parameters.AddWithValue("@fString", fString);
-                                        cmd.Parameters.AddWithValue("@fDate", fDate);
-                                        cmd.Parameters.AddWithValue("@dataIndexOfItem", dataIndexOfItem);
-                                        cmd.Parameters.AddWithValue("@fInt", fInt);
+                                            SqlCommand cmd = new SqlCommand(frfInsertUpdate, cn);
+                                            cmd.Parameters.AddWithValue("@siteId", siteId);
+                                            cmd.Parameters.AddWithValue("@webId", webId);
+                                            cmd.Parameters.AddWithValue("@listId", listId);
+                                            cmd.Parameters.AddWithValue("@itemId", item.ID);
+                                            cmd.Parameters.AddWithValue("@userId", USER_ID);
+                                            cmd.Parameters.AddWithValue("@title", item.Title);
+                                            cmd.Parameters.AddWithValue("@icon", icon);
+                                            cmd.Parameters.AddWithValue("@type", TYPE);
+                                            cmd.Parameters.AddWithValue("@fString", fString);
+                                            cmd.Parameters.AddWithValue("@fDate", fDate);
+                                            cmd.Parameters.AddWithValue("@dataIndexOfItem", dataIndexOfItem);
+                                            cmd.Parameters.AddWithValue("@fInt", fInt);
 
-                                        cmd.ExecuteNonQuery();
-                                    }
+                                            cmd.ExecuteNonQuery();
+                                        }
 
-                                });
+                                    });
+
+                    }
 
                 }
             }
@@ -5932,13 +5933,13 @@ namespace EPMLiveWorkPlanner
         //                {
         //                    #region Load BackLog Status Items
 
-        //                    sbItems.Append("<div class='sortable-item' data-plugid='" + dtSourceListDataRows[props.KanBanStatusColumn].ToString().Replace(" ", "") + "' data-siteid='" + oWeb.Site.ID + "' data-webid='" + oWeb.ID + "' data-listid='" + list.ID + "' data-itemid='" + Convert.ToString(dtSourceListDataRows["ID"]) + "' data-userid='0' data-itemtitle='" + Convert.ToString(dtSourceListDataRows["Title"]) + "' data-icon='' data-type='50' data-fstring='" + kanBanBoardName + "' data-fdate='' data-fint='" + Convert.ToString(dtSourceListDataRows["F_INT"]) + "' id='" + Convert.ToString(dtSourceListDataRows["ID"]) + "'>");
+        //                    sbItems.Append("<div class='sortable-item' data-plugid='" + dtSourceListDataRows[props.KanBanStatusColumn].ToString().Replace(" ", "") + "' data-siteid='" + oWeb.Site.ID + "' data-webid='" + oWeb.ID + "' data-listid='" + list.ID + "' data-itemid='" + Convert.ToString(dtSourceListDataRows["ID"]) + "' data-userid='0' data-icon='' data-type='50' data-fstring='" + kanBanBoardName + "' data-fdate='' data-fint='" + Convert.ToString(dtSourceListDataRows["F_INT"]) + "' id='" + Convert.ToString(dtSourceListDataRows["ID"]) + "'>");
         //                    sbItems.Append("<div style='float:right;'><ul style='margin: 0px; width: 20px;'><li  id='" + Convert.ToString(dtSourceListDataRows["ID"]) + "' class='associateditemscontextmenu'><a data-itemid='" + Convert.ToString(dtSourceListDataRows["ID"]) + "' data-listid='" + list.ID.ToString() + "' data-webid='" + oWeb.ID + "' data-siteid='" + oWeb.Site.ID + "'></a></li></ul></div>");
         //                    foreach (string column in displayColumnsForSourceListData.Split(','))
         //                    {
         //                        if (!string.IsNullOrEmpty(column))
         //                        {
-        //                            string strFullText = Convert.ToString(dtSourceListDataRows[column]);
+        //                            string strFullText = string strFullText = System.Web.HttpUtility.HtmlEncode(Convert.ToString(dtSourceListDataRows[column]));
         //                            string strClass = "single";
         //                            SPField spField = list.Fields.TryGetFieldByStaticName(column);
         //                            if (spField != null && (spField.Type == SPFieldType.Text || spField.Type == SPFieldType.Note))

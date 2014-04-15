@@ -506,7 +506,7 @@
             var saveKanbanTile = function (ui, parentId, childId, datadraggedstatus, indexOfItem) {
                 if (ui.sender == null) {
                     $("#" + childId).fadeTo(10, 0.25);
-                    var data = '<DataXml><data-siteid>' + ui.item.attr("data-siteid") + '</data-siteid><data-webid>' + ui.item.attr("data-webid") + '</data-webid><data-listid>' + ui.item.attr("data-listid") + '</data-listid><data-itemid>' + ui.item.attr("data-itemid") + '</data-itemid><data-userid>' + ui.item.attr("data-userid") + '</data-userid><data-itemtitle>' + ui.item.attr("data-itemtitle") + '</data-itemtitle><data-icon>' + ui.item.attr("data-icon") + '</data-icon><data-type>' + ui.item.attr("data-type") + '</data-type><data-fstring>' + ui.item.attr("data-fstring") + '</data-fstring><data-fdate>' + ui.item.attr("data-fdate") + '</data-fdate><data-fint>' + ui.item.attr("data-fint") + '</data-fint><data-dragged-status>' + datadraggedstatus + '</data-dragged-status><data-index-of-item>' + indexOfItem + '</data-index-of-item></DataXml>';
+                    var data = '<DataXml><data-siteid>' + ui.item.attr("data-siteid") + '</data-siteid><data-webid>' + ui.item.attr("data-webid") + '</data-webid><data-listid>' + ui.item.attr("data-listid") + '</data-listid><data-itemid>' + ui.item.attr("data-itemid") + '</data-itemid><data-userid>' + ui.item.attr("data-userid") + '</data-userid><data-icon>' + ui.item.attr("data-icon") + '</data-icon><data-type>' + ui.item.attr("data-type") + '</data-type><data-fstring>' + ui.item.attr("data-fstring") + '</data-fstring><data-fdate>' + ui.item.attr("data-fdate") + '</data-fdate><data-fint>' + ui.item.attr("data-fint") + '</data-fint><data-dragged-status>' + datadraggedstatus + '</data-dragged-status><data-index-of-item>' + indexOfItem + '</data-index-of-item></DataXml>';
                     $.ajax({
                         type: "POST",
                         url: "<%=SPContext.Current.Web.ServerRelativeUrl%>/_vti_bin/WorkPlanner.asmx/Execute",
@@ -515,7 +515,8 @@
                         dataType: "json",
                         error: function (xhr, status, error) {
                             var err = eval("(" + xhr.responseText + ")");
-                            alert(err.Message);
+                            alert("Problem in saving item " + err.Message);
+                            loadKanBanBoard(selectedKanbanFilter1);
                         },
                         success: function (response) {
                             $("#" + childId).fadeTo(10, 1);
@@ -526,10 +527,6 @@
                                 $("#" + childId + " > div[id^='key']").html(datadraggedstatus);
                                 $("#" + childId + " > div[id^='key']").attr("title", datadraggedstatus);
                             }
-                        },
-                        error: function (response) {
-                            alert("Problem in saving item.");
-                            loadKanBanBoard(selectedKanbanFilter1);
                         }
                     });
                 }
