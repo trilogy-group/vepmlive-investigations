@@ -150,17 +150,6 @@ function SetGridSize(grid) {
         var height = GetPageHeight();
         var top = GetItemTop(outer);
 
-
-        var menuheight = 0;
-        try {
-            menuheight = document.getElementById("actionmenu" + gridid).offsetHeight;
-        } catch (e) { }
-
-        var pagerheight = 0;
-        try {
-            pagerheight = document.getElementById("pagetable" + gridid).offsetHeight;
-        } catch (e) { }
-
         //document.getElementById("griddiv" + gridid).style.height = (height - top) + "px";
         outer.style.height = (height - top - 35) + "px";
         //document.getElementById("MSOZoneCell_WebPart").style.height = "400px";
@@ -477,6 +466,8 @@ function GridHideShowSearch(grid) {
         sdiv.style.display = '';
     else
         sdiv.style.display = 'none';
+
+    SetGridSize(grid);
 }
 
 

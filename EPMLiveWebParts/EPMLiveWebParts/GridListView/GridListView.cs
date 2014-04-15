@@ -3262,7 +3262,13 @@ namespace EPMLiveWebParts
                 sHeight = "height: 100px;";
             }
 
-            
+
+            output.Write("<div id=\"divHead" + sFullGridId  + "\" style=\"display:inline-block;width:100%\">");
+
+            output.Write("<div id=\"leftUpperDiv\" style=\"float:left\">");
+            RenderSearch(output, web);
+            output.Write("</div>");
+            output.Write("<div id=\"rightUpperDiv\" style=\"float:right\">");
             output.Write("<table id=pagetable" + sFullGridId + "><tr><td>");
             if (view.RowLimit > 0)
             {
@@ -3278,7 +3284,9 @@ namespace EPMLiveWebParts
                 }
             }
 
-            RenderSearch(output, web);
+            output.Write("</div>");
+
+            output.WriteLine("</div>");
 
             output.Write("<div  width=\"100%\" id=\"loadinggrid" + sFullGridId + "\" align=\"center\">");
             //output.Write("<img src=\"_layouts/images/gears_anv4.gif\" style=\"vertical-align: middle;\"/> Loading Items...");
