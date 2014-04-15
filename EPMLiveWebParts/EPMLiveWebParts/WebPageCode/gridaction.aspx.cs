@@ -368,7 +368,7 @@ namespace EPMLiveWebParts
                     {
                         case "buildteam":
                             w = site.OpenWeb(new Guid(Request["webid"]));
-                            url = ((w.ServerRelativeUrl == "/") ? "" : w.ServerRelativeUrl) + "/_layouts/epmlive/People.aspx?listid=" + Request["listid"] + "&id=" + Request["id"];
+                            url = ((w.ServerRelativeUrl == "/") ? "" : w.ServerRelativeUrl) + "/_layouts/epmlive/buildteam.aspx?listid=" + Request["listid"] + "&id=" + Request["id"];
                             w.Close();
                             break;
                         case "linkeditemspost":
