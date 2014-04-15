@@ -4,7 +4,7 @@
 	<Cfg Undo='1' Paging='2' PageLength='30'/>
 	<Cfg ExportType='Expanded,Outline'/>
 	<Cfg ChildParts='0'/>
-	<Cfg PrintCols='1'/>
+	<Cfg PrintCols='2' PrintPrint='6'/>
 	<Cfg ExportCols='1'/>
 	<Cfg ShowDeleted='0' Calculated='0'/>
 	<Cfg FullId='0'/>
