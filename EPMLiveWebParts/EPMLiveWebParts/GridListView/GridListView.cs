@@ -1807,7 +1807,7 @@ namespace EPMLiveWebParts
 
         protected override void OnInit(EventArgs e)
         {
-            tb = new EPMLiveCore.TimeDebug("GridListView", Page.Request["debug"]);
+            tb = new EPMLiveCore.TimeDebug("GridListView", Page.Request["epmdebug"]);
         }
 
         protected override void OnLoad(EventArgs e)
@@ -2524,7 +2524,7 @@ namespace EPMLiveWebParts
             ArrayList arrLookups = new ArrayList();
 
             string AllGroupFields = "";
-
+            bool bFoundTitle = false;
             foreach (SPField field in list.Fields)
             {
 
@@ -2532,14 +2532,30 @@ namespace EPMLiveWebParts
                 {
                     if (!field.ShowInDisplayForm.HasValue || field.ShowInDisplayForm.Value)
                     {
-                        sl.Add(field.Title + field.InternalName, field);
-
-                        if (field.Type == SPFieldType.Lookup)
+                        if (getRealField(field).InternalName == "Title")
                         {
-                            arrLookups.Add(field);
+                            if (arrFields.Contains(field.InternalName))
+                            {
+                                bFoundTitle = true;
+                                sl.Add(field.Title + field.InternalName, field);
+                            }
+                        }
+                        else
+                        {
+                            sl.Add(field.Title + field.InternalName, field);
+
+                            if (field.Type == SPFieldType.Lookup)
+                            {
+                                arrLookups.Add(field);
+                            }
                         }
                     }
                 }
+            }
+
+            if (!bFoundTitle)
+            {
+                sl.Add("Title", list.Fields.GetFieldByInternalName("Title"));
             }
 
             AllGroupFields = AllGroupFields.Trim(',');
