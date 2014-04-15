@@ -485,7 +485,7 @@ BEGIN
 	set @list = REPLACE(@list, '' '', '''')
 	if @list = ''Resources'' 
 	begin
-		set @list = ''ResourcePool''
+		set @table = ''lstResourcePool''
 	end
 	else
 	begin
