@@ -1952,7 +1952,7 @@ namespace EPMLiveCore
             catch (Exception ex) { return ex.Message.ToString(); }
         }
 
-        public static string createSite(string title, string url, string template, string user, bool unique, bool toplink,
+        public static string createSite(string title,string description, string url, string template, string user, bool unique, bool toplink,
             SPWeb parentWeb, out Guid createdWebId, out string createdWebUrl, out string createdWebServerRelativeUrl, out string createdWebTitle)
         {
             createdWebId = Guid.Empty;
@@ -1982,7 +1982,7 @@ namespace EPMLiveCore
                 // unique. "OPEN" workspaces are different
                 // in that they have a owner (the workspace creator)
                 // and a "Everyone" group with contribute permission
-                var web = parentWeb.Webs.Add(finalTitle, finalTitle, "", 1033, template, true, false);
+                var web = parentWeb.Webs.Add(finalTitle, finalTitle, description, 1033, template, true, false);
 
                 createdWebId = web.ID;
                 createdWebUrl = web.Url;
@@ -2156,7 +2156,7 @@ namespace EPMLiveCore
             return exists;
         }
 
-        public static string CreateSiteFromItem(string title, string url, string template, string user, bool unique, bool toplink,
+        public static string CreateSiteFromItem(string title,string description ,string url, string template, string user, bool unique, bool toplink,
             SPWeb parentWeb, SPWeb itemWeb, Guid listId, int itemId, out Guid createdSiteId, out string createdWebUrl, out string createdWebRelativeUrl, out string createdWebTitle)
         {
             createdSiteId = Guid.Empty;
@@ -2183,7 +2183,7 @@ namespace EPMLiveCore
                 // in that they have a owner (the workspace creator)
                 // and a "Everyone" group with contribute permission
 
-                var web = parentWeb.Webs.Add(finalTitle, finalTitle, "", 1033, template, true, false);
+                var web = parentWeb.Webs.Add(finalTitle, finalTitle, description, 1033, template, true, false);
 
                 createdSiteId = web.ID;
                 createdWebUrl = web.Url;

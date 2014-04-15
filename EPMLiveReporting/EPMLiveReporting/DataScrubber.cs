@@ -43,6 +43,8 @@ namespace EPMLiveReportsAdmin
             rptWeb.Columns.Add(new DataColumn("WebId", typeof (Guid)));
             rptWeb.Columns.Add(new DataColumn("WebUrl", typeof (string)));
             rptWeb.Columns.Add(new DataColumn("WebTitle", typeof (string)));
+            rptWeb.Columns.Add(new DataColumn("WebDescription", typeof(string)));
+            rptWeb.Columns.Add(new DataColumn("WebOwnerId", typeof(int)));
 
             var listIdsTest = new DataTable();
             var rptWebTest = new DataTable();
@@ -99,7 +101,15 @@ namespace EPMLiveReportsAdmin
                             r["WebUrl"] = w.ServerRelativeUrl;
                             r["WebTitle"] = w.Title;
                         }
-
+                        r["WebDescription"] = w.Description;
+                        if (w.Author.ID == 1073741823)
+                        {
+                            r["WebOwnerId"] = 1;
+                        }
+                        else
+                        {
+                            r["WebOwnerId"] = w.Author.ID;
+                        }
                         #endregion
 
                         #region  POPULATE RPTWEBGROUPS
@@ -249,6 +259,8 @@ namespace EPMLiveReportsAdmin
                                 sbc.ColumnMappings.Add("WebId", "WebId");
                                 sbc.ColumnMappings.Add("WebUrl", "WebUrl");
                                 sbc.ColumnMappings.Add("WebTitle", "WebTitle");
+                                sbc.ColumnMappings.Add("WebDescription", "WebDescription");
+                                sbc.ColumnMappings.Add("WebOwnerId", "WebOwnerId");
                                 sbc.WriteToServer(rptWeb);
                                 sbc.Close();
                                 tx.Commit();

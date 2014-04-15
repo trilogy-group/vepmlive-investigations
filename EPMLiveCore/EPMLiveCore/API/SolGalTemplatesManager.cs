@@ -959,7 +959,7 @@ namespace EPMLiveCore.API
                     cEWeb.AllowUnsafeUpdates = true;
                     cEWeb.Update();
 
-                    err = CoreFunctions.createSite(siteTitle, siteUrl, templateName, siteOwnerName, uniquePermission, inheritTopLink, cEWeb,
+                    err = CoreFunctions.createSite(siteTitle, "", siteUrl, templateName, siteOwnerName, uniquePermission, inheritTopLink, cEWeb,
                         out createdWebId, out sCreatedWebUrl, out sCreatedWebRelativeUrl, out sCreatedWebTitle);
                 }
                 else
@@ -975,7 +975,7 @@ namespace EPMLiveCore.API
                                 tSite.RootWeb.AllowUnsafeUpdates = true;
                                 tWeb.Update();
 
-                                err = CoreFunctions.createSite(siteTitle, siteUrl, templateName, siteOwnerName, uniquePermission, inheritTopLink, tWeb,
+                                err = CoreFunctions.createSite(siteTitle, "", siteUrl, templateName, siteOwnerName, uniquePermission, inheritTopLink, tWeb,
                                         out createdWebId, out sCreatedWebUrl, out sCreatedWebRelativeUrl, out sCreatedWebTitle);
                             }
                         }
@@ -1007,7 +1007,7 @@ namespace EPMLiveCore.API
                     {
                         Guid neededFeatureId = new Guid(err.Substring(err.IndexOf("{") + 1).Split('}')[0]);
                         cSite.Features.Add(neededFeatureId, true);
-                        err = CoreFunctions.createSite(siteTitle, siteUrl, templateName, siteOwnerName, uniquePermission, inheritTopLink, parentWeb,
+                        err = CoreFunctions.createSite(siteTitle, "", siteUrl, templateName, siteOwnerName, uniquePermission, inheritTopLink, parentWeb,
                                 out createdWebId, out sCreatedWebUrl, out sCreatedWebRelativeUrl, out sCreatedWebTitle);
                         trys++;
                     }
