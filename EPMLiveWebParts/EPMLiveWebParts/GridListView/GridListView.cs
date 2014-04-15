@@ -1340,14 +1340,14 @@ namespace EPMLiveWebParts
                         ribbonExtensions.LoadXml("<Button Id=\"Ribbon.List.Datasheet.Save\" Sequence=\"10\" Command=\"DatasheetSave\" Image16by16=\"/_layouts/" + language + "/images/formatmap16x16.png\" Image16by16Top=\"-256\" Image16by16Left=\"0\" Image32by32=\"/_layouts/" + language + "/images/formatmap32x32.png\" Image32by32Top=\"-416\" Image32by32Left=\"-256\" LabelText=\"Save Items\" ToolTipTitle=\"Save Items\" ToolTipDescription=\"Save all items in grid.\" TemplateAlias=\"o1\"/>");
                         ribbon.RegisterDataExtension(ribbonExtensions.FirstChild, "Ribbon.List.Datasheet.Controls._children");
 
-                        if(newGridMode == "datasheet" || newGridMode == "grid" || newGridMode == "")
-                        {
-                            ribbonExtensions = new XmlDocument();
-                            ribbonExtensions.LoadXml("<Button Id=\"Ribbon.List.Datasheet.Print\" Sequence=\"10\" Command=\"PrintGrid\" Image16by16=\"/_layouts/epmlive/images/print.gif\" Image32by32=\"/_layouts/epmlive/images/printmenu.gif\" LabelText=\"Print\" ToolTipTitle=\"Print\" ToolTipDescription=\"\" TemplateAlias=\"o1\"/>");
-                            ribbon.RegisterDataExtension(ribbonExtensions.FirstChild, "Ribbon.List.Share.Controls._children");
-                        }
+                        //if(newGridMode == "datasheet" || newGridMode == "grid" || newGridMode == "")
+                        //{
+                        //    ribbonExtensions = new XmlDocument();
+                        //    ribbonExtensions.LoadXml("<Button Id=\"Ribbon.List.Datasheet.Print\" Sequence=\"10\" Command=\"PrintGrid\" Image16by16=\"/_layouts/epmlive/images/print.gif\" Image32by32=\"/_layouts/epmlive/images/printmenu.gif\" LabelText=\"Print\" ToolTipTitle=\"Print\" ToolTipDescription=\"\" TemplateAlias=\"o1\"/>");
+                        //    ribbon.RegisterDataExtension(ribbonExtensions.FirstChild, "Ribbon.List.Share.Controls._children");
+                        //}
 
-                        if(newGridMode == "gantt")
+                        //if(newGridMode == "gantt")
                         {
                             ribbonExtensions = new XmlDocument();
                             ribbonExtensions.LoadXml("<Button Id=\"Ribbon.List.Datasheet.Print\" Sequence=\"10\" Command=\"PrintGantt\" Image16by16=\"/_layouts/epmlive/images/print.gif\" Image32by32=\"/_layouts/epmlive/images/printmenu.gif\" LabelText=\"Print\" ToolTipTitle=\"Print\" ToolTipDescription=\"\" TemplateAlias=\"o1\"/>");
