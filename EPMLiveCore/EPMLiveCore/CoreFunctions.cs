@@ -816,27 +816,35 @@ namespace EPMLiveCore
 
         public static string GetScheduleStatusField(SPListItem ListItem)
         {
-            string ss = "green.gif";
+            string ss = "";
 
             int yellow = 0;
             int red = 30;
 
             try
             {
-                DateTime duedate = DateTime.Parse(ListItem["DueDate"].ToString());
-                DateTime today = DateTime.Now;
-                today = new DateTime(today.Year, today.Month, today.Day, 0, 0, 0);
-                duedate = new DateTime(duedate.Year, duedate.Month, duedate.Day, 0, 0, 0);
-
-                TimeSpan ts = today - duedate;
-
-                if (ts.TotalDays > red)
+                SPField oField = null;
+                try{
+                    oField = ListItem.ParentList.Fields.GetFieldByInternalName("DueDate");
+                }catch{}
+                if (oField != null)
                 {
-                    ss = "red.gif";
-                }
-                else if (ts.TotalDays > yellow)
-                {
-                    ss = "yellow.gif";
+                    ss = "green.gif";
+                    DateTime duedate = DateTime.Parse(ListItem[oField.Id].ToString());
+                    DateTime today = DateTime.Now;
+                    today = new DateTime(today.Year, today.Month, today.Day, 0, 0, 0);
+                    duedate = new DateTime(duedate.Year, duedate.Month, duedate.Day, 0, 0, 0);
+
+                    TimeSpan ts = today - duedate;
+
+                    if (ts.TotalDays > red)
+                    {
+                        ss = "red.gif";
+                    }
+                    else if (ts.TotalDays > yellow)
+                    {
+                        ss = "yellow.gif";
+                    }
                 }
             }
             catch { }
