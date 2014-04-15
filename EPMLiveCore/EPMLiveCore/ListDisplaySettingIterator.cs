@@ -541,7 +541,11 @@ namespace EPMLiveCore
                             {
                                 if (parentControl.Controls[i].GetType().ToString() == "Microsoft.SharePoint.WebControls.FormField")
                                 {
-                                    writer.Write(@"<img src=""/_layouts/images/" + CoreFunctions.GetScheduleStatusField(base.ListItem) + @""">");
+                                    string color = CoreFunctions.GetScheduleStatusField(base.ListItem);
+                                    if(color != "")
+                                        writer.Write(@"<img src=""/_layouts/images/" + color + @""">");
+                                    else
+                                        AddControlsToWriter(parentControl.Controls[i], writer, field.InternalName);
                                 }
                                 else
                                     AddControlsToWriter(parentControl.Controls[i], writer, field.InternalName);
