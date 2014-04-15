@@ -625,7 +625,8 @@ begin
 
 	print 'Updating Table INT_PROPS'
 
-
+	ALTER TABLE INT_PROPS
+	ALTER COLUMN [VALUE] [varchar](max) NULL
 end
 
 -------------------------INT_PROPS-----------------------

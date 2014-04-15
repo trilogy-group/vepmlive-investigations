@@ -1022,6 +1022,44 @@ end
 exec(@sql)
 ')
 
+if not exists (select routine_name from INFORMATION_SCHEMA.routines where routine_name = 'spTSGetMyApprovals')
+begin
+    Print 'Creating Stored Procedure spTSGetMyApprovals'
+    SET @createoralter = 'CREATE'
+end
+else
+begin
+    Print 'Updating Stored Procedure spTSGetMyApprovals'
+    SET @createoralter = 'ALTER'
+end
+exec(@createoralter + ' PROCEDURE [dbo].[spTSGetMyApprovals]
+
+@siteid uniqueidentifier,
+@periodid int,
+@resources varchar(MAX)
+
+AS
+BEGIN
+
+SELECT     dbo.TSTIMESHEET.TS_UID, dbo.TSTIMESHEET.RESOURCENAME, dbo.TSTIMESHEET.SUBMITTED, dbo.TSTIMESHEET.APPROVAL_STATUS, 
+                      dbo.TSTIMESHEET.APPROVAL_NOTES, dbo.TSUSER.USER_ID
+FROM         dbo.TSTIMESHEET INNER JOIN
+                      dbo.TSUSER ON dbo.TSTIMESHEET.TSUSER_UID = dbo.TSUSER.TSUSERUID
+WHERE     (dbo.TSTIMESHEET.PERIOD_ID = @periodid) and TSTIMESHEET.SITE_UID=@siteid and USER_ID in (select * from Split(@resources, '';#''))
+
+
+SELECT     dbo.TSITEMHOURS.TS_ITEM_DATE, SUM(dbo.TSITEMHOURS.TS_ITEM_HOURS) AS Hours, dbo.TSTIMESHEET.TS_UID, dbo.TSUSER.USER_ID
+FROM         dbo.TSTIMESHEET INNER JOIN
+                      dbo.TSITEM ON dbo.TSTIMESHEET.TS_UID = dbo.TSITEM.TS_UID INNER JOIN
+                      dbo.TSITEMHOURS ON dbo.TSITEM.TS_ITEM_UID = dbo.TSITEMHOURS.TS_ITEM_UID INNER JOIN
+                      dbo.TSUSER ON dbo.TSTIMESHEET.TSUSER_UID = dbo.TSUSER.TSUSERUID
+WHERE     (dbo.TSTIMESHEET.PERIOD_ID = @periodid) and TSTIMESHEET.SITE_UID=@siteid and USER_ID in (select * from Split(@resources, '';#''))
+GROUP BY dbo.TSITEMHOURS.TS_ITEM_DATE, dbo.TSTIMESHEET.TS_UID, USER_ID
+
+
+
+END
+')
 
 if not exists (select routine_name from INFORMATION_SCHEMA.routines where routine_name = 'spTSGetQueue')
 begin
