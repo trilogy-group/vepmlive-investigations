@@ -1338,7 +1338,7 @@ namespace EPMLiveWebParts
 
                         ribbonExtensions = new XmlDocument();
                         ribbonExtensions.LoadXml("<Button Id=\"Ribbon.List.Datasheet.Save\" Sequence=\"10\" Command=\"DatasheetSave\" Image16by16=\"/_layouts/" + language + "/images/formatmap16x16.png\" Image16by16Top=\"-256\" Image16by16Left=\"0\" Image32by32=\"/_layouts/" + language + "/images/formatmap32x32.png\" Image32by32Top=\"-416\" Image32by32Left=\"-256\" LabelText=\"Save Items\" ToolTipTitle=\"Save Items\" ToolTipDescription=\"Save all items in grid.\" TemplateAlias=\"o1\"/>");
-                        ribbon.RegisterDataExtension(ribbonExtensions.FirstChild, "Ribbon.List.Datasheet.Controls._children");
+                        ribbon.RegisterDataExtension(ribbonExtensions.FirstChild, "Ribbon.ListItem.Actions.Controls._children");
 
                         //if(newGridMode == "datasheet" || newGridMode == "grid" || newGridMode == "")
                         //{
@@ -1834,7 +1834,7 @@ namespace EPMLiveWebParts
                 }
                 catch { }
             }
-
+            HideListView();
             try
             {
 
@@ -4064,11 +4064,12 @@ namespace EPMLiveWebParts
 
             if (view.RowLimit > 0)
             {
-
+                output.Write("<table id=pagetable" + sFullGridId + "><tr><td>");
                 if(gSettings.EnableContentReporting)
                     output.Write("<div style=\"display:inline-block;margin:5px 0 5px 0;\"><div id=\"pagediv" + sFullGridId + "\"></div>");
                 else
                     output.Write("<div id=\"pagediv" + sFullGridId + "\" style=\"display:none;margin:5px 0 5px 0;\"><div id=\"PagePrevious" + sFullGridId + "\" style=\"height:18px;width:70px;border:1px solid #CACACA;float:left;padding-left:5px;background-color:#EFEFEF\" onClick=\"javascript:PreviousPage" + sFullGridId + "()\"><a href=\"javascript:void(0);\" style=\"text-decoration:none;color:#666\">&lt; Previous</a></div> <div id=\"PageNext" + sFullGridId + "\" style=\"height:18px;width:70px;border:1px solid #CACACA;float:left;margin-left:10px;padding-right:5px;text-align:right;background-color:#EFEFEF\" onClick=\"javascript:NextPage" + sFullGridId + "()\"><a style=\"text-decoration:none;color:#666\" href=\"javascript:void(0);\">Next &gt;</a></div></div>");
+                output.Write("</td></tr></table>");
             }
 
             output.Write("<div id=\"grid" + this.ID + "\" style=\"width:100%;display:none;\" class=\"ms-listviewtable\"></div>\r\n\r\n");
