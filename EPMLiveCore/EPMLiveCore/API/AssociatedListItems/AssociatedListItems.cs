@@ -67,7 +67,7 @@ namespace EPMLiveCore.API
                                 sqlGetListHeaders.Append("SELECT '" + item.Title + "' ListID UNION ");
 
                             sqlLists = sqlGetListHeaders.ToString().Substring(0, sqlGetListHeaders.ToString().Length - 7); //Removing last UNION keyword
-                            sqlLists = sqlLists + ") AssociatedItemList LEFT OUTER JOIN RPTList ON AssociatedItemList.ListID = RPTList.RPTListId ORDER BY RPTList.ListName";
+                            sqlLists = sqlLists + ") AssociatedItemList LEFT OUTER JOIN RPTList ON AssociatedItemList.ListID = RPTList.RPTListId where RPTListId is not null ORDER BY RPTList.ListName";
 
                             #endregion
 
@@ -277,7 +277,7 @@ namespace EPMLiveCore.API
                                 sqlGetListHeaders.Append("SELECT '" + item.ListId + "' ListID UNION ");
 
                             sqlLists = sqlGetListHeaders.ToString().Substring(0, sqlGetListHeaders.ToString().Length - 7); //Removing last UNION keyword
-                            sqlLists = sqlLists + ") AssociatedItemList LEFT OUTER JOIN RPTList ON AssociatedItemList.ListID = RPTList.RPTListId ORDER BY RPTList.ListName";
+                            sqlLists = sqlLists + ") AssociatedItemList LEFT OUTER JOIN RPTList ON AssociatedItemList.ListID = RPTList.RPTListId where RPTListId is not null ORDER BY RPTList.ListName";
 
                             #endregion
 
