@@ -185,7 +185,6 @@
     .fancyDisplayFormAssociatedItemsContextMenu {
         list-style: none;
         cursor: pointer;
-        position: absolute;
     }
 </style>
 
