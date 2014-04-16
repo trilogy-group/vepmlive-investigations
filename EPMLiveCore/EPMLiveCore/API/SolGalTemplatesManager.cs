@@ -1025,7 +1025,16 @@ namespace EPMLiveCore.API
                         sResultWebId = w.ID.ToString();
                         sResultWebUrl = w.Url;
 
-                        WorkspaceData.SendCompletedSignalsToDB(w.Site.ID, parentWeb, w.ID, w.ServerRelativeUrl, w.Title, "", "0");
+                        string creatorId;
+                        if (SPContext.Current.Web.CurrentUser.ID == 1073741823)
+                        {
+                            creatorId = "1";
+                        }
+                        else
+                        {
+                            creatorId = Convert.ToString(SPContext.Current.Web.CurrentUser.ID);
+                        }
+                        WorkspaceData.SendCompletedSignalsToDB(w.Site.ID, parentWeb, w.ID, w.ServerRelativeUrl, w.Title, creatorId, w.Description);
                         CacheStore.Current.RemoveCategory(new CacheStoreCategory(w).Navigation);
                         WorkspaceData.AddWsPermission(w.Site.ID, createdWebId);
 
