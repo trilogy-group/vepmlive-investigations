@@ -30,7 +30,7 @@
 
 <script id="epm-se-thread-template" type="text/x-handlebars-template">
     <li id="epm-se-thread-{{id}}" class="epm-se-thread clearfix">
-        <div class="epm-se-thread-header clearfix">
+        <div class="epm-se-thread-header">
             {{> user-avatar}}{{> thread-info}}{{> object-info}}
         </div>
         <ul class="epm-se-activities"></ul>
@@ -71,30 +71,36 @@
 </script>
 
 <script id="_epm-se-user-avatar-template" type="text/x-handlebars-template">
-    <div class="epm-se-user-avatar">
-        {{#if user.picture}}
-            <img src="{{user.picture}}" />
-        {{/if}}
+    <div class="epm-se-float-block">
+        <div class="epm-se-user-avatar">
+            {{#if user.picture}}
+                <img src="{{user.picture}}" />
+            {{/if}}
+        </div>
+    </div>
+</script>
+
+<script id="_epm-se-thread-info-template" type="text/x-handlebars-template">
+    <div class="epm-se-float-block">
+        <div class="epm-se-thread-info">{{> thread-icon}}{{> thread-title}}</div>
     </div>
 
 </script>
 
-<script id="_epm-se-thread-info-template" type="text/x-handlebars-template">
-    <div class="epm-se-thread-info clearfix">{{> thread-icon}}{{> thread-title}}</div>
-</script>
-
 <script id="_epm-se-thread-icon-template" type="text/x-handlebars-template">
-    <span class="epm-se-thread-icon {{icon}}"></span>
+    <div class="epm-se-float-block"><span class="epm-se-thread-icon {{icon}}"></span></div>
 </script>
 
 <script id="_epm-se-thread-title-template" type="text/x-handlebars-template">
-    <h2>
-        {{#if url}}
-            <a href="{{url}}" class="epm-se-link" target="_blank" data-kind="{{kind}}">{{title}}</a>
-        {{else}}
-            {{{title}}}
-        {{/if}}
-    </h2>
+    <div class="epm-se-float-block">
+        <h2>
+            {{#if url}}
+                <a href="{{url}}" class="epm-se-link" target="_blank" data-kind="{{kind}}">{{title}}</a>
+            {{else}}
+                {{{title}}}
+            {{/if}}
+        </h2>
+    </div>
 </script>
 
 <script id="_epm-se-activity-icon-template" type="text/x-handlebars-template">
@@ -116,14 +122,16 @@
 </script>
 
 <script id="_epm-se-object-info-template" type="text/x-handlebars-template">
-    <span class="epm-se-object-info">
-        {{#if web}}
-            <span class="epm-se-workspace"><a href="{{web.url}}" target="_blank">{{web.title}}</a></span>
-        {{/if}}
-        {{#if list}}
-            <a href="{{list.url}}" target="_blank" class="epm-se-link">{{list.name}}</a>
-        {{/if}}
-    </span>
+    <div class="epm-se-float-block">
+        <span class="epm-se-object-info">
+            {{#if web}}
+                <span class="epm-se-workspace"><a href="{{web.url}}" target="_blank">{{web.title}}</a></span>
+            {{/if}}
+            {{#if list}}
+                <a href="{{list.url}}" target="_blank" class="epm-se-link">{{list.name}}</a>
+            {{/if}}
+        </span>
+    </div>
 </script>
 
 <script id="_epm-se-comment-box-template" type="text/x-handlebars-template">
