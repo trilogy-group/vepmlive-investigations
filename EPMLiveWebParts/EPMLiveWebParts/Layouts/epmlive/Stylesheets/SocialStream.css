@@ -216,7 +216,7 @@
 #epm-social-stream li.epm-se-thread div.epm-se-comments li.epm-se-comment div.epm-se-comment-details {
   display: table-cell;
   float: none;
-  vertical-align: top;
+  vertical-align: top !important;
 }
 #epm-social-stream li.epm-se-disabled div.epm-se-overlay {
   background-color: #ffffff;
