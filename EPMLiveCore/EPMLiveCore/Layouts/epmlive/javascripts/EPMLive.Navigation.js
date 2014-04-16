@@ -2106,10 +2106,11 @@
 
                             if (forcePopup) {
                                 cmd.kind = 0;
-                        }
+                            }
+                            
                             if (customOverrideKind) {
                                 cmd.kind = customOverrideKind;
-                        }
+                            }
 
                             var webId = $ca.data('webid');
 

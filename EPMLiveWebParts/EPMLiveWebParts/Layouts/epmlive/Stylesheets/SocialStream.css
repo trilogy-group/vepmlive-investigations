@@ -296,7 +296,7 @@
 }
 #epm-social-stream div#epm-se-toolbar h3,
 #epm-social-stream div#epm-se-toolbar ul#epm-se-toolbar-items {
-  float: left;
+  display: table-cell;
 }
 #epm-social-stream div#epm-se-toolbar h3 {
   font-size: 13px;
