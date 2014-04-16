@@ -24,7 +24,7 @@
                 },
                 apiUrl: '/' + baseUrl + '/_vti_bin/SocialEngine.svc',
                 commentServiceUrl: '/' + baseUrl + '/_layouts/15/epmlive/CommentsProxy.aspx',
-                statusUpdateServiceUrl: '/' + baseUrl + '/_vti_bin/WorkEngine.asmx/Execute',
+                statusUpdateServiceUrl: '/' + baseUrl + '/_vti_bin/WorkEngine.asmx/Execute'
             };
 
             var $el = {

@@ -1,0 +1,130 @@
+﻿@font: "Open Sans Regular", Helvetica, Arial;
+@font-bold: "Open Sans Semi Bold", Helvetica, Arial;
+@font-light: "Open Sans Light", Helvetica, Arial;
+@text-color: #555555;
+@list-width: 40%;
+@border-color: #DDDDDD;
+
+#epm-se-logs {
+    font-family: @font !important;
+    color: @text-color;
+
+    #epm-se-log-list,
+    #epm-se-log-details {
+        width: @list-width;
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        overflow-y: auto;
+    }
+
+    #epm-se-log-details {
+        width: 100 - @list-width;
+        left: @list-width;
+        overflow: auto;
+
+        div.epm-se-header {
+            border-bottom: 1px solid @border-color;
+            margin-left: 15px;
+            margin-right: 15px;
+            margin-top: 5px;
+            padding-bottom: 5px;
+
+            span, h1 {
+                display: table-cell;
+            }
+
+            span {
+                font-size: 1.7em;
+            }
+
+            h1 {
+                font-size: 2em;
+                padding-left: 10px;
+            }
+        }
+
+        div.epm-se-details {
+            margin: 10px;
+
+            table {
+                width: 100%;
+                border-spacing: 0;
+
+                td {
+                    padding-bottom: 5px;
+                }
+
+                tr.epm-se-seperator {
+                    td {
+                        border-bottom: 1px solid @border-color;
+                        margin-bottom: 10px;
+                        padding-bottom: 10px;
+                    }
+                }
+
+                tr.epm-se-raw {
+                    td.epm-se-title {
+                        padding-top: 5px;
+                        vertical-align: top;
+                    }
+
+                    pre {
+                        margin: 0;
+                    }
+                }
+
+                td.epm-se-title {
+                    padding: 0 10px;
+                    text-align: right;
+                    width: 1px;
+                    font-family: @font-bold !important;
+                }
+            }
+        }
+    }
+
+    #epm-se-log-list {
+        ul {
+            list-style: none outside none;
+            margin: 10px 15px;
+            padding: 0;
+
+            li {
+                border-bottom: 1px solid #F6F6F6;
+                cursor: pointer;
+                line-height: 20px;
+                overflow: hidden;
+                padding: 5px;
+                -ms-text-overflow: ellipsis;
+                -o-text-overflow: ellipsis;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+
+                span.epm-se-icon {
+                    margin-right: 10px;
+                }
+            }
+
+            li.epm-se-active {
+                background-color: #F6F6F6;
+            }
+        }
+    }
+
+    div.epm-se-message {
+        background-color: rgba(255, 216, 0, 0.50);
+        padding: 10px;
+        border-radius: 3px;
+        display: none;
+    }
+
+    span.icon-info-2 {
+        color: #0090CA;
+    }
+
+    span.icon-warning-2 {
+        color: #f35656;
+    }
+}
