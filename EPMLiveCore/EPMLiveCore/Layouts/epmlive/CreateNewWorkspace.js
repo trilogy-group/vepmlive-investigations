@@ -310,7 +310,7 @@
             if ($('#hdnSiteUrl').val() == $('#hdnSiteName').val()) {
                 // detect alpha
                 if (e.keyCode >= 65 && e.keyCode <= 90) {
-                    var cleanVal = $(this).val().replace(/[^a-zA-Z 0-9]+/g, '').replace(/\s/g, '');
+                    var cleanVal = $(this).val().replace(/[^a-zA-Z 0-9]+/g, '');//.replace(/\s/g, '');
                     $('#hdnSiteUrl').val(cleanVal);
                     $('#hdnSiteName').val(cleanVal);
                     $('#' + urlBoxId).val($('#hdnSiteUrl').val());
@@ -318,7 +318,7 @@
                 // detect numpad #
                 else if (e.keyCode != 16 && e.keyCode != 17 && !e.shiftKey &&
                          e.keyCode >= 96 && e.keyCode <= 105) {
-                    var cleanVal = $(this).val().replace(/[^a-zA-Z 0-9]+/g, '').replace(/\s/g, '');
+                    var cleanVal = $(this).val().replace(/[^a-zA-Z 0-9]+/g, '');//.replace(/\s/g, '');
                     $('#hdnSiteUrl').val(cleanVal);
                     $('#hdnSiteName').val(cleanVal);
                     $('#' + urlBoxId).val($('#hdnSiteUrl').val());
@@ -327,7 +327,7 @@
                 else if (e.keyCode != 16 && e.keyCode != 17 && !e.shiftKey &&
                          e.keyCode >= 48 && e.keyCode <= 57) {
 
-                    var cleanVal = $(this).val().replace(/[^a-zA-Z 0-9]+/g, '').replace(/\s/g, '');
+                    var cleanVal = $(this).val().replace(/[^a-zA-Z 0-9]+/g, '');//.replace(/\s/g, '');
                     $('#hdnSiteUrl').val(cleanVal);
                     $('#hdnSiteName').val(cleanVal);
                     $('#' + urlBoxId).val($('#hdnSiteUrl').val());
@@ -335,21 +335,21 @@
                 }
                 // detect spacebar
                 else if (e.keyCode == 32) {
-                    var cleanVal = $(this).val().replace(/[^a-zA-Z 0-9]+/g, '').replace(/\s/g, '');
+                    var cleanVal = $(this).val().replace(/[^a-zA-Z 0-9]+/g, '');//.replace(/\s/g, '');
                     $('#hdnSiteUrl').val(cleanVal);
                     $('#hdnSiteName').val(cleanVal);
                     $('#' + urlBoxId).val($('#hdnSiteUrl').val());
                 }
                 // detect underscore
                 else if (e.keyCode == 189 && e.shiftKey) {
-                    var cleanVal = $(this).val().replace(/[^a-zA-Z 0-9]+/g, '').replace(/\s/g, '');
+                    var cleanVal = $(this).val().replace(/[^a-zA-Z 0-9]+/g, '');//.replace(/\s/g, '');
                     $('#hdnSiteUrl').val(cleanVal);
                     $('#hdnSiteName').val(cleanVal);
                     $('#' + urlBoxId).val($('#hdnSiteUrl').val());
                 }
                 // detect delete
                 else if (e.keyCode == 8) {
-                    var cleanVal = $(this).val().replace(/[^a-zA-Z 0-9]+/g, '').replace(/\s/g, '');
+                    var cleanVal = $(this).val().replace(/[^a-zA-Z 0-9]+/g, '');//.replace(/\s/g, '');
                     $('#hdnSiteUrl').val(cleanVal);
                     $('#hdnSiteName').val(cleanVal);
                     $('#' + urlBoxId).val($('#hdnSiteUrl').val());
@@ -361,7 +361,7 @@
             if ($('#hdnSiteUrl').val() == $('#hdnSiteName').val()) {
                 // detect alpha
                 if (e.keyCode >= 65 && e.keyCode <= 90) {
-                    var cleanVal = $(this).val().replace(/[^a-zA-Z 0-9]+/g, '').replace(/\s/g, '');
+                    var cleanVal = $(this).val().replace(/[^a-zA-Z 0-9]+/g, '');//.replace(/\s/g, '');
                     $('#hdnSiteUrl').val(cleanVal);
                     $('#hdnSiteName').val(cleanVal);
                     $('#tbNewWorkSpaceName').val($('#hdnSiteName').val());
@@ -369,7 +369,7 @@
                 // detect numpad #
                 else if (e.keyCode != 16 && e.keyCode != 17 && !e.shiftKey &&
                          e.keyCode >= 96 && e.keyCode <= 105) {
-                    var cleanVal = $(this).val().replace(/[^a-zA-Z 0-9]+/g, '').replace(/\s/g, '');
+                    var cleanVal = $(this).val().replace(/[^a-zA-Z 0-9]+/g, '');//.replace(/\s/g, '');
                     $('#hdnSiteUrl').val(cleanVal);
                     $('#hdnSiteName').val(cleanVal);
                     $('#tbNewWorkSpaceName').val($('#hdnSiteName').val());
@@ -378,7 +378,7 @@
                 else if (e.keyCode != 16 && e.keyCode != 17 && !e.shiftKey &&
                          e.keyCode >= 48 && e.keyCode <= 57) {
 
-                    var cleanVal = $(this).val().replace(/[^a-zA-Z 0-9]+/g, '').replace(/\s/g, '');
+                    var cleanVal = $(this).val().replace(/[^a-zA-Z 0-9]+/g, '');//.replace(/\s/g, '');
                     $('#hdnSiteUrl').val(cleanVal);
                     $('#hdnSiteName').val(cleanVal);
                     $('#tbNewWorkSpaceName').val($('#hdnSiteName').val());
@@ -386,21 +386,21 @@
                 }
                 // detect spacebar
                 else if (e.keyCode == 32) {
-                    var cleanVal = $(this).val().replace(/[^a-zA-Z 0-9]+/g, '').replace(/\s/g, '');
+                    var cleanVal = $(this).val().replace(/[^a-zA-Z 0-9]+/g, '');//.replace(/\s/g, '');
                     $('#hdnSiteUrl').val(cleanVal);
                     $('#hdnSiteName').val(cleanVal);
                     $('#tbNewWorkSpaceName').val($('#hdnSiteName').val());
                 }
                 // detect underscore
                 else if (e.keyCode == 189 && e.shiftKey) {
-                    var cleanVal = $(this).val().replace(/[^a-zA-Z 0-9]+/g, '').replace(/\s/g, '');
+                    var cleanVal = $(this).val().replace(/[^a-zA-Z 0-9]+/g, '');//.replace(/\s/g, '');
                     $('#hdnSiteUrl').val(cleanVal);
                     $('#hdnSiteName').val(cleanVal);
                     $('#tbNewWorkSpaceName').val($('#hdnSiteName').val());
                 }
                 // detect delete
                 else if (e.keyCode == 8) {
-                    var cleanVal = $(this).val().replace(/[^a-zA-Z 0-9]+/g, '').replace(/\s/g, '');
+                    var cleanVal = $(this).val().replace(/[^a-zA-Z 0-9]+/g, '');//.replace(/\s/g, '');
                     $('#hdnSiteUrl').val(cleanVal);
                     $('#hdnSiteName').val(cleanVal);
                     $('#tbNewWorkSpaceName').val($('#hdnSiteName').val());
@@ -1146,7 +1146,7 @@
         var createNewFrom = $('#hdnCreateNewFrom').val();
         var siteTitle = $('#tbNewWorkSpaceName').val().trim();
         var siteUrl = $('#' + urlBoxId).val().trim().replace(/[^a-zA-Z 0-9]+/g, '');
-        siteUrl = siteUrl.replace(/\s/g, '');
+       // siteUrl = siteUrl.replace(/\s/g, '');
         var templateId = $('#hdnTemplateId').val();
         var parentWebUrl = $('#hdnParentWebUrl').val();
 
@@ -1362,7 +1362,7 @@
         var siteTitle = $('#tbNewWorkSpaceName').val(); //.trim().replace(/[^a-zA-Z 0-9]+/g, '');
         //siteTitle = siteTitle.replace(/\s/g, '');
         var siteUrl = $('#' + urlBoxId).val().trim().replace(/[^a-zA-Z 0-9]+/g, '');
-        siteUrl = siteUrl.replace(/\s/g, '');
+       // siteUrl = siteUrl.replace(/\s/g, '');
         var templateId = $('#hdnTemplateId').val();
         var parentWebUrl = $('#hdnParentWebUrl').val();
 
