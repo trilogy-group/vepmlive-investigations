@@ -635,7 +635,7 @@ namespace EPMLiveWebParts
                                 else if (!string.IsNullOrEmpty(imageUrl) && imageUrl.Contains(", "))
                                     sbPeopleDetailsContent.Append("<img alt='' src='" + imageUrl.Remove(imageUrl.IndexOf(", ")) + "' class='dispFormUserImage' /></td>");
                                 else
-                                    sbPeopleDetailsContent.Append("<img alt='' src='" + SPContext.Current.Web.Url + "/_layouts/epmlive/images/User.png' class='dispFormUserImage' /></td>");
+                                    sbPeopleDetailsContent.Append("<img alt='' src='" + SPContext.Current.Web.Url + "/_layouts/epmlive/images/defaultprofilepic.png' class='dispFormUserImage' /></td>");
 
                                 sbPeopleDetailsContent.Append("<td style='vertical-align: middle'>");
                                 sbPeopleDetailsContent.Append("<a class='ms-subtleLink' onclick='GoToLinkOrDialogNewWindow(this);return false;' href='" + SPContext.Current.Web.Url + "/_layouts/15/userdisp.aspx?ID=" + userID + "'>" + userName + "</a>" + "&nbsp;&nbsp;</td>");
@@ -657,7 +657,7 @@ namespace EPMLiveWebParts
                                 else if (!string.IsNullOrEmpty(imageUrl) && imageUrl.Contains(", "))
                                     sbPeopleDetailsShowAllRegion.Append("<img alt='' src='" + imageUrl.Remove(imageUrl.IndexOf(", ")) + "' class='dispFormUserImage' /></td>");
                                 else
-                                    sbPeopleDetailsShowAllRegion.Append("<img alt='' src='" + SPContext.Current.Web.Url + "/_layouts/epmlive/images/User.png' class='dispFormUserImage' /></td>");
+                                    sbPeopleDetailsShowAllRegion.Append("<img alt='' src='" + SPContext.Current.Web.Url + "/_layouts/epmlive/images/defaultprofilepic.png' class='dispFormUserImage' /></td>");
 
                                 sbPeopleDetailsShowAllRegion.Append("<td style='vertical-align: middle'>");
                                 sbPeopleDetailsShowAllRegion.Append("<a class'ms-subtleLink' onclick='GoToLinkOrDialogNewWindow(this);return false;' href='" + SPContext.Current.Web.Url + "/_layouts/15/userdisp.aspx?ID=" + userID + "'>" + userName + "</a>" + "&nbsp;&nbsp;</td>");
