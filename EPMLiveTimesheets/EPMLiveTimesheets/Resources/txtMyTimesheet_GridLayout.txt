@@ -1,8 +1,8 @@
 <Grid>
-	<Cfg Code="GTACCNPSQEBSLC" Version="4.0" />
+	<Cfg Code="GTACCNPSQEBSLC" Version="4.0"  NoVScroll="0"/>
 	<Cfg SuppressCfg="1"  Style="GM"  CSS="/_layouts/15/epmlive/treegrid/grid/grid.min.css"/>
 	<Cfg MainCol="Title" NameCol="Title" />
-	<Cfg ConstHeight="0" ConstWidth="1" NoVScroll ="1"/>
+	<Cfg ConstWidth="1" />
 	<Cfg Undo="0" />
 	<Cfg NumberId="1" FullId="0" IdChars="1234567890" AddFocusCol="Title" SortIcons="1"/>
 	<Cfg Searching="1" />
@@ -13,7 +13,7 @@
 		<D GroupEmpty="0" Name="R" Calculated="1" Wrap="0" HoverCell="0" HoverRow="Class" FocusCell="Border" FocusRow="0" ShowHint="0" NoColorState="1" CanEdit="0" CalcOrder="TSTotals,Progress,ProgressHtmlPrefix"  CanSelect="1"/>
 		<D TitleGroupEmpty="0" GroupEmpty="0" Name="Group" Calculated="1" CanFilter="2" Class="TSBold" CalcOrder="TSTotals" Expanded="1" />
 
-		<D Name="Resource" Expanded="0" ProgressFormula="" ProgressHtmlPrefixFormula="" ProgressType="Html" CanSelect="1"/>
+		<D Name="Resource" Expanded="0" ProgressFormula="" ProgressHtmlPrefixFormula="" ProgressType="Html" CanSelect="1" Class="TSBold"/>
 	</Def>
 	<Toolbar Visible="0" CanHide="0" />
 	<Panel Delete="0" Visible="0" CanHide="0" />

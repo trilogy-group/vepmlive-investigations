@@ -1527,6 +1527,99 @@ namespace TimeSheets
 
         }
 
+        private static string getFormat(SPField oField, XmlDocument oDoc, SPWeb oWeb)
+        {
+            string format = "";
+
+            switch (oField.Type)
+            {
+                case SPFieldType.DateTime:
+                    try
+                    {
+
+                        if (oDoc.FirstChild.Attributes["Format"].Value == "DateOnly")
+                        {
+                            format = System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.ShortDatePattern;
+                        }
+                        else
+                        {
+                            format = System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.FullDateTimePattern;
+                        }
+                    }
+                    catch { }
+                    break;
+                case SPFieldType.Number:
+                    if (oDoc.FirstChild.Attributes["Percentage"] != null && oDoc.FirstChild.Attributes["Percentage"].Value.ToLower() == "true")
+                    {
+                        format = "0\\%;0\\%;0\\%";
+                    }
+                    else
+                    {
+                        int decCount = 0;
+                        string decimals = "";
+                        try
+                        {
+                            decCount = int.Parse(oDoc.FirstChild.Attributes["Decimals"].Value);
+                        }
+                        catch { }
+
+                        for (int i = 0; i < decCount; i++)
+                        {
+                            decimals += "0";
+                        }
+
+                        if (decCount > 0)
+                            decimals = "." + decimals;
+
+                        format = ",0" + decimals;
+                        break;
+                    }
+                    break;
+                case SPFieldType.Currency:
+                    SPFieldCurrency c = (SPFieldCurrency)oField;
+                    System.Globalization.NumberFormatInfo nInfo = System.Globalization.CultureInfo.GetCultureInfo(c.CurrencyLocaleId).NumberFormat;
+                    format = nInfo.CurrencySymbol + nInfo.CurrencyGroupSeparator + "0" + nInfo.CurrencyDecimalSeparator + "00";
+                    break;
+                case SPFieldType.Calculated:
+                    switch (oDoc.FirstChild.Attributes["ResultType"].Value)
+                    {
+                        case "Currency":
+                            format = oWeb.Locale.NumberFormat.CurrencySymbol + ",0.00";
+                            break;
+                        case "Number":
+                            if (oDoc.FirstChild.Attributes["Percentage"] != null && oDoc.FirstChild.Attributes["Percentage"].Value.ToLower() == "true")
+                            {
+                                format = "0\\%;0\\%;0\\%";
+                            }
+                            else
+                            {
+                                int decCount = 0;
+                                string decimals = "";
+                                try
+                                {
+                                    decCount = int.Parse(oDoc.FirstChild.Attributes["Decimals"].Value);
+                                }
+                                catch { }
+
+                                for (int i = 0; i < decCount; i++)
+                                {
+                                    decimals += "0";
+                                }
+
+                                if (decCount > 0)
+                                    decimals = "." + decimals;
+
+                                format = ",0" + decimals;
+                            }
+                            break;
+                    };
+                    break;
+
+            };
+
+            return format;
+        }
+
         private static void PopulateTimesheetGridLayout(SPWeb web, ref XmlDocument docLayout, TimesheetSettings settings, ref int MidWidth, Dictionary<string, string> viewInfo, bool isWork, string InputList)
         {
 
@@ -1607,21 +1700,17 @@ namespace TimeSheets
                         attr1.Value = iGetFieldAlign(field);
                         ndCol.Attributes.Append(attr1);
 
-                        if (field.Type == SPFieldType.Number && ((SPFieldNumber)field).ShowAsPercentage)
+
+                        XmlDocument oDoc = new XmlDocument();
+                        oDoc.LoadXml(field.SchemaXml);
+                        string format = getFormat(field, oDoc, web);
+                        if (format != "")
                         {
-                            if (sFieldType == "Int")
-                            {
-                                attr1 = docLayout.CreateAttribute("Format");
-                                attr1.Value = @"0";
-                                ndCol.Attributes.Append(attr1);
-                            }
-                            else if (sFieldType == "Float")
-                            {
-                                attr1 = docLayout.CreateAttribute("Format");
-                                attr1.Value = @"0.00";
-                                ndCol.Attributes.Append(attr1);
-                            }
+                            attr1 = docLayout.CreateAttribute("Format");
+                            attr1.Value = format;
+                            ndCol.Attributes.Append(attr1);
                         }
+                        
 
                         if (sFieldType == "Enum")
                         {
@@ -2052,7 +2141,7 @@ namespace TimeSheets
             {
                 foreach (SPField field in lstMyWork.Fields)
                 {
-                    if (field.Type == SPFieldType.Lookup)
+                    if (field.Type == SPFieldType.Lookup || field.Type == SPFieldType.User)
                     {
 
                         arrLookups.Add(field.InternalName + "Text");
@@ -2219,7 +2308,11 @@ namespace TimeSheets
                         attr1 = docData.CreateAttribute(GoodFieldname);
                         if (GoodFieldname == "PercentComplete")
                         {
-                            attr1.Value = Convert.ToString(Convert.ToDouble(result[dc.ColumnName].ToString()) * 100);
+                            try
+                            {
+                                attr1.Value = Convert.ToString(Convert.ToDouble(result[dc.ColumnName].ToString()) * 100);
+                            }
+                            catch { attr1.Value = "0"; }
                         }
                         else
                         {
@@ -2841,7 +2934,7 @@ namespace TimeSheets
                 string SearchText = "";
                 try
                 {
-                    SearchText = System.Web.HttpUtility.UrlDecode(docIn.FirstChild.Attributes["SearchText"].Value);
+                    SearchText = System.Web.HttpUtility.UrlDecode(docIn.FirstChild.Attributes["SearchText"].Value).Trim();
                 }
                 catch { }
 

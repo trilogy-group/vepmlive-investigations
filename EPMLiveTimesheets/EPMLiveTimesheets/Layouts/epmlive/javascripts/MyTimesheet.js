@@ -165,6 +165,7 @@ function StopEditCols(grid, row)
         if(grid.Cols[col].Sec==0)
             grid.SetAttribute(row, col, "CanEdit", "0", 1);
     }
+    grid.SetAttribute(row, "Title", "HtmlPrefix", "", 1);
     grid.EditRow = "";
     TimesheetItemEdited = false;
 }
@@ -270,7 +271,11 @@ function TSOnMouseOutRow(grid, row, col, event) {
 
 function TSDoubleClick(grid, row, col, x, y, event)
 {
-    EditGridRow(grid, row, col);
+    var newgridid = grid.id.substr(2);
+    var newobj = eval("TSObject" + newgridid);
+
+    if (newobj.Status == "Unsubmitted")        
+        EditGridRow(grid, row, col);
 }
 
 function EditGridRow(grid, row, col) {
@@ -322,7 +327,7 @@ function TSRenderFinish(grid)
 
     EPM.UI.Loader.current().stopLoading('WebPart' + eval("TSObject" + gridid + ".Qualifier"));
 
-    document.getElementById("tsnav").style.display = "";
+    document.getElementById("tsnav").style.display = "inline-block";
 
     curGrid = grid;
     if (GridType == "0") {
@@ -350,6 +355,8 @@ function TSRenderFinish(grid)
             $("#tsan").tooltip();
         } catch (e) { }
     }
+
+    SetGridSize();
 }
 
 
@@ -1201,6 +1208,13 @@ Grids.OnClickOutside = function (grid, row, col, x, y, event) {
         var notesDiv = document.getElementById("NotesDiv");
         notesDiv.style.display = "none";
     }
+
+    try {
+        $("#TypeDivOuter").remove();
+    } catch (e) { }
+
+    if (grid.EditRow)
+        StopEditGridRow(grid, grid.GetRowById("Header"));
 }
 
 
@@ -1353,7 +1367,7 @@ function DoPopUp(grid, row, col) {
                 for (var iType in TSTypeObject) {
                     var oType = TSTypeObject[iType];
 
-                    strTypeDiv += "<tr><td>" + oType + ":</td><td align=\"right\"><input type=\"text\" class=\"epmliveinput\" onkeydown=\"stopProp(event);\" onkeyup=\"stopProp(event);\" onkeypress=\"stopProp(event);\" onClick=\"this.select();stopProp(event);\" style=\"width:25px\" id=\"" + iType + "TypeValue\" Value=\"";
+                    strTypeDiv += "<tr><td>" + oType + ":</td><td align=\"right\"><input type=\"text\" class=\"epmliveinput\" onkeydown=\"stopProp(event);\" onkeyup=\"stopProp(event);\" onkeypress=\"stopProp(event);return isNumberKey(event);\" onClick=\"this.select();stopProp(event);\" style=\"width:25px\" id=\"" + iType + "TypeValue\" Value=\"";
 
                     try {
                         if (oVal[iType]) {
@@ -1397,10 +1411,15 @@ function DoPopUp(grid, row, col) {
 
                 $('body').append(strTypeDiv);
 
-                var oDiv = $("#TypeDivOuter").get(0);
+                var TypeDiveOuter=$("#TypeDivOuter");
+                var oDiv = TypeDiveOuter.get(0);
                 var oLocDiv = $("#typedivlocation");
 
-                oDiv.style.top = (oLocDiv.offset().top - 28) + "px";
+                if(oLocDiv.offset().top - 28 + TypeDiveOuter.height() > $(window).height())
+                    oDiv.style.top = (oLocDiv.offset().top - TypeDiveOuter.height()) + "px";
+                else
+                    oDiv.style.top = (oLocDiv.offset().top - 28) + "px";
+
                 oDiv.style.left = (oLocDiv.offset().left - 5) + "px";
 
                 setTimeout("curGrid.StartEdit()", 100);
@@ -1410,6 +1429,35 @@ function DoPopUp(grid, row, col) {
 
     }
 }
+
+function isNumberKey(evt) {
+    var charCode = (evt.which) ? evt.which : event.keyCode;
+
+    if (charCode != 46 && charCode != 44 && charCode > 31
+      && (charCode < 48 || charCode > 57))
+        return false;
+
+    return true;
+}
+
+function GetGridId(grid) {
+    return grid.id.substr(2);
+}
+
+function SetGridSize() {
+    
+    var outer = document.getElementById("gridouter");
+
+    var height = GetPageHeight();
+    var top = GetItemTop(outer);
+
+    outer.style.height = (height - top - 35) + "px";
+    
+}
+
+$(window).resize(function () {
+    SetGridSize();
+});
 
 function CheckForUpdate(grid) {
 
@@ -1767,7 +1815,7 @@ function MYTSOnGetHtmlValue(grid, row, col, val) {
                 return "<a onclick=\"ShowApprovalNotes('" + grid.id + "','" + row.id + "', this)\" id=\"ANote" + row.id + "\" style=\"text-decoration:none;\"><span class='icon-file-3' style='color:#" + img + ";text-decoration:none'></a>";
             }
         }
-        else {
+        else if (row.Def.Name == "R") {
             if (col == "StopWatch") {
                 if (StopWatchRow && row.UID == StopWatchRow.UID) {
 
@@ -1789,15 +1837,19 @@ function MYTSOnGetHtmlValue(grid, row, col, val) {
                     return "";
                 return getFormattedNumber(val.toLocaleString());
             }
-            else if (col == "Progress" && row.Def.Name=="R") {
+            else if (col == "Progress" && row.Def.Name == "R") {
                 try {
                     return (parseFloat(val) * 100).toFixed(0) + "%";
                 } catch (e) { return "0%"; }
             }
         }
-       
+        else if (row.id == "Header")
+            return null;
     }
-    return val;
+    if (val == "")
+        return "";
+
+    return null;
 }
 
 function getFormattedNumber(Amount) {
@@ -2200,4 +2252,35 @@ function changePeriodCommand(tsURL, sel, delegateId)
         url += "&Delegate=" + delegateId;
     }
     location.href = url;
+}
+
+function GetPageHeight() {
+    var scnHei;
+    if (self.innerHeight) // all except Explorer
+    {
+        //scnWid = self.innerWidth;
+        scnHei = self.innerHeight;
+    }
+    else if (document.documentElement && document.documentElement.clientHeight) {
+        //scnWid = document.documentElement.clientWidth;
+        scnHei = document.documentElement.clientHeight;
+    }
+    else if (document.body) // other Explorers
+    {
+        //scnWid = document.body.clientWidth;
+        scnHei = document.body.clientHeight;
+    }
+    return scnHei;
+}
+
+function GetItemTop(obj) {
+    var posY = obj.offsetTop;
+
+    while (obj.offsetParent) {
+        posY = posY + obj.offsetParent.offsetTop;
+        if (obj == document.getElementsByTagName('body')[0]) { break }
+        else { obj = obj.offsetParent; }
+    }
+
+    return posY;
 }

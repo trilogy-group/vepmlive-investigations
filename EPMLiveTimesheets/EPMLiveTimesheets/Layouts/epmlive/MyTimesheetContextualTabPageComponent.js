@@ -233,7 +233,7 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
             var grid = Grids["TS" + this.tsObject.id]
 
             if (grid.FRow.Def.Name == "R") {
-                if (confirm("Are you sure you want to remove that item from your timesheet?")) {
+                if (confirm("Are you sure you want to remove that item from your timesheet? This will also remove any related hours.")) {
 
                     grid.DeleteRow(grid.FRow, 2);
                     TimesheetHoursEdited = true;

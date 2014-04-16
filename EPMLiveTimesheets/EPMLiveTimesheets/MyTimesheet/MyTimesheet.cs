@@ -678,13 +678,15 @@ namespace TimeSheets
                     </div>
                 </nav>
             </div>");
-
-                output.WriteLine("<div style=\"width:100%\">");
+                output.Write("<div style=\"height:300px;width:100%;overflow:hidden;display:inline-block\" id=\"gridouter\">");
+                output.WriteLine("<div style=\"width:100%;height:100%\">");
                 output.WriteLine(@"<treegrid Data_Url=""" + url + @"/_vti_bin/WorkEngine.asmx"" Data_Timeout=""0"" Data_Method=""Soap"" Data_Function=""Execute"" Data_Namespace=""workengine.com"" Data_Param_Function=""timesheet_GetTimesheetGrid"" Data_Param_Dataxml=""" + sDataParam + @""" 
                                 Layout_Url=""" + url + @"/_vti_bin/WorkEngine.asmx"" Layout_Timeout=""0"" Layout_Method=""Soap"" Layout_Function=""Execute"" Layout_Namespace=""workengine.com"" Layout_Param_Function=""timesheet_GetTimesheetGridLayout"" Layout_Param_Dataxml=""" + sLayoutParam + @""" 
                                 Check_Url=""" + url + @"/_vti_bin/WorkEngine.asmx"" Check_Timeout=""0"" Check_Method=""Soap"" Check_Function=""Execute"" Check_Namespace=""workengine.com"" Check_Param_Function=""timesheet_GetTimesheetUpdates"" Check_Param_Dataxml=""" + sLayoutParam + @""" Check_Interval=""0"" Check_Repeat=""0""
                                 Upload_Url=""" + url + @"/_layouts/epmlive/savemytimesheet.aspx"" Upload_Type=""Body,Cfg"" Upload_Flags=""AllCols,Accepted"" Debug="""" SuppressMessage=""3""></treegrid>");
                 output.WriteLine("</div>");
+                output.WriteLine("</div>");
+
             }
             else if (GridType == 1)
             {
@@ -733,12 +735,13 @@ namespace TimeSheets
                     </div>
                 </nav>
             </div>");
-
-                output.WriteLine("<div style=\"width:100%\">");
+                output.Write("<div style=\"height:300px;width:100%;overflow:hidden;display:inline-block\" id=\"gridouter\">");
+                output.WriteLine("<div style=\"width:100%;height:100%\">");
                 output.WriteLine(@"<treegrid Data_Url=""" + url + @"/_vti_bin/WorkEngine.asmx"" Data_Timeout=""0"" Data_Method=""Soap"" Data_Function=""Execute"" Data_Namespace=""workengine.com"" Data_Param_Function=""timesheet_GetTimesheetApprovalsGrid"" Data_Param_Dataxml=""" + sDataParam + @""" 
                                 Layout_Url=""" + url + @"/_vti_bin/WorkEngine.asmx"" Layout_Timeout=""0"" Layout_Method=""Soap"" Layout_Function=""Execute"" Layout_Namespace=""workengine.com"" Layout_Param_Function=""timesheet_GetTimesheetGridLayout"" Layout_Param_Dataxml=""" + sLayoutParam + @""" 
                                 Page_Url=""" + url + @"/_layouts/15/epmlive/timesheetapprovalpage.aspx?Period=" + sPeriodId + @""" SuppressMessage=""3""
                                  ></treegrid>");
+                output.WriteLine("</div>");
                 output.WriteLine("</div>");
             }
 
