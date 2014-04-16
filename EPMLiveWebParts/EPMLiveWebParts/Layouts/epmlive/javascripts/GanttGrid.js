@@ -305,26 +305,26 @@ function GridOnReady(grid) {
  }
 
 function GridOnGetHtmlValue(grid, row, col, val) {
-     if (row.Def.Name == 'R')
-     {
-         if (col == "Title")
-         {
-             var gridid = GetGridId(grid);
-             if (eval("mygrid" + gridid + ".LinkType") != "")
-                 val = "<a href=\"javascript:GridGoToItem('" + grid.id + "','" + row.id + "');\">" + val + "</a>";
-             
-             if (grid.GetValue(row, "HasComments") == "1")
-             {
-                 val = val + "&nbsp;<a href=\"javascript:GridComments('" + grid.id + "','" + row.id + "');return false;\"><img src=\"/_layouts/15/epmlive/images/mywork/comment-small.png\" border=\"0\"></a>";
-             }
-             else if (grid.GetValue(row, "HasComments") == "2")
-             {
-                 val = val + "&nbsp;<a href=\"javascript:GridComments('" + grid.id + "','" + row.id + "');return false;\"><img src=\"/_layouts/15/epmlive/images/mywork/commentsnew-small.png\" border=\"0\"></a>";
-             }
+    if (row.Def.Name == 'R') {
+        if (col == "Title") {
+            var gridid = GetGridId(grid);
+            if (eval("mygrid" + gridid + ".LinkType") != "")
+                val = "<a href=\"javascript:GridGoToItem('" + grid.id + "','" + row.id + "');\">" + val + "</a>";
 
-             return val;
-         }
-     }
+            if (grid.GetValue(row, "HasComments") == "1") {
+                val = val + "&nbsp;<a href=\"javascript:GridComments('" + grid.id + "','" + row.id + "');return false;\"><img src=\"/_layouts/15/epmlive/images/mywork/comment-small.png\" border=\"0\"></a>";
+            }
+            else if (grid.GetValue(row, "HasComments") == "2") {
+                val = val + "&nbsp;<a href=\"javascript:GridComments('" + grid.id + "','" + row.id + "');return false;\"><img src=\"/_layouts/15/epmlive/images/mywork/commentsnew-small.png\" border=\"0\"></a>";
+            }
+
+            return val;
+        }
+    }
+    else if (row.id == "Header") {
+        if (col == "State")
+            return "State";
+    }
  }
 
 function GridComments(gridid, rowid) {
