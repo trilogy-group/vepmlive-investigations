@@ -1420,11 +1420,11 @@
                     };
 
                     var expandOrCollapseWorkspaceMenu = function ($el) {
-                        var classes = $el.attr('class').toLowerCase();
+                        var classes = ($el.attr('class') || '').toLowerCase();
 
                         if (classes.indexOf('plus') !== -1) {
                             var onReady1 = function () {
-                                if ($el.attr('class').toLowerCase().indexOf('minus') !== -1) {
+                                if (($el.attr('class') || '').toLowerCase().indexOf('minus') !== -1) {
                                     window.setTimeout(function () {
                                         expandWorkspaceMenu();
                                     }, 100);
@@ -1438,7 +1438,7 @@
                             onReady1();
                         } else {
                             var onReady2 = function () {
-                                if ($el.attr('class').toLowerCase().indexOf('plus') !== -1) {
+                                if (($el.attr('class') || '').toLowerCase().indexOf('plus') !== -1) {
                                     window.setTimeout(function () {
                                         collapseWorkspaceTree();
                                     }, 100);
