@@ -299,8 +299,6 @@ function GridOnReady(grid) {
         eval("EPM.UI.Loader.current().stopLoading('WebPart" + eval("mygrid" + gridid + ".Qualifier") + "')");
 
         document.getElementById("searchload" + grid.id.substr(9)).style.display = "";
-
-        
         
         RefreshCommandUI();
     }
@@ -396,7 +394,7 @@ function GridOnMouseOverRow(grid, row, col, event) {
             grid.SetAttribute(row, "Title", "ButtonText", '<div class="gridmenuspan" style="position:absolute;overflow:visible;margin-right:5px" id=\"' + row.id + '\"><a data-itemid="' + grid.GetValue(row, "itemid") + '" data-listid="' + grid.GetValue(row, "listid") + '" data-webid="' + grid.GetValue(row, "webid") + '" data-siteid="' + grid.GetValue(row, "siteid") + '" ></a></div>', 1);
             CurrentGrid = grid;
             CurrentRow = row;
-            window.epmLiveNavigation.addContextualMenu($('#' + row.id), [], false, false, { "delete": "GridGanttDeleteRow", "comments": "GridCommentsCallBack", "edit": "GridCommentsCallBack" });
+            window.epmLiveNavigation.addContextualMenu($('#' + row.id), [], false, 1, { "delete": "GridGanttDeleteRow", "comments": "GridCommentsCallBack", "edit": "GridCommentsCallBack" });
         }
     }
 }
