@@ -5265,6 +5265,7 @@ namespace EPMLiveWorkPlanner
             string columnName = string.Empty;
             string tableName = string.Empty;
             bool isLookupOrUserField = false;
+            string kanbannewitemurl = "";
 
             WorkPlannerAPI.PlannerProps props = null;
             SPList sourceList = null;
@@ -5280,7 +5281,7 @@ namespace EPMLiveWorkPlanner
                     {
                         props = WorkPlannerAPI.getSettings(spWeb, kanBanBoardName);
                         sourceList = spWeb.Lists[props.sListTaskCenter];
-
+                        kanbannewitemurl = string.Format("{0}?LookupField=Project&LookupValue={1}", sourceList.DefaultNewFormUrl, projectID);
                         try
                         {
                             var queryExecutor = new QueryExecutor(spWeb);
@@ -5374,7 +5375,7 @@ namespace EPMLiveWorkPlanner
             {
                 jsonData = jsonData.Substring(0, jsonData.Length - 1);
             }
-            return string.Format("{{ \"kanbannewitemurl\": \"{0}\", \"kanbanitemname\": \"{1}\", \"kanbanstatuscolumn\": \"{2}\", \"kanbanstatusvalues\": [{3}], \"kanbanerror\": \"\", \"kanbanfilter1name\": \"{4}\", \"kanbanfilter1\": [{5}] }}", sourceList.DefaultNewFormUrl, sourceList.Title, props.KanBanStatusColumn, jsonBacklogStatus, props.KanBanFilterColumn, jsonData);
+            return string.Format("{{ \"kanbannewitemurl\": \"{0}\", \"kanbanitemname\": \"{1}\", \"kanbanstatuscolumn\": \"{2}\", \"kanbanstatusvalues\": [{3}], \"kanbanerror\": \"\", \"kanbanfilter1name\": \"{4}\", \"kanbanfilter1\": [{5}] }}", kanbannewitemurl, sourceList.Title, props.KanBanStatusColumn, jsonBacklogStatus, props.KanBanFilterColumn, jsonData);
         }
 
         public static string GetKanBanBoard(XmlDocument data, SPWeb oWeb)
