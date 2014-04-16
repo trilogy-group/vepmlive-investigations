@@ -2219,6 +2219,8 @@
 
                     var hideMenu = function () {
                         $menu.fadeOut(200);
+                        if ($('#menu' + listIdd + itemId).length)
+                            $('#menu' + listIdd + itemId).remove();
                     };
 
                     var toggleMenu = function () {
@@ -2558,7 +2560,7 @@
 
                             var proceed = true;
 
-                            if ($li.hasClass('epm-nav-ws-node')) {
+                            if ($li.hasClass('epm-nav-ws-node') || $li.is('.workspacecentercontextmenu')) {
                                 if (window.epmLiveNavigation.wsInfoDict[liId].hasAccess) {
                                     var found = false;
 
