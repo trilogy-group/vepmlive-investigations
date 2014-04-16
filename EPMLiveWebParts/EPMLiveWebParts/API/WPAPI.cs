@@ -456,7 +456,8 @@ namespace EPMLiveWebParts
 
                         if (((SPFieldNumber)oField).ShowAsPercentage)
                         {
-                            percentageSign = @"%";
+                            //sFormat = "0\\%;0\\%;0\\%";
+                            return "Float";
                         }
 
                         switch (((SPFieldNumber)oField).DisplayFormat)
