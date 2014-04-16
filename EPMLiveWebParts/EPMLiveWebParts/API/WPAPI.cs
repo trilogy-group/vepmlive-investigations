@@ -265,11 +265,28 @@ namespace EPMLiveWebParts
                         li[oField.Id] = nd.InnerText.Replace(";",";#");
                         break;
                     case SPFieldType.Currency:
-                    case SPFieldType.Number:
-                        if (nd.InnerText == "")
+                         if (nd.InnerText == "")
                             li[oField.Id] = null;
                         else
                             li[oField.Id] = nd.InnerText;
+                        break;
+                    case SPFieldType.Number:
+                        SPFieldNumber fNum = (SPFieldNumber)oField;
+                        if (fNum.ShowAsPercentage)
+                        {
+                            try
+                            {
+                                li[oField.Id] = float.Parse(nd.InnerText) / 100;
+                            }
+                            catch { li[oField.Id] = null; }
+                        }
+                        else
+                        {
+                            if (nd.InnerText == "")
+                                li[oField.Id] = null;
+                            else
+                                li[oField.Id] = nd.InnerText;
+                        }
                         break;
                     case SPFieldType.DateTime:
                         if (nd.InnerText == "")
@@ -614,6 +631,24 @@ namespace EPMLiveWebParts
                         else
                         {
                             val = val.Substring(val.IndexOf(";#") + 2);
+                        }
+                        break;
+                    case SPFieldType.Number:
+                        SPFieldNumber fNum = (SPFieldNumber)oField;
+                        if (fNum.ShowAsPercentage)
+                        {
+                            try
+                            {
+                                val = (float.Parse(val) * 100).ToString();
+                            }
+                            catch { }
+                        }
+                        else
+                        {
+                            if (bEditMode)
+                                val = li[oField.Id].ToString();
+                            else
+                                val = oField.GetFieldValueAsText(li[oField.Id].ToString());
                         }
                         break;
                     default:
