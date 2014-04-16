@@ -734,7 +734,7 @@ namespace EPMLiveCore.Services
 
             if (parameters.AllKeys.Contains("commentLimit"))
             {
-                int.TryParse(parameters["commentLimit"], out activityLimit);
+                int.TryParse(parameters["commentLimit"], out commentLimit);
             }
 
             if (parameters.AllKeys.Contains("offset"))

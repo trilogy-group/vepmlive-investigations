@@ -122,7 +122,7 @@
                         page: 1,
                         limit: 10,
                         activityLimit: 1,
-                        commentLimit: 2
+                        commentLimit: 4
                     };
                 };
 
