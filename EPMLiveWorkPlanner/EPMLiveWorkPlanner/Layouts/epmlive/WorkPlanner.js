@@ -3260,17 +3260,76 @@ function BuildTeam() {
 }
 
 function AddFragment() {
-    var options = { url: "addfragment.aspx?PlannerID=" + sPlannerID + '&listid=' + sProjectListId + "&id=" + sItemID, width: 450, height: 450, title: "Insert Fragment", showMaximized: false };
+    var options = {
+        url: "addfragment.aspx?PlannerID=" + sPlannerID + '&listid=' + sProjectListId + "&id=" + sItemID,
+        width: 450,
+        height: 450,
+        title: "Insert Fragment",
+        showMaximized: false,
+        dialogReturnValueCallback: function (dialogResult, returnValue) {
+            toastr.options = {
+                "closeButton": false,
+                "debug": false,
+                "positionClass": "toast-top-right",
+                "onclick": null,
+                "showDuration": "300",
+                "hideDuration": "1000",
+                "timeOut": "5000",
+                "extendedTimeOut": "1000",
+                "showEasing": "swing",
+                "hideEasing": "linear",
+                "showMethod": "fadeIn",
+                "hideMethod": "fadeOut"
+            };
+            if (dialogResult === 1) {
+                toastr.success(returnValue);
+            }
+            else if (dialogResult === -1) {
+                toastr.error(returnValue);
+            }
+        }
+    };
     SP.UI.ModalDialog.showModalDialog(options);
 }
 
 function SaveFragment() {
-    var options = { url: "savefragment.aspx?PlannerID=" + sPlannerID, width: 325, height: 195, title: "Save Fragment", showMaximized: false };
+    var options = {
+        url: "savefragment.aspx?PlannerID=" + sPlannerID,
+        width: 325,
+        height: 195,
+        title: "Save Fragment",
+        showMaximized: false,
+        dialogReturnValueCallback: function (dialogResult, returnValue) {
+            if (dialogResult === 1) {
+                toastr.options = {
+                    "closeButton": false,
+                    "debug": false,
+                    "positionClass": "toast-top-right",
+                    "onclick": null,
+                    "showDuration": "300",
+                    "hideDuration": "1000",
+                    "timeOut": "5000",
+                    "extendedTimeOut": "1000",
+                    "showEasing": "swing",
+                    "hideEasing": "linear",
+                    "showMethod": "fadeIn",
+                    "hideMethod": "fadeOut"
+                };
+                toastr.success(returnValue);
+            }
+        }
+    };
     SP.UI.ModalDialog.showModalDialog(options);
 }
 
 function ManageFragment() {
-    var options = { url: "managefragment.aspx?PlannerID=" + sPlannerID, width: 450, height: 450, title: "Manage Fragments", showMaximized: false};
+    var options = {
+        url: "managefragment.aspx?PlannerID=" + sPlannerID,
+        width: 450,
+        height: 450,
+        title: "Manage Fragments",
+        showMaximized: false
+    };
     SP.UI.ModalDialog.showModalDialog(options);
 }
 

@@ -16,7 +16,28 @@
     <script type="text/javascript">
 
         function OpenPopupToEditFragment(itemid) {
-            var options = { url: "SaveFragment.aspx?ID=" + itemid, height: 200, width: 300, showMaximized: false, dialogReturnValueCallback: function (dialogResult) { if (dialogResult == 1) { refreshFragments(); } } };
+            var options = {
+                url: "SaveFragment.aspx?ID=" + itemid, height: 200, width: 300, showMaximized: false, dialogReturnValueCallback: function (dialogResult, returnValue) {
+                    if (dialogResult == 1) {
+                        toastr.options = {
+                            "closeButton": false,
+                            "debug": false,
+                            "positionClass": "toast-top-right",
+                            "onclick": null,
+                            "showDuration": "300",
+                            "hideDuration": "1000",
+                            "timeOut": "5000",
+                            "extendedTimeOut": "1000",
+                            "showEasing": "swing",
+                            "hideEasing": "linear",
+                            "showMethod": "fadeIn",
+                            "hideMethod": "fadeOut"
+                        };
+                        window.parent.toastr.success(returnValue);
+                        refreshFragments();
+                    }
+                }
+            };
             SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
         }
 
@@ -24,17 +45,42 @@
             location.reload(false);
         }
 
+        function showDeleteToastr(result, message) {
+            toastr.options = {
+                "closeButton": false,
+                "debug": false,
+                "positionClass": "toast-top-right",
+                "onclick": null,
+                "showDuration": "300",
+                "hideDuration": "1000",
+                "timeOut": "5000",
+                "extendedTimeOut": "1000",
+                "showEasing": "swing",
+                "hideEasing": "linear",
+                "showMethod": "fadeIn",
+                "hideMethod": "fadeOut"
+            };
+
+            if (result == 1) {
+                window.parent.toastr.success(message);
+            }
+            else if (result == -1) {
+                window.parent.toastr.error(message);
+            }
+        }
+
         function closeManageFragmentPopup(message) {
             if (message != null) {
-                alert(message);
+                window.frameElement.commonModalDialogClose(1, message);
             }
-            window.frameElement.commonModalDialogClose(1, 1);
+            else {
+                window.frameElement.commonModalDialogClose(0, 1);
+            }
         }
 
         function ConfirmationBox(fragment) {
             var result = confirm('Are you sure you want to delete ' + fragment + ' ?');
             if (result) {
-                $("#divIFLoading").show();
                 return true;
             }
             else {
@@ -43,12 +89,10 @@
         }
 
         $(function () {
-
             $('.row-select').on('click', 'tbody tr', function (event) {
                 $(".row-select").find("tr.highlight").removeClass('highlight');
                 $(this).addClass('highlight');
             });
-
         });
 
     </script>

@@ -9,7 +9,7 @@
 <%@ Page Language="C#" AutoEventWireup="true" CodeBehind="AddFragment.aspx.cs" Inherits="EPMLiveCore.Layouts.epmlive.AddFragment" DynamicMasterPageFile="~masterurl/default.master" %>
 
 <asp:Content ID="PageHead" ContentPlaceHolderID="PlaceHolderAdditionalPageHead" runat="server">
-    
+
     <script type="text/javascript">
         $(function () {
 
@@ -65,19 +65,21 @@
                 if (!message.startsWith('Error')) {
                     window.parent.Grids.WorkPlannerGrid.ReloadBody(HideProjectFolder);
                     HideProjectFolder();
-                    alert(message);
+                    window.frameElement.commonModalDialogClose(1, message);
                 }
                 else {
-                    alert(message);
+                    window.frameElement.commonModalDialogClose(-1, message);
                 }
             }
-            window.frameElement.commonModalDialogClose(1, 1);
+            else
+            {
+                window.frameElement.commonModalDialogClose(0, 1);
+            }
         }
 
         function HideProjectFolder() {
             window.parent.Grids.WorkPlannerGrid.SetAttribute(window.parent.Grids.WorkPlannerGrid.GetRowById("0"), "Title", "HtmlPrefix", "", 1, 0);
         }
-
     </script>
 </asp:Content>
 
@@ -114,7 +116,7 @@
                 <Columns>
                     <asp:TemplateField ItemStyle-Width="6%">
                         <ItemTemplate>
-                            <asp:RadioButton ID="rdoSelect"  runat="server" CssClass="hdnRadio" ClientIDMode="Static" />
+                            <asp:RadioButton ID="rdoSelect" runat="server" CssClass="hdnRadio" ClientIDMode="Static" />
                         </ItemTemplate>
                     </asp:TemplateField>
                     <asp:TemplateField Visible="false">
@@ -130,12 +132,13 @@
 
         </div>
     </div>
-    <div id="divIFLoading" style="left:31%; top:50%; position:absolute;flex-align:center;">
+    <div id="divIFLoading" style="left: 31%; top: 50%; position: absolute; flex-align: center;">
         <table width="100%">
             <tr>
                 <td align="center" class="ms-sectionheader">
                     <img src="../images/GEARS_ANv4.GIF" alt="Inserting Fragment..." style="vertical-align: middle;" /><br />
-                    <H4 class="ms-standardheader">Inserting Fragment...</H4><br />
+                    <h4 class="ms-standardheader">Inserting Fragment...</h4>
+                    <br />
                 </td>
             </tr>
         </table>

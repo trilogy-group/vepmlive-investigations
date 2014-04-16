@@ -51,7 +51,7 @@ namespace EPMLiveCore.Layouts.epmlive
                 gridMyFragments.DataSource = null;
                 gridMyFragments.DataBind();
             }
-        
+
         }
 
         private void FillMyFragmentsGrid()
@@ -133,8 +133,18 @@ namespace EPMLiveCore.Layouts.epmlive
             Label lblId = (Label)gv.Rows[gvrow.RowIndex].FindControl("lblID");
             if (lblId != null)
             {
-                SPListItem fragment = plannerFragmentList.GetItemById(Convert.ToInt32(lblId.Text));
-                fragment.Recycle();
+                string fragmentTitle = string.Empty;
+                try
+                {
+                    SPListItem fragment = plannerFragmentList.GetItemById(Convert.ToInt32(lblId.Text));
+                    fragmentTitle = fragment.Title;
+                    fragment.Recycle();
+                    Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "showDeleteToastr", "<script language='javascript' type='text/javascript'>showDeleteToastr(1,'Fragment " + fragmentTitle + " deleted successfully');</script>");
+                }
+                catch (Exception ex)
+                {
+                    Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "showDeleteToastr", "<script language='javascript' type='text/javascript'>showDeleteToastr(-1,'Something went wrong in deleting fragment " + fragmentTitle + ");</script>");
+                }
                 if (gv.ID == "gridMyFragments")
                 {
                     FillMyFragmentsGrid();

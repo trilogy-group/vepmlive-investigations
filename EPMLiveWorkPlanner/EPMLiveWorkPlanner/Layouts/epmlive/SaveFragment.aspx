@@ -20,11 +20,12 @@
 
         function closeSaveFragmentPopup(message) {
             if (message != null) {
-                alert(message);
+                window.frameElement.commonModalDialogClose(1, message);
             }
-            window.frameElement.commonModalDialogClose(1, 1);
+            else {
+                window.frameElement.commonModalDialogClose(0, 1);
+            }
         }
-
     </script>
 </asp:Content>
 

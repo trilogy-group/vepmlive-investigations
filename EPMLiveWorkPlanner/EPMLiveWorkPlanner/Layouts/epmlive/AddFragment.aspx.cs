@@ -37,7 +37,20 @@ namespace EPMLiveCore.Layouts.epmlive
             {
                 FillMyFragmentsGrid();
                 FillPublicFragmentsGrid();
+                CheckForNoFragment();
             }
+        }
+
+        private void CheckForNoFragment()
+        {
+            if (gridMyFragments.Rows.Count == 0 && gridPublicFragments.Rows.Count == 0)
+            {
+                (gridMyFragments.EmptyDataRowStyle).HorizontalAlign = HorizontalAlign.Center;
+                gridMyFragments.EmptyDataText = "No fragments exist";
+                gridMyFragments.DataSource = null;
+                gridMyFragments.DataBind();
+            }
+
         }
 
         protected void btnImport_Click(object sender, EventArgs e)
