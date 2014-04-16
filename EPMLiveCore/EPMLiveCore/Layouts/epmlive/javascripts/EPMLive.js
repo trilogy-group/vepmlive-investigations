@@ -673,7 +673,7 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
 
         function createDropDown(cfg, ul) {
             //get properties
-            var controlId = cfg['controlId']
+            var controlId = cfg['controlId'];
             var title = cfg['title'];
             var iconClass = cfg['iconClass'];
             var toolTip = cfg['toolTip'];

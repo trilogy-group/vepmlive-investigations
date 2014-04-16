@@ -219,9 +219,6 @@
   float: none;
   vertical-align: top;
 }
-#epm-social-stream li.epm-se-thread div.epm-se-comments div.epm-se-comment-text {
-  color: #777777;
-}
 #epm-social-stream li.epm-se-disabled div.epm-se-overlay {
   background-color: #ffffff;
   -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=50)";
