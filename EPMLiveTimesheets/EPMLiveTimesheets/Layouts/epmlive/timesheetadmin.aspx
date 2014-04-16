@@ -41,17 +41,6 @@
     <script src="DHTML/xgrid/dhtmlxcommon.js"></script>
     <script src="DHTML/xgrid/dhtmlxgrid.js"></script>
     <script src="DHTML/xgrid/dhtmlxgridcell.js"></script>
-    
-    <script src="DHTML/xgrid/ext/dhtmlxgrid_splt.js"></script>
-    <script src="DHTML/xgrid/ext/dhtmlxgrid_nxml.js"></script>
-    <script src="DHTML/xgrid/ext/dhtmlxgrid_drag.js"></script>
-    <script src="DHTML/xgrid/ext/dhtmlxgrid_keymap_access.js"></script>
-    
-    <script src="DHTML/xgrid/excells/dhtmlxgrid_excell_cntr.js"></script>
-    <script src="DHTML/xgrid/excells/dhtmlxgrid_excell_clist.js"></script>
-	<script src="DHTML/xgrid/excells/dhtmlxgrid_excell_acheck.js"></script>
-	<script src="DHTML/xgrid/excells/dhtmlxgrid_excell_calendar.js"></script>	
-    <script src="DHTML/xgrid/excells/dhtmlxgrid_excell_dhxcalendar.js"></script>
 
     <script src="DHTML/calendar/dhtmlxcalendar.js"></script>
 

@@ -1964,7 +1964,7 @@ namespace TimeSheets
 
                 EPMLiveReportsAdmin.MyWorkReportData rptData = new EPMLiveReportsAdmin.MyWorkReportData(web.Site.ID);
 
-                string sql = string.Format(@"SELECT * FROM dbo.LSTResourcePool WHERE (',' + TimesheetManagerID + ',' LIKE '%,{0},%') and Generic=0", web.CurrentUser.ID);
+                string sql = string.Format(@"SELECT * FROM dbo.LSTResourcePool WHERE (',' + TimesheetManagerID + ',' LIKE '%,{0},%') and Generic=0 ANd (Disabled=0 or Disabled is NULL)", web.CurrentUser.ID);
                 DataTable dtMyResources = rptData.ExecuteSql(sql);
 
                 string sResList = "";
@@ -2338,6 +2338,56 @@ namespace TimeSheets
                     }
                 }
             }
+
+            //======================COmments==============
+            string HasComments = "";
+
+            try
+            {
+                string scomments = result["CommentCount"].ToString();
+                double comments = 0;
+                double.TryParse(scomments, out comments);
+                if (comments > 0)
+                {
+                    //if (list.Fields.ContainsFieldWithStaticName("Commenters") && list.Fields.ContainsFieldWithStaticName("CommentersRead"))
+                    {
+                        ArrayList commenters = new ArrayList();
+                        int authorid = 0;
+                        try
+                        {
+                            commenters = new ArrayList(result["Commenters"].ToString().Split(','));
+                        }
+                        catch { }
+                        try
+                        {
+                            SPFieldUserValue uv = new SPFieldUserValue(web, result["Author"].ToString());
+                            authorid = uv.LookupId;
+                        }
+                        catch { }
+
+                        ArrayList commentersread = new ArrayList();
+                        try
+                        {
+                            commentersread = new ArrayList(result["CommentersRead"].ToString().Split(','));
+                        }
+                        catch { }
+                        if (commentersread.Contains(web.CurrentUser.ID.ToString()))
+                        {
+                            HasComments += "1";
+                        }
+                        else
+                        {
+                            HasComments += "2";
+                        }
+
+                    }
+                }
+            }
+            catch { }
+
+            XmlAttribute attrName = docData.CreateAttribute("HasComments");
+            attrName.Value = HasComments;
+            ndCol.Attributes.Append(attrName);
 
             //============Timesheet Specific Fields==============
             foreach (string tsField in settings.TimesheetFields)

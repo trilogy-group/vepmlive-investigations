@@ -38,6 +38,7 @@
 		<C Name="Comments" Type="Html" Width="40" CanFilter="0" CanGroup="0" CanResize="0" CanSort="0" Visible="0"/>
 		<C Name="Title" Type="Html" RelWidth="100" MinWidth="100" CanGroup="0" CanHide="0" GroupEmpty="0" Button="Html" ButtonText=" "/>
 		<C Name="WorkTypeField" Type="Html" GroupEmpty="0" />
+		<C Name="HasComments" Visible="0" CanPrint="0" CanHide="0"/>
 	</LeftCols>
 	<Cols>
 		

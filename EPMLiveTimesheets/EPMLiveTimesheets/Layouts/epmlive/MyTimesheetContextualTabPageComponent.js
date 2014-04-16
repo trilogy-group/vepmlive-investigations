@@ -221,7 +221,6 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
             if (BeforeSave(Grids["TS" + this.tsObject.id])) {
                 ShowMessage("TS" + this.tsObject.id, "Saving...", 100, 30);
                 Grids["TS" + this.tsObject.id].Save();
-                TimesheetHoursEdited = false;
             }
         }
         else if (commandId === 'Ribbon.MyTimesheet.AutoWork') {

@@ -47,9 +47,6 @@
             <link rel="STYLESHEET" type="text/css" href="/_layouts/epmlive/dhtml/xgrid/dhtmlxgrid.css"/>
             <link rel="STYLESHEET" type="text/css" href="/_layouts/epmlive/dhtml/xgrid/dhtmlxgrid_skins.css"/>
             <link rel="STYLESHEET" type="text/css" href="/_layouts/epmlive/dhtml/calendar/dhtmlxcalendar.css"/>
-            <link rel="STYLESHEET" type="text/css" href="/_layouts/epmlive/dhtml/xmenu/dhtmlxmenu.css">
-            <link rel="STYLESHEET" type="text/css" href="/_layouts/epmlive/dhtml/xmenu/context.css">
-            <link rel="STYLESHEET" type="text/css" href="/_layouts/epmlive/dhtml/xcombo/dhtmlxcombo.css">
 
             <script>                _css_prefix = "/_layouts/epmlive/DHTML/xgrid/"; _js_prefix = "/_layouts/epmlive/DHTML/xgrid/"; </script>
             <link rel="stylesheet" href="/_layouts/epmlive/modal/modalmain.css" type="text/css" /> 
@@ -69,7 +66,6 @@
 
             <script src="/_layouts/epmlive/DHTML/xcombo/dhtmlxcombo.js"></script>
 
-            <script src="/_layouts/epmlive/DHTML/dhtmlxajax.js"></script>
 
             <script language="JavaScript" src="/_layouts/epmlive/dhtml/xmenu/dhtmlxprotobar.js"></script>
             <script language="JavaScript" src="/_layouts/epmlive/dhtml/xmenu/dhtmlxmenubar.js"></script>

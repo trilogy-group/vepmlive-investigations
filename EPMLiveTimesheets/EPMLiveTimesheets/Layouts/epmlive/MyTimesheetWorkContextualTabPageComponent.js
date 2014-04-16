@@ -295,7 +295,7 @@ MyTimesheetWorkPageComponent.PageComponent.prototype = {
 
             curGrid = grid;
 
-            var options = { html: viewNameDiv2, width: 250, height: 125, title: "Save View", dialogReturnValueCallback: this.onSaveViewClose };
+            var options = { html: viewNameDiv2, width: 280, height: 150, title: "Save View", dialogReturnValueCallback: this.onSaveViewClose };
             SP.UI.ModalDialog.showModalDialog(options);
         }
         else if (commandId === 'Ribbon.MyTimesheetWork.ChangeView') {

@@ -87,9 +87,12 @@ img.TS_Comments {
     padding-top: 15px;
 }
 
+
+
 .nav-btn a span {
 font-size:.8em;
 padding-right:10px;
+
 }
 
 .select2-container-multi {
@@ -120,6 +123,7 @@ vertical-align: top;
 padding-top:15px;
 padding-bottom:15px;
 margin-left:15px;
+display:inline;
 }
 
 .nopad {

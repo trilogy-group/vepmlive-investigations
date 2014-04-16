@@ -134,7 +134,45 @@ function TSReady(grid) {
     TGSetEvent("OnMouseOverRow", grid.id, TSOnMouseOverRow);
     TGSetEvent("OnClick", grid.id, TSGridClick);
     TGSetEvent("OnAfterValueChanged", grid.id, TSGridOnAfterValueChanged);
+    TGSetEvent("OnSave", grid.id, TSSave);
+    
 }
+
+
+function TSSave(grid, row, autoupdate) {
+
+    var row = grid.GetRowById("-1");
+
+    var bValid = true;
+
+    for (var tsd in TSDCols)
+    {
+        var val = parseFloat(grid.GetValue(row, tsd));
+
+        var minmax = TSDCols[tsd].split('|');
+        var min = parseFloat(minmax[0]);
+        var max = parseFloat(minmax[1]);
+
+        if (val > max)
+        {
+            
+            alert('On ' + grid.GetValue(grid.GetRowById("Header"), tsd).replace("<br>", " ") + ': ' + val + ' is greater than max of ' + max);
+            bValid = false;
+        }
+        if (val < min) {
+            alert('On ' + grid.GetValue(grid.GetRowById("Header"), tsd).replace("<br>", " ") + ': ' + val + ' is smaller than min of ' + min);
+            bValid = false;
+        }
+    }
+
+    if (!bValid)
+        HideMessage(grid.id);
+    else
+        TimesheetHoursEdited = false;
+
+    return !bValid;
+}
+
 
 
 function TSGridClick(grid, row, col, x, y, event) {
@@ -1842,14 +1880,45 @@ function MYTSOnGetHtmlValue(grid, row, col, val) {
                     return (parseFloat(val) * 100).toFixed(0) + "%";
                 } catch (e) { return "0%"; }
             }
+            else if (col == "Title")
+            {
+                if (grid.GetValue(row, "HasComments") == "1") {
+                    val = val + "&nbsp;<a href=\"javascript:GridComments('" + grid.id + "','" + row.id + "');return false;\"><img src=\"/_layouts/15/epmlive/images/mywork/comment-small.png\" border=\"0\"></a>";
+                }
+                else if (grid.GetValue(row, "HasComments") == "2") {
+                    val = val + "&nbsp;<a href=\"javascript:GridComments('" + grid.id + "','" + row.id + "');return false;\"><img src=\"/_layouts/15/epmlive/images/mywork/commentsnew-small.png\" border=\"0\"></a>";
+                }
+
+                return val;
+            }
         }
         else if (row.id == "Header")
-            return null;
+            return val;
     }
     if (val == "")
         return "";
 
     return null;
+}
+
+function GridComments(gridid, rowid) {
+    var grid = Grids[gridid];
+    var row = grid.GetRowById(rowid);
+    CurrentGrid = grid;
+    CurrentRow = row;
+
+    gridid = GetGridId(grid);
+
+    var url = window.epmLiveNavigation.currentWebUrl + "/_layouts/epmlive/gridaction.aspx?action=comments&webid=" + row.WebID + "&listid=" + row.ListID + "&ID=" + row.ItemID + "&Source=" + escape(location.href);
+
+    var options = window.SP.UI.$create_DialogOptions();
+
+    options.url = url;
+    options.width = 600;
+    options.allowMaximize = false;
+    options.showClose = true;
+    window.SP.UI.ModalDialog.showModalDialog(options);
+
 }
 
 function getFormattedNumber(Amount) {
