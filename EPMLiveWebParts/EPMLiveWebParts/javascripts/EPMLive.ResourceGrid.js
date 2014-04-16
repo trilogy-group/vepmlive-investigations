@@ -2079,7 +2079,10 @@ function registerEpmLiveResourceGridScript() {
                                                     'events': [
                                                         {
                                                             'eventName': 'click',
-                                                            'function': function () { $$.actions.redirect('sendnotification'); }
+                                                            'function': function () {
+                                                                $('.dropdown-menu').hide();
+                                                                $$.actions.redirect('sendnotification');
+                                                            }
                                                         }
                                                     ]
                                                 },
@@ -2089,7 +2092,10 @@ function registerEpmLiveResourceGridScript() {
                                                     'events': [
                                                         {
                                                             'eventName': 'click',
-                                                            'function': function () { $$.actions.exportResources(); }
+                                                            'function': function () {
+                                                                $('.dropdown-menu').hide();
+                                                                $$.actions.exportResources();
+                                                            }
                                                         }
                                                     ]
                                                 },
@@ -2099,7 +2105,10 @@ function registerEpmLiveResourceGridScript() {
                                                     'events': [
                                                         {
                                                             'eventName': 'click',
-                                                            'function': function () { $$.actions.importResources(); }
+                                                            'function': function () {
+                                                                $('.dropdown-menu').hide();
+                                                                $$.actions.importResources();
+                                                            }
                                                         }
                                                     ]
                                                 }
