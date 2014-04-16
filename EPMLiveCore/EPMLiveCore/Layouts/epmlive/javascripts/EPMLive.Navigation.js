@@ -1504,7 +1504,7 @@
                     window.epmLiveNavigation.buildLink = function (link) {
                         var webUrl = $$.currentWebUrl();
                         var url = window.location.href;
-                        var rawUrl = (link['#cdata'] || '');
+                        var rawUrl = (link.Url ? link.Url['#cdata'] : '');
                         
                         if ((rawUrl + '').toLowerCase().indexOf('/lists/') !== -1) {
                             url = rawUrl.replace(/Source={page}&BackTo={page}/g, '');
@@ -1525,7 +1525,7 @@
 
                         return {
                             id: link['@Id'],
-                            title: link['@Title'],
+                            title: link.Title['#cdata'],
                             url: url,
                             category: link['@Category'],
                             cssClass: link['@CssClass'],
@@ -1567,7 +1567,7 @@
 
                                                     workspaceTree.trackChanges();
 
-                                                    var title = lnk['@Title'];
+                                                    var title = lnk.Title['#cdata'];
 
                                                     if (workspacesTitleRegistered) {
                                                         tlNode.registerWorkspace(window.epmLiveNavigation.buildLink(lnk), workspaceTree);
@@ -1826,7 +1826,7 @@
                                             var lnk = links[l];
 
                                             if ($sn.find('#' + lnk['@Id']).length === 0) {
-                                                var title = lnk['@Title'];
+                                                var title = lnk.Title['#cdata'];
 
                                                 if (title !== 'Workspaces' && title !== 'New Workspace' && title !== 'Favorite Workspaces' && title !== 'All Workspaces') {
                                                     var registerWS = function () {

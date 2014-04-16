@@ -200,9 +200,9 @@ namespace EPMLiveCore.API
                                 string name = property.Key;
                                 string value = (property.Value.GetValue(navLink) ?? string.Empty).ToString().Trim();
 
-                                if (name.Equals("Url"))
+                                if (name.Equals("Url") || name.Equals("Title"))
                                 {
-                                    link.Add(new XCData(value));
+                                    link.Add(new XElement(name, new XCData(value)));
                                 }
                                 else
                                 {
