@@ -751,9 +751,19 @@
             })();
 
             var toolbarManager = (function () {
-                var _init = function() {
+                var _init = function(tries) {
+                    tries = tries || 0;
+                    
                     $.get(se.apiUrl + '/creatables?v=' + new Date().getTime()).then(function(response) {
-                        if (response.error) return;
+                        if (response.error) {
+                            if (tries < 10) {
+                                window.setTimeout(function() {
+                                    _init(++tries);
+                                }, 250);
+                            }
+
+                            return;
+                        }
 
                         for (var i = 0; i < response.collection.length; i++) {
                             var creatable = response.collection[i];
