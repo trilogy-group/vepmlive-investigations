@@ -352,7 +352,10 @@ function registerEpmLiveResourceGridScript() {
                     $$.grid.resourceUpdated(1, null, { row: selRow, changeType: 'Changed' });
                 }
             },
-
+            viewFormResourceChanged: function (result, target, params) {
+                    $$.grid.resourceUpdated(1, null, { row: params.row, changeType: params.changeType });
+                },
+            
             contextMenuResourceDelete: function (liid) {
                 var grid = $$.grid.grids[$$.id()];
                 if (liid) {
@@ -1384,6 +1387,9 @@ function registerEpmLiveResourceGridScript() {
                         break;
                     case 'showcomments':
                         $$.actions.displayPopUp('{0}&action={1}&id={2}'.format(url, operation, id), null, true, true, null, null, 700, 700);
+                        break;
+                    case 'view':
+                        $$.actions.displayPopUp('{0}&action={1}&id={2}'.format(url, operation, id), null, true, true, $$.grid.viewFormResourceChanged, { row: selRow, changeType: 'Changed' });
                         break;
                     default:
                         $$.actions.displayPopUp('{0}&action={1}&id={2}'.format(url, operation, id));
