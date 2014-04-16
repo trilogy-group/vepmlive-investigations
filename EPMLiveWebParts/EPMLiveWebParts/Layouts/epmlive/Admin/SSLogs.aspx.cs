@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Linq;
+using System.Web.Script.Serialization;
 using EPMLiveCore;
 using EPMLiveCore.Infrastructure;
 using Microsoft.SharePoint;
@@ -8,7 +10,13 @@ namespace EPMLiveWebParts.Layouts.epmlive.Admin
 {
     public partial class SSLogs : LayoutsPageBase
     {
-        #region Methods (1) 
+        #region Properties (1) 
+
+        public string CurrentUserTimeZone { get; private set; }
+
+        #endregion Properties 
+
+        #region Methods (2) 
 
         // Protected Methods (1) 
 
@@ -25,6 +33,40 @@ namespace EPMLiveWebParts.Layouts.epmlive.Admin
                 "@libraries/amplify", "@libraries/bundles/moment",
                 "libraries/highlight/highlight.pack", "@EPMLive.SocialStream.Logs"
             });
+
+            SetTimeZone(SPContext.Current.Web, SPContext.Current);
+        }
+
+        // Private Methods (1) 
+
+        private void SetTimeZone(SPWeb web, SPContext context)
+        {
+            CurrentUserTimeZone = "null";
+
+            try
+            {
+                SPTimeZone spTimeZone = (web.CurrentUser.RegionalSettings ?? context.RegionalSettings).TimeZone;
+                string spTzName = spTimeZone.Description.Replace(" and ", " & ");
+
+                TimeZoneInfo timeZone = (from tz in TimeZoneInfo.GetSystemTimeZones()
+                    let tzName = tz.DisplayName.Replace(" and ", " & ")
+                    where tzName.Equals(spTzName)
+                    select tz).First();
+
+                var timeZoneInfo = new
+                {
+                    id = timeZone.Id,
+                    displayName = timeZone.DisplayName,
+                    olsonName = timeZone.OlsonName(),
+                    standardName = timeZone.StandardName,
+                    daylightName = timeZone.DaylightName,
+                    baseUtcOffset = timeZone.BaseUtcOffset,
+                    supportsDaylightSavingTime = timeZone.SupportsDaylightSavingTime
+                };
+
+                CurrentUserTimeZone = new JavaScriptSerializer().Serialize(timeZoneInfo);
+            }
+            catch { }
         }
 
         #endregion Methods 

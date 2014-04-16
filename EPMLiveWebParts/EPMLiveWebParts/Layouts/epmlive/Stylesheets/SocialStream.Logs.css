@@ -44,6 +44,9 @@
 #epm-se-logs #epm-se-log-details div.epm-se-details table td {
   padding-bottom: 5px;
 }
+#epm-se-logs #epm-se-log-details div.epm-se-details table td span.epm-se-info {
+  margin-left: 5px;
+}
 #epm-se-logs #epm-se-log-details div.epm-se-details table tr.epm-se-seperator td {
   border-bottom: 1px solid #dddddd;
   margin-bottom: 10px;

@@ -8,7 +8,14 @@
 <%@ Page Language="C#" AutoEventWireup="true" CodeBehind="SSLogs.aspx.cs" Inherits="EPMLiveWebParts.Layouts.epmlive.Admin.SSLogs" DynamicMasterPageFile="~masterurl/default.master" %>
 
 <asp:Content ID="PageHead" ContentPlaceHolderID="PlaceHolderAdditionalPageHead" runat="server">
-
+    <SharePoint:ScriptBlock runat="server">
+    (function() {
+        'use strict';
+        
+        window.epmLive = window.epmLive || {};
+        window.epmLive.currentUserTimeZone = <%= CurrentUserTimeZone %>;
+    })();
+</SharePoint:ScriptBlock>
 </asp:Content>
 
 <asp:Content ID="Main" ContentPlaceHolderID="PlaceHolderMain" runat="server">
@@ -30,8 +37,8 @@
             <table>
                 <tr><td class="epm-se-title">ID</td><td>{{id}}</td></tr>
                 <tr><td class="epm-se-title">Kind</td><td>{{kind}}</td></tr>
-                <tr><td class="epm-se-title">Time</td><td>{{friendlyTime}}</td></tr>
-                <tr><td class="epm-se-title">User</td><td>{{user.displayName}} [{{user.name}}]</td></tr>
+                <tr><td class="epm-se-title">Time</td><td>{{friendlyTime}}<span class="epm-se-info">[{{longTime}}]</span></td></tr>
+                <tr><td class="epm-se-title">User</td><td>{{user.displayName}}<span class="epm-se-info">[{{user.name}}]</span></td></tr>
                 <tr class="epm-se-seperator"><td class="epm-se-title">Web</td><td><a href="{{web.url}}" target="_blank">{{web.title}}</a></td></tr>
                 <tr class="epm-se-seperator epm-se-raw"><td class="epm-se-title">Details</td><td><pre>{{details}}</pre></td></tr>
                 <tr class="epm-se-seperator epm-se-raw"><td class="epm-se-title">Trace</td><td><pre>{{stackTrace}}</pre></td></tr>

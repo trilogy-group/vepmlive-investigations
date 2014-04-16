@@ -51,12 +51,61 @@
                 });
 
                 $('html').keydown(function (e) {
-                    e.preventDefault();
-                    
-                    if (e.which === 38) logManager.navigate('up');
-                    else if (e.which === 40) logManager.navigate('down');
+                    if (e.which === 38) {
+                        e.preventDefault();
+                        logManager.navigate('up');
+                    } else if (e.which === 40) {
+                        e.preventDefault();
+                        logManager.navigate('down');
+                    }
                 });
             }
+
+            var helpers = (function () {
+                function getLocalTime(time) {
+                    if (window.epmLive.currentUserTimeZone) {
+                        try {
+                            return moment.tz(time, window.epmLive.currentUserTimeZone.olsonName);
+                        } catch (e) {
+                            if (window.epmLive.debugMode) {
+                                console.log(e.message);
+                            }
+                        }
+                    }
+
+                    return time;
+                }
+
+                var _getFriendlyTime = function (time) {
+                    var date = getLocalTime(time);
+
+                    moment.lang('en', {
+                        calendar: {
+                            lastDay: '[Yesterday]  MMM D',
+                            sameDay: '[Today] MMM D',
+                            nextDay: '[Tomorrow] MMM D',
+                            lastWeek: '[Last] ddd MMM D',
+                            nextWeek: 'ddd MMM D',
+                            sameElse: 'MMMM D YYYY'
+                        }
+                    });
+
+                    date = date.calendar();
+
+                    configureMoment();
+
+                    return date;
+                };
+
+                var _getLongTime = function (time) {
+                    return getLocalTime(time).format('LLLL');
+                };
+
+                return {
+                    getFriendlyTime: _getFriendlyTime,
+                    getLongTime: _getLongTime
+                };
+            })();
 
             var logManager = (function () {
                 function build(log) {
@@ -97,6 +146,9 @@
 
                     log.details = log.details.trim();
                     log.stackTrace = log.stackTrace.trim();
+
+                    log.friendlyTime = helpers.getFriendlyTime(log.time);
+                    log.longTime = helpers.getLongTime(log.time);
 
                     return log;
                 }
