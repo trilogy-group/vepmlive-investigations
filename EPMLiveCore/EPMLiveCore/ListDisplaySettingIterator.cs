@@ -542,10 +542,24 @@ namespace EPMLiveCore
                                 if (parentControl.Controls[i].GetType().ToString() == "Microsoft.SharePoint.WebControls.FormField")
                                 {
                                     string color = CoreFunctions.GetScheduleStatusField(base.ListItem);
-                                    if(color != "")
+                                    if (color != "")
                                         writer.Write(@"<img src=""/_layouts/images/" + color + @""">");
                                     else
-                                        AddControlsToWriter(parentControl.Controls[i], writer, field.InternalName);
+                                    {
+                                        string val = ((Microsoft.SharePoint.WebControls.FormField)parentControl.Controls[i]).ItemFieldValue.ToString();
+                                        string sVal = "";
+                                        try
+                                        {
+                                            sVal = ((Microsoft.SharePoint.WebControls.FieldLabel)parentControl.Controls[1]).Field.GetFieldValueAsHtml(val);
+                                        }
+                                        catch { }
+                                        if (sVal.ToLower().Contains(".gif") || sVal.ToLower().Contains(".jpg"))
+                                            writer.Write("<img src=\"" + SPContext.Current.Web.Url + "/_layouts/images/" + sVal + "\">");
+                                        else if (sVal == "")
+                                            writer.Write("&nbsp;");
+                                        else
+                                            writer.Write(sVal);
+                                    }
                                 }
                                 else
                                     AddControlsToWriter(parentControl.Controls[i], writer, field.InternalName);
