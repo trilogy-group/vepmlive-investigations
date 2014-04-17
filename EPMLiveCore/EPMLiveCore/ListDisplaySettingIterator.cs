@@ -642,7 +642,9 @@ namespace EPMLiveCore
                                     fname = f.InternalName + "_" + f.Id.ToString() + "_$ClientPeoplePicker";
                                 else if (f.TypeAsString == "ResourcePermissions" || f.TypeAsString == "ResourceLevels")
                                     fname = parentControl.Controls[9].Controls[0].Controls[0].Controls[1].ClientID;
-
+                                else if(f.InternalName == "Status")
+                                    fname = f.InternalName + "_" + f.Id.ToString() + "_$DropDownChoice";
+                                    
                                 dControls.Add(field.InternalName, fname);
 
                                 //if (((Microsoft.SharePoint.WebControls.FieldLabel)tc.Controls[1].Controls[0].Controls[1]).Field.Type == SPFieldType.Choice)
@@ -700,8 +702,8 @@ namespace EPMLiveCore
                     catch { }
 
                     writer.WriteLine("<script language=\"javascript\">");
-                    writer.WriteLine("InitStatusingControls('" + compControl + "', '" + pctControl + "', '" + statusControl + "');");
-                    writer.WriteLine("AddFormEvents();");
+                    writer.WriteLine("_spBodyOnLoadFunctionNames.push(\"InitStatusingControls('" + compControl + "', '" + pctControl + "', '" + statusControl + "')\");");
+                    //writer.WriteLine("AddFormEvents();");
                     writer.WriteLine("</script>");
                 }
                 #endregion
