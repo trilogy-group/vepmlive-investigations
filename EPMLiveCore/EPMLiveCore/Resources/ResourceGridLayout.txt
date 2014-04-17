@@ -7,13 +7,13 @@
 	<Cfg NumberId="1" FullId="0" IdChars="1234567890" AddFocusCol="Title" />
 	<Cfg Searching="1" Selecting="1" Deleting="0" />
 	<Cfg StaticCursor="1" Dragging="0" SelectingCells="1" SelectClass="0" />
-	<Cfg NoTreeLines="1" DetailOn="0" MinRowHeight="10" MaxRowHeight="15" MidWidth="300" MenuColumnsSort="1" StandardFilter="2" />
+	<Cfg NoTreeLines="1" DetailOn="0" MinRowHeight="20" MaxRowHeight="25" MidWidth="300" MenuColumnsSort="1" StandardFilter="2" />
 	<Cfg Paging="2" AllPages="1" PageLength="10" MaxPages="20" NoPager="1" ChildParts="2" />
 	<Cfg Editing="0" />
 	<Cfg NoVScroll="0" />
 	<Def>
 		<D Name="C" Width="200" />
-		<D Name="R" Wrap="0" ShowHint="0" NoColorState="1" Height="30" />
+		<D Name="R" Wrap="0" ShowHint="0" NoColorState="1" />
 		<D Name="R" HoverCell="Color" HoverRow="Color" FocusCell="" FocusRow="Background" />
 		<D Name="Group" HoverCell="" HoverRow="" FocusCell="" FocusRow="" />
 		<D Name="Group" CanFilter="2" TitleEmptyValueFormula="'No '+Grid.Header[Row.GroupCol]" />
@@ -37,7 +37,7 @@
 	<LeftCols>
 		<C Name="ResourceID" Visible="0" CanFilter="0" CanGroup="0" CanHide="0" />
 		<C Name="IsMyResource" Visible="0" CanFilter="1" CanGroup="0" CanHide="0" />
-		<C Name="ProfilePic" Type="Html" Visible="1" CanFilter="0" CanGroup="0" CanSort="0" VarHeight="1" />
+		<C Name="ProfilePic" Type="Html" Visible="1" CanFilter="0" CanGroup="0" CanSort="0"/>
 		<C Name="Title" Type="Html" RelWidth="100" MinWidth="100" CanGroup="0" CanHide="0" Button="Html" ButtonText="" />
 		<C Name="itemid" Visible="0" CanFilter="0" CanGroup="0" CanHide="0" />
 		<C Name="listid" Visible="0" CanFilter="0" CanGroup="0" CanHide="0" />

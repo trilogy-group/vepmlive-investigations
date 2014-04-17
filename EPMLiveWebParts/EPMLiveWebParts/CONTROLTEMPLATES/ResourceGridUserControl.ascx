@@ -117,7 +117,6 @@
         
         .EPMLiveResourceGridPicture {
             width:100%;
-            padding: 2.5px;
             text-align:center;
         }
         
@@ -125,7 +124,8 @@
             padding: 1px;
             border: 1px solid #eeeeee;
             background-color: #ffffff;
-            width:30px;
+            border-radius:50%;
+            width:20px;
         }
         
         .EPMLiveResourceGridPanelHovered {
