@@ -250,21 +250,20 @@ namespace EPMLiveWebParts.Layouts.epmlive
 
                             processQuickLaunch(web);
                             hideWizard(web);
-                            if (ssrsurl != "")
-                            {
-                                processReports(web);
-                            }
+                            
 
                             ProcessNotifications(web);
                             ProcessTimerJob(web);
                             ProcessBackEndLists(web);
                             ProcessGroups(web, w.CurrentUser);
                             Guid TimerJobID = ProcessReportingRefreshJob(web);
-                            ProcessExcel(web);
+                            
                             ProcessLists(web);
-                            ProcessIzenda(web);
+                            
 
                             ClearNavigationCache(web);
+                            
+                            QueueWizardJob(web);
 
                             CoreFunctions.enqueue(TimerJobID, 0);
 
@@ -306,15 +305,50 @@ namespace EPMLiveWebParts.Layouts.epmlive
             });
         }
 
-        private void ProcessIzenda(SPWeb web)
+        private void QueueWizardJob(SPWeb web)
         {
-            SPList list = web.Lists.TryGetList("IzendaReports");
-            if(list != null)
+            string password = "";
+            if (hdnReportPassword.Value == "")
+                password = hdnSaveReportPassword.Value;
+            else
+                password = hdnReportPassword.Value;
+
+            SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(web.Site.WebApplication.Id));
+
+            SPSecurity.RunWithElevatedPrivileges(delegate()
             {
-                string errors = "";
-                EPMLiveCore.API.Reporting.ProcessIzendaReportsFromList(list, out errors);
-            }
+                cn.Open();
+            });
+
+            SqlCommand cmd = new SqlCommand("delete from timerjobs where webguid=@webguid and jobtype=150", cn);
+            cmd.Parameters.AddWithValue("@webguid", web.ID.ToString());
+            SqlDataReader dr = cmd.ExecuteReader();
+
+            Guid timerjobguid = Guid.NewGuid();
+            dr.Close();
+            cmd = new SqlCommand("INSERT INTO TIMERJOBS (timerjobuid, siteguid, jobtype, jobname, runtime, scheduletype, webguid, jobdata) VALUES (@timerjobuid, @siteguid, 150, 'Setup Wizard', 0, 0, @webguid, @data)", cn);
+            cmd.Parameters.AddWithValue("@siteguid", web.Site.ID.ToString());
+            cmd.Parameters.AddWithValue("@timerjobuid", timerjobguid);
+            cmd.Parameters.AddWithValue("@webguid", web.ID.ToString());
+            cmd.Parameters.AddWithValue("@data", txtReportServer.Text + "|" + txtReportDatabase.Text + "|" + txtReportUsername.Text + "|" + password + "|" + chkWindows.Checked);
+            cmd.ExecuteNonQuery();
+            
+
+            cn.Close();
+
+            CoreFunctions.enqueue(timerjobguid, 0);
+
         }
+
+        //private void ProcessIzenda(SPWeb web)
+        //{
+        //    SPList list = web.Lists.TryGetList("IzendaReports");
+        //    if(list != null)
+        //    {
+        //        string errors = "";
+        //        EPMLiveCore.API.Reporting.ProcessIzendaReportsFromList(list, out errors);
+        //    }
+        //}
 
         private void ProcessLists(SPWeb web)
         {
@@ -341,47 +375,47 @@ namespace EPMLiveWebParts.Layouts.epmlive
 
         }
 
-        private void ProcessExcel(SPWeb web)
-        {
+        //private void ProcessExcel(SPWeb web)
+        //{
 
-            string pwd = "";
-            if (hdnReportPassword.Value == "")
-                pwd = hdnSaveReportPassword.Value;
-            else
-                pwd = hdnReportPassword.Value;
+        //    string pwd = "";
+        //    if (hdnReportPassword.Value == "")
+        //        pwd = hdnSaveReportPassword.Value;
+        //    else
+        //        pwd = hdnReportPassword.Value;
 
 
-            var connectionInfo = new ExcelConnectionInfo
-            {
-                SiteUrl = web.Url,                                         // The site URL that contains the files to be updated.
-                DataConnectionLibraryName = "Excel Datasources",      // The name of the document library containing the odc files.
-                ExcelFileLibraryName = "Excel Reports",                      // The name of the document library containing the excel files.
-                DataConnectionReportDbName = txtReportDatabase.Text,            // The name of the reporting database.
-                DataConnectionServerName = txtReportServer.Text,                      // The name of the server the reporting database is hosted on.
-                DataConnectionUserName = txtReportUsername.Text,                 // The username to connect to the reporting database.
-                DataConnectionUserPassword = pwd,
-                ReportDatabaseToken = "{REPORTDB}",                        // The token that needs to be put into the odc/excel files to be replaced with DataConnectionReportDbName property above.
-                ReportServerToken = "{DBSERVER}",                          // The token that needs to be put into the odc/excel files to be replaced with DataConnectionServerName property above.
-                UserNameToken = "{USERNAME}",                              // The token that needs to be put into the odc/excel files to be replaced with DataConnectionUserName property above.
-                PasswordToken = "{PASSWORD}",                              // The token that needs to be put into the odc/excel files to be replaced with DataConnectionUserPassword property above.
-                SiteUrlToken = "{SITEURL}",                                // The token that needs to be put into the odc/excel files to be replaced with SiteUrl property above.
-                DataConnectionLibraryToken = "{DATACONNECTIONLIBRARY}",    // The token that needs to be put into the odc/excel files to be replaced with DataConnectionLibraryName property above.
-                OdcFilePrefix = "EPMLIVE_"                                 // This is what the odc files need to be prefixed with so that only those ones are updated.
-            };
+        //    var connectionInfo = new ExcelConnectionInfo
+        //    {
+        //        SiteUrl = web.Url,                                         // The site URL that contains the files to be updated.
+        //        DataConnectionLibraryName = "Excel Datasources",      // The name of the document library containing the odc files.
+        //        ExcelFileLibraryName = "Excel Reports",                      // The name of the document library containing the excel files.
+        //        DataConnectionReportDbName = txtReportDatabase.Text,            // The name of the reporting database.
+        //        DataConnectionServerName = txtReportServer.Text,                      // The name of the server the reporting database is hosted on.
+        //        DataConnectionUserName = txtReportUsername.Text,                 // The username to connect to the reporting database.
+        //        DataConnectionUserPassword = pwd,
+        //        ReportDatabaseToken = "{REPORTDB}",                        // The token that needs to be put into the odc/excel files to be replaced with DataConnectionReportDbName property above.
+        //        ReportServerToken = "{DBSERVER}",                          // The token that needs to be put into the odc/excel files to be replaced with DataConnectionServerName property above.
+        //        UserNameToken = "{USERNAME}",                              // The token that needs to be put into the odc/excel files to be replaced with DataConnectionUserName property above.
+        //        PasswordToken = "{PASSWORD}",                              // The token that needs to be put into the odc/excel files to be replaced with DataConnectionUserPassword property above.
+        //        SiteUrlToken = "{SITEURL}",                                // The token that needs to be put into the odc/excel files to be replaced with SiteUrl property above.
+        //        DataConnectionLibraryToken = "{DATACONNECTIONLIBRARY}",    // The token that needs to be put into the odc/excel files to be replaced with DataConnectionLibraryName property above.
+        //        OdcFilePrefix = "EPMLIVE_"                                 // This is what the odc files need to be prefixed with so that only those ones are updated.
+        //    };
 
-            // This is the updater object which takes in the object above along with a "SharepointService".
-            // The SharepointService class simply encapsulates commands to interact with sharepoint like reading/writing files.
-            var updater = new ExcelConnectionUpdatorService(connectionInfo, new SharepointService());
+        //    // This is the updater object which takes in the object above along with a "SharepointService".
+        //    // The SharepointService class simply encapsulates commands to interact with sharepoint like reading/writing files.
+        //    var updater = new ExcelConnectionUpdatorService(connectionInfo, new SharepointService());
 
-            // These are the only two methods that need to be called on the updater.
-            // One to update the ODC files and another to update the Excel files.
-            try
-            {
-                updater.ProcessOdcFiles();
-                updater.ProcessExcelFiles();
-            }
-            catch { }
-        }
+        //    // These are the only two methods that need to be called on the updater.
+        //    // One to update the ODC files and another to update the Excel files.
+        //    try
+        //    {
+        //        updater.ProcessOdcFiles();
+        //        updater.ProcessExcelFiles();
+        //    }
+        //    catch { }
+        //}
         private Guid ProcessReportingRefreshJob(SPWeb web)
         {
             SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(web.Site.WebApplication.Id));
@@ -751,128 +785,128 @@ namespace EPMLiveWebParts.Layouts.epmlive
             return "";
         }
 
-        private void processReports(SPWeb web)
-        {
-            SPSecurity.RunWithElevatedPrivileges(delegate(){
+        //private void processReports(SPWeb web)
+        //{
+        //    SPSecurity.RunWithElevatedPrivileges(delegate(){
 
-                SSRS2006.ReportingService2006 SSRS = new SSRS2006.ReportingService2006();
-                SSRS.Url = ssrsurl + "/ReportService2006.asmx";
-                SSRS.UseDefaultCredentials = true;
+        //        SSRS2006.ReportingService2006 SSRS = new SSRS2006.ReportingService2006();
+        //        SSRS.Url = ssrsurl + "/ReportService2006.asmx";
+        //        SSRS.UseDefaultCredentials = true;
 
-                string username = "";
-                string password = "";
-                EPMLiveCore.ReportAuth _chrono = SPContext.Current.Site.WebApplication.GetChild<EPMLiveCore.ReportAuth>("ReportAuth");
-                if(_chrono != null)
-                {
-                    username = _chrono.Username;
-                    password = EPMLiveCore.CoreFunctions.Decrypt(_chrono.Password, "KgtH(@C*&@Dhflosdf9f#&f");
-                }
+        //        string username = "";
+        //        string password = "";
+        //        EPMLiveCore.ReportAuth _chrono = SPContext.Current.Site.WebApplication.GetChild<EPMLiveCore.ReportAuth>("ReportAuth");
+        //        if(_chrono != null)
+        //        {
+        //            username = _chrono.Username;
+        //            password = EPMLiveCore.CoreFunctions.Decrypt(_chrono.Password, "KgtH(@C*&@Dhflosdf9f#&f");
+        //        }
 
-                if(password != "")
-                {
-                    SSRS.UseDefaultCredentials = false;
-                    if(username.Contains("\\"))
-                    {
-                        SSRS.Credentials = new System.Net.NetworkCredential(username.Substring(username.IndexOf("\\") + 1), password, username.Substring(0, username.IndexOf("\\")));
-                    }
-                    else
-                    {
-                        SSRS.Credentials = new System.Net.NetworkCredential(username, password);
-                    }
-                }
+        //        if(password != "")
+        //        {
+        //            SSRS.UseDefaultCredentials = false;
+        //            if(username.Contains("\\"))
+        //            {
+        //                SSRS.Credentials = new System.Net.NetworkCredential(username.Substring(username.IndexOf("\\") + 1), password, username.Substring(0, username.IndexOf("\\")));
+        //            }
+        //            else
+        //            {
+        //                SSRS.Credentials = new System.Net.NetworkCredential(username, password);
+        //            }
+        //        }
 
 
-                /*System.Web.HttpCookie tCookie = System.Web.HttpContext.Current.Response.Cookies["WSS_KeepSessionAuthenticated"];
+        //        /*System.Web.HttpCookie tCookie = System.Web.HttpContext.Current.Response.Cookies["WSS_KeepSessionAuthenticated"];
 
-                System.Net.Cookie oC = new System.Net.Cookie();
+        //        System.Net.Cookie oC = new System.Net.Cookie();
 
-                // Convert between the System.Net.Cookie to a System.Web.HttpCookie...
-                oC.Domain = System.Web.HttpContext.Current.Request.Url.Host;
-                oC.Expires = tCookie.Expires;
-                oC.Name = tCookie.Name;
-                oC.Path = tCookie.Path;
-                oC.Secure = tCookie.Secure;
-                oC.Value = tCookie.Value;
+        //        // Convert between the System.Net.Cookie to a System.Web.HttpCookie...
+        //        oC.Domain = System.Web.HttpContext.Current.Request.Url.Host;
+        //        oC.Expires = tCookie.Expires;
+        //        oC.Name = tCookie.Name;
+        //        oC.Path = tCookie.Path;
+        //        oC.Secure = tCookie.Secure;
+        //        oC.Value = tCookie.Value;
                  
-                SSRS.CookieContainer = new System.Net.CookieContainer();
+        //        SSRS.CookieContainer = new System.Net.CookieContainer();
 
-                SSRS.CookieContainer.Add(oC);
-                */
+        //        SSRS.CookieContainer.Add(oC);
+        //        */
 
-                try
-                {
-                    var authCookie = HttpContext.Current.Request.Cookies["FedAuth"];
-                    var fedAuth = new Cookie(authCookie.Name, authCookie.Value, authCookie.Path, string.IsNullOrEmpty(authCookie.Domain) ? HttpContext.Current.Request.Url.Host : authCookie.Domain);
-                    SSRS.CookieContainer = new CookieContainer();
-                    SSRS.CookieContainer.Add(fedAuth);
-                }
-                catch { }
+        //        try
+        //        {
+        //            var authCookie = HttpContext.Current.Request.Cookies["FedAuth"];
+        //            var fedAuth = new Cookie(authCookie.Name, authCookie.Value, authCookie.Path, string.IsNullOrEmpty(authCookie.Domain) ? HttpContext.Current.Request.Url.Host : authCookie.Domain);
+        //            SSRS.CookieContainer = new CookieContainer();
+        //            SSRS.CookieContainer.Add(fedAuth);
+        //        }
+        //        catch { }
 
-                SPDocumentLibrary list = (SPDocumentLibrary)web.Lists["Report Library"];
+        //        SPDocumentLibrary list = (SPDocumentLibrary)web.Lists["Report Library"];
 
-                SPListItemCollection folders = list.GetItemsInFolder(list.DefaultView, list.RootFolder);
+        //        SPListItemCollection folders = list.GetItemsInFolder(list.DefaultView, list.RootFolder);
 
-                foreach (SPListItem li in folders)
-                {
-                    if (li.FileSystemObjectType == SPFileSystemObjectType.Folder && li.Name == "Data Sources")
-                    {
-                        SSRS2006.DataSourceDefinition dsd = new SSRS2006.DataSourceDefinition();
-                        dsd.ConnectString = "Data Source=" + txtReportServer.Text + ";Initial Catalog=" + txtReportDatabase.Text + ";";
-                        dsd.CredentialRetrieval = SSRS2006.CredentialRetrievalEnum.Store;
-                        dsd.UserName = txtReportUsername.Text;
-                        if (hdnReportPassword.Value == "")
-                            dsd.Password = hdnSaveReportPassword.Value;
-                        else
-                            dsd.Password = hdnReportPassword.Value;
+        //        foreach (SPListItem li in folders)
+        //        {
+        //            if (li.FileSystemObjectType == SPFileSystemObjectType.Folder && li.Name == "Data Sources")
+        //            {
+        //                SSRS2006.DataSourceDefinition dsd = new SSRS2006.DataSourceDefinition();
+        //                dsd.ConnectString = "Data Source=" + txtReportServer.Text + ";Initial Catalog=" + txtReportDatabase.Text + ";";
+        //                dsd.CredentialRetrieval = SSRS2006.CredentialRetrievalEnum.Store;
+        //                dsd.UserName = txtReportUsername.Text;
+        //                if (hdnReportPassword.Value == "")
+        //                    dsd.Password = hdnSaveReportPassword.Value;
+        //                else
+        //                    dsd.Password = hdnReportPassword.Value;
                         
-                        if(chkWindows.Checked)
-                            dsd.WindowsCredentials = chkWindows.Checked;
+        //                if(chkWindows.Checked)
+        //                    dsd.WindowsCredentials = chkWindows.Checked;
 
-                        dsd.Enabled = true;
-                        dsd.Extension = "SQL";
+        //                dsd.Enabled = true;
+        //                dsd.Extension = "SQL";
 
-                        SSRS.CreateDataSource("EPMLiveReportDB.rsds", web.Url + "/" + li.Url, true, dsd, null);
-                    }
-                }
+        //                SSRS.CreateDataSource("EPMLiveReportDB.rsds", web.Url + "/" + li.Url, true, dsd, null);
+        //            }
+        //        }
             
-                SSRS2006.DataSourceReference dsr = new SSRS2006.DataSourceReference();
-                dsr.Reference = web.Url + "/Report Library/Data Sources/EPMLiveReportDB.rsds";
+        //        SSRS2006.DataSourceReference dsr = new SSRS2006.DataSourceReference();
+        //        dsr.Reference = web.Url + "/Report Library/Data Sources/EPMLiveReportDB.rsds";
 
-                foreach (SPListItem li in folders)
-                {
-                    processRDL(SSRS, web, li, dsr, list);
-                }
-            });
-        }
+        //        foreach (SPListItem li in folders)
+        //        {
+        //            processRDL(SSRS, web, li, dsr, list);
+        //        }
+        //    });
+        //}
 
-        private void processRDL(SSRS2006.ReportingService2006 SSRS, SPWeb web, SPListItem folder, SSRS2006.DataSourceReference dsr, SPDocumentLibrary list)
-        {
-            foreach (SPListItem li in list.GetItemsInFolder(list.DefaultView, folder.Folder))
-            {
-                if (li.FileSystemObjectType == SPFileSystemObjectType.Folder)
-                {
+        //private void processRDL(SSRS2006.ReportingService2006 SSRS, SPWeb web, SPListItem folder, SSRS2006.DataSourceReference dsr, SPDocumentLibrary list)
+        //{
+        //    foreach (SPListItem li in list.GetItemsInFolder(list.DefaultView, folder.Folder))
+        //    {
+        //        if (li.FileSystemObjectType == SPFileSystemObjectType.Folder)
+        //        {
 
-                    processRDL(SSRS, web, li, dsr, list);
-                }
-                else
-                {
-                    try
-                    {
-                        SSRS2006.DataSource[] dsstl = SSRS.GetItemDataSources(web.Url + "/" + li.Url);
-                        for (int i = 0; i < dsstl.Length; i++)
-                        {
-                            if (dsstl[i].Name == "EPMLiveReportDB")
-                            {
-                                dsstl[i].Item = dsr;
-                            }
-                        }
-                        SSRS.SetItemDataSources(web.Url + "/" + li.Url, dsstl);
-                    }
-                    catch { }
-                }
-            }
+        //            processRDL(SSRS, web, li, dsr, list);
+        //        }
+        //        else
+        //        {
+        //            try
+        //            {
+        //                SSRS2006.DataSource[] dsstl = SSRS.GetItemDataSources(web.Url + "/" + li.Url);
+        //                for (int i = 0; i < dsstl.Length; i++)
+        //                {
+        //                    if (dsstl[i].Name == "EPMLiveReportDB")
+        //                    {
+        //                        dsstl[i].Item = dsr;
+        //                    }
+        //                }
+        //                SSRS.SetItemDataSources(web.Url + "/" + li.Url, dsstl);
+        //            }
+        //            catch { }
+        //        }
+        //    }
             
-        }
+        //}
 
         private void hideWizard(SPWeb web)
         {
