@@ -47,10 +47,10 @@ namespace EPMLiveCore
             if(li.Fields.GetFieldByInternalName(field.InternalName).ReadOnlyField)
                 return false;
             if(li.Fields.GetFieldByInternalName(field.InternalName).ShowInEditForm == null)
-                return isEditableField(li, li.Fields.GetFieldByInternalName(field.InternalName), fieldProperties);
+                return isEditableField(li, li.Fields.GetFieldByInternalName(field.InternalName), fieldProperties, "Edit");
             if(!li.Fields.GetFieldByInternalName(field.InternalName).ShowInEditForm.Value)
                 return false;
-            return isEditableField(li, li.Fields.GetFieldByInternalName(field.InternalName), fieldProperties);
+            return isEditableField(li, li.Fields.GetFieldByInternalName(field.InternalName), fieldProperties, "Edit");
         }
 
         public static bool isEditable(SPList list, SPField field, Dictionary<string, Dictionary<string, string>> fieldProperties)
@@ -59,24 +59,24 @@ namespace EPMLiveCore
                 return false;
 
             if(list.Fields.GetFieldByInternalName(field.InternalName).ShowInEditForm == null)
-                return isEditableField(list.Fields.GetFieldByInternalName(field.InternalName), fieldProperties);
+                return isEditableField(list.Fields.GetFieldByInternalName(field.InternalName), fieldProperties, "Edit");
 
             if(!list.Fields.GetFieldByInternalName(field.InternalName).ShowInEditForm.Value)
                 return false;
 
-            return isEditableField(list.Fields.GetFieldByInternalName(field.InternalName), fieldProperties);
+            return isEditableField(list.Fields.GetFieldByInternalName(field.InternalName), fieldProperties, "Edit");
         }
 
-        private static bool isEditableField(SPField field, Dictionary<string, Dictionary<string, string>> fieldProperties)
+        private static bool isEditableField(SPField field, Dictionary<string, Dictionary<string, string>> fieldProperties, string key)
         {
             try
             {
-                if(!fieldProperties[field.InternalName].ContainsKey("Edit"))
+                if (!fieldProperties[field.InternalName].ContainsKey(key))
                     return true;
 
                 string displaySettings = string.Empty;
 
-                displaySettings = fieldProperties[field.InternalName]["Edit"];
+                displaySettings = fieldProperties[field.InternalName][key];
                 if(displaySettings.Split(";".ToCharArray())[0].ToLower().Equals("where"))
                     return true;
 
@@ -146,16 +146,16 @@ namespace EPMLiveCore
             return bIsDate;
         }
 
-        private static bool isEditableField(SPListItem li, SPField field, Dictionary<string, Dictionary<string, string>> fieldProperties)
+        private static bool isEditableField(SPListItem li, SPField field, Dictionary<string, Dictionary<string, string>> fieldProperties, string key)
         {
             try
             {
-                if(!fieldProperties[field.InternalName].ContainsKey("Edit"))
+                if(!fieldProperties[field.InternalName].ContainsKey(key))
                     return true;
 
                 string displaySettings = string.Empty;
 
-                displaySettings = fieldProperties[field.InternalName]["Edit"];
+                displaySettings = fieldProperties[field.InternalName][key];
                 if(displaySettings.Split(";".ToCharArray())[0].ToLower().Equals("where"))
                 {
                     string where = displaySettings.Split(";".ToCharArray())[1];

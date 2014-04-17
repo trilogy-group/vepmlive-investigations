@@ -70,7 +70,11 @@ namespace EPMLiveCore
 
                     sbAttributes.Append(name);
                     sbAttributes.Append(":\"");
-                    sbAttributes.Append(System.Web.HttpUtility.HtmlEncode(ndChild.InnerText).Replace("\"", "\\\"").Replace("\n", "").Replace("\r", ""));
+                    if (ndChild.Name == "#cdata-section")
+                        sbAttributes.Append(ndChild.InnerText.Replace("\"", "\\\"").Replace("\n", "").Replace("\r", ""));
+                    else
+                        sbAttributes.Append(System.Web.HttpUtility.HtmlEncode(ndChild.InnerText).Replace("\"", "\\\"").Replace("\n", "").Replace("\r", ""));
+                    
                     sbAttributes.Append("\",");
                 }
                 else
