@@ -18,9 +18,9 @@ table.myfragments > tbody > tr > td:first-child {
     border-top: none !important;
 }
 
-#gridMyFragments {
+/*#gridMyFragments {
     border-top: 1px solid #eeeeee !important;
-}
+}*/
 
     #gridMyFragments a {
         text-decoration: none !important;
@@ -68,6 +68,7 @@ table.row-select > tbody > tr:hover {
     overflow: auto;
     color: #555555;
     font-size: 14px;
+     border-top: 1px solid #eeeeee !important;
 }
 
 #divIFLoading {
