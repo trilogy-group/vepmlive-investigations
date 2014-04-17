@@ -264,9 +264,6 @@ div.epmliveToolBar .grouping-delete {
   float: right;
   padding-top: 7px;
 }
-div.epmliveToolBar .navbar-nav.navbar-right:last-child {
-  margin-right: -15px;
-}
 div.epmliveToolBar .navbar-right {
   float: right !important;
 }
