@@ -117,6 +117,10 @@ function ProcessPercentCompleteForm() {
 }
 
 function InitStatusingControls(_comp, _pct, _status) {
+    setTimeout("InitStatusing('" + _comp + "','" + _pct + "','" + _status + "')", 1000);
+}
+
+function InitStatusing(_comp, _pct, _status) {
     try {
         _WEStatus_Control_PercentComplete = document.getElementById(_pct);
         _WEStatus_Complete = _WEStatus_Control_PercentComplete.checked;
@@ -134,15 +138,17 @@ function InitStatusingControls(_comp, _pct, _status) {
             }
         }
     } catch (e) { }
+    AddFormEvents();
 }
 
-function AddFormEvents() {
-    if (_WEStatus_Control_Complete != null)
-        _WEStatus_Control_Complete.onclick = function () { ProcessCompleteForm(); };
 
-    if (_WEStatus_Control_Status != null)
-        _WEStatus_Control_Status.onchange = function () { ProcessStatusForm(); };
+    function AddFormEvents() {
+        if (_WEStatus_Control_Complete != null)
+            _WEStatus_Control_Complete.onclick = function () { ProcessCompleteForm(); };
 
-    if (_WEStatus_Control_PercentComplete != null)
-        _WEStatus_Control_PercentComplete.onchange = function () { ProcessPercentCompleteForm(); };
-}
+        if (_WEStatus_Control_Status != null)
+            _WEStatus_Control_Status.onchange = function () { ProcessStatusForm(); };
+
+        if (_WEStatus_Control_PercentComplete != null)
+            _WEStatus_Control_PercentComplete.onchange = function () { ProcessPercentCompleteForm(); };
+    }
