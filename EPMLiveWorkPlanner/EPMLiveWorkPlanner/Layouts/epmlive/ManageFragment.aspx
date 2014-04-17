@@ -11,8 +11,6 @@
 <asp:content id="PageHead" contentplaceholderid="PlaceHolderAdditionalPageHead" runat="server">
     <link href="styles/icomoon-style.css" rel='stylesheet' type='text/css' />
     
-    <link href='http://www.uplandux.com/styleguide/css/bootstrap.css' type='text/css' rel='stylesheet' />
-    
     <script type="text/javascript">
 
         function OpenPopupToEditFragment(itemid) {
