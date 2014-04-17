@@ -305,6 +305,10 @@ namespace EPMLiveCore
                                 canOnline = true;
                             else
                                 bool.TryParse(EPMLiveCore.CoreFunctions.getConfigSetting(lweb, "EPMLivePlanner" + sPlanner[0] + "EnableOnline"), out canOnline);
+
+                            if(!canOnline)
+                                bool.TryParse(EPMLiveCore.CoreFunctions.getConfigSetting(lweb, "EPMLivePlanner" + sPlanner[0] + "EnableKanban"), out canOnline);
+
                             bool.TryParse(EPMLiveCore.CoreFunctions.getConfigSetting(lweb, "EPMLivePlanner" + sPlanner[0] + "EnableProject"), out canProject);
 
                             if ((!bDisablePlan && canOnline) || (!bDisableProject && canProject))
