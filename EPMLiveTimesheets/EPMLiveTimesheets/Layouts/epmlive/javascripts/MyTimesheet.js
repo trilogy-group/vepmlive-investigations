@@ -1387,6 +1387,9 @@ function DoPopUp(grid, row, col) {
                     grid.SetAttribute(row, col, "HtmlPrefix", strDivTag, true, false);
 
                 }
+                else {
+                    setTimeout("curGrid.StartEdit()", 100);
+                }
             }
             else if (TSColType == 2) {
                 try{
@@ -1462,7 +1465,7 @@ function DoPopUp(grid, row, col) {
 
                 setTimeout("curGrid.StartEdit()", 100);
             }
-
+            
         }
 
     }
