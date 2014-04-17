@@ -1030,7 +1030,7 @@ namespace EPMLiveCore.API
 
                 try
                 {
-                    ndStatus.SelectSingleNode("PercentComplete").InnerText = (float.Parse(oListItem["InstallPercent"].ToString()) * 100).ToString();
+                    ndStatus.SelectSingleNode("PercentComplete").InnerText = Convert.ToInt32(float.Parse(oListItem["InstallPercent"].ToString()) * 100).ToString();
                 }
                 catch
                 {
