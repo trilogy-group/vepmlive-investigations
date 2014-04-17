@@ -119,6 +119,19 @@ namespace EPMLiveCore
             catch { }
         }
 
+        private string GetProperty(SPItemEventProperties properties, string property)
+        {
+            try
+            {
+                if (properties.AfterProperties[property] == null)
+                    return properties.ListItem[property].ToString();
+                else
+                    return properties.AfterProperties[property].ToString();
+            }
+            catch { }
+            return "";
+        }
+
         private void processItem(SPItemEventProperties properties, bool isAdd)
         {
             bool isGeneric = false;
@@ -127,13 +140,13 @@ namespace EPMLiveCore
 
             try
             {
-                bool.TryParse(properties.AfterProperties["Generic"].ToString(), out isGeneric);
+                bool.TryParse(GetProperty(properties, "Generic"), out isGeneric);
             }catch{}
-            try
-            {
-                bool.TryParse(properties.ListItem["Generic"].ToString(), out isGeneric);
-            }
-            catch { }
+            //try
+            //{
+            //    bool.TryParse(properties.ListItem["Generic"].ToString(), out isGeneric);
+            //}
+            //catch { }
 
             try
             {
@@ -805,7 +818,7 @@ namespace EPMLiveCore
         private string createGroup(SPItemEventProperties properties)
         {
             SPWeb web = properties.Web;
-            string group = properties.AfterProperties["Title"].ToString();
+            string group = GetProperty(properties, "Title");
             web.Site.CatchAccessDeniedException = false;
             try
             {
