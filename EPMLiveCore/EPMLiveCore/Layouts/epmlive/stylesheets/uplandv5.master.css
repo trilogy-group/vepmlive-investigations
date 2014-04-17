@@ -5774,7 +5774,7 @@ div.epmliveToolBar {
             right: 0;
             left: auto;
         }
-    }*/
+    }*/   
 }
 div.epmliveToolBar .navbar-collapse:before,
 div.epmliveToolBar .navbar-collapse:after {
@@ -6026,9 +6026,6 @@ div.epmliveToolBar .grouping-delete {
   cursor: pointer;
   float: right;
   padding-top: 7px;
-}
-div.epmliveToolBar .navbar-nav.navbar-right:last-child {
-  margin-right: -15px;
 }
 div.epmliveToolBar .navbar-right {
   float: right !important;
