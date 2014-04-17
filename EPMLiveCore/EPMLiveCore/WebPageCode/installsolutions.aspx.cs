@@ -40,6 +40,7 @@ namespace EPMLiveCore
                 Install(new Guid("1858d521-0375-4a61-9281-f5210854bc12"), farm, apps);
                 Install(new Guid("160f5e32-b93f-4682-95bc-6db38233535a"), farm, apps);
                 Install(new Guid("5a3fe24c-2dc5-4a1c-aec1-6ce942825ceb"), farm, apps);
+                Install(new Guid("171917a9-ea5c-49ec-b144-434a45222fc2"), farm, apps);
             }
             catch(Exception ex) { output = "Failed: " + ex.Message; return; }
             output = "Success";
