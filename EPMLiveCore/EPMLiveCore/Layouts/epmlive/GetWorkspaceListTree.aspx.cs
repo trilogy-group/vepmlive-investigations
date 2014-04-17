@@ -174,7 +174,7 @@ namespace EPMLiveCore
                         newCell = doc.CreateNode(XmlNodeType.Element, "cell", doc.NamespaceURI);
 
                         XmlAttribute attrImage = doc.CreateAttribute("image");
-                        attrImage.Value = "STSICON.GIF";
+                        attrImage.Value = "team.png";
                         newCell.Attributes.Append(attrImage);
 
                         if (tempWeb.ID == Web.ID)
