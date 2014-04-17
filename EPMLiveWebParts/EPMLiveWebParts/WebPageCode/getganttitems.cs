@@ -25,7 +25,7 @@ namespace EPMLiveWebParts
             base.getParams(curWeb);
             ArrayList arrFields = new ArrayList();
 
-            foreach (string field in view.ViewFields)
+            foreach (string field in aViewFields)
             {
                 arrFields.Add(field);
             }
@@ -561,7 +561,10 @@ namespace EPMLiveWebParts
                         }
                         else
                             return value;
-
+                    case SPFieldType.Boolean:
+                        if (value.ToLower() == "true")
+                            return "1";
+                        return "0";
                     default:
                         switch (oField.TypeAsString)
                         {

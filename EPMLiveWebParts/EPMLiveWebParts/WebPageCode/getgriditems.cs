@@ -217,27 +217,7 @@ namespace EPMLiveWebParts
                 
                 getParams(curWeb);
 
-                if (!string.IsNullOrEmpty(DifferentColumns))
-                {
-                    ArrayList arrCurFields = new ArrayList(aViewFields);
-
-                    foreach (string sField in DifferentColumns.Split(','))
-                    {
-
-                        if (!aViewFields.Contains(sField))
-                            aViewFields.Add(sField);
-
-                        if (arrCurFields.Contains(sField))
-                            arrCurFields.Remove(sField);
-                    }
-
-                    foreach (string sField in arrCurFields)
-                    {
-                        if (aViewFields.Contains(sField))
-                            aViewFields.Remove(sField);
-                    }
-                }
-
+                
                 if (aViewFields.Contains("Gantt"))
                 {
                     bShowGantt = true;
@@ -2267,6 +2247,27 @@ namespace EPMLiveWebParts
                                     case SPFieldType.User:
                                         displayValue = oField.GetFieldValueAsHtml(val);
                                         break;
+                                    case SPFieldType.MultiChoice:
+                                        try
+                                        {
+                                            displayValue = "";
+                                            SPFieldMultiChoiceValue f = new SPFieldMultiChoiceValue(val);
+                                            for (int j = 0; j < f.Count; j++)
+                                            {
+                                                displayValue += ";" + f[j];
+                                            }
+                                            displayValue = displayValue.Trim(';');
+                                        }
+                                        catch { }
+                                        break;
+                                    case SPFieldType.Lookup:
+                                        try
+                                        {
+                                            displayValue = li[oField.Id].ToString();
+                                        }
+                                        catch { }
+                                        break;
+                                    
                                     default:
                                         displayValue = val;
                                         break;
@@ -5518,7 +5519,27 @@ namespace EPMLiveWebParts
                     bWorkspaceUrl = true;
             }
 
-            
+            if (!string.IsNullOrEmpty(DifferentColumns))
+            {
+                ArrayList arrCurFields = new ArrayList(aViewFields);
+
+                foreach (string sField in DifferentColumns.Split(','))
+                {
+
+                    if (!aViewFields.Contains(sField))
+                        aViewFields.Add(sField);
+
+                    if (arrCurFields.Contains(sField))
+                        arrCurFields.Remove(sField);
+                }
+
+                foreach (string sField in arrCurFields)
+                {
+                    if (aViewFields.Contains(sField))
+                        aViewFields.Remove(sField);
+                }
+            }
+
             
         }
         public string getField(SPListItem li, string field, bool group)

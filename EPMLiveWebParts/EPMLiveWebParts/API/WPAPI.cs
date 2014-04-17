@@ -652,6 +652,15 @@ namespace EPMLiveWebParts
                                 val = oField.GetFieldValueAsText(li[oField.Id].ToString());
                         }
                         break;
+                    case SPFieldType.Boolean:
+                        val = "0";
+                        try
+                        {
+                            if (li[oField.Id].ToString().ToLower() == "yes")
+                                val = "1";
+                        }
+                        catch { }
+                        break;
                     default:
 
                         if (bEditMode)
