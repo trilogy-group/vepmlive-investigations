@@ -485,16 +485,9 @@ namespace EPMLiveCore.API
             return dt;
         }
 
-        private static string GetCacheKey(SPWeb web, string kind)
-        {
-            return "ResourceGrid_" + kind + "_W_" + web.ID + "_U_" + web.CurrentUser.ID;
-        }
-
         public static string SaveTeam(string sdoc, SPWeb oWeb)
         {
-            CacheStore.Current.Remove(GetCacheKey(oWeb, "Data"),
-                     new CacheStoreCategory(oWeb).ResourceGrid);
-
+            ResourceGrid.ClearCache(oWeb);
             XmlDocument docOut = new XmlDocument();
             docOut.LoadXml("<Team/>");
 
