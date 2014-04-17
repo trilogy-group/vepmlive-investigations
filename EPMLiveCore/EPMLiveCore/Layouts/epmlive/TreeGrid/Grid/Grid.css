@@ -163,6 +163,10 @@ top:4px;
    font-size:13px; "Open Sans Regular", Helvetica, Arial, sans-serif; white-space:nowrap;
   padding-left:3px; padding-right:3px; padding-top:8px; padding-bottom:8px;height: 20px;line-height: 20px;position:relative; color: #555
    }
+    .GMCell a {
+        color: #555;
+    }
+
 .GMInt,.GMFloat,.GMDate { text-align:right; }
 .GMLines,.GMRadio,.GMHtml,.GMList { white-space:normal; }	
 .GMImg,.GMHtml  
