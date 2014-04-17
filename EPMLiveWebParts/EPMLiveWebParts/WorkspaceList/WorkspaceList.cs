@@ -140,7 +140,7 @@ namespace EPMLiveWebParts
 
             output.Write("mygrid.setImagePath('" + SPContext.Current.Web.Url + "/_layouts/epmlive/DHTML/xgrid/imgs/');");
             output.Write("mygrid.setSkin('myworkspace');");
-            output.Write("mygrid.setImageSize(16,16);");
+            output.Write("mygrid.setImageSize(14,14);");
             output.Write("mygrid.attachEvent('onXLE',clearLoader);");
             output.Write("mygrid.enableAutoHeigth(true);");
             output.Write("mygrid.enableAlterCss('', '');");
