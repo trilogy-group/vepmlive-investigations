@@ -638,7 +638,7 @@ function EditGridRow(grid, row, col) {
 
 
 
-    if (row.itemid && grid.EditRow != row.id) {
+    if (row.itemid && grid.EditRow != row.id && row.id != "Header") {
         var webUrl = window.epmLiveNavigation.currentWebUrl;
 
         var cols = "";
