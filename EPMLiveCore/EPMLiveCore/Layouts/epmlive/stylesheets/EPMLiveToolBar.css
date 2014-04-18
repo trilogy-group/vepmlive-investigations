@@ -221,6 +221,16 @@ div.epmliveToolBar .dropdown-header {
   line-height: 1.42857;
   padding: 3px 20px;
 }
+div.epmliveToolBar .no-text {
+  color: #CCCCCC;
+  display: block;
+  font-size: 1.1em;
+  font-weight: 300;
+  line-height: 1.42857;
+  padding: 3px 20px;
+  text-align: center;
+  padding-bottom: 8px;
+}
 div.epmliveToolBar .grouping-dropdown-menu .grouping-wrapper {
   display: inline-block;
   padding: 8px 15px 0;
