@@ -50,6 +50,14 @@
     -ms-filter: "progid:DXImageTransform.Microsoft.Alpha"(Opacity=75);
 }
 
+#kanbanloadingdiv {
+    display: inline-block;
+    min-height: 500px;
+    position: relative;
+    visibility: visible;
+    width: 100%;
+}
+
 #splitter {
     float: left;
     cursor: pointer;
