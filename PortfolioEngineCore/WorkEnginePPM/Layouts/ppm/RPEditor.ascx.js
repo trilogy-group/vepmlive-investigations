@@ -967,7 +967,7 @@
                                 items: [
                                     { type: "smallbutton", id: "PublicBtn", name: "Make Public", img: "epmlive-master.png", style: "top: -116px; left: -216px;position:relative;z-index:5;", tooltip: "Make Private Row Public", onclick: "dialogEvent('EditorTab_Public');", disabled: true },
                                     { type: "smallbutton", id: "CancelBtn", name: "Cancel", img: "epmlive-master.png", style: "top: -116px; left: -116px;position:relative;z-index:5;", tooltip: "Cancel Commitment", onclick: "dialogEvent('EditorTab_Cancel');", disabled: true },
-                                    { type: "smallbutton", id: "DeleteBtn", name: "Delete", img: "epmlive-master.png", style: "top: -117px; left: -364px;position:relative;z-index:5;", tooltip: "Delete", onclick: "dialogEvent('EditorTab_Delete');", disabled: true }
+                                    { type: "smallbutton", id: "DeleteBtn", name: "Delete", img: "delete16.png", tooltip: "Delete", onclick: "dialogEvent('EditorTab_Delete');", disabled: true }
                                 ]
                             }
                         ]
@@ -1008,12 +1008,12 @@
                         columns: [
                            {
                                items: [
-                                    { type: "bigbutton", id: "idExportExcelTop", name: "Export to<br/> Excel", img: "formatmap32x32.png", style: "top: -352px; left: 0px;position:relative;", tooltip: "Export Details to Excel", onclick: "dialogEvent('EditorTab_Export');" }
+                                    { type: "bigbutton", id: "idExportExcelTop", name: "Export to<br/> Excel", img: "export-excel32.png", tooltip: "Export Details to Excel", onclick: "dialogEvent('EditorTab_Export');" }
                                ]
                            },
                            {
                                items: [
-                                    { type: "bigbutton", id: "idPrintTop", name: "Print", img: "ps32x32.png", style: "top: -287px; left: -128px;position:relative;", tooltip: "Print", onclick: "dialogEvent('PrintTopBtn');" }
+                                    { type: "bigbutton", id: "idPrintTop", name: "Print", img: "print32.png", tooltip: "Print", onclick: "dialogEvent('PrintTopBtn');" }
                                ]
                            }
                         ]
@@ -1123,7 +1123,7 @@
                             },
                             {
                                 items: [
-                                    { type: "bigbutton", id: "ResAnalyzeBtn", name: "Analyze", img: "formatmap32x32.png", style: "top: -256px; left: -192px;position:relative;z-index:5;", tooltip: "Ananlyze", onclick: "dialogEvent('ResourcesTab_Analyze');", disabled: true }
+                                    { type: "bigbutton", id: "ResAnalyzeBtn", name: "Analyze", img: "analyze32.png", tooltip: "Ananlyze", onclick: "dialogEvent('ResourcesTab_Analyze');", disabled: true }
                                 ]
                             }
                         ]
@@ -1167,7 +1167,7 @@
                             },
                             {
                                 items: [
-                                    { type: "smallbutton", id: "idResourcesTab_ShowHeatmap", name: "Heat Map", img: "formatmap16x16.png", style: "top: -176px; left: -192px;position:relative;z-index:5;", tooltip: "Show Heat Map", onclick: "dialogEvent('ResourcesTab_ShowHeatmap_Click');" },
+                                    { type: "smallbutton", id: "idResourcesTab_ShowHeatmap", name: "Heat Map", img: "heatmap.png", tooltip: "Show Heat Map", onclick: "dialogEvent('ResourcesTab_ShowHeatmap_Click');" },
                                     { type: "smallbutton", id: "idResourcesTab_IncludePending", name: "Include Pending", img: "showhidefilters-16.png", tooltip: "Include Pending", onclick: "dialogEvent('ResourcesTab_IncludePending_Click');" }
                                 ]
                             }
