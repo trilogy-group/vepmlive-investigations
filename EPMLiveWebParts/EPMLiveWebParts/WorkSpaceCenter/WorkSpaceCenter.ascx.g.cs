@@ -132,8 +132,9 @@ namespace EPMLiveWebParts.WorkSpaceCenter {
                     "              ]\r\n                    }\r\n                    ]\r\n                }" +
                     "\r\n            ];\r\n            epmLiveGenericToolBar.generateToolBar(\'WorkSpacece" +
                     "nterToolbarMenu\', cfgs);\r\n        };\r\n\r\n        var changeView = function (curre" +
-                    "ntView) {\r\n            var source = Grids[\"gridWorkSpaceCenter\"].Source;\r\n      " +
-                    "      source.Data.url = \'");
+                    "ntView) {\r\n            EPM.UI.Loader.current().startLoading({ id: \'EPMWorkspaceC" +
+                    "enterLoadingDiv\' });\r\n            var source = Grids[\"gridWorkSpaceCenter\"].Sour" +
+                    "ce;\r\n            source.Data.url = \'");
                        @__w.Write( WebUrl );
 
             @__w.Write(@"/_vti_bin/WorkEngine.asmx';
@@ -173,6 +174,7 @@ namespace EPMLiveWebParts.WorkSpaceCenter {
         };
 
         var loadWorkspaceCenterGrid = function () {
+            EPM.UI.Loader.current().startLoading({ id: 'EPMWorkspaceCenterLoadingDiv' });
             window.TreeGrid('<treegrid data_url=""");
                                          @__w.Write( WebUrl );
 
@@ -197,6 +199,7 @@ namespace EPMLiveWebParts.WorkSpaceCenter {
 
     Grids.OnRenderFinish = function (grid) {
         if (grid.id == 'gridWorkSpaceCenter') {
+            EPM.UI.Loader.current().stopLoading('EPMWorkspaceCenterLoadingDiv');
             $("".workspacecentercontextmenu"").each(function () {
                 window.epmLiveNavigation.addFavoriteWSMenu($(this));
             });
@@ -204,9 +207,11 @@ namespace EPMLiveWebParts.WorkSpaceCenter {
     };
 </script>
 <div id=""EPMWorkspaceCenter"">
-    <div id=""WorkSpacecenterToolbarMenu"" style=""width: 99%"">
-    </div>
-    <div id=""EPMWorkspaceCenterGrid"" style=""width: 100%; height: 400px;"">
+    <div id=""EPMWorkspaceCenterLoadingDiv"">
+        <div id=""WorkSpacecenterToolbarMenu"" style=""width: 99%"">
+        </div>
+        <div id=""EPMWorkspaceCenterGrid"" style=""width: 100%; height: 400px;"">
+        </div>
     </div>
 </div>
 ");

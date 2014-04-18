@@ -179,6 +179,7 @@
         };
 
         var changeView = function (currentView) {
+            EPM.UI.Loader.current().startLoading({ id: 'EPMWorkspaceCenterLoadingDiv' });
             var source = Grids["gridWorkSpaceCenter"].Source;
             source.Data.url = '<%= WebUrl %>/_vti_bin/WorkEngine.asmx';
             source.Data.Function = 'Execute';
@@ -214,6 +215,7 @@
         };
 
         var loadWorkspaceCenterGrid = function () {
+            EPM.UI.Loader.current().startLoading({ id: 'EPMWorkspaceCenterLoadingDiv' });
             window.TreeGrid('<treegrid data_url="<%= WebUrl %>/_vti_bin/WorkEngine.asmx" data_timeout="0" data_method="Soap" data_function="Execute" data_namespace="workengine.com" data_param_function="GetWorkspaceCenterGridData" data_param_dataxml="AllItems" layout_url="<%= WebUrl %>/_vti_bin/WorkEngine.asmx" layout_timeout="0" layout_method="Soap" layout_function="Execute" layout_namespace="workengine.com" layout_param_function="WorkSpaceCenterLayout" suppressmessage="3" <%= DebugTag %>></treegrid>', 'EPMWorkspaceCenterGrid');
         };
 
@@ -225,6 +227,7 @@
 
     Grids.OnRenderFinish = function (grid) {
         if (grid.id == 'gridWorkSpaceCenter') {
+            EPM.UI.Loader.current().stopLoading('EPMWorkspaceCenterLoadingDiv');
             $(".workspacecentercontextmenu").each(function () {
                 window.epmLiveNavigation.addFavoriteWSMenu($(this));
             });
@@ -232,8 +235,10 @@
     };
 </script>
 <div id="EPMWorkspaceCenter">
-    <div id="WorkSpacecenterToolbarMenu" style="width: 99%">
-    </div>
-    <div id="EPMWorkspaceCenterGrid" style="width: 100%; height: 400px;">
+    <div id="EPMWorkspaceCenterLoadingDiv">
+        <div id="WorkSpacecenterToolbarMenu" style="width: 99%">
+        </div>
+        <div id="EPMWorkspaceCenterGrid" style="width: 100%; height: 400px;">
+        </div>
     </div>
 </div>
