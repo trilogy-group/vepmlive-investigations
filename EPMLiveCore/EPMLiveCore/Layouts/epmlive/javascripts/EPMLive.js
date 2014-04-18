@@ -932,7 +932,7 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
 
             var divGroupingWrapperEmptyText = $(document.createElement('div'));
             divGroupingWrapperEmptyText.attr('class', 'no-text');
-            divGroupingWrapperEmptyText.text('No Grouping Added');
+            divGroupingWrapperEmptyText.text('No grouping specified');
             divGroupingWrapper.append(divGroupingWrapperEmptyText);
 
             var sAvailableGrps = cfg['availableGroups'];
