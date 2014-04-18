@@ -134,7 +134,7 @@ top:4px;
 .GMCellPanel,.GMCellHeaderPanel { background-color:#FFFFFF; }
 .GMCellHeader:hover,.GMCellHeaderEmpty:hover { background-color:#FFF; }
 .GMCellPanel:hover,.GMCellHeaderPanel:hover { background-color:#FAFAFA; }
-.GMCellFilterPanel { padding-left:1px; }
+.GMCellFilterPanel { padding-left:0px; }
 .GMCellUser { background-color:#FFF; }
 .GMCellEmpty { background:#ffffff; border:0px none; }
 .GMCellHeaderEmpty { border:0px none; border-top:1px solid #ffffff; }
@@ -818,8 +818,8 @@ u.GMFilter0,u.GMFilter1 { padding-left:13px; }
 .GMBool1RO { background-position:center -1997px; }
 .GMBool2,.GMBool2RO { background-position:center -1250px; }
 .GMBool3,.GMBool3RO { background-position:center -1500px; }
-.GMFilter0 { background-position:center -750px; }
-.GMFilter1 { background-position:center -1000px; }
+.GMFilter0 { background-image: url("checkbox-sprite.png");background-position: -24px 10px; }
+.GMFilter1 { background-image: url("checkbox-sprite.png");background-position: 0 10px; }
 .GMGroup0 { background-image: url("checkbox-sprite.png");background-position: 0 10px;}
 .GMGroup1 { background-image: url("checkbox-sprite.png");background-position: -24px 10px;}
 .GMSearch0 { background-position:center -750px; }
