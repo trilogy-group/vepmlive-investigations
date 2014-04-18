@@ -931,7 +931,7 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
             divGroupingWrapper.attr('class', 'grouping-wrapper');
 
             var divGroupingWrapperEmptyText = $(document.createElement('div'));
-            divGroupingWrapperEmptyText.attr('class', 'dropdown-header');
+            divGroupingWrapperEmptyText.attr('class', 'no-text');
             divGroupingWrapperEmptyText.text('No Grouping Added');
             divGroupingWrapper.append(divGroupingWrapperEmptyText);
 
