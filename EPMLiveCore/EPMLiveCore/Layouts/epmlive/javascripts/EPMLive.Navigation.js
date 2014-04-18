@@ -946,19 +946,11 @@
                             if (command == 'delete') {
                                 if (confirm('Are you sure you want to send the item(s) to the Recycle Bin?')) {
                                     var nId = SP.UI.Notify.addNotification('Deleting Item...', true, '', null);
-                                    if (command !== 'nav:remove') {
-                                        $.get(redirectUrl).always(function () {
-                                            if (callBackFunction != '')
-                                                eval(callBackFunction + '(' + id + ')');
-                                            else
-                                                removeLink(id, nId);
-                                        });
-                                    } else {
+                                    $.get(redirectUrl).always(function () {
+                                        SP.UI.Notify.removeNotification(nId);
                                         if (callBackFunction != '')
                                             eval(callBackFunction + '(' + id + ')');
-                                        else
-                                            removeLink(id, nId);
-                                    }
+                                    });
                                 }
                             }
                             else {
