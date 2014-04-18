@@ -2935,6 +2935,15 @@
                 case "ViewTab_SelView_Changed":
                     var selectedView = this.GetSelectedView();
                     if (selectedView != null) {
+                        var periods = selectedView.g_RPE.RightCols.split(",");
+                        var spVal = periods[0];
+                        var fpVal = periods[periods.length - 1];
+                        var sp = spVal.split(":")[0].replace("Q", "");
+                        var fp = fpVal.split(":")[0].replace("Q", "");
+                        this.startPeriod = sp;
+                        this.finishPeriod = fp;
+                        this.viewTab.selectByValue("idViewTab_FromPeriod", this.startPeriod);
+                        this.viewTab.selectByValue("idViewTab_ToPeriod", this.finishPeriod);
                         this.ApplyGridView("g_RPE", selectedView, true);
                         this.ApplyGridView("g_Res", selectedView, true);
                         this.ShowSelectedResourceGroup();
