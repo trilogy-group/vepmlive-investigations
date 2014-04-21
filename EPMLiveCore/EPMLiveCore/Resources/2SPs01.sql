@@ -858,7 +858,7 @@ end
 END
 ')
  
-if not exists (select routine_name from INFORMATION_SCHEMA.routines where routine_name = 'spTSAllData')
+ if not exists (select routine_name from INFORMATION_SCHEMA.routines where routine_name = 'spTSAllData')
 begin
     Print 'Creating Stored Procedure spTSAllData'
     SET @createoralter = 'CREATE'
@@ -904,12 +904,12 @@ if @cols <> ''''
 begin
 	declare @sql varchar(MAX)
 
-	set @sql = ''SELECT Username, [Resource Name], [Item Name], [Project], [Item Type], [Period Id], List, [Date], [Hours], [Type Id], [Type Name], [Period Start], [Period End], convert(varchar(15),[Period Start],107) + '''' - '''' + convert(varchar(15),[Period End],107) as [Period Name], [Submitted], [Approval Status], [Approval Notes], [lastmodifiedbyn] as [Last Modified By], [TS_ITEM_NOTES] as [Item Notes]''
+	set @sql = ''SELECT Username, [Resource Name], [Item Name], LIST_UID, ITEM_ID, [Project], [Item Type], [Period Id], List, [Date], [Hours], [Type Id], [Type Name], [Period Start], [Period End], convert(varchar(15),[Period Start],107) + '''' - '''' + convert(varchar(15),[Period End],107) as [Period Name], [Submitted], [Approval Status], [Approval Notes], [lastmodifiedbyn] as [Last Modified By], [TS_ITEM_NOTES] as [Item Notes]''
 
 
 	set @sql = @sql + @cols
 	set @sql = @sql + '', [Item UID], [Timesheet UID] FROM ''
-	set @sql = @sql + ''(SELECT Username, [Resource Name], [Item UID], [Item Name], [Project], [Item Type], [Timesheet UID], [Period Id], List, [Date], [Hours], [Type Id], [Type Name], [Period Start], [Period End], [Submitted], [Approval Status], [Approval Notes],[lastmodifiedbyn], [TS_ITEM_NOTES], columnname, columnvalue,site_id
+	set @sql = @sql + ''(SELECT Username, [Resource Name], [Item UID], [Item Name], LIST_UID, ITEM_ID, [Project], [Item Type], [Timesheet UID], [Period Id], List, [Date], [Hours], [Type Id], [Type Name], [Period Start], [Period End], [Submitted], [Approval Status], [Approval Notes],[lastmodifiedbyn], [TS_ITEM_NOTES], columnname, columnvalue,site_id
 	FROM vwmeta ) ps
 	PIVOT
 	(
@@ -936,7 +936,8 @@ end
 
 exec(@sql)
 ')
- 
+
+
 if not exists (select routine_name from INFORMATION_SCHEMA.routines where routine_name = 'spTSData')
 begin
     Print 'Creating Stored Procedure spTSData'
