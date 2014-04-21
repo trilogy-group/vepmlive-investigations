@@ -485,7 +485,8 @@ var uvOptions = {};
         });
     };
 
-    window.updateProfilePic = function() {
+    window.updateProfilePic = function () {
+        $('#EPMLiveNotificationGeneralWrap').hide();
         OpenPopUpPageWithTitle(window.epmLive.currentSiteUrl + '/_layouts/15/epmlive/UploadProfilePicture.aspx', profilePicUpdated, null, null, 'Update Profile Photo');
     };
 
