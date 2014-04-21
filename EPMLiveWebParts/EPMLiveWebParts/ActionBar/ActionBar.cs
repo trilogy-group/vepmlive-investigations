@@ -10,7 +10,10 @@ using System.Reflection;
 
 namespace EPMLiveWebParts
 {
-    [ToolboxItemAttribute(false)]
+    [MdsCompliant(true)]
+    [ToolboxData("<{0}:ActionBar runat=server></{0}:ActionBar>")]
+    [Guid("f816bcc6-82de-4bb6-98aa-448dd07bf62c")]
+    [XmlRoot(Namespace = "ActionBar")]
     public class ActionBar : Microsoft.SharePoint.WebPartPages.WebPart
     {
         private ViewToolBar toolbar;
