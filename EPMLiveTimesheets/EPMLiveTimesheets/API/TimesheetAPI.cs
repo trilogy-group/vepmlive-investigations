@@ -1545,7 +1545,50 @@ namespace TimeSheets
                     }
                     catch { }
 
-                     
+                    ndNewCol = docLayout.CreateNode(XmlNodeType.Element, "C", docLayout.NamespaceURI);
+                    attr2 = docLayout.CreateAttribute("Name");
+                    attr2.Value = "ResId";
+                    ndNewCol.Attributes.Append(attr2);
+
+                    attr2 = docLayout.CreateAttribute("Visible");
+                    attr2.Value = "0";
+                    ndNewCol.Attributes.Append(attr2);
+
+                    ndLeftCols.AppendChild(ndNewCol);
+
+
+                    ndNewCol = docLayout.CreateNode(XmlNodeType.Element, "C", docLayout.NamespaceURI);
+                    attr2 = docLayout.CreateAttribute("Name");
+                    attr2.Value = "Submitted";
+                    ndNewCol.Attributes.Append(attr2);
+
+                    attr2 = docLayout.CreateAttribute("Visible");
+                    attr2.Value = "0";
+                    ndNewCol.Attributes.Append(attr2);
+
+                    attr2 = docLayout.CreateAttribute("Type");
+                    attr2.Value = "Int";
+                    ndNewCol.Attributes.Append(attr2);
+
+                    ndLeftCols.AppendChild(ndNewCol);
+
+
+
+                    ndNewCol = docLayout.CreateNode(XmlNodeType.Element, "C", docLayout.NamespaceURI);
+                    attr2 = docLayout.CreateAttribute("Name");
+                    attr2.Value = "Approved";
+                    ndNewCol.Attributes.Append(attr2);
+
+                    attr2 = docLayout.CreateAttribute("Type");
+                    attr2.Value = "Int";
+                    ndNewCol.Attributes.Append(attr2);
+
+                    attr2 = docLayout.CreateAttribute("Visible");
+                    attr2.Value = "0";
+                    ndNewCol.Attributes.Append(attr2);
+
+                    ndLeftCols.AppendChild(ndNewCol);
+                    
                 }
 
                 return docLayout.OuterXml;
@@ -2068,7 +2111,9 @@ namespace TimeSheets
             attr1.Value = "Resource";
             ndRow.Attributes.Append(attr1);
 
-            
+            attr1 = docData.CreateAttribute("ResId");
+            attr1.Value = drResource["SharePointAccountId"].ToString();
+            ndRow.Attributes.Append(attr1);
 
             if (drTimesheet != null)
             {
@@ -2077,26 +2122,41 @@ namespace TimeSheets
                 ndRow.Attributes.Append(attr1);
 
 
-                attr1 = docData.CreateAttribute("TMApproval");
-                if (drTimesheet["APPROVAL_STATUS"].ToString() == "1")
-                    attr1.Value = "<span class=\"icon-checkmark-circle-2\" style=\"color:#5BB75B\">";
-                else if (drTimesheet["APPROVAL_STATUS"].ToString() == "2")
-                    attr1.Value = "<span class=\"icon-cancel-circle-2\" style=\"color:#D9534F\">";
-                else if (drTimesheet["SUBMITTED"].ToString() == "True")
-                    attr1.Value = "<span class=\"icon-redo\" style=\"color:#888\">";
+                //attr1 = docData.CreateAttribute("TMApproval");
+                //if (drTimesheet["APPROVAL_STATUS"].ToString() == "1")
+                //    attr1.Value = "<span class=\"icon-checkmark-circle-2\" style=\"color:#5BB75B\">";
+                //else if (drTimesheet["APPROVAL_STATUS"].ToString() == "2")
+                //    attr1.Value = "<span class=\"icon-cancel-circle-2\" style=\"color:#D9534F\">";
+                //else
+                if (drTimesheet["SUBMITTED"].ToString() == "True")
+                {
+
+                    attr1 = docData.CreateAttribute("Submitted");
+                    attr1.Value = "1";
+                    ndRow.Attributes.Append(attr1);
+
+                    attr1 = docData.CreateAttribute("Approved");
+                    attr1.Value = drTimesheet["APPROVAL_STATUS"].ToString();
+                    ndRow.Attributes.Append(attr1);
+                }
                 else
                 {
                     attr1 = docData.CreateAttribute("ApprovalNotesCanEdit");
                     attr1.Value = "0";
                     ndRow.Attributes.Append(attr1);
 
-                    attr1 = docData.CreateAttribute("CanSelect");
+                    attr1 = docData.CreateAttribute("Submitted");
                     attr1.Value = "0";
+                    ndRow.Attributes.Append(attr1);
+
+                    attr1 = docData.CreateAttribute("Approved");
+                    attr1.Value = "0";
+                    ndRow.Attributes.Append(attr1);
+                    //attr1 = docData.CreateAttribute("CanSelect");
+                    //attr1.Value = "0";
 
                 }
                 ndRow.Attributes.Append(attr1);
-
-
 
                 attr1 = docData.CreateAttribute("ApprovalNotes");
                 attr1.Value = drTimesheet["APPROVAL_NOTES"].ToString();
@@ -2120,9 +2180,9 @@ namespace TimeSheets
             }
             else
             {
-                attr1 = docData.CreateAttribute("CanSelect");
-                attr1.Value = "0";
-                ndRow.Attributes.Append(attr1);
+                //attr1 = docData.CreateAttribute("CanSelect");
+                //attr1.Value = "0";
+                //ndRow.Attributes.Append(attr1);
 
                 attr1 = docData.CreateAttribute("ApprovalNotesCanEdit");
                 attr1.Value = "0";
@@ -2131,6 +2191,15 @@ namespace TimeSheets
                 attr1 = docData.CreateAttribute("id");
                 attr1.Value = drResource["SharePointAccountId"].ToString();
                 ndRow.Attributes.Append(attr1);
+
+                attr1 = docData.CreateAttribute("Submitted");
+                attr1.Value = "0";
+                ndRow.Attributes.Append(attr1);
+
+                attr1 = docData.CreateAttribute("Approved");
+                attr1.Value = "0";
+                ndRow.Attributes.Append(attr1);
+
 
             }
 

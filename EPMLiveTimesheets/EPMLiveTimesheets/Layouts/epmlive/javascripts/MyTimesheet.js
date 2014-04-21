@@ -56,6 +56,46 @@ Grids.OnRenderStart = function (grid) {
     }
 }
 
+function TMFilter(gridid, filter)
+{
+
+    var grid = Grids["TS" + gridid];
+
+    if(filter == 1)
+        grid.ChangeFilter("", "", "");
+    else if(filter == 2)
+        grid.ChangeFilter("Submitted", "1", "2", 0, 0) ;
+    else if(filter == 3)
+        grid.ChangeFilter("Submitted,Approved", "1,1", "1,2", 0, 0);
+
+    $('#ddlFilterControl_ul_menu').toggle();
+}
+
+function EmailTSA(gridid) {
+    var grid = Grids["TS" + gridid];
+    var rows = grid.GetSelRows();
+
+    var rowstring = "";
+    for (var row in rows) {
+        rowstring += "," + rows[row].ResId;
+    }
+
+    if(rowstring.length > 2)
+        rowstring = rowstring.substr(1);
+
+    var webUrl = window.epmLiveNavigation.currentWebUrl;
+
+    var newgridid = grid.id.substr(2);
+    var newobj = eval("TSObject" + newgridid);
+
+    var url = webUrl + "/_layouts/epmlive/sendtsemail.aspx?period=" + newobj.CurPeriodId + "&resources=" + rowstring;
+
+    var options = { url: url, width: 600, title: "Send Email", autoSize: false };
+
+    SP.UI.ModalDialog.showModalDialog(options);
+}
+
+
 function Approve(gridid) {
     ProcessApprovals(gridid, "1");
 }
@@ -78,25 +118,21 @@ function ProcessApprovals(gridid, status) {
     else {
         var rowstring = "";
         for (var row in rows) {
-            rowstring += "<TS id=\"" + rows[row].id + "\">" + grid.GetValue(rows[row], "ApprovalNotes") + "</TS>";
+            if (rows[row].Submitted == "1")
+                rowstring += "<TS id=\"" + rows[row].id + "\">" + grid.GetValue(rows[row], "ApprovalNotes") + "</TS>";
         }
-
+        
         ShowMessage(grid.id, "Processing Timesheets...", 200, 50);
 
         EPMLiveCore.WorkEngineAPI.Execute("timesheet_ApproveTimesheets", "<Approve ApproveStatus=\"" + status + "\">" + rowstring + "</Approve>", function (response) {
             response = parseJson(response);
 
-            var img = "";
-            if (status == "1")
-                img = "<span class=\"icon-checkmark-circle-2\" style=\"color:#5BB75B\">";
-            else if (status == "2")
-                img = "<span class=\"icon-cancel-circle-2\" style=\"color:#D9534F\">";
-            else if (status == "0")
-                img = "<span class=\"icon-redo\" style=\"color:#888\">"
-
             if (response.Result['@Status'] == "0") {
                 for (var row in rows) {
-                    grid.SetValue(rows[row], "TMApproval", img, 1);
+                    if (rows[row].Submitted == "1") {
+                        grid.SetValue(rows[row], "Approved", status, 1);
+                        grid.RefreshCell(rows[row], "TMApproval");
+                    }
                 }
             }
             else {
@@ -176,6 +212,7 @@ function TSSave(grid, row, autoupdate) {
 
 
 function TSGridClick(grid, row, col, x, y, event) {
+
     if (grid.EditRow)
         StopEditGridRow(grid, row);
 
@@ -1883,6 +1920,17 @@ function MYTSOnGetHtmlValue(grid, row, col, val) {
 
                 return "<a onclick=\"ShowApprovalNotes('" + grid.id + "','" + row.id + "', this)\" id=\"ANote" + row.id + "\" style=\"text-decoration:none;\"><span class='icon-file-3' style='color:#" + img + ";text-decoration:none'></a>";
             }
+            else if(col == "TMApproval")
+            {
+                if (row.Approved == "1")
+                    return "<span class=\"icon-checkmark-circle-2\" style=\"color:#5BB75B\">";
+                else if (row.Approved == "2")
+                    return "<span class=\"icon-cancel-circle-2\" style=\"color:#D9534F\">";
+                else if (row.Submitted == "1")
+                    return "<span class=\"icon-redo\" style=\"color:#888\">";
+                else
+                    return "";
+            }
         }
         else if (row.Def.Name == "R") {
             if (col == "StopWatch") {
@@ -1923,8 +1971,11 @@ function MYTSOnGetHtmlValue(grid, row, col, val) {
                 return val;
             }
         }
-        else if (row.id == "Header")
+        else if (row.id == "Header") {
+            if (col == "Panel")
+                return null;
             return val;
+        }
     }
     if (val == "")
         return "";

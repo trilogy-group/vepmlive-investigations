@@ -7,11 +7,11 @@
 	<Cfg NumberId="1" FullId="0" IdChars="1234567890" AddFocusCol="Title" SortIcons="1"/>
 	<Cfg Searching="1" />
 	<Cfg StaticCursor="1" Dragging="0" SelectingCells="0" SelectClass="0" Selecting="1"/>
-	<Cfg NoTreeLines="1" DetailOn="0" MinRowHeight="25" MaxRowHeight="25" MenuColumnsSort="1" StandardFilter="2" ChildParts="2"/>
+	<Cfg NoTreeLines="1" DetailOn="0" MinRowHeight="25" MaxRowHeight="25" MenuColumnsSort="1" StandardFilter="0" ChildParts="2"/>
 	<Cfg NoPager="1" InEditMode ="2" ShowDeleted="0"/>
 	<Def>		
 		<D GroupEmpty="0" Name="R" Calculated="1" Wrap="0" HoverCell="0" HoverRow="Class" FocusCell="Border" FocusRow="0" ShowHint="0" NoColorState="1" CanEdit="0" CalcOrder="TSTotals,Progress,ProgressHtmlPrefix"  CanSelect="1"/>
-		<D TitleGroupEmpty="0" GroupEmpty="0" Name="Group" Calculated="1" CanFilter="2" Class="TSBold" CalcOrder="TSTotals" Expanded="1" />
+		<D TitleGroupEmpty="0" GroupEmpty="0" Name="Group" Calculated="1" Class="TSBold" CalcOrder="TSTotals" Expanded="1" />
 
 		<D Name="Resource" Expanded="0" ProgressFormula="" ProgressHtmlPrefixFormula="" ProgressType="Html" CanSelect="1" Class="TSBold"/>
 	</Def>

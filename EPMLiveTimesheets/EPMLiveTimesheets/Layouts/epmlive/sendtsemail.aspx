@@ -54,7 +54,5 @@ E-mail results:<br />
 </asp:Panel>
 <asp:Panel ID="pnlNone" runat="server" Visible="false">
 Based off the selection, there are no users available for emailing.
-<br /><br />
-<a href="<%=source %>">&lt; Back</a>
 </asp:Panel>
 </asp:Content>

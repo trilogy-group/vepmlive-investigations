@@ -385,6 +385,18 @@ namespace TimeSheets
                                             'function': function () { Reject('" + sFullGridId + @"'); }
                                         }
                                     ]
+                                },
+                                {
+                                    'controlId': 'btnEmail',
+                                    'controlType': 'button',
+                                    'iconClass': 'icon-envelop',
+                                    'title': 'Email Selected',
+                                    'events': [
+                                        {
+                                            'eventName': 'click',
+                                            'function': function () { EmailTSA('" + sFullGridId + @"'); }
+                                        }
+                                    ]
                                 }
                             ]
                         },
@@ -392,6 +404,23 @@ namespace TimeSheets
                             'placement': 'right',
                             'content': 
                             [
+                                {
+                                    'controlId': 'ddlFilterControl',
+                                    'controlType': 'dropdown',
+                                    'title': 'none',
+                                    'iconClass': 'icon-filter',
+                                    'sections': 
+                                    [
+                                        {
+                                            'heading': 'none',
+                                            'options': [
+                                                {'iconClass': '','text': 'View All','events': [{'eventName': 'click','function': function () { TMFilter('" + sFullGridId + @"',1); }}]},
+                                                {'iconClass': '','text': 'View Unsubmitted','events': [{'eventName': 'click','function': function () { TMFilter('" + sFullGridId + @"',2); }}]},
+                                                {'iconClass': '','text': 'View Unapproved','events': [{'eventName': 'click','function': function () { TMFilter('" + sFullGridId + @"',3); }}]}
+                                            ]
+                                        }
+                                    ]
+                                },
                                 {
                                     'controlId': 'ddlViewControl',
                                     'controlType': 'dropdown',
@@ -509,6 +538,12 @@ namespace TimeSheets
                 {
                     font-weight: bold !important;
                 }
+                .GMPx0xx 
+                {
+                background: none;
+                opacity: 1;
+                }
+                #ddlFilterControl .caret {display:none;}
                 </style>");
 
             string sUserId = "";

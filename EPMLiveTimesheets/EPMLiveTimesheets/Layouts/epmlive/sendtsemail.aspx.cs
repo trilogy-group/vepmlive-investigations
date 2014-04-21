@@ -58,30 +58,44 @@ namespace TimeSheets
                     try
                     {
 
-                        if (resUrl.ToLower() != web.Url.ToLower())
-                        {
-                            using (SPSite tempSite = new SPSite(resUrl))
-                            {
+                        //if (resUrl.ToLower() != web.Url.ToLower())
+                        //{
+                        //    using (SPSite tempSite = new SPSite(resUrl))
+                        //    {
 
-                                resWeb = tempSite.OpenWeb();
-                                if (resWeb.Url.ToLower() != resUrl.ToLower())
+                        //        resWeb = tempSite.OpenWeb();
+                        //        if (resWeb.Url.ToLower() != resUrl.ToLower())
+                        //        {
+                        //            resWeb = null;
+                        //        }
+                        //    }
+                        //}
+                        //else
+                        //    resWeb = web;
+                        //if (resWeb != null)
+                        //{
+                            //reslist = resWeb.Lists["Resources"];
+
+                            //SPQuery query = new SPQuery();
+                            //query.Query = "<Where><Contains><FieldRef Name='TimesheetManager'/><Value Type='User'>" + SPContext.Current.Web.CurrentUser.Name + "</Value></Contains></Where>";
+
+                            DataTable dtResources = EPMLiveCore.API.APITeam.GetResourcePool("<Resources><Columns>SimpleColumns,Email</Columns></Resources>", Web);
+
+                            foreach(string sRes in Request["resources"].Split(','))
+                            {
+                                if(sRes != "")
                                 {
-                                    resWeb = null;
+                                    DataRow[] dr = dtResources.Select("SPID='" + sRes + "'");
+                                    if (dr.Length > 0)
+                                    {
+                                        strUsers += dr[0]["Title"].ToString() + "<br>";
+                                        emails += "," + dr[0]["Email"].ToString();
+                                        names += "," + dr[0]["Title"].ToString();
+                                    }
                                 }
                             }
-                        }
-                        else
-                            resWeb = web;
-                        if (resWeb != null)
-                        {
-                            reslist = resWeb.Lists["Resources"];
 
-                            SPQuery query = new SPQuery();
-                            query.Query = "<Where><Contains><FieldRef Name='TimesheetManager'/><Value Type='User'>" + SPContext.Current.Web.CurrentUser.Name + "</Value></Contains></Where>";
-
-
-
-                            if (Request["type"] == "1" || Request["type"] == "3")
+                            /*if (Request["type"] == "1" || Request["type"] == "3")
                             {
                                 SPSecurity.RunWithElevatedPrivileges(delegate()
                                 {
@@ -113,46 +127,48 @@ namespace TimeSheets
                                     }
                                     catch { }
                                 });
-                            }
+                            }*/
 
-                            foreach (SPListItem li in reslist.GetItems(query))
-                            {
-                                SPFieldUserValue uv = new SPFieldUserValue(web, li["SharePointAccount"].ToString());
-                                string uName = uv.User.LoginName;
-                                string name = uv.User.Name.Replace(",", ";");
-                                string email = uv.User.Email;
+                            //foreach (SPListItem li in reslist.GetItems(query))
+                            //{
+                            //    SPFieldUserValue uv = new SPFieldUserValue(web, li["SharePointAccount"].ToString());
+                            //    string uName = uv.User.LoginName;
+                            //    string name = uv.User.Name.Replace(",", ";");
+                            //    string email = uv.User.Email;
 
-                                if (email != "")
-                                {
-                                    if (Request["type"] == "1")
-                                    {
-                                        if (dsSubmitted.Tables[0].Select("username like '" + uName + "'").Length == 0)
-                                        {
-                                            strUsers += name + "<br>";
-                                            emails += "," + email;
-                                            names += "," + name;
-                                        }
-                                    }
-                                    else if (Request["type"] == "3")
-                                    {
-                                        if (dsTimesheets.Tables[0].Select("username like '" + uName + "'").Length > 0)
-                                        {
-                                            strUsers += name + "<br>";
-                                            emails += "," + email;
-                                            names += "," + name;
-                                        }
-                                    }
-                                    else
-                                    {
-                                        strUsers += name + "<br>";
-                                        emails += "," + email;
-                                        names += "," + name;
-                                    }
-                                }
-                            }
-                            if (resWeb.ID != SPContext.Current.Web.ID)
-                                resWeb.Close();
-                        }
+                            //    if (email != "")
+                            //    {
+                            //        if (Request["type"] == "1")
+                            //        {
+                            //            if (dsSubmitted.Tables[0].Select("username like '" + uName + "'").Length == 0)
+                            //            {
+                            //                strUsers += name + "<br>";
+                            //                emails += "," + email;
+                            //                names += "," + name;
+                            //            }
+                            //        }
+                            //        else if (Request["type"] == "3")
+                            //        {
+                            //            if (dsTimesheets.Tables[0].Select("username like '" + uName + "'").Length > 0)
+                            //            {
+                            //                strUsers += name + "<br>";
+                            //                emails += "," + email;
+                            //                names += "," + name;
+                            //            }
+                            //        }
+                            //        else
+                            //        {
+                            //            strUsers += name + "<br>";
+                            //            emails += "," + email;
+                            //            names += "," + name;
+                            //        }
+                            //    }
+                            //}
+                            //if (resWeb.ID != SPContext.Current.Web.ID)
+                            //    resWeb.Close();
+
+
+                        //}
                     }
                     catch { }
                     if (emails.Length > 0)
