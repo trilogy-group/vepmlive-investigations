@@ -2208,7 +2208,7 @@
 							},
 							{
 							    items: [
-									{ type: "bigbutton", name: "Close", img: "formatmap32x32.png", style: "top: -448px; left: -288px;position:relative;", tooltip: "Close", onclick: "dialogEvent('AnalyzerTab_Close');" }
+									{ type: "bigbutton", name: "Close", img: "planner-sprite32.png", style: "top: -510px; left: -272px;position:relative;", tooltip: "Close", onclick: "dialogEvent('AnalyzerTab_Close');" }
 							    ]
 							},
 							{
@@ -2218,12 +2218,12 @@
 							},
 							{
 							    items: [
-									{ type: "bigbutton", id: "UndoBtn", name: "Undo", img: "formatmap32x32.png", style: "top: -416px; left: -96px;position:relative;", tooltip: "Undo", onclick: "dialogEvent('AnalyzerTab_UnDoDrag');", disabled: true }
+									{ type: "bigbutton", id: "UndoBtn", name: "Undo", img: "planner-sprite32.png", style: "top: -475px; left: -135px;position:relative;", tooltip: "Undo", onclick: "dialogEvent('AnalyzerTab_UnDoDrag');", disabled: true }
 							    ]
 							},
                             {
                                 items: [
-		{ type: "bigbutton", id: "ChangePeriodBtn", name: "Change<br/>Calendar", img: "formatmap32x32.png", style: "top: -384px; left: 0px;position:relative;", tooltip: "Change Calendar", onclick: "dialogEvent('AnalyzerTab_ChangeCalendar');" }
+		{ type: "bigbutton", id: "ChangePeriodBtn", name: "Change<br/>Calendar", img: "planner-sprite32.png", style: "top: -240px; left: -230px;position:relative;", tooltip: "Change Calendar", onclick: "dialogEvent('AnalyzerTab_ChangeCalendar');" }
                                 ]
                             },
                             {
@@ -2253,12 +2253,12 @@
 					    columns: [
 						   {
 						       items: [
-									{ type: "bigbutton", id: "idExportExcelTop", name: "Export to<br/> Excel", img: "formatmap32x32.png", style: "top: -352px; left: 0px;position:relative;", tooltip: "Export to Excel", onclick: "dialogEvent('AnalyzerTab_ExporttoExcel');" }
+									{ type: "bigbutton", id: "idExportExcelTop", name: "Export to<br/> Excel", img: "planner-sprite32.png", style: "top: -241px; left: -307px;position:relative;", tooltip: "Export to Excel", onclick: "dialogEvent('AnalyzerTab_ExporttoExcel');" }
 						       ]
 						   },
 						   {
 						       items: [
-									{ type: "bigbutton", id: "idPrintTop", name: "Print", img: "ps32x32.png", style: "top: -287px; left: -128px;position:relative;", tooltip: "Print", onclick: "dialogEvent('AnalyzerTab_Print');" }
+									{ type: "bigbutton", id: "idPrintTop", name: "Print", img: "print32.png", tooltip: "Print", onclick: "dialogEvent('AnalyzerTab_Print');" }
 						       ]
 						   }
 					    ]
@@ -2333,7 +2333,7 @@
                              },
 							{
 							    items: [
-									{ type: "bigbutton", id: "idSaveScenario1", name: "Save<br/>Scenario", disabled: (this.fromresource == "1" ? false : true), img: "ps32x32.png", style: "top: -96px; left: -160px;position:relative;", tooltip: "Save Scenario", onclick: "dialogEvent('AnalyzerTab_SaveScen');" }
+									{ type: "bigbutton", id: "idSaveScenario1", name: "Save<br/>Scenario", disabled: (this.fromresource == "1" ? false : true), img: "save-scenario32.png", tooltip: "Save Scenario", onclick: "dialogEvent('AnalyzerTab_SaveScen');" }
 							    ]
 							},
 							{
@@ -2363,8 +2363,8 @@
 							},
 							{
 							    items: [
-									{ type: "smallbutton", id: "idAnalyzerShowBars", name: "Show Bars", img: "ps16x16.png", style: "top: -192px; left: -16px;position:relative;", tooltip: "Show Bars", onclick: "dialogEvent('AnalyzerTab_ShowBars_Click');" },
-									{ type: "smallbutton", id: "idAnalyzerHideDetails", name: "Hide Details", img: "ps16x16.png", style: "top: -112px; left: -64px;position:relative;", tooltip: "Hide Details", onclick: "dialogEvent('AnalyzerTab_HideDetails_Click');" }
+									{ type: "smallbutton", id: "idAnalyzerShowBars", name: "Show Bars", img: "show-bars16.png", tooltip: "Show Bars", onclick: "dialogEvent('AnalyzerTab_ShowBars_Click');" },
+									{ type: "smallbutton", id: "idAnalyzerHideDetails", name: "Hide Details", img: "hide-details16.png", tooltip: "Hide Details", onclick: "dialogEvent('AnalyzerTab_HideDetails_Click');" }
 							    ]
 							},
 							{
@@ -2409,8 +2409,8 @@
                 ]
             };
 
-            var bbEditRes = { items: [{ type: "bigbutton", id: "idEditRes", name: "Edit Resource<br/>Plan", img: "formatmap32x32.png", style: "top: -352px; left: -288px;position:relative;", tooltip: "Plan", onclick: "dialogEvent('EditResPlan');" }] };
-            var bbEditRes1 = { items: [{ type: "bigbutton", id: "idEditRes1", name: "Edit Resource<br/>Plan", img: "formatmap32x32.png", style: "top: -352px; left: -288px;position:relative;", tooltip: "Plan", onclick: "dialogEvent('EditResPlan');" }] };
+            var bbEditRes = { items: [{ type: "bigbutton", id: "idEditRes", name: "Edit Resource<br/>Plan", img: "planner-sprite32.png", style: "top: -340px; left: -442px;position:relative;", tooltip: "Plan", onclick: "dialogEvent('EditResPlan');" }] };
+            var bbEditRes1 = { items: [{ type: "bigbutton", id: "idEditRes1", name: "Edit Resource<br/>Plan", img: "planner-sprite32.png", style: "top: -340px; left: -442px;position:relative;", tooltip: "Plan", onclick: "dialogEvent('EditResPlan');" }] };
 
             if (this.params.RPEMode != 1) {
                 sections = analyzerTabData.sections;
@@ -2524,7 +2524,7 @@
 							},
 							{
 							    items: [
-									{ type: "mediumbutton", id: "idTotCol", name: "Capacity<br/> Scenarios", disabled: (this.fromresource == "1" ? false : true), img: "capscenariosl20x20.png", tooltip: "Capacity Scenarios", onclick: "dialogEvent('AnalyzerTab_CapScen');" }
+									{ type: "mediumbutton", id: "idTotCol", name: "Capacity<br/> Scenarios", disabled: (this.fromresource == "1" ? false : true), img: "capacity-scenarios20.png", tooltip: "Capacity Scenarios", onclick: "dialogEvent('AnalyzerTab_CapScen');" }
 							    ]
 							},
 							{
@@ -2562,7 +2562,7 @@
 							},
 							{
 							    items: [
-									 { type: "smallbutton", id: "TargetLegend", name: "Legend", img: "ps16x16.png", style: "top: -128px; left: -176px;position:relative;", tooltip: "Legend", onclick: "dialogEvent('TotalsTab_TarLegBtn');" }
+									 { type: "smallbutton", id: "TargetLegend", name: "Legend", img: "legend16.png", tooltip: "Legend", onclick: "dialogEvent('TotalsTab_TarLegBtn');" }
 							    ]
 
 							}
@@ -2574,12 +2574,12 @@
 					    columns: [
 						   {
 						       items: [
-									{ type: "mediumbutton", id: "idExportExcelBot", name: "Export<br/> to Excel", img: "exportexcel20x20.png", tooltip: "Export to Excel", onclick: "dialogEvent('TotalsTab_ExporttoExcel');" }
+									{ type: "mediumbutton", id: "idExportExcelBot", name: "Export<br/> to Excel", img: "export-excel20.png", tooltip: "Export to Excel", onclick: "dialogEvent('TotalsTab_ExporttoExcel');" }
 						       ]
 						   },
 						   {
 						       items: [
-									{ type: "mediumbutton", id: "idPrintBot", name: "Print", img: "printl20x20.png", tooltip: "Print", onclick: "dialogEvent('TotalTab_Print');" }
+									{ type: "mediumbutton", id: "idPrintBot", name: "Print", img: "print20.png", tooltip: "Print", onclick: "dialogEvent('TotalTab_Print');" }
 						       ]
 						   }
 					    ]
