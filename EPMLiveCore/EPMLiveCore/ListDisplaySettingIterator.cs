@@ -53,6 +53,9 @@ namespace EPMLiveCore
         Guid accountid;
         bool isWorkList = true;
         int billingtype = 0;
+        int userpanelRequiredCount = 0;
+        int permissionPanelRequiredCount = 0;
+        int profilepanelRequiredCount = 0;
 
         GenericEntityEditor picker;
 
@@ -159,8 +162,6 @@ namespace EPMLiveCore
 
         protected override void OnInit(EventArgs e)
         {
-
-
             Guid siteid = SPContext.Current.Site.ID;
 
             SPSecurity.RunWithElevatedPrivileges(delegate()
@@ -368,7 +369,7 @@ namespace EPMLiveCore
                 }
             }
         }
-
+       
         public override void RenderControl(System.Web.UI.HtmlTextWriter writer)
         {
             string sRelUrl = ((base.Web.ServerRelativeUrl == "/") ? "" : base.Web.ServerRelativeUrl);
@@ -386,6 +387,7 @@ namespace EPMLiveCore
 
                 permissionPanel = new HtmlTextWriter(new System.IO.StringWriter(permissionPanelSb, System.Globalization.CultureInfo.InvariantCulture));
                 permissionPanel.Write(CreateHtmlPanelText("Permissions"));
+
             }
 
             if (isFeatureActivated)
@@ -505,6 +507,23 @@ namespace EPMLiveCore
                     try
                     {
                         SPField field = ((Microsoft.SharePoint.WebControls.FieldLabel)tc.Controls[1].Controls[0].Controls[1]).Field;
+
+                        if (field.Required == true)
+                        {
+                            if (userPanelItems.Contains(field.InternalName))
+                            {
+                                userpanelRequiredCount++;
+                            }
+                            else if (permissionPanelItems.Contains(field.InternalName))
+                            {
+                                permissionPanelRequiredCount++;
+                            }
+                            else
+                            {
+                                profilepanelRequiredCount++;
+                            }
+                        }
+
                         Control parentControl = tc.Controls[1].Controls[0];
                         if (field.InternalName == "Due")
                         {
@@ -686,6 +705,9 @@ namespace EPMLiveCore
                     writer.Write(profilePanelSb.ToString());
                     permissionPanel.Write("</table></div></div></td></tr>");
                     writer.Write(permissionPanelSb.ToString());
+
+
+
                 }
 
                 #endregion
@@ -827,7 +849,8 @@ namespace EPMLiveCore
                                 {
                                     try
                                     {
-                                        writer.WriteLine("          try{document.getElementById('" + dControls["Permissions"] + "').parentNode.parentNode.parentNode.style.display='none';}catch(e){}");
+
+                                        writer.WriteLine(" try{document.getElementById('" + dControls["Permissions"] + "').parentNode.parentNode.parentNode.style.display='none';}catch(e){}");
                                     }
                                     catch { }
                                 }
@@ -877,7 +900,7 @@ namespace EPMLiveCore
                                 {
                                     try
                                     {
-                                        writer.WriteLine("          try{document.getElementById('" + dControls["Permissions"] + "').parentNode.parentNode.parentNode.style.display='';}catch(e){}");
+                                            writer.WriteLine("try{document.getElementById('" + dControls["Permissions"] + "').parentNode.parentNode.parentNode.style.display='';}catch(e){}");
                                     }
                                     catch { }
                                 }
@@ -914,6 +937,8 @@ namespace EPMLiveCore
                         catch { }
 
                         writer.WriteLine("cleanupfields();");
+                       // To make default collapsed div, if there isnt any mandatory field in it
+                        writer.WriteLine("$(document).ready(function () {var headers = $('.upheader');$.each(headers, function (i, val) {if ($(this).find('span').text() == 'Permissions' && " + permissionPanelRequiredCount + " == '0' ) { $(this).next().slideUp();$(this).find('.imgArrow').removeClass('hideImage');$(this).find('.imgDownArrow').addClass('hideImage');} if ($(this).find('span').text() == 'Profile' && " + profilepanelRequiredCount + " == '0' ) { $(this).next().slideUp();$(this).find('.imgArrow').removeClass('hideImage');$(this).find('.imgDownArrow').addClass('hideImage');}  });});");
                         writer.WriteLine("}_spBodyOnLoadFunctionNames.push(\"InitFields\");");
 
 
@@ -949,7 +974,7 @@ namespace EPMLiveCore
 
                 string newLocation = "";
                 bool bDialog = false;
-                if(Page.Request["IsDlg"] == "1")
+                if (Page.Request["IsDlg"] == "1")
                     bDialog = true;
 
 
