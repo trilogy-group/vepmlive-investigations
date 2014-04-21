@@ -27,6 +27,12 @@ namespace EPMLiveReportsAdmin
         {
             try
             {
+                SocialEngineEvents.ItemAdded(properties);
+            }
+            catch { }
+
+            try
+            {
                 //Initialize global variables
                 if (Initialize(true, properties))
                 {
@@ -53,12 +59,17 @@ namespace EPMLiveReportsAdmin
             finally
             {
                 ClearResourceGridCache(properties);
-                SocialEngineEvents.ItemAdded(properties);
             }
         }
 
         public override void ItemUpdated(SPItemEventProperties properties)
         {
+            try
+            {
+                SocialEngineEvents.ItemUpdated(properties);
+            }
+            catch { }
+
             try
             {
                 //Initialize global variables
@@ -88,12 +99,17 @@ namespace EPMLiveReportsAdmin
             finally
             {
                 ClearResourceGridCache(properties);
-                SocialEngineEvents.ItemUpdated(properties);
             }
         }
 
         public override void ItemDeleting(SPItemEventProperties properties)
         {
+            try
+            {
+                SocialEngineEvents.ItemDeleting(properties);
+            }
+            catch { }
+
             try
             {
                 if (Initialize(true, properties))
@@ -128,7 +144,6 @@ namespace EPMLiveReportsAdmin
             finally
             {
                 ClearResourceGridCache(properties);
-                SocialEngineEvents.ItemDeleting(properties);
             }
         }
 

@@ -254,6 +254,11 @@ ALTER TABLE RPTList ALTER COLUMN TableNameSnapshot NVARCHAR(500) NOT NULL
 
 PRINT 'Creating function fnCheckUserAccess'
 
+IF EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[fnCheckUserAccess]') AND type in (N'FN', N'IF', N'TF', N'FS', N'FT'))
+BEGIN
+	DROP FUNCTION [dbo].[fnCheckUserAccess]
+END
+
 IF NOT  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[fnCheckUserAccess]') AND type in (N'FN', N'IF', N'TF', N'FS', N'FT'))
 BEGIN
 	EXEC sp_executesql N'
@@ -277,9 +282,9 @@ BEGIN
 			RETURN 0
 		END
 	
-		IF (@ItemId IN (SELECT ITEMID FROM dbo.RPTITEMGROUPS WHERE (SECTYPE = 1) AND (GROUPID IN 
+		IF (@ItemId IN (SELECT ITEMID FROM dbo.RPTITEMGROUPS WHERE (LISTID = @ListId) AND ((SECTYPE = 1) AND (GROUPID IN 
 				(SELECT GroupId FROM (SELECT GROUPID FROM dbo.RPTGROUPUSER WHERE USERID = @UserId) AS Groups)) 
-				OR (SECTYPE = 0) AND (GROUPID = @UserId) AND (LISTID = @ListId))) RETURN 1
+				OR (SECTYPE = 0) AND (GROUPID = @UserId)))) RETURN 1
 		RETURN 0
 	END'
 END
