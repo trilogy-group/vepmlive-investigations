@@ -56,7 +56,13 @@ namespace EPMLiveCore.Layouts.epmlive
         protected DataTable dtGroupsPermissions = new DataTable();
 
         const string REPORT_CHECK_URL = "/_layouts/epmlive/ReportCheckActions.aspx";
-
+        public override string PageToRedirectOnCancel
+        {
+            get
+            {
+                return ((Web.ServerRelativeUrl == "/") ? "" : Web.ServerRelativeUrl) + "/_layouts/15/listedit.aspx?List=" + Request["List"];
+            }
+        }
         private string GetGroupsPermissionsAssignment()
         {
             StringBuilder sbGroupsPermissions = new StringBuilder();

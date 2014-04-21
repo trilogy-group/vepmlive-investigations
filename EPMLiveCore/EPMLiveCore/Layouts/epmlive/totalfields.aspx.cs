@@ -17,6 +17,14 @@ namespace EPMLiveCore.Layouts.epmlive
         protected Panel pnlFields;
         private SortedList<string, SPField> displayableFields = new SortedList<string, SPField>();
 
+        public override string PageToRedirectOnCancel
+        {
+            get
+            {
+                return ((Web.ServerRelativeUrl == "/") ? "" : Web.ServerRelativeUrl) + "/_layouts/15/listedit.aspx?List=" + Request["List"];
+            }
+        }
+
         protected void Page_Load(object sender, EventArgs e)
         {
             SPWeb web = SPContext.Current.Web;
