@@ -5,7 +5,7 @@ using System.Xml;
 using System.Linq;
 using WorkEnginePPM;
 using ResourceValues;
-using PortfolioEngineCore;   
+using PortfolioEngineCore;
 
 
 namespace RPADataCache
@@ -174,16 +174,16 @@ namespace RPADataCache
             {
                 string StatusText = "";
                 StatusText = "WriteTrace Exception : " + ex.Message.ToString();
-              
+
                 return 0;
             }
         }
 
         internal static void GetCustValue(int fid, List<String> cln, out int lVal, out string sVal, clsResourceValues m_cResVals)
         {
-           string s = "";
-           int j;
-           int i = 0;
+            string s = "";
+            int j;
+            int i = 0;
 
             lVal = 0;
             sVal = "";
@@ -228,7 +228,7 @@ namespace RPADataCache
                     }
                     return;
                 }
-                
+
             }
 
             lVal = 0;
@@ -238,7 +238,7 @@ namespace RPADataCache
 
 
 
-       
+
 
     }
     [Serializable()]
@@ -272,16 +272,16 @@ namespace RPADataCache
         public List<clsResXData> avail = new List<clsResXData>();
 
         public List<clsResXData> used4totals = new List<clsResXData>();
-        public Dictionary<int,clsResXData> PerPItotals = new Dictionary<int, clsResXData>();
+        public Dictionary<int, clsResXData> PerPItotals = new Dictionary<int, clsResXData>();
 
         public List<clsResXData> CapScen = new List<clsResXData>();
 
-        public Dictionary<int, string> PIList = new Dictionary<int, string>(); 
+        public Dictionary<int, string> PIList = new Dictionary<int, string>();
 
         public void CreateTotals(bool chkCommit, bool chkNonWork, bool ckkMSPF, bool chkActual, bool chkOpenRequest, bool chkpropsal)
         {
 
-            PIList = new Dictionary<int, string>(); 
+            PIList = new Dictionary<int, string>();
             tot_Totals.SetPeriodsToZero();
 
             used4totals = new List<clsResXData>();
@@ -316,7 +316,7 @@ namespace RPADataCache
                     }
                 }
             }
-       }
+        }
 
         public void ProcessPITotals(int PeriodsCount)
         {
@@ -404,13 +404,13 @@ namespace RPADataCache
         {
             if (inavail == null)
                 return;
-  
+
             for (int i = 1; i <= m_nump; i++)
             {
                 AvailHours[i] += inavail.AvailHours[i];
                 AvailFTEs[i] += inavail.AvailFTEs[i];
                 AvailHoursSet[i] |= inavail.AvailHoursSet[i];
-                
+
             }
         }
 
@@ -496,9 +496,9 @@ namespace RPADataCache
         public List<clsResXDragClone> m_cloneList = new List<clsResXDragClone>();
     }
 
- 
+
     [Serializable()]
-    class clsResXDragClone 
+    class clsResXDragClone
     {
         public double[] WrkHours;
         public double[] FTEVals;
@@ -523,7 +523,7 @@ namespace RPADataCache
     }
 
     [Serializable()]
-    class clsResXData 
+    class clsResXData
     {
         public int ID;
         public bool bTouched = false;
@@ -541,7 +541,7 @@ namespace RPADataCache
         public double[] FTEVals;
         public bool bRealone = true;
         public int rowid = 0;
-         public string sName = "";
+        public string sName = "";
         public bool bDisplay = true;
         public int CostCat;
         public int CostCatRole = 0;
@@ -561,11 +561,11 @@ namespace RPADataCache
         public bool bDragged = false;
         public bool bDraggable = true;
         public int iDragCnt = 0;
- 
+
         private int m_num_per;
 
 
- 
+
         public void SetUpPeriods(int nPNum)
         {
             WrkHours = new double[nPNum + 1];
@@ -592,14 +592,14 @@ namespace RPADataCache
             }
         }
 
-         public double getvarr(int cid)
+        public double getvarr(int cid)
         {
             return WrkHours[cid];
         }
         public void setvarr(int cid, double value)
         {
             WrkHours[cid] = value;
-         }
+        }
         public double getftarr(int cid)
         {
             return FTEVals[cid];
@@ -626,14 +626,15 @@ namespace RPADataCache
             }
         }
 
-        public void ShuntData(int fromCol, int toCol, clsRPAFTEConv ofte, int mode) {
+        public void ShuntData(int fromCol, int toCol, clsRPAFTEConv ofte, int mode)
+        {
             int tCol = 0;
             int sCol = 0;
 
             int diffr = 0;
 
 
- 
+
             if (fromCol < toCol)
             {
                 diffr = toCol - fromCol;
@@ -659,7 +660,7 @@ namespace RPADataCache
                             else if (ofte.FTEConv[tCol] == 0)
                                 FTEVals[tCol] = 0;
                             else
-                                FTEVals[tCol] = (WrkHours[tCol]*10000)/ofte.FTEConv[tCol];
+                                FTEVals[tCol] = (WrkHours[tCol] * 10000) / ofte.FTEConv[tCol];
                         }
                         else
                         {
@@ -670,7 +671,7 @@ namespace RPADataCache
                             else if (ofte.FTEConv[tCol] == 0)
                                 WrkHours[tCol] = 0;
                             else
-                                WrkHours[tCol] = (FTEVals[tCol]*ofte.FTEConv[tCol])/10000;
+                                WrkHours[tCol] = (FTEVals[tCol] * ofte.FTEConv[tCol]) / 10000;
                         }
                     }
                     WrkHours[1] = 0;
@@ -704,7 +705,7 @@ namespace RPADataCache
                             else if (ofte.FTEConv[tCol] == 0)
                                 FTEVals[tCol] = 0;
                             else
-                                FTEVals[tCol] = (WrkHours[tCol]*10000)/ofte.FTEConv[tCol];
+                                FTEVals[tCol] = (WrkHours[tCol] * 10000) / ofte.FTEConv[tCol];
                         }
                         else
                         {
@@ -715,7 +716,7 @@ namespace RPADataCache
                             else if (ofte.FTEConv[tCol] == 0)
                                 WrkHours[tCol] = 0;
                             else
-                                WrkHours[tCol] = (FTEVals[tCol]*ofte.FTEConv[tCol])/10000;
+                                WrkHours[tCol] = (FTEVals[tCol] * ofte.FTEConv[tCol]) / 10000;
                         }
                     }
 
@@ -723,7 +724,7 @@ namespace RPADataCache
                     FTEVals[m_num_per] = 0;
                 }
             }
-         }
+        }
     }
 
     [Serializable()]
@@ -2562,7 +2563,14 @@ namespace RPADataCache
             }
         }
 
-
+        private string GetPeriodName(string periodName, int disp_mode)
+        {
+            if (disp_mode == 2)
+            {
+                periodName = periodName + "(%)";
+            }
+            return periodName;
+        }
 
         public string GetTopGrid()
         {
@@ -2582,7 +2590,7 @@ namespace RPADataCache
             foreach (CPeriod period in m_cResVals.Periods.Values)
             {
                 i++;
-                oGrid.AddPeriodColumn(period.PeriodID.ToString(), period.PeriodName, m_DispMode, displist, m_pmo_admin);
+                oGrid.AddPeriodColumn(period.PeriodID.ToString(),GetPeriodName(period.PeriodName,m_DispMode), m_DispMode, displist, m_pmo_admin);
             }
 
             oGrid.FinalizeGridLayout();
@@ -2640,7 +2648,7 @@ namespace RPADataCache
             foreach (CPeriod period in m_cResVals.Periods.Values)
             {
                 i++;
-                oGrid.AddPeriodColumn(period.PeriodID.ToString(), period.PeriodName, m_DispMode, TotSelectedOrder, m_use_heatmap);
+                oGrid.AddPeriodColumn(period.PeriodID.ToString(), GetPeriodName(period.PeriodName, m_DispMode), m_DispMode, TotSelectedOrder, m_use_heatmap);
             }
 
             oGrid.FinalizeGridLayout();
@@ -2667,8 +2675,8 @@ namespace RPADataCache
                 {
                     ++i;
                     CStruct xRow = xRoot.CreateSubStruct("Row");
-                    xRow.CreateIntAttr("ID",i);
-                    xRow.CreateIntAttr("Sel", (oRFull.bSelected? 1 : 0));
+                    xRow.CreateIntAttr("ID", i);
+                    xRow.CreateIntAttr("Sel", (oRFull.bSelected ? 1 : 0));
                     xRow.CreateStringAttr("Name", oRFull.ResOrRole);
 
                     int xi = 0;
@@ -2721,7 +2729,7 @@ namespace RPADataCache
                         CStruct xTot = xRow.CreateSubStruct("Tot");
                         CStruct xAvail = xRow.CreateSubStruct("Avail");
 
-                        xTot.CreateDoubleAttr("Value", tval);  
+                        xTot.CreateDoubleAttr("Value", tval);
                         xAvail.CreateDoubleAttr("Value", aval);
 
 
@@ -2732,7 +2740,7 @@ namespace RPADataCache
                     oGrid.AddDetailRow(oRFull, m_totdispcln, m_cResVals, m_cResVals.TargetColors, i, m_DispMode, m_use_role, TotSelectedOrder, m_use_heatmap, m_use_heatmapID, m_use_role, m_use_heatmapColour);
                     if (m_DisplayTotDetails)
                     {
-                            oRFull.ProcessPITotals(m_cResVals.Periods.Count);
+                        oRFull.ProcessPITotals(m_cResVals.Periods.Count);
 
                         int xIi = 0;
                         foreach (clsResXData odt in oRFull.PerPItotals.Values)
@@ -3361,7 +3369,7 @@ namespace RPADataCache
                     if (ViewSettings != null)
                     {
 
-                        m_DisplayTotDetails = (ViewSettings.GetIntAttr("ShowBotDet") == 1);  
+                        m_DisplayTotDetails = (ViewSettings.GetIntAttr("ShowBotDet") == 1);
 
                     }
                     else
@@ -4167,12 +4175,12 @@ namespace RPADataCache
 
         public string GetTotalsGridChartData()
         {
-            return m_totalschartdata; 
+            return m_totalschartdata;
         }
     }
-        
 
 
-    
+
+
 
 }
