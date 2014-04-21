@@ -3508,7 +3508,13 @@ namespace EPMLiveWebParts
                                                         {
                                                             try{
                                                             var grid = Grids.GanttGrid" + sFullGridId + @";
-                                                            return grid.FRow.id;
+                                                            if(!grid.FRow)
+                                                            {
+                                                                var sRows = grid.GetSelRows();
+                                                                return sRows[0].id;
+                                                            }
+                                                            else
+                                                                return grid.FRow.id;
                                                             }catch(e){}
                                                         };");
             output.WriteLine("mygrid" + sFullGridId + @".getUserData = function(rowid, key){  
