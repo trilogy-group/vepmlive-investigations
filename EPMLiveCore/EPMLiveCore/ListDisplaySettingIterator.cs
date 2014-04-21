@@ -833,6 +833,12 @@ namespace EPMLiveCore
 
                                 try
                                 {
+                                    writer.WriteLine("      try{document.getElementById('" + dControls["TimesheetAdministrator"] + "').parentNode.parentNode.parentNode.style.display='none';}catch(e){}");
+                                }
+                                catch { }
+
+                                try
+                                {
                                     writer.WriteLine("      try{document.getElementById('" + dControls["SharePointAccount"] + "').parentNode.parentNode.parentNode.style.display='none';}catch(e){}");
                                 }
                                 catch { }
@@ -881,6 +887,11 @@ namespace EPMLiveCore
                                 try
                                 {
                                     writer.WriteLine("      try{document.getElementById('" + dControls["Email"] + "').parentNode.parentNode.parentNode.style.display='';}catch(e){}");
+                                }
+                                catch { }
+                                try
+                                {
+                                    writer.WriteLine("      try{document.getElementById('" + dControls["TimesheetAdministrator"] + "').parentNode.parentNode.parentNode.style.display='';}catch(e){}");
                                 }
                                 catch { }
                                 if (dControls.ContainsKey("FirstName"))
