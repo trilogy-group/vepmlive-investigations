@@ -1129,16 +1129,14 @@
                                 var nId = SP.UI.Notify.addNotification('Deleting Item...', true, '', null);
                                 if (command !== 'nav:remove') {
                                     $.get(redirectUrl).always(function () {
+                                        removeLink(id, nId);
                                         if (callBackFunction != '')
                                             eval(callBackFunction + '(' + id + ')');
-                                        else
-                                            removeLink(id, nId);
                                     });
                                 } else {
+                                    removeLink(id, nId);
                                     if (callBackFunction != '')
                                         eval(callBackFunction + '(' + id + ')');
-                                    else
-                                        removeLink(id, nId);
                                 }
                             }
                             break;
