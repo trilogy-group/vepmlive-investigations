@@ -483,7 +483,7 @@
                         }
                     ]
                 }
-            ]
+                ]
             };
 
             this.editorTab = new Ribbon(editorTabData);
@@ -814,11 +814,13 @@
                         document.body.style.cursor = 'wait';
                         this.ShowWorkingPopup("divSaving");
                         this.DisableButtons(false);
+                        this.selectedCostTypes = new Array();
                         for (var n = 0; n < this.CostTypes.length; n++) {
                             var g = Grids["g_" + this.CostTypes[n].Id];
                             if (g != null) {
                                 if (g.CostsAreEditable == 1) {
                                     if ((g.HasChanges() & (1 << 0)) != 0) {
+                                        this.selectedCostTypes.push(n);
                                         g.Save();
                                     }
                                 }
@@ -1043,23 +1045,23 @@
     };
     EditCosts.prototype.HideQtyCol = function (grid, col) {
         var canHide = true;
-//        if (grid.RowCount > 0) {
-            var row = grid.GetFirst(null, 0);
-            while (row != null) {
-                var uom = row["uom"];
-                if (uom != null && uom != "") {
-                    var deleted = row.Deleted;
-                    if (deleted == null) deleted = 0;
-                    if (deleted == 0) {
-                        if (row.Visible != 0) {
-                            canHide = false;
-                            break;
-                        }
+        //        if (grid.RowCount > 0) {
+        var row = grid.GetFirst(null, 0);
+        while (row != null) {
+            var uom = row["uom"];
+            if (uom != null && uom != "") {
+                var deleted = row.Deleted;
+                if (deleted == null) deleted = 0;
+                if (deleted == 0) {
+                    if (row.Visible != 0) {
+                        canHide = false;
+                        break;
                     }
                 }
-                row = grid.GetNext(row);
             }
-//        }
+            row = grid.GetNext(row);
+        }
+        //        }
         return canHide;
     };
     EditCosts.prototype.toolsDlg_LoadData = function () {
@@ -1246,6 +1248,10 @@
     EditCosts.prototype.GridOnAfterSave = function (grid, result, autoupdate) {
         this.HideWorkingPopup("divSaving");
         document.body.style.cursor = 'default';
+        for (var n = 0; n < this.selectedCostTypes.length; n++) {
+            var g = Grids["g_" + this.CostTypes[n].Id];
+            g.ReloadBody(null);
+        }
         this.UpdateButtonsAsync();
     };
     EditCosts.prototype.GridsOnValueChanged = function (grid, row, col, val) {
@@ -1681,7 +1687,7 @@
     };
     EditCosts.prototype.HasChanged = function (sChanged) {
         var bChanged = false;
-        if (typeof(sChanged) != "undefined") {
+        if (typeof (sChanged) != "undefined") {
             if (sChanged != null) {
                 if (sChanged != "0")
                     bChanged = true;
@@ -1882,6 +1888,7 @@
         this.hideArray = null;
         this.hideAllArray = null;
         this.showCostDPs = false;
+        this.selectedCostTypes = null;
 
         var loadDelegate = MakeDelegate(this, this.OnLoad);
         var resizeDelegate = MakeDelegate(this, this.OnResizeInternal);
