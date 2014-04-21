@@ -150,6 +150,8 @@ MyTimesheetWorkPageComponent.PageComponent.prototype = {
                                         pGrid.SetValue(nRow, p, 0, 0);
                                     }
                                     pGrid.SetAttribute(nRow, null, "CanEdit", 1, 1);
+
+                                    parent.GetOtherHours(pGrid, nRow);
                                 }
                             }
                         }
@@ -190,6 +192,8 @@ MyTimesheetWorkPageComponent.PageComponent.prototype = {
                                     for (var p in parent.TSCols) {
                                         pGrid.SetValue(nRow, p, 0, 0);
                                     }
+
+                                    parent.GetOtherHours(pGrid, nRow);
                                 }
                                 else
                                 {
@@ -206,6 +210,8 @@ MyTimesheetWorkPageComponent.PageComponent.prototype = {
                                 for (var p in parent.TSCols) {
                                     pGrid.SetValue(nRow, p, 0, 0);
                                 }
+
+                                parent.GetOtherHours(pGrid, nRow);
                             }
                         }
                     }

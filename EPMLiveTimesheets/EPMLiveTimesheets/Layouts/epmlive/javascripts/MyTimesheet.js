@@ -208,6 +208,34 @@ function StopEditCols(grid, row)
     TimesheetItemEdited = false;
 }
 
+function GetOtherHours(grid, row) {
+    grid.SetAttribute(row, "Title", "HtmlPrefix", "<img src='/_layouts/15/epmlive/images/mywork/loading16.gif'>", 1);
+    var webUrl = window.epmLiveNavigation.currentWebUrl;
+    var data = "<Timesheet List=\"" + row.ListID + "\" ID=\"" + row.ItemID + "\"/>";
+
+    $.ajax({
+        type: 'POST',
+        url: (webUrl + '/_vti_bin/WorkEngine.asmx/ExecuteJSON').replace(/\/\//g, '/'),
+        data: "{ Function: 'timesheet_GetOtherHours', Dataxml: '" + data + "' }",
+        contentType: 'application/json; charset=utf-8',
+        dataType: 'json',
+        success: function (response) {
+            var oResp = eval("(" + response.d + ")");
+            if (oResp.GetOtherHours.Status == "0") {
+                grid.SetValue(row, "TSOtherHours", oResp.GetOtherHours.Text, 1, 0);
+            }
+            else
+                alert(oResp.GetOtherHours.Text);
+            grid.SetAttribute(row, "Title", "HtmlPrefix", "", 1);
+        },
+        error: function (response) {
+            alert("Error: " + response);
+            grid.SetAttribute(row, "Title", "HtmlPrefix", "", 1);
+        }
+    });
+}
+
+
 function StopEditGridRow(grid, row) {
     if (row.id != grid.EditRow) {
         var row = grid.GetRowById(grid.EditRow);

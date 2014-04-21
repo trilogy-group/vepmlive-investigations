@@ -130,6 +130,43 @@ namespace TimeSheets
             }
         }
 
+        public static string GetOtherHours(string data, SPWeb oWeb)
+        {
+            try
+            {
+                XmlDocument docTimesheet = new XmlDocument();
+                docTimesheet.LoadXml(data);
+
+                SqlConnection cn = null;
+                SPSecurity.RunWithElevatedPrivileges(delegate()
+                {
+                    cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id));
+                    cn.Open();
+                });
+
+                SqlCommand cmd = new SqlCommand(@"SELECT     SUM(dbo.TSITEMHOURS.TS_ITEM_HOURS) AS Hours
+                                                    FROM         dbo.TSITEMHOURS INNER JOIN
+                                                    dbo.TSITEM ON dbo.TSITEMHOURS.TS_ITEM_UID = dbo.TSITEM.TS_ITEM_UID where LIST_UID=@listid and ITEM_ID=@itemid",cn);
+                cmd.Parameters.AddWithValue("@listid", docTimesheet.FirstChild.Attributes["List"].Value);
+                cmd.Parameters.AddWithValue("@itemid", docTimesheet.FirstChild.Attributes["ID"].Value);
+
+                double hours = 0;
+
+                SqlDataReader dr = cmd.ExecuteReader();
+                if (dr.Read())
+                    hours = dr.GetDouble(0);
+                dr.Close();
+
+                cn.Close();
+
+                return "<GetOtherHours Status=\"0\">" + hours + "</GetOtherHours>";
+            }
+            catch (Exception ex)
+            {
+                return "<GetOtherHours Status=\"1\">" + ex.Message + "</GetOtherHours>";
+            }
+        }
+
         public static string SaveView(string data, SPWeb oWeb)
         {
             try
