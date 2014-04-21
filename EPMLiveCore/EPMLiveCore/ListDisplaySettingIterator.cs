@@ -655,7 +655,7 @@ namespace EPMLiveCore
                                 if (f.Type == SPFieldType.User)
                                     fname = f.InternalName + "_" + f.Id.ToString() + "_$ClientPeoplePicker";
                                 else if (f.TypeAsString == "ResourcePermissions" || f.TypeAsString == "ResourceLevels")
-                                    fname = parentControl.Controls[9].Controls[0].Controls[0].Controls[1].ClientID;
+                                    fname = parentControl.Controls[13].ClientID;
                                 else if(f.InternalName == "Status")
                                     fname = f.InternalName + "_" + f.Id.ToString() + "_$DropDownChoice";
                                     
