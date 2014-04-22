@@ -107,7 +107,10 @@
                     if (comments.length) {
                         comments.sort(function(c1, c2) {
                             if (c1 && c2) {
-                                return c1.time > c2.time;
+                                var t1 = c1.time;
+                                var t2 = c2.time;
+
+                                return t1 > t2 ? 1 : -1;
                             }
 
                             return true;
