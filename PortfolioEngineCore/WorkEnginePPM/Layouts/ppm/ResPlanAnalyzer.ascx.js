@@ -2225,7 +2225,7 @@
 							},
                             {
                                 items: [
-		{ type: "bigbutton", id: "ChangePeriodBtn", name: "Change<br/>Calendar", img: "planner-sprite32.png", style: "top: -240px; left: -230px;position:relative;", tooltip: "Change Calendar", onclick: "dialogEvent('AnalyzerTab_ChangeCalendar');" }
+		{ type: "bigbutton", id: "ChangePeriodBtn", name: "Change<br/>Calendar", img: "planner-sprite32.png", style: "top: -240px; left: -238px;position:relative;", tooltip: "Change Calendar", onclick: "dialogEvent('AnalyzerTab_ChangeCalendar');" }
                                 ]
                             },
                             {
