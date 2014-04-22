@@ -338,13 +338,16 @@ namespace EPMLiveCore.SocialEngine
 
                                 if (args.Cancel)
                                 {
-                                    LogCancellation(objectKind, activityKind, data, spWeb, args);
+                                    args.UntransactionedOperation =
+                                        () => LogCancellation(objectKind, activityKind, data, spWeb, args);
+
+                                    args.EcecuteUntransactionedOperation = true;
                                 }
 
                                 transactionScope.Complete();
                             }
 
-                            if (!args.Cancel && args.EcecuteUntransactionedOperation)
+                            if (args.EcecuteUntransactionedOperation)
                             {
                                 args.UntransactionedOperation();
                             }
