@@ -11,7 +11,9 @@ using System.Net.Mail;
 using EPMLiveCore.Properties;
 using System.Collections;
 using System.Web;
+using Microsoft.SharePoint.Client;
 using Microsoft.SharePoint.Utilities;
+using Telerik.Web;
 
 namespace EPMLiveCore.API
 {
@@ -130,6 +132,8 @@ namespace EPMLiveCore.API
 
                             if (originListItem != null)
                             {
+                                EnsureMetaCols(originList);
+
                                 string sCommenters = originListItem[originList.Fields.GetFieldByInternalName("Commenters").Id] != null ? originListItem[originList.Fields.GetFieldByInternalName("Commenters").Id].ToString() : string.Empty;
                                 foreach (string s in sCommenters.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
                                 {
@@ -243,6 +247,35 @@ namespace EPMLiveCore.API
             }
 
             return retVal;
+        }
+
+        private static void EnsureMetaCols(SPList list)
+        {
+            string lists = CoreFunctions.getConfigSetting(list.ParentWeb, "EPM_Commentable_Lists");
+            if (!string.IsNullOrEmpty(lists) && lists.Contains(list.ID.ToString())) return;
+
+            foreach (var field in from col in new[] {"Commenters", "CommentersRead"}
+                where !list.Fields.ContainsFieldWithInternalName(col)
+                select list.Fields.Add(col, SPFieldType.Note, false)
+                into fieldName
+                select list.Fields.GetFieldByInternalName(fieldName) as SPFieldMultiLineText)
+            {
+                field.Sealed = false;
+                field.Hidden = true;
+                field.AllowDeletion = false;
+                field.DefaultValue = string.Empty;
+                field.Update();
+                list.Update();
+            }
+
+            list.ParentWeb.Update();
+
+            var allLists = new List<string>();
+            if (!string.IsNullOrEmpty(lists)) allLists = lists.Split(',').ToList();
+
+            allLists.Add(list.ID.ToString());
+
+            CoreFunctions.setConfigSetting(list.ParentWeb, "EPM_Commentable_Lists", string.Join(",", allLists.ToArray()));
         }
 
         private static void SyncToSocialStream(Guid id, string comment, Guid listId, int itemId, string itemTitle,
