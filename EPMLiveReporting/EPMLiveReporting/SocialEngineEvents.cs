@@ -104,7 +104,12 @@ namespace EPMLiveReportsAdmin
                 object assignedToUsers = properties.ListItem["AssignedTo"];
                 if (assignedToUsers != null)
                 {
-                    var collection = (SPFieldUserValueCollection) assignedToUsers;
+                    var au = assignedToUsers as string;
+
+                    SPFieldUserValueCollection collection = !string.IsNullOrEmpty(au)
+                        ? new SPFieldUserValueCollection(properties.Web, au)
+                        : (SPFieldUserValueCollection) assignedToUsers;
+
                     users.AddRange(collection.Select(userValue => userValue.LookupId));
                 }
             }
