@@ -173,7 +173,7 @@
     color: #23272C !important;
 }
 .ms-cui-tabBody {
-    background: url("/_layouts/ppm/images/bgximg-B3C644FE.png") repeat-x scroll 0 -882px #FFFFFF;
+    /*background: url("/_layouts/ppm/images/bgximg-B3C644FE.png") repeat-x scroll 0 -882px #FFFFFF;*/
     border-bottom: 1px solid #898D92;
     border-style: solid;
     border-width: 0 0 1px;
@@ -1048,8 +1048,7 @@ a.ms-cui-ctl-a1:hover *, a.ms-cui-ctl-large:hover *, a.ms-cui-ctl-lowerlarge:hov
 }
 
 .ms-cui-ctl-large:hover, a.ms-cui-ctl-lowerlarge:hover, .ms-cui-ctl-light-hoveredOver, .ms-cui-ctl-medium:hover, .ms-cui-ctl:hover, .ms-cui-mrusb-selecteditem.ms-cui-ctl-light-hoveredOver a, .ms-cui-ctl-thin:hover {
-    background-color: #FDEEB3;
-    border-color: #F1C43F !important;
+    border-color: #92B7D1 !important;
 }
 
 .ms-cui-ctl-mousedown, .ms-cui-ctl-large:active, .ms-cui-ctl-lowerlarge:active, .ms-cui-ctl-medium:active, .ms-cui-ctl:active, .ms-cui-ctl-a1:active, .ms-cui-ctl-a2:active, .ms-cui-ctl-thin:active {
@@ -1236,8 +1235,7 @@ ul.ms-cui-menusection-items32 .ms-cui-ctl-iconContainer, ul.ms-cui-menusection-i
     line-height: 1px;
 }
 a.ms-cui-ctl-menu:hover {
-    background-color: #FDEEB3;
-    border-color: #F1C43F;
+    border-color: #92B7D1
 }
 a.ms-cui-ctl-menu-on {
     background-color: #FFD86C;
@@ -1338,8 +1336,7 @@ span:hover > .ms-cui-dd-arrow-button {
     border-color: #B1BAC4;
 }
 .ms-cui-dd-arrow-button:hover {
-    background-color: #FDEEB3 !important;
-    border-color: #F1C43F !important;
+    border-color: #92B7D1 !important;
 }
 .ms-cui-dd-arrow-button:active {
     background-color: #F6C867 !important;
@@ -1497,8 +1494,7 @@ span.ms-cui-disabled:hover > .ms-cui-dd-arrow-button {
     border: 1px solid #ADB0B3;
 }
 .ms-cui-spn-btnup:hover, .ms-cui-spn-btndown:hover {
-    background-color: #FDEEB3;
-    border: 1px solid #F1C43F !important;
+    border: 1px solid #92B7D1 !important;
 }
 .ms-cui-spn-btnup-down, .ms-cui-spn-btndown-down {
     background-color: #F6C867 !important;
