@@ -3279,7 +3279,7 @@ namespace EPMLiveWebParts
             }
 
 
-            output.Write("<div id=\"divHead" + sFullGridId  + "\" style=\"display:inline-block;width:100%\">");
+            output.Write("<div id=\"divHead" + sFullGridId  + "\" style=\"display:block;width:100%\">");
 
             output.Write("<div id=\"leftUpperDiv\" style=\"float:left\">");
             RenderSearch(output, web);
