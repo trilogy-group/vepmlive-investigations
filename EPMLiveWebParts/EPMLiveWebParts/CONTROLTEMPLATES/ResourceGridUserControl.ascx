@@ -124,8 +124,14 @@
             padding: 1px;
             border: 1px solid #eeeeee;
             background-color: #ffffff;
-            border-radius:50%;
-            width:20px;
+            height:25px;
+            width:25px;
+            margin-top:3px;
+        }
+
+        .HideCol0ProfilePic {
+           padding-bottom: 0px;
+           padding-top: 0px;
         }
         
         .EPMLiveResourceGridPanelHovered {
