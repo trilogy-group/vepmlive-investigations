@@ -954,7 +954,7 @@
                                 }
                             }
                             else {
-                                var options = { url: redirectUrl, showMaximized: false, dialogReturnValueCallback: function (dialogResult) { if (dialogResult == 1) { KanbanClient.raiseKanbanFilter1ApplyClick(); } } };
+                                var options = { url: redirectUrl, showMaximized: false, dialogReturnValueCallback: function (dialogResult) { if (dialogResult == 1) { KanbanClient.loadKanBanPlanners(); } } };
                                 SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
                             }
                             return true;
