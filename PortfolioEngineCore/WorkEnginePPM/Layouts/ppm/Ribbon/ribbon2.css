@@ -173,7 +173,7 @@
     color: #23272C !important;
 }
 .ms-cui-tabBody {
-    /*background: url("/_layouts/ppm/images/bgximg-B3C644FE.png") repeat-x scroll 0 -882px #FFFFFF;*/
+    
     border-bottom: 1px solid #898D92;
     border-style: solid;
     border-width: 0 0 1px;
@@ -185,10 +185,7 @@
 }
 
 .ms-cui-tabBodyLower {
-    /*background: url("./images/bgximg-B3C644FE.png") repeat-x scroll 0 -882px #FFFFFF;*/
-    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#FFFFFF', endColorstr='#EFEFEF'); /* for IE */
-    background: -webkit-gradient(linear, left top, left bottom, from(#FFFFFF), to(#EFEFEF)); /* for webkit browsers */
-    background: -moz-linear-gradient(top,  #FFFFFF,  #EFEFEF); /* for firefox 3.6+ */ 
+    
     border-bottom: 1px solid #898D92;
     border-style: solid;
     border-width: 0 0 1px;
