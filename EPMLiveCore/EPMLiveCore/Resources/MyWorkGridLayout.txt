@@ -54,7 +54,7 @@
 		<C Name="Complete" Type="Bool" Width="20" OnClick="changeCompleteStatus(Grid,Row,Col); return true;" ClassFormula="calculateDueColor('Complete',Row)" CanFilter="0" CanGroup="0" CanHide="0" CanResize="0" CanSort="0" />
 		<C Name="CommentCount" Type="Html" Width="26" CanFilter="0" CanGroup="0" CanResize="0" CanSort="0" />
 		<C Name="Priority" Type="Html" Width="25" />
-		<C Name="Title" Type="Html" RelWidth="100" MinWidth="100" CanGroup="0" CanHide="0" />
+		<C Name="Title" Type="Html" RelWidth="100" MinWidth="150" CanGroup="0" CanHide="0" Button="Html" ButtonText=" "/>
 	</LeftCols>
 	<Cols/>
 	<RightCols>
