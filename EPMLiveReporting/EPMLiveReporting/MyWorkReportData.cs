@@ -124,6 +124,7 @@ namespace EPMLiveReportsAdmin
             {
                 object fldAssignedTo = null;
                 string valAssignedTo = null;
+
                 try
                 {
                     fldAssignedTo = spListItem["AssignedTo"];
@@ -149,8 +150,16 @@ namespace EPMLiveReportsAdmin
 
                 string allCols = AddColums(columns).Replace("'", string.Empty);
 
+                var allUsers = new List<string>();
+
+                try
+                {
+                    allUsers.AddRange(spFieldUserValueCollection.Select(userValue => userValue.User.Name));
+                }
+                catch { }
+
                 SPListItem item = spListItem;
-                item["AssignedTo"] = "-99;#";
+                item["AssignedTo"] = string.Format("-99;#{0}", string.Join(", ", allUsers.Distinct()));
 
                 string allValues =
                     AddColumnValues(item, columns, defaultColumns, mandatoryHiddenFlds, "insert")

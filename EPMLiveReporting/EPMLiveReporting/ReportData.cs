@@ -2386,7 +2386,16 @@ namespace EPMLiveReportsAdmin
                             var stringBuilder = new StringBuilder();
                             object originalWork = item["Work"] == null ? DBNull.Value : item["Work"];
                             string originalUser = item["AssignedTo"].ToString();
-                            item["AssignedTo"] = "-99;#";
+
+                            var allUsers = new List<string>();
+
+                            try
+                            {
+                                allUsers.AddRange(spFieldUserValueCollection.Select(userValue => userValue.User.Name));
+                            }
+                            catch { }
+
+                            item["AssignedTo"] = string.Format("-99;#{0}", string.Join(", ", allUsers.Distinct()));
 
                             #region Adding Summary Row
 
