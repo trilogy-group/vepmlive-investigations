@@ -40,7 +40,7 @@ namespace EPMLiveCore.API
                         dt.Columns.Remove("Photo");
                         dt.Columns.Add("Title");
                     }
-                    else
+                    //else
                     {
                         foreach (SPField f in list.Fields)
                         {
