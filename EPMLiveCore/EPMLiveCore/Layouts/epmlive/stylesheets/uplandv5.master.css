@@ -5061,22 +5061,22 @@ span.ms-welcome-hover > span.ms-core-menu-arrow {
     top: 6px;
 }
 
-    .epm-global-button-right a {
-        -moz-transition: color 0.2s ease 0s;
-        -ms-text-shadow: 0 1px 0 #00A9ED;
-        -ms-transition: color 0.2s ease 0s;
-        -o-transition: color 0.2s ease 0s;
-        -webkit-text-shadow: 0 1px 0 #00A9ED;
-        -webkit-transition: color 0.2s ease 0s;
-        color: #00668E;
-        text-decoration: none;
-        text-shadow: 0 1px 0 #00A9ED;
-        transition: color 0.2s ease 0s;
-    }
+.epm-global-button-right a {
+    -moz-transition: color 0.2s ease 0s;
+    -ms-text-shadow: 0 1px 0 #00A9ED;
+    -ms-transition: color 0.2s ease 0s;
+    -o-transition: color 0.2s ease 0s;
+    -webkit-text-shadow: 0 1px 0 #00A9ED;
+    -webkit-transition: color 0.2s ease 0s;
+    color: #00668E;
+    text-decoration: none;
+    text-shadow: 0 1px 0 #00A9ED;
+    transition: color 0.2s ease 0s;
+}
 
-        .epm-global-button-right a:hover {
-            color: #FFFFFF !important;
-        }
+.epm-global-button-right a:hover {
+    color: #FFFFFF !important;
+}
 
 #search-box-container {
     background-color: #FFFFFF;
@@ -5094,36 +5094,40 @@ span.ms-welcome-hover > span.ms-core-menu-arrow {
     width: 220px;
 }
 
-    #search-box-container .ms-srch-sb-searchLink {
-        display: none;
-    }
+#search-box-container .ms-srch-sb-searchLink {
+    display: none;
+}
 
-    #search-box-container .ms-srch-sb {
-        background-color: #FFFFFF;
-        height: 20px;
-        width: 220px;
-    }
+#search-box-container .ms-srch-sb {
+    background-color: #FFFFFF;
+    height: 20px;
+    width: 220px;
+}
 
-    #search-box-container .ms-srch-sb-border {
-        border: medium none;
-    }
+#search-box-container .ms-srch-sb-border {
+    border: medium none;
+}
 
-    #search-box-container .ms-srch-sb-borderFocused {
-        border: medium none !important;
-    }
+#search-box-container .ms-srch-sb-borderFocused {
+    border: medium none !important;
+}
 
-    #search-box-container #SearchBox {
-        height: 20px;
-        line-height: 20px;
-    }
+#search-box-container #SearchBox {
+    height: 20px;
+    line-height: 20px;
+}
 
-        #search-box-container #SearchBox input {
-            height: 20px;
-            margin: 0;
-            position: relative;
-            top: -2px;
-            width: 210px;
-        }
+#search-box-container #SearchBox input {
+    height: 20px;
+    margin: 0;
+    position: relative;
+    top: -2px;
+    width: 210px;
+}
+
+.ms-dialog body #s4-workspace{padding:0;overflow:auto !important;}
+.ms-dialog body #s4-ribbonrow{position:relative;}
+.ms-dialog #isb-wrapper {margin:0;}
 
 #walkme-menu-closed {
     position: absolute;
