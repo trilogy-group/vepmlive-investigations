@@ -2,7 +2,7 @@
     (function (a, $$, $) {
 
         //====== FAVORITES ========================
-        a.isItem = function() {
+        a.isItem = function () {
             var bItem = ($$.currentItemID !== "-1" &&
                 !$$.currentListViewUrl &&
                 ($$.currentUrl.indexOf('NewForm.aspx') !== -1 ||
@@ -15,7 +15,7 @@
 
             return bItem;
         };
-       
+
         a.favoritesData =
             "<Data>" +
                 "<Param key=\"SiteId\">" + $$.currentSiteId + "</Param>" +
@@ -174,7 +174,10 @@
                                 "hideMethod": "fadeOut"
                             };
 
-                            toastr.success("A new item has been added to your favorites list.");
+                            if (window.parent)
+                            { window.parent.toastr.success("A new item has been added to your favorites list."); }
+                            else
+                            { toastr.success("A new item has been added to your favorites list."); }
 
                             var sa = result['#text'].split(',');
                             // asynchronously update nav
@@ -272,7 +275,11 @@
                                 "hideMethod": "fadeOut"
                             };
 
-                            toastr.success("A new item has been added to your favorites list.");
+
+                            if (window.parent)
+                            { window.parent.toastr.success("A new item has been added to your favorites list."); }
+                            else
+                            { toastr.success("A new item has been added to your favorites list."); }
 
                             var sa = result['#text'].split(',');
                             // asynchronously update nav
@@ -307,7 +314,7 @@
                                 });
                             }
 
-                            
+
                         } else {
                             //onError(response);
                         }
@@ -361,7 +368,10 @@
                                 "hideMethod": "fadeOut"
                             };
 
-                            toastr.success("A new item has been added to your favorites list.");
+                            if (window.parent)
+                            { window.parent.toastr.success("A new item has been added to your favorites list."); }
+                            else
+                            { toastr.success("A new item has been added to your favorites list."); }
 
                             var sa = result['#text'].split(',');
                             // asynchronously update nav
@@ -394,7 +404,7 @@
                                     external: false
                                 });
                             }
-                          
+
                         } else {
                             //onError(response);
                         }
@@ -452,7 +462,11 @@
                                 "hideMethod": "fadeOut"
                             };
 
-                            toastr.success("An existing item has been removed from your favorites list.");
+                           
+                            if (window.parent)
+                            { window.parent.toastr.success("An existing item has been removed from your favorites list."); }
+                            else
+                            { toastr.success("An existing item has been removed from your favorites list."); }
 
                             var sa = result['#text'].split(',');
                             // asynchronously update nav
@@ -469,7 +483,7 @@
                                     //webId: use webid for type 3 removal,
                                 });
                             }
-                           
+
 
                         } else {
                             //onError(response);
@@ -533,7 +547,10 @@
                                 "hideMethod": "fadeOut"
                             };
 
-                            toastr.success("An existing item has been removed from your favorites list.");
+                            if (window.parent)
+                            { window.parent.toastr.success("An existing item has been removed from your favorites list."); }
+                            else
+                            { toastr.success("An existing item has been removed from your favorites list."); }
 
                             var sa = result['#text'].split(',');
                             if (window.location.href.indexOf("IsDlg=1") != -1 || window.location.href.indexOf("isdlg=1") != -1) {
@@ -551,7 +568,7 @@
                                     //webId: use webid for type 3 removal,
                                 });
                             }
-                           
+
 
                         } else {
                             //onError(response);
@@ -608,7 +625,10 @@
                                 "hideMethod": "fadeOut"
                             };
 
-                            toastr.success("An existing item has been removed from your favorites list.");
+                            if (window.parent)
+                            { window.parent.toastr.success("An existing item has been removed from your favorites list."); }
+                            else
+                            { toastr.success("An existing item has been removed from your favorites list."); }
 
                             var sa = result['#text'].split(',');
                             if (window.location.href.indexOf("IsDlg=1") != -1 || window.location.href.indexOf("isdlg=1") != -1) {
