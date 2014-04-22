@@ -5604,7 +5604,7 @@ namespace EPMLiveWorkPlanner
                                     //Load Splitter...
                                     if (!splitterLoaded)
                                     {
-                                        sbItems.Append("<div id='splitter'><<</div>");
+                                        sbItems.Append("<div id='splitter' class='icon-arrow-left-17'></div>");
                                         splitterLoaded = true;
                                     }
 

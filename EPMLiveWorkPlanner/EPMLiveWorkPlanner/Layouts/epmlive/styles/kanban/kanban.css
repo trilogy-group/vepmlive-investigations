@@ -59,17 +59,19 @@
 }
 
 #splitter {
-    float: left;
+    background-color: #EEEEEE;
+    border-bottom: 1px solid #DDDDDD;
+    color: #BBBBBB;
     cursor: pointer;
     display: inline-block;
+    float: left;
     font-size: 12px;
     font-weight: bold;
-    position: relative;
-    background-color: #eeeeee;
-    border-bottom: 1px solid #dddddd;
     height: 31px;
     line-height: 33px;
-    width: 5%;
+    padding-left: 1px;
+    position: absolute;
+    width: 15px;
 }
 
 .clear {

@@ -323,9 +323,9 @@
 
                         $("#splitter").click(function () {
                             if ($("#itemContainerTD").is(":visible")) {
-                                $("#splitter").html(">>");
+                                $("#splitter").attr({ class: "icon-arrow-right-17" });
                             } else {
-                                $("#splitter").html("<<");
+                                $("#splitter").attr({ class: "icon-arrow-left-17" });
                             }
                             $("#itemContainerTD").toggle("fast", function () { });
                         });
