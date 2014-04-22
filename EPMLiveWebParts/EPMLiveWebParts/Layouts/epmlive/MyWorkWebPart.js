@@ -1,6 +1,8 @@
 ﻿var iconUrl = '/_layouts/epmlive/images/mywork/';
 var intRegex = /^\d+$/;
 var leaveMessage = "You are currently in the edit mode. If you choose to proceed, all your changes will be lost.";
+var CurrentGrid;
+var CurrentRow;
 
 window.onbeforeunload = confirmPageLeave;
 
@@ -28,6 +30,13 @@ function configureTitleCol(grid) {
     }
 }
 
+function MyWorkOnDblClick(grid, row, col, x, y, event)
+{
+    EditGridRow(grid, row, col);
+}
+
+
+
 //Grids.OnDblClick = function(grid, row, col, x, y, event) {
 //    if (grid.id === window.allWorkGridId) {
 //        if (!row['EditMode']) {
@@ -36,7 +45,142 @@ function configureTitleCol(grid) {
 //    }
 //};
 
+function GoodEditCol(col) {
 
+    switch (col)
+    {
+        case "DueDay":
+        case "TitleLower":
+        case "StatusFC":
+        case "DueDateFC":
+        case "DueDateFC2":
+        case "Complete":
+        case "CommentCount":
+        case "Flag":
+        case "WorkingOn":
+            return false;
+    }
+    return true;
+}
+
+
+function EditGridRow(grid, row, col) {
+
+    if (row.ItemID && grid.EditRow != row.id && row.id != "Header") {
+        var webUrl = window.epmLiveNavigation.currentWebUrl;
+
+        var cols = "";
+
+        for (var c in grid.Cols) {
+            if (GoodEditCol(c))
+                cols += "," + c;
+        }
+
+        cols = cols.substr(1);
+
+        var data = "<Row id=\"" + row.id + "\" siteid=\"" + row.SiteID + "\" webid=\"" + row.WebID + "\" listid=\"" + row.ListID + "\" itemid=\"" + row.ItemID + "\" Cols=\"" + cols + "\"/>";
+
+        grid.SetAttribute(row, "Title", "HtmlPrefix", "<img src='/_layouts/15/epmlive/images/mywork/loading16.gif'>", 1);
+
+        $.ajax({
+            type: 'POST',
+            url: (webUrl + '/_vti_bin/WorkEngine.asmx/ExecuteJSON').replace(/\/\//g, '/'),
+            data: "{ Function: 'webparts_GetGridRowEdit', Dataxml: '" + data + "' }",
+            contentType: 'application/json; charset=utf-8',
+            dataType: 'json',
+            success: function (response) {
+                var oResp = eval("(" + response.d + ")");
+                if (oResp.Result.Status == "0") {
+                    grid.EditRow = row.id;
+                    grid.AddDataFromServer(oResp.Result.InnerText);
+                    grid.SetAttribute(row, "Title", "HtmlPrefix", "<span class=\"icon-pencil\" style=\"color: #CCC;padding-right:5px\"></span>", 1);
+                    grid.StartEdit();
+                }
+                else
+                    alert(oResp.Result.Error.Text);
+
+            },
+            error: function (response) {
+                alert("Error: " + response);
+            }
+        });
+
+
+    }
+}
+
+function MyWorkOnClickOutside(grid, row, col, x, y, event) {
+    if (grid.EditRow)
+        StopEditGridRow(grid, grid.GetRowById("Header"));
+}
+
+function MyWorkOnAfterValueChanged(grid, row, col, val) {
+        grid.EditRowChanged = true;
+}
+
+
+function StopEditGridRow(grid, row) {
+
+    if (row.id != grid.EditRow) {
+        var row = grid.GetRowById(grid.EditRow);
+        grid.EditRow = null;
+        grid.EndEdit(true);
+        if (grid.EditRowChanged) {
+            grid.SetAttribute(row, "Title", "HtmlPrefix", "<img src='/_layouts/15/epmlive/images/mywork/loading16.gif'>", 1);
+
+            var Values = "";
+            var cols = "";
+
+            for (var col in grid.Cols) {
+                if (GoodEditCol(col) && grid.GetAttribute(row, col, "CanEdit") == "1") {
+                    Values += "<Field Name=\"" + col + "\">" + escape(grid.GetValue(row, col)) + "</Field>";
+
+                    cols += "," + col;
+                }
+            }
+
+            var data = "<Row id=\"" + row.id + "\" siteid=\"" + row.SiteID + "\" webid=\"" + row.WebID + "\" listid=\"" + row.ListID + "\" itemid=\"" + row.ItemID + "\" Cols=\"" + cols + "\">" + Values + "</Row>";
+
+            var webUrl = window.epmLiveNavigation.currentWebUrl;
+
+            $.ajax({
+                type: 'POST',
+                url: (webUrl + '/_vti_bin/WorkEngine.asmx/ExecuteJSON').replace(/\/\//g, '/'),
+                data: "{ Function: 'webparts_SetGridRowEdit', Dataxml: '" + data + "' }",
+                contentType: 'application/json; charset=utf-8',
+                dataType: 'json',
+                success: function (response) {
+                    var oResp = eval("(" + response.d + ")");
+                    if (oResp.Result.Status == "0") {
+                        grid.AddDataFromServer(oResp.Result.InnerText);
+                    }
+                    else
+                        alert(oResp.Result.Error.Text);
+                    grid.SetAttribute(row, "Title", "HtmlPrefix", "", 1);
+                    for (var col in grid.Cols) {
+                        if (GoodEditCol(col))
+                            grid.SetAttribute(row, col, "CanEdit", "0", 1);
+                    }
+                    grid.AcceptChanges(row);
+                },
+                error: function (response) {
+                    alert("Error: " + response);
+                    grid.SetAttribute(row, "Title", "HtmlPrefix", "", 1);
+                }
+            });
+        }
+        else {
+            grid.EditRow = "";
+            for (var col in grid.Cols) {
+                if (GoodEditCol(col))
+                    grid.SetAttribute(row, col, "CanEdit", "0", 1);
+            }
+            grid.SetAttribute(row, "Title", "HtmlPrefix", "", 1);
+        }
+        grid.EditRowChanged = false;
+
+    }
+}
 
 function MyWorkOnReady (grid, start) {
     
@@ -45,12 +189,17 @@ function MyWorkOnReady (grid, start) {
         TGSetEvent("OnRenderFinish", grid.id, MyWorkOnRenderFinish);
         TGSetEvent("OnFocus", grid.id, MyWorkOnFocus);
         TGSetEvent("OnClick", grid.id, MyWorkOnClick);
+        TGSetEvent("OnClickOutside", grid.id, MyWorkOnClickOutside);
+        TGSetEvent("OnAfterValueChanged", grid.id, MyWorkOnAfterValueChanged);
         TGSetEvent("OnGetHtmlValue", grid.id, MyWorkOnGetHtmlValue);
         TGSetEvent("OnLoaded", grid.id, MyWorkOnLoaded);
         TGSetEvent("OnColumnsChanged", grid.id, MyWorkOnColumnsChanged);
         TGSetEvent("OnGetColor", grid.id, MyWorkOnGetColor);
         TGSetEvent("OnGroup", grid.id, MyWorkOnGroup);
         TGSetEvent("OnGetSortValue", grid.id, MyWorkOnGetSortValue);
+        TGSetEvent("OnDblClick", grid.id, MyWorkOnDblClick);
+        TGSetEvent("OnMouseOverOutside", grid.id, MyWorkOnMouseOverOutside);
+        TGSetEvent("OnMouseOverRow", grid.id, MyWorkOnMouseOverRow);
 
         EPMLiveCore.WorkEngineAPI.set_path(siteUrl + '/_vti_bin/WorkEngine.asmx');
 
@@ -88,6 +237,8 @@ function MyWorkOnReady (grid, start) {
     }
 };
 
+
+
 function MyWorkOnGetSortValue(grid, row, col, val) {
     if (grid.id === window.allWorkGridId) {
         if (col === 'DueDay') {
@@ -112,9 +263,36 @@ function MyWorkOnRenderFinish (grid) {
 
 function MyWorkOnFocus (grid, row, col, orow, ocol, pagepos) {
     if (grid.id === window.allWorkGridId) {
+        if (row.ItemID) {
+            grid.ActionClearSelection();
+            grid.SelectRow(row);
+        }
+
         window.RefreshCommandUI();
     }
 };
+
+function MyWorkOnMouseOverOutside(grid, row, col, event) {
+    if (grid.CurHoverRow)
+        grid.SetAttribute(grid.GetRowById(grid.CurHoverRow), "Title", "ButtonText", ' ', 1);
+    grid.CurHoverRow = "";
+
+}
+
+function MyWorkOnMouseOverRow(grid, row, col, event) {
+    if (grid.CurHoverRow != row.id) {
+        if (grid.CurHoverRow)
+            grid.SetAttribute(grid.GetRowById(grid.CurHoverRow), "Title", "ButtonText", ' ', 1);
+        grid.CurHoverRow = row.id;
+        CurrentGrid = grid;
+        if (grid.GetValue(row, "ItemID") != "") {
+            grid.SetAttribute(row, "Title", "ButtonText", '<div class="gridmenuspan" style="position:absolute;overflow:visible;margin-right:5px" id=\"' + row.id + '\"><a data-itemid="' + grid.GetValue(row, "ItemID") + '" data-listid="' + grid.GetValue(row, "ListID") + '" data-webid="' + grid.GetValue(row, "WebID") + '" data-siteid="' + grid.GetValue(row, "SiteID") + '" ></a></div>', 1);
+            CurrentGrid = grid;
+            CurrentRow = row;
+            window.epmLiveNavigation.addContextualMenu($('#' + row.id), [], null, null, { "delete": "GridGanttDeleteRow" });
+        }
+    }
+}
 
 function MyWorkOnClick(grid, row, col, x, y, event) {
     if (grid.id === window.allWorkGridId) {
@@ -128,6 +306,9 @@ function MyWorkOnClick(grid, row, col, x, y, event) {
             event.cancelBubble = true;
             return true;
         }
+
+        if (grid.EditRow)
+            StopEditGridRow(grid, row);
 
         if (grid.RowCount === 1) {
             if (grid.Cols[col].Type !== 'Date' && col !== 'Flag' && col !== 'Edit' && col !== 'CommentCount' && col !== 'Priority' && col !== 'Complete') {
@@ -187,9 +368,39 @@ function MyWorkOnClick(grid, row, col, x, y, event) {
     }
 };
 
+function MyWorkGoToItem(gridid, rowid) {
+    var grid = Grids[gridid];
+    var row = grid.GetRowById(rowid);
+    CurrentGrid = grid;
+    CurrentRow = row;
+    gridid = GetGridId(grid);
+
+    var LinkType = eval("mygrid" + gridid + ".LinkType");
+
+    var url = window.epmLiveNavigation.currentWebUrl + "/_layouts/epmlive/gridaction.aspx?action=" + LinkType + "&webid=" + row.WebID + "&listid=" + row.ListID + "&ID=" + row.ItemID + "&Source=" + escape(location.href);
+
+    if (eval("mygrid" + gridid + "._usepopup")) {
+
+        var options = window.SP.UI.$create_DialogOptions();
+
+        options.url = url;
+        options.width = 700;
+        options.allowMaximize = false;
+        options.showClose = true;
+        options.dialogReturnValueCallback = GridCommentsCallBack;
+        window.SP.UI.ModalDialog.showModalDialog(options);
+    }
+    else
+        location.href = url;
+}
+
 function MyWorkOnGetHtmlValue(grid, row, col, val) {
     if (grid.id === window.allWorkGridId) {
-        if (col === 'CommentCount' || col === 'Priority' || col === 'Flag' || col === 'Title' || col === 'WorkingOn') {
+        if (col == "Title" && row.Def.Name == "R")
+        {
+            return "<a href=\"javascript:MyWorkGoToItem('" + grid.id + "','" + row.id + "');\">" + val + "</a>";
+        }
+        else if (col === 'CommentCount' || col === 'Priority' || col === 'Flag' || col === 'Title' || col === 'WorkingOn') {
             if (row.Def.Name !== 'Header' && row.Def.Name !== 'Fixed' && row.Def.Name !== 'Group') {
                 var value = val;
 

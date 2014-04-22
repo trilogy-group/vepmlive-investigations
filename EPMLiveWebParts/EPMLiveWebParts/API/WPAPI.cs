@@ -233,70 +233,78 @@ namespace EPMLiveWebParts
             oWeb.AllowUnsafeUpdates = true;
             foreach (XmlNode nd in DocIn.FirstChild.SelectNodes("//Field"))
             {
-                SPField oField = list.Fields.GetFieldByInternalName(nd.Attributes["Name"].Value);
-                switch(oField.Type)
+                SPField oField = null;
+                try
                 {
-                    case SPFieldType.User:
-                        if (nd.InnerText != "")
-                        {
-                            string[] sUVals = nd.InnerText.Split(';');
-                            SPFieldUserValueCollection uvc = new SPFieldUserValueCollection();
-                            foreach (string sVal in sUVals)
+                    oField = list.Fields.GetFieldByInternalName(nd.Attributes["Name"].Value);
+                }
+                catch { }
+                if (oField != null)
+                {
+                    switch (oField.Type)
+                    {
+                        case SPFieldType.User:
+                            if (nd.InnerText != "")
                             {
-                                SPFieldUserValue lv = new SPFieldUserValue(oWeb, sVal);
-                                uvc.Add(lv);
+                                string[] sUVals = nd.InnerText.Split(';');
+                                SPFieldUserValueCollection uvc = new SPFieldUserValueCollection();
+                                foreach (string sVal in sUVals)
+                                {
+                                    SPFieldUserValue lv = new SPFieldUserValue(oWeb, sVal);
+                                    uvc.Add(lv);
+                                }
+                                li[oField.Id] = uvc;
                             }
-                            li[oField.Id] = uvc;
-                        }
-                        else
-                            li[oField.Id] = null;
-                        break;
-                    case SPFieldType.Lookup:
-                        string[] sVals = nd.InnerText.Split(';');
-                        SPFieldLookupValueCollection lvc = new SPFieldLookupValueCollection();
-                        foreach (string sVal in sVals)
-                        {
-                            SPFieldLookupValue lv = new SPFieldLookupValue(sVal);
-                            lvc.Add(lv);
-                        }
-                        li[oField.Id] = lvc;
-                        break;
-                    case SPFieldType.MultiChoice:
-                        li[oField.Id] = nd.InnerText.Replace(";",";#");
-                        break;
-                    case SPFieldType.Currency:
-                         if (nd.InnerText == "")
-                            li[oField.Id] = null;
-                        else
-                            li[oField.Id] = nd.InnerText;
-                        break;
-                    case SPFieldType.Number:
-                        SPFieldNumber fNum = (SPFieldNumber)oField;
-                        if (fNum.ShowAsPercentage)
-                        {
-                            try
+                            else
+                                li[oField.Id] = null;
+                            break;
+                        case SPFieldType.Lookup:
+                            string[] sVals = nd.InnerText.Split(';');
+                            SPFieldLookupValueCollection lvc = new SPFieldLookupValueCollection();
+                            foreach (string sVal in sVals)
                             {
-                                li[oField.Id] = float.Parse(nd.InnerText) / 100;
+                                SPFieldLookupValue lv = new SPFieldLookupValue(sVal);
+                                lvc.Add(lv);
                             }
-                            catch { li[oField.Id] = null; }
-                        }
-                        else
-                        {
+                            li[oField.Id] = lvc;
+                            break;
+                        case SPFieldType.MultiChoice:
+                            li[oField.Id] = nd.InnerText.Replace(";", ";#");
+                            break;
+                        case SPFieldType.Currency:
                             if (nd.InnerText == "")
                                 li[oField.Id] = null;
                             else
                                 li[oField.Id] = nd.InnerText;
-                        }
-                        break;
-                    case SPFieldType.DateTime:
-                        if (nd.InnerText == "")
-                            li[oField.Id] = null;
-                        else
-                            li[oField.Id] = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddMilliseconds(double.Parse(nd.InnerText));
-                        break;
-                    default:
-                        li[oField.Id] = nd.InnerText;
-                        break;
+                            break;
+                        case SPFieldType.Number:
+                            SPFieldNumber fNum = (SPFieldNumber)oField;
+                            if (fNum.ShowAsPercentage)
+                            {
+                                try
+                                {
+                                    li[oField.Id] = float.Parse(nd.InnerText) / 100;
+                                }
+                                catch { li[oField.Id] = null; }
+                            }
+                            else
+                            {
+                                if (nd.InnerText == "")
+                                    li[oField.Id] = null;
+                                else
+                                    li[oField.Id] = nd.InnerText;
+                            }
+                            break;
+                        case SPFieldType.DateTime:
+                            if (nd.InnerText == "")
+                                li[oField.Id] = null;
+                            else
+                                li[oField.Id] = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddMilliseconds(double.Parse(nd.InnerText));
+                            break;
+                        default:
+                            li[oField.Id] = nd.InnerText;
+                            break;
+                    }
                 }
             }
 
