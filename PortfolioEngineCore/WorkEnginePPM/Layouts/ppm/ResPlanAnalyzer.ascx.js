@@ -569,105 +569,107 @@
                 }
             }
 
+            try {
+                if (gridView.LeftCols !== null) {
 
-            if (gridView.LeftCols !== null) {
+                    if (gridId == "bottomg_1" && gridView.LeftCols == "")
+                        gridView.LeftCols = "rtSelect:20";
+                    else {
+                        if (gridView.LeftCols.indexOf("rtSelect") == -1) {
+                            gridView.LeftCols += ",rtSelect:20";
+                        }
 
-                if (gridId == "bottomg_1" && gridView.LeftCols == "")
-                    gridView.LeftCols = "rtSelect:20";
-                else {
-                    if (gridView.LeftCols.indexOf("rtSelect") == -1) {
-                        gridView.LeftCols += ",rtSelect:20";
                     }
 
-                }
+
+                    var leftCols = gridView.LeftCols.split(',');
 
 
-                var leftCols = gridView.LeftCols.split(',');
+                    if (gridView.LeftCols != "") {
 
 
-                if (gridView.LeftCols != "") {
+                        for (var c in leftCols) {
+                            var cv = leftCols[c].split(':');
+                            var col = cv[0];
 
+                            if (this.DoesColExist(gcols, col) == true) {
 
-                    for (var c in leftCols) {
-                        var cv = leftCols[c].split(':');
-                        var col = cv[0];
+                                Array.add(allCols, col);
 
-                        if (this.DoesColExist(gcols, col) == true) {
+                                try {
+                                    var width = cv[1] - grid.Cols[col].Width;
 
-                            Array.add(allCols, col);
+                                    //                        if (col === 'Edit') {
+                                    //                            if ($.browser.msie && parseInt($.browser.version) <= 8) {
+                                    //                                width = 23;
+                                    //                            }
+                                    //                        }
 
-                            try {
-                                var width = cv[1] - grid.Cols[col].Width;
-
-                                //                        if (col === 'Edit') {
-                                //                            if ($.browser.msie && parseInt($.browser.version) <= 8) {
-                                //                                width = 23;
-                                //                            }
-                                //                        }
-
-                                if (width !== 0) {
-                                    grid.SetWidth(col, width);
+                                    if (width !== 0) {
+                                        grid.SetWidth(col, width);
+                                    }
+                                } catch (e) {
                                 }
-                            } catch (e) {
-                            }
 
-                            grid.MoveCol(col, 0, 1, 1);
+                                grid.MoveCol(col, 0, 1, 1);
+                            }
                         }
                     }
                 }
             }
-
-
-            if (gridView.Cols !== null) {
-                var cols = gridView.Cols.split(',');
-
-                if (gridView.Cols != "") {
-                    for (var c in cols) {
-                        var cv = cols[c].split(':');
-                        var col = cv[0];
-
-                        if (this.DoesColExist(gcols, col) == true) {
-
-                            Array.add(allCols, col);
-
-                            try {
-                                var width = cv[1] - grid.Cols[col].Width;
-                                if (width !== 0) {
-                                    grid.SetWidth(col, width);
-                                }
-                            } catch (e) {
-                            }
-
-                            grid.MoveCol(col, 1, 1, 1);
-                        }
-                    }
-                    for (var i = 0; i < gcols.length; i++) {
-                        if (grid.Cols[gcols[i]].Sec == 2)
-                            break;
-
-                        if (grid.Cols[gcols[i]].Sec == 1) {
-                            var xfound = false;
-                            for (var j = 0; j < allCols.length; j++) {
-                                if (allCols[j] === gcols[i])
-                                    xfound = true;
-                            }
-
-                            if (!xfound)
-                                grid.MoveCol(gcols[i], 1, 1, 1);
-                        }
-                    }
-                }
-
-
-            }
-
-
-
-            var groupCols = grid.Group.split(',');
+            catch (e) { };
 
             try {
-                if (grid.Group != "")
+                if (gridView.Cols !== null) {
+                    var cols = gridView.Cols.split(',');
+
+                    if (gridView.Cols != "") {
+                        for (var c in cols) {
+                            var cv = cols[c].split(':');
+                            var col = cv[0];
+
+                            if (this.DoesColExist(gcols, col) == true) {
+
+                                Array.add(allCols, col);
+
+                                try {
+                                    var width = cv[1] - grid.Cols[col].Width;
+                                    if (width !== 0) {
+                                        grid.SetWidth(col, width);
+                                    }
+                                } catch (e) {
+                                }
+
+                                grid.MoveCol(col, 1, 1, 1);
+                            }
+                        }
+                        for (var i = 0; i < gcols.length; i++) {
+                            if (grid.Cols[gcols[i]].Sec == 2)
+                                break;
+
+                            if (grid.Cols[gcols[i]].Sec == 1) {
+                                var xfound = false;
+                                for (var j = 0; j < allCols.length; j++) {
+                                    if (allCols[j] === gcols[i])
+                                        xfound = true;
+                                }
+
+                                if (!xfound)
+                                    grid.MoveCol(gcols[i], 1, 1, 1);
+                            }
+                        }
+                    }
+
+
+                }
+            }
+            catch (e) { };
+
+            try {
+                if (grid.Group != "") {
+                    var groupCols = grid.Group.split(',');
                     grid.DoGrouping(null);
+                }
             }
             catch (e) { };
 
