@@ -1031,17 +1031,15 @@ a.ms-cui-ctl-a1:hover *, a.ms-cui-ctl-large:hover *, a.ms-cui-ctl-lowerlarge:hov
     border-color: #B1BAC4 !important;
 }
 .ms-cui-ctl-on, .ms-cui-ctl-dark-highlight, .ms-cui-ctl-a2.ms-cui-ctl-dark-highlight:hover, .ms-cui-ctl-a1.ms-cui-ctl-dark-highlight:hover, .ms-cui-mrusb-selecteditem a:hover, .ms-cui-ctl-hoveredOver {
-    background-color: #FFD86C !important;
-    border-color: #C2821B !important;
+    
+    border-color: #92B7D1 !important;
 }
 .ms-cui-ctl-dark-highlight:hover {
-    background-color: #FFED95;
-    border-color: #C28A30;
+    border-color: #92B7D1;
 }
 
 .ms-cui-ctl-on:hover {
-    background-color: #FFED95 !important;
-    border-color: #C28A30 !important;
+    border-color: #92B7D1 !important;
 }
 
 .ms-cui-ctl-large:hover, a.ms-cui-ctl-lowerlarge:hover, .ms-cui-ctl-light-hoveredOver, .ms-cui-ctl-medium:hover, .ms-cui-ctl:hover, .ms-cui-mrusb-selecteditem.ms-cui-ctl-light-hoveredOver a, .ms-cui-ctl-thin:hover {
@@ -1049,8 +1047,8 @@ a.ms-cui-ctl-a1:hover *, a.ms-cui-ctl-large:hover *, a.ms-cui-ctl-lowerlarge:hov
 }
 
 .ms-cui-ctl-mousedown, .ms-cui-ctl-large:active, .ms-cui-ctl-lowerlarge:active, .ms-cui-ctl-medium:active, .ms-cui-ctl:active, .ms-cui-ctl-a1:active, .ms-cui-ctl-a2:active, .ms-cui-ctl-thin:active {
-    background-color: #F6C867 !important;
-    border-color: #C28A30 !important;
+    background-color: #92B7D1 !important;
+    border-color: #92B7D1 !important;
 }
 .ms-cui-ctl-large .ms-cui-ctl-a2 {
     border-top: 0 none !important;
@@ -1235,8 +1233,7 @@ a.ms-cui-ctl-menu:hover {
     border-color: #92B7D1
 }
 a.ms-cui-ctl-menu-on {
-    background-color: #FFD86C;
-    border-color: #C2821B;
+    border-color: #92B7D1;
 }
 span.ms-cui-mrusb-selecteditem {
     display: inline-block;
@@ -1336,8 +1333,8 @@ span:hover > .ms-cui-dd-arrow-button {
     border-color: #92B7D1 !important;
 }
 .ms-cui-dd-arrow-button:active {
-    background-color: #F6C867 !important;
-    border-color: #C28A30 !important;
+    background-color: #92B7D1 !important;
+    border-color: #92B7D1 !important;
 }
 span.ms-cui-disabled:hover > .ms-cui-dd-arrow-button {
     background-color: #FFFFFF !important;
@@ -1494,8 +1491,8 @@ span.ms-cui-disabled:hover > .ms-cui-dd-arrow-button {
     border: 1px solid #92B7D1 !important;
 }
 .ms-cui-spn-btnup-down, .ms-cui-spn-btndown-down {
-    background-color: #F6C867 !important;
-    border: 1px solid #C28A30 !important;
+    background-color: #92B7D1 !important;
+    border: 1px solid #92B7D1 !important;
 }
 .ms-cui-spn-imgcnt {
     display: inline-block;
