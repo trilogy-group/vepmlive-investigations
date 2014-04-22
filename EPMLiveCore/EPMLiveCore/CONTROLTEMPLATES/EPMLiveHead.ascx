@@ -4,6 +4,7 @@
 <%@ Control Language="C#" AutoEventWireup="true" CodeBehind="EPMLiveHead.ascx.cs" Inherits="EPMLiveCore.CONTROLTEMPLATES.EPMLiveHead" %>
 
 <!--[if lt IE 9]>
+    <link href='/_layouts/15/epmlive/stylesheets/uplandv5.master.min.css?v=<%= EPMLiveVersion %>' rel='stylesheet' type='text/css'>
     <SharePoint:ScriptBlock runat="server">
         (function() {
             WebFontConfig = {
@@ -12,20 +13,6 @@
                     urls: ['/_layouts/15/epmlive/stylesheets/masterpages/opensans.ie.min.css']
                 }
             };
-
-            var styles = ['uplandv5.master'];
-
-            var head = document.getElementsByTagName('head')[0];
-
-            for (var i = 0; i < styles.length; i++) {
-                var style = document.createElement('link');
-
-                style.type = 'text/css';
-                style.rel = 'stylesheet';
-                style.href = '/_layouts/15/epmlive/stylesheets/' + styles[i] + '.min.css?v=<%= EPMLiveVersion %>';
-
-                head.appendChild(style);
-            }
         })();
     </SharePoint:ScriptBlock>
     <SharePoint:StyleBlock runat="server">
@@ -38,7 +25,6 @@
 <![endif]-->
         
 <!--[if !IE]><!-->
-
     <SharePoint:StyleBlock runat="server">
         .epm-nav-icon {
             top: 4px;
