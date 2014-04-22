@@ -2796,7 +2796,7 @@ namespace EPMLiveCore.API
                     XDocument.Parse(data).Element("MyWork").Element("WebPart").Attribute("ID")
                         .Value));
                 cfgElement.Add(new XAttribute("CSS",
-                    string.Format("{0}/_layouts/epmlive/treegrid/mywork13/grid.css",
+                    string.Format("{0}/_layouts/epmlive/treegrid/grid/grid.css",
                         SPContext.Current.Web.Url)));
 
                 grid.Add(cfgElement);
