@@ -167,13 +167,10 @@
   position: relative;
   top: -1px;
 }
-#epm-social-stream li.epm-se-thread li.epm-se-activity {
-  margin: 2px 0;
-}
 #epm-social-stream li.epm-se-thread li.epm-se-activity span {
   display: inline-block;
-  height: 20px;
-  line-height: 20px;
+  height: 15px;
+  line-height: 15px;
 }
 #epm-social-stream li.epm-se-thread li.epm-se-activity span.epm-se-activity-icon {
   width: 40px;
