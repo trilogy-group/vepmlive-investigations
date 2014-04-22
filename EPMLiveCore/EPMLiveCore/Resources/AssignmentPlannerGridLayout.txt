@@ -12,7 +12,7 @@
     <Cfg MenuColumnsCount="2"/> <!-- Displays column names in menu in two columns -->
     <Cfg MidWidth="325" MinRightWidth="200" MinLeftWidth="200"/> <!-- Sizes and scrolls for column sections -->
     <Cfg Style="Standard"/> <!-- Presets Standard CSS style -->
-    <Cfg ResizingMain="3"/> <!-- Users can resize grid by right bottom edge -->
+    <Cfg NoVScroll="0"/> <!-- Users can resize grid by right bottom edge -->
     <Cfg Deleting="0"/> <!-- Users can resize grid by right bottom edge -->
     <Cfg Dragging="0"/>
 
