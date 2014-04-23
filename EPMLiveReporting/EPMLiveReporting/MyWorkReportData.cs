@@ -159,11 +159,12 @@ namespace EPMLiveReportsAdmin
                 catch { }
 
                 SPListItem item = spListItem;
-                item["AssignedTo"] = string.Format("-99;#{0}", string.Join(", ", allUsers.Distinct()));
+                //item["AssignedTo"] = string.Format("-99;#{0}", string.Join(", ", allUsers.Distinct()));
+                item["AssignedTo"] = "-99;#";
 
                 string allValues =
-                    AddColumnValues(item, columns, defaultColumns, mandatoryHiddenFlds, "insert")
-                        .Replace("'", string.Empty);
+                    AddColumnValues(item, columns, defaultColumns, mandatoryHiddenFlds, "insert", string.Join(", ", allUsers.Distinct()))
+                        .Replace("'", string.Empty );
 
                 AddMetaInfoCols(listName, item, ref allCols, ref allValues);
 
@@ -189,7 +190,7 @@ namespace EPMLiveReportsAdmin
                         listItem["AssignedTo"] = spFieldUserValue;
 
                         string rvalues = AddColumnValues(listItem, columns, defaultColumns, mandatoryHiddenFlds,
-                            "insert")
+                            "insert", string.Join(", ", allUsers.Distinct()))
                             .Replace("'", string.Empty);
 
                         AddMetaInfoCols(listName, listItem, ref rcols, ref rvalues);
@@ -250,7 +251,7 @@ namespace EPMLiveReportsAdmin
         /// <returns></returns>
         protected override string AddColumnValues(SPListItem spListItem, DataTable columns, ArrayList defaultColumns,
             ArrayList mandatoryHiddenFlds,
-            string operation)
+            string operation, string sAssignedToText)
         {
             string colValues = string.Empty;
             string columnName = string.Empty;
@@ -330,7 +331,11 @@ namespace EPMLiveReportsAdmin
                                     columnName.Replace("'", string.Empty),
                                     identifier);
 
-                                if (columnName.ToLower().EndsWith("text") && spListItem[field.InternalName] != null)
+                                if (columnName.ToLower() == "assignedtotext")
+                                {
+                                    param.Value = sAssignedToText;
+                                }
+                                else if (columnName.ToLower().EndsWith("text") && spListItem[field.InternalName] != null)
                                 {
                                     param.Value = AddLookUpFieldValues(spListItem[field.InternalName].ToString(), "text");
                                 }

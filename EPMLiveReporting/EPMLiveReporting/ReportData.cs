@@ -1544,6 +1544,12 @@ namespace EPMLiveReportsAdmin
         }
 
         protected virtual string AddColumnValues(SPListItem li, DataTable dtColumns, ArrayList arrayList_defaultColumns,
+            ArrayList mandatoryHiddenFlds, string sAction, string sAssignedToText)
+        {
+            throw new Exception("Not Implemented");
+        }
+
+        protected virtual string AddColumnValues(SPListItem li, DataTable dtColumns, ArrayList arrayList_defaultColumns,
             ArrayList mandatoryHiddenFlds, string sAction)
         {
             string sColValues = string.Empty;
@@ -2395,7 +2401,8 @@ namespace EPMLiveReportsAdmin
                             }
                             catch { }
 
-                            item["AssignedTo"] = string.Format("-99;#{0}", string.Join(", ", allUsers.Distinct()));
+                            //item["AssignedTo"] = string.Format("-99;#{0}", string.Join(", ", allUsers.Distinct()));
+                            item["AssignedTo"] = "-99;#";
 
                             #region Adding Summary Row
 
@@ -2415,7 +2422,11 @@ namespace EPMLiveReportsAdmin
                                     if (column["SharepointType"].ToString().ToLower() == "lookup" ||
                                         column["SharepointType"].ToString().ToLower() == "user")
                                     {
-                                        if (column["ColumnName"].ToString().ToLower().EndsWith("text"))
+                                        if (column["ColumnName"].ToString().ToLower() == "assignedtotext")
+                                        {
+                                            itemRow[column["ColumnName"].ToString()] = string.Join(", ", allUsers.Distinct());
+                                        }
+                                        else if (column["ColumnName"].ToString().ToLower().EndsWith("text"))
                                         {
                                             if (ItemHasValue(item, column["internalname"].ToString()))
                                             //if (item[column["internalname"].ToString()] != null)
@@ -2533,7 +2544,11 @@ namespace EPMLiveReportsAdmin
                                         if (column["SharepointType"].ToString().ToLower() == "lookup" ||
                                             column["SharepointType"].ToString().ToLower() == "user")
                                         {
-                                            if (column["ColumnName"].ToString().ToLower().EndsWith("text"))
+                                            if(column["ColumnName"].ToString().ToLower() == "assignedtotext")
+                                            {
+                                                itemRow[column["ColumnName"].ToString()] = string.Join(", ", allUsers.Distinct());
+                                            }
+                                            else if (column["ColumnName"].ToString().ToLower().EndsWith("text"))
                                             {
                                                 if (ItemHasValue(item, column["internalname"].ToString()))
                                                 //if (item[column["internalname"].ToString()] != null)

@@ -52,7 +52,7 @@ if not exists (select table_name from INFORMATION_SCHEMA.tables where table_name
 
 		CREATE TABLE [dbo].[RPTLog](
 			[RPTListId] [uniqueidentifier] NULL,
-			[ListName] [nvarchar](100) NULL,
+			[ListName] [nvarchar](500) NULL,
 			[ShortMessage] [ntext] NOT NULL,
 			[LongMessage] [ntext] NULL,
 			[Level] int NOT NULL,

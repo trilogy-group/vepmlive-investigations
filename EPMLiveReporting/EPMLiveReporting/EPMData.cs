@@ -2017,15 +2017,18 @@ namespace EPMLiveReportsAdmin
 
                 foreach (string sTableName in tableNames)
                 {
-                    if (!refreshAll && sTableName == "LSTMyWork")
+                    if (sTableName != null)
                     {
-                        continue;
-                    }
+                        if (!refreshAll && sTableName == "LSTMyWork")
+                        {
+                            continue;
+                        }
 
-                    if (TableExists(sTableName, GetClientReportingConnection))
-                    {
-                        sSQL = sSQL + " DELETE [" + sTableName.Replace("'", "") + "] WHERE SiteId =@siteID";
-                        // - CAT.NET false-positive: All single quotes are escaped/removed.
+                        if (TableExists(sTableName, GetClientReportingConnection))
+                        {
+                            sSQL = sSQL + " DELETE [" + sTableName.Replace("'", "") + "] WHERE SiteId =@siteID";
+                            // - CAT.NET false-positive: All single quotes are escaped/removed.
+                        }
                     }
                 }
                 AddParam("@siteID", _siteID);
@@ -2041,16 +2044,18 @@ namespace EPMLiveReportsAdmin
                 while (iListCounter < listNames.Length)
                 {
                     listIds[iListCounter] = GetListId(Convert.ToString(listNames[iListCounter]), _webId).ToString();
+                    sSQL = sSQL + " DELETE FROM RPTWork WHERE SiteId=@siteId AND ListId='" +
+                           listIds[iListCounter].Replace("'", "") + "'";
                     iListCounter++;
                 }
 
                 iListCounter = 0; //updated/added during CAT.NET fix iteration
-                foreach (string sTableName in tableNames)
-                {
-                    sSQL = sSQL + " DELETE FROM RPTWork WHERE SiteId=@siteId AND ListId='" +
-                           listIds[iListCounter].Replace("'", "") + "'";
-                    // - CAT.NET false-positive: All single quotes are escaped/removed.
-                }
+                //foreach (string sTableName in tableNames)
+                //{
+                //    sSQL = sSQL + " DELETE FROM RPTWork WHERE SiteId=@siteId AND ListId='" +
+                //           listIds[iListCounter].Replace("'", "") + "'";
+                //    // - CAT.NET false-positive: All single quotes are escaped/removed.
+                //}
                 AddParam("@siteId", _siteID);
                 Command = sSQL;
                 return ExecuteNonQuery(GetClientReportingConnection);
@@ -2278,13 +2283,18 @@ namespace EPMLiveReportsAdmin
         /// <returns></returns>
         public string GetTableName(Guid listId)
         {
-            object objTableName = null;
-            Command = "SELECT TableName FROM " + Resources.ListTable.Replace("'", "") +
-                      " WHERE RPTListId=@RPTListId AND SiteId=@siteID";
-            AddParam("@RPTListId", listId);
-            AddParam("@siteID", _siteID);
-            objTableName = ExecuteScalar(GetClientReportingConnection);
-            return objTableName.ToString();
+            try
+            {
+                object objTableName = null;
+                Command = "SELECT TableName FROM " + Resources.ListTable.Replace("'", "") +
+                          " WHERE RPTListId=@RPTListId AND SiteId=@siteID";
+                AddParam("@RPTListId", listId);
+                AddParam("@siteID", _siteID);
+                objTableName = ExecuteScalar(GetClientReportingConnection);
+                return objTableName.ToString();
+            }
+            catch { }
+            return null;
         }
 
         /// <summary>
