@@ -498,9 +498,9 @@ function GetYValue() {
         } else if (aggType == "Sum" || aggType == "Avg") {
             // 1 Y VALUE (Numerical)
             try {
-                // telerik syntax, don't change
-                yVal = $find(ddlYNumSingleClientId)._value;
-            } catch (e) { }
+             //telerik syntax, don't change
+             yVal = $find(ddlYNumSingleClientId)._value;
+             } catch (e) { }
         }
     } else if (chartType == "Bubble") {
         // 1 Y VALUE (NUMERICAL)
@@ -508,6 +508,7 @@ function GetYValue() {
             // telerik syntax
             yVal = $find(ddlYNumSingleClientId)._value;
         } catch (e) { }
+
     }
 
     return yVal;
@@ -599,8 +600,8 @@ function ValidatePage2() {
         } else if (aggType == "Sum" || aggType == "Avg") {
             // NEED 1 X, 1 OR MORE Y VALUE (NUMERICAL)
             var xVal = $find(ddlXNonNumClientId)._value;
-            var checkedItems = $find(ddlYNumMultiClientId).get_checkedItems();
-            if (xVal != "None" && checkedItems.length > 0) {
+             var yVal = $find(ddlYNumSingleClientId)._value;
+            if (xVal != "None" && yVal != "None") {
                 isValid = true;
             }
         }
