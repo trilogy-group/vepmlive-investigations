@@ -181,7 +181,7 @@ namespace EPMLiveWebParts
 
                 if (fieldProperties != null)
                 {
-                    foreach (SPField field in item.Fields)
+                    foreach (SPField field in item.ContentType.Fields)
                     {
                         try
                         {
@@ -253,7 +253,7 @@ namespace EPMLiveWebParts
                 }
                 else
                 {
-                    foreach (SPField field in item.Fields)
+                    foreach (SPField field in item.ContentType.Fields)
                     {
                         if (!field.Hidden && field.ShowInDisplayForm == true)
                         {
