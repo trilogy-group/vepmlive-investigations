@@ -269,7 +269,10 @@ namespace TimeSheets
                         }
                         drTS.Close();
                     }
-
+                    else
+                    {
+                        bTsLocked = true;
+                    }
 
 
                     cn.Close();
