@@ -103,7 +103,7 @@ namespace EPMLiveCore.Layouts.epmlive
                 foreach(SPGroup g in web.Groups)
                 {
                     string[] sG = g.Name.Split(' ');
-                    if(sG[sG.Length - 1] == "Members")
+                    if(sG[sG.Length - 1] == "Member")
                         sDefaultGroup = g.ID.ToString();
 
                     if(g.CanCurrentUserEditMembership)
