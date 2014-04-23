@@ -1265,7 +1265,11 @@ namespace EPMLiveCore.Layouts.epmlive
                     Collection<string> mappedLists = reportBiz.GetMappedListsIds();
                     if (!mappedLists.Contains(list.ID.ToString().ToLower()))
                     {
-                        reportBiz.CreateListBiz(list.ID);
+                        var fields = new ListItemCollection();
+                        fields = GetListFields(list);
+                        reportBiz.CreateListBiz(list.ID, SPContext.Current.Web.ID, fields);
+
+                        //reportBiz.CreateListBiz(list.ID);
 
                         try
                         {
@@ -1324,6 +1328,52 @@ namespace EPMLiveCore.Layouts.epmlive
             Infrastructure.CacheStore.Current.RemoveCategory("GridSettings-" + list.ID);
 
             Microsoft.SharePoint.Utilities.SPUtility.Redirect("listedit.aspx?List=" + Request["List"], Microsoft.SharePoint.Utilities.SPRedirectFlags.RelativeToLayoutsPage, HttpContext.Current);
+        }
+
+        private ListItemCollection GetListFields(SPList spList)
+        {
+            var fields = new ListItemCollection();
+            ListItem listField;
+            var ListDefaults = new ListBiz(spList.ID, spList.ParentWeb.Site.ID);
+
+            foreach (SPField field in spList.Fields)
+            {
+                try
+                {
+                    //Adding contenttype field specifically.
+                    if (field.InternalName.ToLower() == "contenttype")
+                    {
+                        listField = new ListItem();
+                        listField.Text = field.Title;
+                        listField.Value = field.Id.ToString();
+                        fields.Add(listField);
+                        continue;
+                    }
+
+                    //Adding contenttype field specifically.
+                    if (field.InternalName.ToLower() == "extid")
+                    {
+                        listField = new ListItem();
+                        listField.Text = field.Title;
+                        listField.Value = field.Id.ToString();
+                        fields.Add(listField);
+                        continue;
+                    }
+
+                    if (!field.Hidden
+                        && field.Type != SPFieldType.Computed
+                        )
+                    {
+                        listField = new ListItem();
+                        listField.Text = field.Title;
+                        listField.Value = field.Id.ToString();
+                        fields.Add(listField);
+                    }
+                }
+                catch (Exception ex) { }
+            }
+
+            return fields;
         }
 
         private void DisableFancyForms(SPList list)
