@@ -319,4 +319,16 @@
   color: #555555;
   text-decoration: none;
 }
+#epm-social-stream button#epm-se-load-more {
+  background: none repeat scroll 0 0 #F3F3F3;
+  border: medium none;
+  border-radius: 3px;
+  color: #AAAAAA;
+  margin-left: 25px;
+  cursor: pointer;
+  display: none;
+}
+#epm-social-stream button#epm-se-load-more span {
+  margin-right: 5px;
+}
 /*# sourceMappingURL=SocialStream.css.map */

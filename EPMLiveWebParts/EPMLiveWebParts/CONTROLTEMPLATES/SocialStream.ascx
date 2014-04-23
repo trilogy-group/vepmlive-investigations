@@ -25,6 +25,7 @@
     </div>
     <ul id="epm-se-threads"></ul>
     <div id="epm-se-no-activity">Get to work! - once you do, you'll see activity here.</div>
+    <button id="epm-se-load-more"><span class="icon-arrow-down"></span>Load More</button>
     <div id="epm-se-pagination"><span>Loading more...</span></div>
 </div>
 
