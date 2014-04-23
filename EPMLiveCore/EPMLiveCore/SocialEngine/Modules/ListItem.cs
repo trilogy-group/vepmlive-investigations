@@ -425,16 +425,11 @@ namespace EPMLiveCore.SocialEngine.Modules
             ThreadManager threadManager = args.ThreadManager;
             ActivityManager activityManager = args.ActivityManager;
 
-            Thread thread = threadManager.GetThread((Guid) data["WebId"], (Guid) data["ListId"], (int) data["Id"]) ??
-                            threadManager.SaveThread(new Thread
-                            {
-                                Title = (string) data["Title"],
-                                Url = (string) data["URL"],
-                                Kind = args.ObjectKind,
-                                WebId = (Guid) data["WebId"],
-                                ListId = (Guid) data["ListId"],
-                                ItemId = (int) data["Id"]
-                            });
+            Thread thread = threadManager.GetThread((Guid) data["WebId"], (Guid) data["ListId"], (int) data["Id"]);
+            thread.Title = (string) data["Title"];
+            thread.Url = (string) data["URL"];
+
+            threadManager.SaveThread(thread);
 
             string metaData = null;
 

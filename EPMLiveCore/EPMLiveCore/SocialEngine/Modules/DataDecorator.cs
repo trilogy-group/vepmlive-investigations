@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Threading.Tasks;
+using System.Linq;
 using EPMLiveCore.SocialEngine.Contracts;
 using EPMLiveCore.SocialEngine.Events;
 using Microsoft.SharePoint;
@@ -17,15 +17,19 @@ namespace EPMLiveCore.SocialEngine.Modules
             SPRegionalSettings regionalSettings = args.ContextWeb.CurrentUser.RegionalSettings ??
                                                   args.ContextWeb.RegionalSettings;
 
-            Parallel.ForEach(args.Data, data =>
-            {
-                if (data.Value == null) return;
+            string[] keys = args.Data.Keys.ToArray();
 
-                if (data.Value is DateTime)
+            foreach (string key in keys)
+            {
+                object data = args.Data[key];
+
+                if (data == null) return;
+
+                if (data is DateTime)
                 {
-                    args.Data[data.Key] = regionalSettings.TimeZone.LocalTimeToUTC((DateTime) data.Value);
+                    args.Data[key] = regionalSettings.TimeZone.LocalTimeToUTC((DateTime) data);
                 }
-            });
+            }
         }
 
         #endregion Methods 
