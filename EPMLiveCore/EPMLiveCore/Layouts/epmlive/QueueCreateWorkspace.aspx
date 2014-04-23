@@ -46,7 +46,7 @@
             </div>
             <%--top section--%>
 	        <div class="divTopSection" style="display:none;">    
-	            <label style="font-family:Open Sans Regular;font-size:15px;padding-right:10px;">
+	            <label style="font-family:Open Sans Regular;font-size:15px;padding-right:62px;">
                     What is the title of this Workspace?
 	            </label>  
 	            <input type="textbox" id="tbWsName" name="tbWsName" class="titleInput" data-bind="value: workspaceTitle, valueUpdate: 'afterkeydown', event: { keydown: PreventNonAlphaNumeric }" />
