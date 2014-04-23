@@ -2239,8 +2239,11 @@ function registerEpmLiveResourceGridScript() {
                                         if (data.length > 0) {
                                             for (var i in data) {
                                                 var obj = data[i];
-                                                //txt += ('Key: ' + obj['key'] + '| Value: ' + obj['value'] + ',\r\n');
+                                                //txt += ('Key: ' + obj['key'] + '| Value: ' + obj['value'] + ',\r\n');  
                                                 grpVals.push(obj['value']);
+                                                if ($.inArray(obj['value'], aViewCols) == -1) {
+                                                    $(".multiselect-container").find(".cbColumn[value='" + obj['value'] + "']").attr('checked', true);
+                                                } 
                                             }
                                             if (grpVals.length > 0) {
                                                 sCols = grpVals.join(',');
