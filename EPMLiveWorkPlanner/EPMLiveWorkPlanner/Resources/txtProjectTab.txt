@@ -28,14 +28,14 @@
 				Sequence="10"
 				Description="Opens a modal dialog box"
 				Command="Ribbon.WorkPlanner.SaveButton"
-				Image32by32="/_layouts/images/save32x32.png"
+				Image32by32="/_layouts/ppm/images/save32x32.png"
 				LabelText="Save"
 				TemplateAlias="cust1"/>
 
 				<Button
 				Id="Ribbon.Project.StandardGroup.PublishButton"
 				Sequence="20"
-				Image32by32="/_layouts/epmlive/images/publish.PNG"
+				Image32by32="/_layouts/ppm/images/publish.PNG"
 				Description="Simple alert button"
 				Command="Ribbon.WorkPlanner.PublishButton"
 				LabelText="Publish"
@@ -44,7 +44,7 @@
 				<Button
 				Id="Ribbon.Project.StandardGroup.CloseButton"
 				Sequence="30"
-				Image32by32="/_layouts/epmlive/images/close32.gif"
+				Image32by32="/_layouts/ppm/images/close32.gif"
 				Description="Simple alert button"
 				Command="Ribbon.WorkPlanner.CloseButton"
 				LabelText="Close"
@@ -53,7 +53,7 @@
 				<Button
 				Id="Ribbon.Project.StandardGroup.PrintButton"
 				Sequence="40"
-				Image16by16="/_layouts/epmlive/images/print.gif"
+				Image16by16="/_layouts/epmlive/images/print16.png"
 				Command="Ribbon.WorkPlanner.PrintButton"
 				LabelText="Print"
 				TemplateAlias="oM"/>
