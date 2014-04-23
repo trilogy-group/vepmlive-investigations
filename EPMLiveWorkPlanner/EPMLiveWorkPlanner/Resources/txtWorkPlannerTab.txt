@@ -310,9 +310,9 @@
 				<Button
 					Id="Ribbon.WorkPlanner.PropertiesGroup.Alerts"
 					Sequence="50"
-					Image16by16="/_layouts/#language#/images/formatmap16x16.png"
-					Image16by16Left="-224"
-					Image16by16Top="-144"
+					Image16by16="/_layouts/epmlive/images/planner-sprite16.png"
+					Image16by16Left="-20"
+					Image16by16Top="-295"
 					Command="Ribbon.WorkPlanner.Alerts"
 					LabelText="Alert Me"
 					TemplateAlias="oM"/>
@@ -320,9 +320,9 @@
 				<Button
 					Id="Ribbon.WorkPlanner.PropertiesGroup.History"
 					Sequence="60"
-					Image16by16="/_layouts/#language#/images/formatmap16x16.png"
-					Image16by16Left="-80"
-					Image16by16Top="-48"
+					Image16by16="/_layouts/epmlive/images/planner-sprite16.png"
+					Image16by16Left="-55"
+					Image16by16Top="-99"
 					Command="Ribbon.WorkPlanner.History"
 					LabelText="Version History"
 					TemplateAlias="oM"/>
@@ -330,9 +330,9 @@
 				<Button
 					Id="Ribbon.WorkPlanner.PropertiesGroup.Permissions"
 					Sequence="60"
-					Image16by16="/_layouts/#language#/images/formatmap16x16.png"
-					Image16by16Left="0"
-					Image16by16Top="-128"
+					Image16by16="/_layouts/epmlive/images/planner-sprite16.png"
+					Image16by16Left="-72"
+					Image16by16Top="-145"
 					Command="Ribbon.WorkPlanner.Permissions"
 					LabelText="Permissions"
 					TemplateAlias="oM"/>
@@ -340,9 +340,9 @@
 				<Button
 					Id="Ribbon.WorkPlanner.PropertiesGroup.Workflows"
 					Sequence="60"
-					Image16by16="/_layouts/#language#/images/formatmap16x16.png"
-					Image16by16Left="-208"
-					Image16by16Top="-48"
+					Image16by16="/_layouts/epmlive/images/planner-sprite16.png"
+					Image16by16Left="-295"
+					Image16by16Top="-55"
 					Command="Ribbon.WorkPlanner.Workflows"
 					LabelText="Workflows"
 					TemplateAlias="oM"/>
@@ -350,9 +350,9 @@
 				<Button
 					Id="Ribbon.WorkPlanner.PropertiesGroup.Attachments"
 					Sequence="60"
-					Image16by16="/_layouts/#language#/images/formatmap16x16.png"
-					Image16by16Left="-144"
-					Image16by16Top="-128"
+					Image16by16="/_layouts/epmlive/images/planner-sprite16.png"
+					Image16by16Left="-234"
+					Image16by16Top="-234"
 					Command="Ribbon.WorkPlanner.Attachments"
 					LabelText="Attachments"
 					TemplateAlias="oM"/>
