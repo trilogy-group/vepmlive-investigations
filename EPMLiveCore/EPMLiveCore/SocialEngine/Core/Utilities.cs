@@ -6,26 +6,43 @@ namespace EPMLiveCore.SocialEngine.Core
 {
     internal static class Utilities
     {
-        #region Methods (1) 
+        #region Fields (1) 
 
-        // Public Methods (1) 
+        private const string IGNORED_LISTS_SETTING_KEY = "EPM_SS_Ignored_Lists";
+
+        #endregion Fields 
+
+        #region Methods (2) 
+
+        // Public Methods (2) 
+
+        public static string ConfigureDefaultIgnoredLists(SPWeb contextWeb)
+        {
+            string ignoredLists = CoreFunctions.getConfigSetting(contextWeb, IGNORED_LISTS_SETTING_KEY);
+            if (!string.IsNullOrEmpty(ignoredLists)) return ignoredLists;
+
+            const string IGNORED_LISTS =
+                "EPMLiveFileStore,User Information List,Team,Department,Departments,Excel Reports,Holiday Schedules,My Timesheet,My Work,Non Work,Project Schedules,Report Library,Resource Center,Roles,Site Assets,Site Pages,Style Library,Work Hours";
+
+            CoreFunctions.setConfigSetting(contextWeb, IGNORED_LISTS_SETTING_KEY, IGNORED_LISTS);
+
+            return IGNORED_LISTS;
+        }
 
         public static bool IsIgnoredList(string listTitle, SPWeb contextWeb)
         {
-            const string SETTING_KEY = "EPM_SS_Ignored_Lists";
-
             var settingValue =
-                (string) CacheStore.Current.Get(SETTING_KEY, new CacheStoreCategory(contextWeb).SocialStream,
-                    () => CoreFunctions.getConfigSetting(contextWeb, SETTING_KEY), true).Value;
+                (string)
+                    CacheStore.Current.Get(IGNORED_LISTS_SETTING_KEY, new CacheStoreCategory(contextWeb).SocialStream,
+                        () => CoreFunctions.getConfigSetting(contextWeb, IGNORED_LISTS_SETTING_KEY), true).Value;
 
             if (!string.IsNullOrEmpty(settingValue))
                 return settingValue.Split(',').Any(list => list.Trim().ToLower().Equals(listTitle.ToLower()));
 
-            const string IGNORED_LISTS = "EPMLiveFileStore,User Information List,Team";
+            string ignoredLists = ConfigureDefaultIgnoredLists(contextWeb);
 
-            CoreFunctions.setConfigSetting(contextWeb, SETTING_KEY, IGNORED_LISTS);
-
-            CacheStore.Current.Set(SETTING_KEY, IGNORED_LISTS, new CacheStoreCategory(contextWeb).SocialStream, true);
+            CacheStore.Current.Set(IGNORED_LISTS_SETTING_KEY, ignoredLists,
+                new CacheStoreCategory(contextWeb).SocialStream, true);
 
             return false;
         }
