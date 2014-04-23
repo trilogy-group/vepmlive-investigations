@@ -21,7 +21,7 @@ namespace EPMLiveCore.SocialEngine.Core
             if (!string.IsNullOrEmpty(settingValue))
                 return settingValue.Split(',').Any(list => list.Trim().ToLower().Equals(listTitle.ToLower()));
 
-            const string IGNORED_LISTS = "EPMLiveFileStore,User Information List";
+            const string IGNORED_LISTS = "EPMLiveFileStore,User Information List,Team";
 
             CoreFunctions.setConfigSetting(contextWeb, SETTING_KEY, IGNORED_LISTS);
 
