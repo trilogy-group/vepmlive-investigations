@@ -1130,11 +1130,13 @@
                                 if (command !== 'nav:remove') {
                                     $.get(redirectUrl).always(function () {
                                         removeLink(id, nId);
+                                        SP.UI.Notify.removeNotification(nId);
                                         if (callBackFunction != '')
                                             eval(callBackFunction + '(' + id + ')');
                                     });
                                 } else {
                                     removeLink(id, nId);
+                                    SP.UI.Notify.removeNotification(nId);
                                     if (callBackFunction != '')
                                         eval(callBackFunction + '(' + id + ')');
                                 }
