@@ -1834,7 +1834,7 @@ namespace EPMLiveWebParts
                 }
                 catch { }
             }
-            HideListView();
+            HideListView(!Page.IsPostBack);
             try
             {
 
@@ -1957,7 +1957,7 @@ namespace EPMLiveWebParts
         }
 
 
-        private void processControls(Control parentControl, string listname, string listid, string viewid, string defaultcontrol, string webpartid, string ZoneIndex, bool hideNew)
+        /*private void processControls(Control parentControl, string listname, string listid, string viewid, string defaultcontrol, string webpartid, string ZoneIndex, bool hideNew)
         {
 
 
@@ -2198,14 +2198,14 @@ namespace EPMLiveWebParts
                 processControls(childControl, listname, listid, viewid, defaultcontrol, webpartid, ZoneIndex, hideNew);
             }
         }
-
+        */
         protected override void RenderWebPart(HtmlTextWriter output)
         {
             tb.AddTimer();
             output.Write(error);
             try
             {
-                HideListView();
+                HideListView(Page.IsPostBack);
                 
                 if(view != null)
                     gvs = new GridViewSession(view.ID);
@@ -2841,9 +2841,9 @@ namespace EPMLiveWebParts
             return sb.ToString().Trim(',');
         }
 
-        private void HideListView()
+        private void HideListView(bool DoHide)
         {
-            if (SPContext.Current.ViewContext.View != null)
+            if (SPContext.Current.ViewContext.View != null && DoHide)
             {
                 bool bHasListView = false;
 
@@ -2855,7 +2855,7 @@ namespace EPMLiveWebParts
                         {
                             Microsoft.SharePoint.WebPartPages.XsltListViewWebPart wp2 = (Microsoft.SharePoint.WebPartPages.XsltListViewWebPart)wp;
                             wp2.XmlDefinition = wp2.XmlDefinition.Replace("<Toolbar Type=\"Standard\"/>", "<Toolbar Type=\"Standard\" ShowAlways=\"TRUE\"/>");
-                            wp.Visible = false;
+                            wp.Hidden = true;
                             bHasListView = true;
                             break;
                         }
@@ -3470,6 +3470,30 @@ namespace EPMLiveWebParts
                                                                         return titles;
                                                                         }catch(e){}
                                                                         };");
+
+            output.WriteLine("mygrid" + sFullGridId + @".getCheckedItems = function(){
+                                                
+                                 var ids = """";
+                                try{
+                                var grid = Grids.GanttGrid" + sFullGridId + @";
+
+                                var sRows = grid.GetSelRows();
+                                for(var sRow in sRows)
+                                {
+                                    var row = sRows[sRow];
+    
+                                    if(row.itemid != """")
+                                    {
+                                        ids += "","" + row.itemid;
+                                    }
+                                }
+
+                                if(ids != """" && ids[0] == ',')
+                                    ids = ids.substring(1);
+                                return ids;
+                                }catch(e){return """";}
+                                };");
+
 
 
             output.WriteLine("mygrid" + sFullGridId + @".getCheckedIds = function(){
