@@ -263,7 +263,7 @@
 				Id="Ribbon.WorkPlanner.ToolsGroup.EditResourcePlan"
 				Sequence="12"
 				Command="Ribbon.WorkPlanner.EditResourcePlan"
-				Image16by16="/_layouts/1033/images/formatmap16x16.png" Image16by16Top="-64" Image16by16Left="-128"
+				Image16by16="/_layouts/epmlive/images/editresplan16.gif"
 				LabelText="Edit Resource Plan"
 				TemplateAlias="oM"/>
 
