@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using EPMLiveCore.API;
 using Microsoft.SharePoint;
+using System.Net;
 
 namespace EPMLiveCore.Jobs
 {
@@ -149,14 +150,19 @@ namespace EPMLiveCore.Jobs
                 }
 
 
-                //try
-                //{
-                //    var authCookie = HttpContext.Current.Request.Cookies["FedAuth"];
-                //    var fedAuth = new Cookie(authCookie.Name, authCookie.Value, authCookie.Path, string.IsNullOrEmpty(authCookie.Domain) ? HttpContext.Current.Request.Url.Host : authCookie.Domain);
-                //    SSRS.CookieContainer = new CookieContainer();
-                //    SSRS.CookieContainer.Add(fedAuth);
-                //}
-                //catch { }
+                try
+                {
+                    SPAuthentication.Authentication auth = new SPAuthentication.Authentication();
+                    auth.Url =  web.Url + "/_vti_bin/authentication.asmx";
+                    SPAuthentication.LoginResult loginResult = auth.Login(username.Substring(username.IndexOf("\\") + 1), password);
+                    Cookie cookie = new Cookie();
+                    CookieCollection cookies = auth.CookieContainer.GetCookies(new Uri(auth.Url));
+                    cookie = cookies[loginResult.CookieName];
+
+                    SSRS.CookieContainer = new CookieContainer();
+                    SSRS.CookieContainer.Add(cookie);
+                }
+                catch { }
 
                 SPDocumentLibrary list = (SPDocumentLibrary)web.Lists["Report Library"];
 
