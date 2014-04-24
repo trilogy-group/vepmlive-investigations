@@ -2462,7 +2462,9 @@ namespace EPMLiveCore
                     {
                         testGrp = web.SiteGroups[safeSiteTitle + " " + roleName + " " + grpIndex.ToString()];
                     }
-                    catch { }
+                    catch {
+                        testGrp = null;
+                    }
                     if (testGrp == null)
                     {
                         web.SiteGroups.Add(safeSiteTitle + " " + roleName + " " + grpIndex, owner, defaultUser, groupDescription);

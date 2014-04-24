@@ -30,19 +30,20 @@ namespace EPMLiveCore
                     testGrp = eleWeb.SiteGroups[safeGroupTitle + " " + grp];
                 }
                 catch { }
-                if (testGrp != null)
+                //Commented code is no longer use and commented to resolve Jira Id 2321
+                //if (testGrp != null)
+                //{
+                //    finalName = testGrp.Name;
+                //}
+                //else
+                //{
+                try
                 {
-                    finalName = testGrp.Name;
+                finalName = CoreFunctions.AddGroup(eleWeb, safeGroupTitle, grp, owner, eleWeb.CurrentUser, string.Empty);
+                eleWeb.Update();
                 }
-                else
-                {
-                    try
-                    {
-                        finalName = CoreFunctions.AddGroup(eleWeb, safeGroupTitle, grp, owner, eleWeb.CurrentUser, string.Empty);
-                        eleWeb.Update();
-                    }
-                    catch { }
-                }
+                catch { }
+                //}
 
                 SPGroup finalGrp = eleWeb.SiteGroups[finalName];
                 SPRoleType rType;
