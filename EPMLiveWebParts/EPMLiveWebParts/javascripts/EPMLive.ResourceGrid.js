@@ -353,9 +353,9 @@ function registerEpmLiveResourceGridScript() {
                 }
             },
             viewFormResourceChanged: function (result, target, params) {
-                    $$.grid.resourceUpdated(1, null, { row: params.row, changeType: params.changeType });
-                },
-            
+                $$.grid.resourceUpdated(1, null, { row: params.row, changeType: params.changeType });
+            },
+
             contextMenuResourceDelete: function (liid) {
                 var grid = $$.grid.grids[$$.id()];
                 if (liid) {
@@ -1358,12 +1358,22 @@ function registerEpmLiveResourceGridScript() {
 
                 if (operation === 'sendnotification') {
                     var emails = [];
+                    var limitedCount = false;
+                    var maxlen = 1950;
+                    var arrayCharLength = 0;
 
                     for (var i = 0; i < selRows.length; i++) {
                         var row = selRows[i];
 
                         if (row.Kind === 'Data' && row.Def.Name === 'R') {
                             var email = row.Email;
+                            arrayCharLength = emails.toString().length + email.length;
+
+                            if (arrayCharLength > maxlen)
+                            {
+                                limitedCount = true;
+                                break;
+                            }
 
                             if (email) {
                                 emails.push(email);
@@ -1371,8 +1381,15 @@ function registerEpmLiveResourceGridScript() {
                         }
                     }
 
-                    window.location.href = 'mailto:{0}'.format(emails.join(';'));
-
+                    if (limitedCount) {
+                        var msg = confirm("You can send "+emails.length+" out of "+selRows.length+" notifications, do you want to continue?");
+                        if (msg == true) {
+                            window.location.href = 'mailto:{0}'.format(emails.join(';'));
+                        }
+                    }
+                    else {
+                        window.location.href = 'mailto:{0}'.format(emails.join(';'));
+                    }
                     return;
                 }
 
@@ -1581,7 +1598,7 @@ function registerEpmLiveResourceGridScript() {
                     if (!ribbonButton) {
                         ribbonButton = document.getElementById('Ribbon.ResourceGrid.Actions.Find-Small');
                     }
-
+                    
                     if (ribbonButton && $('.epmliveToolBar').length == 0) {
                         var rButton = $(ribbonButton);
                         var offset = rButton.offset();
@@ -2243,7 +2260,7 @@ function registerEpmLiveResourceGridScript() {
                                                 grpVals.push(obj['value']);
                                                 if ($.inArray(obj['value'], aViewCols) == -1) {
                                                     $(".multiselect-container").find(".cbColumn[value='" + obj['value'] + "']").attr('checked', true);
-                                                } 
+                                                }
                                             }
                                             if (grpVals.length > 0) {
                                                 sCols = grpVals.join(',');
