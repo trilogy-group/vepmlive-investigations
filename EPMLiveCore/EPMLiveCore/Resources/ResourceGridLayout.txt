@@ -19,7 +19,7 @@
 		<D Name="Group" CanFilter="2" TitleEmptyValueFormula="'No '+Grid.Header[Row.GroupCol]" />
 		<D Name="Group" Class="EPMLiveResourceGridGroup" TitleClass="EPMLiveResourceGridGroupTitle" />
 		<D Name="Group" TitleHtmlPrefixFormula="' &lt;span class=&quot;EPMLiveResourceGridGroupPrefix&quot;>'+Grid.Header[Row.GroupCol]+': &lt;/span>'"/>
-		<D Name="Group" TitleHtmlPostfixFormula="' &lt;span class=&quot;EPMLiveResourceGridGroupPostfix&quot;>('+count(4)+')&lt;/span>'"/>
+		<D Name="Group" TitleHtmlPostfixFormula="' &lt;span class=&quot;EPMLiveResourceGridGroupPostfix&quot;>('+count('Row.Level>(Grid.Group.split(\',\').length - 1)',4)+')&lt;/span>'"/>
 		<D Name="Group" Calculated="1" CalcOrder="TitleEmptyValue,TitleHtmlPostfix"/>
 	</Def>
 	<Toolbar Visible="0" />
