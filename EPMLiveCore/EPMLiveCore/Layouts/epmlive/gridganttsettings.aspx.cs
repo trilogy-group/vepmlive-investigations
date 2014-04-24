@@ -405,7 +405,7 @@ namespace EPMLiveCore.Layouts.epmlive
                             {
                                 if (isMaster)
                                 {
-                                    cbEnableReporting.Checked = true; 
+                                    cbEnableReporting.Checked = true;
                                     cbEnableReporting.Enabled = false;
                                 }
                                 else
@@ -434,7 +434,6 @@ namespace EPMLiveCore.Layouts.epmlive
                 }
             }
         }
-
 
         private Dictionary<string, int> GetAvailableDefaultTemps()
         {
@@ -1325,9 +1324,35 @@ namespace EPMLiveCore.Layouts.epmlive
                 }
             }
 
+            SetListIcon(gSettings.ListIcon);
+
             Infrastructure.CacheStore.Current.RemoveCategory("GridSettings-" + list.ID);
 
             Microsoft.SharePoint.Utilities.SPUtility.Redirect("listedit.aspx?List=" + Request["List"], Microsoft.SharePoint.Utilities.SPRedirectFlags.RelativeToLayoutsPage, HttpContext.Current);
+        }
+
+        private void SetListIcon(string icon)
+        {
+            try
+            {
+                var reportBiz = new ReportBiz(SPContext.Current.Site.ID);
+                Guid listId = new Guid(Request["List"]);
+                EPMData _DAO = new EPMData(SPContext.Current.Site.ID);
+                _DAO.Command = "SELECT COUNT(Id) FROM ReportListIds WHERE Id = @ListID";
+                _DAO.AddParam("@ListID", Convert.ToString(Request["List"]));
+                object rowsAffected = _DAO.ExecuteScalar(_DAO.GetClientReportingConnection).ToString();
+
+                if (Convert.ToInt32(rowsAffected) == 0)
+                    _DAO.Command = "INSERT INTO ReportListIds(Id, ListIcon) VALUES (@ID, @ListIcon)";
+                else
+                    _DAO.Command = "UPDATE ReportListIds SET ListIcon = @ListIcon WHERE Id = @ID";
+
+                _DAO.AddParam("@ID", Convert.ToString(Request["List"]));
+                _DAO.AddParam("@ListIcon", icon);
+
+                rowsAffected = _DAO.ExecuteNonQuery(_DAO.GetClientReportingConnection).ToString();
+            }
+            catch { }
         }
 
         private ListItemCollection GetListFields(SPList spList)
