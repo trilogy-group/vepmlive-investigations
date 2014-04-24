@@ -255,7 +255,7 @@
 				Id="Ribbon.WorkPlanner.ToolsGroup.EditCosts"
 				Sequence="12"
 				Command="Ribbon.WorkPlanner.EditCosts"
-				Image16by16="/_layouts/images/versions.gif"
+				Image16by16="/_layouts/epmlive/images/editcosts16.png"
 				LabelText="Edit Costs"
 				TemplateAlias="oM"/>
 
