@@ -914,6 +914,26 @@ namespace TimeSheets
 						/> ");
                 spRibbon.RegisterDataExtension(ribbonExtensions.FirstChild, "Ribbon.MyTimesheet.DelegateGroup.Controls._children");
             }
+
+            bool bDisable = BApprovalDisabled();
+            
+
+            if(bDisable)
+                spRibbon.TrimById("Ribbon.MyTimesheet.Approvals.TM");
+        }
+
+        private bool BApprovalDisabled()
+        {
+            bool bDisabled = false;
+            SPSecurity.RunWithElevatedPrivileges(delegate()
+            {
+                using (SPSite site = new SPSite(SPContext.Current.Site.ID))
+                {
+                    bool.TryParse(EPMLiveCore.CoreFunctions.getConfigSetting(site.RootWeb, "EPMLiveTSDisableApprovals"),out bDisabled);
+                }
+            });
+
+            return bDisabled;
         }
 
         public string DelayScript
