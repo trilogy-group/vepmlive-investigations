@@ -3456,7 +3456,7 @@ namespace EPMLiveWebParts
                                                                         for(var sRow in sRows)
                                                                         {
                                                                             var row = sRows[sRow];
-                                                                            if(row.itemid != """")
+                                                                            if(row.itemid != """" && row.id != ""indexOf"")
                                                                             {
                                                                                 titles += "","" + row.Title;
                                                                             }
@@ -3482,7 +3482,7 @@ namespace EPMLiveWebParts
                                 {
                                     var row = sRows[sRow];
     
-                                    if(row.itemid != """")
+                                    if(row.itemid != """" && row.id != ""indexOf"")
                                     {
                                         ids += "","" + row.itemid;
                                     }
@@ -3507,7 +3507,7 @@ namespace EPMLiveWebParts
                                                                                     {
                                                                                         var row = sRows[sRow];
     
-                                                                                        if(row.itemid != """")
+                                                                                        if(row.itemid != """" && row.id != ""indexOf"")
                                                                                         {
                                                                                             ids += "","" + row.webid + ""."" + row.listid + ""."" + row.itemid;
                                                                                         }
