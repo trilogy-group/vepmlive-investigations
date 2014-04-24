@@ -285,7 +285,7 @@ function GridOnReady(grid) {
 
                      fireEvent(wp, 'mouseup');
 
-                     SelectRibbonTab("Ribbon.ListItem", true);
+                     
 
                  }
              }
@@ -428,6 +428,8 @@ function GridOnFocus(grid, row, col, orow, ocol, pagepos) {
                 grid.ActionClearSelection();
                 grid.SelectRow(row);
             }
+
+            SelectRibbonTab("Ribbon.ListItem", true);
         }
     }
     //RefreshCommandUI();

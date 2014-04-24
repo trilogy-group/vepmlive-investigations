@@ -5809,6 +5809,8 @@ namespace EPMLiveWebParts
                             break;
                         case "Currency":
                             {
+                                if (bCleanValues)
+                                    return val;
                                 double fval = double.Parse(val, providerEn);
                                 val = fval.ToString("c");
                             }
