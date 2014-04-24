@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Xml;
 using Microsoft.SharePoint;
 using System.Collections;
+using Microsoft.SharePoint.WebPartPages;
 
 namespace EPMLiveCore.API
 {
@@ -389,6 +391,64 @@ namespace EPMLiveCore.API
             }
             else
                 return true;
+        }
+
+        public static void InstallListsViewsWebparts(SPList spList)
+        {
+            if (spList.BaseTemplate == SPListTemplateType.DocumentLibrary) return;
+
+            var oWeb = spList.ParentWeb;
+
+            foreach (SPView oView in spList.Views)
+            {
+                SPFile oViewFile = oWeb.GetFile(oView.Url);
+
+                if (oViewFile.Exists)
+                {
+                    SPLimitedWebPartManager oViewWebManager =
+                        oViewFile.GetLimitedWebPartManager(
+                            System.Web.UI.WebControls.WebParts.PersonalizationScope.Shared);
+
+                    bool bHasGrid = false;
+
+                    try
+                    {
+                        foreach (WebPart wp in oViewWebManager.WebParts)
+                        {
+                            if (wp.GetType().ToString() == "EPMLiveWebParts.GridListView")
+                            {
+                                bHasGrid = true;
+                                break;
+                            }
+                        }
+
+                        if (!bHasGrid)
+                        {
+                            EPMLiveWebParts.GridListView gv = new EPMLiveWebParts.GridListView();
+                            oViewWebManager.AddWebPart(gv, "Main", 0);
+                        }
+                    }
+                    catch { }
+                }
+            }
+        }
+
+        public static void MapListToReporting(SPList oList)
+        {
+            bool reportingV2Enabled = false;
+            try
+            {
+                reportingV2Enabled = Convert.ToBoolean(CoreFunctions.getConfigSetting(SPContext.Current.Site.RootWeb, "reportingV2"));
+            }
+            catch { }
+
+            var rb = new EPMLiveReportsAdmin.ReportBiz(oList.ParentWeb.Site.ID, oList.ParentWeb.ID, reportingV2Enabled);
+            EPMLiveReportsAdmin.ListBiz lb = rb.GetListBiz(oList.ID);
+
+            if (string.IsNullOrEmpty(lb.ListName))
+            {
+                rb.CreateListBiz(oList.ID);
+            }
         }
     }
 }
