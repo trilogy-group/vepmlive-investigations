@@ -319,7 +319,9 @@ BEGIN
 	
 	IF @Limit > 1000000 SET @Limit = 1000000;
 	
-	WITH Result AS (
+	SELECT TOP (@End - 1) ThreadId, ThreadTitle, ThreadUrl, ThreadKind, ThreadLastActivityOn, ThreadFirstActivityOn, WebId, WebTitle, 
+				WebUrl, ListId, ListName, ListIcon, ItemId, TotalActivities, TotalComments
+	FROM (
 		SELECT ROW_NUMBER() OVER (ORDER BY ThreadLastActivityOn DESC) AS RowNum,
 			ThreadId, ThreadTitle, ThreadUrl, ThreadKind, ThreadLastActivityOn, ThreadFirstActivityOn, WebId, WebTitle, WebUrl, ListId, 
 			ListName, ListIcon, ItemId, TotalActivities, TotalComments
@@ -336,10 +338,9 @@ BEGIN
 					WHERE   (dbo.SS_Threads.Deleted = 0) AND (dbo.SS_Threads.Id = @ThreadId OR @ThreadId IS NULL) 
 							AND (dbo.RPTWeb.WebUrl = @WebUrl OR dbo.RPTWeb.WebUrl LIKE @WebUrl + @WebUrlSuffix + ''%'')) AS DT1
 			WHERE   ((HasAccess = 1) OR (HasAccess = 0 AND ThreadKind = 3)) AND (TotalActivities > 0 OR TotalComments > 0)
-	) SELECT TOP (@End - 1) ThreadId, ThreadTitle, ThreadUrl, ThreadKind, ThreadLastActivityOn, ThreadFirstActivityOn, WebId, WebTitle, 
-							WebUrl, ListId, ListName, ListIcon, ItemId, TotalActivities, TotalComments
-	  FROM Result WHERE RowNum > @Start AND RowNum < @End
-	  ORDER BY ThreadLastActivityOn DESC
+	) AS Result 
+	WHERE RowNum > @Start AND RowNum < @End
+	ORDER BY ThreadLastActivityOn DESC
 END'
 
 ---------------SP: SS_GetLatestActivities----------------------
@@ -375,7 +376,9 @@ BEGIN
 	SET @Start = (@Page - 1) * @Limit
 	SET @End =   (@Page * @Limit + 1);
 
-	WITH Result AS (
+	SELECT TOP (@End - 1) ActivityId, ActivityKey, ActivityData, ActivityKind, ActivityDate, ActivityIsMassOperation, ThreadId, 
+				UserId, UserDisplayName, UserName, UserPicture
+	FROM (
 		SELECT ROW_NUMBER() OVER (ORDER BY ActivityDate DESC) AS RowNum,
 			ActivityId, ActivityKey, ActivityData, ActivityKind, ActivityDate, ActivityIsMassOperation, ThreadId, 
 			UserId, UserDisplayName, UserName, UserPicture
@@ -390,10 +393,9 @@ BEGIN
 					 dbo.SS_Activities.Kind >= @KindMin AND dbo.SS_Activities.Kind <= @KindMax AND dbo.SS_Activities.Kind <> 3) 
 					 AS DT1
 			WHERE   (HasAccess = 1) OR (@IgnoreAccess = 1 AND HasAccess = 0)
-	) SELECT TOP (@End - 1) ActivityId, ActivityKey, ActivityData, ActivityKind, ActivityDate, ActivityIsMassOperation, ThreadId, 
-							UserId, UserDisplayName, UserName, UserPicture
-	  FROM Result WHERE RowNum > @Start AND RowNum < @End
-	  ORDER BY ActivityDate DESC
+	) AS Result 
+	WHERE RowNum > @Start AND RowNum < @End
+	ORDER BY ActivityDate DESC
 END'
 
 ---------------SP: spGetWorkspaces----------------------
