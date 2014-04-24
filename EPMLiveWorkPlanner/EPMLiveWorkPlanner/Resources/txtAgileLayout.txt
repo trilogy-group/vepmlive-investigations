@@ -13,7 +13,7 @@
 	<Cfg NumberId='1' FullId='0' IdChars='1234567890' AddFocusCol='Title' AutoIdPrefix='AR'/>
 	<Cfg SelectingCells='0'/>
 	<Cfg Searching='1'/>
-	<Cfg StaticCursor='1'/>
+	<Cfg StaticCursor='1' MinTagHeight="200"/>
 	<Toolbar Visible='0'></Toolbar>
 	<Panel Visible='1' Delete='0' Move='1' Select='0' NoFormatEscape='1' CanHide='0'/>
 	<Actions OnShiftDragCell='FillCells'/>
