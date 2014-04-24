@@ -21,14 +21,14 @@
 				Sequence="10"
 				Description="Opens a modal dialog box"
 				Command="Ribbon.WorkPlanner.SaveButton"
-				Image32by32="/_layouts/images/save32x32.png"
+				Image32by32="/_layouts/ppm/images/save32x32.png"
 				LabelText="Save"
 				TemplateAlias="cust1"/>
 
 				<Button
 				Id="Ribbon.WorkViews.StandardGroup.PublishButton"
 				Sequence="20"
-				Image32by32="/_layouts/epmlive/images/publish.PNG"
+				Image32by32="/_layouts/ppm/images/publish.PNG"
 				Description="Simple alert button"
 				Command="Ribbon.WorkPlanner.PublishButton"
 				LabelText="Publish"
@@ -37,7 +37,7 @@
 				<Button
 				Id="Ribbon.WorkViews.StandardGroup.CloseButton"
 				Sequence="30"
-				Image32by32="/_layouts/epmlive/images/close32.gif"
+				Image32by32="/_layouts/ppm/images/close32.gif"
 				Description="Simple alert button"
 				Command="Ribbon.WorkPlanner.CloseButton"
 				LabelText="Close"
@@ -87,7 +87,7 @@
 				<Button
 				Id="Ribbon.WorkViews.WorkViewsGroup.SaveView"
 				Sequence="10"
-				Image16by16="/_layouts/images/createview.gif"
+				Image16by16="/_layouts/ppm/images/createview.gif"
 				Command="Ribbon.WorkPlanner.SaveView"
 				LabelText="Save View"
 				TemplateAlias="oM"/>
@@ -95,7 +95,7 @@
 				<Button
 				Id="Ribbon.WorkViews.WorkViewsGroup.EditView"
 				Sequence="20"
-				Image16by16="/_layouts/epmlive/images/editview.gif"
+				Image16by16="/_layouts/ppm/images/editview.gif"
 				Command="Ribbon.WorkPlanner.EditView"
 				LabelText="Rename View"
 				TemplateAlias="oM"/>
@@ -103,7 +103,7 @@
 				<Button
 				Id="Ribbon.WorkViews.WorkViewsGroup.DeleteView"
 				Sequence="30"
-				Image16by16="/_layouts/epmlive/images/deleteview.gif"
+				Image16by16="/_layouts/ppm/images/deleteview.gif"
 				Command="Ribbon.WorkPlanner.DeleteView"
 				LabelText="Delete View"
 				TemplateAlias="oM"/>
@@ -113,12 +113,12 @@
 			  <Button
 				Id="Ribbon.WorkViews.WorkViewsGroup.SelectColumns"
 				Sequence="70"
-				Image16by16="/_layouts/epmlive/images/selectcolumn.gif"
+				Image16by16="/_layouts/ppm/images/selectcolumn.gif"
 				Command="Ribbon.WorkPlanner.SelectColumns"
 				LabelText="Select Columns"
 				TemplateAlias="oM"/>
 				
-				<FlyoutAnchor Id="Ribbon.WorkViews.WorkViewsGroup.Expand" Sequence="75" PopulateDynamically="false" CommandValueId="-1" Command="Ribbon.WorkPlanner.Expand" Image16by16="/_layouts/epmlive/images/expand.gif" LabelText="Expand/Collapse" TemplateAlias="oM">
+				<FlyoutAnchor Id="Ribbon.WorkViews.WorkViewsGroup.Expand" Sequence="75" PopulateDynamically="false" CommandValueId="-1" Command="Ribbon.WorkPlanner.Expand" Image16by16="/_layouts/ppm/images/expandall.gif" LabelText="Expand/Collapse" TemplateAlias="oM">
                 <Menu Id="Ribbon.WorkViews.WorkViewsGroup.Expand.Menu">
                 <MenuSection Id="Ribbon.WorkViews.WorkViewsGroup.Expand.Menu.Scope" Sequence="10" DisplayMode="Menu16">
                 <Controls Id="Ribbon.WorkViews.WorkViewsGroup.Expand.Menu.Scope.Controls">
@@ -142,7 +142,7 @@
 				<ToggleButton
 				Id="Ribbon.WorkViews.WorkViewsGroup.ShowFilters"
 				Sequence="80"
-				Image16by16="/_layouts/epmlive/images/filter.png"
+				Image16by16="/_layouts/ppm/images/showhidefilters-16.png"
 				Command="Ribbon.WorkPlanner.ShowFilters"
 				QueryCommand="Ribbon.WorkPlanner.QueryShowFilters"
 				LabelText="Show Filters"
@@ -160,7 +160,7 @@
 				<ToggleButton
 				Id="Ribbon.WorkViews.WorkViewsGroup.ShowAssignments"
 				Sequence="82"
-				Image16by16="/_layouts/epmlive/images/ShowAssignments.gif"
+				Image16by16="/_layouts/epmlive/images/Showresources16.png"
 				Command="Ribbon.WorkPlanner.ShowAssignments"
 				QueryCommand="Ribbon.WorkPlanner.QueryShowAssignments"
 				LabelText="Show Assignments"
@@ -186,7 +186,7 @@
 				<Button
 				Id="Ribbon.WorkViews.WorkViewsGroup.CreateColumn"
 				Sequence="90"
-				Image16by16="/_layouts/epmlive/images/CreateColumn.gif"
+				Image16by16="/_layouts/ppm/images/selectColumn.gif"
 				Command="Ribbon.WorkPlanner.CreateColumn"
 				LabelText="Create Column"
 				TemplateAlias="oM"/>
@@ -263,7 +263,7 @@
 				  Id="Ribbon.WorkViews.GanttGroup.ShowBaseline"
 				  Sequence="60"
 				  LabelText="Show Baseline"
-				  Image16by16="/_layouts/epmlive/images/baseline.gif"
+				  Image16by16="/_layouts/epmlive/images/baseline16.gif"
 				  QueryCommand="Ribbon.WorkPlanner.QueryShowBaseline"
 				  TemplateAlias="oM"
 				/>
