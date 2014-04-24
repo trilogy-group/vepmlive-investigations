@@ -429,7 +429,7 @@
                     <asp:CheckBox ID="chkUseNewMenu" runat="server" Text="" />
 				 </Template_Control>
 			</wssuc:InputFormControl>
-			<wssuc:InputFormControl LabelText="Name for New Item" runat="server" visible="false">
+			<wssuc:InputFormControl LabelText="Name for New Item" runat="server">
 				 <Template_Control>
                     <asp:TextBox ID="txtNewMenuName" runat="server"/><br /><br />
 				 </Template_Control>
