@@ -3282,35 +3282,74 @@ namespace EPMLiveWorkPlanner
                     }
                     else
                     {
+                        int holidayhours = int.Parse(dr["Hours"].ToString());
+                        double end = p.iWorkHours[0] / 60 + holidayhours;
+
+                        if (end > p.iWorkHours[1])
+                            end = end + (p.iWorkHours[2] - p.iWorkHours[1]);
+
                         DateTime dt = DateTime.Parse(dr["Date"].ToString());
-                        sb.Append(dt.ToString("yyyy-MM-dd"));
-                        sbBackGround.Append(dt.ToString("yyyy-MM-dd"));
-                        sb.Append(" 00:00~");
-                        sbBackGround.Append(" 00:00~");
-                        sb.Append(dt.ToString("yyyy-MM-dd"));
-                        sbBackGround.Append(dt.ToString("yyyy-MM-dd"));
-                        sb.Append(" ");
-                        sbBackGround.Append(" ");
-                        sb.Append(p.iWorkHours[0] / 60);
-                        sbBackGround.Append(p.iWorkHours[0] / 60);
-                        sb.Append(":00;");
-                        sbBackGround.Append(":00;");
+                        sb.Append(dt.ToString("yyyy-MM-dd") + " " + p.iWorkHours[0] / 60 + "~" + dt.ToString("yyyy-MM-dd") + " " + end + ":00#3;");
+                        sbBackGround.Append(dt.ToString("yyyy-MM-dd") + " " + p.iWorkHours[0] / 60 + "~" + dt.ToString("yyyy-MM-dd") + " " + end + ":00;");
 
-                        sb.Append(dt.ToString("yyyy-MM-dd"));
-                        sbBackGround.Append(dt.ToString("yyyy-MM-dd"));
-                        sb.Append(" ");
-                        sbBackGround.Append(" ");
-                        sb.Append((p.iWorkHours[3] / 60) - int.Parse(dr["Hours"].ToString()));
-                        sbBackGround.Append((p.iWorkHours[3] / 60) - int.Parse(dr["Hours"].ToString()));
-                        sb.Append(":00~");
-                        sbBackGround.Append(":00~");
+                        //sbBackGround.Append(dt.ToString("yyyy-MM-dd"));
+                        //sbBackGround.Append(" " + p.iWorkHours[0] / 60 + "~");
+                        //sbBackGround.Append(dt.ToString("yyyy-MM-dd"));
+                        //sbBackGround.Append(" ");
 
-                        dt = dt.AddDays(1);
 
-                        sb.Append(dt.ToString("yyyy-MM-dd"));
-                        sbBackGround.Append(dt.ToString("yyyy-MM-dd"));
-                        sb.Append(" 24:00#3;");
-                        sbBackGround.Append(" 24:00;");
+                        //sb.Append(p.iWorkHours[0] / 60);
+                        //sbBackGround.Append(p.iWorkHours[0] / 60);
+                        //sb.Append(":00;");
+                        //sbBackGround.Append(":00;");
+
+                        //sb.Append(dt.ToString("yyyy-MM-dd"));
+                        //sbBackGround.Append(dt.ToString("yyyy-MM-dd"));
+                        //sb.Append(" ");
+                        //sbBackGround.Append(" ");
+                        //sb.Append((p.iWorkHours[3] / 60) - int.Parse(dr["Hours"].ToString()));
+                        //sbBackGround.Append((p.iWorkHours[3] / 60) - int.Parse(dr["Hours"].ToString()));
+                        //sb.Append(":00~");
+                        //sbBackGround.Append(":00~");
+
+                        //dt = dt.AddDays(1);
+
+                        //sb.Append(dt.ToString("yyyy-MM-dd"));
+                        //sbBackGround.Append(dt.ToString("yyyy-MM-dd"));
+                        //sb.Append(" 24:00#3;");
+                        //sbBackGround.Append(" 24:00;");
+
+
+
+                        //DateTime dt = DateTime.Parse(dr["Date"].ToString());
+                        //sb.Append(dt.ToString("yyyy-MM-dd"));
+                        //sbBackGround.Append(dt.ToString("yyyy-MM-dd"));
+                        //sb.Append(" 00:00~");
+                        //sbBackGround.Append(" 00:00~");
+                        //sb.Append(dt.ToString("yyyy-MM-dd"));
+                        //sbBackGround.Append(dt.ToString("yyyy-MM-dd"));
+                        //sb.Append(" ");
+                        //sbBackGround.Append(" ");
+                        //sb.Append(p.iWorkHours[0] / 60);
+                        //sbBackGround.Append(p.iWorkHours[0] / 60);
+                        //sb.Append(":00;");
+                        //sbBackGround.Append(":00;");
+
+                        //sb.Append(dt.ToString("yyyy-MM-dd"));
+                        //sbBackGround.Append(dt.ToString("yyyy-MM-dd"));
+                        //sb.Append(" ");
+                        //sbBackGround.Append(" ");
+                        //sb.Append((p.iWorkHours[3] / 60) - int.Parse(dr["Hours"].ToString()));
+                        //sbBackGround.Append((p.iWorkHours[3] / 60) - int.Parse(dr["Hours"].ToString()));
+                        //sb.Append(":00~");
+                        //sbBackGround.Append(":00~");
+
+                        //dt = dt.AddDays(1);
+
+                        //sb.Append(dt.ToString("yyyy-MM-dd"));
+                        //sbBackGround.Append(dt.ToString("yyyy-MM-dd"));
+                        //sb.Append(" 24:00#3;");
+                        //sbBackGround.Append(" 24:00;");
                     }
 
                 }

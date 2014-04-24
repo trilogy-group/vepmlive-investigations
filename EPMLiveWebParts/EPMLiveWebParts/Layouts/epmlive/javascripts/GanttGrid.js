@@ -291,7 +291,7 @@ function GridOnReady(grid) {
              }
         }
 
-        if (ArrGantts.indexOf(grid.id) > -1)
+         if (ArrGantts.indexOf(grid.id) > -1 && grid.PagInfo)
             setupPage(grid.PagInfo, eval("mygrid" + gridid + ".UseReporting"), grid.PagSize, grid, eval("mygrid" + gridid + ".CurPage"));
 
         SetGridSize(grid);
