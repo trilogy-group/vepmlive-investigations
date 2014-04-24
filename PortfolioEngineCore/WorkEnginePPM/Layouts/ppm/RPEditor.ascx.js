@@ -1453,6 +1453,10 @@
                 }
             }
             else if (grid.id == "g_Res") {
+                if (grid.IO != null && grid.IO.Result != null && grid.IO.Result == '0') {
+                    parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.OK, '');
+                    return;
+                }
                 grid.ActionFilterOff();
                 grid.ActionGroupOff();
                 //grid.ActionSortOff();
@@ -5748,7 +5752,7 @@
 
         var GridsOnValueChangedDelegate = MakeDelegate(this, this.GridsOnValueChanged);
         var GridsOnFocusDelegate = MakeDelegate(this, this.GridsOnFocus);
-        var GridsOnReadyDelegate = MakeDelegate(this, this.GridsOnReady);
+        var GridsOnReadyDelegate = MakeDelegate(this, this.GridsOnReady);      
         var GridsOnRenderFinishDelegate = MakeDelegate(this, this.GridsOnRenderFinish);
         var GridsOnScrollDelegate = MakeDelegate(this, this.GridsOnScroll);
         var GridsOnSectionResizeDelegate = MakeDelegate(this, this.GridsOnSectionResize);

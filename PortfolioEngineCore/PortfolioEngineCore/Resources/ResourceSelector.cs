@@ -142,7 +142,8 @@ namespace PortfolioEngineCore
                             xResource.CreateInt("Status", (int)(DBAccess.ReadIntValue(reader["WRES_INACTIVE"]) == 1 ? ResourceStatusEnum.rsInactive : ResourceStatusEnum.rsActive));
 
                             lCCRoleUID = DBAccess.ReadIntValue(row["CCRoleUID"]);
-                            if (lCCRoleUID > 0) {
+                            if (lCCRoleUID > 0)
+                            {
                                 xResource.CreateInt("CCRoleUID", lCCRoleUID);
                             }
 
@@ -367,7 +368,7 @@ namespace PortfolioEngineCore
             catch (Exception ex)
             {
                 _dba.HandleException("ReadResources", (StatusEnum)99999, ex);
-            } 
+            }
             return (_dba.Status == StatusEnum.rsSuccess);
         }
 
@@ -1072,7 +1073,7 @@ namespace PortfolioEngineCore
             {
                 eStatus = dba.HandleException("GetResourceDisplayFields", (StatusEnum)99999, ex);
             }
-Exit_Function:
+        Exit_Function:
             return eStatus;
         }
 
@@ -1131,7 +1132,8 @@ Exit_Function:
                 sPos = "b";
                 if (clnPeriods.Count == 0)
                 {
-                    dba.HandleStatusError(SeverityEnum.Error, "GetPIResourcesStruct", (StatusEnum)99999, "No Periods found");
+                    dba.HandleStatusError(SeverityEnum.Error, "GetPIResourcesStruct", StatusEnum.rsRequestInvalidPeriod, "No Periods found!");
+                    eStatus = StatusEnum.rsRequestInvalidPeriod;
                     goto Exit_Function;
                 }
 
@@ -1154,7 +1156,7 @@ Exit_Function:
                 {
                     oRPCategory.AppendSubStruct(oRPCategoryList);
                 }
-                
+
                 CStruct xResources = xPIResources.CreateSubStruct("Resources");
 
                 Dictionary<string, CStruct> dicResources = new Dictionary<string, CStruct>();
@@ -1719,7 +1721,7 @@ Exit_Function:
             {
                 eStatus = dba.HandleException("GetPIResourcesStruct : " + sPos, (StatusEnum)8791, ex);
             }
-Exit_Function:
+        Exit_Function:
             xReply = xPIResources;
             return eStatus;
         }
@@ -1787,16 +1789,16 @@ Exit_Function:
                                         sTableAlias = "C" + lCodeCount.ToString();
                                         sFrom += stemp.Replace("XY", sTableAlias);
                                         sSelect += (",XY.LV_VALUE AS ").Replace("XY", sTableAlias) + sName;
-                                ////lCodeCount = lCodeCount + 1
-                                ////sTableAlias = "C" & Format$(lCodeCount, "0")
-                                ////stemp = " LEFT JOIN " & sTable & " XX ON WR.WRES_ID = XX.WRES_ID"
-                                ////sFrom = sFrom & Replace(stemp, "XX", sTableAlias)
-                                ////stemp = " LEFT JOIN EPGP_LOOKUP_VALUES XY ON XY.LV_UID = XX." & sField & " "
-                                //stemp = Replace(stemp, "XX", sTableAlias)
-                                //lCodeCount = lCodeCount + 1
-                                //sTableAlias = "C" & Format$(lCodeCount, "0")
-                                //sFrom = sFrom & Replace(stemp, "XY", sTableAlias)
-                                //sSelect = sSelect & Replace(",XY.LV_VALUE AS ", "XY", sTableAlias) & sName
+                                        ////lCodeCount = lCodeCount + 1
+                                        ////sTableAlias = "C" & Format$(lCodeCount, "0")
+                                        ////stemp = " LEFT JOIN " & sTable & " XX ON WR.WRES_ID = XX.WRES_ID"
+                                        ////sFrom = sFrom & Replace(stemp, "XX", sTableAlias)
+                                        ////stemp = " LEFT JOIN EPGP_LOOKUP_VALUES XY ON XY.LV_UID = XX." & sField & " "
+                                        //stemp = Replace(stemp, "XX", sTableAlias)
+                                        //lCodeCount = lCodeCount + 1
+                                        //sTableAlias = "C" & Format$(lCodeCount, "0")
+                                        //sFrom = sFrom & Replace(stemp, "XY", sTableAlias)
+                                        //sSelect = sSelect & Replace(",XY.LV_VALUE AS ", "XY", sTableAlias) & sName
                                     }
                                     else
                                     {
@@ -1859,19 +1861,19 @@ Exit_Function:
                                     sTableAlias = "C" + lCodeCount.ToString("0");
                                     sFrom += stemp.Replace("XY", sTableAlias);
                                     sSelect += (",XY.RT_NAME AS ").Replace("XY", sTableAlias) + sName;
-                        //Case SpecialFieldIDsEnum.sfResourceRate
-                        //    sTable = "EPGP_COST_RATES"
-                        //    sField = "RT_UID"
-                        //    lCodeCount = lCodeCount + 1
-                        //    sTableAlias = "C" & Format$(lCodeCount, "0")
-                        //    stemp = " LEFT JOIN " & sTable & " XX ON WR.WRES_ID = XX.WRES_ID"
-                        //    sFrom = sFrom & Replace(stemp, "XX", sTableAlias)
-                        //    stemp = " LEFT JOIN EPG_RATES XY ON XY.RT_UID = XX." & sField & " "
-                        //    stemp = Replace(stemp, "XX", sTableAlias)
-                        //    lCodeCount = lCodeCount + 1
-                        //    sTableAlias = "C" & Format$(lCodeCount, "0")
-                        //    sFrom = sFrom & Replace(stemp, "XY", sTableAlias)
-                        //    sSelect = sSelect & Replace(",XY.RT_NAME AS ", "XY", sTableAlias) & sName
+                                    //Case SpecialFieldIDsEnum.sfResourceRate
+                                    //    sTable = "EPGP_COST_RATES"
+                                    //    sField = "RT_UID"
+                                    //    lCodeCount = lCodeCount + 1
+                                    //    sTableAlias = "C" & Format$(lCodeCount, "0")
+                                    //    stemp = " LEFT JOIN " & sTable & " XX ON WR.WRES_ID = XX.WRES_ID"
+                                    //    sFrom = sFrom & Replace(stemp, "XX", sTableAlias)
+                                    //    stemp = " LEFT JOIN EPG_RATES XY ON XY.RT_UID = XX." & sField & " "
+                                    //    stemp = Replace(stemp, "XX", sTableAlias)
+                                    //    lCodeCount = lCodeCount + 1
+                                    //    sTableAlias = "C" & Format$(lCodeCount, "0")
+                                    //    sFrom = sFrom & Replace(stemp, "XY", sTableAlias)
+                                    //    sSelect = sSelect & Replace(",XY.RT_NAME AS ", "XY", sTableAlias) & sName
                                     break;
                             }
                             break;
@@ -1882,7 +1884,7 @@ Exit_Function:
             sWhere = " WHERE WR.WRES_ID <> 1 ";
             sWhere += " AND WR.WRES_INACTIVE = 0 ";
             sWhere += " AND (WR.WRES_IS_RESOURCE <> 0 OR WR.WRES_IS_GENERIC <> 0) ";
-            if (sWResIDs != "") 
+            if (sWResIDs != "")
                 sFrom += " INNER JOIN dbo.EPG_FN_ConvertListToTable(N'" + sWResIDs + "') LT on WR.WRES_ID=LT.TokenVal ";
 
         Exit_Function:
@@ -1972,7 +1974,7 @@ Exit_Function:
                     if (bAdd)
                         dic.Add(lCostCategoryUID.ToString(), xCostCategoryRole);
                     if (list.Count == 0) list.Add(xCostCategoryRole); else list.Insert(0, xCostCategoryRole);
-                    
+
                 }
                 reader.Close();
 
