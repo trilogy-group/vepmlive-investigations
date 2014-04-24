@@ -234,6 +234,7 @@ function MyWorkOnReady (grid, start) {
         MyWorkGrid.configureToolbar();
 
         MyWorkGrid.newItemIndicator = window.mwNewItemIndicator;
+        MyWorkGrid.loadRibbon();
     }
 };
 
