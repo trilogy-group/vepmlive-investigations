@@ -28,7 +28,7 @@ namespace EPMLiveCore.SocialEngine.Events.WebEventReceiver
                     {"Title", properties.Web.Title},
                     {"URL", properties.ServerRelativeUrl},
                     {"UserId", properties.Web.CurrentUser.ID},
-                    {"ActivityTime", DateTime.UtcNow}
+                    {"ActivityTime", DateTime.Now}
                 }, properties.Web);
             }
             catch { }
@@ -48,7 +48,7 @@ namespace EPMLiveCore.SocialEngine.Events.WebEventReceiver
                     {"Title", properties.Web.Title},
                     {"URL", properties.ServerRelativeUrl},
                     {"UserId", properties.Web.CurrentUser.ID},
-                    {"ActivityTime", DateTime.UtcNow}
+                    {"ActivityTime", DateTime.Now}
                 }, properties.Web);
             }
             catch { }

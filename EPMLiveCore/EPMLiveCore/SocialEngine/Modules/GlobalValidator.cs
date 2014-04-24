@@ -1,4 +1,6 @@
-﻿using EPMLiveCore.SocialEngine.Contracts;
+﻿using System.Linq;
+using EPMLiveCore.SocialEngine.Contracts;
+using EPMLiveCore.SocialEngine.Core;
 using EPMLiveCore.SocialEngine.Events;
 
 namespace EPMLiveCore.SocialEngine.Modules
@@ -11,7 +13,10 @@ namespace EPMLiveCore.SocialEngine.Modules
 
         private void OnValidateActivity(ProcessActivityEventArgs args)
         {
-            if (args.ContextWeb.CurrentUser.ID != args.ContextWeb.Site.SystemAccount.ID) return;
+            var validObjectKinds = new ObjectKind[] {};
+
+            if (validObjectKinds.Contains(args.ObjectKind) ||
+                args.ContextWeb.CurrentUser.ID != args.ContextWeb.Site.SystemAccount.ID) return;
 
             args.Cancel = true;
             args.CancellationMessage = "Ignoring activities performed by the System Account";

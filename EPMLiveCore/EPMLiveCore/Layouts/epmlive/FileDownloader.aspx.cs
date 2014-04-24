@@ -38,7 +38,7 @@ namespace EPMLiveCore.Layouts.epmlive
 
                 if (!string.IsNullOrEmpty(contentType)) Response.ContentType = contentType;
 
-                Response.AddHeader("Content-Disposition", @"inline;filename=""" + fileName + @"""");
+                Response.AddHeader("Content-Disposition", @"attachment;filename=""" + fileName + @"""");
                 Response.Buffer = true;
                 EnableViewState = false;
 
