@@ -31,14 +31,14 @@
 				Sequence="10"
 				Description="Opens a modal dialog box"
 				Command="Ribbon.WorkPlanner.SaveButton"
-				Image32by32="/_layouts/images/save32x32.png"
+				Image32by32="/_layouts/ppm/images/save32x32.png"
 				LabelText="Save"
 				TemplateAlias="cust1"/>
 
 				<Button
 				Id="Ribbon.WorkPlanner.StandardGroup.PublishButton"
 				Sequence="20"
-				Image32by32="/_layouts/epmlive/images/publish.PNG"
+				Image32by32="/_layouts/ppm/images/publish.PNG"
 				Description="Simple alert button"
 				Command="Ribbon.WorkPlanner.PublishButton"
 				LabelText="Publish"
@@ -47,7 +47,7 @@
 				<Button
 				Id="Ribbon.WorkPlanner.StandardGroup.CloseButton"
 				Sequence="30"
-				Image32by32="/_layouts/epmlive/images/close32.gif"
+				Image32by32="/_layouts/ppm/images/close32.gif"
 				Description="Simple alert button"
 				Command="Ribbon.WorkPlanner.CloseButton"
 				LabelText="Close"
@@ -56,7 +56,7 @@
 				<Button
 				Id="Ribbon.WorkPlanner.StandardGroup.PrintButton"
 				Sequence="40"
-				Image16by16="/_layouts/epmlive/images/print.gif"
+				Image16by16="/_layouts/epmlive/images/print16.png"
 				Command="Ribbon.WorkPlanner.PrintButton"
 				LabelText="Print"
 				TemplateAlias="oM"/>
@@ -224,7 +224,7 @@
 				<Button
 				Id="Ribbon.WorkPlanner.ScheduleGroup.Indent"
 				Sequence="20"
-				Image16by16="/_layouts/epmlive/images/right.gif"
+				Image16by16="/_layouts/epmlive/images/right16.gif"
 				Command="Ribbon.WorkPlanner.Indent"
 				LabelText="Indent"
 				TemplateAlias="indent"/>
@@ -232,7 +232,7 @@
 				<Button
 				Id="Ribbon.WorkPlanner.ScheduleGroup.Outdent"
 				Sequence="30"
-				Image16by16="/_layouts/epmlive/images/left.gif"
+				Image16by16="/_layouts/epmlive/images/left16.gif"
 				Command="Ribbon.WorkPlanner.Outdent"
 				LabelText="Outdent"
 				TemplateAlias="outdent"/>

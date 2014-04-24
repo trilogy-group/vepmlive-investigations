@@ -138,7 +138,7 @@
 				<Button
 				Id="Ribbon.Project.ScheduleGroup.SetBaseline"
 				Sequence="40"
-				Image16by16="/_layouts/epmlive/images/baseline.gif"
+				Image16by16="/_layouts/epmlive/images/baseline16.gif"
 				Command="Ribbon.WorkPlanner.SetBaseline"
 				LabelText="Set Baseline"
 				TemplateAlias="oM"/>
