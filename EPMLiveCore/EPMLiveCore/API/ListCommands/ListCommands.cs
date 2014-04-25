@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Xml;
+using EPMLiveCore.ReportingProxy;
 using Microsoft.SharePoint;
 using System.Collections;
 using Microsoft.SharePoint.WebPartPages;
@@ -449,6 +450,23 @@ namespace EPMLiveCore.API
             {
                 rb.CreateListBiz(oList.ID);
             }
+        }
+
+        public static void SaveIconToReporting(SPList list)
+        {
+            try
+            {
+                var settings = new GridGanttSettings(list);
+
+                var queryExecutor = new QueryExecutor(list.ParentWeb);
+                queryExecutor.ExecuteReportingDBNonQuery(
+                    @"INSERT INTO ReportListIds (Id, ListIcon) VALUES (@Id, @Icon)", new Dictionary<string, object>
+                    {
+                        {"@Id", list.ID},
+                        {"@Icon", settings.ListIcon}
+                    });
+            }
+            catch { }
         }
     }
 }

@@ -30,6 +30,12 @@ namespace EPMLiveCore.Events.GenericListEventReceiver
             }
             catch { }
 
+            try
+            {
+                ListCommands.SaveIconToReporting(properties.List);
+            }
+            catch { }
+
             ClearCache(properties);
         }
 
