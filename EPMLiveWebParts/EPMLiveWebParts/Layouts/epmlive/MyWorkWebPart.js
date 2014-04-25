@@ -182,10 +182,10 @@ function StopEditGridRow(grid, row) {
     }
 }
 
-function MyWorkOnReady (grid, start) {
-    
+function MyWorkOnReady(grid, start) {
+
     if (grid.id === window.allWorkGridId) {
-    
+
         TGSetEvent("OnRenderFinish", grid.id, MyWorkOnRenderFinish);
         TGSetEvent("OnFocus", grid.id, MyWorkOnFocus);
         TGSetEvent("OnClick", grid.id, MyWorkOnClick);
@@ -254,15 +254,15 @@ function MyWorkOnGetSortValue(grid, row, col, val) {
     }
 };
 
-function MyWorkOnRenderFinish (grid) {
-    
+function MyWorkOnRenderFinish(grid) {
+
     if (grid.id === window.allWorkGridId) {
-        
+
         MyWorkGrid.resetNoDataRow();
     }
 };
 
-function MyWorkOnFocus (grid, row, col, orow, ocol, pagepos) {
+function MyWorkOnFocus(grid, row, col, orow, ocol, pagepos) {
     if (grid.id === window.allWorkGridId) {
         if (row.ItemID) {
             grid.ActionClearSelection();
@@ -1935,7 +1935,12 @@ var MyWorkGrid = {
     },
 
     getSavingViewInfo: function (element) {
-        return element.parentNode.children[0].value + '|' + element.parentNode.children[2].checked + '|' + element.parentNode.children[4].checked;
+        if (element.parentNode.children[0].value) {
+            return element.parentNode.children[0].value + '|' + element.parentNode.children[2].checked + '|' + element.parentNode.children[4].checked;
+        }
+        else {
+            return false;
+        }
     },
 
     renameView: function () {
@@ -1960,7 +1965,9 @@ var MyWorkGrid = {
 
     onRenameViewClose: function (dialogResult, returnValue) {
         if (dialogResult !== SP.UI.DialogResult.OK) return;
-
+        if (returnValue == '' | returnValue == null) {
+            return false;
+        }
         for (var v in MyWorkGrid.views) {
             var view = MyWorkGrid.views[v];
 
@@ -2676,7 +2683,7 @@ var MyWorkGrid = {
         configureSearch();
         configureWorkFilters();
     },
-    
+
     configureToolbar: function () {
         var configureMenu = function () {
             $('#MWG_Pivot').find('.mwg-menuitem').each(function () {
