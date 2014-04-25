@@ -126,10 +126,10 @@
     </div>
 
 
-    <div>
+    <%--<div>
         Title<br />
         <input type="text" id="Ribbon_MyWork_Actions_Search" class="ms-cui-tb mwg-watermark" style="width: 100px;">
-    </div>
+    </div>--%>
 
     <div id="EPMMyWorkGrid" style="width: 100%; height: 800px;">
 

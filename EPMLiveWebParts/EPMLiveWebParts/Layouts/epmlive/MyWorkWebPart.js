@@ -2794,8 +2794,7 @@ var MyWorkGrid = {
         };
 
         var configureSearch = function () {
-            //MyWorkGrid.configureSearch($('#MWG_Search'));
-            MyWorkGrid.configureSearch($('#Ribbon_MyWork_Actions_Search'));
+            MyWorkGrid.configureSearch($('#MWG_Search'));
         };
 
         configureMenu();
