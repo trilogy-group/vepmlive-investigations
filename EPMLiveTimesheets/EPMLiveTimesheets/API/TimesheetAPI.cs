@@ -496,7 +496,7 @@ namespace TimeSheets
 
                         if (settings.DisableApprovals)
                         {
-                            ApproveTimesheets("<Approve><TSIDS>" + tsuid + "</TSIDS></Approve>", oWeb);
+                            ApproveTimesheets("<Approve ApproveStatus=\"1\"><TS id=\"" + tsuid + "\"></TS></Approve>", oWeb);
                         }
 
                         message = "<SubmitTimesheet Status=\"0\"></SubmitTimesheet>";
