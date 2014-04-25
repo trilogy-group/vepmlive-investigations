@@ -46,7 +46,7 @@
 				<Button
 				Id="Ribbon.WorkViews.StandardGroup.PrintButton"
 				Sequence="40"
-				Image16by16="/_layouts/epmlive/images/print.gif"
+				Image16by16="/_layouts/epmlive/images/print16.png"
 				Command="Ribbon.WorkPlanner.PrintButton"
 				LabelText="Print"
 				TemplateAlias="oM"/>
