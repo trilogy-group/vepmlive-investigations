@@ -896,15 +896,16 @@ namespace EPMLiveCore.API
                         break;
                     }
 
-                    if (!planner.command.Equals(listTitle)) continue;
-
-                    command = "GoToTaskPlanner";
-                    break;
+                    if (planner.command.Equals(listTitle))
+                    {
+                        command = "GoToTaskPlanner";
+                        break;
+                    }
                 }
 
                 actions = string.IsNullOrEmpty(command)
                     ? null
-                    : new[] {AT("Edit Plan", "gotoplanner", "/_layouts/epmlive/images/planner16.png", true, "1")};
+                    : new[] { AT("Edit Plan", command, "/_layouts/epmlive/images/planner16.png", true, "1") };
             }
             catch (Exception e)
             {
