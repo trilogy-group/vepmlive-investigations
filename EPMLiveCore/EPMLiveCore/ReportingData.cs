@@ -161,7 +161,7 @@ namespace EPMLiveCore
                         {
                             foreach (XmlNode ndVal in ndVals.SelectNodes("Value"))
                             {
-                                vals += field + " = '" + ndVal.InnerText + "' OR ";
+                                vals += field + " = '" + ndVal.InnerText.Replace("'","''") + "' OR ";
                             }
                         }
                         else
