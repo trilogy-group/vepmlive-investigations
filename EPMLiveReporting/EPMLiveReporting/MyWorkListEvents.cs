@@ -208,7 +208,8 @@ namespace EPMLiveReportsAdmin
                     " Error: Add item was unsuccessful.", _myWorkReportData.GetError(), 2, 1);
             }
 
-            if (_myWorkReportData.ListReportsWork(TABLE_NAME))
+            var tableName = _myWorkReportData.GetTableName(_listItem.ParentList.ID);
+            if (!string.IsNullOrEmpty(tableName) && _myWorkReportData.ListReportsWork(tableName))
             {
                 //Save list item "work" field values
                 SaveWork();
