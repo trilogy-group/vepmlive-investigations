@@ -59,7 +59,9 @@ div.epmliveToolBar .nav:after {
 div.epmliveToolBar .navbar-nav {
   float: left;
   margin: 0;
-  margin: 0px -15px;
+}
+div.epmliveToolBar .navbar-nav:first-of-type {
+  margin-left: -15px;
 }
 div.epmliveToolBar .nav {
   list-style: none outside none;
@@ -104,8 +106,8 @@ div.epmliveToolBar .nav > li > a {
 div.epmliveToolBar .navbar-nav > li:first-of-type > a {
   padding-left: 15px;
 }
-div.epmliveToolBar .navbar-nav > li:last-of-type > a {
-  padding-right: 20px;
+div.epmliveToolBar .navbar-nav:last-of-type > li:last-of-type > a {
+  padding-right: 3px;
 }
 div.epmliveToolBar .nav > li > a.nav-icon {
   background-color: #FFFFFF;
