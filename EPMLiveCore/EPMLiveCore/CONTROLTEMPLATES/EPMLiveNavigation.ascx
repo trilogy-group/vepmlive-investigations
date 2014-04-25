@@ -32,7 +32,6 @@
         .ms-dialog #s4-ribbonrow,
         .ms-dialog #s4-workspace {
             margin-left: 0;
-            
         }
     </Sharepoint:StyleBlock>
 <%
@@ -49,7 +48,6 @@
         .ms-dialog #s4-ribbonrow,
         .ms-dialog #s4-workspace {
             margin-left: 0;
-           
         }
     </Sharepoint:StyleBlock>
 <% } %>

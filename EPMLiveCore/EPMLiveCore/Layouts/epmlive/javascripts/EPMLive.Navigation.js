@@ -1175,6 +1175,17 @@
                         }
                     });
 
+                    $('span#epm-nav-asoitems-info').on('shown.bs.tooltip', function () {
+                        var $span = $(this);
+                        var $tooltip = $span.parent().find('div.tooltip');
+                        var offset = $tooltip.offset();
+                        offset.top -= 25;
+
+                        $tooltip.remove();
+                        $('body').append($tooltip);
+                        $tooltip.offset(offset);
+                    });
+
                     window.TreeView_HoverNode = function (data, el) {
                         var node = $(el);
 
