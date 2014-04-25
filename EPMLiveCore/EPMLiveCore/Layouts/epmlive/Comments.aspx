@@ -133,7 +133,7 @@
     </div>
     <div style="clear: both; width: 100%"></div>
     <div>
-        <asp:Panel CssClass="commentsContainer" ID="pnlCommentsContainer" runat="server">
+        <asp:Panel CssClass="commentsContainer" ID="pnlCommentsContainer" runat="server" Width="96%">
         </asp:Panel>
     </div>
     <input type="hidden" id="hdnItemId" runat="server" value="" />
