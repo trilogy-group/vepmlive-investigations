@@ -66,7 +66,8 @@ namespace EPMLiveReportsAdmin
                 {
                     DeleteItem();
 
-                    if (_myWorkReportData.ListReportsWork(TABLE_NAME))
+                    var tableName = _myWorkReportData.GetTableName(_listItem.ParentList.ID);
+                    if (_myWorkReportData.ListReportsWork(tableName))
                     {
                         _myWorkReportData.DeleteWork(_listId, _properties.ListItemId);
                     }
@@ -291,9 +292,10 @@ namespace EPMLiveReportsAdmin
                 {
                     try
                     {
+                        sAssignedTo = ReportData.AddLookUpFieldValues(_listItem["AssignedTo"].ToString(), "id");
+
                         if (_properties.EventType == SPEventReceiverType.ItemAdded)
                         {
-                            sAssignedTo = ReportData.AddLookUpFieldValues(_listItem["AssignedTo"].ToString(), "id");
                             bHasChangedAssignedTo = true;
                         }
                         else if (_properties.EventType == SPEventReceiverType.ItemUpdated)
@@ -340,8 +342,6 @@ namespace EPMLiveReportsAdmin
 
                                 if (execute)
                                 {
-                                    sAssignedTo = ReportData.AddLookUpFieldValues(_listItem["AssignedTo"].ToString(),
-                                        "id");
                                     bHasChangedAssignedTo = true;
                                 }
                             }
@@ -367,9 +367,10 @@ namespace EPMLiveReportsAdmin
                 {
                     try
                     {
+                        StartDate = _listItem["StartDate"];
+
                         if (_properties.EventType == SPEventReceiverType.ItemAdded)
                         {
-                            StartDate = _listItem["StartDate"];
                             bHasChangedStartDate = true;
                         }
                         else if (_properties.EventType == SPEventReceiverType.ItemUpdated)
@@ -385,7 +386,6 @@ namespace EPMLiveReportsAdmin
 
                                 if (dateBefore != dateAfter)
                                 {
-                                    StartDate = _listItem["StartDate"];
                                     bHasChangedStartDate = true;
                                 }
                             }
@@ -411,9 +411,10 @@ namespace EPMLiveReportsAdmin
                 {
                     try
                     {
+                        DueDate = _listItem["DueDate"];
+
                         if (_properties.EventType == SPEventReceiverType.ItemAdded)
                         {
-                            DueDate = _listItem["DueDate"];
                             bHasChangedDueDate = true;
                         }
                         else if (_properties.EventType == SPEventReceiverType.ItemUpdated)
@@ -429,7 +430,6 @@ namespace EPMLiveReportsAdmin
 
                                 if (dueDateBefore != dueDateAfter)
                                 {
-                                    DueDate = _listItem["DueDate"];
                                     bHasChangedDueDate = true;
                                 }
                             }
