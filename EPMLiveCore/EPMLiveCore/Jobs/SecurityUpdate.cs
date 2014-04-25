@@ -32,30 +32,32 @@ namespace EPMLiveCore.Jobs
 
             if (isSecure)
             {
-                string safeTitle = !string.IsNullOrEmpty(li.Title) ? GetSafeGroupTitle(li.Title) : string.Empty;
-
-                web.AllowUnsafeUpdates = true;
-
-                // step 1 perform actions related to "parent item"
-                // ===============================================
-                try
+                if (!li.HasUniqueRoleAssignments)
                 {
-                    Dictionary<string, SPRoleType> pNewGrps = AddBasicSecurityGroups(web, safeTitle, orignalUser, li);
+                    string safeTitle = !string.IsNullOrEmpty(li.Title) ? GetSafeGroupTitle(li.Title) : string.Empty;
 
-                    li.BreakRoleInheritance(false);
+                    web.AllowUnsafeUpdates = true;
 
-                    foreach (KeyValuePair<string, SPRoleType> group in pNewGrps)
+                    // step 1 perform actions related to "parent item"
+                    // ===============================================
+                    try
                     {
-                        SPGroup g = web.SiteGroups[group.Key];
+                        Dictionary<string, SPRoleType> pNewGrps = AddBasicSecurityGroups(web, safeTitle, orignalUser, li);
 
-                        AddNewItemLvlPerm(li, web, group.Value, g);
+                        li.BreakRoleInheritance(false);
+
+                        foreach (KeyValuePair<string, SPRoleType> group in pNewGrps)
+                        {
+                            SPGroup g = web.SiteGroups[group.Key];
+
+                            AddNewItemLvlPerm(li, web, group.Value, g);
+                        }
+
+                        AddBuildTeamSecurityGroups(web, settings, li);
+
                     }
-
-                    AddBuildTeamSecurityGroups(web, settings, li);
-
+                    catch { }
                 }
-                catch { }
-
             }
 
 
