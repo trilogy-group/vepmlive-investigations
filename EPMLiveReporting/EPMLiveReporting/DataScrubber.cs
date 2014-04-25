@@ -185,9 +185,9 @@ namespace EPMLiveReportsAdmin
                                     if (!string.IsNullOrEmpty(sName))
                                     {
                                         SPList tempList = w.Lists.TryGetList(sName);
-                                        var gSettings = new GridGanttSettings(tempList);
                                         if (tempList != null)
                                         {
+                                            var gSettings = new GridGanttSettings(tempList);
                                             DataRow dr = listIds.Rows.Add();
                                             dr["Id"] = tempList.ID;
                                             dr["ListIcon"] = gSettings.ListIcon;
