@@ -8,6 +8,7 @@
     <data>
       <properties>
         <property name="Title" type="string">Setup Wizard</property>
+        <property name="PartImageLarge" type="string">/_layouts/images/wpepmlive.gif</property>
       </properties>
     </data>
   </webPart>
