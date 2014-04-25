@@ -139,13 +139,27 @@ namespace EPMLiveCore.Controls.Navigation.Providers
             SPListItem workplace = communities[0];
             var ql = (string) (workplace["QuickLaunch"] ?? string.Empty);
 
+            var nodes = new List<int>();
+
             foreach (string id in ql.Split(',').Where(id => !string.IsNullOrEmpty(id)))
             {
                 int nodeId;
                 if (int.TryParse(id.Split(':')[0], out nodeId))
                 {
-                    yield return nodeId;
+                    nodes.Add(nodeId);
                 }
+            }
+
+            int totalNodes = nodes.Count;
+            var processed = 0;
+
+            foreach (SPNavigationNode node in spWeb.Navigation.QuickLaunch)
+            {
+                if (processed == totalNodes) yield break;
+                if (!nodes.Contains(node.Id)) continue;
+
+                processed++;
+                yield return node.Id;
             }
         }
 

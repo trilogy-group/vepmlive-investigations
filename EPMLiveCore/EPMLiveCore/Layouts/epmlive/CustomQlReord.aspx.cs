@@ -1,5 +1,6 @@
 ﻿using System;
 using EPMLiveCore.Controls.Navigation.Providers;
+using EPMLiveCore.Infrastructure;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.WebControls;
 using Microsoft.SharePoint.Navigation;
@@ -103,7 +104,11 @@ namespace EPMLiveCore
 
         private void ClearCache()
         {
-            new GenericLinkProvider(SPContext.Current.Site.ID, SPContext.Current.Web.ID, SPContext.Current.Web.CurrentUser.LoginName).ClearCache();
+            try
+            {
+                CacheStore.Current.RemoveSafely(SPContext.Current.Web.Url, new CacheStoreCategory(SPContext.Current.Web).Navigation);
+            }
+            catch { }
         }
 
         private void UpdateNodeOrder()
