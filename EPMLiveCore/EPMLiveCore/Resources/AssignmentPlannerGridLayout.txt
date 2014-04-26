@@ -12,7 +12,6 @@
     <Cfg MenuColumnsCount="2"/> <!-- Displays column names in menu in two columns -->
     <Cfg MidWidth="325" MinRightWidth="200" MinLeftWidth="200"/> <!-- Sizes and scrolls for column sections -->
     <Cfg Style="Standard"/> <!-- Presets Standard CSS style -->
-    <Cfg NoVScroll="0"/> <!-- Users can resize grid by right bottom edge -->
     <Cfg Deleting="0"/> <!-- Users can resize grid by right bottom edge -->
     <Cfg Dragging="0"/>
 
@@ -26,6 +25,8 @@
 	  <D Name="R" RFormula="window.epmLiveAssignmentPlanner.grid.actions.calculateUsage(Grid,Row)"/>
 	  <D Name="R" CommentCountFormula="window.epmLiveAssignmentPlanner.grid.actions.processComments(Grid,Row)"/>
 	  <D Name="R" OnSelect="window.epmLiveAssignmentPlanner.grid.actions.rowSelectionChanged(Grid, Row, Row.Selected ? 1 : 0)+window.RefreshCommandUI()"/>
+	  <D Name="R" Height="20"/>
+	  <D Name="Group" Height="20"/>
       <D Name="Group" Calculated="1" CalcOrder="TitleHtmlPostfix,StartDate,DueDate,Duration,PercentComplete,Work,G"/> <!-- Grouping row is calculated to show summary for its children -->
       <D Name="Group" Expanded="0" /> <!-- Grouping row shows its children by default -->
       <D Name="Group" FocusCell="" FocusRow="" />

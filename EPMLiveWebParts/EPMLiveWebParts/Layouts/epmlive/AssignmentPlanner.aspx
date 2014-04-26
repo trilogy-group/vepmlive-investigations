@@ -175,7 +175,7 @@
 
 <asp:Content ID="Main" ContentPlaceHolderID="PlaceHolderMain" runat="server">
     <asp:Panel ID="pnlGrid" runat="server">
-        <div id="EpmLiveAssignmentPlannerGrid" style="width:100%;height:100%;">
+        <div id="EpmLiveAssignmentPlannerGrid" style="width:100%;height:800px;">
             <script type="text/javascript">
                 function initializeAssignmentPlanner() {
                     $('#EPMSplashStatus').text('Initializing Assignment Planner . . .');
@@ -183,6 +183,7 @@
                     window.epmLiveAssignmentPlanner.id = '<%= GridId %>';
                     window.epmLiveAssignmentPlanner.startDate = '<%= StartDate %>';
                     window.epmLiveAssignmentPlanner.dueDate = '<%= DueDate %>';
+                    window.epmLiveAssignmentPlanner.forceHeight = true;
                     window.epmLiveAssignmentPlanner.userId = <%= SPWeb.CurrentUser.ID.ToString(CultureInfo.InvariantCulture) %>;
                     window.epmLiveAssignmentPlanner.views.userHasGlobalViewModificationPermission = <%= CurrentUserHasDesignerPermission.ToString(CultureInfo.InvariantCulture).ToLower() %>;
 

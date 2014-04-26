@@ -8,6 +8,7 @@
         $$.newDueDate = null;
         $$.iconUrl = $$$.currentWebUrl + '/_layouts/epmlive/images/mywork/';
         $$.maxVScroll = null;
+        $$.forceHeight = false;
         $$.showingComments = false;
         $$.epmrgv = null;
         $$.curDateRangeType = null;
@@ -1509,16 +1510,35 @@
 
         window.Grids.OnLoaded = function (grid) {
             if (grid.id === $$.id) {
-                var maxVScroll = $$.maxVScroll;
+                if (!$$.forceHeight) {
+                    var maxVScroll = $$.maxVScroll;
 
-                if (maxVScroll) {
-                    grid.NoVScroll = 0;
-                    grid.MaxVScroll = maxVScroll;
-                } else {
-                    grid.NoVScroll = 1;
+                    if (maxVScroll) {
+                        grid.MaxVScroll = maxVScroll;
+                    } else {
+                        grid.NoVScroll = 1;
+                    }
                 }
 
                 $$.actions.updateSplashStatus('Rendering data');
+            }
+        };
+
+        window.Grids.OnRenderFinish = function(grid) {
+            if (grid.id === $$.id) {
+                if ($$.forceHeight) {
+                    var height = $(parent.document.getElementsByTagName('iframe')[1]).parent().height() - $(document.getElementById('s4-ribbonrow')).height();
+
+                    $('td.HideCol0Title').each(function () {
+                        var $td = $(this);
+
+                        if ($td.text() === 'Resource') {
+                            height -= $td.parent().parent().parent().height();
+                        }
+                    });
+
+                    $('#EpmLiveAssignmentPlannerGrid').height(height + 40);
+                }
             }
         };
 
