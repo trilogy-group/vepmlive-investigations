@@ -416,8 +416,7 @@
     <div id="div_loading_msg" style="display: none; width: 100%; text-align: center;">
         <%--<span>The <span id="spanTxtProjName"></span> is currently being created. This
             may take a moment.</span>--%>
-        <span>This may take a few minutes – we’re doing some pretty fancy stuff here but rest
-            assured that when we’re finished, you’ll be ready to rock and roll!</span>
+        <span>This may take a few minutes – we’re doing some pretty fancy stuff here, thanks for your patience.</span>
     </div>
     <%--filter links model--%>
     <li id="filterLinks_model" class="ms-create-listitem" style="display: none">
