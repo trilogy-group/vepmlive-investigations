@@ -24,7 +24,7 @@
         <button id="epm-se-comment-post-<%= SEID %>">Post</button>
     </div>
     <ul id="epm-se-threads"></ul>
-    <div id="epm-se-no-activity">Get to work! - once you do, you'll see activity here.</div>
+    <div id="epm-se-no-activity">There is no activity yet, let's get to work!</div>
     <button id="epm-se-load-more"><span class="icon-arrow-down"></span>Load More</button>
     <div id="epm-se-pagination"><span>Loading more...</span></div>
 </div>
