@@ -9,22 +9,29 @@ jPag-first {
 
 }
 .jPag-first {
-border-radius:15px;
-padding:1px 7px !important;
+border-radius:15px !important;
+padding:2px 7px !important;
 }
+
 .jPag-last {
-border-radius:15px;
-padding:1px 7px !important;
+border-radius:15px !important;
+padding:2px 7px !important;
 }
+
+#viewalldiv0Main a {
+padding: 2px 9px;
+border-radius:15px;
+}
+
+
 .jPaginate a{
     line-height:16px;
     height:16px;
     cursor:pointer;
-    padding:1px 5px;
+    padding:2px 5px;
     margin: 2px 0 0;
     float:left;
     text-decoration: none;
-    border-radius:3px;
 }
 .jPag-control-back{
 	position:absolute;
@@ -56,7 +63,6 @@ ul.jPag-pages li a{
 span.jPag-current{
     background-color: #0090CA !important;
     border: 1px solid #0090CA !important;
-    border-radius: 3px;
     color: #FFFFFF !important;
     cursor: default;
     float: left;
@@ -64,7 +70,7 @@ span.jPag-current{
     height: 16px;
     line-height: 16px;
     margin: 2px 0 0;
-    padding: 1px 5px;
+    padding: 2px 5px;
 }
 ul.jPag-pages li span.jPag-previous,
 ul.jPag-pages li span.jPag-next,
