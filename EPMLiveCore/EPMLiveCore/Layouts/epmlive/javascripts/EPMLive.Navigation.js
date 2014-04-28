@@ -972,9 +972,9 @@
                             return true;
                         case '5':
                             if (callBackFunction != '')
-                                SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', { url: redirectUrl, width: 600, height: 500, dialogReturnValueCallback: eval(callBackFunction) });
+                                SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', { url: redirectUrl, width: 700, height: 500, dialogReturnValueCallback: eval(callBackFunction) });
                             else
-                                SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', { url: redirectUrl, width: 600, height: 500 });
+                                SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', { url: redirectUrl, width: 700, height: 500 });
                             return true;
                         case '6':
                             if (callBackFunction != '')
