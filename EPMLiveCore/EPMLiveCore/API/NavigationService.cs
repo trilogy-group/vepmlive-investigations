@@ -265,8 +265,8 @@ namespace EPMLiveCore.API
                                     using (SPWeb spWeb = spSite.OpenWeb(webId))
                                     {
                                         SPList list = spWeb.Lists.GetList(listId, true);
-                                        result = GetGeneralActions(ListCommands.GetGridGanttSettings(list).UsePopup,
-                                            list, out di);
+                                        GridGanttSettings gSettings = ListCommands.GetGridGanttSettings(list);
+                                        result = GetGeneralActions(gSettings.UsePopup, list, gSettings.EnableFancyForms, out di);
                                     }
                                 }
                             }
@@ -829,8 +829,7 @@ namespace EPMLiveCore.API
             return actions.ToArray();
         }
 
-        private static Tuple<string, string, string, string, bool>[] GetGeneralActions(bool usePopup, SPList list,
-            out Dictionary<string, string> di)
+        private static Tuple<string, string, string, string, bool>[] GetGeneralActions(bool usePopup, SPList list, bool bfancyforms, out Dictionary<string, string> di)
         {
             bool success = true;
 
@@ -842,13 +841,10 @@ namespace EPMLiveCore.API
             {
                 actions = new[]
                 {
-                    AT("View Item", "view", "/_layouts/images/blank.gif", LP(list, SPBasePermissions.ViewListItems),
-                        usePopup ? "1" : string.Empty),
-                    AT("Edit Item", "edit", "/_layouts/images/edititem.gif", LP(list, SPBasePermissions.EditListItems),
-                        usePopup ? "1" : string.Empty),
+                    AT("View Item", "view", "/_layouts/images/blank.gif", LP(list, SPBasePermissions.ViewListItems), usePopup ? (bfancyforms ? "6" : "5") : "1"),
+                    AT("Edit Item", "edit", "/_layouts/images/edititem.gif", LP(list, SPBasePermissions.EditListItems), usePopup ? (bfancyforms ? "6" : "5") : "1"),
                     AT("--SEP--", null, null, true),
-                    AT("Approve Item", "approve", "/_layouts/images/apprj.gif",
-                        list.EnableModeration && LP(list, SPBasePermissions.ApproveItems)),
+                    AT("Approve Item", "approve", "/_layouts/images/apprj.gif", list.EnableModeration && LP(list, SPBasePermissions.ApproveItems)),
                     AT("Workflows", "workflows", "/_layouts/images/workflows.gif", list.WorkflowAssociations.Count > 0,
                         "1"),
                     AT("--SEP--", null, null, true),
