@@ -213,7 +213,7 @@ namespace PortfolioEngineCore.PortfolioItems
             }
         }
 
-        public string UpdatePortfolioItems(string xml)
+        public string UpdatePortfolioItems(string xml, int pID)
         {
             //TODO: Check Security on the PI
             //TODO: Find PI By ID or EXTID
@@ -298,29 +298,27 @@ namespace PortfolioEngineCore.PortfolioItems
                     int iPI = 0;
 
                     bUpdatedViaName = false;
-
+                        string sTitleValue = "";
 
                     if (lRowsAffected == 0)
                     {
-
-                        string sTitleValue = "";
 
                         sTitleValue = GetPITitleValue(xPI);
 
                         if (sTitleValue != "")
                         {
-                            sCommand = "UPDATE EPGP_PROJECTS SET PROJECT_MARKED_DELETION = 0, PROJECT_EXT_UID =  '" + sGuid + "' WHERE PROJECT_NAME = " + DBAccess.PrepareText(sTitleValue);
-
+                            //sCommand = "UPDATE EPGP_PROJECTS SET PROJECT_MARKED_DELETION = 0, PROJECT_EXT_UID =  '" + sGuid + "' WHERE PROJECT_NAME = " + DBAccess.PrepareText(sTitleValue);
+                            sCommand = "UPDATE EPGP_PROJECTS SET PROJECT_MARKED_DELETION = 0, PROJECT_EXT_UID =  '" + sGuid + "' WHERE PROJECT_ID = '" + pID + "'";
                             oCommand = new SqlCommand(sCommand, _sqlConnection);
                             lRowsAffected = oCommand.ExecuteNonQuery();
-                            // bUpdatedViaName = true;
+                            bUpdatedViaName = true;
                         }
                     }
 
 
                     if (lRowsAffected == 0)
                     {
-                        iPI = CreatePI(sGuid, out statusText);
+                        iPI = CreatePI(sGuid, out statusText, pID, sTitleValue);
                         _dba.WriteImmTrace("PortfolioItems", "UpdatePortfolioItems", "CreatedPI", iPI.ToString());
                     }
                     else
@@ -602,7 +600,7 @@ namespace PortfolioEngineCore.PortfolioItems
 
         }
 
-        private int CreatePI(string sGuid, out string statusText)
+        private int CreatePI(string sGuid, out string statusText, int pID, string pTitle)
         {
 
             statusText = "";
@@ -633,21 +631,20 @@ namespace PortfolioEngineCore.PortfolioItems
                 reader.Close();
                 reader = null;
 
-                int iPI = 0;
+                int iPI = pID;
 
+                //sCommand = "SELECT MAX(PROJECT_ID) AS EXPR1 FROM EPGP_PROJECTS";
+                //oCommand = new SqlCommand(sCommand, _sqlConnection);
 
-                sCommand = "SELECT MAX(PROJECT_ID) AS EXPR1 FROM EPGP_PROJECTS";
-                oCommand = new SqlCommand(sCommand, _sqlConnection);
+                //reader = oCommand.ExecuteReader();
+                //while (reader.Read())
+                //{
+                //    iPI = DBAccess.ReadIntValue(reader["EXPR1"]);
+                //}
+                //reader.Close();
+                //reader = null;
 
-                reader = oCommand.ExecuteReader();
-                while (reader.Read())
-                {
-                    iPI = DBAccess.ReadIntValue(reader["EXPR1"]);
-                }
-                reader.Close();
-                reader = null;
-
-                iPI = iPI + 1;
+                //iPI = iPI + 1;
 
                 //if (iPI == 1)
                 //{
@@ -663,9 +660,8 @@ namespace PortfolioEngineCore.PortfolioItems
                 //    }
                 //}
 
-
                 sCommand = "INSERT INTO EPGP_PROJECTS (PROJECT_ID, PROJECT_NAME, PROJECT_MARKED_DELETION, PROJECT_STAGE_ID, PROJECT_CREATEDBY,PROJECT_OWNER,PROJECT_MANAGER, PROJECT_CREATED, PROJECT_EXT_UID)" +
-                            " VALUES(" + iPI.ToString() + ", 'Creating Item for WE4.3', 0, " + lUseStage.ToString() + ", " + _dba.UserWResID.ToString() + ", " + _dba.UserWResID.ToString() +
+                            " VALUES(" + iPI.ToString() + ", '" + pTitle + "', 0, " + lUseStage.ToString() + ", " + _dba.UserWResID.ToString() + ", " + _dba.UserWResID.ToString() +
                             ", " + _dba.UserWResID.ToString() + ", @pcre, '" + sGuid + "')";
                 oCommand = new SqlCommand(sCommand, _sqlConnection);
                 oCommand.Parameters.AddWithValue("@pcre", DateTime.Now);
@@ -681,9 +677,6 @@ namespace PortfolioEngineCore.PortfolioItems
                 oCommand = new SqlCommand(sCommand, _sqlConnection);
                 oCommand.Parameters.AddWithValue("@sdate", DateTime.Now);
                 lRowsAffected = oCommand.ExecuteNonQuery();
-
-
-
 
                 for (int lstloop = 0; lstloop <= 4; ++lstloop)
                 {

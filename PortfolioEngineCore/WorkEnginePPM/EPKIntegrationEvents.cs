@@ -103,7 +103,7 @@ namespace WorkEnginePPM
 
                         xml += "</Items>";
 
-                        string ret = UpdateItemXml(xml, properties.Web);
+                        string ret = UpdateItemXml(xml, properties.Web, properties.ListItem.ID);
                         //WorkEnginePPM.WebAdmin.SimpleDBTrace(properties.SiteId, 99901, "WorkEnginePPM", "processItem", xml, ret);
 
                         XmlDocument xmlDoc = new XmlDocument();
@@ -275,7 +275,7 @@ namespace WorkEnginePPM
             }
         }
 
-        private string UpdateItemXml(string xml, SPWeb web)
+        private string UpdateItemXml(string xml, SPWeb web, int pID)
         {
             string username = ConfigFunctions.GetCleanUsername(web);
             
@@ -291,7 +291,7 @@ namespace WorkEnginePPM
             string ret = "";
             SPSecurity.RunWithElevatedPrivileges(delegate()
             {
-                ret = we.UpdatePortfolioItems(xml);
+                ret = we.UpdatePortfolioItems(xml, pID);
             });
             return ret;
         }
