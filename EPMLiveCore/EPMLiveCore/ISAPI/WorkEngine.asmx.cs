@@ -1769,6 +1769,23 @@ namespace EPMLiveCore
         }
 
         #endregion
+        #region Platform
+
+        public static string GetWorkspaceCenterGridData(string data, SPWeb oWeb)
+        {
+            try
+            {
+                return Response.Success(PlatformIntegration.InstallIntegration(data, oWeb));
+
+            }
+            catch (APIException ex)
+            {
+                return Response.Failure(ex.ExceptionNumber, string.Format("Error: {0}", ex.Message));
+            }
+        }
+
+        #endregion
+
 
         #region Workspace Center Method
 
