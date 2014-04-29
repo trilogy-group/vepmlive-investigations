@@ -153,7 +153,7 @@ namespace TimeSheets
                 double hours = 0;
 
                 SqlDataReader dr = cmd.ExecuteReader();
-                if (dr.Read())
+                if (dr.Read() && !dr.IsDBNull(0))
                     hours = dr.GetDouble(0);
                 dr.Close();
 

@@ -217,7 +217,7 @@ namespace TimeSheets
                                 System.Net.Mail.MailMessage mailMsg = new MailMessage();
                                 mailMsg.From = new MailAddress(fromEmail);
                                 mailMsg.To.Add(new MailAddress(semails[i]));
-                                mailMsg.Subject = "Message from timesheet approver: " + txtSubject.Text;
+                                mailMsg.Subject = txtSubject.Text;
                                 mailMsg.Body = body;
                                 mailMsg.IsBodyHtml = true;
                                 mailMsg.BodyEncoding = System.Text.Encoding.UTF8;

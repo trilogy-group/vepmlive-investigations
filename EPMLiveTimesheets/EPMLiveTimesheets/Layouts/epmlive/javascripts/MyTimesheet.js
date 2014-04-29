@@ -1918,7 +1918,7 @@ function MYTSOnGetHtmlValue(grid, row, col, val) {
                     img = "888"
                 }
 
-                return "<a onclick=\"ShowApprovalNotes('" + grid.id + "','" + row.id + "', this)\" id=\"ANote" + row.id + "\" style=\"text-decoration:none;\"><span class='icon-file-3' style='color:#" + img + ";text-decoration:none'></a>";
+                return "<a onclick=\"ShowApprovalNotes('" + grid.id + "','" + row.id + "', this)\" id=\"ANote" + row.id + "\" style=\"text-decoration:none;\"><span class='icon-file-3' style='color:#" + img + ";text-decoration:none;font-size:15px'></a>";
             }
             else if(col == "TMApproval")
             {

@@ -28,19 +28,19 @@
 <asp:Panel ID="pnlMain" runat="server">
 <table border="0">
     <tr>
-        <td class="ms-descriptiontext">Subject:</td>
+        <td class="ms-descriptiontext"><b>Subject:</b></td>
     </tr>
     <tr>
-        <td class="ms-descriptiontext">Message from timesheet approver: <asp:TextBox ID="txtSubject" runat="server" CssClass="ms-input" Width="300"></asp:TextBox></td>
+        <td class="ms-descriptiontext"> <asp:TextBox ID="txtSubject" runat="server" CssClass="ms-input" Width="300" Text="Message from timesheet approver: "></asp:TextBox></td>
     </tr>
     <tr>
-        <td class="ms-descriptiontext">Body:</td>
+        <td class="ms-descriptiontext"><b>Body:</b></td>
     </tr>
     <tr>
         <td class="ms-descriptiontext"><asp:TextBox ID="txtBody" TextMode="MultiLine" runat="server" CssClass="ms-input" Height="200" Width="500"></asp:TextBox><br />Note: A link to this site will be appended to the email.</td>
     </tr>
     <tr>
-        <td align="right"><asp:Button ID="btnSend" runat="server" Text="Send E-mail"  CssClass="ms-input" OnClick="btnSend_Click" /> <asp:Button ID="btnCancel" CssClass="ms-input" runat="server" Text="Cancel" OnClick="btnCancel_Click"/></td>
+        <td align="right"><asp:Button ID="btnSend" runat="server" Text="Send E-mail"  CssClass="ms-input" OnClick="btnSend_Click" /> <asp:Button ID="btnCancel" CssClass="ms-input" runat="server" Text="Cancel" OnClientClick="javascript:SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.commonModalDialogClose', 0, '')"/></td>
     </tr>
 </table>
 <b>The following users will receive this email:</b><br />
@@ -50,7 +50,7 @@
 E-mail results:<br />
 <%=strSent %>
 <br /><br />
-<a href="<%=source %>">Done</a>
+<a href="#" onclick="javascript:SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.commonModalDialogClose', 0, '')">Close</a>
 </asp:Panel>
 <asp:Panel ID="pnlNone" runat="server" Visible="false">
 Based off the selection, there are no users available for emailing.
