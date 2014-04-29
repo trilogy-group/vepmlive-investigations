@@ -850,6 +850,11 @@ namespace EPMLiveCore
                         ss = "yellow.gif";
                     }
                 }
+                else
+                {
+                    ss = ListItem["ScheduleStatus"].ToString();
+                    ss = ss.Substring(ss.IndexOf(";#") + 2);
+                }
             }
             catch { }
 
