@@ -11,7 +11,6 @@
 <%@ Control Language="C#" AutoEventWireup="true" CodeBehind="ResourceGridUserControl.ascx.cs" Inherits="EPMLiveWebParts.ResourceGridUserControl" %>
 
 <asp:Panel ID="pnlGrid" runat="server">
-
     <SharePoint:StyleBlock runat="server">
         input[type=text]::-ms-clear {
             display: none !important;
@@ -238,6 +237,7 @@
     </div>
         <div id="EPMResourceGrid" class="rg-clear-fix" style="width: 100%; height: 500px;">
             <SharePoint:ScriptBlock runat="server">
+                fixedRibbon=true;
                 function initializeResourceGridWP() {
             if (window.epmLiveMasterPageVersion >= 5.5) {
                     function showLoadingV2() {
