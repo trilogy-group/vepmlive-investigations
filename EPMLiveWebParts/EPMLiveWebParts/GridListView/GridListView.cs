@@ -3561,26 +3561,33 @@ namespace EPMLiveWebParts
                                                 
 	                                    var wurl = mygrid" + sFullGridId + @"._newitemurl;
 
-                                        if(wurl.indexOf('?') > 0)
-                                            wurl = wurl + '&GetLastID=true';
+                                        if(mygrid" + sFullGridId + @"._newmenumode == '3')
+                                        {
+                                            newAppPopup(mygrid" + sFullGridId + @"._defaultct);
+                                        }
                                         else
-                                            wurl = wurl + '?GetLastID=true';
+                                        {
+                                            if(wurl.indexOf('?') > 0)
+                                                wurl = wurl + '&GetLastID=true';
+                                            else
+                                                wurl = wurl + '?GetLastID=true';
 
-	                                    if(" + bUsePopUp.ToString().ToLower() + @")
-	                                    {
-		                                    function NewItemCallback(dialogResult, returnValue)
-                                            {
-                                                if(dialogResult){GridNewItem('" + sFullGridId  + @"',returnValue);}
-                                            }
+	                                        if(" + bUsePopUp.ToString().ToLower() + @")
+	                                        {
+		                                        function NewItemCallback(dialogResult, returnValue)
+                                                {
+                                                    if(dialogResult){GridNewItem('" + sFullGridId + @"',returnValue);}
+                                                }
 
-		                                    var options = { url: wurl, width: 700, dialogReturnValueCallback:NewItemCallback };
+		                                        var options = { url: wurl, width: 700, dialogReturnValueCallback:NewItemCallback };
 
-		                                    SP.UI.ModalDialog.showModalDialog(options);
-	                                    }
-	                                    else
-	                                    {
-		                                    location.href = wurl;
-	                                    }
+		                                        SP.UI.ModalDialog.showModalDialog(options);
+	                                        }
+	                                        else
+	                                        {
+		                                        location.href = wurl;
+	                                        }
+                                        }
                                     }");
 
             output.WriteLine("</script>");
