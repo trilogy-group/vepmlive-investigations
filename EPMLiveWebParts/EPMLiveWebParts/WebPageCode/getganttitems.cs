@@ -627,6 +627,13 @@ namespace EPMLiveWebParts
             catch { }
             try
             {
+                XmlAttribute attr = doc.CreateAttribute("wsurl");
+                attr.Value = ndRow.SelectSingleNode("userdata[@name='wsurl']").InnerText;
+                ndNew.Attributes.Append(attr);
+            }
+            catch { }
+            try
+            {
                 XmlAttribute attr = doc.CreateAttribute("listid");
                 attr.Value = ndRow.SelectSingleNode("userdata[@name='listid']").InnerText;
                 ndNew.Attributes.Append(attr);

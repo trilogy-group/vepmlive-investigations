@@ -24,6 +24,7 @@
 		<C Name="listid" Visible="0" CanPrint="0"/>
 		<C Name="itemid" Visible="0" CanPrint="0"/>
 		<C Name="SiteUrl" Visible="0" CanPrint="0"/>
+		<C Name="wsurl" Visible="0" CanPrint="0"/>
 		<C Name="viewMenus" Visible="0" CanPrint="0"/>
 		<C Name="Descendants" Visible="0" CanPrint="0"/>
 		<C Name="HasComments" Visible="0" CanPrint="0"/>

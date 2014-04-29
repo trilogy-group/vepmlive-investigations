@@ -294,7 +294,15 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
             case "DisplayDatasheetView":
                 return this.$Grid._allowedit;
             case "CreateWorkspace":
-                return this.buttonEnabled(9);
+                var rowId = this.$Grid.getSelectedRowId();
+                if(!rowId)
+                    return false;
+            	var wsurl = this.$Grid.getUserData(rowId,"wsurl");
+                if(wsurl && wsurl.trim() != "")
+                {
+                    return false;
+                }
+                return true;
             case "ConnectToClient":
                 return (this.$Grid._outlookexport != "");
             case "ModifyThisView":
