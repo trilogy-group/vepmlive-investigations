@@ -630,7 +630,7 @@
 
     var sPlannerID = "<%=sPlannerID%>";
     var sItemID = <%=sItemID%>;
-    var sProjectName = "<%=sProjectName%>";
+    var sProjectName = "<%=sProjectName.Replace("\"","&quot;")%>";
 
     var iDefaultTaskType = <%=iTaskType %>;
 

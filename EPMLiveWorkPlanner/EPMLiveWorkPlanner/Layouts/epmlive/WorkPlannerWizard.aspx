@@ -91,7 +91,7 @@ font-family: Open Sans Regular, Helvetica;
         var sPlannerID = "<%=sPlannerID %>";
         var sProjectType = "<%=sProjectType %>";
         var sTaskListId = "<%=sTaskListId %>";
-        var sProjectName = "<%=sProjectName %>";
+        var sProjectName = "<%=sProjectName.Replace("\"","&quot;") %>";
         var sSetDefault = "<%=Request["SetDefault"] %>";
 
         var sSource = "<%=System.Web.HttpUtility.UrlEncode(Request["Source"]) %>";
