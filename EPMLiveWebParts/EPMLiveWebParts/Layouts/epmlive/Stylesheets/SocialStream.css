@@ -121,6 +121,8 @@
   background-size: 40px auto;
   margin-right: 10px;
   border-radius: 50%;
+  top: -1px;
+  position: relative;
 }
 #epm-social-stream li.epm-se-thread div.epm-se-user-avatar img {
   width: 40px;
