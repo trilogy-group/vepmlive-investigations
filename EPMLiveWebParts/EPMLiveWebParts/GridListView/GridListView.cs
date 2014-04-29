@@ -2425,7 +2425,7 @@ namespace EPMLiveWebParts
             }
             catch (Exception ex)
             {
-                output.Write("Error (Render WebPart): " + ex.Message);
+                output.Write("Error (Render WebPart): " + ex.Message + ex.StackTrace);
             }
 
             //writetime(output);
