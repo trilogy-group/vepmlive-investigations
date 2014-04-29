@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using EPMLiveCore.Infrastructure;
 using Microsoft.SharePoint;
 
@@ -6,9 +7,10 @@ namespace EPMLiveCore.SocialEngine.Core
 {
     internal static class Utilities
     {
-        #region Fields (1) 
+        #region Fields (2) 
 
-        private const string IGNORED_LISTS_SETTING_KEY = "EPM_SS_Ignored_Lists";
+        private const string IGNORED_LISTS_SETTING_KEY = "epm_ss_ignored_lists";
+        private static readonly object Locker = new Object();
 
         #endregion Fields 
 
@@ -31,20 +33,22 @@ namespace EPMLiveCore.SocialEngine.Core
 
         public static bool IsIgnoredList(string listTitle, SPWeb contextWeb)
         {
-            var settingValue =
-                (string)
-                    CacheStore.Current.Get(IGNORED_LISTS_SETTING_KEY, new CacheStoreCategory(contextWeb).SocialStream,
-                        () => CoreFunctions.getConfigSetting(contextWeb, IGNORED_LISTS_SETTING_KEY), true).Value;
+            lock (Locker)
+            {
+                var settingValue = (string) CacheStore.Current.Get(IGNORED_LISTS_SETTING_KEY,
+                    new CacheStoreCategory(contextWeb).SocialStream, () =>
+                        CoreFunctions.getConfigSetting(contextWeb, IGNORED_LISTS_SETTING_KEY), true).Value;
 
-            if (!string.IsNullOrEmpty(settingValue))
-                return settingValue.Split(',').Any(list => list.Trim().ToLower().Equals(listTitle.ToLower()));
+                if (!string.IsNullOrEmpty(settingValue))
+                    return settingValue.Split(',').Any(list => list.Trim().ToLower().Equals(listTitle.ToLower()));
 
-            string ignoredLists = ConfigureDefaultIgnoredLists(contextWeb);
+                string ignoredLists = ConfigureDefaultIgnoredLists(contextWeb);
 
-            CacheStore.Current.Set(IGNORED_LISTS_SETTING_KEY, ignoredLists,
-                new CacheStoreCategory(contextWeb).SocialStream, true);
+                CacheStore.Current.Set(IGNORED_LISTS_SETTING_KEY, ignoredLists,
+                    new CacheStoreCategory(contextWeb).SocialStream, true);
 
-            return false;
+                return false;
+            }
         }
 
         #endregion Methods 

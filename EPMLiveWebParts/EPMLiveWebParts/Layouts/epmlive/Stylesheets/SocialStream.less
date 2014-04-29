@@ -362,7 +362,10 @@
             font-size: 11px;
         }
 
-        ul#epm-se-toolbar-items {
+        ul {
+            display: none;
+            width: 100%;
+
             li {
                 display: inline-block;
                 margin: 0 5px;
@@ -374,6 +377,17 @@
                         color: #555555;
                         text-decoration: none;
                     }
+                }
+            }
+        }
+
+        ul#epm-se-toolbar-items {
+            li.epm-se-show-more {
+                cursor: pointer;
+                color: #0090ca; 
+
+                span {
+                    margin-right: 5px;
                 }
             }
         }

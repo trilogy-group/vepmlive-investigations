@@ -34,6 +34,8 @@
                 noActivity: $('#epm-social-stream div#epm-se-no-activity'),
                 threads: $('#epm-social-stream ul#epm-se-threads'),
                 toolbarItems: $('#epm-social-stream ul#epm-se-toolbar-items'),
+                toolbarItemsAll: $('#epm-social-stream ul#epm-se-toolbar-items-all'),
+                toolbarMore: $('#epm-social-stream ul#epm-se-toolbar-items li.epm-se-show-more'),
                 statusUpdateBox: $('#epm-social-stream div#epm-se-status-update-box'),
                 loadMoreButton: $('button#epm-se-load-more')
             };
@@ -206,7 +208,7 @@
                 };
 
                 var _paginate = function() {
-                    if ($('#epm-social-stream div#epm-se-pagination').offset().top < $(window).height()) {
+                    if ($('#epm-social-stream div#epm-se-pagination').offset().top < ($(window).height() + 200)) {
                         if (se.pagination.isLoading) return;
                         if (se.pagination.page === 0) return;
 
@@ -755,6 +757,31 @@
             })();
 
             var toolbarManager = (function () {
+                var displayToolbar = function (data) {
+                    var itemCount = window.epmLive.socialStream.toolbarDisplayItemCount;
+
+                    for (var i = 0; i < data.collection.length; i++) {
+                        var creatable = data.collection[i];
+                        creatable.icon = creatable.icon || 'icon-square';
+
+                        var event = i < itemCount ? 'se.creatableLoaded' : 'se.creatableAllLoaded';
+                        $$.publish(event, creatable);
+                    }
+
+                    var $toolbar = itemCount > 0 ? $el.toolbarItems : $el.toolbarItemsAll;
+                    $toolbar.show().css('display', 'table-cell');
+
+                    if (itemCount > 0) {
+                        $el.toolbarMore.remove().appendTo($toolbar).click(function() {
+                            $toolbar.fadeOut('fast',function() {
+                                $el.toolbarItemsAll.fadeIn('fast').css('display', 'table-cell');
+                            });
+                        });
+                    }
+
+                    $toolbar.parent().fadeIn('fast');
+                };
+
                 var _init = function(tries) {
                     tries = tries || 0;
                     
@@ -769,19 +796,13 @@
                             return;
                         }
 
-                        for (var i = 0; i < response.collection.length; i++) {
-                            var creatable = response.collection[i];
-                            creatable.icon = creatable.icon || 'icon-square';
-                            
-                            $$.publish('se.creatableLoaded', creatable);
-                        }
-
-                        $el.toolbarItems.parent().fadeIn('fast');
+                        displayToolbar(response);
                     });
                 };
 
-                var _addCreatable = function (creatable) {
-                    $el.toolbarItems.append(templates.toolbarItem(creatable));
+                var _addCreatable = function(creatable, isHidden) {
+                    if (!isHidden) $el.toolbarItems.append(templates.toolbarItem(creatable));
+                    $el.toolbarItemsAll.append(templates.toolbarItem(creatable));
                 };
 
                 var _handleCreationAction = function(result, target, listInfo) {
@@ -891,6 +912,10 @@
             function attachEvents() {
                 $$.subscribe('se.creatableLoaded', function(creatable) {
                     toolbarManager.addCreatable(creatable);
+                });
+
+                $$.subscribe('se.creatableAllLoaded', function (creatable) {
+                    toolbarManager.addCreatable(creatable, true);
                 });
 
                 $$.subscribe('se.dataLoaded', function(data) {

@@ -11,13 +11,15 @@
         window.epmLive.currentUserTimeZone = <%= CurrentUserTimeZone %>;
         window.epmLive.currentUserDisplayName = '<%= CurrentUserDisplayName %>';
         window.epmLive.currentUserAvatar = '<%= CurrentUserAvatar %>';
+        window.epmLive.socialStream = { toolbarDisplayItemCount: <%= ToolbarDisplayItemCount %> };
     })();
 </SharePoint:ScriptBlock>
 
 <div id="epm-social-stream">
     <div id="epm-se-toolbar" class="clearfix">
         <h3>CREATE</h3>
-        <ul id="epm-se-toolbar-items"></ul>
+        <ul id="epm-se-toolbar-items"><li class="epm-se-show-more"><span class="icon-plus-circle-2"></span>More</li></ul>
+        <ul id="epm-se-toolbar-items-all"></ul>
     </div>
     <div id="epm-se-status-update-box" class="epm-se-comment-box clearfix">
         <div class="epm-se-comment-input" contenteditable="true"></div>

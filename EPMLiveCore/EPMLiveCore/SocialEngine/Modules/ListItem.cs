@@ -72,7 +72,7 @@ namespace EPMLiveCore.SocialEngine.Modules
 
         private TimeSpan GetRelatedActivityInterval(SPWeb contextWeb)
         {
-            const string SETTING_KEY = "EPM_SS_RelatedActivityInterval";
+            const string SETTING_KEY = "epm_ss_related_activity_interval";
 
             return (TimeSpan) CacheStore.Current.Get(SETTING_KEY, "SocialStream", () =>
             {

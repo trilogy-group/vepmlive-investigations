@@ -309,17 +309,28 @@
   color: #777777;
   font-size: 11px;
 }
-#epm-social-stream div#epm-se-toolbar ul#epm-se-toolbar-items li {
+#epm-social-stream div#epm-se-toolbar ul {
+  display: none;
+  width: 100%;
+}
+#epm-social-stream div#epm-se-toolbar ul li {
   display: inline-block;
   margin: 0 5px;
 }
-#epm-social-stream div#epm-se-toolbar ul#epm-se-toolbar-items li a {
+#epm-social-stream div#epm-se-toolbar ul li a {
   margin-left: 5px;
   color: #a2a2a2;
 }
-#epm-social-stream div#epm-se-toolbar ul#epm-se-toolbar-items li a:hover {
+#epm-social-stream div#epm-se-toolbar ul li a:hover {
   color: #555555;
   text-decoration: none;
+}
+#epm-social-stream div#epm-se-toolbar ul#epm-se-toolbar-items li.epm-se-show-more {
+  cursor: pointer;
+  color: #0090ca;
+}
+#epm-social-stream div#epm-se-toolbar ul#epm-se-toolbar-items li.epm-se-show-more span {
+  margin-right: 5px;
 }
 #epm-social-stream button#epm-se-load-more {
   background: none repeat scroll 0 0 #F3F3F3;

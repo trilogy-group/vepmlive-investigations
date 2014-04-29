@@ -112,10 +112,9 @@ namespace EPMLiveCore.Services
                 {
                     bool keep = false;
 
-                    foreach (
-                        DataRow row in
-                            Enumerable.Where(listLibs, row => row["Id"].ToString().ToLower().Equals(c.id.ToLower())
-                                                              && !SEUtils.IsIgnoredList(c.name, contextWeb)))
+                    foreach (DataRow row in 
+                        Enumerable.Where(listLibs, row => row["Id"].ToString().ToLower().Equals(c.id.ToLower()) 
+                            && !SEUtils.IsIgnoredList(c.name, contextWeb)))
                     {
                         keep = true;
 

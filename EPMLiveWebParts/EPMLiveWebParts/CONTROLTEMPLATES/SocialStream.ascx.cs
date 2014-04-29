@@ -11,7 +11,7 @@ namespace EPMLiveWebParts.CONTROLTEMPLATES
 {
     public partial class SocialStream : UserControl
     {
-        #region Properties (4) 
+        #region Properties (5) 
 
         public string CurrentUserAvatar { get; private set; }
 
@@ -20,6 +20,20 @@ namespace EPMLiveWebParts.CONTROLTEMPLATES
         public string CurrentUserTimeZone { get; private set; }
 
         public Guid SEID { get; private set; }
+
+        public int ToolbarDisplayItemCount
+        {
+            get
+            {
+                try
+                {
+                    return int.Parse(CoreFunctions.getConfigSetting(SPContext.Current.Web, "epm_ss_toolbar_itemcount"));
+                }
+                catch { }
+
+                return 0;
+            }
+        }
 
         #endregion Properties 
 
