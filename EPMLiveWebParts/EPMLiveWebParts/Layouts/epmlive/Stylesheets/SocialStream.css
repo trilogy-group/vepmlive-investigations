@@ -331,6 +331,10 @@
 }
 #epm-social-stream div#epm-se-toolbar ul#epm-se-toolbar-items li.epm-se-show-more span {
   margin-right: 5px;
+  font-size: 11px;
+  top: 0;
+  position: relative;
+  color: #0090ca;
 }
 #epm-social-stream button#epm-se-load-more {
   background: none repeat scroll 0 0 #F3F3F3;
