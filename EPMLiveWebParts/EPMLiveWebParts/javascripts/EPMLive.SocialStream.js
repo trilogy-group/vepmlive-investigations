@@ -542,6 +542,7 @@
                     data.payload = payload;
 
                     $$.publish('se.dataLoaded', payload);
+                    $el.noActivity.fadeOut('fast');
                 }
 
                 function addComment(data) {
@@ -560,6 +561,7 @@
                     };
 
                     if (data.$thread) {
+                        $el.noActivity.fadeOut('fast');
                         data.$thread.find(se.ui.selectors.latestComments).append(templates.comment(comment));
                         data.$thread.find(se.ui.selectors.comments).removeClass(se.ui.classes.hidden);
                     } else {
@@ -859,6 +861,7 @@
                             };
 
                             $$.publish('se.dataLoaded', data);
+                            $el.noActivity.fadeOut('fast');
                         });
                     }
                 };
