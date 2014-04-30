@@ -18,30 +18,33 @@ namespace EPMLiveCore.Events.GenericListEventReceiver
         /// </summary>
         public override void ListAdded(SPListEventProperties properties)
         {
-            try
-            {
-                ListCommands.InstallListsViewsWebparts(properties.List);
-            }
-            catch { }
+            //try
+            //{
+            //    if (properties.Web.CurrentUser.ID != properties.Web.Site.SystemAccount.ID)
+            //    {
+            //        try
+            //        {
+            //            ListCommands.MapListToReporting(properties.List);
+            //        }
+            //        catch { }
 
-            try
-            {
-                if (properties.Web.CurrentUser.ID != properties.Web.Site.SystemAccount.ID)
-                {
-                    try
-                    {
-                        ListCommands.MapListToReporting(properties.List);
-                    }
-                    catch { }
+            //        try
+            //        {
+            //            ListCommands.SaveIconToReporting(properties.List);
+            //        }
+            //        catch { }
 
-                    try
-                    {
-                        ListCommands.SaveIconToReporting(properties.List);
-                    }
-                    catch { }
-                }
-            }
-            catch { }
+            //        if (properties.List.BaseType != SPBaseType.DocumentLibrary)
+            //        {
+            //            try
+            //            {
+            //                ListCommands.InstallListsViewsWebparts(properties.List);
+            //            }
+            //            catch { }
+            //        }
+            //    }
+            //}
+            //catch { }
 
             ClearCache(properties);
         }
