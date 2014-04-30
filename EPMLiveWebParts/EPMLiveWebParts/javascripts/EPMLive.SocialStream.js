@@ -1039,7 +1039,13 @@
                         se.pagination.page++;
                         
                         if ($el.noActivity.is(':visible')) $el.noActivity.fadeOut('fast');
-                        if (!$el.loadMoreButton.is(':visible')) $el.loadMoreButton.fadeIn('fast');
+
+                        if (response.threads.length < se.pagination.limit) {
+                            se.pagination.page = 0;
+                            if ($el.loadMoreButton.is(':visible')) $el.loadMoreButton.fadeOut('fast');
+                        } else {
+                            if (!$el.loadMoreButton.is(':visible')) $el.loadMoreButton.fadeIn('fast');
+                        }
                     } else {
                         se.pagination.page = 0;
                         if ($el.loadMoreButton.is(':visible')) $el.loadMoreButton.fadeOut('fast');
