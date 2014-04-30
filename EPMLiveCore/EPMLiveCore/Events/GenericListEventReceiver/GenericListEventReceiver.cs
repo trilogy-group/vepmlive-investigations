@@ -24,17 +24,20 @@ namespace EPMLiveCore.Events.GenericListEventReceiver
             }
             catch { }
 
-            try
+            if (properties.Web.CurrentUser.ID != properties.Web.Site.SystemAccount.ID)
             {
-                ListCommands.MapListToReporting(properties.List);
-            }
-            catch { }
+                try
+                {
+                    ListCommands.MapListToReporting(properties.List);
+                }
+                catch { }
 
-            try
-            {
-                ListCommands.SaveIconToReporting(properties.List);
+                try
+                {
+                    ListCommands.SaveIconToReporting(properties.List);
+                }
+                catch { }   
             }
-            catch { }
 
             ClearCache(properties);
         }
