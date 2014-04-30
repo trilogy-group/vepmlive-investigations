@@ -128,10 +128,10 @@
     <div class="epm-se-float-block">
         <span class="epm-se-object-info">
             {{#if web}}
-                <span class="epm-se-workspace"><a href="{{web.url}}" target="_blank">{{web.title}}</a></span>
+                <span class="epm-se-workspace"><a href="{{web.url}}">{{web.title}}</a></span>
             {{/if}}
             {{#if list}}
-                <a href="{{list.url}}" target="_blank" class="epm-se-link">{{list.name}}</a>
+                <a href="{{list.url}}">{{list.name}}</a>
             {{/if}}
         </span>
     </div>

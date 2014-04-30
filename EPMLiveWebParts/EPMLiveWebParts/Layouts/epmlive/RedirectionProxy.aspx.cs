@@ -28,6 +28,9 @@ namespace EPMLiveWebParts.Layouts.epmlive
                 string listName = Request.QueryString["listname"];
                 string isDlg = Request.QueryString["isdlg"] ?? "1";
 
+                bool noDlg;
+                bool.TryParse(Request.QueryString["nodlg"], out noDlg);
+
                 if (string.IsNullOrEmpty(action)) return;
 
                 SPSite spSite = SPContext.Current.Site;
@@ -146,7 +149,12 @@ namespace EPMLiveWebParts.Layouts.epmlive
                         break;
                 }
 
-                if (!string.IsNullOrEmpty(redirectUrl)) Response.Redirect(redirectUrl);
+                if (string.IsNullOrEmpty(redirectUrl)) return;
+
+                if (noDlg) redirectUrl = redirectUrl.ToLower().Replace("isdlg=1", string.Empty).Replace("isdlg=0", string.Empty);
+                if (redirectUrl.EndsWith("?")) redirectUrl = redirectUrl.Replace("?", string.Empty);
+
+                Response.Redirect(redirectUrl);
             }
             catch (Exception ex)
             {

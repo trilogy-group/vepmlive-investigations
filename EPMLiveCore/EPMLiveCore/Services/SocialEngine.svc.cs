@@ -355,7 +355,7 @@ namespace EPMLiveCore.Services
                 found = activities.lists.Any(list => list.id == thread.listId.Value);
                 if (found) return;
 
-                string url = string.Format("{0}/{1}?action=gotolist&webid={2}&listid={3}",
+                string url = string.Format("{0}/{1}?action=gotolist&webid={2}&listid={3}&nodlg=true",
                     tr["WebUrl"], PROXY_URL, thread.webId, thread.listId);
 
                 if (((ObjectKind) tr["ThreadKind"]) == ObjectKind.List)
