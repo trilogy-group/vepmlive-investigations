@@ -941,6 +941,15 @@
                         redirectUrl = redirectUrl.split('#')[0];
                     }
 
+                    if (command === 'view' || command === 'edit') {
+                        var wUrl = $$.currentWebUrl();
+                        var urlParts = window.location.href.split('?');
+                        var page = (wUrl + urlParts[0].split(escape(wUrl))[1]);
+                        page = escape(page);
+
+                        redirectUrl += '&source=' + page;
+                    }
+
                     switch (kind + '') {
                         case '-1':
                             if (command == 'delete') {
