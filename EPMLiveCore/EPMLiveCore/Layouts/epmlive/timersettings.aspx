@@ -147,7 +147,7 @@
 
 <wssuc:InputFormSection Title="Resource Planner Lists"
 		Description=""
-		runat="server">
+		runat="server" Visible="False">
 		<Template_Description>
             Enter the lists for which you would like to collect data.
 		</Template_Description>
