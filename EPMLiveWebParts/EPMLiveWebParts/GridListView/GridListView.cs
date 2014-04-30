@@ -3550,6 +3550,17 @@ namespace EPMLiveWebParts
                                                                     }catch(e){}
                                                                     };");
 
+            output.WriteLine("mygrid" + sFullGridId + @".getRowById = function(rowid){  
+                                                                    var grid = Grids.GanttGrid" + sFullGridId + @";
+                                                                    return grid.GetRowById(rowid); 
+                                                                    };");
+
+            output.WriteLine("mygrid" + sFullGridId + @".setRowHidden = function(row, hide){  
+                                                                    var grid = Grids.GanttGrid" + sFullGridId + @";
+                                                                    if(hide)
+                                                                        grid.RemoveRow(row); 
+                                                                    };");
+
             output.WriteLine("mygrid" + sFullGridId + @".editStop = function(){  }");
 
             //output.WriteLine("mygrid" + sFullGridId + @".getGlobalCommands = function($arr){return fnGetGlobalCommands($arr);};");

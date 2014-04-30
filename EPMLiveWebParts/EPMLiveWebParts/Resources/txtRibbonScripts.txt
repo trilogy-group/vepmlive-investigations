@@ -45,7 +45,7 @@ function epmlive_doDelete(id, weburl, grid, curRowId)
 		{
 			grid.setRowHidden(grid.getRowById(curRowId), true);
 		}
-		if(grid.getCheckedRowIds())
+		/*if(grid.getCheckedRowIds())
 		{
 			var oRows = grid.getCheckedRowIds().split(',');
 			for(var oRow in oRows)
@@ -53,7 +53,7 @@ function epmlive_doDelete(id, weburl, grid, curRowId)
 				grid.setRowHidden(oRows[oRow], true);
 			}
 		}
-		
+		*/
 	}
 
 	SP.UI.Notify.removeNotification(id);
