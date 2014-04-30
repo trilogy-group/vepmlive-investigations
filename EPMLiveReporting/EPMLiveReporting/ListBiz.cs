@@ -284,10 +284,15 @@ namespace EPMLiveReportsAdmin
                 {
                     columns.AddColumn(field);
                     columnsSnapshot.AddColumn(field);
-                    if (RequiredResourceFields.Contains(field.InternalName))
+                    //if (RequiredResourceFields.Contains(field.InternalName))
+                    //{
+                    //    matches++;
+                    //}
+                    try
                     {
-                        matches++;
+                        required.Remove(field.InternalName);
                     }
+                    catch { }
                 }
             }
 
@@ -312,10 +317,15 @@ namespace EPMLiveReportsAdmin
                 SPField spField = spList.Fields[new Guid(field.Value)];
                 columns.AddColumn(spField);
                 columnsSnapshot.AddColumn(spField);
-                if (RequiredResourceFields.Contains(spField.InternalName))
-                    matches++;
+                //if (RequiredResourceFields.Contains(spField.InternalName))
+                //    matches++;
+                try
+                {
+                    required.Remove(spField.InternalName);
+                }
+                catch { }
             }
-            lb._resourceList = (RequiredResourceFields.Count == matches);
+            lb._resourceList = (required.Count == 0);
 
             //[Fix for:Issue - Resources list sqltable being rename to LST Resourcis in Report Model. Apparently, resources is a reserved word.] by xjh -- START
             string tableName;
