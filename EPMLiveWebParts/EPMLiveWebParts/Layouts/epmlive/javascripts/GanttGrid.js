@@ -429,7 +429,12 @@ function GridOnFocus(grid, row, col, orow, ocol, pagepos) {
                 grid.SelectRow(row);
             }
 
-            SelectRibbonTab("Ribbon.ListItem", true);
+            var gridid = GetGridId(grid);
+
+            var ribbon = eval("mygrid" + gridid + ".RibbonBehavior");
+
+            if (ribbon != "1" && ribbon != "2")
+                SelectRibbonTab("Ribbon.ListItem", true);
         }
     }
     //RefreshCommandUI();
