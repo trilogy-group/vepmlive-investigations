@@ -400,6 +400,10 @@
                         hideNotifications();
                     });
 
+                    $('body').on('epm.updateProfilePic', function() {
+                        hideNotifications();
+                    });
+
                     $("#EPMLiveNotificationsWrap").click(function (event) {
                         event.stopPropagation();
                     });
