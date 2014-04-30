@@ -24,7 +24,7 @@ namespace EPMLiveCore.SocialEngine.Core
             if (!string.IsNullOrEmpty(ignoredLists)) return ignoredLists;
 
             const string IGNORED_LISTS =
-                "PublicComments,Comments,EPMLiveFileStore,User Information List,Team,Department,Departments,Excel Reports,Holiday Schedules,My Timesheet,My Work,Non Work,Project Schedules,Report Library,Resource Center,Roles,Site Assets,Site Pages,Style Library,Work Hours";
+                "PublicComments,Comments,EPMLiveFileStore,User Information List,Team,Department,Departments,Excel Reports,Holiday Schedules,My Timesheet,My Work,Non Work,Project Schedules,Report Library,Resource Center,Roles,Site Assets,Site Pages,Style Library,Work Hours,Installed Applications";
 
             CoreFunctions.setConfigSetting(contextWeb, IGNORED_LISTS_SETTING_KEY, IGNORED_LISTS);
 
