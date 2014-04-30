@@ -770,6 +770,9 @@
                         $$.publish(event, creatable);
                     }
 
+                    $el.toolbarItems.hide();
+                    $el.toolbarItemsAll.hide();
+
                     var $toolbar = itemCount > 0 ? $el.toolbarItems : $el.toolbarItemsAll;
                     $toolbar.show().css('display', 'table-cell');
 
