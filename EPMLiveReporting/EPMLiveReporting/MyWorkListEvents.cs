@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using Microsoft.SharePoint;
 
@@ -10,9 +11,10 @@ namespace EPMLiveReportsAdmin
 {
     public class MyWorkListEvents : SPItemEventReceiver
     {
-        #region Fields (11)
+        #region Fields (13) 
 
         private const string TABLE_NAME = "LSTMyWork";
+        private Dictionary<string, object> _currentValues;
         private ArrayList _defaultColumns;
         private DataTable _listColumns;
         private Guid _listId;
@@ -24,11 +26,10 @@ namespace EPMLiveReportsAdmin
         private Guid _siteId;
         private string _siteName;
         private string _siteUrl;
-        private Dictionary<string, object> currentValues;
 
-        #endregion Fields
+        #endregion Fields 
 
-        #region Methods (9)
+        #region Methods (12) 
 
         // Public Methods (3) 
 
@@ -66,7 +67,7 @@ namespace EPMLiveReportsAdmin
                 {
                     DeleteItem();
 
-                    var tableName = _myWorkReportData.GetTableName(_listItem.ParentList.ID);
+                    string tableName = _myWorkReportData.GetTableName(_listItem.ParentList.ID);
                     if (_myWorkReportData.ListReportsWork(tableName))
                     {
                         _myWorkReportData.DeleteWork(_listId, _properties.ListItemId);
@@ -108,7 +109,7 @@ namespace EPMLiveReportsAdmin
             }
         }
 
-        // Private Methods (6) 
+        // Private Methods (9) 
 
         /// <summary>
         ///     Deletes the item.
@@ -116,6 +117,45 @@ namespace EPMLiveReportsAdmin
         private void DeleteItem()
         {
             _myWorkReportData.DeleteListItem(GetSql("DELETE"));
+        }
+
+        private Dictionary<string, object> GetItemFieldValueFromDB(string listId, string itemId)
+        {
+            var res = new Dictionary<string, object>();
+            DataTable dt =
+                _myWorkReportData.ExecuteSql("SELECT * FROM LSTMyWork WHERE [ListId] = '" + listId + "' AND [ItemId] = " +
+                                             itemId + " AND [AssignedToID] != -99");
+
+            try
+            {
+                res.Add("AssignedToIDs", dt.Rows[0]["AssignedToID"]);
+                res.Add("Work", dt.Rows[0]["Work"]);
+                res.Add("StartDate", dt.Rows[0]["StartDate"]);
+                res.Add("DueDate", dt.Rows[0]["DueDate"]);
+            }
+            catch { }
+
+            if (dt.Rows.Count <= 1) return res;
+
+            string sIds = dt.Rows.Cast<DataRow>().Aggregate("", (current, r) => current + (r["AssignedToID"] + ","));
+
+            res["AssignedToIDs"] = sIds;
+
+            double sum = 0;
+            foreach (DataRow r in dt.Rows)
+            {
+                double n = 0;
+                try
+                {
+                    n = Convert.ToDouble(r["Work"].ToString());
+                }
+                catch { }
+                sum += n;
+            }
+
+            res["Work"] = sum.ToString(CultureInfo.InvariantCulture);
+
+            return res;
         }
 
         /// <summary>
@@ -164,23 +204,23 @@ namespace EPMLiveReportsAdmin
                 _siteName = _myWorkReportData.SiteName;
                 _siteUrl = _myWorkReportData.SiteUrl;
 
-                currentValues = GetItemFieldValueFromDB(properties.ListId.ToString(), properties.ListItemId.ToString());
+                _currentValues = GetItemFieldValueFromDB(properties.ListId.ToString(), properties.ListItemId.ToString());
 
-                if (populateColumns)
+                if (!populateColumns) return true;
+
+                _defaultColumns = new ArrayList {"siteid", "webid", "listid", "itemid", "weburl"};
+                _mandatoryHiddenFlds = new ArrayList
                 {
-                    _defaultColumns = new ArrayList {"siteid", "webid", "listid", "itemid", "weburl"};
-                    _mandatoryHiddenFlds = new ArrayList
-                    {
-                        "commenters",
-                        "commentersread",
-                        "commentcount",
-                        "workspaceurl"
-                    };
-                    _listColumns = _myWorkReportData.GetListColumns("My Work");
-                    _listColumns = _listColumns.DefaultView.ToTable(true,
-                        (from DataColumn dataColumn in _listColumns.Columns
-                            select dataColumn.ColumnName).ToArray());
-                }
+                    "commenters",
+                    "commentersread",
+                    "commentcount",
+                    "workspaceurl"
+                };
+
+                _listColumns = _myWorkReportData.GetListColumns("My Work");
+                _listColumns = _listColumns.DefaultView.ToTable(true,
+                    (from DataColumn dataColumn in _listColumns.Columns
+                        select dataColumn.ColumnName).ToArray());
 
                 return true;
             }
@@ -209,12 +249,23 @@ namespace EPMLiveReportsAdmin
                     " Error: Add item was unsuccessful.", _myWorkReportData.GetError(), 2, 1);
             }
 
-            var tableName = _myWorkReportData.GetTableName(_listItem.ParentList.ID);
+            string tableName = _myWorkReportData.GetTableName(_listItem.ParentList.ID);
             if (!string.IsNullOrEmpty(tableName) && _myWorkReportData.ListReportsWork(tableName))
             {
-                //Save list item "work" field values
                 SaveWork();
             }
+        }
+
+        private bool ItemHasValue(SPListItem i, string fldName)
+        {
+            string result = string.Empty;
+            try
+            {
+                result = i[fldName].ToString();
+            }
+            catch { }
+
+            return !string.IsNullOrEmpty(result);
         }
 
         /// <summary>
@@ -234,6 +285,167 @@ namespace EPMLiveReportsAdmin
                     exception.StackTrace), EventLogEntryType.Error, eventId);
         }
 
+        private void SaveWork()
+        {
+            bool bHasChangedWork = false;
+            bool bHasChangedAssignedTo = false;
+            bool bHasChangedStartDate = false;
+            bool bHasChangedDueDate = false;
+
+            try
+            {
+                //List item "work" fields -- START 
+                string sWork = string.Empty;
+                string sAssignedTo = string.Empty;
+                object startDate = DBNull.Value;
+                object dueDate = DBNull.Value;
+
+                if (ItemHasValue(_listItem, "Work"))
+                {
+                    try
+                    {
+                        sWork = _listItem["Work"].ToString();
+
+                        switch (_properties.EventType)
+                        {
+                            case SPEventReceiverType.ItemAdded:
+                                bHasChangedWork = true;
+                                break;
+                            case SPEventReceiverType.ItemUpdated:
+                                if (_properties.ListItem["Work"] != null &&
+                                    Math.Round(Convert.ToDouble(_currentValues["Work"].ToString()), 2) !=
+                                    Math.Round(Convert.ToDouble(sWork), 2))
+                                {
+                                    bHasChangedWork = true;
+                                }
+                                break;
+                        }
+                    }
+                    catch { }
+                }
+
+                if (ItemHasValue(_listItem, "AssignedTo"))
+                {
+                    try
+                    {
+                        sAssignedTo = ReportData.AddLookUpFieldValues(_listItem["AssignedTo"].ToString(), "id");
+
+                        switch (_properties.EventType)
+                        {
+                            case SPEventReceiverType.ItemAdded:
+                                bHasChangedAssignedTo = true;
+                                break;
+                            case SPEventReceiverType.ItemUpdated:
+                                if (_properties.ListItem["AssignedTo"] != null)
+                                {
+                                    var lIdsBefore =
+                                        new List<int>(
+                                            _currentValues["AssignedToIDs"].ToString()
+                                                .TrimEnd(',')
+                                                .Split(',')
+                                                .Select(int.Parse));
+                                    var lookupValAfter =
+                                        new SPFieldLookupValueCollection(_properties.ListItem["AssignedTo"].ToString());
+                                    List<int> lIdsAfter = lookupValAfter.Select(v => v.LookupId).ToList();
+
+                                    bool execute = false;
+                                    if (lIdsBefore.Count() != lIdsAfter.Count()) execute = true;
+                                    else
+                                    {
+                                        bool containsAll = lIdsBefore.All(lIdsAfter.Contains);
+                                        if (!containsAll) execute = true;
+                                    }
+
+                                    if (execute) bHasChangedAssignedTo = true;
+                                }
+                                break;
+                        }
+                    }
+                    catch { }
+                }
+
+
+                if (ItemHasValue(_listItem, "StartDate"))
+                {
+                    try
+                    {
+                        startDate = _listItem["StartDate"];
+
+                        switch (_properties.EventType)
+                        {
+                            case SPEventReceiverType.ItemAdded:
+                                bHasChangedStartDate = true;
+                                break;
+                            case SPEventReceiverType.ItemUpdated:
+                                if (_properties.ListItem["StartDate"] != null)
+                                {
+                                    DateTime dateBefore =
+                                        Convert.ToDateTime(_currentValues["StartDate"].ToString())
+                                            .ToUniversalTime()
+                                            .Date;
+                                    DateTime dateAfter =
+                                        Convert.ToDateTime(_properties.ListItem["StartDate"].ToString())
+                                            .ToUniversalTime()
+                                            .Date;
+
+                                    if (dateBefore != dateAfter) bHasChangedStartDate = true;
+                                }
+                                break;
+                        }
+                    }
+                    catch { }
+                }
+
+
+                if (ItemHasValue(_listItem, "DueDate"))
+                {
+                    try
+                    {
+                        dueDate = _listItem["DueDate"];
+
+                        switch (_properties.EventType)
+                        {
+                            case SPEventReceiverType.ItemAdded:
+                                bHasChangedDueDate = true;
+                                break;
+                            case SPEventReceiverType.ItemUpdated:
+                                if (_properties.ListItem["DueDate"] != null)
+                                {
+                                    DateTime dueDateBefore =
+                                        Convert.ToDateTime(_currentValues["DueDate"].ToString()).ToUniversalTime().Date;
+                                    DateTime dueDateAfter =
+                                        Convert.ToDateTime(_properties.ListItem["DueDate"].ToString())
+                                            .ToUniversalTime()
+                                            .Date;
+
+                                    if (dueDateBefore != dueDateAfter) bHasChangedDueDate = true;
+                                }
+                                break;
+                        }
+                    }
+                    catch { }
+                }
+
+                Guid siteId = _siteId;
+                Guid listId = _listItem.ParentList.ID;
+
+                if (!bHasChangedWork && !bHasChangedAssignedTo && !bHasChangedStartDate && !bHasChangedDueDate) return;
+
+                if (_myWorkReportData.ProcessAssignments(sWork.Replace("'", ""), sAssignedTo, startDate, dueDate,
+                    listId, siteId, _listItem.ID, _listItem.ParentList.Title)) return;
+
+                _myWorkReportData.LogStatus(string.Empty, string.Empty, "SaveWork() failed.",
+                    _myWorkReportData.GetError().Replace("'", ""), 2, 3, string.Empty);
+            }
+            catch (Exception ex)
+            {
+                _myWorkReportData.LogStatus(string.Empty, string.Empty,
+                    "SaveWork() failed. Web: " + _listItem.ParentList.ParentWeb.Title + ". List: " +
+                    _listItem.ParentList.Title + ". Item: " + _listItem.Title + ".", ex.Message.Replace("'", ""), 2, 3,
+                    string.Empty);
+            }
+        }
+
         /// <summary>
         ///     Updates the item.
         /// </summary>
@@ -243,304 +455,6 @@ namespace EPMLiveReportsAdmin
             InsertItem();
         }
 
-        private bool SaveWork()
-        {
-            bool blnWorkSaved = true;
-            bool bHasChangedWork = false;
-            bool bHasChangedAssignedTo = false;
-            bool bHasChangedStartDate = false;
-            bool bHasChangedDueDate = false;
-
-            string sErrMsg = string.Empty;
-            try
-            {
-                //List item "work" fields -- START 
-                string sWork = string.Empty;
-                string sAssignedTo = string.Empty;
-                object StartDate = DBNull.Value;
-                object DueDate = DBNull.Value;
-
-                if (ItemHasValue(_listItem, "Work"))
-                {
-                    try
-                    {
-                        if (_properties.EventType == SPEventReceiverType.ItemAdded)
-                        {
-                            sWork = _listItem["Work"].ToString();
-                            bHasChangedWork = true;
-                        }
-                        else if (_properties.EventType == SPEventReceiverType.ItemUpdated)
-                        {
-                            if (_properties.ListItem["Work"] != null &&
-                                Math.Round(Convert.ToDouble(currentValues["Work"].ToString()), 2) !=
-                                Math.Round(Convert.ToDouble(_properties.ListItem["Work"].ToString()), 2))
-                            {
-                                sWork = _listItem["Work"].ToString();
-                                bHasChangedWork = true;
-                            }
-                        }
-                    }
-                    catch { }
-                }
-                else
-                {
-                    //blnWorkSaved = false;
-                    sErrMsg = "Work";
-                }
-
-                if (ItemHasValue(_listItem, "AssignedTo"))
-                {
-                    try
-                    {
-                        sAssignedTo = ReportData.AddLookUpFieldValues(_listItem["AssignedTo"].ToString(), "id");
-
-                        if (_properties.EventType == SPEventReceiverType.ItemAdded)
-                        {
-                            bHasChangedAssignedTo = true;
-                        }
-                        else if (_properties.EventType == SPEventReceiverType.ItemUpdated)
-                        {
-                            if (_properties.ListItem["AssignedTo"] != null)
-                            {
-                                var lIdsBefore =
-                                    new List<int>(
-                                        currentValues["AssignedToIDs"].ToString()
-                                            .TrimEnd(',')
-                                            .Split(',')
-                                            .Select(int.Parse));
-                                var lookupValAfter =
-                                    new SPFieldLookupValueCollection(_properties.ListItem["AssignedTo"].ToString());
-                                var lIdsAfter = new List<int>();
-                                foreach (SPFieldLookupValue v in lookupValAfter)
-                                {
-                                    lIdsAfter.Add(v.LookupId);
-                                }
-
-                                bool execute = false;
-                                if (lIdsBefore.Count() != lIdsAfter.Count())
-                                {
-                                    execute = true;
-                                }
-                                else
-                                {
-                                    bool containsAll = true;
-
-                                    foreach (int i in lIdsBefore)
-                                    {
-                                        if (!lIdsAfter.Contains(i))
-                                        {
-                                            containsAll = false;
-                                            break;
-                                        }
-                                    }
-
-                                    if (!containsAll)
-                                    {
-                                        execute = true;
-                                    }
-                                }
-
-                                if (execute)
-                                {
-                                    bHasChangedAssignedTo = true;
-                                }
-                            }
-                        }
-                    }
-                    catch { }
-                }
-                else
-                {
-                    //blnWorkSaved = false;
-                    if (sErrMsg == string.Empty)
-                    {
-                        sErrMsg = "Assigned To";
-                    }
-                    else
-                    {
-                        sErrMsg = sErrMsg + "," + "Assigned To";
-                    }
-                }
-
-
-                if (ItemHasValue(_listItem, "StartDate"))
-                {
-                    try
-                    {
-                        StartDate = _listItem["StartDate"];
-
-                        if (_properties.EventType == SPEventReceiverType.ItemAdded)
-                        {
-                            bHasChangedStartDate = true;
-                        }
-                        else if (_properties.EventType == SPEventReceiverType.ItemUpdated)
-                        {
-                            if (_properties.ListItem["StartDate"] != null)
-                            {
-                                DateTime dateBefore =
-                                    Convert.ToDateTime(currentValues["StartDate"].ToString()).ToUniversalTime().Date;
-                                DateTime dateAfter =
-                                    Convert.ToDateTime(_properties.ListItem["StartDate"].ToString())
-                                        .ToUniversalTime()
-                                        .Date;
-
-                                if (dateBefore != dateAfter)
-                                {
-                                    bHasChangedStartDate = true;
-                                }
-                            }
-                        }
-                    }
-                    catch { }
-                }
-                else
-                {
-                    //blnWorkSaved = false;
-                    if (sErrMsg == string.Empty)
-                    {
-                        sErrMsg = "Start Date";
-                    }
-                    else
-                    {
-                        sErrMsg = sErrMsg + "," + "Start Date (Start)";
-                    }
-                }
-
-
-                if (ItemHasValue(_listItem, "DueDate"))
-                {
-                    try
-                    {
-                        DueDate = _listItem["DueDate"];
-
-                        if (_properties.EventType == SPEventReceiverType.ItemAdded)
-                        {
-                            bHasChangedDueDate = true;
-                        }
-                        else if (_properties.EventType == SPEventReceiverType.ItemUpdated)
-                        {
-                            if (_properties.ListItem["DueDate"] != null)
-                            {
-                                DateTime dueDateBefore =
-                                    Convert.ToDateTime(currentValues["DueDate"].ToString()).ToUniversalTime().Date;
-                                DateTime dueDateAfter =
-                                    Convert.ToDateTime(_properties.ListItem["DueDate"].ToString())
-                                        .ToUniversalTime()
-                                        .Date;
-
-                                if (dueDateBefore != dueDateAfter)
-                                {
-                                    bHasChangedDueDate = true;
-                                }
-                            }
-                        }
-                    }
-                    catch { }
-                }
-                else
-                {
-                    //blnWorkSaved = false;
-                    if (sErrMsg == string.Empty)
-                    {
-                        sErrMsg = "Due Date";
-                    }
-                    else
-                    {
-                        sErrMsg = sErrMsg + "," + "Due Date (Finish)";
-                    }
-                }
-
-                Guid SiteID = _siteId;
-                Guid ListID = _listItem.ParentList.ID;
-                Guid ItemID = _listItem.UniqueId;
-                // "work" fields -- END
-
-                if (bHasChangedWork || bHasChangedAssignedTo || bHasChangedStartDate || bHasChangedDueDate)
-                {
-                    if (
-                        !_myWorkReportData.ProcessAssignments(sWork.Replace("'", ""), sAssignedTo, StartDate, DueDate,
-                            ListID, SiteID, _listItem.ID, _listItem.ParentList.Title))
-                        // - CAT.NET false-positive: All single quotes are escaped/removed.
-                    {
-                        _myWorkReportData.LogStatus(string.Empty, string.Empty, "SaveWork() failed.",
-                            _myWorkReportData.GetError().Replace("'", ""), 2, 3, string.Empty);
-                            // - CAT.NET false-positive: All single quotes are escaped/removed.
-                        blnWorkSaved = false;
-                    }
-                }
-                // Missing required values
-                // NOTE: we are assuming that values are missing because user did not want to submit work item
-            }
-            catch (Exception ex)
-            {
-                _myWorkReportData.LogStatus(string.Empty, string.Empty,
-                    "SaveWork() failed. Web: " + _listItem.ParentList.ParentWeb.Title + ". List: " +
-                    _listItem.ParentList.Title + ". Item: " + _listItem.Title + ".", ex.Message.Replace("'", ""), 2, 3,
-                    string.Empty); // - CAT.NET false-positive: All single quotes are escaped/removed.
-                blnWorkSaved = false;
-            }
-            return blnWorkSaved;
-        }
-
-        private bool ItemHasValue(SPListItem i, string fldName)
-        {
-            string result = string.Empty;
-            try
-            {
-                result = i[fldName].ToString();
-            }
-            catch { }
-
-            return !string.IsNullOrEmpty(result);
-        }
-
-        private Dictionary<string, object> GetItemFieldValueFromDB(string listId, string itemId)
-        {
-            var res = new Dictionary<string, object>();
-            DataTable dt =
-                _myWorkReportData.ExecuteSql("SELECT * FROM LSTMyWork WHERE [ListId] = '" + listId + "' AND [ItemId] = " +
-                                             itemId + " AND [AssignedToID] != -99");
-
-            var sAssignedToID = new object();
-            var sWork = new object();
-            var sStartDate = new object();
-            var sDueDate = new object();
-
-            try
-            {
-                res.Add("AssignedToIDs", dt.Rows[0]["AssignedToID"]);
-                res.Add("Work", dt.Rows[0]["Work"]);
-                res.Add("StartDate", dt.Rows[0]["StartDate"]);
-                res.Add("DueDate", dt.Rows[0]["DueDate"]);
-            }
-            catch { }
-
-            if (dt.Rows.Count > 1)
-            {
-                string sIds = "";
-                foreach (DataRow r in dt.Rows)
-                {
-                    sIds += (r["AssignedToID"] + ",");
-                }
-                res["AssignedToIDs"] = sIds;
-
-                double sum = 0;
-                foreach (DataRow r in dt.Rows)
-                {
-                    double n = 0;
-                    try
-                    {
-                        n = Convert.ToDouble(r["Work"].ToString());
-                    }
-                    catch { }
-                    sum += n;
-                }
-                res["Work"] = sum.ToString();
-            }
-
-            return res;
-        }
-
-        #endregion Methods
+        #endregion Methods 
     }
 }
