@@ -1771,11 +1771,24 @@ namespace EPMLiveCore
         #endregion
         #region Platform
 
-        public static string GetWorkspaceCenterGridData(string data, SPWeb oWeb)
+        public static string InstallPlatformIntegration(string data, SPWeb oWeb)
         {
             try
             {
                 return Response.Success(PlatformIntegration.InstallIntegration(data, oWeb));
+
+            }
+            catch (APIException ex)
+            {
+                return Response.Failure(ex.ExceptionNumber, string.Format("Error: {0}", ex.Message));
+            }
+        }
+
+        public static string RemovePlatformIntegration(string data, SPWeb oWeb)
+        {
+            try
+            {
+                return Response.Success(PlatformIntegration.RemoveIntegration(data, oWeb));
 
             }
             catch (APIException ex)
