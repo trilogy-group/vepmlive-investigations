@@ -149,7 +149,7 @@
 .epm-nav-sub .epm-nav-icon {
   margin-left: 5px;
   position: relative;
-  top: -3.5px;
+  top: -7px;
 }
 .epm-nav-sub .epm-nav-dragger {
   background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABcAAAA/CAYAAAAL1VP7AAAAkklEQVRYw+3RIQ7DQAxE0YmUWEu9xNz3Ku8RVjlAtEcI7/0aunJISUMqq7zqDPyy0Zu23m+yiMQZsbb2AICsZdt632WREmeMtbX7Z5vdXVQrjuMp11PWsrl7ed+VrM2qNcxMAMR1kLVsqnWYWQEwvrXf20RQghKUoAQlKEEJSlCCEpSgBCUoQQlKUIISlKB/A/oC07C7ok5v51YAAAAASUVORK5CYII=') /*../../../images/dragger.png*/;
@@ -161,7 +161,7 @@
   width: 8px;
   visibility: hidden;
   position: relative;
-  top: -3px;
+  top: -7px;
 }
 .epm-nav-sub .epm-nav-drag-placeholder {
   border: 1px dashed #0090ca;
@@ -187,7 +187,6 @@
   position: relative;
   left: 0px;
   top: 0px;
-  top: .1em\9;
 }
 .epm-nav-sub .epm-app-btn {
   padding-left: 6px;
@@ -326,7 +325,6 @@
 .epm-nav-sub li.epm-nav-node.epm-nav-trans a {
   width: 145px !important;
   position: relative;
-  top: 1px;
 }
 .epm-nav-sub li.epm-nav-button {
   background: #F5F5F5;
