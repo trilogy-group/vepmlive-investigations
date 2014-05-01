@@ -537,8 +537,7 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
         mainActionBar.attr('border-bottom', "1px solid #eeeeee");
 
         for (var index in cfgs) {
-            if (!cfgs.hasOwnProperty(j))
-                continue;
+
             var blockContents = cfgs[index];
             if (blockContents["placement"] == "left") {
                 buildLeftBlockHTML(mainActionBar, blockContents);
@@ -557,8 +556,7 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
             mainActionBar_LeftUl.addClass('nav navbar-nav');
             var contents = blockContents["content"];
             for (var i in contents) {
-                if (!contents.hasOwnProperty(j))
-                    continue;
+
                 var cfg = contents[i];
                 var cType = cfg['controlType'];
 
@@ -582,8 +580,7 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
             var contents = blockContents["content"];
 
             for (var i in contents) {
-                if (!contents.hasOwnProperty(j))
-                    continue;
+
                 var cfg = contents[i];
                 var cType = cfg['controlType'];
 
@@ -958,8 +955,7 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
                 divGroupingWrapperEmptyText.text('');
             }
             for (var i in groups) {
-                if (!groups.hasOwnProperty(j))
-                    continue;
+
 
                 var group = groups[i];
 
@@ -1265,8 +1261,7 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
             var sections = cfg['sections'];
             setUlChoices(controlId, sections);
             for (var i in sections) {
-                if (!sections.hasOwnProperty(j))
-                    continue;
+
                 var section = sections[i];
 
                 //add section heading
@@ -1381,8 +1376,7 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
         //START HELPER
         function attachEvents(element, aEvents) {
             for (var i in aEvents) {
-                if (!aEvents.hasOwnProperty(j))
-                    continue;
+
                 var evt = aEvents[i];
                 element.bind(evt['eventName'], evt['function']);
             }
@@ -1390,8 +1384,7 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
 
         function attachProps(element, aProps) {
             for (var p in aProps) {
-                if (!aProps.hasOwnProperty(j))
-                    continue;
+
                 var propVal = aProps[p];
                 element.attr(p, propVal);
             }
