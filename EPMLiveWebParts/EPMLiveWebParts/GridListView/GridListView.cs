@@ -1312,7 +1312,7 @@ namespace EPMLiveWebParts
                         ribbonExtensions.LoadXml(Properties.Resources.gridribbon.Replace("#language#", language));
                         ribbon.RegisterDataExtension(ribbonExtensions.FirstChild, "Ribbon.List.ViewFormat.Controls._children");
 
-                        if(newGridMode == "gantt")
+                        //if(newGridMode == "gantt")
                         {
                             ribbonExtensions = new XmlDocument();
                             ribbonExtensions.LoadXml(Properties.Resources.txtGanttRibbon.Replace("#language#", language));
