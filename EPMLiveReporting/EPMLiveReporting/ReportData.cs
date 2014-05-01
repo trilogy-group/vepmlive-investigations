@@ -2320,7 +2320,7 @@ namespace EPMLiveReportsAdmin
         }
 
         public DataTable MyWorkListItemsDataTable(Guid timerjobguid, string sTableName, SPWeb spWeb, string sListName,
-            ArrayList _arrayListDefaultColumns, out bool error, out string errMsg)
+            ArrayList _arrayListDefaultColumns, Guid listId, out bool error, out string errMsg)
         {
             var dtItems = new DataTable();
             DataTable dtColumns = GetListColumns("My Work");
@@ -2640,7 +2640,8 @@ namespace EPMLiveReportsAdmin
                             item["AssignedTo"] = spFieldUserValueCollection;
                         }
 
-                        if (ListReportsWork(sTableName))
+                        string tableName = _DAO.GetTableName(listId);
+                        if (ListReportsWork(tableName))
                         {
                             _DAO.SaveWork(item);
                         }

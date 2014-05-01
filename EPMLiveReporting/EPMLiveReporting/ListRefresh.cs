@@ -297,7 +297,7 @@ namespace EPMLiveReportsAdmin
                                         _siteID = _web.ID;
                                         bool error;
                                         string sErrMsg;
-                                        AddItems_MyWork(timerjobguid, list.Title, out error, out sErrMsg);
+                                        AddItems_MyWork(timerjobguid, list.Title, list.ID, out error, out sErrMsg);
                                         if (error)
                                         {
                                             DataRow[] dr = dt.Select("ListName='" + list.Title + "'");
@@ -485,7 +485,7 @@ namespace EPMLiveReportsAdmin
                                             _siteID = _web.ID;
                                             bool bError;
                                             string sErr;
-                                            AddItems_MyWork(timerjobguid, spList.Title, out bError, out sErr);
+                                            AddItems_MyWork(timerjobguid, spList.Title, spList.ID, out bError, out sErr);
                                             if (bError)
                                             {
                                                 DataRow[] dr = dt.Select("ListName='" + spList.Title + "'");
@@ -697,13 +697,15 @@ namespace EPMLiveReportsAdmin
             _dsLists.Tables.Add(dtList);
         }
 
-        private void AddItems_MyWork(Guid timerjobguid, string sListName, out bool error, out string sErrMsg)
+        private void AddItems_MyWork(Guid timerjobguid, string sListName, Guid listId, out bool error, out string sErrMsg)
         {
             //init. list datatable
             DataTable dtList = _DAO.MyWorkListItemsDataTable(timerjobguid, _sTableName, _web, sListName,
-                _arrayListdefaultColumns, out error, out sErrMsg);
+                _arrayListdefaultColumns, listId, out error, out sErrMsg);
+
             //Assign sql tablename to list
             dtList.TableName = _sTableName;
+
             //add list to _dsMyWorkLists 
             _dsMyWorkLists.Tables.Add(dtList);
         }

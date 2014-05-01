@@ -2341,99 +2341,54 @@ namespace EPMLiveReportsAdmin
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
-        public bool SaveWork(SPListItem item)
+        public bool SaveWork(SPListItem item, bool forceAdd = true)
         {
             bool blnWorkSaved = true;
             bool hasWork = false, hasAssignedTo = false, hasStartDate = false, hasDueDate = false;
-            string sErrMsg = string.Empty;
+
             try
             {
-                //List item "work" fields -- START 
-                string sWork = string.Empty;
-                string sAssignedTo = string.Empty;
-                object StartDate = DBNull.Value;
-                object DueDate = DBNull.Value;
+                string sWork = item["Work"].ToString();
+
                 if (ItemHasValue(item, "Work"))
                 {
-                    sWork = item["Work"].ToString();
                     hasWork = true;
                 }
-                else
-                {
-                    //blnWorkSaved = false;
-                    sErrMsg = "Work";
-                }
+
+                string sAssignedTo = ReportData.AddLookUpFieldValues(item["AssignedTo"].ToString(), "id");
+
                 if (ItemHasValue(item, "AssignedTo"))
                 {
-                    sAssignedTo = ReportData.AddLookUpFieldValues(item["AssignedTo"].ToString(), "id");
                     hasAssignedTo = true;
                 }
-                else
-                {
-                    //blnWorkSaved = false;
-                    if (sErrMsg == string.Empty)
-                    {
-                        sErrMsg = "Assigned To";
-                    }
-                    else
-                    {
-                        sErrMsg = sErrMsg + "," + "Assigned To";
-                    }
-                }
+
+                object startDate = DateTime.Parse(item["StartDate"].ToString());
 
                 if (ItemHasValue(item, "StartDate"))
                 {
                     try
                     {
-                        StartDate = DateTime.Parse(item["StartDate"].ToString());
                         hasStartDate = true;
                     }
                     catch (Exception ex) { }
                 }
-                else
-                {
-                    //blnWorkSaved = false;
-                    if (sErrMsg == string.Empty)
-                    {
-                        sErrMsg = "Start Date";
-                    }
-                    else
-                    {
-                        sErrMsg = sErrMsg + "," + "Start Date (Start)";
-                    }
-                }
+
+                object dueDate = DateTime.Parse(item["DueDate"].ToString());
 
                 if (ItemHasValue(item, "DueDate"))
                 {
                     try
                     {
-                        DueDate = DateTime.Parse(item["DueDate"].ToString());
                         hasDueDate = true;
                     }
                     catch (Exception ex) { }
                 }
-                else
-                {
-                    //blnWorkSaved = false;
-                    if (sErrMsg == string.Empty)
-                    {
-                        sErrMsg = "Due Date";
-                    }
-                    else
-                    {
-                        sErrMsg = sErrMsg + "," + "Due Date (Finish)";
-                    }
-                }
 
-                Guid ListID = item.ParentList.ID;
-                Guid ItemID = item.UniqueId;
-                // "work" fields -- END
+                Guid listId = item.ParentList.ID;
 
-                //Save/Process "work" (a.k.a. assignment) fields
-                if (blnWorkSaved && hasWork && hasAssignedTo && hasStartDate && hasDueDate)
+                if (forceAdd || (hasWork && hasAssignedTo && hasStartDate && hasDueDate))
                 {
-                    if (
-                        !ProcessAssignments(sWork, sAssignedTo, StartDate, DueDate, ListID, _siteID, item.ID,
+                    if (!ProcessAssignments(sWork, sAssignedTo, startDate, dueDate, listId, _siteID, item.ID,
                             item.ParentList.Title))
                     {
                         LogStatus(string.Empty, string.Empty, "SaveWork() failed.", SqlError.Replace("'", ""), 2, 3,
@@ -2450,6 +2405,7 @@ namespace EPMLiveReportsAdmin
                     string.Empty); // - CAT.NET false-positive: All single quotes are escaped/removed.
                 blnWorkSaved = false;
             }
+
             return blnWorkSaved;
         }
 
