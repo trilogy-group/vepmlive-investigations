@@ -136,7 +136,7 @@ function ProcessApprovals(gridid, status) {
                 }
             }
             else {
-                alert("Error: " + response.Result.Errors);
+                alert(response.Result.Error['#text']);
             }
             HideMessage(grid.id);
         });
