@@ -295,6 +295,8 @@
   padding-left: 6px;
   width: 125px;
   display: inline-block;
+  height: 23px;
+  line-height: 23px;
   color: #666666;
   font-family: 'Open Sans Regular', sans-serif;
   font-weight: 300;
