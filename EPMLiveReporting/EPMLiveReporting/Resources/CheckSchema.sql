@@ -327,7 +327,7 @@ BEGIN
 		SELECT ROW_NUMBER() OVER (ORDER BY ThreadLastActivityOn DESC) AS RowNum,
 			ThreadId, ThreadTitle, ThreadUrl, ThreadKind, ThreadLastActivityOn, ThreadFirstActivityOn, WebId, WebTitle, WebUrl, ListId, 
 			ListName, ListIcon, ItemId, TotalActivities, TotalComments
-			FROM    (SELECT	dbo.SS_Threads.Id AS ThreadId, dbo.SS_Threads.Title AS ThreadTitle, dbo.SS_Threads.URL AS ThreadUrl, 
+			FROM    (SELECT	DISTINCT dbo.SS_Threads.Id AS ThreadId, dbo.SS_Threads.Title AS ThreadTitle, dbo.SS_Threads.URL AS ThreadUrl, 
 							dbo.SS_Threads.Kind AS ThreadKind, dbo.SS_Threads.LastActivityDateTime AS ThreadLastActivityOn, 
 							dbo.SS_Threads.FirstActivityDateTime AS ThreadFirstActivityOn, dbo.SS_Threads.WebId, dbo.RPTWeb.WebTitle, 
 							dbo.RPTWeb.WebUrl, dbo.SS_Threads.ListId, dbo.RPTList.ListName, dbo.ReportListIds.ListIcon AS ListIcon, 
