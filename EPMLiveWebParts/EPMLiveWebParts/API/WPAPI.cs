@@ -231,6 +231,7 @@ namespace EPMLiveWebParts
             SPListItem li = list.GetItemById(itemid);
 
             oWeb.AllowUnsafeUpdates = true;
+
             foreach (XmlNode nd in DocIn.FirstChild.SelectNodes("//Field"))
             {
                 SPField oField = null;
@@ -241,12 +242,15 @@ namespace EPMLiveWebParts
                 catch { }
                 if (oField != null)
                 {
+
+                    string sFieldValue = System.Web.HttpUtility.UrlDecode(nd.InnerText);
+
                     switch (oField.Type)
                     {
                         case SPFieldType.User:
                             if (nd.InnerText != "")
                             {
-                                string[] sUVals = nd.InnerText.Split(';');
+                                string[] sUVals = sFieldValue.Split(';');
                                 SPFieldUserValueCollection uvc = new SPFieldUserValueCollection();
                                 foreach (string sVal in sUVals)
                                 {
@@ -259,7 +263,7 @@ namespace EPMLiveWebParts
                                 li[oField.Id] = null;
                             break;
                         case SPFieldType.Lookup:
-                            string[] sVals = nd.InnerText.Split(';');
+                            string[] sVals = sFieldValue.Split(';');
                             SPFieldLookupValueCollection lvc = new SPFieldLookupValueCollection();
                             foreach (string sVal in sVals)
                             {
@@ -269,13 +273,13 @@ namespace EPMLiveWebParts
                             li[oField.Id] = lvc;
                             break;
                         case SPFieldType.MultiChoice:
-                            li[oField.Id] = nd.InnerText.Replace(";", ";#");
+                            li[oField.Id] = sFieldValue.Replace(";", ";#");
                             break;
                         case SPFieldType.Currency:
                             if (nd.InnerText == "")
                                 li[oField.Id] = null;
                             else
-                                li[oField.Id] = nd.InnerText;
+                                li[oField.Id] = sFieldValue;
                             break;
                         case SPFieldType.Number:
                             SPFieldNumber fNum = (SPFieldNumber)oField;
@@ -283,7 +287,7 @@ namespace EPMLiveWebParts
                             {
                                 try
                                 {
-                                    li[oField.Id] = float.Parse(nd.InnerText) / 100;
+                                    li[oField.Id] = float.Parse(sFieldValue) / 100;
                                 }
                                 catch { li[oField.Id] = null; }
                             }
@@ -292,17 +296,17 @@ namespace EPMLiveWebParts
                                 if (nd.InnerText == "")
                                     li[oField.Id] = null;
                                 else
-                                    li[oField.Id] = nd.InnerText;
+                                    li[oField.Id] = sFieldValue;
                             }
                             break;
                         case SPFieldType.DateTime:
                             if (nd.InnerText == "")
                                 li[oField.Id] = null;
                             else
-                                li[oField.Id] = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddMilliseconds(double.Parse(nd.InnerText));
+                                li[oField.Id] = new DateTime(1970, 1, 1, 0, 0, 0, 0).AddMilliseconds(double.Parse(sFieldValue));
                             break;
                         default:
-                            li[oField.Id] = nd.InnerText;
+                            li[oField.Id] = sFieldValue;
                             break;
                     }
                 }

@@ -539,7 +539,7 @@ function StopEditGridRow(grid, row) {
 
             for (var col in grid.Cols) {
                 if (grid.GetAttribute(row, col, "CanEdit") == "1" && col != "G") {
-                    Values += "<Field Name=\"" + col + "\">" + grid.GetValue(row, col) + "</Field>";
+                    Values += "<Field Name=\"" + col + "\">" + escape(grid.GetValue(row, col)) + "</Field>";
                 }
 
                 cols += "," + col;
