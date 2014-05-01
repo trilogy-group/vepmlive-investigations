@@ -23,7 +23,11 @@
         }
     </SharePoint:StyleBlock>
 <![endif]-->
-        
+
+<!--[if IE 9]>  
+    <link href='/_layouts/15/epmlive/stylesheets/uplandv5.master.min.css?v=<%= EPMLiveVersion %>' rel='stylesheet' type='text/css'>
+<![endif]-->      
+
 <!--[if !IE]><!-->
     <SharePoint:StyleBlock runat="server">
         .epm-nav-icon {
