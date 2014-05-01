@@ -2105,7 +2105,7 @@ function registerEpmLiveResourceGridScript() {
                                                     ]
                                                 },
                                                 {
-                                                    'iconClass': 'icon-download-6 icon-dropdown',
+                                                    'iconClass': 'icon-upload-6 icon-dropdown',
                                                     'text': 'Export Excel',
                                                     'events': [
                                                         {
@@ -2118,7 +2118,7 @@ function registerEpmLiveResourceGridScript() {
                                                     ]
                                                 },
                                                 {
-                                                    'iconClass': 'icon-upload-6 icon-dropdown',
+                                                    'iconClass': 'icon-download-6 icon-dropdown',
                                                     'text': 'Import Excel',
                                                     'events': [
                                                         {
