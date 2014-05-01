@@ -141,7 +141,7 @@
 
                 ExecuteOrDelayUntilScriptLoaded(loadMyWorkGrid, 'EPMLive.js');
 
-                TGSetEvent("OnReady", "<%=WebPartId %>", MyWorkOnReady);
+                TGSetEvent("OnLoaded", "<%=WebPartId %>", MyWorkOnLoaded);
             });
         </SharePoint:ScriptBlock>
 

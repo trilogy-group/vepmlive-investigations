@@ -192,7 +192,6 @@ function MyWorkOnReady(grid, start) {
         TGSetEvent("OnClickOutside", grid.id, MyWorkOnClickOutside);
         TGSetEvent("OnAfterValueChanged", grid.id, MyWorkOnAfterValueChanged);
         TGSetEvent("OnGetHtmlValue", grid.id, MyWorkOnGetHtmlValue);
-        TGSetEvent("OnLoaded", grid.id, MyWorkOnLoaded);
         TGSetEvent("OnColumnsChanged", grid.id, MyWorkOnColumnsChanged);
         TGSetEvent("OnGetColor", grid.id, MyWorkOnGetColor);
         TGSetEvent("OnGroup", grid.id, MyWorkOnGroup);
@@ -500,6 +499,9 @@ function MyWorkOnGetHtmlValue(grid, row, col, val) {
 
 function MyWorkOnLoaded(grid) {
     if (grid.id === window.allWorkGridId) {
+
+        TGSetEvent("OnReady", grid.id, MyWorkOnReady);
+
         var maxHeight = window.mwWebPartHeight;
 
         if (maxHeight === 0) {
