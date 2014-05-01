@@ -2930,8 +2930,13 @@
         return false;
     }
     ResPlanAnalyzer.prototype.GridsOnRenderFinish = function (grid) {
+        if (grid.id == "g_1") {
+            this.flashGridView("g_1", false);
+        }
+
         if (grid.id == "bottomg_1") {
             this.TotGrid = grid;
+            this.flashGridView("bottomg_1", false);
             if (this.refreshIconsInTotGrid != null)
                 window.setTimeout(HandleRerenderDelegate, 400);
         }
@@ -5658,6 +5663,22 @@
                     this.flashRibbonSelect('idAnalyzerTab_FromPeriod');
                     this.flashRibbonSelect('idAnalyzerTab_ToPeriod');
                 }
+                else {
+
+                    var periods = this.selectedView.g_1.RightCols.split(",");
+                    var spVal = periods[0].substr(periods[0].indexOf('P') + 1, periods[0].indexOf('C') - 1);
+                    var fpVal = periods[periods.length - 1].substr(periods[periods.length - 1].indexOf('P') + 1, periods[periods.length - 1].indexOf('C') - 1);
+                    this.startPeriod = spVal;
+                    this.finishPeriod = fpVal - 1;
+                    document.getElementById("idAnalyzerTab_FromPeriod").selectedIndex = this.startPeriod;
+                    document.getElementById("idAnalyzerTab_ToPeriod").selectedIndex = this.finishPeriod;
+                    this.flashRibbonSelect('idAnalyzerTab_FromPeriod');
+                    this.flashRibbonSelect('idAnalyzerTab_ToPeriod');
+                    if (Grids["g_1"])
+                        this.flashGridView("g_1", false);
+                    if (Grids["bottomg_1"])
+                        this.flashGridView("bottomg_1", false);
+                }
             } catch (e) {
             }
 
@@ -5690,7 +5711,7 @@
         if (oldguid == newguid && selindex == null)
             return;
 
-        if (this.selectedView != null) {
+        if (this.selectedView != null && this.selectedView.ViewSettings.PerInc == "1") {
             this.FilterDifferent = false;
 
 
