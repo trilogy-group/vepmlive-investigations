@@ -200,10 +200,10 @@ BEGIN
 		CONSTRAINT [PK_SS_Threads] PRIMARY KEY CLUSTERED ([Id] ASC)
 	);
 
-	ALTER TABLE dbo.SS_Threads ALTER COLUMN Title NVARCHAR(MAX) NOT NULL;
-
 	EXECUTE sp_addextendedproperty @name = N'MS_Description', @value = N'Workspace = 0, List = 1, List Item = 2', @level0type = N'SCHEMA', @level0name = N'dbo', @level1type = N'TABLE', @level1name = N'SS_Threads', @level2type = N'COLUMN', @level2name = N'Kind';
 END
+
+ALTER TABLE dbo.SS_Threads ALTER COLUMN Title NVARCHAR(MAX) NOT NULL
 
 ---------------TABLE: SS_ThreadUsers----------------------
 
