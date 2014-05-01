@@ -357,7 +357,6 @@ namespace EPMLiveCore.SocialEngine.Modules
             ActivityManager activityManager = args.ActivityManager;
 
             var webId = (Guid) data["WebId"];
-
             var activityDateTime = (DateTime) data["ActivityTime"];
 
             Thread thread = threadManager.SaveThread(new Thread
@@ -426,8 +425,28 @@ namespace EPMLiveCore.SocialEngine.Modules
             ActivityManager activityManager = args.ActivityManager;
 
             Thread thread = threadManager.GetThread((Guid) data["WebId"], (Guid) data["ListId"], (int) data["Id"]);
-            thread.Title = (string) data["Title"];
-            thread.Url = (string) data["URL"];
+
+            if (thread == null)
+            {
+                var webId = (Guid) data["WebId"];
+                var activityDateTime = (DateTime) data["ActivityTime"];
+
+                thread = new Thread
+                {
+                    Title = (string) data["Title"],
+                    Url = (string) data["URL"],
+                    Kind = ObjectKind.ListItem,
+                    FirstActivityDateTime = activityDateTime,
+                    WebId = webId,
+                    ListId = (Guid) data["ListId"],
+                    ItemId = (int) data["Id"]
+                };
+            }
+            else
+            {
+                thread.Title = (string) data["Title"];
+                thread.Url = (string) data["URL"];
+            }
 
             threadManager.SaveThread(thread);
 

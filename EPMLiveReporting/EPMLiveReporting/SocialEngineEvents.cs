@@ -10,9 +10,9 @@ namespace EPMLiveReportsAdmin
 {
     internal static class SocialEngineEvents
     {
-		#region Methods (6) 
+        #region Methods (7) 
 
-		// Public Methods (3) 
+        // Public Methods (3) 
 
         public static void ItemAdded(SPItemEventProperties properties)
         {
@@ -23,14 +23,14 @@ namespace EPMLiveReportsAdmin
                 var data = new Dictionary<string, object>
                 {
                     {"Id", properties.ListItemId},
-                    {"Title", properties.ListItem.Title},
+                    {"Title", GetTitle(properties)},
                     {"URL", properties.List.Forms[PAGETYPE.PAGE_DISPLAYFORM].Url + "?ID=" + properties.ListItemId},
                     {"ListTitle", properties.ListTitle},
                     {"ListId", properties.ListId},
                     {"WebId", properties.Web.ID},
                     {"SiteId", properties.SiteId},
                     {"UserId", new SPFieldUserValue(properties.Web, (string) properties.ListItem["Author"]).LookupId},
-                    {"ActivityTime",properties.ListItem["Created"]}
+                    {"ActivityTime", properties.ListItem["Created"]}
                 };
 
                 GetAssignedToUsers(properties, data);
@@ -50,7 +50,7 @@ namespace EPMLiveReportsAdmin
                 var data = new Dictionary<string, object>
                 {
                     {"Id", properties.ListItemId},
-                    {"Title", properties.ListItem.Title},
+                    {"Title", GetTitle(properties)},
                     {"URL", properties.List.Forms[PAGETYPE.PAGE_DISPLAYFORM].Url + "?ID=" + properties.ListItemId},
                     {"ListTitle", properties.ListTitle},
                     {"ListId", properties.ListId},
@@ -76,7 +76,7 @@ namespace EPMLiveReportsAdmin
                 var data = new Dictionary<string, object>
                 {
                     {"Id", properties.ListItemId},
-                    {"Title", properties.ListItem.Title},
+                    {"Title", GetTitle(properties)},
                     {"URL", properties.List.Forms[PAGETYPE.PAGE_DISPLAYFORM].Url + "?ID=" + properties.ListItemId},
                     {"ListTitle", properties.ListTitle},
                     {"ListId", properties.ListId},
@@ -93,7 +93,8 @@ namespace EPMLiveReportsAdmin
             }
             catch { }
         }
-		// Private Methods (3) 
+
+        // Private Methods (4) 
 
         private static void GetAssignedToUsers(SPItemEventProperties properties, Dictionary<string, object> data)
         {
@@ -152,6 +153,13 @@ namespace EPMLiveReportsAdmin
             data.Add("AssociatedListItems", string.Join(",", list.Distinct().ToArray()));
         }
 
+        private static string GetTitle(SPItemEventProperties properties)
+        {
+            return properties.List.BaseType == SPBaseType.DocumentLibrary
+                ? properties.ListItem.File.Name
+                : properties.ListItem.Title;
+        }
+
         private static bool InTransaction(SPItemEventProperties properties)
         {
             Guid? transaction = SocialEngineProxy.GetTransaction(properties.Web.ID, properties.ListId,
@@ -165,6 +173,6 @@ namespace EPMLiveReportsAdmin
             return true;
         }
 
-		#endregion Methods 
+        #endregion Methods 
     }
 }

@@ -813,13 +813,15 @@
                 var _handleCreationAction = function(result, target, listInfo) {
                     if (result === 1) {
                         $.ajax({
-                            url: _spPageContextInfo.webAbsoluteUrl + "/_api/web/lists/getbyid('" + listInfo.id + "')/Items?$select=ID,Title,Created&$orderby=Created desc&$top=1",
+                            url: _spPageContextInfo.webAbsoluteUrl + "/_api/web/lists/getbyid('" + listInfo.id + "')/Items?$select=ID,Title,Created,FileLeafRef&$orderby=Created desc&$top=1",
                             type: 'GET',
                             headers: { accept: 'application/json;odata=verbose' },
                         }).then(function(response) {
                             if (!response || !response.d || !response.d.results || !response.d.results.length) return;
                             
                             var item = response.d.results[0];
+
+                            var title = item.__metadata.type === 'SP.Data.DocumentsItem' ? item.FileLeafRef : item.Title;
 
                             var data = {
                                 lists: [{
@@ -845,7 +847,7 @@
                                     kind: 'ListItem',
                                     lastActivityOn: item.Created,
                                     listId: listInfo.id,
-                                    title: item.Title,
+                                    title: title,
                                     totalActivities: 1,
                                     totalComments: 0,
                                     url: window.epmLive.currentWebUrl + '/_layouts/15/epmlive/redirectionproxy.aspx?action=view&webid=' + window.epmLive.currentWebId + '&listid=' + listInfo.id + '&id=' + item.ID,
