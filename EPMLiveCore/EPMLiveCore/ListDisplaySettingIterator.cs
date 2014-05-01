@@ -674,8 +674,17 @@ namespace EPMLiveCore
                                 if (f.Type == SPFieldType.User)
                                     fname = f.InternalName + "_" + f.Id.ToString() + "_$ClientPeoplePicker";
                                 else if (f.TypeAsString == "ResourcePermissions" || f.TypeAsString == "ResourceLevels")
-                                    fname = parentControl.Controls[13].ClientID;
-                                else if(f.InternalName == "Status")
+                                {
+                                    if (base.ControlMode == SPControlMode.Display)
+                                    {
+                                        fname = parentControl.Controls[13].ClientID;
+                                    }
+                                    else
+                                    {
+                                        fname = parentControl.Controls[9].Controls[0].Controls[0].Controls[1].ClientID;
+                                    }
+                                }
+                                else if (f.InternalName == "Status")
                                     fname = f.InternalName + "_" + f.Id.ToString() + "_$DropDownChoice";
                                     
                                 dControls.Add(field.InternalName, fname);
@@ -855,7 +864,6 @@ namespace EPMLiveCore
                                 {
                                     try
                                     {
-
                                         writer.WriteLine(" try{document.getElementById('" + dControls["Permissions"] + "').parentNode.parentNode.parentNode.style.display='none';}catch(e){}");
                                     }
                                     catch { }
