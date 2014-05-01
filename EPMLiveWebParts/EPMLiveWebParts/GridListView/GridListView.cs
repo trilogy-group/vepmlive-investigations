@@ -2665,6 +2665,7 @@ namespace EPMLiveWebParts
                     {
                         'controlId': 'btnSearch',
                         'controlType': 'button',
+                        'toolTip': 'search',
                         'iconClass': 'icon-search-3',
                         'title': 'none',
                         'events': [
@@ -2678,6 +2679,7 @@ namespace EPMLiveWebParts
                     {
                         'controlId': 'btnFilter',
                         'controlType': 'button',
+                        'toolTip': 'toggle filters',
                         'iconClass': 'icon-filter',
                         'title': 'none',
                         'events': [
@@ -2691,7 +2693,8 @@ namespace EPMLiveWebParts
                     {
                         'controlId': 'btnDefaultSort',
                         'controlType': 'button',
-                        'iconClass': 'icon-sort',
+                        'toolTip': 'default sort',
+                        'iconClass': 'icon-menu-2',
                         'title': 'none',
                         'events': [
                             {
@@ -2703,6 +2706,7 @@ namespace EPMLiveWebParts
                     //group by fields
                     {
                         'controlType': 'groupByFields',
+                        'toolTip': 'manage grouping',
                         'availableGroups': '" + AllGroupFields + @"',
                         
                         'groups': [" + sGroups + @"],
@@ -2712,6 +2716,7 @@ namespace EPMLiveWebParts
                     {
                         'controlId': 'msColumns',
                         'controlType': 'multiselect',
+                        'toolTip': 'select columns',
                         'title': '',
                         'value': '',
                         'iconClass': 'icon-insert-template',
@@ -2796,6 +2801,7 @@ namespace EPMLiveWebParts
                     {
                         'controlId': 'btnSettings',
                         'controlType': 'button',
+                        'toolTip': 'list settings',
                         'iconClass': 'icon-cog-2 ',
                         'title': 'none',
                         'events': [
