@@ -67,7 +67,7 @@ namespace EPMLiveWebParts.Layouts.epmlive
             var valid = false;
             try
             {
-                _srs2006 = new ReportingService2006 {UseDefaultCredentials = true};
+                _srs2006 = new ReportingService2006 { UseDefaultCredentials = true };
                 var username = "";
                 var password = "";
                 var chrono = SPContext.Current.Site.WebApplication.GetChild<ReportAuth>("ReportAuth");
@@ -77,10 +77,10 @@ namespace EPMLiveWebParts.Layouts.epmlive
                     password = CoreFunctions.Decrypt(chrono.Password, "KgtH(@C*&@Dhflosdf9f#&f");
                 }
 
-                if (!bool.Parse(EPMLiveCore.CoreFunctions.getWebAppSetting(SPContext.Current.Site.WebApplication.Id,"ReportsUseIntegrated")))
+                if (!bool.Parse(EPMLiveCore.CoreFunctions.getWebAppSetting(SPContext.Current.Site.WebApplication.Id, "ReportsUseIntegrated")))
                     return valid;
 
-                _srs2006 = new ReportingService2006 {UseDefaultCredentials = true};
+                _srs2006 = new ReportingService2006 { UseDefaultCredentials = true };
                 var rptWs = _reportingServicesUrl + "/ReportService2006.asmx";
                 _srs2006.Url = rptWs;
 
@@ -119,36 +119,38 @@ namespace EPMLiveWebParts.Layouts.epmlive
         {
 
             var parameters = "";
-
             if (!SetupSSRS())
             {
                 return parameters;
             }
 
             var parametersSSRS2006 = _srs2006.GetReportParameters(url, null, null, null);
-
-            foreach (var rp in parametersSSRS2006)
+            using (SPSite spSite = new SPSite(url))
             {
-                if (rp.Prompt != "") continue;
-                
-                switch (rp.Name)
+                SPWeb spWeb = spSite.OpenWeb();
+                foreach (var rp in parametersSSRS2006)
                 {
-                    case "URL":
-                        parameters += "&rp:URL=" + HttpUtility.UrlEncode(SPContext.Current.Web.ServerRelativeUrl);
-                        break;
-                    case "SiteId":
-                        parameters += "&rp:SiteId=" + SPContext.Current.Site.ID;
-                        break;
-                    case "WebId":
-                        parameters += "&rp:WebId=" + SPContext.Current.Web.ID;
-                        break;
-                    case "UserId":
-                        parameters += "&rp:UserId=" + SPContext.Current.Web.CurrentUser.ID;
-                        break;
-                    case "Username":
-                        parameters += "&rp:Username=" + HttpContext.Current.User.Identity.Name;
-                        break;
+                    if (rp.Prompt != "") continue;
+                    switch (rp.Name)
+                    {
+                        case "URL":
+                            parameters += "&rp:URL=" + HttpUtility.UrlEncode(spWeb.ServerRelativeUrl);
+                            break;
+                        case "SiteId":
+                            parameters += "&rp:SiteId=" + spWeb.Site.ID;
+                            break;
+                        case "WebId":
+                            parameters += "&rp:WebId=" + spWeb.ID;
+                            break;
+                        case "UserId":
+                            parameters += "&rp:UserId=" + spWeb.CurrentUser.ID;
+                            break;
+                        case "Username":
+                            parameters += "&rp:Username=" + HttpContext.Current.User.Identity.Name;
+                            break;
+                    }
                 }
+
             }
 
             return parameters;

@@ -148,7 +148,7 @@ namespace EPMLiveReportsAdmin.API
                             stringBuilder.AppendFormat("&rp:URL={0}", HttpUtility.UrlEncode(Web.ServerRelativeUrl));
                             break;
                         case "SiteId":
-                            stringBuilder.AppendFormat("&rp:SiteId={0}", Web.ID);
+                            stringBuilder.AppendFormat("&rp:SiteId={0}", Web.Site.ID);
                             break;
                         case "WebId":
                             stringBuilder.AppendFormat("&rp:WebId={0}", Web.ID);
