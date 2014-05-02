@@ -2801,7 +2801,7 @@ namespace EPMLiveWebParts
                     {
                         'controlId': 'btnSettings',
                         'controlType': 'button',
-                        'toolTip': 'list settings',
+                        'toolTip': 'settings',
                         'iconClass': 'icon-cog-2 ',
                         'title': 'none',
                         'events': [
