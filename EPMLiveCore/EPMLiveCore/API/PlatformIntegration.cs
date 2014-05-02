@@ -23,7 +23,7 @@ namespace EPMLiveCore.API
                     SPList list = null;
                     try
                     {
-                        list = web.Lists[doc.FirstChild.Attributes["List"].Value];
+                        list = web.Lists[new Guid(doc.FirstChild.Attributes["List"].Value)];
                     }
                     catch { }
                     if (list != null)
@@ -63,39 +63,37 @@ namespace EPMLiveCore.API
 
                         SPSecurity.RunWithElevatedPrivileges(delegate()
                         {
-                            try
-                            {
-                                SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(web.Site.WebApplication.Id));
-                                cn.Open();
 
-                                SqlCommand cmd = new SqlCommand("DELETE FROM PLATFORMINTEGRATIONS where PlatformIntegrationId=@id", cn);
-                                cmd.Parameters.AddWithValue("@id", doc.FirstChild.Attributes["IntID"].Value);
-                                cmd.ExecuteNonQuery();
+                            SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(web.Site.WebApplication.Id));
+                            cn.Open();
 
-                                cmd = new SqlCommand("INSERT INTO PLATFORMINTEGRATIONS (PlatformIntegrationId,ListId,IntegrationKey,IntegrationUrl) VALUES (@id,@listid,@key,@url)", cn);
-                                cmd.Parameters.AddWithValue("@id", doc.FirstChild.Attributes["IntID"].Value);
-                                cmd.Parameters.AddWithValue("@listid", doc.FirstChild.Attributes["List"].Value);
-                                cmd.Parameters.AddWithValue("@url", doc.FirstChild.Attributes["APIUrl"].Value);
-                                cmd.Parameters.AddWithValue("@key", doc.FirstChild.Attributes["IntKey"].Value);
-                                cmd.ExecuteNonQuery();
+                            SqlCommand cmd = new SqlCommand("DELETE FROM PLATFORMINTEGRATIONS where PlatformIntegrationId=@id", cn);
+                            cmd.Parameters.AddWithValue("@id", doc.FirstChild.Attributes["IntID"].Value);
+                            cmd.ExecuteNonQuery();
 
-                                cn.Close();
-                            }
-                            catch { }
+                            cmd = new SqlCommand("INSERT INTO PLATFORMINTEGRATIONS (PlatformIntegrationId,ListId,IntegrationKey,IntegrationUrl) VALUES (@id,@listid,@key,@url)", cn);
+                            cmd.Parameters.AddWithValue("@id", doc.FirstChild.Attributes["IntID"].Value);
+                            cmd.Parameters.AddWithValue("@listid", doc.FirstChild.Attributes["List"].Value);
+                            cmd.Parameters.AddWithValue("@url", doc.FirstChild.Attributes["APIUrl"].Value);
+                            cmd.Parameters.AddWithValue("@key", doc.FirstChild.Attributes["IntKey"].Value);
+                            cmd.ExecuteNonQuery();
+
+                            cn.Close();
+
                         });
 
                     }
                     else
                     {
-                        throw new Exception("List not found");
+                        throw new APIException(500002, "List not found");
                     }
                 }
                 else
-                    throw new Exception("User does not have access to modify lists");
+                    throw new APIException(500001, "User does not have access to modify lists");
             }
             catch (Exception ex)
             {
-                throw new Exception("General Error: " + ex.Message);
+                throw new APIException(500000, "General Error: " + ex.Message);
             }
             return "";
         }
