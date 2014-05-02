@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text.RegularExpressions;
 using System.Web;
 using EPMLiveCore;
 using Microsoft.SharePoint;
@@ -151,7 +152,12 @@ namespace EPMLiveWebParts.Layouts.epmlive
 
                 if (string.IsNullOrEmpty(redirectUrl)) return;
 
-                if (noDlg) redirectUrl = redirectUrl.ToLower().Replace("isdlg=1", string.Empty).Replace("isdlg=0", string.Empty);
+                if (noDlg)
+                {
+                    redirectUrl = Regex.Replace(redirectUrl, "isdlg=1", string.Empty, RegexOptions.IgnoreCase);
+                    redirectUrl = Regex.Replace(redirectUrl, "isdlg=0", string.Empty, RegexOptions.IgnoreCase);
+                }
+
                 if (redirectUrl.EndsWith("?")) redirectUrl = redirectUrl.Replace("?", string.Empty);
 
                 Response.Redirect(redirectUrl);
