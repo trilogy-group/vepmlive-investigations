@@ -718,6 +718,11 @@
                 function registerLinkEvents() {
                     var addTooltip = function () {
                         $('li.epm-nav-node').find('a').each(function () {
+                            if (window.epmLiveNavigation.stopAddingTooltips) {
+                                window.epmLiveNavigation.stopAddingTooltips = false;
+                                return false;
+                            }
+
                             var $a = $(this);
 
                             if (!$a.attr('title')) {
@@ -760,6 +765,8 @@
                     });
 
                     $('#epm-nav-top li').click(function () {
+                        window.epmLiveNavigation.stopAddingTooltips = true;
+
                         window.setTimeout(function() {
                             addTooltip();
                         }, 1000);
