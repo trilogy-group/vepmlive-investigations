@@ -749,7 +749,10 @@ function GanttScrollTo(gridid) {
     var grid = Grids["GanttGrid" + gridid];
     var row = grid.FRow;
     if (row != null) {
-        var sDate = grid.GetValue(row, "StartDate")
+
+        var GanttStartField = eval("mygrid" + gridid + ".GanttStart");
+
+        var sDate = grid.GetValue(row, GanttStartField)
         if (sDate != "") {
             var date = new Date(sDate);
             grid.ScrollToDate(date, "left");

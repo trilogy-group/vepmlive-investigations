@@ -824,6 +824,8 @@ namespace EPMLiveWebParts
         Control ActionMenu;
         Control SettingMenu;
 
+        private string GanttStart = "";
+
         public GridListView()
         {
             boolUseDefaults = true;
@@ -3414,6 +3416,8 @@ namespace EPMLiveWebParts
             output.WriteLine("mygrid" + sFullGridId + " = new Object();");
             output.WriteLine("mygrid" + sFullGridId + ".RibbonBehavior='" + gSettings.RibbonBehavior + "';");
             output.WriteLine("mygrid" + sFullGridId + ".GridHeight=" + sGridHeight + ";");
+            output.WriteLine("mygrid" + sFullGridId + ".GanttStart='" + GanttStart + "';");
+            
             if (bHasSearchResults)
             {
                 output.WriteLine("mygrid" + sFullGridId + ".Searcher='" + sSearcher + "';");
@@ -5260,6 +5264,7 @@ namespace EPMLiveWebParts
                 //if (props.Length >= 12)
                 {
                     appendParam("Start", gSettings.StartDate);
+                    GanttStart = gSettings.StartDate;
                     appendParam("Finish", gSettings.DueDate);
                     appendParam("Percent", gSettings.Progress);
 
@@ -5331,6 +5336,7 @@ namespace EPMLiveWebParts
                 //data = PropList + "\n" + PropView + "\n" + PropWBS + "\n" + PropExecView + "\n" + PropLinkType + "\n" + PropRollupList.Replace(",", "|").Replace("\r\n", ",") + "\n" + Page.Request["FilterField1"] + "\n" + Page.Request["FilterValue1"] + "\n" + PropRollupSites.Replace("\r\n", ",") + "\n" + sFullGridId + "\n" + getAdditionalGroupings() + "\n" + PropExpand + "\n" + PropPerformance.Value + "\n" + PropUsePopup + "\n" + PropHideNewButton;
 
                 appendParam("Start", PropStart);
+                GanttStart = PropStart;
                 appendParam("Finish", PropFinish);
                 appendParam("Percent", PropProgress);
                 appendParam("WBS", PropWBS);
