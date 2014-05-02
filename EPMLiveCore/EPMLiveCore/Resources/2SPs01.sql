@@ -330,7 +330,7 @@ exec(@createoralter + ' PROCEDURE SPIntSetProperty
 
 @intlistid uniqueidentifier,
 @property varchar(255),
-@value varchar(255)
+@value varchar(MAX)
 
 AS
 BEGIN
