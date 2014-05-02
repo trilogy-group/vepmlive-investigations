@@ -221,7 +221,10 @@ function MyWorkOnReady(grid, start) {
         MyWorkGrid.configureToolbar();
 
         MyWorkGrid.newItemIndicator = window.mwNewItemIndicator;
-        MyWorkGrid.loadRibbon();
+        var url = (window.location.href + '').toLowerCase();
+        if (url.indexOf('mywork.aspx') !== -1 || url.indexOf('my%20work.aspx') !== -1) {
+            window.setTimeout(function () { MyWorkGrid.loadRibbon(); }, 1500);
+        }
     }
 };
 
