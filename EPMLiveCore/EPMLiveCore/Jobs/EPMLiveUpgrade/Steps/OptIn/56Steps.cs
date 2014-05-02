@@ -101,7 +101,8 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps.OptIn
                             {
                                 LogMessage("Enabling reporting", 3);
 
-                                ListCommands.MapListToReporting(list);
+                                if (!SocialEngine.Core.Utilities.IsIgnoredList(list.Title, list.ParentWeb))
+                                    ListCommands.MapListToReporting(list);
                             }
                             catch { }
                         }
@@ -119,7 +120,8 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps.OptIn
         #endregion
     }
 
-    [UpgradeStep(Version = EPMLiveVersion.V56, Order = 3.0, Description = "Scheduling Reporting Refresh", IsOptIn = true)]
+    [UpgradeStep(Version = EPMLiveVersion.V56, Order = 3.0, Description = "Scheduling Reporting Refresh", IsOptIn = true
+        )]
     internal class RunRefresh56 : UpgradeStep
     {
         #region Constructors (1) 
