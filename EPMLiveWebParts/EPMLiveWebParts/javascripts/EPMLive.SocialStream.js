@@ -281,7 +281,8 @@
                         commentActivity = true;
                     }
 
-                    thread.user = entityManager.getById(actionActivity.userId, data.users);
+                    var userId = thread.kind === 'StatusUpdate' ? thread.activities[0].userId : actionActivity.userId;
+                    thread.user = entityManager.getById(userId, data.users);
 
                     if (thread.kind === 'Workspace') {
                         thread.icon = 'icon-tree-2';
