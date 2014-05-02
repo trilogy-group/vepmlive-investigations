@@ -61,7 +61,7 @@ namespace EPMLiveCore
                     api.Url = url;
                     string ret = api.PostItemSimple(key, properties.ListItemId.ToString());
 
-                    if (ret != "Success")
+                    if (ret != "<Success/>")
                     {
                         SPSecurity.RunWithElevatedPrivileges(delegate()
                         {
