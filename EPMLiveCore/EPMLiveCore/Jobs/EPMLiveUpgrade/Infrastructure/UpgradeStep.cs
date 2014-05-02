@@ -68,12 +68,12 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Infrastructure
 
         #endregion Properties 
 
-        #region Methods (7) 
+        #region Methods (8) 
 
         // Public Methods (1) 
 
         public abstract bool Perform();
-        // Protected Methods (5) 
+        // Protected Methods (6) 
 
         protected string GetListInfo(SPList spList)
         {
@@ -113,7 +113,25 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Infrastructure
         protected void LogTitle(string message, int indentLevel)
         {
             AddLog(string.Format(@"{0}--- {1}{2}", new String('\t', indentLevel), message,
-                                 !string.IsNullOrEmpty(message) ? "." : string.Empty));
+                !string.IsNullOrEmpty(message) ? "." : string.Empty));
+        }
+
+        protected void ResetFeature(KeyValuePair<Guid, string> feature, SPSite spSite)
+        {
+            LogTitle("Feature: " + feature.Value, 2);
+
+            SPFeature spFeature = spSite.Features.FirstOrDefault(f => f.DefinitionId == feature.Key);
+
+            if (spFeature != null)
+            {
+                LogTitle("Deactivating . . ", 4);
+                spSite.Features.Remove(spFeature.DefinitionId);
+            }
+
+            LogTitle("Activating . . ", 4);
+            spSite.Features.Add(feature.Key);
+
+            LogMessage(string.Empty, MessageKind.SUCCESS, 3);
         }
 
         // Private Methods (1) 

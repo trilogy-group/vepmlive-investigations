@@ -1,14 +1,24 @@
 ﻿using System;
-using Microsoft.SharePoint;
-using Microsoft.SharePoint.WebControls;
+using System.Linq;
 using System.Xml;
+using EPMLiveCore.API;
+using Microsoft.SharePoint.WebControls;
 
 namespace EPMLiveCore.Layouts.epmlive.Upgraders
 {
     public partial class proxy : LayoutsPageBase
     {
+        #region Fields (3) 
+
+        private readonly string[] _optInUpgraderVersions = {"5.5.0", "5.6.0"};
         protected string data = "";
         protected int jobtype = 0;
+
+        #endregion Fields 
+
+        #region Methods (4) 
+
+        // Protected Methods (1) 
 
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -16,9 +26,9 @@ namespace EPMLiveCore.Layouts.epmlive.Upgraders
 
             if (jobtype == 0) jobtype = 201;
 
-            if(jobtype != 0)
+            if (jobtype != 0)
             {
-                switch(Request["Action"])
+                switch (Request["Action"])
                 {
                     case "Start":
                         Start();
@@ -37,54 +47,60 @@ namespace EPMLiveCore.Layouts.epmlive.Upgraders
             }
         }
 
-        private void outputData(string status, string message, string percent)
-        {
-            data = "Status: \"" + status + "\", Message: \"" + message + "\", Percent: \"" + percent + "\"";
-        }
+        // Private Methods (3) 
 
         private void CheckStatus()
         {
-            XmlNode ndRes = API.Timer.GetTimerJobStatus(Web.Site.ID, Web.ID, jobtype, false);
+            XmlNode ndRes = Timer.GetTimerJobStatus(Web.Site.ID, Web.ID, jobtype, false);
 
             outputData(ndRes.Attributes["Status"].Value, ndRes.InnerText, ndRes.Attributes["PercentComplete"].Value);
+        }
+
+        private void outputData(string status, string message, string percent)
+        {
+            data = "Status: \"" + status + "\", Message: \"" + message + "\", Percent: \"" + percent + "\"";
         }
 
         private void Start()
         {
             try
             {
-                XmlNode ndRes = API.Timer.GetTimerJobStatus(Web.Site.ID, Web.ID, jobtype, false);
+                XmlNode ndRes = Timer.GetTimerJobStatus(Web.Site.ID, Web.ID, jobtype, false);
 
                 string status = ndRes.Attributes["Status"].Value;
 
-                if(status == "0" || status == "1")
+                if (status == "0" || status == "1")
                     outputData("Success", "", "0");
                 else
                 {
                     Guid jobuid;
 
-                    var version = Request["V"] ?? string.Empty;
+                    string version = Request["V"] ?? string.Empty;
 
-                    if (jobtype == 201 && version.Equals("5.5.0"))
+                    if (jobtype == 201 && _optInUpgraderVersions.Contains(version))
                     {
-                        jobuid = API.Timer.AddTimerJob(Web.Site.ID, Web.ID, "Opt-in Upgrader", jobtype, version, string.Empty, -1, 9, string.Empty);
+                        jobuid = Timer.AddTimerJob(Web.Site.ID, Web.ID, "Opt-in Upgrader", jobtype, version,
+                            string.Empty, -1, 9, string.Empty);
                     }
                     else
                     {
-                        jobuid = API.Timer.AddTimerJob(Web.Site.ID, Web.ID, "Upgrader", jobtype, Jobs.Upgrades.Steps.Utilities.GetJobName(version), "", -1, 9, "");   
+                        jobuid = Timer.AddTimerJob(Web.Site.ID, Web.ID, "Upgrader", jobtype,
+                            Jobs.Upgrades.Steps.Utilities.GetJobName(version), "", -1, 9, "");
                     }
 
-                    API.Timer.Enqueue(jobuid, 0, Web.Site);
+                    Timer.Enqueue(jobuid, 0, Web.Site);
 
                     outputData("Success", "", "0");
 
-                    data += ", jobuid: \"" + jobuid.ToString() + "\"";
+                    data += ", jobuid: \"" + jobuid + "\"";
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 outputData("Error", ex.Message, "0");
             }
         }
+
+        #endregion Methods 
     }
 }

@@ -763,11 +763,11 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps.OptIn
 
     [UpgradeStep(Version = EPMLiveVersion.V55, Order = 7.0, Description = "Scheduling Reporting Refresh", IsOptIn = true
         )]
-    internal class RefreshReporting : UpgradeStep
+    internal class RefreshReporting55 : UpgradeStep
     {
         #region Constructors (1) 
 
-        public RefreshReporting(SPWeb spWeb, bool isPfeSite) : base(spWeb, isPfeSite) { }
+        public RefreshReporting55(SPWeb spWeb, bool isPfeSite) : base(spWeb, isPfeSite) { }
 
         #endregion Constructors 
 

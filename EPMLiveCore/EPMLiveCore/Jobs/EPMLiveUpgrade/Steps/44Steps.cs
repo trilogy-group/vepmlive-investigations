@@ -17,13 +17,11 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
 
         #region Constructors (1) 
 
-        public MapPfeFields44(SPWeb spWeb, bool isPfeSite) : base(spWeb, isPfeSite)
-        {
-        }
+        public MapPfeFields44(SPWeb spWeb, bool isPfeSite) : base(spWeb, isPfeSite) { }
 
         #endregion Constructors 
 
-        #region Methods (2) 
+        #region Methods (3) 
 
         // Public Methods (1) 
 
@@ -88,7 +86,7 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
             return true;
         }
 
-        // Private Methods (1) 
+        // Private Methods (2) 
 
         private void MapField(SPList spList, SPWeb web, string internalName, string displayName, SPFieldType spFieldType,
             string propertyValue)
@@ -165,13 +163,11 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
 
         #region Constructors (1) 
 
-        public ResetFeatures44(SPWeb spWeb, bool isPfeSite) : base(spWeb, isPfeSite)
-        {
-        }
+        public ResetFeatures44(SPWeb spWeb, bool isPfeSite) : base(spWeb, isPfeSite) { }
 
         #endregion Constructors 
 
-        #region Methods (2) 
+        #region Methods (1) 
 
         // Public Methods (1) 
 
@@ -199,26 +195,6 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
             }
 
             return true;
-        }
-
-        // Private Methods (1) 
-
-        private void ResetFeature(KeyValuePair<Guid, string> feature, SPSite spSite)
-        {
-            LogTitle("Feature: " + feature.Value, 2);
-
-            SPFeature spFeature = spSite.Features.FirstOrDefault(f => f.DefinitionId == feature.Key);
-
-            if (spFeature != null)
-            {
-                LogTitle("Deactivating . . ", 4);
-                spSite.Features.Remove(spFeature.DefinitionId);
-            }
-
-            LogTitle("Activating . . ", 4);
-            spSite.Features.Add(feature.Key);
-
-            LogMessage(string.Empty, MessageKind.SUCCESS, 3);
         }
 
         #endregion Methods 

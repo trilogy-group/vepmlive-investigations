@@ -12,6 +12,9 @@ namespace EPMLiveCore.Infrastructure
         public static readonly Feature WEWebParts = new Feature(new Guid("b0af9b25-76d3-419d-9cfb-12e3b33fac2a"),
             "Work Engine Web Parts", Scope.Site);
 
+        public static readonly Feature SocialStream = new Feature(new Guid("501af70f-d734-4ee7-8673-1d841700cb77"),
+            "Social Stream", Scope.Site);
+
         #endregion Fields 
 
         #region Enums (1) 
