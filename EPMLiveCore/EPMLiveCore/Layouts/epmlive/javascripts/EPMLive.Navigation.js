@@ -762,7 +762,7 @@
                     $('#epm-nav-top li').click(function () {
                         window.setTimeout(function() {
                             addTooltip();
-                        }, 200);
+                        }, 1000);
                     });
 
                     addTooltip();
