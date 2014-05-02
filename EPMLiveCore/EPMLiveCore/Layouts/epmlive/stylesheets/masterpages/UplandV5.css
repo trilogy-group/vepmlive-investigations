@@ -742,7 +742,10 @@ button.toast-close-button {
     width: 100%;
 }
 .ms-webpart-titleText.ms-webpart-titleText, .ms-webpart-titleText > a {
-    color: #0090CA;
- border-bottom: 1px solid #EEEEEE;
- padding-bottom:10px;
+ color: #0090CA;
+}
+
+.ms-webpart-chrome .ms-webpart-titleText {
+    border-bottom: 1px solid #EEEEEE;
+    padding-bottom:10px;
 }
