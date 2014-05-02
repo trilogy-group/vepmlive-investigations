@@ -12,7 +12,7 @@
 	<Cfg Paging="2" AllPages="1" PageLength="10" MaxPages="20" NoPager="1" ChildParts="2" />
 	<Cfg BorderCursors="1" />
 	<Def>
-		<D Name="R" HoverCell="Color" HoverRow="Color" FocusCell="" FocusRow="Color" />
+		<D Name="R" HoverCell="Color" HoverRow="Color" FocusCell="" FocusRow="Color" MinWidth="250" Width="250" />
 		<D Name="R" TitleHtmlPrefixFormula="'&lt;img id=&quot;MWG_Processing_'+Row.id+'&quot; class=&quot;MWG_Processing&quot; src=&quot;/_layouts/epmlive/images/mywork/loading16.gif&quot;>&lt;/img>'"/>
 		<D Name="R" TitleLowerFormula="Row.Title?(Row.Title+'').toLowerCase():''"/>
 		<D Name="R" TitleClass="EPMLiveMyWorkTitle"/>
@@ -54,7 +54,7 @@
 		<C Name="Complete" Type="Bool" Width="20" OnClick="changeCompleteStatus(Grid,Row,Col); return true;" ClassFormula="calculateDueColor('Complete',Row)" CanFilter="0" CanGroup="0" CanHide="0" CanResize="0" CanSort="0" />
 		<C Name="CommentCount" Type="Html" Width="26" CanFilter="0" CanGroup="0" CanResize="0" CanSort="0" />
 		<C Name="Priority" Type="Html" Width="25" />
-		<C Name="Title" Type="Html" RelWidth="100" MinWidth="150" CanGroup="0" CanHide="0" Button="Html" ButtonText=" "/>
+		<C Name="Title" Type="Html" RelWidth="1" MinWidth="150" CanGroup="0" CanHide="0" Button="Html" ButtonText=" "/>
 	</LeftCols>
 	<Cols/>
 	<RightCols>

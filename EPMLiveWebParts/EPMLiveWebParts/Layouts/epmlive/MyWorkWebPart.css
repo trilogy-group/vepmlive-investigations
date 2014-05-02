@@ -320,3 +320,13 @@ li.mwg-smi {
 .EPMLiveMyWorkGroupPrefix { color: #777777; }
 
 .EPMLiveMyWorkGroupPostfix { font-weight: normal; }
+
+#EPMMyWorkGrid .GMRightSplitter {
+    border: none;
+    background: none;
+    width: 0;
+}
+
+#EPMMyWorkGrid .GMBodyRight {
+    border-left: none;
+}

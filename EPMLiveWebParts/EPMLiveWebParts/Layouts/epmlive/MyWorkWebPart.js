@@ -21,21 +21,9 @@ function confirmPageLeave(e) {
     }
 }
 
-function configureTitleCol(grid) {
-    if (grid.Cols["Title"]["RelWidth"] === 100) {
-        var width = grid.Cols['Title'].Width;
-
-        grid.Cols["Title"]["RelWidth"] = 0;
-        grid.SetWidth('Title', width - grid.Cols['Title'].Width);
-    }
-}
-
-function MyWorkOnDblClick(grid, row, col, x, y, event)
-{
+function MyWorkOnDblClick(grid, row, col, x, y, event) {
     EditGridRow(grid, row, col);
 }
-
-
 
 //Grids.OnDblClick = function(grid, row, col, x, y, event) {
 //    if (grid.id === window.allWorkGridId) {
@@ -514,6 +502,10 @@ function MyWorkOnLoaded(grid) {
         }
 
         grid.MaxVScroll = maxHeight;
+
+        if ($.browser.msie && location.href.toLowerCase().indexOf('mywork.aspx') === -1) {
+            $('#EPMMyWorkGrid').css('width', $(document.getElementsByName('_invisibleIfEmpty')[1]).width());
+        }
 
         var win = $(window);
 
@@ -1567,7 +1559,7 @@ var MyWorkGrid = {
                             }
                         }
 
-                        if (lwidth !== 0) {
+                        if (lwidth !== 0 && lcol !== 'Title') {
                             grid.SetWidth(lcol, lwidth);
                         }
                     } catch (e) {
@@ -1594,7 +1586,7 @@ var MyWorkGrid = {
                     } catch (e) {
                     }
 
-                    grid.MoveCol(ccol, 1, 1, 1);
+                    grid.MoveCol(ccol, 2, 1, 1);
                 }
             }
 
@@ -1682,15 +1674,11 @@ var MyWorkGrid = {
                 grid.DoGrouping(grouping[1]);
             }
 
-            grid.Cols["Title"]["RelWidth"] = 100;
-
             if (grid.TotalRowsInEditMode === undefined) {
                 grid.TotalRowsInEditMode = 0;
             } else if (grid.TotalRowsInEditMode > 0 && MyWorkGrid.getColWidth('Edit') === 25) {
                 grid.SetWidth('Edit', 25);
             }
-
-            grid.Cols['Title'].RelWidth = 1;
 
             MyWorkGrid.defaultViewId = viewId;
             MyWorkGrid.defaultView = view.name;
@@ -1705,8 +1693,6 @@ var MyWorkGrid = {
                     markRowCompleted(grid, row);
                 }
             }
-
-            configureTitleCol(grid);
 
             RefreshCommandUI();
 
