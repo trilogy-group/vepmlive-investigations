@@ -148,7 +148,7 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps.OptIn
         {
             try
             {
-                string result = UpgradeUtilities.ScheduleReportingRefresh(Web);
+                UpgradeUtilities.ScheduleReportingRefresh(Web);
                 LogMessage(null, MessageKind.SUCCESS, 1);
             }
             catch (Exception e)
