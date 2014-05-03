@@ -211,6 +211,10 @@ namespace EPMLiveCore.API
                 try
                 {
                     sVal = new SPFieldLookupValue(dataElement.Value).LookupId.ToString();
+                    if (sVal == "0")
+                    {
+                        sVal = "";
+                    }
                 }
                 catch { }
 
