@@ -64,47 +64,59 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps.OptIn
             {
                 using (var spSite = new SPSite(Web.Site.ID))
                 {
-                    foreach (SPWeb web in spSite.AllWebs)
+                    foreach (SPWeb spWeb in spSite.AllWebs)
                     {
-                        LogTitle(GetWebInfo(web), 1);
-
-                        for (int i = 0; i < web.Lists.Count; i++)
+                        using (SPWeb web = spSite.OpenWeb(spWeb.ID))
                         {
-                            SPList list = web.Lists[i];
-                            if (list.Hidden) continue;
+                            LogTitle(GetWebInfo(web), 1);
 
-                            LogTitle(GetListInfo(list), 2);
-
-                            var settings = new GridGanttSettings(list);
-
-                            try
+                            for (int i = 0; i < web.Lists.Count; i++)
                             {
-                                LogMessage("Enabling fancy forms", 3);
+                                SPList list = web.Lists[i];
+                                if (list.Hidden) continue;
 
-                                ListCommands.EnableFancyForms(list);
+                                LogTitle(GetListInfo(list), 2);
 
-                                settings.EnableFancyForms = true;
-                                settings.SaveSettings(list);
+                                var settings = new GridGanttSettings(list);
+
+                                try
+                                {
+                                    LogMessage("Enabling fancy forms", 3);
+
+                                    ListCommands.EnableFancyForms(list);
+
+                                    settings.EnableFancyForms = true;
+                                    settings.SaveSettings(list);
+                                }
+                                catch (Exception e)
+                                {
+                                    LogMessage(e.Message, MessageKind.FAILURE, 4);
+                                }
+
+                                try
+                                {
+                                    LogMessage("Configuring ribbon", 3);
+
+                                    settings.RibbonBehavior = list.Title.Equals("Resources") ? "2" : "1";
+                                    settings.SaveSettings(list);
+                                }
+                                catch (Exception e)
+                                {
+                                    LogMessage(e.Message, MessageKind.FAILURE, 4);
+                                }
+
+                                try
+                                {
+                                    LogMessage("Enabling reporting", 3);
+
+                                    if (!SocialEngine.Core.Utilities.IsIgnoredList(list.Title, list.ParentWeb))
+                                        ListCommands.MapListToReporting(list);
+                                }
+                                catch (Exception e)
+                                {
+                                    LogMessage(e.Message, MessageKind.FAILURE, 4);
+                                }
                             }
-                            catch { }
-
-                            try
-                            {
-                                LogMessage("Configuring ribbon", 3);
-
-                                settings.RibbonBehavior = list.Title.Equals("Resources") ? "2" : "1";
-                                settings.SaveSettings(list);
-                            }
-                            catch { }
-
-                            try
-                            {
-                                LogMessage("Enabling reporting", 3);
-
-                                if (!SocialEngine.Core.Utilities.IsIgnoredList(list.Title, list.ParentWeb))
-                                    ListCommands.MapListToReporting(list);
-                            }
-                            catch { }
                         }
                     }
                 }
@@ -136,7 +148,7 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps.OptIn
         {
             try
             {
-                UpgradeUtilities.ScheduleReportingRefresh(Web);
+                string result = UpgradeUtilities.ScheduleReportingRefresh(Web);
                 LogMessage(null, MessageKind.SUCCESS, 1);
             }
             catch (Exception e)

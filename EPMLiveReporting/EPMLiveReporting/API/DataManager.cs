@@ -174,7 +174,7 @@ namespace EPMLiveReportsAdmin.API
                         epmData.ExecuteNonQuery(epmData.GetEPMLiveConnection);
                     }
 
-                    if (timerJobId != Guid.Empty) CoreFunctions.enqueue(timerJobId, 0);
+                    if (timerJobId != Guid.Empty) CoreFunctions.enqueue(timerJobId, 0, Web.Site);
                 }
 
                 return "<RefreshAll><Data/></RefreshAll>";

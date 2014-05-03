@@ -471,73 +471,69 @@ namespace EPMLiveCore.API
 
         public static void EnableFancyForms(SPList list)
         {
-            try
+            SPSecurity.RunWithElevatedPrivileges(() =>
             {
-                SPSecurity.RunWithElevatedPrivileges(() =>
+                SPWeb web = list.ParentWeb;
+                web.AllowUnsafeUpdates = true;
+
+                bool isFancyFormWpExist = false;
+                var rootFolder = list.RootFolder;
+
+                var dispFormUrl = string.Format("{0}/{1}/DispForm.aspx", web.ServerRelativeUrl, rootFolder.Url);
+                var dispForm = web.GetFile(dispFormUrl);
+
+                SPLimitedWebPartManager wpm;
+
+                if (dispForm != null)
                 {
-                    SPWeb web = list.ParentWeb;
-                    web.AllowUnsafeUpdates = true;
-
-                    bool isFancyFormWpExist = false;
-                    var rootFolder = list.RootFolder;
-
-                    var dispFormUrl = string.Format("{0}/{1}/DispForm.aspx", web.ServerRelativeUrl, rootFolder.Url);
-                    var dispForm = web.GetFile(dispFormUrl);
-
-                    SPLimitedWebPartManager wpm;
-
-                    if (dispForm != null)
+                    //Delete webparts from existing list
+                    wpm = dispForm.GetLimitedWebPartManager(System.Web.UI.WebControls.WebParts.PersonalizationScope.Shared);
+                    if (wpm.WebParts != null)
                     {
-                        //Delete webparts from existing list
-                        wpm = dispForm.GetLimitedWebPartManager(System.Web.UI.WebControls.WebParts.PersonalizationScope.Shared);
-                        if (wpm.WebParts != null)
+                        for (int i = 0; i < wpm.WebParts.Count; i++)
                         {
-                            for (int i = 0; i < wpm.WebParts.Count; i++)
+                            try
                             {
-                                try
+                                if ((!string.IsNullOrEmpty(wpm.WebParts[i].Title)) && (wpm.WebParts[i].Title.Equals("Fancy Display Form", StringComparison.InvariantCultureIgnoreCase)) && !isFancyFormWpExist)
                                 {
-                                    if ((!string.IsNullOrEmpty(wpm.WebParts[i].Title)) && (wpm.WebParts[i].Title.Equals("Fancy Display Form", StringComparison.InvariantCultureIgnoreCase)) && !isFancyFormWpExist)
-                                    {
-                                        isFancyFormWpExist = true;
-                                        wpm.WebParts[i].AllowHide = false;
-                                        wpm.WebParts[i].Hidden = false;
-                                        wpm.SaveChanges(wpm.WebParts[i]);
-                                    }
-                                    else if (wpm.WebParts[i].ToString() == "Microsoft.SharePoint.WebPartPages.XsltListViewWebPart" ||
-                                            wpm.WebParts[i].ToString() == "Microsoft.SharePoint.WebPartPages.ListFormWebPart" ||
-                                            wpm.WebParts[i].ToString() == "Microsoft.SharePoint.WebPartPages.ListViewWebPart" ||
-                                            wpm.WebParts[i].ToString() == "Microsoft.SharePoint.WebPartPages.DataFormWebPart")
-                                    {
-                                        wpm.WebParts[i].AllowHide = true;
-                                        wpm.WebParts[i].Hidden = true;
-                                        wpm.SaveChanges(wpm.WebParts[i]);
-                                    }
+                                    isFancyFormWpExist = true;
+                                    wpm.WebParts[i].AllowHide = false;
+                                    wpm.WebParts[i].Hidden = false;
+                                    wpm.SaveChanges(wpm.WebParts[i]);
                                 }
-                                catch { }
+                                else if (wpm.WebParts[i].ToString() == "Microsoft.SharePoint.WebPartPages.XsltListViewWebPart" ||
+                                        wpm.WebParts[i].ToString() == "Microsoft.SharePoint.WebPartPages.ListFormWebPart" ||
+                                        wpm.WebParts[i].ToString() == "Microsoft.SharePoint.WebPartPages.ListViewWebPart" ||
+                                        wpm.WebParts[i].ToString() == "Microsoft.SharePoint.WebPartPages.DataFormWebPart")
+                                {
+                                    wpm.WebParts[i].AllowHide = true;
+                                    wpm.WebParts[i].Hidden = true;
+                                    wpm.SaveChanges(wpm.WebParts[i]);
+                                }
                             }
+                            catch { }
                         }
                     }
-                    else
-                    {
-                        dispForm = rootFolder.Files.Add(dispFormUrl, SPTemplateFileType.FormPage);
-                    }
+                }
+                else
+                {
+                    dispForm = rootFolder.Files.Add(dispFormUrl, SPTemplateFileType.FormPage);
+                }
 
-                    if (isFancyFormWpExist) return;
+                if (isFancyFormWpExist) return;
 
-                    wpm = dispForm.GetLimitedWebPartManager(System.Web.UI.WebControls.WebParts.PersonalizationScope.Shared);
+                wpm = dispForm.GetLimitedWebPartManager(System.Web.UI.WebControls.WebParts.PersonalizationScope.Shared);
 
-                    var fancyDispFormWebPart = new EPMLiveWebParts.FancyDisplayForm();
-                    fancyDispFormWebPart.Title = "Fancy Display Form";
-                    fancyDispFormWebPart.ChromeState = System.Web.UI.WebControls.WebParts.PartChromeState.Normal;
-                    fancyDispFormWebPart.ChromeType = System.Web.UI.WebControls.WebParts.PartChromeType.None;
-                    fancyDispFormWebPart.AllowHide = false;
-                    fancyDispFormWebPart.Hidden = false;
-                    fancyDispFormWebPart.Visible = true;
+                var fancyDispFormWebPart = new EPMLiveWebParts.FancyDisplayForm();
+                fancyDispFormWebPart.Title = "Fancy Display Form";
+                fancyDispFormWebPart.ChromeState = System.Web.UI.WebControls.WebParts.PartChromeState.Normal;
+                fancyDispFormWebPart.ChromeType = System.Web.UI.WebControls.WebParts.PartChromeType.None;
+                fancyDispFormWebPart.AllowHide = false;
+                fancyDispFormWebPart.Hidden = false;
+                fancyDispFormWebPart.Visible = true;
 
-                    wpm.AddWebPart(fancyDispFormWebPart, "Main", 0);
-                });
-            }
-            catch { }
+                wpm.AddWebPart(fancyDispFormWebPart, "Main", 0);
+            });
         }
     }
 }
