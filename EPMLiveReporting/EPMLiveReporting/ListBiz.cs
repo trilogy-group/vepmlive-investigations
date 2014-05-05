@@ -263,7 +263,11 @@ namespace EPMLiveReportsAdmin
                 });
             }
             Collection<string> automatic = AutomaticFields;
-            Collection<string> required = RequiredResourceFields;
+            Collection<string> required = new Collection<string>();
+            foreach (string s in RequiredResourceFields)
+            {
+                required.Add(s);
+            }
 
             var lb = new ListBiz();
             lb._siteId = siteId;
@@ -325,7 +329,7 @@ namespace EPMLiveReportsAdmin
                 }
                 catch { }
             }
-            lb._resourceList = (required.Count == 0);
+            lb._resourceList = (required.Count == 0 && RequiredResourceFields.Count > 0);
 
             //[Fix for:Issue - Resources list sqltable being rename to LST Resourcis in Report Model. Apparently, resources is a reserved word.] by xjh -- START
             string tableName;
