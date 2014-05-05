@@ -318,6 +318,10 @@ function GridOnGetHtmlValue(grid, row, col, val) {
                 val = val + "&nbsp;<a href=\"javascript:GridComments('" + grid.id + "','" + row.id + "');return false;\"><img src=\"/_layouts/15/epmlive/images/mywork/commentsnew-small.png\" border=\"0\"></a>";
             }
 
+
+            if (grid.GetValue(row, "wsurl") != "") {
+                val = val + "&nbsp;<a href=\"javascript:GridWorkspace('" + grid.id + "','" + row.id + "');return false;\"><img src=\"/_layouts/15/epmlive/images/itemworkspace.png\" border=\"0\"></a>";
+            }
             return val;
         }
     }
@@ -326,6 +330,19 @@ function GridOnGetHtmlValue(grid, row, col, val) {
             return "State";
     }
  }
+
+function GridWorkspace(gridid, rowid) {
+    var grid = Grids[gridid];
+    var row = grid.GetRowById(rowid);
+    CurrentGrid = grid;
+    CurrentRow = row;
+
+    gridid = GetGridId(grid);
+
+    var url = window.epmLiveNavigation.currentWebUrl + "/_layouts/epmlive/gridaction.aspx?action=workspace&webid=" + row.webid + "&listid=" + row.listid + "&ID=" + row.itemid + "&Source=" + escape(location.href);
+
+    location.href = url;
+}
 
 function GridComments(gridid, rowid) {
     var grid = Grids[gridid];

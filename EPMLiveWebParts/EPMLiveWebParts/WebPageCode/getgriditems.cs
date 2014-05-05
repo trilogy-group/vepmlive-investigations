@@ -2073,157 +2073,162 @@ namespace EPMLiveWebParts
                         }
                         else if (field.InternalName == "Title")
                         {
-                            if (hshColumnSelectFilter.Contains("Title"))
+                            if (bCleanValues)
+                                displayValue = val;
+                            else
                             {
-                                addFilterItems("Title", val);
-                            }
+                                if (hshColumnSelectFilter.Contains("Title"))
+                                {
+                                    addFilterItems("Title", val);
+                                }
 
-                            string url = "";
-                            switch (linktype)
-                            {
-                                case "view":
-                                    if (usePopup && !inEditMode)
-                                        url = "\" onclick=\"javascript:viewItem" + gridname + "(this,'view');return false;";
-                                    else
-                                        url = li.ParentList.Forms[PAGETYPE.PAGE_DISPLAYFORM].ServerRelativeUrl + "?ID=" + li.ID + "&Source=" + System.Web.HttpUtility.UrlEncode(Request["source"]);
-                                    break;
-                                case "edit":
-                                    if (usePopup && !inEditMode)
-                                        url = "\" onclick=\"javascript:viewItem" + gridname + "(this,'edit');return false;";
-                                    else
-                                        url = li.ParentList.Forms[PAGETYPE.PAGE_EDITFORM].ServerRelativeUrl + "?ID=" + li.ID + "&Source=" + System.Web.HttpUtility.UrlEncode(Request["source"]);
-                                    break;
-                                case null:
-                                case "":
-                                    if (fieldName == "LinkTitleNoMenu")
+                                string url = "";
+                                switch (linktype)
+                                {
+                                    case "view":
                                         if (usePopup && !inEditMode)
                                             url = "\" onclick=\"javascript:viewItem" + gridname + "(this,'view');return false;";
                                         else
                                             url = li.ParentList.Forms[PAGETYPE.PAGE_DISPLAYFORM].ServerRelativeUrl + "?ID=" + li.ID + "&Source=" + System.Web.HttpUtility.UrlEncode(Request["source"]);
-                                    else if (fieldName == "LinkTitle")
+                                        break;
+                                    case "edit":
                                         if (usePopup && !inEditMode)
                                             url = "\" onclick=\"javascript:viewItem" + gridname + "(this,'edit');return false;";
                                         else
                                             url = li.ParentList.Forms[PAGETYPE.PAGE_EDITFORM].ServerRelativeUrl + "?ID=" + li.ID + "&Source=" + System.Web.HttpUtility.UrlEncode(Request["source"]);
-                                    break;
-                                case "workspace":
-                                    url = li.ParentList.ParentWeb.ServerRelativeUrl + "/";
-                                    break;
-                                case "workplan":
-                                    url = li.ParentList.ParentWeb.ServerRelativeUrl + "/_layouts/epmlive/tasks.aspx?ID=" + li.ID;
-                                    break;
-                                case "planner":
-                                    string u = li.ParentList.ParentWeb.ServerRelativeUrl;
-                                    url = ((u == "/") ? "" : u) + "/_layouts/epmlive/workplanner.aspx?ID=" + li.ID + "&Source=" + System.Web.HttpUtility.UrlEncode(Request["source"]);
-                                    break;
-                                case "tasks":
-                                    SPList taskList = null;
+                                        break;
+                                    case null:
+                                    case "":
+                                        if (fieldName == "LinkTitleNoMenu")
+                                            if (usePopup && !inEditMode)
+                                                url = "\" onclick=\"javascript:viewItem" + gridname + "(this,'view');return false;";
+                                            else
+                                                url = li.ParentList.Forms[PAGETYPE.PAGE_DISPLAYFORM].ServerRelativeUrl + "?ID=" + li.ID + "&Source=" + System.Web.HttpUtility.UrlEncode(Request["source"]);
+                                        else if (fieldName == "LinkTitle")
+                                            if (usePopup && !inEditMode)
+                                                url = "\" onclick=\"javascript:viewItem" + gridname + "(this,'edit');return false;";
+                                            else
+                                                url = li.ParentList.Forms[PAGETYPE.PAGE_EDITFORM].ServerRelativeUrl + "?ID=" + li.ID + "&Source=" + System.Web.HttpUtility.UrlEncode(Request["source"]);
+                                        break;
+                                    case "workspace":
+                                        url = li.ParentList.ParentWeb.ServerRelativeUrl + "/";
+                                        break;
+                                    case "workplan":
+                                        url = li.ParentList.ParentWeb.ServerRelativeUrl + "/_layouts/epmlive/tasks.aspx?ID=" + li.ID;
+                                        break;
+                                    case "planner":
+                                        string u = li.ParentList.ParentWeb.ServerRelativeUrl;
+                                        url = ((u == "/") ? "" : u) + "/_layouts/epmlive/workplanner.aspx?ID=" + li.ID + "&Source=" + System.Web.HttpUtility.UrlEncode(Request["source"]);
+                                        break;
+                                    case "tasks":
+                                        SPList taskList = null;
+                                        try
+                                        {
+                                            taskList = li.ParentList.ParentWeb.Lists["Task Center"];
+                                        }
+                                        catch { }
+                                        if (taskList != null)
+                                        {
+                                            url = taskList.ParentWeb.ServerRelativeUrl + "/" + taskList.DefaultView.Url + "?FilterField1=Project&FilterValue1=" + System.Web.HttpUtility.UrlEncode(li.Title);
+                                        }
+                                        break;
+                                };
+
+                                if (url != "" && !inEditMode)
+                                {
+                                    displayValue = "<a href=\"" + url + "\">" + displayValue + "</a>";
                                     try
                                     {
-                                        taskList = li.ParentList.ParentWeb.Lists["Task Center"];
+                                        DateTime dtCreated = DateTime.Parse(li["Created"].ToString());
+                                        if (dtCreated.AddDays(2) > DateTime.Now)
+                                            displayValue += " <img src=\"/_layouts/" + li.Web.Language.ToString() + "/images/new.gif\">";
                                     }
                                     catch { }
-                                    if (taskList != null)
-                                    {
-                                        url = taskList.ParentWeb.ServerRelativeUrl + "/" + taskList.DefaultView.Url + "?FilterField1=Project&FilterValue1=" + System.Web.HttpUtility.UrlEncode(li.Title);
-                                    }
-                                    break;
-                            };
 
-                            if (url != "" && !inEditMode)
-                            {
-                                displayValue = "<a href=\"" + url + "\">" + displayValue + "</a>";
-                                try
-                                {
-                                    DateTime dtCreated = DateTime.Parse(li["Created"].ToString());
-                                    if (dtCreated.AddDays(2) > DateTime.Now)
-                                        displayValue += " <img src=\"/_layouts/" + li.Web.Language.ToString() + "/images/new.gif\">";
+
                                 }
-                                catch { }
-
-
-                            }
-                            else if (isTimesheet)
-                            {
-                                if (url != "")
-                                    displayValue = "<a href=\"" + url + "\">" + displayValue + "</a>";
-                                //url = "\" onclick=\"javascript:viewItem" + gridname + "(this,'view');return false;";
-                                //displayValue = "<a href=\"" + url + "\">" + displayValue + "</a>";
-                            }
-                            if (!inEditMode)
-                            {
-                                try
+                                else if (isTimesheet)
                                 {
-                                    string scomments = li["CommentCount"].ToString();
-                                    double comments = 0;
-                                    double.TryParse(scomments, out comments);
-                                    if (comments > 0)
+                                    if (url != "")
+                                        displayValue = "<a href=\"" + url + "\">" + displayValue + "</a>";
+                                    //url = "\" onclick=\"javascript:viewItem" + gridname + "(this,'view');return false;";
+                                    //displayValue = "<a href=\"" + url + "\">" + displayValue + "</a>";
+                                }
+                                if (!inEditMode)
+                                {
+                                    try
                                     {
-                                        if (list.Fields.ContainsFieldWithStaticName("Commenters") && list.Fields.ContainsFieldWithStaticName("CommentersRead"))
+                                        string scomments = li["CommentCount"].ToString();
+                                        double comments = 0;
+                                        double.TryParse(scomments, out comments);
+                                        if (comments > 0)
                                         {
-                                            ArrayList commenters = new ArrayList();
-                                            int authorid = 0;
-                                            try
+                                            if (list.Fields.ContainsFieldWithStaticName("Commenters") && list.Fields.ContainsFieldWithStaticName("CommentersRead"))
                                             {
-                                                commenters = new ArrayList(li[list.Fields.GetFieldByInternalName("Commenters").Id].ToString().Split(','));
-                                            }
-                                            catch { }
-                                            try
-                                            {
-                                                SPFieldUserValue uv = new SPFieldUserValue(li.ParentList.ParentWeb, li["Author"].ToString());
-                                                authorid = uv.LookupId;
-                                            }
-                                            catch { }
-                                            bool isAssigned = false;
-                                            try
-                                            {
-                                                SPFieldUserValueCollection uvc = new SPFieldUserValueCollection(li.ParentList.ParentWeb, li["AssignedTo"].ToString());
-                                                foreach (SPFieldUserValue uv in uvc)
-                                                {
-                                                    if (uv.LookupId == li.ParentList.ParentWeb.CurrentUser.ID)
-                                                    {
-                                                        isAssigned = true;
-                                                        break;
-                                                    }
-                                                }
-                                            }
-                                            catch { }
-                                            if (commenters.Contains(li.ParentList.ParentWeb.CurrentUser.ID.ToString()) || authorid == li.ParentList.ParentWeb.CurrentUser.ID || isAssigned)
-                                            {
-                                                ArrayList commentersread = new ArrayList();
+                                                ArrayList commenters = new ArrayList();
+                                                int authorid = 0;
                                                 try
                                                 {
-                                                    commentersread = new ArrayList(li[list.Fields.GetFieldByInternalName("CommentersRead").Id].ToString().Split(','));
+                                                    commenters = new ArrayList(li[list.Fields.GetFieldByInternalName("Commenters").Id].ToString().Split(','));
                                                 }
                                                 catch { }
-                                                if (commentersread.Contains(li.ParentList.ParentWeb.CurrentUser.ID.ToString()))
+                                                try
                                                 {
-                                                    displayValue += " &nbsp;<a href=\"javascript:viewItem" + gridname + "(this,'comments');return false;\"><img src=\"/_layouts/epmlive/images/mywork/comment-small.png\" border=\"0\"></a>";
+                                                    SPFieldUserValue uv = new SPFieldUserValue(li.ParentList.ParentWeb, li["Author"].ToString());
+                                                    authorid = uv.LookupId;
+                                                }
+                                                catch { }
+                                                bool isAssigned = false;
+                                                try
+                                                {
+                                                    SPFieldUserValueCollection uvc = new SPFieldUserValueCollection(li.ParentList.ParentWeb, li["AssignedTo"].ToString());
+                                                    foreach (SPFieldUserValue uv in uvc)
+                                                    {
+                                                        if (uv.LookupId == li.ParentList.ParentWeb.CurrentUser.ID)
+                                                        {
+                                                            isAssigned = true;
+                                                            break;
+                                                        }
+                                                    }
+                                                }
+                                                catch { }
+                                                if (commenters.Contains(li.ParentList.ParentWeb.CurrentUser.ID.ToString()) || authorid == li.ParentList.ParentWeb.CurrentUser.ID || isAssigned)
+                                                {
+                                                    ArrayList commentersread = new ArrayList();
+                                                    try
+                                                    {
+                                                        commentersread = new ArrayList(li[list.Fields.GetFieldByInternalName("CommentersRead").Id].ToString().Split(','));
+                                                    }
+                                                    catch { }
+                                                    if (commentersread.Contains(li.ParentList.ParentWeb.CurrentUser.ID.ToString()))
+                                                    {
+                                                        displayValue += " &nbsp;<a href=\"javascript:viewItem" + gridname + "(this,'comments');return false;\"><img src=\"/_layouts/epmlive/images/mywork/comment-small.png\" border=\"0\"></a>";
+                                                    }
+                                                    else
+                                                    {
+                                                        displayValue += " &nbsp;<a href=\"javascript:viewItem" + gridname + "(this,'comments');return false;\"><img src=\"/_layouts/epmlive/images/mywork/commentsnew-small.png\" border=\"0\"></a>";
+                                                    }
                                                 }
                                                 else
-                                                {
-                                                    displayValue += " &nbsp;<a href=\"javascript:viewItem" + gridname + "(this,'comments');return false;\"><img src=\"/_layouts/epmlive/images/mywork/commentsnew-small.png\" border=\"0\"></a>";
-                                                }
+                                                    displayValue += " &nbsp;<a href=\"javascript:viewItem" + gridname + "(this,'comments');return false;\"><img src=\"/_layouts/epmlive/images/mywork/comment-small.png\" border=\"0\"></a>";
                                             }
                                             else
                                                 displayValue += " &nbsp;<a href=\"javascript:viewItem" + gridname + "(this,'comments');return false;\"><img src=\"/_layouts/epmlive/images/mywork/comment-small.png\" border=\"0\"></a>";
                                         }
-                                        else
-                                            displayValue += " &nbsp;<a href=\"javascript:viewItem" + gridname + "(this,'comments');return false;\"><img src=\"/_layouts/epmlive/images/mywork/comment-small.png\" border=\"0\"></a>";
-                                    }
-                                }
-                                catch { }
-
-                                //if (!vfc.Exists("WorkspaceUrl"))
-                                if(bWorkspaceUrl)
-                                {
-                                    try
-                                    {
-                                        string tVal = "&nbsp;<a href=\"" + li["WorkspaceUrl"].ToString().Split(',')[0] + "\"><img src=\"" + list.ParentWeb.ServerRelativeUrl + "/_layouts/epmlive/images/itemworkspace.png\" border=\"0\"></a>"; ;
-
-                                        displayValue += tVal;
                                     }
                                     catch { }
+
+                                    //if (!vfc.Exists("WorkspaceUrl"))
+                                    if (bWorkspaceUrl)
+                                    {
+                                        try
+                                        {
+                                            string tVal = "&nbsp;<a href=\"" + li["WorkspaceUrl"].ToString().Split(',')[0] + "\"><img src=\"" + list.ParentWeb.ServerRelativeUrl + "/_layouts/epmlive/images/itemworkspace.png\" border=\"0\"></a>"; ;
+
+                                            displayValue += tVal;
+                                        }
+                                        catch { }
+                                    }
                                 }
                             }
                         }
