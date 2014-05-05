@@ -244,7 +244,7 @@
     </div>
     <div id="EPMResourceGrid" class="rg-clear-fix" style="width: 100%; height: 500px;">
         <SharePoint:ScriptBlock runat="server">
-            fixedRibbon=false;
+            fixedRibbon=true;
                 function initializeResourceGridWP() {
             if (window.epmLiveMasterPageVersion >= 5.5) {
                     function showLoadingV2() {
