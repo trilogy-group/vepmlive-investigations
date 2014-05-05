@@ -86,7 +86,7 @@ function registerEpmLiveResourceGridScript() {
 
                 $$.reports.opened = true;
 
-                window.open($$.reports.collection[reportId].url + queryString);
+                window.open($$.reports.collection[$$$.md5(reportId)].url + queryString);
 
                 window.setTimeout(function () {
                     $$.reports.opened = false;
@@ -2080,7 +2080,7 @@ function registerEpmLiveResourceGridScript() {
                                                     'events': [
                                                         {
                                                             'eventName': 'click',
-                                                            'function': function () { $$.reports.open('workvscapacity'); }
+                                                            'function': function () { $$.reports.open('Resource Work vs. Capacity'); }
                                                         }
                                                     ]
                                                 }
