@@ -109,7 +109,7 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps.OptIn
                                 {
                                     LogMessage("Enabling reporting", 3);
 
-                                    if (!SocialEngine.Core.Utilities.IsIgnoredList(list.Title, list.ParentWeb))
+                                    if (!SocialEngine.Core.Utilities.IsDefaultIgnoredList(list.Title))
                                         ListCommands.MapListToReporting(list);
                                 }
                                 catch (Exception e)

@@ -7,28 +7,33 @@ namespace EPMLiveCore.SocialEngine.Core
 {
     internal static class Utilities
     {
-        #region Fields (2) 
+        #region Fields (3) 
+
+        private const string IGNORED_LISTS =
+            "PublicComments,Comments,EPMLiveFileStore,User Information List,Team,Department,Departments,Excel Reports,Holiday Schedules,My Timesheet,My Work,Non Work,Project Schedules,Resource Center,Roles,Site Assets,Site Pages,Style Library,Work Hours,Installed Applications,Planner Templates,Project Schedules,Report Library";
 
         private const string IGNORED_LISTS_SETTING_KEY = "epm_ss_ignored_lists";
         private static readonly object Locker = new Object();
 
         #endregion Fields 
 
-        #region Methods (2) 
+        #region Methods (3) 
 
-        // Public Methods (2) 
+        // Public Methods (3) 
 
         public static string ConfigureDefaultIgnoredLists(SPWeb contextWeb)
         {
             string ignoredLists = CoreFunctions.getConfigSetting(contextWeb, IGNORED_LISTS_SETTING_KEY);
             if (!string.IsNullOrEmpty(ignoredLists)) return ignoredLists;
 
-            const string IGNORED_LISTS =
-                "PublicComments,Comments,EPMLiveFileStore,User Information List,Team,Department,Departments,Excel Reports,Holiday Schedules,My Timesheet,My Work,Non Work,Project Schedules,Resource Center,Roles,Site Assets,Site Pages,Style Library,Work Hours,Installed Applications,Planner Templates,Project Schedules,Report Library,User Profile Pictures";
-
             CoreFunctions.setConfigSetting(contextWeb, IGNORED_LISTS_SETTING_KEY, IGNORED_LISTS);
 
             return IGNORED_LISTS;
+        }
+
+        public static bool IsDefaultIgnoredList(string listTitle)
+        {
+            return IGNORED_LISTS.Split(',').Contains(listTitle);
         }
 
         public static bool IsIgnoredList(string listTitle, SPWeb contextWeb)
