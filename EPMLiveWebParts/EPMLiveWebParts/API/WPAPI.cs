@@ -73,7 +73,7 @@ namespace EPMLiveWebParts
             SPListItem li = list.GetItemById(itemid);
 
 
-            iGetRowValue(ref doc, oWeb, DocIn, list, li);
+            iGetRowValue(ref doc, oWeb, DocIn, list, li, false);
         }
 
         public static string SetGridRowEdit(string data, SPWeb web)
@@ -127,7 +127,7 @@ namespace EPMLiveWebParts
             }
         }
 
-        private static void iGetRowValue(ref XmlDocument doc, SPWeb oWeb, XmlDocument DocIn, SPList list, SPListItem li)
+        private static void iGetRowValue(ref XmlDocument doc, SPWeb oWeb, XmlDocument DocIn, SPList list, SPListItem li, bool bEditMode)
         {
             string[] sCols = DocIn.FirstChild.Attributes["Cols"].Value.Split(',');
             XmlNode nd = doc.SelectSingleNode("//I");
@@ -145,7 +145,7 @@ namespace EPMLiveWebParts
                     if (oField != null)
                     {
                         XmlAttribute attr = doc.CreateAttribute(sCol);
-                        attr.Value = GetCellValue(li, oField, true, oWeb);
+                        attr.Value = GetCellValue(li, oField, bEditMode, oWeb);
                         nd.Attributes.Append(attr);
                     }
                 }
@@ -314,7 +314,7 @@ namespace EPMLiveWebParts
 
             li.Update();
 
-            iGetRowValue(ref doc, oWeb, DocIn, list, li);
+            iGetRowValue(ref doc, oWeb, DocIn, list, li, true);
         }
 
         public static string GetGridRowEdit(string data, SPWeb web)
@@ -605,7 +605,7 @@ namespace EPMLiveWebParts
                             val = val.Trim(';');
                         }
                         else
-                            oField.GetFieldValueForEdit(li[oField.Id].ToString());
+                            val = oField.GetFieldValueForEdit(li[oField.Id].ToString());
                         break;
                     case SPFieldType.Lookup:
                         if (bEditMode)
@@ -619,7 +619,7 @@ namespace EPMLiveWebParts
                             val = val.Trim(';');
                         }
                         else
-                            oField.GetFieldValueForEdit(li[oField.Id].ToString());
+                            val = oField.GetFieldValueForEdit(li[oField.Id].ToString());
                         break;
                     case SPFieldType.MultiChoice:
                         if (bEditMode)
