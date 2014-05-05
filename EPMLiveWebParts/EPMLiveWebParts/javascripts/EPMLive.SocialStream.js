@@ -785,6 +785,8 @@
                         });
                     }
 
+                    if (data.collection.length <= itemCount) $el.toolbarMore.hide();
+
                     $toolbar.parent().fadeIn('fast');
                 };
 
