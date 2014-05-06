@@ -46,5 +46,5 @@
 	</LeftCols>
 	<Cols />
 	<RightCols />
-	<Header ProfilePic="Picture" Title="Display Name" NoEscape="1" HoverCell="Color" HoverRow="" SortIcons="2" />
+	<Header ProfilePic="" Title="Display Name" NoEscape="1" HoverCell="Color" HoverRow="" SortIcons="2" />
 </Grid>
