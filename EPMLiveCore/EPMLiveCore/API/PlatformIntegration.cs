@@ -78,8 +78,13 @@ namespace EPMLiveCore.API
                             cmd.Parameters.AddWithValue("@key", doc.FirstChild.Attributes["IntKey"].Value);
                             cmd.ExecuteNonQuery();
 
+                            cmd = new SqlCommand("INSERT INTO PLATFORMINTEGRATIONLOG (PlatformIntegrationId, DTLOGGED, MESSAGE, LOGLEVEL) VALUES (@intid, GETDATE(), 'Successfully installed integration', 10)", cn);
+                            cmd.Parameters.AddWithValue("@intid", doc.FirstChild.Attributes["IntID"].Value);
+                            cmd.ExecuteNonQuery();
+
                             cn.Close();
 
+    
                         });
 
                     }
