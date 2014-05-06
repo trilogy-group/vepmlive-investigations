@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.SharePoint;
 using System.Xml;
 using System.Data.SqlClient;
+using System.Collections;
 
 namespace EPMLiveCore.API
 {
@@ -105,8 +106,76 @@ namespace EPMLiveCore.API
 
         public static string RemoveIntegration(string data, SPWeb web)
         {
-            XmlDocument doc = new XmlDocument();
-            doc.LoadXml(data);
+            try
+            {
+                XmlDocument doc = new XmlDocument();
+                doc.LoadXml(data);
+
+                if (web.DoesUserHavePermissions(SPBasePermissions.ManageLists))
+                {
+                    SPList list = null;
+                    try
+                    {
+                        list = web.Lists[new Guid(doc.FirstChild.Attributes["List"].Value)];
+                    }
+                    catch { }
+                    if (list != null)
+                    {
+                        const string assemblyName =
+                        "EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5";
+                        const string className = "EPMLiveCore.PlatformIntegrationEvent";
+
+
+                        ArrayList arrEvents = new ArrayList();
+
+                        foreach (SPEventReceiverDefinition ev in list.EventReceivers)
+                        {
+                            if (ev.Assembly == assemblyName && ev.Class == className)
+                            {
+                                arrEvents.Add(ev);
+                            }
+                        }
+
+                        foreach (SPEventReceiverDefinition ev in arrEvents)
+                        {
+                            ev.Delete();
+                        }
+
+                        list.Update();
+
+                        SPSecurity.RunWithElevatedPrivileges(delegate()
+                        {
+
+                            SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(web.Site.WebApplication.Id));
+                            cn.Open();
+
+                            SqlCommand cmd = new SqlCommand("DELETE FROM PLATFORMINTEGRATIONS where PlatformIntegrationId=@id", cn);
+                            cmd.Parameters.AddWithValue("@id", doc.FirstChild.Attributes["IntID"].Value);
+                            cmd.ExecuteNonQuery();
+
+                            cmd = new SqlCommand("DELETE FROM PLATFORMINTEGRATIONLOG where PlatformIntegrationId=@id", cn);
+                            cmd.Parameters.AddWithValue("@intid", doc.FirstChild.Attributes["IntID"].Value);
+                            cmd.ExecuteNonQuery();
+
+                            cn.Close();
+
+
+                        });
+
+                    }
+                    else
+                    {
+                        throw new APIException(500002, "List not found");
+                    }
+                }
+                else
+                    throw new APIException(500001, "User does not have access to modify lists");
+            }
+            catch (Exception ex)
+            {
+                throw new APIException(500000, "General Error: " + ex.Message);
+            }
+
 
             return "";
         }
