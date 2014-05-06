@@ -838,6 +838,52 @@ begin
 end
 
 
+-----------------PLATFORMINTEGRATIONS------------
+
+if not exists (select table_name from INFORMATION_SCHEMA.tables where table_name = 'PLATFORMINTEGRATIONS')
+	begin
+		
+		print 'Creating Table PLATFORMINTEGRATIONS'
+	
+		CREATE TABLE [dbo].[PLATFORMINTEGRATIONS](
+			[PlatformIntegrationId] [uniqueidentifier] NULL,
+			[ListId] [uniqueidentifier] NULL,
+			[IntegrationKey] [varchar](255) NULL,
+			[IntegrationUrl] [varchar](2000) NULL
+		)
+		
+end
+else
+begin
+
+	print 'Updating Table PLATFORMINTEGRATIONS'
+
+
+end
+-----------------PLATFORMINTEGRATIONS------------
+
+if not exists (select table_name from INFORMATION_SCHEMA.tables where table_name = 'PLATFORMINTEGRATIONLOG')
+	begin
+		
+		print 'Creating Table PLATFORMINTEGRATIONLOG'
+	
+		CREATE TABLE [dbo].[PLATFORMINTEGRATIONLOG](
+			[LOG_ID] [uniqueidentifier] NULL DEFAULT (newid()),
+			[PlatformIntegrationId] [uniqueidentifier] NULL,
+			[DTLOGGED] [datetime] NULL,
+			[MESSAGE] [ntext] NULL,
+			[LOGLEVEL] [int] NULL
+		)
+		
+end
+else
+begin
+
+	print 'Updating Table PLATFORMINTEGRATIONLOG'
+
+
+end
+
 -------------------------Constraints-----------------
 
 if not exists(select * from INFORMATION_SCHEMA.CONSTRAINT_COLUMN_USAGE where CONSTRAINT_NAME = 'FK_EPMLIVE_LOG_TIMERJOBS')
