@@ -681,7 +681,7 @@ namespace EPMLiveWebParts
                     }
                     else if (fieldName == DueDateField)
                     {
-                        val = DateTime.Parse(val).AddDays(1).AddSeconds(-1).ToString("yyyy-MM-dd HH:mm:ss");
+                        //val = DateTime.Parse(val).AddDays(1).AddSeconds(-1).ToString("yyyy-MM-dd HH:mm:ss");
 
                         XmlAttribute attr = doc.CreateAttribute(fieldName);
                         attr.Value = val;
