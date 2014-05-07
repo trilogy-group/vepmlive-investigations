@@ -270,18 +270,9 @@
                         return false;
                     }
 
-                    var commentActivity = false;
-                    var actionActivity;
+                    var commentActivity = activity.time <= comment.time;
 
-                    if (activity.time > comment.time) {
-                        actionActivity = activity;
-
-                    } else {
-                        actionActivity = comment;
-                        commentActivity = true;
-                    }
-
-                    var userId = thread.kind === 'StatusUpdate' ? thread.activities[0].userId : actionActivity.userId;
+                    var userId = thread.activities[0].userId;
                     thread.user = entityManager.getById(userId, data.users);
 
                     if (thread.kind === 'Workspace') {
