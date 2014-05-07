@@ -3220,9 +3220,9 @@ var MyWorkGrid = {
 
                         if (window.epmLiveMasterPageVersion >= 5.5) {
                             if (!MyWorkGrid.loaderStopped) {
-                                $(document.getElementById("s4-ribbonrow")).height(126);
+                                //$(document.getElementById("s4-ribbonrow")).height(126);
                                 window.EPM.UI.Loader.current().stopLoading('WebPart' + window.myWorkWebPartQualifier);
-                                $('#s4-ribbonrow').height(35);
+                                //$('#s4-ribbonrow').height(35);
                                 MyWorkGrid.loaderStopped = true;
                             }
                         }
