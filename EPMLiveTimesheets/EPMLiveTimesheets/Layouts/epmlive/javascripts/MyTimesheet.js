@@ -32,6 +32,14 @@ var NotesOut = false;
 var TimesheetHoursEdited = false;
 var TimesheetItemEdited = false;
 
+function TSOnLoaded(grid) {
+    var newgridid = grid.id.substr(2);
+    var newobj = eval("TSObject" + newgridid);
+
+    grid.Lang.Format.DecimalSeparator = newobj.DecimalSeparator;
+    grid.Lang.Format.GroupSeparator = newobj.GroupSeparator;
+}
+
 Grids.OnRenderStart = function (grid) {
     if (grid.id.substr(0, 2) == "TS") {
         var newgridid = grid.id.substr(2);

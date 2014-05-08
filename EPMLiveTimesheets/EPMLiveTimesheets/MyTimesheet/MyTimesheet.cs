@@ -595,6 +595,9 @@ namespace TimeSheets
             curUrl = curUrl.Trim('&').Trim('?');
             System.Globalization.CultureInfo cInfo = new System.Globalization.CultureInfo(1033);
             IFormatProvider culture = new System.Globalization.CultureInfo(cInfo.Name, true);
+            
+            System.Globalization.CultureInfo nInfo = new System.Globalization.CultureInfo(SPContext.Current.Web.Locale.LCID);
+
             output.WriteLine(@"<script language=""javascript"">
                                     var TSObject" + sFullGridId + @" = new Object();
                                     TSObject" + sFullGridId + @".canSave = true;
@@ -603,6 +606,11 @@ namespace TimeSheets
                                     TSObject" + sFullGridId + @".PeriodName = '" + sPeriodName + @"';
                                     TSObject" + sFullGridId + @".PeriodId = " + sPeriodId + @";
                                     TSObject" + sFullGridId + @".UserId = '" + sUserId + @"';
+
+                                    TSObject" + sFullGridId + @".DecimalSeparator='" + nInfo.NumberFormat.NumberDecimalSeparator + @"';
+                                    TSObject" + sFullGridId + @".GroupSeparator='" + nInfo.NumberFormat.NumberGroupSeparator + @"';
+            
+
                                     TSObject" + sFullGridId + @".IsCurPeriod = " + bIsCurrentTimesheetPeriod.ToString().ToLower() + @";
                                     TSObject" + sFullGridId + @".CurPeriodId = " + iCurPeriodId + @";
                                     TSObject" + sFullGridId + @".CurPeriodName = '" + sCurPeriodName + @"';
@@ -637,6 +645,7 @@ namespace TimeSheets
 
                                     TGSetEvent('OnRenderFinish', 'TS" + sFullGridId + @"', TSRenderFinish);
                                     TGSetEvent('OnReady', 'TS" + sFullGridId + @"', TSReady);
+                                    TGSetEvent('OnLoaded', 'TS" + sFullGridId + @"', TSOnLoaded);
                             </script>
                             ");
 

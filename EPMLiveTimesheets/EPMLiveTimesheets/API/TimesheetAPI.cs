@@ -8,6 +8,7 @@ using System.Xml;
 using System.Data;
 using System.Collections;
 using EPMLiveCore.ReportingProxy;
+using System.Globalization;
 
 namespace TimeSheets
 {
@@ -2313,6 +2314,8 @@ namespace TimeSheets
 
         private static XmlNode CreateTSRow(ref XmlDocument docData, DataSet dsTS, DataRow dr, ArrayList arrLookups, ArrayList arrPeriods, TimesheetSettings settings, bool bCanEdit, SPWeb web)
         {
+
+            var currenvyCultureInfo = new CultureInfo(1033);
             DataRow result = null;
             try
             {
@@ -2416,13 +2419,21 @@ namespace TimeSheets
                         {
                             try
                             {
-                                attr1.Value = Convert.ToString(Convert.ToDouble(result[dc.ColumnName].ToString()) * 100);
+                                attr1.Value = Convert.ToString(Convert.ToDouble(result[dc.ColumnName].ToString()) * 100, currenvyCultureInfo.NumberFormat);
                             }
                             catch { attr1.Value = "0"; }
                         }
                         else
                         {
-                            attr1.Value = result[dc.ColumnName].ToString();
+                            if (dc.DataType == typeof(Double))
+                            {
+                                try
+                                {
+                                    attr1.Value = ((double)result[dc.ColumnName]).ToString(currenvyCultureInfo.NumberFormat);
+                                }catch{}
+                            }
+                            else
+                                attr1.Value = result[dc.ColumnName].ToString();
                         }
                         ndCol.Attributes.Append(attr1);
 
