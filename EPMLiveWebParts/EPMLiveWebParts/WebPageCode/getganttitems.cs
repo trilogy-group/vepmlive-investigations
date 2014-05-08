@@ -809,7 +809,10 @@ namespace EPMLiveWebParts
                 case SPFieldType.Currency:
                     SPFieldCurrency c = (SPFieldCurrency)oField;
                     System.Globalization.NumberFormatInfo nInfo = System.Globalization.CultureInfo.GetCultureInfo(c.CurrencyLocaleId).NumberFormat;
-                    format = nInfo.CurrencySymbol + nInfo.CurrencyGroupSeparator + "0" + nInfo.CurrencyDecimalSeparator + "00";
+                    if ((0).ToString("c0", nInfo)[0] == '0')
+                        format = ",0.00 " + nInfo.CurrencySymbol;
+                    else
+                        format = nInfo.CurrencySymbol + ",0.00";
                     break;
                 case SPFieldType.Calculated:
                     switch (oDoc.FirstChild.Attributes["ResultType"].Value)

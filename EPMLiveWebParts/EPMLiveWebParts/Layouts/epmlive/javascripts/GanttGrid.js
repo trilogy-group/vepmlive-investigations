@@ -220,6 +220,13 @@ function GridSearch(gridid, searchfield, searchvalue, searchtype) {
 
 }
 
+function GridOnLoaded(grid) {
+    var gridid = GetGridId(grid);
+
+    grid.Lang.Format.DecimalSeparator = eval("mygrid" + gridid + ".DecimalSeparator");
+    grid.Lang.Format.GroupSeparator = eval("mygrid" + gridid + ".GroupSeparator");
+}
+
 function GridOnReady(grid) {
 
     TGSetEvent("OnRenderFinish", grid.id, GridOnRenderFinish);

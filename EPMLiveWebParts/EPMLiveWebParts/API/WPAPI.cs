@@ -584,7 +584,7 @@ namespace EPMLiveWebParts
 
         private static string GetCellValue(SPListItem li, SPField oField, bool bEditMode, SPWeb oWeb)
         {
-            
+            var currenvyCultureInfo = new CultureInfo(1033);
             string val = "";
 
             if (li[oField.Id] != null)
@@ -646,6 +646,14 @@ namespace EPMLiveWebParts
                             val = val.Substring(val.IndexOf(";#") + 2);
                         }
                         break;
+                    case SPFieldType.Currency:
+                        
+                        try
+                        {
+                            val = ((double)li[oField.Id]).ToString(currenvyCultureInfo.NumberFormat);
+                        }
+                        catch { val = "0"; }
+                        break;
                     case SPFieldType.Number:
                         SPFieldNumber fNum = (SPFieldNumber)oField;
                         if (fNum.ShowAsPercentage)
@@ -658,10 +666,19 @@ namespace EPMLiveWebParts
                         }
                         else
                         {
-                            if (bEditMode)
-                                val = li[oField.Id].ToString();
-                            else
-                                val = oField.GetFieldValueAsText(li[oField.Id].ToString());
+                            //if (bEditMode)
+                            //{
+                            //    val = li[oField.Id].ToString();
+                            //}
+                            //else
+                            //    val = oField.GetFieldValueAsText(li[oField.Id].ToString());
+                            
+                            try
+                            {
+                                val = ((double)li[oField.Id]).ToString(currenvyCultureInfo.NumberFormat);
+                            }
+                            catch { val = "0"; }
+
                         }
                         break;
                     case SPFieldType.Boolean:

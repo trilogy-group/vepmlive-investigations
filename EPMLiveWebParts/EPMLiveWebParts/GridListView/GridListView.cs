@@ -3372,7 +3372,7 @@ namespace EPMLiveWebParts
 
 
             output.WriteLine("TGSetEvent(\"OnReady\", \"GanttGrid" + sFullGridId + "\", GridOnReady);");
-
+            output.WriteLine("TGSetEvent(\"OnLoaded\", \"GanttGrid" + sFullGridId + "\", GridOnLoaded);");
            
 
                 output.WriteLine("DataUrl" + sFullGridId + " = '" + web.Url + "/_layouts/epmlive/getganttitems.aspx?data=" + sFullParamList + "'");
@@ -3417,6 +3417,11 @@ namespace EPMLiveWebParts
             output.WriteLine("mygrid" + sFullGridId + ".RibbonBehavior='" + gSettings.RibbonBehavior + "';");
             output.WriteLine("mygrid" + sFullGridId + ".GridHeight=" + sGridHeight + ";");
             output.WriteLine("mygrid" + sFullGridId + ".GanttStart='" + GanttStart + "';");
+
+
+            System.Globalization.CultureInfo cInfo = new System.Globalization.CultureInfo(web.Locale.LCID);
+            output.WriteLine("mygrid" + sFullGridId + ".DecimalSeparator='" + cInfo.NumberFormat.NumberDecimalSeparator + "';");
+            output.WriteLine("mygrid" + sFullGridId + ".GroupSeparator='" + cInfo.NumberFormat.NumberGroupSeparator + "';");
             
             if (bHasSearchResults)
             {

@@ -9,7 +9,7 @@
 	<Cfg ShowDeleted='0' Calculated='0'/>
 	<Cfg FullId='0'/>
 	<Cfg SelectingCells="1" SelectClass="0" NoPager="1" StandardTip="1"/>
-	<Cfg Searching='1'/>
+	<Cfg Searching='1'  />
 	<Toolbar Visible='0'></Toolbar>
 
 	<Cfg NoTreeLines='1' DetailOn='0' MidWidth="400" StandardFilter='2' MenuColumnsSort="0" StaticCursor="1"/>
