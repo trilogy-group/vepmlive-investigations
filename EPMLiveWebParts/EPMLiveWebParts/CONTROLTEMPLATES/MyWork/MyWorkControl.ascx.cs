@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Net;
-using System.Reflection;
 using System.Web;
 using System.Web.UI;
 using System.Xml.Linq;
@@ -90,7 +88,7 @@ namespace EPMLiveWebParts.CONTROLTEMPLATES.MyWork
                 XDocument xml = XDocument.Parse(query);
 
                 xml.Root.Add(new XElement("DateRange", new XAttribute("From", from.ToString("yyyy-MM-dd HH:mm:ss")),
-                                          new XAttribute("To", to.ToString("yyyy-MM-dd HH:mm:ss"))));
+                    new XAttribute("To", to.ToString("yyyy-MM-dd HH:mm:ss"))));
 
                 if (!string.IsNullOrEmpty(Request["listid"]))
                     xml.Root.Add(new XElement("ListId", Convert.ToString(Request["listid"])));
@@ -124,6 +122,9 @@ namespace EPMLiveWebParts.CONTROLTEMPLATES.MyWork
         public string WebPartId { get; set; }
 
         public string WebPartPageComponentId { get; set; }
+        public string DecimalSeparator { get; private set; }
+        public string GroupSeparator { get; private set; }
+        public char PercentSymbol { get; private set; }
 
         #endregion Properties
 
@@ -134,8 +135,8 @@ namespace EPMLiveWebParts.CONTROLTEMPLATES.MyWork
         protected override void CreateChildControls()
         {
             string serviceUrl = ((SPContext.Current.Web.ServerRelativeUrl == "/")
-                                     ? ""
-                                     : SPContext.Current.Web.ServerRelativeUrl) + "/_vti_bin/Workengine.asmx";
+                ? ""
+                : SPContext.Current.Web.ServerRelativeUrl) + "/_vti_bin/Workengine.asmx";
 
             ScriptManager scriptManager = ScriptManager.GetCurrent(Page);
 
@@ -163,8 +164,8 @@ namespace EPMLiveWebParts.CONTROLTEMPLATES.MyWork
 
             if (inDebugMode)
             {
-                var keywords = new[] { "Error", "Problem", "Info", "Check", "IOError", "IO", "Cookie", "Page" };
-                var info = new List<string> { "Error", "Problem" };
+                var keywords = new[] {"Error", "Problem", "Info", "Check", "IOError", "IO", "Cookie", "Page"};
+                var info = new List<string> {"Error", "Problem"};
 
                 foreach (string keyword in epmDebug.Split(',').Select(k => k.ToLower()))
                 {
@@ -184,6 +185,14 @@ namespace EPMLiveWebParts.CONTROLTEMPLATES.MyWork
             WebId = spWeb.ID.ToString();
 
             LoadGridSettings();
+            ConfigureRegionalSettings();
+        }
+
+        private void ConfigureRegionalSettings()
+        {
+            SPRegionalSettings regionalSettings = SPContext.Current.RegionalSettings;
+            DecimalSeparator = regionalSettings.DecimalSeparator;
+            GroupSeparator = regionalSettings.ThousandSeparator;
         }
 
         // Private Methods (7) 
@@ -194,11 +203,11 @@ namespace EPMLiveWebParts.CONTROLTEMPLATES.MyWork
             Guid lockedWeb = CoreFunctions.getLockedWeb(theWeb);
 
             using (SPWeb configWeb = (theWeb.ID != lockedWeb
-                                          ? theWeb.Site.OpenWeb(lockedWeb)
-                                          : theWeb.Site.OpenWeb(theWeb.ID)))
+                ? theWeb.Site.OpenWeb(lockedWeb)
+                : theWeb.Site.OpenWeb(theWeb.ID)))
             {
                 return configWeb.DoesUserHavePermissions(SPContext.Current.Web.CurrentUser.LoginName,
-                                                         SPBasePermissions.AddAndCustomizePages);
+                    SPBasePermissions.AddAndCustomizePages);
             }
         }
 
@@ -215,8 +224,8 @@ namespace EPMLiveWebParts.CONTROLTEMPLATES.MyWork
             Guid lockedWeb = CoreFunctions.getLockedWeb(theWeb);
 
             using (SPWeb configWeb = (theWeb.ID != lockedWeb
-                                          ? theWeb.Site.OpenWeb(lockedWeb)
-                                          : theWeb.Site.OpenWeb(theWeb.ID)))
+                ? theWeb.Site.OpenWeb(lockedWeb)
+                : theWeb.Site.OpenWeb(theWeb.ID)))
             {
                 configSetting = CoreFunctions.getConfigSetting(configWeb, setting);
             }
@@ -257,15 +266,15 @@ namespace EPMLiveWebParts.CONTROLTEMPLATES.MyWork
                 Guid lockedWeb = CoreFunctions.getLockedWeb(theWeb);
 
                 using (SPWeb configWeb = (theWeb.ID != lockedWeb
-                                              ? theWeb.Site.OpenWeb(lockedWeb)
-                                              : theWeb.Site.OpenWeb(theWeb.ID)))
+                    ? theWeb.Site.OpenWeb(lockedWeb)
+                    : theWeb.Site.OpenWeb(theWeb.ID)))
                 {
                     myworkWeb = configWeb;
 
                     foreach (
                         string list in
                             CoreFunctions.getConfigSetting(configWeb, myworksettings.GeneralSettingsSelectedMyWorkLists)
-                                         .Split(new[] { ',' }).Where(list => !string.IsNullOrEmpty(list)))
+                                .Split(new[] {','}).Where(list => !string.IsNullOrEmpty(list)))
                     {
                         newItemLists.Add(list);
                         excludedMyWorkLists.RemoveAll(l => l.Name.Equals(list));
@@ -274,7 +283,7 @@ namespace EPMLiveWebParts.CONTROLTEMPLATES.MyWork
                     foreach (
                         string list in
                             CoreFunctions.getConfigSetting(configWeb, myworksettings.GeneralSettingsSelectedLists)
-                                         .Split(new[] { ',' }).Where(list => !string.IsNullOrEmpty(list)))
+                                .Split(new[] {','}).Where(list => !string.IsNullOrEmpty(list)))
                     {
                         newItemLists.Add(list);
                         excludedMyWorkLists.RemoveAll(l => l.Name.Equals(list));
@@ -367,8 +376,8 @@ namespace EPMLiveWebParts.CONTROLTEMPLATES.MyWork
                 {
                     string requestXml =
                         new XElement("Personalization", new XAttribute("Key", "MyWork_DueFilter"),
-                                     new XElement("Filters",
-                                                  new XElement("Filter", new XAttribute("Key", "SiteId"), spWeb.Site.ID)))
+                            new XElement("Filters",
+                                new XElement("Filter", new XAttribute("Key", "SiteId"), spWeb.Site.ID)))
                             .ToString();
 
                     var personalization = new EPMLiveCore.API.Personalization();
@@ -396,8 +405,8 @@ namespace EPMLiveWebParts.CONTROLTEMPLATES.MyWork
             if (useDefault)
             {
                 string configSetting = UseCentralizedSettings
-                                           ? GetConfigSetting(myworksettings.GENERAL_SETTINGS_WORK_DAY_FILTERS)
-                                           : DueDayFilter;
+                    ? GetConfigSetting(myworksettings.GENERAL_SETTINGS_WORK_DAY_FILTERS)
+                    : DueDayFilter;
 
                 if (!string.IsNullOrEmpty(configSetting))
                 {
@@ -416,8 +425,8 @@ namespace EPMLiveWebParts.CONTROLTEMPLATES.MyWork
             DaysAfter = afterFilterDays;
 
             string indicatorSetting = UseCentralizedSettings
-                                          ? GetConfigSetting(myworksettings.GENERAL_SETTINGS_NEW_ITEM_INDICATOR)
-                                          : NewItemIndicator;
+                ? GetConfigSetting(myworksettings.GENERAL_SETTINGS_NEW_ITEM_INDICATOR)
+                : NewItemIndicator;
 
             bool indicatorActive = true;
             int indicatorDays = 2;
@@ -436,14 +445,14 @@ namespace EPMLiveWebParts.CONTROLTEMPLATES.MyWork
 
         private void RegisterScripts()
         {
-            foreach (string style in new[] { "MyWorkWebPart.min" })
+            foreach (string style in new[] {"MyWorkWebPart.min"})
             {
                 SPPageContentManager.RegisterStyleFile(LAYOUT_PATH + style + ".css");
             }
 
             EPMLiveScriptManager.RegisterScript(Page, new[]
             {
-                "libraries/jquery.min","@EPM", "/treegrid/GridE", "/xml2json", "/MD5", "@/MyWorkWebPart"
+                "libraries/jquery.min", "@EPM", "/treegrid/GridE", "/xml2json", "/MD5", "@/MyWorkWebPart"
             });
 
             ServicePointManager.ServerCertificateValidationCallback += delegate { return true; };

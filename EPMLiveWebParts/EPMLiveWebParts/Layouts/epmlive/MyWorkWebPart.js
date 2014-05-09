@@ -559,6 +559,9 @@ function MyWorkOnLoaded(grid) {
         if (url.indexOf('mywork.aspx') !== -1 || url.indexOf('my%20work.aspx') !== -1) {
             window.setTimeout(function () { MyWorkGrid.loadRibbon(); }, 1500);
         }
+
+        grid.Lang.Format.DecimalSeparator = window.epmLiveMyWork.regionalSettings.decimalSeparator;
+        grid.Lang.Format.GroupSeparator = window.epmLiveMyWork.regionalSettings.groupSeparator;
     }
 };
 

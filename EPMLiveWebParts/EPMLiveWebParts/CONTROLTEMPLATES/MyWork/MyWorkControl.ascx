@@ -184,6 +184,11 @@
 
     <SharePoint:ScriptBlock runat="server">
         var siteUrl = '<%= WebUrl %>', mwWebPartHeight = <%= !string.IsNullOrEmpty(WebPartHeight) ? WebPartHeight : "0" %>, allowGlobalViewCreation = <%= UserHasDesignerPermission ? "true" : "false" %>, myWorkWebPartSelectionCheckBox = 'SelectionCbx<%= WebPartPageComponentId %>', masterView = '<%= DefaultGlobalView %>', nonCompleteQuery = '<%= NonCompleteQuery.Replace(Environment.NewLine, string.Empty) %>', completeQuery = '<%= CompleteQuery.Replace(Environment.NewLine, string.Empty) %>', newItemLists = [<%= NewItemButtonLists %>], myWorkWebPartId = '<%= WebPartId %>', myWorkWebPartQualifier = '<%= Qualifier %>', selectMyWorkWebPart = <%= TotalWebPartCount == 1 ? "true" : "false" %>, userId = <%= UserId %>, requestedView = '<%= RequestedView != null ? Convert.ToBase64String(Encoding.ASCII.GetBytes(RequestedView)) : string.Empty %>', requestedViewType = '<%= RequestedViewType != null ? Convert.ToBase64String(Encoding.ASCII.GetBytes(RequestedViewType)) : string.Empty %>', currentWebId = '<%= WebId %>', workFilters = { daysAgoEnabled: <%= DaysAgoEnabled.ToString().ToLower() %>, daysAgo: <%= DaysAgo %>, daysAfterEnabled: <%= DaysAfterEnabled.ToString().ToLower() %>, daysAfter: <%= DaysAfter %> }, mwNewItemIndicator = { enabled: <%= IsNewItemIndicatorEnabled.ToString().ToLower() %>, days: <%= NewItemIndicatorDays %> };
+        var epmLiveMyWork = window.epmLiveMyWork || {};
+        epmLiveMyWork.regionalSettings = {
+            decimalSeparator: '<%= DecimalSeparator %>',
+            groupSeparator: '<%= GroupSeparator %>'
+        };
     </SharePoint:ScriptBlock>
 
 </div>
