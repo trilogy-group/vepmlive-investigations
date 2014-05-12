@@ -1252,6 +1252,13 @@ namespace EPMLiveWebParts
                                     case SPFieldType.MultiChoice:
                                         displayValue = val.Replace(";#", ";");
                                         break;
+                                    case SPFieldType.DateTime:
+                                        try
+                                        {
+                                            displayValue = DateTime.Parse(val).ToString("u");
+                                        }
+                                        catch { }
+                                        break;
                                     default:
                                         displayValue = val;
                                         break;
@@ -2276,7 +2283,13 @@ namespace EPMLiveWebParts
                                         }
                                         catch { }
                                         break;
-                                    
+                                    case SPFieldType.DateTime:
+                                        try
+                                        {
+                                            displayValue = ((DateTime)li[oField.Id]).ToString("u");
+                                        }
+                                        catch { }
+                                        break;
                                     default:
                                         displayValue = val;
                                         break;
