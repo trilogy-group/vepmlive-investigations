@@ -1960,7 +1960,7 @@ function MYTSOnGetHtmlValue(grid, row, col, val) {
             else if (TSCols[col] || col == "TSTotals") {
                 if (val == "0" || val == "")
                     return "";
-                return getFormattedNumber(val.toLocaleString());
+                return getFormattedNumber(val.toLocaleString(), grid);
             }
             else if (col == "Progress" && row.Def.Name == "R") {
                 try {
@@ -2011,7 +2011,10 @@ function GridComments(gridid, rowid) {
 
 }
 
-function getFormattedNumber(Amount) {
+function getFormattedNumber(Amount, grid) {
+    var newgridid = grid.id.substr(2);
+    var newobj = eval("TSObject" + newgridid);
+
     var DecimalSeparator = Number("1.2").toLocaleString().substr(1, 1);
 
     var AmountWithCommas = Amount.toLocaleString();
@@ -2023,7 +2026,7 @@ function getFormattedNumber(Amount) {
         decPart = "";
         DecimalSeparator = "";
     }
-    return intPart + DecimalSeparator + decPart;
+    return intPart + newobj.DecimalSeparator + decPart;
 }
 
 

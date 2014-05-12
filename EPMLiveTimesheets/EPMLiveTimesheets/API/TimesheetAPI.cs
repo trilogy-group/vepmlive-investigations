@@ -2432,6 +2432,14 @@ namespace TimeSheets
                                     attr1.Value = ((double)result[dc.ColumnName]).ToString(currenvyCultureInfo.NumberFormat);
                                 }catch{}
                             }
+                            else if (dc.DataType == typeof(DateTime))
+                            {
+                                try
+                                {
+                                    attr1.Value = DateTime.Parse(result[dc.ColumnName].ToString()).ToString("u");
+                                }
+                                catch { }
+                            }
                             else
                                 attr1.Value = result[dc.ColumnName].ToString();
                         }
