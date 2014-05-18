@@ -66,7 +66,7 @@ function EditGridRow(grid, row, col) {
 
         cols = cols.substr(1);
 
-        var data = "<Row id=\"" + row.id + "\" siteid=\"" + row.SiteID + "\" webid=\"" + row.WebID + "\" listid=\"" + row.ListID + "\" itemid=\"" + row.ItemID + "\" Cols=\"" + cols + "\"/>";
+        var data = "<Row id=\"" + row.id + "\" siteid=\"" + row.SiteID + "\" webid=\"" + row.WebID + "\" listid=\"" + row.ListID + "\" itemid=\"" + row.ItemID + "\" Cols=\"" + cols + "\" Source=\"MyWork\"/>";
 
         grid.SetAttribute(row, "Title", "HtmlPrefix", "<img src='/_layouts/15/epmlive/images/mywork/loading16.gif'>", 1);
 
@@ -127,7 +127,7 @@ function StopEditGridRow(grid, row) {
                 }
             }
 
-            var data = "<Row id=\"" + row.id + "\" siteid=\"" + row.SiteID + "\" webid=\"" + row.WebID + "\" listid=\"" + row.ListID + "\" itemid=\"" + row.ItemID + "\" Cols=\"" + cols + "\">" + Values + "</Row>";
+            var data = "<Row id=\"" + row.id + "\" siteid=\"" + row.SiteID + "\" webid=\"" + row.WebID + "\" listid=\"" + row.ListID + "\" itemid=\"" + row.ItemID + "\" Cols=\"" + cols + "\" Source=\"MyWork\">" + Values + "</Row>";
 
             var webUrl = window.epmLiveNavigation.currentWebUrl;
 
