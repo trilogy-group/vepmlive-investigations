@@ -250,6 +250,8 @@ namespace EPMLiveCore.Integrations.Salesforce
                     {"{TIMESTAMP}", DateTime.Now.ToUniversalTime().ToString("r")}
                 }.Aggregate(Resources.SFIntTrigger, (c, p) => c.Replace(p.Key, p.Value));
 
+            _apexService.Timeout = 3600 * 1000;
+
             CompileAndTestResult result = _apexService.compileAndTest(new CompileAndTestRequest
             {
                 triggers = new[] {triggerBody},
