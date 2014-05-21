@@ -1156,6 +1156,7 @@ namespace EPMLiveCore.API
         {
             string value = Utils.GetCleanFieldValue(field);
             string name = field.Attribute("Name").Value;
+            var format = field.Attribute("Format").Value ?? string.Empty;
 
             if (field.Attribute("Format").Value.Equals("Indicator")) value = "/_layouts/images/" + value;
 
@@ -1177,15 +1178,20 @@ namespace EPMLiveCore.API
                 {
                     if (!string.IsNullOrEmpty(value))
                     {
+                        var cultureInfo = new CultureInfo((int) SPContext.Current.RegionalSettings.LocaleId);
+
+                        if (format.EndsWith("%"))
+                        {
+                            try
+                            {
+                                value = (Decimal.Parse(value) * 100).ToString(cultureInfo);
+                            }
+                            catch { }
+                        }
+
                         try
                         {
-                            SPWeb spWeb = SPContext.Current.Web;
-                            value = Decimal.Parse(value,
-                                new CultureInfo(
-                                    (int)
-                                        (spWeb.CurrentUser.RegionalSettings ?? spWeb.RegionalSettings).
-                                            LocaleId))
-                                .ToString(CultureInfo.InvariantCulture);
+                            value = Decimal.Parse(value, cultureInfo).ToString(CultureInfo.InvariantCulture);
                         }
                         catch { }
                     }
@@ -3115,7 +3121,7 @@ namespace EPMLiveCore.API
 
                         if (((SPFieldNumber)spField).ShowAsPercentage)
                         {
-                            percentageSign = @"%";
+                            percentageSign = @"\%";
                         }
 
                         switch (((SPFieldNumber)spField).DisplayFormat)
