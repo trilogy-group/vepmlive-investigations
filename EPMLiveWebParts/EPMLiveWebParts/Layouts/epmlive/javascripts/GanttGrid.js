@@ -174,23 +174,30 @@ function SetGridSize(grid) {
     }
 }
 
+function GetWebUrl() {
+    if (_spPageContextInfo.webServerRelativeUrl == "/")
+        return "";
+    else return _spPageContextInfo.webServerRelativeUrl;
+}
+
+
 function GridListSettings(listid) {
     var $v_E = new SP.Guid(listid);
-    var $v_F = _spPageContextInfo.webServerRelativeUrl + '/_layouts/15/listedit.aspx' + '?List=' + SP.Utilities.HttpUtility.urlKeyValueEncode($v_E.toString('B').toUpperCase());
+    var $v_F = GetWebUrl() + '/_layouts/15/listedit.aspx' + '?List=' + SP.Utilities.HttpUtility.urlKeyValueEncode($v_E.toString('B').toUpperCase());
     SP.Utilities.HttpUtility.navigateTo($v_F);
 }
 
 function GridListEditView(listid, viewid) {
     var $v_E = new SP.Guid(listid);
     var $v_C = new SP.Guid(viewid);
-    var $v_F = _spPageContextInfo.webServerRelativeUrl + '/_layouts/15/ViewEdit.aspx' + '?List=' + SP.Utilities.HttpUtility.urlKeyValueEncode($v_E.toString('B').toUpperCase()) + '&View=' + SP.Utilities.HttpUtility.urlKeyValueEncode($v_C.toString('B').toUpperCase()) + '&Source=' + escape(document.location.href);
+    var $v_F = GetWebUrl() + '/_layouts/15/ViewEdit.aspx' + '?List=' + SP.Utilities.HttpUtility.urlKeyValueEncode($v_E.toString('B').toUpperCase()) + '&View=' + SP.Utilities.HttpUtility.urlKeyValueEncode($v_C.toString('B').toUpperCase()) + '&Source=' + escape(document.location.href);
     SP.Utilities.HttpUtility.navigateTo($v_F);
 }
 
 
 function GridListCreateView(listid) {
     var $v_E = new SP.Guid(listid);
-    var $v_F = _spPageContextInfo.webServerRelativeUrl + '/_layouts/15/ViewNew.aspx' + '?List=' + SP.Utilities.HttpUtility.urlKeyValueEncode($v_E.toString('B').toUpperCase()) + '&Source=' + escape(document.location.href);
+    var $v_F = GetWebUrl() + '/_layouts/15/ViewNew.aspx' + '?List=' + SP.Utilities.HttpUtility.urlKeyValueEncode($v_E.toString('B').toUpperCase()) + '&Source=' + escape(document.location.href);
     SP.Utilities.HttpUtility.navigateTo($v_F);
 }
 
@@ -209,7 +216,7 @@ function GridSearch(gridid, searchfield, searchvalue, searchtype) {
     if (!grid) {
         EPM.UI.Loader.current().startLoading({ id: 'WebPart' + eval("mygrid" + gridid + ".Qualifier") });
         eval("mygrid" + gridid + ".Searcher='&searchfield=" + searchfield + "&searchvalue=" + escape(searchvalue) + "&searchtype=" + searchtype + "'");
-        TreeGrid({ Data: { Url: _spPageContextInfo.webServerRelativeUrl + "/_layouts/epmlive/getganttitems.aspx?data=" + eval("mygrid" + gridid + ".Params") + eval("mygrid" + gridid + ".Searcher") }, SuppressMessage: 2, Debug: "" }, "griddiv" + gridid);
+        TreeGrid({ Data: { Url: GetWebUrl() + "/_layouts/epmlive/getganttitems.aspx?data=" + eval("mygrid" + gridid + ".Params") + eval("mygrid" + gridid + ".Searcher") }, SuppressMessage: 2, Debug: "" }, "griddiv" + gridid);
     }
     else {
         var grid = Grids["GanttGrid" + gridid];
@@ -654,7 +661,7 @@ function GetRowData(grid, row)
 
 function LoadGrid(gridid)
 {
-    var gUrl = _spPageContextInfo.webServerRelativeUrl + "/_layouts/15/epmlive/getganttitems.aspx?data=" + eval("mygrid" + gridid + ".Params") + eval("mygrid" + gridid + ".Searcher");
+    var gUrl = GetWebUrl() + "/_layouts/15/epmlive/getganttitems.aspx?data=" + eval("mygrid" + gridid + ".Params") + eval("mygrid" + gridid + ".Searcher");
 
     if (epmdebug)
         gUrl += "&epmdebug=true";
