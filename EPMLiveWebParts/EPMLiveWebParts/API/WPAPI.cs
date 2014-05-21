@@ -132,8 +132,6 @@ namespace EPMLiveWebParts
             string[] sCols = DocIn.FirstChild.Attributes["Cols"].Value.Split(',');
             XmlNode nd = doc.SelectSingleNode("//I");
 
-            var source = GetSource(DocIn);
-
             foreach (string sCol in sCols)
             {
                 if (ValidEditCol(sCol))
@@ -147,7 +145,7 @@ namespace EPMLiveWebParts
                     if (oField != null)
                     {
                         XmlAttribute attr = doc.CreateAttribute(sCol);
-                        attr.Value = GetCellValue(li, oField, bEditMode, oWeb, source);
+                        attr.Value = GetCellValue(li, oField, bEditMode, oWeb);
                         nd.Attributes.Append(attr);
                     }
                 }
@@ -234,9 +232,6 @@ namespace EPMLiveWebParts
 
             oWeb.AllowUnsafeUpdates = true;
 
-            var source = GetSource(DocIn);
-            var cultureInfo = new CultureInfo(1033);
-
             foreach (XmlNode nd in DocIn.FirstChild.SelectNodes("//Field"))
             {
                 SPField oField = null;
@@ -292,9 +287,7 @@ namespace EPMLiveWebParts
                             {
                                 try
                                 {
-                                    li[oField.Id] = (source ?? string.Empty).Equals("MyWork")
-                                        ? float.Parse(sFieldValue, cultureInfo.NumberFormat)
-                                        : float.Parse(sFieldValue)/100;
+                                    li[oField.Id] = float.Parse(sFieldValue) / 100;
                                 }
                                 catch { li[oField.Id] = null; }
                             }
@@ -379,8 +372,6 @@ namespace EPMLiveWebParts
             EPMLiveCore.GridGanttSettings gSettings = new EPMLiveCore.GridGanttSettings(list);
             Dictionary<string, Dictionary<string, string>> fieldProperties = EPMLiveCore.ListDisplayUtils.ConvertFromString(gSettings.DisplaySettings);
 
-            var source = GetSource(DocIn);
-
             foreach (string sCol in sCols)
             {
                 if (ValidEditCol(sCol))
@@ -434,24 +425,13 @@ namespace EPMLiveWebParts
                             }
 
                             attr = doc.CreateAttribute(sCol);
-                            attr.Value = GetCellValue(li, oField, true, oWeb, source);
+                            attr.Value = GetCellValue(li, oField, true, oWeb);
                             nd.Attributes.Append(attr);
                             
                         }
                     }
                 }
             }
-        }
-
-        private static string GetSource(XmlDocument DocIn)
-        {
-            try
-            {
-                return DocIn.FirstChild.Attributes["Source"].Value;
-            }
-            catch { }
-
-            return null;
         }
 
         private static string GetFieldType(SPField oField, out string senum, out string senumkeys, out string sFormat, out string sRange, SPWeb oWeb)
@@ -602,9 +582,9 @@ namespace EPMLiveWebParts
             return true;
         }
 
-        private static string GetCellValue(SPListItem li, SPField oField, bool bEditMode, SPWeb oWeb, string source)
+        private static string GetCellValue(SPListItem li, SPField oField, bool bEditMode, SPWeb oWeb)
         {
-            var currencyCultureInfo = new CultureInfo(1033);
+            var currenvyCultureInfo = new CultureInfo(1033);
             string val = "";
 
             if (li[oField.Id] != null)
@@ -670,7 +650,7 @@ namespace EPMLiveWebParts
                         
                         try
                         {
-                            val = ((double)li[oField.Id]).ToString(currencyCultureInfo.NumberFormat);
+                            val = ((double)li[oField.Id]).ToString(currenvyCultureInfo.NumberFormat);
                         }
                         catch { val = "0"; }
                         break;
@@ -678,22 +658,11 @@ namespace EPMLiveWebParts
                         SPFieldNumber fNum = (SPFieldNumber)oField;
                         if (fNum.ShowAsPercentage)
                         {
-                            if ((source ?? string.Empty).Equals("MyWork"))
+                            try
                             {
-                                try
-                                {
-                                    val = float.Parse(val).ToString(currencyCultureInfo.NumberFormat);
-                                }
-                                catch { }
+                                val = (float.Parse(val) * 100).ToString();
                             }
-                            else
-                            {
-                                try
-                                {
-                                    val = (float.Parse(val) * 100).ToString();
-                                }
-                                catch { }
-                            }
+                            catch { }
                         }
                         else
                         {
@@ -706,7 +675,7 @@ namespace EPMLiveWebParts
                             
                             try
                             {
-                                val = ((double)li[oField.Id]).ToString(currencyCultureInfo.NumberFormat);
+                                val = ((double)li[oField.Id]).ToString(currenvyCultureInfo.NumberFormat);
                             }
                             catch { val = "0"; }
 
