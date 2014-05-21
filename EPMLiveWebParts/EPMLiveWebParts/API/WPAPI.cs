@@ -690,6 +690,13 @@ namespace EPMLiveWebParts
                         }
                         catch { }
                         break;
+                    case SPFieldType.DateTime:
+                        try
+                        {
+                            val = ((DateTime)li[oField.Id]).ToString("u");
+                        }
+                        catch { }
+                        break;
                     default:
 
                         if (bEditMode)
