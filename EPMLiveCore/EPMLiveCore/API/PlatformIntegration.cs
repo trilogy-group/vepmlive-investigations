@@ -83,6 +83,21 @@ namespace EPMLiveCore.API
                             cmd.Parameters.AddWithValue("@intid", doc.FirstChild.Attributes["IntID"].Value);
                             cmd.ExecuteNonQuery();
 
+     
+                            foreach (XmlNode ndControl in doc.FirstChild.SelectSingleNode("Controls").SelectNodes("Control"))
+                            {
+                                cmd = new SqlCommand("INSERT INTO PLATFORMINTEGRATIONCONTROLS (PlatformIntegrationId, ControlId, DisplayName, Image, Global, ButtonStyle, WindowStyle) VALUES (@PlatformIntegrationId, @ControlId, @DisplayName, @Image, @Global, @ButtonStyle, @WindowStyle)", cn);
+                                cmd.Parameters.AddWithValue("@PlatformIntegrationId", doc.FirstChild.Attributes["IntID"].Value);
+                                cmd.Parameters.AddWithValue("@ControlId", ndControl.Attributes["Id"].Value);
+                                cmd.Parameters.AddWithValue("@DisplayName", ndControl.Attributes["DisplayName"].Value);
+                                cmd.Parameters.AddWithValue("@Image", ndControl.Attributes["Image"].Value);
+                                cmd.Parameters.AddWithValue("@Global", ndControl.Attributes["Global"].Value);
+                                cmd.Parameters.AddWithValue("@ButtonStyle", ndControl.Attributes["ButtonStyle"].Value);
+                                cmd.Parameters.AddWithValue("@WindowStyle", ndControl.Attributes["WindowStyle"].Value);
+
+                                cmd.ExecuteNonQuery();
+                            }
+
                             cn.Close();
 
     
@@ -149,13 +164,18 @@ namespace EPMLiveCore.API
                             SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(web.Site.WebApplication.Id));
                             cn.Open();
 
-                            SqlCommand cmd = new SqlCommand("DELETE FROM PLATFORMINTEGRATIONS where PlatformIntegrationId=@id", cn);
+                            SqlCommand cmd = new SqlCommand("DELETE FROM PLATFORMINTEGRATIONLOG where PlatformIntegrationId=@id", cn);
                             cmd.Parameters.AddWithValue("@id", doc.FirstChild.Attributes["IntID"].Value);
                             cmd.ExecuteNonQuery();
 
-                            cmd = new SqlCommand("DELETE FROM PLATFORMINTEGRATIONLOG where PlatformIntegrationId=@id", cn);
-                            cmd.Parameters.AddWithValue("@intid", doc.FirstChild.Attributes["IntID"].Value);
+                            cmd = new SqlCommand("DELETE FROM PLATFORMINTEGRATIONCONTROLS where PlatformIntegrationId=@id", cn);
+                            cmd.Parameters.AddWithValue("@id", doc.FirstChild.Attributes["IntID"].Value);
+                            cmd.ExecuteNonQuery(); 
+                            
+                            cmd = new SqlCommand("DELETE FROM PLATFORMINTEGRATIONS where PlatformIntegrationId=@id", cn);
+                            cmd.Parameters.AddWithValue("@id", doc.FirstChild.Attributes["IntID"].Value);
                             cmd.ExecuteNonQuery();
+                          
 
                             cn.Close();
 
