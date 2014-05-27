@@ -1771,6 +1771,15 @@ namespace EPMLiveCore.API
             return docOut.OuterXml;
         }
 
+        public static string GetResourcePoolXml(string xml, SPWeb oWeb)
+        {
+            System.IO.StringWriter writer = new System.IO.StringWriter();
+            DataTable dt = GetResourcePool(xml, oWeb);
+            dt.TableName = "Resources";
+            dt.WriteXml(writer, XmlWriteMode.WriteSchema, false);
+            return writer.ToString();
+        }
+
         public static DataTable GetResourcePool(string xml, SPWeb oWeb)
         {
             string resUrl = "";

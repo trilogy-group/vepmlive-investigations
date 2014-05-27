@@ -520,6 +520,18 @@ namespace EPMLiveCore
             }
         }
 
+        public static string GetResourcePool(string data, SPWeb oWeb)
+        {
+            try
+            {
+                return Response.Success(APITeam.GetResourcePoolXml(data, oWeb));
+            }
+            catch (APIException ex)
+            {
+                return Response.Failure(ex.ExceptionNumber, string.Format("Error: {0}", ex.Message));
+            }
+        }
+
         #endregion
 
         #region My Work Methods
