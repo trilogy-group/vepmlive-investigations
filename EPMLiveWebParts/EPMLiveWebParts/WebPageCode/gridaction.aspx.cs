@@ -353,6 +353,14 @@ namespace EPMLiveWebParts
             });
         }
 
+        private SPWeb GetWeb(SPSite site)
+        {
+            if (Request["webid"] != null && Request["webid"] != "")
+                return site.OpenWeb(new Guid(Request["webid"]));
+            else
+                return SPContext.Current.Web;
+        }
+
         protected void Page_Load(object sender, EventArgs e)
         {
             string url = "";
@@ -367,7 +375,7 @@ namespace EPMLiveWebParts
                     switch (Request["action"].ToLower())
                     {
                         case "buildteam":
-                            w = site.OpenWeb(new Guid(Request["webid"]));
+                            w = GetWeb(site);
                             url = ((w.ServerRelativeUrl == "/") ? "" : w.ServerRelativeUrl) + "/_layouts/epmlive/buildteam.aspx?listid=" + Request["listid"] + "&id=" + Request["id"];
                             w.Close();
                             break;
@@ -393,15 +401,16 @@ namespace EPMLiveWebParts
                             }
                             break;
                         case "getribbonplanners":
-                            w = site.OpenWeb(new Guid(Request["webid"]));
+                            w = GetWeb(site);
                             {
                                 SPList list = w.Lists[new Guid(Request["listid"])];
                                 SPListItem li = list.GetItemById(int.Parse(Request["itemid"]));
                                 data = getplannerlist(w, li);
                             }
+                            w.Close();
                             break;
                         case "createworkspace":
-                            w = site.OpenWeb(new Guid(Request["webid"]));
+                            w = GetWeb(site);
                             url = ((w.ServerRelativeUrl == "/") ? "" : w.ServerRelativeUrl) + "/_layouts/epmlive/requestworkspace.aspx?id=" + Request["ID"] + "&list=" + Request["listId"];
                             w.Close();
                             break;
@@ -464,7 +473,7 @@ namespace EPMLiveWebParts
                             url = site.ServerRelativeUrl + "/_layouts/ppm/" + Request["epkcontrol"] + ".aspx?itemid=" + Request["itemid"] + "&listid=" + Request["listid"];
                             break;
                         case "epkcommand":
-                            w = site.OpenWeb(new Guid(Request["webid"]));
+                            w = GetWeb(site);
                             {
                                 SPList list = w.Lists[new Guid(Request["listid"])];
 
@@ -499,17 +508,17 @@ namespace EPMLiveWebParts
                             }
                             break;
                         case "gotoplanner":
-                            w = site.OpenWeb(new Guid(Request["webid"]));
+                            w = GetWeb(site);
                             url = ((w.ServerRelativeUrl == "/") ? "" : w.ServerRelativeUrl) + "/_layouts/epmlive/workplanner.aspx?listid=" + Request["listid"] + "&ID=" + Request["id"];
                             w.Close();
                             break;
                         case "gotoplannerpc":
-                            w = site.OpenWeb(new Guid(Request["webid"]));
+                            w = GetWeb(site);
                             url = ((w.ServerRelativeUrl == "/") ? "" : w.ServerRelativeUrl) + "/_layouts/epmlive/workplanner.aspx?listid=" + Request["listid"] + "&ID=" + Request["id"] + "&PCSelected=true";
                             w.Close();
                             break;
                         case "gototaskplanner":
-                            w = site.OpenWeb(new Guid(Request["webid"]));
+                            w = GetWeb(site);
 
                             if(String.IsNullOrEmpty(Request["listid"]))
                             {
@@ -536,7 +545,7 @@ namespace EPMLiveWebParts
                             break;
                         case "editinproject":
                         case "getproject":
-                            w = site.OpenWeb(new Guid(Request["webid"]));
+                            w = GetWeb(site);
 
                             //data = "<script language=\"javascript\">";
                             //data += "javascript:window.open('" + w.ServerRelativeUrl + "/_layouts/epmlive/getproject.aspx?listID=" + Request["listId"] + "&ID=" + Request["ID"] + "','', config='height=100,width=200, toolbar=no, menubar=no, scrollbars=no, resizable=no,location=no, directories=no, status=no');";
@@ -547,7 +556,7 @@ namespace EPMLiveWebParts
                             break;
                         case "editinpsproject":
                         case "getpsproject":
-                            w = site.OpenWeb(new Guid(Request["webid"]));
+                            w = GetWeb(site);
 
                             //data = "<script language=\"javascript\">";
                             //data += "javascript:window.open('" + w.ServerRelativeUrl + "/_layouts/epmlive/getproject.aspx?listID=" + Request["listId"] + "&ID=" + Request["ID"] + "','', config='height=100,width=200, toolbar=no, menubar=no, scrollbars=no, resizable=no,location=no, directories=no, status=no');";
@@ -557,7 +566,7 @@ namespace EPMLiveWebParts
                             w.Close();
                             break;
                         case "getpswebapp":
-                            w = site.OpenWeb(new Guid(Request["webid"]));
+                            w = GetWeb(site);
 
                             //data = "<script language=\"javascript\">";
                             //data += "javascript:window.open('" + w.ServerRelativeUrl + "/_layouts/epmlive/getproject.aspx?listID=" + Request["listId"] + "&ID=" + Request["ID"] + "','', config='height=100,width=200, toolbar=no, menubar=no, scrollbars=no, resizable=no,location=no, directories=no, status=no');";
@@ -567,7 +576,7 @@ namespace EPMLiveWebParts
                             w.Close();
                             break;
                         case "workspace":
-                            w = site.OpenWeb(new Guid(Request["webid"]));
+                            w = GetWeb(site);
                             try
                             {
                                 SPList list = w.Lists[new Guid(Request["listid"])];
@@ -582,29 +591,29 @@ namespace EPMLiveWebParts
                             w.Close();
                             break;
                         case "planner":
-                            w = site.OpenWeb(new Guid(Request["webid"]));
+                            w = GetWeb(site);
                             url = ((w.ServerRelativeUrl == "/") ? "" : w.ServerRelativeUrl) + "/_layouts/epmlive/workplanner.aspx?listID=" + Request["listId"] + "ID=" + Request["id"];
                             w.Close();
                             break;
                         case "plannerwp":
                         case "workplan":
-                            w = site.OpenWeb(new Guid(Request["webid"]));
+                            w = GetWeb(site);
                             url = ((w.ServerRelativeUrl == "/") ? "" : w.ServerRelativeUrl) + "/_layouts/epmlive/tasks.aspx?ID=" + Request["id"];
                             w.Close();
                             break;
                         case "planneragile":
                         case "agile":
-                            w = site.OpenWeb(new Guid(Request["webid"]));
+                            w = GetWeb(site);
                             url = ((w.ServerRelativeUrl == "/") ? "" : w.ServerRelativeUrl) + "/_layouts/epmlive/agile/tasks.aspx?ID=" + Request["id"];
                             w.Close();
                             break;
                         case "tasks":
-                            w = site.OpenWeb(new Guid(Request["webid"]));
+                            w = GetWeb(site);
                             url = ((w.ServerRelativeUrl == "/") ? "" : w.ServerRelativeUrl) + "/Lists/Task Center?FilterField1=" + Request["FilterField1"] + "&FilterValue1=" + Request["FilterValue1"];
                             w.Close();
                             break;
                         case "version":
-                            w = site.OpenWeb(new Guid(Request["webid"]));
+                            w = GetWeb(site);
                             {
                                 SPList list = w.Lists[new Guid(Request["listid"])];
                                 SPListItem li = list.GetItemById(int.Parse (Request["ID"]));
@@ -613,7 +622,7 @@ namespace EPMLiveWebParts
                             w.Close();
                             break;
                         case "edit":
-                            w = site.OpenWeb(new Guid(Request["webid"]));
+                            w = GetWeb(site);
                             {
                                 SPList list = w.Lists[new Guid(Request["listid"])];
                                 url = ((w.ServerRelativeUrl == "/") ? "" : w.ServerRelativeUrl) + "/" + list.Forms[PAGETYPE.PAGE_EDITFORM].Url + "?ID=" + Request["ID"];
@@ -621,7 +630,7 @@ namespace EPMLiveWebParts
                             w.Close();
                             break;
                         case "view":
-                            w = site.OpenWeb(new Guid(Request["webid"]));
+                            w = GetWeb(site);
                             {
                                 SPList list = w.Lists[new Guid(Request["listid"])];
                                 url = ((w.ServerRelativeUrl == "/") ? "" : w.ServerRelativeUrl) + "/" + list.Forms[PAGETYPE.PAGE_DISPLAYFORM].Url + "?ID=" + Request["ID"];
@@ -629,7 +638,7 @@ namespace EPMLiveWebParts
                             w.Close();
                             break;
                         case "delete":
-                            w = site.OpenWeb(new Guid(Request["webid"]));
+                            w = GetWeb(site);
                             w.AllowUnsafeUpdates = true;
                             {
                                 SPList list = w.Lists[new Guid(Request["listid"])];
@@ -665,28 +674,28 @@ namespace EPMLiveWebParts
                             }
                             break;
                         case "subscribe":
-                            w = site.OpenWeb(new Guid(Request["webid"]));
+                            w = GetWeb(site);
                             {
                                 url = ((w.ServerRelativeUrl == "/") ? "" : w.ServerRelativeUrl) + "/_layouts/subnew.aspx?List=" + Request["listid"] + "&ID=" + Request["ID"];
                             }
                             w.Close();
                             break;
                         case "approve":
-                            w = site.OpenWeb(new Guid(Request["webid"]));
+                            w = GetWeb(site);
                             {
                                 url = ((w.ServerRelativeUrl == "/") ? "" : w.ServerRelativeUrl) + "/_layouts/approve.aspx?List=" + Request["listid"] + "&ID=" + Request["ID"];
                             }
                             w.Close();
                             break;
                         case "attachfile":
-                            w = site.OpenWeb(new Guid(Request["webid"]));
+                            w = GetWeb(site);
                             {
                                 url = ((w.ServerRelativeUrl == "/") ? "" : w.ServerRelativeUrl) + "/_layouts/attachfile.aspx?ListId=" + Request["listid"] + "&ItemId=" + Request["ID"];
                             }
                             w.Close();
                             break;
                         case "viewedit2":
-                            w = site.OpenWeb(new Guid(Request["webid"]));
+                            w = GetWeb(site);
                             {
                                 SPList list = w.Lists[new Guid(Request["listid"])];
                                 url = ((w.ServerRelativeUrl == "/") ? "" : w.ServerRelativeUrl) + "/_layouts/epmlive/listedititem.aspx?ListId=" + Request["listid"] + "&ID=" + Request["ID"] + "&Mode=" + Request["mode"] + "&Source=" + HttpUtility.UrlEncode(w.ServerRelativeUrl) + "%2F%5Flayouts%2Fepmlive%2Flistedititem%2Easpx%3Fclose%3D1%26ListId%3D" + Request["listid"] + "%26ID%3D" + Request["ID"] + "&gridid=" + Request["gridid"] + "&siteid=" + w.Site.ID + "&webid=" + w.ID + "&rowid=" + Request["rowid"];
@@ -694,7 +703,7 @@ namespace EPMLiveWebParts
                             w.Close();
                             break;
                         case "perms":
-                            w = site.OpenWeb(new Guid(Request["webid"]));
+                            w = GetWeb(site);
                             {
                                 SPList list = w.Lists[new Guid(Request["listid"])];
                                 url = ((w.ServerRelativeUrl == "/") ? "" : w.ServerRelativeUrl) + "/_layouts/user.aspx?obj=" + Request["listid"] + "," + Request["id"] + ",LISTITEM&LIST=" + Request["listid"] + "&Source=" + HttpUtility.UrlEncode(w.ServerRelativeUrl) + "%2F%5Flayouts%2Fepmlive%2Flistedititem%2Easpx%3Fclose%3D1%26ListId%3D" + Request["listid"] + "%26ID%3D" + Request["ID"] + "&gridid=" + Request["gridid"] + "&siteid=" + w.Site.ID + "&webid=" + w.ID + "&rowid=" + Request["rowid"];
@@ -702,19 +711,19 @@ namespace EPMLiveWebParts
                             w.Close();
                             break;
                         case "workflows":
-                            w = site.OpenWeb(new Guid(Request["webid"]));
+                            w = GetWeb(site);
                             url = ((w.ServerRelativeUrl == "/") ? "" : w.ServerRelativeUrl) + "/_layouts/Workflow.aspx?ID=" + Request["id"] + "&List={" + Request["listid"] + "}";
                             w.Close();
                             break;
                         case "comments":
-                            w = site.OpenWeb(new Guid(Request["webid"]));
+                            w = GetWeb(site);
                             url = ((w.ServerRelativeUrl == "/") ? "" : w.ServerRelativeUrl) + "/_layouts/epmlive/comments.aspx?itemID=" + Request["id"] + "&Listid=" + Request["listid"];
                             w.Close();
                             break;
                         case "getcontextmenus":
                             try
                             {
-                                w = site.OpenWeb(new Guid(Request["webid"]));
+                                w = GetWeb(site);
                                 {
                                     data = getmenus(w);
                                 }
