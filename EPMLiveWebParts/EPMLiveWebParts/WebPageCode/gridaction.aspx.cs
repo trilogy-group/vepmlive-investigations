@@ -592,7 +592,7 @@ namespace EPMLiveWebParts
                             break;
                         case "planner":
                             w = GetWeb(site);
-                            url = ((w.ServerRelativeUrl == "/") ? "" : w.ServerRelativeUrl) + "/_layouts/epmlive/workplanner.aspx?listID=" + Request["listId"] + "ID=" + Request["id"];
+                            url = ((w.ServerRelativeUrl == "/") ? "" : w.ServerRelativeUrl) + "/_layouts/epmlive/workplanner.aspx?listID=" + Request["listId"] + "&ID=" + Request["id"];
                             w.Close();
                             break;
                         case "plannerwp":
