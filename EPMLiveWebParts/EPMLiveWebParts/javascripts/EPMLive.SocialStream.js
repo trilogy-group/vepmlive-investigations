@@ -3,7 +3,8 @@
 
     var SocialEngine = function() {
         var SE = (function() {
-            var baseUrl = window.epmLive.currentWebUrl.slice(1);
+            var webUrl = window.epmLive.currentWebUrl.slice(1) + '/';
+            var baseUrl = webUrl === '/' ? webUrl : '/' + webUrl;
 
             var se = {
                 pagination: null,
@@ -22,9 +23,9 @@
                         disabled: 'epm-se-disabled'
                     }
                 },
-                apiUrl: '/' + baseUrl + '/_vti_bin/SocialEngine.svc',
-                commentServiceUrl: '/' + baseUrl + '/_layouts/15/epmlive/CommentsProxy.aspx',
-                statusUpdateServiceUrl: '/' + baseUrl + '/_vti_bin/WorkEngine.asmx/Execute'
+                apiUrl: baseUrl + '_vti_bin/SocialEngine.svc',
+                commentServiceUrl: baseUrl + '_layouts/15/epmlive/CommentsProxy.aspx',
+                statusUpdateServiceUrl: baseUrl + '_vti_bin/WorkEngine.asmx/Execute'
             };
 
             var $el = {
