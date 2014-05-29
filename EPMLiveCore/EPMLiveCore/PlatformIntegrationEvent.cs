@@ -69,7 +69,7 @@ namespace EPMLiveCore
                             SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(properties.Site.WebApplication.Id));
                             cn.Open();
 
-                            SqlCommand cmd = new SqlCommand("INSERT INTO PLATFORMINTEGRATIONLOG (PlatformIntegrationId, DTLOGGED, MESSAGE, LOGLEEL) VALUES (@intid, GETDATE(), @message, 30)", cn);
+                            SqlCommand cmd = new SqlCommand("INSERT INTO PLATFORMINTEGRATIONLOG (PlatformIntegrationId, DTLOGGED, MESSAGE, LOGLEVEL) VALUES (@intid, GETDATE(), @message, 30)", cn);
                             cmd.Parameters.AddWithValue("@intid", id);
                             cmd.Parameters.AddWithValue("@message", ex.Message);
                             cmd.ExecuteNonQuery();
