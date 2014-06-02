@@ -637,7 +637,7 @@ namespace TimeSheets
                                     TSDCols = " + TSDCols + @";
                                     siteId = '" + SPContext.Current.Web.ID + @"';
                                     siteUrl = '" + url + @"';
-                                    siteColUrl = '" + SPContext.Current.Site.ServerRelativeUrl + @"';
+                                    siteColUrl = '" + (SPContext.Current.Site.ServerRelativeUrl == "/" ? "" : SPContext.Current.Site.ServerRelativeUrl) + @"';
                                     periodId = '" + sPeriodId + @"';
                                     GridType = '" + GridType + @"';
 
