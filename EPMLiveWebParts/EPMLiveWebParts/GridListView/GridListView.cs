@@ -2835,7 +2835,7 @@ namespace EPMLiveWebParts
 
                 sb.Append("{");
                 sb.Append("'iconClass': '',");
-                sb.Append("'text': '" + view.Title + "',");
+                sb.Append("'text': '" + System.Web.HttpUtility.HtmlEncode(view.Title) + "',");
                 sb.Append("'events': [");
                 sb.Append("{");
                 sb.Append("'eventName': 'click',");
