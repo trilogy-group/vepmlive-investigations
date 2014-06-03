@@ -115,6 +115,7 @@
     <Compile Include="Service References\TenroxIntegrationService\Reference.cs" />
     <Compile Include="ServiceNow\ServiceNowIntegrator.cs" />
     <Compile Include="ServiceNow\ServiceNowService.cs" />
+    <Compile Include="Tenrox\Managers\UserManager.cs" />
     <Compile Include="Utils\CustomJsonConverter.cs" />
     <Compile Include="Web References\IntegrationAPI\Reference.cs">
       <AutoGen>True</AutoGen>
@@ -795,7 +796,7 @@
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>"C:\Program Files (x86)\Microsoft SDKs\Windows\v8.0A\Bin\NETFX 4.0 Tools\x64\gacutil.exe" /i "C:\Workspace\Upland\EPM Live\EPMLive2013\UplandIntegrations\UplandIntegrations\bin\Debug\UplandIntegrations.dll" /f
+    <PostBuildEvent>"C:\Program Files (x86)\Microsoft SDKs\Windows\v8.0A\Bin\NETFX 4.0 Tools\x64\gacutil.exe" /i "C:\Workspace\Upland\EPM Live\EPMLive2013Release\Release\\UplandIntegrations\UplandIntegrations\bin\Debug\UplandIntegrations.dll" /f
 iisreset</PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>

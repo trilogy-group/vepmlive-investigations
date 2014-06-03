@@ -22,6 +22,8 @@ namespace UplandIntegrations.Tenrox.Infrastructure
                     return new TaskManager(binding, endpointAddress, token);
                 case "client":
                     return new ClientManager(binding, endpointAddress, token);
+                case "user":
+                    return new UserManager(binding, endpointAddress, token);
                 default:
                     throw new Exception(objectName + " is not a valid Tenrox object.");
             }

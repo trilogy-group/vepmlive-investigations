@@ -100,7 +100,8 @@ namespace UplandIntegrations.Tenrox
                     {
                         {"Client", "Client"},
                         {"Project", "Project"},
-                        {"Task", "Task"}
+                        {"Task", "Task"},
+                        {"User", "User"}
                     };
                 }
 
