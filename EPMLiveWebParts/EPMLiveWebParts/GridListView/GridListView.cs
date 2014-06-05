@@ -2751,7 +2751,7 @@ namespace EPMLiveWebParts
                         'controlId': 'ddlViewControl',
                         'controlType': 'dropdown',
                         'title': 'View: ',
-                        'value': '" + view.Title + @"',
+                        'value': '" + view.Title.Replace("'","\\'") + @"',
                         'iconClass': 'none',
                         'sections': [
                             {
@@ -5031,7 +5031,7 @@ namespace EPMLiveWebParts
             output.WriteLine("mygrid" + sFullGridId + "._viewurl = '" + web.Url.Replace(" ", "%20") + "/" + view.Url.Replace(" ", "%20") + "';");
             output.WriteLine("mygrid" + sFullGridId + "._siteurl = '" + web.Site.ServerRelativeUrl + "';");
             output.WriteLine("mygrid" + sFullGridId + "._webrelurl = '" + (web.ServerRelativeUrl == "/" ? "" : web.ServerRelativeUrl) + "';");
-            output.WriteLine("mygrid" + sFullGridId + "._viewname = '" + view.Title + "';");
+            output.WriteLine("mygrid" + sFullGridId + "._viewname = '" + view.Title.Replace("'","\\'") + "';");
             output.WriteLine("mygrid" + sFullGridId + "._basetype = '" + list.BaseType + "';");
             output.WriteLine("mygrid" + sFullGridId + "._templatetype = '" + (int)list.BaseTemplate + "';");
             output.WriteLine("mygrid" + sFullGridId + "._newrow = " + (inEditMode && allowInsertRow).ToString().ToLower() + ";");
