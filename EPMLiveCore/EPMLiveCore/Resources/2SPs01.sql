@@ -280,6 +280,44 @@ end
 
 END')
  
+if not exists (select routine_name from INFORMATION_SCHEMA.routines where routine_name = 'spNTranslateNotificationToPersonalization')
+begin
+    Print 'Creating Stored Procedure spNTranslateNotificationToPersonalization'
+    SET @createoralter = 'CREATE'
+end
+else
+begin
+    Print 'Updating Stored Procedure spNTranslateNotificationToPersonalization'
+    SET @createoralter = 'ALTER'
+end
+exec(@createoralter + ' PROCEDURE [dbo].[spNTranslateNotificationToPersonalization] 
+	-- Add the parameters for the stored procedure here
+	@NotificationId UNIQUEIDENTIFIER,
+	@UserId NVARCHAR(255),
+	@UserName NVARCHAR(255)
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT ON;
+
+    -- Insert statements for procedure here
+    
+    IF NOT EXISTS(SELECT Id FROM dbo.PERSONALIZATIONS WHERE ([Key] = ''Notifications'') AND (FK = @NotificationId) AND ((UserId = @UserName) OR (UserId = @UserId)))
+	BEGIN
+		DECLARE @User NVARCHAR(255)
+		IF (SELECT dbo.NOTIFICATIONS.Type FROM dbo.NOTIFICATIONS WHERE dbo.NOTIFICATIONS.ID = @NotificationId) > 1
+			SET @User = @UserId
+		ELSE
+			SET @User = @UserName
+		
+		INSERT INTO dbo.PERSONALIZATIONS ([Key], Value, UserId, FK) VALUES (''Notifications'', ''00'', @User, @NotificationId)
+	END
+END
+
+
+')
+ 
 if not exists (select routine_name from INFORMATION_SCHEMA.routines where routine_name = 'spINTGetQueue')
 begin
     Print 'Creating Stored Procedure spINTGetQueue'
@@ -569,44 +607,6 @@ update PERSONALIZATIONS set Value=@newval where FK=@FK and UserId = @userid
 
 
 END
-')
- 
-if not exists (select routine_name from INFORMATION_SCHEMA.routines where routine_name = 'spNTranslateNotificationToPersonalization')
-begin
-    Print 'Creating Stored Procedure spNTranslateNotificationToPersonalization'
-    SET @createoralter = 'CREATE'
-end
-else
-begin
-    Print 'Updating Stored Procedure spNTranslateNotificationToPersonalization'
-    SET @createoralter = 'ALTER'
-end
-exec(@createoralter + ' PROCEDURE [dbo].[spNTranslateNotificationToPersonalization] 
-	-- Add the parameters for the stored procedure here
-	@NotificationId UNIQUEIDENTIFIER,
-	@UserId NVARCHAR(255),
-	@UserName NVARCHAR(255)
-AS
-BEGIN
-	-- SET NOCOUNT ON added to prevent extra result sets from
-	-- interfering with SELECT statements.
-	SET NOCOUNT ON;
-
-    -- Insert statements for procedure here
-    
-    IF NOT EXISTS(SELECT Id FROM dbo.PERSONALIZATIONS WHERE ([Key] = ''Notifications'') AND (FK = @NotificationId) AND ((UserId = @UserName) OR (UserId = @UserId)))
-	BEGIN
-		DECLARE @User NVARCHAR(255)
-		IF (SELECT dbo.NOTIFICATIONS.Type FROM dbo.NOTIFICATIONS WHERE dbo.NOTIFICATIONS.ID = @NotificationId) > 1
-			SET @User = @UserId
-		ELSE
-			SET @User = @UserName
-		
-		INSERT INTO dbo.PERSONALIZATIONS ([Key], Value, UserId, FK) VALUES (''Notifications'', ''00'', @User, @NotificationId)
-	END
-END
-
-
 ')
  
 if not exists (select routine_name from INFORMATION_SCHEMA.routines where routine_name = 'spQueueTimerJobs')

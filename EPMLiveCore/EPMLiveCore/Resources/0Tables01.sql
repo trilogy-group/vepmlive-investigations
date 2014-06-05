@@ -860,7 +860,7 @@ begin
 
 
 end
------------------PLATFORMINTEGRATIONS------------
+-----------------PLATFORMINTEGRATIONLOG------------
 
 if not exists (select table_name from INFORMATION_SCHEMA.tables where table_name = 'PLATFORMINTEGRATIONLOG')
 	begin
@@ -883,6 +883,34 @@ begin
 
 
 end
+
+-----------------PLATFORMINTEGRATIONControlS------------
+
+if not exists (select table_name from INFORMATION_SCHEMA.tables where table_name = 'PLATFORMINTEGRATIONCONTROLS')
+	begin
+		
+		print 'Creating Table PLATFORMINTEGRATIONCONTROLS'
+		
+		CREATE TABLE [dbo].[PLATFORMINTEGRATIONCONTROLS](
+			[PLATFORMCONTROLID] [uniqueidentifier] NULL,
+			[PlatformIntegrationId] [uniqueidentifier] NULL,
+			[ControlId] [varchar](255) NULL,
+			[DisplayName] [varchar](255) NULL,
+			[Image] [varchar](255) NULL,
+			[Global] [bit] NULL,
+			[ButtonStyle] [varchar](50) NULL,
+			[WindowStyle] [varchar](50) NULL
+		) ON [PRIMARY]
+		
+end
+else
+begin
+
+	print 'Updating Table PLATFORMINTEGRATIONCONTROLS'
+
+
+end
+
 
 -------------------------Constraints-----------------
 
