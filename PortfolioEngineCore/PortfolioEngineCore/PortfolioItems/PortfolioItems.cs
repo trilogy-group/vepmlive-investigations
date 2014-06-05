@@ -299,23 +299,26 @@ namespace PortfolioEngineCore.PortfolioItems
 
                     bUpdatedViaName = false;
 
+                    // FIXING BUG: EPML-2952
 
-                    if (lRowsAffected == 0)
-                    {
+                    //if (lRowsAffected == 0)
+                    //{
 
-                        string sTitleValue = "";
+                    //    string sTitleValue = "";
 
-                        sTitleValue = GetPITitleValue(xPI);
+                    //    sTitleValue = GetPITitleValue(xPI);
 
-                        if (sTitleValue != "")
-                        {
-                            sCommand = "UPDATE EPGP_PROJECTS SET PROJECT_MARKED_DELETION = 0, PROJECT_EXT_UID =  '" + sGuid + "' WHERE PROJECT_NAME = " + DBAccess.PrepareText(sTitleValue);
+                    //    if (sTitleValue != "")
+                    //    {
+                    //        sCommand = "UPDATE EPGP_PROJECTS SET PROJECT_MARKED_DELETION = 0, PROJECT_EXT_UID =  '" + sGuid + "' WHERE PROJECT_NAME = " + DBAccess.PrepareText(sTitleValue);
 
-                            oCommand = new SqlCommand(sCommand, _sqlConnection);
-                            lRowsAffected = oCommand.ExecuteNonQuery();
-                            // bUpdatedViaName = true;
-                        }
-                    }
+                    //        oCommand = new SqlCommand(sCommand, _sqlConnection);
+                    //        lRowsAffected = oCommand.ExecuteNonQuery();
+                    //        // bUpdatedViaName = true;
+                    //    }
+                    //}
+
+                    // DONE FIXING BUG: EPML-2952
 
 
                     if (lRowsAffected == 0)
