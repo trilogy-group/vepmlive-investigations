@@ -20,7 +20,7 @@ namespace PortfolioEngineCore.Services.DataServices.Core
             _moduleKind = moduleKind;
             _actionKind = actionKind;
             _logger = logger;
-            _id = Guid.NewGuid();
+            _id = Guid.NewGuid(); // Replace with the database id
         }
 
         #endregion Constructors 
@@ -71,6 +71,7 @@ namespace PortfolioEngineCore.Services.DataServices.Core
 
         internal void ReportProgress(decimal percentage)
         {
+            // Update progress in database
             if (OnProgressed != null) OnProgressed(new TransactionProgressedEventArgs(percentage));
         }
 
