@@ -1251,12 +1251,12 @@ function SaveView(grid, retval) {
 }
 
 function CheckApproveStatus(gridid) {
-
+    return;
     var grid = Grids[gridid];
 
     EPMLiveCore.WorkEngineAPI.ExecuteJSON("timesheet_CheckApproveStatus", "<Timesheet ID=\"" + grid.TimesheetUID + "\" />", function (response) {
         var oResponse = eval("(" + response + ")");
-
+        
         if (oResponse.ApproveStatus.Result == "0") {
 
             var status = "";
