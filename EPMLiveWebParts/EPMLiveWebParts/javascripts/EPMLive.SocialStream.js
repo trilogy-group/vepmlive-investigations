@@ -668,9 +668,15 @@
 
                 function attahEvents(settings) {
                     settings.input.focus(function() {
-                        if ($(this).html() === settings.placeholder) removePlaceholder(settings);
+                        var html = $(this).html();
+
+                        if (html === settings.placeholder) removePlaceholder(settings);
                         settings.input.addClass(se.ui.classes.expanded);
                         settings.button.show();
+
+                        if (html !== '' && html !== '<br>' && html !== settings.placeholder) {
+                            settings.button.addClass(se.ui.classes.active);
+                        }
                     });
 
                     settings.input.blur(function() {
