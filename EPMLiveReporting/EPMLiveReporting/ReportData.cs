@@ -1186,7 +1186,7 @@ namespace EPMLiveReportsAdmin
         public DataTable GetListColumns(string sListName)
         {
             string sSQL =
-                "SELECT dbo.RPTColumn.*, dbo.RPTList.ListName FROM dbo.RPTList INNER JOIN dbo.RPTColumn ON dbo.RPTList.RPTListId = dbo.RPTColumn.RPTListId WHERE (dbo.RPTList.ListName = @listName) AND dbo.RPTList.SiteId=@siteId";
+                "SELECT DISTINCT dbo.RPTColumn.*, dbo.RPTList.ListName FROM dbo.RPTList INNER JOIN dbo.RPTColumn ON dbo.RPTList.RPTListId = dbo.RPTColumn.RPTListId WHERE (dbo.RPTList.ListName = @listName) AND dbo.RPTList.SiteId=@siteId";
             _DAO.Command = sSQL;
             _DAO.AddParam("@listName", sListName);
             _DAO.AddParam("@siteId", _siteId);
@@ -1217,7 +1217,7 @@ namespace EPMLiveReportsAdmin
         {
             //string sSQL = "SELECT dbo.RPTColumn.*, dbo.RPTList.ListName FROM dbo.RPTList INNER JOIN dbo.RPTColumn ON dbo.RPTList.RPTListId = dbo.RPTColumn.RPTListId WHERE (dbo.RPTList.RPTListId = '" + listuid.ToString() + "')"; - CAT.NET
             string sSQL =
-                "SELECT dbo.RPTColumn.*, dbo.RPTList.ListName FROM dbo.RPTList INNER JOIN dbo.RPTColumn ON dbo.RPTList.RPTListId = dbo.RPTColumn.RPTListId WHERE (dbo.RPTList.RPTListId = @listId)";
+                "SELECT DISTINCT dbo.RPTColumn.*, dbo.RPTList.ListName FROM dbo.RPTList INNER JOIN dbo.RPTColumn ON dbo.RPTList.RPTListId = dbo.RPTColumn.RPTListId WHERE (dbo.RPTList.RPTListId = @listId)";
             // - CAT.NET false-positive: All single quotes are escaped/removed.
             _DAO.Command = sSQL;
             _DAO.AddParam("@listId", listuid);
