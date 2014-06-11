@@ -35,6 +35,8 @@ namespace UplandIntegrations.PowerSteering.Infrastructure
                 Authenticator = client.Authenticator
             };
 
+            _metadataClient.AddDefaultHeader("Accept", "application/xml, text/xml");
+
             client.BaseUrl += serviceUrl;
             _client = client;
 

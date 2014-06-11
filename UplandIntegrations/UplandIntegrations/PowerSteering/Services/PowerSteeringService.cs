@@ -31,6 +31,8 @@ namespace UplandIntegrations.PowerSteering.Services
                 BaseUrl = new Uri(new Uri(serverUrl), contextName + "/rest").ToString(),
                 Authenticator = new HttpBasicAuthenticator(apiKey, apiSecret.ToUnsecureString())
             };
+
+            _client.AddDefaultHeader("Accept", "application/xml, text/xml");
         }
 
         #endregion Constructors 
