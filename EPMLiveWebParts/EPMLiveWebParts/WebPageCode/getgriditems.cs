@@ -6022,7 +6022,10 @@ namespace EPMLiveWebParts
                         val = "No";
                     break;
                 case SPFieldType.Lookup:
-                    val = list.Fields[spfield.Id].GetFieldValueAsText(val);
+                    //val = list.Fields[spfield.Id].GetFieldValueAsText(val);
+                    val = list.Fields[spfield.Id].GetFieldValue(val).ToString();
+                    if (val.Contains(";#"))
+                        val = val.Replace(";#", "");
                     break;
                 case SPFieldType.URL:
                     if (((SPFieldUrl)spfield).DisplayFormat == SPUrlFieldFormatType.Image)
