@@ -95,7 +95,7 @@
 			 Sequence="55"
 			 Template="Ribbon.Templates.ResourceGridTemplate">
 		<Controls Id="Ribbon.ResourceGrid.Actions.Controls">
-		  <ToggleButton Id="Ribbon.ResourceGrid.Actions.Find"
+		  <!--<ToggleButton Id="Ribbon.ResourceGrid.Actions.Find"
 				  Command="ResourceGrid.Cmd.Find"
 				  QueryCommand="ResourceGrid.Cmd.Find.Query"
 				  Description="Find a resource"
@@ -106,7 +106,7 @@
 				  Image32by32Left="-256"
 				  Image16by16Top="-32"
 				  Image16by16Left="-144"
-				  Image16by16="_layouts/1033/images/formatmap16x16.png" />
+				  Image16by16="_layouts/1033/images/formatmap16x16.png" />-->
 		  <Button Id="Ribbon.ResourceGrid.Actions.Notify"
 				  Command="ResourceGrid.Cmd.SendNotification"
 				  Description="Send notification"
