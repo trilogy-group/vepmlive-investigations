@@ -38,11 +38,11 @@ namespace EPMLiveCore.Layouts.epmlive
             {
                 try
                 {
-                    XmlNode ndReports = doc.FirstChild.SelectSingleNode("//Data").FirstChild.SelectSingleNode("Folder[@Name='epmlivetl']").SelectSingleNode("Folder[@Name='(2) Resource']");
+                    XmlNode ndReports = doc.FirstChild.SelectSingleNode("//Data").FirstChild.SelectSingleNode("Folder[@Name='epmlivetl']").SelectSingleNode("Folder[@Name='Resources']");
 
                     StringBuilder sb = new StringBuilder();
 
-                    foreach(XmlNode nd in ndReports.SelectNodes("Report"))
+                    foreach(XmlNode nd in ndReports.SelectNodes("Folder/Report"))
                     {
 
                         sb.Append("<Button");
