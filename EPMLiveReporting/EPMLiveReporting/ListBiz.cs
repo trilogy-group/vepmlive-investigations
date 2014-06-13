@@ -440,6 +440,7 @@ namespace EPMLiveReportsAdmin
                 fields.Add(listField);
             }
 
+            matches = 0;
             foreach (ListItem field in fields)
             {
                 SPField spField = spList.Fields[new Guid(field.Value)];
