@@ -387,6 +387,7 @@ namespace EPMLiveWebParts
                             }
                             break;
                         case "associateditems":
+                        case "fancydispform":
                             w = SPContext.Current.Web;
                             {
                                 SPList list = w.Lists[new Guid(Request["list"])];
