@@ -138,7 +138,13 @@ html, body {
                 tgrid1_selectedRow = row;
                 if (row != null && row != "") {
                     toolbar2.enableItem("btnInsert2");
-                    toolbar2.enableItem("btnDelete2");
+                    if (row.id != null && row.id.substring(2) == grid.RowCount) {
+                        toolbar2.enableItem("btnDelete2");
+                    }
+                    else
+                    {
+                        toolbar2.disableItem("btnDelete2");
+                    }
                 }
                 else {
                     toolbar2.disableItem("btnInsert2");
