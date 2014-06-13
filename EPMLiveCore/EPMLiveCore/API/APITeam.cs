@@ -1555,9 +1555,13 @@ namespace EPMLiveCore.API
                         attr = doc.CreateAttribute("Range");
                         attr.Value = "1";
                         ndNew.Attributes.Append(attr);
+                                                
+                        //attr = doc.CreateAttribute("RelWidth");
+                        //attr.Value = "1";
+                        //ndNew.Attributes.Append(attr);
 
-                        attr = doc.CreateAttribute("RelWidth");
-                        attr.Value = "1";
+                        attr = doc.CreateAttribute("Width");
+                        attr.Value = "150";
                         ndNew.Attributes.Append(attr);
 
                         attr = doc.CreateAttribute("Visible");
