@@ -196,19 +196,19 @@ namespace EPMLiveWebParts
                                 break;
                             case SPFieldType.Number:
                                 attr = doc.CreateAttribute("Align");
-                                attr.Value = "Right";
+                                attr.Value = "Center";
                                 ndNew.Attributes.Append(attr);
                                 sType = "Float";
                                 break;
                             case SPFieldType.Currency:
                                 attr = doc.CreateAttribute("Align");
-                                attr.Value = "Right";
+                                attr.Value = "Center";
                                 ndNew.Attributes.Append(attr);
                                 sType = "Float";
                                 break;
                             case SPFieldType.DateTime:
                                 attr = doc.CreateAttribute("Align");
-                                attr.Value = "Right";
+                                attr.Value = "Center";
                                 ndNew.Attributes.Append(attr);
                                 sType = "Date";
                                 break;
@@ -220,7 +220,7 @@ namespace EPMLiveWebParts
                                 if (oFC.OutputType == SPFieldType.Number || oFC.OutputType == SPFieldType.Currency || oFC.OutputType == SPFieldType.DateTime)
                                 {
                                     attr = doc.CreateAttribute("Align");
-                                    attr.Value = "Right";
+                                    attr.Value = "Center";
                                     ndNew.Attributes.Append(attr);
                                     sType = "Float";
                                 }
@@ -306,7 +306,7 @@ namespace EPMLiveWebParts
                                 {
                                     case "TotalRollup":
                                         attr = doc.CreateAttribute("Align");
-                                        attr.Value = "Right";
+                                        attr.Value = "Center";
                                         ndNew.Attributes.Append(attr);
                                         break;
                                 }
