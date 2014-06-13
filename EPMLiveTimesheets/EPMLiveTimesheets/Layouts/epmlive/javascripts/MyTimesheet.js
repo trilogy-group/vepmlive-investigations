@@ -1925,8 +1925,10 @@ function MYTSOnGetHtmlValue(grid, row, col, val) {
                 if (grid.GetValue(row, col) != "") {
                     img = "888"
                 }
-
-                return "<a onclick=\"ShowApprovalNotes('" + grid.id + "','" + row.id + "', this)\" id=\"ANote" + row.id + "\" style=\"text-decoration:none;\"><span class='icon-file-3' style='color:#" + img + ";text-decoration:none;font-size:15px'></a>";
+                if (row.Approved == "1" || row.Approved == "2" || row.Submitted == "1")
+                    return "<a onclick=\"ShowApprovalNotes('" + grid.id + "','" + row.id + "', this)\" id=\"ANote" + row.id + "\" style=\"text-decoration:none;\"><span class='icon-file-3' style='color:#" + img + ";text-decoration:none;font-size:15px'></a>";
+                else
+                    return "";
             }
             else if(col == "TMApproval")
             {
