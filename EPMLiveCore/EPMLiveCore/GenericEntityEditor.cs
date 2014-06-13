@@ -316,45 +316,49 @@ namespace EPMLiveCore
 
             if (!string.IsNullOrEmpty(needsValidation.Key))
             {
-                using (SPWeb web = SPContext.Current.Site.OpenWeb(propBag.LookupWebID))
+                try
                 {
-                    SPList list = web.Lists[propBag.LookupListID];
-                    SPField field = null;
-                    string fieldType = null;
-
-                    if (needsValidation.Key == needsValidation.DisplayText)
+                    using (SPWeb web = SPContext.Current.Site.OpenWeb(propBag.LookupWebID))
                     {
-                        field = list.Fields.GetFieldByInternalName(propBag.LookupFieldInternalName);
-                        fieldType = field.TypeAsString;
+                        SPList list = web.Lists[propBag.LookupListID];
+                        SPField field = null;
+                        string fieldType = null;
+
+                        if (needsValidation.Key == needsValidation.DisplayText)
+                        {
+                            field = list.Fields.GetFieldByInternalName(propBag.LookupFieldInternalName);
+                            fieldType = field.TypeAsString;
+                        }
+                        else
+                        {
+                            field = list.Fields[SPBuiltInFieldId.ID];
+                            fieldType = field.TypeAsString;
+                        }
+
+                        string valueType = field.TypeAsString;
+                        if (field.Type == SPFieldType.Calculated)
+                        {
+                            valueType = "Text";
+                        }
+
+                        string queryString = String.Empty;
+
+                        queryString = string.Format(
+                        "<Where><Eq><FieldRef Name=\"{0}\"/><Value Type=\"{1}\">{2}</Value></Eq></Where>",
+                        field.InternalName, valueType, needsValidation.Key);
+
+                        SPQuery queryByTitle = new SPQuery();
+                        queryByTitle.Query = queryString;
+                        queryByTitle.ViewAttributes = "Scope=\"Recursive\"";
+                        SPListItemCollection items = list.GetItems(queryByTitle);
+                        if (items.Count == 1)
+                        {
+                            entity = this.GetEntity(items[0]);
+                        }
+
                     }
-                    else
-                    {
-                        field = list.Fields[SPBuiltInFieldId.ID];
-                        fieldType = field.TypeAsString;
-                    }
-
-                    string valueType = field.TypeAsString;
-                    if (field.Type == SPFieldType.Calculated)
-                    {
-                        valueType = "Text";
-                    }
-
-                    string queryString = String.Empty;
-
-                    queryString = string.Format(
-                    "<Where><Eq><FieldRef Name=\"{0}\"/><Value Type=\"{1}\">{2}</Value></Eq></Where>",
-                    field.InternalName, valueType, needsValidation.Key);
-
-                    SPQuery queryByTitle = new SPQuery();
-                    queryByTitle.Query = queryString;
-                    queryByTitle.ViewAttributes = "Scope=\"Recursive\"";
-                    SPListItemCollection items = list.GetItems(queryByTitle);
-                    if (items.Count == 1)
-                    {
-                        entity = this.GetEntity(items[0]);
-                    }
-
                 }
+                catch { }
             }
 
             return entity;
