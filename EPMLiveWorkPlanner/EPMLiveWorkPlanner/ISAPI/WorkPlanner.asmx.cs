@@ -5127,10 +5127,27 @@ namespace EPMLiveWorkPlanner
 
                 try
                 {
-                    SPList oList = web.Lists["Holidays"];
-                    p.Holidays = oList.Items.GetDataTable();
+                    SPList holidaySchedulesList = web.Lists["Holiday Schedules"];
+                    SPList holidaysList = web.Lists["Holidays"];
+
+                    SPQuery spQueryHolidaySchedulesList = new SPQuery();
+                    SPListItemCollection defaultHolidaySchedules = null;
+                    spQueryHolidaySchedulesList.Query = "<Where><Eq><FieldRef Name='IsDefault'/><Value Type='Boolean'>1</Value></Eq></Where>";
+                    defaultHolidaySchedules = holidaySchedulesList.GetItems(spQueryHolidaySchedulesList);
+
+                    if (defaultHolidaySchedules != null && defaultHolidaySchedules.Count == 1)
+                    {
+                        SPQuery spQueryHolidaysList = new SPQuery();
+                        spQueryHolidaysList.Query = string.Format("<Where><Eq><FieldRef Name='HolidaySchedule' LookupId='True'/><Value Type='Lookup'>{0}</Value></Eq></Where>", defaultHolidaySchedules[0]["ID"]);
+                        p.Holidays = holidaysList.GetItems(spQueryHolidaysList).GetDataTable();
+                    }
+                    else
+                    {
+                        p.Holidays = holidaysList.Items.GetDataTable();
+                    }
                 }
                 catch { }
+
                 bool.TryParse(EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLivePlanner" + planner + "EnableAgile"), out p.bAgile);
                 p.sIterationCT = EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLivePlanner" + planner + "AgileIterationField");
                 bool.TryParse(EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLivePlanner" + planner + "CalcWork"), out p.bCalcWork);
@@ -5205,14 +5222,28 @@ namespace EPMLiveWorkPlanner
                         p.iWorkHours[2] = lunchend;
                         p.iWorkHours[3] = w.RegionalSettings.WorkDayEndHour;
 
-
-
                         try
                         {
-                            SPList oList = w.Lists["Holidays"];
-                            p.Holidays = oList.Items.GetDataTable();
+                            SPList holidaySchedulesList = web.Lists["Holiday Schedules"];
+                            SPList holidaysList = web.Lists["Holidays"];
+
+                            SPQuery spQueryHolidaySchedulesList = new SPQuery();
+                            SPListItemCollection defaultHolidaySchedules = null;
+                            spQueryHolidaySchedulesList.Query = "<Where><Eq><FieldRef Name='IsDefault'/><Value Type='Boolean'>1</Value></Eq></Where>";
+                            defaultHolidaySchedules = holidaySchedulesList.GetItems(spQueryHolidaySchedulesList);
+
+                            if (defaultHolidaySchedules != null && defaultHolidaySchedules.Count == 1)
+                            {
+                                SPQuery spQueryHolidaysList = new SPQuery();
+                                spQueryHolidaysList.Query = string.Format("<Where><Eq><FieldRef Name='HolidaySchedule' LookupId='True'/><Value Type='Lookup'>{0}</Value></Eq></Where>", defaultHolidaySchedules[0]["ID"]);
+                                p.Holidays = holidaysList.GetItems(spQueryHolidaysList).GetDataTable();
+                            }
+                            else
+                            {
+                                p.Holidays = holidaysList.Items.GetDataTable();
+                            }
                         }
-                        catch { };
+                        catch { }
 
                         bool.TryParse(EPMLiveCore.CoreFunctions.getConfigSetting(w, "EPMLivePlanner" + planner + "EnableAgile"), out p.bAgile);
                         p.sIterationCT = EPMLiveCore.CoreFunctions.getConfigSetting(w, "EPMLivePlanner" + planner + "AgileIterationField");
