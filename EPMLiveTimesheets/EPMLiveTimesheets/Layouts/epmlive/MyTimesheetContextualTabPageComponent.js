@@ -438,9 +438,11 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
 
             var surl = siteColUrl + "/Lists/My%20Timesheet/Project%20Manager%20Approval.aspx";
 
-            var options = { url: surl, showMaximized: true, title: "Approvals", autoSize: false };
+            location.href = surl;
 
-            SP.UI.ModalDialog.showModalDialog(options);
+            //var options = { url: surl, showMaximized: true, title: "Approvals", autoSize: false };
+
+            //SP.UI.ModalDialog.showModalDialog(options);
         }
         else if (commandId === 'Ribbon.MyTimesheet.ApprovalsTM') {
             var grid = Grids["TS" + this.tsObject.id];
