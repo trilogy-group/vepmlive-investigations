@@ -2069,13 +2069,15 @@ function ZoomOut() {
 }
 
 function ShowHideGantt() {
-    var grid = Grids.WorkPlannerGrid;
-    if (grid.Cols.G.Visible)
-        grid.HideCol("G");
-    else {
-        grid.ShowCol("G");
-        ResizeGantt(grid, Grids.AllocationGrid);
-    }
+    //var grid = Grids.WorkPlannerGrid;
+    //if (grid.Cols.G.Visible)
+    //    grid.HideCol("G");
+    //else {
+    //    grid.ShowCol("G");
+    //    ResizeGantt(grid, Grids.AllocationGrid);
+    //}
+    //Changed it to resolve issue EPML-2796
+    ChangeView("GanttView");
 }
 
 function ZoomFit() {
