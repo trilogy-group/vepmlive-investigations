@@ -176,7 +176,7 @@ function epkmultiresponse(ret)
 
 	function myCallback(dialogResult, returnValue){}
 
-	var options = { url: weburl, showMaximized: true, showClose: true, dialogReturnValueCallback:myCallback };
+	var options = { url: weburl, showMaximized: true, showClose: false, dialogReturnValueCallback:myCallback };
 
 	SP.UI.ModalDialog.showModalDialog(options);
 }

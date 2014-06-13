@@ -1289,8 +1289,8 @@ function registerEpmLiveResourceGridScript() {
             },
 
             displayPopUp: function (url, title, allowMaximize, showClose, func, funcParams, width, height) {
-                if (!allowMaximize) allowMaximize = true;
-                if (!showClose) showClose = true;
+                if (!allowMaximize) allowMaximize = true;                
+                //if (!showClose) showClose = true;                
                 if (!func) {
                     func = function () {
                     };
@@ -1424,7 +1424,7 @@ function registerEpmLiveResourceGridScript() {
 
                         if (dataTicket) {
                             var url = '{0}/_layouts/ppm/RPEditor.aspx?dataid={1}&isresource=1'.format($$$.currentWebUrl, dataTicket);
-                            $$.actions.displayPopUp(url, 'Resource Planner', true, true, null, null, 700, 700);
+                            $$.actions.displayPopUp(url, 'Resource Planner', true, false, null, null, 700, 700);
                         }
                     });
                 }
