@@ -239,8 +239,13 @@ namespace EPMLiveWebParts
                                     string senum = "";
 
                                     SPFieldChoice oCField = (SPFieldChoice)oField;
-                                    foreach (string sChoice in oCField.Choices)
-                                        senum += ";" + sChoice.Replace(";", "");
+                                    //foreach (string sChoice in oCField.Choices)
+                                    //{
+                                    //    senum += ";" + sChoice.Replace(";", "");
+                                    //}
+
+                                    for (int i = 0; i < oCField.Choices.Count; i++)
+                                        senum += ";" + i.ToString();
 
                                     attr = doc.CreateAttribute("Enum");
                                     attr.Value = senum;
