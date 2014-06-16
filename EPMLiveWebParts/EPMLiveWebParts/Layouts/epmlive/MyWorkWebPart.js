@@ -2439,8 +2439,6 @@ var MyWorkGrid = {
                 cell.innerHTML = message;
 
                 MyWorkGrid.noDataResetCompleted = true;
-
-                $('#MWG_Pivot_Selector').hide();
             }
         }
     },
