@@ -6,7 +6,7 @@
 	<Cfg Code="GTACCNPSQEBSLC"/>
   <Cols>
     <C Name='R' Type='Text' CanEdit='0' RelWidth='100'/>
-	<C Name='Work' Type='Float' Width='50' Format='0.##'/>
+	<C Name='Work' Type='Float' Width='50' Format='0.##' CanCopyPaste='0'/>
   </Cols>
   <Header R='Resource' U='Units' H='Hours'/>
   <Def>
