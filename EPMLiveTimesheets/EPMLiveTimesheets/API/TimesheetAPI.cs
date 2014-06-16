@@ -989,7 +989,7 @@ namespace TimeSheets
                 //else 
                 if (ndTS.Count <= 0)
                 {
-                    throw new EPMLiveCore.API.APIException(900002, "No Timesheets Provided");
+                    throw new EPMLiveCore.API.APIException(900002, "No submitted timesheets were selected");
                 }
                 else
                 {
