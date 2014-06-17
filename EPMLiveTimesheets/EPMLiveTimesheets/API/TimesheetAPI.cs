@@ -1439,7 +1439,35 @@ namespace TimeSheets
                 {
                     ndFooter.ParentNode.RemoveChild(ndFooter);
 
+
                     XmlNode ndNewCol = docLayout.CreateNode(XmlNodeType.Element, "C", docLayout.NamespaceURI);
+                    attr2 = docLayout.CreateAttribute("Name");
+                    attr2.Value = "Project";
+                    ndNewCol.Attributes.Append(attr2);
+
+                    attr2 = docLayout.CreateAttribute("GroupEmpty");
+                    attr2.Value = "0";
+                    ndNewCol.Attributes.Append(attr2);
+
+                    attr2 = docLayout.CreateAttribute("Width");
+                    attr2.Value = "150";
+                    ndNewCol.Attributes.Append(attr2);
+
+                    attr2 = docLayout.CreateAttribute("CanSort");
+                    attr2.Value = "1";
+                    ndNewCol.Attributes.Append(attr2);
+                                        
+                    attr2 = docLayout.CreateAttribute("CanHide");
+                    attr2.Value = "1";
+                    ndNewCol.Attributes.Append(attr2);
+
+                    attr2 = docLayout.CreateAttribute("CanEdit");
+                    attr2.Value = "0";
+                    ndNewCol.Attributes.Append(attr2);
+
+                    ndLeftCols.InsertAfter(ndNewCol, ndLeftCols.SelectSingleNode("//C[@Name='Title']"));
+
+                    ndNewCol = docLayout.CreateNode(XmlNodeType.Element, "C", docLayout.NamespaceURI);
                     attr2 = docLayout.CreateAttribute("Name");
                     attr2.Value = "PMApproval";
                     ndNewCol.Attributes.Append(attr2);
@@ -2324,7 +2352,7 @@ namespace TimeSheets
             catch { }
 
             XmlNode ndCol = docData.CreateNode(XmlNodeType.Element, "I", docData.NamespaceURI);
-
+            
             XmlAttribute attr1 = docData.CreateAttribute("UID");
             attr1.Value = dr["TS_ITEM_UID"].ToString();
             ndCol.Attributes.Append(attr1);
