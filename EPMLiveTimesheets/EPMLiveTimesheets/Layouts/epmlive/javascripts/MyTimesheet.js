@@ -64,16 +64,15 @@ Grids.OnRenderStart = function (grid) {
     }
 }
 
-function TMFilter(gridid, filter)
-{
+function TMFilter(gridid, filter) {
 
     var grid = Grids["TS" + gridid];
 
-    if(filter == 1)
+    if (filter == 1)
         grid.ChangeFilter("", "", "");
-    else if(filter == 2)
-        grid.ChangeFilter("Submitted", "1", "2", 0, 0) ;
-    else if(filter == 3)
+    else if (filter == 2)
+        grid.ChangeFilter("Submitted", "1", "2", 0, 0);
+    else if (filter == 3)
         grid.ChangeFilter("Submitted,Approved", "1,1", "1,2", 0, 0);
 
     $('#ddlFilterControl_ul_menu').toggle();
@@ -88,7 +87,7 @@ function EmailTSA(gridid) {
         rowstring += "," + rows[row].ResId;
     }
 
-    if(rowstring.length > 2)
+    if (rowstring.length > 2)
         rowstring = rowstring.substr(1);
 
     var webUrl = window.epmLiveNavigation.currentWebUrl;
@@ -129,7 +128,7 @@ function ProcessApprovals(gridid, status) {
             if (rows[row].Submitted == "1")
                 rowstring += "<TS id=\"" + rows[row].id + "\">" + grid.GetValue(rows[row], "ApprovalNotes") + "</TS>";
         }
-        
+
         ShowMessage(grid.id, "Processing Timesheets...", 200, 50);
 
         EPMLiveCore.WorkEngineAPI.Execute("timesheet_ApproveTimesheets", "<Approve ApproveStatus=\"" + status + "\">" + rowstring + "</Approve>", function (response) {
@@ -157,7 +156,7 @@ function GetTSGridId(grid) {
 }
 
 function LoadTSGrid(gridid) {
-    
+
     EPM.UI.Loader.current().startLoading({ id: 'WebPart' + eval("TSObject" + gridid + ".Qualifier") });
 }
 
@@ -167,9 +166,8 @@ function TSReady(grid) {
         TGSetEvent("OnDblClickRow", grid.id, TSDoubleClick);
         TGSetEvent("OnFocus", grid.id, TSOnFocus);
     }
-    else
-    {
-        
+    else {
+
         TGSetEvent("OnFocus", grid.id, TSAOnFocus);
     }
     TGSetEvent("OnGetHtmlValue", grid.id, MYTSOnGetHtmlValue);
@@ -179,7 +177,7 @@ function TSReady(grid) {
     TGSetEvent("OnClick", grid.id, TSGridClick);
     TGSetEvent("OnAfterValueChanged", grid.id, TSGridOnAfterValueChanged);
     TGSetEvent("OnSave", grid.id, TSSave);
-    
+
 }
 
 
@@ -189,17 +187,15 @@ function TSSave(grid, row, autoupdate) {
 
     var bValid = true;
 
-    for (var tsd in TSDCols)
-    {
+    for (var tsd in TSDCols) {
         var val = parseFloat(grid.GetValue(row, tsd));
 
         var minmax = TSDCols[tsd].split('|');
         var min = parseFloat(minmax[0]);
         var max = parseFloat(minmax[1]);
 
-        if (val > max)
-        {
-            
+        if (val > max) {
+
             alert('On ' + grid.GetValue(grid.GetRowById("Header"), tsd).replace("<br>", " ") + ': ' + val + ' is greater than max of ' + max);
             bValid = false;
         }
@@ -242,10 +238,9 @@ function TSGridOnAfterValueChanged(grid, row, col, val) {
         TimesheetHoursEdited = true;
 }
 
-function StopEditCols(grid, row)
-{
+function StopEditCols(grid, row) {
     for (var col in grid.Cols) {
-        if(grid.Cols[col].Sec==0)
+        if (grid.Cols[col].Sec == 0)
             grid.SetAttribute(row, col, "CanEdit", "0", 1);
     }
     grid.SetAttribute(row, "Title", "HtmlPrefix", "", 1);
@@ -335,7 +330,7 @@ function StopEditGridRow(grid, row) {
 }
 
 
-function TSOnFocus (grid, row, col, x, y, event) {
+function TSOnFocus(grid, row, col, x, y, event) {
 
     if (!curRow)
         curRow = row;
@@ -380,60 +375,61 @@ function TSOnMouseOutRow(grid, row, col, event) {
     grid.SetAttribute(row, "Title", "ButtonText", ' ', 1);
 }
 
-function TSDoubleClick(grid, row, col, x, y, event)
-{
+function TSDoubleClick(grid, row, col, x, y, event) {
     var newgridid = grid.id.substr(2);
     var newobj = eval("TSObject" + newgridid);
 
-    if (newobj.Status == "Unsubmitted")        
+    if (newobj.Status == "Unsubmitted")
         EditGridRow(grid, row, col);
 }
 
 function EditGridRow(grid, row, col) {
 
-    if (row.ItemID) {
-        var webUrl = window.epmLiveNavigation.currentWebUrl;
+    if (row.id != "Header") {
 
-        var cols = "";
+        if (row.ItemID) {
+            var webUrl = window.epmLiveNavigation.currentWebUrl;
 
-        for (var c in grid.Cols)
-            cols += "," + c;
+            var cols = "";
 
-        cols = cols.substr(1);
+            for (var c in grid.Cols)
+                cols += "," + c;
 
-        var data = "<Row id=\"" + row.id + "\" siteid=\"" + row.SiteID + "\" webid=\"" + row.WebID + "\" listid=\"" + row.ListID + "\" itemid=\"" + row.ItemID + "\" Cols=\"" + cols + "\"/>";
+            cols = cols.substr(1);
 
-        grid.SetAttribute(row, "Title", "HtmlPrefix", "<img src='/_layouts/15/epmlive/images/mywork/loading16.gif'>", 1);
+            var data = "<Row id=\"" + row.id + "\" siteid=\"" + row.SiteID + "\" webid=\"" + row.WebID + "\" listid=\"" + row.ListID + "\" itemid=\"" + row.ItemID + "\" Cols=\"" + cols + "\"/>";
 
-        $.ajax({
-            type: 'POST',
-            url: (webUrl + '/_vti_bin/WorkEngine.asmx/ExecuteJSON').replace(/\/\//g, '/'),
-            data: "{ Function: 'webparts_GetGridRowEdit', Dataxml: '" + data + "' }",
-            contentType: 'application/json; charset=utf-8',
-            dataType: 'json',
-            success: function (response) {
-                var oResp = eval("(" + response.d + ")");
-                if (oResp.Result.Status == "0") {
-                    grid.EditRow = row.id;
-                    grid.AddDataFromServer(oResp.Result.InnerText);
-                    grid.SetAttribute(row, "Title", "HtmlPrefix", "<span class=\"icon-pencil\" style=\"color: #CCC;padding-right:5px\"></span>", 1);
-                    grid.StartEdit();
+            grid.SetAttribute(row, "Title", "HtmlPrefix", "<img src='/_layouts/15/epmlive/images/mywork/loading16.gif'>", 1);
+
+            $.ajax({
+                type: 'POST',
+                url: (webUrl + '/_vti_bin/WorkEngine.asmx/ExecuteJSON').replace(/\/\//g, '/'),
+                data: "{ Function: 'webparts_GetGridRowEdit', Dataxml: '" + data + "' }",
+                contentType: 'application/json; charset=utf-8',
+                dataType: 'json',
+                success: function (response) {
+                    var oResp = eval("(" + response.d + ")");
+                    if (oResp.Result.Status == "0") {
+                        grid.EditRow = row.id;
+                        grid.AddDataFromServer(oResp.Result.InnerText);
+                        grid.SetAttribute(row, "Title", "HtmlPrefix", "<span class=\"icon-pencil\" style=\"color: #CCC;padding-right:5px\"></span>", 1);
+                        grid.StartEdit();
+                    }
+                    else
+                        alert(oResp.Result.Error.Text);
+
+                },
+                error: function (response) {
+                    alert("Error: " + response);
                 }
-                else
-                    alert(oResp.Result.Error.Text);
-
-            },
-            error: function (response) {
-                alert("Error: " + response);
-            }
-        });
+            });
 
 
+        }
     }
 }
 
-function TSRenderFinish(grid)
-{
+function TSRenderFinish(grid) {
     var gridid = GetTSGridId(grid);
 
     EPM.UI.Loader.current().stopLoading('WebPart' + eval("TSObject" + gridid + ".Qualifier"));
@@ -451,7 +447,7 @@ function TSRenderFinish(grid)
             $(".TS_Comments").click(function () {
                 showComments(grid.id);
             });
-            try{
+            try {
                 $("#tssw").tooltip();
             } catch (e) { }
 
@@ -471,10 +467,8 @@ function TSRenderFinish(grid)
 }
 
 
-Grids.OnStartEdit = function (grid, row, col)
-{
-    if (NotesOut)
-    {
+Grids.OnStartEdit = function (grid, row, col) {
+    if (NotesOut) {
         NotesOut = false;
         var notesDiv = document.getElementById("NotesDiv");
         notesDiv.style.display = "none";
@@ -767,7 +761,7 @@ Grids.OnAfterSave = function (grid, result, autoupdate) {
     if (grid.id.substr(0, 2) == "TS") {
 
         if (grid.IO.Result == "0" || grid.IO.Result == "2") {
-            
+
             bTSSaving = true;
             RefreshCommandUI();
             CheckSaveStatus(grid.id);
@@ -1465,9 +1459,9 @@ function DoPopUp(grid, row, col) {
                 }
             }
             else if (TSColType == 2) {
-                try{
+                try {
                     $("#TypeDivOuter").remove();
-                }catch(e){}
+                } catch (e) { }
                 curPop = true;
 
                 var strTypeDiv = "<div id='TypeDivOuter' style='position: absolute; margin-top: 20px; margin-left: 2px;z-index:999; cursor:default; width:156px; background-color: #F8F8F8; text-align:left;border: 1px solid #AAA; border-radius: 5px; padding:3px;' onClick=\"stopProp(event);\"><table border=\"0\" cellspacing=\"3\" cellpadding=\"0\">";
@@ -1525,11 +1519,11 @@ function DoPopUp(grid, row, col) {
 
                 $('body').append(strTypeDiv);
 
-                var TypeDiveOuter=$("#TypeDivOuter");
+                var TypeDiveOuter = $("#TypeDivOuter");
                 var oDiv = TypeDiveOuter.get(0);
                 var oLocDiv = $("#typedivlocation");
 
-                if(oLocDiv.offset().top - 28 + TypeDiveOuter.height() > $(window).height())
+                if (oLocDiv.offset().top - 28 + TypeDiveOuter.height() > $(window).height())
                     oDiv.style.top = (oLocDiv.offset().top - TypeDiveOuter.height()) + "px";
                 else
                     oDiv.style.top = (oLocDiv.offset().top - 28) + "px";
@@ -1538,7 +1532,7 @@ function DoPopUp(grid, row, col) {
 
                 setTimeout("curGrid.StartEdit()", 100);
             }
-            
+
         }
 
     }
@@ -1559,14 +1553,14 @@ function GetGridId(grid) {
 }
 
 function SetGridSize() {
-    
+
     var outer = document.getElementById("gridouter");
 
     var height = GetPageHeight();
     var top = GetItemTop(outer);
 
     outer.style.height = (height - top - 35) + "px";
-    
+
 }
 
 $(window).resize(function () {
@@ -1901,8 +1895,7 @@ function ShowApprovalNotes(gridid, rowid, img) {
     $('body').append("<div id='divanotes" + rowid.replace(/-/g, '') + "' style='width:150px;height:100px;position:absolute;left:" + oimg.offset().left + "px;top:" + oimg.offset().top + "px;border:1px solid #DDD;background-color:#FFF' onMouseDown=\"stopProp(event);\" ><textarea id=\"anotestxt" + rowid.replace(/-/g, '') + "\" style='width:140px;height:60px;border:none;resize: none;outline:none' onkeyup=\"stopProp(event);\" onclick=\"stopProp(event);\" onkeypress=\"stopProp(event);\">" + grid.GetValue(row, "ApprovalNotes") + "</textarea><input type=\"button\" style=\"float:right\" value=\"Ok\" onclick=\"CloseApprovalNotes('" + grid.id + "','" + row.id + "');\"></div>");
 }
 
-function CloseApprovalNotes(gridid, rowid)
-{
+function CloseApprovalNotes(gridid, rowid) {
     var grid = Grids[gridid];
     var row = grid.GetRowById(rowid);
 
@@ -1930,8 +1923,7 @@ function MYTSOnGetHtmlValue(grid, row, col, val) {
                 else
                     return "";
             }
-            else if(col == "TMApproval")
-            {
+            else if (col == "TMApproval") {
                 if (row.Approved == "1")
                     return "<span class=\"icon-checkmark-circle-2\" style=\"color:#5BB75B\">";
                 else if (row.Approved == "2")
@@ -1969,8 +1961,7 @@ function MYTSOnGetHtmlValue(grid, row, col, val) {
                     return (parseFloat(val) * 100).toFixed(0) + "%";
                 } catch (e) { return "0%"; }
             }
-            else if (col == "Title")
-            {
+            else if (col == "Title") {
                 if (grid.GetValue(row, "HasComments") == "1") {
                     val = val + "&nbsp;<a href=\"javascript:GridComments('" + grid.id + "','" + row.id + "');return false;\"><img src=\"/_layouts/15/epmlive/images/mywork/comment-small.png\" border=\"0\"></a>";
                 }
@@ -2370,8 +2361,7 @@ function showComments(gridId) {
     SP.UI.ModalDialog.showModalDialog(options);
 }
 
-function previousPeriodCommand(tsURL, previousPeriod, delegateId)
-{
+function previousPeriodCommand(tsURL, previousPeriod, delegateId) {
     if (previousPeriod != "0") {
         var url = tsURL;
         if (url.indexOf("?") > 0) {
@@ -2403,8 +2393,7 @@ function nextPeriodCommand(tsURL, nextPeriod, delegateId) {
     }
 }
 
-function changePeriodCommand(tsURL, sel, delegateId)
-{
+function changePeriodCommand(tsURL, sel, delegateId) {
     var url = tsURL;
     var sPeriodId = sel.options[sel.selectedIndex].value;
     if (url.indexOf("?") > 0) {
