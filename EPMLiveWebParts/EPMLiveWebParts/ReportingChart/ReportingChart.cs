@@ -13,13 +13,12 @@ using System.Web.UI.WebControls.WebParts;
 using System.Xml.Serialization;
 using EPMLiveCore;
 using Microsoft.SharePoint;
-using Microsoft.SharePoint.WebControls;
 using Microsoft.SharePoint.WebPartPages;
 using Telerik.Web.UI;
 using EPMLiveCore.ReportingProxy;
-using System.Globalization;
 using System.Xml;
 using ReportFiltering.DomainServices;
+using System.Collections;
 
 namespace EPMLiveWebParts.ReportingChart
 {
@@ -1431,12 +1430,38 @@ namespace EPMLiveWebParts.ReportingChart
                                              r[sCatSQLCol].ToString().Trim() : NULL_CATEGORY_TEXT)).Distinct().ToList();
             // add x axis labels
             XAxisLabels.Clear();
+
             foreach (string cat in distinctCats)
             {
-                XAxisLabels.Add(cat);
+                if (cat.Contains(","))
+                {
+                    string[] diffrentCats = cat.Split(',');
+                    foreach (string item in diffrentCats)
+                    {
+                        if (!XAxisLabels.Contains(item))
+                            XAxisLabels.Add(item);
+                    }
+                }
+                else
+                {
+                    if (!XAxisLabels.Contains(cat))
+                        XAxisLabels.Add(cat);
+                }
             }
 
-            var rx = (from DataRow r in dtRaw.AsEnumerable()
+            IEnumerable<string> strCollection = ((from r in dtRaw.AsEnumerable()
+                                                  select  r[sCatSQLCol].ToString().Split(',')).SelectMany(x => x));
+
+            DataTable dt = new DataTable();
+            dt.Columns.Add(sCatSQLCol, typeof(string));
+            foreach (var item in strCollection.ToList())
+            {
+                DataRow row = dt.NewRow();
+                row[sCatSQLCol] = item;
+                dt.Rows.Add(row);
+            }
+
+            var rx = (from DataRow r in dt.AsEnumerable()
                       group r by r[sCatSQLCol] into gr
                       select new[] { (!string.IsNullOrEmpty(gr.Key.ToString()) ? gr.Key : NULL_CATEGORY_TEXT), gr.Count() }).ToArray();
 
@@ -1451,9 +1476,7 @@ namespace EPMLiveWebParts.ReportingChart
             result.Add(GetFldDispNameFromIntName(category), lsTemp);
             return result;
         }
-
-
-
+      
         /// <summary>
         /// Gets series items that represent the count for multiple series. (multiple y value)
         /// </summary>
