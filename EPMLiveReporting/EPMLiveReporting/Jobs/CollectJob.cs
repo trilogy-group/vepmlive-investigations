@@ -406,7 +406,7 @@ namespace EPMLiveReportsAdmin.Jobs
             catch(Exception ex)
             {
                 bErrors = true;
-                sErrors += "<font color=\"red\">General Error: " + ex.Message + "</font><br>";
+                sErrors += "<font color=\"red\">General Execute Error: " + ex.Message + "</font><br>";
             }
             finishJob();
         }
