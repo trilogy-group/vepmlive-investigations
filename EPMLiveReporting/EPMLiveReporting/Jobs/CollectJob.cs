@@ -88,164 +88,175 @@ namespace EPMLiveReportsAdmin.Jobs
 
         public void execute(SPSite site, SPWeb web, string data)
         {
-            base.totalCount = site.AllWebs.Count;
-            var hshMessages = new Hashtable();
-            bool refreshAll = (string.IsNullOrEmpty(data) ? true : false);
-            var epmdata = new EPMData(site.ID);
-
-            #region Process security
-
             try
             {
-                ProcessSecurity.ProcessSecurityGroups(site, epmdata.GetClientReportingConnection, "");
-                sErrors += "Completed processing security groups for site: " + site.Url + ".</br>";
-            }
-            catch (Exception ex)
-            {
-                bErrors = true;
-                sErrors += "<font color=\"red\">Error processing security on site: " + site.Url + ". Error: " +
-                           ex.Message + "</font><br>";
-            }
-
-            if (string.IsNullOrEmpty(data))
-            {
-                //try
-                //{
-                //    data = epmdata.GetListNames();
-                //}
-                //catch (Exception exData)
-                //{
-                //    bErrors = true;
-                //    sErrors += "<font color=\"red\">Error while retrieving list names: " + exData.Message + "</font><br>";
-                //}
+                EPMData epmdata = null;
+                var hshMessages = new Hashtable();
 
                 try
                 {
-                    setRPTSettings(epmdata, site);
+                    base.totalCount = site.AllWebs.Count;
+                    
+                    bool refreshAll = (string.IsNullOrEmpty(data) ? true : false);
+                    epmdata = new EPMData(site.ID);
+
+                    #region Process security
+
+                    try
+                    {
+                        ProcessSecurity.ProcessSecurityGroups(site, epmdata.GetClientReportingConnection, "");
+                        sErrors += "Completed processing security groups for site: " + site.Url + ".</br>";
+                    }
+                    catch (Exception ex)
+                    {
+                        bErrors = true;
+                        sErrors += "<font color=\"red\">Error processing security on site: " + site.Url + ". Error: " +
+                                   ex.Message + "</font><br>";
+                    }
+
+                    if (string.IsNullOrEmpty(data))
+                    {
+                        //try
+                        //{
+                        //    data = epmdata.GetListNames();
+                        //}
+                        //catch (Exception exData)
+                        //{
+                        //    bErrors = true;
+                        //    sErrors += "<font color=\"red\">Error while retrieving list names: " + exData.Message + "</font><br>";
+                        //}
+
+                        try
+                        {
+                            setRPTSettings(epmdata, site);
+                        }
+                        catch (Exception ex)
+                        {
+                            bErrors = true;
+                            sErrors += "<font color=\"red\">Error Updating RPTSettings: " + ex.Message + "</font><br>";
+                        }
+                    }
                 }
                 catch (Exception ex)
                 {
                     bErrors = true;
-                    sErrors += "<font color=\"red\">Error Updating RPTSettings: " + ex.Message + "</font><br>";
+                    sErrors += "<font color=\"red\">Error Updating base: " + ex.Message + "</font><br>";
                 }
-            }
 
-            //try
-            //{
-            //    data = epmdata.UpdateListNames(data);
-            //}
-            //catch (Exception ex)
-            //{
-            //    bErrors = true;
-            //    sErrors += "<font color=\"red\">Error Updating List Names: " + ex.Message + "</font><br>";
-            //}
+                //try
+                //{
+                //    data = epmdata.UpdateListNames(data);
+                //}
+                //catch (Exception ex)
+                //{
+                //    bErrors = true;
+                //    sErrors += "<font color=\"red\">Error Updating List Names: " + ex.Message + "</font><br>";
+                //}
 
-            // TODO: We need to make sure this doesn't break anything!!!!
-            //foreach (SPWeb w in site.AllWebs)
-            //{
-            //    // IGNORE SPDispose 130 error, web is being disposed
-            //    try
-            //    {
-            //        List<string> allLists = new List<string>(data.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries));
-            //        List<SPList> allSpLists = new List<SPList>();
-            //        foreach (string l in allLists)
-            //        {
-            //            SPList list = w.Lists.TryGetList(l);
-            //            if (list == null ||
-            //                list.Title == "Work Hours" ||
-            //                list.Title == "Resources")
-            //            {
-            //                continue;
-            //            }
+                // TODO: We need to make sure this doesn't break anything!!!!
+                //foreach (SPWeb w in site.AllWebs)
+                //{
+                //    // IGNORE SPDispose 130 error, web is being disposed
+                //    try
+                //    {
+                //        List<string> allLists = new List<string>(data.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries));
+                //        List<SPList> allSpLists = new List<SPList>();
+                //        foreach (string l in allLists)
+                //        {
+                //            SPList list = w.Lists.TryGetList(l);
+                //            if (list == null ||
+                //                list.Title == "Work Hours" ||
+                //                list.Title == "Resources")
+                //            {
+                //                continue;
+                //            }
 
-            //            if (list != null)
-            //            {
-            //                allSpLists.Add(list);
-            //            }
-            //        }
-            //        ProcessSecurity.ProcessSecurityOnRefreshAll(w, allSpLists, epmdata.GetClientReportingConnection);
-            //        if (w != null)
-            //        {
-            //            w.Dispose();
-            //        }
-            //    }
-            //    catch
-            //    {
-            //        if (w != null)
-            //        {
-            //            w.Dispose();
-            //        }
-            //    }
-            //}
+                //            if (list != null)
+                //            {
+                //                allSpLists.Add(list);
+                //            }
+                //        }
+                //        ProcessSecurity.ProcessSecurityOnRefreshAll(w, allSpLists, epmdata.GetClientReportingConnection);
+                //        if (w != null)
+                //        {
+                //            w.Dispose();
+                //        }
+                //    }
+                //    catch
+                //    {
+                //        if (w != null)
+                //        {
+                //            w.Dispose();
+                //        }
+                //    }
+                //}
 
-            #endregion
+                #endregion
 
-            #region Process TimeSheet Data
+                #region Process TimeSheet Data
 
-            try
-            {
-                string err = "";
-                bool tErrors = epmdata.RefreshTimesheets(out err, base.JobUid);
-                if (tErrors)
-                    bErrors = true;
-                if (bErrors)
-                    sErrors += "<font color=\"red\">Error Processing Timesheets: " + err + "</font><br>";
-                else
-                    sErrors += "Processed Timesheets<br>";
-            }
-            catch (Exception ex)
-            {
-                bErrors = true;
-                sErrors += "<font color=\"red\">Error Processing Timesheets: " + ex.Message + "</font><br>";
-            }
-
-            #endregion
-
-            #region Process PFE Data
-
-            try
-            {
-                if (site.Features[new Guid("158c5682-d839-4248-b780-82b4710ee152")] != null)
+                try
                 {
-                    SPWeb rootWeb = site.RootWeb;
+                    string err = "";
+                    bool tErrors = epmdata.RefreshTimesheets(out err, base.JobUid);
+                    if (tErrors)
+                        bErrors = true;
+                    if (bErrors)
+                        sErrors += "<font color=\"red\">Error Processing Timesheets: " + err + "</font><br>";
+                    else
+                        sErrors += "Processed Timesheets<br>";
+                }
+                catch (Exception ex)
+                {
+                    bErrors = true;
+                    sErrors += "<font color=\"red\">Error Processing Timesheets: " + ex.Message + "</font><br>";
+                }
 
-                    string basePath = CoreFunctions.getConfigSetting(rootWeb, "epkbasepath");
-                    string ppmId = CoreFunctions.getConfigSetting(rootWeb, "ppmpid");
-                    string ppmCompany = CoreFunctions.getConfigSetting(rootWeb, "ppmcompany");
-                    string ppmDbConn = CoreFunctions.getConfigSetting(rootWeb, "ppmdbconn");
+                #endregion
 
-                    Assembly assemblyInstance =
-                        Assembly.Load(
-                            "PortfolioEngineCore, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5");
-                    Type thisClass = assemblyInstance.GetType("PortfolioEngineCore.WEIntegration.WEIntegration");
-                    object classObject = Activator.CreateInstance(thisClass,
-                        new object[] { basePath, site.WebApplication.ApplicationPool.Username, ppmId, ppmCompany, ppmDbConn, false });
+                #region Process PFE Data
 
-                    MethodInfo m = thisClass.GetMethod("ExecuteReportExtract");
-                    var message =
-                        (string)
-                            m.Invoke(classObject,
-                                new object[]
+                try
+                {
+                    if (site.Features[new Guid("158c5682-d839-4248-b780-82b4710ee152")] != null)
+                    {
+                        SPWeb rootWeb = site.RootWeb;
+
+                        string basePath = CoreFunctions.getConfigSetting(rootWeb, "epkbasepath");
+                        string ppmId = CoreFunctions.getConfigSetting(rootWeb, "ppmpid");
+                        string ppmCompany = CoreFunctions.getConfigSetting(rootWeb, "ppmcompany");
+                        string ppmDbConn = CoreFunctions.getConfigSetting(rootWeb, "ppmdbconn");
+
+                        Assembly assemblyInstance =
+                            Assembly.Load(
+                                "PortfolioEngineCore, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5");
+                        Type thisClass = assemblyInstance.GetType("PortfolioEngineCore.WEIntegration.WEIntegration");
+                        object classObject = Activator.CreateInstance(thisClass,
+                            new object[] { basePath, site.WebApplication.ApplicationPool.Username, ppmId, ppmCompany, ppmDbConn, false });
+
+                        MethodInfo m = thisClass.GetMethod("ExecuteReportExtract");
+                        var message =
+                            (string)
+                                m.Invoke(classObject,
+                                    new object[]
                                 {
                                     "<ExecuteReportExtract><Params /><Data><ReportExtract Connection=\"" +
                                     getReportingConnection(web) + "\" Execute=\"1\" /></Data></ExecuteReportExtract>"
                                 });
 
-                    sErrors += "Processed PfE Reporting: " + message + "<br>";
+                        sErrors += "Processed PfE Reporting: " + message + "<br>";
+                    }
                 }
-            }
-            catch (Exception ex)
-            {
-                bErrors = true;
-                sErrors += "<font color=\"red\">Error Processing PfE Reporting: " + ex.Message + "</font><br>";
-            }
+                catch (Exception ex)
+                {
+                    bErrors = true;
+                    sErrors += "<font color=\"red\">Error Processing PfE Reporting: " + ex.Message + "</font><br>";
+                }
 
-            #endregion Process PFE Data
+                #endregion Process PFE Data
 
-            #region Database checks
+                #region Database checks
 
-            SPSecurity.RunWithElevatedPrivileges(delegate
-            {
                 try
                 {
                     CheckReqSP(epmdata.GetClientReportingConnection);
@@ -265,125 +276,138 @@ namespace EPMLiveReportsAdmin.Jobs
                     bErrors = true;
                     sErrors += "<font color=\"red\">Error while updating schema: " + exSchema.Message + "</font><br>";
                 }
-            });
-
-            #endregion
-
-            #region Clean Data
-
-            try
-            {
-                DataScrubber.CleanTables(site, epmdata);
-            }
-            catch (Exception ex)
-            {
-                bErrors = true;
-                sErrors += "<font color=\"red\">Error while clean tables: " + ex.Message + "</font><br>";
-            }
-
-            #endregion
-
-            try
-            {
                 
+                #endregion
 
-                if (string.IsNullOrEmpty(data))
+                #region Clean Data
+
+                try
                 {
-                    try
-                    {
-                        DataSet ds = new DataSet();
-                        var cmd2 = new SqlCommand("SELECT TABLENAME FROM RPTList", epmdata.GetClientReportingConnection);
-                        SqlDataAdapter da = new SqlDataAdapter(cmd2);
-                        da.Fill(ds);
-
-                        foreach (DataRow dr in ds.Tables[0].Rows)
-                        {
-                            cmd2 = new SqlCommand("spUpdateStatusFields", epmdata.GetClientReportingConnection);
-                            cmd2.CommandType = CommandType.StoredProcedure;
-                            cmd2.Parameters.AddWithValue("@listtable", dr[0].ToString());
-
-                            cmd2.ExecuteNonQuery();
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        bErrors = true;
-                        sErrors += "<font color=\"red\">Error updating status fields: " + ex.Message + "</font><br>";
-                    }
+                    DataScrubber.CleanTables(site, epmdata);
                 }
-                else
+                catch (Exception ex)
                 {
-                    try
-                    {
-                        foreach(string sList in data.Split(','))
-                        {
-                            if (sList != "")
-                            {
-                                try
-                                {
-                                    SPList list = web.Lists[sList];
-
-                                    DataSet ds = new DataSet();
-                                    var cmd2 = new SqlCommand("SELECT TABLENAME FROM RPTList where listid=@listid", epmdata.GetClientReportingConnection);
-                                    cmd2.Parameters.AddWithValue("@listid", list.ID);
-                                    SqlDataAdapter da = new SqlDataAdapter(cmd2);
-                                    da.Fill(ds);
-
-                                    cmd2 = new SqlCommand("spUpdateStatusFields", epmdata.GetClientReportingConnection);
-                                    cmd2.CommandType = CommandType.StoredProcedure;
-                                    cmd2.Parameters.AddWithValue("@listtable", ds.Tables[0].Rows[0][0].ToString());
-
-                                    cmd2.ExecuteNonQuery();
-                                }
-                                catch (Exception ex)
-                                {
-                                    bErrors = true;
-                                    sErrors += "<font color=\"red\">Error updating status fields (" + sList + "): " + ex.Message + "</font><br>";
-                                }
-                            }
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        bErrors = true;
-                        sErrors += "<font color=\"red\">Error updating status fields: " + ex.Message + "</font><br>";
-                    }
-                    
+                    bErrors = true;
+                    sErrors += "<font color=\"red\">Error while clean tables: " + ex.Message + "</font><br>";
                 }
-                foreach (string list in data.Split(','))
+
+                #endregion
+
+                try
                 {
-                    if (list != "")
+
+
+                    if (string.IsNullOrEmpty(data))
                     {
                         try
                         {
-                            var cmd2 = new SqlCommand("spUpdateStatusFields", epmdata.GetClientReportingConnection);
-                            cmd2.CommandType = CommandType.StoredProcedure;
-                            cmd2.Parameters.AddWithValue("@listtable", list);
+                            DataSet ds = new DataSet();
+                            var cmd2 = new SqlCommand("SELECT TABLENAME FROM RPTList", epmdata.GetClientReportingConnection);
+                            SqlDataAdapter da = new SqlDataAdapter(cmd2);
+                            da.Fill(ds);
 
-                            cmd2.ExecuteNonQuery();
+                            foreach (DataRow dr in ds.Tables[0].Rows)
+                            {
+                                cmd2 = new SqlCommand("spUpdateStatusFields", epmdata.GetClientReportingConnection);
+                                cmd2.CommandType = CommandType.StoredProcedure;
+                                cmd2.Parameters.AddWithValue("@listtable", dr[0].ToString());
+
+                                cmd2.ExecuteNonQuery();
+                            }
                         }
                         catch (Exception ex)
                         {
                             bErrors = true;
-                            sErrors += "<font color=\"red\">Error running schedule field update for (" + list + "): " +
-                                       ex.Message + "</font><br>";
+                            sErrors += "<font color=\"red\">Error updating status fields: " + ex.Message + "</font><br>";
                         }
-                        if (!hshMessages.Contains(list))
-                            hshMessages.Add(list, "");
                     }
+                    else
+                    {
+                        try
+                        {
+                            foreach (string sList in data.Split(','))
+                            {
+                                if (sList != "")
+                                {
+                                    try
+                                    {
+                                        SPList list = web.Lists[sList];
+
+                                        DataSet ds = new DataSet();
+                                        var cmd2 = new SqlCommand("SELECT TABLENAME FROM RPTList where listid=@listid", epmdata.GetClientReportingConnection);
+                                        cmd2.Parameters.AddWithValue("@listid", list.ID);
+                                        SqlDataAdapter da = new SqlDataAdapter(cmd2);
+                                        da.Fill(ds);
+
+                                        cmd2 = new SqlCommand("spUpdateStatusFields", epmdata.GetClientReportingConnection);
+                                        cmd2.CommandType = CommandType.StoredProcedure;
+                                        cmd2.Parameters.AddWithValue("@listtable", ds.Tables[0].Rows[0][0].ToString());
+
+                                        cmd2.ExecuteNonQuery();
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        bErrors = true;
+                                        sErrors += "<font color=\"red\">Error updating status fields (" + sList + "): " + ex.Message + "</font><br>";
+                                    }
+                                }
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            bErrors = true;
+                            sErrors += "<font color=\"red\">Error updating status fields: " + ex.Message + "</font><br>";
+                        }
+
+                    }
+                    foreach (string list in data.Split(','))
+                    {
+                        if (list != "")
+                        {
+                            try
+                            {
+                                var cmd2 = new SqlCommand("spUpdateStatusFields", epmdata.GetClientReportingConnection);
+                                cmd2.CommandType = CommandType.StoredProcedure;
+                                cmd2.Parameters.AddWithValue("@listtable", list);
+
+                                cmd2.ExecuteNonQuery();
+                            }
+                            catch (Exception ex)
+                            {
+                                bErrors = true;
+                                sErrors += "<font color=\"red\">Error running schedule field update for (" + list + "): " +
+                                           ex.Message + "</font><br>";
+                            }
+                            if (!hshMessages.Contains(list))
+                                hshMessages.Add(list, "");
+                        }
+                    }
+
+                    sErrors += "<br>Updated Status Fields<br>";
+                }
+                catch (Exception ex)
+                {
+                    bErrors = true;
+                    sErrors += "<font color=\"red\">Error running schedule field update: " + ex.Message + "</font><br>";
                 }
 
-                sErrors += "<br>Updated Status Fields<br>";
+                // clear cache
+
+                try
+                {
+                    CacheStore.Current.RemoveSafely(web.Url, new CacheStoreCategory(web).Navigation);
+                }
+                catch (Exception ex)
+                {
+                    bErrors = true;
+                    sErrors += "<font color=\"red\">Clear Cache Error: " + ex.Message + "</font><br>";
+                }
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
                 bErrors = true;
-                sErrors += "<font color=\"red\">Error running schedule field update: " + ex.Message + "</font><br>";
+                sErrors += "<font color=\"red\">General Error: " + ex.Message + "</font><br>";
             }
-
-            // clear cache
-
-            CacheStore.Current.RemoveSafely(web.Url, new CacheStoreCategory(web).Navigation);
             finishJob();
         }
 
