@@ -2156,6 +2156,14 @@ namespace EPMLiveWorkPlanner
                 }
                 catch { }
             }
+            else if (field == "StartDate" || field == "DueDate")
+            {
+                try
+                {
+                    value = Convert.ToDateTime(value).ToString("dddd, dd MMMM yyyy");
+                }
+                catch { }
+            }
             return value;
 
         }
