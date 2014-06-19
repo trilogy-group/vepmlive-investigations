@@ -5,6 +5,7 @@ using System.Data.SqlClient;
 using System.Diagnostics;
 using EPMLiveCore.API;
 using Microsoft.SharePoint;
+using EPMLiveCore;
 
 namespace EPMLiveReportsAdmin
 {
@@ -180,6 +181,19 @@ namespace EPMLiveReportsAdmin
                         {
                             SPList list = web.Lists[properties.ListId];
                             SPListItem li = list.GetItemById(properties.ListItemId);
+
+                            var settings = new GridGanttSettings(list);
+                            if (settings.BuildTeamSecurity)
+                            {
+                                if (!li.HasUniqueRoleAssignments)
+                                {
+                                    try
+                                    {
+                                        li.BreakRoleInheritance(true);
+                                    }
+                                    catch { }
+                                }
+                            }
 
                             var cmd =
                                 new SqlCommand(
