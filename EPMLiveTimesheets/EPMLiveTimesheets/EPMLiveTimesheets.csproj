@@ -241,6 +241,11 @@
     <Content Include="Features\TimeSheets\TimeSheets.Template.xml">
       <DependentUpon>TimeSheets.feature</DependentUpon>
     </Content>
+    <Content Include="Layouts\epmlive\images\mytsadditem-16.png" />
+    <Content Include="Layouts\epmlive\images\mytsremoveitem-16.png" />
+    <Content Include="Layouts\epmlive\images\mytssave-16.png" />
+    <Content Include="Layouts\epmlive\images\mytssubmit-16.png" />
+    <Content Include="Layouts\epmlive\images\mytsunsubmit-16.png" />
     <Content Include="Layouts\epmlive\images\ts\approved.png" />
     <Content Include="Layouts\epmlive\images\ts\Rejected.png" />
     <Content Include="Layouts\epmlive\images\ts\submitted.png" />
