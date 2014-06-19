@@ -2,19 +2,19 @@
 	<Tab Id="Ribbon.MyTimesheetTab" Title="My Timesheet" Command="MyTimesheetContextualTab.EnableMyTimesheetTab" Sequence="100">
 		<Scaling Id="Ribbon.MyTimesheet.Scaling">
 			<MaxSize Id="Ribbon.MyTimesheet.ActionsGroup.MaxSize" GroupId="Ribbon.MyTimesheet.ActionsGroup" Size="LargeMediumSmall"/>
-			<Scale Id="Ribbon.MyTimesheet.ActionsGroup.Scaling.CustomTabScaling" GroupId="Ribbon.MyTimesheet.ActionsGroup" Size="LargeMediumSmall" />
+			<Scale Id="Ribbon.MyTimesheet.ActionsGroup.Scaling.CustomTabScaling" GroupId="Ribbon.MyTimesheet.ActionsGroup" Size="ThreeRowMedium" />
 
 			<MaxSize Id="Ribbon.MyTimesheet.ViewPeriodGroup.MaxSize" GroupId="Ribbon.MyTimesheet.ViewPeriodGroup" Size="PeriodView"/>
 			<Scale Id="Ribbon.MyTimesheet.ViewPeriodGroup.Scaling.CustomTabScaling" GroupId="Ribbon.MyTimesheet.ViewPeriodGroup" Size="PeriodView" />
 
 			<MaxSize Id="Ribbon.MyTimesheet.DelegateGroup.MaxSize" GroupId="Ribbon.MyTimesheet.DelegateGroup" Size="LargeMediumSmall"/>
-			<Scale Id="Ribbon.MyTimesheet.DelegateGroup.Scaling.CustomTabScaling" GroupId="Ribbon.MyTimesheet.DelegateGroup" Size="LargeMediumSmall" />
+			<Scale Id="Ribbon.MyTimesheet.DelegateGroup.Scaling.CustomTabScaling" GroupId="Ribbon.MyTimesheet.DelegateGroup" Size="ThreeRowMedium" />
 
 			<MaxSize Id="Ribbon.MyTimesheet.WorkGroup.MaxSize" GroupId="Ribbon.MyTimesheet.WorkGroup" Size="LargeMediumSmall"/>
-			<Scale Id="Ribbon.MyTimesheet.WorkGroup.Scaling.CustomTabScaling" GroupId="Ribbon.MyTimesheet.WorkGroup" Size="LargeMediumSmall" />
+			<Scale Id="Ribbon.MyTimesheet.WorkGroup.Scaling.CustomTabScaling" GroupId="Ribbon.MyTimesheet.WorkGroup" Size="ThreeRowMedium" />
 
 			<MaxSize Id="Ribbon.MyTimesheet.Approvals.MaxSize" GroupId="Ribbon.MyTimesheet.Approvals" Size="LargeMediumSmall"/>
-			<Scale Id="Ribbon.MyTimesheet.Approvals.Scaling.CustomTabScaling" GroupId="Ribbon.MyTimesheet.Approvals" Size="LargeMediumSmall" />
+			<Scale Id="Ribbon.MyTimesheet.Approvals.Scaling.CustomTabScaling" GroupId="Ribbon.MyTimesheet.Approvals" Size="ThreeRowMedium" />
 
 		</Scaling>
 		<Groups Id="Ribbon.MyTimesheet.Groups">
@@ -25,7 +25,8 @@
 					Id="Ribbon.MyTimesheet.ActionsGroup.SaveButton"
 					Sequence="10"
 					Command="Ribbon.MyTimesheet.Save"
-					Image32by32="/_layouts/epmlive/images/mytssave.png"
+					Image32by32="/_layouts/epmlive/images/mytssave.png"					
+					Image16by16="/_layouts/epmlive/images/mytssave-16.png"
 					LabelText="Save"
 					TemplateAlias="oL"/>
 
@@ -34,7 +35,8 @@
 						Command="Ribbon.MyTimesheet.Submit" 
 						Sequence="11" 
 						LabelText="Submit"
-						Image32by32="/_layouts/epmlive/images/mytssubmit.png" 
+						Image32by32="/_layouts/epmlive/images/mytssubmit.png"
+						Image16by16="/_layouts/epmlive/images/mytssubmit-16.png"
 						TemplateAlias="oL"/>
 
 					<Button 
@@ -42,7 +44,8 @@
 		                Command="Ribbon.MyTimesheet.Unsubmit" 
 		                Sequence="12" 
 		                LabelText="Un-Submit"
-						Image32by32="/_layouts/epmlive/images/mytsunsubmit.png" 
+						Image32by32="/_layouts/epmlive/images/mytsunsubmit.png"
+						Image16by16="/_layouts/epmlive/images/mytsunsubmit-16.png"
 		                TemplateAlias="oL"/>
 
 				</Controls>
@@ -56,7 +59,8 @@
 		                Command="Ribbon.MyTimesheet.AddWork" 
 		                Sequence="10" 
 		                LabelText="Add Work"
-						Image32by32="/_layouts/epmlive/images/mytsadditem.png" 
+						Image32by32="/_layouts/epmlive/images/mytsadditem.png" 						
+						Image16by16="/_layouts/epmlive/images/mytsadditem-16.png"
 		                TemplateAlias="oL"/>
 
 					<Button 
@@ -64,7 +68,8 @@
 		                Command="Ribbon.MyTimesheet.AddNonWork" 
 		                Sequence="11" 
 		                LabelText="Add Non-Work"
-						Image32by32="/_layouts/epmlive/images/mytsadditem.png" 
+						Image32by32="/_layouts/epmlive/images/mytsadditem.png"
+						Image16by16="/_layouts/epmlive/images/mytsadditem-16.png"
 		                TemplateAlias="oL"/>
 
 					<Button 
@@ -72,7 +77,8 @@
 		                Command="Ribbon.MyTimesheet.AutoWork" 
 		                Sequence="12" 
 		                LabelText="Auto-Add Work"
-						Image32by32="/_layouts/epmlive/images/mytsadditem.png" 
+						Image32by32="/_layouts/epmlive/images/mytsadditem.png"
+						Image16by16="/_layouts/epmlive/images/mytsadditem-16.png"
 		                TemplateAlias="oL"/>
 
 					<Button 
@@ -80,7 +86,8 @@
 		                Command="Ribbon.MyTimesheet.RemoveWork" 
 		                Sequence="13" 
 		                LabelText="Remove Item"
-						Image32by32="/_layouts/epmlive/images/mytsremoveitem.png" 
+						Image32by32="/_layouts/epmlive/images/mytsremoveitem.png"
+						Image16by16="/_layouts/epmlive/images/mytsremoveitem-16.png"
 		                TemplateAlias="oL"/>
 
 					<Button 
@@ -88,7 +95,8 @@
 		                Command="Ribbon.MyTimesheet.Comments" 
 		                Sequence="14" 
 		                LabelText="Comments"
-						Image32by32="/_layouts/epmlive/images/comments32.png" 
+						Image32by32="/_layouts/epmlive/images/comments32.png"
+						Image16by16="/_layouts/epmlive/images/comments16.gif"
 		                TemplateAlias="oL"/>
 
 				</Controls>
@@ -102,7 +110,7 @@
 						Sequence="20"
 						Command="Ribbon.MyTimesheet.CurrentViewLabel"
 						LabelText="Current View:"
-						TemplateAlias="row2control1"
+						TemplateAlias="row1control1"
 						/> 
 
 					<DropDown
@@ -113,8 +121,8 @@
 						PopulateOnlyOnce="false"
 						PopulateQueryCommand="Ribbon.MyTimesheet.PopulateViewDropDown"
 						QueryCommand="Ribbon.MyTimesheet.QueryCurrentView"
-						Width="180px"
-						TemplateAlias="row2control2">
+						Width="75px"
+						TemplateAlias="row2control1">
 					</DropDown> 
 
 				</Controls>
@@ -128,7 +136,7 @@
 		            Command="Ribbon.MyTimesheet.DelegateMy" 
 		            Sequence="11" 
 		            LabelText="My Timesheet"
-					Image32by32="/_layouts/epmlive/images/mytsmytimesheet.png" 
+					Image32by32="/_layouts/epmlive/images/mytsmytimesheet.png" 					
 		            TemplateAlias="oL"/>
 
 					<FlyoutAnchor

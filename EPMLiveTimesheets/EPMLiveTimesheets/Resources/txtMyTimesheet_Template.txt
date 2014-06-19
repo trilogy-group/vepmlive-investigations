@@ -5,6 +5,12 @@
 		<OverflowSection Type="ThreeRow" TemplateAlias="oS" DisplayMode="Small"/>
 	</Layout>
 
+	<Layout Title="ThreeRowMedium" LayoutTitle="ThreeRowMedium">
+		<OverflowSection Type="ThreeRow" TemplateAlias="oL" DisplayMode="Medium"/>
+		<OverflowSection Type="ThreeRow" TemplateAlias="oM" DisplayMode="Medium"/>
+		<OverflowSection Type="ThreeRow" TemplateAlias="oS" DisplayMode="Medium"/>
+	</Layout>
+
 	<Layout Title="SmallSmall" LayoutTitle="SmallSmall">
 		<Section Alignment="Top" Type="OneRow">
 		<Row>
@@ -20,21 +26,12 @@
 
 
 	<Layout Title="PeriodView">
-		<Section Type="ThreeRow">
+		<Section Type="TwoRow">			
 			<Row>
-			  <ControlRef TemplateAlias="row1control" DisplayMode="Medium" />
-			  <Strip>            
-			    <ControlRef TemplateAlias="previousPage" DisplayMode="Small" />
-			    <ControlRef TemplateAlias="currentPage" DisplayMode="Medium" />
-			    <ControlRef TemplateAlias="nextPage" DisplayMode="Small" />
-			  </Strip>
+			  <ControlRef TemplateAlias="row1control1" DisplayMode="Medium" />
 			</Row>
-			<Row>
-			  
-			</Row>
-			<Row>
+			<Row>			  
 			  <ControlRef TemplateAlias="row2control1" DisplayMode="Medium" />
-			  <ControlRef TemplateAlias="row2control2" DisplayMode="Medium" />
 			</Row>            
 			
 		</Section>
