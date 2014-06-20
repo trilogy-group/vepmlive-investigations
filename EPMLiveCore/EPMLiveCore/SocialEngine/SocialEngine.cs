@@ -180,12 +180,11 @@ namespace EPMLiveCore.SocialEngine
         {
             IEnumerable<Type> types = AssemblyManager.Current.GetTypes();
 
-            foreach (Type t in types)
+            foreach (var module in (from t in types
+                where !t.IsInterface && t.GetInterfaces().Contains(typeof (ISocialEngineModule))
+                select Activator.CreateInstance(t)).OfType<ISocialEngineModule>())
             {
-                if (t.IsInterface || !t.GetInterfaces().Contains(typeof (ISocialEngineModule))) continue;
-
-                var module = Activator.CreateInstance(t) as ISocialEngineModule;
-                if (module != null) module.Initialize(_events);
+                module.Initialize(_events);
             }
         }
 
@@ -201,7 +200,8 @@ namespace EPMLiveCore.SocialEngine
 
         // Internal Methods (3) 
 
-        internal DataTable GetActivities(SPWeb contextWeb, DateTime? minDate, DateTime? maxDate, int? page, int? limit, Guid? threadId)
+        internal DataTable GetActivities(SPWeb contextWeb, DateTime? minDate, DateTime? maxDate, int? page, int? limit,
+            Guid? threadId)
         {
             try
             {
@@ -283,23 +283,23 @@ namespace EPMLiveCore.SocialEngine
         internal string ProcessActivity(ObjectKind objectKind, ActivityKind activityKind,
             Dictionary<string, object> data, SPWeb spWeb)
         {
-            lock (_locker)
+            var correlationIds = new List<Guid>();
+
+            try
             {
-                var correlationIds = new List<Guid>();
-
-                try
+                using (var dbConnectionManager = new DBConnectionManager(spWeb))
                 {
-                    using (var dbConnectionManager = new DBConnectionManager(spWeb))
+                    try
                     {
-                        try
+                        var streamManager = new StreamManager(dbConnectionManager);
+                        var threadManager = new ThreadManager(dbConnectionManager);
+                        var activityManager = new ActivityManager(dbConnectionManager);
+
+                        var args = new ProcessActivityEventArgs(objectKind, activityKind, data, spWeb,
+                            streamManager, threadManager, activityManager);
+
+                        lock (_locker)
                         {
-                            var streamManager = new StreamManager(dbConnectionManager);
-                            var threadManager = new ThreadManager(dbConnectionManager);
-                            var activityManager = new ActivityManager(dbConnectionManager);
-
-                            var args = new ProcessActivityEventArgs(objectKind, activityKind, data, spWeb,
-                                streamManager, threadManager, activityManager);
-
                             using (var transactionScope = new TransactionScope())
                             {
                                 if (_events.OnActivityRegistrationRequest != null)
@@ -346,30 +346,30 @@ namespace EPMLiveCore.SocialEngine
 
                                 transactionScope.Complete();
                             }
+                        }
 
-                            if (args.EcecuteUntransactionedOperation)
-                            {
-                                args.UntransactionedOperation();
-                            }
-                        }
-                        catch (AggregateException e)
+                        if (args.EcecuteUntransactionedOperation)
                         {
-                            correlationIds.AddRange(
-                                e.InnerExceptions.Select(i => _logger.Log(objectKind, activityKind, data, spWeb, i)));
-                        }
-                        catch (Exception exception)
-                        {
-                            correlationIds.Add(_logger.Log(objectKind, activityKind, data, spWeb, exception));
+                            args.UntransactionedOperation();
                         }
                     }
+                    catch (AggregateException e)
+                    {
+                        correlationIds.AddRange(
+                            e.InnerExceptions.Select(i => _logger.Log(objectKind, activityKind, data, spWeb, i)));
+                    }
+                    catch (Exception exception)
+                    {
+                        correlationIds.Add(_logger.Log(objectKind, activityKind, data, spWeb, exception));
+                    }
                 }
-                catch (Exception exception)
-                {
-                    correlationIds.Add(_logger.Log(objectKind, activityKind, data, spWeb, exception));
-                }
-
-                return string.Join(", ", correlationIds.ToArray());
             }
+            catch (Exception exception)
+            {
+                correlationIds.Add(_logger.Log(objectKind, activityKind, data, spWeb, exception));
+            }
+
+            return string.Join(", ", correlationIds.ToArray());
         }
 
         #endregion Methods 
