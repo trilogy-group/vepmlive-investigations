@@ -36,8 +36,8 @@ namespace EPMLiveCore.Jobs
         string sEvent = "";
         string[] arrSectionNames;
         private char[] chrCRSeparator = new char[] { '\r' };
-        private string sFontName = "Lucida Grande,Arial Unicode MS,sans-serif";
-        private int iFontSize = 10;
+        private string sFontName = "Segoe UI,Helvetica,Arial";
+        private int iFontSize = 16;
         private string sFromEmail = "";
         private string sSubject = "EPM Live: Task Status Report";
         private string sNote = "The following items are assigned to you in EPM Live."; // default
@@ -316,10 +316,10 @@ namespace EPMLiveCore.Jobs
             htmlWriter = new HtmlTextWriter(stringWriter);
 
             // write the msg header
-            if (bShowGreeting) htmlWriter.Write("><font face=\"Lucida Grande,Arial Unicode MS,sans-serif\" color=\"#666666\" size=\"2\">Hello " + sUserDisplayName + ",</font><br /><br />");
+            if (bShowGreeting) htmlWriter.Write("><font face=\"Segoe UI,Helvetica,Arial\" color=\"#666666\" size=\"2\">Hello " + sUserDisplayName + ",</font><br /><br />");
 
-            htmlWriter.Write("<font face=\"Lucida Grande,Arial Unicode MS,sans-serif\" color=\"#666666\" size=\"2\">" + sNote + "</font>");
-            htmlWriter.Write("<br /><br /><u><b><font face=\"Lucida Grande,Arial Unicode MS,sans-serif\" color=\"#666666\" size=\"4\">Work Assigned to You</font></b></u><br /><br>");
+            htmlWriter.Write("<p style=\"font-family:Segoe UI,Helvetica,Arial;color:#666;font-size:16px;padding:10px;\">" + sNote + "</p>");
+            htmlWriter.Write("<div style=\"padding-left:10px;margin-bottom:20px;\"><p style=\"font-family:Segoe UI, Helvetica,Arial;color:#0090ca;font-size:30px;padding:0;margin:0;\">Work assigned to you</p></div>");
 
             // write the tables
             convertDataToHTML();
@@ -327,8 +327,7 @@ namespace EPMLiveCore.Jobs
             if (!bLockNotify)
             {
                 // write the msg footer
-                htmlWriter.Write("<br />");
-                htmlWriter.Write("To turn off these email notifications, please click <a href=\"" + sMainURL + "/_layouts/epmlive/notifications.aspx\" >here</a>.</font>");
+                htmlWriter.Write("<div style=\"border-top:1px solid #eee;margin-top:40px;text-align:center;font-family:Segoe UI, Helvetica,Arial;color:#CBD7D7;font-size:12px;\"><p style=\"padding:0px;margin-top:10px;\">You are receiving this email because this email address is assigned work within an EPM Live system. <br>Click <a href=\"" + sMainURL + "/_layouts/epmlive/notifications.aspx\" style=\"text-decoration:none;color:#CBD7D7;\">here</a> if you want to unsubscribe from this email.</p></div>");
             }
 
             return System.Web.HttpUtility.HtmlDecode(stringWriter.ToString());
@@ -410,7 +409,7 @@ namespace EPMLiveCore.Jobs
                 {
                     // format first column
                     e.Row.Cells[0].HorizontalAlign = HorizontalAlign.Left;
-                    e.Row.Cells[0].Width = 275;
+                    //e.Row.Cells[0].Width = 275;
 
                     // loop thru the other columns and align them to center
                     int cnt = 0;
@@ -418,26 +417,37 @@ namespace EPMLiveCore.Jobs
                     {
                         if (cnt > 0)
                         {
-                            if(((DataRowView)e.Row.DataItem).DataView.Table.Columns[cnt].ColumnName == "Title")
+                            if (((DataRowView)e.Row.DataItem).DataView.Table.Columns[cnt].ColumnName == "Title")
                             {
                                 e.Row.Cells[cnt].HorizontalAlign = HorizontalAlign.Left;
                             }
                             else
                             {
                                 e.Row.Cells[cnt].HorizontalAlign = HorizontalAlign.Center;
-                                if(e.Row.Cells[cnt].Text.Length > 10)
-                                {
-                                    e.Row.Cells[cnt].Width = e.Row.Cells[cnt].Text.Length * 8;
-                                }
-                                else
-                                {
-                                    e.Row.Cells[cnt].Width = 150;
-                                }
+                                //if(e.Row.Cells[cnt].Text.Length > 10)
+                                //{
+                                //    e.Row.Cells[cnt].Width = e.Row.Cells[cnt].Text.Length * 8;
+                                //}
+                                //else
+                                //{
+                                //    e.Row.Cells[cnt].Width = 150;
+                                //}
                             }
                         }
                         cnt++;
                     }
                 }
+                else if (e.Row.RowType == DataControlRowType.Header)
+                {
+                    foreach (TableCell cell in e.Row.Cells)
+                    {
+                        cell.Style.Add("border-bottom", "1px solid #eeeeee");
+                        cell.Style.Add("padding", "8px");
+                        cell.Style.Add("font-weight", "normal");
+                        cell.Style.Add("text-align", "left");
+                    }
+                }
+                
             }
             catch { }
         }
@@ -446,21 +456,22 @@ namespace EPMLiveCore.Jobs
         {
             try
             {
+                // table styles
                 gvSection = new GridView();
                 gvSection.RowDataBound += new GridViewRowEventHandler(this.gvSection_RowDataBound);
-                gvSection.BorderWidth = new Unit(1, UnitType.Pixel);
-
-                gvSection.HeaderStyle.BackColor = System.Drawing.Color.WhiteSmoke;
-                gvSection.HeaderStyle.Font.Bold = false;
-                gvSection.HeaderStyle.Font.Size = FontUnit.Point(10);
-                gvSection.HeaderStyle.ForeColor = System.Drawing.ColorTranslator.FromHtml("#666666");
-
-                gvSection.Font.Size = FontUnit.Point(10);
-                gvSection.Font.Bold = false;
-                gvSection.ForeColor = System.Drawing.ColorTranslator.FromHtml("#666666");
+                gvSection.Font.Size = FontUnit.Point(12);
+                gvSection.HorizontalAlign = HorizontalAlign.Left;
+                gvSection.Width = Unit.Percentage(100);
+                gvSection.ForeColor = System.Drawing.ColorTranslator.FromHtml("#555555");
                 gvSection.Style.Add("font-family", sFontName);
-                gvSection.CellPadding = 1;
-
+                
+                // header row styles
+                gvSection.HeaderStyle.Font.Bold = false;
+                //gvSection.HeaderStyle.Font.Size = FontUnit.Point(12);
+                gvSection.HeaderStyle.HorizontalAlign = HorizontalAlign.Left;
+                gvSection.HeaderStyle.ForeColor = System.Drawing.ColorTranslator.FromHtml("#555555");
+                gvSection.HeaderRow.Style.Add("font-size","14px");
+                
                 // convert the dataset data into html
                 foreach (string sSectionName in arrSectionNames)
                 {
@@ -470,9 +481,12 @@ namespace EPMLiveCore.Jobs
                         {
                             gvSection.DataSource = dsSectionTables.Tables[sSectionName];
                             gvSection.DataBind();
-                            htmlWriter.Write("<b><font face=\"Lucida Grande,Arial Unicode MS,sans-serif\" color=\"#666666\" size=\"2\">" + sSectionName + "</font></b><br />");
+                            htmlWriter.Write("<div style=\"padding-left:10px;margin-bottom:20px;\">");
+                            htmlWriter.Write("<div style=\"margin-bottom:5px;\"><p style=\"font-family:Segoe UI, Helvetica,Arial;color:#666;font-size:18px;margin:0;padding:0;\">" + sSectionName + "</p></div>");
+                            htmlWriter.Write("<div>");
                             gvSection.RenderControl(htmlWriter);
-                            htmlWriter.Write("<br />"); // one line spacing between tables
+                            htmlWriter.Write("</div>");
+                            htmlWriter.Write("</div>");
                             dsSectionTables.Tables[sSectionName].Rows.Clear();
                         }
                     }
@@ -751,7 +765,7 @@ namespace EPMLiveCore.Jobs
                                                     }
                                                     if (field.InternalName == "Title")
                                                     {
-                                                        val = "<a href=\"" + web.Url + "/" + list.Forms[PAGETYPE.PAGE_DISPLAYFORM].Url + "?ID=" + li.ID + "\" style=\"color:#3366CC\">" + val + "</a>";
+                                                        val = "<a href=\"" + web.Url + "/" + list.Forms[PAGETYPE.PAGE_DISPLAYFORM].Url + "?ID=" + li.ID + "\" style=\"color:#0090ca;text-decoration:none\">" + val + "</a>";
                                                     }
                                                     sNewRow[cnt] = val;
                                                 }
