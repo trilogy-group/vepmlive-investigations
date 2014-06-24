@@ -445,6 +445,7 @@ namespace EPMLiveCore.Jobs
                         cell.Style.Add("padding", "8px");
                         cell.Style.Add("font-weight", "normal");
                         cell.Style.Add("text-align", "left");
+                        cell.Style.Add("font-size", "14px");
                     }
                 }
                 
@@ -470,7 +471,7 @@ namespace EPMLiveCore.Jobs
                 //gvSection.HeaderStyle.Font.Size = FontUnit.Point(12);
                 gvSection.HeaderStyle.HorizontalAlign = HorizontalAlign.Left;
                 gvSection.HeaderStyle.ForeColor = System.Drawing.ColorTranslator.FromHtml("#555555");
-                gvSection.HeaderRow.Style.Add("font-size","14px");
+                
                 
                 // convert the dataset data into html
                 foreach (string sSectionName in arrSectionNames)
