@@ -327,7 +327,7 @@ namespace EPMLiveCore.Jobs
             if (!bLockNotify)
             {
                 // write the msg footer
-                htmlWriter.Write("<div style=\"border-top:1px solid #eee;margin-top:40px;text-align:center;font-family:Segoe UI, Helvetica,Arial;color:#CBD7D7;font-size:12px;\"><p style=\"padding:0px;margin-top:10px;\">You are receiving this email because this email address is assigned work within an EPM Live system. <br>Click <a href=\"" + sMainURL + "/_layouts/epmlive/notifications.aspx\" style=\"text-decoration:none;color:#CBD7D7;\">here</a> if you want to unsubscribe from this email.</p></div>");
+                htmlWriter.Write("<div style=\"border-top:1px solid #eee;margin-top:40px;text-align:center;font-family:Segoe UI, Helvetica,Arial;color:#CBD7D7;font-size:12px;\"><br /><p style=\"padding:0px;margin:0px;\">You are receiving this email because this email address is assigned work within an EPM Live system. <br>Click <a href=\"" + sMainURL + "/_layouts/epmlive/notifications.aspx\" style=\"text-decoration:none;color:#CBD7D7;\">here</a> if you want to unsubscribe from this email.</p></div>");
             }
 
             return System.Web.HttpUtility.HtmlDecode(stringWriter.ToString());
