@@ -2080,7 +2080,7 @@ namespace EPMLiveWebParts
                         }
                         else if (field.InternalName == "Title")
                         {
-                            if (bCleanValues)
+                            if (bCleanValues || isTimesheet)
                                 displayValue = val;
                             else
                             {
