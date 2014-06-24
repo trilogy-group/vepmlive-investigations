@@ -2184,19 +2184,17 @@
                             }, 200);
                         });
 
-
-                        $('.epm-nav-node, .epm-nav-ws-node').hover(function () {
-                            var id = this.id;
-                            window.epmNavHoveredNode = id;
-
-                            if (id !== liId) {
-                                window.setTimeout(function () {
-                                    if (window.epmNavHoveredNode === id) {
-                                        hideMenu();
-                                }
-                                }, 200);
-                        }
-                        });
+                        //$('.epm-nav-node, .epm-nav-ws-node').hover(function () {
+                        //    var id = this.id;
+                        //    window.epmNavHoveredNode = id;
+                        //    if (id !== liId) {
+                        //        window.setTimeout(function () {
+                        //            if (window.epmNavHoveredNode === id) {
+                        //                hideMenu();
+                        //        }
+                        //        }, 200);
+                        //}
+                        //});
 
                         $('.epm-nav-links, #EPMNavWorkspacesTree').hover(function () {
                         }, function () {
