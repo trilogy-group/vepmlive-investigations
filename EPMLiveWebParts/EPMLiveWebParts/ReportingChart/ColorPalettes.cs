@@ -123,21 +123,52 @@ namespace EPMLiveWebParts.ReportingChart
             get
             {
                return new Color[] {
-                    ColorTranslator.FromHtml("#00aFb0"),
-                    ColorTranslator.FromHtml("#58a128"),
-                    ColorTranslator.FromHtml("#3762ba"),
-                    ColorTranslator.FromHtml("#ff66bb"),
-                    ColorTranslator.FromHtml("#88c8d6"),
-                    ColorTranslator.FromHtml("#ffcc00"),
-                    ColorTranslator.FromHtml("#2fefef"),
-                    ColorTranslator.FromHtml("#f84000"),
-                    ColorTranslator.FromHtml("#7a7363"),
-                    ColorTranslator.FromHtml("#b3c631"),
-                    ColorTranslator.FromHtml("#ff97a3"),
-                    ColorTranslator.FromHtml("#956da3"),
-                    ColorTranslator.FromHtml("#31b77c"),
-                    ColorTranslator.FromHtml("#b2bebf"),
-                    ColorTranslator.FromHtml("#1999dd")
+                    //ColorTranslator.FromHtml("#00aFb0"),
+                    //ColorTranslator.FromHtml("#58a128"),
+                    //ColorTranslator.FromHtml("#3762ba"),
+                    //ColorTranslator.FromHtml("#ff66bb"),
+                    //ColorTranslator.FromHtml("#88c8d6"),
+                    //ColorTranslator.FromHtml("#ffcc00"),
+                    //ColorTranslator.FromHtml("#2fefef"),
+                    //ColorTranslator.FromHtml("#f84000"),
+                    //ColorTranslator.FromHtml("#7a7363"),
+                    //ColorTranslator.FromHtml("#b3c631"),
+                    //ColorTranslator.FromHtml("#ff97a3"),
+                    //ColorTranslator.FromHtml("#956da3"),
+                    //ColorTranslator.FromHtml("#31b77c"),
+                    //ColorTranslator.FromHtml("#b2bebf"),
+                    //ColorTranslator.FromHtml("#1999dd")
+
+
+                    ColorTranslator.FromHtml("#2ecc71"),
+                    ColorTranslator.FromHtml("#0090CA"),
+                    ColorTranslator.FromHtml("#e74c3c"),
+                    ColorTranslator.FromHtml("#C06FE2"),
+                    ColorTranslator.FromHtml("#FFC000"),
+                    ColorTranslator.FromHtml("#7c7c7c"),
+
+
+                    ColorTranslator.FromHtml("#27ae60"),
+                    ColorTranslator.FromHtml("#00668E"),
+                    ColorTranslator.FromHtml("#9E480E"),
+                    ColorTranslator.FromHtml("#5E0089"),
+                    ColorTranslator.FromHtml("#d35400"),
+                    ColorTranslator.FromHtml("#555555"),
+
+                    ColorTranslator.FromHtml("#1abc9c"),
+                    ColorTranslator.FromHtml("#26C6F4"),
+                    ColorTranslator.FromHtml("#c0392b"),
+                    ColorTranslator.FromHtml("#8e44ad"),
+                    ColorTranslator.FromHtml("#e67e22"),
+                    ColorTranslator.FromHtml("#A5A5A5"),
+
+                    ColorTranslator.FromHtml("#73E2CA"),
+                    ColorTranslator.FromHtml("#82E3FF"),
+                    ColorTranslator.FromHtml("#E57A70"),
+                    ColorTranslator.FromHtml("#CC9FE0"),
+                    ColorTranslator.FromHtml("#FFE18E"),
+                    ColorTranslator.FromHtml("#e2e2e2")
+
                 };
             }
         }
