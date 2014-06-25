@@ -327,7 +327,7 @@ namespace EPMLiveCore.Jobs
             if (!bLockNotify)
             {
                 // write the msg footer
-                htmlWriter.Write("<div style=\"border-top:1px solid #eee;margin-top:40px;text-align:center;font-family:Segoe UI, Helvetica,Arial;color:#CBD7D7;font-size:12px;\"><br /><p style=\"padding:0px;margin:0px;\">You are receiving this email because this email address is assigned work within an EPM Live system. <br>Click <a href=\"" + sMainURL + "/_layouts/epmlive/notifications.aspx\" style=\"text-decoration:none;color:#CBD7D7;\">here</a> if you want to unsubscribe from this email.</p></div>");
+                htmlWriter.Write("<div style=\"border-top:1px solid #eee;margin-top:40px;text-align:center;font-family:Segoe UI, Helvetica,Arial;color:#CBD7D7;font-size:12px;display:inline-block;width:100%;padding-bottom:40px;\"><br /><p style=\"padding:0px;margin:0px;\">You are receiving this email because this email address is assigned work within an EPM Live system. <br>Click <a href=\"" + sMainURL + "/_layouts/epmlive/notifications.aspx\" style=\"text-decoration:none;color:#CBD7D7;\">here</a> if you want to unsubscribe from this email.</p></div>");
             }
 
             return System.Web.HttpUtility.HtmlDecode(stringWriter.ToString());
@@ -433,6 +433,9 @@ namespace EPMLiveCore.Jobs
                                 //    e.Row.Cells[cnt].Width = 150;
                                 //}
                             }
+                            e.Row.Cells[cnt].Style.Add("border","none");
+                            e.Row.Cells[cnt].Style.Add("font-size", "14px");
+                            e.Row.Cells[cnt].Style.Add("text-align", "left");
                         }
                         cnt++;
                     }
@@ -441,6 +444,9 @@ namespace EPMLiveCore.Jobs
                 {
                     foreach (TableCell cell in e.Row.Cells)
                     {
+                        cell.Style.Add("border-left", "none");
+                        cell.Style.Add("border-right", "none");
+                        cell.Style.Add("border-top", "none");
                         cell.Style.Add("border-bottom", "1px solid #eeeeee");
                         cell.Style.Add("padding", "8px");
                         cell.Style.Add("font-weight", "normal");
@@ -465,6 +471,7 @@ namespace EPMLiveCore.Jobs
                 gvSection.Width = Unit.Percentage(100);
                 gvSection.ForeColor = System.Drawing.ColorTranslator.FromHtml("#555555");
                 gvSection.Style.Add("font-family", sFontName);
+                gvSection.Style.Add("border","none");
                 
                 // header row styles
                 gvSection.HeaderStyle.Font.Bold = false;
