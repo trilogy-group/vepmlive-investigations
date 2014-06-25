@@ -408,8 +408,10 @@ namespace EPMLiveCore.Jobs
                 if (e.Row.RowType == DataControlRowType.DataRow)
                 {
                     // format first column
-                    e.Row.Cells[0].HorizontalAlign = HorizontalAlign.Left;
-                    //e.Row.Cells[0].Width = 275;
+                    e.Row.Cells[0].Style.Add("border", "none");
+                    e.Row.Cells[0].Style.Add("font-size", "14px");
+                    e.Row.Cells[0].Style.Add("text-align", "left");
+                    e.Row.Cells[0].Style.Add("padding", "8px");
 
                     // loop thru the other columns and align them to center
                     int cnt = 0;
@@ -436,6 +438,7 @@ namespace EPMLiveCore.Jobs
                             e.Row.Cells[cnt].Style.Add("border","none");
                             e.Row.Cells[cnt].Style.Add("font-size", "14px");
                             e.Row.Cells[cnt].Style.Add("text-align", "left");
+                            e.Row.Cells[cnt].Style.Add("padding", "8px");
                         }
                         cnt++;
                     }
