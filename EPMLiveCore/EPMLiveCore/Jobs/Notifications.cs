@@ -492,7 +492,7 @@ namespace EPMLiveCore.Jobs
                         {
                             gvSection.DataSource = dsSectionTables.Tables[sSectionName];
                             gvSection.DataBind();
-                            htmlWriter.Write("<div style=\"padding-left:10px;margin-bottom:20px;\">");
+                            htmlWriter.Write("<div style=\"padding-left:10px;margin-bottom:40px;display:inline-block;width:99%;\">");
                             htmlWriter.Write("<div style=\"margin-bottom:5px;\"><p style=\"font-family:Segoe UI, Helvetica,Arial;color:#666;font-size:18px;margin:0;padding:0;\">" + sSectionName + "</p></div>");
                             htmlWriter.Write("<div>");
                             gvSection.RenderControl(htmlWriter);
