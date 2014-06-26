@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Reflection;
@@ -263,5 +264,50 @@ namespace UplandIntegrations.Tenrox.Services
         }
 
         #endregion Methods 
+
+        public void GetObjectItemsByDate(string objectName, DateTime lastSynchDate, DataTable items)
+        {
+            if (!objectName.ToLower().Equals("project")) return;
+
+            List<string> columns = (from DataColumn column in items.Columns select column.ColumnName).ToList();
+
+            IObjectManager objectManager = GetManager(objectName);
+            foreach (TenroxObject txObject in objectManager.GetItemsByDate(lastSynchDate))
+            {
+                object item = txObject.Item;
+                if (item == null) continue;
+
+                DataRow row = items.NewRow();
+
+                foreach (string column in columns)
+                {
+                    try
+                    {
+                        object value;
+
+                        switch (column)
+                        {
+                            case "SPID":
+                                value = GetValue(item, "Id");
+                                break;
+                            case "ID":
+                                value = GetValue(item, "UniqueId");
+                                break;
+                            default:
+                                value = GetValue(item, column);
+                                break;
+                        }
+
+                        row[column] = value;
+                    }
+                    catch { }
+                }
+
+                PopulateUserFields(objectName, txObject, row, objectManager);
+                GetTimesheetHours(objectName, txObject.ItemId.ToString(CultureInfo.InvariantCulture), columns, row);
+
+                items.Rows.Add(row);
+            }
+        }
     }
 }

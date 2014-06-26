@@ -145,6 +145,18 @@ namespace UplandIntegrations.Tenrox
 
         public DataTable PullData(WebProperties webProps, IntegrationLog log, DataTable items, DateTime lastSynchDate)
         {
+            try
+            {
+                TenroxService txService = GetTenroxService(webProps);
+                txService.GetObjectItemsByDate((string) webProps.Properties["Object"], lastSynchDate, items);
+            }
+            catch (Exception e)
+            {
+                log.LogMessage(e.Message, e.Message.StartsWith("Scheduled Pull: No records found")
+                    ? IntegrationLogType.Warning
+                    : IntegrationLogType.Error);
+            }
+
             return items;
         }
 

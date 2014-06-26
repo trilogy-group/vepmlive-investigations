@@ -61,9 +61,9 @@ namespace UplandIntegrations.Tenrox.Infrastructure
 
         #endregion Properties 
 
-        #region Methods (15) 
+        #region Methods (16) 
 
-        // Public Methods (5) 
+        // Public Methods (6) 
 
         public virtual IEnumerable<TenroxTransactionResult> DeleteItems(int[] itemIds, Guid integrationId)
         {
@@ -170,6 +170,30 @@ namespace UplandIntegrations.Tenrox.Infrastructure
                     yield return task.Result;
                 }
             }
+        }
+
+        public IEnumerable<TenroxObject> GetItemsByDate(DateTime lastSyncDate)
+        {
+            var tenroxObjects = new List<TenroxObject>();
+
+            using (IDisposable client = GetClient())
+            {
+                try
+                {
+                    var txObjects = (object[]) _clientType.GetMethod("QueryBy")
+                        .Invoke(client, new[] {Token, "UPDATEDON > @0", new List<object> {lastSyncDate}});
+
+                    tenroxObjects.AddRange(
+                        txObjects.Select(
+                            txo => new TenroxObject((int) txo.GetType().GetProperty("Id").GetValue(txo), txo)));
+                }
+                catch (Exception exception)
+                {
+                    tenroxObjects.Add(new TenroxObject(-1, exception));
+                }
+            }
+
+            return tenroxObjects;
         }
 
         public string TranslateIdToUserEmail(int userId)
@@ -410,7 +434,8 @@ namespace UplandIntegrations.Tenrox.Infrastructure
                     (TenroxIntegrationService.UserToken)
                         TranslateToken(_authToken, typeof (TenroxIntegrationService.UserToken));
 
-                foreach (Integration integration in integrationsClient.QueryByObjectTypeObjectID(token, ObjectId, itemId))
+                foreach (
+                    Integration integration in integrationsClient.QueryByObjectTypeObjectID(token, ObjectId, itemId))
                 {
                     integrationsClient.Delete(token, integration.UniqueId);
                     break;
