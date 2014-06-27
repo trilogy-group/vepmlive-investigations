@@ -141,6 +141,7 @@ namespace EPMLiveWebParts
                     string sType = "Html";
 
                     string sTitle = oField.Title;
+                    string sTitleAlign = "Left";
 
                     if (sFormat != "")
                     {
@@ -177,6 +178,7 @@ namespace EPMLiveWebParts
 
                         attr = doc.CreateAttribute("Align");
                         attr.Value = "Center";
+                        sTitleAlign = "Center";
                         ndNew.Attributes.Append(attr);
 
                         attr = doc.CreateAttribute("WorkspaceUrl");
@@ -187,6 +189,7 @@ namespace EPMLiveWebParts
                     }
                     else
                     {
+                        
                         string sWidth = "150";
 
                         switch (oField.Type)
@@ -196,13 +199,15 @@ namespace EPMLiveWebParts
                                 break;
                             case SPFieldType.Number:
                                 attr = doc.CreateAttribute("Align");
-                                attr.Value = "Left";
+                                attr.Value = "Right";
+                                sTitleAlign = "Right";
                                 ndNew.Attributes.Append(attr);
                                 sType = "Float";
                                 break;
                             case SPFieldType.Currency:
                                 attr = doc.CreateAttribute("Align");
-                                attr.Value = "Left";
+                                attr.Value = "Right";
+                                sTitleAlign = "Right";
                                 ndNew.Attributes.Append(attr);
                                 sType = "Float";
                                 break;
@@ -220,7 +225,8 @@ namespace EPMLiveWebParts
                                 if (oFC.OutputType == SPFieldType.Number || oFC.OutputType == SPFieldType.Currency || oFC.OutputType == SPFieldType.DateTime)
                                 {
                                     attr = doc.CreateAttribute("Align");
-                                    attr.Value = "Left";
+                                    attr.Value = "Right";
+                                    sTitleAlign = "Right";
                                     ndNew.Attributes.Append(attr);
                                     sType = "Float";
                                 }
@@ -228,6 +234,7 @@ namespace EPMLiveWebParts
                                 {
                                     attr = doc.CreateAttribute("Align");
                                     attr.Value = "Center";
+                                    sTitleAlign = "Center";
                                     ndNew.Attributes.Append(attr);
                                     sWidth = "80";
                                 }
@@ -311,7 +318,8 @@ namespace EPMLiveWebParts
                                 {
                                     case "TotalRollup":
                                         attr = doc.CreateAttribute("Align");
-                                        attr.Value = "Left";
+                                        attr.Value = "Right";
+                                        sTitleAlign = "Right";
                                         ndNew.Attributes.Append(attr);
                                         break;
                                 }
@@ -340,6 +348,10 @@ namespace EPMLiveWebParts
 
                     attr = doc.CreateAttribute(oField.InternalName);
                     attr.Value = sTitle;
+                    ndHeader.Attributes.Append(attr);
+
+                    attr = doc.CreateAttribute(oField.InternalName + "Align");
+                    attr.Value = sTitleAlign;
                     ndHeader.Attributes.Append(attr);
 
                     if (arrHidden.Contains(oField.InternalName))
