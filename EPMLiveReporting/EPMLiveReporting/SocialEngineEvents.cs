@@ -126,26 +126,30 @@ namespace EPMLiveReportsAdmin
 
             foreach (SPField field in fields)
             {
-                if (field.Hidden || field.Type != SPFieldType.Lookup) continue;
+                try
+                {
+                    if (field.Hidden || field.Type != SPFieldType.Lookup) continue;
 
-                object value = properties.ListItem[field.InternalName];
+                    object value = properties.ListItem[field.InternalName];
 
-                if (value == null) continue;
+                    if (value == null) continue;
 
-                var lookup = ((SPFieldLookup) field);
+                    var lookup = ((SPFieldLookup) field);
 
-                if (lookup.AllowMultipleValues) continue;
+                    if (lookup.AllowMultipleValues) continue;
 
-                Guid listId;
-                if (!Guid.TryParse(lookup.LookupList, out listId)) continue;
+                    Guid listId;
+                    if (!Guid.TryParse(lookup.LookupList, out listId)) continue;
 
-                var val = value as string;
-                if (string.IsNullOrEmpty(val)) continue;
+                    var val = value as string;
+                    if (string.IsNullOrEmpty(val)) continue;
 
-                var lookupValue = new SPFieldLookupValue(val);
+                    var lookupValue = new SPFieldLookupValue(val);
 
-                if (!dict.ContainsKey(listId)) dict.Add(listId, lookupValue.LookupId);
-                else dict[listId] = lookupValue.LookupId;
+                    if (!dict.ContainsKey(listId)) dict.Add(listId, lookupValue.LookupId);
+                    else dict[listId] = lookupValue.LookupId;
+                }
+                catch { }
             }
 
             List<string> list = dict.Select(lv => string.Format(@"{0}|{1}", lv.Key, lv.Value)).ToList();
