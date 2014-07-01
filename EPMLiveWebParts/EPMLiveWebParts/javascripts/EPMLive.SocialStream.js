@@ -6,6 +6,9 @@
             var webUrl = window.epmLive.currentWebUrl.slice(1) + '/';
             var baseUrl = webUrl === '/' ? webUrl : '/' + webUrl;
 
+            var urlDict = {};
+            urlDict[window.epmLive.currentWebId] = baseUrl;
+
             var se = {
                 pagination: null,
                 ui: {
@@ -24,8 +27,10 @@
                     }
                 },
                 apiUrl: baseUrl + '_vti_bin/SocialEngine.svc',
-                commentServiceUrl: baseUrl + '_layouts/15/epmlive/CommentsProxy.aspx',
-                statusUpdateServiceUrl: baseUrl + '_vti_bin/WorkEngine.asmx/Execute'
+                statusUpdateServiceUrl: baseUrl + '_vti_bin/WorkEngine.asmx/Execute',
+                commentServiceUrl: function (webId) {
+                    return urlDict[webId] + '_layouts/15/epmlive/CommentsProxy.aspx';
+                }
             };
 
             var $el = {
@@ -64,7 +69,7 @@
                     if (window.epmLive.currentUserTimeZone) {
                         try {
                             return moment.tz(time, window.epmLive.currentUserTimeZone.olsonName);
-                        } catch(e) {
+                        } catch (e) {
                             if (window.epmLive.debugMode) {
                                 console.log(e.message);
                             }
@@ -122,7 +127,7 @@
                     }
                 };
 
-                var _resetPagination = function () {
+                var _resetPagination = function() {
                     se.pagination = {
                         isLoading: false,
                         firstTimeLoad: true,
@@ -151,6 +156,24 @@
                     se.loaderStarted = false;
                 };
 
+                var _getWebUrl = function () {
+                    $.ajax({
+                        url: _spPageContextInfo.webAbsoluteUrl + "/_api/site/rootweb/webinfos?$select=ID,ServerRelativeUrl",
+                        type: 'GET',
+                        headers: { accept: 'application/json;odata=verbose' },
+                    }).then(function (response) {
+                        var webs = response.d.results;
+                        for (var i = 0; i < webs.length; i++) {
+                            var web = webs[i];
+
+                            var wUrl = web.ServerRelativeUrl.slice(1) + '/';
+                            var bUrl = wUrl === '/' ? wUrl : '/' + wUrl;
+
+                            urlDict[web.Id] = bUrl;
+                        }
+                    });
+                };
+
                 return {
                     getFriendlyTime: _getFriendlyTime,
                     getLongTime: _getLongTime,
@@ -159,7 +182,8 @@
                     sortComments: _sortComments,
                     resetPagination: _resetPagination,
                     startLoader: _startLoader,
-                    stopLoader: _stopLoader
+                    stopLoader: _stopLoader,
+                    getWebUrl: _getWebUrl
                 };
             })();
 
@@ -577,7 +601,7 @@
                     }
 
                     if (data.thread) {
-                        $.post(se.commentServiceUrl, {
+                        $.post(se.commentServiceUrl(data.thread.webId), {
                             command: 'CreateComment',
                             comment: data.text,
                             newcomment: null,
@@ -976,6 +1000,7 @@
             var _configure = function() {
                 helpers.startLoader();
                 helpers.resetPagination();
+                helpers.getWebUrl();
 
                 configureMoment();
                 configureUI();
