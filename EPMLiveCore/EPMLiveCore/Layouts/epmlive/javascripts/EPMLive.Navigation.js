@@ -949,9 +949,17 @@
                     }
 
                     if (command === 'view' || command === 'edit') {
+                        var page = '';
+
                         var wUrl = $$.currentWebUrl();
                         var urlParts = window.location.href.split('?');
-                        var page = (wUrl + urlParts[0].split(escape(wUrl))[1]);
+
+                        if (wUrl === '/') {
+                            page = urlParts[0];
+                        } else {
+                            page = (wUrl + urlParts[0].split(escape(wUrl))[1]);
+                        }
+
                         page = escape(page);
 
                         redirectUrl += '&source=' + page;
