@@ -175,6 +175,9 @@ namespace EPMLiveCore.API
                 // save current user
                 SPUser originalUser = SPContext.Current.Web.CurrentUser;
 
+                string originListItemTitle = null;
+                string originListItemUrl = null;
+
                 SPSecurity.RunWithElevatedPrivileges(delegate
                 {
                     using (var es = new SPSite(SPContext.Current.Site.ID))
@@ -192,6 +195,9 @@ namespace EPMLiveCore.API
 
                             if (originListItem != null)
                             {
+                                originListItemTitle = originListItem.Title;
+                                originListItemUrl = originListItem.Url;
+
                                 EnsureMetaCols(originList);
 
                                 string sCommenters =
@@ -295,15 +301,15 @@ namespace EPMLiveCore.API
                     }
                 });
 
-                if (string.IsNullOrEmpty(comment) || originListItem == null) return retVal;
+                if (string.IsNullOrEmpty(comment) || string.IsNullOrEmpty(originListItemTitle)) return retVal;
 
                 try
                 {
                     if (!statusUpdate)
                     {
                         SyncToSocialStream(currentItem.UniqueId, comment, originListItem.ParentList.ID,
-                            originListItem.ID, originListItem.Title,
-                            originListItem.ParentList.Title, originListItem.Url, laCommenters, time, cWeb, "ADD");
+                            originListItem.ID, originListItemTitle,
+                            originListItem.ParentList.Title, originListItemUrl, laCommenters, time, cWeb, "ADD");
                     }
                     else
                     {
