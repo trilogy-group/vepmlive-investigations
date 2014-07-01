@@ -292,6 +292,7 @@ if not exists (select table_name from INFORMATION_SCHEMA.tables where table_name
 			[DTSTARTED] [datetime] NULL,
 			[DTFINISHED] [datetime] NULL,
 			[JOBDATA] ntext NULL,
+			[QUEUE] [nvarchar](255) NULL,
 			[GRIDDATA] ntext NULL,
 			[PERCENTCOMPLETE] [int] NULL
 		) ON [PRIMARY]
