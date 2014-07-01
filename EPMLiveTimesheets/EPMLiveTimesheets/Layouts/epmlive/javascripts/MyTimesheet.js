@@ -1891,8 +1891,8 @@ function ShowApprovalNotes(gridid, rowid, img) {
     var oimg = $("#" + img.id);
 
     curPop = true;
-
-    $('body').append("<div id='divanotes" + rowid.replace(/-/g, '') + "' style='width:150px;height:100px;position:absolute;left:" + oimg.offset().left + "px;top:" + oimg.offset().top + "px;border:1px solid #DDD;background-color:#FFF' onMouseDown=\"stopProp(event);\" ><textarea id=\"anotestxt" + rowid.replace(/-/g, '') + "\" style='width:140px;height:60px;border:none;resize: none;outline:none' onkeyup=\"stopProp(event);\" onclick=\"stopProp(event);\" onkeypress=\"stopProp(event);\">" + grid.GetValue(row, "ApprovalNotes") + "</textarea><input type=\"button\" style=\"float:right\" value=\"Ok\" onclick=\"CloseApprovalNotes('" + grid.id + "','" + row.id + "');\"></div>");
+    var top = oimg.offset().top - 87;
+    $('body').append("<div id='divanotes" + rowid.replace(/-/g, '') + "' style='width:150px;height:100px;position:absolute;left:" + oimg.offset().left + "px;top:" + top + "px;border:1px solid #DDD;background-color:#FFF' onMouseDown=\"stopProp(event);\" ><textarea id=\"anotestxt" + rowid.replace(/-/g, '') + "\" style='width:140px;height:60px;border:none;resize: none;outline:none' onkeyup=\"stopProp(event);\" onclick=\"stopProp(event);\" onkeypress=\"stopProp(event);\">" + grid.GetValue(row, "ApprovalNotes") + "</textarea><input type=\"button\" style=\"float:right\" value=\"Ok\" onclick=\"CloseApprovalNotes('" + grid.id + "','" + row.id + "');\"></div>");
 }
 
 function CloseApprovalNotes(gridid, rowid) {
