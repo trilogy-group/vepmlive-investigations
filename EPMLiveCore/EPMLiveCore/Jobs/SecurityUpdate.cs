@@ -260,7 +260,7 @@ namespace EPMLiveCore.Jobs
             string[] grps = new[] { "Owner", "Member", "Visitor" };
             SPGroup ownerGrp = null;
             //SPListItem eI = ew.Lists[base.ListUid].GetItemById(base.ItemID);
-            var spUInfoList = ew.Lists["User Information List"];
+            var spUInfoList = ew.Site.RootWeb.Lists["User Information List"];
             foreach (string grp in grps)
             {
                 string finalName = string.Empty;
