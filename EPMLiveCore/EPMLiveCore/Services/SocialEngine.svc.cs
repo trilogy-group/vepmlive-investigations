@@ -356,7 +356,7 @@ namespace EPMLiveCore.Services
                 if (found) return;
 
                 string url = string.Format("{0}/{1}?action=gotolist&webid={2}&listid={3}&nodlg=true",
-                    tr["WebUrl"], PROXY_URL, thread.webId, thread.listId);
+                    GetSafeWebUrl(tr["WebUrl"]), PROXY_URL, thread.webId, thread.listId);
 
                 if (((ObjectKind) tr["ThreadKind"]) == ObjectKind.List)
                 {
@@ -536,7 +536,7 @@ namespace EPMLiveCore.Services
             if (listId.HasValue && itemId.HasValue)
             {
                 url = string.Format("{0}/{1}?action=view&webid={2}&listid={3}&id={4}",
-                    tr["WebUrl"], PROXY_URL, webId, listId.Value, itemId.Value);
+                    GetSafeWebUrl(tr["WebUrl"]), PROXY_URL, webId, listId.Value, itemId.Value);
             }
 
             var thread = new SEActivities.Thread
@@ -568,6 +568,11 @@ namespace EPMLiveCore.Services
             thread.comments = thread.comments.Distinct().ToList();
 
             return thread;
+        }
+
+        private static object GetSafeWebUrl(object webUrl)
+        {
+            return ((webUrl as string) ?? string.Empty).Equals("/") ? string.Empty : webUrl;
         }
 
         private void GetData(SEActivities activities, Guid threadId, string kind, DateTime offset)
