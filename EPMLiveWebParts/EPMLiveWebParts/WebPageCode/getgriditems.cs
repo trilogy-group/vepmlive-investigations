@@ -2080,7 +2080,7 @@ namespace EPMLiveWebParts
                         }
                         else if (field.InternalName == "Title")
                         {
-                            if (bCleanValues || isTimesheet)
+                            if (bCleanValues)
                                 displayValue = val;
                             else
                             {
@@ -3726,8 +3726,7 @@ namespace EPMLiveWebParts
                     }
                 }
             }
-            
-            if (rolluplists == null)
+            else if (rolluplists == null)
             {
                 processList(web, spquery, list, arrGTemp);
             }
