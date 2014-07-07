@@ -3726,7 +3726,8 @@ namespace EPMLiveWebParts
                     }
                 }
             }
-            else if (rolluplists == null)
+            
+            if (rolluplists == null)
             {
                 processList(web, spquery, list, arrGTemp);
             }
