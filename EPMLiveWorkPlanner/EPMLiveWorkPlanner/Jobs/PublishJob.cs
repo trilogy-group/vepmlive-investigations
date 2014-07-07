@@ -452,7 +452,12 @@ namespace EPMLiveWorkPlanner
             {
                 foreach(DataRow dr in dt.Select("taskuid <> ''"))
                 {
-                    list.Items.DeleteItemById(int.Parse(dr["id"].ToString()));
+                    try
+                    {
+                        SPListItem l = list.GetItemById(int.Parse(dr["id"].ToString()));
+                        l.Recycle();
+                    }
+                    catch { }
                 }
             }
 
