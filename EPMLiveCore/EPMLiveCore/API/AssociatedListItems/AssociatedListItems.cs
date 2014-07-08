@@ -315,7 +315,7 @@ namespace EPMLiveCore.API
 
                                         string sql = string.Empty;
                                         //sql = "SELECT COUNT(*) AS 'Count' FROM " + tableName + " WHERE ProjectID = " + itemId + " AND ListId = '" + rptListId + "' GROUP BY ProjectID";
-                                        sql = "SELECT COUNT(*) AS 'Count' FROM " + tableName + " WHERE CONVERT(NVARCHAR(MAX), " + projectLinkedField + "ID) LIKE N'%" + itemId + "%' AND ListId = '" + rptListId + "'";
+                                        sql = "SELECT COUNT(*) AS 'Count' FROM " + tableName + " WHERE ',' + CONVERT(NVARCHAR(MAX), " + projectLinkedField + "ID) + ',' LIKE N'%," + itemId + ",%' AND ListId = '" + rptListId + "'";
 
                                         DataTable dtListItemCount = null;
                                         try
