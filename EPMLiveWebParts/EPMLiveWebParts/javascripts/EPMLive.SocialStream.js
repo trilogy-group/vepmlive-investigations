@@ -157,19 +157,20 @@
                 };
 
                 var _getWebUrl = function () {
-                    $.ajax({
-                        url: _spPageContextInfo.webAbsoluteUrl + "/_api/site/rootweb/webinfos?$select=ID,ServerRelativeUrl",
-                        type: 'GET',
-                        headers: { accept: 'application/json;odata=verbose' },
-                    }).then(function (response) {
-                        var webs = response.d.results;
-                        for (var i = 0; i < webs.length; i++) {
-                            var web = webs[i];
+                    var apiUrl = se.apiUrl + '/webs?v=' + new Date().getTime();
+                    $.getJSON(apiUrl).then(function (response) {
+                        if (!response.error) {
+                            if (response.collection.length) {
+                                var webs = response.collection;
+                                for (var i = 0; i < webs.length; i++) {
+                                    var web = webs[i];
 
-                            var wUrl = web.ServerRelativeUrl.slice(1) + '/';
-                            var bUrl = wUrl === '/' ? wUrl : '/' + wUrl;
+                                    var wUrl = web.url.slice(1) + '/';
+                                    var bUrl = wUrl === '/' ? wUrl : '/' + wUrl;
 
-                            urlDict[web.Id] = bUrl;
+                                    urlDict[web.id] = bUrl;
+                                }
+                            }
                         }
                     });
                 };

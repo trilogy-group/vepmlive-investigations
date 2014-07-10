@@ -35,9 +35,9 @@ namespace EPMLiveCore.Services
 
         #endregion Fields 
 
-        #region Methods (21) 
+        #region Methods (23) 
 
-        // Public Methods (5) 
+        // Public Methods (6) 
 
         [WebGet(BodyStyle = WebMessageBodyStyle.Bare,
             ResponseFormat = WebMessageFormat.Json,
@@ -113,8 +113,8 @@ namespace EPMLiveCore.Services
                     bool keep = false;
 
                     foreach (DataRow row in 
-                        Enumerable.Where(listLibs, row => row["Id"].ToString().ToLower().Equals(c.id.ToLower()) 
-                            && !SEUtils.IsIgnoredList(c.name, contextWeb)))
+                        Enumerable.Where(listLibs, row => row["Id"].ToString().ToLower().Equals(c.id.ToLower())
+                                                          && !SEUtils.IsIgnoredList(c.name, contextWeb)))
                     {
                         keep = true;
 
@@ -341,7 +341,42 @@ namespace EPMLiveCore.Services
             return activities;
         }
 
-        // Private Methods (16) 
+        [WebGet(BodyStyle = WebMessageBodyStyle.Bare,
+            ResponseFormat = WebMessageFormat.Json,
+            UriTemplate = "/webs")]
+        [OperationContract]
+        public Webs GetWebs()
+        {
+            var webs = new Webs();
+
+            try
+            {
+                SPWebCollection spWebCollection = SPContext.Current.Site.AllWebs;
+
+                foreach (SPWeb spWeb in spWebCollection)
+                {
+                    webs.collection.Add(new Webs.Web {id = spWeb.ID, url = spWeb.ServerRelativeUrl});
+                }
+            }
+            catch (Exception exception)
+            {
+                if (exception is AggregateException)
+                {
+                    exception = ((AggregateException) exception).Flatten();
+                }
+
+                webs.error = new Error
+                {
+                    message = exception.Message,
+                    stackTrace = exception.StackTrace,
+                    kind = typeof (Exception).ToString()
+                };
+            }
+
+            return webs;
+        }
+
+        // Private Methods (17) 
 
         private void AddList(SEActivities.Thread thread, SEActivities activities, DataRow tr)
         {
@@ -570,11 +605,6 @@ namespace EPMLiveCore.Services
             return thread;
         }
 
-        private static object GetSafeWebUrl(object webUrl)
-        {
-            return ((webUrl as string) ?? string.Empty).Equals("/") ? string.Empty : webUrl;
-        }
-
         private void GetData(SEActivities activities, Guid threadId, string kind, DateTime offset)
         {
             SPWeb web = SPContext.Current.Web;
@@ -645,6 +675,11 @@ namespace EPMLiveCore.Services
                 SqlDataReader reader = sqlCommand.ExecuteReader();
                 reportingLists.Load(reader);
             }
+        }
+
+        private static object GetSafeWebUrl(object webUrl)
+        {
+            return ((webUrl as string) ?? string.Empty).Equals("/") ? string.Empty : webUrl;
         }
 
         private DataTable GetThreadActivities(DBConnectionManager manager, int userId, int kindMin, int kindMax,
