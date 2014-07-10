@@ -654,26 +654,20 @@ namespace EPMLiveReportsAdmin
                         isReportingV2Enabled = false;
                     }
 
-                    if (isReportingV2Enabled)
+                    foreach (Guid listId in sListNames)
                     {
-                        foreach (Guid listId in sListNames)
+                        try
                         {
-                            try
-                            {
-                                spList = null;
-                                spList = spWeb.Lists[listId];
-                            }
-                            catch (Exception ex)
-                            {
-                                //Add Logging here...
-                            }
+                            spList = null;
+                            spList = spWeb.Lists[listId];
+                        }
+                        catch { }
 
-                            if (spList != null && !ListMappedAlready(spList.ID))
-                            {
-                                fields = GetListFields(spList);
-                                var oMapList = new ReportBiz(_siteID, spWeb.ID, isReportingV2Enabled);
-                                oMapList.CreateListBiz(spList.ID, spWeb.ID, fields);
-                            }
+                        if (spList != null && !ListMappedAlready(spList.ID))
+                        {
+                            fields = GetListFields(spList);
+                            var oMapList = new ReportBiz(_siteID, spWeb.ID, isReportingV2Enabled);
+                            oMapList.CreateListBiz(spList.ID, spWeb.ID, fields);
                         }
                     }
                 }
