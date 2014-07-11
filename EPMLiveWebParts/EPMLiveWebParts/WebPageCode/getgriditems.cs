@@ -3655,7 +3655,7 @@ namespace EPMLiveWebParts
                     try
                     {
                         DataSet ds = EPMLiveCore.ReportingData.GetReportingData(web, list.Title, false, query, orderby, iPage, iPageSize);
-                        if (ds != null)
+                        if (ds != null) 
                         {
                             DataTable dt = ds.Tables[0];
                             dt.Columns.Add("SiteURL");
