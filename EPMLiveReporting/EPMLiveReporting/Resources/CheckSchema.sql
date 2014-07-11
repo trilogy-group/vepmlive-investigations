@@ -311,12 +311,10 @@ AS
 BEGIN
 	SET NOCOUNT ON;
 
-	DECLARE @Start INT, @End INT, @WebUrlSuffix CHAR
+	DECLARE @Start INT, @End INT
 	
 	SET @Start = (@Page - 1) * @Limit
 	SET @End =   (@Page * @Limit + 1)
-	
-	SET @WebUrlSuffix = ''/''
 	
 	IF @Limit > 1000000 SET @Limit = 1000000;
 	
@@ -337,7 +335,7 @@ BEGIN
 					FROM	dbo.ReportListIds INNER JOIN dbo.RPTList ON dbo.ReportListIds.Id = dbo.RPTList.RPTListId RIGHT OUTER JOIN 
 							dbo.SS_Threads INNER JOIN dbo.RPTWeb ON dbo.SS_Threads.WebId = dbo.RPTWeb.WebId ON dbo.RPTList.RPTListId = dbo.SS_Threads.ListId
 					WHERE   (dbo.SS_Threads.Deleted = 0) AND (dbo.SS_Threads.Id = @ThreadId OR @ThreadId IS NULL) 
-							AND (dbo.RPTWeb.WebUrl = @WebUrl OR dbo.RPTWeb.WebUrl LIKE REPLACE(@WebUrl + @WebUrlSuffix + ''%'', ''//'', ''/''))) AS DT1
+							AND (dbo.RPTWeb.WebUrl = @WebUrl OR dbo.RPTWeb.WebUrl LIKE REPLACE(@WebUrl + ''/%'', ''//'', ''/''))) AS DT1
 			WHERE   ((HasAccess = 1) OR (HasAccess = 0 AND ThreadKind = 3)) AND (TotalActivities > 0 OR TotalComments > 0)
 	) AS Result 
 	WHERE RowNum > @Start AND RowNum < @End
