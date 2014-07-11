@@ -354,6 +354,16 @@ namespace EPMLiveReportsAdmin
             return (_DAO.ExecuteScalar(_DAO.GetClientReportingConnection) != DBNull.Value);
         }
 
+        public bool ColumnExists(string tableName, string columnname)
+        {
+            _DAO.Command = string.Format("select count(*) from sys.columns where object_id=object_id('{0}', 'U') and name='{1}'", tableName.Replace("'", ""), columnname);
+            // - CAT.NET false-positive: All single quotes are escaped/removed.
+            //_DAO.Command = "select object_id(@tableName, 'U')";
+            //_DAO.AddParam("@tableName", tableName);
+            object o = _DAO.ExecuteScalar(_DAO.GetClientReportingConnection);
+            return ((int)o > 0);
+        }
+
         public bool ProcedureExists(string procName)
         {
             _DAO.Command = string.Format("select object_id('{0}', 'P')", procName.Replace("'", ""));

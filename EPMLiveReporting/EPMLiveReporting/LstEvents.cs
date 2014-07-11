@@ -139,10 +139,14 @@ namespace EPMLiveReportsAdmin
                 var cols = new ColumnDefCollection();
                 tableName = rd.GetTableName(properties.ListId);
                 ssTableName = rd.GetTableNameSnapshot(properties.ListId);
-                cols.AddColumn(properties.Field);
-                rd.AddColumns(tableName, cols);
-                rd.AddColumns(ssTableName, cols);
-                rd.InsertListColumns(properties.ListId, cols);
+
+                if (!rd.ColumnExists(tableName, properties.Field.InternalName))
+                {
+                    cols.AddColumn(properties.Field);
+                    rd.AddColumns(tableName, cols);
+                    rd.AddColumns(ssTableName, cols);
+                    rd.InsertListColumns(properties.ListId, cols);
+                }
                 rd.Dispose();
             }
             catch (Exception ex)
