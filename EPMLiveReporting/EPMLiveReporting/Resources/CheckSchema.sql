@@ -317,7 +317,6 @@ BEGIN
 	SET @End =   (@Page * @Limit + 1)
 	
 	SET @WebUrlSuffix = ''/''
-	IF @WebUrl = ''/'' SET @WebUrlSuffix = ''''
 	
 	IF @Limit > 1000000 SET @Limit = 1000000;
 	
