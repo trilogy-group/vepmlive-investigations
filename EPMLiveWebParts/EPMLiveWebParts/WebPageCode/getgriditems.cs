@@ -3703,7 +3703,7 @@ namespace EPMLiveWebParts
                         try
                         {
                             DataTable dt = EPMLiveCore.ReportingData.GetReportingData(web, rlist, true, query, orderby);
-                            if (dt != null)
+                            if (dt != null && dt.Rows.Count > 0)
                             {
                                 dt.Columns.Add("SiteURL");
                                 dt.Columns.Add("siteid");
@@ -3717,6 +3717,14 @@ namespace EPMLiveWebParts
                                 }
                                 else
                                     processListDT(web, dt.Select(), arrGTemp, rlist);
+                            }
+                            else
+                            {
+                                //When Enable Team, Enable Team Security is Enabled and Enable Reporting Database is unchecked then we need to add this clause
+                                //In this case we need to fetch value using SPOM. As by design, we have not created a property for Enable Reporting Database flag in
+                                //GridGanttSettings. So, we need to call processList routine to fetch record using SPOM
+                                //Workaround:
+                                processList(web, spquery, list, arrGTemp);
                             }
                         }
                         catch (Exception ex)
