@@ -50,13 +50,13 @@
                 return false;
             }
             else {
-                var btn = confirm("Are you sure you want to import selected fragment?");
-                if (btn == true) {
+                //var btn = confirm("Are you sure you want to import selected fragment?");
+                //if (btn == true) {
                     $("#divIFLoading").show();
                     return true;
-                }
-                else
-                    return false;
+                //}
+                //else
+                //    return false;
             }
         }
 
