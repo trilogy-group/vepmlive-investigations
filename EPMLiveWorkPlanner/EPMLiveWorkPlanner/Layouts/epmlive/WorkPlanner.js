@@ -3446,7 +3446,11 @@ function ScrollTo() {
 
 function Close() {
     try {
-        location.href = sSource;
+        if (sSource.toLowerCase().indexOf("&isdlg=1") > 0) {
+            window.close();
+        }
+        else
+            location.href = sSource;
     } catch (e) { }
 }
 
