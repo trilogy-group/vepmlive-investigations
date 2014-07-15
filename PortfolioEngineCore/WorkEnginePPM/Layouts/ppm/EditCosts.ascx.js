@@ -23,6 +23,7 @@
     };
     EditCosts.prototype.GetCostTypeFromId = function (id) {
         for (var n = 0; n < this.CostTypes.length; n++) {
+            toolsDlg_ApplyOnClick()
             var costtypeId = this.CostTypes[n].Id;
             if (costtypeId == id)
                 return this.CostTypes[n];
@@ -227,6 +228,13 @@
     };
     EditCosts.prototype.ApplyChanges = function (json) {
         var selectedgrid = this.GetSelectedTopGrid();
+        if (json.scope == "SelectedRows") {
+            var rows = selectedgrid.GetSelRows();
+            if (rows.length == 0) {
+                alert("A single row must be selected in grid");
+                return;
+            }
+        }
         if (selectedgrid == null) {
             alert("No Cost Type selected");
             return;
