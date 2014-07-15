@@ -40,7 +40,7 @@
                     oInfo.Row = oRows[0];
                     oInfo.ProjectID = projectid;
 
-                    SP.UI.ModalDialog.commonModalDialogClose(SP.UI.DialogResult.OK, oInfo);
+                    parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.OK, oInfo);
                 }
                 else
                 {
@@ -54,10 +54,10 @@
         }
 
         function maximizeWindow() {     
-            var currentDialog = SP.UI.ModalDialog.get_childDialog();                   
+            var currentDialog = parent.SP.UI.ModalDialog.get_childDialog();                   
             if(currentDialog != null) 
             {         
-                if(!currentDialog.$S_0) 
+                if(!currentDialog.$s_0) 
                 {             
                     currentDialog.$z();         
                 }     
@@ -65,10 +65,10 @@
         }
 
         function unMaximizeWindow() {     
-            var currentDialog = SP.UI.ModalDialog.get_childDialog();                   
+            var currentDialog = parent.SP.UI.ModalDialog.get_childDialog();                   
             if(currentDialog != null) 
             {         
-                if(currentDialog.$S_0) 
+                if(currentDialog.$s_0) 
                 {             
                     currentDialog.$z();         
                 }     
