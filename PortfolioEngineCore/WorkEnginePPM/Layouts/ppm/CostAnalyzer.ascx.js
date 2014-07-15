@@ -4951,9 +4951,11 @@
 
                 case "SaveView_OK":
                     var saveViewName = document.getElementById("id_SaveView_Name").value;
+
+                    //TO check entered value is blank or with only space.
                     var val = saveViewName.replace(/^\s+|\s+$/, '');
                     if (val.length == 0) {
-                        alert("Please enter a valid View Name");
+                        alert("Please enter a valid view name");
                         break;
                     }
                     var selectView = document.getElementById("idAnalyzerTab_SelView");
@@ -4983,6 +4985,13 @@
 
                 case "RenameView_OK":
                     var renameViewName = document.getElementById("id_RenameView_Name").value;
+
+                    //TO check entered value is blank or with only space.
+                    var val = renameViewName.replace(/^\s+|\s+$/, '');
+                    if (val.length == 0) {
+                        alert("Please enter a valid view name");
+                        break;
+                    }
                     var selectView = document.getElementById("idAnalyzerTab_SelView");
                     var viewGUID;
                     if (selectView.selectedIndex >= 0) {
