@@ -427,6 +427,7 @@
                     <wssuc:InputFormControl LabelText="Name" runat="server">
                         <Template_Control>
         	                <asp:TextBox ID="txtPlannerName" runat="server"></asp:TextBox>
+                            <asp:RequiredFieldValidator ID="RequiredFieldValidator1" runat="server" ControlToValidate="txtPlannerName" ValidationGroup="vldPlanner" ForeColor="Red" ErrorMessage="Planner Name required !"></asp:RequiredFieldValidator>
                         </Template_Control>
                     </wssuc:InputFormControl>
                 </template_inputformcontrols>
@@ -1150,7 +1151,7 @@
         <wssuc:ButtonSection runat="server">
             <template_buttons>
                     <asp:PlaceHolder ID="PlaceHolder1" runat="server">
-	                    <asp:Button UseSubmitBehavior="false" runat="server" class="ms-ButtonHeightWidth" OnClick="Button1_Click" Text="Save Settings" id="Button2" accesskey="" Width="150"/>
+	                    <asp:Button UseSubmitBehavior="false" runat="server" ValidationGroup="vldPlanner" class="ms-ButtonHeightWidth" OnClick="Button1_Click" Text="Save Settings" id="Button2" accesskey="" Width="150"/>
                     </asp:PlaceHolder>
                 </template_buttons>
         </wssuc:ButtonSection>
