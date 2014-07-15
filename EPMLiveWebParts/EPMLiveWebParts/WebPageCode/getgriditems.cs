@@ -1230,10 +1230,22 @@ namespace EPMLiveWebParts
                                             displayValue = val;
                                         break;
                                     case SPFieldType.User:
-                                        displayValue = oField.GetFieldValueAsHtml(val).Replace("class='ms-vb'", "class='ms-vb' style='display:inline-block;padding-right:5px'");
-                                        if (displayValue.IndexOf("<div", 4) > 0)
+                                        if (field.GetFieldValue(val).GetType().ToString() == "Microsoft.SharePoint.SPFieldUserValue")
                                         {
-                                            displayValue = displayValue.Replace("</div>", ";</div>");
+                                            SPFieldUserValue uv = (SPFieldUserValue)field.GetFieldValue(val);
+                                            displayValue = "";
+                                            displayValue += "<a href=\"" + list.ParentWeb.Url + "/_layouts/userdisp.aspx?ID=" + uv.LookupId.ToString() + "\">" + uv.LookupValue + "</a>";
+                                        }
+                                        else
+                                        {
+                                            SPFieldUserValueCollection uvc = (SPFieldUserValueCollection)field.GetFieldValue(val);
+                                            displayValue = "";
+                                            foreach (SPFieldUserValue uv in uvc)
+                                            {
+                                                displayValue += "; <a href=\"" + list.ParentWeb.Url + "/_layouts/userdisp.aspx?ID=" + uv.LookupId.ToString() + "\">" + uv.LookupValue + "</a>";
+                                            }
+                                            if (displayValue.Length > 1)
+                                                displayValue = displayValue.Substring(2);
                                         }
                                         break;
                                     case SPFieldType.Lookup:
@@ -2257,10 +2269,22 @@ namespace EPMLiveWebParts
                                             displayValue = val;
                                         break;
                                     case SPFieldType.User:
-                                        displayValue = oField.GetFieldValueAsHtml(val).Replace("class='ms-vb'", "class='ms-vb' style='display:inline-block;padding-right:5px'");
-                                        if (displayValue.IndexOf("<div", 4) > 0)
+                                        if (field.GetFieldValue(val).GetType().ToString() == "Microsoft.SharePoint.SPFieldUserValue")
                                         {
-                                            displayValue = displayValue.Replace("</div>", ";</div>");
+                                            SPFieldUserValue uv = (SPFieldUserValue)field.GetFieldValue(val);
+                                            displayValue = "";
+                                            displayValue += "<a href=\"" + li.Web.Url + "/_layouts/userdisp.aspx?ID=" + uv.LookupId.ToString() + "\">" + uv.LookupValue + "</a>";
+                                        }
+                                        else
+                                        {
+                                            SPFieldUserValueCollection uvc = (SPFieldUserValueCollection)field.GetFieldValue(val);
+                                            displayValue = "";
+                                            foreach (SPFieldUserValue uv in uvc)
+                                            {
+                                                displayValue += "; <a href=\"" + li.Web.Url + "/_layouts/userdisp.aspx?ID=" + uv.LookupId.ToString() + "\">" + uv.LookupValue + "</a>";
+                                            }
+                                            if (displayValue.Length > 1)
+                                                displayValue = displayValue.Substring(2);
                                         }
                                         break;
                                     case SPFieldType.MultiChoice:
