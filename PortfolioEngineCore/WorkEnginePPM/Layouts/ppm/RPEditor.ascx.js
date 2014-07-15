@@ -3918,6 +3918,12 @@
 
             var lStartPeriod = parseInt(startPeriod.substring(1));
             var lFinishPeriod = parseInt(finishPeriod.substring(1));
+
+            if (lStartPeriod >= lFinishPeriod) {
+                alert("StartPeriod value should be less then FinishPeriod value");
+                return;
+            }
+
             if (copy == 0) {
                 if (jValue.value != "") {
                     jValue.value = jValue.value / (lFinishPeriod - lStartPeriod + 1);
