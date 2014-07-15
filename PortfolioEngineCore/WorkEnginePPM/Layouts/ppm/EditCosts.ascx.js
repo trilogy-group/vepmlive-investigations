@@ -231,6 +231,13 @@
             alert("No Cost Type selected");
             return;
         }
+
+        // Validating blank value / value with only space
+        var val = json.amount.toString().replace(/^\s+|\s+$/, '');
+        if (val.length == 0){
+            alert("Please enter an amount");
+            return;
+        }
         var amount = parseInt(json.amount);
         if (isNaN(amount)) {
             alert("Amount : '" + json.amount + "' is not a number");
