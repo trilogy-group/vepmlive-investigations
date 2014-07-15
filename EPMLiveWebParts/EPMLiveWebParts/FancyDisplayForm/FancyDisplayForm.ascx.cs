@@ -750,10 +750,10 @@ namespace EPMLiveWebParts
 
             sbItemDetailsContent.Append("<table style='width:100%'>");
             sbItemDetailsContent.Append("<tr colspan='2'>");
-            sbItemDetailsContent.Append("<td>Created " + ((DateTime)(item[SPBuiltInFieldId.Created])).ToFriendlyDateAndTime() + " by " + ((SPField)item.Fields[SPBuiltInFieldId.Author]).GetFieldValueAsHtml(item[SPBuiltInFieldId.Author]) + "</td>");
+            sbItemDetailsContent.Append("<td>Created " + GetFormattedDateTime((DateTime)(item[SPBuiltInFieldId.Created])) + " by " + ((SPField)item.Fields[SPBuiltInFieldId.Author]).GetFieldValueAsHtml(item[SPBuiltInFieldId.Author]) + "</td>");
             sbItemDetailsContent.Append("</tr>");
             sbItemDetailsContent.Append("<tr colspan='2'>");
-            sbItemDetailsContent.Append("<td>Last modified " + ((DateTime)(item[SPBuiltInFieldId.Modified])).ToFriendlyDateAndTime() + " by " + ((SPField)item.Fields[SPBuiltInFieldId.Editor]).GetFieldValueAsHtml(item[SPBuiltInFieldId.Editor]) + "</td>");
+            sbItemDetailsContent.Append("<td>Last modified " + GetFormattedDateTime((DateTime)(item[SPBuiltInFieldId.Modified])) + " by " + ((SPField)item.Fields[SPBuiltInFieldId.Editor]).GetFieldValueAsHtml(item[SPBuiltInFieldId.Editor]) + "</td>");
             sbItemDetailsContent.Append("</tr>");
             sbItemDetailsContent.Append("</table>");
         }
@@ -795,6 +795,12 @@ namespace EPMLiveWebParts
                         DateTimeFormat.ShortDatePattern);
         }
 
+        private string GetFormattedDateTime(DateTime dateTime)
+        {
+            return
+                dateTime.ToString("MM/dd/yyyy HH:mm",
+                    new CultureInfo((int)(SPContext.Current.Web.CurrentUser.RegionalSettings ?? SPContext.Current.Web.RegionalSettings).LocaleId));
+        }
         #endregion
 
     }
