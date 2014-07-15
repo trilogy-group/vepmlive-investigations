@@ -400,7 +400,7 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
         }
         else if (commandId === 'Ribbon.MyTimesheet.ChangeView') {
             var grid = Grids["TS" + this.tsObject.id];
-            ChangeView(grid, properties['CommandValueId']);
+            ChangeView(grid, properties['CommandValueId'],"1");
         }
         else if (commandId === 'Ribbon.MyTimesheet.ClearSort') {
             var grid = Grids["TS" + this.tsObject.id];

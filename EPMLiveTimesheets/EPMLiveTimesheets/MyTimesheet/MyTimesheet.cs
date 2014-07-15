@@ -577,6 +577,8 @@ namespace TimeSheets
 
             int counter = 0;
 
+            bool IsDefaultAvailable = false;
+
             foreach (KeyValuePair<string, Dictionary<string, string>> key in views.Views)
             {
                 try
@@ -586,10 +588,27 @@ namespace TimeSheets
                     {
                         sCurrentView = key.Key;
                         sCurrentViewId = "V" + counter;
+                        IsDefaultAvailable = true;
                     }
                 }
                 catch { }
                 counter++;
+            }
+            if (!IsDefaultAvailable)
+            {
+                counter = 0;
+                foreach (KeyValuePair<string, Dictionary<string, string>> key in views.Views)
+                {
+                    try
+                    {
+
+                        sCurrentView = key.Key;
+                        sCurrentViewId = "V" + counter;
+                    }
+                    catch { }
+                    counter++;
+                }
+
             }
 
             curUrl = curUrl.Trim('&').Trim('?');

@@ -464,6 +464,9 @@ function TSRenderFinish(grid) {
     }
 
     SetGridSize();
+    var newgridid = grid.id.substr(2);
+    var newobj = eval("TSObject" + newgridid);
+    ChangeView(grid, newobj.CurrentViewId, "0");
 }
 
 
@@ -991,7 +994,7 @@ function StartCheckApproveStatus(gridid) {
     iApproveInterval = setInterval("CheckApproveStatus('" + gridid + "')", 10000);
 }
 
-function ChangeView(grid, view) {
+function ChangeView(grid, view, isren) {
     var newgridid = grid.id.substr(2);
     var newobj = eval("TSObject" + newgridid);
 
@@ -1076,17 +1079,19 @@ function ChangeView(grid, view) {
     grid.Sort = oView.Sort;
     grid.SortRows();
     //===========================================
+    if (isren == "1" || isren == undefined) {
+        newobj.CurrentViewId = view;
+        newobj.CurrentView = oView.Name;
 
-    newobj.CurrentViewId = view;
-    newobj.CurrentView = oView.Name;
+        RefreshCommandUI();
 
-    RefreshCommandUI();
-
-    grid.Render();
+        grid.Render();
+    }
 }
 
 function DeleteView(grid, view) {
 
+    var cnt = 0;
     ShowMessage(grid.id, "Deleting View...", 150, 50);
 
     EPMLiveCore.WorkEngineAPI.ExecuteJSON("timesheet_DeleteView", "<View Name=\"" + view + "\"/>", function (response) {
@@ -1104,7 +1109,7 @@ function DeleteView(grid, view) {
 
             for (var view in newobj.Views) {
                 var oView = newobj.Views[view];
-
+                cnt++;
                 //if (oView.Name == retval[0]) {
                 //    newobj.CurrentView = retval[0];
                 //    newobj.CurrentViewId = view;
@@ -1112,8 +1117,18 @@ function DeleteView(grid, view) {
                 //}
             }
 
-            newobj.CurrentView = "";
-            newobj.CurrentViewId = "";
+            if (newobj.Views[view] != "" || newobj.Views[view] != undefined || newobj.Views[view] != null) {                
+                if (cnt != 0) {
+                    ChangeView(grid, view, "1");
+                }
+                else {
+                    newobj.CurrentView = "";
+                    newobj.CurrentViewId = "";
+                }
+            }
+
+            //newobj.CurrentView = "";
+            //newobj.CurrentViewId = "";
 
             RefreshCommandUI();
         }
@@ -1600,7 +1615,7 @@ function CheckedUpdates() {
     var newgridid = curGrid.id.substr(2);
     var newobj = eval("TSObject" + newgridid);
 
-    ChangeView(curGrid, newobj.CurrentViewId);
+    ChangeView(curGrid, newobj.CurrentViewId, "1");
 
     HideMessage(curGrid.id);
 }
