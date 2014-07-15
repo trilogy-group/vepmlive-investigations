@@ -3714,7 +3714,7 @@
 				 this.SearchStartRow = i;
 
 				 grid.SelectRow(arows[i],1);       
-				 grid.Focus(arows[i], this.SeachCol,null, true);   
+				 setTimeout(function () { grid.Focus(arows[i], this.SeachCol, null, true); }, 10);
 
 				 this.ribbonBar.enableItem("FindBtn");
 				 return;
