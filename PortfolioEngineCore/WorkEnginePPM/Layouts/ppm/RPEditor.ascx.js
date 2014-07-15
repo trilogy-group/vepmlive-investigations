@@ -192,6 +192,7 @@
                                     var view = this.Views[i];
                                     if (view != null && view.ViewGUID == viewGUID) {
                                         delete this.Views[i];
+
                                         break;
                                     }
                                 }
@@ -2980,6 +2981,16 @@
                         }
                         document.getElementById("id_DeleteView_Name").value = selectedItem.text;
                     }
+                        //Changes for Issue EPML-1811
+                    else if (selectView.selectedIndex == -1) {
+                        var select = document.getElementById("idViewTab_SelView");
+                        select.options.length = 0;
+                        select.options[select.options.length] = new Option("--No Views--", "-1", false, false);
+                        this.viewTab.refreshSelect("idViewTab_SelView");
+                        alert('There is no view to delete');
+                        break;
+                    }
+                    //Changes Done
                     this.DisplayDialog(20, 30, 280, 150, "Delete View", "winDeleteViewDlg", "idDeleteViewDlg", true, false);
                     break;
                 case "ViewTab_SelectColumns":
