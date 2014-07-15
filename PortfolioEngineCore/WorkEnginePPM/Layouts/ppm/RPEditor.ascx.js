@@ -3415,6 +3415,14 @@
         var bDefault = document.getElementById("id_SaveView_Default").checked;
         var bPersonal = document.getElementById("id_SaveView_Personal").checked;
         var saveViewName = document.getElementById("id_SaveView_Name").value;
+
+        // To check entered value is blank or with only space.
+        var val = saveViewName.replace(/^\s+|\s+$/, '');
+        if (val.length == 0) {
+            alert("Please enter a view name");
+            return;
+        }
+
         var action = document.getElementById("id_SaveView_Action").value;
         //var bCanSave = true;
 
