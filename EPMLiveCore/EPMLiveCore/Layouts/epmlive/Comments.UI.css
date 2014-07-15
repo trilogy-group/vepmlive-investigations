@@ -71,7 +71,7 @@ body {
     -ms-resize: none;
     -o-resize: none;
     resize: none;
-    max-height: 250px;
+    /*max-height: 250px;*/
     min-height: 72px;
 }
 
