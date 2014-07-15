@@ -919,7 +919,7 @@
 
     Grids.OnAutoFillFinish = function (grid, r1, c1, r2, c2, rdir, cdir) {
         
-        if(c1 == c2 && c1 == "AssignedTo")
+        if(c1 == c2 && (c1 == "AssignedTo" || c1 == "StartDate" || c1 == "DueDate"))
         {
             grid.ActionCalcOff();
             var row = r1;
