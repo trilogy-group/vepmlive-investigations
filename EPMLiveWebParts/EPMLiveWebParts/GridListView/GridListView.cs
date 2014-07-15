@@ -1326,6 +1326,8 @@ namespace EPMLiveWebParts
 
                         }
 
+                        ribbon.TrimById("Ribbon.List.ViewFormat.Gantt");
+
                         if(newGridMode != "datasheet")
                         {
                             ribbon.TrimById("Ribbon.List.Datasheet");
@@ -1898,7 +1900,7 @@ namespace EPMLiveWebParts
                 if (switchto != "" && switchto != null && this.ID == Page.Request["webpartid"])
                 {
                     if (switchto == "gantt")
-                        PropMyDefaultControl = "Gantt";
+                        PropMyDefaultControl = "Grid";
                     else if (switchto == "grid")
                         PropMyDefaultControl = "Grid";
                     else if (switchto == "cost")
@@ -1910,7 +1912,14 @@ namespace EPMLiveWebParts
 
                 }
                 else
+                {
                     newGridMode = PropMyDefaultControl.ToLower();
+                }
+
+                if (newGridMode == "gantt")
+                    newGridMode = "grid";
+
+                
 
                 if(list != null)
                     buildParams();
@@ -2493,7 +2502,7 @@ namespace EPMLiveWebParts
                 }
             }
 
-            if (newGridMode == "gantt")
+            if (PropDefaultControl.ToLower() == "gantt")
                 arrFields.Add("Gantt");
             try
             {
@@ -2773,7 +2782,7 @@ namespace EPMLiveWebParts
                                                 'events': [
                                                     {
                                                         'eventName': 'click',
-                                                        'function': function () { return GridListEditView('" + list.ID + @"','" + view.ID + @"'); }
+                                                        'function': function () { $('#ddlViewControl_ul_menu').toggle(); return GridListEditView('" + list.ID + @"','" + view.ID + @"'); }
                                                         //add a callback method
                                                     }
                                                 ]
@@ -2785,7 +2794,7 @@ namespace EPMLiveWebParts
                                                 'events': [
                                                     {
                                                         'eventName': 'click',
-                                                        'function': function () { return GridListCreateView('" + list.ID + @"'); }
+                                                        'function': function () { $('#ddlViewControl_ul_menu').toggle(); return GridListCreateView('" + list.ID + @"'); }
                                                     }
                                                 ]
                                             }
