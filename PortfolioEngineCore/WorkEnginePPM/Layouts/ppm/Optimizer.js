@@ -517,6 +517,13 @@
 
                 case "SaveStratagy_OK":
                     var saveStratName = document.getElementById("idSaveStratName").value;
+                    //TO check entered value is blank or with only space.
+                    var val = saveStratName.replace(/^\s+|\s+$/, '');
+                    if (val.length == 0) {
+                        alert("Please enter a valid Strategy name");
+                        break;
+                    }
+
                     var selectStrat = document.getElementById("idOptTab_SelView");
                     var guid = new Guid();
                     if (selectStrat.selectedIndex >= 0) {
@@ -602,6 +609,15 @@
 
                 case "RenameStratagy_OK":
                     var renameStratName = document.getElementById("idRenameStrat").value;
+
+                    //TO check entered value is blank or with only space.
+                    var val = renameStratName.replace(/^\s+|\s+$/, '');
+                    if (val.length == 0) {
+                        alert("Please enter a valid Strategy name");
+                        break;
+                    }
+
+
                     var selectStrat = document.getElementById("idOptTab_SelView");
 
                     var guid;
