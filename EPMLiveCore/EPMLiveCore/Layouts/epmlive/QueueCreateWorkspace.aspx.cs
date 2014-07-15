@@ -269,6 +269,11 @@ namespace EPMLiveCore.Layouts.epmlive
                 catch { }
                 title = (i != null) ? i.Title : string.Empty;
             }
+            
+            if (title.Contains("'"))
+            {
+                title=title.Replace("'", "\\'");
+            }
             return title;
         }
 
