@@ -49,7 +49,7 @@
                 }
 
                 // kanban planners dropdown
-                if (kanbanPlanners) {
+                if (kanbanPlanners.length > 1) {
                     var selectedKanbanPlannerText;
                     $.each(kanbanPlanners, function (key, value) {
                         if (value.id == selectedKanbanPlanner) {
