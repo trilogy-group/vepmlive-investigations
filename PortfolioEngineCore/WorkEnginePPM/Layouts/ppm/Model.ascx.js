@@ -3120,8 +3120,14 @@
 
 	        var txtName = document.getElementById('id_SaveView_Name').value;
 
-	        if (txtName == "") {
-	            alert("Please enter a view name");
+	        //if (txtName == "") {
+	        //    alert("Please enter a view name");
+	        //    return;
+	        //}
+	        //TO check entered value is blank or with only space.
+	        var val = txtName.replace(/^\s+|\s+$/, '');
+	        if (val.length == 0) {
+	            alert("Please enter a valid view name");
 	            return;
 	        }
 
@@ -3148,8 +3154,14 @@
 
 	        var txtName = document.getElementById('id_RenameView_Name').value;
 
-	        if (txtName == "") {
-	            alert("Please enter a view name");
+	        //if (txtName == "") {
+	        //    alert("Please enter a view name");
+	        //    return;
+	        //}
+	        //TO check entered value is blank or with only space.
+	        var val = txtName.replace(/^\s+|\s+$/, '');
+	        if (val.length == 0) {
+	            alert("Please enter a valid view name");
 	            return;
 	        }
 
@@ -3626,30 +3638,30 @@
 	            alert("search for field can't be left blank !");
 	        }
 	        else {
-	            this.SearchDet = document.getElementById("rbSearchDet").checked;
+		    this.SearchDet = document.getElementById("rbSearchDet").checked;
 
-	            var searchWhere = document.getElementById('idSearchWhere');
-	            var s = searchWhere.options[searchWhere.selectedIndex].text;
+		   var searchWhere = document.getElementById('idSearchWhere');
+		   var s = searchWhere.options[searchWhere.selectedIndex].text; 
 	            this.SeachCol = "";
 
 	            for (var xi = 0; xi < s.length; xi++) {
-	                if (s.charAt(xi) != ' ')
-	                    this.SeachCol = this.SeachCol + s.charAt(xi);
-	            }
-
-	            var searchHow = document.getElementById('idSearchHow');
-	            this.SeachHow = searchHow.options[searchHow.selectedIndex].value;
+			if (s.charAt(xi) != ' ')
+				this.SeachCol = this.SeachCol + s.charAt(xi);
+		   }
+		   
+		   var searchHow = document.getElementById('idSearchHow');
+		   this.SeachHow = searchHow.options[searchHow.selectedIndex].value; 
 
 	            //var searchtext = document.getElementById('idtxtsearch');		   
-	            this.SearchText = searchtext.value;
-
-	            this.SearchGrid(true);
+		   this.SearchText = searchtext.value;
+  
+			this.SearchGrid(true);
 
 	            this.SearchDlg.window("winSearchsDlg").detachObject()
 	            this.SearchDlg.window("winSearchsDlg").close();
 	            this.SearchDlg = null;
-	        }
-
+		 }
+ 
 	    }
 	    else {
 	        this.SearchDlg.window("winSearchsDlg").detachObject()
@@ -3657,7 +3669,7 @@
 	        this.SearchDlg = null;
 	    }
 
-
+		  
 	}
 
 	Model.prototype.SearchGrid = function (bIsFirst) {
