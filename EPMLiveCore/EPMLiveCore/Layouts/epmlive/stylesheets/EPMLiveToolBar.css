@@ -415,5 +415,6 @@ div.epmliveToolBar .disabledLink:hover {
   background-color: #ffffff !important;
   border-color: #dddddd !important;
   cursor: not-allowed !important;
+  pointer-events:none;
 }
 /*# sourceMappingURL=epmliveToolBar.css.map */
