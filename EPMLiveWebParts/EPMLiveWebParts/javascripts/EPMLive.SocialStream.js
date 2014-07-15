@@ -725,8 +725,22 @@
 
                         if (!$(this).hasClass(se.ui.classes.active)) return;
 
+                        var textValue = $.trim(settings.input.html());
+
+                        if ($(textValue).filter('a').length > 0) {
+                            var $comment = $($.trim(settings.input.html())).attr('target','_blank');
+                            textValue = $comment[0].outerHTML;
+                        }
+                        else if ($(textValue).find('a').length > 0) {
+                            $(textValue).find('a').each(function () {
+                                var $actualHtml = $(this)[0].outerHTML;
+                                var $comment = $(this).attr('target','_blank');
+                                textValue = textValue.replace($actualHtml, $comment[0].outerHTML);
+                            });
+                        }
+
                         var data = {
-                            text: $.trim(settings.input.html()),
+                            text: textValue,
                             thread: settings.thread,
                             $thread: settings.$thread
                         };
