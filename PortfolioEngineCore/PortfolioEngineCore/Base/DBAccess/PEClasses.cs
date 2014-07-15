@@ -658,10 +658,12 @@ namespace PortfolioEngineCore
         }
         public static StatusEnum SelectGroupPermissions(DBAccess dba, int nGroupId, out DataTable dt)
         {
-            string cmdText = "SELECT p.*,gp.GROUP_ID From EPG_PERMISSIONS p"
+            string cmdText = "SELECT distinct (p.PERM_UID), p.PERM_ID, p.PERM_LEVEL, p.PERM_NAME, CAST(p.PERM_NOTES AS NVARCHAR(MAX)), p.PERM_WEINCLUDE, "
+                                + "gp.GROUP_ID From EPG_PERMISSIONS p"
                                 + " Left Join EPG_GROUP_PERMISSIONS gp On gp.PERM_UID=p.PERM_UID and gp.GROUP_ID=@p1"
                                 + " Where p.PERM_WEINCLUDE=1"
                                 + " Order by PERM_ID";
+
             dba.SelectDataById(cmdText, nGroupId, (StatusEnum)99925, out dt);
             return dba.Status;
         }
