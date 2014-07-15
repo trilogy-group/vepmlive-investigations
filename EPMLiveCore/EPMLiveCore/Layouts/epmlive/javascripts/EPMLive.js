@@ -517,8 +517,8 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
 
         $(document).click(function (e) {
             //if (e.target.parentElement.id != "toolbar-search-icon") {
-               // $('.toolbar-search').css("margin-left", "0px");
-           // }
+            // $('.toolbar-search').css("margin-left", "0px");
+            // }
 
             if (clickedOutsideElementClass('dropdown-menu', e) && clickedOutsideElementClass('dropdown', e)) {
                 $('.dropdown-menu').css('display', 'none');
@@ -578,12 +578,12 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
             var mainActionBar_RightUl = $(document.createElement('ul'));
             mainActionBar_RightUl.addClass('nav navbar-nav navbar-right');
             var contents = blockContents["content"];
-          
+
             for (var i in contents) {
 
                 var cfg = contents[i];
                 var cType = cfg['controlType'];
-               
+
                 switch (cType) {
                     case "button":
                         createButton(cfg, mainActionBar_RightUl);
@@ -812,7 +812,7 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
 
         //START RIGHT SIDE TOOL BAR METHODS
         function createSearch(cfg, ul) {
-           
+
             var toolTip = cfg['toolTip'];
             var li = $(document.createElement('li'));
             li.attr('title', 'Search');
@@ -835,25 +835,25 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
                 input.autocomplete({
                     source: function (request, response) {
                         var results = $.ui.autocomplete.filter(window.epmLiveResourceGrid.actions.myResourcesOn ? window.epmLiveResourceGrid.myResources : window.epmLiveResourceGrid.resources, request.term);
-                        
+
                         response(results);
                     },
 
                     select: function (event, ui) {
                         var grid = window.Grids[window.epmLive.resourceGridId];
-                        var rowId = window.epmLiveResourceGrid.resourceDictionary[ui.item.value];                        
+                        var rowId = window.epmLiveResourceGrid.resourceDictionary[ui.item.value];
                         if (rowId) {
                             var theRow = grid.Rows[rowId];
 
                             grid.ExpandParents(theRow);
 
                             grid.ActionClearSelection();
-                            grid.SelectRow(theRow, true);                            
+                            grid.SelectRow(theRow, true);
                             grid.SetScrollTop(grid.GetRowTop(theRow));
                         }
-                      
+
                         window.epmLiveResourceGrid.actions.toggleEasyScroll();
-                        
+
                         window.setTimeout(function () { window.RefreshCommandUI(); }, 100);
                     }
                 });
@@ -972,8 +972,7 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
                 var select = $(document.createElement('select'));
                 select.addClass('form-control');
                 for (var j in availableGrps) {
-                    if (availableGrps.hasOwnProperty(j))
-                    {
+                    if (availableGrps.hasOwnProperty(j)) {
                         var txt = availableGrps[j].split('|')[0];
                         var val = availableGrps[j].split('|')[1];
                         select.append('<option value="' + val + '">' + txt + '</option>');
@@ -1126,12 +1125,25 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
                 var numGroups = $('.grouping-wrapper').children('.grouping-row').length;
                 if (numGroups > 0) {
                     var keyVals = [];
-                    $('.grouping-wrapper').children('.grouping-row').each(function () {
+                    var tmpval = [];
+                    $('.grouping-wrapper').children('.grouping-row').each(function () {                        
                         var txt = $(this).find('.grouping-select').find('select option:selected').text();
                         var val = $(this).find('.grouping-select').find('select option:selected').val();
                         var objTemp = { 'key': txt, 'value': val };
                         keyVals.push(objTemp);
+                        tmpval.push(val);
                     });
+                    
+                    for (i = 0; i < keyVals.length; i++) {
+                        var numOccurences = $.grep(tmpval, function (elem) {
+                            return elem === keyVals[i].value;
+                        }).length;
+                        if (numOccurences > 1) {
+                            alert(keyVals[i].key + " is repeated more than once !")
+                            return false;
+                        }
+                    }
+
                     cfg['saveFunction'](keyVals);
                 }
 
@@ -1361,7 +1373,7 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
                     data['sections'] = getUlChoices(ctrlId);
                     cfg['applyButtonConfig']['function'](data);
 
-                    $('#' + ctrlId +"_ul_menu").toggle();
+                    $('#' + ctrlId + "_ul_menu").toggle();
                 });
             }
 
