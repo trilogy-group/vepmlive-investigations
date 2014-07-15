@@ -772,6 +772,15 @@
         bLoading = false;
 
         document.getElementById("divExternalLinkAccept").style.display="";
+
+        if(iDefaultTaskType == 0)
+        {
+            document.getElementById("slcttasktype").selectedIndex = "0";
+        }
+        else
+        {
+            document.getElementById("slcttasktype").selectedIndex = "1";
+        }
         
 
         setTimeout("CreateTrees()", 100);

@@ -2905,13 +2905,20 @@ function NewTask(isSummary, isMilestone, isAbove, bAgileGrid, bIsExternal, bForc
 
         grid.SetValue(newrow, "Title", "Summary Task 1", 1);
         grid.SetValue(newrow, "Summary", 1, 1, 0);
+        if (iDefaultTaskType == 0)
+            grid.SetValue(newrow, "TaskType", "Shared", 1);
+        else if (iDefaultTaskType == 1)
+            grid.SetValue(newrow, "TaskType", "Individual", 1);
         newId = grid.GenerateId();
         newrow = grid.AddRow(newrow, null, true, newId, "Task");
         setDefaultDates(grid, newrow);
 
     }
 
-
+    if (iDefaultTaskType == 0)
+        grid.SetValue(newrow, "TaskType", "Shared", 1);
+    else if (iDefaultTaskType == 1)
+        grid.SetValue(newrow, "TaskType", "Individual", 1);
 
     var hRow = newrow;
 
