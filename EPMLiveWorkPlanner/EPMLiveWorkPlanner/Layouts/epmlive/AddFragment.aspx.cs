@@ -122,8 +122,17 @@ namespace EPMLiveCore.Layouts.epmlive
         {
             SPList plannerFragmentList = SPContext.Current.Web.Lists.TryGetList("PlannerFragments");
             SPQuery qryFilterPlanner = new SPQuery();
+            string qryFilter = string.Empty;
 
-            string qryFilter = "<ViewFields><FieldRef Name='ID' /><FieldRef Name='Title' /><FieldRef Name='FragmentType' /><FieldRef Name='Author' /></ViewFields><OrderBy><FieldRef Name='Title' /><FieldRef Name='Author' /></OrderBy><Where><And><And><Eq><FieldRef Name='Author' /><Value Type='User'>" + SPContext.Current.Web.CurrentUser.Name + "</Value></Eq><Eq><FieldRef Name='PlannerID' /><Value Type='Text'>" + Convert.ToString(Request["PlannerID"]) + "</Value></Eq></And><Eq><FieldRef Name='FragmentType' /><Value Type='Choice'>Private</Value></Eq></And></Where>";
+
+            if (SPContext.Current.Web.CurrentUser.IsSiteAdmin)
+            {
+                qryFilter = "<ViewFields><FieldRef Name='ID' /><FieldRef Name='Title' /><FieldRef Name='FragmentType' /><FieldRef Name='Author' /></ViewFields><OrderBy><FieldRef Name='Title' /><FieldRef Name='Author' /></OrderBy><Where><And><Eq><FieldRef Name='PlannerID' /><Value Type='Text'>" + Convert.ToString(Request["PlannerID"]) + "</Value></Eq><Eq><FieldRef Name='FragmentType' /><Value Type='Choice'>Private</Value></Eq></And></Where>";
+            }
+            else
+            {
+                qryFilter = "<ViewFields><FieldRef Name='ID' /><FieldRef Name='Title' /><FieldRef Name='FragmentType' /><FieldRef Name='Author' /></ViewFields><OrderBy><FieldRef Name='Title' /><FieldRef Name='Author' /></OrderBy><Where><And><And><Eq><FieldRef Name='Author' /><Value Type='User'>" + SPContext.Current.Web.CurrentUser.Name + "</Value></Eq><Eq><FieldRef Name='PlannerID' /><Value Type='Text'>" + Convert.ToString(Request["PlannerID"]) + "</Value></Eq></And><Eq><FieldRef Name='FragmentType' /><Value Type='Choice'>Private</Value></Eq></And></Where>";
+            }
 
             if (plannerFragmentList != null)
             {
@@ -151,7 +160,7 @@ namespace EPMLiveCore.Layouts.epmlive
                 SPListItemCollection fragmentItems = plannerFragmentList.GetItems(qryFilterPlanner);
                 if (fragmentItems != null && fragmentItems.Count > 0)
                 {
-                    gridPublicFragments.DataSource = fragmentItems.GetDataTable(); ;
+                    gridPublicFragments.DataSource = fragmentItems.GetDataTable(); 
                     gridPublicFragments.DataBind();
                 }
             }
