@@ -4951,6 +4951,11 @@
 
                 case "SaveView_OK":
                     var saveViewName = document.getElementById("id_SaveView_Name").value;
+                    var val = saveViewName.replace(/^\s+|\s+$/, '');
+                    if (val.length == 0) {
+                        alert("Please enter a valid View Name");
+                        break;
+                    }
                     var selectView = document.getElementById("idAnalyzerTab_SelView");
                     //var saveViewGuid = "";
                     var guid = new Guid();
