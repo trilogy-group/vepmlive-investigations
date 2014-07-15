@@ -42,14 +42,20 @@ namespace EPMLiveCore.SocialEngine.Events.WebEventReceiver
             try
             {
                 SocialEngine.Current.ProcessActivity(ObjectKind.Workspace, ActivityKind.Created,
-                new Dictionary<string, object>
-                {
-                    {"Id", properties.WebId},
-                    {"Title", properties.Web.Title},
-                    {"URL", properties.ServerRelativeUrl},
-                    {"UserId", properties.Web.CurrentUser.ID},
-                    {"ActivityTime", DateTime.Now}
-                }, properties.Web);
+                    new Dictionary<string, object>
+                    {
+                        {"Id", properties.WebId},
+                        {"Title", properties.Web.Title},
+                        {"URL", properties.ServerRelativeUrl},
+                        {"UserId", properties.Web.CurrentUser.ID},
+                        {"ActivityTime", DateTime.Now}
+                    }, properties.Web);
+            }
+            catch { }
+
+            try
+            {
+                CoreFunctions.ScheduleReportingRefreshJob(properties.Web);
             }
             catch { }
         }

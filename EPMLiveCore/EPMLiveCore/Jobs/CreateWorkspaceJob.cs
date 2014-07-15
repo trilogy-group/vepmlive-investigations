@@ -1,10 +1,6 @@
-﻿using EPMLiveCore.API;
+﻿using System;
+using EPMLiveCore.API;
 using Microsoft.SharePoint;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace EPMLiveCore.Jobs
 {
@@ -14,10 +10,11 @@ namespace EPMLiveCore.Jobs
         {
             try
             {
-            WorkspaceController wsCon = new WorkspaceController(data);
-            wsCon.CreateWorkspace();
-        }
-            catch (Exception ex) {
+                var wsCon = new WorkspaceController(data);
+                wsCon.CreateWorkspace();
+            }
+            catch (Exception ex)
+            {
                 bErrors = true;
                 sErrors = "General Error: " + ex.Message;
             }

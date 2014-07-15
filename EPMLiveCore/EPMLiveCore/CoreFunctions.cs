@@ -3669,5 +3669,15 @@ namespace EPMLiveCore
         //    }
         //    catch { return "C:\\Program Files (x86)\\EPM Live\\Work Engine Server 2010\\Timer\\TEMP"; }
         //}
+
+        public static string ScheduleReportingRefreshJob(SPWeb spWeb)
+        {
+            Assembly assemblyInstance =
+                Assembly.Load("EPMLiveReportsAdmin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b90e532f481cf050");
+            Type thisClass = assemblyInstance.GetType("EPMLiveReportsAdmin.ReportingAPI", true, true);
+            MethodInfo m = thisClass.GetMethod("RefreshAll", BindingFlags.Public | BindingFlags.Instance);
+            object apiClass = Activator.CreateInstance(thisClass);
+            return (string) m.Invoke(apiClass, new object[] { null, spWeb });
+        }
     }
 }

@@ -16,12 +16,7 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Infrastructure
 
         public static string ScheduleReportingRefresh(SPWeb spWeb)
         {
-            Assembly assemblyInstance =
-                Assembly.Load("EPMLiveReportsAdmin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b90e532f481cf050");
-            Type thisClass = assemblyInstance.GetType("EPMLiveReportsAdmin.ReportingAPI", true, true);
-            MethodInfo m = thisClass.GetMethod("RefreshAll", BindingFlags.Public | BindingFlags.Instance);
-            object apiClass = Activator.CreateInstance(thisClass);
-            return (string) m.Invoke(apiClass, new object[] {null, spWeb});
+            return CoreFunctions.ScheduleReportingRefreshJob(spWeb);
         }
 
         // Internal Methods (3) 
