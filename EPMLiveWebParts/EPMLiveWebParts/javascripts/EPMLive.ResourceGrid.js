@@ -1941,12 +1941,7 @@ function registerEpmLiveResourceGridScript() {
                                         {
                                             'eventName': 'click',
                                             'function': function () {
-                                                if ($$.IsRootWeb && $$.ListId == "" && $$.ItemId == "") {
-                                                    $$.actions.displayPopUp($$.actions.getNewFormUrl, 'Add User', true, true, $$.grid.teamUpdated, { row: null, changeType: 'Added' });
-                                                }
-                                                else {
-                                                    $$.actions.displayPopUp($$.actions.getNewFormUrl, 'Add User', true, true, $$.grid.teamUpdated, { row: null, changeType: 'Added' }, 800, 700);
-                                                }
+                                                window.location.href = $$.actions.getNewFormUrl + "?source=" + encodeURIComponent(window.location.pathname);
                                             }
                                         }
                                     ]
