@@ -237,7 +237,7 @@
         },
 
         showNewForm: function (weburl) {
-            var options = { url: weburl, showMaximized: false, dialogReturnValueCallback: function (dialogResult) { if (dialogResult == 1) { FancyDispFormClient.reFillWebPartData(); } } };
+            var options = { url: weburl, showMaximized: true, dialogReturnValueCallback: function (dialogResult) { if (dialogResult == 1) { FancyDispFormClient.reFillWebPartData(); } } };
             SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
         },
 

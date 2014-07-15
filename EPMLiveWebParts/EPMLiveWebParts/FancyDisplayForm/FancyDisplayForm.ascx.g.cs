@@ -651,33 +651,33 @@ namespace EPMLiveWebParts {
                     "g.js\', \'SP.UI.ModalDialog.showModalDialog\', options);\r\n                    }\r\n  " +
                     "                  else {\r\n                        alert(ticket);\r\n              " +
                     "      }\r\n                }\r\n            });\r\n        },\r\n\r\n        showNewForm: " +
-                    "function (weburl) {\r\n            var options = { url: weburl, showMaximized: fal" +
-                    "se, dialogReturnValueCallback: function (dialogResult) { if (dialogResult == 1) " +
-                    "{ FancyDispFormClient.reFillWebPartData(); } } };\r\n            SP.SOD.execute(\'S" +
-                    "P.UI.Dialog.js\', \'SP.UI.ModalDialog.showModalDialog\', options);\r\n        },\r\n\r\n " +
-                    "       showItemPopup: function (siteurl, webid, listid, itemid) {\r\n            s" +
-                    "howSharePointPopup(siteurl + \'/_layouts/epmlive/gridaction.aspx?action=getcontex" +
-                    "tmenus&webid=\' + webid +\r\n                \'&listid=\' + listid + \'&ID=\' + itemid," +
-                    " null, false, true, null, {\r\n                    gridId: \"myDiv\",\r\n             " +
-                    "       rowId: \"myDiv\",\r\n                    col: \"myDiv\"\r\n                }, 300" +
-                    ", 400);\r\n        },\r\n\r\n        emptyFunction: function () {\r\n        },\r\n\r\n     " +
-                    "   showSharePointPopup: function (url, title, allowMaximize, showClose, func, fu" +
-                    "ncParams, width, height) {\r\n            if (allowMaximize == null) allowMaximize" +
-                    " = true;\r\n            if (showClose == null) showClose = true;\r\n            if (" +
-                    "func == null) func = emptyFunction;\r\n\r\n            var options;\r\n\r\n            i" +
-                    "f (width !== undefined && height !== undefined) {\r\n                options = {\r\n" +
-                    "                    title: title,\r\n                    allowMaximize: allowMaxim" +
-                    "ize,\r\n                    showClose: showClose,\r\n                    url: url,\r\n" +
-                    "                    dialogReturnValueCallback: Function.createCallback(Function." +
-                    "createDelegate(null, func), funcParams),\r\n                    width: width,\r\n   " +
-                    "                 height: height\r\n                };\r\n            } else {\r\n     " +
-                    "           options = { title: title, allowMaximize: allowMaximize, showClose: sh" +
-                    "owClose, url: url, dialogReturnValueCallback: Function.createCallback(Function.c" +
-                    "reateDelegate(null, func), funcParams) };\r\n            }\r\n\r\n            SP.UI.Mo" +
-                    "dalDialog.showModalDialog(options);\r\n        },\r\n\r\n        reFillWebPartData: fu" +
-                    "nction () {\r\n            window.setTimeout(\'FancyDispFormClient.fillWebPartData(" +
-                    ")\', 2000);\r\n        },\r\n\r\n        fillWebPartData: function () {\r\n            $." +
-                    "ajax({\r\n                type: \"POST\",\r\n                url: \"");
+                    "function (weburl) {\r\n            var options = { url: weburl, showMaximized: tru" +
+                    "e, dialogReturnValueCallback: function (dialogResult) { if (dialogResult == 1) {" +
+                    " FancyDispFormClient.reFillWebPartData(); } } };\r\n            SP.SOD.execute(\'SP" +
+                    ".UI.Dialog.js\', \'SP.UI.ModalDialog.showModalDialog\', options);\r\n        },\r\n\r\n  " +
+                    "      showItemPopup: function (siteurl, webid, listid, itemid) {\r\n            sh" +
+                    "owSharePointPopup(siteurl + \'/_layouts/epmlive/gridaction.aspx?action=getcontext" +
+                    "menus&webid=\' + webid +\r\n                \'&listid=\' + listid + \'&ID=\' + itemid, " +
+                    "null, false, true, null, {\r\n                    gridId: \"myDiv\",\r\n              " +
+                    "      rowId: \"myDiv\",\r\n                    col: \"myDiv\"\r\n                }, 300," +
+                    " 400);\r\n        },\r\n\r\n        emptyFunction: function () {\r\n        },\r\n\r\n      " +
+                    "  showSharePointPopup: function (url, title, allowMaximize, showClose, func, fun" +
+                    "cParams, width, height) {\r\n            if (allowMaximize == null) allowMaximize " +
+                    "= true;\r\n            if (showClose == null) showClose = true;\r\n            if (f" +
+                    "unc == null) func = emptyFunction;\r\n\r\n            var options;\r\n\r\n            if" +
+                    " (width !== undefined && height !== undefined) {\r\n                options = {\r\n " +
+                    "                   title: title,\r\n                    allowMaximize: allowMaximi" +
+                    "ze,\r\n                    showClose: showClose,\r\n                    url: url,\r\n " +
+                    "                   dialogReturnValueCallback: Function.createCallback(Function.c" +
+                    "reateDelegate(null, func), funcParams),\r\n                    width: width,\r\n    " +
+                    "                height: height\r\n                };\r\n            } else {\r\n      " +
+                    "          options = { title: title, allowMaximize: allowMaximize, showClose: sho" +
+                    "wClose, url: url, dialogReturnValueCallback: Function.createCallback(Function.cr" +
+                    "eateDelegate(null, func), funcParams) };\r\n            }\r\n\r\n            SP.UI.Mod" +
+                    "alDialog.showModalDialog(options);\r\n        },\r\n\r\n        reFillWebPartData: fun" +
+                    "ction () {\r\n            window.setTimeout(\'FancyDispFormClient.fillWebPartData()" +
+                    "\', 2000);\r\n        },\r\n\r\n        fillWebPartData: function () {\r\n            $.a" +
+                    "jax({\r\n                type: \"POST\",\r\n                url: \"");
               @__w.Write(SPContext.Current.Web.Url);
 
             @__w.Write("/_vti_bin/WorkEngine.asmx/Execute\",\r\n                data: \"{Function : \'GetFancy" +
