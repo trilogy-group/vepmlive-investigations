@@ -238,7 +238,7 @@
     <table id="SVATTable" width="100%"  cellspacing="0">
          <tr>
              <td  >
-                <select id="idSaveorApply" name="SoA1">
+                <select id="idSaveorApply" name="SoA1" style="width:100%;">
                 </select>
            </td>
         </tr>
