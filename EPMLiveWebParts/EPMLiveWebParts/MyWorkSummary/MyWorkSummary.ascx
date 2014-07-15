@@ -6,67 +6,65 @@
 <%@ Import Namespace="Microsoft.SharePoint" %>
 <%@ Register TagPrefix="WebPartPages" Namespace="Microsoft.SharePoint.WebPartPages" Assembly="Microsoft.SharePoint, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
 <%@ Control Language="C#" AutoEventWireup="true" CodeBehind="MyWorkSummary.ascx.cs" Inherits="EPMLiveWebParts.MyWorkSummary.MyWorkSummary" %>
+
 <style type="text/css">
     #mwsMainDiv {
-        width: 95%;
+        width: 100%;
         margin: 10px auto;
         padding: 5px;
         position: relative;
         display: inline-block;
-        text-shadow: 0 1px 0 #fff;
+        font-family: "Open Sans";
+        font-weight: 400;
+        color: #555;
     }
 
-        #mwsMainDiv .row {
-            margin: 0;
-            padding: 0;
-        }
-
-        #mwsMainDiv .mwsItemDiv {
-            float: left;
-            color: #777777;
-            margin-right: 20px;
-            cursor: pointer;
-            opacity:1;
-        }
-
-            #mwsMainDiv .mwsItemDiv:hover {
-                opacity: 0.5;
-            }
-
-        #mwsMainDiv .icon-wrapper {
-            float: left;
-        }
-
-            #mwsMainDiv .icon-wrapper .icon {
-                font-size: 23px;
-                text-align: center;
-                line-height: 23px;
-            }
-
-                #mwsMainDiv .icon-wrapper .icon .fa {
-                    display: block;
-                }
-
-            #mwsMainDiv .icon-wrapper .text {
-                font-size: 16px;
-                text-align: center;
-                line-height: 20px;
-                color: #999999;
-            }
-
-        #mwsMainDiv .mwsItemDiv .count {
-            font-size: 35px;
-            line-height: 43px;
-            padding-left: 5px;
+        #mwsMainDiv section {
+            display: table;
             position: relative;
-            display: inline-block;
+            margin-bottom: 7px;
         }
-</style>
 
+            #mwsMainDiv section .icon {
+                float: left;
+                display: inline;
+                font-size: 24px;
+                color: #aaa;
+                width: 20px;
+            }
+
+            #mwsMainDiv section .text {
+                display: inline;
+                float: left;
+                color: #999;
+                padding-left: 10px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                width: 140px;
+            }
+
+            #mwsMainDiv section .count {
+                display: inline;
+                float: left;
+                padding-left: 9px;
+                width: 30px;
+                text-align: center;
+                padding-right: 9px;
+                background-color: #E5E5E5;
+                border-radius: 10px;
+                color: #888;
+            }
+
+    section:hover {
+        cursor: pointer;
+    }
+</style>
 
 <script type="text/javascript">
 
     $(function () {
+
         MyWorkSummaryClient.fillWebPartData();
     });
 
@@ -87,6 +85,21 @@
 
                     $("#mwsLoadDiv").hide();
                     $("#mwsMainDiv").show();
+
+                    $("section")
+.mouseover(function () {
+    $(this).find('.icon').css('color', '#999');
+    $(this).find('.text').css('color', '#888');
+    $(this).find('.count').css('background-color', '#0090CA');
+    $(this).find('.count').css('color', '#ffffff');
+})
+.mouseout(function () {
+    $(this).find('.icon').css('color', '#aaa');
+    $(this).find('.text').css('color', '#999');
+    $(this).find('.count').css('color', '#888');
+    $(this).find('.count').css('background-color', '#e5e5e5');
+
+});
                 });
             }
         },
@@ -95,6 +108,7 @@
             location.href = viewSiteContentUrl;
         }
     }
+
 </script>
 <div id="mwsLoadDiv" style="display: none;">
     <img src="../_layouts/15/epmlive/images/mywork/loading16.gif" />

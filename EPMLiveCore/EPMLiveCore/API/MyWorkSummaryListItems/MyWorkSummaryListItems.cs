@@ -37,7 +37,7 @@ namespace EPMLiveCore.API
                 string siteUrl = xDoc.GetElementsByTagName("SiteUrl")[0].InnerText;
                 string siteId = xDoc.GetElementsByTagName("SiteID")[0].InnerText;
                 string webID = xDoc.GetElementsByTagName("WebID")[0].InnerText;
-                string currentUser = xDoc.GetElementsByTagName("CurrentUser")[0].InnerText;
+                string currentUserId = xDoc.GetElementsByTagName("CurrentUserId")[0].InnerText;
 
 
                 #endregion
@@ -49,7 +49,9 @@ namespace EPMLiveCore.API
                         var queryExecutor = new EPMLiveCore.ReportingProxy.QueryExecutor(spWeb);
                         if (queryExecutor != null)
                         {
-                            sqlquery = string.Format("Select l1.WorkType as WORKTYPE,COUNT(l1.WorkType) as WORKTYPECOUNT,l1.ListId as RPTLISTID, isnull(l2.ListIcon,'') as RPTLISTICON FROM LSTMyWork l1 left join ReportListIds l2 on l1.ListId = l2.id where l1.AssignedToText = '{0}' and l1.Siteid = '{1}' and l1.WebId = '{2}' and (l1.Complete <> 1 or l1.Complete is null) GROUP BY l1.WorkType, l1.ListId, l2.ListIcon Order by l1.WorkType", currentUser, siteId, webID);
+                            //sqlquery = string.Format("Select l1.WorkType as WORKTYPE,COUNT(l1.WorkType) as WORKTYPECOUNT,l1.ListId as RPTLISTID, isnull(l2.ListIcon,'') as RPTLISTICON FROM LSTMyWork l1 left join ReportListIds l2 on l1.ListId = l2.id where l1.AssignedToText = '{0}' and l1.Siteid = '{1}' and l1.WebId = '{2}' and (l1.Complete <> 1 or l1.Complete is null) GROUP BY l1.WorkType, l1.ListId, l2.ListIcon Order by l1.WorkType", currentUser, siteId, webID);
+
+                            sqlquery = string.Format("Select l1.WorkType as WORKTYPE,COUNT(l1.WorkType) as WORKTYPECOUNT,l1.ListId as RPTLISTID, isnull(l2.ListIcon,'') as RPTLISTICON FROM LSTMyWork l1 left join ReportListIds l2 on l1.ListId = l2.id where l1.AssignedToID = '{0}' and l1.Siteid = '{1}' and l1.WebId = '{2}' and (l1.Complete <> 1 or l1.Complete is null) GROUP BY l1.WorkType, l1.ListId, l2.ListIcon Order by l1.WorkType", currentUserId, siteId, webID);
                             dtMyWorkSummary = queryExecutor.ExecuteReportingDBQuery(sqlquery, new Dictionary<string, object> { });
                         }
 
@@ -63,7 +65,12 @@ namespace EPMLiveCore.API
                                 string workTypeCount = Convert.ToString(dtMyWorkSummary.Rows[i]["WORKTYPECOUNT"]);
                                 string rptListId = Convert.ToString(dtMyWorkSummary.Rows[i]["RPTLISTID"]);
                                 string rptListIcon = Convert.ToString(dtMyWorkSummary.Rows[i]["RPTLISTICON"]);
-                                sbListMyWorkSummaryItemsDiv.Append(string.Format("<a href='#' onclick=\"javascript:MyWorkSummaryClient.openMyWorkPage('{0}','{1}');\"><div class='row'><div class='mwsItemDiv'><div class='icon-wrapper'><div class='icon fa {2}'></div><div class='text'>{3}</div></div><div class='count'>{4}</div></div></div></a>", siteUrl, rptListId, rptListIcon, workType, workTypeCount));
+                                if (Convert.ToInt32(workTypeCount) >= 100)
+                                {
+                                    workTypeCount = "99+";
+                                }
+                                //sbListMyWorkSummaryItemsDiv.Append(string.Format("<a href='#' onclick=\"javascript:MyWorkSummaryClient.openMyWorkPage('{0}','{1}');\"><div class='row'><div class='mwsItemDiv'><div class='icon-wrapper'><div class='icon fa {2}'></div><div class='text'>{3}</div></div><div class='count'>{4}</div></div></div></a>", siteUrl, rptListId, rptListIcon, workType, workTypeCount));
+                                sbListMyWorkSummaryItemsDiv.Append(string.Format("<a href='#' onclick=\"javascript:MyWorkSummaryClient.openMyWorkPage('{0}','{1}');\"> <section><div class='icon fa {2}'></div><div class='text'>{3}</div><div class='count'>{4}</div> </section></a></br>", siteUrl, rptListId, rptListIcon, workType, workTypeCount));
                             }
                         }
 

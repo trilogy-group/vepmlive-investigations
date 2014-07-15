@@ -49,12 +49,23 @@ namespace EPMLiveWebParts.MyWorkSummary
         {
             try
             {
+                string userId;
+                if (SPContext.Current.Web.CurrentUser.ID == 1073741823)
+                {
+                    userId = "1";
+                }
+                else
+                {
+                    userId = Convert.ToString(SPContext.Current.Web.CurrentUser.ID);
+                }
+
                 StringBuilder methodParam = new StringBuilder();
                 methodParam.Append("<MyWorkSummaryMethodParam>");
                 methodParam.Append("<SiteUrl>" + SPContext.Current.Site.Url + "</SiteUrl>");
                 methodParam.Append("<SiteID>" + Convert.ToString(SPContext.Current.Site.ID) + "</SiteID>");
                 methodParam.Append("<WebID>" + Convert.ToString(SPContext.Current.Web.ID) + "</WebID>");
-                methodParam.Append("<CurrentUser>" + Convert.ToString(SPContext.Current.Web.CurrentUser.Name) + "</CurrentUser>");
+                //methodParam.Append("<CurrentUser>" + Convert.ToString(SPContext.Current.Web.CurrentUser.Name) + "</CurrentUser>");
+                methodParam.Append("<CurrentUserId>" + userId + "</CurrentUserId>");
                 methodParam.Append("</MyWorkSummaryMethodParam>");
                 dataXml = methodParam.ToString();
             }

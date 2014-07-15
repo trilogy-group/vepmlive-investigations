@@ -50,58 +50,50 @@ namespace EPMLiveWebParts.MyWorkSummary {
         
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Never)]
         private void @__Render__control1(System.Web.UI.HtmlTextWriter @__w, System.Web.UI.Control parameterContainer) {
-            @__w.Write("\r\n<style type=\"text/css\">\r\n    #mwsMainDiv {\r\n        width: 95%;\r\n        margin" +
-                    ": 10px auto;\r\n        padding: 5px;\r\n        position: relative;\r\n        displa" +
-                    "y: inline-block;\r\n        text-shadow: 0 1px 0 #fff;\r\n    }\r\n\r\n        #mwsMainD" +
-                    "iv .row {\r\n            margin: 0;\r\n            padding: 0;\r\n        }\r\n\r\n       " +
-                    " #mwsMainDiv .mwsItemDiv {\r\n            float: left;\r\n            color: #777777" +
-                    ";\r\n            margin-right: 20px;\r\n            cursor: pointer;\r\n            op" +
-                    "acity:1;\r\n        }\r\n\r\n            #mwsMainDiv .mwsItemDiv:hover {\r\n            " +
-                    "    opacity: 0.5;\r\n            }\r\n\r\n        #mwsMainDiv .icon-wrapper {\r\n       " +
-                    "     float: left;\r\n        }\r\n\r\n            #mwsMainDiv .icon-wrapper .icon {\r\n " +
-                    "               font-size: 23px;\r\n                text-align: center;\r\n          " +
-                    "      line-height: 23px;\r\n            }\r\n\r\n                #mwsMainDiv .icon-wra" +
-                    "pper .icon .fa {\r\n                    display: block;\r\n                }\r\n\r\n    " +
-                    "        #mwsMainDiv .icon-wrapper .text {\r\n                font-size: 16px;\r\n   " +
-                    "             text-align: center;\r\n                line-height: 20px;\r\n          " +
-                    "      color: #999999;\r\n            }\r\n\r\n        #mwsMainDiv .mwsItemDiv .count {" +
-                    "\r\n            font-size: 35px;\r\n            line-height: 43px;\r\n            padd" +
-                    "ing-left: 5px;\r\n            position: relative;\r\n            display: inline-blo" +
-                    "ck;\r\n        }\r\n</style>\r\n\r\n\r\n<script type=\"text/javascript\">\r\n\r\n    $(function " +
-                    "() {\r\n        MyWorkSummaryClient.fillWebPartData();\r\n    });\r\n\r\n    MyWorkSumma" +
-                    "ryClient = {\r\n        dataXml: \'");
+            @__w.Write("\r\n\r\n<style type=\"text/css\">\r\n    #mwsMainDiv {\r\n        width: 100%;\r\n        mar" +
+                    "gin: 10px auto;\r\n        padding: 5px;\r\n        position: relative;\r\n        dis" +
+                    "play: inline-block;\r\n        font-family: \"Open Sans\";\r\n        font-weight: 400" +
+                    ";\r\n        color: #555;\r\n    }\r\n\r\n        #mwsMainDiv section {\r\n            dis" +
+                    "play: table;\r\n            position: relative;\r\n            margin-bottom: 7px;\r\n" +
+                    "        }\r\n\r\n            #mwsMainDiv section .icon {\r\n                float: lef" +
+                    "t;\r\n                display: inline;\r\n                font-size: 24px;\r\n        " +
+                    "        color: #aaa;\r\n                width: 20px;\r\n            }\r\n\r\n           " +
+                    " #mwsMainDiv section .text {\r\n                display: inline;\r\n                " +
+                    "float: left;\r\n                color: #999;\r\n                padding-left: 10px;\r" +
+                    "\n                white-space: nowrap;\r\n                overflow: hidden;\r\n      " +
+                    "          text-overflow: ellipsis;\r\n                width: 140px;\r\n            }" +
+                    "\r\n\r\n            #mwsMainDiv section .count {\r\n                display: inline;\r\n" +
+                    "                float: left;\r\n                padding-left: 9px;\r\n              " +
+                    "  width: 30px;\r\n                text-align: center;\r\n                padding-rig" +
+                    "ht: 9px;\r\n                background-color: #E5E5E5;\r\n                border-rad" +
+                    "ius: 10px;\r\n                color: #888;\r\n            }\r\n\r\n    section:hover {\r\n" +
+                    "        cursor: pointer;\r\n    }\r\n</style>\r\n\r\n<script type=\"text/javascript\">\r\n\r\n" +
+                    "    $(function () {\r\n\r\n        MyWorkSummaryClient.fillWebPartData();\r\n    });\r\n" +
+                    "\r\n    MyWorkSummaryClient = {\r\n        dataXml: \'");
           @__w.Write(dataXml);
 
-            @__w.Write(@"',
-        fillWebPartData: function () {
-            if (this.dataXml != '') {
-
-                $(""#mwsMainDiv"").hide();
-                $(""#mwsLoadDiv"").show();
-
-                var siteUrl = $(this.dataXml).find(""SiteUrl"").text();
-                EPMLiveCore.WorkEngineAPI.set_path(siteUrl + '/_vti_bin/WorkEngine.asmx');
-                EPMLiveCore.WorkEngineAPI.Execute(""GetMyWorkSummary"", this.dataXml, function (response) {
-                    var divHTML = response.toString().replace(""<Result Status=\""0\"">"", """").replace(""</Result>"", """");
-                    $(""#mwsMainDiv"").html("""");
-                    $(""#mwsMainDiv"").html(divHTML);
-
-                    $(""#mwsLoadDiv"").hide();
-                    $(""#mwsMainDiv"").show();
-                });
-            }
-        },
-        openMyWorkPage: function (siteUrl, listid) {
-            var viewSiteContentUrl = siteUrl + ""/_layouts/epmlive/mywork.aspx?listid="" + listid;
-            location.href = viewSiteContentUrl;
-        }
-    }
-</script>
-<div id=""mwsLoadDiv"" style=""display: none;"">
-    <img src=""../_layouts/15/epmlive/images/mywork/loading16.gif"" />
-</div>
-<div id=""mwsMainDiv"" />
-");
+            @__w.Write("\',\r\n        fillWebPartData: function () {\r\n            if (this.dataXml != \'\') {" +
+                    "\r\n\r\n                $(\"#mwsMainDiv\").hide();\r\n                $(\"#mwsLoadDiv\").s" +
+                    "how();\r\n\r\n                var siteUrl = $(this.dataXml).find(\"SiteUrl\").text();\r" +
+                    "\n                EPMLiveCore.WorkEngineAPI.set_path(siteUrl + \'/_vti_bin/WorkEng" +
+                    "ine.asmx\');\r\n                EPMLiveCore.WorkEngineAPI.Execute(\"GetMyWorkSummary" +
+                    "\", this.dataXml, function (response) {\r\n                    var divHTML = respon" +
+                    "se.toString().replace(\"<Result Status=\\\"0\\\">\", \"\").replace(\"</Result>\", \"\");\r\n  " +
+                    "                  $(\"#mwsMainDiv\").html(\"\");\r\n                    $(\"#mwsMainDiv" +
+                    "\").html(divHTML);\r\n\r\n                    $(\"#mwsLoadDiv\").hide();\r\n             " +
+                    "       $(\"#mwsMainDiv\").show();\r\n\r\n                    $(\"section\")\r\n.mouseover(" +
+                    "function () {\r\n    $(this).find(\'.icon\').css(\'color\', \'#999\');\r\n    $(this).find" +
+                    "(\'.text\').css(\'color\', \'#888\');\r\n    $(this).find(\'.count\').css(\'background-colo" +
+                    "r\', \'#0090CA\');\r\n    $(this).find(\'.count\').css(\'color\', \'#ffffff\');\r\n})\r\n.mouse" +
+                    "out(function () {\r\n    $(this).find(\'.icon\').css(\'color\', \'#aaa\');\r\n    $(this)." +
+                    "find(\'.text\').css(\'color\', \'#999\');\r\n    $(this).find(\'.count\').css(\'color\', \'#8" +
+                    "88\');\r\n    $(this).find(\'.count\').css(\'background-color\', \'#e5e5e5\');\r\n\r\n});\r\n  " +
+                    "              });\r\n            }\r\n        },\r\n        openMyWorkPage: function (" +
+                    "siteUrl, listid) {\r\n            var viewSiteContentUrl = siteUrl + \"/_layouts/ep" +
+                    "mlive/mywork.aspx?listid=\" + listid;\r\n            location.href = viewSiteConten" +
+                    "tUrl;\r\n        }\r\n    }\r\n\r\n</script>\r\n<div id=\"mwsLoadDiv\" style=\"display: none;" +
+                    "\">\r\n    <img src=\"../_layouts/15/epmlive/images/mywork/loading16.gif\" />\r\n</div>" +
+                    "\r\n<div id=\"mwsMainDiv\" />\r\n");
         }
         
         private void InitializeControl() {
