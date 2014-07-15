@@ -87,6 +87,7 @@
     <Compile Include="PowerSteering\Managers\OrganizationManager.cs" />
     <Compile Include="PowerSteering\Managers\ProjectManager.cs" />
     <Compile Include="PowerSteering\Managers\TaskManager.cs" />
+    <Compile Include="PowerSteering\Managers\UserManager.cs" />
     <Compile Include="PowerSteering\Services\PowerSteeringService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs" />

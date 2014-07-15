@@ -2,6 +2,9 @@
 using RestSharp;
 using UplandIntegrations.Infrastructure;
 using UplandIntegrations.PowerSteering.Managers;
+using ProjectManager = UplandIntegrations.PowerSteering.Managers.ProjectManager;
+using TaskManager = UplandIntegrations.PowerSteering.Managers.TaskManager;
+using UserManager = UplandIntegrations.PowerSteering.Managers.UserManager;
 
 namespace UplandIntegrations.PowerSteering.Infrastructure
 {
@@ -21,6 +24,8 @@ namespace UplandIntegrations.PowerSteering.Infrastructure
                     return new TaskManager(client);
                 case "organization":
                     return new OrganizationManager(client);
+                case "user":
+                    return new UserManager(client);
                 default:
                     throw new Exception(objectName + " is not a valid PowerSteering object.");
             }
