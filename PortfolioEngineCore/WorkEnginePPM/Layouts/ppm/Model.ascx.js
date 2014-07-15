@@ -1451,8 +1451,10 @@
 	Model.prototype.SelectSnG_OKOnClick = function (iApply) {
 	    if (iApply == 2) {
 	        var sng1 = document.getElementById('sng1');
+	        var SelShowToLevel = document.getElementById('idSelShowToLevel');
 
 	        sng1.value = 0;
+	        SelShowToLevel.value = 1;
 	        this.FinishSnG();
 	        
 	        return;
@@ -3616,42 +3618,46 @@
 
 	}
 
-	Model.prototype.SelectSearch_OKOnClick = function (iApply) 
-	{
+	Model.prototype.SelectSearch_OKOnClick = function (iApply) {
+	    if (iApply == 1) {
+	        var searchtext = document.getElementById('idtxtsearch');
+
+	        if (searchtext.value == '' || searchtext.value == null) {
+	            alert("search for field can't be left blank !");
+	        }
+	        else {
+	            this.SearchDet = document.getElementById("rbSearchDet").checked;
+
+	            var searchWhere = document.getElementById('idSearchWhere');
+	            var s = searchWhere.options[searchWhere.selectedIndex].text;
+	            this.SeachCol = "";
+
+	            for (var xi = 0; xi < s.length; xi++) {
+	                if (s.charAt(xi) != ' ')
+	                    this.SeachCol = this.SeachCol + s.charAt(xi);
+	            }
+
+	            var searchHow = document.getElementById('idSearchHow');
+	            this.SeachHow = searchHow.options[searchHow.selectedIndex].value;
+
+	            //var searchtext = document.getElementById('idtxtsearch');		   
+	            this.SearchText = searchtext.value;
+
+	            this.SearchGrid(true);
+
+	            this.SearchDlg.window("winSearchsDlg").detachObject()
+	            this.SearchDlg.window("winSearchsDlg").close();
+	            this.SearchDlg = null;
+	        }
+
+	    }
+	    else {
+	        this.SearchDlg.window("winSearchsDlg").detachObject()
+	        this.SearchDlg.window("winSearchsDlg").close();
+	        this.SearchDlg = null;
+	    }
 
 
-		this.SearchDlg.window("winSearchsDlg").detachObject()
-		this.SearchDlg.window("winSearchsDlg").close();
-		this.SearchDlg = null;
-
-
-		if (iApply == 1)
-		{
-		    this.SearchDet = document.getElementById("rbSearchDet").checked;
-
-		   var searchWhere = document.getElementById('idSearchWhere');
-		   var s = searchWhere.options[searchWhere.selectedIndex].text; 
-		   this.SeachCol  = "";
-
-		   for (var xi = 0; xi < s.length; xi++)
-		   {
-			if (s.charAt(xi) != ' ')
-				this.SeachCol = this.SeachCol + s.charAt(xi);
-		   }
-		   
-		   var searchHow = document.getElementById('idSearchHow');
-		   this.SeachHow = searchHow.options[searchHow.selectedIndex].value; 
-
-		   var searchtext = document.getElementById('idtxtsearch');
-		   this.SearchText = searchtext.value;
-  
-			this.SearchGrid(true);
-
-		 }
- 
-
-
-		  
 	}
 
 	Model.prototype.SearchGrid = function (bIsFirst) {
