@@ -152,7 +152,7 @@
 			Are you sure you want to delete this view?
 		</div>
 		<div>
-			<input id="id_DeleteView_Name" type="text" value="view 1" style="width:10em; text-align:left;" />
+			<input id="id_DeleteView_Name" type="text" value="view 1" readonly="true" style="width:10em; text-align:left;" />
 		</div>
 	    <div style="float:right;">
 		    <div class="button-container" >
