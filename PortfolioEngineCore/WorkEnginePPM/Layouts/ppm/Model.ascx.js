@@ -3702,7 +3702,7 @@
 			else if (this.SeachHow == 3)
 				bTest = (s.indexOf(sLookFor) != -1);
 			else if (this.SeachHow == 4 && s.length >= sLookFor.length)
-				bTest = (sLookFor == s.left(sLookFor.length));
+			    bTest = (sLookFor == s.slice(0, sLookFor.length));
 
 
 
