@@ -89,6 +89,18 @@ namespace TimerService
 
             logMessage("INIT", "STMR", "Setting threads to: " + maxThreads);
 
+            foreach (SPWebApplication webApp in SPWebService.ContentService.WebApplications)
+            {
+                string sConn = EPMLiveCore.CoreFunctions.getConnectionString(webApp.Id);
+                if (sConn != "")
+                {
+                    SqlConnection cn = new SqlConnection(sConn);
+                    cn.Open();
+                    SqlCommand cmd = new SqlCommand("update TSqueue set status = 0, queue = NULL where status <> 3", cn);
+                    cmd.ExecuteNonQuery();
+                    cn.Close();
+                }
+            }
             
             return true;
         }
