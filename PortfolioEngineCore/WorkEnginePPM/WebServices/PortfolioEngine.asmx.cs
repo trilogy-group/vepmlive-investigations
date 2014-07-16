@@ -13,6 +13,8 @@ using WorkEnginePPM.WebServices.Core;
 using PEC = PortfolioEngineCore;
 using WEC = EPMLiveCore;
 using WSC = WorkEnginePPM.WebServices.Core;
+using WorkEnginePPM.Core.PFEDataServiceManager;
+using EPMLiveCore.Infrastructure;
 
 namespace WorkEnginePPM
 {
@@ -26,13 +28,13 @@ namespace WorkEnginePPM
     [ScriptService]
     public class PortfolioEngineAPI : WebService
     {
-        #region Fields (1) 
+        #region Fields (1)
 
         private static SPWeb _spWeb;
 
-        #endregion Fields 
+        #endregion Fields
 
-        #region Constructors (3) 
+        #region Constructors (3)
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PortfolioEngineAPI"/> class.
@@ -60,9 +62,9 @@ namespace WorkEnginePPM
             Dispose(false);
         }
 
-        #endregion Constructors 
+        #endregion Constructors
 
-        #region Methods (4) 
+        #region Methods (4)
 
         // Public Methods (3) 
 
@@ -80,12 +82,12 @@ namespace WorkEnginePPM
                 Assembly assemblyInstance = Assembly.GetExecutingAssembly();
                 Type thisClass = assemblyInstance.GetType("WorkEnginePPM.PortfolioEngineAPI", true, true);
                 MethodInfo m = thisClass.GetMethod(Function);
-                object result = m.Invoke(null, new object[] {Dataxml});
+                object result = m.Invoke(null, new object[] { Dataxml });
                 return result.ToString();
             }
             catch (Exception ex)
             {
-                return Response.Failure((int) APIError.Execute,
+                return Response.Failure((int)APIError.Execute,
                                         string.Format("Error executing function: {0}", ex.GetBaseMessage()));
             }
         }
@@ -104,7 +106,7 @@ namespace WorkEnginePPM
                 Assembly assemblyInstance = Assembly.GetExecutingAssembly();
                 Type thisClass = assemblyInstance.GetType("WorkEnginePPM.PortfolioEngineAPI", true, true);
                 MethodInfo m = thisClass.GetMethod(Function);
-                object result = m.Invoke(null, new object[] {Dataxml});
+                object result = m.Invoke(null, new object[] { Dataxml });
                 string ids = "";
                 try
                 {
@@ -119,7 +121,7 @@ namespace WorkEnginePPM
             }
             catch (Exception ex)
             {
-                return Response.Failure((int) APIError.ExecuteJSON,
+                return Response.Failure((int)APIError.ExecuteJSON,
                                         string.Format("Error executing function: {0}", ex.GetBaseMessage()));
             }
         }
@@ -153,7 +155,7 @@ namespace WorkEnginePPM
                     {
                         try
                         {
-                            var pub = (PublicAPI) attrib;
+                            var pub = (PublicAPI)attrib;
                             isPublic = pub.IsPublic;
                         }
                         catch
@@ -162,7 +164,7 @@ namespace WorkEnginePPM
                     }
                     else if (attrib.GetType().Name == "SampleInOut")
                     {
-                        var si = (SampleInOut) attrib;
+                        var si = (SampleInOut)attrib;
 
                         attr = doc.CreateElement("Input");
                         attr.AppendChild(doc.CreateCDataSection(si.In));
@@ -174,7 +176,7 @@ namespace WorkEnginePPM
                     }
                     else if (attrib.GetType().Name == "DescriptionAttribute")
                     {
-                        var da = (DescriptionAttribute) attrib;
+                        var da = (DescriptionAttribute)attrib;
 
                         attr = doc.CreateElement("Description");
                         attr.InnerText = da.Description;
@@ -209,7 +211,26 @@ namespace WorkEnginePPM
             _spWeb = null;
         }
 
-        #endregion Methods 
+        [WebMethod]
+        public string UploadFile(byte[] fileBytes, string fileName)
+        {
+            try
+            {
+                string fileId;
+                using (var epmLiveFileStore = new EPMLiveFileStore(_spWeb))
+                {
+                    fileId = epmLiveFileStore.Add(fileBytes);
+                }
+                return Response.Success(String.Format("<UploadFileId>{0}</UploadFileId>", fileId));
+            }
+            catch (Exception ex)
+            {
+                return Response.Failure((int)APIError.UploadFile,
+                                        string.Format("Error executing function: {0}", ex.GetBaseMessage()));
+            }
+        }
+
+        #endregion Methods
 
         #region Resource Management
 
@@ -949,6 +970,39 @@ namespace WorkEnginePPM
             // property for named parameter
             public string Out { get; set; }
         }
+
+        #endregion
+
+        #region PFE Import\Export
+
+        [PublicAPI(true)]
+        [Description("This function creates job for DSMComponents for PFE import-export")]
+        public static string ScheduleDataImport(string data)
+        {
+            string response;
+
+            using (var pFEDataServiceManager = new PFEDataServiceManager(_spWeb))
+            {
+                response = pFEDataServiceManager.ScheduleDataImport(data);
+            }
+
+            return response;
+        }
+
+        [PublicAPI(true)]
+        [Description("This function gets dsm job result for DSMComponents for PFE import-export")]
+        public static string CollectDataImportResult(string data)
+        {
+            string response;
+
+            using (var pFEDataServiceManager = new PFEDataServiceManager(_spWeb))
+            {
+                response = pFEDataServiceManager.CollectDataImportResult(data);
+            }
+
+            return response;
+        }
+
 
         #endregion
     }

@@ -4,6 +4,9 @@
     {
         Execute = 1000,
         ExecuteJSON,
+        UploadFile,
+        ScheduleDataImport,
+        CollectDataImportResult,
         ReadPermissionGroups = 2000,
         UpdateResources,
         ReadResources,
