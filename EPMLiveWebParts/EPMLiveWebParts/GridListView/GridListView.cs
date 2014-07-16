@@ -3194,6 +3194,9 @@ namespace EPMLiveWebParts
                 //output.WriteLine("searchbut.disabled = false;");
                 output.WriteLine("}");
 
+                output.WriteLine("function searchKeyPress(e){");
+                output.WriteLine("if(e.keyCode == 13){ doSearch" + sFullGridId + "();}return false;}");
+
                 output.WriteLine("</script>");
 
                 output.Write("<div id=\"search" + this.ID + "\" style=\"width:100%; height:40px;");
@@ -3222,7 +3225,7 @@ namespace EPMLiveWebParts
                         <img alt=""Clear Search"" src=""/_layouts/epmlive/images/unsearch.png"" style=""padding-bottom:2px"" onclick=""unSearch" + sFullGridId + @"()""/>
                     </div>
                     <div style=""display: table-cell"">
-                        <input type=""text"" id=""searchtext" + sFullGridId + @""" value=""" + sSearchValue + @""" style=""border: 0px; width:100%; margin-top:-5px; height:24px; font-family: 'Segoe UI','Segoe',Tahoma,Helvetica,Arial,sans-serif;font-size:13px""/>
+                        <input type=""text"" id=""searchtext" + sFullGridId + @""" value=""" + sSearchValue + @""" style=""border: 0px; width:100%; margin-top:-5px; height:24px; font-family: 'Segoe UI','Segoe',Tahoma,Helvetica,Arial,sans-serif;font-size:13px"" onkeypress=""searchKeyPress(event);""/>
                         <select id=""searchchoice" + sFullGridId + @""" style=""border: 0px; width:100%"">
                         </select>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                     </div>
