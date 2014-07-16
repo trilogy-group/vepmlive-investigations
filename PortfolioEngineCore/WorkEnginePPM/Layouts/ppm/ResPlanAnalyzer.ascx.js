@@ -7722,7 +7722,7 @@
 
         //    weburl = "/_layouts/ppm/rpeditor.aspx?dataid=" + this.params.TicketVal + "&IsResource=" + this.fromresource       
 
-        var options = { url: weburl, width: 800, height: 600, showClose: true, dialogReturnValueCallback: mycallback };
+        var options = { url: weburl, allowMaximize: true, showMaximized: true, showClose: true, dialogReturnValueCallback: mycallback };
 
         parent.SP.UI.ModalDialog.showModalDialog(options);
 
