@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Web;
+using System.Web.Script.Serialization;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using EPMLiveCore.API;
@@ -165,13 +166,24 @@ namespace EPMLiveCore.CONTROLTEMPLATES
 
         private void CalculatePinState()
         {
-            int userId = SPContext.Current.Web.CurrentUser.ID;
+            var spWeb = SPContext.Current.Web;
+            int userId = spWeb.CurrentUser.ID;
 
-            HttpCookie selectedTlNodeCookie = Request.Cookies.Get("epmnav-selected-tlnode-u-" + userId);
-            if (selectedTlNodeCookie != null)
+            try
             {
-                _selectedTlNode = selectedTlNodeCookie.Value;
+                HttpCookie selectedTlNodeCookie = Request.Cookies.Get("epmnav-selected-tlnode-u-" + userId);
+                if (selectedTlNodeCookie != null)
+                {
+                    var javaScriptSerializer = new JavaScriptSerializer();
+                    dynamic cookie = javaScriptSerializer.DeserializeObject(HttpUtility.UrlDecode(selectedTlNodeCookie.Value));
+
+                    if (spWeb.SafeServerRelativeUrl().Equals(cookie["webUrl"]))
+                    {
+                        _selectedTlNode = cookie["id"];
+                    }
+                }
             }
+            catch { }
 
             Pinned = true;
 
