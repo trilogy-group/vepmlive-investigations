@@ -5310,6 +5310,8 @@ namespace EPMLiveWebParts
 
                     appendParam("HideNew", gSettings.HideNewButton.ToString());
                     hideNew = gSettings.HideNewButton;
+                    if (!list.DoesUserHavePermissions(SPBasePermissions.ManageLists, true))
+                        hideNew = true;
 
                     if (!gSettings.EnableContentReporting)
                         appendParam("UsePerf", gSettings.Performance.ToString());
