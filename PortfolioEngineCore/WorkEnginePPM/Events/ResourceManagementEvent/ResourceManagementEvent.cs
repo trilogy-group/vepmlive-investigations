@@ -3,6 +3,8 @@ using System.Diagnostics;
 using System.Linq;
 using Microsoft.SharePoint;
 using WorkEnginePPM.Core.ResourceManagement;
+using EPMLiveCore;
+using Utilities = WorkEnginePPM.Core.ResourceManagement.Utilities;
 
 namespace WorkEnginePPM.Events
 {
@@ -48,7 +50,7 @@ namespace WorkEnginePPM.Events
 
             try
             {
-                EnsureNoDuplicates(properties);
+                CoreFunctions.EnsureNoDuplicates(properties);
 
                 SPWeb spWeb = properties.Web;
 
@@ -178,90 +180,6 @@ namespace WorkEnginePPM.Events
                 properties.Cancel = true;
                 properties.Status = SPEventReceiverStatus.CancelWithError;
             }
-        }
-
-        // Private Methods (2) 
-
-        /// <summary>
-        /// Ensures the no duplicates.
-        /// </summary>
-        /// <param name="properties">The properties.</param>
-        private void EnsureNoDuplicates(SPItemEventProperties properties)
-        {
-            bool isGeneric;
-
-            try
-            {
-                isGeneric = bool.Parse(properties.AfterProperties["Generic"].ToString());
-            }
-            catch
-            {
-                try
-                {
-                    isGeneric = bool.Parse(properties.ListItem["Generic"].ToString());
-                }
-                catch
-                {
-                    isGeneric = false;
-                }
-            }
-
-            if(isGeneric) return;
-
-            string sharePointAccount;
-
-            try
-            {
-                sharePointAccount = properties.AfterProperties["SharePointAccount"].ToString();
-            }
-            catch
-            {
-                try
-                {
-                    sharePointAccount = properties.ListItem["SharePointAccount"].ToString();
-                }
-                catch
-                {
-                    sharePointAccount = string.Empty;
-                }
-            }
-
-            if (string.IsNullOrEmpty(sharePointAccount))
-            {
-                throw new Exception("Please provide a valid SharePoint Account.");
-            }
-
-            SPFieldUserValue uv;
-
-            try
-            {
-                uv = new SPFieldUserValue(properties.Web, sharePointAccount);
-            }
-            catch
-            {
-                throw new Exception(sharePointAccount + " is not a valid SharePoint account.");
-            }
-
-            SPUser u = uv.User ?? properties.Web.EnsureUser(uv.LookupValue);
-
-            string query = string.Format(@"<Where><Eq><FieldRef Name='SharePointAccount' LookupId='TRUE'/><Value Type='Int'>{0}</Value></Eq></Where>", u.ID);
-            const string viewFields = @"<FieldRef Name='Title' Nullable='TRUE'/>";
-
-            SPListItemCollection spListItemCollection = null;
-
-            try
-            {
-                spListItemCollection = properties.List.GetItems(new SPQuery { Query = query, ViewFields = viewFields });
-            }
-            catch { }
-
-            if (spListItemCollection == null) return;
-            if (spListItemCollection.Count <= 0) return;
-
-            SPListItem spListItem = spListItemCollection[0];
-
-            throw new Exception(string.Format("This SharePoint Account ({0}) is currently associated with {1}",
-                                              u.LoginName, spListItem["Title"]));
         }
 
         /// <summary>
