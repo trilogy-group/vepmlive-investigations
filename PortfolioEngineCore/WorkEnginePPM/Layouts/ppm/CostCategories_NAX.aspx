@@ -366,7 +366,7 @@ html, body {
                 break;
             case "btnAddRole":
                 var grid = tgrid1.grid;
-                var parentrow = getParentRow(grid, tgrid1_selectedRow);
+                var parentrow = tgrid1_selectedRow;
                 if (parentrow != null) {
                     var masterRoles = document.getElementById('<%=ddlResourceRoles.ClientID%>');
                     var availableRolesSelect = document.getElementById('idAvailableRoles');
@@ -614,7 +614,7 @@ html, body {
         switch (event) {
             case "ok":
                 var grid = tgrid1.grid;
-                var parentrow = getParentRow(grid, tgrid1_selectedRow);
+                var parentrow = tgrid1_selectedRow;
                 if (parentrow != null) {
                     var uid = grid.GetAttribute(parentrow, "CA_UID", null);
                     var options = document.getElementById('idAvailableRoles').options;
