@@ -4304,7 +4304,9 @@ namespace ModelDataCache
                     sGuids = sGuids.Substring(i + 1);
                 }
 
-                if (sGin != "")
+                // Avoiding "UNDEFINED.UNDEFINED.UNDEFINED" value which comes due to selection of grouping row and is not required.
+                // Failing to do so was resulting in unwanted popup message "Not all list items had matching Portfolio items!" before loading Cost Analyzer
+                if (sGin != "" && !sGin.Equals("UNDEFINED.UNDEFINED.UNDEFINED", StringComparison.InvariantCultureIgnoreCase))
                 {
 
                     sCommand = "SELECT PROJECT_ID FROM EPGP_PROJECTS WHERE { fn UCASE(PROJECT_EXT_UID) }  = '" + sGin + "'";
