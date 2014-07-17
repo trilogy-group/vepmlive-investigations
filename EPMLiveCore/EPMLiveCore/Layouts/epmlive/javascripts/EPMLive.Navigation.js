@@ -438,7 +438,7 @@
                             _select(true);
                             openMenu();
 
-                            $.cookie(selectedTlNodeCookie, _id, cookieOptions);
+                            $.cookie(selectedTlNodeCookie, JSON.stringify({ id: _id, webUrl: $$.currentWebUrl() }), cookieOptions);
                             
                             for (var n2 in tlNodes) {
                                 if (tlNodes.hasOwnProperty(n2)) {
@@ -521,7 +521,15 @@
                 };
 
                 function getSelectedSubLevelNode() {
-                    return ($.cookie(selectedTlNodeCookie) || 'epm-nav-top-ql').replace('epm-nav-top-', 'epm-nav-sub-');
+                    var tlNode = 'epm-nav-top-ql';
+
+                    try {
+                        var cookie = $.parseJSON($.cookie(selectedTlNodeCookie));
+                        if (cookie.webUrl === $$.currentWebUrl()) tlNode = cookie.id;
+                    } catch (e) {
+                    }
+
+                    return tlNode.replace('epm-nav-top-', 'epm-nav-sub-');
                 }
 
                 function getLinkNodes(menu) {
