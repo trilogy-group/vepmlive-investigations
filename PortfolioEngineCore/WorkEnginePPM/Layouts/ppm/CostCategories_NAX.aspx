@@ -380,7 +380,7 @@ html, body {
                                 bAdd = false; 
                                 break; 
                             }
-                            row = grid.GetNextSibling(row);
+                            row = row.nextSibling;
                         }
                         if (bAdd)
                             availableRolesSelect.options[availableRolesSelect.options.length] = new Option(masterRoles.options[i].text, masterRoles.options[i].value);
