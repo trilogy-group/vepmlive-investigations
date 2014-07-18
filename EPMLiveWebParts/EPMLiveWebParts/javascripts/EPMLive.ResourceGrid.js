@@ -1191,15 +1191,16 @@ function registerEpmLiveResourceGridScript() {
                                 };
 
                                 setTabStyle();
-
                                 if (window.epmLiveMasterPageVersion >= 5.5) {
                                     if (!epmLiveResourceGrid.loaderStopped) {
-                                        if ($$.ribbonBehavior == 0) {
-                                            $(document.getElementById("s4-ribbonrow")).height(126);
-                                        }
-                                        else {
-                                            $(document.getElementById("s4-ribbonrow")).height(35);
-                                        }
+
+                                        //if ($$.ribbonBehavior == 0) {
+                                        //    $(document.getElementById("s4-ribbonrow")).height(126);
+                                        //}
+                                        //else {
+                                        //    $(document.getElementById("s4-ribbonrow")).height(35);
+                                        //}
+
                                         window.EPM.UI.Loader.current().stopLoading('WebPart' + $$.webpartQualifier);
                                         epmLiveResourceGrid.loaderStopped = true;
                                     }
