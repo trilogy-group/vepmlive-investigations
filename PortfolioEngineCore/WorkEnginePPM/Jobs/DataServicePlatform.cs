@@ -37,7 +37,7 @@ namespace WorkEnginePPM.Jobs
                 switch (scheduleDataImportRequest.Module)
                 {
                     case DSMModule.CostPlanner:
-                        var dsmModule = new DSMCostPlanner(spWeb, scheduleDataImportRequest.FileId.ToString(), basePath, userName, ppmId, ppmCompany, ppmDbConn, securityLevel);
+                        var dsmModule = new DSMCostPlanner(spWeb, scheduleDataImportRequest.FileId.ToString(), scheduleDataImportRequest.ListId.ToString(), basePath, userName, ppmId, ppmCompany, ppmDbConn, securityLevel);
                         dsmModule.DSMProgressChanged += DSMProgressChanged;
                         dsmModule.DSMCompleted += DSMCompleted;
                         dsmModule.ImportData();

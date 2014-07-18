@@ -17,6 +17,7 @@ namespace WorkEnginePPM.DataServiceModules
 
         private SPWeb _spWeb;
         private string _fileId;
+        private string _listId;
         private DSMResult _dSMResult;
 
         private const string colCalendar = "calendar";
@@ -61,12 +62,13 @@ namespace WorkEnginePPM.DataServiceModules
 
         #endregion
 
-        public DSMCostPlanner(SPWeb spWeb, string fileId, string basepath, string username, string pid, string company, string dbcnstring, SecurityLevels secLevel, bool bDebug = false)
+        public DSMCostPlanner(SPWeb spWeb, string fileId, string listId, string basepath, string username, string pid, string company, string dbcnstring, SecurityLevels secLevel, bool bDebug = false)
             : base(basepath, username, pid, company, dbcnstring, secLevel, bDebug)
         {
 
             _spWeb = spWeb;
             _fileId = fileId;
+            _listId = listId;
 
             if (!_spWeb.CurrentUser.IsSiteAdmin)
             {
@@ -150,39 +152,39 @@ namespace WorkEnginePPM.DataServiceModules
                                 if (calendarValue != Convert.ToString(row[col.ColumnName]))
                                 {
                                     calendarValue = Convert.ToString(row[col.ColumnName]);
-                                    calendarId = GetMasterRecordId(col.ColumnName, calendarValue, 0);
+                                    calendarId = GetMasterRecordId(col.ColumnName, calendarValue, "0");
                                     customIdentityValues.Clear();
-                                    if (calendarId == 0)
-                                    {
-                                        isCalendarIdDirty = true;
-                                        rowError.Append(FormatMessage(calendarValue, null, null, null, null, 0, 0, "Invalid Calendar."));
-                                    }
+                                }
+                                if (calendarId == 0)
+                                {
+                                    isCalendarIdDirty = true;
+                                    rowError.Append(FormatMessage(calendarValue, null, null, null, null, 0, 0, "Invalid Calendar."));
                                 }
                                 break;
                             case colProject:
                                 if (projectValue != Convert.ToString(row[col.ColumnName]))
                                 {
                                     projectValue = Convert.ToString(row[col.ColumnName]);
-                                    projectId = GetMasterRecordId(col.ColumnName, projectValue, 0);
+                                    projectId = GetMasterRecordId(col.ColumnName, projectValue, _listId);
                                     customIdentityValues.Clear();
-                                    if (projectId == 0)
-                                    {
-                                        isProjectIdDirty = true;
-                                        rowError.Append(FormatMessage(calendarValue, projectValue, null, null, null, 0, 0, "Invalid Project."));
-                                    }
+                                }
+                                if (projectId == 0)
+                                {
+                                    isProjectIdDirty = true;
+                                    rowError.Append(FormatMessage(calendarValue, projectValue, null, null, null, 0, 0, "Invalid Project."));
                                 }
                                 break;
                             case colCostType:
                                 if (costTypeValue != Convert.ToString(row[col.ColumnName]))
                                 {
                                     costTypeValue = Convert.ToString(row[col.ColumnName]);
-                                    costTypeId = GetMasterRecordId(col.ColumnName, costTypeValue, 0);
+                                    costTypeId = GetMasterRecordId(col.ColumnName, costTypeValue, "0");
                                     customIdentityValues.Clear();
-                                    if (costTypeId == 0)
-                                    {
-                                        isCostTypeIdDirty = true;
-                                        rowError.Append(FormatMessage(calendarValue, projectValue, costTypeValue, null, null, 0, 0, "Invalid Cost type."));
-                                    }
+                                }
+                                if (costTypeId == 0)
+                                {
+                                    isCostTypeIdDirty = true;
+                                    rowError.Append(FormatMessage(calendarValue, projectValue, costTypeValue, null, null, 0, 0, "Invalid Cost type."));
                                 }
                                 break;
                             case colCostCategory:
@@ -191,7 +193,7 @@ namespace WorkEnginePPM.DataServiceModules
                                     string[] costCategoryArray = Convert.ToString(row[col.ColumnName]).Split('.');
                                     costCategoryFullName = Convert.ToString(row[col.ColumnName]);
                                     costCategoryValue = costCategoryArray[costCategoryArray.Length - 1];
-                                    costCategoryId = GetMasterRecordId(col.ColumnName, costCategoryValue, costTypeId);
+                                    costCategoryId = GetMasterRecordId(col.ColumnName, costCategoryValue, costTypeId.ToString());
                                     customIdentityValues.Clear();
                                     if (costCategoryId == 0)
                                     {
@@ -204,12 +206,12 @@ namespace WorkEnginePPM.DataServiceModules
                                 if (periodValue != Convert.ToString(row[col.ColumnName]))
                                 {
                                     periodValue = Convert.ToString(row[col.ColumnName]);
-                                    periodId = GetMasterRecordId(col.ColumnName, periodValue, calendarId);
-                                    if (periodId == 0)
-                                    {
-                                        isPeriodIdDirty = true;
-                                        rowError.Append(FormatMessage(calendarValue, projectValue, costTypeValue, costCategoryValue, periodValue, 0, 0, "Invalid Period."));
-                                    }
+                                    periodId = GetMasterRecordId(col.ColumnName, periodValue, calendarId.ToString());
+                                }
+                                if (periodId == 0)
+                                {
+                                    isPeriodIdDirty = true;
+                                    rowError.Append(FormatMessage(calendarValue, projectValue, costTypeValue, costCategoryValue, periodValue, 0, 0, "Invalid Period."));
                                 }
                                 break;
                             case colDetailRow:
@@ -369,6 +371,8 @@ namespace WorkEnginePPM.DataServiceModules
 
                 #endregion
 
+                #region Save Rows
+
                 var costDataQuery = from row in _dtInsertCostData.AsEnumerable()
                                     group row by new { calendarid = row["calendarid"], calendarname = row["calendarname"], projectid = row["projectid"], projectname = row["projectname"], costtypeid = row["costtypeid"], costtypename = row["costtypename"] } into grp
                                     select new
@@ -377,102 +381,126 @@ namespace WorkEnginePPM.DataServiceModules
                                     };
                 foreach (var grp in costDataQuery)
                 {
-                    DataRow[] invalidRows = _dtInsertCostData.Select(string.Format("calendarid={0} and projectid={1} and costtypeid={2} and iscustomfielddirty='True'", grp.key.calendarid, grp.key.projectid, grp.key.costtypeid));
+                    calendarId = Convert.ToInt32(grp.key.calendarid);
+                    calendarValue = Convert.ToString(grp.key.calendarname);
+                    projectId = Convert.ToInt32(grp.key.projectid);
+                    projectValue = Convert.ToString(grp.key.projectname);
+                    costTypeId = Convert.ToInt32(grp.key.costtypeid);
+                    costTypeValue = Convert.ToString(grp.key.costtypename);
 
-                    if (invalidRows != null && invalidRows.Count() > 0)
+                    if (calendarId == 0 || projectId == 0 || costTypeId == 0)
                     {
-                        _processedRecords = _processedRecords + (from row in _dtInsertCostData.AsEnumerable()
-                                                                 where
-                                                                 row["calendarid"].Equals(grp.key.calendarid) &&
-                                                                 row["projectid"].Equals(grp.key.projectid) &&
-                                                                 row["costtypeid"].Equals(grp.key.costtypeid)
-                                                                 select row).Count();
-                        _failedRecords = _failedRecords + _processedRecords;
-                        LogDSMMessage(Convert.ToString(invalidRows[0]["rowerror"]), 1);
-                        RaiseDSMProgressChangedEvent("Importing Data...");
+                        DataRow[] invalidRows = _dtInsertCostData.Select(string.Format("calendarid={0} and calendarname='{1}' and projectid={2} and projectname='{3}' and costtypeid={4} and costtypename='{5}'", calendarId, calendarValue, projectId, projectValue, costTypeId, costTypeValue));
+                        if (invalidRows != null && invalidRows.Count() > 0)
+                        {
+                            _processedRecords = _processedRecords + invalidRows.Count();
+                            _failedRecords = _failedRecords + invalidRows.Count();
+                            LogDSMMessage(Convert.ToString(invalidRows[0]["rowerror"]), 1);
+                            RaiseDSMProgressChangedEvent("Importing Data...");
+                        }
                     }
                     else
                     {
-                        _dvCostCategories.RowFilter = String.Empty;
-                        _dvCostCategories.RowFilter = String.Format("ct_id={0}", grp.key.costtypeid);
-                        foreach (DataRowView dataRowView in _dvCostCategories)
-                        {
-                            //pending code for rateid
-                            var costCategoryRowCount = (from row in _dtInsertCostData.AsEnumerable()
-                                                        where
-                                                        row["calendarid"].Equals(grp.key.calendarid) &&
-                                                        row["projectid"].Equals(grp.key.projectid) &&
-                                                        row["costtypeid"].Equals(grp.key.costtypeid) &&
-                                                        row["bc_uid"].Equals(dataRowView["bc_uid"])
-                                                        select row).Count();
-                            if (costCategoryRowCount == 0)
-                                _dtInsertCostData.Rows.Add(new object[] { grp.key.calendarid, grp.key.calendarname, grp.key.projectid, grp.key.projectname, grp.key.costtypeid, grp.key.costtypename, dataRowView["bc_uid"], dataRowView["bc_name"], 0, 0, 0, 0, 0, 0, 0, "", "", "", "", "", 0, "", 0, 0, false, false, "", true });
 
+                        #region Filter and Save Rows
+
+                        DataRow[] invalidRows = _dtInsertCostData.Select(string.Format("calendarid={0} and projectid={1} and costtypeid={2} and iscustomfielddirty='True'", calendarId, projectId, costTypeId));
+
+                        if (invalidRows != null && invalidRows.Count() > 0)
+                        {
+                            Int32 failCount = (from row in _dtInsertCostData.AsEnumerable()
+                                               where
+                                               row["calendarid"].Equals(calendarId) &&
+                                               row["projectid"].Equals(projectId) &&
+                                               row["costtypeid"].Equals(costTypeId)
+                                               select row).Count();
+                            _processedRecords = _processedRecords + failCount;
+                            _failedRecords = _failedRecords + failCount;
+                            LogDSMMessage(Convert.ToString(invalidRows[0]["rowerror"]), 1);
+                            RaiseDSMProgressChangedEvent("Importing Data...");
                         }
-
-                        DataTable dtInsertCostDetails = new DataTable();
-                        dtInsertCostDetails.Columns.Add("BC_UID");
-                        dtInsertCostDetails.Columns.Add("BC_SEQ");
-                        dtInsertCostDetails.Columns.Add("RT_UID");
-                        dtInsertCostDetails.Columns.Add("OC_01");
-                        dtInsertCostDetails.Columns.Add("OC_02");
-                        dtInsertCostDetails.Columns.Add("OC_03");
-                        dtInsertCostDetails.Columns.Add("OC_04");
-                        dtInsertCostDetails.Columns.Add("OC_05");
-                        dtInsertCostDetails.Columns.Add("TEXT_01");
-                        dtInsertCostDetails.Columns.Add("TEXT_02");
-                        dtInsertCostDetails.Columns.Add("TEXT_03");
-                        dtInsertCostDetails.Columns.Add("TEXT_04");
-                        dtInsertCostDetails.Columns.Add("TEXT_05");
-
-                        DataTable dtInsertCostDetailValues = new DataTable();
-                        dtInsertCostDetailValues.Columns.Add("BC_UID");
-                        dtInsertCostDetailValues.Columns.Add("BC_SEQ");
-                        dtInsertCostDetailValues.Columns.Add("BD_PERIOD");
-                        dtInsertCostDetailValues.Columns.Add("BD_VALUE");
-                        dtInsertCostDetailValues.Columns.Add("BD_COST");
-
-                        var insertCostDetailsQuery = from row in _dtInsertCostData.AsEnumerable()
-                                                     where
-                                                     row["calendarid"].Equals(grp.key.calendarid) &&
-                                                     row["projectid"].Equals(grp.key.projectid) &&
-                                                     row["costtypeid"].Equals(grp.key.costtypeid)
-                                                     group row by new
-                                                     {
-                                                         calendarid = row["calendarid"],
-                                                         calendarname = row["calendarname"],
-                                                         projectid = row["projectid"],
-                                                         projectname = row["projectname"],
-                                                         costtypeid = row["costtypeid"],
-                                                         costtypename = row["costtypename"],
-                                                         bc_uid = row["bc_uid"],
-                                                         costcategoryname = row["costcategoryname"],
-                                                         bc_seq = row["bc_seq"],
-                                                         rt_uid = row["rt_uid"],
-                                                         oc_01 = row["oc_01"],
-                                                         oc_02 = row["oc_02"],
-                                                         oc_03 = row["oc_03"],
-                                                         oc_04 = row["oc_04"],
-                                                         oc_05 = row["oc_05"],
-                                                         text_01 = row["text_01"],
-                                                         text_02 = row["text_02"],
-                                                         text_03 = row["text_03"],
-                                                         text_04 = row["text_04"],
-                                                         text_05 = row["text_05"],
-                                                         isdirty = row["isdirty"],
-                                                         iscustomfielddirty = row["iscustomfielddirty"]
-                                                     } into icdGrp
-                                                     select new
-                                                     {
-                                                         key = icdGrp.Key
-                                                     };
-
-                        foreach (var icdGrp in insertCostDetailsQuery)
+                        else
                         {
-                            Boolean isDirty = Convert.ToBoolean(icdGrp.key.isdirty);
-                            if (!isDirty)
+                            _dvCostCategories.RowFilter = String.Empty;
+                            _dvCostCategories.RowFilter = String.Format("ct_id={0}", costTypeId);
+                            foreach (DataRowView dataRowView in _dvCostCategories)
                             {
-                                dtInsertCostDetails.Rows.Add(new object[] { 
+                                //pending code for rateid
+                                var costCategoryRowCount = (from row in _dtInsertCostData.AsEnumerable()
+                                                            where
+                                                            row["calendarid"].Equals(calendarId) &&
+                                                            row["projectid"].Equals(projectId) &&
+                                                            row["costtypeid"].Equals(costTypeId) &&
+                                                            row["bc_uid"].Equals(dataRowView["bc_uid"])
+                                                            select row).Count();
+                                if (costCategoryRowCount == 0)
+                                    _dtInsertCostData.Rows.Add(new object[] { calendarId, calendarValue, projectId, projectValue, costTypeId, costTypeValue, dataRowView["bc_uid"], dataRowView["bc_name"], 0, 0, 0, 0, 0, 0, 0, "", "", "", "", "", 0, "", 0, 0, false, false, "", true });
+
+                            }
+
+                            DataTable dtInsertCostDetails = new DataTable();
+                            dtInsertCostDetails.Columns.Add("BC_UID");
+                            dtInsertCostDetails.Columns.Add("BC_SEQ");
+                            dtInsertCostDetails.Columns.Add("RT_UID");
+                            dtInsertCostDetails.Columns.Add("OC_01");
+                            dtInsertCostDetails.Columns.Add("OC_02");
+                            dtInsertCostDetails.Columns.Add("OC_03");
+                            dtInsertCostDetails.Columns.Add("OC_04");
+                            dtInsertCostDetails.Columns.Add("OC_05");
+                            dtInsertCostDetails.Columns.Add("TEXT_01");
+                            dtInsertCostDetails.Columns.Add("TEXT_02");
+                            dtInsertCostDetails.Columns.Add("TEXT_03");
+                            dtInsertCostDetails.Columns.Add("TEXT_04");
+                            dtInsertCostDetails.Columns.Add("TEXT_05");
+
+                            DataTable dtInsertCostDetailValues = new DataTable();
+                            dtInsertCostDetailValues.Columns.Add("BC_UID");
+                            dtInsertCostDetailValues.Columns.Add("BC_SEQ");
+                            dtInsertCostDetailValues.Columns.Add("BD_PERIOD");
+                            dtInsertCostDetailValues.Columns.Add("BD_VALUE");
+                            dtInsertCostDetailValues.Columns.Add("BD_COST");
+
+                            var insertCostDetailsQuery = from row in _dtInsertCostData.AsEnumerable()
+                                                         where
+                                                         row["calendarid"].Equals(calendarId) &&
+                                                         row["projectid"].Equals(projectId) &&
+                                                         row["costtypeid"].Equals(costTypeId)
+                                                         group row by new
+                                                         {
+                                                             calendarid = row["calendarid"],
+                                                             calendarname = row["calendarname"],
+                                                             projectid = row["projectid"],
+                                                             projectname = row["projectname"],
+                                                             costtypeid = row["costtypeid"],
+                                                             costtypename = row["costtypename"],
+                                                             bc_uid = row["bc_uid"],
+                                                             costcategoryname = row["costcategoryname"],
+                                                             bc_seq = row["bc_seq"],
+                                                             rt_uid = row["rt_uid"],
+                                                             oc_01 = row["oc_01"],
+                                                             oc_02 = row["oc_02"],
+                                                             oc_03 = row["oc_03"],
+                                                             oc_04 = row["oc_04"],
+                                                             oc_05 = row["oc_05"],
+                                                             text_01 = row["text_01"],
+                                                             text_02 = row["text_02"],
+                                                             text_03 = row["text_03"],
+                                                             text_04 = row["text_04"],
+                                                             text_05 = row["text_05"],
+                                                             isdirty = row["isdirty"],
+                                                             iscustomfielddirty = row["iscustomfielddirty"]
+                                                         } into icdGrp
+                                                         select new
+                                                         {
+                                                             key = icdGrp.Key
+                                                         };
+
+                            foreach (var icdGrp in insertCostDetailsQuery)
+                            {
+                                Boolean isDirty = Convert.ToBoolean(icdGrp.key.isdirty);
+                                if (!isDirty)
+                                {
+                                    dtInsertCostDetails.Rows.Add(new object[] { 
                                     icdGrp.key.bc_uid, 
                                     icdGrp.key.bc_seq, 
                                     icdGrp.key.rt_uid, 
@@ -487,63 +515,67 @@ namespace WorkEnginePPM.DataServiceModules
                                     icdGrp.key.text_04, 
                                     icdGrp.key.text_05
                                 });
-                            }
-                        }
-
-                        var insertCostDetailValueQuery = from row in _dtInsertCostData.AsEnumerable()
-                                                         where
-                                                         row["calendarid"].Equals(grp.key.calendarid) &&
-                                                         row["projectid"].Equals(grp.key.projectid) &&
-                                                         row["costtypeid"].Equals(grp.key.costtypeid)
-                                                         select row;
-
-                        foreach (DataRow row in insertCostDetailValueQuery)
-                        {
-                            Boolean isDirty = Convert.ToBoolean(row["isdirty"]);
-                            if (isDirty)
-                            {
-                                if (!Convert.ToBoolean(row["isdefault"]))
-                                {
-                                    _failedRecords = _failedRecords + 1;
-                                    LogDSMMessage(Convert.ToString(row["rowerror"]), 1);
                                 }
                             }
-                            else
+
+                            var insertCostDetailValueQuery = from row in _dtInsertCostData.AsEnumerable()
+                                                             where
+                                                             row["calendarid"].Equals(calendarId) &&
+                                                             row["projectid"].Equals(projectId) &&
+                                                             row["costtypeid"].Equals(costTypeId)
+                                                             select row;
+
+                            foreach (DataRow row in insertCostDetailValueQuery)
                             {
-                                dtInsertCostDetailValues.Rows.Add(new object[] { 
+                                Boolean isDirty = Convert.ToBoolean(row["isdirty"]);
+                                if (isDirty)
+                                {
+                                    if (!Convert.ToBoolean(row["isdefault"]))
+                                    {
+                                        _failedRecords = _failedRecords + 1;
+                                        LogDSMMessage(Convert.ToString(row["rowerror"]), 1);
+                                    }
+                                }
+                                else
+                                {
+                                    dtInsertCostDetailValues.Rows.Add(new object[] { 
                                     row["bc_uid"], 
                                     row["bc_seq"], 
                                     row["bd_period"], 
                                     row["bd_value"], 
                                     row["bd_cost"]
                                 });
+                                    if (!Convert.ToBoolean(row["isdefault"]))
+                                    {
+                                        _successRecords = _successRecords + 1;
+                                        LogDSMMessage(FormatMessage(Convert.ToString(row["calendarname"]), Convert.ToString(row["projectname"]), Convert.ToString(row["costtypename"]), Convert.ToString(row["costcategoryname"]), Convert.ToString(row["bdperiodname"]), Convert.ToDouble(row["bd_value"]), Convert.ToDouble(row["bd_cost"]), "Processed."), 0);
+                                    }
+                                }
+
                                 if (!Convert.ToBoolean(row["isdefault"]))
                                 {
-                                    _successRecords = _successRecords + 1;
-                                    LogDSMMessage(FormatMessage(Convert.ToString(row["calendarname"]), Convert.ToString(row["projectname"]), Convert.ToString(row["costtypename"]), Convert.ToString(row["costcategoryname"]), Convert.ToString(row["bdperiodname"]), Convert.ToDouble(row["bd_value"]), Convert.ToDouble(row["bd_cost"]), "Processed."), 0);
+                                    _processedRecords = _processedRecords + 1;
                                 }
                             }
 
-                            if (!Convert.ToBoolean(row["isdefault"]))
+                            if (SaveRows(calendarId, projectId, costTypeId, dtInsertCostDetails, dtInsertCostDetailValues))
                             {
-                                _processedRecords = _processedRecords + 1;
+                                LogDSMMessage(FormatMessage(calendarValue, projectValue, costTypeValue, null, null, 0, 0, "Data import succeeded."), 0);
                             }
+                            else
+                            {
+                                LogDSMMessage(FormatMessage(calendarValue, projectValue, costTypeValue, null, null, 0, 0, "Data import failed."), 1);
+                            }
+
+                            RaiseDSMProgressChangedEvent("Importing Data...");
                         }
 
-                        if (SaveRows(Convert.ToInt32(grp.key.calendarid), Convert.ToInt32(grp.key.projectid), Convert.ToInt32(grp.key.costtypeid), dtInsertCostDetails, dtInsertCostDetailValues))
-                        {
-                            LogDSMMessage(FormatMessage(Convert.ToString(grp.key.calendarname), Convert.ToString(grp.key.projectname), Convert.ToString(grp.key.costtypename), null, null, 0, 0, "Data import succeeded."), 0);
-                        }
-                        else
-                        {
-                            LogDSMMessage(FormatMessage(Convert.ToString(grp.key.calendarname), Convert.ToString(grp.key.projectname), Convert.ToString(grp.key.costtypename), null, null, 0, 0, "Data import failed."), 1);
-                        }
+                        #endregion
 
-                        RaiseDSMProgressChangedEvent("Importing Data...");
                     }
-
-
                 }
+
+                #endregion
 
             }
             catch (Exception ex)
@@ -608,7 +640,7 @@ namespace WorkEnginePPM.DataServiceModules
             return returnValue;
         }
 
-        private Int32 GetMasterRecordId(string columnName, string columnValue, Int32 foreignKeyId)
+        private Int32 GetMasterRecordId(string columnName, string columnValue, string foreignKeyId)
         {
             Int32 returnValue = 0;
             switch (columnName)
@@ -623,7 +655,7 @@ namespace WorkEnginePPM.DataServiceModules
                     break;
                 case colProject:
                     _dvProjects.RowFilter = String.Empty;
-                    _dvProjects.RowFilter = string.Format("project_name='{0}'", columnValue);
+                    _dvProjects.RowFilter = string.Format("project_ext_uid like ('{0}.{1}%') and project_name='{2}'", _spWeb.ID, foreignKeyId, columnValue);
                     if (_dvProjects.Count > 0)
                     {
                         returnValue = Convert.ToInt32(_dvProjects[0]["project_id"]);
@@ -766,7 +798,7 @@ namespace WorkEnginePPM.DataServiceModules
                 dtCostBreakdowns = null;
             }
 
-            using (SqlDataAdapter sqlDataAdapter = new SqlDataAdapter("select project_id, project_name from epgp_projects", _PFECN))
+            using (SqlDataAdapter sqlDataAdapter = new SqlDataAdapter("select project_id, project_name, project_ext_uid from epgp_projects", _PFECN))
             {
                 DataTable dtProjects = new DataTable();
                 sqlDataAdapter.Fill(dtProjects);

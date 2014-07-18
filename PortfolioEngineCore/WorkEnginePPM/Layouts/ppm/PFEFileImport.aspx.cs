@@ -46,6 +46,12 @@ namespace WorkEnginePPM.Layouts.ppm
                     return;
                 }
 
+                if (Request["listid"] == null)
+                {
+                    lblError.Text = String.Format("Please select a proper list for importing cost data.");
+                    return;
+                }
+
                 /// Incase we are integrating using webservice
                 using (PortfolioEngineAPI api = new PortfolioEngineAPI())
                 {
@@ -63,6 +69,7 @@ namespace WorkEnginePPM.Layouts.ppm
                     {
                         ScheduleDataImportRequest scheduleDataImportRequest = new ScheduleDataImportRequest();
                         scheduleDataImportRequest.Module = DSMModule.CostPlanner;
+                        scheduleDataImportRequest.ListId = new Guid(Request["listid"]);
                         scheduleDataImportRequest.FileId = fileId;
 
                         scheduleDataImportXDocument = XDocument.Parse(api.Execute("ScheduleDataImport", PFEDataServiceUtils.JsonSerializer(scheduleDataImportRequest)));
