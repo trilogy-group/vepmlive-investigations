@@ -21,6 +21,7 @@ namespace EPMLiveCore.Jobs
 
 
             List<string> cNewGrps = new List<string>();
+
             bool isSecure = false;
             try
             {
@@ -30,12 +31,12 @@ namespace EPMLiveCore.Jobs
 
             SPUser orignalUser = web.AllUsers.GetByID(userid);
 
+            string safeTitle = !string.IsNullOrEmpty(li.Title) ? GetSafeGroupTitle(li.Title) : string.Empty;
+
             if (isSecure)
             {
                 if (!li.HasUniqueRoleAssignments)
                 {
-                    string safeTitle = !string.IsNullOrEmpty(li.Title) ? GetSafeGroupTitle(li.Title) : string.Empty;
-
                     web.AllowUnsafeUpdates = true;
 
                     // step 1 perform actions related to "parent item"
@@ -169,14 +170,19 @@ namespace EPMLiveCore.Jobs
 
                     }
 
-                    //List<SPRoleAssignment> lra = (from SPRoleAssignment ra in ei.RoleAssignments
-                    //                              where !pNewGrps.Contains(ra.Member.Name) &&
-                    //                                    !cNewGrps.Contains(ra.Member.Name)
-                    //                              select ra).ToList();
-                    //foreach (SPRoleAssignment r in lra)
-                    //{
-                    //    ei.RoleAssignments.RemoveById(r.Member.ID);
-                    //}
+
+                    List<string> liGrps = new List<string>();
+                    liGrps.Add(string.Format("{0} Owner", safeTitle));
+                    liGrps.Add(string.Format("{0} Member", safeTitle));
+                    liGrps.Add(string.Format("{0} Visitor", safeTitle));
+                    List<SPRoleAssignment> lra = (from SPRoleAssignment ra in li.RoleAssignments
+                                                  where !liGrps.Contains(ra.Member.Name) &&
+                                                        !cNewGrps.Contains(ra.Member.Name)
+                                                  select ra).ToList();
+                    foreach (SPRoleAssignment r in lra)
+                    {
+                        li.RoleAssignments.RemoveById(r.Member.ID);
+                    }
                 }
             }
 
@@ -186,7 +192,7 @@ namespace EPMLiveCore.Jobs
             // only if there isn't a current process creating ws 
             WorkspaceTimerjobAgent.QueueWorkspaceJobOnHoldForSecurity(site.ID, web.ID, list.ID, li.ID);
         }
-     
+
         private void ProcessSecurity(SPSite site, SPList list, SPListItem li, int userid)
         {
 
