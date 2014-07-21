@@ -1361,7 +1361,16 @@ namespace EPMLiveWebParts
                         ribbonExtensions = new XmlDocument();
                         ribbonExtensions.LoadXml("<Button Id=\"Ribbon.List.Share.RefreshItems\" Sequence=\"1\" Command=\"RefreshItems\"  Image32by32=\"/_layouts/epmlive/images/refresh.png\" LabelText=\"Refresh Items\" ToolTipTitle=\"Refresh Items\" ToolTipDescription=\"Refresh all items in grid.\" TemplateAlias=\"o1\"/>");
                         ribbon.RegisterDataExtension(ribbonExtensions.FirstChild, "Ribbon.List.Actions.Controls._children");
-                        
+
+                        //=====================PFE Import Export
+
+                        if (list.Title.Equals("Project Center"))
+                        {
+                            ribbonExtensions = new XmlDocument();
+                            ribbonExtensions.LoadXml(@"<Button Id=""Ribbon.List.Share.PFEImportCostsData"" Sequence=""2"" Command=""PFEImportCostsData"" LabelText=""Import Costs"" TemplateAlias=""o1"" ToolTipTitle=""Import Costs"" ToolTipDescription=""Import costs data into portfolio engine database."" Image32by32=""/_layouts/epmlive/images/ribbon/excel-import-32.png""/>");
+                            ribbon.RegisterDataExtension(ribbonExtensions.FirstChild, "Ribbon.List.Actions.Controls._children");
+                        }
+
                         if (bRollups || requestList)
                         {
                             //workspace = "<Button Id=\"Ribbon.ListItem.EPMLive.GoToWorkspace\" Sequence=\"12\" Command=\"GoToWorkspace\" LabelText=\"Go To Workspace\" TemplateAlias=\"o1\" Image32by32=\"_layouts/images/epmlivelogo.gif\"/>";

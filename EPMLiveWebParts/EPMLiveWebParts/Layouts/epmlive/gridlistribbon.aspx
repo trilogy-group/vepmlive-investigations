@@ -177,6 +177,7 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
         Array.add($arr, 'ScrollTask');
 
         Array.add($arr, 'RefreshItems');
+        Array.add($arr, 'PFEImportCostsData');
 
         Array.add($arr, 'ConnectToClient');
 
@@ -426,6 +427,7 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
             case "ScrollTask":
             case "ShowFilters":
             case "RefreshItems":
+            case "PFEImportCostsData":
             case "EPMLiveAnalyzeGroup":
             case "LPlannerPE":
             case "ListEPMLiveEditPE":
@@ -1205,6 +1207,13 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
             var $v_G = new SP.Guid(this.$Grid._listid);
             var $v_H = this.$curWebUrl + '/_layouts/epmlive/refreshind.aspx?ListId=' + SP.Utilities.HttpUtility.urlKeyValueEncode($v_G.toString('B').toUpperCase()) + '&Source=' + document.location.href;
             SP.Utilities.HttpUtility.navigateTo($v_H);
+        }
+        else if(commandId === 'PFEImportCostsData')
+        {
+            var $v_G = new SP.Guid(this.$Grid._listid);
+            var $v_H = this.$curWebUrl + '/_layouts/ppm/pfefileimport.aspx?listid=' + SP.Utilities.HttpUtility.urlKeyValueEncode($v_G.toString('B').toUpperCase()) + '&Source=' + document.location.href;
+            var options = { url: $v_H, showMaximized: false, showClose: false };
+            SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
         }
         else if(commandId === 'EPKCostView')
         {
