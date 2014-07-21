@@ -10,7 +10,7 @@ using System.Data.SqlClient;
 using System.Collections;
 using System.Diagnostics;
 using System.Linq;
-
+using System.Collections.Generic;
 using System.Reflection;
 using System.Resources;
 
@@ -306,7 +306,7 @@ namespace EPMLiveCore
                             else
                                 bool.TryParse(EPMLiveCore.CoreFunctions.getConfigSetting(lweb, "EPMLivePlanner" + sPlanner[0] + "EnableOnline"), out canOnline);
 
-                            if(!canOnline)
+                            if (!canOnline)
                                 bool.TryParse(EPMLiveCore.CoreFunctions.getConfigSetting(lweb, "EPMLivePlanner" + sPlanner[0] + "EnableKanban"), out canOnline);
 
                             bool.TryParse(EPMLiveCore.CoreFunctions.getConfigSetting(lweb, "EPMLivePlanner" + sPlanner[0] + "EnableProject"), out canProject);
@@ -828,9 +828,11 @@ namespace EPMLiveCore
             try
             {
                 SPField oField = null;
-                try{
+                try
+                {
                     oField = ListItem.ParentList.Fields.GetFieldByInternalName("DueDate");
-                }catch{}
+                }
+                catch { }
                 if (oField != null)
                 {
                     ss = "green.gif";
@@ -1969,7 +1971,7 @@ namespace EPMLiveCore
             catch (Exception ex) { return ex.Message.ToString(); }
         }
 
-        public static string createSite(string title,string description, string url, string template, string user, bool unique, bool toplink,
+        public static string createSite(string title, string description, string url, string template, string user, bool unique, bool toplink,
             SPWeb parentWeb, out Guid createdWebId, out string createdWebUrl, out string createdWebServerRelativeUrl, out string createdWebTitle)
         {
             createdWebId = Guid.Empty;
@@ -2032,8 +2034,16 @@ namespace EPMLiveCore
                                     "EPMLiveGroupsPermAssignments");
                                 List<SPEventReceiverDefinition> evts = null;
                                 List<Guid> listsToBeMapped = new List<Guid>();
+                                Dictionary<String, String> listIconsToBeSet = new Dictionary<string, string>();
                                 string EPMLiveReportingAssembly =
                                     "EPMLiveReportsAdmin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b90e532f481cf050";
+
+                                MethodInfo m = null;
+                                Assembly assemblyInstance = null;
+                                Type thisClass = null;
+                                object apiClass = null;
+                                string listIcon = string.Empty;
+
                                 foreach (SPList l in w.Lists)
                                 {
                                     string sClass = "EPMLiveReportsAdmin.ListEvents";
@@ -2052,37 +2062,61 @@ namespace EPMLiveCore
                                         !listsToBeMapped.Contains(l.ID))
                                     {
                                         listsToBeMapped.Add(l.ID);
+
+                                        try
+                                        {
+                                            //Set List Icon
+                                            var gSettings = new GridGanttSettings(l);
+                                            listIcon = gSettings.ListIcon;
+                                            listIconsToBeSet.Add(l.ID.ToString(), listIcon);
+                                        }
+                                        catch { }
+
                                         continue;
                                     }
                                 }
 
                                 if (listsToBeMapped.Count > 0)
                                 {
-                                    MethodInfo m = null;
-                                    Assembly assemblyInstance = null;
-                                    Type thisClass = null;
-                                    object apiClass = null;
-                                    // use reflection to map list
                                     try
                                     {
                                         assemblyInstance = Assembly.Load(EPMLiveReportingAssembly);
                                         thisClass = assemblyInstance.GetType("EPMLiveReportsAdmin.EPMData", true, true);
-                                        m = thisClass.GetMethod("MapLists", BindingFlags.Public | BindingFlags.Instance);
+                                        m = thisClass.GetMethod("SetListIcon", BindingFlags.Public | BindingFlags.Instance);
                                         apiClass = Activator.CreateInstance(thisClass, new object[] { true, s.ID, w.ID });
+                                   
+                                        if (m != null &&
+                                            assemblyInstance != null &&
+                                            thisClass != null &&
+                                            apiClass != null)
+                                        {
+                                            m.Invoke(apiClass, new object[] { listIconsToBeSet });
+                                        }
                                     }
                                     catch { }
+                                }
 
-                                    if (m != null &&
-                                        assemblyInstance != null &&
-                                        thisClass != null &&
-                                        apiClass != null)
-                                    {
-                                        m.Invoke(apiClass, new object[] { listsToBeMapped, w.ID });
-                                    }
+                                // use reflection to map list
+                                try
+                                {
+                                    assemblyInstance = Assembly.Load(EPMLiveReportingAssembly);
+                                    thisClass = assemblyInstance.GetType("EPMLiveReportsAdmin.EPMData", true, true);
+                                    m = thisClass.GetMethod("MapLists", BindingFlags.Public | BindingFlags.Instance);
+                                    apiClass = Activator.CreateInstance(thisClass, new object[] { true, s.ID, w.ID });
+                                }
+                                catch { }
+
+                                if (m != null &&
+                                    assemblyInstance != null &&
+                                    thisClass != null &&
+                                    apiClass != null)
+                                {
+                                    m.Invoke(apiClass, new object[] { listsToBeMapped, w.ID });
                                 }
                             }
                         }
                     });
+
 
                     if (strEPMLiveGroupsPermAssignments.Length > 1)
                     {
@@ -2173,7 +2207,7 @@ namespace EPMLiveCore
             return exists;
         }
 
-        public static string CreateSiteFromItem(string title,string description ,string url, string template, string user, bool unique, bool toplink,
+        public static string CreateSiteFromItem(string title, string description, string url, string template, string user, bool unique, bool toplink,
             SPWeb parentWeb, SPWeb itemWeb, Guid listId, int itemId, out Guid createdSiteId, out string createdWebUrl, out string createdWebRelativeUrl, out string createdWebTitle)
         {
             createdSiteId = Guid.Empty;
@@ -2394,6 +2428,7 @@ namespace EPMLiveCore
                     web.Update();
                 }
                 #endregion
+
                 #region Modify Open Workspace
                 else
                 {
@@ -2441,9 +2476,9 @@ namespace EPMLiveCore
                     });
                 }
                 #endregion
+
                 sUrl = web.Url;
                 web.Close();
-
 
                 return "0:" + sUrl;
             }
@@ -2467,7 +2502,8 @@ namespace EPMLiveCore
                     {
                         testGrp = web.SiteGroups[safeSiteTitle + " " + roleName + " " + grpIndex.ToString()];
                     }
-                    catch {
+                    catch
+                    {
                         testGrp = null;
                     }
                     if (testGrp == null)
@@ -3759,7 +3795,7 @@ namespace EPMLiveCore
             Type thisClass = assemblyInstance.GetType("EPMLiveReportsAdmin.ReportingAPI", true, true);
             MethodInfo m = thisClass.GetMethod("RefreshAll", BindingFlags.Public | BindingFlags.Instance);
             object apiClass = Activator.CreateInstance(thisClass);
-            return (string) m.Invoke(apiClass, new object[] { null, spWeb });
+            return (string)m.Invoke(apiClass, new object[] { null, spWeb });
         }
     }
 }

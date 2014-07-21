@@ -767,6 +767,21 @@ namespace EPMLiveReportsAdmin
             return blnPassed;
         }
 
+        public void SetListIcon(Dictionary<String, String> listIconsToBeSet)
+        {
+            try
+            {
+                foreach (KeyValuePair<String, String> listIconDetails in listIconsToBeSet)
+                {
+                    _command = "INSERT INTO ReportListIDs VALUES(@Id,@ListIcon)";
+                    AddParam("@Id", listIconDetails.Key.ToString());
+                    AddParam("@ListIcon", listIconDetails.Value.ToString());
+                    ExecuteNonQuery(GetClientReportingConnection);
+                }
+            }
+            catch { }
+        }
+
         private ListItemCollection GetListFields(SPList spList)
         {
             var fields = new ListItemCollection();
