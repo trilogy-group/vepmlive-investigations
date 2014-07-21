@@ -18,7 +18,7 @@ namespace EPMLiveWebParts
 
         private int curId = 0;
 
-        
+       
         public override void getParams(SPWeb curWeb)
         {
             tb.AddTimer();
@@ -312,6 +312,9 @@ namespace EPMLiveWebParts
                                 break;
                             case SPFieldType.User:
                                 sWidth = "150";
+                                attr = doc.CreateAttribute("CanSort");
+                                attr.Value = "0";
+                                ndNew.Attributes.Append(attr);
                                 break;
                             default:
                                 switch (oField.TypeAsString)
@@ -468,6 +471,25 @@ namespace EPMLiveWebParts
                 ndNew.Attributes.Append(attr);
 
                 doc.FirstChild.SelectSingleNode("//B").AppendChild(ndNew);
+            }
+
+            if (list.BaseType == SPBaseType.DocumentLibrary)
+            {
+                XmlAttribute attr = doc.CreateAttribute("NameCol");
+                attr.Value = "FileLeafRef";
+                ndCfg.Attributes.Append(attr);
+                attr = doc.CreateAttribute("MainCol");
+                attr.Value = "FileLeafRef";
+                ndCfg.Attributes.Append(attr);
+            }
+            else
+            {
+                XmlAttribute attr = doc.CreateAttribute("NameCol");
+                attr.Value = "Title";
+                ndCfg.Attributes.Append(attr);
+                attr = doc.CreateAttribute("MainCol");
+                attr.Value = "Title";
+                ndCfg.Attributes.Append(attr);
             }
 
             data = doc.OuterXml;
