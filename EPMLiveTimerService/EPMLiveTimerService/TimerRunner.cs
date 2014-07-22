@@ -93,16 +93,16 @@ namespace TimerService
 
                 bwNotificationsJobs.RunWorkerAsync();
 
-                //================Run Activity
-                bwActivity = new BackgroundWorker();
-                bwActivity.WorkerReportsProgress = true;
-                bwActivity.WorkerSupportsCancellation = true;
+                ////================Run Activity
+                //bwActivity = new BackgroundWorker();
+                //bwActivity.WorkerReportsProgress = true;
+                //bwActivity.WorkerSupportsCancellation = true;
 
-                bwActivity.DoWork += bwActivity_DoWork;
-                //bw.ProgressChanged += bw_ProgressChanged;
-                //bwActivity.RunWorkerCompleted += bwNotificationsJobs_RunWorkerCompleted;
+                //bwActivity.DoWork += bwActivity_DoWork;
+                ////bw.ProgressChanged += bw_ProgressChanged;
+                ////bwActivity.RunWorkerCompleted += bwNotificationsJobs_RunWorkerCompleted;
 
-                bwActivity.RunWorkerAsync();
+                //bwActivity.RunWorkerAsync();
 
                 //================Run Integrations
                 bwIntegrationJobs = new BackgroundWorker();
