@@ -728,14 +728,13 @@
                         var textValue = $.trim(settings.input.html());
 
                         if ($(textValue).filter('a').length > 0) {
-                            var $comment = $($.trim(settings.input.html())).attr('target','_blank');
+                            var $comment = $(textValue).attr('target','_blank');
                             textValue = $comment[0].outerHTML;
-                        }
-                        else if ($(textValue).find('a').length > 0) {
-                            $(textValue).find('a').each(function () {
+                        } else if ($(textValue).find('a').length > 0) {
+                            $(textValue).find('a').each(function() {
                                 var $actualHtml = $(this)[0].outerHTML;
-                                var $comment = $(this).attr('target','_blank');
-                                textValue = textValue.replace($actualHtml, $comment[0].outerHTML);
+                                var $newHtml = $(this).attr('target', '_blank');
+                                textValue = textValue.replace($actualHtml, $newHtml[0].outerHTML);
                             });
                         }
 
