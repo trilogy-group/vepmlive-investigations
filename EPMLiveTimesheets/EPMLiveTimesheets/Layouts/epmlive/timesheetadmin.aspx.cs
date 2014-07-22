@@ -381,7 +381,7 @@ namespace TimeSheets
 
                 if (fields.Length > 0)
                     fields = fields.Substring(1);
-                lstData += "<input type='hidden' name='lst" + list.Replace(" ", "_") + "' id='lst" + list.Replace(" ", "_") + "' value='" + fields + "'>\r\n";
+                lstData += "<input type='hidden' name='lst" + list.Replace(" ", "_") + "' id='lst" + list.Replace(" ", "_") + "' value='" + HttpUtility.HtmlEncode(fields) + "'>\r\n";
                 string sFields = "";
                 if (Page.IsPostBack)
                     sFields = Request["input" + list.Replace(" ", "_")];
