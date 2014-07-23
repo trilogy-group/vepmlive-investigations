@@ -93,8 +93,10 @@ iisreset</PostDeploymentCommand>
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.DirectoryServices" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Web.Services" />
@@ -123,8 +125,13 @@ iisreset</PostDeploymentCommand>
     <Compile Include="Core\Entities\PersonalItem.cs" />
     <Compile Include="Core\Entities\Role.cs" />
     <Compile Include="Core\Entities\WorkSchedule.cs" />
+    <Compile Include="Core\PFEDataServiceManager\PFEDataServiceManager.cs" />
+    <Compile Include="Core\PFEDataServiceManager\PFEDataServiceUtils.cs" />
     <Compile Include="Core\ResourceManagement\PFEResourceField.cs" />
     <Compile Include="Core\ResourceManagement\Utilities.cs" />
+    <Compile Include="DataServiceModules\DSMCostPlanner.cs" />
+    <Compile Include="DataServiceModules\DSMDataContracts.cs" />
+    <Compile Include="DataServiceModules\DSMEvents.cs" />
     <Compile Include="Delegates\Delegates.cs" />
     <Compile Include="EditableFieldDisplay.cs" />
     <Compile Include="EPKIntegrationEvents.cs" />
@@ -139,6 +146,7 @@ iisreset</PostDeploymentCommand>
     <Compile Include="General.cs" />
     <Compile Include="HelperFunctions.cs" />
     <Compile Include="Jobs\Cleanup.cs" />
+    <Compile Include="Jobs\DataServicePlatform.cs" />
     <Compile Include="Jobs\InstallWorkEvents.cs" />
     <Compile Include="Jobs\PublishWorkPlannerWork.cs" />
     <Compile Include="Jobs\Setup.cs" />
@@ -512,6 +520,20 @@ iisreset</PostDeploymentCommand>
     </Compile>
     <Compile Include="Layouts\ppm\PageRequest.ashx.cs">
       <DependentUpon>PageRequest.ashx</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\ppm\PFEFileImport.aspx.cs">
+      <DependentUpon>PFEFileImport.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\ppm\PFEFileImport.aspx.designer.cs">
+      <DependentUpon>PFEFileImport.aspx.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\ppm\PFEFileImportStatus.aspx.cs">
+      <DependentUpon>PFEFileImportStatus.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\ppm\PFEFileImportStatus.aspx.designer.cs">
+      <DependentUpon>PFEFileImportStatus.aspx.cs</DependentUpon>
     </Compile>
     <Compile Include="Layouts\ppm\Postcostoptions.aspx.cs">
       <DependentUpon>Postcostoptions.aspx</DependentUpon>
@@ -1206,6 +1228,8 @@ iisreset</PostDeploymentCommand>
     <Content Include="Layouts\ppm\Optimizer.ascx.js" />
     <Content Include="Layouts\ppm\optimizer.aspx" />
     <Content Include="Layouts\ppm\Optimizer.js" />
+    <Content Include="Layouts\ppm\PFEFileImport.aspx" />
+    <Content Include="Layouts\ppm\PFEFileImportStatus.aspx" />
     <Content Include="Layouts\ppm\Postcostoptions.aspx" />
     <Content Include="Layouts\ppm\Postcostvalues.aspx" />
     <Content Include="Layouts\ppm\PostCostValues_NAX.aspx" />
