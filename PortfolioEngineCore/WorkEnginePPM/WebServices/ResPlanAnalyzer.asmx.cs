@@ -1165,6 +1165,7 @@ namespace WorkEnginePPM
 
                     newRPA.GrabRAData(resValues, "", resValues.ResExamView, StartID, CalID, sParmXML, out sReplyMessage);
 
+                    newRPA.SetCalledFromResources(RAData.GetCalledFromResources());
 
                     string rpkey = GetRPSessionKey();
 
