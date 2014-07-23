@@ -1290,7 +1290,7 @@ function registerEpmLiveResourceGridScript() {
             },
 
             displayPopUp: function (url, title, allowMaximize, showClose, func, funcParams, width, height) {
-                if (!allowMaximize) allowMaximize = true;                
+                if (!allowMaximize) allowMaximize = true;
                 //if (!showClose) showClose = true;                
                 if (!func) {
                     func = function () {
@@ -1371,8 +1371,7 @@ function registerEpmLiveResourceGridScript() {
                             var email = row.Email;
                             arrayCharLength = emails.toString().length + email.length;
 
-                            if (arrayCharLength > maxlen)
-                            {
+                            if (arrayCharLength > maxlen) {
                                 limitedCount = true;
                                 break;
                             }
@@ -1384,7 +1383,7 @@ function registerEpmLiveResourceGridScript() {
                     }
 
                     if (limitedCount) {
-                        var msg = confirm("You can send "+emails.length+" out of "+selRows.length+" notifications, do you want to continue?");
+                        var msg = confirm("You can send " + emails.length + " out of " + selRows.length + " notifications, do you want to continue?");
                         if (msg == true) {
                             window.location.href = 'mailto:{0}'.format(emails.join(';'));
                         }
@@ -1600,7 +1599,7 @@ function registerEpmLiveResourceGridScript() {
                     if (!ribbonButton) {
                         ribbonButton = document.getElementById('Ribbon.ResourceGrid.Actions.Find-Small');
                     }
-                    
+
                     if (ribbonButton && $('.epmliveToolBar').length == 0) {
                         var rButton = $(ribbonButton);
                         var offset = rButton.offset();
@@ -2477,7 +2476,7 @@ function registerEpmLiveResourceGridScript() {
                 grid.CurHoverRow = row.id;
                 CurrentGrid = grid;
                 if (grid.GetValue(row, "itemid") != "") {
-                    grid.SetAttribute(row, "Title", "ButtonText", '<div class="gridmenuspan" style="position:absolute;overflow:visible" id=\"' + row.id + '\"><a data-itemid="' + grid.GetValue(row, "itemid") + '" data-listid="' + grid.GetValue(row, "listid") + '" data-webid="' + grid.GetValue(row, "webid") + '" data-siteid="' + grid.GetValue(row, "siteid") + '" ></a></div>', 1);
+                    grid.SetAttribute(row, "Title", "ButtonText", '<div class="gridmenuspan" style="position:absolute;overflow:visible" id=\"' + row.id + '\"><a data-itemid="' + grid.GetValue(row, "itemid") + '" data-listid="' + grid.GetValue(row, "listid") + '" data-webid="' + $$$.rootWebId + '" data-siteid="' + grid.GetValue(row, "siteid") + '" ></a></div>', 1);
                     window.epmLiveNavigation.addContextualMenu($('#' + row.id), [], false, false, { "edit": "window.epmLiveResourceGrid.grid.contextMenuResourceChanged", "delete": "window.epmLiveResourceGrid.grid.contextMenuResourceDelete" });
                 }
             }
