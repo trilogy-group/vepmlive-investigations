@@ -151,7 +151,10 @@ function SetGridSize(grid) {
         var top = GetItemTop(outer);
 
         //document.getElementById("griddiv" + gridid).style.height = (height - top) + "px";
-        outer.style.height = (height - top - 35) + "px";
+        var currentDialog = SP.UI.ModalDialog.get_childDialog();        if (currentDialog)
+            outer.style.height = (height - top - 105) + "px";
+        else
+            outer.style.height = (height - top - 35) + "px";
         //document.getElementById("MSOZoneCell_WebPart").style.height = "400px";
     }
     else
@@ -190,7 +193,7 @@ function GridListSettings(listid) {
 function GridListEditView(listid, viewid) {
     var $v_E = new SP.Guid(listid);
     var $v_C = new SP.Guid(viewid);
-    var $v_F = GetWebUrl() + '/_layouts/15/ViewEdit.aspx' + '?List=' + SP.Utilities.HttpUtility.urlKeyValueEncode($v_E.toString('B').toUpperCase()) + '&View=' + SP.Utilities.HttpUtility.urlKeyValueEncode($v_C.toString('B').toUpperCase()) + '&Source=' + escape(document.location.href);
+    var $v_F = GetWebUrl() + '/_layouts/15/epmlive/gridaction.aspx' + '?action=editview&List=' + SP.Utilities.HttpUtility.urlKeyValueEncode($v_E.toString('B').toUpperCase()) + '&View=' + SP.Utilities.HttpUtility.urlKeyValueEncode($v_C.toString('B').toUpperCase()) + '&Source=' + escape(document.location.href);
     SP.Utilities.HttpUtility.navigateTo($v_F);
 }
 
@@ -661,6 +664,7 @@ function GetRowData(grid, row)
 
 function LoadGrid(gridid)
 {
+
     var gUrl = GetWebUrl() + "/_layouts/15/epmlive/getganttitems.aspx?data=" + eval("mygrid" + gridid + ".Params") + eval("mygrid" + gridid + ".Searcher");
 
     if (epmdebug)
