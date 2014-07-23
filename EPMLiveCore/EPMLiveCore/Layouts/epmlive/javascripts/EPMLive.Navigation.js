@@ -956,7 +956,7 @@
                         redirectUrl = redirectUrl.split('#')[0];
                     }
 
-                    if (command === 'view' || command === 'edit') {
+                    if (command === 'view' || command === 'edit' || command === 'gotoplanner' || command === 'GoToTaskPlanner') {
                         var page = '';
 
                         var wUrl = $$.currentWebUrl();
