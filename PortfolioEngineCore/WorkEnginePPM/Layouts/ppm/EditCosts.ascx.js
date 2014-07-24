@@ -23,7 +23,6 @@
     };
     EditCosts.prototype.GetCostTypeFromId = function (id) {
         for (var n = 0; n < this.CostTypes.length; n++) {
-            toolsDlg_ApplyOnClick()
             var costtypeId = this.CostTypes[n].Id;
             if (costtypeId == id)
                 return this.CostTypes[n];
@@ -242,7 +241,7 @@
 
         // Validating blank value / value with only space
         var val = json.amount.toString().replace(/^\s+|\s+$/, '');
-        if (val.length == 0){
+        if (val.length == 0) {
             alert("Please enter an amount");
             return;
         }
