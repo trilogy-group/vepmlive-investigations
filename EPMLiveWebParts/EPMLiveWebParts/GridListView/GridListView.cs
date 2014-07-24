@@ -1367,7 +1367,7 @@ namespace EPMLiveWebParts
                         if (list.Title.Equals("Project Center"))
                         {
                             ribbonExtensions = new XmlDocument();
-                            ribbonExtensions.LoadXml(@"<Button Id=""Ribbon.List.Share.PFEImportCostsData"" Sequence=""2"" Command=""PFEImportCostsData"" LabelText=""Import Costs"" TemplateAlias=""o1"" ToolTipTitle=""Import Costs"" ToolTipDescription=""Import costs data into portfolio engine database."" Image32by32=""/_layouts/epmlive/images/ribbon/excel-import-32.png""/>");
+                            ribbonExtensions.LoadXml(@"<Button Id=""Ribbon.List.Share.PFEImportCostsData"" Sequence=""2"" Command=""PFEImportCostsData"" LabelText=""Import Costs"" TemplateAlias=""o1"" ToolTipTitle=""Import Costs"" ToolTipDescription=""Import costs data into portfolio engine database."" Image16by16=""/_layouts/epmlive/images/ribbon/import-costs-16.png"" Image32by32=""/_layouts/epmlive/images/ribbon/import-costs-32.png""/>");
                             ribbon.RegisterDataExtension(ribbonExtensions.FirstChild, "Ribbon.List.Actions.Controls._children");
                         }
 
