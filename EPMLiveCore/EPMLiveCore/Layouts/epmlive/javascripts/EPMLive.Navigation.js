@@ -2034,6 +2034,7 @@
                     registerEvents();
 
                     ExecuteOrDelayUntilScriptLoaded(loadLinks, 'EPMLive.js');
+                    window.SP.SOD.notifyScriptLoadedAndExecuteWaitingJobs('EPMLive.Navigation.Initialized');
                 };
 
                 return {
