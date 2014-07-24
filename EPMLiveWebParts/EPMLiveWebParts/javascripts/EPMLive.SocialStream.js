@@ -163,12 +163,15 @@
                             if (response.collection.length) {
                                 var webs = response.collection;
                                 for (var i = 0; i < webs.length; i++) {
-                                    var web = webs[i];
+                                    try {
+                                        var web = webs[i];
 
-                                    var wUrl = web.url.slice(1) + '/';
-                                    var bUrl = wUrl === '/' ? wUrl : '/' + wUrl;
+                                        var wUrl = web.url.slice(1) + '/';
+                                        var bUrl = wUrl === '/' ? wUrl : '/' + wUrl;
 
-                                    urlDict[web.id] = bUrl;
+                                        urlDict[web.id] = bUrl;
+                                    } catch (e) {
+                                    }
                                 }
                             }
                         }
