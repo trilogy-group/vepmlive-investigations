@@ -854,6 +854,8 @@
       <Generator>SharePointWebPartCodeGenerator</Generator>
       <LastGenOutput>FancyDisplayForm.ascx.g.cs</LastGenOutput>
     </Content>
+    <Content Include="Layouts\epmlive\images\Ribbon\import-costs-16.png" />
+    <Content Include="Layouts\epmlive\images\Ribbon\import-costs-32.png" />
     <Content Include="Layouts\epmlive\images\User.png" />
     <Content Include="MyWorkSummary\MyWorkSummary.ascx">
       <Generator>SharePointWebPartCodeGenerator</Generator>
@@ -1282,7 +1284,7 @@
     <Content Include="Layouts\epmlive\epmlivegrid.js" />
     <Content Include="Layouts\epmlive\EpmLiveRollup.js" />
     <Content Include="Layouts\epmlive\ExPrintCab.CAB" />
-<Content Include="Layouts\epmlive\GanttGrid.js" />
+    <Content Include="Layouts\epmlive\GanttGrid.js" />
     <Content Include="Layouts\epmlive\getedititem.aspx" />
     <Content Include="Layouts\epmlive\getganttitems.aspx" />
     <Content Include="Layouts\epmlive\getgantttasks.aspx" />
