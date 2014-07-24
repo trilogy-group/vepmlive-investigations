@@ -217,7 +217,7 @@ span.ms-welcome-hover > span.ms-core-menu-arrow {
 
 .search-pane {
     bottom: 0;
-    display: block;
+    display: none;
     padding-left: 15px;
     padding-top: 5px;
     position: absolute;

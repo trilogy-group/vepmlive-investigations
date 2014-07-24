@@ -86,7 +86,7 @@
                 <WebPartPages:SPWebPartManager runat="Server"/>
             </SharePoint:AjaxDelta>
             <asp:ScriptManager id="ScriptManager" runat="server" EnablePageMethods="false" EnablePartialRendering="true" EnableScriptGlobalization="false" EnableScriptLocalization="true" />
-            <div style="display: none !important;">
+            <div class="search-pane">
         	    <SharePoint:AjaxDelta id="DeltaPlaceHolderLeftNavBar" role="navigation" runat="server">
         		    <SharePoint:DelegateControl runat="server" ControlId="QuickLaunchDataSource" Id="topNavigationDelegate1" />
                     <asp:ContentPlaceHolder id="PlaceHolderLeftNavBar" runat="server" />

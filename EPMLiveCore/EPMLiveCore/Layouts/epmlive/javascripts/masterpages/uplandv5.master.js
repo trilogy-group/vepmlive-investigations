@@ -656,14 +656,16 @@ var uvOptions = {};
             $(document).ready(function () {
                 if (window.location.href.indexOf("osssearchresults.aspx") > -1) {
 
-                    $('#DeltaPlaceHolderLeftNavBar').parent().addClass('search-pane');
-                    if (document.getElementById('s4-workspace').hasClass('epm-nav-pinned')) {
+                    $('#DeltaPlaceHolderLeftNavBar').parent().show();
+                    var s4Workspace = $(document.getElementById('s4-workspace'));
+
+                    if (s4Workspace.hasClass('epm-nav-pinned')) {
                         $('#DeltaPlaceHolderLeftNavBar').parent().css('left', '230px');
-                        $('.epm-nav-pinned').css('margin-left', '425px !important');
+                        s4Workspace.attr('style', s4Workspace.attr('style') + ' margin-left: 425px !important;');
                     }
                     else {
                         $('#DeltaPlaceHolderLeftNavBar').parent().css('left', '50px');
-                        $('.epm-nav-pinned').css('margin-left', '245px !important');
+                        s4Workspace.attr('style', s4Workspace.attr('style') + ' margin-left: 245px !important;');
                     }
                 }
             });
