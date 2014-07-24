@@ -651,7 +651,7 @@ namespace EPMLiveCore.Services
 
                 foreach (SEActivities.Thread thread in threads)
                 {
-                    activities.threads.Add(thread);
+                    if (thread.activities.Count != 0 || thread.comments.Count != 0) activities.threads.Add(thread);
                 }
             }
 
