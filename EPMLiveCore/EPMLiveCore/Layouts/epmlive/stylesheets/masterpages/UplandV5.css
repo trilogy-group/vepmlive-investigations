@@ -215,6 +215,15 @@ span.ms-welcome-hover > span.ms-core-menu-arrow {
     background-color:#00B6FF;
 }
 
+.search-pane {
+    bottom: 0;
+    display: block;
+    padding-left: 15px;
+    padding-top: 5px;
+    position: absolute;
+    top: 50px;
+}
+
 .ms-dialog body #s4-workspace{padding:0;overflow:auto !important;}
 .ms-dialog body #s4-ribbonrow{position:relative;}
 .ms-dialog #isb-wrapper {margin:0;}

@@ -230,6 +230,23 @@
             }
         };
 
+        var configureEnterpriseSearch = function() {
+            $(document).ready(function () {
+                if (window.location.href.indexOf("osssearchresults.aspx") > -1) {
+
+                    $('#DeltaPlaceHolderLeftNavBar').parent().addClass('search-pane');
+                    if (document.getElementById('s4-workspace').hasClass('epm-nav-pinned')) {
+                        $('#DeltaPlaceHolderLeftNavBar').parent().css('left', '230px');
+                        $('.epm-nav-pinned').css('margin-left', '425px !important');
+                    }
+                    else {
+                        $('#DeltaPlaceHolderLeftNavBar').parent().css('left', '50px');
+                        $('.epm-nav-pinned').css('margin-left', '245px !important');
+                    }
+                }
+            });
+        };
+
         window.fixGridMenus = function() {
             window.setTimeout(function() {
                 $('.js-callout-mainElement').each(function() {
@@ -254,6 +271,8 @@
         window.setTimeout(function() {
             monitorGridMessages();
         }, 2000);
+
+        ExecuteOrDelayUntilScriptLoaded(configureEnterpriseSearch, 'EPMLive.Navigation.Initialized');
     };
 
     ExecuteOrDelayUntilScriptLoaded(epmLiveTweaks, 'jquery.min.js');
