@@ -288,7 +288,7 @@ namespace EPMLiveReportsAdmin.Jobs
                 catch (Exception ex)
                 {
                     bErrors = true;
-                    sErrors += "<font color=\"red\">Error while clean tables: " + ex.Message + "</font><br>";
+                    sErrors += "<font color=\"red\">Error while cleaning tables: " + ex.Message + "</font><br>";
                 }
 
                 #endregion
