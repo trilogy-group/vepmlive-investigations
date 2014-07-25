@@ -188,6 +188,10 @@
                         for (var i = 0; i < select.options.length; i++) {
                             if (select.options[i].value == viewGUID) {
                                 select.options[i] = null;
+                                if (select.options.length == 0) {
+                                    select.options[select.options.length] = new Option("--No Views--", "-1", false, false);
+                                }
+                                this.viewTab.refreshSelect("idViewTab_SelView");
                                 for (var i = 0; i < this.Views.length; i++) {
                                     var view = this.Views[i];
                                     if (view != null && view.ViewGUID == viewGUID) {
@@ -5779,7 +5783,7 @@
 
         var GridsOnValueChangedDelegate = MakeDelegate(this, this.GridsOnValueChanged);
         var GridsOnFocusDelegate = MakeDelegate(this, this.GridsOnFocus);
-        var GridsOnReadyDelegate = MakeDelegate(this, this.GridsOnReady);      
+        var GridsOnReadyDelegate = MakeDelegate(this, this.GridsOnReady);
         var GridsOnRenderFinishDelegate = MakeDelegate(this, this.GridsOnRenderFinish);
         var GridsOnScrollDelegate = MakeDelegate(this, this.GridsOnScroll);
         var GridsOnSectionResizeDelegate = MakeDelegate(this, this.GridsOnSectionResize);
