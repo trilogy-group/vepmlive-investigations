@@ -671,6 +671,30 @@ var uvOptions = {};
             });
         };
 
+        var configurePopMenuFromChevron = function() {
+            var ori_popMenuFromChevron = PopMenuFromChevron;
+            window.PopMenuFromChevron = function(event) {
+                ori_popMenuFromChevron(event);
+
+                var tries = 0;
+
+                var moveMenu = function() {
+                    if (++tries >= 20)return;
+
+                    var $div = $('div.ms-core-menu-box');
+                    if ($div.length) {
+                        $div.css('left', 10);
+                    } else {
+                        window.setTimeout(moveMenu, 100);
+                    }
+                };
+
+                window.setTimeout(function() {
+                    moveMenu();
+                }, 100);
+            }
+        };
+
         window.fixGridMenus = function() {
             window.setTimeout(function() {
                 $('.js-callout-mainElement').each(function() {
@@ -691,6 +715,7 @@ var uvOptions = {};
         configureSearchBox();
         addUpdateProfilePicLink();
         configureTooltips();
+        configurePopMenuFromChevron();
 
         window.setTimeout(function() {
             monitorGridMessages();

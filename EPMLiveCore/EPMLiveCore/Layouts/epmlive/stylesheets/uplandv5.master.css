@@ -5107,7 +5107,6 @@ span.ms-welcome-hover > span.ms-core-menu-arrow {
    color: #ffffff;  
 }
 
-
 #search-box-container .ms-srch-sb-searchLink {
     display: none;
 }
@@ -5148,6 +5147,10 @@ span.ms-welcome-hover > span.ms-core-menu-arrow {
     padding-top: 5px;
     position: absolute;
     top: 50px;
+}
+
+div.ms-core-menu-box {
+    left: 0 !important; 
 }
 
 .ms-dialog body #s4-workspace{padding:0;overflow:auto !important;}
