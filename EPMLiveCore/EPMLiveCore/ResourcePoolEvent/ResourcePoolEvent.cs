@@ -312,8 +312,9 @@ namespace EPMLiveCore
                     string username = "";
                     try
                     {
-                        SPFieldUserValue uv = new SPFieldUserValue(properties.Web, spaccount);
-                        username = CoreFunctions.GetRealUserName(uv.User.LoginName, properties.Web.Site);
+
+                        SPFieldLookupValue uv = new SPFieldLookupValue(spaccount);
+                        username = CoreFunctions.GetRealUserName(uv.LookupValue, properties.Web.Site);
                     }
                     catch { }
 
