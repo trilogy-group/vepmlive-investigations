@@ -321,20 +321,11 @@ namespace EPMLiveWebParts.ReportingChart
         protected override void OnLoad(EventArgs e)
         {
             base.OnLoad(e);
-
             // add kendo culture js reference
-            //ScriptReference srKendo = new ScriptReference();
-            //srKendo.Path = SPContext.Current.Web.Url + "/_layouts/epmlive/javascripts/libraries/Kendo/cultures/kendo.culture." + SPContext.Current.Web.Locale.ToString() + ".min.js";
-            //ScriptManager.GetCurrent(this.Page).Scripts.Add(srKendo);
-
-            this.Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "__KendoCultureJS__",
-                @"$(function () { 
-                    $.getScript('" + SPContext.Current.Web.Url + "/_layouts/epmlive/javascripts/libraries/Kendo/cultures/kendo.culture." + SPContext.Current.Web.Locale.ToString() + @".min.js', function(){
-                        if (kendo){
-                            kendo.culture('" + SPContext.Current.Web.Locale.ToString() + @"');
-                        }
-                    }, true);
-                });", true);
+            ScriptReference srKendo = new ScriptReference();
+            srKendo.Path = SPContext.Current.Web.Url + "/_layouts/epmlive/javascripts/libraries/Kendo/cultures/kendo.culture." + SPContext.Current.Web.Locale.ToString() + ".min.js";
+            ScriptManager.GetCurrent(this.Page).Scripts.Add(srKendo);
+            this.Page.ClientScript.RegisterStartupScript(this.GetType(), "__KendoCultureJS__", @"$(function () { kendo.culture('" + SPContext.Current.Web.Locale.ToString() + @"'); });", true);
         }
 
         protected override void CreateChildControls()
@@ -520,15 +511,15 @@ namespace EPMLiveWebParts.ReportingChart
 
             if (PropYaxisFormat == "Currency")
             {
-                c.PlotArea.YAxis.LabelsAppearance.DataFormatString = "{0:c}";
+                c.PlotArea.YAxis.LabelsAppearance.DataFormatString = "c";
             }
             else if (PropYaxisFormat == "Percentage")
             {
-                c.PlotArea.YAxis.LabelsAppearance.DataFormatString = "{0:p}";
+                c.PlotArea.YAxis.LabelsAppearance.DataFormatString = "p";
             }
             else
             {
-                c.PlotArea.YAxis.LabelsAppearance.DataFormatString = "{0}";
+                c.PlotArea.YAxis.LabelsAppearance.DataFormatString = "n";
             }
 
         }
@@ -538,13 +529,13 @@ namespace EPMLiveWebParts.ReportingChart
             switch (PropYaxisFormat)
             {
                 case "Dollar":
-                    _radChart.PlotArea.YAxis.LabelsAppearance.DataFormatString = "${0}";
+                    _radChart.PlotArea.YAxis.LabelsAppearance.DataFormatString = "c";
                     break;
                 case "Percentage":
-                    _radChart.PlotArea.YAxis.LabelsAppearance.DataFormatString = "{0:p}";
+                    _radChart.PlotArea.YAxis.LabelsAppearance.DataFormatString = "p";
                     break;
                 default:
-                    _radChart.PlotArea.YAxis.LabelsAppearance.DataFormatString = "{0}";
+                    _radChart.PlotArea.YAxis.LabelsAppearance.DataFormatString = "n";
                     break;
             }
         }
@@ -586,11 +577,11 @@ namespace EPMLiveWebParts.ReportingChart
             {
                 if (PropYaxisFormat == "Currency")
                 {
-                    _radChart.PlotArea.YAxis.LabelsAppearance.DataFormatString = "{0:c}";
+                    _radChart.PlotArea.YAxis.LabelsAppearance.DataFormatString = "c";
                 }
                 else if (PropYaxisFormat == "Percentage")
                 {
-                    _radChart.PlotArea.YAxis.LabelsAppearance.DataFormatString = "{0:p}";
+                    _radChart.PlotArea.YAxis.LabelsAppearance.DataFormatString = "p";
                 }
             }
 
@@ -716,14 +707,14 @@ namespace EPMLiveWebParts.ReportingChart
 
                 if (PropYaxisFormat == "Currency")
                 {
-                    sArea.LabelsAppearance.DataFormatString = "{0:c}";
-                    sArea.TooltipsAppearance.DataFormatString = "{0:c}";
+                    sArea.LabelsAppearance.DataFormatString = "c";
+                    sArea.TooltipsAppearance.DataFormatString = "c";
                 }
                 else if (PropYaxisFormat == "Percentage")
                 {
-                    sArea.LabelsAppearance.DataFormatString = "{0:p}";
+                    sArea.LabelsAppearance.DataFormatString = "p";
                     sArea.LabelsAppearance.Position = Telerik.Web.UI.HtmlChart.LineAndScatterLabelsPosition.Above;
-                    sArea.TooltipsAppearance.DataFormatString = "{0:p}";
+                    sArea.TooltipsAppearance.DataFormatString = "p";
                 }
                 _radChart.PlotArea.Series.Add(sArea);
 
@@ -754,13 +745,13 @@ namespace EPMLiveWebParts.ReportingChart
                 ApplyColorToBarSeries(sBar);
                 if (PropYaxisFormat == "Currency")
                 {
-                    sBar.LabelsAppearance.DataFormatString = "{0:c}";
-                    sBar.TooltipsAppearance.DataFormatString = "{0:c}";
+                    sBar.LabelsAppearance.DataFormatString = "c";
+                    sBar.TooltipsAppearance.DataFormatString = "c";
                 }
                 else if (PropYaxisFormat == "Percentage")
                 {
-                    sBar.LabelsAppearance.DataFormatString = "{0:p}";
-                    sBar.TooltipsAppearance.DataFormatString = "{0:p}";
+                    sBar.LabelsAppearance.DataFormatString = "p";
+                    sBar.TooltipsAppearance.DataFormatString = "p";
                 }
 
                 if (MainChartType.ToString().Contains("_Stacked") || MainChartType.ToString().Contains("_100Percent"))
@@ -798,13 +789,13 @@ namespace EPMLiveWebParts.ReportingChart
                 ApplyColorToColumnSeries(sCol);
                 if (PropYaxisFormat == "Currency")
                 {
-                    sCol.LabelsAppearance.DataFormatString = "{0:c}";
-                    sCol.TooltipsAppearance.DataFormatString = "{0:c}";
+                    sCol.LabelsAppearance.DataFormatString = "c";
+                    sCol.TooltipsAppearance.DataFormatString = "c";
                 }
                 else if (PropYaxisFormat == "Percentage")
                 {
-                    sCol.LabelsAppearance.DataFormatString = "{0:p}";
-                    sCol.TooltipsAppearance.DataFormatString = "{0:p}";
+                    sCol.LabelsAppearance.DataFormatString = "p";
+                    sCol.TooltipsAppearance.DataFormatString = "p";
                 }
 
                 if (MainChartType.ToString().Contains("_Stacked") || MainChartType.ToString().Contains("_100Percent"))
@@ -842,13 +833,13 @@ namespace EPMLiveWebParts.ReportingChart
                 ApplyColorToLineSeries(sLine);
                 if (PropYaxisFormat == "Currency")
                 {
-                    sLine.LabelsAppearance.DataFormatString = "{0:c}";
-                    sLine.TooltipsAppearance.DataFormatString = "{0:c}";
+                    sLine.LabelsAppearance.DataFormatString = "c";
+                    sLine.TooltipsAppearance.DataFormatString = "c";
                 }
                 else if (PropYaxisFormat == "Percentage")
                 {
-                    sLine.LabelsAppearance.DataFormatString = "{0:p}";
-                    sLine.TooltipsAppearance.DataFormatString = "{0:p}";
+                    sLine.LabelsAppearance.DataFormatString = "p";
+                    sLine.TooltipsAppearance.DataFormatString = "p";
                 }
 
 
@@ -881,13 +872,13 @@ namespace EPMLiveWebParts.ReportingChart
 
                 if (PropYaxisFormat == "Currency")
                 {
-                    sPie.LabelsAppearance.DataFormatString = "{0:c}";
-                    sPie.TooltipsAppearance.DataFormatString = "{0:c}";
+                    sPie.LabelsAppearance.DataFormatString = "c";
+                    sPie.TooltipsAppearance.DataFormatString = "c";
                 }
                 else if (PropYaxisFormat == "Percentage")
                 {
-                    sPie.LabelsAppearance.DataFormatString = "{0:p}";
-                    sPie.TooltipsAppearance.DataFormatString = "{0:p}";
+                    sPie.LabelsAppearance.DataFormatString = "p";
+                    sPie.TooltipsAppearance.DataFormatString = "p";
                 }
 
                 _radChart.PlotArea.Series.Add(sPie);
@@ -907,7 +898,7 @@ namespace EPMLiveWebParts.ReportingChart
             _radChart.PlotArea.XAxis.MinorGridLines.Visible = false;
             _radChart.PlotArea.YAxis.MajorGridLines.Visible = false;
             _radChart.PlotArea.YAxis.MinorGridLines.Visible = false;
-        }        
+        }
 
         private void BuildScatterSeries()
         {
@@ -1000,13 +991,13 @@ namespace EPMLiveWebParts.ReportingChart
                     switch (PropYaxisFormat)
                     {
                         case "Currency":
-                            sDonut.LabelsAppearance.DataFormatString = "{0:c}";
+                            sDonut.LabelsAppearance.DataFormatString = "c";
 
                             sDonut.LabelsAppearance.Position = Telerik.Web.UI.HtmlChart.PieLabelsPosition.Column;
                             sDonut.TooltipsAppearance.DataFormatString = sDonut.Name + " = {0:c}";
                             break;
                         case "Percentage":
-                            sDonut.LabelsAppearance.DataFormatString = "{0:p}";
+                            sDonut.LabelsAppearance.DataFormatString = "p";
                             sDonut.LabelsAppearance.Position = Telerik.Web.UI.HtmlChart.PieLabelsPosition.Column;
                             sDonut.TooltipsAppearance.DataFormatString = sDonut.Name + " = {0:p}";
                             break;
@@ -1420,7 +1411,7 @@ namespace EPMLiveWebParts.ReportingChart
             result.Add(GetFldDispNameFromIntName(category), lsTemp);
             return result;
         }
-      
+
         /// <summary>
         /// Gets series items that represent the count for multiple series. (multiple y value)
         /// </summary>
@@ -1906,7 +1897,7 @@ namespace EPMLiveWebParts.ReportingChart
                     {
                         // Assigns random color if chart items are more than number of colors in palette 
                         KnownColor randomColorName = names[rColor.Next(names.Length)];
-                        sArea.Items[i].BackgroundColor = Color.FromKnownColor(randomColorName);                        
+                        sArea.Items[i].BackgroundColor = Color.FromKnownColor(randomColorName);
                     }
                     else
                     {
@@ -2030,7 +2021,7 @@ namespace EPMLiveWebParts.ReportingChart
                     {
                         // Assigns random color if chart items are more than number of colors in palette 
                         KnownColor randomColorName = names[rColor.Next(names.Length)];
-                        sPie.Items[i].BackgroundColor = Color.FromKnownColor(randomColorName);                        
+                        sPie.Items[i].BackgroundColor = Color.FromKnownColor(randomColorName);
                     }
                     else
                     {
@@ -2164,7 +2155,7 @@ namespace EPMLiveWebParts.ReportingChart
                 }
             }
             catch { }
-        } 
+        }
 
         #endregion
 
