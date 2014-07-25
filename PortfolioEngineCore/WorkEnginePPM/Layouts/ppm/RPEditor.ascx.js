@@ -5006,8 +5006,10 @@
                 break;
             case 1: /* FTE */
                 fValue = (fHours / fFTEConv);
+                if (fValue < 0)
+                    fValue = 0;
                 break;
-            case 2: /* FTE %*/
+            case 2: /* FTE % */
                 fValue = ((fHours * 100) / fFTEConv);
                 break;
             case 3: /* FTE conversion*/
