@@ -1124,6 +1124,10 @@ namespace EPMLiveWebParts
                 TemplateAlias=""o1""
                 />");
                 ribbon1.RegisterDataExtension(ribbonExtensions.FirstChild, "Ribbon.ListItem.Manage.Controls._children");
+
+                ribbonExtensions = new XmlDocument();
+                ribbonExtensions.LoadXml(@"<Button Id=""Ribbon.List.Share.PFEImportCostsData"" Sequence=""2"" Command=""PFEImportCostsData"" LabelText=""Import Costs"" TemplateAlias=""o1"" ToolTipTitle=""Import Costs"" ToolTipDescription=""Import costs data into portfolio engine database."" Image16by16=""/_layouts/epmlive/images/ribbon/import-costs-16.png"" Image32by32=""/_layouts/epmlive/images/ribbon/import-costs-32.png""/>");
+                ribbon1.RegisterDataExtension(ribbonExtensions.FirstChild, "Ribbon.List.Actions.Controls._children");
             }
             if (rp.aEPKButtons.Contains("workplan"))
             {
@@ -1361,15 +1365,6 @@ namespace EPMLiveWebParts
                         ribbonExtensions = new XmlDocument();
                         ribbonExtensions.LoadXml("<Button Id=\"Ribbon.List.Share.RefreshItems\" Sequence=\"1\" Command=\"RefreshItems\"  Image32by32=\"/_layouts/epmlive/images/refresh.png\" LabelText=\"Refresh Items\" ToolTipTitle=\"Refresh Items\" ToolTipDescription=\"Refresh all items in grid.\" TemplateAlias=\"o1\"/>");
                         ribbon.RegisterDataExtension(ribbonExtensions.FirstChild, "Ribbon.List.Actions.Controls._children");
-
-                        //=====================PFE Import Export
-
-                        if (list.Title.Equals("Project Center"))
-                        {
-                            ribbonExtensions = new XmlDocument();
-                            ribbonExtensions.LoadXml(@"<Button Id=""Ribbon.List.Share.PFEImportCostsData"" Sequence=""2"" Command=""PFEImportCostsData"" LabelText=""Import Costs"" TemplateAlias=""o1"" ToolTipTitle=""Import Costs"" ToolTipDescription=""Import costs data into portfolio engine database."" Image16by16=""/_layouts/epmlive/images/ribbon/import-costs-16.png"" Image32by32=""/_layouts/epmlive/images/ribbon/import-costs-32.png""/>");
-                            ribbon.RegisterDataExtension(ribbonExtensions.FirstChild, "Ribbon.List.Actions.Controls._children");
-                        }
 
                         if (bRollups || requestList)
                         {
