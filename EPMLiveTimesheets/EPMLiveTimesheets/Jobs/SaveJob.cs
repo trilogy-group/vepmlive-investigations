@@ -707,10 +707,13 @@ namespace TimeSheets
                     sErrors = "Timesheet does not exist";
                 }
 
-                cmd = new SqlCommand("INSERT INTO TSQUEUE (TS_UID, STATUS, JOBTYPE_ID, USERID, JOBDATA) VALUES (@tsuid, 0, 32, @userid, @jobdata)", cn);
-                cmd.Parameters.AddWithValue("@tsuid", TSUID);
-                cmd.Parameters.AddWithValue("@userid", userid);
-                cmd.Parameters.AddWithValue("@jobdata", data);
+                if (liveHours)
+                {
+                    cmd = new SqlCommand("INSERT INTO TSQUEUE (TS_UID, STATUS, JOBTYPE_ID, USERID, JOBDATA) VALUES (@tsuid, 0, 32, @userid, @jobdata)", cn);
+                    cmd.Parameters.AddWithValue("@tsuid", TSUID);
+                    cmd.Parameters.AddWithValue("@userid", userid);
+                    cmd.Parameters.AddWithValue("@jobdata", data);
+                }
 
                 cmd.ExecuteNonQuery();
 
