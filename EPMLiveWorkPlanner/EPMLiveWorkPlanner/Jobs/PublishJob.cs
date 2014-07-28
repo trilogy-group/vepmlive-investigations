@@ -217,7 +217,7 @@ namespace EPMLiveWorkPlanner
                     catch { }
                     if(!folderfound)
                     {
-                        SPListItem oFolder = list.Items.Add(fullFolder, SPFileSystemObjectType.Folder, sFolder);
+                        SPListItem oFolder = list.AddItem(fullFolder, SPFileSystemObjectType.Folder, sFolder);
                         oFolder["Title"] = sFolder;
                         oFolder["ContentTypeId"] = itemtype.Id;
                         oFolder.Update();
@@ -374,9 +374,9 @@ namespace EPMLiveWorkPlanner
                             newtask = true;
 
                             if(TaskFolder == "")
-                                liTask = list.Items.Add();
+                                liTask = list.AddItem();
                             else
-                                liTask = list.Items.Add(fullFolder, SPFileSystemObjectType.File, ndTask.SelectSingleNode("Title").InnerText);
+                                liTask = list.AddItem(fullFolder, SPFileSystemObjectType.File, ndTask.SelectSingleNode("Title").InnerText);
 
                         }
 
