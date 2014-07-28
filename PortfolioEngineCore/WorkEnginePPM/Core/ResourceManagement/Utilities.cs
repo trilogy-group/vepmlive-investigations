@@ -15,7 +15,7 @@ namespace WorkEnginePPM.Core.ResourceManagement
 {
     public static class Utilities
     {
-        #region Methods (11) 
+        #region Methods (11)
 
         // Public Methods (6) 
 
@@ -35,12 +35,12 @@ namespace WorkEnginePPM.Core.ResourceManagement
 
             foreach (DataRow dataRow in fieldsTable.Rows)
             {
-                var fieldId = (int) dataRow["Id"];
+                var fieldId = (int)dataRow["Id"];
                 object rawValue = dataRow["Value"];
 
                 if (fieldId == 0)
                 {
-                    if (rawValue == DBNull.Value || string.IsNullOrEmpty((string) rawValue)) rawValue = "0";
+                    if (rawValue == DBNull.Value || string.IsNullOrEmpty((string)rawValue)) rawValue = "0";
 
                     if (rawValue.Equals("0"))
                     {
@@ -70,7 +70,7 @@ namespace WorkEnginePPM.Core.ResourceManagement
                             resourceElement.Add(new XAttribute("ExtId", externalId));
 
                             resourceElement.Add(new XElement("Field", externalId,
-                                new XAttribute("Id", (int) PFEResourceField.ID)));
+                                new XAttribute("Id", (int)PFEResourceField.ID)));
                         }
                     }
                     else
@@ -80,12 +80,12 @@ namespace WorkEnginePPM.Core.ResourceManagement
                 }
                 else
                 {
-                    resourceElement.Add(new XElement("Field", GetCleanFieldValue(spWeb, dataRow, rawValue),
+                    resourceElement.Add(new XElement("Field", GetCleanFieldValue(spWeb, dataRow, rawValue, false),
                         new XAttribute("Id", fieldId)));
                 }
             }
 
-            resourceElement.Add(new XElement("Field", true, new XAttribute("Id", (int) PFEResourceField.IsResource)));
+            resourceElement.Add(new XElement("Field", true, new XAttribute("Id", (int)PFEResourceField.IsResource)));
 
             resourceElement.Add(new XAttribute("DataId", dataId));
 
@@ -166,9 +166,9 @@ namespace WorkEnginePPM.Core.ResourceManagement
 
             var fieldsTable = new DataTable();
 
-            fieldsTable.Columns.Add("Id", typeof (int));
-            fieldsTable.Columns.Add("Value", typeof (object));
-            fieldsTable.Columns.Add("Field", typeof (SPField));
+            fieldsTable.Columns.Add("Id", typeof(int));
+            fieldsTable.Columns.Add("Value", typeof(object));
+            fieldsTable.Columns.Add("Field", typeof(SPField));
 
             var defaultFields = new List<int>();
 
@@ -204,7 +204,7 @@ namespace WorkEnginePPM.Core.ResourceManagement
                     {
                         DataRow idRow = fieldsTable.NewRow();
 
-                        idRow["Id"] = (int) PFEResourceField.ID;
+                        idRow["Id"] = (int)PFEResourceField.ID;
                         idRow["Field"] = dataRow["Field"];
                         idRow["Value"] = properties.ListItem["ID"];
 
@@ -215,7 +215,7 @@ namespace WorkEnginePPM.Core.ResourceManagement
                 {
                     if (!TryGetPFEFieldId(internalName, out pfeResourceField)) continue;
 
-                    var resourceField = (int) pfeResourceField;
+                    var resourceField = (int)pfeResourceField;
 
                     if (internalName.Equals("Permissions"))
                     {
@@ -291,7 +291,7 @@ namespace WorkEnginePPM.Core.ResourceManagement
                     {
                         if (internalName.Equals("Generic"))
                         {
-                            bool.TryParse((string) currentValue, out isGeneric);
+                            bool.TryParse((string)currentValue, out isGeneric);
                             currentValue = isGeneric;
                         }
 
@@ -397,7 +397,7 @@ namespace WorkEnginePPM.Core.ResourceManagement
                             if (isOnline)
                             {
                                 bool canLogin;
-                                bool.TryParse((string) currentValue, out canLogin);
+                                bool.TryParse((string)currentValue, out canLogin);
                                 currentValue = canLogin;
                             }
                             else
@@ -448,11 +448,11 @@ namespace WorkEnginePPM.Core.ResourceManagement
                     {
                         try
                         {
-                            email = (string) properties.AfterProperties["Email"];
+                            email = (string)properties.AfterProperties["Email"];
                         }
                         catch
                         {
-                            email = (string) properties.ListItem["Email"];
+                            email = (string)properties.ListItem["Email"];
                         }
                     }
                     catch { }
@@ -460,7 +460,7 @@ namespace WorkEnginePPM.Core.ResourceManagement
                     if (!string.IsNullOrEmpty(email))
                     {
                         DataRow dataRow = fieldsTable.NewRow();
-                        dataRow["Id"] = (int) PFEResourceField.Email;
+                        dataRow["Id"] = (int)PFEResourceField.Email;
                         dataRow["Value"] = email;
                         dataRow["Field"] = properties.List.Fields["Email"];
 
@@ -518,10 +518,10 @@ namespace WorkEnginePPM.Core.ResourceManagement
         /// <param name="rawValue">The raw value.</param>
         /// <param name="spField">The sp field.</param>
         /// <returns></returns>
-        public static string GetCleanFieldValue(SPWeb spWeb, object rawValue, SPField spField)
+        public static string GetCleanFieldValue(SPWeb spWeb, object rawValue, SPField spField, Boolean returnId)
         {
             if (rawValue == null || rawValue == DBNull.Value) return string.Empty;
-            if (rawValue is string && string.IsNullOrEmpty((string) rawValue)) return string.Empty;
+            if (rawValue is string && string.IsNullOrEmpty((string)rawValue)) return string.Empty;
 
             string value;
 
@@ -540,7 +540,7 @@ namespace WorkEnginePPM.Core.ResourceManagement
 
             if (spField.TypeAsString.Equals("PFERole"))
             {
-                return value.Split(new[] {"#;"}, StringSplitOptions.None)[0];
+                return value.Split(new[] { "#;" }, StringSplitOptions.None)[0];
             }
 
             switch (spField.Type)
@@ -548,93 +548,111 @@ namespace WorkEnginePPM.Core.ResourceManagement
                 case SPFieldType.DateTime:
                     if (rawValue is DateTime)
                     {
-                        value = SPUtility.CreateISO8601DateTimeFromSystemDateTime((DateTime) rawValue);
+                        value = SPUtility.CreateISO8601DateTimeFromSystemDateTime((DateTime)rawValue);
                     }
                     break;
                 case SPFieldType.User:
-                {
-                    var spFieldUser = (SPFieldUser) spField;
-
-                    if (spFieldUser.AllowMultipleValues)
                     {
-                        var users = new List<string>();
+                        var spFieldUser = (SPFieldUser)spField;
 
-                        SPFieldUserValueCollection spFieldUserValueCollection = null;
-
-                        if (rawValue is string)
+                        if (spFieldUser.AllowMultipleValues)
                         {
-                            spFieldUserValueCollection = new SPFieldUserValueCollection(spWeb, (string) rawValue);
-                        }
-                        else if (rawValue is SPFieldUserValueCollection)
-                        {
-                            spFieldUserValueCollection = (SPFieldUserValueCollection) rawValue;
-                        }
+                            var users = new List<string>();
 
-                        if (spFieldUserValueCollection != null)
-                        {
-                            users.AddRange(
-                                spFieldUserValueCollection.Select(
-                                    spFieldUserValue => GetUserName(spWeb, spFieldUserValue)));
+                            SPFieldUserValueCollection spFieldUserValueCollection = null;
 
-                            value = string.Join(",", users.ToArray());
-                        }
-                    }
-                    else
-                    {
-                        var spFieldUserValue = new SPFieldUserValue(spWeb, (string) rawValue);
-
-                        value = GetUserName(spWeb, spFieldUserValue);
-                    }
-                }
-                    break;
-                case SPFieldType.Lookup:
-                {
-                    var spFieldLookup = (SPFieldLookup) spField;
-
-                    SPList spList = spWeb.Lists[new Guid(spFieldLookup.LookupList)];
-
-                    if (spFieldLookup.AllowMultipleValues)
-                    {
-                        var fieldValue = (SPFieldLookupValueCollection) spField.GetFieldValue(rawValue.ToString());
-
-                        if (fieldValue != null)
-                        {
-                            IEnumerable<int> lookupIds =
-                                fieldValue.Select(spFieldLookupValue => spFieldLookupValue.LookupId);
-
-                            SPListItemCollection spListItemCollection = spList.Items;
-
-                            IEnumerable<string> values = spListItemCollection.Cast<SPListItem>()
-                                .Where(spListItem => lookupIds.Contains((int) spListItem["ID"]))
-                                .Select(spListItem => spListItem["EXTID"].ToString());
-
-                            value = string.Join(",", values.ToArray());
-                        }
-                        else
-                        {
-                            value = string.Empty;
-                        }
-                    }
-                    else
-                    {
-                        var fieldValue = (SPFieldLookupValue) spField.GetFieldValue(rawValue.ToString());
-
-                        if (fieldValue != null)
-                        {
-                            SPListItemCollection spListItemCollection = spList.Items;
-
-                            foreach (SPListItem spListItem in spListItemCollection.Cast<SPListItem>()
-                                .Where(spListItem => (int) spListItem["ID"] == fieldValue.LookupId))
+                            if (rawValue is string)
                             {
-                                value = spListItem["EXTID"].ToString();
+                                spFieldUserValueCollection = new SPFieldUserValueCollection(spWeb, (string)rawValue);
+                            }
+                            else if (rawValue is SPFieldUserValueCollection)
+                            {
+                                spFieldUserValueCollection = (SPFieldUserValueCollection)rawValue;
+                            }
+
+                            if (spFieldUserValueCollection != null)
+                            {
+                                users.AddRange(
+                                    spFieldUserValueCollection.Select(
+                                        spFieldUserValue => GetUserName(spWeb, spFieldUserValue)));
+
+                                value = string.Join(",", users.ToArray());
                             }
                         }
                         else
                         {
-                            value = string.Empty;
+                            var spFieldUserValue = new SPFieldUserValue(spWeb, (string)rawValue);
+
+                            value = GetUserName(spWeb, spFieldUserValue);
                         }
                     }
-                }
+                    break;
+                case SPFieldType.Lookup:
+                    {
+                        var spFieldLookup = (SPFieldLookup)spField;
+
+                        SPList spList = spWeb.Lists[new Guid(spFieldLookup.LookupList)];
+
+                        if (spFieldLookup.AllowMultipleValues)
+                        {
+                            var fieldValue = (SPFieldLookupValueCollection)spField.GetFieldValue(rawValue.ToString());
+
+                            if (fieldValue != null)
+                            {
+                                IEnumerable<int> lookupIds =
+                                    fieldValue.Select(spFieldLookupValue => spFieldLookupValue.LookupId);
+
+                                SPListItemCollection spListItemCollection = spList.Items;
+
+                                if (returnId)
+                                {
+                                    IEnumerable<string> values = spListItemCollection.Cast<SPListItem>()
+                                        .Where(spListItem => lookupIds.Contains((int)spListItem["ID"]))
+                                        .Select(spListItem => spListItem["EXTID"].ToString());
+
+                                    value = string.Join(",", values.ToArray());
+                                }
+                                else
+                                {
+                                    IEnumerable<string> values = spListItemCollection.Cast<SPListItem>()
+                                        .Where(spListItem => lookupIds.Contains((int)spListItem["ID"]))
+                                        .Select(spListItem => spListItem["Title"].ToString());
+
+                                    value = string.Join(",", values.ToArray());
+                                }
+                            }
+                            else
+                            {
+                                value = string.Empty;
+                            }
+                        }
+                        else
+                        {
+                            var fieldValue = (SPFieldLookupValue)spField.GetFieldValue(rawValue.ToString());
+
+                            if (fieldValue != null)
+                            {
+                                SPListItemCollection spListItemCollection = spList.Items;
+
+                                foreach (SPListItem spListItem in spListItemCollection.Cast<SPListItem>()
+                                    .Where(spListItem => (int)spListItem["ID"] == fieldValue.LookupId))
+                                {
+                                    if (returnId)
+                                    {
+                                        value = spListItem["EXTID"].ToString();
+                                    }
+                                    else
+                                    {
+                                        value = spListItem["Title"].ToString();
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                value = string.Empty;
+                            }
+                        }
+                    }
                     break;
             }
 
@@ -686,14 +704,14 @@ namespace WorkEnginePPM.Core.ResourceManagement
                 if (dataElement != null)
                 {
                     foreach (var deleteCheckResponse in from e in dataElement.Elements("Resource")
-                        let dataIdAttribute = e.Attribute("DataId")
-                        where
-                            dataIdAttribute != null &&
-                            dataIdAttribute.Value.Equals(dataId.ToString())
-                        let canDeleteAttribute = e.Attribute("CanDelete")
-                        where canDeleteAttribute != null
-                        select
-                            new {Status = canDeleteAttribute.Value, Message = e.Value})
+                                                        let dataIdAttribute = e.Attribute("DataId")
+                                                        where
+                                                            dataIdAttribute != null &&
+                                                            dataIdAttribute.Value.Equals(dataId.ToString())
+                                                        let canDeleteAttribute = e.Attribute("CanDelete")
+                                                        where canDeleteAttribute != null
+                                                        select
+                                                            new { Status = canDeleteAttribute.Value, Message = e.Value })
                     {
                         deleteResourceCheckStatus = deleteCheckResponse.Status;
                         deleteResourceCheckMessage = deleteCheckResponse.Message;
@@ -788,8 +806,8 @@ namespace WorkEnginePPM.Core.ResourceManagement
             return newValue == null
                 ? currentValue == null
                 : currentValue != null &&
-                  GetCleanFieldValue(spWeb, newValue, spField)
-                      .Equals(GetCleanFieldValue(spWeb, currentValue, spField));
+                  GetCleanFieldValue(spWeb, newValue, spField, true)
+                      .Equals(GetCleanFieldValue(spWeb, currentValue, spField, true));
         }
 
         /// <summary>
@@ -799,9 +817,9 @@ namespace WorkEnginePPM.Core.ResourceManagement
         /// <param name="dataRow">The data row.</param>
         /// <param name="rawValue">The raw value.</param>
         /// <returns></returns>
-        private static string GetCleanFieldValue(SPWeb spWeb, DataRow dataRow, object rawValue)
+        private static string GetCleanFieldValue(SPWeb spWeb, DataRow dataRow, object rawValue, Boolean returnId)
         {
-            return GetCleanFieldValue(spWeb, rawValue, (SPField) dataRow["Field"]);
+            return GetCleanFieldValue(spWeb, rawValue, (SPField)dataRow["Field"], returnId);
         }
 
         /// <summary>
@@ -850,7 +868,7 @@ namespace WorkEnginePPM.Core.ResourceManagement
         {
             try
             {
-                pfeResourceField = (PFEResourceField) Enum.Parse(typeof (PFEResourceField), internalName);
+                pfeResourceField = (PFEResourceField)Enum.Parse(typeof(PFEResourceField), internalName);
                 return true;
             }
             catch
@@ -860,6 +878,6 @@ namespace WorkEnginePPM.Core.ResourceManagement
             }
         }
 
-        #endregion Methods 
+        #endregion Methods
     }
 }

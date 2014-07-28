@@ -43,12 +43,12 @@ namespace WorkEnginePPM
                 }
                 StreamReader sr = new StreamReader(stream);
                 doc.LoadXml(sr.ReadToEnd());
-                foreach(XmlNode nd in doc.SelectNodes("/strings/string"))
+                foreach (XmlNode nd in doc.SelectNodes("/strings/string"))
                 {
                     hshResources.Add(nd.Attributes["id"].Value, nd.InnerText);
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 strError = ex.Message;
             }
@@ -108,13 +108,13 @@ namespace WorkEnginePPM
         public static string GetCleanUsername(SPWeb web)
         {
             string username = web.CurrentUser.LoginName;
-            if(username.ToLower() == "sharepoint\\system")
+            if (username.ToLower() == "sharepoint\\system")
             {
                 username = web.Site.WebApplication.ApplicationPool.Username;
             }
             else
             {
-                if(username.Contains("\\"))
+                if (username.Contains("\\"))
                     username = EPMLiveCore.CoreFunctions.GetJustUsername(username);
                 else
                     username = EPMLiveCore.CoreFunctions.GetRealUserName(username, web.Site);
@@ -125,13 +125,13 @@ namespace WorkEnginePPM
 
         public static string GetCleanUsername(SPWeb web, string username)
         {
-            if(username.ToLower() == "sharepoint\\system")
+            if (username.ToLower() == "sharepoint\\system")
             {
                 username = web.Site.WebApplication.ApplicationPool.Username;
             }
             else
             {
-                if(username.Contains("\\"))
+                if (username.Contains("\\"))
                     username = EPMLiveCore.CoreFunctions.GetJustUsername(username);
                 else
                     username = EPMLiveCore.CoreFunctions.GetRealUserName(username, web.Site);
@@ -139,7 +139,7 @@ namespace WorkEnginePPM
 
             return username;
         }
-       
+
 
         private static string getDomain()
         {
@@ -242,8 +242,8 @@ namespace WorkEnginePPM
 
             return sUsernameString;
         }
-        
-        
+
+
 
 
         public static SPField getRealField(SPField field)
@@ -277,7 +277,7 @@ namespace WorkEnginePPM
             return field;
         }
 
-        public static DataTable getSiteItems(SPWeb web, SPView view, string spquery, string filterfield, string usewbs, string rlist, string []arrGroupFields)
+        public static DataTable getSiteItems(SPWeb web, SPView view, string spquery, string filterfield, string usewbs, string rlist, string[] arrGroupFields)
         {
             DataTable dt = null;
             string lists = "";
@@ -388,7 +388,7 @@ namespace WorkEnginePPM
                         {
                             lists = "<List ID='" + view.ParentList.ID + "'/>";
                         }
-                        
+
 
                         if (lists != "")
                         {
@@ -436,21 +436,21 @@ namespace WorkEnginePPM
             try
             {
                 string users = "";
-                if(properties["AssignedTo"] == null)
+                if (properties["AssignedTo"] == null)
                     users = li[li.ParentList.Fields.GetFieldByInternalName("AssignedTo").Id].ToString();
-                else 
+                else
                     users = properties["AssignedTo"].ToString();
 
                 SPFieldUserValueCollection uvc = new SPFieldUserValueCollection(li.ParentList.ParentWeb, users);
 
-                foreach(SPFieldUserValue uv in uvc)
+                foreach (SPFieldUserValue uv in uvc)
                 {
                     try
                     {
                         DataRow[] dr = dtResources.Select("SPID='" + uv.LookupId + "'");
-                        if(dr.Length > 0)
+                        if (dr.Length > 0)
                         {
-                            if(dr[0]["EXTID"].ToString() != "")
+                            if (dr[0]["EXTID"].ToString() != "")
                             {
                                 team += "," + dr[0]["EXTID"].ToString();
                             }
@@ -463,7 +463,7 @@ namespace WorkEnginePPM
             }
             catch { }
 
-            if(team != "")
+            if (team != "")
                 return "<Team>" + team + "</Team>";
             else
                 return "";
@@ -494,9 +494,10 @@ namespace WorkEnginePPM
                 try
                 {
                     oField = list.Fields.GetFieldByInternalName(spfield);
-                }catch{}
+                }
+                catch { }
 
-                if(oField != null)
+                if (oField != null)
                 {
                     try
                     {
@@ -506,9 +507,24 @@ namespace WorkEnginePPM
                             val = oField.GetFieldValue(li[oField.Id].ToString()).ToString();
                         }
                         catch { }
-                        if(oField.Type == SPFieldType.Lookup)
+                        if (oField.Type == SPFieldType.Lookup)
                         {
-                            val = oField.GetFieldValueAsText(li[oField.Id].ToString()).ToString();
+                            if (properties[spfield] != null)
+                            {
+                                try
+                                {
+                                    SPList lookUpList = web.Lists[new Guid(((SPFieldLookup)oField).LookupList)];
+                                    val = lookUpList.GetItemById(Convert.ToInt32(properties[spfield])).Title;
+                                }
+                                catch
+                                {
+                                    val = oField.GetFieldValueAsText(li[oField.Id].ToString()).ToString();
+                                }
+                            }
+                            else
+                            {
+                                val = oField.GetFieldValueAsText(li[oField.Id].ToString()).ToString();
+                            }
                         }
                         else if (oField.Type == SPFieldType.DateTime)
                         {
@@ -541,17 +557,17 @@ namespace WorkEnginePPM
                             SPFieldUser uf = (SPFieldUser)li.Fields.GetFieldByInternalName(spfield);
                             try
                             {
-                                if(properties[spfield] != null)
+                                if (properties[spfield] != null)
                                     val = properties[spfield].ToString();
                             }
                             catch { }
                             string newval = "";
                             try
                             {
-                                if(uf.AllowMultipleValues)
+                                if (uf.AllowMultipleValues)
                                 {
                                     SPFieldUserValueCollection uvc = new SPFieldUserValueCollection(web, val);
-                                    foreach(SPFieldUserValue uv in uvc)
+                                    foreach (SPFieldUserValue uv in uvc)
                                     {
                                         newval += "," + EPMLiveCore.CoreFunctions.GetRealUserName(uv.User.LoginName, web.Site);
                                     }
@@ -562,7 +578,8 @@ namespace WorkEnginePPM
                                     newval = EPMLiveCore.CoreFunctions.GetRealUserName(uv.User.LoginName, web.Site);
                                 }
                             }
-                            catch {
+                            catch
+                            {
                                 try
                                 {
                                     newval = EPMLiveCore.CoreFunctions.GetRealUserName(web.AllUsers[oField.GetFieldValueAsText(properties[spfield].ToString())].LoginName, web.Site);
@@ -580,7 +597,7 @@ namespace WorkEnginePPM
                             }
                             catch { }
                         }
-                        else if(oField.Type == SPFieldType.Boolean)
+                        else if (oField.Type == SPFieldType.Boolean)
                         {
                             try
                             {
@@ -589,7 +606,7 @@ namespace WorkEnginePPM
                             }
                             catch { }
 
-                            if(val == "True")
+                            if (val == "True")
                                 val = "1";
                             else
                                 val = "0";
@@ -636,7 +653,7 @@ namespace WorkEnginePPM
                     //    return (string)m.Invoke(null, null);
                     //}
                     //else
-                        return (string)m.Invoke(null, null);
+                    return (string)m.Invoke(null, null);
                 }
             }
             Exception ex = new Exception("method/class not found");
@@ -661,7 +678,7 @@ namespace WorkEnginePPM
                 {
                     case "PollingInterval":
                         cn = "10";
-                        break; 
+                        break;
                     case "QueueThreads":
                         cn = "5";
                         break;
@@ -724,7 +741,7 @@ namespace WorkEnginePPM
                     webapp.Properties.Add(setting, value);
                 webapp.Update();
             }
-            catch{}
+            catch { }
         }
         public static string getListSetting(SPList list, string setting)
         {
@@ -770,7 +787,7 @@ namespace WorkEnginePPM
             {
                 try
                 {
-                    
+
                     string val = "";
                     switch (setting)
                     {
@@ -813,7 +830,8 @@ namespace WorkEnginePPM
         public static string getConnectionString(Guid gWebApp)
         {
             string cn = "";
-            SPSecurity.RunWithElevatedPrivileges(delegate(){
+            SPSecurity.RunWithElevatedPrivileges(delegate()
+            {
                 try
                 {
                     SPWebApplication webapp = SPWebService.ContentService.WebApplications[gWebApp];
@@ -828,8 +846,9 @@ namespace WorkEnginePPM
                         cn = System.Configuration.ConfigurationManager.ConnectionStrings["epmlive"].ConnectionString;
                         if (cn != "")
                             setConnectionString(gWebApp, cn, out sError);
-                        
-                    }catch{}
+
+                    }
+                    catch { }
                 }
             });
             return cn;
@@ -855,7 +874,7 @@ namespace WorkEnginePPM
             return true;
         }
 
-        
+
 
         public static void setConfigSetting(SPWeb web, string setting, string value)
         {
@@ -1017,7 +1036,7 @@ namespace WorkEnginePPM
         public static string getConfigSetting(SPWeb web, string setting)
         {
             return getConfigSetting(web, setting, true, true);
-            
+
         }
 
         public static string getLockConfigSetting(SPWeb web, string setting, bool isRelative)
@@ -1028,7 +1047,7 @@ namespace WorkEnginePPM
             {
                 using (SPSite site = SPContext.Current.Site)
                 {
-                    using(SPWeb w = site.OpenWeb(lockWeb))
+                    using (SPWeb w = site.OpenWeb(lockWeb))
                     {
                         val = getConfigSetting(w, setting, true, isRelative);
                     }
@@ -1060,7 +1079,7 @@ namespace WorkEnginePPM
 
                             if (translateUrl)
                             {
-                                if(isRelative)
+                                if (isRelative)
                                     prop = prop.Replace("{Site}", rweb.ServerRelativeUrl);
                                 else
                                     prop = prop.Replace("{Site}", rweb.Url);
@@ -1092,8 +1111,8 @@ namespace WorkEnginePPM
             return prop;
 
         }
-            
-        
+
+
 
         public static string farmEncode(string code)
         {
@@ -1125,7 +1144,7 @@ namespace WorkEnginePPM
 
         public static string Encrypt(string plainText, string passPhrase)
         {
-            
+
             try
             {
                 byte[] initVectorBytes = Encoding.ASCII.GetBytes(initVector);
@@ -1220,7 +1239,7 @@ namespace WorkEnginePPM
                     string newkeys = "";
                     try
                     {
-                        string []keys = farm.Properties["EPMLiveKeys"].ToString().Split('\t');
+                        string[] keys = farm.Properties["EPMLiveKeys"].ToString().Split('\t');
 
                         for (int i = 0; i < keys.Length; i = i + 2)
                         {
@@ -1299,15 +1318,15 @@ namespace WorkEnginePPM
                                 string s = arrKeys[i + 1];
                                 if (farmEncode(val) == s)
                                 {
-                                    if(!list.Contains(val))
-                                       list.Add(val);
+                                    if (!list.Contains(val))
+                                        list.Add(val);
                                 }
                             }
                         }
                     }
 
-                    
-                    
+
+
                     //foreach (XmlNode nd in doc.FirstChild.ChildNodes)
                     //{
                     //    try
@@ -1325,7 +1344,7 @@ namespace WorkEnginePPM
                 }
                 catch
                 {
-                    
+
                 }
             });
             return (string[])list.ToArray(typeof(string));
@@ -1333,7 +1352,7 @@ namespace WorkEnginePPM
 
         public static void enqueue(Guid timerjobuid, int defaultstatus)
         {
-            using(SPSite site = SPContext.Current.Site)
+            using (SPSite site = SPContext.Current.Site)
             {
                 enqueue(timerjobuid, defaultstatus, site);
             }
