@@ -561,89 +561,108 @@ namespace EPMLiveCore.API
                 XElement colsElement = gridElement.Element("Cols");
 
                 // build enum value rules for treegrid
-                foreach (var kv in gridFields)
-                {
-                    if (kv.Value.Type == SPFieldType.Lookup)
-                    {
-                        var cElement = new XElement("C");
-                        string gridSafeFieldName = Utils.ToGridSafeFieldName(kv.Value.InternalName);
-                        cElement.Add(new XAttribute("Name", gridSafeFieldName));
-                        cElement.Add(new XAttribute("Type", "Enum"));
-
-                        // build enum choices
-                        var lEnum = new List<string>();
-                        var lEnumKeys = new List<string>();
-                        foreach (XNode n in bElement.DescendantNodes())
-                        {
-                            if (n is XElement)
-                            {
-                                XElement ele = (XElement)n;
-                                if (ele.Name.LocalName.Equals("I"))
-                                {
-                                    var sRaw = (string)ele.Attribute(gridSafeFieldName);
-                                    var ID = (int)ele.Attribute("ID");
-                                    SPListItem item = null;
-
-                                    try
-                                    {
-                                        item = resourcesList.GetItemById(ID);
-                                    }
-                                    catch { }
-
-                                    SPFieldLookupValueCollection lookupValCols = new SPFieldLookupValueCollection();
-
-                                    if (item != null)
-                                    {
-                                        try
-                                        {
-                                            lookupValCols = new SPFieldLookupValueCollection(item[kv.Value.InternalName].ToString());
-                                        }
-                                        catch { }
-                                    }
-
-                                    var sEnum = string.Empty;
-                                    var sEnumKey = string.Empty;
-
-                                    if (lookupValCols.Count > 0)
-                                    {
-                                        foreach (var lookupVal in lookupValCols)
-                                        {
-                                            sEnum += (lookupVal.LookupValue + ";");
-                                            sEnumKey += (lookupVal.LookupId.ToString() + ";");
-                                        }
-                                    }
-
-                                    if (!string.IsNullOrEmpty(sEnum.Trim()))
-                                    {
-                                        sEnum = sEnum.TrimEnd(new[] { ';' });
-                                        if (!lEnum.Contains(sEnum))
-                                        {
-                                            lEnum.Add(sEnum);
-                                        }
-                                    }
-
-                                    if (!string.IsNullOrEmpty(sEnumKey.Trim()))
-                                    {
-                                        sEnumKey = sEnumKey.TrimEnd(new[] { ';' });
-                                        if (!lEnumKeys.Contains(sEnumKey))
-                                        {
-                                            lEnumKeys.Add(sEnumKey);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
-                        cElement.Add(new XAttribute("Enum", (lEnum.Count > 0 ? ("|" + string.Join("|", lEnum.ToArray())) : "")));
-                        cElement.Add(new XAttribute("EnumKeys", (lEnumKeys.Count > 0 ? ("|" + string.Join("|", lEnumKeys.ToArray())) : "")));
-                        cElement.Add(new XAttribute("Range", "1"));
-                        cElement.Add(new XAttribute("FilterEnumKeys", "1"));
-                        colsElement.Add(cElement);
-                    }
-                }
+                BuildEnumValues(gridFields, bElement, resourceTeam, colsElement);
 
                 // ReSharper restore PossibleNullReferenceException
                 return resultXml.ToString();
+            }
+        }
+
+        private static void BuildEnumValues(Dictionary<string, SPField> gridFields, XElement bElement, XDocument resourceTeam,
+            XElement colsElement)
+        {
+            foreach (var kv in gridFields)
+            {
+                if (kv.Value.Type != SPFieldType.Lookup) continue;
+
+                var cElement = new XElement("C");
+                string gridSafeFieldName = Utils.ToGridSafeFieldName(kv.Value.InternalName);
+                cElement.Add(new XAttribute("Name", gridSafeFieldName));
+                cElement.Add(new XAttribute("Type", "Enum"));
+
+                // build enum choices
+                var lEnum = new List<string>();
+                var lEnumKeys = new List<string>();
+                foreach (XNode n in bElement.DescendantNodes())
+                {
+                    if (!(n is XElement)) continue;
+
+                    XElement ele = (XElement) n;
+                    if (!ele.Name.LocalName.Equals("I")) continue;
+
+                    var sRaw = (string) ele.Attribute(gridSafeFieldName);
+                    var ID = (int) ele.Attribute("ID");
+                    //SPListItem item = null;
+
+                    //try
+                    //{
+                    //    item = resourcesList.GetItemById(ID);
+                    //}
+                    //catch { }
+
+                    //SPFieldLookupValueCollection lookupValCols = new SPFieldLookupValueCollection();
+
+                    //if (item != null)
+                    //{
+                    //    try
+                    //    {
+                    //        lookupValCols = new SPFieldLookupValueCollection(item[kv.Value.InternalName].ToString());
+                    //    }
+                    //    catch { }
+                    //}
+
+                    SPFieldLookupValueCollection lookupValCols = new SPFieldLookupValueCollection();
+
+                    try
+                    {
+                        var iEle = resourceTeam.Descendants("Resource")
+                            .First(e => e.Attribute("ID").Value.Equals(
+                                ID.ToString(CultureInfo.InvariantCulture)));
+
+                        string lookupVal = iEle.Elements("Data")
+                            .First(e => e.Attribute("Field").Value.Equals(kv.Value.InternalName)).Value;
+
+                        lookupValCols = new SPFieldLookupValueCollection(lookupVal);
+                    }
+                    catch { }
+
+                    var sEnum = string.Empty;
+                    var sEnumKey = string.Empty;
+
+                    if (lookupValCols.Count > 0)
+                    {
+                        foreach (var lookupVal in lookupValCols)
+                        {
+                            sEnum += (lookupVal.LookupValue + ";");
+                            sEnumKey += (lookupVal.LookupId.ToString() + ";");
+                        }
+                    }
+
+                    if (!string.IsNullOrEmpty(sEnum.Trim()))
+                    {
+                        sEnum = sEnum.TrimEnd(new[] {';'});
+                        if (!lEnum.Contains(sEnum))
+                        {
+                            lEnum.Add(sEnum);
+                        }
+                    }
+
+                    if (!string.IsNullOrEmpty(sEnumKey.Trim()))
+                    {
+                        sEnumKey = sEnumKey.TrimEnd(new[] {';'});
+                        if (!lEnumKeys.Contains(sEnumKey))
+                        {
+                            lEnumKeys.Add(sEnumKey);
+                        }
+                    }
+                }
+
+                cElement.Add(new XAttribute("Enum", (lEnum.Count > 0 ? ("|" + string.Join("|", lEnum.ToArray())) : "")));
+                cElement.Add(new XAttribute("EnumKeys",
+                    (lEnumKeys.Count > 0 ? ("|" + string.Join("|", lEnumKeys.ToArray())) : "")));
+                cElement.Add(new XAttribute("Range", "1"));
+                cElement.Add(new XAttribute("FilterEnumKeys", "1"));
+                colsElement.Add(cElement);
             }
         }
 
