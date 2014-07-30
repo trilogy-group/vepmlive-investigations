@@ -17,7 +17,7 @@
 
 	<LeftCols>
 		<C Name='Photo' Visible='1' Width='65' Type='Html' CanHide='1'/>
-		<C Name='Title' Visible='1' RelWidth='1' CanHide='0' Type='Html'/>
+		<C Name='Title' Visible='1' RelWidth='1' CanHide='0' Type='Html' CaseSensitive='0'/>
 	</LeftCols>
 	<Cols>
 		
