@@ -399,3 +399,8 @@ else
 begin
     UPDATE INT_CATEGORY SET CATEGORY='Generic', ICON='', ORDERBY='3' where INT_CAT_ID='960be444-30f5-4a97-8721-5a210b286dad'
 end
+
+if not exists (select jobtype_id from TIMERJOBTYPES where jobtype_id = 25) 
+begin 
+    INSERT INTO TIMERJOBTYPES (jobtype_id,NetAssembly,NetClass,[Title],priority) VALUES (25,'WorkEnginePPM, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5','WorkEnginePPM.Jobs.DataServicePlatform','PFE Import-Export Data',2) 
+end
