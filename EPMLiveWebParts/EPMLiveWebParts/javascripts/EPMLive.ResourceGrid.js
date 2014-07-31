@@ -14,9 +14,9 @@ function registerEpmLiveResourceGridScript() {
         $$.resourceDictionary = null;
         $$.resources = null;
         $$.myResources = null;
-        $$.exportInProgress = false;
+        $$.exportInProgress = false; 
         $$.importInProgress = false;
-        $$.webpartHeight = false;
+        $$.webpartHeight = false; 
         $$.userIsSiteAdmin = false;
         $$.allSelected = false;
         $$.ribbonBehavior = 0;
@@ -2471,7 +2471,7 @@ function registerEpmLiveResourceGridScript() {
 
         }
 
-        window.Grids.OnMouseOverRow = function (grid, row, col, event) {
+        window.Grids.OnMouseOverRow = function (grid, row, col, event) { 
             if (grid.CurHoverRow != row.id) {
                 grid.CurHoverRow = row.id;
                 CurrentGrid = grid;
