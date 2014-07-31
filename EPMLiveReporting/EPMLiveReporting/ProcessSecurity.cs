@@ -43,19 +43,24 @@ namespace EPMLiveReportsAdmin
             {
                 foreach (string sUser in sUsers.Where(sUser => sUser != ""))
                 {
-                    cmd = new SqlCommand("DELETE FROM RPTGROUPUSER where SITEID=@siteid and userid=@userid", cn);
-                    cmd.Parameters.AddWithValue("@siteid", site.ID);
-                    cmd.Parameters.AddWithValue("@userid", sUser);
-                    cmd.ExecuteNonQuery();
-
-                    SPUser user = site.RootWeb.SiteUsers.GetByID(int.Parse(sUser));
-                    foreach (SPGroup group in user.Groups)
+                    try
                     {
-                        dt.Rows.Add(new object[] {Guid.NewGuid(), site.ID, @group.ID, user.ID});
-                    }
+                        SPUser user = site.RootWeb.SiteUsers.GetByID(int.Parse(sUser));
 
-                    if (user.IsSiteAdmin)
-                        dt.Rows.Add(new object[] {Guid.NewGuid(), site.ID, 999999, user.ID});
+                        cmd = new SqlCommand("DELETE FROM RPTGROUPUSER where SITEID=@siteid and userid=@userid", cn);
+                        cmd.Parameters.AddWithValue("@siteid", site.ID);
+                        cmd.Parameters.AddWithValue("@userid", sUser);
+                        cmd.ExecuteNonQuery();
+
+                        foreach (SPGroup group in user.Groups)
+                        {
+                            dt.Rows.Add(new object[] { Guid.NewGuid(), site.ID, @group.ID, user.ID });
+                        }
+
+                        if (user.IsSiteAdmin)
+                            dt.Rows.Add(new object[] { Guid.NewGuid(), site.ID, 999999, user.ID });
+                    }
+                    catch { }
                 }
             }
             else
