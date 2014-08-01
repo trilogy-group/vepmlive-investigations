@@ -37,6 +37,7 @@
                 display: inline;
                 float: left;
                 color: #999;
+                font-size: 17px;
                 padding-left: 10px;
                 white-space: nowrap;
                 overflow: hidden;
@@ -48,6 +49,7 @@
                 display: inline;
                 float: left;
                 padding-left: 9px;
+                font-size: 17px;
                 width: 30px;
                 text-align: center;
                 padding-right: 9px;

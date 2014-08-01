@@ -59,17 +59,18 @@ namespace EPMLiveWebParts.MyWorkSummary {
                     "t;\r\n                display: inline;\r\n                font-size: 24px;\r\n        " +
                     "        color: #aaa;\r\n                width: 20px;\r\n            }\r\n\r\n           " +
                     " #mwsMainDiv section .text {\r\n                display: inline;\r\n                " +
-                    "float: left;\r\n                color: #999;\r\n                padding-left: 10px;\r" +
-                    "\n                white-space: nowrap;\r\n                overflow: hidden;\r\n      " +
-                    "          text-overflow: ellipsis;\r\n                width: 140px;\r\n            }" +
-                    "\r\n\r\n            #mwsMainDiv section .count {\r\n                display: inline;\r\n" +
-                    "                float: left;\r\n                padding-left: 9px;\r\n              " +
-                    "  width: 30px;\r\n                text-align: center;\r\n                padding-rig" +
-                    "ht: 9px;\r\n                background-color: #E5E5E5;\r\n                border-rad" +
-                    "ius: 10px;\r\n                color: #888;\r\n            }\r\n\r\n    section:hover {\r\n" +
-                    "        cursor: pointer;\r\n    }\r\n</style>\r\n\r\n<script type=\"text/javascript\">\r\n\r\n" +
-                    "    $(function () {\r\n\r\n        MyWorkSummaryClient.fillWebPartData();\r\n    });\r\n" +
-                    "\r\n    MyWorkSummaryClient = {\r\n        dataXml: \'");
+                    "float: left;\r\n                color: #999;\r\n                font-size: 17px;\r\n  " +
+                    "              padding-left: 10px;\r\n                white-space: nowrap;\r\n       " +
+                    "         overflow: hidden;\r\n                text-overflow: ellipsis;\r\n          " +
+                    "      width: 140px;\r\n            }\r\n\r\n            #mwsMainDiv section .count {\r\n" +
+                    "                display: inline;\r\n                float: left;\r\n                " +
+                    "padding-left: 9px;\r\n                font-size: 17px;\r\n                width: 30p" +
+                    "x;\r\n                text-align: center;\r\n                padding-right: 9px;\r\n  " +
+                    "              background-color: #E5E5E5;\r\n                border-radius: 10px;\r\n" +
+                    "                color: #888;\r\n            }\r\n\r\n    section:hover {\r\n        curs" +
+                    "or: pointer;\r\n    }\r\n</style>\r\n\r\n<script type=\"text/javascript\">\r\n\r\n    $(functi" +
+                    "on () {\r\n\r\n        MyWorkSummaryClient.fillWebPartData();\r\n    });\r\n\r\n    MyWork" +
+                    "SummaryClient = {\r\n        dataXml: \'");
           @__w.Write(dataXml);
 
             @__w.Write("\',\r\n        fillWebPartData: function () {\r\n            if (this.dataXml != \'\') {" +
