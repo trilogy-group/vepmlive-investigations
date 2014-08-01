@@ -24,6 +24,7 @@ function registerEpmLiveResourceGridScript() {
         $$.WebId = null;
         $$.ListId = null;
         $$.ItemId = null;
+        $$.LaunchInForm = false;
 
         $$.reports = {
             wcReportId: null,
@@ -1941,7 +1942,17 @@ function registerEpmLiveResourceGridScript() {
                                         {
                                             'eventName': 'click',
                                             'function': function () {
-                                                window.location.href = $$.actions.getNewFormUrl + "?source=" + encodeURIComponent(window.location.pathname);
+                                                if ($$.LaunchInForm) {
+                                                    window.location.href = $$.actions.getNewFormUrl + "?source=" + encodeURIComponent(window.location.pathname);
+                                                }
+                                                else {
+                                                    if ($$.IsRootWeb && $$.ListId == "" && $$.ItemId == "") {
+                                                        $$.actions.displayPopUp($$.actions.getNewFormUrl, 'Add User', true, true, $$.grid.teamUpdated, { row: null, changeType: 'Added' });
+                                                    }
+                                                    else {
+                                                        $$.actions.displayPopUp($$.actions.getNewFormUrl, 'Add User', true, true, $$.grid.teamUpdated, { row: null, changeType: 'Added' }, 800, 700);
+                                                    }
+                                                }
                                             }
                                         }
                                     ]

@@ -28,6 +28,8 @@ namespace EPMLiveWebParts
         public string _reqWebId;
         private string _webPartHeight;
 
+        public bool LaunchInForm;
+
         #endregion Fields 
 
         #region Properties (12) 
@@ -164,7 +166,14 @@ namespace EPMLiveWebParts
                 }
                 else
                 {
-                    url = "/_layouts/epmlive/BuildTeam.aspx?listid=" + Request["listid"] + "&id=" + Request["id"];
+                    if (Request["listid"] != null && Request["id"] != null)
+                    {
+                        url = "/_layouts/epmlive/BuildTeam.aspx?listid=" + Request["listid"] + "&id=" + Request["id"];
+                    }
+                    else
+                    {
+                        url = "/_layouts/epmlive/BuildTeam.aspx";
+                    }
                 }
 
                 return url;
@@ -289,6 +298,16 @@ namespace EPMLiveWebParts
             _debugTag = string.Empty;
             _reqListId = Convert.ToString(Request["listId"]);
             _reqId = Convert.ToString(Request["id"]);
+
+            using (SPWeb web = SPContext.Current.Web)
+            {
+                SPList list = web.Lists.TryGetList("Resources");
+                if (list != null)
+                {
+                    // Launches form in full page or in pop up dialog
+                    LaunchInForm = list.NavigateForFormsPages; 
+                }
+            }
 
             string epmDebug;
             bool inDebugMode = IsInDebugMode(out epmDebug);
