@@ -57,22 +57,22 @@
             var currentDialog = parent.SP.UI.ModalDialog.get_childDialog();                   
             if(currentDialog != null) 
             {         
-                if(!currentDialog.$s_0) 
+                if(!currentDialog.$Q_0) 
                 {             
-                    currentDialog.$z();         
+                    currentDialog.$1Y_0();
                 }     
-            } 
+            }
         }
 
         function unMaximizeWindow() {     
             var currentDialog = parent.SP.UI.ModalDialog.get_childDialog();                   
             if(currentDialog != null) 
             {         
-                if(currentDialog.$s_0) 
+                if(currentDialog.$Q_0) 
                 {             
-                    currentDialog.$z();         
+                    currentDialog.$1Y_0();
                 }     
-            } 
+            }
         }
 
         function LoadTasks() {
