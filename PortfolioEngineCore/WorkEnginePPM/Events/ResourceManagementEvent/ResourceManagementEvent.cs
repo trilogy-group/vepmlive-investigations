@@ -13,7 +13,7 @@ namespace WorkEnginePPM.Events
     /// </summary>
     public class ResourceManagementEvent : SPItemEventReceiver
     {
-        #region Methods (6) 
+        #region Methods (6)
 
         // Public Methods (4) 
 
@@ -30,7 +30,7 @@ namespace WorkEnginePPM.Events
 
                 decimal rate;
                 Utilities.AddUpdateResource(Utilities.BuildFieldsTable(properties, false), spWeb, properties.ListId,
-                                            out rate);
+                                            out rate, false);
             }
             catch (Exception exception)
             {
@@ -57,7 +57,7 @@ namespace WorkEnginePPM.Events
                 decimal rate;
                 properties.AfterProperties["EXTID"] =
                     Utilities.AddUpdateResource(Utilities.BuildFieldsTable(properties, true), spWeb, properties.ListId,
-                                                out rate);
+                                                out rate, true);
 
                 if (rate != 0) properties.AfterProperties["StandardRate"] = rate;
             }
@@ -92,12 +92,12 @@ namespace WorkEnginePPM.Events
                 {
                     if ((from stackFrame in stackFrames
                          select stackFrame.GetMethod()
-                         into methodBase
-                         where methodBase.Name.Equals("ConfirmDelete")
-                         select methodBase.DeclaringType
-                         into declaringType
-                         where declaringType != null
-                         select declaringType.FullName)
+                             into methodBase
+                             where methodBase.Name.Equals("ConfirmDelete")
+                             select methodBase.DeclaringType
+                                 into declaringType
+                                 where declaringType != null
+                                 select declaringType.FullName)
                         .Any(fullName => fullName != null && fullName.Equals("EPMLiveCore.API.ResourceGrid")))
                     {
                         confirmDelete = true;
@@ -169,7 +169,7 @@ namespace WorkEnginePPM.Events
                 SPWeb spWeb = properties.Web;
 
                 decimal rate;
-                var extId = Utilities.AddUpdateResource(Utilities.BuildFieldsTable(properties, false), spWeb, properties.ListId, out rate);
+                var extId = Utilities.AddUpdateResource(Utilities.BuildFieldsTable(properties, false), spWeb, properties.ListId, out rate, false);
 
                 if (rate != 0) properties.AfterProperties["StandardRate"] = rate;
                 properties.AfterProperties["EXTID"] = extId;
@@ -193,6 +193,6 @@ namespace WorkEnginePPM.Events
                    properties.List.Title.Equals("Resources");
         }
 
-        #endregion Methods 
+        #endregion Methods
     }
 }

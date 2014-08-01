@@ -27,7 +27,7 @@ namespace WorkEnginePPM.Core.ResourceManagement
         /// <param name="listId">The list id.</param>
         /// <param name="rate">The rate.</param>
         /// <returns></returns>
-        public static int AddUpdateResource(DataTable fieldsTable, SPWeb spWeb, Guid listId, out decimal rate)
+        public static int AddUpdateResource(DataTable fieldsTable, SPWeb spWeb, Guid listId, out decimal rate, Boolean returnId)
         {
             string dataId = Guid.NewGuid().ToString();
 
@@ -80,7 +80,7 @@ namespace WorkEnginePPM.Core.ResourceManagement
                 }
                 else
                 {
-                    resourceElement.Add(new XElement("Field", GetCleanFieldValue(spWeb, dataRow, rawValue, false),
+                    resourceElement.Add(new XElement("Field", GetCleanFieldValue(spWeb, dataRow, rawValue, returnId),
                         new XAttribute("Id", fieldId)));
                 }
             }
