@@ -191,7 +191,6 @@
     list-style: none;
     cursor: pointer;
     position: absolute;
-    left: 150px;
 }
 
     .sortable-item .associateditemscontextmenu .icon-ellipsis-horizontal:after {
@@ -205,14 +204,10 @@
         font-size: 2em;
         color: #0090CA;
         opacity: .6;
-        position: relative;
-        left: 130px;
     }
 
         .associateditemscontextmenu .epm-menu-btn span:hover {
             opacity: 1;
-            position: relative;
-            left: 130px;
         }
 
     .associateditemscontextmenu ul.epm-nav-contextual-menu {
