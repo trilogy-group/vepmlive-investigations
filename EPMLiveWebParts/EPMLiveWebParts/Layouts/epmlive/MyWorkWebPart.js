@@ -35,8 +35,7 @@ function MyWorkOnDblClick(grid, row, col, x, y, event) {
 
 function GoodEditCol(col) {
 
-    switch (col)
-    {
+    switch (col) {
         case "DueDay":
         case "TitleLower":
         case "StatusFC":
@@ -103,7 +102,7 @@ function MyWorkOnClickOutside(grid, row, col, x, y, event) {
 }
 
 function MyWorkOnAfterValueChanged(grid, row, col, val) {
-        grid.EditRowChanged = true;
+    grid.EditRowChanged = true;
 }
 
 
@@ -223,7 +222,7 @@ function MyWorkOnReady(grid, start) {
         MyWorkGrid.newItemIndicator = window.mwNewItemIndicator;
         var url = (window.location.href + '').toLowerCase();
         if (url.indexOf('mywork.aspx') !== -1 || url.indexOf('my%20work.aspx') !== -1) {
-            window.setTimeout(function () { MyWorkGrid.loadRibbon(); }, 1500);
+            MyWorkGrid.loadRibbon();
         }
     }
 };
@@ -348,11 +347,9 @@ function MyWorkOnClick(grid, row, col, x, y, event) {
                 grid.Expand(row);
             }
 
-            window.setTimeout(function () {
-                var g = Grids[MyWorkGrid.gridId];
-                g.Update();
-                g.Render();
-            }, 100);
+            var g = Grids[MyWorkGrid.gridId];
+            g.Update();
+            g.Render();
 
             return true;
         }
@@ -387,8 +384,7 @@ function MyWorkGoToItem(gridid, rowid) {
 
 function MyWorkOnGetHtmlValue(grid, row, col, val) {
     if (grid.id === window.allWorkGridId) {
-        if (col == "Title" && row.Def.Name == "R")
-        {
+        if (col == "Title" && row.Def.Name == "R") {
             return "<a href=\"javascript:MyWorkGoToItem('" + grid.id + "','" + row.id + "');\">" + val + "</a>";
         }
         else if (col === 'CommentCount' || col === 'Priority' || col === 'Flag' || col === 'Title' || col === 'WorkingOn') {
@@ -557,7 +553,7 @@ function MyWorkOnLoaded(grid) {
 
         var url = (window.location.href + '').toLowerCase();
         if (url.indexOf('mywork.aspx') !== -1 || url.indexOf('my%20work.aspx') !== -1) {
-            window.setTimeout(function () { MyWorkGrid.loadRibbon(); }, 1500);
+            MyWorkGrid.loadRibbon();
         }
 
         grid.Lang.Format.DecimalSeparator = window.epmLiveMyWork.regionalSettings.decimalSeparator;
@@ -2024,11 +2020,9 @@ var MyWorkGrid = {
             MyWorkGrid.hideFilters();
         }
 
-        window.setTimeout(function () {
-            var g = Grids[MyWorkGrid.gridId];
-            g.Update();
-            g.Render();
-        }, 10);
+        var g = Grids[MyWorkGrid.gridId];
+        g.Update();
+        g.Render();
 
         return MyWorkGrid.filtersOn;
     },
@@ -2054,11 +2048,9 @@ var MyWorkGrid = {
             MyWorkGrid.hideGrouping();
         }
 
-        window.setTimeout(function () {
-            var g = Grids[MyWorkGrid.gridId];
-            g.Update();
-            g.Render();
-        }, 10);
+        var g = Grids[MyWorkGrid.gridId];
+        g.Update();
+        g.Render();
 
         return MyWorkGrid.groupingOn;
     },
@@ -2608,11 +2600,9 @@ var MyWorkGrid = {
             }
         }
 
-        window.setTimeout(function () {
-            var g = Grids[MyWorkGrid.gridId];
-            g.Update();
-            g.Render();
-        }, 1000);
+        var g = Grids[MyWorkGrid.gridId];
+        g.Update();
+        g.Render();
     },
 
     configureRibbon: function () {
@@ -2971,11 +2961,10 @@ var MyWorkGrid = {
 
         MyWorkGrid.hidePivotMenu();
 
-        window.setTimeout(function () {
-            var g = Grids[MyWorkGrid.gridId];
-            g.Update();
-            g.Render();
-        }, 10);
+        var g = Grids[MyWorkGrid.gridId];
+        g.Update();
+        g.Render();
+
     },
 
     clearFilter: function () {
@@ -2990,11 +2979,9 @@ var MyWorkGrid = {
 
         MyWorkGrid.hidePivotMenu();
 
-        window.setTimeout(function () {
-            var g = Grids[MyWorkGrid.gridId];
-            g.Update();
-            g.Render();
-        }, 10);
+        var g = Grids[MyWorkGrid.gridId];
+        g.Update();
+        g.Render();
     },
 
     changeToolbarSelection: function (selection) {
