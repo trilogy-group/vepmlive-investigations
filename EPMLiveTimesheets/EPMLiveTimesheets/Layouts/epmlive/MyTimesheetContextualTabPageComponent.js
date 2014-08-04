@@ -348,11 +348,15 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
         }
         else if (commandId === 'Ribbon.MyTimesheet.DeleteView') {
             var grid = Grids["TS" + this.tsObject.id];
+            var newobj = eval("TSObject" + this.tsObject.id);
+
+            if (Object.keys(newobj.Views).length == 1) {
+                alert("You can not delete this view '" + this.tsObject.CurrentView + "'");
+                return;
+            }
 
             if (confirm("Are you sure you want to delete this view: " + this.tsObject.CurrentView + "?")) {
-
                 DeleteView(grid, this.tsObject.CurrentView);
-
             }
         }
         else if (commandId === 'Ribbon.MyTimesheet.RenameView') {
@@ -362,7 +366,7 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
             viewNameDiv.style.display = "";
 
             viewNameDiv.firstChild.nextSibling.nextSibling.value = this.tsObject.CurrentView;
-            
+
             viewNameDiv.firstChild.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling.style.display = "none";
 
             if (this.tsObject.Views[this.tsObject.CurrentViewId].Default.toLowerCase() == "true") {
@@ -384,7 +388,7 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
 
             viewNameDiv.firstChild.nextSibling.nextSibling.value = this.tsObject.CurrentView;
 
-            
+
             viewNameDiv.firstChild.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling.style.display = "";
 
             if (this.tsObject.Views[this.tsObject.CurrentViewId].Default.toLowerCase() == "true") {
@@ -400,7 +404,7 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
         }
         else if (commandId === 'Ribbon.MyTimesheet.ChangeView') {
             var grid = Grids["TS" + this.tsObject.id];
-            ChangeView(grid, properties['CommandValueId'],"1");
+            ChangeView(grid, properties['CommandValueId'], "1");
         }
         else if (commandId === 'Ribbon.MyTimesheet.ClearSort') {
             var grid = Grids["TS" + this.tsObject.id];
