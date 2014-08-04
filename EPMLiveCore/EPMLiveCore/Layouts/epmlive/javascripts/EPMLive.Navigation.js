@@ -2230,7 +2230,10 @@
 
                         if ($menu.offset().top + $menu.height() > $(window).height()) {
                             $menu.css('top', $menu.offset().top - $menu.height() -30);
-                    }
+                        }
+                        if ($menu.offset().left + $menu.width() > $(window).width()) {
+                            $menu.css('left', $menu.offset().left - $menu.width() - 30);
+                        }
                     };
 
                     var showMenu = function () {
@@ -2241,7 +2244,10 @@
 
                         if ($menu.offset().top + $menu.height() > $(window).height()) {
                             $menu.css('top', $menu.offset().top - $menu.height() -30);
-                    }
+                        }
+                        if ($menu.offset().left + $menu.width() > $(window).width()) {
+                            $menu.css('left', $menu.offset().left - $menu.width() - 30);
+                        }
 
                         $menu.fadeIn(200);
 

@@ -1,24 +1,28 @@
 ﻿#section1 {
     width: auto;
 }
+
 .epmliveToolBar {
-    border-bottom:none;
+    border-bottom: none;
 }
+
 #section2 {
-    
 }
+
 #kanbanToolbar {
-    height:40px;
+    height: 40px;
 }
-#kanbanToolbar .navbar-nav:first-child li:first-child a {
-    padding-right: 40px;
-}
+
+    #kanbanToolbar .navbar-nav:first-child li:first-child a {
+        padding-right: 40px;
+    }
+
 #mainContainer {
 }
 
     #mainContainer table {
         width: 100%;
-        border-spacing:0;
+        border-spacing: 0;
     }
 
         #mainContainer table td {
@@ -27,9 +31,11 @@
             padding: 0;
             border-right: 1px solid #eeeeee;
         }
-        #mainContainer table td:last-child {
-            border-right: none;
-        }
+
+            #mainContainer table td:last-child {
+                border-right: none;
+            }
+
 .kanbanLabels {
     font-weight: bold;
     vertical-align: top;
@@ -148,7 +154,7 @@
     white-space: nowrap;
     overflow: hidden;
     width: 10px;
-    color:#777777;
+    color: #777777;
 }
 
 .placeholder {
@@ -193,42 +199,22 @@
     position: absolute;
 }
 
-    .sortable-item .associateditemscontextmenu .icon-ellipsis-horizontal:after {
-        content: '...';
-        position: relative;
-        top: -20px;
-        left: 0px;
+.sortable-item .associateditemscontextmenu .icon-ellipsis-horizontal:after {
+    content: '...';
+    position: relative;
+    top: -20px;
+    left: 0px;
+}
+
+.associateditemscontextmenu .epm-menu-btn span {
+    font-size: 2em;
+    color: #0090CA;
+    opacity: .6;
+}
+
+    .associateditemscontextmenu .epm-menu-btn span:hover {
+        opacity: 1;
     }
-
-    .associateditemscontextmenu .epm-menu-btn span {
-        font-size: 2em;
-        color: #0090CA;
-        opacity: .6;
-    }
-
-        .associateditemscontextmenu .epm-menu-btn span:hover {
-            opacity: 1;
-        }
-
-    .associateditemscontextmenu ul.epm-nav-contextual-menu {
-        left: -150px !important;
-        top: -20px !important;
-    }
-
-        .associateditemscontextmenu ul.epm-nav-contextual-menu li {
-            height: 23px;
-            line-height: 23px;
-        }
-
-            .associateditemscontextmenu ul.epm-nav-contextual-menu li a {
-                text-decoration: none;
-                display: inline-block;
-            }
-
-            .associateditemscontextmenu ul.epm-nav-contextual-menu li span.epm-nav-cm-icon {
-                top: 0px !important;
-            }
-
 
 #dlgBacklogStatus {
     display: none;
