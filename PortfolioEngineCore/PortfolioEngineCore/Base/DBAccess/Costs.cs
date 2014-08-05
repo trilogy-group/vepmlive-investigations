@@ -31,7 +31,7 @@ namespace PortfolioEngineCore
             }
             return eStatus;
         }
-        
+
         public static StatusEnum SelectPIs(DBAccess dba, out DataTable dt)
         {
             string cmdText = "SELECT PROJECT_ID, PROJECT_NAME FROM EPGP_PROJECTS ORDER BY PROJECT_NAME";
@@ -109,7 +109,7 @@ namespace PortfolioEngineCore
                 eStatus = dba.HandleStatusError(SeverityEnum.Exception, "SelectViewCalendarInfo", (StatusEnum)99967, ex.Message.ToString());
             }
             return eStatus;
-Status_Error:
+        Status_Error:
             return dba.Status;
         }
 
@@ -121,9 +121,9 @@ Status_Error:
 
         public static StatusEnum SelectPIDetails(DBAccess dba, int nProjectID, out DataTable dt)
         {
-            string cmdText = 
+            string cmdText =
                 "SELECT PROJECT_CHECKEDOUT,PROJECT_CHECKEDOUT_BY, PROJECT_CHECKEDOUT_DATE, EPG_RESOURCES.RES_NAME" +
-                " FROM EPGP_PROJECTS" + 
+                " FROM EPGP_PROJECTS" +
                 " LEFT OUTER JOIN EPG_RESOURCES ON EPGP_PROJECTS.PROJECT_CHECKEDOUT_BY = EPG_RESOURCES.WRES_ID" +
                 " WHERE PROJECT_ID = @p1";
             return dba.SelectDataById(cmdText, nProjectID, (StatusEnum)99949, out dt);
@@ -291,10 +291,13 @@ Status_Error:
 
                     foreach (DataRow row in dt.Rows)
                     {
-                        pBC_UID.Value = row["BC_UID"];
-                        pBC_SEQ.Value = row["BC_SEQ"];
-                        pBD_PERIOD.Value = row["BD_PERIOD"];
-                        cmd.ExecuteNonQuery();
+                        if (Convert.ToDouble(row["BD_VALUE"]) != 0 || Convert.ToDouble(row["BD_COST"]) != 0)
+                        {
+                            pBC_UID.Value = row["BC_UID"];
+                            pBC_SEQ.Value = row["BC_SEQ"];
+                            pBD_PERIOD.Value = row["BD_PERIOD"];
+                            cmd.ExecuteNonQuery();
+                        }
                     }
                 }
                 catch (Exception ex)
@@ -417,7 +420,7 @@ Status_Error:
 
         //sCommand = "UPDATE EPGP_PROJECTS SET PROJECT_CHECKEDOUT = 1, PROJECT_CHECKEDOUT_BY = " & Format(lWResID) & _
         //           ", PROJECT_CHECKEDOUT_DATE = Getdate() WHERE PROJECT_ID = " & Format(lPI)
-                   
+
         //Call oDataAccess.ExecuteSQL(oRecordset, sCommand, 8512, eStatus)
 
         public static StatusEnum CheckoutPI(DBAccess dba, int nProjectID, out int lRowsAffected)
@@ -524,7 +527,7 @@ Status_Error:
                 cmd.Parameters.AddWithValue("@CT_ID", nCostTypeID);
                 cmd.Parameters.AddWithValue("@CB_ID", nCalendarID);
                 cmd.ExecuteNonQuery();
-            
+
             }
             catch (Exception ex)
             {

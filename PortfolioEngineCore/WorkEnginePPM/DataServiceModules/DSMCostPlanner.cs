@@ -538,20 +538,13 @@ namespace WorkEnginePPM.DataServiceModules
                                 }
                                 else
                                 {
-                                    dtInsertCostDetailValues.Rows.Add(new object[] { 
-                                    row["bc_uid"], 
-                                    row["bc_seq"], 
-                                    row["bd_period"], 
-                                    row["bd_value"], 
-                                    row["bd_cost"]
-                                });
+                                    dtInsertCostDetailValues.Rows.Add(new object[] { row["bc_uid"], row["bc_seq"], row["bd_period"], row["bd_value"], row["bd_cost"] });
                                     if (!Convert.ToBoolean(row["isdefault"]))
                                     {
                                         _successRecords = _successRecords + 1;
                                         LogDSMMessage(FormatMessage(Convert.ToString(row["calendarname"]), Convert.ToString(row["projectname"]), Convert.ToString(row["costtypename"]), Convert.ToString(row["costcategoryname"]), Convert.ToString(row["bdperiodname"]), Convert.ToDouble(row["bd_value"]), Convert.ToDouble(row["bd_cost"]), "Processed."), 0);
                                     }
                                 }
-
                                 if (!Convert.ToBoolean(row["isdefault"]))
                                 {
                                     _processedRecords = _processedRecords + 1;
@@ -601,7 +594,7 @@ namespace WorkEnginePPM.DataServiceModules
                 _dba.BeginTransaction();
                 if (dbaEditCosts.DeleteCostDetails(_dba, calendarId, costTypeId, projectId, out rowsAffected) == StatusEnum.rsSuccess)
                 {
-                    if (dbaEditCosts.DeleteCostDetailsValues(_dba, calendarId, costTypeId, projectId, out rowsAffected) == StatusEnum.rsSuccess)
+                    if (dbaEditCosts.DeleteCostDetailValues(_dba, calendarId, costTypeId, projectId, dtInsertCostDetailValues) == StatusEnum.rsSuccess)
                     {
                         if (dbaEditCosts.InsertCostDetails(_dba, calendarId, costTypeId, projectId, dtInsertCostDetails) == StatusEnum.rsSuccess)
                         {
