@@ -1957,8 +1957,9 @@ namespace TimeSheets
             {
                 case SPFieldType.Choice:
                 case SPFieldType.MultiChoice:
-                case SPFieldType.Lookup:
                     return "Enum";
+                case SPFieldType.Lookup:
+                    return "Text";
                 case SPFieldType.DateTime:
                     return "Date";
                 case SPFieldType.Boolean:
