@@ -70,7 +70,7 @@ namespace EPMLiveCore.API
                                     workTypeCount = "99+";
                                 }
                                 //sbListMyWorkSummaryItemsDiv.Append(string.Format("<a href='#' onclick=\"javascript:MyWorkSummaryClient.openMyWorkPage('{0}','{1}');\"><div class='row'><div class='mwsItemDiv'><div class='icon-wrapper'><div class='icon fa {2}'></div><div class='text'>{3}</div></div><div class='count'>{4}</div></div></div></a>", siteUrl, rptListId, rptListIcon, workType, workTypeCount));
-                                sbListMyWorkSummaryItemsDiv.Append(string.Format("<a href='#' onclick=\"javascript:MyWorkSummaryClient.openMyWorkPage('{0}','{1}');\"> <section><div class='icon fa {2}'></div><div class='text'>{3}</div><div class='count'>{4}</div> </section></a></br>", siteUrl, rptListId, rptListIcon, workType, workTypeCount));
+                                sbListMyWorkSummaryItemsDiv.Append(string.Format("<a href='#' onclick=\"javascript:MyWorkSummaryClient.openMyWorkPage('{0}','{1}');\"> <section><div class='icon fa {2}'></div><div class='text'>{3}</div><div class='count'>{4}</div> </section></a>", siteUrl, rptListId, rptListIcon, workType, workTypeCount));
                             }
                         }
 
