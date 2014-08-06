@@ -2084,7 +2084,7 @@ namespace EPMLiveCore
                                         thisClass = assemblyInstance.GetType("EPMLiveReportsAdmin.EPMData", true, true);
                                         m = thisClass.GetMethod("SetListIcon", BindingFlags.Public | BindingFlags.Instance);
                                         apiClass = Activator.CreateInstance(thisClass, new object[] { true, s.ID, w.ID });
-                                   
+
                                         if (m != null &&
                                             assemblyInstance != null &&
                                             thisClass != null &&
@@ -3700,7 +3700,7 @@ namespace EPMLiveCore
         /// Ensures the no duplicates for Resource Events.
         /// </summary>
         /// <param name="properties">The properties.</param>
-        public static void EnsureNoDuplicates(SPItemEventProperties properties)
+        public static void EnsureNoDuplicates(SPItemEventProperties properties, Boolean isAdd)
         {
             bool isGeneric;
 
@@ -3758,7 +3758,15 @@ namespace EPMLiveCore
 
             SPUser u = uv.User ?? properties.Web.EnsureUser(uv.LookupValue);
 
-            string query = string.Format(@"<Where><Eq><FieldRef Name='SharePointAccount' LookupId='TRUE'/><Value Type='Int'>{0}</Value></Eq></Where>", u.ID);
+            string query = string.Empty;
+            if (isAdd)
+            {
+                query = string.Format(@"<Where><Eq><FieldRef Name='SharePointAccount' LookupId='TRUE'/><Value Type='Integer'>{0}</Value></Eq></Where>", u.ID);
+            }
+            else
+            {
+                query = string.Format(@"<Where><And><Eq><FieldRef Name='SharePointAccount' LookupId='TRUE'/><Value Type='Integer'>{0}</Value></Eq><Neq><FieldRef Name='ID'/><Value Type='Counter'>{1}</Value></Neq></And></Where>", u.ID, properties.ListItem.ID);
+            }
             const string viewFields = @"<FieldRef Name='Title' Nullable='TRUE'/>";
 
             SPListItemCollection spListItemCollection = null;

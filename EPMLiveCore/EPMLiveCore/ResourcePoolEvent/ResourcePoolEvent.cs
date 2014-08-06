@@ -36,9 +36,9 @@ namespace EPMLiveCore
             {
                 try
                 {
-                    using(SPSite site = new SPSite(siteuid))
+                    using (SPSite site = new SPSite(siteuid))
                     {
-                        if(site.WebApplication.Features[new Guid("19e6ae14-9e68-44fa-9a08-c1c4514bf12e")] != null)
+                        if (site.WebApplication.Features[new Guid("19e6ae14-9e68-44fa-9a08-c1c4514bf12e")] != null)
                         {
                             isOnline = true;
 
@@ -78,7 +78,7 @@ namespace EPMLiveCore
 
                                 SqlDataReader dr = cmd.ExecuteReader();
 
-                                if(dr.Read())
+                                if (dr.Read())
                                 {
                                     try
                                     {
@@ -113,7 +113,7 @@ namespace EPMLiveCore
 
             try
             {
-                if(isOnline)
+                if (isOnline)
                     cn.Close();
             }
             catch { }
@@ -141,7 +141,8 @@ namespace EPMLiveCore
             try
             {
                 bool.TryParse(GetProperty(properties, "Generic"), out isGeneric);
-            }catch{}
+            }
+            catch { }
             //try
             //{
             //    bool.TryParse(properties.ListItem["Generic"].ToString(), out isGeneric);
@@ -150,29 +151,29 @@ namespace EPMLiveCore
 
             try
             {
-                if(isGeneric)
+                if (isGeneric)
                 {
                     properties.AfterProperties["SharePointAccount"] = createGroup(properties);
-                    if(properties.List.Fields.ContainsFieldWithInternalName("FirstName") && properties.List.Fields.ContainsFieldWithInternalName("LastName"))
+                    if (properties.List.Fields.ContainsFieldWithInternalName("FirstName") && properties.List.Fields.ContainsFieldWithInternalName("LastName"))
                     {
                         properties.AfterProperties["FirstName"] = "";
                         properties.AfterProperties["LastName"] = "";
                     }
 
-                    if(properties .List.Fields.ContainsFieldWithInternalName("Approved"))
+                    if (properties.List.Fields.ContainsFieldWithInternalName("Approved"))
                         properties.AfterProperties["Approved"] = "1";
                 }
                 else
                 {
-                    if(isAdd || (properties.ListItem != null && properties.ListItem["SharePointAccount"] != null))
+                    if (isAdd || (properties.ListItem != null && properties.ListItem["SharePointAccount"] != null))
                     {
-                        if(isOnline)
+                        if (isOnline)
                         {
-                            if(properties.List.Fields.ContainsFieldWithInternalName("FirstName") && properties.List.Fields.ContainsFieldWithInternalName("LastName"))
+                            if (properties.List.Fields.ContainsFieldWithInternalName("FirstName") && properties.List.Fields.ContainsFieldWithInternalName("LastName"))
                             {
                                 try
                                 {
-                                    if(properties.AfterProperties["FirstName"] == null || properties.AfterProperties["FirstName"].ToString() == "")
+                                    if (properties.AfterProperties["FirstName"] == null || properties.AfterProperties["FirstName"].ToString() == "")
                                     {
                                         string title = properties.AfterProperties["Title"].ToString();
                                         string[] sTitle = title.Split(' ');
@@ -190,18 +191,18 @@ namespace EPMLiveCore
 
                                 }
                             }
-                            
+                            //EnsureNoDuplicates needs to be before ProcessOnlineUser so that incorrect mail is not sent EPML-2556 
+                            CoreFunctions.EnsureNoDuplicates(properties, isAdd);
                             ProcessOnlineUser(properties, isAdd);
-                            //CoreFunctions.EnsureNoDuplicates(properties);
                             disableAccount(properties);
                         }
                         else
                         {
-                            if(properties.List.Fields.ContainsFieldWithInternalName("FirstName") && properties.List.Fields.ContainsFieldWithInternalName("LastName"))
+                            if (properties.List.Fields.ContainsFieldWithInternalName("FirstName") && properties.List.Fields.ContainsFieldWithInternalName("LastName"))
                             {
                                 try
                                 {
-                                    if(properties.AfterProperties["FirstName"] == null || properties.AfterProperties["FirstName"].ToString() == "")
+                                    if (properties.AfterProperties["FirstName"] == null || properties.AfterProperties["FirstName"].ToString() == "")
                                     {
                                         string title = properties.AfterProperties["Title"].ToString();
                                         string[] sTitle = title.Split(' ');
@@ -222,9 +223,9 @@ namespace EPMLiveCore
                         ProcessDepartment(properties);
 
                     }
-                }                
+                }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 properties.Cancel = true;
                 properties.ErrorMessage = "Error (2x1000): " + ex.Message;
@@ -235,18 +236,18 @@ namespace EPMLiveCore
                 int userId = 0;
 
                 SPFieldUserValue uv = new SPFieldUserValue(properties.Web, GetPropertyBeforeOrAfter(properties, "SharePointAccount"));
-                if(uv.User != null)
+                if (uv.User != null)
                 {
                     userId = uv.LookupId;
                     Guid tJob = API.Timer.AddTimerJob(properties.SiteId, properties.Web.ID, "Process Security", 40, uv.User.ID.ToString(), "", 0, 99, "");
                     API.Timer.Enqueue(tJob, 0, properties.Web.Site);
                 }
-                else if(uv.LookupId == -1)
+                else if (uv.LookupId == -1)
                 {
                     SPUser u = properties.Web.EnsureUser(uv.LookupValue);
                     Guid tJob = API.Timer.AddTimerJob(properties.SiteId, properties.Web.ID, "Process Security", 40, u.ID.ToString(), "", 0, 99, "");
                     API.Timer.Enqueue(tJob, 0, properties.Web.Site);
-                    userId = u.ID; 
+                    userId = u.ID;
 
                 }
 
@@ -262,12 +263,13 @@ namespace EPMLiveCore
                     }
                 });
 
-                
 
 
-            }catch{}
 
-            
+            }
+            catch { }
+
+
 
         }
 
@@ -276,7 +278,7 @@ namespace EPMLiveCore
 
             string department = GetPropertyBeforeOrAfter(properties, "Department");
 
-            if(department != "")
+            if (department != "")
             {
 
                 try
@@ -287,7 +289,7 @@ namespace EPMLiveCore
                     string deptGroup = li["Title"].ToString() + " Visitor";
 
                     SPGroup group = properties.Web.SiteGroups[deptGroup];
-                    if(group != null)
+                    if (group != null)
                     {
                         SPFieldUserValue uv = new SPFieldUserValue(properties.Web, GetPropertyBeforeOrAfter(properties, "SharePointAccount"));
 
@@ -302,12 +304,12 @@ namespace EPMLiveCore
 
         private void ProcessLevel(SPItemEventProperties properties)
         {
-            if(properties.Web.CurrentUser.IsSiteAdmin || (isOnline && EPMLiveCore.CoreFunctions.GetRealUserName(properties.Web.CurrentUser.LoginName, properties.Web.Site).ToLower() == ownerusername.ToLower()))
+            if (properties.Web.CurrentUser.IsSiteAdmin || (isOnline && EPMLiveCore.CoreFunctions.GetRealUserName(properties.Web.CurrentUser.LoginName, properties.Web.Site).ToLower() == ownerusername.ToLower()))
             {
                 string spaccount = GetPropertyBeforeOrAfter(properties, "SharePointAccount");
                 string ResLevel = GetPropertyBeforeOrAfter(properties, "ResourceLevel");
 
-                if(!string.IsNullOrEmpty(spaccount) && !string.IsNullOrEmpty(ResLevel))
+                if (!string.IsNullOrEmpty(spaccount) && !string.IsNullOrEmpty(ResLevel))
                 {
 
                     string username = "";
@@ -319,7 +321,7 @@ namespace EPMLiveCore
                     }
                     catch { }
 
-                    if(username != "")
+                    if (username != "")
                     {
                         Act act = new Act(properties.Web);
                         act.SetUserLevelV3(username, int.Parse(ResLevel));
@@ -332,7 +334,7 @@ namespace EPMLiveCore
         {
             string propval = "";
 
-            if(properties.AfterProperties[field] != null)
+            if (properties.AfterProperties[field] != null)
             {
                 try
                 {
@@ -360,9 +362,9 @@ namespace EPMLiveCore
                 isDisabled = bool.Parse(properties.AfterProperties["Disabled"].ToString());
             }
             catch { }
-            if(isDisabled)
+            if (isDisabled)
             {
-                if(CoreFunctions.DoesCurrentUserHaveFullControl(properties.Web))
+                if (CoreFunctions.DoesCurrentUserHaveFullControl(properties.Web))
                 {
                     properties.AfterProperties["Permissions"] = "";
 
@@ -375,7 +377,7 @@ namespace EPMLiveCore
                             uv = new SPFieldUserValue(properties.Web, properties.AfterProperties["SharePointAccount"].ToString());
                         }
                         catch { }
-                        if(uv == null)
+                        if (uv == null)
                         {
                             try
                             {
@@ -385,9 +387,9 @@ namespace EPMLiveCore
                         }
                         SPSecurity.RunWithElevatedPrivileges(delegate()
                         {
-                            using(SPSite oSite = new SPSite(properties.SiteId))
+                            using (SPSite oSite = new SPSite(properties.SiteId))
                             {
-                                foreach(SPGroup webgroup in oSite.RootWeb.SiteGroups)
+                                foreach (SPGroup webgroup in oSite.RootWeb.SiteGroups)
                                 {
                                     try
                                     {
@@ -426,7 +428,7 @@ namespace EPMLiveCore
             }
             catch { }
             location = "1001";
-            if(expired || max == 0)
+            if (expired || max == 0)
             {
                 properties.Cancel = true;
                 properties.ErrorMessage = "Account is expired";
@@ -439,16 +441,16 @@ namespace EPMLiveCore
 
                     Assembly assemblyInstance = Assembly.Load("EPMLiveAccountManagement, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5");
                     Type thisClass = assemblyInstance.GetType("EPMLiveAccountManagement.FindOrCreateAccount", true, true);
-                    
+
                     SqlCommand cmd;
                     location = "1002";
                     string newusername = "";
                     string newemail = "";
                     string newusernameclean = "";
                     string prefix = CoreFunctions.getPrefix(properties.Web.Site);
-                    
 
-                    if(isAdd)
+
+                    if (isAdd)
                     {
                         location = "1003";
                         newemail = properties.AfterProperties["Email"].ToString().Trim();
@@ -458,19 +460,19 @@ namespace EPMLiveCore
                         string founduser = (string)m.Invoke(null, new object[] { newemail });
                         location = "1004";
 
-                        if(founduser == "")
+                        if (founduser == "")
                         {
                             location = "1005";
                             m = thisClass.GetMethod("CreateAccount");
                             string result = (string)m.Invoke(null, new object[] { properties.AfterProperties["FirstName"], properties.AfterProperties["LastName"], newemail, properties.SiteId, true });
                             location = "1006";
-                            if(result.IndexOf("0:") == 0)
+                            if (result.IndexOf("0:") == 0)
                             {
                                 newusername = CoreFunctions.getMainDomain() + "\\" + result.Substring(2);
-                                newusernameclean = result.Substring(2); 
+                                newusernameclean = result.Substring(2);
                                 location = "1007";
 
-                                if(prefix != "")
+                                if (prefix != "")
                                     properties.AfterProperties["SharePointAccount"] = addUser(properties, newusernameclean, properties.AfterProperties["Title"].ToString(), newemail.ToString(), prefix);
                                 else
                                     properties.AfterProperties["SharePointAccount"] = addUser(properties, newusername, properties.AfterProperties["Title"].ToString(), newemail, prefix);
@@ -497,7 +499,7 @@ namespace EPMLiveCore
                             newusernameclean = founduser;
                             location = "1012";
 
-                            if(prefix != "")
+                            if (prefix != "")
                                 properties.AfterProperties["SharePointAccount"] = addUser(properties, founduser, properties.AfterProperties["Title"].ToString(), newemail, prefix);
                             else
                                 properties.AfterProperties["SharePointAccount"] = addUser(properties, newusername, properties.AfterProperties["Title"].ToString(), newemail, prefix);
@@ -523,9 +525,9 @@ namespace EPMLiveCore
 
                     SqlDataReader dr = cmd.ExecuteReader();
                     location = "1018";
-                    if(dr.Read())
+                    if (dr.Read())
                     {
-                        if(dr.GetInt32(0) == 1)
+                        if (dr.GetInt32(0) == 1)
                         {
                             bIsApproved = true;
                             properties.AfterProperties["Approved"] = "1";
@@ -535,9 +537,9 @@ namespace EPMLiveCore
                     location = "1019";
                     bool bhaspermsadded = setPermissions(properties, isAdd);
                     location = "1020";
-                    if(bIsApproved)//Approved (Already in account)
+                    if (bIsApproved)//Approved (Already in account)
                     {
-                        if(bhaspermsadded)
+                        if (bhaspermsadded)
                         {
                             location = "1021";
                             m = thisClass.GetMethod("sendEmail");
@@ -546,10 +548,10 @@ namespace EPMLiveCore
                     }
                     else//Assume we are adding user to account
                     {
-                        if(oCurUser.IsSiteAdmin || disablerequests || properties.CurrentUserId == 1073741823)//if not in account and user is admin
+                        if (oCurUser.IsSiteAdmin || disablerequests || properties.CurrentUserId == 1073741823)//if not in account and user is admin
                         {
                             location = "1022";
-                            if(count < max || max == -1 || billingtype == 2 || ActivationType == 3 || GetPropertyBeforeOrAfter(properties, "ResourceLevel") == "0")//if we have enough accounts then we just accept it or billingtype = 2 (flexible recurring) or new v2 licensing or the user is set to no access
+                            if (count < max || max == -1 || billingtype == 2 || ActivationType == 3 || GetPropertyBeforeOrAfter(properties, "ResourceLevel") == "0")//if we have enough accounts then we just accept it or billingtype = 2 (flexible recurring) or new v2 licensing or the user is set to no access
                             {
                                 location = "1023";
                                 bool bCurApproved = false;
@@ -561,12 +563,12 @@ namespace EPMLiveCore
                                 location = "1024";
 
 
-                                if(isAdd)
+                                if (isAdd)
                                     properties.AfterProperties["Approved"] = "1";
 
 
                                 location = "1025";
-                                if((properties.AfterProperties["Approved"] == null || properties.AfterProperties["Approved"].ToString() == "1" || properties.AfterProperties["Approved"].ToString() == "True") && !bCurApproved)
+                                if ((properties.AfterProperties["Approved"] == null || properties.AfterProperties["Approved"].ToString() == "1" || properties.AfterProperties["Approved"].ToString() == "True") && !bCurApproved)
                                 {
                                     location = "1026";
                                     cmd = new SqlCommand("SELECT COUNT(*) FROM NEWACCOUNTEMAIL where username = @username", cn);
@@ -574,14 +576,14 @@ namespace EPMLiveCore
                                     cmd.Parameters.AddWithValue("@username", newusername);
                                     dr = cmd.ExecuteReader();
                                     location = "1027";
-                                    if(dr.Read())
+                                    if (dr.Read())
                                     {
-                                        if(dr.GetInt32(0) > 0)
+                                        if (dr.GetInt32(0) > 0)
                                             bIsNewUser = true;
                                     }
                                     dr.Close();
                                     location = "1028";
-                                    if(bIsNewUser)
+                                    if (bIsNewUser)
                                     {
                                         m = thisClass.GetMethod("sendEmail");
                                         bool sent = (bool)m.Invoke(null, new object[] { 4, newemail, new string[] { newusernameclean, getTempPassword(newusername) } });
@@ -590,12 +592,12 @@ namespace EPMLiveCore
                                     bool bHasPerms = false;
                                     try
                                     {
-                                        if(properties.ListItem["Permissions"].ToString() != "")
+                                        if (properties.ListItem["Permissions"].ToString() != "")
                                             bHasPerms = true;
                                     }
                                     catch { }
                                     location = "1030";
-                                    if(bhaspermsadded || bHasPerms)
+                                    if (bhaspermsadded || bHasPerms)
                                     {
                                         m = thisClass.GetMethod("sendEmail");
                                         bool sent = (bool)m.Invoke(null, new object[] { 2, newemail, new string[] { oCurUser.Name, properties.Web.Url, properties.Web.Title, newusernameclean } });
@@ -603,9 +605,9 @@ namespace EPMLiveCore
                                     location = "1031";
                                 }
 
-                                if(ActivationType == 3)
+                                if (ActivationType == 3)
                                 {
-                                    if(!oCurUser.IsSiteAdmin)
+                                    if (!oCurUser.IsSiteAdmin)
                                         sendRequestEmail(thisClass, properties, oCurUser.Name);
                                 }
                                 else
@@ -617,10 +619,10 @@ namespace EPMLiveCore
                             else//if we don't have enough accounts
                             {
                                 location = "1033";
-                                if(properties.AfterProperties["Approved"] == null || properties.AfterProperties["Approved"].ToString() == "1" || properties.AfterProperties["Approved"].ToString() == "True")//if we are trying to approve an account and we don't have enough
+                                if (properties.AfterProperties["Approved"] == null || properties.AfterProperties["Approved"].ToString() == "1" || properties.AfterProperties["Approved"].ToString() == "True")//if we are trying to approve an account and we don't have enough
                                 {
                                     location = "1034";
-                                    if(EPMLiveCore.CoreFunctions.GetRealUserName(sCurUsername, properties.Web.Site).ToLower() != ownerusername.ToLower())
+                                    if (EPMLiveCore.CoreFunctions.GetRealUserName(sCurUsername, properties.Web.Site).ToLower() != ownerusername.ToLower())
                                     {
                                         sendOwnerEmail(thisClass, properties, oCurUser.Name);
                                     }
@@ -642,7 +644,7 @@ namespace EPMLiveCore
                         location = "1037";
                     }
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     properties.Cancel = true;
                     properties.ErrorMessage = "Error (" + location + "): " + ex.Message;
@@ -664,7 +666,7 @@ namespace EPMLiveCore
 
         private string getTempPassword(string username)
         {
-            
+
             DataSet ds;
             SqlCommand cmdGetPassword;
             SqlDataAdapter da;
@@ -677,7 +679,7 @@ namespace EPMLiveCore
             ds = new DataSet();
             da.Fill(ds);
 
-            if(ds.Tables[0].Rows.Count > 0)
+            if (ds.Tables[0].Rows.Count > 0)
                 return ds.Tables[0].Rows[0][0].ToString();
             else
                 return "";
@@ -685,7 +687,7 @@ namespace EPMLiveCore
 
         private bool setPermissions(SPItemEventProperties properties, bool isAdd)
         {
-            if(!properties.List.Fields.ContainsFieldWithInternalName("Permissions"))
+            if (!properties.List.Fields.ContainsFieldWithInternalName("Permissions"))
             {
                 return false;
             }
@@ -695,15 +697,15 @@ namespace EPMLiveCore
 
             try
             {
-                
+
                 SPFieldUserValue uv = null;
-                if(isAdd)
+                if (isAdd)
                     uv = new SPFieldUserValue(properties.Web, properties.AfterProperties["SharePointAccount"].ToString());
                 else
                     uv = new SPFieldUserValue(properties.Web, properties.ListItem["SharePointAccount"].ToString());
 
                 SPUser u = uv.User;
-                if(u == null)
+                if (u == null)
                 {
                     u = properties.Web.EnsureUser(uv.LookupValue);
                 }
@@ -745,7 +747,7 @@ namespace EPMLiveCore
                 }
 
 
-                if(!String.IsNullOrEmpty(newProps) && String.IsNullOrEmpty(curProps))
+                if (!String.IsNullOrEmpty(newProps) && String.IsNullOrEmpty(curProps))
                     sendEmail = true;
 
                 try
@@ -756,10 +758,10 @@ namespace EPMLiveCore
                         try
                         {
                             SPGroup g = u.Groups.GetByID(wGroup.ID);
-                            if(g != null && arr.Contains(g.ID.ToString(CultureInfo.InvariantCulture)))
+                            if (g != null && arr.Contains(g.ID.ToString(CultureInfo.InvariantCulture)))
                                 perms += ", " + wGroup.Name;
                         }
-                        catch { }   
+                        catch { }
                     }
 
                     properties.AfterProperties["Permissions"] = perms.Trim(", ".ToCharArray());
@@ -770,7 +772,7 @@ namespace EPMLiveCore
 
             return sendEmail;
         }
-        
+
         /*private void addRequest(string first, string last, string email, string username, string group, bool newuser, SPWeb mySite, string requestorname)
         {
             SqlCommand cmdAddRequest = new SqlCommand("INSERT INTO REQUESTS (firstname,lastname,email,username,siteguid,webguid,requestor,sitegroup,newuser) VALUES (@first,@last,@email,@username,@siteguid,@webguid,@requestor,@sitegroup,@newuser)", cn);
@@ -791,13 +793,13 @@ namespace EPMLiveCore
         {
             SPSecurity.RunWithElevatedPrivileges(delegate()
             {
-                using(SPSite site = new SPSite(properties.SiteId))
+                using (SPSite site = new SPSite(properties.SiteId))
                 {
-                    using(SPWeb tweb = site.OpenWeb())
+                    using (SPWeb tweb = site.OpenWeb())
                     {
-                        foreach(SPUser user in tweb.SiteUsers)
+                        foreach (SPUser user in tweb.SiteUsers)
                         {
-                            if(user.IsSiteAdmin && user.Email != "")
+                            if (user.IsSiteAdmin && user.Email != "")
                             {
                                 try
                                 {
@@ -815,7 +817,7 @@ namespace EPMLiveCore
         private void sendOwnerEmail(Type thisClass, SPItemEventProperties properties, string requestorname)
         {
             MethodInfo m = thisClass.GetMethod("sendEmail");
-            bool sent = (bool)m.Invoke(null, new object[] { 25, owneremail, new string[] { requestorname, properties.AfterProperties["Title"].ToString(), CoreFunctions.getLockConfigSetting(properties.Web, "EPMLiveResourceURL", false) } });                      
+            bool sent = (bool)m.Invoke(null, new object[] { 25, owneremail, new string[] { requestorname, properties.AfterProperties["Title"].ToString(), CoreFunctions.getLockConfigSetting(properties.Web, "EPMLiveResourceURL", false) } });
         }
 
         private string createGroup(SPItemEventProperties properties)
@@ -831,7 +833,7 @@ namespace EPMLiveCore
                     p = web.SiteGroups["." + group];
                 }
                 catch { }
-                if(p == null)
+                if (p == null)
                 {
                     web.SiteGroups.Add("." + group, web.CurrentUser, null, "");
                     p = web.SiteGroups["." + group];
@@ -839,90 +841,90 @@ namespace EPMLiveCore
 
                 return p.ID + ";#" + p.Name;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 properties.AfterProperties["Approved"] = "0";
             }
             return null;
         }
 
-       private string addUser(SPItemEventProperties properties, string username, string display, string email, string prefix)
-       {
-           SPPrincipal p = null;
-           try
-           {
-                if(prefix == "")
+        private string addUser(SPItemEventProperties properties, string username, string display, string email, string prefix)
+        {
+            SPPrincipal p = null;
+            try
+            {
+                if (prefix == "")
                     p = properties.Web.AllUsers[prefix + username];
                 else
                     p = properties.Web.AllUsers[prefix + username];
-           }
-           catch { }
-           if(p == null)
-           {
-               SPSecurity.RunWithElevatedPrivileges(delegate()
-               {
-                   using(SPSite site = new SPSite(properties.SiteId))
-                   {
-                       using(SPWeb web = site.OpenWeb(properties.Web.ID))
-                       {
-                           web.AllUsers.Add(prefix + username, email, display, "");
-
-                           p = properties.Web.AllUsers[prefix + username];
-                       }
-                   }
-               });
-           }
-           if(p != null)
-               return p.ID + ";#" + p.Name;
-
-           return "";
-       }
-       /// <summary>
-       /// An item is being updated.
-       /// </summary>
-       public override void ItemUpdating(SPItemEventProperties properties)
-       {
-
-           loadData(properties.List, properties.SiteId);
-
-           processItem(properties, false);
-
-           try
-           {
-               if(isOnline)
-                cn.Close();
-           }
-           catch { }
-       }
-
-       /// <summary>
-       /// An item was deleted.
-       /// </summary>
-       public override void ItemDeleted(SPItemEventProperties properties)
-       {
-           /*loadData(properties.List, properties.SiteId);
-           properties.Cancel = true;
-           try
-           {
-               if(isOnline)
-               {
-                   
-                   cn.Close();
-               }
-           }
-           catch { }*/
-       }
-
-       public override void ItemDeleting(SPItemEventProperties properties)
-       {
-
-           if(CoreFunctions.DoesCurrentUserHaveFullControl(properties.Web))
-           {
+            }
+            catch { }
+            if (p == null)
+            {
                 SPSecurity.RunWithElevatedPrivileges(delegate()
                 {
-                    using(SPSite oSite = new SPSite(properties.SiteId))
+                    using (SPSite site = new SPSite(properties.SiteId))
                     {
-                        using(SPWeb oWeb = oSite.OpenWeb())
+                        using (SPWeb web = site.OpenWeb(properties.Web.ID))
+                        {
+                            web.AllUsers.Add(prefix + username, email, display, "");
+
+                            p = properties.Web.AllUsers[prefix + username];
+                        }
+                    }
+                });
+            }
+            if (p != null)
+                return p.ID + ";#" + p.Name;
+
+            return "";
+        }
+        /// <summary>
+        /// An item is being updated.
+        /// </summary>
+        public override void ItemUpdating(SPItemEventProperties properties)
+        {
+
+            loadData(properties.List, properties.SiteId);
+
+            processItem(properties, false);
+
+            try
+            {
+                if (isOnline)
+                    cn.Close();
+            }
+            catch { }
+        }
+
+        /// <summary>
+        /// An item was deleted.
+        /// </summary>
+        public override void ItemDeleted(SPItemEventProperties properties)
+        {
+            /*loadData(properties.List, properties.SiteId);
+            properties.Cancel = true;
+            try
+            {
+                if(isOnline)
+                {
+                   
+                    cn.Close();
+                }
+            }
+            catch { }*/
+        }
+
+        public override void ItemDeleting(SPItemEventProperties properties)
+        {
+
+            if (CoreFunctions.DoesCurrentUserHaveFullControl(properties.Web))
+            {
+                SPSecurity.RunWithElevatedPrivileges(delegate()
+                {
+                    using (SPSite oSite = new SPSite(properties.SiteId))
+                    {
+                        using (SPWeb oWeb = oSite.OpenWeb())
                         {
                             oWeb.AllowUnsafeUpdates = true;
 
@@ -936,12 +938,12 @@ namespace EPMLiveCore
                         }
                     }
                 });
-           }
-           else
-           {
-               properties.Cancel = true;
-               properties.ErrorMessage = "You do not have permissions to delete users.";
-           }
-       }
+            }
+            else
+            {
+                properties.Cancel = true;
+                properties.ErrorMessage = "You do not have permissions to delete users.";
+            }
+        }
     }
 }

@@ -50,7 +50,7 @@ namespace WorkEnginePPM.Events
 
             try
             {
-                CoreFunctions.EnsureNoDuplicates(properties);
+                CoreFunctions.EnsureNoDuplicates(properties, true);
 
                 SPWeb spWeb = properties.Web;
 
