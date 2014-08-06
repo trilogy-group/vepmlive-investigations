@@ -782,6 +782,8 @@ namespace WorkEnginePPM.DataServiceModules
 
         private void FillMasterRecordDataViews()
         {
+            if (_PFECN.State != ConnectionState.Open) _PFECN.Open();
+
             using (SqlDataAdapter sqlDataAdapter = new SqlDataAdapter("select cb_id, cb_name from epgp_cost_breakdowns", _PFECN))
             {
                 DataTable dtCostBreakdowns = new DataTable();
@@ -844,6 +846,9 @@ namespace WorkEnginePPM.DataServiceModules
                 dtCostBreakdownAttribs.Dispose();
                 dtCostBreakdownAttribs = null;
             }
+
+            _PFECN.Close();
+
         }
 
         private string FormatMessage(string calendarName, string projectName, string costTypeName, string costCategoryName, string periodName, double quantity, double cost, string errorMessage)
