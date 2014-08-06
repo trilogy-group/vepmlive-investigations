@@ -192,7 +192,7 @@ namespace EPMLiveCore
                             }
                             
                             ProcessOnlineUser(properties, isAdd);
-                            CoreFunctions.EnsureNoDuplicates(properties);
+                            //CoreFunctions.EnsureNoDuplicates(properties);
                             disableAccount(properties);
                         }
                         else
