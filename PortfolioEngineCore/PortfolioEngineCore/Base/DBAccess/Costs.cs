@@ -291,13 +291,10 @@ namespace PortfolioEngineCore
 
                     foreach (DataRow row in dt.Rows)
                     {
-                        if (Convert.ToDouble(row["BD_VALUE"]) != 0 || Convert.ToDouble(row["BD_COST"]) != 0)
-                        {
-                            pBC_UID.Value = row["BC_UID"];
-                            pBC_SEQ.Value = row["BC_SEQ"];
-                            pBD_PERIOD.Value = row["BD_PERIOD"];
-                            cmd.ExecuteNonQuery();
-                        }
+                        pBC_UID.Value = row["BC_UID"];
+                        pBC_SEQ.Value = row["BC_SEQ"];
+                        pBD_PERIOD.Value = row["BD_PERIOD"];
+                        cmd.ExecuteNonQuery();
                     }
                 }
                 catch (Exception ex)

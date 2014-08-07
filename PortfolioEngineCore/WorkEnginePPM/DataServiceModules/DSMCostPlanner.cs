@@ -538,9 +538,9 @@ namespace WorkEnginePPM.DataServiceModules
                                 }
                                 else
                                 {
-                                    dtInsertCostDetailValues.Rows.Add(new object[] { row["bc_uid"], row["bc_seq"], row["bd_period"], row["bd_value"], row["bd_cost"] });
                                     if (!Convert.ToBoolean(row["isdefault"]))
                                     {
+                                        dtInsertCostDetailValues.Rows.Add(new object[] { row["bc_uid"], row["bc_seq"], row["bd_period"], row["bd_value"], row["bd_cost"] });
                                         _successRecords = _successRecords + 1;
                                         LogDSMMessage(FormatMessage(Convert.ToString(row["calendarname"]), Convert.ToString(row["projectname"]), Convert.ToString(row["costtypename"]), Convert.ToString(row["costcategoryname"]), Convert.ToString(row["bdperiodname"]), Convert.ToDouble(row["bd_value"]), Convert.ToDouble(row["bd_cost"]), "Processed."), 0);
                                     }
