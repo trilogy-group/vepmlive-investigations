@@ -191,8 +191,6 @@ namespace EPMLiveCore
 
                                 }
                             }
-                            //EnsureNoDuplicates needs to be before ProcessOnlineUser so that incorrect mail is not sent EPML-2556 
-                            CoreFunctions.EnsureNoDuplicates(properties, isAdd);
                             ProcessOnlineUser(properties, isAdd);
                             disableAccount(properties);
                         }
