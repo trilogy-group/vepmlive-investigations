@@ -17,6 +17,8 @@ namespace EPMLiveCore.API
 {
     public class APITeam
     {
+        static bool bIsTeamSecurityEnabled = false;
+
         private static DataTable getResources(SPWeb web, string filterfield, string filtervalue, bool hasPerms, ArrayList arrColumns, SPListItem liItem)
         {
 
@@ -523,6 +525,7 @@ namespace EPMLiveCore.API
                     SPList list = oWeb.Lists[listid];
                     GridGanttSettings gSettings = new GridGanttSettings(list);
                     bUseTeam = gSettings.BuildTeam;
+                    bIsTeamSecurityEnabled = gSettings.BuildTeamSecurity;
                 }
 
                 if (listid != Guid.Empty && bUseTeam)
@@ -771,7 +774,7 @@ namespace EPMLiveCore.API
                             {
                                 group.AddUser(uv.User);
                             }
-                            if (tempuser != null && !arr.Contains(group.ID.ToString()))
+                            if (tempuser != null && !arr.Contains(group.ID.ToString()) && bIsTeamSecurityEnabled)
                             {
                                 group.RemoveUser(uv.User);
                             }
@@ -1555,7 +1558,7 @@ namespace EPMLiveCore.API
                         attr = doc.CreateAttribute("Range");
                         attr.Value = "1";
                         ndNew.Attributes.Append(attr);
-                                                
+
                         //attr = doc.CreateAttribute("RelWidth");
                         //attr.Value = "1";
                         //ndNew.Attributes.Append(attr);
@@ -1615,18 +1618,18 @@ namespace EPMLiveCore.API
                                 }
                             }
                         }
-                        else
-                        {
-                            foreach (SPGroup group in tWeb.Groups)
-                            {
-                                if (group.CanCurrentUserEditMembership)
-                                {
-                                    enums += "|" + group.Name;
-                                    enumkeys += "|" + group.ID;
-                                }
+                        //else
+                        //{
+                        //    foreach (SPGroup group in tWeb.Groups)
+                        //    {
+                        //        if (group.CanCurrentUserEditMembership)
+                        //        {
+                        //            enums += "|" + group.Name;
+                        //            enumkeys += "|" + group.ID;
+                        //        }
 
-                            }
-                        }
+                        //    }
+                        //}
 
                         attr = doc.CreateAttribute("Enum");
                         attr.Value = enums;
@@ -1635,7 +1638,6 @@ namespace EPMLiveCore.API
                         attr = doc.CreateAttribute("EnumKeys");
                         attr.Value = enumkeys;
                         ndNew.Attributes.Append(attr);
-
 
                         ndRightCols.AppendChild(ndNew);
                     }
