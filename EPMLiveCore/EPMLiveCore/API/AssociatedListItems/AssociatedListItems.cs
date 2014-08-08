@@ -299,7 +299,7 @@ namespace EPMLiveCore.API
                                             sbListAssociatedItemsDiv.Append("<table style='width:100%'><tr><td><table style='border-collapse: collapse;' class='fancy-col-table'>");
                                             foreach (AssociatedListInfo item in arrAssociatedLists)
                                             {
-                                                sbListAssociatedItemsDiv.Append("<tr style='border-bottom: 1px solid #eee;'>");
+                                                sbListAssociatedItemsDiv.Append("<tr style=''>");
                                                 sbListAssociatedItemsDiv.Append("<td>" + item.Title + "</td>");
                                                 sbListAssociatedItemsDiv.Append("<td><a href='#'><div id='div_" + item.ListId + "' class='listMainDiv'><span class='badge'>0</span></a></div>");
                                                 sbListAssociatedItemsDiv.Append("</tr>");
@@ -357,7 +357,7 @@ namespace EPMLiveCore.API
 
                                             //string viewAllItemsUrl = oWeb.Url + "/_layouts/epmlive/gridaction.aspx?action=linkeditemspost&listid=" + listId + "&lookups=" + itemTitle + "&field=" + projectLinkedField + "&LookupFieldList=" + rptListId;// +"&Source=" + sourceUrl;
 
-                                            sbListAssociatedItemsDiv.Append("<tr style='border-bottom: 1px solid #eee;'>");
+                                            sbListAssociatedItemsDiv.Append("<tr style=''>");
                                             sbListAssociatedItemsDiv.Append("<td>" + listName + "</td>");
                                             sbListAssociatedItemsDiv.Append("<td><a href='#' onclick=\"javascript:FancyDispFormClient.emptyFunction('');\"><div id='div_" + rptListId + "' class='listMainDiv'><span class='badge'>" + Convert.ToString(associatedItemsCount) + "</span></a>");
                                             //sbListAssociatedItemsDiv.Append("</tr>");
