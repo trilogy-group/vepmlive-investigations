@@ -1530,6 +1530,7 @@ namespace EPMLiveCore.API
                                 listid = new Guid(InputDoc.FirstChild.Attributes["ListId"].Value);
                                 oList = tWeb.Lists[listid];
                                 gSettings = new GridGanttSettings(oList);
+                                bIsTeamSecurityEnabled = gSettings.BuildTeamSecurity;
                             }
                             catch { }
                             try
@@ -1551,6 +1552,7 @@ namespace EPMLiveCore.API
                         attr.Value = "Permissions";
                         ndNew.Attributes.Append(attr);
 
+
                         attr = doc.CreateAttribute("Type");
                         attr.Value = "Enum";
                         ndNew.Attributes.Append(attr);
@@ -1568,7 +1570,7 @@ namespace EPMLiveCore.API
                         ndNew.Attributes.Append(attr);
 
                         attr = doc.CreateAttribute("Visible");
-                        attr.Value = "1";
+                        attr.Value = bIsTeamSecurityEnabled ? "1" : "0";
                         ndNew.Attributes.Append(attr);
 
                         attr = doc.CreateAttribute("CanHide");
