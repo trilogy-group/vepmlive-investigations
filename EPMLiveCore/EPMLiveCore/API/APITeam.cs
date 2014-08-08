@@ -1599,11 +1599,26 @@ namespace EPMLiveCore.API
 
                         string enums = "";
                         string enumkeys = "";
-
-
+                        List<string> idArrays = new List<string>();
 
                         if (gSettings != null && gSettings.BuildTeam && oLi != null && oLi.HasUniqueRoleAssignments)
                         {
+                            string[] permissionsString = gSettings.BuildTeamPermissions.Split('|');
+                            for (int i = 0; i < permissionsString.Length; i++)
+                            {
+                                if (i % 2 == 0)
+                                {
+                                    string[] strIds = permissionsString[i].Split('~');
+                                    for (int j = 0; j < strIds.Length; j++)
+                                    {
+                                        if (j % 2 == 0)
+                                        {
+                                            idArrays.Add(strIds[j]);
+                                        }
+                                    }
+                                }
+                            }
+
                             foreach (SPRoleAssignment assn in oLi.RoleAssignments)
                             {
                                 if (assn.Member.GetType() == typeof(Microsoft.SharePoint.SPGroup))
@@ -1612,8 +1627,11 @@ namespace EPMLiveCore.API
 
                                     if (group.CanCurrentUserEditMembership)
                                     {
-                                        enums += "|" + group.Name;
-                                        enumkeys += "|" + group.ID;
+                                        if (!idArrays.Contains(Convert.ToString(group.ID)))
+                                        {
+                                            enums += "|" + group.Name;
+                                            enumkeys += "|" + group.ID;
+                                        }
                                     }
                                 }
                             }
