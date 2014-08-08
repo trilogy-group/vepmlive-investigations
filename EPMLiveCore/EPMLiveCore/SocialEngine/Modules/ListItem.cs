@@ -270,9 +270,10 @@ namespace EPMLiveCore.SocialEngine.Modules
             var activityTime = (DateTime) data["ActivityTime"];
 
             var listId = (Guid) data["ListId"];
+            var itemId = (int) data["Id"];
             var userId = (int) data["UserId"];
 
-            Activity relatedActivity = activityManager.FindRelatedActivity(listId, userId, activityTime, interval);
+            Activity relatedActivity = activityManager.FindRelatedActivity(listId, itemId, userId, activityTime, interval);
 
             if (relatedActivity == null) return;
 

@@ -152,18 +152,19 @@ namespace EPMLiveCore.SocialEngine.Core
             }
         }
 
-        public Activity FindRelatedActivity(Guid listId, int userId, DateTime date, TimeSpan interval)
+        public Activity FindRelatedActivity(Guid listId, int itemId, int userId, DateTime date, TimeSpan interval)
         {
             const string SQL = @"
                 SELECT  TOP (1) dbo.SS_Activities.Id, dbo.SS_Activities.MassOperation, dbo.SS_Activities.Date
                 FROM    dbo.SS_Threads INNER JOIN dbo.SS_Activities ON dbo.SS_Threads.Id = dbo.SS_Activities.ThreadId
-                WHERE   (dbo.SS_Threads.ListId = @ListId) AND (dbo.SS_Activities.Date >= @Date) 
+                WHERE   (dbo.SS_Threads.ListId = @ListId) AND (dbo.SS_Threads.ItemId != @ItemId) AND (dbo.SS_Activities.Date >= @Date) 
                             AND (dbo.SS_Activities.Kind < 3) AND (dbo.SS_Activities.UserId = @UserId)
                 ORDER BY dbo.SS_Activities.Date DESC";
 
             using (SqlCommand sqlCommand = GetSqlCommand(SQL))
             {
                 sqlCommand.Parameters.AddWithValue("@ListId", listId);
+                sqlCommand.Parameters.AddWithValue("@ItemId", itemId);
                 sqlCommand.Parameters.AddWithValue("@UserId", userId);
                 sqlCommand.Parameters.AddWithValue("@Date", date - interval);
 
