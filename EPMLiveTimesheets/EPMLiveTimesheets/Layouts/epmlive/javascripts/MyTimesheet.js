@@ -464,9 +464,7 @@ function TSRenderFinish(grid) {
     }
 
     SetGridSize();
-    var newgridid = grid.id.substr(2);
-    var newobj = eval("TSObject" + newgridid);
-    ChangeView(grid, newobj.CurrentViewId, "0");
+
 }
 
 
