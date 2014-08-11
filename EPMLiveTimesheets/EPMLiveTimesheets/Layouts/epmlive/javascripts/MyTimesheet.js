@@ -2029,8 +2029,7 @@ function getFormattedNumber(Amount, grid) {
     var decPart = (arParts.length > 1 ? arParts[1] : '');
     decPart = (decPart + '00').substr(0, 2);
     if (parseInt(decPart) == 0) {
-        decPart = "";
-        DecimalSeparator = "";
+        return intPart;
     }
     return intPart + newobj.DecimalSeparator + decPart;
 }
