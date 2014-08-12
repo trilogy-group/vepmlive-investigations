@@ -754,8 +754,26 @@ namespace EPMLiveCore.API
 
             try
             {
+                GridGanttSettings gSettings = ListCommands.GetGridGanttSettings(li.ParentList);
                 SPFieldUserValue uv = new SPFieldUserValue(web, user);
                 ArrayList arr = new ArrayList(perms.Split(';'));
+                List<string> additionalPermissions = new List<string>();
+
+                string[] permissionsString = gSettings.BuildTeamPermissions.Split('|');
+                for (int i = 0; i < permissionsString.Length; i++)
+                {
+                    if (i % 2 == 0)
+                    {
+                        string[] strIds = permissionsString[i].Split('~');
+                        for (int j = 0; j < strIds.Length; j++)
+                        {
+                            if (j % 2 == 0)
+                            {
+                                additionalPermissions.Add(strIds[j]);
+                            }
+                        }
+                    }
+                }
 
                 foreach (SPRoleAssignment role in li.RoleAssignments)
                 {
@@ -765,18 +783,22 @@ namespace EPMLiveCore.API
                         {
                             SPGroup group = (SPGroup)role.Member;
                             SPUser tempuser = null;
-                            try
+
+                            if (!additionalPermissions.Contains(Convert.ToString(group.ID)))
                             {
-                                tempuser = group.Users.GetByID(uv.LookupId);
-                            }
-                            catch { }
-                            if (tempuser == null && arr.Contains(group.ID.ToString()))
-                            {
-                                group.AddUser(uv.User);
-                            }
-                            if (tempuser != null && !arr.Contains(group.ID.ToString()) && bIsTeamSecurityEnabled)
-                            {
-                                group.RemoveUser(uv.User);
+                                try
+                                {
+                                    tempuser = group.Users.GetByID(uv.LookupId);
+                                }
+                                catch { }
+                                if (tempuser == null && arr.Contains(group.ID.ToString()))
+                                {
+                                    group.AddUser(uv.User);
+                                }
+                                if (tempuser != null && !arr.Contains(group.ID.ToString()) && bIsTeamSecurityEnabled)
+                                {
+                                    group.RemoveUser(uv.User);
+                                }
                             }
                         }
                     }
