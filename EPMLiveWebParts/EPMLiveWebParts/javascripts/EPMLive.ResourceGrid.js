@@ -14,9 +14,9 @@ function registerEpmLiveResourceGridScript() {
         $$.resourceDictionary = null;
         $$.resources = null;
         $$.myResources = null;
-        $$.exportInProgress = false; 
+        $$.exportInProgress = false;
         $$.importInProgress = false;
-        $$.webpartHeight = false; 
+        $$.webpartHeight = false;
         $$.userIsSiteAdmin = false;
         $$.allSelected = false;
         $$.ribbonBehavior = 0;
@@ -1194,21 +1194,15 @@ function registerEpmLiveResourceGridScript() {
                                 setTabStyle();
                                 if (window.epmLiveMasterPageVersion >= 5.5) {
                                     if (!epmLiveResourceGrid.loaderStopped) {
-
-                                        if ($$.ribbonBehavior == 0) {
-                                            $(document.getElementById("s4-ribbonrow")).height(126);
-                                        }
-                                        else {
-                                            $(document.getElementById("s4-ribbonrow")).height(35);
-                                        }
-
+                                        //Toolbar was overlapped in case of IE 11 browser. Following code fixed this issue!
+                                        $(document.getElementById("s4-ribbonrow")).height(35);
                                         window.EPM.UI.Loader.current().stopLoading('WebPart' + $$.webpartQualifier);
                                         epmLiveResourceGrid.loaderStopped = true;
                                     }
                                 }
                                 SetGridSize();
                                 $$.grid.fixIE();
-
+                                SetGridSize();
                             } catch (ex) {
                             }
                         }, 750);
@@ -2482,7 +2476,7 @@ function registerEpmLiveResourceGridScript() {
 
         }
 
-        window.Grids.OnMouseOverRow = function (grid, row, col, event) { 
+        window.Grids.OnMouseOverRow = function (grid, row, col, event) {
             if (grid.CurHoverRow != row.id) {
                 grid.CurHoverRow = row.id;
                 CurrentGrid = grid;
