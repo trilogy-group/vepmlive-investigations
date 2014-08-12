@@ -1592,7 +1592,10 @@ namespace EPMLiveCore.API
                         ndNew.Attributes.Append(attr);
 
                         attr = doc.CreateAttribute("Visible");
-                        attr.Value = bIsTeamSecurityEnabled ? "1" : "0";
+                        if (listid == null || listid == Guid.Empty)
+                            attr.Value = "1";
+                        else
+                            attr.Value = bIsTeamSecurityEnabled ? "1" : "0";
                         ndNew.Attributes.Append(attr);
 
                         attr = doc.CreateAttribute("CanHide");
@@ -1660,18 +1663,21 @@ namespace EPMLiveCore.API
                                 }
                             }
                         }
-                        //else
-                        //{
-                        //    foreach (SPGroup group in tWeb.Groups)
-                        //    {
-                        //        if (group.CanCurrentUserEditMembership)
-                        //        {
-                        //            enums += "|" + group.Name;
-                        //            enumkeys += "|" + group.ID;
-                        //        }
+                        else
+                        {
+                            if (listid == null || listid == Guid.Empty)
+                            {
+                                foreach (SPGroup group in tWeb.Groups)
+                                {
+                                    if (group.CanCurrentUserEditMembership)
+                                    {
+                                        enums += "|" + group.Name;
+                                        enumkeys += "|" + group.ID;
+                                    }
 
-                        //    }
-                        //}
+                                }
+                            }
+                        }
 
                         attr = doc.CreateAttribute("Enum");
                         attr.Value = enums;
