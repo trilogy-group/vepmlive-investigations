@@ -832,25 +832,13 @@ function changeCompleteStatus(grid, row, col) {
 
             window.setTimeout(function () {
                 MyWorkGrid.hideProcessing(row.id);
-
                 if (completed && !MyWorkGrid.showingCompletedItems) {
-                    if (!$.browser.msie) {
-                        $(row.r0).fadeOut(800);
-                        $(row.r1).fadeOut(800);
-                    } else {
-                        $(row.r0).find("td").fadeOut(800, function () { $(this).parent().remove(); });
-                        $(row.r1).find("td").fadeOut(800, function () { $(this).parent().remove(); });
-                    }
+                    $(row.r0).fadeOut(800);
+                    $(row.r1).fadeOut(800);
                 } else if (!completed && MyWorkGrid.showingCompletedItems) {
-                    if (!$.browser.msie) {
-                        $(row.r0).fadeOut(800);
-                        $(row.r1).fadeOut(800);
-                    } else {
-                        $(row.r0).find("td").fadeOut(800, function () { $(this).parent().remove(); });
-                        $(row.r1).find("td").fadeOut(800, function () { $(this).parent().remove(); });
-                    }
+                    $(row.r0).fadeOut(800);
+                    $(row.r1).fadeOut(800);
                 }
-
                 window.setTimeout(function () {
                     if (completed) {
                         markRowCompleted(grid, row);
