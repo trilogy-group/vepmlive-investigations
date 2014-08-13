@@ -455,6 +455,10 @@ function TSRenderFinish(grid) {
 
             window.onbeforeunload = leavePage;
         }
+
+        var newgridid = grid.id.substr(2);
+        var newobj = eval("TSObject" + newgridid);
+        ChangeView(grid, newobj.CurrentViewId, "0");
     }
     else {
         eval("loadMenu" + grid.id.substr(2) + "()");
