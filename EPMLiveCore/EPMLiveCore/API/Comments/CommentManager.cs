@@ -64,11 +64,8 @@ namespace EPMLiveCore.API
 
         // Public Methods (9) 
 
-        public static Hashtable BuildBody(string userName, string listID, string itemID, string comment)
+        public static Hashtable BuildBody(string userName, string listID, string itemID, string comment, SPSite cSite, SPWeb cWeb)
         {
-            string body = string.Empty;
-            SPWeb cWeb = SPContext.Current.Web;
-
             //0 - name of person who made comment
             //1 - created vs edited
             //2 - link to item being commented on
@@ -89,11 +86,11 @@ namespace EPMLiveCore.API
             SPListItem originListItem = originList.GetItemById(int.Parse(itemID));
 
             itemLink =
-                SPContext.Current.Site.MakeFullUrl(originList.Forms[PAGETYPE.PAGE_DISPLAYFORM].ServerRelativeUrl) +
+                cSite.MakeFullUrl(originList.Forms[PAGETYPE.PAGE_DISPLAYFORM].ServerRelativeUrl) +
                 "?ID=" + originListItem.ID;
 
             itemTitle = originListItem[originList.Fields.GetFieldByInternalName("Title").Id].ToString();
-            listLink = SPContext.Current.Site.MakeFullUrl(originList.DefaultViewUrl);
+            listLink = cSite.MakeFullUrl(originList.DefaultViewUrl);
             listTitle = originList.Title;
 
             commentsPageUrl = cWeb.Url + "/_layouts/epmlive/comments.aspx?listid=" + new Guid(listID).ToString("D") +
@@ -115,7 +112,10 @@ namespace EPMLiveCore.API
         public static string CreateComment(string data)
         {
             string retVal = string.Empty;
+
             SPWeb cWeb = SPContext.Current.Web;
+            var cSite = cWeb.Site;
+            var spUserToken = cWeb.CurrentUser.UserToken;
 
             // Data should look like the following:
             // ===============================
@@ -253,11 +253,15 @@ namespace EPMLiveCore.API
                                 {
                                     var emailSentIDs = new List<int>();
                                     // send email to author
+
+                                    var siteId = cSite.ID;
+                                    var webId = cWeb.ID;
+
                                     if (authorObj != null && originalUser.ID != authorObj.ID)
                                     {
                                         emailSentIDs.Add(authorObj.ID);
                                         SendEmailNotification(authorObj.ID, dataMgr.GetPropVal("ListId"),
-                                            dataMgr.GetPropVal("ItemId"), comment, "created");
+                                            dataMgr.GetPropVal("ItemId"), comment, siteId, webId, spUserToken);
                                     }
 
                                     // send email to assigned to people
@@ -275,7 +279,7 @@ namespace EPMLiveCore.API
                                             {
                                                 emailSentIDs.Add(id);
                                                 SendEmailNotification(id, dataMgr.GetPropVal("ListId"),
-                                                    dataMgr.GetPropVal("ItemId"), comment, "created");
+                                                    dataMgr.GetPropVal("ItemId"), comment, siteId, webId, spUserToken);
                                             }
                                         }
                                     }
@@ -288,7 +292,7 @@ namespace EPMLiveCore.API
                                         {
                                             emailSentIDs.Add(id);
                                             SendEmailNotification(id, dataMgr.GetPropVal("ListId"),
-                                                dataMgr.GetPropVal("ItemId"), comment, "created");
+                                                dataMgr.GetPropVal("ItemId"), comment, siteId, webId, spUserToken);
                                         }
                                     }
                                 });
@@ -337,6 +341,7 @@ namespace EPMLiveCore.API
         {
             string retVal = string.Empty;
             SPWeb cWeb = SPContext.Current.Web;
+            var cSite = cWeb.Site;
 
             // Data should look like the following:
             // ===============================
@@ -483,11 +488,16 @@ namespace EPMLiveCore.API
                                 {
                                     var emailSentIDs = new List<int>();
                                     // send email to author
+                                    
+                                    var siteId = cSite.ID;
+                                    var webId = cWeb.ID;
+                                    var spUserToken = cWeb.CurrentUser.UserToken;
+
                                     if (authorObj != null && originalUser.ID != authorObj.ID)
                                     {
                                         emailSentIDs.Add(authorObj.ID);
                                         SendEmailNotification(authorObj.ID, dataMgr.GetPropVal("ListId"),
-                                            dataMgr.GetPropVal("ItemId"), comment, "created");
+                                            dataMgr.GetPropVal("ItemId"), comment, siteId, webId, spUserToken);
                                     }
 
                                     // send email to assigned to people
@@ -505,7 +515,7 @@ namespace EPMLiveCore.API
                                             {
                                                 emailSentIDs.Add(id);
                                                 SendEmailNotification(id, dataMgr.GetPropVal("ListId"),
-                                                    dataMgr.GetPropVal("ItemId"), comment, "created");
+                                                    dataMgr.GetPropVal("ItemId"), comment, siteId, webId, spUserToken);
                                             }
                                         }
                                     }
@@ -518,7 +528,7 @@ namespace EPMLiveCore.API
                                         {
                                             emailSentIDs.Add(id);
                                             SendEmailNotification(id, dataMgr.GetPropVal("ListId"),
-                                                dataMgr.GetPropVal("ItemId"), comment, "created");
+                                                dataMgr.GetPropVal("ItemId"), comment, siteId, webId, spUserToken);
                                         }
                                     }
                                 });
@@ -1304,12 +1314,17 @@ namespace EPMLiveCore.API
                         var emailSentIDs = new List<int>();
 
                         // send email to author
+                        
+                        var siteId = cSite.ID;
+                        var webId = cWeb.ID;
+                        var spUserToken = cWeb.CurrentUser.UserToken;
+
                         if ((authorObj != null) && (SPContext.Current.Web.CurrentUser.ID != authorObj.ID) &&
                             !emailSentIDs.Contains(authorObj.ID))
                         {
                             emailSentIDs.Add(authorObj.ID);
                             SendEmailNotification(authorObj.ID, dataMgr.GetPropVal("ListId"),
-                                dataMgr.GetPropVal("ItemId"), dataMgr.GetPropVal("Comment"), "edited");
+                                dataMgr.GetPropVal("ItemId"), dataMgr.GetPropVal("Comment"), siteId, webId, spUserToken);
                         }
 
                         // send emails out to people in assignedto field if that field exists
@@ -1326,7 +1341,7 @@ namespace EPMLiveCore.API
                                 {
                                     emailSentIDs.Add(id);
                                     SendEmailNotification(id, dataMgr.GetPropVal("ListId"), dataMgr.GetPropVal("ItemId"),
-                                        dataMgr.GetPropVal("Comment"), "created");
+                                        dataMgr.GetPropVal("Comment"), siteId, webId, spUserToken);
                                 }
                             }
                         }
@@ -1339,13 +1354,13 @@ namespace EPMLiveCore.API
                             {
                                 emailSentIDs.Add(id);
                                 SendEmailNotification(id, dataMgr.GetPropVal("ListId"), dataMgr.GetPropVal("ItemId"),
-                                    dataMgr.GetPropVal("Comment"), "edited");
+                                    dataMgr.GetPropVal("Comment"), siteId, webId, spUserToken);
                             }
                         }
 
                         SPSecurity.RunWithElevatedPrivileges(delegate
                         {
-                            using (var es = new SPSite(cSite.ID))
+                            using (var es = new SPSite(siteId))
                             {
                                 using (SPWeb ew = es.OpenWeb(cWeb.ServerRelativeUrl))
                                 {
@@ -1569,49 +1584,46 @@ namespace EPMLiveCore.API
             return result;
         }
 
-        private static bool SendEmailNotification(int userID, string listId, string itemId, string newComment,
-            string emailType)
+        private static bool SendEmailNotification(int userID, string listId, string itemId, string newComment, Guid siteId, Guid webId, SPUserToken userToken)
         {
-            bool mailSent = false;
-            SPSite cSite = SPContext.Current.Site;
-            SPWeb cWeb = SPContext.Current.Web;
-
-            // get target user email
-            SPUser targetUser = cWeb.AllUsers.GetByID(userID);
-
-            SPList originList = cWeb.Lists[new Guid(listId)];
-            SPListItem originItem = originList.GetItemById(int.Parse(itemId));
-            string itemTitle = (originItem[originList.Fields.GetFieldByInternalName("Title").Id] != null)
-                ? originItem[originList.Fields.GetFieldByInternalName("Title").Id].ToString()
-                : string.Empty;
-
-            newComment = newComment.Replace("<P>", "")
-                .Replace("</P>", "")
-                .Replace("\n", "<br />")
-                .Replace("\r\n", "<br />");
-
-            if (newComment.Contains("%20"))
+            using (var cSite = new SPSite(siteId, userToken))
             {
-                newComment = HttpUtility.UrlDecode(newComment);
+                using (var cWeb = cSite.OpenWeb(webId))
+                {
+                    bool mailSent = false;
+
+                    // get target user email
+                    SPUser targetUser = cWeb.AllUsers.GetByID(userID);
+
+                    newComment = newComment.Replace("<P>", "")
+                        .Replace("</P>", "")
+                        .Replace("\n", "<br />")
+                        .Replace("\r\n", "<br />");
+
+                    if (newComment.Contains("%20"))
+                    {
+                        newComment = HttpUtility.UrlDecode(newComment);
+                    }
+
+                    try
+                    {
+                        //string subject = cWeb.CurrentUser.Name + " commented on: " + itemTitle;
+                        Hashtable hshProps = BuildBody(cWeb.CurrentUser.Name, listId, itemId, newComment, cSite, cWeb);
+
+                        SPList list = cWeb.Lists[new Guid(listId)];
+                        SPListItem li = list.GetItemById(int.Parse(itemId));
+
+                        APIEmail.QueueItemMessage(3, false, hshProps, new[] { targetUser.ID.ToString() }, null, false, true, li,
+                            cWeb.CurrentUser, true);
+                    }
+                    catch (Exception e)
+                    {
+                        mailSent = false;
+                    }
+
+                    return mailSent;
+                }
             }
-
-            try
-            {
-                //string subject = cWeb.CurrentUser.Name + " commented on: " + itemTitle;
-                Hashtable hshProps = BuildBody(cWeb.CurrentUser.Name, listId, itemId, newComment);
-
-                SPList list = cWeb.Lists[new Guid(listId)];
-                SPListItem li = list.GetItemById(int.Parse(itemId));
-
-                APIEmail.QueueItemMessage(3, false, hshProps, new[] {targetUser.ID.ToString()}, null, false, true, li,
-                    cWeb.CurrentUser, true);
-            }
-            catch (Exception e)
-            {
-                mailSent = false;
-            }
-
-            return mailSent;
         }
 
         private static void SetSocialEngineTransaction(SPListItem item)
