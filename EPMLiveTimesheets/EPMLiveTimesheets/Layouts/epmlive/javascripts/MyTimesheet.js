@@ -31,6 +31,7 @@ var NotesOut = false;
 
 var TimesheetHoursEdited = false;
 var TimesheetItemEdited = false;
+var rendered = false;
 
 function TSOnLoaded(grid) {
     var newgridid = grid.id.substr(2);
@@ -456,9 +457,19 @@ function TSRenderFinish(grid) {
             window.onbeforeunload = leavePage;
         }
 
-        var newgridid = grid.id.substr(2);
-        var newobj = eval("TSObject" + newgridid);
-        ChangeView(grid, newobj.CurrentViewId, "0");
+        if (!rendered) {
+            rendered = true;
+            var newgridid = grid.id.substr(2);
+            var newobj = eval("TSObject" + newgridid);
+            for (var v in newobj.Views) {
+                var view = newobj.Views[v];
+                if (view.Default == "true") {
+                    setTimeout("SetLoadView('" + grid.id + "','" + v + "')", 100);
+                }
+            }
+            
+        }
+        //ChangeView(grid, "V0", "0");
     }
     else {
         eval("loadMenu" + grid.id.substr(2) + "()");
@@ -471,6 +482,12 @@ function TSRenderFinish(grid) {
 
 }
 
+
+function SetLoadView(gridid, viewid)
+{
+    var grid = Grids[gridid];
+    ChangeView(grid, viewid, "0");
+}
 
 Grids.OnStartEdit = function (grid, row, col) {
     if (NotesOut) {
