@@ -1120,8 +1120,7 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
             var aFooterSave = $(document.createElement('a'));
             aFooterSave.attr('id', 'aGroupBySave');
             aFooterSave.attr('href', 'javascript:void(0)');
-            if ($('.grouping-wrapper').children('.grouping-row').length == 0)
-            aFooterSave.attr('class', 'disabledLink');
+            
             aFooterSave.text('Apply');
             aFooterSave.bind('click', function () {
                 var numGroups = $('.grouping-wrapper').children('.grouping-row').length;
