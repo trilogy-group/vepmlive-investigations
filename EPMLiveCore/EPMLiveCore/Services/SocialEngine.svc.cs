@@ -351,12 +351,20 @@ namespace EPMLiveCore.Services
 
             try
             {
-                SPWebCollection spWebCollection = SPContext.Current.Site.AllWebs;
+                var siteId = SPContext.Current.Site.ID;
 
-                foreach (SPWeb spWeb in spWebCollection)
+                SPSecurity.RunWithElevatedPrivileges(() =>
                 {
-                    webs.collection.Add(new Webs.Web {id = spWeb.ID, url = spWeb.ServerRelativeUrl});
-                }
+                    using (var spSite = new SPSite(siteId))
+                    {
+                        SPWebCollection spWebCollection = spSite.AllWebs;
+
+                        foreach (SPWeb spWeb in spWebCollection)
+                        {
+                            webs.collection.Add(new Webs.Web { id = spWeb.ID, url = spWeb.ServerRelativeUrl });
+                        }
+                    }
+                });
             }
             catch (Exception exception)
             {
