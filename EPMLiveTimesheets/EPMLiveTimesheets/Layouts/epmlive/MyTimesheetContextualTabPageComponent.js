@@ -111,12 +111,13 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
             case 'Ribbon.MyTimesheet.Approvals':
             case 'Ribbon.MyTimesheet.ApprovalsPM':
             case 'Ribbon.MyTimesheet.ApprovalsTM':
-                return true;
+                    return true;
             case 'Ribbon.MyTimesheet.Comments':
                 if (curRow != null && curRow["ItemId"] != null)
                     return true;
                 return false;
             case 'MyTimesheetContextualTab.EnableMyTimesheetViewsTab':
+                return true;
             case 'Ribbon.MyTimesheet.SaveView':
             case 'Ribbon.MyTimesheet.RenameView':
             case 'Ribbon.MyTimesheet.DeleteView':
