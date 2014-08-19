@@ -899,6 +899,7 @@ namespace TimeSheets
                 string sql_getApprovalCount = string.Empty;
                 DataTable dtUserID = null;
                 int approvalCount = 0;
+                string bIsTimeSheetManager = "";
 
 
                 sql_getUserIDs = string.Format("select SharePointAccountID from LSTResourcepool WHERE (',' + TimesheetManagerID + ',' LIKE '%,{0},%') and Generic=0 ", user.ID);
@@ -912,6 +913,7 @@ namespace TimeSheets
                     SqlConnection cn = null;
                     StringBuilder sharePointAccountIDs = new StringBuilder();
                     String userIDs;
+                    bIsTimeSheetManager = "True";
 
                     SPSecurity.RunWithElevatedPrivileges(delegate()
                     {
@@ -946,8 +948,12 @@ namespace TimeSheets
                     }
 
                 }
+                else
+                {
+                    bIsTimeSheetManager = "False";
+                }
 
-                return "<ApprovalNotification Status=\"0\">" + approvalCount + "</ApprovalNotification>";
+                return "<ApprovalNotification Status=\"0\" IsTimeSheetManager=\"" + bIsTimeSheetManager + "\">" + approvalCount + "</ApprovalNotification>";
 
             }
             catch (Exception ex)

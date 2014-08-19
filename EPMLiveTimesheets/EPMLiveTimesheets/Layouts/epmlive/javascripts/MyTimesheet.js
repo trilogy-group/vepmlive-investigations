@@ -32,6 +32,7 @@ var NotesOut = false;
 var TimesheetHoursEdited = false;
 var TimesheetItemEdited = false;
 var rendered = false;
+var bIsTimeSheetManager = false;
 
 function TSOnLoaded(grid) {
     var newgridid = grid.id.substr(2);
@@ -2375,6 +2376,11 @@ function ShowApprovalNotification() {
             }
         } else if (oResp.ApprovalNotification.Text != "0") {
             SP.UI.Status.removeStatus(updateStatusBox);
+        }
+
+        if (oResp.ApprovalNotification.IsTimeSheetManager == "True") {
+            bIsTimeSheetManager = true;
+            RefreshCommandUI();
         }
     });
 }

@@ -110,8 +110,11 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
             case 'Ribbon.MyTimesheet.ShowHideFilters.Query':
             case 'Ribbon.MyTimesheet.Approvals':
             case 'Ribbon.MyTimesheet.ApprovalsPM':
+                return true;
             case 'Ribbon.MyTimesheet.ApprovalsTM':
+                if (bIsTimeSheetManager)
                     return true;
+                return false;
             case 'Ribbon.MyTimesheet.Comments':
                 if (curRow != null && curRow["ItemId"] != null)
                     return true;
