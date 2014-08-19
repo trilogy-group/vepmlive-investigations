@@ -38,6 +38,8 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
         protected ToolBar toolbar;
         protected string version;
 
+        private bool IsListCleanUpEnabled;
+
         public void RaisePostBackEvent(string sAction)
         {
             string param = sAction.Remove(sAction.LastIndexOf("_"));
@@ -89,6 +91,23 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
                     SPContext.Current.Site.RootWeb.AllowUnsafeUpdates = true;
                     CoreFunctions.setConfigSetting(SPContext.Current.Site.RootWeb, "reportingV2", "false");
                 }
+
+                try
+                {
+                    IsListCleanUpEnabled =
+                     Convert.ToBoolean(CoreFunctions.getConfigSetting(SPContext.Current.Site.RootWeb, "epmlivelistcleanup"));
+                    if (IsListCleanUpEnabled)
+                    {
+                        MenuItemTemplate1.Visible = true;
+                    }
+                }
+                catch (Exception)
+                {
+                    IsListCleanUpEnabled = false;
+                    SPContext.Current.Site.RootWeb.AllowUnsafeUpdates = true;
+                    CoreFunctions.setConfigSetting(SPContext.Current.Site.RootWeb, "epmlivelistcleanup", "false");
+                }
+
                 _DAO = new EPMData(SPContext.Current.Site.ID);
                 var rb = new ReportBiz(SPContext.Current.Site.ID, SPContext.Current.Web.ID, reportingV2Enabled);
 
@@ -380,7 +399,7 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
                     "submit('SnapshotAll'); return false", "Snapshot All", "100", enabled));
             }
 
-            if (!_RFqueued)
+            if (!_RFqueued && IsListCleanUpEnabled)
             {
                 //actionsMenu.Items.Add(new EPMMenuItem("epm03_CleanupAll", "images/EPMRefresh.gif", "submit('CleanupAll'); return false", "Cleanup All", "100", enabled));
                 actionsMenu.Items.Add(
