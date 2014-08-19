@@ -561,7 +561,7 @@ namespace EPMLiveCore.API
                         DataRow[] drRes = dtResourcePool.Select("ID='" + nd.Attributes["ID"].Value + "'");
                         if (drRes.Length > 0)
                         {
-                            SPFieldUserValue uv = new SPFieldUserValue(oWeb, drRes[0]["SPID"].ToString());
+                            SPFieldUserValue uv = new SPFieldUserValue(oWeb, drRes[0]["SPAccountInfo"].ToString());
 
                             if (!arrUsers.Contains(int.Parse(drRes[0]["SPID"].ToString())))
                             {
