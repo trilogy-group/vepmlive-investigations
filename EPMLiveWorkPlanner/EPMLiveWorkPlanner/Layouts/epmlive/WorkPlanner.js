@@ -550,6 +550,7 @@ function setWBSAndTaskID(Row, force) {
         var cWBS = 0;
 
         var newWBS = "";
+        var taskHierarchy = "";
 
         while (child != null) {
 
@@ -557,12 +558,34 @@ function setWBSAndTaskID(Row, force) {
                 taskorder++;
                 cWBS++;
 
-                if (WBS == "")
+                if (WBS == "") {
                     newWBS = cWBS.toString();
-                else
+                    taskHierarchy = "";
+                }
+                else {
                     newWBS = WBS + "." + cWBS.toString();
+                    parentItem = child.parentNode;
+                    taskHierarchy = "";
+                    while (parentItem != null) {
+                        if (parentItem.Def.Name != "Folder" && parentItem.parentNode != null) {
+                            if (parentItem.Title != "") {
+                                taskHierarchy = parentItem.Title + " > " + taskHierarchy;
+                            }
+                            parentItem = parentItem.parentNode;
+                        }
+                        else {
+                            break;
+                        }
+                    }
+
+                }
+
+                if (taskHierarchy != "") {
+                    taskHierarchy = taskHierarchy.substr(0, taskHierarchy.length - 3)
+                }
 
                 Grid.SetValue(child, "taskorder", taskorder, 0, 0);
+                Grid.SetValue(child, "TaskHierarchy", taskHierarchy, 0, 0);
                 try {
                     Grid.SetValue(child, "WBS", newWBS, 0, 0);
                 } catch (e) { }
