@@ -3948,6 +3948,7 @@
                         var dblValue = parseFloat(jValue.value) * mpy;
                         this.SetPeriodValue(grid, row, col, dblValue);
                         var sValue = this.GetFormattedPeriodCell(grid, row, col, false, false);
+                        this.GridsOnAfterValueChanged(grid, row, col, sValue);
                         grid.SetAttribute(row, col, null, sValue, 0, 0);
                     }
                 }
