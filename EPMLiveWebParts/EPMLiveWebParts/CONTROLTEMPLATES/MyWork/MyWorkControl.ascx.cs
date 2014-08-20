@@ -301,22 +301,24 @@ namespace EPMLiveWebParts.CONTROLTEMPLATES.MyWork
                 {
                     SPList spList = myworkWeb.Lists.TryGetList(newItemList);
 
+                    
                     if (spList == null) continue;
 
                     var gSettings = new GridGanttSettings(spList);
 
                     string rollupLists = gSettings.RollupLists;
+                    bool bUsePopUp = gSettings.UsePopup;
 
                     if (string.IsNullOrEmpty(rollupLists))
                     {
                         if (spList.Hidden || !spList.DoesUserHavePermissions(SPBasePermissions.AddListItems) ||
                             gSettings.HideNewButton) continue;
 
-                        newItemListsFormatted.Add(string.Format(@"{{Name:'{0}',Rollup:false}}", newItemList));
+                        newItemListsFormatted.Add(string.Format(@"{{Name:'{0}',listID:'{1}',bUsePopUp:'{2}',LinkType:'view',Rollup:false}}", newItemList,spList.ID,bUsePopUp));
                     }
                     else
                     {
-                        newItemListsFormatted.Add(string.Format(@"{{Name:'{0}',Rollup:true}}", newItemList));
+                        newItemListsFormatted.Add(string.Format(@"{{Name:'{0}',listID:'{1}',bUsePopUp:'{2}',LinkType:'view',Rollup:true}}", newItemList, spList.ID, bUsePopUp));
                     }
                 }
 

@@ -363,11 +363,20 @@ function MyWorkGoToItem(gridid, rowid) {
     CurrentRow = row;
     gridid = GetGridId(grid);
 
-    var LinkType = eval("mygrid" + gridid + ".LinkType");
+    for (var l in newItemLists)
+    {
+        var listID = newItemLists[l]["listID"];
+        if (row.ListID.toLowerCase() == listID.toLowerCase())
+        {
+            var bUsePopUp = newItemLists[l]["bUsePopUp"];
+            var linkType = newItemLists[l]["LinkType"];
+            break;
+        }
+    }
 
-    var url = window.epmLiveNavigation.currentWebUrl + "/_layouts/epmlive/gridaction.aspx?action=" + LinkType + "&webid=" + row.WebID + "&listid=" + row.ListID + "&ID=" + row.ItemID + "&Source=" + escape(location.href);
+    var url = window.epmLiveNavigation.currentWebUrl + "/_layouts/epmlive/gridaction.aspx?action=" + linkType + "&webid=" + row.WebID + "&listid=" + row.ListID + "&ID=" + row.ItemID + "&Source=" + escape(location.href);
 
-    if (eval("mygrid" + gridid + "._usepopup")) {
+    if (bUsePopUp.toLowerCase() == "true") {
 
         var options = window.SP.UI.$create_DialogOptions();
 
@@ -380,6 +389,11 @@ function MyWorkGoToItem(gridid, rowid) {
     }
     else
         location.href = url;
+}
+
+
+function GetGridId(grid) {
+    return grid.id.substr(9);
 }
 
 function MyWorkOnGetHtmlValue(grid, row, col, val) {
