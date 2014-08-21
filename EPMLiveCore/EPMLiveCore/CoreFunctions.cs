@@ -1978,6 +1978,27 @@ namespace EPMLiveCore
             createdWebUrl = string.Empty;
             createdWebTitle = string.Empty;
             createdWebServerRelativeUrl = string.Empty;
+            var listsNotToBeMapped = new List<string>
+            {
+                "Holiday Schedules",
+                "My Timesheet",
+                "Holidays",
+                "My Work",
+                "Roles",
+                "Departments",
+                "Non Work",
+                "Project Schedules",
+                "Site Assets",
+                "IzendaReports",
+                "Planner Templates",
+                "Report Library",
+                "Site Pages",
+                "User Profile Pictures",
+                "Excel Reports",
+                "Style Library",
+                "Work Hour"
+            };
+
             try
             {
                 var sUrl = "";
@@ -2024,15 +2045,15 @@ namespace EPMLiveCore
                 {
                     SPSecurity.RunWithElevatedPrivileges(() =>
                     {
-                        using (SPSite s = new SPSite(web.Url))
+                        using (SPSite site = new SPSite(web.Url))
                         {
-                            using (SPWeb w = s.OpenWeb())
+                            using (SPWeb currentWeb = site.OpenWeb())
                             {
-                                Dictionary<string, SPRoleType> groups = Security.AddBasicSecurityToWorkspace(w, w.Title,
-                                    w.AllUsers[user]);
-                                strEPMLiveGroupsPermAssignments = CoreFunctions.getConfigSetting(w,
+                                Dictionary<string, SPRoleType> groups = Security.AddBasicSecurityToWorkspace(currentWeb, currentWeb.Title,
+                                    currentWeb.AllUsers[user]);
+                                strEPMLiveGroupsPermAssignments = CoreFunctions.getConfigSetting(currentWeb,
                                     "EPMLiveGroupsPermAssignments");
-                                List<SPEventReceiverDefinition> evts = null;
+                                //List<SPEventReceiverDefinition> evts = null;
                                 List<Guid> listsToBeMapped = new List<Guid>();
                                 Dictionary<String, String> listIconsToBeSet = new Dictionary<string, string>();
                                 string EPMLiveReportingAssembly =
@@ -2044,31 +2065,41 @@ namespace EPMLiveCore
                                 object apiClass = null;
                                 string listIcon = string.Empty;
 
-                                foreach (SPList l in w.Lists)
+                                foreach (SPList list in currentWeb.Lists)
                                 {
-                                    string sClass = "EPMLiveReportsAdmin.ListEvents";
+                                    //Code keep commented - may be in future there might be requirement for mapping list which has Reporting events enabled.
+                                    //string sClass = "EPMLiveReportsAdmin.ListEvents";
 
-                                    evts = CoreFunctions.GetListEvents(l,
-                                        EPMLiveReportingAssembly,
-                                        sClass,
-                                        new List<SPEventReceiverType>
-                                        {
-                                            SPEventReceiverType.ItemAdded,
-                                            SPEventReceiverType.ItemUpdated,
-                                            SPEventReceiverType.ItemDeleting
-                                        });
+                                    //evts = CoreFunctions.GetListEvents(l,
+                                    //    EPMLiveReportingAssembly,
+                                    //    sClass,
+                                    //    new List<SPEventReceiverType>
+                                    //    {
+                                    //        SPEventReceiverType.ItemAdded,
+                                    //        SPEventReceiverType.ItemUpdated,
+                                    //        SPEventReceiverType.ItemDeleting
+                                    //    });
 
-                                    if (evts.Count > 0 &&
-                                        !listsToBeMapped.Contains(l.ID))
+                                    //if (evts.Count > 0 &&
+                                    //    !listsToBeMapped.Contains(l.ID))
+
+                                    //Previously list which has Reporting events enabled - Only those lists are mapped to Reporting database
+                                    //Condition as mentioned below will now mapped all the list irrespective of Reporting events.
+                                    //EPML-3477: when creating a workspace all lists need to be mapped to the reporting db, currenly none are
+                                    //Previosly lists which has Reporting events enabled only those list icons are associated with Social Engine web part
+                                    //Based on below change all mapped list will have their associated icon to be mapped under Social engine
+                                    //EPML-3476: if workspace tables are not mapped, no social icons show up.
+                                    //Lists mentioned under listsNotToBeMapped variable are system specific / special lists which not required to mapped under Reporting DB
+                                    if (!list.Hidden && !listsNotToBeMapped.Contains(list.Title) && !listsToBeMapped.Contains(list.ID))
                                     {
-                                        listsToBeMapped.Add(l.ID);
+                                        listsToBeMapped.Add(list.ID);
 
                                         try
                                         {
                                             //Set List Icon
-                                            var gSettings = new GridGanttSettings(l);
+                                            var gSettings = new GridGanttSettings(list);
                                             listIcon = gSettings.ListIcon;
-                                            listIconsToBeSet.Add(l.ID.ToString(), listIcon);
+                                            listIconsToBeSet.Add(list.ID.ToString(), listIcon);
                                         }
                                         catch { }
 
@@ -2083,7 +2114,7 @@ namespace EPMLiveCore
                                         assemblyInstance = Assembly.Load(EPMLiveReportingAssembly);
                                         thisClass = assemblyInstance.GetType("EPMLiveReportsAdmin.EPMData", true, true);
                                         m = thisClass.GetMethod("SetListIcon", BindingFlags.Public | BindingFlags.Instance);
-                                        apiClass = Activator.CreateInstance(thisClass, new object[] { true, s.ID, w.ID });
+                                        apiClass = Activator.CreateInstance(thisClass, new object[] { true, site.ID, currentWeb.ID });
 
                                         if (m != null &&
                                             assemblyInstance != null &&
@@ -2102,7 +2133,7 @@ namespace EPMLiveCore
                                     assemblyInstance = Assembly.Load(EPMLiveReportingAssembly);
                                     thisClass = assemblyInstance.GetType("EPMLiveReportsAdmin.EPMData", true, true);
                                     m = thisClass.GetMethod("MapLists", BindingFlags.Public | BindingFlags.Instance);
-                                    apiClass = Activator.CreateInstance(thisClass, new object[] { true, s.ID, w.ID });
+                                    apiClass = Activator.CreateInstance(thisClass, new object[] { true, site.ID, currentWeb.ID });
                                 }
                                 catch { }
 
@@ -2111,7 +2142,7 @@ namespace EPMLiveCore
                                     thisClass != null &&
                                     apiClass != null)
                                 {
-                                    m.Invoke(apiClass, new object[] { listsToBeMapped, w.ID });
+                                    m.Invoke(apiClass, new object[] { listsToBeMapped, currentWeb.ID });
                                 }
                             }
                         }
