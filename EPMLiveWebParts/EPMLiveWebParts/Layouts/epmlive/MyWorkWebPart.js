@@ -1976,7 +1976,8 @@ var MyWorkGrid = {
 
     onRenameViewClose: function (dialogResult, returnValue) {
         if (dialogResult !== SP.UI.DialogResult.OK) return;
-        if (returnValue == '' | returnValue == null) {
+        var val = returnValue.replace(/^\s+|\s+$/, '');
+        if (val.length == 0) {
             return false;
         }
         for (var v in MyWorkGrid.views) {
