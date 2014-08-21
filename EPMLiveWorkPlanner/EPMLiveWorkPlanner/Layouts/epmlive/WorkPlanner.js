@@ -61,7 +61,7 @@ function SaveTemplateClose(dialogResult, returnValue) {
     if (dialogResult == SP.UI.DialogResult.OK) {
         if (returnValue != "") {
             ShowTDialog("Saving Template...");
-            var x = Grids.WorkPlannerGrid.GetXmlData("Body,AllCols,NoIO", "");
+            var x = Grids.WorkPlannerGrid.GetXmlData("Body,AllCols,NoIO,Defaults", "");
             x = x.replace(/&/gi, "%26");
 
             var tVals = returnValue.split('`');
