@@ -2363,8 +2363,8 @@ function setDefaultDates(grid, row, samedates) {
 function LinkDown(type, lag) {
 
     var grid = Grids.WorkPlannerGrid;
-    var IsCalcOff = grid.ActionCalcOff();
-    if (grid.ActionCalcOff() == true)
+    var IsCalcOff = grid.ActionCalcOff();    
+    if (IsCalcOff)
         grid.ActionCalcOff();
     var rows = grid.GetSelRows();
 
@@ -2385,7 +2385,7 @@ function LinkDown(type, lag) {
             }
         }
     }
-    if (IsCalcOff == true)
+    if (IsCalcOff)
         grid.ActionCalcOn();
     setTimeout("Grids.WorkPlannerGrid.ActionCorrectAllDependencies()", 100);
 }
@@ -2559,9 +2559,9 @@ function getDependencyArray(sId) {
 function LinkUp(type, lag) {
 
     var grid = Grids.WorkPlannerGrid;
-    var IsCalcOff = grid.ActionCalcOff();
-    if (grid.ActionCalcOff() == true)
-        grid.ActionCalcOff();
+    var IsCalcOff = grid.ActionCalcOff();    
+    if (IsCalcOff)
+    grid.ActionCalcOff();
     var rows = grid.GetSelRows();
 
     var parent = null;
@@ -2578,7 +2578,7 @@ function LinkUp(type, lag) {
             }
         }
     }
-    if (IsCalcOff == true)
+    if (IsCalcOff)
         grid.ActionCalcOn();
     setTimeout("Grids.WorkPlannerGrid.ActionCorrectAllDependencies()", 100);
 }
@@ -2587,8 +2587,8 @@ function Unlink() {
 
     if (confirm("Are you sure you want to unlink all successors?")) {
         var grid = Grids.WorkPlannerGrid;
-        var IsCalcOff = grid.ActionCalcOff();
-        if (grid.ActionCalcOff() == true)
+        var IsCalcOff = grid.ActionCalcOff();        
+        if (IsCalcOff)
             grid.ActionCalcOff();
         var rows = grid.GetSelRows();
 
@@ -2604,7 +2604,7 @@ function Unlink() {
 
             grid.SetValue(rows[i], "Descendants", "", 1);
         }
-        if (IsCalcOff == true)
+        if (IsCalcOff)
             grid.ActionCalcOn();
         grid.ActionCorrectAllDependencies();
     }
