@@ -312,7 +312,7 @@ namespace EPMLiveWebParts
                                 break;
                             case SPFieldType.User:
                                 sWidth = "150";
-                                attr = doc.CreateAttribute("CanSort");
+                                attr = doc.CreateAttribute("CaseSensitive");
                                 attr.Value = "0";
                                 ndNew.Attributes.Append(attr);
                                 break;
