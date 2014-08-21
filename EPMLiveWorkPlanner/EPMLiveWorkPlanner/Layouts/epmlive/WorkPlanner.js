@@ -37,6 +37,7 @@ var oLinkedTasks;
 
 var newtasktext = "Add New Task";
 
+
 function SetSplashText(text) {
 
     document.getElementById("divSplashInfo").innerHTML = text;
@@ -1333,6 +1334,9 @@ function DeleteTasks() {
                 for (var i = 0; i < delRows.length; i++) {
                     try {
                         var row = grid.GetRowById(delRows[i]);
+                        try{
+                            Grids.WorkPlannerGrid.MoveRow(row, row.parentNode.parentNode, row.parentNode.nextSibling, 1);
+                        } catch (e) { }
                         grid.DeleteRow(row, 2);
                         grid.RemoveRow(row);
                     } catch (e) { }
@@ -2359,7 +2363,7 @@ function setDefaultDates(grid, row, samedates) {
 function LinkDown(type, lag) {
 
     var grid = Grids.WorkPlannerGrid;
-    var IsCalcOff = grid.ActionCalcOff();    
+    var IsCalcOff = grid.ActionCalcOff();
     if (grid.ActionCalcOff() == true)
         grid.ActionCalcOff();
     var rows = grid.GetSelRows();
@@ -2555,9 +2559,9 @@ function getDependencyArray(sId) {
 function LinkUp(type, lag) {
 
     var grid = Grids.WorkPlannerGrid;
-    var IsCalcOff = grid.ActionCalcOff();    
+    var IsCalcOff = grid.ActionCalcOff();
     if (grid.ActionCalcOff() == true)
-    grid.ActionCalcOff();
+        grid.ActionCalcOff();
     var rows = grid.GetSelRows();
 
     var parent = null;
@@ -2583,7 +2587,7 @@ function Unlink() {
 
     if (confirm("Are you sure you want to unlink all successors?")) {
         var grid = Grids.WorkPlannerGrid;
-        var IsCalcOff = grid.ActionCalcOff();        
+        var IsCalcOff = grid.ActionCalcOff();
         if (grid.ActionCalcOff() == true)
             grid.ActionCalcOff();
         var rows = grid.GetSelRows();
