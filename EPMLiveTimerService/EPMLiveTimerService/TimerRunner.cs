@@ -59,7 +59,7 @@ namespace TimerService
                 bw.RunWorkerAsync();
 
 
-                //=========================Run TS Queue
+                //=========================Run Sec Queue
                 bwSec = new BackgroundWorker();
                 bwSec.WorkerReportsProgress = true;
                 bwSec.WorkerSupportsCancellation = true;
@@ -103,6 +103,18 @@ namespace TimerService
                 ////bwActivity.RunWorkerCompleted += bwNotificationsJobs_RunWorkerCompleted;
 
                 //bwActivity.RunWorkerAsync();
+
+
+                //=========================Run Rollup Queue
+                bwSec = new BackgroundWorker();
+                bwSec.WorkerReportsProgress = true;
+                bwSec.WorkerSupportsCancellation = true;
+
+                bwSec.DoWork += bw_RollupDoWork;
+                //bw.ProgressChanged += bw_ProgressChanged;
+                //bw.RunWorkerCompleted += bw_RunWorkerCompleted;
+
+                bwSec.RunWorkerAsync();
 
                 //================Run Integrations
                 bwIntegrationJobs = new BackgroundWorker();
@@ -269,6 +281,36 @@ namespace TimerService
                 {
                     mc.runTimer();
                     if(bw.CancellationPending)
+                    {
+                        mc.stopTimer();
+                        e.Cancel = true;
+                        return;
+                    }
+                    GC.Collect();
+                    int poll = 2;
+                    try
+                    {
+                        poll = int.Parse(EPMLiveCore.CoreFunctions.getFarmSetting("PollingInterval"));
+                    }
+                    catch { }
+                    Thread.Sleep(poll * 1000);
+                }
+            }
+            else
+            {
+                e.Result = -1;
+            }
+        }
+
+        static void bw_RollupDoWork(object sender, DoWorkEventArgs e)
+        {
+            RollupClass mc = new RollupClass();
+            if (mc.startTimer())
+            {
+                while (true)
+                {
+                    mc.runTimer();
+                    if (bw.CancellationPending)
                     {
                         mc.stopTimer();
                         e.Cancel = true;
