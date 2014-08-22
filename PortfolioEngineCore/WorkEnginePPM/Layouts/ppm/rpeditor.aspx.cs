@@ -61,6 +61,7 @@ namespace WorkEnginePPM
                 ctl.TicketVal = Request["dataid"];
                 ctl.IsResource = Request["isresource"];
                 ctl.IsDlg = Request["IsDlg"];
+                ctl.HideCloseBtn = Request["hideCloseBtn"];
                 if (string.IsNullOrEmpty(Request["isresource"]) == true || Request["isresource"] == "0")
                     RPETitle = "Resource Planner - Project Mode";
                 else
@@ -115,6 +116,7 @@ namespace WorkEnginePPM
                     ctl.TicketVal = Request["dataid"];
                     ctl.IsResource = Request["isresource"];
                     ctl.IsDlg = Request["IsDlg"];
+                    ctl.HideCloseBtn = Request["hideCloseBtn"];
                     if (string.IsNullOrEmpty(Request["isresource"]) == true || Request["isresource"] == "0")
                         RPETitle = "Resource Planner - Project Mode";
                     else

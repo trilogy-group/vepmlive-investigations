@@ -939,7 +939,7 @@
                             },
                             {
                                 items: [
-                                    { type: "bigbutton", name: "Close", img: "close32.gif", tooltip: "Close", onclick: "dialogEvent('EditorTab_Close');", disabled: bIsCloseDisabled }
+                                    { type: "bigbutton", id: "CloseBtn", name: "Close", img: "close32.gif", tooltip: "Close", onclick: "dialogEvent('EditorTab_Close');", disabled: bIsCloseDisabled }
                                 ]
                             }
                         ]
@@ -1044,7 +1044,7 @@
                             },
                             {
                                 items: [
-                                    { type: "bigbutton", name: "Close", img: "close32.gif", tooltip: "Close", onclick: "dialogEvent('EditorTab_Close');", disabled: bIsCloseDisabled }
+                                    { type: "bigbutton", id: "CloseBtn2", name: "Close", img: "close32.gif", tooltip: "Close", onclick: "dialogEvent('EditorTab_Close');", disabled: bIsCloseDisabled }
                                 ]
                             }
                         ]
@@ -2783,17 +2783,19 @@
                     break;
                 case "EditorTab_Close":
                     {
-                        var b = true;
-                        this.ExitConfirmed = false;
-                        if (this.HasChanges() == true) {
-                            b = window.confirm("You have unsaved changes.\n\nAre you sure you want to exit without saving?");
-                        }
-                        if (b) {
-                            this.ExitConfirmed = true;
-                            if (parent.SP.UI.DialogResult)
-                                parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.OK, '');
-                            else
-                                parent.SP.UI.ModalDialog.commonModalDialogClose(1, '');
+                        if (this.editorTab.isItemDisabled("CloseBtn") != true || this.editorTab.isItemDisabled("CloseBtn2") != true) {
+                            var b = true;
+                            this.ExitConfirmed = false;
+                            if (this.HasChanges() == true) {
+                                b = window.confirm("You have unsaved changes.\n\nAre you sure you want to exit without saving?");
+                            }
+                            if (b) {
+                                this.ExitConfirmed = true;
+                                if (parent.SP.UI.DialogResult)
+                                    parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.OK, '');
+                                else
+                                    parent.SP.UI.ModalDialog.commonModalDialogClose(1, '');
+                            }
                         }
                         break;
                     }
@@ -4372,6 +4374,11 @@
             this.editorTab.disableItem("SavePlanBtn");
             this.viewTab.disableItem("SavePlanBtn2");
             this.dirty = false;
+        }
+
+        if (this.params.HideCloseBtn != null && this.params.HideCloseBtn.toString().toLowerCase() == "true" ) {
+            this.editorTab.disableItem("CloseBtn");
+            this.viewTab.disableItem("CloseBtn2");
         }
 
         var grid = Grids["g_RPE"];
