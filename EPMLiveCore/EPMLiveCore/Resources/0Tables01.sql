@@ -912,6 +912,34 @@ begin
 end
 
 
+-----------------ROLLUPQUEUE------------
+
+if not exists (select table_name from INFORMATION_SCHEMA.tables where table_name = 'ROLLUPQUEUE')
+	begin
+		
+		print 'Creating Table ROLLUPQUEUE'
+		
+		CREATE TABLE [dbo].[ROLLUPQUEUE](
+			[EventId] [uniqueidentifier] NULL DEFAULT (newid()),
+			[SiteId] [uniqueidentifier] NULL,
+			[WebId] [uniqueidentifier] NULL,
+			[ListId] [uniqueidentifier] NULL,
+			[ItemId] [int] NULL,
+			[EventTime] [datetime] NULL,
+			[Status] [int] NULL,
+			[QueueServer] [varchar](255) NULL,
+			[ErrorLog] [ntext] NULL
+		) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+		
+end
+else
+begin
+
+	print 'Updating Table ROLLUPQUEUE'
+
+
+end
+
 -------------------------Constraints-----------------
 
 if not exists(select * from INFORMATION_SCHEMA.CONSTRAINT_COLUMN_USAGE where CONSTRAINT_NAME = 'FK_EPMLIVE_LOG_TIMERJOBS')
