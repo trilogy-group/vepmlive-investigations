@@ -169,6 +169,10 @@ net start "WETimer"</PostDeploymentCommand>
     <Compile Include="API\CreateWorkspace\WorkspaceFactory.cs" />
     <Compile Include="API\CreateWorkspace\WorkspaceTimerjobAgent.cs" />
     <Compile Include="API\CreateWorkspace\WSTempType.cs" />
+    <Compile Include="API\DomainServices\ExcelConnectionInfo.cs" />
+    <Compile Include="API\DomainServices\ExcelConnectionUpdatorService.cs" />
+    <Compile Include="API\DomainServices\ISharepointService.cs" />
+    <Compile Include="API\DomainServices\SharepointService.cs" />
     <Compile Include="API\ExecutionStatus.asmx.cs" />
     <Compile Include="API\Integration\Generic.cs" />
     <Compile Include="API\Integration\IntegrationAdmin.cs" />
@@ -191,6 +195,7 @@ net start "WETimer"</PostDeploymentCommand>
     <Compile Include="API\Notification\Notification.cs" />
     <Compile Include="API\Personalization.cs" />
     <Compile Include="API\PersonalizationManager.cs" />
+    <Compile Include="API\PlatformIntegration.cs" />
     <Compile Include="API\PropertyHash.cs" />
     <Compile Include="API\Publish\APIPublish.cs" />
     <Compile Include="API\Reporting\Reporting.cs" />
@@ -346,7 +351,11 @@ net start "WETimer"</PostDeploymentCommand>
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Events\ClearCacheEvent.cs" />
+    <Compile Include="Events\GenericListEventReceiver\GenericListEventReceiver.cs" />
     <Compile Include="ExtensionMethods.cs" />
+    <Compile Include="Features\SocialStream\SocialStream.EventReceiver.cs">
+      <DependentUpon>SocialStream.feature</DependentUpon>
+    </Compile>
     <Compile Include="FilteredLookup\FilteredLookupField.cs" />
     <Compile Include="FilteredLookup\FilteredLookupFieldControl.cs" />
     <Compile Include="FilteredLookup\FilteredLookupFieldEditor.cs">
@@ -425,6 +434,7 @@ net start "WETimer"</PostDeploymentCommand>
     <Compile Include="Jobs\EPMLiveUpgrade\Steps\55Steps.cs" />
     <Compile Include="Jobs\EPMLiveUpgrade\Steps\GenericSteps.cs" />
     <Compile Include="Jobs\EPMLiveUpgrade\Steps\OptIn\55Steps.cs" />
+    <Compile Include="Jobs\EPMLiveUpgrade\Steps\OptIn\56Steps.cs" />
     <Compile Include="Jobs\EPMLiveUpgrade\Upgrader.cs" />
     <Compile Include="Jobs\Integration.cs" />
     <Compile Include="Jobs\Notifications.cs" />
@@ -452,6 +462,7 @@ net start "WETimer"</PostDeploymentCommand>
     <Compile Include="Jobs\Upgrades\Steps\WE43UpgraderSteps\UpdateResourcePool.cs" />
     <Compile Include="Jobs\Upgrades\Steps\WE43UpgraderSteps\UpdateWebs.cs" />
     <Compile Include="Jobs\Upgrades\WE43UpgradeJob.cs" />
+    <Compile Include="Jobs\Wizard.cs" />
     <Compile Include="JSONUtil.cs" />
     <Compile Include="Layouts\epmlive\acttest.aspx.cs">
       <DependentUpon>acttest.aspx</DependentUpon>
@@ -1174,6 +1185,13 @@ net start "WETimer"</PostDeploymentCommand>
     <Compile Include="Layouts\epmlive\UpgradeResult.aspx.designer.cs">
       <DependentUpon>UpgradeResult.aspx.cs</DependentUpon>
     </Compile>
+    <Compile Include="Layouts\epmlive\Upgraders\OptInUpgrade56.aspx.cs">
+      <DependentUpon>OptInUpgrade56.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\Upgraders\OptInUpgrade56.aspx.designer.cs">
+      <DependentUpon>OptInUpgrade56.aspx.cs</DependentUpon>
+    </Compile>
     <Compile Include="Layouts\epmlive\Upgraders\proxy.aspx.cs">
       <DependentUpon>proxy.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -1244,6 +1262,7 @@ net start "WETimer"</PostDeploymentCommand>
     <Compile Include="NotificationCounter.cs" />
     <Compile Include="NotificationCounterV2.cs" />
     <Compile Include="NotificationEvent.cs" />
+    <Compile Include="PlatformIntegrationEvent.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -1261,8 +1280,12 @@ net start "WETimer"</PostDeploymentCommand>
     <Compile Include="ResourcePoolEvent\ResourcePoolEvent.cs" />
     <Compile Include="ResourceTools.cs" />
     <Compile Include="Security.cs" />
+    <Compile Include="Services\DataContracts\SocialEngine\Creatables.cs" />
     <Compile Include="Services\DataContracts\SocialEngine\DailyActivities.cs" />
+    <Compile Include="Services\DataContracts\SocialEngine\Error.cs" />
+    <Compile Include="Services\DataContracts\SocialEngine\Logs.cs" />
     <Compile Include="Services\DataContracts\SocialEngine\SEActivities.cs" />
+    <Compile Include="Services\DataContracts\SocialEngine\Webs.cs" />
     <Compile Include="Services\SocialEngine.svc.cs">
       <DependentUpon>SocialEngine.svc</DependentUpon>
     </Compile>
@@ -1288,8 +1311,10 @@ net start "WETimer"</PostDeploymentCommand>
     <Compile Include="SocialEngine\Events\SocialEngineEvents.cs" />
     <Compile Include="SocialEngine\Events\WebEventReceiver\WebEventReceiver.cs" />
     <Compile Include="SocialEngine\Modules\DataDecorator.cs" />
+    <Compile Include="SocialEngine\Modules\GlobalValidator.cs" />
     <Compile Include="SocialEngine\Modules\List.cs" />
     <Compile Include="SocialEngine\Modules\ListItem.cs" />
+    <Compile Include="SocialEngine\Modules\StatusUpdate.cs" />
     <Compile Include="SocialEngine\Modules\Workspace.cs" />
     <Compile Include="SocialEngine\SocialEngine.cs" />
     <Compile Include="SocialEngine\SocialEngineProxy.cs" />
@@ -1364,6 +1389,7 @@ net start "WETimer"</PostDeploymentCommand>
     <Compile Include="Web References\SalesforceApexService\Reference.cs" />
     <Compile Include="Web References\SalesforceMetadataService\Reference.cs" />
     <Compile Include="Web References\SalesforcePartnerService\Reference.cs" />
+    <Compile Include="Web References\SPAuthentication\Reference.cs" />
     <Compile Include="Web References\SSRS2005\Reference.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -1374,6 +1400,7 @@ net start "WETimer"</PostDeploymentCommand>
       <DesignTime>True</DesignTime>
       <DependentUpon>Reference.map</DependentUpon>
     </Compile>
+    <Compile Include="Web References\UplandPlatformAPI\Reference.cs" />
     <Compile Include="Web References\WorkEngineService\Reference.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -1599,6 +1626,9 @@ net start "WETimer"</PostDeploymentCommand>
     </None>
     <None Include="EPMLiveWorkspaceMenus\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{ed4c73b0-c66d-447f-b679-d91cb0667b61}</SharePointProjectItemId>
+    </None>
+    <None Include="Events\GenericListEventReceiver\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{504e5201-0f1d-42c1-99bd-8632a63d2809}</SharePointProjectItemId>
     </None>
     <None Include="Features\AppNavFixUp\AppNavFixUp.feature">
       <FeatureId>{3aa712ee-ed28-48bc-8219-1c5a8c9b5fbc}</FeatureId>
@@ -1893,6 +1923,10 @@ net start "WETimer"</PostDeploymentCommand>
     <None Include="Web References\SalesforcePartnerService\sObject.datasource" />
     <None Include="Web References\SalesforcePartnerService\UndeleteResult.datasource" />
     <None Include="Web References\SalesforcePartnerService\UpsertResult.datasource" />
+    <None Include="Web References\SPAuthentication\authentication.wsdl" />
+    <None Include="Web References\SPAuthentication\AuthenticationMode.datasource" />
+    <None Include="Web References\SPAuthentication\LoginResult.datasource" />
+    <None Include="Web References\SPAuthentication\Reference.map" />
     <None Include="Web References\SSRS2005\ActiveState.datasource">
       <DependentUpon>Reference.map</DependentUpon>
     </None>
@@ -2083,6 +2117,8 @@ net start "WETimer"</PostDeploymentCommand>
     <None Include="Web References\SSRS2006\Warning.datasource">
       <DependentUpon>Reference.map</DependentUpon>
     </None>
+    <None Include="Web References\UplandPlatformAPI\Integration.wsdl" />
+    <None Include="Web References\UplandPlatformAPI\Reference.map" />
     <None Include="Web References\WorkEngineService\Reference.map">
       <Generator>MSDiscoCodeGenerator</Generator>
       <LastGenOutput>Reference.cs</LastGenOutput>
@@ -2194,6 +2230,7 @@ net start "WETimer"</PostDeploymentCommand>
     <Content Include="EPMLiveWorkspaceCenter\Elements.xml" />
     <Content Include="EPMLiveWorkspaceCenter\Schema.xml" />
     <Content Include="EPMLiveWorkspaceMenus\Elements.xml" />
+    <Content Include="Events\GenericListEventReceiver\Elements.xml" />
     <Content Include="Features\AppNavFixUp\AppNavFixUp.Template.xml">
       <DependentUpon>AppNavFixUp.feature</DependentUpon>
     </Content>
@@ -2360,6 +2397,7 @@ net start "WETimer"</PostDeploymentCommand>
     <Content Include="Images\notstarted.png" />
     <Content Include="Images\Off Track.gif" />
     <Content Include="Images\On Track.gif" />
+    <Content Include="Images\orange.gif" />
     <Content Include="Images\pgProj.png" />
     <Content Include="Images\pgResPlans.png" />
     <Content Include="Images\PPEOPLEs.gif" />
@@ -3040,6 +3078,7 @@ net start "WETimer"</PostDeploymentCommand>
     <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\sort_asc.gif" />
     <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\sort_desc.gif" />
     <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\STSICON.GIF" />
+    <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\team.png" />
     <Content Include="Layouts\epmlive\DHTML\xgrid\imgs\true.gif" />
     <Content Include="Layouts\epmlive\DHTML\xgrid\skins\dhtmlxgrid_dhx_black.css" />
     <Content Include="Layouts\epmlive\DHTML\xgrid\skins\dhtmlxgrid_dhx_blue.css" />
@@ -3344,6 +3383,7 @@ net start "WETimer"</PostDeploymentCommand>
     <Content Include="Layouts\epmlive\images\commonactions.gif" />
     <Content Include="Layouts\epmlive\images\Create.png" />
     <Content Include="Layouts\epmlive\images\createworkspace.png" />
+    <Content Include="Layouts\epmlive\images\DefaultProfilePic.png" />
     <Content Include="Layouts\epmlive\images\delete.GIF" />
     <Content Include="Layouts\epmlive\images\deleteteam.png" />
     <Content Include="Layouts\epmlive\images\down.gif" />
@@ -3382,6 +3422,7 @@ net start "WETimer"</PostDeploymentCommand>
     <Content Include="Layouts\epmlive\images\link.GIF" />
     <Content Include="Layouts\epmlive\images\linkeditems.gif" />
     <Content Include="Layouts\epmlive\images\LoadingBar.gif" />
+    <Content Include="Layouts\epmlive\images\lttask.png" />
     <Content Include="Layouts\epmlive\images\menuganttview.gif" />
     <Content Include="Layouts\epmlive\images\menugridview.gif" />
     <Content Include="Layouts\epmlive\images\mewa_left.gif" />
@@ -3899,6 +3940,7 @@ net start "WETimer"</PostDeploymentCommand>
     <Content Include="Layouts\epmlive\unsealfields.aspx" />
     <Content Include="Layouts\epmlive\Upgrade.aspx" />
     <Content Include="Layouts\epmlive\UpgradeResult.aspx" />
+    <Content Include="Layouts\epmlive\Upgraders\OptInUpgrade56.aspx" />
     <Content Include="Layouts\epmlive\Upgraders\proxy.aspx" />
     <Content Include="Layouts\epmlive\Upgraders\Upgrade.aspx" />
     <Content Include="Layouts\epmlive\Upgraders\UpgradeDone.aspx" />
@@ -3994,6 +4036,7 @@ net start "WETimer"</PostDeploymentCommand>
     <Content Include="UplandV5\Elements.xml" />
     <Content Include="ViewPermissions\Elements.xml" />
     <Content Include="ViewSelectorDelegate\Elements.xml" />
+    <Content Include="Web References\UplandPlatformAPI\Integration.disco" />
     <Content Include="WorkEngineActivation\Elements.xml" />
     <Content Include="WorkEngineApps\Elements.xml" />
     <Content Include="WorkEngineApps\Schema.xml" />

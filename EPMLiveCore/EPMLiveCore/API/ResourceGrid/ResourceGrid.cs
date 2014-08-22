@@ -805,8 +805,6 @@ namespace EPMLiveCore.API
                             new XAttribute("CanHide", 0));
                     }
 
-                    cElement.Add(new XAttribute("CaseSensitive", "0"));
-
                     colsElement.Add(cElement);
 
                     headerElement.Add(new XAttribute(gridSafeFieldName, spField.Title));
