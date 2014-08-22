@@ -2083,12 +2083,9 @@ namespace EPMLiveCore
                                     //if (evts.Count > 0 &&
                                     //    !listsToBeMapped.Contains(l.ID))
 
-                                    //Previously list which has Reporting events enabled - Only those lists are mapped to Reporting database
+                                    //Previously, list which has Reporting events enabled - Only those lists are mapped to Reporting database
                                     //Condition as mentioned below will now mapped all the list irrespective of Reporting events.
                                     //EPML-3477: when creating a workspace all lists need to be mapped to the reporting db, currenly none are
-                                    //Previosly lists which has Reporting events enabled only those list icons are associated with Social Engine web part
-                                    //Based on below change all mapped list will have their associated icon to be mapped under Social engine
-                                    //EPML-3476: if workspace tables are not mapped, no social icons show up.
                                     //Lists mentioned under listsNotToBeMapped variable are system specific / special lists which not required to mapped under Reporting DB
                                     if (!list.Hidden && !listsNotToBeMapped.Contains(list.Title) && !listsToBeMapped.Contains(list.ID))
                                     {
