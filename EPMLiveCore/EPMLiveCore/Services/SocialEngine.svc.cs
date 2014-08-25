@@ -16,6 +16,7 @@ using EPMLiveCore.Services.DataContracts.SocialEngine;
 using EPMLiveCore.SocialEngine.Core;
 using Microsoft.SharePoint;
 using SEUtils = EPMLiveCore.SocialEngine.Core.Utilities;
+using EPMLiveCore.ReportingProxy;
 
 namespace EPMLiveCore.Services
 {
@@ -352,16 +353,29 @@ namespace EPMLiveCore.Services
             try
             {
                 var siteId = SPContext.Current.Site.ID;
-
+                string sqlQuery = string.Empty;
+                DataTable dtAllWebs = null; ;
                 SPSecurity.RunWithElevatedPrivileges(() =>
                 {
                     using (var spSite = new SPSite(siteId))
                     {
-                        SPWebCollection spWebCollection = spSite.AllWebs;
-
-                        foreach (SPWeb spWeb in spWebCollection)
+                        try
                         {
-                            webs.collection.Add(new Webs.Web { id = spWeb.ID, url = spWeb.ServerRelativeUrl });
+                            QueryExecutor queryExecutor = new QueryExecutor(SPContext.Current.Web);
+                            sqlQuery = string.Format("select WebId, WebUrl from RPTWeb where [SiteId] = '{0}'", siteId);
+                            dtAllWebs = queryExecutor.ExecuteReportingDBQuery(sqlQuery, new Dictionary<string, object>());
+                        }
+                        catch { }
+
+                        if (dtAllWebs != null && dtAllWebs.Rows.Count > 0)
+                        {
+                            for (int i = 0; i < dtAllWebs.Rows.Count; i++)
+                            {
+                                string webUrl = Convert.ToString(dtAllWebs.Rows[i]["WebUrl"]);
+                                if (webUrl.Trim().EndsWith("/"))
+                                    webUrl = webUrl.Remove(webUrl.Length - 1);
+                                webs.collection.Add(new Webs.Web { id = (Guid)(dtAllWebs.Rows[i]["WebId"]), url = webUrl });
+                            }
                         }
                     }
                 });
@@ -370,20 +384,21 @@ namespace EPMLiveCore.Services
             {
                 if (exception is AggregateException)
                 {
-                    exception = ((AggregateException) exception).Flatten();
+                    exception = ((AggregateException)exception).Flatten();
                 }
 
                 webs.error = new Error
                 {
                     message = exception.Message,
                     stackTrace = exception.StackTrace,
-                    kind = typeof (Exception).ToString()
+                    kind = typeof(Exception).ToString()
                 };
             }
 
             return webs;
         }
 
+       
         // Private Methods (17) 
 
         private void AddList(SEActivities.Thread thread, SEActivities activities, DataRow tr)
