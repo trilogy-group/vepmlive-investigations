@@ -314,11 +314,11 @@ namespace EPMLiveWebParts.CONTROLTEMPLATES.MyWork
                         if (spList.Hidden || !spList.DoesUserHavePermissions(SPBasePermissions.AddListItems) ||
                             gSettings.HideNewButton) continue;
 
-                        newItemListsFormatted.Add(string.Format(@"{{Name:'{0}',ListID:'{1}',usePopUp:'{2}',LinkType:'view',Rollup:false}}", newItemList, spList.ID, usePopUp));
+                        newItemListsFormatted.Add(string.Format(@"{{Name:'{0}',ListID:'{1}',UsePopUp:'{2}',LinkType:'view',Rollup:false}}", newItemList, spList.ID, usePopUp));
                     }
                     else
                     {
-                        newItemListsFormatted.Add(string.Format(@"{{Name:'{0}',ListID:'{1}',usePopUp:'{2}',LinkType:'view',Rollup:true}}", newItemList, spList.ID, usePopUp));
+                        newItemListsFormatted.Add(string.Format(@"{{Name:'{0}',ListID:'{1}',UsePopUp:'{2}',LinkType:'view',Rollup:true}}", newItemList, spList.ID, usePopUp));
                     }
                 }
 

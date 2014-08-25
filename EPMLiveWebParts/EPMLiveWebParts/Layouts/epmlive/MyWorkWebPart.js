@@ -368,7 +368,7 @@ function MyWorkGoToItem(gridid, rowid) {
         var listID = newItemLists[l]["ListID"];
         if (row.ListID.toLowerCase() == listID.toLowerCase())
         {
-            var usePopUp = newItemLists[l]["usePopUp"];
+            var usePopUp = newItemLists[l]["UsePopUp"];
             var linkType = newItemLists[l]["LinkType"];
             break;
         }
