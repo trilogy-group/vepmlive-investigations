@@ -124,7 +124,7 @@ namespace EPMLiveCore.API
             if (filterfield != "")
             {
                 if (filterIsLookup)
-                    query = "';'+" + filterfield + "+';' like '%;" + filtervalue + ";%'";
+                    query = "';'+" + filterfield + "+';' like '%;" + filtervalue + ";%'" + " OR " + filterfield + " like '%" + filtervalue + "%'"; 
                 else
                     query = filterfield + " like '%" + filtervalue + "%'";
             }
