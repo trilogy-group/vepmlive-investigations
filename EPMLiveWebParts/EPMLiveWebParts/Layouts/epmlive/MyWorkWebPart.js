@@ -365,10 +365,10 @@ function MyWorkGoToItem(gridid, rowid) {
 
     for (var l in newItemLists)
     {
-        var listID = newItemLists[l]["listID"];
+        var listID = newItemLists[l]["ListID"];
         if (row.ListID.toLowerCase() == listID.toLowerCase())
         {
-            var bUsePopUp = newItemLists[l]["bUsePopUp"];
+            var usePopUp = newItemLists[l]["usePopUp"];
             var linkType = newItemLists[l]["LinkType"];
             break;
         }
@@ -376,7 +376,7 @@ function MyWorkGoToItem(gridid, rowid) {
 
     var url = window.epmLiveNavigation.currentWebUrl + "/_layouts/epmlive/gridaction.aspx?action=" + linkType + "&webid=" + row.WebID + "&listid=" + row.ListID + "&ID=" + row.ItemID + "&Source=" + escape(location.href);
 
-    if (bUsePopUp.toLowerCase() == "true") {
+    if (usePopUp.toLowerCase() == "true") {
 
         var options = window.SP.UI.$create_DialogOptions();
 
@@ -384,7 +384,6 @@ function MyWorkGoToItem(gridid, rowid) {
         options.width = 700;
         options.allowMaximize = false;
         options.showClose = true;
-        options.dialogReturnValueCallback = GridCommentsCallBack;
         window.SP.UI.ModalDialog.showModalDialog(options);
     }
     else

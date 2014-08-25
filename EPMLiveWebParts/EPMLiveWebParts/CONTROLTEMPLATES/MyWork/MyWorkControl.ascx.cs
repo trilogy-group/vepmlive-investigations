@@ -307,18 +307,18 @@ namespace EPMLiveWebParts.CONTROLTEMPLATES.MyWork
                     var gSettings = new GridGanttSettings(spList);
 
                     string rollupLists = gSettings.RollupLists;
-                    bool bUsePopUp = gSettings.UsePopup;
+                    bool usePopUp = gSettings.UsePopup;
 
                     if (string.IsNullOrEmpty(rollupLists))
                     {
                         if (spList.Hidden || !spList.DoesUserHavePermissions(SPBasePermissions.AddListItems) ||
                             gSettings.HideNewButton) continue;
 
-                        newItemListsFormatted.Add(string.Format(@"{{Name:'{0}',listID:'{1}',bUsePopUp:'{2}',LinkType:'view',Rollup:false}}", newItemList,spList.ID,bUsePopUp));
+                        newItemListsFormatted.Add(string.Format(@"{{Name:'{0}',ListID:'{1}',usePopUp:'{2}',LinkType:'view',Rollup:false}}", newItemList, spList.ID, usePopUp));
                     }
                     else
                     {
-                        newItemListsFormatted.Add(string.Format(@"{{Name:'{0}',listID:'{1}',bUsePopUp:'{2}',LinkType:'view',Rollup:true}}", newItemList, spList.ID, bUsePopUp));
+                        newItemListsFormatted.Add(string.Format(@"{{Name:'{0}',ListID:'{1}',usePopUp:'{2}',LinkType:'view',Rollup:true}}", newItemList, spList.ID, usePopUp));
                     }
                 }
 
