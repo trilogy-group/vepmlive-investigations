@@ -354,7 +354,7 @@ namespace EPMLiveCore.Services
             {
                 var siteId = SPContext.Current.Site.ID;
                 string sqlQuery = string.Empty;
-                DataTable dtAllWebs = null; ;
+                DataTable dtAllWebs = null;
                 SPSecurity.RunWithElevatedPrivileges(() =>
                 {
                     using (var spSite = new SPSite(siteId))
