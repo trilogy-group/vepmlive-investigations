@@ -585,7 +585,7 @@ namespace EPMLiveCore.Layouts.epmlive
 
         }
 
-        private void AddFields(SPList list)
+        private void AddFieldsAndFixLookupFields(SPList list)
         {
             var siteId = list.ParentWeb.Site.ID;
             var webId = list.ParentWeb.ID;
@@ -939,12 +939,14 @@ namespace EPMLiveCore.Layouts.epmlive
                             }
 
                             list.Update();
+
+                            FixLookupFields(list);
                         }
                         catch (Exception exception)
                         {
                             var logger = new ReportingLogger(list.ParentWeb);
                             logger.Log(list,
-                                "Problem adding one or more field when enabling work features for the list.",
+                                "Problem adding one or more field or fixing a lookup field when enabling work features for the list.",
                                 string.Format("Field: {0}, Exception: {1}", fieldName, exception.Message), 2, 1,
                                 string.Empty);
                         }
@@ -986,10 +988,9 @@ namespace EPMLiveCore.Layouts.epmlive
             list.Update();
         }
 
-        private void FixLookupFields()
+        private void FixLookupFields(SPList list)
         {
-            SPWeb web = SPContext.Current.Web;
-            SPList list = web.Lists[new Guid(Request["List"])];
+            var web = list.ParentWeb;
             web.AllowUnsafeUpdates = true;
 
             for (int i = 0; i < list.Fields.Count; i++)
@@ -1039,10 +1040,9 @@ namespace EPMLiveCore.Layouts.epmlive
         private void EnableWorkengineListFeatures(SPList list)
         {
             AddGridGanttToViews(list);
-            AddFields(list);
             AddEventHandlers();
-            FixLookupFields();
             AddRemoveMyWorkReportingEvents("ADD");
+            AddFieldsAndFixLookupFields(list);
         }
 
         private void AddRemoveMyWorkReportingEvents(string operation)
