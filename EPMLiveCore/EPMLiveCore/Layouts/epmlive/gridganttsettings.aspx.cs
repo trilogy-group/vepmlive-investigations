@@ -585,24 +585,6 @@ namespace EPMLiveCore.Layouts.epmlive
 
         private void AddFields(SPList list)
         {
-
-            // add Today field
-            try
-            {
-                if (!FieldExistsInList(list, "Today"))
-                {
-                    string fldTodayIntName = list.Fields.Add("Today", SPFieldType.Text, false);
-                    SPFieldText fldToday = list.Fields.GetFieldByInternalName(fldTodayIntName) as SPFieldText;
-                    fldToday.Update();
-                }
-            }
-            catch { }
-            if (!FieldExistsInList(list, "Today"))
-            {
-                string fldTodayIntName = list.Fields.Add("Today", SPFieldType.Text, false);
-                SPFieldText fldToday = list.Fields.GetFieldByInternalName(fldTodayIntName) as SPFieldText;
-                fldToday.Update();
-            }
             // add startdate field
             if (!FieldExistsInList(list, "StartDate"))
             {
