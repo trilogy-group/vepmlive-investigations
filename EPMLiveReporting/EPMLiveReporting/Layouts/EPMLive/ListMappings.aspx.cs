@@ -392,11 +392,11 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
         {
             var actionsMenu = new EPMMenu("Actions");
             actionsMenu.Items.Add(new EPMMenuItem("epm01_AddList", "/_layouts/images/newitem.gif",
-                "javascript:location.href='setuplistmapping.aspx'; return false", "Add List", "100", enabled));
+                "javascript:location.href='setuplistmapping.aspx';", "Add List", "100", enabled));
             if (!_SSqueued)
             {
                 actionsMenu.Items.Add(new EPMMenuItem("epm02_SnapshotAll", "images/EPMSnapshot.gif",
-                    "submit('SnapshotAll'); return false", "Snapshot All", "100", enabled));
+                    "submit('SnapshotAll');", "Snapshot All", "100", enabled));
             }
 
             if (!_RFqueued && IsListCleanUpEnabled)
@@ -406,7 +406,7 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
                     new EPMMenuItem(
                         "epm03_CleanupAll",
                         "images/EPMRefresh.gif",
-                        "VerifyThenSubmit(); return false;",
+                        "VerifyThenSubmit();",
                         "Cleanup All",
                         "100",
                         enabled));
@@ -415,9 +415,9 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
 
             var settingsMenu = new EPMMenu("Settings");
             settingsMenu.Items.Add(new EPMMenuItem("epm11_Snapshots", "images/EPMSnapshot.gif",
-                "javascript:location.href='allsnapshots.aspx'; return false", "Snapshot Management", "200", enabled));
+                "javascript:location.href='allsnapshots.aspx';", "Snapshot Management", "200", enabled));
             settingsMenu.Items.Add(new EPMMenuItem("epm12_Schedule", "/_layouts/images/calendar.gif",
-                "javascript:location.href='allschedules.aspx'; return false", "Refresh Schedule", "200", enabled));
+                "javascript:location.href='allschedules.aspx';", "Refresh Schedule", "200", enabled));
             settingsMenu.Render(pnlSettingsMenu);
         }
 
