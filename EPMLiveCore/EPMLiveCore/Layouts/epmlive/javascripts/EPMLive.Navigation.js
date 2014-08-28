@@ -1160,11 +1160,18 @@
                             if (confirm('Are you sure you want to send the item(s) to the Recycle Bin?')) {
                                 var nId = SP.UI.Notify.addNotification('Deleting Item...', true, '', null);
                                 if (command !== 'nav:remove') {
-                                    $.get(redirectUrl).always(function () {
-                                        removeLink(id, nId);
-                                        SP.UI.Notify.removeNotification(nId);
-                                        if (callBackFunction != '')
-                                            eval(callBackFunction + '(' + id + ')');
+                                    $.get(redirectUrl, function (data) {
+                                        if (data == "General Error: You do not have permissions to delete users.\r\n") {
+                                            SP.UI.Notify.removeNotification(nId);
+                                            SP.UI.Notify.addNotification('You do not have permission to delete Resources', false, '', null);
+
+                                        }
+                                        else {
+                                            removeLink(id, nId);
+                                            SP.UI.Notify.removeNotification(nId);
+                                            if (callBackFunction != '')
+                                                eval(callBackFunction + '(' + id + ')');
+                                        }
                                     });
                                 } else {
                                     removeLink(id, nId);
