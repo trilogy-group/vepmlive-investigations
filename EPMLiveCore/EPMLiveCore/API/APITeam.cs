@@ -48,7 +48,11 @@ namespace EPMLiveCore.API
                         {
                             if (arrColumns.Contains(f.InternalName))
                             {
-                                dt.Columns.Add(f.InternalName);
+                                try
+                                {
+                                    dt.Columns.Add(f.InternalName);
+                                }
+                                catch { }
                             }
                         }
                     }
@@ -59,7 +63,11 @@ namespace EPMLiveCore.API
                     {
                         if (!f.Hidden && f.Reorderable)
                         {
-                            dt.Columns.Add(f.InternalName);
+                            try
+                            {
+                                dt.Columns.Add(f.InternalName);
+                            }
+                            catch { }
                         }
                     }
                 }
@@ -1169,6 +1177,8 @@ namespace EPMLiveCore.API
                                         }
                                     });
                                 }
+
+                                throw ex;
                             }
 
                             try
@@ -1739,9 +1749,10 @@ namespace EPMLiveCore.API
 
             XmlNode ndBody = docOut.FirstChild.SelectSingleNode("//B");
 
+            DataTable dtTemp = GetResourcePool("", oWeb);
+
             try
             {
-                DataTable dtTemp = GetResourcePool("", oWeb);
                 foreach (DataRow dr in dtTemp.Rows)
                 {
                     XmlNode ndNew = docOut.CreateNode(XmlNodeType.Element, "I", docOut.NamespaceURI);
@@ -1913,6 +1924,8 @@ namespace EPMLiveCore.API
                         }
                     });
                 }
+
+                throw ex;
             }
 
             return dt;
