@@ -2155,7 +2155,7 @@
                                 cmd.kind = customOverrideKind;
                             }
 
-                            var webId = $ca.data('webid');
+                            //var webId = $ca.data('webid');
 
                             if (!webId || webId === 'undefined') {
                                 try {
@@ -2175,7 +2175,7 @@
                                     callbackfunction = callBackFunctions[cmd.command];
                             }
 
-                                $menu.append($('<li><span class="epm-nav-cm-icon ' + getIcon(cmd.command) + '">&nbsp;</span><a href="javascript:epmLiveNavigation.handleContextualCommand(\'' + liId + '\',\'' + webId + '\',\'' + $ca.data('listid') + '\',\'' + $ca.data('itemid') + '\',\'' + cmd.command + '\',\'' + cmd.kind + '\',\'' + callbackfunction + '\');" style="width: 122px !important; display: inline-block;">' + cmd.title + '</a></li>').hide().fadeIn());
+                                $menu.append($('<li><span class="epm-nav-cm-icon ' + getIcon(cmd.command) + '">&nbsp;</span><a href="javascript:epmLiveNavigation.handleContextualCommand(\'' + liId + '\',\'' + webId + '\',\'' + listId + '\',\'' + itemId + '\',\'' + cmd.command + '\',\'' + cmd.kind + '\',\'' + callbackfunction + '\');" style="width: 122px !important; display: inline-block;">' + cmd.title + '</a></li>').hide().fadeIn());
 
                                 $menu.find('a').click(function () {
                                     hideMenu();
