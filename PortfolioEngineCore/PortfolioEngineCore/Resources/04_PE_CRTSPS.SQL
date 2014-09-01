@@ -5758,7 +5758,7 @@ exec(@createoralter + ' PROCEDURE dbo.EPG_SP_ReadResourceAvail
   @ToPeriodID int,
   @sList NTEXT
 AS
-SELECT WRES_ID,BD_PERIOD,CS_AVAIL
+SELECT WRES_ID,BD_PERIOD,CS_AVAIL,CS_OFF 
   From EPGP_CAPACITY_VALUES
  INNER JOIN dbo.EPG_FN_ConvertListToTable(@sList) LT on WRES_ID=LT.TokenVal 
  WHERE CB_ID = @CalID AND BD_PERIOD >= @FromPeriodID AND BD_PERIOD <= @ToPeriodID
@@ -6089,7 +6089,7 @@ exec(@createoralter + ' PROCEDURE dbo.EPG_SP_ReadResourcesWorkA
    @StartPeriodID INT,
    @WResIDs NTEXT
 AS
-SELECT PRD_ID,WR.WRES_ID,CS_AVAIL as AvailableHours
+SELECT PRD_ID,WR.WRES_ID,CS_AVAIL as AvailableHours,CS_OFF as OffHours 
   FROM EPG_PERIODS
  INNER JOIN EPGP_CAPACITY_VALUES CV ON (BD_PERIOD = PRD_ID) and (CV.CB_ID=@CalID)
   LEFT JOIN EPG_RESOURCES WR ON (WR.WRES_ID = CV.WRES_ID)

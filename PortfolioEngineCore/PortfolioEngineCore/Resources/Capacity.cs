@@ -165,7 +165,7 @@ namespace PortfolioEngineCore
                 debug.AddMessage("Open DB Error=" + _dba.FormatErrorText());
 
             StatusEnum eStatus = StatusEnum.rsSuccess;
-            CStruct  xResources = new CStruct();
+            CStruct xResources = new CStruct();
             xResources.Initialize("Resources");
 
             try
@@ -187,7 +187,7 @@ namespace PortfolioEngineCore
                 if (sDeptList.Length > 0)
                 {
                     //  assumption here that IS_RESOURCE and IS_GENERIC can't both be set at once and only gets Resources
-               
+
                     //  Aug 2012 - think we treat Generics just like any other resource as they have depts right
                     string sCommand = "SELECT WRES_ID,WRES_EXT_UID,RES_NAME" +
                                         " FROM EPG_RESOURCES" +
@@ -278,7 +278,7 @@ namespace PortfolioEngineCore
 
             try
             {
-                string sticketData="";
+                string sticketData = "";
                 string sCommand;
 
 
@@ -382,7 +382,7 @@ namespace PortfolioEngineCore
             CStruct xParms = new CStruct();
             xParms.LoadXML(sParmXML);
             int nRequestNo = xParms.GetInt("RequestNo");
-            
+
             RVClass.CalendarID = xParms.GetInt("CalID");
             RVClass.FromPeriodID = xParms.GetInt("StartPeriodID");
             RVClass.ToPeriodID = xParms.GetInt("FinishPeriodID");
@@ -660,17 +660,17 @@ namespace PortfolioEngineCore
                 ResourceValues.clsCatItem oCatItem;
                 RVClass.CostCategories = new Dictionary<int, ResourceValues.clsCatItem>();
 
-                string sCommand = "SELECT  BC_UID, BC_NAME, BC_ID, BC_LEVEL, BC_ROLE, BC_UOM, MC_UID, CA_UID, EPGP_LOOKUP_VALUES.LV_VALUE FROM EPGP_COST_CATEGORIES LEFT OUTER JOIN  EPGP_LOOKUP_VALUES ON " + 
+                string sCommand = "SELECT  BC_UID, BC_NAME, BC_ID, BC_LEVEL, BC_ROLE, BC_UOM, MC_UID, CA_UID, EPGP_LOOKUP_VALUES.LV_VALUE FROM EPGP_COST_CATEGORIES LEFT OUTER JOIN  EPGP_LOOKUP_VALUES ON " +
                     " EPGP_COST_CATEGORIES.BC_ROLE = EPGP_LOOKUP_VALUES.LV_UID ORDER BY BC_ID";
 
 
 
                 oCommand = new SqlCommand(sCommand, _dba.Connection);
-       //         reader = oCommand.ExecuteReader();
+                //         reader = oCommand.ExecuteReader();
 
 
-       //         oCommand = new SqlCommand("EPG_SP_ReadCategoryItems", _dba.Connection);
-       //         oCommand.CommandType = System.Data.CommandType.StoredProcedure;
+                //         oCommand = new SqlCommand("EPG_SP_ReadCategoryItems", _dba.Connection);
+                //         oCommand.CommandType = System.Data.CommandType.StoredProcedure;
                 reader = oCommand.ExecuteReader();
 
                 while (reader.Read())
@@ -1065,7 +1065,7 @@ namespace PortfolioEngineCore
                                 {
                                     if (oCommitment != null)
                                     {
-                                        l_PeriodFTEs = GetFTEValue(clnFTEs, oCommitment.BC_UID_Role, dPeriodHours, l_PeriodID);
+                                        l_PeriodFTEs = GetFTEValue(clnFTEs, oCommitment.BC_UID_Role, dPeriodHours, l_PeriodID, 0);
                                     }
                                 }
                             }
@@ -1117,7 +1117,7 @@ namespace PortfolioEngineCore
 
 
                 // *********************************  Get Open Requirement hours
-                {  
+                {
                     sErrorInfo = "g001";
                     RVClass.OpenReqHours = new List<ResourceValues.clsCommitmentHours>();
 
@@ -1164,7 +1164,7 @@ namespace PortfolioEngineCore
                             {
                                 if (oCommitment != null)
                                 {
-                                    l_PeriodFTEs = GetFTEValue(clnFTEs, oCommitment.BC_UID_Role, dPeriodHours, l_PeriodID);
+                                    l_PeriodFTEs = GetFTEValue(clnFTEs, oCommitment.BC_UID_Role, dPeriodHours, l_PeriodID, 0);
                                 }
                             }
                         }
@@ -1180,24 +1180,24 @@ namespace PortfolioEngineCore
                         oCommitmentHours.Hours += dPeriodHours;
                         oCommitmentHours.FTES += l_PeriodFTEs;
                         l_PrevPRD = l_PeriodID;
-                                                    
+
                         // a total for the UID - across all periods
                         if (l_PrevUID > 0 && l_PrevUID != l_UID)
-                            {
-                                ResourceValues.clsCommitment oCommitment1 = new ResourceValues.clsCommitment();
-                                if (RVClass.OpenReqs.TryGetValue(l_PrevUID, out oCommitment1)) { oCommitment1.HoursInWindow = dHours; }
-                                dHours = 0;
-                            }
-                        l_PrevUID = l_UID;
-                        dHours += dPeriodHours;
-                        }
-                    if (l_PrevUID > 0 && oCommitmentHours.Hours > 0) RVClass.OpenReqHours.Add(oCommitmentHours);
-                    if (l_PrevUID > 0 && dHours > 0)
                         {
                             ResourceValues.clsCommitment oCommitment1 = new ResourceValues.clsCommitment();
                             if (RVClass.OpenReqs.TryGetValue(l_PrevUID, out oCommitment1)) { oCommitment1.HoursInWindow = dHours; }
+                            dHours = 0;
                         }
-                        reader.Close();
+                        l_PrevUID = l_UID;
+                        dHours += dPeriodHours;
+                    }
+                    if (l_PrevUID > 0 && oCommitmentHours.Hours > 0) RVClass.OpenReqHours.Add(oCommitmentHours);
+                    if (l_PrevUID > 0 && dHours > 0)
+                    {
+                        ResourceValues.clsCommitment oCommitment1 = new ResourceValues.clsCommitment();
+                        if (RVClass.OpenReqs.TryGetValue(l_PrevUID, out oCommitment1)) { oCommitment1.HoursInWindow = dHours; }
+                    }
+                    reader.Close();
                 }  //  get Requirement Hours
 
                 //  get rid of any plan rows with no hours
@@ -1351,7 +1351,7 @@ namespace PortfolioEngineCore
                                     lBCUID = GetBCUID(clnXref, lWResID);
                                     if (lBCUID == 0) { lBCUID = lDefaultCostCategory; }
                                     oSchedWork.Hours = oSchedWork.Hours / 100;
-                                    oSchedWork.FTES = GetFTEValue(clnFTEs, lBCUID, oSchedWork.Hours, oSchedWork.PeriodID);
+                                    oSchedWork.FTES = GetFTEValue(clnFTEs, lBCUID, oSchedWork.Hours, oSchedWork.PeriodID, 0);
                                     RVClass.SchedWorkHours.Add(oSchedWork);
                                 }
                                 oSchedWork = new ResourceValues.clsSchedWork();
@@ -1375,7 +1375,7 @@ namespace PortfolioEngineCore
                         lBCUID = GetBCUID(clnXref, lWResID);
                         if (lBCUID == 0) { lBCUID = lDefaultCostCategory; };
                         oSchedWork.Hours = oSchedWork.Hours / 100;
-                        oSchedWork.FTES = GetFTEValue(clnFTEs, lBCUID, oSchedWork.Hours, oSchedWork.PeriodID);
+                        oSchedWork.FTES = GetFTEValue(clnFTEs, lBCUID, oSchedWork.Hours, oSchedWork.PeriodID, 0);
                         RVClass.SchedWorkHours.Add(oSchedWork);
                     }
                 }
@@ -1419,7 +1419,7 @@ namespace PortfolioEngineCore
                         {
                             lBCUID = GetBCUID(clnXref, oActualWork.WResID);
                             if (lBCUID == 0) { lBCUID = lDefaultCostCategory; }
-                            oActualWork.FTES = GetFTEValue(clnFTEs, lBCUID, oActualWork.Hours, oActualWork.PeriodID);
+                            oActualWork.FTES = GetFTEValue(clnFTEs, lBCUID, oActualWork.Hours, oActualWork.PeriodID, 0);
                             RVClass.ActualWorkHours.Add(oActualWork);
                         }
                     }
@@ -1662,7 +1662,7 @@ namespace PortfolioEngineCore
 
                 // Make a list of the departments we've hit (unless list passed in) and get their names
                 sErrorInfo = "k001";
-                RVClass.UserDepartments=new List<int>();
+                RVClass.UserDepartments = new List<int>();
                 if (lRequestNo != ResourceValues.ResCenterRequest.ResourceValuesForDepts)
                 {
                     // June 2013 - new List of Departments I have access to when called from Resource Grid
@@ -1720,13 +1720,13 @@ namespace PortfolioEngineCore
                     if (sManagedDeptList.Length > 0) { sDeptListPlus0 = sManagedDeptList + ",0"; }
                     else { sDeptListPlus0 = "0"; }
 
- 
-                    cmdText = "SELECT * From EPGP_CAPACITY_SETS WHERE DEPT_UID IN (" + sDeptListPlus0 + ") Order by DEPT_UID,CS_NAME" ;
+
+                    cmdText = "SELECT * From EPGP_CAPACITY_SETS WHERE DEPT_UID IN (" + sDeptListPlus0 + ") Order by DEPT_UID,CS_NAME";
 
                     oCommand = new SqlCommand(cmdText, _dba.Connection);
 
 
-                    
+
 
 
                     //oCommand = new SqlCommand("EPG_SP_ReadCapacityTargets", _dba.Connection);
@@ -1747,9 +1747,9 @@ namespace PortfolioEngineCore
                         {
                             oCapacityItem.Flag = DBAccess.ReadIntValue(reader["CS_ROLE_BASED"]);
                         }
-                        catch(Exception ex)
+                        catch (Exception ex)
                         {
-                             oCapacityItem.Flag = 0;
+                            oCapacityItem.Flag = 0;
                         }
 
 
@@ -1795,7 +1795,7 @@ namespace PortfolioEngineCore
 
                                 if (oCapacityValue.Hours > 0 && oCapacityValue.FTES <= 0)
                                 {
-                                    oCapacityValue.FTES = GetFTEValue(clnFTEs, oCapacityValue.RoleUID, oCapacityValue.Hours, oCapacityValue.PeriodID);
+                                    oCapacityValue.FTES = GetFTEValue(clnFTEs, oCapacityValue.RoleUID, oCapacityValue.Hours, oCapacityValue.PeriodID, 0);
                                 }
                                 RVClass.CapacityTargetValues.Add(oCapacityValue);
                                 // in case we hit some new CCRs here 
@@ -1821,7 +1821,7 @@ namespace PortfolioEngineCore
                     {
                         if (oCapacityValue.Hours > 0 && oCapacityValue.FTES <= 0)
                         {
-                            oCapacityValue.FTES = GetFTEValue(clnFTEs, oCapacityValue.RoleUID, oCapacityValue.Hours, oCapacityValue.PeriodID);
+                            oCapacityValue.FTES = GetFTEValue(clnFTEs, oCapacityValue.RoleUID, oCapacityValue.Hours, oCapacityValue.PeriodID, 0);
                         }
                         RVClass.CapacityTargetValues.Add(oCapacityValue);
                         if ((oCapacityValue.RoleUID > 0) && !RVLists_Roles.Contains(oCapacityValue.RoleUID)) { RVLists_Roles.Add(oCapacityValue.RoleUID); }
@@ -1858,10 +1858,10 @@ namespace PortfolioEngineCore
                 // for a Dept(s) call - from here on we only want data for the resources currently in the dept(s)
                 if (lRequestNo == ResourceValues.ResCenterRequest.ResourceValuesForDepts) { sResourceList = MakeListFromCollection(clnDeptResources); }
 
-                
+
                 // Tidier to get Personal Items before availability now - also, always get because need for PIs to reduce availability
                 // ok so we want availability now even for PIs but we still don't want Personal Items
-                
+
                 // following line used to step over this section
                 //if (lRequestNo == ResourceValues.ResCenterRequest.ResourceValuesForPIs || lRequestNo == ResourceValues.ResCenterRequest.ResourceValuesForPIsinDept) { goto Wrapup; }
 
@@ -1892,7 +1892,7 @@ namespace PortfolioEngineCore
                         ResourceValues.clsResCap oResData;
                         if (RVClass.Resources.TryGetValue(oResNWValue.WResID, out oResData))
                         {
-                            oResNWValue.FTES = GetFTEValue(clnFTEs, oResData.BC_UID_Role, oResNWValue.Hours, oResNWValue.PeriodID);
+                            oResNWValue.FTES = GetFTEValue(clnFTEs, oResData.BC_UID_Role, oResNWValue.Hours, oResNWValue.PeriodID, 0);
                         }
                         RVClass.ResNWValues.Add(oResNWValue);
 
@@ -1961,7 +1961,7 @@ namespace PortfolioEngineCore
 
 
                 // ********* Get AVAILABILITY data for the selected Resources - always now regardless of calling mode
-                
+
                 //      We are assuming the cal for the calculated avail is the Planning Calendar. 
                 //      This is correct as that is the only calc option (except for speecial option we did for someone) but no real reason for that in this code
                 sErrorInfo = "m060";
@@ -1971,18 +1971,23 @@ namespace PortfolioEngineCore
 
                     // create a period 'array' for each resource
                     Dictionary<int, Dictionary<int, double>> ResourceAvailabilities = new Dictionary<int, Dictionary<int, double>>();
+                    Dictionary<int, Dictionary<int, double>> ResourceOffHours = new Dictionary<int, Dictionary<int, double>>();
                     Dictionary<int, double> PeriodAvailabilities;
+                    Dictionary<int, double> PeriodOffHours;
 
                     string[] spWresIds = sResourceList.Split(',');
                     foreach (string spWresId in spWresIds)
                     {
                         int lWresID = Convert.ToInt32(spWresId);
                         PeriodAvailabilities = new Dictionary<int, double>();
+                        PeriodOffHours = new Dictionary<int, double>();
                         for (int i = RVClass.FromPeriodID; i <= RVClass.ToPeriodID; i++)
                         {
                             PeriodAvailabilities.Add(i, 0);
+                            PeriodOffHours.Add(i, 0);
                         }
                         ResourceAvailabilities.Add(lWresID, PeriodAvailabilities);
+                        ResourceOffHours.Add(lWresID, PeriodOffHours);
                     }
                     // now we've got a bunch of empty arrays ...  just waiting for availabilities
 
@@ -2013,14 +2018,21 @@ namespace PortfolioEngineCore
                         if (ResourceAvailabilities.TryGetValue(l_WresID, out Availabilities))
                         {
                             if (l_PeriodID >= RVClass.FromPeriodID && l_PeriodID <= RVClass.ToPeriodID)
-                            Availabilities[l_PeriodID] += DBAccess.ReadDoubleValue(reader["CS_AVAIL"]);
+                                Availabilities[l_PeriodID] += DBAccess.ReadDoubleValue(reader["CS_AVAIL"]);
+                        }
+
+                        Dictionary<int, double> OffHours;
+                        if (ResourceOffHours.TryGetValue(l_WresID, out OffHours))
+                        {
+                            if (l_PeriodID >= RVClass.FromPeriodID && l_PeriodID <= RVClass.ToPeriodID)
+                                OffHours[l_PeriodID] += DBAccess.ReadDoubleValue(reader["CS_OFF"]);
                         }
                     }
                     reader.Close();
 
                     // Reduce AVAILABILITY by Personal Time Off on Personal Items AND by work on all OTHER PIs - ONLY when called for PIs as Personal Items are in RPA for resource modes
                     if (lRequestNo == ResourceValues.ResCenterRequest.ResourceValuesForPIs || lRequestNo == ResourceValues.ResCenterRequest.ResourceValuesForPIsinDept)
-                    { 
+                    {
                         // reduce by Personal TIme Off which we've already read above
                         foreach (clsNWValue oNWItem in RVClass.ResNWValues)
                         {
@@ -2090,14 +2102,15 @@ namespace PortfolioEngineCore
                                 ResourceValues.clsResCap oResData;
                                 if (RVClass.Resources.TryGetValue(oResAvail.WResID, out oResData))
                                 {
-                                    oResAvail.FTES = GetFTEValue(clnFTEs, oResData.BC_UID_Role, oResAvail.Hours, oResAvail.PeriodID);
+                                    double offHours = ResourceOffHours[lWresId][availability.Key];
+                                    oResAvail.FTES = GetFTEValue(clnFTEs, oResData.BC_UID_Role, oResAvail.Hours, oResAvail.PeriodID, offHours);
                                 }
                                 RVClass.ResAvail.Add(oResAvail);
                             }
                         }
                     }
                 }
-                //   ************************ end of section to get AVAILABILITY
+            //   ************************ end of section to get AVAILABILITY
 
 
             Wrapup:
@@ -2128,24 +2141,24 @@ namespace PortfolioEngineCore
                 sResult = "Get Data for Analyzer exception at code = " + sErrorInfo; // +"  " + ex.Message;  using ex.Message here results in runtime error - don't know why
                 eStatus = _dba.HandleException("GetPIResourcesStruct", (StatusEnum)9999, ex);
                 sReplyXML = "";
-                return (int) StatusEnum.rsRequestInvalid;
+                return (int)StatusEnum.rsRequestInvalid;
             }
 
             sReplyXML = RVClass.XML();
             sResult = "";
-            return (int) eStatus;
+            return (int)eStatus;
 
-            Error_Return:
+        Error_Return:
             if (eStatus == StatusEnum.rsRequestIncomplete)
             {
                 sResult = sErrorInfo;
             }
             else
             {
-                sResult = "Get Data for Analyzer failed with error code = " + sErrorInfo;                
+                sResult = "Get Data for Analyzer failed with error code = " + sErrorInfo;
             }
             sReplyXML = "";
-            return (int) eStatus;
+            return (int)eStatus;
         }
 
         private static void SetParentUIDs(Dictionary<int, ResourceValues.clsCatItem> costcategories, int lMaxLevel)
@@ -2291,14 +2304,14 @@ namespace PortfolioEngineCore
             return lXRef;
         }
 
-        private static int GetFTEValue(Dictionary<int, Dictionary<int, int>> clnFTEs, int lBC_UID, double dblHours, int lPeriodID)
+        private static int GetFTEValue(Dictionary<int, Dictionary<int, int>> clnFTEs, int lBC_UID, double dblHours, int lPeriodID, double dblOffHours)
         {
             int lFTEValue = 0;
             double dblFTE = -1;
             Dictionary<int, int> clnFTEPeriods;
             clnFTEs.TryGetValue(lBC_UID, out clnFTEPeriods);
             if (clnFTEPeriods != null) { if (!clnFTEPeriods.TryGetValue(lPeriodID, out lFTEValue)) { lFTEValue = 0; }; }
-            if (lFTEValue > 0) { dblFTE = (dblHours * 1000000) / lFTEValue; }
+            if (lFTEValue > 0) { dblFTE = (dblHours * 1000000) / (lFTEValue - (dblOffHours * 100)); }
             return (int)dblFTE;
         }
 

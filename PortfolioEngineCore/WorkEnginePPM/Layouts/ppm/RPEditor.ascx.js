@@ -608,14 +608,37 @@
         }
         return null;
     };
-    RPEditor.prototype.GetFTEConv = function (ccruid, periodId) {
+    RPEditor.prototype.GetFTEConv = function (ccruid, periodId, grid, row) {
         try {
             var key = ccruid + "P" + periodId.toString();
             var ftetohours = this.ccrFTEArray[key];
+
             if (isNaN(ftetohours))
-                return 100;
-            else
-                return parseInt(ftetohours);
+                ftetohours = 100;
+
+            var resrow;
+            switch (grid.id) {
+                case "g_RPE":
+                    var resuid = this.plangrid.GetAttribute(row, null, "Res_UID");
+                    resrow = this.resgrid.GetRowById(resuid);
+                    break;
+                case "g_Res":
+                    resrow = row;
+                    break;
+            }
+
+            var fOff = 0;
+            if (resrow) {
+                var off = this.resgrid.GetAttribute(resrow, null, "O" + periodId);
+                var fO = parseInt(off);
+                if (isNaN(fO) == false)
+                    fOff = fO;
+            }
+
+            if (isNaN(fOff))
+                fOff = 0;
+
+            return ftetohours - fOff;
         }
         catch (e) {
             return 100;
@@ -1847,7 +1870,7 @@
     RPEditor.prototype.ValidatePeriodConversion = function (grid, row, col) {
         var sId = col.substring(1);
         var ccruid = grid.GetAttribute(row, null, "CCRole_UID");
-        var fteconv = this.GetFTEConv(ccruid, sId);
+        var fteconv = this.GetFTEConv(ccruid, sId, grid, row);
         if (fteconv == null) { alert("ValidatePeriodConversion : null fte conversion"); return false; }
         var valueH = grid.GetAttribute(row, "H" + sId);
         var valueF = grid.GetAttribute(row, "F" + sId);
@@ -1892,7 +1915,7 @@
             f = "u";
         }
         var origvalue = value;
-        var fteconv = this.GetFTEConv(ccruid, sId);
+        var fteconv = this.GetFTEConv(ccruid, sId, grid, row);
         if (fteconv > 0) {
             switch (this.displayMode) {
                 case 0: /* Hours mode - so calc FTE */
@@ -2036,7 +2059,7 @@
         var sId = col.substring(1);
         var sValue = "";
         var ccruid = grid.GetAttribute(row, "CCRole_UID");
-        var fteconv = this.GetFTEConv(ccruid, sId);
+        var fteconv = this.GetFTEConv(ccruid, sId, grid, row);
         var dblfteDiv = fteconv / 100;
         if (dblfteDiv != null) {
             sValue = dblfteDiv.toString();
@@ -4376,7 +4399,7 @@
             this.dirty = false;
         }
 
-        if (this.params.HideCloseBtn != null && this.params.HideCloseBtn.toString().toLowerCase() == "true" ) {
+        if (this.params.HideCloseBtn != null && this.params.HideCloseBtn.toString().toLowerCase() == "true") {
             this.editorTab.disableItem("CloseBtn");
             this.viewTab.disableItem("CloseBtn2");
         }
@@ -4988,7 +5011,7 @@
         if (isNaN(fN) == false)
             fNonwork = fN;
 
-        var fteconv = this.GetFTEConv(ccruid, periodid);
+        var fteconv = this.GetFTEConv(ccruid, periodid, grid, row);
 
         var fFTEConv = 10000;
         var fF = parseInt(fteconv);
@@ -5026,6 +5049,10 @@
                 fValue = (fFTEConv / 100);
                 break;
         }
+
+        if (isNaN(fValue))
+            fValue = 0;
+
         if (fValue == 0 && fAvailable == 0)
             fValue = "";
         grid.SetAttribute(row, null, "Q" + periodid, fValue, bRefreshCell, 0);

@@ -1557,8 +1557,10 @@ namespace PortfolioEngineCore
                     int lPrevWResID = 0;
                     int lPeriodID = 0;
                     double dblHours = 0;
+                    double dblOffHours = 0;
                     string sPeriods = "";
                     string sHours = "";
+                    string sOffHours = "";
                     bool bFirst = false;
                     bFirst = true;
                     while (reader.Read())
@@ -1566,6 +1568,7 @@ namespace PortfolioEngineCore
                         int lWResID = DBAccess.ReadIntValue(reader["WRES_ID"]);
                         lPeriodID = DBAccess.ReadIntValue(reader["PRD_ID"]);
                         dblHours = DBAccess.ReadDoubleValue(reader["AvailableHours"]) * Common.const_HoursMultiplier;
+                        dblOffHours = DBAccess.ReadDoubleValue(reader["OffHours"]) * Common.const_HoursMultiplier;
                         if (lWResID == lPrevWResID || bFirst)
                         {
                             bFirst = false;
@@ -1578,12 +1581,15 @@ namespace PortfolioEngineCore
                             {
                                 xResource.CreateString("AvailablePeriods", sPeriods);
                                 xResource.CreateString("AvailableHours", sHours);
+                                xResource.CreateString("OffHours", sOffHours);
                             }
                             sPeriods = "";
                             sHours = "";
+                            sOffHours = "";
                         }
                         sPeriods = Common.AppendItemToList(sPeriods, lPeriodID.ToString("0"));
                         sHours = Common.AppendItemToList(sHours, dblHours.ToString("0"));
+                        sOffHours = Common.AppendItemToList(sOffHours, dblOffHours.ToString("0"));
                         lPrevWResID = lWResID;
                     }
                     // write the final item
@@ -1595,6 +1601,7 @@ namespace PortfolioEngineCore
                         {
                             xResource.CreateString("AvailablePeriods", sPeriods);
                             xResource.CreateString("AvailableHours", sHours);
+                            xResource.CreateString("OffHours", sOffHours);
                         }
                     }
                     reader.Close();
