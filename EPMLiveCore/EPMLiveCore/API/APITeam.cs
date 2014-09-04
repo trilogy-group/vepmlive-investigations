@@ -132,7 +132,7 @@ namespace EPMLiveCore.API
             if (filterfield != "")
             {
                 if (filterIsLookup)
-                    query = "';'+" + filterfield + "+';' like '%;" + filtervalue + ";%'" + " OR " + filterfield + " like '%" + filtervalue + "%'"; 
+                    query = "';'+" + filterfield + "+';' like '%;" + filtervalue + ";%'" + " OR " + filterfield + " like '%" + filtervalue + "%'";
                 else
                     query = filterfield + " like '%" + filtervalue + "%'";
             }
@@ -1637,6 +1637,58 @@ namespace EPMLiveCore.API
                         string enums = "";
                         string enumkeys = "";
                         List<string> idArrays = new List<string>();
+                        List<string> lookupsSecurityGroups = new List<string>();
+
+                        //Get second level permissions: find lookups that has security enabled
+                        if (oLi != null && oLi.HasUniqueRoleAssignments)
+                        {
+                            EnhancedLookupConfigValuesHelper valueHelper = null;
+                            string lookupSettings = gSettings.Lookups;
+                            //string rawValue = "Region^dropdown^none^none^xxx|State^autocomplete^Region^Region^xxx|City^autocomplete^State^State^xxx";                    
+                            valueHelper = new EnhancedLookupConfigValuesHelper(lookupSettings);
+
+                            if (valueHelper != null)
+                            {
+                                List<string> fields = valueHelper.GetSecuredFields();
+
+                                // has security fields
+                                if (fields != null && fields.Count > 0)
+                                {
+                                    foreach (string fld in fields)
+                                    {
+                                        SPFieldLookup lookup = null;
+                                        try
+                                        {
+                                            lookup = oList.Fields.GetFieldByInternalName(fld) as SPFieldLookup;
+                                        }
+                                        catch { }
+
+                                        if (lookup == null) continue;
+
+                                        SPList lookupParentList = tWeb.Lists[new Guid(lookup.LookupList)];
+                                        GridGanttSettings parentListSettings = new GridGanttSettings(lookupParentList);
+
+                                        // skip fields with empty lookup values
+                                        string securityFieldValue = string.Empty;
+
+                                        try { securityFieldValue = oLi[fld].ToString(); }
+                                        catch { }
+
+                                        if (string.IsNullOrEmpty(securityFieldValue)) continue;
+
+                                        SPFieldLookupValue lookupVal = new SPFieldLookupValue(securityFieldValue.ToString());
+                                        SPListItem parentListItem = lookupParentList.GetItemById(lookupVal.LookupId);
+
+                                        if (!parentListItem.HasUniqueRoleAssignments) continue;
+
+                                        SPRoleAssignmentCollection raCol = parentListItem.RoleAssignments;
+                                        
+                                        foreach (SPRoleAssignment ra in raCol)
+                                            lookupsSecurityGroups.Add(ra.Member.Name);
+                                    }
+                                }
+                            }
+                        }
 
                         if (gSettings != null && gSettings.BuildTeam && oLi != null && oLi.HasUniqueRoleAssignments)
                         {
@@ -1666,14 +1718,21 @@ namespace EPMLiveCore.API
                                     {
                                         if (!idArrays.Contains(Convert.ToString(group.ID)))
                                         {
-                                            enums += "|" + group.Name;
-                                            enumkeys += "|" + group.ID;
+                                            if (lookupsSecurityGroups != null && lookupsSecurityGroups.Contains(group.Name))
+                                            {
+                                                continue;
+                                            }
+                                            else
+                                            {
+                                                enums += "|" + group.Name;
+                                                enumkeys += "|" + group.ID;
+                                            }
                                         }
                                     }
                                 }
                             }
                         }
-                        else
+                        else //Manage Web Team Security
                         {
                             if (listid == null || listid == Guid.Empty)
                             {
@@ -1684,7 +1743,6 @@ namespace EPMLiveCore.API
                                         enums += "|" + group.Name;
                                         enumkeys += "|" + group.ID;
                                     }
-
                                 }
                             }
                         }
