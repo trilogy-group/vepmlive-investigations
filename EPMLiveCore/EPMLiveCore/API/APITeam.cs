@@ -1736,7 +1736,11 @@ namespace EPMLiveCore.API
                         {
                             if (listid == null || listid == Guid.Empty)
                             {
-                                foreach (SPGroup group in tWeb.Groups)
+                                foreach (SPGroup group in from SPGroup spGroup in tWeb.Groups
+                                                          let roles = spGroup.Roles
+                                                          let canUse = roles.Cast<SPRole>().Any(role => role.PermissionMask != (SPRights)134287360)
+                                                          where spGroup.CanCurrentUserEditMembership && canUse
+                                                          select spGroup)
                                 {
                                     if (group.CanCurrentUserEditMembership)
                                     {
