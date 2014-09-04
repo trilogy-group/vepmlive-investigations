@@ -13,12 +13,13 @@ namespace EPMLiveCore.Jobs
 {
     public class SecurityUpdate
     {
+        string safeGroupTitle = string.Empty;
+
         public void execute(SPSite site, SPWeb web, Guid listId, int itemId, int userid, string data)
         {
             SPList list = web.Lists[listId];
             SPListItem li = list.GetItemById(itemId);
             GridGanttSettings settings = new GridGanttSettings(list);
-
 
             List<string> cNewGrps = new List<string>();
 
@@ -38,6 +39,9 @@ namespace EPMLiveCore.Jobs
                 if (!li.HasUniqueRoleAssignments)
                 {
                     web.AllowUnsafeUpdates = true;
+                    safeGroupTitle = safeTitle;
+
+                    safeTitle = GetIdenticalGroupName(web, safeTitle, 0);
 
                     // step 1 perform actions related to "parent item"
                     // ===============================================
@@ -170,7 +174,6 @@ namespace EPMLiveCore.Jobs
 
                     }
 
-
                     List<string> liGrps = new List<string>();
                     liGrps.Add(string.Format("{0} Owner", safeTitle));
                     liGrps.Add(string.Format("{0} Member", safeTitle));
@@ -191,6 +194,31 @@ namespace EPMLiveCore.Jobs
             // we wait until all groups have been created to createworkspace
             // only if there isn't a current process creating ws 
             WorkspaceTimerjobAgent.QueueWorkspaceJobOnHoldForSecurity(site.ID, web.ID, list.ID, li.ID);
+        }
+
+        private string GetIdenticalGroupName(SPWeb web, string safeTitle, Int32 uniqueGroupIndex)
+        {
+            string uniqueGroupName = safeTitle;
+            string[] groups = new[] { "Owner", "Member", "Visitor" };
+            foreach (string group in groups)
+            {
+                string groupName = safeTitle + " " + group;
+                SPGroup webGroup = null;
+                try
+                {
+                    webGroup = web.SiteGroups[groupName];
+                }
+                catch { }
+                if (webGroup != null)
+                {
+                    //Recursively call this method to get unique name (without duplicates)
+                    Convert.ToInt32(uniqueGroupIndex++);
+                    string grpTitle = string.Format("{0}{1}", safeGroupTitle, Convert.ToInt32(uniqueGroupIndex));
+                    uniqueGroupName = GetIdenticalGroupName(web, grpTitle, Convert.ToInt32(uniqueGroupIndex));
+                }
+                return uniqueGroupName;
+            }
+            return uniqueGroupName;
         }
 
         private void ProcessSecurity(SPSite site, SPList list, SPListItem li, int userid)
@@ -270,27 +298,14 @@ namespace EPMLiveCore.Jobs
             foreach (string grp in grps)
             {
                 string finalName = string.Empty;
-                SPGroup testGrp = null;
                 try
                 {
-                    testGrp = ew.SiteGroups[safeTitle + " " + grp];
+                    finalName = CoreFunctions.AddGroup(ew, safeTitle, grp, ew.CurrentUser, ew.CurrentUser, string.Empty);
+                    spUInfoList.Items.GetItemById(ew.SiteGroups[finalName].ID).SystemUpdate();
+                    ew.Update();
+                    Thread.Sleep(1000);
                 }
                 catch { }
-                if (testGrp != null)
-                {
-                    finalName = testGrp.Name;
-                }
-                else
-                {
-                    try
-                    {
-                        finalName = CoreFunctions.AddGroup(ew, safeTitle, grp, ew.CurrentUser, ew.CurrentUser, string.Empty);
-                        spUInfoList.Items.GetItemById(ew.SiteGroups[finalName].ID).SystemUpdate();
-                        ew.Update();
-                        Thread.Sleep(1000);
-                    }
-                    catch { }
-                }
 
                 SPGroup finalGrp = ew.SiteGroups[finalName];
                 SPRoleType rType;
