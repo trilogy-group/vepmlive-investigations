@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using EPMLiveCore;
+﻿using EPMLiveCore;
 using EPMLiveCore.ListDefinitions;
 using Microsoft.SharePoint;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using WorkEnginePPM.Core.DataSync;
 using WorkEnginePPM.Core.Entities;
 
@@ -24,13 +24,14 @@ namespace WorkEnginePPM.Events.DataSync
         public override void ItemAdded(SPItemEventProperties properties)
         {
             if (!ValidateRequest(properties)) return;
-
             try
             {
                 using (var holidayManager = new HolidayManager(properties.Web))
                 {
                     holidayManager.AddPFEHolidays(properties);
-                    holidayManager.Synchronize(holidayManager.GetExistingHolidaySchedules(properties.List.Items));
+                    List<HolidaySchedule> existingHolidaySchedules = holidayManager.GetExistingHolidaySchedules(properties.List.Items);
+                    List<HolidaySchedule> newHolidaySchedules = existingHolidaySchedules.Where(holidaySchedule => holidaySchedule.Title.Equals(properties.AfterProperties["Title"])).ToList<HolidaySchedule>();
+                    holidayManager.Synchronize(newHolidaySchedules);                                        
                 }
             }
             catch (Exception exception)
@@ -52,7 +53,7 @@ namespace WorkEnginePPM.Events.DataSync
 
             try
             {
-                List<HolidaySchedule> holidaySchedules;
+                List<HolidaySchedule> newholidaySchedules = new List<HolidaySchedule>();
 
                 object title = properties.AfterProperties["Title"];
 
@@ -64,21 +65,20 @@ namespace WorkEnginePPM.Events.DataSync
 
                 using (var holidayManager = new HolidayManager(properties.Web))
                 {
-                    holidaySchedules = holidayManager.GetExistingHolidaySchedules(properties.List.Items);
-
-                    holidaySchedules.Add(new HolidaySchedule
+                    newholidaySchedules.Add(new HolidaySchedule
                     {
-                        Title = (string) title,
+                        Title = (string)title,
                         IsDefault = isDefault,
                         UniqueId = uniqueId,
                         Holidays = new List<Holiday>()
-                    });
-
-                    holidaySchedules = holidayManager.Synchronize(holidaySchedules);
+                    });                    
+                    
+                    // Syncs only that holiday schedule which is recently created.
+                    newholidaySchedules = holidayManager.Synchronize(newholidaySchedules);                    
                 }
 
                 UpdateDefault(properties, uniqueId, isDefault);
-                SetExtId(properties, uniqueId, holidaySchedules);
+                SetExtId(properties, uniqueId, newholidaySchedules);
             }
             catch (Exception exception)
             {
@@ -176,22 +176,24 @@ namespace WorkEnginePPM.Events.DataSync
                             (properties.AfterProperties["IsDefault"] ?? (properties.ListItem["IsDefault"] ?? false))
                                 .ToString());
 
-                    Guid uniqueId = properties.ListItem.UniqueId;
+                    Guid uniqueId = properties.ListItem.UniqueId;                    
+                    List<HolidaySchedule> updatedHolidaySchedules = new List<HolidaySchedule>();
 
                     foreach (HolidaySchedule holidaySchedule in holidaySchedules
                         .Where(holidaySchedule => holidaySchedule.UniqueId == uniqueId))
                     {
-                        holidaySchedule.Title = (string) title;
+                        holidaySchedule.Title = (string)title;
                         holidaySchedule.IsDefault = isDefault;
-                        holidaySchedule.ExtId = (string) extId;
-
+                        holidaySchedule.ExtId = (string)extId;
+                        // Populating only updated holiday schedule
+                        updatedHolidaySchedules.Add(holidaySchedule);
                         break;
                     }
 
-                    holidaySchedules = holidayManager.Synchronize(holidaySchedules);
-
+                    // Syncs only the updated holiday schedule with PFE Database
+                    updatedHolidaySchedules = holidayManager.Synchronize(updatedHolidaySchedules);
                     UpdateDefault(properties, uniqueId, isDefault);
-                    SetExtId(properties, uniqueId, holidaySchedules);
+                    SetExtId(properties, uniqueId, updatedHolidaySchedules);
 
                     holidayManager.AddPFEHolidays(properties);
                 }

@@ -58,14 +58,19 @@ namespace WorkEnginePPM.Events.DataSync
                     List<HolidaySchedule> holidaySchedules =
                         holidayManager.GetExistingHolidaySchedules(spLists.First().Items);
 
+                    List<HolidaySchedule> newHolidaySchedules = new List<HolidaySchedule>();
+
                     foreach (HolidaySchedule holidaySchedule in holidaySchedules
                         .Where(holidaySchedule => holidaySchedule.Id == newHolidayScheduleId))
                     {
                         holidaySchedule.Holidays.Add(newHoliday);
+                        // Populates only that holiday schedule in which the new holiday is added.
+                        newHolidaySchedules.Add(holidaySchedule);
                         break;
                     }
 
-                    holidayManager.Synchronize(holidaySchedules);
+                    // Syncs only that holiday schedule which is updated with new holiday.
+                    holidayManager.Synchronize(newHolidaySchedules);
                     holidayManager.AddPFEHolidays(properties);
                 }
             }
@@ -124,8 +129,11 @@ namespace WorkEnginePPM.Events.DataSync
                     {
                         holidaySchedules[holidayScheduleIndex].Holidays.Remove(holidayToDelete);
                     }
-
-                    holidayManager.Synchronize(holidaySchedules);
+                    
+                    // Syncs only that holiday schedule whose holiday is deleted.
+                    List<HolidaySchedule> updatedHolidaySchedules = new List<HolidaySchedule>();
+                    updatedHolidaySchedules.Add(holidaySchedules[holidayScheduleIndex]);
+                    holidayManager.Synchronize(updatedHolidaySchedules);
                 }
             }
             catch (Exception exception)
@@ -201,14 +209,19 @@ namespace WorkEnginePPM.Events.DataSync
 
                     var spFieldLookupValue = new SPFieldLookupValue((string) schedule);
 
+                    List<HolidaySchedule> updatedHolidaySchedules = new List<HolidaySchedule>();
+
                     foreach (HolidaySchedule holidaySchedule in holidaySchedules
                         .Where(holidaySchedule => holidaySchedule.Id == spFieldLookupValue.LookupId))
                     {
                         holidaySchedule.Holidays.Add(updatedHoliday);
+                        // Populates only that holiday schedule whose holiday is just got updated.
+                        updatedHolidaySchedules.Add(holidaySchedule);
                         break;
                     }
 
-                    holidayManager.Synchronize(holidaySchedules);
+                    // Syncs only that holiday schedule whose holiday is just modified.
+                    holidayManager.Synchronize(updatedHolidaySchedules);
                     holidayManager.AddPFEHolidays(properties);
                 }
             }
