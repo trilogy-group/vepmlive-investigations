@@ -41,7 +41,7 @@ namespace EPMLiveCore.Jobs
                     web.AllowUnsafeUpdates = true;
                     safeGroupTitle = safeTitle;
 
-                    safeTitle = GetIdenticalGroupName(web, safeTitle, 0);
+                    safeTitle = GetIdenticalGroupName(site.ID, web.ID, safeTitle, 0);
 
                     // step 1 perform actions related to "parent item"
                     // ===============================================
@@ -196,28 +196,31 @@ namespace EPMLiveCore.Jobs
             WorkspaceTimerjobAgent.QueueWorkspaceJobOnHoldForSecurity(site.ID, web.ID, list.ID, li.ID);
         }
 
-        private string GetIdenticalGroupName(SPWeb web, string safeTitle, Int32 uniqueGroupIndex)
+        private string GetIdenticalGroupName(Guid siteId, Guid webId, string safeTitle, Int32 uniqueGroupIndex)
         {
             string uniqueGroupName = safeTitle;
-            string[] groups = new[] { "Owner", "Member", "Visitor" };
-            foreach (string group in groups)
+            string groupTitle = string.Format("'{0} Owner','{0} Member', '{0} Visitor'", uniqueGroupName);
+            string qryGroupExists = "SELECT ID FROM LSTUserInformationList WHERE Title IN (" + groupTitle + ") AND ContentType = 'SharePointGroup'  AND WebId = '" + Convert.ToString(webId) + "'";
+            try
             {
-                string groupName = safeTitle + " " + group;
-                SPGroup webGroup = null;
-                try
+                ReportData _dao = new ReportData(siteId);
+                using (SqlConnection cn = _dao.GetClientReportingConnection())
                 {
-                    webGroup = web.SiteGroups[groupName];
+                    using (SqlCommand cmd = new SqlCommand(qryGroupExists, cn))
+                    {
+                        SqlDataReader dr = cmd.ExecuteReader();
+                        if (dr.Read())
+                        {
+                            //Ooopppsss! Group already exists! Let's try with Incremental Group Search in LSTUserInformationList table!
+                            Convert.ToInt32(uniqueGroupIndex++);
+                            groupTitle = string.Format("{0}{1}", safeGroupTitle, Convert.ToInt32(uniqueGroupIndex));
+                            uniqueGroupName = GetIdenticalGroupName(siteId, webId, groupTitle, Convert.ToInt32(uniqueGroupIndex));
+                        }
+                    }
                 }
-                catch { }
-                if (webGroup != null)
-                {
-                    //Recursively call this method to get unique name (without duplicates)
-                    Convert.ToInt32(uniqueGroupIndex++);
-                    string grpTitle = string.Format("{0}{1}", safeGroupTitle, Convert.ToInt32(uniqueGroupIndex));
-                    uniqueGroupName = GetIdenticalGroupName(web, grpTitle, Convert.ToInt32(uniqueGroupIndex));
-                }
-                return uniqueGroupName;
             }
+            catch { }
+
             return uniqueGroupName;
         }
 
