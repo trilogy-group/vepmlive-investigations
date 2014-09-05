@@ -108,6 +108,7 @@ function AddResource() {
         rGrid.HideRow(oSRow);
     }
     RefreshCommandUI();
+    tGrid.UpdateHeights(1);
 }
 
 function RemoveResource() {

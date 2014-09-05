@@ -250,7 +250,7 @@ namespace EPMLiveCore.API
                                 }
                             }
                             catch { }
-                            item.Add("<img src=\"" + userPictureUrl + "\" height=\"62\">");
+                            item.Add("<img src=\"" + userPictureUrl + "\" height=\"62\" />");
                         }
                         else if (col.ColumnName == "PrincipalType")
                         {
