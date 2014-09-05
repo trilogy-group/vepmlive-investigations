@@ -247,6 +247,12 @@ begin
 
 	print 'Updating Table RPTPeriods'
 
+if exists (select column_name FROM INFORMATION_SCHEMA.COLUMNS where table_name = 'RPTPeriods' and column_name = 'ListNames')
+                                begin
+                                                Print 'Updating Column ListNames'
+                                                ALTER TABLE RPTPeriods 
+			         ALTER COLUMN ListNames nvarchar(MAX)
+                                end
 
 end
 
