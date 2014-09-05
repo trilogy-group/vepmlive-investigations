@@ -310,6 +310,7 @@ namespace EPMLiveCore.API
                                 }
                                 else
                                 {
+                                    SPList otherList = null;
                                     sbListAssociatedItemsDiv.Append("<table style='width: 100%;'><tr><td><table style='border-collapse: collapse;'  class='fancy-col-table'>");
 
                                     for (int i = 0; i < dtListName.Rows.Count; i++)
@@ -318,8 +319,11 @@ namespace EPMLiveCore.API
                                         string listName = Convert.ToString(dtListName.Rows[i]["ListName"]);
                                         string tableName = Convert.ToString(dtListName.Rows[i]["TableName"]);
 
+                                        try { otherList = spWeb.Lists[listName]; }
+                                        catch { }
+
                                         //Checking if rptListId is Null or not: If Null then use Object Model to load count, database call otherwise
-                                        if (!string.IsNullOrEmpty(rptListId))
+                                        if (!string.IsNullOrEmpty(rptListId) && otherList != null && otherList.BaseTemplate != SPListTemplateType.DocumentLibrary)
                                         {
                                             #region Retrieve associated list count from database
 
@@ -369,7 +373,6 @@ namespace EPMLiveCore.API
                                             #region Retrieve associated list count using SharePoint Object Model
 
                                             //SharePoint Object Model to Load Record Count
-                                            SPList otherList = spWeb.Lists[listName];
                                             SPQuery query = new SPQuery();
                                             rptListId = otherList.ID.ToString();
 
