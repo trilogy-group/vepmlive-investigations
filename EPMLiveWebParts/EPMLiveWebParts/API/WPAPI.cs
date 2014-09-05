@@ -685,7 +685,7 @@ namespace EPMLiveWebParts
                         val = "0";
                         try
                         {
-                            if (li[oField.Id].ToString().ToLower() == "yes")
+                            if (li[oField.Id].ToString().ToLower() == "yes" || li[oField.Id].ToString().ToLower() == "true")
                                 val = "1";
                         }
                         catch { }
