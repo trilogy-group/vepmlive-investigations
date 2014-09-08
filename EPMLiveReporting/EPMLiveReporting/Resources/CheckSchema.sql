@@ -252,6 +252,20 @@ ALTER TABLE RPTList ALTER COLUMN ListName NVARCHAR(500) NOT NULL
 ALTER TABLE RPTList ALTER COLUMN TableName NVARCHAR(500) NOT NULL
 ALTER TABLE RPTList ALTER COLUMN TableNameSnapshot NVARCHAR(500) NOT NULL
 
+---------------TABLE: RPTPeriods----------------------
+
+IF EXISTS (SELECT TABLE_NAME FROM INFORMATION_SCHEMA.tables WHERE TABLE_NAME = 'RPTPeriods')
+BEGIN
+	IF EXISTS (SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'RPTPeriods' AND COLUMN_NAME = 'ListNames')
+	BEGIN
+		Print 'Updating Column ListNames'
+                          ALTER TABLE RPTPeriods 
+		ALTER COLUMN ListNames nvarchar(MAX)
+	END
+
+END
+
+
 ---------------FUNCTION: fnCheckUserAccess----------------------
 
 PRINT 'Creating function fnCheckUserAccess'
