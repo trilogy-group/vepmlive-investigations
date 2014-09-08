@@ -179,6 +179,8 @@ namespace WorkEnginePPM.Events.DataSync
                     Holiday updatedHoliday = null;
                     int updatedHolidayScheduleIndex = -1;
 
+                    List<HolidaySchedule> updatedHolidaySchedules = new List<HolidaySchedule>();
+
                     for (int index = 0; index < holidaySchedules.Count; index++)
                     {
                         HolidaySchedule holidaySchedule = holidaySchedules[index];
@@ -205,17 +207,17 @@ namespace WorkEnginePPM.Events.DataSync
                     if (updatedHolidayScheduleIndex != -1)
                     {
                         holidaySchedules[updatedHolidayScheduleIndex].Holidays.Remove(updatedHoliday);
+                        // Populates only that holiday schedule whose holiday list is just got updated.
+                        updatedHolidaySchedules.Add(holidaySchedules[updatedHolidayScheduleIndex]);
                     }
 
                     var spFieldLookupValue = new SPFieldLookupValue((string) schedule);
-
-                    List<HolidaySchedule> updatedHolidaySchedules = new List<HolidaySchedule>();
 
                     foreach (HolidaySchedule holidaySchedule in holidaySchedules
                         .Where(holidaySchedule => holidaySchedule.Id == spFieldLookupValue.LookupId))
                     {
                         holidaySchedule.Holidays.Add(updatedHoliday);
-                        // Populates only that holiday schedule whose holiday is just got updated.
+                        // Populates only that holiday schedule whose holiday list is just got updated.
                         updatedHolidaySchedules.Add(holidaySchedule);
                         break;
                     }

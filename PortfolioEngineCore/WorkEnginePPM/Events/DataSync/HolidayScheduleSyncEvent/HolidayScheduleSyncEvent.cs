@@ -30,7 +30,7 @@ namespace WorkEnginePPM.Events.DataSync
                 {
                     holidayManager.AddPFEHolidays(properties);
                     List<HolidaySchedule> existingHolidaySchedules = holidayManager.GetExistingHolidaySchedules(properties.List.Items);
-                    List<HolidaySchedule> newHolidaySchedules = existingHolidaySchedules.Where(holidaySchedule => holidaySchedule.Title.Equals(properties.AfterProperties["Title"])).ToList<HolidaySchedule>();
+                    List<HolidaySchedule> newHolidaySchedules = existingHolidaySchedules.Where(holidaySchedule => holidaySchedule.Id.Equals(properties.ListItemId)).ToList<HolidaySchedule>();
                     holidayManager.Synchronize(newHolidaySchedules);                                        
                 }
             }
