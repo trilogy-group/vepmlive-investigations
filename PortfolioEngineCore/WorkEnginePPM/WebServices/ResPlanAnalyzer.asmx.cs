@@ -626,7 +626,7 @@ namespace WorkEnginePPM
 
         public static string GetResourceAnalyzerData(HttpContext Context, string sXML, RPAData RAData)
         {
-            string s = RAData.GetTopGrid();
+            string s = RAData.GetTopGrid(sXML);
             return s;
         }
 

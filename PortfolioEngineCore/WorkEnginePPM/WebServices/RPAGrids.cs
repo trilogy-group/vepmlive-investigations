@@ -113,10 +113,18 @@ namespace RPADataCache
 
         private CStruct[] m_xLevels = new CStruct[64];
         private int m_nLevel = 0;
- 
 
-        public bool InitializeGridLayout(List<clsRXDisp> Cols, int gpPMOAdmin)
+
+        public bool InitializeGridLayout(List<clsRXDisp> Cols, int gpPMOAdmin, string sXML)
         {
+            var currentViewResult = GetResourceAnalyzerView(sXML);
+
+            XmlDocument xdoc = new XmlDocument();
+            xdoc.LoadXml(currentViewResult.ToString());
+            var currentViewCols = xdoc.SelectSingleNode("Result/View/g_1").Attributes["Cols"].InnerText;
+            var strCurrentViewCols = currentViewCols.Split(',').Select(x => x.Split(':')).ToArray();
+
+
             xGrid = new CStruct();
             xGrid.Initialize("Grid");
 
@@ -347,6 +355,12 @@ namespace RPADataCache
                     try
                     {
 
+                        // below code find columns which not matched with current saved view's column and that column hide on grid.
+
+                        var SelViewCols = (from x in strCurrentViewCols
+                                           where x[0].ToString() == col.m_realname.Replace(" ", string.Empty)
+                                           select x[0]).FirstOrDefault();
+
 
                         string sn = col.m_realname.Replace("/n", "");
                         sn = sn.Replace(" ", "");
@@ -364,9 +378,12 @@ namespace RPADataCache
                         xC.CreateIntAttr("ShowHint", 0);
                         xC.CreateIntAttr("CaseSensitive", 0);
                         xC.CreateStringAttr("OnDragCell", "Focus,DragCell");
+
+                        if (SelViewCols == null)
+                            xC.CreateIntAttr("Visible", 0); 
+
                         m_xDefTree.CreateIntAttr(sn + "CanDrag", 0);
-
-
+                        
                         m_xDefTree.CreateStringAttr(sn + "HtmlPrefix", "<B>");
                         m_xDefTree.CreateStringAttr(sn + "HtmlPostfix", "</B>");
 
@@ -1103,6 +1120,74 @@ namespace RPADataCache
             return retval;
         }
 
+        private string GetResourceAnalyzerView(string sXML)
+        {
+            string basePath;
+            string ppmId;
+            string ppmCompany;
+            string ppmDbConn;
+            string username;
+            SecurityLevels securityLevel;
+
+            string sReply = "";
+
+            WebAdmin.CapturePFEBaseInfo(out basePath, out username, out ppmId, out ppmCompany, out ppmDbConn, out securityLevel);
+            PortfolioEngineCore.ResourceAnalyzer rpa = new ResourceAnalyzer(basePath, username, ppmId, ppmCompany, ppmDbConn, securityLevel);
+            //string sBaseInfo = WebAdmin.BuildBaseInfo(Context);
+            //PortfolioEngineCore.ResourceAnalyzer rpa = new PortfolioEngineCore.ResourceAnalyzer(sBaseInfo);
+            try
+            {
+                CStruct xExecute = new CStruct();
+                if (xExecute.LoadXML(sXML) == false)
+                {
+                    return HandleError("GetResourceAnalyzerView", 99999, "Invalid request xml");
+                }
+                var viewNode = xExecute.GetXMLNode();
+                var viewGuid = viewNode.SelectSingleNode("View").Attributes["ViewGUID"].InnerText;
+                Guid guidView = Guid.Parse(viewGuid);
+                //Guid guidView = xExecute.GetGuid("ViewGUID");
+
+                string sViewsXML;
+                if (rpa.GetResourceAnalyzerViewXML(guidView, out sViewsXML) == false)
+                {
+                    sReply = HandleError("GetResourceAnalyzerView", rpa.Status, rpa.FormatErrorText());
+                }
+                else
+                {
+                    CStruct xResult = BuildResultXML("GetResourceAnalyzerView", 0);
+                    xResult.AppendXML(sViewsXML);
+                    sReply = xResult.XML();
+                }
+            }
+            catch (Exception ex)
+            {
+                sReply = HandleException("GetResourceAnalyzerViews", 99999, ex, "");
+            }
+            return sReply;
+        }
+
+        private string HandleError(string sContext, int nStatus, string sError)
+        {
+            CStruct xResult = BuildResultXML(sContext, nStatus);
+            CStruct xError = xResult.CreateSubStruct("Error");
+            //xError.Value = sError;
+            xError.CreateIntAttr("ID", 100);
+            xError.CreateStringAttr("Value", sError);
+            return xResult.XML();
+        }
+        private CStruct BuildResultXML(string sContext = "", int nStatus = 0)
+        {
+            CStruct xResult = new CStruct();
+            xResult.Initialize("Result");
+            xResult.CreateStringAttr("Context", sContext);
+            xResult.CreateIntAttr("Status", nStatus);
+            return xResult;
+        }
+        private string HandleException(string sContext, int nStatus, Exception ex, string sStage)
+        {
+            return HandleError(sContext, nStatus, "Exception in RPAGrids.cs (" + sStage + "): '" + ex.Message.ToString() + "'");
+
+        }
 
     }
 

@@ -2130,6 +2130,9 @@
 
         try {
             if (this.DetGrid != null) {
+
+                var selectView = document.getElementById("idAnalyzerTab_SelView");
+
                 //	            this.DetGrid.Reload(null);
                 this.DetGrid = Grids["g_1"];
                 this.DetGrid.Dispose();
@@ -2140,6 +2143,7 @@
                 var sbDataxml = new StringBuilder();
                 sbDataxml.append('<![CDATA[');
                 sbDataxml.append('<Execute Function="GetResourceAnalyzerData">');
+                sbDataxml.append('<View ViewGUID="' + XMLValue(selectView.options[selectView.selectedIndex].value) + '" />');
                 sbDataxml.append('</Execute>');
                 sbDataxml.append(']]>');
 
@@ -3080,10 +3084,12 @@
                 }
             }
 
+            var selectView = document.getElementById("idAnalyzerTab_SelView");
             this.stashgridsettings = null;
             var sbDataxml = new StringBuilder();
             sbDataxml.append('<![CDATA[');
             sbDataxml.append('<Execute Function="GetResourceAnalyzerData">');
+            sbDataxml.append('<View ViewGUID="' + XMLValue(selectView.options[selectView.selectedIndex].value) + '" />');
             sbDataxml.append('</Execute>');
             sbDataxml.append(']]>');
 
@@ -5620,6 +5626,13 @@
         if (this.selectedView != null) {
             newguid = this.selectedView.ViewGUID;
         }
+
+        var sbDataxml = new StringBuilder();
+        sbDataxml.append("<ViewGUID>")
+        sbDataxml.append(newguid)
+        sbDataxml.append("</ViewGUID>")
+
+        var param = sbDataxml.toString();
 
         this.flashRibbonSelect("idAnalyzerTab_SelView");
 
