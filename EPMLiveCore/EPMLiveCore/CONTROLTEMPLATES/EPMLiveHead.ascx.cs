@@ -11,7 +11,7 @@ namespace EPMLiveCore.CONTROLTEMPLATES
 {
     public partial class EPMLiveHead : UserControl
     {
-        #region Fields (17) 
+        #region Fields (17)
 
         protected string CurrentFileIsNull;
         protected string CurrentFileTitle;
@@ -31,9 +31,9 @@ namespace EPMLiveCore.CONTROLTEMPLATES
         protected string WebUrl;
         private SPWeb _spWeb;
 
-        #endregion Fields 
+        #endregion Fields
 
-        #region Properties (3) 
+        #region Properties (3)
 
         public bool DebugMode { get; private set; }
 
@@ -41,9 +41,9 @@ namespace EPMLiveCore.CONTROLTEMPLATES
 
         public string RootWebId { get; private set; }
 
-        #endregion Properties 
+        #endregion Properties
 
-        #region Methods (2) 
+        #region Methods (2)
 
         // Protected Methods (2) 
 
@@ -84,28 +84,32 @@ namespace EPMLiveCore.CONTROLTEMPLATES
             ListTitle = string.Empty;
             try
             {
-                ListTitle = HttpUtility.JavaScriptStringEncode(spContext.List.Title);
+                if (spContext.List != null)
+                    ListTitle = HttpUtility.JavaScriptStringEncode(spContext.List.Title);
             }
             catch { }
 
             ListId = Guid.Empty.ToString();
             try
             {
-                ListId = spContext.ListId.ToString();
+                if (spContext.List != null)
+                    ListId = spContext.ListId.ToString();
             }
             catch { }
 
             ListViewUrl = string.Empty;
             try
             {
-                ListViewUrl = spContext.ViewContext.View.Url;
+                if (spContext.ViewContext != null && spContext.ViewContext.View != null)
+                    ListViewUrl = spContext.ViewContext.View.Url;
             }
             catch { }
 
             ListViewTitle = string.Empty;
             try
             {
-                ListViewTitle = HttpUtility.JavaScriptStringEncode(spContext.ViewContext.View.Title);
+                if (spContext.ViewContext != null && spContext.ViewContext.View != null)
+                    ListViewTitle = HttpUtility.JavaScriptStringEncode(spContext.ViewContext.View.Title);
             }
             catch { }
 
@@ -146,8 +150,11 @@ namespace EPMLiveCore.CONTROLTEMPLATES
             ListIconClass = string.Empty;
             try
             {
-                string sIcon = new GridGanttSettings(SPContext.Current.List).ListIcon;
-                ListIconClass = !string.IsNullOrEmpty(sIcon) ? sIcon : "icon-square";
+                if (spContext.List != null)
+                {
+                    string sIcon = new GridGanttSettings(SPContext.Current.List).ListIcon;
+                    ListIconClass = !string.IsNullOrEmpty(sIcon) ? sIcon : "icon-square";
+                }
             }
             catch { }
 
@@ -166,6 +173,6 @@ namespace EPMLiveCore.CONTROLTEMPLATES
             catch { }
         }
 
-        #endregion Methods 
+        #endregion Methods
     }
 }
