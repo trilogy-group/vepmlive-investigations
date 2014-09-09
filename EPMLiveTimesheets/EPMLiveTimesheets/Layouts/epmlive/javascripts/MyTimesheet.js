@@ -1674,9 +1674,13 @@ Grids.OnValueChanged = function (grid, row, col, val) {
         if (val.toString() == "")
             val = "0";
 
+        var cTotal = 0;
+
         var tVal = GetDecimalFromTime(val);
 
         var oldVal = grid.GetValue(row, col);
+
+        cTotal = curGrid.GetValue(curGrid.Rows[-1], curCol);
 
         if (tVal.toString() == "NaN") {
             alert('That is not a valid entry.');
@@ -1689,11 +1693,11 @@ Grids.OnValueChanged = function (grid, row, col, val) {
             var minmax = TSDCols[col].split('|');
             var min = parseFloat(minmax[0]);
             var max = parseFloat(minmax[1]);
-            if (val > max) {
+            if (val > max || ((cTotal - oldVal) + val) > max) {
                 alert("You may only enter a maximum time of " + max + " hours");
                 val = oldVal;
             }
-            if (val < min) {
+            if (val < min || ((cTotal - oldVal) + val) < min) {
                 alert("You must enter atleast time of " + min + " hours");
                 val = oldVal;
             }
@@ -2125,7 +2129,9 @@ function SaveTypes(event) {
     curGrid.EndEdit(false);
     var newTypeVal = "";
 
+    var oldVal = 0;
     var fTotal = 0;
+    var cTotal = 0;
 
     for (var iType in TSTypeObject) {
 
@@ -2143,22 +2149,41 @@ function SaveTypes(event) {
         }
     }
 
-    if (TSNotes) {
-        newTypeVal += ",Notes: \"" + escape(document.getElementById("txtTNotes").value.replace(/\r\n/g, "<br>")) + "\"";
+    oldVal = curGrid.GetValue(curRow, curCol);
+    cTotal = curGrid.GetValue(curGrid.Rows[-1], curCol);
+
+    if (TSDCols[curCol]) {
+        var minmax = TSDCols[curCol].split('|');
+        var min = parseFloat(minmax[0]);
+        var max = parseFloat(minmax[1]);
+        if (fTotal > max || ((cTotal - oldVal) + fTotal) > max) {
+            alert("You may only enter a maximum time of " + max + " hours");
+        }
+        else if (fTotal < min || ((cTotal - oldVal) + fTotal) < min) {
+            alert("You must enter atleast time of " + min + " hours");
+        }
+        else
+        {
+            if (TSNotes) {
+                newTypeVal += ",Notes: \"" + escape(document.getElementById("txtTNotes").value.replace(/\r\n/g, "<br>")) + "\"";
+            }
+
+            if (newTypeVal.length > 0)
+                newTypeVal = newTypeVal.substr(1);
+
+            newTypeVal = "{" + newTypeVal + "}";
+
+            curGrid.SetAttribute(curRow, curCol, "HtmlPrefix", "", true, false);
+            curGrid.SetValue(curRow, curCol, fTotal, 1, 0);
+
+            if (curGrid.GetValue(curRow, "TS" + curCol) != newTypeVal)
+                TimesheetHoursEdited = true;
+
+            curGrid.SetValue(curRow, "TS" + curCol, newTypeVal, 0, 0);
+        }
+
     }
 
-    if (newTypeVal.length > 0)
-        newTypeVal = newTypeVal.substr(1);
-
-    newTypeVal = "{" + newTypeVal + "}";
-
-    curGrid.SetAttribute(curRow, curCol, "HtmlPrefix", "", true, false);
-    curGrid.SetValue(curRow, curCol, fTotal, 1, 0);
-
-    if (curGrid.GetValue(curRow, "TS" + curCol) != newTypeVal)
-        TimesheetHoursEdited = true;
-
-    curGrid.SetValue(curRow, "TS" + curCol, newTypeVal, 0, 0);
     curPop = false;
 
     $("#TypeDivOuter").remove();
