@@ -65,16 +65,18 @@ namespace WorkEnginePPM.Events.DataSync
                     {
                         #region Check for duplicate holiday
 
+                        int newHolidayYear = Convert.ToDateTime(date).Year;
                         bool duplicateHoliday = false;
                         foreach (Holiday currentHoliday in holidaySchedule.Holidays
-                        .Where(currentHoliday => currentHoliday.Title.Equals((string)title, StringComparison.InvariantCultureIgnoreCase)))
+                        .Where(currentHoliday => currentHoliday.Title.Equals((string)title, StringComparison.InvariantCultureIgnoreCase)
+                        && Convert.ToDateTime(currentHoliday.Date).Year.Equals(newHolidayYear)))
                         {
                             duplicateHoliday = true;
                             break;
                         }
                         if (duplicateHoliday)
                         {
-                            throw new Exception(string.Format("Holiday with title '{0}' already exists in holiday schedule '{1}'", title, holidaySchedule.Title));
+                            throw new Exception(string.Format("Holiday with title '{0}' already exists in holiday schedule '{1}' for year '{2}'", title, holidaySchedule.Title, newHolidayYear));
                         }
 
                         #endregion
@@ -206,12 +208,14 @@ namespace WorkEnginePPM.Events.DataSync
                         foreach (Holiday holiday in holidaySchedule.Holidays
                             .Where(holiday => holiday.Id == properties.ListItem.ID))
                         {
+                            int currentHolidayYear = Convert.ToDateTime(date).Year;
                             #region Check for duplicate holiday
                             bool duplicateHoliday = false;
                             // In case holiday schedule is changed
                             if (holidaySchedule.Id != currentHolidaySchedule.Id)
                             {
-                                foreach (Holiday newHoliday in currentHolidaySchedule.Holidays.Where(newHoliday => newHoliday.Title.Equals((string)title, StringComparison.InvariantCultureIgnoreCase)))
+                                foreach (Holiday newHoliday in currentHolidaySchedule.Holidays.Where(newHoliday => newHoliday.Title.Equals((string)title, StringComparison.InvariantCultureIgnoreCase)
+                                    && Convert.ToDateTime(newHoliday.Date).Year.Equals(currentHolidayYear)))
                                 {
                                     duplicateHoliday = true;
                                     break;
@@ -220,7 +224,8 @@ namespace WorkEnginePPM.Events.DataSync
                             // In case of same holiday schedule
                             else
                             {
-                                foreach (Holiday newHoliday in holidaySchedule.Holidays.Where(newHoliday => newHoliday.Title.Equals((string)title, StringComparison.InvariantCultureIgnoreCase)))
+                                foreach (Holiday newHoliday in holidaySchedule.Holidays.Where(newHoliday => newHoliday.Title.Equals((string)title, StringComparison.InvariantCultureIgnoreCase)
+                                    && Convert.ToDateTime(newHoliday.Date).Year.Equals(currentHolidayYear)))
                                 {
                                     duplicateHoliday = true;
                                     break;
@@ -228,7 +233,7 @@ namespace WorkEnginePPM.Events.DataSync
                             }
                             if (duplicateHoliday)
                             {
-                                throw new Exception(string.Format("Holiday with title '{0}' already exists in holiday schedule '{1}'", title, currentHolidaySchedule.Title));
+                                throw new Exception(string.Format("Holiday with title '{0}' already exists in holiday schedule '{1}' for year '{2}'", title, currentHolidaySchedule.Title, currentHolidayYear));
                             }
                             #endregion
 
