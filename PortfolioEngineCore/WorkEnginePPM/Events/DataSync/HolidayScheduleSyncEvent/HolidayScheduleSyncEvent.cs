@@ -54,10 +54,21 @@ namespace WorkEnginePPM.Events.DataSync
             try
             {
                 List<HolidaySchedule> newholidaySchedules = new List<HolidaySchedule>();
+                List<HolidaySchedule> holidaySchedules;                
 
                 object title = properties.AfterProperties["Title"];
 
                 if (title == null) throw new Exception("Title cannot be empty.");
+
+                using (var holidayManager = new HolidayManager(properties.Web))
+                {
+                    holidaySchedules = holidayManager.GetExistingHolidaySchedules(properties.List.Items);
+                    var existingSchedule = holidaySchedules.Where(hs => hs.Title.Equals(title.ToString(), StringComparison.InvariantCultureIgnoreCase));
+                    if (existingSchedule.Count() > 0)
+                    {
+                        throw new Exception(string.Format("Holiday schedule with title '{0}' already exists.", title.ToString()));                        
+                    }
+                }
 
                 bool isDefault = bool.Parse((properties.AfterProperties["IsDefault"] ?? false).ToString());
 
@@ -170,6 +181,14 @@ namespace WorkEnginePPM.Events.DataSync
 
                     if (title == null) throw new Exception("Title cannot be empty.");
                     if (extId == null) throw new Exception("External ID cannot be empty.");
+
+                    HolidaySchedule existingSchedule = holidaySchedules.Where(hs => hs.Title.Equals(title.ToString(), StringComparison.InvariantCultureIgnoreCase)).First();
+                    // Cancel holiday schedule updation if it is already exist with same title.
+                    // Also ignore if same schedule is getting updated.
+                    if (existingSchedule != null && existingSchedule.Id != properties.ListItemId)
+                    {
+                        throw new Exception(string.Format("Holiday schedule with title '{0}' already exists.", title.ToString()));
+                    }
 
                     bool isDefault =
                         bool.Parse(
