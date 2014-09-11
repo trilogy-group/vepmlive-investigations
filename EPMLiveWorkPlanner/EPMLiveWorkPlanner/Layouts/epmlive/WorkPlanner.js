@@ -791,6 +791,10 @@ function RollupAssignments(Row, Col, Type) {
 
 
 function SaveProject() {
+    try {
+        MapProjectWorkField("ProjectWork", "Work");
+        MapProjectWorkField("Work", "Work");
+    } catch (e) { }
     var x = Grids.ProjectInfo.GetXmlData("Body", "V");
     x = x.replace(/&/gi, "%26");
     dhtmlxAjax.post("WorkPlannerAction.aspx", "Action=SaveProject&ID=" + sItemID + "&PlannerID=" + sPlannerID + "&pjData=" + x, SaveProjectClose);
@@ -1245,6 +1249,11 @@ function DoAssignmentRollDown(Grid, Row, Type, Col) {
 
         oChild = oChild.nextSibling;
     }
+
+    //try {
+    //    MapProjectWorkField("ProjectWork", "Work");
+    //}catch (e) { }
+    
 }
 
 function GetProperDateVal(val, oFromRow, c) {
@@ -1387,6 +1396,13 @@ function onEditViewCloseResponse(loader) {
     }
     else
         alert("Response contains no XML");
+}
+
+function MapProjectWorkField(projectinfocol, workplannergridcol) {
+    try {
+        Grids.ProjectInfo.SetValue(Grids.ProjectInfo.GetRowById(projectinfocol), "V", Grids.WorkPlannerGrid.GetValue(Grids.WorkPlannerGrid.GetRowById("0"), workplannergridcol), 1);
+        Grids.ProjectInfo.RefreshRow(Grids.ProjectInfo.GetRowById(projectinfocol));
+    } catch (e) { }
 }
 
 /*function CopyAllSummaryFields() {
