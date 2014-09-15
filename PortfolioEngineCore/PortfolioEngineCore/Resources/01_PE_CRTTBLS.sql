@@ -3150,6 +3150,7 @@ CREATE TABLE dbo.EPGP_CAPACITY_VALUES
 	WRES_ID int,
 	WRES_DEPT int,
 	CS_AVAIL decimal(25,6),
+	CS_OFF decimal(25,6),
   Primary Key (CB_ID,WRES_ID,BD_PERIOD)
 )
 
