@@ -1,16 +1,15 @@
 ﻿using System;
+using EPMLiveCore;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.WebControls;
-using System.Xml;
-using System.Data;
 
 namespace TimeSheets.Layouts.epmlive
 {
     public partial class MyTimesheet : LayoutsPageBase
     {
-        protected void Page_Load(object sender, EventArgs e)
-        {
-        }
+        #region Methods (3) 
+
+        // Protected Methods (2) 
 
         protected override void OnPreLoad(EventArgs e)
         {
@@ -92,10 +91,43 @@ namespace TimeSheets.Layouts.epmlive
             spRibbon.MakeTabAvailable("Ribbon.MyTimesheetTab");
             spRibbon.MakeTabAvailable("Ribbon.MyTimesheetViewsTab");
             //spRibbon.InitialTabId = "Ribbon.MyTimesheetTab";
-            
+
             spRibbon.Minimized = false;
             spRibbon.CommandUIVisible = true;
             base.OnPreRender(e);
         }
+
+        protected void Page_Load(object sender, EventArgs e)
+        {
+            AddJsHooks();
+        }
+
+        // Private Methods (1) 
+
+        private void AddJsHooks()
+        {
+            SPWeb rootWeb = Web.Site.RootWeb;
+            string jsHook = CoreFunctions.getConfigSetting(rootWeb, "epmlive_timesheet_js_hook");
+
+            if (string.IsNullOrEmpty(jsHook)) return;
+
+            string[] scripts = jsHook.Split(',');
+
+            foreach (string script in scripts)
+            {
+                string src = script;
+
+                string url = rootWeb.ServerRelativeUrl;
+                if (script.StartsWith("~"))
+                {
+                    url = Web.ServerRelativeUrl;
+                    src = script.Substring(1, script.Length);
+                }
+
+                litJsHook.Text += string.Format(@"<script type=""text/javascript"" src=""{0}{1}""></script>", url, src);
+            }
+        }
+
+        #endregion Methods 
     }
 }
