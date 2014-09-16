@@ -93,14 +93,12 @@ namespace EPMLiveReportsAdmin.Jobs
                 EPMData epmdata = null;
                 var hshMessages = new Hashtable();
 
+                #region Process security
+
                 try
                 {
-                    base.totalCount = site.AllWebs.Count;
-                    
-                    bool refreshAll = (string.IsNullOrEmpty(data) ? true : false);
+                    totalCount = site.AllWebs.Count;
                     epmdata = new EPMData(site.ID);
-
-                    #region Process security
 
                     try
                     {
@@ -142,6 +140,10 @@ namespace EPMLiveReportsAdmin.Jobs
                     bErrors = true;
                     sErrors += "<font color=\"red\">Error Updating base: " + ex.Message + "</font><br>";
                 }
+
+                #endregion
+
+                #region History
 
                 //try
                 //{
@@ -293,10 +295,10 @@ namespace EPMLiveReportsAdmin.Jobs
 
                 #endregion
 
+                #region Update Status Field
+
                 try
                 {
-
-
                     if (string.IsNullOrEmpty(data))
                     {
                         try
@@ -360,6 +362,7 @@ namespace EPMLiveReportsAdmin.Jobs
                         }
 
                     }
+
                     foreach (string list in data.Split(','))
                     {
                         if (list != "")
@@ -391,7 +394,9 @@ namespace EPMLiveReportsAdmin.Jobs
                     sErrors += "<font color=\"red\">Error running schedule field update: " + ex.Message + "</font><br>";
                 }
 
-                // clear cache
+                #endregion
+
+                #region Clear Cache
 
                 try
                 {
@@ -402,6 +407,8 @@ namespace EPMLiveReportsAdmin.Jobs
                     bErrors = true;
                     sErrors += "<font color=\"red\">Clear Cache Error: " + ex.Message + "</font><br>";
                 }
+
+                #endregion
             }
             catch(Exception ex)
             {
