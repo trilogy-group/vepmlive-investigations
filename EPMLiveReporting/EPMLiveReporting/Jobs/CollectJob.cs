@@ -429,8 +429,10 @@ namespace EPMLiveReportsAdmin.Jobs
                 }
                 catch (Exception ex)
                 {
+                    var message = ex.InnerException != null ? ex.InnerException.Message : ex.Message;
+
                     bErrors = true;
-                    sErrors += "<font color=\"red\">Clear Cache Error: " + ex.Message + "</font><br>";
+                    sErrors += "<font color=\"red\">Clear Cache Error: " + message + "</font><br>";
                 }
 
                 #endregion
