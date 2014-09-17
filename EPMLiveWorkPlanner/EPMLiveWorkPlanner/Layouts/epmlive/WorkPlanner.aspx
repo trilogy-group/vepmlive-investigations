@@ -1273,11 +1273,15 @@
                 grid.RefreshRow(row.parentNode);
             }
 
-            if (oldparent.firstChild == null && oldparent.id != "BacklogRow" && oldparent.Def.Name != "Iteration") {
+            if (oldparent.firstChild == null && oldparent.id != "BacklogRow" && oldparent.Def.Name != "Iteration")  {  
                 //grid.ChangeDef(grid.GetRowById(oldparent.id), "Task", 1, 0);
                 grid.ChangeDef(oldparent, "Task", 1, 0);
                 grid.SetValue(oldparent, "Summary", 0, 1, 0);
             }
+            else if(oldparent.firstChild.Def.Name == "Assignment"){                
+                if(oldparent.firstChild.parentNode.childNodes.length < 2 )
+                    grid.ChangeDef(oldparent.firstChild.parentNode, "Task", 1, 0);
+            }            
 
             setWBSAndTaskID(grid.GetRowById("0"));
 
@@ -1509,7 +1513,7 @@
     var spEditorDiv = document.getElementById("spEditor");
 
     </script>
-
+    
     <div id="dlgNormal" class="dialog">
         <table width="100%">
             <tr>
