@@ -2994,7 +2994,7 @@ namespace TimeSheets
                                         Declare @isShared as bit
                                         Declare @itemId as int
                                         set @itemId = {2}
-                                        SELECT @isShared = (case when charindex(',',cast(AssignedToID as nvarchar(max))) > 0  then 1 else 0 end)
+                                        SELECT @isShared = (case when (charindex(',',cast(AssignedToID as nvarchar(max))) > 0  or (AssignedToID is null)) then 1 else 0 end)
                                         FROM LSTTaskCenter WHERE SiteId =N'{0}' AND ListId = N'{1}' AND ItemId=@itemId
 
                                         if(@isShared=1)
