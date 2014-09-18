@@ -35,14 +35,14 @@
 		<Text StartErr = "Fatal error! &lt;br/>Resource grid cannot render" />
 	</Lang>
 	<LeftCols>
-		<C Name="ResourceID" Visible="0" CanFilter="0" CanGroup="0" CanHide="0" />
-		<C Name="IsMyResource" Visible="0" CanFilter="1" CanGroup="0" CanHide="0" />
-		<C Name="ProfilePic" Type="Html" Visible="1" CanFilter="0" CanGroup="0" CanSort="0"/>
-		<C Name="Title" Type="Html" RelWidth="100" MinWidth="100" CanGroup="0" CanHide="0" Button="Html" ButtonText="" />
-		<C Name="itemid" Visible="0" CanFilter="0" CanGroup="0" CanHide="0" />
-		<C Name="listid" Visible="0" CanFilter="0" CanGroup="0" CanHide="0" />
-		<C Name="webid" Visible="0" CanFilter="0" CanGroup="0" CanHide="0" />
-		<C Name="siteid" Visible="0" CanFilter="0" CanGroup="0" CanHide="0" />
+		<C Name="ResourceID" Visible="0" CanFilter="0" CanGroup="0" CanHide="0" CaseSensitive="0" />
+		<C Name="IsMyResource" Visible="0" CanFilter="1" CanGroup="0" CanHide="0" CaseSensitive="0" />
+		<C Name="ProfilePic" Type="Html" Visible="1" CanFilter="0" CanGroup="0" CanSort="0" CaseSensitive="0"/>
+		<C Name="Title" Type="Html" RelWidth="100" MinWidth="100" CanGroup="0" CanHide="0" Button="Html" ButtonText="" CaseSensitive="0" />
+		<C Name="itemid" Visible="0" CanFilter="0" CanGroup="0" CanHide="0" CaseSensitive="0" />
+		<C Name="listid" Visible="0" CanFilter="0" CanGroup="0" CanHide="0" CaseSensitive="0" />
+		<C Name="webid" Visible="0" CanFilter="0" CanGroup="0" CanHide="0" CaseSensitive="0" />
+		<C Name="siteid" Visible="0" CanFilter="0" CanGroup="0" CanHide="0" CaseSensitive="0" />
 	</LeftCols>
 	<Cols />
 	<RightCols />
