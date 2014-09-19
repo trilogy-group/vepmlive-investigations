@@ -253,6 +253,7 @@ namespace TimeSheets
                     string webid = iGetAttribute(ndRow, "WebID");
                     string listid = iGetAttribute(ndRow, "ListID");
                     string itemid = iGetAttribute(ndRow, "ItemID");
+                    string assignedtoid = iGetAttribute(ndRow, "AssignedToID");
 
                     string itemtypeid = iGetAttribute(ndRow, "ItemTypeID");
 
@@ -326,7 +327,7 @@ namespace TimeSheets
                                                     }
                                                     catch { }
 
-                                                    SqlCommand cmd = new SqlCommand("INSERT INTO TSITEM (TS_UID,TS_ITEM_UID,WEB_UID,LIST_UID,ITEM_ID,ITEM_TYPE,TITLE, PROJECT,PROJECT_ID, LIST,PROJECT_LIST_UID) VALUES(@tsuid,@uid,@webid,@listid,@itemid,@itemtype,@title,@project,@projectid,@list,@projectlistid)", cn);
+                                                    SqlCommand cmd = new SqlCommand("INSERT INTO TSITEM (TS_UID,TS_ITEM_UID,WEB_UID,LIST_UID,ITEM_ID,ITEM_TYPE,TITLE, PROJECT,PROJECT_ID, LIST,PROJECT_LIST_UID,ASSIGNEDTOID) VALUES(@tsuid,@uid,@webid,@listid,@itemid,@itemtype,@title,@project,@projectid,@list,@projectlistid,@assignedtoid)", cn);
                                                     cmd.Parameters.AddWithValue("@tsuid", TSUID);
                                                     cmd.Parameters.AddWithValue("@uid", id);
                                                     cmd.Parameters.AddWithValue("@webid", web.ID);
@@ -335,6 +336,7 @@ namespace TimeSheets
                                                     cmd.Parameters.AddWithValue("@title", li["Title"].ToString());
                                                     cmd.Parameters.AddWithValue("@list", list.Title);
                                                     cmd.Parameters.AddWithValue("@itemtype", itemtypeid);
+                                                    cmd.Parameters.AddWithValue("@assignedtoid", assignedtoid);
 
                                                     if (projectlist == "")
                                                         cmd.Parameters.AddWithValue("@projectlistid", DBNull.Value);

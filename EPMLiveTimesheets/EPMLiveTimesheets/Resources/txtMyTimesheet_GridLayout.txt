@@ -28,6 +28,7 @@
 		<C Name="Edited" Type="Bool" Visible="0" CanFilter="0" CanGroup="0" CanHide="0" />
 		
 		<C Name="ItemTypeID" Visible="0" CanFilter="0" CanGroup="0" CanHide="0" />
+		<C Name="AssignedToID" Visible="0" CanFilter="0" CanGroup="0" CanHide="0" />
 		<C Name="TSEnabled" Visible="0" CanFilter="0" CanGroup="0" CanHide="0" />
 		<C Name="UID" Visible="0" CanFilter="0" CanGroup="0" CanHide="0" />
 		<C Name="ItemID" Visible="0" CanFilter="0" CanGroup="0" CanHide="0" />

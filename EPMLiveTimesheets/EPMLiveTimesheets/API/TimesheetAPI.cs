@@ -2990,7 +2990,7 @@ namespace TimeSheets
             {
                 if (!drAdded.Contains(drItem["LIST_UID"].ToString() + "." + drItem["ITEM_ID"].ToString()))
                 {
-                    sql = string.Format(@"SELECT * FROM dbo.LSTMyWork WHERE [AssignedToID] = -99 AND [SiteId] = N'{0}' AND LISTID = N'{1}' AND ITEMID=N'{2}'", web.Site.ID, drItem["LIST_UID"].ToString(), drItem["ITEM_ID"].ToString());
+                    sql = string.Format(@"SELECT * FROM dbo.LSTMyWork WHERE [AssignedToID] = {0} AND [SiteId] = N'{1}' AND LISTID = N'{2}' AND ITEMID=N'{3}'", Convert.ToString(drItem["ASSIGNEDTOID"]) == "" ? "-99" : Convert.ToString(drItem["ASSIGNEDTOID"]), web.Site.ID, drItem["LIST_UID"].ToString(), drItem["ITEM_ID"].ToString());
                     myWorkDataTable = rptData.ExecuteSql(sql);
 
 
@@ -3466,6 +3466,7 @@ namespace TimeSheets
             string webid = row["WebID"].ToString();
             string listid = row["ListID"].ToString();
             string itemid = row["ItemID"].ToString();
+            string assignedtoid = row["AssignedToID"].ToString();
 
             if (webid != "")
             {
@@ -3505,7 +3506,7 @@ namespace TimeSheets
                                         }
                                         catch { }
 
-                                        SqlCommand cmd = new SqlCommand("INSERT INTO TSITEM (TS_UID,TS_ITEM_UID,WEB_UID,LIST_UID,ITEM_ID,ITEM_TYPE,TITLE, PROJECT,PROJECT_ID, LIST,PROJECT_LIST_UID) VALUES(@tsuid,@uid,@webid,@listid,@itemid,1,@title,@project,@projectid,@list,@projectlistid)", cn);
+                                        SqlCommand cmd = new SqlCommand("INSERT INTO TSITEM (TS_UID,TS_ITEM_UID,WEB_UID,LIST_UID,ITEM_ID,ITEM_TYPE,TITLE, PROJECT,PROJECT_ID, LIST,PROJECT_LIST_UID,ASSIGNEDTOID) VALUES(@tsuid,@uid,@webid,@listid,@itemid,1,@title,@project,@projectid,@list,@projectlistid,@assignedtoid)", cn);
                                         cmd.Parameters.AddWithValue("@tsuid", tsuid);
                                         cmd.Parameters.AddWithValue("@uid", id);
                                         cmd.Parameters.AddWithValue("@webid", web.ID);
@@ -3513,6 +3514,7 @@ namespace TimeSheets
                                         cmd.Parameters.AddWithValue("@itemid", li.ID);
                                         cmd.Parameters.AddWithValue("@title", li["Title"].ToString());
                                         cmd.Parameters.AddWithValue("@list", list.Title);
+                                        cmd.Parameters.AddWithValue("@assignedtoid", assignedtoid);
                                         if (projectlist == "")
                                             cmd.Parameters.AddWithValue("@projectlistid", DBNull.Value);
                                         else
