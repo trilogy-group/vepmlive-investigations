@@ -2990,40 +2990,9 @@ namespace TimeSheets
             {
                 if (!drAdded.Contains(drItem["LIST_UID"].ToString() + "." + drItem["ITEM_ID"].ToString()))
                 {
-                    sql = string.Format(@"
-                                            Begin
-
-                                            Declare @isShared as bit
-                                            Declare @listTableName as nvarchar(1000)
-                                            Declare @param as nvarchar(1000)
-                                            Declare @sql as nvarchar(2000)
-
-                                            set @param = N'@isSharedOUT bit output';
-
-                                            Select @listTableName = TableName from RPTList where SiteId =N'{0}' AND RPTListId = N'{1}' 
-
-                                            set @sql = 'SELECT @isSharedOUT = (case when (charindex('','',cast(AssignedToID as nvarchar(max))) > 0 or (AssignedToID is null))  then 1 else 0 end)
-                                            FROM dbo.['+@listTableName+'] WHERE SiteId =N''{0}'' AND ListId = N''{1}'' AND ItemId={2}'
-
-                                            exec sp_executesql @sql,@param,@isSharedOUT=@isShared OUTPUT;
-
-                                            if(@isShared=1)
-                                            begin
-	                                            SELECT * FROM dbo.LSTMyWork WHERE [AssignedToID] = -99 AND [SiteId] =N'{0}' AND LISTID = N'{1}' AND ITEMID={2}
-                                            end
-                                            else
-                                            begin
-	                                            set @sql = 'SELECT my.* 
-	                                            FROM dbo.LSTMyWork my 
-	                                            inner join dbo.['+@listTableName+'] lsttable on lsttable.SiteId = my.SiteId and lsttable.ListId = my.ListId and lsttable.ItemId = my.ItemId
-	                                            WHERE my.AssignedToID = lsttable.AssignedToID AND my.SiteId =N''{0}'' AND my.ListId = N''{1}'' AND my.ItemId={2}'
-	
-	                                            exec sp_executesql @sql
-                                            end
-
-                                            End
-                                            ", web.Site.ID, drItem["LIST_UID"].ToString(), drItem["ITEM_ID"].ToString());
+                    sql = string.Format(@"SELECT * FROM dbo.LSTMyWork WHERE [AssignedToID] = -99 AND [SiteId] = N'{0}' AND LISTID = N'{1}' AND ITEMID=N'{2}'", web.Site.ID, drItem["LIST_UID"].ToString(), drItem["ITEM_ID"].ToString());
                     myWorkDataTable = rptData.ExecuteSql(sql);
+
 
                     if (myWorkDataTable.Rows.Count > 0)
                         ds.Tables[myworktableid].Rows.Add(myWorkDataTable.Rows[0].ItemArray);
