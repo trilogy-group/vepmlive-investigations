@@ -96,6 +96,7 @@ if not exists (select table_name from INFORMATION_SCHEMA.tables where table_name
 		[LIST] [varchar](255) NULL,
 		[APPROVAL_STATUS] [int] NOT NULL CONSTRAINT [DF_TSITEM_APPROVAL_STATUS]  DEFAULT ((0)),
 		PROJECT_LIST_UID uniqueidentifier NULL,
+		ASSIGNEDTOID int NULL,
 		CONSTRAINT [PK_TSITEM] PRIMARY KEY CLUSTERED 
 		(
 		[TS_ITEM_UID] ASC
@@ -123,6 +124,12 @@ else
 			ALTER TABLE TSITEM
 			ADD PROJECT_LIST_UID uniqueidentifier NULL
 			
+		end
+		if not exists (select column_name FROM INFORMATION_SCHEMA.COLUMNS where table_name = 'TSITEM' and column_name = 'ASSIGNEDTOID')
+		begin
+			Print '     Add Column ASSIGNEDTOID'
+			ALTER TABLE TSITEM
+			ADD ASSIGNEDTOID int NULL
 		end
 	end
 
