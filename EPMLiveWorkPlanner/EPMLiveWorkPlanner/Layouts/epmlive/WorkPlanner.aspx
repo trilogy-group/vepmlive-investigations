@@ -323,7 +323,7 @@
 
             var surl =  "<%=sWebUrl %>/_layouts/epmlive/workplannerwizard.aspx?dodialog=<%=Request["IsDlg"]%>&Planner=<%=sPlannerID %>&ID=<%=sItemID %>&PType=<%=sProjectType %>&listid=<%=sProjectListId %>&tasklistid=<%=sTaskListId%>&Source=<%=System.Web.HttpUtility.UrlEncode(Request["Source"]) %>";
 
-            var options = { url: surl, width: 450,  height:400, title: "Select Planner", dialogReturnValueCallback: showPlannerPopClose };
+            var options = { url: surl, width: 450, title: "Select Planner", dialogReturnValueCallback: showPlannerPopClose };
 
             SP.UI.ModalDialog.showModalDialog(options);
         }
