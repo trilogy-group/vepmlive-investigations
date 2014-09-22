@@ -225,7 +225,8 @@ namespace WorkEnginePPM.Events.DataSync
                             else
                             {
                                 foreach (Holiday newHoliday in holidaySchedule.Holidays.Where(newHoliday => newHoliday.Title.Equals((string)title, StringComparison.InvariantCultureIgnoreCase)
-                                    && Convert.ToDateTime(newHoliday.Date).Year.Equals(currentHolidayYear)))
+                                    && Convert.ToDateTime(newHoliday.Date).Year.Equals(currentHolidayYear)
+                                    && !properties.ListItemId.Equals(newHoliday.Id)))
                                 {
                                     duplicateHoliday = true;
                                     break;
