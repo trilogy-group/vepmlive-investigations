@@ -851,22 +851,22 @@ namespace EPMLiveCore.API
                                 }
                                 else
                                 {
-                                    try
-                                    {
-                                        tempuser = group.Users.GetByID(uv.LookupId);
-                                    }
-                                    catch { }
-                                    if (tempuser == null && arr.Contains(group.ID.ToString()))
-                                    {
-                                        group.AddUser(uv.User);
-                                    }
-                                    if (tempuser != null && !arr.Contains(group.ID.ToString()) && bIsTeamSecurityEnabled)
-                                    {
-                                        group.RemoveUser(uv.User);
-                                    }
+                                try
+                                {
+                                    tempuser = group.Users.GetByID(uv.LookupId);
+                                }
+                                catch { }
+                                if (tempuser == null && arr.Contains(group.ID.ToString()))
+                                {
+                                    group.AddUser(uv.User);
+                                }
+                                if (tempuser != null && !arr.Contains(group.ID.ToString()) && bIsTeamSecurityEnabled)
+                                {
+                                    group.RemoveUser(uv.User);
                                 }
                             }
                         }
+                    }
                     }
                     catch { }
                 }
@@ -1707,39 +1707,39 @@ namespace EPMLiveCore.API
 
                             if (valueHelper != null)
                             {
-                                List<string> fields = valueHelper.GetSecuredFields();
+                            List<string> fields = valueHelper.GetSecuredFields();
 
-                                // has security fields
-                                if (fields != null && fields.Count > 0)
+                            // has security fields
+                            if (fields != null && fields.Count > 0)
+                            {
+                                foreach (string fld in fields)
                                 {
-                                    foreach (string fld in fields)
+                                    SPFieldLookup lookup = null;
+                                    try
                                     {
-                                        SPFieldLookup lookup = null;
-                                        try
-                                        {
-                                            lookup = oList.Fields.GetFieldByInternalName(fld) as SPFieldLookup;
-                                        }
-                                        catch { }
+                                        lookup = oList.Fields.GetFieldByInternalName(fld) as SPFieldLookup;
+                                    }
+                                    catch { }
 
-                                        if (lookup == null) continue;
+                                    if (lookup == null) continue;
 
-                                        SPList lookupParentList = tWeb.Lists[new Guid(lookup.LookupList)];
+                                    SPList lookupParentList = tWeb.Lists[new Guid(lookup.LookupList)];
                                         GridGanttSettings parentListSettings = new GridGanttSettings(lookupParentList);
 
-                                        // skip fields with empty lookup values
-                                        string securityFieldValue = string.Empty;
+                                    // skip fields with empty lookup values
+                                    string securityFieldValue = string.Empty;
 
-                                        try { securityFieldValue = oLi[fld].ToString(); }
-                                        catch { }
+                                    try { securityFieldValue = oLi[fld].ToString(); }
+                                    catch { }
 
-                                        if (string.IsNullOrEmpty(securityFieldValue)) continue;
+                                    if (string.IsNullOrEmpty(securityFieldValue)) continue;
 
                                         SPFieldLookupValue lookupVal = new SPFieldLookupValue(securityFieldValue.ToString());
-                                        SPListItem parentListItem = lookupParentList.GetItemById(lookupVal.LookupId);
+                                    SPListItem parentListItem = lookupParentList.GetItemById(lookupVal.LookupId);
 
-                                        if (!parentListItem.HasUniqueRoleAssignments) continue;
+                                    if (!parentListItem.HasUniqueRoleAssignments) continue;
 
-                                        SPRoleAssignmentCollection raCol = parentListItem.RoleAssignments;
+                                    SPRoleAssignmentCollection raCol = parentListItem.RoleAssignments;
 
                                         foreach (SPRoleAssignment ra in raCol)
                                             lookupsSecurityGroups.Add(ra.Member.Name);
