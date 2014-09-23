@@ -207,5 +207,37 @@
 		</RenderPattern>
 	</FieldType>
 
+  <FieldType>
+    <Field Name="TypeName">RangeField</Field>
+    <Field Name="TypeDisplayName">Range</Field>
+    <Field Name="TypeShortDescription">Range</Field>
+    <Field Name="ParentType">Note</Field>
+    <Field Name="UserCreatable">TRUE</Field>
+    <Field Name="FieldTypeClass">EPMLiveCore.SPFields.RangeField, EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5</Field>
+    <Field Name="FieldEditorUserControl">/_ControlTemplates/RangeFieldSettings.ascx</Field>
+    <PropertySchema>
+      <Fields>
+        <Field Hidden="TRUE" MaxLength="255" DisplaySize="255" Type="Text" Name="LookupList" DisplayName="Lookup List"></Field>
+        <Field Hidden="TRUE" MaxLength="255" DisplaySize="255" Type="Text" Name="LookupField" DisplayName="Lookup Field"></Field>
+        <Field Hidden="TRUE" MaxLength="255" DisplaySize="255" Type="Text" Name="CategoryField" DisplayName="Category Field"></Field>
+        <Field Hidden="TRUE" Type="Number" Name="MaxRangeValue" DisplayName="Maximum Range Value"></Field>
+      </Fields>
+    </PropertySchema>
+    <RenderPattern Name="DisplayPattern">
+      <RenderPattern Name="DisplayPattern">
+        <Switch>
+          <Expr>
+            <Column />
+          </Expr>
+          <Case Value="" />
+          <Default>
+            <HTML><![CDATA[]]></HTML>
+            <Column HTMLEncode="TRUE" />
+          </Default>
+        </Switch>
+      </RenderPattern>
+    </RenderPattern>
+  </FieldType>
+
 	
 </FieldTypes>
