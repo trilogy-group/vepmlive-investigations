@@ -41,7 +41,7 @@ function Assignments() {
 function RemoveResources() {
     var tGrid = Grids.TeamGrid;
     var rGrid = Grids.ResourceGrid;
-    tGrid.UpdateHeights(1);
+
     for (var Row in tGrid.Rows) {
         try {
             var oRow = rGrid.GetRowById(Row);
