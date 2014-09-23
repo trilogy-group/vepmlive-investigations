@@ -125,12 +125,6 @@ else
 			ADD PROJECT_LIST_UID uniqueidentifier NULL
 			
 		end
-		if not exists (select column_name FROM INFORMATION_SCHEMA.COLUMNS where table_name = 'TSITEM' and column_name = 'ASSIGNEDTOID')
-		begin
-			Print '     Add Column ASSIGNEDTOID'
-			ALTER TABLE TSITEM
-			ADD ASSIGNEDTOID int NULL
-		end
 	end
 
 ------------------TABLE: TSITEMHOURS---------------------------------
