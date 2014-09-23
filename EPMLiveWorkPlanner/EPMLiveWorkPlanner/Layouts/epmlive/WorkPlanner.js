@@ -3203,7 +3203,39 @@ function CanRedo() {
 
 function Undo() {
     try {
-        Grids.WorkPlannerGrid.ActionUndo();
+        //Code for EPML 3720
+        var undoList = Grids.WorkPlannerGrid.DebugUndo();
+        //Need to split with ");" because if there are multiple resources then it is differenciate with ";".
+        var arrUndoList = undoList.split(");");
+        var lastRowId = null;
+        var repeateCounter = 0;
+        for (i = 2; arrUndoList.length >= i; i++) {
+            var finalString = arrUndoList[arrUndoList.length - i];
+            var currentRowId = finalString.substring(finalString.lastIndexOf("['") + 1, finalString.lastIndexOf("']"))
+            var rowId = currentRowId.replace("'", "");
+            if (rowId != null && rowId.indexOf('.') !== -1) {
+                Grids.WorkPlannerGrid.ActionUndo();
+            }
+            else {
+                if (lastRowId == rowId) {
+                    //Need to check this condition to not to remove Project Title.
+                    if (rowId != "0")
+                    {
+                        Grids.WorkPlannerGrid.ActionUndo();
+                        lastRowId = rowId;
+                    }
+                }
+                else {
+                    if (repeateCounter == 1)
+                        break;
+                    Grids.WorkPlannerGrid.ActionUndo();
+                    lastRowId = rowId;
+                    if (repeateCounter == 0)
+                    { repeateCounter = 1; }
+                }
+
+            }
+        }
     } catch (e) { }
     RefreshCommandUI();
 }
