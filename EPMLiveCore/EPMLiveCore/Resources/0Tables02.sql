@@ -16,9 +16,6 @@ if not exists (select table_name from INFORMATION_SCHEMA.tables where table_name
 else
 	begin
 		Print 'Updating Table TSUSER'
-
-		
-		
 	end
 ---------------TABLE: TSTIMESHEET----------------------
 if not exists (select table_name from INFORMATION_SCHEMA.tables where table_name = 'TSTIMESHEET')
