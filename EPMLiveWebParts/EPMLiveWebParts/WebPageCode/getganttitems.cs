@@ -244,27 +244,29 @@ namespace EPMLiveWebParts
                                 }
                                 break;
                             case SPFieldType.Choice:
-
-                                sType = "Enum";
+                                //sType = "Enum";
                                 {
+                                    //Reference: http://longboo.com/demo/ejs-treegrid/Doc/TypeEnum.htm
                                     string senum = "";
+                                    string senumrange = "";
 
                                     SPFieldChoice oCField = (SPFieldChoice)oField;
-                                    //foreach (string sChoice in oCField.Choices)
-                                    //{
-                                    //    senum += ";" + sChoice.Replace(";", "");
-                                    //}
 
+                                    //Used to prepare dropdown with field choice options
+                                    foreach (string sChoice in oCField.Choices)
+                                        senum += ";" + sChoice.Replace(";", "");
+
+                                    //Used to prepare count for an item
                                     for (int i = 0; i < oCField.Choices.Count; i++)
-                                        senum += ";" + i.ToString();
+                                        senumrange += ";" + i.ToString();
 
                                     attr = doc.CreateAttribute("Enum");
                                     attr.Value = senum;
                                     ndNew.Attributes.Append(attr);
 
-                                    //attr = doc.CreateAttribute("Range");
-                                    //attr.Value = "1";
-                                    //ndNew.Attributes.Append(attr);
+                                    attr = doc.CreateAttribute("Value");
+                                    attr.Value = senumrange;
+                                    ndNew.Attributes.Append(attr);
                                 }
                                 sWidth = "150";
                                 break;
