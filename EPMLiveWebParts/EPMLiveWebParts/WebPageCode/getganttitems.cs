@@ -134,6 +134,10 @@ namespace EPMLiveWebParts
                     attr.Value = oField.InternalName;
                     ndNew.Attributes.Append(attr);
 
+                    attr = doc.CreateAttribute("CaseSensitive");
+                    attr.Value = "0";
+                    ndNew.Attributes.Append(attr);
+
                     XmlDocument oDoc = new XmlDocument();
                     oDoc.LoadXml(oField.SchemaXml);
 
