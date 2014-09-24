@@ -8,8 +8,6 @@ function Assignments() {
 
     var sRows = rGrid.GetSelRows();
 
-
-
     for (var r in sRows) {
         var oSRow = sRows[r];
         sResources += "," + oSRow.id;
