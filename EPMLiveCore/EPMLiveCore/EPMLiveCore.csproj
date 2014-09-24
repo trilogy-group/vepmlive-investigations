@@ -32,6 +32,8 @@ net start "WETimer"</PostDeploymentCommand>
     <UpgradeBackupLocation>C:\Workspace\Upland\EPMLive\EPMLive2013Release\Release\EPMLiveCore\Backup3\</UpgradeBackupLocation>
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <WcfConfigValidationEnabled>True</WcfConfigValidationEnabled>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -4393,4 +4395,11 @@ net start "WETimer"</PostDeploymentCommand>
     <PreBuildEvent>del "$(TargetDir)$(TargetName).XmlSerializers.dll"
 del "$(ProjectDir)$(TargetName).XmlSerializers.dll"</PreBuildEvent>
   </PropertyGroup>
+  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('$(SolutionDir)\.nuget\NuGet.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\.nuget\NuGet.targets'))" />
+  </Target>
 </Project>

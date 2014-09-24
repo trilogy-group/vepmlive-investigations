@@ -17,6 +17,16 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EPMLiveCore", "EPMLiveCore\EPMLiveCore.csproj", "{C773AE44-F066-446A-9CBD-D24AFA794E34}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EPMLiveCore.Tests", "EPMLiveCore.Tests\EPMLiveCore.Tests.csproj", "{5704ED41-F33C-4C5F-9141-20340809C67A}"
+	ProjectSection(ProjectDependencies) = postProject
+		{C773AE44-F066-446A-9CBD-D24AFA794E34} = {C773AE44-F066-446A-9CBD-D24AFA794E34}
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{CE9D0EC3-2E3C-4E68-BE35-202068E782A6}"
+	ProjectSection(SolutionItems) = preProject
+		.nuget\NuGet.Config = .nuget\NuGet.Config
+		.nuget\NuGet.exe = .nuget\NuGet.exe
+		.nuget\NuGet.targets = .nuget\NuGet.targets
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution

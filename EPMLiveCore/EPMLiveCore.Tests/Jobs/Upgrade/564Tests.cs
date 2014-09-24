@@ -1,4 +1,6 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using FluentAssertions;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using SPEmulators;
 
 namespace EPMLiveCore.Tests.Jobs.Upgrade
 {
@@ -10,7 +12,13 @@ namespace EPMLiveCore.Tests.Jobs.Upgrade
         // Public Methods (1) 
 
         [TestMethod]
-        public void CS_OFF_ColumnShouldBeAddedTo_EPGP_CAPACITY_VALUES() { }
+        public void CS_OFF_ColumnShouldBeAddedTo_EPGP_CAPACITY_VALUES()
+        {
+            using (var context = new SPEmulationContext(IsolationLevel.Fake))
+            {
+                context.Web.Title.Should().Be("Munjal");
+            }
+        }
 
         #endregion Methods 
     }
