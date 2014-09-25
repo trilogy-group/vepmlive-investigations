@@ -137,6 +137,9 @@ WorkPlannerPageComponent.PageComponent.prototype = {
         else if (commandId === 'Ribbon.WorkPlanner.DoCreateNew') {
             DoCreateNew(properties["CommandValueId"], true);
         }
+        else if (commandId === 'Ribbon.WorkPlanner.CreateNew') {
+            return false;
+        }
         else if (commandId === 'Ribbon.WorkPlanner.DoCreateNewNoProject') {
             DoCreateNew(properties["CommandValueId"], false);
         }
