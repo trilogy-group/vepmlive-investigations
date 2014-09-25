@@ -135,7 +135,7 @@ namespace PortfolioEngineCore
             // Adding hidden column for note to be exported in excel
             xC = xLeftCols.CreateSubStruct("C");
             xC.CreateStringAttr("Name", "ExportNote");
-            xC.CreateStringAttr("Type", "Text");
+            xC.CreateStringAttr("Type", "Html");
             xC.CreateIntAttr("CanEdit", 0);
             xC.CreateIntAttr("CanMove", 0);
             xC.CreateIntAttr("CanHide", 1);
