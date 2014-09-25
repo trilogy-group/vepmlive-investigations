@@ -759,6 +759,10 @@ namespace EPMLiveCore
                     try
                     {
                         writer.WriteLine("<script language=\"javascript\">");
+                        writer.WriteLine("function checkSpecialCharacters(objectName,object){");
+                        writer.WriteLine("var checkPattern = /[\\|\\\\\"\'\\/\\[\\]\\:\\<\\>\\+\\=\\,\\;\\?\\*\\@]/");
+                        writer.WriteLine("if(checkPattern.test(object.value)) { alert(objectName + ' cannot contain any of the following characters ' + '| \\ \" \\' / [ ] : < > + = , ; ? * @'); object.value = ''; setTimeout(function(){object.focus();}, 1); }");
+                        writer.WriteLine("}");
                         writer.WriteLine("function cleanupfields(){");
                         try
                         {
@@ -856,7 +860,7 @@ namespace EPMLiveCore
                                 {
                                     try
                                     {
-                                        writer.WriteLine("      try{document.getElementById('" + dControls["Title"] + "').parentNode.parentNode.parentNode.style.display='';}catch(e){}");
+                                        writer.WriteLine("      try{document.getElementById('" + dControls["Title"] + "').parentNode.parentNode.parentNode.style.display='';document.getElementById('" + dControls["Title"] + "').onblur = function() { checkSpecialCharacters('Display Name',document.getElementById('" + dControls["Title"] + "')); }}catch(e){}");
                                     }
                                     catch { }
                                 }
