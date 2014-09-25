@@ -1465,6 +1465,12 @@
 
             SetPlannerFieldValue(row, col, val);
 
+            if(col == "Work" || col == "ActualWork"){
+                try {
+                    CalculateWorkPercentSpent(grid, row);
+                } catch (e) { }
+            }
+
             //CopySummaryField(col);
 
             //grid.DoFilter();
