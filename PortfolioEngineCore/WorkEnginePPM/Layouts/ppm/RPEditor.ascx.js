@@ -3841,6 +3841,8 @@
                         var val = 0;
                         if (html != "") val = 1;
                         this.plangrid.SetAttribute(planrow, null, "RowNote", val, 0, 0);
+                        // Updating hidden Note field which is used while exporting data to excel.
+                        this.plangrid.SetAttribute(planrow, null, "ExportNote", html, 0, 0);
                         this.SetRowNoteColumn(this.plangrid, planrow, 1);
                     }
                     this.dhxWins_CloseDialog("winRowNoteDlg");

@@ -125,10 +125,25 @@ namespace PortfolioEngineCore
             xC.CreateIntAttr("CanMove", 0);
             xC.CreateIntAttr("CanHide", 0);
             xC.CreateIntAttr("CanSort", 0);
+            // Disabling export for this as we have used hidden column for it.
+            xC.CreateIntAttr("CanExport", 0);
             xC.CreateIntAttr("CanResize", 0);
             xC.CreateIntAttr("ShowHint", 0);
             xC.CreateIntAttr("Width", 25);
             xHeader1.CreateStringAttr("Note", "");
+
+            // Adding hidden column for note to be exported in excel
+            xC = xLeftCols.CreateSubStruct("C");
+            xC.CreateStringAttr("Name", "ExportNote");
+            xC.CreateStringAttr("Type", "Text");
+            xC.CreateIntAttr("CanEdit", 0);
+            xC.CreateIntAttr("CanMove", 0);
+            xC.CreateIntAttr("CanHide", 1);
+            xC.CreateIntAttr("CanSort", 0);
+            xC.CreateIntAttr("CanResize", 0);
+            xC.CreateIntAttr("ShowHint", 0);
+            xC.CreateIntAttr("Width", 50);
+            xHeader1.CreateStringAttr("ExportNote", "Note");
 
             //xC = xLeftCols.CreateSubStruct("C");
             //xC.CreateStringAttr("Name", "RowEvent");
@@ -634,7 +649,11 @@ namespace PortfolioEngineCore
                         xI.CreateIntAttr("CanEdit", 1);
                         int lRowNoteUID = xPlanRow.GetInt("RowNoteUID");
                         if (lRowNoteUID > 0)
+                        {
                             xI.CreateIntAttr("RowNote", 1);
+                            // Populating hidden note field to be used while exporting to excel
+                            xI.CreateStringAttr("ExportNote", xPlanRow.GetString("RowNote_HTML"));
+                        }
                         int lLastEventContext = xPlanRow.GetInt("LastRowEvent");
                         if (lLastEventContext > 0)
                             xI.CreateIntAttr("LastRowEvent", lLastEventContext);
