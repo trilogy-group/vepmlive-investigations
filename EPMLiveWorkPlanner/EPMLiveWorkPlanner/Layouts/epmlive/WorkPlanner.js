@@ -794,6 +794,7 @@ function SaveProject() {
     try {
         MapProjectWorkField("ProjectWork", "Work");
         MapProjectWorkField("Work", "Work");
+        MapProjectWorkField("ProjectActualWork", "ActualWork");
     } catch (e) { }
     var x = Grids.ProjectInfo.GetXmlData("Body", "V");
     x = x.replace(/&/gi, "%26");
@@ -1198,7 +1199,7 @@ function IsAssignmentField(col) {
     switch (col) {
         case "ActualWork":
         case "PercentComplete":
-        case "RemainingWork":
+        case "RemainingWork": 
             return true;
     };
     return false;
@@ -1250,10 +1251,9 @@ function DoAssignmentRollDown(Grid, Row, Type, Col) {
         oChild = oChild.nextSibling;
     }
 
-    //try {
-    //    MapProjectWorkField("ProjectWork", "Work");
-    //}catch (e) { }
-    
+    try{ 
+        CalculateWorkPercentSpent(Grid, Row);
+    }catch(e) { }
 }
 
 function GetProperDateVal(val, oFromRow, c) {
@@ -2692,7 +2692,7 @@ function CheckUpdatesClose(loader) {
 
 
 function CopyRemainingWork(grid, row) {
-    var w = grid.GetValue(row, "Work");
+    var w = grid.GetValue(row, "Work"); 
     if (grid.GetValue(row, "RemainingWork") == oldWork || grid.GetValue(row, "RemainingWork") == "0") {
         try {
             grid.SetValue(row, "RemainingWork", w, 1, 0);
@@ -2831,12 +2831,10 @@ function Outdent() {
             row = Grids.WorkPlannerGrid.GetRowById(row.id);
 
             Grids.WorkPlannerGrid.MoveRow(row, row.parentNode.parentNode, row.parentNode.nextSibling, 1);
-
+            
             for (var s in oSiblings) {
                 Grids.WorkPlannerGrid.MoveRow(Grids.WorkPlannerGrid.GetRowById(oSiblings[s]), row, null, 1);
             }
-
-            //grid.MoveRow(row, row.parentNode.parentNode, null, 1);
 
 
         }
@@ -3557,6 +3555,26 @@ function isActiveRow(Row) {
     if (Grids.WorkPlannerGrid.FRow && Grids.WorkPlannerGrid.FRow.id == Row.id)
         return true;
     return false;
+}
+
+function CalculateWorkPercentSpent(grid, row) {
+    try{
+        var Work = 0;
+        var ActualWork = 0;
+        var WorkPercentSpent = 0;
+        Work = grid.GetValue(row, "Work");
+        ActualWork = grid.GetValue(row, "ActualWork");
+        if (Work != 0)
+        {
+            if (Work >= ActualWork)
+            {
+                WorkPercentSpent = (ActualWork / Work) * 100;
+                //WorkPercentSpent = parseInt(WorkPercentSpent) + '%';
+            }
+        }
+        grid.SetValue(row, "WorkPercentSpent", WorkPercentSpent, 1);
+        grid.RefreshCell(row, "WorkPercentSpent");
+    }catch (e) { }  
 }
 
 function CalculateAssignmentCosts(grid, row) {
