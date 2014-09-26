@@ -79,6 +79,7 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
             }
             else
             {
+                setupMsg = setupMsg.Replace("<br><br>", "<br>");
                 foreach (string message in setupMsg.Split(new[] {"<br>"}, StringSplitOptions.None))
                 {
                     LogMessage(message, 2);
