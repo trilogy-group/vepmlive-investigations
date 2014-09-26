@@ -44,7 +44,7 @@
     <sharepoint:menutemplate id="mtEventMenu" runat="server">
         <Sharepoint:MenuItemTemplate ID="MenuItemTemplate1" runat="server"
                                      Text="Cleanup" ImageUrl="images/EPMRefresh.gif"         
-                                     ClientOnClickUsingPostBackEvent = "__page,%NAME%_cleanup" Visible="false"
+                                     ClientOnClickUsingPostBackEvent = "__page,%NAME%_cleanup"
             >
         </Sharepoint:MenuItemTemplate>
         <Sharepoint:MenuItemTemplate ID="MenuItemTemplate2" runat="server"
