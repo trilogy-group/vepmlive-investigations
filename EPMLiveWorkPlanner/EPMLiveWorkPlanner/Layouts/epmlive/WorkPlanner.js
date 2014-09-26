@@ -37,7 +37,6 @@ var oLinkedTasks;
 
 var newtasktext = "Add New Task";
 
-
 function SetSplashText(text) {
 
     document.getElementById("divSplashInfo").innerHTML = text;
