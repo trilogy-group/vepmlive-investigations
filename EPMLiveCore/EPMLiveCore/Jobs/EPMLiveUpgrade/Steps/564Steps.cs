@@ -29,25 +29,18 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
 
                     string connectionString = CoreFunctions.getConnectionString(webAppId);
 
-                    using (var sqlConnection = new SqlConnection(connectionString))
+                    if (!CheckColumn(connectionString))
                     {
-                        sqlConnection.Open();
+                        AddColumn(connectionString);
+                        LogMessage("ASSIGNEDTOID column added", MessageKind.SUCCESS, 2);
 
-                        if (!CheckColumn(sqlConnection))
-                        {
-                            AddColumn(sqlConnection);
-                            LogMessage("ASSIGNEDTOID column added", MessageKind.SUCCESS, 2);
-
-                            PopulateColumn(connectionString,
-                                CoreFunctions.getReportingConnectionString(webAppId, Web.Site.ID));
-                            LogMessage("ASSIGNEDTOID column populated", MessageKind.SUCCESS, 2);
-                        }
-                        else
-                        {
-                            LogMessage("ASSIGNEDTOID column already exists", MessageKind.SKIPPED, 2);
-                        }
-
-                        sqlConnection.Close();
+                        PopulateColumn(connectionString,
+                            CoreFunctions.getReportingConnectionString(webAppId, Web.Site.ID));
+                        LogMessage("ASSIGNEDTOID column populated", MessageKind.SUCCESS, 2);
+                    }
+                    else
+                    {
+                        LogMessage("ASSIGNEDTOID column already exists", MessageKind.SKIPPED, 2);
                     }
                 }
                 catch (Exception exception)
@@ -63,11 +56,24 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
             return true;
         }
 
-        private void AddColumn(SqlConnection sqlConnection)
+        private void AddColumn(string connectionString)
         {
-            using (var sqlCommand = new SqlCommand("ALTER TABLE TSITEM ADD ASSIGNEDTOID int NULL", sqlConnection))
+            using (var sqlConnection = new SqlConnection(connectionString))
             {
-                sqlCommand.ExecuteNonQuery();
+                sqlConnection.Open();
+
+                try
+                {
+                    using (
+                        var sqlCommand = new SqlCommand("ALTER TABLE TSITEM ADD ASSIGNEDTOID int NULL", sqlConnection))
+                    {
+                        sqlCommand.ExecuteNonQuery();
+                    }
+                }
+                finally
+                {
+                    sqlConnection.Close();
+                }
             }
         }
 
@@ -79,7 +85,7 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
             using (
                 var sqlDataAdapter =
                     new SqlDataAdapter(
-                        "SELECT title,SiteId,WebId,ListId,ItemId,ProjectID,ProjectText,AssignedToText FROM ppmepmlive2013.dbo.LSTMyWork group by title,SiteId,WebId,ListId,ItemId,ProjectID,ProjectText,AssignedToText",
+                        "SELECT title,SiteId,WebId,ListId,ItemId,ProjectID,ProjectText,AssignedToText FROM dbo.LSTMyWork group by title,SiteId,WebId,ListId,ItemId,ProjectID,ProjectText,AssignedToText",
                         reportingCn))
             {
                 sqlDataAdapter.Fill(dtLstMyWork);
@@ -94,77 +100,93 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
                 sqlDataAdapter.Fill(dtToUpdate);
             }
 
-            using (var epmLiveConnection = new SqlConnection(epmLiveCn))
+            try
             {
-                epmLiveConnection.Open();
-                try
+                using (var sqlConnection = new SqlConnection(epmLiveCn))
                 {
-                    foreach (DataRow dataRow in dtToUpdate.Rows)
+                    try
                     {
-                        DataRow[] drs;
-                        if (Convert.ToString(dataRow["project_id"]) != "")
-                        {
-                            drs =
-                                dtLstMyWork.Select(
-                                    string.Format("WebId='{0}' and ListId='{1}' and ItemId={2} and ProjectID={3}",
-                                        dataRow["web_uid"], dataRow["list_uid"], dataRow["item_id"],
-                                        dataRow["project_id"]));
-                        }
-                        else
-                        {
-                            drs =
-                                dtLstMyWork.Select(string.Format("WebId='{0}' and ListId='{1}' and ItemId={2}",
-                                    dataRow["web_uid"], dataRow["list_uid"], dataRow["item_id"]));
-                        }
+                        sqlConnection.Open();
 
-                        if (drs.Length <= 0) continue;
-
-                        string resourceName = Convert.ToString(dataRow["resourcename"]);
-                        string assignedToText = Convert.ToString(drs[0]["AssignedToText"]);
-
-                        using (
-                            var sqlCommand =
-                                new SqlCommand(
-                                    "update tsitem set assignedtoid = @assignedtoid where web_uid = @web_uid and list_uid = @list_uid and item_id = @item_id and project_id = @project_id",
-                                    epmLiveConnection))
+                        foreach (DataRow dataRow in dtToUpdate.Rows)
                         {
-                            sqlCommand.CommandType = CommandType.Text;
-                            sqlCommand.Parameters.AddWithValue("@assignedtoid",
-                                assignedToText.Contains(resourceName) ? dataRow["user_id"] : DBNull.Value);
-                            sqlCommand.Parameters.AddWithValue("@web_uid", dataRow["web_uid"]);
-                            sqlCommand.Parameters.AddWithValue("@list_uid", dataRow["list_uid"]);
-                            sqlCommand.Parameters.AddWithValue("@item_id", dataRow["item_id"]);
-                            sqlCommand.Parameters.AddWithValue("@project_id", dataRow["project_id"]);
-                            int rows = sqlCommand.ExecuteNonQuery();
+                            DataRow[] drs;
+                            if (Convert.ToString(dataRow["project_id"]) != "")
+                            {
+                                drs =
+                                    dtLstMyWork.Select(
+                                        string.Format("WebId='{0}' and ListId='{1}' and ItemId={2} and ProjectID={3}",
+                                            dataRow["web_uid"], dataRow["list_uid"], dataRow["item_id"],
+                                            dataRow["project_id"]));
+                            }
+                            else
+                            {
+                                drs =
+                                    dtLstMyWork.Select(string.Format("WebId='{0}' and ListId='{1}' and ItemId={2}",
+                                        dataRow["web_uid"], dataRow["list_uid"], dataRow["item_id"]));
+                            }
+
+                            if (drs.Length <= 0) continue;
+
+                            string resourceName = Convert.ToString(dataRow["resourcename"]);
+                            string assignedToText = Convert.ToString(drs[0]["AssignedToText"]);
+
+                            using (
+                                var sqlCommand =
+                                    new SqlCommand(
+                                        "update tsitem set assignedtoid = @assignedtoid where web_uid = @web_uid and list_uid = @list_uid and item_id = @item_id and project_id = @project_id",
+                                        sqlConnection))
+                            {
+                                sqlCommand.CommandType = CommandType.Text;
+                                sqlCommand.Parameters.AddWithValue("@assignedtoid",
+                                    assignedToText.Contains(resourceName) ? dataRow["user_id"] : DBNull.Value);
+                                sqlCommand.Parameters.AddWithValue("@web_uid", dataRow["web_uid"]);
+                                sqlCommand.Parameters.AddWithValue("@list_uid", dataRow["list_uid"]);
+                                sqlCommand.Parameters.AddWithValue("@item_id", dataRow["item_id"]);
+                                sqlCommand.Parameters.AddWithValue("@project_id", dataRow["project_id"]);
+                                sqlCommand.ExecuteNonQuery();
+                            }
                         }
                     }
+                    finally
+                    {
+                        sqlConnection.Close();
+                    }
                 }
-                catch (Exception ex)
-                {
-                    throw ex;
-                }
-                finally
-                {
-                    epmLiveConnection.Close();
-                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
             }
         }
 
-        private bool CheckColumn(SqlConnection sqlConnection)
+        private bool CheckColumn(string connectionString)
         {
-            const string SQL = @"
+            using (var sqlConnection = new SqlConnection(connectionString))
+            {
+                try
+                {
+                    sqlConnection.Open();
+
+                    const string SQL = @"
                         IF NOT EXISTS(SELECT * FROM sys.columns WHERE [name] = N'ASSIGNEDTOID' AND [object_id] = OBJECT_ID(N'TSITEM'))
                         BEGIN
                             SELECT 1
                         END
                         ELSE SELECT 0";
 
-            using (var sqlCommand = new SqlCommand(SQL, sqlConnection))
-            {
-                SqlDataReader reader = sqlCommand.ExecuteReader();
-                while (reader.Read())
+                    using (var sqlCommand = new SqlCommand(SQL, sqlConnection))
+                    {
+                        SqlDataReader reader = sqlCommand.ExecuteReader();
+                        while (reader.Read())
+                        {
+                            return reader.GetInt32(0) != 1;
+                        }
+                    }
+                }
+                finally
                 {
-                    return reader.GetInt32(0) != 1;
+                    sqlConnection.Close();
                 }
             }
 
