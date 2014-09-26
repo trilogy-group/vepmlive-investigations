@@ -32,16 +32,16 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
                     if (!CheckColumn(connectionString))
                     {
                         AddColumn(connectionString);
-                        LogMessage("ASSIGNEDTOID column added", MessageKind.SUCCESS, 2);
-
-                        PopulateColumn(connectionString,
-                            CoreFunctions.getReportingConnectionString(webAppId, Web.Site.ID));
-                        LogMessage("ASSIGNEDTOID column populated", MessageKind.SUCCESS, 2);
+                        LogMessage("ASSIGNEDTOID column added", MessageKind.SUCCESS, 4);
                     }
                     else
                     {
-                        LogMessage("ASSIGNEDTOID column already exists", MessageKind.SKIPPED, 2);
+                        LogMessage("ASSIGNEDTOID column already exists", MessageKind.SKIPPED, 4);
                     }
+
+                    PopulateColumn(connectionString,
+                        CoreFunctions.getReportingConnectionString(webAppId, Web.Site.ID));
+                    LogMessage("ASSIGNEDTOID column populated", MessageKind.SUCCESS, 4);
                 }
                 catch (Exception exception)
                 {
@@ -239,17 +239,31 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
 
 		                    ALTER TABLE [dbo].[Logs] ADD  CONSTRAINT [DF_Logs_Id]  DEFAULT (newid()) FOR [Id]
 		                    ALTER TABLE [dbo].[Logs] ADD  CONSTRAINT [DF_Logs_DateTime]  DEFAULT (getdate()) FOR [DateTime]
-                    end";
+
+                            SELECT 1
+                        end
+                        else SELECT 0";
 
                     using (var sqlCommand = new SqlCommand(SQL, sqlConnection))
                     {
-                        sqlCommand.ExecuteNonQuery();
+                        SqlDataReader reader = sqlCommand.ExecuteReader();
+                        while (reader.Read())
+                        {
+                            if (reader.GetInt32(0) == 1)
+                            {
+                                LogMessage("Logging configured", MessageKind.SUCCESS, 2);
+                            }
+                            else
+                            {
+                                LogMessage("Logging is already configured", MessageKind.SKIPPED, 2);
+                            }
+
+                            break;
+                        }
                     }
 
                     sqlConnection.Close();
                 }
-
-                LogMessage("Logging configured", MessageKind.SUCCESS, 2);
             }
             catch (Exception exception)
             {
