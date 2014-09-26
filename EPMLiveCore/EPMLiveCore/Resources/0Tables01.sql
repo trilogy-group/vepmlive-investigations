@@ -940,6 +940,40 @@ begin
 
 end
 
+-----------------LOGS------------
+
+if not exists (select table_name from INFORMATION_SCHEMA.tables where table_name = 'Logs')
+	begin
+		
+		print 'Creating Table Logs'
+		
+		CREATE TABLE [dbo].[Logs](
+			[Id] [uniqueidentifier] NOT NULL,
+			[Component] [nvarchar](255) NOT NULL,
+			[Message] [nvarchar](max) NOT NULL,
+			[StackTrace] [nvarchar](max) NULL,
+			[Details] [nvarchar](max) NULL,
+			[Kind] [tinyint] NOT NULL,
+			[WebId] [uniqueidentifier] NULL,
+			[UserId] [int] NULL,
+			[DateTime] [datetime2](7) NOT NULL,
+		 CONSTRAINT [PK_Logs] PRIMARY KEY CLUSTERED 
+		(
+			[Id] ASC
+		)WITH (PAD_INDEX  = OFF, STATISTICS_NORECOMPUTE  = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS  = ON, ALLOW_PAGE_LOCKS  = ON) ON [PRIMARY]
+		) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+
+		ALTER TABLE [dbo].[Logs] ADD  CONSTRAINT [DF_Logs_Id]  DEFAULT (newid()) FOR [Id]
+		ALTER TABLE [dbo].[Logs] ADD  CONSTRAINT [DF_Logs_DateTime]  DEFAULT (getdate()) FOR [DateTime]
+end
+else
+begin
+
+	print 'Updating Table Logs'
+
+
+end
+
 -------------------------Constraints-----------------
 
 if not exists(select * from INFORMATION_SCHEMA.CONSTRAINT_COLUMN_USAGE where CONSTRAINT_NAME = 'FK_EPMLIVE_LOG_TIMERJOBS')

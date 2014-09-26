@@ -405,7 +405,10 @@ net start "WETimer"</PostDeploymentCommand>
     <Compile Include="Infrastructure\GridView\GridViewUtils.cs" />
     <Compile Include="Infrastructure\GridView\PersonalGridViewManager.cs" />
     <Compile Include="Infrastructure\Interfaces\IGridViewManager.cs" />
+    <Compile Include="Infrastructure\Interfaces\ILogger.cs" />
     <Compile Include="Infrastructure\Interfaces\ISPListItemManager.cs" />
+    <Compile Include="Infrastructure\Logging\Logger.cs" />
+    <Compile Include="Infrastructure\Logging\LogKind.cs" />
     <Compile Include="Infrastructure\Navigation\INavLinkProvider.cs" />
     <Compile Include="Infrastructure\Navigation\INavObject.cs" />
     <Compile Include="Infrastructure\Navigation\NavLink.cs" />
@@ -459,6 +462,7 @@ net start "WETimer"</PostDeploymentCommand>
     <Compile Include="Jobs\Notifications.cs" />
     <Compile Include="Jobs\ResourceImportJob.cs" />
     <Compile Include="Jobs\ResourcePlan.cs" />
+    <Compile Include="Jobs\RollupJob.cs" />
     <Compile Include="Jobs\SecurityUpdate.cs" />
     <Compile Include="Jobs\TimerFix.cs" />
     <Compile Include="Jobs\Upgrades\Steps\IStep.cs" />
