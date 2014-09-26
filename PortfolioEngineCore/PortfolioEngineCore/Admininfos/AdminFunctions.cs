@@ -462,14 +462,13 @@ namespace PortfolioEngineCore
                 oCommand.CommandType = CommandType.Text;
                 oCommand.ExecuteNonQuery();
 
-                sCommand = "INSERT Into EPGP_CAPACITY_VALUES (CB_ID,BD_PERIOD,WRES_ID,CS_AVAIL,CS_OFF)" +
-                            " Values (@CalID,@PerId,@WresId,@avail,@off)";
+                sCommand = "INSERT Into EPGP_CAPACITY_VALUES (CB_ID,BD_PERIOD,WRES_ID,CS_AVAIL)" +
+                            " Values (@CalID,@PerId,@WresId,@avail)";
                 oCommand = new SqlCommand(sCommand, dba.Connection, dba.Transaction);
                 oCommand.Parameters.AddWithValue("@CalID", calendar);
                 SqlParameter p_per = oCommand.Parameters.Add("@PerId", SqlDbType.Int);
                 SqlParameter p_res = oCommand.Parameters.Add("@WresId", SqlDbType.Int);
                 SqlParameter p_avail = oCommand.Parameters.Add("@avail", SqlDbType.Float);
-                SqlParameter p_off = oCommand.Parameters.Add("@off", SqlDbType.Float);
 
                 foreach (PfEResource resource in Resources)
                 {
@@ -485,7 +484,6 @@ namespace PortfolioEngineCore
                             p_per.Value = period.PeriodID;
                             p_res.Value = resource.WresID;
                             p_avail.Value = workhours.workhours(resource.WHGroupId, resource.HolGroupId, START, FINISH);
-                            p_off.Value = workhours.offhours(resource.WHGroupId, resource.HolGroupId, START, FINISH);
                             oCommand.ExecuteNonQuery();
                         }
                     }

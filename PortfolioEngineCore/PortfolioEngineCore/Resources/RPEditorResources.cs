@@ -412,28 +412,6 @@ namespace PortfolioEngineCore
                     }
                 }
                 {
-                    string sPeriods = xResource.GetString("AvailablePeriods");
-                    string[] aPeriod = sPeriods.Split(ch);
-                    string sPeriodHours = xResource.GetString("OffHours");
-                    string[] aPeriodHours = sPeriodHours.Split(ch);
-                    foreach (CStruct xPeriod in listPeriods)
-                    {
-                        string sId = xPeriod.GetStringAttr("ID");
-                        for (int i = 0; i < aPeriod.Length; i++)
-                        {
-                            if (sId == aPeriod[i])
-                            {
-
-                                double dbl = 0;
-                                string sHours = aPeriodHours[i].ToString();
-                                double.TryParse(sHours, out dbl);
-                                xI.CreateDoubleAttr("O" + sId, dbl);
-                                break;
-                            }
-                        }
-                    }
-                }
-                {
                     string sPeriods = xResource.GetString("CommittedPeriods");
                     string[] aPeriod = sPeriods.Split(ch);
                     string sPeriodHours = xResource.GetString("CommittedHours");
