@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data;
 using System.Data.SqlClient;
 using EPMLiveCore.Jobs.EPMLiveUpgrade.Infrastructure;
 using Microsoft.SharePoint;
@@ -18,7 +19,6 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
 
         public override bool Perform()
         {
-            bool success = false;
             Guid webAppId = Web.Site.WebApplication.Id;
 
             SPSecurity.RunWithElevatedPrivileges(() =>
@@ -38,7 +38,7 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
                             AddColumn(sqlConnection);
                             LogMessage("ASSIGNEDTOID column added", MessageKind.SUCCESS, 2);
 
-                            PopulateColumn(sqlConnection,
+                            PopulateColumn(connectionString,
                                 CoreFunctions.getReportingConnectionString(webAppId, Web.Site.ID));
                             LogMessage("ASSIGNEDTOID column populated", MessageKind.SUCCESS, 2);
                         }
@@ -57,11 +57,10 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
                         : exception.Message;
 
                     LogMessage(message, MessageKind.FAILURE, 4);
-                    success = false;
                 }
             });
 
-            return success;
+            return true;
         }
 
         private void AddColumn(SqlConnection sqlConnection)
@@ -72,15 +71,82 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
             }
         }
 
-        private void PopulateColumn(SqlConnection epmLiveConnection, string reportingCn)
+        private void PopulateColumn(string epmLiveCn, string reportingCn)
         {
-            using (var reportingConnection = new SqlConnection(reportingCn))
+            var dtLstMyWork = new DataTable();
+            var dtToUpdate = new DataTable();
+
+            using (
+                var sqlDataAdapter =
+                    new SqlDataAdapter(
+                        "SELECT title,SiteId,WebId,ListId,ItemId,ProjectID,ProjectText,AssignedToText FROM ppmepmlive2013.dbo.LSTMyWork group by title,SiteId,WebId,ListId,ItemId,ProjectID,ProjectText,AssignedToText",
+                        reportingCn))
             {
-                reportingConnection.Open();
+                sqlDataAdapter.Fill(dtLstMyWork);
+            }
 
-                // Put logic to transfer AssignedTo ID from reporting to epmlive TSITEMS here ...
+            using (
+                var sqlDataAdapter =
+                    new SqlDataAdapter(
+                        "Select tsi.WEB_UID, tsi.LIST_UID, tsi.ITEM_ID, tsi.PROJECT_ID, ts.TS_UID,tu.TSUSERUID,tu.USER_ID,ts.RESOURCENAME from TSITEM tsi inner join TSTIMESHEET ts on ts.TS_UID = tsi.TS_UID inner join TSUSER tu on tu.TSUSERUID = ts.TSUSER_UID",
+                        epmLiveCn))
+            {
+                sqlDataAdapter.Fill(dtToUpdate);
+            }
 
-                reportingConnection.Close();
+            using (var epmLiveConnection = new SqlConnection(epmLiveCn))
+            {
+                epmLiveConnection.Open();
+                try
+                {
+                    foreach (DataRow dataRow in dtToUpdate.Rows)
+                    {
+                        DataRow[] drs;
+                        if (Convert.ToString(dataRow["project_id"]) != "")
+                        {
+                            drs =
+                                dtLstMyWork.Select(
+                                    string.Format("WebId='{0}' and ListId='{1}' and ItemId={2} and ProjectID={3}",
+                                        dataRow["web_uid"], dataRow["list_uid"], dataRow["item_id"],
+                                        dataRow["project_id"]));
+                        }
+                        else
+                        {
+                            drs =
+                                dtLstMyWork.Select(string.Format("WebId='{0}' and ListId='{1}' and ItemId={2}",
+                                    dataRow["web_uid"], dataRow["list_uid"], dataRow["item_id"]));
+                        }
+
+                        if (drs.Length <= 0) continue;
+
+                        string resourceName = Convert.ToString(dataRow["resourcename"]);
+                        string assignedToText = Convert.ToString(drs[0]["AssignedToText"]);
+
+                        using (
+                            var sqlCommand =
+                                new SqlCommand(
+                                    "update tsitem set assignedtoid = @assignedtoid where web_uid = @web_uid and list_uid = @list_uid and item_id = @item_id and project_id = @project_id",
+                                    epmLiveConnection))
+                        {
+                            sqlCommand.CommandType = CommandType.Text;
+                            sqlCommand.Parameters.AddWithValue("@assignedtoid",
+                                assignedToText.Contains(resourceName) ? dataRow["user_id"] : DBNull.Value);
+                            sqlCommand.Parameters.AddWithValue("@web_uid", dataRow["web_uid"]);
+                            sqlCommand.Parameters.AddWithValue("@list_uid", dataRow["list_uid"]);
+                            sqlCommand.Parameters.AddWithValue("@item_id", dataRow["item_id"]);
+                            sqlCommand.Parameters.AddWithValue("@project_id", dataRow["project_id"]);
+                            int rows = sqlCommand.ExecuteNonQuery();
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw ex;
+                }
+                finally
+                {
+                    epmLiveConnection.Close();
+                }
             }
         }
 
