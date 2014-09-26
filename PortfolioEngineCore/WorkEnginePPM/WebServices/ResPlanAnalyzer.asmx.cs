@@ -8,6 +8,7 @@ using System.Web.Services;
 using System.Web.Services.Protocols;
 using System.Xml;
 using System.Security.Principal;
+using EPMLiveCore.Infrastructure.Logging;
 using ResourceValues;
 using RPADataCache;
 using System.Reflection;
@@ -35,6 +36,7 @@ namespace WorkEnginePPM
 
     public class ResPlanAnalyzer : System.Web.Services.WebService
     {
+        private const string COMPONENT_NAME = "Resource Plan Analyzer";
 
         private static string basePath;
         private static string ppmId;
@@ -1003,38 +1005,65 @@ namespace WorkEnginePPM
 
         public static string GetCapacityScenarioData(HttpContext Context, string sXML, RPAData RAData)
         {
-            WebAdmin.CapturePFEBaseInfo(out basePath, out username, out ppmId, out ppmCompany, out ppmDbConn, out securityLevel);
-            PortfolioEngineCore.CapacityScenarios rpcs = new CapacityScenarios(basePath, username, ppmId, ppmCompany, ppmDbConn, securityLevel);
-            //string sBaseInfo = WebAdmin.BuildBaseInfo(Context);
-            //PortfolioEngineCore.CapacityScenarios rpcs = new PortfolioEngineCore.CapacityScenarios(sBaseInfo);
-            string sRetXML = "";
-            int statusnum;
             CStruct xResult;
 
-            CStruct xExecute = new CStruct();
-            if (xExecute.LoadXML(sXML) == false)
+            using (var logger = new Logger(SPContext.Current.Web))
             {
-                return HandleError("GetCapacityScenarioData", 99999, "Invalid request xml");
-            }
+                try
+                {
+                    logger.LogMessage("Location: ResPlanAnalyzer.asmx.cs --> GetCapacityScenarioData",
+                        COMPONENT_NAME, LogKind.Info, "[DATA] sXML: " + sXML);
 
-            int csid = xExecute.GetIntAttr("ID");
-            int csmode = xExecute.GetIntAttr("MODE");
+                    logger.LogMessage("Capturing PFE base info", COMPONENT_NAME, LogKind.Info);
+                    WebAdmin.CapturePFEBaseInfo(out basePath, out username, out ppmId, out ppmCompany, out ppmDbConn,
+                        out securityLevel);
 
-            if (rpcs.GetCapacityScenarioValuesXML(csid, out sRetXML, out statusnum) == false)
-            {
-                xResult = BuildResultXML("GetCapacityScenarioData", statusnum);
-                xResult.AppendXML(sRetXML);
+                    logger.LogMessage("Initializing Capacity Scenarios", COMPONENT_NAME, LogKind.Info);
+                    var rpcs = new CapacityScenarios(basePath, username, ppmId, ppmCompany, ppmDbConn, securityLevel);
+
+                    //string sBaseInfo = WebAdmin.BuildBaseInfo(Context);
+                    //PortfolioEngineCore.CapacityScenarios rpcs = new PortfolioEngineCore.CapacityScenarios(sBaseInfo);
+
+                    string sRetXml;
+                    int statusnum;
+
+                    var xExecute = new CStruct();
+                    if (xExecute.LoadXML(sXML) == false)
+                    {
+                        logger.LogMessage("Invalid request XML", COMPONENT_NAME, LogKind.Warning);
+                        return HandleError("GetCapacityScenarioData", 99999, "Invalid request xml");
+                    }
+
+                    int csid = xExecute.GetIntAttr("ID");
+                    int csmode = xExecute.GetIntAttr("MODE");
+
+                    if (rpcs.GetCapacityScenarioValuesXML(csid, out sRetXml, out statusnum) == false)
+                    {
+                        logger.LogMessage("Cannot get Capacity Scenario values", COMPONENT_NAME, LogKind.Warning,
+                            string.Format(@"[DATA] StatusNum: {0}, Return XML: {1}", statusnum, sRetXml));
+
+                        xResult = BuildResultXML("GetCapacityScenarioData", statusnum);
+                        xResult.AppendXML(sRetXml);
+                        return xResult.XML();
+                    }
+
+                    logger.LogMessage("Getting Capacity Scenario values was successful", COMPONENT_NAME, LogKind.Info);
+
+                    xResult = BuildResultXML("GetCapacityScenarioData", 0);
+                    xResult.AppendXML(RAData.PrepareCSGrid(sRetXml, csmode));
+
+                    logger.LogMessage("Return XML prepared", COMPONENT_NAME, LogKind.Info);
+
+                    return xResult.XML();
+                }
+                catch (Exception exception)
+                {
+                    logger.LogMessage(exception, COMPONENT_NAME);
+                }
+
+                xResult = BuildResultXML("GetCapacityScenarioData", -99);
                 return xResult.XML();
-
             }
-
-            
-
-            xResult = BuildResultXML("GetCapacityScenarioData", 0);
-            xResult.AppendXML(RAData.PrepareCSGrid(sRetXML, csmode));
-            return xResult.XML();
-
-
         }
 
         public static string GetCapacityScenarioEdit(HttpContext Context, string sXML, RPAData RAData)
