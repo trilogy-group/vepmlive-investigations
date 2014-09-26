@@ -144,6 +144,7 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
                                 sqlCommand.Parameters.AddWithValue("@list_uid", dataRow["list_uid"]);
                                 sqlCommand.Parameters.AddWithValue("@item_id", dataRow["item_id"]);
                                 sqlCommand.Parameters.AddWithValue("@project_id", dataRow["project_id"]);
+
                                 sqlCommand.ExecuteNonQuery();
                             }
                         }
