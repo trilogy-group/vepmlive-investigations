@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Data.SqlClient;
 using System.Reflection;
+using EPMLiveCore.Infrastructure;
 using EPMLiveCore.Jobs.EPMLiveUpgrade.Infrastructure;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.Utilities;
@@ -11,9 +13,7 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
     {
         #region Constructors (1) 
 
-        public UpgradePfeDb(SPWeb spWeb, bool isPfeSite) : base(spWeb, isPfeSite)
-        {
-        }
+        public UpgradePfeDb(SPWeb spWeb, bool isPfeSite) : base(spWeb, isPfeSite) { }
 
         #endregion Constructors 
 
@@ -88,5 +88,56 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
         }
 
         #endregion Methods 
+    }
+
+    [UpgradeStep(Version = EPMLiveVersion.GENERIC, Order = 100.0, Description = "Updating EPM Live Version")]
+    internal class UpdateVersion : UpgradeStep
+    {
+        #region Fields (1) 
+
+        private const string VERSION_SQL = "INSERT INTO VERSION (VERSION, dtInstalled) VALUES (@Version, @DateTime)";
+
+        #endregion Fields 
+
+        #region Constructors (1) 
+
+        public UpdateVersion(SPWeb spWeb, bool isPfeSite) : base(spWeb, isPfeSite) { }
+
+        #endregion Constructors 
+
+        #region Overrides of UpgradeStep
+
+        public override bool Perform()
+        {
+            try
+            {
+                string connectionString = CoreFunctions.getConnectionString(Web.Site.WebApplication.Id);
+                using (var sqlConnection = new SqlConnection(connectionString))
+                {
+                    try
+                    {
+                        sqlConnection.Open();
+
+                        using (var sqlCommand = new SqlCommand(VERSION_SQL, sqlConnection))
+                        {
+                            sqlCommand.Parameters.AddWithValue("@Version", EPMLiveScriptManager.FileVersion);
+                            sqlCommand.Parameters.AddWithValue("@DateTime", DateTime.UtcNow);
+                        }
+                    }
+                    finally
+                    {
+                        sqlConnection.Close();
+                    }
+                }
+            }
+            catch (Exception exception)
+            {
+                LogMessage(exception.Message, MessageKind.FAILURE, 2);
+            }
+
+            return false;
+        }
+
+        #endregion
     }
 }
