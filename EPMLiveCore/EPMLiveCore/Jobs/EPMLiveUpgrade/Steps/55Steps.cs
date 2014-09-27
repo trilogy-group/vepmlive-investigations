@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Linq;
 using System.Net;
 using EPMLiveCore.Infrastructure;
 using EPMLiveCore.Jobs.EPMLiveUpgrade.Infrastructure;
 using Microsoft.SharePoint;
+using Microsoft.SharePoint.Client;
 
 namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
 {
@@ -92,6 +94,22 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
                             spList.Hidden = true;
                             spList.AllowDeletion = false;
                             spList.Update();
+
+                            LogMessage(null, MessageKind.SUCCESS, 4);
+
+                            SPList appList = spWeb.Lists["Installed Applications"];
+                            SPListItemCollection apps = appList.Items;
+                            var tsAppExists = apps.Cast<SPListItem>().Any(app => app.Title.Equals("Timesheets"));
+
+                            if (tsAppExists) return;
+
+                            LogMessage("The Timesheets app is not installed", 2);
+                            LogMessage("Removing the Timesheets link from the navigation", 3);
+
+                            SPList settingsList = spWeb.Lists[SETTINGS_LIST];
+                            SPListItem tsItem = settingsList.GetItemById(90);
+                            tsItem.Delete();
+                            settingsList.Update();
 
                             LogMessage(null, MessageKind.SUCCESS, 4);
                         }

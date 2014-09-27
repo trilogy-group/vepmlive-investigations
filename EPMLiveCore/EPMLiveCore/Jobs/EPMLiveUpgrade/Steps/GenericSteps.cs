@@ -95,7 +95,7 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
     {
         #region Fields (1) 
 
-        private const string VERSION_SQL = "INSERT INTO VERSION (VERSION, dtInstalled) VALUES (@Version, @DateTime)";
+        private const string VERSION_SQL = "INSERT INTO VERSIONS (VERSION, dtInstalled) VALUES (@Version, @DateTime)";
 
         #endregion Fields 
 
@@ -111,6 +111,9 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
         {
             try
             {
+                string epmLiveVersion = EPMLiveScriptManager.FileVersion;
+                LogMessage("Setting EPM Live version to: " + epmLiveVersion, 2);
+
                 string connectionString = CoreFunctions.getConnectionString(Web.Site.WebApplication.Id);
                 using (var sqlConnection = new SqlConnection(connectionString))
                 {
@@ -120,8 +123,12 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
 
                         using (var sqlCommand = new SqlCommand(VERSION_SQL, sqlConnection))
                         {
-                            sqlCommand.Parameters.AddWithValue("@Version", EPMLiveScriptManager.FileVersion);
+                            sqlCommand.Parameters.AddWithValue("@Version", epmLiveVersion);
                             sqlCommand.Parameters.AddWithValue("@DateTime", DateTime.UtcNow);
+
+                            sqlCommand.ExecuteNonQuery();
+
+                            LogMessage(null, MessageKind.SUCCESS, 4);
                         }
                     }
                     finally
