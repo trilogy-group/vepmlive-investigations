@@ -29,7 +29,7 @@ namespace EPMLiveCore.Infrastructure.Logging
         public Logger(SPWeb web) : this(web, web.CurrentUser.ID)
         {
             _sqlConnection = new SqlConnection(CoreFunctions.getConnectionString(_webAppId));
-            _sqlConnection.Open();
+            SPSecurity.RunWithElevatedPrivileges(() => _sqlConnection.Open());
         }
 
         ~Logger()
@@ -65,11 +65,13 @@ namespace EPMLiveCore.Infrastructure.Logging
             {
                 sqlCommand.Parameters.AddWithValue("@Component", component);
                 sqlCommand.Parameters.AddWithValue("@Message", message);
-                sqlCommand.Parameters.AddWithValue("@Message", details);
-                sqlCommand.Parameters.AddWithValue("@StackTrace", stackTrace);
                 sqlCommand.Parameters.AddWithValue("@Kind", kind);
                 sqlCommand.Parameters.AddWithValue("@WebId", _webId);
                 sqlCommand.Parameters.AddWithValue("@UserId", _userId);
+                sqlCommand.Parameters.AddWithValue("@Details",
+                    string.IsNullOrEmpty(stackTrace) ? DBNull.Value : (object) details);
+                sqlCommand.Parameters.AddWithValue("@StackTrace",
+                    string.IsNullOrEmpty(stackTrace) ? DBNull.Value : (object) stackTrace);
 
                 sqlCommand.ExecuteNonQuery();
             }
