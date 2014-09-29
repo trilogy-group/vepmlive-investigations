@@ -1288,8 +1288,10 @@ net start "WETimer"</PostDeploymentCommand>
     <Compile Include="SocialEngine\Events\SocialEngineEvents.cs" />
     <Compile Include="SocialEngine\Events\WebEventReceiver\WebEventReceiver.cs" />
     <Compile Include="SocialEngine\Modules\DataDecorator.cs" />
+    <Compile Include="SocialEngine\Modules\GlobalValidator.cs" />
     <Compile Include="SocialEngine\Modules\List.cs" />
     <Compile Include="SocialEngine\Modules\ListItem.cs" />
+    <Compile Include="SocialEngine\Modules\StatusUpdate.cs" />
     <Compile Include="SocialEngine\Modules\Workspace.cs" />
     <Compile Include="SocialEngine\SocialEngine.cs" />
     <Compile Include="SocialEngine\SocialEngineProxy.cs" />
