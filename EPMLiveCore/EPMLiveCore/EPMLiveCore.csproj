@@ -1363,14 +1363,17 @@ net start "WETimer"</PostDeploymentCommand>
       <DesignTime>True</DesignTime>
       <DependentUpon>Reference.map</DependentUpon>
     </Compile>
+    <Compile Include="Web References\DevStoreSolutionStore\Reference.cs" />
     <Compile Include="Web References\FeatureActivationSvc\Reference.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Reference.map</DependentUpon>
     </Compile>
+    <Compile Include="Web References\ProductionStore\Reference.cs" />
     <Compile Include="Web References\SalesforceApexService\Reference.cs" />
     <Compile Include="Web References\SalesforceMetadataService\Reference.cs" />
     <Compile Include="Web References\SalesforcePartnerService\Reference.cs" />
+    <Compile Include="Web References\SPAuthentication\Reference.cs" />
     <Compile Include="Web References\SSRS2005\Reference.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -1381,6 +1384,7 @@ net start "WETimer"</PostDeploymentCommand>
       <DesignTime>True</DesignTime>
       <DependentUpon>Reference.map</DependentUpon>
     </Compile>
+    <Compile Include="Web References\UplandPlatformAPI\Reference.cs" />
     <Compile Include="Web References\WorkEngineService\Reference.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -1747,6 +1751,7 @@ net start "WETimer"</PostDeploymentCommand>
     <None Include="Layouts\epmlive\Project1.mpp" />
     <None Include="Layouts\epmlive\stylesheets\controls\navigation\epmnav.chrome.less" />
     <None Include="Layouts\epmlive\stylesheets\controls\navigation\epmnav.less" />
+    <None Include="Layouts\epmlive\stylesheets\epmlive.css.map" />
     <None Include="Layouts\epmlive\stylesheets\epmlive.less" />
     <None Include="Layouts\epmlive\stylesheets\epmliveToolBar.css.map" />
     <None Include="Layouts\epmlive\stylesheets\epmliveToolBar.less" />
@@ -1850,11 +1855,15 @@ net start "WETimer"</PostDeploymentCommand>
       <Generator>MSDiscoCodeGenerator</Generator>
       <LastGenOutput>Reference.cs</LastGenOutput>
     </None>
+    <None Include="Web References\DevStoreSolutionStore\lists.wsdl" />
+    <None Include="Web References\DevStoreSolutionStore\Reference.map" />
     <None Include="Web References\FeatureActivationSvc\Reference.map">
       <Generator>MSDiscoCodeGenerator</Generator>
       <LastGenOutput>Reference.cs</LastGenOutput>
     </None>
     <None Include="Web References\FeatureActivationSvc\service.wsdl" />
+    <None Include="Web References\ProductionStore\lists.wsdl" />
+    <None Include="Web References\ProductionStore\Reference.map" />
     <None Include="Web References\SalesforceApexService\apex.wsdl" />
     <None Include="Web References\SalesforceApexService\CompileAndTestResult.datasource" />
     <None Include="Web References\SalesforceApexService\CompileClassResult.datasource" />
@@ -1900,6 +1909,10 @@ net start "WETimer"</PostDeploymentCommand>
     <None Include="Web References\SalesforcePartnerService\sObject.datasource" />
     <None Include="Web References\SalesforcePartnerService\UndeleteResult.datasource" />
     <None Include="Web References\SalesforcePartnerService\UpsertResult.datasource" />
+    <None Include="Web References\SPAuthentication\authentication.wsdl" />
+    <None Include="Web References\SPAuthentication\AuthenticationMode.datasource" />
+    <None Include="Web References\SPAuthentication\LoginResult.datasource" />
+    <None Include="Web References\SPAuthentication\Reference.map" />
     <None Include="Web References\SSRS2005\ActiveState.datasource">
       <DependentUpon>Reference.map</DependentUpon>
     </None>
@@ -2090,6 +2103,8 @@ net start "WETimer"</PostDeploymentCommand>
     <None Include="Web References\SSRS2006\Warning.datasource">
       <DependentUpon>Reference.map</DependentUpon>
     </None>
+    <None Include="Web References\UplandPlatformAPI\Integration.wsdl" />
+    <None Include="Web References\UplandPlatformAPI\Reference.map" />
     <None Include="Web References\WorkEngineService\Reference.map">
       <Generator>MSDiscoCodeGenerator</Generator>
       <LastGenOutput>Reference.cs</LastGenOutput>
@@ -3626,8 +3641,6 @@ net start "WETimer"</PostDeploymentCommand>
     <Content Include="Layouts\epmlive\stylesheets\masterpages\opensans.ie.css" />
     <Content Include="Layouts\epmlive\stylesheets\masterpages\opensans.ie.min.css" />
     <Content Include="Layouts\epmlive\stylesheets\masterpages\opensans.min.css" />
-    <Content Include="Layouts\epmlive\stylesheets\masterpages\upland.icons.css" />
-    <Content Include="Layouts\epmlive\stylesheets\masterpages\upland.icons.min.css" />
     <Content Include="Layouts\epmlive\stylesheets\masterpages\UplandV5.css" />
     <Content Include="Layouts\epmlive\stylesheets\masterpages\UplandV5.min.css" />
     <Content Include="Layouts\epmlive\stylesheets\notifications.css" />
@@ -4001,6 +4014,9 @@ net start "WETimer"</PostDeploymentCommand>
     <Content Include="UplandV5\Elements.xml" />
     <Content Include="ViewPermissions\Elements.xml" />
     <Content Include="ViewSelectorDelegate\Elements.xml" />
+    <Content Include="Web References\DevStoreSolutionStore\lists.disco" />
+    <Content Include="Web References\ProductionStore\lists.disco" />
+    <Content Include="Web References\UplandPlatformAPI\Integration.disco" />
     <Content Include="WorkEngineActivation\Elements.xml" />
     <Content Include="WorkEngineApps\Elements.xml" />
     <Content Include="WorkEngineApps\Schema.xml" />
