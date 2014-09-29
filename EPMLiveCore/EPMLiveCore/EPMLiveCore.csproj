@@ -191,6 +191,7 @@ net start "WETimer"</PostDeploymentCommand>
     <Compile Include="API\Notification\Notification.cs" />
     <Compile Include="API\Personalization.cs" />
     <Compile Include="API\PersonalizationManager.cs" />
+    <Compile Include="API\PlatformIntegration.cs" />
     <Compile Include="API\PropertyHash.cs" />
     <Compile Include="API\Publish\APIPublish.cs" />
     <Compile Include="API\Reporting\Reporting.cs" />
@@ -1244,6 +1245,7 @@ net start "WETimer"</PostDeploymentCommand>
     <Compile Include="NotificationCounter.cs" />
     <Compile Include="NotificationCounterV2.cs" />
     <Compile Include="NotificationEvent.cs" />
+    <Compile Include="PlatformIntegrationEvent.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -1261,8 +1263,11 @@ net start "WETimer"</PostDeploymentCommand>
     <Compile Include="ResourcePoolEvent\ResourcePoolEvent.cs" />
     <Compile Include="ResourceTools.cs" />
     <Compile Include="Security.cs" />
-    <Compile Include="Services\DataContracts\SocialEngine\DailyActivities.cs" />
+    <Compile Include="Services\DataContracts\SocialEngine\Creatables.cs" />
+    <Compile Include="Services\DataContracts\SocialEngine\Error.cs" />
+    <Compile Include="Services\DataContracts\SocialEngine\Logs.cs" />
     <Compile Include="Services\DataContracts\SocialEngine\SEActivities.cs" />
+    <Compile Include="Services\DataContracts\SocialEngine\Webs.cs" />
     <Compile Include="Services\SocialEngine.svc.cs">
       <DependentUpon>SocialEngine.svc</DependentUpon>
     </Compile>
