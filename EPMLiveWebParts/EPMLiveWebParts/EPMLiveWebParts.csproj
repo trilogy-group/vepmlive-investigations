@@ -237,6 +237,12 @@
     <Compile Include="GridListView\GridSession.cs" />
     <Compile Include="IntegrationModuleDisplay\IntegrationModuleDisplay.cs" />
     <Compile Include="IReportID.cs" />
+    <Compile Include="Layouts\epmlive\Admin\SSLogs.aspx.cs">
+      <DependentUpon>SSLogs.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\Admin\SSLogs.aspx.designer.cs">
+      <DependentUpon>SSLogs.aspx.cs</DependentUpon>
+    </Compile>
     <Compile Include="Layouts\epmlive\AssignmentPlanner.aspx.cs">
       <DependentUpon>AssignmentPlanner.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -487,6 +493,7 @@
     <None Include="AssociatedItems\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{b8018cf5-92b1-456e-8a3d-f694e56a432c}</SharePointProjectItemId>
     </None>
+    <None Include="Layouts\epmlive\javascripts\GanttGrid.min.js.map" />
     <None Include="MyWorkSummary\MyWorkSummary.webpart">
       <SubType>Designer</SubType>
     </None>
@@ -855,9 +862,12 @@
       <Generator>SharePointWebPartCodeGenerator</Generator>
       <LastGenOutput>FancyDisplayForm.ascx.g.cs</LastGenOutput>
     </Content>
+    <Content Include="Layouts\epmlive\Admin\SSLogs.aspx" />
     <Content Include="Layouts\epmlive\images\Ribbon\import-costs-16.png" />
     <Content Include="Layouts\epmlive\images\Ribbon\import-costs-32.png" />
     <Content Include="Layouts\epmlive\images\User.png" />
+    <Content Include="Layouts\epmlive\javascripts\GanttGrid.js" />
+    <Content Include="Layouts\epmlive\javascripts\GanttGrid.min.js" />
     <Content Include="MyWorkSummary\MyWorkSummary.ascx">
       <Generator>SharePointWebPartCodeGenerator</Generator>
       <LastGenOutput>MyWorkSummary.ascx.g.cs</LastGenOutput>
