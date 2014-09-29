@@ -234,6 +234,7 @@
     <Compile Include="GridListView\GridDelegates.cs" />
     <Compile Include="GridListView\GridListView.cs" />
     <Compile Include="GridListView\GridListViewToolpart.cs" />
+    <Compile Include="GridListView\GridSession.cs" />
     <Compile Include="IntegrationModuleDisplay\IntegrationModuleDisplay.cs" />
     <Compile Include="IReportID.cs" />
     <Compile Include="Layouts\epmlive\AssignmentPlanner.aspx.cs">
