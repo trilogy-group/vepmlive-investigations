@@ -6,16 +6,12 @@ using System.Xml;
 using System.Data;
 using System.Globalization;
 using System.Data.SqlClient;
-using EPMLiveCore.Infrastructure.Logging;
-using EPMLiveCore.Layouts.epmlive.Integration;
-using Microsoft.SharePoint;
 
 
 namespace PortfolioEngineCore
 {
     public class CapacityScenarios : PFEBase
     {
-        private const string COMPONENT_NAME = "Capacity Scenarios";
 
         #region Fields (1)
 
@@ -229,187 +225,153 @@ oCommand = new SqlCommand(cmdText, _sqlConnection);
      }
 
 
-      public bool GetCapacityScenarioValuesXML(int iCapacityID, Guid webId, int userId, out string sReply, out int statusvalue)
+      public bool GetCapacityScenarioValuesXML(int iCapacityID, out string sReply, out int statusvalue)
       {
+          if (_sqlConnection.State == ConnectionState.Open) _sqlConnection.Close();
+          _sqlConnection.Open(); 
+          
           sReply = "";
           statusvalue = 0;
 
-          using (var logger = new Logger(webId, userId))
+          CStruct xCSA = new CStruct();
+          xCSA.Initialize("CapacityScenarioValues");
+
+          CStruct xError;
+          CStruct xCSValues;
+          CStruct xNode;
+          xError = xCSA.CreateSubStruct("Error");
+
+          if (iCapacityID < -1)
           {
-              try
-              {
-                  logger.LogMessage("CapacityScenarios --> GetCapacityScenarioValuesXML", COMPONENT_NAME, LogKind.Info);
+              xError.CreateIntAttr("Value", 100);
+              xError.CreateStringAttr("Desc", "Requested Capacity Scenario ID was less than -1");
 
-                  if (_sqlConnection.State == ConnectionState.Open) _sqlConnection.Close();
-                  _sqlConnection.Open();
-
-                  logger.LogMessage("Initializing Capacity Scenario Values with Capacity ID: " + iCapacityID + "...",
-                      COMPONENT_NAME, LogKind.Info);
-
-                  CStruct xCSA = new CStruct();
-                  xCSA.Initialize("CapacityScenarioValues");
-
-                  CStruct xError;
-                  CStruct xCSValues;
-                  CStruct xNode;
-                  xError = xCSA.CreateSubStruct("Error");
-
-                  if (iCapacityID < -1)
-                  {
-                      logger.LogMessage("Requested Capacity Scenario ID was less than -1. Not processing anymore.", COMPONENT_NAME, LogKind.Info);
-
-                      xError.CreateIntAttr("Value", 100);
-                      xError.CreateStringAttr("Desc", "Requested Capacity Scenario ID was less than -1");
-
-                      //    _dba.Status = StatusEnum.rsRequestInvalidParameter;
-                      statusvalue = (int) StatusEnum.rsPIResourceCalendarNotSet;
-                      sReply = xCSA.XML();
-                      return false;
-                  }
-
-                  string cmdText = "SELECT ADM_PORT_COMMITMENTS_CB_ID  FROM EPG_ADMIN";
-
-                  logger.LogMessage("Executing query: " + cmdText, COMPONENT_NAME, LogKind.Info);
-
-                  SqlCommand oCommand = new SqlCommand(cmdText, _sqlConnection);
-                  SqlDataReader reader = oCommand.ExecuteReader();
-                  int CalID = 0;
-                  bool bIsNull = false;
-
-                  while (reader.Read())
-                  {
-                      CalID = DBAccess.ReadIntValue(reader["ADM_PORT_COMMITMENTS_CB_ID"], out bIsNull);
-
-                      if (bIsNull)
-                          CalID = -1;
-                  }
-
-                  reader.Close();
-
-                  logger.LogMessage("Cal ID is: " + CalID, COMPONENT_NAME, LogKind.Info);
-
-                  if (CalID < 0)
-                  {
-                      logger.LogMessage("Planning Calendar has not been set", COMPONENT_NAME, LogKind.Info);
-
-                      xError.CreateIntAttr("Value", 101);
-                      xError.CreateStringAttr("Desc", "Planning Calendar has not been set.  Please contact your Administrator");
-                      //     _dba.Status = StatusEnum.rsPIResourceCalendarNotSet;
-                      statusvalue = (int) StatusEnum.rsPIResourceCalendarNotSet;
-                      sReply = xCSA.XML();
-                      return false;
-                  }
-
-                  cmdText = "SELECT CB_NAME FROM EPGP_COST_BREAKDOWNS WHERE CB_ID = " + CalID.ToString();
-
-                  logger.LogMessage("Executing query: " + cmdText, COMPONENT_NAME, LogKind.Info);
-
-                  oCommand = new SqlCommand(cmdText, _sqlConnection);
-                  reader = oCommand.ExecuteReader();
-
-                  string cal_name = "Timesheet Periods";
-
-                  while (reader.Read())
-                  {
-                      cal_name = DBAccess.ReadStringValue(reader["CB_NAME"]);
-                  }
-
-                  reader.Close();
-
-                  logger.LogMessage("Cal name is: " + cal_name, COMPONENT_NAME, LogKind.Info);
-
-                  xCSValues = xCSA.CreateSubStruct("CS_Values");
-
-                  cmdText = "SELECT * from EPGP_CAPACITY_SETVALUES  WHERE CS_ID = " + iCapacityID.ToString() + " AND CB_ID = " + CalID.ToString() + " ORDER BY ROLE_ID, BD_PERIOD";
-
-                  logger.LogMessage("Executing query: " + cmdText, COMPONENT_NAME, LogKind.Info);
-
-                  oCommand = new SqlCommand(cmdText, _sqlConnection);
-                  reader = oCommand.ExecuteReader();
-
-                  while (reader.Read())
-                  {
-                      int role_id = DBAccess.ReadIntValue(reader["ROLE_ID"]);
-                      int per_id = DBAccess.ReadIntValue(reader["BD_PERIOD"]);
-                      double dhours = DBAccess.ReadDoubleValue(reader["CS_AVAIL"]);
-                      double dftes = DBAccess.ReadDoubleValue(reader["CS_FTES"]);
-
-                      xNode = xCSValues.CreateSubStruct("CS_Value");
-                      xNode.CreateIntAttr("Per_ID", per_id);
-                      xNode.CreateIntAttr("Role_ID", role_id);
-                      xNode.CreateDoubleAttr("Hours", dhours);
-                      xNode.CreateDoubleAttr("FTEs", dftes);
-                  }
-
-                  reader.Close();
-
-                  CStruct xCalendar;
-                  CStruct xPeriods;
-                  CStruct xPeriod;
-                  xCalendar = xCSA.CreateSubStruct("Calendar");
-
-                  xCalendar.CreateIntAttr("CalID", CalID);
-                  xCalendar.CreateStringAttr("CalName", cal_name);
-
-                  logger.LogMessage("Getting PI Commitments calendar periods...", COMPONENT_NAME, LogKind.Info);
-
-                  // Read in the PI Commitments calendar periods
-                  List<CPeriod> clnPeriods;
-                  if (DBCommon.GetPeriods(_dba, CalID, out clnPeriods) != StatusEnum.rsSuccess)
-                  {
-                      logger.LogMessage("Failed to load periods", COMPONENT_NAME, LogKind.Info);
-
-                      xError.CreateIntAttr("Value", 102);
-                      xError.CreateStringAttr("Desc", "Failed to load periods");
-                      //       statusvalue = (int)_dba.Status;
-                      sReply = xCSA.XML();
-                      return false;
-                  }
-
-                  xPeriods = xCalendar.CreateSubStruct("Periods");
-
-                  foreach (CPeriod oPeriod2 in clnPeriods)
-                  {
-                      xPeriod = xPeriods.CreateSubStruct("Period");
-                      xPeriod.CreateIntAttr("ID", oPeriod2.PeriodID);
-                      xPeriod.CreateStringAttr("Name", oPeriod2.PeriodName);
-                      xPeriod.CreateDateAttr("Start", oPeriod2.StartDate);
-                      xPeriod.CreateDateAttr("Finish", oPeriod2.FinishDate);
-                  }
-
-                  logger.LogMessage("Gettings Cost Category Roles...", COMPONENT_NAME, LogKind.Info);
-
-                  CStruct xCostCategoryRoles;
-
-                  if (DBCommon.GetCostCategoryRolesStruct(_dba, CalID, 1, out xCostCategoryRoles, false) != StatusEnum.rsSuccess)
-                  {
-                      xError.CreateIntAttr("Value", 103);
-                      xError.CreateStringAttr("Desc", "Failed to Cost Category Roles etc.");
-                      //         statusvalue = (int)_dba.Status;
-                      sReply = xCSA.XML();
-
-                      return false;
-                  }
-
-                  xCSA.AppendSubStruct(xCostCategoryRoles);
-
-                  sReply = xCSA.XML();
-
-                  logger.LogMessage("GetCapacityScenarioValuesXML was successful", COMPONENT_NAME, LogKind.Info);
-
-                  return true; // (_dba.Status == StatusEnum.rsSuccess);
-              }
-              catch (Exception exception)
-              {
-                  logger.LogMessage(exception, COMPONENT_NAME);
-              }
+          //    _dba.Status = StatusEnum.rsRequestInvalidParameter;
+              statusvalue = (int) StatusEnum.rsPIResourceCalendarNotSet;
+              sReply = xCSA.XML();
+              return false;
           }
 
-          return false;
+
+          string cmdText = "SELECT ADM_PORT_COMMITMENTS_CB_ID  FROM EPG_ADMIN";
+
+          SqlCommand oCommand = new SqlCommand(cmdText, _sqlConnection);
+          SqlDataReader reader = oCommand.ExecuteReader();
+          int CalID = 0;
+          bool bIsNull = false;
+
+          while (reader.Read())
+          {
+              CalID = DBAccess.ReadIntValue(reader["ADM_PORT_COMMITMENTS_CB_ID"],out bIsNull);
+
+              if (bIsNull)
+                  CalID = -1;
+          }
+          reader.Close();
+
+
+          if (CalID < 0)
+          {
+              xError.CreateIntAttr("Value", 101);
+              xError.CreateStringAttr("Desc", "Planning Calendar has not been set.  Please contact your Administrator");
+         //     _dba.Status = StatusEnum.rsPIResourceCalendarNotSet;
+              statusvalue = (int)StatusEnum.rsPIResourceCalendarNotSet;
+              sReply = xCSA.XML();
+              return false;
+          }
+
+
+          cmdText = "SELECT CB_NAME FROM EPGP_COST_BREAKDOWNS WHERE CB_ID = " + CalID.ToString();
+
+
+          oCommand = new SqlCommand(cmdText, _sqlConnection);
+          reader = oCommand.ExecuteReader();
+
+          string cal_name = "Timesheet Periods";
+
+          while (reader.Read())
+          {
+              cal_name = DBAccess.ReadStringValue(reader["CB_NAME"]);
+
+          }
+          reader.Close();
+
+          xCSValues = xCSA.CreateSubStruct("CS_Values");
+          cmdText = "SELECT * from EPGP_CAPACITY_SETVALUES  WHERE CS_ID = " + iCapacityID.ToString() + " AND CB_ID = " +  CalID.ToString() + " ORDER BY ROLE_ID, BD_PERIOD";
+
+          oCommand = new SqlCommand(cmdText, _sqlConnection);
+          reader = oCommand.ExecuteReader();
+
+          while (reader.Read())
+          {
+              int role_id = DBAccess.ReadIntValue(reader["ROLE_ID"]);
+              int per_id = DBAccess.ReadIntValue(reader["BD_PERIOD"]);
+              double dhours = DBAccess.ReadDoubleValue(reader["CS_AVAIL"]);
+              double dftes = DBAccess.ReadDoubleValue(reader["CS_FTES"]);
+
+              xNode = xCSValues.CreateSubStruct("CS_Value");
+              xNode.CreateIntAttr("Per_ID", per_id);
+              xNode.CreateIntAttr("Role_ID", role_id);
+              xNode.CreateDoubleAttr("Hours", dhours);
+              xNode.CreateDoubleAttr("FTEs", dftes);
+                  
+          }
+          reader.Close();
+
+          CStruct xCalendar;
+          CStruct xPeriods;
+          CStruct xPeriod;
+          xCalendar = xCSA.CreateSubStruct("Calendar");
+
+          xCalendar.CreateIntAttr("CalID", CalID);
+          xCalendar.CreateStringAttr("CalName", cal_name);
+
+     
+          // Read in the PI Commitments calendar periods
+          List<CPeriod> clnPeriods;
+          if (DBCommon.GetPeriods(_dba, CalID, out clnPeriods) != StatusEnum.rsSuccess)
+          {
+              xError.CreateIntAttr("Value", 102);
+              xError.CreateStringAttr("Desc", "Failed to load periods");
+       //       statusvalue = (int)_dba.Status;
+              sReply = xCSA.XML();
+              return false;
+          }
+             
+
+          xPeriods = xCalendar.CreateSubStruct("Periods");
+
+          foreach (CPeriod oPeriod2 in clnPeriods)
+          {
+              xPeriod = xPeriods.CreateSubStruct("Period");
+              xPeriod.CreateIntAttr("ID", oPeriod2.PeriodID);
+              xPeriod.CreateStringAttr("Name", oPeriod2.PeriodName);
+              xPeriod.CreateDateAttr("Start", oPeriod2.StartDate);
+              xPeriod.CreateDateAttr("Finish", oPeriod2.FinishDate);
+          }
+
+
+          CStruct xCostCategoryRoles;
+
+          if (DBCommon.GetCostCategoryRolesStruct(_dba, CalID, 1, out xCostCategoryRoles, false) != StatusEnum.rsSuccess)
+          {
+              xError.CreateIntAttr("Value", 103);
+              xError.CreateStringAttr("Desc", "Failed to Cost Category Roles etc.");
+     //         statusvalue = (int)_dba.Status;
+              sReply = xCSA.XML();
+ 
+              return false;
+          }
+
+          xCSA.AppendSubStruct(xCostCategoryRoles);
+
+          sReply = xCSA.XML();
+
+          return true; // (_dba.Status == StatusEnum.rsSuccess);
       }
 
 
-        public bool SaveCapacityScenario(int iCapacityID, string sXLMDataIn)
+      public bool SaveCapacityScenario(int iCapacityID, string sXLMDataIn)
       {
 
           if (_sqlConnection.State == ConnectionState.Open) _sqlConnection.Close();

@@ -1039,7 +1039,7 @@ namespace WorkEnginePPM
                     int csid = xExecute.GetIntAttr("ID");
                     int csmode = xExecute.GetIntAttr("MODE");
 
-                    if (rpcs.GetCapacityScenarioValuesXML(csid, spWeb, out sRetXml, out statusnum) == false)
+                    if (rpcs.GetCapacityScenarioValuesXML(csid, out sRetXml, out statusnum) == false)
                     {
                         logger.LogMessage("Cannot get Capacity Scenario values", COMPONENT_NAME, LogKind.Warning,
                             string.Format(@"[DATA] StatusNum: {0}, Return XML: {1}", statusnum, sRetXml));
@@ -1231,7 +1231,7 @@ namespace WorkEnginePPM
             int statusnum;
             CStruct xResult;
 
-            rpcs.GetCapacityScenarioValuesXML(1, SPContext.Current.Web, out sRetXML, out statusnum);
+            rpcs.GetCapacityScenarioValuesXML(1, out sRetXML, out statusnum);
 
             string sRoleData = RAData.GetRoleScrenarioData(sRetXML, sXML);
 
