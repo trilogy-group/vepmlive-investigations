@@ -229,12 +229,12 @@ oCommand = new SqlCommand(cmdText, _sqlConnection);
      }
 
 
-      public bool GetCapacityScenarioValuesXML(int iCapacityID, SPWeb spWeb, out string sReply, out int statusvalue)
+      public bool GetCapacityScenarioValuesXML(int iCapacityID, Guid webId, int userId, out string sReply, out int statusvalue)
       {
           sReply = "";
           statusvalue = 0;
 
-          using (var logger = new Logger(spWeb))
+          using (var logger = new Logger(webId, userId))
           {
               try
               {

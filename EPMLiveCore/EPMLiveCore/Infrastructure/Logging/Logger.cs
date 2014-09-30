@@ -17,12 +17,18 @@ namespace EPMLiveCore.Infrastructure.Logging
 
         #endregion Fields 
 
-        #region Constructors (3) 
+        #region Constructors (4) 
 
         public Logger(SPWeb web, int userId)
         {
             _webAppId = web.Site.WebApplication.Id;
             _webId = web.ID;
+            _userId = userId;
+        }
+
+        public Logger(Guid webId, int userId)
+        {
+            _webId = webId;
             _userId = userId;
         }
 
