@@ -1295,7 +1295,6 @@
     <Content Include="Layouts\epmlive\epmlivegrid.js" />
     <Content Include="Layouts\epmlive\EpmLiveRollup.js" />
     <Content Include="Layouts\epmlive\ExPrintCab.CAB" />
-    <Content Include="Layouts\epmlive\GanttGrid.js" />
     <Content Include="Layouts\epmlive\getedititem.aspx" />
     <Content Include="Layouts\epmlive\getganttitems.aspx" />
     <Content Include="Layouts\epmlive\getgantttasks.aspx" />
