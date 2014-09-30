@@ -12,16 +12,18 @@
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <TargetOfficeVersion>15.0</TargetOfficeVersion>
     <FileAlignment>512</FileAlignment>
-    <ProjectTypeGuids>{C1CDDADD-2546-481F-9697-4EA41081F2FC};{14822709-B5A1-4724-98CA-57A101D1B079};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
-    <ActiveDeploymentConfiguration>SP 13 Deploy</ActiveDeploymentConfiguration>
+    <ProjectTypeGuids>{BB1F664B-9266-4fd6-B973-E1E44974B511};{14822709-B5A1-4724-98CA-57A101D1B079};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <ActiveDeploymentConfiguration>Default</ActiveDeploymentConfiguration>
     <SccProjectName>SAK</SccProjectName>
     <SccLocalPath>SAK</SccLocalPath>
     <SccAuxPath>SAK</SccAuxPath>
     <SccProvider>SAK</SccProvider>
     <SandboxedSolution>False</SandboxedSolution>
     <ProjectMode>SharePointCustomization</ProjectMode>
-    <FileUpgradeFlags>0</FileUpgradeFlags>
-    <UpgradeBackupLocation>C:\Workspace\Upland\EPM Live\EPMLive2013\PortfolioEngineCore\Backup\WorkEnginePPM\</UpgradeBackupLocation>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
     <OldToolsVersion>4.0</OldToolsVersion>
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <PreDeploymentCommand>"C:\Workspace\Upland\EPM Live\EPM Live Utilities\SPSolutionManager\SPSolutionManager\bin\Debug\SPSolutionManager.exe" -a Uninstall -s WorkEnginePPM
@@ -68,6 +70,9 @@ iisreset</PostDeploymentCommand>
   <PropertyGroup>
     <AssemblyOriginatorKeyFile>EPMLiveLists.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
+  <PropertyGroup>
+    <TokenReplacementFileExtensions>ashx</TokenReplacementFileExtensions>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -97,6 +102,7 @@ iisreset</PostDeploymentCommand>
     <Reference Include="System.DirectoryServices" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ServiceModel" />
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Web.Services" />
@@ -1096,11 +1102,13 @@ iisreset</PostDeploymentCommand>
     <Content Include="Layouts\ppm\Images\AddCommitment.gif" />
     <Content Include="Layouts\ppm\Images\AddResource.gif" />
     <Content Include="Layouts\ppm\Images\allocate.png" />
+    <Content Include="Layouts\ppm\Images\analyze32.png" />
     <Content Include="Layouts\ppm\Images\Approve.gif" />
     <Content Include="Layouts\ppm\Images\Arrow Down Lg.gif" />
     <Content Include="Layouts\ppm\Images\Arrow Up Lg.gif" />
     <Content Include="Layouts\ppm\Images\bgximg-B3C644FE.png" />
     <Content Include="Layouts\ppm\Images\Candidates.gif" />
+    <Content Include="Layouts\ppm\Images\capacity-scenarios20.png" />
     <Content Include="Layouts\ppm\Images\capscenariosl20x20.png" />
     <Content Include="Layouts\ppm\Images\categories.png" />
     <Content Include="Layouts\ppm\Images\checked-dark.png" />
@@ -1118,6 +1126,7 @@ iisreset</PostDeploymentCommand>
     <Content Include="Layouts\ppm\Images\createview.gif" />
     <Content Include="Layouts\ppm\Images\Delete.gif" />
     <Content Include="Layouts\ppm\Images\delete.png" />
+    <Content Include="Layouts\ppm\Images\delete16.png" />
     <Content Include="Layouts\ppm\Images\delete32.png" />
     <Content Include="Layouts\ppm\Images\deleteview.gif" />
     <Content Include="Layouts\ppm\Images\detail.png" />
@@ -1127,6 +1136,8 @@ iisreset</PostDeploymentCommand>
     <Content Include="Layouts\ppm\Images\epmlive-sprite.png" />
     <Content Include="Layouts\ppm\Images\Excel.GIF" />
     <Content Include="Layouts\ppm\Images\ExpandAll.gif" />
+    <Content Include="Layouts\ppm\Images\export-excel20.png" />
+    <Content Include="Layouts\ppm\Images\export-excel32.png" />
     <Content Include="Layouts\ppm\Images\exportexcel20x20.png" />
     <Content Include="Layouts\ppm\Images\filter.png" />
     <Content Include="Layouts\ppm\Images\formatmap16x16.png" />
@@ -1141,9 +1152,12 @@ iisreset</PostDeploymentCommand>
     <Content Include="Layouts\ppm\Images\grouping.gif" />
     <Content Include="Layouts\ppm\Images\Heart.gif" />
     <Content Include="Layouts\ppm\Images\HeartBroke.gif" />
+    <Content Include="Layouts\ppm\Images\heatmap.png" />
     <Content Include="Layouts\ppm\Images\Help.gif" />
+    <Content Include="Layouts\ppm\Images\hide-details16.png" />
     <Content Include="Layouts\ppm\Images\import.png" />
     <Content Include="Layouts\ppm\Images\ImportHours.gif" />
+    <Content Include="Layouts\ppm\Images\legend16.png" />
     <Content Include="Layouts\ppm\Images\Logo.ico" />
     <Content Include="Layouts\ppm\Images\match.png" />
     <Content Include="Layouts\ppm\Images\Move.gif" />
@@ -1156,9 +1170,12 @@ iisreset</PostDeploymentCommand>
     <Content Include="Layouts\ppm\Images\NoteMail.gif" />
     <Content Include="Layouts\ppm\Images\Offer.gif" />
     <Content Include="Layouts\ppm\Images\optimizer.png" />
+    <Content Include="Layouts\ppm\Images\planner-sprite32.png" />
     <Content Include="Layouts\ppm\Images\PMApproved.gif" />
     <Content Include="Layouts\ppm\Images\PMRejected.gif" />
     <Content Include="Layouts\ppm\Images\Print.gif" />
+    <Content Include="Layouts\ppm\Images\print20.png" />
+    <Content Include="Layouts\ppm\Images\print32.png" />
     <Content Include="Layouts\ppm\Images\printl20x20.png" />
     <Content Include="Layouts\ppm\Images\private.png" />
     <Content Include="Layouts\ppm\Images\ProjApprove.gif" />
@@ -1185,6 +1202,7 @@ iisreset</PostDeploymentCommand>
     <Content Include="Layouts\ppm\Images\ribbondnarrow.png" />
     <Content Include="Layouts\ppm\Images\RMApproved.gif" />
     <Content Include="Layouts\ppm\Images\RMRejected.gif" />
+    <Content Include="Layouts\ppm\Images\save-scenario32.png" />
     <Content Include="Layouts\ppm\Images\Save.gif" />
     <Content Include="Layouts\ppm\Images\save32x32.png" />
     <Content Include="Layouts\ppm\Images\SaveItem.gif" />
@@ -1193,6 +1211,8 @@ iisreset</PostDeploymentCommand>
     <Content Include="Layouts\ppm\Images\searchqry.gif" />
     <Content Include="Layouts\ppm\Images\selectcolumn.gif" />
     <Content Include="Layouts\ppm\Images\Selector.gif" />
+    <Content Include="Layouts\ppm\Images\show-bars16.png" />
+    <Content Include="Layouts\ppm\Images\showhidefilters-16.gif" />
     <Content Include="Layouts\ppm\Images\showhidefilters-16.png" />
     <Content Include="Layouts\ppm\Images\sort-16.png" />
     <Content Include="Layouts\ppm\Images\SplitRow.gif" />
@@ -1500,16 +1520,5 @@ iisreset</PostDeploymentCommand>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
   </PropertyGroup>
   <Import Project="$(VSToolsPath)\SharePointTools\Microsoft.VisualStudio.SharePoint.targets" Condition="'$(VSToolsPath)' != ''" />
-  <ProjectExtensions>
-    <VisualStudio>
-      <FlavorProperties GUID="{C1CDDADD-2546-481F-9697-4EA41081F2FC}">
-        <DeploymentConfigurations>
-          <DeploymentConfiguration Name="SP 13 Deploy">
-            <DeploymentSteps>Microsoft.VisualStudio.SharePoint.PreDeploymentCommand;Microsoft.VisualStudio.SharePoint.PostDeploymentCommand</DeploymentSteps>
-            <RetractionSteps>Microsoft.VisualStudio.SharePoint.PreDeploymentCommand</RetractionSteps>
-          </DeploymentConfiguration>
-        </DeploymentConfigurations>
-      </FlavorProperties>
-    </VisualStudio>
-  </ProjectExtensions>
+  <ProjectExtensions />
 </Project>
