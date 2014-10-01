@@ -395,7 +395,12 @@ function GridGoToItem(gridid, rowid) {
 
     var LinkType = eval("mygrid" + gridid + ".LinkType");
     
-    var url = GetWebUrl() + "/_layouts/epmlive/gridaction.aspx?action=" + LinkType + "&webid=" + row.webid + "&listid=" + row.listid + "&ID=" + row.itemid + "&Source=" + escape(location.href);
+    if (new RegExp(/%\d[\dA-F]/g).test(location.href)) {
+        var url = GetWebUrl() + "/_layouts/epmlive/gridaction.aspx?action=" + LinkType + "&webid=" + row.webid + "&listid=" + row.listid + "&ID=" + row.itemid + "&Source=" + location.href;
+    }
+    else {
+        var url = GetWebUrl() + "/_layouts/epmlive/gridaction.aspx?action=" + LinkType + "&webid=" + row.webid + "&listid=" + row.listid + "&ID=" + row.itemid + "&Source=" + escape(location.href);
+    }
 
     if (eval("mygrid" + gridid + "._usepopup")) {
 
