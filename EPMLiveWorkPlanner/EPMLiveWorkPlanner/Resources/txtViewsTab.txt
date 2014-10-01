@@ -92,13 +92,7 @@
 				LabelText="Save View"
 				TemplateAlias="oM"/>
 
-				<Button
-				Id="Ribbon.WorkViews.WorkViewsGroup.EditView"
-				Sequence="20"
-				Image16by16="/_layouts/ppm/images/editview.gif"
-				Command="Ribbon.WorkPlanner.EditView"
-				LabelText="Rename View"
-				TemplateAlias="oM"/>
+				
 
 				<Button
 				Id="Ribbon.WorkViews.WorkViewsGroup.DeleteView"
