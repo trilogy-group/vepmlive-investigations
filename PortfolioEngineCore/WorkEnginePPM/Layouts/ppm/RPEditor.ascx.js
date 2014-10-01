@@ -1736,7 +1736,7 @@
                     if (resuid == null) resuid = grid.GetAttribute(row, null, "Res_UID");
                     var resrow = this.FindResourceRow(resuid);
                     var periodid = col.substring(1);
-                    this.CalculateResourceRowPeriodCommitted(resuid, resrow, periodid, true);
+                    this.CalculateResourceRowPeriodCommitted(resuid, resrow, periodid, true, row);
                     var reqrow = this.GetParentRequirement(row);
                     if (reqrow != null) {
                         this.CalculateRequirementCellValue(reqrow, periodid, 0);
@@ -4844,13 +4844,26 @@
     };
     RPEditor.prototype.FindResourceRow = function (resUID) {
         var grid = Grids["g_Res"];
+        //var row = grid.GetFirst(null, 0);
+        //while (row != null) {
+        //    if (resUID == grid.GetAttribute(row, null, "Res_UID"))
+        //        return row;
+        //    row = grid.GetNext(row);
+        //}
+        //return null;
+        return grid.GetRowById(resUID)
+    };
+    RPEditor.prototype.FindPlannerRow = function (resUID) {
+        var grid = Grids["g_RPE"];
         var row = grid.GetFirst(null, 0);
         while (row != null) {
-            if (resUID == grid.GetAttribute(row, null, "Res_UID"))
+            var planresuid = grid.GetAttribute(row, null, "PendingRes_UID");
+            if (planresuid == null) planresuid = grid.GetAttribute(row, null, "Res_UID");
+            if (resUID == planresuid) {
                 return row;
+            }
             row = grid.GetNext(row);
         }
-        return null;
     };
     RPEditor.prototype.FindProjectRow = function (projectUID) {
         var grid = Grids["g_RPE"];
@@ -4876,9 +4889,11 @@
         var resgrid = Grids["g_Res"];
         var row = resgrid.GetFirst(null, 0);
         while (row != null) {
-            if (bCalculate == true)
+            if (bCalculate == true) {
                 this.CalculateResourceRowCommitted(null, row);
-            this.RefreshResourceRowPeriods(resgrid, row, false);
+            } else {
+                this.RefreshResourceRowPeriods(resgrid, row, false);
+            }
             row = resgrid.GetNext(row);
         }
         if (this.initialized == true)
@@ -4889,42 +4904,39 @@
         if (resuid == null)
             resuid = Grids["g_Res"].GetAttribute(resrow, null, "Res_UID");
         var plangrid = this.plangrid;
+        var plannerRow = this.FindPlannerRow(resuid);
         for (var c = 0; c < plangrid.ColNames[2].length; c++) {
             var col = plangrid.ColNames[2][c];
             var sType = col.substring(0, 1);
             if (sType == "Q") {
                 var periodid = col.substring(1);
-                this.CalculateResourceRowPeriodCommitted(resuid, resrow, periodid, false);
+                this.CalculateResourceRowPeriodCommitted(resuid, resrow, periodid, false, plannerRow);
             }
         }
         this.RefreshResourceRowPeriods(this.resgrid, resrow, true);
     };
-    RPEditor.prototype.CalculateResourceRowPeriodCommitted = function (resuid, resrow, periodid, bRefreshCell) {
+    RPEditor.prototype.CalculateResourceRowPeriodCommitted = function (resuid, resrow, periodid, bRefreshCell, plannerRow) {
         var plangrid = this.plangrid;
         // "C" + periodid represents all the committed hours for a resource on all projects (including this one)
         // deltaC is the difference between the committed hours when the plan was opened vs the committed hours now and, optionally, can include pending on this project
         var deltaC = 0;
-        var row = plangrid.GetFirst(null, 0);
-        while (row != null) {
-            var planresuid = plangrid.GetAttribute(row, null, "PendingRes_UID");
-            if (planresuid == null) planresuid = plangrid.GetAttribute(row, null, "Res_UID");
-            if (resuid == planresuid) {
-                var lHours = this.GetIntValue(plangrid.GetAttribute(row, null, "H" + periodid), 0);
-                var deleted = plangrid.GetAttribute(row, null, "Deleted");
-                if (deleted == 1) {
-                    if (lHours == 0)
-                        deltaC -= this.GetIntValue(this.GetPeriodHoursSpecial(plangrid, row, "H" + periodid), 0);
-                    else
-                        deltaC -= lHours;
-                }
-                else {
-                    deltaC += this.GetIntValue(this.GetPeriodHoursSpecial(plangrid, row, "H" + periodid), 0) - lHours;
-                }
+        if (plannerRow != null) {
+            var lHours = this.GetIntValue(plangrid.GetAttribute(plannerRow, null, "H" + periodid), 0);
+            var deleted = plangrid.GetAttribute(plannerRow, null, "Deleted");
+            if (deleted == 1) {
+                if (lHours == 0)
+                    deltaC -= this.GetIntValue(this.GetPeriodHoursSpecial(plangrid, plannerRow, "H" + periodid), 0);
+                else
+                    deltaC -= lHours;
             }
-            row = plangrid.GetNext(row);
+            else {
+                deltaC += this.GetIntValue(this.GetPeriodHoursSpecial(plangrid, plannerRow, "H" + periodid), 0) - lHours;
+            }
         }
         this.resgrid.SetAttribute(resrow, null, "D" + periodid, deltaC, 0, 0);
-        this.RefreshResourceRowPeriod(this.resgrid, resrow, periodid, bRefreshCell);
+        if (bRefreshCell) {
+            this.RefreshResourceRowPeriod(this.resgrid, resrow, periodid, bRefreshCell);
+        }
     };
     RPEditor.prototype.CommitResourceRowPeriodValue = function (resuid, resrow, periodid, deltaHours) {
         if (deltaHours != 0) {
