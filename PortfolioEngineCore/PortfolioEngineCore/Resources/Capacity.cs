@@ -1065,7 +1065,7 @@ namespace PortfolioEngineCore
                                 {
                                     if (oCommitment != null)
                                     {
-                                        l_PeriodFTEs = GetFTEValue(clnFTEs, oCommitment.BC_UID_Role, dPeriodHours, l_PeriodID);
+                                        l_PeriodFTEs = GetFTEValue(clnFTEs, oCommitment.BC_UID_Role, dPeriodHours, l_PeriodID, 0);
                                     }
                                 }
                             }
@@ -1164,7 +1164,7 @@ namespace PortfolioEngineCore
                             {
                                 if (oCommitment != null)
                                 {
-                                    l_PeriodFTEs = GetFTEValue(clnFTEs, oCommitment.BC_UID_Role, dPeriodHours, l_PeriodID);
+                                    l_PeriodFTEs = GetFTEValue(clnFTEs, oCommitment.BC_UID_Role, dPeriodHours, l_PeriodID, 0);
                                 }
                             }
                         }
@@ -1351,7 +1351,7 @@ namespace PortfolioEngineCore
                                     lBCUID = GetBCUID(clnXref, lWResID);
                                     if (lBCUID == 0) { lBCUID = lDefaultCostCategory; }
                                     oSchedWork.Hours = oSchedWork.Hours / 100;
-                                    oSchedWork.FTES = GetFTEValue(clnFTEs, lBCUID, oSchedWork.Hours, oSchedWork.PeriodID);
+                                    oSchedWork.FTES = GetFTEValue(clnFTEs, lBCUID, oSchedWork.Hours, oSchedWork.PeriodID, 0);
                                     RVClass.SchedWorkHours.Add(oSchedWork);
                                 }
                                 oSchedWork = new ResourceValues.clsSchedWork();
@@ -1375,7 +1375,7 @@ namespace PortfolioEngineCore
                         lBCUID = GetBCUID(clnXref, lWResID);
                         if (lBCUID == 0) { lBCUID = lDefaultCostCategory; };
                         oSchedWork.Hours = oSchedWork.Hours / 100;
-                        oSchedWork.FTES = GetFTEValue(clnFTEs, lBCUID, oSchedWork.Hours, oSchedWork.PeriodID);
+                        oSchedWork.FTES = GetFTEValue(clnFTEs, lBCUID, oSchedWork.Hours, oSchedWork.PeriodID, 0);
                         RVClass.SchedWorkHours.Add(oSchedWork);
                     }
                 }
@@ -1419,7 +1419,7 @@ namespace PortfolioEngineCore
                         {
                             lBCUID = GetBCUID(clnXref, oActualWork.WResID);
                             if (lBCUID == 0) { lBCUID = lDefaultCostCategory; }
-                            oActualWork.FTES = GetFTEValue(clnFTEs, lBCUID, oActualWork.Hours, oActualWork.PeriodID);
+                            oActualWork.FTES = GetFTEValue(clnFTEs, lBCUID, oActualWork.Hours, oActualWork.PeriodID, 0);
                             RVClass.ActualWorkHours.Add(oActualWork);
                         }
                     }
@@ -1795,7 +1795,7 @@ namespace PortfolioEngineCore
 
                                 if (oCapacityValue.Hours > 0 && oCapacityValue.FTES <= 0)
                                 {
-                                    oCapacityValue.FTES = GetFTEValue(clnFTEs, oCapacityValue.RoleUID, oCapacityValue.Hours, oCapacityValue.PeriodID);
+                                    oCapacityValue.FTES = GetFTEValue(clnFTEs, oCapacityValue.RoleUID, oCapacityValue.Hours, oCapacityValue.PeriodID, 0);
                                 }
                                 RVClass.CapacityTargetValues.Add(oCapacityValue);
                                 // in case we hit some new CCRs here 
@@ -1821,7 +1821,7 @@ namespace PortfolioEngineCore
                     {
                         if (oCapacityValue.Hours > 0 && oCapacityValue.FTES <= 0)
                         {
-                            oCapacityValue.FTES = GetFTEValue(clnFTEs, oCapacityValue.RoleUID, oCapacityValue.Hours, oCapacityValue.PeriodID);
+                            oCapacityValue.FTES = GetFTEValue(clnFTEs, oCapacityValue.RoleUID, oCapacityValue.Hours, oCapacityValue.PeriodID, 0);
                         }
                         RVClass.CapacityTargetValues.Add(oCapacityValue);
                         if ((oCapacityValue.RoleUID > 0) && !RVLists_Roles.Contains(oCapacityValue.RoleUID)) { RVLists_Roles.Add(oCapacityValue.RoleUID); }
@@ -1892,7 +1892,7 @@ namespace PortfolioEngineCore
                         ResourceValues.clsResCap oResData;
                         if (RVClass.Resources.TryGetValue(oResNWValue.WResID, out oResData))
                         {
-                            oResNWValue.FTES = GetFTEValue(clnFTEs, oResData.BC_UID_Role, oResNWValue.Hours, oResNWValue.PeriodID);
+                            oResNWValue.FTES = GetFTEValue(clnFTEs, oResData.BC_UID_Role, oResNWValue.Hours, oResNWValue.PeriodID, 0);
                         }
                         RVClass.ResNWValues.Add(oResNWValue);
 
@@ -1971,18 +1971,23 @@ namespace PortfolioEngineCore
 
                     // create a period 'array' for each resource
                     Dictionary<int, Dictionary<int, double>> ResourceAvailabilities = new Dictionary<int, Dictionary<int, double>>();
+                    Dictionary<int, Dictionary<int, double>> ResourceOffHours = new Dictionary<int, Dictionary<int, double>>();
                     Dictionary<int, double> PeriodAvailabilities;
+                    Dictionary<int, double> PeriodOffHours;
 
                     string[] spWresIds = sResourceList.Split(',');
                     foreach (string spWresId in spWresIds)
                     {
                         int lWresID = Convert.ToInt32(spWresId);
                         PeriodAvailabilities = new Dictionary<int, double>();
+                        PeriodOffHours = new Dictionary<int, double>();
                         for (int i = RVClass.FromPeriodID; i <= RVClass.ToPeriodID; i++)
                         {
                             PeriodAvailabilities.Add(i, 0);
+                            PeriodOffHours.Add(i, 0);
                         }
                         ResourceAvailabilities.Add(lWresID, PeriodAvailabilities);
+                        ResourceOffHours.Add(lWresID, PeriodOffHours);
                     }
                     // now we've got a bunch of empty arrays ...  just waiting for availabilities
 
@@ -2014,6 +2019,13 @@ namespace PortfolioEngineCore
                         {
                             if (l_PeriodID >= RVClass.FromPeriodID && l_PeriodID <= RVClass.ToPeriodID)
                                 Availabilities[l_PeriodID] += DBAccess.ReadDoubleValue(reader["CS_AVAIL"]);
+                        }
+
+                        Dictionary<int, double> OffHours;
+                        if (ResourceOffHours.TryGetValue(l_WresID, out OffHours))
+                        {
+                            if (l_PeriodID >= RVClass.FromPeriodID && l_PeriodID <= RVClass.ToPeriodID)
+                                OffHours[l_PeriodID] += DBAccess.ReadDoubleValue(reader["CS_OFF"]);
                         }
                     }
                     reader.Close();
@@ -2090,7 +2102,8 @@ namespace PortfolioEngineCore
                                 ResourceValues.clsResCap oResData;
                                 if (RVClass.Resources.TryGetValue(oResAvail.WResID, out oResData))
                                 {
-                                    oResAvail.FTES = GetFTEValue(clnFTEs, oResData.BC_UID_Role, oResAvail.Hours, oResAvail.PeriodID);
+                                    double offHours = ResourceOffHours[lWresId][availability.Key];
+                                    oResAvail.FTES = GetFTEValue(clnFTEs, oResData.BC_UID_Role, oResAvail.Hours, oResAvail.PeriodID, offHours);
                                 }
                                 RVClass.ResAvail.Add(oResAvail);
                             }
@@ -2291,14 +2304,14 @@ namespace PortfolioEngineCore
             return lXRef;
         }
 
-        private static int GetFTEValue(Dictionary<int, Dictionary<int, int>> clnFTEs, int lBC_UID, double dblHours, int lPeriodID)
+        private static int GetFTEValue(Dictionary<int, Dictionary<int, int>> clnFTEs, int lBC_UID, double dblHours, int lPeriodID, double dblOffHours)
         {
             int lFTEValue = 0;
             double dblFTE = -1;
             Dictionary<int, int> clnFTEPeriods;
             clnFTEs.TryGetValue(lBC_UID, out clnFTEPeriods);
             if (clnFTEPeriods != null) { if (!clnFTEPeriods.TryGetValue(lPeriodID, out lFTEValue)) { lFTEValue = 0; }; }
-            if (lFTEValue > 0) { dblFTE = (dblHours * 1000000) / lFTEValue; }
+            if (lFTEValue > 0) { dblFTE = (dblHours * 1000000) / (lFTEValue - (dblOffHours * 100)); }
             return (int)dblFTE;
         }
 

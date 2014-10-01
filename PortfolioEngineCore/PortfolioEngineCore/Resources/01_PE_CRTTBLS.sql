@@ -3150,6 +3150,7 @@ CREATE TABLE dbo.EPGP_CAPACITY_VALUES
 	WRES_ID int,
 	WRES_DEPT int,
 	CS_AVAIL decimal(25,6),
+	CS_OFF decimal(25,6),
   Primary Key (CB_ID,WRES_ID,BD_PERIOD)
 )
 
@@ -3157,6 +3158,11 @@ CREATE TABLE dbo.EPGP_CAPACITY_VALUES
 else
                 begin
                                 Print 'Updating Table EPGP_CAPACITY_VALUES'
+                                if not exists (select column_name FROM INFORMATION_SCHEMA.COLUMNS where table_name = 'EPGP_CAPACITY_VALUES' and column_name = 'CS_OFF')
+                                begin
+                                                Print '     Add Column CS_OFF'
+                                                ALTER TABLE EPGP_CAPACITY_VALUES ADD CS_OFF decimal(25,6)
+                                end
 
                 end
 

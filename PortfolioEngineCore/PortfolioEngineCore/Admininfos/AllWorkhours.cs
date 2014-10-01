@@ -203,5 +203,40 @@ namespace PortfolioEngineCore
             }
             return totalhours / 100;
         }
+
+        public double offhours(int workhourgroup, int holidaygroup, DateTime startdate, DateTime finishdate)
+        {
+            TimeSpan span = finishdate.Date.Subtract(startdate.Date);
+            int days = span.Days + 1;
+            if (days <= 0) return 0;
+
+            Dictionary<DayOfWeek, double> l_workHours = null;
+            if (workhourgroup < 0 || !m_WorkHours.TryGetValue(workhourgroup, out l_workHours))
+            {
+                return 0;
+            }
+
+            Dictionary<int, double> l_HolidayHours = null;
+            bool haveholidays = true;
+            if (holidaygroup < 0 || !m_HolidayHours.TryGetValue(holidaygroup, out l_HolidayHours))
+            {
+                haveholidays = false;
+            }
+
+            DateTime thisDate = startdate;
+            double totalhours = 0;
+            double hours = 0;
+            while (thisDate <= finishdate)
+            {
+                if (haveholidays)
+                {
+                    hours = GetHolidayHours(l_HolidayHours, thisDate);
+                    if (hours < 0) hours = 0;
+                }
+                totalhours += hours;
+                thisDate = thisDate.AddDays(1);
+            }
+            return totalhours / 100;
+        }
     }
 }
