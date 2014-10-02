@@ -4873,7 +4873,7 @@
         //    row = grid.GetNext(row);
         //}
         //return null;
-        return grid.GetRowById(resUID)
+        return grid.GetRowById(resUID);
     };
     RPEditor.prototype.FindPlannerRow = function (resUID) {
         var grid = Grids["g_RPE"];
