@@ -2213,7 +2213,7 @@
             this.ExecuteJSON(sb.toString(), "GeneralFunctions");
 
             this.SetPlanRowsEditStatus();
-            this.RefreshResourcePeriods(true);
+            //this.RefreshResourcePeriods(true);
         }
         this.UpdateButtonsAsync();
     };
@@ -4909,15 +4909,15 @@
     };
     RPEditor.prototype.RefreshResourcePeriods = function (bCalculate) {
         var resgrid = Grids["g_Res"];
-        //var row = resgrid.GetFirst(null, 0);
-        //while (row != null) {
-        //    if (bCalculate == true) {
-        //        this.CalculateResourceRowCommitted(null, row);
-        //    } else {
-        //        this.RefreshResourceRowPeriods(resgrid, row, false);
-        //    }
-        //    row = resgrid.GetNext(row);
-        //}
+        var row = resgrid.GetFirst(null, 0);
+        while (row != null) {
+            if (bCalculate == true) {
+                this.CalculateResourceRowCommitted(null, row);
+            } else {
+                this.RefreshResourceRowPeriods(resgrid, row, false);
+            }
+            row = resgrid.GetNext(row);
+        }
         if (this.initialized == true)
             resgrid.RenderBody();
         resgrid.Calculate(1, 0);
