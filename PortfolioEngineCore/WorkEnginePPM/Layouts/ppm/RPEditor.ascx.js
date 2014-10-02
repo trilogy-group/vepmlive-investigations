@@ -4927,8 +4927,10 @@
             resuid = Grids["g_Res"].GetAttribute(resrow, null, "Res_UID");
         var plangrid = this.plangrid;
         var plannerRow = this.FindPlannerRow(resuid);
-        for (var c = 0; c < plangrid.ColNames[2].length; c++) {
-            var col = plangrid.ColNames[2][c];
+        var colNames = plangrid.ColNames[2];
+        var colLength = colNames.length;
+        for (var c = 0; c < colLength; c++) {
+            var col = colNames[c];
             var sType = col.substring(0, 1);
             if (sType == "Q") {
                 var periodid = col.substring(1);
