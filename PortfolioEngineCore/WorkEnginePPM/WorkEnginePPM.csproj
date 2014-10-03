@@ -1035,6 +1035,7 @@ iisreset</PostDeploymentCommand>
     <Content Include="Layouts\epmlive\DHTML\windows\imgs\dhxwins_dhx_web\active\icon_normal.gif" />
     <Content Include="Layouts\epmlive\DHTML\windows\imgs\dhxwins_dhx_web\active\progress.gif" />
     <Content Include="Layouts\epmlive\DHTML\windows\imgs\dhxwins_dhx_web\buttons.gif" />
+    <Content Include="Layouts\epmlive\DHTML\windows\imgs\dhxwins_dhx_web\closemodal.jpg" />
     <Content Include="Layouts\epmlive\DHTML\windows\imgs\dhxwins_dhx_web\inactive\header_bg.gif" />
     <Content Include="Layouts\epmlive\DHTML\windows\imgs\dhxwins_dhx_web\inactive\icon_blank.gif" />
     <Content Include="Layouts\epmlive\DHTML\windows\imgs\dhxwins_dhx_web\inactive\icon_normal.gif" />
