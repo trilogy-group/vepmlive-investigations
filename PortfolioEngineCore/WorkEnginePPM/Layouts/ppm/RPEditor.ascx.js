@@ -5019,6 +5019,12 @@
         if (isNaN(fD) == false)
             fDeltaC = fD;
 
+        var offHours = grid.GetAttribute(row, null, "O" + periodid);
+        var fOffHours = 0;
+        var fO = parseInt(offHours);
+        if (isNaN(fO) == false)
+            fOffHours = fO;
+
         var nonwork = grid.GetAttribute(row, null, "N" + periodid);
         var fNonwork = 0.0;
         var fN = parseFloat(nonwork);
@@ -5041,10 +5047,10 @@
                 fHours = fCommitted + fNonwork + fDeltaC;
                 break;
             case "Remaining":
-                fHours = fAvailable - fCommitted - fNonwork - fDeltaC;
+                fHours = fAvailable - fCommitted - fNonwork - fDeltaC - fOffHours;
                 break;
             case "Remaining2":
-                fHours = fAvailable - fCommitted - fNonwork - fDeltaC;
+                fHours = fAvailable - fCommitted - fNonwork - fDeltaC - fOffHours;
                 break;
         }
 
