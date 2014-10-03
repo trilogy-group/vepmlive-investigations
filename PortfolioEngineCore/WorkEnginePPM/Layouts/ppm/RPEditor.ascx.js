@@ -5047,10 +5047,9 @@
                 fHours = fCommitted + fNonwork + fDeltaC;
                 break;
             case "Remaining":
-                fHours = fAvailable - fCommitted - fNonwork - fDeltaC - fOffHours;
-                break;
             case "Remaining2":
-                fHours = fAvailable - fCommitted - fNonwork - fDeltaC - fOffHours;
+                //fHours = fAvailable - fCommitted - fNonwork - fDeltaC - fOffHours;  /// EPML-2320
+                fHours = fAvailable - fCommitted - fNonwork - fDeltaC;
                 break;
         }
 
