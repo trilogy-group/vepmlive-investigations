@@ -124,25 +124,36 @@ namespace WorkEnginePPM
         [WebMethod(EnableSession = true)]
         public string ExecuteJSON(string Function, string Dataxml)
         {
-            string sReply = "";
-            //string ids = "";
-            try
+            using (var logger = new Logger(SPContext.Current.Web))
             {
-                sReply = Execute(Function, Dataxml);
-                //if (Dataxml != string.Empty)
-                //{
-                //    var doc = new XmlDocument();
-                //    doc.LoadXml(Dataxml);
-                //    if (doc.FirstChild != null && doc.FirstChild.Attributes["IDList"] != null)
-                //        ids = doc.FirstChild.Attributes["IDList"].Value;
-                //}
-            }
-            catch (Exception ex)
-            {
-                sReply = HandleError("ExecuteJSON", 99999, string.Format("Error executing function: {0}", ex.Message));
-            }
+                logger.LogMessage("ResPlanAnalyzer.asmx --> ExecuteJSON", COMPONENT_NAME, LogKind.Info);
 
-            return CStruct.ConvertXMLToJSON(sReply);
+                string sReply = "";
+                //string ids = "";
+                try
+                {
+                    sReply = Execute(Function, Dataxml);
+                    //if (Dataxml != string.Empty)
+                    //{
+                    //    var doc = new XmlDocument();
+                    //    doc.LoadXml(Dataxml);
+                    //    if (doc.FirstChild != null && doc.FirstChild.Attributes["IDList"] != null)
+                    //        ids = doc.FirstChild.Attributes["IDList"].Value;
+                    //}
+                }
+                catch (Exception ex)
+                {
+                    logger.LogMessage(ex, COMPONENT_NAME);
+                    sReply = HandleError("ExecuteJSON", 99999, string.Format("Error executing function: {0}", ex.Message));
+                }
+
+                string jsonReply = CStruct.ConvertXMLToJSON(sReply);
+
+                logger.LogMessage("ExecureJSON Original Reply: " + sReply, COMPONENT_NAME, LogKind.Info);
+                logger.LogMessage("ExecureJSON JSON Reply: " + jsonReply, COMPONENT_NAME, LogKind.Info);
+
+                return jsonReply;
+            }
         }
 
         public static string GetRAUserCalendarInfo(HttpContext Context, string sXML, RPAData RAData)
