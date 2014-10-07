@@ -249,7 +249,7 @@
                         case "ResourceAnalyzer":
                             var docurl = document.location.pathname.replace("rpeditor", "rpanalyzer");
                             var weburl = docurl + "?dataid=" + result.Ticket + "&IsDlg=1&rpemode=1";
-                            var options = { url: weburl, width: 800, height: 600, showClose: true, dialogReturnValueCallback: dialogCallbackDelegate };
+                            var options = { url: weburl, width: 800, height: 600, showMaximized: true, showClose: true, dialogReturnValueCallback: dialogCallbackDelegate };
                             parent.SP.UI.ModalDialog.showModalDialog(options);
                             break;
                         case "ResourcePlanner":
