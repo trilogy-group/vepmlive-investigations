@@ -4205,12 +4205,12 @@
         var planrow = plangrid.GetFirst(null, 0);
         var idSelect = document.getElementById("idSelectPlanResources");
         while (planrow != null) {
-            if (plangrid.GetAttribute(planrow, null, "Status") != const_Requirement) {
-                if (this.ValidatePlanRowPeriodConversion(plangrid, planrow) == false) {
-                    alert("Invalid Hours or FTE.\n\nAt least one period value does not match the current FTE Conversion Factor.\n\nPlease report this problem to your System Administrator.");
-                    return;
-                }
-            }
+            //if (plangrid.GetAttribute(planrow, null, "Status") != const_Requirement) {
+            //    if (this.ValidatePlanRowPeriodConversion(plangrid, planrow) == false) {
+            //        alert("Invalid Hours or FTE.\n\nAt least one period value does not match the current FTE Conversion Factor.\n\nPlease report this problem to your System Administrator.");
+            //        return;
+            //    }
+            //}
             planrow = plangrid.GetNext(planrow);
         }
 
