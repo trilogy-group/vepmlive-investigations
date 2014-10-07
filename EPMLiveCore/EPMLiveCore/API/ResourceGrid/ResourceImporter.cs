@@ -316,6 +316,8 @@ namespace EPMLiveCore.API
 
             SPList spList = _spWeb.Lists["Resources"];
 
+            var errors = new List<string>();
+
             foreach (DataColumn dataColumn in _dtResources.Columns)
             {
                 try
@@ -361,17 +363,32 @@ namespace EPMLiveCore.API
 
                     lookupFieldDict.Add(columnName, new Dictionary<string, int>());
 
-                    var spFieldLookup = ((SPFieldLookup) spField);
+                    var spFieldLookup = ((SPFieldLookup)spField);
 
                     SPListItemCollection spListItemCollection =
                         _spWeb.Lists[new Guid(spFieldLookup.LookupList)].GetItems("ID", spFieldLookup.LookupField);
+
                     foreach (SPListItem spListItem in spListItemCollection)
                     {
-                        lookupFieldDict[columnName].Add(spListItem[spFieldLookup.LookupField].ToString(),
-                            (int) spListItem["ID"]);
+                        string lookupValue = string.Empty;
+
+                        try
+                        {
+                            lookupValue = spListItem[spFieldLookup.LookupField].ToString();
+                            lookupFieldDict[columnName].Add(lookupValue, (int)spListItem["ID"]);
+                        }
+                        catch (ArgumentException exception)
+                        {
+                            errors.Add(string.Format(@"{0} ({1}): {2}", columnName, lookupValue, exception.Message));
+                        }
                     }
                 }
                 catch { }
+            }
+
+            if (errors.Any())
+            {
+                throw new Exception(string.Join(Environment.NewLine, errors.ToArray()));
             }
 
             return fieldDict;

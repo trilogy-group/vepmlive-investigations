@@ -92,7 +92,7 @@ iisreset</PostDeploymentCommand>
     </Reference>
     <Reference Include="PortfolioEngineCore, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\PortfolioEngineCore\bin\Debug\PortfolioEngineCore.dll</HintPath>
+      <HintPath>..\..\..\..\..\Windows\Microsoft.NET\assembly\GAC_MSIL\PortfolioEngineCore\v4.0_1.0.0.0__9f4da00116c38ec5\PortfolioEngineCore.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
@@ -1041,6 +1041,7 @@ iisreset</PostDeploymentCommand>
     <Content Include="Layouts\epmlive\DHTML\windows\imgs\dhxwins_dhx_web\active\icon_normal.gif" />
     <Content Include="Layouts\epmlive\DHTML\windows\imgs\dhxwins_dhx_web\active\progress.gif" />
     <Content Include="Layouts\epmlive\DHTML\windows\imgs\dhxwins_dhx_web\buttons.gif" />
+    <Content Include="Layouts\epmlive\DHTML\windows\imgs\dhxwins_dhx_web\closemodal.jpg" />
     <Content Include="Layouts\epmlive\DHTML\windows\imgs\dhxwins_dhx_web\inactive\header_bg.gif" />
     <Content Include="Layouts\epmlive\DHTML\windows\imgs\dhxwins_dhx_web\inactive\icon_blank.gif" />
     <Content Include="Layouts\epmlive\DHTML\windows\imgs\dhxwins_dhx_web\inactive\icon_normal.gif" />

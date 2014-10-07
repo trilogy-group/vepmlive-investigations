@@ -2273,7 +2273,7 @@ namespace EPMLiveWebParts
                                         {
                                             SPFieldUserValue uv = (SPFieldUserValue)field.GetFieldValue(val);
                                             displayValue = "";
-                                            displayValue += "<a href=\"" + li.Web.Url + "/_layouts/userdisp.aspx?ID=" + uv.LookupId.ToString() + "\">" + uv.LookupValue + "</a>";
+                                            displayValue += "<a Title=\"" + uv.LookupValue + "\"href=\"" + li.Web.Url + "/_layouts/userdisp.aspx?ID=" + uv.LookupId.ToString() + "\">" + uv.LookupValue + "</a>";
                                         }
                                         else
                                         {
@@ -2281,7 +2281,7 @@ namespace EPMLiveWebParts
                                             displayValue = "";
                                             foreach (SPFieldUserValue uv in uvc)
                                             {
-                                                displayValue += "; <a href=\"" + li.Web.Url + "/_layouts/userdisp.aspx?ID=" + uv.LookupId.ToString() + "\">" + uv.LookupValue + "</a>";
+                                                displayValue += "; <a Title=\"" + uv.LookupValue + "\"href=\"" + li.Web.Url + "/_layouts/userdisp.aspx?ID=" + uv.LookupId.ToString() + "\">" + uv.LookupValue + "</a>";
                                             }
                                             if (displayValue.Length > 1)
                                                 displayValue = displayValue.Substring(2);
@@ -5784,7 +5784,7 @@ namespace EPMLiveWebParts
                         {
                             SPFieldUserValue uv = (SPFieldUserValue)spfield.GetFieldValue(val);
                             val = "";
-                            val += "<a href=\"" + li.Web.Url + "/_layouts/userdisp.aspx?ID=" + uv.LookupId.ToString() + "\">" + uv.LookupValue + "</a>";
+                            val += "<a Title=\"" + uv.LookupValue + "\"href=\"" + li.Web.Url + "/_layouts/userdisp.aspx?ID=" + uv.LookupId.ToString() + "\">" + uv.LookupValue + "</a>";
                         }
                         else
                         {
@@ -5792,7 +5792,7 @@ namespace EPMLiveWebParts
                             val = "";
                             foreach (SPFieldUserValue uv in uvc)
                             {
-                                val += "; <a href=\"" + li.Web.Url + "/_layouts/userdisp.aspx?ID=" + uv.LookupId.ToString() + "\">" + uv.LookupValue + "</a>";
+                                val += "; <a Title=\"" + uv.LookupValue + "\"href=\"" + li.Web.Url + "/_layouts/userdisp.aspx?ID=" + uv.LookupId.ToString() + "\">" + uv.LookupValue + "</a>";
                             }
                             if (val.Length > 1)
                                 val = val.Substring(2);

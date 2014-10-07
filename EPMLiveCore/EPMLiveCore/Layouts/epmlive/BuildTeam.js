@@ -8,8 +8,6 @@ function Assignments() {
 
     var sRows = rGrid.GetSelRows();
 
-
-
     for (var r in sRows) {
         var oSRow = sRows[r];
         sResources += "," + oSRow.id;
@@ -108,6 +106,7 @@ function AddResource() {
         rGrid.HideRow(oSRow);
     }
     RefreshCommandUI();
+    tGrid.UpdateHeights(1);
 }
 
 function RemoveResource() {

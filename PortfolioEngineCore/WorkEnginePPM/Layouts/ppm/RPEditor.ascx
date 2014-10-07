@@ -334,6 +334,7 @@
         params.IsDlg = "<%=IsDlg%>";
         params.URL = '<%=URL%>';
         params.Webservice = '<%=Webservice%>';
+        params.HideCloseBtn = '<%=HideCloseBtn%>';
         rpeditor = new RPEditor('rpeditor', params);
     }
     catch (e) {

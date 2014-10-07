@@ -147,7 +147,7 @@ namespace TimeSheets
 
                 SqlCommand cmd = new SqlCommand(@"SELECT     SUM(dbo.TSITEMHOURS.TS_ITEM_HOURS) AS Hours
                                                     FROM         dbo.TSITEMHOURS INNER JOIN
-                                                    dbo.TSITEM ON dbo.TSITEMHOURS.TS_ITEM_UID = dbo.TSITEM.TS_ITEM_UID where LIST_UID=@listid and ITEM_ID=@itemid",cn);
+                                                    dbo.TSITEM ON dbo.TSITEMHOURS.TS_ITEM_UID = dbo.TSITEM.TS_ITEM_UID where LIST_UID=@listid and ITEM_ID=@itemid", cn);
                 cmd.Parameters.AddWithValue("@listid", docTimesheet.FirstChild.Attributes["List"].Value);
                 cmd.Parameters.AddWithValue("@itemid", docTimesheet.FirstChild.Attributes["ID"].Value);
 
@@ -899,6 +899,7 @@ namespace TimeSheets
                 string sql_getApprovalCount = string.Empty;
                 DataTable dtUserID = null;
                 int approvalCount = 0;
+                string bIsTimeSheetManager = "";
 
 
                 sql_getUserIDs = string.Format("select SharePointAccountID from LSTResourcepool WHERE (',' + TimesheetManagerID + ',' LIKE '%,{0},%') and Generic=0 ", user.ID);
@@ -912,6 +913,7 @@ namespace TimeSheets
                     SqlConnection cn = null;
                     StringBuilder sharePointAccountIDs = new StringBuilder();
                     String userIDs;
+                    bIsTimeSheetManager = "True";
 
                     SPSecurity.RunWithElevatedPrivileges(delegate()
                     {
@@ -946,8 +948,12 @@ namespace TimeSheets
                     }
 
                 }
+                else
+                {
+                    bIsTimeSheetManager = "False";
+                }
 
-                return "<ApprovalNotification Status=\"0\">" + approvalCount + "</ApprovalNotification>";
+                return "<ApprovalNotification Status=\"0\" IsTimeSheetManager=\"" + bIsTimeSheetManager + "\">" + approvalCount + "</ApprovalNotification>";
 
             }
             catch (Exception ex)
@@ -978,7 +984,7 @@ namespace TimeSheets
                     ApprovalStatus = doc.FirstChild.Attributes["ApproveStatus"].Value;
                 }
                 catch { }
-                
+
                 string outData = "";
                 bool errors = false;
 
@@ -1013,7 +1019,7 @@ namespace TimeSheets
                     });
 
                     outData = "<Approve>";
-                    
+
                     bool liveHours = false;
 
                     bool.TryParse(EPMLiveCore.CoreFunctions.getConfigSetting(oWeb.Site.RootWeb, "EPMLiveTSLiveHours"), out liveHours);
@@ -1060,14 +1066,14 @@ namespace TimeSheets
                                             cmd = new SqlCommand("INSERT INTO TSQUEUE (TS_UID,STATUS,JOBTYPE_ID,USERID,JOBDATA) VALUES(@tsuid,0,30,@USERID,@JOBDATA)", cn);
                                             cmd.Parameters.AddWithValue("@tsuid", TS.Attributes["id"].Value);
                                             cmd.Parameters.AddWithValue("@USERID", oWeb.CurrentUser.ID);
-                                           // if (tsData.Length > 1)
+                                            // if (tsData.Length > 1)
                                             //    cmd.Parameters.AddWithValue("@JOBDATA", tsData[1]);
                                             //else
-                                                cmd.Parameters.AddWithValue("@JOBDATA", "");
+                                            cmd.Parameters.AddWithValue("@JOBDATA", "");
                                             cmd.ExecuteNonQuery();
 
                                         }
-                                        
+
                                     }
 
                                     outData += "<TS id='" + TS.Attributes["id"].Value + "' Status=\"0\"/>";
@@ -1165,7 +1171,7 @@ namespace TimeSheets
                 {
                     ndSW.Attributes["Visible"].Value = "0";
                 }
-                
+
                 string TotalColumnCalc = "";
 
                 Dictionary<string, string> viewInfo = new Dictionary<string, string>();
@@ -1456,7 +1462,7 @@ namespace TimeSheets
                     attr2 = docLayout.CreateAttribute("CanSort");
                     attr2.Value = "1";
                     ndNewCol.Attributes.Append(attr2);
-                                        
+
                     attr2 = docLayout.CreateAttribute("CanHide");
                     attr2.Value = "1";
                     ndNewCol.Attributes.Append(attr2);
@@ -1535,7 +1541,7 @@ namespace TimeSheets
 
                     ndLeftCols.PrependChild(ndNewCol);
 
-                    
+
                     attr2 = docLayout.CreateAttribute("ChildPaging");
                     attr2.Value = "3";
                     ndCfg.Attributes.Append(attr2);
@@ -1617,7 +1623,7 @@ namespace TimeSheets
                     ndNewCol.Attributes.Append(attr2);
 
                     ndLeftCols.AppendChild(ndNewCol);
-                    
+
                 }
 
                 return docLayout.OuterXml;
@@ -1819,7 +1825,7 @@ namespace TimeSheets
                             attr1.Value = format;
                             ndCol.Attributes.Append(attr1);
                         }
-                        
+
 
                         if (sFieldType == "Enum")
                         {
@@ -2006,7 +2012,7 @@ namespace TimeSheets
             XmlDocument doc = new XmlDocument();
             doc.LoadXml(System.Web.HttpUtility.HtmlDecode(data));
 
-            
+
 
             SqlConnection cn = null;
             SPSecurity.RunWithElevatedPrivileges(delegate()
@@ -2048,7 +2054,7 @@ namespace TimeSheets
                 ndB.AppendChild(CreateTSRow(ref docOut, dsTS, dr, arrLookups, arrPeriods, settings, false, web));
             }
 
-            
+
 
             cn.Close();
 
@@ -2100,12 +2106,12 @@ namespace TimeSheets
                 cmd.Parameters.AddWithValue("@resources", sResList);
                 SqlDataAdapter da = new SqlDataAdapter(cmd);
                 da.Fill(ds);
-                
+
                 ArrayList arrPeriods = GetPeriodDaysArray(cn, settings, web, sPeriod);
 
                 cn.Close();
 
-                
+
 
 
                 foreach (DataRow dr in dtMyResources.Rows)
@@ -2127,7 +2133,7 @@ namespace TimeSheets
             }
             catch (Exception ex)
             {
-                return "<Grid><Body><B><I Title=\"Error: " + ex.Message  + "\"/></B></Body></Grid>";
+                return "<Grid><Body><B><I Title=\"Error: " + ex.Message + "\"/></B></Body></Grid>";
             }
         }
 
@@ -2136,7 +2142,7 @@ namespace TimeSheets
             XmlNode ndRow = docData.CreateNode(XmlNodeType.Element, "I", docData.NamespaceURI);
 
             XmlAttribute attr1;
-            
+
             attr1 = docData.CreateAttribute("Def");
             attr1.Value = "Resource";
             ndRow.Attributes.Append(attr1);
@@ -2198,7 +2204,7 @@ namespace TimeSheets
 
                 foreach (DateTime dtStart in arrPeriods)
                 {
-                    DataRow []drDayHour = dtHours.Select("TS_ITEM_DATE='" + dtStart.ToString() + "' AND TS_UID='" + tsuid + "'");
+                    DataRow[] drDayHour = dtHours.Select("TS_ITEM_DATE='" + dtStart.ToString() + "' AND TS_UID='" + tsuid + "'");
                     if (drDayHour.Length > 0)
                     {
                         attr1 = docData.CreateAttribute("P" + dtStart.Ticks);
@@ -2206,7 +2212,7 @@ namespace TimeSheets
                         ndRow.Attributes.Append(attr1);
                     }
                 }
-                
+
             }
             else
             {
@@ -2353,7 +2359,7 @@ namespace TimeSheets
             catch { }
 
             XmlNode ndCol = docData.CreateNode(XmlNodeType.Element, "I", docData.NamespaceURI);
-            
+
             XmlAttribute attr1 = docData.CreateAttribute("UID");
             attr1.Value = dr["TS_ITEM_UID"].ToString();
             ndCol.Attributes.Append(attr1);
@@ -2459,7 +2465,8 @@ namespace TimeSheets
                                 try
                                 {
                                     attr1.Value = ((double)result[dc.ColumnName]).ToString(currenvyCultureInfo.NumberFormat);
-                                }catch{}
+                                }
+                                catch { }
                             }
                             else if (dc.DataType == typeof(DateTime))
                             {
@@ -2983,7 +2990,7 @@ namespace TimeSheets
             {
                 if (!drAdded.Contains(drItem["LIST_UID"].ToString() + "." + drItem["ITEM_ID"].ToString()))
                 {
-                    sql = string.Format(@"SELECT * FROM dbo.LSTMyWork WHERE [AssignedToID] = -99 AND [SiteId] = N'{0}' AND LISTID = N'{1}' AND ITEMID=N'{2}'", web.Site.ID, drItem["LIST_UID"].ToString(), drItem["ITEM_ID"].ToString());
+                    sql = string.Format(@"SELECT * FROM dbo.LSTMyWork WHERE [AssignedToID] = {0} AND [SiteId] = N'{1}' AND LISTID = N'{2}' AND ITEMID=N'{3}'", Convert.ToString(drItem["ASSIGNEDTOID"]) == "" ? "-99" : Convert.ToString(drItem["ASSIGNEDTOID"]), web.Site.ID, drItem["LIST_UID"].ToString(), drItem["ITEM_ID"].ToString());
                     myWorkDataTable = rptData.ExecuteSql(sql);
 
 
@@ -3459,6 +3466,7 @@ namespace TimeSheets
             string webid = row["WebID"].ToString();
             string listid = row["ListID"].ToString();
             string itemid = row["ItemID"].ToString();
+            string assignedtoid = row["AssignedToID"].ToString();
 
             if (webid != "")
             {
@@ -3498,7 +3506,7 @@ namespace TimeSheets
                                         }
                                         catch { }
 
-                                        SqlCommand cmd = new SqlCommand("INSERT INTO TSITEM (TS_UID,TS_ITEM_UID,WEB_UID,LIST_UID,ITEM_ID,ITEM_TYPE,TITLE, PROJECT,PROJECT_ID, LIST,PROJECT_LIST_UID) VALUES(@tsuid,@uid,@webid,@listid,@itemid,1,@title,@project,@projectid,@list,@projectlistid)", cn);
+                                        SqlCommand cmd = new SqlCommand("INSERT INTO TSITEM (TS_UID,TS_ITEM_UID,WEB_UID,LIST_UID,ITEM_ID,ITEM_TYPE,TITLE, PROJECT,PROJECT_ID, LIST,PROJECT_LIST_UID,ASSIGNEDTOID) VALUES(@tsuid,@uid,@webid,@listid,@itemid,1,@title,@project,@projectid,@list,@projectlistid,@assignedtoid)", cn);
                                         cmd.Parameters.AddWithValue("@tsuid", tsuid);
                                         cmd.Parameters.AddWithValue("@uid", id);
                                         cmd.Parameters.AddWithValue("@webid", web.ID);
@@ -3506,6 +3514,7 @@ namespace TimeSheets
                                         cmd.Parameters.AddWithValue("@itemid", li.ID);
                                         cmd.Parameters.AddWithValue("@title", li["Title"].ToString());
                                         cmd.Parameters.AddWithValue("@list", list.Title);
+                                        cmd.Parameters.AddWithValue("@assignedtoid", assignedtoid);
                                         if (projectlist == "")
                                             cmd.Parameters.AddWithValue("@projectlistid", DBNull.Value);
                                         else

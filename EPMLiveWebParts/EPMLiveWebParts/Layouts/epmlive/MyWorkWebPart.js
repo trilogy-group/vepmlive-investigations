@@ -363,11 +363,19 @@ function MyWorkGoToItem(gridid, rowid) {
     CurrentRow = row;
     gridid = GetGridId(grid);
 
-    var LinkType = eval("mygrid" + gridid + ".LinkType");
+    for (var l in newItemLists)
+    {
+        var listID = newItemLists[l]["ListID"];
+        if (row.ListID.toLowerCase() == listID.toLowerCase())
+        {
+            var usePopUp = newItemLists[l]["UsePopUp"];
+            break;
+        }
+    }
 
-    var url = window.epmLiveNavigation.currentWebUrl + "/_layouts/epmlive/gridaction.aspx?action=" + LinkType + "&webid=" + row.WebID + "&listid=" + row.ListID + "&ID=" + row.ItemID + "&Source=" + escape(location.href);
+    var url = window.epmLiveNavigation.currentWebUrl + "/_layouts/epmlive/gridaction.aspx?action=view&webid=" + row.WebID + "&listid=" + row.ListID + "&ID=" + row.ItemID + "&Source=" + escape(location.href);
 
-    if (eval("mygrid" + gridid + "._usepopup")) {
+    if (usePopUp != null && usePopUp.toLowerCase() == "true") {
 
         var options = window.SP.UI.$create_DialogOptions();
 
@@ -375,11 +383,15 @@ function MyWorkGoToItem(gridid, rowid) {
         options.width = 700;
         options.allowMaximize = false;
         options.showClose = true;
-        options.dialogReturnValueCallback = GridCommentsCallBack;
         window.SP.UI.ModalDialog.showModalDialog(options);
     }
     else
         location.href = url;
+}
+
+
+function GetGridId(grid) {
+    return grid.id.substr(9);
 }
 
 function MyWorkOnGetHtmlValue(grid, row, col, val) {
@@ -1966,7 +1978,8 @@ var MyWorkGrid = {
 
     onRenameViewClose: function (dialogResult, returnValue) {
         if (dialogResult !== SP.UI.DialogResult.OK) return;
-        if (returnValue == '' | returnValue == null) {
+        var val = returnValue.replace(/^\s+|\s+$/, '');
+        if (val.length == 0) {
             return false;
         }
         for (var v in MyWorkGrid.views) {

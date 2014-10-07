@@ -1,6 +1,6 @@
 ﻿namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Infrastructure
 {
-    internal interface IUpgradeStep
+    public interface IUpgradeStep
     {
         #region Data Members (1) 
 

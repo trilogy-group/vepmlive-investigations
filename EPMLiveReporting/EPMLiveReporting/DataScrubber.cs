@@ -102,14 +102,23 @@ namespace EPMLiveReportsAdmin
                             r["WebTitle"] = w.Title;
                         }
                         r["WebDescription"] = w.Description;
-                        if (w.Author.ID == 1073741823)
+
+                        try
+                        {
+                            if (w.Author.ID == 1073741823)
+                            {
+                                r["WebOwnerId"] = 1;
+                            }
+                            else
+                            {
+                                r["WebOwnerId"] = w.Author.ID;
+                            }
+                        }
+                        catch
                         {
                             r["WebOwnerId"] = 1;
                         }
-                        else
-                        {
-                            r["WebOwnerId"] = w.Author.ID;
-                        }
+
                         #endregion
 
                         #region  POPULATE RPTWEBGROUPS

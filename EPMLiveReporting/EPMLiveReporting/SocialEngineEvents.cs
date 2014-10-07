@@ -39,6 +39,11 @@ namespace EPMLiveReportsAdmin
                 SocialEngineProxy.ProcessActivity(ObjectKind.ListItem, ActivityKind.Created, data, properties.Web);
             }
             catch { }
+            try
+            {
+                ParentItemUpdate.UpdateParent(properties);
+            }
+            catch { }
         }
 
         public static void ItemDeleting(SPItemEventProperties properties)
@@ -63,6 +68,12 @@ namespace EPMLiveReportsAdmin
                 GetAssociatedListItems(properties, data);
 
                 SocialEngineProxy.ProcessActivity(ObjectKind.ListItem, ActivityKind.Deleted, data, properties.Web);
+                
+            }
+            catch { }
+            try
+            {
+                ParentItemUpdate.UpdateParent(properties);
             }
             catch { }
         }
@@ -90,6 +101,11 @@ namespace EPMLiveReportsAdmin
                 GetAssociatedListItems(properties, data);
 
                 SocialEngineProxy.ProcessActivity(ObjectKind.ListItem, ActivityKind.Updated, data, properties.Web);
+            }
+            catch { }
+            try
+            {
+                ParentItemUpdate.UpdateParent(properties);
             }
             catch { }
         }

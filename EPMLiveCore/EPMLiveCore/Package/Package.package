@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<package xmlns:dm0="http://schemas.microsoft.com/VisualStudio/2008/DslTools/Core" dslVersion="1.0.0.0" Id="64ede3b7-292b-4f08-b56f-1452b1834805" solutionId="55aca119-d7c7-494a-b5a7-c3ade07d06eb" resetWebServer="true" sharePointProductVersion="15.0" name="EPMLiveCore" xmlns="http://schemas.microsoft.com/VisualStudio/2008/SharePointTools/PackageModel">
+<package xmlns:dm0="http://schemas.microsoft.com/VisualStudio/2008/DslTools/Core" dslVersion="1.0.0.0" Id="64ede3b7-292b-4f08-b56f-1452b1834805" solutionId="55aca119-d7c7-494a-b5a7-c3ade07d06eb" resetWebServer="false" sharePointProductVersion="15.0" name="EPMLiveCore" xmlns="http://schemas.microsoft.com/VisualStudio/2008/SharePointTools/PackageModel">
   <assemblies>
     <customAssembly location="EPMLiveIntegration.dll" deploymentTarget="GlobalAssemblyCache" sourcePath="..\..\EPMLiveIntegration\EPMLiveIntegration\bin\Debug\EPMLiveIntegration.dll" />
   </assemblies>
@@ -39,7 +39,6 @@
     <featureReference itemId="597b4d8e-96e3-4b57-afa6-1aacdf3fb5aa" />
     <featureReference itemId="a961d46c-4926-4450-bfb0-280e0bbd044b" />
     <featureReference itemId="eb2d342f-9c62-403c-b945-e67bcb7f7f5c" />
-    <featureReference itemId="41772821-ddd2-4ea4-9150-bb95eae4f875" />
   </features>
   <projectItems>
     <projectItemReference itemId="ce3e15fd-6a5b-4e21-8c3d-b5d4df121ea3" />
@@ -50,6 +49,6 @@
     <projectItemReference itemId="fb58384f-11d7-4a86-991b-0057bb656fd2" />
     <projectItemReference itemId="cbbb302f-1089-43ba-a173-8f12c3803e21" />
     <projectItemReference itemId="3a9c4efe-9c87-4864-93c5-f41679e2c83a" />
-    <projectItemReference itemId="993aa118-2bcd-4ab2-b10c-70f20862bc79" />
+    <projectItemReference itemId="d5a1ebf9-698c-4eae-a9cb-1189c58ee088" />
   </projectItems>
 </package>

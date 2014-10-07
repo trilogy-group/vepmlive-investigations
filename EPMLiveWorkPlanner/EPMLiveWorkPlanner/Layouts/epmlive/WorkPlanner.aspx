@@ -912,7 +912,7 @@
 
     Grids.OnTestConstraints = function(grid, row, col, type, change, d1, d2)  
     {
-        if(type == "main" && d1 != null)
+        if(type == "main" && d1 != null && d2 != null)
         {
             if(d1 < grid.Cols["G"].GanttBase)
             {
@@ -924,7 +924,6 @@
         }
         return change;
     }
-
 
     Grids.OnAutoFillFinish = function (grid, r1, c1, r2, c2, rdir, cdir) {
         

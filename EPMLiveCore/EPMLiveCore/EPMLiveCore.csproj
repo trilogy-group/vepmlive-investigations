@@ -47,6 +47,8 @@ net start "WETimer"</PostDeploymentCommand>
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -88,7 +90,8 @@ net start "WETimer"</PostDeploymentCommand>
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\EPMLiveReporting\EPMLiveReporting\bin\Debug\EPMLiveReportsAdmin.dll</HintPath>
     </Reference>
-    <Reference Include="EPMLiveWebParts">
+    <Reference Include="EPMLiveWebParts, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\EPMLiveWebParts\EPMLiveWebParts\bin\Debug\EPMLiveWebParts.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
@@ -379,7 +382,10 @@ net start "WETimer"</PostDeploymentCommand>
     <Compile Include="Infrastructure\GridView\GridViewUtils.cs" />
     <Compile Include="Infrastructure\GridView\PersonalGridViewManager.cs" />
     <Compile Include="Infrastructure\Interfaces\IGridViewManager.cs" />
+    <Compile Include="Infrastructure\Interfaces\ILogger.cs" />
     <Compile Include="Infrastructure\Interfaces\ISPListItemManager.cs" />
+    <Compile Include="Infrastructure\Logging\Logger.cs" />
+    <Compile Include="Infrastructure\Logging\LogKind.cs" />
     <Compile Include="Infrastructure\Navigation\INavLinkProvider.cs" />
     <Compile Include="Infrastructure\Navigation\INavObject.cs" />
     <Compile Include="Infrastructure\Navigation\NavLink.cs" />
@@ -424,6 +430,7 @@ net start "WETimer"</PostDeploymentCommand>
     <Compile Include="Jobs\EPMLiveUpgrade\Infrastructure\UpgradeUtilities.cs" />
     <Compile Include="Jobs\EPMLiveUpgrade\Steps\44Steps.cs" />
     <Compile Include="Jobs\EPMLiveUpgrade\Steps\55Steps.cs" />
+    <Compile Include="Jobs\EPMLiveUpgrade\Steps\564Steps.cs" />
     <Compile Include="Jobs\EPMLiveUpgrade\Steps\GenericSteps.cs" />
     <Compile Include="Jobs\EPMLiveUpgrade\Steps\OptIn\55Steps.cs" />
     <Compile Include="Jobs\EPMLiveUpgrade\Upgrader.cs" />
@@ -1256,6 +1263,7 @@ net start "WETimer"</PostDeploymentCommand>
     <Compile Include="ReportAuth.cs" />
     <Compile Include="ReportingData.cs" />
     <Compile Include="ReportingProxy\QueryExecutor.cs" />
+    <Compile Include="ReportingProxy\ReportingLogger.cs" />
     <Compile Include="ResourceLevels\ResourceLevelsField.cs" />
     <Compile Include="ResourceLevels\ResourceLevelsFieldControl.cs" />
     <Compile Include="ResourcePermissions\ResourcePermissionsField.cs" />
@@ -4171,4 +4179,5 @@ net start "WETimer"</PostDeploymentCommand>
     <PreBuildEvent>del "$(TargetDir)$(TargetName).XmlSerializers.dll"
 del "$(ProjectDir)$(TargetName).XmlSerializers.dll"</PreBuildEvent>
   </PropertyGroup>
+  <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
 </Project>

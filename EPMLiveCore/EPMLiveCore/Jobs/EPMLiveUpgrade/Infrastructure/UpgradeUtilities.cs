@@ -38,18 +38,7 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Infrastructure
 
                 if (attribute.Version == EPMLiveVersion.GENERIC)
                 {
-                    bool add = false;
-
-                    if (string.IsNullOrEmpty(version))
-                    {
-                        if (!attribute.IsOptIn) add = true;
-                    }
-                    else
-                    {
-                        if (attribute.IsOptIn) add = true;
-                    }
-
-                    if (add) genericSteps.Add(attribute.SequenceOrder, type);
+                    genericSteps.Add(attribute.SequenceOrder, type);
                 }
                 else
                 {

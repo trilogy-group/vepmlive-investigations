@@ -1997,6 +1997,11 @@ namespace PortfolioEngineCore
                     lValue = DBAccess.ReadIntValue(reader["RPEN_UID"], out bNull);
                     if (!bNull)
                         xPlanRow.CreateInt("RowNoteUID", lValue);
+                    // Creating string attribute for hidden note field to be used while exporting to excel.
+                    sValue = DBAccess.ReadStringValue(reader["RPEN_HTML"], out bNull);
+                    if (!bNull)
+                        xPlanRow.CreateString("RowNote_HTML", sValue);
+
                     lValue = DBAccess.ReadIntValue(reader["CMT_LAST_EVENT_CONTEXT"], out bNull);
                     if (!bNull)
                         xPlanRow.CreateInt("LastRowEvent", lValue);

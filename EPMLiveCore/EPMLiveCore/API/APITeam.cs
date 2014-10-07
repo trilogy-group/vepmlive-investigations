@@ -48,7 +48,11 @@ namespace EPMLiveCore.API
                         {
                             if (arrColumns.Contains(f.InternalName))
                             {
-                                dt.Columns.Add(f.InternalName);
+                                try
+                                {
+                                    dt.Columns.Add(f.InternalName);
+                                }
+                                catch { }
                             }
                         }
                     }
@@ -59,7 +63,11 @@ namespace EPMLiveCore.API
                     {
                         if (!f.Hidden && f.Reorderable)
                         {
-                            dt.Columns.Add(f.InternalName);
+                            try
+                            {
+                                dt.Columns.Add(f.InternalName);
+                            }
+                            catch { }
                         }
                     }
                 }
@@ -124,7 +132,7 @@ namespace EPMLiveCore.API
             if (filterfield != "")
             {
                 if (filterIsLookup)
-                    query = "';'+" + filterfield + "+';' like '%;" + filtervalue + ";%'";
+                    query = "';'+" + filterfield + "+';' like '%;" + filtervalue + ";%'" + " OR " + filterfield + " like '%" + filtervalue + "%'";
                 else
                     query = filterfield + " like '%" + filtervalue + "%'";
             }
@@ -136,6 +144,37 @@ namespace EPMLiveCore.API
                 borderby = true;
             dr.Close();
 
+            string filterOnID = "";
+            string iDs = "";
+            Dictionary<string, int> liItemSPGroups = new Dictionary<string, int>();
+            if (liItem != null)
+            {
+                SPFieldUserValueCollection uvc = new SPFieldUserValueCollection(web, liItem["AssignedTo"].ToString());
+                foreach (var uv in uvc)
+                {
+                    iDs = uv.LookupId + "," + iDs;
+                }
+                if (iDs != "")
+                {
+                    filterOnID = "SharePointAccountID in (###)";
+                    iDs = iDs.Substring(0, iDs.Length - 1);
+                    filterOnID = filterOnID.Replace("###", iDs);
+                }
+
+                foreach (SPRoleAssignment role in liItem.RoleAssignments)
+                {
+                    if (role.Member.GetType() == typeof(SPGroup))
+                    {
+                        SPGroup group = (SPGroup)role.Member;
+
+                        foreach (SPUser user in group.Users)
+                        {
+                            liItemSPGroups.Add(string.Format("{0}-{1}", group.ID, user.ID), user.ID);
+                        }
+                    }
+                }
+            }
+
             cmd = new SqlCommand("spGetReportListData", cn);
             cmd.CommandType = CommandType.StoredProcedure;
             cmd.Parameters.AddWithValue("@siteid", web.Site.ID);
@@ -144,13 +183,25 @@ namespace EPMLiveCore.API
             cmd.Parameters.AddWithValue("@userid", web.CurrentUser.ID);
             cmd.Parameters.AddWithValue("@rollup", false);
             cmd.Parameters.AddWithValue("@list", "Resourcepool");
-            cmd.Parameters.AddWithValue("@query", query);
+            cmd.Parameters.AddWithValue("@query", query != "" ? query : filterOnID);
             if (borderby)
                 cmd.Parameters.AddWithValue("@orderby", "Title");
 
             DataSet ds = new DataSet();
             SqlDataAdapter da = new SqlDataAdapter(cmd);
             da.Fill(ds);
+
+            DataSet dsUserInfo = new DataSet();
+            DataTable dtUserInfo = null;
+            cmd = new SqlCommand("SELECT ID,Picture FROM LSTUserInformationList where siteid = @siteid and webid = @webid", cn);
+            cmd.Parameters.AddWithValue("@siteid", web.Site.ID);
+            cmd.Parameters.AddWithValue("@webid", web.ID);
+            da = new SqlDataAdapter(cmd);
+            da.Fill(dsUserInfo);
+            if (dsUserInfo.Tables.Count > 0)
+            {
+                dtUserInfo = dsUserInfo.Tables[0];
+            }
 
             foreach (DataRow dRow in ds.Tables[0].Rows)
             {
@@ -187,23 +238,31 @@ namespace EPMLiveCore.API
                                 {
                                     if (oUser != null)
                                     {
-                                        foreach (SPRoleAssignment role in liItem.RoleAssignments)
-                                        {
-                                            try
-                                            {
-                                                if (role.Member.GetType() == typeof(SPGroup))
-                                                {
-                                                    SPGroup group = (SPGroup)role.Member;
-                                                    if (group.Users.GetByID(userid) != null)
-                                                    {
-                                                        sGroups += ";" + group.ID;
-                                                    }
-                                                }
-                                            }
-                                            catch { }
-                                        }
+                                        //foreach (SPRoleAssignment role in liItem.RoleAssignments)
+                                        //{
+                                        //    try
+                                        //    {
+                                        //        if (role.Member.GetType() == typeof(SPGroup))
+                                        //        {
+                                        //            SPGroup group = (SPGroup)role.Member;
+                                        //            if (group.Users.GetByID(userid) != null)
+                                        //            {
+                                        //                sGroups += ";" + group.ID;
+                                        //            }
+                                        //        }
+                                        //    }
+                                        //    catch { }
+                                        //}
+                                        //sGroups = sGroups.Trim(';');
 
-                                        sGroups = sGroups.Trim(';');
+                                        try
+                                        {
+                                            var groupIds = (from lg in liItemSPGroups
+                                                            where lg.Value.Equals(userid)
+                                                            select lg.Key.Split('-')[0]).ToArray();
+                                            sGroups = string.Join(";", groupIds);
+                                        }
+                                        catch { }
                                     }
                                 }
                                 catch { }
@@ -234,15 +293,23 @@ namespace EPMLiveCore.API
                             string userPictureUrl = ((web.ServerRelativeUrl == "/") ? "" : web.ServerRelativeUrl) + "/_layouts/images/person.gif";
                             try
                             {
-                                SPListItem userItem = userInfoList.GetItemById(oUser.ID);
-
-                                if (userItem["Picture"] != null)
+                                //SPListItem userItem = userInfoList.GetItemById(oUser.ID);
+                                //if (userItem["Picture"] != null)
+                                //{
+                                //    userPictureUrl = userItem["Picture"].ToString().Remove(userItem["Picture"].ToString().IndexOf(','));
+                                //}
+                                DataRow[] drUserInfo = dtUserInfo.Select("ID = " + oUser.ID);
+                                if (drUserInfo != null && drUserInfo.Count() > 0)
                                 {
-                                    userPictureUrl = userItem["Picture"].ToString().Remove(userItem["Picture"].ToString().IndexOf(','));
+                                    string imgUrl = Convert.ToString(drUserInfo[0]["Picture"]);
+                                    if (!string.IsNullOrEmpty(imgUrl))
+                                    {
+                                        userPictureUrl = imgUrl;
+                                    }
                                 }
                             }
                             catch { }
-                            item.Add("<img src=\"" + userPictureUrl + "\" height=\"62\">");
+                            item.Add("<img src=\"" + userPictureUrl + "\" height=\"62\" />");
                         }
                         else if (col.ColumnName == "PrincipalType")
                         {
@@ -561,7 +628,7 @@ namespace EPMLiveCore.API
                         DataRow[] drRes = dtResourcePool.Select("ID='" + nd.Attributes["ID"].Value + "'");
                         if (drRes.Length > 0)
                         {
-                            SPFieldUserValue uv = new SPFieldUserValue(oWeb, drRes[0]["SPID"].ToString());
+                            SPFieldUserValue uv = new SPFieldUserValue(oWeb, drRes[0]["SPAccountInfo"].ToString());
 
                             if (!arrUsers.Contains(int.Parse(drRes[0]["SPID"].ToString())))
                             {
@@ -758,6 +825,57 @@ namespace EPMLiveCore.API
                 SPFieldUserValue uv = new SPFieldUserValue(web, user);
                 ArrayList arr = new ArrayList(perms.Split(';'));
                 List<string> additionalPermissions = new List<string>();
+                List<string> lookupsSecurityGroups = new List<string>();
+
+                if (li != null && li.HasUniqueRoleAssignments)
+                {
+                    EnhancedLookupConfigValuesHelper valueHelper = null;
+                    string lookupSettings = gSettings.Lookups;
+                    //string rawValue = "Region^dropdown^none^none^xxx|State^autocomplete^Region^Region^xxx|City^autocomplete^State^State^xxx";                    
+                    valueHelper = new EnhancedLookupConfigValuesHelper(lookupSettings);
+
+                    if (valueHelper != null)
+                    {
+                        List<string> fields = valueHelper.GetSecuredFields();
+
+                        // has security fields
+                        if (fields != null && fields.Count > 0)
+                        {
+                            foreach (string fld in fields)
+                            {
+                                SPFieldLookup lookup = null;
+                                try
+                                {
+                                    lookup = li.ParentList.Fields.GetFieldByInternalName(fld) as SPFieldLookup;
+                                }
+                                catch { }
+
+                                if (lookup == null) continue;
+
+                                SPList lookupParentList = web.Lists[new Guid(lookup.LookupList)];
+                                GridGanttSettings parentListSettings = new GridGanttSettings(lookupParentList);
+
+                                // skip fields with empty lookup values
+                                string securityFieldValue = string.Empty;
+
+                                try { securityFieldValue = li[fld].ToString(); }
+                                catch { }
+
+                                if (string.IsNullOrEmpty(securityFieldValue)) continue;
+
+                                SPFieldLookupValue lookupVal = new SPFieldLookupValue(securityFieldValue.ToString());
+                                SPListItem parentListItem = lookupParentList.GetItemById(lookupVal.LookupId);
+
+                                if (!parentListItem.HasUniqueRoleAssignments) continue;
+
+                                SPRoleAssignmentCollection raCol = parentListItem.RoleAssignments;
+
+                                foreach (SPRoleAssignment ra in raCol)
+                                    lookupsSecurityGroups.Add(ra.Member.Name);
+                            }
+                        }
+                    }
+                }
 
                 string[] permissionsString = gSettings.BuildTeamPermissions.Split('|');
                 for (int i = 0; i < permissionsString.Length; i++)
@@ -786,6 +904,12 @@ namespace EPMLiveCore.API
 
                             if (!additionalPermissions.Contains(Convert.ToString(group.ID)))
                             {
+                                if (lookupsSecurityGroups != null && lookupsSecurityGroups.Contains(group.Name))
+                                {
+                                    continue;
+                                }
+                                else
+                                {
                                 try
                                 {
                                     tempuser = group.Users.GetByID(uv.LookupId);
@@ -801,6 +925,7 @@ namespace EPMLiveCore.API
                                 }
                             }
                         }
+                    }
                     }
                     catch { }
                 }
@@ -920,29 +1045,36 @@ namespace EPMLiveCore.API
 
                         try
                         {
-                            currentteam = docQuery.FirstChild.Attributes["CurrentTeam"].Value;
+                            if (docQuery.FirstChild.Attributes["CurrentTeam"] != null)
+                                currentteam = docQuery.FirstChild.Attributes["CurrentTeam"].Value;
                         }
                         catch { }
                         try
                         {
-                            webid = new Guid(docQuery.FirstChild.Attributes["WebId"].Value);
+                            if (docQuery.FirstChild.Attributes["WebId"] != null)
+                                webid = new Guid(docQuery.FirstChild.Attributes["WebId"].Value);
                         }
                         catch { }
                         try
                         {
-                            listid = new Guid(docQuery.FirstChild.Attributes["ListId"].Value);
+                            if (docQuery.FirstChild.Attributes["ListId"] != null)
+                                listid = new Guid(docQuery.FirstChild.Attributes["ListId"].Value);
                         }
                         catch { }
                         try
                         {
-                            itemid = int.Parse(docQuery.FirstChild.Attributes["ItemId"].Value);
+                            if (docQuery.FirstChild.Attributes["ItemId"] != null)
+                                itemid = int.Parse(docQuery.FirstChild.Attributes["ItemId"].Value);
                         }
                         catch { }
 
                         try
                         {
-                            filterfield = docQuery.FirstChild.Attributes["Column"].Value;
-                            filterval = docQuery.FirstChild.Attributes["Value"].Value;
+                            if (docQuery.FirstChild.Attributes["Column"] != null && docQuery.FirstChild.Attributes["Value"] != null)
+                            {
+                                filterfield = docQuery.FirstChild.Attributes["Column"].Value;
+                                filterval = docQuery.FirstChild.Attributes["Value"].Value;
+                            }
                         }
                         catch { }
 
@@ -1169,6 +1301,8 @@ namespace EPMLiveCore.API
                                         }
                                     });
                                 }
+
+                                throw ex;
                             }
 
                             try
@@ -1193,21 +1327,22 @@ namespace EPMLiveCore.API
                                         string perms = "";
                                         try
                                         {
-                                            foreach (SPRoleAssignment role in li.RoleAssignments)
-                                            {
-                                                try
-                                                {
-                                                    if (role.Member.GetType() == typeof(SPGroup))
-                                                    {
-                                                        SPGroup group = (SPGroup)role.Member;
-                                                        if (group.Users.GetByID(uv.LookupId) != null)
-                                                        {
-                                                            perms += ";" + group.ID;
-                                                        }
-                                                    }
-                                                }
-                                                catch { }
-                                            }
+                                            //foreach (SPRoleAssignment role in li.RoleAssignments)
+                                            //{
+                                            //    try
+                                            //    {
+                                            //        if (role.Member.GetType() == typeof(SPGroup))
+                                            //        {
+                                            //            SPGroup group = (SPGroup)role.Member;
+                                            //            if (group.Users.GetByID(uv.LookupId) != null)
+                                            //            {
+                                            //                perms += ";" + group.ID;
+                                            //            }
+                                            //        }
+                                            //    }
+                                            //    catch { }
+                                            //}
+                                            perms = Convert.ToString(drs[0]["Groups"]);
                                         }
                                         catch { }
 
@@ -1627,6 +1762,58 @@ namespace EPMLiveCore.API
                         string enums = "";
                         string enumkeys = "";
                         List<string> idArrays = new List<string>();
+                        List<string> lookupsSecurityGroups = new List<string>();
+
+                        //Get second level permissions: find lookups that has security enabled
+                        if (oLi != null && oLi.HasUniqueRoleAssignments)
+                        {
+                            EnhancedLookupConfigValuesHelper valueHelper = null;
+                            string lookupSettings = gSettings.Lookups;
+                            //string rawValue = "Region^dropdown^none^none^xxx|State^autocomplete^Region^Region^xxx|City^autocomplete^State^State^xxx";                    
+                            valueHelper = new EnhancedLookupConfigValuesHelper(lookupSettings);
+
+                            if (valueHelper != null)
+                            {
+                            List<string> fields = valueHelper.GetSecuredFields();
+
+                            // has security fields
+                            if (fields != null && fields.Count > 0)
+                            {
+                                foreach (string fld in fields)
+                                {
+                                    SPFieldLookup lookup = null;
+                                    try
+                                    {
+                                        lookup = oList.Fields.GetFieldByInternalName(fld) as SPFieldLookup;
+                                    }
+                                    catch { }
+
+                                    if (lookup == null) continue;
+
+                                    SPList lookupParentList = tWeb.Lists[new Guid(lookup.LookupList)];
+                                        GridGanttSettings parentListSettings = new GridGanttSettings(lookupParentList);
+
+                                    // skip fields with empty lookup values
+                                    string securityFieldValue = string.Empty;
+
+                                    try { securityFieldValue = oLi[fld].ToString(); }
+                                    catch { }
+
+                                    if (string.IsNullOrEmpty(securityFieldValue)) continue;
+
+                                        SPFieldLookupValue lookupVal = new SPFieldLookupValue(securityFieldValue.ToString());
+                                    SPListItem parentListItem = lookupParentList.GetItemById(lookupVal.LookupId);
+
+                                    if (!parentListItem.HasUniqueRoleAssignments) continue;
+
+                                    SPRoleAssignmentCollection raCol = parentListItem.RoleAssignments;
+
+                                        foreach (SPRoleAssignment ra in raCol)
+                                            lookupsSecurityGroups.Add(ra.Member.Name);
+                                    }
+                                }
+                            }
+                        }
 
                         if (gSettings != null && gSettings.BuildTeam && oLi != null && oLi.HasUniqueRoleAssignments)
                         {
@@ -1656,25 +1843,35 @@ namespace EPMLiveCore.API
                                     {
                                         if (!idArrays.Contains(Convert.ToString(group.ID)))
                                         {
-                                            enums += "|" + group.Name;
-                                            enumkeys += "|" + group.ID;
+                                            if (lookupsSecurityGroups != null && lookupsSecurityGroups.Contains(group.Name))
+                                            {
+                                                continue;
+                                            }
+                                            else
+                                            {
+                                                enums += "|" + group.Name;
+                                                enumkeys += "|" + group.ID;
+                                            }
                                         }
                                     }
                                 }
                             }
                         }
-                        else
+                        else //Manage Web Team Security
                         {
                             if (listid == null || listid == Guid.Empty)
                             {
-                                foreach (SPGroup group in tWeb.Groups)
+                                foreach (SPGroup group in from SPGroup spGroup in tWeb.Groups
+                                                          let roles = spGroup.Roles
+                                                          let canUse = roles.Cast<SPRole>().Any(role => role.PermissionMask != (SPRights)134287360)
+                                                          where spGroup.CanCurrentUserEditMembership && canUse
+                                                          select spGroup)
                                 {
                                     if (group.CanCurrentUserEditMembership)
                                     {
                                         enums += "|" + group.Name;
                                         enumkeys += "|" + group.ID;
                                     }
-
                                 }
                             }
                         }
@@ -1739,9 +1936,10 @@ namespace EPMLiveCore.API
 
             XmlNode ndBody = docOut.FirstChild.SelectSingleNode("//B");
 
+            DataTable dtTemp = GetResourcePool("", oWeb);
+
             try
             {
-                DataTable dtTemp = GetResourcePool("", oWeb);
                 foreach (DataRow dr in dtTemp.Rows)
                 {
                     XmlNode ndNew = docOut.CreateNode(XmlNodeType.Element, "I", docOut.NamespaceURI);
@@ -1844,33 +2042,36 @@ namespace EPMLiveCore.API
             XmlDocument doc = new XmlDocument();
             try
             {
-                doc.LoadXml(xml);
-
-                try
+                if (!string.IsNullOrEmpty(xml))
                 {
-                    XmlNode ndCols = doc.FirstChild.SelectSingleNode("//Columns");
-                    if (ndCols != null)
-                    {
-                        arrColumns = new ArrayList();
+                    doc.LoadXml(xml);
 
-                        if (ndCols.InnerText != "")
+                    try
+                    {
+                        XmlNode ndCols = doc.FirstChild.SelectSingleNode("//Columns");
+                        if (ndCols != null)
                         {
-                            string[] cols = ndCols.InnerText.Split(',');
-                            foreach (string col in cols)
+                            arrColumns = new ArrayList();
+
+                            if (ndCols.InnerText != "")
                             {
-                                arrColumns.Add(col);
+                                string[] cols = ndCols.InnerText.Split(',');
+                                foreach (string col in cols)
+                                {
+                                    arrColumns.Add(col);
+                                }
                             }
                         }
                     }
-                }
-                catch { }
+                    catch { }
 
-                try
-                {
-                    filterfield = doc.FirstChild.Attributes["FilterField"].Value;
-                    filterval = doc.FirstChild.Attributes["FilterFieldValue"].Value;
+                    try
+                    {
+                        filterfield = doc.FirstChild.Attributes["FilterField"].Value;
+                        filterval = doc.FirstChild.Attributes["FilterFieldValue"].Value;
+                    }
+                    catch { }
                 }
-                catch { }
             }
             catch { }
 
@@ -1913,6 +2114,8 @@ namespace EPMLiveCore.API
                         }
                     });
                 }
+
+                throw ex;
             }
 
             return dt;

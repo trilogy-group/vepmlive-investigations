@@ -31,16 +31,16 @@ namespace EPMLiveCore.Layouts.epmlive
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            
+
             SPWeb web = SPContext.Current.Web;
             string resUrl = "";
             web.Site.CatchAccessDeniedException = false;
 
             SPSecurity.RunWithElevatedPrivileges(delegate()
             {
-                using(SPSite site = new SPSite(SPContext.Current.Site.ID))
+                using (SPSite site = new SPSite(SPContext.Current.Site.ID))
                 {
-                    using(SPWeb aweb = site.OpenWeb(web.ID))
+                    using (SPWeb aweb = site.OpenWeb(web.ID))
                     {
                         resUrl = CoreFunctions.getConfigSetting(aweb, "EPMLiveResourceURL", true, false);
                     }
@@ -60,31 +60,31 @@ namespace EPMLiveCore.Layouts.epmlive
             }
             catch { }
 
-            if(bUseTeam)
+            if (bUseTeam)
             {
 
                 SPSecurity.RunWithElevatedPrivileges(delegate()
                 {
-                    using(SPSite tSite = new SPSite(web.Site.ID))
+                    using (SPSite tSite = new SPSite(web.Site.ID))
                     {
-                        using(SPWeb tWeb = tSite.OpenWeb(web.ID))
+                        using (SPWeb tWeb = tSite.OpenWeb(web.ID))
                         {
                             SPList tList = tWeb.Lists[new Guid(Request["listid"])];
                             SPListItem tLi = tList.GetItemById(int.Parse(Request["id"]));
                             web.Site.CatchAccessDeniedException = false;
 
-                            foreach(SPRoleAssignment assn in tLi.RoleAssignments)
+                            foreach (SPRoleAssignment assn in tLi.RoleAssignments)
                             {
-                                if(assn.Member.GetType() == typeof(Microsoft.SharePoint.SPGroup))
+                                if (assn.Member.GetType() == typeof(Microsoft.SharePoint.SPGroup))
                                 {
                                     try
                                     {
                                         SPGroup group = web.SiteGroups.GetByID(assn.Member.ID);
 
-                                        if(group.CanCurrentUserEditMembership)
+                                        if (group.CanCurrentUserEditMembership)
                                         {
                                             string[] sG = group.Name.Split(' ');
-                                            if(sG[sG.Length - 1] == "Member")
+                                            if (sG[sG.Length - 1] == "Member")
                                                 sDefaultGroup = group.ID.ToString();
 
                                             bCanEditTeam = "true";
@@ -100,24 +100,24 @@ namespace EPMLiveCore.Layouts.epmlive
             else
             {
 
-                foreach(SPGroup g in web.Groups)
+                foreach (SPGroup g in web.Groups)
                 {
                     string[] sG = g.Name.Split(' ');
-                    if(sG[sG.Length - 1] == "Member")
+                    if (sG[sG.Length - 1] == "Member")
                         sDefaultGroup = g.ID.ToString();
 
-                    if(g.CanCurrentUserEditMembership)
+                    if (g.CanCurrentUserEditMembership)
                     {
                         bCanEditTeam = "true";
                     }
                 }
             }
 
-            
-            
-            
 
-            if(web.Features[new Guid("84520a2b-8e2b-4ada-8f48-60b138923d01")] == null && !bUseTeam)
+
+
+
+            if (web.Features[new Guid("84520a2b-8e2b-4ada-8f48-60b138923d01")] == null && !bUseTeam)
             {
                 sDisable = "_spBodyOnLoadFunctionNames.push(\"ShowDisable\");";
                 SPList teamlist = web.Lists["Team"];
@@ -131,15 +131,14 @@ namespace EPMLiveCore.Layouts.epmlive
 
                 try
                 {
-                    using(SPSite rsite = new SPSite(resUrl))
+                    using (SPSite rsite = new SPSite(resUrl))
                     {
-                        using(SPWeb rweb = rsite.OpenWeb())
+                        using (SPWeb rweb = rsite.OpenWeb())
                         {
                             SPList list = rweb.Lists["Resources"];
-                            DataTable dtTemp = list.Items.GetDataTable();
-
+                            //DataTable dtTemp = list.Items.GetDataTable();
                             bCanAccessResourcePool = "true";
-                            if(list.DoesUserHavePermissions(SPBasePermissions.AddListItems))
+                            if (list.DoesUserHavePermissions(SPBasePermissions.AddListItems))
                             {
                                 bCanAddResource = "true";
                                 sNewResUrl = list.Forms[PAGETYPE.PAGE_NEWFORM].ServerRelativeUrl;
@@ -152,15 +151,15 @@ namespace EPMLiveCore.Layouts.epmlive
                 XmlDocument doc = new XmlDocument();
                 doc.LoadXml("<Grid/>");
 
-                
-                
 
-                if(bUseTeam)
+
+
+                if (bUseTeam)
                 {
                     try
                     {
 
-                        if(oLi.DoesUserHavePermissions(SPBasePermissions.EditListItems))
+                        if (oLi.DoesUserHavePermissions(SPBasePermissions.EditListItems))
                         {
                             bCanEditTeam = "true";
                         }
@@ -168,11 +167,11 @@ namespace EPMLiveCore.Layouts.epmlive
                         XmlAttribute attr = doc.CreateAttribute("ListId");
                         attr.Value = Request["listid"];
                         doc.FirstChild.Attributes.Append(attr);
-                            
+
                         attr = doc.CreateAttribute("ItemId");
                         attr.Value = Request["id"];
                         doc.FirstChild.Attributes.Append(attr);
-                        
+
                     }
                     catch
                     {
@@ -183,7 +182,7 @@ namespace EPMLiveCore.Layouts.epmlive
                 {
                     SPList teamlist = web.Lists.TryGetList("Team");
 
-                    if(teamlist == null)
+                    if (teamlist == null)
                     {
                         web.AllowUnsafeUpdates = true;
                         web.Lists.Add("Team", "Use this list to manage your project team", SPListTemplateType.GenericList);
@@ -199,7 +198,7 @@ namespace EPMLiveCore.Layouts.epmlive
 
                 sLayoutParam = HttpUtility.HtmlEncode(doc.OuterXml);
 
-                if(bCanEditTeam == "true")
+                if (bCanEditTeam == "true")
                 {
                     sResPool = Properties.Resources.txtBuildTeamResPool.Replace("#LayoutParam#", sLayoutParam).Replace("#DataParam#", sLayoutParam);
                     sResGrid = @"TreeGrid(   { 
@@ -209,18 +208,18 @@ namespace EPMLiveCore.Layouts.epmlive
                     }, 
 	                ""divResPool"" );";
                 }
-                
+
             }
 
             sUserInfoList = web.SiteUserInfoList.ID.ToString().ToUpper();
 
-            if(Request["isDlg"] == "1")
+            if (Request["isDlg"] == "1")
             {
                 sClose = "SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.commonModalDialogClose', SP.UI.DialogResult.OK, '');";
             }
             else
             {
-                if(String.IsNullOrEmpty(Request["Source"]))
+                if (String.IsNullOrEmpty(Request["Source"]))
                 {
                     sClose = "location.href='" + ((web.ServerRelativeUrl == "/") ? "" : web.ServerRelativeUrl) + "'";
                 }
@@ -230,7 +229,7 @@ namespace EPMLiveCore.Layouts.epmlive
                 }
             }
 
-            
+
         }
 
         protected override void OnPreRender(EventArgs e)
@@ -249,7 +248,7 @@ namespace EPMLiveCore.Layouts.epmlive
 
             //Prepares an XmlDocument object used to load the ribbon
             XmlDocument ribbonExtensions = new XmlDocument();
-            
+
             //WorkPlanner Tab
             ribbonExtensions.LoadXml(Properties.Resources.txtBuildTeamTab);
             ribbon.RegisterDataExtension(ribbonExtensions.FirstChild,
@@ -263,21 +262,21 @@ namespace EPMLiveCore.Layouts.epmlive
             ribbon.Minimized = false;
             ribbon.CommandUIVisible = true;
             const string initialTabId = "Ribbon.BuildTeam";
-            
-            if(!ribbon.IsTabAvailable(initialTabId))
+
+            if (!ribbon.IsTabAvailable(initialTabId))
                 ribbon.MakeTabAvailable(initialTabId);
 
             ribbon.InitialTabId = initialTabId;
 
-            if(bCanEditTeam != "true")
+            if (bCanEditTeam != "true")
             {
-                if(sDisable != "")
+                if (sDisable != "")
                     ribbon.TrimById("Ribbon.BuildTeam.ResourceGroup");
 
                 ribbon.TrimById("Ribbon.BuildTeam.StandardGroup.SaveButton");
                 ribbon.TrimById("Ribbon.BuildTeam.StandardGroup.SaveCloseButton");
             }
-            else if(sDisable != "")
+            else if (sDisable != "")
             {
                 ribbon.TrimById("Ribbon.BuildTeam.ResourceGroup");
                 ribbon.TrimById("Ribbon.BuildTeam.TeamGroup.AddToTeam");
@@ -305,7 +304,7 @@ namespace EPMLiveCore.Layouts.epmlive
 
             commands.Add(new SPRibbonCommand("Ribbon.BuildTeam.AddToTeam", "AddResource()", "true"));
             commands.Add(new SPRibbonCommand("Ribbon.BuildTeam.RemoveFromTeam", "RemoveResource()", "true"));
-            
+
             //Register initialize function
             var manager = new SPRibbonScriptManager();
             var methodInfo = typeof(SPRibbonScriptManager).GetMethod(

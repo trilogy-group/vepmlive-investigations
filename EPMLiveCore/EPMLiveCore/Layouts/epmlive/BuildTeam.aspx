@@ -1,78 +1,76 @@
 ﻿<%@ Assembly Name="EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5" %>
 <%@ Import Namespace="Microsoft.SharePoint.ApplicationPages" %>
-<%@ Register Tagprefix="SharePoint" Namespace="Microsoft.SharePoint.WebControls" Assembly="Microsoft.SharePoint, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
-<%@ Register Tagprefix="Utilities" Namespace="Microsoft.SharePoint.Utilities" Assembly="Microsoft.SharePoint, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
-<%@ Register Tagprefix="asp" Namespace="System.Web.UI" Assembly="System.Web.Extensions, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" %>
+<%@ Register TagPrefix="SharePoint" Namespace="Microsoft.SharePoint.WebControls" Assembly="Microsoft.SharePoint, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
+<%@ Register TagPrefix="Utilities" Namespace="Microsoft.SharePoint.Utilities" Assembly="Microsoft.SharePoint, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
+<%@ Register TagPrefix="asp" Namespace="System.Web.UI" Assembly="System.Web.Extensions, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" %>
 <%@ Import Namespace="Microsoft.SharePoint" %>
 <%@ Assembly Name="Microsoft.Web.CommandUI, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
+
 <%@ Page Language="C#" AutoEventWireup="true" CodeBehind="BuildTeam.aspx.cs" Inherits="EPMLiveCore.Layouts.epmlive.BuildTeam" DynamicMasterPageFile="~masterurl/default.master" %>
 
 <asp:Content ID="PageHead" ContentPlaceHolderID="PlaceHolderAdditionalPageHead" runat="server">
-    <script src="TreeGrid/GridE.js"> </script>
-    <script src="BuildTeam.js"> </script>
-    <script src="DHTML/xgrid/dhtmlxcommon.js" type="text/javascript"></script>
-    <script src="dhtml/xlayout/dhtmlxlayout.js"></script> 
-    <script src="dhtml/xlayout/dhtmlxcontainer.js"></script> 
-    
+    <script type="text/javascript" src="TreeGrid/GridE.js"> </script>
+    <script type="text/javascript" src="BuildTeam.js"> </script>
+    <script type="text/javascript" src="DHTML/xgrid/dhtmlxcommon.js"></script>
+    <script type="text/javascript" src="dhtml/xlayout/dhtmlxlayout.js"></script>
+    <script type="text/javascript" src="dhtml/xlayout/dhtmlxcontainer.js"></script>
+
     <link rel="stylesheet" type="text/css" href="stylesheets/buildteam.css" />
 
     <!--[if IE]>
     <link rel="stylesheet" type="text/css" href="stylesheets/buildteamIE.css" />
     <![endif]-->
 
-    <link rel="stylesheet" type="text/css" href="stylesheets/buttons.css"> 
-    <link rel="stylesheet" type="text/css" href="dhtml/xlayout/dhtmlxlayout.css"> 
-    <link rel="stylesheet" type="text/css" href="dhtml/xlayout/skins/dhtmlxlayout_dhx_skyblue.css"> 
+    <link rel="stylesheet" type="text/css" href="stylesheets/buttons.css" />
+    <link rel="stylesheet" type="text/css" href="dhtml/xlayout/dhtmlxlayout.css" />
+    <link rel="stylesheet" type="text/css" href="dhtml/xlayout/skins/dhtmlxlayout_dhx_skyblue.css" />
 
-    <style>
-     .GSEditReadOnly
-     {
-         background-color: #FFFFFF !important
-     }
-     .GSColorReadOnly
-     {
-         background-color: #FFFFFF !important
-     }
-     .GSColorHoveredCellReadOnly
-     {
-         background-color: #FFFFFF !important
-     }
-     #s4-ribbonrow{ height:140px !important}
-     
+    <style type="text/css">
+        .GSEditReadOnly {
+            background-color: #FFFFFF !important;
+        }
 
-a, .ms-link:visited {
-    color: #555555;
-    text-decoration: none;
-}
+        .GSColorReadOnly {
+            background-color: #FFFFFF !important;
+        }
+
+        .GSColorHoveredCellReadOnly {
+            background-color: #FFFFFF !important;
+        }
+
+        #s4-ribbonrow {
+            height: 140px !important;
+        }
 
 
-
-
-
+        a, .ms-link:visited {
+            color: #555555;
+            text-decoration: none;
+        }
     </style>
 
-    <link rel="stylesheet" href="modal/modal.css" type="text/css" /> 
+    <link rel="stylesheet" href="modal/modal.css" type="text/css" />
     <script type="text/javascript" src="modal/modal.js"></script>
 </asp:Content>
 <asp:Content ID="Main" ContentPlaceHolderID="PlaceHolderMain" runat="server">
 
-    <table style="width:100%; height:100%" id="parentId">
+    <table style="width: 100%; height: 100%" id="parentId">
         <tr>
             <td width="50%" valign="top" id="tdTeam">
                 <div class="gridHeader">Current Team</div>
-		        <div class="toolbar">
+                <div class="toolbar">
                     <ul>
- 		                 <li>
-			                <a href="javascript:void(0);" onclick="AddTeamColumns(this)" data-toggle="tooltip" data-placement="bottom" data-delay="100" title="Select Columns"><span class="icon-table"></span></a> 
+                        <li>
+                            <a href="javascript:void(0);" onclick="AddTeamColumns(this)" data-toggle="tooltip" data-placement="bottom" data-delay="100" title="Select Columns"><span class="icon-table"></span></a>
                         </li>
                         <li>
                             <a href="javascript:void(0);" onclick="TeamFilters(this)" data-toggle="tooltip" data-placement="bottom" data-delay="100" title="Show/Hide Filters"><span class="icon-filter-2"></span></a>
                         </li>
-			            <li>
+                        <li>
                             <a href="javascript:void(0);" onclick="TeamGroups(this)" data-toggle="tooltip" data-placement="bottom" data-delay="100" title="Show/Hide Grouping"><span class="icon-indent-increase-2"></span></a>
                         </li>
                     </ul>
-		        </div>
+                </div>
                 <div id="divTeam">
                     Loading...
                 </div>
@@ -181,9 +179,9 @@ a, .ms-link:visited {
 
             TreeGrid(   { 
                 Layout:{ Url:"../../_vti_bin/WorkEngine.asmx", Method:"Soap",Function:"Execute",Namespace:"workengine.com",Param:{Function:"GetTeamGridLayout",Dataxml:"<%=sLayoutParam %>" } } ,
-	            Data:{ Url:"../../_vti_bin/WorkEngine.asmx", Method:"Soap",Function:"Execute",Namespace:"workengine.com",Param:{Function:"GetTeamGridData",Dataxml:"<%=sLayoutParam %>" } }, 
-	            Debug:"",SuppressMessage:"3"
-	        }, 
+                Data:{ Url:"../../_vti_bin/WorkEngine.asmx", Method:"Soap",Function:"Execute",Namespace:"workengine.com",Param:{Function:"GetTeamGridData",Dataxml:"<%=sLayoutParam %>" } }, 
+                Debug:"",SuppressMessage:"3"
+            }, 
 	        "divTeam" );
         }
 
@@ -304,29 +302,32 @@ a, .ms-link:visited {
         <table width="100%">
             <tr>
                 <td align="center" class="ms-sectionheader">
-                    <H3 class="ms-standardheader">Loading Team...</h3><br />
-                    <table style="border: 1px solid black; width:100px; height:10px" cellspacing="1">
-                        <tr style="height:5px;">
-                            <td id="tdPctFull" style="background-color: green; display:none;"><img src="blank.gif" width="1" height="1" /></td>
-                            <td><img src="blank.gif" width="1" height="1" /></td>
+                    <h3 class="ms-standardheader">Loading Team...</h3>
+                    <br />
+                    <table style="border: 1px solid black; width: 100px; height: 10px" cellspacing="1">
+                        <tr style="height: 5px;">
+                            <td id="tdPctFull" style="background-color: green; display: none;">
+                                <img src="blank.gif" width="1" height="1" /></td>
+                            <td>
+                                <img src="blank.gif" width="1" height="1" /></td>
                         </tr>
                     </table>
                 </td>
             </tr>
-                    
+
         </table>
-    </div> 
+    </div>
     <div id="dlgNormal" class="dialog">
         <table width="100%">
             <tr>
                 <td align="center" class="ms-sectionheader">
-                    <img src="../images/GEARS_ANv4.GIF" style="vertical-align: middle;"/><br />
-                    <H3 class="ms-standardheader" id="dlgNormalText">...</h3>
+                    <img src="../images/GEARS_ANv4.GIF" style="vertical-align: middle;" /><br />
+                    <h3 class="ms-standardheader" id="dlgNormalText">...</h3>
                 </td>
             </tr>
-                    
+
         </table>
-    </div> 
+    </div>
 
     <script>
         initmb();
@@ -341,9 +342,9 @@ a, .ms-link:visited {
 </asp:Content>
 
 <asp:Content ID="PageTitle" ContentPlaceHolderID="PlaceHolderPageTitle" runat="server">
-Edit Team
+    Edit Team
 </asp:Content>
 
-<asp:Content ID="PageTitleInTitleArea" ContentPlaceHolderID="PlaceHolderPageTitleInTitleArea" runat="server" >
-Edit Team
+<asp:Content ID="PageTitleInTitleArea" ContentPlaceHolderID="PlaceHolderPageTitleInTitleArea" runat="server">
+    Edit Team
 </asp:Content>

@@ -63,6 +63,8 @@
   <ID>g_7531dcdf_62d1_4c2b_8302_f74b4a96ebc9</ID>
 </WebPart>
 </WpNs0:MyTimesheet>
+    
+    <asp:Literal ID="litJsHook" runat="server"></asp:Literal>
 
 </asp:Content>
 

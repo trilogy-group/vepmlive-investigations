@@ -60,7 +60,7 @@ function SaveTemplateClose(dialogResult, returnValue) {
     if (dialogResult == SP.UI.DialogResult.OK) {
         if (returnValue != "") {
             ShowTDialog("Saving Template...");
-            var x = Grids.WorkPlannerGrid.GetXmlData("Body,AllCols,NoIO", "");
+            var x = Grids.WorkPlannerGrid.GetXmlData("Body,AllCols,NoIO,Defaults", "");
             x = x.replace(/&/gi, "%26");
 
             var tVals = returnValue.split('`');
@@ -550,6 +550,7 @@ function setWBSAndTaskID(Row, force) {
         var cWBS = 0;
 
         var newWBS = "";
+        var taskHierarchy = "";
 
         while (child != null) {
 
@@ -557,12 +558,34 @@ function setWBSAndTaskID(Row, force) {
                 taskorder++;
                 cWBS++;
 
-                if (WBS == "")
+                if (WBS == "") {
                     newWBS = cWBS.toString();
-                else
+                    taskHierarchy = "";
+                }
+                else {
                     newWBS = WBS + "." + cWBS.toString();
+                    parentItem = child.parentNode;
+                    taskHierarchy = "";
+                    while (parentItem != null) {
+                        if (parentItem.Def.Name != "Folder" && parentItem.parentNode != null) {
+                            if (parentItem.Title != "") {
+                                taskHierarchy = parentItem.Title + " > " + taskHierarchy;
+                            }
+                            parentItem = parentItem.parentNode;
+                        }
+                        else {
+                            break;
+                        }
+                    }
+
+                }
+
+                if (taskHierarchy != "") {
+                    taskHierarchy = taskHierarchy.substr(0, taskHierarchy.length - 3)
+                }
 
                 Grid.SetValue(child, "taskorder", taskorder, 0, 0);
+                Grid.SetValue(child, "TaskHierarchy", taskHierarchy, 0, 0);
                 try {
                     Grid.SetValue(child, "WBS", newWBS, 0, 0);
                 } catch (e) { }
@@ -1175,7 +1198,7 @@ function IsAssignmentField(col) {
     switch (col) {
         case "ActualWork":
         case "PercentComplete":
-        case "RemainingWork":
+        case "RemainingWork": 
             return true;
     };
     return false;
@@ -1227,9 +1250,9 @@ function DoAssignmentRollDown(Grid, Row, Type, Col) {
         oChild = oChild.nextSibling;
     }
 
-    try {
+    try{ 
         CalculateWorkPercentSpent(Grid, Row);
-    } catch (e) { }
+    }catch(e) { }
 }
 
 function GetProperDateVal(val, oFromRow, c) {
@@ -1319,6 +1342,9 @@ function DeleteTasks() {
                 for (var i = 0; i < delRows.length; i++) {
                     try {
                         var row = grid.GetRowById(delRows[i]);
+                        try{
+                            Grids.WorkPlannerGrid.MoveRow(row, row.parentNode.parentNode, row.parentNode.nextSibling, 1);
+                        } catch (e) { }
                         grid.DeleteRow(row, 2);
                         grid.RemoveRow(row);
                     } catch (e) { }
@@ -2352,7 +2378,9 @@ function setDefaultDates(grid, row, samedates) {
 function LinkDown(type, lag) {
 
     var grid = Grids.WorkPlannerGrid;
-    grid.ActionCalcOff();
+    var IsCalcOff = grid.ActionCalcOff();    
+    if (IsCalcOff)
+        grid.ActionCalcOff();
     var rows = grid.GetSelRows();
 
     var parent = null;
@@ -2372,7 +2400,8 @@ function LinkDown(type, lag) {
             }
         }
     }
-    grid.ActionCalcOn();
+    if (IsCalcOff)
+        grid.ActionCalcOn();
     setTimeout("Grids.WorkPlannerGrid.ActionCorrectAllDependencies()", 100);
 }
 
@@ -2545,6 +2574,8 @@ function getDependencyArray(sId) {
 function LinkUp(type, lag) {
 
     var grid = Grids.WorkPlannerGrid;
+    var IsCalcOff = grid.ActionCalcOff();    
+    if (IsCalcOff)
     grid.ActionCalcOff();
     var rows = grid.GetSelRows();
 
@@ -2562,7 +2593,8 @@ function LinkUp(type, lag) {
             }
         }
     }
-    grid.ActionCalcOn();
+    if (IsCalcOff)
+        grid.ActionCalcOn();
     setTimeout("Grids.WorkPlannerGrid.ActionCorrectAllDependencies()", 100);
 }
 
@@ -2570,7 +2602,9 @@ function Unlink() {
 
     if (confirm("Are you sure you want to unlink all successors?")) {
         var grid = Grids.WorkPlannerGrid;
-        grid.ActionCalcOff();
+        var IsCalcOff = grid.ActionCalcOff();        
+        if (IsCalcOff)
+            grid.ActionCalcOff();
         var rows = grid.GetSelRows();
 
         for (var i = 0; i < rows.length; i++) {
@@ -2585,7 +2619,8 @@ function Unlink() {
 
             grid.SetValue(rows[i], "Descendants", "", 1);
         }
-        grid.ActionCalcOn();
+        if (IsCalcOff)
+            grid.ActionCalcOn();
         grid.ActionCorrectAllDependencies();
     }
 }
@@ -2656,7 +2691,7 @@ function CheckUpdatesClose(loader) {
 
 
 function CopyRemainingWork(grid, row) {
-    var w = grid.GetValue(row, "Work");
+    var w = grid.GetValue(row, "Work"); 
     if (grid.GetValue(row, "RemainingWork") == oldWork || grid.GetValue(row, "RemainingWork") == "0") {
         try {
             grid.SetValue(row, "RemainingWork", w, 1, 0);
@@ -2795,12 +2830,10 @@ function Outdent() {
             row = Grids.WorkPlannerGrid.GetRowById(row.id);
 
             Grids.WorkPlannerGrid.MoveRow(row, row.parentNode.parentNode, row.parentNode.nextSibling, 1);
-
+            
             for (var s in oSiblings) {
                 Grids.WorkPlannerGrid.MoveRow(Grids.WorkPlannerGrid.GetRowById(oSiblings[s]), row, null, 1);
             }
-
-            //grid.MoveRow(row, row.parentNode.parentNode, null, 1);
 
 
         }
@@ -3561,21 +3594,23 @@ function isActiveRow(Row) {
 }
 
 function CalculateWorkPercentSpent(grid, row) {
-    try {
+    try{
         var Work = 0;
         var ActualWork = 0;
         var WorkPercentSpent = 0;
         Work = grid.GetValue(row, "Work");
         ActualWork = grid.GetValue(row, "ActualWork");
-        if (Work != 0) { 
-            if (Work >= ActualWork) {
+        if (Work != 0)
+        {
+            if (Work >= ActualWork)
+            {
                 WorkPercentSpent = (ActualWork / Work) * 100;
                 //WorkPercentSpent = parseInt(WorkPercentSpent) + '%';
             }
         }
         grid.SetValue(row, "WorkPercentSpent", WorkPercentSpent, 1);
         grid.RefreshCell(row, "WorkPercentSpent");
-    } catch (e) { }
+    }catch (e) { }  
 }
 
 function CalculateAssignmentCosts(grid, row) {

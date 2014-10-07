@@ -154,6 +154,20 @@ namespace TimeSheets.Layouts.epmlive
             }
         }
 
+        private bool BShowAllWork()
+        {
+            bool bDisabled = false;
+            SPSecurity.RunWithElevatedPrivileges(delegate()
+            {
+                using (SPSite site = new SPSite(SPContext.Current.Site.ID))
+                {
+                    bool.TryParse(EPMLiveCore.CoreFunctions.getConfigSetting(site.RootWeb, "EPMLiveTSAllowUnassigned"), out bDisabled);
+                }
+            });
+
+            return bDisabled;
+        }
+
         protected override void OnPreRender(EventArgs e)
         {
             base.OnPreRender(e);
@@ -212,6 +226,13 @@ namespace TimeSheets.Layouts.epmlive
                 ribbon.TrimById("Ribbon.MyTimesheetWorkViews.AllWork");
                 ribbon.TrimById("Ribbon.MyTimesheetWork.ActionsGroup.Search");
             }
+            else 
+            {
+                bool bDisable = BShowAllWork();
+                if (!bDisable)
+                    ribbon.TrimById("Ribbon.MyTimesheetWorkViews.AllWork");
+            }
+            
         }
     }
 }

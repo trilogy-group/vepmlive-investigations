@@ -3169,7 +3169,7 @@
 
 	            var SelView = document.getElementById("idUserViews");
 	            var SelViewName = SelView.options[SelView.selectedIndex].text;
-	            var indx = SelView.options[SelView.selectedIndex].value - 1;
+	            var indx = SelView.options[SelView.selectedIndex].value;
 
 	            var lloc = (this.UserViews[indx].Id == 0 ? 0 : 1);
 

@@ -14,7 +14,7 @@ namespace WorkEnginePPM.Events.DataSync
     /// </summary>
     public class HolidaySyncEvent : SPItemEventReceiver
     {
-        #region Methods (5) 
+        #region Methods (5)
 
         // Public Methods (3) 
 
@@ -40,32 +40,54 @@ namespace WorkEnginePPM.Events.DataSync
 
                 var newHoliday = new Holiday
                 {
-                    Title = (string) title,
-                    Date = (string) date,
-                    Hours = (double) hours,
+                    Title = (string)title,
+                    Date = (string)date,
+                    Hours = (double)hours,
                     UniqueId = uniqueId
                 };
 
-                int newHolidayScheduleId = new SPFieldLookupValue((string) schedule).LookupId;
+                int newHolidayScheduleId = new SPFieldLookupValue((string)schedule).LookupId;
 
                 SPWeb spWeb = properties.Web;
 
                 using (var holidayManager = new HolidayManager(spWeb))
                 {
-                    IEnumerable<SPList> spLists = spWeb.GetListByTemplateId((int) EPMLiveLists.HolidaySchedules);
+                    IEnumerable<SPList> spLists = spWeb.GetListByTemplateId((int)EPMLiveLists.HolidaySchedules);
                     if (spLists == null) throw new Exception("Cannot find the Holiday Schedules list.");
 
                     List<HolidaySchedule> holidaySchedules =
                         holidayManager.GetExistingHolidaySchedules(spLists.First().Items);
 
+                    List<HolidaySchedule> newHolidaySchedules = new List<HolidaySchedule>();
+
                     foreach (HolidaySchedule holidaySchedule in holidaySchedules
                         .Where(holidaySchedule => holidaySchedule.Id == newHolidayScheduleId))
                     {
+                        #region Check for duplicate holiday
+
+                        int newHolidayYear = Convert.ToDateTime(date).Year;
+                        bool duplicateHoliday = false;
+                        foreach (Holiday currentHoliday in holidaySchedule.Holidays
+                        .Where(currentHoliday => currentHoliday.Title.Equals((string)title, StringComparison.InvariantCultureIgnoreCase)
+                        && Convert.ToDateTime(currentHoliday.Date).Year.Equals(newHolidayYear)))
+                        {
+                            duplicateHoliday = true;
+                            break;
+                        }
+                        if (duplicateHoliday)
+                        {
+                            throw new Exception(string.Format("Holiday with title '{0}' already exists in holiday schedule '{1}' for year '{2}'", title, holidaySchedule.Title, newHolidayYear));
+                        }
+
+                        #endregion
+
                         holidaySchedule.Holidays.Add(newHoliday);
-                        break;
+                        // Populates only that holiday schedule in which the new holiday is added.
+                        newHolidaySchedules.Add(holidaySchedule);
                     }
 
-                    holidayManager.Synchronize(holidaySchedules);
+                    // Syncs only that holiday schedule which is updated with new holiday.
+                    holidayManager.Synchronize(newHolidaySchedules);
                     holidayManager.AddPFEHolidays(properties);
                 }
             }
@@ -90,7 +112,7 @@ namespace WorkEnginePPM.Events.DataSync
 
                 using (var holidayManager = new HolidayManager(spWeb))
                 {
-                    IEnumerable<SPList> spLists = spWeb.GetListByTemplateId((int) EPMLiveLists.HolidaySchedules);
+                    IEnumerable<SPList> spLists = spWeb.GetListByTemplateId((int)EPMLiveLists.HolidaySchedules);
                     if (spLists == null) throw new Exception("Cannot find the Holiday Schedules list.");
 
                     List<HolidaySchedule> holidaySchedules =
@@ -125,7 +147,10 @@ namespace WorkEnginePPM.Events.DataSync
                         holidaySchedules[holidayScheduleIndex].Holidays.Remove(holidayToDelete);
                     }
 
-                    holidayManager.Synchronize(holidaySchedules);
+                    // Syncs only that holiday schedule whose holiday is deleted.
+                    List<HolidaySchedule> updatedHolidaySchedules = new List<HolidaySchedule>();
+                    updatedHolidaySchedules.Add(holidaySchedules[holidayScheduleIndex]);
+                    holidayManager.Synchronize(updatedHolidaySchedules);
                 }
             }
             catch (Exception exception)
@@ -160,7 +185,7 @@ namespace WorkEnginePPM.Events.DataSync
 
                 using (var holidayManager = new HolidayManager(spWeb))
                 {
-                    IEnumerable<SPList> spLists = spWeb.GetListByTemplateId((int) EPMLiveLists.HolidaySchedules);
+                    IEnumerable<SPList> spLists = spWeb.GetListByTemplateId((int)EPMLiveLists.HolidaySchedules);
                     if (spLists == null) throw new Exception("Cannot find the Holiday Schedules list.");
 
                     List<HolidaySchedule> holidaySchedules =
@@ -170,6 +195,11 @@ namespace WorkEnginePPM.Events.DataSync
 
                     Holiday updatedHoliday = null;
                     int updatedHolidayScheduleIndex = -1;
+                    var spFieldLookupValue = new SPFieldLookupValue((string)schedule);
+                    List<HolidaySchedule> updatedHolidaySchedules = new List<HolidaySchedule>();
+
+                    // Get current holiday schedule
+                    HolidaySchedule currentHolidaySchedule = holidaySchedules.Where(hs => hs.Id == spFieldLookupValue.LookupId).First();
 
                     for (int index = 0; index < holidaySchedules.Count; index++)
                     {
@@ -178,9 +208,39 @@ namespace WorkEnginePPM.Events.DataSync
                         foreach (Holiday holiday in holidaySchedule.Holidays
                             .Where(holiday => holiday.Id == properties.ListItem.ID))
                         {
-                            holiday.Title = (string) title;
-                            holiday.Date = (string) date;
-                            holiday.Hours = (double) hours;
+                            int currentHolidayYear = Convert.ToDateTime(date).Year;
+                            #region Check for duplicate holiday
+                            bool duplicateHoliday = false;
+                            // In case holiday schedule is changed
+                            if (holidaySchedule.Id != currentHolidaySchedule.Id)
+                            {
+                                foreach (Holiday newHoliday in currentHolidaySchedule.Holidays.Where(newHoliday => newHoliday.Title.Equals((string)title, StringComparison.InvariantCultureIgnoreCase)
+                                    && Convert.ToDateTime(newHoliday.Date).Year.Equals(currentHolidayYear)))
+                                {
+                                    duplicateHoliday = true;
+                                    break;
+                                }
+                            }
+                            // In case of same holiday schedule
+                            else
+                            {
+                                foreach (Holiday newHoliday in holidaySchedule.Holidays.Where(newHoliday => newHoliday.Title.Equals((string)title, StringComparison.InvariantCultureIgnoreCase)
+                                    && Convert.ToDateTime(newHoliday.Date).Year.Equals(currentHolidayYear)
+                                    && !properties.ListItemId.Equals(newHoliday.Id)))
+                                {
+                                    duplicateHoliday = true;
+                                    break;
+                                }
+                            }
+                            if (duplicateHoliday)
+                            {
+                                throw new Exception(string.Format("Holiday with title '{0}' already exists in holiday schedule '{1}' for year '{2}'", title, currentHolidaySchedule.Title, currentHolidayYear));
+                            }
+                            #endregion
+
+                            holiday.Title = (string)title;
+                            holiday.Date = (string)date;
+                            holiday.Hours = (double)hours;
 
                             updatedHoliday = holiday;
                             updatedHolidayFound = true;
@@ -197,18 +257,21 @@ namespace WorkEnginePPM.Events.DataSync
                     if (updatedHolidayScheduleIndex != -1)
                     {
                         holidaySchedules[updatedHolidayScheduleIndex].Holidays.Remove(updatedHoliday);
+                        // Populates only that holiday schedule whose holiday list is just got updated.
+                        updatedHolidaySchedules.Add(holidaySchedules[updatedHolidayScheduleIndex]);
                     }
-
-                    var spFieldLookupValue = new SPFieldLookupValue((string) schedule);
 
                     foreach (HolidaySchedule holidaySchedule in holidaySchedules
                         .Where(holidaySchedule => holidaySchedule.Id == spFieldLookupValue.LookupId))
                     {
                         holidaySchedule.Holidays.Add(updatedHoliday);
+                        // Populates only that holiday schedule whose holiday list is just got updated.
+                        updatedHolidaySchedules.Add(holidaySchedule);
                         break;
                     }
 
-                    holidayManager.Synchronize(holidaySchedules);
+                    // Syncs only that holiday schedule whose holiday is just modified.
+                    holidayManager.Synchronize(updatedHolidaySchedules);
                     holidayManager.AddPFEHolidays(properties);
                 }
             }
@@ -244,7 +307,7 @@ namespace WorkEnginePPM.Events.DataSync
             if (schedule == null) throw new Exception("Please select a holiday schedule.");
 
             hours = double.Parse(hours.ToString());
-            date = (date is string ? (string) date : ((DateTime) date).ToString("s")).Split('T')[0];
+            date = (date is string ? (string)date : ((DateTime)date).ToString("s")).Split('T')[0];
         }
 
         /// <summary>
@@ -258,6 +321,6 @@ namespace WorkEnginePPM.Events.DataSync
                    properties.List.Title.Equals("Holidays");
         }
 
-        #endregion Methods 
+        #endregion Methods
     }
 }

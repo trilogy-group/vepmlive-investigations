@@ -19,8 +19,8 @@ namespace PortfolioEngineCore
 {
     public class AllWorkhours
     {
-        private Dictionary<int,Dictionary<DayOfWeek, double>> m_WorkHours;
-        private Dictionary<int,Dictionary<int, double>> m_HolidayHours;
+        private Dictionary<int, Dictionary<DayOfWeek, double>> m_WorkHours;
+        private Dictionary<int, Dictionary<int, double>> m_HolidayHours;
         private double[] work;
 
         public void Initialize(DataTable dtWorkhours, DataTable dtHolidays)
@@ -96,13 +96,13 @@ namespace PortfolioEngineCore
             //work = null;
             work = new double[days];
 
-            Dictionary<DayOfWeek, double> l_workHours=null;
+            Dictionary<DayOfWeek, double> l_workHours = null;
             if (workhourgroup < 0 || !m_WorkHours.TryGetValue(workhourgroup, out l_workHours))
             {
                 return false;
             }
 
-            Dictionary<int, double> l_HolidayHours=null;
+            Dictionary<int, double> l_HolidayHours = null;
             bool haveholidays = true;
             if (holidaygroup < 0 || !m_HolidayHours.TryGetValue(holidaygroup, out l_HolidayHours))
             {
@@ -117,7 +117,7 @@ namespace PortfolioEngineCore
                 work[index] = l_workHours[thisDate.DayOfWeek];
                 if (haveholidays)
                 {
-                    work[index] = work[index] - GetHolidayHours(l_HolidayHours,thisDate);
+                    work[index] = work[index] - GetHolidayHours(l_HolidayHours, thisDate);
                     if (work[index] < 0) work[index] = 0;
                 }
                 totalhours += work[index];
@@ -152,7 +152,7 @@ namespace PortfolioEngineCore
                 }
             }
 
-            
+
             return true;
         }
 
@@ -201,7 +201,42 @@ namespace PortfolioEngineCore
                 totalhours += hours;
                 thisDate = thisDate.AddDays(1);
             }
-            return totalhours/100;
+            return totalhours / 100;
+        }
+
+        public double offhours(int workhourgroup, int holidaygroup, DateTime startdate, DateTime finishdate)
+        {
+            TimeSpan span = finishdate.Date.Subtract(startdate.Date);
+            int days = span.Days + 1;
+            if (days <= 0) return 0;
+
+            Dictionary<DayOfWeek, double> l_workHours = null;
+            if (workhourgroup < 0 || !m_WorkHours.TryGetValue(workhourgroup, out l_workHours))
+            {
+                return 0;
+            }
+
+            Dictionary<int, double> l_HolidayHours = null;
+            bool haveholidays = true;
+            if (holidaygroup < 0 || !m_HolidayHours.TryGetValue(holidaygroup, out l_HolidayHours))
+            {
+                haveholidays = false;
+            }
+
+            DateTime thisDate = startdate;
+            double totalhours = 0;
+            double hours = 0;
+            while (thisDate <= finishdate)
+            {
+                if (haveholidays)
+                {
+                    hours = GetHolidayHours(l_HolidayHours, thisDate);
+                    if (hours < 0) hours = 0;
+                }
+                totalhours += hours;
+                thisDate = thisDate.AddDays(1);
+            }
+            return totalhours / 100;
         }
     }
 }
