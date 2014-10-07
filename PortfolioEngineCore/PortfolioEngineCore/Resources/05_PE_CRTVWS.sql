@@ -146,7 +146,7 @@ SELECT     TOP (100) PERCENT cc.[Cost Category], dbo.EPG_VW_RPT_ListDepartments.
                       rp.CMT_TIMESTAMP, rp.RP_GROUP, rp.RP_ACTIVE_COMMITMENT, rp.RP_RM_STATUS, rp.RP_PM_STATUS, rp.CMT_START_DATE, rp.CMT_FINISH_DATE, 
                       rp.CMT_ALLOCATION, rp.CMT_ALLOCATION_MODE, rp.CMT_ENTEREDBY_WRES_ID, rp.CMT_MAJORCATEGORY, rp.CMT_DESC, rp.CMT_RT_UID, 
                       rp.PROJECT_ID AS ProjectID, rp.WRES_ID AS ResourceID, rph.PRD_ID AS PeriodID, dbo.EPG_VW_RPT_Calendar.RPCalendar, 
-                      dbo.EPG_VW_RPT_Calendar.[Period Name], rp.CMT_ROLE, rp.CMT_DEPT, dbo.EPG_VW_RPT_Calendar.CalendarID, dbo.EPG_VW_RPT_Calendar.PeriodUID
+                      dbo.EPG_VW_RPT_Calendar.[Period Name], rp.CMT_ROLE, rp.CMT_DEPT, dbo.EPG_VW_RPT_Calendar.CalendarID, dbo.EPG_VW_RPT_Calendar.PeriodUID,dbo.epgp_rp_category_values.cat_text_1 AS CustomTextField1,dbo.epgp_rp_category_values.cat_text_2 AS CustomTextField2,dbo.epgp_rp_category_values.cat_text_3 AS CustomTextField3,dbo.epgp_rp_category_values.cat_text_4 AS CustomTextField4,dbo.epgp_rp_category_values.cat_text_5 AS CustomTextField5,dbo.epgp_rp_category_values.cat_code_1 AS CustomCodeField1,dbo.epgp_rp_category_values.cat_code_2 AS CustomCodeField2,dbo.epgp_rp_category_values.cat_code_3 AS CustomCodeField3,dbo.epgp_rp_category_values.cat_code_4 AS CustomCodeField4,dbo.epgp_rp_category_values.cat_code_5 AS CustomCodeField5     
 FROM         dbo.EPG_VW_RPT_ListDepartments INNER JOIN
                       dbo.EPG_RESOURCEPLANS_HOURS AS rph INNER JOIN
                       dbo.EPG_RESOURCEPLANS AS rp ON rph.CMT_UID = rp.CMT_UID ON dbo.EPG_VW_RPT_ListDepartments.LV_UID = rp.CMT_DEPT INNER JOIN
@@ -155,6 +155,8 @@ FROM         dbo.EPG_VW_RPT_ListDepartments INNER JOIN
                       dbo.EPGP_PROJECTS ON rp.PROJECT_ID = dbo.EPGP_PROJECTS.PROJECT_ID INNER JOIN
                       dbo.EPG_RESOURCES ON rp.WRES_ID = dbo.EPG_RESOURCES.WRES_ID INNER JOIN
                       dbo.EPG_VW_RPT_Calendar ON rph.PRD_ID = dbo.EPG_VW_RPT_Calendar.PeriodID
+       LEFT JOIN dbo.epgp_rp_category_values 
+              ON dbo.epgp_rp_category_values.cat_cmt_uid = rp.cmt_uid                       
 WHERE     (dbo.EPG_VW_RPT_Calendar.RPCalendar = ''Yes'')
 
 ')

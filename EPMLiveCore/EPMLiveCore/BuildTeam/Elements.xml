@@ -9,7 +9,7 @@
 		<UrlAction Url="_layouts/epmlive/People.aspx" />
 	</CustomAction>
 
-	<CustomAction
+	<!--<CustomAction
 		  Id="EPMLive.ResourceTools"
 		  Location="CommandUI.Ribbon"
 		  Title="Resource Tools Build Team"
@@ -33,7 +33,7 @@
       Location="ScriptLink"
       Sequence="100"
       >
-	</CustomAction>
+	</CustomAction>-->
 	
 	
 </Elements>

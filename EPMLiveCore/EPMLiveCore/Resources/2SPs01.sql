@@ -2010,3 +2010,43 @@ INSERT INTO INT_AUTH (AUTH_ID, Username, Email, DateTime) VALUES (@authid, @user
 END
 
 ')
+
+if not exists (select routine_name from INFORMATION_SCHEMA.routines where routine_name = 'spRollupGetQueue')
+begin
+    Print 'Creating Stored Procedure spRollupGetQueue'
+    SET @createoralter = 'CREATE'
+end
+else
+begin
+    Print 'Updating Stored Procedure spRollupGetQueue'
+    SET @createoralter = 'ALTER'
+end
+exec(@createoralter + ' PROCEDURE [dbo].[spRollupGetQueue]
+
+@servername varchar(255),
+@maxthreads varchar(2)
+
+AS
+BEGIN
+
+declare @sql varchar(MAX)
+
+set @sql = '';WITH CTE AS 
+( 
+SELECT TOP '' + @maxthreads + '' * 
+FROM RollupQueue 
+WHERE QUEUESERVER is null and STATUS = 0 and DATEDIFF(mi, EVENTTIME, GETDATE()) > 5
+order by EVENTTIME
+) 
+UPDATE CTE SET QUEUESERVER='''''' + @servername + '''''', STATUS = 1''
+
+
+exec(@sql)
+
+
+SELECT * FROM ROLLUPQUEUE WHERE QUEUESERVER = @servername and status = 1
+
+DELETE FROM ROLLUPQUEUE where DATEDIFF(hh, EVENTTIME, GETDATE()) > 24 and Status = 3
+
+END
+')

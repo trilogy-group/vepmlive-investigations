@@ -466,7 +466,7 @@ namespace WorkEnginePPM
             if (team != "")
                 return "<Team>" + team + "</Team>";
             else
-                return "";
+                return "<Team></Team>";
 
         }
 

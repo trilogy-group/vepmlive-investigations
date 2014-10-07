@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.30324.0
+VisualStudioVersion = 12.0.30723.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Diagrams", "Diagrams", "{B8A0FE5E-3214-4D05-8E5A-68A468AF700B}"
 	ProjectSection(SolutionItems) = preProject
@@ -9,22 +9,39 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Diagrams", "Diagrams", "{B8
 		SocialEngine.dgml = SocialEngine.dgml
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EPMLiveCore", "EPMLiveCore\EPMLiveCore.csproj", "{C773AE44-F066-446A-9CBD-D24AFA794E34}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{D6DB9AC0-66BC-4382-882C-6C2BCBF235C6}"
 	ProjectSection(SolutionItems) = preProject
 		SocialEngine.psess = SocialEngine.psess
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EPMLiveCore", "EPMLiveCore\EPMLiveCore.csproj", "{C773AE44-F066-446A-9CBD-D24AFA794E34}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{CE9D0EC3-2E3C-4E68-BE35-202068E782A6}"
+	ProjectSection(SolutionItems) = preProject
+		.nuget\NuGet.Config = .nuget\NuGet.Config
+		.nuget\NuGet.exe = .nuget\NuGet.exe
+		.nuget\NuGet.targets = .nuget\NuGet.targets
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EPMLive.Data", "EPMLive.Data\EPMLive.Data.csproj", "{F7FAB91F-8469-4B59-9D39-0AFA86BC6A82}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EPMLive.Tests", "EPMLive.Tests\EPMLive.Tests.csproj", "{B2E0C915-454E-4AA9-AA26-46DBD1F79404}"
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 2
+		SccNumberOfProjects = 4
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs.epmlive.com/tfs/epmlive
 		SccLocalPath0 = .
 		SccProjectUniqueName1 = EPMLiveCore\\EPMLiveCore.csproj
 		SccProjectName1 = EPMLiveCore
 		SccLocalPath1 = EPMLiveCore
+		SccProjectUniqueName2 = EPMLive.Data\\EPMLive.Data.csproj
+		SccProjectName2 = EPMLive.Data
+		SccLocalPath2 = EPMLive.Data
+		SccProjectUniqueName3 = EPMLive.Tests\\EPMLive.Tests.csproj
+		SccProjectName3 = EPMLive.Tests
+		SccLocalPath3 = EPMLive.Tests
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -37,6 +54,14 @@ Global
 		{C773AE44-F066-446A-9CBD-D24AFA794E34}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C773AE44-F066-446A-9CBD-D24AFA794E34}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C773AE44-F066-446A-9CBD-D24AFA794E34}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{F7FAB91F-8469-4B59-9D39-0AFA86BC6A82}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F7FAB91F-8469-4B59-9D39-0AFA86BC6A82}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F7FAB91F-8469-4B59-9D39-0AFA86BC6A82}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F7FAB91F-8469-4B59-9D39-0AFA86BC6A82}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B2E0C915-454E-4AA9-AA26-46DBD1F79404}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B2E0C915-454E-4AA9-AA26-46DBD1F79404}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B2E0C915-454E-4AA9-AA26-46DBD1F79404}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B2E0C915-454E-4AA9-AA26-46DBD1F79404}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

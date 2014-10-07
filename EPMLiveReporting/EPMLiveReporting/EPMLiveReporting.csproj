@@ -210,6 +210,7 @@ net start "WETimer"</PostDeploymentCommand>
     <Compile Include="LstEvents.cs" />
     <Compile Include="MyWorkListEvents.cs" />
     <Compile Include="MyWorkReportData.cs" />
+    <Compile Include="ParentItemUpdate.cs" />
     <Compile Include="ProcessSecurity.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
@@ -268,8 +269,6 @@ net start "WETimer"</PostDeploymentCommand>
     <Content Include="Layouts\EPMLive\ViewLogDetail.aspx" />
     <Content Include="Resources\CheckReqSP.sql" />
     <Content Include="Resources\CheckSchema.sql" />
-    <Content Include="Resources\spGetReportListData.txt" />
-    <None Include="Resources\spUpdateStatusFields.txt" />
     <None Include="Resources\InitDatabaseCreateTables.sql" />
     <None Include="Resources\InitDatabaseCreateProcedures.sql" />
   </ItemGroup>

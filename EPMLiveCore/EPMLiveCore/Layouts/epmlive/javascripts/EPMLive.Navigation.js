@@ -1160,11 +1160,18 @@
                             if (confirm('Are you sure you want to send the item(s) to the Recycle Bin?')) {
                                 var nId = SP.UI.Notify.addNotification('Deleting Item...', true, '', null);
                                 if (command !== 'nav:remove') {
-                                    $.get(redirectUrl).always(function () {
-                                        removeLink(id, nId);
-                                        SP.UI.Notify.removeNotification(nId);
-                                        if (callBackFunction != '')
-                                            eval(callBackFunction + '(' + id + ')');
+                                    $.get(redirectUrl, function (data) {
+                                        if (data == "General Error: You do not have permissions to delete users.\r\n") {
+                                            SP.UI.Notify.removeNotification(nId);
+                                            SP.UI.Notify.addNotification('You do not have permission to delete Resources', false, '', null);
+
+                                        }
+                                        else {
+                                            removeLink(id, nId);
+                                            SP.UI.Notify.removeNotification(nId);
+                                            if (callBackFunction != '')
+                                                eval(callBackFunction + '(' + id + ')');
+                                        }
                                     });
                                 } else {
                                     removeLink(id, nId);
@@ -2148,7 +2155,7 @@
                                 cmd.kind = customOverrideKind;
                             }
 
-                            var webId = $ca.data('webid');
+                            //var webId = $ca.data('webid');
 
                             if (!webId || webId === 'undefined') {
                                 try {
@@ -2168,7 +2175,7 @@
                                     callbackfunction = callBackFunctions[cmd.command];
                             }
 
-                                $menu.append($('<li><span class="epm-nav-cm-icon ' + getIcon(cmd.command) + '">&nbsp;</span><a href="javascript:epmLiveNavigation.handleContextualCommand(\'' + liId + '\',\'' + webId + '\',\'' + $ca.data('listid') + '\',\'' + $ca.data('itemid') + '\',\'' + cmd.command + '\',\'' + cmd.kind + '\',\'' + callbackfunction + '\');" style="width: 122px !important; display: inline-block;">' + cmd.title + '</a></li>').hide().fadeIn());
+                                $menu.append($('<li><span class="epm-nav-cm-icon ' + getIcon(cmd.command) + '">&nbsp;</span><a href="javascript:epmLiveNavigation.handleContextualCommand(\'' + liId + '\',\'' + webId + '\',\'' + listId + '\',\'' + itemId + '\',\'' + cmd.command + '\',\'' + cmd.kind + '\',\'' + callbackfunction + '\');" style="width: 122px !important; display: inline-block;">' + cmd.title + '</a></li>').hide().fadeIn());
 
                                 $menu.find('a').click(function () {
                                     hideMenu();

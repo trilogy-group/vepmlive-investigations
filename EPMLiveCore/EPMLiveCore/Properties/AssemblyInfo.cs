@@ -36,3 +36,4 @@ using Microsoft.SharePoint.WebControls;
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("1.0.0.0")]
 [assembly: MdsCompliant(true)]
+[assembly: InternalsVisibleTo("EPMLive.Tests, PublicKey=0024000004800000940000000602000000240000525341310004000001000100dd5f4634f6f2ea7dbbae2803b234d21f289d5758301302e64b68b5d0c5a231a573fbc888f4cc24371c7c7876ed350ec1db3c6167c24999063ea5851e09ac0f083e4043f30470b0c1fcc339a25895057ef6c7c851cc08e4614797309265c53d81e643dd2207c690e39ace5e3ed0e8efc8304069fc37cc0a16642cc9a7750278bd")]

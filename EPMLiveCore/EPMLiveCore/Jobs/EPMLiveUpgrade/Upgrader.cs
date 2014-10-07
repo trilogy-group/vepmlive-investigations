@@ -8,7 +8,7 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade
 {
     public class Upgrader : BaseJob
     {
-        #region Methods (1) 
+        #region Methods (1)
 
         // Public Methods (1) 
 
@@ -22,7 +22,7 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade
             int progressCounter = 1;
             foreach (Type upgradeStep in upgradeSteps)
             {
-                var step = Activator.CreateInstance(upgradeStep, new object[] {web, isPfeSite}) as IUpgradeStep;
+                var step = Activator.CreateInstance(upgradeStep, new object[] { web, isPfeSite }) as IUpgradeStep;
 
                 if (step == null) continue;
 
@@ -38,6 +38,6 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade
             }
         }
 
-        #endregion Methods 
+        #endregion Methods
     }
 }

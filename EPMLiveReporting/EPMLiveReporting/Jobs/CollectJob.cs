@@ -93,14 +93,12 @@ namespace EPMLiveReportsAdmin.Jobs
                 EPMData epmdata = null;
                 var hshMessages = new Hashtable();
 
+                #region Process security
+
                 try
                 {
-                    base.totalCount = site.AllWebs.Count;
-                    
-                    bool refreshAll = (string.IsNullOrEmpty(data) ? true : false);
+                    totalCount = site.AllWebs.Count;
                     epmdata = new EPMData(site.ID);
-
-                    #region Process security
 
                     try
                     {
@@ -109,9 +107,11 @@ namespace EPMLiveReportsAdmin.Jobs
                     }
                     catch (Exception ex)
                     {
+                        var message = ex.InnerException != null ? ex.InnerException.Message : ex.Message;
+
                         bErrors = true;
                         sErrors += "<font color=\"red\">Error processing security on site: " + site.Url + ". Error: " +
-                                   ex.Message + "</font><br>";
+                                   message + "</font><br>";
                     }
 
                     if (string.IsNullOrEmpty(data))
@@ -132,8 +132,10 @@ namespace EPMLiveReportsAdmin.Jobs
                         }
                         catch (Exception ex)
                         {
+                            var message = ex.InnerException != null ? ex.InnerException.Message : ex.Message;
+
                             bErrors = true;
-                            sErrors += "<font color=\"red\">Error Updating RPTSettings: " + ex.Message + "</font><br>";
+                            sErrors += "<font color=\"red\">Error Updating RPTSettings: " + message + "</font><br>";
                         }
                     }
                 }
@@ -142,6 +144,10 @@ namespace EPMLiveReportsAdmin.Jobs
                     bErrors = true;
                     sErrors += "<font color=\"red\">Error Updating base: " + ex.Message + "</font><br>";
                 }
+
+                #endregion
+
+                #region History
 
                 //try
                 //{
@@ -208,8 +214,10 @@ namespace EPMLiveReportsAdmin.Jobs
                 }
                 catch (Exception ex)
                 {
+                    var message = ex.InnerException != null ? ex.InnerException.Message : ex.Message;
+
                     bErrors = true;
-                    sErrors += "<font color=\"red\">Error Processing Timesheets: " + ex.Message + "</font><br>";
+                    sErrors += "<font color=\"red\">Error Processing Timesheets: " + message + "</font><br>";
                 }
 
                 #endregion
@@ -249,8 +257,10 @@ namespace EPMLiveReportsAdmin.Jobs
                 }
                 catch (Exception ex)
                 {
+                    var message = ex.InnerException != null ? ex.InnerException.Message : ex.Message;
+
                     bErrors = true;
-                    sErrors += "<font color=\"red\">Error Processing PfE Reporting: " + ex.Message + "</font><br>";
+                    sErrors += "<font color=\"red\">Error Processing PfE Reporting: " + message + "</font><br>";
                 }
 
                 #endregion Process PFE Data
@@ -263,8 +273,10 @@ namespace EPMLiveReportsAdmin.Jobs
                 }
                 catch (Exception exReqSP)
                 {
+                    var message = exReqSP.InnerException != null ? exReqSP.InnerException.Message : exReqSP.Message;
+
                     bErrors = true;
-                    sErrors += "<font color=\"red\">Error while checking SPRequirement: " + exReqSP.Message + "</font><br>";
+                    sErrors += "<font color=\"red\">Error while checking SPRequirement: " + message + "</font><br>";
                 }
 
                 try
@@ -273,8 +285,10 @@ namespace EPMLiveReportsAdmin.Jobs
                 }
                 catch (Exception exSchema)
                 {
+                    var message = exSchema.InnerException != null ? exSchema.InnerException.Message : exSchema.Message;
+
                     bErrors = true;
-                    sErrors += "<font color=\"red\">Error while updating schema: " + exSchema.Message + "</font><br>";
+                    sErrors += "<font color=\"red\">Error while updating schema: " + message + "</font><br>";
                 }
                 
                 #endregion
@@ -287,16 +301,18 @@ namespace EPMLiveReportsAdmin.Jobs
                 }
                 catch (Exception ex)
                 {
+                    var message = ex.InnerException != null ? ex.InnerException.Message : ex.Message;
+
                     bErrors = true;
-                    sErrors += "<font color=\"red\">Error while cleaning tables: " + ex.Message + "</font><br>";
+                    sErrors += "<font color=\"red\">Error while cleaning tables: " + message + "</font><br>";
                 }
 
                 #endregion
 
+                #region Update Status Field
+
                 try
                 {
-
-
                     if (string.IsNullOrEmpty(data))
                     {
                         try
@@ -317,8 +333,10 @@ namespace EPMLiveReportsAdmin.Jobs
                         }
                         catch (Exception ex)
                         {
+                            var message = ex.InnerException != null ? ex.InnerException.Message : ex.Message;
+
                             bErrors = true;
-                            sErrors += "<font color=\"red\">Error updating status fields: " + ex.Message + "</font><br>";
+                            sErrors += "<font color=\"red\">Error updating status fields: " + message + "</font><br>";
                         }
                     }
                     else
@@ -347,19 +365,24 @@ namespace EPMLiveReportsAdmin.Jobs
                                     }
                                     catch (Exception ex)
                                     {
+                                        var message = ex.InnerException != null ? ex.InnerException.Message : ex.Message;
+
                                         bErrors = true;
-                                        sErrors += "<font color=\"red\">Error updating status fields (" + sList + "): " + ex.Message + "</font><br>";
+                                        sErrors += "<font color=\"red\">Error updating status fields (" + sList + "): " + message + "</font><br>";
                                     }
                                 }
                             }
                         }
                         catch (Exception ex)
                         {
+                            var message = ex.InnerException != null ? ex.InnerException.Message : ex.Message;
+
                             bErrors = true;
-                            sErrors += "<font color=\"red\">Error updating status fields: " + ex.Message + "</font><br>";
+                            sErrors += "<font color=\"red\">Error updating status fields: " + message + "</font><br>";
                         }
 
                     }
+
                     foreach (string list in data.Split(','))
                     {
                         if (list != "")
@@ -374,10 +397,13 @@ namespace EPMLiveReportsAdmin.Jobs
                             }
                             catch (Exception ex)
                             {
+                                var message = ex.InnerException != null ? ex.InnerException.Message : ex.Message;
+
                                 bErrors = true;
                                 sErrors += "<font color=\"red\">Error running schedule field update for (" + list + "): " +
-                                           ex.Message + "</font><br>";
+                                           message + "</font><br>";
                             }
+
                             if (!hshMessages.Contains(list))
                                 hshMessages.Add(list, "");
                         }
@@ -387,11 +413,15 @@ namespace EPMLiveReportsAdmin.Jobs
                 }
                 catch (Exception ex)
                 {
+                    var message = ex.InnerException != null ? ex.InnerException.Message : ex.Message;
+
                     bErrors = true;
-                    sErrors += "<font color=\"red\">Error running schedule field update: " + ex.Message + "</font><br>";
+                    sErrors += "<font color=\"red\">Error running schedule field update: " + message + "</font><br>";
                 }
 
-                // clear cache
+                #endregion
+
+                #region Clear Cache
 
                 try
                 {
@@ -399,15 +429,22 @@ namespace EPMLiveReportsAdmin.Jobs
                 }
                 catch (Exception ex)
                 {
+                    var message = ex.InnerException != null ? ex.InnerException.Message : ex.Message;
+
                     bErrors = true;
-                    sErrors += "<font color=\"red\">Clear Cache Error: " + ex.Message + "</font><br>";
+                    sErrors += "<font color=\"red\">Clear Cache Error: " + message + "</font><br>";
                 }
+
+                #endregion
             }
             catch(Exception ex)
             {
+                var message = ex.InnerException != null ? ex.InnerException.Message : ex.Message;
+
                 bErrors = true;
-                sErrors += "<font color=\"red\">General Execute Error: " + ex.Message + "</font><br>";
+                sErrors += "<font color=\"red\">General Execute Error: " + message + "</font><br>";
             }
+
             finishJob();
         }
 

@@ -13,12 +13,13 @@ namespace EPMLiveCore.Jobs
 {
     public class SecurityUpdate
     {
+        string safeGroupTitle = string.Empty;
+
         public void execute(SPSite site, SPWeb web, Guid listId, int itemId, int userid, string data)
         {
             SPList list = web.Lists[listId];
             SPListItem li = list.GetItemById(itemId);
             GridGanttSettings settings = new GridGanttSettings(list);
-
 
             List<string> cNewGrps = new List<string>();
 
@@ -38,6 +39,9 @@ namespace EPMLiveCore.Jobs
                 if (!li.HasUniqueRoleAssignments)
                 {
                     web.AllowUnsafeUpdates = true;
+                    safeGroupTitle = safeTitle;
+
+                    safeTitle = GetIdenticalGroupName(site.ID, web.ID, safeTitle, 0);
 
                     // step 1 perform actions related to "parent item"
                     // ===============================================
@@ -170,7 +174,6 @@ namespace EPMLiveCore.Jobs
 
                     }
 
-
                     List<string> liGrps = new List<string>();
                     liGrps.Add(string.Format("{0} Owner", safeTitle));
                     liGrps.Add(string.Format("{0} Member", safeTitle));
@@ -191,6 +194,34 @@ namespace EPMLiveCore.Jobs
             // we wait until all groups have been created to createworkspace
             // only if there isn't a current process creating ws 
             WorkspaceTimerjobAgent.QueueWorkspaceJobOnHoldForSecurity(site.ID, web.ID, list.ID, li.ID);
+        }
+
+        private string GetIdenticalGroupName(Guid siteId, Guid webId, string safeTitle, Int32 uniqueGroupIndex)
+        {
+            string uniqueGroupName = safeTitle;
+            string groupTitle = string.Format("'{0} Owner','{0} Member', '{0} Visitor'", uniqueGroupName);
+            string qryGroupExists = "SELECT ID FROM LSTUserInformationList WHERE Title IN (" + groupTitle + ") AND ContentType = 'SharePointGroup'  AND WebId = '" + Convert.ToString(webId) + "'";
+            try
+            {
+                ReportData _dao = new ReportData(siteId);
+                using (SqlConnection cn = _dao.GetClientReportingConnection())
+                {
+                    using (SqlCommand cmd = new SqlCommand(qryGroupExists, cn))
+                    {
+                        SqlDataReader dr = cmd.ExecuteReader();
+                        if (dr.Read())
+                        {
+                            //Ooopppsss! Group already exists! Let's try with Incremental Group Search in LSTUserInformationList table!
+                            Convert.ToInt32(uniqueGroupIndex++);
+                            groupTitle = string.Format("{0}{1}", safeGroupTitle, Convert.ToInt32(uniqueGroupIndex));
+                            uniqueGroupName = GetIdenticalGroupName(siteId, webId, groupTitle, Convert.ToInt32(uniqueGroupIndex));
+                        }
+                    }
+                }
+            }
+            catch { }
+
+            return uniqueGroupName;
         }
 
         private void ProcessSecurity(SPSite site, SPList list, SPListItem li, int userid)
@@ -270,27 +301,14 @@ namespace EPMLiveCore.Jobs
             foreach (string grp in grps)
             {
                 string finalName = string.Empty;
-                SPGroup testGrp = null;
                 try
                 {
-                    testGrp = ew.SiteGroups[safeTitle + " " + grp];
+                    finalName = CoreFunctions.AddGroup(ew, safeTitle, grp, ew.CurrentUser, ew.CurrentUser, string.Empty);
+                    spUInfoList.Items.GetItemById(ew.SiteGroups[finalName].ID).SystemUpdate();
+                    ew.Update();
+                    Thread.Sleep(1000);
                 }
                 catch { }
-                if (testGrp != null)
-                {
-                    finalName = testGrp.Name;
-                }
-                else
-                {
-                    try
-                    {
-                        finalName = CoreFunctions.AddGroup(ew, safeTitle, grp, ew.CurrentUser, ew.CurrentUser, string.Empty);
-                        spUInfoList.Items.GetItemById(ew.SiteGroups[finalName].ID).SystemUpdate();
-                        ew.Update();
-                        Thread.Sleep(1000);
-                    }
-                    catch { }
-                }
 
                 SPGroup finalGrp = ew.SiteGroups[finalName];
                 SPRoleType rType;

@@ -608,14 +608,37 @@
         }
         return null;
     };
-    RPEditor.prototype.GetFTEConv = function (ccruid, periodId) {
+    RPEditor.prototype.GetFTEConv = function (ccruid, periodId, grid, row) {
         try {
             var key = ccruid + "P" + periodId.toString();
             var ftetohours = this.ccrFTEArray[key];
+
             if (isNaN(ftetohours))
-                return 100;
-            else
-                return parseInt(ftetohours);
+                ftetohours = 100;
+
+            var resrow;
+            switch (grid.id) {
+                case "g_RPE":
+                    var resuid = this.plangrid.GetAttribute(row, null, "Res_UID");
+                    resrow = this.resgrid.GetRowById(resuid);
+                    break;
+                case "g_Res":
+                    resrow = row;
+                    break;
+            }
+
+            var fOff = 0;
+            if (resrow) {
+                var off = this.resgrid.GetAttribute(resrow, null, "O" + periodId);
+                var fO = parseInt(off);
+                if (isNaN(fO) == false)
+                    fOff = fO;
+            }
+
+            if (isNaN(fOff))
+                fOff = 0;
+
+            return ftetohours - fOff;
         }
         catch (e) {
             return 100;
@@ -939,7 +962,7 @@
                             },
                             {
                                 items: [
-                                    { type: "bigbutton", name: "Close", img: "close32.gif", tooltip: "Close", onclick: "dialogEvent('EditorTab_Close');", disabled: bIsCloseDisabled }
+                                    { type: "bigbutton", id: "CloseBtn", name: "Close", img: "close32.gif", tooltip: "Close", onclick: "dialogEvent('EditorTab_Close');", disabled: bIsCloseDisabled }
                                 ]
                             }
                         ]
@@ -1044,7 +1067,7 @@
                             },
                             {
                                 items: [
-                                    { type: "bigbutton", name: "Close", img: "close32.gif", tooltip: "Close", onclick: "dialogEvent('EditorTab_Close');", disabled: bIsCloseDisabled }
+                                    { type: "bigbutton", id: "CloseBtn2", name: "Close", img: "close32.gif", tooltip: "Close", onclick: "dialogEvent('EditorTab_Close');", disabled: bIsCloseDisabled }
                                 ]
                             }
                         ]
@@ -1735,7 +1758,7 @@
                     if (resuid == null) resuid = grid.GetAttribute(row, null, "Res_UID");
                     var resrow = this.FindResourceRow(resuid);
                     var periodid = col.substring(1);
-                    this.CalculateResourceRowPeriodCommitted(resuid, resrow, periodid, true);
+                    this.CalculateResourceRowPeriodCommitted(resuid, resrow, periodid, true, row);
                     var reqrow = this.GetParentRequirement(row);
                     if (reqrow != null) {
                         this.CalculateRequirementCellValue(reqrow, periodid, 0);
@@ -1847,7 +1870,7 @@
     RPEditor.prototype.ValidatePeriodConversion = function (grid, row, col) {
         var sId = col.substring(1);
         var ccruid = grid.GetAttribute(row, null, "CCRole_UID");
-        var fteconv = this.GetFTEConv(ccruid, sId);
+        var fteconv = this.GetFTEConv(ccruid, sId, grid, row);
         if (fteconv == null) { alert("ValidatePeriodConversion : null fte conversion"); return false; }
         var valueH = grid.GetAttribute(row, "H" + sId);
         var valueF = grid.GetAttribute(row, "F" + sId);
@@ -1892,7 +1915,7 @@
             f = "u";
         }
         var origvalue = value;
-        var fteconv = this.GetFTEConv(ccruid, sId);
+        var fteconv = this.GetFTEConv(ccruid, sId, grid, row);
         if (fteconv > 0) {
             switch (this.displayMode) {
                 case 0: /* Hours mode - so calc FTE */
@@ -2036,7 +2059,7 @@
         var sId = col.substring(1);
         var sValue = "";
         var ccruid = grid.GetAttribute(row, "CCRole_UID");
-        var fteconv = this.GetFTEConv(ccruid, sId);
+        var fteconv = this.GetFTEConv(ccruid, sId, grid, row);
         var dblfteDiv = fteconv / 100;
         if (dblfteDiv != null) {
             sValue = dblfteDiv.toString();
@@ -2190,7 +2213,7 @@
             this.ExecuteJSON(sb.toString(), "GeneralFunctions");
 
             this.SetPlanRowsEditStatus();
-            this.RefreshResourcePeriods(true);
+            //this.RefreshResourcePeriods(true);
         }
         this.UpdateButtonsAsync();
     };
@@ -2783,17 +2806,19 @@
                     break;
                 case "EditorTab_Close":
                     {
-                        var b = true;
-                        this.ExitConfirmed = false;
-                        if (this.HasChanges() == true) {
-                            b = window.confirm("You have unsaved changes.\n\nAre you sure you want to exit without saving?");
-                        }
-                        if (b) {
-                            this.ExitConfirmed = true;
-                            if (parent.SP.UI.DialogResult)
-                                parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.OK, '');
-                            else
-                                parent.SP.UI.ModalDialog.commonModalDialogClose(1, '');
+                        if (this.editorTab.isItemDisabled("CloseBtn") != true || this.editorTab.isItemDisabled("CloseBtn2") != true) {
+                            var b = true;
+                            this.ExitConfirmed = false;
+                            if (this.HasChanges() == true) {
+                                b = window.confirm("You have unsaved changes.\n\nAre you sure you want to exit without saving?");
+                            }
+                            if (b) {
+                                this.ExitConfirmed = true;
+                                if (parent.SP.UI.DialogResult)
+                                    parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.OK, '');
+                                else
+                                    parent.SP.UI.ModalDialog.commonModalDialogClose(1, '');
+                            }
                         }
                         break;
                     }
@@ -3950,6 +3975,7 @@
                         var dblValue = parseFloat(jValue.value) * mpy;
                         this.SetPeriodValue(grid, row, col, dblValue);
                         var sValue = this.GetFormattedPeriodCell(grid, row, col, false, false);
+                        this.GridsOnAfterValueChanged(grid, row, col, sValue);
                         grid.SetAttribute(row, col, null, sValue, 0, 0);
                     }
                 }
@@ -4209,7 +4235,7 @@
         while (planrow != null) {
             if (plangrid.GetAttribute(planrow, null, "Status") != const_Requirement) {
                 if (this.ValidatePlanRowPeriodConversion(plangrid, planrow) == false) {
-                    alert("Invalid Hours or FTE.\n\nAt least one period value does not match the current FTE Conversion Factor.\n\nPlease report this problem to your System Administrator.");
+                    //alert("Invalid Hours or FTE.\n\nAt least one period value does not match the current FTE Conversion Factor.\n\nPlease report this problem to your System Administrator.");
                     return;
                 }
             }
@@ -4373,6 +4399,11 @@
             this.editorTab.disableItem("SavePlanBtn");
             this.viewTab.disableItem("SavePlanBtn2");
             this.dirty = false;
+        }
+
+        if (this.params.HideCloseBtn != null && this.params.HideCloseBtn.toString().toLowerCase() == "true") {
+            this.editorTab.disableItem("CloseBtn");
+            this.viewTab.disableItem("CloseBtn2");
         }
 
         var grid = Grids["g_RPE"];
@@ -4837,13 +4868,26 @@
     };
     RPEditor.prototype.FindResourceRow = function (resUID) {
         var grid = Grids["g_Res"];
+        //var row = grid.GetFirst(null, 0);
+        //while (row != null) {
+        //    if (resUID == grid.GetAttribute(row, null, "Res_UID"))
+        //        return row;
+        //    row = grid.GetNext(row);
+        //}
+        //return null;
+        return grid.GetRowById(resUID);
+    };
+    RPEditor.prototype.FindPlannerRow = function (resUID) {
+        var grid = Grids["g_RPE"];
         var row = grid.GetFirst(null, 0);
         while (row != null) {
-            if (resUID == grid.GetAttribute(row, null, "Res_UID"))
+            var planresuid = grid.GetAttribute(row, null, "PendingRes_UID");
+            if (planresuid == null) planresuid = grid.GetAttribute(row, null, "Res_UID");
+            if (resUID == planresuid) {
                 return row;
+            }
             row = grid.GetNext(row);
         }
-        return null;
     };
     RPEditor.prototype.FindProjectRow = function (projectUID) {
         var grid = Grids["g_RPE"];
@@ -4869,9 +4913,11 @@
         var resgrid = Grids["g_Res"];
         var row = resgrid.GetFirst(null, 0);
         while (row != null) {
-            if (bCalculate == true)
+            if (bCalculate == true) {
                 this.CalculateResourceRowCommitted(null, row);
-            this.RefreshResourceRowPeriods(resgrid, row, false);
+            } else {
+                this.RefreshResourceRowPeriods(resgrid, row, false);
+            }
             row = resgrid.GetNext(row);
         }
         if (this.initialized == true)
@@ -4882,42 +4928,41 @@
         if (resuid == null)
             resuid = Grids["g_Res"].GetAttribute(resrow, null, "Res_UID");
         var plangrid = this.plangrid;
-        for (var c = 0; c < plangrid.ColNames[2].length; c++) {
-            var col = plangrid.ColNames[2][c];
+        var plannerRow = this.FindPlannerRow(resuid);
+        var colNames = plangrid.ColNames[2];
+        var colLength = colNames.length;
+        for (var c = 0; c < colLength; c++) {
+            var col = colNames[c];
             var sType = col.substring(0, 1);
             if (sType == "Q") {
                 var periodid = col.substring(1);
-                this.CalculateResourceRowPeriodCommitted(resuid, resrow, periodid, false);
+                this.CalculateResourceRowPeriodCommitted(resuid, resrow, periodid, false, plannerRow);
             }
         }
         this.RefreshResourceRowPeriods(this.resgrid, resrow, true);
     };
-    RPEditor.prototype.CalculateResourceRowPeriodCommitted = function (resuid, resrow, periodid, bRefreshCell) {
+    RPEditor.prototype.CalculateResourceRowPeriodCommitted = function (resuid, resrow, periodid, bRefreshCell, plannerRow) {
         var plangrid = this.plangrid;
         // "C" + periodid represents all the committed hours for a resource on all projects (including this one)
         // deltaC is the difference between the committed hours when the plan was opened vs the committed hours now and, optionally, can include pending on this project
         var deltaC = 0;
-        var row = plangrid.GetFirst(null, 0);
-        while (row != null) {
-            var planresuid = plangrid.GetAttribute(row, null, "PendingRes_UID");
-            if (planresuid == null) planresuid = plangrid.GetAttribute(row, null, "Res_UID");
-            if (resuid == planresuid) {
-                var lHours = this.GetIntValue(plangrid.GetAttribute(row, null, "H" + periodid), 0);
-                var deleted = plangrid.GetAttribute(row, null, "Deleted");
-                if (deleted == 1) {
-                    if (lHours == 0)
-                        deltaC -= this.GetIntValue(this.GetPeriodHoursSpecial(plangrid, row, "H" + periodid), 0);
-                    else
-                        deltaC -= lHours;
-                }
-                else {
-                    deltaC += this.GetIntValue(this.GetPeriodHoursSpecial(plangrid, row, "H" + periodid), 0) - lHours;
-                }
+        if (plannerRow != null) {
+            var lHours = this.GetIntValue(plangrid.GetAttribute(plannerRow, null, "H" + periodid), 0);
+            var deleted = plangrid.GetAttribute(plannerRow, null, "Deleted");
+            if (deleted == 1) {
+                if (lHours == 0)
+                    deltaC -= this.GetIntValue(this.GetPeriodHoursSpecial(plangrid, plannerRow, "H" + periodid), 0);
+                else
+                    deltaC -= lHours;
             }
-            row = plangrid.GetNext(row);
+            else {
+                deltaC += this.GetIntValue(this.GetPeriodHoursSpecial(plangrid, plannerRow, "H" + periodid), 0) - lHours;
+            }
         }
         this.resgrid.SetAttribute(resrow, null, "D" + periodid, deltaC, 0, 0);
-        this.RefreshResourceRowPeriod(this.resgrid, resrow, periodid, bRefreshCell);
+        if (bRefreshCell) {
+            this.RefreshResourceRowPeriod(this.resgrid, resrow, periodid, bRefreshCell);
+        }
     };
     RPEditor.prototype.CommitResourceRowPeriodValue = function (resuid, resrow, periodid, deltaHours) {
         if (deltaHours != 0) {
@@ -4976,13 +5021,19 @@
         if (isNaN(fD) == false)
             fDeltaC = fD;
 
+        var offHours = grid.GetAttribute(row, null, "O" + periodid);
+        var fOffHours = 0;
+        var fO = parseInt(offHours);
+        if (isNaN(fO) == false)
+            fOffHours = fO;
+
         var nonwork = grid.GetAttribute(row, null, "N" + periodid);
         var fNonwork = 0.0;
         var fN = parseFloat(nonwork);
         if (isNaN(fN) == false)
             fNonwork = fN;
 
-        var fteconv = this.GetFTEConv(ccruid, periodid);
+        var fteconv = this.GetFTEConv(ccruid, periodid, grid, row);
 
         var fFTEConv = 10000;
         var fF = parseInt(fteconv);
@@ -4998,9 +5049,8 @@
                 fHours = fCommitted + fNonwork + fDeltaC;
                 break;
             case "Remaining":
-                fHours = fAvailable - fCommitted - fNonwork - fDeltaC;
-                break;
             case "Remaining2":
+                //fHours = fAvailable - fCommitted - fNonwork - fDeltaC - fOffHours;  /// EPML-2320
                 fHours = fAvailable - fCommitted - fNonwork - fDeltaC;
                 break;
         }
@@ -5020,6 +5070,10 @@
                 fValue = (fFTEConv / 100);
                 break;
         }
+
+        if (isNaN(fValue))
+            fValue = 0;
+
         if (fValue == 0 && fAvailable == 0)
             fValue = "";
         grid.SetAttribute(row, null, "Q" + periodid, fValue, bRefreshCell, 0);

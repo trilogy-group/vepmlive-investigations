@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using EPMLiveCore;
+﻿using EPMLiveCore;
 using EPMLiveCore.ListDefinitions;
 using Microsoft.SharePoint;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using WorkEnginePPM.Core.DataSync;
 using WorkEnginePPM.Core.Entities;
 
@@ -24,13 +24,14 @@ namespace WorkEnginePPM.Events.DataSync
         public override void ItemAdded(SPItemEventProperties properties)
         {
             if (!ValidateRequest(properties)) return;
-
             try
             {
                 using (var holidayManager = new HolidayManager(properties.Web))
                 {
                     holidayManager.AddPFEHolidays(properties);
-                    holidayManager.Synchronize(holidayManager.GetExistingHolidaySchedules(properties.List.Items));
+                    List<HolidaySchedule> existingHolidaySchedules = holidayManager.GetExistingHolidaySchedules(properties.List.Items);
+                    List<HolidaySchedule> newHolidaySchedules = existingHolidaySchedules.Where(holidaySchedule => holidaySchedule.Id.Equals(properties.ListItemId)).ToList<HolidaySchedule>();
+                    holidayManager.Synchronize(newHolidaySchedules);                                        
                 }
             }
             catch (Exception exception)
@@ -52,11 +53,22 @@ namespace WorkEnginePPM.Events.DataSync
 
             try
             {
-                List<HolidaySchedule> holidaySchedules;
+                List<HolidaySchedule> newholidaySchedules = new List<HolidaySchedule>();
+                List<HolidaySchedule> holidaySchedules;                
 
                 object title = properties.AfterProperties["Title"];
 
                 if (title == null) throw new Exception("Title cannot be empty.");
+
+                using (var holidayManager = new HolidayManager(properties.Web))
+                {
+                    holidaySchedules = holidayManager.GetExistingHolidaySchedules(properties.List.Items);
+                    var existingSchedule = holidaySchedules.Where(hs => hs.Title.Equals(title.ToString(), StringComparison.InvariantCultureIgnoreCase));
+                    if (existingSchedule.Count() > 0)
+                    {
+                        throw new Exception(string.Format("Holiday schedule with title '{0}' already exists.", title.ToString()));                        
+                    }
+                }
 
                 bool isDefault = bool.Parse((properties.AfterProperties["IsDefault"] ?? false).ToString());
 
@@ -64,21 +76,20 @@ namespace WorkEnginePPM.Events.DataSync
 
                 using (var holidayManager = new HolidayManager(properties.Web))
                 {
-                    holidaySchedules = holidayManager.GetExistingHolidaySchedules(properties.List.Items);
-
-                    holidaySchedules.Add(new HolidaySchedule
+                    newholidaySchedules.Add(new HolidaySchedule
                     {
-                        Title = (string) title,
+                        Title = (string)title,
                         IsDefault = isDefault,
                         UniqueId = uniqueId,
                         Holidays = new List<Holiday>()
-                    });
-
-                    holidaySchedules = holidayManager.Synchronize(holidaySchedules);
+                    });                    
+                    
+                    // Syncs only that holiday schedule which is recently created.
+                    newholidaySchedules = holidayManager.Synchronize(newholidaySchedules);                    
                 }
 
                 UpdateDefault(properties, uniqueId, isDefault);
-                SetExtId(properties, uniqueId, holidaySchedules);
+                SetExtId(properties, uniqueId, newholidaySchedules);
             }
             catch (Exception exception)
             {
@@ -171,27 +182,37 @@ namespace WorkEnginePPM.Events.DataSync
                     if (title == null) throw new Exception("Title cannot be empty.");
                     if (extId == null) throw new Exception("External ID cannot be empty.");
 
+                    HolidaySchedule existingSchedule = holidaySchedules.Where(hs => hs.Title.Equals(title.ToString(), StringComparison.InvariantCultureIgnoreCase)).First();
+                    // Cancel holiday schedule updation if it is already exist with same title.
+                    // Also ignore if same schedule is getting updated.
+                    if (existingSchedule != null && existingSchedule.Id != properties.ListItemId)
+                    {
+                        throw new Exception(string.Format("Holiday schedule with title '{0}' already exists.", title.ToString()));
+                    }
+
                     bool isDefault =
                         bool.Parse(
                             (properties.AfterProperties["IsDefault"] ?? (properties.ListItem["IsDefault"] ?? false))
                                 .ToString());
 
-                    Guid uniqueId = properties.ListItem.UniqueId;
+                    Guid uniqueId = properties.ListItem.UniqueId;                    
+                    List<HolidaySchedule> updatedHolidaySchedules = new List<HolidaySchedule>();
 
                     foreach (HolidaySchedule holidaySchedule in holidaySchedules
                         .Where(holidaySchedule => holidaySchedule.UniqueId == uniqueId))
                     {
-                        holidaySchedule.Title = (string) title;
+                        holidaySchedule.Title = (string)title;
                         holidaySchedule.IsDefault = isDefault;
-                        holidaySchedule.ExtId = (string) extId;
-
+                        holidaySchedule.ExtId = (string)extId;
+                        // Populating only updated holiday schedule
+                        updatedHolidaySchedules.Add(holidaySchedule);
                         break;
                     }
 
-                    holidaySchedules = holidayManager.Synchronize(holidaySchedules);
-
+                    // Syncs only the updated holiday schedule with PFE Database
+                    updatedHolidaySchedules = holidayManager.Synchronize(updatedHolidaySchedules);
                     UpdateDefault(properties, uniqueId, isDefault);
-                    SetExtId(properties, uniqueId, holidaySchedules);
+                    SetExtId(properties, uniqueId, updatedHolidaySchedules);
 
                     holidayManager.AddPFEHolidays(properties);
                 }

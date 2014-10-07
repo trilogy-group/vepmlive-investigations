@@ -62,6 +62,13 @@ namespace WorkEnginePPM.ControlTemplates.WorkEnginePPM
             set { m_sIsDlg = value.TrimStart().Substring(0,1); }
         }
 
+        private string m_hideCloseBtn = "";
+        public string HideCloseBtn
+        {
+            get { return m_hideCloseBtn; }
+            set { m_hideCloseBtn = value; }
+        }
+
         public string Webservice
         {
             get

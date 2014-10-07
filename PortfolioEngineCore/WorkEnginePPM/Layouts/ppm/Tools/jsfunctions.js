@@ -11,7 +11,7 @@ function jsf_alertError(error) {
     var severity = error.severity;
     switch (severity) {
         case "error":
-            alert("Error returned from server:\n\n" + error.message + "\n");
+            alert(error.message);
             break;
         default:
             alert("Error returned from server:\nseverity: " + severity + "\nlocation: " + error.location + "\nmessage: " + error.message + "\n");

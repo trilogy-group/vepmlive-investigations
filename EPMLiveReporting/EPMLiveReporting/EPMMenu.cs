@@ -63,7 +63,7 @@ namespace EPMLiveReportsAdmin
             _icon = icon;
             _onMenuClick = enabled
                 ? onMenuClick
-                : "javascript:alert('This site is not currently configured to allow list mapping');return false;";
+                : "javascript:alert('This site is not currently configured to allow list mapping');";
             _text = text;
             _groupId = groupId;
             _enabled = enabled;

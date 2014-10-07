@@ -135,6 +135,15 @@
     <Compile Include="Resources\ResourceSelector.cs" />
     <Compile Include="Resources\RPEditorData.cs" />
     <Compile Include="Resources\RPEditorResources.cs" />
+    <Compile Include="Services\DataServices\Contracts\IDataServiceModule.cs" />
+    <Compile Include="Services\DataServices\Controller.cs" />
+    <Compile Include="Services\DataServices\Core\ActionKind.cs" />
+    <Compile Include="Services\DataServices\Core\DataServiceEvents.cs" />
+    <Compile Include="Services\DataServices\Core\Logger.cs" />
+    <Compile Include="Services\DataServices\Core\ModuleKind.cs" />
+    <Compile Include="Services\DataServices\Core\Transaction.cs" />
+    <Compile Include="Services\DataServices\Core\TransactionEvents.cs" />
+    <Compile Include="Services\DataServices\Modules\CostAnalyzer.cs" />
     <Compile Include="Services\LMR_SQLHelper.cs" />
     <Compile Include="Services\PfE_ReportingDB.cs" />
     <Compile Include="Services\QueueManager.cs" />
