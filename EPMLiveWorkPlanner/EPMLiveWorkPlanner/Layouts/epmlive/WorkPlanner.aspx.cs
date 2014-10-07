@@ -1207,6 +1207,13 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                         {
                             sSource = lstProjectCenter.DefaultView.ServerRelativeUrl;
                         }
+                        else
+                        {
+                            if (Request["isDlg"] != null && Request["isDlg"] == "1")
+                            {
+                                sSource += "&ismodaldlg=1";
+                            }
+                        }
 
                         sFolderDataParam = "<Grid ID='" + sItemID + "' Planner='" + sPlannerID + "'/>";
                         sPlannerLayoutParam = "<Grid View='' ID='" + sItemID + "' Planner='" + sPlannerID + "'/>";

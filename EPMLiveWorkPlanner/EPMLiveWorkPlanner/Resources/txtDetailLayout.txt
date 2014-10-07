@@ -1,7 +1,7 @@
 <Grid>
   <Cfg id='WorkPlannerDetail' Style='Standard' DateStrings='2'
     VarHeight='1' Dragging='0' Adding='0' 
-    Deleting='0' Selecting='0' Sorting='0'/>
+    Deleting='0' Selecting='0' Sorting='0' MaxVScroll='2000'/>
 	<Toolbar Visible='0'></Toolbar>
 	<Cfg Code="GTACCNPSQEBSLC"/>
   <Cols>

@@ -3504,8 +3504,13 @@ function Close() {
         if (sSource.toLowerCase().indexOf("&isdlg=1") > 0) {
             window.close();
         }
-        else
+        else if (sSource.toLowerCase().indexOf("&ismodaldlg=1") > 0)
+        {
+            SP.UI.ModalDialog.commonModalDialogClose(SP.UI.DialogResult.OK, '');
+        }
+        else { 
             location.href = sSource;
+        }
     } catch (e) { }
 }
 
