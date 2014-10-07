@@ -1811,6 +1811,10 @@ var MyWorkGrid = {
         var vals = returnValue.split("|");
 
         var viewName = vals[0];
+        if (viewName.trim().length == 0) {
+            alert("Please enter view name!");
+            return;
+        }
         var viewId = 'dv';
         if (viewName !== 'Default View') {
             viewId = MD5(viewName.toLowerCase());
