@@ -195,9 +195,7 @@ namespace EPMLiveCore.AssignmentPlanner
                             else if (fieldElement.Attribute("Type").Value.Equals("System.DateTime") &&
                                      !string.IsNullOrEmpty(value))
                             {
-                                DateTime localTime =
-                                    spRegionalSettings.TimeZone.UTCToLocalTime(
-                                        SPUtility.CreateDateTimeFromISO8601DateTimeString(value));
+                                DateTime localTime = SPUtility.CreateDateTimeFromISO8601DateTimeString(value);
 
                                 if (fieldName.Equals("startdate") &&
                                     (localTime.Hour < workDayStartHour || localTime.Hour > workDayEndHour))
