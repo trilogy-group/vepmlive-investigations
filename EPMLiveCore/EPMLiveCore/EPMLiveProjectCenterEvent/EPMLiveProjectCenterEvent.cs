@@ -61,29 +61,43 @@ namespace EPMLiveCore
         {
             try
             {
+                bool isListHasEnabledThrottling = false;
                 propStruct properties = (propStruct)data;
-
-                using (SPSite site = new SPSite(properties.weburl))
+                SPSecurity.RunWithElevatedPrivileges(
+                delegate()
                 {
-                    using (SPWeb web = site.OpenWeb())
+                    using (SPSite site = new SPSite(properties.weburl))
                     {
-                        web.AllowUnsafeUpdates = true;
-                        foreach (string listname in properties.lstListDataToDelete.Keys)
+                        using (SPWeb web = site.OpenWeb())
                         {
-                            try
+                            web.AllowUnsafeUpdates = true;
+                            foreach (string listname in properties.lstListDataToDelete.Keys)
                             {
-                                SPList list = web.Lists[listname];
-                                DataTable dt = properties.lstListDataToDelete[listname];
-                                foreach (DataRow dr in dt.Rows)
+                                try
                                 {
-                                    list.GetItemById(int.Parse(dr["ID"].ToString())).Recycle();
+                                    SPList list = web.Lists[listname];
+                                    isListHasEnabledThrottling = list.EnableThrottling;
+                                    list.EnableThrottling = false; //This will reset threshold for this list while cascade delete large number of items
+                                    list.Update();
+
+                                    DataTable dt = properties.lstListDataToDelete[listname];
+                                    foreach (DataRow dr in dt.Rows)
+                                    {
+                                        try
+                                        {
+                                            list.GetItemById(int.Parse(dr["ID"].ToString())).Recycle();
+                                        }
+                                        catch { }
+                                    }
+
+                                    list.EnableThrottling = isListHasEnabledThrottling; //Set threshold back to the list...
+                                    list.Update();
                                 }
+                                catch { }
                             }
-                            catch { }
                         }
                     }
-                }
-
+                });
                 //SPWeb spWeb = properties.web;
                 //spWeb.AllowUnsafeUpdates = true;
 
@@ -157,6 +171,7 @@ namespace EPMLiveCore
                         {
                             fieldname = field.InternalName;
                             SPSiteDataQuery query = new SPSiteDataQuery();
+                            query.QueryThrottleMode = SPQueryThrottleOption.Override; //Used to set/reset throttling while retrieving records using CAML query.
                             query.Lists = "<Lists><List ID=\"" + list.ID.ToString() + "\"/></Lists>";
                             //query.RowLimit = (uint)0;
                             query.Query = "<Where><Eq><FieldRef Name=\"" + field.InternalName + "\" LookupId=\"True\"/><Value Type=\"Lookup\">" + properties.ListItemId + "</Value></Eq></Where>";
