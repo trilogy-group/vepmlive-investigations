@@ -1944,7 +1944,7 @@ namespace EPMLiveCore.API
 
                         GetTypeAndFormat(fieldTypes, selectedField, out type, out format);
 
-                        if (selectedField.Equals("Complete"))
+                        if (type == "Boolean")
                         {
                             value = value.Equals("True") ? "1" : "0";
                         }
