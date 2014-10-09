@@ -40,7 +40,7 @@ namespace EPMLiveCore
                 Install(new Guid("1858d521-0375-4a61-9281-f5210854bc12"), farm, apps); // Timesheets
                 Install(new Guid("8f916fa9-1c2d-4416-8036-4a272256e23d"), farm, apps); // Dashboards
                 Install(new Guid("5a3fe24c-2dc5-4a1c-aec1-6ce942825ceb"), farm, apps); // PFE
-                Install(new Guid("823cf7cc-3c12-47a3-9f0a-6b69c391b915"), farm, apps); // Reporting
+                // Install(new Guid("823cf7cc-3c12-47a3-9f0a-6b69c391b915"), farm, apps); // Reporting
             }
             catch(Exception ex) { output = "Failed: " + ex.Message; return; }
             output = "Success";
