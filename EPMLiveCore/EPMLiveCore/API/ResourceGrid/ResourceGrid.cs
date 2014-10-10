@@ -574,6 +574,7 @@ namespace EPMLiveCore.API
         {
             var resourceDict = new Dictionary<int, XElement>();
 
+            // Performance improvement for EPML-4060
             Parallel.ForEach(resourceTeam.Descendants("Resource"), element =>
             {
                 try
@@ -604,25 +605,7 @@ namespace EPMLiveCore.API
 
                     var sRaw = (string)ele.Attribute(gridSafeFieldName);
                     var ID = (int)ele.Attribute("ID");
-                    //SPListItem item = null;
-
-                    //try
-                    //{
-                    //    item = resourcesList.GetItemById(ID);
-                    //}
-                    //catch { }
-
-                    //SPFieldLookupValueCollection lookupValCols = new SPFieldLookupValueCollection();
-
-                    //if (item != null)
-                    //{
-                    //    try
-                    //    {
-                    //        lookupValCols = new SPFieldLookupValueCollection(item[kv.Value.InternalName].ToString());
-                    //    }
-                    //    catch { }
-                    //}
-
+                    
                     SPFieldLookupValueCollection lookupValCols = new SPFieldLookupValueCollection();
 
                     try
