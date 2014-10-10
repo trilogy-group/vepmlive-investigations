@@ -659,7 +659,7 @@ namespace EPMLiveCore.Layouts.epmlive
                                 fieldName = "Priority";
 
                                 StringCollection choices = new StringCollection();
-                                choices.AddRange(new string[] {"(1) High", "(2) Normal", "(3) Low"});
+                                choices.AddRange(new string[] { "(1) High", "(2) Normal", "(3) Low" });
                                 string fldPIntName = list.Fields.Add("Priority", SPFieldType.Choice, false, false,
                                     choices);
                                 SPFieldChoice fldP = list.Fields.GetFieldByInternalName(fldPIntName) as SPFieldChoice;
@@ -676,8 +676,7 @@ namespace EPMLiveCore.Layouts.epmlive
                                 fieldName = "Status";
 
                                 StringCollection choices = new StringCollection();
-                                choices.AddRange(new string[]
-                                {"Not Started", "In Progress", "Completed", "Deferred", "Waiting on someone else"});
+                                choices.AddRange(new string[] { "Not Started", "In Progress", "Completed", "Deferred", "Waiting on someone else" });
                                 string fldStatusIntName = list.Fields.Add("Status", SPFieldType.Choice, false, false,
                                     choices);
                                 SPFieldChoice fldStatus =
@@ -1321,6 +1320,11 @@ namespace EPMLiveCore.Layouts.epmlive
                 EnableFancyForms(list);
             else
                 DisableFancyForms(list);
+
+            if (chkAssociatedItems.Checked)
+            {
+                AddGridGanttToViews(list);
+            }
 
             if (chkWorkListFeat.Checked)
             {
