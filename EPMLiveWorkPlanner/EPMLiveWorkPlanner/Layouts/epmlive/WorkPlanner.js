@@ -62,14 +62,12 @@ function SaveTemplateClose(dialogResult, returnValue) {
             ShowTDialog("Saving Template...");
             var x = Grids.WorkPlannerGrid.GetXmlData("Body,AllCols,NoIO,Defaults", "");
             x = x.replace(/&/gi, "%26");
-
             var tVals = returnValue.split('`');
-
-            dhtmlxAjax.post("WorkPlannerAction.aspx", "Action=SaveTemplate&TemplateName=" + tVals[0] + "&Description=" + tVals[1] + "&PlannerID=" + sPlannerID + "&pjData=" + x, SaveTemplateCloseClose);
-
+            dhtmlxAjax.post("WorkPlannerAction.aspx", "Action=SaveTemplate&TemplateName=" + tVals[0] + "&Description=" + tVals[1] + "&PlannerID=" + sPlannerID + "&pjData=" + encodeURIComponent(x), SaveTemplateCloseClose);
         }
     }
 }
+
 
 function SaveTemplateCloseClose(loader) {
 
