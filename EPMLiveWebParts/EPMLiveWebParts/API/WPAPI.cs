@@ -31,11 +31,11 @@ namespace EPMLiveWebParts
 
             Guid SiteId = new Guid(DocIn.FirstChild.Attributes["siteid"].Value);
             Guid WebId = new Guid(DocIn.FirstChild.Attributes["webid"].Value);
-                
+
 
             try
             {
-                    
+
                 if (SiteId != web.Site.ID)
                 {
                     using (SPSite oSite = new SPSite(SiteId))
@@ -88,11 +88,11 @@ namespace EPMLiveWebParts
 
                 Guid SiteId = new Guid(DocIn.FirstChild.Attributes["siteid"].Value);
                 Guid WebId = new Guid(DocIn.FirstChild.Attributes["webid"].Value);
-                
+
                 try
                 {
 
-                    
+
                     if (SiteId != web.Site.ID)
                     {
                         using (SPSite oSite = new SPSite(SiteId))
@@ -119,7 +119,7 @@ namespace EPMLiveWebParts
                 {
                     return "<Result Status=\"1\"><Error ID=\"9003\">Error (9003): " + ex.Message + "</Error></Result>";
                 }
-                
+
             }
             catch (Exception ex)
             {
@@ -287,7 +287,7 @@ namespace EPMLiveWebParts
                             {
                                 try
                                 {
-                                    li[oField.Id] = float.Parse(sFieldValue) / 100;
+                                    li[oField.Id] = float.Parse(sFieldValue, CultureInfo.InvariantCulture) / 100;
                                 }
                                 catch { li[oField.Id] = null; }
                             }
@@ -427,7 +427,7 @@ namespace EPMLiveWebParts
                             attr = doc.CreateAttribute(sCol);
                             attr.Value = GetCellValue(li, oField, true, oWeb);
                             nd.Attributes.Append(attr);
-                            
+
                         }
                     }
                 }
@@ -447,7 +447,7 @@ namespace EPMLiveWebParts
             {
                 case SPFieldType.Boolean:
                     return "Bool";
-                 case SPFieldType.DateTime:
+                case SPFieldType.DateTime:
                     SPFieldDateTime oDTField = (SPFieldDateTime)oField;
                     string dateFormat = GetExampleDateFormat(oWeb, "yyyy", "M", "d");
                     sFormat = oDTField.GetProperty("Format").Equals("DateOnly") ? dateFormat : string.Format("{0} h:mm tt", dateFormat);
@@ -466,36 +466,36 @@ namespace EPMLiveWebParts
                 case SPFieldType.Number:
                     string percentageSign = string.Empty;
 
-                        if (((SPFieldNumber)oField).ShowAsPercentage)
-                        {
-                            //sFormat = "0\\%;0\\%;0\\%";
-                            return "Float";
-                        }
+                    if (((SPFieldNumber)oField).ShowAsPercentage)
+                    {
+                        //sFormat = "0\\%;0\\%;0\\%";
+                        return "Float";
+                    }
 
-                        switch (((SPFieldNumber)oField).DisplayFormat)
-                        {
-                            case SPNumberFormatTypes.Automatic:
-                                sFormat = ",#0.##########" + percentageSign;
-                                break;
-                            case SPNumberFormatTypes.NoDecimal:
-                                sFormat = ",#0" + percentageSign;
-                                break;
-                            case SPNumberFormatTypes.OneDecimal:
-                                sFormat = ",#0.0" + percentageSign;
-                                break;
-                            case SPNumberFormatTypes.TwoDecimals:
-                                sFormat = ",#0.00" + percentageSign;
-                                break;
-                            case SPNumberFormatTypes.ThreeDecimals:
-                                sFormat = ",#0.000" + percentageSign;
-                                break;
-                            case SPNumberFormatTypes.FourDecimals:
-                                sFormat = ",#0.0000" + percentageSign;
-                                break;
-                            case SPNumberFormatTypes.FiveDecimals:
-                                sFormat = ",#0.00000" + percentageSign;
-                                break;
-                        }
+                    switch (((SPFieldNumber)oField).DisplayFormat)
+                    {
+                        case SPNumberFormatTypes.Automatic:
+                            sFormat = ",#0.##########" + percentageSign;
+                            break;
+                        case SPNumberFormatTypes.NoDecimal:
+                            sFormat = ",#0" + percentageSign;
+                            break;
+                        case SPNumberFormatTypes.OneDecimal:
+                            sFormat = ",#0.0" + percentageSign;
+                            break;
+                        case SPNumberFormatTypes.TwoDecimals:
+                            sFormat = ",#0.00" + percentageSign;
+                            break;
+                        case SPNumberFormatTypes.ThreeDecimals:
+                            sFormat = ",#0.000" + percentageSign;
+                            break;
+                        case SPNumberFormatTypes.FourDecimals:
+                            sFormat = ",#0.0000" + percentageSign;
+                            break;
+                        case SPNumberFormatTypes.FiveDecimals:
+                            sFormat = ",#0.00000" + percentageSign;
+                            break;
+                    }
                     return "Float";
                 case SPFieldType.Choice:
                     SPFieldChoice oCField = (SPFieldChoice)oField;
@@ -587,6 +587,11 @@ namespace EPMLiveWebParts
             var currenvyCultureInfo = new CultureInfo(1033);
             string val = "";
 
+            NumberFormatInfo providerEn = new System.Globalization.NumberFormatInfo();
+            providerEn.NumberDecimalSeparator = ".";
+            providerEn.NumberGroupSeparator = ",";
+            providerEn.NumberGroupSizes = new int[] { 3 };
+
             if (li[oField.Id] != null)
             {
                 val = li[oField.Id].ToString();
@@ -647,7 +652,7 @@ namespace EPMLiveWebParts
                         }
                         break;
                     case SPFieldType.Currency:
-                        
+
                         try
                         {
                             val = ((double)li[oField.Id]).ToString(currenvyCultureInfo.NumberFormat);
@@ -660,7 +665,7 @@ namespace EPMLiveWebParts
                         {
                             try
                             {
-                                val = (float.Parse(val) * 100).ToString();
+                                val = (float.Parse(val) * 100).ToString(providerEn);
                             }
                             catch { }
                         }
@@ -672,7 +677,7 @@ namespace EPMLiveWebParts
                             //}
                             //else
                             //    val = oField.GetFieldValueAsText(li[oField.Id].ToString());
-                            
+
                             try
                             {
                                 val = ((double)li[oField.Id]).ToString(currenvyCultureInfo.NumberFormat);
@@ -705,7 +710,7 @@ namespace EPMLiveWebParts
                             val = oField.GetFieldValueAsText(li[oField.Id].ToString());
                         break;
                 }
-                
+
             }
             return val;
         }

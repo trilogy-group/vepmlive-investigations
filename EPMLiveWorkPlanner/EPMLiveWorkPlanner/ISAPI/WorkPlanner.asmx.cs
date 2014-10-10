@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Data;
 using System.Data.SqlClient;
+using System.Globalization;
 using System.IO;
 using System.Reflection;
 using System.Text;
@@ -97,6 +98,11 @@ namespace EPMLiveWorkPlanner
         {
             string PlannerID = getAttribute(data.FirstChild, "PlannerID");
             string ProjectID = getAttribute(data.FirstChild, "ProjectID");
+
+            NumberFormatInfo providerEn = new System.Globalization.NumberFormatInfo();
+            providerEn.NumberDecimalSeparator = ".";
+            providerEn.NumberGroupSeparator = ",";
+            providerEn.NumberGroupSizes = new int[] { 3 };
 
             XmlDocument docPlanInfo = new XmlDocument();
             docPlanInfo.LoadXml("<GetTasks Planner=\"" + PlannerID + "\" ID=\"" + ProjectID + "\" View=\"\"/>");
@@ -272,7 +278,7 @@ namespace EPMLiveWorkPlanner
                                     {
                                         try
                                         {
-                                            attr.Value = (float.Parse(li[col].ToString()) * 100).ToString();
+                                            attr.Value = (float.Parse(li[col].ToString()) * 100).ToString(providerEn);
                                         }
                                         catch { }
                                     }
@@ -1036,7 +1042,7 @@ namespace EPMLiveWorkPlanner
                                         {
                                             try
                                             {
-                                                oProject[oField.Id] = double.Parse(val) / 100;
+                                                oProject[oField.Id] = double.Parse(val, CultureInfo.InvariantCulture) / 100;
                                             }
                                             catch { }
                                         }
@@ -4027,6 +4033,10 @@ namespace EPMLiveWorkPlanner
         public static string getFieldValue(SPListItem li, SPField oField, DataSet dsResources)
         {
             string val = "";
+            NumberFormatInfo providerEn = new System.Globalization.NumberFormatInfo();
+            providerEn.NumberDecimalSeparator = ".";
+            providerEn.NumberGroupSeparator = ",";
+            providerEn.NumberGroupSizes = new int[] { 3 };
             try
             {
                 switch (oField.Type)
@@ -4078,7 +4088,7 @@ namespace EPMLiveWorkPlanner
                         {
                             try
                             {
-                                val = (float.Parse(val) * 100).ToString();
+                                val = (float.Parse(val) * 100).ToString(providerEn);
                             }
                             catch { }
                         }

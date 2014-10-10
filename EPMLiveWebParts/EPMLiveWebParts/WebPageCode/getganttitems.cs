@@ -6,6 +6,7 @@ using System.Xml;
 using Microsoft.SharePoint;
 using System.Collections;
 using System.Text.RegularExpressions;
+using System.Globalization;
 
 namespace EPMLiveWebParts
 {
@@ -18,7 +19,7 @@ namespace EPMLiveWebParts
 
         private int curId = 0;
 
-       
+
         public override void getParams(SPWeb curWeb)
         {
             tb.AddTimer();
@@ -163,7 +164,7 @@ namespace EPMLiveWebParts
                     else if (oField.InternalName == "Title")
                     {
                         attr = doc.CreateAttribute("MinWidth");
-                        attr.Value = "300"; 
+                        attr.Value = "300";
                         ndNew.Attributes.Append(attr);
 
                         attr = doc.CreateAttribute("Button");
@@ -193,7 +194,7 @@ namespace EPMLiveWebParts
                     }
                     else
                     {
-                        
+
                         string sWidth = "150";
 
                         switch (oField.Type)
@@ -374,7 +375,7 @@ namespace EPMLiveWebParts
 
             }
 
-            
+
 
             XmlNode ndGantt = doc.FirstChild.SelectSingleNode("//RightCols/C[@Name='G']");
             ndGantt.Attributes["GanttStart"].Value = StartDateField;
@@ -422,7 +423,7 @@ namespace EPMLiveWebParts
             }
 
 
-            foreach(DictionaryEntry de in hshLookupEnums)
+            foreach (DictionaryEntry de in hshLookupEnums)
             {
                 XmlNode nd = doc.FirstChild.SelectSingleNode("//C[@Name='" + de.Key.ToString() + "']");
                 if (nd != null)
@@ -442,12 +443,12 @@ namespace EPMLiveWebParts
 
 
             XmlNode ndPag = docXml.SelectSingleNode("//call[@command='setuppaging']");
-            
+
             XmlNode ndCfg = doc.SelectSingleNode("//Cfg");
 
             if (ndPag != null)
             {
-                
+
 
                 XmlAttribute attr = doc.CreateAttribute("PagInfo");
                 attr.Value = ndPag.InnerText;
@@ -458,7 +459,7 @@ namespace EPMLiveWebParts
                 attr = doc.CreateAttribute("PagSize");
                 attr.Value = view.RowLimit.ToString();
                 ndSummary.Attributes.Append(attr);
-                
+
                 ndCfg.Attributes.Append(attr);
             }
 
@@ -586,10 +587,12 @@ namespace EPMLiveWebParts
                             if (value.Contains("%"))
                                 return value.Replace("%", "");
                             else
-                                return (float.Parse(value) * 100).ToString();
+                                return (float.Parse(value, providerEn) * 100).ToString(providerEn);
                         }
                         else
-                            return value;
+                        {
+                            return float.Parse(value, providerEn).ToString(providerEn);
+                        }
                     case SPFieldType.Calculated:
                         if (oField.Description == "Indicator")
                         {
@@ -602,10 +605,12 @@ namespace EPMLiveWebParts
                             if (value.Contains("%"))
                                 return value.Replace("%", "");
                             else
-                                return (float.Parse(value) * 100).ToString();
+                                return (float.Parse(value, providerEn) * 100).ToString(providerEn);
                         }
                         else
-                            return value;
+                        {
+                            return float.Parse(value, providerEn).ToString(providerEn);
+                        }
                     case SPFieldType.Boolean:
                         if (value.ToLower() == "true")
                             return "1";
@@ -767,7 +772,7 @@ namespace EPMLiveWebParts
                                     {
                                         ((ArrayList)hshLookupEnums[fieldName]).Add(lv.LookupId);
                                         ((ArrayList)hshLookupEnumKeys[fieldName]).Add(lv.LookupValue.Replace(";", ""));
-                                        
+
                                     }
 
                                     newval += ";" + lv.LookupId;
