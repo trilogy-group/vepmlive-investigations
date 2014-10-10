@@ -370,34 +370,87 @@ namespace EPMLiveCore.API
                                         }
                                         else
                                         {
-                                            #region Retrieve associated list count using SharePoint Object Model
-
-                                            //SharePoint Object Model to Load Record Count
-                                            SPQuery query = new SPQuery();
-                                            rptListId = otherList.ID.ToString();
-
-                                            foreach (EPMLiveCore.API.AssociatedListInfo item in arrAssociatedLists)
+                                            if (list.EnableThrottling) //In terms of bulk record SharePoint throws exception hence we need to retrieve records from EPMLive Reporting Database.
                                             {
-                                                if (item.ListId.ToString().Equals(rptListId, StringComparison.InvariantCultureIgnoreCase))
+                                                #region If Threshold is enabled for processed list then retrieve those records from reporting database
+
+                                                //SharePoint Object Model to Load Record Count
+                                                SPList otherList = spWeb.Lists[listName];
+                                                rptListId = otherList.ID.ToString();
+
+                                                foreach (EPMLiveCore.API.AssociatedListInfo associatedListItemInfo in arrAssociatedLists)
                                                 {
-                                                    projectLinkedField = item.LinkedField;
-                                                    break;
+                                                    if (associatedListItemInfo.ListId.ToString().Equals(rptListId, StringComparison.InvariantCultureIgnoreCase))
+                                                    {
+                                                        projectLinkedField = associatedListItemInfo.LinkedField;
+                                                        break;
+                                                    }
                                                 }
+
+                                                string sql = string.Empty;
+                                                //sql = "SELECT COUNT(*) AS 'Count' FROM " + tableName + " WHERE ProjectID = " + itemId + " AND ListId = '" + rptListId + "' GROUP BY ProjectID";
+                                                sql = "SELECT COUNT(*) AS 'Count' FROM " + tableName + " WHERE ',' + CONVERT(NVARCHAR(MAX), " + projectLinkedField + "ID) + ',' LIKE N'%," + itemId + ",%' AND ListId = '" + rptListId + "'";
+
+                                                DataTable dtListItemCount = null;
+                                                try
+                                                {
+                                                    // Wait for 3 seconds just in-case if reporting database is not updated.
+                                                    // Thread.Sleep(3000);
+                                                    var queryExecutor = new QueryExecutor(spWeb);
+                                                    dtListItemCount = queryExecutor.ExecuteReportingDBQuery(sql, new Dictionary<string, object> { });
+                                                }
+                                                catch { }
+
+                                                int associatedItemsCount = 0;
+                                                if (dtListItemCount != null && dtListItemCount.Rows.Count > 0)
+                                                {
+                                                    associatedItemsCount = Convert.ToInt32(dtListItemCount.Rows[0]["Count"]);
+                                                }
+
+                                                //Display ListName [ItemCount] on UI
+                                                //sbListAssociatedItemsDiv.Append("<div id='div_" + rptListId + "' class='listMainDiv'>" + listName + " [" + Convert.ToString(associatedItemsCount) + "]");
+
+                                                //string viewAllItemsUrl = oWeb.Url + "/_layouts/epmlive/gridaction.aspx?action=linkeditemspost&listid=" + listId + "&lookups=" + itemTitle + "&field=" + projectLinkedField + "&LookupFieldList=" + rptListId;// +"&Source=" + sourceUrl;
+
+                                                sbListAssociatedItemsDiv.Append("<tr style=''>");
+                                                sbListAssociatedItemsDiv.Append("<td>" + listName + "</td>");
+                                                sbListAssociatedItemsDiv.Append("<td><a href='#' onclick=\"javascript:FancyDispFormClient.emptyFunction('');\"><div id='div_" + rptListId + "' class='listMainDiv'><span class='badge'>" + Convert.ToString(associatedItemsCount) + "</span></a>");
+                                                //sbListAssociatedItemsDiv.Append("</tr>");
+
+                                                #endregion
                                             }
+                                            else
+                                            {
+                                                #region Retrieve associated list count using SharePoint Object Model
 
-                                            query.Query = "<Where><Eq><FieldRef Name='" + projectLinkedField + "' LookupId='True' /><Value Type='Lookup'>" + itemId + "</Value></Eq></Where>";
-                                            Int64 itemCount = otherList.GetItems(query).Count;
+                                                //SharePoint Object Model to Load Record Count
+                                                SPList otherList = spWeb.Lists[listName];
+                                                SPQuery query = new SPQuery();
+                                                rptListId = otherList.ID.ToString();
 
-                                            //sbListAssociatedItemsDiv.Append("<div id='div_" + rptListId + "' class='listMainDiv'>" + listName + " [" + Convert.ToString(itemCount) + "]");
-                                            //string viewAllItemsUrl = oWeb.Url + "/_layouts/epmlive/gridaction.aspx?action=linkeditemspost&listid=" + listId + "&lookups=" + itemTitle + "&field=" + projectLinkedField + "&LookupFieldList=" + otherList.ID.ToString();// +"&Source=" + sourceUrl;
+                                                foreach (EPMLiveCore.API.AssociatedListInfo item in arrAssociatedLists)
+                                                {
+                                                    if (item.ListId.ToString().Equals(rptListId, StringComparison.InvariantCultureIgnoreCase))
+                                                    {
+                                                        projectLinkedField = item.LinkedField;
+                                                        break;
+                                                    }
+                                                }
 
-                                            sbListAssociatedItemsDiv.Append("<tr>");
-                                            sbListAssociatedItemsDiv.Append("<td>" + listName + "</td>");
-                                            sbListAssociatedItemsDiv.Append("<td><a href='#' onclick=\"javascript:FancyDispFormClient.emptyFunction('');\"> <div id='div_" + rptListId + "' class='listMainDiv'><span class='badge'>" + Convert.ToString(itemCount) + "</span></a>");
-                                            //sbListAssociatedItemsDiv.Append("</tr><tr><td>");
+                                                query.Query = "<Where><Eq><FieldRef Name='" + projectLinkedField + "' LookupId='True' /><Value Type='Lookup'>" + itemId + "</Value></Eq></Where>";
+                                                Int64 itemCount = otherList.GetItems(query).Count;
+
+                                                //sbListAssociatedItemsDiv.Append("<div id='div_" + rptListId + "' class='listMainDiv'>" + listName + " [" + Convert.ToString(itemCount) + "]");
+                                                //string viewAllItemsUrl = oWeb.Url + "/_layouts/epmlive/gridaction.aspx?action=linkeditemspost&listid=" + listId + "&lookups=" + itemTitle + "&field=" + projectLinkedField + "&LookupFieldList=" + otherList.ID.ToString();// +"&Source=" + sourceUrl;
+
+                                                sbListAssociatedItemsDiv.Append("<tr>");
+                                                sbListAssociatedItemsDiv.Append("<td>" + listName + "</td>");
+                                                sbListAssociatedItemsDiv.Append("<td><a href='#' onclick=\"javascript:FancyDispFormClient.emptyFunction('');\"> <div id='div_" + rptListId + "' class='listMainDiv'><span class='badge'>" + Convert.ToString(itemCount) + "</span></a>");
+                                                //sbListAssociatedItemsDiv.Append("</tr><tr><td>");
 
 
-                                            #endregion
+                                                #endregion
+                                            }
                                         }
 
                                         #region Load Top-5 Items (Using SharePoint Object Model)
