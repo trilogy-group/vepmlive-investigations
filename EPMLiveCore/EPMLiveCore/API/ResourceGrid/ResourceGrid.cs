@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web;
 using System.Xml.Linq;
 using EPMLiveCore.Infrastructure;
@@ -571,6 +572,17 @@ namespace EPMLiveCore.API
         private static void BuildEnumValues(Dictionary<string, SPField> gridFields, XElement bElement, XDocument resourceTeam,
             XElement colsElement)
         {
+            var resourceDict = new Dictionary<int, XElement>();
+
+            Parallel.ForEach(resourceTeam.Descendants("Resource"), element =>
+            {
+                try
+                {
+                    resourceDict.Add(Convert.ToInt32(element.Attribute("ID").Value), element);
+                }
+                catch { }
+            });
+
             foreach (var kv in gridFields)
             {
                 if (kv.Value.Type != SPFieldType.Lookup) continue;
@@ -615,9 +627,7 @@ namespace EPMLiveCore.API
 
                     try
                     {
-                        var iEle = resourceTeam.Descendants("Resource")
-                            .First(e => e.Attribute("ID").Value.Equals(
-                                ID.ToString(CultureInfo.InvariantCulture)));
+                        var iEle = resourceDict[ID];
 
                         string lookupVal = iEle.Elements("Data")
                             .First(e => e.Attribute("Field").Value.Equals(kv.Value.InternalName)).Value;
