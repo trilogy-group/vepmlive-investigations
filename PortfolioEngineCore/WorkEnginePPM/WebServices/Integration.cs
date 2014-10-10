@@ -1517,7 +1517,13 @@ namespace WorkEnginePPM
                             if (prop.Key.ToString().ToLower().IndexOf(key.ToLower()) == 0)
                             {
                                 //string val = CoreFunctions.getConfigSetting(web, prop.Key.ToString());
-                                message += "<" + prop.Key.ToString().Replace(key.ToLower(), "") + "><![CDATA[" + prop.Value.ToString() + "]]></" + prop.Key.ToString().Replace(key.ToLower(), "") + ">";
+
+                                try
+                                {
+                                    var propKey = prop.Key.ToString().Replace("&", "__and__");
+                                    message += "<" + propKey.Replace(key.ToLower(), "") + "><![CDATA[" + prop.Value.ToString() + "]]></" + propKey.Replace(key.ToLower(), "") + ">";
+                                }
+                                catch { }
                             }
                         }
                         if (schedule != "")
