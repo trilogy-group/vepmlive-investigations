@@ -2,7 +2,21 @@
 <Elements xmlns="http://schemas.microsoft.com/sharepoint/">
   <Receivers>
 
-  <Receiver>
+<Receiver>
+<Name>TimeOffSyncEventItemAdding</Name>
+<Type>ItemAdding</Type>
+<Assembly>$SharePoint.Project.AssemblyFullName$</Assembly>
+<Class>WorkEnginePPM.Events.DataSync.TimeOffSyncEvent</Class>
+<SequenceNumber>1000</SequenceNumber>
+</Receiver>
+<Receiver>
+<Name>TimeOffSyncEventItemUpdating</Name>
+<Type>ItemUpdating</Type>
+<Assembly>$SharePoint.Project.AssemblyFullName$</Assembly>
+<Class>WorkEnginePPM.Events.DataSync.TimeOffSyncEvent</Class>
+<SequenceNumber>1000</SequenceNumber>
+</Receiver>
+<Receiver>
 <Name>TimeOffSyncEventItemAdded</Name>
 <Type>ItemAdded</Type>
 <Assembly>$SharePoint.Project.AssemblyFullName$</Assembly>
