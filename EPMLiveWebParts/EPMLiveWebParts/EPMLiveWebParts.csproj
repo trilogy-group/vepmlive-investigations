@@ -512,6 +512,12 @@
     <None Include="javascripts\libraries\bundles\moment.min.js.map" />
     <None Include="javascripts\libraries\moment-timezone.data.min.js.map" />
     <None Include="Layouts\epmlive\javascripts\GanttGrid.min.js.map" />
+    <None Include="Layouts\epmlive\Stylesheets\EPMLiveToolBar.css.map" />
+    <None Include="Layouts\epmlive\Stylesheets\EPMLiveToolBar.less" />
+    <None Include="Layouts\epmlive\Stylesheets\SocialStream.css.map" />
+    <None Include="Layouts\epmlive\Stylesheets\SocialStream.less" />
+    <None Include="Layouts\epmlive\Stylesheets\SocialStream.Logs.css.map" />
+    <None Include="Layouts\epmlive\Stylesheets\SocialStream.Logs.less" />
     <None Include="MyWorkSummary\MyWorkSummary.webpart">
       <SubType>Designer</SubType>
     </None>
@@ -908,6 +914,12 @@
     <Content Include="Layouts\epmlive\images\User.png" />
     <Content Include="Layouts\epmlive\javascripts\GanttGrid.js" />
     <Content Include="Layouts\epmlive\javascripts\GanttGrid.min.js" />
+    <Content Include="Layouts\epmlive\Stylesheets\EPMLiveToolBar.css" />
+    <Content Include="Layouts\epmlive\Stylesheets\EPMLiveToolBar.min.css" />
+    <Content Include="Layouts\epmlive\Stylesheets\SocialStream.css" />
+    <Content Include="Layouts\epmlive\Stylesheets\SocialStream.Logs.css" />
+    <Content Include="Layouts\epmlive\Stylesheets\SocialStream.Logs.min.css" />
+    <Content Include="Layouts\epmlive\Stylesheets\SocialStream.min.css" />
     <Content Include="MyWorkSummary\MyWorkSummary.ascx">
       <Generator>SharePointWebPartCodeGenerator</Generator>
       <LastGenOutput>MyWorkSummary.ascx.g.cs</LastGenOutput>
