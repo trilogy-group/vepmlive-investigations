@@ -37,7 +37,9 @@ namespace WorkEnginePPM.Events.DataSync
             }
             catch (Exception exception)
             {
+                properties.Cancel = true;
                 properties.ErrorMessage = exception.Message;
+                properties.Status = SPEventReceiverStatus.CancelWithError;
             }
         }
 
@@ -85,7 +87,9 @@ namespace WorkEnginePPM.Events.DataSync
             }
             catch (Exception exception)
             {
+                properties.Cancel = true;
                 properties.ErrorMessage = exception.Message;
+                properties.Status = SPEventReceiverStatus.CancelWithError;
             }
         }
 
