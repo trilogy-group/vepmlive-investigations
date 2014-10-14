@@ -375,7 +375,7 @@ namespace EPMLiveCore.API
                                                 #region If Threshold is enabled for processed list then retrieve those records from reporting database
 
                                                 //SharePoint Object Model to Load Record Count
-                                                SPList otherList = spWeb.Lists[listName];
+                                                otherList = spWeb.Lists[listName];
                                                 rptListId = otherList.ID.ToString();
 
                                                 foreach (EPMLiveCore.API.AssociatedListInfo associatedListItemInfo in arrAssociatedLists)
@@ -424,7 +424,7 @@ namespace EPMLiveCore.API
                                                 #region Retrieve associated list count using SharePoint Object Model
 
                                                 //SharePoint Object Model to Load Record Count
-                                                SPList otherList = spWeb.Lists[listName];
+                                                otherList = spWeb.Lists[listName];
                                                 SPQuery query = new SPQuery();
                                                 rptListId = otherList.ID.ToString();
 
