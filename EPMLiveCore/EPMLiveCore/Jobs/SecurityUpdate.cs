@@ -34,6 +34,14 @@ namespace EPMLiveCore.Jobs
 
             string safeTitle = !string.IsNullOrEmpty(li.Title) ? GetSafeGroupTitle(li.Title) : string.Empty;
 
+            if (string.IsNullOrEmpty(safeTitle) && list.BaseTemplate == SPListTemplateType.DocumentLibrary)
+            {
+                safeTitle = li.Name; //Assign Name instead of Title - This should perticularly happen with Document libraries.
+                //Remove extensions from file name to create groups with proper name
+                if (safeTitle.Contains('.'))
+                    safeTitle = safeTitle.Substring(0, safeTitle.LastIndexOf('.'));
+            }
+
             if (isSecure)
             {
                 if (!li.HasUniqueRoleAssignments)
