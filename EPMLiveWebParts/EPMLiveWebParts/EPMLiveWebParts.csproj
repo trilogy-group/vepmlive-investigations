@@ -133,6 +133,8 @@
       <Link>CommonAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="ActionBar\ActionBar.cs" />
+    <Compile Include="API\GridAPI.cs" />
+    <Compile Include="API\WPAPI.cs" />
     <Compile Include="AssociatedItems\AssociatedItems.ascx.cs">
       <DependentUpon>AssociatedItems.ascx</DependentUpon>
     </Compile>
@@ -204,6 +206,12 @@
     <Compile Include="CONTROLTEMPLATES\ResourceGridUserControl.ascx.designer.cs">
       <DependentUpon>ResourceGridUserControl.ascx.cs</DependentUpon>
     </Compile>
+    <Compile Include="CONTROLTEMPLATES\SocialStream.ascx.cs">
+      <DependentUpon>SocialStream.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="CONTROLTEMPLATES\SocialStream.ascx.designer.cs">
+      <DependentUpon>SocialStream.ascx.cs</DependentUpon>
+    </Compile>
     <Compile Include="DomainModel\ExcelConnectionInfo.cs" />
     <Compile Include="DomainServices\ExcelConnectionUpdatorService.cs" />
     <Compile Include="DomainServices\ISharepointService.cs" />
@@ -242,6 +250,7 @@
     <Compile Include="IReportID.cs" />
     <Compile Include="Layouts\epmlive\Admin\SSLogs.aspx.cs">
       <DependentUpon>SSLogs.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\epmlive\Admin\SSLogs.aspx.designer.cs">
       <DependentUpon>SSLogs.aspx.cs</DependentUpon>
@@ -396,6 +405,7 @@
     <Compile Include="RollupSummary\RollupSummary.cs" />
     <Compile Include="RollupSummary\SummaryRollupToolpart.cs" />
     <Compile Include="SiteCollectionSetupWizard\SiteCollectionSetupWizard.cs" />
+    <Compile Include="SocialStream\SocialStream.cs" />
     <Compile Include="UserProfileDisplay\DisplayProfilePictures.cs" />
     <Compile Include="UserProfileDisplay\UserProfileToolPart.cs" />
     <Compile Include="Utilities\Extensions.cs" />
@@ -631,6 +641,10 @@
       <SharePointProjectItemId>{cf3ab333-eddf-4fa6-a701-64e1e5355577}</SharePointProjectItemId>
     </None>
     <None Include="SiteCollectionSetupWizard\SiteCollectionSetupWizard.webpart" />
+    <None Include="SocialStream\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{252efff8-b214-4cda-a675-745f8f8eafaf}</SharePointProjectItemId>
+    </None>
+    <None Include="SocialStream\SocialStream.dwp" />
     <None Include="TreeGrid\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{0388813a-a504-4381-bd4f-93ebde77f90d}</SharePointProjectItemId>
     </None>
@@ -860,6 +874,7 @@
       <LastGenOutput>AssociatedItems.ascx.g.cs</LastGenOutput>
     </Content>
     <Content Include="AssociatedItems\Elements.xml" />
+    <Content Include="CONTROLTEMPLATES\SocialStream.ascx" />
     <Content Include="FancyDisplayForm\Elements.xml" />
     <Content Include="FancyDisplayForm\FancyDisplayForm.ascx">
       <Generator>SharePointWebPartCodeGenerator</Generator>
@@ -1482,6 +1497,7 @@
     <Content Include="Resources\MyWorkWebPart_MyWorkDefaultQuery.txt" />
     <Content Include="RollupSummary\Elements.xml" />
     <Content Include="SiteCollectionSetupWizard\Elements.xml" />
+    <Content Include="SocialStream\Elements.xml" />
     <Content Include="TreeGrid\ChartWizard\Backgrounds.gif" />
     <Content Include="TreeGrid\ChartWizard\blackcheck.png" />
     <Content Include="TreeGrid\ChartWizard\Button.gif" />
