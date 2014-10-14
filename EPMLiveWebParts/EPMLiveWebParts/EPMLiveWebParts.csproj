@@ -506,6 +506,11 @@
     <None Include="AssociatedItems\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{b8018cf5-92b1-456e-8a3d-f694e56a432c}</SharePointProjectItemId>
     </None>
+    <None Include="javascripts\EPMLive.SocialStream.Logs.min.js.map" />
+    <None Include="javascripts\EPMLive.SocialStream.min.js.map" />
+    <None Include="javascripts\libraries\bundles\moment.js.bundle" />
+    <None Include="javascripts\libraries\bundles\moment.min.js.map" />
+    <None Include="javascripts\libraries\moment-timezone.data.min.js.map" />
     <None Include="Layouts\epmlive\javascripts\GanttGrid.min.js.map" />
     <None Include="MyWorkSummary\MyWorkSummary.webpart">
       <SubType>Designer</SubType>
@@ -880,6 +885,23 @@
       <Generator>SharePointWebPartCodeGenerator</Generator>
       <LastGenOutput>FancyDisplayForm.ascx.g.cs</LastGenOutput>
     </Content>
+    <Content Include="javascripts\EPMLive.SocialStream.js" />
+    <Content Include="javascripts\EPMLive.SocialStream.Logs.js" />
+    <Content Include="javascripts\EPMLive.SocialStream.Logs.min.js" />
+    <Content Include="javascripts\EPMLive.SocialStream.min.js" />
+    <Content Include="javascripts\EPMLiveGenericToolBar.js" />
+    <Content Include="javascripts\libraries\amplify.js" />
+    <Content Include="javascripts\libraries\amplify.min.js" />
+    <Content Include="javascripts\libraries\bundles\moment.js" />
+    <Content Include="javascripts\libraries\bundles\moment.min.js" />
+    <Content Include="javascripts\libraries\handlebars-v1.3.0.js" />
+    <Content Include="javascripts\libraries\highlight\highlight.pack.js" />
+    <Content Include="javascripts\libraries\highlight\styles\default.css" />
+    <Content Include="javascripts\libraries\highlight\styles\vs.css" />
+    <Content Include="javascripts\libraries\moment-timezone.data.js" />
+    <Content Include="javascripts\libraries\moment-timezone.data.min.js" />
+    <Content Include="javascripts\libraries\moment-timezone.min.js" />
+    <Content Include="javascripts\libraries\moment.min.js" />
     <Content Include="Layouts\epmlive\Admin\SSLogs.aspx" />
     <Content Include="Layouts\epmlive\images\Ribbon\import-costs-16.png" />
     <Content Include="Layouts\epmlive\images\Ribbon\import-costs-32.png" />
@@ -1495,6 +1517,7 @@
     <Content Include="ResourcePlanning\Elements.xml" />
     <Content Include="Resources\AssignmentPlanner_DelayScript.txt" />
     <Content Include="Resources\MyWorkWebPart_MyWorkDefaultQuery.txt" />
+    <Content Include="Resources\txtGridLayout.txt" />
     <Content Include="RollupSummary\Elements.xml" />
     <Content Include="SiteCollectionSetupWizard\Elements.xml" />
     <Content Include="SocialStream\Elements.xml" />
