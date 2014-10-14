@@ -19,7 +19,7 @@ namespace EPMLiveWorkPlanner
             get { return Convert.ToString(Request["planner"]); }
         }
 
-        public string strProjectId
+        public string strId
         {
             get { return Convert.ToString(Request["ID"]); }
         }

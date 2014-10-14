@@ -121,7 +121,7 @@
                 $.ajax({
                     type: "POST",
                     url: "<%=SPContext.Current.Web.ServerRelativeUrl%>/_vti_bin/WorkPlanner.asmx/Execute",
-                    data: "{Functionname : 'GetKanBanNewItemAdded' , Dataxml : '<DataXML><KanBanBoardName>" + selectedKanbanPlanner + "</KanBanBoardName><KanBanFilter1>" + selectedKanbanFilter1 + "</KanBanFilter1><ProjectID><%=strProjectId%></ProjectID><IsForEdit>0</IsForEdit></DataXML>'}",
+                    data: "{Functionname : 'GetKanBanNewItemAdded' , Dataxml : '<DataXML><KanBanBoardName>" + selectedKanbanPlanner + "</KanBanBoardName><KanBanFilter1>" + selectedKanbanFilter1 + "</KanBanFilter1><ID><%=strId%></ID><IsForEdit>0</IsForEdit></DataXML>'}",
                     contentType: "application/json; charset=utf-8",
                     dataType: "json",
                     error: function (xhr, status, error) {
@@ -150,7 +150,7 @@
                     $.ajax({
                         type: "POST",
                         url: "<%=SPContext.Current.Web.ServerRelativeUrl%>/_vti_bin/WorkPlanner.asmx/Execute",
-                        data: "{Functionname : 'GetKanBanNewItemAdded' , Dataxml : '<DataXML><KanBanBoardName>" + selectedKanbanPlanner + "</KanBanBoardName><KanBanFilter1>" + selectedKanbanFilter1 + "</KanBanFilter1><ProjectID><%=strProjectId%></ProjectID><IsForEdit>1</IsForEdit></DataXML>'}",
+                        data: "{Functionname : 'GetKanBanNewItemAdded' , Dataxml : '<DataXML><KanBanBoardName>" + selectedKanbanPlanner + "</KanBanBoardName><KanBanFilter1>" + selectedKanbanFilter1 + "</KanBanFilter1><ID><%=strId%></ID><IsForEdit>1</IsForEdit></DataXML>'}",
                         contentType: "application/json; charset=utf-8",
                         dataType: "json",
                         error: function (xhr, status, error) {
@@ -242,7 +242,7 @@
                     $.ajax({
                         type: "POST",
                         url: "<%=SPContext.Current.Web.ServerRelativeUrl%>/_vti_bin/WorkPlanner.asmx/Execute",
-                        data: "{Functionname : 'GetKanBanFilter1' , Dataxml : '<DataXML><KanBanBoardName>" + selectedKanbanPlanner + "</KanBanBoardName><ProjectID><%=strProjectId%></ProjectID></DataXML>'}",
+                        data: "{Functionname : 'GetKanBanFilter1' , Dataxml : '<DataXML><KanBanBoardName>" + selectedKanbanPlanner + "</KanBanBoardName><ID><%=strId%></ID></DataXML>'}",
                         contentType: "application/json; charset=utf-8",
                         dataType: "json",
                         error: function (xhr, status, error) {
@@ -308,7 +308,7 @@
                 $.ajax({
                     type: "POST",
                     url: "<%=SPContext.Current.Web.ServerRelativeUrl%>/_vti_bin/WorkPlanner.asmx/Execute",
-                    data: "{Functionname : 'GetKanBanBoard' , Dataxml : '<DataXML><KanBanBoardName>" + selectedKanbanPlanner + "</KanBanBoardName><KanBanFilter1>" + selectedKanbanFilter1 + "</KanBanFilter1><ProjectID><%=strProjectId%></ProjectID></DataXML>'}",
+                    data: "{Functionname : 'GetKanBanBoard' , Dataxml : '<DataXML><KanBanBoardName>" + selectedKanbanPlanner + "</KanBanBoardName><KanBanFilter1>" + selectedKanbanFilter1 + "</KanBanFilter1><ID><%=strId%></ID></DataXML>'}",
                     contentType: "application/json; charset=utf-8",
                     dataType: "json",
                     error: function (xhr, status, error) {
