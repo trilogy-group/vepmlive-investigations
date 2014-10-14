@@ -148,7 +148,7 @@ namespace EPMLiveCore
                 else
                     sTSStatus = "Not Deployed";
 
-                if(SPFarm.Local.Solutions[new Guid("160f5e32-b93f-4682-95bc-6db38233535a")].DeployedWebApplications.Contains(webApp))
+                if (SPFarm.Local.Solutions[new Guid("8f916fa9-1c2d-4416-8036-4a272256e23d")].DeployedWebApplications.Contains(webApp))
                     sDashboardStatus = "Deployed";
                 else
                     sDashboardStatus = "Not Deployed";
