@@ -116,7 +116,6 @@ namespace EPMLiveCore
 
         private static string GetReportQueryNode(SPWeb web, XmlNode nd, SPList list)
         {
-
             if (nd.Name == "And")
             {
                 return "(" + GetReportQueryNode(web, nd.FirstChild, list) + " And " + GetReportQueryNode(web, nd.FirstChild.NextSibling, list) + ")";
@@ -127,11 +126,11 @@ namespace EPMLiveCore
             }
             else
             {
-
-
                 string field = nd.SelectSingleNode("FieldRef").Attributes["Name"].Value;
 
-                if (nd.Name == "IsNull")
+                SPField oField = list.Fields.GetFieldByInternalName(field);
+
+                if (nd.Name == "IsNull" && oField.Type != SPFieldType.Lookup)
                 {
                     return field + " is null";
                 }
@@ -143,10 +142,6 @@ namespace EPMLiveCore
                         ndVals = nd.SelectSingleNode("Values");
                     }
                     catch { }
-
-                    SPField oField = list.Fields.GetFieldByInternalName(field);
-
-
 
                     if (ndVals != null)
                     {
@@ -173,22 +168,65 @@ namespace EPMLiveCore
                     }
                     else
                     {
-                        string val = nd.SelectSingleNode("Value").InnerText;
-
-
-
-                        bool bLookup = false;
-
-                        if (oField.Type == SPFieldType.Lookup || oField.Type == SPFieldType.User)
+                        string val = string.Empty;
+                        // Avoiding NULL value when nothing is provided for filter value
+                        if (nd.SelectSingleNode("Value") != null)
                         {
-                            bLookup = true;
-                            if (nd.Name == "Contains")
-                                field += "Text";
-                            else
-                                field += "ID";
+                            val = nd.SelectSingleNode("Value").InnerText;
                         }
 
-                        if (nd.SelectSingleNode("Value").SelectSingleNode("UserID") != null)
+                        bool bLookup = false;
+                        SPFieldType fieldType = SPFieldType.Text;
+
+                        switch (oField.Type)
+                        {
+                            case SPFieldType.Calculated:
+                                {
+                                    // Multiply by 100 if show as percentage true
+                                    if (((SPFieldCalculated)oField).ShowAsPercentage)
+                                    {
+                                        val = Convert.ToString(double.Parse(val) * 100);
+                                    }
+                                }
+                                break;
+                            case SPFieldType.DateTime:
+                                {
+                                    // Converting value to ShortDate string from LongDate string
+                                    // because SharePoint also does not consider the time part in view filter settings so ignoring it
+                                    val = DateTime.Parse(val).ToString("d");
+                                }
+                                break;
+                            case SPFieldType.Lookup:
+                                {
+                                    try
+                                    {
+                                        SPFieldLookup lookupField = oField as SPFieldLookup;
+                                        SPList lookupList = lookupField.ParentList.ParentWeb.Lists[new Guid(lookupField.LookupList)];
+                                        fieldType = lookupList.Fields.GetFieldByInternalName(lookupField.LookupField.ToString()).Type;
+                                        // Check if field type is text / number
+                                        if (fieldType.Equals(SPFieldType.Integer) || fieldType.Equals(SPFieldType.Counter))
+                                            field += "ID";
+                                        else
+                                            field += "Text";
+                                    }
+                                    catch
+                                    {
+                                        field += "Text";
+                                    }
+                                }
+                                break;
+                            case SPFieldType.User:
+                                {
+                                    bLookup = true;
+                                    if (nd.Name == "Contains")
+                                        field += "Text";
+                                    else
+                                        field += "ID";
+                                }
+                                break;
+                        }
+
+                        if (nd.SelectSingleNode("Value") != null && nd.SelectSingleNode("Value").SelectSingleNode("UserID") != null)
                         {
                             val = web.CurrentUser.ID.ToString();
                         }
@@ -209,15 +247,32 @@ namespace EPMLiveCore
                         {
                             return "(" + field + " <> '" + val + "' OR " + field + " IS NULL)";
                         }
+                        else if (nd.Name == "IsNotNull")
+                        {
+                            return field + " Is Not Null";
+                        }
+                        else if (nd.Name == "IsNull")
+                        {
+                            return field + " Is Null";
+                        }
                         else
                         {
                             string sign = GetNodeSign(nd.Name);
 
                             if (bLookup && sign == "=")
-
+                            {
                                 return "',' + CAST(" + field + " as varchar(MAX)) + ',' LIKE '%," + val + ",%'";
+                            }
+                            else if (oField.Type.Equals(SPFieldType.DateTime))
+                            {
+                                // Need to use like operator to match only the date part 
+                                // and ignore time part from db column value same as SharePoint does.
+                                return field + " LIKE '%'+" + " convert(varchar(10), convert(datetime,'" + val + "',101)) " + "+'%'";
+                            }
                             else
+                            {
                                 return field + " " + sign + " '" + val + "'";
+                            }
                         }
                     }
                 }
@@ -247,7 +302,7 @@ namespace EPMLiveCore
                 default:
                     return "=";
             }
-        }
+        }        
 
         // TEST //
         public static string ProcessReportFilter(SPList list, SPWeb web, string filterWpId)
