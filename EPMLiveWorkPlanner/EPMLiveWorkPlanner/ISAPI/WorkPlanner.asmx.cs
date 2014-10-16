@@ -2466,6 +2466,15 @@ namespace EPMLiveWorkPlanner
                         case SPFieldType.MultiChoice:
                             value = value.Replace(";", ";#");
                             break;
+                        case SPFieldType.Choice:
+                            if (!oField.Required)
+                            {
+                                if (value == "None")
+                                {
+                                    value = value.Replace("None", "");
+                                }
+                            }
+                            break;
                         case SPFieldType.Lookup:
                             XmlDocument docF = new XmlDocument();
                             docF.LoadXml(oField.SchemaXml);
@@ -4330,6 +4339,16 @@ namespace EPMLiveWorkPlanner
                         {
                             sEnum += "|" + ndChoice.InnerText;
                         }
+                        //EPML-3127
+                        try
+                        {
+                            if (!oField.Required)
+                            {
+                                sEnum += "|" + "None";
+                            }
+                        }
+                        catch { }
+
                         attr = docOut.CreateAttribute(enumattr + "Enum");
                         attr.Value = sEnum;
                         ndCol.Attributes.Append(attr);
