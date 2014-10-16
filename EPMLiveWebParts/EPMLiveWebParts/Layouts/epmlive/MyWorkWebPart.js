@@ -286,7 +286,7 @@ function MyWorkOnMouseOverRow(grid, row, col, event) {
 
 function MyWorkOnClick(grid, row, col, x, y, event) {
     if (grid.id === window.allWorkGridId) {
-        MyWorkGrid.loadRibbon();
+        if (row.Kind !== 'Header') MyWorkGrid.loadRibbon();
 
         MyWorkGrid.hidePivotMenu();
         $('#MWG_Search').blur();
