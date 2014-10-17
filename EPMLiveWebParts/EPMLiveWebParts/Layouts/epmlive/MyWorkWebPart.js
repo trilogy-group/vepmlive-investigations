@@ -286,7 +286,13 @@ function MyWorkOnMouseOverRow(grid, row, col, event) {
 
 function MyWorkOnClick(grid, row, col, x, y, event) {
     if (grid.id === window.allWorkGridId) {
-        if (row.Kind !== 'Header') MyWorkGrid.loadRibbon();
+        MyWorkGrid.loadRibbon();
+
+        if (grid.FRow) {
+            window.setTimeout(function () {
+                window.epmLive.utils.fireEvent(grid.FRow.r0, 'mouseup');
+            }, 500);
+        }
 
         MyWorkGrid.hidePivotMenu();
         $('#MWG_Search').blur();
@@ -3262,7 +3268,7 @@ var MyWorkGrid = {
                     }
                 } else {
                     window.SelectRibbonTab('Ribbon.MyWorkTab', true);
-                    window.RefreshCommandUI();
+                    //window.RefreshCommandUI();
                 }
             } else {
                 window.setTimeout(function () {
