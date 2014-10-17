@@ -126,7 +126,7 @@ namespace EPMLiveCore.Jobs
                 if (fields.Count > 0)
                 {
                     // if the list is not a security list itself
-                    if (!isSecure)
+                    if (isSecure)
                     {
                         li.BreakRoleInheritance(false);
                     }
@@ -182,17 +182,20 @@ namespace EPMLiveCore.Jobs
 
                     }
 
-                    List<string> liGrps = new List<string>();
-                    liGrps.Add(string.Format("{0} Owner", safeTitle));
-                    liGrps.Add(string.Format("{0} Member", safeTitle));
-                    liGrps.Add(string.Format("{0} Visitor", safeTitle));
-                    List<SPRoleAssignment> lra = (from SPRoleAssignment ra in li.RoleAssignments
-                                                  where !liGrps.Contains(ra.Member.Name) &&
-                                                        !cNewGrps.Contains(ra.Member.Name)
-                                                  select ra).ToList();
-                    foreach (SPRoleAssignment r in lra)
+                    if (isSecure)
                     {
-                        li.RoleAssignments.RemoveById(r.Member.ID);
+                        List<string> liGrps = new List<string>();
+                        liGrps.Add(string.Format("{0} Owner", safeTitle));
+                        liGrps.Add(string.Format("{0} Member", safeTitle));
+                        liGrps.Add(string.Format("{0} Visitor", safeTitle));
+                        List<SPRoleAssignment> lra = (from SPRoleAssignment ra in li.RoleAssignments
+                                                      where !liGrps.Contains(ra.Member.Name) &&
+                                                            !cNewGrps.Contains(ra.Member.Name)
+                                                      select ra).ToList();
+                        foreach (SPRoleAssignment r in lra)
+                        {
+                            li.RoleAssignments.RemoveById(r.Member.ID);
+                        }
                     }
                 }
             }
