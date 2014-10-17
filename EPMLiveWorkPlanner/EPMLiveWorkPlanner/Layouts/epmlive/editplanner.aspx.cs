@@ -90,11 +90,15 @@ namespace EPMLiveWorkPlanner
 
                         foreach (SPList list in web.Lists)
                         {
-                            ListItem li = new ListItem(list.Title, list.ID.ToString().ToLower());
-                            if (list.Title.ToLower() == curList.ToLower())
-                                li.Selected = true;
+                            // base template for project center is 10701,We won't use Task Center template (BaseTemplate ID: 10702) to load task center list details in Source List drowpdown because then it wont find task list of that selected source task list.
+                            if ((uint)list.BaseTemplate == 10701)
+                            {
+                                ListItem li = new ListItem(list.Title, list.ID.ToString().ToLower());
+                                if (list.Title.ToLower() == curList.ToLower())
+                                    li.Selected = true;
 
-                            ddlProjectCenter.Items.Add(li);
+                                ddlProjectCenter.Items.Add(li);
+                            }
                         }
 
                         filltasklist(web);
