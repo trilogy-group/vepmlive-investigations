@@ -28,7 +28,7 @@
 	<RightCols>
 		
 		<C Name="G" Type="Gantt" GanttStart="StartDate" GanttStrict="0" GanttEnd="DueDate" GanttFlags="Deadline" GanttComplete="PercentComplete" GanttDuration="Duration" GanttAncestors="Predecessors" GanttDescendants="Descendants" GanttChartRound="w" GanttEdit="Main,Dependency" GanttRight="1" GanttSlack="Slack" GanttHeader1="w#dddddd MMMM yyyy" GanttHeader2="d#ddddd" /> 
-		<C Name="G" GanttCorrectDependenciesFixed="1"  GanttCorrectDependencies="1" GanttIncorrectDependencies="2"/> 
+		<C Name="G" GanttCorrectDependenciesFixed="1"  GanttCorrectDependencies="1" GanttIncorrectDependencies="1"/> 
 		<C Name="G" GanttMin="1990-1-1" GanttMax="2100-1-1" GanttZoom="weeks and days" GanttDataUnits="28800000" GanttEndLast="0" Width="200" /> 
 		<C Name="G" GanttFlow="BaselineDateRange" CanExport="0"/>
 
