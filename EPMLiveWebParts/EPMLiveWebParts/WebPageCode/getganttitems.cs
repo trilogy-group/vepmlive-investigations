@@ -133,6 +133,10 @@ namespace EPMLiveWebParts
                     XmlNode ndNew = doc.CreateNode(XmlNodeType.Element, "C", doc.NamespaceURI);
                     XmlAttribute attr = doc.CreateAttribute("Name");
                     attr.Value = oField.InternalName;
+
+                    if (attr.Value == "State")
+                        attr.Value = "FState";
+
                     ndNew.Attributes.Append(attr);
 
                     attr = doc.CreateAttribute("CaseSensitive");
@@ -258,9 +262,9 @@ namespace EPMLiveWebParts
                                         senum += ";" + sChoice.Replace(";", "");
 
                                     //Used to prepare count for an item
-                                    for (int i = 0; i < oCField.Choices.Count; i++)
-                                        senumrange += ";" + i.ToString();
-
+                                    //for (int i = 0; i < oCField.Choices.Count; i++)
+                                    //    senumrange += ";" + i.ToString();
+                                    senumrange = senum;
                                     attr = doc.CreateAttribute("Enum");
                                     attr.Value = senum;
                                     ndNew.Attributes.Append(attr);
@@ -356,7 +360,11 @@ namespace EPMLiveWebParts
                         ndCols = doc.FirstChild.SelectSingleNode("//Cols");
                     }
 
-                    attr = doc.CreateAttribute(oField.InternalName);
+                    string iFieldName = oField.InternalName;
+                    if (iFieldName == "State")
+                        iFieldName = "FState";
+
+                    attr = doc.CreateAttribute(iFieldName);
                     attr.Value = sTitle;
                     ndHeader.Attributes.Append(attr);
 
@@ -781,6 +789,9 @@ namespace EPMLiveWebParts
 
                             val = newval.Trim(';');
                         }
+
+                        if (fieldName == "State")
+                            fieldName = "FState";
 
                         XmlAttribute attr = doc.CreateAttribute(fieldName);
                         attr.Value = val;
