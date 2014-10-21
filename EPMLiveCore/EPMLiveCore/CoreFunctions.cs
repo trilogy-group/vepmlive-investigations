@@ -821,42 +821,57 @@ namespace EPMLiveCore
         public static string GetScheduleStatusField(SPListItem ListItem)
         {
             string ss = "";
-
+            string status = "";
             int yellow = 0;
             int red = 30;
 
             try
             {
-                SPField oField = null;
                 try
                 {
-                    oField = ListItem.ParentList.Fields.GetFieldByInternalName("DueDate");
+                    status = ListItem["Status"].ToString();
                 }
                 catch { }
-                if (oField != null)
+
+                if (status != "Completed")
                 {
-                    ss = "green.gif";
-                    DateTime duedate = DateTime.Parse(ListItem[oField.Id].ToString());
-                    DateTime today = DateTime.Now;
-                    today = new DateTime(today.Year, today.Month, today.Day, 0, 0, 0);
-                    duedate = new DateTime(duedate.Year, duedate.Month, duedate.Day, 0, 0, 0);
 
-                    TimeSpan ts = today - duedate;
-
-                    if (ts.TotalDays > red)
+                    SPField oField = null;
+                    try
                     {
-                        ss = "red.gif";
+                        oField = ListItem.ParentList.Fields.GetFieldByInternalName("DueDate");
                     }
-                    else if (ts.TotalDays > yellow)
+                    catch { }
+                    if (oField != null)
                     {
-                        ss = "yellow.gif";
+                        ss = "green.gif";
+                        DateTime duedate = DateTime.Parse(ListItem[oField.Id].ToString());
+                        DateTime today = DateTime.Now;
+                        today = new DateTime(today.Year, today.Month, today.Day, 0, 0, 0);
+                        duedate = new DateTime(duedate.Year, duedate.Month, duedate.Day, 0, 0, 0);
+
+                        TimeSpan ts = today - duedate;
+
+                        if (ts.TotalDays > red)
+                        {
+                            ss = "red.gif";
+                        }
+                        else if (ts.TotalDays > yellow)
+                        {
+                            ss = "yellow.gif";
+                        }
+                    }
+                    else
+                    {
+                        ss = ListItem["ScheduleStatus"].ToString();
+                        ss = ss.Substring(ss.IndexOf(";#") + 2);
                     }
                 }
                 else
                 {
-                    ss = ListItem["ScheduleStatus"].ToString();
-                    ss = ss.Substring(ss.IndexOf(";#") + 2);
+                    ss = "green.gif";
                 }
+
             }
             catch { }
 
@@ -866,18 +881,28 @@ namespace EPMLiveCore
         public static string GetDaysOverdueField(SPListItem ListItem)
         {
             string daysoverdue = "0";
+            string status = "";
             try
             {
-                DateTime duedate = DateTime.Parse(ListItem["DueDate"].ToString());
-                DateTime today = DateTime.Now;
-                today = new DateTime(today.Year, today.Month, today.Day, 0, 0, 0);
-                duedate = new DateTime(duedate.Year, duedate.Month, duedate.Day, 0, 0, 0);
-
-                TimeSpan ts = today - duedate;
-
-                if (ts.TotalDays > 0)
+                try
                 {
-                    daysoverdue = ts.TotalDays.ToString();
+                    status = ListItem["Status"].ToString();
+                }
+                catch { }
+
+                if (status != "Completed")
+                {
+                    DateTime duedate = DateTime.Parse(ListItem["DueDate"].ToString());
+                    DateTime today = DateTime.Now;
+                    today = new DateTime(today.Year, today.Month, today.Day, 0, 0, 0);
+                    duedate = new DateTime(duedate.Year, duedate.Month, duedate.Day, 0, 0, 0);
+
+                    TimeSpan ts = today - duedate;
+
+                    if (ts.TotalDays > 0)
+                    {
+                        daysoverdue = ts.TotalDays.ToString();
+                    }
                 }
             }
             catch
