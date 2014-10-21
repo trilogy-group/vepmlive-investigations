@@ -56,7 +56,7 @@ namespace EPMLiveReportsAdmin.API
         {
             try
             {
-                ConfigureReportingService();
+                //ConfigureReportingService();
 
                 var dataElement = new XElement("Data");
 
@@ -177,14 +177,11 @@ namespace EPMLiveReportsAdmin.API
         /// <param name="spFolders">The sp folders.</param>
         /// <param name="spDocumentLibrary">The sp document library.</param>
         /// <param name="parentElement">The parent element.</param>
-        private void BuildReportTree(SPFolder parentFolder, IEnumerable<SPFolder> spFolders,
-            SPDocumentLibrary spDocumentLibrary, ref XElement parentElement)
+        private void BuildReportTree(SPFolder parentFolder, IEnumerable<SPFolder> spFolders, SPDocumentLibrary spDocumentLibrary, ref XElement parentElement)
         {
             var xElement = new XElement("Folder", new XAttribute("Name", parentFolder.Name));
 
-            foreach (
-                SPListItem spListItem in spDocumentLibrary.GetItemsInFolder(spDocumentLibrary.DefaultView, parentFolder)
-                )
+            foreach (SPListItem spListItem in spDocumentLibrary.GetItemsInFolder(spDocumentLibrary.DefaultView, parentFolder))
             {
                 if (spListItem.FileSystemObjectType != SPFileSystemObjectType.File ||
                     !spListItem.File.Name.ToLower().EndsWith(".rdl")) continue;
@@ -199,10 +196,10 @@ namespace EPMLiveReportsAdmin.API
 
                 try
                 {
-                    string reportUrl = BuildReportQueryString(SPUrlUtility.CombineUrl(Web.Url, spListItem.Url));
-                    string[] reportUrlParts = reportUrl.Split('|');
+                    //string reportUrl = BuildReportQueryString(SPUrlUtility.CombineUrl(Web.Url, spListItem.Url));
+                    //string[] reportUrlParts = reportUrl.Split('|');
 
-                    url =
+                    /*url =
                         string.Format(
                             @"{0}/_layouts/ReportServer/RSViewerPage.aspx?rv:RelativeReportUrl={1}{2}&rv:HeaderArea=none",
                             safeServerRelativeUrl,
@@ -210,6 +207,9 @@ namespace EPMLiveReportsAdmin.API
                             reportUrlParts[0]);
 
                     hasResourcesParam = reportUrlParts[1];
+                     * */
+                    //sites/dev4/_layouts/epmlive/SSRSReportRedirect.aspx?weburl=http%3a%2f%2fcontosos1%2fsites%2fdev4&itemurl=Report+Library%2fepmlivetl%2fResources%2fCapacity+Planning%2fResource+Requirements.rdl
+                     url = spDocumentLibrary.ParentWeb.ServerRelativeUrl + "/_layouts/15/epmlive/SSRSReportRedirect.aspx?weburl=" + System.Web.HttpUtility.UrlEncode(spDocumentLibrary.ParentWeb.Url) + "&itemurl=" + System.Web.HttpUtility.UrlEncode(spListItem.Url);
                 }
                 catch (Exception ex)
                 {
