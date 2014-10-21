@@ -416,7 +416,7 @@ namespace EPMLiveWorkPlanner
                     EPMLiveCore.CoreFunctions.setConfigSetting(web, "EPMLivePlanner" + plannerName + "PJstatus", ddlPubStatus.SelectedValue);
                     EPMLiveCore.CoreFunctions.setConfigSetting(web, "EPMLivePlanner" + plannerName + "PJreslink", ddlResourceLink.SelectedValue);
                     EPMLiveCore.CoreFunctions.setConfigSetting(web, "EPMLivePlanner" + plannerName + "PJuseres", chkUseRes.Checked.ToString());
-                    EPMLiveCore.CoreFunctions.setConfigSetting(web, "EPMLivePlanner" + plannerName + "PJLock", chkUseRes.Checked.ToString());
+                    EPMLiveCore.CoreFunctions.setConfigSetting(web, "EPMLivePlanner" + plannerName + "PJLock", chkLockPublisher.Checked.ToString());
 
                     string locked = "";
                     if (chkLockPublisher.Checked)
