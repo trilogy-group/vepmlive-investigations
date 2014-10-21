@@ -247,6 +247,32 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
             case "ViewProperties":
                 return this.buttonEnabled(0);
             case "TaskPlanner":
+                var $cnt = 0;
+                var ids = "";
+                ids = this.$Grid.getCheckedIds().split(',');
+                if(ids == "")
+                {
+                    return false;
+                }
+                else if (ids.length > 0)
+                {
+                    for (var $v1 = 0; $v1 < ids.length; $v1++) 
+                    {
+                        var $v2 = ids[$v1];
+                        if ($v2 == "undefined" || $v2 == "undefined.undefined" || $v2 == "undefined.undefined.undefined")
+                        {
+                           $cnt =  (parseInt($cnt)+parseInt(1));
+                        }
+                    }
+                    if ($cnt == 1 || ids.length == 1)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
             case "EPKMultiAction":
                 //if(this.buttonEnabled(1))
                 {
