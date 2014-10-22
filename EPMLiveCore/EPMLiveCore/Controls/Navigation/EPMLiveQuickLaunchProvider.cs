@@ -7,6 +7,7 @@ using System.Web;
 using EPMLiveCore.Infrastructure;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.Navigation;
+using System.Text;
 
 namespace EPMLiveCore.Controls.Navigation
 {
@@ -151,6 +152,21 @@ namespace EPMLiveCore.Controls.Navigation
                                             SiteMapNode node = FindSiteMapNodeFromKey(nodeKey);
                                             if (node == null) continue;
 
+                                            var item = GetSpList(node);
+                                            string defaultViewURL = DefaultViewFromPropertyBag(item);
+
+                                            if (!string.IsNullOrEmpty(defaultViewURL))
+                                            {
+                                                var title = node.Title;
+                                                node = new SiteMapNode(this, nodeKey)
+                                                {
+                                                    Title = title,
+                                                    Url = spWeb.ServerRelativeUrl + "/" + defaultViewURL
+                                                };
+                                            }
+                                            linkNodes[nodeKey] = node;
+                                            
+
                                             SiteMapNode parentNode = node.ParentNode;
                                             if (parentNode != null && parentNode.Title.Equals("Quick launch"))
                                             {
@@ -218,5 +234,60 @@ namespace EPMLiveCore.Controls.Navigation
         }
 
         #endregion Overrides of SPNavigationProvider
+
+        public SPList GetSpList(SiteMapNode node)
+        {
+            SPWeb currentWeb = SPContext.Current.Web;
+            Guid siteId = currentWeb.Site.ID;
+            Guid webId = currentWeb.ID;             
+
+            SPList list = currentWeb.GetList(node.Url);
+            return list;
+        }
+
+        public string DefaultViewFromPropertyBag(SPList list)
+        {
+            StringBuilder sb = new StringBuilder();
+            Dictionary<int, string> propBagData = new Dictionary<int, string>();            
+            string defaultViewFirstPermission = string.Empty;
+            bool hasDefaultView = false;
+            try
+            {
+                propBagData = ConvertFromString(list.ParentWeb.Properties[String.Format("ViewPermissions{0}", list.ID.ToString())], list);                
+                foreach (var bagData in propBagData)
+                {
+                    foreach (SPGroup grp in SPContext.Current.Web.CurrentUser.Groups)
+                    {
+                        if (grp.ID == bagData.Key)
+                        {
+                            if (!hasDefaultView)
+                            {
+                                defaultViewFirstPermission = bagData.Value.Split('#')[1];
+                                hasDefaultView = true;
+                            }
+                        }
+                    }
+                }
+            }
+            catch { }
+            return defaultViewFirstPermission;
+        }
+        private Dictionary<int, string> ConvertFromString(string value, SPList currentList)
+        {
+            string[] groups = value.Split("|".ToCharArray());
+            Dictionary<int, string> groupValues = new Dictionary<int, string>();
+
+            foreach (string group in groups)
+            {
+                if (!string.IsNullOrEmpty(group))
+                {
+                    string[] values = group.Split("#".ToCharArray());
+                    int groupId = int.Parse(values[0]);
+                    groupValues.Add(groupId, group);
+                }
+            }
+            return groupValues;
+        }
+
     }
 }
