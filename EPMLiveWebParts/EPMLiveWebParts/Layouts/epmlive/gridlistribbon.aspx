@@ -1589,7 +1589,76 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
         SP.Application.UI.ViewSelectorMenuBuilder.getViewInformation(this, options);
     },
 
-    onViewInformationReturned: function(viewGroups) {ULSMg8:;
+    onViewInformationReturned: function(viewGroups) {ULSMg8:;            
+		var viewControlResult  = viewURLs;		
+		var newPublicViewArr = new Array();
+		var newPersonalViewArr = new Array();
+        var viewDefaultViewUrl = defaultViewUrl;
+        var cntDefault=0;
+
+        if(viewDefaultViewUrl != "")
+        {            
+            if(viewGroups.DefaultView.Id != null)
+		    {	
+			    var tmpDefault = viewGroups.DefaultView["NavigateUrl"];
+			    for(var j=0;j<viewControlResult.length;j++)
+			    {
+				    if(tmpDefault == viewControlResult[j])				
+					    cntDefault++;
+			    }
+			    if(cntDefault == 0)
+				    delete viewGroups.DefaultView;
+		    }
+         }
+
+        if(viewControlResult != "")
+        {
+
+		    if(viewGroups.PublicViews.length > 0)
+		    {
+			    for(var i=0;i<viewGroups.PublicViews.length;i++)
+			    {			
+				    for(var j=0;j<viewControlResult.length;j++)
+				    {
+					    if(viewControlResult[j] != "" && viewGroups.PublicViews[i].NavigateUrl == viewControlResult[j])
+					    {
+						    newPublicViewArr.push(viewGroups.PublicViews[i]);
+					    }
+				    }
+			    }
+			
+			    viewGroups.PublicViews.splice(0,viewGroups.PublicViews.length);
+			
+			    for(var x=0;x<newPublicViewArr.length;x++)
+			    {
+				    viewGroups.PublicViews.push(newPublicViewArr[x]);
+			    }
+		    }
+        }
+
+		// for the Personal View
+		
+		<%--if(viewGroups.PersonalViews.length > 0)
+		{
+			for(var i=0;i<viewGroups.PersonalViews.length;i++)
+			{			
+				for(var j=0;j<viewControlResult.length;j++)
+				{
+					if(viewControlResult[j] != "" && viewGroups.PersonalViews[i].NavigateUrl == viewControlResult[j])
+					{
+						newPersonalViewArr.push(viewGroups.PersonalViews[i]);
+					}
+				}
+			}
+			
+			viewGroups.PersonalViews.splice(0,viewGroups.PersonalViews.length);
+			
+			for(var x=0;x<newPersonalViewArr.length;x++)
+			{
+				viewGroups.PersonalViews.push(newPersonalViewArr[x]);
+			}
+		}--%>
+
         this.$3X_3 = viewGroups;
         this.$22_3 = false;
         this.$1Q_3 = this.buildViewMenu(this.$3X_3);

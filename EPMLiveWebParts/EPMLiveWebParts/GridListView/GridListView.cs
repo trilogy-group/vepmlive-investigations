@@ -28,6 +28,9 @@ using ReportFiltering;
 
 using System.Data.SqlClient;
 using EPMLiveCore.Infrastructure;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web.Script.Serialization;
 
 namespace EPMLiveWebParts
 {
@@ -177,6 +180,9 @@ namespace EPMLiveWebParts
         GridViewSession gvs;
 
         string LinkType = "";
+                
+        string oJsonViewURL = string.Empty;
+        string oJsonDefaultViewURL = string.Empty;
 
         #region Gantt Properties
 
@@ -2840,31 +2846,117 @@ namespace EPMLiveWebParts
             }
             output.WriteLine(@"}
 
-            //ExecuteOrDelayUntilScriptLoaded(loadMenu" + sFullGridId + @", 'EPMLive.js');            
-        </script>");
+            //ExecuteOrDelayUntilScriptLoaded(loadMenu" + sFullGridId + @", 'EPMLive.js');
+            var viewURLs = " + oJsonViewURL + ";"  + 
+            "var defaultViewUrl = " + oJsonDefaultViewURL + ";" +
+        "</script>");
         }
 
         private string GetViews()
         {
-            StringBuilder sb = new StringBuilder();
+            StringBuilder sb = new StringBuilder();            
+            Dictionary<int, string> propBagData = new Dictionary<int, string>();
+            List<string> lstViewURL = new List<string>();
+            bool hasDefaultViewURL = false;
+            string defaultViewURL = string.Empty;
+            JavaScriptSerializer oSerializer = new JavaScriptSerializer();
 
-            foreach (SPView view in list.Views)
+            try
             {
+                propBagData = ConvertFromString(list.ParentWeb.Properties[String.Format("ViewPermissions{0}", list.ID.ToString())], list);
+            }
+            catch { propBagData = null; }
+            if (propBagData != null)
+            {
+                string[] viewArr;
+                List<string> splitViewcollection = new List<string>();
+                foreach (var bagData in propBagData)
+                {
+                    foreach (SPGroup grp in SPContext.Current.Web.CurrentUser.Groups)
+                    {
+                        if (grp.ID == bagData.Key)
+                        {
+                            string viewList = bagData.Value.Split('#')[2];
+                            if (!hasDefaultViewURL)
+                            {
+                                defaultViewURL = bagData.Value.Split('#')[1];
+                                hasDefaultViewURL = true;
+                            }
 
-                sb.Append("{");
-                sb.Append("'iconClass': '',");
-                sb.Append("'text': '" + System.Web.HttpUtility.HtmlEncode(view.Title) + "',");
-                sb.Append("'events': [");
-                sb.Append("{");
-                sb.Append("'eventName': 'click',");
-                sb.Append("'function': function () { $('#ddlViewControl_ul_menu').toggle(); location.href='" + view.ServerRelativeUrl + Page.Request.Url.Query + "'; }");
-                sb.Append("}");
-                sb.Append("]");
-                sb.Append("},");
+                            viewArr = viewList.Split(';');
+
+                            foreach (var tmpViewInsert in viewArr)
+                            {
+                                if (!splitViewcollection.Contains(tmpViewInsert))
+                                    splitViewcollection.Add(tmpViewInsert);
+                            }
+                        }
+                    }
+                }
+
+                // Adding distinct Views
+                foreach (var tmpView in splitViewcollection)
+                {
+                    string viewUrl = tmpView.Substring(tmpView.LastIndexOf('/') + 1);
+                    lstViewURL.Add(Page.ResolveUrl(viewUrl));
+                    string viewName = viewUrl.Split('.')[0];
+                    sb.Append("{");
+                    sb.Append("'iconClass': '',");
+                    sb.Append("'text': '" + viewName + "',");
+                    sb.Append("'events': [");
+                    sb.Append("{");
+                    sb.Append("'eventName': 'click',");
+                    sb.Append("'function': function () { $('#ddlViewControl_ul_menu').toggle(); location.href='" + Page.ResolveUrl(viewUrl) + Page.Request.Url.Query + "'; }");
+                    sb.Append("}");
+                    sb.Append("]");
+                    sb.Append("},");
+                }
+
+                // serialize listview url and pass it to javascript object.
+                
+                oJsonViewURL = oSerializer.Serialize(lstViewURL);
+                oJsonDefaultViewURL = oSerializer.Serialize(defaultViewURL);                
+            }
+            else
+            {
+                // getting view from list.Views
+                foreach (SPView view in list.Views)
+                {
+
+                    sb.Append("{");
+                    sb.Append("'iconClass': '',");
+                    sb.Append("'text': '" + System.Web.HttpUtility.HtmlEncode(view.Title) + "',");
+                    sb.Append("'events': [");
+                    sb.Append("{");
+                    sb.Append("'eventName': 'click',");
+                    sb.Append("'function': function () { $('#ddlViewControl_ul_menu').toggle(); location.href='" + view.ServerRelativeUrl + Page.Request.Url.Query + "'; }");
+                    sb.Append("}");
+                    sb.Append("]");
+                    sb.Append("},");
+                }
+                oJsonViewURL = oSerializer.Serialize(lstViewURL);
+                oJsonDefaultViewURL = oSerializer.Serialize(defaultViewURL);
             }
 
-
             return sb.ToString().Trim(',');
+        }
+
+        private Dictionary<int, string> ConvertFromString(string value, SPList currentList)
+        {
+            string[] groups = value.Split("|".ToCharArray());
+            Dictionary<int, string> groupValues = new Dictionary<int, string>();
+
+            foreach (string group in groups)
+            {
+                if (!string.IsNullOrEmpty(group))
+                {
+                    string[] values = group.Split("#".ToCharArray());
+                    int groupId = int.Parse(values[0]);
+                    groupValues.Add(groupId, group);
+                }
+            }
+
+            return groupValues;
         }
 
         private void HideListView(bool DoHide)
