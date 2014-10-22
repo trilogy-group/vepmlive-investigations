@@ -1778,18 +1778,32 @@ namespace EPMLiveWebParts
 
                 bool wbsfound = false;
                 XmlNode ndGroup = null;
+                string groupname = "";
+
+                if (String.IsNullOrEmpty(group))
+                {
+                    if (!String.IsNullOrEmpty(Convert.ToString(dr["ID"])))
+                    {
+                        groupname = Convert.ToString(dr["ID"]);
+                    }
+                }
+                else
+                {
+                    groupname = group;
+                }
+
                 if (wbs != "")
                 {
                     int ind = wbs.LastIndexOf(".");
                     if (ind > 0)
                     {
                         string parentwbs = wbs.Substring(0, ind);
-                        if (hshWBS.Contains(group + "\n" + parentwbs))
+                        if (hshWBS.Contains(groupname + "\n" + parentwbs))
                         {
                             wbsfound = true;
                             try
                             {
-                                ndGroup = (XmlNode)hshWBS[group + "\n" + parentwbs];
+                                ndGroup = (XmlNode)hshWBS[groupname + "\n" + parentwbs];
                             }
                             catch { }
                             if (ndGroup == null)
@@ -1814,8 +1828,8 @@ namespace EPMLiveWebParts
 
                 if (!wbsfound)
                 {
-                    if (group != null)
-                        ndGroup = (XmlNode)hshItemNodes[group];
+                    if (!String.IsNullOrEmpty(groupname) && hasGroups)
+                        ndGroup = (XmlNode)hshItemNodes[groupname];
                     else
                         ndGroup = ndMainParent;
 
@@ -1841,7 +1855,7 @@ namespace EPMLiveWebParts
                 }
 
                 XmlNode ndCloned = ndNewItem.CloneNode(true);
-                string grouping = group;
+                string grouping = groupname;
 
                 if (grouping == null)
                     grouping = "";
@@ -1855,8 +1869,8 @@ namespace EPMLiveWebParts
                 ndGroup.AppendChild(ndCloned);
                 if (wbs != "")
                 {
-                    if (!hshWBS.Contains(group + "\n" + wbs))
-                        hshWBS.Add(group + "\n" + wbs, ndCloned);
+                    if (!hshWBS.Contains(groupname + "\n" + wbs))
+                        hshWBS.Add(groupname + "\n" + wbs, ndCloned);
                 }
                 counter++;
             }
@@ -2966,18 +2980,32 @@ namespace EPMLiveWebParts
 
                 bool wbsfound = false;
                 XmlNode ndGroup = null;
+                string groupname = "";
+
+                if (String.IsNullOrEmpty(group))
+                {
+                    if (!String.IsNullOrEmpty(Convert.ToString(li["ID"])))
+                    {
+                        groupname = Convert.ToString(li["ID"]);
+                    }
+                }
+                else
+                {
+                    groupname = group;
+                }
+
                 if (wbs != "")
                 {
                     int ind = wbs.LastIndexOf(".");
                     if (ind > 0)
                     {
                         string parentwbs = wbs.Substring(0, ind);
-                        if (hshWBS.Contains(group + "\n" + parentwbs))
+                        if (hshWBS.Contains(groupname + "\n" + parentwbs))
                         {
                             wbsfound = true;
                             try
                             {
-                                ndGroup = (XmlNode)hshWBS[group + "\n" + parentwbs];
+                                ndGroup = (XmlNode)hshWBS[groupname + "\n" + parentwbs];
                             }
                             catch { }
                             if (ndGroup == null)
@@ -3002,8 +3030,8 @@ namespace EPMLiveWebParts
 
                 if (!wbsfound)
                 {
-                    if (group != null)
-                        ndGroup = (XmlNode)hshItemNodes[group];
+                    if (!String.IsNullOrEmpty(groupname) && hasGroups)
+                        ndGroup = (XmlNode)hshItemNodes[groupname];
                     else
                         ndGroup = ndMainParent;
 
@@ -3029,7 +3057,7 @@ namespace EPMLiveWebParts
                 }
 
                 XmlNode ndCloned = ndNewItem.CloneNode(true);
-                string grouping = group;
+                string grouping = groupname;
 
                 if (grouping == null)
                     grouping = "";
@@ -3043,8 +3071,8 @@ namespace EPMLiveWebParts
                 ndGroup.AppendChild(ndCloned);
                 if (wbs != "")
                 {
-                    if (!hshWBS.Contains(group + "\n" + wbs))
-                        hshWBS.Add(group + "\n" + wbs, ndCloned);
+                    if (!hshWBS.Contains(groupname + "\n" + wbs))
+                        hshWBS.Add(groupname + "\n" + wbs, ndCloned);
                 }
                 counter++;
             }
