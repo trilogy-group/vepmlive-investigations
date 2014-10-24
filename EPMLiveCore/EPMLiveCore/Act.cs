@@ -345,15 +345,19 @@ namespace EPMLiveCore
 
                                 foreach(string sUser in arrUsers)
                                 {
-                                    string[] sUserInfo = sUser.Split(':');
-
-                                    if(sUserInfo[1] == oUl.id.ToString())
-                                        featureUserCount++;
-
-                                    if(sUserInfo[0] == username && sUserInfo[1] == oUl.id.ToString() && oUl.levels.Contains((int)feature))
+                                    try
                                     {
-                                        userAlreadyIn = true;
+                                        string[] sUserInfo = sUser.Split(':');
+
+                                        if (sUserInfo[1] == oUl.id.ToString())
+                                            featureUserCount++;
+
+                                        if (sUserInfo[0] == username && sUserInfo[1] == oUl.id.ToString() && oUl.levels.Contains((int) feature))
+                                        {
+                                            userAlreadyIn = true;
+                                        }
                                     }
+                                    catch { }
                                 }
 
                                 if(userAlreadyIn)
