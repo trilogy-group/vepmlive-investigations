@@ -3135,7 +3135,7 @@ namespace EPMLiveWebParts
                             SPFieldChoice c = (SPFieldChoice)field;
                             foreach (string choice in c.Choices)
                             {
-                                jsonfields += "\"" + choice + "\",";
+                                jsonfields += "\"" + choice.Replace("\"", "\\\"") + "\",";
                             }
                             jsonfields = jsonfields.TrimEnd(',') + "],";
                         }
