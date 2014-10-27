@@ -1681,7 +1681,7 @@ Grids.OnValueChanged = function (grid, row, col, val) {
 
         var oldVal = grid.GetValue(row, col);
 
-        cTotal = curGrid.GetValue(curGrid.Rows[-1], curCol);
+        cTotal = grid.GetValue(grid.Rows[-1], col);
 
         if (tVal.toString() == "NaN") {
             alert('That is not a valid entry.');
