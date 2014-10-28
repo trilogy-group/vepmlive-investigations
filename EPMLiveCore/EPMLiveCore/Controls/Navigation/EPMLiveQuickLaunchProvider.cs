@@ -153,18 +153,21 @@ namespace EPMLiveCore.Controls.Navigation
                                             if (node == null) continue;
 
                                             var item = GetSpList(node);
-                                            string defaultViewURL = DefaultViewFromPropertyBag(item);
-
-                                            if (!string.IsNullOrEmpty(defaultViewURL))
+                                            if (item != null)
                                             {
-                                                var title = node.Title;
-                                                node = new SiteMapNode(this, nodeKey)
+                                                string defaultViewURL = DefaultViewFromPropertyBag(item);
+
+                                                if (!string.IsNullOrEmpty(defaultViewURL))
                                                 {
-                                                    Title = title,
-                                                    Url = spWeb.ServerRelativeUrl + "/" + defaultViewURL
-                                                };
+                                                    var title = node.Title;
+                                                    node = new SiteMapNode(this, nodeKey)
+                                                    {
+                                                        Title = title,
+                                                        Url = spWeb.ServerRelativeUrl + "/" + defaultViewURL
+                                                    };
+                                                }
+                                                linkNodes[nodeKey] = node;
                                             }
-                                            linkNodes[nodeKey] = node;
                                             
 
                                             SiteMapNode parentNode = node.ParentNode;
@@ -238,9 +241,6 @@ namespace EPMLiveCore.Controls.Navigation
         public SPList GetSpList(SiteMapNode node)
         {
             SPWeb currentWeb = SPContext.Current.Web;
-            Guid siteId = currentWeb.Site.ID;
-            Guid webId = currentWeb.ID;             
-
             SPList list = currentWeb.GetList(node.Url);
             return list;
         }
