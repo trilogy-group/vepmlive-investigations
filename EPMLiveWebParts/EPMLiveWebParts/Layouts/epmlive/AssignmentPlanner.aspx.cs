@@ -168,7 +168,11 @@ namespace EPMLiveWebParts.Layouts.epmlive
             string value = Page.Request.Params["startdate"];
             if (!string.IsNullOrEmpty(value))
             {
-                if (DateTime.TryParse(value, out date)) startDate = date;
+               // if (DateTime.TryParse(value, out date)) startDate = date;
+                if (DateTime.TryParseExact(value, "M/d/yyyy",
+                             CultureInfo.InvariantCulture,
+                             DateTimeStyles.None,
+                             out date)) startDate = date;
             }
 
             _startDate = startDate.Date;
@@ -178,7 +182,11 @@ namespace EPMLiveWebParts.Layouts.epmlive
             value = Page.Request.Params["duedate"];
             if (!string.IsNullOrEmpty(value))
             {
-                if (DateTime.TryParse(value, out date)) dueDate = date;
+                //if (DateTime.TryParse(value, out date)) dueDate = date;
+                if (DateTime.TryParseExact(value, "M/d/yyyy",
+                              CultureInfo.InvariantCulture,
+                              DateTimeStyles.None,
+                              out date)) dueDate = date;
             }
 
             _dueDate = dueDate.AddHours(23).AddMinutes(59).AddSeconds(59);
@@ -210,7 +218,7 @@ namespace EPMLiveWebParts.Layouts.epmlive
         {
             return
                 dateTime.ToString(
-                    new CultureInfo((int) (Web.CurrentUser.RegionalSettings ?? Web.RegionalSettings).LocaleId).
+                    new CultureInfo((int)(Web.CurrentUser.RegionalSettings ?? Web.RegionalSettings).LocaleId).
                         DateTimeFormat.ShortDatePattern);
         }
 
@@ -253,11 +261,12 @@ namespace EPMLiveWebParts.Layouts.epmlive
         /// </summary>
         private void RegisterScripts()
         {
+            string script = string.Format("var currentDateFormat = '{0}';", CultureInfo.CurrentCulture.DateTimeFormat.ShortDatePattern);
+            ClientScript.RegisterClientScriptBlock(typeof(string), "myscript", script, true);
             EPMLiveScriptManager.RegisterScript(Page, new[]
             {
                 "libraries/jquery.min", "/treegrid/GridE", "@EPMLive.AssignmentPlanner"
             });
-
             ServicePointManager.ServerCertificateValidationCallback += (sender, certificate, chain, errors) => true;
         }
 

@@ -1453,24 +1453,37 @@
                     window.SP.UI.ModalDialog.showModalDialog(options);
                 } else {
                     var newDate = new Date(value);
-
-                    if (type === 'From') {
-                        if (newDate <= new Date($$.dueDate)) {
-                            $$.newStartDate = '{0}/{1}/{2}'.format(newDate.getMonth() + 1, newDate.getDate(), newDate.getFullYear());
-                            $$.newDueDate = $$.dueDate;
-                            $$.grid.reload();
-                        } else {
-                            alert('The start date must be less than or equal to the due date.');
-                        }
-                    } else {
-                        if (newDate >= new Date($$.startDate)) {
-                            $$.newDueDate = '{0}/{1}/{2}'.format(newDate.getMonth() + 1, newDate.getDate(), newDate.getFullYear());
-                            $$.newStartDate = $$.startDate;
-                            $$.grid.reload();
-                        } else {
-                            alert('The due date must be greater than or equal to the start date.');
-                        }
-                    }
+                        if (type === 'From') {
+                            if (currentDateFormat.slice(0, (currentDateFormat.length - (currentDateFormat.length - 1))) == "d") {
+                                var duedateForFormat = $$.dueDate.split(/[/.]+/);
+                                    var dueDateNewFormat = duedateForFormat[1] + "/" + duedateForFormat[0] + "/" + duedateForFormat[2];
+                                }
+                                else {
+                                    var dueDateNewFormat = $$.dueDate;
+                                }
+                                if (newDate <= new Date(dueDateNewFormat)) {
+                                    $$.newStartDate = '{0}/{1}/{2}'.format(newDate.getMonth() + 1, newDate.getDate(), newDate.getFullYear());
+                                    $$.newDueDate = dueDateNewFormat;
+                                    $$.grid.reload();
+                                } else {
+                                    alert('The start date must be less than or equal to the due date.');
+                                }
+                            } else {
+                            if (currentDateFormat.slice(0, (currentDateFormat.length - (currentDateFormat.length - 1))) == "d") {
+                                var startdateForFormat = $$.startDate.split(/[/.]+/);
+                                    var startDateNewFormat = startdateForFormat[1] + "/" + startdateForFormat[0] + "/" + startdateForFormat[2];
+                                }
+                                else {
+                                var startDateNewFormat = $$.startDate;
+                                }
+                                if (newDate >= new Date(startDateNewFormat)) {
+                                    $$.newDueDate = '{0}/{1}/{2}'.format(newDate.getMonth() + 1, newDate.getDate(), newDate.getFullYear());
+                                    $$.newStartDate = startDateNewFormat;
+                                    $$.grid.reload();
+                                } else {
+                                    alert('The due date must be greater than or equal to the start date.');
+                                }
+                            }
                 }
             },
 
