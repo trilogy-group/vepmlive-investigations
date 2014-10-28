@@ -869,7 +869,7 @@ namespace EPMLiveCore
                 }
                 else
                 {
-                    ss = "green.gif";
+                    ss = "checkmark.gif";
                 }
 
             }
