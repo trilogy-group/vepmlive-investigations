@@ -752,7 +752,17 @@ namespace EPMLiveWebParts
             {
                 url = url.Substring(0, 10) + url.Substring(10).Replace("//", "/");
 
-                string source = System.Web.HttpUtility.UrlEncode(Request["source"]);
+                string source;
+
+                if (System.Web.HttpUtility.UrlDecode(Request["source"]) != null && System.Web.HttpUtility.UrlDecode(Request["source"]).Equals(Request["source"]))
+                {
+                    source = System.Web.HttpUtility.UrlEncode(Request["source"]);
+                }
+                else
+                {
+                    source = Request["source"];
+                }
+
                 if (source != null && source != "")
                 {
                     if(url.Contains("?"))
