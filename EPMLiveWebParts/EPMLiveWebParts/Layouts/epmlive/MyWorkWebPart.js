@@ -286,13 +286,29 @@ function MyWorkOnMouseOverRow(grid, row, col, event) {
 
 function MyWorkOnClick(grid, row, col, x, y, event) {
     if (grid.id === window.allWorkGridId) {
-        MyWorkGrid.loadRibbon();
 
-        if (grid.FRow) {
-            window.setTimeout(function () {
-                window.epmLive.utils.fireEvent(grid.FRow.r0, 'mouseup');
-            }, 500);
+        if (row.Kind === 'Header') {
+            event.cancelBubble = true;
+
+            var sortings = grid.Sort.split(',');
+
+            var sortType = 0;
+
+            for (var i = 0; i < sortings.length; i++) {
+                var sortInfo = sortings[i];
+
+                if (sortInfo === col) {
+                    sortType = 1;
+                    break;
+                }
+            }
+
+            grid.SortClick(col, sortType);
+
+            return true;
         }
+
+        MyWorkGrid.loadRibbon();
 
         MyWorkGrid.hidePivotMenu();
         $('#MWG_Search').blur();
@@ -314,36 +330,6 @@ function MyWorkOnClick(grid, row, col, x, y, event) {
                 }
             }
         }
-
-        //var rowBeingEdited = MyWorkGrid.rowBeingEdited;
-        //if (rowBeingEdited) {
-        //    if (row.id !== rowBeingEdited.id) {
-        //        grid.EndEdit(true);
-
-        //        if (grid.HasChanges()) {
-        //            saveRow(grid.id, rowBeingEdited.id);
-        //        } else {
-        //            cancelRowEdit(grid.id, rowBeingEdited.id);
-        //        }
-
-        //        MyWorkGrid.rowBeingEdited = null;
-        //        grid.TotalRowsInEditMode = 0;
-        //    }
-        //}
-
-        //if (!row['EditMode']) {
-        //    var cell = row.id + col;
-
-        //    if (MyWorkGrid.lastClickedCell === cell) {
-        //        editSaveRow(grid.id, row.id);
-
-        //        if (grid.Cols[col].Type === 'Lines') {
-        //            showRichTextBox(grid.id, row.id, col);
-        //        }
-        //    }
-
-        //    MyWorkGrid.lastClickedCell = cell;
-        //}
 
         if (row.Def.Name === 'Group' && col === 'Title') {
             if (row.Expanded === 1) {
@@ -3202,79 +3188,89 @@ var MyWorkGrid = {
 
     loadRibbon: function () {
         SP.SOD.executeOrDelayUntilScriptLoaded(function () {
-            var selectTab = function (tabId) {
-                window._ribbonStartInit(tabId, true, null);
+            //var selectTab = function (tabId) {
+            //    window._ribbonStartInit(tabId, true, null);
 
-                $('#s4-ribbonrow').height(35);
+            //    $('#s4-ribbonrow').height(35);
 
-                window.setTimeout(function () { window.SelectRibbonTab(tabId, true); }, 50);
-                window.setTimeout(function () { window.SelectRibbonTab(tabId, true); }, 100);
-                window.setTimeout(function () { window.SelectRibbonTab(tabId, true); }, 500);
+            //    window.setTimeout(function () { window.SelectRibbonTab(tabId, true); }, 50);
+            //    window.setTimeout(function () { window.SelectRibbonTab(tabId, true); }, 100);
+            //    window.setTimeout(function () { window.SelectRibbonTab(tabId, true); }, 500);
 
-                window.setTimeout(function () {
-                    try {
-                        var setTabStyle = function () {
-                            var tabs = [$(document.getElementById('Ribbon.MyWorkTab-title')), $(document.getElementById('Ribbon.MyWorkViewsTab-title'))];
+            //    window.setTimeout(function () {
+            //        try {
+            //            var setTabStyle = function () {
+            //                var tabs = [$(document.getElementById('Ribbon.MyWorkTab-title')), $(document.getElementById('Ribbon.MyWorkViewsTab-title'))];
 
-                            for (var tab in tabs) {
-                                if (tabs.hasOwnProperty(tab)) {
-                                    var t = tabs[tab];
+            //                for (var tab in tabs) {
+            //                    if (tabs.hasOwnProperty(tab)) {
+            //                        var t = tabs[tab];
 
-                                    t.attr('style', 'border-top: 1px solid #E1E1E1 !important; height: 33px !important; margin-top: -4px !important');
-                                    t.find('a').attr('style', 'padding-top: 4px !important;');
+            //                        t.attr('style', 'border-top: 1px solid #E1E1E1 !important; height: 33px !important; margin-top: -4px !important');
+            //                        t.find('a').attr('style', 'padding-top: 4px !important;');
 
-                                    if (t.attr('aria-selected') === 'false') {
-                                        t.attr('style', 'height: 33px !important; margin-top: -3px !important');
-                                    }
+            //                        if (t.attr('aria-selected') === 'false') {
+            //                            t.attr('style', 'height: 33px !important; margin-top: -3px !important');
+            //                        }
 
-                                    t.click(function () {
-                                        window.setTimeout(function () {
-                                            setTabStyle();
-                                        }, 100);
-                                    });
-                                }
-                            }
-                        };
+            //                        t.click(function () {
+            //                            window.setTimeout(function () {
+            //                                setTabStyle();
+            //                            }, 100);
+            //                        });
+            //                    }
+            //                }
+            //            };
 
-                        if (window.epmLiveMasterPageVersion >= 5.5) {
-                            if (!MyWorkGrid.loaderStopped) {
-                                //$(document.getElementById("s4-ribbonrow")).height(126);
-                                window.EPM.UI.Loader.current().stopLoading('WebPart' + window.myWorkWebPartQualifier);
-                                //$('#s4-ribbonrow').height(35);
-                                MyWorkGrid.loaderStopped = true;
-                            }
-                        }
+            //            if (window.epmLiveMasterPageVersion >= 5.5) {
+            //                if (!MyWorkGrid.loaderStopped) {
+            //                    //$(document.getElementById("s4-ribbonrow")).height(126);
+            //                    window.EPM.UI.Loader.current().stopLoading('WebPart' + window.myWorkWebPartQualifier);
+            //                    //$('#s4-ribbonrow').height(35);
+            //                    MyWorkGrid.loaderStopped = true;
+            //                }
+            //            }
 
-                        setTabStyle();
-                    } catch (ex) {
-                    }
-                }, 750);
-            };
+            //            setTabStyle();
+            //        } catch (ex) {
+            //        }
+            //    }, 750);
+            //};
 
-            var selectedTab = $('#RibbonContainer_activeTabId').val();
-            if (selectedTab !== 'Ribbon.MyWorkTab' && selectedTab !== 'Ribbon.MyWorkViewsTab') {
-                var pm = SP.Ribbon.PageManager.get_instance();
+            //var selectedTab = $('#RibbonContainer_activeTabId').val();
+            //if (selectedTab !== 'Ribbon.MyWorkTab' && selectedTab !== 'Ribbon.MyWorkViewsTab') {
+            //    var pm = SP.Ribbon.PageManager.get_instance();
 
-                var ribbon = null;
+            //    var ribbon = null;
 
-                try {
-                    ribbon = pm.get_ribbon();
-                } catch (e) {
-                }
+            //    try {
+            //        ribbon = pm.get_ribbon();
+            //    } catch (e) {
+            //    }
 
-                if (!ribbon) {
-                    if (typeof (window._ribbonStartInit) === 'function') {
-                        selectTab('Ribbon.MyWorkTab');
-                    }
-                } else {
-                    window.SelectRibbonTab('Ribbon.MyWorkTab', true);
-                    //window.RefreshCommandUI();
-                }
-            } else {
-                window.setTimeout(function () {
-                    window.SelectRibbonTab(selectedTab, true);
-                }, 500);
+            //    if (!ribbon) {
+            //        if (typeof (window._ribbonStartInit) === 'function') {
+            //            selectTab('Ribbon.MyWorkTab');
+            //        }
+            //    } else {
+            //        window.SelectRibbonTab('Ribbon.MyWorkTab', true);
+            //        //window.RefreshCommandUI();
+            //    }
+            //} else {
+            //    window.setTimeout(function () {
+            //        window.SelectRibbonTab(selectedTab, true);
+            //    }, 500);
+            //}
+
+            var tabGroup = document.getElementById('Ribbon.MyWorkContextualTabGroup');
+            if (!tabGroup) window.SelectRibbonTab('Ribbon.MyWorkTab', true);
+            else {
+                var $manageTab = $(document.getElementById('Ribbon.MyWorkTab-title'));
+                var $viewsTab = $(document.getElementById('Ribbon.MyWorkViewsTab-title'));
+
+                if ($manageTab.attr('aria-selected') === 'false' && $viewsTab.attr('aria-selected') === 'false') window.SelectRibbonTab('Ribbon.MyWorkTab', true);
             }
+
         }, 'sp.ribbon.js');
     }
 };
