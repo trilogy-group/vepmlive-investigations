@@ -4761,7 +4761,6 @@ function CloseInit() {
     document.getElementById("divCover").style.display = "none";
     hm("dlgSplash");
     setTimeout("InitLinked()", 100);
-
 }
 
 function HideBacklogRows(grid, row) {
@@ -4778,8 +4777,6 @@ function HideBacklogRows(grid, row) {
 
 function ShowBacklogRows(grid, row) {
     var child = row.firstChild;
-
-
 
     while (child) {
         ShowBacklogRows(grid, child);
