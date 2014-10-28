@@ -30,7 +30,7 @@
 
 <script src="dhtml/xToolbar/dhtmlxtoolbar.js"></script>
 
-<script src="workplanner.js"></script> 
+<script src="workplanner.js?v=<%= EPMLiveVersion %>"></script> 
 <%if(bAgile){ %>
     <script src="WorkPlannerAgile.js" type="text/javascript"></script>
     <%} %>
@@ -82,14 +82,34 @@
     #sideNavBox {
         display: none;
     }
-    #contentBox {
-        margin-left: 0px;
-    }
+    
     .ms-fullscreenmode #contentBox
     {
         margin-left: 0;
     }
 
+    #pageStatusBar[class], .ms-status-msg {
+        margin-top: 5px !important;
+        margin-bottom: 0 !important;
+        padding: 5px 7px !important;
+        font-size: 12px !important;
+    }
+
+    #contentBox {
+        margin-left: 10px !important;
+        margin-right: 10px !important; 
+    }
+
+    #contentRow {
+        padding-top: 0 !important;
+    }
+
+    #we-planner-publish-status {
+        color: #888;
+        font-size: 10px;
+        padding-bottom: 2px;
+        text-align: right;
+    }
 </style>
 
 </asp:Content>
@@ -834,7 +854,7 @@
         //dhxLayout.cells("b").setHeight((getHeight() - getTop(document.getElementById("parentId"))));
         document.getElementById("parentId").style.height = (getHeight() - getTop(document.getElementById("parentId")) - 20) + "px";
 
-        document.getElementById("parentId").style.width = (getWidth() - 100) + "px";
+        document.getElementById("parentId").style.width = (getWidth() - 70) + "px";
         
         dhxLayout.setSizes();
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using EPMLiveCore.Infrastructure;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.WebControls;
 using System.Web;
@@ -98,6 +99,11 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
 
         protected EPMLiveCore.TimeDebug tb;
         protected string timerString;
+
+        public string EPMLiveVersion
+        {
+            get { return EPMLiveScriptManager.FileVersion; }
+        }
 
         protected override void OnInit(EventArgs e)
         {

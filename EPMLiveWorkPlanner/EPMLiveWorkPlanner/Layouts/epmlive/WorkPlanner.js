@@ -2651,9 +2651,8 @@ function closeupdateStatusBox() {
 
 function closepublishStatusBox() {
     if (publishStatusBox != null) {
-        SP.UI.Status.removeStatus(publishStatusBox);
+        publishStatusBox.remove();
         publishStatusBox = null;
-        setHeight();
     }
 }
 
@@ -2675,11 +2674,12 @@ function CheckUpdatesClose(loader) {
             if (updateStatusBox == null) {
                 hasUpdates = true;
                 updateStatusBox = SP.UI.Status.addStatus('Updates:', 'You have ' + uStatus + ' update(s) waiting to be processed <a href=\'#\' onclick=\'Javascript:DoUpdates();\'>[Process Updates]</a>', true);
-                //SP.UI.Status.setStatusPriColor(updateStatusBox, 'yellow');
+                SP.UI.Status.setStatusPriColor(updateStatusBox, 'blue');
             }
             else {
                 hasUpdates = true;
                 SP.UI.Status.updateStatus(updateStatusBox, 'You have ' + uStatus + ' update(s) waiting to be processed <a href=\'#\' onclick=\'Javascript:DoUpdates();\'>[Process Updates]</a>');
+                SP.UI.Status.setStatusPriColor(updateStatusBox, 'blue');
             }
         }
     }
@@ -2717,7 +2717,7 @@ function onDoUpdates(dialogResult, returnValue) {
 function CheckUpdatesBox() {
     if (processUpdatesBox == null && sUpdates != "") {
         processUpdatesBox = SP.UI.Status.addStatus('Updates:', 'You have applied updates. To commit your updates you must save your plan.', true);
-        //SP.UI.Status.setStatusPriColor(processUpdatesBox, 'yellow');
+        SP.UI.Status.setStatusPriColor(processUpdatesBox, 'blue');
     }
     else if (sUpdates != "" && processUpdatesBox != null) {
         try {
@@ -2725,7 +2725,7 @@ function CheckUpdatesBox() {
         } catch (e) {
             processUpdatesBox = SP.UI.Status.addStatus('Updates:', 'You have applied updates. To commit your updates you must save your plan.', true);
         }
-        //SP.UI.Status.setStatusPriColor(processUpdatesBox, 'yellow');
+        SP.UI.Status.setStatusPriColor(processUpdatesBox, 'blue');
     }
     else if (processUpdatesBox != null && sUpdates == "") {
         SP.UI.Status.removeStatus(processUpdatesBox);
@@ -2747,13 +2747,11 @@ function CheckPublishStatus() {
 }
 
 function CheckPublishStatusClose(loader) {
-
     if (loader.xmlDoc.responseText != null) {
-
         if (publishStatusBox == null) {
-            publishStatusBox = SP.UI.Status.addStatus('Publish Status:', '', true);
-            SP.UI.Status.setStatusPriColor(publishStatusBox, 'blue');
-            setHeight();
+            publishStatusBox = $('<div id="we-planner-publish-status"><span tabindex="0" role="alert" class="ms-status-status planner-pub-status"><span id="we-planner-publish-status-hiddenPriMsg" class="ms-accessible">Information Status</span><span class="ms-bold ms-status-title">Publish Status:</span><span class="ms-status-body" id="we-planner-publish-status-body"></span><br></span></div>');
+
+            $('#DeltaPlaceHolderMain').prepend(publishStatusBox);
         }
 
         publishStatus = loader.xmlDoc.responseText.trim();
@@ -2766,22 +2764,13 @@ function CheckPublishStatusClose(loader) {
             canPublish = false;
 
         if (loader.xmlDoc.responseText.trim() != "No Status") {
-            SP.UI.Status.updateStatus(publishStatusBox, sPublishStatus[2]);
-            if (sPublishStatus[1] == "true") {
-                SP.UI.Status.setStatusPriColor(publishStatusBox, 'yellow');
-            } else {
-                SP.UI.Status.setStatusPriColor(publishStatusBox, 'blue');
-            }
+            var status = sPublishStatus[2];
+            if (status.indexOf('Processing') === 0) status += ' - feel free to leave this page while publishing';
 
+            $('#we-planner-publish-status-body').html(status);
             setTimeout("CheckPublishStatus()", 10000);
-            setHeight();
         }
-        //else 
-        //{
-        //    
-        //    RefreshCommandUI();
-        //    closepublishStatusBox();
-        //}
+        
         RefreshCommandUI();
     }
 }
