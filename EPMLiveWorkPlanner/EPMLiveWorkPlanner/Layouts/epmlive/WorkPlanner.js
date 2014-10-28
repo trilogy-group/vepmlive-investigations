@@ -2765,7 +2765,7 @@ function CheckPublishStatusClose(loader) {
 
         if (loader.xmlDoc.responseText.trim() != "No Status") {
             var status = sPublishStatus[2];
-            if (status.indexOf('Processing') === 0) status += ' - feel free to leave this page while publishing';
+            if (status.indexOf('Processing') === 0 || status.indexOf('Queued') === 0) status += ' - feel free to leave this page while publishing';
 
             $('#we-planner-publish-status-body').html(status);
             setTimeout("CheckPublishStatus()", 10000);
