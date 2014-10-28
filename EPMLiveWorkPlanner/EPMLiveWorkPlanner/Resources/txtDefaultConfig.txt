@@ -2,7 +2,7 @@
 	<Cfg id='WorkPlannerGrid' SuppressCfg='1'  DateStrings='2' ConstWidth="0" ConstHeight="1"/>
 	<Cfg MainCol='Title' NameCol='Title' Style='Standard' Paging="2" PageLength="10" MaxPages="2" FastColumns="1"/>
 	<Cfg Undo='1'/>
-	<Cfg ExportType='Expanded,Outline'/>
+	<Cfg ExportType='Expanded,Outline' GanttLap='1'/>
 	<Cfg ChildParts='0'/>
 	<Cfg PrintCols='1'/>
 	<Cfg ExportCols='1'/>
@@ -26,7 +26,7 @@
 	<RightCols>
 		
 		<C Name="G" Type="Gantt" GanttStart="StartDate" GanttStrict="0" GanttEnd="DueDate" GanttFlags="Deadline" GanttComplete="PercentComplete" Visible="1" GanttDuration="Duration" GanttHideExclude="0" GanttAncestors="Predecessors" GanttDescendants="Descendants" GanttChartRound="w" GanttEdit="Main,Dependency" GanttRight="1" GanttSlack="Slack" GanttHeader1="w#dddddd MMMM yyyy" GanttHeader2="d#ddddd" /> 
-		<C Name="G" GanttCorrectDependenciesFixed="1"  GanttCorrectDependencies="1" GanttIncorrectDependencies="1"/> 
+		<C Name="G" GanttCorrectDependenciesFixed="0"  GanttCorrectDependencies="2" GanttIncorrectDependencies="1" GanttLap='1'/> 
 		<C Name="G" GanttChartMinStart="1990-1-1" GanttChartMaxEnd="2100-1-1" GanttZoom="weeks and days" GanttDataUnits="28800000" GanttEndLast="0" Width="200" /> 
 		<C Name="G" GanttFlow="BaselineDateRange" CanExport="0"/>
 		<C Name="G" GanttResourcesAssign="4" GanttResourcesExtra="0" GanttResources="USAGE" GanttAvailabilityMax="1" GanttAvailabilityExclude="0" GanttMinStart="MinStart" GanttMaxEnd="MaxEnd"/>
