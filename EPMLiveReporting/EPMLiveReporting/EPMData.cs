@@ -1721,6 +1721,64 @@ namespace EPMLiveReportsAdmin
             return blnSuccess;
         }
 
+        public string GetAllListIDs()
+        {
+            string sListIDs = string.Empty;
+            var lListIDs = new List<string>();
+
+            SPSecurity.RunWithElevatedPrivileges(() =>
+            {
+                using (var s = new SPSite(_siteID))
+                {
+                    using (SPWeb w = s.OpenWeb(_webId))
+                    {
+                        foreach (SPList l in w.Lists)
+                        {
+                            List<SPEventReceiverDefinition> evts = GetListEvents(l,
+                                "EPMLiveReportsAdmin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b90e532f481cf050",
+                                "EPMLiveReportsAdmin.ListEvents",
+                                new List<SPEventReceiverType>
+                                {
+                                    SPEventReceiverType.ItemAdded,
+                                    SPEventReceiverType.ItemUpdated,
+                                    SPEventReceiverType.ItemDeleting
+                                });
+
+                            if (evts.Count > 0 && !lListIDs.Contains(l.ID.ToString()))
+                            {
+                                lListIDs.Add(l.ID.ToString());
+                                continue;
+                            }
+
+                            List<SPEventReceiverDefinition> mwEvts = GetListEvents(l,
+                                "EPMLiveReportsAdmin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b90e532f481cf050",
+                                "EPMLiveReportsAdmin.MyWorkListEvents",
+                                new List<SPEventReceiverType>
+                                {
+                                    SPEventReceiverType.ItemAdded,
+                                    SPEventReceiverType.ItemUpdated,
+                                    SPEventReceiverType.ItemDeleting
+                                });
+
+                            if (mwEvts.Count > 0 && !lListIDs.Contains(l.ID.ToString()))
+                            {
+                                lListIDs.Add(l.ID.ToString());
+                            }
+                        }
+
+                        if (w != null)
+                        {
+                            w.Dispose();
+                        }
+                    }
+                }
+            });
+
+            sListIDs = string.Join(", ", lListIDs.ToArray());
+
+            return sListIDs;
+        }
+
         public string GetListNames()
         {
             string sLists = string.Empty;
@@ -1903,17 +1961,17 @@ namespace EPMLiveReportsAdmin
         /// <param name="siteId"></param>
         /// <param name="sLists"></param>
         /// <returns></returns>
-        public bool SnapshotLists(Guid timerjobguid, Guid siteId, string sLists)
+        public bool SnapshotLists(Guid timerjobguid, Guid siteId, string sListIDs)
         {
             bool status = true;
             try
             {
-                if (sLists != string.Empty)
+                if (sListIDs != string.Empty)
                 {
                     Command = "spRPTLists";
                     CommandType = CommandType.StoredProcedure;
                     AddParam("@siteID", siteId);
-                    AddParam("@ListNames", sLists);
+                    AddParam("@ListIDs", sListIDs);
                     AddParam("@Enabled", true);
                     AddParam("@timerjobguid", timerjobguid);
                     ExecuteNonQuery(GetClientReportingConnection);

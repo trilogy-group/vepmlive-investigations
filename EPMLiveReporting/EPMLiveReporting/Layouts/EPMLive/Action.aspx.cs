@@ -27,8 +27,8 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
                     //dtResults = _DAO.GetSnapshotResults(timerjobguid);
                     // -- END
 
-                    //PROD -- Start
-                    string sLists = _DAO.GetListNames();
+                    //PROD -- Start                    
+                    string sListIDs = _DAO.GetAllListIDs();
                     using (SPSite site = SPContext.Current.Site)
                     {
                         using (SPWeb web = SPContext.Current.Web)
@@ -38,7 +38,7 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
                             _DAO.AddParam("@timerjobuid", timerjobguid);
                             _DAO.AddParam("@siteguid", site.ID.ToString());
                             _DAO.AddParam("@webguid", web.ID.ToString());
-                            _DAO.AddParam("@jobdata", sLists);
+                            _DAO.AddParam("@jobdata", sListIDs);
                             _DAO.ExecuteNonQuery(_DAO.GetEPMLiveConnection);
                         }
                         CoreFunctions.enqueue(timerjobguid, 0);

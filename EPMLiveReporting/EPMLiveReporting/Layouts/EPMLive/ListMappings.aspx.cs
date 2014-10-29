@@ -312,7 +312,7 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
                         _DAO.AddParam("@siteguid", site.ID.ToString());
                         _DAO.AddParam("@webguid", web.ID.ToString());
                         _DAO.AddParam("@listguid", listId.ToString());
-                        _DAO.AddParam("@jobdata", sLists);
+                        _DAO.AddParam("@jobdata", listId.ToString());
                         _DAO.AddParam("@timerjobuid", timerjobuid);
                         _DAO.ExecuteNonQuery(_DAO.GetEPMLiveConnection);
                     }

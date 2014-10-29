@@ -548,7 +548,7 @@ begin
 end
 exec(@createoralter + ' PROCEDURE [dbo].[spRPTLists] 
 @siteID uniqueidentifier,
-@ListNames nvarchar(max) = null,
+@ListIDs nvarchar(max) = null,
 @Enabled bit,
 @timerjobguid uniqueidentifier = NULL 
       
@@ -573,7 +573,7 @@ INSERT INTO @tblLists (rptlistid, listname,siteid,tablename,tablenamesnapshot)
 FROM [RPTList]
 WHERE Siteid = @siteID)
       
-IF (@ListNames IS NULL) -- process ALL lists
+IF (@ListIDs IS NULL) -- process ALL lists
 BEGIN                               
             --Start Transaction
             BEGIN TRANSACTION 
@@ -593,9 +593,9 @@ BEGIN
                         -- Init. new periodID
                         SET @PeriodID = newid() 
 
-                        SET @ListNames = ''All reporting lists.''                                 
+                        SET @ListIDs = ''All reporting lists.''                                 
                         -- Insert record into RPTPeriod table
-                        INSERT INTO RPTPeriods VALUES(@PeriodID,@SiteID,@Title,@ReportPeriod,GetDate(),@Enabled, @ListNames,@timerjobguid)                   
+                        INSERT INTO RPTPeriods VALUES(@PeriodID,@SiteID,@Title,@ReportPeriod,GetDate(),@Enabled, @ListIDs,@timerjobguid)                   
                         -- Loop thru snapshot lists
                         WHILE @ListCounter <= @ListCount
                         BEGIN 
@@ -636,7 +636,7 @@ BEGIN
                   --Start Try
                   BEGIN TRY 
                         -- table variable that will hold the comma delimited list of lists string values
-                        DECLARE @tblListNames table(id int, listname nvarchar(100))
+                        DECLARE @tblListNames table(id int, listid nvarchar(100))
 
                         --Init. Report period and Report Title
                         SET @ReportPeriod = CONVERT(varchar,Getdate(),101)
@@ -645,7 +645,7 @@ BEGIN
                         -- List name
                         DECLARE @LstName nvarchar(100)                              
                         -- Init. table variable
-                        INSERT INTO @tblListNames(id,listname) SELECT * FROM dbo.Split(@ListNames, '','')
+                        INSERT INTO @tblListNames(id,listid) SELECT * FROM dbo.Split(@ListIDs, '','')
                         -- Init. list count
                         SET @ListCount = (SELECT COUNT(*) FROM @tblListNames)
                         -- Init. list counter
@@ -653,14 +653,14 @@ BEGIN
                         -- Init. new periodID
                         SET @PeriodID = newid()                                     
                         -- Insert record into RPTPeriod table
-                        INSERT INTO RPTPeriods VALUES(@PeriodID,@SiteID,@Title,@ReportPeriod,GetDate(),@Enabled, @ListNames,@timerjobguid)
+                        INSERT INTO RPTPeriods VALUES(@PeriodID,@SiteID,@Title,@ReportPeriod,GetDate(),@Enabled, @ListIDs,@timerjobguid)
                         -- Loop thru snapshot lists
                         WHILE @ListCounter <= @ListCount
-                              BEGIN                         
-                                    SET @LstName = (SELECT listname FROM @tblListNames WHERE id = @ListCounter)
-                                    SET @TableName = (SELECT tablename FROM @tblLists WHERE listname = @LstName)
-                                    SET @RPTListID = (SELECT rptlistid FROM @tblLists WHERE listname = @LstName)
-                                    SET @SnapshotTableName = (SELECT tablenamesnapshot FROM @tblLists WHERE listname = @LstName)
+                              BEGIN 
+									SET @RPTListID = (SELECT listid FROM @tblListNames WHERE id = @ListCounter)                        
+                                    SET @LstName = (SELECT listname FROM @tblLists WHERE rptlistid = @RPTListID)
+                                    SET @TableName = (SELECT tablename FROM @tblLists WHERE rptlistid = @RPTListID)                                    
+                                    SET @SnapshotTableName = (SELECT tablenamesnapshot FROM @tblLists WHERE rptlistid = @RPTListID)
                                     Exec spRPTPeriodSnapshot @TableName, @SnapshotTableName, @Title, @ReportPeriod, @siteID,@PeriodID, @Enabled
                                     -- Insert log ''Success'' record into RPTLog for this list    
                                     SET @timestamp = getdate()     
