@@ -181,22 +181,6 @@ namespace EPMLiveCore.Jobs
                         }
 
                     }
-
-                    if (isSecure)
-                    {
-                        List<string> liGrps = new List<string>();
-                        liGrps.Add(string.Format("{0} Owner", safeTitle));
-                        liGrps.Add(string.Format("{0} Member", safeTitle));
-                        liGrps.Add(string.Format("{0} Visitor", safeTitle));
-                        List<SPRoleAssignment> lra = (from SPRoleAssignment ra in li.RoleAssignments
-                                                      where !liGrps.Contains(ra.Member.Name) &&
-                                                            !cNewGrps.Contains(ra.Member.Name)
-                                                      select ra).ToList();
-                        foreach (SPRoleAssignment r in lra)
-                        {
-                            li.RoleAssignments.RemoveById(r.Member.ID);
-                        }
-                    }
                 }
             }
 
@@ -375,10 +359,42 @@ namespace EPMLiveCore.Jobs
                     catch { }
                     if (g != null && r != null)
                     {
-                        SPRoleAssignment assign = new SPRoleAssignment(g);
-                        assign.RoleDefinitionBindings.Add(r);
-                        AddNewItemLvlPerm(eI, ew, assign);
-                        //pNewGroups.Add(g.Name, );
+                        if (r.Type != SPRoleType.Guest)
+                        {
+                            SPRoleAssignment assign = new SPRoleAssignment(g);
+                            assign.RoleDefinitionBindings.Add(r);
+                            AddNewItemLvlPerm(eI, ew, assign);
+                        }
+                        else
+                        {
+                            // create our custom limited access role
+                            SPRoleDefinition roleDef = new SPRoleDefinition();
+
+                            try
+                            {
+                                roleDef = ew.RoleDefinitions["Limited Access Permission"];
+                            }
+                            catch (SPException)
+                            {
+                                ew.AllowUnsafeUpdates = true;
+                                // give it a name and description
+                                roleDef.Name = "Limited Access Permission";
+                                roleDef.Description = "Identical to standard Limited Access rights. Used to provide access to parent objects of uniquely permissioned content";
+                                // apply the base permissions required
+                                roleDef.BasePermissions = SPBasePermissions.ViewFormPages | SPBasePermissions.Open | SPBasePermissions.BrowseUserInfo | SPBasePermissions.UseClientIntegration | SPBasePermissions.UseRemoteAPIs;
+                                // add it to the web
+                                ew.RoleDefinitions.Add(roleDef);
+                                ew.Update();
+                            }
+
+                            try
+                            {
+                                SPRoleAssignment assign = new SPRoleAssignment(g);
+                                assign.RoleDefinitionBindings.Add(roleDef);
+                                AddNewItemLvlPerm(eI, ew, assign);
+                            }
+                            catch { }
+                        }
                     }
                 }
             }
