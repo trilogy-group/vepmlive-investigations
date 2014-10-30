@@ -722,3 +722,154 @@ end
 
 
 END')
+
+
+
+if not exists (select routine_name from INFORMATION_SCHEMA.routines where routine_name = 'spRPTLists')
+begin
+    Print 'Creating Stored Procedure spRPTLists'
+    SET @createoralter = 'CREATE'
+end
+else
+begin
+    Print 'Updating Stored Procedure spRPTLists'
+    SET @createoralter = 'ALTER'
+end
+exec(@createoralter + ' PROCEDURE [dbo].[spRPTLists] 
+@siteID uniqueidentifier,
+@ListIDs nvarchar(max) = null,
+@Enabled bit,
+@timerjobguid uniqueidentifier = NULL 
+      
+AS
+BEGIN
+
+DECLARE @tblLists table(id int identity(1,1),rptlistid uniqueidentifier,listname nvarchar(100),siteid uniqueidentifier,tablename nvarchar(100), tablenamesnapshot nvarchar(100))
+DECLARE @ListCount int
+DECLARE @ListCounter int
+DECLARE @TableName nvarchar(100)
+DECLARE @SnapshotTableName nvarchar(100)
+DECLARE @PeriodID uniqueidentifier
+DECLARE @RPTListID uniqueidentifier
+DECLARE @ReportPeriod nvarchar(100)
+DECLARE @Title nvarchar(100)
+DECLARE @ListName nvarchar(100)
+DECLARE @errMsg nvarchar(400)
+DECLARE @timestamp datetime
+
+INSERT INTO @tblLists (rptlistid, listname,siteid,tablename,tablenamesnapshot)
+(SELECT rptlistid, listname, Siteid , TableName, TableNameSnapshot
+FROM [RPTList]
+WHERE Siteid = @siteID)
+      
+IF (@ListIDs IS NULL) -- process ALL lists
+BEGIN                               
+            --Start Transaction
+            BEGIN TRANSACTION 
+                  --Start Try
+                  BEGIN TRY 
+                        --Init. default values  
+                        SET @ListName = ''N/A''
+                        
+                        --Init. Report period and Report Title
+                        SET @ReportPeriod = CONVERT(varchar,Getdate(),101)
+                        SET @Title = CONVERT(varchar,Getdate(),100) 
+                        
+                        -- Get list process count
+                        SET @ListCount = (SELECT COUNT(*) FROM @tblLists)
+                        -- Intit. counter
+                        SET @ListCounter = 1          
+                        -- Init. new periodID
+                        SET @PeriodID = newid() 
+
+                        SET @ListIDs = ''All reporting lists.''                                 
+                        -- Insert record into RPTPeriod table
+                        INSERT INTO RPTPeriods VALUES(@PeriodID,@SiteID,@Title,@ReportPeriod,GetDate(),@Enabled, @ListIDs,@timerjobguid)                   
+                        -- Loop thru snapshot lists
+                        WHILE @ListCounter <= @ListCount
+                        BEGIN 
+                        -- Init. listID 
+                              SET @RPTListID = (SELECT rptlistid FROM @tblLists WHERE id = @ListCounter)
+                        -- Init. listname
+                              SET @ListName = (SELECT listname FROM @tblLists WHERE id = @ListCounter)                       
+                        -- Init. list tablename             
+                              SET @TableName = (SELECT tablename FROM @tblLists WHERE id = @ListCounter)
+                        -- Init. list snapshot tablename
+                              SET @SnapshotTableName = (SELECT tablenamesnapshot FROM @tblLists WHERE id = @ListCounter)
+                        -- Insert record into RPTPeriodSnapshot table         
+                              Exec spRPTPeriodSnapshot @TableName, @SnapshotTableName, @Title, @ReportPeriod, @siteID, @PeriodID, @Enabled
+                        -- Insert log ''Success'' record into RPTLog for this list         
+                              SET @timestamp = getdate()
+                              Exec spRPTLogInsert  @RPTListID, @ListName, ''Snapshot taken successfully.'' , ''All sites processed successfully.'',0,2, @timestamp,@timerjobguid
+                        -- Increment counter
+                              SET @ListCounter = @ListCounter + 1
+                        END   
+                  COMMIT TRANSACTION                                    
+                  END TRY
+                  -- Start Catch/error handling
+                  BEGIN CATCH                   
+                        BEGIN 
+                              -- Rollback tx
+                              ROLLBACK TRANSACTION;
+                              -- Log error                              
+                              SET @errMsg = (SELECT ERROR_MESSAGE() as ErrorMessage)
+                              SET @timestamp = getdate()
+                              Exec spRPTLogInsert  @RPTListID, @ListName, ''Snapshot SQL Error.'',@errMsg ,1,2, @timestamp,@timerjobguid                       
+                        END
+                  END CATCH
+            END         
+ELSE -- process list of lists
+BEGIN
+      --Start Transaction
+            BEGIN TRANSACTION 
+                  --Start Try
+                  BEGIN TRY 
+                        -- table variable that will hold the comma delimited list of lists string values
+                        DECLARE @tblListNames table(id int, listid nvarchar(100))
+
+                        --Init. Report period and Report Title
+                        SET @ReportPeriod = CONVERT(varchar,Getdate(),101)
+                        SET @Title = CONVERT(varchar,Getdate(),100) 
+
+                        -- List name
+                        DECLARE @LstName nvarchar(100)                              
+                        -- Init. table variable
+                        INSERT INTO @tblListNames(id,listid) SELECT * FROM dbo.Split(@ListIDs, '','')
+                        -- Init. list count
+                        SET @ListCount = (SELECT COUNT(*) FROM @tblListNames)
+                        -- Init. list counter
+                        SET @ListCounter = 1
+                        -- Init. new periodID
+                        SET @PeriodID = newid()                                     
+                        -- Insert record into RPTPeriod table
+                        INSERT INTO RPTPeriods VALUES(@PeriodID,@SiteID,@Title,@ReportPeriod,GetDate(),@Enabled, @ListIDs,@timerjobguid)
+                        -- Loop thru snapshot lists
+                        WHILE @ListCounter <= @ListCount
+                              BEGIN 
+									SET @RPTListID = (SELECT listid FROM @tblListNames WHERE id = @ListCounter)                        
+                                    SET @LstName = (SELECT listname FROM @tblLists WHERE rptlistid = @RPTListID)
+                                    SET @TableName = (SELECT tablename FROM @tblLists WHERE rptlistid = @RPTListID)                                    
+                                    SET @SnapshotTableName = (SELECT tablenamesnapshot FROM @tblLists WHERE rptlistid = @RPTListID)
+                                    Exec spRPTPeriodSnapshot @TableName, @SnapshotTableName, @Title, @ReportPeriod, @siteID,@PeriodID, @Enabled
+                                    -- Insert log ''Success'' record into RPTLog for this list    
+                                    SET @timestamp = getdate()     
+									Exec spRPTLogInsert  @RPTListID, @LstName, ''Snapshot taken successfully.'' , ''All sites processed successfully.'',0,2, @timestamp,@timerjobguid
+                                    SET @ListCounter = @ListCounter + 1
+                              END   
+                  COMMIT TRANSACTION                              
+                  END TRY
+                  -- Start Catch/error handling
+                  BEGIN CATCH                   
+                        BEGIN 
+                              -- Rollback tx
+                              ROLLBACK TRANSACTION;
+                              -- Log error
+                              SET @errMsg = (SELECT ERROR_MESSAGE() as ErrorMessage)
+                              SET @timestamp = getdate()
+                              Exec spRPTLogInsert  @RPTListID, @ListName, ''Snapshot SQL Error.'',@errMsg ,2,2, @timestamp,@timerjobguid                                    
+                        END
+                  END CATCH
+            END         
+END
+
+')
