@@ -108,7 +108,6 @@
         color: #888;
         font-size: 10px;
         padding-bottom: 2px;
-        text-align: right;
     }
 </style>
 
