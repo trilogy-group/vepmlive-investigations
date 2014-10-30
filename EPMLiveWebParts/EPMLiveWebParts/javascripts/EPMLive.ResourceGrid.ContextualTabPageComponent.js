@@ -195,7 +195,7 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
         else if (commandId === 'ResourceGrid.Cmd.VersionHistory') { $$.actions.redirect('version'); }
         else if (commandId === 'ResourceGrid.Cmd.ItemPermissions') { $$.actions.redirect('perms'); }
 
-        else if (commandId === 'ResourceGrid.Cmd.ReportingWorkVsCapacity') { $$.reports.open('workvscapacity'); }
+        else if (commandId === 'ResourceGrid.Cmd.ReportingWorkVsCapacity') { $$.reports.open('Resource Work vs. Capacity'); }
 
         else if (commandId === 'ResourceGrid.Cmd.ReportsDropDown.Populate') {
             properties.PopulationXML = $$.reports.getXmlForRibbon();

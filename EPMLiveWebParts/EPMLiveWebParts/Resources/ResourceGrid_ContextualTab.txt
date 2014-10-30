@@ -196,7 +196,7 @@
 				  Image16by16Top="-96"
 				  Image16by16Left="-192"
 				  Image16by16="_layouts/1033/images/formatmap16x16.png" />
-			  <Button Id="Ribbon.ResourceGrid.Reporting.WorkVsCapacity"
+			 <!-- <Button Id="Ribbon.ResourceGrid.Reporting.WorkVsCapacity"
 				  Command="ResourceGrid.Cmd.ReportingWorkVsCapacity"
 				  Description="Work vs. Capacity"
 				  LabelText="Work vs. Capacity"
@@ -206,7 +206,7 @@
 				  Image32by32Left="-224"
 				  Image16by16Top="-224"
 				  Image16by16Left="-112"
-				  Image16by16="_layouts/1033/images/formatmap16x16.png" />
+				  Image16by16="_layouts/1033/images/formatmap16x16.png" />-->
 		  <!--<Button Id="Ribbon.ResourceGrid.Analyze.ResourceAvailability"
 				  Command="ResourceGrid.Cmd.ResourceAvailability"
 				  Description="Resource Availability"

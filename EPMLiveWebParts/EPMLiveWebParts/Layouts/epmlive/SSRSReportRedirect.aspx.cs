@@ -40,6 +40,9 @@ namespace EPMLiveWebParts.Layouts.epmlive
             if (!string.IsNullOrEmpty(webUrl) && !string.IsNullOrEmpty(itemUrl))
             {
                 var web = new SPSite(webUrl).OpenWeb();
+                string sRedirectUrl = string.Empty;
+                string queryString = string.Empty;
+
                 if (!web.Exists)
                 {
                     return;
@@ -52,11 +55,23 @@ namespace EPMLiveWebParts.Layouts.epmlive
 
                 var urlim = getReportParameters(SPUrlUtility.CombineUrl(webUrl, itemUrl));
                 var sServerReelativeUrl = (web.ServerRelativeUrl == "/") ? "" : web.ServerRelativeUrl;
+                
+                //var sRedirectUrl = sServerReelativeUrl +
+                //                   "/_layouts/ReportServer/RSViewerPage.aspx?rv:RelativeReportUrl=" +
+                //                   sServerReelativeUrl + "/" + itemUrl + urlim + "&rv:HeaderArea=none";
+                
+                if (Request.QueryString["rp:Resources"] != null)
+                {
+                    var queString = Convert.ToString(Request.QueryString["rp:Resources"]).Split(',');
+                    foreach (var q in queString)
+                    {
+                        queryString += "&rp:Resources=" + q;
+                    }
+                }
 
-                var sRedirectUrl = sServerReelativeUrl +
-                                   "/_layouts/ReportServer/RSViewerPage.aspx?rv:RelativeReportUrl=" +
-                                   sServerReelativeUrl + "/" + itemUrl + urlim + "&rv:HeaderArea=none";
-
+                sRedirectUrl = sServerReelativeUrl +
+                                "/_layouts/ReportServer/RSViewerPage.aspx?rv:RelativeReportUrl=" +
+                                sServerReelativeUrl + "/" + itemUrl + urlim + "&rv:HeaderArea=none" + queryString;
 
                 SPUtility.Redirect(sRedirectUrl, SPRedirectFlags.Default, HttpContext.Current);
             }

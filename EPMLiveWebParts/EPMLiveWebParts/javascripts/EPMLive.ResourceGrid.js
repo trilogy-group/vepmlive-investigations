@@ -87,7 +87,10 @@ function registerEpmLiveResourceGridScript() {
 
                 $$.reports.opened = true;
 
-                window.open($$.reports.collection[$$$.md5(reportId)].url + queryString);
+                if (reportId == "Resource Work vs. Capacity")
+                    window.open($$.reports.collection[$$$.md5(reportId)].url + queryString);
+                else
+                    window.open($$.reports.collection[reportId].url + queryString);
 
                 window.setTimeout(function () {
                     $$.reports.opened = false;
@@ -1866,34 +1869,57 @@ function registerEpmLiveResourceGridScript() {
 
                         var reports = $$.reports.collection;
                         var reportsColl = [];
+                        var queryString;
                         for (var r in reports) {
-                            var report = reports[r];
-                            //{
-                            //    'iconClass': 'icon-pie-3 icon-dropdown',
-                            //    'text': 'Available vs. Planner by Dept',
-                            //    'events': [
-                            //        {
-                            //            'eventName': 'click',
-                            //            'function': function () { alert('report something'); }
-                            //        }
-                            //    ]
+                            var report = reports[r];                            
 
-                            //}
-                            var reportConfig = {
-                                'iconClass': '',
-                                'text': report.name,
-                                'events': [
-                                    {
-                                        'eventName': 'click',
-                                        'function': function () { window.open($(this).attr('reportUrl'), '_blank'); }
+                                //{
+                                //    'iconClass': 'icon-pie-3 icon-dropdown',
+                                //    'text': 'Available vs. Planner by Dept',
+                                //    'events': [
+                                //        {
+                                //            'eventName': 'click',
+                                //            'function': function () { alert('report something'); }
+                                //        }
+                                //    ]
+
+                                //}							
+                                var reportConfig = {
+                                    'iconClass': '',
+                                    'text': report.name,
+                                    'events': [
+                                        {
+                                            'eventName': 'click',
+                                            'function': function (event) {
+                                                if (event.target.innerHTML == "Resource Work vs. Capacity") {
+
+                                                    var grid = $$.grid.grids[$$.id()];
+                                                    var selRows = grid.GetSelRows();
+
+                                                    queryString = '';
+
+                                                    //if ($$.reports.collection[reportId].hasResourcesParam) {
+                                                    for (var j = 0; j < selRows.length; j++) {
+                                                        var sr = selRows[j];
+
+                                                        if (sr.Kind === 'Data' && sr.Def.Name === 'R') {
+                                                            queryString += '&rp:Resources=' + sr.ResourceID;
+                                                        }
+                                                    }
+                                                    //}									
+                                                }
+                                                var rptURL = $(this).attr('reportUrl') + queryString;
+                                                window.open(rptURL, '_blank');
+                                            }
+                                        }
+                                    ],
+
+                                    'properties': {
+                                        'reportUrl': report.url
                                     }
-                                ],
-                                'properties': {
-                                    'reportUrl': report.url
-                                }
-                            };
+                                };
 
-                            reportsColl.push(reportConfig);
+                                reportsColl.push(reportConfig);
                         }
 
                         //'options': [
