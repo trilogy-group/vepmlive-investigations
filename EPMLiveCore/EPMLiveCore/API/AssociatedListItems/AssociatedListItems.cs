@@ -370,7 +370,7 @@ namespace EPMLiveCore.API
                                         }
                                         else
                                         {
-                                            if (list.EnableThrottling) //In terms of bulk record SharePoint throws exception hence we need to retrieve records from EPMLive Reporting Database.
+                                            if (list.EnableThrottling && otherList != null && otherList.BaseTemplate != SPListTemplateType.DocumentLibrary) //In terms of bulk record SharePoint throws exception hence we need to retrieve records from EPMLive Reporting Database.
                                             {
                                                 #region If Threshold is enabled for processed list then retrieve those records from reporting database
 
