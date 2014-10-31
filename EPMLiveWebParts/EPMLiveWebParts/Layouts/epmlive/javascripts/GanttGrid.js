@@ -77,18 +77,21 @@ function setupPage(records, UseReporting, PageSize, grid, startpage) {
         if (rec[0] == "0" || mygrid.PAGEfItemHide == mygrid.PAGEfirstItem) {
 
             prev.style.background = "#EFEFEF";
-
+            prev.style.opacity = "0.5";
             mygrid.PAGEfItemHide = mygrid.PAGEfirstItem;
-
         }
         else {
             prev.style.background = "#DDDDDD";
+            prev.style.opacity = "1";
         }
 
-        if (rec[3] == "true")
+        if (rec[3] == "true") {
             next.style.background = "#DDDDDD";
+            next.style.opacity = "1";
+        }
         else {
-            prev.style.background = "#EFEFEF";
+            next.style.background = "#EFEFEF";
+            next.style.opacity = "0.5";
             mygrid.PAGElastItem = 0;
         }
 

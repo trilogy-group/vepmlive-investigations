@@ -5561,7 +5561,7 @@ namespace EPMLiveWebParts
                     }
                 }
                 catch { }
-                if (iPage == 0)
+                if (iPage == 0 && bUseReporting)
                     iPage = gvs.Page;
 
                 try
