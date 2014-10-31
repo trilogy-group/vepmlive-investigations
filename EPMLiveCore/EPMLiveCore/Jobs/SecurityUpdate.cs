@@ -126,7 +126,7 @@ namespace EPMLiveCore.Jobs
                 if (fields.Count > 0)
                 {
                     // if the list is not a security list itself
-                    if (isSecure)
+                    if (!isSecure)
                     {
                         li.BreakRoleInheritance(false);
                     }
