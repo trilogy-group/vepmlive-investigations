@@ -2095,14 +2095,14 @@ namespace PortfolioEngineCore
                         {
                             if (!(availability.Value == 0))
                             {
-                                double offHours = ResourceOffHours[lWresId][availability.Key];
                                 oResAvail = new ResourceValues.clsResAvail();
                                 oResAvail.WResID = lWresId;
                                 oResAvail.PeriodID = availability.Key;
-                                oResAvail.Hours = availability.Value - offHours;
+                                oResAvail.Hours = availability.Value;
                                 ResourceValues.clsResCap oResData;
                                 if (RVClass.Resources.TryGetValue(oResAvail.WResID, out oResData))
                                 {
+                                    double offHours = ResourceOffHours[lWresId][availability.Key];
                                     oResAvail.FTES = GetFTEValue(clnFTEs, oResData.BC_UID_Role, oResAvail.Hours, oResAvail.PeriodID, offHours);
                                 }
                                 RVClass.ResAvail.Add(oResAvail);
