@@ -1019,7 +1019,10 @@ namespace EPMLiveCore
 
                 if (!string.IsNullOrEmpty(newLocation))
                 {
-                    writer.WriteLine(@"<script>
+                    if (ControlMode == SPControlMode.New)
+                    {
+
+                        writer.WriteLine(@"<script>
 
                         $(document).ready(function() {
                             var button = $('input[id$=SaveItem]');
@@ -1037,6 +1040,7 @@ namespace EPMLiveCore
                             });
                         });
                          </script>");
+                    }
                 }
             }
             else
