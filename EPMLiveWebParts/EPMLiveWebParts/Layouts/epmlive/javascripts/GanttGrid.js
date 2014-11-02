@@ -146,7 +146,7 @@ function SetGridSize(grid) {
     var gridid = GetGridId(grid);
 
     if (OnlyGrid) {
-        
+
 
         var outer = document.getElementById("gridouter" + gridid);
 
@@ -154,28 +154,27 @@ function SetGridSize(grid) {
         var top = GetItemTop(outer);
 
         //document.getElementById("griddiv" + gridid).style.height = (height - top) + "px";
-        var currentDialog = SP.UI.ModalDialog.get_childDialog();        if (currentDialog)
+        var currentDialog = SP.UI.ModalDialog.get_childDialog();
+        if (currentDialog)
             outer.style.height = (height - top - 105) + "px";
         else
             outer.style.height = (height - top - 35) + "px";
         //document.getElementById("MSOZoneCell_WebPart").style.height = "400px";
     }
-    else
-    {
+    else {
         var bodyheight = grid.GetBodyScrollHeight() + 60;
         if (bodyheight < 100)
             bodyheight = 100;
         var gridid = GetGridId(grid);
         var divOuter = document.getElementById("gridouter" + gridid);
 
-        if (bodyheight > parseInt(eval("mygrid" + gridid + ".GridHeight")))
-        {
+        if (bodyheight > parseInt(eval("mygrid" + gridid + ".GridHeight"))) {
             divOuter.style.height = eval("mygrid" + gridid + ".GridHeight") + "px";
         }
         else
             divOuter.style.height = bodyheight + "px";
 
-        
+
 
     }
 }
@@ -252,7 +251,7 @@ function GridOnReady(grid) {
     TGSetEvent("OnSelect", grid.id, GridOnSelect);
     TGSetEvent("OnFocus", grid.id, GridOnFocus);
     TGSetEvent("OnDblClick", grid.id, GridOnDblClick);
-    
+
     var gridid = GetGridId(grid);
 
     var LinkType = eval("mygrid" + gridid + ".LinkType");
@@ -266,52 +265,51 @@ function GridOnReady(grid) {
 }
 
 
- function GridOnRenderFinish(grid) {
+function GridOnRenderFinish(grid) {
 
-     if (grid.id.substr(0, 9) == "GanttGrid") {
+    if (grid.id.substr(0, 9) == "GanttGrid") {
 
-         TGSetEvent("OnAfterValueChanged", grid.id, GridOnAfterValueChanged);
-        
-        
-         grid.EditRow = 0;
-         var gridid = GetGridId(grid);
+        TGSetEvent("OnAfterValueChanged", grid.id, GridOnAfterValueChanged);
 
-         if (!eval("mygrid" + gridid + ".loadedmenu")) {
-             eval("mygrid" + gridid + ".loadedmenu = true;");
-             grid.bPageSetup = false;
 
-             try {
-                 eval("loadMenu" + gridid + "();");
-             } catch (e) { }
-             eval("mygrid" + gridid + ".Groups=''");
-             eval("mygrid" + gridid + ".Cols=''");
-             eval("mygrid" + gridid + ".NoPage=''");
+        grid.EditRow = 0;
+        var gridid = GetGridId(grid);
 
-             var ribbon = eval("mygrid" + gridid + ".RibbonBehavior");
+        if (!eval("mygrid" + gridid + ".loadedmenu")) {
+            eval("mygrid" + gridid + ".loadedmenu = true;");
+            grid.bPageSetup = false;
 
-             if (OnlyGrid)
-             {
-                 if (ribbon == "1") {
+            try {
+                eval("loadMenu" + gridid + "();");
+            } catch (e) { }
+            eval("mygrid" + gridid + ".Groups=''");
+            eval("mygrid" + gridid + ".Cols=''");
+            eval("mygrid" + gridid + ".NoPage=''");
 
-                     var wp = document.getElementById('MSOZoneCell_WebPart' + eval("mygrid" + gridid + ".Qualifier"));
+            var ribbon = eval("mygrid" + gridid + ".RibbonBehavior");
 
-                     fireEvent(wp, 'mouseup');
-                 }
-                 else if (ribbon == "2") {
+            if (OnlyGrid) {
+                if (ribbon == "1") {
 
-                 }
-                 else {
-                     var wp = document.getElementById('MSOZoneCell_WebPart' + eval("mygrid" + gridid + ".Qualifier"));
+                    var wp = document.getElementById('MSOZoneCell_WebPart' + eval("mygrid" + gridid + ".Qualifier"));
 
-                     fireEvent(wp, 'mouseup');
+                    fireEvent(wp, 'mouseup');
+                }
+                else if (ribbon == "2") {
 
-                     
+                }
+                else {
+                    var wp = document.getElementById('MSOZoneCell_WebPart' + eval("mygrid" + gridid + ".Qualifier"));
 
-                 }
-             }
+                    fireEvent(wp, 'mouseup');
+
+
+
+                }
+            }
         }
 
-         if (ArrGantts.indexOf(grid.id) > -1 && grid.PagInfo)
+        if (ArrGantts.indexOf(grid.id) > -1 && grid.PagInfo)
             setupPage(grid.PagInfo, eval("mygrid" + gridid + ".UseReporting"), grid.PagSize, grid, eval("mygrid" + gridid + ".CurPage"));
 
         SetGridSize(grid);
@@ -319,10 +317,10 @@ function GridOnReady(grid) {
         eval("EPM.UI.Loader.current().stopLoading('WebPart" + eval("mygrid" + gridid + ".Qualifier") + "')");
 
         document.getElementById("searchload" + grid.id.substr(9)).style.display = "";
-        
+
         RefreshCommandUI();
     }
- }
+}
 
 function GridOnGetHtmlValue(grid, row, col, val) {
     if (row.Def.Name == 'R') {
@@ -349,7 +347,7 @@ function GridOnGetHtmlValue(grid, row, col, val) {
         if (col == "State")
             return "State";
     }
- }
+}
 
 function GridWorkspace(gridid, rowid) {
     var grid = Grids[gridid];
@@ -381,11 +379,10 @@ function GridComments(gridid, rowid) {
     options.allowMaximize = false;
     options.showClose = true;
     window.SP.UI.ModalDialog.showModalDialog(options);
-    
+
 }
 
-function GridCommentsCallBack()
-{
+function GridCommentsCallBack() {
     GetRowData(CurrentGrid, CurrentRow);
 }
 
@@ -397,7 +394,7 @@ function GridGoToItem(gridid, rowid) {
     gridid = GetGridId(grid);
 
     var LinkType = eval("mygrid" + gridid + ".LinkType");
-    
+
     if (new RegExp(/%\d[\dA-F]/g).test(location.href)) {
         var url = GetWebUrl() + "/_layouts/epmlive/gridaction.aspx?action=" + LinkType + "&webid=" + row.webid + "&listid=" + row.listid + "&ID=" + row.itemid + "&Source=" + location.href;
     }
@@ -419,7 +416,7 @@ function GridGoToItem(gridid, rowid) {
     else
         location.href = url;
 }
- 
+
 
 function GridOnMouseOverOutside(grid, row, col, event) {
     if (grid.CurHoverRow)
@@ -549,8 +546,7 @@ function NewItemCallback(dialogResult, returnValue) {
     if (dialogResult) { GridNewItem(curGrid._gridid, returnValue); }
 }
 
-function GridNewItem(gridid, newid)
-{
+function GridNewItem(gridid, newid) {
     var grid = Grids["GanttGrid" + gridid];
 
     var row = grid.AddRow(null, null, true, null, null);
@@ -568,7 +564,7 @@ function GridNewItem(gridid, newid)
 }
 
 function StopEditGridRow(grid, row) {
-    
+
     if (row.id != grid.EditRow) {
         var row = grid.GetRowById(grid.EditRow);
         grid.EditRow = null;
@@ -616,8 +612,7 @@ function StopEditGridRow(grid, row) {
                 }
             });
         }
-        else
-        {
+        else {
             grid.EditRow = "";
             for (var col in grid.Cols) {
                 grid.SetAttribute(row, col, "CanEdit", "0", 1);
@@ -629,49 +624,70 @@ function StopEditGridRow(grid, row) {
     }
 }
 
-function GetRowData(grid, row)
-{
-
-    var cols = "";
-
-    for (var col in grid.Cols) {
-        cols += "," + col;
-    }
-
-    grid.SetAttribute(row, "Title", "HtmlPrefix", "<img src='/_layouts/15/epmlive/images/mywork/loading16.gif'>", 1);
-
-    var data = "<Row id=\"" + row.id + "\" siteid=\"" + row.siteid + "\" webid=\"" + row.webid + "\" listid=\"" + row.listid + "\" itemid=\"" + row.itemid + "\" Cols=\"" + cols + "\"></Row>";
-
-    var webUrl = window.epmLiveNavigation.currentWebUrl;
-
-    $.ajax({
-        type: 'POST',
-        url: (webUrl + '/_vti_bin/WorkEngine.asmx/ExecuteJSON').replace(/\/\//g, '/'),
-        data: "{ Function: 'webparts_GetGridRow', Dataxml: '" + data + "' }",
-        contentType: 'application/json; charset=utf-8',
-        dataType: 'json',
-        success: function (response) {
-            var oResp = eval("(" + response.d + ")");
-            if (oResp.Result.Status == "0") {
-                grid.AddDataFromServer(oResp.Result.InnerText);
+function GetRowData(grid, row) {
+    if (row.itemid && row.itemid.newFileUrl) {
+        $.ajax({
+            type: 'GET',
+            url: window.epmLive.currentWebFullUrl + "/_api/web/GetFileByServerRelativeUrl('" + row.itemid.newFileUrl + "')/ListItemAllFields",
+            contentType: 'application/json; charset=utf-8',
+            dataType: 'json',
+            headers: {
+                "accept": "application/json;odata=verbose",
+                "content-type": "application/json;odata=verbose"
+            },
+            success: function (response) {
+                if (response && response.d) {
+                    row.itemid = response.d.Id;
+                    getNewRowData(grid, row);
+                }
+            }, error: function (response) {
+                console.log('ERROR: GrtRowData --> ');
+                console.log(response);
             }
-            else
-                alert(oResp.Result.Error.Text);
-            grid.SetAttribute(row, "Title", "HtmlPrefix", "", 1);
-            for (var col in grid.Cols) {
-                grid.SetAttribute(row, col, "CanEdit", "0", 1);
-            }
-            grid.AcceptChanges(row);
-        },
-        error: function (response) {
-            alert("Error: " + response);
-            grid.SetAttribute(row, "Title", "HtmlPrefix", "", 1);
+        });
+    } else getNewRowData(grid, row);
+
+    var getNewRowData = function (grid, row) {
+        var cols = "";
+
+        for (var col in grid.Cols) {
+            cols += "," + col;
         }
-    });
+
+        grid.SetAttribute(row, "Title", "HtmlPrefix", "<img src='/_layouts/15/epmlive/images/mywork/loading16.gif'>", 1);
+
+        var data = "<Row id=\"" + row.id + "\" siteid=\"" + row.siteid + "\" webid=\"" + row.webid + "\" listid=\"" + row.listid + "\" itemid=\"" + row.itemid + "\" Cols=\"" + cols + "\"></Row>";
+
+        var webUrl = window.epmLiveNavigation.currentWebUrl;
+
+        $.ajax({
+            type: 'POST',
+            url: (webUrl + '/_vti_bin/WorkEngine.asmx/ExecuteJSON').replace(/\/\//g, '/'),
+            data: "{ Function: 'webparts_GetGridRow', Dataxml: '" + data + "' }",
+            contentType: 'application/json; charset=utf-8',
+            dataType: 'json',
+            success: function (response) {
+                var oResp = eval("(" + response.d + ")");
+                if (oResp.Result.Status == "0") {
+                    grid.AddDataFromServer(oResp.Result.InnerText);
+                }
+                else
+                    alert(oResp.Result.Error.Text);
+                grid.SetAttribute(row, "Title", "HtmlPrefix", "", 1);
+                for (var col in grid.Cols) {
+                    grid.SetAttribute(row, col, "CanEdit", "0", 1);
+                }
+                grid.AcceptChanges(row);
+            },
+            error: function (response) {
+                alert("Error: " + response);
+                grid.SetAttribute(row, "Title", "HtmlPrefix", "", 1);
+            }
+        });
+    }
 }
 
-function LoadGrid(gridid)
-{
+function LoadGrid(gridid) {
 
     var gUrl = GetWebUrl() + "/_layouts/15/epmlive/getganttitems.aspx?data=" + eval("mygrid" + gridid + ".Params") + eval("mygrid" + gridid + ".Searcher");
 
@@ -769,7 +785,7 @@ function ChangeColumns(gridid, data) {
 }
 
 function ReloadGridWithNewParams(gridid) {
-    EPM.UI.Loader.current().startLoading({ id: 'WebPart' + eval("mygrid" + gridid + ".Qualifier")});
+    EPM.UI.Loader.current().startLoading({ id: 'WebPart' + eval("mygrid" + gridid + ".Qualifier") });
 
     var dataurl = eval("DataUrl" + gridid);
     Grids["GanttGrid" + gridid].Data.Data.Url = dataurl + '&Page=' + eval("mygrid" + gridid + ".CurPage") + "&Cols=" + eval("mygrid" + gridid + ".Cols") + "&GB=" + eval("mygrid" + gridid + ".Groups") + "&NP=" + eval("mygrid" + gridid + ".NoPage") + eval("mygrid" + gridid + ".Searcher");
@@ -803,6 +819,6 @@ function GanttScrollTo(gridid) {
     }
 }
 
-function GridOnMouseOutRow (grid, row, col, event) {
+function GridOnMouseOutRow(grid, row, col, event) {
     grid.SetAttribute(row, "Title", "ButtonText", ' ', 1);
 }
