@@ -5,6 +5,7 @@ using System.Text;
 
 namespace PortfolioEngineCore
 {
+    
 
     internal class RPEditorResources
     {

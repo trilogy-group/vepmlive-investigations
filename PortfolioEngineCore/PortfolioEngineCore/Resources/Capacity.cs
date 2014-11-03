@@ -9,6 +9,7 @@ namespace PortfolioEngineCore
 {
     public class Capacity : PFEBase
     {
+
         public Capacity(string basepath, string username, string pid, string company, string dbcnstring, SecurityLevels secLevel, bool bDebug = false)
             : base(basepath, username, pid, company, dbcnstring, secLevel, bDebug)
         {

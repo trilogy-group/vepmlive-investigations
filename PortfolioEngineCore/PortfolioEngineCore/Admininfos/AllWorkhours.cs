@@ -19,6 +19,7 @@ namespace PortfolioEngineCore
 {
     public class AllWorkhours
     {
+        
         private Dictionary<int, Dictionary<DayOfWeek, double>> m_WorkHours;
         private Dictionary<int, Dictionary<int, double>> m_HolidayHours;
         private double[] work;
