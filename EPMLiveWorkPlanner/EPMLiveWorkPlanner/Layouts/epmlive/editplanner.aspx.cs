@@ -70,6 +70,25 @@ namespace EPMLiveWorkPlanner
                     chkAgilePlanner.Attributes.Add("onclick", "Javascript:ToggleAgile();");
                     chkKanBanPlanner.Attributes.Add("onclick", "Javascript:ToggleKanBan();");
 
+
+                    try
+                    {
+                        chkOnlinePlanner.Checked = bool.Parse(EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLivePlanner" + Request["name"] + "EnableOnline"));
+                    }
+                    catch { chkOnlinePlanner.Checked = true; }
+
+                    try
+                    {
+                        chkProjectPlanner.Checked = bool.Parse(EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLivePlanner" + Request["name"] + "EnableProject"));
+                    }
+                    catch { }
+
+                    try
+                    {
+                        chkAgilePlanner.Checked = bool.Parse(EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLivePlanner" + Request["name"] + "EnableAgile"));
+                    }
+                    catch { }
+
                     Guid lWeb = EPMLiveCore.CoreFunctions.getLockedWeb(web);
 
                     if (Request["name"] != "")
@@ -88,10 +107,24 @@ namespace EPMLiveWorkPlanner
 
                         string curList = EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLivePlanner" + Request["name"] + "ProjectCenter");
 
-                        foreach (SPList list in web.Lists)
+                        if (chkOnlinePlanner.Checked)
                         {
-                            // base template for project center is 10701,We won't use Task Center template (BaseTemplate ID: 10702) to load task center list details in Source List drowpdown because then it wont find task list of that selected source task list.
-                            if ((uint)list.BaseTemplate == 10701)
+                            foreach (SPList list in web.Lists)
+                            {
+                                // base template for project center is 10701,We won't use Task Center template (BaseTemplate ID: 10702) to load task center list details in Source List drowpdown because then it wont find task list of that selected source task list.
+                                if ((uint)list.BaseTemplate == 10701)
+                                {
+                                    ListItem li = new ListItem(list.Title, list.ID.ToString().ToLower());
+                                    if (list.Title.ToLower() == curList.ToLower())
+                                        li.Selected = true;
+
+                                    ddlProjectCenter.Items.Add(li);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            foreach (SPList list in web.Lists)
                             {
                                 ListItem li = new ListItem(list.Title, list.ID.ToString().ToLower());
                                 if (list.Title.ToLower() == curList.ToLower())
@@ -113,25 +146,7 @@ namespace EPMLiveWorkPlanner
                         }
                         catch { }
 
-                        try
-                        {
-                            chkOnlinePlanner.Checked = bool.Parse(EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLivePlanner" + Request["name"] + "EnableOnline"));
-                        }
-                        catch { chkOnlinePlanner.Checked = true; }
-
-                        try
-                        {
-                            chkProjectPlanner.Checked = bool.Parse(EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLivePlanner" + Request["name"] + "EnableProject"));
-                        }
-                        catch { }
-
-                        try
-                        {
-                            chkAgilePlanner.Checked = bool.Parse(EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLivePlanner" + Request["name"] + "EnableAgile"));
-                        }
-                        catch { }
-
-
+                      
                         try
                         {
                             chkCalcWork.Checked = bool.Parse(EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLivePlanner" + Request["name"] + "CalcWork"));
@@ -656,26 +671,39 @@ namespace EPMLiveWorkPlanner
 
             foreach (SPList list in web.Lists)
             {
-                bool found = false;
-                foreach (SPField field in list.Fields)
-                {
-                    if (field.Type == SPFieldType.Lookup)
-                    {
-                        SPFieldLookup lp = (SPFieldLookup)field;
-                        if (lp.LookupList.ToLower() == "{" + ddlProjectCenter.SelectedValue + "}")
-                        {
-                            found = true;
-                        }
-                    }
-                }
-
-                if (found)
+                //EPML-3128: Any lists that are not supported can be used to create a non functional project planner
+                //As discussed during call, we need to add lists which are created based on 10702 list template (i.e. Tasks Center list).
+                if (chkOnlinePlanner.Checked && (uint)list.BaseTemplate == 10702)
                 {
                     ListItem li = new ListItem(list.Title, list.ID.ToString().ToLower());
                     if (list.Title.ToLower() == curList.ToLower())
                         li.Selected = true;
 
                     ddlTaskCenter.Items.Add(li);
+                }
+                else
+                {
+                    bool found = false;
+                    foreach (SPField field in list.Fields)
+                    {
+                        if (field.Type == SPFieldType.Lookup)
+                        {
+                            SPFieldLookup lp = (SPFieldLookup)field;
+                            if (lp.LookupList.ToLower() == "{" + ddlProjectCenter.SelectedValue + "}")
+                            {
+                                found = true;
+                            }
+                        }
+                    }
+
+                    if (found)
+                    {
+                        ListItem li = new ListItem(list.Title, list.ID.ToString().ToLower());
+                        if (list.Title.ToLower() == curList.ToLower())
+                            li.Selected = true;
+
+                        ddlTaskCenter.Items.Add(li);
+                    }
                 }
             }
         }
@@ -899,5 +927,38 @@ namespace EPMLiveWorkPlanner
         }
 
         #endregion
+
+        protected void chkOnlinePlanner_CheckedChanged(object sender, EventArgs e)
+        {
+            string curList = EPMLiveCore.CoreFunctions.getConfigSetting(SPContext.Current.Web, "EPMLivePlanner" + Request["name"] + "ProjectCenter");
+
+            foreach (SPList list in SPContext.Current.Web.Lists)
+            {
+                // base template for project center is 10701,We won't use Task Center template (BaseTemplate ID: 10702) to load task center list details in Source List drowpdown because then it wont find task list of that selected source task list.
+                if ((uint)list.BaseTemplate == 10701)
+                {
+                    ListItem li = new ListItem(list.Title, list.ID.ToString().ToLower());
+                    if (list.Title.ToLower() == curList.ToLower())
+                        li.Selected = true;
+
+                    ddlProjectCenter.Items.Add(li);
+                }
+            }
+        }
+
+        protected void chkAgilePlanner_CheckedChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        protected void chkProjectPlanner_CheckedChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        protected void chkKanBanPlanner_CheckedChanged(object sender, EventArgs e)
+        {
+
+        }
     }
 }

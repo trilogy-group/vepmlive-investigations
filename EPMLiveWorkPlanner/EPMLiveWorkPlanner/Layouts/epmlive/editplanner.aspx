@@ -469,10 +469,10 @@
             <template_inputformcontrols>
                     <wssuc:InputFormControl LabelText="Planner Availability" runat="server">
                         <Template_Control>
-        	                <asp:CheckBox ID="chkOnlinePlanner" runat ="server"/> Online Planner<br />
-                            <asp:CheckBox ID="chkAgilePlanner" runat ="server"/> Use Agile Functions<br />
-                            <asp:CheckBox ID="chkProjectPlanner" runat ="server"/> Microsoft Project<br />
-                            <asp:CheckBox ID="chkKanBanPlanner" runat ="server"/> KanBan Board<br />
+        	                <asp:CheckBox ID="chkOnlinePlanner" runat ="server" AutoPostBack="true" OnCheckedChanged="chkOnlinePlanner_CheckedChanged"/> Online Planner<br />
+                            <asp:CheckBox ID="chkAgilePlanner" runat ="server" AutoPostBack="true" OnCheckedChanged="chkAgilePlanner_CheckedChanged"/> Use Agile Functions<br />
+                            <asp:CheckBox ID="chkProjectPlanner" runat ="server" AutoPostBack="true" OnCheckedChanged="chkProjectPlanner_CheckedChanged"/> Microsoft Project<br />
+                            <asp:CheckBox ID="chkKanBanPlanner" runat ="server" AutoPostBack="true" OnCheckedChanged="chkKanBanPlanner_CheckedChanged"/> KanBan Board<br />
                         </Template_Control>
                     </wssuc:InputFormControl>
                 </template_inputformcontrols>
