@@ -355,7 +355,7 @@ namespace EPMLiveCore
                 }
                 catch { }
 
-                if (mode == SPControlMode.New)
+                if (mode == SPControlMode.New || (this.list.BaseTemplate == SPListTemplateType.DocumentLibrary && !string.IsNullOrEmpty(Page.Request["Mode"]) && Page.Request["Mode"] == "Upload" && mode == SPControlMode.Edit))
                 {
                     if (!string.IsNullOrEmpty(Page.Request["LookupField"]))
                     {
@@ -1019,10 +1019,30 @@ namespace EPMLiveCore
 
                 if (!string.IsNullOrEmpty(newLocation))
                 {
-                    if (ControlMode == SPControlMode.New)
+                    if (this.list.BaseTemplate == SPListTemplateType.DocumentLibrary && base.ControlMode == SPControlMode.Edit)
                     {
-
                         writer.WriteLine(@"<script>
+                    
+                                            $(document).ready(function() {
+                                                var button = $('input[id$=SaveItem]');
+                                                button.removeAttr('onclick');
+                                                button.click(function() {
+                                                    var elementName = $(this).attr('name');
+                                                    var aspForm = $('#aspnetForm');
+                    
+                                                    var editPostbackUrl = '" + Web.Url + "/" + list.Forms[PAGETYPE.PAGE_EDITFORM].Url + "?id=" + this.ListItem.ID + "&Source=" + System.Web.HttpUtility.UrlEncode(Web.Url + "/_layouts/15/epmlive/getlastid.aspx?BackTo=" + System.Web.HttpUtility.UrlEncode(newLocation) + "&listid=" + list.ID + ((bDialog) ? "&isdlg=1" : "")) + @"';
+                    
+                                                    if (!PreSaveItem()) return false;
+                                                    if (SPClientForms.ClientFormManager.SubmitClientForm('WPQ2')) return false;
+                    
+                                                    WebForm_DoPostBackWithOptions(new WebForm_PostBackOptions(elementName, '', true, '', editPostbackUrl, false, true));
+                                                });
+                                            });
+                                             </script>");
+                    }
+                    else
+                    {
+                    writer.WriteLine(@"<script>
 
                         $(document).ready(function() {
                             var button = $('input[id$=SaveItem]');
@@ -1040,8 +1060,8 @@ namespace EPMLiveCore
                             });
                         });
                          </script>");
-                    }
                 }
+            }
             }
             else
                 base.RenderControl(writer);
@@ -1175,7 +1195,7 @@ namespace EPMLiveCore
 
         private void InsertLookupValueByQueryString()
         {
-            if (mode == SPControlMode.New)
+            if (mode == SPControlMode.New || (this.list.BaseTemplate == SPListTemplateType.DocumentLibrary && !string.IsNullOrEmpty(Page.Request["Mode"]) && Page.Request["Mode"] == "Upload" && mode == SPControlMode.Edit))
             {
                 // assume single lookup
                 bool valIsMulti = false;
@@ -1463,7 +1483,7 @@ namespace EPMLiveCore
 
                         SPFieldLookupValueCollection lookupValCol = null;
 
-                        if (mode == SPControlMode.New)
+                        if (mode == SPControlMode.New || (this.list.BaseTemplate == SPListTemplateType.DocumentLibrary && !string.IsNullOrEmpty(Page.Request["Mode"]) && Page.Request["Mode"] == "Upload" && mode == SPControlMode.Edit))
                         {
                             lookupValCol = GetQueryStringLookupVal(fld);
                         }
@@ -1570,7 +1590,7 @@ namespace EPMLiveCore
 
                         SPFieldLookupValueCollection lookupValCol = null;
 
-                        if (mode == SPControlMode.New)
+                        if (mode == SPControlMode.New || (this.list.BaseTemplate == SPListTemplateType.DocumentLibrary && !string.IsNullOrEmpty(Page.Request["Mode"]) && Page.Request["Mode"] == "Upload" && mode == SPControlMode.Edit))
                         {
                             lookupValCol = GetQueryStringLookupVal(fld);
                         }
