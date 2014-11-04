@@ -89,6 +89,12 @@ namespace EPMLiveWorkPlanner
                     }
                     catch { }
 
+                    try
+                    {
+                        chkKanBanPlanner.Checked = bool.Parse(EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLivePlanner" + Request["name"] + "EnableKanBan"));
+                    }
+                    catch { }
+
                     Guid lWeb = EPMLiveCore.CoreFunctions.getLockedWeb(web);
 
                     if (Request["name"] != "")
@@ -146,7 +152,7 @@ namespace EPMLiveWorkPlanner
                         }
                         catch { }
 
-                      
+
                         try
                         {
                             chkCalcWork.Checked = bool.Parse(EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLivePlanner" + Request["name"] + "CalcWork"));
@@ -250,12 +256,6 @@ namespace EPMLiveWorkPlanner
                         catch { }
 
                         #region KanBan Board Settings
-
-                        try
-                        {
-                            chkKanBanPlanner.Checked = bool.Parse(EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLivePlanner" + Request["name"] + "EnableKanBan"));
-                        }
-                        catch { }
 
                         GetStatusColumns(web);
 
@@ -669,19 +669,38 @@ namespace EPMLiveWorkPlanner
 
             string curList = EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLivePlanner" + Request["name"] + "TaskCenter");
 
-            foreach (SPList list in web.Lists)
+            //EPML-3128: Any lists that are not supported can be used to create a non functional project planner
+            //As discussed during call, we need to add lists which are created based on 10702 list template (i.e. Tasks Center list).
+            if (chkOnlinePlanner.Checked)
             {
-                //EPML-3128: Any lists that are not supported can be used to create a non functional project planner
-                //As discussed during call, we need to add lists which are created based on 10702 list template (i.e. Tasks Center list).
-                if (chkOnlinePlanner.Checked && (uint)list.BaseTemplate == 10702)
+                foreach (SPList list in web.Lists)
                 {
-                    ListItem li = new ListItem(list.Title, list.ID.ToString().ToLower());
-                    if (list.Title.ToLower() == curList.ToLower())
-                        li.Selected = true;
+                    bool found = false;
+                    foreach (SPField field in list.Fields)
+                    {
+                        if (field.Type == SPFieldType.Lookup)
+                        {
+                            SPFieldLookup lp = (SPFieldLookup)field;
+                            if (lp.LookupList.ToLower() == "{" + ddlProjectCenter.SelectedValue + "}")
+                            {
+                                found = true;
+                            }
+                        }
+                    }
 
-                    ddlTaskCenter.Items.Add(li);
+                    if (found && (uint)list.BaseTemplate == 10702)
+                    {
+                        ListItem li = new ListItem(list.Title, list.ID.ToString().ToLower());
+                        if (list.Title.ToLower() == curList.ToLower())
+                            li.Selected = true;
+
+                        ddlTaskCenter.Items.Add(li);
+                    }
                 }
-                else
+            }
+            else
+            {
+                foreach (SPList list in web.Lists)
                 {
                     bool found = false;
                     foreach (SPField field in list.Fields)
@@ -930,12 +949,30 @@ namespace EPMLiveWorkPlanner
 
         protected void chkOnlinePlanner_CheckedChanged(object sender, EventArgs e)
         {
+            ddlProjectCenter.Items.Clear();
+            ddlTaskCenter.Items.Clear();
+            ddlTaskCenterPJField.Items.Clear();
             string curList = EPMLiveCore.CoreFunctions.getConfigSetting(SPContext.Current.Web, "EPMLivePlanner" + Request["name"] + "ProjectCenter");
 
-            foreach (SPList list in SPContext.Current.Web.Lists)
+            if (chkOnlinePlanner.Checked)
             {
-                // base template for project center is 10701,We won't use Task Center template (BaseTemplate ID: 10702) to load task center list details in Source List drowpdown because then it wont find task list of that selected source task list.
-                if ((uint)list.BaseTemplate == 10701)
+                foreach (SPList list in SPContext.Current.Web.Lists)
+                {
+                    // base template for project center is 10701,We won't use Task Center template (BaseTemplate ID: 10702) to load task center list details in Source List drowpdown because then it wont find task list of that selected source task list.
+                    if ((uint)list.BaseTemplate == 10701)
+                    {
+                        ListItem li = new ListItem(list.Title, list.ID.ToString().ToLower());
+                        if (list.Title.ToLower() == curList.ToLower())
+                            li.Selected = true;
+
+                        ddlProjectCenter.Items.Add(li);
+                    }
+                }
+            }
+            else
+            {
+               
+                foreach (SPList list in SPContext.Current.Web.Lists)
                 {
                     ListItem li = new ListItem(list.Title, list.ID.ToString().ToLower());
                     if (list.Title.ToLower() == curList.ToLower())
@@ -944,21 +981,6 @@ namespace EPMLiveWorkPlanner
                     ddlProjectCenter.Items.Add(li);
                 }
             }
-        }
-
-        protected void chkAgilePlanner_CheckedChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        protected void chkProjectPlanner_CheckedChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        protected void chkKanBanPlanner_CheckedChanged(object sender, EventArgs e)
-        {
-
         }
     }
 }

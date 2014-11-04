@@ -470,9 +470,9 @@
                     <wssuc:InputFormControl LabelText="Planner Availability" runat="server">
                         <Template_Control>
         	                <asp:CheckBox ID="chkOnlinePlanner" runat ="server" AutoPostBack="true" OnCheckedChanged="chkOnlinePlanner_CheckedChanged"/> Online Planner<br />
-                            <asp:CheckBox ID="chkAgilePlanner" runat ="server" AutoPostBack="true" OnCheckedChanged="chkAgilePlanner_CheckedChanged"/> Use Agile Functions<br />
-                            <asp:CheckBox ID="chkProjectPlanner" runat ="server" AutoPostBack="true" OnCheckedChanged="chkProjectPlanner_CheckedChanged"/> Microsoft Project<br />
-                            <asp:CheckBox ID="chkKanBanPlanner" runat ="server" AutoPostBack="true" OnCheckedChanged="chkKanBanPlanner_CheckedChanged"/> KanBan Board<br />
+                            <asp:CheckBox ID="chkAgilePlanner" runat ="server" /> Use Agile Functions<br />
+                            <asp:CheckBox ID="chkProjectPlanner" runat ="server" /> Microsoft Project<br />
+                            <asp:CheckBox ID="chkKanBanPlanner" runat ="server" /> KanBan Board<br />
                         </Template_Control>
                     </wssuc:InputFormControl>
                 </template_inputformcontrols>
@@ -1118,7 +1118,7 @@
             <wssuc:InputFormSection Title="Additional Columns:"
                 Description=""
                 runat="server" Visible="true">
-                 <template_description>
+                <template_description>
 	                    Select the values for the additional field for tile items that should be shown in. You can select upto 3 additional fields.
 	                </template_description>
                 <template_inputformcontrols>
