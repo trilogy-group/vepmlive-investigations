@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 using EPMLiveCore.Infrastructure;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.Navigation;
-using System.Text;
 
 namespace EPMLiveCore.Controls.Navigation
 {
@@ -20,9 +20,73 @@ namespace EPMLiveCore.Controls.Navigation
 
         #endregion Fields 
 
-        #region Methods (2) 
+        #region Methods (5) 
 
-        // Private Methods (2) 
+        // Public Methods (2) 
+
+        public string DefaultViewFromPropertyBag(SPList list)
+        {
+            var sb = new StringBuilder();
+
+            string defaultViewFirstPermission = string.Empty;
+            bool hasDefaultView = false;
+
+            try
+            {
+                Dictionary<int, string> propBagData = ConvertFromString(
+                    list.ParentWeb.Properties[String.Format("ViewPermissions{0}", list.ID)]);
+                foreach (var bagData in propBagData)
+                {
+                    foreach (SPGroup grp in SPContext.Current.Web.CurrentUser.Groups)
+                    {
+                        if (grp.ID == bagData.Key)
+                        {
+                            if (!hasDefaultView)
+                            {
+                                defaultViewFirstPermission = bagData.Value.Split('#')[1];
+                                hasDefaultView = true;
+                            }
+                        }
+                    }
+                }
+            }
+            catch { }
+
+            return defaultViewFirstPermission;
+        }
+
+        public SPList GetSpList(SiteMapNode node)
+        {
+            try
+            {
+                SPWeb currentWeb = SPContext.Current.Web;
+                SPList list = currentWeb.GetList(node.Url);
+                return list;
+            }
+            catch { }
+
+            return null;
+        }
+
+        // Private Methods (3) 
+
+        private Dictionary<int, string> ConvertFromString(string value)
+        {
+            string[] groups = value.Split("|".ToCharArray());
+            var groupValues = new Dictionary<int, string>();
+
+            foreach (string group in groups)
+            {
+                if (!string.IsNullOrEmpty(group))
+                {
+                    string[] values = group.Split("#".ToCharArray());
+                    int groupId = int.Parse(values[0]);
+                    groupValues.Add(groupId, group);
+                }
+            }
+
+            return groupValues;
+        }
 
         private SiteMapNodeCollection FindChildNodes(SiteMapNode node)
         {
@@ -155,26 +219,30 @@ namespace EPMLiveCore.Controls.Navigation
                                             SiteMapNode parentNode = node.ParentNode;
                                             if (parentNode != null && parentNode.Title.Equals("Quick launch"))
                                             {
-                                                if (node.Url.ToLower().EndsWith(spWeb.ServerRelativeUrl + "/sitepages/report.aspx"))
+                                                if (
+                                                    node.Url.ToLower()
+                                                        .EndsWith(spWeb.ServerRelativeUrl + "/sitepages/report.aspx"))
                                                 {
-                                                    var title = node.Title;
+                                                    string title = node.Title;
 
                                                     node = new SiteMapNode(this, nodeKey)
                                                     {
                                                         Title = title,
-                                                        Url = spWeb.ServerRelativeUrl + "/_layouts/15/epmlive/reporting/landing.aspx"
+                                                        Url =
+                                                            spWeb.ServerRelativeUrl +
+                                                            "/_layouts/15/epmlive/reporting/landing.aspx"
                                                     };
                                                 }
                                                 else
                                                 {
-                                                    var list = GetSpList(node);
+                                                    SPList list = GetSpList(node);
                                                     if (list != null)
                                                     {
                                                         string defaultViewURL = DefaultViewFromPropertyBag(list);
 
                                                         if (!string.IsNullOrEmpty(defaultViewURL))
                                                         {
-                                                            var title = node.Title;
+                                                            string title = node.Title;
 
                                                             node = new SiteMapNode(this, nodeKey)
                                                             {
@@ -237,67 +305,5 @@ namespace EPMLiveCore.Controls.Navigation
         }
 
         #endregion Overrides of SPNavigationProvider
-
-        public SPList GetSpList(SiteMapNode node)
-        {
-            try
-            {
-                SPWeb currentWeb = SPContext.Current.Web;
-                SPList list = currentWeb.GetList(node.Url);
-                return list;
-            }
-            catch { }
-
-            return null;
-        }
-
-        public string DefaultViewFromPropertyBag(SPList list)
-        {
-            StringBuilder sb = new StringBuilder();
-            Dictionary<int, string> propBagData = new Dictionary<int, string>();   
-         
-            string defaultViewFirstPermission = string.Empty;
-            bool hasDefaultView = false;
-
-            try
-            {
-                propBagData = ConvertFromString(list.ParentWeb.Properties[String.Format("ViewPermissions{0}", list.ID.ToString())], list);                
-                foreach (var bagData in propBagData)
-                {
-                    foreach (SPGroup grp in SPContext.Current.Web.CurrentUser.Groups)
-                    {
-                        if (grp.ID == bagData.Key)
-                        {
-                            if (!hasDefaultView)
-                            {
-                                defaultViewFirstPermission = bagData.Value.Split('#')[1];
-                                hasDefaultView = true;
-                            }
-                        }
-                    }
-                }
-            }
-            catch { }
-
-            return defaultViewFirstPermission;
-        }
-
-        private Dictionary<int, string> ConvertFromString(string value, SPList currentList)
-        {
-            string[] groups = value.Split("|".ToCharArray());
-            Dictionary<int, string> groupValues = new Dictionary<int, string>();
-
-            foreach (string group in groups)
-            {
-                if (!string.IsNullOrEmpty(group))
-                {
-                    string[] values = group.Split("#".ToCharArray());
-                    int groupId = int.Parse(values[0]);
-                    groupValues.Add(groupId, group);
-                }
-            }
-
-            return groupValues;
-        }
     }
 }
