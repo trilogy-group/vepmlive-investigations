@@ -5670,13 +5670,11 @@ button.toast-close-button {
 }
 
 .tblResourceWarningMessages {
-    border-left-style: solid;
-    border-left-width: 1px;
-    border-right: 1px solid #C0C0C0;
-    border-top-style: solid;
-    border-top-width: 1px;
-    border-bottom: 1px solid #C0C0C0;
-    background-color: #FFFF76;
+    background-color: #fcf8e3;
+    border-radius: 5px;
+    color: #8a6d3b;
+    padding: 5px;
+    border:1px solid #faebcc;
     width: 100%;
 }
 .ms-webpart-titleText.ms-webpart-titleText, .ms-webpart-titleText > a {
