@@ -1820,9 +1820,25 @@ var MyWorkGrid = {
     onSaveViewClose: function (dialogResult, returnValue) {
         if (dialogResult !== SP.UI.DialogResult.OK) return;
 
-        var vals = returnValue.split("|");
+        var bValidate = true;
+        if (returnValue == false) {
+            bValidate = false;
+        }
+        else {
+            var vals = returnValue.split("|");
 
-        var viewName = vals[0];
+            var viewName = vals[0];
+            viewName = viewName.replace(/^\s+|\s+$/, '');
+            if (viewName.trim().length == 0) {
+                bValidate = false;
+            }
+        }
+
+        if (bValidate == false) {
+            alert("Please enter view name!");
+            return;
+        }
+
         var viewId = 'dv';
         if (viewName !== 'Default View') {
             viewId = MD5(viewName.toLowerCase());
