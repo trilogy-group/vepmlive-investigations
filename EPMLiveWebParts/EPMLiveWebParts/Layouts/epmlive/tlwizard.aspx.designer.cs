@@ -22,6 +22,24 @@ namespace EPMLiveWebParts.Layouts.epmlive {
         protected global::System.Web.UI.WebControls.HiddenField hdnStep;
         
         /// <summary>
+        /// pnlMessage control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel pnlMessage;
+        
+        /// <summary>
+        /// lblInvalidURL control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label lblInvalidURL;
+        
+        /// <summary>
         /// pnl1 control.
         /// </summary>
         /// <remarks>

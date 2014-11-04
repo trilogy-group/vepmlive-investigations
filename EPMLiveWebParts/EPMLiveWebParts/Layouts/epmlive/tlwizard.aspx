@@ -60,6 +60,17 @@ font-size:16px;
 
 
     <asp:HiddenField ID="hdnStep" Value="1" runat="server"/>
+    <asp:Panel ID="pnlMessage" runat="server" Visible ="false">
+        <table border="0" cellpadding="0" cellspacing="0" width="100%">
+            <tr>
+                <td class="wizText">
+                    <asp:Label ID="lblInvalidURL" runat="server" ForeColor="Red">There was an issue configuring Reporting Services. This may be due to an invalid URL in the Central Administration setup<br />
+                        for EPM Live. The wizard will finish now but this Setup Wizard will need to be run again once the connection is resolved in<br />Central Administration.
+                    </asp:Label>
+                </td>
+            </tr>
+         </table>
+    </asp:Panel>
     <asp:Panel ID="pnl1" runat="server">
         <table border="0" cellpadding="0" cellspacing="0" heigh="300" width="100%">
             <tr>
