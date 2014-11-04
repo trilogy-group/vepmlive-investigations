@@ -154,8 +154,7 @@ function SetGridSize(grid) {
         var top = GetItemTop(outer);
 
         //document.getElementById("griddiv" + gridid).style.height = (height - top) + "px";
-        var currentDialog = SP.UI.ModalDialog.get_childDialog();
-        if (currentDialog)
+        var currentDialog = SP.UI.ModalDialog.get_childDialog();        if (currentDialog)
             outer.style.height = (height - top - 105) + "px";
         else
             outer.style.height = (height - top - 35) + "px";
@@ -625,68 +624,43 @@ function StopEditGridRow(grid, row) {
 }
 
 function GetRowData(grid, row) {
-    var _getRowData = function (grid, row) {
-        var cols = "";
 
-        for (var col in grid.Cols) {
-            cols += "," + col;
-        }
+    var cols = "";
 
-        grid.SetAttribute(row, "Title", "HtmlPrefix", "<img src='/_layouts/15/epmlive/images/mywork/loading16.gif'>", 1);
-
-        var data = "<Row id=\"" + row.id + "\" siteid=\"" + row.siteid + "\" webid=\"" + row.webid + "\" listid=\"" + row.listid + "\" itemid=\"" + row.itemid + "\" Cols=\"" + cols + "\"></Row>";
-
-        var webUrl = window.epmLiveNavigation.currentWebUrl;
-
-        $.ajax({
-            type: 'POST',
-            url: (webUrl + '/_vti_bin/WorkEngine.asmx/ExecuteJSON').replace(/\/\//g, '/'),
-            data: "{ Function: 'webparts_GetGridRow', Dataxml: '" + data + "' }",
-            contentType: 'application/json; charset=utf-8',
-            dataType: 'json',
-            success: function (response) {
-                var oResp = eval("(" + response.d + ")");
-                if (oResp.Result.Status == "0") {
-                    grid.AddDataFromServer(oResp.Result.InnerText);
-                }
-                else
-                    alert(oResp.Result.Error.Text);
-                grid.SetAttribute(row, "Title", "HtmlPrefix", "", 1);
-                for (var col in grid.Cols) {
-                    grid.SetAttribute(row, col, "CanEdit", "0", 1);
-                }
-                grid.AcceptChanges(row);
-            },
-            error: function (response) {
-                alert("Error: " + response);
-                grid.SetAttribute(row, "Title", "HtmlPrefix", "", 1);
-            }
-        });
-    };
-
-    if (row.itemid && row.itemid.newFileUrl) {
-        $.ajax({
-            type: 'GET',
-            url: window.epmLive.currentWebFullUrl + "/_api/web/GetFileByServerRelativeUrl('" + row.itemid.newFileUrl + "')/ListItemAllFields",
-            contentType: 'application/json; charset=utf-8',
-            dataType: 'json',
-            headers: {
-                "accept": "application/json;odata=verbose",
-                "content-type": "application/json;odata=verbose"
-            },
-            success: function (response) {
-                if (response && response.d) {
-                    row.itemid = response.d.Id;
-                    _getRowData(grid, row);
-                }
-            }, error: function (response) {
-                console.log('ERROR: GrtRowData --> ');
-                console.log(response);
-            }
-        });
-    } else {
-        _getRowData(grid, row);
+    for (var col in grid.Cols) {
+        cols += "," + col;
     }
+
+    grid.SetAttribute(row, "Title", "HtmlPrefix", "<img src='/_layouts/15/epmlive/images/mywork/loading16.gif'>", 1);
+
+    var data = "<Row id=\"" + row.id + "\" siteid=\"" + row.siteid + "\" webid=\"" + row.webid + "\" listid=\"" + row.listid + "\" itemid=\"" + row.itemid + "\" Cols=\"" + cols + "\"></Row>";
+
+    var webUrl = window.epmLiveNavigation.currentWebUrl;
+
+    $.ajax({
+        type: 'POST',
+        url: (webUrl + '/_vti_bin/WorkEngine.asmx/ExecuteJSON').replace(/\/\//g, '/'),
+        data: "{ Function: 'webparts_GetGridRow', Dataxml: '" + data + "' }",
+        contentType: 'application/json; charset=utf-8',
+        dataType: 'json',
+        success: function (response) {
+            var oResp = eval("(" + response.d + ")");
+            if (oResp.Result.Status == "0") {
+                grid.AddDataFromServer(oResp.Result.InnerText);
+            }
+            else
+                alert(oResp.Result.Error.Text);
+            grid.SetAttribute(row, "Title", "HtmlPrefix", "", 1);
+            for (var col in grid.Cols) {
+                grid.SetAttribute(row, col, "CanEdit", "0", 1);
+            }
+            grid.AcceptChanges(row);
+        },
+        error: function (response) {
+            alert("Error: " + response);
+            grid.SetAttribute(row, "Title", "HtmlPrefix", "", 1);
+        }
+    });
 }
 
 function LoadGrid(gridid) {
