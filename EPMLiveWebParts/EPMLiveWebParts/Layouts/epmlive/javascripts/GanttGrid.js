@@ -625,29 +625,7 @@ function StopEditGridRow(grid, row) {
 }
 
 function GetRowData(grid, row) {
-    if (row.itemid && row.itemid.newFileUrl) {
-        $.ajax({
-            type: 'GET',
-            url: window.epmLive.currentWebFullUrl + "/_api/web/GetFileByServerRelativeUrl('" + row.itemid.newFileUrl + "')/ListItemAllFields",
-            contentType: 'application/json; charset=utf-8',
-            dataType: 'json',
-            headers: {
-                "accept": "application/json;odata=verbose",
-                "content-type": "application/json;odata=verbose"
-            },
-            success: function (response) {
-                if (response && response.d) {
-                    row.itemid = response.d.Id;
-                    getNewRowData(grid, row);
-                }
-            }, error: function (response) {
-                console.log('ERROR: GrtRowData --> ');
-                console.log(response);
-            }
-        });
-    } else getNewRowData(grid, row);
-
-    var getNewRowData = function (grid, row) {
+    var _getRowData = function (grid, row) {
         var cols = "";
 
         for (var col in grid.Cols) {
@@ -684,6 +662,30 @@ function GetRowData(grid, row) {
                 grid.SetAttribute(row, "Title", "HtmlPrefix", "", 1);
             }
         });
+    };
+
+    if (row.itemid && row.itemid.newFileUrl) {
+        $.ajax({
+            type: 'GET',
+            url: window.epmLive.currentWebFullUrl + "/_api/web/GetFileByServerRelativeUrl('" + row.itemid.newFileUrl + "')/ListItemAllFields",
+            contentType: 'application/json; charset=utf-8',
+            dataType: 'json',
+            headers: {
+                "accept": "application/json;odata=verbose",
+                "content-type": "application/json;odata=verbose"
+            },
+            success: function (response) {
+                if (response && response.d) {
+                    row.itemid = response.d.Id;
+                    _getRowData(grid, row);
+                }
+            }, error: function (response) {
+                console.log('ERROR: GrtRowData --> ');
+                console.log(response);
+            }
+        });
+    } else {
+        _getRowData(grid, row);
     }
 }
 
