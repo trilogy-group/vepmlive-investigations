@@ -625,6 +625,8 @@ function StopEditGridRow(grid, row) {
 
 function GetRowData(grid, row) {
 
+    if (!row.itemid) return;
+
     var cols = "";
 
     for (var col in grid.Cols) {
