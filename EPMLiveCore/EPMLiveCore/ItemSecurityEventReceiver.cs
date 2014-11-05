@@ -144,6 +144,12 @@ namespace EPMLiveCore
 
             SPListItem _listItem = properties.ListItem;
 
+            //EPML-3694: Security permissions lost on "SAP Procure to Pay" project
+            //As per proposed solution mentioned in Jira item - "Do not remove groups if title is blank"
+            //So, in case of Title is blank we just return from this routine.
+            if (string.IsNullOrEmpty(_listItem.Title))
+                return;
+
             List<SPGroup> grps = new List<SPGroup>();
             foreach (SPRoleAssignment ra in _listItem.RoleAssignments)
             {
