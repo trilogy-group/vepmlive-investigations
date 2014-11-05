@@ -48,7 +48,6 @@ namespace EPMLiveCore
 
             string oldPercent = null;
             string oldStatus = null;
-            string method = "";
 
             try
             {
@@ -81,7 +80,7 @@ namespace EPMLiveCore
                 {
                     using(SPWeb web = site.OpenWeb(properties.Web.ID))
                     {
-                        method = ReflectionMethods.GetStatusMethod(web, properties.ListTitle);
+                        string method = ReflectionMethods.GetStatusMethod(web, properties.ListTitle);
 
                         if(method == "1") 
                         {
@@ -120,16 +119,16 @@ namespace EPMLiveCore
             {
                 if(newComplete != null)
                 {
-                    if (newComplete == "1" || newComplete.ToLower() == "true")
+                    if(newComplete == "1" || newComplete.ToLower() == "true")
                         newPercent = "1";
-                    else if (newStatus != null)
-                        newPercent = getPercentFromStatus(newStatus, oldPercent);
+                    else if(newStatus != null)
+                        newPercent = getPercentFromStatus(newStatus, newPercent, oldPercent);
                     else
                         newPercent = "0";
                 }
                 else if(newStatus != null)
                 {
-                    newPercent = getPercentFromStatus(newStatus, oldPercent);
+                    newPercent = getPercentFromStatus(newStatus, newPercent, oldPercent);
                 }
                 else
                 {
@@ -145,16 +144,16 @@ namespace EPMLiveCore
             {
                 if(newComplete != null)
                 {
-                    if (newComplete == "1" || newComplete.ToLower() == "true")
+                    if(newComplete == "1" || newComplete.ToLower() == "true")
                         newStatus = "Completed";
-                    else if (newPercent != null)
-                        newStatus = getStatusFromPercent(newPercent);
+                    else if(newPercent != null)
+                        newStatus = getStatusFromPercent(newStatus, oldStatus, newPercent, oldPercent);
                     else
                         newStatus = "Not Started";
                 }
                 else if(newPercent != null)
                 {
-                    newStatus = getStatusFromPercent(newPercent);
+                    newStatus = getStatusFromPercent(newStatus, oldStatus, newPercent, oldPercent);
                 }
                 else
                 {
@@ -184,21 +183,12 @@ namespace EPMLiveCore
                 }
             }
 
-            if (method != "1" && method != "2" && newStatus != oldStatus)
-            {
-                newPercent = getPercentFromStatus(newStatus, oldPercent);
-            }
-            else if (newPercent != oldPercent)
-            {
-                newStatus = getStatusFromPercent(newPercent);
-            }
-
             properties.AfterProperties["PercentComplete"] = newPercent;
             properties.AfterProperties["Complete"] = newComplete;
             properties.AfterProperties["Status"] = newStatus;
         }
 
-        private string getPercentFromStatus(string newStatus,string oldPercent)
+        private string getPercentFromStatus(string newStatus, string newPercent, string oldPercent)
         {
             if(newStatus == "Completed")
                 return "1";
@@ -213,7 +203,7 @@ namespace EPMLiveCore
             return oldPercent;
         }
 
-        private string getStatusFromPercent(string newPercent)
+        private string getStatusFromPercent(string newStatus, string oldStatus, string newPercent, string oldPercent)
         {
             if(newPercent == "0")
                 return "Not Started";
