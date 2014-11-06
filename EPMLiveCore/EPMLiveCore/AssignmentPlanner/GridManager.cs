@@ -116,6 +116,10 @@ namespace EPMLiveCore.AssignmentPlanner
             try
             {
                 string response;
+                NumberFormatInfo providerEn = new System.Globalization.NumberFormatInfo();
+                providerEn.NumberDecimalSeparator = ".";
+                providerEn.NumberGroupSeparator = ",";
+                providerEn.NumberGroupSizes = new int[] { 3 };
 
                 XElement dataRootElement = XDocument.Parse(data).Root;
 
@@ -172,6 +176,8 @@ namespace EPMLiveCore.AssignmentPlanner
                         Guid listId = Guid.Empty;
                         Guid webId = Guid.Empty;
                         Guid siteId = Guid.Empty;
+                        string value = string.Empty;
+                        float floatFieldValue;
 
                         foreach (XElement fieldElement in itemElement.Elements("Field"))
                         {
@@ -182,7 +188,14 @@ namespace EPMLiveCore.AssignmentPlanner
                                 gridSafeFields.Add(field, Utils.ToGridSafeFieldName(field));
                             }
 
-                            string value = fieldElement.Value;
+                            if (float.TryParse(fieldElement.Value.ToString(), out floatFieldValue))
+                            {
+                                value = floatFieldValue.ToString(providerEn);
+                            }
+                            else
+                            {
+                                value = fieldElement.Value;
+                            }
 
                             string fieldName = field.ToLower();
 
