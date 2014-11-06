@@ -434,7 +434,7 @@ namespace EPMLiveCore.API
             using (var resourceManager = new ResourcePoolManager(SPContext.Current.Site.RootWeb))
             {
                 SPList resourcesList = resourceManager.ParentList;
-
+                bool isRootWeb = web.IsRootWeb;
 
                 while (web.Features[WEFeatures.BuildTeam.Id] == null) //Inherit | Open
                 {
@@ -470,7 +470,7 @@ namespace EPMLiveCore.API
                   XDocument.Parse(GetResources(HttpUtility.HtmlDecode(HttpUtility.HtmlDecode(data)), SPContext.Current.Site.RootWeb));
 
                 XDocument resourceTeam = new XDocument();
-                if (web.IsRootWeb && listid == Guid.Empty && itemid == 0)
+                if (isRootWeb && listid == Guid.Empty && itemid == 0)
                 {
                     resourceTeam = resourceXml;
                 }
@@ -605,7 +605,7 @@ namespace EPMLiveCore.API
 
                     var sRaw = (string)ele.Attribute(gridSafeFieldName);
                     var ID = (int)ele.Attribute("ID");
-                    
+
                     SPFieldLookupValueCollection lookupValCols = new SPFieldLookupValueCollection();
 
                     try
