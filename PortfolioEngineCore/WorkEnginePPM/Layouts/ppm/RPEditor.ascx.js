@@ -620,6 +620,11 @@
             switch (grid.id) {
                 case "g_RPE":
                     var resuid = this.plangrid.GetAttribute(row, null, "Res_UID");
+
+                    if (!resuid) {
+                        resuid = this.plangrid.GetAttribute(row, null, "PendingRes_UID");
+                    }
+
                     resrow = this.resgrid.GetRowById(resuid);
                     break;
                 case "g_Res":
