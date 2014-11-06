@@ -139,7 +139,10 @@ namespace EPMLiveWebParts
                     SPField oField = null;
                     try
                     {
-                        oField = list.Fields.GetFieldByInternalName(sCol);
+                        if(sCol == "FState")
+                            oField = list.Fields.GetFieldByInternalName("State");
+                        else
+                            oField = list.Fields.GetFieldByInternalName(sCol);
                     }
                     catch { }
                     if (oField != null)
@@ -237,7 +240,10 @@ namespace EPMLiveWebParts
                 SPField oField = null;
                 try
                 {
-                    oField = list.Fields.GetFieldByInternalName(nd.Attributes["Name"].Value);
+                    if(nd.Attributes["Name"].Value == "FState")
+                        oField = list.Fields.GetFieldByInternalName("State");
+                    else
+                        oField = list.Fields.GetFieldByInternalName(nd.Attributes["Name"].Value);
                 }
                 catch { }
                 if (oField != null)
@@ -379,7 +385,10 @@ namespace EPMLiveWebParts
                     SPField oField = null;
                     try
                     {
-                        oField = list.Fields.GetFieldByInternalName(sCol);
+                        if(sCol == "FState")
+                            oField = list.Fields.GetFieldByInternalName("State");
+                        else
+                            oField = list.Fields.GetFieldByInternalName(sCol);
                     }
                     catch { }
                     if (oField != null)
