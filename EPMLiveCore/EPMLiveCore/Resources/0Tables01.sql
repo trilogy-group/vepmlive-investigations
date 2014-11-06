@@ -455,16 +455,22 @@ if not exists (select table_name from INFORMATION_SCHEMA.tables where table_name
 			[QUEUE] [varchar](255) NULL,
 			[EVENT_TIME] [datetime] NULL DEFAULT (getdate()),
 			[DIRECTION] [int] NULL,
-			[TYPE] [int] NULL
+			[TYPE] [int] NULL,
+			[DATA] [ntext] null
 		) ON [PRIMARY]
 
 
-end
+end 
 else
 begin
 
 	print 'Updating Table INT_EVENTS'
 
+	if not exists (select column_name FROM INFORMATION_SCHEMA.COLUMNS where table_name = 'INT_EVENTS' and column_name = 'DATA')
+	begin
+		alter table INT_EVENTS
+		ADD [DATA] [ntext] NULL
+	end
 
 end
 
