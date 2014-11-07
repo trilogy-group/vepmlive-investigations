@@ -1,4 +1,5 @@
 ﻿using System;
+using EPMLiveCore;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.WebControls;
 using System.Xml;
@@ -132,6 +133,36 @@ namespace TimeSheets.Layouts.epmlive
             //});
 
             ////CurItems = "[" + CurItems.Trim(',') + "]";
+
+            try
+            {
+                AddJsHooks();
+            }
+            catch { }
+        }
+
+        private void AddJsHooks()
+        {
+            SPWeb rootWeb = Web.Site.RootWeb;
+            string jsHook = CoreFunctions.getConfigSetting(rootWeb, "epmlive_timesheet_add_work_js_hook");
+
+            if (string.IsNullOrEmpty(jsHook)) return;
+
+            string[] scripts = jsHook.Split(',');
+
+            foreach (string script in scripts)
+            {
+                string src = script;
+
+                string url = rootWeb.ServerRelativeUrl;
+                if (script.StartsWith("~"))
+                {
+                    url = Web.ServerRelativeUrl;
+                    src = script.Substring(1, script.Length);
+                }
+
+                litJsHook.Text += string.Format(@"<script type=""text/javascript"" src=""{0}{1}""></script>", url, src);
+            }
         }
 
         protected override void CreateChildControls()

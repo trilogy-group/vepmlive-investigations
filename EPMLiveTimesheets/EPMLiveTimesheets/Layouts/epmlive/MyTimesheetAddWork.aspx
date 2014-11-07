@@ -73,7 +73,8 @@
         }
         document.getElementsByTagName("html")[0].className = "ms-dialog";
     </script>
-
+    
+    <asp:Literal ID="litJsHook" runat="server"></asp:Literal>
 </asp:Content>
 
 <asp:Content ID="PageTitle" ContentPlaceHolderID="PlaceHolderPageTitle" runat="server">
