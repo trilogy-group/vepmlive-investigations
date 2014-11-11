@@ -1047,7 +1047,7 @@ namespace EPMLiveWebParts.ReportingChart
                 XmlDocument doc = new XmlDocument();
                 doc.LoadXml("<Query>" + v.Query + "</Query>");
                 camlQuery = GetFilterQuery(l, doc);
-                camlQuery = camlQuery.Replace("<Query>", string.Empty).Replace("</Query>", string.Empty);
+                camlQuery = camlQuery.Replace("<Query>", string.Empty).Replace("</Query>", string.Empty).Replace("<Today />", DateTime.Now.ToString("s"));
                 dbQuery = ReportingData.GetReportQuery(w, l, camlQuery, out sOrderBy);
                 // check if list actually exists in reporting db
                 if (!string.IsNullOrEmpty(sOrderBy) && !ColExistsInListReportingDB(sOrderBy, l.Title))
