@@ -662,7 +662,7 @@ begin
       if exists (select column_name FROM INFORMATION_SCHEMA.COLUMNS where table_name = @listtable and column_name = ''DaysOverdue'')
       begin
             
-            set @sql = ''update '' + @listtable + '' set daysoverdue = case when duedate > GETDATE() then 0 else DATEDIFF(d, duedate, GETDATE()) end''
+            set @sql = ''update ['' + @listtable + ''] set daysoverdue = case when duedate > GETDATE() then 0 else DATEDIFF(d, duedate, GETDATE()) end''
             
             exec (@sql)
             
@@ -673,7 +673,7 @@ begin
       if exists (select column_name FROM INFORMATION_SCHEMA.COLUMNS where table_name = @listtable and column_name = ''Due'') AND  exists (select column_name FROM INFORMATION_SCHEMA.COLUMNS where table_name = @listtable and column_name = ''Status'')
       begin
             
-            set @sql = ''update '' + @listtable + '' set due = 
+            set @sql = ''update ['' + @listtable + ''] set due = 
                               case 
                               when status = ''''Completed'''' then ''''Completed'''' 
                               when duedate is null then ''''No Due Date''''
@@ -694,7 +694,7 @@ begin
       if exists (select column_name FROM INFORMATION_SCHEMA.COLUMNS where table_name = @listtable and column_name = ''ScheduleStatus'')
       begin
             
-            set @sql = ''update '' + @listtable + '' set ScheduleStatus =        
+            set @sql = ''update ['' + @listtable + ''] set ScheduleStatus =        
                               case 
                               when duedate IS NULL then ''''GREEN.GIF''''
                               when DATEDIFF(d, duedate, GETDATE()) > '' + CONVERT(varchar(5), @red) + '' then ''''RED.GIF''''
