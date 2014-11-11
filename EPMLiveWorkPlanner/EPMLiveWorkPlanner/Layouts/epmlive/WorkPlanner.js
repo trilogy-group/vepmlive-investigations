@@ -3006,6 +3006,28 @@ function GetColor(grid, row, col, r, g, b, edit) {
     }
 }
 
+function GetCssClass(grid, row, col, classname) {
+    if (grid.id == "WorkPlannerGrid") {
+        if (col == "Title") {
+            var val1 = grid.GetValue(row, col);
+            if (val1 == "") {
+                return "erroroncell";
+            }
+        }
+    }
+}
+
+function GetToolTip(grid, row, col, tip, clientx, clienty, x, y) {
+    if (grid.id == "WorkPlannerGrid") {
+        if (col == "Title") {
+            var val1 = grid.GetValue(row, col);
+            if (val1 == "") {
+                return "Please enter title!";
+            }
+        }
+    }
+}
+
 function getHTML(grid, row, col, val) {
     if (grid.id == "WorkPlannerGrid") {
         if (row.Kind == "Data") {
