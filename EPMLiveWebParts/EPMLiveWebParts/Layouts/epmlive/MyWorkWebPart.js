@@ -25,14 +25,6 @@ function MyWorkOnDblClick(grid, row, col, x, y, event) {
     EditGridRow(grid, row, col);
 }
 
-//Grids.OnDblClick = function(grid, row, col, x, y, event) {
-//    if (grid.id === window.allWorkGridId) {
-//        if (!row['EditMode']) {
-//            editSaveRow(grid.id, row.id);
-//        }
-//    }
-//};
-
 function GoodEditCol(col) {
 
     switch (col) {
