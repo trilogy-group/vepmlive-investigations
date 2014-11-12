@@ -87,6 +87,9 @@
     {
         margin-left: 0;
     }
+    .erroroncell {
+        background-color: #EEBDBD !important;
+    }
 
     #pageStatusBar[class], .ms-status-msg {
         margin-top: 5px !important;
@@ -1055,10 +1058,19 @@
         //MoveCol               (string col, string tocol, bool right, bool noshow = 0) or (string col, int sec, bool last, bool noshow = 0) 
     } 
 
-
     Grids.OnGetColor = function(grid, row, col, r, g, b, edit)  
     {
         return GetColor(grid, row, col, r, g, b, edit);
+    }
+
+    Grids.OnGetClass = function(grid, row, col, classname)
+    {
+        return GetCssClass(grid, row, col, "erroroncell");
+    }
+    
+    Grids.OnTip = function(grid, row, col, tip, cleintx, clienty, x, y)
+    {
+        return GetToolTip(grid, row, col, tip, 5, 5, 5, 5)
     }
     
     Grids.OnRenderFinish = function (grid) {

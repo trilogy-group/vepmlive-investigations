@@ -50,8 +50,6 @@ namespace WorkEnginePPM.Events
 
             try
             {
-                CoreFunctions.EnsureNoDuplicates(properties, true);
-
                 SPWeb spWeb = properties.Web;
 
                 decimal rate;

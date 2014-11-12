@@ -574,7 +574,6 @@ namespace EPMLiveCore.API
         {
             var resourceDict = new Dictionary<int, XElement>();
 
-            // Performance improvement for EPML-4060
             Parallel.ForEach(resourceTeam.Descendants("Resource"), element =>
             {
                 try

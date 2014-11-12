@@ -27,6 +27,22 @@ namespace WorkEnginePPM.Events.DataSync
             SetHours(properties);
         }
 
+        public override void ItemAdding(SPItemEventProperties properties)
+        {
+            try
+            {
+                this.EventFiringEnabled = false;
+                properties.AfterProperties["DueDate"] = System.Convert.ToDateTime(properties.AfterProperties["DueDate"]).AddDays(1).ToString("yyyy-MM-ddTHH:mm:ssZ");
+                this.EventFiringEnabled = true;
+            }
+            catch (Exception exception)
+            {
+                properties.Cancel = true;
+                properties.ErrorMessage = exception.Message;
+                properties.Status = SPEventReceiverStatus.CancelWithError;
+            }
+        }
+
         /// <summary>
         ///     An item is being deleted
         /// </summary>
@@ -59,6 +75,22 @@ namespace WorkEnginePPM.Events.DataSync
             Synchronize(properties);
 
             SetHours(properties);
+        }
+
+        public override void ItemUpdating(SPItemEventProperties properties)
+        {
+            try
+            {
+                this.EventFiringEnabled = false;
+                properties.AfterProperties["DueDate"] = System.Convert.ToDateTime(properties.AfterProperties["DueDate"]).AddDays(1).ToString("yyyy-MM-ddTHH:mm:ssZ");
+                this.EventFiringEnabled = true;
+            }
+            catch (Exception exception)
+            {
+                properties.Cancel = true;
+                properties.ErrorMessage = exception.Message;
+                properties.Status = SPEventReceiverStatus.CancelWithError;
+            }
         }
 
         // Private Methods (4) 

@@ -3725,7 +3725,7 @@ namespace EPMLiveCore
         /// Ensures the no duplicates for Resource Events.
         /// </summary>
         /// <param name="properties">The properties.</param>
-        public static void EnsureNoDuplicates(SPItemEventProperties properties, Boolean isAdd)
+        public static void EnsureNoDuplicates(SPItemEventProperties properties, Boolean isAdd, Boolean isOnline)
         {
             bool isGeneric;
 
@@ -3749,15 +3749,21 @@ namespace EPMLiveCore
 
             string sharePointAccount;
 
+            string spAccountProperty = "SharePointAccount";
+            if (isOnline)
+            {
+                spAccountProperty = "Email";
+            }
+
             try
             {
-                sharePointAccount = properties.AfterProperties["SharePointAccount"].ToString();
+                sharePointAccount = properties.AfterProperties[spAccountProperty].ToString();
             }
             catch
             {
                 try
                 {
-                    sharePointAccount = properties.ListItem["SharePointAccount"].ToString();
+                    sharePointAccount = properties.ListItem[spAccountProperty].ToString();
                 }
                 catch
                 {
@@ -3770,37 +3776,8 @@ namespace EPMLiveCore
                 throw new Exception("Please provide a valid SharePoint Account.");
             }
 
-            SPFieldUserValue uv;
-
-            try
-            {
-                uv = new SPFieldUserValue(properties.Web, sharePointAccount);
-            }
-            catch
-            {
-                throw new Exception(sharePointAccount + " is not a valid SharePoint account.");
-            }
-
-            SPUser u = uv.User ?? properties.Web.EnsureUser(uv.LookupValue);
-
-            string query = string.Empty;
-            if (isAdd)
-            {
-                query = string.Format(@"<Where><Eq><FieldRef Name='SharePointAccount' LookupId='TRUE'/><Value Type='Integer'>{0}</Value></Eq></Where>", u.ID);
-            }
-            else
-            {
-                query = string.Format(@"<Where><And><Eq><FieldRef Name='SharePointAccount' LookupId='TRUE'/><Value Type='Integer'>{0}</Value></Eq><Neq><FieldRef Name='ID'/><Value Type='Counter'>{1}</Value></Neq></And></Where>", u.ID, properties.ListItem.ID);
-            }
-            const string viewFields = @"<FieldRef Name='Title' Nullable='TRUE'/>";
-
-            SPListItemCollection spListItemCollection = null;
-
-            try
-            {
-                spListItemCollection = properties.List.GetItems(new SPQuery { Query = query, ViewFields = viewFields });
-            }
-            catch { }
+            SPUser u;
+            SPListItemCollection spListItemCollection = GetResourceWithDuplicateEmail(properties, isAdd, isOnline, sharePointAccount, out u);
 
             if (spListItemCollection == null) return;
             if (spListItemCollection.Count <= 0) return;
@@ -3809,6 +3786,63 @@ namespace EPMLiveCore
 
             throw new Exception(string.Format("This SharePoint Account ({0}) is currently associated with {1}",
                                               u.LoginName, spListItem["Title"]));
+        }
+
+        private static SPListItemCollection GetResourceWithDuplicateEmail(SPItemEventProperties properties, Boolean isAdd, Boolean isOnline, string sharePointAccount, out SPUser u)
+        {
+            SPFieldUserValue uv;
+            SPListItemCollection itemCollection = null;
+            string query = string.Empty;
+            const string viewFields = @"<FieldRef Name='Title' Nullable='TRUE'/>";
+
+            if (isOnline)
+            {
+                u = properties.Web.EnsureUser(sharePointAccount);
+                if (u != null)
+                {
+                    if (isAdd)
+                    {
+                        query = string.Format(@"<Where><Eq><FieldRef Name='Email'/><Value Type='Text'>{0}</Value></Eq></Where>", u.Email);
+                    }
+                    else
+                    {
+                        query = string.Format(@"<Where><And><Eq><FieldRef Name='Email'/><Value Type='Text'>{0}</Value></Eq><Neq><FieldRef Name='ID'/><Value Type='Counter'>{1}</Value></Neq></And></Where>", u.Email, properties.ListItem.ID);
+                    }
+                }
+                else
+                {
+                    throw new Exception(sharePointAccount + " is not a valid SharePoint account.");
+                }
+            }
+            else
+            {
+                try
+                {
+                    uv = new SPFieldUserValue(properties.Web, sharePointAccount);
+                }
+                catch
+                {
+                    throw new Exception(sharePointAccount + " is not a valid SharePoint account.");
+                }
+
+                u = uv.User ?? properties.Web.EnsureUser(uv.LookupValue);
+
+                if (isAdd)
+                {
+                    query = string.Format(@"<Where><Eq><FieldRef Name='SharePointAccount' LookupId='TRUE'/><Value Type='Integer'>{0}</Value></Eq></Where>", u.ID);
+                }
+                else
+                {
+                    query = string.Format(@"<Where><And><Eq><FieldRef Name='SharePointAccount' LookupId='TRUE'/><Value Type='Integer'>{0}</Value></Eq><Neq><FieldRef Name='ID'/><Value Type='Counter'>{1}</Value></Neq></And></Where>", u.ID, properties.ListItem.ID);
+                }
+            }
+
+            try
+            {
+                itemCollection = properties.List.GetItems(new SPQuery { Query = query, ViewFields = viewFields });
+            }
+            catch { }
+            return itemCollection;
         }
 
         //public static string GetTempDirectory(SPWeb web)

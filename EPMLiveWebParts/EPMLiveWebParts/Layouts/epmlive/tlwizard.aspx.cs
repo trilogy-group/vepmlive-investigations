@@ -267,17 +267,27 @@ namespace EPMLiveWebParts.Layouts.epmlive
                             ClearNavigationCache(web);
 
                             CoreFunctions.enqueue(TimerJobID, 0);
-
-                            if (rdoYes.Checked)
+                            if (pnlMessage.Visible == false) 
                             {
-                                if (url != "")
+                                if (rdoYes.Checked)
                                 {
-                                    if (Request["isdlg"] == "1")
-                                        Page.ClientScript.RegisterStartupScript(this.GetType(), "redirect",
-                                            "<script language=\"javascript\">window.parent.location.href='" + url +
-                                            "';</script>");
+                                    if (url != "")
+                                    {
+                                        if (Request["isdlg"] == "1")
+                                            Page.ClientScript.RegisterStartupScript(this.GetType(), "redirect",
+                                                "<script language=\"javascript\">window.parent.location.href='" + url +
+                                                "';</script>");
+                                        else
+                                            Response.Redirect(url);
+                                    }
                                     else
-                                        Response.Redirect(url);
+                                    {
+                                        if (Request["isdlg"] == "1")
+                                            Page.ClientScript.RegisterStartupScript(this.GetType(), "closeWindow",
+                                                "<script language=\"javascript\">window.parent.location.href = window.parent.location.href;</script>");
+                                        else
+                                            Response.Redirect(web.ServerRelativeUrl + "/_layouts/settings.aspx");
+                                    }
                                 }
                                 else
                                 {
@@ -287,14 +297,6 @@ namespace EPMLiveWebParts.Layouts.epmlive
                                     else
                                         Response.Redirect(web.ServerRelativeUrl + "/_layouts/settings.aspx");
                                 }
-                            }
-                            else
-                            {
-                                if (Request["isdlg"] == "1")
-                                    Page.ClientScript.RegisterStartupScript(this.GetType(), "closeWindow",
-                                        "<script language=\"javascript\">window.parent.location.href = window.parent.location.href;</script>");
-                                else
-                                    Response.Redirect(web.ServerRelativeUrl + "/_layouts/settings.aspx");
                             }
                         }
                         finally
@@ -812,35 +814,41 @@ namespace EPMLiveWebParts.Layouts.epmlive
 
                 SPListItemCollection folders = list.GetItemsInFolder(list.DefaultView, list.RootFolder);
 
-                foreach (SPListItem li in folders)
+                try
                 {
-                    if (li.FileSystemObjectType == SPFileSystemObjectType.Folder && li.Name == "Data Sources")
+                    foreach (SPListItem li in folders)
                     {
-                        SSRS2006.DataSourceDefinition dsd = new SSRS2006.DataSourceDefinition();
-                        dsd.ConnectString = "Data Source=" + txtReportServer.Text + ";Initial Catalog=" + txtReportDatabase.Text + ";";
-                        dsd.CredentialRetrieval = SSRS2006.CredentialRetrievalEnum.Store;
-                        dsd.UserName = txtReportUsername.Text;
-                        if (hdnReportPassword.Value == "")
-                            dsd.Password = hdnSaveReportPassword.Value;
-                        else
-                            dsd.Password = hdnReportPassword.Value;
-                        
-                        if(chkWindows.Checked)
-                            dsd.WindowsCredentials = chkWindows.Checked;
+                        if (li.FileSystemObjectType == SPFileSystemObjectType.Folder && li.Name == "Data Sources")
+                        {
+                            SSRS2006.DataSourceDefinition dsd = new SSRS2006.DataSourceDefinition();
+                            dsd.ConnectString = "Data Source=" + txtReportServer.Text + ";Initial Catalog=" + txtReportDatabase.Text + ";";
+                            dsd.CredentialRetrieval = SSRS2006.CredentialRetrievalEnum.Store;
+                            dsd.UserName = txtReportUsername.Text;
+                            if (hdnReportPassword.Value == "")
+                                dsd.Password = hdnSaveReportPassword.Value;
+                            else
+                                dsd.Password = hdnReportPassword.Value;
 
-                        dsd.Enabled = true;
-                        dsd.Extension = "SQL";
+                            if (chkWindows.Checked)
+                                dsd.WindowsCredentials = chkWindows.Checked;
 
-                        SSRS.CreateDataSource("EPMLiveReportDB.rsds", web.Url + "/" + li.Url, true, dsd, null);
+                            dsd.Enabled = true;
+                            dsd.Extension = "SQL";
+
+                            SSRS.CreateDataSource("EPMLiveReportDB.rsds", web.Url + "/" + li.Url, true, dsd, null);
+                        }
+                    }
+
+                    SSRS2006.DataSourceReference dsr = new SSRS2006.DataSourceReference();
+                    dsr.Reference = web.Url + "/Report Library/Data Sources/EPMLiveReportDB.rsds";
+
+                    foreach (SPListItem li in folders)
+                    {
+                        processRDL(SSRS, web, li, dsr, list);
                     }
                 }
-            
-                SSRS2006.DataSourceReference dsr = new SSRS2006.DataSourceReference();
-                dsr.Reference = web.Url + "/Report Library/Data Sources/EPMLiveReportDB.rsds";
-
-                foreach (SPListItem li in folders)
-                {
-                    processRDL(SSRS, web, li, dsr, list);
+                catch {
+                    pnlMessage.Visible = true;
                 }
             });
         }

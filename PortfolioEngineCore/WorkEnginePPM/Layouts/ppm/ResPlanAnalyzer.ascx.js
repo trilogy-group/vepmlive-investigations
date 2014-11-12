@@ -7878,8 +7878,9 @@
                 StartID = this.UsingPeriods.CurrentPeriod.Value;
             }
 
-            StartID -= 1;
-            var FinishID = parseInt(ToList.options[ToList.selectedIndex].value) - 1;
+            //StartID -= 1;
+            //var FinishID = parseInt(ToList.options[ToList.selectedIndex].value) - 1;            
+            var FinishID = parseInt(ToList.options[ToList.selectedIndex].value);
 
             var ycnt = FinishID - StartID;
             var ystp = 0;
@@ -7919,7 +7920,7 @@
                     ob.color = this.getRandomColor();
                     ob.data = new Array();
 
-                    for (var i = StartID; i <= FinishID; i++) {
+                    for (var i = StartID - 1; i < FinishID; i++) {
                         ob.data.push(Number(rd.Tot[i]));
                         avail[i - StartID] += Number(rd.Avail[i]);
                     }
