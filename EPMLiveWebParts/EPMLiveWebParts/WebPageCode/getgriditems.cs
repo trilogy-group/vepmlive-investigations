@@ -257,8 +257,13 @@ namespace EPMLiveWebParts
                 catch { }
                 try
                 {
-                    if (docGroup.FirstChild.SelectSingleNode("GroupBy") != null)
+                    // User can provide GroupBy value from list view settings and edit webpart settings.
+                    // So checking GroupBy at both locations.
+                    if (docGroup.FirstChild.SelectSingleNode("GroupBy") != null
+                        || (!string.IsNullOrEmpty(additionalgroups) && additionalgroups != "|"))
+                    {
                         hasGroups = true;
+                    }
                 }
                 catch { }
                 if (view.AggregationsStatus == "On")
