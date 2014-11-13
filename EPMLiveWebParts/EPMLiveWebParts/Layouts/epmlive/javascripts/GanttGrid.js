@@ -220,7 +220,7 @@ function GridSearch(gridid, searchfield, searchvalue, searchtype) {
     if (!grid) {
         EPM.UI.Loader.current().startLoading({ id: 'WebPart' + eval("mygrid" + gridid + ".Qualifier") });
         eval("mygrid" + gridid + ".Searcher='&searchfield=" + searchfield + "&searchvalue=" + escape(searchvalue) + "&searchtype=" + searchtype + "'");
-        TreeGrid({ Data: { Url: GetWebUrl() + "/_layouts/epmlive/getganttitems.aspx?data=" + eval("mygrid" + gridid + ".Params") + eval("mygrid" + gridid + ".Searcher") }, SuppressMessage: 2, Debug: "" }, "griddiv" + gridid);
+        TreeGrid({ Data: { Url: GetWebUrl() + "/_layouts/epmlive/getganttitems.aspx?data=" + eval("mygrid" + gridid + ".Params") + eval("mygrid" + gridid + ".Searcher") }, Export: { Url: GetWebUrl() + '/_layouts/15/epmlive/getgriditemsexport.aspx' }, SuppressMessage: 2, Debug: "" }, "griddiv" + gridid);
     }
     else {
         var grid = Grids["GanttGrid" + gridid];
@@ -674,7 +674,7 @@ function LoadGrid(gridid) {
 
     EPM.UI.Loader.current().startLoading({ id: 'WebPart' + eval("mygrid" + gridid + ".Qualifier") });
 
-    TreeGrid({ Data: { Url: gUrl }, SuppressMessage: 3, Debug: "" }, "griddiv" + gridid);
+    TreeGrid({ Data: { Url: gUrl }, Export: { Url: GetWebUrl() + '/_layouts/15/epmlive/getgriditemsexport.aspx' }, SuppressMessage: 3, Debug: "" }, "griddiv" + gridid);
 
 }
 

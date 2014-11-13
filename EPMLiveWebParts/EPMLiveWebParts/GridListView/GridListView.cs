@@ -1368,6 +1368,11 @@ namespace EPMLiveWebParts
             ribbonExtensions.LoadXml("<Button Id=\"Ribbon.List.Share.RefreshItems\" Sequence=\"1\" Command=\"RefreshItems\"  Image32by32=\"/_layouts/epmlive/images/refresh.png\" LabelText=\"Refresh Items\" ToolTipTitle=\"Refresh Items\" ToolTipDescription=\"Refresh all items in grid.\" TemplateAlias=\"o1\"/>");
             ribbon.RegisterDataExtension(ribbonExtensions.FirstChild, "Ribbon.List.Actions.Controls._children");
 
+            //=====================Export to Excel
+            ribbonExtensions = new XmlDocument();
+            ribbonExtensions.LoadXml(@"<Button Id=""Ribbon.List.Share.ExportToExcel"" Sequence=""3"" Command=""ExportToExcel"" LabelText=""Export To Excel"" TemplateAlias=""o1"" ToolTipTitle=""Export to Excel"" ToolTipDescription=""Analyze items in this list using Microsoft Excel."" Image16by16=""/_layouts/epmlive/images/ribbon/export-excel16.png"" Image32by32=""/_layouts/15/1033/images/formatmap32x32.png?rev=23"" Image32by32Top=""-239"" Image32by32Left=""-307""/>");
+            ribbon.RegisterDataExtension(ribbonExtensions.FirstChild, "Ribbon.List.Actions.Controls._children");
+
             //=====================PFE Import Export
             string epklists = EPMLiveCore.CoreFunctions.getConfigSetting(SPContext.Current.Web, "epklists");
             if (epklists.Contains(list.Title))

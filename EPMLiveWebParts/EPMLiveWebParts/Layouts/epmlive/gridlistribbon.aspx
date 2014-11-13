@@ -178,6 +178,7 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
 
         Array.add($arr, 'RefreshItems');
         Array.add($arr, 'PFEImportCostsData');
+        Array.add($arr, 'ExportToExcel');
 
         Array.add($arr, 'ConnectToClient');
 
@@ -454,6 +455,7 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
             case "ShowFilters":
             case "RefreshItems":
             case "PFEImportCostsData":
+            case "ExportToExcel":
             case "EPMLiveAnalyzeGroup":
             case "LPlannerPE":
             case "ListEPMLiveEditPE":
@@ -493,6 +495,12 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
     },
 
     handleCommand: function ContextualTabWebPart_CustomPageComponent$handleCommand(commandId, properties, sequence) {
+        
+        try
+		{			
+			$("a[id*='ExportToSpreadsheet']").hide();
+		}		
+		catch(err){}
 
         if(commandId == 'CreateView')
         {
@@ -1241,6 +1249,22 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
             var options = { url: $v_H, showMaximized: false, showClose: false };
             SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
         }
+        else if(commandId === 'ExportToExcel')
+        {              
+			var newdiv = document.createElement('div');
+			newdiv.setAttribute('id','exportOptionDiv');
+			var sb = new Sys.StringBuilder();        
+			sb.append('Choose below Options for Export <br /><br/>');
+			sb.append('<input type=\'radio\' name=\'ExportOption\' id=\'rbdsp\' checked=\'true\'/> Export All the Items <br /><br />');
+			sb.append('<input type=\'radio\' name=\'ExportOption\' id=\'rbdtg\'/> Export Current Items <br /><br />');        
+			sb.append('<input type=\'button\' value=\'OK\' onclick=\'SP.UI.ModalDialog.commonModalDialogClose(SP.UI.DialogResult.OK,document.getElementById(\"rbdsp\").checked + \"|\" + document.getElementById(\"rbdtg\").checked); return false;\' class=\'ms-ButtonHeightWidth\' style=\'width:100px\' target=\'_self\' /> &nbsp;');
+			sb.append('<input type=\'button\' value=\'Cancel\' onclick=\'SP.UI.ModalDialog.commonModalDialogClose(SP.UI.DialogResult.cancel); return false;\' class=\'ms-ButtonHeightWidth\' style=\'width:100px\' target=\'_self\' /> ');
+			newdiv.innerHTML = sb.toString();
+            
+			curGrid = this.$Grid;
+            var options = { html:newdiv,width: 400, height: 150,title: "Export to Excel", showMaximized: false, showClose: true,dialogReturnValueCallback: this.onExportExcelClose};            
+			SP.UI.ModalDialog.showModalDialog(options);
+        }
         else if(commandId === 'EPKCostView')
         {
             if(this.$Grid._gridMode != 'cost')
@@ -1423,7 +1447,26 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
         }
     },
 
-
+    onExportExcelClose: function (result,args){		
+	if(result == SP.UI.DialogResult.OK) {
+		var vals = args.split("|");
+		if(vals[0] == "true"){		 
+			if(curGrid._rolluplists != "")
+            {
+                EnsureSSImporter();
+                location.href= this.$curWebUrl + '/_layouts/epmlive/rollupexport.aspx?List=' + curGrid._listid + '&View=' + curGrid._viewid + "&Lists=" + curGrid._rolluplists;
+            }
+            else
+            {
+                EnsureSSImporter();
+                ExportList(curGrid._excell);
+            }
+		}
+		else{
+			Grids["GanttGrid" + curGrid._gridid].ActionExport(); 			
+		    }		
+	    }	
+    },
     
     gridactioncallback: function(dialogResult, returnValue)
 	{
