@@ -1869,7 +1869,7 @@ function registerEpmLiveResourceGridScript() {
 
                         var reports = $$.reports.collection;
                         var reportsColl = [];
-                        var queryString;
+                        var queryString = '';
                         for (var r in reports) {
                             var report = reports[r];                            
 
@@ -1891,12 +1891,11 @@ function registerEpmLiveResourceGridScript() {
                                         {
                                             'eventName': 'click',
                                             'function': function (event) {
+                                                queryString = '';
                                                 if (event.target.innerHTML == "Resource Work vs. Capacity") {
 
                                                     var grid = $$.grid.grids[$$.id()];
                                                     var selRows = grid.GetSelRows();
-
-                                                    queryString = '';
 
                                                     //if ($$.reports.collection[reportId].hasResourcesParam) {
                                                     for (var j = 0; j < selRows.length; j++) {
