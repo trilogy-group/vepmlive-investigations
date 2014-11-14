@@ -184,6 +184,7 @@ namespace EPMLiveCore
                                 }
 
                                 bool bLookup = false;
+                                bool bcontaintoday = false;
                                 SPFieldType fieldType = SPFieldType.Text;
 
                                 switch (oField.Type)
@@ -199,9 +200,14 @@ namespace EPMLiveCore
                                         break;
                                     case SPFieldType.DateTime:
                                         {
-                                            // Converting value to ShortDate string from LongDate string
-                                            // because SharePoint also does not consider the time part in view filter settings so ignoring it
-                                            val = DateTime.Parse(val).ToString("d");
+                                            //Initially the code developed use to check the dates based on Like operator also regardless of  sign and offset set through sharepoint
+                                            //Corrected the code so that it works with sign and  offsetdays like [Today]-1 or [Today]-20 accordingly
+                                            if (string.IsNullOrEmpty(val)
+                                                && nd.SelectSingleNode("Value").InnerXml.Contains("Today"))
+                                            {
+                                                val = nd.SelectSingleNode("Value").InnerXml;
+                                                bcontaintoday = true;
+                                            }
                                         }
                                         break;
                                     case SPFieldType.Lookup:
@@ -239,9 +245,24 @@ namespace EPMLiveCore
                                 {
                                     val = web.CurrentUser.ID.ToString();
                                 }
-                                if (val.ToLower() == "[today]")
+                                if (val.Contains("Today") && bcontaintoday == true)
                                 {
-                                    val = DateTime.Now.ToString("s");
+                                    if (val.ToLower() == "[today]" || val.ToLower() == "<today />")
+                                    {
+                                        val = DateTime.Now.ToString("s");
+                                    }
+                                    else
+                                    {
+                                        try
+                                        {
+                                            Double offsetdays = Convert.ToDouble(nd.SelectSingleNode("//Value/Today").Attributes[0].Value);
+                                            val = DateTime.Now.AddDays(offsetdays).ToString("s");
+                                        }
+                                        catch
+                                        {
+                                            val = DateTime.Now.ToString("s");
+                                        }
+                                    }
                                 }
 
                                 if (nd.Name == "BeginsWith")
@@ -274,9 +295,8 @@ namespace EPMLiveCore
                                     }
                                     else if (oField.Type.Equals(SPFieldType.DateTime))
                                     {
-                                        // Need to use like operator to match only the date part 
-                                        // and ignore time part from db column value same as SharePoint does.
-                                        return field + " LIKE '%'+" + " convert(varchar(10), convert(datetime,'" + val + "',101)) " + "+'%'";
+                                        // Need to use actual sign operator to match only the date part 
+                                        return "CONVERT(nvarchar, " + field + ", 101) " + sign + " CONVERT(nvarchar, CONVERT(DateTime, '" + val + "'), 101)";
                                     }
                                     else
                                     {
