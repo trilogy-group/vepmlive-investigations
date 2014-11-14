@@ -308,6 +308,7 @@ namespace EPMLiveWebParts
                 {
                     if (!f.Hidden && f.Type != SPFieldType.Computed)
                     {
+                        f.Title = System.Web.HttpUtility.UrlEncode(f.Title).Replace("+", "%20");
                         cFields += "," + f.Title + "|" + f.InternalName + "|" + f.Type.ToString();
                     }
                 }
@@ -325,6 +326,7 @@ namespace EPMLiveWebParts
                     {
                         if (!f.Hidden && f.Type != SPFieldType.Computed)
                         {
+                            f.Title = System.Web.HttpUtility.UrlEncode(f.Title).Replace("+", "%20");
                             oFields += "," + f.Title + "|" + f.InternalName + "|" + f.Type.ToString();
                         }
                     }

@@ -50,7 +50,8 @@
 	function newOpt(text, val, sel)
 	{
 		var elOptNew = document.createElement('option');
-        elOptNew.text = text;
+		var str = decodeURIComponent(text);
+        elOptNew.text = str;
         elOptNew.value = val;
 		elOptNew.selected = sel;
 		return elOptNew;
