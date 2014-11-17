@@ -2997,6 +2997,7 @@ function GetCssClass(grid, row, col, classname) {
     if (grid.id == "WorkPlannerGrid") {
         if (col == "Title") {
             var val1 = grid.GetValue(row, col);
+            val1 = val1.toString().trim();
             if (val1 == "") {
                 return "erroroncell";
             }
@@ -3008,6 +3009,7 @@ function GetToolTip(grid, row, col, tip, clientx, clienty, x, y) {
     if (grid.id == "WorkPlannerGrid") {
         if (col == "Title") {
             var val1 = grid.GetValue(row, col);
+            val1 = val1.toString().trim();
             if (val1 == "") {
                 return "Please enter title!";
             }
