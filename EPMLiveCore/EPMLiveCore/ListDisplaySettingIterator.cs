@@ -761,7 +761,7 @@ namespace EPMLiveCore
                         writer.WriteLine("<script language=\"javascript\">");
                         writer.WriteLine("function checkSpecialCharacters(objectName,object){");
                         writer.WriteLine("var checkPattern = /[\\|\\\\\"\'\\/\\[\\]\\:\\<\\>\\+\\=\\,\\;\\?\\*\\@]/");
-                        writer.WriteLine("if(checkPattern.test(object.value)) { alert(objectName + ' cannot contain any of the following characters ' + '| \\ \" \\' / [ ] : < > + = , ; ? * @'); object.value = ''; setTimeout(function(){object.focus();}, 1); }");
+                        writer.WriteLine("if(checkPattern.test(object.value)) { alert(objectName + ' cannot contain any of the following characters ' + '| \\\\ \" \\' / [ ] : < > + = , ; ? * @'); object.value = ''; setTimeout(function(){object.focus();}, 1); }");
                         writer.WriteLine("}");
                         writer.WriteLine("function cleanupfields(){");
                         try
