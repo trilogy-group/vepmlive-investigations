@@ -9,6 +9,7 @@ using System.Reflection;
 using System.Text;
 using System.Web.UI.WebControls;
 using System.Data;
+using EPMLiveCore.API;
 
 namespace EPMLiveCore.Layouts.epmlive
 {
@@ -31,7 +32,6 @@ namespace EPMLiveCore.Layouts.epmlive
 
         protected void Page_Load(object sender, EventArgs e)
         {
-
             SPWeb web = SPContext.Current.Web;
             string resUrl = "";
             web.Site.CatchAccessDeniedException = false;
@@ -51,14 +51,46 @@ namespace EPMLiveCore.Layouts.epmlive
             SPListItem oLi = null;
             SPList oList = null;
             bool bUseTeam = false;
+
+            Guid listid = Guid.Empty;
+            int itemid = 0;
+
             try
             {
-                oList = web.Lists[new Guid(Request["listid"])];
-                oLi = oList.GetItemById(int.Parse(Request["id"]));
+                listid = new Guid(Request["listid"]);
+                itemid = int.Parse(Request["id"]);
+
+                oList = web.Lists[listid];
+                oLi = oList.GetItemById(itemid);
                 GridGanttSettings gSettings = new GridGanttSettings(oList);
                 bUseTeam = gSettings.BuildTeam;
             }
-            catch { }
+            catch (Exception)
+            {
+                try
+                {
+                    APITeam.VerifyProjectTeamWorkspace(web, out itemid, out listid);
+                    if (itemid > 0 && listid != Guid.Empty)
+                    {
+                        try
+                        {
+                            while (!web.IsRootWeb) //Inherit | Open
+                            {
+                                if (web.IsRootWeb)
+                                    break;
+                                web = web.ParentWeb;
+                            }
+
+                            oList = web.Lists[listid];
+                            GridGanttSettings gSettings = ListCommands.GetGridGanttSettings(oList);
+                            bUseTeam = gSettings.BuildTeam;
+                            oLi = oList.GetItemById(itemid);
+                        }
+                        catch { }
+                    }
+                }
+                catch { }
+            }
 
             if (bUseTeam)
             {
@@ -69,8 +101,8 @@ namespace EPMLiveCore.Layouts.epmlive
                     {
                         using (SPWeb tWeb = tSite.OpenWeb(web.ID))
                         {
-                            SPList tList = tWeb.Lists[new Guid(Request["listid"])];
-                            SPListItem tLi = tList.GetItemById(int.Parse(Request["id"]));
+                            SPList tList = tWeb.Lists[listid];
+                            SPListItem tLi = tList.GetItemById(itemid);
                             web.Site.CatchAccessDeniedException = false;
 
                             foreach (SPRoleAssignment assn in tLi.RoleAssignments)
@@ -112,10 +144,6 @@ namespace EPMLiveCore.Layouts.epmlive
                     }
                 }
             }
-
-
-
-
 
             if (web.Features[new Guid("84520a2b-8e2b-4ada-8f48-60b138923d01")] == null && !bUseTeam)
             {
@@ -164,12 +192,16 @@ namespace EPMLiveCore.Layouts.epmlive
                             bCanEditTeam = "true";
                         }
 
-                        XmlAttribute attr = doc.CreateAttribute("ListId");
-                        attr.Value = Request["listid"];
+                        XmlAttribute attr = doc.CreateAttribute("WebId");
+                        attr.Value = Convert.ToString(web.ID);
+                        doc.FirstChild.Attributes.Append(attr);
+
+                        attr = doc.CreateAttribute("ListId");
+                        attr.Value = Convert.ToString(listid);
                         doc.FirstChild.Attributes.Append(attr);
 
                         attr = doc.CreateAttribute("ItemId");
-                        attr.Value = Request["id"];
+                        attr.Value = Convert.ToString(itemid);
                         doc.FirstChild.Attributes.Append(attr);
 
                     }
@@ -228,8 +260,6 @@ namespace EPMLiveCore.Layouts.epmlive
                     sClose = "location.href='" + Request["Source"] + "'";
                 }
             }
-
-
         }
 
         protected override void OnPreRender(EventArgs e)

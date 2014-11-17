@@ -559,8 +559,9 @@ namespace EPMLiveCore.API
             ResourceGrid.ClearCache(oWeb);
             XmlDocument docOut = new XmlDocument();
             docOut.LoadXml("<Team/>");
-
+            bool bUseTeam = false;
             int teamMemberCount = 0;
+
             try
             {
                 string modifiedUsers = "";
@@ -582,10 +583,33 @@ namespace EPMLiveCore.API
                 }
                 catch { }
 
+                try
+                {
+                    if (listid == Guid.Empty && itemid == 0)
+                    {
+                        APITeam.VerifyProjectTeamWorkspace(oWeb, out itemid, out listid);
+                        if (itemid > 0 && listid != Guid.Empty)
+                        {
+                            try
+                            {
+                                while (!oWeb.IsRootWeb) //Inherit | Open
+                                {
+                                    if (oWeb.IsRootWeb)
+                                        break;
+                                    oWeb = oWeb.ParentWeb;
+                                }
+
+                                SPList list = oWeb.Lists[listid];
+                                GridGanttSettings gSettings = ListCommands.GetGridGanttSettings(list);
+                                bUseTeam = gSettings.BuildTeam;
+                            }
+                            catch { }
+                        }
+                    }
+                }
+                catch { }
 
                 oWeb.AllowUnsafeUpdates = true;
-
-                bool bUseTeam = false;
 
                 if (listid != Guid.Empty)
                 {
@@ -597,7 +621,6 @@ namespace EPMLiveCore.API
 
                 if (listid != Guid.Empty && bUseTeam)
                 {
-
                     SPList list = oWeb.Lists[listid];
                     SPListItem li = list.GetItemById(itemid);
 
@@ -646,8 +669,6 @@ namespace EPMLiveCore.API
                             }
                             catch { }
                         }
-
-
                     }
 
                     ArrayList arrDelete = new ArrayList();
@@ -910,22 +931,22 @@ namespace EPMLiveCore.API
                                 }
                                 else
                                 {
-                                try
-                                {
-                                    tempuser = group.Users.GetByID(uv.LookupId);
-                                }
-                                catch { }
-                                if (tempuser == null && arr.Contains(group.ID.ToString()))
-                                {
-                                    group.AddUser(uv.User);
-                                }
-                                if (tempuser != null && !arr.Contains(group.ID.ToString()) && bIsTeamSecurityEnabled)
-                                {
-                                    group.RemoveUser(uv.User);
+                                    try
+                                    {
+                                        tempuser = group.Users.GetByID(uv.LookupId);
+                                    }
+                                    catch { }
+                                    if (tempuser == null && arr.Contains(group.ID.ToString()))
+                                    {
+                                        group.AddUser(uv.User);
+                                    }
+                                    if (tempuser != null && !arr.Contains(group.ID.ToString()) && bIsTeamSecurityEnabled)
+                                    {
+                                        group.RemoveUser(uv.User);
+                                    }
                                 }
                             }
                         }
-                    }
                     }
                     catch { }
                 }
@@ -1108,28 +1129,52 @@ namespace EPMLiveCore.API
 
                 if (webid != Guid.Empty)
                 {
-                    using (SPWeb web = oWeb.Site.OpenWeb(webid))
+                    SPWeb web = oWeb.Site.OpenWeb(webid);
+
+                    if (listid != Guid.Empty)
                     {
-                        if (listid != Guid.Empty)
-                        {
-                            SPList list = web.Lists[listid];
-                            GridGanttSettings gSettings = ListCommands.GetGridGanttSettings(list);
-                            bUseTeam = gSettings.BuildTeam;
-                        }
+                        SPList list = web.Lists[listid];
+                        GridGanttSettings gSettings = ListCommands.GetGridGanttSettings(list);
+                        bUseTeam = gSettings.BuildTeam;
+                    }
 
+                    try
+                    {
+                        if (listid == Guid.Empty && itemid == 0)
+                        {
+                            APITeam.VerifyProjectTeamWorkspace(web, out itemid, out listid);
+                            if (itemid > 0 && listid != Guid.Empty)
+                            {
+                                try
+                                {
+                                    while (!web.IsRootWeb) //Inherit | Open
+                                    {
+                                        if (web.IsRootWeb)
+                                            break;
+                                        web = web.ParentWeb;
+                                    }
 
-                        if (currentteam != null)
-                        {
-                            doc = GetTeamFromCurrent(web, filterfield, filterval, columns, currentteam);
+                                    SPList list = web.Lists[listid];
+                                    GridGanttSettings gSettings = ListCommands.GetGridGanttSettings(list);
+                                    bUseTeam = gSettings.BuildTeam;
+                                }
+                                catch { }
+                            }
                         }
-                        else if (listid != Guid.Empty && bUseTeam)
-                        {
-                            doc = GetTeamFromListItem(web, filterfield, filterval, columns, listid, itemid);
-                        }
-                        else
-                        {
-                            doc = GetTeamFromWeb(web, filterfield, filterval, columns);
-                        }
+                    }
+                    catch { }
+
+                    if (currentteam != null)
+                    {
+                        doc = GetTeamFromCurrent(web, filterfield, filterval, columns, currentteam);
+                    }
+                    else if (listid != Guid.Empty && bUseTeam)
+                    {
+                        doc = GetTeamFromListItem(web, filterfield, filterval, columns, listid, itemid);
+                    }
+                    else
+                    {
+                        doc = GetTeamFromWeb(web, filterfield, filterval, columns);
                     }
                 }
                 else
@@ -1666,114 +1711,134 @@ namespace EPMLiveCore.API
             {
                 using (SPSite tSite = new SPSite(oWeb.Site.ID))
                 {
-                    using (SPWeb tWeb = tSite.OpenWeb(oWeb.ID))
+                    SPWeb tWeb = tSite.OpenWeb(oWeb.ID);
+                    Guid listid = Guid.Empty;
+                    int itemid = 0;
+                    GridGanttSettings gSettings = null;
+                    SPList oList = null;
+                    SPListItem oLi = null;
+
+                    if (!string.IsNullOrEmpty(xml))
                     {
+                        XmlDocument InputDoc = new XmlDocument();
+                        InputDoc.LoadXml(xml);
 
-
-
-                        Guid listid = Guid.Empty;
-                        int itemid = 0;
-                        GridGanttSettings gSettings = null;
-                        SPList oList = null;
-                        SPListItem oLi = null;
-
-                        if (!string.IsNullOrEmpty(xml))
+                        try
                         {
-                            XmlDocument InputDoc = new XmlDocument();
-                            InputDoc.LoadXml(xml);
-
-                            try
-                            {
-                                listid = new Guid(InputDoc.FirstChild.Attributes["ListId"].Value);
-                                oList = tWeb.Lists[listid];
-                                gSettings = new GridGanttSettings(oList);
-                                bIsTeamSecurityEnabled = gSettings.BuildTeamSecurity;
-                            }
-                            catch { }
-                            try
-                            {
-                                itemid = int.Parse(InputDoc.FirstChild.Attributes["ItemId"].Value);
-                                oLi = oList.GetItemById(itemid);
-                            }
-                            catch { }
+                            listid = new Guid(InputDoc.FirstChild.Attributes["ListId"].Value);
+                            oList = tWeb.Lists[listid];
+                            gSettings = new GridGanttSettings(oList);
+                            bIsTeamSecurityEnabled = gSettings.BuildTeamSecurity;
                         }
+                        catch { }
+                        try
+                        {
+                            itemid = int.Parse(InputDoc.FirstChild.Attributes["ItemId"].Value);
+                            oLi = oList.GetItemById(itemid);
+                        }
+                        catch { }
+                    }
+
+                    try
+                    {
+                        if (oList == null && oLi == null)
+                        {
+                            APITeam.VerifyProjectTeamWorkspace(tWeb, out itemid, out listid);
+                            if (itemid > 0 && listid != Guid.Empty)
+                            {
+                                try
+                                {
+                                    while (!tWeb.IsRootWeb) //Inherit | Open
+                                    {
+                                        if (tWeb.IsRootWeb)
+                                            break;
+                                        tWeb = tWeb.ParentWeb;
+                                    }
+
+                                    oList = tWeb.Lists[listid];
+                                    gSettings = new GridGanttSettings(oList);
+                                    bIsTeamSecurityEnabled = gSettings.BuildTeamSecurity;
+                                    oLi = oList.GetItemById(itemid);
+                                }
+                                catch { }
+                            }
+                        }
+                    }
+                    catch { }
+
+                    XmlNode ndRightCols = doc.SelectSingleNode("//Cols");
+                    XmlNode ndHeader = doc.SelectSingleNode("//Header");
+
+                    XmlNode ndNew = doc.CreateNode(XmlNodeType.Element, "C", doc.NamespaceURI);
+                    XmlAttribute attr = doc.CreateAttribute("Name");
+                    attr.Value = "Permissions";
+                    ndNew.Attributes.Append(attr);
 
 
+                    attr = doc.CreateAttribute("Type");
+                    attr.Value = "Enum";
+                    ndNew.Attributes.Append(attr);
 
+                    attr = doc.CreateAttribute("Range");
+                    attr.Value = "1";
+                    ndNew.Attributes.Append(attr);
 
-                        XmlNode ndRightCols = doc.SelectSingleNode("//Cols");
-                        XmlNode ndHeader = doc.SelectSingleNode("//Header");
+                    //attr = doc.CreateAttribute("RelWidth");
+                    //attr.Value = "1";
+                    //ndNew.Attributes.Append(attr);
 
-                        XmlNode ndNew = doc.CreateNode(XmlNodeType.Element, "C", doc.NamespaceURI);
-                        XmlAttribute attr = doc.CreateAttribute("Name");
-                        attr.Value = "Permissions";
-                        ndNew.Attributes.Append(attr);
+                    attr = doc.CreateAttribute("Width");
+                    attr.Value = "150";
+                    ndNew.Attributes.Append(attr);
 
-
-                        attr = doc.CreateAttribute("Type");
-                        attr.Value = "Enum";
-                        ndNew.Attributes.Append(attr);
-
-                        attr = doc.CreateAttribute("Range");
+                    attr = doc.CreateAttribute("Visible");
+                    if (listid == null || listid == Guid.Empty)
                         attr.Value = "1";
-                        ndNew.Attributes.Append(attr);
+                    else
+                        attr.Value = bIsTeamSecurityEnabled ? "1" : "0";
+                    ndNew.Attributes.Append(attr);
 
-                        //attr = doc.CreateAttribute("RelWidth");
-                        //attr.Value = "1";
-                        //ndNew.Attributes.Append(attr);
+                    attr = doc.CreateAttribute("CanHide");
+                    attr.Value = "0";
+                    ndNew.Attributes.Append(attr);
 
-                        attr = doc.CreateAttribute("Width");
-                        attr.Value = "150";
-                        ndNew.Attributes.Append(attr);
+                    attr = doc.CreateAttribute("IconAlign");
+                    attr.Value = "Right";
+                    ndNew.Attributes.Append(attr);
 
-                        attr = doc.CreateAttribute("Visible");
-                        if (listid == null || listid == Guid.Empty)
-                            attr.Value = "1";
-                        else
-                            attr.Value = bIsTeamSecurityEnabled ? "1" : "0";
-                        ndNew.Attributes.Append(attr);
+                    XmlNode nd = doc.SelectSingleNode("//C[@Name='Photo']");
+                    if (nd != null)
+                    {
+                        nd.Attributes["Visible"].Value = "1";
+                    }
 
-                        attr = doc.CreateAttribute("CanHide");
-                        attr.Value = "0";
-                        ndNew.Attributes.Append(attr);
+                    nd = doc.SelectSingleNode("//C[@Name='Role']");
+                    if (nd != null)
+                    {
+                        nd.Attributes["Visible"].Value = "1";
+                    }
 
-                        attr = doc.CreateAttribute("IconAlign");
-                        attr.Value = "Right";
-                        ndNew.Attributes.Append(attr);
+                    nd = doc.SelectSingleNode("//C[@Name='Email']");
+                    if (nd != null)
+                    {
+                        nd.Attributes["Visible"].Value = "1";
+                    }
 
-                        XmlNode nd = doc.SelectSingleNode("//C[@Name='Photo']");
-                        if (nd != null)
+                    string enums = "";
+                    string enumkeys = "";
+                    List<string> idArrays = new List<string>();
+                    List<string> lookupsSecurityGroups = new List<string>();
+
+                    //Get second level permissions: find lookups that has security enabled
+                    if (oLi != null && oLi.HasUniqueRoleAssignments)
+                    {
+                        EnhancedLookupConfigValuesHelper valueHelper = null;
+                        string lookupSettings = gSettings.Lookups;
+                        //string rawValue = "Region^dropdown^none^none^xxx|State^autocomplete^Region^Region^xxx|City^autocomplete^State^State^xxx";                    
+                        valueHelper = new EnhancedLookupConfigValuesHelper(lookupSettings);
+
+                        if (valueHelper != null)
                         {
-                            nd.Attributes["Visible"].Value = "1";
-                        }
-
-                        nd = doc.SelectSingleNode("//C[@Name='Role']");
-                        if (nd != null)
-                        {
-                            nd.Attributes["Visible"].Value = "1";
-                        }
-
-                        nd = doc.SelectSingleNode("//C[@Name='Email']");
-                        if (nd != null)
-                        {
-                            nd.Attributes["Visible"].Value = "1";
-                        }
-
-                        string enums = "";
-                        string enumkeys = "";
-                        List<string> idArrays = new List<string>();
-                        List<string> lookupsSecurityGroups = new List<string>();
-
-                        //Get second level permissions: find lookups that has security enabled
-                        if (oLi != null && oLi.HasUniqueRoleAssignments)
-                        {
-                            EnhancedLookupConfigValuesHelper valueHelper = null;
-                            string lookupSettings = gSettings.Lookups;
-                            //string rawValue = "Region^dropdown^none^none^xxx|State^autocomplete^Region^Region^xxx|City^autocomplete^State^State^xxx";                    
-                            valueHelper = new EnhancedLookupConfigValuesHelper(lookupSettings);
-
-                            if (valueHelper != null)
-                            {
                             List<string> fields = valueHelper.GetSecuredFields();
 
                             // has security fields
@@ -1791,7 +1856,7 @@ namespace EPMLiveCore.API
                                     if (lookup == null) continue;
 
                                     SPList lookupParentList = tWeb.Lists[new Guid(lookup.LookupList)];
-                                        GridGanttSettings parentListSettings = new GridGanttSettings(lookupParentList);
+                                    GridGanttSettings parentListSettings = new GridGanttSettings(lookupParentList);
 
                                     // skip fields with empty lookup values
                                     string securityFieldValue = string.Empty;
@@ -1801,91 +1866,90 @@ namespace EPMLiveCore.API
 
                                     if (string.IsNullOrEmpty(securityFieldValue)) continue;
 
-                                        SPFieldLookupValue lookupVal = new SPFieldLookupValue(securityFieldValue.ToString());
+                                    SPFieldLookupValue lookupVal = new SPFieldLookupValue(securityFieldValue.ToString());
                                     SPListItem parentListItem = lookupParentList.GetItemById(lookupVal.LookupId);
 
                                     if (!parentListItem.HasUniqueRoleAssignments) continue;
 
                                     SPRoleAssignmentCollection raCol = parentListItem.RoleAssignments;
 
-                                        foreach (SPRoleAssignment ra in raCol)
-                                            lookupsSecurityGroups.Add(ra.Member.Name);
-                                    }
+                                    foreach (SPRoleAssignment ra in raCol)
+                                        lookupsSecurityGroups.Add(ra.Member.Name);
                                 }
                             }
                         }
-
-                        if (gSettings != null && gSettings.BuildTeam && oLi != null && oLi.HasUniqueRoleAssignments)
-                        {
-                            string[] permissionsString = gSettings.BuildTeamPermissions.Split('|');
-                            for (int i = 0; i < permissionsString.Length; i++)
-                            {
-                                if (i % 2 == 0)
-                                {
-                                    string[] strIds = permissionsString[i].Split('~');
-                                    for (int j = 0; j < strIds.Length; j++)
-                                    {
-                                        if (j % 2 == 0)
-                                        {
-                                            idArrays.Add(strIds[j]);
-                                        }
-                                    }
-                                }
-                            }
-
-                            foreach (SPRoleAssignment assn in oLi.RoleAssignments)
-                            {
-                                if (assn.Member.GetType() == typeof(Microsoft.SharePoint.SPGroup))
-                                {
-                                    SPGroup group = (SPGroup)assn.Member;
-
-                                    if (group.CanCurrentUserEditMembership)
-                                    {
-                                        if (!idArrays.Contains(Convert.ToString(group.ID)))
-                                        {
-                                            if (lookupsSecurityGroups != null && lookupsSecurityGroups.Contains(group.Name))
-                                            {
-                                                continue;
-                                            }
-                                            else
-                                            {
-                                                enums += "|" + group.Name;
-                                                enumkeys += "|" + group.ID;
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        else //Manage Web Team Security
-                        {
-                            if (listid == null || listid == Guid.Empty)
-                            {
-                                foreach (SPGroup group in from SPGroup spGroup in tWeb.Groups
-                                                          let roles = spGroup.Roles
-                                                          let canUse = roles.Cast<SPRole>().Any(role => role.PermissionMask != (SPRights)134287360)
-                                                          where spGroup.CanCurrentUserEditMembership && canUse
-                                                          select spGroup)
-                                {
-                                    if (group.CanCurrentUserEditMembership)
-                                    {
-                                        enums += "|" + group.Name;
-                                        enumkeys += "|" + group.ID;
-                                    }
-                                }
-                            }
-                        }
-
-                        attr = doc.CreateAttribute("Enum");
-                        attr.Value = enums;
-                        ndNew.Attributes.Append(attr);
-
-                        attr = doc.CreateAttribute("EnumKeys");
-                        attr.Value = enumkeys;
-                        ndNew.Attributes.Append(attr);
-
-                        ndRightCols.AppendChild(ndNew);
                     }
+
+                    if (gSettings != null && gSettings.BuildTeam && oLi != null && oLi.HasUniqueRoleAssignments)
+                    {
+                        string[] permissionsString = gSettings.BuildTeamPermissions.Split('|');
+                        for (int i = 0; i < permissionsString.Length; i++)
+                        {
+                            if (i % 2 == 0)
+                            {
+                                string[] strIds = permissionsString[i].Split('~');
+                                for (int j = 0; j < strIds.Length; j++)
+                                {
+                                    if (j % 2 == 0)
+                                    {
+                                        idArrays.Add(strIds[j]);
+                                    }
+                                }
+                            }
+                        }
+
+                        foreach (SPRoleAssignment assn in oLi.RoleAssignments)
+                        {
+                            if (assn.Member.GetType() == typeof(Microsoft.SharePoint.SPGroup))
+                            {
+                                SPGroup group = (SPGroup)assn.Member;
+
+                                if (group.CanCurrentUserEditMembership)
+                                {
+                                    if (!idArrays.Contains(Convert.ToString(group.ID)))
+                                    {
+                                        if (lookupsSecurityGroups != null && lookupsSecurityGroups.Contains(group.Name))
+                                        {
+                                            continue;
+                                        }
+                                        else
+                                        {
+                                            enums += "|" + group.Name;
+                                            enumkeys += "|" + group.ID;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    else //Manage Web Team Security
+                    {
+                        if (listid == null || listid == Guid.Empty)
+                        {
+                            foreach (SPGroup group in from SPGroup spGroup in tWeb.Groups
+                                                      let roles = spGroup.Roles
+                                                      let canUse = roles.Cast<SPRole>().Any(role => role.PermissionMask != (SPRights)134287360)
+                                                      where spGroup.CanCurrentUserEditMembership && canUse
+                                                      select spGroup)
+                            {
+                                if (group.CanCurrentUserEditMembership)
+                                {
+                                    enums += "|" + group.Name;
+                                    enumkeys += "|" + group.ID;
+                                }
+                            }
+                        }
+                    }
+
+                    attr = doc.CreateAttribute("Enum");
+                    attr.Value = enums;
+                    ndNew.Attributes.Append(attr);
+
+                    attr = doc.CreateAttribute("EnumKeys");
+                    attr.Value = enumkeys;
+                    ndNew.Attributes.Append(attr);
+
+                    ndRightCols.AppendChild(ndNew);
                 }
             });
 
@@ -2146,6 +2210,30 @@ namespace EPMLiveCore.API
             }
 
             return spGroups;
+        }
+
+        public static void VerifyProjectTeamWorkspace(SPWeb web, out int itemId, out Guid listId)
+        {
+            itemId = 0;
+            listId = Guid.Empty;
+
+            try
+            {
+                EPMLiveReportsAdmin.EPMData data = new EPMLiveReportsAdmin.EPMData(web.Site.ID);
+
+                SqlConnection cn = data.GetClientReportingConnection;
+                SqlCommand cmd = new SqlCommand("SELECT ItemId, ItemListId, WebId FROM RPTWeb WHERE WebId = '" + web.ID.ToString() + "'", cn);
+                DataSet ds = new DataSet();
+                SqlDataAdapter da = new SqlDataAdapter(cmd);
+                da.Fill(ds);
+
+                if (ds != null && ds.Tables[0].Rows.Count > 0)
+                {
+                    itemId = Convert.ToInt32(ds.Tables[0].Rows[0][0]);
+                    listId = new Guid(Convert.ToString(ds.Tables[0].Rows[0][1]));
+                }
+            }
+            catch { }
         }
 
         private const string WEB_GROUPS_QUERY =
