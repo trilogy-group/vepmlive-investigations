@@ -767,6 +767,7 @@ function ReloadGridWithNewParams(gridid) {
 
     var dataurl = eval("DataUrl" + gridid);
     Grids["GanttGrid" + gridid].Data.Data.Url = dataurl + '&Page=' + eval("mygrid" + gridid + ".CurPage") + "&Cols=" + eval("mygrid" + gridid + ".Cols") + "&GB=" + eval("mygrid" + gridid + ".Groups") + "&NP=" + eval("mygrid" + gridid + ".NoPage") + eval("mygrid" + gridid + ".Searcher");
+    Grids["GanttGrid" + gridid].Data.Export.Url = GetWebUrl() + '/_layouts/15/epmlive/getgriditemsexport.aspx';
 
     Grids["GanttGrid" + gridid].Reload();
 
@@ -799,4 +800,25 @@ function GanttScrollTo(gridid) {
 
 function GridOnMouseOutRow(grid, row, col, event) {
     grid.SetAttribute(row, "Title", "ButtonText", ' ', 1);
+}
+
+Grids.OnGetExportValue = function (grid, row, col, str) {
+    var val = getHTML(grid, row, col, grid.GetValue(row, col));
+    if (val)
+        return str + val;
+}
+
+function getHTML(grid, row, col, val) {
+    if (row.Kind == "Data") {
+        if (col != "Title") {
+            try {
+                if (grid.GetValue(row, col).indexOf('<img') == 0) {
+                    var colimg = grid.GetValue(row, col);
+                    var splcolimg = colimg.split("/")[colimg.split("/").length - 1];
+                    val = splcolimg.split('"')[0];
+                }
+                return val;
+            } catch (e) { }
+        }
+    }
 }
