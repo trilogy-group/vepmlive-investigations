@@ -3169,12 +3169,30 @@ var MyWorkGrid = {
 
             success: function (response) {
                 if (response.d) {
-                    var responseJson = $$$.parseJson(response.d);
+                    try {
+                        var responseJson = $$$.parseJson(response.d);
+                        var result = responseJson.Result;
 
-                    var result = responseJson.Result;
+                        var fromDate = responseJson["Result"].Personalizations["@FromDate"];
+                        var toDate = responseJson["Result"].Personalizations["@ToDate"];
+                        nonCompleteQuery = nonCompleteQuery.replace(/apos;/g, "'").replace(/quot;/g, '"').replace(/gt;/g, '>').replace(/lt;/g, '<').replace(/&amp;/g, '');
 
-                    if (!$$$.responseIsSuccess(result)) {
-                        $$$.logFailure(result);
+                        var oldfromDate = $(nonCompleteQuery).find("DateRange").attr("From");
+                        var oldtoDate = $(nonCompleteQuery).find("DateRange").attr("To");
+                        nonCompleteQuery = nonCompleteQuery.replace(oldfromDate, fromDate).replace(oldtoDate, toDate);
+
+                        var grid = Grids[MyWorkGrid.gridId];
+                        var source = grid.Source;
+                        source.Data.Param.Dataxml = nonCompleteQuery;
+                        source.Layout.Param.Dataxml = nonCompleteQuery;
+                        grid.Reload(source, null, false);
+
+                        if (!$$$.responseIsSuccess(result)) {
+                            $$$.logFailure(result);
+                        }
+                    }
+                    catch (ex) {
+                        location.reload();
                     }
                 } else {
                     $$$.log('response.d: ' + response.d);
