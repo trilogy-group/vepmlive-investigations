@@ -32,7 +32,8 @@ namespace WorkEnginePPM.Events.DataSync
             try
             {
                 this.EventFiringEnabled = false;
-                properties.AfterProperties["DueDate"] = System.Convert.ToDateTime(properties.AfterProperties["DueDate"]).AddDays(1).ToString("yyyy-MM-ddTHH:mm:ssZ");
+                if (!string.IsNullOrEmpty(Convert.ToString(properties.AfterProperties["DueDate"])))
+                    properties.AfterProperties["DueDate"] = System.Convert.ToDateTime(properties.AfterProperties["DueDate"]).AddDays(1).ToString("yyyy-MM-ddTHH:mm:ssZ");
                 this.EventFiringEnabled = true;
             }
             catch (Exception exception)
@@ -82,6 +83,7 @@ namespace WorkEnginePPM.Events.DataSync
             try
             {
                 this.EventFiringEnabled = false;
+                if (!string.IsNullOrEmpty(Convert.ToString(properties.AfterProperties["DueDate"])))
                 properties.AfterProperties["DueDate"] = System.Convert.ToDateTime(properties.AfterProperties["DueDate"]).AddDays(1).ToString("yyyy-MM-ddTHH:mm:ssZ");
                 this.EventFiringEnabled = true;
             }
