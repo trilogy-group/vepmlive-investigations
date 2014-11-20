@@ -756,7 +756,7 @@ namespace EPMLiveWebParts
 
                 if ((System.Web.HttpUtility.UrlDecode(Request["source"]) != null
                     && System.Web.HttpUtility.UrlDecode(Request["source"]).Equals(Request["source"]))
-                    || Request["source"].ToLower().Contains("fd_item_"))
+                    || (!string.IsNullOrEmpty(Request["source"]) && Request["source"].ToLower().Contains("fd_item_")))
                 {
                     source = System.Web.HttpUtility.UrlEncode(Request["source"]);
                 }
