@@ -19,7 +19,7 @@ namespace EPMLiveCore.API
     {
         static bool bIsTeamSecurityEnabled = false;
 
-        private static DataTable getResources(SPWeb web, string filterfield, string filtervalue, bool hasPerms, ArrayList arrColumns, SPListItem liItem, XmlNodeList nodeTeam = null)
+        private static DataTable getResources(SPWeb web, string filterfield, string filtervalue, bool hasPerms, ArrayList arrColumns, SPListItem liItem)
         {
 
             SPList list = web.Lists[CoreFunctions.getConfigSetting(web, "EPMLiveResourcePool")];
@@ -108,7 +108,7 @@ namespace EPMLiveCore.API
                         }
                     }
 
-                    dt = iGetResourceFromRPT(cn, list, dt, web, filterfield, filtervalue, blookup, hasPerms, arrColumns, liItem, nodeTeam);
+                    dt = iGetResourceFromRPT(cn, list, dt, web, filterfield, filtervalue, blookup, hasPerms, arrColumns, liItem);
                 }
                 else
                     dt = iGetResourcesFromlist(list, dt, web, filterfield, filtervalue, hasPerms, arrColumns, liItem);
@@ -123,7 +123,7 @@ namespace EPMLiveCore.API
             return dt;
         }
 
-        private static DataTable iGetResourceFromRPT(SqlConnection cn, SPList list, DataTable dt, SPWeb web, string filterfield, string filtervalue, bool filterIsLookup, bool hasPerms, ArrayList arrColumns, SPListItem liItem, XmlNodeList nodeTeam)
+        private static DataTable iGetResourceFromRPT(SqlConnection cn, SPList list, DataTable dt, SPWeb web, string filterfield, string filtervalue, bool filterIsLookup, bool hasPerms, ArrayList arrColumns, SPListItem liItem)
         {
             SPList userInfoList = web.SiteUserInfoList;
 
@@ -172,19 +172,6 @@ namespace EPMLiveCore.API
                             liItemSPGroups.Add(string.Format("{0}-{1}", group.ID, user.ID), user.ID);
                         }
                     }
-                }
-            }
-            else if (nodeTeam != null && nodeTeam.Count > 0)
-            {
-                foreach (XmlNode node in nodeTeam)
-                {
-                    iDs = node.Attributes["ID"].Value + "," + iDs;
-                }
-                if (iDs != "")
-                {
-                    filterOnID = "ID in (###)";
-                    iDs = iDs.Substring(0, iDs.Length - 1);
-                    filterOnID = filterOnID.Replace("###", iDs);
                 }
             }
 
@@ -649,7 +636,7 @@ namespace EPMLiveCore.API
                     DataTable dtResourcePool = null;
                     SPSecurity.RunWithElevatedPrivileges(delegate()
                     {
-                        dtResourcePool = GetResourcePool(sdoc, oWeb, docTeam.SelectNodes("//Team/Member"));
+                        dtResourcePool = GetResourcePool(sdoc, oWeb);
                     });
 
                     ArrayList arrUsers = new ArrayList();
@@ -719,7 +706,7 @@ namespace EPMLiveCore.API
                     DataTable dtResourcePool = null;
                     SPSecurity.RunWithElevatedPrivileges(delegate()
                     {
-                        dtResourcePool = GetResourcePool(sdoc, oWeb, docTeam.SelectNodes("//Team/Member"));
+                        dtResourcePool = GetResourcePool(sdoc, oWeb);
                     });
 
                     foreach (XmlNode nd in docTeam.SelectNodes("//Team/Member"))
@@ -2109,7 +2096,7 @@ namespace EPMLiveCore.API
             return writer.ToString();
         }
 
-        public static DataTable GetResourcePool(string xml, SPWeb oWeb, XmlNodeList nodeTeam = null)
+        public static DataTable GetResourcePool(string xml, SPWeb oWeb)
         {
             string resUrl = "";
 
@@ -2172,7 +2159,7 @@ namespace EPMLiveCore.API
                     rsite.CatchAccessDeniedException = false;
                     using (SPWeb rweb = rsite.OpenWeb())
                     {
-                        dt = getResources(rweb, filterfield, filterval, true, arrColumns, null, nodeTeam);
+                        dt = getResources(rweb, filterfield, filterval, true, arrColumns, null);
                     }
                 }
             }
@@ -2186,7 +2173,7 @@ namespace EPMLiveCore.API
                         {
                             using (SPWeb rweb = rsite.OpenWeb())
                             {
-                                dt = getResources(rweb, filterfield, filterval, false, arrColumns, null, nodeTeam);
+                                dt = getResources(rweb, filterfield, filterval, false, arrColumns, null);
                             }
                         }
                     });
