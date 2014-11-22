@@ -62,10 +62,12 @@
     window.epmLive.currentListViewTitle = '<%= ListViewTitle %>';
     window.epmLive.currentListViewUrl = '<%= ListViewUrl %>';
     window.epmLive.currentFileIsNull = '<%= CurrentFileIsNull %>';
-    window.epmLive.currentFileTitle = '<%=CurrentFileTitle %>';
+    window.epmLive.currentFileTitle = '<%= CurrentFileTitle %>';
     window.epmLive.currentItemID = '<%= ItemId %>';
     window.epmLive.currentItemTitle = '<%= ItemTitle %>';
     window.epmLive.currentUserId = '<%= CurrentUserId %>';
+    window.epmLive.currentUserLoginName = '<%= CurrentUserLoginName %>';
+    window.epmLive.currentUserName = '<%= CurrentUserName %>';
     window.epmLive.currentUrl = '<%= CurrentUrl %>';
     window.epmLive.fileVersion = '<%= EPMLiveVersion %>';
     window.epmLive.debugMode = <%= DebugMode.ToString().ToLower() %>;

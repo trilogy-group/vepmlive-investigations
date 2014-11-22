@@ -7,9 +7,10 @@ namespace EPMLiveCore.CONTROLTEMPLATES
 {
     public partial class EPMLiveJSV2 : UserControl
     {
-        #region Fields (4) 
+        #region Fields (5) 
 
         protected string Scheme;
+        protected string UplandInsightId;
         protected string WalkMeId;
         protected string WebUrl;
         private SPWeb _spWeb;
@@ -61,6 +62,12 @@ namespace EPMLiveCore.CONTROLTEMPLATES
             try
             {
                 WalkMeId = CoreFunctions.getConfigSetting(_spWeb, "EPMLiveWalkMeId");
+            }
+            catch { }
+
+            try
+            {
+                UplandInsightId = CoreFunctions.getConfigSetting(_spWeb.Site.RootWeb, "UplandInsightId");
             }
             catch { }
 

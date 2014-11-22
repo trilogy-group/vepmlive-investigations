@@ -11,12 +11,14 @@ namespace EPMLiveCore.CONTROLTEMPLATES
 {
     public partial class EPMLiveHead : UserControl
     {
-        #region Fields (17)
+        #region Fields (19)
 
         protected string CurrentFileIsNull;
         protected string CurrentFileTitle;
         protected string CurrentUrl;
         protected string CurrentUserId;
+        protected string CurrentUserLoginName;
+        protected string CurrentUserName;
         protected string ItemId;
         protected string ItemTitle;
         protected string ListIconClass;
@@ -162,6 +164,20 @@ namespace EPMLiveCore.CONTROLTEMPLATES
             try
             {
                 CurrentUserId = _spWeb.CurrentUser.ID.ToString(CultureInfo.InvariantCulture);
+            }
+            catch { }
+
+            CurrentUserLoginName = string.Empty;
+            try
+            {
+                CurrentUserLoginName = _spWeb.CurrentUser.LoginName;
+            }
+            catch { }
+
+            CurrentUserName = string.Empty;
+            try
+            {
+                CurrentUserName = _spWeb.CurrentUser.Name;
             }
             catch { }
 
