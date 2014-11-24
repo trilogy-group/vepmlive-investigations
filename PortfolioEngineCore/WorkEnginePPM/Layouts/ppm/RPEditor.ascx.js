@@ -6,6 +6,7 @@
             Grids.OnAfterSave = GridsOnAfterSaveDelegate;
             Grids.OnFocus = GridsOnFocusDelegate;
             Grids.OnReady = GridsOnReadyDelegate;
+            Grids.OnRenderPageFinish = OnRenderPageFinishDelegate;
             Grids.OnRenderFinish = GridsOnRenderFinishDelegate;
             Grids.OnScroll = GridsOnScrollDelegate;
             Grids.OnSectionResize = GridsOnSectionResizeDelegate;
@@ -1443,6 +1444,16 @@
     RPEditor.prototype.GridsOnFocus = function (grid, row, col, orow, ocol, pagepos) {
         this.SetCurrentRow(grid, row);
     };
+    RPEditor.prototype.OnRenderPageFinish = function (grid, start) {
+        try {
+            if (grid.id == "g_Res") {
+                setTimeout(function () { rPEditorInstance.RefreshResourcePeriodsPaged(true, start); }, 100);
+            }
+        }
+        catch (e) {
+            this.HandleException("OnRenderPageFinish", e);
+        }
+    };
     RPEditor.prototype.GridsOnReady = function (grid, start) {
         try {
             if (grid.id == "g_RPE") {
@@ -1499,7 +1510,7 @@
                     this.ApplyGridView(grid.id, selectedView, false);
                 this.ShowHidePeriods(grid);
                 this.ShowSelectedResourceGroup();
-                this.RefreshResourcePeriods(true);
+                this.RefreshResourcePeriodsBasic(true);
                 this.viewTab.refreshSelect("idViewTab_FromPeriod");
                 window.setTimeout(thisID + ".HandleAction('OnStart')", 100);
                 window.setTimeout(function () { var gridRPE = Grids["g_RPE"]; gridRPE.Focus(gridRPE.GetFirst(null, 0), "ItemName"); }, 10);
@@ -4929,6 +4940,27 @@
             resgrid.RenderBody();
         resgrid.Calculate(1, 0);
     };
+    RPEditor.prototype.RefreshResourcePeriodsBasic = function (bCalculate) {
+        if (this.initialized == true)
+            resgrid.RenderBody();
+    };
+    RPEditor.prototype.RefreshResourcePeriodsPaged = function (bCalculate, start) {
+        var resgrid = Grids["g_Res"];
+        var pageNum = resgrid.GetPageNum(start);
+        if (rPEditorInstance.fTECalculatedPage[pageNum] === true) return;
+        var row = start.firstChild;
+        var rowlast = start.lastChild;
+        while (row != null) {
+            if (bCalculate == true) {
+                rPEditorInstance.CalculateResourceRowCommitted(null, row);
+            } else {
+                rPEditorInstance.RefreshResourceRowPeriods(resgrid, row, false);
+            }
+            row = row.nextSibling;
+        }
+        resgrid.Calculate(1, 0);
+        rPEditorInstance.fTECalculatedPage[pageNum] = true;
+    };
     RPEditor.prototype.CalculateResourceRowCommitted = function (resuid, resrow) {
         if (resuid == null)
             resuid = Grids["g_Res"].GetAttribute(resrow, null, "Res_UID");
@@ -5751,6 +5783,7 @@
         plangrid.RefreshRow(planrow);
     };
     try {
+        var rPEditorInstance = this;
         this.thisID = thisID;
         this.params = params;
         var const_PlanCell = "a";
@@ -5785,6 +5818,7 @@
         this.displayMode = 0;
         this.costCategoryRoles = null;
         this.ccrFTEArray = null;
+        this.fTECalculatedPage = [];
         this.ccrolesArray = null;
         this.plangrid = null;
         this.resgrid = null;
@@ -5836,6 +5870,7 @@
         var GridsOnValueChangedDelegate = MakeDelegate(this, this.GridsOnValueChanged);
         var GridsOnFocusDelegate = MakeDelegate(this, this.GridsOnFocus);
         var GridsOnReadyDelegate = MakeDelegate(this, this.GridsOnReady);
+        var OnRenderPageFinishDelegate = MakeDelegate(this, this.OnRenderPageFinish);
         var GridsOnRenderFinishDelegate = MakeDelegate(this, this.GridsOnRenderFinish);
         var GridsOnScrollDelegate = MakeDelegate(this, this.GridsOnScroll);
         var GridsOnSectionResizeDelegate = MakeDelegate(this, this.GridsOnSectionResize);

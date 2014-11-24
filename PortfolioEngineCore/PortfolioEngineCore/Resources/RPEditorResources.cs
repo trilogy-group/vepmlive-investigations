@@ -68,6 +68,8 @@ namespace PortfolioEngineCore
             //xCfg.CreateIntAttr("StaticCursor", 1); // If set to 1, grid does not delete cursor when it loses focus   after click outside grid.
             xCfg.CreateIntAttr("FocusWholeRow", 1);
             xCfg.CreateIntAttr("Paging", 2);
+            //xCfg.CreateIntAttr("PageLength", 10);
+            //xCfg.CreateIntAttr("MaxPages", 5);
             xCfg.CreateIntAttr("NoPager", 1);
             xCfg.CreateIntAttr("AllPages", 1);
 
@@ -247,8 +249,21 @@ namespace PortfolioEngineCore
 
             CStruct xCalendar = xPlanResources.GetSubStruct("Calendar");
             CStruct xPeriods = xCalendar.GetSubStruct("Periods");
-
+                       
             List<CStruct> listPeriods = xPeriods.GetList("Period");
+
+            if (listPeriods != null)
+            {
+                if (listPeriods.Count > 370)
+                {
+                    xCfg.CreateIntAttr("PageLength", 10);
+                }
+                else
+                {
+                    xCfg.CreateIntAttr("PageLength", 50);
+                }
+            }
+
             foreach (CStruct xPeriod in listPeriods)
             {
                 CStruct xPeriodCols = xRightCols;
