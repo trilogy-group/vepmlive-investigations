@@ -3148,12 +3148,26 @@ var MyWorkGrid = {
 
         if (action === 'ago') {
             wf.daysAgoEnabled = value;
+            if (wf.daysAgoEnabled == false) {
+                wf.daysAgo = "";
+                $(document.getElementById('Ribbon_MyWork_WorkFilter_DueAgoDays')).val("");
+            }
         } else if (action === 'after') {
             wf.daysAfterEnabled = value;
+            if (wf.daysAgoEnabled == false) {
+                wf.daysAfter = "";
+                $(document.getElementById('Ribbon_MyWork_WorkFilter_DueAfterDays')).val("");
+            }
         } else if (action === 'agodays') {
             wf.daysAgo = value;
+            if (wf.daysAgo == '') {
+                wf.daysAgoEnabled = false;
+            }
         } else if (action === 'afterdays') {
             wf.daysAfter = value;
+            if (wf.daysAfter == '') {
+                wf.daysAfterEnabled = false;
+            }
         }
 
         var $$$ = window.epmLive;
@@ -3171,24 +3185,30 @@ var MyWorkGrid = {
                 if (response.d) {
                     try {
                         var responseJson = $$$.parseJson(response.d);
+
                         var result = responseJson.Result;
-
-                        var fromDate = responseJson["Result"].Personalizations["@FromDate"];
-                        var toDate = responseJson["Result"].Personalizations["@ToDate"];
-                        nonCompleteQuery = nonCompleteQuery.replace(/apos;/g, "'").replace(/quot;/g, '"').replace(/gt;/g, '>').replace(/lt;/g, '<').replace(/&amp;/g, '');
-
-                        var oldfromDate = $(nonCompleteQuery).find("DateRange").attr("From");
-                        var oldtoDate = $(nonCompleteQuery).find("DateRange").attr("To");
-                        nonCompleteQuery = nonCompleteQuery.replace(oldfromDate, fromDate).replace(oldtoDate, toDate);
-
-                        var grid = Grids[MyWorkGrid.gridId];
-                        var source = grid.Source;
-                        source.Data.Param.Dataxml = nonCompleteQuery;
-                        source.Layout.Param.Dataxml = nonCompleteQuery;
-                        grid.Reload(source, null, false);
 
                         if (!$$$.responseIsSuccess(result)) {
                             $$$.logFailure(result);
+                        }
+
+                        if (!(action == 'ago' && value == true && $(document.getElementById('Ribbon_MyWork_WorkFilter_DueAgoDays')).val() == '') &&
+                            !(action == 'after' && value == true && $(document.getElementById('Ribbon_MyWork_WorkFilter_DueAfterDays')).val() == '')) {
+                            var fromDate = responseJson["Result"].Personalizations["@FromDate"];
+                            var toDate = responseJson["Result"].Personalizations["@ToDate"];
+
+                            var query = nonCompleteQuery.replace(/apos;/g, "'").replace(/quot;/g, '"').replace(/gt;/g, '>').replace(/lt;/g, '<').replace(/&amp;/g, '');
+
+                            var oldfromDate = $(query).find("DateRange").attr("From");
+                            var oldtoDate = $(query).find("DateRange").attr("To");
+
+                            nonCompleteQuery = nonCompleteQuery.replace(oldfromDate, fromDate).replace(oldtoDate, toDate);
+
+                            var grid = Grids[MyWorkGrid.gridId];
+                            var source = grid.Source;
+                            source.Data.Param.Dataxml = nonCompleteQuery;
+                            source.Layout.Param.Dataxml = nonCompleteQuery;
+                            grid.Reload(source, null, false);
                         }
                     }
                     catch (ex) {

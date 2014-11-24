@@ -81,7 +81,7 @@ namespace EPMLiveCore.API
                 var parameters = new Dictionary<string, object>();
                 GetParameters(data, parameters, true);
                 bool DaysAgoEnabled;
-                int DaysAgo;
+                int DaysAgo;                              
                 bool DaysAfterEnabled;
                 int DaysAfter;
                 string query;
@@ -116,27 +116,35 @@ namespace EPMLiveCore.API
                 if (parameters["@Value"] != null)
                 {
                     string[] paramArray = parameters["@Value"].ToString().Split('|');
+
                     DaysAgoEnabled = Convert.ToBoolean(paramArray[0]);
-                    DaysAgo = Convert.ToInt32(paramArray[1]);
                     DaysAfterEnabled = Convert.ToBoolean(paramArray[2]);
-                    DaysAfter = Convert.ToInt32(paramArray[3]);
 
                     var from = new DateTime(1900, 1, 1, 0, 0, 0);
                     var to = new DateTime(9998, 12, 31, 23, 59, 59);
                     DateTime today = DateTime.Now.Date;
 
-                    if (DaysAgoEnabled)
+                    if(paramArray[1] != "")
                     {
-                        from = today.AddDays(-DaysAgo);
+                        DaysAgo = Convert.ToInt32(paramArray[1]);
+                        if (DaysAgoEnabled)
+                        {
+                            from = today.AddDays(-DaysAgo);
+                        }
                     }
 
-                    if (DaysAfterEnabled)
+                    if (paramArray[3] != "")
                     {
-                        to = today.AddDays(DaysAfter).AddHours(23).AddMinutes(59).AddSeconds(59);
+                        DaysAfter = Convert.ToInt32(paramArray[3]);
+                        if (DaysAfterEnabled)
+                        {
+                            to = today.AddDays(DaysAfter).AddHours(23).AddMinutes(59).AddSeconds(59);
+                        }
                     }
 
                     resultXml.Add(new XAttribute("FromDate", from.ToString("yyyy-MM-dd HH:mm:ss")));
                     resultXml.Add(new XAttribute("ToDate", to.ToString("yyyy-MM-dd HH:mm:ss")));
+                    
                 }
 
                 return resultXml.ToString();
