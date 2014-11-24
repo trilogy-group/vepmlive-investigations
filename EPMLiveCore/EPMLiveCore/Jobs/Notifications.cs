@@ -42,7 +42,7 @@ namespace EPMLiveCore.Jobs
         private string sSubject = "EPM Live: Task Status Report";
         private string sNote = "The following items are assigned to you in EPM Live."; // default
         private bool bShowGreeting = false;
-        private bool bLockNotify = true;
+        //private bool bLockNotify = true;
         private string sMainURL = "";
         private bool bLogDetailedErrors = true;
         private ErrorLogDetailLevelEnum iErrorLogDetailLevel = ErrorLogDetailLevelEnum.SectionLevelErrors; // default at section level
@@ -138,14 +138,7 @@ namespace EPMLiveCore.Jobs
                                 sNote = web.Properties["EPMLiveNotificationNote"];
                             }
 
-                            if (web.Properties.ContainsKey("EPMLiveNotificationLock"))
-                            {
-                                if (web.Properties["EPMLiveNotificationLock"].ToUpper() == "TRUE")
-                                    bLockNotify = true;
-                                else
-                                    bLockNotify = false;
-                            }
-
+                            //-- EPML 1901
                             if (web.Properties.ContainsKey("EPMLiveLogDetailedErrors"))
                             {
                                 if (web.Properties["EPMLiveLogDetailedErrors"].ToUpper() == "TRUE")
@@ -156,36 +149,63 @@ namespace EPMLiveCore.Jobs
 
                             if (sFromEmail != "")
                             {
-
-                                bool allusers = false;
-                                try
+                                StringBuilder sNotificationUserList = new StringBuilder(string.Empty);
+                                
+                                //Loop through all site users
+                                foreach (SPUser siteUser in site.RootWeb.SiteUsers)
                                 {
-                                    allusers = bool.Parse(web.Properties["EPMLiveNotificationAllUsers"]);
-                                }
-                                catch { }
-
-                                if (allusers)
-                                {
-                                    totalCount = web.SiteUsers.Count;
-                                    float processedUsers = 0;
-                                    foreach (SPUser u in web.SiteUsers)
+                                    if (siteUser.Name.ToLower() != "system account")
                                     {
-                                        processUser(u, web, u.ID, sNotificationLists);
-
-                                        updateProgress(processedUsers++);
+                                        bool bFound = false;
+                                        //Get all OptedOut users
+                                        string sOptedOutUsers = web.Properties["EPMLiveNotificationOptedOutUsers"];
+                                        if (sOptedOutUsers != null && sOptedOutUsers.Trim() != string.Empty)
+                                        {
+                                            string[] arrOptedOutUsers = sOptedOutUsers.Split('|');
+                                            bFound = false; 
+                                            foreach (string sUser in arrOptedOutUsers)
+                                            {
+                                                if (sUser.Trim().Length > 0)
+                                                {
+                                                    string[] sUserIDNameSplit = sUser.Replace("#", "").Split(';');
+                                                    try
+                                                    {
+                                                        if (siteUser.ID.ToString().Trim() == sUserIDNameSplit[0].Trim())
+                                                        {
+                                                            bFound = true;
+                                                            break;
+                                                        }
+                                                    }
+                                                    catch (Exception ex)
+                                                    {
+                                                        throw ex; //TODO anything else to do here??
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        //If the Site user is NOT present in the OptedOut list then send notification to the user
+                                        if (!bFound)
+                                        {
+                                            //sNotificationOptedOutUsers += li.Value + ";#" + li.Text + "|";
+                                            sNotificationUserList.Append(siteUser.ID.ToString());
+                                            sNotificationUserList.Append(";#");
+                                            sNotificationUserList.Append((siteUser.Email != string.Empty) ? siteUser.Name + " (" + siteUser.Email + ")" : siteUser.Name);
+                                            sNotificationUserList.Append("|");
+                                        }
                                     }
                                 }
-                                else
-                                {
-                                    string sSignedUsers = web.Properties["EPMLiveNotificationUsers"];
-                                    if (sSignedUsers != null && sSignedUsers.Trim() != "")
+
+                                //Process Notification
+                                //try
+                                //{
+                                    float processedUsers = 0;
+                                    //Get all users to send notification                                    
+                                    if (sNotificationUserList != null)
                                     {
-                                        string[] arrSignedUsers = sSignedUsers.Split('|');
+                                        string[] arrNotificationUsers = sNotificationUserList.ToString().Split('|');
+                                        totalCount = arrNotificationUsers.Length;
 
-                                        totalCount = arrSignedUsers.Length;
-                                        float processedUsers = 0;
-
-                                        foreach (string sUser in arrSignedUsers)
+                                        foreach (string sUser in arrNotificationUsers)
                                         {
                                             if (sUser != null && sUser.Trim().Length > 0)
                                             {
@@ -193,15 +213,15 @@ namespace EPMLiveCore.Jobs
                                                 {
                                                     // tables are created. fill with data
                                                     SPFieldLookupValue lv = new SPFieldLookupValue(sUser);
-                                                    SPUser u = null;
+                                                    SPUser spUser = null;
                                                     try
                                                     {
-                                                        u = web.AllUsers.GetByID(lv.LookupId);
+                                                        spUser = web.AllUsers.GetByID(lv.LookupId);
                                                     }
                                                     catch { }
-                                                    if (u != null)
+                                                    if (spUser != null)
                                                     {
-                                                        processUser(u, web, lv.LookupId, sNotificationLists);
+                                                        processUser(spUser, web, lv.LookupId, sNotificationLists);
                                                     }
                                                     updateProgress(processedUsers++);
                                                 }
@@ -211,19 +231,19 @@ namespace EPMLiveCore.Jobs
                                                 }
                                             }
                                         }
+
                                     }
-                                }
+                                //}
+                                //catch (Exception exc)
+                                //{
+                                    //logException("NotificationListsJob.ExecuteJob", exc.Message, "User: " + siteUser.ID.ToString() + siteUser.Name);
+                                //}
+
+                                //-- End EPML 1901 --
                             }
                             dsSectionTables.Dispose();
                         }
                     }
-                    //if (web.Properties.ContainsKey("epmlivenotificationlastrun"))
-                    //    web.Properties["epmlivenotificationlastrun"] = DateTime.Now.ToString();
-                    //else
-                    //    web.Properties.Add("epmlivenotificationlastrun", DateTime.Now.ToString());
-                    //web.Properties.Update();
-
-
                 }
                 catch (Exception exc)
                 {
@@ -324,11 +344,11 @@ namespace EPMLiveCore.Jobs
             // write the tables
             convertDataToHTML();
 
-            if (!bLockNotify)
-            {
+            //if (!bLockNotify)
+            //{
                 // write the msg footer
                 htmlWriter.Write("<div style=\"border-top:1px solid #eee;margin-top:40px;text-align:center;font-family:Segoe UI, Helvetica,Arial;color:#CBD7D7;font-size:12px;display:inline-block;width:100%;padding-bottom:40px;\"><br /><p style=\"padding:0px;margin:0px;\">You are receiving this email because this email address is assigned work within an EPM Live system. <br>Click <a href=\"" + sMainURL + "/_layouts/epmlive/notifications.aspx\" style=\"text-decoration:none;color:#CBD7D7;\">here</a> if you want to unsubscribe from this email.</p></div>");
-            }
+            //}
 
             return System.Web.HttpUtility.HtmlDecode(stringWriter.ToString());
         }

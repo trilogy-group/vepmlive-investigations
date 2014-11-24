@@ -1,4 +1,4 @@
-﻿<%@ Assembly Name="$SharePoint.Project.AssemblyFullName$" %>
+﻿<%@ Assembly Name="EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5" %>
 <%@ Import Namespace="Microsoft.SharePoint.ApplicationPages" %>
 <%@ Register Tagprefix="SharePoint" Namespace="Microsoft.SharePoint.WebControls" Assembly="Microsoft.SharePoint, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
 <%@ Register Tagprefix="Utilities" Namespace="Microsoft.SharePoint.Utilities" Assembly="Microsoft.SharePoint, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
@@ -33,7 +33,7 @@
     <script language="javascript" >
 
 
-        function alluserchange(val) {
+        /*function alluserchange(val) {
             if (val == null)
                 return;
             if (val.checked) {
@@ -48,7 +48,7 @@
                 document.getElementById("ctl00_PlaceHolderMain_InputFormSection6_InputFormControl10_btnAdd").disabled = "";
                 document.getElementById("ctl00_PlaceHolderMain_InputFormSection6_InputFormControl10_btnRemove").disabled = "";
             }
-        }
+        }*/
 
         function getWidth() {
             var winW = 800;
@@ -267,52 +267,24 @@
             </tr>
         </table>
         <table class="ms-toolbar" width="100%" cellpadding="3" style="height:20px">
-            <tr><td class="ms-linksectionheader"><h3 class="ms-standardheader">User Settings</h3></td></tr>
+            <tr><td class="ms-linksectionheader"><h3 class="ms-standardheader">User Notifications</h3></td></tr>
         </table>
         <table border="0" cellpadding="0" cellspacing="0" width="100%">
             <tr>
                 <td>
 	                <asp:Panel ID="pnlUserSettings" runat="server">
-	                <wssuc:InputFormSection ID="InputFormSection5" Title="Notification Lock:"
-		                Description=""
-		                runat="server">
+	                <wssuc:InputFormSection ID="InputFormSection6" Description="" runat="server">
 		                <Template_Description>
-		                    If you want to prevent your team members from controlling their own notifications, check the box to the right.
+		                    By default, all members of this site will receive email notifications unless they personally opt-out within their settings or an Admin opts them out by moving them to the “opt-out” list on the far right. 
 		                </Template_Description>
 		                <Template_InputFormControls>
-			                <wssuc:InputFormControl ID="InputFormControl8" LabelText="Lock Notifications:" runat="server" width="460">
-				                 <Template_Control>
-		                            <table border="0" width="460">
-		                                <tr>
-		                                    <td class="ms-authoringcontrols" colspan="3" >
-		                                    <asp:CheckBox ID="chkLockNotify" runat="server" />
-		                                    </td>
-		                                </tr>
-		                            </table>
-				                 </Template_Control>
-			                </wssuc:InputFormControl>
-		                </Template_InputFormControls>
-	                </wssuc:InputFormSection>
-
-	                <wssuc:InputFormSection ID="InputFormSection6" Title="Users:"
-		                Description=""
-		                runat="server">
-		                <Template_Description>
-		                    To sign users up for notifications, select the users in the left box and click add.
-		                </Template_Description>
-		                <Template_InputFormControls>
-		                    <wssuc:InputFormControl ID="InputFormControl9" LabelText="Send to all users:" runat="server" width="460">
-				                 <Template_Control>
-				                    <asp:CheckBox runat="server" ID="chkAllUsers" onclick="javascript:alluserchange(this);" />
-				                 </Template_Control>
-				            </wssuc:InputFormControl>
 			                <wssuc:InputFormControl ID="InputFormControl10" LabelText="Select Users:" runat="server" width="460">
 				                 <Template_Control>
 		                            <table border="0" width="460">
 		                                <tr>
 		                                    <td class="ms-authoringcontrols">
-		                                        Users in site collection:<br />
-		                                        <asp:ListBox runat="server" Rows="10" ID="lstSiteUsers" Width="250" SelectionMode="Multiple">
+		                                        Users receiving notifications:<br />
+		                                        <asp:ListBox runat="server" Rows="10" ID="lstNotificationOptInUsers" Width="250" SelectionMode="Multiple">
 		                                        </asp:ListBox>
 		                                    </td>
 		                                    <td align="center">
@@ -321,8 +293,8 @@
                                                 <asp:Button ID="btnRemove" Text="&lt; Remove" runat="server" OnClick="btnRemove_Click"/>
 		                                    </td>
 		                                    <td class="ms-authoringcontrols">
-		                                        Users signed up for notifications:<br />
-		                                        <asp:ListBox runat="server" Rows="10" ID="lstNotificationUsers" Width="250" SelectionMode="Multiple">
+		                                        Users opted out of notifications:<br />
+		                                        <asp:ListBox runat="server" Rows="10" ID="lstNotificationOptedOutUsers" Width="250" SelectionMode="Multiple">
 		                                        </asp:ListBox>
 		                                    </td>
 		                                </tr>
@@ -435,7 +407,7 @@
         </table>
    </asp:Panel> 
    <script language="javascript">
-       alluserchange(document.getElementById("ctl00_PlaceHolderMain_InputFormSection6_InputFormControl9_chkAllUsers"));
+       //alluserchange(document.getElementById("ctl00_PlaceHolderMain_InputFormSection6_InputFormControl9_chkAllUsers"));
        initmb();
    </script>
 </asp:Content>

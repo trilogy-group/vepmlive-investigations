@@ -51,7 +51,7 @@
 	<wssuc:ButtonSection runat="server">
 		<Template_Buttons>
 			<asp:PlaceHolder ID="PlaceHolder1" runat="server">
-				<asp:Button UseSubmitBehavior="false" runat="server" class="ms-ButtonHeightWidth" OnClick="Button1_Click" Text="Save Notifications" id="Button1" accesskey="" Width="150"/>
+				<asp:Button UseSubmitBehavior="false" runat="server" class="ms-ButtonHeightWidth" OnClick="btnSaveNotification_Click" Text="Save Notifications" id="btnSaveNotification" accesskey="" Width="150"/>
 			</asp:PlaceHolder>
 		</Template_Buttons>
 	</wssuc:ButtonSection>

@@ -55,33 +55,21 @@ namespace EPMLiveCore
                                 site.CatchAccessDeniedException = false;
                                 using (SPWeb currWeb = site.OpenWeb())
                                 {
-                                    string sNotificationUsers = "";
-                                    if (currWeb.Properties.ContainsKey("EPMLiveNotificationUsers"))
+                                    //-- EPML 1901
+                                    string sNotificationOptedOutUsers = "";
+                                    if (currWeb.Properties.ContainsKey("EPMLiveNotificationOptedOutUsers"))
                                     {
-                                        sNotificationUsers = currWeb.Properties["EPMLiveNotificationUsers"];
+                                        sNotificationOptedOutUsers = currWeb.Properties["EPMLiveNotificationOptedOutUsers"];
                                     }
-                                    if (sNotificationUsers.Contains(sCurrUser))
-                                    {
-                                        chkTask.Checked = true;
-                                    }
-                                    else
+                                    if (sNotificationOptedOutUsers.Contains(sCurrUser))
                                     {
                                         chkTask.Checked = false;
                                     }
-
-                                    if (currWeb.Properties.ContainsKey("EPMLiveNotificationLock"))
+                                    else
                                     {
-                                        if (currWeb.Properties["EPMLiveNotificationLock"].ToUpper() == "TRUE" || currWeb.Properties["EPMLiveNotificationAllUsers"].ToUpper() == "TRUE")
-                                            chkTask.Enabled = false;
-                                        else
-                                            chkTask.Enabled = true;
+                                        chkTask.Checked = true;
                                     }
-
-                                    if (currWeb.Properties.ContainsKey("EPMLiveNotificationAllUsers"))
-                                    {
-                                        if (currWeb.Properties["EPMLiveNotificationAllUsers"].ToUpper() == "TRUE")
-                                            chkTask.Enabled = false;
-                                    }
+                                    //--End EPML 1901
                                 }
                             }
 
@@ -100,7 +88,7 @@ namespace EPMLiveCore
             Response.Redirect("default.aspx");
         }
 
-        protected void Button1_Click(object sender, EventArgs e)
+        protected void btnSaveNotification_Click(object sender, EventArgs e)
         {
             try
             {
@@ -113,46 +101,71 @@ namespace EPMLiveCore
                         using (SPWeb currWeb = site.OpenWeb())
                         {
                             currWeb.AllowUnsafeUpdates = true;
-                            string sNotificationUsers = "";
-                            if (currWeb.Properties.ContainsKey("EPMLiveNotificationUsers"))
+
+                            //--EPML 1901 
+                            string sNotificationOptedOutUsers = string.Empty;
+                            if (currWeb.Properties.ContainsKey("EPMLiveNotificationOptedOutUsers"))
                             {
-                                sNotificationUsers = currWeb.Properties["EPMLiveNotificationUsers"];
+                                sNotificationOptedOutUsers = currWeb.Properties["EPMLiveNotificationOptedOutUsers"];
                             }
 
                             string sCurrUser = SPContext.Current.Site.RootWeb.CurrentUser.ID + ";#" + SPContext.Current.Site.RootWeb.CurrentUser.Name;
 
-                            if (chkTask.Checked == true)
+                            ArrayList arrOptedOutUsers = new ArrayList(sNotificationOptedOutUsers.Split('|'));
+                            bool found = false;
+                            foreach (string user in arrOptedOutUsers)
                             {
-                                ArrayList arrUsers = new ArrayList(sNotificationUsers.Split('|'));
-                                bool found = false;
-                                foreach (string user in arrUsers)
-                                {
-                                    string[] userinfo = user.Replace(";#", "\n").Split('\n');
-                                    if (userinfo[0] == SPContext.Current.Site.RootWeb.CurrentUser.ID.ToString())
-                                        found = true;
-                                }
-                                if (!found)
-                                    arrUsers.Add(sCurrUser);
-
-                                currWeb.Properties["EPMLiveNotificationUsers"] = String.Join("|", (string[])arrUsers.ToArray(typeof(string)));
+                                string[] userinfo = user.Replace(";#", "\n").Split('\n');
+                                if (userinfo[0] == SPContext.Current.Site.RootWeb.CurrentUser.ID.ToString())
+                                    found = true;
+                            }
+                            if (chkTask.Checked)
+                            {
+                                if (found) arrOptedOutUsers.Remove(sCurrUser);
+                                currWeb.Properties["EPMLiveNotificationOptedOutUsers"] = String.Join("|", (string[])arrOptedOutUsers.ToArray(typeof(string)));
                                 currWeb.Properties.Update();
                             }
                             else
                             {
-                                ArrayList arrUsers = new ArrayList(sNotificationUsers.Split('|'));
-                                ArrayList arrNewUsers = new ArrayList();
-                                foreach (string user in arrUsers)
-                                {
-                                    string[] userinfo = user.Replace(";#", "\n").Split('\n');
-                                    if (userinfo[0] != SPContext.Current.Site.RootWeb.CurrentUser.ID.ToString() && user != "")
-                                    {
-                                        arrNewUsers.Add(user);
-                                    }
-                                }
-
-                                currWeb.Properties["EPMLiveNotificationUsers"] = String.Join("|", (string[])arrNewUsers.ToArray(typeof(string)));
+                                if (!found) arrOptedOutUsers.Add(sCurrUser);
+                                currWeb.Properties["EPMLiveNotificationOptedOutUsers"] = String.Join("|", (string[])arrOptedOutUsers.ToArray(typeof(string)));
                                 currWeb.Properties.Update();
                             }
+
+                            //--End EPML 1901
+
+                            //if (chkTask.Checked == true)
+                            //{
+                            //    ArrayList arrUsers = new ArrayList(sNotificationUsers.Split('|'));
+                            //    bool found = false;
+                            //    foreach (string user in arrUsers)
+                            //    {
+                            //        string[] userinfo = user.Replace(";#", "\n").Split('\n');
+                            //        if (userinfo[0] == SPContext.Current.Site.RootWeb.CurrentUser.ID.ToString())
+                            //            found = true;
+                            //    }
+                            //    if (!found)
+                            //        arrUsers.Add(sCurrUser);
+
+                            //    currWeb.Properties["EPMLiveNotificationUsers"] = String.Join("|", (string[])arrUsers.ToArray(typeof(string)));
+                            //    currWeb.Properties.Update();
+                            //}
+                            //else
+                            //{
+                            //    ArrayList arrUsers = new ArrayList(sNotificationUsers.Split('|'));
+                            //    ArrayList arrNewUsers = new ArrayList();
+                            //    foreach (string user in arrUsers)
+                            //    {
+                            //        string[] userinfo = user.Replace(";#", "\n").Split('\n');
+                            //        if (userinfo[0] != SPContext.Current.Site.RootWeb.CurrentUser.ID.ToString() && user != "")
+                            //        {
+                            //            arrNewUsers.Add(user);
+                            //        }
+                            //    }
+
+                            //    currWeb.Properties["EPMLiveNotificationUsers"] = String.Join("|", (string[])arrNewUsers.ToArray(typeof(string)));
+                            //    currWeb.Properties.Update();
+                            //}
                         }
                     }
                 });
@@ -163,6 +176,11 @@ namespace EPMLiveCore
             }
 
             Response.Redirect(SPContext.Current.Web.ServerRelativeUrl);
+        }
+
+        private void UpdatePropertyBagForOptedOutUsers()
+        {
+
         }
 
         public class UserObject : IComparable

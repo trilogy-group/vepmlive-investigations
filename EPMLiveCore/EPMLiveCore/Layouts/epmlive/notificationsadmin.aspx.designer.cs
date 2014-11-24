@@ -139,24 +139,6 @@ namespace EPMLiveCore.Layouts.epmlive {
         protected global::System.Web.UI.UserControl InputFormControl7;
         
         /// <summary>
-        /// InputFormSection5 control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.UserControl InputFormSection5;
-        
-        /// <summary>
-        /// InputFormControl8 control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.UserControl InputFormControl8;
-        
-        /// <summary>
         /// InputFormSection6 control.
         /// </summary>
         /// <remarks>
@@ -166,15 +148,6 @@ namespace EPMLiveCore.Layouts.epmlive {
         protected global::System.Web.UI.UserControl InputFormSection6;
         
         /// <summary>
-        /// InputFormControl9 control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.UserControl InputFormControl9;
-        
-        /// <summary>
         /// InputFormControl10 control.
         /// </summary>
         /// <remarks>
@@ -182,6 +155,24 @@ namespace EPMLiveCore.Layouts.epmlive {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.UserControl InputFormControl10;
+        
+        /// <summary>
+        /// lstNotificationOptInUsers control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.ListBox lstNotificationOptInUsers;
+        
+        /// <summary>
+        /// lstNotificationOptedOutUsers control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.ListBox lstNotificationOptedOutUsers;
         
         /// <summary>
         /// pnlListSettings control.

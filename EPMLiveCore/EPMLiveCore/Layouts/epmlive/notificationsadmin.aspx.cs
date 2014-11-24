@@ -12,6 +12,7 @@ using Microsoft.SharePoint.Administration;
 using System.Data.SqlClient;
 using System.Text.RegularExpressions;
 using System.Data;
+using System.Text;
 
 namespace EPMLiveCore.Layouts.epmlive
 {
@@ -20,9 +21,9 @@ namespace EPMLiveCore.Layouts.epmlive
         public string strTitle;
         public string strTemplate;
         public static Hashtable desc;
-        protected ListBox lstSiteUsers;
-        protected ListBox lstNotificationUsers;
-        protected CheckBox chkLockNotify;
+        //protected ListBox lstSiteUsers;           --EPML 1901
+        //protected ListBox lstNotificationUsers;   --EPML 1901
+        //protected CheckBox chkLockNotify;         --EPML 1901
         protected Panel pnlTL;
         protected Panel pnlMain;
         protected Panel pnlGeneralSettings;
@@ -39,7 +40,7 @@ namespace EPMLiveCore.Layouts.epmlive
         protected GridView gvNotificationLists;
         protected Label lblLastRun;
         protected Label lblNotEnabled;
-        protected CheckBox chkAllUsers;
+        //protected CheckBox chkAllUsers;           --EPML 1901
         protected Label lblStatus;
 
 
@@ -138,7 +139,6 @@ namespace EPMLiveCore.Layouts.epmlive
                                     }
                                     else
                                     {
-
                                         currWeb.Properties.Add("EPMLiveNotificationEmailSubject", "EPM Live: Task Status Report");
                                         currWeb.Properties.Update();
                                         txtEmailSubject.Text = "EPM Live: Task Status Report";
@@ -202,25 +202,18 @@ namespace EPMLiveCore.Layouts.epmlive
                                         txtNotes.Text = "The following items are assigned to you in EPM Live.";
                                     }
 
-                                    string sNotificationUsers = "";
-                                    if (currWeb.Properties.ContainsKey("EPMLiveNotificationUsers"))
-                                    {
-                                        sNotificationUsers = currWeb.Properties["EPMLiveNotificationUsers"];
-                                    }
-                                    loadNotificationBoxes(site, sNotificationUsers);
+                                    //-- EPML 1901 --
 
-                                    if (currWeb.Properties.ContainsKey("EPMLiveNotificationLock"))
+                                    //Store the Opted out users in the propery bag
+                                    string sNotificationOptedOutUsers = string.Empty;
+
+                                    if (currWeb.Properties.ContainsKey("EPMLiveNotificationOptedOutUsers"))
                                     {
-                                        if (currWeb.Properties["EPMLiveNotificationLock"].ToUpper() == "TRUE")
-                                            chkLockNotify.Checked = true;
-                                        else
-                                            chkLockNotify.Checked = false;
+                                        sNotificationOptedOutUsers = currWeb.Properties["EPMLiveNotificationOptedOutUsers"];
                                     }
-                                    try
-                                    {
-                                        chkAllUsers.Checked = bool.Parse(currWeb.Properties["EPMLiveNotificationAllUsers"]);
-                                    }
-                                    catch { }
+                                    loadNotificationBoxes(site, sNotificationOptedOutUsers);
+
+                                    //-- End EPML 1901 --
 
                                     //if (site.RootWeb.CurrentUser.IsSiteAdmin)
                                     //{
@@ -278,7 +271,7 @@ namespace EPMLiveCore.Layouts.epmlive
             {
                 Response.Write("Error: " + ex.Message);
             }
-            Page.RegisterStartupScript("disableusers", "<script language=\"javascript\">alluserchange(document.getElementById(\"ctl00_PlaceHolderMain_ctl05_ctl00_chkAllUsers\"));</script>");
+            //Page.RegisterStartupScript("disableusers", "<script language=\"javascript\">alluserchange(document.getElementById(\"ctl00_PlaceHolderMain_ctl05_ctl00_chkAllUsers\"));</script>");
         }
 
         protected void btnTest_Click(object sender, EventArgs e)
@@ -336,15 +329,16 @@ namespace EPMLiveCore.Layouts.epmlive
                 Response.Write("Error: " + ex.Message);
             }
         }
-
-
-        private void loadNotificationBoxes(SPSite site, string sSignedUsers)
+        
+        private void loadNotificationBoxes(SPSite site, string sOptedOutUsers)
         {
             try
             {
-                lstNotificationUsers.Items.Clear();
-                lstSiteUsers.Items.Clear();
+                //-- EPML 1901 --
+                lstNotificationOptInUsers.Items.Clear();
+                lstNotificationOptedOutUsers.Items.Clear();
 
+                //populate the OptIn user list with ALL site users (non System Account)
                 foreach (SPUser u in site.RootWeb.SiteUsers)
                 {
                     if (u.Name != "System Account")
@@ -353,12 +347,13 @@ namespace EPMLiveCore.Layouts.epmlive
                         if (u.Email != "")
                             user += " (" + u.Email + ")";
                         ListItem li = new ListItem(user, u.ID.ToString());
-                        lstSiteUsers.Items.Add(li);
+                        lstNotificationOptInUsers.Items.Add(li);
                     }
                 }
 
-                string[] arrSignedUsers = sSignedUsers.Split('|');
-                foreach (string sUser in arrSignedUsers)
+                //populate the Opted-out user list
+                string[] arrOptedOutUsers = sOptedOutUsers.Split('|');
+                foreach (string sUser in arrOptedOutUsers)
                 {
                     if (sUser.Trim().Length > 0)
                     {
@@ -367,25 +362,26 @@ namespace EPMLiveCore.Layouts.epmlive
                         try
                         {
                             SPUser u = site.RootWeb.SiteUsers.GetByID(int.Parse(sUserIDNameSplit[0].Trim()));
-                            string user = u.Name;
-                            if (u.Email != "")
-                                user += " (" + u.Email + ")";
+                            string user = string.Empty;
+                            if (u != null)
+                            {
+                                user = u.Name;
+                                if (u.Email != string.Empty)
+                                    user += " (" + u.Email + ")";
+                            }
 
                             ListItem li = new ListItem(user, sUserIDNameSplit[0].Trim());
-                            lstNotificationUsers.Items.Add(li);
+                            lstNotificationOptedOutUsers.Items.Add(li);
 
-                            foreach (ListItem liUser in lstSiteUsers.Items)
-                            {
-                                if (liUser.Value == sUserIDNameSplit[0].Trim())
-                                {
-                                    lstSiteUsers.Items.Remove(liUser);
-                                    break;
-                                }
-                            }
+                            //If the OptedOut user is present in OptIn list then remove it
+                            ListItem liOptedOutUser =  lstNotificationOptInUsers.Items.FindByValue(li.Value);
+                            if (liOptedOutUser != null) lstNotificationOptInUsers.Items.Remove(liOptedOutUser);
                         }
-                        catch { }
-
-
+                        catch
+                        {
+                            //No error logging??
+                            throw;
+                        }
                     }
                 }
             }
@@ -394,9 +390,7 @@ namespace EPMLiveCore.Layouts.epmlive
                 Response.Write("Error: " + ex.Message);
             }
         }
-
-
-
+        
         private void BindNListsToGrid(string sLists)
         {
             DataTable dt = new DataTable();
@@ -622,20 +616,19 @@ namespace EPMLiveCore.Layouts.epmlive
         {
             try
             {
-                //SPSecurity.RunWithElevatedPrivileges(delegate()
-                //{
                 ArrayList arrDel = new ArrayList();
-                foreach (ListItem li in lstSiteUsers.Items)
+                //-- EPML 1901
+                foreach (ListItem li in lstNotificationOptInUsers.Items)
                 {
                     if (li.Selected)
                     {
-                        lstNotificationUsers.Items.Add(li);
+                        lstNotificationOptedOutUsers.Items.Add(li);
                         arrDel.Add(li);
                     }
                 }
                 foreach (ListItem li in arrDel)
-                    lstSiteUsers.Items.Remove(li);
-                //});
+                    lstNotificationOptInUsers.Items.Remove(li);
+                //-- End EPML 1901
             }
             catch
             {
@@ -646,20 +639,19 @@ namespace EPMLiveCore.Layouts.epmlive
         {
             try
             {
-                //SPSecurity.RunWithElevatedPrivileges(delegate()
-                //{
+                //-- EPML 1901
                 ArrayList arrDel = new ArrayList();
-                foreach (ListItem li in lstNotificationUsers.Items)
+                foreach (ListItem li in lstNotificationOptedOutUsers.Items)
                 {
                     if (li.Selected)
                     {
-                        lstSiteUsers.Items.Add(li);
+                        lstNotificationOptInUsers.Items.Add(li);
                         arrDel.Add(li);
                     }
                 }
                 foreach (ListItem li in arrDel)
-                    lstNotificationUsers.Items.Remove(li);
-                //});
+                    lstNotificationOptedOutUsers.Items.Remove(li);
+                //-- End EPML 1901
             }
             catch
             {
@@ -685,7 +677,6 @@ namespace EPMLiveCore.Layouts.epmlive
         {
             try
             {
-
                 SPWeb w = SPContext.Current.Web;
 
                 SPSecurity.RunWithElevatedPrivileges(delegate()
@@ -773,30 +764,26 @@ namespace EPMLiveCore.Layouts.epmlive
                                 currWeb.Properties.Add("EPMLiveNotificationNote", sNotes);
                             }
 
-                            string sNotificationUsers = "";
-                            foreach(ListItem li in lstNotificationUsers.Items)
+                            //-- EPML 1901
+                            //string sNotificationOptedOutUsers = string.Empty;
+                            StringBuilder sNotificationOptedOutUsers = new StringBuilder(string.Empty);
+                            foreach(ListItem li in lstNotificationOptedOutUsers.Items)
                             {
-                                sNotificationUsers += li.Value + ";#" + li.Text + "|";
+                                //sNotificationOptedOutUsers += li.Value + ";#" + li.Text + "|";
+                                sNotificationOptedOutUsers.Append(li.Value);
+                                sNotificationOptedOutUsers.Append(";#");
+                                sNotificationOptedOutUsers.Append(li.Text);
+                                sNotificationOptedOutUsers.Append("|");
                             }
-                            if(currWeb.Properties.ContainsKey("EPMLiveNotificationUsers"))
+                            if (currWeb.Properties.ContainsKey("EPMLiveNotificationOptedOutUsers"))
                             {
                                 // property exists already -> update it
-                                currWeb.Properties["EPMLiveNotificationUsers"] = sNotificationUsers;
+                                currWeb.Properties["EPMLiveNotificationOptedOutUsers"] = sNotificationOptedOutUsers.ToString();
                             }
-                            else if(sNotificationUsers.Length > 0)
+                            else if (sNotificationOptedOutUsers.Length > 0)
                             {
                                 // property doesn't exist -> add it if there is value to set
-                                currWeb.Properties.Add("EPMLiveNotificationUsers", sNotificationUsers);
-                            }
-                            if(currWeb.Properties.ContainsKey("EPMLiveNotificationLock"))
-                            {
-                                // property exists already -> update it
-                                currWeb.Properties["EPMLiveNotificationLock"] = chkLockNotify.Checked.ToString();
-                            }
-                            else if(sNotificationUsers.Length > 0)
-                            {
-                                // property doesn't exist -> add it if there is value to set
-                                currWeb.Properties.Add("EPMLiveNotificationLock", chkLockNotify.Checked.ToString());
+                                currWeb.Properties.Add("EPMLiveNotificationOptedOutUsers", sNotificationOptedOutUsers.ToString());
                             }
 
                             if(!currWeb.Properties.ContainsKey("EPMLiveNotificationLists")) // new site. settings not configured. use resource txt file
@@ -804,23 +791,12 @@ namespace EPMLiveCore.Layouts.epmlive
                                 currWeb.Properties.Add("EPMLiveNotificationLists", Properties.Resources.txtFileDefaultSections);
                             }
 
-                            if(currWeb.Properties.ContainsKey("EPMLiveNotificationAllUsers"))
-                            {
-                                // property exists already -> update it
-                                currWeb.Properties["EPMLiveNotificationAllUsers"] = chkAllUsers.Checked.ToString();
-                            }
-                            else
-                            {
-                                // property doesn't exist -> add it if there is value to set
-                                currWeb.Properties.Add("EPMLiveNotificationAllUsers", chkAllUsers.Checked.ToString());
-                            }
                             currWeb.Properties.Update();
                         }
                     }
                 });
                 {
-
-                    
+                                        
                 }
             }
             catch (Exception ex)
