@@ -799,7 +799,12 @@ function SaveProject() {
 }
 
 function SaveWorkPlan() {
-
+    var bVal = AlertBlankTitle()
+    if (bVal == false)
+    {
+        alert('The plan cannot be saved with blank task Title values (red cells). Please either delete these tasks or enter a title!');
+        return;
+    }
     if (sUpdates != "") {
         ShowTDialog("Processing Updates...");
         dhtmlxAjax.post("WorkPlannerAction.aspx", "Action=ProcessUpdates&ID=" + sItemID + "&PlannerID=" + sPlannerID + "&Updates=" + sUpdates, SaveUpdatesClose);
@@ -3011,10 +3016,33 @@ function GetToolTip(grid, row, col, tip, clientx, clienty, x, y) {
             var val1 = grid.GetValue(row, col);
             val1 = val1.toString().trim();
             if (val1 == "") {
-                return "Please enter title!";
+                return "Title values cannot be blank!";
             }
         }
     }
+}
+
+function AlertBlankTitle() {
+    var grid = Grids.WorkPlannerGrid;
+    var bVal_Task = true;
+    if (grid.id == "WorkPlannerGrid") {
+        for (var R in grid.Rows) {
+            var row = grid.GetRowById(R);
+            if ((row.Def.Name == "Task" || row.Def.Name == "Summary") && row.Def.Name != "Header") {
+                    var val1 = grid.GetValue(row, "Title");
+                    val1 = val1.toString().trim();
+                    if (val1 === "") {
+                        bVal_Task = false;
+                        break;
+                    }
+                }
+        }
+        if (bVal_Task == true)
+            return true;
+        else
+            return false;
+    }
+   
 }
 
 function getHTML(grid, row, col, val) {
