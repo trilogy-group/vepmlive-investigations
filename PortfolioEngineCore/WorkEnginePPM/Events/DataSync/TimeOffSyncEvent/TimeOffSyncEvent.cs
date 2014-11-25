@@ -33,8 +33,13 @@ namespace WorkEnginePPM.Events.DataSync
             {
                 this.EventFiringEnabled = false;
                 if (!string.IsNullOrEmpty(Convert.ToString(properties.AfterProperties["DueDate"])))
-                    properties.AfterProperties["DueDate"] = System.Convert.ToDateTime(properties.AfterProperties["DueDate"]).AddDays(1).ToString("yyyy-MM-ddTHH:mm:ssZ");
-                this.EventFiringEnabled = true;
+                {
+                    var regionalSettings = properties.Web.RegionalSettings;
+                    DateTime dt;
+                    dt = System.Convert.ToDateTime(properties.AfterProperties["DueDate"]);
+                    properties.AfterProperties["DueDate"] = regionalSettings.TimeZone.LocalTimeToUTC(dt.ToUniversalTime()).AddMinutes(1).ToString("s") + "Z";
+                    this.EventFiringEnabled = true;
+                }
             }
             catch (Exception exception)
             {
@@ -84,8 +89,13 @@ namespace WorkEnginePPM.Events.DataSync
             {
                 this.EventFiringEnabled = false;
                 if (!string.IsNullOrEmpty(Convert.ToString(properties.AfterProperties["DueDate"])))
-                properties.AfterProperties["DueDate"] = System.Convert.ToDateTime(properties.AfterProperties["DueDate"]).AddDays(1).ToString("yyyy-MM-ddTHH:mm:ssZ");
-                this.EventFiringEnabled = true;
+                {
+                    var regionalSettings = properties.Web.RegionalSettings;
+                    DateTime dt;
+                    dt = System.Convert.ToDateTime(properties.AfterProperties["DueDate"]);
+                    properties.AfterProperties["DueDate"] = regionalSettings.TimeZone.LocalTimeToUTC(dt.ToUniversalTime()).AddMinutes(1).ToString("s") + "Z";
+                    this.EventFiringEnabled = true;
+                }
             }
             catch (Exception exception)
             {
