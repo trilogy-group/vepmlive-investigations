@@ -52,7 +52,6 @@ namespace WorkEnginePPM
             }
             catch (Exception ex)
             {
-                properties.Cancel = true;
                 properties.ErrorMessage = "Error deleting item: " + ex.Message;
             }
         }
