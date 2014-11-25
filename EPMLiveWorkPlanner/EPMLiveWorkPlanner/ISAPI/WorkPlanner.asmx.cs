@@ -2473,13 +2473,11 @@ namespace EPMLiveWorkPlanner
                             value = value.Replace(";", ";#");
                             break;
                         case SPFieldType.Choice:
-                            if (!oField.Required)
+                            try
                             {
-                                if (value == "None")
-                                {
-                                    value = value.Replace("None", "");
-                                }
+                                value = value.ToString().Trim();
                             }
+                            catch { }
                             break;
                         case SPFieldType.Lookup:
                             XmlDocument docF = new XmlDocument();
@@ -4345,20 +4343,19 @@ namespace EPMLiveWorkPlanner
                     case SPFieldType.Choice:
                         string sEnum = "";
                         XmlNode ndChoices = fieldDoc.SelectSingleNode("//CHOICES");
-                        foreach (XmlNode ndChoice in ndChoices.ChildNodes)
-                        {
-                            sEnum += "|" + ndChoice.InnerText;
-                        }
                         //EPML-3127
                         try
                         {
                             if (!oField.Required)
                             {
-                                sEnum += "|" + "None";
+                                sEnum += "| " + " ";
                             }
                         }
                         catch { }
-
+                        foreach (XmlNode ndChoice in ndChoices.ChildNodes)
+                        {
+                            sEnum += "| " + ndChoice.InnerText;
+                        }
                         attr = docOut.CreateAttribute(enumattr + "Enum");
                         attr.Value = sEnum;
                         ndCol.Attributes.Append(attr);
