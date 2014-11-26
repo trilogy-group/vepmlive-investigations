@@ -128,9 +128,22 @@
             }
             var error = result.Error;
             if (error != null) {
-                alert(error.Value);
-                window.setTimeout("parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.OK, '');", 100);
-                return;
+                if (error.Value.indexOf('Save Conflict') < 0) {
+                    alert(error.Value);
+                    window.setTimeout("parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.OK, '');", 100);
+                    return;
+                }
+                else {
+                    // Keeping Resource Planner open when Save Conflict error occurs and giving user a second chance to resave the plan.
+                    alert(error.Value + '\nPlease try to resave the plan.');
+                    if (this.editorTab.isItemDisabled("SavePlanBtn") == true
+                        || this.viewTab.isItemDisabled("SavePlanBtn2") == true) {
+                        this.editorTab.enableItem("SavePlanBtn");
+                        this.viewTab.enableItem("SavePlanBtn2");
+                        this.saveConflict = true;
+                    }
+                    return;
+                }
             }
             var func = result.Function;
             switch (func) {
@@ -2589,7 +2602,8 @@
         //document.body.style.cursor = 'wait';
         var plangrid = this.plangrid;
         if (plangrid != null) {
-            if (this.HasChanges() == true) {
+            // In case of Save Conflict error, we need to give user a second chance to save the item again.
+            if (this.HasChanges() == true || this.saveConflict == true) {
                 plangrid.EndEdit(true);
                 var planrow = plangrid.GetLast(null, 0);
                 this.projectuids = "";
@@ -2609,12 +2623,13 @@
                         }
                     }
                     var bChanged = plangrid.GetAttribute(planrow, null, "Changed");
+                    // Need project uids to update project center item (ie project itself) if save conflict error encountered
+                    this.projectuids = AddItemToList(this.projectuids, plangrid.GetAttribute(planrow, null, "Project_UID").toString());
                     if (bChanged != null && bChanged != 0) {
                         var timestamp = plangrid.GetAttribute(planrow, null, "Timestamp");
                         if (timestamp != null)
                             plangrid.SetAttribute(planrow, null, "TimestampOrig", timestamp);
                         plangrid.SetAttribute(planrow, null, "Timestamp", timestampNow, 0, 0);
-                        this.projectuids = AddItemToList(this.projectuids, plangrid.GetAttribute(planrow, null, "Project_UID").toString());
                         var status = plangrid.GetAttribute(planrow, null, "Status");
                         var pmstatus = plangrid.GetAttribute(planrow, null, "PMStatus");
                         var rmstatus = plangrid.GetAttribute(planrow, null, "RMStatus");
@@ -2630,6 +2645,7 @@
                 }
                 this.ShowWorkingPopup("divSaving");
                 this.savingPlan = true;
+                this.saveConflict = false;
                 plangrid.Save();
             }
         }
@@ -4407,7 +4423,7 @@
         } else {
             this.editorTab.disableItem("PostResourcePlanBtn");
         }
-        if (this.HasChanges() == true) {
+        if (this.HasChanges() == true || this.saveConflict == true) {
             this.editorTab.enableItem("SavePlanBtn");
             this.viewTab.enableItem("SavePlanBtn2");
             this.dirty = true;
@@ -5847,6 +5863,7 @@
         this.importWorkResources = null;
         this.importWorkProjectName = "";
         this.includePending = true;
+        this.saveConflict = false;
 
         var const_HoursFormat = "0.##";
         var const_FTEFormat = "0.####";
