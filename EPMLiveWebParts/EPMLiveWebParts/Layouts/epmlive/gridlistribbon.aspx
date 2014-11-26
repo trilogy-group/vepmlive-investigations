@@ -1667,7 +1667,7 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
 
         if(viewDefaultViewUrl != "")
         {            
-            if(viewGroups.DefaultView.Id != null)
+            if(viewGroups.DefaultView != null)
 		    {	
 			    var tmpDefault = viewGroups.DefaultView["NavigateUrl"];
 			    for(var j=0;j<viewControlResult.length;j++)

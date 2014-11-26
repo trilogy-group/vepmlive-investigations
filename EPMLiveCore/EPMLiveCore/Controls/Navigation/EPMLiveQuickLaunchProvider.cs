@@ -30,14 +30,24 @@ namespace EPMLiveCore.Controls.Navigation
 
             string defaultViewFirstPermission = string.Empty;
             bool hasDefaultView = false;
+            SPGroupCollection spGroupcol;
 
             try
             {
+                if (SPContext.Current.Web.UserIsSiteAdmin)
+                {
+                    spGroupcol = SPContext.Current.Web.Groups;
+                }
+                else
+                {
+                    spGroupcol = SPContext.Current.Web.CurrentUser.Groups;
+                }
+
                 Dictionary<int, string> propBagData = ConvertFromString(
                     list.ParentWeb.Properties[String.Format("ViewPermissions{0}", list.ID)]);
                 foreach (var bagData in propBagData)
-                {
-                    foreach (SPGroup grp in SPContext.Current.Web.CurrentUser.Groups)
+                {                    
+                    foreach (SPGroup grp in spGroupcol)
                     {
                         if (grp.ID == bagData.Key)
                         {
@@ -230,7 +240,8 @@ namespace EPMLiveCore.Controls.Navigation
                                                         Title = title,
                                                         Url =
                                                             spWeb.ServerRelativeUrl +
-                                                            "/_layouts/15/epmlive/reporting/landing.aspx"
+                                                            "/_layouts/15/epmlive/reporting/landing.aspx",
+                                                        ChildNodes = base.GetChildNodes(node)
                                                     };
                                                 }
                                                 else
@@ -247,7 +258,8 @@ namespace EPMLiveCore.Controls.Navigation
                                                             node = new SiteMapNode(this, nodeKey)
                                                             {
                                                                 Title = title,
-                                                                Url = spWeb.ServerRelativeUrl + "/" + defaultViewURL
+                                                                Url = spWeb.IsRootWeb ? spWeb.Url + "/" + defaultViewURL : spWeb.ServerRelativeUrl + "/" + defaultViewURL,
+                                                                ChildNodes = base.GetChildNodes(node)
                                                             };
                                                         }
                                                     }

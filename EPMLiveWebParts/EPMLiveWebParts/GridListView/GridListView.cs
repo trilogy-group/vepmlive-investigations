@@ -2875,9 +2875,20 @@ namespace EPMLiveWebParts
             {
                 string[] viewArr;
                 List<string> splitViewcollection = new List<string>();
-                foreach (var bagData in propBagData)
+                SPGroupCollection arrGroup;
+
+                if (SPContext.Current.Web.UserIsSiteAdmin)
                 {
-                    foreach (SPGroup grp in SPContext.Current.Web.CurrentUser.Groups)
+                    arrGroup = SPContext.Current.Web.Groups;
+                }
+                else
+                {
+                    arrGroup = SPContext.Current.Web.CurrentUser.Groups;
+                }
+
+                foreach (var bagData in propBagData)
+                {                    
+                    foreach (SPGroup grp in arrGroup)
                     {
                         if (grp.ID == bagData.Key)
                         {
@@ -2896,7 +2907,7 @@ namespace EPMLiveWebParts
                                     splitViewcollection.Add(tmpViewInsert);
                             }
                         }
-                    }
+                    }                    
                 }
 
                 // Adding distinct Views
