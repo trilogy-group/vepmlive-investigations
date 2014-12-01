@@ -7,9 +7,9 @@ namespace EPMLiveCore
 {
     public class EditableFieldDisplay
     {
-        #region Methods (9)
+        #region Methods (12)
 
-        // Public Methods (3) 
+        // Public Methods (5) 
 
         public static bool canEdit(SPField field, Dictionary<string, Dictionary<string, string>> fieldProperties, SPListItem li)
         {
@@ -67,32 +67,6 @@ namespace EPMLiveCore
             return isEditableField(list.Fields.GetFieldByInternalName(field.InternalName), fieldProperties, "Edit");
         }
 
-        private static bool isEditableField(SPField field, Dictionary<string, Dictionary<string, string>> fieldProperties, string key)
-        {
-            try
-            {
-                if (!fieldProperties[field.InternalName].ContainsKey(key))
-                    return true;
-
-                string displaySettings = string.Empty;
-
-                displaySettings = fieldProperties[field.InternalName][key];
-                if(displaySettings.Split(";".ToCharArray())[0].ToLower().Equals("where"))
-                    return true;
-
-                displaySettings = fieldProperties[field.InternalName]["Editable"];
-                if(displaySettings.Split(";".ToCharArray())[0].ToLower().Equals("never"))
-                    return false;
-
-                if(displaySettings.Split(";".ToCharArray())[0].ToLower().Equals("where"))
-                    return true;
-            }
-            catch
-            {
-            }
-            return true;
-        }
-
         public static bool RenderField(SPField field, string where, string conditionField, string condition, string group, string valueCondition, SPListItem li)
         {
             bool result = false;
@@ -111,7 +85,69 @@ namespace EPMLiveCore
             return result;
         }
 
-        // Private Methods (6) 
+        public static bool IsDisplayField(SPField field, Dictionary<string, Dictionary<string, string>> fieldProperties)
+        {
+            try
+            {
+                string displaySettings = string.Empty;
+                displaySettings = fieldProperties[field.InternalName]["Display"];
+                if (displaySettings.Split(";".ToCharArray())[0].ToLower().Equals("never"))
+                    return false;
+
+                if (displaySettings.Split(";".ToCharArray())[0].ToLower().Equals("always"))
+                    return true;
+
+                if (displaySettings.Split(";".ToCharArray())[0].ToLower().Equals("where"))
+                {
+                    string where = displaySettings.Split(";".ToCharArray())[1];
+                    string condition = "";
+                    string group = "";
+                    bool result = false;
+                    if (where.Equals("[Me]"))
+                    {
+                        condition = displaySettings.Split(";".ToCharArray())[2];
+                        group = displaySettings.Split(";".ToCharArray())[3];
+                        result = WhereUser(condition, group);
+                        return result;
+                    }
+                    else
+                    {
+                        //For Field
+                        return result;
+                    }
+                }
+            }
+            catch { }
+            return false;
+        }
+
+        // Private Methods (7) 
+
+        private static bool isEditableField(SPField field, Dictionary<string, Dictionary<string, string>> fieldProperties, string key)
+        {
+            try
+            {
+                if (!fieldProperties[field.InternalName].ContainsKey(key))
+                    return true;
+
+                string displaySettings = string.Empty;
+
+                displaySettings = fieldProperties[field.InternalName][key];
+                if (displaySettings.Split(";".ToCharArray())[0].ToLower().Equals("where"))
+                    return true;
+
+                displaySettings = fieldProperties[field.InternalName]["Editable"];
+                if (displaySettings.Split(";".ToCharArray())[0].ToLower().Equals("never"))
+                    return false;
+
+                if (displaySettings.Split(";".ToCharArray())[0].ToLower().Equals("where"))
+                    return true;
+            }
+            catch
+            {
+            }
+            return true;
+        }
 
         private static string getFieldSchemaAttribValue(string sStringToSearch, string sAttribName)
         {
