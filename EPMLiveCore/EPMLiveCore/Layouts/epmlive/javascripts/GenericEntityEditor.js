@@ -24,8 +24,9 @@ function GEInit() {
                             $('#' + controlProps.ControlInfo.GenericEntityDivId).height(h);
                         }
 
-                        if (controlProps.ControlType == '2' && controlProps.Parent !== '') {
-                            $('#' + controlProps.ControlInfo.GenericEntityDivId).attr('disabled', true);
+                        if (controlProps.ControlType == '2' && controlProps.Parent !== '' && controlProps.ControlInfo.SingleSelectLookupVal == '') {
+                            $('#' + controlProps.ControlInfo.GenericEntityDivId).attr("disabled", true);
+                            $('#' + controlProps.ControlInfo.GenericEntityDivId).prop('contenteditable', false);
                             $('#' + controlProps.ControlInfo.GenericEntityDivId).addClass('disabledTb');
                             var index = controlProps.ControlInfo.GenericEntityDivId.lastIndexOf('_');
                             var browseId = controlProps.ControlInfo.GenericEntityDivId.substring(0, index) + '_browse';
@@ -49,8 +50,7 @@ function GEInit() {
 
             if (window._LookupFieldsPropsArray) {
                 for (var k in window._LookupFieldsPropsArray) {
-                    var controlProps = window._LookupFieldsPropsArray[k];
-
+                    var controlProps = window._LookupFieldsPropsArray[k];                    
                     FetchData(controlProps, k);
                 }
             }
@@ -74,14 +74,32 @@ function GEInit() {
 
         function FetchData(controlProps, k) {
 
-            var postData = {
-                webid: controlProps.FieldInfo.LookupWebId,
-                listid: controlProps.FieldInfo.LookupListId,
-                fieldid: controlProps.FieldInfo.LookupFieldId,
-                field: controlProps.FieldInfo.LookupField
-            };
+            if (controlProps.Parent !== '' && controlProps.ControlInfo.SingleSelectLookupVal !== '') {
+                var parentControlPropsArray = $.grep(window._LookupFieldsPropsArray, function (item) { return item.FieldName == controlProps.Parent });
+                var parentControlProps = parentControlPropsArray["0"];
+                parentControlProps.ControlInfo.SingleSelectLookupVal = $($('#' + parentControlProps.ControlInfo.GenericEntityDivId).html()).find('div').attr('key');
+
+                var postData = {
+                    webid: controlProps.FieldInfo.LookupWebId,
+                    listid: controlProps.FieldInfo.LookupListId,
+                    fieldid: controlProps.FieldInfo.LookupFieldId,
+                    field: controlProps.FieldInfo.LookupField,
+                    parent: parentControlProps.FieldName,
+                    parentValue: parentControlProps.ControlInfo.SingleSelectLookupVal,
+                    parentListField: controlProps.ParentListField
+                };
+            }
+            else {
+                var postData = {
+                    webid: controlProps.FieldInfo.LookupWebId,
+                    listid: controlProps.FieldInfo.LookupListId,
+                    fieldid: controlProps.FieldInfo.LookupFieldId,
+                    field: controlProps.FieldInfo.LookupField
+                };
+            }
 
             $.post(controlProps.ControlInfo.CurWebURL + "/_layouts/epmlive/GenericEntityTypeAheadAjaxHandler.aspx", postData, function (data) {
+
                 SetCache(data, controlProps);
 
                 if (controlProps.ControlType !== '2') {
@@ -200,7 +218,7 @@ function GEInit() {
                             break;
                     }
 
-                    
+
 
 
                 });
@@ -417,6 +435,20 @@ function GEInit() {
                     $('#' + controlProps.FieldName + '_ddlShowAll').attr('CtrlPropArrPos', k);
                 }
 
+
+                if ($('#' + controlProps.FieldName + '_ddlShowAll').length > 0 && controlProps.Parent !== '' && controlProps.ControlInfo.SingleSelectLookupVal !== '') {
+                    $('#' + controlProps.FieldName + '_ddlShowAll').click(function () {
+
+                        var index = CheckIfDataExists(controlProps);
+                        var cachedata = GetCachedData(index);
+                        BuildAllItemsDropDown(cachedata, controlProps);
+
+                    });
+
+                    $('#' + controlProps.FieldName + '_ddlShowAll').attr('CtrlPropArrPos', k);
+                    $('#' + controlProps.FieldName + '_ddlShowAll').removeClass('disabledImg');
+                }
+
                 if (!SPControlContainsValue(controlProps.ControlInfo.GenericEntityDivId) && controlProps.Parent === '') {
                     var h = $('#' + controlProps.ControlInfo.GenericEntityDivId).height();
                     $('#' + controlProps.ControlInfo.GenericEntityDivId).html('<span style="color:#ccc">Type here to search...</span>');
@@ -479,7 +511,7 @@ function GEInit() {
             }
             return data;
         }
-        
+
         function BuildAllItemsDropDown(cachedata, controlProps) {
 
             if (controlProps.ControlType == '1') {
@@ -608,6 +640,8 @@ function GEInit() {
                             var newText = $(this).html();
                             var index = $(this).attr('value');
                             //UpdateMultiSelectPickerValue(controlProps, newText);
+                            controlProps.ControlInfo.SingleSelectDisplayVal = newText;
+                            controlProps.ControlInfo.SingleSelectLookupVal = $(this).attr('value');
                             UpdateMultiSelectPickerValueWOValidation(controlProps, newText, index);
                         }
                     });
@@ -796,6 +830,8 @@ function GEInit() {
                             var newText = $(this).html();
                             //UpdateMultiSelectPickerValue(controlProps, newText);
                             var index = $(this).attr('value');
+                            controlProps.ControlInfo.SingleSelectDisplayVal = newText;
+                            controlProps.ControlInfo.SingleSelectLookupVal = $(this).attr('value');
                             UpdateMultiSelectPickerValueWOValidation(controlProps, newText, index);
                         }
                     });
@@ -832,7 +868,7 @@ function GEInit() {
             }
         }
 
-        
+
 
         function RegisterHoverStyle() {
             if ($('.autoText').length > 0) {
@@ -878,7 +914,7 @@ function GEInit() {
 
         function UpdateSingleSelectPickerValueWOValidation(controlProps, index) {
 
-            $('#' + controlProps.ControlInfo.GenericEntityDivId).focus(); 
+            $('#' + controlProps.ControlInfo.GenericEntityDivId).focus();
             $('#' + controlProps.ControlInfo.GenericEntityDivId).html('');
             var selectedValue = controlProps.ControlInfo.SingleSelectDisplayVal;
             var spEntityStyle = '<span contenteditable="false" title="' + selectedValue + '" class="ms-entity-resolved" tabindex="-1" iscontenttype="true" id="span' + index + '" onmouseover="this.contentEditable=false;" onmouseout="this.contentEditable=true;">' +
@@ -934,6 +970,7 @@ function GEInit() {
                 $('#' + childControlProp.ControlInfo.GenericEntityDivId).height(h);
 
                 $('#' + childControlProp.ControlInfo.GenericEntityDivId).attr('disabled', true);
+                $('#' + childControlProp.ControlInfo.GenericEntityDivId).prop('contenteditable', false);
                 $('#' + childControlProp.ControlInfo.GenericEntityDivId).addClass('disabledTb');
                 var index = childControlProp.ControlInfo.GenericEntityDivId.lastIndexOf('_');
                 var browseId = childControlProp.ControlInfo.GenericEntityDivId.substring(0, index) + '_browse';
@@ -948,7 +985,7 @@ function GEInit() {
                 $('#' + addItemId).find('IMG').addClass('disabledImg')
 
                 if (childControlProp.ControlType == '2' && $('#' + childControlProp.FieldName + '_ddlShowAll').length > 0) {
-                    $('#' + childControlProp.FieldName + '_ddlShowAll').addClass('disabledImg');
+                    $('#' + childControlProp.FieldName + '_ddlShowAll').addClass('disabledImg');                    
                 }
             }
         }
@@ -969,6 +1006,7 @@ function GEInit() {
 
                 if (childControlProp.ControlType == '2') {
                     $('#' + childControlProp.ControlInfo.GenericEntityDivId).removeAttr('disabled');
+                    $('#' + childControlProp.ControlInfo.GenericEntityDivId).prop('contenteditable', true);
                     $('#' + childControlProp.ControlInfo.GenericEntityDivId).removeClass('disabledTb');
                     var index = childControlProp.ControlInfo.GenericEntityDivId.lastIndexOf('_');
                     var browseId = childControlProp.ControlInfo.GenericEntityDivId.substring(0, index) + '_browse';
@@ -1202,7 +1240,7 @@ function GEInit() {
 
         function UpdateMultiSelectPickerValueWOValidation(controlProps, newTextVal, index) {
             // updates the picker's values
-            $('#' + controlProps.ControlInfo.GenericEntityDivId).focus(); 
+            $('#' + controlProps.ControlInfo.GenericEntityDivId).focus();
             var clean = $('#' + controlProps.ControlInfo.GenericEntityDivId).html();
             clean = clean.substring(0, clean.lastIndexOf(';') + 1);
             $('#' + controlProps.ControlInfo.GenericEntityDivId).html(clean);
@@ -1221,6 +1259,8 @@ function GEInit() {
             $('#' + controlProps.ControlInfo.GenericEntityDivId).append('&nbsp;');
             RemoveTypeAheadChoiceCandidate(controlProps);
             //ValidateEntity(controlProps.ControlInfo.GenericEntityCheckNameId);
+
+            UpdateChildrenValues(controlProps);
         }
 
         function PostDataBackToMultiSelectLookup() {
@@ -1403,7 +1443,7 @@ function GEInit() {
             }
             return posY;
         }
-       
+
         function GetFullLeft(obj) {
             var posX = obj.offsetLeft;
             while (obj.offsetParent) {
@@ -1413,7 +1453,7 @@ function GEInit() {
             }
             return posX;
         }
-        
+
         function clickedOutsideElement(elemId, event) {
             var theElem = null;
             try {
