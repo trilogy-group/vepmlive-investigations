@@ -335,6 +335,7 @@
         params.URL = '<%=URL%>';
         params.Webservice = '<%=Webservice%>';
         params.HideCloseBtn = '<%=HideCloseBtn%>';
+        params.MaxPeriodLimit = '<%=MaxPeriodLimit%>';
         rpeditor = new RPEditor('rpeditor', params);
     }
     catch (e) {

@@ -59,7 +59,7 @@ namespace WorkEnginePPM.ControlTemplates.WorkEnginePPM
         public string IsDlg
         {
             get { return m_sIsDlg; }
-            set { m_sIsDlg = value.TrimStart().Substring(0,1); }
+            set { m_sIsDlg = value.TrimStart().Substring(0, 1); }
         }
 
         private string m_hideCloseBtn = "";
@@ -67,6 +67,13 @@ namespace WorkEnginePPM.ControlTemplates.WorkEnginePPM
         {
             get { return m_hideCloseBtn; }
             set { m_hideCloseBtn = value; }
+        }
+
+        private Int32 m_maxPeriodLimit;
+        public Int32 MaxPeriodLimit
+        {
+            get { return m_maxPeriodLimit; }
+            set { m_maxPeriodLimit = value; }
         }
 
         public string Webservice

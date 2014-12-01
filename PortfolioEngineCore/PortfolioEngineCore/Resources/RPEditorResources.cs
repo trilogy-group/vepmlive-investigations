@@ -5,7 +5,7 @@ using System.Text;
 
 namespace PortfolioEngineCore
 {
-    
+
 
     internal class RPEditorResources
     {
@@ -68,6 +68,7 @@ namespace PortfolioEngineCore
             //xCfg.CreateIntAttr("StaticCursor", 1); // If set to 1, grid does not delete cursor when it loses focus   after click outside grid.
             xCfg.CreateIntAttr("FocusWholeRow", 1);
             xCfg.CreateIntAttr("Paging", 2);
+            xCfg.CreateIntAttr("ChildPaging", 2);
             //xCfg.CreateIntAttr("PageLength", 10);
             //xCfg.CreateIntAttr("MaxPages", 5);
             xCfg.CreateIntAttr("NoPager", 1);
@@ -81,7 +82,7 @@ namespace PortfolioEngineCore
             xD.CreateStringAttr("HtmlPrefix", "<b>");
             xD.CreateStringAttr("HtmlPostfix", "</b>");
             //xD.CreateStringAttr("ItemNameFormat", "&lt;style=&quot;font-weight:bold&quot;>");
-            
+
             xD.CreateStringAttr("Expanded", "1");
             xD.CreateStringAttr("GroupMainCaption", "Item Name (grouped)");
             //CStruct xDef = xGrid.CreateSubStruct("Def");
@@ -94,6 +95,15 @@ namespace PortfolioEngineCore
             xGroup.CreateIntAttr("Visible", 0);
             //xGroup.CreateStringAttr("Cells", "List,Custom");
             xGroup.CreateStringAttr("Panel", "1");
+
+            //CStruct xSI = xSolid.CreateSubStruct("I");
+            //xSI.CreateStringAttr("id", "PAGER");
+            //xSI.CreateStringAttr("Cells", "LIST");
+            //xSI.CreateStringAttr("Space", "4");
+            //xSI.CreateStringAttr("LISTType", "Pages");
+            //xSI.CreateStringAttr("LISTRelWidth", "1");
+            //xSI.CreateStringAttr("LISTAlign", "left");
+            //xSI.CreateStringAttr("LISTLeft", "10");
 
             CStruct xLeftCols = xGrid.CreateSubStruct("LeftCols");
             CStruct xMidCols = xGrid.CreateSubStruct("Cols");
@@ -249,18 +259,20 @@ namespace PortfolioEngineCore
 
             CStruct xCalendar = xPlanResources.GetSubStruct("Calendar");
             CStruct xPeriods = xCalendar.GetSubStruct("Periods");
-                       
+
             List<CStruct> listPeriods = xPeriods.GetList("Period");
 
             if (listPeriods != null)
             {
-                if (listPeriods.Count > 370)
+                if (listPeriods.Count > 120)
                 {
                     xCfg.CreateIntAttr("PageLength", 10);
+                    xCfg.CreateIntAttr("MaxPages", 5);
                 }
                 else
                 {
                     xCfg.CreateIntAttr("PageLength", 50);
+                    xCfg.CreateIntAttr("MaxPages", 2);
                 }
             }
 
