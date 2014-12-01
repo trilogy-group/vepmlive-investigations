@@ -14,6 +14,8 @@ using System.Xml;
 using System.Data.SqlClient;
 using System.Collections.Generic;
 using System.Globalization;
+using EPMLiveCore;
+using EPMLiveCore.Infrastructure;
 
 namespace EPMLiveWebParts
 {
@@ -5615,9 +5617,23 @@ namespace EPMLiveWebParts
             }
             catch { }
 
+            Dictionary<string, Dictionary<string, string>> fieldProperties = null;
+            GridGanttSettings gSettings = new GridGanttSettings(list);
+            if (gSettings.DisplaySettings != "")
+                fieldProperties = ListDisplayUtils.ConvertFromString(gSettings.DisplaySettings);
+            bool bIsDisplay = false;
+
             foreach (string field in view.ViewFields)
             {
-                aViewFields.Add(field);
+                SPField oField = list.Fields.GetFieldByInternalName(field);
+                if (fieldProperties != null)
+                    bIsDisplay = EPMLiveCore.EditableFieldDisplay.IsDisplayField(oField, fieldProperties);
+                else
+                    bIsDisplay = (bool)oField.ShowInViewForms;
+                if (bIsDisplay == true)
+                {
+                    aViewFields.Add(field);
+                }
                 if (field == "WorkspaceUrl")
                     bWorkspaceUrl = true;
             }
