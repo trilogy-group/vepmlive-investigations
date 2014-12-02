@@ -27,28 +27,6 @@ namespace WorkEnginePPM.Events.DataSync
             SetHours(properties);
         }
 
-        public override void ItemAdding(SPItemEventProperties properties)
-        {
-            try
-            {
-                this.EventFiringEnabled = false;
-                if (!string.IsNullOrEmpty(Convert.ToString(properties.AfterProperties["DueDate"])))
-                {
-                    var regionalSettings = properties.Web.RegionalSettings;
-                    DateTime dt;
-                    dt = System.Convert.ToDateTime(properties.AfterProperties["DueDate"]);
-                    properties.AfterProperties["DueDate"] = regionalSettings.TimeZone.LocalTimeToUTC(dt.ToUniversalTime()).AddMinutes(1).ToString("s") + "Z";
-                    this.EventFiringEnabled = true;
-                }
-            }
-            catch (Exception exception)
-            {
-                properties.Cancel = true;
-                properties.ErrorMessage = exception.Message;
-                properties.Status = SPEventReceiverStatus.CancelWithError;
-            }
-        }
-
         /// <summary>
         ///     An item is being deleted
         /// </summary>
@@ -81,28 +59,6 @@ namespace WorkEnginePPM.Events.DataSync
             Synchronize(properties);
 
             SetHours(properties);
-        }
-
-        public override void ItemUpdating(SPItemEventProperties properties)
-        {
-            try
-            {
-                this.EventFiringEnabled = false;
-                if (!string.IsNullOrEmpty(Convert.ToString(properties.AfterProperties["DueDate"])))
-                {
-                    var regionalSettings = properties.Web.RegionalSettings;
-                    DateTime dt;
-                    dt = System.Convert.ToDateTime(properties.AfterProperties["DueDate"]);
-                    properties.AfterProperties["DueDate"] = regionalSettings.TimeZone.LocalTimeToUTC(dt.ToUniversalTime()).AddMinutes(1).ToString("s") + "Z";
-                    this.EventFiringEnabled = true;
-                }
-            }
-            catch (Exception exception)
-            {
-                properties.Cancel = true;
-                properties.ErrorMessage = exception.Message;
-                properties.Status = SPEventReceiverStatus.CancelWithError;
-            }
         }
 
         // Private Methods (4) 
