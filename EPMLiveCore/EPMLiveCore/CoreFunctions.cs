@@ -3797,19 +3797,40 @@ namespace EPMLiveCore
 
             if (isOnline)
             {
-                u = properties.Web.EnsureUser(sharePointAccount);
-                if (u != null)
+                try
                 {
-                    if (isAdd)
+                    SPQuery userQuery = new SPQuery();
+                    userQuery.Query = string.Format("<Where><Eq><FieldRef Name=\"EMail\" /><Value Type=\"Text\">{0}</Value></Eq></Where>", sharePointAccount);
+                    // Retrieves user based on the email id.
+                    SPListItemCollection items = properties.Web.SiteUserInfoList.GetItems(userQuery);
+                    if (items != null && items.Count > 0)
                     {
-                        query = string.Format(@"<Where><Eq><FieldRef Name='Email'/><Value Type='Text'>{0}</Value></Eq></Where>", u.Email);
+                        try
+                        {
+                            u = properties.Web.SiteUsers.GetByID(items[0].ID);
+                        }
+                        catch (Exception)
+                        {
+                            throw new Exception(sharePointAccount + " is not a valid SharePoint account.");
+                        }
+                        if (u != null)
+                        {
+                            if (isAdd)
+                            {
+                                query = string.Format(@"<Where><Eq><FieldRef Name='Email'/><Value Type='Text'>{0}</Value></Eq></Where>", u.Email);
+                            }
+                            else
+                            {
+                                query = string.Format(@"<Where><And><Eq><FieldRef Name='Email'/><Value Type='Text'>{0}</Value></Eq><Neq><FieldRef Name='ID'/><Value Type='Counter'>{1}</Value></Neq></And></Where>", u.Email, properties.ListItem.ID);
+                            }
+                        }
                     }
                     else
                     {
-                        query = string.Format(@"<Where><And><Eq><FieldRef Name='Email'/><Value Type='Text'>{0}</Value></Eq><Neq><FieldRef Name='ID'/><Value Type='Counter'>{1}</Value></Neq></And></Where>", u.Email, properties.ListItem.ID);
+                        throw new Exception(sharePointAccount + " is not a valid SharePoint account.");
                     }
                 }
-                else
+                catch (Exception)
                 {
                     throw new Exception(sharePointAccount + " is not a valid SharePoint account.");
                 }
