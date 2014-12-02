@@ -1,4 +1,6 @@
-﻿using System;
+﻿using EPMLiveCore;
+using EPMLiveCore.Infrastructure;
+using System;
 using System.Runtime.InteropServices;
 using System.Web;
 using System.Web.UI;
@@ -27,10 +29,11 @@ using System.Reflection;
 using ReportFiltering;
 
 using System.Data.SqlClient;
-using EPMLiveCore.Infrastructure;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Script.Serialization;
+
+
 
 namespace EPMLiveWebParts
 {
@@ -180,7 +183,7 @@ namespace EPMLiveWebParts
         GridViewSession gvs;
 
         string LinkType = "";
-                
+
         string oJsonViewURL = string.Empty;
         string oJsonDefaultViewURL = string.Empty;
 
@@ -2499,15 +2502,11 @@ namespace EPMLiveWebParts
             ArrayList arrFields = new ArrayList();
             ArrayList arrGroups = new ArrayList();
 
-
-
-
-
             if (string.IsNullOrEmpty(gvs.Columns))
             {
                 foreach (string field in view.ViewFields)
                 {
-                    //SPField oField = list.Fields.GetFieldByInternalName(field);
+                    //SPField oField = list.Fields.GetFieldByInternalName(field); 
                     //arrFields.Add(getRealField(oField).InternalName);
                     arrFields.Add(field);
                 }
@@ -2554,14 +2553,26 @@ namespace EPMLiveWebParts
             SortedList sl = new SortedList();
             ArrayList arrLookups = new ArrayList();
 
+            Dictionary<string, Dictionary<string, string>> fieldProperties = null;
+            GridGanttSettings gSettings = new GridGanttSettings(list);
+            if (gSettings.DisplaySettings != "")
+                fieldProperties = ListDisplayUtils.ConvertFromString(gSettings.DisplaySettings);
+
             string AllGroupFields = "";
             bool bFoundTitle = false;
+            bool bflag = false;
+
             foreach (SPField field in list.Fields)
             {
 
                 if (!field.Hidden)
                 {
-                    if (!field.ShowInDisplayForm.HasValue || field.ShowInDisplayForm.Value)
+                    if (fieldProperties != null)
+                        bflag = EPMLiveCore.EditableFieldDisplay.IsDisplayField(field, fieldProperties, "Display");
+                    else
+                        bflag = (bool)field.ShowInViewForms;
+
+                    if (bflag == true)
                     {
                         if (getRealField(field).InternalName == "Title")
                         {
@@ -2601,6 +2612,7 @@ namespace EPMLiveWebParts
             sl.Clear();
             //TODO: remove this and make lookup joins work.
             arrLookups.Clear();
+            //bool bvisible;
             if (gSettings.EnableContentReporting)
             {
                 foreach (SPField field in arrLookups)
@@ -2852,14 +2864,14 @@ namespace EPMLiveWebParts
             output.WriteLine(@"}
 
             //ExecuteOrDelayUntilScriptLoaded(loadMenu" + sFullGridId + @", 'EPMLive.js');
-            var viewURLs = " + oJsonViewURL + ";"  + 
+            var viewURLs = " + oJsonViewURL + ";" +
             "var defaultViewUrl = " + oJsonDefaultViewURL + ";" +
         "</script>");
         }
 
         private string GetViews()
         {
-            StringBuilder sb = new StringBuilder();            
+            StringBuilder sb = new StringBuilder();
             Dictionary<int, string> propBagData = new Dictionary<int, string>();
             List<string> lstViewURL = new List<string>();
             bool hasDefaultViewURL = false;
@@ -2929,9 +2941,9 @@ namespace EPMLiveWebParts
                 }
 
                 // serialize listview url and pass it to javascript object.
-                
+
                 oJsonViewURL = oSerializer.Serialize(lstViewURL);
-                oJsonDefaultViewURL = oSerializer.Serialize(defaultViewURL);                
+                oJsonDefaultViewURL = oSerializer.Serialize(defaultViewURL);
             }
             else
             {
@@ -3016,7 +3028,6 @@ namespace EPMLiveWebParts
             {
 
                 string ids = "";
-
 
                 XmlDocument xmlQuery = new XmlDocument();
                 xmlQuery.LoadXml("<Query>" + view.Query + "</Query>");
@@ -5653,8 +5664,6 @@ namespace EPMLiveWebParts
             }
             tb.StopTimer();
         }
-
-
 
         public override ToolPart[] GetToolParts()
         {

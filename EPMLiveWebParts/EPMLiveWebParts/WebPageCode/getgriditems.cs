@@ -5626,14 +5626,22 @@ namespace EPMLiveWebParts
             foreach (string field in view.ViewFields)
             {
                 SPField oField = list.Fields.GetFieldByInternalName(field);
-                if (fieldProperties != null)
-                    bIsDisplay = EPMLiveCore.EditableFieldDisplay.IsDisplayField(oField, fieldProperties);
-                else
-                    bIsDisplay = (bool)oField.ShowInViewForms;
-                if (bIsDisplay == true)
+                if (getRealField(oField).InternalName == "Title")
                 {
                     aViewFields.Add(field);
                 }
+                else
+                {
+                    if (fieldProperties != null)
+                        bIsDisplay = EPMLiveCore.EditableFieldDisplay.IsDisplayField(oField, fieldProperties, "Display");
+                    else
+                        bIsDisplay = (bool)oField.ShowInViewForms;
+                    if (bIsDisplay == true)
+                    {
+                        aViewFields.Add(field);
+                    }
+                }
+
                 if (field == "WorkspaceUrl")
                     bWorkspaceUrl = true;
             }
