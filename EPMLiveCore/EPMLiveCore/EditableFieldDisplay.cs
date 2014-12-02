@@ -85,36 +85,44 @@ namespace EPMLiveCore
             return result;
         }
 
-        public static bool IsDisplayField(SPField field, Dictionary<string, Dictionary<string, string>> fieldProperties)
+        public static bool IsDisplayField(SPField field, Dictionary<string, Dictionary<string, string>> fieldProperties, string key)
         {
             try
             {
                 string displaySettings = string.Empty;
-                displaySettings = fieldProperties[field.InternalName]["Display"];
-                if (displaySettings.Split(";".ToCharArray())[0].ToLower().Equals("never"))
-                    return false;
-
-                if (displaySettings.Split(";".ToCharArray())[0].ToLower().Equals("always"))
-                    return true;
-
-                if (displaySettings.Split(";".ToCharArray())[0].ToLower().Equals("where"))
+                if (fieldProperties[field.InternalName].ContainsKey(key))
                 {
-                    string where = displaySettings.Split(";".ToCharArray())[1];
-                    string condition = "";
-                    string group = "";
-                    bool result = false;
-                    if (where.Equals("[Me]"))
+                    displaySettings = fieldProperties[field.InternalName][key];
+
+                    if (displaySettings.Split(";".ToCharArray())[0].ToLower().Equals("always"))
+                        return true;
+
+                    if (displaySettings.Split(";".ToCharArray())[0].ToLower().Equals("never"))
+                        return false;
+
+                    if (displaySettings.Split(";".ToCharArray())[0].ToLower().Equals("where"))
                     {
-                        condition = displaySettings.Split(";".ToCharArray())[2];
-                        group = displaySettings.Split(";".ToCharArray())[3];
-                        result = WhereUser(condition, group);
-                        return result;
+                        string where = displaySettings.Split(";".ToCharArray())[1];
+                        string condition = "";
+                        string group = "";
+                        bool result = false;
+                        if (where.Equals("[Me]"))
+                        {
+                            condition = displaySettings.Split(";".ToCharArray())[2];
+                            group = displaySettings.Split(";".ToCharArray())[3];
+                            result = WhereUser(condition, group);
+                            return result;
+                        }
+                        else
+                        {
+                            //For Field
+                            return result;
+                        }
                     }
-                    else
-                    {
-                        //For Field
-                        return result;
-                    }
+                }
+                else
+                {
+                    return true;
                 }
             }
             catch { }
