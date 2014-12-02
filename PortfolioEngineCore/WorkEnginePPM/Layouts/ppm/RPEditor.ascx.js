@@ -92,6 +92,7 @@
         var length = grid.ColNames[2].length;
         var hide = [];
         var show = [];
+        this.maxPeriodLimitExceeds = false;
         for (var c = 0; c < length; c++) {
             var col = grid.ColNames[2][c];
             var sType = col.substring(0, 1);
