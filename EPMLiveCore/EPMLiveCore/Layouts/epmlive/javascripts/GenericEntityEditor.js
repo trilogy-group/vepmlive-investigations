@@ -985,7 +985,8 @@ function GEInit() {
                 $('#' + addItemId).find('IMG').addClass('disabledImg')
 
                 if (childControlProp.ControlType == '2' && $('#' + childControlProp.FieldName + '_ddlShowAll').length > 0) {
-                    $('#' + childControlProp.FieldName + '_ddlShowAll').addClass('disabledImg');                    
+                    $('#' + childControlProp.FieldName + '_ddlShowAll').addClass('disabledImg');
+                    $('#' + childControlProp.FieldName + '_ddlShowAll').unbind('click');
                 }
             }
         }
