@@ -102,18 +102,22 @@
                     hide.push(col);
                 }
                 else {
-                    if (show.length >= this.params.MaxPeriodLimit) {
-                        //hide.push(col);
-                        this.maxPeriodLimitExceeds = true;
-                    }
                     show.push(col);
                 }
             }
         }
-        if (this.maxPeriodLimitExceeds && grid.id == "g_RPE") {
-            alert("You have more than " + this.params.MaxPeriodLimit + " periods! \n\n Try splitting into views for better performace!");
+
+        if (show.length > this.params.MaxPeriodLimit) {
+            this.maxPeriodLimitExceeds = true;
         }
-        grid.ChangeColsVisibility(show, hide, 0);
+        if (this.maxPeriodLimitExceeds && maxPeriodLimitExceedsConfirm === undefined) {
+            maxPeriodLimitExceedsConfirm = confirm("You have more than " + this.params.MaxPeriodLimit + " periods! \n Try splitting periods into views for better performace! \n\n Click 'OK' for restricting view to " + this.params.MaxPeriodLimit + " periods! \n Click 'Cancel' to load all periods!");
+        }
+        if (maxPeriodLimitExceedsConfirm == true) {
+            grid.ChangeColsVisibility(show.slice(0, this.params.MaxPeriodLimit), hide.concat(show.slice(this.params.MaxPeriodLimit, show.length)), 0);
+        } else {
+            grid.ChangeColsVisibility(show, hide, 0);
+        }
     };
     RPEditor.prototype.ExecuteJSON = function (Dataxml, serverFunction) {
         if (typeof serverFunction != "string") serverFunction = "ResourcePlans";
@@ -3034,6 +3038,7 @@
                     plangrid.ActionPrint();
                     break;
                 case "ViewTab_SelView_Changed":
+                    maxPeriodLimitExceedsConfirm = undefined;
                     var selectedView = this.GetSelectedView();
                     if (selectedView != null) {
                         var periods = selectedView.g_RPE.RightCols.split(",");
@@ -3330,6 +3335,7 @@
                     break;
                 case "ViewTab_FromPeriod_Changed":
                 case "ViewTab_ToPeriod_Changed":
+                    maxPeriodLimitExceedsConfirm = undefined;
                     var from = document.getElementById('idViewTab_FromPeriod');
                     var sp = parseInt(from.options[from.selectedIndex].value);
                     if (sp == 0 && this.currentPeriod != null)
@@ -5868,6 +5874,7 @@
     try {
         var rPEditorInstance = this;
         this.maxPeriodLimitExceeds = false;
+        var maxPeriodLimitExceedsConfirm = undefined;
         this.thisID = thisID;
         this.params = params;
         var const_PlanCell = "a";
