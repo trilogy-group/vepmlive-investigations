@@ -155,6 +155,29 @@ namespace EPMLiveCore.Jobs
                         {
                             continue;
                         }
+                        else
+                        {
+                            //EPML-4422: When a project is not using unique security, and a child list like tasks is set to Inherit security from the project lookup, It sets the task to unique, but does not add any groups. It should not get set to Unique.
+                            if (!li.HasUniqueRoleAssignments)
+                            {
+                                web.AllowUnsafeUpdates = true;
+                                safeGroupTitle = safeTitle;
+                                safeTitle = GetIdenticalGroupName(site.ID, web.ID, safeTitle, 0);
+                                try
+                                {
+                                    Dictionary<string, SPRoleType> pNewGrps = AddBasicSecurityGroups(web, safeTitle, orignalUser, li);
+                                    li.BreakRoleInheritance(false);
+                                    foreach (KeyValuePair<string, SPRoleType> group in pNewGrps)
+                                    {
+                                        SPGroup g = web.SiteGroups[group.Key];
+                                        AddNewItemLvlPerm(li, web, group.Value, g);
+                                    }
+                                    AddBuildTeamSecurityGroups(web, settings, li);
+                                }
+                                catch { }
+                            }
+                        }
+
                         SPRoleAssignmentCollection raCol = targetItem.RoleAssignments;
                         string itemMemberGrp = "Member";
                         foreach (SPRoleAssignment ra in raCol)
