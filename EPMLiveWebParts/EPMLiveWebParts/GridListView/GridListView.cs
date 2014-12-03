@@ -187,6 +187,7 @@ namespace EPMLiveWebParts
         string oJsonViewURL = string.Empty;
         string oJsonDefaultViewURL = string.Empty;
 
+
         #region Gantt Properties
 
         [ConnectionConsumer("Report ID Consumer", "ReportIDConsumer")]
@@ -3149,26 +3150,38 @@ namespace EPMLiveWebParts
                 if (sSearchType == "")
                     sSearchType = "1";
 
+                Dictionary<string, Dictionary<string, string>> fieldProperties = null;
+                GridGanttSettings gSettings = new GridGanttSettings(list);
+                if (gSettings.DisplaySettings != "")
+                    fieldProperties = ListDisplayUtils.ConvertFromString(gSettings.DisplaySettings);
+                bool bflag = false;
+
                 foreach (SPField field in list.Fields)
                 {
                     if (field.Reorderable && !field.Hidden)
                     {
-                        slFields.Add(field.Title, field.InternalName);
-
-
-                        if (field.Type == SPFieldType.Choice)
+                        if (fieldProperties != null)
+                            bflag = EPMLiveCore.EditableFieldDisplay.IsDisplayField(field, fieldProperties, "Display");
+                        else
+                            bflag = (bool)field.ShowInViewForms;
+                        if (bflag == true)
                         {
-                            jsonfields += field.InternalName + ": [";
-                            SPFieldChoice c = (SPFieldChoice)field;
-                            foreach (string choice in c.Choices)
+                            slFields.Add(field.Title, field.InternalName);
+
+                            if (field.Type == SPFieldType.Choice)
                             {
-                                jsonfields += "\"" + choice.Replace("\"", "\\\"") + "\",";
+                                jsonfields += field.InternalName + ": [";
+                                SPFieldChoice c = (SPFieldChoice)field;
+                                foreach (string choice in c.Choices)
+                                {
+                                    jsonfields += "\"" + choice.Replace("\"", "\\\"") + "\",";
+                                }
+                                jsonfields = jsonfields.TrimEnd(',') + "],";
                             }
-                            jsonfields = jsonfields.TrimEnd(',') + "],";
-                        }
-                        if (field.Type == SPFieldType.Boolean)
-                        {
-                            jsonfields += field.InternalName + ": [ \"Yes\", \"No\" ],";
+                            if (field.Type == SPFieldType.Boolean)
+                            {
+                                jsonfields += field.InternalName + ": [ \"Yes\", \"No\" ],";
+                            }
                         }
                     }
                 }
