@@ -1593,11 +1593,7 @@
             if (grid.id != this.ScrollMasterGridId)
                 return;
 
-            if (rPEditorInstance.scrollStopTimer)
-                clearTimeout(rPEditorInstance.scrollStopTimer);
-            rPEditorInstance.scrollStopTimer = setTimeout(function () {
-                rPEditorInstance.RefreshResourcePeriodsPaged(true, null);
-            }, 500);
+            
 
             var gridRes = Grids["g_Res"];
             var gridRPE = Grids["g_RPE"];
@@ -1612,6 +1608,14 @@
                         gridRPE.SetScrollLeft(grid.GetScrollLeft(2), 2);
                     }
                 }
+            }
+
+            if (grid.id == "g_Res") {
+                if (rPEditorInstance.scrollStopTimer)
+                    clearTimeout(rPEditorInstance.scrollStopTimer);
+                rPEditorInstance.scrollStopTimer = setTimeout(function () {
+                    rPEditorInstance.RefreshResourcePeriodsPaged(true, null);
+                }, 500);
             }
         }
         catch (e) {
