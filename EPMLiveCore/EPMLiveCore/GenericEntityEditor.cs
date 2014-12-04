@@ -30,13 +30,44 @@ namespace EPMLiveCore
         protected override void CreateChildControls()
         {
             base.CreateChildControls();
-
+            string disThrott = string.Empty;
             Control browseControl = FindBrowseLink(this);
             if (browseControl != null)
             {
                 SPList l = GetListFromPropBag();
                 if (l != null && l.DoesUserHavePermissions(SPBasePermissions.AddListItems))
                 {
+                    SPSecurity.RunWithElevatedPrivileges(delegate()
+                    {
+                        using (SPSite es = new SPSite(SPContext.Current.Site.ID))
+                        {
+                            using (SPWeb ew = es.OpenWeb())
+                            {
+                                try
+                                {
+                                    if (l.EnableThrottling)
+                                    {
+                                        ew.AllowUnsafeUpdates = true;
+                                        l.EnableThrottling = false;
+                                        try
+                                        {
+                                            disThrott = EPMLiveCore.CoreFunctions.getConfigSetting(ew, "EPM_LVT_Disabled");
+                                        }
+                                        catch { }
+                                        if (!disThrott.Contains(Convert.ToString(l.ID)))
+                                        {
+                                            disThrott += Convert.ToString(l.ID) + ",";                                            
+                                            EPMLiveCore.CoreFunctions.setConfigSetting(ew, "EPM_LVT_Disabled", disThrott);
+                                        }
+                                        l.Update();
+                                       
+                                        ew.AllowUnsafeUpdates = false;
+                                    }
+                                }
+                                catch { ew.AllowUnsafeUpdates = false; }
+                            }
+                        }
+                    });
                     browseControl.Parent.Controls.Add(new LiteralControl("&nbsp;"));
                     LiteralControl addItemButton = new LiteralControl();
                     addItemButton.Text = "<a id=\"" + this.ClientID + "_addItem\" title=\"Add Item\" onclick=\"window.epmLiveGenericEntityEditor.OpenUrlWithModal('" + l.DefaultNewFormUrl + "');return false;\" href=\"#\">" +
