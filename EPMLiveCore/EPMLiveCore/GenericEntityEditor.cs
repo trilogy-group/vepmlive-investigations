@@ -34,57 +34,51 @@ namespace EPMLiveCore
             Control browseControl = FindBrowseLink(this);
             if (browseControl != null)
             {
-                SPList l = GetListFromPropBag();
-                if (l != null && l.DoesUserHavePermissions(SPBasePermissions.AddListItems))
+                SPSecurity.RunWithElevatedPrivileges(delegate()
                 {
-                    if (l.EnableThrottling)
+                    SPList l = GetListFromPropBag();
+                    if (l != null && l.DoesUserHavePermissions(SPBasePermissions.AddListItems))
                     {
-                        SPSecurity.RunWithElevatedPrivileges(delegate()
+                        if (l.EnableThrottling)
                         {
-                            using (SPSite es = new SPSite(SPContext.Current.Site.ID))
+                            try
                             {
-                                using (SPWeb ew = es.OpenWeb(SPContext.Current.Web.ID))
+
+                                l.ParentWeb.AllowUnsafeUpdates = true;
+                                l.EnableThrottling = false;
+                                l.Update();                                
+                                try
                                 {
-                                    try
-                                    {
-                                        ew.AllowUnsafeUpdates = true;
-                                        l.EnableThrottling = false;
-                                        try
-                                        {
-                                            disThrott = EPMLiveCore.CoreFunctions.getConfigSetting(ew, "EPM_LVT_Disabled");
-                                        }
-                                        catch { }
-
-                                        if (!disThrott.Contains(Convert.ToString(l.ID)))
-                                        {
-                                            disThrott += Convert.ToString(l.ID) + ",";
-                                            EPMLiveCore.CoreFunctions.setConfigSetting(ew, "EPM_LVT_Disabled", disThrott);
-                                        }
-                                        l.Update();
-                                        ew.AllowUnsafeUpdates = false;
-
-                                    }
-                                    catch { ew.AllowUnsafeUpdates = false; }
+                                    disThrott = EPMLiveCore.CoreFunctions.getConfigSetting(l.ParentWeb, "EPM_LVT_Disabled");
                                 }
+                                catch { }
+
+                                if (!disThrott.Contains(Convert.ToString(l.ID)))
+                                {
+                                    disThrott += Convert.ToString(l.ID) + ",";
+                                    EPMLiveCore.CoreFunctions.setConfigSetting(l.ParentWeb, "EPM_LVT_Disabled", disThrott);
+                                }
+                                l.ParentWeb.AllowUnsafeUpdates = false;
                             }
-                        });
+                            catch { l.ParentWeb.AllowUnsafeUpdates = false; }
+                        }
+
+                        browseControl.Parent.Controls.Add(new LiteralControl("&nbsp;"));
+                        LiteralControl addItemButton = new LiteralControl();
+                        addItemButton.Text = "<a id=\"" + this.ClientID + "_addItem\" title=\"Add Item\" onclick=\"window.epmLiveGenericEntityEditor.OpenUrlWithModal('" + l.DefaultNewFormUrl + "');return false;\" href=\"#\">" +
+                                                "<IMG style=\"BORDER-RIGHT-WIDTH: 0px; BORDER-TOP-WIDTH: 0px; BORDER-BOTTOM-WIDTH: 0px; BORDER-LEFT-WIDTH: 0px\" title=\"AddItem\" alt=\"Add item to lookup list\" src=\"/_layouts/epmlive/images/Plus14.png\">" +
+                                             "</a>";
+
+                        browseControl.Parent.Controls.Add(addItemButton);
+                        Image dropImg = new Image();
+                        dropImg.ImageUrl = "/_layouts/epmlive/images/dropdown2.png";
+                        dropImg.Attributes["id"] = propBag.Field + "_ddlShowAll";
+                        dropImg.Attributes["style"] = "margin-left: -5px;";
+                        browseControl.Parent.Controls.AddAt(0, dropImg);
+
+                        (browseControl.Parent as TableCell).Attributes["Style"] = "padding-left: 5px;";
                     }
-
-                    browseControl.Parent.Controls.Add(new LiteralControl("&nbsp;"));
-                    LiteralControl addItemButton = new LiteralControl();
-                    addItemButton.Text = "<a id=\"" + this.ClientID + "_addItem\" title=\"Add Item\" onclick=\"window.epmLiveGenericEntityEditor.OpenUrlWithModal('" + l.DefaultNewFormUrl + "');return false;\" href=\"#\">" +
-                                            "<IMG style=\"BORDER-RIGHT-WIDTH: 0px; BORDER-TOP-WIDTH: 0px; BORDER-BOTTOM-WIDTH: 0px; BORDER-LEFT-WIDTH: 0px\" title=\"AddItem\" alt=\"Add item to lookup list\" src=\"/_layouts/epmlive/images/Plus14.png\">" +
-                                         "</a>";
-
-                    browseControl.Parent.Controls.Add(addItemButton);
-                    Image dropImg = new Image();
-                    dropImg.ImageUrl = "/_layouts/epmlive/images/dropdown2.png";
-                    dropImg.Attributes["id"] = propBag.Field + "_ddlShowAll";
-                    dropImg.Attributes["style"] = "margin-left: -5px;";
-                    browseControl.Parent.Controls.AddAt(0, dropImg);
-
-                    (browseControl.Parent as TableCell).Attributes["Style"] = "padding-left: 5px;";
-                }
+                });
 
                 //if (propBag.Required)
                 //{
