@@ -49,9 +49,6 @@ namespace EPMLiveCore
                                     {
                                         ew.AllowUnsafeUpdates = true;
                                         l.EnableThrottling = false;
-                                        l.Update();
-                                        ew.AllowUnsafeUpdates = false;
-
                                         try
                                         {
                                             disThrott = EPMLiveCore.CoreFunctions.getConfigSetting(ew, "EPM_LVT_Disabled");
@@ -63,6 +60,9 @@ namespace EPMLiveCore
                                             disThrott += Convert.ToString(l.ID) + ",";
                                             EPMLiveCore.CoreFunctions.setConfigSetting(ew, "EPM_LVT_Disabled", disThrott);
                                         }
+                                        l.Update();
+                                        ew.AllowUnsafeUpdates = false;
+
                                     }
                                     catch { ew.AllowUnsafeUpdates = false; }
                                 }
