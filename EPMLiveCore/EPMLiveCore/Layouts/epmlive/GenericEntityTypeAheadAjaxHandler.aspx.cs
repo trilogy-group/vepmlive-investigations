@@ -4,8 +4,6 @@ using Microsoft.SharePoint.WebControls;
 using System.Xml;
 using System.Text;
 using System.Data;
-using EPMLiveCore.ReportingProxy;
-using System.Collections.Generic;
 
 namespace EPMLiveCore
 {
@@ -114,7 +112,7 @@ namespace EPMLiveCore
             else
             {
                 SPList list = SPContext.Current.Web.Lists[_listID];
-                SPQuery query = new SPQuery();                
+                SPQuery query = new SPQuery();
                 query.Query = "";
                 if ((_field.Trim().ToLower() == "id"))
                 {
@@ -122,81 +120,27 @@ namespace EPMLiveCore
                 }
                 else if ((_field.Trim().ToLower() == "title"))
                 {
-                    query.ViewFields = "<FieldRef Name='" + _field + "' /><FieldRef Name='ID' />";                    
+                    query.ViewFields = "<FieldRef Name='" + _field + "' /><FieldRef Name='ID' />";
                 }
                 else
                 {
                     query.ViewFields = "<FieldRef Name='" + _field + "' /><FieldRef Name='ID' /><FieldRef Name='Title' />";
                 }
-
-                bool isEpmtyTableName = true;
-                if (list.EnableThrottling)
-                {
-                    string sql = string.Empty;
-                    string tableName = string.Empty;
-
-                    tableName = GetTableName(list, SPContext.Current.Web.Site);
-                    if (!string.IsNullOrEmpty(tableName))
-                    {
-                        isEpmtyTableName = false;
-                        
-                        sql = string.Format("SELECT ID,Title FROM [{0}] ORDER BY {1} ASC",tableName,_field);
-                        try
-                        {                            
-                            var queryExecutor = new QueryExecutor(SPContext.Current.Web);
-                            DataTable dt = queryExecutor.ExecuteReportingDBQuery(sql, new Dictionary<string, object> { });
-                            _sbResult = new StringBuilder();
-
-                            if (dt != null)
-                            {                                
-                                foreach (DataRow r in dt.Rows)
-                                {
-                                    _sbResult.Append(r["ID"].ToString() + "^^" + r[_field].ToString() + "^^" + (!string.IsNullOrEmpty(r[_field].ToString()) ? r[_field].ToString() : string.Empty) + ";#");
-                                }
-                            }
-                        }
-                        catch { }
-                    }
-                }
-                if (!list.EnableThrottling || isEpmtyTableName)
-                {
-                    query.ViewFieldsOnly = true;
-                    SPListItemCollection items = list.GetItems(query);
-                    DataTable dt = items.GetDataTable();
-                    _sbResult = new StringBuilder();
-
-                    if (dt != null)
-                    {
-                        DataRow[] results = dt.Select("", _field + " ASC");
-                        foreach (DataRow r in results)
-                        {
-                            _sbResult.Append(r["ID"].ToString() + "^^" + r[_field].ToString() + "^^" + (!string.IsNullOrEmpty(r[_field].ToString()) ? r[_field].ToString() : string.Empty) + ";#");
-                        }
-                    }
-                }
-            }
-
-        }
-
-        private string GetTableName(SPList list, SPSite site)
-        {
-            string sql;
-            string tableName = string.Empty;
-            try
-            {
-                var queryExecutor = new QueryExecutor(SPContext.Current.Web);                
-                sql = string.Format("SELECT TableName FROM RPTList WHERE RPTListId='{0}' AND SiteId='{1}'",list.ID,site.ID);
-                DataTable dt = queryExecutor.ExecuteReportingDBQuery(sql, new Dictionary<string, object> { });
+                query.ViewFieldsOnly = true;
+                SPListItemCollection items = list.GetItems(query);
+                DataTable dt = items.GetDataTable();
+                _sbResult = new StringBuilder();
 
                 if (dt != null)
                 {
-                    tableName = Convert.ToString(dt.Rows[0]["TableName"]);
+                    DataRow[] results = dt.Select("", _field + " ASC");
+                    foreach (DataRow r in results)
+                    {
+                        _sbResult.Append(r["ID"].ToString() + "^^" + r[_field].ToString() + "^^" + (!string.IsNullOrEmpty(r[_field].ToString()) ? r[_field].ToString() : string.Empty) + ";#");
+                    }
                 }
+
             }
-            catch { }
-
-            return tableName;
-
         }
     }
 }
