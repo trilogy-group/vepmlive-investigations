@@ -38,24 +38,24 @@
                 }               
             });
 
-            window.upland_insight = {
-                id: '<%= UplandInsightId %>',
-                user: {
-                    id: window.epmLive.currentUserLoginName,
-                    name: window.epmLive.currentUserName
-                }
-            };
+            //window.upland_insight = {
+            //    id: '<%= UplandInsightId %>',
+            //    user: {
+            //        id: window.epmLive.currentUserLoginName,
+            //        name: window.epmLive.currentUserName
+            //    }
+            //};
 
-            if(window.upland_insight.id) {
-                (function () {
-                    var e = document.createElement('script');
-                    e.type = 'text/javascript';
-                    e.async = true;
-                    e.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 's3.amazonaws.com/cdn.upland/upland.insight.js';
-                    var s = document.getElementsByTagName('script')[0];
-                    s.parentNode.insertBefore(e, s);
-                })();
-            }
+            //if(window.upland_insight.id) {
+            //    (function () {
+            //        var e = document.createElement('script');
+            //        e.type = 'text/javascript';
+            //        e.async = true;
+            //        e.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 's3.amazonaws.com/cdn.upland/upland.insight.js';
+            //        var s = document.getElementsByTagName('script')[0];
+            //        s.parentNode.insertBefore(e, s);
+            //    })();
+            //}
         }
 
         ExecuteOrDelayUntilScriptLoaded(onJqueryLoaded, 'jquery.min.js');
