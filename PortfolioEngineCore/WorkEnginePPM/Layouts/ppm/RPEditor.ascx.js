@@ -91,7 +91,9 @@
         if (this.finishPeriod != null) finish = this.finishPeriod;
         var length = grid.ColNames[2].length;
         var hide = [];
+        var hideTemp = [];
         var show = [];
+        var showTemp = [];
         this.maxPeriodLimitExceeds = false;
         for (var c = 0; c < length; c++) {
             var col = grid.ColNames[2][c];
@@ -109,15 +111,20 @@
 
         if (show.length > this.params.MaxPeriodLimit) {
             this.maxPeriodLimitExceeds = true;
+            hideTemp = hide.concat(show.slice(this.params.MaxPeriodLimit, show.length));
+            showTemp = show.slice(0, this.params.MaxPeriodLimit);
+        }
+        else {
+            hideTemp = hide;
+            showTemp = show;
         }
         if (this.maxPeriodLimitExceeds && maxPeriodLimitExceedsConfirm === undefined) {
-            maxPeriodLimitExceedsConfirm = confirm("You have more than " + this.params.MaxPeriodLimit + " periods! \n Try splitting periods into views for better performace! \n\n Click 'OK' for restricting view to " + this.params.MaxPeriodLimit + " periods! \n Click 'Cancel' to load all periods!");
+            //maxPeriodLimitExceedsConfirm = confirm(" You have selected more than " + this.params.MaxPeriodLimit + " periods in the view. To improve performance we have limited the amount of periods loaded. \n Please ask your administrator to change your view to show less than " + this.params.MaxPeriodLimit + " periods to avoid receiving this message in the future.\n\n Click 'OK' for restricting view to " + this.params.MaxPeriodLimit + " periods! \n Click 'Cancel' to load all periods!");
+            alert(" You have selected more than " + this.params.MaxPeriodLimit + " periods in the view. To improve performance we have limited the amount of periods loaded. \n Please ask your administrator to change your view to show less than " + this.params.MaxPeriodLimit + " periods to avoid receiving this message in the future.");
+            maxPeriodLimitExceedsConfirm = true;
+            this.viewTab.selectByValue("idViewTab_ToPeriod", showTemp[showTemp.length - 1].replace("Q", ""));
         }
-        if (maxPeriodLimitExceedsConfirm == true) {
-            grid.ChangeColsVisibility(show.slice(0, this.params.MaxPeriodLimit), hide.concat(show.slice(this.params.MaxPeriodLimit, show.length)), 0);
-        } else {
-            grid.ChangeColsVisibility(show, hide, 0);
-        }
+        grid.ChangeColsVisibility(showTemp, hideTemp, 0);
     };
     RPEditor.prototype.ExecuteJSON = function (Dataxml, serverFunction) {
         if (typeof serverFunction != "string") serverFunction = "ResourcePlans";
@@ -1593,7 +1600,7 @@
             if (grid.id != this.ScrollMasterGridId)
                 return;
 
-            
+
 
             var gridRes = Grids["g_Res"];
             var gridRPE = Grids["g_RPE"];
@@ -1615,7 +1622,7 @@
                     clearTimeout(rPEditorInstance.scrollStopTimer);
                 rPEditorInstance.scrollStopTimer = setTimeout(function () {
                     rPEditorInstance.RefreshResourcePeriodsPaged(true, null);
-                }, 500);
+                }, 750);
             }
         }
         catch (e) {
