@@ -69,8 +69,8 @@ namespace PortfolioEngineCore
             xCfg.CreateIntAttr("FocusWholeRow", 1);
             xCfg.CreateIntAttr("Paging", 2);
             xCfg.CreateIntAttr("ChildPaging", 2);
-            //xCfg.CreateIntAttr("PageLength", 10);
-            //xCfg.CreateIntAttr("MaxPages", 5);
+            xCfg.CreateIntAttr("PageLength", 20);
+            xCfg.CreateIntAttr("MaxPages", 1);
             xCfg.CreateIntAttr("NoPager", 1);
             xCfg.CreateIntAttr("AllPages", 1);
 
@@ -262,19 +262,19 @@ namespace PortfolioEngineCore
 
             List<CStruct> listPeriods = xPeriods.GetList("Period");
 
-            if (listPeriods != null)
-            {
-                if (listPeriods.Count > 120)
-                {
-                    xCfg.CreateIntAttr("PageLength", 10);
-                    xCfg.CreateIntAttr("MaxPages", 5);
-                }
-                else
-                {
-                    xCfg.CreateIntAttr("PageLength", 50);
-                    xCfg.CreateIntAttr("MaxPages", 2);
-                }
-            }
+            //if (listPeriods != null)
+            //{
+            //    if (listPeriods.Count > 120)
+            //    {
+            //        xCfg.CreateIntAttr("PageLength", 10);
+            //        xCfg.CreateIntAttr("MaxPages", 5);
+            //    }
+            //    else
+            //    {
+            //        xCfg.CreateIntAttr("PageLength", 50);
+            //        xCfg.CreateIntAttr("MaxPages", 2);
+            //    }
+            //}
 
             foreach (CStruct xPeriod in listPeriods)
             {

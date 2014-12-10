@@ -124,7 +124,13 @@
             maxPeriodLimitExceedsConfirm = true;
             this.viewTab.selectByValue("idViewTab_ToPeriod", showTemp[showTemp.length - 1].replace("Q", ""));
         }
-        grid.ChangeColsVisibility(showTemp, hideTemp, 0);
+
+        setTimeout(function () {
+            grid.ChangeColsVisibility(showTemp, hideTemp, 0);
+            //rPEditorInstance.HideWorkingPopup("divLoading");
+        }, 10);
+
+
     };
     RPEditor.prototype.ExecuteJSON = function (Dataxml, serverFunction) {
         if (typeof serverFunction != "string") serverFunction = "ResourcePlans";
@@ -1617,17 +1623,17 @@
                 }
             }
 
-            if (grid.id == "g_Res") {
-                if (rPEditorInstance.scrollStopTimer)
-                    clearTimeout(rPEditorInstance.scrollStopTimer);
-                rPEditorInstance.scrollStopTimer = setTimeout(function () {
-                    rPEditorInstance.RefreshResourcePeriodsPaged(true, null);
-                }, 750);
-            }
+            //if (grid.id == "g_Res") {
+            //    if (rPEditorInstance.scrollStopTimer)
+            //        clearTimeout(rPEditorInstance.scrollStopTimer);
+            //    rPEditorInstance.scrollStopTimer = setTimeout(function () {
+            //        rPEditorInstance.RefreshResourcePeriodsPaged(true, null);
+            //    }, 750);
+            //}
         }
         catch (e) {
-            if (rPEditorInstance.scrollStopTimer)
-                clearTimeout(rPEditorInstance.scrollStopTimer);
+            //if (rPEditorInstance.scrollStopTimer)
+            //    clearTimeout(rPEditorInstance.scrollStopTimer);
             this.HandleException("GridsOnScroll", e);
         }
     };
@@ -3050,6 +3056,7 @@
                     break;
                 case "ViewTab_SelView_Changed":
                     maxPeriodLimitExceedsConfirm = undefined;
+                    //this.ShowWorkingPopup("divLoading");
                     var selectedView = this.GetSelectedView();
                     if (selectedView != null) {
                         var periods = selectedView.g_RPE.RightCols.split(",");
@@ -3347,6 +3354,7 @@
                 case "ViewTab_FromPeriod_Changed":
                 case "ViewTab_ToPeriod_Changed":
                     maxPeriodLimitExceedsConfirm = undefined;
+                    //this.ShowWorkingPopup("divLoading");
                     var from = document.getElementById('idViewTab_FromPeriod');
                     var sp = parseInt(from.options[from.selectedIndex].value);
                     if (sp == 0 && this.currentPeriod != null)
@@ -5016,8 +5024,8 @@
             resgrid.RenderBody();
     };
     RPEditor.prototype.RefreshResourcePeriodsPaged = function (bCalculate, start) {
-        if (rPEditorInstance.scrollStopTimer)
-            clearTimeout(rPEditorInstance.scrollStopTimer);
+        //if (rPEditorInstance.scrollStopTimer)
+        //    clearTimeout(rPEditorInstance.scrollStopTimer);
         var resgrid = Grids["g_Res"];
         if (start != null) {
             //var dt1 = new Date();
@@ -5037,11 +5045,39 @@
         else {
             //var dt11 = new Date();
             var rows = resgrid.GetShownRows();
-            for (var i = 0; i <= rows.length; i++) {
-                if (bCalculate == true) {
-                    rPEditorInstance.CalculateResourceRowCommitted(null, rows[i], false);
-                } else {
-                    rPEditorInstance.RefreshResourceRowPeriods(resgrid, rows[i], true, false);
+            var pages = new Array();
+            for (var i = 0; i < rows.length; i++) {
+                var page = resgrid.GetRowPage(rows[i]);
+                if (pages.indexOf(page) < 0) {
+                    pages.push(page);
+                }
+                if (i == 0) {
+                    var prevpage = resgrid.GetRowPage(rows[i]).previousSibling;
+                    if (prevpage) {
+                        if (pages.indexOf(prevpage) < 0) {
+                            pages.push(page);
+                        }
+                    }
+                }
+                if (i == rows.length - 1) {
+                    var nextpage = resgrid.GetRowPage(rows[i]).nextSibling;
+                    if (nextpage) {
+                        if (pages.indexOf(nextpage) < 0) {
+                            pages.push(page);
+                        }
+                    }
+                }
+            }
+            for (var p = 0; p < pages.length; p++) {
+                var pagerow = pages[p];
+                var row = pagerow.firstChild;
+                while (row != null) {
+                    if (bCalculate == true) {
+                        rPEditorInstance.CalculateResourceRowCommitted(null, row, true);
+                    } else {
+                        rPEditorInstance.RefreshResourceRowPeriods(resgrid, row, true, true);
+                    }
+                    row = row.nextSibling;
                 }
             }
             //var dt22 = new Date();
@@ -5920,7 +5956,7 @@
         this.displayMode = 0;
         this.costCategoryRoles = null;
         this.ccrFTEArray = null;
-        this.scrollStopTimer;
+        //this.scrollStopTimer;
         this.ccrolesArray = null;
         this.plangrid = null;
         this.resgrid = null;
