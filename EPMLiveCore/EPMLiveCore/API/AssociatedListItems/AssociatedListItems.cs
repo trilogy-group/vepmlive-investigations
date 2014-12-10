@@ -370,7 +370,7 @@ namespace EPMLiveCore.API
                                         }
                                         else
                                         {
-                                            if (list.EnableThrottling && otherList != null && otherList.BaseTemplate != SPListTemplateType.DocumentLibrary) //In terms of bulk record SharePoint throws exception hence we need to retrieve records from EPMLive Reporting Database.
+                                            if (otherList != null && otherList.EnableThrottling && otherList.BaseTemplate != SPListTemplateType.DocumentLibrary) //In terms of bulk record SharePoint throws exception hence we need to retrieve records from EPMLive Reporting Database.
                                             {
                                                 #region If Threshold is enabled for processed list then retrieve those records from reporting database
 
@@ -453,7 +453,7 @@ namespace EPMLiveCore.API
                                             }
                                         }
 
-                                        if (list.EnableThrottling && otherList != null && otherList.BaseTemplate != SPListTemplateType.DocumentLibrary)
+                                        if (otherList != null && otherList.EnableThrottling && otherList.BaseTemplate != SPListTemplateType.DocumentLibrary)
                                         {
                                             #region Load Top-5 Items (From Database, In case of Enable Throttling is Set to True)
 
