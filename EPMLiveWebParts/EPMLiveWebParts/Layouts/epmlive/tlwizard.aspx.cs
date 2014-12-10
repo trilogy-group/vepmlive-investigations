@@ -250,9 +250,21 @@ namespace EPMLiveWebParts.Layouts.epmlive
 
                             processQuickLaunch(web);
                             hideWizard(web);
-                            if (ssrsurl != "")
+
+                            if (!string.IsNullOrEmpty(ssrsurl))
                             {
                                 processReports(web);
+                                pnlProcessing.Visible = false;
+                            }
+                            else
+                            {
+                                System.Web.UI.WebControls.Label invalidUrlMsgLable = ((System.Web.UI.WebControls.Label)(pnlMessage.FindControl("lblInvalidUrl")));
+                                if (invalidUrlMsgLable != null)
+                                {
+                                    pnlMessage.Visible = true;
+                                    pnlProcessing.Visible = false;
+                                    invalidUrlMsgLable.Text = "No reporting url has been entered in Central Admin.";
+                                }
                             }
 
                             ProcessNotifications(web);
@@ -267,6 +279,7 @@ namespace EPMLiveWebParts.Layouts.epmlive
                             ClearNavigationCache(web);
 
                             CoreFunctions.enqueue(TimerJobID, 0);
+
                             if (pnlMessage.Visible == false) 
                             {
                                 if (rdoYes.Checked)
