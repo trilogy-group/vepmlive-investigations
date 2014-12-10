@@ -8,6 +8,7 @@ using System.Data.SqlClient;
 using EPMLiveReportsAdmin;
 using System.Threading;
 using EPMLiveCore.API;
+using System.Collections;
 
 namespace EPMLiveCore.Jobs
 {
@@ -142,6 +143,33 @@ namespace EPMLiveCore.Jobs
 
                         SPList lookupPrntList = web.Lists[new Guid(lookup.LookupList)];
                         GridGanttSettings prntListSettings = new GridGanttSettings(lookupPrntList);
+                        bool isEnableSecurity = false;
+                        bool isParentSecure = false;
+                        try
+                        {
+                            isParentSecure = prntListSettings.BuildTeamSecurity;
+                        }
+                        catch { }
+
+                        string[] LookupArray = prntListSettings.Lookups.Split('|');
+                        string[] sLookupInfo = null;
+                        Hashtable hshLookups = new Hashtable();
+                        foreach (string sLookup in LookupArray)
+                        {
+                            if (sLookup != "")
+                            {
+                                sLookupInfo = sLookup.Split('^');
+                                hshLookups.Add(sLookupInfo[0], sLookupInfo);
+                            }
+                        }
+                        try
+                        {
+                            if (sLookupInfo != null && sLookupInfo[4].ToLower() == "true")
+                                isEnableSecurity = true;
+                            else
+                                isEnableSecurity = false;
+                        }
+                        catch { isEnableSecurity = false; }
 
                         // skip fields with empty lookup values
                         string sVal = string.Empty;
@@ -158,23 +186,10 @@ namespace EPMLiveCore.Jobs
                         else
                         {
                             //EPML-4422: When a project is not using unique security, and a child list like tasks is set to Inherit security from the project lookup, It sets the task to unique, but does not add any groups. It should not get set to Unique.
-                            if (!li.HasUniqueRoleAssignments)
+                            if (!isSecure && isParentSecure && isEnableSecurity)
                             {
                                 web.AllowUnsafeUpdates = true;
-                                safeGroupTitle = safeTitle;
-                                safeTitle = GetIdenticalGroupName(site.ID, web.ID, safeTitle, 0);
-                                try
-                                {
-                                    Dictionary<string, SPRoleType> pNewGrps = AddBasicSecurityGroups(web, safeTitle, orignalUser, li);
-                                    li.BreakRoleInheritance(false);
-                                    foreach (KeyValuePair<string, SPRoleType> group in pNewGrps)
-                                    {
-                                        SPGroup g = web.SiteGroups[group.Key];
-                                        AddNewItemLvlPerm(li, web, group.Value, g);
-                                    }
-                                    AddBuildTeamSecurityGroups(web, settings, li);
-                                }
-                                catch { }
+                                li.BreakRoleInheritance(false);
                             }
                         }
 
