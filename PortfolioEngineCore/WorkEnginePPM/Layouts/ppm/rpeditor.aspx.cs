@@ -131,25 +131,28 @@ namespace WorkEnginePPM
         protected Int32 GetMaxPeriodLimit()
         {
             Int32 maxPeriodLimit = 120;
-            try
+            SPSecurity.RunWithElevatedPrivileges(delegate()
             {
-                if (Web.Site.RootWeb.Properties["pfemaxperiodlimit"] != null)
+                try
                 {
-                    Int32 mpl;
-                    if (Int32.TryParse(Convert.ToString(Web.Site.RootWeb.Properties["pfemaxperiodlimit"]), out mpl))
-                        maxPeriodLimit = mpl;
+                    if (Web.Site.RootWeb.Properties["pfemaxperiodlimit"] != null)
+                    {
+                        Int32 mpl;
+                        if (Int32.TryParse(Convert.ToString(Web.Site.RootWeb.Properties["pfemaxperiodlimit"]), out mpl))
+                            maxPeriodLimit = mpl;
+                    }
+                    else
+                    {
+                        Web.AllowUnsafeUpdates = true;
+                        EPMLiveCore.CoreFunctions.setConfigSetting(Web, "pfemaxperiodlimit", "120");
+                        Web.AllowUnsafeUpdates = false;
+                    }
                 }
-                else
+                catch (Exception ex)
                 {
-                    Web.AllowUnsafeUpdates = true;
-                    EPMLiveCore.CoreFunctions.setConfigSetting(Web, "pfemaxperiodlimit", "120");
                     Web.AllowUnsafeUpdates = false;
                 }
-            }
-            catch (Exception ex)
-            {
-                Web.AllowUnsafeUpdates = false;
-            }
+            });
             return maxPeriodLimit;
         }
 
