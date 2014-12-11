@@ -84,7 +84,9 @@
         }
         return null;
     };
-    RPEditor.prototype.ShowHidePeriods = function (grid) {
+    RPEditor.prototype.ShowHidePeriods = function (grid, showLoading) {
+        if (showLoading)
+            this.ShowWorkingPopup("divLoading");
         var start = 0;
         if (this.startPeriod != null) start = this.startPeriod;
         var finish = 99999;
@@ -125,11 +127,11 @@
             this.viewTab.selectByValue("idViewTab_ToPeriod", showTemp[showTemp.length - 1].replace("Q", ""));
         }
 
-        setTimeout(function () {
-            grid.ChangeColsVisibility(showTemp, hideTemp, 0);
-            //rPEditorInstance.HideWorkingPopup("divLoading");
-        }, 10);
-
+        if (showLoading) {
+            setTimeout(function () { grid.ChangeColsVisibility(showTemp, hideTemp, 0); rPEditorInstance.HideWorkingPopup("divLoading"); }, 10);
+        } else {
+            setTimeout(function () { grid.ChangeColsVisibility(showTemp, hideTemp, 0); }, 10);
+        }
 
     };
     RPEditor.prototype.ExecuteJSON = function (Dataxml, serverFunction) {
@@ -1512,7 +1514,7 @@
                 var selectedView = this.GetSelectedView();
                 if (selectedView != null)
                     this.ApplyGridView(grid.id, selectedView, false);
-                this.ShowHidePeriods(grid);
+                this.ShowHidePeriods(grid, false);
                 this.RefreshPlanPeriods(false);
                 if (this.initialized == false) {
                     this.layout_res.cells(const_ResourceGridCell).attachObject("gridDiv_Res");
@@ -1559,7 +1561,7 @@
                 var selectedView = this.GetSelectedView();
                 if (selectedView != null)
                     this.ApplyGridView(grid.id, selectedView, false);
-                this.ShowHidePeriods(grid);
+                this.ShowHidePeriods(grid, false);
                 this.ShowSelectedResourceGroup();
                 this.RefreshResourcePeriodsBasic(true);
                 this.viewTab.refreshSelect("idViewTab_FromPeriod");
@@ -3056,7 +3058,6 @@
                     break;
                 case "ViewTab_SelView_Changed":
                     maxPeriodLimitExceedsConfirm = undefined;
-                    //this.ShowWorkingPopup("divLoading");
                     var selectedView = this.GetSelectedView();
                     if (selectedView != null) {
                         var periods = selectedView.g_RPE.RightCols.split(",");
@@ -3078,8 +3079,8 @@
                         this.InitialiseResourceGrid();
                         this.RefreshResourcePeriodsPaged(true, null);
                         this.spreadDlg_LoadData(this.plangrid, this.planrow, false);
-                        this.ShowHidePeriods(this.plangrid);
-                        this.ShowHidePeriods(this.resgrid);
+                        this.ShowHidePeriods(this.plangrid, false);
+                        this.ShowHidePeriods(this.resgrid, false);
                         this.UpdateButtonsAsync();
                     }
                     break;
@@ -3354,13 +3355,20 @@
                 case "ViewTab_FromPeriod_Changed":
                 case "ViewTab_ToPeriod_Changed":
                     maxPeriodLimitExceedsConfirm = undefined;
-                    //this.ShowWorkingPopup("divLoading");
                     var from = document.getElementById('idViewTab_FromPeriod');
                     var sp = parseInt(from.options[from.selectedIndex].value);
-                    if (sp == 0 && this.currentPeriod != null)
+                    var spi = parseInt(from.selectedIndex);
+
+                    if (from.options[0].value == 0 && from.options[0].text == "Current") {
+                        spi = spi - 1;
+                    }
+
+                    if (sp == 0 && this.currentPeriod != null) {
                         sp = this.currentPeriod;
+                    }
                     var to = document.getElementById('idViewTab_ToPeriod');
                     var fp = parseInt(to.options[to.selectedIndex].value);
+                    var fpi = parseInt(to.selectedIndex);
 
                     if (sp > fp) {
                         alert("The 'From' period cannot be after the 'To' Period");
@@ -3368,10 +3376,40 @@
                         this.viewTab.selectByValue("idViewTab_ToPeriod", this.finishPeriod);
                     }
                     else {
+                        if (event == "ViewTab_FromPeriod_Changed") {
+                            if (spi < 0) {
+                                for (var i = 0; i < from.options.length; i++) {
+                                    if (parseInt(from.options[i].value) == sp) {
+                                        spi = from.options[i].index - 1;
+                                        break;
+                                    }
+                                }
+                            }
+                            var setFPIndex = spi + parseInt(this.params.MaxPeriodLimit);
+                            if (setFPIndex > to.options.length) {
+                                fp = to.options[to.options.length - 1].value;
+                                to.options.selectedIndex = to.options.length - 1;
+                            } else {
+                                fp = to.options[setFPIndex - 1].value;
+                                to.options.selectedIndex = setFPIndex - 1;
+                            }
+                            this.viewTab.refreshSelect("idViewTab_ToPeriod");
+                        }
+                        else if (event == "ViewTab_ToPeriod_Changed") {
+                            var setSPIndex = fpi - parseInt(this.params.MaxPeriodLimit);
+                            if (setSPIndex < 0) {
+                                sp = to.options[0].value;
+                                from.options.selectedIndex = 1;
+                            } else {
+                                sp = to.options[setSPIndex + 1].value;
+                                from.options.selectedIndex = setSPIndex + 2;
+                            }
+                            this.viewTab.refreshSelect("idViewTab_FromPeriod");
+                        }
                         this.startPeriod = sp;
                         this.finishPeriod = fp;
-                        this.ShowHidePeriods(this.plangrid);
-                        this.ShowHidePeriods(this.resgrid);
+                        this.ShowHidePeriods(this.plangrid, true);
+                        this.ShowHidePeriods(this.resgrid, true);
                     }
                     break;
                 case "privateRowsDlg_Yes":
