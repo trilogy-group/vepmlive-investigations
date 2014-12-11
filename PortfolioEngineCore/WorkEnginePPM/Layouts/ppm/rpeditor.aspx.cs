@@ -133,24 +133,30 @@ namespace WorkEnginePPM
             Int32 maxPeriodLimit = 120;
             SPSecurity.RunWithElevatedPrivileges(delegate()
             {
-                try
+                using (SPSite site = new SPSite(Web.Site.ID))
                 {
-                    if (Web.Site.RootWeb.Properties["pfemaxperiodlimit"] != null)
+                    using (SPWeb web = site.RootWeb)
                     {
-                        Int32 mpl;
-                        if (Int32.TryParse(Convert.ToString(Web.Site.RootWeb.Properties["pfemaxperiodlimit"]), out mpl))
-                            maxPeriodLimit = mpl;
+                        try
+                        {
+                            if (web.Properties["pfemaxperiodlimit"] != null)
+                            {
+                                Int32 mpl;
+                                if (Int32.TryParse(Convert.ToString(web.Properties["pfemaxperiodlimit"]), out mpl))
+                                    maxPeriodLimit = mpl;
+                            }
+                            else
+                            {
+                                web.AllowUnsafeUpdates = true;
+                                EPMLiveCore.CoreFunctions.setConfigSetting(web, "pfemaxperiodlimit", "120");
+                                web.AllowUnsafeUpdates = false;
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            web.AllowUnsafeUpdates = false;
+                        }
                     }
-                    else
-                    {
-                        Web.AllowUnsafeUpdates = true;
-                        EPMLiveCore.CoreFunctions.setConfigSetting(Web, "pfemaxperiodlimit", "120");
-                        Web.AllowUnsafeUpdates = false;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Web.AllowUnsafeUpdates = false;
                 }
             });
             return maxPeriodLimit;
