@@ -5635,7 +5635,7 @@ namespace EPMLiveWebParts
                     if (fieldProperties != null)
                         bIsDisplay = EPMLiveCore.EditableFieldDisplay.IsDisplayField(oField, fieldProperties, "Display");
                     else
-                        bIsDisplay = (bool)oField.ShowInViewForms;
+                        bIsDisplay = !oField.ShowInDisplayForm.HasValue || (bool)oField.ShowInViewForms;
                     if (bIsDisplay == true)
                     {
                         aViewFields.Add(field);
