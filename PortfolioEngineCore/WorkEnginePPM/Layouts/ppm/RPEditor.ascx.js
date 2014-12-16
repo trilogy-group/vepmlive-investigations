@@ -1155,7 +1155,7 @@
                         columns: [
                             {
                                 items: [
-                                    { type: "text", name: "From Period:" },
+                                    { type: "text", name: "From Period:", showInfoIcon: true, showInfoMessage: "Due to a large number of configured periods, there is a limit to the number of periods that can be selected at one time." },
                                     { type: "select", id: "idViewTab_FromPeriod", onchange: "dialogEvent('ViewTab_FromPeriod_Changed');", width: "100px" }
                                 ]
                             },
@@ -1166,7 +1166,7 @@
                                 },
                                 {
                                     items: [
-                                    { type: "text", name: "To Period:" },
+                                    { type: "text", name: "To Period:", showInfoIcon: true, showInfoMessage: "Due to a large number of configured periods, there is a limit to the number of periods that can be selected at one time." },
                                     { type: "select", id: "idViewTab_ToPeriod", onchange: "dialogEvent('ViewTab_ToPeriod_Changed');", width: "100px" }
                                     ]
                                 }
