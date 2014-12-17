@@ -151,7 +151,7 @@ namespace EPMLiveCore.Jobs
                         }
                         catch { }
 
-                        string[] LookupArray = prntListSettings.Lookups.Split('|');
+                        string[] LookupArray = settings.Lookups.Split('|');
                         string[] sLookupInfo = null;
                         Hashtable hshLookups = new Hashtable();
                         foreach (string sLookup in LookupArray)
