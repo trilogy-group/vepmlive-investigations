@@ -41,7 +41,7 @@
 <script src="/_layouts/epmlive/TreeGrid/GridE.js" type="text/javascript"></script>
 
 <link rel="stylesheet" type="text/css" href="/_layouts/ppm/ribbon/ribbon2.css" />
-<script src="/_layouts/ppm/ribbon/ribbon2.js" type="text/javascript"></script>
+<script src="/_layouts/ppm/ribbon/ribbon2.js?ver=<%=FileVersion%>" type="text/javascript"></script>
 <script src="/_layouts/ppm/rpeditor.ascx.js?ver=<%=FileVersion%>" type="text/javascript"></script>
 <script src="/_layouts/ppm/general.js" type="text/javascript"></script>
 <script src="/_layouts/ppm/tools/jsfunctions.js" type="text/javascript"></script>
