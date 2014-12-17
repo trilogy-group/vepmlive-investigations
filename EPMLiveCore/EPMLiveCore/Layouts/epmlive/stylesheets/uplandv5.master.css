@@ -6266,8 +6266,8 @@ div.epmliveToolBar .disabledLink:hover {
         .fancy-col-table tr td {
             font-size: 1em;
             padding-bottom: 5px;
-            max-width: 200px;
-            min-width:150px;
+            max-width: 155px;
+            min-width:155px;
             vertical-align: top;
             overflow: hidden;
             text-overflow: ellipsis;
