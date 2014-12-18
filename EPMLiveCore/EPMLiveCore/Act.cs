@@ -683,9 +683,13 @@ namespace EPMLiveCore
 
                             foreach(string sUser in CurrentActivatedUsers1)
                             {
+                                try
+                                {
                                 string[] sU = sUser.Split(':');
                                 if(sU[1] == oUl.id.ToString())
                                     activatedusers++;
+                                }
+                                catch { }
                             }
 
                             int availAct = 0;
