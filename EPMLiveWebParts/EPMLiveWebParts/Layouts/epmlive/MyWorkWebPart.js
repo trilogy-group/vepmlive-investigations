@@ -1785,7 +1785,7 @@ var MyWorkGrid = {
 
         viewDiv.innerHTML = document.getElementById('MWG_SaveView').innerHTML;
         viewDiv.children[0].children[0].value = MyWorkGrid.defaultView;
-
+        
         if (MyWorkGrid.views[MyWorkGrid.defaultViewId].isDefault) {
             viewDiv.children[0].children[2].checked = true;
         }
@@ -1810,16 +1810,19 @@ var MyWorkGrid = {
         }
         else {
             var vals = returnValue.split("|");
-
             var viewName = vals[0];
             viewName = viewName.replace(/^\s+|\s+$/, '');
             if (viewName.trim().length == 0) {
                 bValidate = false;
             }
         }
-
+        
         if (bValidate == false) {
-            alert("Please enter view name!");
+            alert("Please enter view name - view names cannot be blank.");
+            var viewDiv = document.createElement('div');
+            viewDiv.innerHTML = document.getElementById('MWG_SaveView').innerHTML;
+            var options = { html: viewDiv, width: 250, height: 125, title: "Save View", dialogReturnValueCallback: MyWorkGrid.onSaveViewClose };
+            SP.UI.ModalDialog.showModalDialog(options);
             return;
         }
 
@@ -1974,6 +1977,29 @@ var MyWorkGrid = {
 
     onRenameViewClose: function (dialogResult, returnValue) {
         if (dialogResult !== SP.UI.DialogResult.OK) return;
+
+        var bValidateRename = true;
+        if (returnValue == false) {
+            bValidateRename = false; 
+        }
+        else {
+            var vals = returnValue.split("|");
+            var viewName = vals[0];
+            viewName = viewName.replace(/^\s+|\s+$/, '');
+            if (viewName.trim().length == 0) {
+                bValidateRename = false;
+            }
+        }
+
+        if (bValidateRename == false) {
+            alert("Please enter new name - new name cannot be blank.");
+            var viewDiv = document.createElement('div');
+            viewDiv.innerHTML = document.getElementById('MWG_RenameView').innerHTML;
+            var options = { html: viewDiv, width: 280, height: 115, title: "Rename View", dialogReturnValueCallback: MyWorkGrid.onRenameViewClose };
+            SP.UI.ModalDialog.showModalDialog(options);
+            return;
+        }
+
         var val = returnValue.replace(/^\s+|\s+$/, '');
         if (val.length == 0) {
             return false;
