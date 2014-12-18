@@ -3204,6 +3204,7 @@ var MyWorkGrid = {
 
                             nonCompleteQuery = nonCompleteQuery.replace(oldfromDate, fromDate).replace(oldtoDate, toDate);
 
+                            MyWorkGrid.defaultViewId = null;
                             var grid = Grids[MyWorkGrid.gridId];
                             var source = grid.Source;
                             source.Data.Param.Dataxml = nonCompleteQuery;
