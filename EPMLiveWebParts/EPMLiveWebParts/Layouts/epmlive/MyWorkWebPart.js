@@ -3176,13 +3176,11 @@ var MyWorkGrid = {
             wf.daysAgoEnabled = value;
             if (wf.daysAgoEnabled == false) {
                 wf.daysAgo = "";
-                $(document.getElementById('Ribbon_MyWork_WorkFilter_DueAgoDays')).val("");
             }
         } else if (action === 'after') {
             wf.daysAfterEnabled = value;
             if (wf.daysAgoEnabled == false) {
                 wf.daysAfter = "";
-                $(document.getElementById('Ribbon_MyWork_WorkFilter_DueAfterDays')).val("");
             }
         } else if (action === 'agodays') {
             wf.daysAgo = value;
@@ -3218,8 +3216,18 @@ var MyWorkGrid = {
                             $$$.logFailure(result);
                         }
 
-                        if (!(action == 'ago' && value == true && $(document.getElementById('Ribbon_MyWork_WorkFilter_DueAgoDays')).val() == '') &&
-                            !(action == 'after' && value == true && $(document.getElementById('Ribbon_MyWork_WorkFilter_DueAfterDays')).val() == '')) {
+                        if (!(action == 'ago' && (value == true || value == false) && $(document.getElementById('Ribbon_MyWork_WorkFilter_DueAgoDays')).val() == '') &&
+                            !(action == 'after' && (value == true || value == false) && $(document.getElementById('Ribbon_MyWork_WorkFilter_DueAfterDays')).val() == '')) {
+
+                            if (wf.daysAgo == '')
+                            {
+                                $(document.getElementById('Ribbon_MyWork_WorkFilter_DueAgoDays')).val("");
+                            }
+                            
+                            if (wf.daysAfter == '') {
+                                $(document.getElementById('Ribbon_MyWork_WorkFilter_DueAfterDays')).val("");
+                            }
+
                             var fromDate = responseJson["Result"].Personalizations["@FromDate"];
                             var toDate = responseJson["Result"].Personalizations["@ToDate"];
 
