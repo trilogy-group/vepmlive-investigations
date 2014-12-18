@@ -84,7 +84,7 @@
         }
         return null;
     };
-    RPEditor.prototype.ShowHidePeriods = function (grid, showLoading) {
+    RPEditor.prototype.ShowHidePeriods = function (grid, showLoading, chkInfoIcon) {
         if (showLoading)
             this.ShowWorkingPopup("divLoading");
         var start = 0;
@@ -97,6 +97,10 @@
         var show = [];
         var showTemp = [];
         this.maxPeriodLimitExceeds = false;
+        if (chkInfoIcon) {
+            $("#idViewTab_FromPeriodLabel .icon-info-2").hide();
+            $("#idViewTab_ToPeriodLabel .icon-info-2").hide();
+        }
         for (var c = 0; c < length; c++) {
             var col = grid.ColNames[2][c];
             var sType = col.substring(0, 1);
@@ -122,6 +126,10 @@
         }
         if (this.maxPeriodLimitExceeds && maxPeriodLimitExceedsConfirm === undefined) {
             //maxPeriodLimitExceedsConfirm = confirm(" You have selected more than " + this.params.MaxPeriodLimit + " periods in the view. To improve performance we have limited the amount of periods loaded. \n Please ask your administrator to change your view to show less than " + this.params.MaxPeriodLimit + " periods to avoid receiving this message in the future.\n\n Click 'OK' for restricting view to " + this.params.MaxPeriodLimit + " periods! \n Click 'Cancel' to load all periods!");
+            if (chkInfoIcon) {
+                $("#idViewTab_FromPeriodLabel .icon-info-2").show();
+                $("#idViewTab_ToPeriodLabel .icon-info-2").show();
+            }
             alert(" You have selected more than " + this.params.MaxPeriodLimit + " periods in the view. To improve performance we have limited the amount of periods loaded. \n Please ask your administrator to change your view to show less than " + this.params.MaxPeriodLimit + " periods to avoid receiving this message in the future.");
             maxPeriodLimitExceedsConfirm = true;
             this.viewTab.selectByValue("idViewTab_ToPeriod", showTemp[showTemp.length - 1].replace("Q", ""));
@@ -1155,7 +1163,7 @@
                         columns: [
                             {
                                 items: [
-                                    { type: "text", name: "From Period:", showInfoIcon: true, showInfoMessage: "Due to a large number of configured periods, there is a limit to the number of periods that can be selected at one time." },
+                                    { type: "text", id: "idViewTab_FromPeriodLabel", name: "From Period:", showInfoIcon: true, showInfoMessage: "Due to a large number of configured periods, there is a limit to the number of periods that can be selected at one time." },
                                     { type: "select", id: "idViewTab_FromPeriod", onchange: "dialogEvent('ViewTab_FromPeriod_Changed');", width: "100px" }
                                 ]
                             },
@@ -1166,7 +1174,7 @@
                                 },
                                 {
                                     items: [
-                                    { type: "text", name: "To Period:", showInfoIcon: true, showInfoMessage: "Due to a large number of configured periods, there is a limit to the number of periods that can be selected at one time." },
+                                    { type: "text", id: "idViewTab_ToPeriodLabel", name: "To Period:", showInfoIcon: true, showInfoMessage: "Due to a large number of configured periods, there is a limit to the number of periods that can be selected at one time." },
                                     { type: "select", id: "idViewTab_ToPeriod", onchange: "dialogEvent('ViewTab_ToPeriod_Changed');", width: "100px" }
                                     ]
                                 }
@@ -1514,7 +1522,7 @@
                 var selectedView = this.GetSelectedView();
                 if (selectedView != null)
                     this.ApplyGridView(grid.id, selectedView, false);
-                this.ShowHidePeriods(grid, false);
+                this.ShowHidePeriods(grid, false, true);
                 this.RefreshPlanPeriods(false);
                 if (this.initialized == false) {
                     this.layout_res.cells(const_ResourceGridCell).attachObject("gridDiv_Res");
@@ -1561,7 +1569,7 @@
                 var selectedView = this.GetSelectedView();
                 if (selectedView != null)
                     this.ApplyGridView(grid.id, selectedView, false);
-                this.ShowHidePeriods(grid, false);
+                this.ShowHidePeriods(grid, false, false);
                 this.ShowSelectedResourceGroup();
                 this.RefreshResourcePeriodsBasic(true);
                 this.viewTab.refreshSelect("idViewTab_FromPeriod");
@@ -3079,8 +3087,8 @@
                         this.InitialiseResourceGrid();
                         this.RefreshResourcePeriodsPaged(true, null);
                         this.spreadDlg_LoadData(this.plangrid, this.planrow, false);
-                        this.ShowHidePeriods(this.plangrid, false);
-                        this.ShowHidePeriods(this.resgrid, false);
+                        this.ShowHidePeriods(this.plangrid, false, true);
+                        this.ShowHidePeriods(this.resgrid, false, false);
                         this.UpdateButtonsAsync();
                     }
                     break;
@@ -3408,8 +3416,8 @@
                         }
                         this.startPeriod = sp;
                         this.finishPeriod = fp;
-                        this.ShowHidePeriods(this.plangrid, true);
-                        this.ShowHidePeriods(this.resgrid, true);
+                        this.ShowHidePeriods(this.plangrid, true, false);
+                        this.ShowHidePeriods(this.resgrid, true, false);
                     }
                     break;
                 case "privateRowsDlg_Yes":
