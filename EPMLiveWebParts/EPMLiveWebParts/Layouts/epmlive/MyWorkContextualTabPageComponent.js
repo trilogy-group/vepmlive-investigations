@@ -4,7 +4,7 @@ var _webPartPageComponentId;
 
 ContextualTabWebPart.CustomPageComponent = function ContextualTabWebPart_CustomPageComponent(webPartPcId, allWorkGridId, workingOnGridId) {
     this._webPartPageComponentId = webPartPcId;
-    
+
     this.$allWorkGridId = allWorkGridId;
     this.$workingOnGridId = workingOnGridId;
 
@@ -267,15 +267,19 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
         }
 
         else if (commandId === 'MyWork.Cmd.DueAgoDays') {
-            MyWorkGrid.updateWorkFilter('agodays', properties['Value']);
+            if (properties['Value'] != MyWorkGrid.workFilters.daysAgo) {
+                MyWorkGrid.updateWorkFilter('agodays', properties['Value']);
+            }
         }
 
         else if (commandId === 'MyWork.Cmd.DueAgoDays.Query') {
             properties['Value'] = MyWorkGrid.workFilters.daysAgo;
         }
-        
+
         else if (commandId === 'MyWork.Cmd.DueAfterDays') {
-            MyWorkGrid.updateWorkFilter('afterdays', properties['Value']);
+            if (properties['Value'] != MyWorkGrid.workFilters.daysAfter) {
+                MyWorkGrid.updateWorkFilter('afterdays', properties['Value']);
+            }
         }
 
         else if (commandId === 'MyWork.Cmd.DueAfterDays.Query') {
