@@ -1780,7 +1780,7 @@ var MyWorkGrid = {
         return sb.toString();
     },
 
-    saveView: function () {
+    saveView: function (isFromSaveViewClose) {
         var grid = Grids[MyWorkGrid.gridId];
 
         grid.StaticCursor = 0;
@@ -1789,23 +1789,34 @@ var MyWorkGrid = {
         var viewDiv = document.createElement('div');
 
         viewDiv.innerHTML = document.getElementById('MWG_SaveView').innerHTML;
-        viewDiv.children[0].children[0].value = MyWorkGrid.defaultView;
+        if (isFromSaveViewClose == false || isFromSaveViewClose == undefined)
+            viewDiv.children[0].children[0].value = MyWorkGrid.defaultView;
         
         if (MyWorkGrid.views[MyWorkGrid.defaultViewId].isDefault) {
             viewDiv.children[0].children[2].checked = true;
         }
 
-        if (MyWorkGrid.isDefaultViewPersonal) {
-            var personalCheckBox = viewDiv.children[0].children[4];
-            if (!personalCheckBox.disabled) {
-                personalCheckBox.checked = true;
-            }
-        }
+        if (MyWorkGrid.isDefaultViewPersonal == "true" || MyWorkGrid.isDefaultViewPersonal == true)
+            viewDiv.children[0].children[4].checked = true;
+        else
+            viewDiv.children[0].children[4].checked = false;
+       
+        //if (MyWorkGrid.isDefaultViewPersonal) {
+        //    var personalCheckBox = viewDiv.children[0].children[4];
+        //    if (!personalCheckBox.disabled) {
+        //        personalCheckBox.checked = true;
+        //    }
+        //}
 
-        var options = { html: viewDiv, width: 250, height: 125, title: "Save View", dialogReturnValueCallback: MyWorkGrid.onSaveViewClose };
+        var options = {html: viewDiv,width: 250,height: 125,title: "Save View",dialogReturnValueCallback: MyWorkGrid.onSaveViewClose};
         SP.UI.ModalDialog.showModalDialog(options);
+
+        if (isFromSaveViewClose == true)
+            viewDiv.children[0].children[0].focus();
+
     },
 
+   
     onSaveViewClose: function (dialogResult, returnValue) {
         if (dialogResult !== SP.UI.DialogResult.OK) return;
 
@@ -1821,13 +1832,10 @@ var MyWorkGrid = {
                 bValidate = false;
             }
         }
-        
+
         if (bValidate == false) {
             alert("Please enter view name - view names cannot be blank.");
-            var viewDiv = document.createElement('div');
-            viewDiv.innerHTML = document.getElementById('MWG_SaveView').innerHTML;
-            var options = { html: viewDiv, width: 250, height: 125, title: "Save View", dialogReturnValueCallback: MyWorkGrid.onSaveViewClose };
-            SP.UI.ModalDialog.showModalDialog(options);
+            MyWorkGrid.saveView(true);
             return;
         }
 
@@ -1915,7 +1923,7 @@ var MyWorkGrid = {
             var dataXml = '<MyWork><View ID="' + viewId + '" Name="' + viewName + '" Default="'
                 + isViewDefault + '" Personal="' + isViewPersonal + '" LeftCols="' + leftCols + '" Cols="' + cols + '" RightCols="'
                 + rightCols + '" Filters="' + filters + '" Grouping="' + grouping + '" Sorting="' + sorting + '"/></MyWork>';
-
+            
             EPMLiveCore.WorkEngineAPI.Execute("SaveMyWorkGridView", dataXml, function (response) {
                 response = parseJson(response);
 
@@ -1960,7 +1968,7 @@ var MyWorkGrid = {
         }
     },
 
-    renameView: function () {
+    renameView: function (isFromRenameViewClose) {
         if (MyWorkGrid.defaultViewId === "dv") {
             alert('You cannot rename the Default View');
             return;
@@ -1974,10 +1982,13 @@ var MyWorkGrid = {
         var viewDiv = document.createElement('div');
 
         viewDiv.innerHTML = document.getElementById('MWG_RenameView').innerHTML;
+
         viewDiv.children[0].children[0].innerHTML = '<strong>' + MyWorkGrid.defaultView + '</strong>';
 
         var options = { html: viewDiv, width: 280, height: 115, title: "Rename View", dialogReturnValueCallback: MyWorkGrid.onRenameViewClose };
         SP.UI.ModalDialog.showModalDialog(options);
+
+        viewDiv.children[0].children[4].focus();
     },
 
     onRenameViewClose: function (dialogResult, returnValue) {
@@ -1997,11 +2008,8 @@ var MyWorkGrid = {
         }
 
         if (bValidateRename == false) {
-            alert("Please enter new name - new name cannot be blank.");
-            var viewDiv = document.createElement('div');
-            viewDiv.innerHTML = document.getElementById('MWG_RenameView').innerHTML;
-            var options = { html: viewDiv, width: 280, height: 115, title: "Rename View", dialogReturnValueCallback: MyWorkGrid.onRenameViewClose };
-            SP.UI.ModalDialog.showModalDialog(options);
+            alert("Please enter a view name - view names cannot be blank.");
+            MyWorkGrid.renameView(true);
             return;
         }
 
