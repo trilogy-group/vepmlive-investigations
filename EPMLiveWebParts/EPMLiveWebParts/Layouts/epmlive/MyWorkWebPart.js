@@ -195,6 +195,11 @@ function MyWorkOnReady(grid, start) {
             }
         }
 
+        if (navigator.appName == 'Microsoft Internet Explorer')
+        {
+            document.getElementById("Ribbon.MyWorkTab").setAttribute("unselectable", "off");
+        }
+
         if (MyWorkGrid.showingCompletedItems) {
             for (var rowId in grid.Rows) {
                 var row = grid.Rows[rowId];
@@ -3179,7 +3184,7 @@ var MyWorkGrid = {
             }
         } else if (action === 'after') {
             wf.daysAfterEnabled = value;
-            if (wf.daysAgoEnabled == false) {
+            if (wf.daysAfterEnabled == false) {
                 wf.daysAfter = "";
             }
         } else if (action === 'agodays') {
