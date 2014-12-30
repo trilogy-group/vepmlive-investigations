@@ -193,12 +193,7 @@ function MyWorkOnReady(grid, start) {
             } else {
                 document.getElementById('MWG_Loader_' + myWorkWebPartId).style.display = 'none';
             }
-        }
-
-        if (navigator.appName == 'Microsoft Internet Explorer')
-        {
-            document.getElementById("Ribbon.MyWorkTab").setAttribute("unselectable", "off");
-        }
+        }        
 
         if (MyWorkGrid.showingCompletedItems) {
             for (var rowId in grid.Rows) {
@@ -220,6 +215,12 @@ function MyWorkOnReady(grid, start) {
         var url = (window.location.href + '').toLowerCase();
         if (url.indexOf('mywork.aspx') !== -1 || url.indexOf('my%20work.aspx') !== -1) {
             MyWorkGrid.loadRibbon();
+        }
+
+        if (navigator.appName == 'Microsoft Internet Explorer') {
+            if (document.getElementById("Ribbon.MyWorkTab") != null) {
+                document.getElementById("Ribbon.MyWorkTab").setAttribute("unselectable", "off");
+            }
         }
     }
 };
