@@ -3384,16 +3384,16 @@
                         this.viewTab.selectByValue("idViewTab_ToPeriod", this.finishPeriod);
                     }
                     else {
+                        if (spi < 0) {
+                            for (var i = 0; i < from.options.length; i++) {
+                                if (parseInt(from.options[i].value) == sp) {
+                                    spi = from.options[i].index - 1;
+                                    break;
+                                }
+                            }
+                        }
                         if (fpi - spi >= parseInt(this.params.MaxPeriodLimit)) {
                             if (event == "ViewTab_FromPeriod_Changed") {
-                                if (spi < 0) {
-                                    for (var i = 0; i < from.options.length; i++) {
-                                        if (parseInt(from.options[i].value) == sp) {
-                                            spi = from.options[i].index - 1;
-                                            break;
-                                        }
-                                    }
-                                }
                                 var setFPIndex = spi + parseInt(this.params.MaxPeriodLimit);
                                 if (setFPIndex > to.options.length) {
                                     fp = to.options[to.options.length - 1].value;
