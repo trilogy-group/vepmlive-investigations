@@ -3384,35 +3384,37 @@
                         this.viewTab.selectByValue("idViewTab_ToPeriod", this.finishPeriod);
                     }
                     else {
-                        if (event == "ViewTab_FromPeriod_Changed") {
-                            if (spi < 0) {
-                                for (var i = 0; i < from.options.length; i++) {
-                                    if (parseInt(from.options[i].value) == sp) {
-                                        spi = from.options[i].index - 1;
-                                        break;
+                        if (fpi - spi >= parseInt(this.params.MaxPeriodLimit)) {
+                            if (event == "ViewTab_FromPeriod_Changed") {
+                                if (spi < 0) {
+                                    for (var i = 0; i < from.options.length; i++) {
+                                        if (parseInt(from.options[i].value) == sp) {
+                                            spi = from.options[i].index - 1;
+                                            break;
+                                        }
                                     }
                                 }
+                                var setFPIndex = spi + parseInt(this.params.MaxPeriodLimit);
+                                if (setFPIndex > to.options.length) {
+                                    fp = to.options[to.options.length - 1].value;
+                                    to.options.selectedIndex = to.options.length - 1;
+                                } else {
+                                    fp = to.options[setFPIndex - 1].value;
+                                    to.options.selectedIndex = setFPIndex - 1;
+                                }
+                                this.viewTab.refreshSelect("idViewTab_ToPeriod");
                             }
-                            var setFPIndex = spi + parseInt(this.params.MaxPeriodLimit);
-                            if (setFPIndex > to.options.length) {
-                                fp = to.options[to.options.length - 1].value;
-                                to.options.selectedIndex = to.options.length - 1;
-                            } else {
-                                fp = to.options[setFPIndex - 1].value;
-                                to.options.selectedIndex = setFPIndex - 1;
+                            else if (event == "ViewTab_ToPeriod_Changed") {
+                                var setSPIndex = fpi - parseInt(this.params.MaxPeriodLimit);
+                                if (setSPIndex < 0) {
+                                    sp = to.options[0].value;
+                                    from.options.selectedIndex = 1;
+                                } else {
+                                    sp = to.options[setSPIndex + 1].value;
+                                    from.options.selectedIndex = setSPIndex + 2;
+                                }
+                                this.viewTab.refreshSelect("idViewTab_FromPeriod");
                             }
-                            this.viewTab.refreshSelect("idViewTab_ToPeriod");
-                        }
-                        else if (event == "ViewTab_ToPeriod_Changed") {
-                            var setSPIndex = fpi - parseInt(this.params.MaxPeriodLimit);
-                            if (setSPIndex < 0) {
-                                sp = to.options[0].value;
-                                from.options.selectedIndex = 1;
-                            } else {
-                                sp = to.options[setSPIndex + 1].value;
-                                from.options.selectedIndex = setSPIndex + 2;
-                            }
-                            this.viewTab.refreshSelect("idViewTab_FromPeriod");
                         }
                         this.startPeriod = sp;
                         this.finishPeriod = fp;
