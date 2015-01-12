@@ -2571,7 +2571,8 @@ namespace EPMLiveWebParts
                     if (fieldProperties != null)
                         bflag = EPMLiveCore.EditableFieldDisplay.IsDisplayField(field, fieldProperties, "Display");
                     else
-                        bflag = !field.ShowInDisplayForm.HasValue || (bool)field.ShowInViewForms;
+                        bflag = !field.ShowInDisplayForm.HasValue || (field.ShowInViewForms != null ? (bool)field.ShowInViewForms : false);
+                        //bflag = !field.ShowInDisplayForm.HasValue || (bool)field.ShowInViewForms;
 
                     if (bflag == true)
                     {
@@ -3163,7 +3164,8 @@ namespace EPMLiveWebParts
                         if (fieldProperties != null)
                             bflag = EPMLiveCore.EditableFieldDisplay.IsDisplayField(field, fieldProperties, "Display");
                         else
-                            bflag = !field.ShowInDisplayForm.HasValue || (bool)field.ShowInViewForms;
+                            bflag = !field.ShowInDisplayForm.HasValue || (field.ShowInViewForms != null ? (bool)field.ShowInViewForms : false);
+                            //bflag = !field.ShowInDisplayForm.HasValue || (bool)field.ShowInViewForms;
                         if (bflag == true)
                         {
                             slFields.Add(field.Title, field.InternalName);
