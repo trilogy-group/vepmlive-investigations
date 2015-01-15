@@ -2568,12 +2568,19 @@ namespace EPMLiveWebParts
 
                 if (!field.Hidden)
                 {
-                    if (fieldProperties != null)
-                        bflag = EPMLiveCore.EditableFieldDisplay.IsDisplayField(field, fieldProperties, "Display");
+                    //EPML-4625: LinkTitleNoMenu/LinkTitle columns bind to Title field and the column name always remain the same
+                    //make sure to always display Title fields irrespective of display rules
+                    if (field.InternalName == "LinkTitleNoMenu" || field.InternalName == "LinkTitle")
+                    {
+                        bflag = true;
+                    }
                     else
-                        bflag = !field.ShowInDisplayForm.HasValue || (field.ShowInViewForms != null ? (bool)field.ShowInViewForms : false);
-                        //bflag = !field.ShowInDisplayForm.HasValue || (bool)field.ShowInViewForms;
-
+                    {
+                        if (fieldProperties != null)
+                            bflag = EPMLiveCore.EditableFieldDisplay.IsDisplayField(field, fieldProperties, "Display");
+                        else
+                            bflag = !field.ShowInDisplayForm.HasValue || (field.ShowInViewForms != null ? (bool)field.ShowInViewForms : false);
+                    }
                     if (bflag == true)
                     {
                         if (getRealField(field).InternalName == "Title")
@@ -2607,8 +2614,13 @@ namespace EPMLiveWebParts
             foreach (DictionaryEntry de in sl)
             {
                 SPField field = (SPField)de.Value;
-                fields += "'" + field.InternalName + "': { 'value': '" + System.Web.HttpUtility.HtmlEncode(field.Title) + "', 'checked':" + arrFields.Contains(field.InternalName).ToString().ToLower() + "},";
-                AllGroupFields += System.Web.HttpUtility.HtmlEncode(field.Title) + "|" + field.InternalName + "|" + field.Id + ",";
+                //EPML-4625: Remove duplicate column names from fields list
+                string fieldValue = System.Web.HttpUtility.HtmlEncode(field.Title);
+                if (!fields.Contains(fieldValue))
+                {
+                    fields += "'" + field.InternalName + "': { 'value': '" + fieldValue + "', 'checked':" + arrFields.Contains(field.InternalName).ToString().ToLower() + "},";
+                    AllGroupFields += System.Web.HttpUtility.HtmlEncode(field.Title) + "|" + field.InternalName + "|" + field.Id + ",";
+                }
             }
 
             sl.Clear();
@@ -3161,11 +3173,19 @@ namespace EPMLiveWebParts
                 {
                     if (field.Reorderable && !field.Hidden)
                     {
-                        if (fieldProperties != null)
-                            bflag = EPMLiveCore.EditableFieldDisplay.IsDisplayField(field, fieldProperties, "Display");
+                        //EPML-4625: Title columns bind to Title field and the column name always remain the same
+                        //make sure to always display Title fields irrespective of display rules
+                        if (field.InternalName == "Title")
+                        {
+                            bflag = true;
+                        }
                         else
-                            bflag = !field.ShowInDisplayForm.HasValue || (field.ShowInViewForms != null ? (bool)field.ShowInViewForms : false);
-                            //bflag = !field.ShowInDisplayForm.HasValue || (bool)field.ShowInViewForms;
+                        {
+                            if (fieldProperties != null)
+                                bflag = EPMLiveCore.EditableFieldDisplay.IsDisplayField(field, fieldProperties, "Display");
+                            else
+                                bflag = !field.ShowInDisplayForm.HasValue || (field.ShowInViewForms != null ? (bool)field.ShowInViewForms : false);
+                        }
                         if (bflag == true)
                         {
                             slFields.Add(field.Title, field.InternalName);
@@ -3190,10 +3210,10 @@ namespace EPMLiveWebParts
 
                 foreach (DictionaryEntry de in slFields)
                 {
-                    if (sSearchField == de.Value.ToString())
-                        fieldlist += "<option value=\"" + de.Value + "\" selected>" + de.Key.ToString() + "</option>";
-                    else
-                        fieldlist += "<option value=\"" + de.Value + "\">" + de.Key.ToString() + "</option>";
+                        if (sSearchField == de.Value.ToString())
+                            fieldlist += "<option value=\"" + de.Value + "\" selected>" + de.Key.ToString() + "</option>";
+                        else
+                            fieldlist += "<option value=\"" + de.Value + "\">" + de.Key.ToString() + "</option>";
                 }
 
                 output.WriteLine("<script language=\"javascript\">");
