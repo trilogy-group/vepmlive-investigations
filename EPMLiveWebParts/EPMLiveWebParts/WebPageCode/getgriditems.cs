@@ -5653,7 +5653,12 @@ namespace EPMLiveWebParts
                 foreach (string sField in DifferentColumns.Split(','))
                 {
 
-                    if (!aViewFields.Contains(sField))
+                    //if (!aViewFields.Contains(sField))
+                    //    aViewFields.Add(sField);
+                    //EPML-4653: for fields with no permission, we should NOT add them back to the current view.
+                    //Adding them back into the view causes the view column ordering to break
+                    SPField oField = list.Fields.GetFieldByInternalName(sField);
+                    if (!aViewFields.Contains(sField) && EPMLiveCore.EditableFieldDisplay.IsDisplayField(oField, fieldProperties, "Display"))
                         aViewFields.Add(sField);
 
                     if (arrCurFields.Contains(sField))
