@@ -65,19 +65,26 @@ namespace EPMLiveCore.Controls.Navigation
             return defaultViewFirstPermission;
         }
 
+        //Why create this method as public? are we using this somewhere else??
         public SPList GetSpList(SiteMapNode node)
         {
-            try
-            {
-                SPWeb currentWeb = SPContext.Current.Web;
-                SPList list = currentWeb.GetList(node.Url);
-                return list;
-            }
-            catch { }
-
-            return null;
+            SPList list = null;
+                try
+                {
+                    SPWeb currentWeb = SPContext.Current.Web;
+                    //list = currentWeb.GetList(node.Url);
+                    if (currentWeb != null && currentWeb.Lists != null)
+                    {
+                        list = currentWeb.Lists.TryGetList(node.Title);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    //TODO: log the error
+                }
+            //});
+            return list;
         }
-
         // Private Methods (3) 
 
         private Dictionary<int, string> ConvertFromString(string value)
