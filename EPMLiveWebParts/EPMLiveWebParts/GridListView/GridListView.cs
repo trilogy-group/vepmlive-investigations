@@ -3473,7 +3473,7 @@ namespace EPMLiveWebParts
             {
                 if (gSettings.EnableContentReporting)
                 {
-                    output.Write("<div style=\"display:inline-block;margin:0px;\"><div id=\"pagediv" + sFullGridId + "\"></div>");
+                    output.Write("<div style=\"margin:0px;\"><div id=\"pagediv" + sFullGridId + "\"></div>");
                     output.Write("</td><td><div id=\"viewalldiv" + sFullGridId + "\" style=\"display:none;margin:0px 3px 0 0;\" class=\"jPaginate\"><a onclick=\"ViewAllPages('" + sFullGridId + "');\" style=\"color: rgb(102, 102, 102); background-color: rgb(255, 255, 255); border: 1px solid rgb(219, 219, 219);\">View All</a></div></td></tr></table>");
                 }
                 else
