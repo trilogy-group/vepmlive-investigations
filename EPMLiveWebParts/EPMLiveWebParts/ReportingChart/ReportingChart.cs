@@ -1275,7 +1275,48 @@ namespace EPMLiveWebParts.ReportingChart
             }
             List<SeriesItem> result = new List<SeriesItem>();
             string sCatSQLCol = GetSQLColNameIfLookup(category);
-            var rx = (from DataRow r in dtRaw.AsEnumerable()
+
+            // add new part //
+            List<string> distinctCats = (from r in dtRaw.AsEnumerable()
+                                         select (!string.IsNullOrEmpty(r[sCatSQLCol].ToString()) ?
+                                             r[sCatSQLCol].ToString().Trim() : NULL_CATEGORY_TEXT)).Distinct().ToList();
+            // add x axis labels
+            XAxisLabels.Clear();
+
+            foreach (string cat in distinctCats)
+            {
+                if (cat.Contains(","))
+                {
+                    string[] diffrentCats = cat.Split(',');
+                    foreach (string item in diffrentCats)
+                    {
+                        if (!XAxisLabels.Contains(item))
+                            XAxisLabels.Add(item);
+                    }
+                }
+                else
+                {
+                    if (!XAxisLabels.Contains(cat))
+                        XAxisLabels.Add(cat);
+                }
+            }
+
+            IEnumerable<string> strCollection = ((from r in dtRaw.AsEnumerable()
+                                                  select r[sCatSQLCol].ToString().Split(',')).SelectMany(x => x));
+
+            DataTable dt = new DataTable();
+            dt.Columns.Add(sCatSQLCol, typeof(string));
+            foreach (var item in strCollection.ToList())
+            {
+                DataRow row = dt.NewRow();
+                row[sCatSQLCol] = item;
+                dt.Rows.Add(row);
+            }
+
+            // add new part //
+
+
+            var rx = (from DataRow r in dt.AsEnumerable()
                       group r by r[sCatSQLCol] into gr
                       select new[] { (!string.IsNullOrEmpty(gr.Key.ToString()) ? gr.Key : NULL_CATEGORY_TEXT), gr.Count() }).ToArray();
 
