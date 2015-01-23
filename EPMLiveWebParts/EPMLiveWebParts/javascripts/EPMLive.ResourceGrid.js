@@ -2098,17 +2098,7 @@ function registerEpmLiveResourceGridScript() {
                                                             'function': function () { $$.actions.analyzeResources(); }
                                                         }
                                                     ]
-                                                },
-                                                //{
-                                                //    'iconClass': 'icon-bars-4 icon-dropdown',
-                                                //    'text': 'Work vs. Capacity',
-                                                //    'events': [
-                                                //        {
-                                                //            'eventName': 'click',
-                                                //            'function': function () { $$.reports.open('Resource Work vs. Capacity'); }
-                                                //        }
-                                                //    ]
-                                                //}
+                                                }
                                             ]
                                         },
                                         // Non Header section
