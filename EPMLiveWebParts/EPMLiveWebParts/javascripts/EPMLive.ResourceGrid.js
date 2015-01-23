@@ -2099,16 +2099,16 @@ function registerEpmLiveResourceGridScript() {
                                                         }
                                                     ]
                                                 },
-                                                {
-                                                    'iconClass': 'icon-bars-4 icon-dropdown',
-                                                    'text': 'Work vs. Capacity',
-                                                    'events': [
-                                                        {
-                                                            'eventName': 'click',
-                                                            'function': function () { $$.reports.open('Resource Work vs. Capacity'); }
-                                                        }
-                                                    ]
-                                                }
+                                                //{
+                                                //    'iconClass': 'icon-bars-4 icon-dropdown',
+                                                //    'text': 'Work vs. Capacity',
+                                                //    'events': [
+                                                //        {
+                                                //            'eventName': 'click',
+                                                //            'function': function () { $$.reports.open('Resource Work vs. Capacity'); }
+                                                //        }
+                                                //    ]
+                                                //}
                                             ]
                                         },
                                         // Non Header section
