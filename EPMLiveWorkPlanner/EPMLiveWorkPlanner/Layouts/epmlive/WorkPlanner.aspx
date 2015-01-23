@@ -415,7 +415,7 @@
     </div>
 
     <div id="detailDiv" style="width:100%;height:100%">
-        <div id="detailTree" style="width:100%;height:100%;">
+        <div id="detailTree" style="width:100%;height:100%;background-color:White">
             <!--<treegrid 
             Data_Url="BlankTable.xml"
             Layout_Url="../../_vti_bin/WorkPlanner.asmx" Layout_Method="Soap" Layout_Function="Execute" Layout_Namespace="workengine.com" Layout_Param_Functionname="GetDetailLayout" Layout_Param_Dataxml="<%=sPlannerLayoutParam %>"
@@ -427,7 +427,7 @@
         </div>
     </div>
 
-    <div id="assignmentsDiv" style="width:100%;height:100%;display:none;">
+    <div id="assignmentsDiv" style="width:100%;height:100%;display:none;background-color:White">
         <div id="assignmentsDivInner" style="width:100%;height:100%">
             <div style="width:100%;height:22px">
                 <div class="wetoolbar">
@@ -508,7 +508,7 @@
         </div>
     </div>
 
-    <div id="projectDiv" style="width:100%;height:100%">
+    <div id="projectDiv" style="width:100%;height:100%;background-color:White">
 
         <!--<treegrid 
         Data_Url="../../_vti_bin/WorkPlanner.asmx" Data_Method="Soap" Data_Function="Execute" Data_Namespace="workengine.com" Data_Param_Functionname="GetProjectInfo" Data_Param_Dataxml="<%=sPlannerDataParam %>"
