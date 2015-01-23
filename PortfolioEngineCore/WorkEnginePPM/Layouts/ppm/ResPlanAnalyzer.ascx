@@ -466,15 +466,16 @@
 <div id="toolbarDataObjectDiv">
 </div>
 <script type="text/javascript">
-	function dialogEvent(action) { resplana.externalEvent(action); }
-	function deferCallbackAction(deferaction) { resplana.deferExternalEvent(deferaction); }
-	
-	var params = {};
-	params.ClientID = '<%=ClientID%>';
+    function dialogEvent(action) { resplana.externalEvent(action); }
+    function deferCallbackAction(deferaction) { resplana.deferExternalEvent(deferaction); }
+
+    var params = {};
+    params.ClientID = '<%=ClientID%>';
 	params.URL = '<%=URL%>';
-	params.TicketVal = '<%=TicketVal%>';
-	params.Webservice = '<%=Webservice%>';
-	params.RPEMode = '<%=RPEMode%>';
-	resplana = new ResPlanAnalyzer('resplananalyzer', params);
+    params.TicketVal = '<%=TicketVal%>';
+    params.Webservice = '<%=Webservice%>';
+    params.RPEMode = '<%=RPEMode%>';
+    params.MaxPeriodLimit = '<%=MaxPeriodLimit%>';
+    resplana = new ResPlanAnalyzer('resplananalyzer', params);
 
 </script>
