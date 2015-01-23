@@ -802,7 +802,7 @@ function SaveWorkPlan() {
     var bVal = AlertBlankTitle()
     if (bVal == false)
     {
-        alert('The plan cannot be saved with blank task Title values (red cells). Please either delete these tasks or enter a title!');
+        alert('The plan cannot be saved with blank task Title values (red cells). Please either delete these tasks or enter a title');
         return;
     }
     if (sUpdates != "") {
@@ -3022,7 +3022,7 @@ function GetToolTip(grid, row, col, tip, clientx, clienty, x, y) {
             var val1 = grid.GetValue(row, col);
             val1 = val1.toString().trim();
             if (val1 == "") {
-                return "Title values cannot be blank!";
+                return "Title values cannot be blank";
             }
         }
     }
