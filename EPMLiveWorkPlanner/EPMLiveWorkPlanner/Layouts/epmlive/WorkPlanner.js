@@ -1475,76 +1475,82 @@ function iChangeView(view, bHide) {
 
     var grid = Grids.WorkPlannerGrid;
 
-    var cols = viewObject[view]["cols"].split(",");
-    var leftCols = viewObject[view]["leftCols"].split(",");
-    var allCols = (viewObject[view]["leftCols"] + "," + viewObject[view]["cols"] + ",G").split(",");
+    //var cols = viewObject[view]["cols"].split(",");
+    //var leftCols = viewObject[view]["leftCols"].split(",");
+    //var allCols = (viewObject[view]["leftCols"] + "," + viewObject[view]["cols"] + ",G").split(",");
 
-    var vCols = grid.GetCols("Visible");
+    //var vCols = grid.GetCols("Visible");
 
-    var oViews = {};
-    var lViews = {};
+    //var oViews = {};
+    //var lViews = {};
 
-    for (var i = 0; i < leftCols.length; i++) {
-        lViews[leftCols[i]] = new Object();
-        lViews[leftCols[i]] = 0;
-        if (leftCols[i] != "Panel") {
-            grid.MoveCol(leftCols[i], 0, 1, 1);
-            try {
-                grid.Cols[leftCols[i]].Visible = 1;
-            } catch (e) { }
-        }
+    //for (var i = 0; i < leftCols.length; i++) {
+    //    lViews[leftCols[i]] = new Object();
+    //    lViews[leftCols[i]] = 0;
+    //    if (leftCols[i] != "Panel") {
+    //        grid.MoveCol(leftCols[i], 0, 1, 1);
+    //        try {
+    //            grid.Cols[leftCols[i]].Visible = 1;
+    //        } catch (e) { }
+    //    }
+    //}
+
+    //for (var i = 0; i < cols.length; i++) {
+    //    oViews[cols[i]] = new Object();
+    //    oViews[cols[i]] = 1;
+
+    //    grid.MoveCol(cols[i], 1, 1, 1);
+    //    try {
+    //        grid.Cols[cols[i]].Visible = 1;
+    //    } catch (e) { }
+    //}
+
+
+
+    //for (var c in grid.Cols) {
+    //    if (oViews[c] == null && lViews[c] == null && c != "G") {
+    //        oViews[c] = new Object();
+    //        oViews[c] = 0;
+    //    }
+    //}
+
+    //var mainCols = [];
+    //var counter = 0;
+
+    ////for (var c in oViews)
+    ////    mainCols[counter++] = c;
+
+    //for (var i = 0; i < vCols.length; i++) {
+    //    var found = false;
+    //    for (var j = 0; j < allCols.length; j++) {
+    //        if (allCols[j] == vCols[i])
+    //            found = true;
+    //    }
+    //    if (!found)
+    //        mainCols.push(vCols[i]);
+    //}
+
+    //grid.ChangeColsVisibility(allCols, mainCols, 0);
+    //grid.ShowCol("Notifications");
+    //grid.ShowCol("Panel");
+    ////grid.ChangeColsVisibility(allCols, "", 0);
+
+    //try {
+    //    if (viewObject[view]["gantt"] == "1")
+    //        grid.ShowCol("G");
+    //    else if (grid.Cols["G"].Visible)
+    //        grid.HideCol("G");
+    //} catch (e) { }
+    ////if (viewObject[view]["folders"] == "true" && bUseFolders)
+    ////    dhxLayout.cells(folderCell).expand();
+    ////else
+    ////    dhxLayout.cells(folderCell).collapse();
+
+    if (grid.Cols.G.Visible)
+        grid.HideCol("G");
+    else {
+        grid.ShowCol("G");
     }
-
-    for (var i = 0; i < cols.length; i++) {
-        oViews[cols[i]] = new Object();
-        oViews[cols[i]] = 1;
-
-        grid.MoveCol(cols[i], 1, 1, 1);
-        try {
-            grid.Cols[cols[i]].Visible = 1;
-        } catch (e) { }
-    }
-
-
-
-    for (var c in grid.Cols) {
-        if (oViews[c] == null && lViews[c] == null && c != "G") {
-            oViews[c] = new Object();
-            oViews[c] = 0;
-        }
-    }
-
-    var mainCols = [];
-    var counter = 0;
-
-    //for (var c in oViews)
-    //    mainCols[counter++] = c;
-
-    for (var i = 0; i < vCols.length; i++) {
-        var found = false;
-        for (var j = 0; j < allCols.length; j++) {
-            if (allCols[j] == vCols[i])
-                found = true;
-        }
-        if (!found)
-            mainCols.push(vCols[i]);
-    }
-
-    grid.ChangeColsVisibility(allCols, mainCols, 0);
-    grid.ShowCol("Notifications");
-    grid.ShowCol("Panel");
-    //grid.ChangeColsVisibility(allCols, "", 0);
-
-    try {
-        if (viewObject[view]["gantt"] == "1")
-            grid.ShowCol("G");
-        else if (grid.Cols["G"].Visible)
-            grid.HideCol("G");
-    } catch (e) { }
-    //if (viewObject[view]["folders"] == "true" && bUseFolders)
-    //    dhxLayout.cells(folderCell).expand();
-    //else
-    //    dhxLayout.cells(folderCell).collapse();
 
     if (viewObject[view]["details"] == "true")
         dhxLayout.cells(detailsCell).expand();
