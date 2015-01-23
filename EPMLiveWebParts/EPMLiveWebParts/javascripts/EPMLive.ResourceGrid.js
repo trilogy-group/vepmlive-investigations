@@ -132,8 +132,13 @@ function registerEpmLiveResourceGridScript() {
                             var result = responseJson.Result;
 
                             if ($$$.responseIsSuccess(result)) {
-                                if (result.GetReportsByFolder.Data.Folder && result.GetReportsByFolder.Data.Folder.Folder) {
+                                try {
+                                    if (result.GetReportsByFolder.Data.Folder && result.GetReportsByFolder.Data.Folder.Folder) {
                                     register(result.GetReportsByFolder.Data.Folder.Folder);
+                                    }
+                                }
+                                catch (ex) {
+                                    $$.actions.areReportsLoaded = true;
                                 }
                             } else {
                                 $$$.logFailure(result);
