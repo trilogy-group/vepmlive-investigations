@@ -124,7 +124,7 @@ WEDispFormPageComponent.PageComponent.prototype = {
 
             var listInfo = properties.SourceControlId.split('.');
 
-            dhtmlxAjax.post(WEWebUrl + "/_layouts/epmlive/gridaction.aspx?action=linkeditemspost", "listid=" + WEListId + "&lookups=" + escape(WETitle) + "&field=" + listInfo[5] + "&LookupFieldList=" + listInfo[4], this.LinkedItemsButtonPost);
+            dhtmlxAjax.post(WEWebUrl + "/_layouts/epmlive/gridaction.aspx?action=linkeditemspost", "listid=" + WEListId + "&lookups=" + escape(WETitle) + "&lookupid=" + WEItemId + "&field=" + listInfo[5] + "&LookupFieldList=" + listInfo[4], this.LinkedItemsButtonPost);
 
         }
         else if (commandId === 'Ribbon.ListForm.Display.Manage.TaskPlanner') {

@@ -5338,7 +5338,7 @@ namespace EPMLiveWebParts
 
                         try
                         {
-                            SqlCommand cmd = new SqlCommand("SELECT VALUE FROM PERSONALIZATIONS where userid=@userid and [key]=@key and listid=@listid", cn);
+                            SqlCommand cmd = new SqlCommand("SELECT VALUE,ItemId FROM PERSONALIZATIONS where userid=@userid and [key]=@key and listid=@listid", cn);
                             cmd.Parameters.AddWithValue("@userid", web.CurrentUser.ID);
                             cmd.Parameters.AddWithValue("@key", "LIP");
                             cmd.Parameters.AddWithValue("@listid", Page.Request["LookupFieldList"]);
@@ -5346,19 +5346,26 @@ namespace EPMLiveWebParts
                             SqlDataReader dr = cmd.ExecuteReader();
                             if (dr.Read())
                             {
-                                ArrayList lookupFilterIDs = new ArrayList(dr.GetString(0).Split(','));
-
-                                if (lookupFilterIDs.Count == 1 && !string.IsNullOrEmpty(lookupFilterIDs[0].ToString()))
+                                if (!string.IsNullOrEmpty(Convert.ToString(dr.GetInt32(1))))
                                 {
-                                    SPQuery query = new SPQuery();
-                                    query.Query = "<Where><Eq><FieldRef Name=\"Title\"/><Value Type=\"Text\">" + lookupFilterIDs[0].ToString() + "</Value></Eq></Where>";
+                                    retItem = dr.GetInt32(1);
+                                }
+                                else
+                                {
+                                    ArrayList lookupFilterIDs = new ArrayList(dr.GetString(0).Split(','));
 
-                                    SPList templist = web.Lists[new Guid(Page.Request["LookupFieldList"])];
-
-                                    SPListItemCollection lic = templist.GetItems(query);
-                                    if (lic.Count == 1)
+                                    if (lookupFilterIDs.Count == 1 && !string.IsNullOrEmpty(lookupFilterIDs[0].ToString()))
                                     {
-                                        retItem = lic[0].ID;
+                                        SPQuery query = new SPQuery();
+                                        query.Query = "<Where><Eq><FieldRef Name=\"Title\"/><Value Type=\"Text\">" + lookupFilterIDs[0].ToString() + "</Value></Eq></Where>";
+
+                                        SPList templist = web.Lists[new Guid(Page.Request["LookupFieldList"])];
+
+                                        SPListItemCollection lic = templist.GetItems(query);
+                                        if (lic.Count == 1)
+                                        {
+                                            retItem = lic[0].ID;
+                                        }
                                     }
                                 }
                             }

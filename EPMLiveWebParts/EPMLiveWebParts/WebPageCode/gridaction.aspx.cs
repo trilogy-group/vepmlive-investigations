@@ -339,13 +339,14 @@ namespace EPMLiveWebParts
                     cmd.Parameters.AddWithValue("@listid", Request["listid"]);
                     cmd.ExecuteNonQuery();
 
-                    cmd = new SqlCommand("INSERT INTO PERSONALIZATIONS (userid, [key], value,siteid,webid,listid) VALUES (@userid,@key,@value,@siteid,@webid,@listid)", cn);
+                    cmd = new SqlCommand("INSERT INTO PERSONALIZATIONS (userid, [key], value,siteid,webid,listid,ItemId) VALUES (@userid,@key,@value,@siteid,@webid,@listid,@ItemId)", cn);
                     cmd.Parameters.AddWithValue("@userid", web.CurrentUser.ID);
                     cmd.Parameters.AddWithValue("@key", "LIP");
                     cmd.Parameters.AddWithValue("@siteid", web.Site.ID);
                     cmd.Parameters.AddWithValue("@webid", web.ID);
                     cmd.Parameters.AddWithValue("@listid", Request["listid"]);
                     cmd.Parameters.AddWithValue("@value", Request["lookups"]);
+                    cmd.Parameters.AddWithValue("@ItemId", Request["lookupid"]);
                     cmd.ExecuteNonQuery();
 
                     cn.Close();
