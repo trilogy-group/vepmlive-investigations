@@ -3734,6 +3734,42 @@ namespace EPMLiveWebParts
                             DataTable dt = ds.Tables[0];
                             dt.Columns.Add("SiteURL");
                             dt.Columns.Add("siteid");
+
+                            ////Update Calculated Field Value
+                            if (dt != null)
+                            {
+                                if (dt.Rows.Count > 0)
+                                {
+                                    foreach (DataRow dr in dt.Rows)
+                                    {
+                                        string[] vfc = (string[])aViewFields.ToArray(typeof(string));
+
+                                        for (int i = 0; i < vfc.Length; i++)
+                                        {
+                                            string val = "";
+                                            string displayValue = "";
+
+                                            string fieldName = vfc[i];
+
+                                            SPField field = null;
+                                            field = getRealField(list.Fields.GetFieldByInternalName(fieldName));
+
+                                            if (field.Type == SPFieldType.Calculated)
+                                            {
+                                                Int16 itemid = Convert.ToInt16(dr["ItemID"]);
+                                                SPListItem li = list.GetItemById(itemid);
+                                                val = getField(li, field.InternalName, false);
+                                                if (field.Type != SPFieldType.Attachments)
+                                                    displayValue = formatField(val, fieldName, field.Type == SPFieldType.Calculated, false, li);
+                                                dr[fieldName] = displayValue;
+                                                dt.AcceptChanges();
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            ////// 
+
                             if (filterfield != "")
                             {
                                 try
