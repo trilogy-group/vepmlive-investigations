@@ -5658,15 +5658,20 @@ namespace EPMLiveWebParts
                     //EPML-4653: for fields with no permission, we should NOT add them back to the current view.
                     //Adding them back into the view causes the view column ordering to break
                     //Since Gantt is a special column and not a field we need to make special adjustment for Gantt column
-                    if (sField.ToLower().Equals("gantt"))
+                    if (!aViewFields.Contains(sField))
                     {
-                        aViewFields.Add(sField);
-                    }
-                    else
-                    {
-                        SPField oField = list.Fields.GetFieldByInternalName(sField);
-                        if (!aViewFields.Contains(sField) && EPMLiveCore.EditableFieldDisplay.IsDisplayField(oField, fieldProperties, "Display"))
+                        if (sField.ToLower().Equals("gantt"))
+                        {
                             aViewFields.Add(sField);
+                        }
+                        else
+                        {
+                            SPField oField = list.Fields.GetFieldByInternalName(sField);
+                            if (EPMLiveCore.EditableFieldDisplay.IsDisplayField(oField, fieldProperties, "Display"))
+                            {
+                                aViewFields.Add(sField);
+                            }
+                        }
                     }
                     if (arrCurFields.Contains(sField))
                         arrCurFields.Remove(sField);
