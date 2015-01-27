@@ -919,8 +919,10 @@ namespace EPMLiveReportsAdmin
                                             new List<SPEventReceiverType>
                                             {
                                                 SPEventReceiverType.ListDeleting,
-                                                SPEventReceiverType.FieldDeleting,
-                                                SPEventReceiverType.FieldAdded
+                                                SPEventReceiverType.FieldAdded,
+                                                SPEventReceiverType.FieldUpdated,
+                                                SPEventReceiverType.FieldDeleting
+
                                             });
 
                                         foreach (SPEventReceiverDefinition e in delEvts)
@@ -931,9 +933,11 @@ namespace EPMLiveReportsAdmin
                                         // then add event receivers
                                         spList.EventReceivers.Add(SPEventReceiverType.ListDeleting, Resources.Assembly,
                                             "EPMLiveReportsAdmin.LstEvents");
-                                        spList.EventReceivers.Add(SPEventReceiverType.FieldDeleting, Resources.Assembly,
-                                            "EPMLiveReportsAdmin.LstEvents");
                                         spList.EventReceivers.Add(SPEventReceiverType.FieldAdded, Resources.Assembly,
+                                            "EPMLiveReportsAdmin.LstEvents");
+                                        spList.EventReceivers.Add(SPEventReceiverType.FieldUpdated, Resources.Assembly,
+                                            "EPMLiveReportsAdmin.LstEvents");
+                                        spList.EventReceivers.Add(SPEventReceiverType.FieldDeleting, Resources.Assembly,
                                             "EPMLiveReportsAdmin.LstEvents");
 
                                         List<SPEventReceiverDefinition> newEvts2 = GetListEvents(spList,
@@ -942,8 +946,9 @@ namespace EPMLiveReportsAdmin
                                             new List<SPEventReceiverType>
                                             {
                                                 SPEventReceiverType.ListDeleting,
+                                                SPEventReceiverType.FieldAdded,
+                                                SPEventReceiverType.FieldUpdated,
                                                 SPEventReceiverType.FieldDeleting,
-                                                SPEventReceiverType.FieldAdded
                                             });
                                         foreach (SPEventReceiverDefinition e in newEvts2)
                                         {

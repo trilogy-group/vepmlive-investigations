@@ -288,9 +288,12 @@ namespace EPMLiveWebParts
                                 attr.Value = "";
                                 ndNew.Attributes.Append(attr);
 
-                                //attr = doc.CreateAttribute("Range");
-                                //attr.Value = "1";
-                                //ndNew.Attributes.Append(attr);
+                                if (oField.TypeAsString.Equals("LookupMulti", StringComparison.InvariantCultureIgnoreCase))
+                                {
+                                    attr = doc.CreateAttribute("Range");
+                                    attr.Value = "1";
+                                    ndNew.Attributes.Append(attr);
+                                }
 
                                 hshLookupEnums.Add(oField.InternalName, new ArrayList());
                                 hshLookupEnumKeys.Add(oField.InternalName, new ArrayList());

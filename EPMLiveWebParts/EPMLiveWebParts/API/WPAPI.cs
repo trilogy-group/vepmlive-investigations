@@ -269,14 +269,23 @@ namespace EPMLiveWebParts
                                 li[oField.Id] = null;
                             break;
                         case SPFieldType.Lookup:
-                            string[] sVals = sFieldValue.Split(';');
-                            SPFieldLookupValueCollection lvc = new SPFieldLookupValueCollection();
-                            foreach (string sVal in sVals)
+                            // Need to check for null / empty value otherwise it will display invalid lookup value error message 
+                            // when we click outside the grid after editing lookup field value by double clicking on the field.
+                            if (!string.IsNullOrEmpty(nd.InnerText))
                             {
-                                SPFieldLookupValue lv = new SPFieldLookupValue(sVal);
-                                lvc.Add(lv);
+                                string[] sVals = sFieldValue.Split(';');
+                                SPFieldLookupValueCollection lvc = new SPFieldLookupValueCollection();
+                                foreach (string sVal in sVals)
+                                {
+                                    SPFieldLookupValue lv = new SPFieldLookupValue(sVal);
+                                    lvc.Add(lv);
+                                }
+                                li[oField.Id] = lvc;
                             }
-                            li[oField.Id] = lvc;
+                            else
+                            {
+                                li[oField.Id] = null;
+                            }
                             break;
                         case SPFieldType.MultiChoice:
                             li[oField.Id] = sFieldValue.Replace(";", ";#");
