@@ -30,6 +30,7 @@
             Grids.OnFilter = GridsOnFilterDelegate;
             Grids.OnRowFilter = GridsOnRowFilterDelegate;
             Grids.OnFilterFinish = GridsOnFilterFinishDelegate;
+            Grids.OnShowColumns = GridsOnShowColumnsDelegate;
             //Grids.OnGroup = GridsOnGroupDelegate;
             Grids.OnGroupFinish = GridsOnGroupFinishDelegate;
 
@@ -3561,6 +3562,13 @@
             this.HideUnusedGroupRowsAsync();
         rPEditorInstance.RefreshResourcePeriodsPaged(true, null);
     };
+    RPEditor.prototype.GridsOnShowColumns = function (grid, menu) {
+        if (grid.id == "g_RPE") {
+            if (menu.Items.length > 0 && menu.Items[0].Items[1] != null) {
+                menu.Items[0].Items[1].Text = "Status";
+            }
+        }
+    };
     RPEditor.prototype.HideUnusedGroupRowsAsync = function () {
         //window.setTimeout(function () { var grid = Grids["g_Res"]; var row = grid.GetFirst(null, 0); HideUnusedGroupRows(grid, row); }, 100);
         var grid = Grids["g_Res"];
@@ -6087,6 +6095,7 @@
         var GridsOnFilterDelegate = MakeDelegate(this, this.GridsOnFilter);
         var GridsOnRowFilterDelegate = MakeDelegate(this, this.GridsOnRowFilter);
         var GridsOnFilterFinishDelegate = MakeDelegate(this, this.GridsOnFilterFinish);
+        var GridsOnShowColumnsDelegate = MakeDelegate(this, this.GridsOnShowColumns);
 
         var dlg_OnCloseDelegate = MakeDelegate(this, this.dlg_OnClose);
 
