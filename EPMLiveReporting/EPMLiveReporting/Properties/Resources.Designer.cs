@@ -160,6 +160,15 @@ namespace EPMLiveReportsAdmin.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to EPMLiveReportsAdmin.ListFieldAdding.
+        /// </summary>
+        internal static string FieldAddingEvent {
+            get {
+                return ResourceManager.GetString("FieldAddingEvent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to EPMLiveReportsAdmin.ListFieldUpdated.
         /// </summary>
         internal static string FieldUpdatedEvent {

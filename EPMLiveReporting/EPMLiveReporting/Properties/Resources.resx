@@ -183,4 +183,7 @@
   <data name="FieldUpdatedEvent" xml:space="preserve">
     <value>EPMLiveReportsAdmin.ListFieldUpdated</value>
   </data>
+  <data name="FieldAddingEvent" xml:space="preserve">
+    <value>EPMLiveReportsAdmin.ListFieldAdding</value>
+  </data>
 </root>

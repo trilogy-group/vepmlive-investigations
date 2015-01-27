@@ -32,6 +32,16 @@ namespace EPMLiveReportsAdmin
             AddField(properties);
         }
 
+        public override void FieldAdding(SPListEventProperties properties)
+        {
+            if (properties.FieldName.ToLower().EndsWith("id") || properties.FieldName.ToLower().EndsWith("text"))
+            {
+                properties.Status = SPEventReceiverStatus.CancelWithError;
+                properties.ErrorMessage = "Field ending with ID or Text is not allowed.";
+
+            }
+        }
+
         public override void FieldUpdated(SPListEventProperties properties)
         {
             if (properties.Field.InternalName.ToLower() == "today")

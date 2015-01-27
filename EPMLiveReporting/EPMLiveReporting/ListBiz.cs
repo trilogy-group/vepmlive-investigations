@@ -918,6 +918,7 @@ namespace EPMLiveReportsAdmin
                                             "EPMLiveReportsAdmin.LstEvents",
                                             new List<SPEventReceiverType>
                                             {
+                                                SPEventReceiverType.FieldAdding,
                                                 SPEventReceiverType.ListDeleting,
                                                 SPEventReceiverType.FieldAdded,
                                                 SPEventReceiverType.FieldUpdated,
@@ -931,6 +932,8 @@ namespace EPMLiveReportsAdmin
                                         }
 
                                         // then add event receivers
+                                        spList.EventReceivers.Add(SPEventReceiverType.FieldAdding, Resources.Assembly,
+                                          "EPMLiveReportsAdmin.LstEvents");
                                         spList.EventReceivers.Add(SPEventReceiverType.ListDeleting, Resources.Assembly,
                                             "EPMLiveReportsAdmin.LstEvents");
                                         spList.EventReceivers.Add(SPEventReceiverType.FieldAdded, Resources.Assembly,
@@ -945,6 +948,7 @@ namespace EPMLiveReportsAdmin
                                             "EPMLiveReportsAdmin.LstEvents",
                                             new List<SPEventReceiverType>
                                             {
+                                                SPEventReceiverType.FieldAdding,
                                                 SPEventReceiverType.ListDeleting,
                                                 SPEventReceiverType.FieldAdded,
                                                 SPEventReceiverType.FieldUpdated,

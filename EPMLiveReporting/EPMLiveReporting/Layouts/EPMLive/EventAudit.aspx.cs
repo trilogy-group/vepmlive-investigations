@@ -116,6 +116,7 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
                                         "EPMLiveReportsAdmin.LstEvents",
                                         new List<SPEventReceiverType>
                                         {
+                                            SPEventReceiverType.FieldAdding,
                                             SPEventReceiverType.ListDeleting,
                                             SPEventReceiverType.FieldAdded,
                                             SPEventReceiverType.FieldUpdated,
@@ -127,6 +128,8 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
                                         e.Delete();
                                     }
 
+                                    spList.EventReceivers.Add(SPEventReceiverType.FieldAdding, Resources.Assembly,
+                                      "EPMLiveReportsAdmin.LstEvents");
                                     spList.EventReceivers.Add(SPEventReceiverType.ListDeleting, Resources.Assembly,
                                         "EPMLiveReportsAdmin.LstEvents");
                                     spList.EventReceivers.Add(SPEventReceiverType.FieldAdded, Resources.Assembly,
@@ -141,6 +144,7 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
                                         "EPMLiveReportsAdmin.LstEvents",
                                         new List<SPEventReceiverType>
                                         {
+                                            SPEventReceiverType.FieldAdding,
                                             SPEventReceiverType.ListDeleting,
                                             SPEventReceiverType.FieldAdded,
                                             SPEventReceiverType.FieldUpdated,
@@ -214,6 +218,7 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
             bool blnColumnDeleteEvent = false;
             bool blnColumnAddEvent = false;
             bool blnColumnUpdateEvent = false;
+            bool blnColumnAddingEvent = false;
 
             SPSecurity.RunWithElevatedPrivileges(
                 delegate
@@ -243,6 +248,7 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
                                     blnColumnDeleteEvent = false;
                                     blnColumnAddEvent = false;
                                     blnColumnUpdateEvent = false;
+                                    blnColumnAddingEvent = false;
 
                                     foreach (SPEventReceiverDefinition spEventDef in spList.EventReceivers)
                                     {
@@ -290,6 +296,11 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
                                             {
                                                 blnColumnDeleteEvent = true;
                                             }
+                                            if (spEventDef.Type == SPEventReceiverType.FieldAdding &&
+                                              spEventDef.Class.ToLower() == "EPMLiveReportsAdmin.LstEvents".ToLower())
+                                            {
+                                                blnColumnAddingEvent = true;
+                                            }
                                         }
                                     }
 
@@ -329,6 +340,10 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
                                         if (!blnColumnDeleteEvent)
                                         {
                                             AddAuditRecord("FieldDeleting", _sListName, spWeb.ServerRelativeUrl);
+                                        }
+                                        if (!blnColumnAddingEvent)
+                                        {
+                                            AddAuditRecord("FieldAdding", _sListName, spWeb.ServerRelativeUrl);
                                         }
                                     }
                                 }
