@@ -5696,7 +5696,7 @@ namespace EPMLiveWebParts
             EPMLiveCore.API.ListPlannerProps plan = EPMLiveCore.API.ListCommands.GetListPlannerInfo(list);
             PlannerV2Menu = plan.PlannerV2Menu;
 
-            if (Page.Request["IsDlg"] == "1")
+            if (!string.IsNullOrEmpty(Page.Request["IsDlg"]) && Page.Request["IsDlg"].Contains("1"))
                 bUsePopUp = true;
 
             if (!string.IsNullOrEmpty(Page.Request["LookupFieldList"]))
