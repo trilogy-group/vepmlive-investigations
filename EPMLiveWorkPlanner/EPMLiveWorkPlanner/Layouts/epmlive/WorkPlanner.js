@@ -802,7 +802,7 @@ function SaveWorkPlan() {
     var bVal = AlertBlankTitle()
     if (bVal == false)
     {
-        alert('The plan cannot be saved with blank task Title values (red cells). Please either delete these tasks or enter a title');
+        alert('The plan cannot be saved with blank task Title values (red cells). Please either delete these tasks or enter a title.');
         return;
     }
     if (sUpdates != "") {
