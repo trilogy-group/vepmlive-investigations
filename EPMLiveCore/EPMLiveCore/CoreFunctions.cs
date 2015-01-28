@@ -2026,7 +2026,9 @@ namespace EPMLiveCore
                 // unique. "OPEN" workspaces are different
                 // in that they have a owner (the workspace creator)
                 // and a "Everyone" group with contribute permission
-                var web = parentWeb.Webs.Add(finalTitle, finalTitle, description, 1033, template, true, false);
+
+                //Change entire workspace permission logic for Jira item # EPML-4553: Open workspace not inhering permissions
+                var web = parentWeb.Webs.Add(finalTitle, finalTitle, description, 1033, template, unique, false);
 
                 createdWebId = web.ID;
                 createdWebUrl = web.Url;
@@ -2176,36 +2178,8 @@ namespace EPMLiveCore
                             using (var ew = es.OpenWeb())
                             {
                                 ew.AllowUnsafeUpdates = true;
-
-                                // add creator with full control
-                                var raAdmin = new SPRoleAssignment(ownerByCreation);
-                                raAdmin.RoleDefinitionBindings.Add(ew.RoleDefinitions.GetByType(SPRoleType.Administrator));
-                                ew.RoleAssignments.Add(raAdmin);
-
-                                // add administrator group with full control, add rest with contribute
-                                foreach (var @group in from SPGroup @group in es.RootWeb.Groups
-                                                       let eGroup = es.RootWeb.Groups[@group.Name]
-                                                       let c = eGroup.Roles
-                                                       let canUse = c.Cast<SPRole>().Any(role => role.PermissionMask != (SPRights)134287360)
-                                                       where @group.CanCurrentUserEditMembership && canUse
-                                                       select @group)
-                                {
-                                    if (@group.Name.Contains("Administrators"))
-                                    {
-                                        var raAdministrators = new SPRoleAssignment(@group);
-                                        raAdministrators.RoleDefinitionBindings.Add(
-                                            ew.RoleDefinitions.GetByType(SPRoleType.Administrator));
-                                        ew.RoleAssignments.Add(raAdministrators);
-                                    }
-                                    else
-                                    {
-                                        var raContribute = new SPRoleAssignment(@group);
-                                        raContribute.RoleDefinitionBindings.Add(
-                                            ew.RoleDefinitions.GetByType(SPRoleType.Contributor));
-                                        ew.RoleAssignments.Add(raContribute);
-                                    }
-                                }
-
+                                //EPML-4553: Open workspace not inhering permissions
+                                ew.ResetRoleInheritance();
                                 ew.Update();
                             }
                         }
@@ -2466,35 +2440,8 @@ namespace EPMLiveCore
                             using (var ew = es.OpenWeb(itemWeb.ID))
                             {
                                 ew.AllowUnsafeUpdates = true;
-                                // Add creator with full control perm
-                                var raAdmin = new SPRoleAssignment(ownerByCreation);
-                                raAdmin.RoleDefinitionBindings.Add(ew.RoleDefinitions.GetByType(SPRoleType.Administrator));
-                                ew.RoleAssignments.Add(raAdmin);
-
-                                // administrator group full control, add rest at contribute
-                                foreach (var @group in from SPGroup @group in es.RootWeb.Groups
-                                                       let eGroup = es.RootWeb.Groups[@group.Name]
-                                                       let c = eGroup.Roles
-                                                       let canUse = c.Cast<SPRole>().Any(role => role.PermissionMask != (SPRights)134287360)
-                                                       where @group.CanCurrentUserEditMembership && canUse
-                                                       select @group)
-                                {
-                                    if (@group.Name.Contains("Administrators"))
-                                    {
-                                        var raAdministrators = new SPRoleAssignment(@group);
-                                        raAdministrators.RoleDefinitionBindings.Add(
-                                            ew.RoleDefinitions.GetByType(SPRoleType.Administrator));
-                                        ew.RoleAssignments.Add(raAdministrators);
-                                    }
-                                    else
-                                    {
-                                        var raContribute = new SPRoleAssignment(@group);
-                                        raContribute.RoleDefinitionBindings.Add(
-                                            ew.RoleDefinitions.GetByType(SPRoleType.Contributor));
-                                        ew.RoleAssignments.Add(raContribute);
-                                    }
-                                }
-
+                                //EPML-4553 : Open workspace not inhering permissions
+                                ew.ResetRoleInheritance();
                                 ew.Update();
                             }
                         }
