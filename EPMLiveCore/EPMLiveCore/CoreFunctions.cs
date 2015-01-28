@@ -2259,7 +2259,7 @@ namespace EPMLiveCore
                 // in that they have a owner (the workspace creator)
                 // and a "Everyone" group with contribute permission
 
-                var web = parentWeb.Webs.Add(finalTitle, finalTitle, description, 1033, template, true, false);
+                var web = parentWeb.Webs.Add(finalTitle, finalTitle, description, 1033, template, unique, false);
 
                 createdSiteId = web.ID;
                 createdWebUrl = web.Url;
