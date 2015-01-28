@@ -3756,7 +3756,7 @@ namespace EPMLiveWebParts
 
                                             if (field.Type == SPFieldType.Calculated)
                                             {
-                                                Int16 itemid = Convert.ToInt16(dr["ItemID"]);
+                                                Int32 itemid = Convert.ToInt32(dr["ItemID"]);
                                                 SPListItem li = list.GetItemById(itemid);
                                                 val = getField(li, field.InternalName, false);
                                                 if (field.Type != SPFieldType.Attachments)
