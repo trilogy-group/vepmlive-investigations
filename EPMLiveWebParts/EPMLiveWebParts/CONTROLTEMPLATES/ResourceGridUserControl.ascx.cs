@@ -11,6 +11,7 @@ using EPMLiveCore.Infrastructure;
 using EPMLiveWebParts.Properties;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.WebControls;
+using EPMLiveCore.API;
 
 namespace EPMLiveWebParts
 {
@@ -72,27 +73,61 @@ namespace EPMLiveWebParts
         {
             get
             {
-                if (_currentWeb.IsRootWeb && string.IsNullOrEmpty(Request["webid"]) &&
-                    string.IsNullOrEmpty(Request["listId"]) && string.IsNullOrEmpty(Request["id"]))
+                Guid webId = Guid.Empty;
+                Guid listid = Guid.Empty;
+                int itemid = 0;
+
+                try
+                {
+                    webId = new Guid(Convert.ToString(Request["webid"]));
+                }
+                catch { }
+                try
+                {
+                    listid = new Guid(Convert.ToString(Request["listId"]));
+                }
+                catch { }
+                try
+                {
+                    itemid = int.Parse(Convert.ToString(Request["id"]));
+                }
+                catch { }
+
+                if (_currentWeb.IsRootWeb && Guid.Empty == webId &&
+                    Guid.Empty == listid && itemid == 0)
                 {
                     return GetGridParam(XDocument.Parse(Resources.ResourceGrid_DataXml))
                         .Replace(Environment.NewLine, string.Empty).Replace(@"\t", string.Empty);
                 }
 
-                SPWeb web = string.IsNullOrEmpty(Request["webid"]) ? _currentWeb : SPContext.Current.Site.OpenWeb(new Guid(Request["webid"]));
+                SPWeb web = Guid.Empty == webId ? _currentWeb : SPContext.Current.Site.OpenWeb(webId);
 
-                while (web.Features[WEFeatures.BuildTeam.Id] == null) //Inherit | Open
+                if (listid == Guid.Empty && itemid == 0)
                 {
-                    if (web.IsRootWeb)
-                        break;
-                    
-                    //using (web = web.ParentWeb) { }
+                    APITeam.VerifyProjectTeamWorkspace(web, out itemid, out listid);
+                    if (itemid > 0 && listid != Guid.Empty)
+                    {
+                        try
+                        {
+                            while (web.Features[WEFeatures.BuildTeam.Id] == null) //Inherit | Open
+                            {
+                                if (web.IsRootWeb)
+                                    break;
 
-                    // ** You do not need to dispose any web object that was not explicitly opened like: spSite.OpenWeb(webId)
-                    // Moreover, the code above should not have worked on lower level workspace since the the newly assigned web object gets disposed right away.
-                    
-                    web = web.ParentWeb;
+                                //using (web = web.ParentWeb) { }
+
+                                // ** You do not need to dispose any web object that was not explicitly opened like: spSite.OpenWeb(webId)
+                                // Moreover, the code above should not have worked on lower level workspace since the the newly assigned web object gets disposed right away.
+
+                                web = web.ParentWeb;
+                            }
+                        }
+                        catch { }
+                    }
                 }
+
+                if (web.IsRootWeb)
+                    webId = web.ID;
 
                 var doc = new XmlDocument();
                 doc.LoadXml(Resources.ResourceGrid_DataXml);
@@ -102,11 +137,11 @@ namespace EPMLiveWebParts
                 doc.FirstChild.Attributes.Append(attr);
 
                 attr = doc.CreateAttribute("ListId");
-                attr.Value = Request["listid"];
+                attr.Value = Convert.ToString(listid);
                 doc.FirstChild.Attributes.Append(attr);
 
                 attr = doc.CreateAttribute("ItemId");
-                attr.Value = Request["id"];
+                attr.Value = Convert.ToString(itemid);
                 doc.FirstChild.Attributes.Append(attr);
 
                 return GetGridParam(XDocument.Parse(doc.OuterXml))
