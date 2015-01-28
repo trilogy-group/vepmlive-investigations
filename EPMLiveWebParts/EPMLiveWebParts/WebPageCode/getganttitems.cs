@@ -157,6 +157,9 @@ namespace EPMLiveWebParts
                         attr = doc.CreateAttribute("Format");
                         attr.Value = sFormat;
                         ndNew.Attributes.Append(attr);
+                        attr = doc.CreateAttribute("EditFormat");
+                        attr.Value = sFormat;
+                        ndNew.Attributes.Append(attr);
                     }
 
                     if (oField.InternalName == "Edit")
