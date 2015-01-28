@@ -181,11 +181,11 @@ namespace EPMLiveWebParts
 
                 if (fieldProperties != null)
                 {
-                    foreach (SPField field in item.ContentType.Fields)
+                    foreach (SPField field in list.Fields)
                     {
                         try
                         {
-                            if (!field.Hidden && fieldProperties.ContainsKey(field.InternalName) && "title" != field.InternalName.ToString().ToLower())
+                            if ((!field.Hidden && "title" != field.InternalName.ToString().ToLower() && !field.InternalName.ToLower().Equals("contenttype") && field.Type != SPFieldType.Attachments))
                             {
                                 string display = fieldProperties[field.InternalName]["Display"];
                                 display = display.Split(";".ToCharArray())[0].ToLower(); //always;;;;;
@@ -195,7 +195,8 @@ namespace EPMLiveWebParts
                                     switch (field.Type)
                                     {
                                         case SPFieldType.DateTime:
-                                            FillDateDetailsSection(field.Title, GetFormattedDate(Convert.ToDateTime(Convert.ToString(item[field.InternalName]))));
+                                            if (!string.IsNullOrEmpty(Convert.ToString(item[field.InternalName])))
+                                                FillDateDetailsSection(field.Title, GetFormattedDate(Convert.ToDateTime(Convert.ToString(item[field.InternalName]))));
                                             break;
                                         case SPFieldType.User:
                                             FillPeopleDetailsSection(field.Title, Convert.ToString(item[field.InternalName]));
@@ -232,7 +233,8 @@ namespace EPMLiveWebParts
                                         switch (field.Type)
                                         {
                                             case SPFieldType.DateTime:
-                                                FillDateDetailsSection(field.Title, GetFormattedDate(Convert.ToDateTime(Convert.ToString(item[field.InternalName]))));
+                                                if (!string.IsNullOrEmpty(Convert.ToString(item[field.InternalName])))
+                                                    FillDateDetailsSection(field.Title, GetFormattedDate(Convert.ToDateTime(Convert.ToString(item[field.InternalName]))));
                                                 break;
                                             case SPFieldType.User:
                                                 FillPeopleDetailsSection(field.Title, Convert.ToString(item[field.InternalName]));
@@ -248,19 +250,42 @@ namespace EPMLiveWebParts
                                 }
                             }
                         }
+                        catch (KeyNotFoundException)
+                        {
+                            if (!field.Hidden && !field.ReadOnlyField)
+                            {
+                                switch (field.Type)
+                                {
+                                    case SPFieldType.DateTime:
+                                        if (!string.IsNullOrEmpty(Convert.ToString(item[field.InternalName])))
+                                            FillDateDetailsSection(field.Title, GetFormattedDate(Convert.ToDateTime(Convert.ToString(item[field.InternalName]))));
+                                        break;
+                                    case SPFieldType.User:
+                                        FillPeopleDetailsSection(field.Title, Convert.ToString(item[field.InternalName]));
+                                        break;
+                                    case SPFieldType.Note:
+                                        FillNarrativeDetailsSection(field.Title, field.GetFieldValueAsText(item[field.InternalName]));
+                                        break;
+                                    default:
+                                        FillQuickDetailsSection(field, item);
+                                        break;
+                                }
+                            }
+                        }
                         catch { }
                     }
                 }
                 else
                 {
-                    foreach (SPField field in item.ContentType.Fields)
+                    foreach (SPField field in list.Fields)
                     {
-                        if (!field.Hidden && field.ShowInDisplayForm == true)
+                        if (!field.Hidden)
                         {
                             switch (field.Type)
                             {
                                 case SPFieldType.DateTime:
-                                    FillDateDetailsSection(field.Title, GetFormattedDate(Convert.ToDateTime(Convert.ToString(item[field.InternalName]))));
+                                    if (!string.IsNullOrEmpty(Convert.ToString(item[field.InternalName])))
+                                        FillDateDetailsSection(field.Title, GetFormattedDate(Convert.ToDateTime(Convert.ToString(item[field.InternalName]))));
                                     break;
                                 case SPFieldType.User:
                                     FillPeopleDetailsSection(field.Title, Convert.ToString(item[field.InternalName]));
