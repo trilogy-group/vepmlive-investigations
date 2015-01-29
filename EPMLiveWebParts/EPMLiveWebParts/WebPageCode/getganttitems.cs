@@ -890,7 +890,7 @@ namespace EPMLiveWebParts
                         case "Number":
                             if (oDoc.FirstChild.Attributes["Percentage"] != null && oDoc.FirstChild.Attributes["Percentage"].Value.ToLower() == "true")
                             {
-                                format = "0\\%;0\\%;0\\%";
+                                format = "0\\%;-##%";
                             }
                             else
                             {
