@@ -280,6 +280,11 @@ namespace EPMLiveCore.Layouts.epmlive.Integration
                      }
                  }
 
+                 if (chkCleanup.Checked)
+                 {
+                     intcore.ExecuteQuery("UPDATE INT_LISTS set lastsynch=null where INT_LIST_ID=@intlistid", hshProps, true);
+                 }
+
                  intcore.CloseConnection(true);
             });
             if(success)
