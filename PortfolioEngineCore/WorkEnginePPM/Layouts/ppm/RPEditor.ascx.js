@@ -5561,7 +5561,7 @@
                                     if (div > 1) // added check to fix EPML-2134.
                                         this.SetPeriodValue(plangrid, childplanrow, col, split / div);
                                     else {
-                                        var FTEVal = grid.GetAttribute(parentplanrow, "f" + col.substring(1)) / 10000;
+                                        var FTEVal = this.GetIntValue(this.GetPeriodFTE(plangrid, parentplanrow, col), null) / 10000;
                                         var singsplit = split / FTEVal;
                                         if (split > singsplit)
                                             this.SetPeriodValue(plangrid, childplanrow, col, singsplit);
@@ -5577,7 +5577,7 @@
                                     if (div > 1) // added check to fix EPML-2134.
                                         this.SetPeriodValue(plangrid, childplanrow, col, split / div);
                                     else {
-                                        var FTEVal = grid.GetAttribute(parentplanrow, "f" + col.substring(1)) / 10000;
+                                        var FTEVal = this.GetIntValue(this.GetPeriodFTE(plangrid, parentplanrow, col), null) / 10000;
                                         var singsplit = split / FTEVal;
                                         if (split > singsplit)
                                             this.SetPeriodValue(plangrid, childplanrow, col, singsplit);
