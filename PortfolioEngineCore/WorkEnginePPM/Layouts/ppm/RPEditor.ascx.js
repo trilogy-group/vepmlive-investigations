@@ -5558,14 +5558,32 @@
                             case 0: /* Hours */
                                 var split = this.GetIntValue(this.GetPeriodHours(plangrid, parentplanrow, col), null);
                                 if (split != null && split > 0) {
-                                    this.SetPeriodValue(plangrid, childplanrow, col, split / div);
+                                    if (div > 1) // added check to fix EPML-2134.
+                                        this.SetPeriodValue(plangrid, childplanrow, col, split / div);
+                                    else {
+                                        var FTEVal = grid.GetAttribute(parentplanrow, "f" + col.substring(1)) / 10000;
+                                        var singsplit = split / FTEVal;
+                                        if (split > singsplit)
+                                            this.SetPeriodValue(plangrid, childplanrow, col, singsplit);
+                                        else
+                                            this.SetPeriodValue(plangrid, childplanrow, col, split);
+                                    }
                                 }
                                 break;
                             case 1: /* FTE */
                             case 2: /* FTE %*/
                                 split = this.GetIntValue(this.GetPeriodFTE(plangrid, parentplanrow, col), null);
                                 if (split != null && split > 0) {
-                                    this.SetPeriodValue(plangrid, childplanrow, col, split / div);
+                                    if (div > 1) // added check to fix EPML-2134.
+                                        this.SetPeriodValue(plangrid, childplanrow, col, split / div);
+                                    else {
+                                        var FTEVal = grid.GetAttribute(parentplanrow, "f" + col.substring(1)) / 10000;
+                                        var singsplit = split / FTEVal;
+                                        if (split > singsplit)
+                                            this.SetPeriodValue(plangrid, childplanrow, col, singsplit);
+                                        else
+                                            this.SetPeriodValue(plangrid, childplanrow, col, split);
+                                    }
                                 }
                                 break;
                         }
