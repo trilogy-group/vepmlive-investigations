@@ -6,6 +6,7 @@ using System.Linq;
 using WorkEnginePPM;
 using ResourceValues;
 using PortfolioEngineCore;
+using System.Globalization;
 
 
 namespace RPADataCache
@@ -1710,6 +1711,11 @@ namespace RPADataCache
             string cellval;
             int cnt = 0;
 
+            NumberFormatInfo providerEn = new System.Globalization.NumberFormatInfo();
+            providerEn.NumberDecimalSeparator = ".";
+            providerEn.NumberGroupSeparator = ",";
+            providerEn.NumberGroupSizes = new int[] { 3 };
+
             bool bDoIt = true;
 
             if (bDoZeroRowCleverStuff)
@@ -1927,11 +1933,11 @@ namespace RPADataCache
                         cval = GetDataValue(oDet, iHeatMapID, iMode, i, true, 0);
 
                         if (iMode == 0)
-                            cellval = cval.ToString("0.##");
+                            cellval = cval.ToString(providerEn);
                         else if (iMode == 2)
-                            cellval = cval.ToString("0.###");
+                            cellval = cval.ToString(providerEn);
                         else
-                            cellval = cval.ToString("0.###");
+                            cellval = cval.ToString(providerEn);
 
                         xI.CreateStringAttr("P" + oPer.PeriodID.ToString() + "H", cellval);
                     }
@@ -1947,11 +1953,11 @@ namespace RPADataCache
 
 
                         if (iMode == 0)
-                            cellval = xval.ToString("0.##");
+                            cellval = xval.ToString(providerEn);
                         else if (iMode == 2)
-                          cellval = xval.ToString("0.###");
+                            cellval = xval.ToString(providerEn);
                         else
-                            cellval = xval.ToString("0.###");
+                            cellval = xval.ToString(providerEn);
                  
 
                         xI.CreateStringAttr(sCName, cellval);
