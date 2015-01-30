@@ -864,7 +864,7 @@
                             var item = response.d.results[0];
 
                             var title = item.__metadata.type === 'SP.Data.DocumentsItem' ? item.FileLeafRef : item.Title;
-
+                            
                             var data = {
                                 lists: [{
                                     icon: listInfo.icon,
@@ -1120,15 +1120,21 @@
 
             return {
                 configure: _configure,
-                load: _load
+                load: _load,
+                toolbarManager: toolbarManager
             };
         })();
 
         SE.configure();
         SE.load();
+
+        return {
+            SE: SE
+        };
     };
 
-    var loadSocialEngine = function() {
+    var loadSocialEngine = function () {
+        window.epmLive.SocialStream_SE = SocialEngine().SE;
         if (window.epmLive) {
             SocialEngine();
         } else {
