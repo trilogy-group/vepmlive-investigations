@@ -1133,10 +1133,9 @@
         };
     };
 
-    var loadSocialEngine = function () {
-        window.epmLive.SocialStream_SE = SocialEngine().SE;
+    var loadSocialEngine = function () {        
         if (window.epmLive) {
-            SocialEngine();
+            window.epmLive.SocialStream_SE = SocialEngine().SE;
         } else {
             window.setTimeout(function() {
                 loadSocialEngine();
