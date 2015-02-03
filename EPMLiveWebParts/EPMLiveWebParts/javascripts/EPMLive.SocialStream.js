@@ -864,6 +864,11 @@
                             var item = response.d.results[0];
 
                             var title = item.__metadata.type === 'SP.Data.DocumentsItem' ? item.FileLeafRef : item.Title;
+
+                            //EPML-4329 : if title is null then assign it to file name
+                            if (title == null || title == '') {
+                                title = item.FileLeafRef;
+                            }
                             
                             var data = {
                                 lists: [{
