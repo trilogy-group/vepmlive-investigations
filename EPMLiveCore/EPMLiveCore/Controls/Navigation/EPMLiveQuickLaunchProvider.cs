@@ -17,15 +17,14 @@ namespace EPMLiveCore.Controls.Navigation
 
         private Dictionary<string, IList<string>> _communityLinks;
         private Dictionary<string, SiteMapNode> _linkNodes;
-        private List<string> splitViewcollection;
-
+        
         #endregion Fields 
 
         #region Methods (5) 
 
         // Public Methods (2) 
 
-        public string DefaultViewFromPropertyBag(SPList list)
+        public string DefaultViewFromPropertyBag(SPList list, out List<string> splitViewcollection)
         {
             var sb = new StringBuilder();
 
@@ -345,13 +344,14 @@ namespace EPMLiveCore.Controls.Navigation
         /// <returns>SiteMapNode</returns>
         private SiteMapNode ChangeNodeLink(SPWeb spWeb, SiteMapNode node)
         {
+            List<string> splitViewcollection;
             SiteMapNode chgNode = FindSiteMapNodeFromKey(node.Key);
 
             SPList list = GetSpList(node);
 
             if (list != null)
             {
-                string defaultViewURL = DefaultViewFromPropertyBag(list);
+                string defaultViewURL = DefaultViewFromPropertyBag(list, out splitViewcollection);
                 string prevURL = node.Url;
                 string title = node.Title;
 
