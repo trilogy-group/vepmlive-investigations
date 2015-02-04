@@ -127,8 +127,6 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
             }
             catch { }
 
-            var DisplayName = "";
-
             foreach (SPField oField in lstTaskCenter.Fields)
             {
                 if (oField.Type == SPFieldType.User)
@@ -169,8 +167,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                 if (!oField.Hidden && oField.Required)
                 {
                     sRequiredFields += ",'" + oField.InternalName + "'";
-                    DisplayName = lstTaskCenter.Fields.GetField(oField.InternalName).Title;
-                    sFieldDisplayNames += ",'" + DisplayName + "'";
+                    sFieldDisplayNames += ",'" + lstTaskCenter.Fields.GetField(oField.InternalName).Title + "'";
                 }
                 
             }
