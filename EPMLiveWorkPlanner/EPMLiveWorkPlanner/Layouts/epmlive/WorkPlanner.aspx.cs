@@ -66,6 +66,8 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
         protected string sTaskUserFields = "";
         protected string sProjectUserFields = "";
         protected string sDefaults = "";
+        protected string sRequiredFields = "";
+        protected string sFieldDisplayNames = "";
 
         protected string sPlannerDescriptions = "";
 
@@ -125,6 +127,8 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
             }
             catch { }
 
+            var DisplayName = "";
+
             foreach (SPField oField in lstTaskCenter.Fields)
             {
                 if (oField.Type == SPFieldType.User)
@@ -161,7 +165,18 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                     }
                     catch { }
                 }
+
+                if (!oField.Hidden && oField.Required)
+                {
+                    sRequiredFields += ",'" + oField.InternalName + "'";
+                    DisplayName = lstTaskCenter.Fields.GetField(oField.InternalName).Title;
+                    sFieldDisplayNames += ",'" + DisplayName + "'";
+                }
+                
             }
+            sRequiredFields = sRequiredFields.Trim(',');
+            sFieldDisplayNames = sFieldDisplayNames.Trim(',');
+
             sDefaults = sDefaults.Trim(',');
             sTaskUserFields = sTaskUserFields.Trim(',');
 
@@ -1615,5 +1630,6 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
             manager.RegisterCommandEnabledFunction(Page, "commandEnabled", commands);
             manager.RegisterHandleCommandFunction(Page, "handleCommand", commands);
         }
+
     }
 }
