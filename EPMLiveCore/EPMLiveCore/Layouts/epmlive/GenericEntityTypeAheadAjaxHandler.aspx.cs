@@ -20,6 +20,9 @@ namespace EPMLiveCore
         string _parentListField = string.Empty;
         StringBuilder _sbResult;
 
+        bool _isMultiSelect = false;
+        string _selectedChildren = string.Empty;
+
         protected void Page_Load(object sender, EventArgs e)
         {
             InitVals();
@@ -74,6 +77,16 @@ namespace EPMLiveCore
             {
                 _parentListField = Request["parentlistfield"];
             }
+
+            if (!string.IsNullOrEmpty(Request["isMultiSelect"]))
+            {
+                _isMultiSelect = Convert.ToBoolean(Request["isMultiSelect"]);
+            }
+
+            if (!string.IsNullOrEmpty(Request["selectedChildren"]))
+            {
+                _selectedChildren = Request["selectedChildren"];
+            }
         }
 
         private void IssueQuery()
@@ -83,7 +96,15 @@ namespace EPMLiveCore
             {
                 SPList list = SPContext.Current.Web.Lists[_listID];
                 SPQuery query = new SPQuery();
-                query.Query = "<Where><Eq><FieldRef Name='" + _parentListField + "' LookupId='TRUE'/><Value Type='Lookup'>" + int.Parse(_parentValue).ToString() + "</Value></Eq></Where>";
+                if (!_isMultiSelect)
+                {
+                    query.Query = "<Where><Eq><FieldRef Name='" + _parentListField + "' LookupId='TRUE'/><Value Type='Lookup'>" + int.Parse(_parentValue).ToString() + "</Value></Eq></Where>";
+                }
+                else
+                {
+                    string[] values = _parentValue.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                    query.Query = BuildDynamicSPQueryWithMultipleOrConditions(_parentListField, values);
+                }
                 if (_field.Contains("ID") || _parentListField.Contains("ID"))
                 {
                     query.ViewFields = "<FieldRef Name='" + _field + "' /><FieldRef Name='" + _parentListField + "' /><FieldRef Name='Title' />";
@@ -102,6 +123,19 @@ namespace EPMLiveCore
                 {
                     DataTable dt = items.GetDataTable();
                     _sbResult = new StringBuilder();
+
+                    if (!string.IsNullOrEmpty(_selectedChildren))
+                    {
+                        try
+                        {
+                            var rows = from r in dt.AsEnumerable()
+                                       where !_selectedChildren.Contains(r[_field].ToString())
+                                       select r;
+                            dt = rows.CopyToDataTable();
+                        }
+                        catch
+                        {}
+                    }
 
                     foreach (DataRow r in dt.Rows)
                     {
@@ -139,8 +173,153 @@ namespace EPMLiveCore
                         _sbResult.Append(r["ID"].ToString() + "^^" + r[_field].ToString() + "^^" + (!string.IsNullOrEmpty(r[_field].ToString()) ? r[_field].ToString() : string.Empty) + ";#");
                     }
                 }
-
             }
         }
+
+        #region Dynamic SPQuery Generation Methods
+
+        private static String BuildDynamicSPQueryWithMultipleOrConditions(string lookupField, string[] selectedParents)
+        {
+            String query = String.Empty;
+
+            try
+            {
+                XmlDocument xmlDoc = new XmlDocument();
+                XmlElement nodeWhere;
+
+                //Create root node SPListItems
+                nodeWhere = xmlDoc.CreateElement("Where");
+                xmlDoc.AppendChild(nodeWhere);
+
+                XmlElement nodeOr = null;
+                int locCtr = 0;
+
+                if (selectedParents.Length == 1)
+                {
+                    XmlElement nodeEq = BuildEqNodeForSPQuery(ref xmlDoc, ref nodeWhere);
+                    BuildEqNodeInnerXmlForSPQuery(ref xmlDoc, ref nodeEq, lookupField, selectedParents[0].ToString());
+                }
+                else
+                {
+                    foreach (string val in selectedParents)
+                    {
+                        //Increment counter. We will need it to find the last item
+                        locCtr++;
+
+                        if (locCtr == 1)
+                        {
+                            nodeOr = BuildDynamicOrEqCombination(ref xmlDoc, ref nodeWhere, lookupField, val);
+                        }
+                        else if (locCtr == selectedParents.Length)
+                        {
+                            //We will need to include the last 2 nodes in the Or node. Is this the last record?
+                            UpdateOrNode(ref xmlDoc, ref nodeOr, lookupField, val);
+                        }
+                        else
+                        {
+                            nodeOr = BuildDynamicOrEqCombination(ref xmlDoc, ref nodeOr, lookupField, val);
+                        }
+                    }
+                }
+                query = xmlDoc.InnerXml;
+            }
+            catch (Exception ex)
+            { }
+
+            return query;
+        }
+
+        /// <summary>
+        /// Update Or node with a new Eq node
+        /// </summary>
+        /// <param name="xmlDoc"></param>
+        /// <param name="nodeParent"></param>
+        /// <param name="id"></param>
+        private static void UpdateOrNode(ref XmlDocument xmlDoc, ref XmlElement nodeParent, string lookupField, string val)
+        {
+            XmlElement nodeEq = BuildEqNodeForSPQuery(ref xmlDoc, ref nodeParent);
+            nodeParent.AppendChild(nodeEq);
+
+            BuildEqNodeInnerXmlForSPQuery(ref xmlDoc, ref nodeEq, lookupField, val);
+        }
+
+        /// <summary>
+        /// Build Xml node with a combination of Or and Eq
+        /// </summary>
+        /// <param name="xmlDoc"></param>
+        /// <param name="nodeParent"></param>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        private static XmlElement BuildDynamicOrEqCombination(ref XmlDocument xmlDoc, ref XmlElement nodeParent, string lookupField, string val)
+        {
+            XmlElement nodeOr = BuildOrNodeForSPQuery(ref xmlDoc, ref nodeParent);
+            XmlElement nodeEq = BuildEqNodeForSPQuery(ref xmlDoc, ref nodeOr);
+            nodeOr.AppendChild(nodeEq);
+            BuildEqNodeInnerXmlForSPQuery(ref xmlDoc, ref nodeEq, lookupField, val);
+            return nodeOr;
+        }
+
+        /// <summary>
+        /// Build Xml node for "Or"
+        /// </summary>
+        /// <param name="xmlDoc"></param>
+        /// <param name="nodeListItem"></param>
+        private static XmlElement BuildOrNodeForSPQuery(ref XmlDocument xmlDoc, ref XmlElement nodeParent)
+        {
+            XmlElement nodeOr = null;
+            try
+            {
+                nodeOr = xmlDoc.CreateElement("Or");
+                nodeParent.AppendChild(nodeOr);
+            }
+            catch (Exception ex)
+            { }
+            return nodeOr;
+        }
+
+        /// <summary>
+        /// Build Xml node for "Eq"
+        /// </summary>
+        /// <param name="xmlDoc"></param>
+        /// <param name="nodeListItem"></param>
+        private static XmlElement BuildEqNodeForSPQuery(ref XmlDocument xmlDoc, ref XmlElement nodeParent)
+        {
+            XmlElement nodeEq = null;
+            try
+            {
+                nodeEq = xmlDoc.CreateElement("Eq");
+                nodeParent.AppendChild(nodeEq);
+            }
+            catch (Exception ex)
+            { }
+            return nodeEq;
+        }
+
+        /// <summary>
+        /// Build Xml node for "Eq"
+        /// </summary>
+        /// <param name="xmlDoc"></param>
+        /// <param name="nodeParent"></param>
+        private static void BuildEqNodeInnerXmlForSPQuery(ref XmlDocument xmlDoc, ref XmlElement nodeParent, string fieldName, string val)
+        {
+            try
+            {
+                XmlElement nodeFieldRef = xmlDoc.CreateElement("FieldRef");
+                nodeFieldRef.SetAttribute("Name", fieldName);
+
+                XmlElement nodeValue = xmlDoc.CreateElement("Value");
+                nodeValue.SetAttribute("Type", "LookupMulti");
+                nodeValue.InnerText = val;
+
+                nodeParent.AppendChild(nodeFieldRef);
+                nodeParent.AppendChild(nodeValue);
+            }
+            catch (Exception ex)
+            {
+            }
+        }
+
+        #endregion
+
     }
 }

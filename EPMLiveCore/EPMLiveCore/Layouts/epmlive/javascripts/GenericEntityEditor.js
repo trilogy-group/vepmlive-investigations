@@ -50,7 +50,7 @@ function GEInit() {
 
             if (window._LookupFieldsPropsArray) {
                 for (var k in window._LookupFieldsPropsArray) {
-                    var controlProps = window._LookupFieldsPropsArray[k];                    
+                    var controlProps = window._LookupFieldsPropsArray[k];
                     FetchData(controlProps, k);
                 }
             }
@@ -993,14 +993,46 @@ function GEInit() {
 
         function FetchChildData(parentControlProp, childControlProp, k) {
 
+            var reqValues = "";
+            var clean = $('#' + childControlProp.ControlInfo.GenericEntityDivId).html();
+            var selectedChildren = "";
+
+            if (parentControlProp.ControlInfo.IsMultiSelect) {
+                $('#' + parentControlProp.ControlInfo.GenericEntityDivId).html(function () {
+                    $(this).find('#divEntityData').each(function () {
+                        reqValues += $(this).attr('displaytext') + ",";
+                    })
+                });
+                reqValues = reqValues.substr(0, reqValues.length - 1);
+            }
+            else {
+                reqValues = parentControlProp.ControlInfo.SingleSelectLookupVal;
+            }
+
+            var childCount = 0;
+            $('#' + childControlProp.ControlInfo.GenericEntityDivId).html(function () {
+                childCount = $(this).find('#divEntityData').length;
+                if (childCount > 0) {
+                    $(this).find('#divEntityData').each(function () {
+                        selectedChildren += $(this).attr('displaytext') + ",";
+                    });
+                    selectedChildren = selectedChildren.substr(0, selectedChildren.length - 1);
+
+                    var loadingDiv = "<img id=\"imgLoading\" src=\"/_layouts/epmlive/images/LoadingBar.gif\" style=\"vertical-align: middle;float:left;margin-left:5px;margin-top: 2px;\" /><div id=\"divSavingUser\" style=\"float:left;margin-left:5px;color:gray;\">Loading...</div> ";
+                    $('#' + childControlProp.ControlInfo.GenericEntityDivId).html(loadingDiv);
+                }
+            })
+
             var postData = {
                 webid: childControlProp.FieldInfo.LookupWebId,
                 listid: childControlProp.FieldInfo.LookupListId,
                 fieldid: childControlProp.FieldInfo.LookupFieldId,
                 field: childControlProp.FieldInfo.LookupField,
                 parent: parentControlProp.FieldName,
-                parentValue: parentControlProp.ControlInfo.SingleSelectLookupVal,
-                parentListField: childControlProp.ParentListField
+                parentValue: reqValues,
+                parentListField: childControlProp.ParentListField,
+                isMultiSelect: parentControlProp.ControlInfo.IsMultiSelect,
+                selectedChildren: selectedChildren
             };
 
             $.post(childControlProp.ControlInfo.CurWebURL + "/_layouts/epmlive/GenericEntityTypeAheadAjaxHandler.aspx", postData, function (data) {
@@ -1049,6 +1081,11 @@ function GEInit() {
                 $('#' + childControlProp.ControlInfo.GenericEntityDivId).html('<span style="color:gray">Type here to search...</span>');
                 SetCache(data, childControlProp);
                 BuildDropDownWithCache(data, childControlProp);
+
+                // Re-adding already saved values which got wiped out due to drop down population
+                if (childCount > 0) {
+                    $('#' + childControlProp.ControlInfo.GenericEntityDivId).html(clean);
+                }
             });
         }
 
