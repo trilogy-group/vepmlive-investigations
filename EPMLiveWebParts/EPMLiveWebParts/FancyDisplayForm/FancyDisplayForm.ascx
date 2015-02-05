@@ -1,4 +1,4 @@
-<%@ Assembly Name="$SharePoint.Project.AssemblyFullName$" %>
+﻿<%@ Assembly Name="$SharePoint.Project.AssemblyFullName$" %>
 <%@ Assembly Name="Microsoft.Web.CommandUI, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
 <%@ Register TagPrefix="SharePoint" Namespace="Microsoft.SharePoint.WebControls" Assembly="Microsoft.SharePoint, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
 <%@ Register TagPrefix="Utilities" Namespace="Microsoft.SharePoint.Utilities" Assembly="Microsoft.SharePoint, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
@@ -7,13 +7,80 @@
 <%@ Register TagPrefix="WebPartPages" Namespace="Microsoft.SharePoint.WebPartPages" Assembly="Microsoft.SharePoint, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
 <%@ Control Language="C#" AutoEventWireup="true" CodeBehind="FancyDisplayForm.ascx.cs" Inherits="EPMLiveWebParts.FancyDisplayForm" %>
 
+<link rel="stylesheet" type="text/css" href="http://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css">
 
+<style type="text/css">
+    @import url(http://fonts.googleapis.com/css?family=Open+Sans:400,300,600);
 
-<script type="text/javascript"> 
+    #attach-wrapper {
+        font-family: "Open Sans";
+        font-size: 13px;
+    }
+
+        #attach-wrapper .paperclip {
+            color: #999999;
+            display: inline-block;
+            padding-right: 8px;
+            font-size: 16px;
+            vertical-align: top;
+            position: relative;
+        }
+
+        #attach-wrapper .attach-text {
+            color: #555555;
+            padding: 4px 4px 0px 4px;
+            line-height: 12px;
+        }
+
+        #attach-wrapper #attach-text-wrapper {
+            display: inline-block;
+            width: 95%;
+        }
+
+        #attach-wrapper .attach-text .file {
+            padding-right: 5px;
+            color: #bbbbbb;
+        }
+
+        #attach-wrapper .attach-text .delete {
+            padding-left: 5px;
+            color: #cccccc;
+            display: none;
+        }
+
+            #attach-wrapper .attach-text .delete:hover {
+                cursor: pointer;
+                color: #0090ca;
+            }
+
+        #attach-wrapper .attach-text a {
+            text-decoration: none;
+            color: #0090ca;
+        }
+
+            #attach-wrapper .attach-text a:hover {
+                color: #0090ca;
+                cursor: pointer;
+            }
+</style>
+
+<script type="text/javascript">
+    function openDialog() {
+        var options =
+        {
+            url: $("#<%= hiddenWebUrl.ClientID %>").val() + "/_layouts/AttachFile.aspx?ListId=" + $("#<%= hiddenListId.ClientID %>").val() + "&ItemId=" + $("#<%= hiddenItemId.ClientID %>").val() + "&isdlg=1&Source=" + $("#<%= hiddenSourceUrl.ClientID %>").val(),
+            width: 325,
+            height: 155,
+            title: "Attach File",
+            dialogReturnValueCallback: function (dialogResult) { if (dialogResult == 1) { FancyDispFormClient.FillAttachmentSection(); } }
+        };
+        SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
+    }
 
     $(function () {
 
-        FancyDispFormClient.fillWebPartData();
+        FancyDispFormClient.LoadAssociatedItems();
+        FancyDispFormClient.LoadItemAttachments();
 
         $(".fancy-display-form-wrapper .dispFormExpandHeader").click(function () {
             $header = $(this);
@@ -34,9 +101,42 @@
             $header = $(this);
             $header.closest('tr').next('.ShowMoreRow').toggle();
         });
+
+        $(".attach-text").mouseover(function () {
+            $(this).find('.delete').css("display", "inline");
+        }).mouseout(function () {
+            $(this).find('.delete').css("display", "none");
+        });
     });
 
     FancyDispFormClient = {
+
+        DeleteItemAttachment: function (deleteItemUrl) {
+
+            if (confirm('Are you sure you want to send the item to the Recycle Bin?')) {
+
+                $.ajax({
+                    type: "POST",
+                    url: deleteItemUrl,
+                    success: function (ticket) {
+                        if (ticket.indexOf("General Error") != 0) {
+                            var listInfo = ticket.split('|');
+                            var viewSiteContentUrl = $("#<%= hiddenWebUrl.ClientID %>").val() + "/_layouts/epmlive/gridaction.aspx?action=deleteitemattachment&listid=" + listInfo[0] + "&itemid=" + listInfo[1] + "&fname=" + listInfo[2] + "&Source=" + document.location.href;
+                            FancyDispFormClient.LoadItemAttachments();
+                        }
+                        else {
+                            alert(ticket);
+                        }
+                        $(".attach-text").mouseover(function () {
+                            $(this).find('.delete').css("display", "inline");
+                        }).mouseout(function () {
+                            $(this).find('.delete').css("display", "none");
+                        });
+                    }
+                });
+            }
+
+        },
 
         showItemUrl: function (weburl) {
             $.ajax({
@@ -47,8 +147,9 @@
                         var listInfo = ticket.split('|');
 
                         var viewSiteContentUrl = listInfo[0] + "/_layouts/epmlive/gridaction.aspx?action=FancyDispForm&list=" + listInfo[3] + "&field=" + listInfo[1] + "&LookupFieldList=" + listInfo[2] + "&Source=" + document.location.href;
-                        var options = { url: viewSiteContentUrl, showMaximized: true };
-                        SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
+                        //var options = { url: viewSiteContentUrl, showMaximized: true };
+                        //SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
+                        FancyDispFormClient.FillAssociatedItemSection();
                     }
                     else {
                         alert(ticket);
@@ -58,7 +159,7 @@
         },
 
         showNewForm: function (weburl) {
-            var options = { url: weburl, showMaximized: true, dialogReturnValueCallback: function (dialogResult) { if (dialogResult == 1) { FancyDispFormClient.reFillWebPartData(); } } };
+            var options = { url: weburl, showMaximized: true, dialogReturnValueCallback: function (dialogResult) { if (dialogResult == 1) { FancyDispFormClient.FillAssociatedItemSection(); } } };
             SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
         },
 
@@ -98,11 +199,36 @@
             SP.UI.ModalDialog.showModalDialog(options);
         },
 
-        reFillWebPartData: function () {
-            window.setTimeout('FancyDispFormClient.fillWebPartData()', 2000);
+        FillAttachmentSection: function () {
+            window.setTimeout('FancyDispFormClient.LoadItemAttachments()', 1000);
         },
 
-        fillWebPartData: function () {
+        LoadItemAttachments: function () {
+            $.ajax({
+                type: "POST",
+                url: "<%=SPContext.Current.Web.Url%>/_vti_bin/WorkEngine.asmx/Execute",
+                data: "{Function : 'GetFancyFormAssociatedItemAttachments' , Dataxml: '<FancyFormAssociatedItemAttachments><FancyFormListID><%=SPContext.Current.ListId%></FancyFormListID><FancyFormItemID><%=SPContext.Current.ItemId%></FancyFormItemID></FancyFormAssociatedItemAttachments>'}",
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+
+                    $("#<%=divAttachmentDetailsContent.ClientID%>").html("");
+                    $("#<%=divAttachmentDetailsContent.ClientID%>").html(response.d.toString().replace("<Result Status=\"0\">", "").replace("</Result>", ""));
+
+                    $(".attach-text").mouseover(function () {
+                        $(this).find('.delete').css("display", "inline");
+                    }).mouseout(function () {
+                        $(this).find('.delete').css("display", "none");
+                    });
+                }
+            });
+        },
+
+        FillAssociatedItemSection: function () {
+            window.setTimeout('FancyDispFormClient.LoadAssociatedItems()', 2000);
+        },
+
+        LoadAssociatedItems: function () {
             $.ajax({
                 type: "POST",
                 url: "<%=SPContext.Current.Web.Url%>/_vti_bin/WorkEngine.asmx/Execute",
@@ -188,7 +314,7 @@
 
                     var addContextualMenu = function () {
                         $(".fancyDisplayFormAssociatedItemsContextMenu").each(function () {
-                            window.epmLiveNavigation.addContextualMenu($(this), null, true, '-1', { "delete": "FancyDispFormClient.reFillWebPartData" });
+                            window.epmLiveNavigation.addContextualMenu($(this), null, true, '-1', { "delete": "FancyDispFormClient.FillAssociatedItemSection" });
                         });
                     };
 
@@ -257,6 +383,14 @@
                         </div>
                     </td>
                 </tr>
+                <tr>
+                    <td id="divAttachmentDetailsParent" runat="server">
+                        <div id="divAttachmentDetails" runat="server" class="fancy-display-header">
+                        </div>
+                        <div class="dispFormContent" id="divAttachmentDetailsContent" runat="server">
+                        </div>
+                    </td>
+                </tr>
             </table>
         </div>
         <div style="vertical-align: top; display: inline;">
@@ -312,6 +446,7 @@
                         <div id="divFancyDispForm" class="fancy-display-header">
                             <span>Associated Items</span>
                         </div>
+
                         <div class="dispFormContent" id="divFancyDispFormAssociatedItemsContent" runat="server" style="color: #555555;">
                         </div>
                     </td>
@@ -327,5 +462,10 @@
     <div style="text-align: right; float: right;">
         <asp:Button ID="btnCancel2" runat="server" Text="Close" OnClick="btnCancel_Click" />
     </div>
+
+    <input id="hiddenListId" type="hidden" runat="server" />
+    <input id="hiddenItemId" type="hidden" runat="server" />
+    <input id="hiddenSourceUrl" type="hidden" runat="server" />
+    <input id="hiddenWebUrl" type="hidden" runat="server" />
 
 </div>

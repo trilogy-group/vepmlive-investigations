@@ -615,6 +615,69 @@ namespace EPMLiveCore.API
             }
         }
 
+        public static string GetFancyFormAssociatedItemAttachments(string data, SPWeb oWeb)
+        {
+            StringBuilder sbItemAttachments = new StringBuilder();
+
+            try
+            {
+                #region Xml Parsing - Parameters
+
+                //Parse XML to get paramater values
+                var xDoc = new XmlDocument();
+                xDoc.LoadXml(data);
+
+                //Set values from parameter
+                Guid listId = new Guid(xDoc.GetElementsByTagName("FancyFormListID")[0].InnerText);
+                string itemId = xDoc.GetElementsByTagName("FancyFormItemID")[0].InnerText;
+                string sourceUrl = HttpUtility.UrlEncode(HttpContext.Current.Request.UrlReferrer.ToString());
+
+                #endregion
+
+                //Using SharePoint Object Model fetching data values
+                using (SPSite spSite = new SPSite(oWeb.Site.ID))
+                {
+                    using (SPWeb spWeb = spSite.OpenWeb(oWeb.ID))
+                    {
+                        SPList list = spWeb.Lists[listId];
+                        SPListItem item = list.GetItemById(Convert.ToInt32(itemId));
+
+                        sbItemAttachments.Append("<div id='attach-wrapper'>");
+                        if (item.Attachments != null && item.Attachments.Count == 0)
+                        {
+                            sbItemAttachments.Append("<span>There are no attachments, click the \"+\" icon above to upload new attachments.</span>");
+                        }
+                        else
+                        {
+                            foreach (string fileName in item.Attachments)
+                            {
+                                string attachmentUrl = spWeb.Url + "/" + list.RootFolder.Url + "/attachments/" + item.ID + "/" + fileName;
+                                sbItemAttachments.Append("<div class='paperclip'><i class='fa fa-paperclip'></i></div>");
+
+                                sbItemAttachments.Append("<div id='attach-text-wrapper'>");
+
+                                sbItemAttachments.Append("<div class='attach-text'>");
+                                sbItemAttachments.Append("<i class='fa fa-file-o file'></i>");
+                                sbItemAttachments.Append("<a href='" + attachmentUrl + "' target='_blank' ID='" + fileName + "'>" + fileName + "</a>");
+
+                                string deleteAttachmentLink = spWeb.Url + "/_layouts/epmlive/gridaction.aspx?action=deleteitemattachment&listid=" + list.ID.ToString() + "&itemid=" + item.ID + "&fname=" + fileName;// +"&Source=" + sourceUrl;
+                                sbItemAttachments.Append("<a href='#' onclick=\"javascript:FancyDispFormClient.DeleteItemAttachment('" + deleteAttachmentLink + "');return false;\"><i class='fa fa-times delete'></i></a>");
+
+                                sbItemAttachments.Append("</div>");
+                                sbItemAttachments.Append("</div>");
+                            }
+                        }
+                        sbItemAttachments.Append("</div> <br/>");
+                    }
+                }
+                return Response.Success(sbItemAttachments.ToString());
+            }
+            catch (APIException ex)
+            {
+                return Response.Failure(ex.ExceptionNumber, string.Format("Error: {0}", ex.Message));
+            }
+        }
+
         #endregion
     }
 }

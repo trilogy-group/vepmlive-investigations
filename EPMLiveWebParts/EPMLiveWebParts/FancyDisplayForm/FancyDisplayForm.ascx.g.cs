@@ -60,6 +60,12 @@ namespace EPMLiveWebParts {
         
         protected global::System.Web.UI.HtmlControls.HtmlTableCell divNarrativeDetailsParent;
         
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl divAttachmentDetails;
+        
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl divAttachmentDetailsContent;
+        
+        protected global::System.Web.UI.HtmlControls.HtmlTableCell divAttachmentDetailsParent;
+        
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl divPeopleDetails;
         
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl divPeopleContent;
@@ -89,6 +95,14 @@ namespace EPMLiveWebParts {
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl divItemDetailParent;
         
         protected global::System.Web.UI.WebControls.Button btnCancel2;
+        
+        protected global::System.Web.UI.HtmlControls.HtmlInputHidden hiddenListId;
+        
+        protected global::System.Web.UI.HtmlControls.HtmlInputHidden hiddenItemId;
+        
+        protected global::System.Web.UI.HtmlControls.HtmlInputHidden hiddenSourceUrl;
+        
+        protected global::System.Web.UI.HtmlControls.HtmlInputHidden hiddenWebUrl;
         
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl divFancyDisplayForm;
         
@@ -269,6 +283,49 @@ namespace EPMLiveWebParts {
             @__parser.AddParsedSubObject(new System.Web.UI.LiteralControl("\r\n                                    </td>\r\n                                </tr" +
                         ">\r\n                            </table>\r\n                        </div>\r\n       " +
                         "             "));
+            return @__ctrl;
+        }
+        
+        [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Never)]
+        private global::System.Web.UI.HtmlControls.HtmlGenericControl @__BuildControldivAttachmentDetails() {
+            global::System.Web.UI.HtmlControls.HtmlGenericControl @__ctrl;
+            @__ctrl = new global::System.Web.UI.HtmlControls.HtmlGenericControl("div");
+            this.divAttachmentDetails = @__ctrl;
+            @__ctrl.ID = "divAttachmentDetails";
+            ((System.Web.UI.IAttributeAccessor)(@__ctrl)).SetAttribute("class", "fancy-display-header");
+            System.Web.UI.IParserAccessor @__parser = ((System.Web.UI.IParserAccessor)(@__ctrl));
+            @__parser.AddParsedSubObject(new System.Web.UI.LiteralControl("\r\n                        "));
+            return @__ctrl;
+        }
+        
+        [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Never)]
+        private global::System.Web.UI.HtmlControls.HtmlGenericControl @__BuildControldivAttachmentDetailsContent() {
+            global::System.Web.UI.HtmlControls.HtmlGenericControl @__ctrl;
+            @__ctrl = new global::System.Web.UI.HtmlControls.HtmlGenericControl("div");
+            this.divAttachmentDetailsContent = @__ctrl;
+            ((System.Web.UI.IAttributeAccessor)(@__ctrl)).SetAttribute("class", "dispFormContent");
+            @__ctrl.ID = "divAttachmentDetailsContent";
+            System.Web.UI.IParserAccessor @__parser = ((System.Web.UI.IParserAccessor)(@__ctrl));
+            @__parser.AddParsedSubObject(new System.Web.UI.LiteralControl("\r\n                        "));
+            return @__ctrl;
+        }
+        
+        [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Never)]
+        private global::System.Web.UI.HtmlControls.HtmlTableCell @__BuildControldivAttachmentDetailsParent() {
+            global::System.Web.UI.HtmlControls.HtmlTableCell @__ctrl;
+            @__ctrl = new global::System.Web.UI.HtmlControls.HtmlTableCell("td");
+            this.divAttachmentDetailsParent = @__ctrl;
+            @__ctrl.ID = "divAttachmentDetailsParent";
+            System.Web.UI.IParserAccessor @__parser = ((System.Web.UI.IParserAccessor)(@__ctrl));
+            @__parser.AddParsedSubObject(new System.Web.UI.LiteralControl("\r\n                        "));
+            global::System.Web.UI.HtmlControls.HtmlGenericControl @__ctrl1;
+            @__ctrl1 = this.@__BuildControldivAttachmentDetails();
+            @__parser.AddParsedSubObject(@__ctrl1);
+            @__parser.AddParsedSubObject(new System.Web.UI.LiteralControl("\r\n                        "));
+            global::System.Web.UI.HtmlControls.HtmlGenericControl @__ctrl2;
+            @__ctrl2 = this.@__BuildControldivAttachmentDetailsContent();
+            @__parser.AddParsedSubObject(@__ctrl2);
+            @__parser.AddParsedSubObject(new System.Web.UI.LiteralControl("\r\n                    "));
             return @__ctrl;
         }
         
@@ -471,7 +528,7 @@ namespace EPMLiveWebParts {
             System.Web.UI.IParserAccessor @__parser = ((System.Web.UI.IParserAccessor)(@__ctrl));
             @__parser.AddParsedSubObject(new System.Web.UI.LiteralControl("\r\n                        <div id=\"divFancyDispForm\" class=\"fancy-display-header\"" +
                         ">\r\n                            <span>Associated Items</span>\r\n                  " +
-                        "      </div>\r\n                        "));
+                        "      </div>\r\n\r\n                        "));
             global::System.Web.UI.HtmlControls.HtmlGenericControl @__ctrl1;
             @__ctrl1 = this.@__BuildControldivFancyDispFormAssociatedItemsContent();
             @__parser.AddParsedSubObject(@__ctrl1);
@@ -506,6 +563,46 @@ namespace EPMLiveWebParts {
         }
         
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Never)]
+        private global::System.Web.UI.HtmlControls.HtmlInputHidden @__BuildControlhiddenListId() {
+            global::System.Web.UI.HtmlControls.HtmlInputHidden @__ctrl;
+            @__ctrl = new global::System.Web.UI.HtmlControls.HtmlInputHidden();
+            this.hiddenListId = @__ctrl;
+            @__ctrl.ID = "hiddenListId";
+            ((System.Web.UI.IAttributeAccessor)(@__ctrl)).SetAttribute("type", "hidden");
+            return @__ctrl;
+        }
+        
+        [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Never)]
+        private global::System.Web.UI.HtmlControls.HtmlInputHidden @__BuildControlhiddenItemId() {
+            global::System.Web.UI.HtmlControls.HtmlInputHidden @__ctrl;
+            @__ctrl = new global::System.Web.UI.HtmlControls.HtmlInputHidden();
+            this.hiddenItemId = @__ctrl;
+            @__ctrl.ID = "hiddenItemId";
+            ((System.Web.UI.IAttributeAccessor)(@__ctrl)).SetAttribute("type", "hidden");
+            return @__ctrl;
+        }
+        
+        [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Never)]
+        private global::System.Web.UI.HtmlControls.HtmlInputHidden @__BuildControlhiddenSourceUrl() {
+            global::System.Web.UI.HtmlControls.HtmlInputHidden @__ctrl;
+            @__ctrl = new global::System.Web.UI.HtmlControls.HtmlInputHidden();
+            this.hiddenSourceUrl = @__ctrl;
+            @__ctrl.ID = "hiddenSourceUrl";
+            ((System.Web.UI.IAttributeAccessor)(@__ctrl)).SetAttribute("type", "hidden");
+            return @__ctrl;
+        }
+        
+        [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Never)]
+        private global::System.Web.UI.HtmlControls.HtmlInputHidden @__BuildControlhiddenWebUrl() {
+            global::System.Web.UI.HtmlControls.HtmlInputHidden @__ctrl;
+            @__ctrl = new global::System.Web.UI.HtmlControls.HtmlInputHidden();
+            this.hiddenWebUrl = @__ctrl;
+            @__ctrl.ID = "hiddenWebUrl";
+            ((System.Web.UI.IAttributeAccessor)(@__ctrl)).SetAttribute("type", "hidden");
+            return @__ctrl;
+        }
+        
+        [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Never)]
         private global::System.Web.UI.HtmlControls.HtmlGenericControl @__BuildControldivFancyDisplayForm() {
             global::System.Web.UI.HtmlControls.HtmlGenericControl @__ctrl;
             @__ctrl = new global::System.Web.UI.HtmlControls.HtmlGenericControl("div");
@@ -532,30 +629,50 @@ namespace EPMLiveWebParts {
             global::System.Web.UI.HtmlControls.HtmlTableCell @__ctrl4;
             @__ctrl4 = this.@__BuildControldivNarrativeDetailsParent();
             @__parser.AddParsedSubObject(@__ctrl4);
+            @__parser.AddParsedSubObject(new System.Web.UI.LiteralControl("\r\n                </tr>\r\n                <tr>\r\n                    "));
+            global::System.Web.UI.HtmlControls.HtmlTableCell @__ctrl5;
+            @__ctrl5 = this.@__BuildControldivAttachmentDetailsParent();
+            @__parser.AddParsedSubObject(@__ctrl5);
             @__parser.AddParsedSubObject(new System.Web.UI.LiteralControl("\r\n                </tr>\r\n            </table>\r\n        </div>\r\n        <div style" +
                         "=\"vertical-align: top; display: inline;\">\r\n            <table border=\"0\">\r\n     " +
                         "           <tr>\r\n                    "));
-            global::System.Web.UI.HtmlControls.HtmlTableCell @__ctrl5;
-            @__ctrl5 = this.@__BuildControldivPeopleDetailsParent();
-            @__parser.AddParsedSubObject(@__ctrl5);
-            @__parser.AddParsedSubObject(new System.Web.UI.LiteralControl("\r\n                </tr>\r\n                <tr>\r\n                    "));
             global::System.Web.UI.HtmlControls.HtmlTableCell @__ctrl6;
-            @__ctrl6 = this.@__BuildControldivDateDetailsParent();
+            @__ctrl6 = this.@__BuildControldivPeopleDetailsParent();
             @__parser.AddParsedSubObject(@__ctrl6);
             @__parser.AddParsedSubObject(new System.Web.UI.LiteralControl("\r\n                </tr>\r\n                <tr>\r\n                    "));
             global::System.Web.UI.HtmlControls.HtmlTableCell @__ctrl7;
-            @__ctrl7 = this.@__BuildControldivFancyDispFormParent();
+            @__ctrl7 = this.@__BuildControldivDateDetailsParent();
             @__parser.AddParsedSubObject(@__ctrl7);
+            @__parser.AddParsedSubObject(new System.Web.UI.LiteralControl("\r\n                </tr>\r\n                <tr>\r\n                    "));
+            global::System.Web.UI.HtmlControls.HtmlTableCell @__ctrl8;
+            @__ctrl8 = this.@__BuildControldivFancyDispFormParent();
+            @__parser.AddParsedSubObject(@__ctrl8);
             @__parser.AddParsedSubObject(new System.Web.UI.LiteralControl("\r\n                </tr>\r\n            </table>\r\n        </div>\r\n\r\n    </div>\r\n\r\n  " +
                         "  "));
-            global::System.Web.UI.HtmlControls.HtmlGenericControl @__ctrl8;
-            @__ctrl8 = this.@__BuildControldivItemDetailParent();
-            @__parser.AddParsedSubObject(@__ctrl8);
-            @__parser.AddParsedSubObject(new System.Web.UI.LiteralControl("\r\n\r\n    <div style=\"text-align: right; float: right;\">\r\n        "));
-            global::System.Web.UI.WebControls.Button @__ctrl9;
-            @__ctrl9 = this.@__BuildControlbtnCancel2();
+            global::System.Web.UI.HtmlControls.HtmlGenericControl @__ctrl9;
+            @__ctrl9 = this.@__BuildControldivItemDetailParent();
             @__parser.AddParsedSubObject(@__ctrl9);
-            @__parser.AddParsedSubObject(new System.Web.UI.LiteralControl("\r\n    </div>\r\n\r\n"));
+            @__parser.AddParsedSubObject(new System.Web.UI.LiteralControl("\r\n\r\n    <div style=\"text-align: right; float: right;\">\r\n        "));
+            global::System.Web.UI.WebControls.Button @__ctrl10;
+            @__ctrl10 = this.@__BuildControlbtnCancel2();
+            @__parser.AddParsedSubObject(@__ctrl10);
+            @__parser.AddParsedSubObject(new System.Web.UI.LiteralControl("\r\n    </div>\r\n\r\n    "));
+            global::System.Web.UI.HtmlControls.HtmlInputHidden @__ctrl11;
+            @__ctrl11 = this.@__BuildControlhiddenListId();
+            @__parser.AddParsedSubObject(@__ctrl11);
+            @__parser.AddParsedSubObject(new System.Web.UI.LiteralControl("\r\n    "));
+            global::System.Web.UI.HtmlControls.HtmlInputHidden @__ctrl12;
+            @__ctrl12 = this.@__BuildControlhiddenItemId();
+            @__parser.AddParsedSubObject(@__ctrl12);
+            @__parser.AddParsedSubObject(new System.Web.UI.LiteralControl("\r\n    "));
+            global::System.Web.UI.HtmlControls.HtmlInputHidden @__ctrl13;
+            @__ctrl13 = this.@__BuildControlhiddenSourceUrl();
+            @__parser.AddParsedSubObject(@__ctrl13);
+            @__parser.AddParsedSubObject(new System.Web.UI.LiteralControl("\r\n    "));
+            global::System.Web.UI.HtmlControls.HtmlInputHidden @__ctrl14;
+            @__ctrl14 = this.@__BuildControlhiddenWebUrl();
+            @__parser.AddParsedSubObject(@__ctrl14);
+            @__parser.AddParsedSubObject(new System.Web.UI.LiteralControl("\r\n\r\n"));
             return @__ctrl;
         }
         
@@ -570,114 +687,154 @@ namespace EPMLiveWebParts {
         
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Never)]
         private void @__Render__control1(System.Web.UI.HtmlTextWriter @__w, System.Web.UI.Control parameterContainer) {
-            @__w.Write("\r\n\r\n<style type=\"text/css\">\r\n    .fancy-display-form-wrapper {\r\n        font-fami" +
-                    "ly: Open Sans Light !important;\r\n        color: #555555;\r\n        width: 100%;\r\n" +
-                    "        height: 100%;\r\n        /*width: 900px;*/\r\n        /*min-width: 900px;*/\r" +
-                    "\n    }\r\n\r\n    .fancyDisplayForm {\r\n        background-color: #ffffff;\r\n        v" +
-                    "ertical-align: middle;\r\n        outline: none;\r\n        resize: none;\r\n        d" +
-                    "isplay: inline-block;\r\n        -webkit-font-smoothing: antialiased;\r\n        -mo" +
-                    "z-osx-font-smoothing: grayscale;\r\n        width: 100%;\r\n    }\r\n\r\n        .fancyD" +
-                    "isplayForm #first-table {\r\n            vertical-align: top;\r\n            float: " +
-                    "left;\r\n            margin-right: 20px;\r\n            width: 63.5%;\r\n        }\r\n\r\n" +
-                    "    .fancy-display-header {\r\n        border-bottom: 1px solid #EEEEEE;\r\n        " +
-                    "cursor: auto;\r\n        font-size: 1.4em;\r\n        padding-bottom: 5px;\r\n        " +
-                    "padding-top: 5px;\r\n        font-family: Open Sans Regular !important;\r\n    }\r\n\r\n" +
-                    "        .fancy-display-header span {\r\n            color: #555555;\r\n        }\r\n\r\n" +
-                    "    .fancy-col-table {\r\n    }\r\n\r\n        .fancy-col-table tr td:first-child {\r\n " +
-                    "           width: 175px;\r\n            font-family: Open Sans Regular !important;" +
-                    "\r\n            vertical-align: middle;\r\n        }\r\n\r\n        .fancy-col-table tr " +
-                    "td {\r\n            font-size: 1em;\r\n            padding-bottom: 5px;\r\n           " +
-                    " width: 150px;\r\n        }\r\n\r\n    .fancyDisplayForm .dispFormContent {\r\n        d" +
-                    "isplay: block;\r\n        width: 100%;\r\n        padding-top: 5px;\r\n    }\r\n\r\n    .f" +
-                    "ancy-display-form-wrapper .dispFormExpandHeader {\r\n        cursor: pointer;\r\n   " +
-                    "     display: inline-block;\r\n        padding-bottom: 5px;\r\n        color: #0090C" +
-                    "A;\r\n        vertical-align: top;\r\n    }\r\n\r\n        .fancy-display-form-wrapper ." +
-                    "dispFormExpandHeader span:first-child {\r\n            color: #0090CA;\r\n          " +
-                    "  padding-right: 5px;\r\n            position: relative;\r\n            top: 1px;\r\n " +
-                    "           font-size: .9em;\r\n        }\r\n\r\n    .fancy-display-form-wrapper .dispF" +
-                    "ormFancyTitle {\r\n        display: inline-block;\r\n        padding-bottom: 5px;\r\n " +
-                    "   }\r\n\r\n        .fancy-display-form-wrapper .dispFormFancyTitle span {\r\n        " +
-                    "    font-size: 2em;\r\n        }\r\n\r\n    .fancy-display-form-wrapper .dispFormUserI" +
-                    "mage {\r\n        fit-position: slice;\r\n        height: 22px;\r\n        text-align:" +
-                    " center;\r\n        border-radius: 50%;\r\n        vertical-align: bottom;\r\n    }\r\n\r" +
-                    "\n    .fancy-display-form-wrapper .dispFormExpandMore {\r\n        cursor: pointer;" +
-                    "\r\n        display: inline-block;\r\n        color: #0090CA;\r\n        font-size: 12" +
-                    "px;\r\n        padding-top: 7px;\r\n    }\r\n\r\n    .badge {\r\n        display: inline-b" +
-                    "lock;\r\n        min-width: 14px;\r\n        padding: 2px 8px;\r\n        font-size: 1" +
-                    "2px;\r\n        font-family: \"Open Sans Semi Bold\" !important;\r\n        color: #ff" +
-                    "f;\r\n        line-height: 13px;\r\n        vertical-align: baseline;\r\n        white" +
-                    "-space: nowrap;\r\n        text-align: center;\r\n        background-color: #999;\r\n " +
-                    "       border-radius: 10px;\r\n    }\r\n\r\n        .badge:hover {\r\n            backgr" +
-                    "ound-color: #0090CA;\r\n        }\r\n\r\n\r\n    /* Small devices */\r\n    @media (max-wi" +
-                    "dth: 768px) {\r\n        .fancyDisplayForm #first-table {\r\n            float: none" +
-                    ";\r\n        }\r\n\r\n        .fancyDisplayForm #first-table {\r\n            width: 100" +
-                    "%;\r\n        }\r\n    }\r\n\r\n    .fancy-display-form-wrapper .slidingDiv {\r\n        w" +
-                    "idth: 100%;\r\n        padding: 20px;\r\n        border: 1px thin black;\r\n        -w" +
-                    "ebkit-box-shadow: 0px 3px 20px rgba(50, 50, 50, 0.8);\r\n        -moz-box-shadow: " +
-                    "0px 3px 20px rgba(50, 50, 50, 0.8);\r\n        box-shadow: 0px 3px 20px rgba(50, 5" +
-                    "0, 50, 0.8);\r\n        position: absolute;\r\n        width: 200px;\r\n        backgr" +
-                    "ound-color: white;\r\n        text-align: left;\r\n        z-index: 100;\r\n    }\r\n\r\n " +
-                    "   .fancy-display-form-wrapper .slidingDivClose {\r\n        float: right;\r\n      " +
-                    "  font-size: large;\r\n    }\r\n\r\n    .fancy-display-form-wrapper .slidingDivHeader " +
-                    "{\r\n        border-bottom: 1px solid #EEEEEE;\r\n        cursor: auto;\r\n        fon" +
-                    "t-size: 1.4em;\r\n        padding-bottom: 5px;\r\n        padding-top: 5px;\r\n       " +
-                    " font-family: Open Sans Regular !important;\r\n        color: #555555;\r\n    }\r\n\r\n " +
-                    "   .fancy-display-form-wrapper .slidingDivAdd {\r\n        float: right;\r\n        " +
-                    "left: 190px;\r\n        position: inherit;\r\n        top: 25px;\r\n    }\r\n\r\n    .fanc" +
-                    "y-display-form-wrapper .listMainDiv {\r\n        float: left;\r\n        margin-righ" +
-                    "t: 5px;\r\n    }\r\n\r\n    .fancyDisplayFormAssociatedItemsContextMenu {\r\n        lis" +
-                    "t-style: none;\r\n        cursor: pointer;\r\n    }\r\n</style>\r\n\r\n<script type=\"text/" +
-                    "javascript\">\r\n\r\n    $(function () {\r\n\r\n        FancyDispFormClient.fillWebPartDa" +
-                    "ta();\r\n\r\n        $(\".fancy-display-form-wrapper .dispFormExpandHeader\").click(fu" +
-                    "nction () {\r\n            $header = $(this);\r\n            $content = $header.next" +
-                    "();\r\n            $content.slideToggle(100, function () {\r\n            });\r\n     " +
-                    "       if ($(this).find(\"span:first\").hasClass(\"icon-plus-circle-2\")) {\r\n       " +
-                    "         $(this).find(\"span:first\").removeClass(\"icon-plus-circle-2\").addClass(\"" +
-                    "icon-minus-circle-2\");\r\n                $(this).find(\"span:last\").text(\"hide\");\r" +
-                    "\n            }\r\n            else {\r\n                $(this).find(\"span:first\").r" +
-                    "emoveClass(\"icon-minus-circle-2\").addClass(\"icon-plus-circle-2\");\r\n             " +
-                    "   $(this).find(\"span:last\").text(\"show\");\r\n            }\r\n        });\r\n\r\n      " +
-                    "  $(\".dispFormExpandMore\").click(function () {\r\n            $header = $(this);\r\n" +
-                    "            $header.closest(\'tr\').next(\'.ShowMoreRow\').toggle();\r\n        });\r\n " +
-                    "   });\r\n\r\n    FancyDispFormClient = {\r\n\r\n        showItemUrl: function (weburl) " +
-                    "{\r\n            $.ajax({\r\n                type: \"POST\",\r\n                url: web" +
-                    "url,\r\n                success: function (ticket) {\r\n                    if (tick" +
-                    "et.indexOf(\"General Error\") != 0) {\r\n                        var listInfo = tick" +
-                    "et.split(\'|\');\r\n\r\n                        var viewSiteContentUrl = listInfo[0] +" +
-                    " \"/_layouts/epmlive/gridaction.aspx?action=FancyDispForm&list=\" + listInfo[3] + " +
-                    "\"&field=\" + listInfo[1] + \"&LookupFieldList=\" + listInfo[2] + \"&Source=\" + docum" +
-                    "ent.location.href;\r\n                        var options = { url: viewSiteContent" +
-                    "Url, showMaximized: true };\r\n                        SP.SOD.execute(\'SP.UI.Dialo" +
-                    "g.js\', \'SP.UI.ModalDialog.showModalDialog\', options);\r\n                    }\r\n  " +
-                    "                  else {\r\n                        alert(ticket);\r\n              " +
-                    "      }\r\n                }\r\n            });\r\n        },\r\n\r\n        showNewForm: " +
-                    "function (weburl) {\r\n            var options = { url: weburl, showMaximized: tru" +
-                    "e, dialogReturnValueCallback: function (dialogResult) { if (dialogResult == 1) {" +
-                    " FancyDispFormClient.reFillWebPartData(); } } };\r\n            SP.SOD.execute(\'SP" +
-                    ".UI.Dialog.js\', \'SP.UI.ModalDialog.showModalDialog\', options);\r\n        },\r\n\r\n  " +
-                    "      showItemPopup: function (siteurl, webid, listid, itemid) {\r\n            sh" +
-                    "owSharePointPopup(siteurl + \'/_layouts/epmlive/gridaction.aspx?action=getcontext" +
-                    "menus&webid=\' + webid +\r\n                \'&listid=\' + listid + \'&ID=\' + itemid, " +
-                    "null, false, true, null, {\r\n                    gridId: \"myDiv\",\r\n              " +
-                    "      rowId: \"myDiv\",\r\n                    col: \"myDiv\"\r\n                }, 300," +
-                    " 400);\r\n        },\r\n\r\n        emptyFunction: function () {\r\n        },\r\n\r\n      " +
-                    "  showSharePointPopup: function (url, title, allowMaximize, showClose, func, fun" +
-                    "cParams, width, height) {\r\n            if (allowMaximize == null) allowMaximize " +
-                    "= true;\r\n            if (showClose == null) showClose = true;\r\n            if (f" +
-                    "unc == null) func = emptyFunction;\r\n\r\n            var options;\r\n\r\n            if" +
-                    " (width !== undefined && height !== undefined) {\r\n                options = {\r\n " +
-                    "                   title: title,\r\n                    allowMaximize: allowMaximi" +
-                    "ze,\r\n                    showClose: showClose,\r\n                    url: url,\r\n " +
-                    "                   dialogReturnValueCallback: Function.createCallback(Function.c" +
-                    "reateDelegate(null, func), funcParams),\r\n                    width: width,\r\n    " +
-                    "                height: height\r\n                };\r\n            } else {\r\n      " +
-                    "          options = { title: title, allowMaximize: allowMaximize, showClose: sho" +
-                    "wClose, url: url, dialogReturnValueCallback: Function.createCallback(Function.cr" +
-                    "eateDelegate(null, func), funcParams) };\r\n            }\r\n\r\n            SP.UI.Mod" +
-                    "alDialog.showModalDialog(options);\r\n        },\r\n\r\n        reFillWebPartData: fun" +
-                    "ction () {\r\n            window.setTimeout(\'FancyDispFormClient.fillWebPartData()" +
-                    "\', 2000);\r\n        },\r\n\r\n        fillWebPartData: function () {\r\n            $.a" +
-                    "jax({\r\n                type: \"POST\",\r\n                url: \"");
+            @__w.Write("\r\n\r\n<link rel=\"stylesheet\" type=\"text/css\" href=\"http://maxcdn.bootstrapcdn.com/f" +
+                    "ont-awesome/4.2.0/css/font-awesome.min.css\">\r\n\r\n<style type=\"text/css\">\r\n    @im" +
+                    "port url(http://fonts.googleapis.com/css?family=Open+Sans:400,300,600);\r\n\r\n    #" +
+                    "attach-wrapper {\r\n        font-family: \"Open Sans\";\r\n        font-size: 13px;\r\n " +
+                    "   }\r\n\r\n        #attach-wrapper .paperclip {\r\n            color: #999999;\r\n     " +
+                    "       display: inline-block;\r\n            padding-right: 8px;\r\n            font" +
+                    "-size: 16px;\r\n            vertical-align: top;\r\n            position: relative;\r" +
+                    "\n        }\r\n\r\n        #attach-wrapper .attach-text {\r\n            color: #555555" +
+                    ";\r\n            padding: 4px 4px 0px 4px;\r\n            line-height: 12px;\r\n      " +
+                    "  }\r\n\r\n        #attach-wrapper #attach-text-wrapper {\r\n            display: inli" +
+                    "ne-block;\r\n            width: 95%;\r\n        }\r\n\r\n        #attach-wrapper .attach" +
+                    "-text .file {\r\n            padding-right: 5px;\r\n            color: #bbbbbb;\r\n   " +
+                    "     }\r\n\r\n        #attach-wrapper .attach-text .delete {\r\n            padding-le" +
+                    "ft: 5px;\r\n            color: #cccccc;\r\n            display: none;\r\n        }\r\n\r\n" +
+                    "            #attach-wrapper .attach-text .delete:hover {\r\n                cursor" +
+                    ": pointer;\r\n                color: #0090ca;\r\n            }\r\n\r\n        #attach-wr" +
+                    "apper .attach-text a {\r\n            text-decoration: none;\r\n            color: #" +
+                    "0090ca;\r\n        }\r\n\r\n            #attach-wrapper .attach-text a:hover {\r\n      " +
+                    "          color: #0090ca;\r\n                cursor: pointer;\r\n            }\r\n</st" +
+                    "yle>\r\n\r\n<script type=\"text/javascript\">\r\n    function openDialog() {\r\n        va" +
+                    "r options =\r\n        {\r\n            url: $(\"#");
+             @__w.Write( hiddenWebUrl.ClientID );
+
+            @__w.Write("\").val() + \"/_layouts/AttachFile.aspx?ListId=\" + $(\"#");
+                                                                                              @__w.Write( hiddenListId.ClientID );
+
+            @__w.Write("\").val() + \"&ItemId=\" + $(\"#");
+                                                                                                                                                      @__w.Write( hiddenItemId.ClientID );
+
+            @__w.Write("\").val() + \"&isdlg=1&Source=\" + $(\"#");
+                                                                                                                                                                                                                      @__w.Write( hiddenSourceUrl.ClientID );
+
+            @__w.Write("\").val(),\r\n            width: 325,\r\n            height: 155,\r\n            title: " +
+                    "\"Attach File\",\r\n            dialogReturnValueCallback: function (dialogResult) {" +
+                    " if (dialogResult == 1) { FancyDispFormClient.FillAttachmentSection(); } }\r\n    " +
+                    "    };\r\n        SP.SOD.execute(\'SP.UI.Dialog.js\', \'SP.UI.ModalDialog.showModalDi" +
+                    "alog\', options);\r\n    }\r\n\r\n    $(function () {\r\n\r\n        FancyDispFormClient.Lo" +
+                    "adAssociatedItems();\r\n        FancyDispFormClient.LoadItemAttachments();\r\n\r\n    " +
+                    "    $(\".fancy-display-form-wrapper .dispFormExpandHeader\").click(function () {\r\n" +
+                    "            $header = $(this);\r\n            $content = $header.next();\r\n        " +
+                    "    $content.slideToggle(100, function () {\r\n            });\r\n            if ($(" +
+                    "this).find(\"span:first\").hasClass(\"icon-plus-circle-2\")) {\r\n                $(th" +
+                    "is).find(\"span:first\").removeClass(\"icon-plus-circle-2\").addClass(\"icon-minus-ci" +
+                    "rcle-2\");\r\n                $(this).find(\"span:last\").text(\"hide\");\r\n            " +
+                    "}\r\n            else {\r\n                $(this).find(\"span:first\").removeClass(\"i" +
+                    "con-minus-circle-2\").addClass(\"icon-plus-circle-2\");\r\n                $(this).fi" +
+                    "nd(\"span:last\").text(\"show\");\r\n            }\r\n        });\r\n\r\n        $(\".dispFor" +
+                    "mExpandMore\").click(function () {\r\n            $header = $(this);\r\n            $" +
+                    "header.closest(\'tr\').next(\'.ShowMoreRow\').toggle();\r\n        });\r\n\r\n        $(\"." +
+                    "attach-text\").mouseover(function () {\r\n            $(this).find(\'.delete\').css(\"" +
+                    "display\", \"inline\");\r\n        }).mouseout(function () {\r\n            $(this).fin" +
+                    "d(\'.delete\').css(\"display\", \"none\");\r\n        });\r\n    });\r\n\r\n    FancyDispFormC" +
+                    "lient = {\r\n\r\n        DeleteItemAttachment: function (deleteItemUrl) {\r\n\r\n       " +
+                    "     if (confirm(\'Are you sure you want to send the item to the Recycle Bin?\')) " +
+                    "{\r\n\r\n                $.ajax({\r\n                    type: \"POST\",\r\n              " +
+                    "      url: deleteItemUrl,\r\n                    success: function (ticket) {\r\n   " +
+                    "                     if (ticket.indexOf(\"General Error\") != 0) {\r\n              " +
+                    "              var listInfo = ticket.split(\'|\');\r\n                            var" +
+                    " viewSiteContentUrl = $(\"#");
+                                                 @__w.Write( hiddenWebUrl.ClientID );
+
+            @__w.Write("\").val() + \"/_layouts/epmlive/gridaction.aspx?action=deleteitemattachment&listid=" +
+                    "\" + listInfo[0] + \"&itemid=\" + listInfo[1] + \"&fname=\" + listInfo[2] + \"&Source=" +
+                    "\" + document.location.href;\r\n                            FancyDispFormClient.Loa" +
+                    "dItemAttachments();\r\n                        }\r\n                        else {\r\n" +
+                    "                            alert(ticket);\r\n                        }\r\n         " +
+                    "               $(\".attach-text\").mouseover(function () {\r\n                      " +
+                    "      $(this).find(\'.delete\').css(\"display\", \"inline\");\r\n                       " +
+                    " }).mouseout(function () {\r\n                            $(this).find(\'.delete\')." +
+                    "css(\"display\", \"none\");\r\n                        });\r\n                    }\r\n   " +
+                    "             });\r\n            }\r\n\r\n        },\r\n\r\n        showItemUrl: function (" +
+                    "weburl) {\r\n            $.ajax({\r\n                type: \"POST\",\r\n                " +
+                    "url: weburl,\r\n                success: function (ticket) {\r\n                    " +
+                    "if (ticket.indexOf(\"General Error\") != 0) {\r\n                        var listInf" +
+                    "o = ticket.split(\'|\');\r\n\r\n                        var viewSiteContentUrl = listI" +
+                    "nfo[0] + \"/_layouts/epmlive/gridaction.aspx?action=FancyDispForm&list=\" + listIn" +
+                    "fo[3] + \"&field=\" + listInfo[1] + \"&LookupFieldList=\" + listInfo[2] + \"&Source=\"" +
+                    " + document.location.href;\r\n                        //var options = { url: viewS" +
+                    "iteContentUrl, showMaximized: true };\r\n                        //SP.SOD.execute(" +
+                    "\'SP.UI.Dialog.js\', \'SP.UI.ModalDialog.showModalDialog\', options);\r\n             " +
+                    "           FancyDispFormClient.FillAssociatedItemSection();\r\n                   " +
+                    " }\r\n                    else {\r\n                        alert(ticket);\r\n        " +
+                    "            }\r\n                }\r\n            });\r\n        },\r\n\r\n        showNew" +
+                    "Form: function (weburl) {\r\n            var options = { url: weburl, showMaximize" +
+                    "d: true, dialogReturnValueCallback: function (dialogResult) { if (dialogResult =" +
+                    "= 1) { FancyDispFormClient.FillAssociatedItemSection(); } } };\r\n            SP.S" +
+                    "OD.execute(\'SP.UI.Dialog.js\', \'SP.UI.ModalDialog.showModalDialog\', options);\r\n  " +
+                    "      },\r\n\r\n        showItemPopup: function (siteurl, webid, listid, itemid) {\r\n" +
+                    "            showSharePointPopup(siteurl + \'/_layouts/epmlive/gridaction.aspx?act" +
+                    "ion=getcontextmenus&webid=\' + webid +\r\n                \'&listid=\' + listid + \'&I" +
+                    "D=\' + itemid, null, false, true, null, {\r\n                    gridId: \"myDiv\",\r\n" +
+                    "                    rowId: \"myDiv\",\r\n                    col: \"myDiv\"\r\n         " +
+                    "       }, 300, 400);\r\n        },\r\n\r\n        emptyFunction: function () {\r\n      " +
+                    "  },\r\n\r\n        showSharePointPopup: function (url, title, allowMaximize, showCl" +
+                    "ose, func, funcParams, width, height) {\r\n            if (allowMaximize == null) " +
+                    "allowMaximize = true;\r\n            if (showClose == null) showClose = true;\r\n   " +
+                    "         if (func == null) func = emptyFunction;\r\n\r\n            var options;\r\n\r\n" +
+                    "            if (width !== undefined && height !== undefined) {\r\n                " +
+                    "options = {\r\n                    title: title,\r\n                    allowMaximiz" +
+                    "e: allowMaximize,\r\n                    showClose: showClose,\r\n                  " +
+                    "  url: url,\r\n                    dialogReturnValueCallback: Function.createCallb" +
+                    "ack(Function.createDelegate(null, func), funcParams),\r\n                    width" +
+                    ": width,\r\n                    height: height\r\n                };\r\n            } " +
+                    "else {\r\n                options = { title: title, allowMaximize: allowMaximize, " +
+                    "showClose: showClose, url: url, dialogReturnValueCallback: Function.createCallba" +
+                    "ck(Function.createDelegate(null, func), funcParams) };\r\n            }\r\n\r\n       " +
+                    "     SP.UI.ModalDialog.showModalDialog(options);\r\n        },\r\n\r\n        FillAtta" +
+                    "chmentSection: function () {\r\n            window.setTimeout(\'FancyDispFormClient" +
+                    ".LoadItemAttachments()\', 1000);\r\n        },\r\n\r\n        LoadItemAttachments: func" +
+                    "tion () {\r\n            $.ajax({\r\n                type: \"POST\",\r\n                " +
+                    "url: \"");
+              @__w.Write(SPContext.Current.Web.Url);
+
+            @__w.Write("/_vti_bin/WorkEngine.asmx/Execute\",\r\n                data: \"{Function : \'GetFancy" +
+                    "FormAssociatedItemAttachments\' , Dataxml: \'<FancyFormAssociatedItemAttachments><" +
+                    "FancyFormListID>");
+                                                                                                                                    @__w.Write(SPContext.Current.ListId);
+
+            @__w.Write("</FancyFormListID><FancyFormItemID>");
+                                                                                                                                                                                                    @__w.Write(SPContext.Current.ItemId);
+
+            @__w.Write("</FancyFormItemID></FancyFormAssociatedItemAttachments>\'}\",\r\n                cont" +
+                    "entType: \"application/json; charset=utf-8\",\r\n                dataType: \"json\",\r\n" +
+                    "                success: function (response) {\r\n\r\n                    $(\"#");
+                @__w.Write(divAttachmentDetailsContent.ClientID);
+
+            @__w.Write("\").html(\"\");\r\n                    $(\"#");
+                @__w.Write(divAttachmentDetailsContent.ClientID);
+
+            @__w.Write(@""").html(response.d.toString().replace(""<Result Status=\""0\"">"", """").replace(""</Result>"", """"));
+
+                    $("".attach-text"").mouseover(function () {
+                        $(this).find('.delete').css(""display"", ""inline"");
+                    }).mouseout(function () {
+                        $(this).find('.delete').css(""display"", ""none"");
+                    });
+                }
+            });
+        },
+
+        FillAssociatedItemSection: function () {
+            window.setTimeout('FancyDispFormClient.LoadAssociatedItems()', 2000);
+        },
+
+        LoadAssociatedItems: function () {
+            $.ajax({
+                type: ""POST"",
+                url: """);
               @__w.Write(SPContext.Current.Web.Url);
 
             @__w.Write("/_vti_bin/WorkEngine.asmx/Execute\",\r\n                data: \"{Function : \'GetFancy" +
@@ -739,10 +896,11 @@ namespace EPMLiveWebParts {
                     "                 );\r\n\r\n                    var addContextualMenu = function () {" +
                     "\r\n                        $(\".fancyDisplayFormAssociatedItemsContextMenu\").each(" +
                     "function () {\r\n                            window.epmLiveNavigation.addContextua" +
-                    "lMenu($(this), null, true, \'-1\', { \"delete\": \"FancyDispFormClient.reFillWebPartD" +
-                    "ata\" });\r\n                        });\r\n                    };\r\n\r\n               " +
-                    "     window.ExecuteOrDelayUntilScriptLoaded(addContextualMenu, \'EPMLive.Navigati" +
-                    "on.js\');\r\n                }\r\n            });\r\n        }\r\n    }\r\n</script>\r\n\r\n");
+                    "lMenu($(this), null, true, \'-1\', { \"delete\": \"FancyDispFormClient.FillAssociated" +
+                    "ItemSection\" });\r\n                        });\r\n                    };\r\n\r\n       " +
+                    "             window.ExecuteOrDelayUntilScriptLoaded(addContextualMenu, \'EPMLive." +
+                    "Navigation.js\');\r\n                }\r\n            });\r\n        }\r\n    }\r\n</script" +
+                    ">\r\n\r\n");
             parameterContainer.Controls[0].RenderControl(@__w);
             @__w.Write("\r\n");
         }
