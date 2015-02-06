@@ -135,7 +135,7 @@ function setDefaults#gridid#(id)
 	
 	var rows = dxml.doXPath("//rows/row[@id='_NEWROW_']");
 	
-	defaultxml#gridid# = rows[0].xml;
+	defaultxml#gridid# = rows[0].outerHTML;
 
 	mygrid#gridid#._defaults = defaultxml#gridid#;
 
@@ -178,19 +178,21 @@ function onEditCell#gridid#(stage, rowId, ind, nval, oval)
 function insertBlankRow#gridid#(id)
 {
 	var xmlDoc; 
-	 var moz = (typeof document.implementation != 'undefined') && (typeof 
+	var moz = (typeof document.implementation != 'undefined') && (typeof 
 	document.implementation.createDocument != 'undefined'); 
-	 var ie = (typeof window.ActiveXObject != 'undefined'); 
+	var ie = (typeof window.ActiveXObject != 'undefined'); 
 
-	 if (moz) { 
-	   xmlDoc = document.implementation.createDocument("", "", null) 
-	   xmlDoc.onload = readXML; 
-	 } else if (ie) { 
-	   xmlDoc = new ActiveXObject("Microsoft.XMLDOM"); 
-	   xmlDoc.async = false; 
-	   while(xmlDoc.readyState != 4) {}; 
-	 } 
-	 xmlDoc.loadXML(defaultxml#gridid#); 
+	if (window.DOMParser)
+	{
+		parser=new DOMParser();
+		xmlDoc=parser.parseFromString(defaultxml#gridid#,"text/xml");
+	}
+	else // code for IE
+	{
+		xmlDoc=new ActiveXObject("Microsoft.XMLDOM");
+		xmlDoc.async=false;
+		xmlDoc.loadXML(defaultxml#gridid#); 
+	}
 
 	var newId = "_NEWROW_" + mygrid#gridid#.getUID();
 	var nRow = mygrid#gridid#.addRow(newId,"<img src=\"/_layouts/images/newitem.gif\">");
