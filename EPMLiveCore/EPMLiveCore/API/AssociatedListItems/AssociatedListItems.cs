@@ -667,7 +667,7 @@ namespace EPMLiveCore.API
                                 sbItemAttachments.Append("</div>");
                             }
                         }
-                        sbItemAttachments.Append("</div> <br/>");
+                        sbItemAttachments.Append("</div>");
                     }
                 }
                 return Response.Success(sbItemAttachments.ToString());

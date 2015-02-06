@@ -96,6 +96,8 @@ namespace EPMLiveWebParts {
         
         protected global::System.Web.UI.WebControls.Button btnCancel2;
         
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl divFancyDisplayForm;
+        
         protected global::System.Web.UI.HtmlControls.HtmlInputHidden hiddenListId;
         
         protected global::System.Web.UI.HtmlControls.HtmlInputHidden hiddenItemId;
@@ -103,8 +105,6 @@ namespace EPMLiveWebParts {
         protected global::System.Web.UI.HtmlControls.HtmlInputHidden hiddenSourceUrl;
         
         protected global::System.Web.UI.HtmlControls.HtmlInputHidden hiddenWebUrl;
-        
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl divFancyDisplayForm;
         
         public static implicit operator global::System.Web.UI.TemplateControl(FancyDisplayForm target) 
         {
@@ -490,7 +490,7 @@ namespace EPMLiveWebParts {
             this.divDateDetailsParent = @__ctrl;
             @__ctrl.ID = "divDateDetailsParent";
             System.Web.UI.IParserAccessor @__parser = ((System.Web.UI.IParserAccessor)(@__ctrl));
-            @__parser.AddParsedSubObject(new System.Web.UI.LiteralControl("\r\n\r\n                        "));
+            @__parser.AddParsedSubObject(new System.Web.UI.LiteralControl("\r\n                        "));
             global::System.Web.UI.HtmlControls.HtmlGenericControl @__ctrl1;
             @__ctrl1 = this.@__BuildControldivDateDetails();
             @__parser.AddParsedSubObject(@__ctrl1);
@@ -543,7 +543,7 @@ namespace EPMLiveWebParts {
             this.divItemDetailParent = @__ctrl;
             ((System.Web.UI.IAttributeAccessor)(@__ctrl)).SetAttribute("class", "fancyDisplayForm dispFormContent");
             @__ctrl.ID = "divItemDetailParent";
-            ((System.Web.UI.IAttributeAccessor)(@__ctrl)).SetAttribute("style", "float: right; width: 100%;");
+            ((System.Web.UI.IAttributeAccessor)(@__ctrl)).SetAttribute("style", "float: right; width: 100%; padding-top:10px;");
             System.Web.UI.IParserAccessor @__parser = ((System.Web.UI.IParserAccessor)(@__ctrl));
             @__parser.AddParsedSubObject(new System.Web.UI.LiteralControl("\r\n    "));
             return @__ctrl;
@@ -559,6 +559,63 @@ namespace EPMLiveWebParts {
             @__ctrl.Text = "Close";
             @__ctrl.Click -= new System.EventHandler(this.btnCancel_Click);
             @__ctrl.Click += new System.EventHandler(this.btnCancel_Click);
+            return @__ctrl;
+        }
+        
+        [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Never)]
+        private global::System.Web.UI.HtmlControls.HtmlGenericControl @__BuildControldivFancyDisplayForm() {
+            global::System.Web.UI.HtmlControls.HtmlGenericControl @__ctrl;
+            @__ctrl = new global::System.Web.UI.HtmlControls.HtmlGenericControl("div");
+            this.divFancyDisplayForm = @__ctrl;
+            ((System.Web.UI.IAttributeAccessor)(@__ctrl)).SetAttribute("class", "fancy-display-form-wrapper");
+            @__ctrl.ID = "divFancyDisplayForm";
+            ((System.Web.UI.IAttributeAccessor)(@__ctrl)).SetAttribute("style", "width: 100%");
+            System.Web.UI.IParserAccessor @__parser = ((System.Web.UI.IParserAccessor)(@__ctrl));
+            @__parser.AddParsedSubObject(new System.Web.UI.LiteralControl("\r\n\r\n    <div style=\"text-align: right; float: right;\">\r\n        "));
+            global::System.Web.UI.WebControls.Button @__ctrl1;
+            @__ctrl1 = this.@__BuildControlbtnCancel1();
+            @__parser.AddParsedSubObject(@__ctrl1);
+            @__parser.AddParsedSubObject(new System.Web.UI.LiteralControl("\r\n    </div>\r\n\r\n    <div class=\"dispFormFancyTitle\">\r\n        "));
+            global::System.Web.UI.WebControls.Label @__ctrl2;
+            @__ctrl2 = this.@__BuildControllblItemTitle();
+            @__parser.AddParsedSubObject(@__ctrl2);
+            @__parser.AddParsedSubObject(new System.Web.UI.LiteralControl("\r\n    </div>\r\n\r\n    <div class=\"fancyDisplayForm\" style=\"width: 100%; vertical-al" +
+                        "ign: top;\">\r\n\r\n        <div id=\"first-table\">\r\n            <table border=\"0\" sty" +
+                        "le=\"width: 100%\">\r\n                <tr>\r\n                    "));
+            global::System.Web.UI.HtmlControls.HtmlTableCell @__ctrl3;
+            @__ctrl3 = this.@__BuildControldivQuickDetailsParent();
+            @__parser.AddParsedSubObject(@__ctrl3);
+            @__parser.AddParsedSubObject(new System.Web.UI.LiteralControl("\r\n                </tr>\r\n                <tr>\r\n                    "));
+            global::System.Web.UI.HtmlControls.HtmlTableCell @__ctrl4;
+            @__ctrl4 = this.@__BuildControldivNarrativeDetailsParent();
+            @__parser.AddParsedSubObject(@__ctrl4);
+            @__parser.AddParsedSubObject(new System.Web.UI.LiteralControl("\r\n                </tr>\r\n                <tr>\r\n                    "));
+            global::System.Web.UI.HtmlControls.HtmlTableCell @__ctrl5;
+            @__ctrl5 = this.@__BuildControldivAttachmentDetailsParent();
+            @__parser.AddParsedSubObject(@__ctrl5);
+            @__parser.AddParsedSubObject(new System.Web.UI.LiteralControl("\r\n                </tr>\r\n            </table>\r\n        </div>\r\n        <div style" +
+                        "=\"vertical-align: top; display: inline;\">\r\n            <table border=\"0\" style=\"" +
+                        "display:-webkit-box;\">\r\n                <tr>\r\n                    "));
+            global::System.Web.UI.HtmlControls.HtmlTableCell @__ctrl6;
+            @__ctrl6 = this.@__BuildControldivPeopleDetailsParent();
+            @__parser.AddParsedSubObject(@__ctrl6);
+            @__parser.AddParsedSubObject(new System.Web.UI.LiteralControl("\r\n                </tr>\r\n                <tr>\r\n                    "));
+            global::System.Web.UI.HtmlControls.HtmlTableCell @__ctrl7;
+            @__ctrl7 = this.@__BuildControldivDateDetailsParent();
+            @__parser.AddParsedSubObject(@__ctrl7);
+            @__parser.AddParsedSubObject(new System.Web.UI.LiteralControl("\r\n                </tr>\r\n                <tr>\r\n                    "));
+            global::System.Web.UI.HtmlControls.HtmlTableCell @__ctrl8;
+            @__ctrl8 = this.@__BuildControldivFancyDispFormParent();
+            @__parser.AddParsedSubObject(@__ctrl8);
+            @__parser.AddParsedSubObject(new System.Web.UI.LiteralControl("\r\n                </tr>\r\n            </table>\r\n        </div>\r\n    </div>\r\n    "));
+            global::System.Web.UI.HtmlControls.HtmlGenericControl @__ctrl9;
+            @__ctrl9 = this.@__BuildControldivItemDetailParent();
+            @__parser.AddParsedSubObject(@__ctrl9);
+            @__parser.AddParsedSubObject(new System.Web.UI.LiteralControl("\r\n    <div style=\"text-align: right; float: right;\">\r\n        "));
+            global::System.Web.UI.WebControls.Button @__ctrl10;
+            @__ctrl10 = this.@__BuildControlbtnCancel2();
+            @__parser.AddParsedSubObject(@__ctrl10);
+            @__parser.AddParsedSubObject(new System.Web.UI.LiteralControl("\r\n    </div>\r\n"));
             return @__ctrl;
         }
         
@@ -603,85 +660,23 @@ namespace EPMLiveWebParts {
         }
         
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Never)]
-        private global::System.Web.UI.HtmlControls.HtmlGenericControl @__BuildControldivFancyDisplayForm() {
-            global::System.Web.UI.HtmlControls.HtmlGenericControl @__ctrl;
-            @__ctrl = new global::System.Web.UI.HtmlControls.HtmlGenericControl("div");
-            this.divFancyDisplayForm = @__ctrl;
-            ((System.Web.UI.IAttributeAccessor)(@__ctrl)).SetAttribute("class", "fancy-display-form-wrapper");
-            @__ctrl.ID = "divFancyDisplayForm";
-            ((System.Web.UI.IAttributeAccessor)(@__ctrl)).SetAttribute("style", "width: 100%");
-            System.Web.UI.IParserAccessor @__parser = ((System.Web.UI.IParserAccessor)(@__ctrl));
-            @__parser.AddParsedSubObject(new System.Web.UI.LiteralControl("\r\n\r\n    <div style=\"text-align: right; float: right;\">\r\n        "));
-            global::System.Web.UI.WebControls.Button @__ctrl1;
-            @__ctrl1 = this.@__BuildControlbtnCancel1();
-            @__parser.AddParsedSubObject(@__ctrl1);
-            @__parser.AddParsedSubObject(new System.Web.UI.LiteralControl("\r\n    </div>\r\n\r\n    <div class=\"dispFormFancyTitle\">\r\n        "));
-            global::System.Web.UI.WebControls.Label @__ctrl2;
-            @__ctrl2 = this.@__BuildControllblItemTitle();
-            @__parser.AddParsedSubObject(@__ctrl2);
-            @__parser.AddParsedSubObject(new System.Web.UI.LiteralControl("\r\n    </div>\r\n\r\n    <div class=\"fancyDisplayForm\" style=\"width: 100%; vertical-al" +
-                        "ign: top;\">\r\n\r\n        <div id=\"first-table\">\r\n            <table border=\"0\" sty" +
-                        "le=\"width: 100%\">\r\n                <tr>\r\n                    "));
-            global::System.Web.UI.HtmlControls.HtmlTableCell @__ctrl3;
-            @__ctrl3 = this.@__BuildControldivQuickDetailsParent();
-            @__parser.AddParsedSubObject(@__ctrl3);
-            @__parser.AddParsedSubObject(new System.Web.UI.LiteralControl("\r\n                </tr>\r\n                <tr>\r\n                    "));
-            global::System.Web.UI.HtmlControls.HtmlTableCell @__ctrl4;
-            @__ctrl4 = this.@__BuildControldivNarrativeDetailsParent();
-            @__parser.AddParsedSubObject(@__ctrl4);
-            @__parser.AddParsedSubObject(new System.Web.UI.LiteralControl("\r\n                </tr>\r\n                <tr>\r\n                    "));
-            global::System.Web.UI.HtmlControls.HtmlTableCell @__ctrl5;
-            @__ctrl5 = this.@__BuildControldivAttachmentDetailsParent();
-            @__parser.AddParsedSubObject(@__ctrl5);
-            @__parser.AddParsedSubObject(new System.Web.UI.LiteralControl("\r\n                </tr>\r\n            </table>\r\n        </div>\r\n        <div style" +
-                        "=\"vertical-align: top; display: inline;\">\r\n            <table border=\"0\">\r\n     " +
-                        "           <tr>\r\n                    "));
-            global::System.Web.UI.HtmlControls.HtmlTableCell @__ctrl6;
-            @__ctrl6 = this.@__BuildControldivPeopleDetailsParent();
-            @__parser.AddParsedSubObject(@__ctrl6);
-            @__parser.AddParsedSubObject(new System.Web.UI.LiteralControl("\r\n                </tr>\r\n                <tr>\r\n                    "));
-            global::System.Web.UI.HtmlControls.HtmlTableCell @__ctrl7;
-            @__ctrl7 = this.@__BuildControldivDateDetailsParent();
-            @__parser.AddParsedSubObject(@__ctrl7);
-            @__parser.AddParsedSubObject(new System.Web.UI.LiteralControl("\r\n                </tr>\r\n                <tr>\r\n                    "));
-            global::System.Web.UI.HtmlControls.HtmlTableCell @__ctrl8;
-            @__ctrl8 = this.@__BuildControldivFancyDispFormParent();
-            @__parser.AddParsedSubObject(@__ctrl8);
-            @__parser.AddParsedSubObject(new System.Web.UI.LiteralControl("\r\n                </tr>\r\n            </table>\r\n        </div>\r\n\r\n    </div>\r\n\r\n  " +
-                        "  "));
-            global::System.Web.UI.HtmlControls.HtmlGenericControl @__ctrl9;
-            @__ctrl9 = this.@__BuildControldivItemDetailParent();
-            @__parser.AddParsedSubObject(@__ctrl9);
-            @__parser.AddParsedSubObject(new System.Web.UI.LiteralControl("\r\n\r\n    <div style=\"text-align: right; float: right;\">\r\n        "));
-            global::System.Web.UI.WebControls.Button @__ctrl10;
-            @__ctrl10 = this.@__BuildControlbtnCancel2();
-            @__parser.AddParsedSubObject(@__ctrl10);
-            @__parser.AddParsedSubObject(new System.Web.UI.LiteralControl("\r\n    </div>\r\n\r\n    "));
-            global::System.Web.UI.HtmlControls.HtmlInputHidden @__ctrl11;
-            @__ctrl11 = this.@__BuildControlhiddenListId();
-            @__parser.AddParsedSubObject(@__ctrl11);
-            @__parser.AddParsedSubObject(new System.Web.UI.LiteralControl("\r\n    "));
-            global::System.Web.UI.HtmlControls.HtmlInputHidden @__ctrl12;
-            @__ctrl12 = this.@__BuildControlhiddenItemId();
-            @__parser.AddParsedSubObject(@__ctrl12);
-            @__parser.AddParsedSubObject(new System.Web.UI.LiteralControl("\r\n    "));
-            global::System.Web.UI.HtmlControls.HtmlInputHidden @__ctrl13;
-            @__ctrl13 = this.@__BuildControlhiddenSourceUrl();
-            @__parser.AddParsedSubObject(@__ctrl13);
-            @__parser.AddParsedSubObject(new System.Web.UI.LiteralControl("\r\n    "));
-            global::System.Web.UI.HtmlControls.HtmlInputHidden @__ctrl14;
-            @__ctrl14 = this.@__BuildControlhiddenWebUrl();
-            @__parser.AddParsedSubObject(@__ctrl14);
-            @__parser.AddParsedSubObject(new System.Web.UI.LiteralControl("\r\n\r\n"));
-            return @__ctrl;
-        }
-        
-        [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Never)]
         private void @__BuildControlTree(global::EPMLiveWebParts.FancyDisplayForm @__ctrl) {
             global::System.Web.UI.HtmlControls.HtmlGenericControl @__ctrl1;
             @__ctrl1 = this.@__BuildControldivFancyDisplayForm();
             System.Web.UI.IParserAccessor @__parser = ((System.Web.UI.IParserAccessor)(@__ctrl));
             @__parser.AddParsedSubObject(@__ctrl1);
+            global::System.Web.UI.HtmlControls.HtmlInputHidden @__ctrl2;
+            @__ctrl2 = this.@__BuildControlhiddenListId();
+            @__parser.AddParsedSubObject(@__ctrl2);
+            global::System.Web.UI.HtmlControls.HtmlInputHidden @__ctrl3;
+            @__ctrl3 = this.@__BuildControlhiddenItemId();
+            @__parser.AddParsedSubObject(@__ctrl3);
+            global::System.Web.UI.HtmlControls.HtmlInputHidden @__ctrl4;
+            @__ctrl4 = this.@__BuildControlhiddenSourceUrl();
+            @__parser.AddParsedSubObject(@__ctrl4);
+            global::System.Web.UI.HtmlControls.HtmlInputHidden @__ctrl5;
+            @__ctrl5 = this.@__BuildControlhiddenWebUrl();
+            @__parser.AddParsedSubObject(@__ctrl5);
             @__ctrl.SetRenderMethodDelegate(new System.Web.UI.RenderMethod(this.@__Render__control1));
         }
         
@@ -902,6 +897,14 @@ namespace EPMLiveWebParts {
                     "Navigation.js\');\r\n                }\r\n            });\r\n        }\r\n    }\r\n</script" +
                     ">\r\n\r\n");
             parameterContainer.Controls[0].RenderControl(@__w);
+            @__w.Write("\r\n");
+            parameterContainer.Controls[1].RenderControl(@__w);
+            @__w.Write("\r\n");
+            parameterContainer.Controls[2].RenderControl(@__w);
+            @__w.Write("\r\n");
+            parameterContainer.Controls[3].RenderControl(@__w);
+            @__w.Write("\r\n");
+            parameterContainer.Controls[4].RenderControl(@__w);
             @__w.Write("\r\n");
         }
         

@@ -833,7 +833,7 @@ namespace EPMLiveWebParts
                     sbItemAttachments.Append("</div>");
                 }
             }
-            sbItemAttachments.Append("</div> <br/>");
+            sbItemAttachments.Append("</div>");
 
             divAttachmentDetails.InnerHtml = sbItemAttachmentAddNew.ToString();
             divAttachmentDetailsContent.InnerHtml = sbItemAttachments.ToString();

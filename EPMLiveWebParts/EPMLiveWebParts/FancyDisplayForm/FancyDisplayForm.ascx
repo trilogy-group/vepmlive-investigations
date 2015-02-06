@@ -394,7 +394,7 @@
             </table>
         </div>
         <div style="vertical-align: top; display: inline;">
-            <table border="0">
+            <table border="0" style="display:-webkit-box;">
                 <tr>
                     <td id="divPeopleDetailsParent" runat="server">
 
@@ -420,7 +420,6 @@
                 </tr>
                 <tr>
                     <td id="divDateDetailsParent" runat="server">
-
                         <div id="divDateDetails" runat="server" class="fancy-display-header">
                             <span>Dates</span>
                         </div>
@@ -453,19 +452,14 @@
                 </tr>
             </table>
         </div>
-
     </div>
-
-    <div class="fancyDisplayForm dispFormContent" id="divItemDetailParent" runat="server" style="float: right; width: 100%;">
+    <div class="fancyDisplayForm dispFormContent" id="divItemDetailParent" runat="server" style="float: right; width: 100%; padding-top:10px;">
     </div>
-
     <div style="text-align: right; float: right;">
         <asp:Button ID="btnCancel2" runat="server" Text="Close" OnClick="btnCancel_Click" />
     </div>
-
-    <input id="hiddenListId" type="hidden" runat="server" />
-    <input id="hiddenItemId" type="hidden" runat="server" />
-    <input id="hiddenSourceUrl" type="hidden" runat="server" />
-    <input id="hiddenWebUrl" type="hidden" runat="server" />
-
 </div>
+<input id="hiddenListId" type="hidden" runat="server" />
+<input id="hiddenItemId" type="hidden" runat="server" />
+<input id="hiddenSourceUrl" type="hidden" runat="server" />
+<input id="hiddenWebUrl" type="hidden" runat="server" />
