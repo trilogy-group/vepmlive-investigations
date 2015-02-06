@@ -135,10 +135,14 @@ function setDefaults#gridid#(id)
 	
 	var rows = dxml.doXPath("//rows/row[@id='_NEWROW_']");
 	
-	defaultxml#gridid# = rows[0].outerHTML;
+	var ua = window.navigator.userAgent;
+    var msie = ua.indexOf("MSIE ");
+	if (msie > 0)
+		defaultxml#gridid# = rows[0].xml;
+	else
+		defaultxml#gridid# = rows[0].outerHTML;
 
 	mygrid#gridid#._defaults = defaultxml#gridid#;
-
 }
 function onEditCell#gridid#(stage, rowId, ind, nval, oval)
 {
