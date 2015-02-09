@@ -163,16 +163,16 @@ namespace EPMLiveCore
                     query.ViewFields = "<FieldRef Name='" + _field + "' /><FieldRef Name='ID' /><FieldRef Name='Title' />";
                 }
 
-                bool isEpmtyTableName = true;
+                bool isEmptyTableName = true;
                 if (list.EnableThrottling)
                 {
                     string sql = string.Empty;
                     string tableName = string.Empty;
 
-                    tableName = GetTableName(list, SPContext.Current.Web.Site);
+                    tableName = GetTableName(list.ID);
                     if (!string.IsNullOrEmpty(tableName))
                     {
-                        isEpmtyTableName = false;
+                        isEmptyTableName = false;
 
                         sql = string.Format("SELECT ID,Title FROM [{0}] ORDER BY {1} ASC", tableName, _field);
                         try
@@ -192,7 +192,7 @@ namespace EPMLiveCore
                         catch { }
                     }
                 }
-                if (!list.EnableThrottling || isEpmtyTableName)
+                if (!list.EnableThrottling || isEmptyTableName)
                 {
                     query.ViewFieldsOnly = true;
                     SPListItemCollection items = list.GetItems(query);
@@ -211,14 +211,14 @@ namespace EPMLiveCore
             }
         }
 
-        private string GetTableName(SPList list, SPSite site)
+        private string GetTableName(Guid listID)
         {
             string sql;
             string tableName = string.Empty;
             try
             {
                 var queryExecutor = new QueryExecutor(SPContext.Current.Web);
-                sql = string.Format("SELECT TableName FROM RPTList WHERE RPTListId='{0}' AND SiteId='{1}'", list.ID, site.ID);
+                sql = string.Format("SELECT TableName FROM RPTList WHERE RPTListId='{0}' AND SiteId='{1}'", listID, SPContext.Current.Site.ID);
                 DataTable dt = queryExecutor.ExecuteReportingDBQuery(sql, new Dictionary<string, object> { });
 
                 if (dt != null)
