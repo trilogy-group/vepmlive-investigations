@@ -358,5 +358,22 @@ namespace EPMLiveCore.API
             return jobuid;
 
         }
+
+        public static void CancelTimerJob(Guid siteid, Guid timerjobuid)
+        {
+            SPSecurity.RunWithElevatedPrivileges(delegate()
+            {
+                using (SPSite site = new SPSite(siteid))
+                {
+                    using (SqlConnection cn = new SqlConnection(CoreFunctions.getConnectionString(site.WebApplication.Id)))
+                    {
+                        cn.Open();
+                        SqlCommand cmd = new SqlCommand("UPDATE [QUEUE] SET status = 2, percentComplete = 100 WHERE timerjobuid = @timerjobuid", cn);
+                        cmd.Parameters.AddWithValue("@timerjobuid", timerjobuid);
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+            });
+        }
     }
 }
