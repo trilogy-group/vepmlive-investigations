@@ -3473,7 +3473,7 @@ namespace EPMLiveWebParts
             {
                 if (gSettings.EnableContentReporting)
                 {
-                    output.Write("<div style=\"display:inline-block;margin:0px;\"><div id=\"pagediv" + sFullGridId + "\"></div>");
+                    output.Write("<div style=\"margin:0px;\"><div id=\"pagediv" + sFullGridId + "\"></div>");
                     output.Write("</td><td><div id=\"viewalldiv" + sFullGridId + "\" style=\"display:none;margin:0px 3px 0 0;\" class=\"jPaginate\"><a onclick=\"ViewAllPages('" + sFullGridId + "');\" style=\"color: rgb(102, 102, 102); background-color: rgb(255, 255, 255); border: 1px solid rgb(219, 219, 219);\">View All</a></div></td></tr></table>");
                 }
                 else
@@ -5338,7 +5338,7 @@ namespace EPMLiveWebParts
 
                         try
                         {
-                            SqlCommand cmd = new SqlCommand("SELECT VALUE FROM PERSONALIZATIONS where userid=@userid and [key]=@key and listid=@listid", cn);
+                            SqlCommand cmd = new SqlCommand("SELECT VALUE,ItemId FROM PERSONALIZATIONS where userid=@userid and [key]=@key and listid=@listid", cn);
                             cmd.Parameters.AddWithValue("@userid", web.CurrentUser.ID);
                             cmd.Parameters.AddWithValue("@key", "LIP");
                             cmd.Parameters.AddWithValue("@listid", Page.Request["LookupFieldList"]);
@@ -5346,19 +5346,26 @@ namespace EPMLiveWebParts
                             SqlDataReader dr = cmd.ExecuteReader();
                             if (dr.Read())
                             {
-                                ArrayList lookupFilterIDs = new ArrayList(dr.GetString(0).Split(','));
-
-                                if (lookupFilterIDs.Count == 1 && !string.IsNullOrEmpty(lookupFilterIDs[0].ToString()))
+                                if (!string.IsNullOrEmpty(Convert.ToString(dr.GetInt32(1))))
                                 {
-                                    SPQuery query = new SPQuery();
-                                    query.Query = "<Where><Eq><FieldRef Name=\"Title\"/><Value Type=\"Text\">" + lookupFilterIDs[0].ToString() + "</Value></Eq></Where>";
+                                    retItem = dr.GetInt32(1);
+                                }
+                                else
+                                {
+                                    ArrayList lookupFilterIDs = new ArrayList(dr.GetString(0).Split(','));
 
-                                    SPList templist = web.Lists[new Guid(Page.Request["LookupFieldList"])];
-
-                                    SPListItemCollection lic = templist.GetItems(query);
-                                    if (lic.Count == 1)
+                                    if (lookupFilterIDs.Count == 1 && !string.IsNullOrEmpty(lookupFilterIDs[0].ToString()))
                                     {
-                                        retItem = lic[0].ID;
+                                        SPQuery query = new SPQuery();
+                                        query.Query = "<Where><Eq><FieldRef Name=\"Title\"/><Value Type=\"Text\">" + lookupFilterIDs[0].ToString() + "</Value></Eq></Where>";
+
+                                        SPList templist = web.Lists[new Guid(Page.Request["LookupFieldList"])];
+
+                                        SPListItemCollection lic = templist.GetItems(query);
+                                        if (lic.Count == 1)
+                                        {
+                                            retItem = lic[0].ID;
+                                        }
                                     }
                                 }
                             }
@@ -5689,7 +5696,7 @@ namespace EPMLiveWebParts
             EPMLiveCore.API.ListPlannerProps plan = EPMLiveCore.API.ListCommands.GetListPlannerInfo(list);
             PlannerV2Menu = plan.PlannerV2Menu;
 
-            if (Page.Request["IsDlg"] == "1")
+            if (!string.IsNullOrEmpty(Page.Request["IsDlg"]) && Page.Request["IsDlg"].Contains("1"))
                 bUsePopUp = true;
 
             if (!string.IsNullOrEmpty(Page.Request["LookupFieldList"]))

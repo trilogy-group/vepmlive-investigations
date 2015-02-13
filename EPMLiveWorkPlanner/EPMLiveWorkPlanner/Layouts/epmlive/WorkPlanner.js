@@ -799,12 +799,32 @@ function SaveProject() {
 }
 
 function SaveWorkPlan() {
-    var bVal = AlertBlankTitle()
-    if (bVal == false)
-    {
-        alert('The plan cannot be saved with blank task Title values (red cells). Please either delete these tasks or enter a title!');
+    //EPML-3070
+    var strReqFields_CurrentView = ValidateRequiredFields("CurrentView") //Return WorkPlannerGrid Mandatory Fields
+    var strReqFields_DetailView = ValidateRequiredFields("DetailView") //Return WorkPlannerDetail Mandatory Fields
+    var bFlag_WorkPlannerDetail_Visible = false;
+    if (strReqFields_CurrentView.length > 0 && strReqFields_DetailView.length > 0) {
+        bFlag_WorkPlannerDetail_Visible = CheckRequiredFieldInCurrentView(); //For open right panel and focus on specific row in workplannergrid along with workplannerdetail row
+        if (bFlag_WorkPlannerDetail_Visible == true) {
+            ShowTab('t1');
+        }
+        alert("The schedule cannot be saved because there are one or more empty required fields in current view (red cells) :" + '\n' + strReqFields_CurrentView + '\n' + "The schedule cannot be saved because there are one or more empty required fields in details view (red cells) :" + '\n' + strReqFields_DetailView + "");
         return;
     }
+    else if (strReqFields_CurrentView.length > 0 && strReqFields_DetailView.length == 0) {
+        dhxLayout.cells(detailsCell).collapse();
+        alert("The schedule cannot be saved because there are one or more empty required fields (red cells) :" + '\n' + strReqFields_CurrentView + "");
+        return;
+    }
+    else if (strReqFields_CurrentView.length == 0 && strReqFields_DetailView.length > 0) {
+        bFlag_WorkPlannerDetail_Visible = CheckRequiredFieldInCurrentView();
+        if (bFlag_WorkPlannerDetail_Visible == true) {
+            ShowTab('t1');
+        }
+        alert("The schedule cannot be saved because there are one or more empty required fields in details view (red cells) :" + '\n' + strReqFields_DetailView + "");
+        return;
+    }
+    //------
     if (sUpdates != "") {
         ShowTDialog("Processing Updates...");
         dhtmlxAjax.post("WorkPlannerAction.aspx", "Action=ProcessUpdates&ID=" + sItemID + "&PlannerID=" + sPlannerID + "&Updates=" + sUpdates, SaveUpdatesClose);
@@ -1201,7 +1221,7 @@ function IsAssignmentField(col) {
     switch (col) {
         case "ActualWork":
         case "PercentComplete":
-        case "RemainingWork": 
+        case "RemainingWork":
             return true;
     };
     return false;
@@ -1253,9 +1273,9 @@ function DoAssignmentRollDown(Grid, Row, Type, Col) {
         oChild = oChild.nextSibling;
     }
 
-    try{ 
+    try {
         CalculateWorkPercentSpent(Grid, Row);
-    }catch(e) { }
+    } catch (e) { }
 }
 
 function GetProperDateVal(val, oFromRow, c) {
@@ -1345,7 +1365,7 @@ function DeleteTasks() {
                 for (var i = 0; i < delRows.length; i++) {
                     try {
                         var row = grid.GetRowById(delRows[i]);
-                        try{
+                        try {
                             Grids.WorkPlannerGrid.MoveRow(row, row.parentNode.parentNode, row.parentNode.nextSibling, 1);
                         } catch (e) { }
                         grid.DeleteRow(row, 2);
@@ -2114,15 +2134,13 @@ function ZoomOut() {
 }
 
 function ShowHideGantt() {
-    //var grid = Grids.WorkPlannerGrid;
-    //if (grid.Cols.G.Visible)
-    //    grid.HideCol("G");
-    //else {
-    //    grid.ShowCol("G");
-    //    ResizeGantt(grid, Grids.AllocationGrid);
-    //}
-    //Changed it to resolve issue EPML-2796
-    ChangeView("GanttView");
+    var grid = Grids.WorkPlannerGrid;
+    if (grid.Cols.G.Visible)
+        grid.HideCol("G");
+    else {
+        grid.ShowCol("G");
+    }
+    ResizeGantt(grid, Grids.AllocationGrid);
 }
 
 function ZoomFit() {
@@ -2381,7 +2399,7 @@ function setDefaultDates(grid, row, samedates) {
 function LinkDown(type, lag) {
 
     var grid = Grids.WorkPlannerGrid;
-    var IsCalcOff = grid.ActionCalcOff();    
+    var IsCalcOff = grid.ActionCalcOff();
     if (IsCalcOff)
         grid.ActionCalcOff();
     var rows = grid.GetSelRows();
@@ -2577,9 +2595,9 @@ function getDependencyArray(sId) {
 function LinkUp(type, lag) {
 
     var grid = Grids.WorkPlannerGrid;
-    var IsCalcOff = grid.ActionCalcOff();    
+    var IsCalcOff = grid.ActionCalcOff();
     if (IsCalcOff)
-    grid.ActionCalcOff();
+        grid.ActionCalcOff();
     var rows = grid.GetSelRows();
 
     var parent = null;
@@ -2605,7 +2623,7 @@ function Unlink() {
 
     if (confirm("Are you sure you want to unlink all successors?")) {
         var grid = Grids.WorkPlannerGrid;
-        var IsCalcOff = grid.ActionCalcOff();        
+        var IsCalcOff = grid.ActionCalcOff();
         if (IsCalcOff)
             grid.ActionCalcOff();
         var rows = grid.GetSelRows();
@@ -2694,7 +2712,7 @@ function CheckUpdatesClose(loader) {
 
 
 function CopyRemainingWork(grid, row) {
-    var w = grid.GetValue(row, "Work"); 
+    var w = grid.GetValue(row, "Work");
     if (grid.GetValue(row, "RemainingWork") == oldWork || grid.GetValue(row, "RemainingWork") == "0") {
         try {
             grid.SetValue(row, "RemainingWork", w, 1, 0);
@@ -2775,7 +2793,7 @@ function CheckPublishStatusClose(loader) {
             $('#we-planner-publish-status-body').html(status);
             setTimeout("CheckPublishStatus()", 10000);
         }
-        
+
         RefreshCommandUI();
     }
 }
@@ -2822,7 +2840,7 @@ function Outdent() {
             row = Grids.WorkPlannerGrid.GetRowById(row.id);
 
             Grids.WorkPlannerGrid.MoveRow(row, row.parentNode.parentNode, row.parentNode.nextSibling, 1);
-            
+
             for (var s in oSiblings) {
                 Grids.WorkPlannerGrid.MoveRow(Grids.WorkPlannerGrid.GetRowById(oSiblings[s]), row, null, 1);
             }
@@ -3000,50 +3018,132 @@ function GetColor(grid, row, col, r, g, b, edit) {
 
 function GetCssClass(grid, row, col, classname) {
     if (grid.id == "WorkPlannerGrid") {
-        if (col == "Title") {
-            var val1 = grid.GetValue(row, col);
-            val1 = val1.toString().trim();
-            if (val1 == "") {
-                return "erroroncell";
+        if ((row.Def.Name == "Task" || row.Def.Name == "Summary") && row.Def.Name != "Header") {
+            if (oRequiredFields.length > 0) {
+                if (oRequiredFields.indexOf(col) > -1) {
+                    var val1 = grid.GetValue(row, col);
+                    val1 = val1.toString().trim();
+                    if (val1 == "") {
+                        return "erroroncell";
+                    }
+                }
             }
         }
+    }
+    if (grid.id == "WorkPlannerDetail" && col == "V") {
+        try {
+            var vCols = Grids.WorkPlannerGrid.GetCols("Visible");
+            if ((row.Def.Name == "R" && vCols.length > 0)) {
+                if (oRequiredFields.length > 0) {
+                    if (oRequiredFields.indexOf(row.id) > -1 && vCols.indexOf(row.id) == -1) {
+                        var val1 = grid.GetValue(row, "V");
+                        val1 = val1.toString().trim();
+                        if (val1 == "") {
+                            return "erroroncell";
+                        }
+                    }
+                }
+            }
+        }
+        catch (e) { }
     }
 }
 
 function GetToolTip(grid, row, col, tip, clientx, clienty, x, y) {
     if (grid.id == "WorkPlannerGrid") {
-        if (col == "Title") {
-            var val1 = grid.GetValue(row, col);
-            val1 = val1.toString().trim();
-            if (val1 == "") {
-                return "Title values cannot be blank!";
+        if ((row.Def.Name == "Task" || row.Def.Name == "Summary") && row.Def.Name != "Header") {
+            if (oRequiredFields.length > 0) {
+                if (oRequiredFields.indexOf(col) > -1) {
+                    var val1 = grid.GetValue(row, col);
+                    val1 = val1.toString().trim();
+                    if (val1 == "") {
+                        return "" + col + " values cannot be blank";
+                    }
+                }
+            }
+        }
+    }
+    if (grid.id == "WorkPlannerDetail") {
+        if ((row.Def.Name == "R")) {
+            if (oRequiredFields.length > 0) {
+                if (oRequiredFields.indexOf(row.id) > -1) {
+                    var val1 = grid.GetValue(row, "V");
+                    val1 = val1.toString().trim();
+                    if (val1 == "") {
+                        return "" + row.id + " values cannot be blank";
+                    }
+                }
             }
         }
     }
 }
 
-function AlertBlankTitle() {
+function ValidateRequiredFields(view) {
     var grid = Grids.WorkPlannerGrid;
-    var bVal_Task = true;
-    if (grid.id == "WorkPlannerGrid") {
-        for (var R in grid.Rows) {
-            var row = grid.GetRowById(R);
-            if ((row.Def.Name == "Task" || row.Def.Name == "Summary") && row.Def.Name != "Header") {
-                    var val1 = grid.GetValue(row, "Title");
+    var sRequiredFields = "";
+    var sDisplayNames = ""; 
+    var vCols = grid.GetCols("Visible");
+    for (var R in grid.Rows) {
+        var row = grid.GetRowById(R);
+        if ((row.Def.Name == "Task" || row.Def.Name == "Summary") && row.Def.Name != "Header") {
+            if (oRequiredFields.length > 0) {
+                for (var i = 0; i < oRequiredFields.length; i++) {
+                    var f = oRequiredFields[i];
+                    var f_DisplayName = oFieldDisplayNames[i];
+                    var val1 = grid.GetValue(row, f);
                     val1 = val1.toString().trim();
-                    if (val1 === "") {
-                        bVal_Task = false;
-                        break;
+                    if (view == "CurrentView") {
+                        if (val1 == "" && vCols.indexOf(f) > -1 && sRequiredFields.indexOf(f) == -1) {
+                            sRequiredFields += f + '\n';
+                            sDisplayNames += f_DisplayName + '\n';
+                        }
+                    }
+                    else if (view == "DetailView") {
+                        if (val1 == "" && vCols.indexOf(f) == -1 && sRequiredFields.indexOf(f) == -1) {
+                            sRequiredFields += f + '\n';
+                            sDisplayNames += f_DisplayName + '\n';
+                        }
                     }
                 }
+            }
         }
-        if (bVal_Task == true)
-            return true;
-        else
-            return false;
     }
-   
+    return sDisplayNames;
 }
+
+function CheckRequiredFieldInCurrentView() {
+    var grid_WorkPlannerGrid = Grids.WorkPlannerGrid;
+    var bFlag_WorkPlannerDetail_Visible = false;
+    var sCurrentViewFields = "";
+    var vCols = grid_WorkPlannerGrid.GetCols("Visible");
+    loop1:
+        for (var R in grid_WorkPlannerGrid.Rows) {
+            var row = grid_WorkPlannerGrid.GetRowById(R);
+            if ((row.Def.Name == "Task" || row.Def.Name == "Summary") && row.Def.Name != "Header") {
+                if (oRequiredFields.length > 0) {
+                    loop2:
+                        for (var i = 0; i < oRequiredFields.length; i++) {
+                            var f = oRequiredFields[i];
+                            if (vCols.indexOf(f) == -1) {
+                                var val1 = grid_WorkPlannerGrid.GetValue(row, f);
+                                val1 = val1.toString().trim();
+                                if (val1 == "") {
+                                    grid_WorkPlannerGrid.Focus(row, grid_WorkPlannerGrid.FCol, null, 1);
+                                    bFlag_WorkPlannerDetail_Visible = true;
+                                    break loop1;
+                                }
+                            }
+                        }
+                }
+            }
+        }
+    if (bFlag_WorkPlannerDetail_Visible == true)
+        return true;
+    else
+        return false;
+}
+
+
 
 function getHTML(grid, row, col, val) {
     if (grid.id == "WorkPlannerGrid") {
@@ -3307,8 +3407,7 @@ function Undo() {
             else {
                 if (lastRowId == rowId) {
                     //Need to check this condition to not to remove Project Title.
-                    if (rowId != "0")
-                    {
+                    if (rowId != "0") {
                         Grids.WorkPlannerGrid.ActionUndo();
                         lastRowId = rowId;
                     }
@@ -3576,11 +3675,10 @@ function Close() {
         if (sSource.toLowerCase().indexOf("&isdlg=1") > 0) {
             window.close();
         }
-        else if (sSource.toLowerCase().indexOf("&ismodaldlg=1") > 0)
-        {
+        else if (sSource.toLowerCase().indexOf("&ismodaldlg=1") > 0) {
             SP.UI.ModalDialog.commonModalDialogClose(SP.UI.DialogResult.OK, '');
         }
-        else { 
+        else {
             location.href = sSource;
         }
     } catch (e) { }
@@ -3633,23 +3731,21 @@ function isActiveRow(Row) {
 }
 
 function CalculateWorkPercentSpent(grid, row) {
-    try{
+    try {
         var Work = 0;
         var ActualWork = 0;
         var WorkPercentSpent = 0;
         Work = grid.GetValue(row, "Work");
         ActualWork = grid.GetValue(row, "ActualWork");
-        if (Work != 0)
-        {
-            if (Work >= ActualWork)
-            {
+        if (Work != 0) {
+            if (Work >= ActualWork) {
                 WorkPercentSpent = (ActualWork / Work) * 100;
                 //WorkPercentSpent = parseInt(WorkPercentSpent) + '%';
             }
         }
         grid.SetValue(row, "WorkPercentSpent", WorkPercentSpent, 1);
         grid.RefreshCell(row, "WorkPercentSpent");
-    }catch (e) { }  
+    } catch (e) { }
 }
 
 function CalculateAssignmentCosts(grid, row) {
@@ -4686,7 +4782,7 @@ function InitView() {
             if (filters[0] != "1")
                 grid.ActionFilterOff();
         }
-        //iChangeView(v);
+        iChangeView(view);
         break;
     }
 

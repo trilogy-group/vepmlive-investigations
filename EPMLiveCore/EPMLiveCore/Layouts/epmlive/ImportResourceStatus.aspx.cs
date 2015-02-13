@@ -57,42 +57,50 @@ namespace EPMLiveCore.Layouts.epmlive
         {
             _jobId = Request.Params["jobid"] ?? string.Empty;
             string format = Request.Params["format"] ?? string.Empty;
+            bool isImportCancelled = Convert.ToBoolean(Request.Params["isCancelImportResourceJob"]);
 
-            if (!format.Trim().ToLower().Equals("json"))
+            if (!isImportCancelled)
             {
-                if (string.IsNullOrEmpty(_jobId))
+                if (!format.Trim().ToLower().Equals("json"))
                 {
-                    MissingJobIdErrorLabel.Visible = true;
+                    if (string.IsNullOrEmpty(_jobId))
+                    {
+                        MissingJobIdErrorLabel.Visible = true;
+                    }
+                    else
+                    {
+                        Panel.Visible = true;
+                        ScriptLink.Register(Page, "/_layouts/epmlive/javascripts/libraries/jquery.min.js", false);
+                    }
                 }
                 else
                 {
-                    Panel.Visible = true;
-                    ScriptLink.Register(Page, "/_layouts/epmlive/javascripts/libraries/jquery.min.js", false);
+                    string response = "{warmingUp:true}";
+
+                    if (string.IsNullOrEmpty(_jobId))
+                    {
+                        response = "{error:\"No Job ID was provided.\"}";
+                    }
+                    else
+                    {
+                        XmlNode timerJobStatus = Timer.GetTimerJobStatus(Web, new Guid(_jobId));
+
+                        XmlNode node = timerJobStatus.FirstChild;
+                        if (node != null)
+                        {
+                            response = node.Value;
+                        }
+                    }
+
+                    Response.Clear();
+                    Response.ContentType = "application/json; charset=utf-8";
+                    Response.Write(Server.HtmlDecode(response));
+                    Response.End();
                 }
             }
             else
             {
-                string response = "{warmingUp:true}";
-
-                if (string.IsNullOrEmpty(_jobId))
-                {
-                    response = "{error:\"No Job ID was provided.\"}";
-                }
-                else
-                {
-                    XmlNode timerJobStatus = Timer.GetTimerJobStatus(Web, new Guid(_jobId));
-
-                    XmlNode node = timerJobStatus.FirstChild;
-                    if (node != null)
-                    {
-                        response = node.Value;
-                    }
-                }
-
-                Response.Clear();
-                Response.ContentType = "application/json; charset=utf-8";
-                Response.Write(Server.HtmlDecode(response));
-                Response.End();
+                Timer.CancelTimerJob(Web.Site.ID, new Guid(_jobId));
             }
         }
 

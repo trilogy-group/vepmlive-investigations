@@ -67,29 +67,28 @@ namespace PortfolioEngineCore
             }
         }
 
+        //EPML-4761: Store PFE SQL ConnectionString encrypted
         private void getpid(string basepath)
         {
             try
             {
-                RegistryKey key = Registry.LocalMachine.OpenSubKey("Software", false).OpenSubKey("EPMLive", false).OpenSubKey("PortfolioEngine", false).OpenSubKey(basepath);
-                _pid = key.GetValue("PID").ToString();
-                _company = key.GetValue("CN").ToString();
+                RegistryKey key = Utilities.GetRegistryKey(basepath);
+                if (key != null)
+                {
+                    var pid = key.GetValue("PID");
+                    var company = key.GetValue("CN");
+
+                    _pid = (pid != null ? pid.ToString() : string.Empty);
+                    _company = (company != null ? company.ToString() : string.Empty);
+                }
             }
             catch
             {
-                try
-                {
-                    RegistryKey key = Registry.LocalMachine.OpenSubKey("Software", false).OpenSubKey("Wow6432Node", false).OpenSubKey("EPMLive", false).OpenSubKey("PortfolioEngine", false).OpenSubKey(basepath);
-                    _pid = key.GetValue("PID").ToString();
-                    _company = key.GetValue("CN").ToString();
-                }
-                catch
-                {
-                    throw new PFEException((int) PFEError.ActivationCantLoadPId, message: "Could not load product PID");
-                }
+                throw new PFEException((int)PFEError.ActivationCantLoadPId, message: "Could not load product PID");
             }
         }
-
+        //END EPML-4761
+    
         public bool ValidateClient(string s, string c)
         {
             try

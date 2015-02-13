@@ -1255,6 +1255,31 @@ namespace EPMLiveCore.Layouts.epmlive
                 evtAdded.Update();
                 list.Update();
             }
+            else if (chkEnableTeam.Checked || chkEnableTeamSecurity.Checked && list.BaseTemplate == SPListTemplateType.DocumentLibrary )
+            {
+                //EPML-4257 : In  document library if you have enable team and enable team security on the library will not load
+                API.ListCommands.EnableTeamFeatures(list);
+
+                string assemblyName = "EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5";
+                string className = "EPMLiveCore.ItemEnableTeamEvent";
+
+                List<SPEventReceiverDefinition> evts = CoreFunctions.GetListEvents(list,
+                                                                     assemblyName,
+                                                                     className,
+                                                                     new List<SPEventReceiverType> { SPEventReceiverType.ItemAdded });
+                foreach (SPEventReceiverDefinition evt in evts)
+                {
+                    evt.Delete();
+                }
+
+                SPEventReceiverDefinition evtAdded = list.EventReceivers.Add();
+                evtAdded.Type = SPEventReceiverType.ItemAdded;
+                evtAdded.Assembly = assemblyName;
+                evtAdded.Class = className;
+                evtAdded.SequenceNumber = 11000;
+                evtAdded.Update();
+                list.Update();
+            }
             else
             {
                 string assemblyName = "EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5";

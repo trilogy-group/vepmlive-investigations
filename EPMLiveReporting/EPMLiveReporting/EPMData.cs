@@ -1082,10 +1082,23 @@ namespace EPMLiveReportsAdmin
         {
             string sql = command.CommandText;
             var sqlCommand = new SqlCommand(command.CommandText);
-
+            bool isDocumenttypeProcessing = false;
             try
             {
-                if (command.Parameters.Count > 2000)
+
+                //EPML-4329 : Added check for document type and if title is null then title will be same as file name.
+                try
+                {                    
+                    if (Convert.ToString(command.Parameters["@ContentType"].Value).ToLower().Equals("document"))
+                    {
+                        if(string.IsNullOrEmpty(Convert.ToString(command.Parameters["@Title"].Value)))
+                            command.Parameters["@Title"].Value = command.Parameters["@FileLeafRef"].Value;
+                        isDocumenttypeProcessing = true;
+                    }
+                }
+                catch { }
+
+                if (command.Parameters.Count > 2000 || isDocumenttypeProcessing)
                 {
                     var parameters = new List<SqlParameter>();
                     foreach (object parameter in command.Parameters)

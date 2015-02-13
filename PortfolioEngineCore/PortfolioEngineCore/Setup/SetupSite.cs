@@ -29,6 +29,7 @@ namespace PortfolioEngineCore.Setup
         private string _message = "";
         private SqlConnection _CN = null;
         private string _dbcon = "";
+        private const string PASS_PHRASE = "MnjkafjhkAS&*^#@";
 
         public bool SetupErrors
         {
@@ -271,7 +272,10 @@ namespace PortfolioEngineCore.Setup
 
                 key.SetValue("CN", CN);
                 key.SetValue("PID", PID);
-                key.SetValue("ConnectionString", _dbcon);
+                //EPML-4761: Store PFE SQL ConnectionString encrypted
+                key.SetValue("encrypted", true);
+                key.SetValue("ConnectionString", PFEEncrypt.Encrypt(_dbcon, PASS_PHRASE));
+                //EPML-4761
                 key.SetValue("QMActive", "Yes");
             }
         }
@@ -289,7 +293,10 @@ namespace PortfolioEngineCore.Setup
 
                 key.SetValue("CN", CN);
                 key.SetValue("PID", PID);
-                key.SetValue("ConnectionString", _dbcon);
+                //EPML-4761: Store PFE SQL ConnectionString encrypted
+                key.SetValue("encrypted", true);
+                key.SetValue("ConnectionString", PFEEncrypt.Encrypt(_dbcon, PASS_PHRASE));
+                //EPML-4761
                 key.SetValue("QMActive", "Yes");
 
                 _message += "...Success";
@@ -414,20 +421,14 @@ namespace PortfolioEngineCore.Setup
             }
         }
 
+        //EPML-4761: Store PFE SQL ConnectionString encrypted
         public bool CheckBasePath(string basepath)
         {
             try
             {
-                RegistryKey key = null;
-                if(Registry.LocalMachine.OpenSubKey("Software", true).OpenSubKey("Wow6432Node", true) != null)
-                {
-                    key = Registry.LocalMachine.OpenSubKey("Software", true).OpenSubKey("Wow6432Node",true).OpenSubKey("EPMLive", true).OpenSubKey("PortfolioEngine", true).OpenSubKey(basepath);
-                }
-                else
-                {
-                    key = Registry.LocalMachine.OpenSubKey("Software", true).OpenSubKey("EPMLive", true).OpenSubKey("PortfolioEngine", true).OpenSubKey(basepath);
-                }
-                if(key == null)
+                RegistryKey key = Utilities.GetRegistryKey(basepath);
+                //if key exists return false
+                if (key == null)
                     return true;
                 else
                     return false;
@@ -437,34 +438,38 @@ namespace PortfolioEngineCore.Setup
                 return true;
             }
         }
+        //End EPML-4761
 
+        //EPML-4761: Store PFE SQL ConnectionString encrypted
         public bool MakeSureBasePathExists(string basepath)
         {
             try
             {
-                RegistryKey key = null;
-                if(Registry.LocalMachine.OpenSubKey("Software", false).OpenSubKey("Wow6432Node", false) != null)
+                _dbcon = Utilities.GetConnectionString(basepath);
+                if (_dbcon != string.Empty)
                 {
-                    key = Registry.LocalMachine.OpenSubKey("Software", false).OpenSubKey("Wow6432Node", false).OpenSubKey("EPMLive", false).OpenSubKey("PortfolioEngine", false).OpenSubKey(basepath);
-                }
-                else
-                {
-                    key = Registry.LocalMachine.OpenSubKey("Software", false).OpenSubKey("EPMLive", false).OpenSubKey("PortfolioEngine", false).OpenSubKey(basepath);
-                    
-                }
-                if(key != null)
-                {
-                    _dbcon = key.GetValue("ConnectionString").ToString();
                     return true;
                 }
                 else
+                {
                     return false;
+                }
+                //RegistryKey key = Utilities.GetRegistryKey(basepath);
+                //if (key != null)
+                //{
+                //    var dbcon = key.GetValue("ConnectionString");
+                //    _dbcon = (dbcon != null ? dbcon.ToString() : string.Empty);
+                //    return true;
+                //}
+                //else
+                //    return false;
             }
             catch
             {
                 return false;
             }
         }
+        //End EPML-4761
 
         public void RenamePermissions(string basepath,Dictionary<string,string> permissionsDictionary)
         {

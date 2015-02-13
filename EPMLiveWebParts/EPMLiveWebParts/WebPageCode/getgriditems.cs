@@ -276,7 +276,10 @@ namespace EPMLiveWebParts
                     foreach (XmlNode ndagg in docAgg.FirstChild.ChildNodes)
                     {
                         SPField field = getRealField(list.Fields.GetFieldByInternalName(ndagg.Attributes["Name"].Value));
-                        arrAggregationDef.Add(field.InternalName, ndagg.Attributes["Type"].Value);
+                        if (field.InternalName != "Title")
+                        {
+                            arrAggregationDef.Add(field.InternalName, ndagg.Attributes["Type"].Value);
+                        }
                     }
                 }
 
@@ -310,10 +313,14 @@ namespace EPMLiveWebParts
                     {
                         XmlNode ndGroup = (XmlNode)de.Value;
 
-                        for (int i = 1; i < arrColumns.Count; i++)
+                        for (int i = 0; i < arrColumns.Count; i++)
                         {
                             XmlNode ndCell = ndGroup.SelectSingleNode("cell[@id='" + arrColumns[i] + "']");//docXml.CreateNode(XmlNodeType.Element, "cell", docXml.NamespaceURI);
                             string cellValue = "";
+
+                            if (arrColumns[i].ToString() == "Title")
+                                cellValue = de.Key.ToString();
+
                             if (ndCell != null)
                             {
                                 if (arrAggregationDef.Contains(arrColumns[i]))
@@ -386,10 +393,36 @@ namespace EPMLiveWebParts
                                                 }
                                                 break;
                                         };
+                                        //EPML-4263
                                         if (arrAggregationDef[arrColumns[i]].ToString() == "COUNT")
-                                            cellValue = val;
+                                        {
+                                            if (arrColumns[i].ToString() == "Title")
+                                            {
+                                                string[] strGroups = de.Key.ToString().Split('\n');
+                                                string strMaxGroup = "";
+                                                if (strGroups.Length == 1)
+                                                {
+                                                    strMaxGroup = strGroups[0];
+                                                }
+                                                else
+                                                {
+                                                    strMaxGroup = strGroups[strGroups.Length - 1];
+                                                }
+                                                cellValue = strMaxGroup + " (count: " + val + ")";
+                                            }
+                                            else
+                                            {
+                                                cellValue = val;
+                                            }
+                                        }
                                         else
+                                        {
                                             cellValue = formatField(val, arrColumns[i].ToString(), false, true, null);
+                                        }
+                                        //if (arrAggregationDef[arrColumns[i]].ToString() == "COUNT")
+                                        //    cellValue = val;
+                                        //else
+                                        //    cellValue = formatField(val, arrColumns[i].ToString(), false, true, null);
                                     }
                                     catch { }
                                 }
@@ -3734,6 +3767,42 @@ namespace EPMLiveWebParts
                             DataTable dt = ds.Tables[0];
                             dt.Columns.Add("SiteURL");
                             dt.Columns.Add("siteid");
+
+                            ////Update Calculated Field Value
+                            if (dt != null)
+                            {
+                                if (dt.Rows.Count > 0)
+                                {
+                                    foreach (DataRow dr in dt.Rows)
+                                    {
+                                        string[] vfc = (string[])aViewFields.ToArray(typeof(string));
+
+                                        for (int i = 0; i < vfc.Length; i++)
+                                        {
+                                            string val = "";
+                                            string displayValue = "";
+
+                                            string fieldName = vfc[i];
+
+                                            SPField field = null;
+                                            field = getRealField(list.Fields.GetFieldByInternalName(fieldName));
+
+                                            if (field.Type == SPFieldType.Calculated)
+                                            {
+                                                Int32 itemid = Convert.ToInt32(dr["ItemID"]);
+                                                SPListItem li = list.GetItemById(itemid);
+                                                val = getField(li, field.InternalName, false);
+                                                if (field.Type != SPFieldType.Attachments)
+                                                    displayValue = formatField(val, fieldName, field.Type == SPFieldType.Calculated, false, li);
+                                                dr[fieldName] = displayValue;
+                                                dt.AcceptChanges();
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            ////// 
+
                             if (filterfield != "")
                             {
                                 try
@@ -4563,7 +4632,7 @@ namespace EPMLiveWebParts
                     foreach (string f in aViewFields)
                     {
                         SPField field = getRealField(list.Fields.GetFieldByInternalName(f));
-                        if (field.InternalName == "Title" || field.InternalName == "URL" || field.InternalName == "FileLeafRef")
+                        if (field.InternalName == "URL" || field.InternalName == "FileLeafRef")
                         {
                             XmlNode newCell = docXml.CreateNode(XmlNodeType.Element, "cell", docXml.NamespaceURI);
                             if (newItem == "")

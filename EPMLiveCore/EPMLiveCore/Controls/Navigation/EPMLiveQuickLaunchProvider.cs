@@ -17,20 +17,23 @@ namespace EPMLiveCore.Controls.Navigation
 
         private Dictionary<string, IList<string>> _communityLinks;
         private Dictionary<string, SiteMapNode> _linkNodes;
-
+        
         #endregion Fields 
 
         #region Methods (5) 
 
         // Public Methods (2) 
 
-        public string DefaultViewFromPropertyBag(SPList list)
+        public string DefaultViewFromPropertyBag(SPList list, out List<string> splitViewcollection)
         {
             var sb = new StringBuilder();
 
             string defaultViewFirstPermission = string.Empty;
+            Dictionary<int, string> propBagData = new Dictionary<int, string>();
             bool hasDefaultView = false;
             SPGroupCollection spGroupcol;
+            string[] viewArr;
+            splitViewcollection = new List<string>();
 
             try
             {
@@ -43,18 +46,34 @@ namespace EPMLiveCore.Controls.Navigation
                     spGroupcol = SPContext.Current.Web.CurrentUser.Groups;
                 }
 
-                Dictionary<int, string> propBagData = ConvertFromString(
-                    list.ParentWeb.Properties[String.Format("ViewPermissions{0}", list.ID)]);
-                foreach (var bagData in propBagData)
-                {                    
-                    foreach (SPGroup grp in spGroupcol)
+                try
+                {
+                    propBagData = ConvertFromString(
+                        list.ParentWeb.Properties[String.Format("ViewPermissions{0}", list.ID)]);
+                }
+                catch { propBagData = null; }
+                if (propBagData != null)
+                {
+                    foreach (var bagData in propBagData)
                     {
-                        if (grp.ID == bagData.Key)
+                        foreach (SPGroup grp in spGroupcol)
                         {
-                            if (!hasDefaultView)
+                            if (grp.ID == bagData.Key)
                             {
-                                defaultViewFirstPermission = bagData.Value.Split('#')[1];
-                                hasDefaultView = true;
+                                string viewList = bagData.Value.Split('#')[2];
+                                if (!hasDefaultView)
+                                {
+                                    defaultViewFirstPermission = bagData.Value.Split('#')[1];
+                                    hasDefaultView = true;
+                                }
+
+                                viewArr = viewList.Split(';');
+
+                                foreach (var tmpViewInsert in viewArr)
+                                {
+                                    if (!splitViewcollection.Contains(tmpViewInsert))
+                                        splitViewcollection.Add(tmpViewInsert);
+                                }
                             }
                         }
                     }
@@ -65,27 +84,27 @@ namespace EPMLiveCore.Controls.Navigation
             return defaultViewFirstPermission;
         }
 
-        //Why create this method as public? are we using this somewhere else??
-        public SPList GetSpList(SiteMapNode node)
+        // Private Methods (3) 
+
+        private SPList GetSpList(SiteMapNode node)
         {
             SPList list = null;
-                try
-                {
-                    SPWeb currentWeb = SPContext.Current.Web;
-                    //list = currentWeb.GetList(node.Url);
-                    if (currentWeb != null && currentWeb.Lists != null)
-                    {
-                        list = currentWeb.Lists.TryGetList(node.Title);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    //TODO: log the error
-                }
-            //});
+            //Handle access denied exceptions 
+            bool originalCatchValue = SPSecurity.CatchAccessDeniedException;
+            SPSecurity.CatchAccessDeniedException = false;
+            try
+            {
+                SPWeb currentWeb = SPContext.Current.Web;
+                list = currentWeb.GetList(node.Url);
+            }
+            catch (Exception ex) { list = null; }
+            finally
+            {
+                SPSecurity.CatchAccessDeniedException = originalCatchValue;
+            }
+
             return list;
         }
-        // Private Methods (3) 
 
         private Dictionary<int, string> ConvertFromString(string value)
         {
@@ -242,34 +261,21 @@ namespace EPMLiveCore.Controls.Navigation
                                                 {
                                                     string title = node.Title;
 
+                                                    SiteMapNodeCollection spNavCol;
+                                                    spNavCol = ChangeChildNodeLink(spWeb, node);
+
                                                     node = new SiteMapNode(this, nodeKey)
                                                     {
                                                         Title = title,
                                                         Url =
                                                             spWeb.ServerRelativeUrl +
                                                             "/_layouts/15/epmlive/reporting/landing.aspx",
-                                                        ChildNodes = base.GetChildNodes(node)
+                                                        ChildNodes = spNavCol
                                                     };
                                                 }
                                                 else
                                                 {
-                                                    SPList list = GetSpList(node);
-                                                    if (list != null)
-                                                    {
-                                                        string defaultViewURL = DefaultViewFromPropertyBag(list);
-
-                                                        if (!string.IsNullOrEmpty(defaultViewURL))
-                                                        {
-                                                            string title = node.Title;
-
-                                                            node = new SiteMapNode(this, nodeKey)
-                                                            {
-                                                                Title = title,
-                                                                Url = spWeb.IsRootWeb ? spWeb.Url + "/" + defaultViewURL : spWeb.ServerRelativeUrl + "/" + defaultViewURL,
-                                                                ChildNodes = base.GetChildNodes(node)
-                                                            };
-                                                        }
-                                                    }
+                                                    node = ChangeNodeLink(spWeb, node);
                                                 }
 
                                                 linkNodes[nodeKey] = node;
@@ -306,6 +312,87 @@ namespace EPMLiveCore.Controls.Navigation
 
             _communityLinks = (Dictionary<string, IList<string>>) navLinks[0];
             _linkNodes = (Dictionary<string, SiteMapNode>) navLinks[1];
+        }
+
+        /// <summary>
+        /// EPML-4667 : used to change the url of child node based on viewpermission settings.
+        /// </summary>
+        /// <param name="spWeb">spWeb</param>
+        /// <param name="node">node</param>
+        /// <returns>SiteMapNodeCollection</returns>
+        private SiteMapNodeCollection ChangeChildNodeLink(SPWeb spWeb, SiteMapNode node)
+        {
+            SiteMapNodeCollection spChildNavCol = base.GetChildNodes(node);
+            SiteMapNodeCollection nodeCol = new SiteMapNodeCollection();
+
+            foreach (SiteMapNode cnode in spChildNavCol)
+            {
+                SiteMapNode currNode = FindSiteMapNodeFromKey(cnode.Key);
+
+                currNode = ChangeNodeLink(spWeb, cnode);
+                nodeCol.Add(currNode);
+
+            }
+            return nodeCol;
+        }
+
+        /// <summary>
+        /// EPML-4667 : chnage the link/url of the node based on viewpermission settings
+        /// </summary>
+        /// <param name="spWeb">spWeb</param>
+        /// <param name="node">node</param>
+        /// <returns>SiteMapNode</returns>
+        private SiteMapNode ChangeNodeLink(SPWeb spWeb, SiteMapNode node)
+        {
+            List<string> splitViewcollection;
+            SiteMapNode chgNode = FindSiteMapNodeFromKey(node.Key);
+
+            SPList list = GetSpList(node);
+
+            if (list != null)
+            {
+                string defaultViewURL = DefaultViewFromPropertyBag(list, out splitViewcollection);
+                string prevURL = node.Url;
+                string title = node.Title;
+
+                if (string.IsNullOrEmpty(defaultViewURL))
+                    defaultViewURL = list.DefaultViewUrl;
+
+                if (!string.IsNullOrEmpty(defaultViewURL))
+                {
+                    if (prevURL.EndsWith("/")) // it check if url is like "/Issues/" or not
+                    {
+                        chgNode = new SiteMapNode(this, node.Key)
+                        {
+                            Title = title,
+                            Url = defaultViewURL.Contains("sites") ? defaultViewURL : spWeb.IsRootWeb ? spWeb.Url + "/" + defaultViewURL : spWeb.ServerRelativeUrl + "/" + defaultViewURL,
+                            ChildNodes = ChangeChildNodeLink(spWeb, node)
+                        };
+                    }
+                    else
+                    {
+                        if (splitViewcollection.Count > 0 && !splitViewcollection.Contains(prevURL.Replace((spWeb.ServerRelativeUrl + "/"), "")))
+                        {
+                            chgNode = new SiteMapNode(this, node.Key)
+                            {
+                                Title = title,
+                                Url = defaultViewURL.Contains("sites") ? defaultViewURL : spWeb.IsRootWeb ? spWeb.Url + "/" + defaultViewURL : spWeb.ServerRelativeUrl + "/" + defaultViewURL,
+                                ChildNodes = ChangeChildNodeLink(spWeb, node)
+                            };
+                        }
+                        else
+                        {
+                            chgNode = new SiteMapNode(this, node.Key)
+                            {
+                                Title = title,
+                                Url = prevURL,
+                                ChildNodes = ChangeChildNodeLink(spWeb, node)
+                            };
+                        }
+                    }
+                }
+            }
+            return chgNode;
         }
 
         #endregion Methods 

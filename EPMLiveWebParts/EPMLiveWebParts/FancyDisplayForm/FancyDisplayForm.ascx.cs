@@ -49,6 +49,9 @@ namespace EPMLiveWebParts
         StringBuilder sbItemDetailsContent = new StringBuilder();
         StringBuilder sbItemDetailsShowAllRegion = new StringBuilder();
 
+        StringBuilder sbItemAttachmentAddNew = new StringBuilder();
+        StringBuilder sbItemAttachments = new StringBuilder();
+
         StringBuilder sbFancyDispFormContent = new StringBuilder();
 
         #endregion
@@ -116,6 +119,15 @@ namespace EPMLiveWebParts
 
             if (itemId > 0)
             {
+                try
+                {
+                    hiddenListId.Value = SPContext.Current.List.ID.ToString();
+                    hiddenItemId.Value = itemId.ToString();
+                    hiddenSourceUrl.Value = SPContext.Current.List.DefaultViewUrl;
+                    hiddenWebUrl.Value = SPContext.Current.Web.Url;
+                }
+                catch { }
+
                 LoadAssociatedItems();
                 LoadFancyFormData();
                 ManageHTMLOpeningClosing();
@@ -181,11 +193,11 @@ namespace EPMLiveWebParts
 
                 if (fieldProperties != null)
                 {
-                    foreach (SPField field in item.ContentType.Fields)
+                    foreach (SPField field in list.Fields)
                     {
                         try
                         {
-                            if (!field.Hidden && fieldProperties.ContainsKey(field.InternalName) && "title" != field.InternalName.ToString().ToLower())
+                            if ((!field.Hidden && "title" != field.InternalName.ToString().ToLower() && !field.InternalName.ToLower().Equals("contenttype") && field.Type != SPFieldType.Attachments))
                             {
                                 string display = fieldProperties[field.InternalName]["Display"];
                                 display = display.Split(";".ToCharArray())[0].ToLower(); //always;;;;;
@@ -195,7 +207,8 @@ namespace EPMLiveWebParts
                                     switch (field.Type)
                                     {
                                         case SPFieldType.DateTime:
-                                            FillDateDetailsSection(field.Title, GetFormattedDate(Convert.ToDateTime(Convert.ToString(item[field.InternalName]))));
+                                            if (!string.IsNullOrEmpty(Convert.ToString(item[field.InternalName])))
+                                                FillDateDetailsSection(field.Title, GetFormattedDate(Convert.ToDateTime(Convert.ToString(item[field.InternalName]))));
                                             break;
                                         case SPFieldType.User:
                                             FillPeopleDetailsSection(field.Title, Convert.ToString(item[field.InternalName]));
@@ -232,7 +245,8 @@ namespace EPMLiveWebParts
                                         switch (field.Type)
                                         {
                                             case SPFieldType.DateTime:
-                                                FillDateDetailsSection(field.Title, GetFormattedDate(Convert.ToDateTime(Convert.ToString(item[field.InternalName]))));
+                                                if (!string.IsNullOrEmpty(Convert.ToString(item[field.InternalName])))
+                                                    FillDateDetailsSection(field.Title, GetFormattedDate(Convert.ToDateTime(Convert.ToString(item[field.InternalName]))));
                                                 break;
                                             case SPFieldType.User:
                                                 FillPeopleDetailsSection(field.Title, Convert.ToString(item[field.InternalName]));
@@ -248,19 +262,42 @@ namespace EPMLiveWebParts
                                 }
                             }
                         }
+                        catch (KeyNotFoundException)
+                        {
+                            if (!field.Hidden && !field.ReadOnlyField)
+                            {
+                                switch (field.Type)
+                                {
+                                    case SPFieldType.DateTime:
+                                        if (!string.IsNullOrEmpty(Convert.ToString(item[field.InternalName])))
+                                            FillDateDetailsSection(field.Title, GetFormattedDate(Convert.ToDateTime(Convert.ToString(item[field.InternalName]))));
+                                        break;
+                                    case SPFieldType.User:
+                                        FillPeopleDetailsSection(field.Title, Convert.ToString(item[field.InternalName]));
+                                        break;
+                                    case SPFieldType.Note:
+                                        FillNarrativeDetailsSection(field.Title, field.GetFieldValueAsText(item[field.InternalName]));
+                                        break;
+                                    default:
+                                        FillQuickDetailsSection(field, item);
+                                        break;
+                                }
+                            }
+                        }
                         catch { }
                     }
                 }
                 else
                 {
-                    foreach (SPField field in item.ContentType.Fields)
+                    foreach (SPField field in list.Fields)
                     {
-                        if (!field.Hidden && field.ShowInDisplayForm == true)
+                        if (!field.Hidden)
                         {
                             switch (field.Type)
                             {
                                 case SPFieldType.DateTime:
-                                    FillDateDetailsSection(field.Title, GetFormattedDate(Convert.ToDateTime(Convert.ToString(item[field.InternalName]))));
+                                    if (!string.IsNullOrEmpty(Convert.ToString(item[field.InternalName])))
+                                        FillDateDetailsSection(field.Title, GetFormattedDate(Convert.ToDateTime(Convert.ToString(item[field.InternalName]))));
                                     break;
                                 case SPFieldType.User:
                                     FillPeopleDetailsSection(field.Title, Convert.ToString(item[field.InternalName]));
@@ -277,6 +314,8 @@ namespace EPMLiveWebParts
                 }
 
                 FillItemDetailsSection(item);
+
+                FillAttachmentSection(item);
             }
         }
 
@@ -756,6 +795,48 @@ namespace EPMLiveWebParts
             sbItemDetailsContent.Append("<td>Last modified " + GetFormattedDateTime((DateTime)(item[SPBuiltInFieldId.Modified])) + " by " + ((SPField)item.Fields[SPBuiltInFieldId.Editor]).GetFieldValueAsHtml(item[SPBuiltInFieldId.Editor]) + "</td>");
             sbItemDetailsContent.Append("</tr>");
             sbItemDetailsContent.Append("</table>");
+        }
+
+        private void FillAttachmentSection(SPListItem item)
+        {
+            /* Add new attachment region */
+            sbItemAttachmentAddNew = new StringBuilder();
+            sbItemAttachmentAddNew.Append("<span> Attachments </span>");
+            sbItemAttachmentAddNew.Append("<a onclick='javascript:openDialog(); return false;' href='#'>");
+            sbItemAttachmentAddNew.Append("<span class='fui-plus'>");
+            sbItemAttachmentAddNew.Append("</a>");
+            sbItemAttachmentAddNew.Append("</span>");
+
+            sbItemAttachments = new StringBuilder();
+
+            sbItemAttachments.Append("<div id='attach-wrapper'>");
+
+            if (item.Attachments != null && item.Attachments.Count == 0)
+                sbItemAttachments.Append("<span>There are no attachments, click the \"+\" icon above to upload new attachments.</span>");
+            else
+            {
+                foreach (string fileName in item.Attachments)
+                {
+                    string attachmentUrl = SPContext.Current.Web.Url + "/" + SPContext.Current.List.RootFolder.Url + "/attachments/" + item.ID + "/" + fileName;
+                    sbItemAttachments.Append("<div class='paperclip'><i class='fa fa-paperclip'></i></div>");
+
+                    sbItemAttachments.Append("<div id='attach-text-wrapper'>");
+
+                    sbItemAttachments.Append("<div class='attach-text'>");
+                    sbItemAttachments.Append("<i class='fa fa-file-o file'></i>");
+                    sbItemAttachments.Append("<a href='" + attachmentUrl + "' target='_blank' ID='" + fileName + "'>" + fileName + "</a>");
+
+                    string deleteAttachmentLink = SPContext.Current.Web.Url + "/_layouts/epmlive/gridaction.aspx?action=deleteitemattachment&listid=" + SPContext.Current.List.ID.ToString() + "&itemid=" + item.ID + "&fname=" + fileName;// +"&Source=" + sourceUrl;
+                    sbItemAttachments.Append("<a href='#' onclick=\"javascript:FancyDispFormClient.DeleteItemAttachment('" + deleteAttachmentLink + "');return false;\"><i class='fa fa-times delete'></i></a>");
+
+                    sbItemAttachments.Append("</div>");
+                    sbItemAttachments.Append("</div>");
+                }
+            }
+            sbItemAttachments.Append("</div>");
+
+            divAttachmentDetails.InnerHtml = sbItemAttachmentAddNew.ToString();
+            divAttachmentDetailsContent.InnerHtml = sbItemAttachments.ToString();
         }
 
         private void LoadAssociatedItems()

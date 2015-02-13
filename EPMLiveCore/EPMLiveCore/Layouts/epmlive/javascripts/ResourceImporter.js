@@ -1,64 +1,121 @@
 ﻿$(function () {
+    ImportResourceStatusClient.waitForKo();
+});
+
+var ImportResourceStatusClient = (function () {
+
+    var filterLogByStatus = function (status) {
+        $("#importdetailslog tbody tr").hide();
+        if (status == "All") {
+            $("#importdetailslog tbody tr").show();
+        } else {
+            $("#importdetailslog tbody tr").each(function () {
+                if ($(this).find("td:eq(1)").text().indexOf(status) >= 0) {
+                    $(this).show();
+                }
+            });
+        }
+    };
 
     var initialize = function () {
         var k = window.ko;
 
-        var importResourceStatus = {
-            percentage: k.observable(0),
-            currentProcess: k.observable('Initializing . . .'),
-            log: k.observable(null),
-            resources: k.observableArray([])
+        var status = {
+            TotalRecords: k.observable(0),
+            PercentComplete: k.observable(0),
+            ProcessedRecords: k.observable(0),
+            SuccessRecords: k.observable(0),
+            FailedRecords: k.observable(0),
+            CurrentProcess: k.observable("Initializing..."),
+            infoCount: k.observable(0),
+            warningCount: k.observable(0),
+            errorCount: k.observable(0),
+            log: ko.observableArray([])
         };
 
-        k.applyBindings(importResourceStatus, document.getElementById('epmcontainer'));
+        k.applyBindings(status, document.getElementById('epmcontainer'));
 
         var getStatus = function () {
             if (window.epmLive.currentWebFullUrl) {
-                if (importResourceStatus.percentage() != 100) {
+                if (status.PercentComplete() != 100) {
                     $.ajax({
                         url: window.epmLive.currentWebFullUrl + '/_layouts/epmlive/importresourcestatus.aspx?jobid=' + window.epmLive.jobId + '&format=json&token=' + new Date().getTime(),
                         type: 'GET',
-                        success: function(data) {
+                        success: function (data) {
                             if (!data.warmingUp) {
                                 if (!data.error) {
-                                    importResourceStatus.percentage(data.ProgressPercentage);
-                                    importResourceStatus.currentProcess(data.CurrentProcess);
-                                    importResourceStatus.log(data.Log);
-                                    importResourceStatus.resources(data.Resources);
-                                } else {
-                                    importResourceStatus.percentage(100);
-                                    importResourceStatus.currentProcess(data.error);
+                                    status.TotalRecords(data.TotalRecords);
+                                    status.PercentComplete(data.PercentComplete);
+                                    status.ProcessedRecords(data.ProcessedRecords);
+                                    status.SuccessRecords(data.SuccessRecords);
+                                    status.FailedRecords(data.FailedRecords);
+                                    status.CurrentProcess(data.CurrentProcess);
+                                    status.infoCount(data.Log.InfoCount);
+                                    status.warningCount(data.Log.WarningCount);
+                                    status.errorCount(data.Log.ErrorCount);
+                                    status.log(data.Log.Messages);
+
+                                    if (status.log().length > 0) {
+                                        $("#lnkall").show();
+                                        $("#lnkall").text("All (" + status.log().length + ")");
+                                    }
+                                    if (status.infoCount() > 0) {
+                                        $("#lnkinfo").show();
+                                        $("#lnkinfo").text("Info (" + status.infoCount() + ")");
+                                    }
+                                    if (status.warningCount() > 0) {
+                                        $("#lnkwarning").show();
+                                        $("#lnkwarning").text("Warning (" + status.warningCount() + ")");
+                                    }
+                                    if (status.errorCount() > 0) {
+                                        $("#lnkerror").show();
+                                        $("#lnkerror").text("Error (" + status.errorCount() + ")");
+                                    }
                                 }
-
-                                var log = $('#talog');
-                                log.scrollTop(log[0].scrollHeight - log.height());
-
-                                $('#resourcetable-wrap').animate({ scrollTop: $('#resourcetable').height() }, 495);
+                                else {
+                                    status.PercentComplete(100);
+                                }
                             }
-
                             window.setTimeout(getStatus, 500);
                         },
-
-                        error: function(data) {
+                        error: function (data) {
                             window.setTimeout(getStatus, 500);
                         }
                     });
                 }
-            } else {
-                window.setTimeout(getStatus, 500);
+                else {
+                    $("#CancelImport").attr("disabled", true);
+                }
             }
+
         };
 
-        getStatus();
+        window.setTimeout(getStatus, 500);
     };
 
     var waitForKo = function () {
         if (window.ko) {
             initialize();
         } else {
-            window.setTimeout(waitForKo, 10);
+            window.setTimeout(waitForKo, 500);
         }
     };
 
-    waitForKo();
-});
+    return {
+        waitForKo: waitForKo,
+        filterLogByStatus: filterLogByStatus
+    };
+    
+})();
+
+var cancelImportResourceJob = function () {
+    var result = confirm("Are you sure you want to cancel import resources task?");
+    if (Boolean(result)) {
+        $.ajax({
+            url: window.epmLive.currentWebFullUrl + '/_layouts/epmlive/importresourcestatus.aspx?jobid=' + window.epmLive.jobId + '&isCancelImportResourceJob=true',
+            type: 'GET'
+        });
+        $("#CancelImport").attr("disabled", true);
+    }
+}
+

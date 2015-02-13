@@ -1758,7 +1758,23 @@ namespace EPMLiveCore
             }
         }
 
-
+        /// <summary>
+        /// Get fancy form attachment details...
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="oWeb"></param>
+        /// <returns></returns>
+        public static string GetFancyFormAssociatedItemAttachments(string data, SPWeb oWeb)
+        {
+            try
+            {
+                return Response.Success(AssociatedListItems.GetFancyFormAssociatedItemAttachments(data, oWeb));
+            }
+            catch (APIException ex)
+            {
+                return Response.Failure(ex.ExceptionNumber, string.Format("Error: {0}", ex.Message));
+            }
+        }
         #endregion
 
         #region My Work Summary Method

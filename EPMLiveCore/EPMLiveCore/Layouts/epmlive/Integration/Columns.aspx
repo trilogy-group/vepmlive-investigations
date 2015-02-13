@@ -127,6 +127,21 @@
 	            </Template_InputFormControls>
             </wssuc:InputFormSection>
 
+             <wssuc:InputFormSection ID="InputFormSection1" Title="Cleanup"
+	            Description=""
+	            runat="server">
+	            <Template_Description>
+	                If you would like the items to resynchronize by the integration , check this box.
+	            </Template_Description>
+	            <Template_InputFormControls>
+		            <wssuc:InputFormControl ID="InputFormControl1" LabelText="" runat="server">
+			                <Template_Control>
+			                    <asp:CheckBox ID="chkCleanup" runat="server"></asp:CheckBox>
+			                </Template_Control>
+		            </wssuc:InputFormControl>
+	            </Template_InputFormControls>
+            </wssuc:InputFormSection>
+
             <wssuc:ButtonSection ID="ButtonSection1" runat="server">
 		        <Template_Buttons>
 			        <asp:PlaceHolder ID="PlaceHolder1" runat="server">

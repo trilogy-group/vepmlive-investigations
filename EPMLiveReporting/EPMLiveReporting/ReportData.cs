@@ -625,6 +625,23 @@ namespace EPMLiveReportsAdmin
             return _DAO.ExecuteNonQuery(_DAO.GetClientReportingConnection);
         }
 
+        public bool UpdateColumns(string table, List<ColumnDef> columns)
+        {
+            if (columns.Count == 0)
+                return true;
+
+            bool success = false;
+            // Delete column from the table.
+            success = DeleteColumns(table, columns);
+            if (success)
+            {
+                // Add column with changed data type.
+                success = AddColumns(table, columns);
+            }
+
+            return success;
+        }
+
         public bool DeleteColumns(string table, List<ColumnDef> columns)
         {
             if (columns.Count == 0)
@@ -1041,6 +1058,33 @@ namespace EPMLiveReportsAdmin
                          values
                                ( @RPTListId, @ColumnName, @ColumnType, @ColumnSize, @SharePointSize, @InternalName, @DisplayName )
                     ", Resources.ColumnTable);
+                success = success && _DAO.ExecuteNonQuery(_DAO.GetClientReportingConnection);
+            }
+            return success;
+        }
+
+        public bool UpdateListColumns(Guid listId, List<ColumnDef> columns)
+        {
+            bool success = true;
+            foreach (ColumnDef column in columns)
+            {
+                _DAO.AddParam("@RPTListId", listId);
+                _DAO.AddParam("@ColumnName", column.SqlColumnName);
+                _DAO.AddParam("@ColumnType", column.SqlColumnType.ToString());
+                _DAO.AddParam("@ColumnSize", column.SqlColumnSize);
+                _DAO.AddParam("@SharePointType", column.ColumnType.ToString());
+                _DAO.AddParam("@InternalName", column.InternalName);
+                _DAO.AddParam("@DisplayName", column.DisplayName);
+
+                _DAO.Command = string.Format(
+                    @"Update [{0}]
+                               Set [ColumnType] = @ColumnType
+                               ,[ColumnSize] = @ColumnSize
+                               ,[SharePointType] = @SharePointType
+                               ,[InternalName] = @InternalName
+                               ,[DisplayName] = @DisplayName
+                                where [RPTListId] = @RPTListId and [ColumnName] = @ColumnName", Resources.ColumnTable.Replace("'", ""));
+
                 success = success && _DAO.ExecuteNonQuery(_DAO.GetClientReportingConnection);
             }
             return success;
@@ -2132,7 +2176,7 @@ namespace EPMLiveReportsAdmin
             ArrayList _arrayListDefaultColumns, out bool error, out string errMsg)
         {
             var dtItems = new DataTable();
-            
+
             SPList spList = null;
             DataRow itemRow;
             SPField field;
@@ -2215,13 +2259,22 @@ namespace EPMLiveReportsAdmin
                                     if (ItemHasValue(item, column["internalname"].ToString()))
                                     //if (item[column["internalname"].ToString()] != null)
                                     {
+                                        string fieldType = GetFieldType(item, column["internalname"].ToString());
+
                                         int iResult;
                                         string sInt =
                                             AddLookUpFieldValues(item[column["internalname"].ToString()].ToString(),
                                                 "id");
-                                        if (int.TryParse(sInt, out iResult))
+                                        if (fieldType.Equals("lookupmulti", StringComparison.InvariantCultureIgnoreCase))
                                         {
                                             itemRow[column["ColumnName"].ToString()] = sInt;
+                                        }
+                                        else
+                                        {
+                                            if (int.TryParse(sInt, out iResult))
+                                            {
+                                                itemRow[column["ColumnName"].ToString()] = sInt;
+                                            }
                                         }
                                     }
                                     else
@@ -2780,6 +2833,23 @@ namespace EPMLiveReportsAdmin
             catch { }
 
             return !string.IsNullOrEmpty(test);
+        }
+
+        private string GetFieldType(SPListItem item, string colInternalName)
+        {
+            SPField lookupField = null;
+            string fieldType = string.Empty;
+            try
+            {
+                lookupField = item.Fields.GetFieldByInternalName(colInternalName);
+                if (lookupField != null)
+                {
+                    fieldType = lookupField.TypeAsString;
+                }
+            }
+            catch
+            { }
+            return fieldType;
         }
 
         // -- END
