@@ -360,7 +360,7 @@ namespace EPMLiveReportsAdmin
                                 catch { }
                                 DataRow[] childListInfo =
                                     AllMappedLists.Select("ListName='" + childList.Title.Replace("'", "") + "'");
-                                    // - CAT.NET false-positive: All single quotes are escaped/removed.
+                                // - CAT.NET false-positive: All single quotes are escaped/removed.
                                 DataRow[] parentListInfo = null;
                                 if (parentList != null)
                                 {
@@ -368,7 +368,7 @@ namespace EPMLiveReportsAdmin
                                     {
                                         parentListInfo =
                                             AllMappedLists.Select("ListName='" + parentList.Title.Replace("'", "") + "'");
-                                            // - CAT.NET false-positive: All single quotes are escaped/removed.
+                                        // - CAT.NET false-positive: All single quotes are escaped/removed.
                                     }
                                     catch { }
                                 }
@@ -414,13 +414,13 @@ namespace EPMLiveReportsAdmin
                                     //Add FK SCRIPTS
                                     DataRow row = AllForeignKeysByTable.NewRow();
                                     row["TABLE_NAME"] = childTableName.Replace("'", "''");
-                                        // - CAT.NET false-positive: All single quotes are escaped/removed.
+                                    // - CAT.NET false-positive: All single quotes are escaped/removed.
                                     row["FK_TABLE_SCRIPT"] = LST_TABLE_FK_SCRIPT;
-                                        //.Replace("'", "''"); // - CAT.NET false-positive: All single quotes are escaped/removed.
+                                    //.Replace("'", "''"); // - CAT.NET false-positive: All single quotes are escaped/removed.
                                     row["SNAPSHOT_TABLE_NAME"] = childTableSnapShotName.Replace("'", "''");
-                                        // - CAT.NET false-positive: All single quotes are escaped/removed.
+                                    // - CAT.NET false-positive: All single quotes are escaped/removed.
                                     row["FK_SNAPSHOT_TABLE_SCRIPT"] = LST_SNAPSHOT_TABLE_FK_SCRIPT;
-                                        //.Replace("'", "''"); // - CAT.NET false-positive: All single quotes are escaped/removed.
+                                    //.Replace("'", "''"); // - CAT.NET false-positive: All single quotes are escaped/removed.
                                     AllForeignKeysByTable.Rows.Add(row);
                                 }
                             }
@@ -470,6 +470,197 @@ namespace EPMLiveReportsAdmin
             return AllForeignKeysByTable;
         }
 
+        public DataTable GetSpecificForeignKey(EPMData DAO, string listId, string tableName, string columnName)
+        {
+            // Checks if the specified column has foreign key associated with it
+            bool hasForeignKey = HasForeignKey(DAO, tableName, columnName);
+
+            //Initialize return value DataTable (will hold all FK update scripts for both live and snapshot tables)
+            var ForeignKeysByTable = new DataTable();
+            ForeignKeysByTable.Columns.Add("TABLE_NAME");
+            ForeignKeysByTable.Columns.Add("SNAPSHOT_TABLE_NAME");
+            ForeignKeysByTable.Columns.Add("FK_TABLE_SCRIPT");
+            ForeignKeysByTable.Columns.Add("FK_SNAPSHOT_TABLE_SCRIPT");
+            // Get script if foreign key found
+            if (hasForeignKey)
+            {
+                // Get specific lookup field from list
+                string sql =
+                    "SELECT dbo.RPTColumn.RPTListId,  dbo.RPTList.ListName, dbo.RPTList.TableName, dbo.RPTList.TableNameSnapshot, dbo.RPTColumn.InternalName , dbo.RPTColumn.ColumnName" +
+                    " FROM dbo.RPTList INNER JOIN dbo.RPTColumn ON dbo.RPTList.RPTListId = dbo.RPTColumn.RPTListId " +
+                    "WHERE dbo.RPTList.SiteId=@siteId AND dbo.RPTList.RPTListId=@listId AND (dbo.RPTColumn.SharePointType = N'lookup') " +
+                    "AND (ColumnType = 'Int' OR ColumnType = 'NTEXT') AND dbo.RPTColumn.ColumnName = @columnName";
+                DAO.Command = sql;
+                DAO.AddParam("@siteId", DAO.SiteId);
+                DAO.AddParam("@listId", listId);
+                DAO.AddParam("@columnName", columnName);
+                DataTable ListLookupFields = DAO.GetTable(DAO.GetClientReportingConnection);
+
+                //Initialize and open topsite/web
+                SPWeb web = null;
+                SPSite site = null;
+                SPList childList = null;
+
+                SPSecurity.RunWithElevatedPrivileges(delegate
+                {
+                    site = new SPSite(DAO.SiteId);
+                    web = site.OpenWeb(); //IGNORE SPDispose 110, web is being disposed outside scope
+                    childList = web.Lists[new Guid(listId)];
+                });
+
+                if (childList == null)
+                {
+                    foreach (SPWeb w in site.AllWebs)
+                    {
+                        try
+                        {
+                            childList = w.Lists[new Guid(listId)];
+                        }
+                        catch { }
+
+                        w.Close();
+
+                        if (childList != null)
+                        {
+                            break;
+                        }
+                    }
+                }
+
+                try
+                {
+                    if (ListLookupFields != null && ListLookupFields.Rows.Count > 0)
+                    {
+                        foreach (DataRow lookupField in ListLookupFields.Rows)
+                        {
+                            var field =
+                                (SPFieldLookup)
+                                    childList.Fields.GetFieldByInternalName(lookupField["InternalName"].ToString());
+                            if (field.TypeAsString.ToLower() != "filteredlookup" && field.LookupList != null &&
+                                field.LookupList != string.Empty)
+                            {
+                                #region Get parent list info of lookup field
+                                string listuid = field.LookupList;
+                                SPList parentList = null;
+                                try
+                                {
+                                    parentList = web.Lists[new Guid(listuid)];
+                                }
+                                catch { }
+                                DataRow parentListInfo = null;
+                                if (parentList != null)
+                                {
+                                    try
+                                    {
+                                        //Get All mapped lists
+                                        DAO.Command = "SELECT * FROM RPTList WHERE SiteId=@siteId AND RPTListId=@listId";
+                                        DAO.AddParam("@siteId", DAO.SiteId);
+                                        DAO.AddParam("@listId", parentList.ID);
+                                        DataTable parentListTable = DAO.GetTable(DAO.GetClientReportingConnection);
+
+                                        if (parentListTable != null && parentListTable.Rows.Count > 0)
+                                        {
+                                            parentListInfo = parentListTable.Rows[0];
+                                        }
+                                    }
+                                    catch { }
+                                }
+                                #endregion
+
+                                #region Add foreign key script to table
+                                if (parentListInfo != null)
+                                {
+                                    string parentTableName = parentListInfo["TableName"].ToString();
+                                    //string childTableName = childListInfo[0]["TableName"].ToString();
+                                    string childTableName = lookupField["TableName"].ToString();
+                                    //string childTableSnapShotName = childListInfo[0]["TableNameSnapshot"].ToString();
+                                    string childTableSnapShotName = lookupField["TableNameSnapshot"].ToString();
+                                    string fieldName = lookupField["InternalName"].ToString();
+
+                                    //Init. LST_XXXX_Table FK SCRIPT
+                                    string LST_TABLE_FK_SCRIPT =
+                                        "IF (EXISTS(SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = \'" +
+                                        childTableName + "\')) " +
+                                        "BEGIN " +
+                                        "ALTER TABLE [dbo].[" + childTableName + "] WITH NOCHECK " +
+                                        "ADD CONSTRAINT [FK_EPMLIVE_" + lookupField["InternalName"] + "_" +
+                                        childTableName.ToUpper() + "_" + parentTableName.ToUpper() +
+                                        "] FOREIGN KEY([webid], [" + lookupField["ColumnName"] + "]) REFERENCES [dbo].[" +
+                                        parentTableName + "] ([WebId], [ItemId]) NOT FOR REPLICATION " +
+                                        "ALTER TABLE [dbo].[" + childTableName + "] NOCHECK CONSTRAINT [FK_EPMLIVE_" +
+                                        lookupField["InternalName"] + "_" + childTableName.ToUpper() + "_" +
+                                        parentTableName.ToUpper() + "] " +
+                                        "END ";
+
+                                    //Init. LST_XXXX_Snapshot_Table FK SCRIPT
+                                    string LST_SNAPSHOT_TABLE_FK_SCRIPT =
+                                        "IF (EXISTS(SELECT 1 FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = \'" +
+                                        childTableSnapShotName + "\')) " +
+                                        "BEGIN " +
+                                        "ALTER TABLE [dbo].[" + childTableSnapShotName + "] WITH NOCHECK " +
+                                        "ADD CONSTRAINT [FK_EPMLIVE_" + lookupField["InternalName"] + "_" +
+                                        childTableSnapShotName.ToUpper() + "_" + parentTableName.ToUpper() +
+                                        "] FOREIGN KEY([webid], [" + lookupField["ColumnName"] + "]) REFERENCES [dbo].[" +
+                                        parentTableName + "] ([WebId], [ItemId]) NOT FOR REPLICATION " +
+                                        "ALTER TABLE [dbo].[" + childTableSnapShotName.ToUpper() +
+                                        "] NOCHECK CONSTRAINT [FK_EPMLIVE_" + lookupField["InternalName"] + "_" +
+                                        childTableSnapShotName.ToUpper() + "_" + parentTableName.ToUpper() + "] " +
+                                        "END ";
+
+                                    //Add FK SCRIPTS
+                                    DataRow row = ForeignKeysByTable.NewRow();
+                                    row["TABLE_NAME"] = childTableName.Replace("'", "''");
+                                    // - CAT.NET false-positive: All single quotes are escaped/removed.
+                                    row["FK_TABLE_SCRIPT"] = LST_TABLE_FK_SCRIPT;
+                                    //.Replace("'", "''"); // - CAT.NET false-positive: All single quotes are escaped/removed.
+                                    row["SNAPSHOT_TABLE_NAME"] = childTableSnapShotName.Replace("'", "''");
+                                    // - CAT.NET false-positive: All single quotes are escaped/removed.
+                                    row["FK_SNAPSHOT_TABLE_SCRIPT"] = LST_SNAPSHOT_TABLE_FK_SCRIPT;
+                                    //.Replace("'", "''"); // - CAT.NET false-positive: All single quotes are escaped/removed.
+                                    ForeignKeysByTable.Rows.Add(row);
+                                }
+                                #endregion
+                            }
+                        }
+                    }
+                }
+                catch { }
+                finally
+                {
+                    if (web != null)
+                    {
+                        web.Dispose();
+                    }
+                    if (site != null)
+                    {
+                        site.Dispose();
+                    }
+                }
+            }
+            return ForeignKeysByTable;
+        }
+
+        private bool HasForeignKey(EPMData DAO, string tableName, string columnName)
+        {
+            bool hasForeignKey = false;
+            try
+            {
+                DAO.Command = "SELECT DISTINCT * FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE " +
+                              "WHERE TABLE_NAME = '" + tableName + "' AND COLUMN_NAME = '" + columnName + "' AND CONSTRAINT_NAME LIKE 'FK_%'";
+
+                object result = DAO.ExecuteScalar(DAO.GetClientReportingConnection);
+                if (result != null)
+                {
+                    hasForeignKey = true;
+                }
+                return hasForeignKey;
+            }
+            catch (Exception)
+            {
+                return hasForeignKey;
+            }
+        }
+
         public bool UpdateForeignKeys(EPMData DAO)
         {
             DataTable AllForeignKeysByList = GetAllForeignKeys(DAO);
@@ -493,7 +684,7 @@ namespace EPMLiveReportsAdmin
                     "PRINT 'Error Detected' " +
                     "END CATCH";
                 DAO.AddParam("@tableName", AllListForeignKeys["TABLE_NAME"].ToString());
-                    // - CAT.NET false-positive: All single quotes are escaped/removed.
+                // - CAT.NET false-positive: All single quotes are escaped/removed.
                 DAO.ExecuteNonQuery(DAO.GetClientReportingConnection);
 
                 //DELETE EXISTING FK's from list snapshot table
@@ -512,17 +703,74 @@ namespace EPMLiveReportsAdmin
                     "PRINT 'Error Detected' " +
                     "END CATCH";
                 DAO.AddParam("@tableName", AllListForeignKeys["SNAPSHOT_TABLE_NAME"].ToString());
-                    // - CAT.NET false-positive: All single quotes are escaped/removed.
+                // - CAT.NET false-positive: All single quotes are escaped/removed.
                 DAO.ExecuteNonQuery(DAO.GetClientReportingConnection);
 
                 //ADD FK's to list table
                 DAO.Command = AllListForeignKeys["FK_TABLE_SCRIPT"].ToString();
-                    // - CAT.NET false-positive: All single quotes are escaped/removed.
+                // - CAT.NET false-positive: All single quotes are escaped/removed.
                 DAO.ExecuteNonQuery(DAO.GetClientReportingConnection);
 
                 //ADD FK's to list snapshot table
                 DAO.Command = AllListForeignKeys["FK_SNAPSHOT_TABLE_SCRIPT"].ToString();
-                    // - CAT.NET false-positive: All single quotes are escaped/removed.
+                // - CAT.NET false-positive: All single quotes are escaped/removed.
+                DAO.ExecuteNonQuery(DAO.GetClientReportingConnection);
+            }
+            return true;
+        }
+
+        public bool AddORRemoveForeignKey(EPMData DAO, DataRow foreignKey, bool addOperation)
+        {
+            if (!addOperation)
+            {
+                //DELETE EXISTING FK's from list table
+                DAO.Command =
+                    "BEGIN TRY " +
+                    "WHILE EXISTS(select * from INFORMATION_SCHEMA.CONSTRAINT_COLUMN_USAGE where CONSTRAINT_NAME like 'FK_EPMLIVE_%' AND TABLE_NAME=@tableName) " +
+                    "BEGIN " +
+                    "DECLARE @cName nvarchar(Max) " +
+                    "SELECT @cName = (SELECT TOP 1 [CONSTRAINT_NAME] FROM INFORMATION_SCHEMA.CONSTRAINT_COLUMN_USAGE WHERE CONSTRAINT_NAME LIKE 'FK_EPMLIVE_%' AND TABLE_NAME=@tableName) " +
+                    "DECLARE @sql nvarchar(Max) " +
+                    "SELECT @sql = 'ALTER TABLE ' + @tableName + ' DROP CONSTRAINT ' + @cName " +
+                    "EXEC sp_executesql @sql " +
+                    "END " +
+                    "END TRY " +
+                    "BEGIN CATCH " +
+                    "PRINT 'Error Detected' " +
+                    "END CATCH";
+                DAO.AddParam("@tableName", foreignKey["TABLE_NAME"].ToString());
+                // - CAT.NET false-positive: All single quotes are escaped/removed.
+                DAO.ExecuteNonQuery(DAO.GetClientReportingConnection);
+
+                //DELETE EXISTING FK's from list snapshot table
+                DAO.Command =
+                    "BEGIN TRY " +
+                    "WHILE EXISTS(select * from INFORMATION_SCHEMA.CONSTRAINT_COLUMN_USAGE where CONSTRAINT_NAME like 'FK_EPMLIVE_%' AND TABLE_NAME=@tableName) " +
+                    "BEGIN " +
+                    "DECLARE @cName nvarchar(Max) " +
+                    "SELECT @cName = (SELECT TOP 1 [CONSTRAINT_NAME] FROM INFORMATION_SCHEMA.CONSTRAINT_COLUMN_USAGE WHERE CONSTRAINT_NAME LIKE 'FK_EPMLIVE_%' AND TABLE_NAME=@tableName) " +
+                    "DECLARE @sql nvarchar(Max) " +
+                    "SELECT @sql = 'ALTER TABLE ' + @tableName + ' DROP CONSTRAINT ' + @cName " +
+                    "EXEC sp_executesql @sql " +
+                    "END " +
+                    "END TRY " +
+                    "BEGIN CATCH " +
+                    "PRINT 'Error Detected' " +
+                    "END CATCH";
+                DAO.AddParam("@tableName", foreignKey["SNAPSHOT_TABLE_NAME"].ToString());
+                // - CAT.NET false-positive: All single quotes are escaped/removed.
+                DAO.ExecuteNonQuery(DAO.GetClientReportingConnection);
+            }
+            else
+            {
+                //ADD FK's to list table
+                DAO.Command = foreignKey["FK_TABLE_SCRIPT"].ToString();
+                // - CAT.NET false-positive: All single quotes are escaped/removed.
+                DAO.ExecuteNonQuery(DAO.GetClientReportingConnection);
+
+                //ADD FK's to list snapshot table
+                DAO.Command = foreignKey["FK_SNAPSHOT_TABLE_SCRIPT"].ToString();
+                // - CAT.NET false-positive: All single quotes are escaped/removed.
                 DAO.ExecuteNonQuery(DAO.GetClientReportingConnection);
             }
             return true;
@@ -531,7 +779,7 @@ namespace EPMLiveReportsAdmin
         public DataTable GetReferencingTables(EPMData DAO, string sTableName)
         {
             string sql = string.Format("EXEC sp_MSdependencies N'{0}', null, 1315327", sTableName.Replace("'", ""));
-                // - CAT.NET false-positive: All single quotes are escaped/removed.
+            // - CAT.NET false-positive: All single quotes are escaped/removed.
             //string sql = "EXEC sp_MSdependencies N'{0}', null, 1315327";
             DAO.Command = sql;
             //DAO.AddParam("@tableName", sTableName);

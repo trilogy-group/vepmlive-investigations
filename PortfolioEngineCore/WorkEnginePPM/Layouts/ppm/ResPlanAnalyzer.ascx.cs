@@ -68,6 +68,13 @@ namespace WorkEnginePPM.ControlTemplates.WorkEnginePPM
             set { m_sWebservice = value.Trim(); }
         }
 
+        private Int32 m_maxPeriodLimit;
+        public Int32 MaxPeriodLimit
+        {
+            get { return m_maxPeriodLimit; }
+            set { m_maxPeriodLimit = value; }
+        }
+
         protected void Page_Load(object sender, EventArgs e)
         {
             sm1.Services.Add(new ServiceReference(Webservice));

@@ -865,6 +865,11 @@
 
                             var title = item.__metadata.type === 'SP.Data.DocumentsItem' ? item.FileLeafRef : item.Title;
 
+                            //EPML-4329 : if title is null then assign it to file name
+                            if (title == null || title == '') {
+                                title = item.FileLeafRef;
+                            }
+                            
                             var data = {
                                 lists: [{
                                     icon: listInfo.icon,
@@ -1120,17 +1125,22 @@
 
             return {
                 configure: _configure,
-                load: _load
+                load: _load,
+                toolbarManager: toolbarManager
             };
         })();
 
         SE.configure();
         SE.load();
+
+        return {
+            SE: SE
+        };
     };
 
-    var loadSocialEngine = function() {
+    var loadSocialEngine = function () {        
         if (window.epmLive) {
-            SocialEngine();
+            window.epmLive.SocialStream_SE = SocialEngine().SE;
         } else {
             window.setTimeout(function() {
                 loadSocialEngine();

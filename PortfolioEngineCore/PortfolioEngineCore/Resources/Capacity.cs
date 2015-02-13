@@ -803,7 +803,7 @@ namespace PortfolioEngineCore
 
                 cmdText = "Select FA_FIELD_ID as FIELD_ID,FA_NAME,FA_FORMAT,FA_TABLE_ID,FA_FIELD_IN_TABLE,FA_LOOKUP_UID" +
                             " From EPGC_FIELD_ATTRIBS" +
-                            " Where (FA_FORMAT = 4 or FA_FORMAT = 9) and (FA_TABLE_ID > 100 and FA_TABLE_ID < 210)" +
+                            " Where (FA_FORMAT = 4 or FA_FORMAT = 9 or FA_FORMAT = 1) and (FA_TABLE_ID > 100 and FA_TABLE_ID < 210)" +
                             " ORDER BY FA_TABLE_ID,FIELD_ID";
                 oCommand = new SqlCommand(cmdText, _dba.Connection);
                 reader = oCommand.ExecuteReader();
@@ -1449,7 +1449,7 @@ namespace PortfolioEngineCore
 
                     // create a dirty great SQL stmnt to get all the regular fields plus the custom fields we've selected
                     string sSQLExtraFields1 = "", sSQLExtraFields2 = "";
-                    bool bPortfolioINT = false, bPortfolioTEXT = false, bProjectINT = false, bProjectTEXT = false;
+                    bool bPortfolioINT = false, bPortfolioTEXT = false, bPortfolioDATE = false, bProjectINT = false, bProjectTEXT = false;
 
                     string sTable;
                     string sField;
@@ -1491,6 +1491,15 @@ namespace PortfolioEngineCore
                                 oPIFieldItem.FullGenName = sField;
                             }
                         }
+                        else if (oPIFieldItem.CFTable == (int)CustomFieldDBTable.PortfolioDATE)
+                        {
+                            if (EPKClass01.GetTableAndField(oPIFieldItem.CFTable, oPIFieldItem.CFField, out sTable, out sField))
+                            {
+                                bPortfolioDATE = true;
+                                sSQLExtraFields2 += "," + sField;
+                                oPIFieldItem.FullGenName = sField;
+                            }
+                        }
                         else
                         {
                             oPIFieldItem.CFTable = -1;
@@ -1506,6 +1515,7 @@ namespace PortfolioEngineCore
                     if (bPortfolioTEXT == true) { cmdText += " Left Join EPGP_PROJECT_TEXT_VALUES pt On pt.PROJECT_ID=p.PROJECT_ID"; }
                     if (bProjectINT == true) { cmdText += " Left Join EPGX_PROJ_INT_VALUES ei On ei.WPROJ_ID=pv.WPROJ_ID"; }
                     if (bProjectTEXT == true) { cmdText += " Left Join EPGX_PROJ_TEXT_VALUES et On et.WPROJ_ID=pv.WPROJ_ID"; }
+                    if (bPortfolioDATE == true) { cmdText += " Left Join EPGP_PROJECT_DATE_VALUES pd On pd.PROJECT_ID=p.PROJECT_ID"; }
                     cmdText += " Left Join EPG_RESOURCES r1 On r1.WRES_ID=p.PROJECT_MANAGER" +
                             " Left Join EPG_RESOURCES r2 On r2.WRES_ID=p.PROJECT_OWNER" +
                             " Left Join EPGP_STAGES s On s.STAGE_ID=p.PROJECT_STAGE_ID";
@@ -2180,7 +2190,7 @@ namespace PortfolioEngineCore
             {
                 case 1:
                     DateTime dt = DBAccess.ReadDateValue(reader[sFieldName]);
-                    customfields.Add(lFieldID.ToString() + " " + dt.ToString("yyyyMMddHHmm"));
+                    customfields.Add(lFieldID.ToString() + " " + dt.ToString("yyyy-MM-dd").Length.ToString() + " " + dt.ToString("yyyy-MM-dd"));
                     break;
                 case 2:
                 case 4:

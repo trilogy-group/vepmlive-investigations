@@ -183,7 +183,7 @@ namespace EPMLiveCore.Controls.Navigation.Providers
                 new Tuple<string, string>("'; return false;", string.Empty)
             }.Aggregate(url, (current, p) => current.Replace(p.Item1, p.Item2));
 
-            return string.Format("javascript:OpenCreateWebPageDialog('{0}');", url.Trim());
+            return string.Format("javascript:window.epmLiveNavigation.createNewOpenDialog('{0}','{1}','{2}');", url.Trim(), info[1], info[5]);
         }
 
         #endregion

@@ -116,9 +116,11 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
                                         "EPMLiveReportsAdmin.LstEvents",
                                         new List<SPEventReceiverType>
                                         {
-                                            SPEventReceiverType.FieldDeleting,
+                                            SPEventReceiverType.FieldAdding,
                                             SPEventReceiverType.ListDeleting,
-                                            SPEventReceiverType.FieldAdded
+                                            SPEventReceiverType.FieldAdded,
+                                            SPEventReceiverType.FieldUpdated,
+                                            SPEventReceiverType.FieldDeleting
                                         });
 
                                     foreach (SPEventReceiverDefinition e in delEvts)
@@ -126,11 +128,15 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
                                         e.Delete();
                                     }
 
-                                    spList.EventReceivers.Add(SPEventReceiverType.FieldDeleting, Resources.Assembly,
-                                        "EPMLiveReportsAdmin.LstEvents");
+                                    spList.EventReceivers.Add(SPEventReceiverType.FieldAdding, Resources.Assembly,
+                                      "EPMLiveReportsAdmin.LstEvents");
                                     spList.EventReceivers.Add(SPEventReceiverType.ListDeleting, Resources.Assembly,
                                         "EPMLiveReportsAdmin.LstEvents");
                                     spList.EventReceivers.Add(SPEventReceiverType.FieldAdded, Resources.Assembly,
+                                        "EPMLiveReportsAdmin.LstEvents");
+                                    spList.EventReceivers.Add(SPEventReceiverType.FieldUpdated, Resources.Assembly,
+                                        "EPMLiveReportsAdmin.LstEvents");
+                                    spList.EventReceivers.Add(SPEventReceiverType.FieldDeleting, Resources.Assembly,
                                         "EPMLiveReportsAdmin.LstEvents");
 
                                     List<SPEventReceiverDefinition> newEvts2 = GetListEvents(spList,
@@ -138,9 +144,11 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
                                         "EPMLiveReportsAdmin.LstEvents",
                                         new List<SPEventReceiverType>
                                         {
-                                            SPEventReceiverType.FieldDeleting,
+                                            SPEventReceiverType.FieldAdding,
                                             SPEventReceiverType.ListDeleting,
-                                            SPEventReceiverType.FieldAdded
+                                            SPEventReceiverType.FieldAdded,
+                                            SPEventReceiverType.FieldUpdated,
+                                            SPEventReceiverType.FieldDeleting,
                                         });
 
                                     foreach (SPEventReceiverDefinition e in newEvts2)
@@ -170,10 +178,10 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
             try
             {
                 evts = (from e in list.EventReceivers.OfType<SPEventReceiverDefinition>()
-                    where e.Assembly.Equals(assemblyName, StringComparison.CurrentCultureIgnoreCase) &&
-                          e.Class.Equals(className, StringComparison.CurrentCultureIgnoreCase) &&
-                          types.Contains(e.Type)
-                    select e).ToList<SPEventReceiverDefinition>();
+                        where e.Assembly.Equals(assemblyName, StringComparison.CurrentCultureIgnoreCase) &&
+                              e.Class.Equals(className, StringComparison.CurrentCultureIgnoreCase) &&
+                              types.Contains(e.Type)
+                        select e).ToList<SPEventReceiverDefinition>();
             }
             catch { }
 
@@ -209,6 +217,8 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
             bool blnListDeleteEvent = false;
             bool blnColumnDeleteEvent = false;
             bool blnColumnAddEvent = false;
+            bool blnColumnUpdateEvent = false;
+            bool blnColumnAddingEvent = false;
 
             SPSecurity.RunWithElevatedPrivileges(
                 delegate
@@ -237,6 +247,8 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
                                     blnListDeleteEvent = false;
                                     blnColumnDeleteEvent = false;
                                     blnColumnAddEvent = false;
+                                    blnColumnUpdateEvent = false;
+                                    blnColumnAddingEvent = false;
 
                                     foreach (SPEventReceiverDefinition spEventDef in spList.EventReceivers)
                                     {
@@ -267,16 +279,27 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
                                                 blnListDeleteEvent = true;
                                             }
 
+                                            if (spEventDef.Type == SPEventReceiverType.FieldAdded &&
+                                                spEventDef.Class.ToLower() == "EPMLiveReportsAdmin.LstEvents".ToLower())
+                                            {
+                                                blnColumnAddEvent = true;
+                                            }
+
+                                            if (spEventDef.Type == SPEventReceiverType.FieldUpdated &&
+                                                spEventDef.Class.ToLower() == "EPMLiveReportsAdmin.LstEvents".ToLower())
+                                            {
+                                                blnColumnUpdateEvent = true;
+                                            }
+
                                             if (spEventDef.Type == SPEventReceiverType.FieldDeleting &&
                                                 spEventDef.Class.ToLower() == "EPMLiveReportsAdmin.LstEvents".ToLower())
                                             {
                                                 blnColumnDeleteEvent = true;
                                             }
-
-                                            if (spEventDef.Type == SPEventReceiverType.FieldAdded &&
-                                                spEventDef.Class.ToLower() == "EPMLiveReportsAdmin.LstEvents".ToLower())
+                                            if (spEventDef.Type == SPEventReceiverType.FieldAdding &&
+                                              spEventDef.Class.ToLower() == "EPMLiveReportsAdmin.LstEvents".ToLower())
                                             {
-                                                blnColumnAddEvent = true;
+                                                blnColumnAddingEvent = true;
                                             }
                                         }
                                     }
@@ -304,14 +327,23 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
                                             AddAuditRecord("ListDeleting", _sListName, spWeb.ServerRelativeUrl);
                                         }
 
+                                        if (!blnColumnAddEvent)
+                                        {
+                                            AddAuditRecord("FieldAdded", _sListName, spWeb.ServerRelativeUrl);
+                                        }
+
+                                        if (!blnColumnUpdateEvent)
+                                        {
+                                            AddAuditRecord("FieldUpdated", _sListName, spWeb.ServerRelativeUrl);
+                                        }
+
                                         if (!blnColumnDeleteEvent)
                                         {
                                             AddAuditRecord("FieldDeleting", _sListName, spWeb.ServerRelativeUrl);
                                         }
-
-                                        if (!blnColumnAddEvent)
+                                        if (!blnColumnAddingEvent)
                                         {
-                                            AddAuditRecord("FieldAdded", _sListName, spWeb.ServerRelativeUrl);
+                                            AddAuditRecord("FieldAdding", _sListName, spWeb.ServerRelativeUrl);
                                         }
                                     }
                                 }

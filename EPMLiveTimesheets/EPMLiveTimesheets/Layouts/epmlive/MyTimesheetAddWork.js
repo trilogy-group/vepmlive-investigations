@@ -17,14 +17,21 @@ function SearchWork() {
     
     var grid = Grids["TSWork"];
 
-    var dataxml = sLayout;
-    dataxml += " SearchField=\"" + sField + "\"";
-    dataxml += " SearchText=\"" + escape(sText) + "\"";
-    dataxml += "/&gt;";
+    //var dataxml = sLayout;
+    //dataxml += " SearchField=\"" + sField + "\"";
+    //dataxml += " SearchText=\"" + escape(sText) + "\"";
+    //dataxml += "/&gt;";
 
-    grid.Data.Data.Param.Dataxml = dataxml;
+    //grid.Data.Data.Param.Dataxml = dataxml;
 
-    grid.Reload();
+    //grid.Reload();
+
+    grid.SearchCells = 1;
+    grid.SearchCols = sField;
+    grid.SearchExpression = sText;
+    grid.DoSearch('Filter');
+
+    HideMessage();
 }
 
 function ShowMessage(message, w, h) {

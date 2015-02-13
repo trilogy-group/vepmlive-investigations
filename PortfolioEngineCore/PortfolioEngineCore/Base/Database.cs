@@ -59,28 +59,27 @@ namespace PortfolioEngineCore
             return cn;
         }
 
+        //EPML-4761: Store PFE SQL ConnectionString encrypted
         private string getstring(string basepath)
         {
-            string sCN = "";
+            string sCN = string.Empty;
             try
             {
-                RegistryKey key = Registry.LocalMachine.OpenSubKey("Software", false).OpenSubKey("EPMLive", false).OpenSubKey("PortfolioEngine", false).OpenSubKey(basepath);
-                sCN = key.GetValue("ConnectionString").ToString();
+                sCN = Utilities.GetConnectionString(basepath);
+                //RegistryKey key = Utilities.GetRegistryKey(basepath);
+                //if (key != null)
+                //{
+                //    var value = key.GetValue("ConnectionString");
+                //    sCN = (value != null ? value.ToString() : string.Empty);
+                //}
             }
-            catch
+            catch (Exception ex)
             {
-                try
-                {
-                    RegistryKey key = Registry.LocalMachine.OpenSubKey("Software", false).OpenSubKey("Wow6432Node", false).OpenSubKey("EPMLive", false).OpenSubKey("PortfolioEngine", false).OpenSubKey(basepath);
-                    sCN = key.GetValue("ConnectionString").ToString();
-                }
-                catch
-                {
-                    throw new PFEException((int) PFEError.DBCantLoadConnectionString, "Could not load Connection String from registry");
-                }
+                //throw ex;
+                throw new PFEException((int)PFEError.DBCantLoadConnectionString, "Could not load Connection String from registry: " + ex.Message);
             }
             return sCN;
-
         }
+        //END EPML-4761
     }
 }

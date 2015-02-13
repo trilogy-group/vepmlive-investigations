@@ -30,6 +30,7 @@
             Grids.OnFilter = GridsOnFilterDelegate;
             Grids.OnRowFilter = GridsOnRowFilterDelegate;
             Grids.OnFilterFinish = GridsOnFilterFinishDelegate;
+            Grids.OnShowColumns = GridsOnShowColumnsDelegate;
             //Grids.OnGroup = GridsOnGroupDelegate;
             Grids.OnGroupFinish = GridsOnGroupFinishDelegate;
 
@@ -3561,6 +3562,13 @@
             this.HideUnusedGroupRowsAsync();
         rPEditorInstance.RefreshResourcePeriodsPaged(true, null);
     };
+    RPEditor.prototype.GridsOnShowColumns = function (grid, menu) {
+        if (grid.id == "g_RPE") {
+            if (menu.Items.length > 0 && menu.Items[0].Items[1] != null) {
+                menu.Items[0].Items[1].Text = "Status";
+            }
+        }
+    };
     RPEditor.prototype.HideUnusedGroupRowsAsync = function () {
         //window.setTimeout(function () { var grid = Grids["g_Res"]; var row = grid.GetFirst(null, 0); HideUnusedGroupRows(grid, row); }, 100);
         var grid = Grids["g_Res"];
@@ -5550,14 +5558,32 @@
                             case 0: /* Hours */
                                 var split = this.GetIntValue(this.GetPeriodHours(plangrid, parentplanrow, col), null);
                                 if (split != null && split > 0) {
-                                    this.SetPeriodValue(plangrid, childplanrow, col, split / div);
+                                    if (div > 1) // added check to fix EPML-2134.
+                                        this.SetPeriodValue(plangrid, childplanrow, col, split / div);
+                                    else {
+                                        var FTEVal = this.GetIntValue(this.GetPeriodFTE(plangrid, parentplanrow, col), null) / 10000;
+                                        var singsplit = split / FTEVal;
+                                        if (split > singsplit)
+                                            this.SetPeriodValue(plangrid, childplanrow, col, singsplit);
+                                        else
+                                            this.SetPeriodValue(plangrid, childplanrow, col, split);
+                                    }
                                 }
                                 break;
                             case 1: /* FTE */
                             case 2: /* FTE %*/
                                 split = this.GetIntValue(this.GetPeriodFTE(plangrid, parentplanrow, col), null);
                                 if (split != null && split > 0) {
-                                    this.SetPeriodValue(plangrid, childplanrow, col, split / div);
+                                    if (div > 1) // added check to fix EPML-2134.
+                                        this.SetPeriodValue(plangrid, childplanrow, col, split / div);
+                                    else {
+                                        var FTEVal = this.GetIntValue(this.GetPeriodFTE(plangrid, parentplanrow, col), null) / 10000;
+                                        var singsplit = split / FTEVal;
+                                        if (split > singsplit)
+                                            this.SetPeriodValue(plangrid, childplanrow, col, singsplit);
+                                        else
+                                            this.SetPeriodValue(plangrid, childplanrow, col, split);
+                                    }
                                 }
                                 break;
                         }
@@ -6087,6 +6113,7 @@
         var GridsOnFilterDelegate = MakeDelegate(this, this.GridsOnFilter);
         var GridsOnRowFilterDelegate = MakeDelegate(this, this.GridsOnRowFilter);
         var GridsOnFilterFinishDelegate = MakeDelegate(this, this.GridsOnFilterFinish);
+        var GridsOnShowColumnsDelegate = MakeDelegate(this, this.GridsOnShowColumns);
 
         var dlg_OnCloseDelegate = MakeDelegate(this, this.dlg_OnClose);
 

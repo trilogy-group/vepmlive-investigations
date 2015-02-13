@@ -2032,6 +2032,17 @@
                     showItems(itemInfo);
                 };
 
+                window.epmLiveNavigation.createNewOpenDialog = function (url, listName, listid) {
+                    var listInfo = {
+                        id: listid,
+                        url: window.epmLive.currentWebUrl + '/_layouts/15/epmlive/redirectionproxy.aspx?action=gotolist&webid=' + window.epmLive.currentWebId + '&listid=' + listid,
+                        name: listName,
+                        icon: null
+                    };
+                    var options = { url: url, showMaximized: false, dialogReturnValueCallback: function (dialogResult) { if (dialogResult == 1) { if (window.epmLive.SocialStream_SE != undefined || window.epmLive.SocialStream_SE != null) { window.epmLive.SocialStream_SE.toolbarManager.handleCreationAction(dialogResult, null, listInfo); } } } };
+                    SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
+                };
+
                 var _init = function () {
                     registerTopLevelNodes();
                     registerStaticProviderLinks();

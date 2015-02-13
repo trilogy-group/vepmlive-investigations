@@ -537,8 +537,11 @@
         return false;
     }
 
-    ResPlanAnalyzer.prototype.ApplyGridView = function (gridId, view, bRender) {
+    ResPlanAnalyzer.prototype.ApplyGridView = function (gridId, view, bRender, showLoading, chkInfoIcon) {
         try {
+
+            if (showLoading)
+                this.ShowWorkingPopup("divLoading");
 
             var grid = Grids[gridId];
             var gridView = view[gridId];
@@ -548,13 +551,20 @@
 
             var p1c1ind = 0;
 
+            if (chkInfoIcon) {
+                $("#idAnalyzerTab_FromPeriodLabel .icon-info-2").hide();
+                $("#idAnalyzerTab_ToPeriodLabel .icon-info-2").hide();
+            }
 
             var FromList = document.getElementById("idAnalyzerTab_FromPeriod");
             var ToList = document.getElementById("idAnalyzerTab_ToPeriod");
 
             var StartID = parseInt(FromList.options[FromList.selectedIndex].value);
 
-
+            var initialColumnCount = 0;
+            this.maxPeriodLimitExceeds = false;
+            var hideTemp = [];
+            var showTemp = [];
 
             if (StartID == -1) {
                 StartID = this.UsingPeriods.CurrentPeriod.Value;
@@ -683,7 +693,8 @@
             try {
                 if (gridView.Cols !== null) {
                     var vCols = grid.GetCols('Visible');
-                    vCols = vCols.concat(groupCols);
+                    if (groupCols)
+                        vCols = vCols.concat(groupCols);
 
                     var mainCols = [];
 
@@ -691,8 +702,10 @@
 
                     for (var i = 0; i < vCols.length; i++) {
 
-                        if (vCols[i] === "P1C1")
+                        if (vCols[i] === "P1C1") {
                             bhadFirstPer = true;
+                            initialColumnCount = allCols.length;
+                        }
 
                         if (bhadFirstPer) {
 
@@ -721,12 +734,58 @@
                             }
                         }
                     }
+                    if (allCols.length > 0) {
+                        //grid.ChangeColsVisibility(allCols, mainCols, 0);
+                        if (allCols.length - initialColumnCount > this.params.MaxPeriodLimit) {
+                            this.maxPeriodLimitExceeds = true;
+                            this.extracolumninbottomgrid = false;
+                            //hideTemp = mainCols.concat(allCols.slice(initialColumnCount + parseInt(this.params.MaxPeriodLimit), allCols.length));
+                            //showTemp = allCols.slice(initialColumnCount, initialColumnCount + parseInt(this.params.MaxPeriodLimit));
+                            var pcnt = 0;
+                            var prev_perid = 0;
+                            for (var cnt = initialColumnCount; cnt < allCols.length; cnt++) {
+                                var perid = allCols[cnt].substr(allCols[cnt].indexOf('P') + 1, allCols[cnt].indexOf('C') - 1);
+                                if (prev_perid != perid) {
+                                    prev_perid = perid;
+                                    pcnt++;
+                                }
+                                else {
+                                    this.extracolumninbottomgrid = true;
+                                }
+                                if (pcnt <= this.params.MaxPeriodLimit) {
+                                    showTemp = showTemp.concat(allCols[cnt]);
+                                } else {
+                                    hideTemp = mainCols.concat(allCols[cnt]);
+                                }
+                            }
+                            if (hideTemp.length == 0) {
+                                hideTemp = mainCols;
+                            }
+                        }
+                        else {
+                            hideTemp = mainCols;
+                            showTemp = allCols;
+                        }
+                        if (this.maxPeriodLimitExceeds && maxPeriodLimitExceedsConfirm === undefined && this.extracolumninbottomgrid == false) {
+                            if (chkInfoIcon) {
+                                $("#idAnalyzerTab_FromPeriodLabel .icon-info-2").show();
+                                $("#idAnalyzerTab_ToPeriodLabel .icon-info-2").show();
+                            }
+                            alert(" You have selected more than " + this.params.MaxPeriodLimit + " periods in the view. To improve performance we have limited the amount of periods loaded. \n Please ask your administrator to change your view to show less than " + this.params.MaxPeriodLimit + " periods to avoid receiving this message in the future.");
+                            maxPeriodLimitExceedsConfirm = true;
+                            this.ribbonSetSelectValue('idAnalyzerTab_ToPeriod', showTemp[showTemp.length - 1].substr(showTemp[showTemp.length - 1].indexOf('P') + 1, showTemp[showTemp.length - 1].indexOf('C') - 1));
+                            this.flashRibbonSelect('idAnalyzerTab_ToPeriod');
+                        }
 
+                        if (showLoading) {
+                            setTimeout(function () { grid.ChangeColsVisibility(showTemp, hideTemp, 0); rESAnalyzerInstance.HideWorkingPopup("divLoading"); }, 10);
+                        } else {
+                            setTimeout(function () { grid.ChangeColsVisibility(showTemp, hideTemp, 0); }, 10);
+                        }
+                    }
 
-                    if (allCols.length > 0)
-                        grid.ChangeColsVisibility(allCols, mainCols, 0);
                 } else {
-                    this.flashGridView(gridId, false);
+                    this.flashGridView(gridId, false, false, false);
                 }
             }
             catch (e) { }
@@ -782,9 +841,8 @@
 
             try {
                 grid.ChangeSort(gridView['Sorting']);
-            } catch (e) { }
-
-
+            }
+            catch (e) { }
 
 
             if (gridView['Grouping'] === '') {
@@ -811,13 +869,17 @@
             catch (e) { };
 
 
-        } catch (e) {
+        }
+
+        catch (e) {
             this.HandleException("ApplyGridView", e);
         }
     }
 
-    ResPlanAnalyzer.prototype.flashGridView = function (gridId, bDoRender) {
+    ResPlanAnalyzer.prototype.flashGridView = function (gridId, bDoRender, showLoading, chkInfoIcon) {
         try {
+            if (showLoading)
+                this.ShowWorkingPopup("divLoading");
 
             var grid = Grids[gridId];
             var allCols = new Array();
@@ -827,6 +889,10 @@
 
             var p1c1ind = 0;
 
+            if (chkInfoIcon) {
+                $("#idAnalyzerTab_FromPeriodLabel .icon-info-2").hide();
+                $("#idAnalyzerTab_ToPeriodLabel .icon-info-2").hide();
+            }
 
             var FromList = document.getElementById("idAnalyzerTab_FromPeriod");
             var ToList = document.getElementById("idAnalyzerTab_ToPeriod");
@@ -834,7 +900,10 @@
             var StartID = parseInt(FromList.options[FromList.selectedIndex].value);
             var FinishID = parseInt(ToList.options[ToList.selectedIndex].value);
 
-
+            var initialColumnCount = 0;
+            this.maxPeriodLimitExceeds = false;
+            var hideTemp = [];
+            var showTemp = [];
 
 
             if (StartID == -1) {
@@ -863,8 +932,10 @@
 
             for (var i = 0; i < gcols.length; i++) {
 
-                if (gcols[i] === "P1C1")
+                if (gcols[i] === "P1C1") {
                     bhadFirstPer = true;
+                    initialColumnCount = allCols.length;
+                }
 
                 if (bhadFirstPer) {
 
@@ -900,9 +971,55 @@
                 }
             }
 
+            if (allCols.length > 0) {
+                //grid.ChangeColsVisibility(allCols, mainCols, 0);
+                if (allCols.length - initialColumnCount > this.params.MaxPeriodLimit) {
+                    this.maxPeriodLimitExceeds = true;
+                    this.extracolumninbottomgrid = false;
+                    //hideTemp = mainCols.concat(allCols.slice(initialColumnCount + parseInt(this.params.MaxPeriodLimit), allCols.length));
+                    //showTemp = allCols.slice(initialColumnCount, initialColumnCount + parseInt(this.params.MaxPeriodLimit));
+                    var pcnt = 0;
+                    var prev_perid = 0;
+                    for (var cnt = initialColumnCount; cnt < allCols.length; cnt++) {
+                        var perid = allCols[cnt].substr(allCols[cnt].indexOf('P') + 1, allCols[cnt].indexOf('C') - 1);
+                        if (prev_perid != perid) {
+                            prev_perid = perid;
+                            pcnt++;
+                        }
+                        else {
+                            this.extracolumninbottomgrid = true;
+                        }
+                        if (pcnt <= this.params.MaxPeriodLimit) {
+                            showTemp = showTemp.concat(allCols[cnt]);
+                        } else {
+                            hideTemp = mainCols.concat(allCols[cnt]);
+                        }
+                    }
+                    if (hideTemp.length == 0) {
+                        hideTemp = mainCols;
+                    }
+                }
+                else {
+                    hideTemp = mainCols;
+                    showTemp = allCols;
+                }
+                if (this.maxPeriodLimitExceeds && maxPeriodLimitExceedsConfirm === undefined && this.extracolumninbottomgrid == false) {
+                    if (chkInfoIcon) {
+                        $("#idAnalyzerTab_FromPeriodLabel .icon-info-2").show();
+                        $("#idAnalyzerTab_ToPeriodLabel .icon-info-2").show();
+                    }
+                    alert(" You have selected more than " + this.params.MaxPeriodLimit + " periods in the view. To improve performance we have limited the amount of periods loaded. \n Please ask your administrator to change your view to show less than " + this.params.MaxPeriodLimit + " periods to avoid receiving this message in the future.");
+                    maxPeriodLimitExceedsConfirm = true;
+                    this.ribbonSetSelectValue('idAnalyzerTab_ToPeriod', showTemp[showTemp.length - 1].substr(showTemp[showTemp.length - 1].indexOf('P') + 1, showTemp[showTemp.length - 1].indexOf('C') - 1));
+                    this.flashRibbonSelect('idAnalyzerTab_ToPeriod');
+                }
 
-            if (allCols.length > 0)
-                grid.ChangeColsVisibility(allCols, mainCols, 0);
+                if (showLoading) {
+                    setTimeout(function () { grid.ChangeColsVisibility(showTemp, hideTemp, 0); rESAnalyzerInstance.HideWorkingPopup("divLoading"); }, 10);
+                } else {
+                    setTimeout(function () { grid.ChangeColsVisibility(showTemp, hideTemp, 0); }, 10);
+                }
+            }
 
             try {
                 if (bDoRender == true)
@@ -913,7 +1030,7 @@
 
         }
         catch (e) {
-            this.HandleException("ApplyGridView", e);
+            this.HandleException("flashGridView", e);
         }
     }
 
@@ -2400,8 +2517,8 @@
 					       columns: [
 						   {
 						       items: [
-									{ type: "text", name: "From Period:" },
-									{ type: "text", name: "To Period:" }
+									{ type: "text", id: "idAnalyzerTab_FromPeriodLabel", name: "From Period:", showInfoIcon: true, showInfoMessage: "Due to a large number of configured periods, there is a limit to the number of periods that can be selected at one time." },
+									{ type: "text", id: "idAnalyzerTab_ToPeriodLabel", name: "To Period:", showInfoIcon: true, showInfoMessage: "Due to a large number of configured periods, there is a limit to the number of periods that can be selected at one time." }
 						       ]
 						   },
 				           {
@@ -2935,12 +3052,12 @@
     }
     ResPlanAnalyzer.prototype.GridsOnRenderFinish = function (grid) {
         if (grid.id == "g_1") {
-            this.flashGridView("g_1", false);
+            //this.flashGridView("g_1", false);
         }
 
         if (grid.id == "bottomg_1") {
             this.TotGrid = grid;
-            this.flashGridView("bottomg_1", false);
+            //this.flashGridView("bottomg_1", false);
             if (this.refreshIconsInTotGrid != null)
                 window.setTimeout(HandleRerenderDelegate, 400);
         }
@@ -2948,7 +3065,6 @@
 
 
     ResPlanAnalyzer.prototype.HandleRerender = function () {
-
         if (this.refreshIconsInTotGrid != null) {
             for (var i = 0; i < this.refreshIconsInTotGrid.length; i++) {
                 this.TotGrid.RefreshCell(this.refreshIconsInTotGrid[i], "IconFlag");
@@ -3450,7 +3566,6 @@
             if (grid.id == "bottomg_1") {
                 WorkEnginePPM.ResPlanAnalyzer.ExecuteJSON("GetTotalsGridChartData", "", GetTotalsGridChartDataCompleteDelegate);
 
-
                 if (this.bottomgridfirstready == false) {
                     this.HideWorkingPopup("divLoading");
                     bottomgridfirstready = true;
@@ -3461,16 +3576,15 @@
             }
 
             if (this.doTopApply == false && this.doBottomApply == false && this.stashgridsettings != null && (grid.id == "g_1" || grid.id == "bottomg_1")) {
-
-                this.ApplyGridView(grid.id, this.stashgridsettings.View, false);
+                this.ApplyGridView(grid.id, this.stashgridsettings.View, false, false, false);
             }
             else if (this.bottomgriddragstash != null && grid.id == "bottomg_1") {
-                this.ApplyGridView(grid.id, this.bottomgriddragstash.View, false);
+                this.ApplyGridView(grid.id, this.bottomgriddragstash.View, false, false, false);
                 this.bottomgriddragstash = null;
                 return;
             }
             else if (this.topgridstash != null && grid.id == "g_1") {
-                this.ApplyGridView(grid.id, this.topgridstash.View, false);
+                this.ApplyGridView(grid.id, this.topgridstash.View, false, false, true);
                 this.topgridstash = null;
                 return;
             }
@@ -3530,7 +3644,7 @@
                 }
 
                 if (this.selectedView != null && this.doTopApply == true)
-                    this.ApplyGridView(grid.id, this.selectedView, true);
+                    this.ApplyGridView(grid.id, this.selectedView, false, false, true);
 
 
 
@@ -3554,7 +3668,7 @@
             if (grid.id == "bottomg_1") {
 
                 if (this.selectedView != null && this.doBottomApply == true)
-                    this.ApplyGridView(grid.id, this.selectedView, false);
+                    this.ApplyGridView(grid.id, this.selectedView, false, false, false);
 
                 this.doBottomApply = false;
 
@@ -3573,8 +3687,6 @@
 
                 if (this.loadedDataCount == "0") {
                     alert("The Items or Resources you selected to Analyze do not have any associated plans with them - hence the grids are displaying no data");
-
-
                 }
 
             }
@@ -4697,7 +4809,6 @@
 
     ResPlanAnalyzer.prototype.GetTotalsGridChartDataComplete = function (jsonString) {
         try {
-
             if (jsonString != "") {
                 var jsonObject = JSON_ConvertString(jsonString);
                 if (JSON_ValidateServerResult(jsonObject)) {
@@ -5688,9 +5799,9 @@
                     this.flashRibbonSelect('idAnalyzerTab_FromPeriod');
                     this.flashRibbonSelect('idAnalyzerTab_ToPeriod');
                     if (Grids["g_1"])
-                        this.flashGridView("g_1", false);
+                        this.flashGridView("g_1", false, false, true);
                     if (Grids["bottomg_1"])
-                        this.flashGridView("bottomg_1", false);
+                        this.flashGridView("bottomg_1", false, false, false);
                 }
             } catch (e) {
             }
@@ -5882,13 +5993,48 @@
                     break;
 
                 case "AnalyzerTab_FromPeriod_Changed":
+                    maxPeriodLimitExceedsConfirm = undefined;
+                    var from = document.getElementById("idAnalyzerTab_FromPeriod");
+                    var to = document.getElementById("idAnalyzerTab_ToPeriod");
+
                     var fp = this.ribbonGetSelectValue("idAnalyzerTab_FromPeriod");
                     var tp = this.ribbonGetSelectValue("idAnalyzerTab_ToPeriod");
+
+                    var spi = parseInt(from.selectedIndex);
+
+                    if (from.options[0].value == -1 && from.options[0].text == "Current") {
+                        spi = spi - 1;
+                    }
+
+                    var fpi = parseInt(to.selectedIndex);
+
+                    if (fp == -1) {
+                        fp = this.UsingPeriods.CurrentPeriod.Value;
+                    }
 
                     if (tp < fp) {
                         alert("The From period cannot be after the To Period");
                         this.ribbonSetSelectValue("idAnalyzerTab_FromPeriod", this.PerStart);
                         return;
+                    } else {
+                        if (spi < 0) {
+                            for (var i = 0; i < from.options.length; i++) {
+                                if (parseInt(from.options[i].value) == fp) {
+                                    spi = from.options[i].index - 1;
+                                    break;
+                                }
+                            }
+                        }
+                        if (fpi - spi >= parseInt(this.params.MaxPeriodLimit)) {
+                            var setFPIndex = spi + parseInt(this.params.MaxPeriodLimit);
+                            if (setFPIndex > to.options.length) {
+                                fp = to.options[to.options.length - 1].value;
+                                to.options.selectedIndex = to.options.length - 1;
+                            } else {
+                                fp = to.options[setFPIndex - 1].value;
+                                to.options.selectedIndex = setFPIndex - 1;
+                            }
+                        }
                     }
 
                     if (fp == -1) {
@@ -5899,14 +6045,15 @@
                             this.PerEnd = tp;
 
                             document.getElementById("idAnalyzerTab_ToPeriod").selectedIndex = tp - 1;
-                            this.flashRibbonSelect('idAnalyzerTab_ToPeriod');
                         }
                     }
 
+                    this.flashRibbonSelect('idAnalyzerTab_ToPeriod');
+
                     this.PerStart = fp;
 
-                    this.flashGridView("g_1", true);
-                    this.flashGridView("bottomg_1", true);
+                    this.flashGridView("g_1", true, true, false);
+                    this.flashGridView("bottomg_1", true, true, false);
 
                     if (this.showingGraph == true)
                         this.createChart();
@@ -6042,11 +6189,20 @@
                     break;
 
                 case "AnalyzerTab_ToPeriod_Changed":
-
+                    maxPeriodLimitExceedsConfirm = undefined;
+                    var from = document.getElementById("idAnalyzerTab_FromPeriod");
+                    var to = document.getElementById("idAnalyzerTab_ToPeriod");
 
                     var fp = this.ribbonGetSelectValue("idAnalyzerTab_FromPeriod");
                     var tp = this.ribbonGetSelectValue("idAnalyzerTab_ToPeriod");
 
+                    var spi = parseInt(from.selectedIndex);
+
+                    if (from.options[0].value == -1 && from.options[0].text == "Current") {
+                        spi = spi - 1;
+                    }
+
+                    var fpi = parseInt(to.selectedIndex);
 
                     if (fp == -1) {
                         fp = this.UsingPeriods.CurrentPeriod.Value;
@@ -6057,11 +6213,32 @@
                         this.ribbonSetSelectValue("idAnalyzerTab_ToPeriod", this.PerEnd);
                         return;
                     }
+                    else {
+                        if (spi < 0) {
+                            for (var i = 0; i < from.options.length; i++) {
+                                if (parseInt(from.options[i].value) == fp) {
+                                    spi = from.options[i].index - 1;
+                                    break;
+                                }
+                            }
+                        }
+                        if (fpi - spi >= parseInt(this.params.MaxPeriodLimit)) {
+                            var setSPIndex = fpi - parseInt(this.params.MaxPeriodLimit);
+                            if (setSPIndex < 0) {
+                                sp = to.options[0].value;
+                                from.options.selectedIndex = 1;
+                            } else {
+                                sp = to.options[setSPIndex + 1].value;
+                                from.options.selectedIndex = setSPIndex + 2;
+                            }
+                        }
+                    }
 
+                    this.flashRibbonSelect('idAnalyzerTab_FromPeriod');
                     this.PerEnd = tp;
 
-                    this.flashGridView("g_1", true);
-                    this.flashGridView("bottomg_1", true);
+                    this.flashGridView("g_1", true, true, false);
+                    this.flashGridView("bottomg_1", true, true, false);
 
                     if (this.showingGraph == true)
                         this.createChart();
@@ -6252,8 +6429,8 @@
 
 
                 case "AnalyzerTab_SelView_Changed":
+                    maxPeriodLimitExceedsConfirm = undefined;
                     this.SetViewChanged(null);
-
                     break;
 
 
@@ -8256,7 +8433,10 @@
 
 
         this.InitVars();
-
+        var rESAnalyzerInstance = this;
+        this.maxPeriodLimitExceeds = false;
+        this.extracolumninbottomgrid = false;
+        var maxPeriodLimitExceedsConfirm = undefined;
         this.layout = null;
         this.layout_totals = null;
         this.analyzerTab = null;

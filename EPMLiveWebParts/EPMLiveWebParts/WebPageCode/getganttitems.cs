@@ -157,6 +157,9 @@ namespace EPMLiveWebParts
                         attr = doc.CreateAttribute("Format");
                         attr.Value = sFormat;
                         ndNew.Attributes.Append(attr);
+                        attr = doc.CreateAttribute("EditFormat");
+                        attr.Value = sFormat;
+                        ndNew.Attributes.Append(attr);
                     }
 
                     if (oField.InternalName == "Edit")
@@ -288,9 +291,12 @@ namespace EPMLiveWebParts
                                 attr.Value = "";
                                 ndNew.Attributes.Append(attr);
 
-                                //attr = doc.CreateAttribute("Range");
-                                //attr.Value = "1";
-                                //ndNew.Attributes.Append(attr);
+                                if (oField.TypeAsString.Equals("LookupMulti", StringComparison.InvariantCultureIgnoreCase))
+                                {
+                                    attr = doc.CreateAttribute("Range");
+                                    attr.Value = "1";
+                                    ndNew.Attributes.Append(attr);
+                                }
 
                                 hshLookupEnums.Add(oField.InternalName, new ArrayList());
                                 hshLookupEnumKeys.Add(oField.InternalName, new ArrayList());
@@ -884,7 +890,7 @@ namespace EPMLiveWebParts
                         case "Number":
                             if (oDoc.FirstChild.Attributes["Percentage"] != null && oDoc.FirstChild.Attributes["Percentage"].Value.ToLower() == "true")
                             {
-                                format = "0\\%;0\\%;0\\%";
+                                format = "0\\%;-##%";
                             }
                             else
                             {

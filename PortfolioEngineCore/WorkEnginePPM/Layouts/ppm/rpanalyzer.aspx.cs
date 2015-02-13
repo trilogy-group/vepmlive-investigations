@@ -53,8 +53,8 @@ namespace WorkEnginePPM
 
             sProjectName = HelperFunctions.getProjectNameFromUID(Request["itemid"]);
             int i;
-            int irpemode; 
-            
+            int irpemode;
+
             if (int.TryParse(Request["rpemode"], out irpemode) == false)
                 irpemode = 0;
 
@@ -68,12 +68,12 @@ namespace WorkEnginePPM
 
                 ctl.TicketVal = Request["dataid"];
                 ctl.RPEMode = irpemode;
-
+                ctl.MaxPeriodLimit = GetMaxPeriodLimit();
                 PlaceHolder1.Controls.Add(ctl);
             }
             else
             {
-                
+
 
                 SPList list = Web.Lists[new Guid(Request["listid"])];
 
@@ -81,12 +81,12 @@ namespace WorkEnginePPM
                 {
 
                     if (int.TryParse(Request["view"], out i))
-                            strOutput = HelperFunctions.outputEPKControl(Request["epkurl"], "WE_ResCenter.RPAnalyzer",
-                                                                     "<Params Ticket=\\\"" + Request["dataid"] +
-                                                                     "\\\" rpemode=\\\"" + irpemode.ToString() + "\\" +
-                                                                     "\\\" ViewID=\\\"" + Request["view"] + "\\\"/>",
-                                                                     "true",
-                                                                     Page);
+                        strOutput = HelperFunctions.outputEPKControl(Request["epkurl"], "WE_ResCenter.RPAnalyzer",
+                                                                 "<Params Ticket=\\\"" + Request["dataid"] +
+                                                                 "\\\" rpemode=\\\"" + irpemode.ToString() + "\\" +
+                                                                 "\\\" ViewID=\\\"" + Request["view"] + "\\\"/>",
+                                                                 "true",
+                                                                 Page);
                     else
                         strOutput = HelperFunctions.outputEPKControl(Request["epkurl"], "WE_ResCenter.RPAnalyzer",
                                                                      "<Params Ticket=\\\"" + Request["dataid"] +
@@ -104,10 +104,44 @@ namespace WorkEnginePPM
 
                     ctl.TicketVal = Request["dataid"];
                     ctl.RPEMode = irpemode;
-
+                    ctl.MaxPeriodLimit = GetMaxPeriodLimit();
                     PlaceHolder1.Controls.Add(ctl);
                 }
             }
+        }
+
+        protected Int32 GetMaxPeriodLimit()
+        {
+            Int32 maxPeriodLimit = 120;
+            SPSecurity.RunWithElevatedPrivileges(delegate()
+            {
+                using (SPSite site = new SPSite(Web.Site.ID))
+                {
+                    using (SPWeb web = site.RootWeb)
+                    {
+                        try
+                        {
+                            if (web.Properties["pfemaxperiodlimit"] != null)
+                            {
+                                Int32 mpl;
+                                if (Int32.TryParse(Convert.ToString(web.Properties["pfemaxperiodlimit"]), out mpl))
+                                    maxPeriodLimit = mpl;
+                            }
+                            else
+                            {
+                                web.AllowUnsafeUpdates = true;
+                                EPMLiveCore.CoreFunctions.setConfigSetting(web, "pfemaxperiodlimit", "120");
+                                web.AllowUnsafeUpdates = false;
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            web.AllowUnsafeUpdates = false;
+                        }
+                    }
+                }
+            });
+            return maxPeriodLimit;
         }
     }
 }

@@ -86,8 +86,7 @@ namespace EPMLiveReportsAdmin.Properties {
         ///      @UserId AS INT,
         ///      @SiteId AS UNIQUEIDENTIFIER
         ///AS
-        ///BEGIN
-        /// [rest of string was truncated]&quot;;.
+        ///BEGIN        /// [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string CheckReqSP {
             get {
@@ -103,11 +102,11 @@ namespace EPMLiveReportsAdmin.Properties {
         ///	CREATE TABLE [dbo].[ReportListIds] ( Id uniqueidentifier )
         ///END
         ///
-        ///---------------TABLE: RPTWeb----------------------
-        ///IF NOT EXISTS (SELECT TABLE_NAME FROM INFORMATION_SCHEMA.tables WHERE TABLE_NAME = &apos;RPTWeb&apos;)
+        ///IF NOT EXISTS (SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = &apos;ReportListIds&apos; AND COLUMN_NAME = &apos;ListIcon&apos;)
         ///BEGIN
-        ///	PRINT &apos;Creating Table RPTWeb&apos;
-        ///	CREATE TABLE [dbo].[RPTWeb] ([SiteId] uniqueidentifi [rest of string was truncated]&quot;;.
+        ///	PRINT &apos;Add Column ListIcon&apos;
+        ///	ALTER TABLE [dbo].[ReportListIds]
+        ///	ADD [ListIcon] [NVARCHAR](100) N [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string CheckSchema {
             get {
@@ -157,6 +156,24 @@ namespace EPMLiveReportsAdmin.Properties {
         internal static string FieldAddedEvent {
             get {
                 return ResourceManager.GetString("FieldAddedEvent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to EPMLiveReportsAdmin.ListFieldAdding.
+        /// </summary>
+        internal static string FieldAddingEvent {
+            get {
+                return ResourceManager.GetString("FieldAddingEvent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to EPMLiveReportsAdmin.ListFieldUpdated.
+        /// </summary>
+        internal static string FieldUpdatedEvent {
+            get {
+                return ResourceManager.GetString("FieldUpdatedEvent", resourceCulture);
             }
         }
         
@@ -290,23 +307,13 @@ namespace EPMLiveReportsAdmin.Properties {
         /// <summary>
         ///   Looks up a localized string similar to CREATE PROCEDURE spUpdateStatusFields
         ///
-        ///@listname varchar(255),
+        ///@listtable varchar(255),
         ///@yellow int = 0,
         ///@red int = 30
         ///
         ///AS
         ///BEGIN
         ///
-        ///declare @listtable as varchar(260)
-        ///
-        ///if @listname = &apos;Resources&apos;
-        ///begin
-        ///      set @listtable = &apos;LstResourcepool&apos;
-        ///end
-        ///else
-        ///begin
-        ///      set @listtable = &apos;LST&apos; + @listname
-        ///end
         ///
         ///declare @cols as bit
         ///set @cols = 1
@@ -314,7 +321,9 @@ namespace EPMLiveReportsAdmin.Properties {
         ///
         ///if exists (select column_name FROM INFORMATION_SCHEMA.COLUMNS where table_name = @listtable and column_name = &apos;DueDate&apos;)
         ///begin
-        ///      ------------ [rest of string was truncated]&quot;;.
+        ///      ----------------------Days Overdue------------
+        ///      if exists (select column_name FROM INFORMATION_SCHEMA.COLUMNS where table_name = @listtable and column_name = &apos;DaysOverdue&apos;)
+        ///      begin [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string spUpdateStatusFields {
             get {

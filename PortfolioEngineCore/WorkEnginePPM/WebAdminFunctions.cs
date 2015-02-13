@@ -65,12 +65,15 @@ namespace WorkEnginePPM
             string sConnection = "";
             if (basePath.Length > 0)
             {
-                RegistryKey rk = Registry.LocalMachine.OpenSubKey(BuildSiteRegistryKey(basePath));
-                if (rk != null)
-                {
-                    sConnection = rk.GetValue("ConnectionString", "").ToString();
-                    rk.Close();
-                }
+                //EPML-4761
+                sConnection = PortfolioEngineCore.Utilities.GetConnectionString(basePath);
+                //RegistryKey rk = PortfolioEngineCore.Utilities.GetRegistryKey(basePath);
+                //if (rk != null)
+                //{
+                //    var value = rk.GetValue("ConnectionString");
+                //    sConnection = (value != null ? value.ToString() : string.Empty);
+                //    rk.Close();
+                //}
             }
             return sConnection;
         }

@@ -2,10 +2,15 @@
 using System.Data;
 using System.Data.SqlClient;
 
+using Microsoft.Win32;
+using System.Diagnostics;
+
 namespace PortfolioEngineCore
 {
     public static class Utilities
     {
+        private const string PASS_PHRASE = "MnjkafjhkAS&*^#@";
+
         #region Methods (6) 
 
         // Public Methods (6) 
@@ -122,6 +127,65 @@ namespace PortfolioEngineCore
 
         }
 
-        #endregion Methods 
+        //EPML-4761: Store PFE SQL ConnectionString encrypted
+        public static RegistryKey GetRegistryKey(string basepath)
+        {
+            RegistryKey key;
+
+            try
+            {
+                string registryKeyPath1 = @"Software\Wow6432Node\EPMLive\PortfolioEngine\" + basepath;
+                string registryKeyPath2 = @"Software\EPMLive\PortfolioEngine\" + basepath;
+
+                key = Registry.LocalMachine.OpenSubKey(registryKeyPath1, false);
+
+                if (key == null)
+                {
+                    key = Registry.LocalMachine.OpenSubKey(registryKeyPath2, false);
+                }
+            }
+            catch (Exception ex)
+            {
+                EventLog.WriteEntry("EPMLive Core: ", ex.Message, EventLogEntryType.Error);
+                key = null;
+            }
+            return key;
+        }
+
+        //Method would check if the connection string is encyrpted or not
+        //if encryted: decrypt it, else return as is
+        public static string GetConnectionString(string basepath)
+        {
+            string connectionString = string.Empty;
+
+            try
+            {
+                RegistryKey key = GetRegistryKey(basepath);
+
+                if (key != null)
+                {
+                    var encrypted = key.GetValue("encrypted");
+                    var value = key.GetValue("ConnectionString");
+                    connectionString = (value != null ? value.ToString() : string.Empty);
+
+                    //check to see if encrypted property exists, if it does means connection string is encrypted
+                    if (encrypted != null)
+                    {
+                        //decrypt the connection string
+                        connectionString = PortfolioEngineCore.PFEEncrypt.Decrypt(connectionString, PASS_PHRASE);
+                    }
+
+                }                
+            }
+            catch (Exception ex)
+            {
+                connectionString = string.Empty;
+                //TODO: Log error 
+            }
+            return connectionString;
+        }
+        //End EPML-4761
+
+        #endregion Methods
     }
 }

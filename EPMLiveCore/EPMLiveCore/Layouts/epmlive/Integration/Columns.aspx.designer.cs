@@ -166,6 +166,33 @@ namespace EPMLiveCore.Layouts.epmlive.Integration {
         protected global::System.Web.UI.WebControls.Panel pnlColumns;
         
         /// <summary>
+        /// InputFormSection1 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.UserControl InputFormSection1;
+        
+        /// <summary>
+        /// InputFormControl1 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.UserControl InputFormControl1;
+        
+        /// <summary>
+        /// chkCleanup control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.CheckBox chkCleanup;
+        
+        /// <summary>
         /// ButtonSection1 control.
         /// </summary>
         /// <remarks>

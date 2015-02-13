@@ -41,7 +41,7 @@ namespace EPMLiveWebParts
 
             bool bUsePopup = false;
             bool.TryParse(Request["popups"], out bUsePopup);
-            
+
 
             StringBuilder sb = new StringBuilder();
 
@@ -57,8 +57,8 @@ namespace EPMLiveWebParts
 
                 bool isFav = IsFav(list, li, web, gSettings);
 
-               
-                if(list.DoesUserHavePermissions(SPBasePermissions.ViewListItems))
+
+                if (list.DoesUserHavePermissions(SPBasePermissions.ViewListItems))
                 {
                     if (bUsePopup)
                         items.Add("View Item", getMenuItem(Request["grid"], "View Item", "/_layouts/images/blank.gif", "view", ""));
@@ -66,9 +66,9 @@ namespace EPMLiveWebParts
                         items.Add("View Item", getMenuItem(Request["grid"], "View Item", "/_layouts/images/blank.gif", "view", "1"));
                 }
 
-                if(list.DoesUserHavePermissions(SPBasePermissions.EditListItems))
+                if (list.DoesUserHavePermissions(SPBasePermissions.EditListItems))
                 {
-                    if(bUsePopup)
+                    if (bUsePopup)
                         items.Add("Edit Item", getMenuItem(Request["grid"], "Edit Item", "/_layouts/images/edititem.gif", "edit", ""));
                     else
                         items.Add("Edit Item", getMenuItem(Request["grid"], "Edit Item", "/_layouts/images/edititem.gif", "edit", "1"));
@@ -86,89 +86,89 @@ namespace EPMLiveWebParts
                 }
 
                 items.Add("SEP" + (counter++).ToString(), "");
-                
-                if(list.EnableVersioning)
-                    if(list.DoesUserHavePermissions(SPBasePermissions.ViewVersions))
+
+                if (list.EnableVersioning)
+                    if (list.DoesUserHavePermissions(SPBasePermissions.ViewVersions))
                         items.Add("View Versions", getMenuItem(Request["grid"], "View Versions", "/_layouts/images/versions.gif", "version", ""));
 
-                if(list.EnableModeration)
-                    if(list.DoesUserHavePermissions(SPBasePermissions.ApproveItems))
+                if (list.EnableModeration)
+                    if (list.DoesUserHavePermissions(SPBasePermissions.ApproveItems))
                         items.Add("Approve Item", getMenuItem(Request["grid"], "Approve Item", "/_layouts/images/apprj.gif", "approve", ""));
 
-                if(list.WorkflowAssociations.Count > 0)
+                if (list.WorkflowAssociations.Count > 0)
                     items.Add("Workflows", getMenuItem(Request["grid"], "Workflows", "/_layouts/images/workflows.gif", "workflows", "1"));
 
                 items.Add("SEP" + (counter++).ToString(), "");
 
-                if(list.DoesUserHavePermissions(SPBasePermissions.ManagePermissions))
+                if (list.DoesUserHavePermissions(SPBasePermissions.ManagePermissions))
                     items.Add("Permissions", getMenuItem(Request["grid"], "Permissions", "/_layouts/images/permissions16.png", "perms", "1"));
 
-                if(list.DoesUserHavePermissions(SPBasePermissions.DeleteListItems))
+                if (list.DoesUserHavePermissions(SPBasePermissions.DeleteListItems))
                     items.Add("Delete Item", getMenuItem(Request["grid"], "Delete Item", "/_layouts/images/delitem.gif", "delete", "99"));
 
                 items.Add("SEP" + (counter++).ToString(), "");
 
-                
+
 
                 Dictionary<string, EPMLiveCore.PlannerDefinition> pList = EPMLiveCore.CoreFunctions.GetPlannerList(web, null);
 
                 int bPlanner = 0;
 
-                foreach(KeyValuePair<string, EPMLiveCore.PlannerDefinition> de in pList)
+                foreach (KeyValuePair<string, EPMLiveCore.PlannerDefinition> de in pList)
                 {
                     string id = (string)de.Key;
                     EPMLiveCore.PlannerDefinition p = (EPMLiveCore.PlannerDefinition)de.Value;
 
-                    if(String.Equals(p.commandPrefix, li.ParentList.Title, StringComparison.InvariantCultureIgnoreCase))
+                    if (String.Equals(p.commandPrefix, li.ParentList.Title, StringComparison.InvariantCultureIgnoreCase))
                     {
                         bPlanner = 1;
                         break;
                     }
-                    if(String.Equals(p.command, li.ParentList.Title, StringComparison.InvariantCultureIgnoreCase))
+                    if (String.Equals(p.command, li.ParentList.Title, StringComparison.InvariantCultureIgnoreCase))
                     {
                         bPlanner = 2;
                         break;
                     }
                 }
 
-                if(bPlanner == 1)
+                if (bPlanner == 1)
                 {
                     items.Add("Edit Plan", getMenuItem(Request["grid"], "Edit Plan", "/_layouts/epmlive/images/planner16.png", "gotoplanner", "1"));
                 }
-                else if(bPlanner == 2)
+                else if (bPlanner == 2)
                 {
                     items.Add("Edit Plan", getMenuItem(Request["grid"], "Edit Plan", "/_layouts/epmlive/images/planner16.png", "GoToTaskPlanner", "1"));
                 }
 
-                if(li.DoesUserHavePermissions(SPBasePermissions.EditListItems))
+                if (li.DoesUserHavePermissions(SPBasePermissions.EditListItems))
                     items.Add("Comments", getMenuItem(Request["grid"], "Comments", "/_layouts/epmlive/images/comments16.gif", "comments", "5"));
-                
-                if(li.DoesUserHavePermissions(SPBasePermissions.EditListItems) && gSettings.BuildTeam)
+
+                if (li.DoesUserHavePermissions(SPBasePermissions.EditListItems) && gSettings.BuildTeam)
                     items.Add("BuildTeam", getMenuItem(Request["grid"], "Edit Team", "/_layouts/epmlive/images/buildteam16.gif", "buildteam", "6"));
 
                 bool gotoshown = false;
 
-                if(Request["rollups"] == "true")
+                if (Request["rollups"] == "true")
                 {
-                    if(li.Web.ID != SPContext.Current.Web.ID)
+                    if (li.Web.ID != SPContext.Current.Web.ID)
                     {
                         gotoshown = true;
                         items.Add("Go To Workspace", getMenuItem(Request["grid"], "Go To Workspace", "/_layouts/images/STSICON.gif", "workspace", "1"));
                     }
                 }
 
-                if(Request["requestlist"] == "true" && !gotoshown)
+                if (Request["requestlist"] == "true" && !gotoshown)
                 {
                     try
                     {
                         string tempurl = li["WorkspaceUrl"].ToString();
-                        if(tempurl != "")
+                        if (tempurl != "")
                             items.Add("Go To Workspace", getMenuItem(Request["grid"], "Go To Workspace", "/_layouts/images/STSICON.gif", "workspace", "1"));
                     }
                     catch { }
                 }
-                
-                if(Request["requestlist"] == "true")
+
+                if (Request["requestlist"] == "true")
                 {
                     string childitem = "";
                     string wsurl = "";
@@ -183,9 +183,9 @@ namespace EPMLiveWebParts
                     }
                     catch { }
 
-                    if((li.ModerationInformation == null || li.ModerationInformation.Status == SPModerationStatusType.Approved) 
-                        && web.ID == SPContext.Current.Web.ID 
-                        && childitem == "" 
+                    if ((li.ModerationInformation == null || li.ModerationInformation.Status == SPModerationStatusType.Approved)
+                        && web.ID == SPContext.Current.Web.ID
+                        && childitem == ""
                         && wsurl == ""
                         && li.DoesUserHavePermissions(web.CurrentUser, SPBasePermissions.EditListItems)
                         && web.DoesUserHavePermissions(web.CurrentUser.LoginName, SPBasePermissions.ManageSubwebs))
@@ -194,36 +194,36 @@ namespace EPMLiveWebParts
                     }
                 }
 
-                
 
-                if(web.Site.Features[new Guid("158c5682-d839-4248-b780-82b4710ee152")] != null)
+
+                if (web.Site.Features[new Guid("158c5682-d839-4248-b780-82b4710ee152")] != null)
                 {
                     SPWeb rweb = web.Site.RootWeb;
 
                     ArrayList arr = new ArrayList(EPMLiveCore.CoreFunctions.getConfigSetting(rweb, "EPKLists").ToLower().Split(','));
-                    if(arr.Contains(list.Title.ToLower()))
+                    if (arr.Contains(list.Title.ToLower()))
                     {
                         items.Add("SEP" + (counter++).ToString(), "");
 
                         string menus = EPMLiveCore.CoreFunctions.getConfigSetting(web.Site.RootWeb, "EPK" + list.Title.Replace(" ", "") + "_menus");
-                        if(menus == "")
+                        if (menus == "")
                             menus = EPMLiveCore.CoreFunctions.getConfigSetting(web.Site.RootWeb, "EPKMenus");
-                        
+
                         ArrayList arrButtons = new ArrayList(menus.Split('|'));
 
-                        if(arrButtons.Contains("details"))
+                        if (arrButtons.Contains("details"))
                         {
                             items.Add("PI Details", getMenuItem(Request["grid"], "PI Details", "/_layouts/images/edititem.gif", "epkcommand:Details", ""));
                         }
-                        if(arrButtons.Contains("costs"))
+                        if (arrButtons.Contains("costs"))
                         {
                             items.Add("Edit Costs", getMenuItem(Request["grid"], "Edit Costs", "/_layouts/epmlive/images/editcosts16.png", "epkcommand:Costs", "6"));
                         }
-                        if(arrButtons.Contains("workplan"))
+                        if (arrButtons.Contains("workplan"))
                         {
                             items.Add("Work Planner", getMenuItem(Request["grid"], "Work Planner", "/_layouts/epmlive/images/workitems.gif", "epkcommand:workplan", "6"));
                         }
-                        if(arrButtons.Contains("resplan"))
+                        if (arrButtons.Contains("resplan"))
                         {
                             items.Add("Edit Resource Plan", getMenuItem(Request["grid"], "Edit Resource Plan", "/_layouts/epmlive/images/resplan.gif", "epkcommand:rpeditor", "6"));
                         }
@@ -232,15 +232,15 @@ namespace EPMLiveWebParts
 
                 bool hassep = false;
 
-                foreach(KeyValuePair<string, string> de in items)
+                foreach (KeyValuePair<string, string> de in items)
                 {
-                    if(de.Key.ToString().IndexOf("SEP") == 0)
+                    if (de.Key.ToString().IndexOf("SEP") == 0)
                     {
                         hassep = true;
                     }
                     else
                     {
-                        if(hassep)
+                        if (hassep)
                         {
                             hassep = false;
                             sb.Append(@"<LI id=sep class=ms-MenuUIULItem type=""separator""><DIV class=ms-MenuUISeparator type=""separator"">&nbsp;</DIV></LI>");
@@ -250,7 +250,7 @@ namespace EPMLiveWebParts
                 }
 
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return "Error: " + ex.Message;
             }
@@ -284,14 +284,14 @@ namespace EPMLiveWebParts
 
             var qExec = new QueryExecutor(SPContext.Current.Web);
             var table = qExec.ExecuteEpmLiveQuery(queryCheckFavStatus_Item, qParams);
-           
+
             if (table != null)
             {
                 try
                 {
                     result = bool.Parse(table.Rows[0][0].ToString());
                 }
-                catch{}
+                catch { }
             }
 
             return result;
@@ -303,7 +303,7 @@ namespace EPMLiveWebParts
 
             Dictionary<string, EPMLiveCore.PlannerDefinition> pList = EPMLiveCore.CoreFunctions.GetPlannerList(web, li);
 
-            foreach(KeyValuePair<string, EPMLiveCore.PlannerDefinition> de in pList)
+            foreach (KeyValuePair<string, EPMLiveCore.PlannerDefinition> de in pList)
             {
                 string id = (string)de.Key;
                 EPMLiveCore.PlannerDefinition p = (EPMLiveCore.PlannerDefinition)de.Value;
@@ -339,13 +339,14 @@ namespace EPMLiveWebParts
                     cmd.Parameters.AddWithValue("@listid", Request["listid"]);
                     cmd.ExecuteNonQuery();
 
-                    cmd = new SqlCommand("INSERT INTO PERSONALIZATIONS (userid, [key], value,siteid,webid,listid) VALUES (@userid,@key,@value,@siteid,@webid,@listid)", cn);
+                    cmd = new SqlCommand("INSERT INTO PERSONALIZATIONS (userid, [key], value,siteid,webid,listid,ItemId) VALUES (@userid,@key,@value,@siteid,@webid,@listid,@ItemId)", cn);
                     cmd.Parameters.AddWithValue("@userid", web.CurrentUser.ID);
                     cmd.Parameters.AddWithValue("@key", "LIP");
                     cmd.Parameters.AddWithValue("@siteid", web.Site.ID);
                     cmd.Parameters.AddWithValue("@webid", web.ID);
                     cmd.Parameters.AddWithValue("@listid", Request["listid"]);
                     cmd.Parameters.AddWithValue("@value", Request["lookups"]);
+                    cmd.Parameters.AddWithValue("@ItemId", Request["lookupid"]);
                     cmd.ExecuteNonQuery();
 
                     cn.Close();
@@ -392,6 +393,29 @@ namespace EPMLiveWebParts
                             {
                                 SPList list = w.Lists[new Guid(Request["list"])];
                                 url = list.DefaultViewUrl + "?lookupfield=" + Request["field"] + "&LookupFieldList=" + Request["LookupFieldList"];
+                            }
+                            break;
+                        case "deleteitemattachment":
+                            w = SPContext.Current.Web;
+                            {
+                                try
+                                {
+                                    w.AllowUnsafeUpdates = true;
+                                    Guid listId = new Guid(Request["listid"]);
+                                    Int32 itemId = Convert.ToInt32(Request["itemid"]);
+                                    string fileName = Convert.ToString(Request["fname"]);
+
+                                    SPList list = w.Lists[listId];
+                                    SPListItem item = list.GetItemById(itemId);
+                                    SPAttachmentCollection allAttachments = item.Attachments;
+                                    if (allAttachments != null)
+                                    {
+                                        allAttachments.RecycleNow(fileName);
+                                    }
+
+                                    data = ((w.ServerRelativeUrl == "/") ? "" : w.ServerRelativeUrl) + "|" + listId + "|" + itemId + "|" + fileName;
+                                }
+                                catch { }
                             }
                             break;
                         case "linkeditems":
@@ -450,7 +474,7 @@ namespace EPMLiveWebParts
                             {
                                 string epkurl = EPMLiveCore.CoreFunctions.getConfigSetting(site.RootWeb, "EPKURL");
 
-                                if(epkurl != "")
+                                if (epkurl != "")
                                 {
                                     //EPKIntegration.Integration epkInt = new EPKIntegration.Integration();
                                     //epkInt.Url = epkurl + "/services/integration.asmx";
@@ -484,23 +508,23 @@ namespace EPMLiveWebParts
                                 SPList list = w.Lists[new Guid(Request["listid"])];
 
                                 string view = EPMLiveCore.CoreFunctions.getConfigSetting(site.RootWeb, "EPK" + list.Title.Replace(" ", "") + "_costview");
-                                if(view == "")
+                                if (view == "")
                                 {
                                     string[] sEPKCostViews = EPMLiveCore.CoreFunctions.getConfigSetting(site.RootWeb, "EPKCostViews").Split('|');
-                                    foreach(string sEPKView in sEPKCostViews)
+                                    foreach (string sEPKView in sEPKCostViews)
                                     {
                                         string[] sEPKViewMap = sEPKView.Split(',');
-                                        if(sEPKViewMap[0].ToLower() == Request["view"].ToLower())
+                                        if (sEPKViewMap[0].ToLower() == Request["view"].ToLower())
                                             view = sEPKViewMap[1];
                                     }
-                                    if(view == "")
+                                    if (view == "")
                                     {
                                         string sviewtitle = list.DefaultView.Title;
 
-                                        foreach(string sEPKView in sEPKCostViews)
+                                        foreach (string sEPKView in sEPKCostViews)
                                         {
                                             string[] sEPKViewMap = sEPKView.Split(',');
-                                            if(sEPKViewMap[0].ToLower() == sviewtitle.ToLower())
+                                            if (sEPKViewMap[0].ToLower() == sviewtitle.ToLower())
                                                 view = sEPKViewMap[1];
                                         }
                                     }
@@ -526,7 +550,7 @@ namespace EPMLiveWebParts
                         case "gototaskplanner":
                             w = GetWeb(site);
 
-                            if(String.IsNullOrEmpty(Request["listid"]))
+                            if (String.IsNullOrEmpty(Request["listid"]))
                             {
                                 url = ((w.ServerRelativeUrl == "/") ? "" : w.ServerRelativeUrl) + "/_layouts/epmlive/workplanner.aspx";
                             }
@@ -590,8 +614,8 @@ namespace EPMLiveWebParts
                                 url = li["WorkspaceUrl"].ToString().Split(',')[0]; ;
                             }
                             catch { }
-                            
-                            if(url == "")
+
+                            if (url == "")
                                 url = w.ServerRelativeUrl;
 
                             w.Close();
@@ -622,7 +646,7 @@ namespace EPMLiveWebParts
                             w = GetWeb(site);
                             {
                                 SPList list = w.Lists[new Guid(Request["listid"])];
-                                SPListItem li = list.GetItemById(int.Parse (Request["ID"]));
+                                SPListItem li = list.GetItemById(int.Parse(Request["ID"]));
                                 url = ((w.ServerRelativeUrl == "/") ? "" : w.ServerRelativeUrl) + "/_layouts/versions.aspx?List=" + Request["listid"] + "&ID=" + Request["ID"] + "&Filename=" + HttpUtility.UrlEncode(li.Url);
                             }
                             w.Close();
@@ -657,14 +681,14 @@ namespace EPMLiveWebParts
                         case "deletemulti":
 
                             string[] items = Request["Items"].Split(',');
-                            foreach(string item in items)
+                            foreach (string item in items)
                             {
-                                if(item != "")
+                                if (item != "")
                                 {
                                     try
                                     {
                                         string[] sItemInfo = item.Split('.');
-                                        using(SPWeb web = site.OpenWeb(new Guid(sItemInfo[0])))
+                                        using (SPWeb web = site.OpenWeb(new Guid(sItemInfo[0])))
                                         {
                                             web.AllowUnsafeUpdates = true;
                                             {
@@ -746,7 +770,7 @@ namespace EPMLiveWebParts
             {
                 data = "General Error: " + ex.Message;
             }
-            
+
 
             if (url != "")
             {
@@ -767,7 +791,7 @@ namespace EPMLiveWebParts
 
                 if (source != null && source != "")
                 {
-                    if(url.Contains("?"))
+                    if (url.Contains("?"))
                         url += "&source=" + source.Replace("#", "");
                     else
                         url += "?source=" + source.Replace("#", "");

@@ -31,7 +31,8 @@
 <script src="dhtml/xToolbar/dhtmlxtoolbar.js"></script>
 
 <script src="workplanner.js?v=<%= EPMLiveVersion %>"></script> 
-<%if(bAgile){ %>
+<%if (bAgile)
+  { %>
     <script src="WorkPlannerAgile.js" type="text/javascript"></script>
     <%} %>
 <script src="TreeGrid/GridE.js"> </script>
@@ -48,45 +49,48 @@
         margin: 0px;
         overflow: hidden;
     }
-    #s4-leftpanel
-    {
+
+    #s4-leftpanel {
         display: none !important;
     }
-    .s4-ca
-    {
-        margin-left:0px
+
+    .s4-ca {
+        margin-left: 0px;
     }
-    .GSTestRow
-    {
-        height:20px;
+
+    .GSTestRow {
+        height: 20px;
         background-color: #dfe3e8;
-        padding:2px;
+        padding: 2px;
         border-bottom: #b1b5ba 1px solid;
     }
-    
-    .newclassinput
-    {
-           padding: 2px 5px;
-            background-color: rgba(255, 255, 255, 0.85);
-            border: 1px solid #FFFFFF;
-            color: #9C9C9C;
-            font-family:"Segoe UI","Segoe",Tahoma,Helvetica,Arial,sans-serif;
-            font-size:13px;
-            vertical-align: middle;
-            outline: none;
+
+    .newclassinput {
+        padding: 2px 5px;
+        background-color: rgba(255, 255, 255, 0.85);
+        border: 1px solid #FFFFFF;
+        color: #9C9C9C;
+        font-family: "Segoe UI","Segoe",Tahoma,Helvetica,Arial,sans-serif;
+        font-size: 13px;
+        vertical-align: middle;
+        outline: none;
     }
-    
-    #mbox{background-color:#FFFFFF; padding:0px !important; border:2px solid #FFF;}
+
+    #mbox {
+        background-color: #FFFFFF;
+        padding: 0px !important;
+        border: 2px solid #FFF;
+    }
 
 
     #sideNavBox {
         display: none;
     }
-    
-    .ms-fullscreenmode #contentBox
-    {
+
+    .ms-fullscreenmode #contentBox {
         margin-left: 0;
     }
+
     .erroroncell {
         background-color: #EEBDBD !important;
     }
@@ -100,7 +104,7 @@
 
     #contentBox {
         margin-left: 10px !important;
-        margin-right: 10px !important; 
+        margin-right: 10px !important;
     }
 
     #contentRow {
@@ -147,16 +151,16 @@
         }
 
         function fireEvent(element, event) {
-        if (document.createEventObject) {
-        // dispatch for IE
-        var evt = document.createEventObject();
-        return element.fireEvent('on' + event, evt);
-        } else {
-        // dispatch for firefox + others
-        var evt = document.createEvent("HTMLEvents");
-        evt.initEvent(event, true, true); // event type,bubbling,cancelable
-        return !element.dispatchEvent(evt);
-        }
+            if (document.createEventObject) {
+                // dispatch for IE
+                var evt = document.createEventObject();
+                return element.fireEvent('on' + event, evt);
+            } else {
+                // dispatch for firefox + others
+                var evt = document.createEvent("HTMLEvents");
+                evt.initEvent(event, true, true); // event type,bubbling,cancelable
+                return !element.dispatchEvent(evt);
+            }
         }
 
         _spBodyOnLoadFunctionNames.push("doOpen");*/
@@ -415,7 +419,7 @@
     </div>
 
     <div id="detailDiv" style="width:100%;height:100%">
-        <div id="detailTree" style="width:100%;height:100%;">
+        <div id="detailTree" style="width:100%;height:100%;background-color:White">
             <!--<treegrid 
             Data_Url="BlankTable.xml"
             Layout_Url="../../_vti_bin/WorkPlanner.asmx" Layout_Method="Soap" Layout_Function="Execute" Layout_Namespace="workengine.com" Layout_Param_Functionname="GetDetailLayout" Layout_Param_Dataxml="<%=sPlannerLayoutParam %>"
@@ -427,7 +431,7 @@
         </div>
     </div>
 
-    <div id="assignmentsDiv" style="width:100%;height:100%;display:none;">
+    <div id="assignmentsDiv" style="width:100%;height:100%;display:none;background-color:White">
         <div id="assignmentsDivInner" style="width:100%;height:100%">
             <div style="width:100%;height:22px">
                 <div class="wetoolbar">
@@ -508,7 +512,7 @@
         </div>
     </div>
 
-    <div id="projectDiv" style="width:100%;height:100%">
+    <div id="projectDiv" style="width:100%;height:100%;background-color:White">
 
         <!--<treegrid 
         Data_Url="../../_vti_bin/WorkPlanner.asmx" Data_Method="Soap" Data_Function="Execute" Data_Namespace="workengine.com" Data_Param_Functionname="GetProjectInfo" Data_Param_Dataxml="<%=sPlannerDataParam %>"
@@ -529,7 +533,7 @@
     </div>
 
     <div id="addResourceDiv" style="display:none;width:200;padding:10px">
-        Select Resource:<br /><select class="ms-input" name="newresourceslct" id="newresourceslct" size="10" style="width:280px" multiple="multiple"></select><br /><br /><input type="button" value="OK" onclick="SP.UI.ModalDialog.commonModalDialogClose(SP.UI.DialogResult.OK, document.getElementById('newresourceslct')); return false;" class="ms-ButtonHeightWidth" style="width:100px" target="_self" /><input type="button" value="Cancel" onclick="SP.UI.ModalDialog.commonModalDialogClose(SP.UI.DialogResult.cancel, 'Cancel clicked'); return false;" class="ms-ButtonHeightWidth" style="width:100px" target="_self" />  
+        Select Resource:<br /><select class="ms-input" name="newresourceslct" id="newresourceslct" size="10" style="width:280px" multiple="multiple"></select><br /><br /><input type="button" value="OK" onclick="SP.UI.ModalDialog.commonModalDialogClose(SP.UI.DialogResult.OK, document.getElementById('newresourceslct')); return false;" class="ms-ButtonHeightWidth" style="width:100px" target="_self" /><input type="button" value="Cancel" onclick="    SP.UI.ModalDialog.commonModalDialogClose(SP.UI.DialogResult.cancel, 'Cancel clicked'); return false;" class="ms-ButtonHeightWidth" style="width:100px" target="_self" />  
     </div>
 
     <div id="saveTemplateDiv" style="display:none;width:200;padding:10px">
@@ -537,7 +541,7 @@
         Template Descripton: <br />
         <textarea cols="20" rows="3" id="txtTDescription" onkeydown="CancelBubbling(this, event);" onkeypress="CancelBubbling(this, event);"></textarea><br /><br />
         
-        <input type="button" value="OK" onclick="SP.UI.ModalDialog.commonModalDialogClose(SP.UI.DialogResult.OK, document.getElementById('txtTemplate').value + '`' + document.getElementById('txtTDescription').value); return false;" class="ms-ButtonHeightWidth" style="width:100px" target="_self" /> &nbsp;<input type="button" value="Cancel" onclick="SP.UI.ModalDialog.commonModalDialogClose(SP.UI.DialogResult.cancel, 'Cancel clicked'); return false;" class="ms-ButtonHeightWidth" style="width:100px" target="_self" />
+        <input type="button" value="OK" onclick="SP.UI.ModalDialog.commonModalDialogClose(SP.UI.DialogResult.OK, document.getElementById('txtTemplate').value + '`' + document.getElementById('txtTDescription').value); return false;" class="ms-ButtonHeightWidth" style="width:100px" target="_self" /> &nbsp;<input type="button" value="Cancel" onclick="    SP.UI.ModalDialog.commonModalDialogClose(SP.UI.DialogResult.cancel, 'Cancel clicked'); return false;" class="ms-ButtonHeightWidth" style="width:100px" target="_self" />
     </div>
 
     <div id="divExternalLinkAccept" style="display:none;width:580px;padding:10px">
@@ -598,218 +602,227 @@
 
     <script language="javascript">    
 
-    bAgile = <%=bAgile.ToString().ToLower() %>;
+        bAgile = <%=bAgile.ToString().ToLower() %>;
 
-    var parentDiv = document.getElementById("parentId");
+        var parentDiv = document.getElementById("parentId");
 
-    var dhxLayout;
+        var dhxLayout;
 
-    var detailLayout;
+        var detailLayout;
 
-    var dhxTabbar;
+        var dhxTabbar;
 
-    var bUseFolders = false;//<%=bUseFolders.ToString().ToLower() %>;
+        var bUseFolders = false;//<%=bUseFolders.ToString().ToLower() %>;
 
-    var sWebUrl = "<%=sWebUrl %>";
+        var sWebUrl = "<%=sWebUrl %>";
 
-    var viewObject = {
+        var viewObject = {
         <%=sViewObject %>
-    }; 
+        }; 
 
-    var oChoiceFields = {
+        var oChoiceFields = {
         <%=sChoiceFields %>
-    };
+        };
 
-    var oDefaults = {
+        var oDefaults = {
         <%=sDefaults %>
-    };
+        };
 
-    var oTaskUserFields = [<%=sTaskUserFields %>];
+        var oTaskUserFields = [<%=sTaskUserFields %>];
 
-    var oProjectUserFields = [<%=sProjectUserFields %>];
+        var oProjectUserFields = [<%=sProjectUserFields %>];
 
-    var oBaselineFields = {
+        var oBaselineFields = {
         <%=sBaselineFields %>
-    };
+        };
 
-    var oRollUp = {
+        var oRollUp = {
         <%=sRollUp %>
-    };
+        };
 
-    var oRollDown = {
+        var oRollDown = {
         <%=sRollDown %>
-    };
+        };
 
+        var oRequiredFields = [<%=sRequiredFields %>];
+        var oFieldDisplayNames = [<%=sFieldDisplayNames %>];
+    
+        var editor;
 
-    var editor;
+        var oAttachedLists = [<%=sAttachedLists %>];
+        var oAttachedDocLibs = [<%=sAttachedDocLibs %>];
 
-    var oAttachedLists = [<%=sAttachedLists %>];
-    var oAttachedDocLibs = [<%=sAttachedDocLibs %>];
+        var bSummaryRollup = <%=sSummaryRollup%>;
 
-    var bSummaryRollup = <%=sSummaryRollup%>;
+        var sSource = "<%=sSource %>";
 
-    var sSource = "<%=sSource %>";
+        var sPlannerID = "<%=sPlannerID%>";
+        var sItemID = <%=sItemID%>;
+        var sProjectName = "<%=sProjectName.Replace("\"","&quot;")%>";
 
-    var sPlannerID = "<%=sPlannerID%>";
-    var sItemID = <%=sItemID%>;
-    var sProjectName = "<%=sProjectName.Replace("\"","&quot;")%>";
+        var iDefaultTaskType = <%=iTaskType %>;
 
-    var iDefaultTaskType = <%=iTaskType %>;
+        var curTree = 0;
+        var tdPctFull;
+        var tdPctEmpty;
 
-    var curTree = 0;
-    var tdPctFull;
-    var tdPctEmpty;
+        var sUpdates = "";
 
-    var sUpdates = "";
+        var EPKCost = <%=EPKCost %>;
+        var EPKResPlan = <%=EPKResPlan %>;
 
-    var EPKCost = <%=EPKCost %>;
-    var EPKResPlan = <%=EPKResPlan %>;
+        var sWebId = "<%=sWebId %>";
+        var sProjectListId = "<%=sProjectListId %>";
+        var sTaskListId = "<%=sTaskListId %>";
 
-    var sWebId = "<%=sWebId %>";
-    var sProjectListId = "<%=sProjectListId %>";
-    var sTaskListId = "<%=sTaskListId %>";
+        var oShowAssignments = false;
 
-    var oShowAssignments = false;
-
-    var oldVal;
+        var oldVal;
      
-    var oldWork;
+        var oldWork;
 
-    var bNewRowHasChanged = false;
-    var bNewRowEnter = false;
+        var bNewRowHasChanged = false;
+        var bNewRowEnter = false;
 
-    var sBaselineDate = "<%=sBaselineDate %>";
+        var sBaselineDate = "<%=sBaselineDate %>";
 
-    var MouseDownGrid = "";
+        var MouseDownGrid = "";
 
-    var bLoading = true;
-    var bRendering = true;
+        var bLoading = true;
+        var bRendering = true;
 
-    var CanLinkExternal = <%=CanLinkExternal %>;
+        var CanLinkExternal = <%=CanLinkExternal %>;
 
     oLinkedTasks = [ <%=sLinkedTasks %>];
 
-    bCalcCost = <%=bCalcCost.ToString().ToLower() %>;
-    bCalcWork = <%=bCalcWork.ToString().ToLower() %>;
+        bCalcCost = <%=bCalcCost.ToString().ToLower() %>;
+        bCalcWork = <%=bCalcWork.ToString().ToLower() %>;
 
-    oResourceList = { <%=sResourceList %> };
+        oResourceList = { <%=sResourceList %> };
 
-    iWorkHours = <%=iWorkHours.ToString() %>
+        iWorkHours = <%=iWorkHours.ToString() %>
     
-    try
-    {
-        document.getElementById('expandIcon').parentNode.style.display = 'none';
-    }catch(e){}
-    function doOnLoad() {    
-        //========================
-        folderCell = "a";
-        plannerCell = "b";
-        allocCell = "c";
+        try
+        {
+            document.getElementById('expandIcon').parentNode.style.display = 'none';
+        }catch(e){}
+        function doOnLoad() {    
+            //========================
+            folderCell = "a";
+            plannerCell = "b";
+            allocCell = "c";
 
-        <% if(bAgile){%>
-        dhxLayout = new dhtmlXLayoutObject("parentId", "5H", "dhx_blue"); 
-        agileCell = "d";
-        detailsCell = "e";
-        <%}else{%>
+        <% if (bAgile)
+           {%>
+            dhxLayout = new dhtmlXLayoutObject("parentId", "5H", "dhx_blue"); 
+            agileCell = "d";
+            detailsCell = "e";
+        <%}
+           else
+           {%>
         
-        dhxLayout = new dhtmlXLayoutObject("parentId", "4H", "dhx_blue"); 
-        agileCell = "";
-        detailsCell = "d";
+            dhxLayout = new dhtmlXLayoutObject("parentId", "4H", "dhx_blue"); 
+            agileCell = "";
+            detailsCell = "d";
 
-        //dhxLayout = new dhtmlXLayoutObject("parentId", "3W", "dhx_blue"); 
-        //detailsCell = "c";
+            //dhxLayout = new dhtmlXLayoutObject("parentId", "3W", "dhx_blue"); 
+            //detailsCell = "c";
         <%} %>
 
-        dhxLayout.cells(folderCell).attachObject("folderDiv");
-        dhxLayout.cells(folderCell).setText("Folders");
-        dhxLayout.cells(folderCell).setWidth(250);
+            dhxLayout.cells(folderCell).attachObject("folderDiv");
+            dhxLayout.cells(folderCell).setText("Folders");
+            dhxLayout.cells(folderCell).setWidth(250);
 
-        dhxLayout.cells(plannerCell).setText("");
-        dhxLayout.cells(plannerCell).attachObject("workplannerDiv");
-        dhxLayout.cells(plannerCell).hideHeader();
+            dhxLayout.cells(plannerCell).setText("");
+            dhxLayout.cells(plannerCell).attachObject("workplannerDiv");
+            dhxLayout.cells(plannerCell).hideHeader();
 
-        dhxLayout.cells(detailsCell).setText("Details");
-        dhxLayout.cells(detailsCell).attachObject("detailDivMain");
-        dhxLayout.cells(detailsCell).setWidth(300);
-        dhxLayout.cells(detailsCell).fixSize(true, false);
+            dhxLayout.cells(detailsCell).setText("Details");
+            dhxLayout.cells(detailsCell).attachObject("detailDivMain");
+            dhxLayout.cells(detailsCell).setWidth(300);
+            dhxLayout.cells(detailsCell).fixSize(true, false);
 
-        <% if(bAgile){%>
+        <% if (bAgile)
+           {%>
             dhxLayout.cells(agileCell).attachObject("agileDiv");
             dhxLayout.cells(agileCell).setText("Backlog");
             
         <%} %>
             
-        dhxLayout.cells(allocCell).attachObject("allocDiv");
-        dhxLayout.cells(allocCell).setText("Resource Allocation");
+            dhxLayout.cells(allocCell).attachObject("allocDiv");
+            dhxLayout.cells(allocCell).setText("Resource Allocation");
         
 
-        <%if(!bUseFolders){ %>
+        <%if (!bUseFolders)
+          { %>
             //dhxLayout.cells("a").collapse();
             var cell = dhxLayout.cells(folderCell);
             cell.collapse();
             cell.style.display = "none";
-        <%}else{ %>
+            <%}
+          else
+          { %>
             
         <%} %>
-        dhxTabbar = new dhtmlXTabBar("detailDivTab", "top");
+            dhxTabbar = new dhtmlXTabBar("detailDivTab", "top");
 
-        dhxTabbar.setImagePath("dhtml/xtab/imgs/");
-        dhxTabbar.setSkin("dhx_skyblue");
+            dhxTabbar.setImagePath("dhtml/xtab/imgs/");
+            dhxTabbar.setSkin("dhx_skyblue");
 
-        dhxTabbar.addTab("t1", "<img src='/_layouts/epmlive/images/details16.gif' alt='Details'/>", "30px");
-        dhxTabbar.setContent("t1", "detailDiv");
+            dhxTabbar.addTab("t1", "<img src='/_layouts/epmlive/images/details16.gif' alt='Details'/>", "30px");
+            dhxTabbar.setContent("t1", "detailDiv");
 
-	    document.getElementById("assignmentsDiv").style.display="";
+            document.getElementById("assignmentsDiv").style.display="";
 
-        dhxTabbar.addTab("t2", "<img src='/_layouts/epmlive/images/showassignments.gif' alt='Assignments'/>", "30px");
-        dhxTabbar.setContent("t2", "assignmentsDiv");
+            dhxTabbar.addTab("t2", "<img src='/_layouts/epmlive/images/showassignments.gif' alt='Assignments'/>", "30px");
+            dhxTabbar.setContent("t2", "assignmentsDiv");
 
-	    document.getElementById("linksDiv").style.display="";
+            document.getElementById("linksDiv").style.display="";
 
-        dhxTabbar.addTab("t3", "<img src='/_layouts/epmlive/images/link.gif' alt='Task Successors'/>", "30px");
-        dhxTabbar.setContent("t3", "linksDiv");
+            dhxTabbar.addTab("t3", "<img src='/_layouts/epmlive/images/link.gif' alt='Task Successors'/>", "30px");
+            dhxTabbar.setContent("t3", "linksDiv");
 
-	    document.getElementById("notesDiv").style.display="";
+            document.getElementById("notesDiv").style.display="";
 
-        dhxTabbar.addTab("t5", "<img src='/_layouts/epmlive/images/notes16.png' alt='Task Notes'/>", "30px");
-        dhxTabbar.setContent("t5", "notesDiv");
+            dhxTabbar.addTab("t5", "<img src='/_layouts/epmlive/images/notes16.png' alt='Task Notes'/>", "30px");
+            dhxTabbar.setContent("t5", "notesDiv");
 
-        dhxTabbar.addTab("t4", "<img src='/_layouts/images/ENTITYPICKER.png' alt='Project Information'/>", "30px");
-        dhxTabbar.setContent("t4", "projectDiv");
+            dhxTabbar.addTab("t4", "<img src='/_layouts/images/ENTITYPICKER.png' alt='Project Information'/>", "30px");
+            dhxTabbar.setContent("t4", "projectDiv");
 
-        dhxTabbar.setTabActive("t4");
+            dhxTabbar.setTabActive("t4");
     
-        setHeight();
+            setHeight();
 
-        try{
-            document.getElementById("agileDiv").style.display="";
+            try{
+                document.getElementById("agileDiv").style.display="";
             
-        }catch(e){}
+            }catch(e){}
 
-        //if(!bAgile)
-        //    document.getElementById("allocDiv").style.display="";
+            //if(!bAgile)
+            //    document.getElementById("allocDiv").style.display="";
 
-        sm("dlgSplash", 450, 300);
+            sm("dlgSplash", 450, 300);
         
-        bLoading = false;
+            bLoading = false;
 
-        document.getElementById("divExternalLinkAccept").style.display="";
+            document.getElementById("divExternalLinkAccept").style.display="";
 
-        if(iDefaultTaskType == 0)
-        {
-            document.getElementById("slcttasktype").selectedIndex = "0";
+            if(iDefaultTaskType == 0)
+            {
+                document.getElementById("slcttasktype").selectedIndex = "0";
+            }
+            else
+            {
+                document.getElementById("slcttasktype").selectedIndex = "1";
+            }
+        
+
+            setTimeout("CreateTrees()", 100);
+        
+
+        
         }
-        else
-        {
-            document.getElementById("slcttasktype").selectedIndex = "1";
-        }
-        
-
-        setTimeout("CreateTrees()", 100);
-        
-
-        
-    }
         ExecuteOrDelayUntilScriptLoaded(UnpinNav, 'EPMLive.Navigation.js');
         function UnpinNav()
         {
@@ -817,9 +830,9 @@
 
         }
 
-    function CreateTrees()
-    {
-        TreeGrid( { Data:{ Url:"../../_vti_bin/WorkPlanner.asmx", Method:"Soap",Function:"Execute",Namespace:"workengine.com",Param:{Functionname:"GetAllocationLayout",Dataxml:"<%=sPlannerDataParam %>" } }, SuppressMessage:2, Debug:""}, "allocDiv" ); 
+        function CreateTrees()
+        {
+            TreeGrid( { Data:{ Url:"../../_vti_bin/WorkPlanner.asmx", Method:"Soap",Function:"Execute",Namespace:"workengine.com",Param:{Functionname:"GetAllocationLayout",Dataxml:"<%=sPlannerDataParam %>" } }, SuppressMessage:2, Debug:""}, "allocDiv" ); 
         
         CreateBasicTree("GetAddLinksLayout","addLinkTableDivTree");
         CreateBasicTree("GetDetailLayout","detailTree");
@@ -831,11 +844,11 @@
 
 
         TreeGrid(   { 
-                    Layout:{ Url:"../../_vti_bin/WorkPlanner.asmx", Method:"Soap",Function:"Execute",Namespace:"workengine.com",Param:{Functionname:"GetLayout",Dataxml:"<%=sPlannerLayoutParam %>" } } ,
-                    Upload:{ Url:"SaveWorkPlanner.aspx", Type:"Body",Format:"Internal",Data:"TGData",Flags:"Accepted,AllCols,NoIO,Defaults",Param:{Dataxml:"<%=sPlannerDataParam %>"} } ,
-                    Data:{ Url:"../../_vti_bin/WorkPlanner.asmx", Method:"Soap",Function:"Execute",Namespace:"workengine.com",Param:{Functionname:"GetTasks",Dataxml:"<%=sPlannerDataParam %>" } }, 
-                    Debug:"Error",Export:{Url:"PlannerExcelExport.aspx"}, SuppressMessage:1
-                    }, 
+            Layout:{ Url:"../../_vti_bin/WorkPlanner.asmx", Method:"Soap",Function:"Execute",Namespace:"workengine.com",Param:{Functionname:"GetLayout",Dataxml:"<%=sPlannerLayoutParam %>" } } ,
+            Upload:{ Url:"SaveWorkPlanner.aspx", Type:"Body",Format:"Internal",Data:"TGData",Flags:"Accepted,AllCols,NoIO,Defaults",Param:{Dataxml:"<%=sPlannerDataParam %>"} } ,
+            Data:{ Url:"../../_vti_bin/WorkPlanner.asmx", Method:"Soap",Function:"Execute",Namespace:"workengine.com",Param:{Functionname:"GetTasks",Dataxml:"<%=sPlannerDataParam %>" } }, 
+            Debug:"Error",Export:{Url:"PlannerExcelExport.aspx"}, SuppressMessage:1
+        }, 
             "workplannerDiv" );
 
         <%=agileDiv %>
@@ -843,138 +856,138 @@
         
     }
 
-    function CreateBasicTree(functionname, div)
-    {
-        TreeGrid( { Data:{ Url:"BlankTable.xml" }, Layout:{Url: "../../_vti_bin/WorkPlanner.asmx",Method:"Soap",Function:"Execute",Namespace:"workengine.com",Param:{Functionname:functionname,Dataxml:"<%=sPlannerLayoutParam %>" } }, SuppressMessage:1 }, div ); 
-    }
-
-    _spBodyOnLoadFunctionNames.push("doOnLoad");
-
-
-
-    function setHeight(a, b, c) {
-        //dhxLayout.cells("b").setHeight((getHeight() - getTop(document.getElementById("parentId"))));
-        document.getElementById("parentId").style.height = (getHeight() - getTop(document.getElementById("parentId")) - 20) + "px";
-
-        document.getElementById("parentId").style.width = (getWidth() - 85) + "px";
-        
-        dhxLayout.setSizes();
-
-        if(bLoading)
+        function CreateBasicTree(functionname, div)
         {
-            if(bAgile)
-            {
-                var gHeight = (getHeight() - getTop(document.getElementById("parentId")) - 20) / 3;
+            TreeGrid( { Data:{ Url:"BlankTable.xml" }, Layout:{Url: "../../_vti_bin/WorkPlanner.asmx",Method:"Soap",Function:"Execute",Namespace:"workengine.com",Param:{Functionname:functionname,Dataxml:"<%=sPlannerLayoutParam %>" } }, SuppressMessage:1 }, div ); 
+        }
 
-                dhxLayout.cells("b").setHeight(gHeight);
-                dhxLayout.cells("c").setHeight(gHeight);
-            }
-            else
-            {
-                var gHeight = (getHeight() - getTop(document.getElementById("parentId")) - 20) / 2;
+        _spBodyOnLoadFunctionNames.push("doOnLoad");
 
-                dhxLayout.cells("b").setHeight(gHeight);
-                dhxLayout.cells("c").setHeight(gHeight);
-            }
 
+
+        function setHeight(a, b, c) {
+            //dhxLayout.cells("b").setHeight((getHeight() - getTop(document.getElementById("parentId"))));
+            document.getElementById("parentId").style.height = (getHeight() - getTop(document.getElementById("parentId")) - 20) + "px";
+
+            document.getElementById("parentId").style.width = (getWidth() - 85) + "px";
+        
             dhxLayout.setSizes();
 
-            var divCover = document.getElementById("divCover");
-            divCover.style.left = 0;
-            divCover.style.top = 0;
-            divCover.style.width = (getWidth() - 20) + "px";
-            divCover.style.height = (getHeight() - getTop(document.getElementById("parentId")) - 20) + "px";
+            if(bLoading)
+            {
+                if(bAgile)
+                {
+                    var gHeight = (getHeight() - getTop(document.getElementById("parentId")) - 20) / 3;
+
+                    dhxLayout.cells("b").setHeight(gHeight);
+                    dhxLayout.cells("c").setHeight(gHeight);
+                }
+                else
+                {
+                    var gHeight = (getHeight() - getTop(document.getElementById("parentId")) - 20) / 2;
+
+                    dhxLayout.cells("b").setHeight(gHeight);
+                    dhxLayout.cells("c").setHeight(gHeight);
+                }
+
+                dhxLayout.setSizes();
+
+                var divCover = document.getElementById("divCover");
+                divCover.style.left = 0;
+                divCover.style.top = 0;
+                divCover.style.width = (getWidth() - 20) + "px";
+                divCover.style.height = (getHeight() - getTop(document.getElementById("parentId")) - 20) + "px";
+            }
         }
-    }
 
     
 
-    function getHeight() {
-        var scnHei;
-        if (self.innerHeight) // all except Explorer
-        {
-            //scnWid = self.innerWidth;
-            scnHei = self.innerHeight;
-        }
-        else if (document.documentElement && document.documentElement.clientHeight) {
-            //scnWid = document.documentElement.clientWidth;
-            scnHei = document.documentElement.clientHeight;
-        }
-        else if (document.body) // other Explorers
-        {
-            //scnWid = document.body.clientWidth;
-            scnHei = document.body.clientHeight;
-        }
-        return scnHei;
-    }
-
-    function getWidth() {
-        var scnWid;
-        if (self.innerHeight) // all except Explorer
-        {
-            scnWid = self.innerWidth;
-            //scnHei = self.innerHeight;
-        }
-        else if (document.documentElement && document.documentElement.clientHeight) {
-            scnWid = document.documentElement.clientWidth;
-            //scnHei = document.documentElement.clientHeight;
-        }
-        else if (document.body) // other Explorers
-        {
-            scnWid = document.body.clientWidth;
-            //scnHei = document.body.clientHeight;
-        }
-        return scnWid;
-    }
-
-    if (window.addEventListener)
-        window.addEventListener('resize', setHeight, false);
-    else if (window.attachEvent)
-        window.attachEvent('onresize', setHeight);
-
-    Grids.OnTestConstraints = function(grid, row, col, type, change, d1, d2)  
-    {
-        if(type == "main" && d1 != null && d2 != null)
-        {
-            if(d1 < grid.Cols["G"].GanttBase)
+        function getHeight() {
+            var scnHei;
+            if (self.innerHeight) // all except Explorer
             {
-                if(confirm("You are trying to set the Task Start Date earlier than the Project Start Date. Would you like to modify the Project Start Date"))
+                //scnWid = self.innerWidth;
+                scnHei = self.innerHeight;
+            }
+            else if (document.documentElement && document.documentElement.clientHeight) {
+                //scnWid = document.documentElement.clientWidth;
+                scnHei = document.documentElement.clientHeight;
+            }
+            else if (document.body) // other Explorers
+            {
+                //scnWid = document.body.clientWidth;
+                scnHei = document.body.clientHeight;
+            }
+            return scnHei;
+        }
+
+        function getWidth() {
+            var scnWid;
+            if (self.innerHeight) // all except Explorer
+            {
+                scnWid = self.innerWidth;
+                //scnHei = self.innerHeight;
+            }
+            else if (document.documentElement && document.documentElement.clientHeight) {
+                scnWid = document.documentElement.clientWidth;
+                //scnHei = document.documentElement.clientHeight;
+            }
+            else if (document.body) // other Explorers
+            {
+                scnWid = document.body.clientWidth;
+                //scnHei = document.body.clientHeight;
+            }
+            return scnWid;
+        }
+
+        if (window.addEventListener)
+            window.addEventListener('resize', setHeight, false);
+        else if (window.attachEvent)
+            window.attachEvent('onresize', setHeight);
+
+        Grids.OnTestConstraints = function(grid, row, col, type, change, d1, d2)  
+        {
+            if(type == "main" && d1 != null && d2 != null)
+            {
+                if(d1 < grid.Cols["G"].GanttBase)
                 {
-                    MoveProject();
+                    if(confirm("You are trying to set the Task Start Date earlier than the Project Start Date. Would you like to modify the Project Start Date"))
+                    {
+                        MoveProject();
+                    }
                 }
             }
+            return change;
         }
-        return change;
-    }
 
-    Grids.OnAutoFillFinish = function (grid, r1, c1, r2, c2, rdir, cdir) {
+        Grids.OnAutoFillFinish = function (grid, r1, c1, r2, c2, rdir, cdir) {
         
-        if(c1 == c2 && (c1 == "AssignedTo" || c1 == "StartDate" || c1 == "DueDate"))
-        {
-            grid.ActionCalcOff();
-            var row = r1;
-        
-            row = grid.GetNext(row);
-
-            while(row && row.id != r2.id)
+            if(c1 == c2 && (c1 == "AssignedTo" || c1 == "StartDate" || c1 == "DueDate"))
             {
-                if(row.Def.Name == "Task")
-                    SetTaskAssignments(row);
+                grid.ActionCalcOff();
+                var row = r1;
+        
+                row = grid.GetNext(row);
 
-                if(rdir == 0)
-                    row = grid.GetNext(row);
-                else
-                    row = grid.GetPrev(row);                
+                while(row && row.id != r2.id)
+                {
+                    if(row.Def.Name == "Task")
+                        SetTaskAssignments(row);
+
+                    if(rdir == 0)
+                        row = grid.GetNext(row);
+                    else
+                        row = grid.GetPrev(row);                
+                }
+
+                SetTaskAssignments(r2);
+
+                grid.ActionCalcOn();
             }
-
-            SetTaskAssignments(r2);
-
-            grid.ActionCalcOn();
         }
-    }
 
-    Grids.OnLoaded = function(G){ 
-        G.Lang.Format.DecimalSeparator='<%=DecimalSeparator %>';
+        Grids.OnLoaded = function(G){ 
+            G.Lang.Format.DecimalSeparator='<%=DecimalSeparator %>';
         G.Lang.Format.GroupSeparator='<%=GroupSeparator %>';
         G.Lang.Format.InputDecimalSeparators='<%=DecimalSeparator %>';
         G.Lang.Format.InputGroupSeparators='<%=GroupSeparator %>';
@@ -1067,7 +1080,7 @@
     {
         return GetCssClass(grid, row, col, "erroroncell");
     }
-    
+
     Grids.OnTip = function(grid, row, col, tip, cleintx, clienty, x, y)
     {
         return GetToolTip(grid, row, col, tip, 5, 5, 5, 5)
@@ -1644,7 +1657,8 @@ Name:&nbsp;&nbsp;<%=sProjectName %></div>
 
     <script>
         initmb();
-        <%if(Request["isdlg"] == "1"){%>
+        <%if (Request["isdlg"] == "1")
+          {%>
         document.getElementsByTagName("html")[0].className = "ms-dialog";
         <%}%>
     </script>

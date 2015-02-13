@@ -13,12 +13,14 @@ using DocumentFormat.OpenXml.Spreadsheet;
 using EPMLiveCore.Infrastructure;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.Utilities;
+using EPMLiveCore.Jobs;
+using System.Threading;
 
 namespace EPMLiveCore.API
 {
     public class ResourceImporter
     {
-        #region Fields (14) 
+        #region Fields (13) 
 
         private const char TAB_SEPERATOR = '-';
 
@@ -35,18 +37,19 @@ namespace EPMLiveCore.API
         private readonly DataTable _dtResources;
         private readonly string _fileId;
         private readonly bool _isOnline;
-        private readonly StringBuilder _masterLog;
-        private readonly IList<ProcessedResource> _processedResources;
         private readonly SPWeb _spWeb;
         private string _currentProcess;
-        private int _step;
-        private int _totalResources;
+        
+        private ResourceImportResult _dSMResult;
+        private Int32 _totalRecords = 0, _successRecords = 0, _failedRecords = 0, _processedRecords = 0;
 
-        #endregion Fields 
+        public bool IsImportCancelled;
+
+        #endregion
 
         #region Constructors (1) 
 
-        public ResourceImporter(SPWeb spWeb, string data)
+        public ResourceImporter(SPWeb spWeb, string data, bool isImportCancelled)
         {
             if (!spWeb.CurrentUser.IsSiteAdmin)
             {
@@ -56,31 +59,13 @@ namespace EPMLiveCore.API
             _spWeb = spWeb;
             _fileId = data;
             _dtResources = new DataTable();
-            _masterLog = new StringBuilder();
             _currentProcess = string.Empty;
-            _totalResources = 0;
-            _processedResources = new List<ProcessedResource>();
             _act = new Act(_spWeb);
             _isOnline = _act.IsOnline;
+            _dSMResult = new ResourceImportResult();
         }
 
-        #endregion Constructors 
-
-        #region Properties (1) 
-
-        private int ProgressPercentage
-        {
-            get
-            {
-                if (_step == 1) return 1;
-                if (_step == 3) return 99;
-
-                int percentage = (_processedResources.Count*100)/_totalResources;
-                return percentage > 98 ? 98 : percentage;
-            }
-        }
-
-        #endregion Properties 
+        #endregion Constructors         
 
         #region Delegates and Events (2) 
 
@@ -101,40 +86,33 @@ namespace EPMLiveCore.API
             Exception exception = null;
             try
             {
-                LoadSpreadsheet();
-                ImportResources();
+                if (!this.IsImportCancelled)
+                {
+                    LoadSpreadsheet();
+                    ImportResources(); 
+                }
             }
             catch (Exception e)
             {
                 exception = e;
+                LogImportMessage(e.Message, 2);
             }
             finally
             {
-                ImportCompleted(this,
-                    new ImportCompletedEventHandlerArgs(exception, false, null, _masterLog.ToString(),
-                        _processedResources));
+                string msg = string.Empty;
+                if (!this.IsImportCancelled)
+                { 
+                    msg = String.Format("Import completed {0}!", exception != null ? "with errors" : "successfully");
+                }
+                else
+                {
+                    msg = String.Format("Import cancelled!");
+                }
+                
+                LogImportMessage(msg, exception != null ? 1 : 0);
+                RaiseImportCompletedEvent(exception);
             }
-        }
-
-        // Private Methods (16) 
-
-        private void AddMasterLog(string message, bool isHeader)
-        {
-            if (isHeader)
-            {
-                _masterLog.AppendLine();
-                _masterLog.AppendLine(message.ToUpper());
-            }
-            else
-            {
-                AddMasterLog(message, 1);
-            }
-        }
-
-        private void AddMasterLog(string message, int indentLevel)
-        {
-            _masterLog.AppendLine(new string(TAB_SEPERATOR, indentLevel*2) + " " + message);
-        }
+        }        
 
         private void AddNewResource(DataRow row, bool isGeneric)
         {
@@ -180,99 +158,106 @@ namespace EPMLiveCore.API
 
             foreach (DataRow row in _dtResources.Rows)
             {
-                foreach (DataColumn column in _dtResources.Columns)
+                if (!this.IsImportCancelled)
                 {
-                    string col = column.ColumnName;
-                    object value = row[col];
-                    string val = string.Empty;
-
-                    if (value != null && value != DBNull.Value) val = value.ToString();
-
-                    if (!string.IsNullOrEmpty(val))
+                    foreach (DataColumn column in _dtResources.Columns)
                     {
-                        if (fieldDict.ContainsKey(col))
+                        string col = column.ColumnName;
+                        object value = row[col];
+                        string val = string.Empty;
+
+                        if (value != null && value != DBNull.Value) val = value.ToString();
+
+                        if (!string.IsNullOrEmpty(val))
                         {
-                            try
+                            if (fieldDict.ContainsKey(col))
                             {
-                                if (col.Equals("ResourceLevel"))
+                                try
                                 {
-                                    if (!string.IsNullOrEmpty(val))
+                                    if (col.Equals("ResourceLevel"))
                                     {
-                                        value = lookupFieldDict["ResourceLevel"][val];
+                                        if (!string.IsNullOrEmpty(val))
+                                        {
+                                            value = lookupFieldDict["ResourceLevel"][val];
+                                        }
+
+                                        row[col] = value;
+                                        continue;
                                     }
 
-                                    row[col] = value;
-                                    continue;
-                                }
-
-                                if (col.Equals("Permissions"))
-                                {
-                                    if (!string.IsNullOrEmpty(val))
+                                    if (col.Equals("Permissions"))
                                     {
-                                        IEnumerable<string> permissions =
-                                            val.Split(',')
-                                                .Select(
-                                                    p =>
-                                                        lookupFieldDict["Permissions"][p.Trim()].ToString(
-                                                            CultureInfo.InvariantCulture));
-                                        value = string.Join(",", permissions.ToArray());
+                                        if (!string.IsNullOrEmpty(val))
+                                        {
+                                            IEnumerable<string> permissions =
+                                                val.Split(',')
+                                                    .Select(
+                                                        p =>
+                                                            lookupFieldDict["Permissions"][p.Trim()].ToString(
+                                                                CultureInfo.InvariantCulture));
+                                            value = string.Join(",", permissions.ToArray());
+                                        }
+
+                                        row[col] = value;
+                                        continue;
                                     }
 
-                                    row[col] = value;
-                                    continue;
+                                    switch (fieldDict[col])
+                                    {
+                                        case SPFieldType.Boolean:
+                                            if (val.Equals("0")) value = false;
+                                            else if (val.Equals("1")) value = true;
+                                            break;
+                                        case SPFieldType.DateTime:
+                                            value = DateTime.FromOADate(Convert.ToDouble(val));
+                                            break;
+                                        case SPFieldType.User:
+                                            if (val.Contains(","))
+                                            {
+                                                var collection = new SPFieldUserValueCollection();
+                                                collection.AddRange(
+                                                    val.Split(',')
+                                                        .Select(u => u.Trim())
+                                                        .Select(uv => GetUserValue(usersDict, uv)));
+                                                value = collection;
+                                            }
+                                            else
+                                            {
+                                                value = GetUserValue(usersDict, val);
+                                            }
+                                            break;
+                                        case SPFieldType.Lookup:
+                                            if (val.Contains(","))
+                                            {
+                                                var collection = new SPFieldLookupValueCollection();
+                                                collection.AddRange(
+                                                    val.Split(',')
+                                                        .Select(v => v.Trim())
+                                                        .Select(lv => new SPFieldLookupValue(lookupFieldDict[col][lv], lv)));
+                                                value = collection;
+                                            }
+                                            else
+                                            {
+                                                value = new SPFieldLookupValue(lookupFieldDict[col][val], val);
+                                            }
+                                            break;
+                                    }
                                 }
-
-                                switch (fieldDict[col])
+                                catch (Exception e)
                                 {
-                                    case SPFieldType.Boolean:
-                                        if (val.Equals("0")) value = false;
-                                        else if (val.Equals("1")) value = true;
-                                        break;
-                                    case SPFieldType.DateTime:
-                                        value = DateTime.FromOADate(Convert.ToDouble(val));
-                                        break;
-                                    case SPFieldType.User:
-                                        if (val.Contains(","))
-                                        {
-                                            var collection = new SPFieldUserValueCollection();
-                                            collection.AddRange(
-                                                val.Split(',')
-                                                    .Select(u => u.Trim())
-                                                    .Select(uv => GetUserValue(usersDict, uv)));
-                                            value = collection;
-                                        }
-                                        else
-                                        {
-                                            value = GetUserValue(usersDict, val);
-                                        }
-                                        break;
-                                    case SPFieldType.Lookup:
-                                        if (val.Contains(","))
-                                        {
-                                            var collection = new SPFieldLookupValueCollection();
-                                            collection.AddRange(
-                                                val.Split(',')
-                                                    .Select(v => v.Trim())
-                                                    .Select(lv => new SPFieldLookupValue(lookupFieldDict[col][lv], lv)));
-                                            value = collection;
-                                        }
-                                        else
-                                        {
-                                            value = new SPFieldLookupValue(lookupFieldDict[col][val], val);
-                                        }
-                                        break;
+                                    string message = string.Format("Resource: {0} (ID: {1}). Field: {2} Error: {3}",
+                                        row["Title"], row["ID"], col, e.Message);
+                                    LogImportMessage(message, 2);
                                 }
-                            }
-                            catch (Exception e)
-                            {
-                                string message = string.Format("Resource: {0} (ID: {1}). Field: {2} Error: {3}",
-                                    row["Title"], row["ID"], col, e.Message);
-                                AddMasterLog(message, 2);
                             }
                         }
-                    }
 
-                    row[col] = value;
+                        row[col] = value;
+                    }
+                }
+                else
+                {
+                    break;
                 }
             }
         }
@@ -443,80 +428,84 @@ namespace EPMLiveCore.API
 
         private void ImportResources()
         {
-            _step = 2;
-
-            AddMasterLog("Importing Resources", true);
+            LogImportMessage("Importing Resources", 0);
 
             foreach (DataRow row in _dtResources.Rows)
             {
-                var resource = new ProcessedResource();
-                string message = string.Empty;
-
-                try
+                if (!this.IsImportCancelled)
                 {
-                    resource.Id = row["ID"].ToString();
-                    resource.Name = (string) row["Title"];
+                    string message = string.Empty;
 
-                    message = string.Format("Importing resource {1} of {2}: {0} . . .", resource.Name,
-                        _processedResources.Count + 1, _totalResources);
-
-                    AddMasterLog(message, false);
-
-                    var isGeneric = (bool) row["Generic"];
-
-                    AddMasterLog(string.Format("Is Generic? {0}.", isGeneric ? "YES" : "NO"), 3);
-
-                    if (string.IsNullOrEmpty(resource.Id))
+                    try
                     {
-                        AddMasterLog("Is New? YES.", 3);
-                        AddNewResource(row, isGeneric);
+                        message = string.Format("Importing resource {1} of {2}: {0} . . .", (string)row["Title"],
+                            _processedRecords + 1, _totalRecords);
+
+                        RaiseImportProgressChangedEvent(message);
+
+                        var isGeneric = (bool)row["Generic"];
+
+                        if (string.IsNullOrEmpty(row["ID"].ToString()))
+                        {
+                            AddNewResource(row, isGeneric);
+                        }
+                        else
+                        {
+                            UpdateResource(row, isGeneric);
+                        }
+
+                        _successRecords++;
+                        _processedRecords++;
+                        RaiseImportProgressChangedEvent(_currentProcess);
                     }
-                    else
+                    catch (Exception e)
                     {
-                        AddMasterLog("Is New? NO.", 3);
-                        UpdateResource(row, isGeneric);
+                        LogImportMessage("FAILURE. Reason: " + e.Message, 2);
+                        _failedRecords++;
+                        _processedRecords++;
+                        RaiseImportProgressChangedEvent(_currentProcess);
                     }
-
-                    AddMasterLog("SUCCESS.", 2);
-                    resource.Processed = true;
+                    finally
+                    {
+                        _currentProcess = message;
+                        RaiseImportProgressChangedEvent(_currentProcess);
+                    }
                 }
-                catch (Exception e)
+                else
                 {
-                    resource.Processed = false;
-                    resource.Comment = e.Message;
-
-                    AddMasterLog("FAILURE. Reason: " + e.Message, 2);
-                }
-                finally
-                {
-                    _currentProcess = message;
-                    _processedResources.Add(resource);
-                    ReportProgress();
+                    break;
                 }
             }
         }
 
         private void LoadSpreadsheet()
         {
-            _step = 1;
-
-            AddMasterLog("Loading Spreadsheet", true);
-
-            ReportProgress();
-
-            using (var epmLiveFileStore = new EPMLiveFileStore(_spWeb))
+            if (!this.IsImportCancelled)
             {
-                using (Stream stream = epmLiveFileStore.GetStream(_fileId))
+                LogImportMessage("Loading Spreadsheet", 0);
+
+                RaiseImportProgressChangedEvent("Loading Spreadsheet");
+
+                using (var epmLiveFileStore = new EPMLiveFileStore(_spWeb))
                 {
-                    ParseExcelResources(stream);
+                    using (Stream stream = epmLiveFileStore.GetStream(_fileId))
+                    {
+                        if (!this.IsImportCancelled)
+                        {
+                            ParseExcelResources(stream); 
+                        }
+                    }
+
+                    epmLiveFileStore.Delete(_fileId);
                 }
 
-                epmLiveFileStore.Delete(_fileId);
+                if (!this.IsImportCancelled)
+                {
+                    BuildResourceTable(); 
+                }
+
+                _totalRecords = _dtResources.Rows.Count;
             }
-
-            BuildResourceTable();
-
-            _totalResources = _dtResources.Rows.Count;
         }
 
         private void ParseExcelResources(Stream stream)
@@ -535,111 +524,112 @@ namespace EPMLiveCore.API
                 int rowIndex = 0;
                 foreach (Row row in rows)
                 {
-                    rowIndex++;
-
-                    if (rowIndex == 1)
+                    if (!this.IsImportCancelled)
                     {
-                        foreach (Cell cell in row)
+                        rowIndex++;
+
+                        if (rowIndex == 1)
                         {
-                            string columnName = GetCellValue(document, cell);
-                            _dtResources.Columns.Add(columnName, typeof (object));
+                            foreach (Cell cell in row)
+                            {
+                                string columnName = GetCellValue(document, cell);
+                                _dtResources.Columns.Add(columnName, typeof(object));
 
-                            fieldCellDict.Add(GetCellReference(cell), columnName);
+                                fieldCellDict.Add(GetCellReference(cell), columnName);
+                            }
                         }
-                    }
 
-                    if (rowIndex < 3)
-                    {
-                        continue;
-                    }
-
-                    bool isEmpty = true;
-
-                    DataRow dataRow = _dtResources.NewRow();
-
-                    for (int i = 0; i < row.Descendants<Cell>().Count(); i++)
-                    {
-                        try
+                        if (rowIndex < 3)
                         {
-                            Cell cell = row.Descendants<Cell>().ElementAt(i);
-
-                            string columnName = fieldCellDict[GetCellReference(cell)];
-                            string value = GetCellValue(document, cell);
-
-                            dataRow[columnName] = value;
-
-                            if (!string.IsNullOrEmpty(value)) isEmpty = false;
+                            continue;
                         }
-                        catch { }
-                    }
 
-                    if (!isEmpty) _dtResources.Rows.Add(dataRow);
+                        bool isEmpty = true;
+
+                        DataRow dataRow = _dtResources.NewRow();
+
+                        for (int i = 0; i < row.Descendants<Cell>().Count(); i++)
+                        {
+                            try
+                            {
+                                Cell cell = row.Descendants<Cell>().ElementAt(i);
+
+                                string columnName = fieldCellDict[GetCellReference(cell)];
+                                string value = GetCellValue(document, cell);
+
+                                dataRow[columnName] = value;
+
+                                if (!string.IsNullOrEmpty(value)) isEmpty = false;
+                            }
+                            catch { }
+                        }
+
+                        if (!isEmpty) _dtResources.Rows.Add(dataRow);
+                    }
+                    else
+                    {
+                        break;
+                    }
                 }
             }
-        }
-
-        private void ReportProgress()
-        {
-            ImportProgressChanged(this, new ImportProgressChangedEventHandlerArgs(
-                ProgressPercentage, new ResourceImporterState(
-                    _step, _currentProcess, _masterLog.ToString(),
-                    _processedResources)));
         }
 
         private void UpdateItem(DataRow row, ICollection<string> lockedColumns, SPList spList, SPListItem spListItem,
             bool isGeneric)
         {
-            foreach (
-                string columnName in
-                    _dtResources.Columns.Cast<DataColumn>()
-                        .Select(c => c.ColumnName)
-                        .Where(c => !lockedColumns.Contains(c)))
+            if (!this.IsImportCancelled)
             {
-                try
+                foreach (
+                        string columnName in
+                            _dtResources.Columns.Cast<DataColumn>()
+                                .Select(c => c.ColumnName)
+                                .Where(c => !lockedColumns.Contains(c)))
                 {
-                    object value = row[columnName];
-
-                    string col = columnName.Replace(" ", "_x0020_");
-
-                    if (value != null && value != DBNull.Value)
+                    try
                     {
-                        string sValue = value.ToString();
-                        if (!string.IsNullOrEmpty(sValue))
+                        object value = row[columnName];
+
+                        string col = columnName.Replace(" ", "_x0020_");
+
+                        if (value != null && value != DBNull.Value)
                         {
-                            if (col.Equals("Title"))
+                            string sValue = value.ToString();
+                            if (!string.IsNullOrEmpty(sValue))
                             {
-                                value = sValue.Trim();
+                                if (col.Equals("Title"))
+                                {
+                                    value = sValue.Trim();
+                                }
+                                else
+                                {
+                                    SPField spField = spList.Fields.GetFieldByInternalName(col);
+                                    if (spField.Type == SPFieldType.DateTime)
+                                    {
+                                        value =
+                                            SPUtility.CreateISO8601DateTimeFromSystemDateTime(
+                                                ((DateTime)value).ToUniversalTime());
+                                    }
+                                }
                             }
                             else
                             {
-                                SPField spField = spList.Fields.GetFieldByInternalName(col);
-                                if (spField.Type == SPFieldType.DateTime)
-                                {
-                                    value =
-                                        SPUtility.CreateISO8601DateTimeFromSystemDateTime(
-                                            ((DateTime) value).ToUniversalTime());
-                                }
+                                value = null;
                             }
                         }
                         else
                         {
                             value = null;
                         }
-                    }
-                    else
-                    {
-                        value = null;
-                    }
 
-                    spListItem[col] = value;
-                    AddMasterLog(string.Format("{0}: {1}", columnName, value), 4);
+                        spListItem[col] = value;
+                    }
+                    catch { }
                 }
-                catch { }
+
+                if (isGeneric) spListItem["Title"] = spListItem["Title"];
+
+                spListItem.Update(); 
             }
-
-            if (isGeneric) spListItem["Title"] = spListItem["Title"];
-
-            spListItem.Update();
         }
 
         private void UpdateResource(DataRow row, bool isGeneric)
@@ -796,42 +786,59 @@ namespace EPMLiveCore.API
                 }
             }
         }
-
-        #endregion Methods 
-    }
-
-    [DataContract]
-    public class ProcessedResource
-    {
-        #region Constructors (1) 
-
-        internal ProcessedResource() { }
-
-        #endregion Constructors 
-
-        #region Properties (5) 
-
-        [DataMember]
-        public string Comment { get; set; }
-
-        [DataMember]
-        public string Id { get; set; }
-
-        [DataMember]
-        public bool IsNew
+        
+        private void LogImportMessage(string message, Int32 messageType)
         {
-            get { return string.IsNullOrEmpty(Id); }
-            set { }
+            //  0 Info   
+            //  1 Warning
+            //  2 Error
+            ResourceImportMessage dSMMessage = new ResourceImportMessage();
+            dSMMessage.Kind = messageType;
+            dSMMessage.Message = message;
+            dSMMessage.DateTime = DateTime.Now;
+
+            if (messageType == 0)
+            {
+                _dSMResult.Log.InfoCount++;
+            }
+            else if (messageType == 1)
+            {
+                _dSMResult.Log.WarningCount++;
+            }
+            else if (messageType == 2)
+            {
+                _dSMResult.Log.ErrorCount++;
+            }
+
+            _dSMResult.Log.Messages.Add(dSMMessage);
+            dSMMessage = null;
         }
 
-        [DataMember]
-        public string Name { get; set; }
+        private void RaiseImportProgressChangedEvent(String currentProcess)
+        {
+            Int32 percentage = (_processedRecords == 0 ? 0 : (_processedRecords * 100) / _totalRecords);
+            _dSMResult.CurrentProcess = (percentage == 100 ? string.Format("Import {0}. Check the log for more details.", this.IsImportCancelled? "Cancelled" : "Completed") : currentProcess);
+            _dSMResult.TotalRecords = _totalRecords;
+            _dSMResult.ProcessedRecords = _processedRecords;
+            _dSMResult.SuccessRecords = _successRecords;
+            _dSMResult.FailedRecords = _failedRecords;
+            _dSMResult.PercentComplete = percentage;
+            ImportProgressChanged(this, new ImportProgressChangedEventHandlerArgs(_processedRecords, _dSMResult));
+        }
 
-        [DataMember]
-        public bool Processed { get; set; }
+        private void RaiseImportCompletedEvent(Exception exception)
+        {            
+            _dSMResult.CurrentProcess = String.Format("Import {0}{1}. Check the log for more details.", this.IsImportCancelled? "Cancelled" : "Completed", exception == null ? "" : " with errors");
+            _dSMResult.TotalRecords = _totalRecords;
+            _dSMResult.ProcessedRecords = _processedRecords;
+            _dSMResult.SuccessRecords = _successRecords;
+            _dSMResult.FailedRecords = _failedRecords;
+            _dSMResult.PercentComplete = 100;
+            ImportCompleted(this, new ImportCompletedEventHandlerArgs(exception, false, _dSMResult));
+        }        
 
-        #endregion Properties 
-    }
+        #endregion Methods
+    }    
 
     public delegate void ImportProgressChangedEventHandler(object sender, ImportProgressChangedEventHandlerArgs args);
 
@@ -858,13 +865,6 @@ namespace EPMLiveCore.API
 
     public class ImportCompletedEventHandlerArgs : AsyncCompletedEventArgs
     {
-        #region Fields (2) 
-
-        private readonly IList<ProcessedResource> _resources;
-        private readonly string _result;
-
-        #endregion Fields 
-
         #region Constructors (1) 
 
         /// <summary>
@@ -879,76 +879,11 @@ namespace EPMLiveCore.API
         /// </param>
         /// <param name="result">The result.</param>
         /// <param name="resources">The resources.</param>
-        public ImportCompletedEventHandlerArgs(Exception error, bool cancelled, object userState,
-            string result, IList<ProcessedResource> resources)
+        public ImportCompletedEventHandlerArgs(Exception error, bool cancelled, object userState)
             : base(error, cancelled, userState)
-        {
-            _result = result;
-            _resources = resources;
+        {            
         }
 
-        #endregion Constructors 
-
-        #region Properties (2) 
-
-        public IList<ProcessedResource> Resources
-        {
-            get { return _resources; }
-        }
-
-        public string Result
-        {
-            get { return _result; }
-        }
-
-        #endregion Properties 
-    }
-
-    public class ResourceImporterState
-    {
-        #region Fields (4) 
-
-        private readonly string _currentProcess;
-        private readonly string _log;
-        private readonly IList<ProcessedResource> _resources;
-        private readonly int _step;
-
-        #endregion Fields 
-
-        #region Constructors (1) 
-
-        public ResourceImporterState(int step, string currentProcess, string log, IList<ProcessedResource> resources)
-        {
-            _step = step;
-            _currentProcess = currentProcess;
-            _log = log;
-            _resources = resources;
-        }
-
-        #endregion Constructors 
-
-        #region Properties (4) 
-
-        public string CurrentProcess
-        {
-            get { return _currentProcess; }
-        }
-
-        public string Log
-        {
-            get { return _log; }
-        }
-
-        public IList<ProcessedResource> Resources
-        {
-            get { return _resources; }
-        }
-
-        public int Step
-        {
-            get { return _step; }
-        }
-
-        #endregion Properties 
-    }
+        #endregion Constructors         
+    }    
 }

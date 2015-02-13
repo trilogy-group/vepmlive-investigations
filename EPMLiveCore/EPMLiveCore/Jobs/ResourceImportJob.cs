@@ -1,11 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using EPMLiveCore.API;
+using Microsoft.SharePoint;
+using System;
+using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.IO;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Json;
 using System.Threading;
-using EPMLiveCore.API;
-using Microsoft.SharePoint;
 
 namespace EPMLiveCore.Jobs
 {
@@ -13,14 +14,16 @@ namespace EPMLiveCore.Jobs
     {
         #region Fields (2) 
 
-        private const string UPDATE_LOG_SQL =
-            "UPDATE EPMLIVE_LOG SET resulttext = @Result WHERE timerjobuid = @TimerJobUId IF @@ROWCOUNT = 0 INSERT INTO EPMLIVE_LOG (timerjobuid, resulttext) VALUES(@TimerJobUId, @Result)";
+        private const string UPDATE_LOG_SQL = "UPDATE EPMLIVE_LOG SET resulttext = @ResultText WHERE timerjobuid = @TimerJobUId IF @@ROWCOUNT = 0 INSERT INTO EPMLIVE_LOG (timerjobuid, resulttext) VALUES(@TimerJobUId, @ResultText)";
+        private const string GET_JOBQUEUE_STATUS = "SELECT status from vwQueueTimerLog where timerjobuid=@timerjobuid";
 
         private bool _done;
 
+        private ResourceImporter resourceImporter;
+
         #endregion Fields 
 
-        #region Methods (5) 
+        #region Method
 
         // Public Methods (1) 
 
@@ -36,128 +39,157 @@ namespace EPMLiveCore.Jobs
 
             totalCount = 2;
 
-            var resourceImporter = new ResourceImporter(web, data);
-
-            resourceImporter.ImportCompleted += ResourceImporterImportCompleted;
-            resourceImporter.ImportProgressChanged += ResourceImporterImportProgressChanged;
+            resourceImporter = new ResourceImporter(web, data, false);
+            
+            resourceImporter.ImportCompleted += ResourceImportCompleted;
+            resourceImporter.ImportProgressChanged += ResourceImportProgressChanged;
 
             resourceImporter.ImportAsync();
-
+            
             while (!_done)
             {
                 Thread.Sleep(1000);
             }
-        }
-
-        // Private Methods (4) 
-
-        private string BuildResult(int progressPercentage, string currentProcess,
-                                   string log, IList<ProcessedResource> resources, bool hasError)
-        {
-            var result = new ResourceImportJobResult(progressPercentage, currentProcess,
-                                                     log, hasError, resources);
-
-            var memoryStream = new MemoryStream();
-
-            var serializer = new DataContractJsonSerializer(typeof (ResourceImportJobResult));
-            serializer.WriteObject(memoryStream, result);
-            memoryStream.Position = 0;
-
-            return new StreamReader(memoryStream).ReadToEnd();
-        }
-
-        private void ResourceImporterImportCompleted(object sender, ImportCompletedEventHandlerArgs args)
-        {
-            if (args.Error == null)
-            {
-                sErrors = BuildResult(100, "All resources have been imported. Check the log for details.", args.Result,
-                                      args.Resources, false);
-            }
-            else
-            {
-                sErrors = BuildResult(100, "Unable to import resources. Check the log for more details.",
-                                      args.Error.Message,
-                                      args.Resources, true);
-                bErrors = true;
-            }
-
-            UpdateProgress(totalCount);
-            _done = true;
-        }
-
-        private void ResourceImporterImportProgressChanged(object sender, ImportProgressChangedEventHandlerArgs args)
-        {
-            var resourceImporterState = (ResourceImporterState) args.UserState;
-            sErrors = BuildResult(args.ProgressPercentage,
-                                  resourceImporterState.CurrentProcess,
-                                  resourceImporterState.Log,
-                                  resourceImporterState.Resources, false);
-
-            UpdateProgress(resourceImporterState.Step);
-        }
-
-        private void UpdateProgress(float step)
-        {
-            updateProgress(step);
-
-            try
-            {
-                SPSecurity.RunWithElevatedPrivileges(() => cn.Open());
-
-                var cmd = new SqlCommand(UPDATE_LOG_SQL, cn);
-                cmd.Parameters.AddWithValue("@Result", sErrors);
-                cmd.Parameters.AddWithValue("@TimerJobUId", JobUid);
-                cmd.ExecuteNonQuery();
-
-                cn.Close();
-            }
-            catch
-            {
-            }
-        }
+        }        
 
         #endregion Methods 
+
+        #region Resource Import Progress Events
+
+        private void ResourceImportProgressChanged(object sender, ImportProgressChangedEventHandlerArgs args)
+        {
+            try
+            {
+                sErrors = BuildResult(args.UserState);
+                UpdateProgress(args.UserState);
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        private void ResourceImportCompleted(object sender, ImportCompletedEventHandlerArgs args)
+        {
+            try
+            {
+                sErrors = BuildResult(args.UserState);
+                UpdateProgress(args.UserState);
+                _done = true;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        private void UpdateProgress(object userState)
+        {
+            try
+            {
+                if (!resourceImporter.IsImportCancelled)
+                {
+                    IsImportCancelled(JobUid);
+                }
+
+                ResourceImportResult dSMResult = (ResourceImportResult)userState;
+                totalCount = dSMResult.TotalRecords == 0 ? 1 : dSMResult.TotalRecords;
+                updateProgress(dSMResult.ProcessedRecords);
+                SPSecurity.RunWithElevatedPrivileges(() => cn.Open());
+                var cmd = new SqlCommand(UPDATE_LOG_SQL, cn);
+                cmd.Parameters.AddWithValue("@ResultText", sErrors);
+                cmd.Parameters.AddWithValue("@TimerJobUId", JobUid);
+                cmd.ExecuteNonQuery();
+                cn.Close();
+
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        private string BuildResult(object dSMResult)
+        {
+            using (var memoryStream = new MemoryStream())
+            {
+                var serializer = new DataContractJsonSerializer(typeof(ResourceImportResult));
+                serializer.WriteObject(memoryStream, dSMResult);
+                memoryStream.Position = 0;
+                return new StreamReader(memoryStream).ReadToEnd();
+            }
+        }
+
+        private void IsImportCancelled(Guid jobUid)
+        {
+            SPSecurity.RunWithElevatedPrivileges(() => cn.Open());
+            using (SqlCommand cmd = new SqlCommand(GET_JOBQUEUE_STATUS, cn))
+            {
+                cmd.Parameters.AddWithValue("@timerjobuid", JobUid);
+                SqlDataReader dr = cmd.ExecuteReader();
+                if (dr.Read())
+                {
+                    if (dr.GetInt32(0) == 2)
+                    {
+                        resourceImporter.IsImportCancelled = true;
+                    }
+                }
+                dr.Close();
+                cn.Close();
+            }
+        }
+
+        #endregion
     }
 
     [DataContract]
-    public class ResourceImportJobResult
+    public class ResourceImportResult
     {
-        #region Constructors (2) 
-
-        public ResourceImportJobResult(int progressPercentage,
-                                       string currentProcess, string log,
-                                       bool hasError, IList<ProcessedResource> resources)
+        public ResourceImportResult()
         {
-            ProgressPercentage = progressPercentage;
-            CurrentProcess = currentProcess;
-            Log = log;
-            HasError = hasError;
-            Resources = resources;
+            Log = new ResourceImportLog();
         }
 
-        private ResourceImportJobResult()
+        [DataMember]
+        public String CurrentProcess { get; set; }
+        [DataMember]
+        public Int32 TotalRecords { get; set; }
+        [DataMember]
+        public Int32 PercentComplete { get; set; }
+        [DataMember]
+        public Int32 ProcessedRecords { get; set; }
+        [DataMember]
+        public Int32 SuccessRecords { get; set; }
+        [DataMember]
+        public Int32 FailedRecords { get; set; }
+        [DataMember]
+        public ResourceImportLog Log { get; set; }
+    }
+    [DataContract]
+    public class ResourceImportLog
+    {
+        public ResourceImportLog()
         {
+            Messages = new List<ResourceImportMessage>();
         }
-
-        #endregion Constructors 
-
-        #region Properties (5) 
-
         [DataMember]
-        public string CurrentProcess { get; set; }
-
+        public Int32 InfoCount { get; set; }
         [DataMember]
-        public bool HasError { get; set; }
-
+        public Int32 WarningCount { get; set; }
         [DataMember]
-        public string Log { get; set; }
-
+        public Int32 ErrorCount { get; set; }
         [DataMember]
-        public int ProgressPercentage { get; set; }
-
+        public List<ResourceImportMessage> Messages { get; set; }
+    }
+    [DataContract]
+    public class ResourceImportMessage
+    {
+        public ResourceImportMessage() { }
         [DataMember]
-        public IList<ProcessedResource> Resources { get; set; }
-
-        #endregion Properties 
+        public Int32 Kind { get; set; }
+        [DataMember]
+        public DateTime DateTime { get; set; }
+        [DataMember]
+        public String Message { get; set; }
     }
 }

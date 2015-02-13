@@ -11,43 +11,72 @@
 	<link rel="stylesheet" type="text/css" href="/_layouts/epmlive/stylesheets/libraries/bootstrap/css/bootstrap.min.css"/>
 	<script src="/_layouts/epmlive/javascripts/libraries/bootstrap.min.js" type="text/javascript"></script>
 	
-	<style type="text/css">
-		.hero-unit {
-			padding: 30px;
-			line-height: 1em;
-		}
-		
-		.hero-unit > p {
-			margin: 0;
-		}
-		
-		textarea[readonly] {
-			height: 285px;
-			cursor: text;
-		}
-		
-		#resourcetable-wrap {
-			height: 285px;
-			overflow: auto;
-		}
-		
-		th, td {
-			font-family: 'Segoe UI', 'Segoe', Tahoma, Helvetica, Arial, sans-serif;
-		}
-		
-		.container-wrap {
-			height: 565px;
-		}
-		
-		.accordion-inner {
-		    height: 285px !important;
-		}
+    <style type="text/css">
+        .allLog {
+            font-weight: bold;
+            color: #000000;
+            padding-right: 5px;
+        }
+
+        .infoLog {
+            font-weight: bold;
+            color: #3399FF;
+            padding-right: 5px;
+        }
+
+        .warningLog {
+            font-weight: bold;
+            color: #FF9900;
+            padding-right: 5px;
+        }
+
+        .errorLog {
+            font-weight: bold;
+            color: #FF0000;
+            padding-right: 5px;
+        }
+
+        .hero-unit {
+            padding: 30px;
+            line-height: 1em;
+        }
+
+            .hero-unit > p {
+                margin: 0;
+            }
+
+        textarea[readonly] {
+            height: 285px;
+            cursor: text;
+        }
+
+        #importdetailstable-wrap {
+            height: 285px;
+            overflow: auto;
+        }
+
+        #importdetailslog-wrap {
+            height: 250px;
+            overflow: auto;
+        }
+
+        div, p, th, td {
+            font-family: 'Segoe UI', 'Segoe', Tahoma, Helvetica, Arial, sans-serif;
+        }
+
+        .container-wrap {
+            height: 565px;
+        }
+
+        .accordion-inner {
+            height: 285px !important;
+        }
 
         .ms-core-overlay {
             overflow: hidden !important;
         }
-	</style>
-	
+    </style>
+
 	<!--[if IE]>
 	<style type="text/css">
 		textarea[readonly] {
@@ -65,10 +94,9 @@
 	<![endif]-->
 
 	<script type="text/javascript">
-		window.epmLive = window.epmLive || {};
-		window.epmLive.jobId = '<%= JobId %>';
-	</script>
-	
+	    window.epmLive = window.epmLive || {};
+	    window.epmLive.jobId = '<%= JobId %>';	    
+    </script>
 	<script src="/_layouts/epmlive/javascripts/resourceimporter.js<%= Version %>" type="text/javascript"></script>
 </asp:Content>
 
@@ -79,14 +107,14 @@
 			<div class="hero-unit">
 				<div class="row-fluid">
 					<div class="span11">
-						<div class="progress progress-striped" data-bind="css: { active: percentage() < 100 }">
-						  <div class="bar" data-bind="style:{ width: percentage() + '%' }"></div>
+						<div class="progress progress-striped" data-bind="css: { active: PercentComplete() < 100 }">
+						  <div class="bar" data-bind="style: { width: PercentComplete() + '%' }"></div>
 						</div>
 					</div>
-					<div class="span1" style="font-family: 'Segoe UI', 'Segoe', Tahoma, Helvetica, Arial, sans-serif;" data-bind="text: percentage() + '%'"/>
+					<div class="span1" style="font-family: 'Segoe UI', 'Segoe', Tahoma, Helvetica, Arial, sans-serif;" data-bind="text: PercentComplete() + '%'"/>
 				</div>
 			</div>
-			<div class="row-fluid"><p style="font-family: 'Segoe UI', 'Segoe', Tahoma, Helvetica, Arial, sans-serif;" data-bind="text: currentProcess()"/></div>
+			<div class="row-fluid"><p style="font-family: 'Segoe UI', 'Segoe', Tahoma, Helvetica, Arial, sans-serif;" data-bind="text: CurrentProcess()"/></div>
 		</div>
 		<div class="accordion" id="status">
 		  <div class="accordion-group">
@@ -95,37 +123,34 @@
 				Import Details
 			  </a>
 			</div>
-			<div id="details" class="accordion-body collapse in">
-			  <div class="accordion-inner">
-				<div class="row-fluid" id="resourcetable-wrap" style="display: none" data-bind="visible: resources().length > 0">
-					<table class="table table-bordered" id="resourcetable">
-						<thead>
-							<tr>
-								<th width="15" style="text-align: center">#</th>
-								<th width="200">Name</th>
-								<th width="75" style="text-align: center">Status</th>
-								<th>Comment</th>
-							</tr>
-						</thead>
-						<tbody data-bind="foreach: resources ">
-							<tr>
-								<td data-bind="text: $index() + 1"></td>
-								<td data-bind="text: Name"></td>
-								<td data-bind="style: { color: Processed ? '#67A2C0' : '#CEAF7A' }" style="text-align: center; font-weight:bold;">
-									<!-- ko if: Processed -->
-										SUCCESS
-									<!-- /ko -->
-									<!-- ko if: !Processed -->
-										FAILED
-									<!-- /ko -->
-								</td>
-								<td data-bind="text: Comment ? (Id ? '[User ID: ' + Id + '] ' : '') + Comment : ''"></td>
-							</tr>
-						</tbody>
-					</table>
-				</div>
-			  </div>
-			</div>
+            <div id="details" class="accordion-body collapse in">
+                    <div class="accordion-inner">
+                        <div class="row-fluid" id="importdetailstable-wrap">
+                            <table class="table table-bordered" id="importdetailstable">
+                                <tr>
+                                    <td>Total Records</td>
+                                    <td data-bind="text: TotalRecords"></td>
+                                </tr>
+                                <tr>
+                                    <td>Processed Records</td>
+                                    <td data-bind="text: ProcessedRecords"></td>
+                                </tr>
+                                <tr>
+                                    <td>Success Records</td>
+                                    <td data-bind="text: SuccessRecords"></td>
+                                </tr>
+                                <tr>
+                                    <td>Failed Records</td>
+                                    <td data-bind="text: FailedRecords"></td>
+                                </tr>
+                                <tr>
+                                    <td>Log Count</td>
+                                    <td data-bind="text: log().length"></td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
 		  </div>
 		  <div class="accordion-group">
 			<div class="accordion-heading">
@@ -133,16 +158,54 @@
 				Import Log
 			  </a>
 			</div>
-			<div id="log" class="accordion-body collapse">
-			  <div class="accordion-inner">
-				<div class="row-fluid">
-					<textarea id="talog" rows="10" cols="10" data-bind="value: log" class="span12" readonly="readonly"></textarea>
-				</div>
-			  </div>
-			</div>
+            <div id="log" class="accordion-body collapse">
+                    <div class="accordion-inner">
+                        <div class="row-fluid">
+                            <div>
+                                <a id="lnkall" style="display: none;" class="allLog" onclick="javascript:ImportResourceStatusClient.filterLogByStatus('All');">All</a>
+                                <a id="lnkinfo" style="display: none;" class="infoLog" onclick="javascript:ImportResourceStatusClient.filterLogByStatus('Info');">Info</a>
+                                <a id="lnkwarning" style="display: none;" class="warningLog" onclick="javascript:ImportResourceStatusClient.filterLogByStatus('Warning');">Warning</a>
+                                <a id="lnkerror" style="display: none;" class="errorLog" onclick="javascript:ImportResourceStatusClient.filterLogByStatus('Error');">Error</a>
+                            </div>
+                            <br />
+                            <div class="row-fluid" id="importdetailslog-wrap">
+
+                                <table class="table table-bordered" id="importdetailslog">
+                                    <thead>
+                                        <tr>
+                                            <th width="10">#</th>
+                                            <th width="10">Status</th>
+                                            <th width="270">Description</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody data-bind="foreach: log ">
+                                        <tr>
+                                            <td data-bind="text: $index() + 1"></td>
+                                            <td data-bind="attr: { 'class': Kind == '0' ? 'infoLog' : Kind == '1' ? 'warningLog' : 'errorLog' }">
+                                                <!-- ko if: Kind == '0' -->
+                                                Info
+                                                <!-- /ko -->
+                                                <!-- ko if: Kind == '1' -->
+                                                Warning
+                                                <!-- /ko -->
+                                                <!-- ko if: Kind == '2' -->
+                                                Error
+                                                <!-- /ko -->
+                                            </td>
+                                            <td>
+                                                <div data-bind="html: Message"></div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 		  </div>
 		</div>
 		<input type="button" value="Close" onclick="parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.OK); return false;" style="float: right; position: relative; top: -5px;">
+        <input id="CancelImport" type="button" value="Cancel" onclick="cancelImportResourceJob();" style="float: right; position: relative; top: -5px;">
 	</asp:Panel>
 </asp:Content>
 

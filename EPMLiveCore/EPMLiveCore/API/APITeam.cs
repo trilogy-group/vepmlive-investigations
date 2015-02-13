@@ -317,6 +317,8 @@ namespace EPMLiveCore.API
                                     string imgUrl = Convert.ToString(drUserInfo[0]["Picture"]);
                                     if (!string.IsNullOrEmpty(imgUrl))
                                     {
+                                        if (imgUrl.Contains(","))
+                                            imgUrl = imgUrl.Remove(imgUrl.IndexOf(','));
                                         userPictureUrl = imgUrl;
                                     }
                                 }

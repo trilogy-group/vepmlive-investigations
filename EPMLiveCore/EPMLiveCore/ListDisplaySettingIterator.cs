@@ -385,9 +385,11 @@ namespace EPMLiveCore
                 profilePanel = new HtmlTextWriter(new System.IO.StringWriter(profilePanelSb, System.Globalization.CultureInfo.InvariantCulture));
                 profilePanel.Write(CreateHtmlPanelText("Profile"));
 
-                permissionPanel = new HtmlTextWriter(new System.IO.StringWriter(permissionPanelSb, System.Globalization.CultureInfo.InvariantCulture));
-                permissionPanel.Write(CreateHtmlPanelText("Permissions"));
-
+                if (Web.CurrentUser.IsSiteAdmin)
+                {
+                    permissionPanel = new HtmlTextWriter(new System.IO.StringWriter(permissionPanelSb, System.Globalization.CultureInfo.InvariantCulture));
+                    permissionPanel.Write(CreateHtmlPanelText("Permissions"));
+                }
             }
 
             if (isFeatureActivated)
@@ -712,11 +714,12 @@ namespace EPMLiveCore
                     writer.Write(userPanelSb.ToString());
                     profilePanel.Write("</table></div></div></td></tr>");
                     writer.Write(profilePanelSb.ToString());
-                    permissionPanel.Write("</table></div></div></td></tr>");
-                    writer.Write(permissionPanelSb.ToString());
 
-
-
+                    if (Web.CurrentUser.IsSiteAdmin)
+                    {
+                        permissionPanel.Write("</table></div></div></td></tr>");
+                        writer.Write(permissionPanelSb.ToString());
+                    }
                 }
 
                 #endregion
@@ -868,7 +871,7 @@ namespace EPMLiveCore
                                 {
                                     try
                                     {
-                                        writer.WriteLine(" try{document.getElementById('" + dControls["Permissions"] + "').parentNode.parentNode.parentNode.style.display='none';}catch(e){}");
+                                        writer.WriteLine(" try{document.getElementById('" + dControls["Permissions"] + "').parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.style.display='none';}catch(e){}");
                                     }
                                     catch { }
                                 }
@@ -923,7 +926,7 @@ namespace EPMLiveCore
                                 {
                                     try
                                     {
-                                            writer.WriteLine("try{document.getElementById('" + dControls["Permissions"] + "').parentNode.parentNode.parentNode.style.display='';}catch(e){}");
+                                        writer.WriteLine("try{document.getElementById('" + dControls["Permissions"] + "').parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.style.display='';}catch(e){}");
                                     }
                                     catch { }
                                 }
@@ -961,7 +964,7 @@ namespace EPMLiveCore
 
                         writer.WriteLine("cleanupfields();");
                        // To make default collapsed div, if there isnt any mandatory field in it
-                        writer.WriteLine("$(document).ready(function () {var headers = $('.upheader');$.each(headers, function (i, val) {if ($(this).find('span').text() == 'Permissions' && " + permissionPanelRequiredCount + " == '0' ) { $(this).next().slideUp();$(this).find('.imgArrow').removeClass('hideImage');$(this).find('.imgDownArrow').addClass('hideImage');} if ($(this).find('span').text() == 'Profile' && " + profilepanelRequiredCount + " == '0' ) { $(this).next().slideUp();$(this).find('.imgArrow').removeClass('hideImage');$(this).find('.imgDownArrow').addClass('hideImage');}  });});");
+                        writer.WriteLine("$(document).ready(function () {var headers = $('.upheader');$.each(headers, function (i, val) {if ($(this).find('span').text() == 'Permissions' && " + permissionPanelRequiredCount + " == '0') {if('" + Convert.ToString(this.ListItem["Generic"]) + "' == 'True'){ $($(this).next()).hide(); $(this).hide(); }else{ $(this).next().slideUp();$(this).find('.imgArrow').removeClass('hideImage');$(this).find('.imgDownArrow').addClass('hideImage');}} if ($(this).find('span').text() == 'Profile' && " + profilepanelRequiredCount + " == '0' ) { $(this).next().slideUp();$(this).find('.imgArrow').removeClass('hideImage');$(this).find('.imgDownArrow').addClass('hideImage');}  });});");
                         writer.WriteLine("}_spBodyOnLoadFunctionNames.push(\"InitFields\");");
 
 
