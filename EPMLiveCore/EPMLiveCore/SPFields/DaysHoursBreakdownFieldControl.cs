@@ -135,6 +135,14 @@ namespace EPMLiveCore.SPFields
 
                 FillGridView(datePattern);
             }
+            //EPML-3726 : If user doesn't have permission then argumentexception thrown, so handle it and display appropriate error message as suggested in Jira Item.
+            catch (ArgumentException ex)
+            {
+                gridPanel.Visible = false;
+                gridErrorPanel.Visible = true;
+                errorLabel.Text = string.Format("<b>Error: </b>You do not have permission to read required information from the resource pool. You must have at least read-only access to the resource pool in order to enter Time Off. Please contact your system administrator to have your permissions adjusted.");
+                errorTextBox.Text = "You dont have permisions to the resource pool. Please contact your administrator.";
+            }
             catch (Exception exception)
             {
                 gridPanel.Visible = false;
