@@ -21,7 +21,7 @@ namespace EPMLiveWorkPlanner
         protected string viewList = "";
         protected string currentView = "";
         protected string currentViewGuid = "";
-        protected string autoCalc = "";
+        protected string autoCalc = "true";
         protected string columnCalculations = "";
         protected string defaultValues = "";
         protected string minValues = "";
@@ -571,13 +571,14 @@ namespace EPMLiveWorkPlanner
 
             loadViews(web);
 
-            autoCalc = "false";
+            //autoCalc = "false";
+            autoCalc = "true";
 
-            try
-            {
-                autoCalc = project["AutoCalculate"].ToString().ToLower();
-            }
-            catch { autoCalc = "true"; }
+            //try
+            //{
+            //    autoCalc = project["AutoCalculate"].ToString().ToLower();
+            //}
+            //catch { autoCalc = "true"; }
 
             projectName = project.Title.Replace(" ", "%20");
 

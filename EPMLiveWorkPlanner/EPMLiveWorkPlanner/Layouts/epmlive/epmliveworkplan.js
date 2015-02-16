@@ -1,5 +1,5 @@
 var curProj;
-var autoCalc;
+var autoCalc = true;
 var maxLevel;
 var gridLoading = true;
 var columnCalculations;
@@ -1429,7 +1429,8 @@ function autocalcres(loader)
 function autocalc(cell)
 {
     sm('dlgAutoCalc',200,100);
-    autoCalc = !autoCalc;
+    //autoCalc = !autoCalc;
+    autoCalc = "true";
     dhtmlxAjax.post("setPCfield.aspx", "Field=AutoCalculate&Value=" + autoCalc + "&ID=" + curProj,autocalcres);
 }
 

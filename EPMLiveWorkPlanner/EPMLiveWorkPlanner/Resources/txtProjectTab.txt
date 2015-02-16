@@ -104,7 +104,7 @@
 				LabelText="Project Info"
 				TemplateAlias="cust1"/>
 
-				<ToggleButton
+				<!--<ToggleButton
 				  Command="Ribbon.WorkPlanner.DisableCalc"
 				  Id="Ribbon.Project.ScheduleGroup.DisableCalc"
 				  Sequence="10"
@@ -112,7 +112,7 @@
 				  Image16by16="/_layouts/epmlive/images/disablecalc.gif"
 				  QueryCommand="Ribbon.WorkPlanner.QueryAutoCalc"
 				  TemplateAlias="oM"
-				/>
+				/>-->
 
 				<ToggleButton
 				  Command="Ribbon.WorkPlanner.RespectLinks"
