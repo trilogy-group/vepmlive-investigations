@@ -83,7 +83,6 @@ namespace EPMLiveWorkPlanner
 
             SPListItem project = lstProjectCenter.GetItemById(int.Parse(Request["ID"].ToString()));
 
-            //string autoCalc = "false";
             string autoCalc = "true";
 
             //try

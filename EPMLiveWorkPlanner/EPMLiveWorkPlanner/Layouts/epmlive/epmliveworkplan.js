@@ -1430,7 +1430,6 @@ function autocalc(cell)
 {
     sm('dlgAutoCalc',200,100);
     //autoCalc = !autoCalc;
-    autoCalc = "true";
     dhtmlxAjax.post("setPCfield.aspx", "Field=AutoCalculate&Value=" + autoCalc + "&ID=" + curProj,autocalcres);
 }
 

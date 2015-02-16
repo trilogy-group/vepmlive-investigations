@@ -571,7 +571,6 @@ namespace EPMLiveWorkPlanner
 
             loadViews(web);
 
-            //autoCalc = "false";
             autoCalc = "true";
 
             //try
