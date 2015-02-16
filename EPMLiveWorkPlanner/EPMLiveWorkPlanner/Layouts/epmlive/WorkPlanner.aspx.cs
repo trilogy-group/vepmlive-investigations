@@ -164,7 +164,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                     catch { }
                 }
 
-                if (!oField.Hidden && oField.Required)
+                if (!oField.Hidden && oField.Required && oField.Type != SPFieldType.Computed && isValidField(oField.InternalName, false) && oField.InternalName != "Notes")
                 {
                     sRequiredFields += ",'" + oField.InternalName + "'";
                     sFieldDisplayNames += ",'" + lstTaskCenter.Fields.GetField(oField.InternalName).Title + "'";
@@ -219,7 +219,36 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
             tb.StopTimer();
         }
 
-
+        public static bool isValidField(string fieldname, bool isProjectCenter)
+        {
+            switch (fieldname)
+            {
+                case "ContentType":
+                case "Modified":
+                case "Created":
+                case "Author":
+                case "Editor":
+                case "_UIVersionString":
+                case "Attachments":
+                case "Edit":
+                case "ID":
+                case "ItemChildCount":
+                case "FolderChildCount":
+                case "DocIcon":
+                case "Def":
+                case "Panel":
+                case "Project":
+                case "D":
+                case "Detail":
+                    return false;
+                case "AssignedTo":
+                    if (isProjectCenter)
+                        return false;
+                    else
+                        return true;
+            }
+            return true;
+        }
 
         protected void getAttachedLists(SPWeb web, string listid)
         {

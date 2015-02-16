@@ -808,7 +808,7 @@ function SaveWorkPlan() {
         if (bFlag_WorkPlannerDetail_Visible == true) {
             ShowTab('t1');
         }
-        alert("The schedule cannot be saved because there are one or more empty required fields in current view (red cells) :" + '\n' + strReqFields_CurrentView + '\n' + "The schedule cannot be saved because there are one or more empty required fields in details view (red cells) :" + '\n' + strReqFields_DetailView + "");
+        alert("The schedule cannot be saved because there are one or more empty required fields (red cells) :" + '\n' + 'Current View :' + '\n\t' + strReqFields_CurrentView + '\n' + "Details View :" + '\n\t' + strReqFields_DetailView + "");
         return;
     }
     else if (strReqFields_CurrentView.length > 0 && strReqFields_DetailView.length == 0) {
@@ -3031,21 +3031,17 @@ function GetCssClass(grid, row, col, classname) {
         }
     }
     if (grid.id == "WorkPlannerDetail" && col == "V") {
-        try {
-            var vCols = Grids.WorkPlannerGrid.GetCols("Visible");
-            if ((row.Def.Name == "R" && vCols.length > 0)) {
-                if (oRequiredFields.length > 0) {
-                    if (oRequiredFields.indexOf(row.id) > -1 && vCols.indexOf(row.id) == -1) {
-                        var val1 = grid.GetValue(row, "V");
-                        val1 = val1.toString().trim();
-                        if (val1 == "") {
-                            return "erroroncell";
-                        }
+        if (row.Def.Name == "R") {
+            if (oRequiredFields.length > 0) {
+                if (oRequiredFields.indexOf(row.id) > -1) {
+                    var val1 = grid.GetValue(row, "V");
+                    val1 = val1.toString().trim();
+                    if (val1 == "") {
+                        return "erroroncell";
                     }
                 }
             }
         }
-        catch (e) { }
     }
 }
 
@@ -3081,7 +3077,7 @@ function GetToolTip(grid, row, col, tip, clientx, clienty, x, y) {
 function ValidateRequiredFields(view) {
     var grid = Grids.WorkPlannerGrid;
     var sRequiredFields = "";
-    var sDisplayNames = ""; 
+    var sDisplayNames = "";
     var vCols = grid.GetCols("Visible");
     for (var R in grid.Rows) {
         var row = grid.GetRowById(R);
@@ -3095,19 +3091,20 @@ function ValidateRequiredFields(view) {
                     if (view == "CurrentView") {
                         if (val1 == "" && vCols.indexOf(f) > -1 && sRequiredFields.indexOf(f) == -1) {
                             sRequiredFields += f + '\n';
-                            sDisplayNames += f_DisplayName + '\n';
+                            sDisplayNames += f_DisplayName + ', ';
                         }
                     }
                     else if (view == "DetailView") {
                         if (val1 == "" && vCols.indexOf(f) == -1 && sRequiredFields.indexOf(f) == -1) {
                             sRequiredFields += f + '\n';
-                            sDisplayNames += f_DisplayName + '\n';
+                            sDisplayNames += f_DisplayName + ', ';
                         }
                     }
                 }
             }
         }
     }
+    sDisplayNames = sDisplayNames.replace(/,\s*$/, ""); //Remove Last Comma
     return sDisplayNames;
 }
 

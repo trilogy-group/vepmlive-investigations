@@ -418,7 +418,7 @@
         </div>
     </div>
 
-    <div id="detailDiv" style="width:100%;height:100%">
+    <div id="detailDiv" style="width:100%;height:100%;overflow-y: auto;">
         <div id="detailTree" style="width:100%;height:100%;background-color:White">
             <!--<treegrid 
             Data_Url="BlankTable.xml"
