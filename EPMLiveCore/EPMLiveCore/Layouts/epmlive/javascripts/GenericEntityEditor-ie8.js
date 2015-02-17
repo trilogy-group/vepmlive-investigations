@@ -1258,6 +1258,8 @@ function GEInit() {
             $('#' + controlProps.ControlInfo.GenericEntityDivId).append('&nbsp;');
             RemoveTypeAheadChoiceCandidate(controlProps);
             //ValidateEntity(controlProps.ControlInfo.GenericEntityCheckNameId);
+
+            UpdateChildrenValues(controlProps);
         }
 
         function PostDataBackToMultiSelectLookup() {
