@@ -323,6 +323,7 @@ namespace EPMLiveCore.API.SPAdmin
                                                            SPEventReceiverType.ItemAdded,
                                                            SPEventReceiverType.ItemAdding,
                                                            SPEventReceiverType.ItemUpdating,
+                                                           SPEventReceiverType.ItemUpdated,
                                                            SPEventReceiverType.ItemDeleting
                                                        };
 

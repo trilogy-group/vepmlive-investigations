@@ -5,6 +5,7 @@ using Microsoft.SharePoint;
 using WorkEnginePPM.Core.ResourceManagement;
 using EPMLiveCore;
 using Utilities = WorkEnginePPM.Core.ResourceManagement.Utilities;
+using WorkEnginePPM.WebServices.Core;
 
 namespace WorkEnginePPM.Events
 {
@@ -31,6 +32,8 @@ namespace WorkEnginePPM.Events
                 decimal rate;
                 Utilities.AddUpdateResource(Utilities.BuildFieldsTable(properties, false), spWeb, properties.ListId,
                                             out rate, false);
+
+                CalculateResourceAvailabilities(properties.ListItem["EXTID"].ToString(), spWeb);
             }
             catch (Exception exception)
             {
@@ -180,6 +183,22 @@ namespace WorkEnginePPM.Events
             }
         }
 
+        public override void ItemUpdated(SPItemEventProperties properties)
+        {
+            if (!ValidateRequest(properties)) return;
+
+            try
+            {
+                CalculateResourceAvailabilities(properties.ListItem["EXTID"].ToString(), properties.Web);
+            }
+            catch (Exception exception)
+            {
+                properties.ErrorMessage = exception.GetBaseException().Message;
+                properties.Cancel = true;
+                properties.Status = SPEventReceiverStatus.CancelWithError;
+            }
+        }
+
         /// <summary>
         /// Validates the request.
         /// </summary>
@@ -189,6 +208,14 @@ namespace WorkEnginePPM.Events
         {
             return properties.OpenSite().Features[new Guid("158c5682-d839-4248-b780-82b4710ee152")] != null &&
                    properties.List.Title.Equals("Resources");
+        }
+
+        private void CalculateResourceAvailabilities(string pfeResourceId, SPWeb spWeb)
+        {
+            using (var resourceManager = new ResourceManager(spWeb))
+            {
+                resourceManager.CalculateResourceAvailabilities(int.Parse(pfeResourceId));
+            }
         }
 
         #endregion Methods
