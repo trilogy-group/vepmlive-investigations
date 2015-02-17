@@ -68,6 +68,14 @@ namespace EPMLiveCore.SocialEngine.Modules
                 {"UserId", DataType.Int},
                 {"ActivityTime", DataType.DateTime}
             });
+
+            var oriUrl = data["URL"].ToString();
+            var url = oriUrl.ToLower();
+
+            if (url.StartsWith("lists/") && !url.Contains("id="))
+            {
+                throw new SocialEngineException(oriUrl + " is not a valid URL.");
+            }
         }
 
         private TimeSpan GetRelatedActivityInterval(SPWeb contextWeb)
