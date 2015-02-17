@@ -752,7 +752,6 @@ namespace WorkEnginePPM.WebServices.Core
                     try
                     {
                         int resourceId = resourceCore.UpdateResource(resourceCore.BuildResource(dataRow));
-                        adminFunctions.CalcAvailabilities(-1, resourceId.ToString(CultureInfo.InvariantCulture));
 
                         resourceElement.Add(new XAttribute("Id", resourceId),
                                             new XAttribute("Rate", adminFunctions.CalcResourceRate(resourceId)));
@@ -778,6 +777,12 @@ namespace WorkEnginePPM.WebServices.Core
             {
                 return Response.Failure((int) APIError.UpdateResources, exception);
             }
+        }
+
+        internal void CalculateResourceAvailabilities(int resourceId)
+        {
+            AdminFunctions adminFunctions = GetAdminFunctionsCore(SecurityLevels.AdminCalc);
+            adminFunctions.CalcAvailabilities(-1, resourceId.ToString(CultureInfo.InvariantCulture));
         }
 
         #endregion Methods 
