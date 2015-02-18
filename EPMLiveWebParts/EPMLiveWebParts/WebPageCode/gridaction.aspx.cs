@@ -346,7 +346,14 @@ namespace EPMLiveWebParts
                     cmd.Parameters.AddWithValue("@webid", web.ID);
                     cmd.Parameters.AddWithValue("@listid", Request["listid"]);
                     cmd.Parameters.AddWithValue("@value", Request["lookups"]);
-                    cmd.Parameters.AddWithValue("@ItemId", Request["lookupid"]);
+                    if (Request["lookupid"] != null)
+                    {
+                        cmd.Parameters.AddWithValue("@ItemId", Request["lookupid"]);
+                    }
+                    else
+                    {
+                        cmd.Parameters.AddWithValue("@ItemId", DBNull.Value);
+                    }
                     cmd.ExecuteNonQuery();
 
                     cn.Close();
