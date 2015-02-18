@@ -3,6 +3,7 @@ using Microsoft.SharePoint;
 using Microsoft.SharePoint.WebControls;
 using System.Data.SqlClient;
 using System.Data;
+using System.Linq;
 
 namespace EPMLiveCore.Layouts.epmlive.reporting.izenda
 {
@@ -56,7 +57,10 @@ namespace EPMLiveCore.Layouts.epmlive.reporting.izenda
                     dr["Name"] = System.Web.HttpUtility.UrlEncode(dr["Name"].ToString());
                 }
 
-                gvReports.DataSource = ds;
+                DataTable dt = ds.Tables[0];                
+                dt = dt.AsEnumerable().GroupBy(x => x["Category"]).SelectMany(g => g.OrderBy(v => v["ShortName"])).CopyToDataTable();
+                
+                gvReports.DataSource = dt;
                 gvReports.DataBind();
 
                 cn.Close();
