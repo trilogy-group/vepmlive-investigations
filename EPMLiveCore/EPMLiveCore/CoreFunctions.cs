@@ -2431,14 +2431,21 @@ namespace EPMLiveCore
                 #region Modify Open Workspace
                 else
                 {
-                    try
+                    var ownerByCreation = web.AllUsers[user];
+
+                    SPSecurity.RunWithElevatedPrivileges(delegate
                     {
-                        web.AllowUnsafeUpdates = true;
-                        //EPML-4553 : Open workspace not inhering permissions
-                        web.ResetRoleInheritance();
-                        web.Update();
-                    }
-                    catch { }
+                        using (var es = new SPSite(itemWeb.Site.ID))
+                        {
+                            using (var ew = es.OpenWeb(itemWeb.ID))
+                            {
+                                ew.AllowUnsafeUpdates = true;
+                                //EPML-4553 : Open workspace not inhering permissions
+                                ew.ResetRoleInheritance();
+                                ew.Update();
+                            }
+                        }
+                    });
                 }
                 #endregion
 
