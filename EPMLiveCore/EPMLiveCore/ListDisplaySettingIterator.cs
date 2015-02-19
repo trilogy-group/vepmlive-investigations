@@ -385,7 +385,7 @@ namespace EPMLiveCore
                 profilePanel = new HtmlTextWriter(new System.IO.StringWriter(profilePanelSb, System.Globalization.CultureInfo.InvariantCulture));
                 profilePanel.Write(CreateHtmlPanelText("Profile"));
 
-                if (Web.CurrentUser.IsSiteAdmin)
+                if (CoreFunctions.DoesCurrentUserHaveFullControl(Web))
                 {
                     permissionPanel = new HtmlTextWriter(new System.IO.StringWriter(permissionPanelSb, System.Globalization.CultureInfo.InvariantCulture));
                     permissionPanel.Write(CreateHtmlPanelText("Permissions"));
@@ -715,7 +715,7 @@ namespace EPMLiveCore
                     profilePanel.Write("</table></div></div></td></tr>");
                     writer.Write(profilePanelSb.ToString());
 
-                    if (Web.CurrentUser.IsSiteAdmin)
+                    if (CoreFunctions.DoesCurrentUserHaveFullControl(Web))
                     {
                         permissionPanel.Write("</table></div></div></td></tr>");
                         writer.Write(permissionPanelSb.ToString());
