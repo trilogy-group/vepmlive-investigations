@@ -118,25 +118,17 @@ begin
     Print 'Updating Function EPG_FN_ConvertListToTable'
     SET @createoralter = 'ALTER'
 end
-exec(@createoralter + ' function dbo.EPG_FN_ConvertListToTable(@str ntext)
-returns @TokenVals table (TokenVal int)
-as
-begin
-   declare @strlen int, @curpos int, @val int, @nextcomma int
-   set @strlen = datalength(@str)
-   set @curpos = 0
--- For each token, load it into the table
-       while @curpos <= @strlen
-          begin
-             set @nextcomma = dbo.EPG_FN_charindex_ex('','', @str, @curpos)
-             if @nextcomma = 0
-                 set @nextcomma = @strlen + 1
-                 set @val = cast(substring(@str,@curpos,@nextcomma - @curpos)   as int)
-                 insert @TokenVals values (@val)
-                 set @curpos = @nextcomma + 1
-          end
-return
-end
+exec(@createoralter + ' function dbo.EPG_FN_ConvertListToTable(@strString nvarchar(max))
+RETURNS  @TokenVals TABLE(TokenVal BIGINT)
+AS
+BEGIN
+      DECLARE @x XML
+      SELECT @x = CAST(''<A>''+ REPLACE(@strString,'','',''</A><A>'')+ ''</A>'' AS XML)
+      INSERT INTO @TokenVals        
+      SELECT t.value(''.'', ''int'') AS inVal
+      FROM @x.nodes(''/A'') AS x(t)
+    RETURN
+END
 ')
  
 if not exists (select routine_name from INFORMATION_SCHEMA.routines where routine_name = 'EPG_FN_ConvertWEPIDToTable')
