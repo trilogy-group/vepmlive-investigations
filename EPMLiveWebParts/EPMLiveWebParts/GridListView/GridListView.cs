@@ -2913,7 +2913,7 @@ namespace EPMLiveWebParts
                 }
 
                 foreach (var bagData in propBagData)
-                {                    
+                {
                     foreach (SPGroup grp in arrGroup)
                     {
                         if (grp.ID == bagData.Key)
@@ -2933,7 +2933,7 @@ namespace EPMLiveWebParts
                                     splitViewcollection.Add(tmpViewInsert);
                             }
                         }
-                    }                    
+                    }
                 }
 
                 // Adding distinct Views
@@ -3210,10 +3210,10 @@ namespace EPMLiveWebParts
 
                 foreach (DictionaryEntry de in slFields)
                 {
-                        if (sSearchField == de.Value.ToString())
-                            fieldlist += "<option value=\"" + de.Value + "\" selected>" + de.Key.ToString() + "</option>";
-                        else
-                            fieldlist += "<option value=\"" + de.Value + "\">" + de.Key.ToString() + "</option>";
+                    if (sSearchField == de.Value.ToString())
+                        fieldlist += "<option value=\"" + de.Value + "\" selected>" + de.Key.ToString() + "</option>";
+                    else
+                        fieldlist += "<option value=\"" + de.Value + "\">" + de.Key.ToString() + "</option>";
                 }
 
                 output.WriteLine("<script language=\"javascript\">");
@@ -5262,15 +5262,22 @@ namespace EPMLiveWebParts
             XmlDocument doc = new XmlDocument();
             doc.LoadXml("<Query>" + view.Query + "</Query>");
             XmlNode ndGroup = doc.SelectSingleNode("//GroupBy");
-
+            EPMLiveCore.GridGanttSettings gSettings = new EPMLiveCore.GridGanttSettings(list);
+            Dictionary<string, Dictionary<string, string>> fieldProperties = EPMLiveCore.ListDisplayUtils.ConvertFromString(gSettings.DisplaySettings);
             foreach (string f in view.ViewFields)
             {
                 SPField field = getRealField(list.Fields.GetFieldByInternalName(f));
-                if (field.InternalName == "Title" || field.InternalName == "URL" || field.InternalName == "FileLeafRef")
+                if (field != null)
                 {
-                    titlefound = true;
+                    if (EPMLiveCore.EditableFieldDisplay.IsDisplayField(field, fieldProperties, "Display"))
+                    {
+                        if (field.InternalName == "Title" || field.InternalName == "URL" || field.InternalName == "FileLeafRef")
+                        {
+                            titlefound = true;
+                        }
+                        fields += "\n" + field.InternalName;
+                    }
                 }
-                fields += "\n" + field.InternalName;
             }
             if (!titlefound && (ndGroup != null || getAdditionalGroupings() != "|"))
                 fields = "\n_Title_" + fields;
