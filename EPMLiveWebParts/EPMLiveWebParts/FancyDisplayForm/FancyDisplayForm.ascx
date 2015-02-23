@@ -7,21 +7,14 @@
 <%@ Register TagPrefix="WebPartPages" Namespace="Microsoft.SharePoint.WebPartPages" Assembly="Microsoft.SharePoint, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
 <%@ Control Language="C#" AutoEventWireup="true" CodeBehind="FancyDisplayForm.ascx.cs" Inherits="EPMLiveWebParts.FancyDisplayForm" %>
 
-<link rel="stylesheet" type="text/css" href="http://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css">
-
 <style type="text/css">
-    @import url(http://fonts.googleapis.com/css?family=Open+Sans:400,300,600);
-
     #attach-wrapper {
-        font-family: "Open Sans";
-        font-size: 13px;
     }
 
         #attach-wrapper .paperclip {
             color: #999999;
             display: inline-block;
-            padding-right: 8px;
-            font-size: 16px;
+            font-size: 14px;
             vertical-align: top;
             position: relative;
         }

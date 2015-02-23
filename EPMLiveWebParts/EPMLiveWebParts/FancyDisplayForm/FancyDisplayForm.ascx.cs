@@ -818,16 +818,17 @@ namespace EPMLiveWebParts
                 foreach (string fileName in item.Attachments)
                 {
                     string attachmentUrl = SPContext.Current.Web.Url + "/" + SPContext.Current.List.RootFolder.Url + "/attachments/" + item.ID + "/" + fileName;
-                    sbItemAttachments.Append("<div class='paperclip'><i class='fa fa-paperclip'></i></div>");
+                    sbItemAttachments.Append("<div class='paperclip'><span class='icon-attachment-2' style='float:none; font-size:14px; display:inline-table;'></span></div>");
 
                     sbItemAttachments.Append("<div id='attach-text-wrapper'>");
 
                     sbItemAttachments.Append("<div class='attach-text'>");
-                    sbItemAttachments.Append("<i class='fa fa-file-o file'></i>");
-                    sbItemAttachments.Append("<a href='" + attachmentUrl + "' target='_blank' ID='" + fileName + "'>" + fileName + "</a>");
+                    sbItemAttachments.Append("<span class='icon-file'  style='float:left; margin-right:5px; margin-top:-2px;'></span>");
+                    sbItemAttachments.Append("<a href='" + attachmentUrl + "' target='_blank' ID='" + fileName + "'><span>&nbsp;" + fileName + "</span></a>");
+
 
                     string deleteAttachmentLink = SPContext.Current.Web.Url + "/_layouts/epmlive/gridaction.aspx?action=deleteitemattachment&listid=" + SPContext.Current.List.ID.ToString() + "&itemid=" + item.ID + "&fname=" + fileName;// +"&Source=" + sourceUrl;
-                    sbItemAttachments.Append("<a href='#' onclick=\"javascript:FancyDispFormClient.DeleteItemAttachment('" + deleteAttachmentLink + "');return false;\"><i class='fa fa-times delete'></i></a>");
+                    sbItemAttachments.Append("<a href='#' onclick=\"javascript:FancyDispFormClient.DeleteItemAttachment('" + deleteAttachmentLink + "');return false;\"><span class='fui-cross delete' style='margin-left:3px;vertical-align:sub'></span></a>");
 
                     sbItemAttachments.Append("</div>");
                     sbItemAttachments.Append("</div>");
