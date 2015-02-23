@@ -502,9 +502,8 @@ namespace EPMLiveCore.SPFields
                     }
 
                     if (!resourceFoundInPool)
-                    {
-                        throw new Exception(string.Format("Cannot find '{0}' in the Resource Pool.",
-                                                          web.CurrentUser.LoginName));
+                    {                        
+                        throw new ArgumentException();                        
                     }
                 }
             }
