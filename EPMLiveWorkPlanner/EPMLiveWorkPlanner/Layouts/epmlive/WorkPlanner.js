@@ -3050,10 +3050,12 @@ function GetToolTip(grid, row, col, tip, clientx, clienty, x, y) {
         if ((row.Def.Name == "Task" || row.Def.Name == "Summary") && row.Def.Name != "Header") {
             if (oRequiredFields.length > 0) {
                 if (oRequiredFields.indexOf(col) > -1) {
+                    var index_oRequiredFields = oRequiredFields.indexOf(col);
+                    var displayname_CurrentView = oFieldDisplayNames[index_oRequiredFields];
                     var val1 = grid.GetValue(row, col);
                     val1 = val1.toString().trim();
                     if (val1 == "") {
-                        return "" + col + " values cannot be blank";
+                        return "" + displayname_CurrentView + " values cannot be blank";
                     }
                 }
             }
@@ -3063,10 +3065,12 @@ function GetToolTip(grid, row, col, tip, clientx, clienty, x, y) {
         if ((row.Def.Name == "R")) {
             if (oRequiredFields.length > 0) {
                 if (oRequiredFields.indexOf(row.id) > -1) {
+                    var i_oRequiredFields = oRequiredFields.indexOf(row.id);
+                    var displayname_DetailView = oFieldDisplayNames[i_oRequiredFields];
                     var val1 = grid.GetValue(row, "V");
                     val1 = val1.toString().trim();
                     if (val1 == "") {
-                        return "" + row.id + " values cannot be blank";
+                        return "" + displayname_DetailView + " values cannot be blank";
                     }
                 }
             }

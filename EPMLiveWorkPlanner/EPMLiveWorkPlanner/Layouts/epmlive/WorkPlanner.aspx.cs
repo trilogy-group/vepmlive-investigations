@@ -164,7 +164,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                     catch { }
                 }
 
-                if (!oField.Hidden && oField.Required && oField.Type != SPFieldType.Computed && isValidField(oField.InternalName, false) && oField.InternalName != "Notes")
+                if (!oField.Hidden && !oField.ReadOnlyField && oField.Required && oField.Type != SPFieldType.Computed && isValidField(oField.InternalName, false) && oField.InternalName != "Notes")
                 {
                     sRequiredFields += ",'" + oField.InternalName + "'";
                     sFieldDisplayNames += ",'" + lstTaskCenter.Fields.GetField(oField.InternalName).Title + "'";

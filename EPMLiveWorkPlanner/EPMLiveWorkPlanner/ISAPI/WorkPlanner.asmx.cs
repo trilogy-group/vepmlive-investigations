@@ -4007,7 +4007,7 @@ namespace EPMLiveWorkPlanner
                             break;
                     }
 
-                    attr = docOut.CreateAttribute("CanEdit");
+                    attr = docOut.CreateAttribute("VCanEdit");
                     attr.Value = canEdit;
                     ndNew.Attributes.Append(attr);
 
