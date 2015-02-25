@@ -17,7 +17,7 @@ namespace EPMLiveWebParts
     public partial class savegrid : getgriditems
     {
         private string output;
-        private string []strFields;
+        private string[] strFields;
         protected bool useResourcePool;
         private Hashtable hshResources = new Hashtable();
 
@@ -121,10 +121,10 @@ namespace EPMLiveWebParts
         }
         */
 
-        public override void populateGroups(string query, SortedList arrGTemp, SPWeb curWeb)
-        {
+        //public override void populateGroups(string query, SortedList arrGTemp, SPWeb curWeb)
+        //{
 
-        }
+        //}
 
         private void processItem(string gr_id, SPWeb web, SPList list)
         {
@@ -162,15 +162,15 @@ namespace EPMLiveWebParts
                 //bool added = false;
                 try
                 {
-                    if(id != "0")
+                    if (id != "0")
                     {
                         li = list.GetItemById(int.Parse(id));
                     }
                 }
-                catch{}
-                if(li == null)
+                catch { }
+                if (li == null)
                 {
-                   // added = true;
+                    // added = true;
                     li = list.Items.Add();
                 }
                 if (status == "deleted")
@@ -321,8 +321,8 @@ namespace EPMLiveWebParts
                     {
 
                         li.Update();
-                        arrItems.Add(li.ParentList.ParentWeb.ID + "." + li.ParentList.ID + "." + li.ID, new string[1] { null });
-                        queueAllItems.Enqueue(li);
+                        //arrItems.Add(li.ParentList.ParentWeb.ID + "." + li.ParentList.ID + "." + li.ID, new string[1] { null });
+                        //queueAllItems.Enqueue(li);
                         hshSaveGroups.Add(li.ParentList.ParentWeb.ID + "." + li.ParentList.ID + "." + li.ID + ".1", gr_id);
 
                         gr_id = HttpUtility.UrlEncode(gr_id);
@@ -338,13 +338,13 @@ namespace EPMLiveWebParts
             catch (Exception ex)
             {
                 gr_id = HttpUtility.UrlEncode(gr_id);
-                if(curField != "")
+                if (curField != "")
                     output += "<action type='error100' sid='" + gr_id + "'><![CDATA[Field: " + curField + "<br>Error: " + ex.Message + "]]></action>";
                 else
                     output += "<action type='error100' sid='" + gr_id + "'><![CDATA[" + ex.Message + "]]></action>";
             }
-            
-            
+
+
         }
 
         public override void getParams(SPWeb curWeb)
@@ -447,21 +447,15 @@ namespace EPMLiveWebParts
         }
         protected override void outputXml()
         {
-            XmlNode ndRows = docXml.SelectSingleNode("//rows");
-            XmlNode ndHead = ndRows.SelectSingleNode("head");
-            ndRows.RemoveChild(ndHead);
-            docXml.RemoveChild(ndRows);
-                
-            XmlNode ndData = docXml.CreateNode(XmlNodeType.Element, "data", docXml.NamespaceURI);
+            XmlNodeList ndRows = docXml.SelectNodes("//row");
+            XmlDocument docXmlNew = new XmlDocument();
+            XmlNode ndData = docXmlNew.CreateNode(XmlNodeType.Element, "data", docXmlNew.NamespaceURI);
             ndData.InnerXml = output;
-            docXml.AppendChild(ndData);
-            XmlNode ndAllData = docXml.CreateNode(XmlNodeType.Element, "action", docXml.NamespaceURI);
-            XmlAttribute attrType = docXml.CreateAttribute("type");
+            docXmlNew.AppendChild(ndData);
+            XmlNode ndAllData = docXmlNew.CreateNode(XmlNodeType.Element, "action", docXmlNew.NamespaceURI);
+            XmlAttribute attrType = docXmlNew.CreateAttribute("type");
             attrType.Value = "alldatareturned";
             ndAllData.Attributes.Append(attrType);
-            ndAllData.AppendChild(ndRows);
-
-            ndData.AppendChild(ndAllData);
 
             foreach (XmlNode ndRow in ndRows)
             {
@@ -472,8 +466,15 @@ namespace EPMLiveWebParts
                 }
             }
 
+            foreach (XmlNode ndRow in ndRows)
+            {
+                XmlNode newNode = docXmlNew.ImportNode(ndRow, true);
+                ndAllData.AppendChild(newNode);
+            }
+            ndData.AppendChild(ndAllData);
+
             //base.outputXml();
-            data = docXml.OuterXml;
+            data = docXmlNew.OuterXml;
         }
     }
 }
