@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
 {
-    [UpgradeStep(Version = EPMLiveVersion.V567, Order = 1.0, Description = "Adding Resource Pool events, Updating Description(Body) field with base content types")]
+    [UpgradeStep(Version = EPMLiveVersion.V567, Order = 1.0, Description = "Adding Resource Pool events")]
     internal class AddResourcePoolEvents : UpgradeStep
     {
         public AddResourcePoolEvents(SPWeb spWeb, bool isPfeSite) : base(spWeb, isPfeSite) { }
@@ -36,8 +36,21 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
 
                     LogMessage(message, MessageKind.FAILURE, 4);
                 }
+            });
 
+            return true;
+        }
+    }
 
+    [UpgradeStep(Version = EPMLiveVersion.V567, Order = 2.0, Description = "Updating Description(Body) field with base content types")]
+    internal class UpdateBodyField : UpgradeStep
+    {
+        public UpdateBodyField(SPWeb spWeb, bool isPfeSite) : base(spWeb, isPfeSite) { }
+
+        public override bool Perform()
+        {
+            SPSecurity.RunWithElevatedPrivileges(() =>
+            {
                 try
                 {
                     Web.AllowUnsafeUpdates = true;
