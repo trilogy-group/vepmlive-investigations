@@ -645,7 +645,7 @@ namespace EPMLiveCore.API
                         sbItemAttachments.Append("<div id='attach-wrapper'>");
                         if (item.Attachments != null && item.Attachments.Count == 0)
                         {
-                            sbItemAttachments.Append("<span>There are no attachments, click the \"+\" icon above to upload new attachments.</span>");
+                            sbItemAttachments.Append("<table class='fancy-col-table'><tr><td>There are no attachments, click the \"+\" icon above to upload new attachments.</td></tr></table>");
                         }
                         else
                         {

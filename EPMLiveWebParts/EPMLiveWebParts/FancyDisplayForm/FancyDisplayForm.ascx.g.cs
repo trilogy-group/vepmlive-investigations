@@ -682,27 +682,63 @@ namespace EPMLiveWebParts {
         
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Never)]
         private void @__Render__control1(System.Web.UI.HtmlTextWriter @__w, System.Web.UI.Control parameterContainer) {
-            @__w.Write("\r\n\r\n<link rel=\"stylesheet\" type=\"text/css\" href=\"http://maxcdn.bootstrapcdn.com/f" +
-                    "ont-awesome/4.2.0/css/font-awesome.min.css\">\r\n\r\n<style type=\"text/css\">\r\n    @im" +
-                    "port url(http://fonts.googleapis.com/css?family=Open+Sans:400,300,600);\r\n\r\n    #" +
-                    "attach-wrapper {\r\n        font-family: \"Open Sans\";\r\n        font-size: 13px;\r\n " +
-                    "   }\r\n\r\n        #attach-wrapper .paperclip {\r\n            color: #999999;\r\n     " +
-                    "       display: inline-block;\r\n            padding-right: 8px;\r\n            font" +
-                    "-size: 16px;\r\n            vertical-align: top;\r\n            position: relative;\r" +
-                    "\n        }\r\n\r\n        #attach-wrapper .attach-text {\r\n            color: #555555" +
-                    ";\r\n            padding: 4px 4px 0px 4px;\r\n            line-height: 12px;\r\n      " +
-                    "  }\r\n\r\n        #attach-wrapper #attach-text-wrapper {\r\n            display: inli" +
-                    "ne-block;\r\n            width: 95%;\r\n        }\r\n\r\n        #attach-wrapper .attach" +
-                    "-text .file {\r\n            padding-right: 5px;\r\n            color: #bbbbbb;\r\n   " +
-                    "     }\r\n\r\n        #attach-wrapper .attach-text .delete {\r\n            padding-le" +
-                    "ft: 5px;\r\n            color: #cccccc;\r\n            display: none;\r\n        }\r\n\r\n" +
-                    "            #attach-wrapper .attach-text .delete:hover {\r\n                cursor" +
-                    ": pointer;\r\n                color: #0090ca;\r\n            }\r\n\r\n        #attach-wr" +
-                    "apper .attach-text a {\r\n            text-decoration: none;\r\n            color: #" +
-                    "0090ca;\r\n        }\r\n\r\n            #attach-wrapper .attach-text a:hover {\r\n      " +
-                    "          color: #0090ca;\r\n                cursor: pointer;\r\n            }\r\n</st" +
-                    "yle>\r\n\r\n<script type=\"text/javascript\">\r\n    function openDialog() {\r\n        va" +
-                    "r options =\r\n        {\r\n            url: $(\"#");
+            @__w.Write(@"
+
+<style type=""text/css"">
+    #attach-wrapper {
+    }
+
+        #attach-wrapper .paperclip {
+            color: #999999;
+            display: inline-block;
+            font-size: 14px;
+            vertical-align: top;
+            position: relative;
+        }
+
+        #attach-wrapper .attach-text {
+            color: #555555;
+            padding: 4px 4px 0px 4px;
+            line-height: 12px;
+        }
+
+        #attach-wrapper #attach-text-wrapper {
+            display: inline-block;
+            width: 95%;
+        }
+
+        #attach-wrapper .attach-text .file {
+            padding-right: 5px;
+            color: #bbbbbb;
+        }
+
+        #attach-wrapper .attach-text .delete {
+            padding-left: 5px;
+            color: #cccccc;
+            display: none;
+        }
+
+            #attach-wrapper .attach-text .delete:hover {
+                cursor: pointer;
+                color: #0090ca;
+            }
+
+        #attach-wrapper .attach-text a {
+            text-decoration: none;
+            color: #0090ca;
+        }
+
+            #attach-wrapper .attach-text a:hover {
+                color: #0090ca;
+                cursor: pointer;
+            }
+</style>
+
+<script type=""text/javascript"">
+    function openDialog() {
+        var options =
+        {
+            url: $(""#");
              @__w.Write( hiddenWebUrl.ClientID );
 
             @__w.Write("\").val() + \"/_layouts/AttachFile.aspx?ListId=\" + $(\"#");

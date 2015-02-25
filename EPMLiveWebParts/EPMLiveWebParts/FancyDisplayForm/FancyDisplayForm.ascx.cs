@@ -803,7 +803,7 @@ namespace EPMLiveWebParts
             sbItemAttachmentAddNew = new StringBuilder();
             sbItemAttachmentAddNew.Append("<span> Attachments </span>");
             sbItemAttachmentAddNew.Append("<a onclick='javascript:openDialog(); return false;' href='#'>");
-            sbItemAttachmentAddNew.Append("<span class='fui-plus'>");
+            sbItemAttachmentAddNew.Append("<span class='fui-plus' style='font-color: #BBBBBF'>");
             sbItemAttachmentAddNew.Append("</a>");
             sbItemAttachmentAddNew.Append("</span>");
 
@@ -812,7 +812,7 @@ namespace EPMLiveWebParts
             sbItemAttachments.Append("<div id='attach-wrapper'>");
 
             if (item.Attachments != null && item.Attachments.Count == 0)
-                sbItemAttachments.Append("<span>There are no attachments, click the \"+\" icon above to upload new attachments.</span>");
+                sbItemAttachments.Append("<table class='fancy-col-table'><tr><td>There are no attachments, click the \"+\" icon above to upload new attachments.</td></tr></table>");
             else
             {
                 foreach (string fileName in item.Attachments)
