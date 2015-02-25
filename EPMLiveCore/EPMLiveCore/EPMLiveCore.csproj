@@ -432,6 +432,7 @@ net start "WETimer"</PostDeploymentCommand>
     <Compile Include="Jobs\EPMLiveUpgrade\Steps\44Steps.cs" />
     <Compile Include="Jobs\EPMLiveUpgrade\Steps\55Steps.cs" />
     <Compile Include="Jobs\EPMLiveUpgrade\Steps\564Steps.cs" />
+    <Compile Include="Jobs\EPMLiveUpgrade\Steps\567Steps.cs" />
     <Compile Include="Jobs\EPMLiveUpgrade\Steps\GenericSteps.cs" />
     <Compile Include="Jobs\EPMLiveUpgrade\Steps\OptIn\55Steps.cs" />
     <Compile Include="Jobs\EPMLiveUpgrade\Upgrader.cs" />
