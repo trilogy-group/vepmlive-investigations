@@ -1004,7 +1004,17 @@ namespace EPMLiveWebParts
                                         }
                                         catch { }
                                     else
-                                        val = dr[field.InternalName].ToString();
+                                        try
+                                        {
+                                            val = dr[field.InternalName].ToString();
+                                            Int32 itemid = Convert.ToInt32(dr["ItemID"]);
+                                            SPListItem li = list.GetItemById(itemid);
+                                            val = formatField(val, fieldName, field.Type == SPFieldType.Calculated, false, li);
+                                        }
+                                        catch
+                                        {
+                                            val = dr[field.InternalName].ToString();
+                                        }
                                 }
                                 else if (field.Type == SPFieldType.Number)
                                 {
@@ -3768,41 +3778,6 @@ namespace EPMLiveWebParts
                             dt.Columns.Add("SiteURL");
                             dt.Columns.Add("siteid");
 
-                            ////Update Calculated Field Value
-                            if (dt != null)
-                            {
-                                if (dt.Rows.Count > 0)
-                                {
-                                    foreach (DataRow dr in dt.Rows)
-                                    {
-                                        string[] vfc = (string[])aViewFields.ToArray(typeof(string));
-
-                                        for (int i = 0; i < vfc.Length; i++)
-                                        {
-                                            string val = "";
-                                            string displayValue = "";
-
-                                            string fieldName = vfc[i];
-
-                                            SPField field = null;
-                                            field = getRealField(list.Fields.GetFieldByInternalName(fieldName));
-
-                                            if (field.Type == SPFieldType.Calculated)
-                                            {
-                                                Int32 itemid = Convert.ToInt32(dr["ItemID"]);
-                                                SPListItem li = list.GetItemById(itemid);
-                                                val = getField(li, field.InternalName, false);
-                                                if (field.Type != SPFieldType.Attachments)
-                                                    displayValue = formatField(val, fieldName, field.Type == SPFieldType.Calculated, false, li);
-                                                dr[fieldName] = displayValue;
-                                                dt.AcceptChanges();
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                            ////// 
-
                             if (filterfield != "")
                             {
                                 try
@@ -4214,7 +4189,7 @@ namespace EPMLiveWebParts
             StringBuilder sb = new StringBuilder();
             foreach (string s in lookupFilterIDs)
             {
-                sb.Append("<Value Type=\"Text\">");
+                sb.Append("<Value Type=\"ID\">");
                 sb.Append(HttpUtility.HtmlEncode(s));
                 sb.Append("</Value>");
             }
@@ -4248,7 +4223,7 @@ namespace EPMLiveWebParts
                         SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(web.Site.WebApplication.Id));
                         cn.Open();
 
-                        SqlCommand cmd = new SqlCommand("SELECT VALUE FROM PERSONALIZATIONS where userid=@userid and [key]=@key and listid=@listid", cn);
+                        SqlCommand cmd = new SqlCommand("SELECT VALUE,ItemId FROM PERSONALIZATIONS where userid=@userid and [key]=@key and listid=@listid", cn);
                         cmd.Parameters.AddWithValue("@userid", web.CurrentUser.ID);
                         cmd.Parameters.AddWithValue("@key", "LIP");
                         cmd.Parameters.AddWithValue("@listid", lookupFilterFieldList);
@@ -4256,7 +4231,7 @@ namespace EPMLiveWebParts
                         SqlDataReader dr = cmd.ExecuteReader();
                         if (dr.Read())
                         {
-                            lookupFilterIDs = new ArrayList(dr.GetString(0).Split(','));
+                            lookupFilterIDs = new ArrayList(dr.GetString(1).Split(','));
                         }
                         dr.Close();
                         cn.Close();
