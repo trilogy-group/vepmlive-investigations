@@ -803,7 +803,7 @@ namespace EPMLiveWebParts
             sbItemAttachmentAddNew = new StringBuilder();
             sbItemAttachmentAddNew.Append("<span> Attachments </span>");
             sbItemAttachmentAddNew.Append("<a onclick='javascript:openDialog(); return false;' href='#'>");
-            sbItemAttachmentAddNew.Append("<span class='fui-plus' style='font-color: #BBBBBF'>");
+            sbItemAttachmentAddNew.Append("<span class='icon-plus-2' style='color: #aaaaaa;font-size:12px;padding-left:5px;'>");
             sbItemAttachmentAddNew.Append("</a>");
             sbItemAttachmentAddNew.Append("</span>");
 
@@ -824,7 +824,7 @@ namespace EPMLiveWebParts
 
                     sbItemAttachments.Append("<div class='attach-text'>");
                     sbItemAttachments.Append("<span class='icon-file'  style='float:left; margin-right:5px; margin-top:-2px;'></span>");
-                    sbItemAttachments.Append("<a href='" + attachmentUrl + "' target='_blank' ID='" + fileName + "'><span>&nbsp;" + fileName + "</span></a>");
+                    sbItemAttachments.Append("<a href='" + attachmentUrl + "' target='_blank' ID='" + fileName + "' class='fancybox'><span>&nbsp;" + fileName + "</span></a>");
 
 
                     string deleteAttachmentLink = SPContext.Current.Web.Url + "/_layouts/epmlive/gridaction.aspx?action=deleteitemattachment&listid=" + SPContext.Current.List.ID.ToString() + "&itemid=" + item.ID + "&fname=" + fileName;// +"&Source=" + sourceUrl;
