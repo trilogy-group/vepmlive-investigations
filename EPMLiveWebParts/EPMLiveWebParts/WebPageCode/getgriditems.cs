@@ -676,13 +676,6 @@ namespace EPMLiveWebParts
                 return;
             }
 
-            try
-            {
-                Int32 itemid = Convert.ToInt32(dr["ItemID"]);
-                SPListItem li = list.GetItemById(itemid);
-            }
-            catch { }
-
             //NEED TO DO
             string tsdisabled = "";
             string wbs = "";
@@ -1014,6 +1007,8 @@ namespace EPMLiveWebParts
                                         try
                                         {
                                             val = dr[field.InternalName].ToString();
+                                            Int32 itemid = Convert.ToInt32(dr["ItemID"]);
+                                            SPListItem li = list.GetItemById(itemid);
                                             val = formatField(val, fieldName, field.Type == SPFieldType.Calculated, false, li);
                                         }
                                         catch
@@ -4194,7 +4189,7 @@ namespace EPMLiveWebParts
             StringBuilder sb = new StringBuilder();
             foreach (string s in lookupFilterIDs)
             {
-                sb.Append("<Value Type=\"Text\">");
+                sb.Append("<Value Type=\"ID\">");
                 sb.Append(HttpUtility.HtmlEncode(s));
                 sb.Append("</Value>");
             }
@@ -4228,7 +4223,7 @@ namespace EPMLiveWebParts
                         SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(web.Site.WebApplication.Id));
                         cn.Open();
 
-                        SqlCommand cmd = new SqlCommand("SELECT VALUE FROM PERSONALIZATIONS where userid=@userid and [key]=@key and listid=@listid", cn);
+                        SqlCommand cmd = new SqlCommand("SELECT VALUE,ItemId FROM PERSONALIZATIONS where userid=@userid and [key]=@key and listid=@listid", cn);
                         cmd.Parameters.AddWithValue("@userid", web.CurrentUser.ID);
                         cmd.Parameters.AddWithValue("@key", "LIP");
                         cmd.Parameters.AddWithValue("@listid", lookupFilterFieldList);
@@ -4236,7 +4231,7 @@ namespace EPMLiveWebParts
                         SqlDataReader dr = cmd.ExecuteReader();
                         if (dr.Read())
                         {
-                            lookupFilterIDs = new ArrayList(dr.GetString(0).Split(','));
+                            lookupFilterIDs = new ArrayList(dr.GetString(1).Split(','));
                         }
                         dr.Close();
                         cn.Close();
