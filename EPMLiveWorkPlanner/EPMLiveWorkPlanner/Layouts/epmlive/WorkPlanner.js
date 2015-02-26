@@ -808,12 +808,14 @@ function SaveWorkPlan() {
         if (bFlag_WorkPlannerDetail_Visible == true) {
             ShowTab('t1');
         }
-        alert("The schedule cannot be saved because there are one or more empty required fields (red cells) :" + '\n' + 'Current View :' + '\n\t' + strReqFields_CurrentView + '\n' + "Details View :" + '\n\t' + strReqFields_DetailView + "");
+        alert("The schedule cannot be saved because there are one or more empty required fields (red cells).");
+        //alert("The schedule cannot be saved because there are one or more empty required fields (red cells) :" + '\n' + 'Current View :' + '\n\t' + strReqFields_CurrentView + '\n' + "Details View :" + '\n\t' + strReqFields_DetailView + "");
         return;
     }
     else if (strReqFields_CurrentView.length > 0 && strReqFields_DetailView.length == 0) {
         dhxLayout.cells(detailsCell).collapse();
-        alert("The schedule cannot be saved because there are one or more empty required fields (red cells) :" + '\n' + strReqFields_CurrentView + "");
+        alert("The schedule cannot be saved because there are one or more empty required fields (red cells).");
+        //alert("The schedule cannot be saved because there are one or more empty required fields (red cells) :" + '\n' + strReqFields_CurrentView + "");
         return;
     }
     else if (strReqFields_CurrentView.length == 0 && strReqFields_DetailView.length > 0) {
@@ -821,7 +823,8 @@ function SaveWorkPlan() {
         if (bFlag_WorkPlannerDetail_Visible == true) {
             ShowTab('t1');
         }
-        alert("The schedule cannot be saved because there are one or more empty required fields in details view (red cells) :" + '\n' + strReqFields_DetailView + "");
+        alert("The schedule cannot be saved because there are one or more empty required fields (red cells).");
+        //alert("The schedule cannot be saved because there are one or more empty required fields in details view (red cells) :" + '\n' + strReqFields_DetailView + "");
         return;
     }
     //------
