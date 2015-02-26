@@ -1,5 +1,6 @@
 ﻿using EPMLiveCore;
 using EPMLiveCore.API;
+using EPMLiveCore.Infrastructure;
 using EPMLiveCore.ReportingProxy;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.WebControls;
@@ -21,6 +22,7 @@ namespace EPMLiveWebParts
     {
         #region Variables and Constants
 
+        private const string LAYOUT_PATH = "/_layouts/15/epmlive/";
         const int QUICK_DETAILS_SECTION_ONE_FIELD_COUNT = 7;
         const int QUICK_DETAILS_SECTION_TOTAL_FIELD_COUNT = 14;
         const int NARRATIVE_DETAILS_SECTION_FIELD_COUNT = 2;
@@ -76,6 +78,16 @@ namespace EPMLiveWebParts
         protected override void OnPreRender(EventArgs e)
         {
             base.OnPreRender(e);
+
+            foreach (string style in new[] { "jquery.fancybox" })
+            {
+                SPPageContentManager.RegisterStyleFile(LAYOUT_PATH + "stylesheets/" + style + ".css");
+            }
+
+            EPMLiveScriptManager.RegisterScript(Page, new[]
+                {
+                    "jquery.fancybox"
+                });
 
             SPContext.Current.FormContext.FormMode = SPControlMode.Display;
         }
