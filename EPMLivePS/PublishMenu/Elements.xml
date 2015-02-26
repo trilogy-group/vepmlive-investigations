@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Elements xmlns="http://schemas.microsoft.com/sharepoint/">
+<CustomAction
+	Id="CustomPublish"
+	Location="CommandUI.Ribbon"
+	Sequence="5" 
+	Title="Publish Settings">
+	<CommandUIExtension>
+		<CommandUIDefinitions>
+			<CommandUIDefinition Location="Ribbon.ContextualTabs.ProjectDrilldown.Tasks.Update.Controls._children">
+				<Button
+					Id="Ribbon.ContextualTabs.ProjectDrilldown.Tasks.Update.PublishSettings"
+					Sequence="31"
+					Command="PublishSettings"
+					Image16by16="_layouts/15/images/epmlivelogosmall.gif"
+					Image32by32="_layouts/15/images/epmlivelogo.gif"
+					LabelText="Publish Settings"
+					TemplateAlias="o1" />
+				</CommandUIDefinition>
+			</CommandUIDefinitions>
+			<CommandUIHandlers>
+				<CommandUIHandler
+					Command="PublishSettings"
+					CommandAction="javascript: var options = { url: pdpPwaSitePath + '/_layouts/15/epmlive/pspubsettings.aspx?ProjectUid=' + PDP_projUid + '&amp;ProjName=' + PDP_projName, width: 500 };SP.UI.ModalDialog.showModalDialog(options);" />
+			</CommandUIHandlers>
+		</CommandUIExtension>
+	</CustomAction>
+</Elements>

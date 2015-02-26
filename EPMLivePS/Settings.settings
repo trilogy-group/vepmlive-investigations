@@ -1,0 +1,33 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="EPMLiveEnterprise" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="EPMLivePS_WebSvcCustomFields_customfields" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">http://ps-2013/PWA/_vti_bin/psi/customfields.asmx?wsdl</Value>
+    </Setting>
+    <Setting Name="EPMLivePS_WebSvcEvents_events" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">http://ps-2013/PWA/_vti_bin/psi/events.asmx?wsdl</Value>
+    </Setting>
+    <Setting Name="EPMLivePS_WebSvcLoginWindows_loginwindows" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">http://ps-2013/PWA/_vti_bin/psi/loginwindows.asmx?wsdl</Value>
+    </Setting>
+    <Setting Name="EPMLivePS_WebSvcLookupTables_lookuptable" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">http://ps-2013/PWA/_vti_bin/psi/lookuptable.asmx?wsdl</Value>
+    </Setting>
+    <Setting Name="EPMLivePS_WebSvcProject_project" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">http://ps-2013/PWA/_vti_bin/psi/project.asmx?wsdl</Value>
+    </Setting>
+    <Setting Name="EPMLivePS_WebSvcQueueSystem_queuesystem" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">http://ps-2013/PWA/_vti_bin/psi/queuesystem.asmx?wsdl</Value>
+    </Setting>
+    <Setting Name="EPMLivePS_WebSvcResource_resource" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">http://ps-2013/PWA/_vti_bin/psi/resource.asmx?wsdl</Value>
+    </Setting>
+    <Setting Name="EPMLivePS_WebSvcStatusing_statusing" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">http://ps-2013/PWA/_vti_bin/psi/statusing.asmx?wsdl</Value>
+    </Setting>
+    <Setting Name="EPMLivePS_WebSvcWssInterop_wssinterop" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">http://ps-2013/PWA/_vti_bin/psi/wssinterop.asmx?wsdl</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>
