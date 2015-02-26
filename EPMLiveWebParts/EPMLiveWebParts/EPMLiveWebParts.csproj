@@ -231,6 +231,12 @@
     <Compile Include="FancyDisplayForm\FancyDisplayForm.ascx.cs">
       <DependentUpon>FancyDisplayForm.ascx</DependentUpon>
     </Compile>
+    <Compile Include="FancyDisplayForm\FancyDisplayForm.ascx.g.cs">
+      <SubType>Code</SubType>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>FancyDisplayForm.ascx</DependentUpon>
+    </Compile>
     <Compile Include="GridListView\GanttUtilities.cs" />
     <Compile Include="GridListView\GridData.cs">
       <SubType>ASPXCodeBehind</SubType>
