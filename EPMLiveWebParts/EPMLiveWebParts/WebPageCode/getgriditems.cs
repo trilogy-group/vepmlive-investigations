@@ -676,6 +676,14 @@ namespace EPMLiveWebParts
                 return;
             }
 
+            SPListItem li = null;
+            try
+            {
+                Int32 itemid = Convert.ToInt32(dr["ItemID"]);
+                li = list.GetItemById(itemid);
+            }
+            catch { }
+
             //NEED TO DO
             string tsdisabled = "";
             string wbs = "";
@@ -1004,7 +1012,16 @@ namespace EPMLiveWebParts
                                         }
                                         catch { }
                                     else
-                                        val = dr[field.InternalName].ToString();
+                                        try
+                                        {
+                                            val = dr[field.InternalName].ToString();
+                                            if (li != null)
+                                                val = formatField(val, fieldName, field.Type == SPFieldType.Calculated, false, li);
+                                        }
+                                        catch
+                                        {
+                                            val = dr[field.InternalName].ToString();
+                                        }
                                 }
                                 else if (field.Type == SPFieldType.Number)
                                 {
@@ -3767,41 +3784,6 @@ namespace EPMLiveWebParts
                             DataTable dt = ds.Tables[0];
                             dt.Columns.Add("SiteURL");
                             dt.Columns.Add("siteid");
-
-                            ////Update Calculated Field Value
-                            if (dt != null)
-                            {
-                                if (dt.Rows.Count > 0)
-                                {
-                                    foreach (DataRow dr in dt.Rows)
-                                    {
-                                        string[] vfc = (string[])aViewFields.ToArray(typeof(string));
-
-                                        for (int i = 0; i < vfc.Length; i++)
-                                        {
-                                            string val = "";
-                                            string displayValue = "";
-
-                                            string fieldName = vfc[i];
-
-                                            SPField field = null;
-                                            field = getRealField(list.Fields.GetFieldByInternalName(fieldName));
-
-                                            if (field.Type == SPFieldType.Calculated)
-                                            {
-                                                Int32 itemid = Convert.ToInt32(dr["ItemID"]);
-                                                SPListItem li = list.GetItemById(itemid);
-                                                val = getField(li, field.InternalName, false);
-                                                if (field.Type != SPFieldType.Attachments)
-                                                    displayValue = formatField(val, fieldName, field.Type == SPFieldType.Calculated, false, li);
-                                                dr[fieldName] = displayValue;
-                                                dt.AcceptChanges();
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                            ////// 
 
                             if (filterfield != "")
                             {
