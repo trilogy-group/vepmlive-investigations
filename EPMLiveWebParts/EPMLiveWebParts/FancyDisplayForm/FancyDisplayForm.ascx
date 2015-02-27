@@ -233,8 +233,9 @@
                             window.setTimeout(function () { applyFancybox(); }, 10);
                         }
                     }
-
-                    applyFancybox();
+                    $(document).ready(function () {
+                        applyFancybox();
+                    });
                 }
             });
         },
