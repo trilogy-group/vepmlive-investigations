@@ -813,7 +813,7 @@ namespace EPMLiveWebParts
         {
             /* Add new attachment region */
             sbItemAttachmentAddNew = new StringBuilder();
-            sbItemAttachmentAddNew.Append("<span> Attachments </span>");
+            sbItemAttachmentAddNew.Append("<span class='icon-attachment-2' style='font-size:14px;'></span><span> Attachments </span>");
             sbItemAttachmentAddNew.Append("<a onclick='javascript:openDialog(); return false;' href='#'>");
             sbItemAttachmentAddNew.Append("<span class='icon-plus-2' style='color: #aaaaaa;font-size:12px;padding-left:5px;'>");
             sbItemAttachmentAddNew.Append("</a>");
@@ -824,14 +824,13 @@ namespace EPMLiveWebParts
             sbItemAttachments.Append("<div id='attach-wrapper'>");
 
             if (item.Attachments != null && item.Attachments.Count == 0)
-                sbItemAttachments.Append("<table class='fancy-col-table'><tr><td>There are no attachments, click the \"+\" icon above to upload new attachments.</td></tr></table>");
+                sbItemAttachments.Append("<table class='fancy-col-table'><tr><td style='color:#bbbbbb;'>There are no attachments, click the \"+\" icon above to upload new attachments.</td></tr></table>");
             else
             {
                 foreach (string fileName in item.Attachments)
                 {
                     string attachmentUrl = SPContext.Current.Web.Url + "/" + SPContext.Current.List.RootFolder.Url + "/attachments/" + item.ID + "/" + fileName;
-                    sbItemAttachments.Append("<div class='paperclip'><span class='icon-attachment-2' style='float:none; font-size:14px; display:inline-table;'></span></div>");
-
+                    
                     sbItemAttachments.Append("<div id='attach-text-wrapper'>");
 
                     sbItemAttachments.Append("<div class='attach-text'>");
