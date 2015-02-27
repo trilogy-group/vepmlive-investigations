@@ -51,11 +51,22 @@
             color: #0090ca;
         }
 
-            #attach-wrapper .attach-text a:hover {
-                color: #0090ca;
-                cursor: pointer;
-                text-decoration:underline;
-            }
+        #attach-wrapper .attach-text a:hover {
+            color: #0090ca;
+            cursor: pointer;
+            text-decoration:underline;
+        }
+
+        #attach-wrapper .upload-attach {
+           color: #aaaaaa;
+           font-size:12px;
+           padding-left:5px;
+        }
+        
+        #attach-wrapper .upload-attach:hover {
+           color: #555555; 
+        }
+        
 </style>
 
 <script type="text/javascript">
