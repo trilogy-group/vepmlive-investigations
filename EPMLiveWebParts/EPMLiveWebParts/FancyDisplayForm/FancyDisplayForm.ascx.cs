@@ -834,12 +834,12 @@ namespace EPMLiveWebParts
                     sbItemAttachments.Append("<div id='attach-text-wrapper'>");
 
                     sbItemAttachments.Append("<div class='attach-text'>");
-                    sbItemAttachments.Append("<span class='icon-file'  style='float:left; margin-right:5px; margin-top:-2px;'></span>");
+                    sbItemAttachments.Append("<span class='icon-file'  style='float:left; margin-right:5px;color:#999999;'></span>");
                     sbItemAttachments.Append("<a href='" + attachmentUrl + "' target='_blank' ID='" + fileName + "' class='fancybox'><span>&nbsp;" + fileName + "</span></a>");
 
 
                     string deleteAttachmentLink = SPContext.Current.Web.Url + "/_layouts/epmlive/gridaction.aspx?action=deleteitemattachment&listid=" + SPContext.Current.List.ID.ToString() + "&itemid=" + item.ID + "&fname=" + fileName;// +"&Source=" + sourceUrl;
-                    sbItemAttachments.Append("<a href='#' onclick=\"javascript:FancyDispFormClient.DeleteItemAttachment('" + deleteAttachmentLink + "');return false;\"><span class='fui-cross delete' style='margin-left:3px;vertical-align:sub'></span></a>");
+                    sbItemAttachments.Append("<a href='#' onclick=\"javascript:FancyDispFormClient.DeleteItemAttachment('" + deleteAttachmentLink + "');return false;\"><span class='fui-cross delete' style='top:2px;position:relative;'></span></a>");
 
                     sbItemAttachments.Append("</div>");
                     sbItemAttachments.Append("</div>");
