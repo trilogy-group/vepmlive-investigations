@@ -54,6 +54,7 @@
             #attach-wrapper .attach-text a:hover {
                 color: #0090ca;
                 cursor: pointer;
+                text-decoration:underline;
             }
 </style>
 
