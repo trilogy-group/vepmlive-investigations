@@ -652,13 +652,13 @@ namespace EPMLiveCore.API
                             foreach (string fileName in item.Attachments)
                             {
                                 string attachmentUrl = spWeb.Url + "/" + list.RootFolder.Url + "/attachments/" + item.ID + "/" + fileName;
-                                sbItemAttachments.Append("<div class='paperclip'><span class='icon-attachment-2' style='float:none; font-size:14px; display:inline-table;'></span></div>");
+                                
 
                                 sbItemAttachments.Append("<div id='attach-text-wrapper'>");
 
                                 sbItemAttachments.Append("<div class='attach-text'>");
                                 sbItemAttachments.Append("<span class='icon-file'  style='float:left; margin-right:5px; margin-top:-2px;'></span>");
-                                sbItemAttachments.Append("<a href='" + attachmentUrl + "' target='_blank' ID='" + fileName + "'><span>" + fileName + "</span></a>");
+                                sbItemAttachments.Append("<a href='" + attachmentUrl + "' target='_blank' ID='" + fileName + "' class='fancybox'><span>" + fileName + "</span></a>");
 
                                 string deleteAttachmentLink = spWeb.Url + "/_layouts/epmlive/gridaction.aspx?action=deleteitemattachment&listid=" + list.ID.ToString() + "&itemid=" + item.ID + "&fname=" + fileName;// +"&Source=" + sourceUrl;
                                 sbItemAttachments.Append("<a href='#' onclick=\"javascript:FancyDispFormClient.DeleteItemAttachment('" + deleteAttachmentLink + "');return false;\"><span class='fui-cross delete' style='margin-left:3px;vertical-align:sub;'></span></a>");
