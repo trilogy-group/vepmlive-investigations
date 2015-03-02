@@ -64,7 +64,7 @@
         }
         
         #attach-wrapper .upload-attach:hover {
-           color: #555555; 
+           color: #555555;
         }
         
 </style>
