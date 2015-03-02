@@ -645,7 +645,7 @@ namespace EPMLiveCore.API
                         sbItemAttachments.Append("<div id='attach-wrapper'>");
                         if (item.Attachments != null && item.Attachments.Count == 0)
                         {
-                            sbItemAttachments.Append("<table class='fancy-col-table'><tr><td>There are no attachments, click the \"+\" icon above to upload new attachments.</td></tr></table>");
+                            sbItemAttachments.Append("<table class='fancy-col-table'><tr><td style='color:#bbbbbb;'>There are no attachments, click the \"+\" icon above to upload new attachments.</td></tr></table>");
                         }
                         else
                         {
@@ -657,11 +657,11 @@ namespace EPMLiveCore.API
                                 sbItemAttachments.Append("<div id='attach-text-wrapper'>");
 
                                 sbItemAttachments.Append("<div class='attach-text'>");
-                                sbItemAttachments.Append("<span class='icon-file'  style='float:left; margin-right:5px; margin-top:-2px;'></span>");
+                                sbItemAttachments.Append("<span class='icon-file'  style='float:left; margin-right:5px; margin-top:-2px;color:#999999;'></span>");
                                 sbItemAttachments.Append("<a href='" + attachmentUrl + "' target='_blank' ID='" + fileName + "' class='fancybox'><span>" + fileName + "</span></a>");
 
                                 string deleteAttachmentLink = spWeb.Url + "/_layouts/epmlive/gridaction.aspx?action=deleteitemattachment&listid=" + list.ID.ToString() + "&itemid=" + item.ID + "&fname=" + fileName;// +"&Source=" + sourceUrl;
-                                sbItemAttachments.Append("<a href='#' onclick=\"javascript:FancyDispFormClient.DeleteItemAttachment('" + deleteAttachmentLink + "');return false;\"><span class='fui-cross delete' style='margin-left:3px;vertical-align:sub;'></span></a>");
+                                sbItemAttachments.Append("<a href='#' onclick=\"javascript:FancyDispFormClient.DeleteItemAttachment('" + deleteAttachmentLink + "');return false;\"><span class='fui-cross delete' style='top:2px;position:relative;'></span></a>");
 
                                 sbItemAttachments.Append("</div>");
                                 sbItemAttachments.Append("</div>");
