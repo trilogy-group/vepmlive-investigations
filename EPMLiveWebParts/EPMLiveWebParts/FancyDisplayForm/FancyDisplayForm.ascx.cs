@@ -815,7 +815,7 @@ namespace EPMLiveWebParts
             sbItemAttachmentAddNew = new StringBuilder();
             sbItemAttachmentAddNew.Append("<span class='icon-attachment-2' style='font-size:14px;'></span><span> Attachments </span>");
             sbItemAttachmentAddNew.Append("<a onclick='javascript:openDialog(); return false;' href='#' style='text-decoration:none;'>");
-            sbItemAttachmentAddNew.Append("<span class='icon-plus-2' class='upload-attach'>");
+            sbItemAttachmentAddNew.Append("<span class='icon-plus-2 upload-attach'>");
             sbItemAttachmentAddNew.Append("</a>");
             sbItemAttachmentAddNew.Append("</span>");
 
