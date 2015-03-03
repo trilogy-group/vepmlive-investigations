@@ -57,13 +57,13 @@
             text-decoration:underline;
         }
 
-        #attach-wrapper .upload-attach {
+        .upload-attach {
            color: #aaaaaa;
            font-size:12px;
            padding-left:5px;
         }
         
-        #attach-wrapper .upload-attach:hover {
+        .upload-attach:hover {
            color: #555555;
         }
         
