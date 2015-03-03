@@ -16,24 +16,28 @@
             font-weight: bold;
             color: #000000;
             padding-right: 5px;
+            cursor: pointer;
         }
 
         .infoLog {
             font-weight: bold;
             color: #3399FF;
             padding-right: 5px;
+            cursor: pointer;
         }
 
         .warningLog {
             font-weight: bold;
             color: #FF9900;
             padding-right: 5px;
+            cursor: pointer;
         }
 
         .errorLog {
             font-weight: bold;
             color: #FF0000;
             padding-right: 5px;
+            cursor: pointer;
         }
 
         .hero-unit {
