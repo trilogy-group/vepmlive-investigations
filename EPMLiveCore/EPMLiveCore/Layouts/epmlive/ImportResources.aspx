@@ -12,11 +12,6 @@
 	<script src="/_layouts/epmlive/javascripts/libraries/bootstrap.min.js" type="text/javascript"></script>
 	
 	<style type="text/css">
-		body {
-			padding-top: 40px;
-			padding-bottom: 40px;
-		}
-	  
 		div.fileinputs {
 			position: relative;
 		}
