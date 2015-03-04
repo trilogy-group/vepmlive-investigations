@@ -15,18 +15,19 @@ namespace EPMLiveReportsAdmin
 {
     public class MyWorkReportData : ReportData, IDisposable
     {
-        #region Constructors (3) 
+        #region Constructors (3)
 
         public MyWorkReportData(Guid siteId, string name, string server, bool useSAccount, string username,
-            string password) : base(siteId, name, server, useSAccount, username, password) { }
+            string password)
+            : base(siteId, name, server, useSAccount, username, password) { }
 
         public MyWorkReportData(Guid siteId, Guid webAppId) : base(siteId, webAppId) { }
 
         public MyWorkReportData(Guid siteId) : base(siteId) { }
 
-        #endregion Constructors 
+        #endregion Constructors
 
-        #region Methods (12) 
+        #region Methods (12)
 
         // Public Methods (5) 
 
@@ -162,7 +163,7 @@ namespace EPMLiveReportsAdmin
 
                 try
                 {
-                    isAssignment = (bool) spListItem["IsAssignment"];
+                    isAssignment = (bool)spListItem["IsAssignment"];
                 }
                 catch { }
 
@@ -188,7 +189,7 @@ namespace EPMLiveReportsAdmin
                     object hours = null;
                     try
                     {
-                        hours = double.Parse(originalWork.ToString())/totalAssignedToUsers;
+                        hours = double.Parse(originalWork.ToString()) / totalAssignedToUsers;
                     }
                     catch { }
 
@@ -224,24 +225,13 @@ namespace EPMLiveReportsAdmin
             {
                 var stringBuilder = new StringBuilder();
 
-                string[] stmts = sql.Split(new[] {"\r\n", "\n"}, StringSplitOptions.None);
+                string[] stmts = sql.Split(new[] { "\r\n", "\n" }, StringSplitOptions.None);
                 int totalParams = 0;
 
                 foreach (string stmt in stmts)
                 {
-                    int paramCount = stmt.TakeWhile(c => c == '@').Count();
-
-                    if (totalParams + paramCount > 2000)
-                    {
-                        stringBuilder.AppendLine("!-x-x-x-x-x-!");
-                        stringBuilder.AppendLine(stmt);
-                        totalParams = paramCount;
-                    }
-                    else
-                    {
-                        stringBuilder.AppendLine(stmt);
-                        totalParams += paramCount;
-                    }
+                    stringBuilder.AppendLine(stmt);
+                    stringBuilder.AppendLine("!-x-x-x-x-x-!");
                 }
 
                 return stringBuilder.ToString();
@@ -316,7 +306,7 @@ namespace EPMLiveReportsAdmin
                                 {
                                     param.Value = field.Type != SPFieldType.DateTime
                                         ? (spListItem[field.InternalName] != null
-                                            ? (object) spListItem[field.InternalName].ToString()
+                                            ? (object)spListItem[field.InternalName].ToString()
                                             : DBNull.Value)
                                         : (spListItem[field.InternalName] ?? DBNull.Value);
                                 }
@@ -324,7 +314,7 @@ namespace EPMLiveReportsAdmin
                                 {
                                     try
                                     {
-                                        param.Value = _DAO.GetCalculatedFieldValue(spListItem, (SPFieldCalculated) field);
+                                        param.Value = _DAO.GetCalculatedFieldValue(spListItem, (SPFieldCalculated)field);
                                     }
                                     catch (Exception)
                                     {
@@ -745,7 +735,7 @@ namespace EPMLiveReportsAdmin
             if (columnType == null || columnType == DBNull.Value)
                 throw new Exception(string.Format("Cannot find column: {0}", columnName));
 
-            return (string) columnType;
+            return (string)columnType;
         }
 
         /// <summary>
@@ -761,14 +751,13 @@ namespace EPMLiveReportsAdmin
                 EventLog.CreateEventSource("EPMLive My Work Reporting GetColumnValue", "EPM Live");
             }
 
-            var errorLog = new EventLog("EPM Live", ".", "EPMLive My Work Reporting GetColumnValue")
-            {MaximumKilobytes = 32768};
+            var errorLog = new EventLog("EPM Live", ".", "EPMLive My Work Reporting GetColumnValue") { MaximumKilobytes = 32768 };
 
             errorLog.WriteEntry(
                 "Name: " + _siteName + " Url: " + _siteUrl + " ID: " + _siteId + " : " + ex.Message +
                 " ColumnName: " + columnName + " InternalName: " + internalName, EventLogEntryType.Error, 9000);
         }
 
-        #endregion Methods 
+        #endregion Methods
     }
 }
