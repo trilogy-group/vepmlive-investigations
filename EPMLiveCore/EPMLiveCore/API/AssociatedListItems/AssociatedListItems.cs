@@ -657,7 +657,7 @@ namespace EPMLiveCore.API
                                 sbItemAttachments.Append("<div id='attach-text-wrapper'>");
 
                                 sbItemAttachments.Append("<div class='attach-text'>");
-                                sbItemAttachments.Append("<span class='icon-file'  style='float:left; margin-right:5px;color:#999999;'></span>");
+                                sbItemAttachments.Append("<span class='icon-file'  style='margin-right:5px;color:#999999;'></span>");
                                 sbItemAttachments.Append("<a href='" + attachmentUrl + "' target='_blank' ID='" + fileName + "' class='fancybox'><span>" + fileName + "</span></a>");
 
                                 string deleteAttachmentLink = spWeb.Url + "/_layouts/epmlive/gridaction.aspx?action=deleteitemattachment&listid=" + list.ID.ToString() + "&itemid=" + item.ID + "&fname=" + fileName;// +"&Source=" + sourceUrl;
