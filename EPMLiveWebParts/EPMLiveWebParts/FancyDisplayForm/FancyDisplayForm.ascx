@@ -58,19 +58,19 @@
         }
 
         .upload-attach {
-           color: #aaaaaa;
+           color: #aaaaaa !important;
            font-size:12px;
            padding-left:5px;
         }
         
         .upload-attach:hover {
-           color: #555555;
+           color: #555555 !important;
         }
         
 </style>
 
 <script type="text/javascript">
-    function openDialog() {
+    function openDialog() {s
         var options =
         {
             url: $("#<%= hiddenWebUrl.ClientID %>").val() + "/_layouts/AttachFile.aspx?ListId=" + $("#<%= hiddenListId.ClientID %>").val() + "&ItemId=" + $("#<%= hiddenItemId.ClientID %>").val() + "&isdlg=1&Source=" + $("#<%= hiddenSourceUrl.ClientID %>").val(),
