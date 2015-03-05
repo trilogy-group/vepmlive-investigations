@@ -78,7 +78,7 @@ namespace EPMLiveCore
 
                     SortedList sl = Act.GetAllAvailableLevels(out actType);
 
-                    string[] sInUserInfo = username.Split(':');
+                    string[] sInUserInfo = username.Replace("i:0#.w|","").Split(':');
 
                     int newfeatureid = int.Parse(sInUserInfo[1]);
 
