@@ -70,7 +70,7 @@
 </style>
 
 <script type="text/javascript">
-    function openDialog() {s
+    function openDialog() {
         var options =
         {
             url: $("#<%= hiddenWebUrl.ClientID %>").val() + "/_layouts/AttachFile.aspx?ListId=" + $("#<%= hiddenListId.ClientID %>").val() + "&ItemId=" + $("#<%= hiddenItemId.ClientID %>").val() + "&isdlg=1&Source=" + $("#<%= hiddenSourceUrl.ClientID %>").val(),
