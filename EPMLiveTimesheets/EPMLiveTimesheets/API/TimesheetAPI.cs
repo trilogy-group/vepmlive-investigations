@@ -1286,6 +1286,10 @@ namespace TimeSheets
                         attr1.Value = "sum()";
                         ndGroupDef.Attributes.Append(attr1);
 
+                        attr1 = docLayout.CreateAttribute("P" + dtStart.Ticks + "Type");
+                        attr1.Value = "Float";
+                        ndGroupDef.Attributes.Append(attr1);
+
                         TotalColumnCalc += "+" + "P" + dtStart.Ticks;
 
                         ndRDef.Attributes["CalcOrder"].Value += "," + "P" + dtStart.Ticks;
@@ -1396,6 +1400,10 @@ namespace TimeSheets
 
                 attr2 = docLayout.CreateAttribute("Formula");
                 attr2.Value = TotalColumnCalc.Trim('+');
+                ndTotalsCol.Attributes.Append(attr2);
+
+                attr2 = docLayout.CreateAttribute("Format");
+                attr2.Value = ",0.00";
                 ndTotalsCol.Attributes.Append(attr2);
 
                 ndRightCols.AppendChild(ndTotalsCol);
