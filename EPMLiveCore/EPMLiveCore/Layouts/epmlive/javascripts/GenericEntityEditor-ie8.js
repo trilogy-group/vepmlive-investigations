@@ -1579,9 +1579,7 @@ function GEInit() {
                 width: 650,
                 height: 500,
                 dialogReturnValueCallback: function(dialogResult) {
-                    if (dialogResult == 1) {
-                        location.reload(true);
-                    }
+                    SP.UI.ModalDialog.RefreshPage(dialogResult);
                 }
             };
 
