@@ -17,6 +17,7 @@ using System.Data;
 using System.Data.SqlClient;
 
 using System.Collections.Generic;
+using System.Linq;
 
 using System.Xml;
 
@@ -440,7 +441,7 @@ namespace EPMLiveWebParts
                         }
                     });
 
-                    foreach (string rlist in PropRollupList.Replace("\r\n", "\n").Split('\n'))
+                    foreach (string rlist in PropRollupList.Replace("\r\n", "\n").Split('\n').Distinct().ToArray())
                     {
                         try
                         {
