@@ -1,4 +1,5 @@
-﻿using EPMLiveCore.Jobs.EPMLiveUpgrade.Infrastructure;
+﻿using EPMLiveCore.API.SPAdmin;
+using EPMLiveCore.Jobs.EPMLiveUpgrade.Infrastructure;
 using Microsoft.SharePoint;
 using System;
 using System.Collections.Generic;
@@ -11,7 +12,8 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
     [UpgradeStep(Version = EPMLiveVersion.V567, Order = 1.0, Description = "Adding Resource Pool events")]
     internal class AddResourcePoolEvents : UpgradeStep
     {
-        public AddResourcePoolEvents(SPWeb spWeb, bool isPfeSite) : base(spWeb, isPfeSite) { }
+        private SPWeb _spWeb;
+        public AddResourcePoolEvents(SPWeb spWeb, bool isPfeSite) : base(spWeb, isPfeSite) { _spWeb = spWeb; }
 
         public override bool Perform()
         {
@@ -21,9 +23,8 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
                 {
                     using (var workEngineAPI = new WorkEngineAPI())
                     {
-                        var log = System.Web.HttpUtility.HtmlEncode(workEngineAPI.Execute("AddRemoveFeatureEvents",
-                            @"<AddRemoveFeatureEvents><Data><Feature Name=""PFEResourceManagement"" Operation=""ADD""/></Data></AddRemoveFeatureEvents>"));
-
+                        var featureEventsManager = new FeatureEventsManager(_spWeb);
+                        var log = System.Web.HttpUtility.HtmlEncode(featureEventsManager.Manage(@"<AddRemoveFeatureEvents><Data><Feature Name=""PFEResourceManagement"" Operation=""ADD""/></Data></AddRemoveFeatureEvents>"));
                         LogMessage(log, 2);
                         LogMessage("Resource Pool Events processed", MessageKind.SUCCESS, 4);
                     }
