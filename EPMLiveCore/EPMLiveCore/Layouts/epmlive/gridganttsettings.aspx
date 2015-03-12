@@ -513,7 +513,7 @@
 		Description=""
 		runat="server">
 		<Template_Description>
-		    When checked, this list will be anabled for timesheet usage. 2 fields will be added to your list and the list will be added to the timesheet configuration.
+		    When checked, this list will be enabled for timesheet usage. 2 fields will be added to your list and the list will be added to the timesheet configuration.
 		</Template_Description>
 		<Template_InputFormControls>
 			<wssuc:InputFormControl LabelText="" runat="server">
