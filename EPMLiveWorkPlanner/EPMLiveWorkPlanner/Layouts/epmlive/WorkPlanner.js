@@ -1127,7 +1127,8 @@ function SetTaskAssignments(Row) {
 
                 if (assnObj == null) {
                     grid.RemoveRow(grid.GetRowById(id));
-                } else {
+                }
+                else {
                     oAssns[resource] = null;
                 }
             }
@@ -1156,23 +1157,8 @@ function SetTaskAssignments(Row) {
                         var en = Row.DueDate;
                         var diff = grid.DiffGanttDate(st, en, "h");
                         grid.SetValue(newrow, "Work", diff, 1);
-                        RollupAssignments(Row, "Work", "SUM");
+                        ////RollupAssignments(Row, "Work", "SUM");
                         //SetPlannerFieldValue(newrow, "Work", diff, true);
-                    }
-                    else {
-
-                        var fWork = 0;
-                        try {
-                            fWork = parseFloat(Row.Work);
-                        } catch (e) { }
-
-                        if (fWork == 0) {
-                            var st = grid.GetValue(Row, "StartDate")
-                            var en = grid.GetValue(Row, "DueDate")
-                            var diff = grid.DiffGanttDate(st, en, "h");
-                            // SetPlannerFieldValue(Row, "Work", diff, true);
-                            grid.SetValue(Row, "Work", diff * assignmentcount, 1);
-                        }
                     }
                 }
                 else {
@@ -1183,6 +1169,21 @@ function SetTaskAssignments(Row) {
 
                 RefreshResourceUsage(newrow.id);
                 //hideNonFolders(newrow);
+            }
+        }
+
+        if (Row.TaskType == "Individual") {
+            RollupAssignments(Row, "Work", "SUM");
+        }
+        else {
+            if (oArray == "") {
+                grid.SetValue(Row, "Work", 0, 1);
+            }
+            else {
+                var st = grid.GetValue(Row, "StartDate")
+                var en = grid.GetValue(Row, "DueDate")
+                var diff = grid.DiffGanttDate(st, en, "h");
+                grid.SetValue(Row, "Work", diff * assignmentcount, 1);
             }
         }
 
