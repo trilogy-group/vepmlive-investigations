@@ -654,7 +654,7 @@
                 if (level <= 0) level = 99;
                 var row = grid.GetFirst(null, 0);
                 while (row != null) {
-                    if (row.Level > level)
+                    if (row.Level >= level)
                         grid.Collapse(row);
                     else
                         grid.Expand(row);
