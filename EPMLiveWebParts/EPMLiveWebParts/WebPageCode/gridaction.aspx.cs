@@ -23,6 +23,7 @@ namespace EPMLiveWebParts
     public partial class gridaction : System.Web.UI.Page
     {
         protected string data;
+        
 
         private string getMenuItem(string grid, string title, string image, string command, string type)
         {
@@ -443,7 +444,6 @@ namespace EPMLiveWebParts
                             break;
                         case "editview":
                             w = GetWeb(site);
-                            GridViewSession gvs = new GridViewSession(Guid.Empty);
                             url = ((w.ServerRelativeUrl == "/") ? "" : w.ServerRelativeUrl) + "/_layouts/15/ViewEdit.aspx?List=" + Request["List"] + "&View=" + Request["view"];
                             break;
                         case "createworkspace":
