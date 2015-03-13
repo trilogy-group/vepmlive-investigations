@@ -5353,7 +5353,7 @@ namespace EPMLiveWebParts
                             SqlDataReader dr = cmd.ExecuteReader();
                             if (dr.Read())
                             {
-                                if (!string.IsNullOrEmpty(Convert.ToString(dr.GetInt32(1))))
+                                if (dr[1] != DBNull.Value)
                                 {
                                     retItem = dr.GetInt32(1);
                                 }
