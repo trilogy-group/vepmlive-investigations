@@ -606,15 +606,35 @@ function GEInit() {
                     var items = cachedata.split(';#');
                     var itemIndex = 0;
 
+                    var actualHiddenControl;
+                    if (controlProps.ControlInfo.SelectCandidateId != "")
+                        actualHiddenControl = document.getElementById(controlProps.ControlInfo.SelectCandidateId);
+                    else
+                        actualHiddenControl = document.getElementById(controlProps.ControlInfo.SourceControlId);
                     // get the values that contains the search text
                     // don't return options that has been selected already
                     for (var i in items) {
                         var itemPair = items[i].split('^^');
-                        if (itemPair[1] != undefined &&
-                !ArrayContains(pickerSelections, itemPair[1].toLowerCase().trim())) {
-                            hasMatch = true;
-                            $('#' + controlProps.ControlInfo.AutoCompleteDivId).append("<div class='autoText' id='autoText_" + itemIndex + "' value='" + itemPair[0] + "'>" + itemPair[1] + "</div>");
-                            itemIndex++;
+                        if (itemPair[1] != undefined) {
+                            var valueExists = false;
+                            for (var i = 0; i <= actualHiddenControl.length - 1; i++) {
+                                if (actualHiddenControl.options[i].value == itemPair[0] && actualHiddenControl.options[i].text == itemPair[1]) {
+                                    valueExists = true;
+                                    break;
+                                }
+                            }
+                            if (!valueExists) {
+                                var opt = document.createElement("option");
+                                opt.value = itemPair[0];
+                                opt.text = itemPair[1];
+                                opt.title = itemPair[1];
+                                actualHiddenControl.add(opt);
+                            }
+                            if (!ArrayContains(pickerSelections, itemPair[1].toLowerCase().trim())) {
+                                hasMatch = true;
+                                $('#' + controlProps.ControlInfo.AutoCompleteDivId).append("<div class='autoText' id='autoText_" + itemIndex + "' value='" + itemPair[0] + "'>" + itemPair[1] + "</div>");
+                                itemIndex++;
+                            }
                         }
                     }
 
@@ -889,7 +909,7 @@ function GEInit() {
         }
 
         function RegisterClickOutsideEvent(controlProps) {
-            document.onclick = function(event) {
+            document.onclick = function (event) {
                 if (clickedOutsideElement(controlProps.ControlInfo.AutoCompleteDivId, event)) {
                     if (clickedOutsideElement(controlProps.FieldName + '_ddlShowAll', event)) {
                         $('#' + controlProps.ControlInfo.AutoCompleteDivId).css('display', 'none');
@@ -1423,12 +1443,14 @@ function GEInit() {
 
         function ArrayContains(array, searchVal) {
             var result = false;
-            var cleanSearchVal = searchVal.toLowerCase().trim();
-            for (i in array) {
-                var arrayVal = array[i].toLowerCase().trim();
-                if (arrayVal == cleanSearchVal) {
-                    result = true;
-                    break;
+            if (searchVal) {
+                var cleanSearchVal = searchVal.toLowerCase().trim();
+                for (i in array) {
+                    var arrayVal = array[i].toLowerCase().trim();
+                    if (arrayVal == cleanSearchVal) {
+                        result = true;
+                        break;
+                    }
                 }
             }
 
@@ -1605,15 +1627,22 @@ function GEInit() {
             $('#' + GenericEntityDivIdRoot + '_OuterTable').addClass("ms-long");
         }
 
-        $$.OpenUrlWithModal = function(urlVal) {
+        $$.OpenUrlWithModal = function (urlVal) {
             var options = {
                 url: urlVal,
                 title: 'Add New Item to Target List',
                 allowMaximize: true,
                 width: 650,
                 height: 500,
-                dialogReturnValueCallback: function(dialogResult) {
-                    SP.UI.ModalDialog.RefreshPage(dialogResult);
+                dialogReturnValueCallback: function (dialogResult) {
+                    if (dialogResult == 1) {
+                        if (window._LookupFieldsPropsArray) {
+                            for (var k in window._LookupFieldsPropsArray) {
+                                var controlProps = window._LookupFieldsPropsArray[k];
+                                FetchData(controlProps, k);
+                            }
+                        }
+                    }
                 }
             };
 
