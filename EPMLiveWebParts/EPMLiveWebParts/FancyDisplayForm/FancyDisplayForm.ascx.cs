@@ -233,8 +233,9 @@ namespace EPMLiveWebParts
                                             break;
                                     }
                                 }
-                                else if (displaySettings.Split(";".ToCharArray())[0].ToLower().Equals("where"))
+                                else if (display.Split(";".ToCharArray())[0].ToLower().Equals("where"))
                                 {
+                                    displaySettings = fieldProperties[field.InternalName]["Display"];
                                     string where = displaySettings.Split(";".ToCharArray())[1];
                                     string conditionField = "";
                                     string condition = "";
