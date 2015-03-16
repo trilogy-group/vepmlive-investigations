@@ -221,6 +221,8 @@ namespace EPMLiveWebParts
                                         case SPFieldType.DateTime:
                                             if (!string.IsNullOrEmpty(Convert.ToString(item[field.InternalName])))
                                                 FillDateDetailsSection(field.Title, GetFormattedDate(Convert.ToDateTime(Convert.ToString(item[field.InternalName]))));
+                                            else
+                                                FillDateDetailsSection(field.Title, string.Empty);
                                             break;
                                         case SPFieldType.User:
                                             FillPeopleDetailsSection(field.Title, Convert.ToString(item[field.InternalName]));
@@ -260,6 +262,8 @@ namespace EPMLiveWebParts
                                             case SPFieldType.DateTime:
                                                 if (!string.IsNullOrEmpty(Convert.ToString(item[field.InternalName])))
                                                     FillDateDetailsSection(field.Title, GetFormattedDate(Convert.ToDateTime(Convert.ToString(item[field.InternalName]))));
+                                                else
+                                                    FillDateDetailsSection(field.Title, string.Empty);
                                                 break;
                                             case SPFieldType.User:
                                                 FillPeopleDetailsSection(field.Title, Convert.ToString(item[field.InternalName]));
@@ -284,6 +288,8 @@ namespace EPMLiveWebParts
                                     case SPFieldType.DateTime:
                                         if (!string.IsNullOrEmpty(Convert.ToString(item[field.InternalName])))
                                             FillDateDetailsSection(field.Title, GetFormattedDate(Convert.ToDateTime(Convert.ToString(item[field.InternalName]))));
+                                        else
+                                            FillDateDetailsSection(field.Title, string.Empty);
                                         break;
                                     case SPFieldType.User:
                                         FillPeopleDetailsSection(field.Title, Convert.ToString(item[field.InternalName]));
@@ -311,6 +317,8 @@ namespace EPMLiveWebParts
                                 case SPFieldType.DateTime:
                                     if (!string.IsNullOrEmpty(Convert.ToString(item[field.InternalName])))
                                         FillDateDetailsSection(field.Title, GetFormattedDate(Convert.ToDateTime(Convert.ToString(item[field.InternalName]))));
+                                    else
+                                        FillDateDetailsSection(field.Title, string.Empty);
                                     break;
                                 case SPFieldType.User:
                                     FillPeopleDetailsSection(field.Title, Convert.ToString(item[field.InternalName]));
@@ -831,7 +839,7 @@ namespace EPMLiveWebParts
                 foreach (string fileName in item.Attachments)
                 {
                     string attachmentUrl = SPContext.Current.Web.Url + "/" + SPContext.Current.List.RootFolder.Url + "/attachments/" + item.ID + "/" + fileName;
-                    
+
                     sbItemAttachments.Append("<div id='attach-text-wrapper'>");
 
                     sbItemAttachments.Append("<div class='attach-text'>");
