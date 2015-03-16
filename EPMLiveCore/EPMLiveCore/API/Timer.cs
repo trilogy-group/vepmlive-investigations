@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Microsoft.SharePoint;
-using System.Data;
 using System.Data.SqlClient;
 using System.Xml;
+using EPMLiveCore.Jobs;
+using System.Web.Script.Serialization;
 
 namespace EPMLiveCore.API
 {
@@ -374,6 +372,52 @@ namespace EPMLiveCore.API
                     }
                 }
             });
+        }
+
+        public static string IsImportResourceAlreadyRunning(Guid siteid, Guid webid, string jobname)
+        {
+            bool isRunning = false;
+            Guid jobId = Guid.Empty;
+            int percentComplete = 0;
+            string query = "SELECT status, view_log.timerjobuid, epml_log.resulttext from vwQueueTimerLog view_log inner join EPMLIVE_LOG as epml_log on view_log.timerjobuid = epml_log.timerjobuid where siteguid='" + siteid + "' and webguid='" + webid + "' and jobname='" + jobname + "'";
+
+            SPSecurity.RunWithElevatedPrivileges(delegate()
+            {
+                using (SPSite site = new SPSite(siteid))
+                {
+                    using (SqlConnection cn = new SqlConnection(CoreFunctions.getConnectionString(site.WebApplication.Id)))
+                    {
+                        cn.Open();
+                        using (SqlCommand cmd = new SqlCommand(query, cn))
+                        {
+                            SqlDataReader dr = cmd.ExecuteReader();
+                            if (dr.Read())
+                            {
+                                // Status 0 = Not started, Status 1 = Running, Status 2 = Completed
+                                if (dr.GetInt32(0) != 2)
+                                {
+                                    isRunning = true;
+                                }
+                                jobId = dr.GetGuid(1);
+                                string jsonText = dr.GetString(2);
+
+                                try
+                                {
+                                    JavaScriptSerializer jsSerializer = new JavaScriptSerializer();
+                                    ResourceImportResult resourceImport = jsSerializer.Deserialize<ResourceImportResult>(jsonText);
+                                    percentComplete = resourceImport.PercentComplete;
+                                }
+                                catch
+                                {}
+                            }
+                            dr.Close();
+                        }
+                    }
+                }
+            });
+
+            return string.Format(@"<ResourceImporter Success=""{0}"" JobUid=""{1}"" PercentComplete=""{2}"" />", isRunning,
+                    jobId, percentComplete);
         }
     }
 }

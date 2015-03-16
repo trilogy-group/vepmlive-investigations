@@ -134,7 +134,7 @@ function registerEpmLiveResourceGridScript() {
                             if ($$$.responseIsSuccess(result)) {
                                 try {
                                     if (result.GetReportsByFolder.Data.Folder && result.GetReportsByFolder.Data.Folder.Folder) {
-                                    register(result.GetReportsByFolder.Data.Folder.Folder);
+                                        register(result.GetReportsByFolder.Data.Folder.Folder);
                                     }
                                 }
                                 catch (ex) {
@@ -1348,7 +1348,7 @@ function registerEpmLiveResourceGridScript() {
                             $$.actions.displayPopUp(url, 'Resource Analyzer', true, true, null, null, 700, 700);
                         }
                     });
-                }
+                }                
             },
 
             redirect: function (operation) {
@@ -1430,7 +1430,7 @@ function registerEpmLiveResourceGridScript() {
                             $$.actions.displayPopUp(url, 'Resource Planner', true, false, null, null, 700, 700);
                         }
                     });
-                }
+                }                
             },
 
             loadAssignmentPlanner: function () {
@@ -1754,14 +1754,97 @@ function registerEpmLiveResourceGridScript() {
             },
 
             importResources: function () {
-                var options = window.SP.UI.$create_DialogOptions();
 
-                options.title = 'Import Resources';
-                options.url = $$$.currentWebUrl + '/_layouts/epmlive/importresources.aspx';
-                options.dialogReturnValueCallback = window.epmLiveResourceGrid.actions.onImportResourcesCompleted;
-
-                window.SP.UI.ModalDialog.showModalDialog(options);
+                $$.actions.isImportResourceInProgress();
             },
+
+            isImportResourceInProgress: function () {
+                var paramData =
+                    "<Data>" +
+                        "<Param key=\"SiteID\">" + $$$.currentSiteId + "</Param>" +
+                        "<Param key=\"WebID\">" + $$$.currentWebId + "</Param>" +
+                    "</Data>";
+
+                $.ajax({
+                    type: 'POST',
+                    url: $$$.currentWebUrl + '/_vti_bin/WorkEngine.asmx/Execute',
+                    data: "{ Function: 'IsImportResourceAlreadyRunning', Dataxml: '" + paramData + "' }",
+                    contentType: 'application/json; charset=utf-8',
+                    dataType: 'json',
+                    success: function (response) {
+                        $$.actions.importResourcesMain(response);
+                    },
+                    error: function (err) {
+                        $$$.log(err);
+
+                        status.title('Error');
+                        status.message('Unable to check if any import resources job is running. The response was: (' + err.status + ') ' + err.statusText);
+                        statusbar.color('red');
+
+                        $$.importInProgress = false;
+                        window.RefreshCommandUI();
+                    }
+                });
+            },
+
+            importResourcesMain: function (response) {
+
+                if (response.d) {
+
+                    var responseJson = $$$.parseJson(response.d);
+                    var result = responseJson.Result;
+
+                    if ($$$.responseIsSuccess(result)) {
+
+                        if (result.ResourceImporter['@Success'] === 'True') {
+                            var canContinue = confirm("A resource import job is currently running and is " + result.ResourceImporter['@PercentComplete'] + "% complete. Would you like to cancel it and run this new import job instead?");
+                            if (canContinue) {
+                                var params =
+                                    "<Data>" +
+                                        "<Param key=\"SiteID\">" + $$$.currentSiteId + "</Param>" +
+                                        "<Param key=\"JobID\">" + result.ResourceImporter['@JobUid'] + "</Param>" +
+                                    "</Data>";
+
+                                $.ajax({
+                                    type: 'POST',
+                                    url: $$$.currentWebUrl + '/_vti_bin/WorkEngine.asmx/Execute',
+                                    data: "{ Function: 'CancelTimerJob', Dataxml: '" + params + "' }",
+                                    contentType: 'application/json; charset=utf-8',
+                                    dataType: 'json',
+                                    success: function () {
+                                        var options = window.SP.UI.$create_DialogOptions();
+
+                                        options.title = 'Import Resources';
+                                        options.url = $$$.currentWebUrl + '/_layouts/epmlive/importresources.aspx';
+                                        options.dialogReturnValueCallback = window.epmLiveResourceGrid.actions.onImportResourcesCompleted;
+
+                                        window.SP.UI.ModalDialog.showModalDialog(options);
+                                    },
+                                    error: function (err) {
+                                        $$$.log(err);
+
+                                        status.title('Error');
+                                        status.message('Unable to cancel timer job for import resources. The response was: (' + err.status + ') ' + err.statusText);
+                                        statusbar.color('red');
+
+                                        $$.importInProgress = false;
+                                        window.RefreshCommandUI();
+                                    }
+                                });
+                            }
+                        }
+                        else {
+                            var options = window.SP.UI.$create_DialogOptions();
+
+                            options.title = 'Import Resources';
+                            options.url = $$$.currentWebUrl + '/_layouts/epmlive/importresources.aspx';
+                            options.dialogReturnValueCallback = window.epmLiveResourceGrid.actions.onImportResourcesCompleted;
+
+                            window.SP.UI.ModalDialog.showModalDialog(options);
+                        }
+                    }
+                }
+            },            
 
             onImportResourcesCompleted: function (result, value) {
                 if (result === 1) {
@@ -1876,54 +1959,54 @@ function registerEpmLiveResourceGridScript() {
                         var reportsColl = [];
                         var queryString = '';
                         for (var r in reports) {
-                            var report = reports[r];                            
+                            var report = reports[r];
 
-                                //{
-                                //    'iconClass': 'icon-pie-3 icon-dropdown',
-                                //    'text': 'Available vs. Planner by Dept',
-                                //    'events': [
-                                //        {
-                                //            'eventName': 'click',
-                                //            'function': function () { alert('report something'); }
-                                //        }
-                                //    ]
+                            //{
+                            //    'iconClass': 'icon-pie-3 icon-dropdown',
+                            //    'text': 'Available vs. Planner by Dept',
+                            //    'events': [
+                            //        {
+                            //            'eventName': 'click',
+                            //            'function': function () { alert('report something'); }
+                            //        }
+                            //    ]
 
-                                //}							
-                                var reportConfig = {
-                                    'iconClass': '',
-                                    'text': report.name,
-                                    'events': [
-                                        {
-                                            'eventName': 'click',
-                                            'function': function (event) {
-                                                queryString = '';
-                                                if (event.target.innerHTML == "Resource Work vs. Capacity") {
+                            //}							
+                            var reportConfig = {
+                                'iconClass': '',
+                                'text': report.name,
+                                'events': [
+                                    {
+                                        'eventName': 'click',
+                                        'function': function (event) {
+                                            queryString = '';
+                                            if (event.target.innerHTML == "Resource Work vs. Capacity") {
 
-                                                    var grid = $$.grid.grids[$$.id()];
-                                                    var selRows = grid.GetSelRows();
+                                                var grid = $$.grid.grids[$$.id()];
+                                                var selRows = grid.GetSelRows();
 
-                                                    //if ($$.reports.collection[reportId].hasResourcesParam) {
-                                                    for (var j = 0; j < selRows.length; j++) {
-                                                        var sr = selRows[j];
+                                                //if ($$.reports.collection[reportId].hasResourcesParam) {
+                                                for (var j = 0; j < selRows.length; j++) {
+                                                    var sr = selRows[j];
 
-                                                        if (sr.Kind === 'Data' && sr.Def.Name === 'R') {
-                                                            queryString += '&rp:Resources=' + sr.ResourceID;
-                                                        }
+                                                    if (sr.Kind === 'Data' && sr.Def.Name === 'R') {
+                                                        queryString += '&rp:Resources=' + sr.ResourceID;
                                                     }
-                                                    //}									
                                                 }
-                                                var rptURL = $(this).attr('reportUrl') + queryString;
-                                                window.open(rptURL, '_blank');
+                                                //}									
                                             }
+                                            var rptURL = $(this).attr('reportUrl') + queryString;
+                                            window.open(rptURL, '_blank');
                                         }
-                                    ],
-
-                                    'properties': {
-                                        'reportUrl': report.url
                                     }
-                                };
+                                ],
 
-                                reportsColl.push(reportConfig);
+                                'properties': {
+                                    'reportUrl': report.url
+                                }
+                            };
+
+                            reportsColl.push(reportConfig);
                         }
 
                         //'options': [

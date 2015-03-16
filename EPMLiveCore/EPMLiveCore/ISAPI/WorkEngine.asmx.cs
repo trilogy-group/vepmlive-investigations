@@ -1405,6 +1405,76 @@ namespace EPMLiveCore
             }
         }
 
+        /// <summary>
+        /// Check if already running an import resource job for same site
+        /// </summary>
+        /// <param name="data">Json Object</param>
+        /// <param name="SPWeb">Web</param>
+        /// <returns></returns>
+        public static string IsImportResourceAlreadyRunning(string data, SPWeb oWeb)
+        {
+            try
+            {
+                Guid spSiteID = Guid.Empty;
+                Guid spWebID = Guid.Empty;
+                XDocument xDoc = XDocument.Parse(data);
+                if (xDoc != null)
+                {                    
+                    foreach (XElement current in xDoc.Root.Elements())
+                    {
+                        if (current.Attribute("key").Value.Equals("SiteID"))
+                        {
+                            spSiteID = new Guid(current.Value);                            
+                        }
+                        else if (current.Attribute("key").Value.Equals("WebID"))
+                        {
+                            spWebID = new Guid(current.Value);
+                        }
+                    }
+                }
+                return Response.Success(Timer.IsImportResourceAlreadyRunning(spSiteID, spWebID, "Import Resources"));                
+            }
+            catch (APIException ex)
+            {
+                return Response.Failure(ex.ExceptionNumber, string.Format("Error: {0}", ex.Message));
+            }
+        }
+        /// <summary>
+        /// Cancel the already running import resource job
+        /// </summary>
+        /// <param name="data">Json Object</param>
+        /// <param name="SPWeb">Web</param>
+        /// <returns></returns>
+        public static string CancelTimerJob(string data, SPWeb oWeb)
+        {            
+            try
+            {
+                Guid siteId = Guid.Empty;
+                Guid jobUid = Guid.Empty;
+                XDocument xDoc = XDocument.Parse(data);
+                if (xDoc != null)
+                {
+                    foreach (XElement current in xDoc.Root.Elements())
+                    {
+                        if (current.Attribute("key").Value.Equals("SiteID"))
+                        {
+                            siteId = new Guid(current.Value);
+                        }
+                        else if (current.Attribute("key").Value.Equals("JobID"))
+                        {
+                            jobUid = new Guid(current.Value);
+                        }
+                    }
+                }
+                Timer.CancelTimerJob(siteId, jobUid);                
+                return Response.Success(string.Format(@"<ResourceImporter Success=""{0}"" />", true));
+            }
+            catch (APIException ex)
+            {
+                return Response.Failure(ex.ExceptionNumber, string.Format("Error: {0}", ex.Message));
+            }
+        }
+
         #endregion
 
         #region Resource Management Methods
