@@ -2891,6 +2891,13 @@ namespace EPMLiveWebParts
             bool hasDefaultViewURL = false;
             string defaultViewURL = string.Empty;
             JavaScriptSerializer oSerializer = new JavaScriptSerializer();
+            List<string> lstListViewURL = new List<string>();
+
+            // EPML-4803: taking list's view url and match it with propertybag's views, if don't match it will not display to generic Views.
+            foreach (SPView spView in list.Views)
+            {
+                lstListViewURL.Add(spView.Url);
+            }
 
             try
             {
@@ -2929,7 +2936,7 @@ namespace EPMLiveWebParts
 
                             foreach (var tmpViewInsert in viewArr)
                             {
-                                if (!splitViewcollection.Contains(tmpViewInsert))
+                                if (!splitViewcollection.Contains(tmpViewInsert) && lstListViewURL.Contains(tmpViewInsert))
                                     splitViewcollection.Add(tmpViewInsert);
                             }
                         }
