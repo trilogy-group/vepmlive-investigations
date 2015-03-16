@@ -528,7 +528,7 @@ namespace EPMLiveWorkPlanner
                 }
 
                 PlannerProps props = getSettings(oWeb, sPlanner);
-
+                
                 SPList oProjectList = oWeb.Lists.TryGetList(props.sListProjectCenter);
 
                 DataSet dsResources = GetResourceTable(props, oProjectList.ID, sID, oWeb);
@@ -537,7 +537,7 @@ namespace EPMLiveWorkPlanner
                 {
                     if (ndImportTask.Name == "Item")
                     {
-                        processTasks(ndImportTask, ref docRet, docPlan.FirstChild.SelectSingleNode("//I[@id='0']"), docPlan, sUID, arrCols, bAllowDuplicates, ref curtaskuid, sResField, dsResources);
+                        processTasks(ndImportTask, ref docRet, docPlan.FirstChild.SelectSingleNode("//I[@id='0']"), docPlan, sUID, arrCols, bAllowDuplicates, ref curtaskuid, sResField, dsResources, Convert.ToString(props.iTaskType));
                     }
                 }
 
@@ -585,9 +585,10 @@ namespace EPMLiveWorkPlanner
             return docRet.OuterXml;
         }
 
-        private static void processTasks(XmlNode ndImportTask, ref XmlDocument docRet, XmlNode ndParent, XmlDocument docPlan, string sUID, ArrayList arrCols, bool bAllowDuplicates, ref int curtaskuid, string sResField, DataSet dsResources)
+        private static void processTasks(XmlNode ndImportTask, ref XmlDocument docRet, XmlNode ndParent, XmlDocument docPlan, string sUID, ArrayList arrCols, bool bAllowDuplicates, ref int curtaskuid, string sResField, DataSet dsResources, string sTaskType = "")
         {
             string extid = getAttribute(ndImportTask, sUID);
+            string columnTaskType = "TaskType";
 
             if (extid == "" && sUID != "")
                 return;
@@ -611,13 +612,20 @@ namespace EPMLiveWorkPlanner
                     ndNew.Attributes.Append(attr);
 
                     attr = docPlan.CreateAttribute("id");
-                    attr.Value = curtaskuid.ToString(); ;
+                    attr.Value = curtaskuid.ToString();
                     ndNew.Attributes.Append(attr);
 
                     foreach (string sCol in arrCols)
                     {
                         attr = docPlan.CreateAttribute(sCol);
-                        attr.Value = getAttribute(ndImportTask, sCol);
+                        if (sCol == columnTaskType)
+                        {
+                            attr.Value = sTaskType;
+                        }
+                        else
+                        {
+                            attr.Value = getAttribute(ndImportTask, sCol);
+                        }
                         ndNew.Attributes.Append(attr);
                     }
 
