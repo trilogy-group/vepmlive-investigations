@@ -116,7 +116,6 @@ namespace WE_QueueMgr
                 sites = new List<QMSite>();
                 string basepaths = "";
                 string sNTUserName = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
-                
                 RegistryKey rk = Registry.LocalMachine.OpenSubKey(const_subKey);
                 if (rk != null)
                 {
@@ -140,11 +139,11 @@ namespace WE_QueueMgr
                                         //EPML-4761: Logic to get encrypted/clear text registry key
                                         var encrypted = rk.GetValue("encrypted");
                                         string strConnectionString = rk.GetValue("ConnectionString", string.Empty).ToString().Trim();
+                                        var dbConnectionStringBuilder = new DbConnectionStringBuilder { ConnectionString = strConnectionString };
                                         if (encrypted != null)
                                         {
-                                            strConnectionString = Decrypt(strConnectionString, PASS_PHRASE);
+                                            dbConnectionStringBuilder.ConnectionString = Decrypt(strConnectionString, PASS_PHRASE);
                                         }
-                                        var dbConnectionStringBuilder = new DbConnectionStringBuilder { ConnectionString = strConnectionString };
                                         dbConnectionStringBuilder.Remove("Provider");
 
                                         site.connection = dbConnectionStringBuilder.ToString();
