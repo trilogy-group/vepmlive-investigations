@@ -14,10 +14,6 @@ using System.Collections.Generic;
 using System.Data.Common;
 using System.Data.SqlClient;
 
-using System.Text;
-using System.Security.Cryptography;
-using System.IO;
-
 namespace WE_QueueMgr
 {
     public partial class PPMWorkEngineQueueService : ServiceBase
@@ -39,7 +35,6 @@ namespace WE_QueueMgr
 
         //private const string const_subKey = "SOFTWARE\\EPMLive\\PortfolioEngine\\";
         private const string const_subKey = "SOFTWARE\\Wow6432Node\\EPMLive\\PortfolioEngine\\";
-        private const string PASS_PHRASE = "MnjkafjhkAS&*^#@";
         private bool m_bFirstTick;
         private long m_lMinutes;
         private long m_lTenSeconds;
@@ -136,18 +131,10 @@ namespace WE_QueueMgr
                                     {
                                         site = new QMSite();
                                         site.basePath = basePath;
-                                        //EPML-4761: Logic to get encrypted/clear text registry key
-                                        var encrypted = rk.GetValue("encrypted");
-                                        string strConnectionString = rk.GetValue("ConnectionString", string.Empty).ToString().Trim();
-                                        var dbConnectionStringBuilder = new DbConnectionStringBuilder { ConnectionString = strConnectionString };
-                                        if (encrypted != null)
-                                        {
-                                            dbConnectionStringBuilder.ConnectionString = Decrypt(strConnectionString, PASS_PHRASE);
-                                        }
+                                        var dbConnectionStringBuilder = new DbConnectionStringBuilder { ConnectionString = rk.GetValue("ConnectionString", string.Empty).ToString().Trim() };
                                         dbConnectionStringBuilder.Remove("Provider");
 
                                         site.connection = dbConnectionStringBuilder.ToString();
-                                        //END-4761
                                         site.pid = rk.GetValue("PID", string.Empty).ToString().Trim();
                                         site.cn = rk.GetValue("CN", string.Empty).ToString().Trim();
                                         int nDefaultTraceChannels = 0;
@@ -429,50 +416,5 @@ namespace WE_QueueMgr
                 ExceptionHandler("MessageHandler - " + sContext + sLocation, ex);
             }
         }
-
-        public static string Decrypt(string cipherText, string passPhrase)
-        {
-            try
-            {
-                byte[] initVectorBytes = Encoding.ASCII.GetBytes("77B2c3D4e1F3g7R1");
-                byte[] saltValueBytes = Encoding.ASCII.GetBytes("f53fNDH@");
-                byte[] cipherTextBytes = Convert.FromBase64String(cipherText);
-
-                PasswordDeriveBytes password = new PasswordDeriveBytes(
-                                                                passPhrase,
-                                                                saltValueBytes,
-                                                                "SHA1",
-                                                                2);
-
-                byte[] keyBytes = password.GetBytes(256 / 8);
-
-                RijndaelManaged symmetricKey = new RijndaelManaged();
-                symmetricKey.Mode = CipherMode.CBC;
-                ICryptoTransform decryptor = symmetricKey.CreateDecryptor(
-                                                                 keyBytes,
-                                                                 initVectorBytes);
-
-                MemoryStream memoryStream = new MemoryStream(cipherTextBytes);
-
-                CryptoStream cryptoStream = new CryptoStream(memoryStream,
-                                                              decryptor,
-                                                              CryptoStreamMode.Read);
-
-                byte[] plainTextBytes = new byte[cipherTextBytes.Length];
-
-                int decryptedByteCount = cryptoStream.Read(plainTextBytes,
-                                                           0,
-                                                           plainTextBytes.Length);
-                memoryStream.Close();
-                cryptoStream.Close();
-
-                string plainText = Encoding.UTF8.GetString(plainTextBytes,
-                                                           0,
-                                                           decryptedByteCount);
-                return plainText;
-            }
-            catch { return ""; }
-        }
-
     }
 }
