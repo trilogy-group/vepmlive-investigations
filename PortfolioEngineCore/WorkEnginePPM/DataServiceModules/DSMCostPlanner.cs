@@ -8,6 +8,7 @@ using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Xml;
 
 namespace WorkEnginePPM.DataServiceModules
 {
@@ -152,7 +153,7 @@ namespace WorkEnginePPM.DataServiceModules
                                 if (calendarValue != Convert.ToString(row[col.ColumnName]))
                                 {
                                     calendarValue = Convert.ToString(row[col.ColumnName]);
-                                    calendarId = GetMasterRecordId(col.ColumnName, calendarValue, "0");
+                                    calendarId = GetMasterRecordId(col.ColumnName, calendarValue, "0", null);
                                     customIdentityValues.Clear();
                                 }
                                 if (calendarId == 0)
@@ -165,7 +166,7 @@ namespace WorkEnginePPM.DataServiceModules
                                 if (projectValue != Convert.ToString(row[col.ColumnName]))
                                 {
                                     projectValue = Convert.ToString(row[col.ColumnName]);
-                                    projectId = GetMasterRecordId(col.ColumnName, projectValue, _listId);
+                                    projectId = GetMasterRecordId(col.ColumnName, projectValue, _listId, null);
                                     customIdentityValues.Clear();
                                 }
                                 if (projectId == 0)
@@ -178,7 +179,7 @@ namespace WorkEnginePPM.DataServiceModules
                                 if (costTypeValue != Convert.ToString(row[col.ColumnName]))
                                 {
                                     costTypeValue = Convert.ToString(row[col.ColumnName]);
-                                    costTypeId = GetMasterRecordId(col.ColumnName, costTypeValue, "0");
+                                    costTypeId = GetMasterRecordId(col.ColumnName, costTypeValue, "0", null);
                                     customIdentityValues.Clear();
                                 }
                                 if (costTypeId == 0)
@@ -193,12 +194,12 @@ namespace WorkEnginePPM.DataServiceModules
                                     string[] costCategoryArray = Convert.ToString(row[col.ColumnName]).Split('.');
                                     costCategoryFullName = Convert.ToString(row[col.ColumnName]);
                                     costCategoryValue = costCategoryArray[costCategoryArray.Length - 1];
-                                    costCategoryId = GetMasterRecordId(col.ColumnName, costCategoryValue, costTypeId.ToString());
+                                    costCategoryId = GetMasterRecordId(col.ColumnName, costCategoryValue, costTypeId.ToString(), costCategoryArray);
                                     customIdentityValues.Clear();
                                     if (costCategoryId == 0)
                                     {
                                         isCostCategoryIdDirty = true;
-                                        rowError.Append(FormatMessage(calendarValue, projectValue, costTypeValue, costCategoryValue, null, 0, 0, "Invalid Cost Category."));
+                                        rowError.Append(FormatMessage(calendarValue, projectValue, costTypeValue, String.Join(" > ", costCategoryArray), null, 0, 0, "Invalid Cost Category."));
                                     }
                                 }
                                 break;
@@ -206,7 +207,7 @@ namespace WorkEnginePPM.DataServiceModules
                                 if (periodValue != Convert.ToString(row[col.ColumnName]))
                                 {
                                     periodValue = Convert.ToString(row[col.ColumnName]);
-                                    periodId = GetMasterRecordId(col.ColumnName, periodValue, calendarId.ToString());
+                                    periodId = GetMasterRecordId(col.ColumnName, periodValue, calendarId.ToString(), null);
                                 }
                                 if (periodId == 0)
                                 {
@@ -633,7 +634,7 @@ namespace WorkEnginePPM.DataServiceModules
             return returnValue;
         }
 
-        private Int32 GetMasterRecordId(string columnName, string columnValue, string foreignKeyId)
+        private Int32 GetMasterRecordId(string columnName, string columnValue, string foreignKeyId, string[] costCategoryArray)
         {
             Int32 returnValue = 0;
             switch (columnName)
@@ -664,7 +665,48 @@ namespace WorkEnginePPM.DataServiceModules
                     break;
                 case colCostCategory:
                     _dvCostCategories.RowFilter = String.Empty;
-                    _dvCostCategories.RowFilter = string.Format("ct_id={0} and bc_name='{1}'", foreignKeyId, columnValue);
+                    if (costCategoryArray != null && costCategoryArray.Length >= 2)
+                    {
+                        Int32 bc_id = Int32.MaxValue;
+                        foreach (string costCategory in costCategoryArray)
+                        {
+                            if (bc_id == Int32.MaxValue)
+                            {
+                                _dvCostCategories.RowFilter = String.Empty;
+                                _dvCostCategories.RowFilter = string.Format("ct_id={0} and bc_name='{1}'", foreignKeyId, costCategory);
+                                if (_dvCostCategories.Count == 0)
+                                {
+                                    bc_id = Int32.MaxValue;
+                                    break;
+                                }
+                                else
+                                {
+                                    bc_id = Convert.ToInt32(_dvCostCategories[0]["bc_id"]);
+                                }
+                            }
+                            else
+                            {
+                                _dvCostCategories.RowFilter = String.Empty;
+                                _dvCostCategories.RowFilter = string.Format("ct_id={0} and bc_name='{1}' and bc_id>={2}", foreignKeyId, costCategory, bc_id);
+                                if (_dvCostCategories.Count == 0)
+                                {
+                                    bc_id = Int32.MaxValue;
+                                    break;
+                                }
+                                else
+                                {
+                                    bc_id = Convert.ToInt32(_dvCostCategories[0]["bc_id"]);
+                                }
+                            }
+                        }
+                        _dvCostCategories.RowFilter = String.Empty;
+                        _dvCostCategories.RowFilter = string.Format("ct_id={0} and bc_name='{1}' and bc_id>={2}", foreignKeyId, columnValue, bc_id);
+                    }
+                    else
+                    {
+                        _dvCostCategories.RowFilter = string.Format("ct_id={0} and bc_name='{1}'", foreignKeyId, columnValue);
+                    }
+
                     if (_dvCostCategories.Count > 0)
                     {
                         returnValue = Convert.ToInt32(_dvCostCategories[0]["bc_uid"]);
@@ -811,7 +853,7 @@ namespace WorkEnginePPM.DataServiceModules
                 dtCostTypes = null;
             }
 
-            using (SqlDataAdapter sqlDataAdapter = new SqlDataAdapter("select cc.bc_uid, cc.bc_id, bc_name, bc_level, bc_uom, ac.ct_id from epgp_cost_categories cc inner join epgp_avail_categories ac on (cc.bc_uid = ac.bc_uid) order by bc_id", _PFECN))
+            using (SqlDataAdapter sqlDataAdapter = new SqlDataAdapter("select cc.bc_uid, cc.bc_id, bc_name, bc_level, bc_uom, ac.ct_id from epgp_cost_categories cc inner join epgp_avail_categories ac on (cc.bc_uid = ac.bc_uid) order by ac.CT_ID,bc_id", _PFECN))
             {
                 DataTable dtCategories = new DataTable();
                 sqlDataAdapter.Fill(dtCategories);
