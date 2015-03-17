@@ -693,7 +693,7 @@
 
         var CanLinkExternal = <%=CanLinkExternal %>;
 
-    oLinkedTasks = [ <%=sLinkedTasks %>];
+        oLinkedTasks = [ <%=sLinkedTasks %>];
 
         bCalcCost = <%=bCalcCost.ToString().ToLower() %>;
         bCalcWork = <%=bCalcWork.ToString().ToLower() %>;
@@ -834,13 +834,13 @@
         {
             TreeGrid( { Data:{ Url:"../../_vti_bin/WorkPlanner.asmx", Method:"Soap",Function:"Execute",Namespace:"workengine.com",Param:{Functionname:"GetAllocationLayout",Dataxml:"<%=sPlannerDataParam %>" } }, SuppressMessage:2, Debug:""}, "allocDiv" ); 
         
-        CreateBasicTree("GetAddLinksLayout","addLinkTableDivTree");
-        CreateBasicTree("GetDetailLayout","detailTree");
-        CreateBasicTree("GetAssignmentLayout","assignmentsDivTree");
-        CreateBasicTree("GetLinksLayout","linksDivTree");
-        CreateBasicTree("GetExternalLinkLayout","divExternalLinkAcceptTree");
+            CreateBasicTree("GetAddLinksLayout","addLinkTableDivTree");
+            CreateBasicTree("GetDetailLayout","detailTree");
+            CreateBasicTree("GetAssignmentLayout","assignmentsDivTree");
+            CreateBasicTree("GetLinksLayout","linksDivTree");
+            CreateBasicTree("GetExternalLinkLayout","divExternalLinkAcceptTree");
 
-        TreeGrid( { Data:{ Url:"../../_vti_bin/WorkPlanner.asmx", Method:"Soap",Function:"Execute",Namespace:"workengine.com",Param:{Functionname:"GetProjectInfo",Dataxml:"<%=sPlannerDataParam %>" } }, SuppressMessage:1, Debug:"" }, "projectDiv" ); 
+            TreeGrid( { Data:{ Url:"../../_vti_bin/WorkPlanner.asmx", Method:"Soap",Function:"Execute",Namespace:"workengine.com",Param:{Functionname:"GetProjectInfo",Dataxml:"<%=sPlannerDataParam %>" } }, SuppressMessage:1, Debug:"" }, "projectDiv" ); 
 
 
         TreeGrid(   { 
@@ -854,7 +854,7 @@
         <%=agileDiv %>
 
         
-    }
+        }
 
         function CreateBasicTree(functionname, div)
         {
@@ -988,574 +988,577 @@
 
         Grids.OnLoaded = function(G){ 
             G.Lang.Format.DecimalSeparator='<%=DecimalSeparator %>';
-        G.Lang.Format.GroupSeparator='<%=GroupSeparator %>';
-        G.Lang.Format.InputDecimalSeparators='<%=DecimalSeparator %>';
-        G.Lang.Format.InputGroupSeparators='<%=GroupSeparator %>';
-    }
-
-    Grids.OnMouseDown = function(grid, row, col, x, y, event)
-    {
-        if(grid)
-            MouseDownGrid = grid.id;
-    }
-
-    Grids.OnCanDrop = function(grid, row, togrid, torow, type, copy) 
-    {
-        if(torow.id == 0)
-            return 0;
-
-        return type;
-    }
-
-    Grids.OnScroll = function(grid, hpos1, vpos, oldhpos1, oldvpos, hpos0, oldhpos0, hpos2, oldhpos2)
-    {
-        if(grid.id == "WorkPlannerGrid" && grid.id==MouseDownGrid)
-        {
-            var left = grid.GetScrollLeft(2);
-            Grids.AllocationGrid.SetScrollLeft(left, 2);
-
-            
-        }
-        else if(grid.id == "AllocationGrid" && grid.id==MouseDownGrid)
-        {
-            var left = grid.GetScrollLeft(2);
-            Grids.WorkPlannerGrid.SetScrollLeft(left, 2);
-        }
-    }
-    
-    Grids.OnGanttChanged = function(grid, row, col, item, new1, new2, old1, old2, action) 
-    {
-    
-        if(grid.id == "WorkPlannerGrid")
-        {
-            DoAssignmentRollDown(grid, row, 0, "StartDate");
-            DoAssignmentRollDown(grid, row, 0, "DueDate");
-            DoAssignmentRollDown(grid, row, 0, "Duration");
-            if(row.Def && row.Def.Name == "Iteration")
-            {
-                RollDown(row, "StartDate");
-                RollDown(row, "DueDate");
-                RollDown(row, "Duration");
-            }
-
-            CalculateAssignmentCosts(grid, row);
-        }
-    }
-
-    Grids.OnCorrectDependencies = function(grid, A, R, error )
-    {
-    
-        var g = grid;
-
-        setTimeout("RollupSummaryField('DueDate')", 1000);
-    }
-
-
-    Grids.OnAfterSave = function (grid, result, autoupdate) {
-        HideTDialog();
-        CheckUpdates();
-        RefreshCommandUI();
-    }
-
-    Grids.OnColumnsChanged = function(grid, cols, count)
-    {
-        var lastCol = grid.GetLastCol("1");
-        
-        for(var col in cols)
-        {
-            if(cols[col])
-            {
-                grid.MoveCol(col, 1, true, 0);
-            }
-        }
-        //MoveCol               (string col, string tocol, bool right, bool noshow = 0) or (string col, int sec, bool last, bool noshow = 0) 
-    } 
-
-    Grids.OnGetColor = function(grid, row, col, r, g, b, edit)  
-    {
-        return GetColor(grid, row, col, r, g, b, edit);
-    }
-
-    Grids.OnGetClass = function(grid, row, col, classname)
-    {
-        return GetCssClass(grid, row, col, "erroroncell");
-    }
-
-    Grids.OnTip = function(grid, row, col, tip, cleintx, clienty, x, y)
-    {
-        return GetToolTip(grid, row, col, tip, 5, 5, 5, 5)
-    }
-    
-    Grids.OnRenderFinish = function (grid) {
-    
-        curTree++;
-        var pct = curTree/Grids.length*100;
-
-        document.getElementById("tdPctFull").style.display = "";
-        document.getElementById("tdPctFull").style.width = parseInt(pct) + "%";
-
-        if(curTree <= Grids.length)
-            SetSplashText("Loading " + curTree + " of " + Grids.length);
-
-        if(curTree == Grids.length)
-        {
-
-            var WGrid = Grids.WorkPlannerGrid;
-
-            var AGrid = Grids.AgileGrid;
-
-            CheckPublishStatus();
-            CheckUpdates();
-
-            WGrid.Actions.OnClickSort='SortAscOne OR SortDescOne'; 
-            WGrid.Actions.OnClickSortUp='SortAscOne'; 
-            WGrid.Actions.OnClickSortDown='SortDescOne'; 
-            WGrid.Actions.OnShiftClickSort='SortAscAppend OR SortDescAppend'; 
-            WGrid.Actions.OnShiftClickSortUp='SortAscAppend'; 
-            WGrid.Actions.OnShiftClickSortDown='SortDescAppend';
-
-            //CopyAllSummaryFields();
-
-            WGrid.SetAttribute(WGrid.GetRowById("0"), "Title", "HtmlPrefix", "", 1, 0)
-
-            SetSplashText("Initializing Gantt...");
-            setTimeout("InitGantt()", 100);
-
-        }
-    }
-    
-    Grids.OnZoom = function(grid, zoom, FirstDate, LastDate) 
-    {
-        if(grid.id == "WorkPlannerGrid" && !bRendering)
-        {
-
-            var N = Grids.AllocationGrid;
-            N.ZoomTo(FirstDate,LastDate,grid.Cols.G.Width);
-            setTimeout(function(){N.SetScrollLeft(grid.GetScrollLeft(2),2);},100);
-
-        }
-    }
-
-
-    Grids.OnEnterEdit = function(grid, row, col)
-    {
-        if(grid.id == "WorkPlannerGrid" )
-        {
-            if(row.id == "NewTask")
-            {
-                var newrow = DoNewRow();
-                    
-                //hideNonFolders(newrow);
-
-                grid.SetScrollTop(99999);
-
-            }
-            else
-            {
-                EnterButton(grid);
-            }
-        }
-
-        if(grid.id == "AgileGrid" )
-        {
-            if(row.id == "NewTask")
-            {
-                var newrow = DoNewRowA(true);
-                    
-                //hideNonFolders(newrow);
-                
-                grid.SetScrollTop(99999);
-
-            }
-            else
-            {
-                EnterButtonA(grid);
-            }
-        }
-    }
-
-    Grids.OnKeyDown = function(grid, key, event, name, prefix)         
-    {
-        if(grid.id == "WorkPlannerGrid")
-        {
-            if(key == 13)
-            {
-                EnterButton(grid);
-                return true;
-            }
-            if(key == 45)
-            {
-                NewTask(false, false, true);
-                return true;
-            }
-            if(key == 46)
-            {
-                DeleteTasks();
-                return true;
-            }
-        }
-    }
-
-    Grids.OnSelect = function(grid, row, deselect)
-    {
-
-        if(deselect && grid.FRow && grid.FRow.id == row.id)
-        {
-            return false;
-        }
-        selRows = grid.GetSelRows();
-        if(selRows.length > 0)
-        {
-            if(deselect == 0 && selRows.length >= 1)
-            {
+            G.Lang.Format.GroupSeparator='<%=GroupSeparator %>';
+            G.Lang.Format.InputDecimalSeparators='<%=DecimalSeparator %>';
+            G.Lang.Format.InputGroupSeparators='<%=GroupSeparator %>';
+            if (G.id == "WorkPlannerDetail"){
                 hideDetails("Multiple Tasks Are Selected.");
             }
-            else if(deselect == 1 && selRows.length == 2)
+        }
+
+        Grids.OnMouseDown = function(grid, row, col, x, y, event)
+        {
+            if(grid)
+                MouseDownGrid = grid.id;
+        }
+
+        Grids.OnCanDrop = function(grid, row, togrid, torow, type, copy) 
+        {
+            if(torow.id == 0)
+                return 0;
+
+            return type;
+        }
+
+        Grids.OnScroll = function(grid, hpos1, vpos, oldhpos1, oldvpos, hpos0, oldhpos0, hpos2, oldhpos2)
+        {
+            if(grid.id == "WorkPlannerGrid" && grid.id==MouseDownGrid)
             {
-                //grid.Focus(row);
+                var left = grid.GetScrollLeft(2);
+                Grids.AllocationGrid.SetScrollLeft(left, 2);
+
+            
+            }
+            else if(grid.id == "AllocationGrid" && grid.id==MouseDownGrid)
+            {
+                var left = grid.GetScrollLeft(2);
+                Grids.WorkPlannerGrid.SetScrollLeft(left, 2);
+            }
+        }
+    
+        Grids.OnGanttChanged = function(grid, row, col, item, new1, new2, old1, old2, action) 
+        {
+    
+            if(grid.id == "WorkPlannerGrid")
+            {
+                DoAssignmentRollDown(grid, row, 0, "StartDate");
+                DoAssignmentRollDown(grid, row, 0, "DueDate");
+                DoAssignmentRollDown(grid, row, 0, "Duration");
+                if(row.Def && row.Def.Name == "Iteration")
+                {
+                    RollDown(row, "StartDate");
+                    RollDown(row, "DueDate");
+                    RollDown(row, "Duration");
+                }
+
+                CalculateAssignmentCosts(grid, row);
+            }
+        }
+
+        Grids.OnCorrectDependencies = function(grid, A, R, error )
+        {
+    
+            var g = grid;
+
+            setTimeout("RollupSummaryField('DueDate')", 1000);
+        }
+
+
+        Grids.OnAfterSave = function (grid, result, autoupdate) {
+            HideTDialog();
+            CheckUpdates();
+            RefreshCommandUI();
+        }
+
+        Grids.OnColumnsChanged = function(grid, cols, count)
+        {
+            var lastCol = grid.GetLastCol("1");
+        
+            for(var col in cols)
+            {
+                if(cols[col])
+                {
+                    grid.MoveCol(col, 1, true, 0);
+                }
+            }
+            //MoveCol               (string col, string tocol, bool right, bool noshow = 0) or (string col, int sec, bool last, bool noshow = 0) 
+        } 
+
+        Grids.OnGetColor = function(grid, row, col, r, g, b, edit)  
+        {
+            return GetColor(grid, row, col, r, g, b, edit);
+        }
+
+        Grids.OnGetClass = function(grid, row, col, classname)
+        {
+            return GetCssClass(grid, row, col, "erroroncell");
+        }
+
+        Grids.OnTip = function(grid, row, col, tip, cleintx, clienty, x, y)
+        {
+            return GetToolTip(grid, row, col, tip, 5, 5, 5, 5)
+        }
+    
+        Grids.OnRenderFinish = function (grid) {
+    
+            curTree++;
+            var pct = curTree/Grids.length*100;
+
+            document.getElementById("tdPctFull").style.display = "";
+            document.getElementById("tdPctFull").style.width = parseInt(pct) + "%";
+
+            if(curTree <= Grids.length)
+                SetSplashText("Loading " + curTree + " of " + Grids.length);
+
+            if(curTree == Grids.length)
+            {
+
+                var WGrid = Grids.WorkPlannerGrid;
+
+                var AGrid = Grids.AgileGrid;
+
+                CheckPublishStatus();
+                CheckUpdates();
+
+                WGrid.Actions.OnClickSort='SortAscOne OR SortDescOne'; 
+                WGrid.Actions.OnClickSortUp='SortAscOne'; 
+                WGrid.Actions.OnClickSortDown='SortDescOne'; 
+                WGrid.Actions.OnShiftClickSort='SortAscAppend OR SortDescAppend'; 
+                WGrid.Actions.OnShiftClickSortUp='SortAscAppend'; 
+                WGrid.Actions.OnShiftClickSortDown='SortDescAppend';
+
+                //CopyAllSummaryFields();
+
+                WGrid.SetAttribute(WGrid.GetRowById("0"), "Title", "HtmlPrefix", "", 1, 0)
+
+                SetSplashText("Initializing Gantt...");
+                setTimeout("InitGantt()", 100);
+
+            }
+        }
+    
+        Grids.OnZoom = function(grid, zoom, FirstDate, LastDate) 
+        {
+            if(grid.id == "WorkPlannerGrid" && !bRendering)
+            {
+
+                var N = Grids.AllocationGrid;
+                N.ZoomTo(FirstDate,LastDate,grid.Cols.G.Width);
+                setTimeout(function(){N.SetScrollLeft(grid.GetScrollLeft(2),2);},100);
+
+            }
+        }
+
+
+        Grids.OnEnterEdit = function(grid, row, col)
+        {
+            if(grid.id == "WorkPlannerGrid" )
+            {
+                if(row.id == "NewTask")
+                {
+                    var newrow = DoNewRow();
+                    
+                    //hideNonFolders(newrow);
+
+                    grid.SetScrollTop(99999);
+
+                }
+                else
+                {
+                    EnterButton(grid);
+                }
+            }
+
+            if(grid.id == "AgileGrid" )
+            {
+                if(row.id == "NewTask")
+                {
+                    var newrow = DoNewRowA(true);
+                    
+                    //hideNonFolders(newrow);
+                
+                    grid.SetScrollTop(99999);
+
+                }
+                else
+                {
+                    EnterButtonA(grid);
+                }
+            }
+        }
+
+        Grids.OnKeyDown = function(grid, key, event, name, prefix)         
+        {
+            if(grid.id == "WorkPlannerGrid")
+            {
+                if(key == 13)
+                {
+                    EnterButton(grid);
+                    return true;
+                }
+                if(key == 45)
+                {
+                    NewTask(false, false, true);
+                    return true;
+                }
+                if(key == 46)
+                {
+                    DeleteTasks();
+                    return true;
+                }
+            }
+        }
+
+        Grids.OnSelect = function(grid, row, deselect)
+        {
+
+            if(deselect && grid.FRow && grid.FRow.id == row.id)
+            {
+                return false;
+            }
+            selRows = grid.GetSelRows();
+            if(selRows.length > 0)
+            {
+                if(deselect == 0 && selRows.length >= 1)
+                {
+                    hideDetails("Multiple Tasks Are Selected.");
+                }
+                else if(deselect == 1 && selRows.length == 2)
+                {
+                    //grid.Focus(row);
+                    showDetails();
+                }
+            }
+            else
+            {
+                var cId = null;
+                try
+                {
+                    cId = grid.FRow.id;
+                }catch(e){}
+                if(row.id != cId)
+                    grid.Focus(row);
                 showDetails();
             }
-        }
-        else
-        {
-            var cId = null;
-            try
-            {
-                cId = grid.FRow.id;
-            }catch(e){}
-            if(row.id != cId)
-                grid.Focus(row);
-            showDetails();
+
+            RefreshCommandUI();
         }
 
-        RefreshCommandUI();
-    }
+        Grids.OnFocus = function (grid, row, col, orow, ocol, pagepos) {
 
-    Grids.OnFocus = function (grid, row, col, orow, ocol, pagepos) {
-
-        Grids.WorkPlannerDetail.MainTag.style.display = "";
+            Grids.WorkPlannerDetail.MainTag.style.display = "";
         
-        if (grid.id == "WorkPlannerGrid" || grid.id == "AgileGrid") {
+            if (grid.id == "WorkPlannerGrid" || grid.id == "AgileGrid") {
             
-            if(row.id == "NewTask" && grid.GetValue(row, "Title") == "New Item")
-            {
-                grid.SetValue(row, "Title", "", 1, 0);
-            }
-
-            if(orow != null && orow.id == "NewTask")
-            {
-                if(bNewRowHasChanged && (orow.id != row.id))
+                if(row.id == "NewTask" && grid.GetValue(row, "Title") == "New Item")
                 {
-                    DoNewRow(grid.id == "AgileGrid");
+                    grid.SetValue(row, "Title", "", 1, 0);
                 }
-                else if(grid.GetValue(orow, "Title") == "")
+
+                if(orow != null && orow.id == "NewTask")
                 {
-                    grid.SetValue(orow, "Title", "New Item", 1, 0);
+                    if(bNewRowHasChanged && (orow.id != row.id))
+                    {
+                        DoNewRow(grid.id == "AgileGrid");
+                    }
+                    else if(grid.GetValue(orow, "Title") == "")
+                    {
+                        grid.SetValue(orow, "Title", "New Item", 1, 0);
+                    }
                 }
-            }
 
-            var dGrid = Grids.WorkPlannerDetail;
+                var dGrid = Grids.WorkPlannerDetail;
 
-            for (var col in grid.Cols) {
-                var C = grid.Cols[col];
+                for (var col in grid.Cols) {
+                    var C = grid.Cols[col];
 
-                try {
-                    dGrid.SetValue(dGrid.GetRowById(C.Name), "V", grid.GetValue(row, C.Name), 1);
-                    dGrid.SetAttribute(C.Name, "V", "CanEdit", grid.GetAttribute(orow, C, "CanEdit"), true, false);
-                } catch (e) { }
-            }
+                    try {
+                        dGrid.SetValue(dGrid.GetRowById(C.Name), "V", grid.GetValue(row, C.Name), 1);
+                        dGrid.SetAttribute(C.Name, "V", "CanEdit", grid.GetAttribute(orow, C, "CanEdit"), true, false);
+                    } catch (e) { }
+                }
             
-            if(bAgile)
-            {
-                Grids.AgileGrid.SelectAllRows(false);
-                Grids.WorkPlannerGrid.SelectAllRows(false);
-                //Grids.AgileGrid.ActionClearSelection();
-                //Grids.WorkPlannerGrid.ActionClearSelection();
-            }
-            else
-            {
-                //grid.SelectAllRows(false);
-                grid.ActionClearSelection();
-            }
-            grid.SelectRow(row, true);
+                if(bAgile)
+                {
+                    Grids.AgileGrid.SelectAllRows(false);
+                    Grids.WorkPlannerGrid.SelectAllRows(false);
+                    //Grids.AgileGrid.ActionClearSelection();
+                    //Grids.WorkPlannerGrid.ActionClearSelection();
+                }
+                else
+                {
+                    //grid.SelectAllRows(false);
+                    grid.ActionClearSelection();
+                }
+                grid.SelectRow(row, true);
 
-            SetDepsGrid(grid, row);
+                SetDepsGrid(grid, row);
             
-            PopulateResourceTable(row, true);
+                PopulateResourceTable(row, true);
 
-            document.getElementById("noteDivInner").innerHTML = grid.GetValue(row, "Notes");
+                document.getElementById("noteDivInner").innerHTML = grid.GetValue(row, "Notes");
 
-            RefreshCommandUI();
+                RefreshCommandUI();
 
+            }
+            if(row.id == "0" || row.id == "NewTask")
+            {
+                hideDetails(" ");
+            }
+            if(grid.id == "WorkPlannerAssignments")
+            {
+                RefreshCommandUI();
+            }
         }
-        if(row.id == "0" || row.id == "NewTask")
+
+        Grids.OnCtrlS = function()
         {
-            hideDetails(" ");
+            SaveWorkPlan();
         }
-        if(grid.id == "WorkPlannerAssignments")
-        {
-            RefreshCommandUI();
-        }
-    }
-
-    Grids.OnCtrlS = function()
-    {
-        SaveWorkPlan();
-    }
 
     
-    Grids.OnRowMove = function(grid, row, oldparent, oldnext)         
-    {
-        if (grid.id == "WorkPlannerGrid") 
+        Grids.OnRowMove = function(grid, row, oldparent, oldnext)         
         {
-            if (row.Visible && row.parentNode.Def.Name == "Task") {
-                //grid.ChangeDef(grid.GetRowById(row.parentNode, "Summary", 1, 0);
-                grid.ChangeDef(row.parentNode, "Summary", 1, 0);
-                grid.SetValue(row.parentNode, "Summary", 1, 1, 0);
-                grid.Expand(row.parentNode);
-                grid.RefreshRow(row.parentNode);
-            }
-
-            if (grid.HasChildren(oldparent) == 0 && oldparent.id != "BacklogRow" && oldparent.Def.Name != "Iteration")  {  
-                //grid.ChangeDef(grid.GetRowById(oldparent.id), "Task", 1, 0);
-                grid.ChangeDef(oldparent, "Task", 1, 0);
-                grid.SetValue(oldparent, "Summary", 0, 1, 0);
-            }
-
-            setWBSAndTaskID(grid.GetRowById("0"));
-
-            if(bAgile)
+            if (grid.id == "WorkPlannerGrid") 
             {
-                AgileGridMove(grid, row);
-            }
+                if (row.Visible && row.parentNode.Def.Name == "Task") {
+                    //grid.ChangeDef(grid.GetRowById(row.parentNode, "Summary", 1, 0);
+                    grid.ChangeDef(row.parentNode, "Summary", 1, 0);
+                    grid.SetValue(row.parentNode, "Summary", 1, 1, 0);
+                    grid.Expand(row.parentNode);
+                    grid.RefreshRow(row.parentNode);
+                }
 
-            RefreshCommandUI();
-        }
-    }
-    
-    Grids.OnRowDelete = function(grid, row, type)
-    {
-        if (grid.id == "WorkPlannerGrid") 
-        {            
-            try
-            {
+                if (grid.HasChildren(oldparent) == 0 && oldparent.id != "BacklogRow" && oldparent.Def.Name != "Iteration")  {  
+                    //grid.ChangeDef(grid.GetRowById(oldparent.id), "Task", 1, 0);
+                    grid.ChangeDef(oldparent, "Task", 1, 0);
+                    grid.SetValue(oldparent, "Summary", 0, 1, 0);
+                }
+
                 setWBSAndTaskID(grid.GetRowById("0"));
-            }catch(e){}
-        }
-    }
-    
-    Grids.OnValueChanged = function(grid, row, col, val)          
-    {
-    
-        if(grid.id == "ProjectInfo")
-            oldVal = Grids.WorkPlannerGrid.GetValue(Grids.WorkPlannerGrid.GetRowById("0"), col);
 
-        if (grid.id == "WorkPlannerDetail") 
-        {
-            oldVal = grid.GetValue(row, col);
-
-            if(col == "Work")
-                oldWork = grid.GetValue(row, col);
-        }
-
-        if (grid.id == "WorkPlannerGrid") 
-        {
-            oldVal = grid.GetValue(row, col);
-
-            if(col == "Work")
-                oldWork = grid.GetValue(row, col);
-        }
-
-        return val;
-    }
-    
-    Grids.OnAfterValueChanged = function (grid, row, col, val)
-    {
-
-        //=============================Project Info=====================
-        if(grid.id == "ProjectInfo")
-        {
-            var col = row.id;
-            if (col == "Start")
-                col = "StartDate";
-            if (col == "Finish")
-                col = "DueDate";
-
-            var o = oRollDown[row.id];
-
-            if (o != null)
-                Grids.WorkPlannerGrid.SetValue(Grids.WorkPlannerGrid.GetRowById("0"), col, val, 1);
-
-            RollDown(Grids.WorkPlannerGrid.GetRowById("0"), col);
-
-            //CopySummaryField(col);
-        }
-        //=============================WorkPlannerAssignments=====================
-        if (grid.id == "WorkPlannerAssignments") 
-        {
-            var selRow = Grids.WorkPlannerGrid.GetRowById(row.id);
-
-            Grids.WorkPlannerGrid.SetValue(selRow, col, val, 1);
-
-            try{
-                if(col == "Work" && selRow.parentNode.TaskType == "Individual")
+                if(bAgile)
                 {
-                    RollupAssignments(selRow.parentNode, col, "SUM");
+                    AgileGridMove(grid, row);
                 }
-                CalculateAssignmentCosts(Grids.WorkPlannerGrid, Grids.WorkPlannerGrid.FRow);
-            }catch(e){}
+
+                RefreshCommandUI();
+            }
         }
-        //=============================WorkPlannerDetail=====================
-        if (grid.id == "WorkPlannerDetail") 
+    
+        Grids.OnRowDelete = function(grid, row, type)
+        {
+            if (grid.id == "WorkPlannerGrid") 
+            {            
+                try
+                {
+                    setWBSAndTaskID(grid.GetRowById("0"));
+                }catch(e){}
+            }
+        }
+    
+        Grids.OnValueChanged = function(grid, row, col, val)          
+        {
+    
+            if(grid.id == "ProjectInfo")
+                oldVal = Grids.WorkPlannerGrid.GetValue(Grids.WorkPlannerGrid.GetRowById("0"), col);
+
+            if (grid.id == "WorkPlannerDetail") 
+            {
+                oldVal = grid.GetValue(row, col);
+
+                if(col == "Work")
+                    oldWork = grid.GetValue(row, col);
+            }
+
+            if (grid.id == "WorkPlannerGrid") 
+            {
+                oldVal = grid.GetValue(row, col);
+
+                if(col == "Work")
+                    oldWork = grid.GetValue(row, col);
+            }
+
+            return val;
+        }
+    
+        Grids.OnAfterValueChanged = function (grid, row, col, val)
         {
 
-            if(row.id == "Duration")
+            //=============================Project Info=====================
+            if(grid.id == "ProjectInfo")
+            {
+                var col = row.id;
+                if (col == "Start")
+                    col = "StartDate";
+                if (col == "Finish")
+                    col = "DueDate";
+
+                var o = oRollDown[row.id];
+
+                if (o != null)
+                    Grids.WorkPlannerGrid.SetValue(Grids.WorkPlannerGrid.GetRowById("0"), col, val, 1);
+
+                RollDown(Grids.WorkPlannerGrid.GetRowById("0"), col);
+
+                //CopySummaryField(col);
+            }
+            //=============================WorkPlannerAssignments=====================
+            if (grid.id == "WorkPlannerAssignments") 
+            {
+                var selRow = Grids.WorkPlannerGrid.GetRowById(row.id);
+
+                Grids.WorkPlannerGrid.SetValue(selRow, col, val, 1);
+
+                try{
+                    if(col == "Work" && selRow.parentNode.TaskType == "Individual")
+                    {
+                        RollupAssignments(selRow.parentNode, col, "SUM");
+                    }
+                    CalculateAssignmentCosts(Grids.WorkPlannerGrid, Grids.WorkPlannerGrid.FRow);
+                }catch(e){}
+            }
+            //=============================WorkPlannerDetail=====================
+            if (grid.id == "WorkPlannerDetail") 
             {
 
-                Grids.WorkPlannerGrid.CheckGantt(Grids.WorkPlannerGrid.FRow, "Duration", val);
-                Grids.WorkPlannerGrid.CorrectDependencies(Grids.WorkPlannerGrid.FRow, "G");
+                if(row.id == "Duration")
+                {
+
+                    Grids.WorkPlannerGrid.CheckGantt(Grids.WorkPlannerGrid.FRow, "Duration", val);
+                    Grids.WorkPlannerGrid.CorrectDependencies(Grids.WorkPlannerGrid.FRow, "G");
                 
-                grid.SetValue(grid.GetRowById("DueDate"), "V", Grids.WorkPlannerGrid.GetValue(Grids.WorkPlannerGrid.FRow, "DueDate"), 1, 0);
+                    grid.SetValue(grid.GetRowById("DueDate"), "V", Grids.WorkPlannerGrid.GetValue(Grids.WorkPlannerGrid.FRow, "DueDate"), 1, 0);
 
-            }
-            else if(row.id == "DueDate")
-            {
-                RollupSummaryField("Duration");
-                DoAssignmentRollDown(grid, Grids.WorkPlannerGrid.FRow, 0, "Duration");
+                }
+                else if(row.id == "DueDate")
+                {
+                    RollupSummaryField("Duration");
+                    DoAssignmentRollDown(grid, Grids.WorkPlannerGrid.FRow, 0, "Duration");
 
-                Grids.WorkPlannerGrid.SetValue(Grids.WorkPlannerGrid.FRow, "Duration", Grids.WorkPlannerGrid.DiffGanttDate(Grids.WorkPlannerGrid.FRow.StartDate, Grids.WorkPlannerGrid.FRow.DueDate, "d", null, null), 1, 0);
-                grid.SetValue(grid.GetRowById("Duration"), "V", Grids.WorkPlannerGrid.GetValue(Grids.WorkPlannerGrid.FRow, "Duration"), 1, 0);
+                    Grids.WorkPlannerGrid.SetValue(Grids.WorkPlannerGrid.FRow, "Duration", Grids.WorkPlannerGrid.DiffGanttDate(Grids.WorkPlannerGrid.FRow.StartDate, Grids.WorkPlannerGrid.FRow.DueDate, "d", null, null), 1, 0);
+                    grid.SetValue(grid.GetRowById("Duration"), "V", Grids.WorkPlannerGrid.GetValue(Grids.WorkPlannerGrid.FRow, "Duration"), 1, 0);
 
-                SetPlannerFieldValue(Grids.WorkPlannerGrid.FRow, row.id, val, true);
-            }
-            else
-                SetPlannerFieldValue(Grids.WorkPlannerGrid.FRow, row.id, val, true);
+                    SetPlannerFieldValue(Grids.WorkPlannerGrid.FRow, row.id, val, true);
+                }
+                else
+                    SetPlannerFieldValue(Grids.WorkPlannerGrid.FRow, row.id, val, true);
             
-            return;
+                return;
 
             
 
-            if(row.id == "Duration")
+                if(row.id == "Duration")
+                {
+                    Grids.WorkPlannerGrid.CheckGantt(Grids.WorkPlannerGrid.FRow, "Duration", val);
+                    Grids.WorkPlannerGrid.CorrectDependencies(Grids.WorkPlannerGrid.FRow, "G");
+                    grid.SetValue(grid.GetRowById("DueDate"), "V", Grids.WorkPlannerGrid.GetValue(Grids.WorkPlannerGrid.FRow, "DueDate"), 1, 0);
+                }
+
+                Grids.WorkPlannerGrid.SetValue(Grids.WorkPlannerGrid.FRow, row.id, val, 1);
+
+                RollupSummaryField(row.id);
+
+                DoAssignmentRollDown(Grids.WorkPlannerGrid, Grids.WorkPlannerGrid.FRow, 0, row.id);
+
+                if(row.id == "AssignedTo")
+                {
+                    SetTaskAssignments(Grids.WorkPlannerGrid.FRow);
+                    PopulateResourceTable(Grids.WorkPlannerGrid.FRow);
+                }
+                else if(row.id == "Duration")
+                {
+                    RollupSummaryField("DueDate");
+                    DoAssignmentRollDown(grid, Grids.WorkPlannerGrid.FRow, 0, "DueDate");
+                    //CopySummaryField("DueDate");
+                    CheckMilestone(Grids.WorkPlannerGrid.FRow.id);
+                }
+                else if(row.id == "DueDate")
+                {
+                    RollupSummaryField("Duration");
+                    DoAssignmentRollDown(grid, Grids.WorkPlannerGrid.FRow, 0, "Duration");
+
+                    Grids.WorkPlannerGrid.SetValue(Grids.WorkPlannerGrid.FRow, "Duration", Grids.WorkPlannerGrid.DiffGanttDate(Grids.WorkPlannerGrid.FRow.StartDate, Grids.WorkPlannerGrid.FRow.DueDate, "d", null, null), 1, 0);
+                    grid.SetValue(grid.GetRowById("Duration"), "V", Grids.WorkPlannerGrid.GetValue(Grids.WorkPlannerGrid.FRow, "Duration"), 1, 0);
+                }
+                else if(row.id == "StartDate")
+                {
+                    RollupSummaryField("DueDate");
+                    DoAssignmentRollDown(grid, Grids.WorkPlannerGrid.FRow, 0, "DueDate");
+                }
+                else if(row.id == "Work")
+                {
+                    CopyRemainingWork(Grids.WorkPlannerGrid, Grids.WorkPlannerGrid.FRow);
+                    CalculateAssignmentCosts(Grids.WorkPlannerGrid, Grids.WorkPlannerGrid.FRow);
+                }
+                else if(col == "Status")
+                    WEStatusCalculateStatus(Grids.WorkPlannerGrid, Grids.WorkPlannerGrid.FRow, val);
+                else if(col == "PercentComplete")
+                    WEStatusCalculatePercentComplete(Grids.WorkPlannerGrid, Grids.WorkPlannerGrid.FRow, val);
+                else if(col == "Complete")
+                    WEStatusCalculateComplete(Grids.WorkPlannerGrid, Grids.WorkPlannerGrid.FRow, val);
+                else if(Grids.WorkPlannerGrid.FRow.Def.Name == "Folder")
+                    RollDown(Grids.WorkPlannerGrid.FRow, row.id);
+
+                //CopySummaryField(row.id);
+
+            }
+            //=============================WorkPlannerGrid=====================
+            if (grid.id == "AgileGrid") 
             {
-                Grids.WorkPlannerGrid.CheckGantt(Grids.WorkPlannerGrid.FRow, "Duration", val);
-                Grids.WorkPlannerGrid.CorrectDependencies(Grids.WorkPlannerGrid.FRow, "G");
-                grid.SetValue(grid.GetRowById("DueDate"), "V", Grids.WorkPlannerGrid.GetValue(Grids.WorkPlannerGrid.FRow, "DueDate"), 1, 0);
+                SetPlannerFieldValue(row, col, val);
+
+
+                RefreshCommandUI();
             }
-
-            Grids.WorkPlannerGrid.SetValue(Grids.WorkPlannerGrid.FRow, row.id, val, 1);
-
-            RollupSummaryField(row.id);
-
-            DoAssignmentRollDown(Grids.WorkPlannerGrid, Grids.WorkPlannerGrid.FRow, 0, row.id);
-
-            if(row.id == "AssignedTo")
+            //=============================WorkPlannerGrid=====================
+            if (grid.id == "WorkPlannerGrid") 
             {
-                SetTaskAssignments(Grids.WorkPlannerGrid.FRow);
-                PopulateResourceTable(Grids.WorkPlannerGrid.FRow);
+
+                SetPlannerFieldValue(row, col, val);
+
+                if(col == "Work" || col == "ActualWork"){
+                    try {
+                        CalculateWorkPercentSpent(grid, row);
+                    } catch (e) { }
+                }
+
+                //CopySummaryField(col);
+
+                //grid.DoFilter();
+
+                RefreshCommandUI();
             }
-            else if(row.id == "Duration")
+            //=============================WorkPlannerLinks=====================
+            if (grid.id == "WorkPlannerLinks")
             {
-                RollupSummaryField("DueDate");
-                DoAssignmentRollDown(grid, Grids.WorkPlannerGrid.FRow, 0, "DueDate");
-                //CopySummaryField("DueDate");
-                CheckMilestone(Grids.WorkPlannerGrid.FRow.id);
+                UpdateDependencies(grid);
             }
-            else if(row.id == "DueDate")
-            {
-                RollupSummaryField("Duration");
-                DoAssignmentRollDown(grid, Grids.WorkPlannerGrid.FRow, 0, "Duration");
-
-                Grids.WorkPlannerGrid.SetValue(Grids.WorkPlannerGrid.FRow, "Duration", Grids.WorkPlannerGrid.DiffGanttDate(Grids.WorkPlannerGrid.FRow.StartDate, Grids.WorkPlannerGrid.FRow.DueDate, "d", null, null), 1, 0);
-                grid.SetValue(grid.GetRowById("Duration"), "V", Grids.WorkPlannerGrid.GetValue(Grids.WorkPlannerGrid.FRow, "Duration"), 1, 0);
-            }
-            else if(row.id == "StartDate")
-            {
-                RollupSummaryField("DueDate");
-                DoAssignmentRollDown(grid, Grids.WorkPlannerGrid.FRow, 0, "DueDate");
-            }
-            else if(row.id == "Work")
-            {
-                CopyRemainingWork(Grids.WorkPlannerGrid, Grids.WorkPlannerGrid.FRow);
-                CalculateAssignmentCosts(Grids.WorkPlannerGrid, Grids.WorkPlannerGrid.FRow);
-            }
-            else if(col == "Status")
-                WEStatusCalculateStatus(Grids.WorkPlannerGrid, Grids.WorkPlannerGrid.FRow, val);
-            else if(col == "PercentComplete")
-                WEStatusCalculatePercentComplete(Grids.WorkPlannerGrid, Grids.WorkPlannerGrid.FRow, val);
-            else if(col == "Complete")
-                WEStatusCalculateComplete(Grids.WorkPlannerGrid, Grids.WorkPlannerGrid.FRow, val);
-            else if(Grids.WorkPlannerGrid.FRow.Def.Name == "Folder")
-                RollDown(Grids.WorkPlannerGrid.FRow, row.id);
-
-            //CopySummaryField(row.id);
-
-        }
-        //=============================WorkPlannerGrid=====================
-        if (grid.id == "AgileGrid") 
-        {
-            SetPlannerFieldValue(row, col, val);
-
-
-            RefreshCommandUI();
-        }
-        //=============================WorkPlannerGrid=====================
-        if (grid.id == "WorkPlannerGrid") 
-        {
-
-            SetPlannerFieldValue(row, col, val);
-
-            if(col == "Work" || col == "ActualWork"){
-                try {
-                    CalculateWorkPercentSpent(grid, row);
-                } catch (e) { }
-            }
-
-            //CopySummaryField(col);
-
-            //grid.DoFilter();
-
-            RefreshCommandUI();
-        }
-        //=============================WorkPlannerLinks=====================
-        if (grid.id == "WorkPlannerLinks")
-        {
-            UpdateDependencies(grid);
-        }
-    }   
+        }   
     
-    Grids.OnRowFilter = function(grid, row, show)
-    {
+        Grids.OnRowFilter = function(grid, row, show)
+        {
 
-        if (row.Def.Name == "Assignment" && grid.id == "WorkPlannerGrid" && show)
-            return HideShowAssignment(grid, row);
+            if (row.Def.Name == "Assignment" && grid.id == "WorkPlannerGrid" && show)
+                return HideShowAssignment(grid, row);
         
-        return show;
-    }
+            return show;
+        }
     
-    Grids.OnGetExportValue = function(grid, row, col, str)                 
-    {
-        var val = getHTML(grid, row, col, grid.GetValue(row, col));
-        if(val)
-            return str + val;
-    }
+        Grids.OnGetExportValue = function(grid, row, col, str)                 
+        {
+            var val = getHTML(grid, row, col, grid.GetValue(row, col));
+            if(val)
+                return str + val;
+        }
 
-    Grids.OnGetHtmlValue = function(grid, row, col, val)
-    {
-        return getHTML(grid, row, col, val);
-    } 
+        Grids.OnGetHtmlValue = function(grid, row, col, val)
+        {
+            return getHTML(grid, row, col, val);
+        } 
     
-    Grids.OnAfterSectionResize = function(grid, section)  
-    {
-        ResizeGantt(Grids.WorkPlannerGrid, Grids.AllocationGrid);
-    }
+        Grids.OnAfterSectionResize = function(grid, section)  
+        {
+            ResizeGantt(Grids.WorkPlannerGrid, Grids.AllocationGrid);
+        }
     
 
 
-    var viewNameDiv = document.getElementById("viewNameDiv");
-    var addResourceDiv = document.getElementById("addResourceDiv");
-    var addlinkdiv = document.getElementById("addlinkdiv");
-    var addLinkTableDiv = document.getElementById("addLinkTableDiv");
-    var spEditorDiv = document.getElementById("spEditor");
+        var viewNameDiv = document.getElementById("viewNameDiv");
+        var addResourceDiv = document.getElementById("addResourceDiv");
+        var addlinkdiv = document.getElementById("addlinkdiv");
+        var addLinkTableDiv = document.getElementById("addLinkTableDiv");
+        var spEditorDiv = document.getElementById("spEditor");
 
     </script>
     
