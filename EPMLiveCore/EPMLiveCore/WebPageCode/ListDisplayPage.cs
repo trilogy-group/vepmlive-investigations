@@ -6,6 +6,7 @@ using Microsoft.SharePoint;
 using Microsoft.SharePoint.WebControls;
 using System.Web;
 using System.Configuration;
+using System.Linq;
 
 namespace EPMLiveCore
 {
@@ -18,6 +19,7 @@ namespace EPMLiveCore
         private StringBuilder computeFieldsScript = new StringBuilder();
         private Dictionary<string, Dictionary<string, string>> hiddenFields = new Dictionary<string, Dictionary<string, string>>();
         private Dictionary<string, Dictionary<string, string>> fieldProperties = null;
+        private string[] meFields = { "ID", "Created By", "CreatedBy", "Modified By", "ModifiedBy" };
 
         protected Button OK = new Button();
         protected Button Cancel = new Button();
@@ -38,6 +40,14 @@ namespace EPMLiveCore
             {
                 if (field.Reorderable && !field.Sealed)
                     displayableFields.Add(field.Title, field);
+                else
+                {
+                    foreach (var fl in meFields)
+                    {
+                        if (field.Title.Equals(fl))
+                            displayableFields.Add(field.Title, field);
+                    }
+                }
             }
 
             foreach (SPGroup group in this.CurrentList.ParentWeb.Groups)
@@ -73,14 +83,26 @@ namespace EPMLiveCore
 
             foreach (SPField field in displayableFields.Values)
             {
+                var roFields = MatchROFields(field);                
                 result.Append("<tr><td colspan=\"2\" class=\"ms-sectionline\" style=\"height:1px;\" ></td></tr>");
-                result.Append(string.Format("<tr><td valign=\"top\" class=\"ms-sectionheader\" style=\"width:120px\">{0}</td>", field.Title));
-                result.Append(string.Format("<td class=\"ms-authoringcontrols\">{0}</td></tr><tr><td></td><td class=\"ms-authoringcontrols\" style=\"height:10px;\"></td></tr>", RenderOptions(field)));
+                if (roFields == null)
+                    result.Append(string.Format("<tr><td valign=\"top\" class=\"ms-sectionheader\" style=\"width:120px\">{0}</td>", field.Title));                        
+                else
+                    result.Append(string.Format("<tr style=\"display:none;\"><td valign=\"top\" class=\"ms-sectionheader\" style=\"width:120px\">{0}</td>", field.Title));                        
+                result.Append(string.Format("<td class=\"ms-authoringcontrols\">{0}</td></tr><tr><td></td><td class=\"ms-authoringcontrols\" style=\"height:10px;\"></td></tr>", RenderOptions(field)));                
             }
 
             result.Append("</table>");
 
             return result.ToString();
+        }
+
+        private SPField MatchROFields(SPField field)
+        {
+            var roFields = (from fl in meFields
+                            where field.Title.Equals(fl)
+                            select field).FirstOrDefault();
+            return roFields;
         }
 
         private string RenderOptions(SPField field)
@@ -136,7 +158,7 @@ namespace EPMLiveCore
             {
                 result.Append("<table style=\"width: 100%\" id=\"Editable" + field.InternalName + "Edit\" style=\"display:");
                 if (!showEdit)
-                    result.Append("none");
+                    result.Append("none");                        
                 result.Append(";\">");
                 result.Append("<tr><td style=\"width: 150px;\"  class=\"ms-authoringcontrols\">");
                 result.Append("On edit item, editable: ");
@@ -253,8 +275,9 @@ namespace EPMLiveCore
 
         private string RenderOption(SPField field, string mode, ref bool showWhere, ref bool showEdit)
         {
-            StringBuilder result = new StringBuilder();
+            StringBuilder result = new StringBuilder();            
 
+            var roFields = MatchROFields(field);            
             result.Append(String.Format("<select id=\"Option{0}{1}\" runat=\"server\" onchange=\"javascript:OptionChange('{0}{1}');\" style=\"width: 100px;\">", field.InternalName, mode));
 
             
@@ -266,8 +289,8 @@ namespace EPMLiveCore
             {
                 string optionMode = "";
                 try
-                {
-                    optionMode = fieldProperties[field.InternalName][mode];
+                {                    
+                    optionMode = fieldProperties[field.InternalName][mode];                 
                 }
                 catch { }
                 string sSelectOption = optionMode.Split(";".ToCharArray())[0];
@@ -288,7 +311,7 @@ namespace EPMLiveCore
                             }
                             else
                             {
-                                if (field.ShowInNewForm.Value)
+                                if (field.ShowInNewForm.Value && roFields == null)
                                     optionValueAlways = "selected ";
                                 else
                                     optionValueNever = "selected ";
@@ -309,7 +332,7 @@ namespace EPMLiveCore
                             }
                             else
                             {
-                                if (field.ShowInEditForm.Value)
+                                if (field.ShowInEditForm.Value && roFields == null)
                                 {
                                     showEdit = true;
                                     optionValueAlways = "selected ";
@@ -361,7 +384,7 @@ namespace EPMLiveCore
                         }
                         else
                         {
-                            if (field.ShowInNewForm.Value)
+                            if (field.ShowInNewForm.Value && roFields == null)
                                 optionValueAlways = "selected ";
                             else
                                 optionValueNever = "selected ";
@@ -382,7 +405,7 @@ namespace EPMLiveCore
                         }
                         else
                         {
-                            if (field.ShowInEditForm.Value)
+                            if (field.ShowInEditForm.Value && roFields == null)
                             {
                                 showEdit = true;
                                 optionValueAlways = "selected ";
@@ -405,7 +428,10 @@ namespace EPMLiveCore
                         }
                         break;
                     case "Editable":
-                        optionValueAlways = "selected ";
+                        if(roFields == null)
+                            optionValueAlways = "selected ";
+                        else
+                            optionValueNever = "selected ";
                         break;
                 }
 
