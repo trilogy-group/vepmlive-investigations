@@ -160,22 +160,31 @@ namespace PortfolioEngineCore
 
             try
             {
+                //ROLLBACK: changes for PFE connection string encryption
+                //RegistryKey key = GetRegistryKey(basepath);
+
+                //if (key != null)
+                //{
+                //    var encrypted = key.GetValue("encrypted");
+                //    var value = key.GetValue("ConnectionString");
+                //    connectionString = (value != null ? value.ToString() : string.Empty);
+
+                //    //check to see if encrypted property exists, if it does means connection string is encrypted
+                //    if (encrypted != null)
+                //    {
+                //        //decrypt the connection string
+                //        connectionString = PortfolioEngineCore.PFEEncrypt.Decrypt(connectionString, PASS_PHRASE);
+                //    }
+
+                //}
                 RegistryKey key = GetRegistryKey(basepath);
 
                 if (key != null)
                 {
-                    var encrypted = key.GetValue("encrypted");
                     var value = key.GetValue("ConnectionString");
                     connectionString = (value != null ? value.ToString() : string.Empty);
-
-                    //check to see if encrypted property exists, if it does means connection string is encrypted
-                    if (encrypted != null)
-                    {
-                        //decrypt the connection string
-                        connectionString = PortfolioEngineCore.PFEEncrypt.Decrypt(connectionString, PASS_PHRASE);
-                    }
-
-                }                
+                }
+                //END ROLLBACK: changes for PFE connection string encryption
             }
             catch (Exception ex)
             {
