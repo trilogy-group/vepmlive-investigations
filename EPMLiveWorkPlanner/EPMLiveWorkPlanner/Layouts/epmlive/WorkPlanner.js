@@ -4305,6 +4305,7 @@ function newtaskkeypress(textfield, event, agilegrid) {
             var row = grid.GetRowById(rid);
             if (row) {
                 grid.SetValue(row, "Title", textfield.value, 1, 0);
+                grid.SelectRow(row, 1);
                 textfield.value = "";
             }
         }
