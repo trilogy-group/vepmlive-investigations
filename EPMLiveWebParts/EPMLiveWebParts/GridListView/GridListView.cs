@@ -3672,7 +3672,7 @@ namespace EPMLiveWebParts
                                 {
                                     var row = sRows[sRow];
     
-                                    if(row.itemid != """" && row.id != ""indexOf"")
+                                    if(row.itemid != """" && row.id != ""indexOf"" && row.id != ""Header"")
                                     {
                                         ids += "","" + row.itemid;
                                     }

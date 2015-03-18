@@ -518,7 +518,15 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
 
             var lookups = this.$Grid.getTitles();
 
-            dhtmlxAjax.post(this.$curWebUrl + "/_layouts/epmlive/gridaction.aspx?action=linkeditemspost", "listid=" + this.$Grid._listid + "&lookups=" + escape(lookups) + "&field=" + listInfo[5] + "&LookupFieldList=" + listInfo[4], this.LinkedItemsButtonPost);
+            if(this.$Grid.getCheckedItems().split(',').length == 1)
+            {
+                var lookupid = this.$Grid.getCheckedItems();
+                dhtmlxAjax.post(this.$curWebUrl + "/_layouts/epmlive/gridaction.aspx?action=linkeditemspost", "listid=" + this.$Grid._listid + "&lookups=" + escape(lookups) + "&lookupid=" + lookupid + "&field=" + listInfo[5] + "&LookupFieldList=" + listInfo[4], this.LinkedItemsButtonPost);
+            }
+            else
+            {
+                dhtmlxAjax.post(this.$curWebUrl + "/_layouts/epmlive/gridaction.aspx?action=linkeditemspost", "listid=" + this.$Grid._listid + "&lookups=" + escape(lookups) + "&field=" + listInfo[5] + "&LookupFieldList=" + listInfo[4], this.LinkedItemsButtonPost);
+            }
             
         }
         else if(commandId === 'EditComments')
