@@ -799,35 +799,11 @@ function SaveProject() {
 }
 
 function SaveWorkPlan() {
-    //EPML-3070
-    var strReqFields_CurrentView = ValidateRequiredFields("CurrentView") //Return WorkPlannerGrid Mandatory Fields
-    var strReqFields_DetailView = ValidateRequiredFields("DetailView") //Return WorkPlannerDetail Mandatory Fields
-    var bFlag_WorkPlannerDetail_Visible = false;
-    if (strReqFields_CurrentView.length > 0 && strReqFields_DetailView.length > 0) {
-        bFlag_WorkPlannerDetail_Visible = CheckRequiredFieldInCurrentView(); //For open right panel and focus on specific row in workplannergrid along with workplannerdetail row
-        if (bFlag_WorkPlannerDetail_Visible == true) {
-            ShowTab('t1');
-        }
-        alert("The schedule cannot be saved because there are one or more empty required fields (red cells).");
-        //alert("The schedule cannot be saved because there are one or more empty required fields (red cells) :" + '\n' + 'Current View :' + '\n\t' + strReqFields_CurrentView + '\n' + "Details View :" + '\n\t' + strReqFields_DetailView + "");
+    var bVal = AlertBlankTitle()
+    if (bVal == false) {
+        alert('The plan cannot be saved with blank task Title values (red cells). Please either delete these tasks or enter a title.');
         return;
     }
-    else if (strReqFields_CurrentView.length > 0 && strReqFields_DetailView.length == 0) {
-        dhxLayout.cells(detailsCell).collapse();
-        alert("The schedule cannot be saved because there are one or more empty required fields (red cells).");
-        //alert("The schedule cannot be saved because there are one or more empty required fields (red cells) :" + '\n' + strReqFields_CurrentView + "");
-        return;
-    }
-    else if (strReqFields_CurrentView.length == 0 && strReqFields_DetailView.length > 0) {
-        bFlag_WorkPlannerDetail_Visible = CheckRequiredFieldInCurrentView();
-        if (bFlag_WorkPlannerDetail_Visible == true) {
-            ShowTab('t1');
-        }
-        alert("The schedule cannot be saved because there are one or more empty required fields (red cells).");
-        //alert("The schedule cannot be saved because there are one or more empty required fields in details view (red cells) :" + '\n' + strReqFields_DetailView + "");
-        return;
-    }
-    //------
     if (sUpdates != "") {
         ShowTDialog("Processing Updates...");
         dhtmlxAjax.post("WorkPlannerAction.aspx", "Action=ProcessUpdates&ID=" + sItemID + "&PlannerID=" + sPlannerID + "&Updates=" + sUpdates, SaveUpdatesClose);
@@ -2882,7 +2858,7 @@ function Indent() {
     grid.ActionCalcOn();
 }
 
-function NewTask(isSummary, isMilestone, isAbove, bAgileGrid, bIsExternal, bForceNew, title) {
+function NewTask(isSummary, isMilestone, isAbove, bAgileGrid, bIsExternal, bForceNew) {
 
     if (bAgileGrid) {
         var aRow = Grids.AgileGrid.FRow;
@@ -2976,9 +2952,7 @@ function NewTask(isSummary, isMilestone, isAbove, bAgileGrid, bIsExternal, bForc
         setDefaultDates(grid, newrow);
 
     }
-    else {
-        grid.SetValue(newrow, "Title", title, 1);
-    }
+
     if (iDefaultTaskType == 0)
         grid.SetValue(newrow, "TaskType", "Shared", 1);
     else if (iDefaultTaskType == 1)
@@ -3023,28 +2997,11 @@ function GetColor(grid, row, col, r, g, b, edit) {
 
 function GetCssClass(grid, row, col, classname) {
     if (grid.id == "WorkPlannerGrid") {
-        if ((row.Def.Name == "Task" || row.Def.Name == "Summary") && row.Def.Name != "Header") {
-            if (oRequiredFields.length > 0) {
-                if (oRequiredFields.indexOf(col) > -1) {
-                    var val1 = grid.GetValue(row, col);
-                    val1 = val1.toString().trim();
-                    if (val1 == "") {
-                        return "erroroncell";
-                    }
-                }
-            }
-        }
-    }
-    if (grid.id == "WorkPlannerDetail" && col == "V") {
-        if (row.Def.Name == "R") {
-            if (oRequiredFields.length > 0) {
-                if (oRequiredFields.indexOf(row.id) > -1) {
-                    var val1 = grid.GetValue(row, "V");
-                    val1 = val1.toString().trim();
-                    if (val1 == "") {
-                        return "erroroncell";
-                    }
-                }
+        if (col == "Title") {
+            var val1 = grid.GetValue(row, col);
+            val1 = val1.toString().trim();
+            if (val1 == "") {
+                return "erroroncell";
             }
         }
     }
@@ -3052,104 +3009,38 @@ function GetCssClass(grid, row, col, classname) {
 
 function GetToolTip(grid, row, col, tip, clientx, clienty, x, y) {
     if (grid.id == "WorkPlannerGrid") {
-        if ((row.Def.Name == "Task" || row.Def.Name == "Summary") && row.Def.Name != "Header") {
-            if (oRequiredFields.length > 0) {
-                if (oRequiredFields.indexOf(col) > -1) {
-                    var index_oRequiredFields = oRequiredFields.indexOf(col);
-                    var displayname_CurrentView = oFieldDisplayNames[index_oRequiredFields];
-                    var val1 = grid.GetValue(row, col);
-                    val1 = val1.toString().trim();
-                    if (val1 == "") {
-                        return "" + displayname_CurrentView + " values cannot be blank";
-                    }
-                }
-            }
-        }
-    }
-    if (grid.id == "WorkPlannerDetail") {
-        if ((row.Def.Name == "R")) {
-            if (oRequiredFields.length > 0) {
-                if (oRequiredFields.indexOf(row.id) > -1) {
-                    var i_oRequiredFields = oRequiredFields.indexOf(row.id);
-                    var displayname_DetailView = oFieldDisplayNames[i_oRequiredFields];
-                    var val1 = grid.GetValue(row, "V");
-                    val1 = val1.toString().trim();
-                    if (val1 == "") {
-                        return "" + displayname_DetailView + " values cannot be blank";
-                    }
-                }
+        if (col == "Title") {
+            var val1 = grid.GetValue(row, col);
+            val1 = val1.toString().trim();
+            if (val1 == "") {
+                return "Title values cannot be blank";
             }
         }
     }
 }
 
-function ValidateRequiredFields(view) {
+function AlertBlankTitle() {
     var grid = Grids.WorkPlannerGrid;
-    var sRequiredFields = "";
-    var sDisplayNames = "";
-    var vCols = grid.GetCols("Visible");
-    for (var R in grid.Rows) {
-        var row = grid.GetRowById(R);
-        if ((row.Def.Name == "Task" || row.Def.Name == "Summary") && row.Def.Name != "Header") {
-            if (oRequiredFields.length > 0) {
-                for (var i = 0; i < oRequiredFields.length; i++) {
-                    var f = oRequiredFields[i];
-                    var f_DisplayName = oFieldDisplayNames[i];
-                    var val1 = grid.GetValue(row, f);
-                    val1 = val1.toString().trim();
-                    if (view == "CurrentView") {
-                        if (val1 == "" && vCols.indexOf(f) > -1 && sRequiredFields.indexOf(f) == -1) {
-                            sRequiredFields += f + '\n';
-                            sDisplayNames += f_DisplayName + ', ';
-                        }
-                    }
-                    else if (view == "DetailView") {
-                        if (val1 == "" && vCols.indexOf(f) == -1 && sRequiredFields.indexOf(f) == -1) {
-                            sRequiredFields += f + '\n';
-                            sDisplayNames += f_DisplayName + ', ';
-                        }
-                    }
-                }
-            }
-        }
-    }
-    sDisplayNames = sDisplayNames.replace(/,\s*$/, ""); //Remove Last Comma
-    return sDisplayNames;
-}
-
-function CheckRequiredFieldInCurrentView() {
-    var grid_WorkPlannerGrid = Grids.WorkPlannerGrid;
-    var bFlag_WorkPlannerDetail_Visible = false;
-    var sCurrentViewFields = "";
-    var vCols = grid_WorkPlannerGrid.GetCols("Visible");
-    loop1:
-        for (var R in grid_WorkPlannerGrid.Rows) {
-            var row = grid_WorkPlannerGrid.GetRowById(R);
+    var bVal_Task = true;
+    if (grid.id == "WorkPlannerGrid") {
+        for (var R in grid.Rows) {
+            var row = grid.GetRowById(R);
             if ((row.Def.Name == "Task" || row.Def.Name == "Summary") && row.Def.Name != "Header") {
-                if (oRequiredFields.length > 0) {
-                    loop2:
-                        for (var i = 0; i < oRequiredFields.length; i++) {
-                            var f = oRequiredFields[i];
-                            if (vCols.indexOf(f) == -1) {
-                                var val1 = grid_WorkPlannerGrid.GetValue(row, f);
-                                val1 = val1.toString().trim();
-                                if (val1 == "") {
-                                    grid_WorkPlannerGrid.Focus(row, grid_WorkPlannerGrid.FCol, null, 1);
-                                    bFlag_WorkPlannerDetail_Visible = true;
-                                    break loop1;
-                                }
-                            }
-                        }
+                var val1 = grid.GetValue(row, "Title");
+                val1 = val1.toString().trim();
+                if (val1 === "") {
+                    bVal_Task = false;
+                    break;
                 }
             }
         }
-    if (bFlag_WorkPlannerDetail_Visible == true)
-        return true;
-    else
-        return false;
+        if (bVal_Task == true)
+            return true;
+        else
+            return false;
+    }
+
 }
-
-
 
 function getHTML(grid, row, col, val) {
     if (grid.id == "WorkPlannerGrid") {
@@ -4300,12 +4191,11 @@ function newtaskblur(textfield) {
 function newtaskkeypress(textfield, event, agilegrid) {
     if (event.which == 13 || event.keyCode == 13) {
         if (textfield.value != newtasktext && textfield.value != "") {
-            var rid = NewTask(false, false, false, agilegrid, false, true, textfield.value);
+            var rid = NewTask(false, false, false, agilegrid, false, true);
             var grid = Grids.WorkPlannerGrid;
             var row = grid.GetRowById(rid);
             if (row) {
                 grid.SetValue(row, "Title", textfield.value, 1, 0);
-                grid.SelectRow(row, 1);
                 textfield.value = "";
             }
         }
