@@ -870,10 +870,20 @@ namespace EPMLiveWebParts {
             color: #0090ca;
         }
 
-            #attach-wrapper .attach-text a:hover {
-                color: #0090ca;
-                cursor: pointer;
-            }
+        #attach-wrapper .attach-text a:hover {
+            color: #0090ca;
+            cursor: pointer;
+        }
+
+        .upload-attach {
+           color: #aaaaaa !important;
+           font-size:12px;
+           padding-left:5px;
+        }
+        
+        .upload-attach:hover {
+           color: #555555 !important;
+        }
 </style>
 
 <script type=""text/javascript"">

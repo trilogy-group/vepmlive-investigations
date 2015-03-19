@@ -2883,7 +2883,7 @@ function Indent() {
     grid.ActionCalcOn();
 }
 
-function NewTask(isSummary, isMilestone, isAbove, bAgileGrid, bIsExternal, bForceNew) {
+function NewTask(isSummary, isMilestone, isAbove, bAgileGrid, bIsExternal, bForceNew, title) {
 
     if (bAgileGrid) {
         var aRow = Grids.AgileGrid.FRow;
@@ -2977,7 +2977,9 @@ function NewTask(isSummary, isMilestone, isAbove, bAgileGrid, bIsExternal, bForc
         setDefaultDates(grid, newrow);
 
     }
-
+    else {
+        grid.SetValue(newrow, "Title", title, 1);
+    }
     if (iDefaultTaskType == 0)
         grid.SetValue(newrow, "TaskType", "Shared", 1);
     else if (iDefaultTaskType == 1)
@@ -4299,11 +4301,12 @@ function newtaskblur(textfield) {
 function newtaskkeypress(textfield, event, agilegrid) {
     if (event.which == 13 || event.keyCode == 13) {
         if (textfield.value != newtasktext && textfield.value != "") {
-            var rid = NewTask(false, false, false, agilegrid, false, true);
+            var rid = NewTask(false, false, false, agilegrid, false, true, textfield.value);
             var grid = Grids.WorkPlannerGrid;
             var row = grid.GetRowById(rid);
             if (row) {
                 grid.SetValue(row, "Title", textfield.value, 1, 0);
+                grid.SelectRow(row, 1);
                 textfield.value = "";
             }
         }

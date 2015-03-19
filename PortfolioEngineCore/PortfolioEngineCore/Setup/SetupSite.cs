@@ -272,10 +272,14 @@ namespace PortfolioEngineCore.Setup
 
                 key.SetValue("CN", CN);
                 key.SetValue("PID", PID);
-                //EPML-4761: Store PFE SQL ConnectionString encrypted
-                key.SetValue("encrypted", true);
-                key.SetValue("ConnectionString", PFEEncrypt.Encrypt(_dbcon, PASS_PHRASE));
-                //EPML-4761
+                //ROLLBACK: changes for PFE connection string encryption
+                ////EPML-4761: Store PFE SQL ConnectionString encrypted
+                //key.SetValue("encrypted", true);
+                //key.SetValue("ConnectionString", PFEEncrypt.Encrypt(_dbcon, PASS_PHRASE));
+                ////EPML-4761
+                key.SetValue("ConnectionString", _dbcon);
+                //END ROLLBACK: changes for PFE connection string encryption
+
                 key.SetValue("QMActive", "Yes");
             }
         }
@@ -293,10 +297,13 @@ namespace PortfolioEngineCore.Setup
 
                 key.SetValue("CN", CN);
                 key.SetValue("PID", PID);
-                //EPML-4761: Store PFE SQL ConnectionString encrypted
-                key.SetValue("encrypted", true);
-                key.SetValue("ConnectionString", PFEEncrypt.Encrypt(_dbcon, PASS_PHRASE));
-                //EPML-4761
+                //ROLLBACK: changes for PFE connection string encryption
+                ////EPML-4761: Store PFE SQL ConnectionString encrypted
+                //key.SetValue("encrypted", true);
+                //key.SetValue("ConnectionString", PFEEncrypt.Encrypt(_dbcon, PASS_PHRASE));
+                ////EPML-4761
+                key.SetValue("ConnectionString", _dbcon);
+                //END ROLLBACK: changes for PFE connection string encryption
                 key.SetValue("QMActive", "Yes");
 
                 _message += "...Success";

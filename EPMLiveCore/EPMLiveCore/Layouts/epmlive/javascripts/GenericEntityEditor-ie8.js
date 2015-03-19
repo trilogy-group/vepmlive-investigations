@@ -117,7 +117,7 @@ function GEInit() {
                             }
                         }
                     }
-                    
+
                     switch (e.keyCode) {
                         case 8:
                             var text = $(this).text();
@@ -199,7 +199,7 @@ function GEInit() {
                             break;
                     }
 
-                    
+
 
 
                 });
@@ -296,7 +296,7 @@ function GEInit() {
                                 RemoveTypeAheadChoiceCandidate(controlProps);
                             }
                             break;
-                       
+
                         case 38: //up
                             //alert('moved up!');
                             $('.autoText').each(function () {
@@ -479,7 +479,7 @@ function GEInit() {
             }
             return data;
         }
-        
+
         function BuildAllItemsDropDown(cachedata, controlProps) {
 
             if (controlProps.ControlType == '1') {
@@ -574,15 +574,35 @@ function GEInit() {
                     var items = cachedata.split(';#');
                     var itemIndex = 0;
 
+                    var actualHiddenControl;
+                    if (controlProps.ControlInfo.SelectCandidateId != "")
+                        actualHiddenControl = document.getElementById(controlProps.ControlInfo.SelectCandidateId);
+                    else
+                        actualHiddenControl = document.getElementById(controlProps.ControlInfo.SourceControlId);
                     // get the values that contains the search text
                     // don't return options that has been selected already
                     for (var i in items) {
                         var itemPair = items[i].split('^^');
-                        if (itemPair[1] != undefined &&
-                !ArrayContains(pickerSelections, itemPair[1].toLowerCase().trim())) {
-                            hasMatch = true;
-                            $('#' + controlProps.ControlInfo.AutoCompleteDivId).append("<div class='autoText' id='autoText_" + itemIndex + "' value='" + itemPair[0] + "'>" + itemPair[1] + "</div>");
-                            itemIndex++;
+                        if (itemPair[1] != undefined) {
+                            var valueExists = false;
+                            for (var i = 0; i <= actualHiddenControl.length - 1; i++) {
+                                if (actualHiddenControl.options[i].value == itemPair[0] && actualHiddenControl.options[i].text == itemPair[1]) {
+                                    valueExists = true;
+                                    break;
+                                }
+                            }
+                            if (!valueExists) {
+                                var opt = document.createElement("option");
+                                opt.value = itemPair[0];
+                                opt.text = itemPair[1];
+                                opt.title = itemPair[1];
+                                actualHiddenControl.add(opt);
+                            }
+                            if (!ArrayContains(pickerSelections, itemPair[1].toLowerCase().trim())) {
+                                hasMatch = true;
+                                $('#' + controlProps.ControlInfo.AutoCompleteDivId).append("<div class='autoText' id='autoText_" + itemIndex + "' value='" + itemPair[0] + "'>" + itemPair[1] + "</div>");
+                                itemIndex++;
+                            }
                         }
                     }
 
@@ -832,7 +852,7 @@ function GEInit() {
             }
         }
 
-        
+
 
         function RegisterHoverStyle() {
             if ($('.autoText').length > 0) {
@@ -853,7 +873,7 @@ function GEInit() {
         }
 
         function RegisterClickOutsideEvent(controlProps) {
-            document.onclick = function(event) {
+            document.onclick = function (event) {
                 if (clickedOutsideElement(controlProps.ControlInfo.AutoCompleteDivId, event)) {
                     if (clickedOutsideElement(controlProps.FieldName + '_ddlShowAll', event)) {
                         $('#' + controlProps.ControlInfo.AutoCompleteDivId).css('display', 'none');
@@ -878,7 +898,7 @@ function GEInit() {
 
         function UpdateSingleSelectPickerValueWOValidation(controlProps, index) {
 
-            $('#' + controlProps.ControlInfo.GenericEntityDivId).focus(); 
+            $('#' + controlProps.ControlInfo.GenericEntityDivId).focus();
             $('#' + controlProps.ControlInfo.GenericEntityDivId).html('');
             var selectedValue = controlProps.ControlInfo.SingleSelectDisplayVal;
             var spEntityStyle = '<span contenteditable="false" title="' + selectedValue + '" class="ms-entity-resolved" tabindex="-1" iscontenttype="true" id="span' + index + '" onmouseover="this.contentEditable=false;" onmouseout="this.contentEditable=true;">' +
@@ -1239,7 +1259,7 @@ function GEInit() {
 
         function UpdateMultiSelectPickerValueWOValidation(controlProps, newTextVal, index) {
             // updates the picker's values
-            $('#' + controlProps.ControlInfo.GenericEntityDivId).focus(); 
+            $('#' + controlProps.ControlInfo.GenericEntityDivId).focus();
             var clean = $('#' + controlProps.ControlInfo.GenericEntityDivId).html();
             clean = clean.substring(0, clean.lastIndexOf(';') + 1);
             $('#' + controlProps.ControlInfo.GenericEntityDivId).html(clean);
@@ -1384,12 +1404,14 @@ function GEInit() {
 
         function ArrayContains(array, searchVal) {
             var result = false;
-            var cleanSearchVal = searchVal.toLowerCase().trim();
-            for (i in array) {
-                var arrayVal = array[i].toLowerCase().trim();
-                if (arrayVal == cleanSearchVal) {
-                    result = true;
-                    break;
+            if (searchVal) {
+                var cleanSearchVal = searchVal.toLowerCase().trim();
+                for (i in array) {
+                    var arrayVal = array[i].toLowerCase().trim();
+                    if (arrayVal == cleanSearchVal) {
+                        result = true;
+                        break;
+                    }
                 }
             }
 
@@ -1442,7 +1464,7 @@ function GEInit() {
             }
             return posY;
         }
-       
+
         function GetFullLeft(obj) {
             var posX = obj.offsetLeft;
             while (obj.offsetParent) {
@@ -1452,7 +1474,7 @@ function GEInit() {
             }
             return posX;
         }
-        
+
         function clickedOutsideElement(elemId, event) {
             var theElem = null;
             try {
@@ -1571,16 +1593,21 @@ function GEInit() {
             $('#' + GenericEntityDivIdRoot + '_OuterTable').addClass("ms-long");
         }
 
-        $$.OpenUrlWithModal = function(urlVal) {
+        $$.OpenUrlWithModal = function (urlVal) {
             var options = {
                 url: urlVal,
                 title: 'Add New Item to Target List',
                 allowMaximize: true,
                 width: 650,
                 height: 500,
-                dialogReturnValueCallback: function(dialogResult) {
+                dialogReturnValueCallback: function (dialogResult) {
                     if (dialogResult == 1) {
-                        location.reload(true);
+                        if (window._LookupFieldsPropsArray) {
+                            for (var k in window._LookupFieldsPropsArray) {
+                                var controlProps = window._LookupFieldsPropsArray[k];
+                                FetchData(controlProps, k);
+                            }
+                        }
                     }
                 }
             };
