@@ -40,7 +40,7 @@ namespace EPMLiveCore
                     browseControl.Parent.Controls.Add(new LiteralControl("&nbsp;"));
                     LiteralControl addItemButton = new LiteralControl();
                     addItemButton.Text = "<a id=\"" + this.ClientID + "_addItem\" title=\"Add Item\" onclick=\"window.epmLiveGenericEntityEditor.OpenUrlWithModal('" + l.DefaultNewFormUrl + "');return false;\" href=\"#\">" +
-                                            "<IMG style=\"BORDER-RIGHT-WIDTH: 0px; BORDER-TOP-WIDTH: 0px; BORDER-BOTTOM-WIDTH: 0px; BORDER-LEFT-WIDTH: 0px\" title=\"AddItem\" alt=\"Add item to lookup list\" src=\"/_layouts/epmlive/images/Plus14.png\">" +
+                                            "<IMG style=\"BORDER-RIGHT-WIDTH: 0px; BORDER-TOP-WIDTH: 0px; BORDER-BOTTOM-WIDTH: 0px; BORDER-LEFT-WIDTH: 0px; position:relative; top:-2px;\" title=\"AddItem\" alt=\"Add item to lookup list\" src=\"/_layouts/epmlive/images/Plus14.png\">" +
                                          "</a>";
 
                     browseControl.Parent.Controls.Add(addItemButton);
