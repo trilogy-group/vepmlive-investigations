@@ -177,7 +177,7 @@ namespace EPMLiveCore.CONTROLTEMPLATES
             CurrentUserName = string.Empty;
             try
             {
-                CurrentUserName = _spWeb.CurrentUser.Name;
+                CurrentUserName = _spWeb.CurrentUser.Name.Replace("'","");
             }
             catch { }
 
