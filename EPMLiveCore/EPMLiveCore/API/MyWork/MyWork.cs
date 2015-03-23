@@ -2833,7 +2833,16 @@ namespace EPMLiveCore.API
                     var c = new XElement("C");
                     c.Add(new XAttribute("Name", Utils.ToGridSafeFieldName(internalName)));
 
-                    c.Add(new XAttribute("Type", type));
+                    if (type.Equals("Enum"))
+                    {
+                        c.Add(new XAttribute("Type", "Html"));
+                        c.Add(new XAttribute("CaseSensitive", 0));
+                    }
+                    else
+                    {
+                        c.Add(new XAttribute("Type", type));
+                    }
+                    
                     if (!string.IsNullOrEmpty(format))
                     {
                         string relatedGridFormat = GetRelatedGridFormat(type, format, fieldTypes[internalName], spWeb);
