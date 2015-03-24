@@ -426,7 +426,7 @@ namespace EPMLiveWebParts
                                     }
                                     catch { }
                                 }
-                                ndCell.InnerXml = cellValue;
+                                ndCell.InnerXml = HttpUtility.HtmlEncode(cellValue);
                             }
 
                             //ndGroup.AppendChild(ndCell);
