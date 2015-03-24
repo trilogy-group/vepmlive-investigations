@@ -2891,14 +2891,7 @@ namespace EPMLiveWebParts
             bool hasDefaultViewURL = false;
             string defaultViewURL = string.Empty;
             JavaScriptSerializer oSerializer = new JavaScriptSerializer();
-            List<string> lstListViewURL = new List<string>();
-
-            // EPML-4803: taking list's view url and match it with propertybag's views, if don't match it will not display to generic Views.
-            foreach (SPView spView in list.Views)
-            {
-                lstListViewURL.Add(spView.Url);
-            }
-
+            
             try
             {
                 propBagData = ConvertFromString(list.ParentWeb.Properties[String.Format("ViewPermissions{0}", list.ID.ToString())], list);
@@ -2909,6 +2902,13 @@ namespace EPMLiveWebParts
                 string[] viewArr;
                 List<string> splitViewcollection = new List<string>();
                 SPGroupCollection arrGroup;
+                List<string> lstListViewURL = new List<string>();
+
+                // EPML-4803: taking list's view url and match it with propertybag's views, if don't match it will not display to generic Views.
+                foreach (SPView spView in list.Views)
+                {
+                    lstListViewURL.Add(spView.Url);
+                }
 
                 if (SPContext.Current.Web.UserIsSiteAdmin)
                 {
