@@ -1337,18 +1337,26 @@ function registerEpmLiveResourceGridScript() {
             },
 
             analyzeResources: function () {
-                var dataTicketRequest = $$.actions.dataTicketRequest();
 
-                if (dataTicketRequest) {
-                    dataTicketRequest.success(function (response) {
-                        var dataTicket = $$.actions.retriveDataTicket(response);
+                var canLaunch = $$.actions.canLaunchResourcePlannerOrAnalyzer();
 
-                        if (dataTicket) {
-                            var url = '{0}/_layouts/ppm/rpanalyzer.aspx?dataid={1}'.format($$$.currentWebUrl, dataTicket);
-                            $$.actions.displayPopUp(url, 'Resource Analyzer', true, true, null, null, 700, 700);
-                        }
-                    });
-                }                
+                if (canLaunch == 'true') {
+                    var dataTicketRequest = $$.actions.dataTicketRequest();
+
+                    if (dataTicketRequest) {
+                        dataTicketRequest.success(function (response) {
+                            var dataTicket = $$.actions.retriveDataTicket(response);
+
+                            if (dataTicket) {
+                                var url = '{0}/_layouts/ppm/rpanalyzer.aspx?dataid={1}'.format($$$.currentWebUrl, dataTicket);
+                                $$.actions.displayPopUp(url, 'Resource Analyzer', true, true, null, null, 700, 700);
+                            }
+                        });
+                    }
+                }
+                else {
+                    alert('The Resource Analyzer cannot be opened because there is an active resource import job running.')
+                }
             },
 
             redirect: function (operation) {
@@ -1418,19 +1426,27 @@ function registerEpmLiveResourceGridScript() {
                 }
             },
 
-            loadResourcePlanner: function () {
-                var dataTicketRequest = $$.actions.dataTicketRequest();
+            loadResourcePlanner: function () {                    
 
-                if (dataTicketRequest) {
-                    dataTicketRequest.success(function (response) {
-                        var dataTicket = $$.actions.retriveDataTicket(response);
+                var canLaunch = $$.actions.canLaunchResourcePlannerOrAnalyzer();
+                
+                if (canLaunch == 'true') {
+                    var dataTicketRequest = $$.actions.dataTicketRequest();
 
-                        if (dataTicket) {
-                            var url = '{0}/_layouts/ppm/RPEditor.aspx?dataid={1}&isresource=1'.format($$$.currentWebUrl, dataTicket);
-                            $$.actions.displayPopUp(url, 'Resource Planner', true, false, null, null, 700, 700);
-                        }
-                    });
-                }                
+                    if (dataTicketRequest) {
+                        dataTicketRequest.success(function (response) {
+                            var dataTicket = $$.actions.retriveDataTicket(response);
+
+                            if (dataTicket) {
+                                var url = '{0}/_layouts/ppm/RPEditor.aspx?dataid={1}&isresource=1'.format($$$.currentWebUrl, dataTicket);
+                                $$.actions.displayPopUp(url, 'Resource Planner', true, false, null, null, 700, 700);
+                            }
+                        });
+                    }
+                }
+                else {
+                    alert('The Resource Planner cannot be opened because there is an active resource import job running.')
+                }
             },
 
             loadAssignmentPlanner: function () {
@@ -1449,6 +1465,38 @@ function registerEpmLiveResourceGridScript() {
                     var url = '{0}/_layouts/epmlive/AssignmentPlanner.aspx?resources={1}&IsDlg=1'.format($$$.currentWebUrl, selectedRowIds.join(','));
                     $$.actions.displayPopUp(url, 'Assignment Planner', true, true, null, null, 1000, 700);
                 }
+            },
+
+            canLaunchResourcePlannerOrAnalyzer: function () {
+                var res = "";
+
+                $.ajax({
+                    type: 'POST',
+                    url: $$$.currentWebUrl + '/_vti_bin/WorkEngine.asmx/Execute',
+                    async: false,
+                    data: "{ Function: 'IsImportResourceAlreadyRunning', Dataxml: '' }",
+                    contentType: 'application/json; charset=utf-8',
+                    dataType: 'json',
+                    success: function (response) {
+                        if (response.d) {
+                            var responseJson = $$$.parseJson(response.d);
+                            var result = responseJson.Result;
+                            if ($$$.responseIsSuccess(result)) {                                
+                                if (result.ResourceImporter['@Success'] === 'True') {
+                                    res = "false";
+                                }
+                                else{
+                                    res = "true";
+                                }
+                            }
+                        }
+                    },
+                    error: function (err) {
+                        $$$.log(err);
+                        res = "true";
+                    }
+                });
+                return res;
             },
 
             deleteResource: function () {
@@ -1759,16 +1807,11 @@ function registerEpmLiveResourceGridScript() {
             },
 
             isImportResourceInProgress: function () {
-                var paramData =
-                    "<Data>" +
-                        "<Param key=\"SiteID\">" + $$$.currentSiteId + "</Param>" +
-                        "<Param key=\"WebID\">" + $$$.currentWebId + "</Param>" +
-                    "</Data>";
-
+                
                 $.ajax({
                     type: 'POST',
                     url: $$$.currentWebUrl + '/_vti_bin/WorkEngine.asmx/Execute',
-                    data: "{ Function: 'IsImportResourceAlreadyRunning', Dataxml: '" + paramData + "' }",
+                    data: "{ Function: 'IsImportResourceAlreadyRunning', Dataxml: '' }",
                     contentType: 'application/json; charset=utf-8',
                     dataType: 'json',
                     success: function (response) {

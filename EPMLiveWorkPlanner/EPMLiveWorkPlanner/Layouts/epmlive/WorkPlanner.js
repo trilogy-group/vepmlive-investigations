@@ -4583,21 +4583,28 @@ function EditCosts() {
 }
 
 function EditResourcePlan() {
-    if (EPKResPlan == 1) {
 
-        ShowTDialog("Loading...");
+    var canLaunch = canLaunchResourcePlannerOrAnalyzer();
+    if (canLaunch == 'true') {
+        if (EPKResPlan == 1) {
 
-        dhtmlxAjax.post(sWebUrl + "/_layouts/ppm/gridaction.aspx?action=postepkmultipage", "IDs=" + sWebId + "." + sProjectListId + "." + sItemID, EditResourcePlanResponse);
+            ShowTDialog("Loading...");
 
+            dhtmlxAjax.post(sWebUrl + "/_layouts/ppm/gridaction.aspx?action=postepkmultipage", "IDs=" + sWebId + "." + sProjectListId + "." + sItemID, EditResourcePlanResponse);
+
+        }
+        else if (EPKResPlan == 2) {
+            var FullId = sWebId + "." + sProjectListId + "." + sItemID;
+
+            var weburl = sWebUrl + "/_layouts/ppm/rpeditor.aspx?itemid=" + FullId;
+
+            var options = { url: weburl, showMaximized: true, showClose: false };
+
+            SP.UI.ModalDialog.showModalDialog(options);
+        }
     }
-    else if (EPKResPlan == 2) {
-        var FullId = sWebId + "." + sProjectListId + "." + sItemID;
-
-        var weburl = sWebUrl + "/_layouts/ppm/rpeditor.aspx?itemid=" + FullId;
-
-        var options = { url: weburl, showMaximized: true, showClose: false };
-
-        SP.UI.ModalDialog.showModalDialog(options);
+    else {
+        alert('The Resource Planner cannot be opened because there is an active resource import job running.');
     }
 }
 
@@ -4613,6 +4620,37 @@ function EditResourcePlanResponse(ret) {
     SP.UI.ModalDialog.showModalDialog(options);
 }
 
+function canLaunchResourcePlannerOrAnalyzer() {
+    var res = "";
+    
+    $.ajax({
+        type: 'POST',
+        url: sWebUrl + '/_vti_bin/WorkEngine.asmx/Execute',
+        async: false,
+        data: "{ Function: 'IsImportResourceAlreadyRunning', Dataxml: '' }",
+        contentType: 'application/json; charset=utf-8',
+        dataType: 'json',
+        success: function (response) {
+            if (response.d) {                    
+                var responseJson = window.epmLive.parseJson(response.d);
+                var result = responseJson.Result;
+                if (window.epmLive.responseIsSuccess(result)) {  
+                    if (result.ResourceImporter['@Success'] === 'True') {
+                        res = "false";
+                    }
+                    else{
+                        res = "true";
+                    }
+                }
+            }
+        },
+        error: function(err){
+            window.epmLive.log(err);
+            res = "true";
+        }
+    });
+    return res;
+}
 
 function LinkExternalTask() {
 

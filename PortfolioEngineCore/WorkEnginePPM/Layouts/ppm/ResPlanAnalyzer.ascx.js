@@ -6627,8 +6627,13 @@
 
                     if (this.params.RPEMode == 1)
                         break;
-
-                    WorkEnginePPM.ResPlanAnalyzer.ExecuteJSON("EditResPlanTicket", this.params.TicketVal, this.EditResPlanDelegate);
+                    var canLaunch = canLaunchResourcePlanner();
+                    if (canLaunch == 'true') {
+                        WorkEnginePPM.ResPlanAnalyzer.ExecuteJSON("EditResPlanTicket", this.params.TicketVal, this.EditResPlanDelegate);
+                    }
+                    else {
+                        alert('The Resource Planner cannot be opened because there is an active resource import job running.')
+                    }
                     break;
 
                     //   this.EditResPlan();     
@@ -8560,5 +8565,35 @@
         alert("Resource Plan Analyzer Initialization error");
     }
 
-
+    function canLaunchResourcePlanner() {
+        var res = "";
+        
+        $.ajax({
+            type: 'POST',
+            url: window.epmLive.currentWebUrl + '/_vti_bin/WorkEngine.asmx/Execute',
+            async: false,
+            data: "{ Function: 'IsImportResourceAlreadyRunning', Dataxml: '' }",
+            contentType: 'application/json; charset=utf-8',
+            dataType: 'json',
+            success: function (response) {
+                if (response.d) {
+                    var responseJson = window.epmLive.parseJson(response.d);
+                    var result = responseJson.Result;
+                    if (window.epmLive.responseIsSuccess(result)) {
+                        if (result.ResourceImporter['@Success'] === 'True') {
+                            res = "false";
+                        }
+                        else {
+                            res = "true";
+                        }
+                    }
+                }
+            },
+            error: function (err) {
+                window.epmLive.log(err)
+                res = "true";
+            }
+        });
+        return res;
+    }
 }

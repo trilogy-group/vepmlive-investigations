@@ -3197,12 +3197,19 @@
                         if (resrows == null || resrows.length == 0)
                             alert("One or more candidate rows must be selected");
                     } else {
-                        var resuids = this.GetSelectedCandidateUids(this.resgrid);
-                        var sb = new StringBuilder();
-                        sb.append('<Execute Function="CreateTicket" Context="ResourceAnalyzer">');
-                        sb.append('<Data>' + resuids + '</Data>');
-                        sb.append('</Execute>');
-                        this.ExecuteJSON(sb.toString(), "GeneralFunctions");
+                        var canLaunch = canLaunchResourceAnalyzer();
+                        
+                        if (canLaunch == 'true') {
+                            var resuids = this.GetSelectedCandidateUids(this.resgrid);
+                            var sb = new StringBuilder();
+                            sb.append('<Execute Function="CreateTicket" Context="ResourceAnalyzer">');
+                            sb.append('<Data>' + resuids + '</Data>');
+                            sb.append('</Execute>');
+                            this.ExecuteJSON(sb.toString(), "GeneralFunctions");
+                        }
+                        else {
+                            alert('The Resource Analyzer cannot be opened because there is an active resource import job running.');
+                        }
                     }
                     break;
                 case "ResourcesTab_Match":
@@ -6165,5 +6172,37 @@ function HideUnusedGroupRows(grid, row, level) {
     }
     return childrenvisible;
 };
+
+function canLaunchResourceAnalyzer() {
+    var res = "";
+    
+    $.ajax({
+        type: 'POST',
+        url: window.epmLive.currentWebUrl + '/_vti_bin/WorkEngine.asmx/Execute',
+        async: false,
+        data: "{ Function: 'IsImportResourceAlreadyRunning', Dataxml: '' }",
+        contentType: 'application/json; charset=utf-8',
+        dataType: 'json',
+        success: function (response) {
+            if (response.d) {
+                var responseJson = window.epmLive.parseJson(response.d);
+                var result = responseJson.Result;
+                if (window.epmLive.responseIsSuccess(result)) {
+                    if (result.ResourceImporter['@Success'] === 'True') {
+                        res = "false";
+                    }
+                    else {
+                        res = "true";
+                    }
+                }
+            }
+        },
+        error: function (err) {
+            window.epmLive.log(err);
+            res = "true";
+        }
+    });
+    return res;
+}
 
 

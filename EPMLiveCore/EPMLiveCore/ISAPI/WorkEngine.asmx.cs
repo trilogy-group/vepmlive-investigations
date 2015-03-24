@@ -1415,24 +1415,7 @@ namespace EPMLiveCore
         {
             try
             {
-                Guid spSiteID = Guid.Empty;
-                Guid spWebID = Guid.Empty;
-                XDocument xDoc = XDocument.Parse(data);
-                if (xDoc != null)
-                {                    
-                    foreach (XElement current in xDoc.Root.Elements())
-                    {
-                        if (current.Attribute("key").Value.Equals("SiteID"))
-                        {
-                            spSiteID = new Guid(current.Value);                            
-                        }
-                        else if (current.Attribute("key").Value.Equals("WebID"))
-                        {
-                            spWebID = new Guid(current.Value);
-                        }
-                    }
-                }
-                return Response.Success(Timer.IsImportResourceAlreadyRunning(spSiteID, spWebID, "Import Resources"));                
+                return Response.Success(Timer.IsImportResourceAlreadyRunning(oWeb.Site.ID, oWeb.ID, "Import Resources"));                
             }
             catch (APIException ex)
             {

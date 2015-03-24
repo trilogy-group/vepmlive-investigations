@@ -1009,11 +1009,24 @@
                                 SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', { url: redirectUrl, width: 700, height: 500 });
                             return true;
                         case '6':
-                            if (callBackFunction != '')
-                                SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', { url: redirectUrl, showMaximized: true,  dialogReturnValueCallback: eval(callBackFunction) });
-                            else
-                                SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', { url: redirectUrl, showMaximized: true });
-                            return true;
+                            var canLaunchResPlanner = 'true';
+                            if (command == 'epkcommand:rpeditor') {
+                                canLaunchResPlanner = canLaunchResourcePlanner(window.epmLive);
+                            }
+
+                            if (canLaunchResPlanner == 'true') {
+                                if (callBackFunction != '')
+                                    SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', { url: redirectUrl, showMaximized: true,  dialogReturnValueCallback: eval(callBackFunction) });
+                                else
+                                    SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', { url: redirectUrl, showMaximized: true });
+                                return true;
+                            }
+                            else {
+                                if (canLaunchResPlanner == 'false') {
+                                    alert('The Resource Planner cannot be opened because there is an active resource import job running.');
+                                }
+                                return false;
+                            }
                         case '98':
                             if (command !== 'nav:addToFav') {
                                 if (command !== 'nav:remove' && command !== 'nav:removeFavWS' && command !== 'nav:removeFavRI') {
@@ -1777,6 +1790,38 @@
                     $('#epm-nav-top').find("[data-role='top-nav-node']").each(function () {
                         tlNodes.push(new navNode(this));
                     });
+                }
+
+                function canLaunchResourcePlanner($$) {
+                    var res = "";
+                    
+                    $.ajax({
+                        type: 'POST',
+                        url: $$.currentWebUrl + '/_vti_bin/WorkEngine.asmx/Execute',
+                        async: false,
+                        data: "{ Function: 'IsImportResourceAlreadyRunning', Dataxml: '' }",
+                        contentType: 'application/json; charset=utf-8',
+                        dataType: 'json',
+                        success: function (response) {
+                            if (response.d) {
+                                var responseJson = $$.parseJson(response.d);
+                                var result = responseJson.Result;
+                                if ($$.responseIsSuccess(result)) {                                
+                                    if (result.ResourceImporter['@Success'] === 'True') {
+                                        res = "false";
+                                    }
+                                    else{
+                                        res = "true";
+                                    }
+                                }
+                            }
+                        },
+                        error: function (err) {
+                            $$.log(err);
+                            res = "true";
+                        }
+                    });
+                    return res;
                 }
 
                 window.epmLiveNavigation.removeLink = function (link) {

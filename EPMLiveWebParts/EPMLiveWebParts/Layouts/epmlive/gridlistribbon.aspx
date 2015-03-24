@@ -1311,6 +1311,12 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
             {
                 case "Ribbon.ListItem.Manage.EPKResourcePlanner":
                     epkcontrol = "rpeditor";
+                    var launch = this.canLaunchResourcePlannerOrAnalyzer(this.$curWebUrl);
+                    if(launch == 'false')
+                    {
+                        alert("The Resource Planner cannot be opened because there is an active resource import job running.");
+                        return;
+                    }
                     break;
                 case "Ribbon.ListItem.Manage.EPKCosts":
                     epkcontrol = "costs";
@@ -1346,7 +1352,6 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
         }
         else if(commandId === 'EPKMultiAction')
         {
-
             var ids = this.$Grid.getCheckedIds();
             
             if(ids != "" && ids[0] == ',')
@@ -1358,14 +1363,16 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
             {
                 var epkurl = this.$Grid._epkurl;
                 var epkcontrol = "";
-
+                var controlName = "";
                 switch(properties.SourceControlId)
                 {
                     case "Ribbon.ListItem.Manage.EPKResourceAnalyzer":
                         epkcontrol = "rpanalyzer";
+                        controlName = "Resource Analyzer";
                         break;
                     case "Ribbon.ListItem.Manage.EPKResourcePlanner":
                         epkcontrol = "rpeditor";
+                        controlName = "Resource Planner";
                         break;
                     case "Ribbon.ListItem.Manage.EPKCostAnalyzer":
                         epkcontrol = "costanalyzer";
@@ -1378,9 +1385,22 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
                         break;
                 }
 
-                epkmulti(epkcontrol, this.$Grid._webrelurl, ids, this.$Grid._epkcostview, this.$Grid._listid);
-
-                
+                if(epkcontrol == "rpanalyzer" || epkcontrol == "rpeditor")
+                {
+                    var launch = this.canLaunchResourcePlannerOrAnalyzer(this.$curWebUrl);
+                    if(launch == 'true')
+                    {
+                        epkmulti(epkcontrol, this.$Grid._webrelurl, ids, this.$Grid._epkcostview, this.$Grid._listid);
+                    }
+                    else
+                    {
+                        alert("The " + controlName + " cannot be opened because there is an active resource import job running.");
+                    }
+                }
+                else
+                {
+                    epkmulti(epkcontrol, this.$Grid._webrelurl, ids, this.$Grid._epkcostview, this.$Grid._listid);
+                }                
             }
         }
         else if (commandId === 'ShowFilters')
@@ -1453,6 +1473,38 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
                 window.stopImmediatePropagation();
             }catch(e){}
         }
+    },
+
+    canLaunchResourcePlannerOrAnalyzer: function (curWebUrl) {
+        var res = "";        
+
+        $.ajax({
+            type: 'POST',
+            url: curWebUrl + '/_vti_bin/WorkEngine.asmx/Execute',
+            async: false,
+            data: "{ Function: 'IsImportResourceAlreadyRunning', Dataxml: '' }",
+            contentType: 'application/json; charset=utf-8',
+            dataType: 'json',
+            success: function (response) {
+                if (response.d) {                    
+                    var responseJson = window.epmLive.parseJson(response.d);
+                    var result = responseJson.Result;
+                    if (window.epmLive.responseIsSuccess(result)) {  
+                        if (result.ResourceImporter['@Success'] === 'True') {
+                            res = "false";
+                        }
+                        else{
+                            res = "true";
+                        }
+                    }                    
+                }
+            },
+            error: function(err){
+                window.epmLive.log(err);
+                res = "true";
+            }
+        });
+	    return res;
     },
 
     onExportExcelClose: function (result,args){		
@@ -1906,7 +1958,7 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
         $v_0.append('</Menu>');
         return $v_0.toString();
     }
-}
+}      
 
 function getDropdownItemsXml(menus)
 {

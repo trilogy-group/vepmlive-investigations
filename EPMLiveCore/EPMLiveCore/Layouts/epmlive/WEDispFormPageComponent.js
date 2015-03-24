@@ -225,16 +225,28 @@ WEDispFormPageComponent.PageComponent.prototype = {
             SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
         }
         else if (commandId === 'Ribbon.ListForm.Display.Manage.EPKRP') {
-            var FullId = WEWebId + "." + WEListId + "." + WEItemId;
+            var canLaunch = this.canLaunchResourcePlanner();
+            if (canLaunch == 'true') {
+                var FullId = WEWebId + "." + WEListId + "." + WEItemId;
 
-            weburl = WEWebUrl + "/_layouts/ppm/rpeditor.aspx?itemid=" + FullId;
+                weburl = WEWebUrl + "/_layouts/ppm/rpeditor.aspx?itemid=" + FullId;
 
-            var options = { url: weburl, showMaximized: true, showClose: false, dialogReturnValueCallback: this.NewItemCallback };
+                var options = { url: weburl, showMaximized: true, showClose: false, dialogReturnValueCallback: this.NewItemCallback };
 
-            SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
+                SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
+            }
+            else{
+                alert('The Resource Planner cannot be opened because there is an active resource import job running.');
+            }
         }
         else if (commandId === 'Ribbon.ListForm.Display.Manage.EPKRPM') {
-            this.epkmulti('rpeditor');
+            var canLaunch = this.canLaunchResourcePlanner();
+            if (canLaunch == 'true') {
+                this.epkmulti('rpeditor');
+            }
+            else {
+                alert('The Resource Planner cannot be opened because there is an active resource import job running.');
+            }
         }
         else if (commandId === 'Ribbon.ListForm.Display.Manage.EPMINT') {
             OpenIntegrationPage(properties.SourceControlId.replace("EPMINT.", ""), WEListId, WEItemId);
@@ -292,6 +304,38 @@ WEDispFormPageComponent.PageComponent.prototype = {
         var options = { url: weburl, showMaximized: true, showClose: false, dialogReturnValueCallback: myCallback };
 
         SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
+    },
+
+    canLaunchResourcePlanner: function () {
+        var res = "";
+        
+        $.ajax({
+            type: 'POST',
+            url: window.epmLive.currentWebUrl + '/_vti_bin/WorkEngine.asmx/Execute',
+            async: false,
+            data: "{ Function: 'IsImportResourceAlreadyRunning', Dataxml: '' }",
+            contentType: 'application/json; charset=utf-8',
+            dataType: 'json',
+            success: function (response) {
+                if (response.d) {
+                    var responseJson = window.epmLive.parseJson(response.d);
+                    var result = responseJson.Result;
+                    if (window.epmLive.responseIsSuccess(result)) {
+                        if (result.ResourceImporter['@Success'] === 'True') {
+                            res = "false";
+                        }
+                        else{
+                            res = "true";
+                        }
+                    }
+                }
+            },
+            error: function (err) {
+                window.epmLive.log(err);
+                res = "true";
+            }
+        });
+        return res;
     }
 }
 
