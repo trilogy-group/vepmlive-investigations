@@ -1357,8 +1357,6 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                                 sViewObject = sb.ToString().Trim(',');
                         }
                         catch { }
-
-
                     }
                 }
             }
@@ -1379,7 +1377,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                 {
                     this.AddRibbonTab();
                 }
-                AddTabEvents();
+                AddTabEvents();                
             }
             tb.StopTimer();
 
@@ -1426,6 +1424,12 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
             if (!ribbon.IsTabAvailable("Ribbon.WorkViews"))
                 ribbon.MakeTabAvailable("Ribbon.WorkViews");
 
+            if (!EPMLiveCore.CoreFunctions.DoesCurrentUserHaveFullControl(SPContext.Current.Web))
+            {
+                ribbon.TrimById("Ribbon.WorkViews.WorkViewsGroup.SaveView");
+                ribbon.TrimById("Ribbon.WorkViews.WorkViewsGroup.DeleteView");
+            }
+
             if (!bEnableLink)
             {
                 ribbon.TrimById("Ribbon.WorkPlanner.InsertGroup.LinkExternalTask");
@@ -1456,7 +1460,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
             ribbon.TrimById("Ribbon.WorkPlanner.ClipGroup.Paste");
 
 
-            ribbon.InitialTabId = initialTabId;
+            ribbon.InitialTabId = initialTabId;            
         }
 
         public static string GetCleanString(string str)
