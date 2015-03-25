@@ -19,8 +19,7 @@ namespace EPMLiveCore
         private StringBuilder computeFieldsScript = new StringBuilder();
         private Dictionary<string, Dictionary<string, string>> hiddenFields = new Dictionary<string, Dictionary<string, string>>();
         private Dictionary<string, Dictionary<string, string>> fieldProperties = null;
-        private string[] meFields = { "ID", "Author", "Editor" };
-
+        
         protected Button OK = new Button();
         protected Button Cancel = new Button();
 
@@ -42,7 +41,7 @@ namespace EPMLiveCore
                     displayableFields.Add(field.Title, field);
                 else
                 {
-                    if (meFields.Contains(field.InternalName))
+                    if (MatchROFields(field.Id))
                          displayableFields.Add(field.Title, field);
                 }
             }
@@ -79,10 +78,9 @@ namespace EPMLiveCore
             result.Append("<table style=\"width:100%\" cellpadding=\"0\" cellspacing=\"0\">");
 
             foreach (SPField field in displayableFields.Values)
-            {
-                bool roFields = MatchROFields(field.Id);
+            {                
                 result.Append("<tr><td colspan=\"2\" class=\"ms-sectionline\" style=\"height:1px;\" ></td></tr>");
-                if (roFields == false)
+                if (MatchROFields(field.Id) == false)
                     result.Append(string.Format("<tr><td valign=\"top\" class=\"ms-sectionheader\" style=\"width:120px\">{0}</td>", field.Title));                        
                 else
                     result.Append(string.Format("<tr style=\"display:none;\"><td valign=\"top\" class=\"ms-sectionheader\" style=\"width:120px\">{0}</td>", field.Title));                        
@@ -94,17 +92,13 @@ namespace EPMLiveCore
             return result.ToString();
         }
 
+        ///EPML4718 : checked for is fields are ID,Author or Editor, those fields need display always but it will be in hidden in Manage editable field page.
         private bool MatchROFields(Guid fieldId)
         {
-            if (SPBuiltInFieldId.ID == fieldId)
-                return true;
-            else if (SPBuiltInFieldId.Author == fieldId)
-                return true;
-            else if (SPBuiltInFieldId.Editor == fieldId)
-                return true;
+            if (SPBuiltInFieldId.ID == fieldId || SPBuiltInFieldId.Author == fieldId || SPBuiltInFieldId.Editor == fieldId)
+                return true;            
             else
                 return false;
-
         }
 
         private string RenderOptions(SPField field)
@@ -277,9 +271,7 @@ namespace EPMLiveCore
 
         private string RenderOption(SPField field, string mode, ref bool showWhere, ref bool showEdit)
         {
-            StringBuilder result = new StringBuilder();            
-
-            bool roFields = MatchROFields(field.Id);            
+            StringBuilder result = new StringBuilder();                        
             result.Append(String.Format("<select id=\"Option{0}{1}\" runat=\"server\" onchange=\"javascript:OptionChange('{0}{1}');\" style=\"width: 100px;\">", field.InternalName, mode));
 
             
@@ -313,7 +305,7 @@ namespace EPMLiveCore
                             }
                             else
                             {
-                                if (field.ShowInNewForm.Value && roFields == false)
+                                if (field.ShowInNewForm.Value && MatchROFields(field.Id) == false)
                                     optionValueAlways = "selected ";
                                 else
                                     optionValueNever = "selected ";
@@ -334,7 +326,7 @@ namespace EPMLiveCore
                             }
                             else
                             {
-                                if (field.ShowInEditForm.Value && roFields == false)
+                                if (field.ShowInEditForm.Value && MatchROFields(field.Id) == false)
                                 {
                                     showEdit = true;
                                     optionValueAlways = "selected ";
@@ -386,7 +378,7 @@ namespace EPMLiveCore
                         }
                         else
                         {
-                            if (field.ShowInNewForm.Value && roFields == false)
+                            if (field.ShowInNewForm.Value && MatchROFields(field.Id) == false)
                                 optionValueAlways = "selected ";
                             else
                                 optionValueNever = "selected ";
@@ -407,7 +399,7 @@ namespace EPMLiveCore
                         }
                         else
                         {
-                            if (field.ShowInEditForm.Value && roFields == false)
+                            if (field.ShowInEditForm.Value && MatchROFields(field.Id) == false)
                             {
                                 showEdit = true;
                                 optionValueAlways = "selected ";
@@ -430,7 +422,7 @@ namespace EPMLiveCore
                         }
                         break;
                     case "Editable":
-                        if(roFields == false)
+                        if (MatchROFields(field.Id) == false)
                             optionValueAlways = "selected ";
                         else
                             optionValueNever = "selected ";
