@@ -89,6 +89,9 @@ namespace EPMLiveCore
                 RedirectUrl = String.Concat(sUrl, "/", List.Forms[PAGETYPE.PAGE_DISPLAYFORM].Url, @"?ID=", ListItem.ID, @"&Source=", ListItem.ParentList.DefaultViewUrl);
 
                 ProcessNewItemRecent(ListItem);
+
+                //Once item is created set default values for choice fields.
+                AssignDefaultValueToChoiceFields(ListItem);
             }
         }
 
@@ -97,7 +100,38 @@ namespace EPMLiveCore
             if (SaveButton.SaveItem(SPContext.Current, false, ""))
             {
                 ProcessNewItemRecent(SPContext.Current.ListItem);
+
+                //Once item is created set default values for choice fields.
+                AssignDefaultValueToChoiceFields(SPContext.Current.ListItem);
             }
+        }
+
+        private void AssignDefaultValueToChoiceFields(SPListItem item)
+        {
+            //EPML-4267: Service Request Choice field does not pre-populate with default value in view/edit
+            try
+            {
+                //Iterating through current item fields
+                foreach (SPField field in item.Fields)
+                {
+                    if (field.Type == SPFieldType.Choice)
+                    {
+                        //Retrieving choice field value.
+                        string fieldValue = Convert.ToString(item[field.Id]);
+
+                        //If value is null / empty then verifying weather field has default value
+                        if (string.IsNullOrEmpty(fieldValue))
+                        {
+                            //If field has default value then assigning this default value to item.
+                            if (!string.IsNullOrEmpty(field.DefaultValue))
+                                item[field.Id] = Convert.ToString(field.DefaultValue);
+                        }
+                    }
+                }
+                //just making systemupdate so that event wont trigger once again and it directly make change to item inline.
+                item.SystemUpdate();
+            }
+            catch { }
         }
 
         protected void ProcessNewItemRecent(SPListItem i)
@@ -690,11 +724,6 @@ namespace EPMLiveCore
                                     fname = f.InternalName + "_" + f.Id.ToString() + "_$DropDownChoice";
                                     
                                 dControls.Add(field.InternalName, fname);
-
-                                //if (((Microsoft.SharePoint.WebControls.FieldLabel)tc.Controls[1].Controls[0].Controls[1]).Field.Type == SPFieldType.Choice)
-                                //    dControls.Add(((Microsoft.SharePoint.WebControls.FieldLabel)tc.Controls[1].Controls[0].Controls[1]).Field.InternalName, tc.Controls[1].Controls[0].Controls[9].Controls[0].Controls[0].ClientID);
-                                //else
-                                //    dControls.Add(((Microsoft.SharePoint.WebControls.FieldLabel)tc.Controls[1].Controls[0].Controls[1]).Field.InternalName, tc.Controls[1].Controls[0].Controls[9].Controls[0].Controls[0].Controls[1].ClientID);
 
                                 AddControlsToWriter(tc, writer, field.InternalName);
                             }
