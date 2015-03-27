@@ -1128,9 +1128,9 @@ function SetTaskAssignments(Row) {
                 if (assnObj == null) {
                     grid.RemoveRow(grid.GetRowById(id));
                 }
-                else {
-                    oAssns[resource] = null;
-                }
+                //else {
+                //    oAssns[resource] = null;
+                //}
             }
         }
 
@@ -1141,7 +1141,14 @@ function SetTaskAssignments(Row) {
 
         for (var oAssn in oAssns) {
             if (oAssns[oAssn] != null && oAssns[oAssn] != "") {
-                newrow = grid.AddRow(Row, null, oShowAssignments, Row.id + "." + oAssn, "Assignment");
+                //--EPML-4699 
+                var newrow = null;
+                if (grid.GetRowById(Row.id + "." + oAssn) == null) {
+                    newrow = grid.AddRow(Row, null, oShowAssignments, Row.id + "." + oAssn, "Assignment");
+                } else {
+                    newrow = grid.GetRowById(Row.id + "." + oAssn);
+                }
+                
                 //newrow = grid.CopyRow(Row, Row, null, false, false);
                 grid.ChangeDef(newrow, "Assignment", oShowAssignments, 0);
                 if (!oShowAssignments)
@@ -1157,8 +1164,21 @@ function SetTaskAssignments(Row) {
                         var en = Row.DueDate;
                         var diff = grid.DiffGanttDate(st, en, "h");
                         grid.SetValue(newrow, "Work", diff, 1);
-                        ////RollupAssignments(Row, "Work", "SUM");
+                        RollupAssignments(Row, "Work", "SUM");
                         //SetPlannerFieldValue(newrow, "Work", diff, true);
+                    }
+                    else {
+
+                        var fWork = 0;
+                        try {
+                            fWork = parseFloat(Row.Work);
+                        } catch (e) { }
+                            var st = grid.GetValue(Row, "StartDate")
+                            var en = grid.GetValue(Row, "DueDate")
+                            var diff = grid.DiffGanttDate(st, en, "h");
+                            // SetPlannerFieldValue(Row, "Work", diff, true);
+                            grid.SetValue(Row, "Work", diff * assignmentcount, 1);
+                        
                     }
                 }
                 else {
@@ -1172,19 +1192,8 @@ function SetTaskAssignments(Row) {
             }
         }
 
-        if (Row.TaskType == "Individual") {
-            RollupAssignments(Row, "Work", "SUM");
-        }
-        else {
-            if (oArray == "") {
-                grid.SetValue(Row, "Work", 0, 1);
-            }
-            else {
-                var st = grid.GetValue(Row, "StartDate")
-                var en = grid.GetValue(Row, "DueDate")
-                var diff = grid.DiffGanttDate(st, en, "h");
-                grid.SetValue(Row, "Work", diff * assignmentcount, 1);
-            }
+        if (oArray == "") {
+            grid.SetValue(Row, "Work", 0, 1);
         }
 
         //DoAssignmentRollDown(Grids.WorkPlannerGrid, Row, 1, "Work");
