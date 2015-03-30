@@ -3496,11 +3496,46 @@ function ResourceInformation() {
 }
 
 function BuildTeam() {
-    var options = { url: "buildteam.aspx?listid=" + sProjectListId + "&id=" + sItemID, title: "Build Team", showMaximized: true, dialogReturnValueCallback: RefreshTeam };
+    var isSecRunning = 'False';
+    isSecRunning = SecurityJobResponse(sWebUrl, sProjectListId, sItemID);
+    if (isSecRunning == 'False') {
+        var options = { url: "buildteam.aspx?listid=" + sProjectListId + "&id=" + sItemID, title: "Build Team", showMaximized: true, dialogReturnValueCallback: RefreshTeam };
 
-    //var options = { url: "buildteam.aspx?useteam=" + bUseTeam + "&listid=" + sProjectListId + "&id=" + sItemID + "&nosave=true&currentteam=1", title: "Build Team", showMaximized: true, dialogReturnValueCallback: RefreshTeam };
+        //var options = { url: "buildteam.aspx?useteam=" + bUseTeam + "&listid=" + sProjectListId + "&id=" + sItemID + "&nosave=true&currentteam=1", title: "Build Team", showMaximized: true, dialogReturnValueCallback: RefreshTeam };
 
-    SP.UI.ModalDialog.showModalDialog(options);
+        SP.UI.ModalDialog.showModalDialog(options);
+    }
+    else {
+        alert("The team cannot be edited because the security queue job has not completed. This should be completed in less than a minute or so - please try again.");
+    }
+
+}
+
+function SecurityJobResponse(webUrl, listid, itemid) {
+    var isRunning = '';
+
+    var paramData =
+				"<Data>" +					
+					"<Param key=\"ListID\">" + listid + "</Param>" +
+					"<Param key=\"itemId\">" + itemid + "</Param>" +
+				"</Data>";
+
+    $.ajax({
+        type: 'POST',
+        url: webUrl + '/_vti_bin/WorkEngine.asmx/Execute',
+        data: "{ Function: 'IsSecurityJobAlreadyRunning', Dataxml: '" + paramData + "' }",
+        async: false,
+        contentType: 'application/json; charset=utf-8',
+        dataType: 'json',
+        success: function (response) {
+            IsRunning = response.d;
+        },
+        error: function (err) {
+            IsRunning = 'False'
+            alert(err);
+        }
+    });
+    return IsRunning;
 }
 
 function AddFragment() {

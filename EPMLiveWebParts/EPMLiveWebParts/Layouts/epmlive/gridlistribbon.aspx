@@ -1431,16 +1431,22 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
             var weburl = this.$Grid.getUserData(rowId,"SiteUrl");
     	    var webid = this.$Grid.getUserData(rowId,"webid");
     	    var listid = this.$Grid.getUserData(rowId,"listid");
-    	    var itemid = this.$Grid.getUserData(rowId,"itemid");
+    	    var itemid = this.$Grid.getUserData(rowId,"itemid");            
 
     	    if(weburl == "/")
     		    weburl = "";
 
-    	    weburl = weburl + "/_layouts/epmlive/gridaction.aspx?action=BuildTeam&webid=" + webid + "&ListId=" + listid + "&id=" + itemid + "&Source=" + document.location.href;
+            var isSecRunning = this.SecurityJobResponse(weburl,listid,itemid);
+            if (isSecRunning == 'True') {
+                alert("The team cannot be edited because the security queue job has not completed. This should be completed in less than a minute or so - please try again.");
+            }
+            else {
+				weburl = weburl + "/_layouts/epmlive/gridaction.aspx?action=BuildTeam&webid=" + webid + "&ListId=" + listid + "&id=" + itemid + "&Source=" + document.location.href;
 
-            var options = { url: weburl, showMaximized: true, showClose: true };
+				var options = { url: weburl, showMaximized: true, showClose: true };
 
-        	SP.UI.ModalDialog.showModalDialog(options);
+				SP.UI.ModalDialog.showModalDialog(options);
+            }
 
         }
         else
@@ -1473,6 +1479,31 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
                 window.stopImmediatePropagation();
             }catch(e){}
         }
+    },
+    SecurityJobResponse: function (webUrl,listid,itemid) {
+        var isRunning = 'False';
+        var paramData =
+                    "<Data>" +                        
+                        "<Param key=\"ListID\">" + listid + "</Param>" +                        
+                        "<Param key=\"itemId\">" + itemid + "</Param>" +
+                    "</Data>";
+
+        $.ajax({
+            type: 'POST',
+            url: webUrl + '/_vti_bin/WorkEngine.asmx/Execute',
+            async: false,
+            data: "{ Function: 'IsSecurityJobAlreadyRunning', Dataxml: '" + paramData + "' }",
+            contentType: 'application/json; charset=utf-8',
+            dataType: 'json',
+            success: function (response) {
+                isRunning = response.d;
+            },
+            error: function (err) {                
+                window.epmLive.log(err);
+                isRunning ='False';
+            }
+        });
+        return isRunning;
     },
 
     canLaunchResourcePlannerOrAnalyzer: function (curWebUrl) {

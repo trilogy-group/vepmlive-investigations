@@ -1010,11 +1010,19 @@
                             return true;
                         case '6':
                             var canLaunchResPlanner = 'true';
+                            var isSecRunning = 'False';
                             if (command == 'epkcommand:rpeditor') {
                                 canLaunchResPlanner = canLaunchResourcePlanner(window.epmLive);
                             }
+                            else if (command == 'buildteam') {
+                                isSecRunning = SecurityJobResponse(window.epmLive.currentWebUrl, listId, itemId);
+                            }
+                            else if (command == 'nav:team' && window.epmLiveNavigation.wsTeamDict[webId] != '') {
+                                var idInfo = window.epmLiveNavigation.wsTeamDict[webId].split(".");
+                                isSecRunning = SecurityJobResponse(window.epmLive.currentWebUrl, idInfo[1], idInfo[2]);
+                            }
 
-                            if (canLaunchResPlanner == 'true') {
+                            if (canLaunchResPlanner == 'true' && isSecRunning == 'False') {
                                 if (callBackFunction != '')
                                     SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', { url: redirectUrl, showMaximized: true,  dialogReturnValueCallback: eval(callBackFunction) });
                                 else
@@ -1024,6 +1032,9 @@
                             else {
                                 if (canLaunchResPlanner == 'false') {
                                     alert('The Resource Planner cannot be opened because there is an active resource import job running.');
+                                }
+                                else if (isSecRunning == 'True') {
+                                    alert("The team cannot be edited because the security queue job has not completed. This should be completed in less than a minute or so - please try again.");
                                 }
                                 return false;
                             }
@@ -1205,6 +1216,33 @@
                             SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
                             break;
                     }
+
+                }
+
+                function SecurityJobResponse(webUrl, listid, itemid) {
+                    var IsRunning = '';
+                    var paramData =
+                    "<Data>" +                        
+                        "<Param key=\"ListID\">" + listid + "</Param>" +
+                        "<Param key=\"itemId\">" + itemid + "</Param>" +
+                    "</Data>";
+
+                    $.ajax({
+                        type: 'POST',
+                        url: webUrl + '/_vti_bin/WorkEngine.asmx/Execute',
+                        data: "{ Function: 'IsSecurityJobAlreadyRunning', Dataxml: '" + paramData + "' }",
+                        async: false,
+                        contentType: 'application/json; charset=utf-8',
+                        dataType: 'json',
+                        success: function (response) {
+                            IsRunning = response.d;
+                        },
+                        error: function (err) {
+                            IsRunning = 'False'
+                            $$.log(err);
+                        }
+                    });
+                    return IsRunning;
 
                 }
 

@@ -1908,5 +1908,40 @@ namespace EPMLiveCore
         }
 
         #endregion
+
+        /// <summary>
+        /// Check if already running an security job for same site
+        /// </summary>
+        /// <param name="data">string Param</param>
+        /// <param name="SPWeb">Web</param>
+        /// <returns></returns>
+        public static bool IsSecurityJobAlreadyRunning(string data, SPWeb oWeb)
+        {
+            try
+            {                
+                Guid oListID = Guid.Empty;                
+                int itemId=0;
+                XDocument xDoc = XDocument.Parse(data);
+                if (xDoc != null)
+                {
+                    foreach (XElement current in xDoc.Root.Elements())
+                    {                        
+                        if (current.Attribute("key").Value.Equals("ListID"))
+                        {
+                            oListID = new Guid(current.Value);
+                        }                     
+                        else if (current.Attribute("key").Value.Equals("itemId"))
+                        {
+                            itemId = Convert.ToInt32(current.Value);
+                        }
+                    }
+                }
+                return Timer.IsSecurityJobAlreadyRunning(oWeb, oListID, itemId);
+            }
+            catch (APIException ex)
+            {
+                return false;
+            }
+        }
     }
 }

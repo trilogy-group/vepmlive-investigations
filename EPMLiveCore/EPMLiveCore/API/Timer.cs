@@ -415,5 +415,31 @@ namespace EPMLiveCore.API
             return string.Format(@"<ResourceImporter Success=""{0}"" JobUid=""{1}"" PercentComplete=""{2}"" />", isRunning,
                     jobId, percentComplete);
         }
+
+        public static bool IsSecurityJobAlreadyRunning(SPWeb web, Guid listId, int itemId)
+        {
+            bool isRunning = false;
+            string query = "Select * from ITEMSEC where SITE_ID='" + web.Site.ID + "' and WEB_ID='" + web.ID + "' and LIST_ID='" + listId + "' and ITEM_ID='" + itemId + "'";
+
+            SPSecurity.RunWithElevatedPrivileges(delegate()
+            {
+                using (SqlConnection cn = new SqlConnection(CoreFunctions.getConnectionString(web.Site.WebApplication.Id)))
+                {
+                    cn.Open();
+                    using (SqlCommand cmd = new SqlCommand(query, cn))
+                    {
+                        SqlDataReader dr = cmd.ExecuteReader();
+                        if (dr.Read())
+                            isRunning = true;
+                        else
+                            isRunning = false;
+                        dr.Close();
+                    }
+                    cn.Close();
+                }
+            });
+
+            return isRunning;
+        }
     }
 }
