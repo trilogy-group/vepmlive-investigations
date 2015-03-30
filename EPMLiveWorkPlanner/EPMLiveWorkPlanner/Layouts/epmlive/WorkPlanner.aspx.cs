@@ -66,8 +66,6 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
         protected string sTaskUserFields = "";
         protected string sProjectUserFields = "";
         protected string sDefaults = "";
-        protected string sRequiredFields = "";
-        protected string sFieldDisplayNames = "";
 
         protected string sPlannerDescriptions = "";
 
@@ -163,17 +161,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                     }
                     catch { }
                 }
-
-                if (!oField.Hidden && !oField.ReadOnlyField && oField.Required && oField.Type != SPFieldType.Computed && isValidField(oField.InternalName, false) && oField.InternalName != "Notes")
-                {
-                    sRequiredFields += ",'" + oField.InternalName + "'";
-                    sFieldDisplayNames += ",'" + lstTaskCenter.Fields.GetField(oField.InternalName).Title + "'";
-                }
-                
             }
-            sRequiredFields = sRequiredFields.Trim(',');
-            sFieldDisplayNames = sFieldDisplayNames.Trim(',');
-
             sDefaults = sDefaults.Trim(',');
             sTaskUserFields = sTaskUserFields.Trim(',');
 
@@ -219,36 +207,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
             tb.StopTimer();
         }
 
-        public static bool isValidField(string fieldname, bool isProjectCenter)
-        {
-            switch (fieldname)
-            {
-                case "ContentType":
-                case "Modified":
-                case "Created":
-                case "Author":
-                case "Editor":
-                case "_UIVersionString":
-                case "Attachments":
-                case "Edit":
-                case "ID":
-                case "ItemChildCount":
-                case "FolderChildCount":
-                case "DocIcon":
-                case "Def":
-                case "Panel":
-                case "Project":
-                case "D":
-                case "Detail":
-                    return false;
-                case "AssignedTo":
-                    if (isProjectCenter)
-                        return false;
-                    else
-                        return true;
-            }
-            return true;
-        }
+
 
         protected void getAttachedLists(SPWeb web, string listid)
         {
@@ -1660,6 +1619,5 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
             manager.RegisterCommandEnabledFunction(Page, "commandEnabled", commands);
             manager.RegisterHandleCommandFunction(Page, "handleCommand", commands);
         }
-
     }
 }
