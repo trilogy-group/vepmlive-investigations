@@ -91,7 +91,7 @@ namespace EPMLiveCore
                 ProcessNewItemRecent(ListItem);
 
                 //Once item is created set default values for choice fields.
-                AssignDefaultValueToChoiceFields(ListItem);
+                AssignDefaultValueToFields(ListItem);
             }
         }
 
@@ -102,11 +102,11 @@ namespace EPMLiveCore
                 ProcessNewItemRecent(SPContext.Current.ListItem);
 
                 //Once item is created set default values for choice fields.
-                AssignDefaultValueToChoiceFields(SPContext.Current.ListItem);
+                AssignDefaultValueToFields(SPContext.Current.ListItem);
             }
         }
 
-        private void AssignDefaultValueToChoiceFields(SPListItem item)
+        private void AssignDefaultValueToFields(SPListItem item)
         {
             //EPML-4267: Service Request Choice field does not pre-populate with default value in view/edit
             try
@@ -114,18 +114,15 @@ namespace EPMLiveCore
                 //Iterating through current item fields
                 foreach (SPField field in item.Fields)
                 {
-                    if (field.Type == SPFieldType.Choice)
-                    {
-                        //Retrieving choice field value.
-                        string fieldValue = Convert.ToString(item[field.Id]);
+                    //Retrieving choice field value.
+                    string fieldValue = Convert.ToString(item[field.Id]);
 
-                        //If value is null / empty then verifying weather field has default value
-                        if (string.IsNullOrEmpty(fieldValue))
-                        {
-                            //If field has default value then assigning this default value to item.
-                            if (!string.IsNullOrEmpty(field.DefaultValue))
-                                item[field.Id] = Convert.ToString(field.DefaultValue);
-                        }
+                    //If value is null / empty then verifying weather field has default value
+                    if (string.IsNullOrEmpty(fieldValue))
+                    {
+                        //If field has default value then assigning this default value to item.
+                        if (!string.IsNullOrEmpty(field.DefaultValue))
+                            item[field.Id] = Convert.ToString(field.DefaultValue);
                     }
                 }
                 //just making systemupdate so that event wont trigger once again and it directly make change to item inline.
@@ -403,7 +400,7 @@ namespace EPMLiveCore
                 }
             }
         }
-       
+
         public override void RenderControl(System.Web.UI.HtmlTextWriter writer)
         {
             string sRelUrl = ((base.Web.ServerRelativeUrl == "/") ? "" : base.Web.ServerRelativeUrl);
@@ -722,7 +719,7 @@ namespace EPMLiveCore
                                 }
                                 else if (f.InternalName == "Status")
                                     fname = f.InternalName + "_" + f.Id.ToString() + "_$DropDownChoice";
-                                    
+
                                 dControls.Add(field.InternalName, fname);
 
                                 AddControlsToWriter(tc, writer, field.InternalName);
@@ -992,7 +989,7 @@ namespace EPMLiveCore
                         catch { }
 
                         writer.WriteLine("cleanupfields();");
-                       // To make default collapsed div, if there isnt any mandatory field in it
+                        // To make default collapsed div, if there isnt any mandatory field in it
                         writer.WriteLine("$(document).ready(function () {var headers = $('.upheader');$.each(headers, function (i, val) {if ($(this).find('span').text() == 'Permissions' && " + permissionPanelRequiredCount + " == '0') {if('" + Convert.ToString(this.ListItem["Generic"]) + "' == 'True'){ $($(this).next()).hide(); $(this).hide(); }else{ $(this).next().slideUp();$(this).find('.imgArrow').removeClass('hideImage');$(this).find('.imgDownArrow').addClass('hideImage');}} if ($(this).find('span').text() == 'Profile' && " + profilepanelRequiredCount + " == '0' ) { $(this).next().slideUp();$(this).find('.imgArrow').removeClass('hideImage');$(this).find('.imgDownArrow').addClass('hideImage');}  });});");
                         writer.WriteLine("}_spBodyOnLoadFunctionNames.push(\"InitFields\");");
 
@@ -1074,7 +1071,7 @@ namespace EPMLiveCore
                     }
                     else
                     {
-                    writer.WriteLine(@"<script>
+                        writer.WriteLine(@"<script>
 
                         $(document).ready(function() {
                             var button = $('input[id$=SaveItem]');
@@ -1092,8 +1089,8 @@ namespace EPMLiveCore
                             });
                         });
                          </script>");
+                    }
                 }
-            }
             }
             else
                 base.RenderControl(writer);
