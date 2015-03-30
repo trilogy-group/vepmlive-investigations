@@ -100,7 +100,7 @@ namespace EPMLiveCore.Layouts.epmlive
             }
             else
             {
-                Timer.CancelTimerJob(Web.Site.ID, new Guid(_jobId));
+                Timer.CancelTimerJob(Web, new Guid(_jobId));
             }
         }
 

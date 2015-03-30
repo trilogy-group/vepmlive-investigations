@@ -357,62 +357,58 @@ namespace EPMLiveCore.API
 
         }
 
-        public static void CancelTimerJob(Guid siteid, Guid timerjobuid)
+        public static void CancelTimerJob(SPWeb web, Guid timerjobuid)
         {
             SPSecurity.RunWithElevatedPrivileges(delegate()
             {
-                using (SPSite site = new SPSite(siteid))
+                using (SqlConnection cn = new SqlConnection(CoreFunctions.getConnectionString(web.Site.WebApplication.Id)))
                 {
-                    using (SqlConnection cn = new SqlConnection(CoreFunctions.getConnectionString(site.WebApplication.Id)))
-                    {
-                        cn.Open();
-                        SqlCommand cmd = new SqlCommand("UPDATE [QUEUE] SET status = 2, percentComplete = 100 WHERE timerjobuid = @timerjobuid", cn);
-                        cmd.Parameters.AddWithValue("@timerjobuid", timerjobuid);
-                        cmd.ExecuteNonQuery();
-                    }
+                    cn.Open();
+                    SqlCommand cmd = new SqlCommand("UPDATE [QUEUE] SET status = 2, percentComplete = 100 WHERE timerjobuid = @timerjobuid", cn);
+                    cmd.Parameters.AddWithValue("@timerjobuid", timerjobuid);
+                    cmd.ExecuteNonQuery();
+                    cn.Close();
                 }
             });
         }
 
-        public static string IsImportResourceAlreadyRunning(Guid siteid, Guid webid, string jobname)
+        public static string IsImportResourceAlreadyRunning(SPWeb web)
         {
             bool isRunning = false;
             Guid jobId = Guid.Empty;
             int percentComplete = 0;
-            string query = "SELECT status, view_log.timerjobuid, epml_log.resulttext from vwQueueTimerLog view_log inner join EPMLIVE_LOG as epml_log on view_log.timerjobuid = epml_log.timerjobuid where siteguid='" + siteid + "' and webguid='" + webid + "' and jobname='" + jobname + "'";
+            string query = "SELECT status, view_log.timerjobuid, epml_log.resulttext from vwQueueTimerLog view_log inner join EPMLIVE_LOG as epml_log on view_log.timerjobuid = epml_log.timerjobuid where siteguid='" + web.Site.ID + "' and webguid='" + web.ID + "' and jobtype=60";
 
             SPSecurity.RunWithElevatedPrivileges(delegate()
             {
-                using (SPSite site = new SPSite(siteid))
+                using (SqlConnection cn = new SqlConnection(CoreFunctions.getConnectionString(web.Site.WebApplication.Id)))
                 {
-                    using (SqlConnection cn = new SqlConnection(CoreFunctions.getConnectionString(site.WebApplication.Id)))
+                    cn.Open();
+                    using (SqlCommand cmd = new SqlCommand(query, cn))
                     {
-                        cn.Open();
-                        using (SqlCommand cmd = new SqlCommand(query, cn))
+                        SqlDataReader dr = cmd.ExecuteReader();
+                        if (dr.Read())
                         {
-                            SqlDataReader dr = cmd.ExecuteReader();
-                            if (dr.Read())
+                            // Status 0 = Not started, Status 1 = Running, Status 2 = Completed
+                            if (dr.GetInt32(0) != 2)
                             {
-                                // Status 0 = Not started, Status 1 = Running, Status 2 = Completed
-                                if (dr.GetInt32(0) != 2)
-                                {
-                                    isRunning = true;
-                                }
-                                jobId = dr.GetGuid(1);
-                                string jsonText = dr.GetString(2);
-
-                                try
-                                {
-                                    JavaScriptSerializer jsSerializer = new JavaScriptSerializer();
-                                    ResourceImportResult resourceImport = jsSerializer.Deserialize<ResourceImportResult>(jsonText);
-                                    percentComplete = resourceImport.PercentComplete;
-                                }
-                                catch
-                                {}
+                                isRunning = true;
                             }
-                            dr.Close();
+                            jobId = dr.GetGuid(1);
+                            string jsonText = dr.GetString(2);
+
+                            try
+                            {
+                                JavaScriptSerializer jsSerializer = new JavaScriptSerializer();
+                                ResourceImportResult resourceImport = jsSerializer.Deserialize<ResourceImportResult>(jsonText);
+                                percentComplete = resourceImport.PercentComplete;
+                            }
+                            catch
+                            {}
                         }
+                        dr.Close();
                     }
+                    cn.Close();
                 }
             });
 

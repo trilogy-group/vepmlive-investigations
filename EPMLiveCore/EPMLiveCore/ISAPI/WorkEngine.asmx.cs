@@ -1415,7 +1415,7 @@ namespace EPMLiveCore
         {
             try
             {
-                return Response.Success(Timer.IsImportResourceAlreadyRunning(oWeb.Site.ID, oWeb.ID, "Import Resources"));                
+                return Response.Success(Timer.IsImportResourceAlreadyRunning(oWeb));                
             }
             catch (APIException ex)
             {
@@ -1432,24 +1432,19 @@ namespace EPMLiveCore
         {            
             try
             {
-                Guid siteId = Guid.Empty;
                 Guid jobUid = Guid.Empty;
                 XDocument xDoc = XDocument.Parse(data);
                 if (xDoc != null)
                 {
                     foreach (XElement current in xDoc.Root.Elements())
                     {
-                        if (current.Attribute("key").Value.Equals("SiteID"))
-                        {
-                            siteId = new Guid(current.Value);
-                        }
-                        else if (current.Attribute("key").Value.Equals("JobID"))
+                        if (current.Attribute("key").Value.Equals("JobID"))
                         {
                             jobUid = new Guid(current.Value);
                         }
                     }
                 }
-                Timer.CancelTimerJob(siteId, jobUid);                
+                Timer.CancelTimerJob(oWeb, jobUid);                
                 return Response.Success(string.Format(@"<ResourceImporter Success=""{0}"" />", true));
             }
             catch (APIException ex)

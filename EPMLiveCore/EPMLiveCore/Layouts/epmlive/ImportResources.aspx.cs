@@ -39,7 +39,7 @@ namespace EPMLiveCore.Layouts.epmlive
 
         private void IsImportResourceAlreadyRunning()
         {
-            string result = Timer.IsImportResourceAlreadyRunning(SPContext.Current.Web.Site.ID, SPContext.Current.Web.ID, "Import Resources");
+            string result = Timer.IsImportResourceAlreadyRunning(SPContext.Current.Web);
 
             XmlDocument resultDoc = new XmlDocument();
             resultDoc.LoadXml(result);
@@ -59,7 +59,7 @@ namespace EPMLiveCore.Layouts.epmlive
             {
                 // Again calling this method to fetch currently running job id to cancel it.
                 IsImportResourceAlreadyRunning();
-                Timer.CancelTimerJob(SPContext.Current.Site.ID, jobUid);
+                Timer.CancelTimerJob(SPContext.Current.Web, jobUid);
             }
             if (!FileUpload.HasFile) return;
 

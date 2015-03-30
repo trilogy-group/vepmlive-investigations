@@ -1803,11 +1803,6 @@ function registerEpmLiveResourceGridScript() {
 
             importResources: function () {
 
-                $$.actions.isImportResourceInProgress();
-            },
-
-            isImportResourceInProgress: function () {
-                
                 $.ajax({
                     type: 'POST',
                     url: $$$.currentWebUrl + '/_vti_bin/WorkEngine.asmx/Execute',
@@ -1815,79 +1810,72 @@ function registerEpmLiveResourceGridScript() {
                     contentType: 'application/json; charset=utf-8',
                     dataType: 'json',
                     success: function (response) {
-                        $$.actions.importResourcesMain(response);
+                        if (response.d) {
+
+                            var responseJson = $$$.parseJson(response.d);
+                            var result = responseJson.Result;
+
+                            if ($$$.responseIsSuccess(result)) {
+
+                                if (result.ResourceImporter['@Success'] === 'True') {
+                                    var canContinue = confirm("A resource import job is currently running and is " + result.ResourceImporter['@PercentComplete'] + "% complete. Would you like to cancel it and run this new import job instead?");
+                                    if (canContinue) {
+                                        var params =
+                                            "<Data>" +
+                                                "<Param key=\"JobID\">" + result.ResourceImporter['@JobUid'] + "</Param>" +
+                                            "</Data>";
+
+                                        $.ajax({
+                                            type: 'POST',
+                                            url: $$$.currentWebUrl + '/_vti_bin/WorkEngine.asmx/Execute',
+                                            data: "{ Function: 'CancelTimerJob', Dataxml: '" + params + "' }",
+                                            contentType: 'application/json; charset=utf-8',
+                                            dataType: 'json',
+                                            success: function () {
+                                                var options = window.SP.UI.$create_DialogOptions();
+
+                                                options.title = 'Import Resources';
+                                                options.url = $$$.currentWebUrl + '/_layouts/epmlive/importresources.aspx';
+                                                options.dialogReturnValueCallback = window.epmLiveResourceGrid.actions.onImportResourcesCompleted;
+
+                                                window.SP.UI.ModalDialog.showModalDialog(options);
+                                            },
+                                            error: function (err) {
+                                                $$$.log(err);
+
+                                                status.title('Error');
+                                                status.message('Unable to cancel timer job for import resources. The response was: (' + err.status + ') ' + err.statusText);
+                                                statusbar.color('red');
+
+                                                $$.importInProgress = false;
+                                                window.RefreshCommandUI();
+                                            }
+                                        });
+                                    }
+                                }
+                                else {
+                                    var options = window.SP.UI.$create_DialogOptions();
+
+                                    options.title = 'Import Resources';
+                                    options.url = $$$.currentWebUrl + '/_layouts/epmlive/importresources.aspx';
+                                    options.dialogReturnValueCallback = window.epmLiveResourceGrid.actions.onImportResourcesCompleted;
+
+                                    window.SP.UI.ModalDialog.showModalDialog(options);
+                                }
+                            }
+                        }
                     },
                     error: function (err) {
                         $$$.log(err);
-
                         status.title('Error');
                         status.message('Unable to check if any import resources job is running. The response was: (' + err.status + ') ' + err.statusText);
                         statusbar.color('red');
-
                         $$.importInProgress = false;
                         window.RefreshCommandUI();
                     }
                 });
+
             },
-
-            importResourcesMain: function (response) {
-
-                if (response.d) {
-
-                    var responseJson = $$$.parseJson(response.d);
-                    var result = responseJson.Result;
-
-                    if ($$$.responseIsSuccess(result)) {
-
-                        if (result.ResourceImporter['@Success'] === 'True') {
-                            var canContinue = confirm("A resource import job is currently running and is " + result.ResourceImporter['@PercentComplete'] + "% complete. Would you like to cancel it and run this new import job instead?");
-                            if (canContinue) {
-                                var params =
-                                    "<Data>" +
-                                        "<Param key=\"SiteID\">" + $$$.currentSiteId + "</Param>" +
-                                        "<Param key=\"JobID\">" + result.ResourceImporter['@JobUid'] + "</Param>" +
-                                    "</Data>";
-
-                                $.ajax({
-                                    type: 'POST',
-                                    url: $$$.currentWebUrl + '/_vti_bin/WorkEngine.asmx/Execute',
-                                    data: "{ Function: 'CancelTimerJob', Dataxml: '" + params + "' }",
-                                    contentType: 'application/json; charset=utf-8',
-                                    dataType: 'json',
-                                    success: function () {
-                                        var options = window.SP.UI.$create_DialogOptions();
-
-                                        options.title = 'Import Resources';
-                                        options.url = $$$.currentWebUrl + '/_layouts/epmlive/importresources.aspx';
-                                        options.dialogReturnValueCallback = window.epmLiveResourceGrid.actions.onImportResourcesCompleted;
-
-                                        window.SP.UI.ModalDialog.showModalDialog(options);
-                                    },
-                                    error: function (err) {
-                                        $$$.log(err);
-
-                                        status.title('Error');
-                                        status.message('Unable to cancel timer job for import resources. The response was: (' + err.status + ') ' + err.statusText);
-                                        statusbar.color('red');
-
-                                        $$.importInProgress = false;
-                                        window.RefreshCommandUI();
-                                    }
-                                });
-                            }
-                        }
-                        else {
-                            var options = window.SP.UI.$create_DialogOptions();
-
-                            options.title = 'Import Resources';
-                            options.url = $$$.currentWebUrl + '/_layouts/epmlive/importresources.aspx';
-                            options.dialogReturnValueCallback = window.epmLiveResourceGrid.actions.onImportResourcesCompleted;
-
-                            window.SP.UI.ModalDialog.showModalDialog(options);
-                        }
-                    }
-                }
-            },            
 
             onImportResourcesCompleted: function (result, value) {
                 if (result === 1) {
