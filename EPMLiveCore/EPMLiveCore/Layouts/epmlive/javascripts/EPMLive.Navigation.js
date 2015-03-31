@@ -1010,19 +1010,19 @@
                             return true;
                         case '6':
                             var canLaunchResPlanner = 'true';
-                            var isSecRunning = 'False';
+                            var isSecRunning = false;
                             if (command == 'epkcommand:rpeditor') {
                                 canLaunchResPlanner = canLaunchResourcePlanner(window.epmLive);
                             }
                             else if (command == 'buildteam') {
-                                isSecRunning = SecurityJobResponse(window.epmLive.currentWebUrl, listId, itemId);
+                                isSecRunning = window.epmLiveNavigation.isSecurityJobRunning(window.epmLive.currentWebUrl, listId, itemId);
                             }
                             else if (command == 'nav:team' && window.epmLiveNavigation.wsTeamDict[webId] != '') {
                                 var idInfo = window.epmLiveNavigation.wsTeamDict[webId].split(".");
-                                isSecRunning = SecurityJobResponse(window.epmLive.currentWebUrl, idInfo[1], idInfo[2]);
+                                isSecRunning = window.epmLiveNavigation.isSecurityJobRunning(window.epmLive.currentWebUrl, idInfo[1], idInfo[2]);
                             }
 
-                            if (canLaunchResPlanner == 'true' && isSecRunning == 'False') {
+                            if (canLaunchResPlanner == 'true' && !isSecRunning) {
                                 if (callBackFunction != '')
                                     SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', { url: redirectUrl, showMaximized: true,  dialogReturnValueCallback: eval(callBackFunction) });
                                 else
@@ -1033,7 +1033,7 @@
                                 if (canLaunchResPlanner == 'false') {
                                     alert('The Resource Planner cannot be opened because there is an active resource import job running.');
                                 }
-                                else if (isSecRunning == 'True') {
+                                else if (isSecRunning) {
                                     alert("The team cannot be edited because the security queue job has not completed. This should be completed in less than a minute or so - please try again.");
                                 }
                                 return false;
@@ -1218,34 +1218,7 @@
                     }
 
                 }
-
-                function SecurityJobResponse(webUrl, listid, itemid) {
-                    var IsRunning = '';
-                    var paramData =
-                    "<Data>" +                        
-                        "<Param key=\"ListID\">" + listid + "</Param>" +
-                        "<Param key=\"itemId\">" + itemid + "</Param>" +
-                    "</Data>";
-
-                    $.ajax({
-                        type: 'POST',
-                        url: webUrl + '/_vti_bin/WorkEngine.asmx/Execute',
-                        data: "{ Function: 'IsSecurityJobAlreadyRunning', Dataxml: '" + paramData + "' }",
-                        async: false,
-                        contentType: 'application/json; charset=utf-8',
-                        dataType: 'json',
-                        success: function (response) {
-                            IsRunning = response.d;
-                        },
-                        error: function (err) {
-                            IsRunning = 'False'
-                            $$.log(err);
-                        }
-                    });
-                    return IsRunning;
-
-                }
-
+                
                 function registerEvents() {
                     var hoverNode = window.TreeView_HoverNode;
                     var unhoverNode = window.TreeView_UnhoverNode;
@@ -2462,6 +2435,45 @@
                     menuManager.setupMenu($li, defaultCommands, forcePopup, customOverrideKind, customCallbackFunctions);
                 });
             };
+
+            window.epmLiveNavigation.isSecurityJobRunning = function isSecurityJobRunning(webUrl, listid, itemid) {
+                var IsRunning = false;
+                var paramData =
+                "<Data>" +
+                    "<Param key=\"ListID\">" + listid + "</Param>" +
+                    "<Param key=\"itemId\">" + itemid + "</Param>" +
+                "</Data>";
+
+                $.ajax({
+                    type: 'POST',
+                    url: webUrl + '/_vti_bin/WorkEngine.asmx/Execute',
+                    data: "{ Function: 'IsSecurityJobAlreadyRunning', Dataxml: '" + paramData + "' }",
+                    async: false,
+                    contentType: 'application/json; charset=utf-8',
+                    dataType: 'json',
+                    success: function (response) {
+                        if (response.d) {
+                            var responseJson = $$.parseJson(response.d);
+                            var result = responseJson.Result;
+                            if ($$.responseIsSuccess(result)) {
+                                if (result.SecurityJob['@Success'] === 'True') {
+                                    IsRunning = true;
+                                }
+                                else {
+                                    IsRunning = false;
+                                }
+                            }
+                        }
+                    },
+                    error: function (err) {
+                        console.log(err);
+                        IsRunning = false;
+                    }
+                });
+                return IsRunning;
+
+            };
+
 
             var manageSettings = function () {
                 var settingsManager = (function () {

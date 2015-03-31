@@ -416,7 +416,7 @@ namespace EPMLiveCore.API
                     jobId, percentComplete);
         }
 
-        public static bool IsSecurityJobAlreadyRunning(SPWeb web, Guid listId, int itemId)
+        public static string IsSecurityJobAlreadyRunning(SPWeb web, Guid listId, int itemId)
         {
             bool isRunning = false;
             string query = "Select * from ITEMSEC where SITE_ID='" + web.Site.ID + "' and WEB_ID='" + web.ID + "' and LIST_ID='" + listId + "' and ITEM_ID='" + itemId + "'";
@@ -439,7 +439,7 @@ namespace EPMLiveCore.API
                 }
             });
 
-            return isRunning;
+            return string.Format(@"<SecurityJob Success=""{0}"" />", isRunning);            
         }
     }
 }

@@ -1915,7 +1915,7 @@ namespace EPMLiveCore
         /// <param name="data">string Param</param>
         /// <param name="SPWeb">Web</param>
         /// <returns></returns>
-        public static bool IsSecurityJobAlreadyRunning(string data, SPWeb oWeb)
+        public static string IsSecurityJobAlreadyRunning(string data, SPWeb oWeb)
         {
             try
             {                
@@ -1936,11 +1936,11 @@ namespace EPMLiveCore
                         }
                     }
                 }
-                return Timer.IsSecurityJobAlreadyRunning(oWeb, oListID, itemId);
+                return Response.Success(Timer.IsSecurityJobAlreadyRunning(oWeb,oListID,itemId));
             }
             catch (APIException ex)
             {
-                return false;
+                return Response.Failure(ex.ExceptionNumber, string.Format("Error: {0}", ex.Message));
             }
         }
     }

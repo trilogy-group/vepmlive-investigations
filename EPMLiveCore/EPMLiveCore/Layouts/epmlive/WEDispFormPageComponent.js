@@ -211,8 +211,8 @@ WEDispFormPageComponent.PageComponent.prototype = {
             }
         }
         else if (commandId === 'Ribbon.ListForm.Display.Manage.BuildTeam') {
-            var isSecRunning = this.SecurityJobResponse();
-            if (isSecRunning == 'True') {
+            var isSecRunning = window.epmLiveNavigation.isSecurityJobRunning(WEWebUrl, WEListId, WEItemId);
+            if (isSecRunning) {
                 alert("The team cannot be edited because the security queue job has not completed. This should be completed in less than a minute or so - please try again.");
             }
             else {
@@ -311,31 +311,7 @@ WEDispFormPageComponent.PageComponent.prototype = {
 
         SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
     },
-    SecurityJobResponse: function () {
-        var isRunning = 'False';
-        var paramData =
-                    "<Data>" +                        
-                        "<Param key=\"ListID\">" + WEListId + "</Param>" +                        
-                        "<Param key=\"itemId\">" + WEItemId + "</Param>" +
-                    "</Data>";
-
-        $.ajax({
-            type: 'POST',
-            url: WEWebUrl + '/_vti_bin/WorkEngine.asmx/Execute',
-            data: "{ Function: 'IsSecurityJobAlreadyRunning', Dataxml: '" + paramData + "' }",
-            contentType: 'application/json; charset=utf-8',
-            dataType: 'json',
-            success: function (response) {
-                isRunning = response.d;                
-            },
-            error: function (err) {                
-                window.epmLive.log(err);
-                isRunning = 'False';
-            }
-        });
-        return isRunning;
-    },
-
+    
     canLaunchResourcePlanner: function () {
         var res = "";
         

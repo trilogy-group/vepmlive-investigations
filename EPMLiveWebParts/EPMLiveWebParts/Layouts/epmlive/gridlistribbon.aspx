@@ -1436,8 +1436,8 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
     	    if(weburl == "/")
     		    weburl = "";
 
-            var isSecRunning = this.SecurityJobResponse(weburl,listid,itemid);
-            if (isSecRunning == 'True') {
+            var isSecRunning = window.epmLiveNavigation.isSecurityJobRunning(weburl,listid,itemid);
+            if (isSecRunning) {
                 alert("The team cannot be edited because the security queue job has not completed. This should be completed in less than a minute or so - please try again.");
             }
             else {
@@ -1480,32 +1480,7 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
             }catch(e){}
         }
     },
-    SecurityJobResponse: function (webUrl,listid,itemid) {
-        var isRunning = 'False';
-        var paramData =
-                    "<Data>" +                        
-                        "<Param key=\"ListID\">" + listid + "</Param>" +                        
-                        "<Param key=\"itemId\">" + itemid + "</Param>" +
-                    "</Data>";
-
-        $.ajax({
-            type: 'POST',
-            url: webUrl + '/_vti_bin/WorkEngine.asmx/Execute',
-            async: false,
-            data: "{ Function: 'IsSecurityJobAlreadyRunning', Dataxml: '" + paramData + "' }",
-            contentType: 'application/json; charset=utf-8',
-            dataType: 'json',
-            success: function (response) {
-                isRunning = response.d;
-            },
-            error: function (err) {                
-                window.epmLive.log(err);
-                isRunning ='False';
-            }
-        });
-        return isRunning;
-    },
-
+    
     canLaunchResourcePlannerOrAnalyzer: function (curWebUrl) {
         var res = "";        
 
