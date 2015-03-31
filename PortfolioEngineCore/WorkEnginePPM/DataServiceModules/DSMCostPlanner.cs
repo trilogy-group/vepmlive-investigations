@@ -674,29 +674,20 @@ namespace WorkEnginePPM.DataServiceModules
                             {
                                 _dvCostCategories.RowFilter = String.Empty;
                                 _dvCostCategories.RowFilter = string.Format("ct_id={0} and bc_name='{1}'", foreignKeyId, costCategory);
-                                if (_dvCostCategories.Count == 0)
-                                {
-                                    bc_id = Int32.MaxValue;
-                                    break;
-                                }
-                                else
-                                {
-                                    bc_id = Convert.ToInt32(_dvCostCategories[0]["bc_id"]);
-                                }
                             }
                             else
                             {
                                 _dvCostCategories.RowFilter = String.Empty;
                                 _dvCostCategories.RowFilter = string.Format("ct_id={0} and bc_name='{1}' and bc_id>={2}", foreignKeyId, costCategory, bc_id);
-                                if (_dvCostCategories.Count == 0)
-                                {
-                                    bc_id = Int32.MaxValue;
-                                    break;
-                                }
-                                else
-                                {
-                                    bc_id = Convert.ToInt32(_dvCostCategories[0]["bc_id"]);
-                                }
+                            }
+                            if (_dvCostCategories.Count == 0)
+                            {
+                                bc_id = Int32.MaxValue;
+                                break;
+                            }
+                            else
+                            {
+                                bc_id = Convert.ToInt32(_dvCostCategories[0]["bc_id"]);
                             }
                         }
                         _dvCostCategories.RowFilter = String.Empty;
