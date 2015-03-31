@@ -231,8 +231,8 @@ WEDispFormPageComponent.PageComponent.prototype = {
             SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
         }
         else if (commandId === 'Ribbon.ListForm.Display.Manage.EPKRP') {
-            var canLaunch = this.canLaunchResourcePlanner();
-            if (canLaunch == 'true') {
+            var isResImportRunning = window.epmLiveNavigation.isImportResourceRunning();
+            if (!isResImportRunning) {
                 var FullId = WEWebId + "." + WEListId + "." + WEItemId;
 
                 weburl = WEWebUrl + "/_layouts/ppm/rpeditor.aspx?itemid=" + FullId;
@@ -246,8 +246,8 @@ WEDispFormPageComponent.PageComponent.prototype = {
             }
         }
         else if (commandId === 'Ribbon.ListForm.Display.Manage.EPKRPM') {
-            var canLaunch = this.canLaunchResourcePlanner();
-            if (canLaunch == 'true') {
+            var isResImportRunning = window.epmLiveNavigation.isImportResourceRunning();
+            if (!isResImportRunning) {
                 this.epkmulti('rpeditor');
             }
             else {
@@ -312,37 +312,6 @@ WEDispFormPageComponent.PageComponent.prototype = {
         SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
     },
     
-    canLaunchResourcePlanner: function () {
-        var res = "";
-        
-        $.ajax({
-            type: 'POST',
-            url: window.epmLive.currentWebUrl + '/_vti_bin/WorkEngine.asmx/Execute',
-            async: false,
-            data: "{ Function: 'IsImportResourceAlreadyRunning', Dataxml: '' }",
-            contentType: 'application/json; charset=utf-8',
-            dataType: 'json',
-            success: function (response) {
-                if (response.d) {
-                    var responseJson = window.epmLive.parseJson(response.d);
-                    var result = responseJson.Result;
-                    if (window.epmLive.responseIsSuccess(result)) {
-                        if (result.ResourceImporter['@Success'] === 'True') {
-                            res = "false";
-                        }
-                        else{
-                            res = "true";
-                        }
-                    }
-                }
-            },
-            error: function (err) {
-                window.epmLive.log(err);
-                res = "true";
-            }
-        });
-        return res;
-    }
 }
 
 

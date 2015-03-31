@@ -1311,8 +1311,8 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
             {
                 case "Ribbon.ListItem.Manage.EPKResourcePlanner":
                     epkcontrol = "rpeditor";
-                    var launch = this.canLaunchResourcePlannerOrAnalyzer(this.$curWebUrl);
-                    if(launch == 'false')
+                    var isResImportRunning = window.epmLiveNavigation.isImportResourceRunning();
+                    if(isResImportRunning)
                     {
                         alert("The Resource Planner cannot be opened because there is an active resource import job running.");
                         return;
@@ -1387,8 +1387,8 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
 
                 if(epkcontrol == "rpanalyzer" || epkcontrol == "rpeditor")
                 {
-                    var launch = this.canLaunchResourcePlannerOrAnalyzer(this.$curWebUrl);
-                    if(launch == 'true')
+                    var isResImportRunning = window.epmLiveNavigation.isImportResourceRunning();    
+                    if(!isResImportRunning)
                     {
                         epkmulti(epkcontrol, this.$Grid._webrelurl, ids, this.$Grid._epkcostview, this.$Grid._listid);
                     }
@@ -1479,38 +1479,6 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
                 window.stopImmediatePropagation();
             }catch(e){}
         }
-    },
-    
-    canLaunchResourcePlannerOrAnalyzer: function (curWebUrl) {
-        var res = "";        
-
-        $.ajax({
-            type: 'POST',
-            url: curWebUrl + '/_vti_bin/WorkEngine.asmx/Execute',
-            async: false,
-            data: "{ Function: 'IsImportResourceAlreadyRunning', Dataxml: '' }",
-            contentType: 'application/json; charset=utf-8',
-            dataType: 'json',
-            success: function (response) {
-                if (response.d) {                    
-                    var responseJson = window.epmLive.parseJson(response.d);
-                    var result = responseJson.Result;
-                    if (window.epmLive.responseIsSuccess(result)) {  
-                        if (result.ResourceImporter['@Success'] === 'True') {
-                            res = "false";
-                        }
-                        else{
-                            res = "true";
-                        }
-                    }                    
-                }
-            },
-            error: function(err){
-                window.epmLive.log(err);
-                res = "true";
-            }
-        });
-	    return res;
     },
 
     onExportExcelClose: function (result,args){		

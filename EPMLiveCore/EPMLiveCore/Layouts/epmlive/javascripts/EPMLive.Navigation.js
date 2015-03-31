@@ -1009,10 +1009,10 @@
                                 SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', { url: redirectUrl, width: 700, height: 500 });
                             return true;
                         case '6':
-                            var canLaunchResPlanner = 'true';
+                            var isResImportRunning = false;
                             var isSecRunning = false;
                             if (command == 'epkcommand:rpeditor') {
-                                canLaunchResPlanner = canLaunchResourcePlanner(window.epmLive);
+                                isResImportRunning = window.epmLiveNavigation.isImportResourceRunning(); //canLaunchResourcePlanner(window.epmLive);
                             }
                             else if (command == 'buildteam') {
                                 isSecRunning = window.epmLiveNavigation.isSecurityJobRunning(window.epmLive.currentWebUrl, listId, itemId);
@@ -1022,7 +1022,7 @@
                                 isSecRunning = window.epmLiveNavigation.isSecurityJobRunning(window.epmLive.currentWebUrl, idInfo[1], idInfo[2]);
                             }
 
-                            if (canLaunchResPlanner == 'true' && !isSecRunning) {
+                            if (!isResImportRunning && !isSecRunning) {
                                 if (callBackFunction != '')
                                     SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', { url: redirectUrl, showMaximized: true,  dialogReturnValueCallback: eval(callBackFunction) });
                                 else
@@ -1030,7 +1030,7 @@
                                 return true;
                             }
                             else {
-                                if (canLaunchResPlanner == 'false') {
+                                if (isResImportRunning) {
                                     alert('The Resource Planner cannot be opened because there is an active resource import job running.');
                                 }
                                 else if (isSecRunning) {
@@ -1801,39 +1801,7 @@
                     $('#epm-nav-top').find("[data-role='top-nav-node']").each(function () {
                         tlNodes.push(new navNode(this));
                     });
-                }
-
-                function canLaunchResourcePlanner($$) {
-                    var res = "";
-                    
-                    $.ajax({
-                        type: 'POST',
-                        url: $$.currentWebUrl + '/_vti_bin/WorkEngine.asmx/Execute',
-                        async: false,
-                        data: "{ Function: 'IsImportResourceAlreadyRunning', Dataxml: '' }",
-                        contentType: 'application/json; charset=utf-8',
-                        dataType: 'json',
-                        success: function (response) {
-                            if (response.d) {
-                                var responseJson = $$.parseJson(response.d);
-                                var result = responseJson.Result;
-                                if ($$.responseIsSuccess(result)) {                                
-                                    if (result.ResourceImporter['@Success'] === 'True') {
-                                        res = "false";
-                                    }
-                                    else{
-                                        res = "true";
-                                    }
-                                }
-                            }
-                        },
-                        error: function (err) {
-                            $$.log(err);
-                            res = "true";
-                        }
-                    });
-                    return res;
-                }
+                }                
 
                 window.epmLiveNavigation.removeLink = function (link) {
                     var $a = $sn.find('#epm-nav-link-' + link.id);
@@ -2474,6 +2442,37 @@
 
             };
 
+            window.epmLiveNavigation.isImportResourceRunning = function isImportResourceRunning() {
+                var IsRunning = false;
+
+                $.ajax({
+                    type: 'POST',
+                    url: window.epmLive.currentWebUrl + '/_vti_bin/WorkEngine.asmx/Execute',
+                    async: false,
+                    data: "{ Function: 'IsImportResourceAlreadyRunning', Dataxml: '' }",
+                    contentType: 'application/json; charset=utf-8',
+                    dataType: 'json',
+                    success: function (response) {
+                        if (response.d) {
+                            var responseJson = window.epmLive.parseJson(response.d);
+                            var result = responseJson.Result;
+                            if (window.epmLive.responseIsSuccess(result)) {
+                                if (result.ResourceImporter['@Success'] === 'True') {
+                                    IsRunning = true;
+                                }
+                                else {
+                                    IsRunning = false;
+                                }
+                            }
+                        }
+                    },
+                    error: function (err) {
+                        window.epmLive.log(err);
+                        IsRunning = false;
+                    }
+                });
+                return IsRunning;
+            }
 
             var manageSettings = function () {
                 var settingsManager = (function () {

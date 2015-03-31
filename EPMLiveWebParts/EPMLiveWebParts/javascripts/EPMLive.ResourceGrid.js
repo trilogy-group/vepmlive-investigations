@@ -1338,9 +1338,8 @@ function registerEpmLiveResourceGridScript() {
 
             analyzeResources: function () {
 
-                var canLaunch = $$.actions.canLaunchResourcePlannerOrAnalyzer();
-
-                if (canLaunch == 'true') {
+                var isResImportRunning = window.epmLiveNavigation.isImportResourceRunning();
+                if (!isResImportRunning) {
                     var dataTicketRequest = $$.actions.dataTicketRequest();
 
                     if (dataTicketRequest) {
@@ -1428,9 +1427,8 @@ function registerEpmLiveResourceGridScript() {
 
             loadResourcePlanner: function () {                    
 
-                var canLaunch = $$.actions.canLaunchResourcePlannerOrAnalyzer();
-                
-                if (canLaunch == 'true') {
+                var isResImportRunning = window.epmLiveNavigation.isImportResourceRunning();
+                if (!isResImportRunning) {
                     var dataTicketRequest = $$.actions.dataTicketRequest();
 
                     if (dataTicketRequest) {
@@ -1466,38 +1464,7 @@ function registerEpmLiveResourceGridScript() {
                     $$.actions.displayPopUp(url, 'Assignment Planner', true, true, null, null, 1000, 700);
                 }
             },
-
-            canLaunchResourcePlannerOrAnalyzer: function () {
-                var res = "";
-
-                $.ajax({
-                    type: 'POST',
-                    url: $$$.currentWebUrl + '/_vti_bin/WorkEngine.asmx/Execute',
-                    async: false,
-                    data: "{ Function: 'IsImportResourceAlreadyRunning', Dataxml: '' }",
-                    contentType: 'application/json; charset=utf-8',
-                    dataType: 'json',
-                    success: function (response) {
-                        if (response.d) {
-                            var responseJson = $$$.parseJson(response.d);
-                            var result = responseJson.Result;
-                            if ($$$.responseIsSuccess(result)) {                                
-                                if (result.ResourceImporter['@Success'] === 'True') {
-                                    res = "false";
-                                }
-                                else{
-                                    res = "true";
-                                }
-                            }
-                        }
-                    },
-                    error: function (err) {
-                        $$$.log(err);
-                        res = "true";
-                    }
-                });
-                return res;
-            },
+            
 
             deleteResource: function () {
                 var grid = $$.grid.g();

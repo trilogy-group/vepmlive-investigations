@@ -3197,9 +3197,8 @@
                         if (resrows == null || resrows.length == 0)
                             alert("One or more candidate rows must be selected");
                     } else {
-                        var canLaunch = canLaunchResourceAnalyzer();
-                        
-                        if (canLaunch == 'true') {
+                        var isResImportRunning = window.epmLiveNavigation.isImportResourceRunning();
+                        if (!isResImportRunning) {
                             var resuids = this.GetSelectedCandidateUids(this.resgrid);
                             var sb = new StringBuilder();
                             sb.append('<Execute Function="CreateTicket" Context="ResourceAnalyzer">');
@@ -6172,37 +6171,3 @@ function HideUnusedGroupRows(grid, row, level) {
     }
     return childrenvisible;
 };
-
-function canLaunchResourceAnalyzer() {
-    var res = "";
-    
-    $.ajax({
-        type: 'POST',
-        url: window.epmLive.currentWebUrl + '/_vti_bin/WorkEngine.asmx/Execute',
-        async: false,
-        data: "{ Function: 'IsImportResourceAlreadyRunning', Dataxml: '' }",
-        contentType: 'application/json; charset=utf-8',
-        dataType: 'json',
-        success: function (response) {
-            if (response.d) {
-                var responseJson = window.epmLive.parseJson(response.d);
-                var result = responseJson.Result;
-                if (window.epmLive.responseIsSuccess(result)) {
-                    if (result.ResourceImporter['@Success'] === 'True') {
-                        res = "false";
-                    }
-                    else {
-                        res = "true";
-                    }
-                }
-            }
-        },
-        error: function (err) {
-            window.epmLive.log(err);
-            res = "true";
-        }
-    });
-    return res;
-}
-
-

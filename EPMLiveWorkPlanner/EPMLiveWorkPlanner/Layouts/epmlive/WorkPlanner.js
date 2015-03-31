@@ -4490,8 +4490,8 @@ function EditCosts() {
 
 function EditResourcePlan() {
 
-    var canLaunch = canLaunchResourcePlannerOrAnalyzer();
-    if (canLaunch == 'true') {
+    var isResImportRunning = window.epmLiveNavigation.isImportResourceRunning();
+    if (!isResImportRunning) {
         if (EPKResPlan == 1) {
 
             ShowTDialog("Loading...");
@@ -4526,37 +4526,6 @@ function EditResourcePlanResponse(ret) {
     SP.UI.ModalDialog.showModalDialog(options);
 }
 
-function canLaunchResourcePlannerOrAnalyzer() {
-    var res = "";
-    
-    $.ajax({
-        type: 'POST',
-        url: sWebUrl + '/_vti_bin/WorkEngine.asmx/Execute',
-        async: false,
-        data: "{ Function: 'IsImportResourceAlreadyRunning', Dataxml: '' }",
-        contentType: 'application/json; charset=utf-8',
-        dataType: 'json',
-        success: function (response) {
-            if (response.d) {                    
-                var responseJson = window.epmLive.parseJson(response.d);
-                var result = responseJson.Result;
-                if (window.epmLive.responseIsSuccess(result)) {  
-                    if (result.ResourceImporter['@Success'] === 'True') {
-                        res = "false";
-                    }
-                    else{
-                        res = "true";
-                    }
-                }
-            }
-        },
-        error: function(err){
-            window.epmLive.log(err);
-            res = "true";
-        }
-    });
-    return res;
-}
 
 function LinkExternalTask() {
 
