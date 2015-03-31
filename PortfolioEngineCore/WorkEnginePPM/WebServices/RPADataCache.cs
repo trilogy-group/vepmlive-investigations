@@ -1445,6 +1445,7 @@ namespace RPADataCache
                             clsRD.CostCat = clsra.CostCat;
                             clsRD.CostCatRole = clsra.CostCatRole;
                             clsRD.Resotherdata = clsra.CustomFields;
+                            clsRD.ProjectName = ResolvePIName(clsnwv.UID + Max_PI);
 
                             clsRD.SetUpPeriods(m_cResVals.Periods.Count);
 
