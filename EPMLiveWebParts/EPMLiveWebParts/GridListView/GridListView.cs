@@ -2566,7 +2566,7 @@ namespace EPMLiveWebParts
             foreach (SPField field in list.Fields)
             {
 
-                if (!field.Hidden)
+                if (!field.Hidden && field.Reorderable)
                 {
                     //EPML-4625: LinkTitleNoMenu/LinkTitle columns bind to Title field and the column name always remain the same
                     //make sure to always display Title fields irrespective of display rules
