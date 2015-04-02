@@ -873,3 +873,50 @@ BEGIN
 END
 
 ')
+
+if not exists (select routine_name from INFORMATION_SCHEMA.routines where routine_name = 'spGetSnapshotManagementDetails')
+begin
+    Print 'Creating Stored Procedure spGetSnapshotManagementDetails'
+    SET @createoralter = 'CREATE'
+end
+else
+begin
+    Print 'Updating Stored Procedure spGetSnapshotManagementDetails'
+    SET @createoralter = 'ALTER'
+end
+exec(@createoralter + ' PROCEDURE [dbo].[spGetSnapshotManagementDetails] 
+AS
+BEGIN
+
+CREATE TABLE #RPTPeriods
+(
+[Active] nvarchar(256),
+[Report Title] nvarchar(512),
+[Reporting Period] nvarchar(512),
+[Snapshot Date] nvarchar(512),
+[Lists] nvarchar(max),
+PeriodID nvarchar(512),
+siteid nvarchar(512)
+)
+DECLARE @Active nvarchar(256),@ReportTitle nvarchar(512),@ReportingPeriod nvarchar(512),@SnapshotDate nvarchar(512),@PeriodID nvarchar(512),@siteid nvarchar(512)
+DECLARE @Lists varchar(max)
+DECLARE curSnapshotData CURSOR FOR SELECT Enabled AS [Active], Title AS [ReportTitle], PeriodDate AS [ReportingPeriod], DateArchived AS [SnapshotDate], 
+'''''''' + REPLACE(ListNames,'', '','''''','''''')+'''''''' AS [Lists],periodid,siteid 
+FROM RPTPeriods
+OPEN curSnapshotData
+FETCH NEXT FROM curSnapshotData INTO @Active,@ReportTitle,@ReportingPeriod,@SnapshotDate,@Lists,@PeriodID,@siteid
+WHILE   @@FETCH_STATUS = 0   
+BEGIN
+DECLARE @sql nvarchar(max)
+DECLARE @AllListName nvarchar(max)
+SET @sql = ''select @AllListName = STUFF((select '''', '''' + ListName FROM RPTList WHERE CONVERT(VARCHAR(max), RPTListId) IN (''+ @Lists +'') FOR XML PATH('''''''')), 1, 1, '''''''')''
+EXECUTE sp_executesql @sql, N''@Lists nvarchar(max),@AllListName nvarchar(max) OUTPUT'', @Lists = @Lists, @AllListName = @AllListName OUTPUT
+INSERT INTO #RPTPeriods
+SELECT @Active,@ReportTitle,@ReportingPeriod,@SnapshotDate,@AllListName,@PeriodID,@siteid
+FETCH NEXT FROM curSnapshotData INTO @Active,@ReportTitle,@ReportingPeriod,@SnapshotDate,@Lists,@PeriodID,@siteid
+END
+CLOSE curSnapshotData
+DEALLOCATE curSnapshotData
+SELECT * FROM #RPTPeriods
+
+END')

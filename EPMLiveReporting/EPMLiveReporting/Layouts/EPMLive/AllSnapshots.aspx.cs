@@ -40,57 +40,34 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
 
         protected void LoadSnapshots()
         {
-            DataTable manipulateDt = new DataTable();
-
-            _DAO.Command = "SELECT Enabled as [Active], Title as [Report Title], PeriodDate as [Reporting Period], DateArchived as [Snapshot Date], ListNames as [Lists],periodid,siteid FROM RPTPeriods";
-
-            DataTable dt = _DAO.GetTable(_DAO.GetClientReportingConnection);
-            SPBoundField gridColumn;
-
-            if (!IsPostBack)
+            try
             {
-                foreach (DataColumn column in dt.Columns)
+                DataTable manipulateDt = new DataTable();
+                _DAO.Command = "spGetSnapshotManagementDetails";
+                _DAO.CommandType = CommandType.StoredProcedure;
+                DataTable dt = _DAO.GetTable(_DAO.GetClientReportingConnection);
+                SPBoundField gridColumn;
+
+                if (!IsPostBack)
                 {
-                    gridColumn = new SPBoundField();
-                    gridColumn.HeaderText = column.ColumnName;
-                    gridColumn.DataField = column.ColumnName;
-
-                    if (column.ColumnName.ToLower().EndsWith("id"))
+                    foreach (DataColumn column in dt.Columns)
                     {
-                        gridColumn.Visible = false;
-                    }
-                    grdVwSnapshots.Columns.Add(gridColumn);
-                }
+                        gridColumn = new SPBoundField();
+                        gridColumn.HeaderText = column.ColumnName;
+                        gridColumn.DataField = column.ColumnName;
 
-                //EPML-4538 : List Names in Snapshot Management Page showing as Unique ID's
-                //Manipulate data table to process List Guids and display list name on Snapshot Management page.
-                if (dt != null && dt.Rows.Count > 0)
-                {
-                    for (int i = 0; i < dt.Rows.Count; i++)
-                    {
-                        StringBuilder listNames = new StringBuilder();
-                        string listIds = Convert.ToString(dt.Rows[i]["Lists"]);
-                        if (!string.IsNullOrEmpty(listIds) && listIds.Contains(","))
-                            listIds = listIds.Replace(", ", "','").Trim();
-
-                        _DAO.Command = "SELECT DISTINCT ListName FROM RPTList WHERE RPTListId in('" + listIds + "')";
-                        manipulateDt = _DAO.GetTable(_DAO.GetClientReportingConnection);
-
-                        if (manipulateDt != null && manipulateDt.Rows.Count > 0)
+                        if (column.ColumnName.ToLower().EndsWith("id"))
                         {
-                            for (int id = 0; id < manipulateDt.Rows.Count; id++)
-                            {
-                                listNames.Append(Convert.ToString(manipulateDt.Rows[id][0]) + ", ");
-                            }
-                            if (listNames.Length > 0)
-                                dt.Rows[i]["Lists"] = listNames.ToString().Substring(0, listNames.Length - 2).Trim();
+                            gridColumn.Visible = false;
                         }
+                        grdVwSnapshots.Columns.Add(gridColumn);
                     }
-                }
 
-                grdVwSnapshots.DataSource = dt;
-                grdVwSnapshots.DataBind();
+                    grdVwSnapshots.DataSource = dt;
+                    grdVwSnapshots.DataBind();
+                }
             }
+            catch { }
         }
 
         protected void LoadSchedules(bool blnLoadColums)
