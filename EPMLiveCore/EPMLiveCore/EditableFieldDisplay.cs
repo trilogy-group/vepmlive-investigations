@@ -89,8 +89,9 @@ namespace EPMLiveCore
         {
             try
             {
+                Dictionary<string, string> fieldValue;               
                 string displaySettings = string.Empty;
-                if (fieldProperties[field.InternalName].ContainsKey(key))
+                if (fieldProperties.TryGetValue(Convert.ToString(field.InternalName), out fieldValue) == true)
                 {
                     displaySettings = fieldProperties[field.InternalName][key];
 
