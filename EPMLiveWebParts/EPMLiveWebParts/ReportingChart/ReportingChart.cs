@@ -1932,6 +1932,7 @@ namespace EPMLiveWebParts.ReportingChart
 
                 Color[] paletteColors = GetColors(PropChartSelectedPaletteName);
                 int colorIndex = 0;
+                Color Legendcolor = Color.AliceBlue;
                 for (int i = 0; i < sArea.Items.Count; i++)
                 {
                     if (colorIndex >= paletteColors.Length)
@@ -1939,13 +1940,16 @@ namespace EPMLiveWebParts.ReportingChart
                         // Assigns random color if chart items are more than number of colors in palette 
                         KnownColor randomColorName = names[rColor.Next(names.Length)];
                         sArea.Items[i].BackgroundColor = Color.FromKnownColor(randomColorName);
+                        Legendcolor = Color.FromKnownColor(randomColorName);
                     }
                     else
                     {
                         sArea.Items[i].BackgroundColor = paletteColors[colorIndex];
+                        Legendcolor = paletteColors[colorIndex];
                         colorIndex++;
                     }
                 }
+                sArea.Appearance.FillStyle.BackgroundColor = Legendcolor;
             }
             catch { }
         }
@@ -1963,6 +1967,7 @@ namespace EPMLiveWebParts.ReportingChart
 
                 Color[] paletteColors = GetColors(PropChartSelectedPaletteName);
                 int colorIndex = 0;
+                Color Legendcolor = Color.AliceBlue;
                 for (int i = 0; i < sBar.Items.Count; i++)
                 {
                     if (colorIndex >= paletteColors.Length)
@@ -1970,13 +1975,16 @@ namespace EPMLiveWebParts.ReportingChart
                         // Assigns random color if chart items are more than number of colors in palette 
                         KnownColor randomColorName = names[rColor.Next(names.Length)];
                         sBar.Items[i].BackgroundColor = Color.FromKnownColor(randomColorName);
+                        Legendcolor = Color.FromKnownColor(randomColorName);
                     }
                     else
                     {
                         sBar.Items[i].BackgroundColor = paletteColors[colorIndex];
+                        Legendcolor = paletteColors[colorIndex];
                         colorIndex++;
                     }
                 }
+                sBar.Appearance.FillStyle.BackgroundColor = Legendcolor;
             }
             catch { }
         }
@@ -1994,6 +2002,7 @@ namespace EPMLiveWebParts.ReportingChart
 
                 Color[] paletteColors = GetColors(PropChartSelectedPaletteName);
                 int colorIndex = 0;
+                Color Legendcolor = Color.AliceBlue;
                 for (int i = 0; i < sColumn.Items.Count; i++)
                 {
                     if (colorIndex >= paletteColors.Length)
@@ -2001,13 +2010,16 @@ namespace EPMLiveWebParts.ReportingChart
                         // Assigns random color if chart items are more than number of colors in palette 
                         KnownColor randomColorName = names[rColor.Next(names.Length)];
                         sColumn.Items[i].BackgroundColor = Color.FromKnownColor(randomColorName);
+                        Legendcolor = Color.FromKnownColor(randomColorName);
                     }
                     else
                     {
                         sColumn.Items[i].BackgroundColor = paletteColors[colorIndex];
+                        Legendcolor = paletteColors[colorIndex];
                         colorIndex++;
                     }
                 }
+                sColumn.Appearance.FillStyle.BackgroundColor = Legendcolor;
             }
             catch { }
         }
@@ -2025,6 +2037,7 @@ namespace EPMLiveWebParts.ReportingChart
 
                 Color[] paletteColors = GetColors(PropChartSelectedPaletteName);
                 int colorIndex = 0;
+                Color Legendcolor = Color.AliceBlue;
                 for (int i = 0; i < sLine.Items.Count; i++)
                 {
                     if (colorIndex >= paletteColors.Length)
@@ -2032,13 +2045,16 @@ namespace EPMLiveWebParts.ReportingChart
                         // Assigns random color if chart items are more than number of colors in palette 
                         KnownColor randomColorName = names[rColor.Next(names.Length)];
                         sLine.Items[i].BackgroundColor = Color.FromKnownColor(randomColorName);
+                        Legendcolor = Color.FromKnownColor(randomColorName);
                     }
                     else
                     {
                         sLine.Items[i].BackgroundColor = paletteColors[colorIndex];
+                        Legendcolor = paletteColors[colorIndex];
                         colorIndex++;
                     }
                 }
+                sLine.Appearance.FillStyle.BackgroundColor = Legendcolor;
             }
             catch { }
         }
@@ -2087,6 +2103,7 @@ namespace EPMLiveWebParts.ReportingChart
 
                 Color[] paletteColors = GetColors(PropChartSelectedPaletteName);
                 int colorIndex = 0;
+                Color Legendcolor = Color.AliceBlue;
                 for (int i = 0; i < sScatter.Items.Count; i++)
                 {
                     if (colorIndex >= paletteColors.Length)
@@ -2094,13 +2111,16 @@ namespace EPMLiveWebParts.ReportingChart
                         // Assigns random color if chart items are more than number of colors in palette 
                         KnownColor randomColorName = names[rColor.Next(names.Length)];
                         sScatter.Items[i].BackgroundColor = Color.FromKnownColor(randomColorName);
+                        Legendcolor = Color.FromKnownColor(randomColorName);
                     }
                     else
                     {
                         sScatter.Items[i].BackgroundColor = paletteColors[colorIndex];
+                        Legendcolor = paletteColors[colorIndex];
                         colorIndex++;
                     }
                 }
+                sScatter.Appearance.FillStyle.BackgroundColor = Legendcolor;
             }
             catch { }
         }
