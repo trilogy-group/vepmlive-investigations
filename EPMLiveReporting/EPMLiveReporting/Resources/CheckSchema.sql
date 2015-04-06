@@ -4,7 +4,7 @@ BEGIN
 	PRINT 'Creating Table ReportListIds'
 	CREATE TABLE [dbo].[ReportListIds] ( Id uniqueidentifier )
 END
-
+ 
 IF NOT EXISTS (SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'ReportListIds' AND COLUMN_NAME = 'ListIcon')
 BEGIN
 	PRINT 'Add Column ListIcon'
