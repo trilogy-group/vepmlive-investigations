@@ -66,7 +66,7 @@ namespace EPMLiveWebParts.CONTROLTEMPLATES
 
             SetTimeZone(web, context);
 
-            CurrentUserDisplayName = Convert.ToString(web.CurrentUser.Name).Replace("'","");
+            CurrentUserDisplayName = EPMLiveCore.CoreFunctions.GetSafeUserTitle(Convert.ToString(web.CurrentUser.Name));
 
             try
             {

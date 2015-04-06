@@ -672,6 +672,20 @@ namespace EPMLiveCore
             return safeGroupTitle;
         }
 
+        /// <summary>
+        /// remove apostophe from user's name
+        /// </summary>
+        /// <param name="sUsrName">username</param>
+        /// <returns>removed apostrophe from username</returns>
+        public static string GetSafeUserTitle(string sUsrName)
+        {
+            string safeUserTitle = string.Empty;
+            safeUserTitle = sUsrName.Replace("'", "");
+
+            return safeUserTitle;
+        }
+
+
         public static string getMainDomain()
         {
             string s = "epm";

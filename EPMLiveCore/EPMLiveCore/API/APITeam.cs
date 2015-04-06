@@ -2147,7 +2147,7 @@ namespace EPMLiveCore.API
                     try
                     {
                         filterfield = doc.FirstChild.Attributes["FilterField"].Value;
-                        filterval = doc.FirstChild.Attributes["FilterFieldValue"].Value;
+                        filterval = CoreFunctions.GetSafeUserTitle(Convert.ToString(doc.FirstChild.Attributes["FilterFieldValue"].Value));
                     }
                     catch { }
                 }
