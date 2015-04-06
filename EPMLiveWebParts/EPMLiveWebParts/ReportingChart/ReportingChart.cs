@@ -2072,6 +2072,7 @@ namespace EPMLiveWebParts.ReportingChart
 
                 Color[] paletteColors = GetColors(PropChartSelectedPaletteName);
                 int colorIndex = 0;
+                Color Legendcolor = Color.AliceBlue;
                 for (int i = 0; i < sPie.Items.Count; i++)
                 {
                     if (colorIndex >= paletteColors.Length)
@@ -2079,13 +2080,16 @@ namespace EPMLiveWebParts.ReportingChart
                         // Assigns random color if chart items are more than number of colors in palette 
                         KnownColor randomColorName = names[rColor.Next(names.Length)];
                         sPie.Items[i].BackgroundColor = Color.FromKnownColor(randomColorName);
+                        Legendcolor = Color.FromKnownColor(randomColorName);
                     }
                     else
                     {
                         sPie.Items[i].BackgroundColor = paletteColors[colorIndex];
+                        Legendcolor = paletteColors[colorIndex];
                         colorIndex++;
                     }
                 }
+                sPie.Appearance.FillStyle.BackgroundColor = Legendcolor;
             }
             catch { }
         }
@@ -2138,6 +2142,7 @@ namespace EPMLiveWebParts.ReportingChart
 
                 Color[] paletteColors = GetColors(PropChartSelectedPaletteName);
                 int colorIndex = 0;
+                Color Legendcolor = Color.AliceBlue;
                 for (int i = 0; i < sScatterLine.Items.Count; i++)
                 {
                     if (colorIndex >= paletteColors.Length)
@@ -2145,13 +2150,16 @@ namespace EPMLiveWebParts.ReportingChart
                         // Assigns random color if chart items are more than number of colors in palette 
                         KnownColor randomColorName = names[rColor.Next(names.Length)];
                         sScatterLine.Items[i].BackgroundColor = Color.FromKnownColor(randomColorName);
+                        Legendcolor = Color.FromKnownColor(randomColorName);
                     }
                     else
                     {
                         sScatterLine.Items[i].BackgroundColor = paletteColors[colorIndex];
+                        Legendcolor = paletteColors[colorIndex];
                         colorIndex++;
                     }
                 }
+                sScatterLine.Appearance.FillStyle.BackgroundColor = Legendcolor;
             }
             catch { }
         }
@@ -2169,6 +2177,7 @@ namespace EPMLiveWebParts.ReportingChart
 
                 Color[] paletteColors = GetColors(PropChartSelectedPaletteName);
                 int colorIndex = 0;
+                Color Legendcolor = Color.AliceBlue;
                 for (int i = 0; i < sBubble.Items.Count; i++)
                 {
                     if (colorIndex >= paletteColors.Length)
@@ -2176,13 +2185,16 @@ namespace EPMLiveWebParts.ReportingChart
                         // Assigns random color if chart items are more than number of colors in palette 
                         KnownColor randomColorName = names[rColor.Next(names.Length)];
                         sBubble.Items[i].BackgroundColor = Color.FromKnownColor(randomColorName);
+                        Legendcolor = Color.FromKnownColor(randomColorName);
                     }
                     else
                     {
                         sBubble.Items[i].BackgroundColor = paletteColors[colorIndex];
+                        Legendcolor = paletteColors[colorIndex];
                         colorIndex++;
                     }
                 }
+                sBubble.Appearance.FillStyle.BackgroundColor = Legendcolor;
             }
             catch { }
         }
@@ -2200,6 +2212,7 @@ namespace EPMLiveWebParts.ReportingChart
 
                 Color[] paletteColors = GetColors(PropChartSelectedPaletteName);
                 int colorIndex = 0;
+                Color Legendcolor = Color.AliceBlue;
                 for (int i = 0; i < sDonut.Items.Count; i++)
                 {
                     if (colorIndex >= paletteColors.Length)
@@ -2207,13 +2220,16 @@ namespace EPMLiveWebParts.ReportingChart
                         // Assigns random color if chart items are more than number of colors in palette 
                         KnownColor randomColorName = names[rColor.Next(names.Length)];
                         sDonut.Items[i].BackgroundColor = Color.FromKnownColor(randomColorName);
+                        Legendcolor = Color.FromKnownColor(randomColorName);
                     }
                     else
                     {
                         sDonut.Items[i].BackgroundColor = paletteColors[colorIndex];
+                        Legendcolor = paletteColors[colorIndex];
                         colorIndex++;
                     }
                 }
+                sDonut.Appearance.FillStyle.BackgroundColor = Legendcolor;
             }
             catch { }
         }
