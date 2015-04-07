@@ -610,7 +610,12 @@ namespace EPMLiveEnterprise
 
                 CustomFields.Url = pwaSiteUrl + "/_vti_bin/psi/CustomFields.asmx";
                 CustomFields.UseDefaultCredentials = true;
-                WebSvcCustomFields.CustomFieldDataSet customFieldDs = CustomFields.ReadCustomFieldsByEntity(new Guid(PSLibrary.EntityCollection.Entities.TaskEntity.UniqueId));
+
+                WebSvcCustomFields.CustomFieldDataSet customFieldDs = new WebSvcCustomFields.CustomFieldDataSet();
+                SPSecurity.RunWithElevatedPrivileges(delegate()
+                {
+                    customFieldDs = CustomFields.ReadCustomFieldsByEntity(new Guid(PSLibrary.EntityCollection.Entities.TaskEntity.UniqueId));
+                });
 
                 EPMLiveCore.GridGanttSettings gSettings = new EPMLiveCore.GridGanttSettings(list);
 
@@ -1134,7 +1139,6 @@ namespace EPMLiveEnterprise
                 Statusing.Url = pwaSiteUrl + "/_vti_bin/psi/Statusing.asmx";
                 Statusing.UseDefaultCredentials = true;
                 Statusing.SubmitStatus(null, statusMsg);
-
 
                 return true;
             }
