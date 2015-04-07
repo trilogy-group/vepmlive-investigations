@@ -22,30 +22,33 @@ namespace EPMLiveEnterprise
         public ResourceSyncher(Guid siteId)
         {
             siteGuid = siteId;
-            using (SPSite site = new SPSite(siteGuid))
+            SPSecurity.RunWithElevatedPrivileges(delegate()
             {
-                pCf = new WebSvcCustomFields.CustomFields();
-                pCf.Url = site.Url + "/_vti_bin/psi/customfields.asmx";
-                pCf.UseDefaultCredentials = true;
-                cfDs = new WebSvcCustomFields.CustomFieldDataSet();
-                cfDs = pCf.ReadCustomFieldsByEntity(resEntity);
-
-                psiLookupTable = new WebSvcLookupTables.LookupTable();
-                psiLookupTable.Url = site.Url + "/_vti_bin/psi/lookuptable.asmx";
-                psiLookupTable.UseDefaultCredentials = true;
-
-                pResource = new WebSvcResource.Resource();
-                pResource.Url = site.Url + "/_vti_bin/psi/resource.asmx";
-                pResource.UseDefaultCredentials = true;
-
-                SPSecurity.RunWithElevatedPrivileges(delegate()
+                using (SPSite site = new SPSite(siteGuid))
                 {
+                    pCf = new WebSvcCustomFields.CustomFields();
+                    pCf.Url = site.Url + "/_vti_bin/psi/customfields.asmx";
+                    pCf.UseDefaultCredentials = true;
+                    cfDs = new WebSvcCustomFields.CustomFieldDataSet();
+                    cfDs = pCf.ReadCustomFieldsByEntity(resEntity);
+
+                    psiLookupTable = new WebSvcLookupTables.LookupTable();
+                    psiLookupTable.Url = site.Url + "/_vti_bin/psi/lookuptable.asmx";
+                    psiLookupTable.UseDefaultCredentials = true;
+
+                    pResource = new WebSvcResource.Resource();
+                    pResource.Url = site.Url + "/_vti_bin/psi/resource.asmx";
+                    pResource.UseDefaultCredentials = true;
+
+                    //SPSecurity.RunWithElevatedPrivileges(delegate()
+                    //{
 
                     cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(site.WebApplication.Id));
                     cn.Open();
 
-                });
-            }
+                    //});
+                }
+            });
         }
 
         public void end()
@@ -396,68 +399,70 @@ namespace EPMLiveEnterprise
 
         public void synchAllResources()
         {
-            WebSvcResource.ResourceDataSet ds = pResource.ReadUserList(EPMLiveEnterprise.WebSvcResource.ResourceActiveFilter.All);
-
-            using (SPSite site = new SPSite(siteGuid))
+            SPSecurity.RunWithElevatedPrivileges(delegate()
             {
-                using (SPWeb web = site.RootWeb)
+                WebSvcResource.ResourceDataSet ds = pResource.ReadUserList(EPMLiveEnterprise.WebSvcResource.ResourceActiveFilter.All);
+                using (SPSite site = new SPSite(siteGuid))
                 {
-                    string resUrl = EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLiveResourceURL", true, false);
-                    if (resUrl != "")
+                    using (SPWeb web = site.RootWeb)
                     {
-                        using (SPSite tempSite = new SPSite(resUrl))
+                        string resUrl = EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLiveResourceURL", true, false);
+                        if (resUrl != "")
                         {
-                            using (SPWeb resWeb = tempSite.OpenWeb())
+                            using (SPSite tempSite = new SPSite(resUrl))
                             {
-                                resWeb.AllowUnsafeUpdates = true;
-                                foreach (WebSvcResource.ResourceDataSet.ResourcesRow row in ds.Resources)
+                                using (SPWeb resWeb = tempSite.OpenWeb())
                                 {
-                                    processResource(web, row.RES_UID, resWeb);
+                                    resWeb.AllowUnsafeUpdates = true;
+                                    foreach (WebSvcResource.ResourceDataSet.ResourcesRow row in ds.Resources)
+                                    {
+                                        processResource(web, row.RES_UID, resWeb);
+                                    }
                                 }
                             }
                         }
                     }
                 }
-            }
 
-            SqlCommand cmd = new SqlCommand("select config_value from econfig where config_name='ConnectedURLs'", cn);
+                SqlCommand cmd = new SqlCommand("select config_value from econfig where config_name='ConnectedURLs'", cn);
 
-            SqlDataReader dr = cmd.ExecuteReader();
+                SqlDataReader dr = cmd.ExecuteReader();
 
-            if (dr.Read())
-            {
-                string sSites = dr.GetString(0);
-                string[] strSites = sSites.Replace("\r\n", "\n").Split('\n');
-                foreach (string strSite in strSites)
+                if (dr.Read())
                 {
-                    try
+                    string sSites = dr.GetString(0);
+                    string[] strSites = sSites.Replace("\r\n", "\n").Split('\n');
+                    foreach (string strSite in strSites)
                     {
-                        using (SPSite site = new SPSite(strSite))
+                        try
                         {
-                            using (SPWeb web = site.OpenWeb())
+                            using (SPSite site = new SPSite(strSite))
                             {
-                                string resUrl = EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLiveResourceURL", true, false);
-                                if (resUrl != "")
+                                using (SPWeb web = site.OpenWeb())
                                 {
-                                    using (SPSite tempSite = new SPSite(resUrl))
+                                    string resUrl = EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLiveResourceURL", true, false);
+                                    if (resUrl != "")
                                     {
-                                        using (SPWeb resWeb = tempSite.OpenWeb())
+                                        using (SPSite tempSite = new SPSite(resUrl))
                                         {
-                                            resWeb.AllowUnsafeUpdates = true;
-                                            foreach (WebSvcResource.ResourceDataSet.ResourcesRow row in ds.Resources)
+                                            using (SPWeb resWeb = tempSite.OpenWeb())
                                             {
-                                                processResource(web, row.RES_UID, resWeb);
+                                                resWeb.AllowUnsafeUpdates = true;
+                                                foreach (WebSvcResource.ResourceDataSet.ResourcesRow row in ds.Resources)
+                                                {
+                                                    processResource(web, row.RES_UID, resWeb);
+                                                }
                                             }
                                         }
                                     }
                                 }
                             }
                         }
+                        catch { }
                     }
-                    catch { }
                 }
-            }
-            dr.Close();
+                dr.Close();
+            });
 
         }
 

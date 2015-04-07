@@ -20,7 +20,9 @@ namespace EPMLiveEnterprise
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            if (!SPContext.Current.Web.Users[HttpContext.Current.User.Identity.Name].IsSiteAdmin)
+            //if (!SPContext.Current.Web.Users[HttpContext.Current.User.Identity.Name].IsSiteAdmin)
+            //if (!SPContext.Current.Web.Users[SPContext.Current.Web.CurrentUser.LoginName].IsSiteAdmin)
+            if(!SPContext.Current.Web.UserIsSiteAdmin)
                 Response.Redirect(SPContext.Current.Site.Url + "/_layouts/accessdenied.aspx");
             
             //Guid siteGuid = SPContext.Current.Site.ID;

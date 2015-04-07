@@ -390,8 +390,12 @@ namespace EPMLiveEnterprise
             
             try
             {
-                WebSvcProject.ProjectDataSet pDs = pService.ReadProject(projectGuid, WebSvcProject.DataStoreEnum.PublishedStore);
-                
+                WebSvcProject.ProjectDataSet pDs = null;
+
+                SPSecurity.RunWithElevatedPrivileges(delegate()
+                {
+                    pDs = pService.ReadProject(projectGuid, WebSvcProject.DataStoreEnum.PublishedStore);
+                });
 
                 int counter = 0;
                 StringBuilder sbBatch = new StringBuilder();

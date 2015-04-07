@@ -492,12 +492,13 @@ namespace EPMLiveEnterprise
                 WebSvcProject.Project pSvc = new EPMLiveEnterprise.WebSvcProject.Project();
                 pSvc.Url = web.Site.Url + "/_vti_bin/psi/project.asmx";
                 pSvc.UseDefaultCredentials = true;
-
-                WebSvcProject.ProjectDataSet pds = pSvc.ReadProject(projectGuid, WebSvcProject.DataStoreEnum.PublishedStore);
-                string projectname = pds.Project[0].PROJ_NAME;
+                WebSvcProject.ProjectDataSet pds = null;
 
                 SPSecurity.RunWithElevatedPrivileges(delegate()
                 {
+                    pds = pSvc.ReadProject(projectGuid, WebSvcProject.DataStoreEnum.PublishedStore);
+                    string projectname = pds.Project[0].PROJ_NAME;
+
                     SqlConnection cn = null;
                     try
                     {
