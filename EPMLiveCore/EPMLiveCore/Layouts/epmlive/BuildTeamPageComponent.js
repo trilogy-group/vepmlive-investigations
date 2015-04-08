@@ -92,17 +92,18 @@ BuildTeamPageComponent.PageComponent.prototype = {
             var rGrid = Grids.ResourceGrid;
 
             var sRows = rGrid.GetSelRows();
+            if (properties.LabelText == 'Resource Work vs. Capacity') {
+                for (var r in sRows) {
+                    var oSRow = sRows[r];
+                    sResources += "%26rp%3aResources%3d" + oSRow.SPID;
+                }
 
-            for (var r in sRows) {
-                var oSRow = sRows[r];
-                sResources += "%26rp%3aResources%3d" + oSRow.SPID;
-            }
+                sRows = tGrid.GetSelRows();
 
-            sRows = tGrid.GetSelRows();
-
-            for (var r in sRows) {
-                var oSRow = sRows[r];
-                sResources += "%26rp%3aResources%3d" + oSRow.SPID;
+                for (var r in sRows) {
+                    var oSRow = sRows[r];
+                    sResources += "%26rp%3aResources%3d" + oSRow.SPID;
+                }
             }
 
             //if (sResources != "") 
