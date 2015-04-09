@@ -246,6 +246,29 @@ function MyWorkOnRenderFinish(grid) {
     if (grid.id === window.allWorkGridId) {
 
         MyWorkGrid.resetNoDataRow();
+
+        var enumcols = [];
+        var enumvals = "";
+
+        for (var c in grid.Cols) {
+            if (grid.Cols[c].Type == "Enum") {
+                enumcols.push(c);
+            }
+        }
+
+        for (var i = 0; i < enumcols.length; i++) {
+            for (var r in grid.Rows) {
+                var row = grid.Rows[r];
+                if (row.Def.Kind === 'Data' && row.Def.Name === 'R') {
+                    var col = row[enumcols[i]];
+                    if (!enumvals.contains(col)) {
+                        enumvals += "|" + col;
+                    }
+                }
+            }            
+            grid.SetAttribute(grid.GetRowById("Filter"), null, enumcols[i] + 'Enum', enumvals, 1);
+            enumvals = "";
+        }        
     }
 };
 
@@ -2091,7 +2114,7 @@ var MyWorkGrid = {
         var grid = Grids[MyWorkGrid.gridId];
 
         MyWorkGrid.filtersOn = true;
-        grid.ShowRow(grid.GetRowById("Filter"));
+        grid.ShowRow(grid.GetRowById("Filter"));        
     },
 
     hideFilters: function () {
