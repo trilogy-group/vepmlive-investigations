@@ -164,7 +164,8 @@ namespace EPMLiveEnterprise
                 Hashtable delFields = new Hashtable();
                 Hashtable updFields = new Hashtable();
 
-                SqlCommand cmd = new SqlCommand("select wssfieldname,editable from customfields where visible = 1 and fieldcategory != 1", cn);
+                SqlCommand cmd = new SqlCommand("select wssfieldname,editable from customfields where visible = 1 and fieldcategory in (3,4)", cn);
+                //SqlCommand cmd = new SqlCommand("select wssfieldname,editable from customfields where visible = 1 and fieldcategory != 1", cn);
                 SqlDataReader dr = cmd.ExecuteReader();
                 while (dr.Read())
                 {
