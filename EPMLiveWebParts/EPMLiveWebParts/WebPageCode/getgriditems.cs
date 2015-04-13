@@ -426,6 +426,16 @@ namespace EPMLiveWebParts
                                     }
                                     catch { }
                                 }
+                                else if (arrColumns[i].ToString() == "Title")
+                                {
+                                    string[] strGroups = de.Key.ToString().Split('\n');
+                                    string strMaxGroup = "";
+                                    if (strGroups.Length == 1)
+                                        strMaxGroup = strGroups[0];
+                                    else
+                                        strMaxGroup = strGroups[strGroups.Length - 1];
+                                    cellValue = strMaxGroup;
+                                }
                                 ndCell.InnerXml = HttpUtility.HtmlEncode(cellValue);
                             }
 
