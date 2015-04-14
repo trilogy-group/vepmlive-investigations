@@ -440,6 +440,7 @@ net start "WETimer"</PostDeploymentCommand>
     <Compile Include="Jobs\Notifications.cs" />
     <Compile Include="Jobs\ResourceImportJob.cs" />
     <Compile Include="Jobs\ResourcePlan.cs" />
+    <Compile Include="Jobs\RollupJob.cs" />
     <Compile Include="Jobs\SecurityUpdate.cs" />
     <Compile Include="Jobs\TimerFix.cs" />
     <Compile Include="Jobs\Upgrades\Steps\IStep.cs" />
@@ -462,6 +463,7 @@ net start "WETimer"</PostDeploymentCommand>
     <Compile Include="Jobs\Upgrades\Steps\WE43UpgraderSteps\UpdateResourcePool.cs" />
     <Compile Include="Jobs\Upgrades\Steps\WE43UpgraderSteps\UpdateWebs.cs" />
     <Compile Include="Jobs\Upgrades\WE43UpgradeJob.cs" />
+    <Compile Include="Jobs\Wizard.cs" />
     <Compile Include="JSONUtil.cs" />
     <Compile Include="Layouts\epmlive\acttest.aspx.cs">
       <DependentUpon>acttest.aspx</DependentUpon>
