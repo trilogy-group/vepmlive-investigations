@@ -184,11 +184,11 @@ namespace EPMLiveCore
                 }
             }
 
-            if (method != "1" && method != "2" && newStatus != oldStatus)
+            if (method != "1" && method != "2" && newStatus != oldStatus && newPercent == oldPercent)
             {
                 newPercent = getPercentFromStatus(newStatus, oldPercent);
             }
-            else if (newPercent != oldPercent)
+            else if (newPercent != oldPercent && newStatus == oldStatus)
             {
                 newStatus = getStatusFromPercent(newPercent);
             }
