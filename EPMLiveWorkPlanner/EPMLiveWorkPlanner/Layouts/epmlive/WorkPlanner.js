@@ -4367,6 +4367,17 @@ function CheckProjectStart() {
 
     var grid = Grids.ProjectInfo;
 
+    if (grid.GetValue(grid.GetRowById("ProjectUpdate"), "V") == "Manual")
+    {
+        var date = grid.GetValue(grid.GetRowById("ProjectStart"), "V");
+
+        Grids.WorkPlannerGrid.SetGanttBase(date, 2, null);
+
+        Grids.ProjectInfo.SetValue(Grids.ProjectInfo.GetRowById("Start"), "V", date, 1, 0);
+
+        Grids.WorkPlannerGrid.Cols["G"].GanttBase = date;
+    }
+
     if (grid.GetValue(grid.GetRowById("Start"), "V") == "") {
         SetProjectStartDate(new Date().toDateString());
     }
