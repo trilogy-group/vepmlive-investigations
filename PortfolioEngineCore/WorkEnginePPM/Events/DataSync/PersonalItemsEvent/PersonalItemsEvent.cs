@@ -67,6 +67,19 @@ namespace WorkEnginePPM.Events.DataSync
             {
                 if (title == null) throw new Exception("Title cannot be empty.");
 
+                //-- EPML-3648
+                string sTitle = properties.AfterProperties["Title"].ToString().Trim();
+                SPQuery query = new SPQuery();
+                query.Query = "<Where><Eq><FieldRef Name='Title' /><Value Type='Text'>" + sTitle + "</Value></Eq></Where>";
+                SPListItemCollection items = properties.List.GetItems(query);
+                if (items.Count > 0)
+                {
+                    properties.Cancel = true;
+                    properties.ErrorMessage = "Non work with title '" + sTitle + "' already exists.";
+                    return;
+                }
+                // ---
+
                 List<PersonalItem> personalItems;
 
                 Guid uniqueId = Guid.NewGuid();
@@ -174,6 +187,25 @@ namespace WorkEnginePPM.Events.DataSync
 
                 extId = (string) (properties.AfterProperties["EXTID"] ?? properties.ListItem["EXTID"]);
                 if (string.IsNullOrEmpty(extId)) throw new Exception("External ID cannot be empty.");
+
+                ////-----
+                string sTitle = properties.AfterProperties["Title"].ToString().Trim();
+                SPQuery query = new SPQuery();
+                query.Query =
+                    "<Where>" +
+                    "<And>" +
+                        "<Eq><FieldRef Name='Title' /><Value Type='Text'>" + sTitle + "</Value></Eq>" +
+                        "<Neq><FieldRef Name='UniqueId' /><Value Type='Text'>" + properties.ListItem.UniqueId.ToString().ToUpper() + "</Value></Neq>" +
+                    "</And>" +
+                    "</Where>";
+                SPListItemCollection items = properties.List.GetItems(query);
+                if (items.Count > 0)
+                {
+                    properties.Cancel = true;
+                    properties.ErrorMessage = "Non work with title '" + sTitle + "' already exists.";
+                    return;
+                }
+                ////----
 
                 using (var personalItemManager = new PersonalItemManager(properties.Web))
                 {

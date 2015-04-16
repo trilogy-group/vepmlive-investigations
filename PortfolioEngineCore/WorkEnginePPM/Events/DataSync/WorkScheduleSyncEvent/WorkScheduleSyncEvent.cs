@@ -65,6 +65,19 @@ namespace WorkEnginePPM.Events.DataSync
         {
             if (!ValidateRequest(properties)) return;
 
+            //-- EPML-3648
+            string sTitle = properties.AfterProperties["Title"].ToString().Trim();
+            SPQuery query = new SPQuery();
+            query.Query = "<Where><Eq><FieldRef Name='Title' /><Value Type='Text'>" + sTitle + "</Value></Eq></Where>";
+            SPListItemCollection items = properties.List.GetItems(query);
+            if (items.Count > 0)
+            {
+                properties.Cancel = true;
+                properties.ErrorMessage = "Work hours with title '" + sTitle + "' already exists.";
+                return;
+            }
+            // ---
+
             if (!properties.List.Fields.ContainsFieldWithInternalName("EXTID")) return;
 
             try
@@ -198,6 +211,25 @@ namespace WorkEnginePPM.Events.DataSync
                     SPListItem spListItem = properties.ListItem;
 
                     Guid uniqueId = spListItem.UniqueId;
+
+                    // EPML-3648
+                    string sTitle = properties.AfterProperties["Title"].ToString().Trim();
+                    SPQuery query = new SPQuery();
+                    query.Query =
+                        "<Where>" +
+                        "<And>" +
+                            "<Eq><FieldRef Name='Title' /><Value Type='Text'>" + sTitle + "</Value></Eq>" +
+                            "<Neq><FieldRef Name='UniqueId' /><Value Type='Text'>" + uniqueId.ToString().ToUpper() + "</Value></Neq>" +
+                        "</And>" +
+                        "</Where>";
+                    SPListItemCollection items = properties.List.GetItems(query);
+                    if (items.Count > 0)
+                    {
+                        properties.Cancel = true;
+                        properties.ErrorMessage = "Work hours with title '" + sTitle + "' already exists.";
+                        return;
+                    }
+                    // ---
 
                     foreach (
                         WorkSchedule workSchedule in

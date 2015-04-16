@@ -58,6 +58,20 @@ namespace WorkEnginePPM.Events.DataSync
                 object title = properties.AfterProperties["Title"];
                 if (title == null) throw new Exception("Title cannot be empty.");
 
+                //-- EPML-3648
+                string sTitle = properties.AfterProperties["Title"].ToString().Trim();
+                string strQuery = "<Where><Eq><FieldRef Name='Title' /><Value Type='Text'>" + sTitle + "</Value></Eq></Where>";
+                SPQuery query = new SPQuery();
+                query.Query = strQuery;
+                SPListItemCollection items = properties.List.GetItems(query);
+                if (items.Count > 0)
+                {
+                    properties.Cancel = true;
+                    properties.ErrorMessage = "Role with title '" + sTitle + "' already exists.";
+                    return;
+                }
+                // ---
+
                 List<Role> roles;
                 Role role;
 
@@ -124,6 +138,25 @@ namespace WorkEnginePPM.Events.DataSync
 
                 List<Role> roles;
                 Role role;
+
+                //-- EPML-3648
+                string sTitle = properties.AfterProperties["Title"].ToString().Trim();
+                SPQuery query = new SPQuery();
+                query.Query =
+                    "<Where>" +
+                    "<And>" +
+                        "<Eq><FieldRef Name='Title' /><Value Type='Text'>" + sTitle + "</Value></Eq>" +
+                        "<Neq><FieldRef Name='UniqueId' /><Value Type='Text'>" + properties.ListItem.UniqueId.ToString().ToUpper() + "</Value></Neq>" +
+                    "</And>" +
+                    "</Where>";
+                SPListItemCollection items = properties.List.GetItems(query);
+                if (items.Count > 0)
+                {
+                    properties.Cancel = true;
+                    properties.ErrorMessage = "Role with title '" + sTitle + "' already exists.";
+                    return;
+                }
+                // ---
 
                 using (var roleManager = new RoleManager(properties.Web))
                 {

@@ -76,10 +76,23 @@ namespace WorkEnginePPM.Events.DataSync
                                         : spFieldLookupValueCollection;
                 Guid uniqueId = Guid.NewGuid();
 
+                //-- EPML-3648
+                string sTitle = properties.AfterProperties["Title"].ToString().Trim();
+                SPQuery query = new SPQuery();
+                query.Query = "<Where><Eq><FieldRef Name='Title' /><Value Type='Text'>" + sTitle + "</Value></Eq></Where>";
+                SPListItemCollection items = properties.List.GetItems(query);
+                if (items.Count > 0) {
+                    properties.Cancel = true;
+                    properties.ErrorMessage = "Department with title '" + sTitle + "' already exists.";
+                    return;
+                }
+                // ---
+                
                 using (var departmentManager = new DepartmentManager(spWeb))
                 {
-                    DataTable dataTable = departmentManager.GetDataTable(properties.List.Items);
 
+                    DataTable dataTable = departmentManager.GetDataTable(properties.List.Items);
+                 
                     DataRow dataRow = dataTable.NewRow();
 
                     dataRow["Title"] = title;
@@ -228,6 +241,24 @@ namespace WorkEnginePPM.Events.DataSync
                     SPListItem spListItem = properties.ListItem;
 
                     DataRow[] dataRows = dataTable.Select(string.Format("UniqueId = '{0}'", spListItem.UniqueId));
+
+                    ////-----
+                    string sTitle = properties.AfterProperties["Title"].ToString().Trim();
+                    SPQuery query = new SPQuery();
+                    query.Query =
+                        "<Where>" +
+                        "<And>" +
+                            "<Eq><FieldRef Name='Title' /><Value Type='Text'>" + sTitle + "</Value></Eq>" +
+                            "<Neq><FieldRef Name='UniqueId' /><Value Type='Text'>" + spListItem.UniqueId.ToString().ToUpper() + "</Value></Neq>" +
+                        "</And>" +
+                        "</Where>";
+                    SPListItemCollection items = properties.List.GetItems(query);
+                    if (items.Count > 0) {
+                        properties.Cancel = true;
+                        properties.ErrorMessage = "Department with title '" + sTitle + "' already exists.";
+                        return;
+                    }
+                    ////----
 
                     dataRows[0]["Id"] = spListItem.ID;
                     dataRows[0]["Title"] = title;
