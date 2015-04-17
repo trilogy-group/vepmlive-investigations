@@ -2566,7 +2566,7 @@ namespace EPMLiveWebParts
             foreach (SPField field in list.Fields)
             {
 
-                if (!field.Hidden && field.Reorderable)
+                if (!field.Hidden && field.Reorderable || (SPBuiltInFieldId.Author == field.Id || SPBuiltInFieldId.Editor == field.Id || SPBuiltInFieldId.ID == field.Id))
                 {
                     //EPML-4625: LinkTitleNoMenu/LinkTitle columns bind to Title field and the column name always remain the same
                     //make sure to always display Title fields irrespective of display rules
@@ -2616,7 +2616,8 @@ namespace EPMLiveWebParts
                 SPField field = (SPField)de.Value;
                 //EPML-4625: Remove duplicate column names from fields list
                 string fieldValue = System.Web.HttpUtility.HtmlEncode(field.Title);
-                if (!fields.Contains(fieldValue))
+                //To fix EPML-4718 change the current checking condition
+                if (!fields.Equals(fieldValue, StringComparison.InvariantCultureIgnoreCase))
                 {
                     fields += "'" + field.InternalName + "': { 'value': '" + fieldValue + "', 'checked':" + arrFields.Contains(field.InternalName).ToString().ToLower() + "},";
                     AllGroupFields += System.Web.HttpUtility.HtmlEncode(field.Title) + "|" + field.InternalName + "|" + field.Id + ",";
