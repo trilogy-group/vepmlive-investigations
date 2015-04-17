@@ -248,7 +248,7 @@ function MyWorkOnRenderFinish(grid) {
         MyWorkGrid.resetNoDataRow();
 
         var enumcols = [];
-        var enumvals = "";
+        var enumvals = [];
 
         for (var c in grid.Cols) {
             if (grid.Cols[c].Type == "Enum") {
@@ -261,12 +261,12 @@ function MyWorkOnRenderFinish(grid) {
                 var row = grid.Rows[r];
                 if (row.Def.Kind === 'Data' && row.Def.Name === 'R') {
                     var col = row[enumcols[i]];
-                    if (!enumvals.contains(col)) {
-                        enumvals += "|" + col;
+                    if (enumvals.indexOf("|" + col) == -1) {
+                        enumvals.push("|" + col);
                     }
                 }
             }            
-            grid.SetAttribute(grid.GetRowById("Filter"), null, enumcols[i] + 'Enum', enumvals, 1);
+            grid.SetAttribute(grid.GetRowById("Filter"), null, enumcols[i] + 'Enum', enumvals.join(""), 1);
             enumvals = "";
         }        
     }
