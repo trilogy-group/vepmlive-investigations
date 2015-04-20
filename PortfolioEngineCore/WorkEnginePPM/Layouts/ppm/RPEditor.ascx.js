@@ -1346,6 +1346,8 @@
                 sb.append("<treegrid SuppressMessage='3' debug='0' sync='0' ");
                 sb.append(" Export_Url='ModelExportExcel.aspx'");
                 sb.append(" data_url='" + this.params.Webservice + "'");
+                sb.append(" data_timeout='180'");
+                sb.append(" data_repeat='2'");
                 sb.append(" data_method='Soap'");
                 sb.append(" data_function='Execute'");
                 sb.append(" data_namespace='PortfolioEngine'");
@@ -1542,6 +1544,8 @@
                         var sb = new StringBuilder();
                         sb.append("<treegrid SuppressMessage='3' debug='0' sync='0' ");
                         sb.append(" data_url='" + this.params.Webservice + "'");
+                        sb.append(" data_timeout='180'");
+                        sb.append(" data_repeat='2'");
                         sb.append(" data_method='Soap'");
                         sb.append(" data_function='Execute'");
                         sb.append(" data_namespace='PortfolioEngine'");
@@ -3975,6 +3979,8 @@
             var sb = new StringBuilder();
             sb.append("<treegrid SuppressMessage='3' debug='0' sync='0' ");
             sb.append(" data_url='" + this.params.Webservice + "'");
+            sb.append(" data_timeout='180'");
+            sb.append(" data_repeat='2'");
             sb.append(" data_method='Soap'");
             sb.append(" data_function='Execute'");
             sb.append(" data_namespace='PortfolioEngine'");
