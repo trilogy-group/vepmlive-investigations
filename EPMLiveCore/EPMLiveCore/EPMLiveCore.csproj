@@ -3354,7 +3354,6 @@ net start "WETimer"</PostDeploymentCommand>
     <Content Include="Layouts\epmlive\getworkspacexml.aspx" />
     <Content Include="Layouts\epmlive\gotoresources.aspx" />
     <Content Include="Layouts\epmlive\gridganttsettings.aspx" />
-    <Content Include="Layouts\epmlive\GridGanttSettings.js" />
     <Content Include="Layouts\epmlive\IconPicker.aspx" />
     <Content Include="Layouts\epmlive\images\16x16Text.gif" />
     <Content Include="Layouts\epmlive\images\add.GIF" />
@@ -3519,6 +3518,7 @@ net start "WETimer"</PostDeploymentCommand>
     <Content Include="Layouts\epmlive\javascripts\EPMLive.Upgrader.min.js" />
     <Content Include="Layouts\epmlive\javascripts\GenericEntityEditor-ie8.js" />
     <Content Include="Layouts\epmlive\javascripts\GenericEntityEditor.js" />
+    <Content Include="Layouts\epmlive\javascripts\GridGanttSettings.js" />
     <Content Include="Layouts\epmlive\javascripts\icomoon-ie7.js" />
     <Content Include="Layouts\epmlive\javascripts\icomoon-ie7.min.js" />
     <Content Include="Layouts\epmlive\javascripts\libraries\bindWithDelay.js" />

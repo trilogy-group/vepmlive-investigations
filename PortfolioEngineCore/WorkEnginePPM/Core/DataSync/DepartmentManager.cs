@@ -9,26 +9,28 @@ namespace WorkEnginePPM.Core.DataSync
 {
     public class DepartmentManager : BaseManager
     {
-        #region Constructors (1) 
+        #region Constructors (1)
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DepartmentManager"/> class.
         /// </summary>
         /// <param name="spWeb">The sp web.</param>
-        public DepartmentManager(SPWeb spWeb) : base(spWeb)
+        public DepartmentManager(SPWeb spWeb)
+            : base(spWeb)
         {
             ResourceDictionary = new Dictionary<int, string>();
         }
 
-        #endregion Constructors 
+        #endregion Constructors
 
-        #region Properties (1) 
+        #region Properties (1)
 
         private Dictionary<int, string> ResourceDictionary { get; set; }
+        private List<SPListItem> ResourcesListItems { get; set; }
 
-        #endregion Properties 
+        #endregion Properties
 
-        #region Methods (7) 
+        #region Methods (7)
 
         // Public Methods (4) 
 
@@ -70,12 +72,12 @@ namespace WorkEnginePPM.Core.DataSync
         {
             var dataTable = new DataTable();
 
-            dataTable.Columns.Add("Id", typeof (int));
-            dataTable.Columns.Add("Title", typeof (string));
-            dataTable.Columns.Add("Managers", typeof (object));
-            dataTable.Columns.Add("Executives", typeof (object));
-            dataTable.Columns.Add("ExtId", typeof (string));
-            dataTable.Columns.Add("Parent", typeof (string));
+            dataTable.Columns.Add("Id", typeof(int));
+            dataTable.Columns.Add("Title", typeof(string));
+            dataTable.Columns.Add("Managers", typeof(object));
+            dataTable.Columns.Add("Executives", typeof(object));
+            dataTable.Columns.Add("ExtId", typeof(string));
+            dataTable.Columns.Add("Parent", typeof(string));
 
             XDocument responseXml;
 
@@ -108,7 +110,7 @@ namespace WorkEnginePPM.Core.DataSync
                                                                false);
 
                 dataTable.Rows.Add(id, title, managers, executives, extId,
-                                   level == 1 ? (object) (-1) : dictionary[level - 1]);
+                                   level == 1 ? (object)(-1) : dictionary[level - 1]);
             }
 
             return dataTable;
@@ -123,21 +125,21 @@ namespace WorkEnginePPM.Core.DataSync
         {
             var dataTable = new DataTable("Departments");
 
-            dataTable.Columns.Add("Id", typeof (int));
-            dataTable.Columns.Add("Title", typeof (string));
-            dataTable.Columns.Add("Managers", typeof (object));
-            dataTable.Columns.Add("Executives", typeof (object));
-            dataTable.Columns.Add("ExtId", typeof (string));
-            dataTable.Columns.Add("UniqueId", typeof (Guid));
-            dataTable.Columns.Add("ParentId", typeof (int));
+            dataTable.Columns.Add("Id", typeof(int));
+            dataTable.Columns.Add("Title", typeof(string));
+            dataTable.Columns.Add("Managers", typeof(object));
+            dataTable.Columns.Add("Executives", typeof(object));
+            dataTable.Columns.Add("ExtId", typeof(string));
+            dataTable.Columns.Add("UniqueId", typeof(Guid));
+            dataTable.Columns.Add("ParentId", typeof(int));
 
             foreach (SPListItem spListItem in spListItemCollection)
             {
-                dataTable.Rows.Add(spListItem.ID, (string) spListItem["Title"],
+                dataTable.Rows.Add(spListItem.ID, (string)spListItem["Title"],
                                    new SPFieldLookupValueCollection((spListItem["Managers"] ?? string.Empty).ToString()),
                                    new SPFieldLookupValueCollection(
                                        (spListItem["Executives"] ?? string.Empty).ToString()),
-                                   (string) spListItem["EXTID"], spListItem.UniqueId,
+                                   (string)spListItem["EXTID"], spListItem.UniqueId,
                                    new SPFieldLookupValue((spListItem["RBS"] ?? string.Empty).ToString()).LookupId);
             }
 
@@ -155,6 +157,8 @@ namespace WorkEnginePPM.Core.DataSync
             requestDocument.Add(new XElement("UpdateDepartments", new XElement("Params"), new XElement("Data")));
 
             XElement dataElement = requestDocument.Root.Element("Data");
+
+            ResourcesListItems = Web.Lists["Resources"].GetItems().Cast<SPListItem>().ToList();
 
             BuildRequest(0, dataTable, ref dataElement);
 
@@ -219,7 +223,7 @@ namespace WorkEnginePPM.Core.DataSync
 
                 if (managerCollection != DBNull.Value)
                 {
-                    foreach (string resourcePoolId in ((SPFieldLookupValueCollection) managerCollection)
+                    foreach (string resourcePoolId in ((SPFieldLookupValueCollection)managerCollection)
                         .Select(GetResourcePoolId).Where(resourcePoolId => !string.IsNullOrEmpty(resourcePoolId))
                         .Where(resourcePoolId => !managers.Contains(resourcePoolId)))
                     {
@@ -231,7 +235,7 @@ namespace WorkEnginePPM.Core.DataSync
 
                 if (executiveCollection != DBNull.Value)
                 {
-                    foreach (string resourcePoolId in ((SPFieldLookupValueCollection) executiveCollection)
+                    foreach (string resourcePoolId in ((SPFieldLookupValueCollection)executiveCollection)
                         .Select(GetResourcePoolId).Where(resourcePoolId => !string.IsNullOrEmpty(resourcePoolId))
                         .Where(resourcePoolId => !executives.Contains(resourcePoolId)))
                     {
@@ -252,7 +256,7 @@ namespace WorkEnginePPM.Core.DataSync
                 else parentElement.Add(departmentElement);
 
                 if (!string.IsNullOrEmpty(departmentId.ToString()))
-                    BuildRequest((int) departmentId, dataTable, ref departmentElement);
+                    BuildRequest((int)departmentId, dataTable, ref departmentElement);
             }
         }
 
@@ -262,7 +266,7 @@ namespace WorkEnginePPM.Core.DataSync
         /// <param name="resources">The resources.</param>
         /// <param name="isManager">if set to <c>true</c> [is manager].</param>
         /// <returns></returns>
-        private object GetResourceLookupFromExtId(string resources,bool isManager)
+        private object GetResourceLookupFromExtId(string resources, bool isManager)
         {
             if (!isManager && resources.Equals("-1")) return null;
 
@@ -321,29 +325,28 @@ namespace WorkEnginePPM.Core.DataSync
 
             if (!ResourceDictionary.ContainsKey(lookupId))
             {
-                SPList spList = Web.Lists["Resources"];
-
-                foreach (
-                    SPListItem spListItem in
-                        spList.Items.Cast<SPListItem>().Where(spListItem => spListItem.ID == lookupId))
+                SPListItem resource = (from rc in ResourcesListItems
+                                       where rc["ID"].Equals(lookupId)
+                                       select rc).FirstOrDefault();
+                if (resource != null)
                 {
-                    object extId = spListItem["EXTID"];
+                    object extId = resource["EXTID"];
 
                     if (extId == null || string.IsNullOrEmpty(extId.ToString()))
                     {
                         throw new Exception(string.Format("EXTID is not set for the Resource. ID: {0}, Name: {1}",
-                                                          lookupId, spListItem["Title"]));
+                                                          lookupId, resource["Title"]));
                     }
 
                     ResourceDictionary.Add(lookupId, extId.ToString());
-
-                    break;
                 }
             }
 
             return ResourceDictionary[lookupId];
         }
 
-        #endregion Methods 
+
+
+        #endregion Methods
     }
 }

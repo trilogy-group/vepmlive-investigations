@@ -831,7 +831,7 @@ namespace EPMLiveCore.API
                 if (!_resourceDictionary.ContainsKey(resource))
                 {
                     SPListItem spListItem = spList.GetItemById(Convert.ToInt32(resourcePoolId));
-                    _resourceDictionary.Add(resource, spListItem["SharePointAccount"].ToString());
+                    _resourceDictionary.Add(resource, Convert.ToString(spListItem["SharePointAccount"]));
                 }
 
                 string mappedResource = _resourceDictionary[resource];
