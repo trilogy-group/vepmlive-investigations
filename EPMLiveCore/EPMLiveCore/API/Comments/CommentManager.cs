@@ -108,7 +108,7 @@ namespace EPMLiveCore.API
                                                          .Replace("##itemId##", currentItem.ID.ToString())
                                                          .Replace("##itemTitle##", currentItem.Title)
                                                          .Replace("##createdDate##", ((DateTime)currentItem["Created"]).ToFriendlyDateAndTime())
-                                                         .Replace("##comment##", GetXMLSafeVersion((string)(comment))));                                                         
+                                                         .Replace("##comment##", GetXMLSafeVersion((string)(comment))));
                 sbResult.Append(XML_RESPONSE_COMMENT_ITEM_CLOSE);
                 sbResult.Append(XML_RESPONSE_COMMENT_SECTION_FOOTER);
                 sbResult.Append(XML_RESPONSE_COMMENT_FOOTER);
@@ -131,7 +131,7 @@ namespace EPMLiveCore.API
                             }
 
                             if (originListItem != null)
-                            {                                
+                            {
                                 EnsureMetaCols(originList);
 
                                 string sCommenters = originListItem[originList.Fields.GetFieldByInternalName("Commenters").Id] != null ? originListItem[originList.Fields.GetFieldByInternalName("Commenters").Id].ToString() : string.Empty;
@@ -224,7 +224,7 @@ namespace EPMLiveCore.API
                         {
                             SyncToSocialStream(currentItem.UniqueId, comment, originListItem.ParentList.ID,
                                 originListItem.ID, originListItem.Title,
-                                originListItem.ParentList.Title, originListItem.ParentList.DefaultDisplayFormUrl + "?ID=" + originListItem.ID, laCommenters, time, cWeb, "ADD");
+                                originListItem.ParentList.Title, originListItem.Url, laCommenters, time, cWeb, "ADD");
                         }
                         else
                         {
@@ -762,7 +762,7 @@ namespace EPMLiveCore.API
                 try
                 {
                     SyncToSocialStream(targetComment.UniqueId, comment, originListItem.ParentList.ID, originListItem.ID, originListItem.Title,
-                        originListItem.ParentList.Title, originListItem.ParentList.DefaultDisplayFormUrl + "?ID=" + originListItem.ID, laCommenters, time, cWeb, "UPDATE");
+                        originListItem.ParentList.Title, originListItem.Url, laCommenters, time, cWeb, "UPDATE");
                 }
                 catch { }
             }
