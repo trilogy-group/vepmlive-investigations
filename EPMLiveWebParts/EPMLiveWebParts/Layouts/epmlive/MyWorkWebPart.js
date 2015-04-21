@@ -2588,6 +2588,7 @@ var MyWorkGrid = {
             $.ajax({
                 type: 'POST',
                 url: $$$.currentWebUrl + '/_vti_bin/WorkEngine.asmx/Execute',
+                async: false,
                 data: "{ Function: 'TagManager_GetTag', Dataxml: '<Tag Type=\"1\"/>' }",
                 contentType: 'application/json; charset=utf-8',
                 dataType: 'json',
@@ -2620,6 +2621,7 @@ var MyWorkGrid = {
             $.ajax({
                 type: 'POST',
                 url: $$$.currentWebUrl + '/_vti_bin/WorkEngine.asmx/Execute',
+                async: false,
                 data: "{ Function: 'TagManager_RegisterTag', Dataxml: '<Tag Name=\"WorkingOn\" Type=\"1\"/>' }",
                 contentType: 'application/json; charset=utf-8',
                 dataType: 'json',
