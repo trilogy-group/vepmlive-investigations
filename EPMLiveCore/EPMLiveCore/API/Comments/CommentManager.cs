@@ -224,7 +224,7 @@ namespace EPMLiveCore.API
                         {
                             SyncToSocialStream(currentItem.UniqueId, comment, originListItem.ParentList.ID,
                                 originListItem.ID, originListItem.Title,
-                                originListItem.ParentList.Title, originListItem.Url, laCommenters, time, cWeb, "ADD");
+                                originListItem.ParentList.Title, originListItem.ParentList.DefaultDisplayFormUrl + "?ID=" + originListItem.ID, laCommenters, time, cWeb, "ADD");
                         }
                         else
                         {
@@ -762,7 +762,7 @@ namespace EPMLiveCore.API
                 try
                 {
                     SyncToSocialStream(targetComment.UniqueId, comment, originListItem.ParentList.ID, originListItem.ID, originListItem.Title,
-                        originListItem.ParentList.Title, originListItem.Url, laCommenters, time, cWeb, "UPDATE");
+                        originListItem.ParentList.Title, originListItem.ParentList.DefaultDisplayFormUrl + "?ID=" + originListItem.ID, laCommenters, time, cWeb, "UPDATE");
                 }
                 catch { }
             }
