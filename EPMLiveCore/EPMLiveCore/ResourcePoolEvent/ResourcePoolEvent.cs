@@ -167,7 +167,7 @@ namespace EPMLiveCore
                 {
                     if (isAdd || (properties.ListItem != null && properties.ListItem["SharePointAccount"] != null))
                     {
-						//CoreFunctions.EnsureNoDuplicates(properties, isAdd, isOnline);
+                        //CoreFunctions.EnsureNoDuplicates(properties, isAdd, isOnline);
                         if (isOnline)
                         {
                             if (properties.List.Fields.ContainsFieldWithInternalName("FirstName") && properties.List.Fields.ContainsFieldWithInternalName("LastName"))
@@ -923,6 +923,8 @@ namespace EPMLiveCore
 
         public override void ItemDeleting(SPItemEventProperties properties)
         {
+            string deleteResourceCheckMessage = string.Empty;
+            string deleteResourceCheckStatus = string.Empty;
 
             if (CoreFunctions.DoesCurrentUserHaveFullControl(properties.Web))
             {
@@ -934,13 +936,32 @@ namespace EPMLiveCore
                         {
                             oWeb.AllowUnsafeUpdates = true;
 
-                            try
+                            int extId;
+
+                            if (!int.TryParse(properties.ListItem["EXTID"] as string, out extId))
+                            {
+                                return;
+                            }
+
+                            var args = new object[] { extId, properties.ListItem.UniqueId, properties.Web, deleteResourceCheckMessage, deleteResourceCheckStatus };
+                            Assembly assembly = Assembly.Load("WorkEnginePPM, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5");
+                            Type type = assembly.GetType("WorkEnginePPM.Core.ResourceManagement.Utilities", true, true);
+                            type.GetMethod("PerformDeleteResourceCheck", BindingFlags.Public | BindingFlags.Static).Invoke(null, args);
+
+                            deleteResourceCheckStatus = Convert.ToString(args[3]);
+                            deleteResourceCheckMessage = Convert.ToString(args[4]);
+
+                            if (!string.IsNullOrEmpty(deleteResourceCheckStatus) && deleteResourceCheckStatus.ToLower().Equals("no"))
+                            {
+                                properties.ErrorMessage = deleteResourceCheckMessage;
+                                properties.Status = SPEventReceiverStatus.CancelWithError;
+                                properties.Cancel = true;
+                            }
+                            else
                             {
                                 SPFieldUserValue uv = new SPFieldUserValue(properties.Web, properties.ListItem["SharePointAccount"].ToString());
-
                                 oWeb.SiteUsers.RemoveByID(uv.LookupId);
                             }
-                            catch { }
                         }
                     }
                 });

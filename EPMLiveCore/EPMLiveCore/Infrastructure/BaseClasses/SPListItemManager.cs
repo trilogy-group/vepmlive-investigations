@@ -9,15 +9,15 @@ namespace EPMLiveCore.Infrastructure
 {
     public class SPListItemManager : ISPListItemManager
     {
-        #region Fields (3) 
+        #region Fields (3)
 
         protected readonly string ElementName;
         protected readonly string RootElementName;
         private int _batchProcessLimit;
 
-        #endregion Fields 
+        #endregion Fields
 
-        #region Constructors (3) 
+        #region Constructors (3)
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SPListItemManager"/> class.
@@ -40,7 +40,7 @@ namespace EPMLiveCore.Infrastructure
 
                         if (spList == null)
                         {
-                            throw new APIException((int) Errors.SPLIMListNotFound,
+                            throw new APIException((int)Errors.SPLIMListNotFound,
                                                    string.Format(@"Cannot find the ""{0}"" list at {1}", listName,
                                                                  spWeb.Url));
                         }
@@ -55,7 +55,7 @@ namespace EPMLiveCore.Infrastructure
             }
             catch (Exception exception)
             {
-                throw new APIException((int) Errors.SPLIM, exception.GetBaseException().Message);
+                throw new APIException((int)Errors.SPLIM, exception.GetBaseException().Message);
             }
         }
 
@@ -79,9 +79,9 @@ namespace EPMLiveCore.Infrastructure
             Dispose(false);
         }
 
-        #endregion Constructors 
+        #endregion Constructors
 
-        #region Properties (2) 
+        #region Properties (2)
 
         /// <summary>
         /// Gets or sets the batch process limit.
@@ -96,7 +96,7 @@ namespace EPMLiveCore.Infrastructure
             {
                 if (value < 2)
                 {
-                    throw new APIException((int) Errors.SPLIMBatchProcessLimit,
+                    throw new APIException((int)Errors.SPLIMBatchProcessLimit,
                                            "The BatchProcessLimit cannot be less that 2");
                 }
 
@@ -109,9 +109,9 @@ namespace EPMLiveCore.Infrastructure
         /// </summary>
         public SPList ParentList { get; private set; }
 
-        #endregion Properties 
+        #endregion Properties
 
-        #region Methods (13) 
+        #region Methods (13)
 
         // Public Methods (9) 
 
@@ -128,7 +128,7 @@ namespace EPMLiveCore.Infrastructure
             }
             catch (Exception exception)
             {
-                throw new APIException((int) Errors.SPLIMAdd, exception.GetBaseException().Message);
+                throw new APIException((int)Errors.SPLIMAdd, exception.GetBaseException().Message);
             }
         }
 
@@ -145,7 +145,7 @@ namespace EPMLiveCore.Infrastructure
             }
             catch (Exception exception)
             {
-                throw new APIException((int) Errors.SPLIMDelete, exception.GetBaseException().Message);
+                throw new APIException((int)Errors.SPLIMDelete, exception.GetBaseException().Message);
             }
         }
 
@@ -260,7 +260,7 @@ namespace EPMLiveCore.Infrastructure
             }
             catch (Exception exception)
             {
-                throw new APIException((int) Errors.SPLIMGetAll, exception.GetBaseException().Message);
+                throw new APIException((int)Errors.SPLIMGetAll, exception.GetBaseException().Message);
             }
         }
 
@@ -277,6 +277,24 @@ namespace EPMLiveCore.Infrastructure
         }
 
         /// <summary>
+        /// Items the exists.
+        /// </summary>
+        /// <param name="id">The id.</param>
+        /// <returns></returns>
+        public virtual SPListItem GetCurrentResource(int id)
+        {
+            try
+            {
+                return ParentList.GetItemByIdSelectedFields(id, "ID");
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+
+        }
+
+        /// <summary>
         /// Updates the specified serialized list items.
         /// </summary>
         /// <param name="serializedListItems">The serialized list items.</param>
@@ -288,7 +306,7 @@ namespace EPMLiveCore.Infrastructure
             }
             catch (Exception exception)
             {
-                throw new APIException((int) Errors.SPLIMUpdate, exception.GetBaseException().Message);
+                throw new APIException((int)Errors.SPLIMUpdate, exception.GetBaseException().Message);
             }
         }
 
@@ -364,7 +382,7 @@ namespace EPMLiveCore.Infrastructure
             {
                 string specialValue = string.IsNullOrEmpty(stringValue)
                                           ? string.Empty
-                                          : ((DateTime) value).ToShortDateString();
+                                          : ((DateTime)value).ToShortDateString();
 
                 fieldTextValue = specialValue;
                 fieldHtmlValue = specialValue;
@@ -408,7 +426,7 @@ namespace EPMLiveCore.Infrastructure
 
                         if (rootElement == null)
                         {
-                            throw new APIException((int) Errors.SPLIMBatchOpRootEleNotFound,
+                            throw new APIException((int)Errors.SPLIMBatchOpRootEleNotFound,
                                                    string.Format(@"Cannot find the ""{0}"" element.", RootElementName));
                         }
 
@@ -433,7 +451,7 @@ namespace EPMLiveCore.Infrastructure
 
                                 if (idAttribute == null)
                                 {
-                                    throw new APIException((int) Errors.SPLIMBatchOpIdNotFound,
+                                    throw new APIException((int)Errors.SPLIMBatchOpIdNotFound,
                                                            string.Format(
                                                                @"ID is not specified for the item at index {0}",
                                                                methodCounter));
@@ -453,7 +471,7 @@ namespace EPMLiveCore.Infrastructure
                                 XAttribute fieldAttribute = dataElement.Attribute("Field");
                                 if (fieldAttribute == null)
                                 {
-                                    throw new APIException((int) Errors.SPLIMBatchOpFieldAttrNotFound,
+                                    throw new APIException((int)Errors.SPLIMBatchOpFieldAttrNotFound,
                                                            string.Format(
                                                                @"The Field attribute is not specified for the item with ID {0}",
                                                                itemId));
@@ -470,7 +488,7 @@ namespace EPMLiveCore.Infrastructure
 
                             batchBuilder.Append("</Method>");
 
-                            if (methodCounter%_batchProcessLimit != 0) continue;
+                            if (methodCounter % _batchProcessLimit != 0) continue;
 
                             batchBuilder.Append("</ows:Batch>");
                             batchResultBuilder.Append(spWeb.ProcessBatchData(batchBuilder.ToString()));
@@ -493,10 +511,10 @@ namespace EPMLiveCore.Infrastructure
             }
             catch (Exception exception)
             {
-                throw new APIException((int) Errors.SPLIMBatchOp, exception.GetBaseException().Message);
+                throw new APIException((int)Errors.SPLIMBatchOp, exception.GetBaseException().Message);
             }
         }
 
-        #endregion Methods 
+        #endregion Methods
     }
 }

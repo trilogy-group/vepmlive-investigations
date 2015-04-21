@@ -2622,7 +2622,7 @@ namespace EPMLiveWebParts
                     fields += "'" + field.InternalName + "': { 'value': '" + fieldValue + "', 'checked':" + arrFields.Contains(field.InternalName).ToString().ToLower() + "},";
                     AllGroupFields += System.Web.HttpUtility.HtmlEncode(field.Title) + "|" + field.InternalName + "|" + field.Id + ",";
                 }
-            }
+            } 
 
             sl.Clear();
             //TODO: remove this and make lookup joins work.

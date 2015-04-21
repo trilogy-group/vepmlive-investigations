@@ -12,6 +12,7 @@ using Microsoft.SharePoint;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml;
+using System.Reflection;
 
 namespace EPMLiveCore.API
 {
@@ -905,6 +906,39 @@ namespace EPMLiveCore.API
                     {
                         // this might seem strange, but we need this as we check from where 
                         // the "Delete" is being executed in the ItemDeleting event.
+                        
+                        //Pre check..
+                        SPListItem listItem = resourceManager.GetCurrentResource(resourceId);
+                        string deleteResourceCheckMessage = string.Empty;
+                        string deleteResourceCheckStatus = string.Empty;
+
+                        SPSecurity.RunWithElevatedPrivileges(delegate()
+                        {
+                            SPWeb oWeb = SPContext.Current.Web;
+                            oWeb.AllowUnsafeUpdates = true;
+
+                            int extId = 0;
+
+                            if ((listItem != null) && !int.TryParse(listItem["EXTID"] as string, out extId))
+                            {
+                                return;
+                            }
+
+                            var args = new object[] { extId, listItem.UniqueId, oWeb, deleteResourceCheckMessage, deleteResourceCheckStatus };
+                            Assembly assembly = Assembly.Load("WorkEnginePPM, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5");
+                            Type type = assembly.GetType("WorkEnginePPM.Core.ResourceManagement.Utilities", true, true);
+                            type.GetMethod("PerformDeleteResourceCheck", BindingFlags.Public | BindingFlags.Static).Invoke(null, args);
+
+                            deleteResourceCheckStatus = Convert.ToString(args[3]);
+                            deleteResourceCheckMessage = Convert.ToString(args[4]);
+
+                            if (!string.IsNullOrEmpty(deleteResourceCheckStatus) && deleteResourceCheckStatus.ToLower().Equals("no"))
+                            {
+                                throw new Exception(deleteResourceCheckStatus.ToUpper() + "|||" +  deleteResourceCheckMessage);
+                            }
+                        });
+
+
 
                         if (confirmDelete)
                         {

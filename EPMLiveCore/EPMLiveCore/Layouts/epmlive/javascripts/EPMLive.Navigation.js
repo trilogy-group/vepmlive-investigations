@@ -210,7 +210,7 @@
                         var info = link.itemId.split('.');
 
                         var listId = '';
-                        
+
                         try {
                             listId = info[1];
                         } catch (e) {
@@ -220,7 +220,7 @@
 
                         try {
                             itemId = info[2];
-                        } catch(e) {
+                        } catch (e) {
                         }
 
                         window.epmLiveNavigation.wsInfoDict = window.epmLiveNavigation.wsInfoDict || {};
@@ -347,7 +347,7 @@
 
                                 var url = '';
                                 var aId = '';
-                                
+
                                 var id = $parent.parent().get(0).id;
 
                                 if (id !== 'epm-nav-sub-favorites-static-links' && id !== 'epm-nav-sub-recent-static-links' && id !== 'epm-nav-sub-new-static-links') {
@@ -355,7 +355,7 @@
                                     url = $a.attr('href');
                                     aId = $a.get(0).id;
                                 }
-                                
+
                                 $.cookie(selectedLinkCookie, JSON.stringify({ id: aId, url: url }), cookieOptions);
                             }
                         });
@@ -439,7 +439,7 @@
                             openMenu();
 
                             $.cookie(selectedTlNodeCookie, JSON.stringify({ id: _id, webUrl: $$.currentWebUrl() }), cookieOptions);
-                            
+
                             for (var n2 in tlNodes) {
                                 if (tlNodes.hasOwnProperty(n2)) {
                                     var nde2 = tlNodes[n2];
@@ -477,7 +477,7 @@
                     }
                 }
 
-                function changePinState(state,remember) {
+                function changePinState(state, remember) {
                     var elements = ['s4-ribbonrow', 's4-workspace'];
                     for (var e in elements) {
                         if (elements.hasOwnProperty(e)) {
@@ -498,24 +498,24 @@
                     }
 
                     $sn.data('pinstate', state);
-                    
+
                     if (remember) {
                         $.cookie(pinStateCookie, state, cookieOptions);
                     }
                 }
 
-                window.epmLiveNavigation.togglePinned = function(remember) {
+                window.epmLiveNavigation.togglePinned = function (remember) {
                     if ($sn.data('pinstate') === 'pinned') {
                         window.epmLiveNavigation.unpin(remember);
                     } else {
                         window.epmLiveNavigation.pin(remember);
                     }
                 };
-                
+
                 window.epmLiveNavigation.pin = function (remember) {
                     changePinState('pinned', remember);
                 };
-                
+
                 window.epmLiveNavigation.unpin = function (remember) {
                     changePinState('unpinned', remember);
                 };
@@ -539,7 +539,7 @@
                 function selectLink() {
                     var selected = false;
                     var link = $.parseJSON($.cookie(selectedLinkCookie));
-                    
+
                     if (link) {
                         if (link.id) {
                             var $a = $($sn.find('#' + link.id).get(0));
@@ -575,23 +575,23 @@
                             }
                         }
                     }
-                    
+
                     var url = escape(unescape(window.location.href)).toLowerCase();
 
                     if (selected) {
                         var $node = $('.epm-nav-node-selected');
-                        $node.find('a').each(function() {
+                        $node.find('a').each(function () {
                             var lnk = escape(unescape(this.href)).toLowerCase();
-                            
+
                             if (url.indexOf(lnk) === -1) {
                                 $node.removeClass(selectedClass);
                                 selected = false;
                             }
                         });
                     }
-                    
+
                     if (!selected) {
-                        $('td.epm-nav-node').each(function() {
+                        $('td.epm-nav-node').each(function () {
                             if (!selected) {
                                 $(this).find('a').each(function () {
                                     if (!selected) {
@@ -606,13 +606,13 @@
                                 });
                             }
                         });
-                        
+
                         if (!selected) {
-                            $('#epm-nav-sub-workplace').find('a').each(function() {
+                            $('#epm-nav-sub-workplace').find('a').each(function () {
                                 if (!selected) {
                                     var $link = $(this);
                                     var lnk = escape(unescape($link.get(0).href)).toLowerCase();
-                                    
+
                                     if (url.indexOf(lnk) !== -1) {
                                         $link.parents('li').addClass(selectedClass);
                                         selected = true;
@@ -775,7 +775,7 @@
                     $('#epm-nav-top li').click(function () {
                         window.epmLiveNavigation.stopAddingTooltips = true;
 
-                        window.setTimeout(function() {
+                        window.setTimeout(function () {
                             addTooltip();
                         }, 1000);
                     });
@@ -784,12 +784,12 @@
                 }
 
                 function handleContextualCommand(id, webId, listId, itemId, command, kind, callBackFunction) {
-                    var removeLink = function(linkId, notifId) {
-                        var remove = function(lid, nid) {
+                    var removeLink = function (linkId, notifId) {
+                        var remove = function (lid, nid) {
                             var $item = $('#' + lid);
                             var $parent = $item.parent();
 
-                            $item.fadeOut(300, function() {
+                            $item.fadeOut(300, function () {
                                 $item.remove();
 
                                 var pId = $parent.get(0).id;
@@ -798,7 +798,7 @@
                                     if ($parent.find('a').length === 1) {
                                         var wExists = false;
 
-                                        $parent.find('li').each(function() {
+                                        $parent.find('li').each(function () {
                                             if ($(this).text() === 'No favorite workspaces') {
                                                 wExists = true;
                                             }
@@ -814,7 +814,7 @@
 
                                     var iIndex = 0;
 
-                                    $parent.find('li').each(function() {
+                                    $parent.find('li').each(function () {
                                         var $ph = $(this);
 
                                         if ($ph.text() === 'Items') {
@@ -822,7 +822,7 @@
                                         }
                                     });
 
-                                    $parent.find('li').each(function() {
+                                    $parent.find('li').each(function () {
                                         var $li = $(this);
 
                                         if ($li.hasClass('epm-nav-node')) {
@@ -837,7 +837,7 @@
                                     if (!pFound) {
                                         var pExists = false;
 
-                                        $parent.find('li').each(function() {
+                                        $parent.find('li').each(function () {
                                             if ($(this).text() === 'No pages') {
                                                 pExists = true;
                                             }
@@ -851,7 +851,7 @@
                                     if (!iFound) {
                                         var iExists = false;
 
-                                        $parent.find('li').each(function() {
+                                        $parent.find('li').each(function () {
                                             if ($(this).text() === 'No items') {
                                                 iExists = true;
                                             }
@@ -889,9 +889,9 @@
                             });
                         };
 
-                        epmLiveService.execute('RemoveNavigationLink', linkId, function(response) {
+                        epmLiveService.execute('RemoveNavigationLink', linkId, function (response) {
                             remove(linkId, notifId);
-                        }, function(response) {
+                        }, function (response) {
                             remove(linkId, notifId);
                         });
                     };
@@ -903,42 +903,42 @@
                     var redirectUrl = '';
 
                     switch (command) {
-                    case 'nav:add':
-                        redirectUrl = rpUrl + 'action=new';
-                        break;
-                    case 'nav:team':
-                        var wId = '';
-                        var lId = '';
-                        var iId = '';
+                        case 'nav:add':
+                            redirectUrl = rpUrl + 'action=new';
+                            break;
+                        case 'nav:team':
+                            var wId = '';
+                            var lId = '';
+                            var iId = '';
 
-                        if (itemId !== 'undefined') {
-                            try {
-                                var info = window.epmLiveNavigation.wsTeamDict[webId].split('.');
-                                if (info[2] !== '-1') {
-                                    wId = info[0];
-                                    lId = info[1];
-                                    iId = info[2];
+                            if (itemId !== 'undefined') {
+                                try {
+                                    var info = window.epmLiveNavigation.wsTeamDict[webId].split('.');
+                                    if (info[2] !== '-1') {
+                                        wId = info[0];
+                                        lId = info[1];
+                                        iId = info[2];
+                                    }
+                                } catch (e) {
                                 }
-                            } catch(e) {
                             }
-                        }
 
-                        redirectUrl = (url + '/_layouts/15/epmlive/gridaction.aspx?').replace(/\/\//g, '/') + 'action=buildteam&webid=' + (wId || webId);
+                            redirectUrl = (url + '/_layouts/15/epmlive/gridaction.aspx?').replace(/\/\//g, '/') + 'action=buildteam&webid=' + (wId || webId);
 
-                        if (iId) {
-                            redirectUrl = redirectUrl + '&listid=' + lId + '&id=' + iId;
-                        }
+                            if (iId) {
+                                redirectUrl = redirectUrl + '&listid=' + lId + '&id=' + iId;
+                            }
                     }
 
                     if (!redirectUrl && command) {
                         if (command.indexOf('epkcommand:') !== -1) {
                             redirectUrl = gaUrl + 'action=epkcommand&subaction=' + command.split(':')[1];
                         } else if (command === 'createworkspace') {
-                            var loadWSCreationDialog = function() {
+                            var loadWSCreationDialog = function () {
                                 if (window.CreateEPMLiveWorkspace) {
                                     window.CreateEPMLiveWorkspace(listId, itemId);
                                 } else {
-                                    window.setTimeout(function() {
+                                    window.setTimeout(function () {
                                         loadWSCreationDialog();
                                     }, 1);
                                 }
@@ -1024,7 +1024,7 @@
 
                             if (!isResImportRunning && !isSecRunning) {
                                 if (callBackFunction != '')
-                                    SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', { url: redirectUrl, showMaximized: true,  dialogReturnValueCallback: eval(callBackFunction) });
+                                    SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', { url: redirectUrl, showMaximized: true, dialogReturnValueCallback: eval(callBackFunction) });
                                 else
                                     SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', { url: redirectUrl, showMaximized: true });
                                 return true;
@@ -1041,21 +1041,21 @@
                         case '98':
                             if (command !== 'nav:addToFav') {
                                 if (command !== 'nav:remove' && command !== 'nav:removeFavWS' && command !== 'nav:removeFavRI') {
-                                    $.get(redirectUrl).always(function() {
+                                    $.get(redirectUrl).always(function () {
                                         removeLink(id);
                                     });
                                 } else {
                                     var fKind = null;
 
                                     if (command === 'nav:removeFavWS') {
-                                        $('#epm-nav-sub-workspaces-static-links').find('a').each(function() {
+                                        $('#epm-nav-sub-workspaces-static-links').find('a').each(function () {
                                             var $ws = $(this);
                                             if ($ws.data('webid') === webId) {
                                                 id = $ws.parent().get(0).id;
                                             }
                                         });
                                     } else if (command === 'nav:removeFavRI') {
-                                        $('#epm-nav-sub-favorites-static-links').find('a').each(function() {
+                                        $('#epm-nav-sub-favorites-static-links').find('a').each(function () {
                                             var $fa = $(this);
                                             if ($fa.data('listid') === listId) {
                                                 if ($fa.data('itemid') == itemId) {
@@ -1106,7 +1106,7 @@
 
                                     try {
                                         icon = $($link.parent().find('span').get(0)).attr('class').split(' ')[1];
-                                    } catch(e) {
+                                    } catch (e) {
                                     }
 
                                     data = '<Data><Param key="SiteId">' + _$$.currentSiteId + '</Param><Param key="WebId">' + webId + '</Param><Param key="ListId">' + listId + '</Param><Param key="ListViewUrl"></Param><Param key="ListIconClass">' + icon + '</Param><Param key="ItemId">' + itemId + '</Param><Param key="FString"></Param><Param key="Type">2</Param><Param key="UserId">' + _$$.currentUserId + '</Param><Param key="Title">' + title + '</Param><Param key="FileIsNull"></Param><Param key="IsItem">True</Param></Data>';
@@ -1114,7 +1114,7 @@
                                     riFav = true;
                                 }
 
-                                var notify = function() {
+                                var notify = function () {
                                     if (riFav) {
                                         toastr.options = {
                                             'closeButton': false,
@@ -1137,7 +1137,7 @@
 
                                 id = new Date().getTime() + '';
 
-                                epmLiveService.execute(methodName, data, function(response) {
+                                epmLiveService.execute(methodName, data, function (response) {
                                     window.epmLiveNavigation.registerLink({
                                         id: id,
                                         title: title,
@@ -1157,7 +1157,7 @@
                                     });
 
                                     notify();
-                                }, function(response) {
+                                }, function (response) {
                                     window.epmLiveNavigation.registerLink({
                                         id: id,
                                         title: title,
@@ -1180,6 +1180,7 @@
                                 });
                             }
                             break;
+
                         case '99':
                             if (confirm('Are you sure you want to send the item(s) to the Recycle Bin?')) {
                                 var nId = SP.UI.Notify.addNotification('Deleting Item...', true, '', null);
@@ -1189,6 +1190,10 @@
                                             SP.UI.Notify.removeNotification(nId);
                                             SP.UI.Notify.addNotification('You do not have permission to delete Resources', false, '', null);
 
+                                        }
+                                        else if (data.startsWith("General Error:")) {
+                                            SP.UI.Notify.removeNotification(nId);
+                                            alert(data.replace("General Error: ", ""));
                                         }
                                         else {
                                             removeLink(id, nId);
@@ -1206,6 +1211,7 @@
                             }
                             break;
                         default:
+
                             var options;
                             if (callBackFunction != '' && callBackFunction != 'undefined') {
                                 callBackFunction = eval(callBackFunction);
@@ -1218,7 +1224,7 @@
                     }
 
                 }
-                
+
                 function registerEvents() {
                     var hoverNode = window.TreeView_HoverNode;
                     var unhoverNode = window.TreeView_UnhoverNode;
@@ -1228,7 +1234,7 @@
                     $('td.epm-nav-node').find('a').each(function () {
                         var $a = $(this);
                         var offset = $a.offset().left;
-                        
+
                         if (navLinkOffset === 0) {
                             navLinkOffset = offset;
                         } else {
@@ -1367,8 +1373,8 @@
 
                     $ss.hover(function () {
                         var show = false;
-                        
-                        $('.epm-nav-sub').each(function() {
+
+                        $('.epm-nav-sub').each(function () {
                             var $menu = $(this);
                             if ($menu.is(':visible')) {
                                 if ($menu.height() >= $ss.height()) {
@@ -1376,11 +1382,11 @@
                                 }
                             }
                         });
-                        
+
                         if (show) {
                             $sb.fadeIn(300);
                         }
-                    }, function() {
+                    }, function () {
                         $sb.fadeOut(300);
                     });
 
@@ -1422,12 +1428,12 @@
 
                     var $wsTree;
 
-                    var setWSTree = function() {
+                    var setWSTree = function () {
                         var workspaceTree = window.epmLiveNavigation.workspaceTree();
                         if (workspaceTree) {
                             $wsTree = $('#' + workspaceTree._element.id);
                         } else {
-                            window.setTimeout(function() {
+                            window.setTimeout(function () {
                                 setWSTree();
                             }, 1);
                         }
@@ -1451,9 +1457,9 @@
 
                         try {
                             wsWidth = $wsTree.width() + 40;
-                        } catch(ex) {
-                        } 
-                        
+                        } catch (ex) {
+                        }
+
                         var newWidth = 0;
 
                         if (snWidth < wsWidth) {
@@ -1462,7 +1468,7 @@
                             $sn.stop().animate({ width: newWidth }, 300);
                             $sn.parent().stop().animate({ width: newWidth }, 300);
                         }
-                        
+
                         $('.epm-nav-ws-node').each(function () {
                             var $div = $(this);
 
@@ -1536,33 +1542,33 @@
                         }
                     });
 
-                    var registerWSExpandCollapseEvent = function() {
+                    var registerWSExpandCollapseEvent = function () {
                         var $workspaces = $('a.rtIn');
-                        
+
                         if ($workspaces.length) {
-                            $workspaces.each(function() {
+                            $workspaces.each(function () {
                                 var $spans = $(this).parent().parent().find('span');
                                 if ($spans.length > 1) {
                                     var $span = $($spans.get(1));
 
                                     if ($span) {
-                                        $span.click(function() {
+                                        $span.click(function () {
                                             expandOrCollapseWorkspaceMenu($(this));
                                         });
 
-                                        $span.hover(function() {
+                                        $span.hover(function () {
                                             window.epmLiveNavigation.wsNodeSelectorClass = $(this).attr('class');
                                         });
                                     }
                                 }
                             });
                         } else {
-                            window.setTimeout(function() {
+                            window.setTimeout(function () {
                                 registerWSExpandCollapseEvent();
                             }, 1);
                         }
                     };
-                    
+
                     registerWSExpandCollapseEvent();
                 }
 
@@ -1571,11 +1577,11 @@
                         var webUrl = $$.currentWebUrl();
                         var url = window.location.href;
                         var rawUrl = (link.Url ? link.Url['#cdata'] : '');
-                        
+
                         if ((rawUrl + '').toLowerCase().indexOf('/lists/') !== -1) {
                             url = rawUrl.replace(/Source={page}&BackTo={page}/g, '');
                             var parts = url.split('?');
-                            
+
                             if (parts.length > 1) {
                                 if (!parts[1]) {
                                     url = parts[0];
@@ -1585,7 +1591,7 @@
                             var urlParts = url.split('?');
                             var page = (webUrl + urlParts[0].split(escape(webUrl))[1]);
                             page = escape(page);
-                            
+
                             url = rawUrl.replace(/{page}/g, page);
                         }
 
@@ -1739,7 +1745,7 @@
                             }
                         }
                     }
-                    
+
                     $('.epm-app-btn').click(function () {
                         document.location.href = $(this).data('url');
                     });
@@ -1791,7 +1797,7 @@
                             }
                         }
                     } else {
-                        window.setTimeout(function() {
+                        window.setTimeout(function () {
                             registerStaticProviderLinks();
                         }, 1);
                     }
@@ -1801,26 +1807,26 @@
                     $('#epm-nav-top').find("[data-role='top-nav-node']").each(function () {
                         tlNodes.push(new navNode(this));
                     });
-                }                
+                }
 
                 window.epmLiveNavigation.removeLink = function (link) {
                     var $a = $sn.find('#epm-nav-link-' + link.id);
                     window.epmLiveNavigation.handleContextualCommand(link.id, $a.data('webid'), $a.data('listid'), $a.data('itemid'), 'nav:remove', '98');
                 };
-                
-                window.epmLiveNavigation.registerLink = function(link) {
+
+                window.epmLiveNavigation.registerLink = function (link) {
                     if (link) {
                         var providerName;
 
                         switch (link.kind) {
-                        case 0:
-                        case 1:
-                            providerName = 'Favorites';
-                            break;
-                        case 2:
-                        case 3:
-                            providerName = 'Workspaces';
-                            break;
+                            case 0:
+                            case 1:
+                                providerName = 'Favorites';
+                                break;
+                            case 2:
+                            case 3:
+                                providerName = 'Workspaces';
+                                break;
                         }
 
                         if (providerName) {
@@ -1886,7 +1892,7 @@
                                 epmLiveService.execute('GetNavigationLinks', providerName, function (response) {
                                     var registeredLinks = [];
                                     var links = response.Nodes.Workspaces.NavLink;
-                                    
+
                                     for (var l in links) {
                                         if (links.hasOwnProperty(l)) {
                                             var lnk = links[l];
@@ -2011,11 +2017,11 @@
 
                                     try {
                                         if ($('#epm-nav-sub-workspaces a').length < 3) {
-                                            window.setTimeout(function() {
+                                            window.setTimeout(function () {
                                                 window.epmLiveNavigation.registerLink({ kind: 3 });
                                             }, 200);
                                         }
-                                    } catch(ex) {
+                                    } catch (ex) {
                                     }
                                 }, function (response) {
                                     console.log(response);
@@ -2026,28 +2032,28 @@
                 };
 
                 window.epmLiveNavigation.showAssociatedItems = function (itemInfo) {
-                    var displayPopup = function(url) {
+                    var displayPopup = function (url) {
                         SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', { url: url, showMaximized: true });
                     };
-                    
+
                     var showItems = function (info) {
                         var webUrl = $$.currentWebUrl();
 
                         if (webUrl) {
                             $.ajax({
                                 type: 'POST',
-                                url: (webUrl + '/_layouts/15/epmlive/gridaction.aspx?action=linkeditemspost&listid='+ info.listId +'&lookups='+ info.lookup +'&field='+ info.field +'&LookupFieldList='+info.listName).replace(/\/\//g, '/'),
+                                url: (webUrl + '/_layouts/15/epmlive/gridaction.aspx?action=linkeditemspost&listid=' + info.listId + '&lookups=' + info.lookup + '&field=' + info.field + '&LookupFieldList=' + info.listName).replace(/\/\//g, '/'),
                                 contentType: 'application/json; charset=utf-8',
                                 dataType: 'json',
-                                success: function(response) {
+                                success: function (response) {
                                     displayPopup(info.url);
                                 },
-                                error: function(response) {
+                                error: function (response) {
                                     displayPopup(info.url);
                                 }
                             });
                         } else {
-                            window.setTimeout(function() {
+                            window.setTimeout(function () {
                                 showItems(info);
                             }, 1);
                         }
@@ -2090,13 +2096,13 @@
             var menuManager = (function () {
                 var _setupMenu = function ($li, defaultCommands, forcePopup, customOverrideKind, callBackFunctions) {
                     defaultCommands = defaultCommands || [];
-                     
+
                     var $a = $($li.find('a').get(0));
                     var itemId = $a.data('itemid');
                     var siteId = $a.data('siteid');
                     var webId = $a.data('webid');
                     var listId = $a.data('listid');
-                    
+
                     var liDomId = $li.get(0).id;
 
                     try {
@@ -2115,13 +2121,13 @@
                             listId = inf[1];
                             itemId = inf[2];
                         }
-                    } catch(e) {
+                    } catch (e) {
                     }
 
                     var listIdd = (listId || '').replace(/-/g, '');
 
-                        //var $menu = $($li.find('.epm-nav-contextual-menu').get(0));
-                    var $menu = $('#menu' + listIdd +itemId);
+                    //var $menu = $($li.find('.epm-nav-contextual-menu').get(0));
+                    var $menu = $('#menu' + listIdd + itemId);
 
                     var setup = function (commands, $ca) {
                         var getIcon = function (command) {
@@ -2159,23 +2165,23 @@
                                     return 'fui-ext-project';
                                 default:
                                     return 'epm-nav-cm-blank';
-                        }
-                    };
+                            }
+                        };
 
                         var liId = liDomId;
 
                         if (commands.length) {
                             commands.push({ title: '--SEP--' });
-                    }
+                        }
 
                         for (var dc in defaultCommands) {
                             if (defaultCommands.hasOwnProperty(dc)) {
                                 commands.push(defaultCommands[dc]);
+                            }
                         }
-                    }
 
                         //$menu = $($li.find('.epm-nav-contextual-menu').get(0));
-                        $menu = $('#menu' + listIdd +itemId);
+                        $menu = $('#menu' + listIdd + itemId);
 
                         $($menu.find('.epm-nav-cm-loading').get(0)).remove();
 
@@ -2185,7 +2191,7 @@
                             if (forcePopup) {
                                 cmd.kind = 0;
                             }
-                            
+
                             if (customOverrideKind) {
                                 cmd.kind = customOverrideKind;
                             }
@@ -2195,28 +2201,28 @@
                             if (!webId || webId === 'undefined') {
                                 try {
                                     webId = $ca.parent().get(0).id;
-                            } catch (e) {
+                                } catch (e) {
+                                }
                             }
-                        }
 
                             if (cmd.title === '--SEP--') {
-                                if (i !== commands.length -1) {
+                                if (i !== commands.length - 1) {
                                     $menu.append($('<li class="seprator"></li>').hide().fadeIn());
-                            }
+                                }
                             } else {
 
                                 var callbackfunction = '';
                                 if (callBackFunctions) {
                                     callbackfunction = callBackFunctions[cmd.command];
-                            }
+                                }
 
                                 $menu.append($('<li><span class="epm-nav-cm-icon ' + getIcon(cmd.command) + '">&nbsp;</span><a href="javascript:epmLiveNavigation.handleContextualCommand(\'' + liId + '\',\'' + webId + '\',\'' + listId + '\',\'' + itemId + '\',\'' + cmd.command + '\',\'' + cmd.kind + '\',\'' + callbackfunction + '\');" style="width: 122px !important; display: inline-block;">' + cmd.title + '</a></li>').hide().fadeIn());
 
                                 $menu.find('a').click(function () {
                                     hideMenu();
                                 });
+                            }
                         }
-                    }
 
                         $menu.find('a').click(function () {
                             var $at = $(this);
@@ -2225,7 +2231,7 @@
                                 }, function () {
                                     $menu.remove();
                                 });
-                        }
+                            }
                         });
 
                         $menu.hover(function () {
@@ -2239,10 +2245,10 @@
                             window.setTimeout(function () {
                                 if (window.epmNavHoveredNode == null) {
                                     hideMenu();
-                            }
+                                }
                             }, 200);
                         });
-                          
+
                         //$('.epm-nav-node, .epm-nav-ws-node').hover(function () {
                         //    var id = this.id;
                         //    window.epmNavHoveredNode = id;
@@ -2262,7 +2268,7 @@
                             window.setTimeout(function () {
                                 if (window.epmNavHoveredNode === null) {
                                     hideMenu();
-                            }
+                                }
                             }, 200);
                         });
 
@@ -2271,7 +2277,7 @@
                         });
 
                         if ($menu.offset().top + $menu.height() > $(window).height()) {
-                            $menu.css('top', $menu.offset().top - $menu.height() -30);
+                            $menu.css('top', $menu.offset().top - $menu.height() - 30);
                         }
                         if ($menu.offset().left + $menu.width() > $(window).width()) {
                             $menu.css('left', $menu.offset().left - $menu.width() - 30);
@@ -2285,7 +2291,7 @@
                         $menu.css('left', $li.offset().left);
 
                         if ($menu.offset().top + $menu.height() > $(window).height()) {
-                            $menu.css('top', $menu.offset().top - $menu.height() -30);
+                            $menu.css('top', $menu.offset().top - $menu.height() - 30);
                         }
                         if ($menu.offset().left + $menu.width() > $(window).width()) {
                             $menu.css('left', $menu.offset().left - $menu.width() - 30);
@@ -2296,7 +2302,7 @@
                         window.setTimeout(function () {
                             if (window.epmNavHoveredNode === null) {
                                 hideMenu();
-                        }
+                            }
                         }, 6000);
                     };
 
@@ -2311,25 +2317,25 @@
                             hideMenu();
                         } else {
                             showMenu();
-                    }
+                        }
                     };
 
                     if (window.epmNavSelectNode != listIdd + itemId && window.epmNavSelectNode != null) {
                         $('#menu' + window.epmNavSelectNode).fadeOut(200);
                     }
 
-                    window.epmNavSelectNode = listIdd +itemId;
-                        //if($('body').find('.epm-nav-contextual-menu').length > 0)
-                        //    $('body').find('.epm-nav-contextual-menu').get(0).remove();
+                    window.epmNavSelectNode = listIdd + itemId;
+                    //if($('body').find('.epm-nav-contextual-menu').length > 0)
+                    //    $('body').find('.epm-nav-contextual-menu').get(0).remove();
 
 
 
-                        //if ($li.find('.epm-nav-contextual-menu').length === 0) {
-                    if ($('body').find('#menu' + listIdd +itemId).length === 0) {
+                    //if ($li.find('.epm-nav-contextual-menu').length === 0) {
+                    if ($('body').find('#menu' + listIdd + itemId).length === 0) {
 
                         $('body').append('<ul class="epm-nav-contextual-menu"  id="menu' + listIdd + itemId + '" style="display:block;position:absolute;top:' + ($li.offset().top + 20) + 'px;left:' + $li.offset().left + 'px;"><li class="epm-nav-cm-loading"><span>Loading...</span></li></ul>');
                         //$menu = $($li.find('.epm-nav-contextual-menu').get(0));
-                        $menu = $('#menu' + listIdd +itemId);
+                        $menu = $('#menu' + listIdd + itemId);
                         showMenu();
 
 
@@ -2346,7 +2352,7 @@
                             $a.data('webid', webId);
                             $a.data('listid', listId);
                             $a.data('itemid', itemId);
-                    }
+                        }
 
                         var getMenuItems = function () {
                             if (window.epmLive) {
@@ -2361,18 +2367,18 @@
                                         if (items) {
                                             if (!items.length) {
                                                 items = [items];
-                                        }
+                                            }
 
                                             for (var i = 0; i < items.length; i++) {
                                                 var item = items[i];
                                                 if (customOverrideKind) {
-                                                    commands.push({ title: item['@Title'], command: item['@Command'], kind: customOverrideKind, imgUrl: item['@ImageUrl']});
+                                                    commands.push({ title: item['@Title'], command: item['@Command'], kind: customOverrideKind, imgUrl: item['@ImageUrl'] });
                                                 } else {
-                                                    commands.push({ title: item['@Title'], command: item['@Command'], kind: item['@Kind'], imgUrl: item['@ImageUrl']});
+                                                    commands.push({ title: item['@Title'], command: item['@Command'], kind: item['@Kind'], imgUrl: item['@ImageUrl'] });
+                                                }
                                             }
                                         }
                                     }
-                                }
 
                                     setup(commands, $a);
                                 }, function (response) {
@@ -2382,8 +2388,8 @@
                                 window.setTimeout(function () {
                                     getMenuItems();
                                 }, 1);
-                        }
-                    };
+                            }
+                        };
 
                         getMenuItems();
                     } else {
@@ -2510,9 +2516,9 @@
                         if ($li.get(0).innerHTML.indexOf('epm-nav-dragger') === -1) {
                             $li.prepend('<span class="epm-nav-dragger">&nbsp;</span>');
 
-                            $li.hover(function() {
+                            $li.hover(function () {
                                 $($(this).find('.epm-nav-dragger').get(0)).css('visibility', 'visible');
-                            }, function() {
+                            }, function () {
                                 $($(this).find('.epm-nav-dragger').get(0)).css('visibility', 'hidden');
                             });
                         }
@@ -2521,7 +2527,7 @@
                     window.epmLiveNavigation.addFavoritesMenu = function ($li) {
                         $li.append('<span class="epm-menu-btn"><span class="icon-ellipsis-horizontal"></span></span>');
 
-                        $($li.find('.epm-menu-btn').get(0)).click(function() {
+                        $($li.find('.epm-menu-btn').get(0)).click(function () {
                             menuManager.setupMenu($li, [
                                 { title: 'Remove', command: 'nav:remove', kind: '98' }
                             ]);
@@ -2577,7 +2583,7 @@
                     $ul.sortable({
                         items: 'li.epm-nav-sortable',
                         placeholder: 'epm-nav-drag-placeholder',
-                        start: function(event, ui) {
+                        start: function (event, ui) {
                             if ($favMenu.is(':visible')) {
                                 var index = ui.item.index();
                                 var kind = 'page';
@@ -2589,7 +2595,7 @@
                                 ui.item.data('kind', kind);
                             }
                         },
-                        stop: function(event, ui) {
+                        stop: function (event, ui) {
                             if ($favMenu.is(':visible')) {
                                 var valid = true;
 
@@ -2612,7 +2618,7 @@
                                 }
                             }
                         },
-                        update: function() {
+                        update: function () {
                             favoritesManager.resetOrder($ul);
                         }
                     });
@@ -2668,7 +2674,7 @@
                             } else {
                                 commands.push({ title: 'Add', command: 'nav:addToFav', kind: 98 });
                             }
-                            
+
                             menuManager.setupMenu($li, commands);
                         });
                     };
@@ -2699,9 +2705,9 @@
 
             var manageWorkspaces = function () {
                 var $wsTree = $('#EPMNavWorkspacesTree');
-                
+
                 var workspacesManager = (function () {
-                    window.epmLiveNavigation.addFavoriteWSMenu = function($li) {
+                    window.epmLiveNavigation.addFavoriteWSMenu = function ($li) {
                         $li.append('<span class="epm-menu-btn"><span class="icon-ellipsis-horizontal"></span></span>');
 
                         $($li.find('.epm-menu-btn').get(0)).click(function () {
@@ -2717,7 +2723,7 @@
                                 if (window.epmLiveNavigation.wsInfoDict[liId].hasAccess) {
                                     var found = false;
 
-                                    $('#epm-nav-sub-workspaces-static-links').find('a').each(function() {
+                                    $('#epm-nav-sub-workspaces-static-links').find('a').each(function () {
                                         if ($(this).data('webid') === liId) {
                                             found = true;
                                         }
@@ -2737,7 +2743,7 @@
                                 commands.push({ title: 'Remove', command: 'nav:removeFavWS', kind: 98 });
                                 webId = $($li.find('a').get(0)).data('webid');
                             }
-                            
+
                             if (proceed) {
                                 if (window.epmLiveNavigation.wsTeamDict[webId] !== 'X' && liId !== window.epmLive.rootWebId) {
                                     commands.push({ title: 'Edit team', command: 'nav:team', kind: 6 });
@@ -2820,7 +2826,7 @@
                             var $sb = $('#EPMNavWSTSearch');
 
                             $sb.val('');
-                            $sb.bindWithDelay('keyup', function() {
+                            $sb.bindWithDelay('keyup', function () {
                                 var term = $(this).val().trim();
                                 if (term) {
                                     if (term.length > 1) {
@@ -2833,7 +2839,7 @@
                                 }
                             }, 200);
                         } else {
-                            window.setTimeout(function() {
+                            window.setTimeout(function () {
                                 _initSearch();
                             }, 100);
                         }
@@ -2864,15 +2870,15 @@
                         }
                     };
 
-                    var removeSearchPlaceHolders = function() {
-                        $wsTree.find('.epm-nav-sub-placeholder').each(function() {
+                    var removeSearchPlaceHolders = function () {
+                        $wsTree.find('.epm-nav-sub-placeholder').each(function () {
                             $(this).remove();
                         });
                     };
 
                     var showAllNodes = function () {
                         removeSearchPlaceHolders();
-                        
+
                         var nodes = window.epmLiveNavigation.workspaceTree().get_allNodes();
 
                         for (var i = 0; i < nodes.length; i++) {
@@ -2932,7 +2938,7 @@
                 $wsTree.find('a').each(function () {
                     workspacesManager.addMenu($(this).parent());
                 });
-                
+
                 if ($wsTree.find('a').length === 1) {
                     $wsTree.hide();
 
@@ -2944,7 +2950,7 @@
             ExecuteOrDelayUntilScriptLoaded(manageFavorites, 'EPMLiveNavigation_Favorites');
             ExecuteOrDelayUntilScriptLoaded(manageWorkspaces, 'EPMLiveNavigation_Workspaces');
             ExecuteOrDelayUntilScriptLoaded(manageRecentItems, 'EPMLiveNavigation_RecentItems');
-            
+
             window.SP.SOD.notifyScriptLoadedAndExecuteWaitingJobs('EPMLive.Navigation.js');
         });
     }

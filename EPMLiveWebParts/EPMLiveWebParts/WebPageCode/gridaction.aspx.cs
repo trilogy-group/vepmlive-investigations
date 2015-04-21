@@ -17,6 +17,7 @@ using System.Xml;
 using System.Text;
 using System.Data.SqlClient;
 using EPMLiveCore.API;
+using System.Reflection;
 
 namespace EPMLiveWebParts
 {
@@ -679,9 +680,48 @@ namespace EPMLiveWebParts
                             w.AllowUnsafeUpdates = true;
                             {
                                 SPList list = w.Lists[new Guid(Request["listid"])];
-                                list.GetItemById(int.Parse(Request["ID"])).Recycle();
-                                //url = Request["Source"];
-                                data = "Success";
+
+                                if (list.Title.ToLower().Equals("resources"))
+                                {
+                                    w.AllowUnsafeUpdates = true;
+                                    SPListItem item = list.GetItemById(int.Parse(Request["ID"]));
+                                    int extId;
+                                    string deleteResourceCheckStatus = string.Empty;
+                                    string deleteResourceCheckMessage = string.Empty;
+
+                                    if (!int.TryParse(item["EXTID"] as string, out extId))
+                                    {
+                                        return;
+                                    }
+
+                                    var args = new object[] { extId, item.UniqueId, w, deleteResourceCheckMessage, deleteResourceCheckStatus };
+                                    Assembly assembly = Assembly.Load("WorkEnginePPM, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5");
+                                    Type type = assembly.GetType("WorkEnginePPM.Core.ResourceManagement.Utilities", true, true);
+                                    type.GetMethod("PerformDeleteResourceCheck", BindingFlags.Public | BindingFlags.Static).Invoke(null, args);
+
+                                    deleteResourceCheckStatus = Convert.ToString(args[3]);
+                                    deleteResourceCheckMessage = Convert.ToString(args[4]);
+
+                                    if (!string.IsNullOrEmpty(deleteResourceCheckStatus) && deleteResourceCheckStatus.ToLower().Equals("no"))
+                                    {
+                                        ClientScript.RegisterStartupScript(this.GetType(), "canceldelete", "javascript:alert('hi');");
+                                        throw new Exception(deleteResourceCheckMessage);
+                                    }
+                                    else
+                                    {
+                                        list.ParentWeb.AllowUnsafeUpdates = true;
+                                        list.GetItemById(int.Parse(Request["ID"])).Recycle();
+                                        //url = Request["Source"];
+                                        data = "Success";
+                                    }
+                                }
+                                else
+                                {
+                                    list.ParentWeb.AllowUnsafeUpdates = true;
+                                    list.GetItemById(int.Parse(Request["ID"])).Recycle();
+                                    //url = Request["Source"];
+                                    data = "Success";
+                                }
                             }
                             w.Close();
                             break;
@@ -776,6 +816,7 @@ namespace EPMLiveWebParts
             catch (Exception ex)
             {
                 data = "General Error: " + ex.Message;
+                //ClientScript.RegisterStartupScript(this.GetType(), "closeWindow", "<script language=\"javascript\">javascript:alert('hi'); return false;</script>");
             }
 
 

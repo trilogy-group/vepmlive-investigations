@@ -281,7 +281,7 @@ namespace WorkEnginePPM.WebServices.Core
         /// </summary>
         /// <param name="data">The data.</param>
         /// <returns></returns>
-        internal string DeleteResourceCheck(string data)
+        public string DeleteResourceCheck(string data)
         {
             try
             {
