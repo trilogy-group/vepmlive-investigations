@@ -186,7 +186,13 @@ namespace EPMLiveEnterprise
                 WebSvcProject.Project pService = new WebSvcProject.Project();
                 pService.Url = url + "/_vti_bin/psi/project.asmx";
                 pService.UseDefaultCredentials = true;
-                WebSvcProject.ProjectDataSet pDs = pService.ReadProject(projectuid, WebSvcProject.DataStoreEnum.PublishedStore);
+
+                WebSvcProject.ProjectDataSet pDs = new WebSvcProject.ProjectDataSet();
+                SPSecurity.RunWithElevatedPrivileges(delegate()
+                {
+                    pDs = pService.ReadProject(projectuid, WebSvcProject.DataStoreEnum.PublishedStore);
+                });
+
                 return pDs.Project[0].ProjectOwnerID;
             }
             catch (Exception ex)
@@ -204,7 +210,13 @@ namespace EPMLiveEnterprise
                 WebSvcResource.Resource pResource = new WebSvcResource.Resource();
                 pResource.Url = url + "/_vti_bin/psi/resource.asmx";
                 pResource.UseDefaultCredentials = true;
-                WebSvcResource.ResourceDataSet rDs = pResource.ReadResource(RES_GUID);
+                WebSvcResource.ResourceDataSet rDs = new WebSvcResource.ResourceDataSet();
+
+                SPSecurity.RunWithElevatedPrivileges(delegate()
+                {
+                    rDs = pResource.ReadResource(RES_GUID);
+                });
+
                 if (rDs.Resources.Count > 0)
                 {
                     if (rDs.Resources[0].RES_IS_WINDOWS_USER)

@@ -197,8 +197,12 @@ namespace EPMLiveEnterprise
                     site.Close();
 
                     wssInterop.Credentials = System.Net.CredentialCache.DefaultCredentials;
+                    WebSvcWssInterop.WssSettingsDataSet dsCurrentWssInfo = new WebSvcWssInterop.WssSettingsDataSet();
 
-                    WebSvcWssInterop.WssSettingsDataSet dsCurrentWssInfo = wssInterop.ReadWssSettings();
+                    SPSecurity.RunWithElevatedPrivileges(delegate()
+                    {
+                        dsCurrentWssInfo = wssInterop.ReadWssSettings();
+                    });
                     WebSvcWssInterop.WssSettingsDataSet.WssAdminRow adminRow = dsCurrentWssInfo.WssAdmin[0];
 
                     return adminRow.WADMIN_DEFAULT_SITE_COLLECTION;
@@ -260,8 +264,12 @@ namespace EPMLiveEnterprise
                 wssInterop.Url = interopUrl + "/_vti_bin/psi/wssinterop.asmx";
 
                 wssInterop.Credentials = System.Net.CredentialCache.DefaultCredentials;
+                WebSvcWssInterop.WssSettingsDataSet dsCurrentWssInfo = new WebSvcWssInterop.WssSettingsDataSet();
 
-                WebSvcWssInterop.WssSettingsDataSet dsCurrentWssInfo = wssInterop.ReadWssSettings();
+                SPSecurity.RunWithElevatedPrivileges(delegate()
+                {
+                    dsCurrentWssInfo = wssInterop.ReadWssSettings();
+                });
                 WebSvcWssInterop.WssSettingsDataSet.WssAdminRow adminRow = dsCurrentWssInfo.WssAdmin[0];
                 
 
@@ -672,18 +680,19 @@ namespace EPMLiveEnterprise
                 WebSvcProject.Project pSvc = new EPMLiveEnterprise.WebSvcProject.Project();
                 pSvc.Url = psweb.Url + "/_vti_bin/psi/project.asmx";
                 pSvc.UseDefaultCredentials = true;
-                
+                WebSvcProject.ProjectDataSet pds = new WebSvcProject.ProjectDataSet();
+
                 WebSvcCustomFields.CustomFields svcCF = new EPMLiveEnterprise.WebSvcCustomFields.CustomFields();
                 svcCF.Url = psweb.Url + "/_vti_bin/psi/customfields.asmx";
                 svcCF.UseDefaultCredentials = true;
-
-                WebSvcCustomFields.CustomFieldDataSet cfDs = svcCF.ReadCustomFieldsByEntity(new Guid(PSLibrary.EntityCollection.Entities.TaskEntity.UniqueId));
-
-                WebSvcProject.ProjectDataSet pds = pSvc.ReadProject(new Guid(projectGuid), WebSvcProject.DataStoreEnum.PublishedStore);
-                string projectname = pds.Project[0].PROJ_NAME;
+                WebSvcCustomFields.CustomFieldDataSet cfDs = new WebSvcCustomFields.CustomFieldDataSet();
 
                 SPSecurity.RunWithElevatedPrivileges(delegate()
                 {
+
+                    cfDs = svcCF.ReadCustomFieldsByEntity(new Guid(PSLibrary.EntityCollection.Entities.TaskEntity.UniqueId));
+                    pds = pSvc.ReadProject(new Guid(projectGuid), WebSvcProject.DataStoreEnum.PublishedStore);
+                    string projectname = pds.Project[0].PROJ_NAME;
 
                     SqlConnection cn = null;
                     try
@@ -1125,8 +1134,13 @@ namespace EPMLiveEnterprise
                     WebSvcCustomFields.CustomFields svcCF = new EPMLiveEnterprise.WebSvcCustomFields.CustomFields();
                     svcCF.Url = projectServerURL + "/_vti_bin/psi/customfields.asmx";
                     svcCF.UseDefaultCredentials = true;
+                    WebSvcCustomFields.CustomFieldDataSet dsF = new WebSvcCustomFields.CustomFieldDataSet();
 
-                    WebSvcCustomFields.CustomFieldDataSet dsF = svcCF.ReadCustomFieldsByEntity(new Guid(PSLibrary.EntityCollection.Entities.TaskEntity.UniqueId));
+                    SPSecurity.RunWithElevatedPrivileges(delegate()
+                    {
+                        dsF = svcCF.ReadCustomFieldsByEntity(new Guid(PSLibrary.EntityCollection.Entities.TaskEntity.UniqueId));
+                    });
+
                     for (int i = 0; i < dsF.CustomFields.Count; i++)
                     {
                         WebSvcCustomFields.CustomFieldDataSet.CustomFieldsRow customField = dsF.CustomFields[i];
@@ -1241,8 +1255,12 @@ namespace EPMLiveEnterprise
                 WebSvcCustomFields.CustomFields svcCF = new EPMLiveEnterprise.WebSvcCustomFields.CustomFields();
                 svcCF.Url = url + "/_vti_bin/psi/customfields.asmx";
                 svcCF.UseDefaultCredentials = true;
+                WebSvcCustomFields.CustomFieldDataSet dsF = new WebSvcCustomFields.CustomFieldDataSet();
 
-                WebSvcCustomFields.CustomFieldDataSet dsF = svcCF.ReadCustomFieldsByEntity(new Guid(PSLibrary.EntityCollection.Entities.TaskEntity.UniqueId));
+                SPSecurity.RunWithElevatedPrivileges(delegate()
+                {
+                    dsF = svcCF.ReadCustomFieldsByEntity(new Guid(PSLibrary.EntityCollection.Entities.TaskEntity.UniqueId));
+                });
 
                 foreach(WebSvcCustomFields.CustomFieldDataSet.CustomFieldsRow cfr in dsF.CustomFields)
                 {

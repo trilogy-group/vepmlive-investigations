@@ -229,10 +229,14 @@ namespace EPMLiveEnterprise
                             da.Fill(ds);
                             dtFieldsToPublish = ds.Tables[0];
 
-                            WebSvcProject.ProjectDataSet pDs = pService.ReadProject(projectGuid, WebSvcProject.DataStoreEnum.PublishedStore);
-                            rDs = pResource.ReadResources("", false);
-                            dsFields = pCf.ReadCustomFieldsByEntity(new Guid(PSLibrary.EntityCollection.Entities.TaskEntity.UniqueId));
-                            dsLt = psiLookupTable.ReadLookupTables("", false, 0);
+                            WebSvcProject.ProjectDataSet pDs = new WebSvcProject.ProjectDataSet();
+                            SPSecurity.RunWithElevatedPrivileges(delegate()
+                            {
+                                pDs = pService.ReadProject(projectGuid, WebSvcProject.DataStoreEnum.PublishedStore);
+                                rDs = pResource.ReadResources("", false);
+                                dsFields = pCf.ReadCustomFieldsByEntity(new Guid(PSLibrary.EntityCollection.Entities.TaskEntity.UniqueId));
+                                dsLt = psiLookupTable.ReadLookupTables("", false, 0);
+                            });
 
                             //SPUser user = mySiteToPublish.AllUsers[getResourceUsername(pDs.Project[0].ProjectOwnerID)];
                             //SPUserToken token = user.UserToken;
@@ -300,7 +304,11 @@ namespace EPMLiveEnterprise
 
         private void linkProjectWss()
         {
-            WebSvcWssInterop.WssSettingsDataSet dsCurrentWssInfo = pWssInterop.ReadWssSettings();
+            WebSvcWssInterop.WssSettingsDataSet dsCurrentWssInfo = new WebSvcWssInterop.WssSettingsDataSet();
+            SPSecurity.RunWithElevatedPrivileges(delegate()
+            {
+                dsCurrentWssInfo = pWssInterop.ReadWssSettings();
+            });
             WebSvcWssInterop.WssSettingsDataSet.WssAdminRow adminRow = dsCurrentWssInfo.WssAdmin[0];
 
             Guid serverUid = adminRow.WADMIN_CURRENT_STS_SERVER_UID;
@@ -346,12 +354,15 @@ namespace EPMLiveEnterprise
             try
             {
                 WebSvcWssInterop.WssInterop wssInterop = new WebSvcWssInterop.WssInterop();
-
                 wssInterop.Url = pwaUrl + "/_vti_bin/psi/wssinterop.asmx";
-
                 wssInterop.Credentials = System.Net.CredentialCache.DefaultCredentials;
 
-                WebSvcWssInterop.ProjectWSSInfoDataSet ds = wssInterop.ReadWssData(projectUID);
+                WebSvcWssInterop.ProjectWSSInfoDataSet ds = new WebSvcWssInterop.ProjectWSSInfoDataSet();
+
+                SPSecurity.RunWithElevatedPrivileges(delegate()
+                {
+                    ds = wssInterop.ReadWssData(projectUID);
+                });
 
                 if (ds.ProjWssInfo.Count > 0)
                 {
@@ -634,7 +645,10 @@ namespace EPMLiveEnterprise
             {
                 try
                 {
-                    cfDs = pCf.ReadCustomFieldsByEntity(taskEntity);
+                    SPSecurity.RunWithElevatedPrivileges(delegate()
+                    {
+                        cfDs = pCf.ReadCustomFieldsByEntity(taskEntity);
+                    });
                 }
                 catch (Exception ex)
                 {
@@ -1503,8 +1517,10 @@ namespace EPMLiveEnterprise
 
                 if (ds.Length <= 0)
                 {
-                    dsFields = pCf.ReadCustomFieldsByEntity(new Guid(PSLibrary.EntityCollection.Entities.ProjectEntity.UniqueId));
-
+                    SPSecurity.RunWithElevatedPrivileges(delegate()
+                    {
+                        dsFields = pCf.ReadCustomFieldsByEntity(new Guid(PSLibrary.EntityCollection.Entities.ProjectEntity.UniqueId));
+                    });
                     ds = (WebSvcCustomFields.CustomFieldDataSet.CustomFieldsRow[])dsFields.CustomFields.Select("MD_PROP_ID=" + fieldName);
 
                 }

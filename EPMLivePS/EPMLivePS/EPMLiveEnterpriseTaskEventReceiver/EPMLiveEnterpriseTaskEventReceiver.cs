@@ -723,7 +723,12 @@ namespace EPMLiveEnterprise
                                         {
                                             LookupTable.Url = pwaSiteUrl + "/_vti_bin/psi/LookupTable.asmx";
                                             LookupTable.UseDefaultCredentials = true;
-                                            WebSvcLookupTables.LookupTableDataSet LookupTableDs = LookupTable.ReadLookupTablesByUids(new Guid[] { CustomFieldsArray[0].MD_LOOKUP_TABLE_UID }, false, 0);
+                                            WebSvcLookupTables.LookupTableDataSet LookupTableDs = new WebSvcLookupTables.LookupTableDataSet();
+
+                                            SPSecurity.RunWithElevatedPrivileges(delegate()
+                                            {
+                                                LookupTableDs = LookupTable.ReadLookupTablesByUids(new Guid[] { CustomFieldsArray[0].MD_LOOKUP_TABLE_UID }, false, 0);
+                                            });
 
                                             string customfieldtype = getCustomFieldChangeType((PSLibrary.PSDataType)CustomFieldsArray[0].MD_PROP_TYPE_ENUM);
 
@@ -914,8 +919,12 @@ namespace EPMLiveEnterprise
             {
                 Project.Url = pwaSiteUrl + "/_vti_bin/psi/Project.asmx";
                 Project.UseDefaultCredentials = true;
+                WebSvcProject.ProjectDataSet projectDs = new WebSvcProject.ProjectDataSet();
 
-                WebSvcProject.ProjectDataSet projectDs = Project.ReadProjectEntities(projectId, 2, WebSvcProject.DataStoreEnum.PublishedStore);
+                SPSecurity.RunWithElevatedPrivileges(delegate()
+                {
+                     projectDs = Project.ReadProjectEntities(projectId, 2, WebSvcProject.DataStoreEnum.PublishedStore);
+                });
                 taskuid = projectDs.Task[0].TASK_UID;
 
             });
@@ -1300,7 +1309,10 @@ namespace EPMLiveEnterprise
                 lo_filter.Fields.Add(new PSLibrary.Filter.Field(resUID));
                 lo_filter.Criteria = new PSLibrary.Filter.FieldOperator(equal, nameColumn, ls_name);
                 errLoc = "ReadResources()";
-                lo_resDS = Resource.ReadResources(lo_filter.GetXml(), false);
+                SPSecurity.RunWithElevatedPrivileges(delegate()
+                {
+                    lo_resDS = Resource.ReadResources(lo_filter.GetXml(), false);
+                });
                 errLoc = "Returning Guid";
                 return (Guid)lo_resDS.Tables[lo_resDS.Resources.TableName].Rows[0][0];
             }

@@ -82,9 +82,12 @@ namespace EPMLiveEnterprise
 
                         try
                         {
-                            // Read project from PS using project GUID                
-                            WebSvcProject.ProjectDataSet projectDs = project.ReadProject(projectGuid, WebSvcProject.DataStoreEnum.WorkingStore);
-
+                            WebSvcProject.ProjectDataSet projectDs = new WebSvcProject.ProjectDataSet();
+                            // Read project from PS using project GUID
+                            SPSecurity.RunWithElevatedPrivileges(delegate()
+                            {
+                                projectDs = project.ReadProject(projectGuid, WebSvcProject.DataStoreEnum.WorkingStore);
+                            });
                             // Does it exist?
                             if (projectDs != null && projectDs.Tables.Count > 0)
                             {
@@ -164,80 +167,83 @@ namespace EPMLiveEnterprise
                 // Get the template Guid from the selected item in the list
                 Guid templateGuid = new Guid(ListBox1.SelectedValue);
 
-                SPWeb spWeb = SPContext.Current.Web;
+                SPSecurity.RunWithElevatedPrivileges(delegate()
                 {
-                    // Create instance of Project
-                    WebSvcProject.Project project = new WebSvcProject.Project();
-                    project.Url = ViewState["siteURL"] + "/_vti_bin/psi/project.asmx";
-                    project.UseDefaultCredentials = true;
-
-                    // Guid for new project
-                    Guid newProjectGuid = Guid.NewGuid();
-
-                    if (templateGuid == Guid.Empty)
+                    SPWeb spWeb = SPContext.Current.Web;
                     {
-                        WebSvcProject.ProjectDataSet dsProjectDataSet = new WebSvcProject.ProjectDataSet();
-                        WebSvcProject.ProjectDataSet.ProjectRow projectRow = dsProjectDataSet.Project.NewProjectRow();
-                        projectRow.PROJ_UID = newProjectGuid;
-                        projectRow.PROJ_NAME = ViewState["projectName"].ToString();
-                        projectRow.PROJ_INFO_START_DATE = System.DateTime.Now;
-                        projectRow.PROJ_TYPE = 0; //0 is for project and 1 is for template
-                        dsProjectDataSet.Project.AddProjectRow(projectRow);
+                        // Create instance of Project
+                        WebSvcProject.Project project = new WebSvcProject.Project();
+                        project.Url = ViewState["siteURL"] + "/_vti_bin/psi/project.asmx";
+                        project.UseDefaultCredentials = true;
 
-                        //create a project 
-                        Guid job = Guid.NewGuid();
-                        project.QueueCreateProject(job, dsProjectDataSet, false);
-                        WaitForQueue(job);
+                        // Guid for new project
+                        Guid newProjectGuid = Guid.NewGuid();
 
-                        job = Guid.NewGuid();
-                        project.QueuePublish(job, newProjectGuid, true, spWeb.Url);
-                        WaitForQueue(job);
-                    }
-                    else
-                    {
-                        Guid owner = getResourceUid();
-                        SPSecurity.RunWithElevatedPrivileges(delegate()
+                        if (templateGuid == Guid.Empty)
                         {
-                            newProjectGuid = project.CreateProjectFromTemplate(templateGuid, ViewState["projectName"].ToString());
+                            WebSvcProject.ProjectDataSet dsProjectDataSet = new WebSvcProject.ProjectDataSet();
+                            WebSvcProject.ProjectDataSet.ProjectRow projectRow = dsProjectDataSet.Project.NewProjectRow();
+                            projectRow.PROJ_UID = newProjectGuid;
+                            projectRow.PROJ_NAME = ViewState["projectName"].ToString();
+                            projectRow.PROJ_INFO_START_DATE = System.DateTime.Now;
+                            projectRow.PROJ_TYPE = 0; //0 is for project and 1 is for template
+                            dsProjectDataSet.Project.AddProjectRow(projectRow);
 
-                            WebSvcProject.ProjectDataSet templateProject;
-                            Guid jobGuid = Guid.NewGuid();
-                            Guid sessionGuid = Guid.NewGuid();
+                            //create a project 
+                            Guid job = Guid.NewGuid();
+                            project.QueueCreateProject(job, dsProjectDataSet, false);
+                            WaitForQueue(job);
 
-                            project.CheckOutProject(newProjectGuid, sessionGuid, "");
-                            templateProject = project.ReadProject(newProjectGuid, WebSvcProject.DataStoreEnum.WorkingStore);
-                            WebSvcProject.ProjectDataSet temp = ((WebSvcProject.ProjectDataSet)(templateProject.Copy()));
+                            job = Guid.NewGuid();
+                            project.QueuePublish(job, newProjectGuid, true, spWeb.Url);
+                            WaitForQueue(job);
+                        }
+                        else
+                        {
+                            SPSecurity.RunWithElevatedPrivileges(delegate()
+                            {
+                                Guid owner = getResourceUid();
+                                newProjectGuid = project.CreateProjectFromTemplate(templateGuid, ViewState["projectName"].ToString());
+
+                                WebSvcProject.ProjectDataSet templateProject;
+                                Guid jobGuid = Guid.NewGuid();
+                                Guid sessionGuid = Guid.NewGuid();
+
+                                project.CheckOutProject(newProjectGuid, sessionGuid, "");
+                                templateProject = project.ReadProject(newProjectGuid, WebSvcProject.DataStoreEnum.WorkingStore);
+                                WebSvcProject.ProjectDataSet temp = ((WebSvcProject.ProjectDataSet)(templateProject.Copy()));
 
 
-                            temp.Tables[temp.Project.TableName].Rows[0][temp.Project.ProjectOwnerIDColumn] = owner;
-                            WebSvcProject.ProjectDataSet updateProjectDataSet = new WebSvcProject.ProjectDataSet();
-                            updateProjectDataSet.Project.Merge(temp.Tables[temp.Project.TableName], true);
-                            updateProjectDataSet = ((WebSvcProject.ProjectDataSet)updateProjectDataSet.GetChanges(DataRowState.Modified));
+                                temp.Tables[temp.Project.TableName].Rows[0][temp.Project.ProjectOwnerIDColumn] = owner;
+                                WebSvcProject.ProjectDataSet updateProjectDataSet = new WebSvcProject.ProjectDataSet();
+                                updateProjectDataSet.Project.Merge(temp.Tables[temp.Project.TableName], true);
+                                updateProjectDataSet = ((WebSvcProject.ProjectDataSet)updateProjectDataSet.GetChanges(DataRowState.Modified));
 
-                            project.QueueUpdateProject(jobGuid, sessionGuid, updateProjectDataSet, false);
-                            WaitForQueue(jobGuid);
+                                project.QueueUpdateProject(jobGuid, sessionGuid, updateProjectDataSet, false);
+                                WaitForQueue(jobGuid);
 
-                            jobGuid = Guid.NewGuid();
-                            project.QueueCheckInProject(jobGuid, newProjectGuid, true, sessionGuid, "");
-                            WaitForQueue(jobGuid);
-                        });
+                                jobGuid = Guid.NewGuid();
+                                project.QueueCheckInProject(jobGuid, newProjectGuid, true, sessionGuid, "");
+                                WaitForQueue(jobGuid);
+                            });
+                        }
+
+                        SPList list = spWeb.Lists["Project Center"];
+                        spWeb.AllowUnsafeUpdates = true;
+                        // Find the item by ID
+                        SPListItem item = list.Items.GetItemById(itemId);
+                        // Set the new project Guid in the List
+                        item["projectguid"] = newProjectGuid;
+                        item.SystemUpdate();
+                        pwaUrl = ViewState["siteURL"].ToString();
+                        projectName = item.Title;
+                        // Add record to PublisherCheck Table
+                        InsertRowIntoPublisherCheck(newProjectGuid);
+
+                        pnlOpenProject.Visible = true;
+                        pnlNewProject.Visible = false;
                     }
-
-                    SPList list = spWeb.Lists["Project Center"];
-                    spWeb.AllowUnsafeUpdates = true;
-                    // Find the item by ID
-                    SPListItem item = list.Items.GetItemById(itemId);
-                    // Set the new project Guid in the List
-                    item["projectguid"] = newProjectGuid;
-                    item.SystemUpdate();
-                    pwaUrl = ViewState["siteURL"].ToString();
-                    projectName = item.Title;
-                    // Add record to PublisherCheck Table
-                    InsertRowIntoPublisherCheck(newProjectGuid);
-
-                    pnlOpenProject.Visible = true;
-                    pnlNewProject.Visible = false;
-                }
+                });
             }
             catch (SoapException ex)
             {
@@ -271,50 +277,53 @@ namespace EPMLiveEnterprise
 
         private void WaitForQueue(Guid jobId)
         {
-            WebSvcQueueSystem.QueueSystem q = new EPMLiveEnterprise.WebSvcQueueSystem.QueueSystem();
-            q.Url = ViewState["siteURL"] + "/_vti_bin/psi/queuesystem.asmx";
-            q.UseDefaultCredentials = true;
-            WebSvcQueueSystem.JobState jobState;
-            const int QUEUE_WAIT_TIME = 2; // two seconds
-            bool jobDone = false;
-            string xmlError = string.Empty;
-            int wait = 0;
-
-            //Wait for the project to get through the queue
-            // - Get the estimated wait time in seconds
-            wait = q.GetJobWaitTime(jobId);
-
-            // - Wait for it
-            Thread.Sleep(wait * 1000);
-            // - Wait until it is done.
-
-            do
+            SPSecurity.RunWithElevatedPrivileges(delegate()
             {
-                // - Get the job state
-                jobState = q.GetJobCompletionState(jobId, out xmlError);
+                WebSvcQueueSystem.QueueSystem q = new EPMLiveEnterprise.WebSvcQueueSystem.QueueSystem();
+                q.Url = ViewState["siteURL"] + "/_vti_bin/psi/queuesystem.asmx";
+                q.UseDefaultCredentials = true;
+                WebSvcQueueSystem.JobState jobState;
+                const int QUEUE_WAIT_TIME = 2; // two seconds
+                bool jobDone = false;
+                string xmlError = string.Empty;
+                int wait = 0;
 
-                if (jobState == WebSvcQueueSystem.JobState.Success)
+                //Wait for the project to get through the queue
+                // - Get the estimated wait time in seconds
+                wait = q.GetJobWaitTime(jobId);
+
+                // - Wait for it
+                Thread.Sleep(wait * 1000);
+                // - Wait until it is done.
+
+                do
                 {
-                    jobDone = true;
-                }
-                else
-                {
-                    if (jobState == WebSvcQueueSystem.JobState.Unknown
-                    || jobState == WebSvcQueueSystem.JobState.Failed
-                    || jobState == WebSvcQueueSystem.JobState.FailedNotBlocking
-                    || jobState == WebSvcQueueSystem.JobState.CorrelationBlocked
-                    || jobState == WebSvcQueueSystem.JobState.Canceled)
+                    // - Get the job state
+                    jobState = q.GetJobCompletionState(jobId, out xmlError);
+
+                    if (jobState == WebSvcQueueSystem.JobState.Success)
                     {
-                        // If the job failed, error out
-                        throw (new ApplicationException("Queue request " + jobState + " for Job ID " + jobId + ".\r\n" + xmlError));
+                        jobDone = true;
                     }
                     else
                     {
-                        Thread.Sleep(QUEUE_WAIT_TIME * 1000);
+                        if (jobState == WebSvcQueueSystem.JobState.Unknown
+                        || jobState == WebSvcQueueSystem.JobState.Failed
+                        || jobState == WebSvcQueueSystem.JobState.FailedNotBlocking
+                        || jobState == WebSvcQueueSystem.JobState.CorrelationBlocked
+                        || jobState == WebSvcQueueSystem.JobState.Canceled)
+                        {
+                            // If the job failed, error out
+                            throw (new ApplicationException("Queue request " + jobState + " for Job ID " + jobId + ".\r\n" + xmlError));
+                        }
+                        else
+                        {
+                            Thread.Sleep(QUEUE_WAIT_TIME * 1000);
+                        }
                     }
                 }
-            }
-            while (!jobDone);
+                while (!jobDone);
+            });
         }
 
 

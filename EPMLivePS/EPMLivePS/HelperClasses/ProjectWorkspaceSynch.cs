@@ -93,21 +93,30 @@ namespace EPMLiveEnterprise
                 doc.LoadXml(f.SchemaXml);
 
                 //WebSvcCustomFields.CustomFieldDataSet ds = pCf.ReadCustomFieldsByMdPropUids(new Guid[1] { new Guid(fieldName) }, false);
+                WebSvcCustomFields.CustomFieldDataSet dsFields = new WebSvcCustomFields.CustomFieldDataSet();
 
-                WebSvcCustomFields.CustomFieldDataSet dsFields = pCf.ReadCustomFieldsByEntity(new Guid(PSLibrary.EntityCollection.Entities.TaskEntity.UniqueId));
+                SPSecurity.RunWithElevatedPrivileges(delegate()
+                {
+                    dsFields = pCf.ReadCustomFieldsByEntity(new Guid(PSLibrary.EntityCollection.Entities.TaskEntity.UniqueId));
+                });
 
                 WebSvcCustomFields.CustomFieldDataSet.CustomFieldsRow[] ds = (WebSvcCustomFields.CustomFieldDataSet.CustomFieldsRow[])dsFields.CustomFields.Select("MD_PROP_ID=" + fieldName);
 
                 if (ds.Length <= 0)
                 {
-                    dsFields = pCf.ReadCustomFieldsByEntity(new Guid(PSLibrary.EntityCollection.Entities.ProjectEntity.UniqueId));
+                    SPSecurity.RunWithElevatedPrivileges(delegate()
+                    {
+                        dsFields = pCf.ReadCustomFieldsByEntity(new Guid(PSLibrary.EntityCollection.Entities.ProjectEntity.UniqueId));
+                    });
                     ds = (WebSvcCustomFields.CustomFieldDataSet.CustomFieldsRow[])dsFields.CustomFields.Select("MD_PROP_ID=" + fieldName);
                 }
                 if (ds.Length > 0)
                 {
-
-                    WebSvcLookupTables.LookupTableDataSet dsLt = psiLookupTable.ReadLookupTablesByUids(new Guid[1] { ds[0].MD_LOOKUP_TABLE_UID }, false, 0);
-
+                    WebSvcLookupTables.LookupTableDataSet dsLt = new WebSvcLookupTables.LookupTableDataSet();
+                    SPSecurity.RunWithElevatedPrivileges(delegate()
+                    {
+                        dsLt = psiLookupTable.ReadLookupTablesByUids(new Guid[1] { ds[0].MD_LOOKUP_TABLE_UID }, false, 0);
+                    });
                     StringBuilder sbChoices = new StringBuilder();
                     foreach (WebSvcLookupTables.LookupTableDataSet.LookupTableTreesRow tr in dsLt.LookupTableTrees)
                     {
@@ -221,7 +230,10 @@ namespace EPMLiveEnterprise
                     WebSvcCustomFields.CustomFieldDataSet cfDs = new WebSvcCustomFields.CustomFieldDataSet();
                     try
                     {
-                        cfDs = pCf.ReadCustomFieldsByEntity(new Guid(PSLibrary.EntityCollection.Entities.TaskEntity.UniqueId));
+                        SPSecurity.RunWithElevatedPrivileges(delegate()
+                        {
+                            cfDs = pCf.ReadCustomFieldsByEntity(new Guid(PSLibrary.EntityCollection.Entities.TaskEntity.UniqueId));
+                        });
                     }
                     catch (Exception ex)
                     {
@@ -822,7 +834,12 @@ namespace EPMLiveEnterprise
 
                         SPGroup members = myWebToPublish.AssociatedMemberGroup;
                         SPGroup visitors = myWebToPublish.AssociatedVisitorGroup;
-                        WebSvcProject.ProjectDataSet pDs = psiProject.ReadProject(projectUid, EPMLiveEnterprise.WebSvcProject.DataStoreEnum.PublishedStore);
+
+                        WebSvcProject.ProjectDataSet pDs = new WebSvcProject.ProjectDataSet();
+                        SPSecurity.RunWithElevatedPrivileges(delegate()
+                        {
+                            pDs = psiProject.ReadProject(projectUid, EPMLiveEnterprise.WebSvcProject.DataStoreEnum.PublishedStore);
+                        });
 
                         if (pubtype == 3)
                         {
@@ -923,8 +940,13 @@ namespace EPMLiveEnterprise
                 cfFilter.Fields.Add(new PSLibrary.Filter.Field("RES_UID"));
                 cfFilter.Criteria = new PSLibrary.Filter.FieldOperator(PSLibrary.Filter.FieldOperationType.Equal, "WRES_EMAIL", email);
 
-                WebSvcResource.ResourceDataSet rDs = psiResource.ReadResources(cfFilter.GetXml(), false);
-                
+                WebSvcResource.ResourceDataSet rDs = new WebSvcResource.ResourceDataSet();
+
+                SPSecurity.RunWithElevatedPrivileges(delegate()
+                {
+                    rDs = psiResource.ReadResources(cfFilter.GetXml(), false);
+                });
+
                 if (rDs.Resources.Count > 0)
                 {
                     if (rDs.Resources[0].RES_IS_WINDOWS_USER)
@@ -944,9 +966,14 @@ namespace EPMLiveEnterprise
         {
             try
             {
-                WebSvcCustomFields.CustomFieldDataSet ds = pCf.ReadCustomFieldsByMdPropUids(new Guid[1] { new Guid(fieldName) }, false);
-                WebSvcLookupTables.LookupTableDataSet dsLt = psiLookupTable.ReadLookupTablesByUids(new Guid[1] { ds.CustomFields[0].MD_LOOKUP_TABLE_UID }, false, 0);
+                WebSvcCustomFields.CustomFieldDataSet ds = new WebSvcCustomFields.CustomFieldDataSet();
+                WebSvcLookupTables.LookupTableDataSet dsLt = new WebSvcLookupTables.LookupTableDataSet();
 
+                SPSecurity.RunWithElevatedPrivileges(delegate()
+                {
+                    ds = pCf.ReadCustomFieldsByMdPropUids(new Guid[1] { new Guid(fieldName) }, false);
+                    dsLt = psiLookupTable.ReadLookupTablesByUids(new Guid[1] { ds.CustomFields[0].MD_LOOKUP_TABLE_UID }, false, 0);
+                });
                 WebSvcLookupTables.LookupTableDataSet.LookupTableTreesRow[] tr = (WebSvcLookupTables.LookupTableDataSet.LookupTableTreesRow[])dsLt.LookupTableTrees.Select("LT_STRUCT_UID = '" + lv_id + "'");
 
                 return tr[0].LT_VALUE_DESC;
@@ -962,7 +989,12 @@ namespace EPMLiveEnterprise
         {
             try
             {
-                WebSvcResource.ResourceDataSet rDs = psiResource.ReadResource(RES_GUID);
+                WebSvcResource.ResourceDataSet rDs = new WebSvcResource.ResourceDataSet();
+                SPSecurity.RunWithElevatedPrivileges(delegate()
+                {
+                    rDs = psiResource.ReadResource(RES_GUID);
+                });
+
                 if (rDs.Resources.Count > 0)
                 {
                     if (rDs.Resources[0].RES_IS_WINDOWS_USER)
