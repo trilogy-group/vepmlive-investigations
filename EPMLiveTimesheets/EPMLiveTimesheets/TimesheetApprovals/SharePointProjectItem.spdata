@@ -5,6 +5,6 @@
     <ProjectItemFile Source="TimesheetApprovals.dwp" Target="TimesheetApprovals\" Type="ElementFile" />
   </Files>
   <SafeControls>
-    <SafeControl Name="SafeControlEntry1" Assembly="$SharePoint.Project.AssemblyFullName$" Namespace="TimeSheets.TimesheetApprovals" TypeName="*" IsSafe="true" IsSafeAgainstScript="false" />
+    <SafeControl Name="SafeControlEntry1" Assembly="$SharePoint.Project.AssemblyFullName$" Namespace="TimeSheets.TimesheetApprovals" TypeName="*" IsSafe="true" IsSafeAgainstScript="true" />
   </SafeControls>
 </ProjectItem>

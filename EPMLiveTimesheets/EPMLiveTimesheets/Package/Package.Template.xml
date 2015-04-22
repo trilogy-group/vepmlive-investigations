@@ -3,7 +3,7 @@
   <Assemblies>
     <Assembly Location="TimeSheets.dll" DeploymentTarget="GlobalAssemblyCache">
       <SafeControls>
-        <SafeControl Assembly="$SharePoint.Project.AssemblyFullName$" Namespace="TimeSheets" TypeName="*" />
+        <SafeControl Assembly="$SharePoint.Project.AssemblyFullName$" Namespace="TimeSheets" TypeName="*" Safe="True" SafeAgainstScript="True" />
       </SafeControls>
     </Assembly>
   </Assemblies>
