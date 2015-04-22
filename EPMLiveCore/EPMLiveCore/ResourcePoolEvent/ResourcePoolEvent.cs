@@ -938,30 +938,35 @@ namespace EPMLiveCore
 
                             int extId;
 
-                            if (!int.TryParse(properties.ListItem["EXTID"] as string, out extId))
+                            try
                             {
-                                return;
-                            }
 
-                            var args = new object[] { extId, properties.ListItem.UniqueId, properties.Web, deleteResourceCheckMessage, deleteResourceCheckStatus };
-                            Assembly assembly = Assembly.Load("WorkEnginePPM, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5");
-                            Type type = assembly.GetType("WorkEnginePPM.Core.ResourceManagement.Utilities", true, true);
-                            type.GetMethod("PerformDeleteResourceCheck", BindingFlags.Public | BindingFlags.Static).Invoke(null, args);
+                                if (!int.TryParse(properties.ListItem["EXTID"] as string, out extId))
+                                {
+                                    return;
+                                }
 
-                            deleteResourceCheckStatus = Convert.ToString(args[3]);
-                            deleteResourceCheckMessage = Convert.ToString(args[4]);
+                                var args = new object[] { extId, properties.ListItem.UniqueId, properties.Web, deleteResourceCheckMessage, deleteResourceCheckStatus };
+                                Assembly assembly = Assembly.Load("WorkEnginePPM, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5");
+                                Type type = assembly.GetType("WorkEnginePPM.Core.ResourceManagement.Utilities", true, true);
+                                type.GetMethod("PerformDeleteResourceCheck", BindingFlags.Public | BindingFlags.Static).Invoke(null, args);
 
-                            if (!string.IsNullOrEmpty(deleteResourceCheckStatus) && deleteResourceCheckStatus.ToLower().Equals("no"))
-                            {
-                                properties.ErrorMessage = deleteResourceCheckMessage;
-                                properties.Status = SPEventReceiverStatus.CancelWithError;
-                                properties.Cancel = true;
+                                deleteResourceCheckStatus = Convert.ToString(args[3]);
+                                deleteResourceCheckMessage = Convert.ToString(args[4]);
+
+                                if (!string.IsNullOrEmpty(deleteResourceCheckStatus) && deleteResourceCheckStatus.ToLower().Equals("no"))
+                                {
+                                    properties.ErrorMessage = deleteResourceCheckMessage;
+                                    properties.Status = SPEventReceiverStatus.CancelWithError;
+                                    properties.Cancel = true;
+                                }
+                                else
+                                {
+                                    SPFieldUserValue uv = new SPFieldUserValue(properties.Web, properties.ListItem["SharePointAccount"].ToString());
+                                    oWeb.SiteUsers.RemoveByID(uv.LookupId);
+                                }
                             }
-                            else
-                            {
-                                SPFieldUserValue uv = new SPFieldUserValue(properties.Web, properties.ListItem["SharePointAccount"].ToString());
-                                oWeb.SiteUsers.RemoveByID(uv.LookupId);
-                            }
+                            catch { }
                         }
                     }
                 });
