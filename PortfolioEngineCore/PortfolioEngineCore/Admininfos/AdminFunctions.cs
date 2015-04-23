@@ -328,7 +328,7 @@ namespace PortfolioEngineCore
 
         public bool CalcAvailabilities(int calendar, string reslist)
         {
-            if (reslist != "")
+            if (!string.IsNullOrEmpty(reslist))
                 return CalcInternalAvailabilities(_dba, -1, reslist);
             else
                 return CalcInternalAvailabilities(_dba, -1, "");
