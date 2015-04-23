@@ -167,7 +167,7 @@ namespace EPMLiveCore
                 {
                     if (isAdd || (properties.ListItem != null && properties.ListItem["SharePointAccount"] != null))
                     {
-                        //CoreFunctions.EnsureNoDuplicates(properties, isAdd, isOnline);
+                        CoreFunctions.EnsureNoDuplicates(properties, isAdd, isOnline);
                         if (isOnline)
                         {
                             if (properties.List.Fields.ContainsFieldWithInternalName("FirstName") && properties.List.Fields.ContainsFieldWithInternalName("LastName"))
