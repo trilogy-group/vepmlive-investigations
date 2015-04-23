@@ -328,7 +328,10 @@ namespace PortfolioEngineCore
 
         public bool CalcAvailabilities(int calendar, string reslist)
         {
-            return CalcInternalAvailabilities(_dba, -1, "");
+            if (reslist != "")
+                return CalcInternalAvailabilities(_dba, -1, reslist);
+            else
+                return CalcInternalAvailabilities(_dba, -1, "");
         }
 
         public static bool CalcRPAllAvailabilities(DBAccess dba)
