@@ -497,8 +497,8 @@ namespace EPMLiveCore
             tempVal = "<li class=\"ms-create-listitem\"><div class=\"divCreateNewWorkspaceFrom \"><a id=\"lnkNewTempFrmSolGal\" class=\"sameColorLink\" href=\"#\" onclick=\"javascript:window.epmLiveCreateWorkspace.ClearAllSelection(\'createNewWorkspaceFrom\'); $(this).addClass(\'selectedLink\'); window.epmLiveCreateWorkspace.DisplaySolGalTemps(); window.epmLiveCreateWorkspace.SetCreateNewFrom(\'solutionGal\'); window.epmLiveCreateWorkspace.SelectAllCategory(\'solgal\'); window.epmLiveCreateWorkspace.SetupSearchLogic(\'solgal\'); return false;\">Solution Gallery</a></div></li>";
             pnlCreateNewWorkspaceFrom.Controls.Add(new LiteralControl(tempVal));
 
-            tempVal = "<li class=\"ms-create-listitem\"><div class=\"divCreateNewWorkspaceFrom \"><a id=\"lnkNewTempFrmExisting\" class=\"sameColorLink\" href=\"#\" onclick=\"javascript:window.epmLiveCreateWorkspace.ClearAllSelection(\'createNewWorkspaceFrom\'); $(this).addClass(\'selectedLink\'); window.epmLiveCreateWorkspace.SwitchToCreateFromExistingWorkspace(); window.epmLiveCreateWorkspace.SetCreateNewFrom(\'existingWorkspace\');return false;\">Existing Workspace</a></div></li>";
-            pnlCreateNewWorkspaceFrom.Controls.Add(new LiteralControl(tempVal));
+            //tempVal = "<li class=\"ms-create-listitem\"><div class=\"divCreateNewWorkspaceFrom \"><a id=\"lnkNewTempFrmExisting\" class=\"sameColorLink\" href=\"#\" onclick=\"javascript:window.epmLiveCreateWorkspace.ClearAllSelection(\'createNewWorkspaceFrom\'); $(this).addClass(\'selectedLink\'); window.epmLiveCreateWorkspace.SwitchToCreateFromExistingWorkspace(); window.epmLiveCreateWorkspace.SetCreateNewFrom(\'existingWorkspace\');return false;\">Existing Workspace</a></div></li>";
+            //pnlCreateNewWorkspaceFrom.Controls.Add(new LiteralControl(tempVal));
 
             pnlCreateNewWorkspaceFrom.Controls.Add(new LiteralControl("</ul>"));
         }
