@@ -1136,10 +1136,7 @@ namespace EPMLiveEnterprise
                     svcCF.UseDefaultCredentials = true;
                     WebSvcCustomFields.CustomFieldDataSet dsF = new WebSvcCustomFields.CustomFieldDataSet();
 
-                    SPSecurity.RunWithElevatedPrivileges(delegate()
-                    {
-                        dsF = svcCF.ReadCustomFieldsByEntity(new Guid(PSLibrary.EntityCollection.Entities.TaskEntity.UniqueId));
-                    });
+                    dsF = svcCF.ReadCustomFieldsByEntity(new Guid(PSLibrary.EntityCollection.Entities.TaskEntity.UniqueId));
 
                     for (int i = 0; i < dsF.CustomFields.Count; i++)
                     {
@@ -1244,6 +1241,11 @@ namespace EPMLiveEnterprise
         [WebMethod]
         public string[] getAllTaskEnterpriseFieldList()
         {
+            string[] ret = new string[0];
+            string username = "";
+
+            try
+            { 
             ArrayList arrList = new ArrayList();
 
             SPWeb web = SPContext.Current.Web;
@@ -1252,15 +1254,13 @@ namespace EPMLiveEnterprise
 
             SPSecurity.RunWithElevatedPrivileges(delegate()
             {
+                username = "Context: [" + HttpContext.Current.User.Identity.Name + "] Windows [" + System.Security.Principal.WindowsIdentity.GetCurrent().Name + "]";
                 WebSvcCustomFields.CustomFields svcCF = new EPMLiveEnterprise.WebSvcCustomFields.CustomFields();
                 svcCF.Url = url + "/_vti_bin/psi/customfields.asmx";
                 svcCF.UseDefaultCredentials = true;
                 WebSvcCustomFields.CustomFieldDataSet dsF = new WebSvcCustomFields.CustomFieldDataSet();
 
-                SPSecurity.RunWithElevatedPrivileges(delegate()
-                {
-                    dsF = svcCF.ReadCustomFieldsByEntity(new Guid(PSLibrary.EntityCollection.Entities.TaskEntity.UniqueId));
-                });
+                dsF = svcCF.ReadCustomFieldsByEntity(new Guid(PSLibrary.EntityCollection.Entities.TaskEntity.UniqueId));
 
                 foreach(WebSvcCustomFields.CustomFieldDataSet.CustomFieldsRow cfr in dsF.CustomFields)
                 {
@@ -1268,11 +1268,20 @@ namespace EPMLiveEnterprise
                 }
             });
 
-            string []ret = new string[arrList.Count];
+            ret = new string[arrList.Count];
                 
             for(int i = 0;i<arrList.Count;i++)
             {
                 ret[i] = (string)arrList[i];
+            }
+            }
+            catch (Exception ex)
+            {
+                SPSecurity.RunWithElevatedPrivileges(delegate()
+                {
+                    EventLog myLog = new EventLog("EPM Live", ".", "Publisher WS");
+                    myLog.WriteEntry("Error in getAllTaskEnterpriseFieldList() username (" + username + "): " + ex.Message + ex.StackTrace, EventLogEntryType.Error, 1000);
+                });
             }
 
             return ret;
