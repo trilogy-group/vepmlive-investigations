@@ -221,6 +221,10 @@ namespace EPMLiveCore
                                                 // Check if field type is text / number
                                                 if (fieldType.Equals(SPFieldType.Integer) || fieldType.Equals(SPFieldType.Counter))
                                                     field += "ID";
+                                                // Need this condition while adding external task
+                                                else if (nd.SelectSingleNode("Value") != null && nd.SelectSingleNode("Value").Attributes["Type"] != null
+                                                    && (nd.SelectSingleNode("Value").Attributes["Type"].Value.Equals(SPFieldType.Counter.ToString())))
+                                                    field += "ID"; 
                                                 else
                                                     field += "Text";
                                             }

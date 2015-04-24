@@ -164,10 +164,9 @@ namespace EPMLiveWorkPlanner
 
             Hashtable hshUserFields = new Hashtable();
 
-            SPQuery query = new SPQuery();
-            query.Query = "<Where><Eq><FieldRef Name='Project' LookupId='TRUE'/><Value Type='Lookup'>" + ProjectID + "</Value></Eq></Where><OrderBy><FieldRef Name='taskorder'/></OrderBy>";
-
-            SPListItemCollection lic = oList.GetItems(query);
+            string orderby = "";
+            string query = EPMLiveCore.ReportingData.GetReportQuery(oWeb, oList, "<Where><Eq><FieldRef Name='Project' LookupId='true'/><Value Type='Counter'>" + ProjectID + "</Value></Eq></Where>", out orderby);
+            DataTable dtTasks = EPMLiveCore.ReportingData.GetReportingData(oWeb, oList.Title, false, query, orderby);
 
             Hashtable arrFields = new Hashtable();
             arrFields.Add("ID", null);
@@ -203,8 +202,9 @@ namespace EPMLiveWorkPlanner
 
             DataTable dtResources = EPMLiveCore.API.APITeam.GetResourcePool("<Data><Columns></Columns></Data>", oWeb);
 
-            foreach (SPListItem li in lic)
+            foreach (DataRow dr in dtTasks.Rows)
             {
+
                 XmlNode ndI = doc.CreateNode(XmlNodeType.Element, "I", doc.NamespaceURI);
 
                 attr = doc.CreateAttribute("Def");
@@ -225,7 +225,7 @@ namespace EPMLiveWorkPlanner
                         attr = doc.CreateAttribute("id");
                         try
                         {
-                            attr.Value = li["taskuid"].ToString();
+                            attr.Value = dr["taskuid"].ToString();
                         }
                         catch { }
                         ndI.Attributes.Append(attr);
@@ -238,7 +238,7 @@ namespace EPMLiveWorkPlanner
 
                             try
                             {
-                                SPFieldUserValueCollection uvc = new SPFieldUserValueCollection(oWeb, li[col].ToString());
+                                SPFieldUserValueCollection uvc = new SPFieldUserValueCollection(oWeb, dr[col].ToString());
 
                                 foreach (SPFieldUserValue uv in uvc)
                                 {
@@ -265,7 +265,7 @@ namespace EPMLiveWorkPlanner
                                 case SPFieldType.Boolean:
                                     try
                                     {
-                                        if (li[col].ToString() == "True")
+                                        if (dr[col].ToString() == "True")
                                             attr.Value = "1";
                                         else
                                             attr.Value = "0";
@@ -278,7 +278,7 @@ namespace EPMLiveWorkPlanner
                                     {
                                         try
                                         {
-                                            attr.Value = (float.Parse(li[col].ToString()) * 100).ToString(providerEn);
+                                            attr.Value = (float.Parse(dr[col].ToString()) * 100).ToString(providerEn);
                                         }
                                         catch { }
                                     }
@@ -286,7 +286,7 @@ namespace EPMLiveWorkPlanner
                                     {
                                         try
                                         {
-                                            attr.Value = li[col].ToString();
+                                            attr.Value = dr[col].ToString();
                                         }
                                         catch { }
 
@@ -295,7 +295,7 @@ namespace EPMLiveWorkPlanner
                                 default:
                                     try
                                     {
-                                        attr.Value = li[col].ToString();
+                                        attr.Value = dr[col].ToString();
                                     }
                                     catch { }
                                     break;
@@ -329,8 +329,6 @@ namespace EPMLiveWorkPlanner
                         ndBody.AppendChild(ndI);
                 }
                 catch { ndBody.AppendChild(ndI); }
-
-
             }
 
             return doc.OuterXml;
