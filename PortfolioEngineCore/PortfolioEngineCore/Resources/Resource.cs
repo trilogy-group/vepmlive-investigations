@@ -153,6 +153,10 @@ namespace PortfolioEngineCore
                     errorMessages.Add(validationAttribute.ErrorMessage);
                 }
             }
+            if (Email.Contains("'"))
+            {
+                errorMessages.Add(string.Format("Apostrophes are not supported in email addresses."));
+            }
 
             if (AvailableFrom.HasValue && AvailableTo.HasValue && AvailableTo < AvailableFrom)
             {
