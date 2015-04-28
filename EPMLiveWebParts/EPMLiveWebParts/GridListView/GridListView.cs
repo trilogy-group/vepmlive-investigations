@@ -2565,12 +2565,13 @@ namespace EPMLiveWebParts
 
             foreach (SPField field in list.Fields)
             {
-
-                if (!field.Hidden && field.Reorderable || (SPBuiltInFieldId.Author == field.Id || SPBuiltInFieldId.Editor == field.Id || SPBuiltInFieldId.ID == field.Id))
+                // EPML-5152,4718,4980: added extra check for ID,Created By, Modified By, LinkTitleNoMenu & LinkTitle.
+                if (!field.Hidden && field.Reorderable || (field.Id == SPBuiltInFieldId.Author || field.Id == SPBuiltInFieldId.Editor || field.Id == SPBuiltInFieldId.ID) || (field.Id == SPBuiltInFieldId.LinkTitleNoMenu || field.Id == SPBuiltInFieldId.LinkTitle))                
                 {
                     //EPML-4625: LinkTitleNoMenu/LinkTitle columns bind to Title field and the column name always remain the same
                     //make sure to always display Title fields irrespective of display rules
-                    if (field.InternalName == "LinkTitleNoMenu" || field.InternalName == "LinkTitle")
+                    // change condition with spbuiltinfieldid
+                    if (field.Id == SPBuiltInFieldId.LinkTitleNoMenu || field.Id == SPBuiltInFieldId.LinkTitle)
                     {
                         bflag = true;
                     }
@@ -2615,10 +2616,9 @@ namespace EPMLiveWebParts
             {
                 SPField field = (SPField)de.Value;
                 //EPML-4625: Remove duplicate column names from fields list
-                string fieldValue = System.Web.HttpUtility.HtmlEncode(field.Title);
-                //To fix EPML-4718 change the current checking condition
-                if (!fields.Equals(fieldValue, StringComparison.InvariantCultureIgnoreCase))
-                {
+                string fieldValue = System.Web.HttpUtility.HtmlEncode(field.Title);                
+                if (!fields.Contains(fieldValue))
+                {                    
                     fields += "'" + field.InternalName + "': { 'value': '" + fieldValue + "', 'checked':" + arrFields.Contains(field.InternalName).ToString().ToLower() + "},";
                     AllGroupFields += System.Web.HttpUtility.HtmlEncode(field.Title) + "|" + field.InternalName + "|" + field.Id + ",";
                 }
