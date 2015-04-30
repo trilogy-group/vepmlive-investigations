@@ -1,17 +1,18 @@
 ﻿<%@ Assembly Name="$SharePoint.Project.AssemblyFullName$" %>
 <%@ Import Namespace="Microsoft.SharePoint.ApplicationPages" %>
-<%@ Register Tagprefix="SharePoint" Namespace="Microsoft.SharePoint.WebControls" Assembly="Microsoft.SharePoint, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
-<%@ Register Tagprefix="Utilities" Namespace="Microsoft.SharePoint.Utilities" Assembly="Microsoft.SharePoint, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
-<%@ Register Tagprefix="asp" Namespace="System.Web.UI" Assembly="System.Web.Extensions, Version=3.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" %>
+<%@ Register TagPrefix="SharePoint" Namespace="Microsoft.SharePoint.WebControls" Assembly="Microsoft.SharePoint, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
+<%@ Register TagPrefix="Utilities" Namespace="Microsoft.SharePoint.Utilities" Assembly="Microsoft.SharePoint, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
+<%@ Register TagPrefix="asp" Namespace="System.Web.UI" Assembly="System.Web.Extensions, Version=3.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" %>
 <%@ Import Namespace="Microsoft.SharePoint" %>
 <%@ Assembly Name="Microsoft.Web.CommandUI, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
+
 <%@ Page Language="C#" AutoEventWireup="true" CodeBehind="PlannerUpdates.aspx.cs" Inherits="EPMLiveWorkPlanner.Layouts.epmlive.PlannerUpdates" DynamicMasterPageFile="~masterurl/default.master" %>
 
 <asp:Content ID="PageHead" ContentPlaceHolderID="PlaceHolderAdditionalPageHead" runat="server">
     <script src="TreeGrid/GridE.js"> </script>
     <link href="TreeGrid/Styles/Examples.css" rel="stylesheet" type="text/css" />
     <link href="WorkPlanner.css" rel="stylesheet" type="text/css" />
-    <link rel="stylesheet" href="modal/modal.css" type="text/css" /> 
+    <link rel="stylesheet" href="modal/modal.css" type="text/css" />
     <script type="text/javascript" src="modal/modal.js"></script>
 
     <script language="javascript">
@@ -39,8 +40,7 @@
                 if (oRow.ApprovalNotes != null)
                     aNotes = oRow.ApprovalNotes;
 
-                if (oRow.Accept == "1")
-                {
+                if (oRow.Accept == "1") {
 
                     var oToRow = grid.GetRowById(R);
                     if (oToRow == null) {
@@ -63,12 +63,11 @@
 
                     processRow(grid, ugrid, oToRow, oRow);
                 }
-                else if (oRow.Reject == "1")
-                {
+                else if (oRow.Reject == "1") {
                     acceptString += "<Task ItemID='" + oRow.SPID + "' Status='2'><![CDATA[" + aNotes + "]]></Task>";
                 }
             }
-            
+
             parent.setWBSAndTaskID(grid.GetRowById('0'));
 
             grid.ActionCalcOn();
@@ -79,7 +78,7 @@
         }
 
         function processRow(grid, ugrid, oToRow, oRow) {
-            
+
 
             for (var C in ugrid.Cols) {
                 if (validColumn(C)) {
@@ -96,7 +95,7 @@
                     parent.Grids.WorkPlannerGrid.CorrectDependencies(oToRow.parentNode, "G");
             }
 
-            parent.ApplyDefaults(grid, oToRow, false);
+            parent.ApplyDefaults(grid, oToRow, false, undefined, true);
         }
 
         Grids.OnAfterValueChanged = function (grid, row, col, val) {
@@ -172,7 +171,7 @@
                                 grid.SetAttribute(uRow, c, "Type", parent.Grids.WorkPlannerGrid.Cols[c].Type);
                                 if (c == "Title") {
                                     if (oFromRow) {
-                                        if(oFromRow.Def.Name == "Assignment")
+                                        if (oFromRow.Def.Name == "Assignment")
                                             grid.SetValue(uRow, c, val + "(" + oFromRow.Title + ")", 1, 0);
                                     }
                                 }
@@ -309,7 +308,7 @@
         }
 
         function temp() {
-            Grids.UpdateGrid.Rerender();
+            //Grids.UpdateGrid.Rerender();
         }
 
         _spBodyOnLoadFunctionNames.push("setHeight");
@@ -317,14 +316,14 @@
         if (window.addEventListener)
             window.addEventListener('resize', setHeight, false);
         else if (window.attachEvent)
-            window.attachEvent('onresize', setHeight);            
+            window.attachEvent('onresize', setHeight);
 
         function setHeight() {
             var h = getHeight();
             document.getElementById("divMain").style.height = (h - 40) + "px";
             document.getElementById("divTree").style.height = (h - 90) + "px";
 
-            if(!divDetail)
+            if (!divDetail)
                 divDetail = document.getElementById("divDetail");
 
             divDetail.style.display = "none";
@@ -379,50 +378,50 @@
 </asp:Content>
 
 <asp:Content ID="Main" ContentPlaceHolderID="PlaceHolderMain" runat="server">
-    
-    <div id="divMain" style="width:100%; height:400px">
-        <div id="div1" style="width:100%; height:20px">
+
+    <div id="divMain" style="width: 100%; height: 400px">
+        <div id="div1" style="width: 100%; height: 20px">
             Double click to view task details.<br />
         </div>
-        <div id="divTree" style="width:100%; height:400px">
-            <treegrid Data_Url="../../_vti_bin/WorkPlanner.asmx" Data_Method="Soap" Data_Function="Execute" Data_Namespace="workengine.com" Data_Param_Functionname="GetUpdates" Data_Param_Dataxml="<%=sParam %>"></treegrid>
+        <div id="divTree" style="width: 100%; height: 400px">
+            <treegrid data_url="../../_vti_bin/WorkPlanner.asmx" data_method="Soap" data_function="Execute" data_namespace="workengine.com" data_param_functionname="GetUpdates" data_param_dataxml="<%=sParam %>"></treegrid>
         </div>
-        <div style="width:100%; height: 30px; vertical-align:bottom;">
-            <p style="float:left">
+        <div style="width: 100%; height: 30px; vertical-align: bottom;">
+            <p style="float: left">
                 <a href="#" onclick="Javascript:Grids.UpdateGrid.ActionShowColumns(); return false;">[Add/Remove Columns]</a>
             </p>
-            <p style="float:right">
-                <input type="button" value="Process" onclick="javascript:ProcessUpdates();"/> 
-                <input type="button" value="Cancel" onclick="parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.cancel, 'Cancel clicked'); return false;" /> 
+            <p style="float: right">
+                <input type="button" value="Process" onclick="javascript: ProcessUpdates();" />
+                <input type="button" value="Cancel" onclick="parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.cancel, 'Cancel clicked'); return false;" />
             </p>
             <div style="clear: both;"></div>
         </div>
-        
+
     </div>
-    <div id="divDetail" style="width:100%;height:100%">
-        <treegrid Data_Url="../../_vti_bin/WorkPlanner.asmx" Data_Method="Soap" Data_Function="Execute" Data_Namespace="workengine.com" Data_Param_Functionname="GetUpdateDetailLayout" Data_Param_Dataxml="<%=sParam %>"></treegrid>
+    <div id="divDetail" style="width: 100%; height: 100%">
+        <treegrid data_url="../../_vti_bin/WorkPlanner.asmx" data_method="Soap" data_function="Execute" data_namespace="workengine.com" data_param_functionname="GetUpdateDetailLayout" data_param_dataxml="<%=sParam %>"></treegrid>
     </div>
     <div id="dlgProcessing" class="dialog">
         <table width="100%">
             <tr>
                 <td align="center" class="ms-sectionheader">
-                    <img src="../images/GEARS_ANv4.GIF" style="vertical-align: middle;"/><br />
-                    <H3 class="ms-standardheader">Processing Updates...</h3>
+                    <img src="../images/GEARS_ANv4.GIF" style="vertical-align: middle;" /><br />
+                    <h3 class="ms-standardheader">Processing Updates...</h3>
                 </td>
             </tr>
-                    
+
         </table>
-    </div> 
-    
+    </div>
+
     <script>
         initmb();
     </script>
 </asp:Content>
 
 <asp:Content ID="PageTitle" ContentPlaceHolderID="PlaceHolderPageTitle" runat="server">
-Process Updates
+    Process Updates
 </asp:Content>
 
-<asp:Content ID="PageTitleInTitleArea" ContentPlaceHolderID="PlaceHolderPageTitleInTitleArea" runat="server" >
-Process Updates
+<asp:Content ID="PageTitleInTitleArea" ContentPlaceHolderID="PlaceHolderPageTitleInTitleArea" runat="server">
+    Process Updates
 </asp:Content>

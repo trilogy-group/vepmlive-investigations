@@ -3480,7 +3480,7 @@ function RefreshTeam(dialogResult, returnValue) {
     dhtmlxAjax.post("WorkPlannerAction.aspx", "Action=GetTeam&PlannerID=" + sPlannerID + "&itemid=" + sItemID + "&listid=" + sProjectListId, RefreshTeamClose);
 }
 
-function ApplyDefaults(grid, row, isMilestone, isSummary) {
+function ApplyDefaults(grid, row, isMilestone, isSummary, isFromProcessUpdates) {
 
     if (grid && row) {
         /*for (var oD in oDefaults) {
@@ -3500,12 +3500,12 @@ function ApplyDefaults(grid, row, isMilestone, isSummary) {
         else if (!isSummary)
             setDefaultDates(grid, row);
 
-
-        if (iDefaultTaskType == 0)
-            grid.SetValue(row, "TaskType", "Shared", 1);
-        else if (iDefaultTaskType == 1)
-            grid.SetValue(row, "TaskType", "Individual", 1);
-
+        if (!isFromProcessUpdates) {
+            if (iDefaultTaskType == 0)
+                grid.SetValue(row, "TaskType", "Shared", 1);
+            else if (iDefaultTaskType == 1)
+                grid.SetValue(row, "TaskType", "Individual", 1);
+        }
         grid.RefreshRow(row);
     }
 }
