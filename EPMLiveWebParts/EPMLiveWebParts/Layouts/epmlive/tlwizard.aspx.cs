@@ -360,36 +360,37 @@ namespace EPMLiveWebParts.Layouts.epmlive
 
         private void ProcessCleanUpAll(SPWeb web)
         {
-            SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(web.Site.WebApplication.Id));            
             SPSecurity.RunWithElevatedPrivileges(delegate()
             {
-                cn.Open();
+                using (SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(web.Site.WebApplication.Id)))
+                {
+                    cn.Open();
+                    SqlCommand cmd = new SqlCommand("select timerjobuid from timerjobs where siteguid=@siteguid and listguid is null and jobtype=6", cn);
+                    cmd.Parameters.AddWithValue("@siteguid", web.Site.ID.ToString());
+                    object oResult = cmd.ExecuteScalar();
+                    Guid timerjobuid = Guid.Empty;
+
+                    if (oResult != null)
+                    {
+                        timerjobuid = (Guid)oResult;
+                    }
+                    else
+                    {
+                        timerjobuid = Guid.NewGuid();
+                        SqlCommand cmd1 = new SqlCommand(
+                            "INSERT INTO TIMERJOBS (siteguid, jobtype, jobname, scheduletype, webguid, timerjobuid) VALUES (@siteguid, 6, 'List Data Cleanup', 2, @webguid, @timerjobuid)", cn);
+                        cmd1.Parameters.AddWithValue("@siteguid", web.Site.ID.ToString());
+                        cmd1.Parameters.AddWithValue("@webguid", web.ID.ToString());
+                        cmd1.Parameters.AddWithValue("@timerjobuid", timerjobuid);
+                        cmd1.ExecuteNonQuery();
+                    }
+
+                    if (timerjobuid != Guid.Empty)
+                        CoreFunctions.enqueue(timerjobuid, 0);
+
+                    cn.Close();
+                }
             });
-
-            SqlCommand cmd = new SqlCommand("select timerjobuid from timerjobs where siteguid=@siteguid and listguid is null and jobtype=6",cn);
-            cmd.Parameters.AddWithValue("@siteguid", web.Site.ID.ToString());
-            object oResult = cmd.ExecuteScalar();
-            Guid timerjobuid = Guid.Empty;
-
-            if (oResult != null)
-            {
-                timerjobuid = (Guid)oResult;
-            }
-            else
-            {
-                timerjobuid = Guid.NewGuid();
-                SqlCommand cmd1 = new SqlCommand(
-                    "INSERT INTO TIMERJOBS (siteguid, jobtype, jobname, scheduletype, webguid, timerjobuid) VALUES (@siteguid, 6, 'List Data Cleanup', 2, @webguid, @timerjobuid)",cn);
-                cmd1.Parameters.AddWithValue("@siteguid", web.Site.ID.ToString());
-                cmd1.Parameters.AddWithValue("@webguid", web.ID.ToString());
-                cmd1.Parameters.AddWithValue("@timerjobuid", timerjobuid);
-                cmd1.ExecuteNonQuery();
-            }
-
-            if (timerjobuid != Guid.Empty)
-                CoreFunctions.enqueue(timerjobuid, 0);
-           
-            cn.Close();
         }
 
         private void ProcessExcel(SPWeb web)
