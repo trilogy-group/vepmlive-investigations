@@ -41,6 +41,7 @@
         DeletePIListWork,
         GetCostCategoryRoles,
         SetDatabaseVersion,
-        PostCostValues
+        PostCostValues,
+        DeleteRolesByCostCategories
     }
 }

@@ -838,7 +838,19 @@ namespace WorkEnginePPM
 
             return response;
         }
+        [PublicAPI(false)]
+        [Description("This function will delete Role from the Roles list based on PFE delete action.")]
+        public static string DeleteRolesByCostCategories(string data)
+        {
+            string response;
 
+            using (var roleManager = new RoleManager(_spWeb))
+            {
+                response = roleManager.DeleteRolesByCostCategories(data);
+            }
+
+            return response;
+        }
         #endregion
 
         #region Nested type: PublicAPI
