@@ -17,6 +17,7 @@ using System.Web.UI;
 using System.Linq;
 using System.Globalization;
 using System.Xml;
+using System.Web.UI.HtmlControls;
 
 namespace EPMLiveCore
 {
@@ -93,6 +94,22 @@ namespace EPMLiveCore
                 //Once item is created set default values for choice fields.
                 AssignDefaultValueToFields(ListItem);
             }
+            else
+            {
+                //We cannot check validations prior to SaveButton.SaveItem event - Because validation setting is set on List level!
+                //this means SaveItem is unsuccessful - Let's check for validation settings for New and Edit form mode
+                //If item won't saved due to some other reason then that thing is already handled in respective ItemAdding/ItemUpdating event and throws proper exception on screen.
+                //Here, we have handled this special case for List Validation Settings because this page is inherit from ListFieldIterator class.
+                if (mode == SPControlMode.New || mode == SPControlMode.Edit)
+                {
+                    if (!string.IsNullOrEmpty(list.ValidationFormula))
+                    {
+                        HtmlGenericControl divValidationErrorMessage = new HtmlGenericControl("div");
+                        divValidationErrorMessage.InnerHtml = "<span id='Error_WPQ2ClientFormPlaceholder' class='ms-formvalidation ms-csrformvalidation'>" + list.ValidationMessage + "</span>";
+                        this.Controls.Add(divValidationErrorMessage);
+                    }
+                }
+            }
         }
 
         protected void HandleNewItemRecent(object sender, EventArgs e)
@@ -103,6 +120,22 @@ namespace EPMLiveCore
 
                 //Once item is created set default values for choice fields.
                 AssignDefaultValueToFields(SPContext.Current.ListItem);
+            }
+            else
+            {
+                //We cannot check validations prior to SaveButton.SaveItem event - Because validation setting is set on List level!
+                //this means SaveItem is unsuccessful - Let's check for validation settings for New and Edit form mode
+                //If item won't saved due to some other reason then that thing is already handled in respective ItemAdding/ItemUpdating event and throws proper exception on screen.
+                //Here, we have handled this special case for List Validation Settings because this page is inherit from ListFieldIterator class.
+                if (mode == SPControlMode.New || mode == SPControlMode.Edit)
+                {
+                    if (!string.IsNullOrEmpty(list.ValidationFormula))
+                    {
+                        HtmlGenericControl divValidationErrorMessage = new HtmlGenericControl("div");
+                        divValidationErrorMessage.InnerHtml = "<span id='Error_WPQ2ClientFormPlaceholder' class='ms-formvalidation ms-csrformvalidation'>" + list.ValidationMessage + "</span>";
+                        this.Controls.Add(divValidationErrorMessage);
+                    }
+                }
             }
         }
 
@@ -1082,7 +1115,7 @@ namespace EPMLiveCore
 
                                 var newPostbackUrl = '" + Web.Url + "/" + list.Forms[PAGETYPE.PAGE_NEWFORM].Url + "?Source=" + System.Web.HttpUtility.UrlEncode(Web.Url + "/_layouts/15/epmlive/getlastid.aspx?BackTo=" + System.Web.HttpUtility.UrlEncode(newLocation) + "&listid=" + list.ID + ((bDialog) ? "&isdlg=1" : "")) + @"';
 
-                                if (!PreSaveItem()) return false;
+                               if (!PreSaveItem()) return false;
                                 if (SPClientForms.ClientFormManager.SubmitClientForm('WPQ2')) return false;
 
                                 WebForm_DoPostBackWithOptions(new WebForm_PostBackOptions(elementName, '', true, '', newPostbackUrl, false, true));
