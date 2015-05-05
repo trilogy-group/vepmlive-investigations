@@ -225,14 +225,6 @@ namespace WorkEnginePPM
 
 
                     string sTreegridData = xData.InnerText;
-
-                    string deletedRoleIds = GetDeletedRoleIds(sTreegridData);
-                    PortfolioEngineAPI pFeAPI = new PortfolioEngineAPI();
-                    if (!string.IsNullOrEmpty(deletedRoleIds))
-                    {
-                        pFeAPI.Execute("DeleteRolesByCostCategories", deletedRoleIds);
-                    }
-
                     DataTable dt = tg.SetXmlData(sTreegridData);
                     if (dbaCostCategories.SaveCostCategories(dba, nMCLookupId, nMCDefaultId, dt, out sReply) != StatusEnum.rsSuccess)
                     { }
@@ -267,6 +259,7 @@ namespace WorkEnginePPM
                             //AdminFunctions.SubmitJobRequest(dba, 0, xQueue.XML());
 
                             // need to run Refresh Roles Synchronously - this is what the Job Server WAS doing for job 200 (qjcRefreshRoles)
+                            PortfolioEngineAPI pFeAPI = new PortfolioEngineAPI();
                             pFeAPI.Execute("RefreshRoles", "");
                             pFeAPI.Dispose();
 
@@ -401,42 +394,7 @@ namespace WorkEnginePPM
             }
             return sReply;
         }
-        private static string GetDeletedRoleIds(string data)
-        {
-            string ids = string.Empty;
-            try
-            {
-                CStruct xGrid = new CStruct();
-                xGrid.LoadXML(data);
-                CStruct xBody = xGrid.GetSubStruct("Body");
-                CStruct xB = xBody.GetSubStruct("B");
-                List<CStruct> listI = xB.GetList("I");
-                ids = GetRecursiveRoleIds(listI, ids);
-                ids = ids.TrimEnd(',');
-            }
-            catch
-            {}
-            return ids;
-        }
-        private static string GetRecursiveRoleIds(List<CStruct> listI, string ids)
-        {
-            foreach (CStruct xI in listI)
-            {
-                if (xI.GetBooleanAttr("Deleted") == true)
-                {
-                    if (xI.GetIntAttr("CA_ROLE") != 0)
-                    {
-                        ids += xI.GetStringAttr("CA_UID") + ",";
-                    }
-                }
-                List<CStruct> listIChildren = xI.GetList("I");
-                if (listIChildren != null && listIChildren.Count > 0)
-                {
-                    ids = GetRecursiveRoleIds(listIChildren, ids);
-                }
-            }
-            return ids;
-        }
+
         #endregion
     }
 }

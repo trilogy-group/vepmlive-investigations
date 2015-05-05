@@ -25,9 +25,9 @@ namespace WorkEnginePPM.Core.DataSync
 
         #endregion Constructors 
 
-        #region Methods (4) 
+        #region Methods (3) 
 
-        // Public Methods (4) 
+        // Public Methods (3) 
 
         /// <summary>
         /// Adds or updates the role.
@@ -150,48 +150,6 @@ namespace WorkEnginePPM.Core.DataSync
                 return Response.Failure((int) APIError.RefreshRoles, exception);
             }
         }
-
-        /// <summary>
-        /// Deletes role from role list when performed delete operation from Cost Categories page
-        /// </summary>
-        /// <param name="extIds">Role ids to be deleted</param>
-        /// <returns>Result</returns>
-        public string DeleteRolesByCostCategories(string extIds)
-        {
-            try
-            {
-                IEnumerable<SPList> spLists = Web.GetListByTemplateId((int)EPMLiveLists.Roles);
-                if (spLists == null) throw new Exception("Cannot find the Roles list.");
-
-                string[] ids = extIds.Split(',');
-                Web.AllowUnsafeUpdates = true;
-                SPListItemCollection items = spLists.First().GetItems();
-                if (items != null && items.Count > 0)
-                {
-                    IEnumerable<SPListItem> itemsToDelete = from itm in items.OfType<SPListItem>()
-                                                            where ids.Contains(itm["EXTID"])
-                                                            select itm;
-
-                    List<SPListItem> tempCollection = itemsToDelete.ToList();
-                    int count = itemsToDelete.Count();
-                    for (int i = count - 1; i >= 0; i--)
-                    {
-                        tempCollection[i].Delete();
-                    }
-                }
-                Web.AllowUnsafeUpdates = false;
-
-                return Response.Success(string.Empty);
-            }
-            catch (PFEException pfeException)
-            {
-                return Response.PfEFailure(pfeException);
-            }
-            catch (Exception exception)
-            {
-                return Response.Failure((int)APIError.DeleteRolesByCostCategories, exception);
-            }
-        }   
 
         #endregion Methods 
     }
