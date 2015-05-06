@@ -4624,7 +4624,7 @@ namespace EPMLiveWebParts
                     foreach (string f in aViewFields)
                     {
                         SPField field = getRealField(list.Fields.GetFieldByInternalName(f));
-                        if ((!arrAggregationDef.Contains(field.InternalName) && field.InternalName.Equals("Title")) || field.InternalName == "URL" || field.InternalName == "FileLeafRef")
+                        if (field.InternalName == "URL" || field.InternalName == "FileLeafRef")
                         {
                             XmlNode newCell = docXml.CreateNode(XmlNodeType.Element, "cell", docXml.NamespaceURI);
                             if (newItem == "")
