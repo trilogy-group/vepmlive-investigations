@@ -593,7 +593,20 @@ namespace EPMLiveEnterprise
 
                 string AssnHeaderXML = "<Changes xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">";
                 string AssnProjectXML = "<Proj ID=\"" + projectId.ToString() + "\">";
-                string AssnidXML = "<Assn ID=\"" + taskId.ToString() + "\">";
+                //string AssnidXML = "<Assn ID=\"" + taskId.ToString() + "\">";
+                string AssnidXML = string.Format("<Assn ID=\"{0}\"", taskId.ToString());
+
+                //PS 2013 migration code change (Task/assignment update for logged in user)
+                Guid userGUID = GetResourceGuidByWindowsAccount(pwaSiteUrl, properties.UserLoginName);
+                if (userGUID != null)
+                {
+                    AssnidXML += string.Format(" ResID=\"{0}\">", userGUID);
+                }
+                else
+                {
+                    AssnidXML += ">";
+                }
+                //End
 
                 string strXML = "";
                 DataSet ds = RetrieveEditableFields();
@@ -811,12 +824,14 @@ namespace EPMLiveEnterprise
             catch (SoapException ex1)
             {
                 properties.ErrorMessage = "SoapError Updating Task to Project Server:<br>" + getError(ex1); ;
-                properties.Cancel = true;
+                properties.Status = SPEventReceiverStatus.CancelNoError; //.Cancel = true;
+                string logEntry = DateTime.Now.ToString() + "\tUpdateTask()\t" + properties.ErrorMessage;
+                ErrorTrap(3649, logEntry);
             }
             catch (Exception ex)
             {
                 properties.ErrorMessage = "Error in UpdateTask:<br>" + ex.Message;
-                properties.Cancel = true;
+                properties.Status = SPEventReceiverStatus.CancelNoError; //.Cancel = true;
                 string logEntry = DateTime.Now.ToString() + "\tUpdateTask()\t" + ex.Message.ToString() + "\r\n\r\nXML: " + AssnXML;
                 ErrorTrap(3645, logEntry);
             }
@@ -1005,7 +1020,7 @@ namespace EPMLiveEnterprise
             doc.LoadXml(ex.Detail.InnerXml);
             XmlNode nd = doc.SelectSingleNode("//class");
 
-            sError = "Details: " + nd.Attributes["name"].Value + "<br><br><br>";
+            sError = "Details: " + (nd != null ? nd.Attributes["name"].Value : string.Empty) + "<br><br><br>";
 
             sError += "Error List:<br>";
 
@@ -1108,21 +1123,22 @@ namespace EPMLiveEnterprise
         {
             try
             {
-
                 Statusing.Url = pwaSiteUrl + "/_vti_bin/psi/Statusing.asmx";
                 Statusing.Credentials = System.Net.CredentialCache.DefaultCredentials;
-                Statusing.UpdateStatus(changeXml);
 
+                SPSecurity.RunWithElevatedPrivileges(delegate()
+                {
+                    Statusing.UpdateStatus(changeXml);
+                });
                 return true;
             }
 
             catch (SoapException ex)
             {
                 properties.ErrorMessage = "Error Updating Task to Project Server (UpdateTask):<br>" + getError(ex) + "<br><br>Change XML:<br>" + changeXml;
-                properties.Cancel = true;
-                //m_last_errors = ExceptionHandlers.HandleSoapException(ex);
-                //string logEntry = DateTime.Now.ToString() + "\tUpdateStatus()\t" + m_last_errors;
-                //.ErrorTrap(3648, logEntry);
+                properties.Status = SPEventReceiverStatus.CancelNoError;   //.Cancel = true;
+                string logEntry = DateTime.Now.ToString() + "\tUpdateStatus()\t" + ex + "\t Change XML:<br>" + changeXml;
+                ErrorTrap(3648, logEntry);
                 return false;
             }
             catch (Exception ex)
@@ -1144,20 +1160,25 @@ namespace EPMLiveEnterprise
         {
             try
             {
+                Guid userGUID = GetResourceGuidByWindowsAccount(pwaSiteUrl, properties.UserLoginName);
 
                 Statusing.Url = pwaSiteUrl + "/_vti_bin/psi/Statusing.asmx";
-                Statusing.UseDefaultCredentials = true;
-                Statusing.SubmitStatus(null, statusMsg);
+                Statusing.Credentials = System.Net.CredentialCache.DefaultCredentials;
+
+                SPSecurity.RunWithElevatedPrivileges(delegate()
+                {
+                    Statusing.SubmitStatusForResource(userGUID, null, statusMsg);
+                });
 
                 return true;
             }
             catch (SoapException ex)
             {
                 properties.ErrorMessage = "Error Submitting Task to Project Server:\r\n" + getError(ex);
-                properties.Cancel = true;
-                //m_last_errors = ExceptionHandlers.HandleSoapException(ex);
-                //string logEntry = DateTime.Now.ToString() + "\tSubmitAllUpdates()\t" + m_last_errors;
-                //ErrorTrap(3649, logEntry);
+                properties.Status = SPEventReceiverStatus.CancelNoError; //.Cancel = true;
+                m_last_errors = ExceptionHandlers.HandleSoapException(ex);
+                string logEntry = DateTime.Now.ToString() + "\tSubmitAllUpdates()\t" + ex;
+                ErrorTrap(3649, logEntry);
                 return false;
             }
             catch (WebException ex)
