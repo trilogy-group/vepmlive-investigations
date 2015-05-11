@@ -17,6 +17,12 @@
     </iframe>
 
     <script language="javascript">
+        window.onmessage = function (event) {
+            if (event.data === "closed") {
+                location.reload();
+            }
+        }
+        
         function setHeight() {
             document.getElementById("frmReport").style.height = (getHeight() - getTop(document.getElementById("frmReport")) - 40) + "px";
         }
