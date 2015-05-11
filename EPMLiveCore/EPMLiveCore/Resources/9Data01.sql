@@ -493,3 +493,21 @@ else
 begin
     UPDATE EMAILTEMPLATES SET subject='{EditorUser_Name} has updated Resource Plans you manage', body='<html><body><table width="100%" cellpadding="0" cellspacing="0"><tr><td style="font-size:18px;color:#666666;font-family:Segoe UI, Segoe, Helvetica;">{EditorUser_Name} has updated Resource Plans you manage - click the link to open these Resource Plans: <a href="{SiteUrl}/_layouts{EditorUrl}" style="font-size:18px;color:#3366CC;" target="_blank">Resource Planner</a></td></tr><tr><td>&nbsp;</td></tr></table>{CommitmentBody}<table width="100%" cellpadding="0" cellspacing="0"><tr><td>&nbsp;</td></tr><tr><td style="font-size:12px;color:#666666;font-family:Segoe UI, Segoe, Helvetica;">For help, please visit <a target="_blank" href="http://support.epmlive.com" style="font-size:12px;color:#3366CC;font-family:Segoe UI, Segoe, Helvetica;">http://support.epmlive.com</a></td></tr><tr><td><hr></td></tr><tr><td style="font-size:10px;color:#666666;font-family:Segoe UI, Segoe, Helvetica;">Powered by EPM Live :)</td></tr></table></body></html>' where emailid=13
 end
+
+if not exists (select emailid from EMAILTEMPLATES where emailid = 14)
+begin
+INSERT INTO EMAILTEMPLATES ([EmailId], [Body], [Subject], [Title]) VALUES (14, N'<table width="100%" cellspacing="0" cellpadding="0"><tbody><tr><td style="font-size:16px;color:#666666;font-family:Segoe UI,Helvetica,Arial">Your publish job for project {ProjectName} was created successfully and is now publishing. You will receive another notification when it''s finished. In the meantime, feel free to check the status <u><a href="#" onclick ="{PageUrl}" style="color:#0090ca;">here</a></u></td></tr></tbody></table>', N'Performance Publish Job Created Successfully.', N'Performance Publish Job Notification')
+end
+else
+begin
+    UPDATE EMAILTEMPLATES SET subject='Performance Publish Job Created Successfully.', body='<table width="100%" cellspacing="0" cellpadding="0"><tbody><tr><td style="font-size:16px;color:#666666;font-family:Segoe UI,Helvetica,Arial">Your publish job for project {ProjectName} was created successfully and is now publishing. You will receive another notification when it''s finished. In the meantime, feel free to check the status <u><a href="#" onclick ="{PageUrl}" style="color:#0090ca;">here</a></u></td></tr></tbody></table>' where emailid=14
+end
+if not exists (select emailid from EMAILTEMPLATES where emailid = 15)
+begin
+INSERT INTO EMAILTEMPLATES ([EmailId], [Body], [Subject], [Title]) VALUES (15, N'<table width="100%" cellspacing="0" cellpadding="0"><tbody><tr><td style="font-size:16px;color:#666666;font-family:Segoe UI,Helvetica,Arial"><table width="100%" cellspacing="0" cellpadding="0"><tbody><tr><td style="font-size:16px;color:#666666;font-family:Segoe UI,Helvetica,Arial">Your Performance Publish Job {Publish_DetailedStatus}.</td></tr></tbody></table>', N'Performance Publish Job {Publish_Status}.', N'Performance Publish Job Complete Notification')
+end
+else
+begin
+    UPDATE EMAILTEMPLATES SET subject='Performance Publish Job {Publish_Status}.', body='<table width="100%" cellspacing="0" cellpadding="0"><tbody><tr><td style="font-size:16px;color:#666666;font-family:Segoe UI,Helvetica,Arial"><table width="100%" cellspacing="0" cellpadding="0"><tbody><tr><td style="font-size:16px;color:#666666;font-family:Segoe UI,Helvetica,Arial">Your Performance Publish Job {Publish_DetailedStatus}.</td></tr></tbody></table>' where emailid=15
+end
+

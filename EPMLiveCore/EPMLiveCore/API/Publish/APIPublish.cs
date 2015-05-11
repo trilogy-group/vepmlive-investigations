@@ -343,6 +343,12 @@ namespace EPMLiveCore.API
                 //string sProjectName = doc.FirstChild.Attributes["ProjectName"].Value;
                 string sPlannerID = doc.FirstChild.Attributes["PlannerID"].Value;
                 string sID = doc.FirstChild.Attributes["ID"].Value;
+
+                string projectName = doc.SelectSingleNode("/Project/Task/Field[@Name='Project']").InnerText;
+                if (!String.IsNullOrEmpty(projectName))
+                {
+                    projectName = projectName.Substring(projectName.IndexOf("#") + 1);
+                }
                 
                 XmlAttribute attr = doc.CreateAttribute("Key");
                 attr.Value = "EPMLivePlanner" + doc.FirstChild.Attributes["PlannerID"].Value;
@@ -385,13 +391,14 @@ namespace EPMLiveCore.API
                                 {
                                     tJob = Guid.NewGuid();
                                     dr.Close();
-                                    cmd = new SqlCommand("INSERT INTO TIMERJOBS (timerjobuid, siteguid, jobtype, jobname,  scheduletype, webguid, listguid, itemid, jobdata, [key]) VALUES (@timerjobuid, @siteguid, 9, 'Project Publish', 9, @webguid, @listguid, @itemid, @jobdata, @key)", cn);
+                                    cmd = new SqlCommand("INSERT INTO TIMERJOBS (timerjobuid, siteguid, jobtype, jobname,  scheduletype, webguid, listguid, itemid, jobdata, [key]) VALUES (@timerjobuid, @siteguid, 9, @jobname, 9, @webguid, @listguid, @itemid, @jobdata, @key)", cn);
                                     cmd.Parameters.AddWithValue("@siteguid", oSite.ID.ToString());
                                     cmd.Parameters.AddWithValue("@webguid", oWeb.ID);
                                     cmd.Parameters.AddWithValue("@listguid", oList.ID);
                                     cmd.Parameters.AddWithValue("@itemid", sID);
                                     cmd.Parameters.AddWithValue("@jobdata", doc.FirstChild.OuterXml);
-                                    cmd.Parameters.AddWithValue("@timerjobuid", tJob);
+                                    cmd.Parameters.AddWithValue("@timerjobuid", tJob);                                    
+                                    cmd.Parameters.AddWithValue("@jobname", "Project Publish" + "_" + projectName);
                                     cmd.Parameters.AddWithValue("@key", sPlannerID);
                                     cmd.ExecuteNonQuery();
                                 }
@@ -415,6 +422,18 @@ namespace EPMLiveCore.API
                                     {
                                         CoreFunctions.enqueue(tJob, 0);
                                         message = "Success";
+
+                                        if (!String.IsNullOrEmpty(sPlannerID) && sPlannerID.ToLower().Equals("msproject"))
+                                        {
+                                            SPUser currentuser = oWeb.CurrentUser;
+                                            var res = new Hashtable();
+                                            res.Add("ProjectName", projectName);
+                                            string queueJobsUrl = oWeb.Url + "/_layouts/epmlive/queuejobs.aspx?jobid=" + tJob + "&isdlg=1";
+                                            string pageUrl = "javascript:var options = { url:'" + queueJobsUrl + "', width: 1000, height:600, title: 'EPM Live Jobs Queue'}; SP.UI.ModalDialog.showModalDialog(options); return false;";
+                                            res.Add("PageUrl", pageUrl);
+                                            EPMLiveCore.API.APIEmail.QueueItemMessage(14, true, res, new[] { currentuser.ID.ToString() }, null, true, true, oWeb, currentuser, true);
+                                        }
+
                                     }
 
                                 }

@@ -36,7 +36,8 @@ namespace WorkEnginePPM.Jobs
                 SPList oTaskCenter = web.Lists[base.ListUid];
 
                 SPQuery query = new SPQuery();
-                query.Query = "<Where><Eq><FieldRef Name='Project' LookupId='TRUE'/><Value Type='Lookup'>" + key + "</Value></Eq></Where>";
+                string[] keys = key.Split('.');
+                query.Query = "<Where><Eq><FieldRef Name='Project' LookupId='TRUE'/><Value Type='Lookup'>" + keys[0] + "</Value></Eq></Where>";
 
                 string sendValue = "<UpdateListWork><Params />";
 
@@ -94,11 +95,26 @@ namespace WorkEnginePPM.Jobs
                 admin.UpdateListWork(sendValue, out result);
 
                 result = result.Trim();
+
+                if (!String.IsNullOrEmpty(keys[1]) && keys[1].ToLower().Equals("msproject"))
+                {
+                    SPUser currentuser = web.AllUsers.GetByID(userid);
+                    var res = new Hashtable();
+                    res.Add("Publish_Status", "Completed Successfully");
+                    res.Add("Publish_DetailedStatus", "Completed Successfully");
+                    EPMLiveCore.API.APIEmail.QueueItemMessage(15, true, res, new[] { currentuser.ID.ToString() }, null, false, true, web, currentuser, true);
+                }
             }
             catch(Exception ex)
             {
+
                 bErrors = true;
                 sErrors = "Error: " + ex.Message;
+                SPUser currentuser = web.AllUsers.GetByID(userid);
+                var res = new Hashtable();
+                res.Add("Publish_Status", "Failed");
+                res.Add("Publish_DetailedStatus", "failed due to the following reason: " + sErrors);
+                EPMLiveCore.API.APIEmail.QueueItemMessage(15, true, res, new[] { currentuser.ID.ToString() }, null, false, true, web, currentuser, true);
             }
         }
     }
