@@ -277,7 +277,7 @@
                                     <telerik:RadComboBox ID="ddlPalette" runat="server" MaxHeight="180" Width="170" Skin="Metro">
                                         <Items>
                                             <telerik:RadComboBoxItem Text="Color 1" Value="Color1" />
-                                            <telerik:RadComboBoxItem Text="Color 2" Value="Color2" />
+                                            <telerik:RadComboBoxItem Text="Color 2" Value="Color2" Selected="true" />
                                             <telerik:RadComboBoxItem Text="Blue" Value="Blue" />
                                             <telerik:RadComboBoxItem Text="Red" Value="Red" />
                                             <telerik:RadComboBoxItem Text="Yellow" Value="Yellow" />
