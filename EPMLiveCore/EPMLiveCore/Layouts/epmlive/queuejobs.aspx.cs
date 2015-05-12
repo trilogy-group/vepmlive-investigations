@@ -22,11 +22,12 @@ namespace EPMLiveCore.Layouts.epmlive
                         cn.Open();
                     });
 
-                    SqlCommand cmd = new SqlCommand("select jobname as JobName,timerjobuid,percentComplete as PercentComplete,status as JobStatus,dtcreated as DateCreated,dtstarted as DateStarted,dtfinished as DateFinished from vwQueueTimerLog", cn);
+                    SqlCommand cmd = new SqlCommand("select jobname as [Job Name],timerjobuid,percentComplete as [% Complete],status as [Job Status],dtcreated as [Created Date],dtstarted as [Started Date],dtfinished as [Finished Date] from vwQueueTimerLog", cn);
 
                     SqlDataReader dr = cmd.ExecuteReader();
                     DataTable dataTable = new DataTable();
                     dataTable.Load(dr);
+                    dr.Close();
 
                     StringBuilder html = new StringBuilder();
 
@@ -51,7 +52,7 @@ namespace EPMLiveCore.Layouts.epmlive
                         {
                             html.Append("<td>");
 
-                            if (column.ColumnName.Equals("JobStatus"))
+                            if (column.ColumnName.Equals("Job Status"))
                             {
                                 switch (row[column.ColumnName].ToString())
                                 {
@@ -80,6 +81,7 @@ namespace EPMLiveCore.Layouts.epmlive
 
                     queuejobsPlaceHolder.Controls.Add(new Literal { Text = html.ToString() });
 
+                    cn.Close();
                 }
             }
             catch (Exception ex)

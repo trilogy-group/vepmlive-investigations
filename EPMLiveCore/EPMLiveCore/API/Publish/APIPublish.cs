@@ -335,6 +335,7 @@ namespace EPMLiveCore.API
         public static string Publish(string data)
         {
             string message = "";
+            string projectName = "";
             try
             {
                 XmlDocument doc = new XmlDocument();
@@ -344,10 +345,13 @@ namespace EPMLiveCore.API
                 string sPlannerID = doc.FirstChild.Attributes["PlannerID"].Value;
                 string sID = doc.FirstChild.Attributes["ID"].Value;
 
-                string projectName = doc.SelectSingleNode("/Project/Task/Field[@Name='Project']").InnerText;
-                if (!String.IsNullOrEmpty(projectName))
+                if (doc.SelectSingleNode("//Field[@Name='Project']") != null)
                 {
-                    projectName = projectName.Substring(projectName.IndexOf("#") + 1);
+                    projectName = doc.SelectSingleNode("//Field[@Name='Project']").InnerText;
+                    if (!String.IsNullOrEmpty(projectName))
+                    {
+                        projectName = projectName.Substring(projectName.IndexOf("#") + 1);
+                    }
                 }
                 
                 XmlAttribute attr = doc.CreateAttribute("Key");
