@@ -540,8 +540,8 @@
             var cb = document.getElementById('idWorkItem_' + i);
             var projectID = plangrid.GetAttribute(this.planrow, null, "Project_UID");
             var projectRow = this.FindProjectRow(projectID);
-            while (cb != null) {
-                if (cb.checked == true && cblabel.style.display != "none") {
+            while (i < this.importWorkResources.length) {
+                if (cb != null && cb.checked == true && cblabel.style.display != "none") {
                     var resource = this.importWorkResources[i];
                     var WResID = resource.WResID;
                     var planrow = this.FindChildPlanRow(projectRow, resource.WResID);
