@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Data;
 using System.Configuration;
 using System.Collections;
@@ -4485,8 +4486,8 @@ namespace EPMLiveWebParts
                 }
                 foreach (string additionalgroup in additionalgroups.Split('|'))
                 {
-                    if (additionalgroup.Trim() != "")
-                        arrTempGroups.Add(additionalgroup);
+                    if (additionalgroup.Trim() != "")                    
+                        arrTempGroups.Add(additionalgroup);                    
                 }
 
                 ndGroupBy = xmlQuery.SelectSingleNode("//GroupBy");
@@ -4513,8 +4514,10 @@ namespace EPMLiveWebParts
             appendLookupQuery(ref xmlQuery, ref arrTempGroups);
 
             arrGroupFields = (string[])arrTempGroups.ToArray(typeof(string));
-
-
+            
+            // EPML-5197 : to fix duplicate grouping.
+            if(arrGroupFields.Count() > 0)
+                arrGroupFields = arrGroupFields.Distinct().ToArray();
 
             SortedList arrGTemp = new SortedList();
 
