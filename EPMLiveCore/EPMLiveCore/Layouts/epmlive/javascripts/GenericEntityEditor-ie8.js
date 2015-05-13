@@ -206,182 +206,187 @@ function GEInit() {
 
                 // register keyup event with type ahead logic 
                 $('#' + controlProps.ControlInfo.GenericEntityDivId).unbind('keyup').keyup(function (e) {
+                    var e = e;
+                    var that = this;
+                    delay(function () {
 
-                    var index = $(this).attr('CtrlPropArrPos');
-                    if (index != undefined && window._LookupFieldsPropsArray) {
-                        controlProps = window._LookupFieldsPropsArray[index];
-                    }
+                        var index = $(that).attr('CtrlPropArrPos');
+                        if (index != undefined && window._LookupFieldsPropsArray) {
+                            controlProps = window._LookupFieldsPropsArray[index];
+                        }
 
-                    switch (e.keyCode) {
-                        case 8:
-                            if (!SPControlContainsValue($(this).attr('id'))) {
-                                RedisableChildren(controlProps);
-                            }
+                        switch (e.keyCode) {
+                            case 8:
+                                if (!SPControlContainsValue($(that).attr('id'))) {
+                                    RedisableChildren(controlProps);
+                                }
 
-                            var sSearch = $(this).html();
-                            sSearch = ParseForSearchVal(sSearch);
-                            // clearn text for firefox
-                            if (sSearch.indexOf('<br>') != -1) {
-                                sSearch = sSearch.replace(/<br>/g, '');
-                            }
+                                var sSearch = $(that).html();
+                                sSearch = ParseForSearchVal(sSearch);
+                                // clearn text for firefox
+                                if (sSearch.indexOf('<br>') != -1) {
+                                    sSearch = sSearch.replace(/<br>/g, '');
+                                }
 
-                            sSearch = sSearch.trim();
-                            controlProps.ControlInfo.SearchText = sSearch;
+                                sSearch = sSearch.trim();
+                                controlProps.ControlInfo.SearchText = sSearch;
 
-                            if (controlProps.ControlInfo.SearchText.length > 0) {
-                                // is multi select
-                                if (controlProps.ControlInfo.IsMultiSelect ||
-                                    // or is single select and does not contain a value already
-                                    (!controlProps.ControlInfo.IsMultiSelect && !SPControlContainsValue(controlProps.ControlInfo.GenericEntityDivId))) {
+                                if (controlProps.ControlInfo.SearchText.length > 0) {
+                                    // is multi select
+                                    if (controlProps.ControlInfo.IsMultiSelect ||
+                                        // or is single select and does not contain a value already
+                                        (!controlProps.ControlInfo.IsMultiSelect && !SPControlContainsValue(controlProps.ControlInfo.GenericEntityDivId))) {
 
-                                    if (controlProps.Parent != '') {
-                                        var index = CheckIfDataExists(controlProps);
-                                        var cachedata = GetCachedData(index);
-                                        BuildDropDownWithCache(cachedata, controlProps);
-                                    }
-                                    else {
-                                        var cacheObjID = CheckIfDataExists(controlProps);
-                                        var cachedata = '';
-                                        cachedata = GetCachedData(cacheObjID);
-                                        cachedata = cachedata.replace(/\n/g, '').replace(/\r/g, '').replace(/\r\n/g, '');
-                                        //if (cachedata.trim() != '') {
-                                        BuildDropDownWithCache(cachedata, controlProps);
-                                        //}
+                                        if (controlProps.Parent != '') {
+                                            var index = CheckIfDataExists(controlProps);
+                                            var cachedata = GetCachedData(index);
+                                            BuildDropDownWithCache(cachedata, controlProps);
+                                        }
+                                        else {
+                                            var cacheObjID = CheckIfDataExists(controlProps);
+                                            var cachedata = '';
+                                            cachedata = GetCachedData(cacheObjID);
+                                            cachedata = cachedata.replace(/\n/g, '').replace(/\r/g, '').replace(/\r\n/g, '');
+                                            //if (cachedata.trim() != '') {
+                                            BuildDropDownWithCache(cachedata, controlProps);
+                                            //}
+                                        }
                                     }
                                 }
-                            }
-                            else {
-                                RemoveTypeAheadChoiceCandidate(controlProps);
-                            }
-
-                            break;
-                        case 46:
-                            if (!SPControlContainsValue($(this).attr('id'))) {
-                                RedisableChildren(controlProps);
-                            }
-
-                            var sSearch = $(this).html();
-                            sSearch = ParseForSearchVal(sSearch);
-                            // clearn text for firefox
-                            if (sSearch.indexOf('<br>') != -1) {
-                                sSearch = sSearch.replace(/<br>/g, '');
-                            }
-
-                            sSearch = sSearch.trim();
-                            controlProps.ControlInfo.SearchText = sSearch;
-
-                            if (controlProps.ControlInfo.SearchText.length > 0) {
-                                // is multi select
-                                if (controlProps.ControlInfo.IsMultiSelect ||
-                                    // or is single select and does not contain a value already
-                                    (!controlProps.ControlInfo.IsMultiSelect && !SPControlContainsValue(controlProps.ControlInfo.GenericEntityDivId))) {
-
-                                    if (controlProps.Parent != '') {
-                                        var index = CheckIfDataExists(controlProps);
-                                        var cachedata = GetCachedData(index);
-                                        BuildDropDownWithCache(cachedata, controlProps);
-                                    }
-                                    else {
-                                        var cacheObjID = CheckIfDataExists(controlProps);
-                                        var cachedata = '';
-                                        cachedata = GetCachedData(cacheObjID);
-                                        cachedata = cachedata.replace(/\n/g, '').replace(/\r/g, '').replace(/\r\n/g, '');
-                                        //if (cachedata.trim() != '') {
-                                        BuildDropDownWithCache(cachedata, controlProps);
-                                        //}
-                                    }
+                                else {
+                                    RemoveTypeAheadChoiceCandidate(controlProps);
                                 }
-                            }
-                            else {
-                                RemoveTypeAheadChoiceCandidate(controlProps);
-                            }
-                            break;
 
-                        case 38: //up
-                            //alert('moved up!');
-                            $('.autoText').each(function () {
-                                $(this).removeClass('autoTextOnHover');
-                            });
-                            var targetDiv;
-                            if (window.parseInt(controlProps.ControlInfo.CandidateIndex) == 0) {
-                                controlProps.ControlInfo.CandidateIndex = '-1';
-                                RemoveTypeAheadChoiceCandidate(controlProps);
-                            }
-                            else if (window.parseInt(controlProps.ControlInfo.CandidateIndex) > -1) {
-                                controlProps.ControlInfo.CandidateIndex = (window.parseInt(controlProps.ControlInfo.CandidateIndex) - 1);
-                                targetDiv = $('#' + controlProps.ControlInfo.AutoCompleteDivId + ' > div')[controlProps.ControlInfo.CandidateIndex];
-                                $(targetDiv).addClass('autoTextOnHover');
-                            }
-                            if ($(targetDiv).offset() != null) {
-                                var sTop = $(targetDiv).offset().top;
-                                if (sTop <= $('#' + controlProps.ControlInfo.AutoCompleteDivId).offset().top) {
-                                    ScrollCandidateDiv(controlProps.ControlInfo.AutoCompleteDivId, $('#' + controlProps.ControlInfo.AutoCompleteDivId).scrollTop() - 100);
+                                break;
+                            case 46:
+                                if (!SPControlContainsValue($(that).attr('id'))) {
+                                    RedisableChildren(controlProps);
                                 }
-                            }
-                            break;
-                        case 40: // down
-                            //alert('moved down!');
-                            $('.autoText').each(function () {
-                                $(this).removeClass('autoTextOnHover');
-                            });
-                            var targetDiv;
 
-                            if (window.parseInt(controlProps.ControlInfo.CandidateIndex) == $('#' + controlProps.ControlInfo.AutoCompleteDivId + ' > div').length - 1) {
-                                targetDiv = $('#' + controlProps.ControlInfo.AutoCompleteDivId + ' > div')[$('#' + controlProps.ControlInfo.AutoCompleteDivId + ' > div').length - 1];
-                                $(targetDiv).addClass('autoTextOnHover');
-                            }
-                            else if (window.parseInt(controlProps.ControlInfo.CandidateIndex) < $('#' + controlProps.ControlInfo.AutoCompleteDivId + ' > div').length) {
-                                controlProps.ControlInfo.CandidateIndex = (window.parseInt(controlProps.ControlInfo.CandidateIndex) + 1);
-                                targetDiv = $('#' + controlProps.ControlInfo.AutoCompleteDivId + ' > div')[controlProps.ControlInfo.CandidateIndex];
-                                $(targetDiv).addClass('autoTextOnHover');
-                            }
-
-                            if ($(targetDiv).offset() != null) {
-                                var sTop = $(targetDiv).offset().top;
-                                if (sTop >= $('#' + controlProps.ControlInfo.AutoCompleteDivId).offset().top + 150) {
-                                    ScrollCandidateDiv(controlProps.ControlInfo.AutoCompleteDivId, $('#' + controlProps.ControlInfo.AutoCompleteDivId).scrollTop() + 100);
+                                var sSearch = $(that).html();
+                                sSearch = ParseForSearchVal(sSearch);
+                                // clearn text for firefox
+                                if (sSearch.indexOf('<br>') != -1) {
+                                    sSearch = sSearch.replace(/<br>/g, '');
                                 }
-                            }
-                            break;
-                        default:
-                            var sSearch = $(this).html();
-                            sSearch = ParseForSearchVal(sSearch);
-                            // clearn text for firefox
-                            if (sSearch.indexOf('<br>') != -1) {
-                                sSearch = sSearch.replace(/<br>/g, '');
-                            }
 
-                            sSearch = sSearch.trim();
-                            controlProps.ControlInfo.SearchText = sSearch;
+                                sSearch = sSearch.trim();
+                                controlProps.ControlInfo.SearchText = sSearch;
 
-                            if (controlProps.ControlInfo.SearchText.length > 0) {
-                                // is multi select
-                                if (controlProps.ControlInfo.IsMultiSelect ||
-                                    // or is single select and does not contain a value already
-                                    (!controlProps.ControlInfo.IsMultiSelect && !SPControlContainsValue(controlProps.ControlInfo.GenericEntityDivId))) {
+                                if (controlProps.ControlInfo.SearchText.length > 0) {
+                                    // is multi select
+                                    if (controlProps.ControlInfo.IsMultiSelect ||
+                                        // or is single select and does not contain a value already
+                                        (!controlProps.ControlInfo.IsMultiSelect && !SPControlContainsValue(controlProps.ControlInfo.GenericEntityDivId))) {
 
-                                    if (controlProps.Parent != '') {
-                                        var index = CheckIfDataExists(controlProps);
-                                        var cachedata = GetCachedData(index);
-                                        BuildDropDownWithCache(cachedata, controlProps);
-                                    }
-                                    else {
-                                        var cacheObjID = CheckIfDataExists(controlProps);
-                                        var cachedata = '';
-                                        cachedata = GetCachedData(cacheObjID);
-                                        cachedata = cachedata.replace(/\n/g, '').replace(/\r/g, '').replace(/\r\n/g, '');
-                                        //if (cachedata.trim() != '') {
-                                        BuildDropDownWithCache(cachedata, controlProps);
-                                        //}
+                                        if (controlProps.Parent != '') {
+                                            var index = CheckIfDataExists(controlProps);
+                                            var cachedata = GetCachedData(index);
+                                            BuildDropDownWithCache(cachedata, controlProps);
+                                        }
+                                        else {
+                                            var cacheObjID = CheckIfDataExists(controlProps);
+                                            var cachedata = '';
+                                            cachedata = GetCachedData(cacheObjID);
+                                            cachedata = cachedata.replace(/\n/g, '').replace(/\r/g, '').replace(/\r\n/g, '');
+                                            //if (cachedata.trim() != '') {
+                                            BuildDropDownWithCache(cachedata, controlProps);
+                                            //}
+                                        }
                                     }
                                 }
-                            }
-                            else {
-                                RemoveTypeAheadChoiceCandidate(controlProps);
-                            }
+                                else {
+                                    RemoveTypeAheadChoiceCandidate(controlProps);
+                                }
+                                break;
 
-                            break;
-                    }
+                            case 38: //up
+                                //alert('moved up!');
+                                $('.autoText').each(function () {
+                                    $(that).removeClass('autoTextOnHover');
+                                });
+                                var targetDiv;
+                                if (window.parseInt(controlProps.ControlInfo.CandidateIndex) == 0) {
+                                    controlProps.ControlInfo.CandidateIndex = '-1';
+                                    RemoveTypeAheadChoiceCandidate(controlProps);
+                                }
+                                else if (window.parseInt(controlProps.ControlInfo.CandidateIndex) > -1) {
+                                    controlProps.ControlInfo.CandidateIndex = (window.parseInt(controlProps.ControlInfo.CandidateIndex) - 1);
+                                    targetDiv = $('#' + controlProps.ControlInfo.AutoCompleteDivId + ' > div')[controlProps.ControlInfo.CandidateIndex];
+                                    $(targetDiv).addClass('autoTextOnHover');
+                                }
+                                if ($(targetDiv).offset() != null) {
+                                    var sTop = $(targetDiv).offset().top;
+                                    if (sTop <= $('#' + controlProps.ControlInfo.AutoCompleteDivId).offset().top) {
+                                        ScrollCandidateDiv(controlProps.ControlInfo.AutoCompleteDivId, $('#' + controlProps.ControlInfo.AutoCompleteDivId).scrollTop() - 100);
+                                    }
+                                }
+                                break;
+                            case 40: // down
+                                //alert('moved down!');
+                                $('.autoText').each(function () {
+                                    $(that).removeClass('autoTextOnHover');
+                                });
+                                var targetDiv;
+
+                                if (window.parseInt(controlProps.ControlInfo.CandidateIndex) == $('#' + controlProps.ControlInfo.AutoCompleteDivId + ' > div').length - 1) {
+                                    targetDiv = $('#' + controlProps.ControlInfo.AutoCompleteDivId + ' > div')[$('#' + controlProps.ControlInfo.AutoCompleteDivId + ' > div').length - 1];
+                                    $(targetDiv).addClass('autoTextOnHover');
+                                }
+                                else if (window.parseInt(controlProps.ControlInfo.CandidateIndex) < $('#' + controlProps.ControlInfo.AutoCompleteDivId + ' > div').length) {
+                                    controlProps.ControlInfo.CandidateIndex = (window.parseInt(controlProps.ControlInfo.CandidateIndex) + 1);
+                                    targetDiv = $('#' + controlProps.ControlInfo.AutoCompleteDivId + ' > div')[controlProps.ControlInfo.CandidateIndex];
+                                    $(targetDiv).addClass('autoTextOnHover');
+                                }
+
+                                if ($(targetDiv).offset() != null) {
+                                    var sTop = $(targetDiv).offset().top;
+                                    if (sTop >= $('#' + controlProps.ControlInfo.AutoCompleteDivId).offset().top + 150) {
+                                        ScrollCandidateDiv(controlProps.ControlInfo.AutoCompleteDivId, $('#' + controlProps.ControlInfo.AutoCompleteDivId).scrollTop() + 100);
+                                    }
+                                }
+                                break;
+                            default:
+                                var sSearch = $(that).html();
+                                sSearch = ParseForSearchVal(sSearch);
+                                // clearn text for firefox
+                                if (sSearch.indexOf('<br>') != -1) {
+                                    sSearch = sSearch.replace(/<br>/g, '');
+                                }
+
+                                sSearch = sSearch.trim();
+                                controlProps.ControlInfo.SearchText = sSearch;
+
+                                if (controlProps.ControlInfo.SearchText.length > 0) {
+                                    // is multi select
+                                    if (controlProps.ControlInfo.IsMultiSelect ||
+                                        // or is single select and does not contain a value already
+                                        (!controlProps.ControlInfo.IsMultiSelect && !SPControlContainsValue(controlProps.ControlInfo.GenericEntityDivId))) {
+
+                                        if (controlProps.Parent != '') {
+                                            var index = CheckIfDataExists(controlProps);
+                                            var cachedata = GetCachedData(index);
+                                            BuildDropDownWithCache(cachedata, controlProps);
+                                        }
+                                        else {
+                                            var cacheObjID = CheckIfDataExists(controlProps);
+                                            var cachedata = '';
+                                            cachedata = GetCachedData(cacheObjID);
+                                            cachedata = cachedata.replace(/\n/g, '').replace(/\r/g, '').replace(/\r\n/g, '');
+                                            //if (cachedata.trim() != '') {
+                                            BuildDropDownWithCache(cachedata, controlProps);
+                                            //}
+                                        }
+                                    }
+                                }
+                                else {
+                                    RemoveTypeAheadChoiceCandidate(controlProps);
+                                }
+
+                                break;
+                        }
+
+                    }, 750);
                 })
 
                 if (controlProps.ControlType == '2' && $('#' + controlProps.FieldName + '_ddlShowAll').length > 0 && controlProps.Parent == '') {
@@ -1628,6 +1633,14 @@ function GEInit() {
         function ScrollCandidateDiv(id, newTop) {
             $('#' + id).animate({ scrollTop: newTop }, 'fast');
         }
+
+        var delay = (function () {
+            var timer = 0;
+            return function (callback, ms) {
+                clearTimeout(timer);
+                timer = setTimeout(callback, ms);
+            };
+        })();
 
     }(window.epmLiveGenericEntityEditor = window.epmLiveGenericEntityEditor || {}, jQuery, window));
 
