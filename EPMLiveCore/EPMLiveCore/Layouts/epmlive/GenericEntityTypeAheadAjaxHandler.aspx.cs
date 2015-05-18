@@ -136,7 +136,7 @@ namespace EPMLiveCore
                             dt = rows.CopyToDataTable();
                         }
                         catch
-                        {}
+                        { }
                     }
 
                     foreach (DataRow r in dt.Rows)
@@ -163,36 +163,24 @@ namespace EPMLiveCore
                     query.ViewFields = "<FieldRef Name='" + _field + "' /><FieldRef Name='ID' /><FieldRef Name='Title' />";
                 }
 
-                bool isEmptyTableName = true;
                 if (list.EnableThrottling)
                 {
-                    string sql = string.Empty;
-                    string tableName = string.Empty;
-
-                    tableName = GetTableName(list.ID);
-                    if (!string.IsNullOrEmpty(tableName))
+                    try
                     {
-                        isEmptyTableName = false;
+                        DataTable dt = ReportingData.GetReportingData(SPContext.Current.Web, list.Title, false, string.Empty, string.Empty);
+                        _sbResult = new StringBuilder();
 
-                        sql = string.Format("SELECT ID,Title FROM [{0}] ORDER BY {1} ASC", tableName, _field);
-                        try
+                        if (dt != null)
                         {
-                            var queryExecutor = new QueryExecutor(SPContext.Current.Web);
-                            DataTable dt = queryExecutor.ExecuteReportingDBQuery(sql, new Dictionary<string, object> { });
-                            _sbResult = new StringBuilder();
-
-                            if (dt != null)
+                            foreach (DataRow r in dt.Rows)
                             {
-                                foreach (DataRow r in dt.Rows)
-                                {
-                                    _sbResult.Append(r["ID"].ToString() + "^^" + r[_field].ToString() + "^^" + (!string.IsNullOrEmpty(r[_field].ToString()) ? r[_field].ToString() : string.Empty) + ";#");
-                                }
+                                _sbResult.Append(r["ID"].ToString() + "^^" + r[_field].ToString() + "^^" + (!string.IsNullOrEmpty(r[_field].ToString()) ? r[_field].ToString() : string.Empty) + ";#");
                             }
                         }
-                        catch { }
                     }
+                    catch { }
                 }
-                if (!list.EnableThrottling || isEmptyTableName)
+                else
                 {
                     query.ViewFieldsOnly = true;
                     SPListItemCollection items = list.GetItems(query);
