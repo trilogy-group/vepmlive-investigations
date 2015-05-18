@@ -2469,6 +2469,9 @@ namespace PortfolioEngineCore
                 _dba.WriteImmTrace("DataSynch", "UpdateListWork", "Input", data);
 
                 string stablename = "EPGP_PI_WORK2";
+                // Use to delete work from this table to avoid duplication in resource analyzer
+                string sdeleteWorkFromTable = "EPGP_PI_WORK1";
+
                 CStruct xItems = new CStruct();
                 xItems.LoadXML(data);
                 List<CStruct> listPIs = xItems.GetList("Project");
@@ -2557,6 +2560,15 @@ namespace PortfolioEngineCore
                     {
                         transaction = _sqlConnection.BeginTransaction();
 
+                        // Delete work from table to avoid duplicate work hours in resource analyzer 
+                        // since resource analyzer combines data from EPGP_PI_WORK1 & EPGP_PI_WORK2 tables
+                        sCommand = "Delete from " + sdeleteWorkFromTable + " Where PROJECT_ID=@ProjectID";
+                        SqlCommand = new SqlCommand(sCommand, _sqlConnection);
+                        SqlCommand.Parameters.AddWithValue("@ProjectID", nProjectID);
+                        SqlCommand.CommandType = CommandType.Text;
+                        SqlCommand.Transaction = transaction;
+                        SqlCommand.ExecuteNonQuery();
+
                         List<CStruct> listWIs = xProject.GetList("Item");
                         foreach (CStruct xWI in listWIs)
                         {
@@ -2587,7 +2599,7 @@ namespace PortfolioEngineCore
                             SqlCommand.Transaction = transaction;
 
 
-                            List<CStruct> listResources = xWI.GetList("Resource");
+                            List<CStruct> listResources = xWI.GetList("Resource");                            
                             foreach (CStruct xResource in listResources)
                             {
                                 int WresId = xResource.GetIntAttr("Id");
@@ -3663,7 +3675,12 @@ namespace PortfolioEngineCore
                 _dba.WriteImmTrace("DataSynch", "UpdateScheduledWork", "Input", data);
 
                 string stablename = "EPGP_PI_WORK1";
-                if (worktype == 2) stablename = "EPGP_PI_WORK2";
+                string sdeleteWorkFromTable = "EPGP_PI_WORK2";
+                if (worktype == 2)
+                {
+                    stablename = "EPGP_PI_WORK2";
+                    sdeleteWorkFromTable = "EPGP_PI_WORK1";
+                }
                 CStruct xItems = new CStruct();
                 xItems.LoadXML(data);
                 List<CStruct> listPIs = xItems.GetList("Project");
@@ -3712,6 +3729,15 @@ namespace PortfolioEngineCore
                     {
                         // start a transaction and delete all existing work
                         transaction = _sqlConnection.BeginTransaction();
+                        // Delete work from table to avoid duplicate work hours in resource analyzer 
+                        // since resource analyzer combines data from EPGP_PI_WORK1 & EPGP_PI_WORK2 tables
+                        sCommand = "Delete from " + sdeleteWorkFromTable + " Where PROJECT_ID=@ProjectID";
+                        SqlCommand = new SqlCommand(sCommand, _sqlConnection);
+                        SqlCommand.Parameters.AddWithValue("@ProjectID", nProjectID);
+                        SqlCommand.CommandType = CommandType.Text;
+                        SqlCommand.Transaction = transaction;
+                        SqlCommand.ExecuteNonQuery();
+
                         sCommand = "Delete from " + stablename + " Where PROJECT_ID=@ProjectID";
                         SqlCommand = new SqlCommand(sCommand, _sqlConnection);
                         SqlCommand.Parameters.AddWithValue("@ProjectID", nProjectID);
