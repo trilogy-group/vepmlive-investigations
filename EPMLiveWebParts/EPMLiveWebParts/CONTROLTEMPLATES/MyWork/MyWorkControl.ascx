@@ -136,7 +136,7 @@
         <SharePoint:ScriptBlock runat="server">
             $(function () {
                 var loadMyWorkGrid = function () {
-                    window.TreeGrid('<treegrid data_url="<%= WebUrl %>/_vti_bin/WorkEngine.asmx" data_timeout="0" data_method="Soap" data_function="Execute" data_namespace="workengine.com" data_param_function="GetMyWorkGridData" data_param_dataxml="<%= NonCompleteQuery.Replace(Environment.NewLine, string.Empty) %>" layout_url="<%= WebUrl %>/_vti_bin/WorkEngine.asmx" layout_timeout="0" layout_method="Soap" layout_function="Execute" layout_namespace="workengine.com" layout_param_function="GetMyWorkGridLayout" layout_param_dataxml="<%= NonCompleteQuery.Replace(Environment.NewLine, string.Empty) %>" suppressmessage="3" <%= DebugTag %>></treegrid>', 'EPMMyWorkGrid');
+                    window.TreeGrid('<treegrid data_url="<%= WebUrl %>/_vti_bin/WorkEngine.asmx" data_timeout="180" data_repeat="2" data_method="Soap" data_function="Execute" data_namespace="workengine.com" data_param_function="GetMyWorkGridData" data_param_dataxml="<%= NonCompleteQuery.Replace(Environment.NewLine, string.Empty) %>" layout_url="<%= WebUrl %>/_vti_bin/WorkEngine.asmx" layout_timeout="180" layout_method="Soap" layout_function="Execute" layout_namespace="workengine.com" layout_param_function="GetMyWorkGridLayout" layout_param_dataxml="<%= NonCompleteQuery.Replace(Environment.NewLine, string.Empty) %>" suppressmessage="3" <%= DebugTag %>></treegrid>', 'EPMMyWorkGrid');
                 };
 
                 ExecuteOrDelayUntilScriptLoaded(loadMyWorkGrid, 'EPMLive.js');
