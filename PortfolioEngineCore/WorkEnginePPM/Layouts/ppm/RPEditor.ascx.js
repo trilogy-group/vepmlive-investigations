@@ -2960,12 +2960,44 @@
                                         var wresId = plangrid.GetAttribute(row, null, "Res_UID");
                                         var resrow = this.FindResourceRow(wresId);
                                         if (wresId != null && resrow != null) {
-                                            this.CalculateResourceRowCommitted(wresId, resrow);
+                                            this.CalculateResourceRowCommitted(wresId, resrow, true);
+                                            var colNames = plangrid.ColNames[2];
+                                            var colLength = colNames.length;
+                                            for (var c = 0; c < colLength; c++) {
+                                                var col = colNames[c];
+                                                var sType = col.substring(0, 1);
+                                                if (sType == "Q") {
+                                                    var periodid = col.substring(1);
+                                                    var oldDelta = this.resgrid.GetAttribute(resrow, null, "D" + periodid);
+                                                    var oldCommitted = this.resgrid.GetAttribute(resrow, null, "C" + periodid);
+                                                    var newCommitted = oldCommitted - Math.abs(oldDelta);
+                                                    this.resgrid.SetAttribute(resrow, null, "C" + periodid, newCommitted, true, 0);
+                                                    this.resgrid.SetAttribute(resrow, null, "D" + periodid, 0, true, 0);
+                                                    this.plangrid.SetAttribute(row, null, "H" + periodid, 0, true, 0);
+                                                }
+                                            }
+                                            this.resgrid.RefreshRow(resrow);
                                         }
                                         wresId = plangrid.GetAttribute(row, null, "PendingRes_UID");
                                         resrow = this.FindResourceRow(wresId);
                                         if (wresId != null && resrow != null) {
-                                            this.CalculateResourceRowCommitted(wresId, resrow);
+                                            this.CalculateResourceRowCommitted(wresId, resrow, true);
+                                            var colNames = plangrid.ColNames[2];
+                                            var colLength = colNames.length;
+                                            for (var c = 0; c < colLength; c++) {
+                                                var col = colNames[c];
+                                                var sType = col.substring(0, 1);
+                                                if (sType == "Q") {
+                                                    var periodid = col.substring(1);
+                                                    var oldDelta = this.resgrid.GetAttribute(resrow, null, "D" + periodid);
+                                                    var oldCommitted = this.resgrid.GetAttribute(resrow, null, "C" + periodid);
+                                                    var newCommitted = oldCommitted - Math.abs(oldDelta);
+                                                    this.resgrid.SetAttribute(resrow, null, "C" + periodid, newCommitted, true, 0);
+                                                    this.resgrid.SetAttribute(resrow, null, "D" + periodid, 0, true, 0);
+                                                    this.plangrid.SetAttribute(row, null, "H" + periodid, 0, true, 0);
+                                                }
+                                            }
+                                            this.resgrid.RefreshRow(resrow);
                                         }
                                     }
                                     break;
