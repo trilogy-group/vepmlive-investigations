@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns:dm0="http://schemas.microsoft.com/VisualStudio/2008/DslTools/Core" dslVersion="1.0.0.0" Id="004cd07a-6271-4c40-b407-4ca3394e8b34" solutionId="004cd07a-6271-4c40-b407-4ca3394e8b34" resetWebServer="false" sharePointProductVersion="15.0" name="PWChanger" xmlns="http://schemas.microsoft.com/VisualStudio/2008/SharePointTools/PackageModel">
+  <features>
+    <featureReference itemId="760e892d-eb2e-4894-be2c-583026866f49" />
+  </features>
+  <projectItems>
+    <projectItemReference itemId="9c90b7b3-6cf6-4339-b871-b703d83ae6f0" />
+    <projectItemReference itemId="b1ffaee2-321c-4f84-90b6-4f967dbc71c5" />
+  </projectItems>
+</package>

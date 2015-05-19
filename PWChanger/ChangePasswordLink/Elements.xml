@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Elements xmlns="http://schemas.microsoft.com/sharepoint/">
+  <CustomAction
+    Id="ChangePassword"
+    GroupId="PersonalActions"
+    Location="Microsoft.SharePoint.StandardMenu"
+    Sequence="1000"
+    Title="Change my password"
+    ImageUrl="_layouts/15/EPMLive/ico_chngpswd.png"
+    Description="Change your system password">
+    <UrlAction Url="javascript:openModalDialog();"/>
+  </CustomAction>
+  <CustomAction
+    Id="ChangePasswordScript"
+    Location="ScriptLink"
+    ScriptSrc="/_layouts/15/EPMLive/ChangePassword.js">
+  </CustomAction>
+</Elements>

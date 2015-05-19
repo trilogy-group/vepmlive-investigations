@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Feature xmlns="http://schemas.microsoft.com/sharepoint/" Id="273e66fe-2c18-42d2-8a74-ff992aad45a3" Scope="Farm" Title="EPMLive AD Password Changer">
+  <ElementManifests>
+    <ElementManifest Location="ChangePasswordLink\Elements.xml" />
+  </ElementManifests>
+</Feature>
