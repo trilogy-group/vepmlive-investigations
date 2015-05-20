@@ -875,6 +875,8 @@ namespace EPMLiveCore
                         {
                             //EPML-4941: Creating Resource Error
                             int i = 0;
+                            bool blnError = false;
+                            string errorMessage = string.Empty;
                             while (i < 10)
                             {
                                 try
@@ -882,17 +884,24 @@ namespace EPMLiveCore
                                     web.AllUsers.Add(prefix + username, email, display, "");
 
                                     p = properties.Web.AllUsers[prefix + username];
+                                    blnError = false;
                                     i = 10;
                                     break;
                                 }
                                 catch (Exception ex)
                                 {
+                                    errorMessage = ex.Message;
                                     if (ex.Message.Contains("The user does not exists or is not unique"))
                                     {
                                         System.Threading.Thread.Sleep(1000);
+                                        blnError = true;
                                         i++;
                                     }
                                 }
+                            }
+                            if (blnError)
+                            {
+                                throw new Exception(errorMessage);
                             }
                             //End EPML-4941: Creating Resource Error
                         }
