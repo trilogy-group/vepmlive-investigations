@@ -873,9 +873,28 @@ namespace EPMLiveCore
                     {
                         using (SPWeb web = site.OpenWeb(properties.Web.ID))
                         {
-                            web.AllUsers.Add(prefix + username, email, display, "");
+                            //EPML-4941: Creating Resource Error
+                            int i = 0;
+                            while (i < 10)
+                            {
+                                try
+                                {
+                                    web.AllUsers.Add(prefix + username, email, display, "");
 
-                            p = properties.Web.AllUsers[prefix + username];
+                                    p = properties.Web.AllUsers[prefix + username];
+                                    i = 10;
+                                    break;
+                                }
+                                catch (Exception ex)
+                                {
+                                    if (ex.Message.Contains("The user does not exists or is not unique"))
+                                    {
+                                        System.Threading.Thread.Sleep(1000);
+                                        i++;
+                                    }
+                                }
+                            }
+                            //End EPML-4941: Creating Resource Error
                         }
                     }
                 });
