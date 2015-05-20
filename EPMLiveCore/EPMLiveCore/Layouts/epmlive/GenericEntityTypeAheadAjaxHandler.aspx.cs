@@ -163,24 +163,34 @@ namespace EPMLiveCore
                     query.ViewFields = "<FieldRef Name='" + _field + "' /><FieldRef Name='ID' /><FieldRef Name='Title' />";
                 }
 
+                //This special check needs to add to load Roles and Departments and few other lists which won't configured / added as part of List mapping screen.
+                bool isEmptyTableName = true;
                 if (list.EnableThrottling)
                 {
                     try
                     {
-                        DataTable dt = ReportingData.GetReportingData(SPContext.Current.Web, list.Title, false, string.Empty, string.Empty);
-                        _sbResult = new StringBuilder();
+                        string tableName = string.Empty;
 
-                        if (dt != null)
+                        tableName = GetTableName(list.ID);
+                        if (!string.IsNullOrEmpty(tableName))
                         {
-                            foreach (DataRow r in dt.Rows)
+                            isEmptyTableName = false;
+                            DataTable dt = ReportingData.GetReportingData(SPContext.Current.Web, list.Title, false, string.Empty, string.Empty);
+                            _sbResult = new StringBuilder();
+
+                            if (dt != null)
                             {
-                                _sbResult.Append(r["ID"].ToString() + "^^" + r[_field].ToString() + "^^" + (!string.IsNullOrEmpty(r[_field].ToString()) ? r[_field].ToString() : string.Empty) + ";#");
+                                foreach (DataRow r in dt.Rows)
+                                {
+                                    _sbResult.Append(r["ID"].ToString() + "^^" + r[_field].ToString() + "^^" + (!string.IsNullOrEmpty(r[_field].ToString()) ? r[_field].ToString() : string.Empty) + ";#");
+                                }
                             }
                         }
                     }
                     catch { }
                 }
-                else
+                
+                if(!list.EnableThrottling || isEmptyTableName)
                 {
                     query.ViewFieldsOnly = true;
                     SPListItemCollection items = list.GetItems(query);
