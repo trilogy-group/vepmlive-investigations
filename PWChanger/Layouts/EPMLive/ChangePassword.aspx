@@ -10,6 +10,8 @@
 
 <%@ OutputCache Location="None" VaryByParam="None" %>
 <asp:Content ID="PageHead" ContentPlaceHolderID="PlaceHolderAdditionalPageHead" runat="server">
+    <Sharepoint:ScriptLink ID="sl1" name="sp.core.js" OnDemand="false" LoadAfterUI="true" Localizable="false" runat="server"></Sharepoint:ScriptLink>
+    <Sharepoint:ScriptLink ID="sl2" name="sp.js" OnDemand="false" LoadAfterUI="true" Localizable="false" runat="server"></Sharepoint:ScriptLink>
 </asp:Content>
 <asp:Content ID="Main" ContentPlaceHolderID="PlaceHolderMain" runat="server">
     <script type="text/javascript">
@@ -36,6 +38,12 @@
             tbchecknewpw.onclick = function () { checkMatchPWD(tbchecknewpw.value, tbnewpw.value, 2); };
 
             tboldpw.focus();
+
+            if (ReturnStatus)
+            {
+                modalDialogClosedCallback('1', ReturnStatus);
+                ReturnStatus = "";
+            }
         }
     </script>
     <script language="javascript" type="text/javascript">

@@ -63,12 +63,27 @@ namespace EPMLive
         try
         {
           this.ChangeADPassword(this._loginName, this.oldpassword.Text, this.newpassword.Text);
-          this.ReturnStatus("success");
+
+          if (Request["isDlg"] != null && Request["isDlg"] == "1")
+          {
+              this.ReturnStatus("success");
+          }
+          else
+          {
+              ((Page)this).ClientScript.RegisterClientScriptBlock(((object)this).GetType(), "initReturnStatus", "var ReturnStatus='success';", true);
+          }
         }
         catch (Exception ex)
         {
             this.LogError(ex.Message, (ex.InnerException != null ? ex.InnerException.Message : ex.Message), EventLogEntryType.Error);
-            this.ReturnStatus("fail");
+            if (Request["isDlg"] != null && Request["isDlg"] == "1")
+            {
+                this.ReturnStatus("fail");
+            }
+            else
+            {
+                ((Page)this).ClientScript.RegisterClientScriptBlock(((object)this).GetType(), "initReturnStatus", "var ReturnStatus='fail';", true);
+            }
         }
       }
     }
@@ -96,7 +111,7 @@ namespace EPMLive
             bool flag = false;
             try
             {
-                flag = principalContext.ValidateCredentials(CoreFunctions.GetCleanUserName(spLoginName), password);
+                flag = principalContext.ValidateCredentials(CoreFunctions.GetCleanUserName(spLoginName), password);                
             }
             catch (Exception ex)
             {
