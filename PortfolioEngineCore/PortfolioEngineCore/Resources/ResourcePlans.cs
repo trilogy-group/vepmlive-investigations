@@ -498,7 +498,7 @@ namespace PortfolioEngineCore
                     {
                         CStruct xGrid;
                         //string sDebug = xRPE.XML();
-                        RPEditorData.BuildResourcePlanGridXML(xRPE, out xGrid);
+                        RPEditorData.BuildResourcePlanGridXML(_dba, xRPE, out xGrid);
                         //xGrid.AppendXML("<IO Result=\"0\" Message=\"hello john gotta new mota\" />");
                         CStruct xResult = BuildResultStruct("GetResourcePlan");
                         xResult.AppendSubStruct(xGrid);

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Globalization;
 using System.Text;
 using System.Xml;
 
@@ -87,7 +88,7 @@ namespace PortfolioEngineCore
             {
                 SqlCommand oCommand = null;
                 SqlDataReader reader = null;
-                oCommand = new SqlCommand("EPG_SP_ReadViewFieldDefinitions", dba.Connection);
+                oCommand = new SqlCommand("EPG_SP_ReadViewFieldDefinitionsWithProjectFields", dba.Connection);
                 oCommand.CommandType = System.Data.CommandType.StoredProcedure;
                 oCommand.Parameters.Add("ViewTypeID", SqlDbType.Int).Value = (int)ViewTypeEnum.vtResourcePlan;
                 oCommand.Parameters.Add("ViewUID", SqlDbType.Int).Value = lViewUID;
@@ -470,5 +471,32 @@ namespace PortfolioEngineCore
             return eStatus;
         }
 
+        public static Dictionary<string, string> GetPortfolioFieldsAndValues(DBAccess dba, string projectId)
+        {
+            var fieldsAndValues = new Dictionary<string, string>();
+            if (string.IsNullOrEmpty(projectId)) return fieldsAndValues;
+
+            try
+            {
+                var sqlCommand = new SqlCommand("EPG_SP_GetPortfolioCustomFieldsAndValues", dba.Connection);
+                sqlCommand.CommandType = System.Data.CommandType.StoredProcedure;
+                sqlCommand.Parameters.Add("ProjectID", SqlDbType.Int).Value = Int32.Parse(projectId);
+                var reader = sqlCommand.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    fieldsAndValues.Add(reader["FieldName"].ToString(), reader["Value"].ToString());
+                }
+
+                reader.Close();
+                reader.Dispose();
+            }
+            catch (Exception ex)
+            {
+                dba.HandleStatusError(SeverityEnum.Exception, "GetPortfolioFieldsAndValues", (StatusEnum)99999, ex.Message.ToString(CultureInfo.InvariantCulture));
+            }
+
+            return fieldsAndValues;
+        }
     }
 }

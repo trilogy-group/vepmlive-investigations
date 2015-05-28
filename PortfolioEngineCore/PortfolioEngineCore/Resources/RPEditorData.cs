@@ -16,7 +16,7 @@ namespace PortfolioEngineCore
         //    return BuildResourcePlanGridXML(xPlanData, out xGrid);
         //}
 
-        public static StatusEnum BuildResourcePlanGridXML(CStruct xPlanData, out CStruct xGrid)
+        public static StatusEnum BuildResourcePlanGridXML(DBAccess databaseAccess, CStruct xPlanData, out CStruct xGrid)
         {
             // BUGBUG - remove this
             //string sXML = xPlanData.XML();
@@ -311,6 +311,13 @@ namespace PortfolioEngineCore
                     case SpecialFieldIDsEnum.sfResourceGroups:
                         break;
                     case SpecialFieldIDsEnum.sfResourceType:
+                        break;
+                    case SpecialFieldIDsEnum.sfPortfolioField:
+                        sColIDName = xField.GetStringAttr("Title");
+                        if (!string.IsNullOrEmpty(sColIDName))
+                        {
+                            sColIDName = sColIDName.Replace(" ", "_");
+                        }
                         break;
                     default:
                         if (eFieldID >= SpecialFieldIDsEnum.sfRPCatText1 && eFieldID <= SpecialFieldIDsEnum.sfRPCatCode5)
@@ -657,6 +664,8 @@ namespace PortfolioEngineCore
                         int lLastEventContext = xPlanRow.GetInt("LastRowEvent");
                         if (lLastEventContext > 0)
                             xI.CreateIntAttr("LastRowEvent", lLastEventContext);
+                        
+                        var portfolioFields = DBCommon.GetPortfolioFieldsAndValues(databaseAccess, sProjectID);
 
                         //xI.CreateStringAttr("Def", "Summary");
                         foreach (CStruct xField in listFields)
@@ -741,7 +750,20 @@ namespace PortfolioEngineCore
                                     break;
                                 case SpecialFieldIDsEnum.sfResourceType:
                                     break;
+                                case SpecialFieldIDsEnum.sfPortfolioField:
+                                    sColIDName = xField.GetStringAttr("Title");
 
+                                    if (!string.IsNullOrEmpty(sColIDName))
+                                    {
+                                        if (portfolioFields.ContainsKey(sColIDName))
+                                        {
+                                            sValue = portfolioFields[sColIDName];
+                                        }
+                                        
+                                        sColIDName = sColIDName.Replace(" ", "_");
+                                    }
+
+                                    break;
                                 default:
                                     {
                                         if (eFieldID >= SpecialFieldIDsEnum.sfRPCatText1 && eFieldID <= SpecialFieldIDsEnum.sfRPCatCode5)
