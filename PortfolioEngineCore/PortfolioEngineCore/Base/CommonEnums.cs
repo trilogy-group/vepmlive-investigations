@@ -385,8 +385,7 @@ namespace PortfolioEngineCore
         sfEVCatCode2 = 9506,
         sfEVCatCode3 = 9507,
         sfEVCatCode4 = 9508,
-        sfEVCatCode5 = 9509,
-        sfPortfolioField = 0
+        sfEVCatCode5 = 9509
     }
 
     enum DelegateContextEnum
