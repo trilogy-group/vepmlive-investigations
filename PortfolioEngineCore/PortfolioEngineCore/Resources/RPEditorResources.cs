@@ -1,25 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Xml;
-using System.Text;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Xml.Linq;
 
 namespace PortfolioEngineCore
 {
-
-
     internal class RPEditorResources
     {
-        public static StatusEnum BuildPlanResourcesGridXML(string sPlanResources, out CStruct xGrid)
+        public static string BuildPlanResourcesGridXML(string sPlanResources)
         {
-            CStruct xPlanResources = new CStruct();
+            var xPlanResources = new CStruct();
             xPlanResources.LoadXML(sPlanResources);
-            return BuildPlanResourcesGridXML(xPlanResources, out xGrid);
+            return BuildPlanResourcesGridXML(null, xPlanResources);
         }
 
-        public static StatusEnum BuildPlanResourcesGridXML(CStruct xPlanResources, out CStruct xGrid)
+        public static string BuildPlanResourcesGridXML(CStruct resultStruct, CStruct xPlanResources)
         {
-            xGrid = new CStruct();
-            xGrid.Initialize("Grid");
+            CStruct xGrid = resultStruct == null ? new CStruct() : resultStruct.CreateSubStruct("Grid");
+
             CStruct xToolbar = xGrid.CreateSubStruct("Toolbar");
             xToolbar.CreateIntAttr("Visible", 0);
             CStruct xPanel = xGrid.CreateSubStruct("Panel");
@@ -308,377 +305,158 @@ namespace PortfolioEngineCore
             }
 
             // DATA
-            CStruct xBody = xGrid.CreateSubStruct("Body");
-            CStruct xB = xBody.CreateSubStruct("B");
+            var xBody = xGrid.CreateSubStruct("Body");
+            xBody.CreateSubStruct("B");
 
-            CStruct xResources = xPlanResources.GetSubStruct("Resources");
+            var planResourcesGridXml = resultStruct == null
+                ? XElement.Parse(xGrid.XML())
+                : XElement.Parse(resultStruct.XML());
 
-            string s = xPlanResources.XML().ToString();
+            var xResources = xPlanResources.GetSubStruct("Resources");
+            var listResources = xResources.GetList("Resource");
 
-            List<CStruct> listResources = xResources.GetList("Resource");
-            foreach (CStruct xResource in listResources)
+            foreach (var xResource in listResources)
             {
-                CStruct xI = xB.CreateSubStruct("I");
-                //xI.CreateStringAttr("Status", "/_layouts/ppm/images/requirement.gif");
-                xI.CreateIntAttr("CanEdit", 0);
-
-
-                //xI.CreateStringAttr("rowid", xResource.GetStringAttr("WResID"));
-                //xI.CreateIntAttr("CanEdit", 0);
-                xI.CreateStringAttr("id", xResource.GetStringAttr("WResID"));
-                xI.CreateStringAttr("Res_UID", xResource.GetStringAttr("WResID"));
-                xI.CreateStringAttr("Res_EMail", xResource.GetStringAttr("EMail"));
-                bool bUserIsRM = xResource.GetBooleanAttr("UserIsRM");
-                if (bUserIsRM)
-                    xI.CreateBooleanAttr("UserIsRM", bUserIsRM);
-
-                bool bInTeam = xResource.GetBoolean("InTeam");
-                if (bInTeam)
-                    xI.CreateBooleanAttr("InTeam", bInTeam);
-                bool bIsGeneric = xResource.GetBoolean("IsGeneric");
-                xI.CreateBooleanAttr("IsGeneric", bIsGeneric);
-                if (bIsGeneric)
-                    xI.CreateStringAttr("Status", "/_layouts/ppm/images/generic.gif");
-                int lDeptUID = xResource.GetInt("DeptUID");
-                //if (lDeptUID > 0)
-                xI.CreateIntAttr("Dept_UID", lDeptUID);
-                int lCCRoleUID = xResource.GetInt("CCRoleUID");
-                //if (lCCRoleUID > 0)
-                xI.CreateIntAttr("CCRole_UID", lCCRoleUID);
-                int lCCRoleParentUID = xResource.GetInt("CCRoleParentUID");
-                if (lCCRoleParentUID > 0)
-                    xI.CreateIntAttr("CCRoleParent_UID", lCCRoleParentUID);
-                int lRoleUID = xResource.GetInt("RoleUID");
-                //if (lRoleUID > 0)
-                xI.CreateIntAttr("Role_UID", lRoleUID);
-
-                xI.CreateStringAttr("Role_Name", xResource.GetString("RoleName"));
-                xI.CreateStringAttr("CCRole_Name", xResource.GetString("CCRoleName"));
-                xI.CreateStringAttr("CCRoleParent_Name", xResource.GetString("CCRoleParentName"));
-                xI.CreateStringAttr("Dept_Name", xResource.GetString("DeptName"));
-
-                string sItemName = xResource.GetStringAttr("Name");
-                xI.CreateStringAttr("ItemName", sItemName);
-                foreach (CStruct xField in listFields)
-                {
-                    string sValue = "";
-                    string sColIDName = "";
-                    SpecialFieldIDsEnum eFieldID = (SpecialFieldIDsEnum)xField.GetIntAttr("FieldID");
-                    switch (eFieldID)
-                    {
-                        case SpecialFieldIDsEnum.sfResourceName:
-                            sColIDName = "Res_Name";
-                            sValue = xResource.GetStringAttr("Name");
-                            break;
-                        case SpecialFieldIDsEnum.sfRoleName:
-                            //sColIDName = "Role_Name";
-                            //sValue = xResource.GetString("Field" + ((int)(eFieldID)).ToString());
-                            break;
-                        case SpecialFieldIDsEnum.sfResourceRate:
-                            sColIDName = "ResourceRate";
-                            sValue = xResource.GetString("Field" + ((int)(eFieldID)).ToString());
-                            break;
-                        case SpecialFieldIDsEnum.sfResourceGroups:
-                            sColIDName = "ResourceGroups";
-                            sValue = xResource.GetString("Field" + ((int)(eFieldID)).ToString());
-                            break;
-                        case SpecialFieldIDsEnum.sfResourceCostCategory:
-                            //sColIDName = "CCRole_Name";
-                            //sValue = xResource.GetString("Field" + ((int)(eFieldID)).ToString());
-                            break;
-                        case SpecialFieldIDsEnum.sfRPDeptName:
-                            //sColIDName = "Dept_Name";
-                            //SortedList<string, CStruct> listItems;
-                            //if (listLookups.TryGetValue(((int)eFieldID).ToString(), out listItems))
-                            //{
-                            //    CStruct xItem;
-                            //    if (listItems.TryGetValue(lDeptUID.ToString(), out xItem))
-                            //    {
-                            //        sValue = xItem.GetStringAttr("Name");
-                            //    }
-                            //}
-                            break;
-                        case SpecialFieldIDsEnum.sfResourceNotes:
-                            sColIDName = "ResourceNotes";
-                            sValue = xResource.GetString("Field" + ((int)(eFieldID)).ToString());
-                            break;
-                        default:
-                            sColIDName = "C" + ((int)eFieldID).ToString();
-                            sValue = xResource.GetString("Field" + ((int)(eFieldID)).ToString());
-                            break;
-                    }
-                    if (sColIDName != "")
-                    {
-                        xI.CreateStringAttr(sColIDName, sValue);
-                        //xI.CreateStringAttr("Type", "Text");
-                        //xI.CreateIntAttr("CanEdit", 0);
-                        //xI.CreateIntAttr("CanMove", 0);
-                    }
-                }
-
-                char[] ch = new char[] { ',' };
-                {
-                    string sPeriods = xResource.GetString("AvailablePeriods");
-                    string[] aPeriod = sPeriods.Split(ch);
-                    string sPeriodHours = xResource.GetString("AvailableHours");
-                    string[] aPeriodHours = sPeriodHours.Split(ch);
-                    foreach (CStruct xPeriod in listPeriods)
-                    {
-                        string sId = xPeriod.GetStringAttr("ID");
-                        for (int i = 0; i < aPeriod.Length; i++)
-                        {
-                            if (sId == aPeriod[i])
-                            {
-
-                                double dbl = 0;
-                                string sHours = aPeriodHours[i].ToString();
-                                double.TryParse(sHours, out dbl);
-                                xI.CreateDoubleAttr("A" + sId, dbl);
-                                break;
-                            }
-                        }
-                    }
-                }
-                {
-                    string sPeriods = xResource.GetString("AvailablePeriods");
-                    string[] aPeriod = sPeriods.Split(ch);
-                    string sPeriodHours = xResource.GetString("OffHours");
-                    string[] aPeriodHours = sPeriodHours.Split(ch);
-                    foreach (CStruct xPeriod in listPeriods)
-                    {
-                        string sId = xPeriod.GetStringAttr("ID");
-                        for (int i = 0; i < aPeriod.Length; i++)
-                        {
-                            if (sId == aPeriod[i])
-                            {
-
-                                double dbl = 0;
-                                string sHours = aPeriodHours[i].ToString();
-                                double.TryParse(sHours, out dbl);
-                                xI.CreateDoubleAttr("O" + sId, dbl);
-                                break;
-                            }
-                        }
-                    }
-                }
-                {
-                    string sPeriods = xResource.GetString("CommittedPeriods");
-                    string[] aPeriod = sPeriods.Split(ch);
-                    string sPeriodHours = xResource.GetString("CommittedHours");
-                    string[] aPeriodHours = sPeriodHours.Split(ch);
-                    foreach (CStruct xPeriod in listPeriods)
-                    {
-                        string sId = xPeriod.GetStringAttr("ID");
-                        for (int i = 0; i < aPeriod.Length; i++)
-                        {
-                            if (sId == aPeriod[i])
-                            {
-
-                                double dbl = 0;
-                                string sHours = aPeriodHours[i].ToString();
-                                double.TryParse(sHours, out dbl);
-                                xI.CreateDoubleAttr("C" + sId, dbl);
-                                break;
-                            }
-                        }
-                    }
-                }
-                {
-                    string sPeriods = xResource.GetString("NonWorkPeriods");
-                    string[] aPeriod = sPeriods.Split(ch);
-                    string sPeriodHours = xResource.GetString("NonWorkHours");
-                    string[] aPeriodHours = sPeriodHours.Split(ch);
-                    foreach (CStruct xPeriod in listPeriods)
-                    {
-                        string sId = xPeriod.GetStringAttr("ID");
-                        for (int i = 0; i < aPeriod.Length; i++)
-                        {
-                            if (sId == aPeriod[i])
-                            {
-                                double dbl = 0;
-                                string sFTEToHours = aPeriodHours[i].ToString();
-                                double.TryParse(sFTEToHours, out dbl);
-                                xI.CreateDoubleAttr("N" + sId, dbl);
-                                break;
-                            }
-                        }
-                    }
-                }
+                planResourcesGridXml
+                    .Element("Grid")
+                    .Element("Body")
+                    .Element("B")
+                    .Add(BuildResourceXML(xResource, listFields));
             }
-            return StatusEnum.rsSuccess;
+            return planResourcesGridXml.ToString();
         }
 
-        //public static StatusEnum BuildResourceSelectorGridXML(string sSelectedResources, out CStruct xGrid)
-        //{
-        //    CStruct xSelectedResources = new CStruct();
-        //    xSelectedResources.LoadXML(sSelectedResources);
-        //    return BuildResourceSelectorGridXML(xSelectedResources, out xGrid);
-        //}
+        private static XElement BuildResourceXML(CStruct xResource, IEnumerable<CStruct> listFields)
+        {
+            var xI = new XElement("I");
 
-        //public static StatusEnum BuildResourceSelectorGridXML(CStruct xSelectedResources, out CStruct xGrid)
-        //{
-        //    xGrid = new CStruct();
-        //    xGrid.Initialize("Grid");
-        //    CStruct xToolbar = xGrid.CreateSubStruct("Toolbar");
-        //    xToolbar.CreateIntAttr("Visible", 1);
-        //    CStruct xPanel = xGrid.CreateSubStruct("Panel");
-        //    xPanel.CreateIntAttr("Visible", 1);
-        //    xPanel.CreateIntAttr("Delete", 0);
-        //    CStruct xCfg = xGrid.CreateSubStruct("Cfg");
-        //    xCfg.CreateStringAttr("MainCol", "ItemName");
-        //    xCfg.CreateStringAttr("Code", "GTACCNPSQEBSLC");
-        //    xCfg.CreateIntAttr("SuppressCfg", 3);
-        //    xCfg.CreateIntAttr("Dragging", 1);
-        //    xCfg.CreateIntAttr("ColsMoving", 1);
-        //    xCfg.CreateIntAttr("ColsPosLap", 1);
-        //    xCfg.CreateIntAttr("ColsLap", 1);
-        //    xCfg.CreateIntAttr("Sorting", 1);
-        //    xCfg.CreateIntAttr("VisibleLap", 1);
-        //    xCfg.CreateIntAttr("SectionWidthLap", 1);
-        //    xCfg.CreateIntAttr("GroupLap", 1);
-        //    xCfg.CreateIntAttr("WideHScroll", 0);
-        //    xCfg.CreateIntAttr("LeftWidth", 400);
-        //    xCfg.CreateIntAttr("Width", 400);
-        //    xCfg.CreateIntAttr("RightWidth", 400);
-        //    xCfg.CreateIntAttr("MaxHeight", 0);
-        //    xCfg.CreateIntAttr("ShowDeleted", 0);
-        //    xCfg.CreateBooleanAttr("DateStrings", true);
-        //    xCfg.CreateIntAttr("MaxWidth", 1);
-        //    xCfg.CreateIntAttr("MaxSort", 2);
-        //    xCfg.CreateStringAttr("DefaultSort", "ItemName");
-        //    xCfg.CreateIntAttr("AppendId", 0);
-        //    xCfg.CreateIntAttr("FullId", 0);
-        //    xCfg.CreateStringAttr("IdChars", "0123456789");
-        //    xCfg.CreateIntAttr("NumberId", 1);
-        //    xCfg.CreateIntAttr("LastId", 1);
-        //    xCfg.CreateIntAttr("CaseSensitiveId", 0);
-        //    xCfg.CreateStringAttr("Style", "GM");
-        //    xCfg.CreateStringAttr("CSS", "RPEditor");
-        //    xCfg.CreateIntAttr("FastColumns", 1);
-        //    xCfg.CreateIntAttr("ExpandAllLevels", 3);
-        //    xCfg.CreateIntAttr("GroupSortMain", 1);
-        //    xCfg.CreateIntAttr("GroupRestoreSort", 1);
-        //    xCfg.CreateStringAttr("IdNames", "ItemName");
+            xI.Add(new XAttribute("CanEdit", 0));
+            xI.Add(new XAttribute("id", xResource.GetStringAttr("WResID")));
+            xI.Add(new XAttribute("Res_UID", xResource.GetStringAttr("WResID")));
+            xI.Add(new XAttribute("Res_EMail", xResource.GetStringAttr("EMail")));
+            var bUserIsRM = xResource.GetBooleanAttr("UserIsRM");
+            if (bUserIsRM)
+                xI.Add(new XAttribute("UserIsRM", 1));
 
-        //    CStruct xDef = xGrid.CreateSubStruct("Def");
-        //    CStruct xD = xDef.CreateSubStruct("D");
-        //    xD.CreateStringAttr("Name", "Group");
-        //    xD.CreateStringAttr("Expanded", "1");
-        //    xD.CreateStringAttr("GroupMainCaption", "Item Name (grouped)");
-        //    //CStruct xDef = xGrid.CreateSubStruct("Def");
-        //    CStruct xDSummaryRow = xDef.CreateSubStruct("D");
-        //    xDSummaryRow.CreateStringAttr("Name", "Summary");
+            var bInTeam = xResource.GetBoolean("InTeam");
+            if (bInTeam)
+                xI.Add(new XAttribute("InTeam", 1));
+            var bIsGeneric = xResource.GetBoolean("IsGeneric");
+            xI.Add(new XAttribute("IsGeneric", bIsGeneric ? 1 : 0));
+            if (bIsGeneric)
+                xI.Add(new XAttribute("Status", "/_layouts/ppm/images/generic.gif"));
+            var lDeptUID = xResource.GetInt("DeptUID");
+            xI.Add(new XAttribute("Dept_UID", lDeptUID));
+            var lCCRoleUID = xResource.GetInt("CCRoleUID");
+            xI.Add(new XAttribute("CCRole_UID", lCCRoleUID));
+            var lCCRoleParentUID = xResource.GetInt("CCRoleParentUID");
+            if (lCCRoleParentUID > 0)
+                xI.Add(new XAttribute("CCRoleParent_UID", lCCRoleParentUID));
+            var lRoleUID = xResource.GetInt("RoleUID");
+            xI.Add(new XAttribute("Role_UID", lRoleUID));
 
-        //    CStruct xSolid = xGrid.CreateSubStruct("Solid");
-        //    CStruct xGroup = xSolid.CreateSubStruct("Group");
-        //    xGroup.CreateIntAttr("Visible", 0);
-        //    //xGroup.CreateStringAttr("Cells", "List,Custom");
-        //    xGroup.CreateStringAttr("Panel", "2");
+            xI.Add(new XAttribute("Role_Name", xResource.GetString("RoleName")));
+            xI.Add(new XAttribute("CCRole_Name", xResource.GetString("CCRoleName")));
+            xI.Add(new XAttribute("CCRoleParent_Name", xResource.GetString("CCRoleParentName")));
+            xI.Add(new XAttribute("Dept_Name", xResource.GetString("DeptName")));
 
-        //    CStruct xLeftCols = xGrid.CreateSubStruct("LeftCols");
-        //    CStruct xMidCols = xGrid.CreateSubStruct("Cols");
-        //    CStruct xRightCols = xGrid.CreateSubStruct("RightCols");
+            var sItemName = xResource.GetStringAttr("Name");
+            xI.Add(new XAttribute("ItemName", sItemName));
+            foreach (var xField in listFields)
+            {
+                var sValue = "";
+                var sColIDName = "";
+                var eFieldID = (SpecialFieldIDsEnum)xField.GetIntAttr("FieldID");
+                switch (eFieldID)
+                {
+                    case SpecialFieldIDsEnum.sfResourceName:
+                        sColIDName = "Res_Name";
+                        sValue = xResource.GetStringAttr("Name");
+                        break;
+                    case SpecialFieldIDsEnum.sfRoleName:
+                        //sColIDName = "Role_Name";
+                        //sValue = xResource.GetString("Field" + ((int)(eFieldID)).ToString());
+                        break;
+                    case SpecialFieldIDsEnum.sfResourceRate:
+                        sColIDName = "ResourceRate";
+                        sValue = xResource.GetString("Field" + ((int)(eFieldID)).ToString());
+                        break;
+                    case SpecialFieldIDsEnum.sfResourceGroups:
+                        sColIDName = "ResourceGroups";
+                        sValue = xResource.GetString("Field" + ((int)(eFieldID)).ToString());
+                        break;
+                    case SpecialFieldIDsEnum.sfResourceCostCategory:
+                        //sColIDName = "CCRole_Name";
+                        //sValue = xResource.GetString("Field" + ((int)(eFieldID)).ToString());
+                        break;
+                    case SpecialFieldIDsEnum.sfRPDeptName:
+                        //sColIDName = "Dept_Name";
+                        //SortedList<string, CStruct> listItems;
+                        //if (listLookups.TryGetValue(((int)eFieldID).ToString(), out listItems))
+                        //{
+                        //    CStruct xItem;
+                        //    if (listItems.TryGetValue(lDeptUID.ToString(), out xItem))
+                        //    {
+                        //        sValue = xItem.GetStringAttr("Name");
+                        //    }
+                        //}
+                        break;
+                    case SpecialFieldIDsEnum.sfResourceNotes:
+                        sColIDName = "ResourceNotes";
+                        sValue = xResource.GetString("Field" + ((int)(eFieldID)));
+                        break;
+                    default:
+                        var fieldInt = ((int)eFieldID);
+                        sColIDName = "C" + fieldInt;
+                        sValue = xResource.GetString("Field" + fieldInt);
+                        break;
+                }
+                if (sColIDName != "")
+                {
+                    xI.Add(new XAttribute(sColIDName, sValue));
+                    //xI.CreateStringAttr("Type", "Text");
+                    //xI.CreateIntAttr("CanEdit", 0);
+                    //xI.CreateIntAttr("CanMove", 0);
+                }
+            }
 
-        //    CStruct xHead = xGrid.CreateSubStruct("Head");
-        //    CStruct xFilter = xHead.CreateSubStruct("Filter");
-        //    xFilter.CreateStringAttr("id", "Filter");
+            var ch = new[] { ',' };
 
-        //    CStruct xHeader1 = xGrid.CreateSubStruct("Header");
-        //    xHeader1.CreateIntAttr("ItemNameVisible", 1);
-        //    xHeader1.CreateIntAttr("Spanned", -1);
+            var availablePeriods = xResource.GetString("AvailablePeriods").Split(ch);
+            var committedPeriods = xResource.GetString("CommittedPeriods").Split(ch);
+            var nonWorkPeriods = xResource.GetString("NonWorkPeriods").Split(ch);
 
-        //    CStruct xC;
-        //    xC = xLeftCols.CreateSubStruct("C");
-        //    xC.CreateStringAttr("Name", "Status");
-        //    xC.CreateStringAttr("Type", "Icon");
-        //    xC.CreateIntAttr("CanEdit", 0);
-        //    xC.CreateIntAttr("CanMove", 0);
-        //    xC.CreateIntAttr("Width", 25);
-        //    xHeader1.CreateStringAttr("Status", " ");
+            var availableHours = xResource.GetString("AvailableHours").Split(ch);
+            var committedHours = xResource.GetString("CommittedHours").Split(ch);
+            var offHours = xResource.GetString("OffHours").Split(ch);
+            var nonWorkHours = xResource.GetString("NonWorkHours").Split(ch);
 
-        //    //xC = xLeftCols.CreateSubStruct("C");
-        //    //xC.CreateStringAttr("Name", "ResStatus");
-        //    //xC.CreateStringAttr("Type", "Icon");
-        //    //xC.CreateIntAttr("CanEdit", 0);
-        //    //xC.CreateIntAttr("CanMove", 0);
-        //    //xC.CreateIntAttr("Width", 25);
-        //    //xHeader1.CreateStringAttr("ResStatus", " ");
-        //    //xC.CreateIntAttr("Visible", 0);
+            for (var i = 0; i < availablePeriods.Count(); i++)
+            {
+                var period = availablePeriods[i];
+                if (string.IsNullOrEmpty(period)) break;
 
-        //    xC = xLeftCols.CreateSubStruct("C");
-        //    xC.CreateStringAttr("Name", "ItemName");
-        //    xC.CreateStringAttr("Type", "Text");
-        //    xC.CreateIntAttr("Width", 250);
-        //    //xC.CreateBooleanAttr("CanEdit", false);
-        //    //xC.CreateIntAttr("GroupWidth", 1);
-        //    xC.CreateIntAttr("CanEdit", 0);
-        //    xC.CreateIntAttr("CanMove", 0);
-        //    xHeader1.CreateStringAttr("ItemName", "Item Name");
-        //    xC.CreateIntAttr("Visible", 1);
+                xI.Add(new XAttribute("A" + period, availableHours[i]));
+                xI.Add(new XAttribute("O" + period, offHours[i]));
+            }
 
-        //    CStruct xResourceDisplayFields = xSelectedResources.GetSubStruct("ResourceDisplayFields");
-        //    CStruct xFieldDefinitions = xResourceDisplayFields.GetSubStruct("Items");
+            for (var i = 0; i < committedPeriods.Count(); i++)
+            {
+                var period = committedPeriods[i];
+                if (string.IsNullOrEmpty(period)) break;
 
-        //    List<CStruct> listFields = xFieldDefinitions.GetList("Item");
-        //    foreach (CStruct xField in listFields)
-        //    {
-        //        xC = xMidCols.CreateSubStruct("C");
-        //        xC.CreateStringAttr("Name", "X" + xField.GetStringAttr("FieldID"));
-        //        xC.CreateStringAttr("Type", "Text");
-        //        xC.CreateIntAttr("CanEdit", 0);
-        //        xC.CreateIntAttr("CanMove", 1);
-        //        xC.CreateIntAttr("CanHide", 1);
-        //        string sTitle = xField.GetStringAttr("Title").Replace("/n", "\n");
-        //        xHeader1.CreateStringAttr("X" + xField.GetStringAttr("FieldID"), sTitle);
-        //    }
+                xI.Add(new XAttribute("C" + period, committedHours[i]));
+            }
 
-        //    // DATA
-        //    CStruct xBody = xGrid.CreateSubStruct("Body");
-        //    CStruct xB = xBody.CreateSubStruct("B");
+            for (var i = 0; i < nonWorkPeriods.Count(); i++)
+            {
+                var period = nonWorkPeriods[i];
+                if (string.IsNullOrEmpty(period)) break;
 
-        //    CStruct xResources = xSelectedResources.GetSubStruct("Resources");
+                xI.Add(new XAttribute("N" + period, nonWorkHours[i]));
+            }
 
-        //    string s = xSelectedResources.XML().ToString();
-
-        //    List<CStruct> listResources = xResources.GetList("Resource");
-        //    foreach (CStruct xResource in listResources)
-        //    {
-        //        CStruct xI = xB.CreateSubStruct("I");
-        //        //xI.CreateStringAttr("Status", "/_layouts/ppm/images/requirement.gif");
-        //        xI.CreateStringAttr("Status", "/_layouts/ppm/images/commitment.gif");
-        //        xI.CreateIntAttr("CanEdit", 0);
-
-
-        //        //xI.CreateStringAttr("rowid", xResource.GetStringAttr("WResID"));
-        //        xI.CreateIntAttr("CanEdit", 0);
-        //        xI.CreateStringAttr("WResID", xResource.GetStringAttr("WResID"));
-        //        xI.CreateStringAttr("ItemName", xResource.GetString("ResourceName"));
-        //        foreach (CStruct xField in listFields)
-        //        {
-        //            string sValue = "";
-        //            //CStruct xCCRole;
-        //            SpecialFieldIDsEnum eFieldID = (SpecialFieldIDsEnum)xField.GetIntAttr("FieldID");
-        //            switch (eFieldID)
-        //            {
-        //                case SpecialFieldIDsEnum.sfRPEGroup:
-        //                    sValue = xResource.GetStringAttr("Group");
-        //                    break;
-        //                case SpecialFieldIDsEnum.sfMajorCategory:
-        //                    //sValue = xField.GetStringAttr("Group");
-        //                    break;
-        //                case SpecialFieldIDsEnum.sfResourceName:
-        //                    sValue = xResource.GetString("ResourceName");
-        //                    break;
-        //                default:
-        //                    break;
-        //            }
-        //            xI.CreateStringAttr("X" + xField.GetStringAttr("FieldID"), sValue);
-        //            xI.CreateStringAttr("Type", "Text");
-        //            xI.CreateIntAttr("CanEdit", 0);
-        //            xI.CreateIntAttr("CanMove", 0);
-        //        }
-        //    }
-        //    return StatusEnum.rsSuccess;
-        //}
+            return xI;
+        }
     }
 }

@@ -9,7 +9,7 @@ namespace PortfolioEngineCore
 {
     internal class ResourceSelector : PFEBase
     {
-        
+
         public ResourceSelector(string basepath, string username, string pid, string company, string dbcnstring, SecurityLevels secLevel, bool bDebug = false)
             : base(basepath, username, pid, company, dbcnstring, secLevel, bDebug)
         {
@@ -1559,9 +1559,9 @@ namespace PortfolioEngineCore
                     int lPeriodID = 0;
                     double dblHours = 0;
                     double dblOffHours = 0;
-                    string sPeriods = "";
-                    string sHours = "";
-                    string sOffHours = "";
+                    var sPeriods = new StringBuilder();
+                    var sHours = new StringBuilder();
+                    var sOffHours = new StringBuilder();
                     bool bFirst = false;
                     bFirst = true;
                     while (reader.Read())
@@ -1580,29 +1580,29 @@ namespace PortfolioEngineCore
                             dicResources.TryGetValue(lPrevWResID.ToString(), out xResource);
                             if (xResource != null)
                             {
-                                xResource.CreateString("AvailablePeriods", sPeriods);
-                                xResource.CreateString("AvailableHours", sHours);
-                                xResource.CreateString("OffHours", sOffHours);
+                                xResource.CreateString("AvailablePeriods", sPeriods.ToString().TrimEnd(','));
+                                xResource.CreateString("AvailableHours", sHours.ToString().TrimEnd(','));
+                                xResource.CreateString("OffHours", sOffHours.ToString().TrimEnd(','));
                             }
-                            sPeriods = "";
-                            sHours = "";
-                            sOffHours = "";
+                            sPeriods.Clear();
+                            sHours.Clear();
+                            sOffHours.Clear();
                         }
-                        sPeriods = Common.AppendItemToList(sPeriods, lPeriodID.ToString("0"));
-                        sHours = Common.AppendItemToList(sHours, dblHours.ToString("0"));
-                        sOffHours = Common.AppendItemToList(sOffHours, dblOffHours.ToString("0"));
+                        sPeriods.Append((lPeriodID.ToString("0"))).Append(',');
+                        sHours.Append(dblHours.ToString("0")).Append(',');
+                        sOffHours.Append(dblOffHours.ToString("0")).Append(',');
                         lPrevWResID = lWResID;
                     }
                     // write the final item
-                    if (sHours != "")
+                    if (sHours.ToString() != "")
                     {
                         CStruct xResource = null;
                         dicResources.TryGetValue(lPrevWResID.ToString(), out xResource);
                         if (xResource != null)
                         {
-                            xResource.CreateString("AvailablePeriods", sPeriods);
-                            xResource.CreateString("AvailableHours", sHours);
-                            xResource.CreateString("OffHours", sOffHours);
+                            xResource.CreateString("AvailablePeriods", sPeriods.ToString().TrimEnd(','));
+                            xResource.CreateString("AvailableHours", sHours.ToString().TrimEnd(','));
+                            xResource.CreateString("OffHours", sOffHours.ToString().TrimEnd(','));
                         }
                     }
                     reader.Close();
@@ -1624,10 +1624,10 @@ namespace PortfolioEngineCore
                         string sHoursTag = "";
                         sPeriodTag = "CommittedPeriods";
                         sHoursTag = "CommittedHours";
-                        sHours = "";
+                        sHours.Clear();
                         lPrevWResID = 0;
-                        sPeriods = "";
-                        sHours = "";
+                        sPeriods.Clear();
+                        sHours.Clear();
                         bFirst = true;
                         while (reader.Read())
                         {
@@ -1644,25 +1644,25 @@ namespace PortfolioEngineCore
                                 dicResources.TryGetValue(lPrevWResID.ToString(), out xResource);
                                 if (xResource != null)
                                 {
-                                    xResource.CreateString(sPeriodTag, sPeriods);
-                                    xResource.CreateString(sHoursTag, sHours);
-                                    sPeriods = "";
-                                    sHours = "";
+                                    xResource.CreateString(sPeriodTag, sPeriods.ToString().TrimEnd(','));
+                                    xResource.CreateString(sHoursTag, sHours.ToString().TrimEnd(','));
+                                    sPeriods.Clear();
+                                    sHours.Clear();
                                 }
                             }
-                            sPeriods = Common.AppendItemToList(sPeriods, lPeriodID.ToString("0"));
-                            sHours = Common.AppendItemToList(sHours, dblHours.ToString("0"));
+                            sPeriods.Append((lPeriodID.ToString("0"))).Append(',');
+                            sHours.Append(dblHours.ToString("0")).Append(',');
                             lPrevWResID = lWResID;
                         }
                         // write the final item
-                        if (sHours != "")
+                        if (sHours.ToString() != "")
                         {
                             CStruct xResource = null;
                             dicResources.TryGetValue(lPrevWResID.ToString(), out xResource);
                             if (xResource != null)
                             {
-                                xResource.CreateString(sPeriodTag, sPeriods);
-                                xResource.CreateString(sHoursTag, sHours);
+                                xResource.CreateString(sPeriodTag, sPeriods.ToString().TrimEnd(','));
+                                xResource.CreateString(sHoursTag, sHours.ToString().TrimEnd(','));
                             }
                         }
                         reader.Close();
@@ -1678,10 +1678,10 @@ namespace PortfolioEngineCore
 
                     reader = oCommand.ExecuteReader();
 
-                    sHours = "";
+                    sHours.Clear();
                     lPrevWResID = 0;
-                    sPeriods = "";
-                    sHours = "";
+                    sPeriods.Clear();
+                    sHours.Clear();
                     bFirst = true;
                     while (reader.Read())
                     {
@@ -1698,25 +1698,25 @@ namespace PortfolioEngineCore
                             dicResources.TryGetValue(lPrevWResID.ToString(), out xResource);
                             if (xResource != null)
                             {
-                                xResource.CreateString("NonWorkPeriods", sPeriods);
-                                xResource.CreateString("NonWorkHours", sHours);
+                                xResource.CreateString("NonWorkPeriods", sPeriods.ToString().TrimEnd(','));
+                                xResource.CreateString("NonWorkHours", sHours.ToString().TrimEnd(','));
                             }
-                            sPeriods = "";
-                            sHours = "";
+                            sPeriods.Clear();
+                            sHours.Clear();
                         }
-                        sPeriods = Common.AppendItemToList(sPeriods, lPeriodID.ToString("0"));
-                        sHours = Common.AppendItemToList(sHours, dblHours.ToString("0"));
+                        sPeriods.Append((lPeriodID.ToString("0"))).Append(',');
+                        sHours.Append(dblHours.ToString("0")).Append(',');
                         lPrevWResID = lWResID;
                     }
                     // write the final item
-                    if (sHours != "")
+                    if (sHours.ToString() != "")
                     {
                         CStruct xResource = null;
                         dicResources.TryGetValue(lPrevWResID.ToString(), out xResource);
                         if (xResource != null)
                         {
-                            xResource.CreateString("NonWorkPeriods", sPeriods);
-                            xResource.CreateString("NonWorkHours", sHours);
+                            xResource.CreateString("NonWorkPeriods", sPeriods.ToString().TrimEnd(','));
+                            xResource.CreateString("NonWorkHours", sHours.ToString().TrimEnd(','));
                         }
                     }
 

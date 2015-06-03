@@ -549,11 +549,7 @@ namespace PortfolioEngineCore
                         if (ResourceSelector.GetPIResourcesStruct(_dba, _userWResID, lProjectID.ToString("0"), sWResIDs, clnPeriods, oAdmin, lStartPeriodID, out xReply) != StatusEnum.rsSuccess)
                             goto Exit_Function;
 
-                        CStruct xGrid;
-                        RPEditorResources.BuildPlanResourcesGridXML(xReply, out xGrid);
-                        CStruct xResult = BuildResultStruct("GetResourcePlanWork");
-                        xResult.AppendSubStruct(xGrid);
-                        sReply = xResult.XML();
+                        sReply = RPEditorResources.BuildPlanResourcesGridXML(BuildResultStruct("GetResourcePlanWork"), xReply);
                     }
                 }
             }
@@ -951,11 +947,7 @@ namespace PortfolioEngineCore
                         if (ResourceSelector.GetPIResourcesStruct(_dba, _userWResID, sProjectIDs, sWResIDs, clnPeriods, oAdmin, lStartPeriodID, out xReply) != StatusEnum.rsSuccess)
                             goto Exit_Function;
 
-                        CStruct xGrid;
-                        RPEditorResources.BuildPlanResourcesGridXML(xReply, out xGrid);
-                        CStruct xResult = BuildResultStruct("GetPlanResources");
-                        xResult.AppendSubStruct(xGrid);
-                        sReply = xResult.XML();
+                        sReply = RPEditorResources.BuildPlanResourcesGridXML(BuildResultStruct("GetPlanResources"), xReply);
                     }
                 }
             }
