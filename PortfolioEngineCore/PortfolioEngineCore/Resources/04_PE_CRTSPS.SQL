@@ -122,7 +122,7 @@ exec(@createoralter + ' function dbo.EPG_FN_ConvertListToTable(@str nvarchar(max
 RETURNS  @listOfIds TABLE(TokenVal int)
 AS
 BEGIN
-    DECLARE @delimiter	nchar(1) = N','
+    DECLARE @delimiter	nchar(1) = N'',''
 	DECLARE @lenString int
 	
     WHILE len(@str) > 0 
@@ -137,7 +137,7 @@ BEGIN
                SELECT substring( @str, 1, @lenString )                
             SELECT @str = 
                (CASE (len( @str ) - @lenString ) 
-                   WHEN 0 THEN '' 
+                   WHEN 0 THEN '''' 
                    ELSE right( @str, len( @str ) - @lenString - 1 ) 
                 END
                ) 
