@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Xml;
+using System.Linq;
 using ResourceValues;
 
 namespace PortfolioEngineCore
@@ -292,6 +293,8 @@ namespace PortfolioEngineCore
                     sticketData = DBAccess.ReadStringValue(reader["DC_DATA"]);
                 }
                 reader.Close();
+
+                sticketData = String.Join(",", sticketData.Split(',').ToList().SelectMany(ids => ids.Split(',')).Distinct().ToArray());
 
                 bool bisValidResourceTicket = true;
                 foreach (string sList in sticketData.Split(','))
