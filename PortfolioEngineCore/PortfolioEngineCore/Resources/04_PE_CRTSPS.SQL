@@ -118,16 +118,31 @@ begin
     Print 'Updating Function EPG_FN_ConvertListToTable'
     SET @createoralter = 'ALTER'
 end
-exec(@createoralter + ' function dbo.EPG_FN_ConvertListToTable(@strString nvarchar(max))
-RETURNS  @TokenVals TABLE(TokenVal BIGINT)
+exec(@createoralter + ' function dbo.EPG_FN_ConvertListToTable(@str nvarchar(max))
+RETURNS  @listOfIds TABLE(TokenVal int)
 AS
 BEGIN
-      DECLARE @x XML
-      SELECT @x = CAST(''<A>''+ REPLACE(@strString,'','',''</A><A>'')+ ''</A>'' AS XML)
-      INSERT INTO @TokenVals        
-      SELECT t.value(''.'', ''int'') AS inVal
-      FROM @x.nodes(''/A'') AS x(t)
-    RETURN
+    DECLARE @delimiter	nchar(1) = N'',''
+	DECLARE @lenString int
+	
+    WHILE len(@str) > 0 
+         BEGIN          
+            SELECT @lenString = 
+               (CASE charindex( @delimiter, @str ) 
+                   WHEN 0 THEN len( @str ) 
+                   ELSE (charindex( @delimiter, @str ) -1 )
+                END
+               )                                 
+            INSERT INTO @listOfIds 
+               SELECT substring( @str, 1, @lenString )                
+            SELECT @str = 
+               (CASE (len( @str ) - @lenString ) 
+                   WHEN 0 THEN '''' 
+                   ELSE right( @str, len( @str ) - @lenString - 1 ) 
+                END
+               ) 
+         END          
+      RETURN
 END
 ')
  
@@ -6081,13 +6096,21 @@ exec(@createoralter + ' PROCEDURE dbo.EPG_SP_ReadResourcesWorkA
    @StartPeriodID INT,
    @WResIDs NTEXT
 AS
-SELECT PRD_ID,WR.WRES_ID,CS_AVAIL as AvailableHours,CS_OFF as OffHours   
-  FROM EPG_PERIODS
- INNER JOIN EPGP_CAPACITY_VALUES CV ON (BD_PERIOD = PRD_ID) and (CV.CB_ID=@CalID)
-  LEFT JOIN EPG_RESOURCES WR ON (WR.WRES_ID = CV.WRES_ID)
- INNER JOIN dbo.EPG_FN_ConvertListToTable(@WResIDs) LT on WR.WRES_ID=LT.TokenVal 
- WHERE EPG_PERIODS.CB_ID = @CalID AND PRD_ID >= @StartPeriodID
- ORDER BY WR.WRES_ID,PRD_ID
+	DECLARE @t TABLE (TokenVal  int not null PRIMARY KEY)
+	INSERT INTO @t(TokenVal)
+	SELECT DISTINCT TokenVal 
+	FROM dbo.EPG_FN_ConvertListToTable (@WResIDs) 	
+
+	SELECT PRD_ID,WR.WRES_ID,CS_AVAIL as AvailableHours,CS_OFF as OffHours   
+	  FROM EPG_PERIODS P1
+	 INNER JOIN EPGP_CAPACITY_VALUES CV 
+		ON CV.BD_PERIOD = P1.PRD_ID
+		   AND CV.CB_ID = P1.CB_ID   
+	 INNER JOIN EPG_RESOURCES WR  ON (WR.WRES_ID = CV.WRES_ID)
+	 inner join @t LT on WR.WRES_ID=LT.TokenVal 
+	 WHERE P1.CB_ID = @CalID AND P1.PRD_ID >= @StartPeriodID	
+	 ORDER BY LT.TokenVal ,PRD_ID	
+
 ')
  
 if not exists (select routine_name from INFORMATION_SCHEMA.routines where routine_name = 'EPG_SP_ReadResourcesWorkB')

@@ -4155,7 +4155,7 @@
                     jValue.value = jValue.value / (lFinishPeriod - lStartPeriod + 1);
                 }
             }
-            for (var c = 0; c < grid.ColNames[2].length; c++) {
+            for (var c = (lStartPeriod - 1) ; c < lFinishPeriod; c++) {
                 var col = grid.ColNames[2][c];
                 var sType = col.substring(0, 1);
                 if (sType == "Q") {
@@ -4170,7 +4170,11 @@
                         var dblValue = parseFloat(jValue.value) * mpy;
                         this.SetPeriodValue(grid, row, col, dblValue);
                         var sValue = this.GetFormattedPeriodCell(grid, row, col, false, false);
-                        this.GridsOnAfterValueChanged(grid, row, col, sValue);
+
+                        var retVal = function (callback) {
+                            setTimeout(function () { this.GridsOnAfterValueChanged(grid, row, col, sValue); }, 1);
+                        };
+
                         grid.SetAttribute(row, col, null, sValue, 0, 0);
                     }
                 }
@@ -4183,6 +4187,14 @@
                 this.RefreshPlanRowPeriods(grid, reqrow, true);
                 grid.SetAttribute(reqrow, null, "Changed", 1, 0, 0);
             }
+
+            var wresId = grid.GetAttribute(row, null, "PendingRes_UID");
+            if (wresId == null) wresId = grid.GetAttribute(row, null, "Res_UID");
+            var resrow = this.FindResourceRow(wresId);
+            if (wresId != null && resrow != null) {
+                this.CalculateResourceRowCommitted(wresId, resrow, true);
+            }
+
             this.UpdateButtonsAsync();
         }
     };

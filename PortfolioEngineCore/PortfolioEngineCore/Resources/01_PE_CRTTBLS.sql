@@ -346,6 +346,7 @@ if not exists (select table_name from INFORMATION_SCHEMA.tables where table_name
 
 CREATE TABLE dbo.EPG_PERIODS
 (
+	ID int IDENTITY NOT NULL,
 	PRD_ID int NOT NULL,
 	CB_ID int,
 	PRD_NAME nvarchar(255) NOT NULL,
@@ -353,13 +354,20 @@ CREATE TABLE dbo.EPG_PERIODS
 	PRD_FINISH_DATE datetime,
 	PRD_CLOSED_DATE datetime,
 	PRD_CLOSED_NAME nvarchar(255) NULL,
-	PRD_IS_CLOSED tinyint NOT NULL DEFAULT 0
+	PRD_IS_CLOSED tinyint NOT NULL DEFAULT 0,
+	CONSTRAINT PK_EPG_PERIODS PRIMARY KEY (ID)
 )
 
                 end
 else
                 begin
                                 Print 'Updating Table EPG_PERIODS'
+
+								IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE  CONSTRAINT_TYPE = 'PRIMARY KEY' AND TABLE_NAME = 'EPG_PERIODS')
+								BEGIN
+										ALTER TABLE [dbo].[EPG_PERIODS]
+										ADD ID int IDENTITY NOT NULL CONSTRAINT PK_EPG_PERIODS PRIMARY KEY (ID)
+								END
                 end
 
 if not exists (select table_name from INFORMATION_SCHEMA.tables where table_name = 'EPG_NOTE_THREADS')
@@ -3318,7 +3326,7 @@ if not exists (select table_name from INFORMATION_SCHEMA.tables where table_name
 
 CREATE TABLE dbo.EPG_RESOURCES
 (
-	WRES_ID int NOT NULL,
+	WRES_ID int IDENTITY NOT NULL,
 	RES_NAME nvarchar(255) NOT NULL,
 	WRES_PASSWORD nvarchar(255) NULL,
 	WRES_USE_NT_LOGON tinyint NOT NULL DEFAULT 0,
@@ -3336,13 +3344,19 @@ CREATE TABLE dbo.EPG_RESOURCES
 	WRES_RP_DEPT int,
 	WRES_NOTES nvarchar(255),
 	WRES_EXT_UID nvarchar(64) NULL,
-	WRES_TRACE int NOT NULL DEFAULT 0
+	WRES_TRACE int NOT NULL DEFAULT 0,
+	CONSTRAINT [PK_EPG_RESOURCES] PRIMARY KEY (	[WRES_ID] ASC )
 )
 
                 end
 else
                 begin
                                 Print 'Updating Table EPG_RESOURCES'
+
+								IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE  CONSTRAINT_TYPE = 'PRIMARY KEY' AND TABLE_NAME = 'EPG_RESOURCES')
+								BEGIN
+										ALTER TABLE [dbo].[EPG_RESOURCES] ADD  CONSTRAINT [PK_EPG_RESOURCES] PRIMARY KEY ([WRES_ID] ASC)
+								END								
                 end
 
 if not exists (select table_name from INFORMATION_SCHEMA.tables where table_name = 'EPG_GROUPS')
@@ -3394,14 +3408,50 @@ if not exists (select table_name from INFORMATION_SCHEMA.tables where table_name
 
 CREATE TABLE dbo.EPG_GROUP_MEMBERS
 (
+	ID int IDENTITY NOT NULL,
 	GROUP_ID int NOT NULL,
-	MEMBER_UID int NOT NULL
+	MEMBER_UID int NOT NULL,
+	CONSTRAINT [PK_EPG_GROUP_MEMBERS1] PRIMARY KEY CLUSTERED 
+	(
+		[GROUP_ID] ASC,
+		[MEMBER_UID] ASC,
+		ID
+	)
 )
 
                 end
 else
                 begin
                                 Print 'Updating Table EPG_GROUP_MEMBERS'
+
+								IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE  CONSTRAINT_TYPE = 'PRIMARY KEY' AND TABLE_NAME = 'EPG_GROUP_MEMBERS')
+								BEGIN
+									--Create copy of EPG_GROUP_MEMBERS data
+									SELECT  [GROUP_ID],[MEMBER_UID]
+									INTO dbo.temp_GROUP_MEMBERS
+									FROM dbo.EPG_GROUP_MEMBERS
+
+									--Add column for surrogate PK constraint
+									ALTER TABLE [dbo].[temp_GROUP_MEMBERS]
+									ADD ID int IDENTITY NOT NULL 
+
+									--Rename original and temporary tables
+									EXEC sp_rename N'dbo.EPG_GROUP_MEMBERS',N'EPG_GROUP_MEMBERS_Prev'
+
+									EXEC sp_rename N'dbo.temp_GROUP_MEMBERS',N'EPG_GROUP_MEMBERS'
+
+									--Create PK. Support duplicates (same as the previous Cluster Index)
+									ALTER TABLE [dbo].[EPG_GROUP_MEMBERS] ADD  CONSTRAINT [PK_EPG_GROUP_MEMBERS1] PRIMARY KEY CLUSTERED 
+									(
+										[GROUP_ID] ASC,
+										[MEMBER_UID] ASC,
+										ID
+									)
+
+									--Remove TEMPORARY table
+									DROP TABLE [dbo].[EPG_GROUP_MEMBERS_Prev]
+								END
+
                 end
 
 if not exists (select table_name from INFORMATION_SCHEMA.tables where table_name = 'EPG_GROUP_PERMISSIONS')

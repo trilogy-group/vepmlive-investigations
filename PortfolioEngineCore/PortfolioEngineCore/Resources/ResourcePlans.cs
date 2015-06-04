@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Globalization;
 using System.Text;
 using System.Xml;
 
@@ -549,11 +550,7 @@ namespace PortfolioEngineCore
                         if (ResourceSelector.GetPIResourcesStruct(_dba, _userWResID, lProjectID.ToString("0"), sWResIDs, clnPeriods, oAdmin, lStartPeriodID, out xReply) != StatusEnum.rsSuccess)
                             goto Exit_Function;
 
-                        CStruct xGrid;
-                        RPEditorResources.BuildPlanResourcesGridXML(xReply, out xGrid);
-                        CStruct xResult = BuildResultStruct("GetResourcePlanWork");
-                        xResult.AppendSubStruct(xGrid);
-                        sReply = xResult.XML();
+                        sReply = RPEditorResources.BuildPlanResourcesGridXML(BuildResultStruct("GetResourcePlanWork"), xReply);
                     }
                 }
             }
@@ -951,11 +948,7 @@ namespace PortfolioEngineCore
                         if (ResourceSelector.GetPIResourcesStruct(_dba, _userWResID, sProjectIDs, sWResIDs, clnPeriods, oAdmin, lStartPeriodID, out xReply) != StatusEnum.rsSuccess)
                             goto Exit_Function;
 
-                        CStruct xGrid;
-                        RPEditorResources.BuildPlanResourcesGridXML(xReply, out xGrid);
-                        CStruct xResult = BuildResultStruct("GetPlanResources");
-                        xResult.AppendSubStruct(xGrid);
-                        sReply = xResult.XML();
+                        sReply = RPEditorResources.BuildPlanResourcesGridXML(BuildResultStruct("GetPlanResources"), xReply);
                     }
                 }
             }
@@ -2541,10 +2534,10 @@ namespace PortfolioEngineCore
                         {
                             bool bFoundH;
                             string suffix = lPeriod.ToString("0");
-                            string sHours = xI.GetStringAttr("H" + suffix, "0", out bFoundH);
+                            string sHours = xI.GetStringAttr("H" + suffix, "0", out bFoundH);                            
                             if (bFoundH)
                             {
-                                dblHours += Convert.ToDouble(sHours);
+                                dblHours += double.Parse(sHours,CultureInfo.InvariantCulture);
                             }
                         }
 
@@ -2641,7 +2634,7 @@ namespace PortfolioEngineCore
                                 string sMode = xI.GetStringAttr("M" + suffix, "0", out bFoundM);
                                 if (bFoundH || bFoundF || bFoundM)
                                 {
-                                    double dblHours = Convert.ToDouble(sHours);
+                                    double dblHours = double.Parse(sHours,CultureInfo.InvariantCulture);
                                     int lFTEs = Convert.ToInt32(sFTE);
                                     int lMode = Convert.ToInt32(sMode);
                                     if (dblHours != 0 || lFTEs != 0)
@@ -2664,7 +2657,7 @@ namespace PortfolioEngineCore
                                     sMode = xI.GetStringAttr("m" + suffix, "0", out bFoundM);
                                     if (bFoundH || bFoundF || bFoundM)
                                     {
-                                        double dblHours = Convert.ToDouble(sHours);
+                                        double dblHours = double.Parse(sHours, CultureInfo.InvariantCulture);
                                         int lFTEs = Convert.ToInt32(sFTE);
                                         int lMode = Convert.ToInt32(sMode);
 
