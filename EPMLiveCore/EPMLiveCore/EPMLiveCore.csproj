@@ -1024,6 +1024,12 @@ net start "WETimer"</PostDeploymentCommand>
     <Compile Include="Layouts\epmlive\QueueCreateWorkspace.aspx.designer.cs">
       <DependentUpon>QueueCreateWorkspace.aspx.cs</DependentUpon>
     </Compile>
+    <Compile Include="Layouts\epmlive\queuejobs.aspx.cs">
+      <DependentUpon>queuejobs.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Layouts\epmlive\queuejobs.aspx.designer.cs">
+      <DependentUpon>queuejobs.aspx.cs</DependentUpon>
+    </Compile>
     <Compile Include="Layouts\epmlive\regionalsetng.aspx.cs">
       <DependentUpon>regionalsetng.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -3581,6 +3587,7 @@ net start "WETimer"</PostDeploymentCommand>
     <Content Include="Layouts\epmlive\publishersettings.aspx" />
     <Content Include="Layouts\epmlive\QueueCreateWorkspace.aspx" />
     <Content Include="Layouts\epmlive\QueueCreateWorkspace.js" />
+    <Content Include="Layouts\epmlive\queuejobs.aspx" />
     <Content Include="Layouts\epmlive\refreshind.aspx" />
     <Content Include="Layouts\epmlive\refreshpc.aspx" />
     <Content Include="Layouts\epmlive\regionalsetng.aspx" />
