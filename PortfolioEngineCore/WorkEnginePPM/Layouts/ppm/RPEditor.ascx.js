@@ -4150,8 +4150,8 @@
                 grid.SetAttribute(reqrow, null, "Changed", 1, 0, 0);
             }
 
-            var resGrid = Grids["g_Res"];
-            var wresId = grid.GetAttribute(row, null, "Res_UID");
+            var wresId = grid.GetAttribute(row, null, "PendingRes_UID");
+            if (wresId == null) wresId = grid.GetAttribute(row, null, "Res_UID");
             var resrow = this.FindResourceRow(wresId);
             if (wresId != null && resrow != null) {
                 this.CalculateResourceRowCommitted(wresId, resrow, true);
