@@ -2,11 +2,21 @@
 using System.Data;
 using System.Diagnostics;
 using Microsoft.SharePoint;
+using System.Web;
+
 
 namespace EPMLiveReportsAdmin
 {
     public class LstEvents : SPListEventReceiver
     {
+        private HttpContext currentContext;
+        static HttpContext _stCurrentContext;
+
+        public LstEvents()
+        {
+            currentContext = HttpContext.Current;
+        }
+
         public override void ListDeleting(SPListEventProperties properties)
         {
             DeleteList(properties);
@@ -24,6 +34,7 @@ namespace EPMLiveReportsAdmin
 
         public override void FieldAdded(SPListEventProperties properties)
         {
+            _stCurrentContext.Session["ViewSession"] = null;
             if (properties.Field.InternalName.ToLower() == "today")
             {
                 return;
@@ -34,6 +45,7 @@ namespace EPMLiveReportsAdmin
 
         public override void FieldAdding(SPListEventProperties properties)
         {
+            _stCurrentContext = currentContext;
             if (properties.FieldName.ToLower().EndsWith("id") || properties.FieldName.ToLower().EndsWith("text"))
             {
                 properties.Status = SPEventReceiverStatus.CancelWithError;
