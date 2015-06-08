@@ -19,7 +19,7 @@
         }
 
         #jobqueuedetailslog-wrap {
-            height: 400px;
+            height: 100%;
             overflow: auto;
         }
 

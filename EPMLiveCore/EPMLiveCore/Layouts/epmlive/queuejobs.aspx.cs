@@ -22,7 +22,8 @@ namespace EPMLiveCore.Layouts.epmlive
                         cn.Open();
                     });
 
-                    SqlCommand cmd = new SqlCommand("select jobname as [Job Name],timerjobuid,percentComplete as [% Complete],status as [Job Status],dtcreated as [Created Date],dtstarted as [Started Date],dtfinished as [Finished Date] from vwQueueTimerLog", cn);
+                    SqlCommand cmd = new SqlCommand("select jobname as [Job Name],timerjobuid,percentComplete as [% Complete],status as [Job Status],dtcreated as [Created Date],dtstarted as [Started Date],dtfinished as [Finished Date] from vwQueueTimerLog where DATEDIFF(DAY,[dtcreated],GETDATE()) <= 7 and siteguid=@siteId order by dtcreated desc", cn);
+                    cmd.Parameters.AddWithValue("@siteId", oSite.ID);
 
                     SqlDataReader dr = cmd.ExecuteReader();
                     DataTable dataTable = new DataTable();
