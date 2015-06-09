@@ -80,7 +80,7 @@
         }
 
         $(function () {
-            $('#jobqueuedetailslog td:nth-child(2),th:nth-child(2)').hide()
+            $('#jobqueuedetailslog td:nth-child(2),#jobqueuedetailslog th:nth-child(2)').hide()
             timerjobuid = getParameterByName('jobid');
             if (timerjobuid) {
                 filterLogByJobId(timerjobuid);
