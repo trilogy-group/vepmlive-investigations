@@ -29,41 +29,30 @@
             *zoom: 1;
         }
 
-        table {
-            max-width: 100%;
+        table#jobqueuedetailslog {            
             background-color: transparent;
             border-collapse: collapse;
             border-spacing: 0;
-        }
-
-
-
-        .table {
             width: 100%;
             margin-bottom: 20px;
         }
+        
+        table#jobqueuedetailslog th,
+        table#jobqueuedetailslog td {
+            padding: 6px;
+            line-height: 20px;
+            text-align: left;
+            vertical-align: top;
+            border-top: 1px solid #dddddd;
+        }
 
-            .table th,
-            .table td {
-                padding: 6px;
-                line-height: 20px;
-                text-align: left;
-                vertical-align: top;
-                border-top: 1px solid #dddddd;
-            }
+        table#jobqueuedetailslog th {
+            font-weight: bold;
+        }
 
-
-
-            .table th {
-                font-weight: bold;
-            }
-
-
-
-            .table thead th {
-                vertical-align: bottom;
-            }
-
+        table#jobqueuedetailslog  thead th {
+            vertical-align: bottom;
+        }
 
         .table-bordered {
             border: 1px solid #dddddd;
@@ -91,7 +80,7 @@
         }
 
         $(function () {
-            $('td:nth-child(2),th:nth-child(2)').hide()
+            $('#jobqueuedetailslog td:nth-child(2),th:nth-child(2)').hide()
             timerjobuid = getParameterByName('jobid');
             if (timerjobuid) {
                 filterLogByJobId(timerjobuid);
@@ -100,35 +89,21 @@
         });
 
         var filterLogByJobId = function (jobid) {
-            if (jobid) {
-                //if (jobid == "All" && $("#lnkshowallJobs").text() == "Show All Jobs") {
-                //    $("#jobqueuedetailslog tbody tr").show();
-                //    $("#lnkshowallJobs").text('Show Current Job');
-                //}
-                //else {
-                    $("#jobqueuedetailslog tbody tr").hide();
+            if (jobid) {                
+                $("#jobqueuedetailslog tbody tr").hide();
 
-                    $("#jobqueuedetailslog tbody tr").each(function () {
-                        if ($(this).find("td:eq(1)").text().indexOf(timerjobuid) >= 0) {
-                            $(this).show();
-                        }
-                    });
-
-                    //if (jobid == "All" && $("#lnkshowallJobs").text() == "Show Current Job") {
-                    //    $("#lnkshowallJobs").text('Show All Jobs');
-                    //}
-                //}
+                $("#jobqueuedetailslog tbody tr").each(function () {
+                    if ($(this).find("td:eq(1)").text().indexOf(timerjobuid) >= 0) {
+                        $(this).show();
+                    }
+                });
             }
         };
 
     </script>
 </asp:Content>
 
-<asp:Content ID="Main" ContentPlaceHolderID="PlaceHolderMain" runat="server">
-    <%--<div>
-        <a id="lnkshowallJobs" style="display: none;" class="allJobs" onclick="javascript:filterLogByJobId('All');">Show All Jobs</a>
-    </div>
-    <br />--%>
+<asp:Content ID="Main" ContentPlaceHolderID="PlaceHolderMain" runat="server">    
     <asp:PlaceHolder ID="queuejobsPlaceHolder" runat="server" />
 </asp:Content>
 

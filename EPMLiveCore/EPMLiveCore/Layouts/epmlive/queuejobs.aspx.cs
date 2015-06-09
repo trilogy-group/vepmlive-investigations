@@ -33,7 +33,7 @@ namespace EPMLiveCore.Layouts.epmlive
                     StringBuilder html = new StringBuilder();
 
                     html.Append("<div class='row-fluid' id='jobqueuedetailslog-wrap'>");
-                    html.Append("<table class='table table-bordered' id='jobqueuedetailslog'>");
+                    html.Append("<table class='table-bordered' id='jobqueuedetailslog'>");
                     html.Append("<thead>");
                     html.Append("<tr>");
 

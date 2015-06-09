@@ -433,7 +433,7 @@ namespace EPMLiveCore.API
                                             var res = new Hashtable();
                                             res.Add("ProjectName", projectName);
                                             string queueJobsUrl = oWeb.Url + "/_layouts/epmlive/queuejobs.aspx?jobid=" + tJob + "&isdlg=1";
-                                            string pageUrl = "javascript:var options = { url:'" + queueJobsUrl + "', width: 1000, height:600, title: 'EPM Live Jobs Queue'}; SP.UI.ModalDialog.showModalDialog(options); return false;";
+                                            string pageUrl = "javascript:var options = { url:'" + queueJobsUrl + "', width: 1000, height:600, title: 'EPM Live Jobs Queue'}; SP.SOD.execute('sp.ui.dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);  return false;";
                                             res.Add("PageUrl", pageUrl);
                                             EPMLiveCore.API.APIEmail.QueueItemMessage(14, true, res, new[] { currentuser.ID.ToString() }, null, true, true, oWeb, currentuser, true);
                                         }
