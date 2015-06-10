@@ -17,12 +17,24 @@
     </iframe>
 
     <script language="javascript">
-        window.onmessage = function (event) {
+        // Here "addEventListener" is for standards-compliant web browsers and "attachEvent" is for IE Browsers.
+        var eventMethod = window.addEventListener ? "addEventListener" : "attachEvent";
+        var eventer = window[eventMethod];
+
+        // if 
+        //    "attachEvent", then we need to select "onmessage" as the event. 
+        // if 
+        //    "addEventListener", then we need to select "message" as the event
+
+        var messageEvent = eventMethod == "attachEvent" ? "onmessage" : "message";
+
+        // Listen to message from child IFrame window
+        eventer(messageEvent, function (e) {
             if (event.data === "closed") {
                 location.reload();
             }
-        }
-        
+        }, false);
+
         function setHeight() {
             document.getElementById("frmReport").style.height = (getHeight() - getTop(document.getElementById("frmReport")) - 40) + "px";
         }
