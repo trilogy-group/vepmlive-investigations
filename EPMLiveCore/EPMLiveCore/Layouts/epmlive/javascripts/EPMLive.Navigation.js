@@ -2303,7 +2303,7 @@
                             if (window.epmNavHoveredNode === null) {
                                 hideMenu();
                             }
-                        }, 6000);
+                        }, 3000);
                     };
 
                     var hideMenu = function () {
