@@ -9,6 +9,7 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Infrastructure
         V56,
         V564,
         V567,
+        V568,
         GENERIC
     }
 
@@ -46,6 +47,12 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Infrastructure
                         break;
                     case EPMLiveVersion.V564:
                         version = "5.6.4";
+                        break;
+                    case EPMLiveVersion.V567:
+                        version = "5.6.7";
+                        break;
+                    case EPMLiveVersion.V568:
+                        version = "5.6.8";
                         break;
                     case EPMLiveVersion.GENERIC:
                         version = "GENERIC";
