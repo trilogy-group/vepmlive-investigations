@@ -42,7 +42,7 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
                             if (list != null)
                             {
 
-                                LogMessage("Updating Job Queue Menu", 2);
+                                LogMessage("Rename Menu Title: Job Queue to Portfolio Queue.", 2);
 
                                 SPQuery jobQueueQuery = new SPQuery();
                                 jobQueueQuery.Query = "<Where><Eq><FieldRef Name='Title'/><Value Type='Text'>Job Queue</Value></Eq></Where>";
@@ -52,10 +52,15 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
                                 {
                                     SPListItem li = jobListItems[0];
                                     li["Title"] = "Portfolio Queue";
-                                    li.Update();                                    
+                                    li.Update();
+                                    LogMessage("Job Queue Menu renamed to Portfolio Queue.", MessageKind.SUCCESS, 4);
+                                }
+                                else
+                                {
+                                    LogMessage("Job Queue Menu not available.", MessageKind.SKIPPED, 2);                                    
                                 }
 
-                                LogMessage("Adding Work Queue Menu", 2);
+                                LogMessage("Adding New Menu: Work Queue.", 2);
 
                                 var blnItemExists = list.Items.Cast<SPListItem>().Any(item => item.Title.Equals("Work Queue"));
 
@@ -67,9 +72,12 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
                                     listItem["Description"] = "General EPM Live Queue";
                                     listItem["Category"] = "10) Utilities";
                                     listItem.Update();
+                                    LogMessage("Work Queue Menu added.", MessageKind.SUCCESS, 4);
                                 }
-
-                                LogMessage(null, MessageKind.SUCCESS, 4);
+                                else
+                                {
+                                    LogMessage("Work Queue Menu already exists.", MessageKind.SKIPPED, 2);
+                                }
                             }
                         }
                     }
