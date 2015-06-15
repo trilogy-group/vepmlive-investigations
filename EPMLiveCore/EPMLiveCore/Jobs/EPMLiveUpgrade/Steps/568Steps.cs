@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using EPMLiveCore.Infrastructure;
 
 namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
 {
@@ -86,6 +87,14 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
             catch (Exception e)
             {
                 LogMessage(e.Message, MessageKind.FAILURE, 2);
+            }
+            finally
+            {
+                try
+                {
+                    CacheStore.Current.RemoveSafely(Web.Url, new CacheStoreCategory(Web).Navigation);
+                }
+                catch { }
             }
             return true;
         }
