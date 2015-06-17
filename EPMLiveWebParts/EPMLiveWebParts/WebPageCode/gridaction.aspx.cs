@@ -445,6 +445,11 @@ namespace EPMLiveWebParts
                             break;
                         case "editview":
                             w = GetWeb(site);
+                            try
+                            {
+                                GridViewSession gvs = new GridViewSession(Guid.Empty);
+                            }
+                            catch { }
                             url = ((w.ServerRelativeUrl == "/") ? "" : w.ServerRelativeUrl) + "/_layouts/15/ViewEdit.aspx?List=" + Request["List"] + "&View=" + Request["view"];
                             break;
                         case "createworkspace":
