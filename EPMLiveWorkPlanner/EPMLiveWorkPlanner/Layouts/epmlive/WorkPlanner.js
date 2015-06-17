@@ -1918,7 +1918,7 @@ function DoCreateNew(fieldinfo, hasproject) {
 
     var sFieldInfo = fieldinfo.split('.');
 
-    var params = "listid=" + sProjectListId + "&lookups=" + escape(sProjectName) + "&field=" + sFieldInfo[0] + "&LookupFieldList=" + sFieldInfo[1];
+    var params = "listid=" + sProjectListId + "&lookups=" + escape(sProjectName) + "&field=" + sFieldInfo[0] + "&LookupFieldList=" + sFieldInfo[1] + "&lookupid=" + sItemID;
 
     dhtmlxAjax.post("gridaction.aspx?action=linkeditemspost", params, DoCreateNewPost);
 
