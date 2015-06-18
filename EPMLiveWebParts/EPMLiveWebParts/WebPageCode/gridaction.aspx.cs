@@ -823,8 +823,6 @@ namespace EPMLiveWebParts
                 data = "General Error: " + ex.Message;
                 //ClientScript.RegisterStartupScript(this.GetType(), "closeWindow", "<script language=\"javascript\">javascript:alert('hi'); return false;</script>");
             }
-
-
             if (url != "")
             {
                 url = url.Substring(0, 10) + url.Substring(10).Replace("//", "/");
@@ -851,7 +849,8 @@ namespace EPMLiveWebParts
                 }
                 try
                 {
-                    if (Request["action"].ToLower() != "workspace" && (Request["isDlg"] == "1" || HttpContext.Current.Request.UrlReferrer.OriginalString.ToLower().Contains("&isdlg=1")))
+                    //EPML-5263, EPML-5224 - Code Change: Rather then using Equals, at some of the places, it returns value for isDlg as isDlg=1,1. Hence, used Contains which worked in all the cases.
+                    if (Request["action"].ToLower() != "workspace" && (Request["isDlg"] != null && Convert.ToString(Request["isDlg"]).Contains("1") || HttpContext.Current.Request.UrlReferrer.OriginalString.ToLower().Contains("&isdlg=1")))
                         url += "&IsDlg=1";
                 }
                 catch { }
