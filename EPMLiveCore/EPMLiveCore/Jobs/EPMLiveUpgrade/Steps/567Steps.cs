@@ -80,6 +80,10 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
                                                     list.Update();
                                                     LogMessage(string.Format("Update processed with List: {0} , ContentType: {1} , Field: {2}", list.Title, contentType.Name, fld.DisplayName), MessageKind.SUCCESS, 4);
                                                 }
+                                                else
+                                                {
+                                                    LogMessage(string.Format("Skipped process with List: {0} , ContentType: {1} , Field: {2}", list.Title, contentType.Name, fld.DisplayName), MessageKind.SKIPPED, 2);
+                                                }
                                             }
                                         }
                                     }
