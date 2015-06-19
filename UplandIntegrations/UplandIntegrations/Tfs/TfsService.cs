@@ -20,7 +20,7 @@ namespace UplandIntegrations.Tfs
 
         #region Constructor
 
-        public TfsService(string serverUrl, string userName, string password)
+        public TfsService(string serverUrl, string userName, string password, bool useBasicAuthCredential)
         {
             try
             {
@@ -40,7 +40,7 @@ namespace UplandIntegrations.Tfs
                 NetworkCredential netCred = new NetworkCredential(userName, password);
                 Uri serverUri = new Uri(serverUrl);
 
-                if (serverUri.Scheme.ToLower().Equals("https"))
+                if (useBasicAuthCredential)
                 {
                     BasicAuthCredential basicCred = new BasicAuthCredential(netCred);
                     tfsCred = new TfsClientCredentials(basicCred);

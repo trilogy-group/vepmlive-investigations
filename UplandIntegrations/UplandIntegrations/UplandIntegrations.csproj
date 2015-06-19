@@ -45,6 +45,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\EPMLiveIntegration\EPMLiveIntegration\bin\Debug\EPMLiveIntegration.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.TeamFoundation.Client, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.TeamFoundation.VersionControl.Client, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.TeamFoundation.WorkItemTracking.Client, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\Libraries\Newtonsoft.Json.dll</HintPath>
@@ -117,6 +120,9 @@
     <Compile Include="ServiceNow\ServiceNowIntegrator.cs" />
     <Compile Include="ServiceNow\ServiceNowService.cs" />
     <Compile Include="Tenrox\Managers\UserManager.cs" />
+    <Compile Include="Tfs\TfsIntegrator.cs" />
+    <Compile Include="Tfs\TfsService.cs" />
+    <Compile Include="Tfs\TfsType.cs" />
     <Compile Include="Utils\CustomJsonConverter.cs" />
     <Compile Include="Web References\IntegrationAPI\Reference.cs">
       <AutoGen>True</AutoGen>
