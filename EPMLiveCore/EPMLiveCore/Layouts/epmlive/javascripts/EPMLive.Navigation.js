@@ -2298,12 +2298,6 @@
                         }
 
                         $menu.fadeIn(200);
-
-                        window.setTimeout(function () {
-                            if (window.epmNavHoveredNode === null) {
-                                hideMenu();
-                            }
-                        }, 3000);
                     };
 
                     var hideMenu = function () {
@@ -2392,6 +2386,18 @@
                         };
 
                         getMenuItems();
+                        //EPML-5337: Solution for when ellipsis menus hide if they take too long to load
+                        $('.epm-menu-btn span').hover(function () {
+                            showMenu();
+                        });
+                        $('.epm-menu-btn span').mouseleave(function () {
+                            window.epmNavHoveredNode = null;
+                            window.setTimeout(function () {
+                                if (window.epmNavHoveredNode == null) {
+                                    hideMenu();
+                                }
+                            }, 3000);
+                        });
                     } else {
                         toggleMenu();
                     }
