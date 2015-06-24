@@ -434,7 +434,7 @@ namespace EPMLiveWebParts
                                 attr = doc.CreateAttribute(sCol + "Format");
                                 attr.Value = sFormat;
                                 nd.Attributes.Append(attr);
-                            }
+                            }                            
                             if (sRange != "")
                             {
                                 attr = doc.CreateAttribute(sCol + "Range");
@@ -477,7 +477,7 @@ namespace EPMLiveWebParts
                     sFormat = currencyFormatDictionary[numberFormatInfo.CurrencyPositivePattern]
                         .Replace("$", numberFormatInfo.CurrencySymbol)
                         .Replace("n",
-                            string.Format("##,#.{0}", new string('0', numberFormatInfo.CurrencyDecimalDigits)));
+                            string.Format(",0.{0}", new string('0', numberFormatInfo.CurrencyDecimalDigits)));
                     return "Float";
                 case SPFieldType.Note:
                     return "Lines";
