@@ -2265,7 +2265,7 @@ namespace EPMLiveReportsAdmin
                                         string sInt =
                                             AddLookUpFieldValues(item[column["internalname"].ToString()].ToString(),
                                                 "id");
-                                        if (fieldType.Equals("lookupmulti", StringComparison.InvariantCultureIgnoreCase))
+                                        if (fieldType.Equals("lookupmulti", StringComparison.InvariantCultureIgnoreCase) || fieldType.Equals("usermulti", StringComparison.InvariantCultureIgnoreCase))
                                         {
                                             itemRow[column["ColumnName"].ToString()] = sInt;
                                         }
