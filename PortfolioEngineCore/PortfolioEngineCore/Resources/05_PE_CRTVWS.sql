@@ -157,8 +157,8 @@ FROM         dbo.EPG_VW_RPT_ListDepartments INNER JOIN
                       dbo.EPG_VW_RPT_Calendar ON rph.PRD_ID = dbo.EPG_VW_RPT_Calendar.PeriodID
        LEFT JOIN dbo.epgp_rp_category_values 
               ON dbo.epgp_rp_category_values.cat_cmt_uid = rp.cmt_uid                       
-WHERE     (dbo.EPG_VW_RPT_Calendar.RPCalendar = ''Yes'') AND (dbo.EPGP_PROJECTS.PROJECT_MARKED_DELETION = 0)
-
+WHERE     (dbo.EPG_VW_RPT_Calendar.RPCalendar = ''Yes'') AND (dbo.EPGP_PROJECTS.PROJECT_MARKED_DELETION = 0) 
+  
 ')
  
 ------------------------------View: EPG_VW_RPT_Cost---------------------------
