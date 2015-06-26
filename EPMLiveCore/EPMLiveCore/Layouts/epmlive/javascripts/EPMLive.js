@@ -915,6 +915,13 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
             aContainer.bind('click', function () {
                 $('.dropdown-menu').css('display', 'none');
                 divContainer.toggle();
+                //EPML-5286 -- Here, when page load then fetch selected value and hide from other ddl
+                var keyVals = [];
+                keyVals = ddlselectedoption();
+                if (keyVals.length > 0) {
+                    HideOptionValue(keyVals);
+                }
+                // //-----
             });
 
             li.append(aContainer);
@@ -988,6 +995,9 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
                 spanGroupingDelete.attr('class', 'fui-cross icon-dropdown');
                 aGroupingDelete.append(spanGroupingDelete);
                 aGroupingDelete.bind('click', function () {
+                    //EPML-5286 - Here, fetch deleted ddl selected option so that we can add into other ddl
+                    var val = $(this).closest('.grouping-row').find('.grouping-select').find('select option:selected').val();
+                    //---
                     $(this).closest('.grouping-row').remove();
                     var num = 1;
                     $('.grouping-wrapper').children('.grouping-row').each(function () {
@@ -1006,6 +1016,11 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
                         $('#aGroupBySave').removeAttr('class');
                         $('#aAddGrouping').attr('class', 'disabledLink');
                     }
+                    //EPML-5286 - show above selected value into rest of ddl
+                    $('.grouping-wrapper').children('.grouping-row').each(function () {
+                        $('.grouping-select select').not(this).children('option[value=' + val + ']').show();
+                    });
+                    //--
                 });
                 divGroupingDelete.append(aGroupingDelete);
 
@@ -1059,7 +1074,24 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
                             select.append('<option value="' + val + '">' + txt + '</option>');
                         }
                     }
-                    select.prop('selectedIndex', 0);
+                    //EPML-5286 -- here, hide option value, which is already selected in other ddl, in newly created ddl
+                    var keyVals = [];
+                    keyVals = ddlselectedoption();
+                    if (keyVals.length > 0) {
+                        for (k = 0; k < keyVals.length; k++) {
+                            select.children('option[value=' + keyVals[k].value + ']').hide();
+                        }
+                        jQuery(select).find('option').each(function () {
+                            if ($(this).css('display') != 'none') {
+                                $(this).prop("selected", true);
+                                return false;
+                            }
+                        });
+                    }
+                    else {
+                        select.prop('selectedIndex', 0);
+                    }
+                    //-------
                     divGroupingSelect.append(select);
 
                     var divGroupingDelete = $(document.createElement('div'));
@@ -1069,6 +1101,9 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
                     spanGroupingDelete.attr('class', 'fui-cross icon-dropdown');
                     aGroupingDelete.append(spanGroupingDelete);
                     aGroupingDelete.bind('click', function () {
+                        //EPML-5286 - Here, fetch deleted ddl selected option so that we can add into other ddl
+                        var val = $(this).closest('.grouping-row').find('.grouping-select').find('select option:selected').val();
+                        //----
                         $(this).closest('.grouping-row').remove();
                         var num = 1;
                         $('.grouping-wrapper').children('.grouping-row').each(function () {
@@ -1087,6 +1122,12 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
                             $('#aGroupBySave').removeAttr('class');
                             $('#aAddGrouping').attr('class', 'disabledLink');
                         }
+
+                        //EPML-5286 - show above selected value into rest of ddl
+                        $('.grouping-wrapper').children('.grouping-row').each(function () {
+                            $('.grouping-select select').not(this).children('option[value=' + val + ']').show();
+                        });
+                        //----
 
                         var keyVals = [];
                         $('.grouping-wrapper').children('.grouping-row').each(function () {
@@ -1110,7 +1151,13 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
 
                     $('#aGroupBySave').removeAttr('class');
                 }
-
+                //EPML-5286 -- here, default selected option in newly created ddl must be invisible in reset of ddl 
+                var keyVals = [];
+                keyVals = ddlselectedoption();
+                if (keyVals.length > 0) {
+                    HideOptionValue(keyVals);
+                }
+                //---
             });
             divFooterAdd.append(aFooterAdd);
             divGroupingFooter.append(divFooterAdd);
@@ -1120,31 +1167,18 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
             var aFooterSave = $(document.createElement('a'));
             aFooterSave.attr('id', 'aGroupBySave');
             aFooterSave.attr('href', 'javascript:void(0)');
-            
+
             aFooterSave.text('Apply');
             aFooterSave.bind('click', function () {
                 var numGroups = $('.grouping-wrapper').children('.grouping-row').length;
                 if (numGroups > 0) {
                     var keyVals = [];
-                    var tmpval = [];
-                    $('.grouping-wrapper').children('.grouping-row').each(function () {                        
+                    $('.grouping-wrapper').children('.grouping-row').each(function () {
                         var txt = $(this).find('.grouping-select').find('select option:selected').text();
                         var val = $(this).find('.grouping-select').find('select option:selected').val();
                         var objTemp = { 'key': txt, 'value': val };
                         keyVals.push(objTemp);
-                        tmpval.push(val);
                     });
-                    
-                    for (i = 0; i < keyVals.length; i++) {
-                        var numOccurences = $.grep(tmpval, function (elem) {
-                            return elem === keyVals[i].value;
-                        }).length;
-                        if (numOccurences > 1) {
-                            alert(keyVals[i].key + " is repeated more than once !")
-                            return false;
-                        }
-                    }
-
                     cfg['saveFunction'](keyVals);
                 }
 
@@ -1155,9 +1189,58 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
             divGroupingFooter.append(divFooterSave);
 
             divContainer.append(divGroupingFooter);
-
+            //EPML-5286 - When change value in ddl 
+            changeddl();
+            //----
             li.append(divContainer);
             ul.append(li);
+        }
+
+        function changeddl() {
+            $('.grouping-select select').live("change", function () {
+                $('option:hidden', $('.grouping-select select')).each(function () {
+                    var self = this,
+						toShow = true;
+                    $('.grouping-select select').not($(this).parent()).each(function () {
+                        if (self.value == this.value) {
+                            toShow = false;
+                        }
+                    })
+                    if (toShow) {
+                        $(this).show();
+                    }
+                });
+                $('.grouping-select select').not(this).children('option[value=' + this.value + ']').hide();
+            });
+        }
+
+        function ddlselectedoption() {
+            var selectedoptions = [];
+            $('.grouping-wrapper').children('.grouping-row').each(function () {
+                var txt = $(this).find('.grouping-select').find('select option:selected').text();
+                var val = $(this).find('.grouping-select').find('select option:selected').val();
+                var objTemp1 = { 'key': txt, 'value': val };
+                selectedoptions.push(objTemp1);
+            });
+            return (selectedoptions);
+        }
+
+        function HideOptionValue(arr_keyvalue) {
+            for (j = 0; j < arr_keyvalue.length; j++) {
+                $('option:hidden', $('.grouping-select select')).each(function () {
+                    var self = this,
+                    toShow = true;
+                    $('.grouping-select select').not($(this).parent()).each(function () {
+                        if (self.value == this.value) {
+                            toShow = false;
+                        }
+                    })
+                    if (toShow) {
+                        $(this).show();
+                    }
+                });
+                $('.grouping-select select').not(this).children('option[value=' + arr_keyvalue[j].value + ']').hide();
+            }
         }
 
         function createMultiSelect(cfg, ul) {
