@@ -2387,9 +2387,6 @@
 
                         getMenuItems();
                         //EPML-5337: Solution for when ellipsis menus hide if they take too long to load
-                        $('.epm-menu-btn span').hover(function () {
-                            showMenu();
-                        });
                         $('.epm-menu-btn span').mouseleave(function () {
                             window.epmNavHoveredNode = null;
                             window.setTimeout(function () {
