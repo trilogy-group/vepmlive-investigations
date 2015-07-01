@@ -825,6 +825,35 @@ namespace EPMLiveCore
                         writer.WriteLine("var checkPattern = /[\\|\\\\\"\'\\/\\[\\]\\:\\<\\>\\+\\=\\,\\;\\?\\*\\@]/");
                         writer.WriteLine("if(checkPattern.test(object.value)) { alert(objectName + ' cannot contain any of the following characters ' + '| \\\\ \" \\' / [ ] : < > + = , ; ? * @'); object.value = ''; setTimeout(function(){object.focus();}, 1); }");
                         writer.WriteLine("}");
+
+                        writer.WriteLine("function setLicenseType(){");
+                        if (dControls.ContainsKey("ResourceLevel"))
+                        {
+                            writer.WriteLine("var id = '';");
+                            writer.WriteLine("if(document.getElementById('" + dControls["ResourceLevel"] + "') !== null){");
+                            writer.WriteLine("var tbl = document.getElementById('" + dControls["ResourceLevel"] + "');");
+                            writer.WriteLine("for (var rIdx = 0; rIdx < tbl.rows.length; rIdx++) {");
+                            writer.WriteLine("var row = tbl.rows[rIdx];");
+                            writer.WriteLine("for (var cIdx = 0; cIdx < row.cells.length; cIdx++) {");
+                            writer.WriteLine("var cell = row.cells[cIdx];");
+                            writer.WriteLine("for (var idx = 0; idx < cell.childNodes.length; idx++) {");
+                            writer.WriteLine("var child = cell.childNodes[idx];");
+                            writer.WriteLine("if (child.nodeName != null && child.nodeName != undefined && child.nodeName.toUpperCase() == 'INPUT') {");
+                            writer.WriteLine("if(child.nextSibling != null && child.nextSibling != undefined && child.nextSibling.innerHTML.toUpperCase()  == 'NO ACCESS') {");
+                            writer.WriteLine("id = child.id;");
+                            writer.WriteLine("}");
+                            writer.WriteLine("if(child.checked){");
+                            writer.WriteLine("defaultLicenseTypeId = child.id;");
+                            writer.WriteLine("}");
+                            writer.WriteLine("}");
+                            writer.WriteLine("}");
+                            writer.WriteLine("}");
+                            writer.WriteLine("}");
+                            writer.WriteLine("document.getElementById(id).checked = true;");
+                            writer.WriteLine("}");
+                        }
+                        writer.WriteLine("}");
+
                         writer.WriteLine("function cleanupfields(){");
                         try
                         {
@@ -890,6 +919,7 @@ namespace EPMLiveCore
                             if (dControls.ContainsKey("Generic"))
                             {
                                 writer.WriteLine("  if(document.getElementById('" + dControls["Generic"] + "').checked){");
+                                writer.WriteLine("setLicenseType();");
                                 try
                                 {
                                     writer.WriteLine("      try{document.getElementById('" + dControls["FirstName"] + "').parentNode.parentNode.parentNode.style.display='none';}catch(e){}");
@@ -948,6 +978,7 @@ namespace EPMLiveCore
                                     catch { }
                                 }
                                 writer.WriteLine("  }else{");
+                                writer.WriteLine("try{document.getElementById(defaultLicenseTypeId).checked = true;}catch(e){}");
                                 try
                                 {
                                     writer.WriteLine("      try{document.getElementById('" + dControls["FirstName"] + "').parentNode.parentNode.parentNode.style.display='';}catch(e){}");
@@ -1023,7 +1054,7 @@ namespace EPMLiveCore
 
                         writer.WriteLine("cleanupfields();");
                         // To make default collapsed div, if there isnt any mandatory field in it
-                        writer.WriteLine("$(document).ready(function () {var headers = $('.upheader');$.each(headers, function (i, val) {if ($(this).find('span').text() == 'Permissions' && " + permissionPanelRequiredCount + " == '0') {if('" + Convert.ToString(this.ListItem["Generic"]) + "' == 'True'){ $($(this).next()).hide(); $(this).hide(); }else{ $(this).next().slideUp();$(this).find('.imgArrow').removeClass('hideImage');$(this).find('.imgDownArrow').addClass('hideImage');}} if ($(this).find('span').text() == 'Profile' && " + profilepanelRequiredCount + " == '0' ) { $(this).next().slideUp();$(this).find('.imgArrow').removeClass('hideImage');$(this).find('.imgDownArrow').addClass('hideImage');}  });});");
+                        writer.WriteLine("$(document).ready(function () {var defaultLicenseTypeId = '';var headers = $('.upheader');$.each(headers, function (i, val) {if ($(this).find('span').text() == 'Permissions' && " + permissionPanelRequiredCount + " == '0') {if('" + Convert.ToString(this.ListItem["Generic"]) + "' == 'True'){ $($(this).next()).hide(); $(this).hide(); }else{ $(this).next().slideUp();$(this).find('.imgArrow').removeClass('hideImage');$(this).find('.imgDownArrow').addClass('hideImage');}} if ($(this).find('span').text() == 'Profile' && " + profilepanelRequiredCount + " == '0' ) { $(this).next().slideUp();$(this).find('.imgArrow').removeClass('hideImage');$(this).find('.imgDownArrow').addClass('hideImage');}  });});");
                         writer.WriteLine("}_spBodyOnLoadFunctionNames.push(\"InitFields\");");
 
 
