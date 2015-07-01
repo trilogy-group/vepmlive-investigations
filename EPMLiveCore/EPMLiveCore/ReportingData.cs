@@ -300,7 +300,7 @@ namespace EPMLiveCore
                                     else if (oField.Type.Equals(SPFieldType.DateTime))
                                     {
                                         // Need to use actual sign operator to match only the date part 
-                                        return "CONVERT(nvarchar, " + field + ", 101) " + sign + " CONVERT(nvarchar, CONVERT(DateTime, '" + val + "'), 101)";
+                                        return "CONVERT(nvarchar, " + field + ", 111) " + sign + " CONVERT(nvarchar, CONVERT(DateTime, '" + val + "'), 111)";
                                     }
                                     else
                                     {
