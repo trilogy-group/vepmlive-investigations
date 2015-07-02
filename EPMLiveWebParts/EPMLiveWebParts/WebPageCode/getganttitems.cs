@@ -157,12 +157,18 @@ namespace EPMLiveWebParts
                         attr = doc.CreateAttribute("Format");
                         attr.Value = sFormat;
                         ndNew.Attributes.Append(attr);
-                        if (sFormat.Contains("$"))
+
+                        if (oField.Type == SPFieldType.Currency)
                         {
-                            attr = doc.CreateAttribute("EditFormat");
-                            attr.Value = sFormat.Replace("$", string.Empty);
-                            ndNew.Attributes.Append(attr);
-                        }
+                            SPFieldCurrency c = (SPFieldCurrency)oField;
+                            System.Globalization.NumberFormatInfo nInfo = System.Globalization.CultureInfo.GetCultureInfo(c.CurrencyLocaleId).NumberFormat;
+                            if (sFormat.Contains(nInfo.CurrencySymbol))
+                            {
+                                attr = doc.CreateAttribute("EditFormat");
+                                attr.Value = sFormat.Replace(nInfo.CurrencySymbol, string.Empty);
+                                ndNew.Attributes.Append(attr);
+                            }
+                        }                        
                         else
                         {
                             attr = doc.CreateAttribute("EditFormat");
