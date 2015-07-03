@@ -91,6 +91,13 @@
         background-color: #EEBDBD !important;
     }
 
+    .detailsdivinfo{
+        overflow-y:auto !important;
+        width:100% !important;
+        height:100% !important;
+        background-color:white !important;
+    }
+
     #pageStatusBar[class], .ms-status-msg {
         margin-top: 5px !important;
         margin-bottom: 0 !important;
@@ -414,7 +421,7 @@
         </div>
     </div>
 
-    <div id="detailDiv" style="width:100%;height:100%">
+    <div id="detailDiv" class="detailsdivinfo">
         <div id="detailTree" style="width:100%;height:100%;background-color:White">
             <!--<treegrid 
             Data_Url="BlankTable.xml"
@@ -427,7 +434,7 @@
         </div>
     </div>
 
-    <div id="assignmentsDiv" style="width:100%;height:100%;display:none;background-color:White">
+    <div id="assignmentsDiv" class="detailsdivinfo" style="display:none">
         <div id="assignmentsDivInner" style="width:100%;height:100%">
             <div style="width:100%;height:22px">
                 <div class="wetoolbar">
@@ -459,7 +466,7 @@
         </div>
     </div>
 
-    <div id="linksDiv" style="width:100%;height:100%;display:none;">
+    <div id="linksDiv" class="detailsdivinfo" style="display:none"">
         <div id="linksDivInner" style="width:100%;height:100%">
             <div style="width:100%;height:24px">
                 <div class="wetoolbar">
@@ -496,9 +503,9 @@
         </div>
     </div>
 
-    <div id="notesDiv" style="width:100%;height:100%;background-color:White;padding:5px;display:none">
-        <div id="notesDivInner2" style="width:100%;height:100%">
-            <a href="#" onclick="Javascript:ShowNotes();" >[Edit Notes]</a><br><br />
+    <div id="notesDiv" class="detailsdivinfo" style="display:none">
+        <div id="notesDivInner2">
+            <a href="#" onclick="Javascript:ShowNotes();" >[Edit Notes]</a><br /><br />
             <div id="noteDivInner" style="width:100%;height:100%;background-color:White">
             
             </div>
@@ -508,7 +515,7 @@
         </div>
     </div>
 
-    <div id="projectDiv" style="width:100%;height:100%;background-color:White">
+    <div id="projectDiv" class="detailsdivinfo">
 
         <!--<treegrid 
         Data_Url="../../_vti_bin/WorkPlanner.asmx" Data_Method="Soap" Data_Function="Execute" Data_Namespace="workengine.com" Data_Param_Functionname="GetProjectInfo" Data_Param_Dataxml="<%=sPlannerDataParam %>"
