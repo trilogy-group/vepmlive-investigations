@@ -4013,7 +4013,7 @@ namespace EPMLiveWorkPlanner
                             break;
                     }
 
-                    attr = docOut.CreateAttribute("VCanEdit");
+                    attr = docOut.CreateAttribute("VCanEdit");                    
                     attr.Value = canEdit;
                     ndNew.Attributes.Append(attr);
 
@@ -4571,14 +4571,15 @@ namespace EPMLiveWorkPlanner
                         if (oDoc.FirstChild.Attributes["Format"].Value == "DateOnly")
                         {
                             format = System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.ShortDatePattern;
+                            EditFormat = format;
                         }
                         else
                         {
-                            format = System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.FullDateTimePattern;
+                            format = System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.ShortDatePattern;
+                            EditFormat = format + " HH:mm";
                         }
                     }
-                    catch { }
-                    EditFormat = format + " HH:mm";
+                    catch { }                    
                     break;
                 case SPFieldType.Number:
                     if (oDoc.FirstChild.Attributes["Percentage"] != null && oDoc.FirstChild.Attributes["Percentage"].Value.ToLower() == "true")
@@ -4935,7 +4936,7 @@ namespace EPMLiveWorkPlanner
             attr = docOut.CreateAttribute("CanEdit");
             attr.Value = oCanEdit;
             ndNew.Attributes.Append(attr);
-
+            
             attr = docOut.CreateAttribute("Width");
             attr.Value = sWidth;
             ndNew.Attributes.Append(attr);
