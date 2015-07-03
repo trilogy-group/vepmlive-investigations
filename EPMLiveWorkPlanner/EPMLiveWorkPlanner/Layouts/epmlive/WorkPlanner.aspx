@@ -466,7 +466,7 @@
         </div>
     </div>
 
-    <div id="linksDiv" class="detailsdivinfo" style="display:none"">
+    <div id="linksDiv" class="detailsdivinfo" style="display:none">
         <div id="linksDivInner" style="width:100%;height:100%">
             <div style="width:100%;height:24px">
                 <div class="wetoolbar">
