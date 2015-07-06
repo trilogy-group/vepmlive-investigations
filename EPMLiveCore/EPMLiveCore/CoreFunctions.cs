@@ -2264,11 +2264,101 @@ namespace EPMLiveCore
                 web.Update();
 
                 API.Applications.GenerateQuickLaunchFromApp(web);
+                SPSecurity.RunWithElevatedPrivileges(() =>
+                {
+                    using (SPSite ss = new SPSite(web.Url))
+                    {
+                        using (SPWeb sw = ss.OpenWeb())
+                        {
 
+                            List<SPEventReceiverDefinition> evts = null;
+                            List<Guid> listsToBeMapped = new List<Guid>();
+                            Dictionary<String, String> listIconsToBeSet = new Dictionary<string, string>();
+                            string EPMLiveReportingAssembly =
+                                "EPMLiveReportsAdmin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b90e532f481cf050";
+
+                            MethodInfo m = null;
+                            Assembly assemblyInstance = null;
+                            Type thisClass = null;
+                            object apiClass = null;
+                            string listIcon = string.Empty;
+
+                            foreach (SPList l in sw.Lists)
+                            {
+                                string sClass = "EPMLiveReportsAdmin.ListEvents";
+
+                                evts = CoreFunctions.GetListEvents(l,
+                                    EPMLiveReportingAssembly,
+                                    sClass,
+                                    new List<SPEventReceiverType>
+                                        {
+                                            SPEventReceiverType.ItemAdded,
+                                            SPEventReceiverType.ItemUpdated,
+                                            SPEventReceiverType.ItemDeleting
+                                        });
+
+                                if (evts.Count > 0 &&
+                                    !listsToBeMapped.Contains(l.ID))
+                                {
+                                    listsToBeMapped.Add(l.ID);
+
+                                    try
+                                    {
+                                        //Set List Icon
+                                        var gSettings = new GridGanttSettings(l);
+                                        listIcon = gSettings.ListIcon;
+                                        listIconsToBeSet.Add(l.ID.ToString(), listIcon);
+                                    }
+                                    catch { }
+
+                                    continue;
+                                }
+                            }
+                            if (listsToBeMapped.Count > 0)
+                            {
+                                try
+                                {
+                                    assemblyInstance = Assembly.Load(EPMLiveReportingAssembly);
+                                    thisClass = assemblyInstance.GetType("EPMLiveReportsAdmin.EPMData", true, true);
+                                    m = thisClass.GetMethod("SetListIcon", BindingFlags.Public | BindingFlags.Instance);
+                                    apiClass = Activator.CreateInstance(thisClass, new object[] { true, ss.ID, sw.ID });
+
+                                    if (m != null &&
+                                        assemblyInstance != null &&
+                                        thisClass != null &&
+                                        apiClass != null)
+                                    {
+                                        m.Invoke(apiClass, new object[] { listIconsToBeSet });
+                                    }
+                                }
+                                catch { }
+                            }
+                            try
+                            {
+                                assemblyInstance = Assembly.Load(EPMLiveReportingAssembly);
+                                thisClass = assemblyInstance.GetType("EPMLiveReportsAdmin.EPMData", true, true);
+                                m = thisClass.GetMethod("MapLists", BindingFlags.Public | BindingFlags.Instance);
+                                apiClass = Activator.CreateInstance(thisClass, new object[] { true, ss.ID, sw.ID });
+                            }
+                            catch { }
+
+                            if (m != null &&
+                                assemblyInstance != null &&
+                                thisClass != null &&
+                                apiClass != null)
+                            {
+                                m.Invoke(apiClass, new object[] { listsToBeMapped, sw.ID });
+                            }
+
+                        }
+                    }
+
+                });
+                
                 #region Modify Unique Workspace
-
                 if (unique)
                 {
+
                     var iowner = 0;
                     var imember = 0;
                     var ivisitor = 0;
