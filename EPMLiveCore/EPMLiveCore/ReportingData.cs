@@ -44,7 +44,7 @@ namespace EPMLiveCore
                 cmd.Parameters.AddWithValue("@pagesize", pagesize);
                 cmd.Parameters.AddWithValue("@page", page);
                 cmd.Parameters.AddWithValue("@listid", oList.ID);
-                
+
                 if (borderby)
                     cmd.Parameters.AddWithValue("@orderby", orderby);
 
@@ -63,7 +63,7 @@ namespace EPMLiveCore
         public static DataTable GetReportingData(SPWeb web, string list, bool bRollup, string query, string orderby)
         {
             return GetReportingData(web, list, bRollup, query, orderby, 0, 0).Tables[0];
-            
+
         }
 
         public static string GetReportQuery(SPWeb web, SPList list, string spquery, out string orderby)
@@ -86,7 +86,7 @@ namespace EPMLiveCore
                 {
 
                     SPField oField = list.Fields.GetFieldByInternalName(nd.Attributes["Name"].Value);
-                    if(oField.Type == SPFieldType.Lookup || oField.Type == SPFieldType.User)
+                    if (oField.Type == SPFieldType.Lookup || oField.Type == SPFieldType.User)
                         orderby += "," + nd.Attributes["Name"].Value + "Text";
                     else
                         orderby += "," + nd.Attributes["Name"].Value;
@@ -164,7 +164,7 @@ namespace EPMLiveCore
                                 {
                                     foreach (XmlNode ndVal in ndVals.SelectNodes("Value"))
                                     {
-                                        vals += field + " = '" + ndVal.InnerText.Replace("'","''") + "' OR ";
+                                        vals += field + " = '" + ndVal.InnerText.Replace("'", "''") + "' OR ";
                                     }
                                 }
                                 else
@@ -224,7 +224,7 @@ namespace EPMLiveCore
                                                 // Need this condition while adding external task
                                                 else if (nd.SelectSingleNode("Value") != null && nd.SelectSingleNode("Value").Attributes["Type"] != null
                                                     && (nd.SelectSingleNode("Value").Attributes["Type"].Value.Equals(SPFieldType.Counter.ToString())))
-                                                    field += "ID"; 
+                                                    field += "ID";
                                                 else
                                                     field += "Text";
                                             }
@@ -237,10 +237,12 @@ namespace EPMLiveCore
                                     case SPFieldType.User:
                                         {
                                             bLookup = true;
-                                            if (nd.Name == "Contains")
-                                                field += "Text";
-                                            else
+                                            Int32 tempVal = 0;
+                                            //If user has entered user id for filter then it will pass ID otherwise pass Text to CAML query / database while quering data and returning results.
+                                            if (Int32.TryParse(Convert.ToString(val), out tempVal))
                                                 field += "ID";
+                                            else
+                                                field += "Text";
                                         }
                                         break;
                                 }
@@ -308,8 +310,8 @@ namespace EPMLiveCore
                                     }
                                 }
                             }
-                        } 
-                    } 
+                        }
+                    }
                 }
                 return string.Empty;
             }
@@ -338,7 +340,7 @@ namespace EPMLiveCore
                 default:
                     return "=";
             }
-        }        
+        }
 
         // TEST //
         public static string ProcessReportFilter(SPList list, SPWeb web, string filterWpId)
