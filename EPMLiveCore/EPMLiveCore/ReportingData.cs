@@ -183,6 +183,11 @@ namespace EPMLiveCore
                                     val = nd.SelectSingleNode("Value").InnerText;
                                 }
 
+                                if (nd.SelectSingleNode("Value") != null && nd.SelectSingleNode("Value").SelectSingleNode("UserID") != null)
+                                {
+                                    val = web.CurrentUser.ID.ToString();
+                                }
+
                                 bool bLookup = false;
                                 bool bcontaintoday = false;
                                 SPFieldType fieldType = SPFieldType.Text;
@@ -247,10 +252,6 @@ namespace EPMLiveCore
                                         break;
                                 }
 
-                                if (nd.SelectSingleNode("Value") != null && nd.SelectSingleNode("Value").SelectSingleNode("UserID") != null)
-                                {
-                                    val = web.CurrentUser.ID.ToString();
-                                }
                                 if (val.Contains("Today") && bcontaintoday == true)
                                 {
                                     if (val.ToLower() == "[today]" || val.ToLower() == "<today />")
