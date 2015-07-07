@@ -1413,13 +1413,13 @@ namespace EPMLiveReportsAdmin
             //return sfieldValue;
             //END
 
-
+            System.Globalization.NumberFormatInfo nInfo = System.Globalization.CultureInfo.GetCultureInfo(field.CurrencyLocaleId).NumberFormat;
             switch (sResultType)
             {
                 case "currency":
                     if (
                         field.GetFieldValueAsText(li[field.InternalName])
-                            .Replace("$", "")
+                            .Replace(nInfo.CurrencySymbol, "")
                             .Replace("#VALUE!", "")
                             .Replace("<(", "")
                             .Replace(")>", "")
@@ -1430,7 +1430,7 @@ namespace EPMLiveReportsAdmin
                         oValue =
                             float.Parse(
                                 field.GetFieldValueAsText(li[field.InternalName])
-                                    .Replace("$", "")
+                                    .Replace(nInfo.CurrencySymbol, "")
                                     .Replace("#VALUE!", "")
                                     .Replace("<(", "")
                                     .Replace(")>", "")
