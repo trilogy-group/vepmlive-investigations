@@ -74,6 +74,12 @@ namespace EPMLiveWorkPlanner
 
                     setupProjectCenter(oProjectCenter);
                     setupTaskCenter(oTaskCenter);
+                    string sData = string.Empty;
+
+                    if (!key.Equals("msproject", StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        sData = project[0] + "." + project[1] + "." + project[2]; 
+                    }
 
                     if(userid != 0)
                     {
@@ -88,9 +94,20 @@ namespace EPMLiveWorkPlanner
                                 StartPublish(doc, site, web, oProjectCenter, oTaskCenter, project[2], props, key);
                                 if(osite.Features[new Guid("158c5682-d839-4248-b780-82b4710ee152")] != null)
                                 {
-                                    Guid jobid = EPMLiveCore.API.Timer.AddTimerJob(osite.ID, oweb.ID, oTaskCenter.ID, "Publish Work" + "_" + projectName, 81, project[0] + "." + project[1] + "." + project[2], project[2] + "." + key, 0, 9, "");
-
-                                    EPMLiveCore.API.Timer.Enqueue(jobid, 0, site);
+                                    if (key.Equals("msproject", StringComparison.InvariantCultureIgnoreCase))
+                                    {
+                                        // Prepares PFE work job xml to comply with Performance = False scenario
+                                        sData = FormatPFEWorkJobXml(doc);
+                                    }
+                                    if (!string.IsNullOrEmpty(sData))
+                                    {
+                                        Guid jobid = EPMLiveCore.API.Timer.AddTimerJob(osite.ID, oweb.ID, oTaskCenter.ID, "Publish Work" + "_" + projectName, 81, sData, project[2] + "." + key, 0, 9, "");
+                                        EPMLiveCore.API.Timer.Enqueue(jobid, 0, site);
+                                    }
+                                    else
+                                    {
+                                        throw new Exception(string.Format("Publish Work job data is empty for '{0}' project.", projectName));
+                                    }
                                 }
                             }
                         }
@@ -100,16 +117,23 @@ namespace EPMLiveWorkPlanner
                         StartPublish(doc, osite, oweb, oProjectCenter, oTaskCenter, project[2], props, key);
                         if(osite.Features[new Guid("158c5682-d839-4248-b780-82b4710ee152")] != null)
                         {
-                            Guid jobid = EPMLiveCore.API.Timer.AddTimerJob(osite.ID, oweb.ID, oTaskCenter.ID, "Publish Work" + "_" + projectName, 81, project[0] + "." + project[1] + "." + project[2], project[2] + "." + key, 0, 9, "");
-
-                            EPMLiveCore.API.Timer.Enqueue(jobid, 0, osite);
+                            if (key.Equals("msproject", StringComparison.InvariantCultureIgnoreCase))
+                            {
+                                // Prepares PFE work job xml to comply with Performance = False scenario
+                                sData = FormatPFEWorkJobXml(doc); 
+                            }
+                            if (!string.IsNullOrEmpty(sData))
+                            {
+                                Guid jobid = EPMLiveCore.API.Timer.AddTimerJob(osite.ID, oweb.ID, oTaskCenter.ID, "Publish Work" + "_" + projectName, 81, sData, project[2] + "." + key, 0, 9, "");
+                                EPMLiveCore.API.Timer.Enqueue(jobid, 0, osite);
+                            }
+                            else
+                            {
+                                throw new Exception(string.Format("Publish Work job data is empty for '{0}' project.", projectName));
+                            }
                         }
-                    }
-
-
+                    }                    
                 }
-
-
             }
             catch(Exception ex)
             {
@@ -121,6 +145,24 @@ namespace EPMLiveWorkPlanner
                 res.Add("Publish_DetailedStatus", "failed due to the following reason: " + sErrors);
                 EPMLiveCore.API.APIEmail.QueueItemMessage(15, true, res, new[] { currentuser.ID.ToString() }, null, false, true, oweb, currentuser, true);
             }
+        }
+
+        private string FormatPFEWorkJobXml(XmlDocument doc)
+        {
+            string resultXml = string.Empty;
+            try
+            {
+                XmlNode dataNode = doc.SelectSingleNode("/Project/UpdateScheduledWork");
+                if (dataNode != null)
+                {
+                    resultXml = dataNode.OuterXml; 
+                }
+            }
+            catch(Exception ex)
+            {
+                throw new Exception("Error while formatting PFE work job xml.", ex);
+            }
+            return resultXml;
         }
 
         private void StartPublish(XmlDocument doc, SPSite site, SPWeb web, SPList oProjectCenter, SPList oTaskCenter, string projectid, EPMLiveWorkPlanner.WorkPlannerAPI.PlannerProps props, string plannerid)

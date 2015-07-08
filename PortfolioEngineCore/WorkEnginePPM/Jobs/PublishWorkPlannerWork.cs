@@ -5,6 +5,7 @@ using System.Text;
 using Microsoft.SharePoint;
 using System.Collections;
 using System.Data;
+using System.Xml;
 
 namespace WorkEnginePPM.Jobs
 {
@@ -33,66 +34,77 @@ namespace WorkEnginePPM.Jobs
         {
             try
             {
-                SPList oTaskCenter = web.Lists[base.ListUid];
-
-                SPQuery query = new SPQuery();
                 string[] keys = key.Split('.');
-                query.Query = "<Where><Eq><FieldRef Name='Project' LookupId='TRUE'/><Value Type='Lookup'>" + keys[0] + "</Value></Eq></Where>";
-
-                string sendValue = "<UpdateListWork><Params />";
-
-                sendValue += @"<Project ExtId=""" + data + @""" Source=""1"">";
-
-                SPListItemCollection lic = oTaskCenter.GetItems(query);
-
-                totalCount = lic.Count;
-
-                int counter = 0;
-
-                DataTable dtResources = EPMLiveCore.API.APITeam.GetResourcePool("<GetResources><Columns>EXTID</Columns></GetResources>", web);
-
-                foreach(SPListItem li in lic)
+                string result = "";
+                if (!String.IsNullOrEmpty(keys[1]) && keys[1].ToLower().Equals("msproject"))
                 {
-                    string assignedto = "";
-                    try
+                    using (var portfolioEngineAPI = new PortfolioEngineAPI(web))
                     {
-                        assignedto = li["AssignedTo"].ToString();
+                        result = portfolioEngineAPI.Execute("UpdateScheduledWork", data);
                     }
-                    catch { }
-                    if(assignedto != "")
+                }
+                else
+                {
+                    SPList oTaskCenter = web.Lists[base.ListUid];
+
+                    SPQuery query = new SPQuery();
+
+                    query.Query = "<Where><Eq><FieldRef Name='Project' LookupId='TRUE'/><Value Type='Lookup'>" + keys[0] + "</Value></Eq></Where>";
+
+                    string sendValue = "<UpdateListWork><Params />";
+
+                    sendValue += @"<Project ExtId=""" + data + @""" Source=""1"">";
+
+                    SPListItemCollection lic = oTaskCenter.GetItems(query);
+
+                    totalCount = lic.Count;
+
+                    int counter = 0;
+
+                    DataTable dtResources = EPMLiveCore.API.APITeam.GetResourcePool("<GetResources><Columns>EXTID</Columns></GetResources>", web);
+
+                    foreach(SPListItem li in lic)
                     {
-                        SPFieldUserValueCollection uvc = new SPFieldUserValueCollection(web, assignedto);
-
-                        ArrayList arrResourceExtId = new ArrayList();
-
-                        foreach(SPFieldUserValue uv in uvc)
+                        string assignedto = "";
+                        try
                         {
+                            assignedto = li["AssignedTo"].ToString();
+                        }
+                        catch { }
+                        if(assignedto != "")
+                        {
+                            SPFieldUserValueCollection uvc = new SPFieldUserValueCollection(web, assignedto);
 
-                            DataRow[] dr = dtResources.Select("SPID='" + uv.LookupId + "'");
+                            ArrayList arrResourceExtId = new ArrayList();
 
-                            if(dr.Length > 0)
+                            foreach(SPFieldUserValue uv in uvc)
                             {
-                                if(dr[0]["EXTID"].ToString() != "")
+
+                                DataRow[] dr = dtResources.Select("SPID='" + uv.LookupId + "'");
+
+                                if(dr.Length > 0)
                                 {
-                                    arrResourceExtId.Add(dr[0]["EXTID"].ToString());
+                                    if(dr[0]["EXTID"].ToString() != "")
+                                    {
+                                        arrResourceExtId.Add(dr[0]["EXTID"].ToString());
+                                    }
                                 }
                             }
+
+                            sendValue += HelperFunctions.AddXml(li, arrResourceExtId);
                         }
 
-                        sendValue += HelperFunctions.AddXml(li, arrResourceExtId);
+                        updateProgress(counter++);
                     }
 
-                    updateProgress(counter++);
+                    sendValue += @"</Project>";
+
+                    sendValue += "</UpdateListWork>";
+
+                    PortfolioEngineCore.Admininfos admin = GetAdminInfos(site);
+                    
+                    admin.UpdateListWork(sendValue, out result); 
                 }
-
-                sendValue += @"</Project>";
-
-                sendValue += "</UpdateListWork>";
-
-                PortfolioEngineCore.Admininfos admin = GetAdminInfos(site);
-
-                string result = "";
-                admin.UpdateListWork(sendValue, out result);
 
                 result = result.Trim();
 

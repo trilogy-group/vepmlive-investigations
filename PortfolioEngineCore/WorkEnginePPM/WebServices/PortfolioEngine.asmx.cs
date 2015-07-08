@@ -501,7 +501,7 @@ namespace WorkEnginePPM
         public static string UpdateScheduledWork(string data)
         {
             string response;
-
+            SPWeb web = null;
             var doc = new XmlDocument();
             doc.LoadXml(data);
 
@@ -521,8 +521,14 @@ namespace WorkEnginePPM
                 }
                 else
                 {
-                    SPWeb web = SPContext.Current.Web;
-
+                    if(_spWeb != null)
+                    {
+                        web = _spWeb;
+                    }
+                    else
+                    {
+                        web = SPContext.Current.Web;
+                    }
                     SPList oList = web.Lists.TryGetList(sList);
 
                     if (oList == null)
@@ -838,7 +844,7 @@ namespace WorkEnginePPM
 
             return response;
         }
-
+        
         #endregion
 
         #region Nested type: PublicAPI
