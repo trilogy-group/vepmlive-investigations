@@ -12,6 +12,7 @@ using Microsoft.SharePoint;
 using System.Text;
 using System.Xml;
 using System.Data.SqlClient;
+using System.Text.RegularExpressions;
 
 
 namespace TimeSheets
@@ -581,6 +582,7 @@ namespace TimeSheets
 
                                 XmlNode ndProject = null;
                                 string curProject = "";
+                                Regex regex = new Regex("[^0-9a-zA-Z]+",RegexOptions.Compiled);                                                            
 
                                 foreach (DataRow drTask in drTasks)
                                 {
@@ -590,7 +592,7 @@ namespace TimeSheets
                                         ndProject = docXml.CreateNode(XmlNodeType.Element, "row", docXml.NamespaceURI);
                                         
                                         attrId = docXml.CreateAttribute("id");
-                                        attrId.Value = li.ID.ToString() + "." + curProject;
+                                        attrId.Value = li.ID.ToString() + "." + regex.Replace(curProject, "");
                                         ndProject.Attributes.Append(attrId);
 
                                         attrExpand = docXml.CreateAttribute("open");
@@ -649,7 +651,7 @@ namespace TimeSheets
                                     XmlNode ndTask = docXml.CreateNode(XmlNodeType.Element, "row", docXml.NamespaceURI);
 
                                     attrId = docXml.CreateAttribute("id");
-                                    attrId.Value = li.ID.ToString() + "." + curProject + "." + drTask["title"].ToString();
+                                    attrId.Value = li.ID.ToString() + "." + regex.Replace(curProject,"") + "." + regex.Replace(drTask["title"].ToString(),"");
                                     ndTask.Attributes.Append(attrId);
 
                                     newCell = docXml.CreateNode(XmlNodeType.Element, "cell", docXml.NamespaceURI);
