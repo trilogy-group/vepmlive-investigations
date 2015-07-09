@@ -6403,3 +6403,7 @@ div.epmliveToolBar .disabledLink:hover {
     }
 
 /* End Fancy Forms */
+
+.GMHScrollHidden {
+    background:#ffffff none repeat scroll 0 0 !important;
+}
