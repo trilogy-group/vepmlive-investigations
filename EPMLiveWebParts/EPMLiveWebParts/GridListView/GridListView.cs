@@ -2664,8 +2664,9 @@ namespace EPMLiveWebParts
 
 
             string sGroups = "";
+            var distinctArraylist = arrGroups.ToArray().Distinct();
 
-            foreach (string group in arrGroups)
+            foreach (string group in distinctArraylist)
             {
                 if (group != "")
                 {
