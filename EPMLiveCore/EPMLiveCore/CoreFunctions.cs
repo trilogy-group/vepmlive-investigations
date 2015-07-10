@@ -2227,6 +2227,26 @@ namespace EPMLiveCore
             createdWebUrl = string.Empty;
             createdWebRelativeUrl = string.Empty;
             createdWebTitle = string.Empty;
+            var listsNotToBeMapped = new List<string>
+            {
+                "Holiday Schedules",
+                "My Timesheet",
+                "Holidays",
+                "My Work",
+                "Roles",
+                "Departments",
+                "Non Work",
+                "Project Schedules",
+                "Site Assets",
+                "IzendaReports",
+                "Planner Templates",
+                "Report Library",
+                "Site Pages",
+                "User Profile Pictures",
+                "Excel Reports",
+                "Style Library",
+                "Work Hour"
+            };
             try
             {
                 var sUrl = "";
@@ -2298,7 +2318,7 @@ namespace EPMLiveCore
                                         });
 
                                 if (evts.Count > 0 &&
-                                    !listsToBeMapped.Contains(l.ID))
+                                    !listsToBeMapped.Contains(l.ID) && !listsNotToBeMapped.Contains(l.Title))
                                 {
                                     listsToBeMapped.Add(l.ID);
 
