@@ -256,6 +256,52 @@
 		                </wssuc:InputFormControl>
 	                </template_inputformcontrols>
         </wssuc:InputFormSection>
+        <%-- Version Information --%>
+        <wssuc:InputFormSection Title="Version Information" Description="" runat="server">
+            <template_description>
+	                </template_description>
+            <template_inputformcontrols>
+		                <wssuc:InputFormControl LabelText="EPMLive Version" runat="server">
+			                 <Template_Control>
+			                    <asp:Label id="lblEPMLVersion" runat="server"></asp:Label>
+			                 </Template_Control>
+		                </wssuc:InputFormControl>                        
+                        <wssuc:InputFormControl LabelText="SharePoint Version" runat="server">
+			                 <Template_Control>
+			                    <asp:Label id="lblSPVersion" runat="server"></asp:Label>
+			                 </Template_Control>
+		                </wssuc:InputFormControl>
+	                </template_inputformcontrols>
+        </wssuc:InputFormSection>
+        <%-- Database Information --%>
+        <wssuc:InputFormSection Title="Database Information" Description="" runat="server">
+            <template_description>
+	                </template_description>
+            <template_inputformcontrols>
+		                <wssuc:InputFormControl LabelText="EPMLive Database" runat="server">
+			                 <Template_Control>
+			                    <asp:Label id="lblEMPLDB" runat="server">Name: </asp:Label>                             
+                                 <br/>
+                                <asp:Label id="lblEPMLDBServer" runat="server">Server: </asp:Label>
+			                 </Template_Control>
+		                </wssuc:InputFormControl>
+                        <wssuc:InputFormControl LabelText="PFE Database" runat="server">
+			                 <Template_Control>
+			                    <asp:Label id="lblPFEDB" runat="server">Name: </asp:Label>
+                                 <br/>
+                                <asp:Label id="lblPFEDBServer" runat="server">Server: </asp:Label>
+			                 </Template_Control>
+		                </wssuc:InputFormControl>
+                        <wssuc:InputFormControl LabelText="Reporting Database" runat="server">
+			                 <Template_Control>
+			                    <asp:Label id="lblReportingDB" runat="server">Name: </asp:Label>
+                                 <br/>
+                                <asp:Label id="lblReportingDBServer" runat="server">Server: </asp:Label>
+			                 </Template_Control>
+		                </wssuc:InputFormControl>
+	                </template_inputformcontrols>
+        </wssuc:InputFormSection>
+
         <wssuc:ButtonSection runat="server">
             <template_buttons>
 		                <asp:PlaceHolder ID="PlaceHolder1" runat="server">
