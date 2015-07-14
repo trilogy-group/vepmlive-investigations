@@ -4568,18 +4568,10 @@ namespace EPMLiveWorkPlanner
                 case SPFieldType.DateTime:
                     try
                     {
-                        if (oDoc.FirstChild.Attributes["Format"].Value == "DateOnly")
-                        {
-                            format = System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.ShortDatePattern;
-                            EditFormat = format;
-                        }
-                        else
-                        {
-                            format = System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.ShortDatePattern;
-                            EditFormat = format + " HH:mm";
-                        }
+                        format = System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.ShortDatePattern;                        
                     }
-                    catch { }                    
+                    catch { }
+                    EditFormat = format + " HH:mm";
                     break;
                 case SPFieldType.Number:
                     if (oDoc.FirstChild.Attributes["Percentage"] != null && oDoc.FirstChild.Attributes["Percentage"].Value.ToLower() == "true")
