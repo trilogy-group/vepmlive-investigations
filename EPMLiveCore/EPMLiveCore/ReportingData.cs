@@ -280,6 +280,10 @@ namespace EPMLiveCore
                                 {
                                     return field + " Like '%" + val + "%'";
                                 }
+                                else if (nd.Name == "Neq" && oField.Type.Equals(SPFieldType.DateTime))
+                                {
+                                    return "((CONVERT(nvarchar," + field + ", 111) <> CONVERT(nvarchar, CONVERT(DateTime, '" + val + "'), 111)) OR " + field + " IS NULL)";
+                                }
                                 else if (nd.Name == "Neq")
                                 {
                                     return "(" + field + " <> '" + val + "' OR " + field + " IS NULL)";
