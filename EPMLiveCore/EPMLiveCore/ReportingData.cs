@@ -138,7 +138,8 @@ namespace EPMLiveCore
 
                     if (oField != null)
                     {
-                        if (nd.Name == "IsNull" && oField.Type != SPFieldType.Lookup)
+                        //Lookups and User type of columns were created in database as ID and Text fields hence direct returning (column name is null) will not work. Fixed this.
+                        if (nd.Name == "IsNull" && oField.Type != SPFieldType.Lookup && oField.Type != SPFieldType.User)
                         {
                             return field + " is null";
                         }
