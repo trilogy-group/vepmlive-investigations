@@ -14,8 +14,7 @@ namespace EPMLiveCore
         protected string strSiteUrl;
         protected string strCurrentTemplate;
 
-        private const string EPMLiveRegistryPath = @"SOFTWARE\Wow6432Node\EPMLive\PortfolioEngine\";
-
+        
         protected void Page_Load(object sender, EventArgs e)
         {
             if (!IsPostBack)
@@ -202,9 +201,10 @@ namespace EPMLiveCore
  
             #endregion
 
-            #region Product Databases
+            #region EPMLive Database
+
             string epmliveConnection = string.Empty;
-            // EPML Database
+            string errMsg = "Cannot get EPMLive database information.";
             try
             {
                 epmliveConnection = CoreFunctions.getConnectionString(web.Site.WebApplication.Id);
@@ -212,86 +212,103 @@ namespace EPMLiveCore
                 {
                     using (SqlConnection conn = new SqlConnection(epmliveConnection))
                     {
-                        lblEMPLDB.Text += conn.Database;
-                        lblEPMLDBServer.Text += conn.DataSource;
+                        lblEMPLDB.Text = string.Format("Name: {0}", conn.Database);
+                        lblEPMLDBServer.Text = string.Format("Server: {0}", conn.DataSource);
                     }
+                }
+                else 
+                {
+                    lblEMPLDB.Text = errMsg;
                 }
             }
             catch
-            { }
-            // Reporting Database
+            {
+                lblEMPLDB.Text = errMsg;
+            } 
+            #endregion
+
+            #region Reporting Database
+            
+            errMsg = "Cannot get Reporting database information.";
             if (!string.IsNullOrEmpty(epmliveConnection))
             {
-                SqlConnection conn = null;
-                SqlDataReader reader = null;
-                try
+                string info = Utilities.GetReportingDbConnectionString(epmliveConnection, web.Site.ID, web.Site.WebApplication.Id);
+                if (!string.IsNullOrEmpty(info))
                 {
-                    using (conn = new SqlConnection(epmliveConnection))
+                    try
                     {
-                        conn.Open();
-                        using (SqlCommand cmd = new SqlCommand())
+                        using (SqlConnection reportingConn = new SqlConnection(info))
                         {
-                            cmd.CommandText = "select DatabaseName, DatabaseServer from RPTDATABASES where SiteId = '" + web.Site.ID + "' and WebApplicationId = '" + web.Site.WebApplication.Id + "'";
-                            cmd.Connection = conn;
-                            reader = cmd.ExecuteReader();
-                            while (reader.Read())
-                            {
-                                lblReportingDB.Text += Convert.ToString(reader["DatabaseName"]);
-                                lblReportingDBServer.Text += Convert.ToString(reader["DatabaseServer"]);
-                            }
-                            reader.Close();
-                            reader.Dispose();
+                            lblReportingDB.Text = string.Format("Name: {0}", reportingConn.Database);
+                            lblReportingDBServer.Text = string.Format("Server: {0}", reportingConn.DataSource);
                         }
-                        conn.Close();
+                    }
+                    catch
+                    {
+                        lblReportingDB.Text = errMsg;
                     }
                 }
-                catch
+                else
                 {
-                    if (reader != null)
-                    {
-                        reader.Dispose();
-                    }
-                    if (conn != null)
-                    {
-                        conn.Dispose();
-                    }
+                    lblReportingDB.Text = errMsg;
                 }
             }
-            // PFE Database
-            try
+            else
             {
-                Uri uri = new Uri(web.Site.RootWeb.Url);
-                // Getting site part from the URL
-                string registryPath = uri.Segments[uri.Segments.Length - 1];
-                // Preparing exact registry path based on site
-                registryPath = EPMLiveRegistryPath + registryPath;
-                using (RegistryKey key = Registry.LocalMachine.OpenSubKey(registryPath, false))
-                {
-                    foreach (string value in key.GetValueNames())
-                    {
-                        if (value.Equals("ConnectionString", StringComparison.InvariantCultureIgnoreCase))
-                        {
-                            string connectionString = key.GetValue(value) as string;
-                            if (connectionString.StartsWith("provider", StringComparison.InvariantCultureIgnoreCase))
-                            {
-                                // Removing "Provider" part from connection string
-                                connectionString = connectionString.Substring(connectionString.IndexOf(';') + 1);
-                            }
-                            using (SqlConnection pfeConn = new SqlConnection(connectionString))
-                            {
-                                lblPFEDB.Text += pfeConn.Database;
-                                lblPFEDBServer.Text += pfeConn.DataSource;
-                            }
-                            break;
-                        }
-                    }
-                }
+                lblReportingDB.Text = errMsg;
             }
-            catch
-            { }
 
             #endregion
-        }        
+
+            #region PFE Database
+
+            string basePath = GetBasePath();
+            errMsg = "Cannot get PFE database information.";
+            if (!string.IsNullOrEmpty(basePath))
+            {
+                string pfeConnection = Utilities.GetPFEDBConnectionString(basePath);
+                if (!string.IsNullOrEmpty(pfeConnection))
+                {
+                    try
+                    {
+                        if (pfeConnection.StartsWith("provider", StringComparison.InvariantCultureIgnoreCase))
+                        {
+                            // Removing "Provider" part from connection string
+                            pfeConnection = pfeConnection.Substring(pfeConnection.IndexOf(';') + 1);
+                        }
+                        using (SqlConnection pfeConn = new SqlConnection(pfeConnection))
+                        {
+                            lblPFEDB.Text = string.Format("Name: {0}", pfeConn.Database);
+                            lblPFEDBServer.Text = string.Format("Server: {0}", pfeConn.DataSource);
+                        }
+                    }
+                    catch
+                    {
+                        lblPFEDB.Text = errMsg;
+                    }
+                }
+                else
+                {
+                    lblPFEDB.Text = errMsg;
+                }
+            }
+            else
+            {
+                lblPFEDB.Text = errMsg;
+            }
+
+            #endregion
+        }
+
+        private string GetBasePath()
+        {
+            try
+            {
+                string basePath = CoreFunctions.getConfigSetting(SPContext.Current.Web.Site.RootWeb, "EPKBasepath").Replace("/", "").Replace("\\", "");
+                return basePath;
+            }
+            catch { return ""; }
+        }
 
         protected void Button1_Click(object sender, EventArgs e)
         {
