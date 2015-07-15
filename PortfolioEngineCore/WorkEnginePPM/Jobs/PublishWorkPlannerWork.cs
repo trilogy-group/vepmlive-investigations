@@ -122,11 +122,14 @@ namespace WorkEnginePPM.Jobs
 
                 bErrors = true;
                 sErrors = "Error: " + ex.Message;
-                SPUser currentuser = web.AllUsers.GetByID(userid);
-                var res = new Hashtable();
-                res.Add("Publish_Status", "Failed");
-                res.Add("Publish_DetailedStatus", "failed due to the following reason: " + sErrors);
-                EPMLiveCore.API.APIEmail.QueueItemMessage(15, true, res, new[] { currentuser.ID.ToString() }, null, false, true, web, currentuser, true);
+                if (key.Contains("MSProject"))
+                {
+                    SPUser currentuser = web.AllUsers.GetByID(userid);
+                    var res = new Hashtable();
+                    res.Add("Publish_Status", "Failed");
+                    res.Add("Publish_DetailedStatus", "failed due to the following reason: " + sErrors);
+                    EPMLiveCore.API.APIEmail.QueueItemMessage(15, true, res, new[] { currentuser.ID.ToString() }, null, false, true, web, currentuser, true);
+                }
             }
         }
     }

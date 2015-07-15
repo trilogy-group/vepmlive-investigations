@@ -139,11 +139,14 @@ namespace EPMLiveWorkPlanner
             {
                 bErrors = true;
                 sErrors = "Error Publishing: " + ex.Message;
-                SPUser currentuser = oweb.AllUsers.GetByID(userid);
-                var res = new Hashtable();
-                res.Add("Publish_Status", "Failed");
-                res.Add("Publish_DetailedStatus", "failed due to the following reason: " + sErrors);
-                EPMLiveCore.API.APIEmail.QueueItemMessage(15, true, res, new[] { currentuser.ID.ToString() }, null, false, true, oweb, currentuser, true);
+                if (key != "" && key.ToUpper().Equals("MSPROJECT"))
+                {
+                    SPUser currentuser = oweb.AllUsers.GetByID(userid);
+                    var res = new Hashtable();
+                    res.Add("Publish_Status", "Failed");
+                    res.Add("Publish_DetailedStatus", "failed due to the following reason: " + sErrors);
+                    EPMLiveCore.API.APIEmail.QueueItemMessage(15, true, res, new[] { currentuser.ID.ToString() }, null, false, true, oweb, currentuser, true);
+                }
             }
         }
 

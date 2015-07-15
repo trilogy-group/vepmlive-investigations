@@ -353,6 +353,10 @@ namespace EPMLiveCore.API
                         projectName = projectName.Substring(projectName.IndexOf("#") + 1);
                     }
                 }
+                else if (doc.SelectSingleNode("//Task[@UID='0']/Title") != null)
+                {
+                    projectName = doc.SelectSingleNode("//Task[@UID='0']/Title").InnerText;
+                }
                 
                 XmlAttribute attr = doc.CreateAttribute("Key");
                 attr.Value = "EPMLivePlanner" + doc.FirstChild.Attributes["PlannerID"].Value;
