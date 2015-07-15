@@ -1463,8 +1463,14 @@ namespace PortfolioEngineCore
 
                                 typeDictionary.Add(columnName, propertyType);
                             }
-
-                            propertyInfo.SetValue(resource, GetUnboxedValue(value, typeDictionary[columnName]), null);
+                            try
+                            {
+                                propertyInfo.SetValue(resource, GetUnboxedValue(value, typeDictionary[columnName]), null);
+                            }
+                            catch
+                            {
+                                propertyInfo.SetValue(resource, null, null);
+                            }
                         }
                         else
                         {

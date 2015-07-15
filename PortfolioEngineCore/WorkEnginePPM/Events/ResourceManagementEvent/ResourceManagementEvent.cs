@@ -58,7 +58,7 @@ namespace WorkEnginePPM.Events
                 decimal rate;
                 properties.AfterProperties["EXTID"] =
                     Utilities.AddUpdateResource(Utilities.BuildFieldsTable(properties, true), spWeb, properties.ListId,
-                                                out rate, true);
+                                                out rate, false);
 
                 if (rate != 0) properties.AfterProperties["StandardRate"] = rate;
             }
@@ -170,7 +170,7 @@ namespace WorkEnginePPM.Events
                 SPWeb spWeb = properties.Web;
 
                 decimal rate;
-                var extId = Utilities.AddUpdateResource(Utilities.BuildFieldsTable(properties, false), spWeb, properties.ListId, out rate, true);
+                var extId = Utilities.AddUpdateResource(Utilities.BuildFieldsTable(properties, false), spWeb, properties.ListId, out rate, false);
 
                 if (rate != 0) properties.AfterProperties["StandardRate"] = rate;
                 properties.AfterProperties["EXTID"] = extId;
