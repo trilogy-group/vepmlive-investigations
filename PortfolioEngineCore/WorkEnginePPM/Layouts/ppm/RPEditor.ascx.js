@@ -1883,7 +1883,7 @@
                 var PMStatus = grid.GetAttribute(row, null, "PMStatus");
                 var RMStatus = grid.GetAttribute(row, null, "RMStatus");
                 var priorEvent = grid.GetAttribute(row, null, "RowEventId");
-                if (UserIsPM == 1) {
+                if (UserIsPM == 1 && UserIsRM != 1) {
                     if (PMStatus != 1 || RMStatus == 1) {
                         grid.SetAttribute(row, null, "PMStatus", 1, 1, 0);
                         this.SetPMStatusColumn(grid, row, 1);
