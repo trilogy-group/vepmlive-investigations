@@ -139,7 +139,7 @@ namespace EPMLiveWorkPlanner
             {
                 bErrors = true;
                 sErrors = "Error Publishing: " + ex.Message;
-                if (key != "" && key.ToUpper().Equals("MSPROJECT"))
+                if (key != null && key.ToUpper().Equals("MSPROJECT"))
                 {
                     SPUser currentuser = oweb.AllUsers.GetByID(userid);
                     var res = new Hashtable();

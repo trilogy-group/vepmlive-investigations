@@ -122,7 +122,7 @@ namespace WorkEnginePPM.Jobs
 
                 bErrors = true;
                 sErrors = "Error: " + ex.Message;
-                if (key.Contains("MSProject"))
+                if (key != null && key.Contains("MSProject"))
                 {
                     SPUser currentuser = web.AllUsers.GetByID(userid);
                     var res = new Hashtable();
