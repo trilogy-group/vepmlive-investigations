@@ -940,17 +940,28 @@
         window.attachEvent('onresize', setHeight);
 
     Grids.OnTestConstraints = function(grid, row, col, type, change, d1, d2)  
-    {
+    {   
         if(type == "main" && d1 != null && d2 != null)
         {
             if(d1 < grid.Cols["G"].GanttBase)
             {
-                if(confirm("You are trying to set the Task Start Date earlier than the Project Start Date. Would you like to modify the Project Start Date"))
+                var projectGrid = Grids.ProjectInfo;
+                var prjUpdate = projectGrid.GetValue(projectGrid.GetRowById("ProjectUpdate"), "V");
+                if(prjUpdate.toLowerCase() == "manual")
                 {
-                    MoveProject();
+                    grid.Cols["G"].GanttUseConstraints = 0;
+                    return 0;
                 }
+                else
+                {
+                    if(confirm("You are trying to set the Task Start Date earlier than the Project Start Date. Would you like to modify the Project Start Date"))
+                    {
+                        MoveProject();
+                    }
+                }            
             }
         }
+        
         return change;
     }
 
