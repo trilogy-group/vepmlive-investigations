@@ -826,7 +826,7 @@ namespace TimeSheets
                 View Name:<br />
                 <input type=""text"" class=""ms-input"" name=""viewname"" id=""viewname""/><br /><br />
                 <div><input type=""checkbox"" name=""chkViewDefault"" id=""chkViewDefault"" /> Default View </div><br /><br />
-                <input type=""button"" value=""OK"" onclick=""SP.UI.ModalDialog.commonModalDialogClose(SP.UI.DialogResult.OK, document.getElementById('viewname').value + '|' + document.getElementById('chkViewDefault').checked); return false;"" class=""ms-ButtonHeightWidth"" style=""width:100px"" target=""_self"" /> &nbsp;
+                <input type=""button"" value=""OK"" onclick=""validate()"" class=""ms-ButtonHeightWidth"" style=""width:100px"" target=""_self"" /> &nbsp;
 
                <input type=""button"" value=""Cancel"" onclick=""SP.UI.ModalDialog.commonModalDialogClose(SP.UI.DialogResult.cancel, 'Cancel clicked'); return false;"" class=""ms-ButtonHeightWidth"" style=""width:100px"" target=""_self"" />  
     
@@ -847,6 +847,16 @@ namespace TimeSheets
             //output.WriteLine("fireEvent(wp, 'mouseup');");
             output.WriteLine("}");
 
+            output.WriteLine("function validate(){");
+            output.WriteLine("if(document.getElementById('viewname').value.replace(/^\\s+|\\s+$/, '') == ''){");
+            output.WriteLine("alert('Please enter view name')");
+            output.WriteLine("return false;");
+            output.WriteLine("}");
+            output.WriteLine("else{");
+            output.WriteLine("SP.UI.ModalDialog.commonModalDialogClose(SP.UI.DialogResult.OK, document.getElementById('viewname').value + '|' + document.getElementById('chkViewDefault').checked); return false;");
+            output.WriteLine("}");
+            output.WriteLine("}");
+            
             //output.Write("SP.SOD.executeOrDelayUntilScriptLoaded(clickTab, \"MyTimesheetContextualTabPageComponent.js\");");
             output.WriteLine(@"var viewNameDiv = document.getElementById(""viewNameDiv"");");
             output.WriteLine("</script>");

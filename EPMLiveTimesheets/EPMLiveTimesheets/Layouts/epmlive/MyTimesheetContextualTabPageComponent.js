@@ -369,15 +369,15 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
 
             viewNameDiv.style.display = "";
 
-            viewNameDiv.firstChild.nextSibling.nextSibling.value = this.tsObject.CurrentView;
+            viewNameDiv.firstChild.nextSibling.nextSibling.nextSibling.value = this.tsObject.CurrentView;
 
             viewNameDiv.firstChild.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling.style.display = "none";
 
-            if (this.tsObject.Views[this.tsObject.CurrentViewId].Default.toLowerCase() == "true") {
-                viewNameDiv.firstChild.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling.checked = true;
+            if (this.tsObject.Views[this.tsObject.CurrentViewId].Default != null && this.tsObject.Views[this.tsObject.CurrentViewId].Default.toLowerCase() == "true") {
+                viewNameDiv.firstChild.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling.firstChild.checked = true;
             }
             else
-                viewNameDiv.firstChild.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling.checked = false;
+                viewNameDiv.firstChild.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling.firstChild.checked = false;
 
             curGrid = grid;
             cView = this.tsObject.CurrentView;
@@ -395,7 +395,7 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
 
             viewNameDiv.firstChild.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling.style.display = "";
 
-            if (this.tsObject.Views[this.tsObject.CurrentViewId].Default.toLowerCase() == "true") {
+            if (this.tsObject.Views[this.tsObject.CurrentViewId].Default != null && this.tsObject.Views[this.tsObject.CurrentViewId].Default.toLowerCase() == "true") {
                 viewNameDiv.firstChild.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling.checked = true;
             }
             else
