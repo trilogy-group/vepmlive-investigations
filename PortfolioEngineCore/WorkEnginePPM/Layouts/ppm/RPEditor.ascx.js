@@ -1501,7 +1501,7 @@
     RPEditor.prototype.OnRenderPageStart = function (grid, start) {
         try {
             if (grid.id == "g_Res") {
-                rPEditorInstance.RefreshResourcePeriodsPaged(true, start);
+                rPEditorInstance.RefreshResourcePeriodsPaged(false, start);
             }
         }
         catch (e) {
@@ -1511,7 +1511,7 @@
     //RPEditor.prototype.OnRenderPageFinish = function (grid, start) {
     //    try {
     //        if (grid.id == "g_Res") {
-    //            rPEditorInstance.RefreshResourcePeriodsPaged(true, null);
+    //            rPEditorInstance.RefreshResourcePeriodsPaged(false, null);
     //        }
     //    }
     //    catch (e) {
@@ -1603,7 +1603,7 @@
                 grid.ActionFilterOn();
                 grid.ActionGroupOn();
                 //grid.ActionSortOn();
-                //rPEditorInstance.RefreshResourcePeriodsPaged(true, null);
+                //rPEditorInstance.RefreshResourcePeriodsPaged(false, null);
             }
         }
     };
@@ -1642,7 +1642,7 @@
             //    if (rPEditorInstance.scrollStopTimer)
             //        clearTimeout(rPEditorInstance.scrollStopTimer);
             //    rPEditorInstance.scrollStopTimer = setTimeout(function () {
-            //        rPEditorInstance.RefreshResourcePeriodsPaged(true, null);
+            //        rPEditorInstance.RefreshResourcePeriodsPaged(false, null);
             //    }, 750);
             //}
         }
@@ -2313,7 +2313,7 @@
             this.ExecuteJSON(sb.toString(), "GeneralFunctions");
 
             this.SetPlanRowsEditStatus();
-            //this.RefreshResourcePeriodsPaged(true, null);
+            //this.RefreshResourcePeriodsPaged(false, null);
         }
         this.UpdateButtonsAsync();
     };
@@ -2960,44 +2960,12 @@
                                         var wresId = plangrid.GetAttribute(row, null, "Res_UID");
                                         var resrow = this.FindResourceRow(wresId);
                                         if (wresId != null && resrow != null) {
-                                            this.CalculateResourceRowCommitted(wresId, resrow, true);
-                                            var colNames = plangrid.ColNames[2];
-                                            var colLength = colNames.length;
-                                            for (var c = 0; c < colLength; c++) {
-                                                var col = colNames[c];
-                                                var sType = col.substring(0, 1);
-                                                if (sType == "Q") {
-                                                    var periodid = col.substring(1);
-                                                    var oldDelta = this.resgrid.GetAttribute(resrow, null, "D" + periodid);
-                                                    var oldCommitted = this.resgrid.GetAttribute(resrow, null, "C" + periodid);
-                                                    var newCommitted = oldCommitted - Math.abs(oldDelta);
-                                                    this.resgrid.SetAttribute(resrow, null, "C" + periodid, newCommitted, true, 0);
-                                                    this.resgrid.SetAttribute(resrow, null, "D" + periodid, 0, true, 0);
-                                                    this.plangrid.SetAttribute(row, null, "H" + periodid, 0, true, 0);
-                                                }
-                                            }
-                                            this.resgrid.RefreshRow(resrow);
+                                            this.CalculateResourceRowCommitted(wresId, resrow);
                                         }
                                         wresId = plangrid.GetAttribute(row, null, "PendingRes_UID");
                                         resrow = this.FindResourceRow(wresId);
                                         if (wresId != null && resrow != null) {
-                                            this.CalculateResourceRowCommitted(wresId, resrow, true);
-                                            var colNames = plangrid.ColNames[2];
-                                            var colLength = colNames.length;
-                                            for (var c = 0; c < colLength; c++) {
-                                                var col = colNames[c];
-                                                var sType = col.substring(0, 1);
-                                                if (sType == "Q") {
-                                                    var periodid = col.substring(1);
-                                                    var oldDelta = this.resgrid.GetAttribute(resrow, null, "D" + periodid);
-                                                    var oldCommitted = this.resgrid.GetAttribute(resrow, null, "C" + periodid);
-                                                    var newCommitted = oldCommitted - Math.abs(oldDelta);
-                                                    this.resgrid.SetAttribute(resrow, null, "C" + periodid, newCommitted, true, 0);
-                                                    this.resgrid.SetAttribute(resrow, null, "D" + periodid, 0, true, 0);
-                                                    this.plangrid.SetAttribute(row, null, "H" + periodid, 0, true, 0);
-                                                }
-                                            }
-                                            this.resgrid.RefreshRow(resrow);
+                                            this.CalculateResourceRowCommitted(wresId, resrow);
                                         }
                                     }
                                     break;
@@ -3122,7 +3090,7 @@
                         var grid = Grids["g_RPE"];
                         this.RefreshGrid(grid);
                         this.InitialiseResourceGrid();
-                        this.RefreshResourcePeriodsPaged(true, null);
+                        this.RefreshResourcePeriodsPaged(false, null);
                         this.spreadDlg_LoadData(this.plangrid, this.planrow, false);
                         this.ShowHidePeriods(this.plangrid, false, true);
                         this.ShowHidePeriods(this.resgrid, false, false);
@@ -3189,7 +3157,7 @@
                     var grid = Grids["g_RPE"];
                     this.RefreshGrid(grid);
                     this.InitialiseResourceGrid();
-                    this.RefreshResourcePeriodsPaged(true, null);
+                    this.RefreshResourcePeriodsPaged(false, null);
                     this.spreadDlg_LoadData(this.plangrid, this.planrow, false);
                     this.UpdateButtonsAsync();
                     break;
@@ -3253,7 +3221,7 @@
                     this.HandleMatch();
                     //resgrid.Rendering = false;
                     resgrid.RenderBody();
-                    setTimeout(function () { rPEditorInstance.RefreshResourcePeriodsPaged(true, null); }, 500);
+                    setTimeout(function () { rPEditorInstance.RefreshResourcePeriodsPaged(false, null); }, 500);
                     break;
                 case "ResourcesTab_Select_Changed":
                     var select = document.getElementById("idResourcesTab_Select");
@@ -3286,14 +3254,14 @@
                         this.resourcesTab.setButtonStateOff("idResourcesTab_IncludePending");
                         this.includePending = false;
                     }
-                    this.RefreshResourcePeriodsPaged(true, null);
+                    this.RefreshResourcePeriodsPaged(false, null);
                     this.UpdateButtonsAsync();
                     break;
                 case "ResourcesTab_ShowMe_Changed":
                     var selectShowMe = document.getElementById("idResourcesTab_ShowMe");
                     var selectedItem = selectShowMe.options[selectShowMe.selectedIndex];
                     this.ResourceDisplayMode = selectedItem.value;
-                    this.RefreshResourcePeriodsPaged(true, null);
+                    this.RefreshResourcePeriodsPaged(false, null);
                     this.UpdateButtonsAsync();
                     break;
                 case "ResourcesTab_ShowGrouping_Click":
@@ -3318,7 +3286,7 @@
                         this.showHeatmap = false;
                     }
                     this.InitialiseResourceGrid();
-                    this.RefreshResourcePeriodsPaged(true, null);
+                    this.RefreshResourcePeriodsPaged(false, null);
                     this.UpdateButtonsAsync();
                     break;
                 case "ResourcesTab_RemoveSorting_Click":
@@ -3586,7 +3554,7 @@
     RPEditor.prototype.GridsOnGroupFinish = function (grid) {
         if (grid.id != "g_Res")
             return;
-        rPEditorInstance.RefreshResourcePeriodsPaged(true, null);
+        rPEditorInstance.RefreshResourcePeriodsPaged(false, null);
     };
     RPEditor.prototype.GridsOnFilter = function (grid, type) {
         if (grid.id != "g_Res")
@@ -3602,7 +3570,7 @@
             return;
         if (type == 2 && grid.Group != "" && grid.Grouping == 1)
             this.HideUnusedGroupRowsAsync();
-        rPEditorInstance.RefreshResourcePeriodsPaged(true, null);
+        rPEditorInstance.RefreshResourcePeriodsPaged(false, null);
     };
     RPEditor.prototype.GridsOnShowColumns = function (grid, menu) {
         if (grid.id == "g_RPE") {
@@ -5218,20 +5186,27 @@
         var plangrid = this.plangrid;
         // "C" + periodid represents all the committed hours for a resource on all projects (including this one)
         // deltaC is the difference between the committed hours when the plan was opened vs the committed hours now and, optionally, can include pending on this project
+        var row = plangrid.GetFirst(null, 0);
         var deltaC = 0;
-        if (plannerRow != null) {
-            var lHours = this.GetIntValue(plangrid.GetAttribute(plannerRow, null, "H" + periodid), 0);
-            var deleted = plangrid.GetAttribute(plannerRow, null, "Deleted");
-            if (deleted == 1) {
-                if (lHours == 0)
-                    deltaC -= this.GetIntValue(this.GetPeriodHoursSpecial(plangrid, plannerRow, "H" + periodid), 0);
-                else
-                    deltaC -= lHours;
+        while (row != null) {
+            var planresuid = plangrid.GetAttribute(row, null, "PendingRes_UID");
+            if (planresuid == null) planresuid = plangrid.GetAttribute(row, null, "Res_UID");
+            if (resuid == planresuid) {
+                var lHours = this.GetIntValue(plangrid.GetAttribute(row, null, "H" + periodid), 0);
+                var deleted = plangrid.GetAttribute(row, null, "Deleted");
+                if (deleted == 1) {
+                    if (lHours == 0)
+                        deltaC -= this.GetIntValue(this.GetPeriodHoursSpecial(plangrid, row, "H" + periodid), 0);
+                    else
+                        deltaC -= lHours;
+                }
+                else {
+                    deltaC += this.GetIntValue(this.GetPeriodHoursSpecial(plangrid, row, "H" + periodid), 0) - lHours;
+                }
             }
-            else {
-                deltaC += this.GetIntValue(this.GetPeriodHoursSpecial(plangrid, plannerRow, "H" + periodid), 0) - lHours;
-            }
+            row = plangrid.GetNext(row);
         }
+
         this.resgrid.SetAttribute(resrow, null, "D" + periodid, deltaC, 0, 0);
         if (bRefreshCell) {
             this.RefreshResourceRowPeriod(this.resgrid, resrow, periodid, bRefreshCell);
