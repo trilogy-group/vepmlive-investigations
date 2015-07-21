@@ -721,7 +721,7 @@ namespace EPMLiveCore.API
                     DataTable dtResourcePool = null;
                     SPSecurity.RunWithElevatedPrivileges(delegate()
                     {
-                        dtResourcePool = GetResourcePoolForSave(sdoc, oWeb, docTeam.SelectNodes("//Team/Member"));
+                        dtResourcePool = GetResourcePool(sdoc, oWeb);
                     });
 
                     foreach (XmlNode nd in docTeam.SelectNodes("//Team/Member"))
