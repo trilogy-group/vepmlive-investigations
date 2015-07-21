@@ -849,7 +849,7 @@ namespace TimeSheets
 
             output.WriteLine("function validate(){");
             output.WriteLine("if(document.getElementById('viewname').value.replace(/^\\s+|\\s+$/, '') == ''){");
-            output.WriteLine("alert('Please enter view name')");
+            output.WriteLine("alert('Please enter a view name - view names cannot be blank.')");
             output.WriteLine("return false;");
             output.WriteLine("}");
             output.WriteLine("else{");
