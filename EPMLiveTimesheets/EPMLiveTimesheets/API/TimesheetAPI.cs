@@ -225,7 +225,7 @@ namespace TimeSheets
 
                 EPMLiveCore.API.ViewManager Views = GetViews(oWeb);
 
-                Views.RenameView(docTimesheet.FirstChild.Attributes["Name"].Value, docTimesheet.FirstChild.Attributes["NewName"].Value);
+                Views.RenameView(docTimesheet.FirstChild.Attributes["Name"].Value, docTimesheet.FirstChild.Attributes["NewName"].Value, docTimesheet.FirstChild.Attributes["Default"].Value);
 
                 oWeb.AllowUnsafeUpdates = true;
 

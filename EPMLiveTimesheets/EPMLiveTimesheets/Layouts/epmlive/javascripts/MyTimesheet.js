@@ -1158,11 +1158,11 @@ function DeleteView(grid, view) {
     });
 }
 
-function RenameView(grid, view, newview) {
+function RenameView(grid, view, retval) {
 
     ShowMessage(grid.id, "Renaming View...", 150, 50);
 
-    EPMLiveCore.WorkEngineAPI.ExecuteJSON("timesheet_RenameView", "<View Name=\"" + view + "\" NewName=\"" + newview + "\"/>", function (response) {
+    EPMLiveCore.WorkEngineAPI.ExecuteJSON("timesheet_RenameView", "<View Name=\"" + view + "\" NewName=\"" + retval[0] + "\" Default=\"" + retval[1] + "\"/>", function (response) {
         var oResponse = eval("(" + response + ")");
         grid.StaticCursor = 1;
 
@@ -1178,8 +1178,8 @@ function RenameView(grid, view, newview) {
             for (var view in newobj.Views) {
                 var oView = newobj.Views[view];
 
-                if (oView.Name == newview) {
-                    newobj.CurrentView = newview;
+                if (oView.Name == retval[0]) {
+                    newobj.CurrentView = retval[0];
                     newobj.CurrentViewId = view;
                     break;
                 }

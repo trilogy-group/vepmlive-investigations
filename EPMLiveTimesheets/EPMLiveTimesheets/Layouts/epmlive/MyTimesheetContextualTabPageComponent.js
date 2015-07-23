@@ -381,7 +381,7 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
 
             curGrid = grid;
             cView = this.tsObject.CurrentView;
-            var options = { html: viewNameDiv, width: 280, height: 150, title: "Rename View", dialogReturnValueCallback: this.onRenameViewClose };
+            var options = { html: viewNameDiv, width: 260, height: 150, title: "Rename View", dialogReturnValueCallback: this.onRenameViewClose };
             SP.UI.ModalDialog.showModalDialog(options);
         }
         else if (commandId === 'Ribbon.MyTimesheet.SaveView') {
@@ -389,21 +389,21 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
             var grid = Grids["TS" + this.tsObject.id];
 
             viewNameDiv.style.display = "";
-
-            viewNameDiv.firstChild.nextSibling.nextSibling.value = this.tsObject.CurrentView;
+            
+            viewNameDiv.firstChild.nextSibling.nextSibling.nextSibling.value = this.tsObject.CurrentView;
 
 
             viewNameDiv.firstChild.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling.style.display = "none";
 
-            if (this.tsObject.Views[this.tsObject.CurrentViewId].Default != null && this.tsObject.Views[this.tsObject.CurrentViewId].Default.toLowerCase() == "true") {
-                viewNameDiv.firstChild.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling.checked = true;
+            if (this.tsObject.Views[this.tsObject.CurrentViewId].Default != null && this.tsObject.Views[this.tsObject.CurrentViewId].Default.toLowerCase() == "true") {                
+                viewNameDiv.firstChild.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling.firstChild.checked = true;
             }
-            else
-                viewNameDiv.firstChild.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling.checked = false;
+            else                
+                viewNameDiv.firstChild.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling.firstChild.checked = false;
 
             curGrid = grid;
 
-            var options = { html: viewNameDiv, width: 280, height: 150, title: "Save View", dialogReturnValueCallback: this.onSaveViewClose };
+            var options = { html: viewNameDiv, width: 260, height: 150, title: "Save View", dialogReturnValueCallback: this.onSaveViewClose };
             SP.UI.ModalDialog.showModalDialog(options);
         }
         else if (commandId === 'Ribbon.MyTimesheet.ChangeView') {
@@ -483,8 +483,8 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
     onRenameViewClose: function (dialogResult, returnValue) {
         if (dialogResult == "1") {
             var retval = returnValue.split('|');
-
-            RenameView(curGrid, cView, retval[0]);
+            
+            RenameView(curGrid, cView, retval);
         }
 
     },

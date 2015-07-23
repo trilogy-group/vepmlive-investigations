@@ -159,11 +159,23 @@ namespace EPMLiveCore.API
             //}
         }
 
-        public void RenameView(string view, string newname)
+        public void RenameView(string view, string newname, string defaultView)
         {
             try
             {
+                if (defaultView.ToLower() == "true")
+                {
+                    foreach (KeyValuePair<string, Dictionary<string, string>> key in Views)
+                    {
+                        key.Value["Default"] = "false";
+                    }
+                }
+
                 Dictionary<string, string> d = Views[view];
+                if (d.ContainsKey("Default"))
+                {                    
+                    d["Default"] = defaultView;
+                }
                 Views.Remove(view);
                 Views.Add(newname, d);
             }
