@@ -165,9 +165,11 @@ namespace EPMLiveCore
                 }
                 else
                 {
+                    //Add OR Edit functionality
                     if (isAdd || (properties.ListItem != null && properties.ListItem["SharePointAccount"] != null))
                     {
                         //CoreFunctions.EnsureNoDuplicates(properties, isAdd, isOnline);
+                        //ONLINE
                         if (isOnline)
                         {
                             if (properties.List.Fields.ContainsFieldWithInternalName("FirstName") && properties.List.Fields.ContainsFieldWithInternalName("LastName"))
@@ -195,6 +197,7 @@ namespace EPMLiveCore
                             ProcessOnlineUser(properties, isAdd);
                             disableAccount(properties);
                         }
+                        //ON-PREM/ON-SITE
                         else
                         {
                             if (properties.List.Fields.ContainsFieldWithInternalName("FirstName") && properties.List.Fields.ContainsFieldWithInternalName("LastName"))
@@ -455,7 +458,7 @@ namespace EPMLiveCore
                     string newusernameclean = "";
                     string prefix = CoreFunctions.getPrefix(properties.Web.Site);
 
-
+                    //ADD online user
                     if (isAdd)
                     {
                         location = "1003";
@@ -463,9 +466,12 @@ namespace EPMLiveCore
                         properties.AfterProperties["Email"] = newemail;
                         location = "10031";
                         m = thisClass.GetMethod("FindUserName");
+                        //Call Account Management method "FindUserName" to find the user by email address
                         string founduser = (string)m.Invoke(null, new object[] { newemail });
                         location = "1004";
 
+                        //If user not found then create a new user for an existing account
+                        //EPML-5040: SCENARIO-1: NEW AD User Added
                         if (founduser == "")
                         {
                             location = "1005";
@@ -498,6 +504,7 @@ namespace EPMLiveCore
                             }
                             location = "1010";
                         }
+                        //-- AD USER EXISTS
                         else
                         {
                             location = "1011";
@@ -511,6 +518,7 @@ namespace EPMLiveCore
                                 properties.AfterProperties["SharePointAccount"] = addUser(properties, newusername, properties.AfterProperties["Title"].ToString(), newemail, prefix);
                         }
                     }
+                    //--EDIT ONLINE user
                     else
                     {
                         location = "1013-1";
@@ -523,6 +531,11 @@ namespace EPMLiveCore
                         newemail = uv.User.Email;
                         location = "1016";
                     }
+                    //END Add/Edit condition check
+
+                    //-- This code gets called for BOTH ADD/EDIT ONLINE user --
+
+                    //Check if current user is associated to an Account site
                     location = "1017";
                     cmd = new SqlCommand("SP_IsUserInAccountSite", cn);
                     cmd.CommandType = CommandType.StoredProcedure;
@@ -540,18 +553,21 @@ namespace EPMLiveCore
                         }
                     }
                     dr.Close();
+                    
                     location = "1019";
-                    bool bhaspermsadded = setPermissions(properties, isAdd);
+                    bool bhaspermsadded = setPermissions(properties, isAdd);    //SETUP PERMISSION Add/Edit mode
                     location = "1020";
-                    if (bIsApproved)//Approved (Already in account)
+                    if (bIsApproved)//Approved (User already in account site)
                     {
-                        if (bhaspermsadded)
+                        if (bhaspermsadded) //Permissions added
                         {
                             location = "1021";
+                            //EMAIL: "You have been given access to an EPM Live site"
                             m = thisClass.GetMethod("sendEmail");
                             bool sent = (bool)m.Invoke(null, new object[] { 2, newemail, new string[] { oCurUser.Name, properties.Web.Url, properties.Web.Title, newusernameclean } });
                         }
                     }
+                    //EPML-5040: SCENARIO-2: ADD Existing AD User to site
                     else//Assume we are adding user to account
                     {
                         if (oCurUser.IsSiteAdmin || disablerequests || properties.CurrentUserId == 1073741823)//if not in account and user is admin
@@ -591,6 +607,7 @@ namespace EPMLiveCore
                                     location = "1028";
                                     if (bIsNewUser)
                                     {
+                                        //EMAIL: "EPM Live Account Information"
                                         m = thisClass.GetMethod("sendEmail");
                                         bool sent = (bool)m.Invoke(null, new object[] { 4, newemail, new string[] { newusernameclean, getTempPassword(newusername) } });
                                     }
@@ -605,6 +622,7 @@ namespace EPMLiveCore
                                     location = "1030";
                                     if (bhaspermsadded || bHasPerms)
                                     {
+                                        //EMAIL: "You have been given access to an EPM Live site"
                                         m = thisClass.GetMethod("sendEmail");
                                         bool sent = (bool)m.Invoke(null, new object[] { 2, newemail, new string[] { oCurUser.Name, properties.Web.Url, properties.Web.Title, newusernameclean } });
                                     }
@@ -809,6 +827,7 @@ namespace EPMLiveCore
                             {
                                 try
                                 {
+                                    //EMAIL: "New EPM Live Account Request"
                                     MethodInfo m = thisClass.GetMethod("sendEmail");
                                     bool sent = (bool)m.Invoke(null, new object[] { 24, user.Email, new string[] { requestorname, properties.AfterProperties["Title"].ToString(), CoreFunctions.getLockConfigSetting(properties.Web, "EPMLiveResourceURL", false) } });
                                 }
@@ -822,6 +841,7 @@ namespace EPMLiveCore
 
         private void sendOwnerEmail(Type thisClass, SPItemEventProperties properties, string requestorname)
         {
+            //EMAIL: "New EPM Live Account Request"
             MethodInfo m = thisClass.GetMethod("sendEmail");
             bool sent = (bool)m.Invoke(null, new object[] { 25, owneremail, new string[] { requestorname, properties.AfterProperties["Title"].ToString(), CoreFunctions.getLockConfigSetting(properties.Web, "EPMLiveResourceURL", false) } });
         }
