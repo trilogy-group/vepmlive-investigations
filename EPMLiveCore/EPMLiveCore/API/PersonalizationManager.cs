@@ -124,13 +124,17 @@ namespace EPMLiveCore.API
                     var to = new DateTime(9998, 12, 31, 23, 59, 59);
                     DateTime today = DateTime.Now.Date;
 
-                    if(paramArray[1] != "")
+                    if (paramArray[1] != "")
                     {
                         DaysAgo = Convert.ToInt32(paramArray[1]);
                         if (DaysAgoEnabled)
                         {
                             from = today.AddDays(-DaysAgo);
                         }
+                    }
+                    else if(paramArray[1] == "" && paramArray[3] != "")
+                    {
+                        from = today;
                     }
 
                     if (paramArray[3] != "")
@@ -140,6 +144,10 @@ namespace EPMLiveCore.API
                         {
                             to = today.AddDays(DaysAfter).AddHours(23).AddMinutes(59).AddSeconds(59);
                         }
+                    }
+                    else if (paramArray[3] == "" && paramArray[1] != "")
+                    {
+                        to = today;
                     }
 
                     resultXml.Add(new XAttribute("FromDate", from.ToString("yyyy-MM-dd HH:mm:ss")));
