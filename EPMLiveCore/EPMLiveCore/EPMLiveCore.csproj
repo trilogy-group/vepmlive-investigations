@@ -12,7 +12,7 @@
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <TargetOfficeVersion>15.0</TargetOfficeVersion>
     <FileAlignment>512</FileAlignment>
-    <ProjectTypeGuids>{BB1F664B-9266-4fd6-B973-E1E44974B511};{14822709-B5A1-4724-98CA-57A101D1B079};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <ProjectTypeGuids>{C1CDDADD-2546-481F-9697-4EA41081F2FC};{14822709-B5A1-4724-98CA-57A101D1B079};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <ActiveDeploymentConfiguration>Default</ActiveDeploymentConfiguration>
     <SandboxedSolution>False</SandboxedSolution>
     <SccProjectName>SAK</SccProjectName>
@@ -1027,6 +1027,7 @@ net start "WETimer"</PostDeploymentCommand>
     </Compile>
     <Compile Include="Layouts\epmlive\queuejobs.aspx.cs">
       <DependentUpon>queuejobs.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\epmlive\queuejobs.aspx.designer.cs">
       <DependentUpon>queuejobs.aspx.cs</DependentUpon>
@@ -3547,6 +3548,7 @@ net start "WETimer"</PostDeploymentCommand>
     <Content Include="Layouts\epmlive\javascripts\libraries\tooltip.js" />
     <Content Include="Layouts\epmlive\javascripts\libraries\tooltip.min.js" />
     <Content Include="Layouts\epmlive\javascripts\libraries\WalkMe.js" />
+    <Content Include="Layouts\epmlive\javascripts\libraries\Zendesk.js" />
     <Content Include="Layouts\epmlive\javascripts\masterpages\UplandV5.js" />
     <Content Include="Layouts\epmlive\javascripts\masterpages\uplandv5.master.js" />
     <Content Include="Layouts\epmlive\javascripts\masterpages\uplandv5.master.min.js" />

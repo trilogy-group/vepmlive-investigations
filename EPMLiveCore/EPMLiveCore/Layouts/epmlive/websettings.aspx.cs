@@ -72,7 +72,10 @@ namespace EPMLiveCore
 
                     try
                     {
-                        tbWalkMe.Text = CoreFunctions.getConfigSetting(web, "EPMLiveWalkMeId");
+                        //EPML-5445
+                        var supportIntegration = CoreFunctions.getConfigSetting(web, "SupportIntegration");
+                        chkSupportIntegration.Checked = !string.IsNullOrEmpty(supportIntegration) && Convert.ToBoolean(supportIntegration);
+                        //EPML-5445
                     }
                     catch { }
 
@@ -88,7 +91,7 @@ namespace EPMLiveCore
                     if (!web.CurrentUser.IsSiteAdmin)
                     {
                         pnlAllowSynch.Visible = false;
-                        ifsWalkMe.Visible = false;
+                        ifsSupportIntegration.Visible = false;
                     }
                     else
                     {
@@ -128,7 +131,7 @@ namespace EPMLiveCore
                             }
                         }
 
-                        ifsWalkMe.Visible = true;
+                        ifsSupportIntegration.Visible = true;
                     }
                     foreach (SPList list in web.Lists)
                     {
@@ -319,7 +322,9 @@ namespace EPMLiveCore
             CoreFunctions.setConfigSetting(web, "EPMLiveDisablePublishing", chkDisablePublishing.Checked.ToString());
             CoreFunctions.setConfigSetting(web, "EPMLiveDisablePlanners", chkDisablePlanners.Checked.ToString());
             CoreFunctions.setConfigSetting(web, "EPMLiveDisableContextualSlideouts", chkDisableContextualSlideouts.Checked.ToString());
-            CoreFunctions.setConfigSetting(web, "EPMLiveWalkMeId", tbWalkMe.Text.ToString());
+            //EPML-5445
+            CoreFunctions.setConfigSetting(web, "SupportIntegration", chkSupportIntegration.Checked.ToString());
+            //EPML-5445
             CoreFunctions.setConfigSetting(web, "EPMLivePublicCommentText", tbPublicCommentDefaultTxt.Text.ToString());
 
             if (web.CurrentUser.IsSiteAdmin)

@@ -25,18 +25,20 @@
                     window.SP.SOD.notifyScriptLoadedAndExecuteWaitingJobs('EPMLive.js');
                 }, !window.isIE8);
             }, !window.isIE8);
-            
+
+            //EPML-5445            
             $(function () {
-                var walkmeId = '<%= WalkMeId %>';
-                if (walkmeId){
-                    var walkme = document.createElement('script');
-                    walkme.type = 'text/javascript';
-                    walkme.async = true;
-                    walkme.src = '<%= Scheme %>://d3b3ehuo35wzeh.cloudfront.net/users/<%= WalkMeId %>/walkme_<%= WalkMeId %>_https.js';
+                var supportIntegration = '<%= SupportIntegration %>';
+                if (supportIntegration.toLowerCase() == 'true') {
+                    var zendesk = document.createElement('script');
+                    zendesk.type = 'text/javascript';
+                    zendesk.async = true;
+                    zendesk.src = "../../_layouts/15/epmlive/javascripts/libraries/Zendesk.js";
                     var s = document.getElementsByTagName('script')[0];
-                    s.parentNode.insertBefore(walkme, s);
-                }               
+                    s.parentNode.insertBefore(zendesk, s);
+                }
             });
+            //EPML-5445
 
             //window.upland_insight = {
             //    id: '<%= UplandInsightId %>',

@@ -67,17 +67,17 @@
 		                </wssuc:InputFormControl>
 	                </template_inputformcontrols>
         </wssuc:InputFormSection>
-        <wssuc:InputFormSection Id="ifsWalkMe" Title="WalkMe Integration" Description="" runat="server">
+        <wssuc:InputFormSection Id="ifsSupportIntegration" Title="Support Integration" Description="" runat="server">
             <template_description>
-	                    Enabling WalkMe will add a help menu to the bottom of each page allowing users to "walk through" various steps and learn how to use the product.
+	                    Enabling Support Integration will allow users to use the Help icon in the upper right corner of the screen to search for answers without leaving the application.
 	                </template_description>
             <template_inputformcontrols>
 		                <wssuc:InputFormControl LabelText="" runat="server">
 			                 <Template_Control>
-                                <asp:Label runat="server" Text="WalkMeId"></asp:Label>
+                                <asp:Label runat="server" Text="Support Integration"></asp:Label>
                                 <br />
                                 <br />
-			                    <asp:TextBox ID="tbWalkMe" runat="server" />
+                                 <asp:CheckBox ID="chkSupportIntegration" runat="server" />
 			                 </Template_Control>
 		                </wssuc:InputFormControl>
 	                </template_inputformcontrols>

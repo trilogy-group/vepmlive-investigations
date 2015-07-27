@@ -420,54 +420,8 @@ url:function(i,b){this.anchors.eq(i).removeData("cache.tabs").data("load.tabs",b
 f.rotate(null)}:function(){t=j.selected;l()});if(i){this.element.bind("tabsshow",l);this.anchors.bind(j.event+".tabs",b);l()}else{clearTimeout(f.rotation);this.element.unbind("tabsshow",l);this.anchors.unbind(j.event+".tabs",b);delete this._rotate;delete this._unrotate}return this}})})(jQuery);
 
 ///#source 1 1 /Layouts/epmlive/javascripts/masterpages/UplandV5.js
-var uvOptions = {};
-
-(function() {
+(function() { 
     'use strict';
-
-    function loadUserVoice() {
-        var uv = document.createElement('script');
-        uv.type = 'text/javascript';
-        uv.async = true;
-        uv.src = '//widget.uservoice.com/uFW21LPmYTawwUX9btPog.js';
-        var s = document.getElementsByTagName('script')[0];
-        s.parentNode.insertBefore(uv, s);
-    }
-
-    window.showUserVoicePopup = function() {
-        if (window.isIE8 && window.userVoiceIgnored) {
-            alert('User Voice is not supported on this page in IE 8.');
-        } else {
-            window.UserVoice.showPopupWidget();
-        }
-    };
-
-    if (window.isIE8) {
-        window.ie8StringContains = function(str1, str2) {
-            var arr = str1.split(str2);
-            if (arr.length > 1) return true;
-            return false;
-        };
-
-        var currentUrl = (window.location + '').toLowerCase();
-
-        var ignore = false;
-        var ignoredUrls = ['EditableFields.aspx', 'ViewEdit.aspx'];
-        for (var i = 0; i < ignoredUrls.length; i++) {
-            if (window.ie8StringContains(currentUrl, ignoredUrls[i].toLowerCase())) {
-                ignore = true;
-                break;
-            }
-        }
-
-        if (!ignore) {
-            loadUserVoice();
-        }
-
-        window.userVoiceIgnored = ignore;
-    } else {
-        loadUserVoice();
-    }
 
     window.toggleSearch = function() {
         var $sbox = $('#search-box-container');
@@ -493,35 +447,6 @@ var uvOptions = {};
     window.profilePicUpdated = function(status, picUrl) {
         if (status === 1) {
             $('#EPMLiveProfilePic').attr('src', picUrl + '?v' + new Date().getTime()).show();
-        }
-    };
-
-    window.walkme_ready = function() {
-        var $supportLink = $('#epm-support-link');
-        $supportLink.attr('href', '#');
-        $supportLink.removeAttr('target');
-
-        $supportLink.click(function(event) {
-            $('.walkme-menu-click-close').after('<a id="support-link" style="right: 31px !important; top:  8px !important; width: 220px !important; height: 25px !important; z-index: 2147483647 !important; position: absolute !important; font-size: 14px; color: #1F80C8" href="http://support.epmlive.com" target="_blank">Visit our Support Community</a>');
-            window.WalkMePlayerAPI.toggleMenu();
-
-            event.stopPropagation();
-        });
-
-        $('body').click(function () {
-            if ($('#walkme-menu-open').is(':visible')) {
-                window.WalkMePlayerAPI.toggleMenu();
-            }
-        });
-    };
-
-    window.walkme_player_event = function(eventData) {
-        if (eventData.Type === "AfterMenuOpen") {
-            $('#epm-support-link').css('color', '#FFFFFF');
-        }
-
-        if (eventData.Type === "BeforeMenuClose") {
-            $('#epm-support-link').css('color', '#00668E');
         }
     };
 

@@ -1681,32 +1681,35 @@
 	    ExecuteOrDelayUntilScriptLoaded(epmLiveTweaks, 'jquery.min.js');
 
 	    
+        //EPML-5445
+	    //function zendesk_ready() {
 
-	    function walkme_ready() {
+	    //    alert('inside EPMLiveMasterV5Blue: window.zendesk_ready');
+	    //    var supportLink = $('#epm-support-link');
+	    //    supportLink.removeAttr('onclick');
+	    //    //var supportUrl = supportLink.attr('href');
+	    //    supportLink.attr('href', '#');
+	    //    supportLink.removeAttr('target');
 
-	        var supportLink = $('#ctl00_TopHelpLinkSupport');
-	        supportLink.removeAttr('onclick');
-	        //var supportUrl = supportLink.attr('href');
-	        supportLink.attr('href', '#');
-	        supportLink.removeAttr('target');
+	    //    supportLink.click(function () {
+	    //        alert('inside EPMLiveMasterV5Blue: supportLink click');
+	    //        $("[rel=tooltipbottom]").tooltip('hide');
+	    //        //$('.zendesk-menu-click-close').after('<a id="support-link" style="display: none; right: 31px !important; top:  8px !important; width: 220px !important; height: 25px !important; z-index: 2147483647 !important; position: absolute !important; font-size: 14px; color: #1F80C8" href="http://support.epmlive.com" target="_blank">Visit our Support Community</a>');
+	    //        //ZendeskPlayerAPI.toggleMenu();
+	    //    });
+	    //}
 
-	        supportLink.click(function () {
-	            $("[rel=tooltipbottom]").tooltip('hide')
-	            $('.walkme-menu-click-close').after('<a id="support-link" style="display: none; right: 31px !important; top:  8px !important; width: 220px !important; height: 25px !important; z-index: 2147483647 !important; position: absolute !important; font-size: 14px; color: #1F80C8" href="http://support.epmlive.com" target="_blank">Visit our Support Community</a>');
-	            WalkMePlayerAPI.toggleMenu();
+	    //function zendesk_player_event(eventData) {
+	        //alert('inside EPMLiveMasterV5Blue: zendesk_player_event');
+	        //if (eventData.Type === "AfterMenuOpen") {
+	        //    $('#support-link').fadeIn("slow");
+	        //}
 
-	        });
-	    }
-
-	    function walkme_player_event(eventData) {
-	        if (eventData.Type === "AfterMenuOpen") {
-	            $('#support-link').fadeIn("slow");
-	        }
-
-	        if (eventData.Type === "BeforeMenuClose") {
-	            $('#support-link').fadeOut("fast");
-	        }
-	    }
+	        //if (eventData.Type === "BeforeMenuClose") {
+	        //    $('#support-link').fadeOut("fast");
+	        //}
+	    //}
+	    //EPML-5445
 
 	    (function () {
 	        var uv = document.createElement('script');
@@ -1719,6 +1722,6 @@
 
         </script>
        
-<span style="display:none;" id="walkMe2013"></span>
+<span style="display:none;" id="zendesk2015"></span>
 </body>
 </SharePoint:SPHtmlTag>
