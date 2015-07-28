@@ -32,11 +32,11 @@ namespace WorkEnginePPM.Jobs
 
         public void execute(SPSite site, SPWeb web, string data)
         {
+            string[] keys = key.Split('.');
             try
             {
-                string[] keys = key.Split('.');
                 string result = "";
-                if (!String.IsNullOrEmpty(keys[1]) && keys[1].ToLower().Equals("msproject"))
+                if (!String.IsNullOrEmpty(keys[2]) && keys[2].ToLower().Equals("msproject"))
                 {
                     using (var portfolioEngineAPI = new PortfolioEngineAPI(web))
                     {
@@ -108,12 +108,12 @@ namespace WorkEnginePPM.Jobs
 
                 result = result.Trim();
 
-                if (!String.IsNullOrEmpty(keys[1]) && keys[1].ToLower().Equals("msproject"))
+                if (!String.IsNullOrEmpty(keys[2]) && keys[2].ToLower().Equals("msproject"))
                 {
                     SPUser currentuser = web.AllUsers.GetByID(userid);
                     var res = new Hashtable();
                     res.Add("Publish_Status", "Completed Successfully");
-                    res.Add("Publish_DetailedStatus", "Completed Successfully");
+                    res.Add("Publish_DetailedStatus", "for project " + keys[1] + " Completed Successfully");
                     EPMLiveCore.API.APIEmail.QueueItemMessage(15, true, res, new[] { currentuser.ID.ToString() }, null, false, true, web, currentuser, true);
                 }
             }
@@ -127,7 +127,7 @@ namespace WorkEnginePPM.Jobs
                     SPUser currentuser = web.AllUsers.GetByID(userid);
                     var res = new Hashtable();
                     res.Add("Publish_Status", "Failed");
-                    res.Add("Publish_DetailedStatus", "failed due to the following reason: " + sErrors);
+                    res.Add("Publish_DetailedStatus", "for project " + keys[1] + " failed due to the following reason: " + sErrors);
                     EPMLiveCore.API.APIEmail.QueueItemMessage(15, true, res, new[] { currentuser.ID.ToString() }, null, false, true, web, currentuser, true);
                 }
             }

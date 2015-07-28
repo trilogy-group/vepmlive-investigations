@@ -20,6 +20,7 @@ namespace EPMLiveWorkPlanner
 
         public void execute(SPSite osite, SPWeb oweb, string data)
         {
+            string projectName = "";
             try
             {
                 XmlDocument doc = new XmlDocument();
@@ -70,7 +71,7 @@ namespace EPMLiveWorkPlanner
                     SPList oProjectCenter = oweb.Lists[new Guid(project[1])];
                     SPList oTaskCenter = oweb.Lists[taskCenterListName];
 
-                    string projectName = oProjectCenter.GetItemById(Convert.ToInt32(project[2])).Name;
+                    projectName = oProjectCenter.GetItemById(Convert.ToInt32(project[2])).Name;
 
                     setupProjectCenter(oProjectCenter);
                     setupTaskCenter(oTaskCenter);
@@ -101,7 +102,7 @@ namespace EPMLiveWorkPlanner
                                     }
                                     if (!string.IsNullOrEmpty(sData))
                                     {
-                                        Guid jobid = EPMLiveCore.API.Timer.AddTimerJob(osite.ID, oweb.ID, oTaskCenter.ID, "Publish Work" + "_" + projectName, 81, sData, project[2] + "." + key, 0, 9, "");
+                                        Guid jobid = EPMLiveCore.API.Timer.AddTimerJob(osite.ID, oweb.ID, oTaskCenter.ID, "Publish Work" + "_" + projectName, 81, sData, project[2] + "." + projectName + "." + key, 0, 9, "");
                                         EPMLiveCore.API.Timer.Enqueue(jobid, 0, site);
                                     }
                                     else
@@ -124,7 +125,7 @@ namespace EPMLiveWorkPlanner
                             }
                             if (!string.IsNullOrEmpty(sData))
                             {
-                                Guid jobid = EPMLiveCore.API.Timer.AddTimerJob(osite.ID, oweb.ID, oTaskCenter.ID, "Publish Work" + "_" + projectName, 81, sData, project[2] + "." + key, 0, 9, "");
+                                Guid jobid = EPMLiveCore.API.Timer.AddTimerJob(osite.ID, oweb.ID, oTaskCenter.ID, "Publish Work" + "_" + projectName, 81, sData, project[2] + "." + projectName + "." + key, 0, 9, "");
                                 EPMLiveCore.API.Timer.Enqueue(jobid, 0, osite);
                             }
                             else
@@ -144,7 +145,7 @@ namespace EPMLiveWorkPlanner
                     SPUser currentuser = oweb.AllUsers.GetByID(userid);
                     var res = new Hashtable();
                     res.Add("Publish_Status", "Failed");
-                    res.Add("Publish_DetailedStatus", "failed due to the following reason: " + sErrors);
+                    res.Add("Publish_DetailedStatus", "for project " + projectName + " failed due to the following reason: " + sErrors);
                     EPMLiveCore.API.APIEmail.QueueItemMessage(15, true, res, new[] { currentuser.ID.ToString() }, null, false, true, oweb, currentuser, true);
                 }
             }
