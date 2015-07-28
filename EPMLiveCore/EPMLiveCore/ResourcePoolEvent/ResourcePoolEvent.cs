@@ -484,6 +484,7 @@ namespace EPMLiveCore
                                 newusernameclean = result.Substring(2);
                                 location = "1007";
 
+                                //Add user to the site
                                 if (prefix != "")
                                     properties.AfterProperties["SharePointAccount"] = addUser(properties, newusernameclean, properties.AfterProperties["Title"].ToString(), newemail.ToString(), prefix);
                                 else
@@ -491,6 +492,7 @@ namespace EPMLiveCore
 
                                 bIsNewUser = true;
                                 location = "1008";
+                                //ONLY setups the new email but doesnt send it as of now
                                 cmd = new SqlCommand("INSERT INTO NEWACCOUNTEMAIL (username) VALUES (@username)", cn);
                                 cmd.CommandType = CommandType.Text;
                                 cmd.Parameters.AddWithValue("@username", newusername);
@@ -512,6 +514,7 @@ namespace EPMLiveCore
                             newusernameclean = founduser;
                             location = "1012";
 
+                            //Add user to the site (NO AD add here, user already exists in AD)
                             if (prefix != "")
                                 properties.AfterProperties["SharePointAccount"] = addUser(properties, founduser, properties.AfterProperties["Title"].ToString(), newemail, prefix);
                             else
@@ -549,6 +552,7 @@ namespace EPMLiveCore
                         if (dr.GetInt32(0) == 1)
                         {
                             bIsApproved = true;
+                            //Check if the user already exists with some other Site, set approved to true
                             properties.AfterProperties["Approved"] = "1";
                         }
                     }
@@ -570,6 +574,7 @@ namespace EPMLiveCore
                     //EPML-5040: SCENARIO-2: ADD Existing AD User to site
                     else//Assume we are adding user to account
                     {
+                        //SYSTEM ACCOUNT: 1073741823
                         if (oCurUser.IsSiteAdmin || disablerequests || properties.CurrentUserId == 1073741823)//if not in account and user is admin
                         {
                             location = "1022";
@@ -631,6 +636,7 @@ namespace EPMLiveCore
 
                                 if (ActivationType == 3)
                                 {
+                                    //If not current site admin, then send email to Site Admin about new user added
                                     if (!oCurUser.IsSiteAdmin)
                                         sendRequestEmail(thisClass, properties, oCurUser.Name);
                                 }
@@ -648,6 +654,7 @@ namespace EPMLiveCore
                                     location = "1034";
                                     if (EPMLiveCore.CoreFunctions.GetRealUserName(sCurUsername, properties.Web.Site).ToLower() != ownerusername.ToLower())
                                     {
+                                        //Sending email about out of license
                                         sendOwnerEmail(thisClass, properties, oCurUser.Name);
                                     }
                                     else
