@@ -37,13 +37,14 @@
             }, true);
 
             //EPML-5445
+            //Looks like this control is NOT used
             $(function () {
                 var supportintegration = '<%= SupportIntegration %>';
                 if (supportintegration.toLowerCase() == 'true') {
                     var zendesk = document.createElement('script');
                     zendesk.type = 'text/javascript';
                     zendesk.async = true;
-                    zendesk.src = "../../_layouts/15/epmlive/javascripts/libraries/Zendesk.js";
+                    zendesk.src = "../../_layouts/15/epmlive/javascripts/libraries/EPMLiveFooter.js";
                     var s = document.getElementsByTagName('script')[0];
                     s.parentNode.insertBefore(zendesk, s);
                 }
