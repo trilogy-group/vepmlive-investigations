@@ -30,22 +30,17 @@
             $(function () {
                 var supportIntegration = '<%= SupportIntegration %>';
                 if (supportIntegration.toLowerCase() == 'true') {
-                    var zendesk = document.createElement('script');
-                    zendesk.type = 'text/javascript';
-                    zendesk.async = true;
-                    zendesk.src = "../../_layouts/15/epmlive/javascripts/libraries/zendesk.js";
-                    var s = document.getElementsByTagName('script')[0];
-                    s.parentNode.insertBefore(zendesk, s);
-                    
-                    $("zendesk-container").click(function () {
-                        if ($('#helpCenterForm').css('left') == '-9999px') {
-                        zE.activate({ hideOnClose: true });
-                        $("#helpCenterForm").css("left", ($(this).top + 10) + 'px');
-                        $("#helpCenterForm").css("top", ($(this).position.top) + 'px');
-                        }
-                        else {
-                            zE.hide();
-                        }
+                    $.getScript("../../_layouts/15/epmlive/javascripts/libraries/zendesk.min.js", function(){
+                        $("zendesk-container").click(function () {
+                            if ($('#helpCenterForm').css('left') == '-9999px') {
+                                zE.activate({ hideOnClose: true });
+                                $("#helpCenterForm").css("left", ($(this).top + 10) + 'px');
+                                $("#helpCenterForm").css("top", ($(this).position.top) + 'px');
+                            }
+                            else {
+                                zE.hide();
+                            }
+                        });
                     });
                 }
                 else
