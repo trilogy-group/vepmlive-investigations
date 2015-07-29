@@ -48,6 +48,10 @@
                         }
                     });
                 }
+                else
+                {
+                     $("zendesk-container").find("a").attr("href", "https://support.epmlive.com")
+                }
             });
             //EPML-5445
 
