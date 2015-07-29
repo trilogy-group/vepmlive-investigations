@@ -1463,14 +1463,32 @@ function GEInit() {
         }
 
         // fires before form save
+        //this method is required when lookup field is enable in any list to check all special character
+        function IsTitleValid() {
+            var tags = document.getElementsByTagName('input');
+            for (var i = 0; i < tags.length; i++) {
+                var tagIdStr = tags[i].id;
+                if (tagIdStr.indexOf("Title_") == 0 && tagIdStr.lastIndexOf("_$TextField" == tagIdStr.length - "_$TextField".length)) {
+                    var col = tags[i];
+                    if (col != null && col.value != null && col.value != "") {
+                        var title = col.value.replace(/[^a-zA-Z0-9 ]/g, "");
+                        if (title.length == 0) {
+                            alert("Atleast one Alpha-numeric character is required at " + col.title);
+                            return false;
+                        }
+                    }
+                }
+            }
+            return true;
+        }
+
         window.PreSaveAction = function () {
             var multiOk = PostDataBackToMultiSelectLookup();
             var updateOk = UpdateAllSingleSelectValsBeforeSafe();
             var singleOk = PostDataBackToSingleSelectLookup();
-
             CleanPeopleEditorVals();
-
-            if (multiOk && updateOk && singleOk) {
+            var titleOk = IsTitleValid();
+            if (multiOk && updateOk && singleOk && titleOk) {
                 return true;
             } else {
                 return false;

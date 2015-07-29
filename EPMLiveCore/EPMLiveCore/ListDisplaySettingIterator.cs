@@ -981,12 +981,12 @@ namespace EPMLiveCore
                                 writer.WriteLine("try{document.getElementById(defaultLicenseTypeId).checked = true;}catch(e){}");
                                 try
                                 {
-                                    writer.WriteLine("      try{document.getElementById('" + dControls["FirstName"] + "').parentNode.parentNode.parentNode.style.display='';}catch(e){}");
+                                    writer.WriteLine("      try{document.getElementById('" + dControls["FirstName"] + "').parentNode.parentNode.parentNode.style.display='';document.getElementById('" + dControls["FirstName"] + "').onblur = function() { checkSpecialCharacters('First Name',document.getElementById('" + dControls["FirstName"] + "')); }}catch(e){}");
                                 }
                                 catch { }
                                 try
                                 {
-                                    writer.WriteLine("      try{document.getElementById('" + dControls["LastName"] + "').parentNode.parentNode.parentNode.style.display='';}catch(e){}");
+                                    writer.WriteLine("      try{document.getElementById('" + dControls["LastName"] + "').parentNode.parentNode.parentNode.style.display='';document.getElementById('" + dControls["LastName"] + "').onblur = function() { checkSpecialCharacters('Last Name',document.getElementById('" + dControls["LastName"] + "')); }}catch(e){}");
                                 }
                                 catch { }
                                 try
@@ -1035,6 +1035,25 @@ namespace EPMLiveCore
                                 }
                                 writer.WriteLine("  }");
                             }
+                            //to check validtion for special character at the time of edit resources
+                            else if ((dControls.ContainsKey("FirstName") || dControls.ContainsKey("LastName")))
+                            {
+                                try
+                                {
+                                    writer.WriteLine("      try{document.getElementById('" + dControls["FirstName"] + "').parentNode.parentNode.parentNode.style.display='';document.getElementById('" + dControls["FirstName"] + "').onblur = function() { checkSpecialCharacters('First Name',document.getElementById('" + dControls["FirstName"] + "')); }}catch(e){}");
+                                    writer.WriteLine("      try{document.getElementById('" + dControls["LastName"] + "').parentNode.parentNode.parentNode.style.display='';document.getElementById('" + dControls["LastName"] + "').onblur = function() { checkSpecialCharacters('Last Name',document.getElementById('" + dControls["LastName"] + "')); }}catch(e){}");
+                                }
+                                catch { }
+                            }
+                            else if (dControls.ContainsKey("Title"))
+                            {
+                                try
+                                {
+                                    writer.WriteLine("      try{document.getElementById('" + dControls["Title"] + "').parentNode.parentNode.parentNode.style.display='';document.getElementById('" + dControls["Title"] + "').onblur = function() { checkSpecialCharacters('Display Name',document.getElementById('" + dControls["Title"] + "')); }}catch(e){}");
+                                }
+                                catch { }
+                            }
+
                         }
                         catch { }
                         writer.WriteLine("}");
@@ -1084,6 +1103,29 @@ namespace EPMLiveCore
 
                     }
                     catch { }
+                }
+                else
+                {
+                    //this method is required when lookup field is disable in any list for all special character
+                    writer.WriteLine("<script language=\"javascript\">");
+                    writer.WriteLine("function PreSaveAction(){");
+                    writer.WriteLine("var tags = document.getElementsByTagName('input');");
+                    writer.WriteLine("for (var i = 0; i < tags.length; i++) {");
+                    writer.WriteLine("var tagIdStr = tags[i].id;");
+                    writer.WriteLine(" if (tagIdStr.indexOf(\"Title_\") == 0 && tagIdStr.lastIndexOf(\"_$TextField\" == tagIdStr.length - \"_$TextField\".length)) {");
+                    writer.WriteLine("var col = tags[i];");
+                    writer.WriteLine("if (col != null && col.value != null && col.value != \"\") {");
+                    writer.WriteLine("var title = col.value.replace(/[^a-zA-Z0-9 ]/g, \"\");");
+                    writer.WriteLine(" if (title.length == 0) {");
+                    writer.WriteLine("alert(\"Atleast one Alpha-numeric character is required at \" + col.title);");
+                    writer.WriteLine(" return false;");
+                    writer.WriteLine("}");
+                    writer.WriteLine(" }");
+                    writer.WriteLine("}");
+                    writer.WriteLine("}");
+                    writer.WriteLine(" return true;");
+                    writer.WriteLine("  }");
+                    writer.WriteLine("</script>");
                 }
 
                 #endregion
