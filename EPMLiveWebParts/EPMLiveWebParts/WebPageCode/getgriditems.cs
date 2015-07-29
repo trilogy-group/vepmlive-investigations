@@ -5685,6 +5685,11 @@ namespace EPMLiveWebParts
             catch { }
 
             Dictionary<string, Dictionary<string, string>> fieldProperties = null;
+            try
+            {
+                GridViewSession gvs = new GridViewSession(Guid.Empty);
+            }
+            catch { }
             GridGanttSettings gSettings = new GridGanttSettings(list);
             if (gSettings.DisplaySettings != "")
                 fieldProperties = ListDisplayUtils.ConvertFromString(gSettings.DisplaySettings);
