@@ -30,22 +30,25 @@
             $(function () {
                 var supportIntegration = '<%= SupportIntegration %>';
                 if (supportIntegration.toLowerCase() == 'true') {
-                    $.getScript("../../_layouts/15/epmlive/javascripts/libraries/zendesk.min.js", function(){
-                        $("zendesk-container").click(function () {
-                            if ($('#helpCenterForm').css('left') == '-9999px') {
+                    $.getScript("<%= WebUrl %>/_layouts/15/epmlive/javascripts/libraries/zendesk.min.js", function(){
+                        var helpPosition = $("#zendesk-container").position();
+			
+			$("#zendesk-container").click(function (e) {
+                            if ($('#helpCenterForm').css('top') == '-9999px') {
                                 zE.activate({ hideOnClose: true });
-                                $("#helpCenterForm").css("left", ($(this).top + 10) + 'px');
-                                $("#helpCenterForm").css("top", ($(this).position.top) + 'px');
+				$("#helpCenterForm").css("top", (helpPosition.top) + 'px');
+				e.stopPropagation();
                             }
                             else {
                                 zE.hide();
                             }
+			return false;
                         });
                     });
                 }
                 else
                 {
-                     $("zendesk-container").find("a").attr("href", "https://support.epmlive.com")
+                     $("#zendesk-container").find("a").attr("href", "https://support.epmlive.com")
                 }
             });
             //EPML-5445
