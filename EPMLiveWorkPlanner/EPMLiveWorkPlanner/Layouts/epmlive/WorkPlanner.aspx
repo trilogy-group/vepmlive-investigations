@@ -1554,7 +1554,23 @@
         ResizeGantt(Grids.WorkPlannerGrid, Grids.AllocationGrid);
     }
     
-
+    Grids.OnReady = function()
+    {
+        try{
+            // Only if workplanner grid is reloaded
+            if (isWorkPlannerGridReloaded) {
+                var workPlannerGrid = Grids.WorkPlannerGrid;
+                if (bAgile) {
+                    Grids.AgileGrid.ShowCol("id");
+                    HideBacklogRows(workPlannerGrid, workPlannerGrid.GetRowById("BacklogRow"));
+                    workPlannerGrid.HideRow(workPlannerGrid.GetRowById("BacklogRow"));
+                }
+                workPlannerGrid.SetAttribute(workPlannerGrid.GetRowById("0"), "Title", "HtmlPrefix", "", 1, 0)
+                isWorkPlannerGridReloaded = "false";
+            }
+        }
+        catch(e){}
+    }
 
     var viewNameDiv = document.getElementById("viewNameDiv");
     var addResourceDiv = document.getElementById("addResourceDiv");

@@ -526,7 +526,7 @@ namespace EPMLiveWorkPlanner
                 }
 
                 PlannerProps props = getSettings(oWeb, sPlanner);
-                
+
                 SPList oProjectList = oWeb.Lists.TryGetList(props.sListProjectCenter);
 
                 DataSet dsResources = GetResourceTable(props, oProjectList.ID, sID, oWeb);
@@ -1636,25 +1636,29 @@ namespace EPMLiveWorkPlanner
                     foreach (XmlNode ndTask in doc.SelectNodes("//I"))
                     {
                         string id = getAttribute(ndTask, "id");
-                        DataRow[] drTask = dtTasks.Select("taskuid='" + id + "'");
-                        if (drTask.Length > 0)
-                        {
-                            XmlAttribute attr = doc.CreateAttribute("CommentCount");
-                            try
-                            {
-                                attr.Value = drTask[0]["CommentCount"].ToString();
-                            }
-                            catch { }
-                            ndTask.Attributes.Append(attr);
 
-                            attr = doc.CreateAttribute("Attachments");
-                            try
+                        if (dtTasks != null)
+                        {
+                            DataRow[] drTask = dtTasks.Select("taskuid='" + id + "'");
+                            if (drTask.Length > 0)
                             {
-                                if (drTask[0]["Attachments"].ToString() == "1")
-                                    attr.Value = "True";
+                                XmlAttribute attr = doc.CreateAttribute("CommentCount");
+                                try
+                                {
+                                    attr.Value = drTask[0]["CommentCount"].ToString();
+                                }
+                                catch { }
+                                ndTask.Attributes.Append(attr);
+
+                                attr = doc.CreateAttribute("Attachments");
+                                try
+                                {
+                                    if (drTask[0]["Attachments"].ToString() == "1")
+                                        attr.Value = "True";
+                                }
+                                catch { }
+                                ndTask.Attributes.Append(attr);
                             }
-                            catch { }
-                            ndTask.Attributes.Append(attr);
                         }
 
                         try
@@ -1673,6 +1677,79 @@ namespace EPMLiveWorkPlanner
             return doc.OuterXml;
         }
 
+        private static bool ModifyWorkPlannerGridBasedOnTeam(XmlDocument doc, DataTable dtTeamMembers)
+        {
+            bool saveWorkPlan = true;
+            if (dtTeamMembers != null)
+            {
+                foreach (XmlNode ndTask in doc.SelectNodes("//I"))
+                {
+                    try
+                    {
+                        string id = getAttribute(ndTask, "id");
+                        string sAssignedTo = getAttribute(ndTask, "AssignedTo");
+                        string sResourceNames = getAttribute(ndTask, "ResourceNames");
+                        string[] arrassignedto = sAssignedTo.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+                        string[] arrresourcenames = sResourceNames.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+                        string sNewArrAssinedTo = "";
+                        string sNewArrResourceNames = "";
+
+                        if (!string.IsNullOrEmpty(id) && id != "0" && dtTeamMembers.Rows.Count > 0)
+                        {
+                            string expr = "ID = {0}";
+                            if (arrassignedto.Length == 1)
+                            {
+                                DataRow[] rows = dtTeamMembers.Select(string.Format(expr, sAssignedTo));
+
+                                if (rows == null || rows.Length == 0)
+                                {                                    
+                                    if (SetValidAssignedTo(ndTask, string.Empty, string.Empty))
+                                    {
+                                        saveWorkPlan = false;
+                                    }
+                                }
+                            }
+                            else if (arrassignedto.Length > 1)
+                            {
+                                foreach (string assto in arrassignedto)
+                                {
+                                    DataRow[] rows = dtTeamMembers.Select(string.Format(expr, assto));
+                                    if (rows != null && rows.Length > 0)
+                                    {
+                                        sNewArrAssinedTo += assto + ";";
+                                        sNewArrResourceNames += rows[0]["Title"].ToString() + ";";
+                                    }
+                                }
+                                sNewArrAssinedTo = sNewArrAssinedTo.TrimEnd(';');
+                                sNewArrResourceNames = sNewArrResourceNames.TrimEnd(';');
+
+                                SetValidAssignedTo(ndTask, sNewArrAssinedTo, sNewArrResourceNames);
+                            }
+                        }
+                    }
+                    catch
+                    { }
+                }
+            }
+            else
+            {
+                // In case of project team does not exist
+                foreach (XmlNode ndTask in doc.SelectNodes("//I"))
+                {
+                    try
+                    {
+                        if (SetValidAssignedTo(ndTask, string.Empty, string.Empty))
+                        {
+                            saveWorkPlan = false;
+                        }
+                    }
+                    catch 
+                    { }
+                }
+            }
+            return saveWorkPlan;
+        }
+
         public static string GetTasks(XmlDocument data, SPWeb oWeb)
         {
 
@@ -1682,6 +1759,9 @@ namespace EPMLiveWorkPlanner
 
             doc.LoadXml("<Grid><Body><B><I Def='Folder' Title='All Folders' id='0' Detail='WorkPlannerGrid'/></B></Body></Grid>");
 
+
+            SPList oProjectCenter = oWeb.Lists[p.sListProjectCenter];
+            DataSet dsResources = GetResourceTable(p, oProjectCenter.ID, data.FirstChild.Attributes["ID"].Value, oWeb);
 
             try
             {
@@ -1695,15 +1775,13 @@ namespace EPMLiveWorkPlanner
 
             if (p.bAgile)
             {
-                SPList oProjectCenter = oWeb.Lists[p.sListProjectCenter];
-
-                DataSet dsResources = GetResourceTable(p, oProjectCenter.ID, data.FirstChild.Attributes["ID"].Value, oWeb);
-
                 string xml = AppendNewAgileTasks(oWeb, p, doc, data.FirstChild.Attributes["ID"].Value, dsResources);
 
                 XmlDocument docNew = new XmlDocument();
                 docNew.LoadXml(xml);
 
+                bool saveWorkPlan = ModifyWorkPlannerGridBasedOnTeam(docNew, dsResources.Tables["Member"]);
+                xml = docNew.OuterXml;
 
                 XmlAttribute attr = docNew.CreateAttribute("Planner");
                 attr.Value = data.FirstChild.Attributes["Planner"].Value;
@@ -1712,8 +1790,11 @@ namespace EPMLiveWorkPlanner
                 attr = docNew.CreateAttribute("ID");
                 attr.Value = data.FirstChild.Attributes["ID"].Value;
                 docNew.FirstChild.Attributes.Append(attr);
-
-                SaveWorkPlan(docNew, oWeb);
+                // Save work plan if Assigned To field is not blank.
+                if (saveWorkPlan)
+                {
+                    SaveWorkPlan(docNew, oWeb); 
+                }
 
                 return xml;
             }
@@ -1723,6 +1804,8 @@ namespace EPMLiveWorkPlanner
                 int lastid = 0;
 
                 ProcessTaskXmlFromTaskCenter(doc, p, oWeb, data.FirstChild.Attributes["ID"].Value, out lastid);
+
+                ModifyWorkPlannerGridBasedOnTeam(doc, dsResources.Tables["Member"]);
 
                 SPSecurity.RunWithElevatedPrivileges(delegate()
                 {
@@ -1741,11 +1824,8 @@ namespace EPMLiveWorkPlanner
                     {
                         string taskupdates = "";
 
-                        SPList oProjectCenter = oWeb.Lists.TryGetList(p.sListProjectCenter);
                         SPList oListTaskCenter = oWeb.Lists.TryGetList(p.sListTaskCenter);
-
-                        DataSet dsResources = GetResourceTable(p, oProjectCenter.ID, data.FirstChild.Attributes["ID"].Value, oWeb);
-
+                        
                         if (oListTaskCenter != null)
                         {
                             foreach (DataRow dr in ds.Tables[0].Rows)
@@ -2188,6 +2268,29 @@ namespace EPMLiveWorkPlanner
             }
             catch { }
             return "";
+        }
+
+        private static bool SetValidAssignedTo(XmlNode ndTask, string assignedTo, string resNames)
+        {
+            bool setAttribute = false;
+            try
+            {
+                if (ndTask.Attributes["AssignedTo"] != null)
+                {
+                    ndTask.Attributes["AssignedTo"].Value = assignedTo;
+                    setAttribute = true;
+                }
+                if (ndTask.Attributes["ResourceNames"] != null)
+                {
+                    ndTask.Attributes["ResourceNames"].Value = resNames;
+                    setAttribute = true;
+                }
+            }
+            catch
+            {
+                setAttribute = false;
+            }
+            return setAttribute;
         }
 
         private static void PublishProcessTasks(XmlNode ndFolder, string parentfolderpath, ref XmlDocument data, SPList oTaskCenter, DataSet dsResources, string iteration, PlannerProps props)
@@ -4013,7 +4116,7 @@ namespace EPMLiveWorkPlanner
                             break;
                     }
 
-                    attr = docOut.CreateAttribute("VCanEdit");                    
+                    attr = docOut.CreateAttribute("VCanEdit");
                     attr.Value = canEdit;
                     ndNew.Attributes.Append(attr);
 
@@ -4439,7 +4542,7 @@ namespace EPMLiveWorkPlanner
                                 sbEnum.Append("|");
                                 sbEnum.Append(dr["Title"].ToString());
                                 sbEnumKeys.Append("|");
-                                sbEnumKeys.Append(dr["ID"].ToString());
+                                sbEnumKeys.Append(dr["ID"].ToString());                                
                             }
 
                             attr = docOut.CreateAttribute(enumattr + "Enum");
@@ -4928,7 +5031,7 @@ namespace EPMLiveWorkPlanner
             attr = docOut.CreateAttribute("CanEdit");
             attr.Value = oCanEdit;
             ndNew.Attributes.Append(attr);
-            
+
             attr = docOut.CreateAttribute("Width");
             attr.Value = sWidth;
             ndNew.Attributes.Append(attr);
@@ -5817,13 +5920,13 @@ namespace EPMLiveWorkPlanner
 
                         //Insert/Update Record to FRF list...
                         SPSecurity.RunWithElevatedPrivileges(delegate()
-                                    {
-                                        using (SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(web.Site.WebApplication.Id)))
-                                        {
-                                            cn.Open();
+                        {
+                            using (SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(web.Site.WebApplication.Id)))
+                            {
+                                cn.Open();
 
-                                            //Replace userId and Type fields after words...
-                                            string frfInsertUpdate = @"IF NOT EXISTS (SELECT 1 FROM FRF WHERE [SITE_ID]=@siteId AND [WEB_ID]=@webId AND [LIST_ID]=@listId AND [ITEM_ID]=@itemId AND [USER_ID]=@userId AND [Type]=@type)
+                                //Replace userId and Type fields after words...
+                                string frfInsertUpdate = @"IF NOT EXISTS (SELECT 1 FROM FRF WHERE [SITE_ID]=@siteId AND [WEB_ID]=@webId AND [LIST_ID]=@listId AND [ITEM_ID]=@itemId AND [USER_ID]=@userId AND [Type]=@type)
                                                                     BEGIN
 	                                                                    INSERT INTO FRF ([SITE_ID],[WEB_ID],[LIST_ID],[ITEM_ID],[USER_ID],[Title],[Icon],[Type],[F_String],[F_Date],[F_Int])
                                                                                 VALUES (@siteId, @webId, @listId, @itemId, @userId, @title, @icon, @type, @fString, @fDate, @dataIndexOfItem)
@@ -5840,24 +5943,24 @@ namespace EPMLiveWorkPlanner
                                                                         WHERE [SITE_ID]=@siteId AND [WEB_ID]=@webId AND [LIST_ID]=@listId AND [ITEM_ID]=@itemId AND [USER_ID]=@userId AND [Type]=@type 
                                                                     END";
 
-                                            SqlCommand cmd = new SqlCommand(frfInsertUpdate, cn);
-                                            cmd.Parameters.AddWithValue("@siteId", siteId);
-                                            cmd.Parameters.AddWithValue("@webId", webId);
-                                            cmd.Parameters.AddWithValue("@listId", listId);
-                                            cmd.Parameters.AddWithValue("@itemId", item.ID);
-                                            cmd.Parameters.AddWithValue("@userId", USER_ID);
-                                            cmd.Parameters.AddWithValue("@title", item.Title);
-                                            cmd.Parameters.AddWithValue("@icon", icon);
-                                            cmd.Parameters.AddWithValue("@type", TYPE);
-                                            cmd.Parameters.AddWithValue("@fString", fString);
-                                            cmd.Parameters.AddWithValue("@fDate", fDate);
-                                            cmd.Parameters.AddWithValue("@dataIndexOfItem", dataIndexOfItem);
-                                            cmd.Parameters.AddWithValue("@fInt", fInt);
+                                SqlCommand cmd = new SqlCommand(frfInsertUpdate, cn);
+                                cmd.Parameters.AddWithValue("@siteId", siteId);
+                                cmd.Parameters.AddWithValue("@webId", webId);
+                                cmd.Parameters.AddWithValue("@listId", listId);
+                                cmd.Parameters.AddWithValue("@itemId", item.ID);
+                                cmd.Parameters.AddWithValue("@userId", USER_ID);
+                                cmd.Parameters.AddWithValue("@title", item.Title);
+                                cmd.Parameters.AddWithValue("@icon", icon);
+                                cmd.Parameters.AddWithValue("@type", TYPE);
+                                cmd.Parameters.AddWithValue("@fString", fString);
+                                cmd.Parameters.AddWithValue("@fDate", fDate);
+                                cmd.Parameters.AddWithValue("@dataIndexOfItem", dataIndexOfItem);
+                                cmd.Parameters.AddWithValue("@fInt", fInt);
 
-                                            cmd.ExecuteNonQuery();
-                                        }
+                                cmd.ExecuteNonQuery();
+                            }
 
-                                    });
+                        });
 
                     }
 

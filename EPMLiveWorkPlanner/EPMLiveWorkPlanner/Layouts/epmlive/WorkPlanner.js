@@ -15,6 +15,7 @@ var taskorder;
 var hasUpdates = false;
 var curTempDate;
 
+var isWorkPlannerGridReloaded = false;
 var bAgile = false;
 var folderCell = "a";
 var plannerCell = "b";
@@ -264,7 +265,7 @@ function RollupSummaryField(Col) {
                     if (newCol == "DueDate")
                         newCol = "Finish";
 
-                    Grids.ProjectInfo.SetValue(Grids.ProjectInfo.GetRowById(newCol), "V", Grids.WorkPlannerGrid.GetValue(Grids.WorkPlannerGrid.GetRowById("0"), Col), 1);                    
+                    Grids.ProjectInfo.SetValue(Grids.ProjectInfo.GetRowById(newCol), "V", Grids.WorkPlannerGrid.GetValue(Grids.WorkPlannerGrid.GetRowById("0"), Col), 1);
                 } catch (e) { }
             }
         }
@@ -800,8 +801,12 @@ function SaveProject() {
 
 function SaveWorkPlan() {
     var bVal = AlertBlankTitle()
-    if (bVal == false) {
-        alert('The plan cannot be saved with blank task Title values (red cells). Please either delete these tasks or enter a title.');
+    if (bVal == 1) {
+        alert('The plan cannot be saved with blank task AssignedTo values (red cells). Please either delete these tasks or enter a title.');
+        return;
+    }
+    else if (bVal == 2) {
+        alert('AssignedTo values cannot be blank. Please add user that is removed or remove the task.');
         return;
     }
     if (sUpdates != "") {
@@ -3014,7 +3019,17 @@ function GetCssClass(grid, row, col, classname) {
                 return "erroroncell";
             }
         }
+
+        if (row.Def.Name == "Assignment" && row.Def.Name != "Header") {
+            if (col == "AssignedTo") {
+                var val1 = grid.GetValue(row, col);
+                val1 = val1.toString().trim();
+                if (val1 == "") {
+                    return "erroroncell";
+                }
+            }
     }
+}
 }
 
 function GetToolTip(grid, row, col, tip, clientx, clienty, x, y) {
@@ -3026,12 +3041,21 @@ function GetToolTip(grid, row, col, tip, clientx, clienty, x, y) {
                 return "Title values cannot be blank";
             }
         }
+        if (row.Def.Name == "Assignment" && row.Def.Name != "Header") {
+            if (col == "AssignedTo") {
+                var val1 = grid.GetValue(row, col);
+                val1 = val1.toString().trim();
+                if (val1 == "") {
+                    return "AssignedTo values cannot be blank. Please add user that is removed or remove the task.";
+                }
+            }
     }
+}
 }
 
 function AlertBlankTitle() {
     var grid = Grids.WorkPlannerGrid;
-    var bVal_Task = true;
+    var bVal_Task = 0;
     if (grid.id == "WorkPlannerGrid") {
         for (var R in grid.Rows) {
             var row = grid.GetRowById(R);
@@ -3039,15 +3063,22 @@ function AlertBlankTitle() {
                 var val1 = grid.GetValue(row, "Title");
                 val1 = val1.toString().trim();
                 if (val1 === "") {
-                    bVal_Task = false;
+                    bVal_Task = 1;
+                    break;
+                }
+            }
+
+            if (row.Def.Name == "Assignment" && row.Def.Name != "Header") {
+                var val1 = grid.GetValue(row, "AssignedTo");
+                val1 = val1.toString().trim();
+                if (val1 === "") {
+                    bVal_Task = 2;
                     break;
                 }
             }
         }
-        if (bVal_Task == true)
-            return true;
-        else
-            return false;
+
+        return bVal_Task;
     }
 
 }
@@ -3392,7 +3423,7 @@ function BuildTeam() {
         alert("The team cannot be edited because the security queue job has not completed. This should be completed in less than a minute or so - please try again.");
     }
     else {
-        var options = { url: "buildteam.aspx?listid=" + sProjectListId + "&id=" + sItemID, title: "Build Team", showMaximized: true, dialogReturnValueCallback: RefreshTeam };
+        var options = { url: "buildteam.aspx?listid=" + sProjectListId + "&id=" + sItemID, title: "Build Team", showMaximized: true, dialogReturnValueCallback: ReloadWorkPlannerGrid };
 
         //var options = { url: "buildteam.aspx?useteam=" + bUseTeam + "&listid=" + sProjectListId + "&id=" + sItemID + "&nosave=true&currentteam=1", title: "Build Team", showMaximized: true, dialogReturnValueCallback: RefreshTeam };
 
@@ -3480,6 +3511,13 @@ function RefreshTeam(dialogResult, returnValue) {
     dhtmlxAjax.post("WorkPlannerAction.aspx", "Action=GetTeam&PlannerID=" + sPlannerID + "&itemid=" + sItemID + "&listid=" + sProjectListId, RefreshTeamClose);
 }
 
+function ReloadWorkPlannerGrid()
+{
+    var grid = Grids.WorkPlannerGrid;
+    Grids.WorkPlannerGrid = grid.Reload();
+    isWorkPlannerGridReloaded = true;
+}
+
 function ApplyDefaults(grid, row, isMilestone, isSummary, isFromProcessUpdates) {
 
     if (grid && row) {
@@ -3519,7 +3557,7 @@ function RefreshTeamClose(loader) {
         else {
             oResourceList = eval("({" + loader.xmlDoc.responseText.trim() + "})");
 
-            RefreshResourceObject();
+            RefreshResourceObject();            
         }
     }
 }
@@ -4366,7 +4404,7 @@ function SetProjectStartDate(idate) {
 function CheckProjectStart() {
 
     var grid = Grids.ProjectInfo;
-    
+
     if (grid.GetValue(grid.GetRowById("Start"), "V") == "") {
         SetProjectStartDate(new Date().toDateString());
     }
