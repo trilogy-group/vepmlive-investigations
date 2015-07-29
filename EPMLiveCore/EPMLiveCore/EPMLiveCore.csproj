@@ -1763,6 +1763,9 @@ net start "WETimer"</PostDeploymentCommand>
     <None Include="Layouts\epmlive\javascripts\EPMLive.Upgrader.min.js.map" />
     <None Include="Layouts\epmlive\javascripts\icomoon-ie7.min.js.map" />
     <None Include="Layouts\epmlive\javascripts\libraries\bindWithDelay.min.js.map" />
+    <None Include="Layouts\epmlive\javascripts\libraries\EPMLiveFooter.min.js.map">
+      <DependentUpon>EPMLiveFooter.min.js</DependentUpon>
+    </None>
     <None Include="Layouts\epmlive\javascripts\libraries\jquery.cookie.min.js.map" />
     <None Include="Layouts\epmlive\javascripts\masterpages\uplandv5.master.js.bundle" />
     <None Include="Layouts\epmlive\javascripts\masterpages\uplandv5.master.min.js.map" />
@@ -3532,6 +3535,9 @@ net start "WETimer"</PostDeploymentCommand>
     <Content Include="Layouts\epmlive\javascripts\icomoon-ie7.min.js" />
     <Content Include="Layouts\epmlive\javascripts\libraries\bindWithDelay.js" />
     <Content Include="Layouts\epmlive\javascripts\libraries\bindWithDelay.min.js" />
+    <Content Include="Layouts\epmlive\javascripts\libraries\EPMLiveFooter.min.js">
+      <DependentUpon>EPMLiveFooter.js</DependentUpon>
+    </Content>
     <Content Include="Layouts\epmlive\javascripts\libraries\jquery-ui.min.js" />
     <Content Include="Layouts\epmlive\javascripts\libraries\jquery.cookie.js" />
     <Content Include="Layouts\epmlive\javascripts\libraries\jquery.cookie.min.js" />
