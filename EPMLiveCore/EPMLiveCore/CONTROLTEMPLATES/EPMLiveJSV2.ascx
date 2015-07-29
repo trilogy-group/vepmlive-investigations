@@ -36,6 +36,17 @@
                     zendesk.src = "../../_layouts/15/epmlive/javascripts/libraries/EPMLiveFooter.js";
                     var s = document.getElementsByTagName('script')[0];
                     s.parentNode.insertBefore(zendesk, s);
+                    
+                    $("zendesk-container").click(function () {
+                        if ($('#helpCenterForm').css('left') == '-9999px') {
+                        zE.activate({ hideOnClose: true });
+                        $("#helpCenterForm").css("left", ($(this).top + 10) + 'px');
+                        $("#helpCenterForm").css("top", ($(this).position.top) + 'px');
+                        }
+                        else {
+                            zE.hide();
+                        }
+                    });
                 }
             });
             //EPML-5445
