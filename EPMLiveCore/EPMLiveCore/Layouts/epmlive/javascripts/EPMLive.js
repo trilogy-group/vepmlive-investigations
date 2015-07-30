@@ -1018,6 +1018,7 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
                     }
                     //EPML-5286 - show above selected value into rest of ddl
                     $('.grouping-wrapper').children('.grouping-row').each(function () {
+                        $('.grouping-select select').not(this).children('option[value=' + val + ']').prop('disabled', false);
                         $('.grouping-select select').not(this).children('option[value=' + val + ']').show();
                     });
                     //--
@@ -1125,6 +1126,7 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
 
                         //EPML-5286 - show above selected value into rest of ddl
                         $('.grouping-wrapper').children('.grouping-row').each(function () {
+                            $('.grouping-select select').not(this).children('option[value=' + val + ']').prop('disabled', false);
                             $('.grouping-select select').not(this).children('option[value=' + val + ']').show();
                         });
                         //----
@@ -1207,9 +1209,11 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
                         }
                     })
                     if (toShow) {
+                        $(this).prop('disabled', false);
                         $(this).show();
                     }
                 });
+                $('.grouping-select select').not(this).children('option[value=' + this.value + ']').prop('disabled', true);
                 $('.grouping-select select').not(this).children('option[value=' + this.value + ']').hide();
             });
         }
@@ -1236,9 +1240,11 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
                         }
                     })
                     if (toShow) {
+                        $(this).prop('disabled', false);
                         $(this).show();
                     }
                 });
+                $('.grouping-select select').not(this).children('option[value=' + arr_keyvalue[j].value + ']').prop('disabled', true);
                 $('.grouping-select select').not(this).children('option[value=' + arr_keyvalue[j].value + ']').hide();
             }
         }
