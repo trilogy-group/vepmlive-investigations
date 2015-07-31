@@ -27,6 +27,7 @@ namespace EPMLiveCore
 
         protected TextBox txtThreads;
         protected TextBox txtInterval;
+        protected TextBox txtSecurityThreads;
 
         protected WebApplicationSelector WebApplicationSelector1;
 
@@ -53,6 +54,7 @@ namespace EPMLiveCore
             {
                 txtInterval.Text = CoreFunctions.getFarmSetting("PollingInterval");
                 txtThreads.Text = CoreFunctions.getFarmSetting("QueueThreads");
+                txtSecurityThreads.Text = CoreFunctions.getFarmSetting("SecQueueThreads");
             }
         }
 
@@ -123,6 +125,7 @@ namespace EPMLiveCore
         {
             CoreFunctions.setFarmSetting("PollingInterval", txtInterval.Text);
             CoreFunctions.setFarmSetting("QueueThreads", txtThreads.Text);
+            CoreFunctions.setFarmSetting("SecQueueThreads", txtSecurityThreads.Text);
         }
 
         protected string showtime(int seconds)

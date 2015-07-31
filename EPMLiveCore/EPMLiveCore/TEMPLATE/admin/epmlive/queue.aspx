@@ -58,6 +58,21 @@
     </Template_InputFormControls>
 </wssuc:InputFormSection>
 
+<wssuc:InputFormSection Title="Security Thread Count"
+    Description=""
+    runat="server">
+    <Template_Description>
+        This specifies the number of concurrent security threads the queueing system will run.
+    </Template_Description>
+    <Template_InputFormControls>
+        <wssuc:InputFormControl LabelText="Security Threads" runat="server">
+             <Template_Control>
+                <asp:TextBox ID="txtSecurityThreads" runat="server" ></asp:TextBox>
+             </Template_Control>
+        </wssuc:InputFormControl>
+    </Template_InputFormControls>
+</wssuc:InputFormSection>
+
 <wssuc:ButtonSection runat="server">
     <Template_Buttons>
         <asp:PlaceHolder ID="PlaceHolder1" runat="server">
