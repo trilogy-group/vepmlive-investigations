@@ -46,11 +46,14 @@ namespace EPMLiveReportsAdmin
         public override void FieldAdding(SPListEventProperties properties)
         {
             _stCurrentContext = currentContext;
-            if (properties.FieldName.ToLower().EndsWith("id") || properties.FieldName.ToLower().EndsWith("text"))
+            if (!properties.Field.Hidden)
             {
-                properties.Status = SPEventReceiverStatus.CancelWithError;
-                properties.ErrorMessage = "Field ending with ID or Text is not allowed.";
+                if (properties.FieldName.ToLower().EndsWith("id") || properties.FieldName.ToLower().EndsWith("text"))
+                {
+                    properties.Status = SPEventReceiverStatus.CancelWithError;
+                    properties.ErrorMessage = "Field ending with ID or Text is not allowed.";
 
+                }
             }
         }
 
