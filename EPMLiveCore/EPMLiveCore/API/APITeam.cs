@@ -1017,7 +1017,11 @@ namespace EPMLiveCore.API
                 SPFieldUserValue uv = new SPFieldUserValue(web, user);
                 ArrayList arr = new ArrayList(perms.Split(';'));
 
-                foreach (SPGroup group in web.Groups)
+                foreach (SPGroup group in from SPGroup spGroup in web.Groups
+                                          let roles = spGroup.Roles
+                                          let canUse = roles.Cast<SPRole>().Any(role => role.PermissionMask != (SPRights)134287360)
+                                          where spGroup.CanCurrentUserEditMembership && canUse
+                                          select spGroup)
                 {
                     try
                     {
