@@ -709,7 +709,8 @@ if not exists (select table_name from INFORMATION_SCHEMA.tables where table_name
 			[dtadded] [datetime] NULL DEFAULT (getdate()),
 			[PRIORITY] [int] NULL DEFAULT ((1)),
 			[QUEUE] [varchar](255) NULL,
-			[STATUS] [int] NULL DEFAULT ((0))
+			[STATUS] [int] NULL DEFAULT ((0)),
+			[resulttext] [ntext] NULL,
 		) ON [PRIMARY]
 
 end
@@ -728,6 +729,12 @@ begin
 	begin
 		alter table ITEMSEC
 		ADD [STATUS] [int] NULL DEFAULT ((0))
+	end
+	
+	if not exists (select column_name FROM INFORMATION_SCHEMA.COLUMNS where table_name = 'ITEMSEC' and column_name = 'resulttext')
+	begin
+		alter table ITEMSEC
+		ADD [resulttext] [ntext] NULL
 	end
 
 end

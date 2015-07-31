@@ -123,6 +123,14 @@ namespace TimerService
             }
         }
 
+        private void logMessageinDatabase(string itemsecid, string message, SqlConnection cn)
+        {
+            SqlCommand cmd = new SqlCommand("UPDATE ITEMSEC SET STATUS = 2,resulttext = @errortext where ITEM_SEC_ID=@id", cn);
+            cmd.Parameters.AddWithValue("@errortext", message);
+            cmd.Parameters.AddWithValue("@id", itemsecid);
+            cmd.ExecuteNonQuery();
+        }
+
         public void runTimer()
         {
             try
@@ -186,7 +194,7 @@ namespace TimerService
                     SqlCommand cmd = new SqlCommand("UPDATE ITEMSEC SET STATUS = 1 where ITEM_SEC_ID=@id", cn);
                     cmd.Parameters.AddWithValue("@id", dr["ITEM_SEC_ID"].ToString());
                     cmd.ExecuteNonQuery();
-
+                 
                     bw.RunWorkerAsync(d);
 
                 }
@@ -196,6 +204,7 @@ namespace TimerService
             catch (Exception ex)
             {
                 logMessage("ERR", "STPR", ex.Message);
+                logMessageinDatabase(dr["ITEM_SEC_ID"].ToString(), ex.Message, cn);
                 return false;
             }
         }
@@ -205,6 +214,8 @@ namespace TimerService
             Thread.Sleep(500);
             RunnerData rd = (RunnerData)e.Argument;
             DataRow dr = rd.dr;
+            SqlConnection cn = new SqlConnection(rd.cn);
+            cn.Open();
             try
             {
                 try
@@ -223,16 +234,25 @@ namespace TimerService
                     }
 
                 }
-                catch { }
+                catch (Exception ex) 
+                {                    
+                    logMessageinDatabase(dr["ITEM_SEC_ID"].ToString(), ex.Message, cn);
+                }
 
-                SqlConnection cn = new SqlConnection(rd.cn);
-                cn.Open();
                 SqlCommand cmd = new SqlCommand("delete from ITEMSEC where ITEM_SEC_ID=@id", cn);
                 cmd.Parameters.AddWithValue("@id", dr["ITEM_SEC_ID"].ToString());
                 cmd.ExecuteNonQuery();
                 cn.Close();
             }
-            catch { }
+            catch (Exception ex) 
+            {
+                logMessageinDatabase(dr["ITEM_SEC_ID"].ToString(), ex.Message, cn);
+            }
+            finally
+            {
+                if (cn.State != ConnectionState.Closed)
+                    cn.Close();
+            }
 
             workingThreads.remove(rd.index);
         }
