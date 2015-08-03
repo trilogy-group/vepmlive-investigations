@@ -66,7 +66,10 @@ namespace EPMLiveCore
             {
                 using (conn = new SqlConnection(epmliveConnection))
                 {
-                    conn.Open();
+                    Microsoft.SharePoint.SPSecurity.RunWithElevatedPrivileges(delegate()
+                    {
+                        conn.Open();
+                    });
                     using (SqlCommand cmd = new SqlCommand())
                     {
                         cmd.CommandText = "select * from RPTDATABASES where SiteId = '" + siteId + "' and WebApplicationId = '" + webAppId + "'";
