@@ -155,10 +155,11 @@ namespace EPMLiveEnterprise
 
                 if (!list.Fields.ContainsField("ResUid"))
                 {
-                    list.Fields.Add("ResUid", SPFieldType.Text, false);
-                    SPField f = list.Fields.GetFieldByInternalName("ResUid");
-                    f.Hidden = true;
-                    f.Update();
+                    SPFieldText fldResUid = (SPFieldText)list.Fields.CreateNewField(SPFieldType.Text.ToString(), "ResUid");
+                    fldResUid.Hidden = true;
+                    fldResUid.Required = false;
+                    list.Fields.Add(fldResUid);
+                    list.Update();                    
                 }
 
                 DataRow []drFields = rds.ResourceCustomFields.Select("RES_UID='" + rds.Resources[0].RES_UID + "'");

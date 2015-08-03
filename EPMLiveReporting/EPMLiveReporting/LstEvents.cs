@@ -3,6 +3,7 @@ using System.Data;
 using System.Diagnostics;
 using Microsoft.SharePoint;
 using System.Web;
+using System.Xml;
 
 
 namespace EPMLiveReportsAdmin
@@ -46,12 +47,24 @@ namespace EPMLiveReportsAdmin
         public override void FieldAdding(SPListEventProperties properties)
         {
             _stCurrentContext = currentContext;
-            if (properties.FieldName.ToLower().EndsWith("id") || properties.FieldName.ToLower().EndsWith("text"))
+            if (properties != null)
             {
-                properties.Status = SPEventReceiverStatus.CancelWithError;
-                properties.ErrorMessage = "Field ending with ID or Text is not allowed.";
+                XmlDocument doc = new XmlDocument();
+                doc.LoadXml(properties.FieldXml);
+                if (doc != null)
+                {
+                    bool isHidden = Convert.ToBoolean(doc.FirstChild.Attributes["Hidden"].Value);
+                    if (!isHidden)
+                    {
+                        if (properties.FieldName.ToLower().EndsWith("id") || properties.FieldName.ToLower().EndsWith("text"))
+                        {
+                            properties.Status = SPEventReceiverStatus.CancelWithError;
+                            properties.ErrorMessage = "Field ending with ID or Text is not allowed.";
 
-            }
+                        }
+                    }
+                }
+            }            
         }
 
         public override void FieldUpdated(SPListEventProperties properties)
