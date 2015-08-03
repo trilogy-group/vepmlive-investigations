@@ -800,27 +800,33 @@ function SaveProject() {
 }
 
 function SaveWorkPlan() {
+    if (ValidWorkPlan()) {
+        if (sUpdates != "") {
+            ShowTDialog("Processing Updates...");
+            dhtmlxAjax.post("WorkPlannerAction.aspx", "Action=ProcessUpdates&ID=" + sItemID + "&PlannerID=" + sPlannerID + "&Updates=" + sUpdates, SaveUpdatesClose);
+        }
+        else {
+            Grids.WorkPlannerGrid.ActionCalcOff();
+            setWBSAndTaskID(Grids.WorkPlannerGrid.GetRowById('0'), true);
+            Grids.WorkPlannerGrid.ActionCalcOn();
+            ShowTDialog("Saving Project...");
+            SaveProject();
+        }
+    }
+}
+
+function ValidWorkPlan()
+{
     var bVal = AlertBlankTitle()
     if (bVal == 1) {
         alert('The plan cannot be saved with blank task AssignedTo values (red cells). Please either delete these tasks or enter a title.');
-        return;
+        return false;
     }
     else if (bVal == 2) {
         alert('AssignedTo values cannot be blank. Please add user that is removed or remove the task.');
-        return;
+        return false;
     }
-    if (sUpdates != "") {
-        ShowTDialog("Processing Updates...");
-        dhtmlxAjax.post("WorkPlannerAction.aspx", "Action=ProcessUpdates&ID=" + sItemID + "&PlannerID=" + sPlannerID + "&Updates=" + sUpdates, SaveUpdatesClose);
-    }
-    else {
-        Grids.WorkPlannerGrid.ActionCalcOff();
-        setWBSAndTaskID(Grids.WorkPlannerGrid.GetRowById('0'), true);
-        Grids.WorkPlannerGrid.ActionCalcOn();
-        ShowTDialog("Saving Project...");
-        SaveProject();
-    }
-
+    return true;
 }
 
 function SaveProjectClose(loader) {
@@ -2642,10 +2648,11 @@ function Unlink() {
 
 function PublishWorkPlan() {
 
-    sm("divPublish", 130, 50);
+    if (ValidWorkPlan()) {
+        sm("divPublish", 130, 50);
 
-    dhtmlxAjax.post("WorkPlannerAction.aspx", "Action=Publish&ID=" + sItemID + "&PlannerID=" + sPlannerID, onPublishClose);
-
+        dhtmlxAjax.post("WorkPlannerAction.aspx", "Action=Publish&ID=" + sItemID + "&PlannerID=" + sPlannerID, onPublishClose);
+    }
 }
 
 function CheckUpdates() {
@@ -3515,7 +3522,7 @@ function ReloadWorkPlannerGrid()
 {
     var grid = Grids.WorkPlannerGrid;
     Grids.WorkPlannerGrid = grid.Reload();
-    isWorkPlannerGridReloaded = true;
+    isWorkPlannerGridReloaded = true;    
 }
 
 function ApplyDefaults(grid, row, isMilestone, isSummary, isFromProcessUpdates) {
