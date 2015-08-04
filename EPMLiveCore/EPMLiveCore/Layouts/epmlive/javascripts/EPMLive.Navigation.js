@@ -2393,8 +2393,25 @@
                                 if (window.epmNavHoveredNode == null) {
                                     hideMenu();
                                 }
-                            }, 3000);
+                            }, 200);
                         });
+                        $('.epm-nav-ws-node').mouseleave(function () {
+                            window.epmNavHoveredNode = null;
+                            window.setTimeout(function () {
+                                if (window.epmNavHoveredNode == null) {
+                                    hideMenu();
+                                }
+                            }, 200);
+                        });
+                        $('.epm-nav-node').mouseleave(function () {
+                            window.epmNavHoveredNode = null;
+                            window.setTimeout(function () {
+                                if (window.epmNavHoveredNode == null) {
+                                    hideMenu();
+                                }
+                            }, 200);
+                        });
+                        
                     } else {
                         toggleMenu();
                     }
