@@ -16,7 +16,7 @@ namespace EPMLiveCore
     /// </summary>
     public class StatusingEvent : SPItemEventReceiver
     {
-
+        private System.Collections.Generic.Dictionary<string, System.Collections.Generic.Dictionary<string, string>> fieldProperties = null;
         public override void ItemAdding(SPItemEventProperties properties)
         {
             processItem(properties, true);
@@ -28,9 +28,9 @@ namespace EPMLiveCore
 
             try
             {
-                foreach(System.Collections.DictionaryEntry sField in properties.AfterProperties)
+                foreach (System.Collections.DictionaryEntry sField in properties.AfterProperties)
                 {
-                    if(!properties.List.Fields.GetFieldByInternalName(sField.Key.ToString()).Hidden)
+                    if (!properties.List.Fields.GetFieldByInternalName(sField.Key.ToString()).Hidden)
                     {
                         allHidden = false;
                         break;
@@ -39,7 +39,7 @@ namespace EPMLiveCore
             }
             catch { allHidden = false; }
 
-            if(allHidden)
+            if (allHidden)
                 return;
 
             string newPercent = null;
@@ -62,7 +62,27 @@ namespace EPMLiveCore
             catch { }
             try
             {
-                newStatus = properties.AfterProperties["Status"].ToString();
+                if (properties.AfterProperties["Status"] == null)
+                {
+                    string editableStatusProperty = "";
+                    string newStatusProperty = "";
+                    string displayStatusProperty = "";
+                    string editStatusProperty = "";
+                    GridGanttSettings gSettings = new GridGanttSettings(properties.List);
+                    fieldProperties = ListDisplayUtils.ConvertFromString(gSettings.DisplaySettings);
+                    newStatusProperty = fieldProperties["Status"]["New"].Split(";".ToCharArray())[0].ToLower();
+                    editableStatusProperty = fieldProperties["Status"]["Editable"].Split(";".ToCharArray())[0].ToLower();
+                    displayStatusProperty = fieldProperties["Status"]["Display"].Split(";".ToCharArray())[0].ToLower();
+                    editStatusProperty = fieldProperties["Status"]["Edit"].Split(";".ToCharArray())[0].ToLower();
+                    if (newStatusProperty == "always" || displayStatusProperty == "always" || editStatusProperty == "always" || editableStatusProperty == "always")
+                    {
+                        newStatus = properties.List.Fields["Status"].DefaultValue;
+                    }
+                }
+                else
+                {
+                    newStatus = properties.AfterProperties["Status"].ToString();
+                }
             }
             catch { }
             try
@@ -76,21 +96,22 @@ namespace EPMLiveCore
             }
             catch { }
 
-            SPSecurity.RunWithElevatedPrivileges(delegate(){
-                using(SPSite site = new SPSite(properties.SiteId))
+            SPSecurity.RunWithElevatedPrivileges(delegate()
+            {
+                using (SPSite site = new SPSite(properties.SiteId))
                 {
-                    using(SPWeb web = site.OpenWeb(properties.Web.ID))
+                    using (SPWeb web = site.OpenWeb(properties.Web.ID))
                     {
                         method = ReflectionMethods.GetStatusMethod(web, properties.ListTitle);
 
-                        if(method == "1")
+                        if (method == "1")
                         {
                             try
                             {
                                 float aWork = float.Parse(properties.AfterProperties["ActualWork"].ToString());
                                 float rWork = float.Parse(properties.AfterProperties["RemainingWork"].ToString());
 
-                                if(aWork == 0 && rWork == 0)
+                                if (aWork == 0 && rWork == 0)
                                     newPercent = "0";
                                 else
                                     newPercent = (aWork / (rWork + aWork)).ToString();
@@ -98,14 +119,14 @@ namespace EPMLiveCore
                             catch { }
                         }
 
-                        if(method == "2")
+                        if (method == "2")
                         {
                             try
                             {
                                 float Work = float.Parse(properties.ListItem["Work"].ToString());
                                 float rWork = float.Parse(properties.AfterProperties["RemainingWork"].ToString());
 
-                                if(Work == 0)
+                                if (Work == 0)
                                     newPercent = "0";
                                 else
                                     newPercent = ((Work - rWork) / (Work)).ToString();
@@ -116,18 +137,18 @@ namespace EPMLiveCore
                 }
             });
 
-            if(newPercent == null)
+            if (newPercent == null)
             {
-                if(newComplete != null)
+                if (newComplete != null)
                 {
-                    if(newComplete == "1" || newComplete.ToLower() == "true")
+                    if (newComplete == "1" || newComplete.ToLower() == "true")
                         newPercent = "1";
-                    else if(newStatus != null)
+                    else if (newStatus != null)
                         newPercent = getPercentFromStatus(newStatus, oldPercent);
                     else
                         newPercent = "0";
                 }
-                else if(newStatus != null)
+                else if (newStatus != null)
                 {
                     newPercent = getPercentFromStatus(newStatus, oldPercent);
                 }
@@ -141,18 +162,18 @@ namespace EPMLiveCore
                 }
             }
 
-            if(newStatus == null)
+            if (newStatus == null)
             {
-                if(newComplete != null)
+                if (newComplete != null)
                 {
-                    if(newComplete == "1" || newComplete.ToLower() == "true")
+                    if (newComplete == "1" || newComplete.ToLower() == "true")
                         newStatus = "Completed";
-                    else if(newPercent != null)
+                    else if (newPercent != null)
                         newStatus = getStatusFromPercent(newPercent);
                     else
                         newStatus = "Not Started";
                 }
-                else if(newPercent != null)
+                else if (newPercent != null)
                 {
                     newStatus = getStatusFromPercent(newPercent);
                 }
@@ -166,18 +187,18 @@ namespace EPMLiveCore
                 }
             }
 
-            if(newComplete == null)
+            if (newComplete == null)
             {
-                if(newStatus != null)
+                if (newStatus != null)
                 {
-                    if(newStatus == "Completed")
+                    if (newStatus == "Completed")
                         newComplete = "1";
                     else
                         newComplete = "0";
                 }
                 else
                 {
-                    if(newPercent == "1")
+                    if (newPercent == "1")
                         newComplete = "1";
                     else
                         newComplete = "0";
@@ -200,13 +221,13 @@ namespace EPMLiveCore
 
         private string getPercentFromStatus(string newStatus, string oldPercent)
         {
-            if(newStatus == "Completed")
+            if (newStatus == "Completed")
                 return "1";
-            else if(newStatus == "Not Started")
+            else if (newStatus == "Not Started")
                 return "0";
             else
             {
-                if(oldPercent == "0" || oldPercent == null || oldPercent == "1")
+                if (oldPercent == "0" || oldPercent == null || oldPercent == "1")
                     return ".5";
             }
 
@@ -215,9 +236,9 @@ namespace EPMLiveCore
 
         private string getStatusFromPercent(string newPercent)
         {
-            if(newPercent == "0")
+            if (newPercent == "0")
                 return "Not Started";
-            else if(newPercent == "1")
+            else if (newPercent == "1")
                 return "Completed";
             else
                 return "In Progress";
