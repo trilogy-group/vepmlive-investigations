@@ -16,7 +16,6 @@ namespace EPMLiveCore
     /// </summary>
     public class StatusingEvent : SPItemEventReceiver
     {
-        private System.Collections.Generic.Dictionary<string, System.Collections.Generic.Dictionary<string, string>> fieldProperties = null;
         public override void ItemAdding(SPItemEventProperties properties)
         {
             processItem(properties, true);
@@ -64,17 +63,7 @@ namespace EPMLiveCore
             {
                 if (properties.AfterProperties["Status"] == null)
                 {
-                    string editableStatusProperty = "";
-                    string newStatusProperty = "";
-                    string displayStatusProperty = "";
-                    string editStatusProperty = "";
-                    GridGanttSettings gSettings = new GridGanttSettings(properties.List);
-                    fieldProperties = ListDisplayUtils.ConvertFromString(gSettings.DisplaySettings);
-                    newStatusProperty = fieldProperties["Status"]["New"].Split(";".ToCharArray())[0].ToLower();
-                    editableStatusProperty = fieldProperties["Status"]["Editable"].Split(";".ToCharArray())[0].ToLower();
-                    displayStatusProperty = fieldProperties["Status"]["Display"].Split(";".ToCharArray())[0].ToLower();
-                    editStatusProperty = fieldProperties["Status"]["Edit"].Split(";".ToCharArray())[0].ToLower();
-                    if ((newStatusProperty == "never") && (displayStatusProperty != "never" || editStatusProperty != "never" || editableStatusProperty != "never"))
+                    if (properties.List.Fields["Status"].DefaultValue != null)
                     {
                         newStatus = properties.List.Fields["Status"].DefaultValue;
                     }
