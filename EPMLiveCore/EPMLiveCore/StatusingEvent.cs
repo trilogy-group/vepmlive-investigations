@@ -74,7 +74,7 @@ namespace EPMLiveCore
                     editableStatusProperty = fieldProperties["Status"]["Editable"].Split(";".ToCharArray())[0].ToLower();
                     displayStatusProperty = fieldProperties["Status"]["Display"].Split(";".ToCharArray())[0].ToLower();
                     editStatusProperty = fieldProperties["Status"]["Edit"].Split(";".ToCharArray())[0].ToLower();
-                    if (newStatusProperty == "always" || displayStatusProperty == "always" || editStatusProperty == "always" || editableStatusProperty == "always")
+                    if ((newStatusProperty == "never") && (displayStatusProperty != "never" || editStatusProperty != "never" || editableStatusProperty != "never"))
                     {
                         newStatus = properties.List.Fields["Status"].DefaultValue;
                     }
