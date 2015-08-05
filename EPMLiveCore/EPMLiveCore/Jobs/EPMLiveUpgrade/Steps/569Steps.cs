@@ -7,6 +7,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using EPMLiveCore.Infrastructure;
+using System.Data.SqlClient;
+using System.Data;
 
 namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
 {
@@ -16,6 +18,49 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
         public UpdateTfsCustomProps(SPWeb spWeb, bool isPfeSite) : base(spWeb, isPfeSite) { }
         public override bool Perform()
         {
+            Guid webAppId = Web.Site.WebApplication.Id;
+            SPSecurity.RunWithElevatedPrivileges(() =>
+            {
+                try
+                {
+                    LogMessage("Connecting to the database . . .", 2);
+                    string connectionString = CoreFunctions.getConnectionString(webAppId);
+                    using (var sqlConnection = new SqlConnection(connectionString))
+                    {
+                        try
+                        {
+                            sqlConnection.Open();
+                            string moduleId = "B0950B9B-3525-40B8-A456-6403156DC003";
+                            string customPropsText = @"<Properties><Connection><Input Type=""Text"" Property=""ServerUrl"" Title=""Tfs Server Url"" /><Input Type=""Text"" Property=""Username"" Title=""Username"" /><Input Type=""Password"" Property=""Password"" Title=""Password"" /><Input Type=""Checkbox"" Property=""UseBasicAuthentication"" Title=""Use Basic Authentication"" /></Connection><General><Input Type=""Select"" Property=""TeamProjectCollection"" Title=""Project Collection"" /><Input Type=""Select"" Property=""Object"" Title=""Object"" /></General></Properties>";
+                            using (
+                               var sqlCommand =
+                                   new SqlCommand(
+                                       "update INT_MODULES set CustomProps = @customProps where MODULE_ID = @module_Id",
+                                       sqlConnection))
+                            {
+                                sqlCommand.CommandType = CommandType.Text;
+                                sqlCommand.Parameters.AddWithValue("@customProps", customPropsText);
+                                sqlCommand.Parameters.AddWithValue("@module_Id", moduleId);
+                                sqlCommand.ExecuteNonQuery();
+                            }
+                        }
+                        finally
+                        {
+                            sqlConnection.Close();
+                        }
+                        LogMessage(string.Format("Added new check box type field 'Use Basic Authentication' on the screen for TFS integration"), MessageKind.SUCCESS, 4);
+                    }
+
+                }
+                catch (Exception exception)
+                {
+                    string message = exception.InnerException != null
+                        ? exception.InnerException.Message
+                        : exception.Message;
+
+                    LogMessage(message, MessageKind.FAILURE, 4);
+                }
+            });
             return true;
         }
     }
@@ -34,7 +79,8 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
     internal class UpdateZendeskWidgetIntegration : UpgradeStep
     {
         private SPWeb _spWeb;
-        public UpdateZendeskWidgetIntegration(SPWeb spWeb, bool isPfeSite) : base(spWeb, isPfeSite)
+        public UpdateZendeskWidgetIntegration(SPWeb spWeb, bool isPfeSite)
+            : base(spWeb, isPfeSite)
         {
             _spWeb = spWeb;
         }
@@ -52,7 +98,7 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
             }
             else
             {
-                CoreFunctions.setConfigSetting(_spWeb, "SupportIntegration", "False");                
+                CoreFunctions.setConfigSetting(_spWeb, "SupportIntegration", "False");
             }
 
             return true;
