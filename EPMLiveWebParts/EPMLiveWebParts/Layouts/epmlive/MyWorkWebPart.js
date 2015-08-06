@@ -1534,20 +1534,23 @@ var MyWorkGrid = {
                             for (var v in MyWorkGrid.views) {
                                 var view = MyWorkGrid.views[v];
 
-                                if (view.isDefault && MyWorkGrid.defaultViewId !== view.id) {
+                                if (view.isDefault && MyWorkGrid.defaultViewId !== view.id) {                                    
                                     if (view.isPersonal) {
                                         defaultPersonalView = view.id;
+                                        if (defaultPersonalView !== '') {
+                                            MyWorkGrid.applyView(defaultPersonalView);
+                                            break;
+                                        }
                                     } else {
                                         defaultGlobalView = view.id;
+                                        if (defaultGlobalView !== '') {
+                                            MyWorkGrid.applyView(defaultGlobalView);
+                                            break;
+                                        }
                                     }
                                 }
                             }
-
-                            if (defaultPersonalView !== '') {
-                                MyWorkGrid.applyView(defaultPersonalView);
-                            } else {
-                                MyWorkGrid.applyView(defaultGlobalView);
-                            }
+                            
 
                         } else {
                             MyWorkGrid.applyView(masterView);
@@ -1993,8 +1996,8 @@ var MyWorkGrid = {
     },
 
     renameView: function (isFromRenameViewClose) {
-        if (MyWorkGrid.defaultViewId === "dv") {
-            alert('You cannot rename the Default View');
+        if (MyWorkGrid.defaultViewId === "dv") {        
+            alert('The default view cannot be renamed. If you want to create a new view that will act as the default for all users, select the Default View and click "Save View" - this will let you create a new view from the Default View schema.');
             return;
         }
 
@@ -2076,21 +2079,20 @@ var MyWorkGrid = {
     },
 
     deleteView: function () {
-        if (MyWorkGrid.defaultViewId === "dv") {
+        if (MyWorkGrid.defaultViewId === "dv") {        
             alert('You cannot delete the Default View');
             return;
         }
 
         if (MyWorkGrid.validateViewName(MyWorkGrid.defaultViewId, MyWorkGrid.defaultView, 'delete')) {
-            var dataXml = '<MyWork><View ID="' + MyWorkGrid.defaultViewId + '" Personal="' + MyWorkGrid.isDefaultViewPersonal + '"/></MyWork>';
+            var dataXml = '<MyWork><View ID="' + MyWorkGrid.defaultViewId + '" Default="' + MyWorkGrid.views[MyWorkGrid.defaultViewId].isDefault + '" Personal="' + MyWorkGrid.isDefaultViewPersonal + '"/></MyWork>';
 
             EPMLiveCore.WorkEngineAPI.Execute("DeleteMyWorkGridView", dataXml, function (response) {
                 response = parseJson(response);
 
                 if (responseIsSuccess(response)) {
-                    delete MyWorkGrid.views[MyWorkGrid.defaultViewId];
-
-                    MyWorkGrid.applyView('dv');
+                    delete MyWorkGrid.views[MyWorkGrid.defaultViewId];                                       
+                    MyWorkGrid.applyView('dv');                    
                 }
             });
         }

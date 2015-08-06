@@ -514,10 +514,18 @@ namespace EPMLiveCore.API
         /// <param name="viewId">The view id.</param>
         /// <param name="globalViews">The global views.</param>
         /// <param name="configWeb">The config web.</param>
-        private static void DeleteGlobalView(string viewId, IEnumerable<MyWorkGridView> globalViews, SPWeb configWeb)
+        private static void DeleteGlobalView(string viewId, bool isDefault, IEnumerable<MyWorkGridView> globalViews, SPWeb configWeb)
         {
             List<MyWorkGridView> myWorkGridViews = globalViews.ToList();
             myWorkGridViews.RemoveAll(v => v.Id.Equals(viewId));
+
+            if (isDefault)
+            {
+                if (myWorkGridViews.FirstOrDefault(p => p.Id.Equals("dv")) != null)
+                {
+                    myWorkGridViews.FirstOrDefault(p => p.Id.Equals("dv")).Default = true;
+                }
+            }
 
             SaveGlobalViews(myWorkGridViews, configWeb);
         }
@@ -2279,9 +2287,11 @@ namespace EPMLiveCore.API
 
                 string viewId = viewElement.Attribute("ID").Value;
                 bool isViewPersonal = Convert.ToBoolean(viewElement.Attribute("Personal").Value);
+                bool isViewDefault = Convert.ToBoolean(viewElement.Attribute("Default").Value);
+
 
                 if (isViewPersonal) DeletePersonalView(viewId, GetPersonalViews(configWeb), configWeb);
-                else DeleteGlobalView(viewId, GetGlobalViews(configWeb), configWeb);
+                else DeleteGlobalView(viewId, isViewDefault,GetGlobalViews(configWeb), configWeb);
 
                 return result.ToString();
             }
