@@ -158,8 +158,11 @@ namespace WorkEnginePPM.Core.DataSync
 
             XElement dataElement = requestDocument.Root.Element("Data");
 
-            ResourcesListItems = Web.Lists["Resources"].GetItems().Cast<SPListItem>().ToList();
-
+            SPQuery query = new SPQuery();
+            query.Query = string.Empty;
+            query.ViewFields = "<FieldRef Name='ID'/><FieldRef Name='Title'/><FieldRef Name='EXTID'/>";
+            ResourcesListItems = Web.Lists["Resources"].GetItems(query).Cast<SPListItem>().ToList();
+            
             BuildRequest(0, dataTable, ref dataElement);
 
             using (var portfolioEngineAPI = new PortfolioEngineAPI(Web))
