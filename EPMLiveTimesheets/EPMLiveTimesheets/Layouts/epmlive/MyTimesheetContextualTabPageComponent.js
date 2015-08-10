@@ -373,7 +373,9 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
 
             viewNameDiv.firstChild.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling.style.display = "none";
 
-            if (this.tsObject.Views[this.tsObject.CurrentViewId].Default != null && this.tsObject.Views[this.tsObject.CurrentViewId].Default.toLowerCase() == "true") {
+            var isDefault = checkDefaultView(grid,this.tsObject.CurrentView);
+
+            if (isDefault != null && isDefault.toLowerCase() == "true") {
                 viewNameDiv.firstChild.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling.firstChild.checked = true;
             }
             else
@@ -395,7 +397,9 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
 
             viewNameDiv.firstChild.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling.style.display = "none";
 
-            if (this.tsObject.Views[this.tsObject.CurrentViewId].Default != null && this.tsObject.Views[this.tsObject.CurrentViewId].Default.toLowerCase() == "true") {                
+            var isDefault = checkDefaultView(grid, this.tsObject.CurrentView);
+
+            if (isDefault != null && isDefault.toLowerCase() == "true") {
                 viewNameDiv.firstChild.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling.firstChild.checked = true;
             }
             else                

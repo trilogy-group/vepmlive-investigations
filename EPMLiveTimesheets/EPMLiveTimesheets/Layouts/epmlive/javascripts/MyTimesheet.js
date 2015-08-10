@@ -1158,6 +1158,20 @@ function DeleteView(grid, view) {
     });
 }
 
+function checkDefaultView(grid,viewName)
+{
+    var newgridid = grid.id.substr(2);
+    var newobj = eval("TSObject" + newgridid);
+
+    for (var view in newobj.Views) {        
+        var oView = newobj.Views[view];
+        if (oView.Name == viewName)
+        {
+            return oView.Default;
+        }
+    }
+}
+
 function RenameView(grid, view, retval) {
 
     ShowMessage(grid.id, "Renaming View...", 150, 50);
