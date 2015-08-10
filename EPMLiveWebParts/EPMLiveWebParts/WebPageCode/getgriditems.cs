@@ -1060,7 +1060,7 @@ namespace EPMLiveWebParts
                             }
                         }
 
-
+                        val = val.Replace("<", "&lt;");
 
                         if (field.Type != SPFieldType.Attachments)
                             displayValue = formatField(val, fieldName, dr, false);
@@ -4636,7 +4636,7 @@ namespace EPMLiveWebParts
                             if (newItem == "")
                                 newCell.InnerText = "No Value";
                             else
-                                newCell.InnerText = newItem;
+                                newCell.InnerText = newItem.Replace("<", "&lt;");
                             newNode.AppendChild(newCell);
                         }
                         else

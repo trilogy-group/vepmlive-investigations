@@ -194,7 +194,7 @@ namespace EPMLiveWebParts
 
             if (list != null && item != null)
             {
-                lblItemTitle.Text = Convert.ToString(item["Title"]);
+                lblItemTitle.Text = Convert.ToString(item["Title"]).Replace("<", "&lt;");
 
                 GridGanttSettings gSettings = new GridGanttSettings(list);
 
