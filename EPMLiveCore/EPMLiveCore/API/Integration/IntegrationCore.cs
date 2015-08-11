@@ -1773,8 +1773,8 @@ namespace EPMLiveCore.API.Integration
             dr.Close();
             CloseConnection(true);
 
-            Assembly assemblyInstance = Assembly.Load(netAssembly);
-            Type thisClass = assemblyInstance.GetType(netClass);
+            Assembly assemblyInstance = Assembly.Load(netAssembly.Trim());
+            Type thisClass = assemblyInstance.GetType(netClass.Trim());
             return (IIntegrator)Activator.CreateInstance(thisClass);
 
         }
