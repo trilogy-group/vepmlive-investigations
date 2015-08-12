@@ -190,13 +190,14 @@ namespace EPMLiveEnterprise
                 catch { }
 
                 if (list != null)
-                {
+                {                    
                     if (!list.Fields.ContainsField("transuid"))
                     {
-                        list.Fields.Add("transuid", SPFieldType.Text, false);
-                        SPField f = list.Fields["transuid"];
-                        f.Hidden = true;
-                        f.Update();
+                        SPFieldText fldTransUid = (SPFieldText)list.Fields.CreateNewField(SPFieldType.Text.ToString(), "transuid");
+                        fldTransUid.Hidden = true;
+                        fldTransUid.Required = false;
+                        list.Fields.Add(fldTransUid);
+                        list.Update();
                     }
                     if (!list.Fields.ContainsField("Summary"))
                     {
@@ -596,13 +597,14 @@ namespace EPMLiveEnterprise
                 catch { }
 
                 if (list != null)
-                {
+                {                    
                     if (!list.Fields.ContainsField("projectguid"))
                     {
-                        list.Fields.Add("projectguid", SPFieldType.Text, false);
-                        SPField f = list.Fields["projectguid"];
-                        f.Hidden = true;
-                        f.Update();
+                        SPFieldText fldProjUid = (SPFieldText)list.Fields.CreateNewField(SPFieldType.Text.ToString(), "projectguid");
+                        fldProjUid.Hidden = true;
+                        fldProjUid.Required = false;
+                        list.Fields.Add(fldProjUid);
+                        list.Update();
                     }
 
                     if (!list.Fields.ContainsField("IsProjectServer"))
