@@ -185,14 +185,14 @@
 				LabelText="Create Column"
 				TemplateAlias="oM"/>
 
-				<ToggleButton
+				<!--<ToggleButton
 					Id="Ribbon.WorkPlanner.ResourcesGroup.ShowGrid"
 					Sequence="100"
 					Image16by16="/_layouts/epmlive/images/allocgrid16.gif"
 					Command="Ribbon.WorkPlanner.ShowResGrid"
 					LabelText="Resource Usage"
 					QueryCommand="Ribbon.WorkPlanner.QueryShowResGrid"
-					TemplateAlias="oM"/>
+					TemplateAlias="oM"/>-->
 
 					<ToggleButton
 					Id="Ribbon.WorkPlanner.InsertGroup.ShowBacklog"
