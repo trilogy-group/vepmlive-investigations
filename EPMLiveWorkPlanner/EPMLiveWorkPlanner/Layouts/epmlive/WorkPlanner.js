@@ -823,7 +823,7 @@ function ValidWorkPlan()
         return false;
     }
     else if (bVal == 2) {
-        alert('AssignedTo values cannot be blank. Please add user that is removed or remove the task.');
+        alert("The project schedule cannot be saved or published because one of more assignments belong to users who have since been removed from the team or deleted. Please review the schedule's assigned to column and either remove or substitute for valid resources.");
         return false;
     }
     return true;
@@ -3029,14 +3029,12 @@ function GetCssClass(grid, row, col, classname) {
 
         if (row.Def.Name == "Assignment" && row.Def.Name != "Header") {
             if (col == "AssignedTo") {
-                var val1 = grid.GetValue(row, col);
-                val1 = val1.toString().trim();
-                if (val1 == "") {
+                if (row.ResourceNames.indexOf('[Removed]') > 0){
                     return "erroroncell";
                 }
             }
+        }
     }
-}
 }
 
 function GetToolTip(grid, row, col, tip, clientx, clienty, x, y) {
@@ -3048,16 +3046,7 @@ function GetToolTip(grid, row, col, tip, clientx, clienty, x, y) {
                 return "Title values cannot be blank";
             }
         }
-        if (row.Def.Name == "Assignment" && row.Def.Name != "Header") {
-            if (col == "AssignedTo") {
-                var val1 = grid.GetValue(row, col);
-                val1 = val1.toString().trim();
-                if (val1 == "") {
-                    return "AssignedTo values cannot be blank. Please add user that is removed or remove the task.";
-                }
-            }
     }
-}
 }
 
 function AlertBlankTitle() {
@@ -3076,12 +3065,11 @@ function AlertBlankTitle() {
             }
 
             if (row.Def.Name == "Assignment" && row.Def.Name != "Header") {
-                var val1 = grid.GetValue(row, "AssignedTo");
-                val1 = val1.toString().trim();
-                if (val1 === "") {
-                    bVal_Task = 2;
-                    break;
-                }
+                    if (row.ResourceNames.indexOf('[Removed]') > 0)
+                    {
+                        bVal_Task = 2;
+                        break;
+                    }
             }
         }
 

@@ -1677,75 +1677,58 @@ namespace EPMLiveWorkPlanner
             return doc.OuterXml;
         }
 
-        private static bool ModifyWorkPlannerGridBasedOnTeam(XmlDocument doc, DataTable dtTeamMembers)
+        private static bool ModifyWorkPlannerGridBasedOnTeam(XmlDocument doc, DataTable dtTeamMembers, DataTable dtAllResources)
         {
             bool saveWorkPlan = true;
-            if (dtTeamMembers != null)
+            if (dtTeamMembers == null)
             {
-                foreach (XmlNode ndTask in doc.SelectNodes("//I"))
+                // Handles scenario when no team member exists            
+                dtTeamMembers = new DataTable();
+                dtTeamMembers.Columns.Add("ID");            
+            }
+            foreach (XmlNode ndTask in doc.SelectNodes("//I"))
+            {
+                try
                 {
-                    try
+                    string id = getAttribute(ndTask, "id");
+                    string sAssignedTo = getAttribute(ndTask, "AssignedTo");
+                    string sResourceNames = getAttribute(ndTask, "ResourceNames");
+                    string[] arrassignedto = sAssignedTo.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+                    string[] arrresourcenames = sResourceNames.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+                    string sNewArrAssinedTo = "";
+                    string sNewArrResourceNames = "";
+
+                    if (!string.IsNullOrEmpty(id) && id != "0")
                     {
-                        string id = getAttribute(ndTask, "id");
-                        string sAssignedTo = getAttribute(ndTask, "AssignedTo");
-                        string sResourceNames = getAttribute(ndTask, "ResourceNames");
-                        string[] arrassignedto = sAssignedTo.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
-                        string[] arrresourcenames = sResourceNames.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
-                        string sNewArrAssinedTo = "";
-                        string sNewArrResourceNames = "";
-
-                        if (!string.IsNullOrEmpty(id) && id != "0" && dtTeamMembers.Rows.Count > 0)
+                        string expr = "ID = {0}";                        
+                        foreach (string assto in arrassignedto)
                         {
-                            string expr = "ID = {0}";
-                            if (arrassignedto.Length == 1)
+                            DataRow[] rows = dtTeamMembers.Select(string.Format(expr, assto));
+                            if (rows != null && rows.Length > 0)
                             {
-                                DataRow[] rows = dtTeamMembers.Select(string.Format(expr, sAssignedTo));
-
-                                if (rows == null || rows.Length == 0)
-                                {                                    
-                                    if (SetValidAssignedTo(ndTask, string.Empty, string.Empty))
-                                    {
-                                        saveWorkPlan = false;
-                                    }
-                                }
+                                sNewArrAssinedTo += assto + ";";
+                                sNewArrResourceNames += rows[0]["Title"].ToString() + ";";
                             }
-                            else if (arrassignedto.Length > 1)
+                            else
                             {
-                                foreach (string assto in arrassignedto)
+                                DataRow[] removedRes = dtAllResources.Select(string.Format(expr, assto));
+                                if (removedRes.Length > 0)
                                 {
-                                    DataRow[] rows = dtTeamMembers.Select(string.Format(expr, assto));
-                                    if (rows != null && rows.Length > 0)
-                                    {
-                                        sNewArrAssinedTo += assto + ";";
-                                        sNewArrResourceNames += rows[0]["Title"].ToString() + ";";
-                                    }
+                                    sNewArrAssinedTo += assto + ";";
+                                    sNewArrResourceNames += removedRes[0]["Title"].ToString() + " [Removed]" + ";";
                                 }
-                                sNewArrAssinedTo = sNewArrAssinedTo.TrimEnd(';');
-                                sNewArrResourceNames = sNewArrResourceNames.TrimEnd(';');
-
-                                SetValidAssignedTo(ndTask, sNewArrAssinedTo, sNewArrResourceNames);
                             }
                         }
-                    }
-                    catch
-                    { }
-                }
-            }
-            else
-            {
-                // In case of project team does not exist
-                foreach (XmlNode ndTask in doc.SelectNodes("//I"))
-                {
-                    try
-                    {
-                        if (SetValidAssignedTo(ndTask, string.Empty, string.Empty))
+                        sNewArrAssinedTo = sNewArrAssinedTo.TrimEnd(';');
+                        sNewArrResourceNames = sNewArrResourceNames.TrimEnd(';');
+                        if (SetValidAssignedTo(ndTask, sNewArrAssinedTo, sNewArrResourceNames))
                         {
                             saveWorkPlan = false;
                         }
                     }
-                    catch 
-                    { }
                 }
+                catch
+                { }
             }
             return saveWorkPlan;
         }
@@ -1762,6 +1745,11 @@ namespace EPMLiveWorkPlanner
 
             SPList oProjectCenter = oWeb.Lists[p.sListProjectCenter];
             DataSet dsResources = GetResourceTable(p, oProjectCenter.ID, data.FirstChild.Attributes["ID"].Value, oWeb);
+            
+            SPQuery query = new SPQuery();
+            query.Query = string.Empty;
+            query.ViewFields = "<FieldRef Name='ID'/><FieldRef Name='Title'/>";
+            DataTable resourcesTable = oWeb.Lists["Resources"].Items.GetDataTable();
 
             try
             {
@@ -1780,7 +1768,7 @@ namespace EPMLiveWorkPlanner
                 XmlDocument docNew = new XmlDocument();
                 docNew.LoadXml(xml);
 
-                bool saveWorkPlan = ModifyWorkPlannerGridBasedOnTeam(docNew, dsResources.Tables["Member"]);
+                bool saveWorkPlan = ModifyWorkPlannerGridBasedOnTeam(docNew, dsResources.Tables["Member"], resourcesTable);
                 xml = docNew.OuterXml;
 
                 XmlAttribute attr = docNew.CreateAttribute("Planner");
@@ -1793,7 +1781,7 @@ namespace EPMLiveWorkPlanner
                 // Save work plan if Assigned To field is not blank.
                 if (saveWorkPlan)
                 {
-                    SaveWorkPlan(docNew, oWeb); 
+                    SaveWorkPlan(docNew, oWeb);
                 }
 
                 return xml;
@@ -1805,7 +1793,7 @@ namespace EPMLiveWorkPlanner
 
                 ProcessTaskXmlFromTaskCenter(doc, p, oWeb, data.FirstChild.Attributes["ID"].Value, out lastid);
 
-                ModifyWorkPlannerGridBasedOnTeam(doc, dsResources.Tables["Member"]);
+                ModifyWorkPlannerGridBasedOnTeam(doc, dsResources.Tables["Member"], resourcesTable);
 
                 SPSecurity.RunWithElevatedPrivileges(delegate()
                 {
@@ -3220,7 +3208,7 @@ namespace EPMLiveWorkPlanner
                     {
                         SPField oField = getRealField(oListTaskCenter.Fields.GetFieldByInternalName(sField));
 
-                        processField(ref docOut, oField, "1", ref ndLeftCols, ref ndHeader, p, web, dsResources);
+                        processField(ref docOut, oField, "1", ref ndLeftCols, ref ndHeader, p, web, dsResources, data);
 
                         bHasViewInfo = true;
                     }
@@ -3236,7 +3224,7 @@ namespace EPMLiveWorkPlanner
                     {
                         SPField oField = getRealField(oListTaskCenter.Fields.GetFieldByInternalName(sField));
 
-                        processField(ref docOut, oField, "1", ref ndCols, ref ndHeader, p, web, dsResources);
+                        processField(ref docOut, oField, "1", ref ndCols, ref ndHeader, p, web, dsResources, data);
 
                         bHasViewInfo = true;
                     }
@@ -3252,9 +3240,9 @@ namespace EPMLiveWorkPlanner
                 if (!oField.Hidden && isValidField(oField.InternalName, false) && oField.Reorderable && !arrCols.Contains(oField.InternalName) && !arrLeftCols.Contains(oField.InternalName))
                 {
                     if (oViewFields.Exists(oField.InternalName) && !bHasViewInfo)
-                        processField(ref docOut, oField, "1", ref ndCols, ref ndHeader, p, web, dsResources);
+                        processField(ref docOut, oField, "1", ref ndCols, ref ndHeader, p, web, dsResources, data);
                     else
-                        processField(ref docOut, oField, "0", ref ndCols, ref ndHeader, p, web, dsResources);
+                        processField(ref docOut, oField, "0", ref ndCols, ref ndHeader, p, web, dsResources, data);
 
                 }
             }
@@ -3988,7 +3976,7 @@ namespace EPMLiveWorkPlanner
 
                 if (!oField.Hidden && isValidField(oField.InternalName, false))
                 {
-                    processField(ref docOut, oField, ((oField.InternalName == "Title") ? "1" : "0"), ref ndCols, ref ndHeader, p, oWeb, dsResources);
+                    processField(ref docOut, oField, ((oField.InternalName == "Title") ? "1" : "0"), ref ndCols, ref ndHeader, p, oWeb, dsResources, data);
                 }
             }
 
@@ -4112,7 +4100,7 @@ namespace EPMLiveWorkPlanner
                         case SPFieldType.Lookup:
                         case SPFieldType.MultiChoice:
                         case SPFieldType.User:
-                            setEnumField(oField, ref ndNew, docF, docOut, oWeb, false, "V", dsResources);
+                            setEnumField(oField, ref ndNew, docF, docOut, oWeb, false, "V", dsResources, null);
                             break;
                     }
 
@@ -4144,6 +4132,56 @@ namespace EPMLiveWorkPlanner
             }
 
             return docOut.OuterXml;
+        }
+
+        private static Hashtable GetRemovedUserCollection(XmlDocument data, SPWeb oWeb, DataTable dtTeamMembers)
+        {
+            Hashtable removedUsers = new Hashtable();
+            // Handles scenario when no team member exists
+            if (dtTeamMembers == null)
+            {
+                dtTeamMembers = new DataTable();
+                dtTeamMembers.Columns.Add("ID");
+            }
+
+            try
+            {
+                XmlDocument savedPlan = new XmlDocument();
+                SPFile file = GetTaskFile(oWeb, data.FirstChild.Attributes["ID"].Value, data.FirstChild.Attributes["Planner"].Value);
+                StreamReader reader = new StreamReader(file.OpenBinaryStream(), Encoding.GetEncoding("iso-8859-1"));
+                savedPlan.LoadXml(reader.ReadToEnd());
+
+                foreach (XmlNode ndTask in savedPlan.SelectNodes("//I"))
+                {
+                    try
+                    {
+                        string id = getAttribute(ndTask, "id");
+                        string sAssignedTo = getAttribute(ndTask, "AssignedTo");
+                        string sResourceNames = getAttribute(ndTask, "ResourceNames");
+                        string[] arrassignedto = sAssignedTo.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+                        string[] arrresourcenames = sResourceNames.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+                        
+                        if (!string.IsNullOrEmpty(id) && id != "0")
+                        {
+                            string expr = "ID = {0}";
+                            for (int i = 0; i < arrassignedto.Length; i++)
+                            {
+                                DataRow[] rows = dtTeamMembers.Select(string.Format(expr, arrassignedto[i]));
+                                if (rows == null || rows.Length == 0)
+                                {
+                                    if (!removedUsers.ContainsKey(arrassignedto[i]))
+                                    {
+                                        removedUsers.Add(arrassignedto[i], arrresourcenames[i]); 
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    catch { }
+                }
+            }
+            catch { }
+            return removedUsers;
         }
 
         public static string getFieldValue(SPListItem li, SPField oField, DataSet dsResources)
@@ -4422,7 +4460,7 @@ namespace EPMLiveWorkPlanner
                         case SPFieldType.Lookup:
                         case SPFieldType.MultiChoice:
                         case SPFieldType.User:
-                            setEnumField(oField, ref ndNew, docF, docOut, oWeb, false, "V", dsResources);
+                            setEnumField(oField, ref ndNew, docF, docOut, oWeb, false, "V", dsResources, null);
                             break;
                     }
 
@@ -4437,7 +4475,7 @@ namespace EPMLiveWorkPlanner
             return docOut.OuterXml;
         }
 
-        public static void setEnumField(SPField oField, ref XmlNode ndCol, XmlDocument fieldDoc, XmlDocument docOut, SPWeb web, bool multi, string enumattr, DataSet dsResources)
+        public static void setEnumField(SPField oField, ref XmlNode ndCol, XmlDocument fieldDoc, XmlDocument docOut, SPWeb web, bool multi, string enumattr, DataSet dsResources, XmlDocument data)
         {
 
             try
@@ -4537,14 +4575,31 @@ namespace EPMLiveWorkPlanner
                             StringBuilder sbEnum = new StringBuilder();
                             StringBuilder sbEnumKeys = new StringBuilder();
 
-                            foreach (DataRow dr in dsResources.Tables[2].Rows)
+                            // Tables["Member"] == Tables[2]
+                            if (dsResources.Tables["Member"] != null)
                             {
-                                sbEnum.Append("|");
-                                sbEnum.Append(dr["Title"].ToString());
-                                sbEnumKeys.Append("|");
-                                sbEnumKeys.Append(dr["ID"].ToString());                                
+                                foreach (DataRow dr in dsResources.Tables[2].Rows)
+                                {
+                                    sbEnum.Append("|");
+                                    sbEnum.Append(dr["Title"].ToString());
+                                    sbEnumKeys.Append("|");
+                                    sbEnumKeys.Append(dr["ID"].ToString());
+                                }
                             }
-
+                            if (data != null)
+                            {
+                                Hashtable removedUsers = GetRemovedUserCollection(data, web, dsResources.Tables["Member"]);
+                                if (removedUsers != null && removedUsers.Count > 0)
+                                {
+                                    foreach (var key in removedUsers.Keys)
+                                    {
+                                        sbEnum.Append("|");
+                                        sbEnum.Append(Convert.ToString(removedUsers[key]) + " [Removed]");
+                                        sbEnumKeys.Append("|");
+                                        sbEnumKeys.Append(Convert.ToString(key));
+                                    }
+                                }
+                            }
                             attr = docOut.CreateAttribute(enumattr + "Enum");
                             attr.Value = sbEnum.ToString();
 
@@ -4939,7 +4994,7 @@ namespace EPMLiveWorkPlanner
 
         }
 
-        private static void processField(ref XmlDocument docOut, SPField oField, string visible, ref XmlNode ndCols, ref XmlNode ndHeader, PlannerProps p, SPWeb web, DataSet dsResources)
+        private static void processField(ref XmlDocument docOut, SPField oField, string visible, ref XmlNode ndCols, ref XmlNode ndHeader, PlannerProps p, SPWeb web, DataSet dsResources, XmlDocument data)
         {
 
 
@@ -5003,14 +5058,14 @@ namespace EPMLiveWorkPlanner
                     break;
                 case SPFieldType.Choice:
                     sWidth = "150";
-                    setEnumField(oField, ref ndNew, docF, docOut, web, false, "", dsResources);
+                    setEnumField(oField, ref ndNew, docF, docOut, web, false, "", dsResources, null);
                     break;
                 case SPFieldType.Lookup:
-                    setEnumField(oField, ref ndNew, docF, docOut, web, false, "", dsResources);
+                    setEnumField(oField, ref ndNew, docF, docOut, web, false, "", dsResources, null);
                     sWidth = "150";
                     break;
                 case SPFieldType.MultiChoice:
-                    setEnumField(oField, ref ndNew, docF, docOut, web, false, "", dsResources);
+                    setEnumField(oField, ref ndNew, docF, docOut, web, false, "", dsResources, null);
                     sWidth = "150";
                     break;
                 case SPFieldType.Note:
@@ -5020,7 +5075,7 @@ namespace EPMLiveWorkPlanner
                     sWidth = "150";
                     break;
                 case SPFieldType.User:
-                    setEnumField(oField, ref ndNew, docF, docOut, web, false, "", dsResources);
+                    setEnumField(oField, ref ndNew, docF, docOut, web, false, "", dsResources, data);
                     sWidth = "150";
                     break;
             }
