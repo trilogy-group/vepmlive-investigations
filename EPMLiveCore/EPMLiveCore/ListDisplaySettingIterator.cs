@@ -796,6 +796,11 @@ namespace EPMLiveCore
                         writer.WriteLine("if(checkPattern.test(object.value)) { alert(objectName + ' cannot contain any of the following characters ' + '| \\\\ \" \\' / [ ] : < > + = , ; ? * @'); object.value = ''; setTimeout(function(){object.focus();}, 1); }");
                         writer.WriteLine("}");
 
+                        writer.WriteLine("function checkSpecialCharactersForNonGeneric(objectName,object){");
+                        writer.WriteLine("var checkPattern = /[\\|\\\\\"\\/\\[\\]\\:\\<\\>\\+\\=\\,\\;\\?\\*\\@]/");
+                        writer.WriteLine("if(checkPattern.test(object.value)) { alert(objectName + ' cannot contain any of the following characters ' + '| \\\\ \" \\/ [ ] : < > + = , ; ? * @'); object.value = ''; setTimeout(function(){object.focus();}, 1); }");
+                        writer.WriteLine("}");
+
                         writer.WriteLine("function setLicenseType(){");
                         if (dControls.ContainsKey("ResourceLevel"))
                         {
@@ -951,12 +956,12 @@ namespace EPMLiveCore
                                 writer.WriteLine("try{document.getElementById(defaultLicenseTypeId).checked = true;}catch(e){}");
                                 try
                                 {
-                                    writer.WriteLine("      try{document.getElementById('" + dControls["FirstName"] + "').parentNode.parentNode.parentNode.style.display='';document.getElementById('" + dControls["FirstName"] + "').onblur = function() { checkSpecialCharacters('First Name',document.getElementById('" + dControls["FirstName"] + "')); }}catch(e){}");
+                                    writer.WriteLine("      try{document.getElementById('" + dControls["FirstName"] + "').parentNode.parentNode.parentNode.style.display='';document.getElementById('" + dControls["FirstName"] + "').onblur = function() { checkSpecialCharactersForNonGeneric('First Name',document.getElementById('" + dControls["FirstName"] + "')); }}catch(e){}");
                                 }
                                 catch { }
                                 try
                                 {
-                                    writer.WriteLine("      try{document.getElementById('" + dControls["LastName"] + "').parentNode.parentNode.parentNode.style.display='';document.getElementById('" + dControls["LastName"] + "').onblur = function() { checkSpecialCharacters('Last Name',document.getElementById('" + dControls["LastName"] + "')); }}catch(e){}");
+                                    writer.WriteLine("      try{document.getElementById('" + dControls["LastName"] + "').parentNode.parentNode.parentNode.style.display='';document.getElementById('" + dControls["LastName"] + "').onblur = function() { checkSpecialCharactersForNonGeneric('Last Name',document.getElementById('" + dControls["LastName"] + "')); }}catch(e){}");
                                 }
                                 catch { }
                                 try
@@ -1010,8 +1015,8 @@ namespace EPMLiveCore
                             {
                                 try
                                 {
-                                    writer.WriteLine("      try{document.getElementById('" + dControls["FirstName"] + "').parentNode.parentNode.parentNode.style.display='';document.getElementById('" + dControls["FirstName"] + "').onblur = function() { checkSpecialCharacters('First Name',document.getElementById('" + dControls["FirstName"] + "')); }}catch(e){}");
-                                    writer.WriteLine("      try{document.getElementById('" + dControls["LastName"] + "').parentNode.parentNode.parentNode.style.display='';document.getElementById('" + dControls["LastName"] + "').onblur = function() { checkSpecialCharacters('Last Name',document.getElementById('" + dControls["LastName"] + "')); }}catch(e){}");
+                                    writer.WriteLine("      try{document.getElementById('" + dControls["FirstName"] + "').parentNode.parentNode.parentNode.style.display='';document.getElementById('" + dControls["FirstName"] + "').onblur = function() { checkSpecialCharactersForNonGeneric('First Name',document.getElementById('" + dControls["FirstName"] + "')); }}catch(e){}");
+                                    writer.WriteLine("      try{document.getElementById('" + dControls["LastName"] + "').parentNode.parentNode.parentNode.style.display='';document.getElementById('" + dControls["LastName"] + "').onblur = function() { checkSpecialCharactersForNonGeneric('Last Name',document.getElementById('" + dControls["LastName"] + "')); }}catch(e){}");
                                 }
                                 catch { }
                             }
