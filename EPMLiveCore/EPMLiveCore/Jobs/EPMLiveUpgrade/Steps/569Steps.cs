@@ -9,6 +9,8 @@ using System.Threading.Tasks;
 using EPMLiveCore.Infrastructure;
 using System.Data.SqlClient;
 using System.Data;
+using System.IO;
+using System.Web.UI.WebControls;
 
 namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
 {
@@ -65,12 +67,76 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
         }
     }
 
-    [UpgradeStep(Version = EPMLiveVersion.V569, Order = 2.0, Description = "Updates for Custom Project Field")]
-    internal class UpdateCustomProjectField : UpgradeStep
+    [UpgradeStep(Version = EPMLiveVersion.V569, Order = 2.0, Description = "Updates for Resource List Cleanup")]
+    internal class UpdateTimerSetting : UpgradeStep
     {
-        public UpdateCustomProjectField(SPWeb spWeb, bool isPfeSite) : base(spWeb, isPfeSite) { }
+        public UpdateTimerSetting(SPWeb spWeb, bool isPfeSite) : base(spWeb, isPfeSite) { }
         public override bool Perform()
         {
+            Guid webAppId = Web.Site.WebApplication.Id;
+            SPSecurity.RunWithElevatedPrivileges(() =>
+            {
+                try
+                {
+                    SPList list = Web.Lists.TryGetList("Resources");
+                    string sLists = EPMLiveCore.CoreFunctions.getConfigSetting(Web, "epmlivefixlists");
+                    if (list != null && sLists.ToLower().Contains("\r\nresources"))
+                    {
+                        LogMessage("Resource List Cleanup settings kept as is.", 2);
+                    }
+                    else
+                    {
+                         string connectionString = CoreFunctions.getConnectionString(webAppId);
+                         using (var sqlConnection = new SqlConnection(connectionString))
+                         {
+                             try
+                             {
+                                 sqlConnection.Open();
+                                 Guid timerjobguid;
+                                 //=======================Timer Job==========================
+                                 SqlCommand cmd = new SqlCommand("select timerjobuid from timerjobs where siteguid=@siteguid and jobtype=2", sqlConnection);
+                                 cmd.Parameters.AddWithValue("@siteguid", Web.Site.ID.ToString());
+                                 SqlDataReader dr = cmd.ExecuteReader();
+                                 if (dr.Read())
+                                 {
+                                     timerjobguid = dr.GetGuid(0);
+                                     dr.Close();
+                                     cmd = new SqlCommand("UPDATE TIMERJOBS set runtime = @runtime where siteguid=@siteguid and jobtype=2", sqlConnection);
+                                     cmd.Parameters.AddWithValue("@siteguid", Web.Site.ID.ToString());
+                                     cmd.Parameters.AddWithValue("@runtime", "-1");
+                                     cmd.ExecuteNonQuery();
+                                 }
+                                 else
+                                 {
+                                     timerjobguid = Guid.NewGuid();
+                                     dr.Close();
+                                     cmd = new SqlCommand("INSERT INTO TIMERJOBS (timerjobuid, siteguid, jobtype, jobname, runtime, scheduletype, webguid) VALUES (@timerjobuid, @siteguid, 2, 'Today Fix/Res Plan', @runtime, 2, @webguid)", sqlConnection);
+                                     cmd.Parameters.AddWithValue("@siteguid", Web.Site.ID.ToString());
+                                     cmd.Parameters.AddWithValue("@timerjobuid", timerjobguid);
+                                     cmd.Parameters.AddWithValue("@webguid", Web.ID.ToString());
+                                     cmd.Parameters.AddWithValue("@runtime", "-1");
+                                     cmd.ExecuteNonQuery();
+                                 }
+
+                             }
+                             finally
+                             {
+                                 sqlConnection.Close();
+                             }
+                         }
+                         LogMessage("Resource List Cleanup settings disabled.", 2);
+                    }
+
+                }
+                catch (Exception exception)
+                {
+                    string message = exception.InnerException != null
+                        ? exception.InnerException.Message
+                        : exception.Message;
+
+                    LogMessage(message, MessageKind.FAILURE, 4);
+                }
+            });
             return true;
         }
     }
