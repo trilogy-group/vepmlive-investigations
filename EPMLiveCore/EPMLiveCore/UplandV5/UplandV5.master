@@ -204,7 +204,7 @@
                                 <a id="epm-support-link" href="#" target="_blank" data-toggle="tooltip" data-placement="bottom" data-delay="100" title="Help"><span class="fui-question"></span></a>
                             </div>
                             <div id="uv-container" class="epm-global-button-right">
-                                <a href="https://ideas.epmlive.com" title="Provide Feedback" data-toggle="tooltip" data-placement="bottom" data-delay="100" target="_blank"><span class="icon-bullhorn"></span></a>
+                                <a href="https://epmlive.ideas.aha.io" title="Provide Feedback" data-toggle="tooltip" data-placement="bottom" data-delay="100" target="_blank"><span class="icon-bullhorn"></span></a>
                             </div>
                             <!-- Notification Counter -->
                             <div id="EPMLiveNCWrap" class="ms-tableCell ms-verticalAlignMiddle">
