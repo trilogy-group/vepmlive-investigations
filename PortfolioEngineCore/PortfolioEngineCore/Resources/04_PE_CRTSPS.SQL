@@ -5937,12 +5937,13 @@ begin
 end
 exec(@createoralter + ' PROCEDURE dbo.EPG_SP_ReadResourcePlansHours
    @StartPeriodID INT,
+   @FinishPeriodID INT,
    @sList NTEXT
 AS
 SELECT *
   FROM EPG_RESOURCEPLANS_HOURS
   INNER JOIN dbo.EPG_FN_ConvertListToTable(@sList) LT on CMT_UID=LT.TokenVal 
- WHERE PRD_ID >= @StartPeriodID
+ WHERE (PRD_ID >= @StartPeriodID AND PRD_ID <= @FinishPeriodID)
  ORDER BY CMT_UID,CMH_PENDING,PRD_ID
 ')
  
@@ -6094,6 +6095,7 @@ end
 exec(@createoralter + ' PROCEDURE dbo.EPG_SP_ReadResourcesWorkA
    @CalID INT,
    @StartPeriodID INT,
+   @FinishPeriodID INT,  
    @WResIDs NTEXT
 AS
 	DECLARE @t TABLE (TokenVal  int not null PRIMARY KEY)
@@ -6108,7 +6110,7 @@ AS
 		   AND CV.CB_ID = P1.CB_ID   
 	 INNER JOIN EPG_RESOURCES WR  ON (WR.WRES_ID = CV.WRES_ID)
 	 inner join @t LT on WR.WRES_ID=LT.TokenVal 
-	 WHERE P1.CB_ID = @CalID AND P1.PRD_ID >= @StartPeriodID	
+	 WHERE P1.CB_ID = @CalID AND (P1.PRD_ID >= @StartPeriodID AND P1.PRD_ID <= @FinishPeriodID)	
 	 ORDER BY LT.TokenVal ,PRD_ID	
 
 ')
@@ -6126,16 +6128,18 @@ end
 exec(@createoralter + ' PROCEDURE dbo.EPG_SP_ReadResourcesWorkB
    @ExcludeProjectID INT,
    @StartPeriodID INT,
+   @FinishPeriodID INT,  
    @WResIDs NTEXT
 AS
 SELECT RPH.PRD_ID,RP.WRES_ID,SUM(CMH_HOURS) as CommittedHours
   FROM EPG_RESOURCEPLANS_HOURS RPH
   LEFT JOIN EPG_RESOURCEPLANS RP ON (RP.CMT_UID = RPH.CMT_UID)
  INNER JOIN dbo.EPG_FN_ConvertListToTable(@WResIDs) LT on RP.WRES_ID=LT.TokenVal
- WHERE RP.PROJECT_ID <> @ExcludeProjectID AND RPH.PRD_ID >= @StartPeriodID AND RP.CMT_STATUS = 256 AND RPH.CMH_PENDING = 0
+ WHERE RP.PROJECT_ID <> @ExcludeProjectID AND (RPH.PRD_ID >= @StartPeriodID AND RPH.PRD_ID <= @FinishPeriodID) AND RP.CMT_STATUS = 256 AND RPH.CMH_PENDING = 0
    AND RP.PROJECT_ID NOT IN (SELECT PROJECT_ID FROM EPGP_PROJECTS WHERE PROJECT_MARKED_DELETION <> 0)
  GROUP BY RPH.PRD_ID,RP.WRES_ID
  ORDER BY RP.WRES_ID,RPH.PRD_ID
+
 ')
  
 if not exists (select routine_name from INFORMATION_SCHEMA.routines where routine_name = 'EPG_SP_ReadResourcesWorkC')
@@ -6151,13 +6155,14 @@ end
 exec(@createoralter + ' PROCEDURE dbo.EPG_SP_ReadResourcesWorkC
    @CalID INT,
    @StartPeriodID INT,
+   @FinishPeriodID INT,  
    @WResIDs NTEXT
 AS
 SELECT PRD_ID,NWH.WRES_ID,SUM(NWH_HOURS) as NonWorkHours
   FROM EPG_PERIODS
  INNER JOIN EPG_NONWORK_HOURS NWH ON (NWH_DATE >= PRD_START_DATE and NWH_DATE <= PRD_FINISH_DATE)
  INNER JOIN dbo.EPG_FN_ConvertListToTable(@WResIDs) LT on NWH.WRES_ID=LT.TokenVal 
- WHERE CB_ID = @CalID AND PRD_ID >= @StartPeriodID
+ WHERE CB_ID = @CalID AND (PRD_ID >= @StartPeriodID AND PRD_ID <= @FinishPeriodID)
  GROUP BY PRD_ID,NWH.WRES_ID
  ORDER BY NWH.WRES_ID,PRD_ID
 ')

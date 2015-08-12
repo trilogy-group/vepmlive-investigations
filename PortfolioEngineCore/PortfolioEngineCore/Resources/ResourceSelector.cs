@@ -1548,6 +1548,7 @@ namespace PortfolioEngineCore
                     oCommand.CommandType = System.Data.CommandType.StoredProcedure;
                     oCommand.Parameters.Add("CalID", SqlDbType.Int).Value = oAdmin.PortfolioCommitmentsCalendarUID;
                     oCommand.Parameters.Add("StartPeriodID", SqlDbType.Int).Value = lStartPeriodID;
+                    oCommand.Parameters.Add("FinishPeriodID", SqlDbType.Int).Value = lFinishPeriodID;
                     oCommand.Parameters.Add("WResIDs", SqlDbType.NVarChar, sGroupWResIDs.Length).Value = sGroupWResIDs;
 
                     reader = oCommand.ExecuteReader();
@@ -1616,6 +1617,7 @@ namespace PortfolioEngineCore
                         oCommand.CommandType = System.Data.CommandType.StoredProcedure;
                         oCommand.Parameters.Add("ExcludeProjectID", SqlDbType.Int).Value = 0;
                         oCommand.Parameters.Add("StartPeriodID", SqlDbType.Int).Value = lStartPeriodID;
+                        oCommand.Parameters.Add("FinishPeriodID", SqlDbType.Int).Value = lFinishPeriodID;
                         oCommand.Parameters.Add("WResIDs", SqlDbType.NVarChar, sGroupWResIDs.Length).Value = sGroupWResIDs;
 
                         reader = oCommand.ExecuteReader();
@@ -1674,6 +1676,7 @@ namespace PortfolioEngineCore
                     oCommand.CommandType = System.Data.CommandType.StoredProcedure;
                     oCommand.Parameters.Add("CalID", SqlDbType.Int).Value = oAdmin.PortfolioCommitmentsCalendarUID;
                     oCommand.Parameters.Add("StartPeriodID", SqlDbType.Int).Value = lStartPeriodID;
+                    oCommand.Parameters.Add("FinishPeriodID", SqlDbType.Int).Value = lFinishPeriodID;
                     oCommand.Parameters.Add("WResIDs", SqlDbType.NVarChar, sGroupWResIDs.Length).Value = sGroupWResIDs;
 
                     reader = oCommand.ExecuteReader();

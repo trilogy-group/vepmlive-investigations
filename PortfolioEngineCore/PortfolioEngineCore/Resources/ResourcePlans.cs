@@ -204,7 +204,7 @@ namespace PortfolioEngineCore
                 string sStatus = "";
                 if (Security.CheckUserGlobalPermission(_dba, _userWResID, GlobalPermissionsEnum.gpResourcePlan) == false)
                 {
-                    nStatus = (int) StatusEnum.rsSecurityAccessDenied;
+                    nStatus = (int)StatusEnum.rsSecurityAccessDenied;
                     sStatus = "You do not have permission to view resource plan";
                 }
                 else
@@ -255,7 +255,7 @@ namespace PortfolioEngineCore
                                 {
                                     //sCommand = "SELECT WRES_ID, RES_NAME FROM EPG_RESOURCES WHERE WRES_RP_DEPT IN (" + sResManagerDeptUIDs + ")";
                                     sCommand = "SELECT WRES_ID, RES_NAME, WRES_RP_DEPT FROM EPG_RESOURCES" +
-                                               "  JOIN dbo.EPG_FN_ConvertListToTable(N'" + sResourceUIDs + "')" + 
+                                               "  JOIN dbo.EPG_FN_ConvertListToTable(N'" + sResourceUIDs + "')" +
                                                "    LT on (WRES_ID = LT.TokenVal AND WRES_RP_DEPT IS NOT NULL)" +
                                                " WHERE WRES_RP_DEPT NOT IN (" + sResManagerDeptUIDs + ")";
                                     oCommand = new SqlCommand(sCommand, _dba.Connection, _dba.Transaction);
@@ -337,7 +337,7 @@ namespace PortfolioEngineCore
                                     if (nValidCount == 0)
                                     {
                                         sStatus = "You do not have permission to view the selected project(s)";
-                                        nStatus = (int) StatusEnum.rsSecurityNoProjects;
+                                        nStatus = (int)StatusEnum.rsSecurityNoProjects;
                                     }
                                     else
                                     {
@@ -394,9 +394,21 @@ namespace PortfolioEngineCore
                     if (GetResourcePlanViewsXML(out xPlanViews) == false)
                         goto Exit_Function;
 
+                    StringBuilder xPeriods = new StringBuilder();
+                    List<CPeriod> clnPeriods;
+                    if (DBCommon.GetPeriods(_dba, oAdmin.PortfolioCommitmentsCalendarUID, out clnPeriods) != StatusEnum.rsSuccess)
+                        goto Exit_Function;
+                    xPeriods.Append("<Periods>");
+                    foreach (CPeriod prd in clnPeriods)
+                    {
+                        xPeriods.Append(string.Format("<Period PeriodID='{0}' PeriodName='{1}'></Period>", prd.PeriodID, prd.PeriodName));
+                    }
+                    xPeriods.Append("</Periods>");
+
                     xResult.CreateBoolean("NegotiationMode", (oAdmin.PortfolioCommitmentsOpMode == 0));
                     xResult.AppendSubStruct(xCostCategoryRoles);
                     xResult.AppendSubStruct(xPlanViews);
+                    xResult.AppendXML(xPeriods.ToString());
                 }
                 sReply = xResult.XML();
             }
@@ -491,8 +503,12 @@ namespace PortfolioEngineCore
                     //sbDataxml.append('<TicketVal>' + this.params.TicketVal + '</TicketVal>');
                     //sbDataxml.append('<IsResource>' + this.params.IsResource + '</IsResource>');
                     //sbDataxml.append('</Execute>');
+
+                    Int32 fromPeriodId = Convert.ToInt32(xExecute.GetString("FromPeriodId"));
+                    Int32 toPeriodId = Convert.ToInt32(xExecute.GetString("ToPeriodId"));
+
                     CStruct xRPE;
-                    if (GetResourcePlanStruct(xExecute, out xRPE) != true)
+                    if (GetResourcePlanStruct(xExecute, out xRPE, fromPeriodId, toPeriodId) != true)
                         goto Exit_Function;
 
                     if (xRPE != null)
@@ -678,28 +694,37 @@ namespace PortfolioEngineCore
                 CStruct xExecute = new CStruct();
                 if (xExecute.LoadXML(sRequest) == true)
                 {
-                    CStruct xGrid = xExecute.GetSubStruct("Grid");
-                    if (SaveResourcePlanStruct(xGrid) == true)
+                    Int32 startPeriod = Convert.ToInt32(xExecute.GetString("StartPeriod"));
+                    Int32 finishPeriod = Convert.ToInt32(xExecute.GetString("FinishPeriod"));
+                    String gridData = Convert.ToString(xExecute.GetSubStruct("Data").GetXMLNode().OuterXml);
+
+                    CStruct xExecuteGrid = new CStruct();
+                    if (xExecuteGrid.LoadXML(gridData) == true)
                     {
-                        CStruct xResult = BuildResultStruct("SaveResourcePlan");
-                        xResult.AppendXML("<Grid><IO Result=\"0\"/></Grid>");
-                        sReply = xResult.XML();
-                    }
-                    else
-                    {
-                        CStruct xResult = BuildResultStruct("SaveResourcePlan", (int)_dba.Status);
-                        xGrid = xResult.CreateSubStruct("Grid");
-                        CStruct xIO = xGrid.CreateSubStruct("IO");
-                        xIO.CreateIntAttr("Result", -11);
-                        if (_dba.Status == (StatusEnum)123456)
+
+                        CStruct xGrid = xExecuteGrid.GetSubStruct("Grid");
+                        if (SaveResourcePlanStruct(xGrid, startPeriod, finishPeriod) == true)
                         {
-                            xIO.CreateStringAttr("Message", _dba.StatusText);
+                            CStruct xResult = BuildResultStruct("SaveResourcePlan");
+                            xResult.AppendXML("<Grid><IO Result=\"0\"/></Grid>");
+                            sReply = xResult.XML();
                         }
                         else
                         {
-                            xIO.CreateStringAttr("Message", FormatErrorText());
+                            CStruct xResult = BuildResultStruct("SaveResourcePlan", (int)_dba.Status);
+                            xGrid = xResult.CreateSubStruct("Grid");
+                            CStruct xIO = xGrid.CreateSubStruct("IO");
+                            xIO.CreateIntAttr("Result", -11);
+                            if (_dba.Status == (StatusEnum)123456)
+                            {
+                                xIO.CreateStringAttr("Message", _dba.StatusText);
+                            }
+                            else
+                            {
+                                xIO.CreateStringAttr("Message", FormatErrorText());
+                            }
+                            sReply = xResult.XML();
                         }
-                        sReply = xResult.XML();
                     }
                 }
             }
@@ -832,7 +857,7 @@ namespace PortfolioEngineCore
                         }
                         else
                         {
-                            _dba.Status = (StatusEnum) 99999;
+                            _dba.Status = (StatusEnum)99999;
                             _dba.StatusText = "No database rows affected";
                             sReply = HandleError("SaveRowNote", Status, FormatErrorText());
                         }
@@ -892,6 +917,10 @@ namespace PortfolioEngineCore
                     bool bIsResource = xExecute.GetBoolean("IsResource");
                     string sWResIDs = xExecute.GetString("WResIDs");
 
+                    Int32 fromPeriodId = Convert.ToInt32(xExecute.GetString("FromPeriodId"));
+                    Int32 toPeriodId = Convert.ToInt32(xExecute.GetString("ToPeriodId"));
+
+
                     string sProjectIDs = "";
 
                     if (sTicket != string.Empty)
@@ -940,8 +969,18 @@ namespace PortfolioEngineCore
                     if (GetPeriods(_dba, oAdmin.PortfolioCommitmentsCalendarUID, out clnPeriods) != StatusEnum.rsSuccess)
                         goto Exit_Function;
 
+                    List<CPeriod> clnPeriodsDefined = new List<CPeriod>();
+                    foreach (var prd in clnPeriods)
+                    {
+                        if (prd.PeriodID >= fromPeriodId && prd.PeriodID <= toPeriodId)
+                        {
+                            clnPeriodsDefined.Add(prd);
+                        }
+                    }
+                    clnPeriods = clnPeriodsDefined;
+
                     // Take into account the status date
-                    int lStartPeriodID = 1;
+                    int lStartPeriodID = clnPeriods[0].PeriodID;
 
                     {
                         CStruct xReply;
@@ -1224,7 +1263,8 @@ namespace PortfolioEngineCore
                         cmd.Parameters.AddWithValue("@VIEW_DATA", sData);
                         nRowsAffected = cmd.ExecuteNonQuery();
                     }
-                    if (nRowsAffected != 1) {
+                    if (nRowsAffected != 1)
+                    {
                         _dba.Status = (StatusEnum)99999;
                         _dba.StatusText = "No database rows affected";
                         sReply = HandleError("SaveResourcePlanView", Status, FormatErrorText());
@@ -1419,7 +1459,7 @@ namespace PortfolioEngineCore
                                                             "0"));
                             double dblHours = DBAccess.ReadDoubleValue(reader["BD_VALUE"]);
                             xCostValue.CreateStringAttr("hours",
-                                                        ((Int32) (dblHours*100)).ToString(
+                                                        ((Int32)(dblHours * 100)).ToString(
                                                             "0"));
                         }
                         else
@@ -1429,7 +1469,7 @@ namespace PortfolioEngineCore
                                                     "0");
                             double dblHours = DBAccess.ReadDoubleValue(reader["BD_VALUE"]);
                             string sHours = xCostValue.GetStringAttr("hours") + "," +
-                                            ((Int32) (dblHours*100)).ToString("0");
+                                            ((Int32)(dblHours * 100)).ToString("0");
                             xCostValue.SetStringAttr("periods", sPeriods);
                             xCostValue.SetStringAttr("hours", sHours);
                         }
@@ -1454,7 +1494,7 @@ namespace PortfolioEngineCore
             return bResult;
         }
 
-        private bool GetResourcePlanStruct(CStruct xExecute, out CStruct xReply)
+        private bool GetResourcePlanStruct(CStruct xExecute, out CStruct xReply, Int32 fromPeriodId, Int32 toPeriodId)
         {
             xReply = null;
             string sPos = "";
@@ -1520,6 +1560,18 @@ namespace PortfolioEngineCore
                 List<CPeriod> clnPeriods;
                 if (DBCommon.GetPeriods(_dba, oAdmin.PortfolioCommitmentsCalendarUID, out clnPeriods) != StatusEnum.rsSuccess)
                     goto Exit_Function;
+
+
+                List<CPeriod> clnPeriodsDefined = new List<CPeriod>();
+                foreach (var prd in clnPeriods)
+                {
+                    if (prd.PeriodID >= fromPeriodId && prd.PeriodID <= toPeriodId)
+                    {
+                        clnPeriodsDefined.Add(prd);
+                    }
+                }
+
+                clnPeriods = clnPeriodsDefined;
 
                 bool bNull;
                 sPos = "c";
@@ -1735,7 +1787,7 @@ namespace PortfolioEngineCore
                 xCalendar.CreateIntAttr("CalID", oAdmin.PortfolioCommitmentsCalendarUID);
 
                 // Take into account the status date
-                const int lStartPeriodID = 1;
+                int lStartPeriodID = clnPeriods[0].PeriodID;
                 int lFinishPeriodID;
                 xRPE.CreateInt("StartPeriodID", lStartPeriodID);
                 if (clnPeriods.Count > 0)
@@ -2050,6 +2102,7 @@ namespace PortfolioEngineCore
                     oCommand = new SqlCommand("EPG_SP_ReadResourcePlansHours", _dba.Connection);
                     oCommand.CommandType = CommandType.StoredProcedure;
                     oCommand.Parameters.Add("StartPeriodID", SqlDbType.Int).Value = lStartPeriodID;
+                    oCommand.Parameters.Add("FinishPeriodID", SqlDbType.Int).Value = lFinishPeriodID;
                     oCommand.Parameters.Add("sList", SqlDbType.VarChar, sCMTUIDs.Length).Value = sCMTUIDs;
                     reader = oCommand.ExecuteReader();
 
@@ -2339,7 +2392,7 @@ namespace PortfolioEngineCore
             return sb.ToString();
         }
 
-        private bool SaveResourcePlanStruct(CStruct xGrid)
+        private bool SaveResourcePlanStruct(CStruct xGrid, Int32 startPeriod, Int32 finishPeriod)
         {
             try
             {
@@ -2364,12 +2417,15 @@ namespace PortfolioEngineCore
                 if (DBCommon.GetPeriods(_dba, oAdmin.PortfolioCommitmentsCalendarUID, out clnPeriods) != StatusEnum.rsSuccess)
                     goto Exit_Function;
 
-                int lStartPeriodID = 1;
-                int lFinishPeriodID = 1;
-                foreach (CPeriod oPeriod in clnPeriods)
-                {
-                    if (lFinishPeriodID < oPeriod.PeriodID) lFinishPeriodID = oPeriod.PeriodID;
-                }
+                //int lStartPeriodID = 1;
+                //int lFinishPeriodID = 1;
+                //foreach (CPeriod oPeriod in clnPeriods)
+                //{
+                //    if (lFinishPeriodID < oPeriod.PeriodID) lFinishPeriodID = oPeriod.PeriodID;
+                //}
+
+                int lStartPeriodID = startPeriod;
+                int lFinishPeriodID = finishPeriod;
 
                 List<CStruct> clnPlanRows = new List<CStruct>();
 
@@ -2451,7 +2507,7 @@ namespace PortfolioEngineCore
                     _dba.HandleStatusError(SeverityEnum.Error, "SaveResourcePlanXML", StatusEnum.rsPIResourcePlanViewNotSet, "No planrow field definitions found");
                     goto Exit_Function;
                 }
-                
+
                 // start the transaction - we don't want anybody to sneek an update in whilst we're doing ours
                 _dba.BeginTransaction();
                 if (bRequireNewUIDs)
@@ -2534,10 +2590,10 @@ namespace PortfolioEngineCore
                         {
                             bool bFoundH;
                             string suffix = lPeriod.ToString("0");
-                            string sHours = xI.GetStringAttr("H" + suffix, "0", out bFoundH);                            
+                            string sHours = xI.GetStringAttr("H" + suffix, "0", out bFoundH);
                             if (bFoundH)
                             {
-                                dblHours += double.Parse(sHours,CultureInfo.InvariantCulture);
+                                dblHours += double.Parse(sHours, CultureInfo.InvariantCulture);
                             }
                         }
 
@@ -2569,7 +2625,7 @@ namespace PortfolioEngineCore
                                         changedby = DBAccess.ReadStringValue(reader["RES_NAME"]); // +"(" + DBAccess.ReadIntValue(reader["CMT_ENTEREDBY_WRES_ID"]).ToString() + ")";
                                     reader.Close();
                                 }
-                                
+
                                 _dba.Status = (StatusEnum)123456;
                                 _dba.StatusText = "Save has failed.\nRow '" + itemname + "' has been already been changed by '" + changedby + "'.\nPlease refresh your plan and resave your changes.";
                                 goto Exit_Transaction;
@@ -2602,7 +2658,7 @@ namespace PortfolioEngineCore
 
                 if (sDeleteCMTUIDs != "")
                 {
-                    string sCommand = "DELETE FROM EPG_RESOURCEPLANS_HOURS WHERE CMT_UID IN (" + sDeleteCMTUIDs + ") AND PRD_ID >= " + lStartPeriodID.ToString("0");
+                    string sCommand = "DELETE FROM EPG_RESOURCEPLANS_HOURS WHERE CMT_UID IN (" + sDeleteCMTUIDs + ") AND (PRD_ID >= " + lStartPeriodID.ToString("0") + " AND PRD_ID <= " + lFinishPeriodID.ToString("0") + ")";
                     SqlCommand oCommand = new SqlCommand(sCommand, _dba.Connection, _dba.Transaction);
                     oCommand.ExecuteNonQuery();
                 }
@@ -2627,14 +2683,14 @@ namespace PortfolioEngineCore
                             int lUID = xI.GetIntAttr("UID");
                             for (int lPeriod = lStartPeriodID; lPeriod <= lFinishPeriodID; lPeriod++)
                             {
-                                bool bFoundH,bFoundF,bFoundM;
+                                bool bFoundH, bFoundF, bFoundM;
                                 string suffix = lPeriod.ToString("0");
                                 string sHours = xI.GetStringAttr("H" + suffix, "0", out bFoundH);
                                 string sFTE = xI.GetStringAttr("F" + suffix, "0", out bFoundF);
                                 string sMode = xI.GetStringAttr("M" + suffix, "0", out bFoundM);
                                 if (bFoundH || bFoundF || bFoundM)
                                 {
-                                    double dblHours = double.Parse(sHours,CultureInfo.InvariantCulture);
+                                    double dblHours = double.Parse(sHours, CultureInfo.InvariantCulture);
                                     int lFTEs = Convert.ToInt32(sFTE);
                                     int lMode = Convert.ToInt32(sMode);
                                     if (dblHours != 0 || lFTEs != 0)
@@ -2673,6 +2729,10 @@ namespace PortfolioEngineCore
                                     }
                                 }
                             }
+
+                            string sCommand1 = "UPDATE [EPG_RESOURCEPLANS] SET CMT_HOURS = (SELECT SUM(CMH_HOURS) FROM EPG_RESOURCEPLANS_HOURS WHERE CMT_UID = " + lUID + ") WHERE CMT_GUID = '" + xI.GetGuidAttr("GUID") + "'";
+                            SqlCommand oCommand1 = new SqlCommand(sCommand1, _dba.Connection, _dba.Transaction);
+                            oCommand1.ExecuteNonQuery();
                         }
                     }
                 }
@@ -2711,11 +2771,11 @@ namespace PortfolioEngineCore
                 }
 
 
-        Exit_Transaction:
+            Exit_Transaction:
                 if (_dba.Status == StatusEnum.rsSuccess)
                     _dba.CommitTransaction();
                 else
-                _dba.RollbackTransaction();
+                    _dba.RollbackTransaction();
 
                 // do a post costs for each PI NB - this is now done after synchronizeteam
                 //if (sTeamPIs != "")
@@ -2734,7 +2794,7 @@ namespace PortfolioEngineCore
                 _dba.HandleException("SaveResourcePlanXML", (StatusEnum)99999, ex);
                 _dba.RollbackTransaction();
             }
-            
+
         Exit_Function:
             return (_dba.Status == StatusEnum.rsSuccess);
         }
@@ -2934,7 +2994,7 @@ namespace PortfolioEngineCore
         //    }
         //    return StatusEnum.rsSuccess;
         //}
-       
+
         //public bool GetCostCategoryRolesXML(out string sReply)
         //{
         //    sReply = "";

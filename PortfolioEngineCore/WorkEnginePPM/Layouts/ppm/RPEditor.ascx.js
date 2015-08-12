@@ -81,7 +81,13 @@
             return null;
 
         if (source.Name == "Upload") {
-            return '<Execute Function="SaveResourcePlan">' + data + '</Execute>';
+            var sb = new StringBuilder();
+            sb.append('<Execute Function="SaveResourcePlan">');
+            sb.append('<StartPeriod>' + this.viewStartPeriod + '</StartPeriod>');
+            sb.append('<FinishPeriod>' + this.viewFinishPeriod + '</FinishPeriod>');
+            sb.append('<Data>' + data + '</Data>');
+            sb.append('</Execute>');
+            return sb.toString();
         }
         return null;
     };
@@ -202,6 +208,8 @@
                     this.costCategoryRoles = result.CostCategoryRoles;
                     var views = result.Views;
                     this.Views = JSON_GetArray(views, "View");
+                    var periods = result.Periods;
+                    this.allPeriods = JSON_GetArray(periods, "Period");
                     this.InitializeLayout();
                     break;
                 case "SaveResourcePlanView":
@@ -891,7 +899,7 @@
                 }
                 if (view.Settings.UseCurrentPeriod != null) {
                     var UseCurrentPeriod = parseInt(view.Settings.UseCurrentPeriod);
-                    if (UseCurrentPeriod == 1) {
+                    if (UseCurrentPeriod == 1 & this.reloaded == false) {
                         this.startPeriod = this.currentPeriod;
                         var from = document.getElementById('idViewTab_FromPeriod');
                         from.options.selectedIndex = 0;
@@ -974,371 +982,386 @@
     RPEditor.prototype.InitializeLayout = function () {
         try {
 
-            this.ccrolesArray = [];
-            this.ccrFTEArray = [];
+            if (!this.reloaded) {
+                this.ccrolesArray = [];
+                this.ccrFTEArray = [];
 
-            var ccroles = this.costCategoryRoles;
-            if (ccroles != null && ccroles.CostCategoryRole != null) {
-                for (var i = 0; i < ccroles.CostCategoryRole.length; i++) {
-                    var ccr = ccroles.CostCategoryRole[i];
-                    var ccruid = ccr.ID.toString();
-                    this.ccrolesArray[ccruid] = ccr;
-                    if (ccr.Periods != null) {
-                        var periods = ccr.Periods.split(',');
-                        var ftetohours = ccr.FTEToHours.split(',');
-                        for (var j = 0; j < periods.length; j++) {
-                            var key = ccruid + "P" + periods[j].toString();
-                            this.ccrFTEArray[key] = ftetohours[j];
+                var ccroles = this.costCategoryRoles;
+                if (ccroles != null && ccroles.CostCategoryRole != null) {
+                    for (var i = 0; i < ccroles.CostCategoryRole.length; i++) {
+                        var ccr = ccroles.CostCategoryRole[i];
+                        var ccruid = ccr.ID.toString();
+                        this.ccrolesArray[ccruid] = ccr;
+                        if (ccr.Periods != null) {
+                            var periods = ccr.Periods.split(',');
+                            var ftetohours = ccr.FTEToHours.split(',');
+                            for (var j = 0; j < periods.length; j++) {
+                                var key = ccruid + "P" + periods[j].toString();
+                                this.ccrFTEArray[key] = ftetohours[j];
+                            }
                         }
                     }
+                } else {
+                    alert("No Cost Category Roles have been configured.\n\nPlease contact your System Administrator for more information.");
+                    window.setTimeout("parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.OK, '');", 100);
+                    return;
                 }
-            } else {
-                alert("No Cost Category Roles have been configured.\n\nPlease contact your System Administrator for more information.");
-                window.setTimeout("parent.SP.UI.ModalDialog.commonModalDialogClose(parent.SP.UI.DialogResult.OK, '');", 100);
-                return;
-            }
 
-            var bIsCloseDisabled = true;
-            if (this.params.IsDlg == "1")
-                bIsCloseDisabled = false;
-            var editorTabData = {
-                parent: "idEditorTabDiv",
-                style: "display:none;",
-                showstate: "true",
-                initialstate: "expanded",
-                onstatechange: "dialogEvent('PlanRibbon_Toggle');",
-                imagePath: this.imagePath,
-                sections: [
-                    {
-                        name: "Plan Actions",
-                        tooltip: "Plan Actions",
-                        columns: [
-                            {
-                                items: [
-                                    { type: "bigbutton", id: "SavePlanBtn", name: "Save", img: "save32x32.png", tooltip: "Save", onclick: "dialogEvent('EditorTab_SavePlan');", disabled: true }
-                                ]
-                            },
-                            {
-                                items: [
-                                    { type: "bigbutton", id: "CloseBtn", name: "Close", img: "close32.gif", tooltip: "Close", onclick: "dialogEvent('EditorTab_Close');", disabled: bIsCloseDisabled }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        name: "Item Actions",
-                        tooltip: "Item Actions",
-                        columns: [
-                            {
-                                items: [
-                                    { type: "bigbutton", id: "AcceptBtn", name: "Accept", img: "epmlive-master.png", style: "top: -109px; left: -405px;position:relative;z-index:5;", tooltip: "Accept Commitment", onclick: "dialogEvent('EditorTab_Accept');", disabled: true }
-                                ]
-                            },
-                            {
-                                items: [
-                                    { type: "bigbutton", id: "RejectBtn", name: "Reject", img: "epmlive-master.png", style: "top: -109px; left: -457px;position:relative;z-index:5;", tooltip: "Reject Commitment", onclick: "dialogEvent('EditorTab_Reject');", disabled: true }
-                                ]
-                            },
-                            {
-                                items: [
-                                    { type: "bigbutton", id: "RowNoteBtn", name: "Note", img: "Note32.png", tooltip: "Note", onclick: "dialogEvent('EditorTab_RowNote');", disabled: true }
-                                ]
-                            },
-                            {
-                                items: [
-                                    { type: "bigbutton", id: "RowHistoryBtn", name: "History", img: "epmlive-master.png", style: "top: -109px; left: -159px;", tooltip: "History", onclick: "dialogEvent('EditorTab_RowHistory');", disabled: true }
-                                ]
-                            },
-                            {
-                                items: [
-                                    { type: "smallbutton", id: "PublicBtn", name: "Make Public", img: "epmlive-master.png", style: "top: -116px; left: -216px;position:relative;z-index:5;", tooltip: "Make Private Row Public", onclick: "dialogEvent('EditorTab_Public');", disabled: true },
-                                    { type: "smallbutton", id: "CancelBtn", name: "Cancel", img: "epmlive-master.png", style: "top: -116px; left: -116px;position:relative;z-index:5;", tooltip: "Cancel Commitment", onclick: "dialogEvent('EditorTab_Cancel');", disabled: true },
-                                    { type: "smallbutton", id: "DeleteBtn", name: "Delete", img: "delete16.png", tooltip: "Delete", onclick: "dialogEvent('EditorTab_Delete');", disabled: true }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        name: "Tools",
-                        tooltip: "Tools",
-                        columns: [
-                            {
-                                items: [
-                                    { type: "bigbutton", id: "SpreadBtn", name: "Allocate Values", img: "allocate.png", tooltip: "Allocate Values", onclick: "dialogEvent('EditorTab_Spread');", disabled: true }
-                                ]
-                            },
-                            {
-                                items: [
-                                    { type: "smallbutton", id: "ImportWorkBtn", name: "Import Work", img: "import.png", tooltip: "Import Scheduled Work", onclick: "dialogEvent('EditorTab_ImportWork');", disabled: true },
-                                    { type: "smallbutton", id: "ImportCostPlanBtn", name: "Import Cost Plan", img: "import.png", tooltip: "Import Cost Plan", onclick: "dialogEvent('EditorTab_ImportCostPlan');", disabled: true }
-                                //                                    { type: "smallbutton", id: "NotesBtn", name: "Notes", img: "notemail.gif", tooltip: "Plan row notes", onclick: "dialogEvent('EditorTab_Notes');", disabled: true }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        name: "Options",
-                        tooltip: "Options",
-                        columns: [
-                            {
-                                items: [
-                                    { type: "text", name: "Show Me:" },
-                                    { type: "select", id: "idViewTab_DisplayedValues", onchange: "dialogEvent('ViewTab_DisplayedValues_Changed');", width: "100px" }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        name: "Share",
-                        tooltip: "Share",
-                        columns: [
-                           {
-                               items: [
-                                    { type: "bigbutton", id: "idExportExcelTop", name: "Export to<br/> Excel", img: "export-excel32.png", tooltip: "Export Details to Excel", onclick: "dialogEvent('EditorTab_Export');" }
-                               ]
-                           },
-                           {
-                               items: [
-                                    { type: "bigbutton", id: "idPrintTop", name: "Print", img: "print32.png", tooltip: "Print", onclick: "dialogEvent('PrintTopBtn');" }
-                               ]
-                           }
-                        ]
-                    }
-                ]
-            };
-
-            var viewTabData = {
-                parent: "idViewTabDiv",
-                style: "display:none;",
-                showstate: "true",
-                initialstate: "expanded",
-                onstatechange: "dialogEvent('PlanRibbon_Toggle');",
-                imagePath: this.imagePath,
-                sections: [
-                    {
-                        name: "Plan Actions",
-                        columns: [
-                            {
-                                items: [
-                                    { type: "bigbutton", id: "SavePlanBtn2", name: "Save", img: "save32x32.png", tooltip: "Save", onclick: "dialogEvent('EditorTab_SavePlan');", disabled: true }
-                                ]
-                            },
-                            {
-                                items: [
-                                    { type: "bigbutton", id: "CloseBtn2", name: "Close", img: "close32.gif", tooltip: "Close", onclick: "dialogEvent('EditorTab_Close');", disabled: bIsCloseDisabled }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        name: "Views",
-                        columns: [
-                            {
-                                items: [
-                                    { type: "smallbutton", id: "SaveViewBtn", name: "Save View", img: "createview.gif", tooltip: "Save View", onclick: "dialogEvent('ViewTab_SaveView');" },
-                                    { type: "smallbutton", id: "RenameViewBtn", name: "Rename View", img: "editview.gif", tooltip: "Rename View", onclick: "dialogEvent('ViewTab_RenameView');" },
-                                    { type: "smallbutton", id: "DeleteViewBtn", name: "Delete View", img: "deleteview.gif", tooltip: "Delete View", onclick: "dialogEvent('ViewTab_DeleteView');" }
-                                ]
-                            },
-                            {
-                                items: [
-                                    { type: "text", name: "Current View:" },
-                                    { type: "select", id: "idViewTab_SelView", onchange: "dialogEvent('ViewTab_SelView_Changed');", width: "100px" }
-                                ]
-                            },
-                            {
-                                items: [
-                                    { type: "smallbutton", id: "SelectColumnsBtn", name: "Select Columns", img: "selectcolumn.gif", tooltip: "Select Columns", onclick: "dialogEvent('ViewTab_SelectColumns');" },
-                                    { type: "smallbutton", id: "idViewTab_RemoveSorting", name: "Clear Sorting", img: "clearsort.gif", tooltip: "Remove Sorting", onclick: "dialogEvent('ViewTab_RemoveSorting_Click');" }
-                                ]
-                            },
-                            {
-                                items: [
-                                    { type: "smallbutton", id: "idViewTab_ShowFilters", name: "Show Filters", img: "showhidefilters-16.png", tooltip: "Show Filters", onclick: "dialogEvent('ViewTab_ShowFilters_Click');" }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        name: "Periods",
-                        columns: [
-                            {
-                                items: [
-                                    { type: "text", id: "idViewTab_FromPeriodLabel", name: "From Period:", showInfoIcon: true, showInfoMessage: "Due to a large number of configured periods, there is a limit to the number of periods that can be selected at one time." },
-                                    { type: "select", id: "idViewTab_FromPeriod", onchange: "dialogEvent('ViewTab_FromPeriod_Changed');", width: "100px" }
-                                ]
-                            },
+                var bIsCloseDisabled = true;
+                if (this.params.IsDlg == "1")
+                    bIsCloseDisabled = false;
+                var editorTabData = {
+                    parent: "idEditorTabDiv",
+                    style: "display:none;",
+                    showstate: "true",
+                    initialstate: "expanded",
+                    onstatechange: "dialogEvent('PlanRibbon_Toggle');",
+                    imagePath: this.imagePath,
+                    sections: [
+                        {
+                            name: "Plan Actions",
+                            tooltip: "Plan Actions",
+                            columns: [
                                 {
                                     items: [
-                                    { type: "text", name: " ", width: "10px" }
+                                        { type: "bigbutton", id: "SavePlanBtn", name: "Save", img: "save32x32.png", tooltip: "Save", onclick: "dialogEvent('EditorTab_SavePlan');", disabled: true }
                                     ]
                                 },
                                 {
                                     items: [
-                                    { type: "text", id: "idViewTab_ToPeriodLabel", name: "To Period:", showInfoIcon: true, showInfoMessage: "Due to a large number of configured periods, there is a limit to the number of periods that can be selected at one time." },
-                                    { type: "select", id: "idViewTab_ToPeriod", onchange: "dialogEvent('ViewTab_ToPeriod_Changed');", width: "100px" }
+                                        { type: "bigbutton", id: "CloseBtn", name: "Close", img: "close32.gif", tooltip: "Close", onclick: "dialogEvent('EditorTab_Close');", disabled: bIsCloseDisabled }
                                     ]
                                 }
-                        ]
-                    }
-                ]
-            };
+                            ]
+                        },
+                        {
+                            name: "Item Actions",
+                            tooltip: "Item Actions",
+                            columns: [
+                                {
+                                    items: [
+                                        { type: "bigbutton", id: "AcceptBtn", name: "Accept", img: "epmlive-master.png", style: "top: -109px; left: -405px;position:relative;z-index:5;", tooltip: "Accept Commitment", onclick: "dialogEvent('EditorTab_Accept');", disabled: true }
+                                    ]
+                                },
+                                {
+                                    items: [
+                                        { type: "bigbutton", id: "RejectBtn", name: "Reject", img: "epmlive-master.png", style: "top: -109px; left: -457px;position:relative;z-index:5;", tooltip: "Reject Commitment", onclick: "dialogEvent('EditorTab_Reject');", disabled: true }
+                                    ]
+                                },
+                                {
+                                    items: [
+                                        { type: "bigbutton", id: "RowNoteBtn", name: "Note", img: "Note32.png", tooltip: "Note", onclick: "dialogEvent('EditorTab_RowNote');", disabled: true }
+                                    ]
+                                },
+                                {
+                                    items: [
+                                        { type: "bigbutton", id: "RowHistoryBtn", name: "History", img: "epmlive-master.png", style: "top: -109px; left: -159px;", tooltip: "History", onclick: "dialogEvent('EditorTab_RowHistory');", disabled: true }
+                                    ]
+                                },
+                                {
+                                    items: [
+                                        { type: "smallbutton", id: "PublicBtn", name: "Make Public", img: "epmlive-master.png", style: "top: -116px; left: -216px;position:relative;z-index:5;", tooltip: "Make Private Row Public", onclick: "dialogEvent('EditorTab_Public');", disabled: true },
+                                        { type: "smallbutton", id: "CancelBtn", name: "Cancel", img: "epmlive-master.png", style: "top: -116px; left: -116px;position:relative;z-index:5;", tooltip: "Cancel Commitment", onclick: "dialogEvent('EditorTab_Cancel');", disabled: true },
+                                        { type: "smallbutton", id: "DeleteBtn", name: "Delete", img: "delete16.png", tooltip: "Delete", onclick: "dialogEvent('EditorTab_Delete');", disabled: true }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            name: "Tools",
+                            tooltip: "Tools",
+                            columns: [
+                                {
+                                    items: [
+                                        { type: "bigbutton", id: "SpreadBtn", name: "Allocate Values", img: "allocate.png", tooltip: "Allocate Values", onclick: "dialogEvent('EditorTab_Spread');", disabled: true }
+                                    ]
+                                },
+                                {
+                                    items: [
+                                        { type: "smallbutton", id: "ImportWorkBtn", name: "Import Work", img: "import.png", tooltip: "Import Scheduled Work", onclick: "dialogEvent('EditorTab_ImportWork');", disabled: true },
+                                        { type: "smallbutton", id: "ImportCostPlanBtn", name: "Import Cost Plan", img: "import.png", tooltip: "Import Cost Plan", onclick: "dialogEvent('EditorTab_ImportCostPlan');", disabled: true }
+                                    //                                    { type: "smallbutton", id: "NotesBtn", name: "Notes", img: "notemail.gif", tooltip: "Plan row notes", onclick: "dialogEvent('EditorTab_Notes');", disabled: true }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            name: "Options",
+                            tooltip: "Options",
+                            columns: [
+                                {
+                                    items: [
+                                        { type: "text", name: "Show Me:" },
+                                        { type: "select", id: "idViewTab_DisplayedValues", onchange: "dialogEvent('ViewTab_DisplayedValues_Changed');", width: "100px" }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            name: "Share",
+                            tooltip: "Share",
+                            columns: [
+                               {
+                                   items: [
+                                        { type: "bigbutton", id: "idExportExcelTop", name: "Export to<br/> Excel", img: "export-excel32.png", tooltip: "Export Details to Excel", onclick: "dialogEvent('EditorTab_Export');" }
+                                   ]
+                               },
+                               {
+                                   items: [
+                                        { type: "bigbutton", id: "idPrintTop", name: "Print", img: "print32.png", tooltip: "Print", onclick: "dialogEvent('PrintTopBtn');" }
+                                   ]
+                               }
+                            ]
+                        }
+                    ]
+                };
+
+                var viewTabData = {
+                    parent: "idViewTabDiv",
+                    style: "display:none;",
+                    showstate: "true",
+                    initialstate: "expanded",
+                    onstatechange: "dialogEvent('PlanRibbon_Toggle');",
+                    imagePath: this.imagePath,
+                    sections: [
+                        {
+                            name: "Plan Actions",
+                            columns: [
+                                {
+                                    items: [
+                                        { type: "bigbutton", id: "SavePlanBtn2", name: "Save", img: "save32x32.png", tooltip: "Save", onclick: "dialogEvent('EditorTab_SavePlan');", disabled: true }
+                                    ]
+                                },
+                                {
+                                    items: [
+                                        { type: "bigbutton", id: "CloseBtn2", name: "Close", img: "close32.gif", tooltip: "Close", onclick: "dialogEvent('EditorTab_Close');", disabled: bIsCloseDisabled }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            name: "Views",
+                            columns: [
+                                {
+                                    items: [
+                                        { type: "smallbutton", id: "SaveViewBtn", name: "Save View", img: "createview.gif", tooltip: "Save View", onclick: "dialogEvent('ViewTab_SaveView');" },
+                                        { type: "smallbutton", id: "RenameViewBtn", name: "Rename View", img: "editview.gif", tooltip: "Rename View", onclick: "dialogEvent('ViewTab_RenameView');" },
+                                        { type: "smallbutton", id: "DeleteViewBtn", name: "Delete View", img: "deleteview.gif", tooltip: "Delete View", onclick: "dialogEvent('ViewTab_DeleteView');" }
+                                    ]
+                                },
+                                {
+                                    items: [
+                                        { type: "text", name: "Current View:" },
+                                        { type: "select", id: "idViewTab_SelView", onchange: "dialogEvent('ViewTab_SelView_Changed');", width: "100px" }
+                                    ]
+                                },
+                                {
+                                    items: [
+                                        { type: "smallbutton", id: "SelectColumnsBtn", name: "Select Columns", img: "selectcolumn.gif", tooltip: "Select Columns", onclick: "dialogEvent('ViewTab_SelectColumns');" },
+                                        { type: "smallbutton", id: "idViewTab_RemoveSorting", name: "Clear Sorting", img: "clearsort.gif", tooltip: "Remove Sorting", onclick: "dialogEvent('ViewTab_RemoveSorting_Click');" }
+                                    ]
+                                },
+                                {
+                                    items: [
+                                        { type: "smallbutton", id: "idViewTab_ShowFilters", name: "Show Filters", img: "showhidefilters-16.png", tooltip: "Show Filters", onclick: "dialogEvent('ViewTab_ShowFilters_Click');" }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            name: "Periods",
+                            columns: [
+                                {
+                                    items: [
+                                        { type: "text", id: "idViewTab_FromPeriodLabel", name: "From Period:", showInfoIcon: true, showInfoMessage: "Due to a large number of configured periods, there is a limit to the number of periods that can be selected at one time." },
+                                        { type: "select", id: "idViewTab_FromPeriod", onchange: "dialogEvent('ViewTab_FromPeriod_Changed');", width: "100px" }
+                                    ]
+                                },
+                                    {
+                                        items: [
+                                        { type: "text", name: " ", width: "10px" }
+                                        ]
+                                    },
+                                    {
+                                        items: [
+                                        { type: "text", id: "idViewTab_ToPeriodLabel", name: "To Period:", showInfoIcon: true, showInfoMessage: "Due to a large number of configured periods, there is a limit to the number of periods that can be selected at one time." },
+                                        { type: "select", id: "idViewTab_ToPeriod", onchange: "dialogEvent('ViewTab_ToPeriod_Changed');", width: "100px" }
+                                        ]
+                                    }
+                            ]
+                        }
+                    ]
+                };
 
 
-            var resourcesTabData = {
-                parent: "idResourcesTabDiv",
-                style: "display:none;",
-                showstate: "true",
-                initialstate: "expanded",
-                onstatechange: "dialogEvent('ResRibbon_Toggle');",
-                imagePath: this.imagePath,
-                sections: [
-                    {
-                        name: "Actions",
-                        tooltip: "Actions",
-                        columns: [
-                            {
-                                items: [
-                                    { type: "bigbutton", id: "MatchBtn", name: "Match", img: "match.png", tooltip: "Match", onclick: "dialogEvent('ResourcesTab_Match');", disabled: true }
-                                ]
-                            },
-                            {
-                                items: [
-                                    { type: "bigbutton", id: "ResAddBtn", name: "Add", img: "add.png", tooltip: "Add Resource", onclick: "dialogEvent('ResourcesTab_Add');", disabled: true }
-                                ]
-                            },
-                            {
-                                items: [
-                                    { type: "bigbutton", id: "ResAnalyzeBtn", name: "Analyze", img: "analyze32.png", tooltip: "Ananlyze", onclick: "dialogEvent('ResourcesTab_Analyze');", disabled: true }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        name: "Find Resources",
-                        tooltip: "Find Resourcess",
-                        columns: [
-                            {
-                                items: [
-                                    { type: "select", id: "idResourcesTab_Select", onchange: "dialogEvent('ResourcesTab_Select_Changed');", options: "<option value='0'>Show All Resources</option><option value='1'>Show Generic Resources</option><option value='2'>Show Plan Resources</option><option value='3'>Show Team Resources</option><option value='4'>Match</option>", width: "125px" }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        name: "Resources View",
-                        tooltip: "Resources View",
-                        columns: [
-                            {
-                                items: [
-                                    { type: "smallbutton", id: "SelectResColumnsBtn", name: "Select Columns", img: "selectcolumn.gif", tooltip: "Select Columns", onclick: "dialogEvent('ResourcesTab_SelectColumns');" },
-                                    { type: "smallbutton", id: "idResourcesTab_RemoveSorting", name: "Clear Sorting", img: "clearsort.gif", tooltip: "Remove Sorting", onclick: "dialogEvent('ResourcesTab_RemoveSorting_Click');" }
-                                ]
-                            },
-                            {
-                                items: [
-                                    { type: "smallbutton", id: "idResourcesTab_ShowFilters", name: "Show Filters", img: "showhidefilters-16.png", tooltip: "Show Filters", onclick: "dialogEvent('ResourcesTab_ShowFilters_Click');" },
-                                    { type: "smallbutton", id: "idResourcesTab_ShowGrouping", name: "Show Grouping", img: "grouping.gif", tooltip: "Show Grouping", onclick: "dialogEvent('ResourcesTab_ShowGrouping_Click');" }
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        columns: [
-                            {
-                                items: [
-                                    { type: "text", name: "Show Me:" },
-                                    { type: "select", id: "idResourcesTab_ShowMe", onchange: "dialogEvent('ResourcesTab_ShowMe_Changed');", width: "75px" }
-                                ]
-                            },
-                            {
-                                items: [
-                                    { type: "smallbutton", id: "idResourcesTab_ShowHeatmap", name: "Heat Map", img: "heatmap.png", tooltip: "Show Heat Map", onclick: "dialogEvent('ResourcesTab_ShowHeatmap_Click');" },
-                                    { type: "smallbutton", id: "idResourcesTab_IncludePending", name: "Include Pending", img: "showhidefilters-16.png", tooltip: "Include Pending", onclick: "dialogEvent('ResourcesTab_IncludePending_Click');" }
-                                ]
-                            }
-                        ]
-                    }
-                ]
-            };
+                var resourcesTabData = {
+                    parent: "idResourcesTabDiv",
+                    style: "display:none;",
+                    showstate: "true",
+                    initialstate: "expanded",
+                    onstatechange: "dialogEvent('ResRibbon_Toggle');",
+                    imagePath: this.imagePath,
+                    sections: [
+                        {
+                            name: "Actions",
+                            tooltip: "Actions",
+                            columns: [
+                                {
+                                    items: [
+                                        { type: "bigbutton", id: "MatchBtn", name: "Match", img: "match.png", tooltip: "Match", onclick: "dialogEvent('ResourcesTab_Match');", disabled: true }
+                                    ]
+                                },
+                                {
+                                    items: [
+                                        { type: "bigbutton", id: "ResAddBtn", name: "Add", img: "add.png", tooltip: "Add Resource", onclick: "dialogEvent('ResourcesTab_Add');", disabled: true }
+                                    ]
+                                },
+                                {
+                                    items: [
+                                        { type: "bigbutton", id: "ResAnalyzeBtn", name: "Analyze", img: "analyze32.png", tooltip: "Ananlyze", onclick: "dialogEvent('ResourcesTab_Analyze');", disabled: true }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            name: "Find Resources",
+                            tooltip: "Find Resourcess",
+                            columns: [
+                                {
+                                    items: [
+                                        { type: "select", id: "idResourcesTab_Select", onchange: "dialogEvent('ResourcesTab_Select_Changed');", options: "<option value='0'>Show All Resources</option><option value='1'>Show Generic Resources</option><option value='2'>Show Plan Resources</option><option value='3'>Show Team Resources</option><option value='4'>Match</option>", width: "125px" }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            name: "Resources View",
+                            tooltip: "Resources View",
+                            columns: [
+                                {
+                                    items: [
+                                        { type: "smallbutton", id: "SelectResColumnsBtn", name: "Select Columns", img: "selectcolumn.gif", tooltip: "Select Columns", onclick: "dialogEvent('ResourcesTab_SelectColumns');" },
+                                        { type: "smallbutton", id: "idResourcesTab_RemoveSorting", name: "Clear Sorting", img: "clearsort.gif", tooltip: "Remove Sorting", onclick: "dialogEvent('ResourcesTab_RemoveSorting_Click');" }
+                                    ]
+                                },
+                                {
+                                    items: [
+                                        { type: "smallbutton", id: "idResourcesTab_ShowFilters", name: "Show Filters", img: "showhidefilters-16.png", tooltip: "Show Filters", onclick: "dialogEvent('ResourcesTab_ShowFilters_Click');" },
+                                        { type: "smallbutton", id: "idResourcesTab_ShowGrouping", name: "Show Grouping", img: "grouping.gif", tooltip: "Show Grouping", onclick: "dialogEvent('ResourcesTab_ShowGrouping_Click');" }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            columns: [
+                                {
+                                    items: [
+                                        { type: "text", name: "Show Me:" },
+                                        { type: "select", id: "idResourcesTab_ShowMe", onchange: "dialogEvent('ResourcesTab_ShowMe_Changed');", width: "75px" }
+                                    ]
+                                },
+                                {
+                                    items: [
+                                        { type: "smallbutton", id: "idResourcesTab_ShowHeatmap", name: "Heat Map", img: "heatmap.png", tooltip: "Show Heat Map", onclick: "dialogEvent('ResourcesTab_ShowHeatmap_Click');" },
+                                        { type: "smallbutton", id: "idResourcesTab_IncludePending", name: "Include Pending", img: "showhidefilters-16.png", tooltip: "Include Pending", onclick: "dialogEvent('ResourcesTab_IncludePending_Click');" }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                };
 
-            this.layout = new dhtmlXLayoutObject(this.params.ClientID + "layoutDiv", "2E", "dhx_skyblue");
-            this.layout.cells(const_PlanCell).setText("Plan Area");
-            this.layout.cells(const_ResourcesCell).setText("Resource Area");
-            this.layout.cells(const_PlanCell).hideHeader();
-            this.layout.cells(const_ResourcesCell).hideHeader();
+                this.layout = new dhtmlXLayoutObject(this.params.ClientID + "layoutDiv", "2E", "dhx_skyblue");
+                this.layout.cells(const_PlanCell).setText("Plan Area");
+                this.layout.cells(const_ResourcesCell).setText("Resource Area");
+                this.layout.cells(const_PlanCell).hideHeader();
+                this.layout.cells(const_ResourcesCell).hideHeader();
 
-            this.layout_plan = this.layout.cells(const_PlanCell).attachLayout("2E", "dhx_skyblue");
-            this.layout_plan._minHeight = 18;
-            this.layout_plan.cells(const_PlanRibbonCell).setText("Plan Ribbon Area");
-            this.layout_plan.cells(const_PlanRibbonCell).hideHeader();
-            this.layout_plan.cells(const_PlanRibbonCell).setHeight(120);
-            this.layout_plan.cells(const_PlanRibbonCell).fixSize(false, true);
-            this.layout_plan.cells(const_PlanGridCell).setText("Plan Grid Area");
-            this.layout_plan.cells(const_PlanGridCell).hideHeader();
-            this.layout.setAutoSize("a;b", "a");
+                this.layout_plan = this.layout.cells(const_PlanCell).attachLayout("2E", "dhx_skyblue");
+                this.layout_plan._minHeight = 18;
+                this.layout_plan.cells(const_PlanRibbonCell).setText("Plan Ribbon Area");
+                this.layout_plan.cells(const_PlanRibbonCell).hideHeader();
+                this.layout_plan.cells(const_PlanRibbonCell).setHeight(120);
+                this.layout_plan.cells(const_PlanRibbonCell).fixSize(false, true);
+                this.layout_plan.cells(const_PlanGridCell).setText("Plan Grid Area");
+                this.layout_plan.cells(const_PlanGridCell).hideHeader();
+                this.layout.setAutoSize("a;b", "a");
 
-            this.editorTab = new Ribbon(editorTabData);
-            this.editorTab.Render();
+                this.editorTab = new Ribbon(editorTabData);
+                this.editorTab.Render();
 
-            this.viewTab = new Ribbon(viewTabData);
-            this.viewTab.Render();
-            this.resourcesTab = new Ribbon(resourcesTabData);
-            this.resourcesTab.Render();
-            // comment next line to show the Include Pending button
-            this.resourcesTab.hideItem('idResourcesTab_IncludePending');
-            this.resourcesTab.setButtonStateOn("idResourcesTab_IncludePending");
+                this.viewTab = new Ribbon(viewTabData);
+                this.viewTab.Render();
+                this.resourcesTab = new Ribbon(resourcesTabData);
+                this.resourcesTab.Render();
+                // comment next line to show the Include Pending button
+                this.resourcesTab.hideItem('idResourcesTab_IncludePending');
+                this.resourcesTab.setButtonStateOn("idResourcesTab_IncludePending");
 
-            if (this.NegotiationMode != true) {
-                this.editorTab.hideItem('CancelBtn');
-                this.editorTab.hideItem('AcceptBtn');
-                this.editorTab.hideItem('RejectBtn');
-                this.editorTab.hideItem('RowHistoryBtn');
+                if (this.NegotiationMode != true) {
+                    this.editorTab.hideItem('CancelBtn');
+                    this.editorTab.hideItem('AcceptBtn');
+                    this.editorTab.hideItem('RejectBtn');
+                    this.editorTab.hideItem('RowHistoryBtn');
+                }
+                // comment this out to show heatmap button in ribbon
+                //this.resourcesTab.hideItem('idResourcesTab_ShowHeatmap');
+
+                this.planTabbar = this.layout_plan.cells(const_PlanRibbonCell).attachTabbar();
+                this.planTabbar.attachEvent("onSelect", function (id) { tabbarOnSelectDelegate(id, arguments); return true; });
+
+                this.planTabbar.setImagePath("/_layouts/epmlive/dhtml/xtab/imgs/");
+                this.planTabbar.enableAutoReSize();
+                this.planTabbar.addTab("tab_Editor", "Editor", 70);
+                this.planTabbar.setContent("tab_Editor", this.editorTab.getRibbonDiv());
+                this.planTabbar.addTab("tab_View", "View", 70);
+                this.planTabbar.setContent("tab_View", this.viewTab.getRibbonDiv());
+
+                this.layout_res = this.layout.cells(const_ResourcesCell).attachLayout("2E", "dhx_skyblue");
+                this.layout_res._minHeight = 18;
+                this.layout_res.cells(const_ResourceRibbonCell).setText("Resource Ribbon Area");
+                this.layout_res.cells(const_ResourceRibbonCell).hideHeader();
+                this.layout_res.cells(const_ResourceRibbonCell).setHeight(68);
+                this.layout_res.cells(const_ResourceRibbonCell).fixSize(false, true);
+                this.layout_res.cells(const_ResourceGridCell).setText("Resource Grid Area");
+                this.layout_res.cells(const_ResourceGridCell).hideHeader();
+
+                this.layout_res.cells(const_ResourceRibbonCell).attachObject(document.getElementById(this.resourcesTab.getRibbonDiv()));
+
+                var select = document.getElementById("idResourcesTab_ShowMe");
+                select.options.length = 0;
+                select.options[select.options.length] = new Option("Remaining", "Remaining", false, false);
+                select.options[select.options.length] = new Option("Committed", "Committed", false, false);
+                select.options[select.options.length] = new Option("Available", "Available", false, false);
+                this.resourcesTab.refreshSelect("idResourcesTab_ShowMe");
+
+                this.planTabbar.setTabActive("tab_Editor");
+
+                this.layout_plan.cells(const_PlanGridCell).attachObject("gridDiv_RPE");
+
             }
-            // comment this out to show heatmap button in ribbon
-            //this.resourcesTab.hideItem('idResourcesTab_ShowHeatmap');
-
-            this.planTabbar = this.layout_plan.cells(const_PlanRibbonCell).attachTabbar();
-            this.planTabbar.attachEvent("onSelect", function (id) { tabbarOnSelectDelegate(id, arguments); return true; });
-
-            this.planTabbar.setImagePath("/_layouts/epmlive/dhtml/xtab/imgs/");
-            this.planTabbar.enableAutoReSize();
-            this.planTabbar.addTab("tab_Editor", "Editor", 70);
-            this.planTabbar.setContent("tab_Editor", this.editorTab.getRibbonDiv());
-            this.planTabbar.addTab("tab_View", "View", 70);
-            this.planTabbar.setContent("tab_View", this.viewTab.getRibbonDiv());
-
-            this.layout_res = this.layout.cells(const_ResourcesCell).attachLayout("2E", "dhx_skyblue");
-            this.layout_res._minHeight = 18;
-            this.layout_res.cells(const_ResourceRibbonCell).setText("Resource Ribbon Area");
-            this.layout_res.cells(const_ResourceRibbonCell).hideHeader();
-            this.layout_res.cells(const_ResourceRibbonCell).setHeight(68);
-            this.layout_res.cells(const_ResourceRibbonCell).fixSize(false, true);
-            this.layout_res.cells(const_ResourceGridCell).setText("Resource Grid Area");
-            this.layout_res.cells(const_ResourceGridCell).hideHeader();
-
-            this.layout_res.cells(const_ResourceRibbonCell).attachObject(document.getElementById(this.resourcesTab.getRibbonDiv()));
-
-            var select = document.getElementById("idResourcesTab_ShowMe");
-            select.options.length = 0;
-            select.options[select.options.length] = new Option("Remaining", "Remaining", false, false);
-            select.options[select.options.length] = new Option("Committed", "Committed", false, false);
-            select.options[select.options.length] = new Option("Available", "Available", false, false);
-            this.resourcesTab.refreshSelect("idResourcesTab_ShowMe");
-
-            this.planTabbar.setTabActive("tab_Editor");
-
-            this.layout_plan.cells(const_PlanGridCell).attachObject("gridDiv_RPE");
-
 
             var grid = Grids["g_RPE"];
             if (grid == null) {
+                if (!this.reloaded) {
+                    for (var i = 0; i < this.Views.length; i++) {
+                        if (this.Views[i].Default == true) {
+                            var selPeriods = this.Views[i].g_RPE.RightCols.split(",");
+                            this.viewStartPeriod = selPeriods[0].split(":")[0].replace("Q", "");
+                            this.viewFinishPeriod = selPeriods[selPeriods.length - 1].split(":")[0].replace("Q", "");
+                            break;
+                        }
+                    }
+                }
+
                 var sbDataxml = new StringBuilder();
                 sbDataxml.append('<![CDATA[');
                 sbDataxml.append('<Execute Function="GetResourcePlan">');
                 sbDataxml.append('<Wepid>' + this.params.WEPID + '</Wepid>');
                 sbDataxml.append('<TicketVal>' + this.params.TicketVal + '</TicketVal>');
                 sbDataxml.append('<IsResource>' + this.params.IsResource + '</IsResource>');
+                sbDataxml.append('<FromPeriodId>' + this.viewStartPeriod + '</FromPeriodId>');
+                sbDataxml.append('<ToPeriodId>' + this.viewFinishPeriod + '</ToPeriodId>');
                 sbDataxml.append('</Execute>');
                 sbDataxml.append(']]>');
 
@@ -1536,6 +1559,8 @@
                         sbd.append('<Wepid>' + this.params.WEPID + '</Wepid>');
                         sbd.append('<TicketVal>' + this.params.TicketVal + '</TicketVal>');
                         sbd.append('<IsResource>' + this.params.IsResource + '</IsResource>');
+                        sbd.append('<FromPeriodId>' + this.viewStartPeriod + '</FromPeriodId>');
+                        sbd.append('<ToPeriodId>' + this.viewFinishPeriod + '</ToPeriodId>');
                         // leave blank for now to get all valid resources
                         //sbd.append('<WResIDs>' + this.GetPlanResourceList() + '</WResIDs>');
                         sbd.append('</Execute>');
@@ -2995,7 +3020,7 @@
                                 document.getElementById("idSpreadAmount").select();
                             }
                             else {
-                                this.spreadDlg_LoadData(this.plangrid, this.planrow, false);
+                                this.spreadDlg_LoadData(this.plangrid, this.planrow, true);
                                 dlg.show();
                                 document.getElementById("idSpreadAmount").select();
                             }
@@ -3082,19 +3107,22 @@
                         this.finishPeriod = fp;
                         this.viewTab.selectByValue("idViewTab_FromPeriod", this.startPeriod);
                         this.viewTab.selectByValue("idViewTab_ToPeriod", this.finishPeriod);
-                        this.ApplyGridView("g_RPE", selectedView, true);
-                        this.ApplyGridView("g_Res", selectedView, true);
-                        this.ShowSelectedResourceGroup();
-                        //this.UpdatePlanCalculatedValues();
-                        this.RefreshPlanPeriods(false);
-                        var grid = Grids["g_RPE"];
-                        this.RefreshGrid(grid);
-                        this.InitialiseResourceGrid();
-                        this.RefreshResourcePeriodsPaged(false, null);
-                        this.spreadDlg_LoadData(this.plangrid, this.planrow, false);
-                        this.ShowHidePeriods(this.plangrid, false, true);
-                        this.ShowHidePeriods(this.resgrid, false, false);
-                        this.UpdateButtonsAsync();
+                        //this.ApplyGridView("g_RPE", selectedView, true);
+                        //this.ApplyGridView("g_Res", selectedView, true);
+                        //this.ShowSelectedResourceGroup();
+                        ////this.UpdatePlanCalculatedValues();
+                        //this.RefreshPlanPeriods(false);
+                        //var grid = Grids["g_RPE"];
+                        //this.RefreshGrid(grid);
+                        //this.InitialiseResourceGrid();
+                        //this.RefreshResourcePeriodsPaged(false, null);
+                        //this.spreadDlg_LoadData(this.plangrid, this.planrow, false);
+                        //this.ShowHidePeriods(this.plangrid, false, true);
+                        //this.ShowHidePeriods(this.resgrid, false, false);
+                        //this.UpdateButtonsAsync();
+                        this.viewTab.refreshSelect("idViewTab_FromPeriod");
+                        this.viewTab.refreshSelect("idViewTab_ToPeriod");
+                        this.AsyncReload(this.startPeriod, this.finishPeriod);
                     }
                     break;
                 case "ViewTab_SaveView":
@@ -3429,8 +3457,12 @@
                         }
                         this.startPeriod = sp;
                         this.finishPeriod = fp;
-                        this.ShowHidePeriods(this.plangrid, true, false);
-                        this.ShowHidePeriods(this.resgrid, true, false);
+                        if (this.viewStartPeriod > sp || this.viewFinishPeriod < fp) {
+                            this.AsyncReload(this.startPeriod, this.finishPeriod);
+                        } else {
+                            this.ShowHidePeriods(this.plangrid, true, false);
+                            this.ShowHidePeriods(this.resgrid, true, false);
+                        }
                     }
                     break;
                 case "privateRowsDlg_Yes":
@@ -3463,6 +3495,19 @@
             this.HandleException("externalEvent - " + event, e);
         }
     };
+
+    RPEditor.prototype.AsyncReload = function (fromPeriod, toPeriod) {
+        Grids["g_RPE"] = null;
+        Grids["g_Res"] = null;
+        this.plangrid = null;
+        this.resgrid = null;
+        this.initialized = false;
+        this.viewStartPeriod = fromPeriod;
+        this.viewFinishPeriod = toPeriod;
+        this.reloaded = true;
+        this.InitializeLayout();
+    };
+
     RPEditor.prototype.ShowSelectedResourceGroup = function () {
         var resgrid = this.resgrid;
         var sort = resgrid.Sort;
@@ -4667,8 +4712,10 @@
     RPEditor.prototype.InitialisePlanGrid = function () {
         var grid = Grids["g_RPE"];
         var row = grid.GetFirst(null, 0);
-        this.startPeriod = 999999;
-        this.finishPeriod = -1;
+        if (!this.reloaded) {
+            this.startPeriod = 999999;
+            this.finishPeriod = -1;
+        }
         while (row != null) {
             var status = grid.GetAttribute(row, null, "Status");
             if (status == 0) {
@@ -4695,25 +4742,40 @@
         if (this.finishPeriod == -1)
             this.finishPeriod = null;
 
-        var select = document.getElementById("idViewTab_SelView");
-        select.options.length = 0;
-        if (this.Views.length == 0) {
-            select.options[select.options.length] = new Option("--No Views--", "-1", false, false);
-        } else {
-            for (var i = 0; i < this.Views.length; i++) {
-                var view = this.Views[i];
-                select.options[select.options.length] = new Option(view.Name, view.ViewGUID, false, false);
+        if (!this.reloaded) {
+            var select = document.getElementById("idViewTab_SelView");
+            select.options.length = 0;
+            if (this.Views.length == 0) {
+                select.options[select.options.length] = new Option("--No Views--", "-1", false, false);
+            } else {
+                for (var i = 0; i < this.Views.length; i++) {
+                    var view = this.Views[i];
+                    select.options[select.options.length] = new Option(view.Name, view.ViewGUID, false, false);
+                }
             }
+            this.viewTab.refreshSelect("idViewTab_SelView");
         }
-        this.viewTab.refreshSelect("idViewTab_SelView");
 
         var from = document.getElementById('idViewTab_FromPeriod');
-        from.options.length = 0;
-        from.options.selectedIndex = -1;
-        from.options[from.options.length] = new Option("Current", 0);
         var to = document.getElementById('idViewTab_ToPeriod');
-        to.options.length = 0;
-        to.options.selectedIndex = -1;
+
+        if (!this.reloaded) {
+            from.options.length = 0;
+            from.options.selectedIndex = -1;
+            from.options[from.options.length] = new Option("Current", 0);
+
+            to.options.length = 0;
+            to.options.selectedIndex = -1;
+
+            for (var i = 0; i < this.allPeriods.length; i++) {
+                var sPeriod = this.allPeriods[i].PeriodName;
+                var periodid = parseInt(this.allPeriods[i].PeriodID);
+                from.options[from.options.length] = new Option(sPeriod, periodid);
+                to.options[to.options.length] = new Option(sPeriod, periodid);
+            }
+
+        }
+
         for (var c = 0; c < grid.ColNames[2].length; c++) {
             var col = grid.ColNames[2][c];
             var sType = col.substring(0, 1);
@@ -4722,23 +4784,33 @@
                 var periodid = parseInt(col.substring(1));
                 if (grid.GetAttribute(null, col, "Current") == true)
                     this.currentPeriod = periodid;
-                from.options[from.options.length] = new Option(sPeriod, periodid);
-                if (this.startPeriod == null) {
-                    this.startPeriod = periodid;
-                    from.options.selectedIndex = from.options.length - 1;
-                }
-                else if (periodid == this.startPeriod)
-                    from.options.selectedIndex = from.options.length - 1;
-
-                to.options[to.options.length] = new Option(sPeriod, periodid);
-                if (this.finishPeriod == null && c == grid.ColNames[2].length - 1) {
-                    this.finishPeriod = periodid;
-                    to.options.selectedIndex = to.options.length - 1;
-                }
-                else if (periodid == this.finishPeriod)
-                    to.options.selectedIndex = to.options.length - 1;
             }
         }
+
+        if (!this.reloaded) {
+            var selectedView = this.GetSelectedView();
+            if (selectedView != null) {
+                var selPeriods = selectedView.g_RPE.RightCols.split(",");
+                if (this.startPeriod == null) {
+                    this.startPeriod = selPeriods[0].split(":")[0].replace("Q", "");
+                }
+                if (this.finishPeriod == null) {
+                    this.finishPeriod = selPeriods[selPeriods.length - 1].split(":")[0].replace("Q", "");
+                }
+            }
+            if (this.currentPeriod != null) {
+                this.viewTab.selectByValue("idViewTab_FromPeriod", this.currentPeriod);
+            } else {
+                this.viewTab.selectByValue("idViewTab_FromPeriod", this.startPeriod);
+            }
+        } else {
+            this.currentPeriod = this.startPeriod;
+            this.viewTab.selectByValue("idViewTab_FromPeriod", this.startPeriod);
+        }
+
+        this.viewTab.selectByValue("idViewTab_FromPeriod", this.startPeriod);
+        this.viewTab.selectByValue("idViewTab_ToPeriod", this.finishPeriod);
+
         if (from.options.selectedIndex == -1) from.options.selectedIndex = 0;
         if (to.options.selectedIndex == -1) to.options.selectedIndex = to.options.length - 1;
         this.viewTab.refreshSelect("idViewTab_FromPeriod");
@@ -4753,6 +4825,9 @@
         this.viewTab.refreshSelect("idViewTab_DisplayedValues");
 
         try { grid.CalcWidth("Res_Names", 0); } catch (e) { }
+
+        //alert("11startPeriod " + this.startPeriod + " finishPeriod " + this.finishPeriod + " currentPeriod " + this.currentPeriod);
+
     };
     RPEditor.prototype.InitialiseResourceGrid = function () {
         var sValue = "";
@@ -6080,6 +6155,11 @@
         this.wins.attachViewportTo(this.params.ClientID + "layoutDiv");
         this.wins.setImagePath("../epmlive/dhtml/windows/imgs/");
         this.wins.setSkin("dhx_web");
+        this.reloaded = false;
+        this.allPeriods = null;
+        this.viewStartPeriod = null;
+        this.viewFinishPeriod = null;
+        this.reloadFinishPeriod = null;
         this.startPeriod = null;
         this.finishPeriod = null;
         this.currentPeriod = null;
