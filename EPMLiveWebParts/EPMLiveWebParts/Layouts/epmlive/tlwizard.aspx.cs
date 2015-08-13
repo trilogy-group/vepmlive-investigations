@@ -13,14 +13,14 @@ using System.Net;
 
 namespace EPMLiveWebParts.Layouts.epmlive
 {
-    
+
 
     public partial class tlwizard : LayoutsPageBase
     {
-        [DllImport("advapi32.dll",CharSet=CharSet.Unicode,SetLastError=true)]
-        static public extern bool LogonUser(string userName,string domain,string passWord,int logonType,int logonProvider,ref IntPtr accessToken);
-        [DllImport("kernel32.dll", CharSet=CharSet.Auto)]
-        public static extern  bool CloseHandle(IntPtr handle);
+        [DllImport("advapi32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+        static public extern bool LogonUser(string userName, string domain, string passWord, int logonType, int logonProvider, ref IntPtr accessToken);
+        [DllImport("kernel32.dll", CharSet = CharSet.Auto)]
+        public static extern bool CloseHandle(IntPtr handle);
 
         //static int step = 1;
         static string ssrsurl = "";
@@ -35,7 +35,7 @@ namespace EPMLiveWebParts.Layouts.epmlive
             //if (!SPContext.Current.Web.CurrentUser.IsSiteAdmin)
             //    Response.Redirect("../accessdenied.aspx");
 
-            
+
             if (!IsPostBack)
             {
                 //step = 1;
@@ -55,7 +55,7 @@ namespace EPMLiveWebParts.Layouts.epmlive
                     SPSecurity.RunWithElevatedPrivileges(delegate()
                     {
                         string strCon = EPMLiveCore.CoreFunctions.getConnectionString(SPContext.Current.Site.WebApplication.Id);
-                        if(strCon != "")
+                        if (strCon != "")
                         {
                             SqlConnection cn = new SqlConnection(strCon);
                             cn.Open();
@@ -63,7 +63,7 @@ namespace EPMLiveWebParts.Layouts.epmlive
                             SqlCommand cmd = new SqlCommand("SELECT databaseserver,databasename from RPTDATABASES where siteid=@siteid", cn);
                             cmd.Parameters.AddWithValue("@siteid", SPContext.Current.Site.ID);
                             SqlDataReader dr = cmd.ExecuteReader();
-                            if(dr.Read())
+                            if (dr.Read())
                             {
                                 txtReportDatabase.Text = dr.GetString(1);
                                 txtReportServer.Text = dr.GetString(0);
@@ -114,7 +114,7 @@ namespace EPMLiveWebParts.Layouts.epmlive
                     });
                 }
 
-                
+
 
                 appendclick(btnNext1);
                 appendclick(bntCancel1);
@@ -136,7 +136,7 @@ namespace EPMLiveWebParts.Layouts.epmlive
                     pnl2.Visible = false;
                     break;
                 case 3:
-                    if(ssrsurl != "")
+                    if (ssrsurl != "")
                     {
 
                         pnl2.Visible = true;
@@ -170,11 +170,11 @@ namespace EPMLiveWebParts.Layouts.epmlive
             {
                 case 1:
                     hdnStep.Value = (int.Parse(hdnStep.Value) + 1).ToString();
-                    if(ssrsurl != "")
+                    if (ssrsurl != "")
                     {
                         pnl1.Visible = false;
                         pnl2.Visible = true;
-                        
+
                     }
                     else
                     {
@@ -185,10 +185,10 @@ namespace EPMLiveWebParts.Layouts.epmlive
                     break;
                 case 2:
                     string cn = "";
-                    
+
                     cn = checkConnection();
 
-                    if(cn == "")
+                    if (cn == "")
                     {
                         pnl2.Visible = false;
                         pnl3.Visible = true;
@@ -213,7 +213,7 @@ namespace EPMLiveWebParts.Layouts.epmlive
                     hdnStep.Value = (int.Parse(hdnStep.Value) + 1).ToString();
                     break;
             }
-            
+
         }
 
         protected void btnYes_Click(object sender, EventArgs e)
@@ -225,9 +225,9 @@ namespace EPMLiveWebParts.Layouts.epmlive
 
             SPSecurity.RunWithElevatedPrivileges(delegate()
             {
-                using(SPSite site = new SPSite(w.Url))
+                using (SPSite site = new SPSite(w.Url))
                 {
-                    using(SPWeb web = site.OpenWeb())
+                    using (SPWeb web = site.OpenWeb())
                     {
                         try
                         {
@@ -268,7 +268,6 @@ namespace EPMLiveWebParts.Layouts.epmlive
                             }
 
                             ProcessNotifications(web);
-                            ProcessTimerJob(web);
                             ProcessBackEndLists(web);
                             ProcessGroups(web, w.CurrentUser);
                             Guid TimerJobID = ProcessReportingRefreshJob(web);
@@ -277,12 +276,12 @@ namespace EPMLiveWebParts.Layouts.epmlive
                             ProcessIzenda(web);
                             // EPML-5167 : Call cleanupAll to fix the issue.
                             ProcessCleanUpAll(web);
-                             
+
                             ClearNavigationCache(web);
 
                             CoreFunctions.enqueue(TimerJobID, 0);
 
-                            if (pnlMessage.Visible == false) 
+                            if (pnlMessage.Visible == false)
                             {
                                 if (rdoYes.Checked)
                                 {
@@ -326,7 +325,7 @@ namespace EPMLiveWebParts.Layouts.epmlive
         private void ProcessIzenda(SPWeb web)
         {
             SPList list = web.Lists.TryGetList("IzendaReports");
-            if(list != null)
+            if (list != null)
             {
                 string errors = "";
                 EPMLiveCore.API.Reporting.ProcessIzendaReportsFromList(list, out errors);
@@ -521,8 +520,8 @@ namespace EPMLiveWebParts.Layouts.epmlive
             }
             catch { }
 
-            roll = web.Roles["Contribute2"]; 
-            
+            roll = web.Roles["Contribute2"];
+
             try
             {
                 web.SiteGroups.Add("Project Managers", newOwner, user, "");
@@ -570,8 +569,8 @@ namespace EPMLiveWebParts.Layouts.epmlive
 
         static SPGroup GetSiteGroup(SPWeb web, string name)
         {
-            foreach(SPGroup group in web.SiteGroups)
-                if(group.Name.ToLower() == name.ToLower())
+            foreach (SPGroup group in web.SiteGroups)
+                if (group.Name.ToLower() == name.ToLower())
                     return group;
             return null;
         }
@@ -588,7 +587,7 @@ namespace EPMLiveWebParts.Layouts.epmlive
         private void ProcessBackEndList(SPWeb web, string slist)
         {
             SPList list = web.Lists.TryGetList(slist);
-            if(list != null)
+            if (list != null)
             {
                 try
                 {
@@ -617,69 +616,6 @@ namespace EPMLiveWebParts.Layouts.epmlive
             }
         }
 
-        private void ProcessTimerJob(SPWeb web)
-        {
-            SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(web.Site.WebApplication.Id));
-
-            SPSecurity.RunWithElevatedPrivileges(delegate()
-            {
-                cn.Open();
-            });
-            Guid timerjobguid;
-            SqlCommand cmd = new SqlCommand("select timerjobuid from timerjobs where siteguid=@siteguid and jobtype=2", cn);
-            cmd.Parameters.AddWithValue("@siteguid", web.Site.ID.ToString());
-            SqlDataReader dr = cmd.ExecuteReader();
-            if(dr.Read())
-            {
-                timerjobguid = dr.GetGuid(0);
-                dr.Close();
-                cmd = new SqlCommand("UPDATE TIMERJOBS set runtime = @runtime where siteguid=@siteguid and jobtype=2", cn);
-                cmd.Parameters.AddWithValue("@siteguid", web.Site.ID.ToString());
-                cmd.Parameters.AddWithValue("@runtime", ddlTimerRunTime.SelectedValue);
-                cmd.ExecuteNonQuery();
-            }
-            else
-            {
-                timerjobguid = Guid.NewGuid();
-                dr.Close();
-                cmd = new SqlCommand("INSERT INTO TIMERJOBS (timerjobuid, siteguid, jobtype, jobname, runtime, scheduletype, webguid) VALUES (@timerjobuid, @siteguid, 2, 'Today Fix/Res Plan', @runtime, 2, @webguid)", cn);
-                cmd.Parameters.AddWithValue("@siteguid", web.Site.ID.ToString());
-                cmd.Parameters.AddWithValue("@timerjobuid", timerjobguid);
-                cmd.Parameters.AddWithValue("@webguid", web.ID.ToString());
-                cmd.Parameters.AddWithValue("@runtime", ddlTimerRunTime.SelectedValue);
-                cmd.ExecuteNonQuery();
-            }
-
-
-            ////=========================Res Plan Job================
-            //cmd = new SqlCommand("select timerjobuid from timerjobs where siteguid=@siteguid and jobtype=1", cn);
-            //cmd.Parameters.AddWithValue("@siteguid", web.Site.ID.ToString());
-            //dr = cmd.ExecuteReader();
-
-            //string planlists = EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLiveResPlannerLists");
-
-            //if(dr.Read())
-            //{
-            //    dr.Close();
-            //    cmd = new SqlCommand("UPDATE TIMERJOBS set enabled = @enabled, parentjobuid=@parentjobuid where siteguid=@siteguid and jobtype=1", cn);
-            //    cmd.Parameters.AddWithValue("@siteguid", web.Site.ID.ToString());
-            //    cmd.Parameters.AddWithValue("@enabled", (planlists.Length > 0));
-            //    cmd.Parameters.AddWithValue("@parentjobuid", timerjobguid);
-            //    cmd.ExecuteNonQuery();
-            //}
-            //else
-            //{
-            //    dr.Close();
-            //    cmd = new SqlCommand("INSERT INTO TIMERJOBS (siteguid, jobtype, jobname, enabled, scheduletype,webguid, parentjobuid) VALUES (@siteguid, 1, 'Res Plan', @enabled, 1,@webguid,@parentjobuid)", cn);
-            //    cmd.Parameters.AddWithValue("@siteguid", web.Site.ID.ToString());
-            //    cmd.Parameters.AddWithValue("@webguid", web.ID.ToString());
-            //    cmd.Parameters.AddWithValue("@enabled", (planlists.Length > 0));
-            //    cmd.Parameters.AddWithValue("@parentjobuid", timerjobguid);
-
-            //    cmd.ExecuteNonQuery();
-            //}
-            cn.Close();
-        }
 
         private void ProcessNotifications(SPWeb web)
         {
@@ -693,7 +629,7 @@ namespace EPMLiveWebParts.Layouts.epmlive
             SqlCommand cmd = new SqlCommand("select timerjobuid from timerjobs where siteguid=@siteguid and jobtype=3", cn);
             cmd.Parameters.AddWithValue("@siteguid", web.Site.ID.ToString());
             SqlDataReader dr = cmd.ExecuteReader();
-            if(dr.Read())
+            if (dr.Read())
             {
                 dr.Close();
                 cmd = new SqlCommand("UPDATE TIMERJOBS set runtime = @runtime where siteguid=@siteguid and jobtype=3", cn);
@@ -733,7 +669,8 @@ namespace EPMLiveWebParts.Layouts.epmlive
                 {
                     string error = "";
 
-                    SPSecurity.RunWithElevatedPrivileges(delegate(){
+                    SPSecurity.RunWithElevatedPrivileges(delegate()
+                    {
                         string username = txtReportUsername.Text;
                         string domain = "";
 
@@ -784,7 +721,7 @@ namespace EPMLiveWebParts.Layouts.epmlive
                     });
 
                     return error;
-                    
+
                 }
                 else
                 {
@@ -805,7 +742,8 @@ namespace EPMLiveWebParts.Layouts.epmlive
 
         private void processReports(SPWeb web)
         {
-            SPSecurity.RunWithElevatedPrivileges(delegate(){
+            SPSecurity.RunWithElevatedPrivileges(delegate()
+            {
 
                 SSRS2006.ReportingService2006 SSRS = new SSRS2006.ReportingService2006();
                 SSRS.Url = ssrsurl + "/ReportService2006.asmx";
@@ -814,16 +752,16 @@ namespace EPMLiveWebParts.Layouts.epmlive
                 string username = "";
                 string password = "";
                 EPMLiveCore.ReportAuth _chrono = SPContext.Current.Site.WebApplication.GetChild<EPMLiveCore.ReportAuth>("ReportAuth");
-                if(_chrono != null)
+                if (_chrono != null)
                 {
                     username = _chrono.Username;
                     password = EPMLiveCore.CoreFunctions.Decrypt(_chrono.Password, "KgtH(@C*&@Dhflosdf9f#&f");
                 }
 
-                if(password != "")
+                if (password != "")
                 {
                     SSRS.UseDefaultCredentials = false;
-                    if(username.Contains("\\"))
+                    if (username.Contains("\\"))
                     {
                         SSRS.Credentials = new System.Net.NetworkCredential(username.Substring(username.IndexOf("\\") + 1), password, username.Substring(0, username.IndexOf("\\")));
                     }
@@ -897,7 +835,8 @@ namespace EPMLiveWebParts.Layouts.epmlive
                         processRDL(SSRS, web, li, dsr, list);
                     }
                 }
-                catch {
+                catch
+                {
                     pnlMessage.Visible = true;
                 }
             });
@@ -929,7 +868,7 @@ namespace EPMLiveWebParts.Layouts.epmlive
                     catch { }
                 }
             }
-            
+
         }
 
         private void hideWizard(SPWeb web)

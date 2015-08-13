@@ -11,31 +11,24 @@
 <link rel="stylesheet" type="text/css" href="/_layouts/epmlive/stylesheets/buttons.css" />
 
 <style>
-
-.wizHeader
-{
-font-family:Segoe UI Light,Verdana;
-font-size:24px;
-padding-left:5px;
-margin-top:0px;
-padding-top:5px;
-margin-bottom:15px;
-font-weight:normal;
-
-}
+    .wizHeader {
+        font-family: Segoe UI Light,Verdana;
+        font-size: 24px;
+        padding-left: 5px;
+        margin-top: 0px;
+        padding-top: 5px;
+        margin-bottom: 15px;
+        font-weight: normal;
+    }
 
 
-.wizText
-{
-margin-top:0px;
-padding-top:0px;
-padding-left:5px;
-font-family:Segoe UI Light,Verdana;
-font-size:16px;
-
-}
-
-
+    .wizText {
+        margin-top: 0px;
+        padding-top: 0px;
+        padding-left: 5px;
+        font-family: Segoe UI Light,Verdana;
+        font-size: 16px;
+    }
 </style>
 
 </asp:Content>
@@ -183,47 +176,6 @@ font-size:16px;
 				<p class="wizText">
 				This service will run daily at the time you specify and send email notifications based on the settings configured within the Notification Settings section of Site Settings.
 				</p></td>
-                        </tr>
-                         <tr>
-                            <td colspan="2">&nbsp;</td>
-                        </tr>
-                        <tr>
-                            <td><p style="margin-top:0px;padding-top:0px;padding-left:5px;font-family:Segoe UI Light,Verdana;font-size:16px;margin-bottom:0px;">Timer Service Run Time:</p></td>
-                            <td style="text-align:right;padding-right:15px;">
-                                <asp:DropDownList ID="ddlTimerRunTime" runat="server">
-                                    <asp:ListItem Enabled ="true" Selected ="true" Value ="-1" Text ="Disabled"></asp:ListItem>
-                                    <asp:ListItem Enabled ="true" Selected ="false" Value ="0" Text ="12:00 AM"></asp:ListItem>
-                                    <asp:ListItem Enabled ="true" Selected ="false" Value ="1" Text ="1:00 AM"></asp:ListItem>
-                                    <asp:ListItem Enabled ="true" Selected ="false" Value ="2" Text ="2:00 AM"></asp:ListItem>
-                                    <asp:ListItem Enabled ="true" Selected ="false" Value ="3" Text ="3:00 AM"></asp:ListItem>
-                                    <asp:ListItem Enabled ="true" Selected ="false" Value ="4" Text ="4:00 AM"></asp:ListItem>
-                                    <asp:ListItem Enabled ="true" Selected ="false" Value ="5" Text ="5:00 AM"></asp:ListItem>
-                                    <asp:ListItem Enabled ="true" Selected ="false" Value ="6" Text ="6:00 AM"></asp:ListItem>
-                                    <asp:ListItem Enabled ="true" Selected ="false" Value ="7" Text ="7:00 AM"></asp:ListItem>
-                                    <asp:ListItem Enabled ="true" Selected ="false" Value ="8" Text ="8:00 AM"></asp:ListItem>
-                                    <asp:ListItem Enabled ="true" Selected ="false" Value ="9" Text ="9:00 AM"></asp:ListItem>
-                                    <asp:ListItem Enabled ="true" Selected ="false" Value ="10" Text ="10:00 AM"></asp:ListItem>
-                                    <asp:ListItem Enabled ="true" Selected ="false" Value ="11" Text ="11:00 AM"></asp:ListItem>
-                                    <asp:ListItem Enabled ="true" Selected ="false" Value ="12" Text ="12:00 PM"></asp:ListItem>
-                                    <asp:ListItem Enabled ="true" Selected ="false" Value ="13" Text ="1:00 PM"></asp:ListItem>
-                                    <asp:ListItem Enabled ="true" Selected ="false" Value ="14" Text ="2:00 PM"></asp:ListItem>
-                                    <asp:ListItem Enabled ="true" Selected ="false" Value ="15" Text ="3:00 PM"></asp:ListItem>
-                                    <asp:ListItem Enabled ="true" Selected ="false" Value ="16" Text ="4:00 PM"></asp:ListItem>
-                                    <asp:ListItem Enabled ="true" Selected ="false" Value ="17" Text ="5:00 PM"></asp:ListItem>
-                                    <asp:ListItem Enabled ="true" Selected ="false" Value ="18" Text ="6:00 PM"></asp:ListItem>
-                                    <asp:ListItem Enabled ="true" Selected ="false" Value ="19" Text ="7:00 PM"></asp:ListItem>
-                                    <asp:ListItem Enabled ="true" Selected ="false" Value ="20" Text ="8:00 PM"></asp:ListItem>
-                                    <asp:ListItem Enabled ="true" Selected ="false" Value ="21" Text ="9:00 PM"></asp:ListItem>
-                                    <asp:ListItem Enabled ="true" Selected ="false" Value ="22" Text ="10:00 PM"></asp:ListItem>
-                                    <asp:ListItem Enabled ="true" Selected ="false" Value ="23" Text ="11:00 PM"></asp:ListItem>         
-                                </asp:DropDownList>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colspan="2">
-			    <p class="wizText">
-				This service will run daily at the time you specify and perform various administrative tasks such as recalculating fields.  Depending on the size of your Site Collection, this service may utilize considerable system resources and is recommended to be run off hours.</font></td>
-			     </p>
                         </tr>
                         <tr>
                             <td colspan="2">&nbsp;</td>
