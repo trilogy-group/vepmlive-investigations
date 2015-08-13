@@ -87,7 +87,7 @@ namespace EPMLiveCore
                 //    catch { }
 
                 SPWeb web = SPContext.Current.Web;
-                if(!CoreFunctions.DoesCurrentUserHaveFullControl(web))
+                if (!CoreFunctions.DoesCurrentUserHaveFullControl(web))
                 {
                     Microsoft.SharePoint.Utilities.SPUtility.TransferToErrorPage("Access denied.");
                 }
@@ -308,9 +308,9 @@ namespace EPMLiveCore
 
                     SPSecurity.RunWithElevatedPrivileges(delegate()
                     {
-                        using(SPSite site = new SPSite(currWeb.Site.ID))
+                        using (SPSite site = new SPSite(currWeb.Site.ID))
                         {
-                            using(SPWeb web = site.OpenWeb(currWeb.ID))
+                            using (SPWeb web = site.OpenWeb(currWeb.ID))
                             {
                                 saveSettings(web);
                             }
@@ -318,7 +318,7 @@ namespace EPMLiveCore
                     });
                 }
 
-                if(!String.IsNullOrEmpty(Request["Source"]))
+                if (!String.IsNullOrEmpty(Request["Source"]))
                 {
                     Response.Redirect(Request["Source"]);
                 }
