@@ -1389,10 +1389,10 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                 ribbon.TrimById("Ribbon.WorkViews.WorkViewsGroup.DeleteView");
             }
 
-            if (!bEnableLink)
-            {
+            //if (!bEnableLink)
+            //{
                 ribbon.TrimById("Ribbon.WorkPlanner.InsertGroup.LinkExternalTask");
-            }
+            //}
 
             if (bAgile)
             {
