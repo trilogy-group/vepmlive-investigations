@@ -1192,6 +1192,15 @@ namespace WorkEnginePPM
             bool errors = false;
             string key = "";
 
+            string sSource = "EPM Live";
+            string sLog = "Application";
+
+            SPSecurity.RunWithElevatedPrivileges(delegate()
+            {
+                if (!EventLog.SourceExists(sSource))
+                    EventLog.CreateEventSource(sSource, sLog);
+            });
+
             try
             {
                 StringReader sr = new StringReader(xml);
@@ -1205,12 +1214,12 @@ namespace WorkEnginePPM
 
                 SPSecurity.RunWithElevatedPrivileges(delegate()
                 {
-                    using(SPSite site = new SPSite(siteid))
+                    EventLog.WriteEntry(sSource, "Inside UpdateItems", EventLogEntryType.Information);
+
+                    using (SPSite site = new SPSite(siteid))
                     {
                         using(SPWeb web = site.OpenWeb(webid))
                         {
-
-
                             DataView dv = ds.Tables[1].DefaultView;
                             dv.Sort = "itemid";
 
@@ -1277,6 +1286,12 @@ namespace WorkEnginePPM
             {
                 errors = true;
                 message = "<Error ID=\"100\"><![CDATA[" + ex.Message + "]]></Error>";
+
+                SPSecurity.RunWithElevatedPrivileges(delegate()
+                {
+                    EventLog.WriteEntry(sSource, "In UpdateItems CATCH block: Error message: " + ex.Message, EventLogEntryType.Error);
+                    EventLog.WriteEntry(sSource, "In UpdateItems CATCH block: Stack Trace:\r\n" + ex.StackTrace.ToString(), EventLogEntryType.Error);
+                });
             }
 
             if (errors)
@@ -1284,6 +1299,10 @@ namespace WorkEnginePPM
             else
                 message = "<Result Status=\"0\">" + message + "</Result>";
 
+            SPSecurity.RunWithElevatedPrivileges(delegate()
+            {
+                EventLog.WriteEntry(sSource, "End of Method UpdateItems, errors:" + errors.ToString(), EventLogEntryType.Information);
+            });
 
             return message;
 
