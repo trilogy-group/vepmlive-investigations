@@ -5158,10 +5158,10 @@ span.ms-welcome-hover > span.ms-core-menu-arrow {
 .ms-dialog #isb-wrapper {margin:0;}
 
 /*epml-5445*/
-#zendesk-menu-closed {
+/*#zendesk-menu-closed {
     position: absolute;
     right: 50px !important;
-}
+}*/
 /*epml-5445*/
 
 .epm-loader {

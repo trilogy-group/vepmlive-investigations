@@ -67,7 +67,7 @@
 		                </wssuc:InputFormControl>
 	                </template_inputformcontrols>
         </wssuc:InputFormSection>
-        <wssuc:InputFormSection Id="ifsSupportIntegration" Title="Support Integration" Description="" runat="server">
+<%--        <wssuc:InputFormSection Id="ifsSupportIntegration" Title="Support Integration" Description="" runat="server">
             <template_description>
 	                    Enabling Support Integration will allow users to use the Help icon in the upper right corner of the screen to search for answers without leaving the application.
 	                </template_description>
@@ -81,7 +81,7 @@
 			                 </Template_Control>
 		                </wssuc:InputFormControl>
 	                </template_inputformcontrols>
-        </wssuc:InputFormSection>
+        </wssuc:InputFormSection>--%>
         <asp:Panel ID="pnlResources" runat="server" Visible="false">
             <wssuc:InputFormSection Title="Resources List" Description="" runat="server">
                 <template_description>

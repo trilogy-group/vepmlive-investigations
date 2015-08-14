@@ -26,7 +26,7 @@
                 }, !window.isIE8);
             }, !window.isIE8);
 
-            //EPML-5445            
+<%--            //EPML-5445            
             $(function () {
                 var supportIntegration = '<%= SupportIntegration %>';
                 if (supportIntegration.toLowerCase() == 'true') {
@@ -51,7 +51,7 @@
                      $("#zendesk-container").find("a").attr("href", "https://support.epmlive.com")
                 }
             });
-            //EPML-5445
+            //EPML-5445--%>
 
             //window.upland_insight = {
             //    id: '<%= UplandInsightId %>',

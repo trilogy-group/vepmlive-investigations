@@ -36,7 +36,7 @@
                 }, true);
             }, true);
 
-            //EPML-5445
+<%--            //EPML-5445
             //Looks like this control is NOT used
             $(function () {
                 var supportintegration = '<%= SupportIntegration %>';
@@ -49,7 +49,7 @@
                     s.parentNode.insertBefore(zendesk, s);
                 }
             });
-            //EPML-5445
+            //EPML-5445--%>
         }
 
         ExecuteOrDelayUntilScriptLoaded(onJqueryLoaded, 'jquery.min.js');

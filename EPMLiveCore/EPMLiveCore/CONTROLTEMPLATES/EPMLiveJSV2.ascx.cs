@@ -11,9 +11,9 @@ namespace EPMLiveCore.CONTROLTEMPLATES
 
         protected string Scheme;
         protected string UplandInsightId;
-        //EPML-5445
-        protected bool SupportIntegration;
-        //EPML-5445
+        ////EPML-5445
+        //protected bool SupportIntegration;
+        ////EPML-5445
         protected string WebUrl;
         private SPWeb _spWeb;
 
@@ -63,10 +63,10 @@ namespace EPMLiveCore.CONTROLTEMPLATES
 
             try
             {
-                //EPML-5445
-                var configValue = CoreFunctions.getConfigSetting(_spWeb, "SupportIntegration");
-                SupportIntegration = !string.IsNullOrEmpty(configValue) && Convert.ToBoolean(configValue);
-                //EPML-5445
+                ////EPML-5445
+                //var configValue = CoreFunctions.getConfigSetting(_spWeb, "SupportIntegration");
+                //SupportIntegration = !string.IsNullOrEmpty(configValue) && Convert.ToBoolean(configValue);
+                ////EPML-5445
             }
             catch { }
 
