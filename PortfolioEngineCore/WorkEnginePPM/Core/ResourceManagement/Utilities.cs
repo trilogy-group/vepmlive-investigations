@@ -608,7 +608,7 @@ namespace WorkEnginePPM.Core.ResourceManagement
                                 {
                                     IEnumerable<string> values = spListItemCollection.Cast<SPListItem>()
                                         .Where(spListItem => lookupIds.Contains((int)spListItem["ID"]))
-                                        .Select(spListItem => spListItem["EXTID"].ToString());
+                                        .Select(spListItem => Convert.ToString(spListItem["EXTID"]) == "" ? spListItem["Title"].ToString() : spListItem["EXTID"].ToString());
 
                                     value = string.Join(",", values.ToArray());
                                 }
@@ -639,7 +639,14 @@ namespace WorkEnginePPM.Core.ResourceManagement
                                 {
                                     if (returnId)
                                     {
-                                        value = spListItem["EXTID"].ToString();
+                                        if (Convert.ToString(spListItem["EXTID"]) == "")
+                                        {
+                                            value = spListItem["Title"].ToString();
+                                        }
+                                        else
+                                        {
+                                            value = spListItem["EXTID"].ToString();
+                                        }
                                     }
                                     else
                                     {
