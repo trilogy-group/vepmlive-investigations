@@ -141,33 +141,28 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
         }
     }
 
-    //[UpgradeStep(Version = EPMLiveVersion.V569, Order = 3.0, Description = "Updates for Zendesk Widget Integration")]
-    //internal class UpdateZendeskWidgetIntegration : UpgradeStep
-    //{
-    //    private SPWeb _spWeb;
-    //    public UpdateZendeskWidgetIntegration(SPWeb spWeb, bool isPfeSite)
-    //        : base(spWeb, isPfeSite)
-    //    {
-    //        _spWeb = spWeb;
-    //    }
-    //    public override bool Perform()
-    //    {
-    //        //Check if WalkMeID property is available 
-    //        var walkMeId = CoreFunctions.getConfigSetting(_spWeb, "EPMLiveWalkMeId");
-    //        if (walkMeId != null)
-    //        {
-    //            //Add new setting for ZendeskIntegration
-    //            CoreFunctions.setConfigSetting(_spWeb, "SupportIntegration", "True");
-    //            //Remove EPMLiveWalkMeId from config settings 
-    //            _spWeb.Properties.Remove("EPMLiveWalkMeId");
-    //            _spWeb.Properties.Update();
-    //        }
-    //        else
-    //        {
-    //            CoreFunctions.setConfigSetting(_spWeb, "SupportIntegration", "False");
-    //        }
 
-    //        return true;
-    //    }
-    //}
+    [UpgradeStep(Version = EPMLiveVersion.V569, Order = 3.0, Description = "Remove WalkMe Integration")]
+    internal class RemoveWalkMeIntegration : UpgradeStep
+    {
+        private SPWeb _spWeb;
+        public RemoveWalkMeIntegration(SPWeb spWeb, bool isPfeSite)
+            : base(spWeb, isPfeSite)
+        {
+            _spWeb = spWeb;
+        }
+        public override bool Perform()
+        {
+            //Check if WalkMeID property is available 
+            var walkMeId = CoreFunctions.getConfigSetting(_spWeb, "EPMLiveWalkMeId");
+            if (walkMeId != null)
+            {
+                //Remove EPMLiveWalkMeId from config settings 
+                _spWeb.Properties.Remove("EPMLiveWalkMeId");
+                _spWeb.Properties.Update();
+            }
+
+            return true;
+        }
+    }
 }
