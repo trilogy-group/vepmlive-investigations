@@ -50,7 +50,7 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
                         {
                             sqlConnection.Close();
                         }
-                        LogMessage(string.Format("Added new check box type field 'Use Basic Authentication' on the screen for TFS integration"), MessageKind.SUCCESS, 4);
+                        LogMessage(string.Format("Use Basic Authentication property for TFS integration added successfully."), MessageKind.SUCCESS, 4);
                     }
 
                 }
