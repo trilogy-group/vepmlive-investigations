@@ -260,3 +260,789 @@ ORDER BY [Resource Name]
 
 ')
  
+--------------------------------------------------------------
+------------------------------View: EPG_VW_PortfolioCustomFields---------------------------
+if not exists (select table_name from INFORMATION_SCHEMA.tables where table_name = 'EPG_VW_PortfolioCustomFields')
+begin
+    Print 'Creating View EPG_VW_PortfolioCustomFields'
+    SET @createoralter = 'CREATE'
+end
+else
+begin
+    Print 'Updating View EPG_VW_PortfolioCustomFields'
+    SET @createoralter = 'ALTER'
+end
+exec(@createoralter + ' VIEW [dbo].[EPG_VW_PortfolioCustomFields]
+AS
+
+-- ****************************************************************************************************
+-- EPGP_PROJECT_INT_VALUES
+-- ****************************************************************************************************
+select Project_ID as ProjectID, ''EPGP_PROJECT_INT_VALUES'' as TableName, ''PI_001'' as ColumnName, convert(varchar(255), PI_001) as Value
+from  EPGP_PROJECT_INT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_INT_VALUES'' as TableName, ''PI_002'' as ColumnName, convert(varchar(255), PI_002) as Value
+from  EPGP_PROJECT_INT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_INT_VALUES'' as TableName, ''PI_003'' as ColumnName, convert(varchar(255), PI_003) as Value
+from  EPGP_PROJECT_INT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_INT_VALUES'' as TableName, ''PI_004'' as ColumnName, convert(varchar(255), PI_004) as Value
+from  EPGP_PROJECT_INT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_INT_VALUES'' as TableName, ''PI_005'' as ColumnName, convert(varchar(255), PI_005) as Value
+from  EPGP_PROJECT_INT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_INT_VALUES'' as TableName, ''PI_006'' as ColumnName, convert(varchar(255), PI_006) as Value
+from  EPGP_PROJECT_INT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_INT_VALUES'' as TableName, ''PI_007'' as ColumnName, convert(varchar(255), PI_007) as Value
+from  EPGP_PROJECT_INT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_INT_VALUES'' as TableName, ''PI_008'' as ColumnName, convert(varchar(255), PI_008) as Value
+from  EPGP_PROJECT_INT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_INT_VALUES'' as TableName, ''PI_009'' as ColumnName, convert(varchar(255), PI_009) as Value
+from  EPGP_PROJECT_INT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_INT_VALUES'' as TableName, ''PI_010'' as ColumnName, convert(varchar(255), PI_010) as Value
+from  EPGP_PROJECT_INT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_INT_VALUES'' as TableName, ''PI_011'' as ColumnName, convert(varchar(255), PI_011) as Value
+from  EPGP_PROJECT_INT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_INT_VALUES'' as TableName, ''PI_012'' as ColumnName, convert(varchar(255), PI_012) as Value
+from  EPGP_PROJECT_INT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_INT_VALUES'' as TableName, ''PI_013'' as ColumnName, convert(varchar(255), PI_013) as Value
+from  EPGP_PROJECT_INT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_INT_VALUES'' as TableName, ''PI_014'' as ColumnName, convert(varchar(255), PI_014) as Value
+from  EPGP_PROJECT_INT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_INT_VALUES'' as TableName, ''PI_015'' as ColumnName, convert(varchar(255), PI_015) as Value
+from  EPGP_PROJECT_INT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_INT_VALUES'' as TableName, ''PI_016'' as ColumnName, convert(varchar(255), PI_016) as Value
+from  EPGP_PROJECT_INT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_INT_VALUES'' as TableName, ''PI_017'' as ColumnName, convert(varchar(255), PI_017) as Value
+from  EPGP_PROJECT_INT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_INT_VALUES'' as TableName, ''PI_018'' as ColumnName, convert(varchar(255), PI_018) as Value
+from  EPGP_PROJECT_INT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_INT_VALUES'' as TableName, ''PI_019'' as ColumnName, convert(varchar(255), PI_019) as Value
+from  EPGP_PROJECT_INT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_INT_VALUES'' as TableName, ''PI_020'' as ColumnName, convert(varchar(255), PI_020) as Value
+from  EPGP_PROJECT_INT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_INT_VALUES'' as TableName, ''PI_021'' as ColumnName, convert(varchar(255), PI_021) as Value
+from  EPGP_PROJECT_INT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_INT_VALUES'' as TableName, ''PI_022'' as ColumnName, convert(varchar(255), PI_022) as Value
+from  EPGP_PROJECT_INT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_INT_VALUES'' as TableName, ''PI_023'' as ColumnName, convert(varchar(255), PI_023) as Value
+from  EPGP_PROJECT_INT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_INT_VALUES'' as TableName, ''PI_024'' as ColumnName, convert(varchar(255), PI_024) as Value
+from  EPGP_PROJECT_INT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_INT_VALUES'' as TableName, ''PI_025'' as ColumnName, convert(varchar(255), PI_025) as Value
+from  EPGP_PROJECT_INT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_INT_VALUES'' as TableName, ''PI_026'' as ColumnName, convert(varchar(255), PI_026) as Value
+from  EPGP_PROJECT_INT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_INT_VALUES'' as TableName, ''PI_027'' as ColumnName, convert(varchar(255), PI_027) as Value
+from  EPGP_PROJECT_INT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_INT_VALUES'' as TableName, ''PI_028'' as ColumnName, convert(varchar(255), PI_028) as Value
+from  EPGP_PROJECT_INT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_INT_VALUES'' as TableName, ''PI_029'' as ColumnName, convert(varchar(255), PI_029) as Value
+from  EPGP_PROJECT_INT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_INT_VALUES'' as TableName, ''PI_030'' as ColumnName, convert(varchar(255), PI_030) as Value
+from  EPGP_PROJECT_INT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_INT_VALUES'' as TableName, ''PI_031'' as ColumnName, convert(varchar(255), PI_031) as Value
+from  EPGP_PROJECT_INT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_INT_VALUES'' as TableName, ''PI_032'' as ColumnName, convert(varchar(255), PI_032) as Value
+from  EPGP_PROJECT_INT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_INT_VALUES'' as TableName, ''PI_033'' as ColumnName, convert(varchar(255), PI_033) as Value
+from  EPGP_PROJECT_INT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_INT_VALUES'' as TableName, ''PI_034'' as ColumnName, convert(varchar(255), PI_034) as Value
+from  EPGP_PROJECT_INT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_INT_VALUES'' as TableName, ''PI_035'' as ColumnName, convert(varchar(255), PI_035) as Value
+from  EPGP_PROJECT_INT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_INT_VALUES'' as TableName, ''PI_036'' as ColumnName, convert(varchar(255), PI_036) as Value
+from  EPGP_PROJECT_INT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_INT_VALUES'' as TableName, ''PI_037'' as ColumnName, convert(varchar(255), PI_037) as Value
+from  EPGP_PROJECT_INT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_INT_VALUES'' as TableName, ''PI_038'' as ColumnName, convert(varchar(255), PI_038) as Value
+from  EPGP_PROJECT_INT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_INT_VALUES'' as TableName, ''PI_039'' as ColumnName, convert(varchar(255), PI_039) as Value
+from  EPGP_PROJECT_INT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_INT_VALUES'' as TableName, ''PI_040'' as ColumnName, convert(varchar(255), PI_040) as Value
+from  EPGP_PROJECT_INT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_INT_VALUES'' as TableName, ''PI_041'' as ColumnName, convert(varchar(255), PI_041) as Value
+from  EPGP_PROJECT_INT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_INT_VALUES'' as TableName, ''PI_042'' as ColumnName, convert(varchar(255), PI_042) as Value
+from  EPGP_PROJECT_INT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_INT_VALUES'' as TableName, ''PI_043'' as ColumnName, convert(varchar(255), PI_043) as Value
+from  EPGP_PROJECT_INT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_INT_VALUES'' as TableName, ''PI_044'' as ColumnName, convert(varchar(255), PI_044) as Value
+from  EPGP_PROJECT_INT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_INT_VALUES'' as TableName, ''PI_045'' as ColumnName, convert(varchar(255), PI_045) as Value
+from  EPGP_PROJECT_INT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_INT_VALUES'' as TableName, ''PI_046'' as ColumnName, convert(varchar(255), PI_046) as Value
+from  EPGP_PROJECT_INT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_INT_VALUES'' as TableName, ''PI_047'' as ColumnName, convert(varchar(255), PI_047) as Value
+from  EPGP_PROJECT_INT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_INT_VALUES'' as TableName, ''PI_048'' as ColumnName, convert(varchar(255), PI_048) as Value
+from  EPGP_PROJECT_INT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_INT_VALUES'' as TableName, ''PI_049'' as ColumnName, convert(varchar(255), PI_049) as Value
+from  EPGP_PROJECT_INT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_INT_VALUES'' as TableName, ''PI_050'' as ColumnName, convert(varchar(255), PI_050) as Value
+from  EPGP_PROJECT_INT_VALUES
+union
+
+-- ****************************************************************************************************
+-- EPGP_PROJECT_TEXT_VALUES
+-- ****************************************************************************************************
+select Project_ID as ProjectID, ''EPGP_PROJECT_TEXT_VALUES'' as TableName, ''PT_001'' as ColumnName, PT_001 as Value
+from  EPGP_PROJECT_TEXT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_TEXT_VALUES'' as TableName, ''PT_002'' as ColumnName, PT_002 as Value
+from  EPGP_PROJECT_TEXT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_TEXT_VALUES'' as TableName, ''PT_003'' as ColumnName, PT_003 as Value
+from  EPGP_PROJECT_TEXT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_TEXT_VALUES'' as TableName, ''PT_004'' as ColumnName, PT_004 as Value
+from  EPGP_PROJECT_TEXT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_TEXT_VALUES'' as TableName, ''PT_005'' as ColumnName, PT_005 as Value
+from  EPGP_PROJECT_TEXT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_TEXT_VALUES'' as TableName, ''PT_006'' as ColumnName, PT_006 as Value
+from  EPGP_PROJECT_TEXT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_TEXT_VALUES'' as TableName, ''PT_007'' as ColumnName, PT_007 as Value
+from  EPGP_PROJECT_TEXT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_TEXT_VALUES'' as TableName, ''PT_008'' as ColumnName, PT_008 as Value
+from  EPGP_PROJECT_TEXT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_TEXT_VALUES'' as TableName, ''PT_009'' as ColumnName, PT_009 as Value
+from  EPGP_PROJECT_TEXT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_TEXT_VALUES'' as TableName, ''PT_010'' as ColumnName, PT_010 as Value
+from  EPGP_PROJECT_TEXT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_TEXT_VALUES'' as TableName, ''PT_011'' as ColumnName, PT_011 as Value
+from  EPGP_PROJECT_TEXT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_TEXT_VALUES'' as TableName, ''PT_012'' as ColumnName, PT_012 as Value
+from  EPGP_PROJECT_TEXT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_TEXT_VALUES'' as TableName, ''PT_013'' as ColumnName, PT_013 as Value
+from  EPGP_PROJECT_TEXT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_TEXT_VALUES'' as TableName, ''PT_014'' as ColumnName, PT_014 as Value
+from  EPGP_PROJECT_TEXT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_TEXT_VALUES'' as TableName, ''PT_015'' as ColumnName, PT_015 as Value
+from  EPGP_PROJECT_TEXT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_TEXT_VALUES'' as TableName, ''PT_016'' as ColumnName, PT_016 as Value
+from  EPGP_PROJECT_TEXT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_TEXT_VALUES'' as TableName, ''PT_017'' as ColumnName, PT_017 as Value
+from  EPGP_PROJECT_TEXT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_TEXT_VALUES'' as TableName, ''PT_018'' as ColumnName, PT_018 as Value
+from  EPGP_PROJECT_TEXT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_TEXT_VALUES'' as TableName, ''PT_019'' as ColumnName, PT_019 as Value
+from  EPGP_PROJECT_TEXT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_TEXT_VALUES'' as TableName, ''PT_020'' as ColumnName, PT_020 as Value
+from  EPGP_PROJECT_TEXT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_TEXT_VALUES'' as TableName, ''PT_021'' as ColumnName, PT_021 as Value
+from  EPGP_PROJECT_TEXT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_TEXT_VALUES'' as TableName, ''PT_022'' as ColumnName, PT_022 as Value
+from  EPGP_PROJECT_TEXT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_TEXT_VALUES'' as TableName, ''PT_023'' as ColumnName, PT_023 as Value
+from  EPGP_PROJECT_TEXT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_TEXT_VALUES'' as TableName, ''PT_024'' as ColumnName, PT_024 as Value
+from  EPGP_PROJECT_TEXT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_TEXT_VALUES'' as TableName, ''PT_025'' as ColumnName, PT_025 as Value
+from  EPGP_PROJECT_TEXT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_TEXT_VALUES'' as TableName, ''PT_026'' as ColumnName, PT_026 as Value
+from  EPGP_PROJECT_TEXT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_TEXT_VALUES'' as TableName, ''PT_027'' as ColumnName, PT_027 as Value
+from  EPGP_PROJECT_TEXT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_TEXT_VALUES'' as TableName, ''PT_028'' as ColumnName, PT_028 as Value
+from  EPGP_PROJECT_TEXT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_TEXT_VALUES'' as TableName, ''PT_029'' as ColumnName, PT_029 as Value
+from  EPGP_PROJECT_TEXT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_TEXT_VALUES'' as TableName, ''PT_030'' as ColumnName, PT_030 as Value
+from  EPGP_PROJECT_TEXT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_TEXT_VALUES'' as TableName, ''PT_031'' as ColumnName, PT_031 as Value
+from  EPGP_PROJECT_TEXT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_TEXT_VALUES'' as TableName, ''PT_032'' as ColumnName, PT_032 as Value
+from  EPGP_PROJECT_TEXT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_TEXT_VALUES'' as TableName, ''PT_033'' as ColumnName, PT_033 as Value
+from  EPGP_PROJECT_TEXT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_TEXT_VALUES'' as TableName, ''PT_034'' as ColumnName, PT_034 as Value
+from  EPGP_PROJECT_TEXT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_TEXT_VALUES'' as TableName, ''PT_035'' as ColumnName, PT_035 as Value
+from  EPGP_PROJECT_TEXT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_TEXT_VALUES'' as TableName, ''PT_036'' as ColumnName, PT_036 as Value
+from  EPGP_PROJECT_TEXT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_TEXT_VALUES'' as TableName, ''PT_037'' as ColumnName, PT_037 as Value
+from  EPGP_PROJECT_TEXT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_TEXT_VALUES'' as TableName, ''PT_038'' as ColumnName, PT_038 as Value
+from  EPGP_PROJECT_TEXT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_TEXT_VALUES'' as TableName, ''PT_039'' as ColumnName, PT_039 as Value
+from  EPGP_PROJECT_TEXT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_TEXT_VALUES'' as TableName, ''PT_040'' as ColumnName, PT_040 as Value
+from  EPGP_PROJECT_TEXT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_TEXT_VALUES'' as TableName, ''PT_041'' as ColumnName, PT_041 as Value
+from  EPGP_PROJECT_TEXT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_TEXT_VALUES'' as TableName, ''PT_042'' as ColumnName, PT_042 as Value
+from  EPGP_PROJECT_TEXT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_TEXT_VALUES'' as TableName, ''PT_043'' as ColumnName, PT_043 as Value
+from  EPGP_PROJECT_TEXT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_TEXT_VALUES'' as TableName, ''PT_044'' as ColumnName, PT_044 as Value
+from  EPGP_PROJECT_TEXT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_TEXT_VALUES'' as TableName, ''PT_045'' as ColumnName, PT_045 as Value
+from  EPGP_PROJECT_TEXT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_TEXT_VALUES'' as TableName, ''PT_046'' as ColumnName, PT_046 as Value
+from  EPGP_PROJECT_TEXT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_TEXT_VALUES'' as TableName, ''PT_047'' as ColumnName, PT_047 as Value
+from  EPGP_PROJECT_TEXT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_TEXT_VALUES'' as TableName, ''PT_048'' as ColumnName, PT_048 as Value
+from  EPGP_PROJECT_TEXT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_TEXT_VALUES'' as TableName, ''PT_049'' as ColumnName, PT_049 as Value
+from  EPGP_PROJECT_TEXT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_TEXT_VALUES'' as TableName, ''PT_050'' as ColumnName, PT_050 as Value
+from  EPGP_PROJECT_TEXT_VALUES
+union
+
+-- ****************************************************************************************************
+-- EPGP_PROJECT_NTEXT_VALUES
+-- ****************************************************************************************************
+select Project_ID as ProjectID, ''EPGP_PROJECT_NTEXT_VALUES'' as TableName, ''PN_001'' as ColumnName, Convert(varchar(max), PN_001) as Value
+from  EPGP_PROJECT_NTEXT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_NTEXT_VALUES'' as TableName, ''PN_002'' as ColumnName, Convert(varchar(max), PN_002) as Value
+from  EPGP_PROJECT_NTEXT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_NTEXT_VALUES'' as TableName, ''PN_003'' as ColumnName, Convert(varchar(max), PN_003) as Value
+from  EPGP_PROJECT_NTEXT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_NTEXT_VALUES'' as TableName, ''PN_004'' as ColumnName, Convert(varchar(max), PN_004) as Value
+from  EPGP_PROJECT_NTEXT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_NTEXT_VALUES'' as TableName, ''PN_005'' as ColumnName, Convert(varchar(max), PN_005) as Value
+from  EPGP_PROJECT_NTEXT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_NTEXT_VALUES'' as TableName, ''PN_006'' as ColumnName, Convert(varchar(max), PN_006) as Value
+from  EPGP_PROJECT_NTEXT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_NTEXT_VALUES'' as TableName, ''PN_007'' as ColumnName, Convert(varchar(max), PN_007) as Value
+from  EPGP_PROJECT_NTEXT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_NTEXT_VALUES'' as TableName, ''PN_008'' as ColumnName, Convert(varchar(max), PN_008) as Value
+from  EPGP_PROJECT_NTEXT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_NTEXT_VALUES'' as TableName, ''PN_009'' as ColumnName, Convert(varchar(max), PN_009) as Value
+from  EPGP_PROJECT_NTEXT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_NTEXT_VALUES'' as TableName, ''PN_010'' as ColumnName, Convert(varchar(max), PN_010) as Value
+from  EPGP_PROJECT_NTEXT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_NTEXT_VALUES'' as TableName, ''PN_011'' as ColumnName, Convert(varchar(max), PN_011) as Value
+from  EPGP_PROJECT_NTEXT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_NTEXT_VALUES'' as TableName, ''PN_012'' as ColumnName, Convert(varchar(max), PN_012) as Value
+from  EPGP_PROJECT_NTEXT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_NTEXT_VALUES'' as TableName, ''PN_013'' as ColumnName, Convert(varchar(max), PN_013) as Value
+from  EPGP_PROJECT_NTEXT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_NTEXT_VALUES'' as TableName, ''PN_014'' as ColumnName, Convert(varchar(max), PN_014) as Value
+from  EPGP_PROJECT_NTEXT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_NTEXT_VALUES'' as TableName, ''PN_015'' as ColumnName, Convert(varchar(max), PN_015) as Value
+from  EPGP_PROJECT_NTEXT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_NTEXT_VALUES'' as TableName, ''PN_016'' as ColumnName, Convert(varchar(max), PN_016) as Value
+from  EPGP_PROJECT_NTEXT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_NTEXT_VALUES'' as TableName, ''PN_017'' as ColumnName, Convert(varchar(max), PN_017) as Value
+from  EPGP_PROJECT_NTEXT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_NTEXT_VALUES'' as TableName, ''PN_018'' as ColumnName, Convert(varchar(max), PN_018) as Value
+from  EPGP_PROJECT_NTEXT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_NTEXT_VALUES'' as TableName, ''PN_019'' as ColumnName, Convert(varchar(max), PN_019) as Value
+from  EPGP_PROJECT_NTEXT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_NTEXT_VALUES'' as TableName, ''PN_020'' as ColumnName, Convert(varchar(max), PN_020) as Value
+from  EPGP_PROJECT_NTEXT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_NTEXT_VALUES'' as TableName, ''PN_021'' as ColumnName, Convert(varchar(max), PN_021) as Value
+from  EPGP_PROJECT_NTEXT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_NTEXT_VALUES'' as TableName, ''PN_022'' as ColumnName, Convert(varchar(max), PN_022) as Value
+from  EPGP_PROJECT_NTEXT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_NTEXT_VALUES'' as TableName, ''PN_023'' as ColumnName, Convert(varchar(max), PN_023) as Value
+from  EPGP_PROJECT_NTEXT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_NTEXT_VALUES'' as TableName, ''PN_024'' as ColumnName, Convert(varchar(max), PN_024) as Value
+from  EPGP_PROJECT_NTEXT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_NTEXT_VALUES'' as TableName, ''PN_025'' as ColumnName, Convert(varchar(max), PN_025) as Value
+from  EPGP_PROJECT_NTEXT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_NTEXT_VALUES'' as TableName, ''PN_026'' as ColumnName, Convert(varchar(max), PN_026) as Value
+from  EPGP_PROJECT_NTEXT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_NTEXT_VALUES'' as TableName, ''PN_027'' as ColumnName, Convert(varchar(max), PN_027) as Value
+from  EPGP_PROJECT_NTEXT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_NTEXT_VALUES'' as TableName, ''PN_028'' as ColumnName, Convert(varchar(max), PN_028) as Value
+from  EPGP_PROJECT_NTEXT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_NTEXT_VALUES'' as TableName, ''PN_029'' as ColumnName, Convert(varchar(max), PN_029) as Value
+from  EPGP_PROJECT_NTEXT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_NTEXT_VALUES'' as TableName, ''PN_030'' as ColumnName, Convert(varchar(max), PN_030) as Value
+from  EPGP_PROJECT_NTEXT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_NTEXT_VALUES'' as TableName, ''PN_031'' as ColumnName, Convert(varchar(max), PN_031) as Value
+from  EPGP_PROJECT_NTEXT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_NTEXT_VALUES'' as TableName, ''PN_032'' as ColumnName, Convert(varchar(max), PN_032) as Value
+from  EPGP_PROJECT_NTEXT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_NTEXT_VALUES'' as TableName, ''PN_033'' as ColumnName, Convert(varchar(max), PN_033) as Value
+from  EPGP_PROJECT_NTEXT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_NTEXT_VALUES'' as TableName, ''PN_034'' as ColumnName, Convert(varchar(max), PN_034) as Value
+from  EPGP_PROJECT_NTEXT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_NTEXT_VALUES'' as TableName, ''PN_035'' as ColumnName, Convert(varchar(max), PN_035) as Value
+from  EPGP_PROJECT_NTEXT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_NTEXT_VALUES'' as TableName, ''PN_036'' as ColumnName, Convert(varchar(max), PN_036) as Value
+from  EPGP_PROJECT_NTEXT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_NTEXT_VALUES'' as TableName, ''PN_037'' as ColumnName, Convert(varchar(max), PN_037) as Value
+from  EPGP_PROJECT_NTEXT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_NTEXT_VALUES'' as TableName, ''PN_038'' as ColumnName, Convert(varchar(max), PN_038) as Value
+from  EPGP_PROJECT_NTEXT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_NTEXT_VALUES'' as TableName, ''PN_039'' as ColumnName, Convert(varchar(max), PN_039) as Value
+from  EPGP_PROJECT_NTEXT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_NTEXT_VALUES'' as TableName, ''PN_040'' as ColumnName, Convert(varchar(max), PN_040) as Value
+from  EPGP_PROJECT_NTEXT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_NTEXT_VALUES'' as TableName, ''PN_041'' as ColumnName, Convert(varchar(max), PN_041) as Value
+from  EPGP_PROJECT_NTEXT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_NTEXT_VALUES'' as TableName, ''PN_042'' as ColumnName, Convert(varchar(max), PN_042) as Value
+from  EPGP_PROJECT_NTEXT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_NTEXT_VALUES'' as TableName, ''PN_043'' as ColumnName, Convert(varchar(max), PN_043) as Value
+from  EPGP_PROJECT_NTEXT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_NTEXT_VALUES'' as TableName, ''PN_044'' as ColumnName, Convert(varchar(max), PN_044) as Value
+from  EPGP_PROJECT_NTEXT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_NTEXT_VALUES'' as TableName, ''PN_045'' as ColumnName, Convert(varchar(max), PN_045) as Value
+from  EPGP_PROJECT_NTEXT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_NTEXT_VALUES'' as TableName, ''PN_046'' as ColumnName, Convert(varchar(max), PN_046) as Value
+from  EPGP_PROJECT_NTEXT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_NTEXT_VALUES'' as TableName, ''PN_047'' as ColumnName, Convert(varchar(max), PN_047) as Value
+from  EPGP_PROJECT_NTEXT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_NTEXT_VALUES'' as TableName, ''PN_048'' as ColumnName, Convert(varchar(max), PN_048) as Value
+from  EPGP_PROJECT_NTEXT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_NTEXT_VALUES'' as TableName, ''PN_049'' as ColumnName, Convert(varchar(max), PN_049) as Value
+from  EPGP_PROJECT_NTEXT_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_NTEXT_VALUES'' as TableName, ''PN_050'' as ColumnName, Convert(varchar(max), PN_050) as Value
+from  EPGP_PROJECT_NTEXT_VALUES
+union
+
+-- ****************************************************************************************************
+-- EPGP_PROJECT_DEC_VALUES
+-- ****************************************************************************************************
+select Project_ID as ProjectID, ''EPGP_PROJECT_DEC_VALUES'' as TableName, ''PC_001'' as ColumnName, Convert(varchar(255), cast(PC_001 as decimal(18,2))) as Value
+from  EPGP_PROJECT_DEC_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_DEC_VALUES'' as TableName, ''PC_002'' as ColumnName, Convert(varchar(255), cast(PC_002 as decimal(18,2))) as Value
+from  EPGP_PROJECT_DEC_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_DEC_VALUES'' as TableName, ''PC_003'' as ColumnName, Convert(varchar(255), cast(PC_003 as decimal(18,2))) as Value
+from  EPGP_PROJECT_DEC_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_DEC_VALUES'' as TableName, ''PC_004'' as ColumnName, Convert(varchar(255), cast(PC_004 as decimal(18,2))) as Value
+from  EPGP_PROJECT_DEC_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_DEC_VALUES'' as TableName, ''PC_005'' as ColumnName, Convert(varchar(255), cast(PC_005 as decimal(18,2))) as Value
+from  EPGP_PROJECT_DEC_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_DEC_VALUES'' as TableName, ''PC_006'' as ColumnName, Convert(varchar(255), cast(PC_006 as decimal(18,2))) as Value
+from  EPGP_PROJECT_DEC_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_DEC_VALUES'' as TableName, ''PC_007'' as ColumnName, Convert(varchar(255), cast(PC_007 as decimal(18,2))) as Value
+from  EPGP_PROJECT_DEC_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_DEC_VALUES'' as TableName, ''PC_008'' as ColumnName, Convert(varchar(255), cast(PC_008 as decimal(18,2))) as Value
+from  EPGP_PROJECT_DEC_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_DEC_VALUES'' as TableName, ''PC_009'' as ColumnName, Convert(varchar(255), cast(PC_009 as decimal(18,2))) as Value
+from  EPGP_PROJECT_DEC_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_DEC_VALUES'' as TableName, ''PC_010'' as ColumnName, Convert(varchar(255), cast(PC_010 as decimal(18,2))) as Value
+from  EPGP_PROJECT_DEC_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_DEC_VALUES'' as TableName, ''PC_011'' as ColumnName, Convert(varchar(255), cast(PC_011 as decimal(18,2))) as Value
+from  EPGP_PROJECT_DEC_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_DEC_VALUES'' as TableName, ''PC_012'' as ColumnName, Convert(varchar(255), cast(PC_012 as decimal(18,2))) as Value
+from  EPGP_PROJECT_DEC_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_DEC_VALUES'' as TableName, ''PC_013'' as ColumnName, Convert(varchar(255), cast(PC_013 as decimal(18,2))) as Value
+from  EPGP_PROJECT_DEC_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_DEC_VALUES'' as TableName, ''PC_014'' as ColumnName, Convert(varchar(255), cast(PC_014 as decimal(18,2))) as Value
+from  EPGP_PROJECT_DEC_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_DEC_VALUES'' as TableName, ''PC_015'' as ColumnName, Convert(varchar(255), cast(PC_015 as decimal(18,2))) as Value
+from  EPGP_PROJECT_DEC_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_DEC_VALUES'' as TableName, ''PC_016'' as ColumnName, Convert(varchar(255), cast(PC_016 as decimal(18,2))) as Value
+from  EPGP_PROJECT_DEC_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_DEC_VALUES'' as TableName, ''PC_017'' as ColumnName, Convert(varchar(255), cast(PC_017 as decimal(18,2))) as Value
+from  EPGP_PROJECT_DEC_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_DEC_VALUES'' as TableName, ''PC_018'' as ColumnName, Convert(varchar(255), cast(PC_018 as decimal(18,2))) as Value
+from  EPGP_PROJECT_DEC_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_DEC_VALUES'' as TableName, ''PC_019'' as ColumnName, Convert(varchar(255), cast(PC_019 as decimal(18,2))) as Value
+from  EPGP_PROJECT_DEC_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_DEC_VALUES'' as TableName, ''PC_020'' as ColumnName, Convert(varchar(255), cast(PC_020 as decimal(18,2))) as Value
+from  EPGP_PROJECT_DEC_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_DEC_VALUES'' as TableName, ''PC_021'' as ColumnName, Convert(varchar(255), cast(PC_021 as decimal(18,2))) as Value
+from  EPGP_PROJECT_DEC_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_DEC_VALUES'' as TableName, ''PC_022'' as ColumnName, Convert(varchar(255), cast(PC_022 as decimal(18,2))) as Value
+from  EPGP_PROJECT_DEC_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_DEC_VALUES'' as TableName, ''PC_023'' as ColumnName, Convert(varchar(255), cast(PC_023 as decimal(18,2))) as Value
+from  EPGP_PROJECT_DEC_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_DEC_VALUES'' as TableName, ''PC_024'' as ColumnName, Convert(varchar(255), cast(PC_024 as decimal(18,2))) as Value
+from  EPGP_PROJECT_DEC_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_DEC_VALUES'' as TableName, ''PC_025'' as ColumnName, Convert(varchar(255), cast(PC_025 as decimal(18,2))) as Value
+from  EPGP_PROJECT_DEC_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_DEC_VALUES'' as TableName, ''PC_026'' as ColumnName, Convert(varchar(255), cast(PC_026 as decimal(18,2))) as Value
+from  EPGP_PROJECT_DEC_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_DEC_VALUES'' as TableName, ''PC_027'' as ColumnName, Convert(varchar(255), cast(PC_027 as decimal(18,2))) as Value
+from  EPGP_PROJECT_DEC_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_DEC_VALUES'' as TableName, ''PC_028'' as ColumnName, Convert(varchar(255), cast(PC_028 as decimal(18,2))) as Value
+from  EPGP_PROJECT_DEC_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_DEC_VALUES'' as TableName, ''PC_029'' as ColumnName, Convert(varchar(255), cast(PC_029 as decimal(18,2))) as Value
+from  EPGP_PROJECT_DEC_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_DEC_VALUES'' as TableName, ''PC_030'' as ColumnName, Convert(varchar(255), cast(PC_030 as decimal(18,2))) as Value
+from  EPGP_PROJECT_DEC_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_DEC_VALUES'' as TableName, ''PC_031'' as ColumnName, Convert(varchar(255), cast(PC_031 as decimal(18,2))) as Value
+from  EPGP_PROJECT_DEC_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_DEC_VALUES'' as TableName, ''PC_032'' as ColumnName, Convert(varchar(255), cast(PC_032 as decimal(18,2))) as Value
+from  EPGP_PROJECT_DEC_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_DEC_VALUES'' as TableName, ''PC_033'' as ColumnName, Convert(varchar(255), cast(PC_033 as decimal(18,2))) as Value
+from  EPGP_PROJECT_DEC_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_DEC_VALUES'' as TableName, ''PC_034'' as ColumnName, Convert(varchar(255), cast(PC_034 as decimal(18,2))) as Value
+from  EPGP_PROJECT_DEC_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_DEC_VALUES'' as TableName, ''PC_035'' as ColumnName, Convert(varchar(255), cast(PC_035 as decimal(18,2))) as Value
+from  EPGP_PROJECT_DEC_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_DEC_VALUES'' as TableName, ''PC_036'' as ColumnName, Convert(varchar(255), cast(PC_036 as decimal(18,2))) as Value
+from  EPGP_PROJECT_DEC_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_DEC_VALUES'' as TableName, ''PC_037'' as ColumnName, Convert(varchar(255), cast(PC_037 as decimal(18,2))) as Value
+from  EPGP_PROJECT_DEC_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_DEC_VALUES'' as TableName, ''PC_038'' as ColumnName, Convert(varchar(255), cast(PC_038 as decimal(18,2))) as Value
+from  EPGP_PROJECT_DEC_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_DEC_VALUES'' as TableName, ''PC_039'' as ColumnName, Convert(varchar(255), cast(PC_039 as decimal(18,2))) as Value
+from  EPGP_PROJECT_DEC_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_DEC_VALUES'' as TableName, ''PC_040'' as ColumnName, Convert(varchar(255), cast(PC_040 as decimal(18,2))) as Value
+from  EPGP_PROJECT_DEC_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_DEC_VALUES'' as TableName, ''PC_041'' as ColumnName, Convert(varchar(255), cast(PC_041 as decimal(18,2))) as Value
+from  EPGP_PROJECT_DEC_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_DEC_VALUES'' as TableName, ''PC_042'' as ColumnName, Convert(varchar(255), cast(PC_042 as decimal(18,2))) as Value
+from  EPGP_PROJECT_DEC_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_DEC_VALUES'' as TableName, ''PC_043'' as ColumnName, Convert(varchar(255), cast(PC_043 as decimal(18,2))) as Value
+from  EPGP_PROJECT_DEC_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_DEC_VALUES'' as TableName, ''PC_044'' as ColumnName, Convert(varchar(255), cast(PC_044 as decimal(18,2))) as Value
+from  EPGP_PROJECT_DEC_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_DEC_VALUES'' as TableName, ''PC_045'' as ColumnName, Convert(varchar(255), cast(PC_045 as decimal(18,2))) as Value
+from  EPGP_PROJECT_DEC_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_DEC_VALUES'' as TableName, ''PC_046'' as ColumnName, Convert(varchar(255), cast(PC_046 as decimal(18,2))) as Value
+from  EPGP_PROJECT_DEC_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_DEC_VALUES'' as TableName, ''PC_047'' as ColumnName, Convert(varchar(255), cast(PC_047 as decimal(18,2))) as Value
+from  EPGP_PROJECT_DEC_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_DEC_VALUES'' as TableName, ''PC_048'' as ColumnName, Convert(varchar(255), cast(PC_048 as decimal(18,2))) as Value
+from  EPGP_PROJECT_DEC_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_DEC_VALUES'' as TableName, ''PC_049'' as ColumnName, Convert(varchar(255), cast(PC_049 as decimal(18,2))) as Value
+from  EPGP_PROJECT_DEC_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_DEC_VALUES'' as TableName, ''PC_050'' as ColumnName, Convert(varchar(255), cast(PC_050 as decimal(18,2))) as Value
+from  EPGP_PROJECT_DEC_VALUES
+union
+
+-- ****************************************************************************************************
+-- EPGP_PROJECT_DATE_VALUES
+-- ****************************************************************************************************
+select Project_ID as ProjectID, ''EPGP_PROJECT_DATE_VALUES'' as TableName, ''PD_001'' as ColumnName, Convert(varchar(255), CONVERT(char(10), PD_001,126)) as Value
+from  EPGP_PROJECT_DATE_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_DATE_VALUES'' as TableName, ''PD_002'' as ColumnName, Convert(varchar(255), CONVERT(char(10), PD_002,126)) as Value
+from  EPGP_PROJECT_DATE_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_DATE_VALUES'' as TableName, ''PD_003'' as ColumnName, Convert(varchar(255), CONVERT(char(10), PD_003,126)) as Value
+from  EPGP_PROJECT_DATE_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_DATE_VALUES'' as TableName, ''PD_004'' as ColumnName, Convert(varchar(255), CONVERT(char(10), PD_004,126)) as Value
+from  EPGP_PROJECT_DATE_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_DATE_VALUES'' as TableName, ''PD_005'' as ColumnName, Convert(varchar(255), CONVERT(char(10), PD_005,126)) as Value
+from  EPGP_PROJECT_DATE_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_DATE_VALUES'' as TableName, ''PD_006'' as ColumnName, Convert(varchar(255), CONVERT(char(10), PD_006,126)) as Value
+from  EPGP_PROJECT_DATE_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_DATE_VALUES'' as TableName, ''PD_007'' as ColumnName, Convert(varchar(255), CONVERT(char(10), PD_007,126)) as Value
+from  EPGP_PROJECT_DATE_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_DATE_VALUES'' as TableName, ''PD_008'' as ColumnName, Convert(varchar(255), CONVERT(char(10), PD_008,126)) as Value
+from  EPGP_PROJECT_DATE_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_DATE_VALUES'' as TableName, ''PD_009'' as ColumnName, Convert(varchar(255), CONVERT(char(10), PD_009,126)) as Value
+from  EPGP_PROJECT_DATE_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_DATE_VALUES'' as TableName, ''PD_010'' as ColumnName, Convert(varchar(255), CONVERT(char(10), PD_010,126)) as Value
+from  EPGP_PROJECT_DATE_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_DATE_VALUES'' as TableName, ''PD_011'' as ColumnName, Convert(varchar(255), CONVERT(char(10), PD_011,126)) as Value
+from  EPGP_PROJECT_DATE_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_DATE_VALUES'' as TableName, ''PD_012'' as ColumnName, Convert(varchar(255), CONVERT(char(10), PD_012,126)) as Value
+from  EPGP_PROJECT_DATE_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_DATE_VALUES'' as TableName, ''PD_013'' as ColumnName, Convert(varchar(255), CONVERT(char(10), PD_013,126)) as Value
+from  EPGP_PROJECT_DATE_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_DATE_VALUES'' as TableName, ''PD_014'' as ColumnName, Convert(varchar(255), CONVERT(char(10), PD_014,126)) as Value
+from  EPGP_PROJECT_DATE_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_DATE_VALUES'' as TableName, ''PD_015'' as ColumnName, Convert(varchar(255), CONVERT(char(10), PD_015,126)) as Value
+from  EPGP_PROJECT_DATE_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_DATE_VALUES'' as TableName, ''PD_016'' as ColumnName, Convert(varchar(255), CONVERT(char(10), PD_016,126)) as Value
+from  EPGP_PROJECT_DATE_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_DATE_VALUES'' as TableName, ''PD_017'' as ColumnName, Convert(varchar(255), CONVERT(char(10), PD_017,126)) as Value
+from  EPGP_PROJECT_DATE_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_DATE_VALUES'' as TableName, ''PD_018'' as ColumnName, Convert(varchar(255), CONVERT(char(10), PD_018,126)) as Value
+from  EPGP_PROJECT_DATE_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_DATE_VALUES'' as TableName, ''PD_019'' as ColumnName, Convert(varchar(255), CONVERT(char(10), PD_019,126)) as Value
+from  EPGP_PROJECT_DATE_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_DATE_VALUES'' as TableName, ''PD_020'' as ColumnName, Convert(varchar(255), CONVERT(char(10), PD_020,126)) as Value
+from  EPGP_PROJECT_DATE_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_DATE_VALUES'' as TableName, ''PD_021'' as ColumnName, Convert(varchar(255), CONVERT(char(10), PD_021,126)) as Value
+from  EPGP_PROJECT_DATE_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_DATE_VALUES'' as TableName, ''PD_022'' as ColumnName, Convert(varchar(255), CONVERT(char(10), PD_022,126)) as Value
+from  EPGP_PROJECT_DATE_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_DATE_VALUES'' as TableName, ''PD_023'' as ColumnName, Convert(varchar(255), CONVERT(char(10), PD_023,126)) as Value
+from  EPGP_PROJECT_DATE_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_DATE_VALUES'' as TableName, ''PD_024'' as ColumnName, Convert(varchar(255), CONVERT(char(10), PD_024,126)) as Value
+from  EPGP_PROJECT_DATE_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_DATE_VALUES'' as TableName, ''PD_025'' as ColumnName, Convert(varchar(255), CONVERT(char(10), PD_025,126)) as Value
+from  EPGP_PROJECT_DATE_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_DATE_VALUES'' as TableName, ''PD_026'' as ColumnName, Convert(varchar(255), CONVERT(char(10), PD_026,126)) as Value
+from  EPGP_PROJECT_DATE_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_DATE_VALUES'' as TableName, ''PD_027'' as ColumnName, Convert(varchar(255), CONVERT(char(10), PD_027,126)) as Value
+from  EPGP_PROJECT_DATE_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_DATE_VALUES'' as TableName, ''PD_028'' as ColumnName, Convert(varchar(255), CONVERT(char(10), PD_028,126)) as Value
+from  EPGP_PROJECT_DATE_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_DATE_VALUES'' as TableName, ''PD_029'' as ColumnName, Convert(varchar(255), CONVERT(char(10), PD_029,126)) as Value
+from  EPGP_PROJECT_DATE_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_DATE_VALUES'' as TableName, ''PD_030'' as ColumnName, Convert(varchar(255), CONVERT(char(10), PD_030,126)) as Value
+from  EPGP_PROJECT_DATE_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_DATE_VALUES'' as TableName, ''PD_031'' as ColumnName, Convert(varchar(255), CONVERT(char(10), PD_031,126)) as Value
+from  EPGP_PROJECT_DATE_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_DATE_VALUES'' as TableName, ''PD_032'' as ColumnName, Convert(varchar(255), CONVERT(char(10), PD_032,126)) as Value
+from  EPGP_PROJECT_DATE_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_DATE_VALUES'' as TableName, ''PD_033'' as ColumnName, Convert(varchar(255), CONVERT(char(10), PD_033,126)) as Value
+from  EPGP_PROJECT_DATE_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_DATE_VALUES'' as TableName, ''PD_034'' as ColumnName, Convert(varchar(255), CONVERT(char(10), PD_034,126)) as Value
+from  EPGP_PROJECT_DATE_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_DATE_VALUES'' as TableName, ''PD_035'' as ColumnName, Convert(varchar(255), CONVERT(char(10), PD_035,126)) as Value
+from  EPGP_PROJECT_DATE_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_DATE_VALUES'' as TableName, ''PD_036'' as ColumnName, Convert(varchar(255), CONVERT(char(10), PD_036,126)) as Value
+from  EPGP_PROJECT_DATE_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_DATE_VALUES'' as TableName, ''PD_037'' as ColumnName, Convert(varchar(255), CONVERT(char(10), PD_037,126)) as Value
+from  EPGP_PROJECT_DATE_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_DATE_VALUES'' as TableName, ''PD_038'' as ColumnName, Convert(varchar(255), CONVERT(char(10), PD_038,126)) as Value
+from  EPGP_PROJECT_DATE_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_DATE_VALUES'' as TableName, ''PD_039'' as ColumnName, Convert(varchar(255), CONVERT(char(10), PD_039,126)) as Value
+from  EPGP_PROJECT_DATE_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_DATE_VALUES'' as TableName, ''PD_040'' as ColumnName, Convert(varchar(255), CONVERT(char(10), PD_040,126)) as Value
+from  EPGP_PROJECT_DATE_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_DATE_VALUES'' as TableName, ''PD_041'' as ColumnName, Convert(varchar(255), CONVERT(char(10), PD_041,126)) as Value
+from  EPGP_PROJECT_DATE_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_DATE_VALUES'' as TableName, ''PD_042'' as ColumnName, Convert(varchar(255), CONVERT(char(10), PD_042,126)) as Value
+from  EPGP_PROJECT_DATE_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_DATE_VALUES'' as TableName, ''PD_043'' as ColumnName, Convert(varchar(255), CONVERT(char(10), PD_043,126)) as Value
+from  EPGP_PROJECT_DATE_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_DATE_VALUES'' as TableName, ''PD_044'' as ColumnName, Convert(varchar(255), CONVERT(char(10), PD_044,126)) as Value
+from  EPGP_PROJECT_DATE_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_DATE_VALUES'' as TableName, ''PD_045'' as ColumnName, Convert(varchar(255), CONVERT(char(10), PD_045,126)) as Value
+from  EPGP_PROJECT_DATE_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_DATE_VALUES'' as TableName, ''PD_046'' as ColumnName, Convert(varchar(255), CONVERT(char(10), PD_046,126)) as Value
+from  EPGP_PROJECT_DATE_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_DATE_VALUES'' as TableName, ''PD_047'' as ColumnName, Convert(varchar(255), CONVERT(char(10), PD_047,126)) as Value
+from  EPGP_PROJECT_DATE_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_DATE_VALUES'' as TableName, ''PD_048'' as ColumnName, Convert(varchar(255), CONVERT(char(10), PD_048,126)) as Value
+from  EPGP_PROJECT_DATE_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_DATE_VALUES'' as TableName, ''PD_049'' as ColumnName, Convert(varchar(255), CONVERT(char(10), PD_049,126)) as Value
+from  EPGP_PROJECT_DATE_VALUES
+union
+select Project_ID as ProjectID, ''EPGP_PROJECT_DATE_VALUES'' as TableName, ''PD_050'' as ColumnName, Convert(varchar(255), CONVERT(char(10), PD_050,126)) as Value
+from  EPGP_PROJECT_DATE_VALUES
+
+GO
+')

@@ -9244,3 +9244,128 @@ else
 
 ')
  
+ if not exists (select routine_name from INFORMATION_SCHEMA.routines where routine_name = 'EPG_SP_GetPortfolioCustomFieldsAndValues')
+begin
+    Print 'Creating Stored Procedure EPG_SP_GetPortfolioCustomFieldsAndValues'
+    SET @createoralter = 'CREATE'
+end
+else
+begin
+    Print 'Updating Stored Procedure EPG_SP_GetPortfolioCustomFieldsAndValues'
+    SET @createoralter = 'ALTER'
+end
+exec(@createoralter + ' PROCEDURE [dbo].[EPG_SP_GetPortfolioCustomFieldsAndValues]
+  @ProjectID int
+AS
+create table #CustomPortfolioItems (TableName varchar(100), Name varchar(255), FieldName varchar(6), Value varchar(500))
+
+insert into #CustomPortfolioItems (TableName, Name, FieldName)
+SELECT
+	case
+		when FA_TABLE_ID = 201 then ''EPGP_PROJECT_INT_VALUES''
+		when FA_TABLE_ID = 202 then ''EPGP_PROJECT_TEXT_VALUES''
+		when FA_TABLE_ID = 203 then ''EPGP_PROJECT_DEC_VALUES''
+		when FA_TABLE_ID = 204 then ''EPGP_PROJECT_NTEXT_VALUES''
+		when FA_TABLE_ID = 205 then ''EPGP_PROJECT_DATE_VALUES''
+	end as TableName
+	,EPGC_FIELD_ATTRIBS.FA_NAME
+	,case
+		when FA_TABLE_ID = 201 then ''PI_'' + right (''000''+ltrim(str(FA_FIELD_IN_TABLE)),3 )
+		when FA_TABLE_ID = 202 then ''PT_'' + right (''000''+ltrim(str(FA_FIELD_IN_TABLE)),3 )
+		when FA_TABLE_ID = 203 then ''PC_'' + right (''000''+ltrim(str(FA_FIELD_IN_TABLE)),3 )
+		when FA_TABLE_ID = 204 then ''PN_'' + right (''000''+ltrim(str(FA_FIELD_IN_TABLE)),3 )
+		when FA_TABLE_ID = 205 then ''PD_'' + right (''000''+ltrim(str(FA_FIELD_IN_TABLE)),3 )
+	end as FieldName
+FROM
+	EPGC_FIELD_ATTRIBS
+	LEFT OUTER JOIN EPGP_RD_FIELDS ON EPGP_RD_FIELDS.FIELD_ID = EPGC_FIELD_ATTRIBS.FA_FIELD_ID AND EPGP_RD_FIELDS.CONTEXT_ID = 101
+	LEFT OUTER JOIN EPGT_FIELDS ON EPGT_FIELDS.FIELD_ID = EPGP_RD_FIELDS.FIELD_ID
+WHERE
+	(EPGC_FIELD_ATTRIBS.FA_TABLE_ID = 201)
+	 AND (EPGC_FIELD_ATTRIBS.FA_FORMAT = 4 OR EPGC_FIELD_ATTRIBS.FA_FORMAT = 13 OR EPGC_FIELD_ATTRIBS.FA_FORMAT = 7)
+	 OR (EPGC_FIELD_ATTRIBS.FA_TABLE_ID = 202)
+	 OR (EPGC_FIELD_ATTRIBS.FA_TABLE_ID = 203)
+	 OR (EPGC_FIELD_ATTRIBS.FA_TABLE_ID = 204)
+	 OR (EPGC_FIELD_ATTRIBS.FA_TABLE_ID = 205)
+ORDER BY FA_TABLE_ID, FA_FIELD_IN_TABLE	 
+
+-- Set values
+update #CustomPortfolioItems
+set Value = EPG_VW_PortfolioCustomFields.Value
+from #CustomPortfolioItems
+join EPG_VW_PortfolioCustomFields on EPG_VW_PortfolioCustomFields.ProjectID = @ProjectId
+									  and EPG_VW_PortfolioCustomFields.TableName = #CustomPortfolioItems.TableName
+									  and EPG_VW_PortfolioCustomFields.ColumnName = #CustomPortfolioItems.FieldName
+
+select Name as FieldName, Value from #CustomPortfolioItems
+
+drop table #CustomPortfolioItems
+')
+
+if not exists (select routine_name from INFORMATION_SCHEMA.routines where routine_name = 'EPG_SP_ReadViewFieldDefinitionsWithProjectFields')
+begin
+    Print 'Creating Stored Procedure EPG_SP_ReadViewFieldDefinitionsWithProjectFields'
+    SET @createoralter = 'CREATE'
+end
+else
+begin
+    Print 'Updating Stored Procedure EPG_SP_ReadViewFieldDefinitionsWithProjectFields'
+    SET @createoralter = 'ALTER'
+end
+exec(@createoralter + ' PROCEDURE [dbo].[EPG_SP_ReadViewFieldDefinitionsWithProjectFields]
+  @ViewTypeID INT,
+  @ViewUID INT
+AS
+
+ SELECT
+	VF.FIELD_ID,
+	FIELD_TITLE,
+	FIELD_ALIGN,
+	FIELD_HIDDEN,
+	FIELD_FROZEN,
+	FIELD_NAME,
+	FIELD_NAME_SQL,
+	FIELD_TABLE_ID,
+	FIELD_FORMAT,
+	FA_FIELD_ID,
+	FA_LOOKUP_UID,
+	FA_LEAFONLY,
+	FA_USEFULLNAME,
+	FA_VALUE_UNIQUE,
+	FA_ADMIN
+FROM
+	EPG_VIEW_FIELDS VF
+	left join EPGT_FIELDS TSF on (TSF.FIELD_ID = VF.FIELD_ID AND FIELD_VIEWTYPE_ID = @ViewTypeID)
+	left join EPGP_FIELD_ATTRIBS FA on (TSF.FIELD_ID = FA_FIELD_ID)
+WHERE
+	VIEW_UID = @ViewUID
+union
+SELECT
+	0 as FIELD_ID,
+	at.FA_NAME as FIELD_TITLE,
+	0 as FIELD_ALIGN,
+	0 as FIELD_HIDDEN,
+	0 as FIELD_FROZEN,
+	at.FA_NAME as FIELD_NAME,
+	fl.FIELD_NAME_SQL,
+	at.FA_TABLE_ID,
+	at.FA_FORMAT,
+	fl.FIELD_ID as FA_FIELD_ID,
+	null as FA_LOOKUP_UID,
+	null as FA_LEAFONLY,
+	null as FA_USEFULLNAME,
+	null as FA_VALUE_UNIQUE,
+	null as FA_ADMIN	
+FROM
+	EPGC_FIELD_ATTRIBS AS at
+	LEFT OUTER JOIN EPGP_RD_FIELDS AS rd ON rd.FIELD_ID = at.FA_FIELD_ID AND rd.CONTEXT_ID = 101
+	LEFT OUTER JOIN EPGT_FIELDS AS fl ON fl.FIELD_ID = rd.FIELD_ID
+WHERE
+	(at.FA_TABLE_ID = 201) AND (at.FA_FORMAT = 4 OR at.FA_FORMAT = 13 OR at.FA_FORMAT = 7) OR 
+	(at.FA_TABLE_ID = 202)
+		or (at.FA_TABLE_ID = 203)
+	or (at.FA_TABLE_ID = 204)
+	or (at.FA_TABLE_ID = 205)
+ORDER BY 1
+')
+ 

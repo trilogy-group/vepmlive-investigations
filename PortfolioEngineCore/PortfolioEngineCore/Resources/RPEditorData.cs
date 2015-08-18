@@ -16,7 +16,7 @@ namespace PortfolioEngineCore
         //    return BuildResourcePlanGridXML(xPlanData, out xGrid);
         //}
 
-        public static StatusEnum BuildResourcePlanGridXML(CStruct xPlanData, out CStruct xGrid)
+        public static StatusEnum BuildResourcePlanGridXML(DBAccess databaseAccess, CStruct xPlanData, out CStruct xGrid)
         {
             // BUGBUG - remove this
             //string sXML = xPlanData.XML();
@@ -77,7 +77,7 @@ namespace PortfolioEngineCore
 
             CStruct xActions = xGrid.CreateSubStruct("Actions");
             xActions.CreateStringAttr("OnDrag", "DragCell");
-           
+
             CStruct xDef = xGrid.CreateSubStruct("Def");
             CStruct xD = xDef.CreateSubStruct("D");
             xD.CreateStringAttr("Name", "Group");
@@ -100,14 +100,14 @@ namespace PortfolioEngineCore
             CStruct xMidCols = xGrid.CreateSubStruct("Cols");
             //CStruct xPeriodCols = xGrid.CreateSubStruct("Cols");
             CStruct xRightCols = xGrid.CreateSubStruct("RightCols");
-            
+
             CStruct xHead = xGrid.CreateSubStruct("Head");
             CStruct xFilter = xHead.CreateSubStruct("Filter");
             xFilter.CreateStringAttr("id", "Filter");
             xFilter.CreateIntAttr("Visible", 0);
 
-//            <Head>
-//<Filter id="Filter1" Height="22" ENUMFilterOff="(All)" ICONTip="Input 'red', 'green' or 'yellow'" HTMLTip="Input 'yes', 'no', 'warn' or 'empty'"/>
+            //            <Head>
+            //<Filter id="Filter1" Height="22" ENUMFilterOff="(All)" ICONTip="Input 'red', 'green' or 'yellow'" HTMLTip="Input 'yes', 'no', 'warn' or 'empty'"/>
 
 
             CStruct xHeader1 = xGrid.CreateSubStruct("Header");
@@ -282,12 +282,12 @@ namespace PortfolioEngineCore
                         break;
                     case SpecialFieldIDsEnum.sfCostCategoryName:
                         //sColIDName = "CCRoleParent_Name";
-                         sColIDName = "CCRole_Name";
-                       break;
+                        sColIDName = "CCRole_Name";
+                        break;
                     case SpecialFieldIDsEnum.sfCostCategoryRoleName:
                         //sColIDName = "CCRole_Name";
-                         sColIDName = "Role_Name";
-                       break;
+                        sColIDName = "Role_Name";
+                        break;
                     case SpecialFieldIDsEnum.sfRoleName:
                         //sColIDName = "Role_Name";
                         break;
@@ -312,6 +312,13 @@ namespace PortfolioEngineCore
                         break;
                     case SpecialFieldIDsEnum.sfResourceType:
                         break;
+                    case SpecialFieldIDsEnum.sfPortfolioField:
+                        sColIDName = xField.GetStringAttr("Title");
+                        if (!string.IsNullOrEmpty(sColIDName))
+                        {
+                            sColIDName = sColIDName.Replace(" ", "_");
+                        }
+                        break;
                     default:
                         if (eFieldID >= SpecialFieldIDsEnum.sfRPCatText1 && eFieldID <= SpecialFieldIDsEnum.sfRPCatCode5)
                         {
@@ -321,7 +328,7 @@ namespace PortfolioEngineCore
                         }
                         break;
                 }
-                
+
                 if (sColIDName != "")
                 {
                     xC = xMidCols.CreateSubStruct("C");
@@ -399,11 +406,11 @@ namespace PortfolioEngineCore
 
             CStruct xBody = xGrid.CreateSubStruct("Body");
             CStruct xB = xBody.CreateSubStruct("B");
-            SortedList<string,CStruct> listAddedProjects = new SortedList<string,CStruct>();
+            SortedList<string, CStruct> listAddedProjects = new SortedList<string, CStruct>();
 
             CStruct xPlanRows = xPlanData.GetSubStruct("PlanRows");
             List<CStruct> listPlanRows = xPlanRows.GetList("PlanRow");
-            SortedList<string,bool> listGroups = new SortedList<string,bool>();
+            SortedList<string, bool> listGroups = new SortedList<string, bool>();
             string sResourceUIDs = xPlanData.GetStringAttr("ResourceUIDs", "");
             string sProjectIDs = xPlanData.GetStringAttr("ProjectIDs", "");
             bool bProjectMode = (sProjectIDs != "") ? true : false;
@@ -412,6 +419,9 @@ namespace PortfolioEngineCore
             foreach (CStruct xPI in listPIs.Values)
             {
                 string sProjectID = xPI.GetStringAttr("ProjectID");
+                Dictionary<string, string> portfolioFieldsForProject;
+                DBCommon.GetPortfolioFieldsAndValues(databaseAccess, sProjectID, out portfolioFieldsForProject);
+
                 //bool bUserCanEdit = xPI.GetBooleanAttr("UserCanEdit", false);
                 bool bIsUsed = xPI.GetBooleanAttr("IsUsed", false);
                 if (sProjectID != "" && (bProjectMode || bIsUsed))
@@ -453,19 +463,32 @@ namespace PortfolioEngineCore
                             case SpecialFieldIDsEnum.sfResourceGroups:
                             case SpecialFieldIDsEnum.sfResourceType:
                                 break;
+                            case SpecialFieldIDsEnum.sfPortfolioField:
+                                sColIDName = xField.GetStringAttr("Title");
 
-                            default:
-                            {
-                                if (eFieldID >= SpecialFieldIDsEnum.sfRPCatText1 && eFieldID <= SpecialFieldIDsEnum.sfRPCatCode5)
+                                if (!string.IsNullOrEmpty(sColIDName))
                                 {
-                                    sColIDName = "X" + ((int)eFieldID).ToString("0000") + "_Name";
-                                    xI.CreateIntAttr(sColIDName + "CanEdit", 0);
-                                    CStruct xLookup = GetLookup(listRPCats, (int)eFieldID);
-                                    if (xLookup != null)
-                                        xI.CreateStringAttr(sColIDName + "Button", "");
+                                    if (portfolioFieldsForProject.ContainsKey(sColIDName))
+                                    {
+                                        var sValue = portfolioFieldsForProject[sColIDName];
+                                        var sColIdNameWithouSpace = sColIDName.Replace(" ", "_");
+                                        xI.CreateStringAttr(sColIdNameWithouSpace, sValue);
+                                    }
                                 }
+
                                 break;
-                            }
+                            default:
+                                {
+                                    if (eFieldID >= SpecialFieldIDsEnum.sfRPCatText1 && eFieldID <= SpecialFieldIDsEnum.sfRPCatCode5)
+                                    {
+                                        sColIDName = "X" + ((int)eFieldID).ToString("0000") + "_Name";
+                                        xI.CreateIntAttr(sColIDName + "CanEdit", 0);
+                                        CStruct xLookup = GetLookup(listRPCats, (int)eFieldID);
+                                        if (xLookup != null)
+                                            xI.CreateStringAttr(sColIDName + "Button", "");
+                                    }
+                                    break;
+                                }
                         }
                     }
                     listAddedProjects.Add(sProjectID, xI);

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Globalization;
 using System.Text;
 using System.Xml;
 
@@ -87,7 +88,7 @@ namespace PortfolioEngineCore
             {
                 SqlCommand oCommand = null;
                 SqlDataReader reader = null;
-                oCommand = new SqlCommand("EPG_SP_ReadViewFieldDefinitions", dba.Connection);
+                oCommand = new SqlCommand("EPG_SP_ReadViewFieldDefinitionsWithProjectFields", dba.Connection);
                 oCommand.CommandType = System.Data.CommandType.StoredProcedure;
                 oCommand.Parameters.Add("ViewTypeID", SqlDbType.Int).Value = (int)ViewTypeEnum.vtResourcePlan;
                 oCommand.Parameters.Add("ViewUID", SqlDbType.Int).Value = lViewUID;
@@ -198,9 +199,9 @@ namespace PortfolioEngineCore
             //List<CStruct> cln;
             Dictionary<string, CStruct> dic;
 
-           if (GetCostCategoryRoles(dba, lPortfolioCommitmentsCalendarUID, lStartPeriodID, out dic, bGetAll) != StatusEnum.rsSuccess)
-                    goto Exit_Function;
- 
+            if (GetCostCategoryRoles(dba, lPortfolioCommitmentsCalendarUID, lStartPeriodID, out dic, bGetAll) != StatusEnum.rsSuccess)
+                goto Exit_Function;
+
             // Now add the relevant cost category/role rows into the XML
 
             CStruct xCostCategoryRoles;
@@ -247,7 +248,7 @@ namespace PortfolioEngineCore
                 while (reader.Read())
                 {
                     lRoleUID = DBAccess.ReadIntValue(reader["BC_ROLE"]);
-                    lCostCategoryUID = DBAccess.ReadIntValue(reader["BC_UID"]); 
+                    lCostCategoryUID = DBAccess.ReadIntValue(reader["BC_UID"]);
                     lLevel = DBAccess.ReadIntValue(reader["BC_LEVEL"]);
 
                     bAdd = false;
@@ -356,7 +357,7 @@ namespace PortfolioEngineCore
 
                 for (int i = RevAccess.Count - 1; i >= 0; i--)
                 {
-                   
+
                     xCostCategoryRole2 = RevAccess[i];
 
                     // jwg 3/22/12 end of replace
@@ -466,6 +467,36 @@ namespace PortfolioEngineCore
             catch (Exception ex)
             {
                 eStatus = dba.HandleStatusError(SeverityEnum.Exception, "SelectProjectIDByExtUID", (StatusEnum)99999, ex.Message.ToString());
+            }
+            return eStatus;
+        }
+
+        public static StatusEnum GetPortfolioFieldsAndValues(DBAccess dba, string projectId, out Dictionary<string, string>  portfolioFieldsForProject)
+        {
+            StatusEnum eStatus = StatusEnum.rsSuccess;
+            portfolioFieldsForProject = null;
+            try
+            {
+                if (!string.IsNullOrEmpty(projectId))
+                {
+                    portfolioFieldsForProject = new Dictionary<string,string>();
+                    var sqlCommand = new SqlCommand("EPG_SP_GetPortfolioCustomFieldsAndValues", dba.Connection);
+                    sqlCommand.CommandType = System.Data.CommandType.StoredProcedure;
+                    sqlCommand.Parameters.Add("ProjectID", SqlDbType.Int).Value = Int32.Parse(projectId);
+                    var reader = sqlCommand.ExecuteReader();
+
+                    while (reader.Read())
+                    {
+                        portfolioFieldsForProject.Add(reader["FieldName"].ToString(), reader["Value"].ToString());
+                    }
+
+                    reader.Close();
+                    reader.Dispose();
+                }
+            }
+            catch (Exception ex)
+            {
+                eStatus = dba.HandleStatusError(SeverityEnum.Exception, "GetPortfolioFieldsAndValues", (StatusEnum)99999, ex.Message.ToString(CultureInfo.InvariantCulture));
             }
             return eStatus;
         }
