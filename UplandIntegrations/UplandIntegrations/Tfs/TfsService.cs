@@ -1,13 +1,16 @@
 ﻿using Microsoft.TeamFoundation.Client;
 using Microsoft.TeamFoundation.Framework.Client;
+using Microsoft.TeamFoundation.Framework.Common;
 using Microsoft.TeamFoundation.VersionControl.Client;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Data;
 using System.Linq;
 using System.Net;
 using System.Reflection;
+
 
 namespace UplandIntegrations.Tfs
 {
@@ -110,7 +113,7 @@ namespace UplandIntegrations.Tfs
             {
                 try
                 {
-                    TfsType tfsType = (TfsType)Enum.Parse(typeof(TfsType), objectName);
+                    var tfsType = (TfsType)Enum.Parse(typeof(TfsType), objectName);
                     switch (tfsType)
                     {
                         case TfsType.Bug:
@@ -478,24 +481,50 @@ namespace UplandIntegrations.Tfs
                 }
             }
         }
+        //private void GetTeamProjectCollections(DataTable items, Boolean isOnlyColumns)
+        //{
+        //    ITeamProjectCollectionService tpcService = tfsConfigurationServer.GetService<ITeamProjectCollectionService>();
+        //    {
+        //        foreach (TeamProjectCollection teamProjectCollection in tpcService.GetCollections())
+        //        {
+        //            FillDataTable(teamProjectCollection, items, isOnlyColumns);
+        //        }
+        //    }
+        //}
+
+        //private void GetTeamProjectCollection(DataTable items, string teamProjectCollectionId, Boolean isOnlyColumns)
+        //{
+        //    ITeamProjectCollectionService tpcService = tfsConfigurationServer.GetService<ITeamProjectCollectionService>();
+        //    {
+        //        TeamProjectCollection teamProjectCollection = tpcService.GetCollection(new Guid(teamProjectCollectionId));
+        //        FillDataTable(teamProjectCollection, items, isOnlyColumns);
+        //    }
+        //}
+
         private void GetTeamProjectCollections(DataTable items, Boolean isOnlyColumns)
         {
-            ITeamProjectCollectionService tpcService = tfsConfigurationServer.GetService<ITeamProjectCollectionService>();
+            // Get the catalog of team project collections
+            CatalogNode catalogNode = tfsConfigurationServer.CatalogNode;
+
+            ReadOnlyCollection<CatalogNode> tpcNodes = catalogNode.QueryChildren(new Guid[] { CatalogResourceTypes.ProjectCollection },false, CatalogQueryOptions.None);
+
+            // List the team project collections
+            foreach (CatalogNode tpcNode in tpcNodes)
             {
-                foreach (TeamProjectCollection teamProjectCollection in tpcService.GetCollections())
-                {
-                    FillDataTable(teamProjectCollection, items, isOnlyColumns);
-                }
+                // Use the InstanceId property to get the team project collection
+                Guid tpcId = new Guid(tpcNode.Resource.Properties["InstanceId"]);
+                TfsTeamProjectCollection tpc = tfsConfigurationServer.GetTeamProjectCollection(tpcId);
+                FillDataTable(tpcNode.Resource, items, isOnlyColumns);
             }
         }
+
         private void GetTeamProjectCollection(DataTable items, string teamProjectCollectionId, Boolean isOnlyColumns)
         {
-            ITeamProjectCollectionService tpcService = tfsConfigurationServer.GetService<ITeamProjectCollectionService>();
-            {
-                TeamProjectCollection teamProjectCollection = tpcService.GetCollection(new Guid(teamProjectCollectionId));
-                FillDataTable(teamProjectCollection, items, isOnlyColumns);
-            }
+
+            TfsTeamProjectCollection tpc = tfsConfigurationServer.GetTeamProjectCollection(new Guid(teamProjectCollectionId));
+            FillDataTable(tpc, items, isOnlyColumns);
         }
+
         private void FillDataTable(object item, DataTable dataTable, Boolean isOnlyColumns)
         {
             PropertyInfo[] Props = item.GetType().GetProperties();
