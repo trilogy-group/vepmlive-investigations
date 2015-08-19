@@ -91,7 +91,7 @@ namespace UplandIntegrations.Tfs
                     tfsService.GetObjectItems(null, Property, collection, DateTime.Now, false);
                     foreach (DataRow dataRow in collection.Rows)
                     {
-                        props.Add(Convert.ToString(dataRow["Name"]), Convert.ToString(dataRow["Name"]));
+                        props.Add(Convert.ToString(dataRow["DisplayName"]), Convert.ToString(dataRow["DisplayName"]));
                     }
                 }
             }
