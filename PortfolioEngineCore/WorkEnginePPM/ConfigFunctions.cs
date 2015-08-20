@@ -107,7 +107,12 @@ namespace WorkEnginePPM
 
         public static string GetCleanUsername(SPWeb web)
         {
-            string username = web.CurrentUser.LoginName;
+            string username = string.Empty;
+            //Added code for the Cost Planner Integration - EPML-5327
+            if (web.CurrentUser == null)
+                username = "sharepoint\\system";
+            else
+                username = web.CurrentUser.LoginName;
             if (username.ToLower() == "sharepoint\\system")
             {
                 username = web.Site.WebApplication.ApplicationPool.Username;
