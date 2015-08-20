@@ -3717,6 +3717,7 @@ namespace EPMLiveCore
         {
             using (SPWeb web = site.OpenWeb())
             {
+                //Added code for the Cost Planner Integration - EPML-5327
                 int userid = 0;
                 if (web.CurrentUser == null)
                     userid = 1073741823;
