@@ -2377,7 +2377,7 @@ namespace EPMLiveCore
                     }
 
                 });
-                
+
                 #region Modify Unique Workspace
                 if (unique)
                 {
@@ -3717,7 +3717,12 @@ namespace EPMLiveCore
         {
             using (SPWeb web = site.OpenWeb())
             {
-                int userid = web.CurrentUser.ID;
+                int userid = 0;
+                if (web.CurrentUser == null)
+                    userid = 1073741823;
+                else
+                    userid = web.CurrentUser.ID;
+
                 SPSecurity.RunWithElevatedPrivileges(delegate()
                 {
                     SqlConnection cn = new SqlConnection(getConnectionString(site.WebApplication.Id));
