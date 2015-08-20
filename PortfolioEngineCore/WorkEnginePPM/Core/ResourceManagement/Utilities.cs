@@ -608,7 +608,7 @@ namespace WorkEnginePPM.Core.ResourceManagement
                                 {
                                     IEnumerable<string> values = spListItemCollection.Cast<SPListItem>()
                                         .Where(spListItem => lookupIds.Contains((int)spListItem["ID"]))
-                                        .Select(spListItem => spList.Fields.ContainsField("EXTID") ? spListItem["EXTID"].ToString() : spListItem["Title"].ToString());
+                                        .Select(spListItem => spList.Fields.ContainsField("EXTID") ? Convert.ToString(spListItem["EXTID"]) : Convert.ToString(spListItem["Title"]));
 
                                     value = string.Join(",", values.ToArray());
                                 }
@@ -616,7 +616,7 @@ namespace WorkEnginePPM.Core.ResourceManagement
                                 {
                                     IEnumerable<string> values = spListItemCollection.Cast<SPListItem>()
                                         .Where(spListItem => lookupIds.Contains((int)spListItem["ID"]))
-                                        .Select(spListItem => spListItem["Title"].ToString());
+                                        .Select(spListItem => Convert.ToString(spListItem["Title"]));
 
                                     value = string.Join(",", values.ToArray());
                                 }
@@ -641,15 +641,15 @@ namespace WorkEnginePPM.Core.ResourceManagement
                                     {
                                         if (spList.Fields.ContainsField("EXTID"))
                                         {
-                                            value = spListItem["EXTID"].ToString();
+                                            value = Convert.ToString(spListItem["EXTID"]);
                                         }
                                         else {
-                                            value = spListItem["Title"].ToString();
+                                            value = Convert.ToString(spListItem["Title"]);
                                         }
                                     }
                                     else
                                     {
-                                        value = spListItem["Title"].ToString();
+                                        value = Convert.ToString(spListItem["Title"]);
                                     }
                                 }
                             }
