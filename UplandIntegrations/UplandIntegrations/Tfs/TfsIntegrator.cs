@@ -88,7 +88,7 @@ namespace UplandIntegrations.Tfs
                 using (TfsService tfsService = new TfsService(WebProps.Properties["ServerUrl"].ToString(), WebProps.Properties["Username"].ToString(), WebProps.Properties["Password"].ToString(), Convert.ToBoolean(WebProps.Properties["UseBasicAuthCredential"].ToString())))
                 {
                     DataTable collection = new DataTable();
-                    tfsService.GetObjectItems(null, Property, collection, DateTime.Now, false);
+                    tfsService.GetTeamProjectCollections(collection, false);
                     foreach (DataRow dataRow in collection.Rows)
                     {
                         props.Add(Convert.ToString(dataRow["DisplayName"]), Convert.ToString(dataRow["DisplayName"]));
@@ -97,18 +97,16 @@ namespace UplandIntegrations.Tfs
             }
             else if (Property == "Object")
             {
-                props.Add(TfsType.Bug.ToString(), TfsType.Bug.ToString());
-                props.Add(TfsType.Change_Request.ToString(), TfsType.Change_Request.ToString().Replace("_", " "));
-                props.Add(TfsType.Feature.ToString(), TfsType.Feature.ToString());
-                props.Add(TfsType.Issue.ToString(), TfsType.Issue.ToString());
-                props.Add(TfsType.Product_Backlog_Item.ToString(), TfsType.Product_Backlog_Item.ToString().Replace("_", " "));
-                props.Add(TfsType.Projects.ToString(), TfsType.Projects.ToString());
-                props.Add(TfsType.Requirement.ToString(), TfsType.Requirement.ToString());
-                props.Add(TfsType.Risk.ToString(), TfsType.Risk.ToString());
-                props.Add(TfsType.Shared_Steps.ToString(), TfsType.Shared_Steps.ToString().Replace("_", " "));
-                props.Add(TfsType.Task.ToString(), TfsType.Task.ToString());
-                props.Add(TfsType.Test_Case.ToString(), TfsType.Test_Case.ToString().Replace("_", " "));
-                props.Add(TfsType.User_Story.ToString(), TfsType.User_Story.ToString().Replace("_", " "));
+                CheckWebProps(WebProps, false);
+                using (TfsService tfsService = new TfsService(WebProps.Properties["ServerUrl"].ToString(), WebProps.Properties["Username"].ToString(), WebProps.Properties["Password"].ToString(), Convert.ToBoolean(WebProps.Properties["UseBasicAuthCredential"].ToString())))
+                {
+                    DataTable collection = new DataTable();
+                    tfsService.GetWorkItemTypes((string)WebProps.Properties["TeamProjectCollection"], collection, false);
+                    foreach (DataRow dataRow in collection.Rows)
+                    {
+                        props.Add(Convert.ToString(dataRow["Name"]), Convert.ToString(dataRow["Name"]));
+                    }
+                }
             }
             else if (Property == "UseBasicAuthCredential")
             {
@@ -245,6 +243,7 @@ namespace UplandIntegrations.Tfs
             if (string.IsNullOrEmpty(Convert.ToString(WebProps.Properties["ServerUrl"]))) throw new Exception("Please provide the serverurl.");
             if (string.IsNullOrEmpty(Convert.ToString(WebProps.Properties["Username"]))) throw new Exception("Please provide the username.");
             if (string.IsNullOrEmpty(Convert.ToString(WebProps.Properties["Password"]))) throw new Exception("Please provide the password.");
+            if (string.IsNullOrEmpty(Convert.ToString(WebProps.Properties["UseBasicAuthCredential"]))) throw new Exception("Please provide use basic auth credential.");
 
             if (checkOtherWebProperties)
             {
@@ -274,35 +273,17 @@ namespace UplandIntegrations.Tfs
             if (!GlobalButtons)
             {
                 CheckWebProps(WebProps, true);
-                TfsType tfsType = (TfsType)Enum.Parse(typeof(TfsType), Convert.ToString(WebProps.Properties["Object"]));
-                switch (tfsType)
+                return new List<IntegrationControl>
                 {
-                    case TfsType.Bug:
-                    case TfsType.Change_Request:
-                    case TfsType.Feature:
-                    case TfsType.Issue:
-                    case TfsType.Product_Backlog_Item:
-                    case TfsType.Requirement:
-                    case TfsType.Risk:
-                    case TfsType.Shared_Steps:
-                    case TfsType.Task:
-                    case TfsType.Test_Case:
-                    case TfsType.User_Story:
-                        return new List<IntegrationControl>
-                        {
-                            new IntegrationControl
-                            {
-                                Control = "TF_ViewWorkItem",
-                                Title = "View Work Item",
-                                Image = "tf_viewworkitem.png",
-                                Window = IntegrationControlWindowStyle.FullWindow
-                            }
-                    
-                        };
-                        break;
-                    default:
-                        break;
-                }
+                    new IntegrationControl
+                    {
+                        Control = "TF_ViewWorkItem",
+                        Title = "View Work Item",
+                        Image = "tf_viewworkitem.png",
+                        Window = IntegrationControlWindowStyle.FullWindow
+                    }
+
+                };
             }
             return new List<IntegrationControl>();
         }

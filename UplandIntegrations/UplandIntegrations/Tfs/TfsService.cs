@@ -11,7 +11,6 @@ using System.Linq;
 using System.Net;
 using System.Reflection;
 
-
 namespace UplandIntegrations.Tfs
 {
     public class TfsService : IDisposable
@@ -73,34 +72,18 @@ namespace UplandIntegrations.Tfs
         {
             try
             {
-                TfsType tfsType = (TfsType)Enum.Parse(typeof(TfsType), objectName);
-                switch (tfsType)
+                if (!objectName.ToLower().Equals("projects"))
                 {
-                    case TfsType.Bug:
-                    case TfsType.Change_Request:
-                    case TfsType.Feature:
-                    case TfsType.Issue:
-                    case TfsType.Product_Backlog_Item:
-                    case TfsType.Requirement:
-                    case TfsType.Risk:
-                    case TfsType.Shared_Steps:
-                    case TfsType.Task:
-                    case TfsType.Test_Case:
-                    case TfsType.User_Story:
-                        using (TfsTeamProjectCollection tfsTeamProjectCollection = new TfsTeamProjectCollection(new Uri(string.Format("{0}/{1}", tfsConfigurationServer.Uri.AbsoluteUri, projectCollection)), tfsCred))
-                        {
-                            IEventService eventService = tfsTeamProjectCollection.GetService(typeof(IEventService)) as IEventService;
-                            DeliveryPreference delivery = new DeliveryPreference();
-                            delivery.Type = DeliveryType.Soap;
-                            delivery.Schedule = DeliverySchedule.Immediate;
-                            delivery.Address = string.Format("{0}?integrationkey={1}", apiUrl, integrationKey);
-                            eventService.SubscribeEvent("", tfsWorkItemChangedEventName, "", delivery, string.Format("{0}-{1}", integrationKey, tfsWorkItemChangedEventName));
-                        }
-                        break;
-                    default:
-                        break;
+                    using (TfsTeamProjectCollection tfsTeamProjectCollection = new TfsTeamProjectCollection(new Uri(string.Format("{0}/{1}", tfsConfigurationServer.Uri.AbsoluteUri, projectCollection)), tfsCred))
+                    {
+                        IEventService eventService = tfsTeamProjectCollection.GetService(typeof(IEventService)) as IEventService;
+                        DeliveryPreference delivery = new DeliveryPreference();
+                        delivery.Type = DeliveryType.Soap;
+                        delivery.Schedule = DeliverySchedule.Immediate;
+                        delivery.Address = string.Format("{0}?integrationkey={1}", apiUrl, integrationKey);
+                        eventService.SubscribeEvent("", tfsWorkItemChangedEventName, "", delivery, string.Format("{0}-{1}", integrationKey, tfsWorkItemChangedEventName));
+                    }
                 }
-
             }
             catch (Exception ex)
             {
@@ -113,33 +96,17 @@ namespace UplandIntegrations.Tfs
             {
                 try
                 {
-                    var tfsType = (TfsType)Enum.Parse(typeof(TfsType), objectName);
-                    switch (tfsType)
+                    if (!objectName.ToLower().Equals("projects"))
                     {
-                        case TfsType.Bug:
-                        case TfsType.Change_Request:
-                        case TfsType.Feature:
-                        case TfsType.Issue:
-                        case TfsType.Product_Backlog_Item:
-                        case TfsType.Requirement:
-                        case TfsType.Risk:
-                        case TfsType.Shared_Steps:
-                        case TfsType.Task:
-                        case TfsType.Test_Case:
-                        case TfsType.User_Story:
-                            using (TfsTeamProjectCollection tfsTeamProjectCollection = new TfsTeamProjectCollection(new Uri(string.Format("{0}/{1}", tfsConfigurationServer.Uri.AbsoluteUri, projectCollection)), tfsCred))
+                        using (TfsTeamProjectCollection tfsTeamProjectCollection = new TfsTeamProjectCollection(new Uri(string.Format("{0}/{1}", tfsConfigurationServer.Uri.AbsoluteUri, projectCollection)), tfsCred))
+                        {
+                            IEventService eventService = tfsTeamProjectCollection.GetService(typeof(IEventService)) as IEventService;
+                            foreach (Subscription eventSub in eventService.GetEventSubscriptions("", string.Format("{0}-{1}", integrationKey, tfsWorkItemChangedEventName)))
                             {
-                                IEventService eventService = tfsTeamProjectCollection.GetService(typeof(IEventService)) as IEventService;
-                                foreach (Subscription eventSub in eventService.GetEventSubscriptions("", string.Format("{0}-{1}", integrationKey, tfsWorkItemChangedEventName)))
-                                {
-                                    eventService.UnsubscribeEvent(eventSub.ID);
-                                }
+                                eventService.UnsubscribeEvent(eventSub.ID);
                             }
-                            break;
-                        default:
-                            break;
+                        }
                     }
-
                 }
                 catch (Exception ex)
                 {
@@ -152,34 +119,114 @@ namespace UplandIntegrations.Tfs
                 throw ex;
             }
         }
+
+        //public void GetTeamProjectCollections(DataTable items, Boolean isOnlyColumns)
+        //{
+        //    ITeamProjectCollectionService tpcService = tfsConfigurationServer.GetService<ITeamProjectCollectionService>();
+        //    {
+        //        foreach (TeamProjectCollection teamProjectCollection in tpcService.GetCollections())
+        //        {
+        //            FillDataTable(teamProjectCollection, items, isOnlyColumns);
+        //        }
+        //    }
+        //}
+        //public void GetTeamProjectCollection(DataTable items, string teamProjectCollectionId, Boolean isOnlyColumns)
+        //{
+        //    ITeamProjectCollectionService tpcService = tfsConfigurationServer.GetService<ITeamProjectCollectionService>();
+        //    {
+        //        TeamProjectCollection teamProjectCollection = tpcService.GetCollection(new Guid(teamProjectCollectionId));
+        //        FillDataTable(teamProjectCollection, items, isOnlyColumns);
+        //    }
+        //}
+
+        public void GetTeamProjectCollections(DataTable items, Boolean isOnlyColumns)
+        {
+            // Get the catalog of team project collections
+            CatalogNode catalogNode = tfsConfigurationServer.CatalogNode;
+
+            ReadOnlyCollection<CatalogNode> tpcNodes = catalogNode.QueryChildren(new Guid[] { CatalogResourceTypes.ProjectCollection }, false, CatalogQueryOptions.None);
+
+            // List the team project collections
+            foreach (CatalogNode tpcNode in tpcNodes)
+            {
+                // Use the InstanceId property to get the team project collection
+                Guid tpcId = new Guid(tpcNode.Resource.Properties["InstanceId"]);
+                TfsTeamProjectCollection tpc = tfsConfigurationServer.GetTeamProjectCollection(tpcId);
+                FillDataTable(tpcNode.Resource, items, isOnlyColumns);
+            }
+        }
+        public void GetTeamProjectCollection(DataTable items, string teamProjectCollectionId, Boolean isOnlyColumns)
+        {
+
+            TfsTeamProjectCollection tpc = tfsConfigurationServer.GetTeamProjectCollection(new Guid(teamProjectCollectionId));
+            FillDataTable(tpc, items, isOnlyColumns);
+        }
+
+        public void GetTeamProjects(string projectCollection, DataTable items, Boolean isOnlyColumns)
+        {
+            using (TfsTeamProjectCollection tfsTeamProjectCollection = new TfsTeamProjectCollection(new Uri(string.Format("{0}/{1}", tfsConfigurationServer.Uri.AbsoluteUri, projectCollection)), tfsCred))
+            {
+                tfsTeamProjectCollection.Authenticate();
+                var workItemStore = tfsTeamProjectCollection.GetService<WorkItemStore>();
+                foreach (Project project in workItemStore.Projects)
+                {
+                    FillDataTable(project, items, isOnlyColumns);
+                }
+            }
+
+        }
+        public void GetTeamProject(string projectCollection, DataTable items, string projectId, Boolean isOnlyColumns)
+        {
+            using (TfsTeamProjectCollection tfsTeamProjectCollection = new TfsTeamProjectCollection(new Uri(string.Format("{0}/{1}", tfsConfigurationServer.Uri.AbsoluteUri, projectCollection)), tfsCred))
+            {
+                tfsTeamProjectCollection.Authenticate();
+                var workItemStore = tfsTeamProjectCollection.GetService<WorkItemStore>();
+                foreach (Project project in workItemStore.Projects)
+                {
+                    if (project.Id.Equals(projectId))
+                    {
+                        FillDataTable(project, items, isOnlyColumns);
+                        break;
+                    }
+                }
+            }
+        }
+
+        public void GetWorkItemTypes(string projectCollection, DataTable items, Boolean isOnlyColumns)
+        {
+            using (TfsTeamProjectCollection tfsTeamProjectCollection = new TfsTeamProjectCollection(new Uri(string.Format("{0}/{1}", tfsConfigurationServer.Uri.AbsoluteUri, projectCollection)), tfsCred))
+            {
+                tfsTeamProjectCollection.Authenticate();
+                var workItemStore = tfsTeamProjectCollection.GetService<WorkItemStore>();
+                foreach (Project project in workItemStore.Projects)
+                {
+                    foreach (WorkItemType workitem in project.WorkItemTypes)
+                    {
+                        if (items.Rows.Count == 0)
+                        {
+                            FillDataTable(workitem, items, isOnlyColumns);
+                        }
+                        else if (items.Rows.Count > 0 && items.Select(string.Format("Name ='{0}'", workitem.Name)).Count() <= 0)
+                        {
+                            FillDataTable(workitem, items, isOnlyColumns);
+                        }
+                    }
+                }
+            }
+
+        }
+
         public void GetObjectItem(string projectCollection, string objectName, DataTable items, string itemId, Boolean isOnlyColumns)
         {
             try
             {
-                TfsType tfsType = (TfsType)Enum.Parse(typeof(TfsType), objectName);
-                switch (tfsType)
+                if (objectName.ToLower().Equals("projects"))
                 {
-                    case TfsType.TeamProjectCollection:
-                        GetTeamProjectCollection(items, itemId, false);
-                        break;
-                    case TfsType.Projects:
-                        GetTeamProject(projectCollection, items, itemId, false);
-                        break;
-                    case TfsType.Bug:
-                    case TfsType.Change_Request:
-                    case TfsType.Feature:
-                    case TfsType.Issue:
-                    case TfsType.Product_Backlog_Item:
-                    case TfsType.Requirement:
-                    case TfsType.Risk:
-                    case TfsType.Shared_Steps:
-                    case TfsType.Task:
-                    case TfsType.Test_Case:
-                    case TfsType.User_Story:
-                        GetWorkItem(projectCollection, objectName.Replace("_", " "), items, itemId, false);
-                        break;
-                    default:
-                        break;
+                    GetTeamProject(projectCollection, items, itemId, isOnlyColumns);
+                }
+                else
+                {
+                    GetWorkItem(projectCollection, objectName.Replace("_", " "), items, itemId, isOnlyColumns);
                 }
             }
             catch (Exception ex)
@@ -191,33 +238,14 @@ namespace UplandIntegrations.Tfs
         {
             try
             {
-
-                TfsType tfsType = (TfsType)Enum.Parse(typeof(TfsType), objectName);
-                switch (tfsType)
+                if (objectName.ToLower().Equals("projects"))
                 {
-                    case TfsType.TeamProjectCollection:
-                        GetTeamProjectCollections(items, false);
-                        break;
-                    case TfsType.Projects:
-                        GetTeamProjects(projectCollection, items, false);
-                        break;
-                    case TfsType.Bug:
-                    case TfsType.Change_Request:
-                    case TfsType.Feature:
-                    case TfsType.Issue:
-                    case TfsType.Product_Backlog_Item:
-                    case TfsType.Requirement:
-                    case TfsType.Risk:
-                    case TfsType.Shared_Steps:
-                    case TfsType.Task:
-                    case TfsType.Test_Case:
-                    case TfsType.User_Story:
-                        GetWorkItems(projectCollection, objectName.Replace("_", " "), items, lastSyncDateTime, false);
-                        break;
-                    default:
-                        break;
+                    GetTeamProjects(projectCollection, items, isOnlyColumns);
                 }
-
+                else
+                {
+                    GetWorkItems(projectCollection, objectName.Replace("_", " "), items, lastSyncDateTime, isOnlyColumns);
+                }
             }
             catch (Exception ex)
             {
@@ -228,25 +256,9 @@ namespace UplandIntegrations.Tfs
         {
             try
             {
-
-                TfsType tfsType = (TfsType)Enum.Parse(typeof(TfsType), objectName);
-                switch (tfsType)
+                if (!objectName.ToLower().Equals("projects"))
                 {
-                    case TfsType.Bug:
-                    case TfsType.Change_Request:
-                    case TfsType.Feature:
-                    case TfsType.Issue:
-                    case TfsType.Product_Backlog_Item:
-                    case TfsType.Requirement:
-                    case TfsType.Risk:
-                    case TfsType.Shared_Steps:
-                    case TfsType.Task:
-                    case TfsType.Test_Case:
-                    case TfsType.User_Story:
-                        return CreateWorkItem(projectCollection, objectName.Replace("_", " "), Item, dataColumns);
-                        break;
-                    default:
-                        break;
+                    return CreateWorkItem(projectCollection, objectName.Replace("_", " "), Item, dataColumns);
                 }
                 return 0;
             }
@@ -259,27 +271,10 @@ namespace UplandIntegrations.Tfs
         {
             try
             {
-
-                TfsType tfsType = (TfsType)Enum.Parse(typeof(TfsType), objectName);
-                switch (tfsType)
+                if (!objectName.ToLower().Equals("projects"))
                 {
-                    case TfsType.Bug:
-                    case TfsType.Change_Request:
-                    case TfsType.Feature:
-                    case TfsType.Issue:
-                    case TfsType.Product_Backlog_Item:
-                    case TfsType.Requirement:
-                    case TfsType.Risk:
-                    case TfsType.Shared_Steps:
-                    case TfsType.Task:
-                    case TfsType.Test_Case:
-                    case TfsType.User_Story:
-                        UpdateWorkItem(projectCollection, objectName.Replace("_", " "), Item, itemId, dataColumns);
-                        break;
-                    default:
-                        break;
+                    UpdateWorkItem(projectCollection, objectName.Replace("_", " "), Item, itemId, dataColumns);
                 }
-
             }
             catch (Exception ex)
             {
@@ -290,24 +285,9 @@ namespace UplandIntegrations.Tfs
         {
             try
             {
-                TfsType tfsType = (TfsType)Enum.Parse(typeof(TfsType), objectName);
-                switch (tfsType)
+                if (!objectName.ToLower().Equals("projects"))
                 {
-                    case TfsType.Bug:
-                    case TfsType.Change_Request:
-                    case TfsType.Feature:
-                    case TfsType.Issue:
-                    case TfsType.Product_Backlog_Item:
-                    case TfsType.Requirement:
-                    case TfsType.Risk:
-                    case TfsType.Shared_Steps:
-                    case TfsType.Task:
-                    case TfsType.Test_Case:
-                    case TfsType.User_Story:
-                        DeleteWorkItem(projectCollection, itemId);
-                        break;
-                    default:
-                        break;
+                    DeleteWorkItem(projectCollection, itemId);
                 }
             }
             catch (Exception ex)
@@ -452,78 +432,7 @@ namespace UplandIntegrations.Tfs
                 }
             }
         }
-        private void GetTeamProjects(string projectCollection, DataTable items, Boolean isOnlyColumns)
-        {
-            using (TfsTeamProjectCollection tfsTeamProjectCollection = new TfsTeamProjectCollection(new Uri(string.Format("{0}/{1}", tfsConfigurationServer.Uri.AbsoluteUri, projectCollection)), tfsCred))
-            {
-                tfsTeamProjectCollection.Authenticate();
-                var workItemStore = tfsTeamProjectCollection.GetService<WorkItemStore>();
-                foreach (Project project in workItemStore.Projects)
-                {
-                    FillDataTable(project, items, isOnlyColumns);
-                }
-            }
 
-        }
-        private void GetTeamProject(string projectCollection, DataTable items, string projectId, Boolean isOnlyColumns)
-        {
-            using (TfsTeamProjectCollection tfsTeamProjectCollection = new TfsTeamProjectCollection(new Uri(string.Format("{0}/{1}", tfsConfigurationServer.Uri.AbsoluteUri, projectCollection)), tfsCred))
-            {
-                tfsTeamProjectCollection.Authenticate();
-                var workItemStore = tfsTeamProjectCollection.GetService<WorkItemStore>();
-                foreach (Project project in workItemStore.Projects)
-                {
-                    if (project.Id.Equals(projectId))
-                    {
-                        FillDataTable(project, items, isOnlyColumns);
-                        break;
-                    }
-                }
-            }
-        }
-        //private void GetTeamProjectCollections(DataTable items, Boolean isOnlyColumns)
-        //{
-        //    ITeamProjectCollectionService tpcService = tfsConfigurationServer.GetService<ITeamProjectCollectionService>();
-        //    {
-        //        foreach (TeamProjectCollection teamProjectCollection in tpcService.GetCollections())
-        //        {
-        //            FillDataTable(teamProjectCollection, items, isOnlyColumns);
-        //        }
-        //    }
-        //}
-
-        //private void GetTeamProjectCollection(DataTable items, string teamProjectCollectionId, Boolean isOnlyColumns)
-        //{
-        //    ITeamProjectCollectionService tpcService = tfsConfigurationServer.GetService<ITeamProjectCollectionService>();
-        //    {
-        //        TeamProjectCollection teamProjectCollection = tpcService.GetCollection(new Guid(teamProjectCollectionId));
-        //        FillDataTable(teamProjectCollection, items, isOnlyColumns);
-        //    }
-        //}
-
-        private void GetTeamProjectCollections(DataTable items, Boolean isOnlyColumns)
-        {
-            // Get the catalog of team project collections
-            CatalogNode catalogNode = tfsConfigurationServer.CatalogNode;
-
-            ReadOnlyCollection<CatalogNode> tpcNodes = catalogNode.QueryChildren(new Guid[] { CatalogResourceTypes.ProjectCollection },false, CatalogQueryOptions.None);
-
-            // List the team project collections
-            foreach (CatalogNode tpcNode in tpcNodes)
-            {
-                // Use the InstanceId property to get the team project collection
-                Guid tpcId = new Guid(tpcNode.Resource.Properties["InstanceId"]);
-                TfsTeamProjectCollection tpc = tfsConfigurationServer.GetTeamProjectCollection(tpcId);
-                FillDataTable(tpcNode.Resource, items, isOnlyColumns);
-            }
-        }
-
-        private void GetTeamProjectCollection(DataTable items, string teamProjectCollectionId, Boolean isOnlyColumns)
-        {
-
-            TfsTeamProjectCollection tpc = tfsConfigurationServer.GetTeamProjectCollection(new Guid(teamProjectCollectionId));
-            FillDataTable(tpc, items, isOnlyColumns);
-        }
 
         private void FillDataTable(object item, DataTable dataTable, Boolean isOnlyColumns)
         {
