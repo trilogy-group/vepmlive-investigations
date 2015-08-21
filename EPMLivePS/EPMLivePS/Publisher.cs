@@ -11,6 +11,7 @@ using System.Xml;
 using System.IO;
 using System.Resources;
 using Microsoft.Win32;
+using System.Web.Configuration;
 
 namespace EPMLiveEnterprise
 {
@@ -247,6 +248,8 @@ namespace EPMLiveEnterprise
                             {
                                 publishTasks(projectId, pubType, newTransUid, lastTransUid);
                             }
+
+                            ProcessPFEWork(projectId);
 
                             int status = 2;
 
@@ -637,6 +640,67 @@ namespace EPMLiveEnterprise
                 myLog.WriteEntry("Error in publishProjectCenter(): " + ex.Message + ex.StackTrace + ex.InnerException, EventLogEntryType.Error, 315);
             }
             return 0;
+        }
+
+        /// <summary>
+        /// This method used to insert the data into EPMLive PFE.
+        /// </summary>
+        /// <param name="projectId">project id</param>
+        private void ProcessPFEWork(int projectId)
+        {
+            try
+            {
+                WebSvcProject.ProjectDataSet pDs = null;
+                string lstName = "Project Center";
+
+                SPSecurity.RunWithElevatedPrivileges(delegate()
+                {
+                    pDs = pService.ReadProject(projectGuid, WebSvcProject.DataStoreEnum.PublishedStore);
+                });
+
+                string str = "<UpdateScheduledWork><Params Worktype=\"1\"/><Data><Project ID='" + projectId + "' List='" + lstName + "'>";
+
+                foreach (WebSvcProject.ProjectDataSet.AssignmentRow assn in pDs.Assignment)
+                {
+                    Int64 resId = 0;
+                    resId = getResourceResId(assn.RES_UID_OWNER);
+                    if (resId > 0)
+                    {
+                        str += "<Resource Id=\"" + resId + "\">";
+
+                        DateTime assnSTDate = assn.ASSN_START_DATE;
+                        DateTime assnFDate = assn.ASSN_FINISH_DATE;
+                        var interavl = (assnFDate - assnSTDate).Days;
+                        var hour = assn.ASSN_WORK;
+                        DateTime loopStDate = assnSTDate;
+
+                        while (loopStDate <= assnFDate)
+                        {
+                            var indvHour = ((hour / (interavl + 1)) / assn.ASSN_UNITS) / 6;  // logically devide the hours to each day (Right now it equally seprate hours to each day).
+                            str += "<Work Date=\"" + DateTime.Parse(loopStDate.ToString()).ToString("s") + "\" Hours=\"" + indvHour + "\"/>";
+                            loopStDate = loopStDate.AddDays(1);
+                        }
+
+                        str += "</Resource>";
+                    }
+                }
+
+                str += "</Project></Data></UpdateScheduledWork>";
+
+                //calling portfolioengineAPI
+                SPSecurity.RunWithElevatedPrivileges(delegate()
+                {
+                    EPMLivePortfolioEngine.PortfolioEngineAPI pfe = new EPMLivePortfolioEngine.PortfolioEngineAPI();
+                    pfe.Url = mySiteToPublish.Url + "/_vti_bin/portfolioengine.asmx";
+                    pfe.UseDefaultCredentials = true;
+                    string ret = pfe.Execute("UpdateScheduledWork", str);
+                });
+            }
+            catch (Exception ex) 
+            {
+                //Need to change event number accordingly.
+                myLog.WriteEntry("Error in ProcessPFEWork " + ex.Message + ex.StackTrace, EventLogEntryType.Error, 305);
+            }
         }
 
         private void loadFields()
@@ -1459,6 +1523,25 @@ namespace EPMLiveEnterprise
                     {
                         return 0;
                     }
+                }
+            }
+            return 0;
+        }
+
+        /// <summary>
+        /// this method used to return resource Id.
+        /// </summary>
+        /// <param name="RES_GUID"></param>
+        /// <returns></returns>
+        private Int64 getResourceResId(Guid RES_GUID)
+        {
+            DataRow[] drRes = rDs.Resources.Select("RES_UID='" + RES_GUID + "'");
+            if (drRes.Length > 0)
+            {
+                if (drRes[0]["RES_IS_WINDOWS_USER"].ToString() == "True")
+                {
+                    Int64 ResId = Convert.ToInt64(drRes[0]["Res_ID"]);
+                    return ResId;
                 }
             }
             return 0;

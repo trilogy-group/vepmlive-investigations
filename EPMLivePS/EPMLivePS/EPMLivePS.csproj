@@ -77,6 +77,7 @@
     </Reference>
     <Reference Include="Microsoft.SharePoint.WorkflowActions, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL" />
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -188,6 +189,11 @@
     <Compile Include="ResourceEvents.cs" />
     <Compile Include="ResourceSyncher.cs" />
     <Compile Include="Status.cs" />
+    <Compile Include="Web References\EPMLivePortfolioEngine\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.map</DependentUpon>
+    </Compile>
     <Compile Include="Web References\WebSvcCustomFields\Reference.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -261,6 +267,11 @@
     </None>
     <None Include="PublishMenu\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{84f22592-0c7b-4065-91e8-05a470180ac6}</SharePointProjectItemId>
+    </None>
+    <None Include="Web References\EPMLivePortfolioEngine\portfolioengine.wsdl" />
+    <None Include="Web References\EPMLivePortfolioEngine\Reference.map">
+      <Generator>MSDiscoCodeGenerator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
     </None>
     <None Include="Web References\WebSvcCustomFields\CustomFieldDataSet.datasource">
       <DependentUpon>Reference.map</DependentUpon>
@@ -543,6 +554,19 @@
       <UrlBehavior>Dynamic</UrlBehavior>
       <RelPath>Web References\WebSvcWssInterop\</RelPath>
       <UpdateFromURL>C:\Users\Administrator\Desktop\CODE\WorkEngineForProjectServer\WorkEngineForProjectServer\Web References\WebSvcWssInterop\wssinterop.wsdl</UpdateFromURL>
+      <ServiceLocationURL>
+      </ServiceLocationURL>
+      <CachedDynamicPropName>
+      </CachedDynamicPropName>
+      <CachedAppSettingsObjectName>
+      </CachedAppSettingsObjectName>
+      <CachedSettingsPropName>
+      </CachedSettingsPropName>
+    </WebReferenceUrl>
+    <WebReferenceUrl Include="http://epmdevps/sites/PS2013/_vti_bin/portfolioengine.asmx%3fwsdl">
+      <UrlBehavior>Dynamic</UrlBehavior>
+      <RelPath>Web References\EPMLivePortfolioEngine\</RelPath>
+      <UpdateFromURL>http://epmdevps/sites/PS2013/_vti_bin/portfolioengine.asmx%3fwsdl</UpdateFromURL>
       <ServiceLocationURL>
       </ServiceLocationURL>
       <CachedDynamicPropName>
