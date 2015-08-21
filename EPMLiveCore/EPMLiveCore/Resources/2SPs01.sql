@@ -2029,6 +2029,8 @@ exec(@createoralter + ' PROCEDURE [dbo].[spRollupGetQueue]
 AS
 BEGIN
 
+update ROLLUPQUEUE set Retry=coalesce(Retry,0)+1, EventTime = GETDATE(), QueueServer = null,ErrorLog='''', status = 0 where (errorlog is not null and errorlog like ''%save conflict%'') and coalesce(retry,0) < 3 and Status = 3
+
 declare @sql varchar(MAX)
 
 set @sql = '';WITH CTE AS 

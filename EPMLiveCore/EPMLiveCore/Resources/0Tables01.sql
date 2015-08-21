@@ -950,6 +950,14 @@ begin
 
 	print 'Updating Table ROLLUPQUEUE'
 
+	alter table rollupqueue
+
+	ALTER COLUMN errorlog varchar(MAX)
+
+	alter table rollupqueue
+
+	ADD [retry] int default(0)
+
 
 end
 
