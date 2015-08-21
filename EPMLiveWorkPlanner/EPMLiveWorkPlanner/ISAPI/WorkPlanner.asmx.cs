@@ -1677,62 +1677,6 @@ namespace EPMLiveWorkPlanner
             return doc.OuterXml;
         }
 
-        private static bool ModifyWorkPlannerGridBasedOnTeam(XmlDocument doc, DataTable dtTeamMembers, DataTable dtAllResources)
-        {
-            bool saveWorkPlan = true;
-            if (dtTeamMembers == null)
-            {
-                // Handles scenario when no team member exists            
-                dtTeamMembers = new DataTable();
-                dtTeamMembers.Columns.Add("ID");            
-            }
-            foreach (XmlNode ndTask in doc.SelectNodes("//I"))
-            {
-                try
-                {
-                    string id = getAttribute(ndTask, "id");
-                    string sAssignedTo = getAttribute(ndTask, "AssignedTo");
-                    string sResourceNames = getAttribute(ndTask, "ResourceNames");
-                    string[] arrassignedto = sAssignedTo.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
-                    string[] arrresourcenames = sResourceNames.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
-                    string sNewArrAssinedTo = "";
-                    string sNewArrResourceNames = "";
-
-                    if (!string.IsNullOrEmpty(id) && id != "0")
-                    {
-                        string expr = "ID = {0}";                        
-                        foreach (string assto in arrassignedto)
-                        {
-                            DataRow[] rows = dtTeamMembers.Select(string.Format(expr, assto));
-                            if (rows != null && rows.Length > 0)
-                            {
-                                sNewArrAssinedTo += assto + ";";
-                                sNewArrResourceNames += rows[0]["Title"].ToString() + ";";
-                            }
-                            else
-                            {
-                                DataRow[] removedRes = dtAllResources.Select(string.Format(expr, assto));
-                                if (removedRes.Length > 0)
-                                {
-                                    sNewArrAssinedTo += assto + ";";
-                                    sNewArrResourceNames += removedRes[0]["Title"].ToString() + " [Removed]" + ";";
-                                }
-                            }
-                        }
-                        sNewArrAssinedTo = sNewArrAssinedTo.TrimEnd(';');
-                        sNewArrResourceNames = sNewArrResourceNames.TrimEnd(';');
-                        if (SetValidAssignedTo(ndTask, sNewArrAssinedTo, sNewArrResourceNames))
-                        {
-                            saveWorkPlan = false;
-                        }
-                    }
-                }
-                catch
-                { }
-            }
-            return saveWorkPlan;
-        }
-
         public static string GetTasks(XmlDocument data, SPWeb oWeb)
         {
 
@@ -1744,13 +1688,8 @@ namespace EPMLiveWorkPlanner
 
 
             SPList oProjectCenter = oWeb.Lists[p.sListProjectCenter];
-            DataSet dsResources = GetResourceTable(p, oProjectCenter.ID, data.FirstChild.Attributes["ID"].Value, oWeb);
+            DataSet dsResources = GetResourceTable(p, oProjectCenter.ID, data.FirstChild.Attributes["ID"].Value, oWeb);            
             
-            SPQuery query = new SPQuery();
-            query.Query = string.Empty;
-            query.ViewFields = "<FieldRef Name='ID'/><FieldRef Name='Title'/>";
-            DataTable resourcesTable = oWeb.Lists["Resources"].Items.GetDataTable();
-
             try
             {
                 SPFile file = GetTaskFile(oWeb, data.FirstChild.Attributes["ID"].Value, data.FirstChild.Attributes["Planner"].Value);
@@ -1768,9 +1707,6 @@ namespace EPMLiveWorkPlanner
                 XmlDocument docNew = new XmlDocument();
                 docNew.LoadXml(xml);
 
-                bool saveWorkPlan = ModifyWorkPlannerGridBasedOnTeam(docNew, dsResources.Tables["Member"], resourcesTable);
-                xml = docNew.OuterXml;
-
                 XmlAttribute attr = docNew.CreateAttribute("Planner");
                 attr.Value = data.FirstChild.Attributes["Planner"].Value;
                 docNew.FirstChild.Attributes.Append(attr);
@@ -1778,12 +1714,8 @@ namespace EPMLiveWorkPlanner
                 attr = docNew.CreateAttribute("ID");
                 attr.Value = data.FirstChild.Attributes["ID"].Value;
                 docNew.FirstChild.Attributes.Append(attr);
-                // Save work plan if Assigned To field is not blank.
-                if (saveWorkPlan)
-                {
-                    SaveWorkPlan(docNew, oWeb);
-                }
-
+                SaveWorkPlan(docNew, oWeb);
+                
                 return xml;
             }
             else
@@ -1792,8 +1724,6 @@ namespace EPMLiveWorkPlanner
                 int lastid = 0;
 
                 ProcessTaskXmlFromTaskCenter(doc, p, oWeb, data.FirstChild.Attributes["ID"].Value, out lastid);
-
-                ModifyWorkPlannerGridBasedOnTeam(doc, dsResources.Tables["Member"], resourcesTable);
 
                 SPSecurity.RunWithElevatedPrivileges(delegate()
                 {
@@ -2256,29 +2186,6 @@ namespace EPMLiveWorkPlanner
             }
             catch { }
             return "";
-        }
-
-        private static bool SetValidAssignedTo(XmlNode ndTask, string assignedTo, string resNames)
-        {
-            bool setAttribute = false;
-            try
-            {
-                if (ndTask.Attributes["AssignedTo"] != null)
-                {
-                    ndTask.Attributes["AssignedTo"].Value = assignedTo;
-                    setAttribute = true;
-                }
-                if (ndTask.Attributes["ResourceNames"] != null)
-                {
-                    ndTask.Attributes["ResourceNames"].Value = resNames;
-                    setAttribute = true;
-                }
-            }
-            catch
-            {
-                setAttribute = false;
-            }
-            return setAttribute;
         }
 
         private static void PublishProcessTasks(XmlNode ndFolder, string parentfolderpath, ref XmlDocument data, SPList oTaskCenter, DataSet dsResources, string iteration, PlannerProps props)
@@ -4574,18 +4481,24 @@ namespace EPMLiveWorkPlanner
 
                             StringBuilder sbEnum = new StringBuilder();
                             StringBuilder sbEnumKeys = new StringBuilder();
-
+                            
+                            string enumMenuItems = string.Empty;
                             // Tables["Member"] == Tables[2]
                             if (dsResources.Tables["Member"] != null)
                             {
+                                enumMenuItems = "{Items:[";
                                 foreach (DataRow dr in dsResources.Tables[2].Rows)
                                 {
                                     sbEnum.Append("|");
                                     sbEnum.Append(dr["Title"].ToString());
                                     sbEnumKeys.Append("|");
                                     sbEnumKeys.Append(dr["ID"].ToString());
+                                    
+                                    enumMenuItems += string.Format("{{Name:{0},Text:'{1}'}},", Convert.ToString(dr["ID"]), Convert.ToString(dr["Title"]));
                                 }
+                                enumMenuItems = enumMenuItems.TrimEnd(',') + "]}";                                
                             }
+                            
                             if (data != null)
                             {
                                 Hashtable removedUsers = GetRemovedUserCollection(data, web, dsResources.Tables["Member"]);
@@ -4594,7 +4507,7 @@ namespace EPMLiveWorkPlanner
                                     foreach (var key in removedUsers.Keys)
                                     {
                                         sbEnum.Append("|");
-                                        sbEnum.Append(Convert.ToString(removedUsers[key]) + " [Removed]");
+                                        sbEnum.Append(Convert.ToString(removedUsers[key]));
                                         sbEnumKeys.Append("|");
                                         sbEnumKeys.Append(Convert.ToString(key));
                                     }
@@ -4610,6 +4523,9 @@ namespace EPMLiveWorkPlanner
 
                             ndCol.Attributes.Append(attr);
 
+                            attr = docOut.CreateAttribute(enumattr + "EnumMenu");
+                            attr.Value = enumMenuItems == string.Empty ? "{Items:[{Name:'-',Text:''}]}" : enumMenuItems;
+                            ndCol.Attributes.Append(attr);
                         }
                         break;
 

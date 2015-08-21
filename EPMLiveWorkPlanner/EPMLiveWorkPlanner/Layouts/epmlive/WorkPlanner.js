@@ -800,33 +800,23 @@ function SaveProject() {
 }
 
 function SaveWorkPlan() {
-    if (ValidWorkPlan()) {
-        if (sUpdates != "") {
-            ShowTDialog("Processing Updates...");
-            dhtmlxAjax.post("WorkPlannerAction.aspx", "Action=ProcessUpdates&ID=" + sItemID + "&PlannerID=" + sPlannerID + "&Updates=" + sUpdates, SaveUpdatesClose);
-        }
-        else {
-            Grids.WorkPlannerGrid.ActionCalcOff();
-            setWBSAndTaskID(Grids.WorkPlannerGrid.GetRowById('0'), true);
-            Grids.WorkPlannerGrid.ActionCalcOn();
-            ShowTDialog("Saving Project...");
-            SaveProject();
-        }
-    }
-}
-
-function ValidWorkPlan()
-{
     var bVal = AlertBlankTitle()
-    if (bVal == 1) {
-        alert('The plan cannot be saved with blank task AssignedTo values (red cells). Please either delete these tasks or enter a title.');
-        return false;
+    if (bVal == false) {
+        alert('The plan cannot be saved with blank task Title values (red cells). Please either delete these tasks or enter a title.');
+        return;
     }
-    else if (bVal == 2) {
-        alert("The project schedule cannot be saved or published because one of more assignments belong to users who have since been removed from the team or deleted. Please review the schedule's assigned to column and either remove or substitute for valid resources.");
-        return false;
+    if (sUpdates != "") {
+        ShowTDialog("Processing Updates...");
+        dhtmlxAjax.post("WorkPlannerAction.aspx", "Action=ProcessUpdates&ID=" + sItemID + "&PlannerID=" + sPlannerID + "&Updates=" + sUpdates, SaveUpdatesClose);
     }
-    return true;
+    else {
+        Grids.WorkPlannerGrid.ActionCalcOff();
+        setWBSAndTaskID(Grids.WorkPlannerGrid.GetRowById('0'), true);
+        Grids.WorkPlannerGrid.ActionCalcOn();
+        ShowTDialog("Saving Project...");
+        SaveProject();
+    }
+
 }
 
 function SaveProjectClose(loader) {
@@ -2648,11 +2638,10 @@ function Unlink() {
 
 function PublishWorkPlan() {
 
-    if (ValidWorkPlan()) {
-        sm("divPublish", 130, 50);
+    sm("divPublish", 130, 50);
 
-        dhtmlxAjax.post("WorkPlannerAction.aspx", "Action=Publish&ID=" + sItemID + "&PlannerID=" + sPlannerID, onPublishClose);
-    }
+    dhtmlxAjax.post("WorkPlannerAction.aspx", "Action=Publish&ID=" + sItemID + "&PlannerID=" + sPlannerID, onPublishClose);
+    
 }
 
 function CheckUpdates() {
@@ -3026,14 +3015,6 @@ function GetCssClass(grid, row, col, classname) {
                 return "erroroncell";
             }
         }
-
-        if (row.Def.Name == "Assignment" && row.Def.Name != "Header") {
-            if (col == "AssignedTo") {
-                if (row.ResourceNames.indexOf('[Removed]') > 0){
-                    return "erroroncell";
-                }
-            }
-        }
     }
 }
 
@@ -3051,7 +3032,7 @@ function GetToolTip(grid, row, col, tip, clientx, clienty, x, y) {
 
 function AlertBlankTitle() {
     var grid = Grids.WorkPlannerGrid;
-    var bVal_Task = 0;
+    var bVal_Task = true;
     if (grid.id == "WorkPlannerGrid") {
         for (var R in grid.Rows) {
             var row = grid.GetRowById(R);
@@ -3059,21 +3040,15 @@ function AlertBlankTitle() {
                 var val1 = grid.GetValue(row, "Title");
                 val1 = val1.toString().trim();
                 if (val1 === "") {
-                    bVal_Task = 1;
+                    bVal_Task = false;
                     break;
                 }
             }
-
-            if (row.Def.Name == "Assignment" && row.Def.Name != "Header") {
-                    if (row.ResourceNames.indexOf('[Removed]') > 0)
-                    {
-                        bVal_Task = 2;
-                        break;
-                    }
-            }
         }
-
-        return bVal_Task;
+        if (bVal_Task == true)
+            return true;
+        else
+            return false;
     }
 
 }
@@ -3510,7 +3485,7 @@ function ReloadWorkPlannerGrid()
 {
     var grid = Grids.WorkPlannerGrid;
     Grids.WorkPlannerGrid = grid.Reload();
-    isWorkPlannerGridReloaded = true;    
+    isWorkPlannerGridReloaded = true;
 }
 
 function ApplyDefaults(grid, row, isMilestone, isSummary, isFromProcessUpdates) {
