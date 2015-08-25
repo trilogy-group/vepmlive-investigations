@@ -4772,19 +4772,11 @@
                 var periodid = parseInt(this.allPeriods[i].PeriodID);
                 from.options[from.options.length] = new Option(sPeriod, periodid);
                 to.options[to.options.length] = new Option(sPeriod, periodid);
-            }
-
-        }
-
-        for (var c = 0; c < grid.ColNames[2].length; c++) {
-            var col = grid.ColNames[2][c];
-            var sType = col.substring(0, 1);
-            if (sType == "Q") {
-                var sPeriod = grid.GetCaption(col);
-                var periodid = parseInt(col.substring(1));
-                if (grid.GetAttribute(null, col, "Current") == true)
+                if (this.allPeriods[i].Current == 'true') {
                     this.currentPeriod = periodid;
+                }
             }
+
         }
 
         if (!this.reloaded) {
@@ -4804,7 +4796,6 @@
                 this.viewTab.selectByValue("idViewTab_FromPeriod", this.startPeriod);
             }
         } else {
-            this.currentPeriod = this.startPeriod;
             this.viewTab.selectByValue("idViewTab_FromPeriod", this.startPeriod);
         }
 

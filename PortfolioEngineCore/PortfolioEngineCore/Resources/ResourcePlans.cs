@@ -398,10 +398,11 @@ namespace PortfolioEngineCore
                     List<CPeriod> clnPeriods;
                     if (DBCommon.GetPeriods(_dba, oAdmin.PortfolioCommitmentsCalendarUID, out clnPeriods) != StatusEnum.rsSuccess)
                         goto Exit_Function;
+                    DateTime dtNow = DateTime.Now.Date;
                     xPeriods.Append("<Periods>");
                     foreach (CPeriod prd in clnPeriods)
                     {
-                        xPeriods.Append(string.Format("<Period PeriodID='{0}' PeriodName='{1}'></Period>", prd.PeriodID, prd.PeriodName));
+                        xPeriods.Append(string.Format("<Period PeriodID='{0}' PeriodName='{1}' Current='{2}'></Period>", prd.PeriodID, prd.PeriodName, Convert.ToString(prd.StartDate <= dtNow && prd.FinishDate >= dtNow).ToLower()));
                     }
                     xPeriods.Append("</Periods>");
 
