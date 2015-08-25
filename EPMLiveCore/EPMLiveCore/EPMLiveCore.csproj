@@ -1405,6 +1405,11 @@ net start "WETimer"</PostDeploymentCommand>
       <DependentUpon>Reference.map</DependentUpon>
     </Compile>
     <Compile Include="Web References\UplandPlatformAPI\Reference.cs" />
+    <Compile Include="Web References\UsageTracking\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.map</DependentUpon>
+    </Compile>
     <Compile Include="Web References\WorkEngineService\Reference.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -2126,6 +2131,11 @@ net start "WETimer"</PostDeploymentCommand>
     </None>
     <None Include="Web References\UplandPlatformAPI\Integration.wsdl" />
     <None Include="Web References\UplandPlatformAPI\Reference.map" />
+    <None Include="Web References\UsageTracking\Reference.map">
+      <Generator>MSDiscoCodeGenerator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
+    <None Include="Web References\UsageTracking\SiteUsageTracking.wsdl" />
     <None Include="Web References\WorkEngineService\Reference.map">
       <Generator>MSDiscoCodeGenerator</Generator>
       <LastGenOutput>Reference.cs</LastGenOutput>
@@ -4043,6 +4053,7 @@ net start "WETimer"</PostDeploymentCommand>
     <Content Include="Web References\DevStoreSolutionStore\lists.disco" />
     <Content Include="Web References\ProductionStore\lists.disco" />
     <Content Include="Web References\UplandPlatformAPI\Integration.disco" />
+    <None Include="Web References\UsageTracking\SiteUsageTracking.disco" />
     <Content Include="WorkEngineActivation\Elements.xml" />
     <Content Include="WorkEngineApps\Elements.xml" />
     <Content Include="WorkEngineApps\Schema.xml" />
@@ -4159,6 +4170,19 @@ net start "WETimer"</PostDeploymentCommand>
       <UrlBehavior>Dynamic</UrlBehavior>
       <RelPath>Web References\WorkEngineSolutionStoreListSvc\</RelPath>
       <UpdateFromURL>C:\Users\Administrator\Desktop\CODE\EPMLiveCore\EPMLiveCore\Web References\WorkEngineSolutionStoreListSvc\lists.wsdl</UpdateFromURL>
+      <ServiceLocationURL>
+      </ServiceLocationURL>
+      <CachedDynamicPropName>
+      </CachedDynamicPropName>
+      <CachedAppSettingsObjectName>
+      </CachedAppSettingsObjectName>
+      <CachedSettingsPropName>
+      </CachedSettingsPropName>
+    </WebReferenceUrl>
+    <WebReferenceUrl Include="http://localhost:8080/UsageTracking/SiteUsageTracking.asmx">
+      <UrlBehavior>Dynamic</UrlBehavior>
+      <RelPath>Web References\UsageTracking\</RelPath>
+      <UpdateFromURL>http://localhost:8080/UsageTracking/SiteUsageTracking.asmx</UpdateFromURL>
       <ServiceLocationURL>
       </ServiceLocationURL>
       <CachedDynamicPropName>

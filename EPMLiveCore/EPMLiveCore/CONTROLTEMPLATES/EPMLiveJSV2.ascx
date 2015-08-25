@@ -71,6 +71,45 @@
             //        s.parentNode.insertBefore(e, s);
             //    })();
             //}
+
+        //EPML-5446: Totango Implementation
+        $(function() {
+            var enableTotango = '<%= EnableUsageTracking %>';
+
+            if (enableTotango.toLowerCase() == 'true') {
+
+                //Call webservice to pass the parameters to Totango
+                var siteGuid = '<%= SiteGuid %>';
+                var siteUrl = '<%= WebUrl %>';
+                var siteName = '<%= SiteName %>';
+                var userEmail = '<%= UserEmail %>';
+                var userName = '<%= UserName %>';
+                var version = '<%= Version %>';
+                var pageTitle = document.title;
+                var toolKitOrderNumber = '<%= ToolKitOrderNumber %>';
+                var url = 'http://localhost:8080/UsageTracking/SiteUsageTracking.asmx';
+                if(<%= TrackingUrl %> != '')
+                {
+                    url  = '<%= TrackingUrl %>';
+                }
+                var data = '{siteGuid:"' + siteGuid + '",siteUrl:"' + siteUrl + '",siteName:"' + siteName + '",userEmail:"' + userEmail + '",userName:"' + userName + '",version:"' + version + '",pageTitle:"' + pageTitle + '",toolKitOrderNumber:"' + toolKitOrderNumber + '"}';
+
+                $.ajax({
+		            type: 'POST',
+                    contentType: 'application/json; charset=utf-8', // content type sent to server
+                    url: url + '/PostUsageTrackingInfoToTotango', // Location of the service
+                    data: data, //Data sent to server
+                    dataType: 'json', //Expected data format from server
+                    crossDomain: 'true', //True or False
+		            jsonp:false,
+                    success: function(data, textStatus) { //On Successfull service call
+                    },
+                    error: function(erroObj) { // When Service call fails
+		            }
+                });
+            }
+        });
+        //EPML-5446
         }
 
         ExecuteOrDelayUntilScriptLoaded(onJqueryLoaded, 'jquery.min.js');
