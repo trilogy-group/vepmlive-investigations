@@ -88,9 +88,11 @@
                 var pageTitle = document.title;
                 var toolKitOrderNumber = '<%= ToolKitOrderNumber %>';
                 var url = 'http://localhost:8080/UsageTracking/SiteUsageTracking.asmx';
-                if(<%= TrackingUrl %> != '')
+                var trackingUrl = '<%= TrackingUrl %>';
+
+                if(trackingUrl != '')
                 {
-                    url  = '<%= TrackingUrl %>';
+                    url  = trackingUrl;
                 }
                 var data = '{siteGuid:"' + siteGuid + '",siteUrl:"' + siteUrl + '",siteName:"' + siteName + '",userEmail:"' + userEmail + '",userName:"' + userName + '",version:"' + version + '",pageTitle:"' + pageTitle + '",toolKitOrderNumber:"' + toolKitOrderNumber + '"}';
 
