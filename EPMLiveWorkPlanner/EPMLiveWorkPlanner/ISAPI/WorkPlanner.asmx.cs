@@ -4481,22 +4481,23 @@ namespace EPMLiveWorkPlanner
 
                             StringBuilder sbEnum = new StringBuilder();
                             StringBuilder sbEnumKeys = new StringBuilder();
+                            StringBuilder sbEnumMenu = new StringBuilder();
                             
-                            string enumMenuItems = string.Empty;
                             // Tables["Member"] == Tables[2]
                             if (dsResources.Tables["Member"] != null)
                             {
-                                enumMenuItems = "{Items:[";
+                                sbEnumMenu.Append("{Items:[");
                                 foreach (DataRow dr in dsResources.Tables[2].Rows)
                                 {
                                     sbEnum.Append("|");
                                     sbEnum.Append(dr["Title"].ToString());
                                     sbEnumKeys.Append("|");
                                     sbEnumKeys.Append(dr["ID"].ToString());
-                                    
-                                    enumMenuItems += string.Format("{{Name:{0},Text:'{1}'}},", Convert.ToString(dr["ID"]), Convert.ToString(dr["Title"]));
+
+                                    sbEnumMenu.Append(string.Format("{{Name:{0},Text:'{1}'}},", Convert.ToString(dr["ID"]), Convert.ToString(dr["Title"])));
                                 }
-                                enumMenuItems = enumMenuItems.TrimEnd(',') + "]}";                                
+                                sbEnumMenu = sbEnumMenu.Remove(sbEnumMenu.Length-1, 1);
+                                sbEnumMenu.Append("]}");
                             }
                             
                             if (data != null)
@@ -4507,10 +4508,14 @@ namespace EPMLiveWorkPlanner
                                     foreach (var key in removedUsers.Keys)
                                     {
                                         sbEnum.Append("|");
-                                        sbEnum.Append(Convert.ToString(removedUsers[key]));
+                                        sbEnum.Append(Convert.ToString(removedUsers[key]) + " [Removed]");
                                         sbEnumKeys.Append("|");
                                         sbEnumKeys.Append(Convert.ToString(key));
                                     }
+
+                                    attr = docOut.CreateAttribute(enumattr + "EnumMenu");
+                                    attr.Value = sbEnumMenu.ToString() == string.Empty ? "{Items:[{Name:'-',Text:'-'}]}" : sbEnumMenu.ToString();
+                                    ndCol.Attributes.Append(attr);
                                 }
                             }
                             attr = docOut.CreateAttribute(enumattr + "Enum");
@@ -4521,10 +4526,6 @@ namespace EPMLiveWorkPlanner
                             attr = docOut.CreateAttribute(enumattr + "EnumKeys");
                             attr.Value = sbEnumKeys.ToString();
 
-                            ndCol.Attributes.Append(attr);
-
-                            attr = docOut.CreateAttribute(enumattr + "EnumMenu");
-                            attr.Value = enumMenuItems == string.Empty ? "{Items:[{Name:'-',Text:''}]}" : enumMenuItems;
                             ndCol.Attributes.Append(attr);
                         }
                         break;
