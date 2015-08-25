@@ -950,13 +950,15 @@ begin
 
 	print 'Updating Table ROLLUPQUEUE'
 
-	alter table rollupqueue
-
+	ALTER TABLE rollupqueue
 	ALTER COLUMN errorlog varchar(MAX)
 
-	alter table rollupqueue
-
-	ADD [retry] int default(0)
+	IF NOT EXISTS (select column_name FROM INFORMATION_SCHEMA.COLUMNS where table_name = 'ROLLUPQUEUE' and column_name = 'retry')
+	begin
+		Print '     Add Column retry'
+		ALTER TABLE rollupqueue
+		ADD [retry] INT DEFAULT(0)
+	end
 
 
 end
