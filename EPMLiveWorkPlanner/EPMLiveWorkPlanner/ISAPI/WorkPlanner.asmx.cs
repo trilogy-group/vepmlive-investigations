@@ -4486,18 +4486,21 @@ namespace EPMLiveWorkPlanner
                             // Tables["Member"] == Tables[2]
                             if (dsResources.Tables["Member"] != null)
                             {
-                                sbEnumMenu.Append("{Items:[");
-                                foreach (DataRow dr in dsResources.Tables[2].Rows)
+                                if (dsResources.Tables["Member"].Rows.Count > 0)
                                 {
-                                    sbEnum.Append("|");
-                                    sbEnum.Append(dr["Title"].ToString());
-                                    sbEnumKeys.Append("|");
-                                    sbEnumKeys.Append(dr["ID"].ToString());
+                                    sbEnumMenu.Append("{Items:[");
+                                    foreach (DataRow dr in dsResources.Tables[2].Rows)
+                                    {
+                                        sbEnum.Append("|");
+                                        sbEnum.Append(dr["Title"].ToString());
+                                        sbEnumKeys.Append("|");
+                                        sbEnumKeys.Append(dr["ID"].ToString());
 
-                                    sbEnumMenu.Append(string.Format("{{Name:{0},Text:'{1}'}},", Convert.ToString(dr["ID"]), Convert.ToString(dr["Title"])));
+                                        sbEnumMenu.Append(string.Format("{{Name:{0},Text:'{1}'}},", Convert.ToString(dr["ID"]), Convert.ToString(dr["Title"])));
+                                    }
+                                    sbEnumMenu = sbEnumMenu.Remove(sbEnumMenu.Length - 1, 1);
+                                    sbEnumMenu.Append("]}"); 
                                 }
-                                sbEnumMenu = sbEnumMenu.Remove(sbEnumMenu.Length-1, 1);
-                                sbEnumMenu.Append("]}");
                             }
                             
                             if (data != null)
