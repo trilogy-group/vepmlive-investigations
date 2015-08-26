@@ -4777,18 +4777,11 @@
                 }
             }
 
-        }
-
-        if (!this.reloaded) {
             var selectedView = this.GetSelectedView();
             if (selectedView != null) {
                 var selPeriods = selectedView.g_RPE.RightCols.split(",");
-                if (this.startPeriod == null) {
-                    this.startPeriod = selPeriods[0].split(":")[0].replace("Q", "");
-                }
-                if (this.finishPeriod == null) {
-                    this.finishPeriod = selPeriods[selPeriods.length - 1].split(":")[0].replace("Q", "");
-                }
+                this.startPeriod = selPeriods[0].split(":")[0].replace("Q", "");
+                this.finishPeriod = selPeriods[selPeriods.length - 1].split(":")[0].replace("Q", "");
             }
             if (this.currentPeriod != null) {
                 this.viewTab.selectByValue("idViewTab_FromPeriod", this.currentPeriod);
