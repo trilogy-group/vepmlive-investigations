@@ -4486,8 +4486,8 @@ namespace EPMLiveWebParts
                 }
                 foreach (string additionalgroup in additionalgroups.Split('|'))
                 {
-                    if (additionalgroup.Trim() != "")                    
-                        arrTempGroups.Add(additionalgroup);                    
+                    if (additionalgroup.Trim() != "")
+                        arrTempGroups.Add(additionalgroup);
                 }
 
                 ndGroupBy = xmlQuery.SelectSingleNode("//GroupBy");
@@ -4514,9 +4514,9 @@ namespace EPMLiveWebParts
             appendLookupQuery(ref xmlQuery, ref arrTempGroups);
 
             arrGroupFields = (string[])arrTempGroups.ToArray(typeof(string));
-            
+
             // EPML-5197 : to fix duplicate grouping.
-            if(arrGroupFields.Count() > 0)
+            if (arrGroupFields.Count() > 0)
                 arrGroupFields = arrGroupFields.Distinct().ToArray();
 
             SortedList arrGTemp = new SortedList();
@@ -5429,9 +5429,8 @@ namespace EPMLiveWebParts
             try
             {
                 Hashtable hshParams = new Hashtable();
-
-                byte[] encodedDataAsBytes = System.Convert.FromBase64String(Request["data"]);
-
+                string sEncryptedString = Request["data"];
+                byte[] encodedDataAsBytes = System.Convert.FromBase64String(sEncryptedString.Replace(' ', '+'));
                 string[] props = System.Text.ASCIIEncoding.ASCII.GetString(encodedDataAsBytes).Split('\n');
 
                 foreach (string s in props)

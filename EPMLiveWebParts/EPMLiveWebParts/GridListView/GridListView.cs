@@ -2566,7 +2566,7 @@ namespace EPMLiveWebParts
             foreach (SPField field in list.Fields)
             {
                 // EPML-5152,4718,4980: added extra check for ID,Created By, Modified By, LinkTitleNoMenu & LinkTitle.
-                if (!field.Hidden && field.Reorderable || (field.Id == SPBuiltInFieldId.Author || field.Id == SPBuiltInFieldId.Editor || field.Id == SPBuiltInFieldId.ID) || (field.Id == SPBuiltInFieldId.LinkTitleNoMenu || field.Id == SPBuiltInFieldId.LinkTitle))                
+                if (!field.Hidden && field.Reorderable || (field.Id == SPBuiltInFieldId.Author || field.Id == SPBuiltInFieldId.Editor || field.Id == SPBuiltInFieldId.ID) || (field.Id == SPBuiltInFieldId.LinkTitleNoMenu || field.Id == SPBuiltInFieldId.LinkTitle))
                 {
                     //EPML-4625: LinkTitleNoMenu/LinkTitle columns bind to Title field and the column name always remain the same
                     //make sure to always display Title fields irrespective of display rules
@@ -2616,13 +2616,13 @@ namespace EPMLiveWebParts
             {
                 SPField field = (SPField)de.Value;
                 //EPML-4625: Remove duplicate column names from fields list
-                string fieldValue = System.Web.HttpUtility.HtmlEncode(field.Title);                
+                string fieldValue = System.Web.HttpUtility.HtmlEncode(field.Title);
                 if (!fields.Contains(fieldValue))
-                {                    
+                {
                     fields += "'" + field.InternalName + "': { 'value': '" + fieldValue + "', 'checked':" + arrFields.Contains(field.InternalName).ToString().ToLower() + "},";
                     AllGroupFields += System.Web.HttpUtility.HtmlEncode(field.Title) + "|" + field.InternalName + "|" + field.Id + ",";
                 }
-            } 
+            }
 
             sl.Clear();
             //TODO: remove this and make lookup joins work.
@@ -2893,7 +2893,7 @@ namespace EPMLiveWebParts
             bool hasDefaultViewURL = false;
             string defaultViewURL = string.Empty;
             JavaScriptSerializer oSerializer = new JavaScriptSerializer();
-            
+
             try
             {
                 propBagData = ConvertFromString(list.ParentWeb.Properties[String.Format("ViewPermissions{0}", list.ID.ToString())], list);
@@ -2976,7 +2976,7 @@ namespace EPMLiveWebParts
 
                     sb.Append("{");
                     sb.Append("'iconClass': '',");
-                    sb.Append("'text': '" + System.Web.HttpUtility.HtmlEncode(view.Title) + "',");
+                    sb.Append("'text': '" + HttpUtility.HtmlDecode(view.Title.Replace("'", "\\'")) + "',");
                     sb.Append("'events': [");
                     sb.Append("{");
                     sb.Append("'eventName': 'click',");
