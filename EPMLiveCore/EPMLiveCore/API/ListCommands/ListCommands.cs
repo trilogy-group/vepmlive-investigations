@@ -276,6 +276,29 @@ namespace EPMLiveCore.API
 
             try
             {
+                SPContentType defaultContentType = list.ContentTypes["Item"];
+                {
+                    if (field != null)
+                    {
+                        SPFieldLink fld = new SPFieldLink(field);
+                        if (fld != null)
+                        {
+                            if (defaultContentType.FieldLinks[fld.Id] == null)
+                            {
+                                defaultContentType.FieldLinks.Delete(fld.Name);
+                                defaultContentType.Update();
+                                defaultContentType.FieldLinks.Add(fld);
+                                defaultContentType.Update();
+                                list.Update();
+                            }
+                        }
+                    }
+                }
+            }
+            catch { }
+
+            try
+            {
                 SPWeb rootWeb = web.Site.RootWeb;
 
                 ArrayList lists = new ArrayList(EPMLiveCore.CoreFunctions.getConfigSetting(rootWeb, "EPMLiveTSLists").Replace("\r\n", "\n").Split('\n')); ;
