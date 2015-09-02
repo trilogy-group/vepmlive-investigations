@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 
 namespace UplandIntegrations.Tfs
 {
@@ -60,6 +61,7 @@ namespace UplandIntegrations.Tfs
         {
             CheckWebProps(WebProps, true);
             List<ColumnProperty> columnPropertyList = new List<ColumnProperty>();
+            List<ColumnProperty> columnPropertyListSorted = new List<ColumnProperty>();
             using (TfsService tfsService = new TfsService(WebProps.Properties["ServerUrl"].ToString(), WebProps.Properties["Username"].ToString(), WebProps.Properties["Password"].ToString(), Convert.ToBoolean(WebProps.Properties["UseBasicAuthCredential"].ToString())))
             {
                 DataTable dataTable = new DataTable();
@@ -77,7 +79,12 @@ namespace UplandIntegrations.Tfs
                 dataTable.Dispose();
                 dataTable = null;
             }
-            return columnPropertyList;
+
+            columnPropertyListSorted = (from cp in columnPropertyList
+                                        orderby cp.ColumnName
+                                        select cp).ToList();
+
+            return columnPropertyListSorted;
         }
         public Dictionary<string, string> GetDropDownValues(WebProperties WebProps, IntegrationLog log, string Property, string ParentPropertyValue)
         {

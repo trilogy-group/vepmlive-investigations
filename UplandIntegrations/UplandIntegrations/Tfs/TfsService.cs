@@ -4,12 +4,14 @@ using Microsoft.TeamFoundation.Framework.Common;
 using Microsoft.TeamFoundation.VersionControl.Client;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
 using System.Linq;
 using System.Net;
 using System.Reflection;
+using System.Text;
 
 namespace UplandIntegrations.Tfs
 {
@@ -361,6 +363,18 @@ namespace UplandIntegrations.Tfs
                 var workItemTypes = project.WorkItemTypes;
                 var workItem = new WorkItem(workItemTypes[workItemType]);
                 FillWorkItemFromDataRow(workItem, item, dataColumns);
+
+                ArrayList fields = workItem.Validate();
+                if (fields.Count > 0)
+                {
+                    StringBuilder error = new StringBuilder();
+                    error.Append(string.Format("{0} {1}", "The value(s) assigned to the following field(s) are not valid:", Environment.NewLine));
+                    foreach (Field field in fields)
+                    {
+                        error.Append(string.Format("[{0}] {1} ", field.Name, Environment.NewLine));
+                    }
+                    throw new Exception(error.ToString());
+                }
                 workItem.Save();
                 return workItem.Id;
             }
