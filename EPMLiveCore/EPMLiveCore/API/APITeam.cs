@@ -149,7 +149,7 @@ namespace EPMLiveCore.API
             Dictionary<string, int> liItemSPGroups = new Dictionary<string, int>();
             if (liItem != null)
             {
-                SPFieldUserValueCollection uvc = new SPFieldUserValueCollection(web, liItem["AssignedTo"].ToString());
+                SPFieldUserValueCollection uvc = new SPFieldUserValueCollection(web, Convert.ToString(liItem["AssignedTo"]));
                 foreach (var uv in uvc)
                 {
                     iDs = uv.LookupId + "," + iDs;
@@ -642,7 +642,7 @@ namespace EPMLiveCore.API
                     SPFieldUserValueCollection uvc = null;
                     try
                     {
-                        uvc = new SPFieldUserValueCollection(oWeb, li["AssignedTo"].ToString());
+                        uvc = new SPFieldUserValueCollection(oWeb, Convert.ToString(li["AssignedTo"]));
                     }
                     catch { }
                     if (uvc == null)
@@ -1372,7 +1372,7 @@ namespace EPMLiveCore.API
                             try
                             {
 
-                                SPFieldUserValueCollection uvc = new SPFieldUserValueCollection(tWeb, li["AssignedTo"].ToString());
+                                SPFieldUserValueCollection uvc = new SPFieldUserValueCollection(tWeb, Convert.ToString(li["AssignedTo"]));
 
                                 SortedList slUsers = new SortedList();
 
