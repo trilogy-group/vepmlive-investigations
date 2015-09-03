@@ -30,7 +30,8 @@ namespace EPMLiveCore.Layouts.epmlive.reporting.izenda
                 SqlConnection cn = new SqlConnection(CoreFunctions.getConnectionString(Web.Site.WebApplication.Id));
                 cn.Open();
 
-                SqlCommand cmd = new SqlCommand("SELECT * FROM IzendaAdHocReports where TenantID='" + Web.ID.ToString() + "' order by Name", cn);
+                SqlCommand cmd = new SqlCommand("SELECT * FROM IzendaAdHocReports where TenantID=@siteid order by Name", cn);
+                cmd.Parameters.AddWithValue("@siteid", Convert.ToString(Web.ID));
 
                 DataSet ds = new DataSet();
                 SqlDataAdapter da = new SqlDataAdapter(cmd);
