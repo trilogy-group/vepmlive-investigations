@@ -4168,13 +4168,14 @@
                     jValue.value = jValue.value / (lFinishPeriod - lStartPeriod + 1);
                 }
             }
-            for (var c = (lStartPeriod - 1) ; c < lFinishPeriod; c++) {
+
+            for (var c = 0; c < grid.ColNames[2].length; c++) {
                 var col = grid.ColNames[2][c];
                 var sType = col.substring(0, 1);
                 if (sType == "Q") {
                     var nId = parseInt(col.substring(1));
                     if (nId < lStartPeriod || nId > lFinishPeriod) {
-                        if (clearPeriods != 0) {
+                        if (clearPeriods) {
                             this.SetPeriodValue(grid, row, col, 0);
                             grid.SetAttribute(row, col, null, "", 0, 0);
                         }
