@@ -33,24 +33,46 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
                         {
                             sqlConnection.Open();
                             string moduleId = "B0950B9B-3525-40B8-A456-6403156DC003";
-                            string customPropsText = @"<Properties><Connection><Input Type=""Text"" Property=""ServerUrl"" Title=""Tfs Server Url"" /><Input Type=""Text"" Property=""Username"" Title=""Username"" /><Input Type=""Password"" Property=""Password"" Title=""Password"" /><Input Type=""Checkbox"" Property=""UseBasicAuthentication"" Title=""Use Basic Authentication"" /></Connection><General><Input Type=""Select"" Property=""TeamProjectCollection"" Title=""Project Collection"" /><Input Type=""Select"" Property=""Object"" Title=""Object"" /></General></Properties>";
-                            using (
-                               var sqlCommand =
-                                   new SqlCommand(
-                                       "update INT_MODULES set CustomProps = @customProps where MODULE_ID = @module_Id",
-                                       sqlConnection))
+                            string customPropsText = string.Empty;
+                            using (SqlCommand cmd = new SqlCommand("select CustomProps from INT_MODULES where MODULE_ID = @module_Id", sqlConnection))
                             {
-                                sqlCommand.CommandType = CommandType.Text;
-                                sqlCommand.Parameters.AddWithValue("@customProps", customPropsText);
-                                sqlCommand.Parameters.AddWithValue("@module_Id", moduleId);
-                                sqlCommand.ExecuteNonQuery();
+                                cmd.Parameters.AddWithValue("@module_Id", moduleId);
+                                using (SqlDataReader dr = cmd.ExecuteReader())
+                                {
+                                    if (dr.Read())
+                                    {
+                                        customPropsText = dr.GetString(0);
+                                        dr.Close();
+                                    }
+                                }
+                            }
+                            if (customPropsText.Contains("UseBasicAuthentication"))
+                            {
+                                LogMessage(string.Format("Use Basic Authentication property for TFS integration is already exists."), MessageKind.SKIPPED, 4);
+                            }
+                            else
+                            {
+
+                                customPropsText = @"<Properties><Connection><Input Type=""Text"" Property=""ServerUrl"" Title=""Tfs Server Url"" /><Input Type=""Text"" Property=""Username"" Title=""Username"" /><Input Type=""Password"" Property=""Password"" Title=""Password"" /><Input Type=""Checkbox"" Property=""UseBasicAuthentication"" Title=""Use Basic Authentication"" /></Connection><General><Input Type=""Select"" Property=""TeamProjectCollection"" Title=""Project Collection"" /><Input Type=""Select"" Property=""Object"" Title=""Object"" /></General></Properties>";
+                                using (
+                                   var sqlCommand =
+                                       new SqlCommand(
+                                           "update INT_MODULES set CustomProps = @customProps where MODULE_ID = @module_Id",
+                                           sqlConnection))
+                                {
+                                    sqlCommand.CommandType = CommandType.Text;
+                                    sqlCommand.Parameters.AddWithValue("@customProps", customPropsText);
+                                    sqlCommand.Parameters.AddWithValue("@module_Id", moduleId);
+                                    sqlCommand.ExecuteNonQuery();
+                                }
+                                LogMessage(string.Format("Use Basic Authentication property for TFS integration added successfully."), MessageKind.SUCCESS, 4);
                             }
                         }
                         finally
                         {
                             sqlConnection.Close();
                         }
-                        LogMessage(string.Format("Use Basic Authentication property for TFS integration added successfully."), MessageKind.SUCCESS, 4);
+
                     }
 
                 }
@@ -86,45 +108,53 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
                     }
                     else
                     {
-                         string connectionString = CoreFunctions.getConnectionString(webAppId);
-                         using (var sqlConnection = new SqlConnection(connectionString))
-                         {
-                             try
-                             {
-                                 sqlConnection.Open();
-                                 Guid timerjobguid;
-                                 //=======================Timer Job==========================
-                                 SqlCommand cmd = new SqlCommand("select timerjobuid from timerjobs where siteguid=@siteguid and jobtype=2", sqlConnection);
-                                 cmd.Parameters.AddWithValue("@siteguid", Web.Site.ID.ToString());
-                                 SqlDataReader dr = cmd.ExecuteReader();
-                                 if (dr.Read())
-                                 {
-                                     timerjobguid = dr.GetGuid(0);
-                                     dr.Close();
-                                     cmd = new SqlCommand("UPDATE TIMERJOBS set runtime = @runtime where siteguid=@siteguid and jobtype=2", sqlConnection);
-                                     cmd.Parameters.AddWithValue("@siteguid", Web.Site.ID.ToString());
-                                     cmd.Parameters.AddWithValue("@runtime", "-1");
-                                     cmd.ExecuteNonQuery();
-                                 }
-                                 else
-                                 {
-                                     timerjobguid = Guid.NewGuid();
-                                     dr.Close();
-                                     cmd = new SqlCommand("INSERT INTO TIMERJOBS (timerjobuid, siteguid, jobtype, jobname, runtime, scheduletype, webguid) VALUES (@timerjobuid, @siteguid, 2, 'Today Fix/Res Plan', @runtime, 2, @webguid)", sqlConnection);
-                                     cmd.Parameters.AddWithValue("@siteguid", Web.Site.ID.ToString());
-                                     cmd.Parameters.AddWithValue("@timerjobuid", timerjobguid);
-                                     cmd.Parameters.AddWithValue("@webguid", Web.ID.ToString());
-                                     cmd.Parameters.AddWithValue("@runtime", "-1");
-                                     cmd.ExecuteNonQuery();
-                                 }
+                        string connectionString = CoreFunctions.getConnectionString(webAppId);
+                        using (var sqlConnection = new SqlConnection(connectionString))
+                        {
+                            try
+                            {
+                                sqlConnection.Open();
+                                Guid timerjobguid;
+                                //=======================Timer Job==========================
+                                using (SqlCommand cmd = new SqlCommand("select timerjobuid from timerjobs where siteguid=@siteguid and jobtype=2", sqlConnection))
+                                {
+                                    cmd.Parameters.AddWithValue("@siteguid", Web.Site.ID.ToString());
+                                    using (SqlDataReader dr = cmd.ExecuteReader())
+                                    {
+                                        if (dr.Read())
+                                        {
+                                            timerjobguid = dr.GetGuid(0);
+                                            dr.Close();
+                                            using (SqlCommand cmd1 = new SqlCommand("UPDATE TIMERJOBS set runtime = @runtime where siteguid=@siteguid and jobtype=2", sqlConnection))
+                                            {
+                                                cmd1.Parameters.AddWithValue("@siteguid", Web.Site.ID.ToString());
+                                                cmd1.Parameters.AddWithValue("@runtime", "-1");
+                                                cmd1.ExecuteNonQuery();
+                                            }
+                                        }
+                                        else
+                                        {
+                                            timerjobguid = Guid.NewGuid();
+                                            dr.Close();
+                                            using (SqlCommand cmd2 = new SqlCommand("INSERT INTO TIMERJOBS (timerjobuid, siteguid, jobtype, jobname, runtime, scheduletype, webguid) VALUES (@timerjobuid, @siteguid, 2, 'Today Fix/Res Plan', @runtime, 2, @webguid)", sqlConnection))
+                                            {
+                                                cmd2.Parameters.AddWithValue("@siteguid", Web.Site.ID.ToString());
+                                                cmd2.Parameters.AddWithValue("@timerjobuid", timerjobguid);
+                                                cmd2.Parameters.AddWithValue("@webguid", Web.ID.ToString());
+                                                cmd2.Parameters.AddWithValue("@runtime", "-1");
+                                                cmd2.ExecuteNonQuery();
+                                            }
+                                        }
+                                    }
+                                }
 
-                             }
-                             finally
-                             {
-                                 sqlConnection.Close();
-                             }
-                         }
-                         LogMessage("Resource List Cleanup settings disabled.", 2);
+                            }
+                            finally
+                            {
+                                sqlConnection.Close();
+                            }
+                        }
+                        LogMessage("Resource List Cleanup settings disabled.", 2);
                     }
 
                 }
