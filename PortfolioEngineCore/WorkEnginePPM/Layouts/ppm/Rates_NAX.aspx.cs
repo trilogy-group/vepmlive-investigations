@@ -4,17 +4,19 @@ using System.Web.UI.WebControls;
 using Microsoft.SharePoint.WebControls;
 using PortfolioEngineCore;
 using WorkEnginePPM.ControlTemplates.WorkEnginePPM;
+using Microsoft.SharePoint;
 
 namespace WorkEnginePPM
 {
     public partial class Rates_NAX : LayoutsPageBase
     {
+        string sBaseInfo = string.Empty;
         protected void Page_Load(object sender, EventArgs e)
         {
             DBAccess dba = null;
             try
             {
-                string sBaseInfo = WebAdmin.BuildBaseInfo(Context);
+                sBaseInfo = WebAdmin.BuildBaseInfo(Context);
                 DataAccess da = new DataAccess(sBaseInfo, SecurityLevels.PortAdmin);
                 dba = da.dba;
 
@@ -61,6 +63,8 @@ namespace WorkEnginePPM
                     //    ddlResourceRoles.Items.Add(li);
                     //}
                     dba.Close();
+                    if (IsPostBack)
+                        updateResourceRate(dt);
 
                     if (dba.Status != StatusEnum.rsSuccess)
                     {
@@ -85,6 +89,54 @@ namespace WorkEnginePPM
             {
                 if (dba != null)
                     dba.Close();
+            }
+        }
+
+        protected void updateResourceRate(DataTable dt)
+        {
+            try
+            {
+                if (dt != null && dt.Rows.Count > 0)
+                {
+                    using (SPSite site = new SPSite(this.Site.Url))
+                    {
+                        using (SPWeb web = site.OpenWeb())
+                        {
+                            web.AllowUnsafeUpdates = true;
+                            SPList list = web.Lists.TryGetList("Resources");
+                            if (list != null)
+                            {
+                                AdminFunctions objAdminFunctions = new AdminFunctions(sBaseInfo);
+                                foreach (DataRow row in dt.Rows)
+                                {
+                                    string[] wresIds = row["wres_ids"].ToString().Split(',');
+                                    string[] resIds = row["res_ids"].ToString().Split(',');
+                                    for (int i = 0; i < resIds.Length; i++)
+                                    {
+                                        if (!string.IsNullOrEmpty(resIds[i]))
+                                        {
+                                            if (Convert.ToInt32(resIds[i]) != 0)
+                                            {
+                                                decimal rate = objAdminFunctions.CalcResourceRate(Convert.ToInt32(wresIds[i]));
+                                                SPListItem item = list.GetItemById(Convert.ToInt32(resIds[i]));
+                                                if (Convert.ToDecimal(item["StandardRate"]) != rate)
+                                                    item.Update();
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            catch (PFEException pex)
+            {
+                throw pex;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
             }
         }
     }
