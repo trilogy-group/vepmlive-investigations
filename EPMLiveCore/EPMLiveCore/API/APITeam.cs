@@ -1073,7 +1073,7 @@ namespace EPMLiveCore.API
                 Guid listid = Guid.Empty;
                 int itemid = 0;
                 string currentteam = null;
-
+                SPList list = null;
                 bool bUseTeam = false;
 
                 if (queryDoc != "")
@@ -1152,9 +1152,18 @@ namespace EPMLiveCore.API
 
                     if (listid != Guid.Empty)
                     {
-                        SPList list = web.Lists[listid];
-                        GridGanttSettings gSettings = ListCommands.GetGridGanttSettings(list);
-                        bUseTeam = gSettings.BuildTeam;
+                        try
+                        {
+                            list = web.Lists[listid];
+                            GridGanttSettings gSettings = ListCommands.GetGridGanttSettings(list);
+                            bUseTeam = gSettings.BuildTeam;
+                        }
+                        catch (Exception)
+                        {
+                            //EPML-5575:need to re-initialize these variables in case of Item level workspace created using Project/Collaborative workspace template
+                            listid = Guid.Empty;
+                            itemid = 0;
+                        }
                     }
 
                     try
@@ -1173,7 +1182,7 @@ namespace EPMLiveCore.API
                                         web = web.ParentWeb;
                                     }
 
-                                    SPList list = web.Lists[listid];
+                                    list = web.Lists[listid];
                                     GridGanttSettings gSettings = ListCommands.GetGridGanttSettings(list);
                                     bUseTeam = gSettings.BuildTeam;
                                 }
@@ -1200,7 +1209,7 @@ namespace EPMLiveCore.API
                 {
                     if (listid != Guid.Empty)
                     {
-                        SPList list = oWeb.Lists[listid];
+                        list = oWeb.Lists[listid];
                         GridGanttSettings gSettings = new GridGanttSettings(list);
                         bUseTeam = gSettings.BuildTeam;
                     }
