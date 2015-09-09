@@ -257,7 +257,10 @@ namespace EPMLiveWebParts
                                     attr.Value = "Right";
                                     sTitleAlign = "Right";
                                     ndNew.Attributes.Append(attr);
-                                    sType = "Float";
+                                    if(oFC.OutputType == SPFieldType.DateTime)
+                                        sType = "Date";
+                                    else
+                                        sType = "Float";
                                 }
                                 else if (oFC.Description == "Indicator")
                                 {
