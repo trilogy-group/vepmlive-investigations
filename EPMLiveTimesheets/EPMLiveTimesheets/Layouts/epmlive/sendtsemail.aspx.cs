@@ -74,98 +74,98 @@ namespace TimeSheets
                         //    resWeb = web;
                         //if (resWeb != null)
                         //{
-                            //reslist = resWeb.Lists["Resources"];
+                        //reslist = resWeb.Lists["Resources"];
 
-                            //SPQuery query = new SPQuery();
-                            //query.Query = "<Where><Contains><FieldRef Name='TimesheetManager'/><Value Type='User'>" + SPContext.Current.Web.CurrentUser.Name + "</Value></Contains></Where>";
+                        //SPQuery query = new SPQuery();
+                        //query.Query = "<Where><Contains><FieldRef Name='TimesheetManager'/><Value Type='User'>" + SPContext.Current.Web.CurrentUser.Name + "</Value></Contains></Where>";
 
-                            DataTable dtResources = EPMLiveCore.API.APITeam.GetResourcePool("<Resources><Columns>SimpleColumns,Email</Columns></Resources>", Web);
+                        DataTable dtResources = EPMLiveCore.API.APITeam.GetResourcePool("<Resources><Columns>SimpleColumns,Email</Columns></Resources>", Web);
 
-                            foreach(string sRes in Request["resources"].Split(','))
+                        foreach (string sRes in Request["resources"].Split(','))
+                        {
+                            if (sRes != "")
                             {
-                                if(sRes != "")
+                                DataRow[] dr = dtResources.Select("SPID='" + sRes + "'");
+                                if (dr.Length > 0)
                                 {
-                                    DataRow[] dr = dtResources.Select("SPID='" + sRes + "'");
-                                    if (dr.Length > 0)
-                                    {
-                                        strUsers += dr[0]["Title"].ToString() + "<br>";
-                                        emails += "," + dr[0]["Email"].ToString();
-                                        names += "," + dr[0]["Title"].ToString();
-                                    }
+                                    strUsers += dr[0]["Title"].ToString() + "<br>";
+                                    emails += "," + dr[0]["Email"].ToString();
+                                    names += "," + dr[0]["Title"].ToString();
                                 }
                             }
+                        }
 
-                            /*if (Request["type"] == "1" || Request["type"] == "3")
+                        /*if (Request["type"] == "1" || Request["type"] == "3")
+                        {
+                            SPSecurity.RunWithElevatedPrivileges(delegate()
                             {
-                                SPSecurity.RunWithElevatedPrivileges(delegate()
+                                try
                                 {
-                                    try
-                                    {
-                                        SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(web.Site.WebApplication.Id));
-                                        cn.Open();
+                                    SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(web.Site.WebApplication.Id));
+                                    cn.Open();
 
-                                        SqlCommand cmd = new SqlCommand("select ts_uid,username from TSTIMESHEET where period_id=@period_id and site_uid=@siteid and submitted=1", cn);
-                                        cmd.CommandType = CommandType.Text;
-                                        cmd.Parameters.AddWithValue("@period_id", Request["period"]);
-                                        cmd.Parameters.AddWithValue("@siteid", web.Site.ID);
-                                        dsSubmitted = new DataSet();
-                                        SqlDataAdapter da = new SqlDataAdapter(cmd);
-                                        da.Fill(dsSubmitted);
+                                    SqlCommand cmd = new SqlCommand("select ts_uid,username from TSTIMESHEET where period_id=@period_id and site_uid=@siteid and submitted=1", cn);
+                                    cmd.CommandType = CommandType.Text;
+                                    cmd.Parameters.AddWithValue("@period_id", Request["period"]);
+                                    cmd.Parameters.AddWithValue("@siteid", web.Site.ID);
+                                    dsSubmitted = new DataSet();
+                                    SqlDataAdapter da = new SqlDataAdapter(cmd);
+                                    da.Fill(dsSubmitted);
 
 
-                                        cmd = new SqlCommand("select ts_uid,username from TSTIMESHEET where period_id=@period_id and site_uid=@siteid and ts_uid in (SELECT Item FROM dbo.Split (@timesheets, ';#'))", cn);
-                                        cmd.CommandType = CommandType.Text;
-                                        cmd.Parameters.AddWithValue("@period_id", Request["period"]);
-                                        cmd.Parameters.AddWithValue("@siteid", web.Site.ID);
-                                        cmd.Parameters.AddWithValue("@timesheets", Request["timesheets"].Replace(",", ";#"));
-                                        //Request["timesheets"].Replace(",","','")
-                                        dsTimesheets = new DataSet();
-                                        da = new SqlDataAdapter(cmd);
-                                        da.Fill(dsTimesheets);
+                                    cmd = new SqlCommand("select ts_uid,username from TSTIMESHEET where period_id=@period_id and site_uid=@siteid and ts_uid in (SELECT Item FROM dbo.Split (@timesheets, ';#'))", cn);
+                                    cmd.CommandType = CommandType.Text;
+                                    cmd.Parameters.AddWithValue("@period_id", Request["period"]);
+                                    cmd.Parameters.AddWithValue("@siteid", web.Site.ID);
+                                    cmd.Parameters.AddWithValue("@timesheets", Request["timesheets"].Replace(",", ";#"));
+                                    //Request["timesheets"].Replace(",","','")
+                                    dsTimesheets = new DataSet();
+                                    da = new SqlDataAdapter(cmd);
+                                    da.Fill(dsTimesheets);
 
-                                        cn.Close();
-                                    }
-                                    catch { }
-                                });
-                            }*/
+                                    cn.Close();
+                                }
+                                catch { }
+                            });
+                        }*/
 
-                            //foreach (SPListItem li in reslist.GetItems(query))
-                            //{
-                            //    SPFieldUserValue uv = new SPFieldUserValue(web, li["SharePointAccount"].ToString());
-                            //    string uName = uv.User.LoginName;
-                            //    string name = uv.User.Name.Replace(",", ";");
-                            //    string email = uv.User.Email;
+                        //foreach (SPListItem li in reslist.GetItems(query))
+                        //{
+                        //    SPFieldUserValue uv = new SPFieldUserValue(web, li["SharePointAccount"].ToString());
+                        //    string uName = uv.User.LoginName;
+                        //    string name = uv.User.Name.Replace(",", ";");
+                        //    string email = uv.User.Email;
 
-                            //    if (email != "")
-                            //    {
-                            //        if (Request["type"] == "1")
-                            //        {
-                            //            if (dsSubmitted.Tables[0].Select("username like '" + uName + "'").Length == 0)
-                            //            {
-                            //                strUsers += name + "<br>";
-                            //                emails += "," + email;
-                            //                names += "," + name;
-                            //            }
-                            //        }
-                            //        else if (Request["type"] == "3")
-                            //        {
-                            //            if (dsTimesheets.Tables[0].Select("username like '" + uName + "'").Length > 0)
-                            //            {
-                            //                strUsers += name + "<br>";
-                            //                emails += "," + email;
-                            //                names += "," + name;
-                            //            }
-                            //        }
-                            //        else
-                            //        {
-                            //            strUsers += name + "<br>";
-                            //            emails += "," + email;
-                            //            names += "," + name;
-                            //        }
-                            //    }
-                            //}
-                            //if (resWeb.ID != SPContext.Current.Web.ID)
-                            //    resWeb.Close();
+                        //    if (email != "")
+                        //    {
+                        //        if (Request["type"] == "1")
+                        //        {
+                        //            if (dsSubmitted.Tables[0].Select("username like '" + uName + "'").Length == 0)
+                        //            {
+                        //                strUsers += name + "<br>";
+                        //                emails += "," + email;
+                        //                names += "," + name;
+                        //            }
+                        //        }
+                        //        else if (Request["type"] == "3")
+                        //        {
+                        //            if (dsTimesheets.Tables[0].Select("username like '" + uName + "'").Length > 0)
+                        //            {
+                        //                strUsers += name + "<br>";
+                        //                emails += "," + email;
+                        //                names += "," + name;
+                        //            }
+                        //        }
+                        //        else
+                        //        {
+                        //            strUsers += name + "<br>";
+                        //            emails += "," + email;
+                        //            names += "," + name;
+                        //        }
+                        //    }
+                        //}
+                        //if (resWeb.ID != SPContext.Current.Web.ID)
+                        //    resWeb.Close();
 
 
                         //}
@@ -203,40 +203,47 @@ namespace TimeSheets
                 SPSecurity.RunWithElevatedPrivileges(delegate()
                 {
 
+                    // Mail server objects
+                    SmtpClient smtpClient = new SmtpClient();
+                    SPAdministrationWebApplication spWebAdmin = Microsoft.SharePoint.Administration.SPAdministrationWebApplication.Local;
+
                     string[] semails = emails.Split(',');
                     string[] snames = names.Split(',');
 
                     string body = txtBody.Text + "<br><br>Go To Site: <a href=\"" + web.Url + "\">" + web.Title + "</a>";
 
-                    for (int i = 0; i < semails.Length; i++)
+                    if (spWebAdmin.OutboundMailServiceInstance != null)
                     {
-                        if (semails[i] != "")
+                        for (int i = 0; i < semails.Length; i++)
                         {
-                            try
+                            if (semails[i] != "")
                             {
-                                System.Net.Mail.MailMessage mailMsg = new MailMessage();
-                                mailMsg.From = new MailAddress(fromEmail);
-                                mailMsg.To.Add(new MailAddress(semails[i]));
-                                mailMsg.Subject = txtSubject.Text;
-                                mailMsg.Body = body;
-                                mailMsg.IsBodyHtml = true;
-                                mailMsg.BodyEncoding = System.Text.Encoding.UTF8;
-                                mailMsg.Priority = MailPriority.Normal;
+                                try
+                                {
+                                    System.Net.Mail.MailMessage mailMsg = new MailMessage();
+                                    mailMsg.From = new MailAddress(fromEmail);
+                                    mailMsg.To.Add(new MailAddress(semails[i]));
+                                    mailMsg.Subject = txtSubject.Text;
+                                    mailMsg.Body = body;
+                                    mailMsg.IsBodyHtml = true;
+                                    mailMsg.BodyEncoding = System.Text.Encoding.UTF8;
+                                    mailMsg.Priority = MailPriority.Normal;
 
-                                // Configure the mail server
-                                SmtpClient smtpClient = new SmtpClient();
-                                SPAdministrationWebApplication spWebAdmin = Microsoft.SharePoint.Administration.SPAdministrationWebApplication.Local;
-                                string sMailSvr = spWebAdmin.OutboundMailServiceInstance.Server.Name;
-                                smtpClient.Host = sMailSvr;
-                                smtpClient.Send(mailMsg);
-                                strSent += snames[i] + " (" + semails[i] + ")...Success<br>";
-                            }
-                            catch (Exception ex)
-                            {
-                                strSent += "<font color=\"red\">" + snames[i] + " (" + semails[i] + ")...Failed: " + ex.Message + "</font><br>";
+                                    //Email Sent process.
+                                    string sMailSvr = spWebAdmin.OutboundMailServiceInstance.Server.Name;
+                                    smtpClient.Host = sMailSvr;
+                                    smtpClient.Send(mailMsg);
+                                    strSent += snames[i] + " (" + semails[i] + ")...Success<br>";
+                                }
+                                catch (Exception ex)
+                                {
+                                    strSent += "<font color=\"red\">" + snames[i] + " (" + semails[i] + ")...Failed: " + ex.Message + "</font><br>";
+                                }
                             }
                         }
                     }
+                    else
+                        strSent = "<font color=\"red\"> Failed: Outbound E-mail service is not configured on this server. Please contact Administrator. </font><br>";
 
                 });
             }
