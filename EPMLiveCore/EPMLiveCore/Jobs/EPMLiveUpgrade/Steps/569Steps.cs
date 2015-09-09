@@ -208,32 +208,30 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
         }
         public override bool Perform()
         {
-            bool blnReturn = false;
             LogMessage("Read Property Bag setting: EPMLiveWalkMeId", 2);
 
             try
             {
+                string propertyBagKey = "epmlivewalkmeid";
                 //Check if WalkMeID property is available 
-                var walkMeId = CoreFunctions.getConfigSetting(_spWeb, "EPMLiveWalkMeId");
-                if (string.IsNullOrEmpty(walkMeId))
+                if (_spWeb.Properties.ContainsKey(propertyBagKey))
                 {
-                    LogMessage("WalkMeId property doesn't exists.", MessageKind.SKIPPED, 4);
+                    _spWeb.AllProperties.Remove(propertyBagKey); //first clear from AllProperties.
+                    _spWeb.Properties[propertyBagKey] = null; // remove property value
+                    _spWeb.Update(); //update web object.
+                    _spWeb.Properties.Update(); // update properties object
+                    LogMessage("WalkMeId property removed.", MessageKind.SUCCESS, 4);
                 }
                 else
                 {
-                    //Remove EPMLiveWalkMeId from config settings 
-                    _spWeb.Properties.Remove("epmlivewalkmeid");
-                    _spWeb.Properties.Update();
-                    blnReturn = true;
-                    LogMessage("WalkMeId property removed.", MessageKind.SUCCESS, 4);
+                    LogMessage("WalkMeId property doesn't exists.", MessageKind.SKIPPED, 4);
                 }
             }
             catch (Exception ex)
             {
                 LogMessage(ex.Message, MessageKind.FAILURE, 4);
-                blnReturn = false; 
             }
-            return blnReturn;
+            return true;
         }
     }
 }
