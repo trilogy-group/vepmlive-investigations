@@ -102,7 +102,10 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
     [UpgradeStep(Version = EPMLiveVersion.V569, Order = 2.0, Description = "Updates for Resource List Cleanup")]
     internal class UpdateTimerSetting : UpgradeStep
     {
-        public UpdateTimerSetting(SPWeb spWeb, bool isPfeSite) : base(spWeb, isPfeSite) { }
+        private SPWeb _spWeb;
+        public UpdateTimerSetting(SPWeb spWeb, bool isPfeSite) : base(spWeb, isPfeSite) {
+            _spWeb = spWeb;
+        }
         public override bool Perform()
         {
             Guid webAppId = Web.Site.WebApplication.Id;
@@ -118,8 +121,10 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
                     //If property bag setting contains "Resources" then, remove "Resources" value from property bag
                     if (resourcelist != null && propertyBagValue.ToLower().Contains("\r\nresources"))
                     {
-                        propertyBagValue.Replace("\r\nresources", "");
-                        EPMLiveCore.CoreFunctions.setConfigSetting(Web, "epmlivefixlists", propertyBagValue);
+                        propertyBagValue = propertyBagValue.Replace("\r\nresources", "");
+                        propertyBagValue = propertyBagValue.Replace("\r\nResources", "");
+
+                        EPMLiveCore.CoreFunctions.setConfigSetting(_spWeb, "EPMLiveFixLists", propertyBagValue);
                         
                         LogMessage("Resources value removed from property bag", MessageKind.SUCCESS, 4);
                     }
@@ -152,7 +157,7 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
                                             }
                                             else
                                             {
-                                                using (SqlCommand cmd1 = new SqlCommand("UPDATE TIMERJOBS set runtime = @runtime where siteguid=@siteguid and jobtype=2", sqlConnection))
+                                                using (SqlCommand cmd1 = new SqlCommand("UPDATE TIMERJOBS set runtime = @runtime, scheduletype = -1 where siteguid=@siteguid and jobtype=2", sqlConnection))
                                                 {
                                                     cmd1.Parameters.AddWithValue("@siteguid", Web.Site.ID.ToString());
                                                     cmd1.Parameters.AddWithValue("@runtime", "-1");
