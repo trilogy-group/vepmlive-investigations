@@ -48,6 +48,30 @@ namespace EPMLiveCore
             SPList List = SPContext.Current.List;
             SPListItem ListItem = SPContext.Current.ListItem;
 
+            try
+            {
+                if (List.Title.Equals("Resources"))
+                {
+                    string basePath = CoreFunctions.getConfigSetting(Web.Site.RootWeb, "EPKBasepath").Replace("/", "").Replace("\\", ""); ;
+                    if (List.Fields.ContainsField("EXTID"))
+                    {
+                        int EXTID = Convert.ToInt32(ListItem["EXTID"]);
+                        decimal rate = 0;
+                        if (!string.IsNullOrEmpty(basePath))
+                        {
+                            string pfeConnection = Utilities.GetPFEDBConnectionString(basePath);
+                            if (!string.IsNullOrEmpty(pfeConnection))
+                            {
+                                rate = Utilities.CalcResourceRate(EXTID, pfeConnection);
+                            }
+                        }
+                        if (List.Fields.ContainsField("StandardRate") && rate != 0)
+                            ListItem["StandardRate"] =rate;
+                    }
+                }
+            }
+            catch { }
+
             CssRegistration.Register("/_layouts/epmlive/modal/modal.css");
             ScriptLink.Register(Page, "/_layouts/epmlive/modal/modal.js", false);
 
@@ -287,7 +311,7 @@ namespace EPMLiveCore
             string Errors = "";
 
             int seq = 130;
-            
+
             var commands = new List<IRibbonCommand>();
 
             List<EPMLiveIntegration.IntegrationControl> ics = core.GetItemButtons(ListItem.ParentList.ID, ListItem, out Errors);
@@ -313,7 +337,7 @@ namespace EPMLiveCore
 
             //===============================================
 
-            
+
 
             // register the command at the ribbon. Include the callback to the server     // to generate the xml
             //commands.Add(new SPRibbonCommand("Ribbon.ListForm.Display.Manage.EditItem2", "alert('test');", "true"));

@@ -57,6 +57,7 @@ namespace EPMLiveCore
         int userpanelRequiredCount = 0;
         int permissionPanelRequiredCount = 0;
         int profilepanelRequiredCount = 0;
+        decimal rate = 0;
 
         GenericEntityEditor picker;
 
@@ -699,6 +700,31 @@ namespace EPMLiveCore
                             AddControlsToWriter(tc.Controls[2], writer, field.InternalName);
 
                         }
+                        else if (isResList && field.InternalName == "StandardRate")
+                        {
+                            try
+                            {
+                                string basePath = CoreFunctions.getConfigSetting(SPContext.Current.Web.Site.RootWeb, "EPKBasepath").Replace("/", "").Replace("\\", "");
+                                if (this.List.Fields.ContainsField("EXTID"))
+                                {
+                                    int EXTID = Convert.ToInt32(this.ListItem["EXTID"]);
+                                    if (!string.IsNullOrEmpty(basePath))
+                                    {
+                                        string pfeConnection = Utilities.GetPFEDBConnectionString(basePath);
+                                        if (!string.IsNullOrEmpty(pfeConnection))
+                                        {
+                                            rate = Utilities.CalcResourceRate(EXTID, pfeConnection);
+                                        }
+                                    }
+                                }
+                                SPField f = ((Microsoft.SharePoint.WebControls.CompositeField)tc.Controls[1]).Field;
+                                string fname = f.InternalName + "_" + f.Id.ToString() + "_$" + f.TypeAsString + "Field";
+                                dControls.Add(field.InternalName, fname);
+
+                                AddControlsToWriter(tc, writer, field.InternalName);
+                            }
+                            catch { }
+                        }
                         else
                         {
 
@@ -832,6 +858,14 @@ namespace EPMLiveCore
                         writer.WriteLine("function cleanupfields(){");
                         try
                         {
+                            if (dControls.ContainsKey("StandardRate") && rate != 0)
+                            {
+                                try
+                                {
+                                    writer.WriteLine("      try{document.getElementById('" + dControls["StandardRate"] + "').value=" + rate + ";}catch(e){}");
+                                }
+                                catch { }
+                            }
                             if (outofusers)
                             {
 
@@ -1028,7 +1062,6 @@ namespace EPMLiveCore
                                 }
                                 catch { }
                             }
-
                         }
                         catch { }
                         writer.WriteLine("}");
@@ -2443,6 +2476,8 @@ namespace EPMLiveCore
             else
                 return base.IsFieldExcluded(field);
         }
+
+
     }
 
     public static class ControlExtensions
