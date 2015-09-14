@@ -941,7 +941,8 @@ if not exists (select table_name from INFORMATION_SCHEMA.tables where table_name
 			[EventTime] [datetime] NULL,
 			[Status] [int] NULL,
 			[QueueServer] [varchar](255) NULL,
-			[ErrorLog] [ntext] NULL
+			[ErrorLog] [ntext] NULL,
+			[Retry] INT DEFAULT(0)
 		) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 		
 end
@@ -953,14 +954,12 @@ begin
 	ALTER TABLE rollupqueue
 	ALTER COLUMN errorlog varchar(MAX)
 
-	IF NOT EXISTS (select column_name FROM INFORMATION_SCHEMA.COLUMNS where table_name = 'ROLLUPQUEUE' and column_name = 'retry')
+	IF NOT EXISTS (select column_name FROM INFORMATION_SCHEMA.COLUMNS where table_name = 'ROLLUPQUEUE' and column_name = 'Retry')
 	begin
-		Print '     Add Column retry'
+		Print '     Add Column Retry'
 		ALTER TABLE rollupqueue
-		ADD [retry] INT DEFAULT(0)
+		ADD [Retry] INT DEFAULT(0)
 	end
-
-
 end
 
 -----------------LOGS------------
