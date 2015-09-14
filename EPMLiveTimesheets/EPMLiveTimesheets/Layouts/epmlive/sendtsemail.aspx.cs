@@ -243,7 +243,7 @@ namespace TimeSheets
                         }
                     }
                     else
-                        strSent = "<font color=\"red\"> Failed: Outbound E-mail service is not configured on this server. Please contact Administrator. </font><br>";
+                        strSent = "<font color=\"red\"> Email Failure: Outbound Email service is not configured on this server, please contact your System Administrator. </font><br>";
 
                 });
             }
