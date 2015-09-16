@@ -227,19 +227,19 @@ namespace EPMLiveCore.API
                                             }
                                             break;
                                         case SPFieldType.Lookup:
-                                            if (val.Contains(","))
-                                            {
-                                                var collection = new SPFieldLookupValueCollection();
-                                                collection.AddRange(
-                                                    val.Split(',')
-                                                        .Select(v => v.Trim())
-                                                        .Select(lv => new SPFieldLookupValue(lookupFieldDict[col][lv], lv)));
-                                                value = collection;
-                                            }
-                                            else
-                                            {
+                                            //if (val.Contains(","))
+                                            //{
+                                            //    var collection = new SPFieldLookupValueCollection();
+                                            //    collection.AddRange(
+                                            //        val.Split(',')
+                                            //            .Select(v => v.Trim())
+                                            //            .Select(lv => new SPFieldLookupValue(lookupFieldDict[col][lv], lv)));
+                                            //    value = collection;
+                                            //}
+                                            //else
+                                            //{
                                                 value = new SPFieldLookupValue(lookupFieldDict[col][val], val);
-                                            }
+                                            //}
                                             break;
                                     }
                                 }
