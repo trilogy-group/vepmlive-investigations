@@ -1433,7 +1433,7 @@ function GEInit() {
                     if (col != null && col.value != null && col.value != "") {
                         var title = col.value.replace(/[^a-zA-Z0-9 ]/g, "");
                         if (title.length == 0) {
-                            alert("Atleast one Alpha-numeric character is required at " + col.title);
+                            alert("At least one alpha-numeric character is required for " + col.title);
                             return false;
                         }
                     }
