@@ -218,14 +218,21 @@ namespace EPMLiveWorkPlanner
                 f.Update();
                 list.Update();
             }
-            if(!list.Fields.ContainsField("taskuid"))
+
+            try
             {
-                list.Fields.Add("taskuid", SPFieldType.Text, false);
-                SPField f = list.Fields["taskuid"];
-                f.Hidden = true;
-                f.Update();
-                list.Update();
+                if (!list.Fields.ContainsField("taskuid"))
+                {
+                    SPFieldText fldTaskUid = (SPFieldText)list.Fields.CreateNewField(SPFieldType.Text.ToString(), "taskuid");
+                    fldTaskUid.Hidden = true;
+                    fldTaskUid.Required = false;
+                    list.Fields.Add(fldTaskUid);
+                    fldTaskUid.Update();
+                    list.Update();
+                }
             }
+            catch { }
+            
             if(!list.Fields.ContainsField("taskorder"))
             {
                 list.Fields.Add("taskorder", SPFieldType.Number, false);
