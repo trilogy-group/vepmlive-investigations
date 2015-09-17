@@ -698,6 +698,7 @@ function eXcell_choice(cell){                                    //excell name i
 		this.list.style.top=arPos[1]+this.cell.offsetHeight+"px"; //arPos[1]+this.cell.offsetHeight;
 		this.list.onclick=function(e){
 			var ev = e||window.event;
+			ev.cancelBubble=true;
 			var cell = ev.target||ev.srcElement
 
 			//tbl.editor_obj.val=cell.combo_val;
