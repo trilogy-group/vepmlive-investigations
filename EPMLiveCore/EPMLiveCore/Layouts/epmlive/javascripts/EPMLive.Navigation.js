@@ -558,18 +558,12 @@
                             var uri = link.uri;
                             if (window.location.href.indexOf(uri) !== -1) {
                                 var $menu = $('#' + getSelectedSubLevelNode());
-
-                                if (!index || index === -1) {
-                                    $menu.find('a[href="' + uri + '"]:first').parents('table').addClass(selectedClass);
-                                    selected = true;
-                                } else {
-                                    var $nodes = getLinkNodes($menu.parent().attr('id'));
-                                    for (var i = 0; i < $nodes.length; i++) {
-                                        if (i === index) {
-                                            $($nodes[i]).find('a[href="' + uri + '"]:first').parents('table').addClass(selectedClass);
-                                            selected = true;
-                                            break;
-                                        }
+                                var $nodes = getLinkNodes($menu.parent().attr('id'));
+                                for (var i = 0; i < $nodes.length; i++) {
+                                    if (i === index) {
+                                        $($nodes[i]).find('a[href="' + uri + '"]:first').parents('table').addClass(selectedClass);
+                                        selected = true;
+                                        break;
                                     }
                                 }
                             }
