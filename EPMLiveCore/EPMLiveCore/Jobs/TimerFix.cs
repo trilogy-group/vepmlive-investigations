@@ -90,7 +90,8 @@ namespace EPMLiveCore.Jobs
                 //==================Code===================
 
                 string resPlanLists = EPMLiveCore.CoreFunctions.getConfigSetting(site.RootWeb, "EPMLiveResPlannerLists");
-                string sFixLists = EPMLiveCore.CoreFunctions.getConfigSetting(site.RootWeb, "EPMLiveFixLists");
+                //string sFixLists = EPMLiveCore.CoreFunctions.getConfigSetting(site.RootWeb, "EPMLiveFixLists");
+                string sFixLists = "Resources";
 
                 SPSecurity.RunWithElevatedPrivileges(delegate()
                 {

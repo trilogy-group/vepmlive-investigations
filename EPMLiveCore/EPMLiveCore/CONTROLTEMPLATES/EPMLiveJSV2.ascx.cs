@@ -105,7 +105,7 @@ namespace EPMLiveCore.CONTROLTEMPLATES
                 //Get Totango service URL
                 if (ConfigurationManager.AppSettings["trackingUrl"] != null)
                 {
-                    TrackingUrl = ConfigurationManager.AppSettings["emailUrl"];
+                    TrackingUrl = ConfigurationManager.AppSettings["trackingUrl"];
                 }
 
                 //EPML-5445

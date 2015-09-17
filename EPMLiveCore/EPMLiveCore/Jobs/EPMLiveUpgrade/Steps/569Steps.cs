@@ -14,7 +14,7 @@ using System.Web.UI.WebControls;
 
 namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
 {
-    [UpgradeStep(Version = EPMLiveVersion.V569, Order = 1.0, Description = "Updates for TFS Integration")]
+    [UpgradeStep(Version = EPMLiveVersion.V569, Order = 1.0, Description = "Add Custom property for TFS Integration")]
     internal class UpdateTfsCustomProps : UpgradeStep
     {
         public UpdateTfsCustomProps(SPWeb spWeb, bool isPfeSite) : base(spWeb, isPfeSite) { }
@@ -25,7 +25,7 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
             {
                 try
                 {
-                    LogMessage("Connecting to the database . . .", 2);
+                    LogMessage("Connecting to the database.", 2);
                     string connectionString = CoreFunctions.getConnectionString(webAppId);
                     using (var sqlConnection = new SqlConnection(connectionString))
                     {
@@ -43,38 +43,48 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
                                     {
                                         customPropsText = dr.GetString(0);
                                         dr.Close();
+
+                                        if (customPropsText.Contains("UseBasicAuthentication"))
+                                        {
+                                            LogMessage("TFS integration property 'UseBasicAuthentication' already exists.", MessageKind.SKIPPED, 4);
+                                        }
+                                        else
+                                        {
+                                            customPropsText = @"<Properties><Connection><Input Type=""Text"" Property=""ServerUrl"" Title=""Tfs Server Url"" /><Input Type=""Text"" Property=""Username"" Title=""Username"" /><Input Type=""Password"" Property=""Password"" Title=""Password"" /><Input Type=""Checkbox"" Property=""UseBasicAuthentication"" Title=""Use Basic Authentication"" /></Connection><General><Input Type=""Select"" Property=""TeamProjectCollection"" Title=""Project Collection"" /><Input Type=""Select"" Property=""Object"" Title=""Object"" /></General></Properties>";
+                                            using (
+                                               var sqlCommand =
+                                                   new SqlCommand(
+                                                       "update INT_MODULES set CustomProps = @customProps where MODULE_ID = @module_Id",
+                                                       sqlConnection))
+                                            {
+                                                sqlCommand.CommandType = CommandType.Text;
+                                                sqlCommand.Parameters.AddWithValue("@customProps", customPropsText);
+                                                sqlCommand.Parameters.AddWithValue("@module_Id", moduleId);
+                                                sqlCommand.ExecuteNonQuery();
+                                            }
+                                            LogMessage("TFS integration property - UseBasicAuthentication added successfully.", MessageKind.SUCCESS, 4);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        LogMessage("No TFS integration available.", MessageKind.SKIPPED, 4);
                                     }
                                 }
                             }
-                            if (customPropsText.Contains("UseBasicAuthentication"))
-                            {
-                                LogMessage(string.Format("Use Basic Authentication property for TFS integration is already exists."), MessageKind.SKIPPED, 4);
-                            }
-                            else
-                            {
+                        }
+                        catch (Exception e)
+                        {
+                            string message = e.InnerException != null
+                                ? e.InnerException.Message
+                                : e.Message;
 
-                                customPropsText = @"<Properties><Connection><Input Type=""Text"" Property=""ServerUrl"" Title=""Tfs Server Url"" /><Input Type=""Text"" Property=""Username"" Title=""Username"" /><Input Type=""Password"" Property=""Password"" Title=""Password"" /><Input Type=""Checkbox"" Property=""UseBasicAuthentication"" Title=""Use Basic Authentication"" /></Connection><General><Input Type=""Select"" Property=""TeamProjectCollection"" Title=""Project Collection"" /><Input Type=""Select"" Property=""Object"" Title=""Object"" /></General></Properties>";
-                                using (
-                                   var sqlCommand =
-                                       new SqlCommand(
-                                           "update INT_MODULES set CustomProps = @customProps where MODULE_ID = @module_Id",
-                                           sqlConnection))
-                                {
-                                    sqlCommand.CommandType = CommandType.Text;
-                                    sqlCommand.Parameters.AddWithValue("@customProps", customPropsText);
-                                    sqlCommand.Parameters.AddWithValue("@module_Id", moduleId);
-                                    sqlCommand.ExecuteNonQuery();
-                                }
-                                LogMessage(string.Format("Use Basic Authentication property for TFS integration added successfully."), MessageKind.SUCCESS, 4);
-                            }
+                            LogMessage(message, MessageKind.FAILURE, 4);
                         }
                         finally
                         {
                             sqlConnection.Close();
                         }
-
                     }
-
                 }
                 catch (Exception exception)
                 {
@@ -92,7 +102,10 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
     [UpgradeStep(Version = EPMLiveVersion.V569, Order = 2.0, Description = "Updates for Resource List Cleanup")]
     internal class UpdateTimerSetting : UpgradeStep
     {
-        public UpdateTimerSetting(SPWeb spWeb, bool isPfeSite) : base(spWeb, isPfeSite) { }
+        private SPWeb _spWeb;
+        public UpdateTimerSetting(SPWeb spWeb, bool isPfeSite) : base(spWeb, isPfeSite) {
+            _spWeb = spWeb;
+        }
         public override bool Perform()
         {
             Guid webAppId = Web.Site.WebApplication.Id;
@@ -100,63 +113,80 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
             {
                 try
                 {
-                    SPList list = Web.Lists.TryGetList("Resources");
-                    string sLists = EPMLiveCore.CoreFunctions.getConfigSetting(Web, "epmlivefixlists");
-                    if (list != null && sLists.ToLower().Contains("\r\nresources"))
+                    LogMessage("Read Property Bag setting: epmlivefixlists", 2);
+
+                    SPList resourcelist = Web.Lists.TryGetList("Resources");
+                    string propertyBagValue = EPMLiveCore.CoreFunctions.getConfigSetting(Web, "epmlivefixlists");
+                    
+                    //If property bag setting contains "Resources" then, remove "Resources" value from property bag
+                    if (resourcelist != null && propertyBagValue.ToLower().Contains("\r\nresources"))
                     {
-                        LogMessage("Resource List Cleanup settings kept as is.", 2);
+                        propertyBagValue = propertyBagValue.Replace("\r\nresources", "");
+                        propertyBagValue = propertyBagValue.Replace("\r\nResources", "");
+
+                        EPMLiveCore.CoreFunctions.setConfigSetting(_spWeb, "EPMLiveFixLists", propertyBagValue);
+                        
+                        LogMessage("Resources value removed from property bag", MessageKind.SUCCESS, 4);
                     }
-                    else
+                    else //If property bag setting doesn't contain "Resources" then, disable Timer job for JobType=2 (EPMLiveCore.Jobs.TimerFix)
                     {
+                        LogMessage("Connect to database to find the Timer job", 2);
+
                         string connectionString = CoreFunctions.getConnectionString(webAppId);
                         using (var sqlConnection = new SqlConnection(connectionString))
                         {
                             try
                             {
                                 sqlConnection.Open();
-                                Guid timerjobguid;
-                                //=======================Timer Job==========================
-                                using (SqlCommand cmd = new SqlCommand("select timerjobuid from timerjobs where siteguid=@siteguid and jobtype=2", sqlConnection))
+                                //Guid timerjobguid;
+                                //=======================Timer Job (EPMLiveCore.Jobs.TimerFix, JobType = 2) ==========================
+                                using (SqlCommand cmd = new SqlCommand("select timerjobuid, runtime from timerjobs where siteguid=@siteguid and jobtype=2", sqlConnection))
                                 {
                                     cmd.Parameters.AddWithValue("@siteguid", Web.Site.ID.ToString());
                                     using (SqlDataReader dr = cmd.ExecuteReader())
                                     {
                                         if (dr.Read())
                                         {
-                                            timerjobguid = dr.GetGuid(0);
+                                            int runtimeValue = dr.GetInt32(1);  //Get runtime value
                                             dr.Close();
-                                            using (SqlCommand cmd1 = new SqlCommand("UPDATE TIMERJOBS set runtime = @runtime where siteguid=@siteguid and jobtype=2", sqlConnection))
+
+                                            if (runtimeValue == -1)
                                             {
-                                                cmd1.Parameters.AddWithValue("@siteguid", Web.Site.ID.ToString());
-                                                cmd1.Parameters.AddWithValue("@runtime", "-1");
-                                                cmd1.ExecuteNonQuery();
+                                                LogMessage("Time job is already disabled.", MessageKind.SKIPPED, 4);
+
+                                            }
+                                            else
+                                            {
+                                                using (SqlCommand cmd1 = new SqlCommand("UPDATE TIMERJOBS set runtime = @runtime, scheduletype = -1 where siteguid=@siteguid and jobtype=2", sqlConnection))
+                                                {
+                                                    cmd1.Parameters.AddWithValue("@siteguid", Web.Site.ID.ToString());
+                                                    cmd1.Parameters.AddWithValue("@runtime", "-1");
+                                                    cmd1.ExecuteNonQuery();
+                                                    LogMessage("Timer job disabled.", MessageKind.SUCCESS, 4);
+                                                }
                                             }
                                         }
                                         else
                                         {
-                                            timerjobguid = Guid.NewGuid();
-                                            dr.Close();
-                                            using (SqlCommand cmd2 = new SqlCommand("INSERT INTO TIMERJOBS (timerjobuid, siteguid, jobtype, jobname, runtime, scheduletype, webguid) VALUES (@timerjobuid, @siteguid, 2, 'Today Fix/Res Plan', @runtime, 2, @webguid)", sqlConnection))
-                                            {
-                                                cmd2.Parameters.AddWithValue("@siteguid", Web.Site.ID.ToString());
-                                                cmd2.Parameters.AddWithValue("@timerjobuid", timerjobguid);
-                                                cmd2.Parameters.AddWithValue("@webguid", Web.ID.ToString());
-                                                cmd2.Parameters.AddWithValue("@runtime", "-1");
-                                                cmd2.ExecuteNonQuery();
-                                            }
+                                            LogMessage("Time job doesn't exists for this site", MessageKind.SKIPPED, 4);
                                         }
                                     }
                                 }
+                            }
+                            catch (Exception e)
+                            {
+                                string message = e.InnerException != null
+                                    ? e.InnerException.Message
+                                    : e.Message;
 
+                                LogMessage(message, MessageKind.FAILURE, 4);
                             }
                             finally
                             {
                                 sqlConnection.Close();
                             }
                         }
-                        LogMessage("Resource List Cleanup settings disabled.", 2);
                     }
-
                 }
                 catch (Exception exception)
                 {
@@ -183,30 +213,30 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
         }
         public override bool Perform()
         {
-            bool blnReturn = false;
+            LogMessage("Read Property Bag setting: EPMLiveWalkMeId", 2);
+
             try
             {
+                string propertyBagKey = "epmlivewalkmeid";
                 //Check if WalkMeID property is available 
-                var walkMeId = CoreFunctions.getConfigSetting(_spWeb, "EPMLiveWalkMeId");
-                if (walkMeId != null)
+                if (_spWeb.Properties.ContainsKey(propertyBagKey))
                 {
-                    //Remove EPMLiveWalkMeId from config settings 
-                    _spWeb.Properties.Remove("EPMLiveWalkMeId");
-                    _spWeb.Properties.Update();
-                    blnReturn = true;
+                    _spWeb.AllProperties.Remove(propertyBagKey); //first clear from AllProperties.
+                    _spWeb.Properties[propertyBagKey] = null; // remove property value
+                    _spWeb.Update(); //update web object.
+                    _spWeb.Properties.Update(); // update properties object
                     LogMessage("WalkMeId property removed.", MessageKind.SUCCESS, 4);
                 }
                 else
                 {
-                    LogMessage("WalkMeId property doesn't exists.", MessageKind.SKIPPED, 2);
+                    LogMessage("WalkMeId property doesn't exists.", MessageKind.SKIPPED, 4);
                 }
             }
             catch (Exception ex)
             {
-                LogMessage(ex.Message, MessageKind.FAILURE, 2);
-                blnReturn = false;
+                LogMessage(ex.Message, MessageKind.FAILURE, 4);
             }
-            return blnReturn;
+            return true;
         }
     }
 }

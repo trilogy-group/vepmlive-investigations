@@ -1125,7 +1125,7 @@ namespace EPMLiveCore
                     writer.WriteLine("if (col != null && col.value != null && col.value != \"\") {");
                     writer.WriteLine("var title = col.value.replace(/[^a-zA-Z0-9 ]/g, \"\");");
                     writer.WriteLine(" if (title.length == 0) {");
-                    writer.WriteLine("alert(\"Atleast one Alpha-numeric character is required at \" + col.title);");
+                    writer.WriteLine("alert(\"At least one alpha-numeric character is required for \" + col.title);");
                     writer.WriteLine(" return false;");
                     writer.WriteLine("}");
                     writer.WriteLine(" }");
