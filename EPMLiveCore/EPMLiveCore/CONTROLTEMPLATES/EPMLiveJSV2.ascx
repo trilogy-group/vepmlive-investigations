@@ -73,7 +73,7 @@
             //}
 
         //EPML-5446: Totango Implementation
-        $(function() {
+        $(window).bind("load", function() {
             var enableTotango = '<%= EnableUsageTracking %>';
 
             if (enableTotango.toLowerCase() == 'true') {
@@ -87,7 +87,7 @@
                 var version = '<%= Version %>';
                 var pageTitle = document.title;
                 var toolKitOrderNumber = '<%= ToolKitOrderNumber %>';
-                var url = 'http://localhost:8080/UsageTracking/SiteUsageTracking.asmx';
+                var url = 'https://services.epmlive.com/services/usagetracking/siteusagetracking.asmx';
                 var trackingUrl = '<%= TrackingUrl %>';
 
                 if(trackingUrl != '')

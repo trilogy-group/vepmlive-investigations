@@ -4168,7 +4168,6 @@
                     jValue.value = jValue.value / (lFinishPeriod - lStartPeriod + 1);
                 }
             }
-
             for (var c = 0; c < grid.ColNames[2].length; c++) {
                 var col = grid.ColNames[2][c];
                 var sType = col.substring(0, 1);
