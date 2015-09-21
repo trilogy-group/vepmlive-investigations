@@ -1565,8 +1565,12 @@
                     HideBacklogRows(workPlannerGrid, workPlannerGrid.GetRowById("BacklogRow"));
                     workPlannerGrid.HideRow(workPlannerGrid.GetRowById("BacklogRow"));
                 }
-                workPlannerGrid.SetAttribute(workPlannerGrid.GetRowById("0"), "Title", "HtmlPrefix", "", 1, 0)
-                isWorkPlannerGridReloaded = "false";
+                var row = workPlannerGrid.GetRowById("0");
+                workPlannerGrid.SetAttribute(row, "Title", "HtmlPrefix", "", 1, 0);
+                if (row.Title == "All Folders") {
+                    workPlannerGrid.SetValue(row, "Title", currentProjectName, 1, 0);
+                }
+                isWorkPlannerGridReloaded = false;
             }
         }
         catch(e){}

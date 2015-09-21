@@ -16,6 +16,7 @@ var hasUpdates = false;
 var curTempDate;
 
 var isWorkPlannerGridReloaded = false;
+var currentProjectName = "";
 var bAgile = false;
 var folderCell = "a";
 var plannerCell = "b";
@@ -3484,6 +3485,9 @@ function RefreshTeam(dialogResult, returnValue) {
 function ReloadWorkPlannerGrid()
 {
     var grid = Grids.WorkPlannerGrid;
+    if (grid.RowCount > 0 && grid.Rows[0].Def.Name == "Folder") {
+        currentProjectName = grid.Rows[0].Title;
+    }
     Grids.WorkPlannerGrid = grid.Reload();
     isWorkPlannerGridReloaded = true;
 }
