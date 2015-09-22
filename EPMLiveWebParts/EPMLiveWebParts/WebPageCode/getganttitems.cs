@@ -272,7 +272,7 @@ namespace EPMLiveWebParts
                                 }
                                 break;
                             case SPFieldType.Choice:
-                                //sType = "Enum";
+                                sType = "Enum";
                                 {
                                     //Reference: http://longboo.com/demo/ejs-treegrid/Doc/TypeEnum.htm
                                     string senum = "";
