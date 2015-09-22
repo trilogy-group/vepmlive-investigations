@@ -23,7 +23,7 @@ namespace EPMLiveWebParts
         private const string ChartsXapPath = "/_layouts/epmlive/SL.Visifire.Charts.xap";
         private const string VfDataPath = "/_layouts/epmlive/vfdata.aspx";
 
-        private const int MaximumPointsInSeries = 40;
+        
 
         private const string QTitle = "Title";
         private const string QXfield = "XField";
@@ -394,7 +394,7 @@ namespace EPMLiveWebParts
                     SortChart(vfChartSeries);
                 }
 
-                foreach (VfPoint point in vfChartSeries.GetRange(0, vfChartSeries.Count > MaximumPointsInSeries ? MaximumPointsInSeries : vfChartSeries.Count))
+                foreach (VfPoint point in vfChartSeries.GetRange(0, vfChartSeries.Count))
                 {
                     if (PointShouldBeDisplayed(point))
                     {
