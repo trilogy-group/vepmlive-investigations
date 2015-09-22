@@ -15,8 +15,6 @@ var taskorder;
 var hasUpdates = false;
 var curTempDate;
 
-var isWorkPlannerGridReloaded = false;
-var currentProjectName = "";
 var bAgile = false;
 var folderCell = "a";
 var plannerCell = "b";
@@ -3394,7 +3392,7 @@ function BuildTeam() {
         alert("The team cannot be edited because the security queue job has not completed. This should be completed in less than a minute or so - please try again.");
     }
     else {
-        var options = { url: "buildteam.aspx?listid=" + sProjectListId + "&id=" + sItemID, title: "Build Team", showMaximized: true, dialogReturnValueCallback: ReloadWorkPlannerGrid };
+        var options = { url: "buildteam.aspx?listid=" + sProjectListId + "&id=" + sItemID, title: "Build Team", showMaximized: true, dialogReturnValueCallback: RefreshTeam };
 
         //var options = { url: "buildteam.aspx?useteam=" + bUseTeam + "&listid=" + sProjectListId + "&id=" + sItemID + "&nosave=true&currentteam=1", title: "Build Team", showMaximized: true, dialogReturnValueCallback: RefreshTeam };
 
@@ -3480,16 +3478,6 @@ function ManageFragment() {
 function RefreshTeam(dialogResult, returnValue) {
     sm("dlgResource", 130, 50);
     dhtmlxAjax.post("WorkPlannerAction.aspx", "Action=GetTeam&PlannerID=" + sPlannerID + "&itemid=" + sItemID + "&listid=" + sProjectListId, RefreshTeamClose);
-}
-
-function ReloadWorkPlannerGrid()
-{
-    var grid = Grids.WorkPlannerGrid;
-    if (grid.RowCount > 0 && grid.Rows[0].Def.Name == "Folder") {
-        currentProjectName = grid.Rows[0].Title;
-    }
-    Grids.WorkPlannerGrid = grid.Reload();
-    isWorkPlannerGridReloaded = true;
 }
 
 function ApplyDefaults(grid, row, isMilestone, isSummary, isFromProcessUpdates) {
