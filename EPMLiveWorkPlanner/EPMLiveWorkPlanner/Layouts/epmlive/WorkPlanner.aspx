@@ -91,6 +91,13 @@
         background-color: #EEBDBD !important;
     }
 
+    .detailsdivinfo{
+        overflow-y:auto !important;
+        width:100% !important;
+        height:100% !important;
+        background-color:white !important;
+    }
+
     #pageStatusBar[class], .ms-status-msg {
         margin-top: 5px !important;
         margin-bottom: 0 !important;
@@ -414,7 +421,7 @@
         </div>
     </div>
 
-    <div id="detailDiv" style="width:100%;height:100%">
+    <div id="detailDiv" class="detailsdivinfo">
         <div id="detailTree" style="width:100%;height:100%;background-color:White">
             <!--<treegrid 
             Data_Url="BlankTable.xml"
@@ -427,7 +434,7 @@
         </div>
     </div>
 
-    <div id="assignmentsDiv" style="width:100%;height:100%;display:none;background-color:White">
+    <div id="assignmentsDiv" class="detailsdivinfo" style="display:none">
         <div id="assignmentsDivInner" style="width:100%;height:100%">
             <div style="width:100%;height:22px">
                 <div class="wetoolbar">
@@ -459,7 +466,7 @@
         </div>
     </div>
 
-    <div id="linksDiv" style="width:100%;height:100%;display:none;">
+    <div id="linksDiv" class="detailsdivinfo" style="display:none">
         <div id="linksDivInner" style="width:100%;height:100%">
             <div style="width:100%;height:24px">
                 <div class="wetoolbar">
@@ -496,7 +503,7 @@
         </div>
     </div>
 
-    <div id="notesDiv" style="width:100%;height:100%;background-color:White;padding:5px;display:none">
+    <div id="notesDiv" class="detailsdivinfo" style="display:none">
         <div id="notesDivInner2" style="width:100%;height:100%">
             <a href="#" onclick="Javascript:ShowNotes();" >[Edit Notes]</a><br><br />
             <div id="noteDivInner" style="width:100%;height:100%;background-color:White">
@@ -508,13 +515,15 @@
         </div>
     </div>
 
-    <div id="projectDiv" style="width:100%;height:100%;background-color:White">
+    <div id="projectMainDiv" class="detailsdivinfo">
+        <div id="projectDiv" style="width:100%;height:100%;background-color:White">
 
         <!--<treegrid 
         Data_Url="../../_vti_bin/WorkPlanner.asmx" Data_Method="Soap" Data_Function="Execute" Data_Namespace="workengine.com" Data_Param_Functionname="GetProjectInfo" Data_Param_Dataxml="<%=sPlannerDataParam %>"
         >
         </treegrid>-->
 
+        </div>
     </div>
 
     <div id="viewNameDiv" style="display:none;width:200;padding:10px">
@@ -610,19 +619,19 @@
 
         var bUseFolders = false;//<%=bUseFolders.ToString().ToLower() %>;
 
-    var sWebUrl = "<%=sWebUrl %>";
+        var sWebUrl = "<%=sWebUrl %>";
 
         var viewObject = {
         <%=sViewObject %>
-    }; 
+        }; 
 
         var oChoiceFields = {
         <%=sChoiceFields %>
-    };
+        };
 
         var oDefaults = {
         <%=sDefaults %>
-    };
+        };
 
         var oTaskUserFields = [<%=sTaskUserFields %>];
 
@@ -630,21 +639,21 @@
 
         var oBaselineFields = {
         <%=sBaselineFields %>
-    };
+        };
 
         var oRollUp = {
         <%=sRollUp %>
-    };
+        };
 
         var oRollDown = {
         <%=sRollDown %>
-    };
+        };
 
 
         var editor;
 
         var oAttachedLists = [<%=sAttachedLists %>];
-    var oAttachedDocLibs = [<%=sAttachedDocLibs %>];
+        var oAttachedDocLibs = [<%=sAttachedDocLibs %>];
 
         var bSummaryRollup = <%=sSummaryRollup%>;
 
@@ -663,7 +672,7 @@
         var sUpdates = "";
 
         var EPKCost = <%=EPKCost %>;
-    var EPKResPlan = <%=EPKResPlan %>;
+        var EPKResPlan = <%=EPKResPlan %>;
 
         var sWebId = "<%=sWebId %>";
         var sProjectListId = "<%=sProjectListId %>";
@@ -680,12 +689,12 @@
 
         var sBaselineDate = "<%=sBaselineDate %>";
 
-    var MouseDownGrid = "";
+        var MouseDownGrid = "";
 
-    var bLoading = true;
-    var bRendering = true;
+        var bLoading = true;
+        var bRendering = true;
 
-    var CanLinkExternal = <%=CanLinkExternal %>;
+        var CanLinkExternal = <%=CanLinkExternal %>;
 
     oLinkedTasks = [ <%=sLinkedTasks %>];
 
@@ -707,119 +716,119 @@
             allocCell = "c";
 
         <% if(bAgile){%>
-        dhxLayout = new dhtmlXLayoutObject("parentId", "5H", "dhx_blue"); 
-        agileCell = "d";
-        detailsCell = "e";
+            dhxLayout = new dhtmlXLayoutObject("parentId", "5H", "dhx_blue"); 
+            agileCell = "d";
+            detailsCell = "e";
         <%}else{%>
         
-        dhxLayout = new dhtmlXLayoutObject("parentId", "4H", "dhx_blue"); 
-        agileCell = "";
-        detailsCell = "d";
+            dhxLayout = new dhtmlXLayoutObject("parentId", "4H", "dhx_blue"); 
+            agileCell = "";
+            detailsCell = "d";
 
-        //dhxLayout = new dhtmlXLayoutObject("parentId", "3W", "dhx_blue"); 
-        //detailsCell = "c";
+            //dhxLayout = new dhtmlXLayoutObject("parentId", "3W", "dhx_blue"); 
+            //detailsCell = "c";
         <%} %>
 
-        dhxLayout.cells(folderCell).attachObject("folderDiv");
-        dhxLayout.cells(folderCell).setText("Folders");
-        dhxLayout.cells(folderCell).setWidth(250);
+            dhxLayout.cells(folderCell).attachObject("folderDiv");
+            dhxLayout.cells(folderCell).setText("Folders");
+            dhxLayout.cells(folderCell).setWidth(250);
 
-        dhxLayout.cells(plannerCell).setText("");
-        dhxLayout.cells(plannerCell).attachObject("workplannerDiv");
-        dhxLayout.cells(plannerCell).hideHeader();
+            dhxLayout.cells(plannerCell).setText("");
+            dhxLayout.cells(plannerCell).attachObject("workplannerDiv");
+            dhxLayout.cells(plannerCell).hideHeader();
 
-        dhxLayout.cells(detailsCell).setText("Details");
-        dhxLayout.cells(detailsCell).attachObject("detailDivMain");
-        dhxLayout.cells(detailsCell).setWidth(300);
-        dhxLayout.cells(detailsCell).fixSize(true, false);
+            dhxLayout.cells(detailsCell).setText("Details");
+            dhxLayout.cells(detailsCell).attachObject("detailDivMain");
+            dhxLayout.cells(detailsCell).setWidth(300);
+            dhxLayout.cells(detailsCell).fixSize(true, false);
 
         <% if(bAgile){%>
-        dhxLayout.cells(agileCell).attachObject("agileDiv");
-        dhxLayout.cells(agileCell).setText("Backlog");
+            dhxLayout.cells(agileCell).attachObject("agileDiv");
+            dhxLayout.cells(agileCell).setText("Backlog");
             
         <%} %>
             
-        dhxLayout.cells(allocCell).attachObject("allocDiv");
-        dhxLayout.cells(allocCell).setText("Resource Allocation");
+            dhxLayout.cells(allocCell).attachObject("allocDiv");
+            dhxLayout.cells(allocCell).setText("Resource Allocation");
         
 
         <%if(!bUseFolders){ %>
-        //dhxLayout.cells("a").collapse();
-        var cell = dhxLayout.cells(folderCell);
-        cell.collapse();
-        cell.style.display = "none";
-        <%}else{ %>
+            //dhxLayout.cells("a").collapse();
+            var cell = dhxLayout.cells(folderCell);
+            cell.collapse();
+            cell.style.display = "none";
+            <%}else{ %>
             
         <%} %>
-        dhxTabbar = new dhtmlXTabBar("detailDivTab", "top");
+            dhxTabbar = new dhtmlXTabBar("detailDivTab", "top");
 
-        dhxTabbar.setImagePath("dhtml/xtab/imgs/");
-        dhxTabbar.setSkin("dhx_skyblue");
+            dhxTabbar.setImagePath("dhtml/xtab/imgs/");
+            dhxTabbar.setSkin("dhx_skyblue");
 
-        dhxTabbar.addTab("t1", "<img src='/_layouts/epmlive/images/details16.gif' alt='Details'/>", "30px");
-        dhxTabbar.setContent("t1", "detailDiv");
+            dhxTabbar.addTab("t1", "<img src='/_layouts/epmlive/images/details16.gif' alt='Details'/>", "30px");
+            dhxTabbar.setContent("t1", "detailDiv");
 
-        document.getElementById("assignmentsDiv").style.display="";
+            document.getElementById("assignmentsDiv").style.display="";
 
-        dhxTabbar.addTab("t2", "<img src='/_layouts/epmlive/images/showassignments.gif' alt='Assignments'/>", "30px");
-        dhxTabbar.setContent("t2", "assignmentsDiv");
+            dhxTabbar.addTab("t2", "<img src='/_layouts/epmlive/images/showassignments.gif' alt='Assignments'/>", "30px");
+            dhxTabbar.setContent("t2", "assignmentsDiv");
 
-        document.getElementById("linksDiv").style.display="";
+            document.getElementById("linksDiv").style.display="";
 
-        dhxTabbar.addTab("t3", "<img src='/_layouts/epmlive/images/link.gif' alt='Task Successors'/>", "30px");
-        dhxTabbar.setContent("t3", "linksDiv");
+            dhxTabbar.addTab("t3", "<img src='/_layouts/epmlive/images/link.gif' alt='Task Successors'/>", "30px");
+            dhxTabbar.setContent("t3", "linksDiv");
 
-        document.getElementById("notesDiv").style.display="";
+            document.getElementById("notesDiv").style.display="";
 
-        dhxTabbar.addTab("t5", "<img src='/_layouts/epmlive/images/notes16.png' alt='Task Notes'/>", "30px");
-        dhxTabbar.setContent("t5", "notesDiv");
+            dhxTabbar.addTab("t5", "<img src='/_layouts/epmlive/images/notes16.png' alt='Task Notes'/>", "30px");
+            dhxTabbar.setContent("t5", "notesDiv");
 
-        dhxTabbar.addTab("t4", "<img src='/_layouts/images/ENTITYPICKER.png' alt='Project Information'/>", "30px");
-        dhxTabbar.setContent("t4", "projectDiv");
+            dhxTabbar.addTab("t4", "<img src='/_layouts/images/ENTITYPICKER.png' alt='Project Information'/>", "30px");
+            dhxTabbar.setContent("t4", "projectMainDiv");
 
-        dhxTabbar.setTabActive("t4");
+            dhxTabbar.setTabActive("t4");
     
-        setHeight();
+            setHeight();
 
-        try{
-            document.getElementById("agileDiv").style.display="";
+            try{
+                document.getElementById("agileDiv").style.display="";
             
-        }catch(e){}
+            }catch(e){}
 
-        //if(!bAgile)
-        //    document.getElementById("allocDiv").style.display="";
+            //if(!bAgile)
+            //    document.getElementById("allocDiv").style.display="";
 
-        sm("dlgSplash", 450, 300);
+            sm("dlgSplash", 450, 300);
         
-        bLoading = false;
+            bLoading = false;
 
-        document.getElementById("divExternalLinkAccept").style.display="";
+            document.getElementById("divExternalLinkAccept").style.display="";
 
-        if(iDefaultTaskType == 0)
-        {
-            document.getElementById("slcttasktype").selectedIndex = "0";
+            if(iDefaultTaskType == 0)
+            {
+                document.getElementById("slcttasktype").selectedIndex = "0";
+            }
+            else
+            {
+                document.getElementById("slcttasktype").selectedIndex = "1";
+            }
+        
+
+            setTimeout("CreateTrees()", 100);
+        
+
+        
         }
-        else
+        ExecuteOrDelayUntilScriptLoaded(UnpinNav, 'EPMLive.Navigation.js');
+        function UnpinNav()
         {
-            document.getElementById("slcttasktype").selectedIndex = "1";
+            window.epmLiveNavigation.unpin();
+
         }
-        
 
-        setTimeout("CreateTrees()", 100);
-        
-
-        
-    }
-    ExecuteOrDelayUntilScriptLoaded(UnpinNav, 'EPMLive.Navigation.js');
-    function UnpinNav()
-    {
-        window.epmLiveNavigation.unpin();
-
-    }
-
-    function CreateTrees()
-    {
-        TreeGrid( { Data:{ Url:"../../_vti_bin/WorkPlanner.asmx", Method:"Soap",Function:"Execute",Namespace:"workengine.com",Param:{Functionname:"GetAllocationLayout",Dataxml:"<%=sPlannerDataParam %>" } }, SuppressMessage:2, Debug:""}, "allocDiv" ); 
+        function CreateTrees()
+        {
+            TreeGrid( { Data:{ Url:"../../_vti_bin/WorkPlanner.asmx", Method:"Soap",Function:"Execute",Namespace:"workengine.com",Param:{Functionname:"GetAllocationLayout",Dataxml:"<%=sPlannerDataParam %>" } }, SuppressMessage:2, Debug:""}, "allocDiv" ); 
         
         CreateBasicTree("GetAddLinksLayout","addLinkTableDivTree");
         CreateBasicTree("GetDetailLayout","detailTree");
@@ -846,146 +855,146 @@
         function CreateBasicTree(functionname, div)
         {
             TreeGrid( { Data:{ Url:"BlankTable.xml" }, Layout:{Url: "../../_vti_bin/WorkPlanner.asmx",Method:"Soap",Function:"Execute",Namespace:"workengine.com",Param:{Functionname:functionname,Dataxml:"<%=sPlannerLayoutParam %>" } }, SuppressMessage:1 }, div ); 
-    }
+        }
 
-    _spBodyOnLoadFunctionNames.push("doOnLoad");
+        _spBodyOnLoadFunctionNames.push("doOnLoad");
 
 
 
-    function setHeight(a, b, c) {
-        //dhxLayout.cells("b").setHeight((getHeight() - getTop(document.getElementById("parentId"))));
-        document.getElementById("parentId").style.height = (getHeight() - getTop(document.getElementById("parentId")) - 20) + "px";
+        function setHeight(a, b, c) {
+            //dhxLayout.cells("b").setHeight((getHeight() - getTop(document.getElementById("parentId"))));
+            document.getElementById("parentId").style.height = (getHeight() - getTop(document.getElementById("parentId")) - 20) + "px";
 
-        document.getElementById("parentId").style.width = (getWidth() - 85) + "px";
+            document.getElementById("parentId").style.width = (getWidth() - 85) + "px";
         
-        dhxLayout.setSizes();
-
-        if(bLoading)
-        {
-            if(bAgile)
-            {
-                var gHeight = (getHeight() - getTop(document.getElementById("parentId")) - 20) / 3;
-
-                dhxLayout.cells("b").setHeight(gHeight);
-                dhxLayout.cells("c").setHeight(gHeight);
-            }
-            else
-            {
-                var gHeight = (getHeight() - getTop(document.getElementById("parentId")) - 20) / 2;
-
-                dhxLayout.cells("b").setHeight(gHeight);
-                dhxLayout.cells("c").setHeight(gHeight);
-            }
-
             dhxLayout.setSizes();
 
-            var divCover = document.getElementById("divCover");
-            divCover.style.left = 0;
-            divCover.style.top = 0;
-            divCover.style.width = (getWidth() - 20) + "px";
-            divCover.style.height = (getHeight() - getTop(document.getElementById("parentId")) - 20) + "px";
-        }
-    }
-
-    
-
-    function getHeight() {
-        var scnHei;
-        if (self.innerHeight) // all except Explorer
-        {
-            //scnWid = self.innerWidth;
-            scnHei = self.innerHeight;
-        }
-        else if (document.documentElement && document.documentElement.clientHeight) {
-            //scnWid = document.documentElement.clientWidth;
-            scnHei = document.documentElement.clientHeight;
-        }
-        else if (document.body) // other Explorers
-        {
-            //scnWid = document.body.clientWidth;
-            scnHei = document.body.clientHeight;
-        }
-        return scnHei;
-    }
-
-    function getWidth() {
-        var scnWid;
-        if (self.innerHeight) // all except Explorer
-        {
-            scnWid = self.innerWidth;
-            //scnHei = self.innerHeight;
-        }
-        else if (document.documentElement && document.documentElement.clientHeight) {
-            scnWid = document.documentElement.clientWidth;
-            //scnHei = document.documentElement.clientHeight;
-        }
-        else if (document.body) // other Explorers
-        {
-            scnWid = document.body.clientWidth;
-            //scnHei = document.body.clientHeight;
-        }
-        return scnWid;
-    }
-
-    if (window.addEventListener)
-        window.addEventListener('resize', setHeight, false);
-    else if (window.attachEvent)
-        window.attachEvent('onresize', setHeight);
-
-    Grids.OnTestConstraints = function(grid, row, col, type, change, d1, d2)  
-    {   
-        if(type == "main" && d1 != null && d2 != null)
-        {
-            if(d1 < grid.Cols["G"].GanttBase)
+            if(bLoading)
             {
-                var projectGrid = Grids.ProjectInfo;
-                var prjUpdate = projectGrid.GetValue(projectGrid.GetRowById("ProjectUpdate"), "V");
-                if(prjUpdate.toLowerCase() == "manual")
+                if(bAgile)
                 {
-                    grid.Cols["G"].GanttUseConstraints = 0;
-                    return 0;
+                    var gHeight = (getHeight() - getTop(document.getElementById("parentId")) - 20) / 3;
+
+                    dhxLayout.cells("b").setHeight(gHeight);
+                    dhxLayout.cells("c").setHeight(gHeight);
                 }
                 else
                 {
-                    if(confirm("You are trying to set the Task Start Date earlier than the Project Start Date. Would you like to modify the Project Start Date"))
-                    {
-                        MoveProject();
-                    }
-                }            
+                    var gHeight = (getHeight() - getTop(document.getElementById("parentId")) - 20) / 2;
+
+                    dhxLayout.cells("b").setHeight(gHeight);
+                    dhxLayout.cells("c").setHeight(gHeight);
+                }
+
+                dhxLayout.setSizes();
+
+                var divCover = document.getElementById("divCover");
+                divCover.style.left = 0;
+                divCover.style.top = 0;
+                divCover.style.width = (getWidth() - 20) + "px";
+                divCover.style.height = (getHeight() - getTop(document.getElementById("parentId")) - 20) + "px";
             }
         }
-        
-        return change;
-    }
 
-    Grids.OnAutoFillFinish = function (grid, r1, c1, r2, c2, rdir, cdir) {
-        
-        if(c1 == c2 && (c1 == "AssignedTo" || c1 == "StartDate" || c1 == "DueDate"))
-        {
-            grid.ActionCalcOff();
-            var row = r1;
-        
-            row = grid.GetNext(row);
+    
 
-            while(row && row.id != r2.id)
+        function getHeight() {
+            var scnHei;
+            if (self.innerHeight) // all except Explorer
             {
-                if(row.Def.Name == "Task")
-                    SetTaskAssignments(row);
-
-                if(rdir == 0)
-                    row = grid.GetNext(row);
-                else
-                    row = grid.GetPrev(row);                
+                //scnWid = self.innerWidth;
+                scnHei = self.innerHeight;
             }
-
-            SetTaskAssignments(r2);
-
-            grid.ActionCalcOn();
+            else if (document.documentElement && document.documentElement.clientHeight) {
+                //scnWid = document.documentElement.clientWidth;
+                scnHei = document.documentElement.clientHeight;
+            }
+            else if (document.body) // other Explorers
+            {
+                //scnWid = document.body.clientWidth;
+                scnHei = document.body.clientHeight;
+            }
+            return scnHei;
         }
-    }
 
-    Grids.OnLoaded = function(G){ 
-        G.Lang.Format.DecimalSeparator='<%=DecimalSeparator %>';
+        function getWidth() {
+            var scnWid;
+            if (self.innerHeight) // all except Explorer
+            {
+                scnWid = self.innerWidth;
+                //scnHei = self.innerHeight;
+            }
+            else if (document.documentElement && document.documentElement.clientHeight) {
+                scnWid = document.documentElement.clientWidth;
+                //scnHei = document.documentElement.clientHeight;
+            }
+            else if (document.body) // other Explorers
+            {
+                scnWid = document.body.clientWidth;
+                //scnHei = document.body.clientHeight;
+            }
+            return scnWid;
+        }
+
+        if (window.addEventListener)
+            window.addEventListener('resize', setHeight, false);
+        else if (window.attachEvent)
+            window.attachEvent('onresize', setHeight);
+
+        Grids.OnTestConstraints = function(grid, row, col, type, change, d1, d2)  
+        {   
+            if(type == "main" && d1 != null && d2 != null)
+            {
+                if(d1 < grid.Cols["G"].GanttBase)
+                {
+                    var projectGrid = Grids.ProjectInfo;
+                    var prjUpdate = projectGrid.GetValue(projectGrid.GetRowById("ProjectUpdate"), "V");
+                    if(prjUpdate.toLowerCase() == "manual")
+                    {
+                        grid.Cols["G"].GanttUseConstraints = 0;
+                        return 0;
+                    }
+                    else
+                    {
+                        if(confirm("You are trying to set the Task Start Date earlier than the Project Start Date. Would you like to modify the Project Start Date"))
+                        {
+                            MoveProject();
+                        }
+                    }            
+                }
+            }
+        
+            return change;
+        }
+
+        Grids.OnAutoFillFinish = function (grid, r1, c1, r2, c2, rdir, cdir) {
+        
+            if(c1 == c2 && (c1 == "AssignedTo" || c1 == "StartDate" || c1 == "DueDate"))
+            {
+                grid.ActionCalcOff();
+                var row = r1;
+        
+                row = grid.GetNext(row);
+
+                while(row && row.id != r2.id)
+                {
+                    if(row.Def.Name == "Task")
+                        SetTaskAssignments(row);
+
+                    if(rdir == 0)
+                        row = grid.GetNext(row);
+                    else
+                        row = grid.GetPrev(row);                
+                }
+
+                SetTaskAssignments(r2);
+
+                grid.ActionCalcOn();
+            }
+        }
+
+        Grids.OnLoaded = function(G){ 
+            G.Lang.Format.DecimalSeparator='<%=DecimalSeparator %>';
         G.Lang.Format.GroupSeparator='<%=GroupSeparator %>';
         G.Lang.Format.InputDecimalSeparators='<%=DecimalSeparator %>';
         G.Lang.Format.InputGroupSeparators='<%=GroupSeparator %>';
