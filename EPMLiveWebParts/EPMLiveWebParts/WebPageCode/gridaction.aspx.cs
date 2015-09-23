@@ -843,9 +843,9 @@ namespace EPMLiveWebParts
                 if (source != null && source != "")
                 {
                     if (url.Contains("?"))
-                        url += "&source=" + source.Replace("#", "");
+                        url += "&Source=" + source.Replace("#", "");
                     else
-                        url += "?source=" + source.Replace("#", "");
+                        url += "?Source=" + source.Replace("#", "");
                 }
                 try
                 {
