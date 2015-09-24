@@ -312,17 +312,14 @@ function setHeight() {
 }
 
 function SaveAndClose() {
-    if (ValidateTeam()) {
-        ShowTDialog("Saving Team...");
+    ShowTDialog("Saving Team...");
 
-        var x = Grids.TeamGrid.GetXmlData("Body", "Permissions");
+    var x = Grids.TeamGrid.GetXmlData("Body", "Permissions");
 
-        if (sListId != "")
-            dhtmlxAjax.post("SaveTeam.aspx", "team=" + x + "&HasResAccess=" + bCanAccessResourcePool + "&ListId=" + sListId + "&ItemId=" + sItemId, SaveTeamCloseClose);
-        else
-            dhtmlxAjax.post("SaveTeam.aspx", "team=" + x + "&HasResAccess=" + bCanAccessResourcePool, SaveTeamCloseClose);
-    }
-
+    if (sListId != "")
+        dhtmlxAjax.post("SaveTeam.aspx", "team=" + x + "&HasResAccess=" + bCanAccessResourcePool + "&ListId=" + sListId + "&ItemId=" + sItemId, SaveTeamCloseClose);
+    else
+        dhtmlxAjax.post("SaveTeam.aspx", "team=" + x + "&HasResAccess=" + bCanAccessResourcePool, SaveTeamCloseClose);
 }
 
 
@@ -340,17 +337,16 @@ function SaveTeamCloseClose(loader) {
 
 function SaveTeam() {
 
-    if (ValidateTeam()) {
-        ShowTDialog("Saving Team...");
+    ShowTDialog("Saving Team...");
 
-        var x = Grids.TeamGrid.GetXmlData("Body", "Permissions");
+    var x = Grids.TeamGrid.GetXmlData("Body", "Permissions");
 
-        if (sListId != "")
-            dhtmlxAjax.post("SaveTeam.aspx", "team=" + x + "&HasResAccess=" + bCanAccessResourcePool + "&ListId=" + sListId + "&ItemId=" + sItemId, SaveTeamClose);
-        else
-            dhtmlxAjax.post("SaveTeam.aspx", "team=" + x + "&HasResAccess=" + bCanAccessResourcePool, SaveTeamClose);
-    }
+    if (sListId != "")
+        dhtmlxAjax.post("SaveTeam.aspx", "team=" + x + "&HasResAccess=" + bCanAccessResourcePool + "&ListId=" + sListId + "&ItemId=" + sItemId, SaveTeamClose);
+    else
+        dhtmlxAjax.post("SaveTeam.aspx", "team=" + x + "&HasResAccess=" + bCanAccessResourcePool, SaveTeamClose);
 }
+
 
 function SaveTeamClose(loader) {
     HideTDialog();
@@ -359,16 +355,6 @@ function SaveTeamClose(loader) {
         if (data != "Success") {
             alert(data);
         }
-    }
-}
-
-function ValidateTeam() {
-    if (Grids.TeamGrid.GetShownRows().length > 0) {
-        return true;
-    }
-    else {
-        alert("The team cannot be saved if empty. Please select at least one team member from the list on the right.");
-        return false;
     }
 }
 
