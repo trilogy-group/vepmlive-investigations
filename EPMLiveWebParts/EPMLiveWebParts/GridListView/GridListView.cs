@@ -1889,9 +1889,10 @@ namespace EPMLiveWebParts
                 {
                     try
                     {
-                        list = web.GetListFromUrl(PropList);
+                        //to Fix EPML-5716
+                        list = web.GetList(web.Url + "/" + PropList);
                         view = list.Views[PropView];
-                    }
+                    }                    
                     catch { }
                     try
                     {
@@ -5421,9 +5422,10 @@ namespace EPMLiveWebParts
             SPWeb web = SPContext.Current.Web;
             try
             {
-                list = web.GetListFromUrl(PropList);
+                //to Fix EPML-5716
+                list = web.GetList(web.Url + "/" + PropList);
                 view = list.Views[PropView];
-            }
+            }            
             catch { }
 
 

@@ -5566,20 +5566,22 @@ namespace EPMLiveWebParts
                 catch { }
 
                 SPList tempList = null;
-
+               
                 SPSecurity.RunWithElevatedPrivileges(delegate()
                 {
                     using (SPSite s = new SPSite(curWeb.Url))
                     {
                         using (SPWeb w = s.OpenWeb())
                         {
-                            tempList = w.GetListFromUrl(strlist);
+                            //to Fix EPML-5716
+                            tempList = w.GetList(curWeb.Url + "/" + strlist);
                         }
                     }
                 });
 
                 list = curWeb.Lists[tempList.ID];
                 view = list.Views[strview];
+                                
                 try
                 {
                     inEditMode = bool.Parse(Request["edit"]);
