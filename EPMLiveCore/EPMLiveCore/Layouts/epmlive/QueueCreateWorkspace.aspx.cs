@@ -269,10 +269,13 @@ namespace EPMLiveCore.Layouts.epmlive
                 catch { }
                 title = (i != null) ? i.Title : string.Empty;
             }
-            
-            if (title.Contains("'"))
+            if (!String.IsNullOrEmpty(title))
             {
-                title=title.Replace("'", "\\'");
+                title = HttpUtility.JavaScriptStringEncode(title);
+                //if (title.Contains("'"))
+                //{
+                //    title = title.Replace("'", "\\'");
+                //}
             }
             return title;
         }

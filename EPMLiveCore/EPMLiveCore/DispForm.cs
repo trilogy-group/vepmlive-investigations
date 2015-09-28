@@ -26,12 +26,13 @@ namespace EPMLiveCore
             string extraParams = "";
 
             GridGanttSettings gSettings = API.ListCommands.GetGridGanttSettings(SPContext.Current.List);
-
+            
             writer.WriteLine("<script>");
             writer.WriteLine("WEWebId = '" + SPContext.Current.Web.ID + "';");
             writer.WriteLine("WEListId = '" + SPContext.Current.List.ID + "';");
             writer.WriteLine("WEItemId = '" + SPContext.Current.ListItem.ID + "';");
-            writer.WriteLine("WETitle = \"" + SPContext.Current.ListItem.Title.Replace("\"", "&quot;") + "\";");
+            //writer.WriteLine("WETitle = \"" + title.Replace("\"", "&quot;") + "\";");
+            writer.WriteLine("WETitle = \"" + HttpUtility.JavaScriptStringEncode(SPContext.Current.ListItem.Title) + "\";");
             writer.WriteLine("WEWebUrl = '" + ((web.ServerRelativeUrl == "/") ? "" : web.ServerRelativeUrl) + "';");
             writer.WriteLine("WEWebId = '" + web.ID + "';");
             writer.WriteLine("WEEditForm = '" + editURL + "';");

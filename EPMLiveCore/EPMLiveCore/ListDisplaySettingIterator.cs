@@ -442,9 +442,10 @@ namespace EPMLiveCore
                     {
                         extraParams += "&isDlg=" + Page.Request["IsDlg"];
                     }
-
+                    
                     writer.WriteLine("<script language=\"javascript\">");
-                    writer.WriteLine("WETitle = \"" + base.ListItem.Title.Replace("\"", "&quot;") + "\";");
+                    //writer.WriteLine("WETitle = \"" + base.ListItem.Title.Replace("\"", "&quot;") + "\";");
+                    writer.WriteLine("WETitle = \"" + HttpUtility.JavaScriptStringEncode(base.ListItem.Title) + "\";");
                     writer.WriteLine("WEWebUrl = '" + sRelUrl + "';");
                     writer.WriteLine("WEWebId = '" + Web.ID + "';");
                     writer.WriteLine("WEEditForm = '" + editURL + "';");
