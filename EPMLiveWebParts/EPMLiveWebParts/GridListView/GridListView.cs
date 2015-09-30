@@ -2618,7 +2618,7 @@ namespace EPMLiveWebParts
                 SPField field = (SPField)de.Value;
                 //EPML-4625: Remove duplicate column names from fields list
                 string fieldValue = System.Web.HttpUtility.HtmlEncode(field.Title);
-                if (!fields.Equals(fieldValue))
+                if (!fields.Equals(fieldValue, StringComparison.InvariantCultureIgnoreCase))
                 {
                     fields += "'" + field.InternalName + "': { 'value': '" + fieldValue + "', 'checked':" + arrFields.Contains(field.InternalName).ToString().ToLower() + "},";
                     AllGroupFields += System.Web.HttpUtility.HtmlEncode(field.Title) + "|" + field.InternalName + "|" + field.Id + ",";
