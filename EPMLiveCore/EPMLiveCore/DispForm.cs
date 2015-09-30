@@ -53,9 +53,9 @@ namespace EPMLiveCore
             {
                 if (List.Title.Equals("Resources"))
                 {
-                    string basePath = CoreFunctions.getConfigSetting(Web.Site.RootWeb, "EPKBasepath").Replace("/", "").Replace("\\", ""); ;
                     if (List.Fields.ContainsField("EXTID"))
                     {
+                        string basePath = CoreFunctions.getConfigSetting(Web.Site.RootWeb, "EPKBasepath").Replace("/", "").Replace("\\", "");
                         int EXTID = Convert.ToInt32(ListItem["EXTID"]);
                         decimal rate = 0;
                         if (!string.IsNullOrEmpty(basePath))

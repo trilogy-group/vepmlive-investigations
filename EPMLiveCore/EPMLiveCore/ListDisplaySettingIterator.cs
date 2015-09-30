@@ -705,10 +705,10 @@ namespace EPMLiveCore
                         {
                             try
                             {
-                                string basePath = CoreFunctions.getConfigSetting(SPContext.Current.Web.Site.RootWeb, "EPKBasepath").Replace("/", "").Replace("\\", "");
                                 if (this.List.Fields.ContainsField("EXTID"))
                                 {
                                     int EXTID = Convert.ToInt32(this.ListItem["EXTID"]);
+                                    string basePath = CoreFunctions.getConfigSetting(SPContext.Current.Web.Site.RootWeb, "EPKBasepath").Replace("/", "").Replace("\\", "");
                                     if (!string.IsNullOrEmpty(basePath))
                                     {
                                         string pfeConnection = Utilities.GetPFEDBConnectionString(basePath);
