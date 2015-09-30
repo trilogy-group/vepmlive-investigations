@@ -157,7 +157,7 @@ html, body {
                 break;
             case "btnDelete":
                 sRowId = dgrid1_selectedRow;
-                DisplayDialog(340, 140, "Delete Queue Manager Rows", "winDeleteDlg", "idDeleteDlg", true, false);
+                DisplayDialog(340, 140, "Delete Portfolio Queue Rows", "winDeleteDlg", "idDeleteDlg", true, false);
                 break;
         }
         return false;
@@ -196,9 +196,9 @@ html, body {
 </asp:Content>
 
 <asp:Content ID="PageTitle" ContentPlaceHolderID="PlaceHolderPageTitle" runat="server">
-Queue Manager
+Portfolio Queue
 </asp:Content>
 
 <asp:Content ID="PageTitleInTitleArea" ContentPlaceHolderID="PlaceHolderPageTitleInTitleArea" runat="server" >
-Queue Manager
+Portfolio Queue
 </asp:Content>

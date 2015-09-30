@@ -108,9 +108,9 @@
 </asp:Content>
 
 <asp:Content ID="PageTitle" ContentPlaceHolderID="PlaceHolderPageTitle" runat="server">
-    <SharePoint:EncodedLiteral ID="EncodedLiteral1" runat="server" Text="Queue Jobs Manager" EncodeMethod='HtmlEncode' />
+    <SharePoint:EncodedLiteral ID="EncodedLiteral1" runat="server" Text="Work Queue" EncodeMethod='HtmlEncode' />
 </asp:Content>
 
 <asp:Content ID="PageTitleInTitleArea" ContentPlaceHolderID="PlaceHolderPageTitleInTitleArea" runat="server">
-    <asp:Label ID="lblTitle" runat="server" Text="EPM Live Jobs Queue"></asp:Label>
+    <asp:Label ID="lblTitle" runat="server" Text="Work Queue"></asp:Label>
 </asp:Content>
