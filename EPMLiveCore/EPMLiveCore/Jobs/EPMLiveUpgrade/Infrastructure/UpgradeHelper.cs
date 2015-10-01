@@ -11,6 +11,7 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Infrastructure
         V567,
         V568,
         V569,
+        V5610,
         GENERIC
     }
 
