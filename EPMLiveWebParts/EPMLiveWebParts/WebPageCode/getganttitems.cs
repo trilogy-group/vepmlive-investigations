@@ -292,7 +292,7 @@ namespace EPMLiveWebParts
                                     attr.Value = senum;
                                     ndNew.Attributes.Append(attr);
 
-                                    attr = doc.CreateAttribute("Value");
+                                    attr = doc.CreateAttribute("EnumKeys");
                                     attr.Value = senumrange;
                                     ndNew.Attributes.Append(attr);
                                 }
