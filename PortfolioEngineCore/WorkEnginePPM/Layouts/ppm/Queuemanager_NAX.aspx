@@ -88,7 +88,7 @@ html, body {
             { type: "button", id: "btnRefresh", name: "REFRESH", img: "refresh.png", tooltip: "Refresh and go to first page", onclick: "return toolbar_event('btnRefresh');" },
             { type: "button", id: "btnNext", name: "NEXT", img: "formatmap16x16_2.png", style: "top: -18px; left: -248px;", tooltip: "go to next page", onclick: "return toolbar_event('btnNext');" },
             { type: "button", id: "btnTest", name: "TEST", img: "formatmap16x16_2.png", style: "top: -254px; left: -270px;", tooltip: "Test", onclick: "return toolbar_event('btnTest');" },
-            { type: "button", id: "btnCheck", name: "CHECK", img: "heart.gif", tooltip: "Check QueueManager Status", onclick: "return toolbar_event('btnCheck');" },
+            { type: "button", id: "btnCheck", name: "CHECK", img: "heart.gif", tooltip: "Check Portfolio Queue Status", onclick: "return toolbar_event('btnCheck');" },
             { type: "button", id: "btnDelete", name: "Delete", img: "delete.png", tooltip: "Delete selected row or rows older than date", width: "80px", onclick: "return toolbar_event('btnDelete');" }
         ]
     };

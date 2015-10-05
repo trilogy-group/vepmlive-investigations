@@ -113,11 +113,11 @@ namespace WorkEnginePPM
             string sInfo;
             if (dtWhen < dtHeartbeat) 
             {
-                sInfo = "QueueManager is running\n\nLast heartbeat was at " + dtHeartbeat.ToString();
+                sInfo = "Portfolio Queue is running\n\nLast heartbeat was at " + dtHeartbeat.ToString();
             }
             else
             {
-                sInfo = "QueueManager is NOT running\n\nLast heartbeat was at " + dtHeartbeat.ToString();
+                sInfo = "Portfolio Queue is NOT running\n\nLast heartbeat was at " + dtHeartbeat.ToString();
             }
 
             xQMStatus.CreateString("HeartbeatInfo", sInfo);
