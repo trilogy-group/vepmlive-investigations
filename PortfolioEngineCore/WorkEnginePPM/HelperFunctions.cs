@@ -42,16 +42,17 @@ namespace WorkEnginePPM
             if(!string.IsNullOrEmpty(Start) && !string.IsNullOrEmpty(Finish) && !string.IsNullOrEmpty(Work))
             {
 
-                string sendValue = @"<Item Id=""" + li.ParentList.ID + "." + li.ID + @""">";
+                StringBuilder sendValue = new StringBuilder();
+                sendValue.Append(@"<Item Id=""" + li.ParentList.ID + "." + li.ID + @""">");
 
                 foreach(string res in arrResourceExtIds)
                 {
-                    sendValue += "<Resource Id=\"" + res + "\" StartDate=\"" + Start + "\" FinishDate=\"" + Finish + "\" Hours=\"" + Work + "\" />";
+                    sendValue.Append("<Resource Id=\"" + res + "\" StartDate=\"" + Start + "\" FinishDate=\"" + Finish + "\" Hours=\"" + Work + "\" />");
                 }
 
-                sendValue += @"</Item>";
+                sendValue.Append(@"</Item>");
 
-                return sendValue;
+                return sendValue.ToString();
             }
             return "";
         }

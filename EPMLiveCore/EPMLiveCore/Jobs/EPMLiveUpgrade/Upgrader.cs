@@ -14,27 +14,46 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade
 
         public void execute(SPSite site, SPWeb web, string data)
         {
-            bool isPfeSite = site.Features[new Guid("158c5682-d839-4248-b780-82b4710ee152")] != null;
-
-            List<Type> upgradeSteps = UpgradeUtilities.GetUpgradeSteps(data);
-            totalCount = upgradeSteps.Count;
-
-            int progressCounter = 1;
-            foreach (Type upgradeStep in upgradeSteps)
+            List<Type> upgradeSteps = null;
+            try
             {
-                var step = Activator.CreateInstance(upgradeStep, new object[] { web, isPfeSite }) as IUpgradeStep;
 
-                if (step == null) continue;
+                bool isPfeSite = site.Features[new Guid("158c5682-d839-4248-b780-82b4710ee152")] != null;
 
-                bool success = step.Perform();
-                sErrors += step.Log;
+                upgradeSteps = UpgradeUtilities.GetUpgradeSteps(data);
+                totalCount = upgradeSteps.Count;
 
-                updateProgress(progressCounter++);
+                int progressCounter = 1;
+                foreach (Type upgradeStep in upgradeSteps)
+                {
+                    var step = Activator.CreateInstance(upgradeStep, new object[] { web, isPfeSite }) as IUpgradeStep;
 
-                if (success) continue;
+                    if (step == null) continue;
 
-                bErrors = true;
-                break;
+                    bool success = step.Perform();
+                    sErrors += step.Log;
+
+                    updateProgress(progressCounter++);
+
+                    if (success) continue;
+
+                    bErrors = true;
+                    break;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                if (web != null)
+                    web.Dispose();
+                if (site != null)
+                    site.Dispose();
+                data = null;
+                upgradeSteps = null;
             }
         }
 

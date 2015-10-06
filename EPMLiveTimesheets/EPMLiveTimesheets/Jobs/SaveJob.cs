@@ -18,6 +18,7 @@ namespace TimeSheets
         SPList WorkList;
         private bool Editable = false;
         private string NonUpdatingColumns = "Project,AssignedTo";
+        StringBuilder sbErrors = null;
         private static string iGetAttribute(XmlNode nd, string attribute)
         {
             try
@@ -52,192 +53,248 @@ namespace TimeSheets
         private void ProcessTimesheetHours(string id, XmlNode ndRow, SqlConnection cn, TimesheetSettings settings, SPWeb web, string period)
         {
 
-            ArrayList arrPeriods = TimesheetAPI.GetPeriodDaysArray(cn, settings, web, period);
-
-            foreach (XmlNode ndDate in ndRow.SelectNodes("Hours/Date"))
+            ArrayList arrPeriods = null;
+            try
             {
-                DateTime dt = DateTime.Parse(ndDate.Attributes["Value"].Value);
-
-                if (arrPeriods.Contains(dt))
+                arrPeriods = TimesheetAPI.GetPeriodDaysArray(cn, settings, web, period);
+                foreach (XmlNode ndDate in ndRow.SelectNodes("Hours/Date"))
                 {
-                    SqlCommand cmd = new SqlCommand("DELETE FROM TSITEMHOURS where TS_ITEM_UID=@id and TS_ITEM_DATE=@dt", cn);
-                    cmd.Parameters.AddWithValue("@id", id);
-                    cmd.Parameters.AddWithValue("@dt", dt);
-                    cmd.ExecuteNonQuery();
+                    DateTime dt = DateTime.Parse(ndDate.Attributes["Value"].Value);
 
-                    cmd = new SqlCommand("DELETE FROM TSNOTES where TS_ITEM_UID=@id and TS_ITEM_DATE=@dt", cn);
-                    cmd.Parameters.AddWithValue("@id", id);
-                    cmd.Parameters.AddWithValue("@dt", dt);
-                    cmd.ExecuteNonQuery();
-
-                    foreach (XmlNode ndTime in ndDate.SelectNodes("Time"))
+                    if (arrPeriods.Contains(dt))
                     {
-                        string hours = iGetAttribute(ndTime, "Hours");
-                        string type = "0";
-                        try
+                        using (SqlCommand cmd = new SqlCommand("DELETE FROM TSITEMHOURS where TS_ITEM_UID=@id and TS_ITEM_DATE=@dt", cn))
                         {
-                            type = ndTime.Attributes["Type"].Value;
+                            cmd.Parameters.AddWithValue("@id", id);
+                            cmd.Parameters.AddWithValue("@dt", dt);
+                            cmd.ExecuteNonQuery();
                         }
-                        catch { }
 
-                        cmd = new SqlCommand("INSERT INTO TSITEMHOURS (TS_ITEM_UID, TS_ITEM_DATE, TS_ITEM_HOURS, TS_ITEM_TYPE_ID) VALUES (@id,@dt,@hours,@type)", cn);
-                        cmd.Parameters.AddWithValue("@id", id);
-                        cmd.Parameters.AddWithValue("@dt", dt);
-                        cmd.Parameters.AddWithValue("@hours", hours);
-                        cmd.Parameters.AddWithValue("@type", type);
-                        cmd.ExecuteNonQuery();
+                        using (SqlCommand cmd1 = new SqlCommand("DELETE FROM TSNOTES where TS_ITEM_UID=@id and TS_ITEM_DATE=@dt", cn))
+                        {
+                            cmd1.Parameters.AddWithValue("@id", id);
+                            cmd1.Parameters.AddWithValue("@dt", dt);
+                            cmd1.ExecuteNonQuery();
+                        }
+
+                        foreach (XmlNode ndTime in ndDate.SelectNodes("Time"))
+                        {
+                            string hours = iGetAttribute(ndTime, "Hours");
+                            string type = "0";
+                            try
+                            {
+                                type = ndTime.Attributes["Type"].Value;
+                            }
+                            catch { }
+
+                            using (SqlCommand cmd2 = new SqlCommand("INSERT INTO TSITEMHOURS (TS_ITEM_UID, TS_ITEM_DATE, TS_ITEM_HOURS, TS_ITEM_TYPE_ID) VALUES (@id,@dt,@hours,@type)", cn))
+                            {
+                                cmd2.Parameters.AddWithValue("@id", id);
+                                cmd2.Parameters.AddWithValue("@dt", dt);
+                                cmd2.Parameters.AddWithValue("@hours", hours);
+                                cmd2.Parameters.AddWithValue("@type", type);
+                                cmd2.ExecuteNonQuery();
+                            }
+
+                        }
+
+                        XmlNode ndNotes = ndDate.SelectSingleNode("Notes");
+                        if (ndNotes != null)
+                        {
+                            using (SqlCommand cmd3 = new SqlCommand("INSERT INTO TSNOTES (TS_ITEM_UID, TS_ITEM_DATE, TS_ITEM_NOTES) VALUES (@id,@dt,@notes)", cn))
+                            {
+                                cmd3.Parameters.AddWithValue("@id", id);
+                                cmd3.Parameters.AddWithValue("@dt", dt);
+                                cmd3.Parameters.AddWithValue("@notes", System.Web.HttpUtility.UrlDecode(ndNotes.InnerText));
+                                cmd3.ExecuteNonQuery();
+                            }
+                        }
 
                     }
-
-                    XmlNode ndNotes = ndDate.SelectSingleNode("Notes");
-                    if (ndNotes != null)
-                    {
-                        cmd = new SqlCommand("INSERT INTO TSNOTES (TS_ITEM_UID, TS_ITEM_DATE, TS_ITEM_NOTES) VALUES (@id,@dt,@notes)", cn);
-                        cmd.Parameters.AddWithValue("@id", id);
-                        cmd.Parameters.AddWithValue("@dt", dt);
-                        cmd.Parameters.AddWithValue("@notes", System.Web.HttpUtility.UrlDecode(ndNotes.InnerText));
-                        cmd.ExecuteNonQuery();
-                    }
-
                 }
             }
+            finally
+            {
+                arrPeriods = null;
+            }
+
 
         }
 
         private void ProcessListFields(string id, XmlNode ndRow, SqlConnection cn, TimesheetSettings settings, SPListItem li, bool recurse, SPList list)
         {
-            SqlCommand cmd = new SqlCommand("SELECT * FROM TSMETA where TS_ITEM_UID=@uid and ListName = @list", cn);
-            cmd.Parameters.AddWithValue("@uid", id);
-            cmd.Parameters.AddWithValue("@list", list.Title);
-
-            DataSet ds = new DataSet();
-            SqlDataAdapter da = new SqlDataAdapter(cmd);
-            da.Fill(ds);
-
-            ArrayList fields = new ArrayList(EPMLiveCore.CoreFunctions.getConfigSetting(list.ParentWeb.Site.RootWeb, "EPMLiveTSFields-" + System.IO.Path.GetDirectoryName(list.DefaultView.Url)).Split(','));
-
-            foreach (string field in fields)
+            ArrayList fields = null;
+            DataSet ds = null;
+            try
             {
-                if (field == "")
-                    continue;
-
-                string newValue = iGetValue(li, field);
-
-                if (newValue != "")
+                using (SqlCommand cmd = new SqlCommand("SELECT * FROM TSMETA where TS_ITEM_UID=@uid and ListName = @list", cn))
                 {
-                    SPField oField = null;
-                    try
-                    {
-                        oField = list.Fields.GetFieldByInternalName(field);
-                    }
-                    catch { }
-
-                    if (oField != null)
-                    {
-
-                        DataRow[] drTs = ds.Tables[0].Select("ColumnName='" + field + "'");
-
-                        if (drTs.Length > 0)
-                        {
-                            cmd = new SqlCommand("UPDATE TSMETA SET ColumnValue=@val where TSMETA_UID=@muid", cn);
-                            cmd.Parameters.AddWithValue("@val", newValue);
-                            cmd.Parameters.AddWithValue("@muid", drTs[0]["TSMETA_UID"].ToString());
-                            cmd.ExecuteNonQuery();
-                        }
-                        else
-                        {
-                            cmd = new SqlCommand("INSERT INTO TSMETA (TS_ITEM_UID,ColumnName,DisplayName,ColumnValue,ListName) VALUES (@uid,@col,@disp,@val,@list)", cn);
-                            cmd.Parameters.AddWithValue("@uid", id);
-                            cmd.Parameters.AddWithValue("@col", field);
-                            cmd.Parameters.AddWithValue("@disp", oField.Title);
-                            cmd.Parameters.AddWithValue("@val", newValue);
-                            cmd.Parameters.AddWithValue("@list", list.Title);
-                            cmd.ExecuteNonQuery();
-                        }
-                    }
-                }
-                else
-                {
-                    cmd = new SqlCommand("DELETE FROM TSMETA WHERE TS_ITEM_UID=@uid and ColumnName=@col and ListName=@list", cn);
                     cmd.Parameters.AddWithValue("@uid", id);
-                    cmd.Parameters.AddWithValue("@col", field);
                     cmd.Parameters.AddWithValue("@list", list.Title);
-                    cmd.ExecuteNonQuery();
+
+                    using (SqlDataAdapter da = new SqlDataAdapter(cmd))
+                    {
+                        ds = new DataSet();
+                        da.Fill(ds);
+
+                        fields = new ArrayList(EPMLiveCore.CoreFunctions.getConfigSetting(list.ParentWeb.Site.RootWeb, "EPMLiveTSFields-" + System.IO.Path.GetDirectoryName(list.DefaultView.Url)).Split(','));
+
+                        foreach (string field in fields)
+                        {
+                            if (field == "")
+                                continue;
+
+                            string newValue = iGetValue(li, field);
+
+                            if (newValue != "")
+                            {
+                                SPField oField = null;
+                                try
+                                {
+                                    oField = list.Fields.GetFieldByInternalName(field);
+                                }
+                                catch { }
+
+                                if (oField != null)
+                                {
+
+                                    DataRow[] drTs = ds.Tables[0].Select("ColumnName='" + field + "'");
+
+                                    if (drTs.Length > 0)
+                                    {
+                                        using (SqlCommand cmd1 = new SqlCommand("UPDATE TSMETA SET ColumnValue=@val where TSMETA_UID=@muid", cn))
+                                        {
+                                            cmd1.Parameters.AddWithValue("@val", newValue);
+                                            cmd1.Parameters.AddWithValue("@muid", drTs[0]["TSMETA_UID"].ToString());
+                                            cmd1.ExecuteNonQuery();
+                                        }
+                                    }
+                                    else
+                                    {
+                                        using (SqlCommand cmd2 = new SqlCommand("INSERT INTO TSMETA (TS_ITEM_UID,ColumnName,DisplayName,ColumnValue,ListName) VALUES (@uid,@col,@disp,@val,@list)", cn))
+                                        {
+                                            cmd2.Parameters.AddWithValue("@uid", id);
+                                            cmd2.Parameters.AddWithValue("@col", field);
+                                            cmd2.Parameters.AddWithValue("@disp", oField.Title);
+                                            cmd2.Parameters.AddWithValue("@val", newValue);
+                                            cmd2.Parameters.AddWithValue("@list", list.Title);
+                                            cmd2.ExecuteNonQuery();
+                                        }
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                using (SqlCommand cmd3 = new SqlCommand("DELETE FROM TSMETA WHERE TS_ITEM_UID=@uid and ColumnName=@col and ListName=@list", cn))
+                                {
+                                    cmd3.Parameters.AddWithValue("@uid", id);
+                                    cmd3.Parameters.AddWithValue("@col", field);
+                                    cmd3.Parameters.AddWithValue("@list", list.Title);
+                                    cmd3.ExecuteNonQuery();
+                                }
+                            }
+                        }
+                    }
+                    if (recurse)
+                    {
+
+                        try
+                        {
+                            SPFieldLookup ProjectField = (SPFieldLookup)list.Fields.GetFieldByInternalName("Project");
+
+                            SPFieldLookupValue lv = new SPFieldLookupValue(li[ProjectField.Id].ToString());
+
+
+                            SPList pList = list.ParentWeb.Lists[new Guid(ProjectField.LookupList)];
+                            SPListItem pLi = pList.GetItemById(lv.LookupId);
+
+                            ProcessListFields(id, ndRow, cn, settings, pLi, false, pList);
+                        }
+                        catch { }
+                    }
                 }
             }
-
-            if (recurse)
+            finally
             {
-
-                try
-                {
-                    SPFieldLookup ProjectField = (SPFieldLookup)list.Fields.GetFieldByInternalName("Project");
-
-                    SPFieldLookupValue lv = new SPFieldLookupValue(li[ProjectField.Id].ToString());
-
-
-                    SPList pList = list.ParentWeb.Lists[new Guid(ProjectField.LookupList)];
-                    SPListItem pLi = pList.GetItemById(lv.LookupId);
-
-                    ProcessListFields(id, ndRow, cn, settings, pLi, false, pList);
-                }
-                catch { }
+                fields = null;
+                if (ds != null)
+                    ds.Dispose();
             }
+
         }
 
         private void ProcessTimesheetFields(string id, XmlNode ndRow, SqlConnection cn, TimesheetSettings settings)
         {
-            SqlCommand cmd = new SqlCommand("SELECT * FROM TSMETA where TS_ITEM_UID=@uid and ListName='MYTS'", cn);
-            cmd.Parameters.AddWithValue("@uid", id);
-
-            DataSet ds = new DataSet();
-            SqlDataAdapter da = new SqlDataAdapter(cmd);
-            da.Fill(ds);
-
-            foreach (string field in settings.TimesheetFields)
+            DataSet ds = null;
+            try
             {
-                string newValue = iGetAttribute(ndRow, field);
-
-                if (newValue != "")
+                using (SqlCommand cmd = new SqlCommand("SELECT * FROM TSMETA where TS_ITEM_UID=@uid and ListName='MYTS'", cn))
                 {
-                    SPField oField = null;
-                    try
-                    {
-                        oField = WorkList.Fields.GetFieldByInternalName(field);
-                    }
-                    catch { }
-
-                    if (oField != null)
-                    {
-
-                        DataRow[] drTs = ds.Tables[0].Select("ColumnName='" + field + "'");
-
-                        if (drTs.Length > 0)
-                        {
-                            cmd = new SqlCommand("UPDATE TSMETA SET ColumnValue=@val where TSMETA_UID=@muid", cn);
-                            cmd.Parameters.AddWithValue("@val", newValue);
-                            cmd.Parameters.AddWithValue("@muid", drTs[0]["TSMETA_UID"].ToString());
-                            cmd.ExecuteNonQuery();
-                        }
-                        else
-                        {
-                            cmd = new SqlCommand("INSERT INTO TSMETA (TS_ITEM_UID,ColumnName,DisplayName,ColumnValue,ListName) VALUES (@uid,@col,@disp,@val,'MYTS')", cn);
-                            cmd.Parameters.AddWithValue("@uid", id);
-                            cmd.Parameters.AddWithValue("@col", field);
-                            cmd.Parameters.AddWithValue("@disp", oField.Title);
-                            cmd.Parameters.AddWithValue("@val", newValue);
-                            cmd.ExecuteNonQuery();
-                        }
-                    }
-                }
-                else
-                {
-                    cmd = new SqlCommand("DELETE FROM TSMETA WHERE TS_ITEM_UID=@uid and ColumnName=@col and ListName='MYTS'", cn);
                     cmd.Parameters.AddWithValue("@uid", id);
-                    cmd.Parameters.AddWithValue("@col", field);
-                    cmd.ExecuteNonQuery();
+                    using (SqlDataAdapter da = new SqlDataAdapter(cmd))
+                    {
+                        ds = new DataSet();
+                        da.Fill(ds);
+
+                        foreach (string field in settings.TimesheetFields)
+                        {
+                            string newValue = iGetAttribute(ndRow, field);
+
+                            if (newValue != "")
+                            {
+                                SPField oField = null;
+                                try
+                                {
+                                    oField = WorkList.Fields.GetFieldByInternalName(field);
+                                }
+                                catch { }
+
+                                if (oField != null)
+                                {
+
+                                    DataRow[] drTs = ds.Tables[0].Select("ColumnName='" + field + "'");
+
+                                    if (drTs.Length > 0)
+                                    {
+                                        using (SqlCommand cmd1 = new SqlCommand("UPDATE TSMETA SET ColumnValue=@val where TSMETA_UID=@muid", cn))
+                                        {
+                                            cmd1.Parameters.AddWithValue("@val", newValue);
+                                            cmd1.Parameters.AddWithValue("@muid", drTs[0]["TSMETA_UID"].ToString());
+                                            cmd1.ExecuteNonQuery();
+                                        }
+                                    }
+                                    else
+                                    {
+                                        using (SqlCommand cmd2 = new SqlCommand("INSERT INTO TSMETA (TS_ITEM_UID,ColumnName,DisplayName,ColumnValue,ListName) VALUES (@uid,@col,@disp,@val,'MYTS')", cn))
+                                        {
+                                            cmd2.Parameters.AddWithValue("@uid", id);
+                                            cmd2.Parameters.AddWithValue("@col", field);
+                                            cmd2.Parameters.AddWithValue("@disp", oField.Title);
+                                            cmd2.Parameters.AddWithValue("@val", newValue);
+                                            cmd2.ExecuteNonQuery();
+                                        }
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                using (SqlCommand cmd3 = new SqlCommand("DELETE FROM TSMETA WHERE TS_ITEM_UID=@uid and ColumnName=@col and ListName='MYTS'", cn))
+                                {
+                                    cmd3.Parameters.AddWithValue("@uid", id);
+                                    cmd3.Parameters.AddWithValue("@col", field);
+                                    cmd3.ExecuteNonQuery();
+                                }
+                            }
+                        }
+                    }
                 }
             }
+            finally
+            {
+                if (ds != null)
+                    ds.Dispose();
+            }
+
         }
 
         private void ProcessItemRow(XmlNode ndRow, ref DataTable dtItems, SqlConnection cn, SPSite site, TimesheetSettings settings, string period, bool liveHours, bool bSkipSP)
@@ -266,19 +323,18 @@ namespace TimeSheets
                         {
                             if (itemid != "")
                             {
-
-
                                 try
                                 {
-
                                     using (SPWeb web = site.OpenWeb(new Guid(webid)))
                                     {
                                         SPListItem li = null;
 
-                                        SPList list = web.Lists[new Guid(listid)];
+                                        SPList list = null;
 
                                         try
                                         {
+                                            list = web.Lists[new Guid(listid)];
+
                                             try
                                             {
                                                 li = list.GetItemById(int.Parse(itemid));
@@ -298,24 +354,24 @@ namespace TimeSheets
                                                 }
                                                 catch { }
 
-
-
                                                 if (drItem.Length > 0)
                                                 {
-                                                    SqlCommand cmd = new SqlCommand("UPDATE TSITEM set Title = @title, project=@project, project_id=@projectid where ts_item_uid=@uid", cn);
-                                                    cmd.Parameters.AddWithValue("@uid", id);
-                                                    cmd.Parameters.AddWithValue("@title", li["Title"].ToString());
-                                                    if (projectid == 0)
+                                                    using (SqlCommand cmd = new SqlCommand("UPDATE TSITEM set Title = @title, project=@project, project_id=@projectid where ts_item_uid=@uid", cn))
                                                     {
-                                                        cmd.Parameters.AddWithValue("@project", DBNull.Value);
-                                                        cmd.Parameters.AddWithValue("@projectid", DBNull.Value);
+                                                        cmd.Parameters.AddWithValue("@uid", id);
+                                                        cmd.Parameters.AddWithValue("@title", li["Title"].ToString());
+                                                        if (projectid == 0)
+                                                        {
+                                                            cmd.Parameters.AddWithValue("@project", DBNull.Value);
+                                                            cmd.Parameters.AddWithValue("@projectid", DBNull.Value);
+                                                        }
+                                                        else
+                                                        {
+                                                            cmd.Parameters.AddWithValue("@project", project);
+                                                            cmd.Parameters.AddWithValue("@projectid", projectid);
+                                                        }
+                                                        cmd.ExecuteNonQuery();
                                                     }
-                                                    else
-                                                    {
-                                                        cmd.Parameters.AddWithValue("@project", project);
-                                                        cmd.Parameters.AddWithValue("@projectid", projectid);
-                                                    }
-                                                    cmd.ExecuteNonQuery();
 
                                                 }
                                                 else
@@ -327,33 +383,35 @@ namespace TimeSheets
                                                     }
                                                     catch { }
 
-                                                    SqlCommand cmd = new SqlCommand("INSERT INTO TSITEM (TS_UID,TS_ITEM_UID,WEB_UID,LIST_UID,ITEM_ID,ITEM_TYPE,TITLE, PROJECT,PROJECT_ID, LIST,PROJECT_LIST_UID,ASSIGNEDTOID) VALUES(@tsuid,@uid,@webid,@listid,@itemid,@itemtype,@title,@project,@projectid,@list,@projectlistid,@assignedtoid)", cn);
-                                                    cmd.Parameters.AddWithValue("@tsuid", TSUID);
-                                                    cmd.Parameters.AddWithValue("@uid", id);
-                                                    cmd.Parameters.AddWithValue("@webid", web.ID);
-                                                    cmd.Parameters.AddWithValue("@listid", list.ID);
-                                                    cmd.Parameters.AddWithValue("@itemid", li.ID);
-                                                    cmd.Parameters.AddWithValue("@title", li["Title"].ToString());
-                                                    cmd.Parameters.AddWithValue("@list", list.Title);
-                                                    cmd.Parameters.AddWithValue("@itemtype", itemtypeid);
-                                                    cmd.Parameters.AddWithValue("@assignedtoid", assignedtoid);
-
-                                                    if (projectlist == "")
-                                                        cmd.Parameters.AddWithValue("@projectlistid", DBNull.Value);
-                                                    else
-                                                        cmd.Parameters.AddWithValue("@projectlistid", projectlist);
-
-                                                    if (projectid == 0)
+                                                    using (SqlCommand cmd = new SqlCommand("INSERT INTO TSITEM (TS_UID,TS_ITEM_UID,WEB_UID,LIST_UID,ITEM_ID,ITEM_TYPE,TITLE, PROJECT,PROJECT_ID, LIST,PROJECT_LIST_UID,ASSIGNEDTOID) VALUES(@tsuid,@uid,@webid,@listid,@itemid,@itemtype,@title,@project,@projectid,@list,@projectlistid,@assignedtoid)", cn))
                                                     {
-                                                        cmd.Parameters.AddWithValue("@project", DBNull.Value);
-                                                        cmd.Parameters.AddWithValue("@projectid", DBNull.Value);
+                                                        cmd.Parameters.AddWithValue("@tsuid", TSUID);
+                                                        cmd.Parameters.AddWithValue("@uid", id);
+                                                        cmd.Parameters.AddWithValue("@webid", web.ID);
+                                                        cmd.Parameters.AddWithValue("@listid", list.ID);
+                                                        cmd.Parameters.AddWithValue("@itemid", li.ID);
+                                                        cmd.Parameters.AddWithValue("@title", li["Title"].ToString());
+                                                        cmd.Parameters.AddWithValue("@list", list.Title);
+                                                        cmd.Parameters.AddWithValue("@itemtype", itemtypeid);
+                                                        cmd.Parameters.AddWithValue("@assignedtoid", assignedtoid);
+
+                                                        if (projectlist == "")
+                                                            cmd.Parameters.AddWithValue("@projectlistid", DBNull.Value);
+                                                        else
+                                                            cmd.Parameters.AddWithValue("@projectlistid", projectlist);
+
+                                                        if (projectid == 0)
+                                                        {
+                                                            cmd.Parameters.AddWithValue("@project", DBNull.Value);
+                                                            cmd.Parameters.AddWithValue("@projectid", DBNull.Value);
+                                                        }
+                                                        else
+                                                        {
+                                                            cmd.Parameters.AddWithValue("@project", project);
+                                                            cmd.Parameters.AddWithValue("@projectid", projectid);
+                                                        }
+                                                        cmd.ExecuteNonQuery();
                                                     }
-                                                    else
-                                                    {
-                                                        cmd.Parameters.AddWithValue("@project", project);
-                                                        cmd.Parameters.AddWithValue("@projectid", projectid);
-                                                    }
-                                                    cmd.ExecuteNonQuery();
                                                 }
 
                                                 ProcessTimesheetHours(id, ndRow, cn, settings, web, period);
@@ -494,10 +552,6 @@ namespace TimeSheets
 
                                                     ProcessListFields(id, ndRow, cn, settings, li, true, list);
 
-                                                    
-
-
-
                                                     //if (liveHours)
                                                     //    processLiveHours(li, list.ID);
 
@@ -512,40 +566,41 @@ namespace TimeSheets
                                         catch (Exception ex)
                                         {
                                             bErrors = true;
-                                            sErrors += "Item (" + id + ") Error: " + ex.Message;
+                                            sbErrors.Append("Item (" + id + ") Error: " + ex.Message);
                                         }
-
+                                        finally
+                                        {
+                                            li = null;
+                                            list = null;
+                                        }
 
                                     }
 
                                 }
                                 catch { }
-
-
-
                             }
                             else
                             {
                                 bErrors = true;
-                                sErrors += "Item (" + id + ") missing item id";
+                                sbErrors.Append("Item (" + id + ") missing item id");
                             }
                         }
                         else
                         {
                             bErrors = true;
-                            sErrors += "Item (" + id + ") missing list id";
+                            sbErrors.Append("Item (" + id + ") missing list id");
                         }
                     }
                     else
                     {
                         bErrors = true;
-                        sErrors += "Item (" + id + ") missing web id";
+                        sbErrors.Append("Item (" + id + ") missing web id");
                     }
                 }
                 catch (Exception ex)
                 {
                     bErrors = true;
-                    sErrors += "Item (" + id + ") Error x2: " + ex.Message;
+                    sbErrors.Append("Item (" + id + ") Error x2: " + ex.Message);
                 }
                 if (drItem.Length > 0)
                 {
@@ -555,12 +610,18 @@ namespace TimeSheets
             else
             {
                 bErrors = true;
-                sErrors += "Could not get id for item";
+                sbErrors.Append("Could not get id for item");
             }
         }
 
         public void execute(SPSite site, string data)
         {
+            sbErrors = new StringBuilder();
+            SPUser user = null;
+            TimesheetSettings settings = null;
+            DataSet dsItems = null;
+            SPUser editUser = null;
+            XmlNodeList ndItems = null;
             try
             {
                 try
@@ -579,160 +640,191 @@ namespace TimeSheets
                     cn.Open();
                 });
 
-                SqlCommand cmd = new SqlCommand("SELECT     dbo.TSUSER.USER_ID FROM         dbo.TSUSER INNER JOIN dbo.TSTIMESHEET ON dbo.TSUSER.TSUSERUID = dbo.TSTIMESHEET.TSUSER_UID WHERE TS_UID=@tsuid", cn);
-                cmd.Parameters.AddWithValue("@tsuid", base.TSUID);
-
-                SqlDataReader dr = cmd.ExecuteReader();
-
-                int userid = 0;
-
-                if (dr.Read())
+                using (SqlCommand cmd = new SqlCommand("SELECT     dbo.TSUSER.USER_ID FROM         dbo.TSUSER INNER JOIN dbo.TSTIMESHEET ON dbo.TSUSER.TSUSERUID = dbo.TSTIMESHEET.TSUSER_UID WHERE TS_UID=@tsuid", cn))
                 {
-                    userid = dr.GetInt32(0);
-                }
-                dr.Close();
+                    cmd.Parameters.AddWithValue("@tsuid", base.TSUID);
 
-                try
-                {
-                    if (docTimesheet.FirstChild.Attributes["Editable"].Value == "1")
-                        Editable = true;
-                }
-                catch { }
+                    SqlDataReader dr = cmd.ExecuteReader();
 
-                bool SaveAndSubmit = false;
-                try
-                {
-                    SaveAndSubmit = bool.Parse(docTimesheet.FirstChild.Attributes["SaveAndSubmit"].Value);
-                }
-                catch { }
+                    int userid = 0;
 
-                bool liveHours = false;
-
-                bool.TryParse(EPMLiveCore.CoreFunctions.getConfigSetting(site.RootWeb, "EPMLiveTSLiveHours"), out liveHours);
-
-                if (userid != 0)
-                {
-                    SPUser user = TimesheetAPI.GetUser(site.RootWeb, userid.ToString());
-
-                    if (user.ID != userid)
+                    if (dr.Read())
                     {
-                        bErrors = true;
-                        sErrors = "You do not have access to edit that timesheet.";
+                        userid = dr.GetInt32(0);
+                    }
+                    dr.Close();
+
+                    try
+                    {
+                        if (docTimesheet.FirstChild.Attributes["Editable"].Value == "1")
+                            Editable = true;
+                    }
+                    catch { }
+
+                    bool SaveAndSubmit = false;
+                    try
+                    {
+                        SaveAndSubmit = bool.Parse(docTimesheet.FirstChild.Attributes["SaveAndSubmit"].Value);
+                    }
+                    catch { }
+
+                    bool liveHours = false;
+
+                    bool.TryParse(EPMLiveCore.CoreFunctions.getConfigSetting(site.RootWeb, "EPMLiveTSLiveHours"), out liveHours);
+
+                    if (userid != 0)
+                    {
+                        user = TimesheetAPI.GetUser(site.RootWeb, userid.ToString());
+
+                        if (user.ID != userid)
+                        {
+                            bErrors = true;
+                            sbErrors.Append("You do not have access to edit that timesheet.");
+                        }
+                        else
+                        {
+                            settings = new TimesheetSettings(site.RootWeb);
+
+                            dsItems = new DataSet();
+
+                            editUser = site.RootWeb.AllUsers.GetByID(base.userid);
+
+                            using (SqlCommand cmd1 = new SqlCommand("UPDATE TSTIMESHEET SET LASTMODIFIEDBYU=@uname, LASTMODIFIEDBYN=@name where TS_UID=@tsuid", cn))
+                            {
+                                cmd1.Parameters.AddWithValue("@uname", editUser.LoginName);
+                                cmd1.Parameters.AddWithValue("@name", editUser.Name);
+                                cmd1.Parameters.AddWithValue("@tsuid", base.TSUID);
+                                cmd1.ExecuteNonQuery();
+
+                                using (SqlCommand cmd2 = new SqlCommand("SELECT * FROM TSITEM WHERE TS_UID=@tsuid", cn))
+                                {
+                                    cmd2.Parameters.AddWithValue("@tsuid", base.TSUID);
+                                    SqlDataAdapter da = new SqlDataAdapter(cmd2);
+                                    da.Fill(dsItems);
+                                    DataTable dtItems = dsItems.Tables[0];
+
+                                    string period = "";
+
+                                    using (SqlCommand cmd3 = new SqlCommand("SELECT period_id FROM TSTIMESHEET WHERE TS_UID=@tsuid", cn))
+                                    {
+                                        cmd3.Parameters.AddWithValue("@tsuid", base.TSUID);
+                                        using (SqlDataReader drts = cmd3.ExecuteReader())
+                                        {
+                                            if (drts.Read())
+                                            {
+                                                period = drts.GetInt32(0).ToString();
+                                            }
+                                            drts.Close();
+                                        }
+                                        ndItems = docTimesheet.FirstChild.SelectNodes("Item");
+
+                                        float percent = 0;
+                                        float count = 0;
+                                        float total = ndItems.Count;
+
+                                        foreach (XmlNode ndItem in ndItems)
+                                        {
+                                            string worktype = "";
+
+                                            try
+                                            {
+                                                worktype = ndItem.Attributes["WorkTypeField"].Value;
+                                            }
+                                            catch { }
+
+                                            ProcessItemRow(ndItem, ref dtItems, cn, site, settings, period, liveHours, worktype == settings.NonWorkList);
+
+                                            count++;
+                                            float pct = count / total * 98;
+
+                                            if (pct >= percent + 10)
+                                            {
+                                                using (SqlCommand cmd4 = new SqlCommand("update TSQUEUE set percentcomplete=@pct where TSQUEUE_ID=@QueueUid", cn))
+                                                {
+                                                    cmd4.Parameters.AddWithValue("@queueuid", QueueUid);
+                                                    cmd4.Parameters.AddWithValue("@pct", pct);
+                                                    cmd4.ExecuteNonQuery();
+                                                }
+
+                                                percent = pct;
+                                            }
+                                        }
+
+                                        using (SqlCommand cmd5 = new SqlCommand("update TSQUEUE set percentcomplete=98 where TSQUEUE_ID=@QueueUid", cn))
+                                        {
+                                            cmd5.Parameters.AddWithValue("@queueuid", QueueUid);
+                                            cmd5.ExecuteNonQuery();
+                                        }
+
+                                        foreach (DataRow drDelItem in dtItems.Rows)
+                                        {
+                                            using (SqlCommand cmd6 = new SqlCommand("DELETE FROM TSITEM where TS_ITEM_UID=@uid", cn))
+                                            {
+                                                cmd6.Parameters.AddWithValue("@uid", drDelItem["TS_ITEM_UID"].ToString());
+                                                cmd6.ExecuteNonQuery();
+                                            }
+                                        }
+
+                                        //if (liveHours)
+                                        //    sErrors += processActualWork(cn, TSUID.ToString(), site, true, false);
+
+                                        using (SqlCommand cmd7 = new SqlCommand("update TSQUEUE set percentcomplete=99 where TSQUEUE_ID=@QueueUid", cn))
+                                        {
+                                            cmd7.Parameters.AddWithValue("@queueuid", QueueUid);
+                                            cmd7.ExecuteNonQuery();
+                                        }
+                                        SharedFunctions.processResources(cn, TSUID.ToString(), site.RootWeb, user.LoginName);
+                                    }
+                                }
+                            }
+                        }
                     }
                     else
                     {
-                        TimesheetSettings settings = new TimesheetSettings(site.RootWeb);
-
-                        DataSet dsItems = new DataSet();
-
-                        SPUser editUser = site.RootWeb.AllUsers.GetByID(base.userid);
-
-                        cmd = new SqlCommand("UPDATE TSTIMESHEET SET LASTMODIFIEDBYU=@uname, LASTMODIFIEDBYN=@name where TS_UID=@tsuid", cn);
-                        cmd.Parameters.AddWithValue("@uname", editUser.LoginName);
-                        cmd.Parameters.AddWithValue("@name", editUser.Name);
-                        cmd.Parameters.AddWithValue("@tsuid", base.TSUID);
-                        cmd.ExecuteNonQuery();
-
-                        cmd = new SqlCommand("SELECT * FROM TSITEM WHERE TS_UID=@tsuid", cn);
-                        cmd.Parameters.AddWithValue("@tsuid", base.TSUID);
-                        SqlDataAdapter da = new SqlDataAdapter(cmd);
-                        da.Fill(dsItems);
-                        DataTable dtItems = dsItems.Tables[0];
-
-                        string period = "";
-
-                        cmd = new SqlCommand("SELECT period_id FROM TSTIMESHEET WHERE TS_UID=@tsuid", cn);
-                        cmd.Parameters.AddWithValue("@tsuid", base.TSUID);
-                        SqlDataReader drts = cmd.ExecuteReader();
-                        if (drts.Read())
-                        {
-                            period = drts.GetInt32(0).ToString();
-                        }
-                        drts.Close();
-
-                        XmlNodeList ndItems = docTimesheet.FirstChild.SelectNodes("Item");
-
-                        float percent = 0;
-                        float count = 0;
-                        float total = ndItems.Count;
-
-                        foreach (XmlNode ndItem in ndItems)
-                        {
-                            string worktype = "";
-
-                            try
-                            {
-                                worktype = ndItem.Attributes["WorkTypeField"].Value;
-                            }
-                            catch { }
-
-                            ProcessItemRow(ndItem, ref dtItems, cn, site, settings, period, liveHours, worktype == settings.NonWorkList);
-
-                            count++;
-                            float pct = count / total * 98;
-
-                            if (pct >= percent + 10)
-                            {
-                                cmd = new SqlCommand("update TSQUEUE set percentcomplete=@pct where TSQUEUE_ID=@QueueUid", cn);
-                                cmd.Parameters.AddWithValue("@queueuid", QueueUid);
-                                cmd.Parameters.AddWithValue("@pct", pct);
-                                cmd.ExecuteNonQuery();
-
-                                percent = pct;
-                            }
-                        }
-
-                        cmd = new SqlCommand("update TSQUEUE set percentcomplete=98 where TSQUEUE_ID=@QueueUid", cn);
-                        cmd.Parameters.AddWithValue("@queueuid", QueueUid);
-                        cmd.ExecuteNonQuery();
-
-                        foreach (DataRow drDelItem in dtItems.Rows)
-                        {
-                            cmd = new SqlCommand("DELETE FROM TSITEM where TS_ITEM_UID=@uid", cn);
-                            cmd.Parameters.AddWithValue("@uid", drDelItem["TS_ITEM_UID"].ToString());
-                            cmd.ExecuteNonQuery();
-                        }
-
-                        //if (liveHours)
-                        //    sErrors += processActualWork(cn, TSUID.ToString(), site, true, false);
-
-                        cmd = new SqlCommand("update TSQUEUE set percentcomplete=99 where TSQUEUE_ID=@QueueUid", cn);
-                        cmd.Parameters.AddWithValue("@queueuid", QueueUid);
-                        cmd.ExecuteNonQuery();
-
-                        SharedFunctions.processResources(cn, TSUID.ToString(), site.RootWeb, user.LoginName);
+                        bErrors = true;
+                        sbErrors.Append("Timesheet does not exist");
                     }
+                    if (liveHours)
+                    {
+                        using (SqlCommand cmd8 = new SqlCommand("INSERT INTO TSQUEUE (TS_UID, STATUS, JOBTYPE_ID, USERID, JOBDATA) VALUES (@tsuid, 0, 32, @userid, @jobdata)", cn))
+                        {
+                            cmd8.Parameters.AddWithValue("@tsuid", TSUID);
+                            cmd8.Parameters.AddWithValue("@userid", userid);
+                            cmd8.Parameters.AddWithValue("@jobdata", data);
+                            cmd8.ExecuteNonQuery();
+                        }
+                    }
+
+                    cn.Close();
+
+                    if (SaveAndSubmit)
+                        TimesheetAPI.SubmitTimesheet("<Timesheet ID=\"" + base.TSUID + "\" />", site.RootWeb);
                 }
-                else
-                {
-                    bErrors = true;
-                    sErrors = "Timesheet does not exist";
-                }
-
-                if (liveHours)
-                {
-                    cmd = new SqlCommand("INSERT INTO TSQUEUE (TS_UID, STATUS, JOBTYPE_ID, USERID, JOBDATA) VALUES (@tsuid, 0, 32, @userid, @jobdata)", cn);
-                    cmd.Parameters.AddWithValue("@tsuid", TSUID);
-                    cmd.Parameters.AddWithValue("@userid", userid);
-                    cmd.Parameters.AddWithValue("@jobdata", data);
-                }
-
-                cmd.ExecuteNonQuery();
-
-                cn.Close();
-
-                if (SaveAndSubmit)
-                    TimesheetAPI.SubmitTimesheet("<Timesheet ID=\"" + base.TSUID + "\" />", site.RootWeb);
             }
             catch (Exception ex)
             {
                 bErrors = true;
-                sErrors = "Error: " + ex.Message;
+                sbErrors.Append("Error: " + ex.Message);
             }
+            finally
+            {
+                sErrors = sbErrors.ToString();
+                sbErrors = null;
+                user = null;
+                settings = null;
+                editUser = null;
+                ndItems = null;
+                if (dsItems != null)
+                    dsItems = null;
+                if (site != null)
+                    site.Dispose();
+                data = null;
+            }
+
         }
 
-        
 
-        
+
+
     }
 }

@@ -18,24 +18,24 @@ namespace EPMLiveWorkPlanner
         {
             SharedStringTablePart stringTablePart = document.WorkbookPart.SharedStringTablePart;
 
-            if(cell.CellValue != null)
+            if (cell.CellValue != null)
             {
                 string value = cell.CellValue.InnerXml;
 
                 try
                 {
-                    if(cell.DataType != null && cell.DataType.Value == CellValues.SharedString)
+                    if (cell.DataType != null && cell.DataType.Value == CellValues.SharedString)
                     {
                         return stringTablePart.SharedStringTable.ChildElements[Int32.Parse(value)].InnerText;
                     }
                     else
                     {
-                        if(cell.DataType == null)
+                        if (cell.DataType == null)
                         {
                             CellFormat cf = cellFormats.Descendants<CellFormat>().ElementAt<CellFormat>(Convert.ToInt32(cell.StyleIndex.Value));
-                            if(cf.NumberFormatId >= 0 && cf.NumberFormatId <= 13)
+                            if (cf.NumberFormatId >= 0 && cf.NumberFormatId <= 13)
                                 return Convert.ToDecimal(value).ToString();
-                            else if(cf.NumberFormatId >= 14 && cf.NumberFormatId <= 22)
+                            else if (cf.NumberFormatId >= 14 && cf.NumberFormatId <= 22)
                                 return DateTime.FromOADate(Convert.ToDouble(value)).ToString("s");
                             else
                                 return value;
@@ -52,18 +52,21 @@ namespace EPMLiveWorkPlanner
 
         public void execute(SPSite osite, SPWeb oweb, string data)
         {
+            XmlDocument docData = null;
+            Hashtable hshCols = null;
+            EPMLiveCore.Infrastructure.EPMLiveFileStore epmLiveFileStore = null;
             try
             {
-                XmlDocument docData = new XmlDocument();
+                docData = new XmlDocument();
                 docData.LoadXml(data);
 
                 string filename = docData.FirstChild.Attributes["FileName"].Value;
-                
-                string sSheetId = docData.FirstChild.Attributes["SheetId"].Value;
-                
-                var epmLiveFileStore = new EPMLiveCore.Infrastructure.EPMLiveFileStore(oweb);
 
-                using(SpreadsheetDocument myDoc = SpreadsheetDocument.Open(epmLiveFileStore.GetStream(filename), false))
+                string sSheetId = docData.FirstChild.Attributes["SheetId"].Value;
+
+                epmLiveFileStore = new EPMLiveCore.Infrastructure.EPMLiveFileStore(oweb);
+
+                using (SpreadsheetDocument myDoc = SpreadsheetDocument.Open(epmLiveFileStore.GetStream(filename), false))
                 {
                     WorkbookPart workbookPart = myDoc.WorkbookPart;
 
@@ -75,7 +78,7 @@ namespace EPMLiveWorkPlanner
                     Worksheet worksheet = worksheetPart.Worksheet;
                     SheetData oSheetData = worksheet.GetFirstChild<SheetData>();
                     WorkbookStylesPart workbookStylesPart = myDoc.WorkbookPart.GetPartsOfType<WorkbookStylesPart>().First();
-                    CellFormats cellFormats = (CellFormats)workbookStylesPart.Stylesheet.CellFormats; 
+                    CellFormats cellFormats = (CellFormats)workbookStylesPart.Stylesheet.CellFormats;
 
                     IEnumerable<Row> rows = oSheetData.Descendants<Row>();
 
@@ -84,7 +87,7 @@ namespace EPMLiveWorkPlanner
 
                     string sUID = "";
 
-                    
+
 
                     try
                     {
@@ -109,22 +112,20 @@ namespace EPMLiveWorkPlanner
                     }
                     catch { }
 
-
-                    Hashtable hshCols = new Hashtable();
-
+                    hshCols = new Hashtable();
                     XmlNode ndCols = docData.FirstChild.SelectSingleNode("Columns");
-                    if(ndCols != null)
+                    if (ndCols != null)
                     {
-                        foreach(XmlNode ndCol in ndCols.SelectNodes("Column"))
+                        foreach (XmlNode ndCol in ndCols.SelectNodes("Column"))
                         {
                             try
                             {
                                 string ListField = ndCol.Attributes["ExcelField"].Value;
                                 string PlannerField = ndCol.Attributes["PlannerField"].Value;
 
-                                if(ListField != "" && PlannerField != "")
+                                if (ListField != "" && PlannerField != "")
                                 {
-                                    if(!hshCols.ContainsKey(ListField))
+                                    if (!hshCols.ContainsKey(ListField))
                                     {
                                         hshCols.Add(ListField, PlannerField);
                                     }
@@ -137,7 +138,7 @@ namespace EPMLiveWorkPlanner
                     string[] sCols = new string[rows.ElementAt(0).Descendants<Cell>().Count()];
                     int colcount = 0;
 
-                    foreach(Cell cell in rows.ElementAt(0))
+                    foreach (Cell cell in rows.ElementAt(0))
                     {
                         sCols[colcount++] = GetCellValue(myDoc, cell, cellFormats);
                     }
@@ -148,7 +149,7 @@ namespace EPMLiveWorkPlanner
 
                     try
                     {
-                        if(hshCols.Contains(docData.FirstChild.Attributes["Structure"].Value))
+                        if (hshCols.Contains(docData.FirstChild.Attributes["Structure"].Value))
                         {
                             XmlAttribute attr = docImport.CreateAttribute("Structure");
                             attr.Value = hshCols[docData.FirstChild.Attributes["Structure"].Value].ToString();
@@ -157,14 +158,14 @@ namespace EPMLiveWorkPlanner
                     }
                     catch { }
 
-                    foreach(Row row in rows)
+                    foreach (Row row in rows)
                     {
-                        if(counter > 0)
+                        if (counter > 0)
                         {
                             XmlNode ndRow = docImport.CreateNode(XmlNodeType.Element, "Item", docImport.NamespaceURI);
-                            for(int i = 0; i < row.Descendants<Cell>().Count(); i++)
+                            for (int i = 0; i < row.Descendants<Cell>().Count(); i++)
                             {
-                                if(sCols[i] == sUID)
+                                if (sCols[i] == sUID)
                                 {
                                     XmlAttribute attr = docImport.CreateAttribute("EXTID");
                                     attr.Value = GetCellValue(myDoc, row.Descendants<Cell>().ElementAt(i), cellFormats);
@@ -173,7 +174,7 @@ namespace EPMLiveWorkPlanner
                                 else
                                 {
                                     string colName = sCols[i];
-                                    if(hshCols.Contains(colName))
+                                    if (hshCols.Contains(colName))
                                     {
                                         colName = hshCols[colName].ToString();
 
@@ -192,7 +193,7 @@ namespace EPMLiveWorkPlanner
                     XmlDocument docRet = new XmlDocument();
                     docRet.LoadXml(WorkPlannerAPI.ImportTasks(docImport, oweb));
 
-                    if(docRet.FirstChild.Attributes["Status"].Value == "1")
+                    if (docRet.FirstChild.Attributes["Status"].Value == "1")
                     {
                         bErrors = true;
                     }
@@ -206,10 +207,22 @@ namespace EPMLiveWorkPlanner
                 }
                 catch { }
             }
-            catch(Exception ex) 
+            catch (Exception ex)
             {
                 base.bErrors = true;
                 base.sErrors = "Error: " + ex.Message;
+            }
+            finally
+            {
+                docData = null;
+                hshCols = null;
+                if (epmLiveFileStore != null)
+                    epmLiveFileStore.Dispose();
+                if (oweb != null)
+                    oweb.Dispose();
+                if (osite != null)
+                    osite.Dispose();
+                data = null;
             }
         }
     }

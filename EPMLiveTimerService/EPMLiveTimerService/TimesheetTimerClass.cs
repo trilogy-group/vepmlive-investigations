@@ -36,7 +36,7 @@ namespace TimerService
 
             public bool add(BackgroundWorker newBw)
             {
-                for (int i = 0; i < _maxThreads;i++ )
+                for (int i = 0; i < _maxThreads; i++)
                 {
                     if (_arrWorkers[i] == null)
                     {
@@ -94,14 +94,18 @@ namespace TimerService
                 string sConn = EPMLiveCore.CoreFunctions.getConnectionString(webApp.Id);
                 if (sConn != "")
                 {
-                    SqlConnection cn = new SqlConnection(sConn);
-                    cn.Open();
-                    SqlCommand cmd = new SqlCommand("update TSqueue set status = 0, queue = NULL where status <> 3", cn);
-                    cmd.ExecuteNonQuery();
-                    cn.Close();
+                    using (SqlConnection cn = new SqlConnection(sConn))
+                    {
+                        cn.Open();
+                        using (SqlCommand cmd = new SqlCommand("update TSqueue set status = 0, queue = NULL where status <> 3", cn))
+                        {
+                            cmd.ExecuteNonQuery();
+                        }
+                        cn.Close();
+                    }
                 }
             }
-            
+
             return true;
         }
 
@@ -133,40 +137,46 @@ namespace TimerService
                         string sConn = EPMLiveCore.CoreFunctions.getConnectionString(webApp.Id);
                         if (sConn != "")
                         {
-                            SqlConnection cn = new SqlConnection(sConn);
-                            cn.Open();
-
-                            SqlCommand cmd = new SqlCommand("spTSGetQueue", cn);
-                            cmd.CommandType = CommandType.StoredProcedure;
-                            cmd.Parameters.AddWithValue("@servername", System.Environment.MachineName);
-                            cmd.Parameters.AddWithValue("@maxthreads", maxThreads);
-
-                            DataSet ds = new DataSet();
-                            SqlDataAdapter da = new SqlDataAdapter(cmd);
-                            da.Fill(ds);
-
-                            foreach (DataRow dr in ds.Tables[0].Rows)
+                            using (SqlConnection cn = new SqlConnection(sConn))
                             {
-                                RunnerData rd = new RunnerData();
-                                rd.cn = sConn;
-                                rd.dr = dr;
-                                if (startProcess(rd))
+                                cn.Open();
+
+                                using (SqlCommand cmd = new SqlCommand("spTSGetQueue", cn))
                                 {
-                                    //cmd = new SqlCommand("UPDATE TSqueue set status=1,dtstarted = GETDATE() where tsqueue_id=@id", cn);
-                                    //cmd.Parameters.AddWithValue("@id", dr["tsqueue_id"].ToString());
-                                    //cmd.ExecuteNonQuery();
+                                    cmd.CommandType = CommandType.StoredProcedure;
+                                    cmd.Parameters.AddWithValue("@servername", System.Environment.MachineName);
+                                    cmd.Parameters.AddWithValue("@maxthreads", maxThreads);
+
+                                    DataSet ds = new DataSet();
+                                    using (SqlDataAdapter da = new SqlDataAdapter(cmd))
+                                    {
+                                        da.Fill(ds);
+
+                                        foreach (DataRow dr in ds.Tables[0].Rows)
+                                        {
+                                            RunnerData rd = new RunnerData();
+                                            rd.cn = sConn;
+                                            rd.dr = dr;
+                                            if (startProcess(rd))
+                                            {
+                                                //cmd = new SqlCommand("UPDATE TSqueue set status=1,dtstarted = GETDATE() where tsqueue_id=@id", cn);
+                                                //cmd.Parameters.AddWithValue("@id", dr["tsqueue_id"].ToString());
+                                                //cmd.ExecuteNonQuery();
+                                            }
+                                        }
+                                    }
+
+                                    using (SqlCommand cmd1 = new SqlCommand("delete from TSqueue where DateAdd(day, 1, dtfinished) < GETDATE()", cn))
+                                    {
+                                        cmd1.ExecuteNonQuery();
+                                    }
                                 }
+
+                                cn.Close();
                             }
 
-
-                            cmd = new SqlCommand("delete from TSqueue where DateAdd(day, 1, dtfinished) < GETDATE()", cn);
-                            cmd.ExecuteNonQuery();
-
-                            cn.Close();
-
-
                         }
-
+                        
                     }
                 }
             }
@@ -190,7 +200,7 @@ namespace TimerService
 
                 bw.RunWorkerAsync(dr);
 
-                if(dr.dr["JOBTYPE_ID"].ToString() != "32")
+                if (dr.dr["JOBTYPE_ID"].ToString() != "32")
                     workingThreads.add(bw);
 
                 return true;
@@ -216,67 +226,72 @@ namespace TimerService
             {
                 if (ex.Message.Contains("could not be found"))
                 {
-                    SqlConnection cn = new SqlConnection(rd.cn);
-                    cn.Open();
-                    SqlCommand cmd = new SqlCommand("DELETE FROM TSQUEUE WHERE TSQUEUE_ID=@id", cn);
-                    cmd.Parameters.AddWithValue("@id", dr["TSQUEUE_ID"].ToString());
-                    cmd.ExecuteNonQuery();
-                    cn.Close();
+                    using (SqlConnection cn = new SqlConnection(rd.cn))
+                    {
+                        cn.Open();
+                        using (SqlCommand cmd = new SqlCommand("DELETE FROM TSQUEUE WHERE TSQUEUE_ID=@id", cn))
+                        {
+                            cmd.Parameters.AddWithValue("@id", dr["TSQUEUE_ID"].ToString());
+                            cmd.ExecuteNonQuery();
+                        }
+                        cn.Close();
+                    }
                 }
                 else
                 {
                     logMessage("ERR", "PROC", ex.Message);
                 }
             }
+           
         }
 
         static void bw_GenericJob(DataRow dr)
         {
             try
             {
-                using(SPSite site = new SPSite(new Guid(dr["SITE_UID"].ToString())))
+                using (SPSite site = new SPSite(new Guid(dr["SITE_UID"].ToString())))
                 {
 
-                        MethodInfo m;
+                    MethodInfo m;
 
-                        Assembly assemblyInstance = Assembly.Load(dr["NetAssembly"].ToString());
-                        Type thisClass = assemblyInstance.GetType(dr["NetClass"].ToString());
-                        object classObject = Activator.CreateInstance(thisClass);
+                    Assembly assemblyInstance = Assembly.Load(dr["NetAssembly"].ToString());
+                    Type thisClass = assemblyInstance.GetType(dr["NetClass"].ToString());
+                    object classObject = Activator.CreateInstance(thisClass);
 
-                        thisClass.GetField("QueueUid").SetValue(classObject, new Guid(dr["TSQUEUE_ID"].ToString()));
-                        thisClass.GetField("TSUID").SetValue(classObject, new Guid(dr["TS_UID"].ToString()));
-                        thisClass.GetField("jobtype").SetValue(classObject, int.Parse(dr["jobtype_id"].ToString()));
+                    thisClass.GetField("QueueUid").SetValue(classObject, new Guid(dr["TSQUEUE_ID"].ToString()));
+                    thisClass.GetField("TSUID").SetValue(classObject, new Guid(dr["TS_UID"].ToString()));
+                    thisClass.GetField("jobtype").SetValue(classObject, int.Parse(dr["jobtype_id"].ToString()));
 
-                        try
-                        {
-                            thisClass.GetField("userid").SetValue(classObject, int.Parse(dr["userid"].ToString()));
-                        }
-                        catch { } 
+                    try
+                    {
+                        thisClass.GetField("userid").SetValue(classObject, int.Parse(dr["userid"].ToString()));
+                    }
+                    catch { }
 
-                        m = thisClass.GetMethod("initJob");
-                        bool bInit = (bool)m.Invoke(classObject, new object[] { site });
+                    m = thisClass.GetMethod("initJob");
+                    bool bInit = (bool)m.Invoke(classObject, new object[] { site });
 
-                        try
-                        {
+                    try
+                    {
 
-                            m = thisClass.GetMethod("execute");
-                            m.Invoke(classObject, new object[] { site, dr["JOBDATA"].ToString() });
+                        m = thisClass.GetMethod("execute");
+                        m.Invoke(classObject, new object[] { site, dr["JOBDATA"].ToString() });
 
-                        }
-                        catch(Exception ex)
-                        {
-                            thisClass.GetField("bErrors").SetValue(classObject, true);
-                            thisClass.GetField("sErrors").SetValue(classObject, "General Error: " + ex.Message);
-                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        thisClass.GetField("bErrors").SetValue(classObject, true);
+                        thisClass.GetField("sErrors").SetValue(classObject, "General Error: " + ex.Message);
+                    }
 
-                        m = thisClass.GetMethod("finishJob");
-                        m.Invoke(classObject, new object[] { });
-                    
+                    m = thisClass.GetMethod("finishJob");
+                    m.Invoke(classObject, new object[] { });
+
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                
+
             }
         }
 

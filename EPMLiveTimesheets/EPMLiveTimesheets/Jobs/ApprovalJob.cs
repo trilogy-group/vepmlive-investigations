@@ -8,40 +8,50 @@ using System.Data;
 
 namespace TimeSheets
 {
-    public class ApprovalJob: BaseJob
+    public class ApprovalJob : BaseJob
     {
 
         public void execute(SPSite site, string data)
         {
-            SPSecurity.RunWithElevatedPrivileges(delegate()
+            try
             {
-                if(cn.State == System.Data.ConnectionState.Closed)
-                    cn.Open();
-            });
-
-            bool liveHours = false;
-
-            bool.TryParse(EPMLiveCore.CoreFunctions.getConfigSetting(site.RootWeb, "EPMLiveTSLiveHours"), out liveHours);
-
-            //string[] tsuids = data.Split(',');
-
-            //foreach(string tsuidData in tsuids)
-            {
-                //if (actualWork != "")
-                //{
-                if (!liveHours)
+                SPSecurity.RunWithElevatedPrivileges(delegate()
                 {
-                    sErrors = SharedFunctions.processActualWork(cn, TSUID.ToString(), site, true, true);
+                    if (cn.State == System.Data.ConnectionState.Closed)
+                        cn.Open();
+                });
+
+                bool liveHours = false;
+
+                bool.TryParse(EPMLiveCore.CoreFunctions.getConfigSetting(site.RootWeb, "EPMLiveTSLiveHours"), out liveHours);
+
+                //string[] tsuids = data.Split(',');
+
+                //foreach(string tsuidData in tsuids)
+                {
+                    //if (actualWork != "")
+                    //{
+                    if (!liveHours)
+                    {
+                        sErrors = SharedFunctions.processActualWork(cn, TSUID.ToString(), site, true, true);
+                    }
+                    //}
                 }
-                //}
+
+                if (sErrors != "")
+                    bErrors = true;
             }
-
-            if(sErrors != "")
-                bErrors = true;
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                if (site != null)
+                    site.Dispose();
+                data = null;
+            }
         }
-
-        
-
 
     }
 }

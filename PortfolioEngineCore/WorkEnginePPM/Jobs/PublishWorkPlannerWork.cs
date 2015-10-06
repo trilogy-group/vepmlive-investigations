@@ -33,6 +33,12 @@ namespace WorkEnginePPM.Jobs
         public void execute(SPSite site, SPWeb web, string data)
         {
             string[] keys = key.Split('.');
+            SPList oTaskCenter;
+            SPQuery query = null;
+            SPListItemCollection lic = null;
+            SPFieldUserValueCollection uvc = null;
+            DataTable dtResources = null;
+            ArrayList arrResourceExtId = null;
             try
             {
                 string result = "";
@@ -45,25 +51,26 @@ namespace WorkEnginePPM.Jobs
                 }
                 else
                 {
-                    SPList oTaskCenter = web.Lists[base.ListUid];
+                    oTaskCenter = web.Lists[base.ListUid];
 
-                    SPQuery query = new SPQuery();
+                    query = new SPQuery();
 
                     query.Query = "<Where><Eq><FieldRef Name='Project' LookupId='TRUE'/><Value Type='Lookup'>" + keys[0] + "</Value></Eq></Where>";
 
-                    string sendValue = "<UpdateListWork><Params />";
+                    StringBuilder sendValue = new StringBuilder();
+                    sendValue.Append("<UpdateListWork><Params />");
 
-                    sendValue += @"<Project ExtId=""" + data + @""" Source=""1"">";
+                    sendValue.Append(@"<Project ExtId=""" + data + @""" Source=""1"">");
 
-                    SPListItemCollection lic = oTaskCenter.GetItems(query);
+                    lic = oTaskCenter.GetItems(query);
 
                     totalCount = lic.Count;
 
                     int counter = 0;
 
-                    DataTable dtResources = EPMLiveCore.API.APITeam.GetResourcePool("<GetResources><Columns>EXTID</Columns></GetResources>", web);
+                    dtResources = EPMLiveCore.API.APITeam.GetResourcePool("<GetResources><Columns>EXTID</Columns></GetResources>", web);
 
-                    foreach(SPListItem li in lic)
+                    foreach (SPListItem li in lic)
                     {
                         string assignedto = "";
                         try
@@ -71,39 +78,39 @@ namespace WorkEnginePPM.Jobs
                             assignedto = li["AssignedTo"].ToString();
                         }
                         catch { }
-                        if(assignedto != "")
+                        if (assignedto != "")
                         {
-                            SPFieldUserValueCollection uvc = new SPFieldUserValueCollection(web, assignedto);
+                            uvc = new SPFieldUserValueCollection(web, assignedto);
+                            arrResourceExtId = null;
+                            arrResourceExtId = new ArrayList();
 
-                            ArrayList arrResourceExtId = new ArrayList();
-
-                            foreach(SPFieldUserValue uv in uvc)
+                            foreach (SPFieldUserValue uv in uvc)
                             {
 
                                 DataRow[] dr = dtResources.Select("SPID='" + uv.LookupId + "'");
 
-                                if(dr.Length > 0)
+                                if (dr.Length > 0)
                                 {
-                                    if(dr[0]["EXTID"].ToString() != "")
+                                    if (dr[0]["EXTID"].ToString() != "")
                                     {
                                         arrResourceExtId.Add(dr[0]["EXTID"].ToString());
                                     }
                                 }
                             }
 
-                            sendValue += HelperFunctions.AddXml(li, arrResourceExtId);
+                            sendValue.Append(HelperFunctions.AddXml(li, arrResourceExtId));
                         }
 
                         updateProgress(counter++);
                     }
 
-                    sendValue += @"</Project>";
+                    sendValue.Append(@"</Project>");
 
-                    sendValue += "</UpdateListWork>";
+                    sendValue.Append("</UpdateListWork>");
 
                     PortfolioEngineCore.Admininfos admin = GetAdminInfos(site);
-                    
-                    admin.UpdateListWork(sendValue, out result); 
+
+                    admin.UpdateListWork(sendValue.ToString(), out result);
                 }
 
                 result = result.Trim();
@@ -117,7 +124,7 @@ namespace WorkEnginePPM.Jobs
                     EPMLiveCore.API.APIEmail.QueueItemMessage(15, true, res, new[] { currentuser.ID.ToString() }, null, false, true, web, currentuser, true);
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
 
                 bErrors = true;
@@ -130,6 +137,21 @@ namespace WorkEnginePPM.Jobs
                     res.Add("Publish_DetailedStatus", "for project " + keys[1] + " failed due to the following reason: " + sErrors);
                     EPMLiveCore.API.APIEmail.QueueItemMessage(15, true, res, new[] { currentuser.ID.ToString() }, null, false, true, web, currentuser, true);
                 }
+            }
+            finally
+            {
+                oTaskCenter = null;
+                query = null;
+                lic = null;
+                uvc = null;
+                if (dtResources != null)
+                    dtResources.Dispose();
+                arrResourceExtId = null;
+                if (web != null)
+                    web.Dispose();
+                if (site != null)
+                    site.Dispose();
+                data = null;
             }
         }
     }

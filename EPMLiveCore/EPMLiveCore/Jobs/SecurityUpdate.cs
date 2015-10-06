@@ -18,210 +18,250 @@ namespace EPMLiveCore.Jobs
 
         public void execute(SPSite site, SPWeb web, Guid listId, int itemId, int userid, string data)
         {
-            SPList list = web.Lists[listId];
-            SPListItem li = list.GetItemById(itemId);
-            GridGanttSettings settings = new GridGanttSettings(list);
-
-            List<string> cNewGrps = new List<string>();
-
-            bool isSecure = false;
+            SPList list = null;
+            SPListItem li = null;
+            GridGanttSettings settings = null;
+            List<string> cNewGrps = null;
+            List<string> fields = null;
+            SPUser orignalUser = null;
+            EnhancedLookupConfigValuesHelper valueHelper = null;
+            SPList lookupPrntList = null;
+            GridGanttSettings prntListSettings = null;
+            SPFieldLookupValue lookupVal = null;
+            SPListItem targetItem = null;
             try
             {
-                isSecure = settings.BuildTeamSecurity;
-            }
-            catch { }
-
-            SPUser orignalUser = web.AllUsers.GetByID(userid);
-
-            string safeTitle = !string.IsNullOrEmpty(li.Title) ? GetSafeGroupTitle(li.Title) : string.Empty;
-
-            if (string.IsNullOrEmpty(safeTitle) && list.BaseTemplate == SPListTemplateType.DocumentLibrary)
-                safeTitle = GetSafeGroupTitle(li.Name); //Assign Name instead of Title - This should perticularly happen with Document libraries.
-
-            if (isSecure)
-            {
-                if (!li.HasUniqueRoleAssignments)
+                list = web.Lists[listId];
+                li = list.GetItemById(itemId);
+                settings = new GridGanttSettings(list);
+                cNewGrps = new List<string>();
+                bool isSecure = false;
+                try
                 {
-                    web.AllowUnsafeUpdates = true;
-                    safeGroupTitle = safeTitle;
+                    isSecure = settings.BuildTeamSecurity;
+                }
+                catch { }
 
-                    safeTitle = GetIdenticalGroupName(site.ID, web.ID, safeTitle, 0);
+                orignalUser = web.AllUsers.GetByID(userid);
 
-                    // step 1 perform actions related to "parent item"
-                    // ===============================================
+                string safeTitle = !string.IsNullOrEmpty(li.Title) ? GetSafeGroupTitle(li.Title) : string.Empty;
+
+                if (string.IsNullOrEmpty(safeTitle) && list.BaseTemplate == SPListTemplateType.DocumentLibrary)
+                    safeTitle = GetSafeGroupTitle(li.Name); //Assign Name instead of Title - This should perticularly happen with Document libraries.
+
+                if (isSecure)
+                {
+                    if (!li.HasUniqueRoleAssignments)
+                    {
+                        web.AllowUnsafeUpdates = true;
+                        safeGroupTitle = safeTitle;
+
+                        safeTitle = GetIdenticalGroupName(site.ID, web.ID, safeTitle, 0);
+
+                        // step 1 perform actions related to "parent item"
+                        // ===============================================
+                        Dictionary<string, SPRoleType> pNewGrps = null;
+                        try
+                        {
+                            pNewGrps = AddBasicSecurityGroups(web, safeTitle, orignalUser, li);
+
+                            li.BreakRoleInheritance(false);
+
+                            foreach (KeyValuePair<string, SPRoleType> group in pNewGrps)
+                            {
+                                SPGroup g = web.SiteGroups[group.Key];
+                                AddNewItemLvlPerm(li, web, group.Value, g);
+                                g = null;
+                            }
+
+                            AddBuildTeamSecurityGroups(web, settings, li);
+
+                        }
+                        catch { }
+                        finally
+                        {
+                            pNewGrps = null;
+                        }
+                    }
+                }
+
+
+                // step 2 perform actions related to "child item"
+                // ====================================
+                // find lookups that has security enabled
+                string lookupSettings = settings.Lookups;
+                //string rawValue = "Region^dropdown^none^none^xxx|State^autocomplete^Region^Region^xxx|City^autocomplete^State^State^xxx";                    
+                valueHelper = new EnhancedLookupConfigValuesHelper(lookupSettings);
+
+                if (valueHelper == null)
+                {
+                    return;
+                }
+
+                fields = valueHelper.GetSecuredFields();
+
+                bool bHasLookup = false;
+
+                foreach (string fld in fields)
+                {
+                    SPFieldLookup lookup = null;
                     try
                     {
-                        Dictionary<string, SPRoleType> pNewGrps = AddBasicSecurityGroups(web, safeTitle, orignalUser, li);
-
-                        li.BreakRoleInheritance(false);
-
-                        foreach (KeyValuePair<string, SPRoleType> group in pNewGrps)
-                        {
-                            SPGroup g = web.SiteGroups[group.Key];
-
-                            AddNewItemLvlPerm(li, web, group.Value, g);
-                        }
-
-                        AddBuildTeamSecurityGroups(web, settings, li);
-
+                        lookup = list.Fields.GetFieldByInternalName(fld) as SPFieldLookup;
                     }
                     catch { }
-                }
-            }
 
-
-            // step 2 perform actions related to "child item"
-            // ====================================
-            // find lookups that has security enabled
-            EnhancedLookupConfigValuesHelper valueHelper = null;
-            string lookupSettings = settings.Lookups;
-            //string rawValue = "Region^dropdown^none^none^xxx|State^autocomplete^Region^Region^xxx|City^autocomplete^State^State^xxx";                    
-            valueHelper = new EnhancedLookupConfigValuesHelper(lookupSettings);
-
-            if (valueHelper == null)
-            {
-                return;
-            }
-
-            List<string> fields = valueHelper.GetSecuredFields();
-
-            bool bHasLookup = false;
-
-            foreach (string fld in fields)
-            {
-                SPFieldLookup lookup = null;
-                try
-                {
-                    lookup = list.Fields.GetFieldByInternalName(fld) as SPFieldLookup;
-                }
-                catch { }
-
-                if (lookup == null)
-                {
-                    continue;
-                }
-
-                SPList lookupPrntList = web.Lists[new Guid(lookup.LookupList)];
-                GridGanttSettings prntListSettings = new GridGanttSettings(lookupPrntList);
-                string sVal = string.Empty;
-                try
-                {
-                    sVal = li[fld].ToString();
-                }
-                catch { }
-                if (!string.IsNullOrEmpty(sVal))
-                {
-                    bHasLookup = true;
-                    break;
-                }
-            }
-
-            if (bHasLookup)
-            {
-                // has security fields
-                if (fields.Count > 0)
-                {
-                    // if the list is not a security list itself
-                    if (isSecure)
+                    if (lookup == null)
                     {
-                        li.BreakRoleInheritance(false);
+                        continue;
                     }
 
-                    foreach (string fld in fields)
+                    lookupPrntList = web.Lists[new Guid(lookup.LookupList)];
+                    prntListSettings = new GridGanttSettings(lookupPrntList);
+                    string sVal = string.Empty;
+                    try
                     {
-                        SPFieldLookup lookup = null;
-                        try
-                        {
-                            lookup = list.Fields.GetFieldByInternalName(fld) as SPFieldLookup;
-                        }
-                        catch { }
+                        sVal = li[fld].ToString();
+                    }
+                    catch { }
+                    if (!string.IsNullOrEmpty(sVal))
+                    {
+                        bHasLookup = true;
+                        break;
+                    }
 
-                        if (lookup == null)
+                }
+                if (bHasLookup)
+                {
+                    // has security fields
+                    if (fields.Count > 0)
+                    {
+                        // if the list is not a security list itself
+                        if (isSecure)
                         {
-                            continue;
+                            li.BreakRoleInheritance(false);
                         }
 
-                        SPList lookupPrntList = web.Lists[new Guid(lookup.LookupList)];
-                        GridGanttSettings prntListSettings = new GridGanttSettings(lookupPrntList);
-                        bool isEnableSecurity = false;
-                        bool isParentSecure = false;
-                        try
+                        foreach (string fld in fields)
                         {
-                            isParentSecure = prntListSettings.BuildTeamSecurity;
-                        }
-                        catch { }
-
-                        string[] LookupArray = settings.Lookups.Split('|');
-                        string[] sLookupInfo = null;
-                        Hashtable hshLookups = new Hashtable();
-                        foreach (string sLookup in LookupArray)
-                        {
-                            if (sLookup != "")
+                            SPFieldLookup lookup = null;
+                            try
                             {
-                                sLookupInfo = sLookup.Split('^');
-                                hshLookups.Add(sLookupInfo[0], sLookupInfo);
+                                lookup = list.Fields.GetFieldByInternalName(fld) as SPFieldLookup;
                             }
-                        }
-                        try
-                        {
-                            if (sLookupInfo != null && sLookupInfo[4].ToLower() == "true")
-                                isEnableSecurity = true;
-                            else
-                                isEnableSecurity = false;
-                        }
-                        catch { isEnableSecurity = false; }
+                            catch { }
 
-                        // skip fields with empty lookup values
-                        string sVal = string.Empty;
-                        try { sVal = li[fld].ToString(); }
-                        catch { }
-                        if (string.IsNullOrEmpty(sVal)) { continue; }
-
-                        SPFieldLookupValue lookupVal = new SPFieldLookupValue(sVal.ToString());
-                        SPListItem targetItem = lookupPrntList.GetItemById(lookupVal.LookupId);
-                        if (!targetItem.HasUniqueRoleAssignments)
-                        {
-                            continue;
-                        }
-                        else
-                        {
-                            //EPML-4422: When a project is not using unique security, and a child list like tasks is set to Inherit security from the project lookup, It sets the task to unique, but does not add any groups. It should not get set to Unique.
-                            if (!isSecure && isParentSecure && isEnableSecurity)
+                            if (lookup == null)
                             {
-                                web.AllowUnsafeUpdates = true;
-                                li.BreakRoleInheritance(false);
+                                continue;
                             }
-                        }
 
-                        SPRoleAssignmentCollection raCol = targetItem.RoleAssignments;
-                        string itemMemberGrp = "Member";
-                        foreach (SPRoleAssignment ra in raCol)
-                        {
-                            // add their groups to this item but change permission lvl
-                            if (ra.Member.Name.Contains(itemMemberGrp))
+                            lookupPrntList = web.Lists[new Guid(lookup.LookupList)];
+                            prntListSettings = new GridGanttSettings(lookupPrntList);
+                            bool isEnableSecurity = false;
+                            bool isParentSecure = false;
+                            try
                             {
-                                SPRoleAssignment newRa = new SPRoleAssignment(ra.Member);
-                                SPRoleDefinition newDef = web.RoleDefinitions.GetByType(SPRoleType.Contributor);
-                                newRa.RoleDefinitionBindings.Add(newDef);
-                                li.RoleAssignments.Add(newRa);
+                                isParentSecure = prntListSettings.BuildTeamSecurity;
+                            }
+                            catch { }
+
+                            string[] LookupArray = settings.Lookups.Split('|');
+                            string[] sLookupInfo = null;
+                            Hashtable hshLookups = new Hashtable();
+                            foreach (string sLookup in LookupArray)
+                            {
+                                if (sLookup != "")
+                                {
+                                    sLookupInfo = sLookup.Split('^');
+                                    hshLookups.Add(sLookupInfo[0], sLookupInfo);
+                                }
+                            }
+                            try
+                            {
+                                if (sLookupInfo != null && sLookupInfo[4].ToLower() == "true")
+                                    isEnableSecurity = true;
+                                else
+                                    isEnableSecurity = false;
+                            }
+                            catch { isEnableSecurity = false; }
+
+                            // skip fields with empty lookup values
+                            string sVal = string.Empty;
+                            try { sVal = li[fld].ToString(); }
+                            catch { }
+                            if (string.IsNullOrEmpty(sVal)) { continue; }
+
+                            lookupVal = new SPFieldLookupValue(sVal.ToString());
+                            targetItem = lookupPrntList.GetItemById(lookupVal.LookupId);
+                            if (!targetItem.HasUniqueRoleAssignments)
+                            {
+                                continue;
                             }
                             else
                             {
-                                li.RoleAssignments.Add(ra);
+                                //EPML-4422: When a project is not using unique security, and a child list like tasks is set to Inherit security from the project lookup, It sets the task to unique, but does not add any groups. It should not get set to Unique.
+                                if (!isSecure && isParentSecure && isEnableSecurity)
+                                {
+                                    web.AllowUnsafeUpdates = true;
+                                    li.BreakRoleInheritance(false);
+                                }
                             }
 
-                            cNewGrps.Add(ra.Member.Name);
-                        }
+                            SPRoleAssignmentCollection raCol = targetItem.RoleAssignments;
+                            string itemMemberGrp = "Member";
+                            foreach (SPRoleAssignment ra in raCol)
+                            {
+                                // add their groups to this item but change permission lvl
+                                if (ra.Member.Name.Contains(itemMemberGrp))
+                                {
+                                    SPRoleAssignment newRa = new SPRoleAssignment(ra.Member);
+                                    SPRoleDefinition newDef = web.RoleDefinitions.GetByType(SPRoleType.Contributor);
+                                    newRa.RoleDefinitionBindings.Add(newDef);
+                                    li.RoleAssignments.Add(newRa);
+                                }
+                                else
+                                {
+                                    li.RoleAssignments.Add(ra);
+                                }
 
+                                cNewGrps.Add(ra.Member.Name);
+                            }
+
+                        }
                     }
                 }
+                ProcessSecurity(site, list, li, userid);
+
+                // we wait until all groups have been created to createworkspace
+                // only if there isn't a current process creating ws 
+                WorkspaceTimerjobAgent.QueueWorkspaceJobOnHoldForSecurity(site.ID, web.ID, list.ID, li.ID);
             }
 
-            ProcessSecurity(site, list, li, userid);
-
-            // we wait until all groups have been created to createworkspace
-            // only if there isn't a current process creating ws 
-            WorkspaceTimerjobAgent.QueueWorkspaceJobOnHoldForSecurity(site.ID, web.ID, list.ID, li.ID);
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                list = null;
+                li = null;
+                lookupPrntList = null;
+                prntListSettings = null;
+                settings = null;
+                cNewGrps = null;
+                fields = null;
+                orignalUser = null;
+                valueHelper = null;
+                lookupVal = null;
+                targetItem = null;
+                fields = null;
+                if (web != null)
+                    web.Dispose();
+                if (site != null)
+                    site.Dispose();
+                data = null;
+            }
         }
 
         private string GetIdenticalGroupName(Guid siteId, Guid webId, string safeTitle, Int32 uniqueGroupIndex)
@@ -229,93 +269,120 @@ namespace EPMLiveCore.Jobs
             string uniqueGroupName = safeTitle;
             string groupTitle = string.Format("'{0} Owner','{0} Member', '{0} Visitor'", uniqueGroupName);
             string qryGroupExists = "SELECT ID FROM LSTUserInformationList WHERE Title IN (" + groupTitle + ") AND ContentType = 'SharePointGroup'  AND WebId = '" + Convert.ToString(webId) + "'";
+            ReportData _dao = null;
             try
             {
-                ReportData _dao = new ReportData(siteId);
+                _dao = new ReportData(siteId);
                 using (SqlConnection cn = _dao.GetClientReportingConnection())
                 {
                     using (SqlCommand cmd = new SqlCommand(qryGroupExists, cn))
                     {
-                        SqlDataReader dr = cmd.ExecuteReader();
-                        if (dr.Read())
+                        using (SqlDataReader dr = cmd.ExecuteReader())
                         {
-                            //Ooopppsss! Group already exists! Let's try with Incremental Group Search in LSTUserInformationList table!
-                            Convert.ToInt32(uniqueGroupIndex++);
-                            groupTitle = string.Format("{0}{1}", safeGroupTitle, Convert.ToInt32(uniqueGroupIndex));
-                            uniqueGroupName = GetIdenticalGroupName(siteId, webId, groupTitle, Convert.ToInt32(uniqueGroupIndex));
+                            if (dr.Read())
+                            {
+                                //Ooopppsss! Group already exists! Let's try with Incremental Group Search in LSTUserInformationList table!
+                                Convert.ToInt32(uniqueGroupIndex++);
+                                groupTitle = string.Format("{0}{1}", safeGroupTitle, Convert.ToInt32(uniqueGroupIndex));
+                                uniqueGroupName = GetIdenticalGroupName(siteId, webId, groupTitle, Convert.ToInt32(uniqueGroupIndex));
+                            }
                         }
                     }
                 }
             }
             catch { }
-
+            finally
+            {
+                groupTitle = null;
+                qryGroupExists = null;
+                if (_dao != null)
+                    _dao.Dispose();
+            }
             return uniqueGroupName;
         }
 
         private void ProcessSecurity(SPSite site, SPList list, SPListItem li, int userid)
         {
 
-            ReportData _dao = new ReportData(site.ID);
-            SqlConnection cn = _dao.GetClientReportingConnection();
+            ReportData _dao = null;
             try
             {
-
-                SqlCommand cmd = new SqlCommand("DELETE RPTITEMGROUPS where siteid=@siteid and listid=@listid and itemid=@itemid", cn);
-                cmd.Parameters.AddWithValue("@siteid", site.ID);
-                cmd.Parameters.AddWithValue("@listid", list.ID);
-                cmd.Parameters.AddWithValue("@itemid", li.ID);
-                cmd.ExecuteNonQuery();
-
-                foreach (SPRoleAssignment ra in li.RoleAssignments)
+                _dao = new ReportData(site.ID);
+                using (SqlConnection cn = _dao.GetClientReportingConnection())
                 {
-                    int type = 0;
-                    if (ra.Member.GetType() == typeof(SPGroup))
+                    using (SqlCommand cmd = new SqlCommand("DELETE RPTITEMGROUPS where siteid=@siteid and listid=@listid and itemid=@itemid", cn))
                     {
-                        type = 1;
-                    }
-                    if ((ra.RoleDefinitionBindings[0].BasePermissions & SPBasePermissions.ViewListItems) == SPBasePermissions.ViewListItems)
-                    {
-                        cmd = new SqlCommand("INSERT INTO RPTITEMGROUPS (SITEID, LISTID, ITEMID, GROUPID, SECTYPE) VALUES (@siteid, @listid, @itemid, @groupid, @sectype)", cn);
                         cmd.Parameters.AddWithValue("@siteid", site.ID);
                         cmd.Parameters.AddWithValue("@listid", list.ID);
                         cmd.Parameters.AddWithValue("@itemid", li.ID);
-                        cmd.Parameters.AddWithValue("@groupid", ra.Member.ID);
-                        cmd.Parameters.AddWithValue("@sectype", type);
                         cmd.ExecuteNonQuery();
+                    }
 
-                        cmd = new SqlCommand("SELECT * FROM RPTGROUPUSER where SITEID=@siteid and GROUPID=@groupid and USERID=@userid", cn);
-                        cmd.Parameters.AddWithValue("@siteid", site.ID);
-                        cmd.Parameters.AddWithValue("@groupid", ra.Member.ID);
-                        cmd.Parameters.AddWithValue("@userid", userid);
-                        SqlDataReader dr = cmd.ExecuteReader();
-                        bool found = false;
-                        if (dr.Read())
+                    foreach (SPRoleAssignment ra in li.RoleAssignments)
+                    {
+                        int type = 0;
+                        if (ra.Member.GetType() == typeof(SPGroup))
                         {
-                            found = true;
+                            type = 1;
                         }
-                        dr.Close();
-                        if (!found)
+                        if ((ra.RoleDefinitionBindings[0].BasePermissions & SPBasePermissions.ViewListItems) == SPBasePermissions.ViewListItems)
                         {
-                            cmd = new SqlCommand("INSERT INTO RPTGROUPUSER (SITEID, GROUPID, USERID) VALUES (@siteid, @groupid, @userid)", cn);
-                            cmd.Parameters.AddWithValue("@siteid", site.ID);
-                            cmd.Parameters.AddWithValue("@groupid", ra.Member.ID);
-                            cmd.Parameters.AddWithValue("@userid", userid);
-                            cmd.ExecuteNonQuery();
+                            using (SqlCommand cmd1 = new SqlCommand("INSERT INTO RPTITEMGROUPS (SITEID, LISTID, ITEMID, GROUPID, SECTYPE) VALUES (@siteid, @listid, @itemid, @groupid, @sectype)", cn))
+                            {
+                                cmd1.Parameters.AddWithValue("@siteid", site.ID);
+                                cmd1.Parameters.AddWithValue("@listid", list.ID);
+                                cmd1.Parameters.AddWithValue("@itemid", li.ID);
+                                cmd1.Parameters.AddWithValue("@groupid", ra.Member.ID);
+                                cmd1.Parameters.AddWithValue("@sectype", type);
+                                cmd1.ExecuteNonQuery();
+                            }
+
+                            using (SqlCommand cmd2 = new SqlCommand("SELECT * FROM RPTGROUPUSER where SITEID=@siteid and GROUPID=@groupid and USERID=@userid", cn))
+                            {
+                                cmd2.Parameters.AddWithValue("@siteid", site.ID);
+                                cmd2.Parameters.AddWithValue("@groupid", ra.Member.ID);
+                                cmd2.Parameters.AddWithValue("@userid", userid);
+                                using (SqlDataReader dr = cmd2.ExecuteReader())
+                                {
+                                    bool found = false;
+                                    if (dr.Read())
+                                    {
+                                        found = true;
+                                    }
+                                    dr.Close();
+
+                                    if (!found)
+                                    {
+                                        using (SqlCommand cmd3 = new SqlCommand("INSERT INTO RPTGROUPUSER (SITEID, GROUPID, USERID) VALUES (@siteid, @groupid, @userid)", cn))
+                                        {
+                                            cmd3.Parameters.AddWithValue("@siteid", site.ID);
+                                            cmd3.Parameters.AddWithValue("@groupid", ra.Member.ID);
+                                            cmd3.Parameters.AddWithValue("@userid", userid);
+                                            cmd3.ExecuteNonQuery();
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
+
+                    using (SqlCommand cmd4 = new SqlCommand("INSERT INTO RPTITEMGROUPS (SITEID, LISTID, ITEMID, GROUPID, SECTYPE) VALUES (@siteid, @listid, @itemid, @groupid, @sectype)", cn))
+                    {
+                        cmd4.Parameters.AddWithValue("@siteid", site.ID);
+                        cmd4.Parameters.AddWithValue("@listid", list.ID);
+                        cmd4.Parameters.AddWithValue("@itemid", li.ID);
+                        cmd4.Parameters.AddWithValue("@groupid", 999999);
+                        cmd4.Parameters.AddWithValue("@sectype", 1);
+                        cmd4.ExecuteNonQuery();
+                    }
                 }
-
-                cmd = new SqlCommand("INSERT INTO RPTITEMGROUPS (SITEID, LISTID, ITEMID, GROUPID, SECTYPE) VALUES (@siteid, @listid, @itemid, @groupid, @sectype)", cn);
-                cmd.Parameters.AddWithValue("@siteid", site.ID);
-                cmd.Parameters.AddWithValue("@listid", list.ID);
-                cmd.Parameters.AddWithValue("@itemid", li.ID);
-                cmd.Parameters.AddWithValue("@groupid", 999999);
-                cmd.Parameters.AddWithValue("@sectype", 1);
-                cmd.ExecuteNonQuery();
-
             }
             catch { }
-
+            finally
+            {
+                if (_dao != null)
+                    _dao.Dispose();
+            }
         }
 
         public Dictionary<string, SPRoleType> AddBasicSecurityGroups(SPWeb ew, string safeTitle, SPUser owner, SPListItem eI)

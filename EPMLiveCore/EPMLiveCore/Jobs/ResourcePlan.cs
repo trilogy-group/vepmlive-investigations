@@ -12,110 +12,135 @@ namespace EPMLiveCore.Jobs
     {
         private DataTable dtResLink;
         private DataTable dtResInfo;
-
+        StringBuilder sbErrors = null;
         public void execute(SPSite site, SPWeb web, string data)
         {
-            queuetype = 1;
-
-            if(!initJob(site))
-                return;
-
-            string resPlanLists = EPMLiveCore.CoreFunctions.getConfigSetting(site.RootWeb, "EPMLiveResPlannerLists");
-            if(resPlanLists.Trim() != "")
+            sbErrors = new StringBuilder();
+            try
             {
+                queuetype = 1;
 
-                string sFixLists = EPMLiveCore.CoreFunctions.getConfigSetting(site.RootWeb, "EPMLiveFixLists");
+                if (!initJob(site))
+                    return;
 
-                SPSecurity.RunWithElevatedPrivileges(delegate()
+                string resPlanLists = EPMLiveCore.CoreFunctions.getConfigSetting(site.RootWeb, "EPMLiveResPlannerLists");
+                if (resPlanLists.Trim() != "")
                 {
-                    cn.Open();
-                });
 
-                SqlCommand cmd = new SqlCommand("DELETE FROM RESINFO where siteid=@siteid", cn);
-                cmd.Parameters.AddWithValue("@siteid", site.ID);
-                cmd.ExecuteNonQuery();
+                    string sFixLists = EPMLiveCore.CoreFunctions.getConfigSetting(site.RootWeb, "EPMLiveFixLists");
 
-                cmd = new SqlCommand("DELETE FROM RESLINK where siteid=@siteid or siteid in (select siteid from reslink where weburl=@weburl)", cn);
-                cmd.Parameters.AddWithValue("@siteid", site.ID);
-                cmd.Parameters.AddWithValue("@weburl", site.ServerRelativeUrl);
-                cmd.ExecuteNonQuery();
-
-                cn.Close();
-
-                buildResPlanInfo();
-
-                int hours = 0;
-                string workdays = " ";
-                SPSecurity.RunWithElevatedPrivileges(delegate()
-                {
-                    int startHour = site.RootWeb.RegionalSettings.WorkDayStartHour / 60;
-                    int endHour = site.RootWeb.RegionalSettings.WorkDayEndHour / 60;
-                    hours = endHour - startHour - 1;
-
-                    int work = site.RootWeb.RegionalSettings.WorkDays;
-                    for(byte x = 0; x < 7; x++)
+                    SPSecurity.RunWithElevatedPrivileges(delegate()
                     {
-                        workdays = ((((work >> x) & 0x01) == 0x01) ? "" : "," + (7 - x)) + workdays;
-                    }
-                });
+                        cn.Open();
+                    });
 
-                if(workdays.Length > 1)
-                    workdays = workdays.Substring(1);
-
-                float webCount = 0;
-                base.totalCount = site.AllWebs.Count;
-
-                foreach(SPWeb w in site.AllWebs)
-                {
-                    try
+                    using (SqlCommand cmd = new SqlCommand("DELETE FROM RESINFO where siteid=@siteid", cn))
                     {
-                        sErrors += "<br>Processing Web: " + w.Title + " (" + w.ServerRelativeUrl + ")";
-                        processResPlan(w, resPlanLists, site.ID, hours, workdays);
-
+                        cmd.Parameters.AddWithValue("@siteid", site.ID);
+                        cmd.ExecuteNonQuery();
                     }
-                    catch { }
-                    w.Close();
-                    w.Dispose();
 
-                    updateProgress(webCount++);
+                    using (SqlCommand cmd1 = new SqlCommand("DELETE FROM RESLINK where siteid=@siteid or siteid in (select siteid from reslink where weburl=@weburl)", cn))
+                    {
+                        cmd1.Parameters.AddWithValue("@siteid", site.ID);
+                        cmd1.Parameters.AddWithValue("@weburl", site.ServerRelativeUrl);
+                        cmd1.ExecuteNonQuery();
+                    }
+
+                    cn.Close();
+
+                    buildResPlanInfo();
+
+                    int hours = 0;
+                    string workdays = " ";
+                    SPSecurity.RunWithElevatedPrivileges(delegate()
+                    {
+                        int startHour = site.RootWeb.RegionalSettings.WorkDayStartHour / 60;
+                        int endHour = site.RootWeb.RegionalSettings.WorkDayEndHour / 60;
+                        hours = endHour - startHour - 1;
+
+                        int work = site.RootWeb.RegionalSettings.WorkDays;
+                        for (byte x = 0; x < 7; x++)
+                        {
+                            workdays = ((((work >> x) & 0x01) == 0x01) ? "" : "," + (7 - x)) + workdays;
+                        }
+                    });
+
+                    if (workdays.Length > 1)
+                        workdays = workdays.Substring(1);
+
+                    float webCount = 0;
+                    base.totalCount = site.AllWebs.Count;
+
+                    foreach (SPWeb w in site.AllWebs)
+                    {
+                        try
+                        {
+                            sbErrors.Append("<br>Processing Web: " + w.Title + " (" + w.ServerRelativeUrl + ")");
+                            processResPlan(w, resPlanLists, site.ID, hours, workdays);
+
+                        }
+                        catch { }
+                        w.Close();
+                        w.Dispose();
+
+                        updateProgress(webCount++);
+                    }
+
+                    SPSecurity.RunWithElevatedPrivileges(delegate()
+                    {
+                        cn.Open();
+                    });
+                    storeResPlanInfo();
+                    cn.Close();
                 }
-
-                SPSecurity.RunWithElevatedPrivileges(delegate()
-                {
-                    cn.Open();
-                });
-                storeResPlanInfo();
-                cn.Close();
             }
-
-            finishJob();
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                sErrors = sbErrors.ToString();
+                sbErrors = null;
+                finishJob();
+                if (dtResLink != null)
+                    dtResLink.Dispose();
+                if (dtResInfo != null)
+                    dtResInfo.Dispose();
+                if (web != null)
+                    web.Dispose();
+                if (site != null)
+                    site.Dispose();
+                data = null;
+            }
         }
 
         private void processResPlan(SPWeb web, string resPlanLists, Guid siteId, int hours, string workdays)
         {
             string resurl = getResUrl(EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLiveResourceURL"));
 
-            if(resurl.Trim() != "")
+            if (resurl.Trim() != "")
             {
 
                 dtResLink.Rows.Add(new object[] { web.ServerRelativeUrl, resurl, siteId, workdays, hours });
 
-                if(resPlanLists.Trim().Length > 0)
+                if (resPlanLists.Trim().Length > 0)
                 {
                     string[] arLists = resPlanLists.Replace("\r\n", "\n").Split('\n');
 
-                    foreach(string sList in arLists)
+                    foreach (string sList in arLists)
                     {
-                        if(sList.Trim().Length > 0)
+                        if (sList.Trim().Length > 0)
                         {
-                            sErrors += "<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Processing: " + sList;
+                            sbErrors.Append("<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Processing: " + sList);
                             try
                             {
                                 SPList list = web.Lists[sList];
                                 SPQuery query = new SPQuery();
                                 query.Query = "<Where><And><And><And><IsNotNull><FieldRef Name=\"StartDate\"/></IsNotNull><IsNotNull><FieldRef Name=\"DueDate\"/></IsNotNull></And><IsNotNull><FieldRef Name=\"Work\"/></IsNotNull></And><IsNotNull><FieldRef Name=\"AssignedTo\"/></IsNotNull></And></Where>";
 
-                                foreach(SPListItem li in list.GetItems(query))
+                                foreach (SPListItem li in list.GetItems(query))
                                 {
                                     string project = "";
                                     string assignedTo = "";
@@ -135,7 +160,7 @@ namespace EPMLiveCore.Jobs
                                     catch { }
 
                                     SPFieldUserValueCollection uvc = new SPFieldUserValueCollection(web, assignedTo);
-                                    foreach(SPFieldUserValue uv in uvc)
+                                    foreach (SPFieldUserValue uv in uvc)
                                     {
                                         float work = 0;
                                         try
@@ -150,12 +175,12 @@ namespace EPMLiveCore.Jobs
 
                                 }
                             }
-                            catch(Exception ex)
+                            catch (Exception ex)
                             {
-                                if(ex.Message != "Value does not fall within the expected range.")
+                                if (ex.Message != "Value does not fall within the expected range.")
                                 {
                                     bErrors = true;
-                                    sErrors += "...<font color=\"red\">Error: " + ex.Message + "</font>";
+                                    sbErrors.Append("...<font color=\"red\">Error: " + ex.Message + "</font>");
                                 }
                             }
                         }
@@ -187,15 +212,15 @@ namespace EPMLiveCore.Jobs
 
         private void storeResPlanInfo()
         {
-            if(cn.State == ConnectionState.Open)
+            if (cn.State == ConnectionState.Open)
             {
 
-                using(SqlBulkCopy sbc = new SqlBulkCopy(cn))
+                using (SqlBulkCopy sbc = new SqlBulkCopy(cn))
                 {
                     sbc.DestinationTableName = "RESINFO";
                     // Number Of Records Processed In One Go 
                     int iRowCount = dtResInfo.Rows.Count;
-                    if(iRowCount > 500)
+                    if (iRowCount > 500)
                     {
                         iRowCount = 500;
                     }
@@ -207,12 +232,12 @@ namespace EPMLiveCore.Jobs
 
                 }
 
-                using(SqlBulkCopy sbc = new SqlBulkCopy(cn))
+                using (SqlBulkCopy sbc = new SqlBulkCopy(cn))
                 {
                     sbc.DestinationTableName = "RESLINK";
                     // Number Of Records Processed In One Go 
                     int iRowCount = dtResLink.Rows.Count;
-                    if(iRowCount > 500)
+                    if (iRowCount > 500)
                     {
                         iRowCount = 500;
                     }
@@ -231,7 +256,7 @@ namespace EPMLiveCore.Jobs
             try
             {
                 //resUrl = resUrl.Substring(resUrl.IndexOf("/", resUrl.IndexOf("//")+2));
-                if(resUrl.StartsWith("/"))
+                if (resUrl.StartsWith("/"))
                     return resUrl;
 
                 System.Uri u = new Uri(resUrl);

@@ -14,7 +14,7 @@ namespace EPMLiveCore.Jobs
         private DataTable dtResInfo;
         private string sResErrors = "";
         private bool bResErrors = false;
-
+        StringBuilder sbErrors = null;
         private void buildResPlanInfo()
         {
             dtResInfo = new DataTable();
@@ -79,6 +79,9 @@ namespace EPMLiveCore.Jobs
 
         public void execute(SPSite site, SPWeb web, string data)
         {
+            sbErrors = new StringBuilder();
+            try
+            {
             Guid ResJobUid = Guid.Empty;
             try
             {
@@ -98,25 +101,31 @@ namespace EPMLiveCore.Jobs
                     cn.Open();
                 });
 
-                SqlCommand cmd = new SqlCommand("DELETE FROM RESINFO where siteid=@siteid", cn);
+                    using (SqlCommand cmd = new SqlCommand("DELETE FROM RESINFO where siteid=@siteid", cn))
+                    {
                 cmd.Parameters.AddWithValue("@siteid", site.ID);
                 cmd.ExecuteNonQuery();
+                    }
 
-                cmd = new SqlCommand("DELETE FROM RESLINK where siteid=@siteid or siteid in (select siteid from reslink where weburl=@weburl)", cn);
-                cmd.Parameters.AddWithValue("@siteid", site.ID);
-                cmd.Parameters.AddWithValue("@weburl", site.ServerRelativeUrl);
-                cmd.ExecuteNonQuery();
+                    using (SqlCommand cmd1 = new SqlCommand("DELETE FROM RESLINK where siteid=@siteid or siteid in (select siteid from reslink where weburl=@weburl)", cn))
+                    {
+                        cmd1.Parameters.AddWithValue("@siteid", site.ID);
+                        cmd1.Parameters.AddWithValue("@weburl", site.ServerRelativeUrl);
+                        cmd1.ExecuteNonQuery();
+                    }
 
-                cmd = new SqlCommand("select timerjobuid from vwQueueTimer where siteguid=@siteguid and jobtype=1", cn);
-                cmd.Parameters.AddWithValue("@siteguid", site.ID);
-                SqlDataReader dr = cmd.ExecuteReader();
-
+                    using (SqlCommand cmd2 = new SqlCommand("select timerjobuid from vwQueueTimer where siteguid=@siteguid and jobtype=1", cn))
+                    {
+                        cmd2.Parameters.AddWithValue("@siteguid", site.ID);
+                        using (SqlDataReader dr = cmd2.ExecuteReader())
+                        {
                 if (dr.Read())
                 {
                     ResJobUid = dr.GetGuid(0);
                 }
                 dr.Close();
-
+                        }
+                    }
                 cn.Close();
 
                 buildResPlanInfo();
@@ -152,7 +161,7 @@ namespace EPMLiveCore.Jobs
                 {
                     try
                     {
-                        sErrors += "<br>Processing Web: " + w.Title + " (" + w.ServerRelativeUrl + ")";
+                            sbErrors.Append("<br>Processing Web: " + w.Title + " (" + w.ServerRelativeUrl + ")");
                         sResErrors += "<br>Processing Web: " + w.Title + " (" + w.ServerRelativeUrl + ")";
                         processWeb(w, sFixLists, ref counter);
                         processResPlan(w, resPlanLists, site.ID, hours, workdays);
@@ -160,19 +169,14 @@ namespace EPMLiveCore.Jobs
                     catch { }
                     w.Close();
                     w.Dispose();
-
-
                 }
 
                 //=========================================
-
-
-
             }
             catch (Exception ex)
             {
                 bErrors = true;
-                sErrors += "Execute Error: " + ex.Message;
+                    sbErrors.Append("Execute Error: " + ex.Message);
             }
             finishJob();
 
@@ -185,25 +189,45 @@ namespace EPMLiveCore.Jobs
             if (ResJobUid != Guid.Empty)
             {
                 //cmd.ExecuteNonQuery();
-                SqlCommand cmd = new SqlCommand("update queue set status = 2, dtfinished=GETDATE() where timerjobuid=@timerjobuid", cn);
+                    using (SqlCommand cmd = new SqlCommand("update queue set status = 2, dtfinished=GETDATE() where timerjobuid=@timerjobuid", cn))
+                    {
                 cmd.Parameters.AddWithValue("@timerjobuid", ResJobUid);
                 cmd.ExecuteNonQuery();
+                    }
 
-                cmd = new SqlCommand("DELETE FROM EPMLIVE_LOG where timerjobuid=@timerjobuid", cn);
-                cmd.Parameters.AddWithValue("@timerjobuid", ResJobUid);
-                cmd.ExecuteNonQuery();
-
-                cmd = new SqlCommand("INSERT INTO EPMLIVE_LOG (timerjobuid,result,resulttext) VALUES (@timerjobuid,@result,@resulttext)", cn);
+                    using (SqlCommand cmd1 = new SqlCommand("DELETE FROM EPMLIVE_LOG where timerjobuid=@timerjobuid", cn))
+                    {
+                        cmd1.Parameters.AddWithValue("@timerjobuid", ResJobUid);
+                        cmd1.ExecuteNonQuery();
+                    }
+                    using (SqlCommand cmd2 = new SqlCommand("INSERT INTO EPMLIVE_LOG (timerjobuid,result,resulttext) VALUES (@timerjobuid,@result,@resulttext)", cn))
+                    {
                 if (bResErrors)
-                    cmd.Parameters.AddWithValue("@result", "Errors");
+                            cmd2.Parameters.AddWithValue("@result", "Errors");
                 else
-                    cmd.Parameters.AddWithValue("@result", "No Errors");
-                cmd.Parameters.AddWithValue("@resulttext", sResErrors);
-                cmd.Parameters.AddWithValue("@timerjobuid", ResJobUid);
-                cmd.ExecuteNonQuery();
+                            cmd2.Parameters.AddWithValue("@result", "No Errors");
+                        cmd2.Parameters.AddWithValue("@resulttext", sResErrors);
+                        cmd2.Parameters.AddWithValue("@timerjobuid", ResJobUid);
+                        cmd2.ExecuteNonQuery();
+                    }
             }
 
             cn.Close();
+        }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                sErrors = sbErrors.ToString();
+                sbErrors = null;
+                if (web != null)
+                    web.Dispose();
+                if (site != null)
+                    site.Dispose();
+                data = null;
+            }
         }
 
 
@@ -321,7 +345,7 @@ namespace EPMLiveCore.Jobs
                     {
                         try
                         {
-                            sErrors += "<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Processing List: " + sList;
+                            sbErrors.Append("<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Processing List: " + sList);
                             oList = web.Lists.TryGetList(sList);
                             if (oList != null)
                             {
@@ -365,9 +389,9 @@ namespace EPMLiveCore.Jobs
                                 catch (Exception exc)
                                 {
                                     bErrors = true;
-                                    sErrors += "...<font color=\"red\">Error: " + exc.Message + "</font>";
+                                    sbErrors.Append("...<font color=\"red\">Error: " + exc.Message + "</font>");
                                 }
-                                sErrors += "...Success";
+                                sbErrors.Append("...Success");
                             }
                         }
                         catch (Exception exc)
@@ -375,11 +399,11 @@ namespace EPMLiveCore.Jobs
                             if (exc.Message != "Value does not fall within the expected range.")
                             {
                                 bErrors = true;
-                                sErrors += "...<font color=\"red\">Error: " + exc.Message + "</font>";
+                                sbErrors.Append("...<font color=\"red\">Error: " + exc.Message + "</font>");
                             }
                             else
                             {
-                                sErrors += "...Skipping";
+                                sbErrors.Append("...Skipping");
                             }
                         }
                     }

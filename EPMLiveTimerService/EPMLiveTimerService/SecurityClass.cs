@@ -144,24 +144,30 @@ namespace TimerService
                         string sConn = EPMLiveCore.CoreFunctions.getConnectionString(webApp.Id);
                         if (sConn != "")
                         {
-                            SqlConnection cn = new SqlConnection(sConn);
-                            cn.Open();
-
-                            SqlCommand cmd = new SqlCommand("spSecGetQueue", cn);
-                            cmd.CommandType = CommandType.StoredProcedure;
-                            cmd.Parameters.AddWithValue("@servername", System.Environment.MachineName);
-                            cmd.Parameters.AddWithValue("@maxthreads", maxThreads);
-
-                            DataSet ds = new DataSet();
-                            SqlDataAdapter da = new SqlDataAdapter(cmd);
-                            da.Fill(ds);
-
-                            foreach (DataRow dr in ds.Tables[0].Rows)
+                            using (SqlConnection cn = new SqlConnection(sConn))
                             {
-                                startProcess(dr, cn);
-                            }
+                                cn.Open();
 
-                            cn.Close();
+                                using (SqlCommand cmd = new SqlCommand("spSecGetQueue", cn))
+                                {
+                                    cmd.CommandType = CommandType.StoredProcedure;
+                                    cmd.Parameters.AddWithValue("@servername", System.Environment.MachineName);
+                                    cmd.Parameters.AddWithValue("@maxthreads", maxThreads);
+
+                                    DataSet ds = new DataSet();
+                                    using (SqlDataAdapter da = new SqlDataAdapter(cmd))
+                                    {
+                                        da.Fill(ds);
+
+                                        foreach (DataRow dr in ds.Tables[0].Rows)
+                                        {
+                                            startProcess(dr, cn);
+                                        }
+                                    }
+                                }
+
+                                cn.Close();
+                            }
                         }
                     }
                 }
@@ -191,10 +197,12 @@ namespace TimerService
 
                 if (d.index > -1)
                 {
-                    SqlCommand cmd = new SqlCommand("UPDATE ITEMSEC SET STATUS = 1 where ITEM_SEC_ID=@id", cn);
-                    cmd.Parameters.AddWithValue("@id", dr["ITEM_SEC_ID"].ToString());
-                    cmd.ExecuteNonQuery();
-                 
+                    using (SqlCommand cmd = new SqlCommand("UPDATE ITEMSEC SET STATUS = 1 where ITEM_SEC_ID=@id", cn))
+                    {
+                        cmd.Parameters.AddWithValue("@id", dr["ITEM_SEC_ID"].ToString());
+                        cmd.ExecuteNonQuery();
+                    }
+
                     bw.RunWorkerAsync(d);
 
                 }
@@ -234,17 +242,19 @@ namespace TimerService
                     }
 
                 }
-                catch (Exception ex) 
-                {                    
+                catch (Exception ex)
+                {
                     logMessageinDatabase(dr["ITEM_SEC_ID"].ToString(), ex.Message, cn);
                 }
 
-                SqlCommand cmd = new SqlCommand("delete from ITEMSEC where ITEM_SEC_ID=@id", cn);
-                cmd.Parameters.AddWithValue("@id", dr["ITEM_SEC_ID"].ToString());
-                cmd.ExecuteNonQuery();
+                using (SqlCommand cmd = new SqlCommand("delete from ITEMSEC where ITEM_SEC_ID=@id", cn))
+                {
+                    cmd.Parameters.AddWithValue("@id", dr["ITEM_SEC_ID"].ToString());
+                    cmd.ExecuteNonQuery();
+                }
                 cn.Close();
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 logMessageinDatabase(dr["ITEM_SEC_ID"].ToString(), ex.Message, cn);
             }

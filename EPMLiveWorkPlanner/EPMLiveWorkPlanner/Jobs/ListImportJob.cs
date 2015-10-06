@@ -23,13 +23,17 @@ namespace EPMLiveWorkPlanner
             catch { }
             return "";
         }
-
+        StringBuilder sbErrors = null;
         public void execute(SPSite osite, SPWeb oweb, string data)
         {
-
+            sbErrors = new StringBuilder();
+            XmlDocument docNew = null;
+            Hashtable hshMapping = null;
+            DataSet dsResources = null;
+            XmlDocument docRet = null;
             try
             {
-                XmlDocument docNew = new XmlDocument();
+                docNew = new XmlDocument();
                 docNew.LoadXml(data);
 
                 XmlAttribute attr = docNew.CreateAttribute("UIDColumn");
@@ -45,7 +49,7 @@ namespace EPMLiveWorkPlanner
                 docNew.FirstChild.Attributes.Append(attr);
 
                 bool bAttachedItemsOnly = true;
-                Hashtable hshMapping = new Hashtable();
+                hshMapping = new Hashtable();
                 string sID = base.ItemID.ToString();
                 string sPlanner = "";
                 string sList = "";
@@ -87,17 +91,17 @@ namespace EPMLiveWorkPlanner
                 if (sPlanner == "")
                 {
                     bErrors = true;
-                    sErrors = "No Planner Specified";
+                    sbErrors.Append("No Planner Specified");
                 }
                 else if (sID == "")
                 {
                     bErrors = true;
-                    sErrors = "No ID Specified";
+                    sbErrors.Append("No ID Specified");
                 }
                 else if (sList == "")
                 {
                     bErrors = true;
-                    sErrors = "No List Specified";
+                    sbErrors.Append("No List Specified");
                 }
                 else
                 {
@@ -109,8 +113,8 @@ namespace EPMLiveWorkPlanner
                         WorkPlannerAPI.PlannerProps props = WorkPlannerAPI.getSettings(oweb, sPlanner);
 
                         SPList oProjectList = oweb.Lists[props.sListProjectCenter];
-
-                        DataSet dsResources = WorkPlannerAPI.GetResourceTable(props, oProjectList.ID, sID, oweb);
+                        dsResources = new DataSet();
+                        dsResources = WorkPlannerAPI.GetResourceTable(props, oProjectList.ID, sID, oweb);
 
                         bool bMatchingTaskCenter = false;
 
@@ -138,7 +142,7 @@ namespace EPMLiveWorkPlanner
                             ImportTasksFromListTasks(oList.Items, docNew, hshMapping, dsResources, bMatchingTaskCenter, docPlan);
                         }
 
-                        XmlDocument docRet = new XmlDocument();
+                        docRet = new XmlDocument();
                         docRet.LoadXml(WorkPlannerAPI.ImportTasks(docNew, oweb));
 
                         if (docRet.FirstChild.Attributes["Status"].Value == "1")
@@ -146,19 +150,34 @@ namespace EPMLiveWorkPlanner
                             bErrors = true;
                         }
 
-                        sErrors = docRet.OuterXml;
+                        sbErrors.Append(docRet.OuterXml);
                     }
                     else
                     {
                         bErrors = true;
-                        sErrors = "List could not be found.";
+                        sbErrors.Append("List could not be found.");
                     }
                 }
             }
             catch (Exception ex)
             {
                 bErrors = true;
-                sErrors = "Error importing list: " + ex.Message + "";
+                sbErrors.Append("Error importing list: " + ex.Message + "");
+            }
+            finally
+            {
+                sErrors = sbErrors.ToString();
+                sbErrors = null;
+                docNew = null;
+                hshMapping = null;
+                if (dsResources != null)
+                    dsResources.Dispose();
+                docRet = null;
+                if (oweb != null)
+                    oweb.Dispose();
+                if (osite != null)
+                    osite.Dispose();
+                data = null;
             }
 
         }
@@ -328,7 +347,6 @@ namespace EPMLiveWorkPlanner
                 }
             }
             catch { }
-
             return val;
         }
     }

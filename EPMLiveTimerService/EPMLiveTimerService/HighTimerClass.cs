@@ -107,13 +107,17 @@ namespace TimerService
             foreach(SPWebApplication webApp in SPWebService.ContentService.WebApplications)
             {
                 string sConn = EPMLiveCore.CoreFunctions.getConnectionString(webApp.Id);
-                if(sConn != "")
+                if (sConn != "")
                 {
-                    SqlConnection cn = new SqlConnection(sConn);
-                    cn.Open();
-                    SqlCommand cmd = new SqlCommand("update queue set status = 0 where status = 1", cn);
-                    cmd.ExecuteNonQuery();
-                    cn.Close();
+                    using (SqlConnection cn = new SqlConnection(sConn))
+                    {
+                        cn.Open();
+                        using (SqlCommand cmd = new SqlCommand("update queue set status = 0 where status = 1", cn))
+                        {
+                            cmd.ExecuteNonQuery();
+                        }
+                        cn.Close();
+                    }
                 }
             }
 
@@ -148,28 +152,34 @@ namespace TimerService
                         string sConn = EPMLiveCore.CoreFunctions.getConnectionString(webApp.Id);
                         if (sConn != "")
                         {
-                            SqlConnection cn = new SqlConnection(sConn);
-                            cn.Open();
-                            SqlCommand cmd = new SqlCommand("SELECT TOP " + maxThreads + " queueuid,timerjobuid,siteguid,webguid,listguid,itemid,jobtype,jobdata,userid,netassembly,netclass,title,[key] from vwQueueTimer where status=0 and priority <= 10 order by priority,dtcreated asc", cn);
-                            DataSet ds = new DataSet();
-                            SqlDataAdapter da = new SqlDataAdapter(cmd);
-                            da.Fill(ds);
-
-                            foreach (DataRow dr in ds.Tables[0].Rows)
+                            using (SqlConnection cn = new SqlConnection(sConn))
                             {
-                                RunnerData rd = new RunnerData();
-                                rd.cn = sConn;
-                                rd.dr = dr;
-                                if (startProcess(rd))
+                                cn.Open();
+                                using (SqlCommand cmd = new SqlCommand("SELECT TOP " + maxThreads + " queueuid,timerjobuid,siteguid,webguid,listguid,itemid,jobtype,jobdata,userid,netassembly,netclass,title,[key] from vwQueueTimer where status=0 and priority <= 10 order by priority,dtcreated asc", cn))
                                 {
-                                    cmd = new SqlCommand("UPDATE queue set status=1,dtstarted = GETDATE() where queueuid=@id", cn);
-                                    cmd.Parameters.AddWithValue("@id", dr["queueuid"].ToString());
-                                    cmd.ExecuteNonQuery();
+                                    DataSet ds = new DataSet();
+                                    using (SqlDataAdapter da = new SqlDataAdapter(cmd))
+                                    {
+                                        da.Fill(ds);
+
+                                        foreach (DataRow dr in ds.Tables[0].Rows)
+                                        {
+                                            RunnerData rd = new RunnerData();
+                                            rd.cn = sConn;
+                                            rd.dr = dr;
+                                            if (startProcess(rd))
+                                            {
+                                                using (SqlCommand cmd1 = new SqlCommand("UPDATE queue set status=1,dtstarted = GETDATE() where queueuid=@id", cn))
+                                                {
+                                                    cmd1.Parameters.AddWithValue("@id", dr["queueuid"].ToString());
+                                                    cmd1.ExecuteNonQuery();
+                                                }
+                                            }
+                                        }
+                                    }
                                 }
+                                cn.Close();
                             }
-
-                            cn.Close();
-
 
                         }
 
@@ -221,12 +231,16 @@ namespace TimerService
             {
                 if (ex.Message.Contains("could not be found"))
                 {
-                    SqlConnection cn = new SqlConnection(rd.cn);
-                    cn.Open();
-                    SqlCommand cmd = new SqlCommand("DELETE FROM TIMERJOBS WHERE siteguid=@siteguid", cn);
-                    cmd.Parameters.AddWithValue("@siteguid", dr["siteguid"].ToString());
-                    cmd.ExecuteNonQuery();
-                    cn.Close();
+                    using (SqlConnection cn = new SqlConnection(rd.cn))
+                    {
+                        cn.Open();
+                        using (SqlCommand cmd = new SqlCommand("DELETE FROM TIMERJOBS WHERE siteguid=@siteguid", cn))
+                        {
+                            cmd.Parameters.AddWithValue("@siteguid", dr["siteguid"].ToString());
+                            cmd.ExecuteNonQuery();
+                        }
+                        cn.Close();
+                    }
                 }
                 else
                 {

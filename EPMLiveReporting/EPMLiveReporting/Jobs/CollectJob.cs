@@ -8,6 +8,7 @@ using EPMLiveCore.API;
 using EPMLiveCore.Infrastructure;
 using EPMLiveReportsAdmin.Properties;
 using Microsoft.SharePoint;
+using System.Text;
 
 namespace EPMLiveReportsAdmin.Jobs
 {
@@ -17,6 +18,7 @@ namespace EPMLiveReportsAdmin.Jobs
     /// </summary>
     public class CollectJob : BaseJob
     {
+        StringBuilder sbErrors = null;
         private void setRPTSettings(EPMData epmdata, SPSite site)
         {
             int hours = 0;
@@ -45,13 +47,13 @@ namespace EPMLiveReportsAdmin.Jobs
                 if (!sResults.Equals("success"))
                 {
                     bErrors = true;
-                    sErrors += "<font color=\"red\">Error Updating RPTSettings: " + sResults + "</font><br>";
+                    sbErrors.Append("<font color=\"red\">Error Updating RPTSettings: " + sResults + "</font><br>");
                 }
             }
             catch (Exception ex)
             {
                 bErrors = true;
-                sErrors += "<font color=\"red\">Error Updating RPTSettings: " + ex.Message + "</font><br>";
+                sbErrors.Append("<font color=\"red\">Error Updating RPTSettings: " + ex.Message + "</font><br>");
             }
         }
 
@@ -61,25 +63,29 @@ namespace EPMLiveReportsAdmin.Jobs
             string sCn = "";
             try
             {
-                var cmd =
+                using (var cmd =
                     new SqlCommand(
                         "SELECT Username, Password, DatabaseServer, DatabaseName from RPTDATABASES where SiteId=@SiteId",
-                        cn);
-                cmd.Parameters.AddWithValue("@SiteId", web.Site.ID);
-                SqlDataReader dr = cmd.ExecuteReader();
-                if (dr.Read())
+                        cn))
                 {
-                    sCn = "Data Source=" + dr.GetString(2) + ";Initial Catalog=" + dr.GetString(3);
-                    if (!dr.IsDBNull(0) && dr.GetString(0) != "")
-                        sCn += ";User ID=" + dr.GetString(0) + ";Password=" + EPMData.Decrypt(dr.GetString(1));
-                    else
-                        sCn += ";Trusted_Connection=True";
+                    cmd.Parameters.AddWithValue("@SiteId", web.Site.ID);
+                    using (SqlDataReader dr = cmd.ExecuteReader())
+                    {
+                        if (dr.Read())
+                        {
+                            sCn = "Data Source=" + dr.GetString(2) + ";Initial Catalog=" + dr.GetString(3);
+                            if (!dr.IsDBNull(0) && dr.GetString(0) != "")
+                                sCn += ";User ID=" + dr.GetString(0) + ";Password=" + EPMData.Decrypt(dr.GetString(1));
+                            else
+                                sCn += ";Trusted_Connection=True";
+                        }
+                    }
                 }
             }
             catch (Exception ex)
             {
                 bErrors = true;
-                sErrors += "<font color=\"red\">Error: " + ex.Message + "</font><br>";
+                sbErrors.Append("<font color=\"red\">Error: " + ex.Message + "</font><br>");
             }
             cn.Close();
             return sCn;
@@ -88,10 +94,13 @@ namespace EPMLiveReportsAdmin.Jobs
 
         public void execute(SPSite site, SPWeb web, string data)
         {
+            sbErrors = new StringBuilder();
+            EPMData epmdata = null;
+            Hashtable hshMessages = null;
+            SPWeb rootWeb = null;
             try
             {
-                EPMData epmdata = null;
-                var hshMessages = new Hashtable();
+                hshMessages = new Hashtable();
 
                 #region Process security
 
@@ -103,15 +112,14 @@ namespace EPMLiveReportsAdmin.Jobs
                     try
                     {
                         ProcessSecurity.ProcessSecurityGroups(site, epmdata.GetClientReportingConnection, "");
-                        sErrors += "Completed processing security groups for site: " + site.Url + ".</br>";
+                        sbErrors.Append("Completed processing security groups for site: " + site.Url + ".</br>");
                     }
                     catch (Exception ex)
                     {
                         var message = ex.InnerException != null ? ex.InnerException.Message : ex.Message;
 
                         bErrors = true;
-                        sErrors += "<font color=\"red\">Error processing security on site: " + site.Url + ". Error: " +
-                                   message + "</font><br>";
+                        sbErrors.Append("<font color=\"red\">Error processing security on site: " + site.Url + ". Error: " + message + "</font><br>");
                     }
 
                     if (string.IsNullOrEmpty(data))
@@ -135,14 +143,14 @@ namespace EPMLiveReportsAdmin.Jobs
                             var message = ex.InnerException != null ? ex.InnerException.Message : ex.Message;
 
                             bErrors = true;
-                            sErrors += "<font color=\"red\">Error Updating RPTSettings: " + message + "</font><br>";
+                            sbErrors.Append("<font color=\"red\">Error Updating RPTSettings: " + message + "</font><br>");
                         }
                     }
                 }
                 catch (Exception ex)
                 {
                     bErrors = true;
-                    sErrors += "<font color=\"red\">Error Updating base: " + ex.Message + "</font><br>";
+                    sbErrors.Append("<font color=\"red\">Error Updating base: " + ex.Message + "</font><br>");
                 }
 
                 #endregion
@@ -208,16 +216,16 @@ namespace EPMLiveReportsAdmin.Jobs
                     if (tErrors)
                         bErrors = true;
                     if (bErrors)
-                        sErrors += "<font color=\"red\">Error Processing Timesheets: " + err + "</font><br>";
+                        sbErrors.Append("<font color=\"red\">Error Processing Timesheets: " + err + "</font><br>");
                     else
-                        sErrors += "Processed Timesheets<br>";
+                        sbErrors.Append("Processed Timesheets<br>");
                 }
                 catch (Exception ex)
                 {
                     var message = ex.InnerException != null ? ex.InnerException.Message : ex.Message;
 
                     bErrors = true;
-                    sErrors += "<font color=\"red\">Error Processing Timesheets: " + message + "</font><br>";
+                    sbErrors.Append("<font color=\"red\">Error Processing Timesheets: " + message + "</font><br>");
                 }
 
                 #endregion
@@ -226,9 +234,10 @@ namespace EPMLiveReportsAdmin.Jobs
 
                 try
                 {
+
                     if (site.Features[new Guid("158c5682-d839-4248-b780-82b4710ee152")] != null)
                     {
-                        SPWeb rootWeb = site.RootWeb;
+                        rootWeb = site.RootWeb;
 
                         string basePath = CoreFunctions.getConfigSetting(rootWeb, "epkbasepath");
                         string ppmId = CoreFunctions.getConfigSetting(rootWeb, "ppmpid");
@@ -252,7 +261,7 @@ namespace EPMLiveReportsAdmin.Jobs
                                     getReportingConnection(web) + "\" Execute=\"1\" /></Data></ExecuteReportExtract>"
                                 });
 
-                        sErrors += "Processed PfE Reporting: " + message + "<br>";
+                        sbErrors.Append("Processed PfE Reporting: " + message + "<br>");
                     }
                 }
                 catch (Exception ex)
@@ -260,7 +269,7 @@ namespace EPMLiveReportsAdmin.Jobs
                     var message = ex.InnerException != null ? ex.InnerException.Message : ex.Message;
 
                     bErrors = true;
-                    sErrors += "<font color=\"red\">Error Processing PfE Reporting: " + message + "</font><br>";
+                    sbErrors.Append("<font color=\"red\">Error Processing PfE Reporting: " + message + "</font><br>");
                 }
 
                 #endregion Process PFE Data
@@ -276,7 +285,7 @@ namespace EPMLiveReportsAdmin.Jobs
                     var message = exReqSP.InnerException != null ? exReqSP.InnerException.Message : exReqSP.Message;
 
                     bErrors = true;
-                    sErrors += "<font color=\"red\">Error while checking SPRequirement: " + message + "</font><br>";
+                    sbErrors.Append("<font color=\"red\">Error while checking SPRequirement: " + message + "</font><br>");
                 }
 
                 try
@@ -288,9 +297,9 @@ namespace EPMLiveReportsAdmin.Jobs
                     var message = exSchema.InnerException != null ? exSchema.InnerException.Message : exSchema.Message;
 
                     bErrors = true;
-                    sErrors += "<font color=\"red\">Error while updating schema: " + message + "</font><br>";
+                    sbErrors.Append("<font color=\"red\">Error while updating schema: " + message + "</font><br>");
                 }
-                
+
                 #endregion
 
                 #region Clean Data
@@ -304,7 +313,7 @@ namespace EPMLiveReportsAdmin.Jobs
                     var message = ex.InnerException != null ? ex.InnerException.Message : ex.Message;
 
                     bErrors = true;
-                    sErrors += "<font color=\"red\">Error while cleaning tables: " + message + "</font><br>";
+                    sbErrors.Append("<font color=\"red\">Error while cleaning tables: " + message + "</font><br>");
                 }
 
                 #endregion
@@ -315,20 +324,26 @@ namespace EPMLiveReportsAdmin.Jobs
                 {
                     if (string.IsNullOrEmpty(data))
                     {
+                        DataSet ds = null;
                         try
                         {
-                            DataSet ds = new DataSet();
-                            var cmd2 = new SqlCommand("SELECT TABLENAME FROM RPTList", epmdata.GetClientReportingConnection);
-                            SqlDataAdapter da = new SqlDataAdapter(cmd2);
-                            da.Fill(ds);
-
-                            foreach (DataRow dr in ds.Tables[0].Rows)
+                            ds = new DataSet();
+                            using (var cmd1 = new SqlCommand("SELECT TABLENAME FROM RPTList", epmdata.GetClientReportingConnection))
                             {
-                                cmd2 = new SqlCommand("spUpdateStatusFields", epmdata.GetClientReportingConnection);
-                                cmd2.CommandType = CommandType.StoredProcedure;
-                                cmd2.Parameters.AddWithValue("@listtable", dr[0].ToString());
+                                using (SqlDataAdapter da = new SqlDataAdapter(cmd1))
+                                {
+                                    da.Fill(ds);
 
-                                cmd2.ExecuteNonQuery();
+                                    foreach (DataRow dr in ds.Tables[0].Rows)
+                                    {
+                                        using (var cmd2 = new SqlCommand("spUpdateStatusFields", epmdata.GetClientReportingConnection))
+                                        {
+                                            cmd2.CommandType = CommandType.StoredProcedure;
+                                            cmd2.Parameters.AddWithValue("@listtable", dr[0].ToString());
+                                            cmd2.ExecuteNonQuery();
+                                        }
+                                    }
+                                }
                             }
                         }
                         catch (Exception ex)
@@ -336,7 +351,12 @@ namespace EPMLiveReportsAdmin.Jobs
                             var message = ex.InnerException != null ? ex.InnerException.Message : ex.Message;
 
                             bErrors = true;
-                            sErrors += "<font color=\"red\">Error updating status fields: " + message + "</font><br>";
+                            sbErrors.Append("<font color=\"red\">Error updating status fields: " + message + "</font><br>");
+                        }
+                        finally
+                        {
+                            if (ds != null)
+                                ds.Dispose();
                         }
                     }
                     else
@@ -347,28 +367,41 @@ namespace EPMLiveReportsAdmin.Jobs
                             {
                                 if (sList != "")
                                 {
+                                    DataSet ds = null;
+                                    SPList list = null;
                                     try
                                     {
-                                        SPList list = web.Lists[sList];
+                                        list = web.Lists[sList];
 
-                                        DataSet ds = new DataSet();
-                                        var cmd2 = new SqlCommand("SELECT TABLENAME FROM RPTList where listid=@listid", epmdata.GetClientReportingConnection);
-                                        cmd2.Parameters.AddWithValue("@listid", list.ID);
-                                        SqlDataAdapter da = new SqlDataAdapter(cmd2);
-                                        da.Fill(ds);
+                                        ds = new DataSet();
+                                        using (var cmd1 = new SqlCommand("SELECT TABLENAME FROM RPTList where listid=@listid", epmdata.GetClientReportingConnection))
+                                        {
+                                            cmd1.Parameters.AddWithValue("@listid", list.ID);
+                                            using (SqlDataAdapter da = new SqlDataAdapter(cmd1))
+                                            {
+                                                da.Fill(ds);
 
-                                        cmd2 = new SqlCommand("spUpdateStatusFields", epmdata.GetClientReportingConnection);
-                                        cmd2.CommandType = CommandType.StoredProcedure;
-                                        cmd2.Parameters.AddWithValue("@listtable", ds.Tables[0].Rows[0][0].ToString());
-
-                                        cmd2.ExecuteNonQuery();
+                                                using (var cmd2 = new SqlCommand("spUpdateStatusFields", epmdata.GetClientReportingConnection))
+                                                {
+                                                    cmd2.CommandType = CommandType.StoredProcedure;
+                                                    cmd2.Parameters.AddWithValue("@listtable", ds.Tables[0].Rows[0][0].ToString());
+                                                    cmd2.ExecuteNonQuery();
+                                                }
+                                            }
+                                        }
                                     }
                                     catch (Exception ex)
                                     {
                                         var message = ex.InnerException != null ? ex.InnerException.Message : ex.Message;
 
                                         bErrors = true;
-                                        sErrors += "<font color=\"red\">Error updating status fields (" + sList + "): " + message + "</font><br>";
+                                        sbErrors.Append("<font color=\"red\">Error updating status fields (" + sList + "): " + message + "</font><br>");
+                                    }
+                                    finally
+                                    {
+                                        if (ds != null)
+                                            ds.Dispose();
+                                        list = null;
                                     }
                                 }
                             }
@@ -378,7 +411,7 @@ namespace EPMLiveReportsAdmin.Jobs
                             var message = ex.InnerException != null ? ex.InnerException.Message : ex.Message;
 
                             bErrors = true;
-                            sErrors += "<font color=\"red\">Error updating status fields: " + message + "</font><br>";
+                            sbErrors.Append("<font color=\"red\">Error updating status fields: " + message + "</font><br>");
                         }
 
                     }
@@ -389,19 +422,20 @@ namespace EPMLiveReportsAdmin.Jobs
                         {
                             try
                             {
-                                var cmd2 = new SqlCommand("spUpdateStatusFields", epmdata.GetClientReportingConnection);
-                                cmd2.CommandType = CommandType.StoredProcedure;
-                                cmd2.Parameters.AddWithValue("@listtable", list);
+                                using (var cmd2 = new SqlCommand("spUpdateStatusFields", epmdata.GetClientReportingConnection))
+                                {
+                                    cmd2.CommandType = CommandType.StoredProcedure;
+                                    cmd2.Parameters.AddWithValue("@listtable", list);
 
-                                cmd2.ExecuteNonQuery();
+                                    cmd2.ExecuteNonQuery();
+                                }
                             }
                             catch (Exception ex)
                             {
                                 var message = ex.InnerException != null ? ex.InnerException.Message : ex.Message;
 
                                 bErrors = true;
-                                sErrors += "<font color=\"red\">Error running schedule field update for (" + list + "): " +
-                                           message + "</font><br>";
+                                sbErrors.Append("<font color=\"red\">Error running schedule field update for (" + list + "): " + message + "</font><br>");
                             }
 
                             if (!hshMessages.Contains(list))
@@ -409,14 +443,14 @@ namespace EPMLiveReportsAdmin.Jobs
                         }
                     }
 
-                    sErrors += "<br>Updated Status Fields<br>";
+                    sbErrors.Append("<br>Updated Status Fields<br>");
                 }
                 catch (Exception ex)
                 {
                     var message = ex.InnerException != null ? ex.InnerException.Message : ex.Message;
 
                     bErrors = true;
-                    sErrors += "<font color=\"red\">Error running schedule field update: " + message + "</font><br>";
+                    sbErrors.Append("<font color=\"red\">Error running schedule field update: " + message + "</font><br>");
                 }
 
                 #endregion
@@ -432,35 +466,53 @@ namespace EPMLiveReportsAdmin.Jobs
                     var message = ex.InnerException != null ? ex.InnerException.Message : ex.Message;
 
                     bErrors = true;
-                    sErrors += "<font color=\"red\">Clear Cache Error: " + message + "</font><br>";
+                    sbErrors.Append("<font color=\"red\">Clear Cache Error: " + message + "</font><br>");
                 }
 
                 #endregion
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 var message = ex.InnerException != null ? ex.InnerException.Message : ex.Message;
 
                 bErrors = true;
-                sErrors += "<font color=\"red\">General Execute Error: " + message + "</font><br>";
+                sbErrors.Append("<font color=\"red\">General Execute Error: " + message + "</font><br>");
             }
-
-            finishJob();
+            finally
+            {
+                sErrors = sbErrors.ToString();
+                sbErrors = null;
+                finishJob();
+                hshMessages = null;
+                if (epmdata != null)
+                    epmdata.Dispose();
+                if (web != null)
+                    web.Dispose();
+                if (rootWeb != null)
+                    rootWeb.Dispose();
+                if (site != null)
+                    site.Dispose();
+                data = null;
+            }
         }
 
 
         private void CheckSchema(SqlConnection cn)
         {
-            var cmd = new SqlCommand(Resources.CheckSchema, cn);
-            cmd.CommandType = CommandType.Text;
-            cmd.ExecuteNonQuery();
+            using (var cmd = new SqlCommand(Resources.CheckSchema, cn))
+            {
+                cmd.CommandType = CommandType.Text;
+                cmd.ExecuteNonQuery();
+            }
         }
 
         private void CheckReqSP(SqlConnection cn)
         {
-            var cmd = new SqlCommand(Resources.CheckReqSP, cn);
-            cmd.CommandType = CommandType.Text;
-            cmd.ExecuteNonQuery();
+            using (var cmd = new SqlCommand(Resources.CheckReqSP, cn))
+            {
+                cmd.CommandType = CommandType.Text;
+                cmd.ExecuteNonQuery();
+            }
         }
     }
 }

@@ -12,7 +12,7 @@ namespace EPMLiveCore.Jobs
 {
     public class ResourceImportJob : BaseJob
     {
-        #region Fields (2) 
+        #region Fields (2)
 
         private const string UPDATE_LOG_SQL = "UPDATE EPMLIVE_LOG SET resulttext = @ResultText WHERE timerjobuid = @TimerJobUId IF @@ROWCOUNT = 0 INSERT INTO EPMLIVE_LOG (timerjobuid, resulttext) VALUES(@TimerJobUId, @ResultText)";
         private const string GET_JOBQUEUE_STATUS = "SELECT status from vwQueueTimerLog where timerjobuid=@timerjobuid";
@@ -21,7 +21,7 @@ namespace EPMLiveCore.Jobs
 
         private ResourceImporter resourceImporter;
 
-        #endregion Fields 
+        #endregion Fields
 
         #region Method
 
@@ -35,24 +35,40 @@ namespace EPMLiveCore.Jobs
         /// <param name="data">The data.</param>
         public void execute(SPSite site, SPWeb web, string data)
         {
-            _done = false;
-
-            totalCount = 2;
-
-            resourceImporter = new ResourceImporter(web, data, false);
-            
-            resourceImporter.ImportCompleted += ResourceImportCompleted;
-            resourceImporter.ImportProgressChanged += ResourceImportProgressChanged;
-
-            resourceImporter.ImportAsync();
-            
-            while (!_done)
+            try
             {
-                Thread.Sleep(1000);
-            }
-        }        
+                _done = false;
 
-        #endregion Methods 
+                totalCount = 2;
+
+                resourceImporter = new ResourceImporter(web, data, false);
+
+                resourceImporter.ImportCompleted += ResourceImportCompleted;
+                resourceImporter.ImportProgressChanged += ResourceImportProgressChanged;
+
+                resourceImporter.ImportAsync();
+
+                while (!_done)
+                {
+                    Thread.Sleep(1000);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            finally
+            {
+                if (web != null)
+                    web.Dispose();
+                if (site != null)
+                    site.Dispose();
+                data = null;
+            }
+
+        }
+
+        #endregion Methods
 
         #region Resource Import Progress Events
 
@@ -96,10 +112,12 @@ namespace EPMLiveCore.Jobs
                 totalCount = dSMResult.TotalRecords == 0 ? 1 : dSMResult.TotalRecords;
                 updateProgress(dSMResult.ProcessedRecords);
                 SPSecurity.RunWithElevatedPrivileges(() => cn.Open());
-                var cmd = new SqlCommand(UPDATE_LOG_SQL, cn);
-                cmd.Parameters.AddWithValue("@ResultText", sErrors);
-                cmd.Parameters.AddWithValue("@TimerJobUId", JobUid);
-                cmd.ExecuteNonQuery();
+                using (var cmd = new SqlCommand(UPDATE_LOG_SQL, cn))
+                {
+                    cmd.Parameters.AddWithValue("@ResultText", sErrors);
+                    cmd.Parameters.AddWithValue("@TimerJobUId", JobUid);
+                    cmd.ExecuteNonQuery();
+                }
                 cn.Close();
 
             }
@@ -126,15 +144,17 @@ namespace EPMLiveCore.Jobs
             using (SqlCommand cmd = new SqlCommand(GET_JOBQUEUE_STATUS, cn))
             {
                 cmd.Parameters.AddWithValue("@timerjobuid", JobUid);
-                SqlDataReader dr = cmd.ExecuteReader();
-                if (dr.Read())
+                using (SqlDataReader dr = cmd.ExecuteReader())
                 {
-                    if (dr.GetInt32(0) == 2)
+                    if (dr.Read())
                     {
-                        resourceImporter.IsImportCancelled = true;
+                        if (dr.GetInt32(0) == 2)
+                        {
+                            resourceImporter.IsImportCancelled = true;
+                        }
                     }
+                    dr.Close();
                 }
-                dr.Close();
                 cn.Close();
             }
         }

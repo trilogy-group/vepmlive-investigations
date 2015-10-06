@@ -14,12 +14,16 @@ namespace WorkEnginePPM.Jobs
     public class Cleanup : EPMLiveCore.API.BaseJob
     {
         private float counter = 0;
-
+        StringBuilder sbErrors = null;
         public void execute(SPSite site, SPWeb web, string data)
         {
+            sbErrors = new StringBuilder();
+            SPWeb rootWeb = null;
+            PortfolioEngineCore.WEIntegration.WEIntegration we = null;
+            PortfolioEngineCore.PortfolioItems.PortfolioItems pe = null;
             try
             {
-                SPWeb rootWeb = site.RootWeb;
+                rootWeb = site.RootWeb;
 
                 string username = site.WebApplication.ApplicationPool.Username;
 
@@ -28,12 +32,10 @@ namespace WorkEnginePPM.Jobs
                 string ppmCompany = EPMLiveCore.CoreFunctions.getConfigSetting(rootWeb, "ppmcompany");
                 string ppmDbConn = EPMLiveCore.CoreFunctions.getConfigSetting(rootWeb, "ppmdbconn");
 
-                PortfolioEngineCore.WEIntegration.WEIntegration we =
-                    new PortfolioEngineCore.WEIntegration.WEIntegration(basePath, username, ppmId, ppmCompany, ppmDbConn,
-                                                                        false);
-                PortfolioEngineCore.PortfolioItems.PortfolioItems pe =
-                    new PortfolioEngineCore.PortfolioItems.PortfolioItems(basePath, username, ppmId, ppmCompany,
-                                                                          ppmDbConn, false);
+                we = new PortfolioEngineCore.WEIntegration.WEIntegration(basePath, username, ppmId, ppmCompany, ppmDbConn,
+                                                                       false);
+                pe = new PortfolioEngineCore.PortfolioItems.PortfolioItems(basePath, username, ppmId, ppmCompany,
+                                                                         ppmDbConn, false);
 
                 //string resUrl = EPMLiveCore.CoreFunctions.getLockConfigSetting(web, "EPMLiveResourceURL", false);
                 //SPWeb resWeb = null;
@@ -92,8 +94,7 @@ namespace WorkEnginePPM.Jobs
                 //    }
 
 
-
-                sErrors = "Processing Timesheets: <br>";
+                sbErrors.Append("Processing Timesheets: <br>");
                 try
                 {
                     if (cn != null)
@@ -102,9 +103,7 @@ namespace WorkEnginePPM.Jobs
                 catch (Exception ex)
                 {
                     bErrors = true;
-                    sErrors +=
-                        "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color=\"red\">General Error Processing Timesheets: " +
-                        ex.Message + "</font><br>";
+                    sbErrors.Append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color=\"red\">General Error Processing Timesheets: " + ex.Message + "</font><br>");
                 }
 
                 //    sErrors += "<br>Processing Resources: <br>";
@@ -135,7 +134,21 @@ namespace WorkEnginePPM.Jobs
             catch (Exception ex)
             {
                 bErrors = true;
-                sErrors += "<font color=\"red\">General Error: " + ex.Message + "</font><br>";
+                sbErrors.Append("<font color=\"red\">General Error: " + ex.Message + "</font><br>");
+            }
+            finally
+            {
+                sErrors = sbErrors.ToString();
+                sbErrors = null;
+                we = null;
+                pe = null;
+                if (rootWeb != null)
+                    rootWeb.Dispose();
+                if (web != null)
+                    web.Dispose();
+                if (site != null)
+                    site.Dispose();
+                data = null;
             }
         }
 
@@ -151,166 +164,177 @@ namespace WorkEnginePPM.Jobs
 
         private void processTimesheets(SPSite site, SPWeb web, SqlConnection cn, PortfolioEngineCore.WEIntegration.WEIntegration we)
         {
-
-            SPSecurity.RunWithElevatedPrivileges(delegate()
-            {
-                if(cn.State == System.Data.ConnectionState.Closed)
-                    cn.Open();
-            });
-
-            string lastApproved = EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPKTSLastTSApprove");
-            lastApproved = "";
-
-            ArrayList arrLists = new ArrayList(EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPKLists").Split(','));
-
-            string newLastApproved = DateTime.Now.ToString();
-
-            SqlCommand cmd = new SqlCommand("spTSGetApprovedTimesheets", cn);
-            cmd.CommandType = CommandType.StoredProcedure;
-            cmd.Parameters.AddWithValue("@siteguid", site.ID);
-            if(lastApproved == "")
-                cmd.Parameters.AddWithValue("@dtapproved", "1/1/1900");
-            else
-                cmd.Parameters.AddWithValue("@dtapproved", lastApproved);
-
+            ArrayList arrLists = null;
+            XmlDocument doc = null;
+            XmlDocument docResXml = null;
             DataSet ds = new DataSet();
-
-            SqlDataAdapter da = new SqlDataAdapter(cmd);
-            da.Fill(ds);
-
-            cn.Close();
-
-            XmlDocument doc = new XmlDocument();
-            doc.LoadXml("<Timesheets/>");
-
-
-            foreach(DataRow dr in ds.Tables[0].Rows)
-            {
-                string sUsername = ConfigFunctions.GetCleanUsername(web, dr["username"].ToString());
-
-                XmlNode ndTimesheet = doc.FirstChild.SelectSingleNode("Timesheet[@Resource='" + sUsername + "' and @period_start='" + ((DateTime)dr["period_start"]).ToString("s") + "'  and @period_end='" + ((DateTime)dr["period_end"]).ToString("s") + "']");
-                if(ndTimesheet == null)
-                {
-                    ndTimesheet = doc.CreateNode(XmlNodeType.Element, "Timesheet", doc.NamespaceURI);
-
-                    XmlAttribute attrResource = doc.CreateAttribute("Resource");
-                    attrResource.Value = sUsername;
-                    ndTimesheet.Attributes.Append(attrResource);
-
-                    XmlAttribute attrStart = doc.CreateAttribute("period_start");
-                    attrStart.Value = ((DateTime)dr["period_start"]).ToString("s");
-                    ndTimesheet.Attributes.Append(attrStart);
-
-                    XmlAttribute attrEnd = doc.CreateAttribute("period_end");
-                    attrEnd.Value = ((DateTime)dr["period_end"]).ToString("s");
-                    ndTimesheet.Attributes.Append(attrEnd);
-
-                    doc.FirstChild.AppendChild(ndTimesheet);
-                }
-
-                if(dr["project_list_uid"].ToString() != "")
-                {
-                    XmlNode ndProject = doc.CreateNode(XmlNodeType.Element, "Hours", doc.NamespaceURI);
-
-                    XmlAttribute attrProject = doc.CreateAttribute("Project");
-
-                    string itemid = dr["web_uid"].ToString() + "." + dr["project_list_uid"].ToString() + "." + dr["project_id"].ToString();
-
-                    try
-                    {
-                        using(SPWeb tweb = site.OpenWeb(new Guid(dr["web_uid"].ToString())))
-                        {
-                            SPList tList = tweb.Lists[new Guid(dr["project_list_uid"].ToString())];
-
-                            SPListItem li = tList.GetItemById(int.Parse(dr["project_id"].ToString()));
-
-                            if(li["ParentItem"].ToString() != "")
-                            {
-                                itemid = li["ParentItem"].ToString();
-                            }
-                        }
-                    }
-                    catch { }
-
-                    attrProject.Value = itemid;
-                    ndProject.Attributes.Append(attrProject);
-
-                    XmlAttribute attrDate = doc.CreateAttribute("Date");
-                    attrDate.Value = ((DateTime)dr["ts_item_date"]).ToString("s");
-                    ndProject.Attributes.Append(attrDate);
-
-                    XmlAttribute attrHours = doc.CreateAttribute("Hours");
-                    attrHours.Value = dr["TotalHours"].ToString();
-                    ndProject.Attributes.Append(attrHours);
-
-                    XmlAttribute attrType = doc.CreateAttribute("Type");
-                    attrType.Value = dr["TYPEID"].ToString();
-                    ndProject.Attributes.Append(attrType);
-
-                    XmlAttribute attrCategory = doc.CreateAttribute("Category");
-                    attrCategory.Value = dr["TSTYPE_NAME"].ToString();
-                    ndProject.Attributes.Append(attrCategory);
-
-                    ndTimesheet.AppendChild(ndProject);
-                }
-                else if(arrLists.Contains(dr["LIST"].ToString()))
-                {
-                    XmlNode ndProject = doc.CreateNode(XmlNodeType.Element, "Hours", doc.NamespaceURI);
-
-                    XmlAttribute attrProject = doc.CreateAttribute("Project");
-
-                    string itemid = dr["web_uid"].ToString() + "." + dr["list_uid"].ToString() + "." + dr["project_id"].ToString();
-
-                    attrProject.Value = itemid;
-                    ndProject.Attributes.Append(attrProject);
-
-                    XmlAttribute attrDate = doc.CreateAttribute("Date");
-                    attrDate.Value = ((DateTime)dr["ts_item_date"]).ToString("s");
-                    ndProject.Attributes.Append(attrDate);
-
-                    XmlAttribute attrHours = doc.CreateAttribute("Hours");
-                    attrHours.Value = dr["TotalHours"].ToString();
-                    ndProject.Attributes.Append(attrHours);
-
-                    XmlAttribute attrType = doc.CreateAttribute("Type");
-                    attrType.Value = dr["TYPEID"].ToString();
-                    ndProject.Attributes.Append(attrType);
-
-                    XmlAttribute attrCategory = doc.CreateAttribute("Category");
-                    attrCategory.Value = dr["TSTYPE_NAME"].ToString();
-                    ndProject.Attributes.Append(attrCategory);
-
-                    ndTimesheet.AppendChild(ndProject);
-                }
-            }
-
             try
             {
-                string ResXml = we.PostTimesheetData(doc.OuterXml);
-                XmlDocument docResXml = new XmlDocument();
-                docResXml.LoadXml(ResXml);
+                SPSecurity.RunWithElevatedPrivileges(delegate()
+                {
+                    if (cn.State == System.Data.ConnectionState.Closed)
+                        cn.Open();
+                });
 
-                if(docResXml.FirstChild.Attributes["Status"].Value != "0")
+                string lastApproved = EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPKTSLastTSApprove");
+                lastApproved = "";
+
+                arrLists = new ArrayList(EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPKLists").Split(','));
+
+                string newLastApproved = DateTime.Now.ToString();
+
+                using (SqlCommand cmd = new SqlCommand("spTSGetApprovedTimesheets", cn))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@siteguid", site.ID);
+                    if (lastApproved == "")
+                        cmd.Parameters.AddWithValue("@dtapproved", "1/1/1900");
+                    else
+                        cmd.Parameters.AddWithValue("@dtapproved", lastApproved);
+
+                    SqlDataAdapter da = new SqlDataAdapter(cmd);
+                    da.Fill(ds);
+
+                    cn.Close();
+
+                    doc = new XmlDocument();
+                    doc.LoadXml("<Timesheets/>");
+                    foreach (DataRow dr in ds.Tables[0].Rows)
+                    {
+                        string sUsername = ConfigFunctions.GetCleanUsername(web, dr["username"].ToString());
+
+                        XmlNode ndTimesheet = doc.FirstChild.SelectSingleNode("Timesheet[@Resource='" + sUsername + "' and @period_start='" + ((DateTime)dr["period_start"]).ToString("s") + "'  and @period_end='" + ((DateTime)dr["period_end"]).ToString("s") + "']");
+                        if (ndTimesheet == null)
+                        {
+                            ndTimesheet = doc.CreateNode(XmlNodeType.Element, "Timesheet", doc.NamespaceURI);
+
+                            XmlAttribute attrResource = doc.CreateAttribute("Resource");
+                            attrResource.Value = sUsername;
+                            ndTimesheet.Attributes.Append(attrResource);
+
+                            XmlAttribute attrStart = doc.CreateAttribute("period_start");
+                            attrStart.Value = ((DateTime)dr["period_start"]).ToString("s");
+                            ndTimesheet.Attributes.Append(attrStart);
+
+                            XmlAttribute attrEnd = doc.CreateAttribute("period_end");
+                            attrEnd.Value = ((DateTime)dr["period_end"]).ToString("s");
+                            ndTimesheet.Attributes.Append(attrEnd);
+
+                            doc.FirstChild.AppendChild(ndTimesheet);
+                        }
+
+                        if (dr["project_list_uid"].ToString() != "")
+                        {
+                            XmlNode ndProject = doc.CreateNode(XmlNodeType.Element, "Hours", doc.NamespaceURI);
+
+                            XmlAttribute attrProject = doc.CreateAttribute("Project");
+
+                            string itemid = dr["web_uid"].ToString() + "." + dr["project_list_uid"].ToString() + "." + dr["project_id"].ToString();
+
+                            try
+                            {
+                                using (SPWeb tweb = site.OpenWeb(new Guid(dr["web_uid"].ToString())))
+                                {
+                                    SPList tList = tweb.Lists[new Guid(dr["project_list_uid"].ToString())];
+
+                                    SPListItem li = tList.GetItemById(int.Parse(dr["project_id"].ToString()));
+
+                                    if (li["ParentItem"].ToString() != "")
+                                    {
+                                        itemid = li["ParentItem"].ToString();
+                                    }
+                                }
+                            }
+                            catch { }
+
+                            attrProject.Value = itemid;
+                            ndProject.Attributes.Append(attrProject);
+
+                            XmlAttribute attrDate = doc.CreateAttribute("Date");
+                            attrDate.Value = ((DateTime)dr["ts_item_date"]).ToString("s");
+                            ndProject.Attributes.Append(attrDate);
+
+                            XmlAttribute attrHours = doc.CreateAttribute("Hours");
+                            attrHours.Value = dr["TotalHours"].ToString();
+                            ndProject.Attributes.Append(attrHours);
+
+                            XmlAttribute attrType = doc.CreateAttribute("Type");
+                            attrType.Value = dr["TYPEID"].ToString();
+                            ndProject.Attributes.Append(attrType);
+
+                            XmlAttribute attrCategory = doc.CreateAttribute("Category");
+                            attrCategory.Value = dr["TSTYPE_NAME"].ToString();
+                            ndProject.Attributes.Append(attrCategory);
+
+                            ndTimesheet.AppendChild(ndProject);
+                        }
+                        else if (arrLists.Contains(dr["LIST"].ToString()))
+                        {
+                            XmlNode ndProject = doc.CreateNode(XmlNodeType.Element, "Hours", doc.NamespaceURI);
+
+                            XmlAttribute attrProject = doc.CreateAttribute("Project");
+
+                            string itemid = dr["web_uid"].ToString() + "." + dr["list_uid"].ToString() + "." + dr["project_id"].ToString();
+
+                            attrProject.Value = itemid;
+                            ndProject.Attributes.Append(attrProject);
+
+                            XmlAttribute attrDate = doc.CreateAttribute("Date");
+                            attrDate.Value = ((DateTime)dr["ts_item_date"]).ToString("s");
+                            ndProject.Attributes.Append(attrDate);
+
+                            XmlAttribute attrHours = doc.CreateAttribute("Hours");
+                            attrHours.Value = dr["TotalHours"].ToString();
+                            ndProject.Attributes.Append(attrHours);
+
+                            XmlAttribute attrType = doc.CreateAttribute("Type");
+                            attrType.Value = dr["TYPEID"].ToString();
+                            ndProject.Attributes.Append(attrType);
+
+                            XmlAttribute attrCategory = doc.CreateAttribute("Category");
+                            attrCategory.Value = dr["TSTYPE_NAME"].ToString();
+                            ndProject.Attributes.Append(attrCategory);
+
+                            ndTimesheet.AppendChild(ndProject);
+                        }
+                    }
+                }
+                try
+                {
+                    string ResXml = we.PostTimesheetData(doc.OuterXml);
+                    docResXml = new XmlDocument();
+                    docResXml.LoadXml(ResXml);
+
+                    if (docResXml.FirstChild.Attributes["Status"].Value != "0")
+                    {
+                        bErrors = true;
+                        sbErrors.Append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color=\"red\">Error Posting Timesheet Data: " + System.Web.HttpUtility.HtmlEncode(docResXml.FirstChild.InnerXml) + "</font><br>");
+                    }
+                    else
+                    {
+                        sbErrors.Append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Success<br>");
+                    }
+                }
+                catch (Exception ex)
                 {
                     bErrors = true;
-                    sErrors += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color=\"red\">Error Posting Timesheet Data: " + System.Web.HttpUtility.HtmlEncode(docResXml.FirstChild.InnerXml) + "</font><br>";
+                    sbErrors.Append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color=\"red\">Error Posting Timesheet Data: " + ex.Message + "</font><br>");
                 }
-                else
-                {
-                    sErrors += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Success<br>";
-                }
+                EPMLiveCore.CoreFunctions.setConfigSetting(web, "EPKTSLastTSApprove", newLastApproved);
             }
-            catch(Exception ex)
+            finally
             {
-                bErrors = true;
-                sErrors += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color=\"red\">Error Posting Timesheet Data: " + ex.Message + "</font><br>";
+                arrLists = null;
+                doc = null;
+                docResXml = null;
+                if (ds != null)
+                    ds.Dispose();
             }
-            EPMLiveCore.CoreFunctions.setConfigSetting(web, "EPKTSLastTSApprove", newLastApproved);
         }
 
         private void processItems(SPSite site, SPWeb web, DataView dv, DataSet ds, PortfolioEngineCore.PortfolioItems.PortfolioItems pe)
         {
-           
+
             Guid webGuid = Guid.Empty;
             SPWeb iWeb = null;
             Guid listGuid = Guid.Empty;
@@ -318,7 +342,7 @@ namespace WorkEnginePPM.Jobs
 
             string disableItems = "";
 
-            foreach(DataRow dr in dv.Table.Rows)
+            foreach (DataRow dr in dv.Table.Rows)
             {
                 string title = "Unknown";
                 string[] itemid = dr["itemid"].ToString().Split('.');
@@ -338,9 +362,9 @@ namespace WorkEnginePPM.Jobs
                     Guid lGuid = new Guid(itemid[1]);
 
 
-                    if(webGuid != wGuid)
+                    if (webGuid != wGuid)
                     {
-                        if(iWeb != null)
+                        if (iWeb != null)
                         {
                             iWeb.Close();
                             iWeb = site.OpenWeb(wGuid);
@@ -349,7 +373,7 @@ namespace WorkEnginePPM.Jobs
                             iWeb = site.OpenWeb(wGuid);
                         webGuid = iWeb.ID;
                     }
-                    if(listGuid != lGuid)
+                    if (listGuid != lGuid)
                     {
                         iList = iWeb.Lists[lGuid];
                         listGuid = iList.ID;
@@ -358,11 +382,11 @@ namespace WorkEnginePPM.Jobs
                     DataRow[] drFields = ds.Tables[4].Select("portfolioitem_id=" + dr["portfolioitem_id"].ToString());
 
                     string message = WorkEnginePPM.HelperFunctions.processPortfolioItem(iWeb, iList, itemid[2], drFields, "1", out e);
-                    if(e)
+                    if (e)
                     {
-                        if(message.Contains("Item does not exist"))
+                        if (message.Contains("Item does not exist"))
                         {
-                            sErrors += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + title + ": Item No Longer Exists (Disabling Portfolio Item)<br>";
+                            sbErrors.Append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + title + ": Item No Longer Exists (Disabling Portfolio Item)<br>");
                             disableItems += "<Item ID=\"" + dr["itemid"].ToString() + "\"/>";
                         }
                         else
@@ -371,32 +395,32 @@ namespace WorkEnginePPM.Jobs
                             doc.LoadXml(message);
 
                             bErrors = true;
-                            sErrors += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + title + ": <font color=\"red\">Error: " + doc.InnerText + "</font><br>";
+                            sbErrors.Append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + title + ": <font color=\"red\">Error: " + doc.InnerText + "</font><br>");
                         }
                     }
                     else
                     {
-                        sErrors += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + title + ": Success<br>";
+                        sbErrors.Append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + title + ": Success<br>");
                     }
 
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
-                    if(ex.Message.Contains("0x80070002"))
+                    if (ex.Message.Contains("0x80070002"))
                     {
-                        sErrors += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + title + ": Web No Longer Exists (Disabling Portfolio Item)<br>";
+                        sbErrors.Append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" + title + ": Web No Longer Exists (Disabling Portfolio Item)<br>");
                         disableItems += "<Item EXTID=\"" + dr["itemid"].ToString() + "\"/>";
                     }
                     else
                     {
                         bErrors = true;
-                        sErrors += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color=\"red\">General Error (" + title + "): " + ex.Message + "</font><br>";
+                        sbErrors.Append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<font color=\"red\">General Error (" + title + "): " + ex.Message + "</font><br>");
                     }
                 }
                 updateProgress(counter++);
             }
 
-            if(disableItems != "")
+            if (disableItems != "")
             {
                 string ret = pe.ClosePortfolioItems("<Items>" + disableItems + "</Items>");
 
@@ -405,46 +429,56 @@ namespace WorkEnginePPM.Jobs
 
                 XmlNode ndStatus = xmlDoc.SelectSingleNode("Reply/STATUS");
 
-                if(ndStatus != null)
+                if (ndStatus != null)
                 {
-                    if(ndStatus.InnerText != "0")
+                    if (ndStatus.InnerText != "0")
                     {
                         bErrors = true;
-                        sErrors += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Disabling Portfolio Items: <font color=\"red\">Error: " + xmlDoc.SelectSingleNode("Reply/Error").InnerText + "</font><br>";
+                        sbErrors.Append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Disabling Portfolio Items: <font color=\"red\">Error: " + xmlDoc.SelectSingleNode("Reply/Error").InnerText + "</font><br>");
                     }
                     else
                     {
-                        sErrors += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Disabling Portfolio Items: Success<br>";
+                        sbErrors.Append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Disabling Portfolio Items: Success<br>");
                     }
                 }
                 else
                 {
                     bErrors = true;
-                    sErrors += "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Disabling Portfolio Items: <font color=\"red\">Error: Could not get status</font><br>";
+                    sbErrors.Append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Disabling Portfolio Items: <font color=\"red\">Error: Could not get status</font><br>");
                 }
             }
         }
 
         private void processResources(SPSite site, SPWeb resWeb, string sPrefix, SPList resList)
         {
-            
-            Hashtable hshFields = new Hashtable();
 
-            string fields = EPMLiveCore.CoreFunctions.getConfigSetting(site.RootWeb, "EPKResourceFields");
-            if(fields != "")
+            Hashtable hshFields = null;
+            XmlDocument doc = null;
+            try
             {
-                foreach(string field in fields.Split('|'))
+                hshFields = new Hashtable();
+                string fields = EPMLiveCore.CoreFunctions.getConfigSetting(site.RootWeb, "EPKResourceFields");
+                if (fields != "")
                 {
-                    string[] spField = field.Split(',');
-                    hshFields.Add(spField[0], spField[1]);
+                    foreach (string field in fields.Split('|'))
+                    {
+                        string[] spField = field.Split(',');
+                        hshFields.Add(spField[0], spField[1]);
+                    }
                 }
+
+
+                string ret = EPMLiveCore.WorkEngineAPI.GetResources("", resWeb);
+
+                doc = new XmlDocument();
+                doc.LoadXml(ret);
+            }
+            finally
+            {
+                hshFields = null;
+                doc = null;
             }
 
-
-            string ret = EPMLiveCore.WorkEngineAPI.GetResources("", resWeb);
-
-            XmlDocument doc = new XmlDocument();
-            doc.LoadXml(ret);
             //foreach(XmlNode ndResource in ndResources)
             //{
             //    try
@@ -471,8 +505,6 @@ namespace WorkEnginePPM.Jobs
             //    }
             //    updateProgress(counter++);
             //}
-                
-            
         }
     }
 }

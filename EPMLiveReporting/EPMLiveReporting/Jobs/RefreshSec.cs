@@ -7,13 +7,24 @@ namespace EPMLiveReportsAdmin.Jobs
     {
         public void execute(SPSite site, SPWeb web, string data)
         {
+            EPMData epmdata = null;
             try
             {
-                var epmdata = new EPMData(site.ID);
+                epmdata = new EPMData(site.ID);
 
                 ProcessSecurity.ProcessSecurityGroups(site, epmdata.GetClientReportingConnection, data);
             }
             catch { }
+            finally
+            {
+                if (epmdata != null)
+                    epmdata.Dispose();
+                if (web != null)
+                    web.Dispose();
+                if (site != null)
+                    site.Dispose();
+                data = null;
+            }
         }
     }
 }

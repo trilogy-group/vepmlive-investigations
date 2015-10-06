@@ -97,11 +97,15 @@ namespace TimerService
                 string sConn = EPMLiveCore.CoreFunctions.getConnectionString(webApp.Id);
                 if(sConn != "")
                 {
-                    SqlConnection cn = new SqlConnection(sConn);
-                    cn.Open();
-                    SqlCommand cmd = new SqlCommand("update rollupqueue set status = 0,queueserver=NULL  where status = 1 OR STATUS = 2", cn);
-                    cmd.ExecuteNonQuery();
-                    cn.Close();
+                    using (SqlConnection cn = new SqlConnection(sConn))
+                    {
+                        cn.Open();
+                        using (SqlCommand cmd = new SqlCommand("update rollupqueue set status = 0,queueserver=NULL  where status = 1 OR STATUS = 2", cn))
+                        {
+                            cmd.ExecuteNonQuery();
+                        }
+                        cn.Close();
+                    }
                 }
             }
 
@@ -136,33 +140,39 @@ namespace TimerService
                         string sConn = EPMLiveCore.CoreFunctions.getConnectionString(webApp.Id);
                         if (sConn != "")
                         {
-                            SqlConnection cn = new SqlConnection(sConn);
-                            cn.Open();
-
-                            SqlCommand cmd = new SqlCommand("spRollupGetQueue", cn);
-                            cmd.CommandType = CommandType.StoredProcedure;
-                            cmd.Parameters.AddWithValue("@servername", System.Environment.MachineName);
-                            cmd.Parameters.AddWithValue("@maxthreads", maxThreads);
-
-                            DataSet ds = new DataSet();
-                            SqlDataAdapter da = new SqlDataAdapter(cmd);
-                            da.Fill(ds);
-
-                            foreach (DataRow dr in ds.Tables[0].Rows)
+                            using (SqlConnection cn = new SqlConnection(sConn))
                             {
-                                RunnerData rd = new RunnerData();
-                                rd.cn = sConn;
-                                rd.dr = dr;
-                                if (startProcess(rd))
+                                cn.Open();
+
+                                using (SqlCommand cmd = new SqlCommand("spRollupGetQueue", cn))
                                 {
-                                    cmd = new SqlCommand("UPDATE ROLLUPQUEUE set status=2 where eventid=@id", cn);
-                                    cmd.Parameters.AddWithValue("@id", dr["eventid"].ToString());
-                                    cmd.ExecuteNonQuery();
+                                    cmd.CommandType = CommandType.StoredProcedure;
+                                    cmd.Parameters.AddWithValue("@servername", System.Environment.MachineName);
+                                    cmd.Parameters.AddWithValue("@maxthreads", maxThreads);
+
+                                    DataSet ds = new DataSet();
+                                    using (SqlDataAdapter da = new SqlDataAdapter(cmd))
+                                    {
+                                        da.Fill(ds);
+
+                                        foreach (DataRow dr in ds.Tables[0].Rows)
+                                        {
+                                            RunnerData rd = new RunnerData();
+                                            rd.cn = sConn;
+                                            rd.dr = dr;
+                                            if (startProcess(rd))
+                                            {
+                                                using (SqlCommand cmd1 = new SqlCommand("UPDATE ROLLUPQUEUE set status=2 where eventid=@id", cn))
+                                                {
+                                                    cmd1.Parameters.AddWithValue("@id", dr["eventid"].ToString());
+                                                    cmd1.ExecuteNonQuery();
+                                                }
+                                            }
+                                        }
+                                    }
                                 }
+                                cn.Close();
                             }
-
-                            cn.Close();
-
 
                         }
 
@@ -215,22 +225,30 @@ namespace TimerService
                     }
                 }
 
-                SqlConnection cn = new SqlConnection(rd.cn);
-                cn.Open();
-                SqlCommand cmd = new SqlCommand("Update RollupQueue set Status = 3 where EventId=@id", cn);
-                cmd.Parameters.AddWithValue("@id", dr["EventId"].ToString());
-                cmd.ExecuteNonQuery();
-                cn.Close();
+                using (SqlConnection cn = new SqlConnection(rd.cn))
+                {
+                    cn.Open();
+                    using (SqlCommand cmd = new SqlCommand("Update RollupQueue set Status = 3 where EventId=@id", cn))
+                    {
+                        cmd.Parameters.AddWithValue("@id", dr["EventId"].ToString());
+                        cmd.ExecuteNonQuery();
+                    }
+                    cn.Close();
+                }
             }
             catch (Exception ex)
             {
-                SqlConnection cn = new SqlConnection(rd.cn);
-                cn.Open();
-                SqlCommand cmd = new SqlCommand("UPDATE RollupQueue SET ErrorLog=@log, Status = 3 where EventId=@id", cn);
-                cmd.Parameters.AddWithValue("@id", dr["EventId"].ToString());
-                cmd.Parameters.AddWithValue("@log", ex.Message);
-                cmd.ExecuteNonQuery();
-                cn.Close(); 
+                using (SqlConnection cn = new SqlConnection(rd.cn))
+                {
+                    cn.Open();
+                    using (SqlCommand cmd = new SqlCommand("UPDATE RollupQueue SET ErrorLog=@log, Status = 3 where EventId=@id", cn))
+                    {
+                        cmd.Parameters.AddWithValue("@id", dr["EventId"].ToString());
+                        cmd.Parameters.AddWithValue("@log", ex.Message);
+                        cmd.ExecuteNonQuery();
+                    }
+                    cn.Close();
+                }
             }
         }
 

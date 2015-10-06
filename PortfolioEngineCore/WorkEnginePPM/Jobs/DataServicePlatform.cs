@@ -23,9 +23,10 @@ namespace WorkEnginePPM.Jobs
 
         public void execute(SPSite spSite, SPWeb spWeb, string data)
         {
+            SPWeb rootWeb = null;
             try
             {
-                SPWeb rootWeb = spSite.RootWeb;
+                rootWeb = spSite.RootWeb;
                 securityLevel = SecurityLevels.Base;
                 basePath = CoreFunctions.getConfigSetting(rootWeb, "epkbasepath");
                 ppmId = CoreFunctions.getConfigSetting(rootWeb, "ppmpid");
@@ -49,6 +50,16 @@ namespace WorkEnginePPM.Jobs
             catch (Exception ex)
             {
                 throw ex;
+            }
+            finally
+            {
+                if (rootWeb != null)
+                    rootWeb.Dispose();
+                if (spWeb != null)
+                    spWeb.Dispose();
+                if (spSite != null)
+                    spSite.Dispose();
+                data = null;
             }
         }
 
@@ -86,10 +97,12 @@ namespace WorkEnginePPM.Jobs
                 totalCount = dSMResult.TotalRecords == 0 ? 1 : dSMResult.TotalRecords;
                 updateProgress(dSMResult.ProcessedRecords);
                 SPSecurity.RunWithElevatedPrivileges(() => cn.Open());
-                var cmd = new SqlCommand(UPDATE_LOG_SQL, cn);
-                cmd.Parameters.AddWithValue("@ResultText", sErrors);
-                cmd.Parameters.AddWithValue("@TimerJobUId", JobUid);
-                cmd.ExecuteNonQuery();
+                using (var cmd = new SqlCommand(UPDATE_LOG_SQL, cn))
+                {
+                    cmd.Parameters.AddWithValue("@ResultText", sErrors);
+                    cmd.Parameters.AddWithValue("@TimerJobUId", JobUid);
+                    cmd.ExecuteNonQuery();
+                }
                 cn.Close();
 
             }

@@ -23,31 +23,32 @@ namespace TimeSheets
         {
             string strConn = EPMLiveCore.CoreFunctions.getConnectionString(site.WebApplication.Id);
             cn = new SqlConnection(strConn);
-
             SPSecurity.RunWithElevatedPrivileges(delegate()
             {
                 cn.Open();
             });
 
-            SqlCommand cmd = new SqlCommand("select status from TSQUEUE where TSQUEUE_ID=@QueueUid", cn);
-            cmd.Parameters.AddWithValue("@queueuid", QueueUid);
-            SqlDataReader dr = cmd.ExecuteReader();
-
-            if(dr.Read())
+            using (SqlCommand cmd = new SqlCommand("select status from TSQUEUE where TSQUEUE_ID=@QueueUid", cn))
             {
-                if(dr.GetInt32(0) != 1)
+                cmd.Parameters.AddWithValue("@queueuid", QueueUid);
+                using (SqlDataReader dr = cmd.ExecuteReader())
                 {
-                    cn.Close();
-                    return false;
+                    if (dr.Read())
+                    {
+                        if (dr.GetInt32(0) != 1)
+                        {
+                            cn.Close();
+                            return false;
+                        }
+                    }
+                    else
+                    {
+                        cn.Close();
+                        return false;
+                    }
+                    dr.Close();
                 }
             }
-            else
-            {
-                cn.Close();
-                return false;
-            }
-            dr.Close();
-
             cn.Close();
             return true;
         }
@@ -58,7 +59,7 @@ namespace TimeSheets
 
             SPSecurity.RunWithElevatedPrivileges(delegate()
             {
-                if(cn.State == System.Data.ConnectionState.Closed)
+                if (cn.State == System.Data.ConnectionState.Closed)
                     cn.Open();
             });
 
@@ -74,14 +75,16 @@ namespace TimeSheets
 
             //if (!tempJob)
             {
-                SqlCommand cmd = new SqlCommand("update TSQUEUE set status = 3, dtfinished=GETDATE(),result=@result,resulttext=@resulttext where TSQUEUE_ID=@queueuid", cn);
-                cmd.Parameters.AddWithValue("@queueuid", QueueUid);
-                if(bErrors)
-                    cmd.Parameters.AddWithValue("@result", "Errors");
-                else
-                    cmd.Parameters.AddWithValue("@result", "No Errors");
-                cmd.Parameters.AddWithValue("@resulttext", sErrors);
-                cmd.ExecuteNonQuery();
+                using (SqlCommand cmd = new SqlCommand("update TSQUEUE set status = 3, dtfinished=GETDATE(),result=@result,resulttext=@resulttext where TSQUEUE_ID=@queueuid", cn))
+                {
+                    cmd.Parameters.AddWithValue("@queueuid", QueueUid);
+                    if (bErrors)
+                        cmd.Parameters.AddWithValue("@result", "Errors");
+                    else
+                        cmd.Parameters.AddWithValue("@result", "No Errors");
+                    cmd.Parameters.AddWithValue("@resulttext", sErrors);
+                    cmd.ExecuteNonQuery();
+                }
 
             }
             //else

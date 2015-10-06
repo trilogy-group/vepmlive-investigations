@@ -17,7 +17,7 @@ namespace EPMLiveWorkPlanner
     {
         private string[] ConvertFromCSV(string line, int cols)
         {
-            string []sRet = new string[cols];
+            string[] sRet = new string[cols];
 
             string[] sSplit = line.Split(',');
 
@@ -25,13 +25,13 @@ namespace EPMLiveWorkPlanner
 
             bool processingcomma = false;
 
-            for(int i = 0; i < sSplit.Length && counter <= cols; i++)
+            for (int i = 0; i < sSplit.Length && counter <= cols; i++)
             {
                 try
                 {
-                    if(processingcomma)
+                    if (processingcomma)
                     {
-                        if(sSplit[i][sSplit[i].Length - 1] == '"')
+                        if (sSplit[i][sSplit[i].Length - 1] == '"')
                         {
                             sRet[counter] += "," + sSplit[i].Substring(0, sSplit[i].Length - 1);
                             processingcomma = false;
@@ -42,9 +42,9 @@ namespace EPMLiveWorkPlanner
                             sRet[counter] += "," + sSplit[i];
                         }
                     }
-                    else if(sSplit[i][0] == '"')
+                    else if (sSplit[i][0] == '"')
                     {
-                        if(sSplit[i][sSplit[i].Length - 1] == '"')
+                        if (sSplit[i][sSplit[i].Length - 1] == '"')
                         {
                             sRet[counter] = sSplit[i].Substring(1, sSplit[i].Length - 2);
                             counter++;
@@ -69,90 +69,90 @@ namespace EPMLiveWorkPlanner
 
         public void execute(SPSite osite, SPWeb oweb, string data)
         {
+            XmlDocument docData = null;
+            XmlDocument docImport = null;
+            Hashtable hshCols = null;
+            XmlDocument docRet = null;
             try
             {
-                XmlDocument docData = new XmlDocument();
+                docData = new XmlDocument();
                 docData.LoadXml(data);
 
                 string filename = docData.FirstChild.Attributes["FileName"].Value;
-                
-                
 
-                    XmlDocument docImport = new XmlDocument();
-                    docImport.LoadXml("<Import Planner='" + base.key + "' ID='" + base.ItemID + "' ResourceField='Title'/>");
+                docImport = new XmlDocument();
+                docImport.LoadXml("<Import Planner='" + base.key + "' ID='" + base.ItemID + "' ResourceField='Title'/>");
 
-                    string sUID = "";
-                    string sSeperator = "CSV";
+                string sUID = "";
+                string sSeperator = "CSV";
 
-                    try
+                try
+                {
+                    XmlAttribute attr = docImport.CreateAttribute("Structure");
+                    attr.Value = docData.FirstChild.Attributes["Structure"].Value;
+                    docImport.FirstChild.Attributes.Append(attr);
+                }
+                catch { }
+
+                try
+                {
+                    docImport.FirstChild.Attributes["ResourceField"].Value = docData.FirstChild.Attributes["ResourceField"].Value;
+                }
+                catch { }
+
+                try
+                {
+                    sSeperator = docData.FirstChild.Attributes["Seperator"].Value;
+                }
+                catch { }
+
+                try
+                {
+                    XmlAttribute attr = docImport.CreateAttribute("UIDColumn");
+                    attr.Value = docData.FirstChild.Attributes["UIDColumn"].Value;
+                    sUID = docData.FirstChild.Attributes["UIDColumn"].Value;
+                    docImport.FirstChild.Attributes.Append(attr);
+                }
+                catch { }
+
+                try
+                {
+                    XmlAttribute attr = docImport.CreateAttribute("AllowDuplicateRows");
+                    attr.Value = docData.FirstChild.Attributes["AllowDuplicateRows"].Value;
+                    docImport.FirstChild.Attributes.Append(attr);
+                }
+                catch { }
+                hshCols = new Hashtable();
+                XmlNode ndCols = docData.FirstChild.SelectSingleNode("Columns");
+                if (ndCols != null)
+                {
+                    foreach (XmlNode ndCol in ndCols.SelectNodes("Column"))
                     {
-                        XmlAttribute attr = docImport.CreateAttribute("Structure");
-                        attr.Value = docData.FirstChild.Attributes["Structure"].Value;
-                        docImport.FirstChild.Attributes.Append(attr);
-                    }
-                    catch { }
-
-                    try
-                    {
-                        docImport.FirstChild.Attributes["ResourceField"].Value = docData.FirstChild.Attributes["ResourceField"].Value;
-                    }
-                    catch { }
-                
-                    try
-                    {
-                        sSeperator = docData.FirstChild.Attributes["Seperator"].Value;
-                    }
-                    catch { }
-
-                    try
-                    {
-                        XmlAttribute attr = docImport.CreateAttribute("UIDColumn");
-                        attr.Value = docData.FirstChild.Attributes["UIDColumn"].Value;
-                        sUID = docData.FirstChild.Attributes["UIDColumn"].Value;
-                        docImport.FirstChild.Attributes.Append(attr);
-                    }
-                    catch { }
-
-                    try
-                    {
-                        XmlAttribute attr = docImport.CreateAttribute("AllowDuplicateRows");
-                        attr.Value = docData.FirstChild.Attributes["AllowDuplicateRows"].Value;
-                        docImport.FirstChild.Attributes.Append(attr);
-                    }
-                    catch { }
-
-
-                    Hashtable hshCols = new Hashtable();
-
-                    XmlNode ndCols = docData.FirstChild.SelectSingleNode("Columns");
-                    if(ndCols != null)
-                    {
-                        foreach(XmlNode ndCol in ndCols.SelectNodes("Column"))
+                        try
                         {
-                            try
-                            {
-                                string ListField = ndCol.Attributes["ImportField"].Value;
-                                string PlannerField = ndCol.Attributes["PlannerField"].Value;
+                            string ListField = ndCol.Attributes["ImportField"].Value;
+                            string PlannerField = ndCol.Attributes["PlannerField"].Value;
 
-                                if(ListField != "" && PlannerField != "")
+                            if (ListField != "" && PlannerField != "")
+                            {
+                                if (!hshCols.ContainsKey(ListField) && !hshCols.ContainsValue(PlannerField))
                                 {
-                                    if(!hshCols.ContainsKey(ListField) && !hshCols.ContainsValue(PlannerField))
-                                    {
-                                        hshCols.Add(ListField, PlannerField);
-                                    }
+                                    hshCols.Add(ListField, PlannerField);
                                 }
                             }
-                            catch { }
                         }
+                        catch { }
                     }
+                }
 
-                    var epmLiveFileStore = new EPMLiveCore.Infrastructure.EPMLiveFileStore(oweb);
+                var epmLiveFileStore = new EPMLiveCore.Infrastructure.EPMLiveFileStore(oweb);
 
-                    StreamReader sr = new StreamReader(epmLiveFileStore.GetStream(filename));
+                using (StreamReader sr = new StreamReader(epmLiveFileStore.GetStream(filename)))
+                {
                     string firstLine = sr.ReadLine();
                     char seperator = ',';
 
-                    switch(sSeperator)
+                    switch (sSeperator)
                     {
                         case "TSV":
                             seperator = '\t';
@@ -166,12 +166,12 @@ namespace EPMLiveWorkPlanner
 
                     string[] headers = firstLine.Split(seperator);
 
-                    while(!sr.EndOfStream)
+                    while (!sr.EndOfStream)
                     {
                         string line = sr.ReadLine();
-                        string []sLine;
+                        string[] sLine;
 
-                        if(sSeperator == "CSV")
+                        if (sSeperator == "CSV")
                         {
                             sLine = ConvertFromCSV(line, headers.Length);
                         }
@@ -181,11 +181,11 @@ namespace EPMLiveWorkPlanner
                         }
 
                         XmlNode ndRow = docImport.CreateNode(XmlNodeType.Element, "Item", docImport.NamespaceURI);
-                        for(int i = 0; i < sLine.Length; i++)
+                        for (int i = 0; i < sLine.Length; i++)
                         {
                             try
                             {
-                                if(headers[i] == sUID)
+                                if (headers[i] == sUID)
                                 {
                                     XmlAttribute attr = docImport.CreateAttribute("EXTID");
                                     attr.Value = sLine[i];
@@ -194,7 +194,7 @@ namespace EPMLiveWorkPlanner
                                 else
                                 {
                                     string colName = headers[i];
-                                    if(hshCols.Contains(colName))
+                                    if (hshCols.Contains(colName))
                                         colName = hshCols[colName].ToString();
 
                                     XmlAttribute attr = docImport.CreateAttribute(colName);
@@ -207,18 +207,18 @@ namespace EPMLiveWorkPlanner
 
                         docImport.FirstChild.AppendChild(ndRow);
                     }
+                }
+                updateProgress(1);
 
-                    updateProgress(1);
+                docRet = new XmlDocument();
+                docRet.LoadXml(WorkPlannerAPI.ImportTasks(docImport, oweb));
 
-                    XmlDocument docRet = new XmlDocument();
-                    docRet.LoadXml(WorkPlannerAPI.ImportTasks(docImport, oweb));
+                if (docRet.FirstChild.Attributes["Status"].Value == "1")
+                {
+                    bErrors = true;
+                }
 
-                    if(docRet.FirstChild.Attributes["Status"].Value == "1")
-                    {
-                        bErrors = true;
-                    }
-
-                    sErrors = docRet.OuterXml;
+                sErrors = docRet.OuterXml;
 
                 try
                 {
@@ -226,10 +226,22 @@ namespace EPMLiveWorkPlanner
                 }
                 catch { }
             }
-            catch(Exception ex) 
+            catch (Exception ex)
             {
                 base.bErrors = true;
                 base.sErrors = "Error: " + ex.Message;
+            }
+            finally
+            {
+                docData = null;
+                docImport = null;
+                hshCols = null;
+                docRet = null;
+                if (oweb != null)
+                    oweb.Dispose();
+                if (osite != null)
+                    osite.Dispose();
+                data = null;
             }
         }
     }

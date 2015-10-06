@@ -11,34 +11,50 @@ namespace EPMLiveCore.Jobs
     {
         public void Execute(SPWeb web, Guid listid, int itemid)
         {
-            SPList oList = web.Lists[listid];
-            SPListItem oLi = oList.GetItemById(itemid);
-
-            foreach (SPField f in oList.Fields)
+            SPList oList = null;
+            SPListItem oLi = null;
+            try
             {
-                if (f.TypeAsString == "TotalRollup")
+                oList = web.Lists[listid];
+                oLi = oList.GetItemById(itemid);
+                foreach (SPField f in oList.Fields)
                 {
-                    oLi[f.InternalName] = getListItemCount(web, f, oLi.Title);
+                    if (f.TypeAsString == "TotalRollup")
+                    {
+                        oLi[f.InternalName] = getListItemCount(web, f, oLi.Title);
+                    }
                 }
-            }
-            try
-            {
-                if (oList.Fields.ContainsField("PubUpdate"))
-                    oLi["PubUpdate"] = oLi["PubUpdate"];
-            }
-            catch { }
-            try
-            {
-                if (oList.Fields.ContainsField("IsPublished"))
-                    oLi["IsPublished"] = oLi["IsPublished"];
-            }
-            catch { }
+                try
+                {
+                    if (oList.Fields.ContainsField("PubUpdate"))
+                        oLi["PubUpdate"] = oLi["PubUpdate"];
+                }
+                catch { }
+                try
+                {
+                    if (oList.Fields.ContainsField("IsPublished"))
+                        oLi["IsPublished"] = oLi["IsPublished"];
+                }
+                catch { }
 
-            if (web.Features[new Guid("ebc3f0dc-533c-4c72-8773-2aaf3eac1055")] != null && oList.Title.ToLower() == "task center")
-            {
-                oLi["taskuid"] = oLi["taskuid"].ToString();
+                if (web.Features[new Guid("ebc3f0dc-533c-4c72-8773-2aaf3eac1055")] != null && oList.Title.ToLower() == "task center")
+                {
+                    oLi["taskuid"] = oLi["taskuid"].ToString();
+                }
+                oLi.SystemUpdate();
             }
-            oLi.SystemUpdate();
+            catch (Exception)
+            {
+
+                throw;
+            }
+            finally
+            {
+                oList = null;
+                oLi = null;
+                if (web != null)
+                    web.Dispose();
+            }
         }
 
         private double getListItemCount(SPWeb web, SPField f, string project)

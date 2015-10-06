@@ -18,6 +18,14 @@ namespace EPMLiveCore.Jobs
                 bErrors = true;
                 sErrors = "General Error: " + ex.Message;
             }
+            finally
+            {
+                if (web != null)
+                    web.Dispose();
+                if (site != null)
+                    site.Dispose();
+                data = null;
+            }
         }
     }
 }
