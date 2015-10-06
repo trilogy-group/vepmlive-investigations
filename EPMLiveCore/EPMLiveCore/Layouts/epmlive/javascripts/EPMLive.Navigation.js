@@ -988,7 +988,17 @@
                             OpenCreateWebPageDialog(redirectUrl);
                             return true;
                         case '1':
-                            location.href = redirectUrl;
+                            if (window.location.href.toLowerCase().toString().indexOf("isdlg") > -1)
+                            {
+                                if (callBackFunction != '')
+                                    SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', { url: redirectUrl, width: 650, height: 700, dialogReturnValueCallback: eval(callBackFunction) });
+                                else
+                                    SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', { url: redirectUrl, width: 650, height: 700 });
+                            }
+                            else
+                            {
+                                location.href = redirectUrl;
+                            }
                             return true;
                         case '2':
                             window.open(redirectUrl + '&IsDlg=1', '', 'height=100, width=200, toolbar=no, menubar=no, scrollbars=yes, resizable=yes,location=no, directories=no, status=yes');
