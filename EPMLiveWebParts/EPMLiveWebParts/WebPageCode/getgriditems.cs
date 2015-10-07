@@ -2169,7 +2169,7 @@ namespace EPMLiveWebParts
                                     break;
                                 case "edit":
                                     //url = li.ParentList.Forms[PAGETYPE.PAGE_EDITFORM].ServerRelativeUrl + "?ID=" + li.ID + "&Source=" + System.Web.HttpUtility.UrlEncode(Request["source"]);
-                                    val = "<A onfocus=\"OnLink(this)\" HREF=\"" + li.File.ServerRelativeUrl + "\" onclick=\"return DispEx(this,event,'TRUE','FALSE','FALSE','SharePoint.OpenDocuments.3','0','SharePoint.OpenDocuments','','','','1','0','0','" + perm + "')\">" + basename + "<img src=\"/_layouts/images/blank.gif\" class=\"ms-hidden\" border=1 width=1 height=26 alt=\"Use SHIFT+ENTER to open the menu (new window).\"></A></td><td><img src=\"/_layouts/images/blank.gif\" width=13 style=\"visibility:hidden\" alt=\"\">";
+                                    val = "<A onfocus=\"OnLink(this)\" HREF=\"" + li.File.ServerRelativeUrl + "\" onclick=\"return DispEx(this,event,'TRUE','FALSE','FALSE','SharePoint.OpenDocuments.3','0','SharePoint.OpenDocuments','','','','1','0','0','" + perm + "')\">" + basename + "<img src=\"/_layouts/images/blank.gif\" class=\"ms-hidden\" border=1 width=1 height=26 alt=\"Use SHIFT+ENTER to open the menu (new window).\"></A><img src=\"/_layouts/images/blank.gif\" width=13 style=\"visibility:hidden\" alt=\"\">";
                                     break;
                                 case "":
                                     if (fieldName == "LinkFilenameNoMenu")
