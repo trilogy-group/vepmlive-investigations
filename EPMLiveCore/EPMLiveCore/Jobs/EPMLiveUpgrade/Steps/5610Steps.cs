@@ -30,7 +30,7 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
                 }
                 else
                 {
-                    LogMessage("Management of personal views already removed from Contribute2 permission level.", MessageKind.SKIPPED, 2);
+                    LogMessage("Management of personal views already removed from Contribute2 permission level.", MessageKind.SKIPPED, 4);
                 }
                 Web.AllowUnsafeUpdates = false;
             }
