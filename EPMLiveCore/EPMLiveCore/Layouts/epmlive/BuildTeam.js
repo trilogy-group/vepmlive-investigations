@@ -44,8 +44,10 @@ function RemoveResources() {
         try {
             var oRow = rGrid.GetRowById(Row);
             if (oRow != null) {
-                if (oRow.Kind == "Data")
+                if (oRow.Kind == "Data") {
+                    oRow.CanFilter = 0;
                     rGrid.HideRow(oRow);
+                }
             }
         } catch (e) { }
     }
@@ -103,6 +105,7 @@ function AddResource() {
         tGrid.SetValue(oTRow, "Title", rGrid.GetValue(oSRow, "Title"), 1, 0);
 
         tGrid.RefreshCell(oTRow, "Permissions");
+        oSRow.CanFilter = 0;
         rGrid.HideRow(oSRow);
     }
     RefreshCommandUI();
@@ -117,11 +120,13 @@ function RemoveResource() {
 
     for (var r in sRows) {
         var oSRow = sRows[r];
-
-        rGrid.ShowRow(rGrid.GetRowById(oSRow.id));
+        var oRrow = rGrid.GetRowById(oSRow.id);
+        oRrow.CanFilter = 1
+        rGrid.ShowRow(oRrow);
         tGrid.RemoveRow(oSRow);
     }
     RefreshCommandUI();
+    tGrid.UpdateHeights(1);
 }
 
 function AddResourcePool() {

@@ -11,7 +11,7 @@
 
 	<Panel Visible='1' Delete='0' Move='0' NoFormatEscape='1' CanHide='0' SelectWidth="30"/>
 
-	<Cfg NoTreeLines='1' DetailOn='0' MinRowHeight='20' MidWidth='300' MenuColumnsSort='1' StandardFilter='2'/>
+	<Cfg NoTreeLines='1' DetailOn='0' MinRowHeight='20' MidWidth='300' MenuColumnsSort='1' StandardFilter='2' FilterLap='1'/>
 	<Header SortIcons="2"/>
 	<Cfg Code="GTACCNPSQEBSLC"/>
 
