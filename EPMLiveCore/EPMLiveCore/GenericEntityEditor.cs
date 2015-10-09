@@ -19,12 +19,27 @@ namespace EPMLiveCore
     {
         private GenericEntityPickerPropertyBag propBag;
         private string requiredErrTxtId = string.Empty;
+        private Dictionary<string, Dictionary<string, string>> fieldProperties = null;
+        private SPControlMode mode = 0;
 
         protected override void OnInit(EventArgs e)
         {
             base.OnInit(e);
             this.PickerDialogType = typeof(GenericPickerDialog);
             propBag = new GenericEntityPickerPropertyBag(this.CustomProperty);
+
+            if (SPContext.Current.FormContext.FormMode != SPControlMode.Invalid)
+            {
+                mode = SPContext.Current.FormContext.FormMode;
+            }
+            else
+            {
+                try
+                {
+                    mode = (SPControlMode)int.Parse(Page.Request["mode"]);
+                }
+                catch { }
+            }
         }
 
         protected override void CreateChildControls()
@@ -68,7 +83,6 @@ namespace EPMLiveCore
                 //}
             }
         }
-
 
         private SPList GetListFromPropBag()
         {
@@ -218,6 +232,7 @@ namespace EPMLiveCore
                 "                                                                    SingleSelectLookupVal: '" + sSingleSelectLookupVal + "', " +
                 "                                                                    SingleSelectDisplayVal: '', " +
                 "                                                                    CandidateIndex: '-1', " +
+                "                                                                    IsEditable: '" + IsFieldEditable().ToString().ToLower() + "', " +
                 "                                                                    AutoCompleteDivId : 'autoCompleteDiv_" + this.ClientID + "', " +
                 "                                                                    BrowseLinkOnClick : '', " +
                 "                                                                    AddItemLinkOnClick : '', " +
@@ -429,6 +444,62 @@ namespace EPMLiveCore
         //    return entities.ToArray();
         //}
 
+        private bool IsFieldEditable()
+        {
+            bool isEditable = true;
+            string editableSettings = string.Empty;
+            try
+            {
+                SPList list = SPContext.Current.List;
+                SPField field = list.Fields.GetField(propBag.Field);
+                GridGanttSettings gSettings = new GridGanttSettings(list);
+
+                if (gSettings.DisplaySettings != "")
+                    fieldProperties = ListDisplayUtils.ConvertFromString(gSettings.DisplaySettings);
+
+                switch (mode)
+                {
+                    case SPControlMode.Edit:
+                        {
+                            try
+                            {
+                                editableSettings = fieldProperties[propBag.Field]["Editable"];
+                            }
+                            catch { }
+
+                            if (!string.IsNullOrEmpty(editableSettings))
+                            {
+                                if (editableSettings.Split(";".ToCharArray())[0].ToLower().Equals("never"))
+                                    isEditable = false;
+                                else if (editableSettings.Split(";".ToCharArray())[0].ToLower().Equals("where"))
+                                {
+                                    string where = editableSettings.Split(";".ToCharArray())[1];
+                                    string conditionField = string.Empty;
+                                    string condition = string.Empty;
+                                    string group = string.Empty;
+                                    string valueCondition = string.Empty;
+                                    if (where.Equals("[Me]"))
+                                    {
+                                        condition = editableSettings.Split(";".ToCharArray())[2];
+                                        group = editableSettings.Split(";".ToCharArray())[3];
+                                    }
+                                    else //[Field]
+                                    {
+                                        conditionField = editableSettings.Split(";".ToCharArray())[2];
+                                        condition = editableSettings.Split(";".ToCharArray())[3];
+                                        valueCondition = editableSettings.Split(";".ToCharArray())[4];
+                                    }
+
+                                    isEditable = EditableFieldDisplay.RenderField(field, where, conditionField, condition, group, valueCondition, SPContext.Current.ListItem);
+                                }
+                            }
+                        }
+                        break;
+                }
+            }
+            catch { }
+            return isEditable;
+        }
     }
 
 

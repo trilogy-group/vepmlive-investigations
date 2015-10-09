@@ -24,7 +24,7 @@ function GEInit() {
                             $('#' + controlProps.ControlInfo.GenericEntityDivId).height(h);
                         }
 
-                        if (controlProps.ControlType == '2' && controlProps.Parent !== '') {
+                        if (controlProps.ControlInfo.IsEditable == "false" || (controlProps.ControlType == '2' && controlProps.Parent !== '')) {
                             $('#' + controlProps.ControlInfo.GenericEntityDivId).attr('disabled', true);
                             $('#' + controlProps.ControlInfo.GenericEntityDivId).addClass('disabledTb');
                             var index = controlProps.ControlInfo.GenericEntityDivId.lastIndexOf('_');
@@ -47,7 +47,7 @@ function GEInit() {
                 }
             }
 
-            if (window._LookupFieldsPropsArray) {
+            if (window._LookupFieldsPropsArray && controlProps.ControlInfo.IsEditable != "false") {
                 for (var k in window._LookupFieldsPropsArray) {
                     var controlProps = window._LookupFieldsPropsArray[k];
 

@@ -9,7 +9,6 @@ function GEInit() {
                 for (var k in window._LookupFieldsPropsArray) {
                     if (window._LookupFieldsPropsArray.hasOwnProperty(k)) {
                         var controlProps = window._LookupFieldsPropsArray[k];
-
                         HideSPControls(controlProps);
 
                         if (controlProps.ControlType !== '2') {
@@ -17,14 +16,13 @@ function GEInit() {
                         }
 
                         SetProperOuterTableCssClass(controlProps.ControlInfo.GenericEntityDivIdRoot);
-
                         if (!SPControlContainsValue(controlProps.ControlInfo.GenericEntityDivId) && controlProps.Parent == '') {
                             var h = $('#' + controlProps.ControlInfo.GenericEntityDivId).height();
                             $('#' + controlProps.ControlInfo.GenericEntityDivId).append("<img src=\"/_layouts/epmlive/images/LoadingBar.gif\" style=\"vertical-align: middle;float:left;margin-left:5px;margin-top: 2px;\" /><div style=\"float:left;margin-left:5px;color:gray;\">Loading...</div> ");
                             $('#' + controlProps.ControlInfo.GenericEntityDivId).height(h);
                         }
 
-                        if (controlProps.ControlType == '2' && controlProps.Parent !== '' && controlProps.ControlInfo.SingleSelectLookupVal == '') {
+                        if (controlProps.ControlInfo.IsEditable == "false" || (controlProps.ControlType == '2' && controlProps.Parent !== '' && controlProps.ControlInfo.SingleSelectLookupVal == '')) {
                             $('#' + controlProps.ControlInfo.GenericEntityDivId).attr("disabled", true);
                             $('#' + controlProps.ControlInfo.GenericEntityDivId).prop('contenteditable', false);
                             $('#' + controlProps.ControlInfo.GenericEntityDivId).addClass('disabledTb');
@@ -48,7 +46,7 @@ function GEInit() {
                 }
             }
 
-            if (window._LookupFieldsPropsArray) {
+            if (window._LookupFieldsPropsArray && controlProps.ControlInfo.IsEditable != "false") {
                 for (var k in window._LookupFieldsPropsArray) {
                     var controlProps = window._LookupFieldsPropsArray[k];
                     FetchData(controlProps, k);
