@@ -18,7 +18,7 @@ function GEInit() {
 
                         SetProperOuterTableCssClass(controlProps.ControlInfo.GenericEntityDivIdRoot);
 
-                        if (!SPControlContainsValue(controlProps.ControlInfo.GenericEntityDivId) && controlProps.Parent == '') {
+                        if (!SPControlContainsValue(controlProps.ControlInfo.GenericEntityDivId) && controlProps.Parent == '' && controlProps.ControlInfo.IsEditable != "false") {
                             var h = $('#' + controlProps.ControlInfo.GenericEntityDivId).height();
                             $('#' + controlProps.ControlInfo.GenericEntityDivId).append("<img src=\"/_layouts/epmlive/images/LoadingBar.gif\" style=\"vertical-align: middle;float:left;margin-left:5px;margin-top: 2px;\" /><div style=\"float:left;margin-left:5px;color:gray;\">Loading...</div> ");
                             $('#' + controlProps.ControlInfo.GenericEntityDivId).height(h);
