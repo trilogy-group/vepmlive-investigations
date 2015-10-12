@@ -321,8 +321,9 @@
         <table width="100%">
             <tr>
                 <td align="center" class="ms-sectionheader">
-                    <img src="../images/GEARS_ANv4.GIF" style="vertical-align: middle;" /><br />
-                    <h3 class="ms-standardheader" id="dlgNormalText">...</h3>
+                    <!--<img src="../images/GEARS_ANv4.GIF" style="vertical-align: middle;" /><br />
+                    <h3 class="ms-standardheader" id="dlgNormalText">...</h3>-->
+                    <img src="./images/loader-epmlive.gif"  style="width:50px;"/>
                 </td>
             </tr>
 
