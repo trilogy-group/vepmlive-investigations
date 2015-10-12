@@ -20,7 +20,7 @@ namespace UplandIntegrations.Tfs
                     Message = "APIUrl is required for integration. Please contact administrator.";
                     return false;
                 }
-                using (TfsService tfsService = new TfsService(WebProps.Properties["ServerUrl"].ToString(), WebProps.Properties["Username"].ToString(), WebProps.Properties["Password"].ToString(), Convert.ToBoolean(WebProps.Properties["UseBasicAuthCredential"].ToString())))
+                using (TfsService tfsService = new TfsService(WebProps.Properties["ServerUrl"].ToString(), WebProps.Properties["Username"].ToString(), WebProps.Properties["Password"].ToString(), Convert.ToBoolean(WebProps.Properties["UseBasicAuthentication"].ToString())))
                 {
                     tfsService.InstallEvent((string)WebProps.Properties["TeamProjectCollection"], (string)WebProps.Properties["Object"], IntegrationKey, APIUrl);
                 }
@@ -39,7 +39,7 @@ namespace UplandIntegrations.Tfs
             {
                 Message = "";
                 CheckWebProps(WebProps, true);
-                using (TfsService tfsService = new TfsService(WebProps.Properties["ServerUrl"].ToString(), WebProps.Properties["Username"].ToString(), WebProps.Properties["Password"].ToString(), Convert.ToBoolean(WebProps.Properties["UseBasicAuthCredential"].ToString())))
+                using (TfsService tfsService = new TfsService(WebProps.Properties["ServerUrl"].ToString(), WebProps.Properties["Username"].ToString(), WebProps.Properties["Password"].ToString(), Convert.ToBoolean(WebProps.Properties["UseBasicAuthentication"].ToString())))
                 {
                     tfsService.RemoveEvent((string)WebProps.Properties["TeamProjectCollection"], (string)WebProps.Properties["Object"], Convert.ToString(WebProps.Properties["ServerUrl"]), IntegrationKey);
                 }
@@ -62,7 +62,7 @@ namespace UplandIntegrations.Tfs
             CheckWebProps(WebProps, true);
             List<ColumnProperty> columnPropertyList = new List<ColumnProperty>();
             List<ColumnProperty> columnPropertyListSorted = new List<ColumnProperty>();
-            using (TfsService tfsService = new TfsService(WebProps.Properties["ServerUrl"].ToString(), WebProps.Properties["Username"].ToString(), WebProps.Properties["Password"].ToString(), Convert.ToBoolean(WebProps.Properties["UseBasicAuthCredential"].ToString())))
+            using (TfsService tfsService = new TfsService(WebProps.Properties["ServerUrl"].ToString(), WebProps.Properties["Username"].ToString(), WebProps.Properties["Password"].ToString(), Convert.ToBoolean(WebProps.Properties["UseBasicAuthentication"].ToString())))
             {
                 DataTable dataTable = new DataTable();
                 String objectName = (string)WebProps.Properties["Object"];
@@ -92,7 +92,7 @@ namespace UplandIntegrations.Tfs
             if (Property == "TeamProjectCollection")
             {
                 CheckWebProps(WebProps, false);
-                using (TfsService tfsService = new TfsService(WebProps.Properties["ServerUrl"].ToString(), WebProps.Properties["Username"].ToString(), WebProps.Properties["Password"].ToString(), Convert.ToBoolean(WebProps.Properties["UseBasicAuthCredential"].ToString())))
+                using (TfsService tfsService = new TfsService(WebProps.Properties["ServerUrl"].ToString(), WebProps.Properties["Username"].ToString(), WebProps.Properties["Password"].ToString(), Convert.ToBoolean(WebProps.Properties["UseBasicAuthentication"].ToString())))
                 {
                     DataTable collection = new DataTable();
                     tfsService.GetTeamProjectCollections(collection, false);
@@ -105,7 +105,7 @@ namespace UplandIntegrations.Tfs
             else if (Property == "Object")
             {
                 CheckWebProps(WebProps, false);
-                using (TfsService tfsService = new TfsService(WebProps.Properties["ServerUrl"].ToString(), WebProps.Properties["Username"].ToString(), WebProps.Properties["Password"].ToString(), Convert.ToBoolean(WebProps.Properties["UseBasicAuthCredential"].ToString())))
+                using (TfsService tfsService = new TfsService(WebProps.Properties["ServerUrl"].ToString(), WebProps.Properties["Username"].ToString(), WebProps.Properties["Password"].ToString(), Convert.ToBoolean(WebProps.Properties["UseBasicAuthentication"].ToString())))
                 {
                     DataTable collection = new DataTable();
                     tfsService.GetWorkItemTypes((string)WebProps.Properties["TeamProjectCollection"], collection, false);
@@ -115,7 +115,7 @@ namespace UplandIntegrations.Tfs
                     }
                 }
             }
-            else if (Property == "UseBasicAuthCredential")
+            else if (Property == "UseBasicAuthentication")
             {
                 props.Add("true", "true");
                 props.Add("false", "false");
@@ -128,7 +128,7 @@ namespace UplandIntegrations.Tfs
             {
                 Message = "";
                 CheckWebProps(WebProps, false);
-                using (TfsService tfsService = new TfsService(WebProps.Properties["ServerUrl"].ToString(), WebProps.Properties["Username"].ToString(), WebProps.Properties["Password"].ToString(), Convert.ToBoolean(WebProps.Properties["UseBasicAuthCredential"].ToString())))
+                using (TfsService tfsService = new TfsService(WebProps.Properties["ServerUrl"].ToString(), WebProps.Properties["Username"].ToString(), WebProps.Properties["Password"].ToString(), Convert.ToBoolean(WebProps.Properties["UseBasicAuthentication"].ToString())))
                 {
                 }
                 return true;
@@ -145,7 +145,7 @@ namespace UplandIntegrations.Tfs
         {
             CheckWebProps(WebProps, true);
             TransactionTable transactionTable = new TransactionTable();
-            using (TfsService tfsService = new TfsService(WebProps.Properties["ServerUrl"].ToString(), WebProps.Properties["Username"].ToString(), WebProps.Properties["Password"].ToString(), Convert.ToBoolean(WebProps.Properties["UseBasicAuthCredential"].ToString())))
+            using (TfsService tfsService = new TfsService(WebProps.Properties["ServerUrl"].ToString(), WebProps.Properties["Username"].ToString(), WebProps.Properties["Password"].ToString(), Convert.ToBoolean(WebProps.Properties["UseBasicAuthentication"].ToString())))
             {
                 foreach (DataRow item in Items.Rows)
                 {
@@ -170,7 +170,7 @@ namespace UplandIntegrations.Tfs
         {
             CheckWebProps(WebProps, true);
             TransactionTable transactionTable = new TransactionTable();
-            using (TfsService tfsService = new TfsService(WebProps.Properties["ServerUrl"].ToString(), WebProps.Properties["Username"].ToString(), WebProps.Properties["Password"].ToString(), Convert.ToBoolean(WebProps.Properties["UseBasicAuthCredential"].ToString())))
+            using (TfsService tfsService = new TfsService(WebProps.Properties["ServerUrl"].ToString(), WebProps.Properties["Username"].ToString(), WebProps.Properties["Password"].ToString(), Convert.ToBoolean(WebProps.Properties["UseBasicAuthentication"].ToString())))
             {
                 foreach (DataRow item in Items.Rows)
                 {
@@ -214,7 +214,7 @@ namespace UplandIntegrations.Tfs
             try
             {
                 CheckWebProps(WebProps, true);
-                using (TfsService tfsService = new TfsService(WebProps.Properties["ServerUrl"].ToString(), WebProps.Properties["Username"].ToString(), WebProps.Properties["Password"].ToString(), Convert.ToBoolean(WebProps.Properties["UseBasicAuthCredential"].ToString())))
+                using (TfsService tfsService = new TfsService(WebProps.Properties["ServerUrl"].ToString(), WebProps.Properties["Username"].ToString(), WebProps.Properties["Password"].ToString(), Convert.ToBoolean(WebProps.Properties["UseBasicAuthentication"].ToString())))
                 {
                     tfsService.GetObjectItem((string)WebProps.Properties["TeamProjectCollection"], (string)WebProps.Properties["Object"], Items, ItemID, false);
                 }
@@ -230,7 +230,7 @@ namespace UplandIntegrations.Tfs
             try
             {
                 CheckWebProps(WebProps, true);
-                using (TfsService tfsService = new TfsService(WebProps.Properties["ServerUrl"].ToString(), WebProps.Properties["Username"].ToString(), WebProps.Properties["Password"].ToString(), Convert.ToBoolean(WebProps.Properties["UseBasicAuthCredential"].ToString())))
+                using (TfsService tfsService = new TfsService(WebProps.Properties["ServerUrl"].ToString(), WebProps.Properties["Username"].ToString(), WebProps.Properties["Password"].ToString(), Convert.ToBoolean(WebProps.Properties["UseBasicAuthentication"].ToString())))
                 {
                     tfsService.GetObjectItems((string)WebProps.Properties["TeamProjectCollection"], (string)WebProps.Properties["Object"], Items, LastSynchDate, false);
                 }
@@ -250,7 +250,7 @@ namespace UplandIntegrations.Tfs
             if (string.IsNullOrEmpty(Convert.ToString(WebProps.Properties["ServerUrl"]))) throw new Exception("Please provide the serverurl.");
             if (string.IsNullOrEmpty(Convert.ToString(WebProps.Properties["Username"]))) throw new Exception("Please provide the username.");
             if (string.IsNullOrEmpty(Convert.ToString(WebProps.Properties["Password"]))) throw new Exception("Please provide the password.");
-            if (string.IsNullOrEmpty(Convert.ToString(WebProps.Properties["UseBasicAuthCredential"]))) throw new Exception("Please provide use basic auth credential.");
+            if (string.IsNullOrEmpty(Convert.ToString(WebProps.Properties["UseBasicAuthentication"]))) throw new Exception("Please provide use basic auth credential.");
 
             if (checkOtherWebProperties)
             {
@@ -303,7 +303,7 @@ namespace UplandIntegrations.Tfs
                 switch (control)
                 {
                     case "TF_ViewWorkItem":
-                        using (TfsService tfsService = new TfsService(webProps.Properties["ServerUrl"].ToString(), webProps.Properties["Username"].ToString(), webProps.Properties["Password"].ToString(), Convert.ToBoolean(webProps.Properties["UseBasicAuthCredential"].ToString())))
+                        using (TfsService tfsService = new TfsService(webProps.Properties["ServerUrl"].ToString(), webProps.Properties["Username"].ToString(), webProps.Properties["Password"].ToString(), Convert.ToBoolean(webProps.Properties["UseBasicAuthentication"].ToString())))
                         {
                             return tfsService.GetWorkItemURL((string)webProps.Properties["TeamProjectCollection"], (string)webProps.Properties["Object"], itemId);
                         }
