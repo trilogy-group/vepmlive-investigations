@@ -52,10 +52,10 @@ div.dhx_modal_cover_dv {
 	width: 100%;
 	height: 100%;
 	border: none;
-	filter: alpha(opacity=50);
-	-moz-opacity: 0.5;
-	opacity: 0.5;
-	background-color: #EEEEEE; /*#D3E7FF;*/
+	filter: alpha(opacity=90);
+	-moz-opacity: 0.9;
+	opacity: 0.9;
+	background-color: #ffffff; /*#D3E7FF;*/
 }
 iframe.dhx_ie6_wincover_forsel {
 	position: absolute;
