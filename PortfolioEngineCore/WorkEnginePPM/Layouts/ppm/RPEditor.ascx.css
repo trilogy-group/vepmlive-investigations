@@ -441,12 +441,12 @@ left:0px;
 top:0px;
 width:100%;
 height:100%;
-filter:alpha(opacity=30);
-opacity:0.3;
--moz-opacity:0.3;
--khtml-opacity:0.3;
+filter:alpha(opacity=90);
+opacity:0.9;
+-moz-opacity:0.9;
+-khtml-opacity:0.9;
 z-index:997;
-background:gray;
+background-color:#ffffff;
 
 }
 html, body {
