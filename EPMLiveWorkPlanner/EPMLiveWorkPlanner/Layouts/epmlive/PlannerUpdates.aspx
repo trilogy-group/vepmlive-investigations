@@ -405,11 +405,10 @@
         <table width="100%">
             <tr>
                 <td align="center" class="ms-sectionheader">
-                    <img src="../images/GEARS_ANv4.GIF" style="vertical-align: middle;" /><br />
-                    <h3 class="ms-standardheader">Processing Updates...</h3>
+                    <img src="./images/loader-epmlive.GIF" style="vertical-align: middle;width:50px;"/>
+                    <div style="line-height:40px;font-family:'Open Sans Regular';color:#666666;font-size:14px;" id="dlgNormalText">Processing Updates...</div>
                 </td>
-            </tr>
-
+            </tr>   
         </table>
     </div>
 

@@ -1568,11 +1568,10 @@
         <table width="100%">
             <tr>
                 <td align="center" class="ms-sectionheader">
-                    <img src="../images/GEARS_ANv4.GIF" style="vertical-align: middle;"/><br />
-                    <H3 class="ms-standardheader" id="dlgNormalText">Saving Work Plan...</h3>
+                    <img src="./images/loader-epmlive.GIF" style="vertical-align: middle;width:50px;"/>
+                    <div style="line-height:40px;font-family:'Open Sans Regular';color:#666666;font-size:14px;" id="dlgNormalText">Saving Work Plan...</div>
                 </td>
-            </tr>
-                    
+            </tr>   
         </table>
     </div> 
 
@@ -1580,11 +1579,10 @@
         <table width="100%">
             <tr>
                 <td align="center" class="ms-sectionheader">
-                    <img src="../images/GEARS_ANv4.GIF" style="vertical-align: middle;"/><br />
-                    <H3 class="ms-standardheader">Saving View...</h3>
+                    <img src="./images/loader-epmlive.GIF" style="vertical-align: middle;width:50px;"/>
+                    <div style="line-height:40px;font-family:'Open Sans Regular';color:#666666;font-size:14px;" id="dlgNormalText">Saving View...</div>
                 </td>
-            </tr>
-                    
+            </tr>   
         </table>
     </div> 
 
@@ -1592,11 +1590,10 @@
         <table width="100%">
             <tr>
                 <td align="center" class="ms-sectionheader">
-                    <img src="../images/GEARS_ANv4.GIF" style="vertical-align: middle;"/><br />
-                    <H3 class="ms-standardheader">Starting Publish...</h3>
+                    <img src="./images/loader-epmlive.GIF" style="vertical-align: middle;width:50px;"/>
+                    <div style="line-height:40px;font-family:'Open Sans Regular';color:#666666;font-size:14px;" id="dlgNormalText">Starting Publish...</div>
                 </td>
-            </tr>
-                    
+            </tr>   
         </table>
     </div> 
 
@@ -1604,11 +1601,10 @@
         <table width="100%">
             <tr>
                 <td align="center" class="ms-sectionheader">
-                    <img src="../images/GEARS_ANv4.GIF" style="vertical-align: middle;"/><br />
-                    <H3 class="ms-standardheader">Deleting View...</h3>
+                    <img src="./images/loader-epmlive.GIF" style="vertical-align: middle;width:50px;"/>
+                    <div style="line-height:40px;font-family:'Open Sans Regular';color:#666666;font-size:14px;" id="dlgNormalText">Deleting View...</div>
                 </td>
-            </tr>
-                    
+            </tr>   
         </table>
     </div> 
 
@@ -1616,11 +1612,10 @@
         <table width="100%">
             <tr>
                 <td align="center" class="ms-sectionheader">
-                    <img src="../images/GEARS_ANv4.GIF" style="vertical-align: middle;"/><br />
-                    <H3 class="ms-standardheader">Refreshing Resources...</h3>
+                    <img src="./images/loader-epmlive.GIF" style="vertical-align: middle;width:50px;"/>
+                    <div style="line-height:40px;font-family:'Open Sans Regular';color:#666666;font-size:14px;" id="dlgNormalText">Refreshing Resources...</div>
                 </td>
-            </tr>
-                    
+            </tr>   
         </table>
     </div> 
 

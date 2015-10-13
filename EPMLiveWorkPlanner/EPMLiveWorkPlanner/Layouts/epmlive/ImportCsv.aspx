@@ -39,14 +39,13 @@
 
         <div id="dlgUploading" class="dialog">
             <table width="100%">
-                <tr>
-                    <td align="center" class="ms-sectionheader">
-                        <img src="../images/GEARS_ANv4.GIF" style="vertical-align: middle;"/><br />
-                        <H3 class="ms-standardheader">Uploading File...</h3>
-                    </td>
-                </tr>
-                    
-            </table>
+            <tr>
+                <td align="center" class="ms-sectionheader">
+                    <img src="./images/loader-epmlive.GIF" style="vertical-align: middle;width:50px;"/>
+                    <div style="line-height:40px;font-family:'Open Sans Regular';color:#666666;font-size:14px;" id="dlgNormalText">Uploading File...</div>
+                </td>
+            </tr>   
+        </table>
         </div> 
         <script language="javascript">
             initmb();
@@ -87,13 +86,13 @@
 
         <div id="dlgImport" class="dialog">
             <table width="100%">
-                <tr>
-                    <td align="center" class="ms-sectionheader">
-                        <img src="../images/GEARS_ANv4.GIF" style="vertical-align: middle;"/><br />
-                        <H3 class="ms-standardheader">Starting Import...</h3>
-                    </td>
-                </tr>
-            </table>
+            <tr>
+                <td align="center" class="ms-sectionheader">
+                    <img src="./images/loader-epmlive.GIF" style="vertical-align: middle;width:50px;"/>
+                    <div style="line-height:40px;font-family:'Open Sans Regular';color:#666666;font-size:14px;" id="dlgNormalText">Starting Import...</div>
+                </td>
+            </tr>   
+        </table>
         </div> 
 
         <script language="javascript">

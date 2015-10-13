@@ -429,78 +429,67 @@
             
             <div id="dlgAutoCalc" class="dialog">
                 <table width="100%">
-                    <tr>
-                        <td align="center" class="ms-sectionheader">
-                            <img src="../images/GEARS_AN.GIF" style="vertical-align: middle;"/><br />
-                            <H3 class="ms-standardheader">Switching Auto-Calculate...</h3>
-                        </td>
-                    </tr>
-                    
-                </table>
+            <tr>
+                <td align="center" class="ms-sectionheader">
+                    <img src="./images/loader-epmlive.GIF" style="vertical-align: middle;width:50px;"/>
+                    <div style="line-height:40px;font-family:'Open Sans Regular';color:#666666;font-size:14px;" id="dlgNormalText">Switching auto-calculate...</div>
+                </td>
+            </tr>   
+        </table>
             </div> 
             
             <div id="dlgSaving" class="dialog">
-
                 <table width="100%">
                     <tr>
                         <td align="center" class="ms-sectionheader">
-                            <img src="../images/GEARS_AN.GIF" style="vertical-align: middle;"/><br />
-                            <H3 class="ms-standardheader">Saving Work Plan...</h3>
+                            <img src="./images/loader-epmlive.GIF" style="vertical-align: middle;width:50px;"/>
+                            <div style="line-height:40px;font-family:'Open Sans Regular';color:#666666;font-size:14px;" id="dlgNormalText">Saving Work Plan...</div>
                         </td>
-                    </tr>
-                    
+                    </tr>   
                 </table>
             </div> 
             
             <div id="dlgOpening" class="dialog">
-
                 <table width="100%">
                     <tr>
                         <td align="center" class="ms-sectionheader">
-                            <img src="../images/GEARS_AN.GIF" style="vertical-align: middle;"/><br />
-                            <H3 class="ms-standardheader">Opening Task...</h3>
+                            <img src="./images/loader-epmlive.GIF" style="vertical-align: middle;width:50px;"/>
+                            <div style="line-height:40px;font-family:'Open Sans Regular';color:#666666;font-size:14px;" id="dlgNormalText">Opening Task...</div>
                         </td>
-                    </tr>
-                    
+                    </tr>   
                 </table>
             </div> 
             
             <div id="dlgCalculating" class="dialog">
-
                 <table width="100%">
                     <tr>
                         <td align="center" class="ms-sectionheader">
-                            <img src="../images/GEARS_AN.GIF" style="vertical-align: middle;"/><br />
-                            <H3 class="ms-standardheader">Calculating Work Plan...</h3>
+                            <img src="./images/loader-epmlive.GIF" style="vertical-align: middle;width:50px;"/>
+                            <div style="line-height:40px;font-family:'Open Sans Regular';color:#666666;font-size:14px;" id="dlgNormalText">Calculating Work Plan...</div>
                         </td>
-                    </tr>
-                    
+                    </tr>   
                 </table>
             </div> 
             
             <div id="dlgBaseline" class="dialog">
-
                 <table width="100%">
                     <tr>
                         <td align="center" class="ms-sectionheader">
-                            <img src="../images/GEARS_AN.GIF" style="vertical-align: middle;"/><br />
-                            <H3 class="ms-standardheader">Saving Baseline...</h3>
+                            <img src="./images/loader-epmlive.GIF" style="vertical-align: middle;width:50px;"/>
+                            <div style="line-height:40px;font-family:'Open Sans Regular';color:#666666;font-size:14px;" id="dlgNormalText">Saving Baseline...</div>
                         </td>
-                    </tr>
-                    
+                    </tr>   
                 </table>
             </div> 
             
             <div id="dlgTasks" class="dialog">
-
                 <table width="100%">
                     <tr>
                         <td align="center" class="ms-sectionheader">
-                            <img src="../images/GEARS_AN.GIF" style="vertical-align: middle;"/><br />
-                            <H3 class="ms-standardheader">Loading Tasks...</h3>
+                            <img src="./images/loader-epmlive.GIF" style="vertical-align: middle;width:50px;"/>
+                            <div style="line-height:40px;font-family:'Open Sans Regular';color:#666666;font-size:14px;" id="dlgNormalText">Loading Tasks...</div>
                         </td>
-                    </tr>
-                    
+                    </tr>   
                 </table>
             </div> 
             <script>
