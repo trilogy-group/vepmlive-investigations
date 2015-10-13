@@ -366,7 +366,7 @@ function SaveTeamClose(loader) {
 function ShowTDialog(text) {
 
     sm("dlgNormal", 150, 50);
-    document.getElementById("dlgNormalText").innerText = text;
+    //document.getElementById("dlgNormalText").innerText = text;
 }
 
 function HideTDialog() {
