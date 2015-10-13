@@ -111,6 +111,8 @@ namespace TimeSheets
                 order by t.PERIOD_ID desc
 
 
+               IF (@LASTTSUID != NULL)
+BEGIN
                 insert into TSITEM
                 select
                     @TimesheetId as TS_UID
@@ -124,14 +126,15 @@ namespace TimeSheets
                     ,i.LIST
                     ,i.APPROVAL_STATUS
                     ,i.PROJECT_LIST_UID
+,'NULL' as AssignedToID
                 from TSITEM i
                 join TSTIMESHEET t
                     on t.TS_UID = i.TS_UID
                 where i.ITEM_TYPE = 1
                     and t.TS_UID = @LASTTSUID
-
+ END
                     ";
-            return ExecuteNonQuery() ? timesheetId: null;
+            return ExecuteNonQuery() ? timesheetId : null;
         }
 
         public Guid? GetTimesheetItemId(Guid timesheetId, Guid listId, int itemId)
