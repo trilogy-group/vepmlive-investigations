@@ -608,7 +608,7 @@ BEGIN
 			
 			'' + @sca + ''
 			
-			WITH MyCTE AS (
+			;WITH MyCTE AS (
 				SELECT top '' + convert(varchar(15),@topval) + '' ROW_NUMBER () OVER  (order by '' + @orderby + '') as RowID,*
 				from #tmp
 			)
