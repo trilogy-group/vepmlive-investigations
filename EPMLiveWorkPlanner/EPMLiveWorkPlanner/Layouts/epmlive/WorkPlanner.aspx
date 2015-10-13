@@ -76,7 +76,7 @@
             outline: none;
     }
     
-    #mbox{background-color:#FFFFFF; padding:0px !important; border:2px solid #FFF;}
+    #mbox{background-color:transparent; padding:0px !important;}
 
 
     #sideNavBox {
