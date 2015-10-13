@@ -309,11 +309,10 @@
 
 <div id="gridDiv_ResWork" style="width:100%;overflow:auto;display:none;"></div>
 <div id="divLoading" style="z-index:999; display:none; padding-right: 20px; padding-left: 20px; vertical-align: middle; white-space: nowrap; position: absolute; background-color:transparent;">
-    <img style="margin: 30px 10px; vertical-align: middle" title="Loading..." alt="" src="./images/loader-epmlive.GIF"/>
+    <img style="margin: 30px 10px; vertical-align: middle;width:50px;" title="Loading..." alt="" src="./images/loader-epmlive.GIF" />
 </div>
 <div id="divSaving" style="z-index:998; display:none; padding-right: 20px; padding-left: 20px; vertical-align: middle; white-space: nowrap; position: absolute; background-color: transparent;">
-    <img style="margin: 30px 10px; vertical-align: middle" title="Saving..." alt="" src="./images/loader-epmlive.GIF"/>
-    
+    <img style="margin: 30px 10px; vertical-align: middle;width:50px;" title="Saving..." alt="" src="./images/loader-epmlive.GIF"/>
 </div>
 <div id="<%=ClientID%>mainDiv">
     <div id="veil" style="display:none;"></div>
