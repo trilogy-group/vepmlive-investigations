@@ -196,10 +196,6 @@
 
         function gridsloaded()
         {
-
-            try {
-                RemoveResources();
-            } catch (e) { }
             try {
                 CheckAddRemoveButtons();
             } catch (e) { }
@@ -211,8 +207,7 @@
                 }
             } catch (e) { }
             hm("dlgLoading");
-            RefreshCommandUI();	
-
+            RefreshCommandUI();
         }
 
 
@@ -296,6 +291,15 @@
             return mode;
         }
     
+        Grids.OnUpdated = function()
+        {
+            // Hides resource rows from ResourceGrid which are part of current team.
+            // This enables filter works properly in case of filter saved in cookies.
+            try {
+                RemoveResources();
+            } catch (e) { }
+        }
+
     </script>
 
     <div id="dlgLoading" class="dialog">
