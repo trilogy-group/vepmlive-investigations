@@ -419,7 +419,8 @@ namespace EPMLiveCore.API
         public static string IsSecurityJobAlreadyRunning(SPWeb web, Guid listId, int itemId)
         {
             bool isRunning = false;
-            string query = "Select * from ITEMSEC where SITE_ID='" + web.Site.ID + "' and WEB_ID='" + web.ID + "' and LIST_ID='" + listId + "' and ITEM_ID='" + itemId + "'";
+            //string query = "Select * from ITEMSEC where SITE_ID='" + web.Site.ID + "' and WEB_ID='" + web.ID + "' and LIST_ID='" + listId + "' and ITEM_ID='" + itemId + "'";
+            string query = "Select * from ITEMSEC where SITE_ID='" + web.Site.ID + "' and WEB_ID='" + web.ID + "' and LIST_ID='" + listId + "' and ITEM_ID='" + itemId + "' and status <> 2";
 
             SPSecurity.RunWithElevatedPrivileges(delegate()
             {
