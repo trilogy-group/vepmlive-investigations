@@ -126,7 +126,7 @@ BEGIN
                     ,i.LIST
                     ,i.APPROVAL_STATUS
                     ,i.PROJECT_LIST_UID
-,'NULL' as AssignedToID
+                    ,NULL as AssignedToID
                 from TSITEM i
                 join TSTIMESHEET t
                     on t.TS_UID = i.TS_UID
