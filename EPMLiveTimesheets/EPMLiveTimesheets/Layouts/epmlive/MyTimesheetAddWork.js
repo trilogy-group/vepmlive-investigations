@@ -14,24 +14,17 @@ function SearchWork() {
     var o = document.getElementById("ctl00_PlaceHolderMain_ddlField");
     var sText = document.getElementById("txtSearch").value;
     var sField = o.options[o.selectedIndex].value;
-    
+
     var grid = Grids["TSWork"];
 
-    //var dataxml = sLayout;
-    //dataxml += " SearchField=\"" + sField + "\"";
-    //dataxml += " SearchText=\"" + escape(sText) + "\"";
-    //dataxml += "/&gt;";
+    var dataxml = sLayout;
+    dataxml += " SearchField=\"" + sField + "\"";
+    dataxml += " SearchText=\"" + escape(sText) + "\"";
+    dataxml += "/&gt;";
 
-    //grid.Data.Data.Param.Dataxml = dataxml;
+    grid.Data.Data.Param.Dataxml = dataxml;
 
-    //grid.Reload();
-
-    grid.SearchCells = 1;
-    grid.SearchCols = sField;
-    grid.SearchExpression = sText;
-    grid.DoSearch('Filter');
-
-    HideMessage();
+    grid.Reload();
 }
 
 function ShowMessage(message, w, h) {
