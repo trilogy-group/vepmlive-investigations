@@ -368,7 +368,7 @@ function SaveTeamClose(loader) {
 }
 
 function ValidateTeam() {
-    if (Grids.TeamGrid.GetShownRows().length > 0) {
+    if (Grids.TeamGrid.LoadedCount > 0) {
         return true;
     }
     else {

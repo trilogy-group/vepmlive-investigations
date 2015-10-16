@@ -192,6 +192,7 @@
             window.attachEvent('onresize', setHeight);
 
         var renderCount = 0;
+        var updatedGridCount = 0;
 
 
         function gridsloaded()
@@ -293,11 +294,15 @@
     
         Grids.OnUpdated = function()
         {
-            // Hides resource rows from ResourceGrid which are part of current team.
-            // This enables filter works properly in case of filter saved in cookies.
-            try {
-                RemoveResources();
-            } catch (e) { }
+            updatedGridCount++;
+            // Ensure all grids are updated
+            if (updatedGridCount == Grids.length) {
+                // Hides resource rows from ResourceGrid which are part of current team.
+                // This enables filter works properly in case of filter saved in cookies.
+                try {
+                    RemoveResources();
+                } catch (e) { }
+            }
         }
 
     </script>
