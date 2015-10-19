@@ -781,7 +781,7 @@ set @sql = '';WITH CTE AS
 ( 
 SELECT TOP '' + @maxthreads + '' * 
 FROM ITEMSEC 
-WHERE QUEUE is null and STATUS = 0 and DATEDIFF(mi, dtadded, GETDATE()) > 5
+WHERE QUEUE is null and STATUS = 0 
 order by case when USER_ID=1073741823 then 1 else 0 end, priority, dtadded
 ) 
 UPDATE CTE SET QUEUE='''''' + @servername + '''''', STATUS = 1''
