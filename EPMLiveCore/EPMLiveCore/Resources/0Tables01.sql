@@ -707,6 +707,7 @@ if not exists (select table_name from INFORMATION_SCHEMA.tables where table_name
 			[ITEM_ID] [int] NULL,
 			[USER_ID] [int] NULL,
 			[dtadded] [datetime] NULL DEFAULT (getdate()),
+			[FinishDate] [datetime] NULL,
 			[PRIORITY] [int] NULL DEFAULT ((1)),
 			[QUEUE] [varchar](255) NULL,
 			[STATUS] [int] NULL DEFAULT ((0)),
@@ -735,6 +736,12 @@ begin
 	begin
 		alter table ITEMSEC
 		ADD [resulttext] [ntext] NULL
+	end
+
+	if not exists (select column_name FROM INFORMATION_SCHEMA.COLUMNS where table_name = 'ITEMSEC' and column_name = 'FinishDate')
+	begin
+		alter table ITEMSEC
+		ADD [FinishDate] [datetime] NULL
 	end
 
 end

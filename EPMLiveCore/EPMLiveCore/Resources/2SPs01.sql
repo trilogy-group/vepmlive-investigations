@@ -781,16 +781,16 @@ set @sql = '';WITH CTE AS
 ( 
 SELECT TOP '' + @maxthreads + '' * 
 FROM ITEMSEC 
-WHERE QUEUE is null and STATUS = 0
+WHERE QUEUE is null and STATUS = 0 and DATEDIFF(mi, dtadded, GETDATE()) > 5
 order by case when USER_ID=1073741823 then 1 else 0 end, priority, dtadded
 ) 
-UPDATE CTE SET QUEUE='''''' + @servername + ''''''''
-
+UPDATE CTE SET QUEUE='''''' + @servername + '''''', STATUS = 1''
 
 exec(@sql)
 
+SELECT * FROM ITEMSEC WHERE QUEUE = @servername and status = 1
 
-SELECT * FROM ITEMSEC WHERE QUEUE = @servername and status = 0
+DELETE FROM ITEMSEC where DATEDIFF(hh, dtadded, GETDATE()) > 24 and Status = 3 and resulttext is null
 
 END
 ')
