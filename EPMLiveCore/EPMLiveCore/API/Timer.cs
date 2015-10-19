@@ -420,7 +420,7 @@ namespace EPMLiveCore.API
         {
             bool isRunning = false;
             //string query = "Select * from ITEMSEC where SITE_ID='" + web.Site.ID + "' and WEB_ID='" + web.ID + "' and LIST_ID='" + listId + "' and ITEM_ID='" + itemId + "'";
-            string query = "Select * from ITEMSEC where SITE_ID='" + web.Site.ID + "' and WEB_ID='" + web.ID + "' and LIST_ID='" + listId + "' and ITEM_ID='" + itemId + "' and status <> 2";
+            string query = "Select * from ITEMSEC where SITE_ID='" + web.Site.ID + "' and WEB_ID='" + web.ID + "' and LIST_ID='" + listId + "' and ITEM_ID='" + itemId + "' and status <> 3";
 
             SPSecurity.RunWithElevatedPrivileges(delegate()
             {
