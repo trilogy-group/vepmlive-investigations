@@ -105,7 +105,25 @@ namespace TimerService
 
             logMessage("INIT", "STMR", "Setting Security Threads to: " + maxThreads);
 
+            //EPML-5787
+            logMessage("INIT", "STMR", "Clearing Queue");
 
+            foreach (SPWebApplication webApp in SPWebService.ContentService.WebApplications)
+            {
+                string sConn = EPMLiveCore.CoreFunctions.getConnectionString(webApp.Id);
+                if (sConn != "")
+                {
+                    using (SqlConnection cn = new SqlConnection(sConn))
+                    {
+                        cn.Open();
+                        using (SqlCommand cmd = new SqlCommand("update ITEMSEC set status = 0, queue=NULL  where status = 1 OR STATUS = 2", cn))
+                        {
+                            cmd.ExecuteNonQuery();
+                        }
+                        cn.Close();
+                    }
+                }
+            }
             return true;
         }
 
@@ -123,13 +141,13 @@ namespace TimerService
             }
         }
 
-        private void logMessageinDatabase(string itemsecid, string message, SqlConnection cn)
-        {
-            SqlCommand cmd = new SqlCommand("UPDATE ITEMSEC SET STATUS = 2,resulttext = @errortext where ITEM_SEC_ID=@id", cn);
-            cmd.Parameters.AddWithValue("@errortext", message);
-            cmd.Parameters.AddWithValue("@id", itemsecid);
-            cmd.ExecuteNonQuery();
-        }
+        //private void logMessageinDatabase(string itemsecid, string message, SqlConnection cn)
+        //{
+        //    SqlCommand cmd = new SqlCommand("UPDATE ITEMSEC SET STATUS = 2,resulttext = @errortext where ITEM_SEC_ID=@id", cn);
+        //    cmd.Parameters.AddWithValue("@errortext", message);
+        //    cmd.Parameters.AddWithValue("@id", itemsecid);
+        //    cmd.ExecuteNonQuery();
+        //}
 
         public void runTimer()
         {
@@ -144,25 +162,36 @@ namespace TimerService
                         string sConn = EPMLiveCore.CoreFunctions.getConnectionString(webApp.Id);
                         if (sConn != "")
                         {
-                            using (SqlConnection cn = new SqlConnection(sConn))
+                            using (var cn = new SqlConnection(sConn))
                             {
                                 cn.Open();
 
-                                using (SqlCommand cmd = new SqlCommand("spSecGetQueue", cn))
+                                using (var cmd = new SqlCommand("spSecGetQueue", cn))
                                 {
                                     cmd.CommandType = CommandType.StoredProcedure;
                                     cmd.Parameters.AddWithValue("@servername", System.Environment.MachineName);
                                     cmd.Parameters.AddWithValue("@maxthreads", maxThreads);
 
-                                    DataSet ds = new DataSet();
-                                    using (SqlDataAdapter da = new SqlDataAdapter(cmd))
+                                    var ds = new DataSet();
+                                    using (var da = new SqlDataAdapter(cmd))
                                     {
                                         da.Fill(ds);
-
-                                        foreach (DataRow dr in ds.Tables[0].Rows)
+                                        if (ds.Tables.Count > 0)
                                         {
-                                            startProcess(dr, cn);
+                                            foreach (DataRow dr in ds.Tables[0].Rows)
+                                            {
+                                                var rd = new RunnerData {cn = sConn, dr = dr};
+                                                if (startProcess(rd))
+                                                {
+                                                    using (var cmd1 = new SqlCommand("UPDATE ITEMSEC set status=2 where ITEM_SEC_ID=@id", cn))
+                                                    {
+                                                        cmd1.Parameters.AddWithValue("@id", dr["ITEM_SEC_ID"].ToString());
+                                                        cmd1.ExecuteNonQuery();
+                                                    }
+                                                }
+                                            }
                                         }
+
                                     }
                                 }
 
@@ -178,41 +207,44 @@ namespace TimerService
             }
         }
 
-        public bool startProcess(DataRow dr, SqlConnection cn)
+        //public bool startProcess(DataRow dr, SqlConnection cn)
+        public bool startProcess(RunnerData dr)
         {
             try
             {
-                BackgroundWorker bw = new BackgroundWorker();
-                bw.WorkerReportsProgress = true;
-                bw.WorkerSupportsCancellation = true;
+                var bw = new BackgroundWorker {WorkerReportsProgress = true, WorkerSupportsCancellation = true};
 
                 bw.DoWork += bw_DoWork;
                 //bw.ProgressChanged += bw_ProgressChanged;
-                bw.RunWorkerCompleted += bw_RunWorkerCompleted;
+                //bw.RunWorkerCompleted += bw_RunWorkerCompleted;
 
-                RunnerData d = new RunnerData();
-                d.cn = cn.ConnectionString;
-                d.dr = dr;
-                d.index = workingThreads.add(bw);
+                bw.RunWorkerAsync(dr);
 
-                if (d.index > -1)
-                {
-                    using (SqlCommand cmd = new SqlCommand("UPDATE ITEMSEC SET STATUS = 1 where ITEM_SEC_ID=@id", cn))
-                    {
-                        cmd.Parameters.AddWithValue("@id", dr["ITEM_SEC_ID"].ToString());
-                        cmd.ExecuteNonQuery();
-                    }
+                workingThreads.add(bw);
 
-                    bw.RunWorkerAsync(d);
+                //RunnerData d = new RunnerData();
+                //d.cn = cn.ConnectionString;
+                //d.dr = dr;
+                //d.index = workingThreads.add(bw);
 
-                }
+                //if (d.index > -1)
+                //{
+                //    using (SqlCommand cmd = new SqlCommand("UPDATE ITEMSEC SET STATUS = 1 where ITEM_SEC_ID=@id", cn))
+                //    {
+                //        cmd.Parameters.AddWithValue("@id", dr["ITEM_SEC_ID"].ToString());
+                //        cmd.ExecuteNonQuery();
+                //    }
+
+                //    bw.RunWorkerAsync(d);
+
+                //}
 
                 return true;
             }
             catch (Exception ex)
             {
                 logMessage("ERR", "STPR", ex.Message);
-                logMessageinDatabase(dr["ITEM_SEC_ID"].ToString(), ex.Message, cn);
+                //logMessageinDatabase(dr["ITEM_SEC_ID"].ToString(), ex.Message, cn);
                 return false;
             }
         }
@@ -220,58 +252,65 @@ namespace TimerService
         private void bw_DoWork(object sender, DoWorkEventArgs e)
         {
             Thread.Sleep(500);
-            RunnerData rd = (RunnerData)e.Argument;
+            var rd = (RunnerData)e.Argument;
             DataRow dr = rd.dr;
-            SqlConnection cn = new SqlConnection(rd.cn);
-            cn.Open();
+
             try
             {
-                try
-                {
-                    EPMLiveCore.Jobs.SecurityUpdate sec = new EPMLiveCore.Jobs.SecurityUpdate();
-                    Guid ListUid = new Guid(dr["LIST_ID"].ToString());
-                    int ItemID = int.Parse(dr["ITEM_ID"].ToString());
+                //try
+                //{
+                    var secJob = new EPMLiveCore.Jobs.SecurityUpdate();
+                    var listUid = new Guid(dr["LIST_ID"].ToString());
+                    int itemID = int.Parse(dr["ITEM_ID"].ToString());
                     int userid = int.Parse(dr["USER_ID"].ToString());
 
-                    using (SPSite site = new SPSite(new Guid(dr["SITE_ID"].ToString())))
+                    using (var site = new SPSite(new Guid(dr["SITE_ID"].ToString())))
                     {
                         using (SPWeb web = site.OpenWeb(new Guid(dr["WEB_ID"].ToString())))
                         {
-                            sec.execute(site, web, ListUid, ItemID, userid, "");
+                            secJob.execute(site, web, listUid, itemID, userid, string.Empty);
                         }
                     }
+                //}
+                //catch (Exception ex)
+                //{
+                //    logMessageinDatabase(dr["ITEM_SEC_ID"].ToString(), ex.Message, cn);
+                //}
 
-                }
-                catch (Exception ex)
+                using (var cn = new SqlConnection(rd.cn))
                 {
-                    logMessageinDatabase(dr["ITEM_SEC_ID"].ToString(), ex.Message, cn);
+                    cn.Open();
+                    using (var cmd = new SqlCommand("Update ITEMSEC set status=3, finishdate = GETDATE() where ITEM_SEC_ID=@id", cn))
+                    {
+                        cmd.Parameters.AddWithValue("@id", dr["ITEM_SEC_ID"].ToString());
+                        cmd.ExecuteNonQuery();
+                    }
+                    cn.Close();
                 }
-
-                using (SqlCommand cmd = new SqlCommand("delete from ITEMSEC where ITEM_SEC_ID=@id", cn))
-                {
-                    cmd.Parameters.AddWithValue("@id", dr["ITEM_SEC_ID"].ToString());
-                    cmd.ExecuteNonQuery();
-                }
-                cn.Close();
             }
             catch (Exception ex)
             {
-                logMessageinDatabase(dr["ITEM_SEC_ID"].ToString(), ex.Message, cn);
-            }
-            finally
-            {
-                if (cn.State != ConnectionState.Closed)
+                using (var cn = new SqlConnection(rd.cn))
+                {
+                    cn.Open();
+                    using (var cmd = new SqlCommand("UPDATE ITEMSEC SET resulttext=@resulttext, Status = 3, finishdate=GETDATE() where ITEM_SEC_ID=@id", cn))
+                    {
+                        cmd.Parameters.AddWithValue("@id", dr["ITEM_SEC_ID"].ToString());
+                        cmd.Parameters.AddWithValue("@resulttext", ex.Message);
+                        cmd.ExecuteNonQuery();
+                    }
                     cn.Close();
+                }
             }
 
-            workingThreads.remove(rd.index);
+            //workingThreads.remove(rd.index);
         }
 
 
-        static void bw_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
-        {
+        //static void bw_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        //{
 
-        }
+        //}
 
         public void stopTimer()
         {
