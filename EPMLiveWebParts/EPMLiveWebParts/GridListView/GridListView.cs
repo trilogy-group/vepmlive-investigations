@@ -2557,6 +2557,7 @@ namespace EPMLiveWebParts
 
             Dictionary<string, Dictionary<string, string>> fieldProperties = null;
             GridGanttSettings gSettings = new GridGanttSettings(list);
+            
             if (gSettings.DisplaySettings != "")
                 fieldProperties = ListDisplayUtils.ConvertFromString(gSettings.DisplaySettings);
 
@@ -2564,67 +2565,117 @@ namespace EPMLiveWebParts
             bool bFoundTitle = false;
             bool bflag = false;
 
-            foreach (SPField field in list.Fields)
+            //EPML-5543: added extra check for DocumentLibrary
+            if (list.BaseTemplate == SPListTemplateType.DocumentLibrary)
             {
-                // EPML-5152,4718,4980: added extra check for ID,Created By, Modified By, LinkTitleNoMenu & LinkTitle.
-                if (!field.Hidden && field.Reorderable || (field.Id == SPBuiltInFieldId.Author || field.Id == SPBuiltInFieldId.Editor || field.Id == SPBuiltInFieldId.ID) || (field.Id == SPBuiltInFieldId.LinkTitleNoMenu || field.Id == SPBuiltInFieldId.LinkTitle))
+                foreach (SPField field in list.Fields)
                 {
-                    //EPML-4625: LinkTitleNoMenu/LinkTitle columns bind to Title field and the column name always remain the same
-                    //make sure to always display Title fields irrespective of display rules
-                    // change condition with spbuiltinfieldid
-                    if (field.Id == SPBuiltInFieldId.LinkTitleNoMenu || field.Id == SPBuiltInFieldId.LinkTitle)
+                    //EPML-5543: added extra check for ID, Created By, Modified By, LinkTitleNoMenu, LinkTitle, FileName, File Type and Moified.
+                    if (!field.Hidden && field.Reorderable || (MatchROFields(field.Id)))
                     {
-                        bflag = true;
-                    }
-                    else
-                    {
-                        if (fieldProperties != null)
-                            bflag = EPMLiveCore.EditableFieldDisplay.IsDisplayField(field, fieldProperties, "Display");
-                        else
-                            bflag = !field.ShowInDisplayForm.HasValue || (field.ShowInViewForms != null ? (bool)field.ShowInViewForms : false);
-                    }
-                    if (bflag == true)
-                    {
-                        if (getRealField(field).InternalName == "Title")
+                        //EPML-5543: LinkTitleNoMenu/LinkTitle columns bind to Title field,LinkFilename/LinkFilenameNoMenu columns bind to FileName field and the column name always remain the same
+                        //make sure to always display these fields irrespective of display rules
+                        //changed condition with SPBuiltInFieldId
+                        if (field.Id == SPBuiltInFieldId.LinkTitleNoMenu || field.Id == SPBuiltInFieldId.LinkTitle || field.Id == SPBuiltInFieldId.LinkFilename || field.Id == SPBuiltInFieldId.LinkFilenameNoMenu)
                         {
-                            if (arrFields.Contains(field.InternalName))
-                            {
-                                bFoundTitle = true;
-                                sl.Add(field.Title + field.InternalName, field);
-                            }
+                            bflag = true;
                         }
                         else
                         {
-                            sl.Add(field.Title + field.InternalName, field);
-
-                            if (field.Type == SPFieldType.Lookup)
+                            if (fieldProperties != null)
+                                bflag = EPMLiveCore.EditableFieldDisplay.IsDisplayField(field, fieldProperties, "Display");
+                            else
+                                bflag = !field.ShowInDisplayForm.HasValue || (field.ShowInViewForms != null ? (bool)field.ShowInViewForms : false);
+                        }
+                        if (bflag == true)
+                        {
+                            //EPML-5543: FileLeafRef column binds to FileName field
+                            if (getRealField(field).InternalName == "Title" || getRealField(field).InternalName == "FileLeafRef")
                             {
-                                arrLookups.Add(field);
+                                if (arrFields.Contains(field.InternalName))
+                                {
+                                    bFoundTitle = true;
+                                    sl.Add(field.Title + field.InternalName, field);
+                                }
+                            }
+                            else
+                            {
+                                sl.Add(field.Title + field.InternalName, field);
+
+                                if (field.Type == SPFieldType.Lookup)
+                                {
+                                    arrLookups.Add(field);
+                                }
                             }
                         }
                     }
                 }
             }
+            else
+            {
+                foreach (SPField field in list.Fields)
+                {
+                    // EPML-5152,4718,4980: added extra check for ID,Created By, Modified By, LinkTitleNoMenu & LinkTitle.
+                    if (!field.Hidden && field.Reorderable || (field.Id == SPBuiltInFieldId.Author || field.Id == SPBuiltInFieldId.Editor || field.Id == SPBuiltInFieldId.ID) || (field.Id == SPBuiltInFieldId.LinkTitleNoMenu || field.Id == SPBuiltInFieldId.LinkTitle))
+                    {
+                        //EPML-4625: LinkTitleNoMenu/LinkTitle columns bind to Title field and the column name always remain the same
+                        //make sure to always display Title fields irrespective of display rules
+                        // change condition with spbuiltinfieldid
+                        if (field.Id == SPBuiltInFieldId.LinkTitleNoMenu || field.Id == SPBuiltInFieldId.LinkTitle)
+                        {
+                            bflag = true;
+                        }
+                        else
+                        {
+                            if (fieldProperties != null)
+                                bflag = EPMLiveCore.EditableFieldDisplay.IsDisplayField(field, fieldProperties, "Display");
+                            else
+                                bflag = !field.ShowInDisplayForm.HasValue || (field.ShowInViewForms != null ? (bool)field.ShowInViewForms : false);
+                        }
+                        if (bflag == true)
+                        {
+                            if (getRealField(field).InternalName == "Title")
+                            {
+                                if (arrFields.Contains(field.InternalName))
+                                {
+                                    bFoundTitle = true;
+                                    sl.Add(field.Title + field.InternalName, field);
+                                }
+                            }
+                            else
+                            {
+                                sl.Add(field.Title + field.InternalName, field);
 
+                                if (field.Type == SPFieldType.Lookup)
+                                {
+                                    arrLookups.Add(field);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            
             if (!bFoundTitle)
             {
                 sl.Add("Title", list.Fields.GetFieldByInternalName("Title"));
             }
 
             AllGroupFields = AllGroupFields.Trim(',');
-
+            Dictionary<string, string> dupName = new Dictionary<string, string>();
             foreach (DictionaryEntry de in sl)
             {
                 SPField field = (SPField)de.Value;
                 //EPML-4625: Remove duplicate column names from fields list
                 string fieldValue = System.Web.HttpUtility.HtmlEncode(field.Title);
-                if (!fields.Equals(fieldValue, StringComparison.InvariantCultureIgnoreCase))
+                if(!dupName.ContainsValue(fieldValue))
                 {
                     fields += "'" + field.InternalName + "': { 'value': '" + fieldValue + "', 'checked':" + arrFields.Contains(field.InternalName).ToString().ToLower() + "},";
                     AllGroupFields += System.Web.HttpUtility.HtmlEncode(field.Title) + "|" + field.InternalName + "|" + field.Id + ",";
+                    dupName.Add(field.InternalName, fieldValue);
                 }
             }
-
+            dupName.Clear();
             sl.Clear();
             //TODO: remove this and make lookup joins work.
             arrLookups.Clear();
@@ -5734,6 +5785,20 @@ namespace EPMLiveWebParts
 
 
             return toolparts;
+        }
+
+        ///EPML5543 : checked for fields are ID,Author,Editor,Modified,Type,Name
+        private bool MatchROFields(Guid fieldId)
+        {
+            if (fieldId == SPBuiltInFieldId.ID || fieldId == SPBuiltInFieldId.Author ||
+                fieldId == SPBuiltInFieldId.Editor || fieldId == SPBuiltInFieldId.LinkTitleNoMenu ||
+                fieldId == SPBuiltInFieldId.LinkTitle || fieldId == SPBuiltInFieldId.LinkFilename ||
+                fieldId == SPBuiltInFieldId.DocIcon || fieldId == SPBuiltInFieldId.Modified ||
+                fieldId == SPBuiltInFieldId.LinkFilenameNoMenu  
+                )
+                return true;
+            else
+                return false;
         }
 
         #region GridLoadHelpers
