@@ -89,7 +89,6 @@
                 var toolKitOrderNumber = '<%= ToolKitOrderNumber %>';
                 var url = 'https://services.epmlive.com/services/usagetracking/siteusagetracking.asmx';
                 var trackingUrl = '<%= TrackingUrl %>';
-
                 if(trackingUrl != '')
                 {
                     url  = trackingUrl;

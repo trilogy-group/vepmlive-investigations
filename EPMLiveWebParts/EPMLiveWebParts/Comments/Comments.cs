@@ -169,6 +169,7 @@ namespace EPMLiveWebParts.Comments
             }
 
             SPUser user = cWeb.CurrentUser;
+            
             //get user picture from user id
             SPList userInfoList = cWeb.SiteUserInfoList;
             SPListItem userItem = userInfoList.GetItemById(user.ID);
@@ -205,7 +206,7 @@ namespace EPMLiveWebParts.Comments
                            "userProfileUrl = '" + userProfileUrl + "';" +
                            "userEmail = '" + user.Email + "';" +
                            "userPicUrl = '" + userPictureUrl + "';" +
-                           "userName = '" + user.Name + "';" +
+                           "userName = '" + HttpUtility.JavaScriptStringEncode(user.Name)+ "';" +
                            "numThreads = '" + this.NumThreads.ToString() + "';" +
                            "maxComments = '" + this.MaxComments.ToString() + "';" +
                            "sPubComTxt = '" + sPubComTxt + "';" +

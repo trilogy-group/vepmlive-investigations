@@ -6,6 +6,7 @@ using System.Web.UI;
 using EPMLiveCore.Infrastructure;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.WebControls;
+using Microsoft.SharePoint.Utilities;
 
 namespace EPMLiveCore.CONTROLTEMPLATES
 {
@@ -170,7 +171,7 @@ namespace EPMLiveCore.CONTROLTEMPLATES
             CurrentUserLoginName = string.Empty;
             try
             {
-                CurrentUserLoginName = _spWeb.CurrentUser.LoginName;
+                CurrentUserLoginName =SPHttpUtility.HtmlEncode(_spWeb.CurrentUser.LoginName);
             }
             catch { }
 

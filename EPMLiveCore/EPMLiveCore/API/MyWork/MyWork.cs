@@ -814,8 +814,8 @@ namespace EPMLiveCore.API
                         l => string.Format(@"N'{0}'", l)).
                         ToArray());
 
-                SPUser currentUser = spWeb.CurrentUser;
-
+                    SPUser currentUser = spWeb.CurrentUser;
+                
                 string sql = "";
                 if (listIdQuery == Guid.Empty)
                 {
@@ -909,7 +909,7 @@ namespace EPMLiveCore.API
                 sql =
                     string.Format(
                         @"SELECT ListId, ItemId, Value FROM dbo.PERSONALIZATIONS WHERE [Key] = 'Flag' AND UserId = N'{0}'",
-                        currentUser.LoginName);
+                        currentUser.LoginName.ToSqlCompliant());
 
                 flagsTable = myWorkReportData.ExecuteEpmLiveSql(sql);
                 flagsTable.PrimaryKey = new[] { flagsTable.Columns["ListId"], flagsTable.Columns["ItemId"] };

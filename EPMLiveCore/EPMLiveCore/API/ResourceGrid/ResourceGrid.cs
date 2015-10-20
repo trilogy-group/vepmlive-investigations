@@ -388,7 +388,7 @@ namespace EPMLiveCore.API
             }
 
             SPUser currentUser = SPContext.Current.Web.CurrentUser;
-            string username = string.Format("{0};#{1}", currentUser.ID, currentUser.Name);
+            string username = string.Format("{0};#{1}", currentUser.ID, currentUser.Name.ToSqlCompliant());
 
             var departments = new List<string>();
 

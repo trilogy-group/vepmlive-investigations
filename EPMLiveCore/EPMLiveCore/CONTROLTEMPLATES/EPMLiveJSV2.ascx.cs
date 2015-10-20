@@ -5,6 +5,8 @@ using EPMLiveCore.Infrastructure;
 using EPMLiveCore.UsageTracking;
 using Microsoft.SharePoint;
 using Microsoft.Web.Hosting.Administration;
+using System.Web;
+
 
 namespace EPMLiveCore.CONTROLTEMPLATES
 {
@@ -99,7 +101,7 @@ namespace EPMLiveCore.CONTROLTEMPLATES
                 SiteName = _spWeb.Title;
                 SPUser currentUser = SPContext.Current.Web.CurrentUser;
                 UserEmail = currentUser.Email;
-                UserName = currentUser.Name;
+                UserName =HttpUtility.UrlEncode(currentUser.Name);
                 Version = CoreFunctions.GetFullAssemblyVersion();
 
                 //Get Totango service URL

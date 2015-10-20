@@ -334,6 +334,20 @@ namespace EPMLiveCore
             return val != "false" && val != "no" && val != "0";
         }
 
+        /// <summary>
+        ///     Sql compliant converter.
+        /// </summary>
+        /// <returns>Returns modified string value.</returns>
+        public static string ToSqlCompliant(this string value)
+        {
+            if (!string.IsNullOrEmpty(value))
+            {
+                if (value.Contains("'"))
+                    value = value.Replace("'", "''");
+            }
+            return value;
+        }
+
         #endregion
 
         #region SPFile Extensions
