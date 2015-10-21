@@ -521,10 +521,11 @@ BEGIN
 			if @table is null
 			begin
 				set @table = ''lst'' + @list
-			end
+			end			
 		end
 	end
 
+	set @table = '[' + @table + ']'
 	declare @sca varchar(255)
 	set @sca = ''''
 	if @userid = 1073741823
