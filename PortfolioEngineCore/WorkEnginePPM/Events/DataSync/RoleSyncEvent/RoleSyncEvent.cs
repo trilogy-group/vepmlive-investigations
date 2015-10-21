@@ -59,7 +59,7 @@ namespace WorkEnginePPM.Events.DataSync
                 if (title == null) throw new Exception("Title cannot be empty.");
 
                 //-- EPML-3648
-                string sTitle = properties.AfterProperties["Title"].ToString().Trim();
+                string sTitle = Convert.ToString(properties.AfterProperties["Title"]).Trim();
                 string strQuery = "<Where><Eq><FieldRef Name='Title' /><Value Type='Text'>" + sTitle + "</Value></Eq></Where>";
                 SPQuery query = new SPQuery();
                 query.Query = strQuery;
@@ -140,7 +140,7 @@ namespace WorkEnginePPM.Events.DataSync
                 Role role;
 
                 //-- EPML-3648
-                string sTitle = properties.AfterProperties["Title"].ToString().Trim();
+                string sTitle = Convert.ToString(properties.AfterProperties["Title"]).Trim();
                 SPQuery query = new SPQuery();
                 query.Query =
                     "<Where>" +
