@@ -525,7 +525,7 @@ BEGIN
 		end
 	end
 
-	set @table = '[' + @table + ']'
+	set @table = ''['' + @table + '']''
 	declare @sca varchar(255)
 	set @sca = ''''
 	if @userid = 1073741823
