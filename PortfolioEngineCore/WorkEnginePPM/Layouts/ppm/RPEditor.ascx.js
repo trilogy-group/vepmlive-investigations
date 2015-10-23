@@ -234,8 +234,11 @@
                     }
                     if (view.Default == true) {
                         for (var i = 0; i < this.Views.length; i++) {
-                            if (this.Views[i].ViewGUID != view.ViewGUID)
-                                this.Views[i].Default = false;
+                            if (this.Views[i] != undefined || this.Views[i] != null) {
+                                if (this.Views[i].ViewGUID != view.ViewGUID) {
+                                    this.Views[i].Default = false;
+                                }
+                            }
                         }
                     }
                     this.externalEvent('SaveView_Cancel');
@@ -3132,6 +3135,13 @@
                     this.DisplaySaveViewDialog("Rename View", "rename");
                     break;
                 case "ViewTab_DeleteView":
+                    var defaultView = this.GetSelectedView();
+                    if (defaultView != null) {
+                        if (defaultView.Default == 1) {
+                            alert("This default view cannot be deleted. If you want to delete this view, make another view the default and then this view can be deleted successfully.");
+                            return;
+                        }
+                    }
                     document.getElementById("id_DeleteView_Name").value = "";
                     var selectView = document.getElementById("idViewTab_SelView");
                     if (selectView != null && selectView.selectedIndex >= 0) {
