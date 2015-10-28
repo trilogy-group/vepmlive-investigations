@@ -1892,7 +1892,7 @@ namespace EPMLiveWebParts
                         //to Fix EPML-5716
                         list = web.GetList(web.Url + "/" + PropList);
                         view = list.Views[PropView];
-                    }                    
+                    }
                     catch { }
                     try
                     {
@@ -2557,7 +2557,7 @@ namespace EPMLiveWebParts
 
             Dictionary<string, Dictionary<string, string>> fieldProperties = null;
             GridGanttSettings gSettings = new GridGanttSettings(list);
-            
+
             if (gSettings.DisplaySettings != "")
                 fieldProperties = ListDisplayUtils.ConvertFromString(gSettings.DisplaySettings);
 
@@ -2655,7 +2655,7 @@ namespace EPMLiveWebParts
                     }
                 }
             }
-            
+
             if (!bFoundTitle)
             {
                 sl.Add("Title", list.Fields.GetFieldByInternalName("Title"));
@@ -2774,7 +2774,7 @@ namespace EPMLiveWebParts
                     'content': [
                     //search control
                     {
-                        'controlId': 'btnSearch',
+                        'controlId': 'btnSearch" + sFullGridId + @"',
                         'controlType': 'button',
                         'toolTip': 'search',
                         'iconClass': 'icon-search-3',
@@ -2788,7 +2788,7 @@ namespace EPMLiveWebParts
                     },
                     // filter button
                     {
-                        'controlId': 'btnFilter',
+                        'controlId': 'btnFilter" + sFullGridId + @"',
                         'controlType': 'button',
                         'toolTip': 'toggle filters',
                         'iconClass': 'icon-filter',
@@ -2802,7 +2802,7 @@ namespace EPMLiveWebParts
                     },
                     // default sort button
                     {
-                        'controlId': 'btnDefaultSort',
+                        'controlId': 'btnDefaultSort" + sFullGridId + @"',
                         'controlType': 'button',
                         'toolTip': 'default sort',
                         'iconClass': 'icon-menu-2',
@@ -2816,6 +2816,7 @@ namespace EPMLiveWebParts
                     },
                     //group by fields
                     {
+                        'controlId': 'msGroupFields" + sFullGridId + @"',
                         'controlType': 'groupByFields',
                         'toolTip': 'manage grouping',
                         'availableGroups': '" + AllGroupFields + @"',
@@ -2825,7 +2826,7 @@ namespace EPMLiveWebParts
                     },
                     //select columns control
                     {
-                        'controlId': 'msColumns',
+                        'controlId': 'msColumns" + sFullGridId + @"',
                         'controlType': 'multiselect',
                         'toolTip': 'select columns',
                         'title': '',
@@ -2857,7 +2858,7 @@ namespace EPMLiveWebParts
                     },
                     //view control
                     {
-                        'controlId': 'ddlViewControl',
+                        'controlId': 'ddlViewControl" + sFullGridId + @"',
                         'controlType': 'dropdown',
                         'title': 'View: ',
                         'value': '" + view.Title.Replace("'", "\\'") + @"',
@@ -3418,7 +3419,7 @@ namespace EPMLiveWebParts
                 //output.WriteLine("searchbut.disabled = false;");
                 output.WriteLine("}");
 
-                output.WriteLine("function searchKeyPress(e){");
+                output.WriteLine("function searchKeyPress" + sFullGridId + "(e){");
                 output.WriteLine("if(e.keyCode == 13){ doSearch" + sFullGridId + "();}return false;}");
 
                 output.WriteLine("</script>");
@@ -3449,7 +3450,7 @@ namespace EPMLiveWebParts
                         <img alt=""Clear Search"" src=""/_layouts/epmlive/images/unsearch.png"" style=""padding-bottom:2px"" onclick=""unSearch" + sFullGridId + @"()""/>
                     </div>
                     <div style=""display: table-cell"">
-                        <input type=""text"" id=""searchtext" + sFullGridId + @""" value=""" + sSearchValue + @""" style=""border: 0px; width:100%; margin-top:-5px; height:24px; font-family: 'Segoe UI','Segoe',Tahoma,Helvetica,Arial,sans-serif;font-size:13px"" onkeypress=""searchKeyPress(event);""/>
+                        <input type=""text"" id=""searchtext" + sFullGridId + @""" value=""" + sSearchValue + @""" style=""border: 0px; width:100%; margin-top:-5px; height:24px; font-family: 'Segoe UI','Segoe',Tahoma,Helvetica,Arial,sans-serif;font-size:13px"" onkeypress=""searchKeyPress" + sFullGridId + @"(event);""/>
                         <select id=""searchchoice" + sFullGridId + @""" style=""border: 0px; width:100%"">
                         </select>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                     </div>
@@ -5476,7 +5477,7 @@ namespace EPMLiveWebParts
                 //to Fix EPML-5716
                 list = web.GetList(web.Url + "/" + PropList);
                 view = list.Views[PropView];
-            }            
+            }
             catch { }
 
 
@@ -5794,7 +5795,7 @@ namespace EPMLiveWebParts
                 fieldId == SPBuiltInFieldId.Editor || fieldId == SPBuiltInFieldId.LinkTitleNoMenu ||
                 fieldId == SPBuiltInFieldId.LinkTitle || fieldId == SPBuiltInFieldId.LinkFilename ||
                 fieldId == SPBuiltInFieldId.DocIcon || fieldId == SPBuiltInFieldId.Modified ||
-                fieldId == SPBuiltInFieldId.LinkFilenameNoMenu  
+                fieldId == SPBuiltInFieldId.LinkFilenameNoMenu
                 )
                 return true;
             else

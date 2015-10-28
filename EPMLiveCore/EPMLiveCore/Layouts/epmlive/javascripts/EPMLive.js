@@ -893,6 +893,7 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
         }
 
         function createGroupBy(cfg, ul) {
+            var customCtrlId = cfg['controlId'];
             var toolTip = cfg['toolTip'];
             var li = $(document.createElement('li'));
             li.attr('class', 'dropdown');
@@ -917,7 +918,7 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
                 divContainer.toggle();
                 //EPML-5286 -- Here, when page load then fetch selected value and hide from other ddl
                 var keyVals = [];
-                keyVals = ddlselectedoption();
+                keyVals = ddlselectedoption(cfg);
                 if (keyVals.length > 0) {
                     HideOptionValue(keyVals);
                 }
@@ -927,6 +928,7 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
             li.append(aContainer);
 
             var divContainer = $(document.createElement('div'));
+            divContainer.attr('id', 'no-close-grouping-dropdown-menu' + customCtrlId);
             divContainer.attr('class', 'dropdown-menu no-close grouping-dropdown-menu');
             var groupbyUl = $(document.createElement('ul'));
             var groupbyLiHeader = $(document.createElement('li'));
@@ -939,6 +941,7 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
             divContainer.append(groupbyUl);
 
             var divGroupingWrapper = $(document.createElement('div'));
+            divGroupingWrapper.attr('id', 'grouping-wrapper' + customCtrlId);
             divGroupingWrapper.attr('class', 'grouping-wrapper');
 
             var divGroupingWrapperEmptyText = $(document.createElement('div'));
@@ -1000,10 +1003,10 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
                     //---
                     $(this).closest('.grouping-row').remove();
                     var num = 1;
-                    $('.grouping-wrapper').children('.grouping-row').each(function () {
+                    $('#grouping-wrapper' + customCtrlId).children('.grouping-row').each(function () {
                         $(this).find('.grouping-number').first().text(num++);
                     });
-                    var numRows = $('.grouping-wrapper').children('.grouping-row').length;
+                    var numRows = $('#grouping-wrapper' + customCtrlId).children('.grouping-row').length;
                     if (numRows == 0) {
                         divGroupingWrapperEmptyText.text('No Grouping Added');
                         $('#aGroupBySave').attr('class', 'disabledLink');
@@ -1017,7 +1020,7 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
                         $('#aAddGrouping').attr('class', 'disabledLink');
                     }
                     //EPML-5286 - show above selected value into rest of ddl
-                    $('.grouping-wrapper').children('.grouping-row').each(function () {
+                    $('#grouping-wrapper' + customCtrlId).children('.grouping-row').each(function () {
                         $('.grouping-select select').not(this).children('option[value=' + val + ']').prop('disabled', false);
                         $('.grouping-select select').not(this).children('option[value=' + val + ']').show();
                     });
@@ -1048,14 +1051,14 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
             aFooterAdd.text('Add Grouping');
             aFooterAdd.bind('click', function () {
                 divGroupingWrapperEmptyText.text('');
-                var numRows = $('.grouping-wrapper').children('.grouping-row').length;
+                var numRows = $('#grouping-wrapper' + customCtrlId).children('.grouping-row').length;
                 if (numRows < 4) {
 
                     if (numRows == 3) {
                         $(this).attr('class', 'disabledLink');
                     }
 
-                    var divGroupingWrapper = $('.grouping-wrapper');
+                    var divGroupingWrapper = $('#grouping-wrapper' + customCtrlId);
 
                     var divGroupingRow = $(document.createElement('div'));
                     divGroupingRow.attr('class', 'grouping-row');
@@ -1077,7 +1080,7 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
                     }
                     //EPML-5286 -- here, hide option value, which is already selected in other ddl, in newly created ddl
                     var keyVals = [];
-                    keyVals = ddlselectedoption();
+                    keyVals = ddlselectedoption(cfg);
                     if (keyVals.length > 0) {
                         for (k = 0; k < keyVals.length; k++) {
                             select.children('option[value=' + keyVals[k].value + ']').hide();
@@ -1107,10 +1110,10 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
                         //----
                         $(this).closest('.grouping-row').remove();
                         var num = 1;
-                        $('.grouping-wrapper').children('.grouping-row').each(function () {
+                        $('#grouping-wrapper' + customCtrlId).children('.grouping-row').each(function () {
                             $(this).find('.grouping-number').first().text(num++);
                         });
-                        var numRows = $('.grouping-wrapper').children('.grouping-row').length;
+                        var numRows = $('#grouping-wrapper' + customCtrlId).children('.grouping-row').length;
                         if (numRows == 0) {
                             divGroupingWrapperEmptyText.text('No Grouping Added');
                             $('#aGroupBySave').attr('class', 'disabledLink');
@@ -1125,14 +1128,14 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
                         }
 
                         //EPML-5286 - show above selected value into rest of ddl
-                        $('.grouping-wrapper').children('.grouping-row').each(function () {
+                        $('#grouping-wrapper' + customCtrlId).children('.grouping-row').each(function () {
                             $('.grouping-select select').not(this).children('option[value=' + val + ']').prop('disabled', false);
                             $('.grouping-select select').not(this).children('option[value=' + val + ']').show();
                         });
                         //----
 
                         var keyVals = [];
-                        $('.grouping-wrapper').children('.grouping-row').each(function () {
+                        $('#grouping-wrapper' + customCtrlId).children('.grouping-row').each(function () {
                             //var txt = $(this).find('.grouping-select').find('select option:selected').text();
                             var val = $(this).find('.grouping-select').find('select option:selected').val();
                             //var objTemp = { 'key': txt, 'value': val };
@@ -1155,7 +1158,7 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
                 }
                 //EPML-5286 -- here, default selected option in newly created ddl must be invisible in reset of ddl 
                 var keyVals = [];
-                keyVals = ddlselectedoption();
+                keyVals = ddlselectedoption(cfg);
                 if (keyVals.length > 0) {
                     HideOptionValue(keyVals);
                 }
@@ -1172,10 +1175,10 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
 
             aFooterSave.text('Apply');
             aFooterSave.bind('click', function () {
-                var numGroups = $('.grouping-wrapper').children('.grouping-row').length;
+                var numGroups = $('#grouping-wrapper' + customCtrlId).children('.grouping-row').length;
                 if (numGroups > 0) {
                     var keyVals = [];
-                    $('.grouping-wrapper').children('.grouping-row').each(function () {
+                    $('#grouping-wrapper' + customCtrlId).children('.grouping-row').each(function () {
                         var txt = $(this).find('.grouping-select').find('select option:selected').text();
                         var val = $(this).find('.grouping-select').find('select option:selected').val();
                         var objTemp = { 'key': txt, 'value': val };
@@ -1185,7 +1188,8 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
                 }
 
                 //$(this).parent('.grouping-dropdown-menu').toggle();
-                $(".grouping-dropdown-menu").toggle();
+                //$('.grouping-dropdown-menu').toggle();
+                $("#no-close-grouping-dropdown-menu" + customCtrlId).toggle();
             });
             divFooterSave.append(aFooterSave);
             divGroupingFooter.append(divFooterSave);
@@ -1218,9 +1222,10 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
             });
         }
 
-        function ddlselectedoption() {
+        function ddlselectedoption(cfg) {
+            var customCtrlId = cfg['controlId'];
             var selectedoptions = [];
-            $('.grouping-wrapper').children('.grouping-row').each(function () {
+            $('#grouping-wrapper' + customCtrlId).children('.grouping-row').each(function () {
                 var txt = $(this).find('.grouping-select').find('select option:selected').text();
                 var val = $(this).find('.grouping-select').find('select option:selected').val();
                 var objTemp1 = { 'key': txt, 'value': val };
