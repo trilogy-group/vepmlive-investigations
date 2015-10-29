@@ -20,14 +20,6 @@
 			<Controls Id="Ribbon.BuildTeam.StandardGroup.Controls">
 
 				<Button
-				Id="Ribbon.BuildTeam.StandardGroup.SaveButton"
-				Sequence="10"
-				Command="Ribbon.BuildTeam.SaveButton"
-				Image32by32="/_layouts/images/save32x32.png"
-				LabelText="Save"
-				TemplateAlias="cust1"/>
-
-				<Button
 				Id="Ribbon.BuildTeam.StandardGroup.SaveCloseButton"
 				Sequence="20"
 				Command="Ribbon.BuildTeam.SaveCloseButton"

@@ -292,6 +292,18 @@
             return mode;
         }
     
+        Grids.OnAfterValueChanged = function(grid, row, col, val)
+        {
+            if(col == "Permissions")
+            {
+                isDirty = true;
+                EnableDisableSaveButton();
+                gridsloaded();
+                return true;
+            }
+            return true;
+        }
+
         Grids.OnUpdated = function()
         {
             updatedGridCount++;
@@ -330,8 +342,8 @@
         <table width="100%">
             <tr>
                 <td align="center" class="ms-sectionheader">
-                    
-                    <img src="./images/loader-epmlive.gif"  style="width:50px;"/>
+
+                    <img src="./images/loader-epmlive.gif" style="width: 50px;" />
                 </td>
             </tr>
 

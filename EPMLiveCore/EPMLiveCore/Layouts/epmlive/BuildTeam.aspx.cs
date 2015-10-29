@@ -303,7 +303,6 @@ namespace EPMLiveCore.Layouts.epmlive
                 if (sDisable != "")
                     ribbon.TrimById("Ribbon.BuildTeam.ResourceGroup");
 
-                ribbon.TrimById("Ribbon.BuildTeam.StandardGroup.SaveButton");
                 ribbon.TrimById("Ribbon.BuildTeam.StandardGroup.SaveCloseButton");
             }
             else if (sDisable != "")
@@ -320,8 +319,7 @@ namespace EPMLiveCore.Layouts.epmlive
             var commands = new List<IRibbonCommand>();
 
             // register the command at the ribbon. Include the callback to the server     // to generate the xml
-            commands.Add(new SPRibbonCommand("Ribbon.BuildTeam.SaveButton", "SaveTeam();", "bCanEditTeam"));
-            commands.Add(new SPRibbonCommand("Ribbon.BuildTeam.SaveCloseButton", "SaveAndClose();", "bCanEditTeam"));
+            commands.Add(new SPRibbonCommand("Ribbon.BuildTeam.SaveCloseButton", "SaveAndClose();", "EnableDisableSaveButton()"));
             commands.Add(new SPRibbonCommand("Ribbon.BuildTeam.CloseButton", "Close();", "true"));
 
             commands.Add(new SPRibbonCommand("Ribbon.BuildTeam.ShowPool", "ShowPool();", "bCanEditTeam"));

@@ -1,25 +1,21 @@
 ﻿
+var isDirty = false;
+
 function Assignments() {
-
     var sResources = "";
-
     var tGrid = Grids.TeamGrid;
     var rGrid = Grids.ResourceGrid;
-
     var sRows = rGrid.GetSelRows();
 
     for (var r in sRows) {
         var oSRow = sRows[r];
         sResources += "," + oSRow.id;
     }
-
     sRows = tGrid.GetSelRows();
-
     for (var r in sRows) {
         var oSRow = sRows[r];
         sResources += "," + oSRow.id;
     }
-
 
     if (sResources != "") {
         sResources = sResources.substr(1);
@@ -29,7 +25,6 @@ function Assignments() {
         var surl = urlBuilder.get_url() + "?resources=" + sResources;
 
         var options = { url: surl, showMaximized: true, title: "Assignment Planner" };
-
         SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
     }
     //_layouts/epmlive/AssignmentPlanner.aspx?resources=7,5,19,6&IsDlg=1
@@ -39,7 +34,6 @@ function Assignments() {
 function RemoveResources() {
     var tGrid = Grids.TeamGrid;
     var rGrid = Grids.ResourceGrid;
-
     for (var Row in tGrid.Rows) {
         try {
             var oRow = rGrid.GetRowById(Row);
@@ -56,8 +50,8 @@ function RemoveResources() {
 function AddResource() {
     var tGrid = Grids.TeamGrid;
     var rGrid = Grids.ResourceGrid;
-
     var sRows = rGrid.GetSelRows();
+    isDirty = true;
 
     for (var r in sRows) {
         var oSRow = sRows[r];
@@ -73,7 +67,6 @@ function AddResource() {
         }
 
         var validPerms = tGrid.Cols["Permissions"].EnumKeys.split(tGrid.Cols["Permissions"].EnumKeys[0])
-
         var perms = new Array();
 
         var cGroups = rGrid.GetValue(oSRow, "Groups").toString().split(';');
@@ -115,9 +108,8 @@ function AddResource() {
 function RemoveResource() {
     var tGrid = Grids.TeamGrid;
     var rGrid = Grids.ResourceGrid;
-
     var sRows = tGrid.GetSelRows();
-
+    isDirty = true;
     for (var r in sRows) {
         var oSRow = sRows[r];
         var oRrow = rGrid.GetRowById(oSRow.id);
@@ -127,20 +119,27 @@ function RemoveResource() {
     }
     RefreshCommandUI();
     tGrid.UpdateHeights(1);
+
+    if (Grids.TeamGrid.LoadedCount > 0) {
+        return true;
+    }
+    else {
+        isDirty = false;
+        EnableDisableSaveButton();
+        gridsloaded();
+        //alert("The team cannot be saved if empty. Please select at least one team member from the list on the right.");
+        return false;
+    }
 }
 
 function AddResourcePool() {
     var options = { url: newResUrl, width: 600, height: 600, title: "Add Resource", dialogReturnValueCallback: onAddResourcePool };
-
     SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
 }
 
 function onAddResourcePool(dialogResult, returnValue) {
-
     ShowTDialog("Refreshing...");
-
     setTimeout("reloadres()", 2000);
-
 }
 
 function reloadres() {
@@ -150,8 +149,8 @@ function reloadres() {
 
 function AddResColumns() {
     Grids.ResourceGrid.ActionShowColumns();
-
 }
+
 function AddTeamColumns() {
     Grids.TeamGrid.ActionShowColumns();
 }
@@ -185,7 +184,6 @@ function TeamGroups(o) {
     }
 }
 
-
 function ResFilters(o) {
     var grid = Grids.ResourceGrid;
     var row = grid.GetRowById("Filter");
@@ -201,17 +199,14 @@ function ResFilters(o) {
     } catch (e) { }
 }
 
-
 function ResGroups(o) {
     var grid = Grids.ResourceGrid;
     var row = grid.GetRowById("GroupRow");
-    if (row.Visible)
-    {
+    if (row.Visible) {
         grid.HideRow(row);
         $(o).find("span").css("color", "#777777");
     }
-    else
-    {
+    else {
         grid.ShowRow(row);
         $(o).find("span").css("color", "#000000");
     }
@@ -227,16 +222,11 @@ function CanAddResource() {
     return canAddResource;
 }
 
-
-
 function ShowPool() {
-
-
     RefreshCommandUI();
 }
 
 function ShowUserPopup(spaccount) {
-
     var layoutsUrl = SP.Utilities.Utility.getLayoutsPageUrl('listform.aspx');
     var urlBuilder = new SP.Utilities.UrlBuilder(layoutsUrl);
     var url = urlBuilder.get_url() + "?PageType=4&ListId=" + sUserInfoList + "&ID=" + spaccount.split(';')[0];
@@ -247,11 +237,15 @@ function ShowUserPopup(spaccount) {
 
 }
 
+function EnableDisableSaveButton() {
+    if (bCanEditTeam && isDirty)
+        return true;
+    return false;
+}
 
 function CheckAddRemoveButtons() {
     var tGrid = Grids.TeamGrid;
     var rGrid = Grids.ResourceGrid;
-
     try {
         if (tGrid.GetSelRows().length == 0)
             document.getElementById("btnRemove").disabled = true;
@@ -263,7 +257,6 @@ function CheckAddRemoveButtons() {
         else
             document.getElementById("btnAdd").disabled = false;
     } catch (e) { }
-
 }
 
 function getHeight() {
@@ -329,7 +322,6 @@ function SaveAndClose() {
     }
 }
 
-
 function SaveTeamCloseClose(loader) {
     HideTDialog();
     if (loader.xmlDoc.responseText != null) {
@@ -343,7 +335,6 @@ function SaveTeamCloseClose(loader) {
 }
 
 function SaveTeam() {
-
     if (ValidateTeam()) {
         ShowTDialog("Saving Team...");
 
@@ -355,7 +346,6 @@ function SaveTeam() {
             dhtmlxAjax.post("SaveTeam.aspx", "team=" + x + "&HasResAccess=" + bCanAccessResourcePool, SaveTeamClose);
     }
 }
-
 
 function SaveTeamClose(loader) {
     HideTDialog();
@@ -372,7 +362,10 @@ function ValidateTeam() {
         return true;
     }
     else {
-        alert("The team cannot be saved if empty. Please select at least one team member from the list on the right.");
+        isDirty = false;
+        EnableDisableSaveButton();
+        gridsloaded();
+        //alert("The team cannot be saved if empty. Please select at least one team member from the list on the right.");
         return false;
     }
 }
