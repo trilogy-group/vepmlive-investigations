@@ -37,7 +37,7 @@ namespace EPMLiveCore
             writer.WriteLine("WEWebId = '" + web.ID + "';");
             writer.WriteLine("WEEditForm = '" + editURL + "';");
             writer.WriteLine("WEExtraParams = '" + extraParams.Trim('&') + "';");
-            writer.WriteLine("WESource = '" + HttpUtility.UrlEncode(HttpContext.Current.Request.Url.ToString()) + "';");
+            writer.WriteLine("WESource = '" + HttpUtility.UrlEncode(HttpContext.Current.Request.Url.ToString()).Replace("+","%20")+ "';");
             writer.WriteLine("WEUseTeam = " + gSettings.BuildTeam.ToString().ToLower() + ";");
             writer.WriteLine("WEDLG = '" + Page.Request["IsDlg"] + "';");
             writer.WriteLine("</script>");

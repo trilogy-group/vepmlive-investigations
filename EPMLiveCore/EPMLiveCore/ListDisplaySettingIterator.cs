@@ -452,7 +452,7 @@ namespace EPMLiveCore
                     writer.WriteLine("WEExtraParams = '" + extraParams.Trim('&') + "';");
                     writer.WriteLine("WEListId = '" + base.ListId + "';");
                     writer.WriteLine("WEItemId = '" + base.ItemId + "';");
-                    writer.WriteLine("WESource = '" + HttpUtility.UrlEncode(HttpContext.Current.Request.Url.ToString()) + "';");
+                    writer.WriteLine("WESource = '" + HttpUtility.UrlEncode(HttpContext.Current.Request.Url.ToString()).Replace("+", "%20") + "';");
                     writer.WriteLine("WEUseTeam = " + bUseTeam.ToString().ToLower() + ";");
                     writer.WriteLine("WEDLG = '" + Page.Request["IsDlg"] + "';");
                     writer.WriteLine("</script>");

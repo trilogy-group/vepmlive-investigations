@@ -833,7 +833,7 @@ namespace EPMLiveWebParts
                     && System.Web.HttpUtility.UrlDecode(Request["source"]).Equals(Request["source"]))
                     || (!string.IsNullOrEmpty(Request["source"]) && Request["source"].ToLower().Contains("fd_item_")))
                 {
-                    source = System.Web.HttpUtility.UrlEncode(Request["source"]);
+                    source = System.Web.HttpUtility.UrlEncode(Request["source"]).Replace("+", "%20");
                 }
                 else
                 {
