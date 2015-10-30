@@ -2303,44 +2303,60 @@
         return html;
     };
     RPEditor.prototype.GridsOnAfterSave = function (grid, result, autoupdate) {
-        this.HideWorkingPopup("divSaving");
-        this.savingPlan = false;
-        if (result == 0) {
-            var planrow = grid.GetFirst(null, 0);
-            while (planrow != null) {
-                // need to clear some changed flags
-                grid.SetAttribute(planrow, null, "CCRole_NameChanged", null, 0, 0);
-                grid.SetAttribute(planrow, null, "CCRoleParent_NameChanged", null, 0, 0);
-                grid.SetAttribute(planrow, null, "GroupChanged", null, 0, 0);
-                grid.SetAttribute(planrow, null, "PrivateChanged", null, 0, 0);
-                grid.SetAttribute(planrow, null, "Project_NameChanged", null, 0, 0);
-                grid.SetAttribute(planrow, null, "Res_NameChanged", null, 0, 0);
-                var eventId = grid.GetAttribute(planrow, null, "RowEventId");
-                if (eventId != null) {
-                    grid.SetAttribute(planrow, null, "RowEventId", null, 0, 0);
-                    grid.SetAttribute(planrow, null, "RowEventTitle", null, 0, 0);
-                    grid.SetAttribute(planrow, null, "RowEventHtml", null, 0, 0);
+        if (this.AsyncReloaded) {
+            setTimeout(function () {
+                rPEditorInstance.AsyncReloaded = false;
+                Grids["g_RPE"] = null;
+                Grids["g_Res"] = null;
+                rPEditorInstance.plangrid = null;
+                rPEditorInstance.resgrid = null;
+                rPEditorInstance.viewStartPeriod = rPEditorInstance.preViewStartPeriod;
+                rPEditorInstance.viewFinishPeriod = rPEditorInstance.preViewFinishPeriod;
+                rPEditorInstance.HideWorkingPopup("divSaving");
+                rPEditorInstance.savingPlan = false;
+                rPEditorInstance.InitializeLayout();
+            }, 500);
+
+        } else {
+            this.HideWorkingPopup("divSaving");
+            this.savingPlan = false;
+            if (result == 0) {
+                var planrow = grid.GetFirst(null, 0);
+                while (planrow != null) {
+                    // need to clear some changed flags
+                    grid.SetAttribute(planrow, null, "CCRole_NameChanged", null, 0, 0);
+                    grid.SetAttribute(planrow, null, "CCRoleParent_NameChanged", null, 0, 0);
+                    grid.SetAttribute(planrow, null, "GroupChanged", null, 0, 0);
+                    grid.SetAttribute(planrow, null, "PrivateChanged", null, 0, 0);
+                    grid.SetAttribute(planrow, null, "Project_NameChanged", null, 0, 0);
+                    grid.SetAttribute(planrow, null, "Res_NameChanged", null, 0, 0);
+                    var eventId = grid.GetAttribute(planrow, null, "RowEventId");
+                    if (eventId != null) {
+                        grid.SetAttribute(planrow, null, "RowEventId", null, 0, 0);
+                        grid.SetAttribute(planrow, null, "RowEventTitle", null, 0, 0);
+                        grid.SetAttribute(planrow, null, "RowEventHtml", null, 0, 0);
+                    }
+                    grid.SetAttribute(planrow, null, "TimestampOrig", null, 0, 0);
+                    planrow = grid.GetNext(planrow);
                 }
-                grid.SetAttribute(planrow, null, "TimestampOrig", null, 0, 0);
-                planrow = grid.GetNext(planrow);
+
+                var sbn = new StringBuilder();
+                sbn.append('<SynchronizeTeam');
+                sbn.append(' Project_UIDs="' + this.projectuids + '"');
+                sbn.append(' >');
+                sbn.append('</SynchronizeTeam>');
+
+                var sb = new StringBuilder();
+                sb.append('<Execute Function="SynchronizeTeam">');
+                sb.append(sbn.toString());
+                sb.append('</Execute>');
+                this.ExecuteJSON(sb.toString(), "GeneralFunctions");
+
+                this.SetPlanRowsEditStatus();
+                //this.RefreshResourcePeriodsPaged(false, null);          
             }
-
-            var sbn = new StringBuilder();
-            sbn.append('<SynchronizeTeam');
-            sbn.append(' Project_UIDs="' + this.projectuids + '"');
-            sbn.append(' >');
-            sbn.append('</SynchronizeTeam>');
-
-            var sb = new StringBuilder();
-            sb.append('<Execute Function="SynchronizeTeam">');
-            sb.append(sbn.toString());
-            sb.append('</Execute>');
-            this.ExecuteJSON(sb.toString(), "GeneralFunctions");
-
-            this.SetPlanRowsEditStatus();
-            //this.RefreshResourcePeriodsPaged(false, null);
+            this.UpdateButtonsAsync();
         }
-        this.UpdateButtonsAsync();
     };
     RPEditor.prototype.AddRowsToProject = function (resrows, planrow, buttonPress) {
         var projectID = this.plangrid.GetAttribute(planrow, null, "Project_UID");
@@ -3497,15 +3513,24 @@
     };
 
     RPEditor.prototype.AsyncReload = function (fromPeriod, toPeriod) {
-        Grids["g_RPE"] = null;
-        Grids["g_Res"] = null;
-        this.plangrid = null;
-        this.resgrid = null;
-        this.initialized = false;
-        this.viewStartPeriod = fromPeriod;
-        this.viewFinishPeriod = toPeriod;
-        this.reloaded = true;
-        this.InitializeLayout();
+        if (this.editorTab.isItemDisabled("SavePlanBtn") == false) {
+            this.AsyncReloaded = true;
+            this.initialized = false;
+            this.preViewStartPeriod = fromPeriod;
+            this.preViewFinishPeriod = toPeriod;
+            this.reloaded = true;
+            this.SavePlan(false);
+        } else {
+            this.initialized = false;
+            this.viewStartPeriod = fromPeriod;
+            this.viewFinishPeriod = toPeriod;
+            this.reloaded = true;
+            Grids["g_RPE"] = null;
+            Grids["g_Res"] = null;
+            this.plangrid = null;
+            this.resgrid = null;
+            this.InitializeLayout();
+        }
     };
 
     RPEditor.prototype.ShowSelectedResourceGroup = function () {
@@ -6140,9 +6165,12 @@
         this.wins.setImagePath("../epmlive/dhtml/windows/imgs/");
         this.wins.setSkin("dhx_web");
         this.reloaded = false;
+        this.AsyncReloaded = false;
         this.allPeriods = null;
         this.viewStartPeriod = null;
         this.viewFinishPeriod = null;
+        this.preViewStartPeriod = null;
+        this.preViewFinishPeriod = null;
         this.reloadFinishPeriod = null;
         this.startPeriod = null;
         this.finishPeriod = null;
