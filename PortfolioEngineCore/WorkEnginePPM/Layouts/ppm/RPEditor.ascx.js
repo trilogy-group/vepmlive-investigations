@@ -5180,14 +5180,7 @@
             //var dt1 = new Date();
             var pageNum = resgrid.GetPageNum(start);
             var row = start.firstChild;
-            while (row != null) {
-                if (bCalculate == true) {
-                    rPEditorInstance.CalculateResourceRowCommitted(null, row, true);
-                } else {
-                    rPEditorInstance.RefreshResourceRowPeriods(resgrid, row, true, true);
-                }
-                row = row.nextSibling;
-            }
+            this.CalculateRow(resgrid, row, bCalculate);
             //var dt2 = new Date();
             //alert((dt2.getTime() - dt1.getTime()) / 1000);
         }
@@ -5220,19 +5213,28 @@
             for (var p = 0; p < pages.length; p++) {
                 var pagerow = pages[p];
                 var row = pagerow.firstChild;
-                while (row != null) {
-                    if (bCalculate == true) {
-                        rPEditorInstance.CalculateResourceRowCommitted(null, row, true);
-                    } else {
-                        rPEditorInstance.RefreshResourceRowPeriods(resgrid, row, true, true);
-                    }
-                    row = row.nextSibling;
-                }
+                this.CalculateRow(resgrid, row, bCalculate);
             }
             //var dt22 = new Date();
             //alert((dt22.getTime() - dt11.getTime()) / 1000);
         }
         resgrid.Calculate(1, 0);
+    };
+    RPEditor.prototype.CalculateRow = function (resgrid, row, bCalculate) {
+        while (row != null) {
+            if (row.Def.Group === undefined) {
+                if (bCalculate == true) {
+                    rPEditorInstance.CalculateResourceRowCommitted(null, row, true);
+                } else {
+                    rPEditorInstance.RefreshResourceRowPeriods(resgrid, row, true, true);
+                }
+            }
+            else if (row.Def.Group === 1) {
+                var innerrow = row.firstChild;
+                this.CalculateRow(resgrid, innerrow, bCalculate);
+            }
+            row = row.nextSibling;
+        }
     };
     RPEditor.prototype.CalculateResourceRowCommitted = function (resuid, resrow, bRefreshAllColumns) {
         if (resuid == null)
