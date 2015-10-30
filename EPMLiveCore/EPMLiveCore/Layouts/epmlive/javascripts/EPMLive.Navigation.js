@@ -1220,13 +1220,23 @@
                             if (callBackFunction != '' && callBackFunction != 'undefined') {
                                 callBackFunction = eval(callBackFunction);
                                 options = { url: redirectUrl, width: 700, dialogReturnValueCallback: Function.createCallback(Function.createDelegate(null, callBackFunction), id) };
-                            } else {
+                            }
+                            else if (command === 'approve') {
+                                options = { url: redirectUrl, width: 700, dialogReturnValueCallback: approveDialogCallback };
+                            }
+                            else {
                                 options = { url: redirectUrl, width: 700 };
                             }
                             SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
                             break;
                     }
 
+                }
+
+                function approveDialogCallback(dialogResult, returnValue) {
+                    if (dialogResult == SP.UI.DialogResult.OK) {
+                        window.location.reload();
+                    }
                 }
 
                 function registerEvents() {

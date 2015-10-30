@@ -2571,7 +2571,7 @@ namespace EPMLiveWebParts
                 foreach (SPField field in list.Fields)
                 {
                     //EPML-5543: added extra check for ID, Created By, Modified By, LinkTitleNoMenu, LinkTitle, FileName, File Type and Moified.
-                    if (!field.Hidden && field.Reorderable || (MatchROFields(field.Id)))
+                    if (!field.Hidden && field.Reorderable || (MatchROFields(field.Id) || (IsEnableModeration(field.Id))))
                     {
                         //EPML-5543: LinkTitleNoMenu/LinkTitle columns bind to Title field,LinkFilename/LinkFilenameNoMenu columns bind to FileName field and the column name always remain the same
                         //make sure to always display these fields irrespective of display rules
@@ -2616,7 +2616,7 @@ namespace EPMLiveWebParts
                 foreach (SPField field in list.Fields)
                 {
                     // EPML-5152,4718,4980: added extra check for ID,Created By, Modified By, LinkTitleNoMenu & LinkTitle.
-                    if (!field.Hidden && field.Reorderable || (field.Id == SPBuiltInFieldId.Author || field.Id == SPBuiltInFieldId.Editor || field.Id == SPBuiltInFieldId.ID) || (field.Id == SPBuiltInFieldId.LinkTitleNoMenu || field.Id == SPBuiltInFieldId.LinkTitle))
+                    if (!field.Hidden && field.Reorderable || (field.Id == SPBuiltInFieldId.Author || field.Id == SPBuiltInFieldId.Editor || field.Id == SPBuiltInFieldId.ID) || (field.Id == SPBuiltInFieldId.LinkTitleNoMenu || field.Id == SPBuiltInFieldId.LinkTitle || (IsEnableModeration(field.Id))))
                     {
                         //EPML-4625: LinkTitleNoMenu/LinkTitle columns bind to Title field and the column name always remain the same
                         //make sure to always display Title fields irrespective of display rules
@@ -3233,7 +3233,7 @@ namespace EPMLiveWebParts
 
                 foreach (SPField field in list.Fields)
                 {
-                    if (field.Reorderable && !field.Hidden)
+                    if ((field.Reorderable && !field.Hidden) || (IsEnableModeration(field.Id)))
                     {
                         //EPML-4625: Title columns bind to Title field and the column name always remain the same
                         //make sure to always display Title fields irrespective of display rules
@@ -5800,6 +5800,23 @@ namespace EPMLiveWebParts
                 return true;
             else
                 return false;
+        }
+
+        private bool IsEnableModeration(Guid fieldId) 
+        { 
+            if (list.EnableModeration){
+                if (list.DoesUserHavePermissions(SPBasePermissions.ApproveItems))
+                {
+                    if (fieldId == SPBuiltInFieldId._ModerationComments || fieldId == SPBuiltInFieldId._ModerationStatus)
+                    {
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
+                }
+            }
+            return false;
         }
 
         #region GridLoadHelpers

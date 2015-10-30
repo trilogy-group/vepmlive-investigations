@@ -983,6 +983,43 @@ namespace EPMLiveWebParts
                         {
                             field = getRealField(list.Fields.GetFieldByInternalName(fieldName));
 
+                            if (list.EnableModeration)
+                            {
+                                if (list.DoesUserHavePermissions(SPBasePermissions.ApproveItems))
+                                {
+                                    if (field.Id == SPBuiltInFieldId._ModerationStatus)
+                                    {
+                                        val = Convert.ToString(li[field.Id]);
+                                        switch (val)
+                                        {
+                                            case "0":
+                                                displayValue = "Approved";
+                                                break;
+                                            case "1":
+                                                displayValue = "Rejected";
+                                                break;
+                                            case "2":
+                                                displayValue = "Pending";
+                                                break;
+                                            case "3":
+                                                displayValue = "Draft";
+                                                break;
+                                            case "4":
+                                                displayValue = "Scheduled";
+                                                break;
+                                            default:
+                                                displayValue = "Approved";
+                                                break;
+                                        }
+                                    }
+                                    if (field.Id == SPBuiltInFieldId._ModerationComments)
+                                    {
+                                        val = Convert.ToString(li[field.Id]);
+                                        displayValue = val;
+                                    }
+                                }
+                            }
+
                             if (bUseReporting)
                             {
 
