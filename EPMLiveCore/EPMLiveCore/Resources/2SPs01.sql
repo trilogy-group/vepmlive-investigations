@@ -1084,21 +1084,21 @@ declare @sql varchar(MAX)
 
 set @sql = '';WITH CTE AS 
 ( 
-SELECT TOP '' + @maxthreads + '' TSQUEUE_ID, QUEUE, STATUS, JOBTYPE_ID, DTSTARTED
+SELECT TOP '' + @maxthreads + '' TSQUEUE_ID, QUEUE, STATUS, JOBTYPE_ID, DTSTARTED, PERCENTCOMPLETE
 FROM TSQUEUE 
 WHERE QUEUE is null and status=0 and JOBTYPE_ID = 32
 order by DTCREATED
 ) 
-UPDATE CTE SET QUEUE='''''' + @servername + '''''', status=1;
+UPDATE CTE SET QUEUE='''''' + @servername + '''''', status=1, PERCENTCOMPLETE=0;
 
 WITH CTE2 AS 
 ( 
-SELECT TOP 200 TSQUEUE_ID, QUEUE, STATUS, JOBTYPE_ID, DTSTARTED
+SELECT TOP 200 TSQUEUE_ID, QUEUE, STATUS, JOBTYPE_ID, DTSTARTED, PERCENTCOMPLETE
 FROM TSQUEUE 
 WHERE QUEUE is null and status=0 and (JOBTYPE_ID = 30 OR JOBTYPE_ID = 31)
 order by DTCREATED
 ) 
-UPDATE CTE2 SET QUEUE='''''' + @servername + '''''', status=1
+UPDATE CTE2 SET QUEUE='''''' + @servername + '''''', status=1, PERCENTCOMPLETE=0
 ''
 
 exec(@sql)
@@ -1113,8 +1113,6 @@ FROM         dbo.TSQUEUE INNER JOIN
                       dbo.TSTIMESHEET ON dbo.TSQUEUE.TS_UID = dbo.TSTIMESHEET.TS_UID INNER JOIN
                       dbo.TIMERJOBTYPES ON dbo.TSQUEUE.JOBTYPE_ID = dbo.TIMERJOBTYPES.JOBTYPE_ID
 WHERE QUEUE = @servername and STATUS = 1
-
-UPDATE TSQUEUE SET STATUS = 2,PERCENTCOMPLETE=0 WHERE QUEUE = @servername and STATUS = 1
 
 END
 ')
@@ -2049,6 +2047,78 @@ exec(@sql)
 SELECT * FROM ROLLUPQUEUE WHERE QUEUESERVER = @servername and status = 1
 
 DELETE FROM ROLLUPQUEUE where DATEDIFF(hh, EVENTTIME, GETDATE()) > 24 and Status = 3
+
+END
+')
+
+if not exists (select routine_name from INFORMATION_SCHEMA.routines where routine_name = 'spTimerGetQueue')
+begin
+    Print 'Creating Stored Procedure spTimerGetQueue'
+    SET @createoralter = 'CREATE'
+end
+else
+begin
+    Print 'Updating Stored Procedure spTimerGetQueue'
+    SET @createoralter = 'ALTER'
+end
+exec(@createoralter + ' PROCEDURE [dbo].[spTimerGetQueue]
+
+@servername varchar(255),
+@maxthreads varchar(2),
+@minPriority int,
+@maxPriority int
+AS
+BEGIN
+
+declare @sql varchar(MAX)
+
+set @sql = '';WITH CTE AS 
+( 
+	SELECT TOP '' + @maxthreads + '' * 
+	FROM vwQueueTimer 
+	WHERE QUEUESERVER is null 
+	AND STATUS = 0 
+	AND priority > '' + CAST(@minPriority AS NVARCHAR(10)) + '' AND priority <= '' + CAST(@maxPriority AS NVARCHAR(10)) + '' 
+	ORDER BY priority,dtcreated ASC
+) 
+UPDATE CTE SET QUEUESERVER='''''' + @servername + '''''', STATUS = 0''
+
+exec(@sql)
+
+SELECT queueuid,timerjobuid,siteguid,webguid,listguid,itemid,jobtype,jobdata,userid,netassembly,netclass,title,[key] 
+FROM vwQueueTimer WHERE QUEUESERVER = @servername and status = 0
+
+END
+')
+
+if not exists (select routine_name from INFORMATION_SCHEMA.routines where routine_name = 'spNotificationGetQueue')
+begin
+    Print 'Creating Stored Procedure spNotificationGetQueue'
+    SET @createoralter = 'CREATE'
+end
+else
+begin
+    Print 'Updating Stored Procedure spNotificationGetQueue'
+    SET @createoralter = 'ALTER'
+end
+exec(@createoralter + ' PROCEDURE [dbo].[spNotificationGetQueue]
+	@servername varchar(255)
+AS
+BEGIN
+
+declare @sql varchar(MAX)
+
+set @sql = '';WITH CTE AS 
+( 
+	SELECT * 
+	FROM vwNReadyEmails 
+	WHERE QUEUESERVER is null 
+) 
+UPDATE CTE SET QUEUESERVER= '''''' + @servername + ''''''''
+
+exec(@sql)
+
+SELECT * FROM vwNReadyEmails WHERE QUEUESERVER = @servername
 
 END
 ')

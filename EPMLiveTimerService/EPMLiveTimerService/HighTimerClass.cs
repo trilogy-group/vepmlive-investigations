@@ -112,7 +112,7 @@ namespace TimerService
                     using (SqlConnection cn = new SqlConnection(sConn))
                     {
                         cn.Open();
-                        using (SqlCommand cmd = new SqlCommand("update queue set status = 0 where status = 1", cn))
+                        using (SqlCommand cmd = new SqlCommand("update queue set status = 0, queueserver=NULL where status = 1", cn))
                         {
                             cmd.ExecuteNonQuery();
                         }
@@ -155,8 +155,15 @@ namespace TimerService
                             using (SqlConnection cn = new SqlConnection(sConn))
                             {
                                 cn.Open();
-                                using (SqlCommand cmd = new SqlCommand("SELECT TOP " + maxThreads + " queueuid,timerjobuid,siteguid,webguid,listguid,itemid,jobtype,jobdata,userid,netassembly,netclass,title,[key] from vwQueueTimer where status=0 and priority <= 10 order by priority,dtcreated asc", cn))
+                                //using (SqlCommand cmd = new SqlCommand("SELECT TOP " + maxThreads + " queueuid,timerjobuid,siteguid,webguid,listguid,itemid,jobtype,jobdata,userid,netassembly,netclass,title,[key] from vwQueueTimer where status=0 and priority <= 10 order by priority,dtcreated asc", cn))
+                                using (SqlCommand cmd = new SqlCommand("spTimerGetQueue", cn))
                                 {
+                                    cmd.CommandType = CommandType.StoredProcedure;
+                                    cmd.Parameters.AddWithValue("@servername", System.Environment.MachineName);
+                                    cmd.Parameters.AddWithValue("@maxthreads", maxThreads);
+                                    cmd.Parameters.AddWithValue("@minPriority", 0);
+                                    cmd.Parameters.AddWithValue("@maxPriority", 10);
+
                                     DataSet ds = new DataSet();
                                     using (SqlDataAdapter da = new SqlDataAdapter(cmd))
                                     {
@@ -169,7 +176,7 @@ namespace TimerService
                                             rd.dr = dr;
                                             if (startProcess(rd))
                                             {
-                                                using (SqlCommand cmd1 = new SqlCommand("UPDATE queue set status=1,dtstarted = GETDATE() where queueuid=@id", cn))
+                                                using (SqlCommand cmd1 = new SqlCommand("UPDATE queue set status=1, dtstarted = GETDATE() where queueuid=@id", cn))
                                                 {
                                                     cmd1.Parameters.AddWithValue("@id", dr["queueuid"].ToString());
                                                     cmd1.ExecuteNonQuery();

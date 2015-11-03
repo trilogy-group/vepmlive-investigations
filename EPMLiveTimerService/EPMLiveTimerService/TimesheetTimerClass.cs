@@ -154,19 +154,19 @@ namespace TimerService
 
                                         foreach (DataRow dr in ds.Tables[0].Rows)
                                         {
-                                            RunnerData rd = new RunnerData();
-                                            rd.cn = sConn;
-                                            rd.dr = dr;
+                                            var rd = new RunnerData {cn = sConn, dr = dr};
                                             if (startProcess(rd))
                                             {
-                                                //cmd = new SqlCommand("UPDATE TSqueue set status=1,dtstarted = GETDATE() where tsqueue_id=@id", cn);
-                                                //cmd.Parameters.AddWithValue("@id", dr["tsqueue_id"].ToString());
-                                                //cmd.ExecuteNonQuery();
+                                                using (var cmd1 = new SqlCommand("UPDATE TSqueue set status=2, dtstarted = GETDATE() where tsqueue_id=@id", cn))
+                                                {
+                                                    cmd1.Parameters.AddWithValue("@id", dr["tsqueue_id"].ToString());
+                                                    cmd1.ExecuteNonQuery();
+                                                }
                                             }
                                         }
                                     }
 
-                                    using (SqlCommand cmd1 = new SqlCommand("delete from TSqueue where DateAdd(day, 1, dtfinished) < GETDATE()", cn))
+                                    using (var cmd1 = new SqlCommand("delete from TSqueue where DateAdd(day, 1, dtfinished) < GETDATE()", cn))
                                     {
                                         cmd1.ExecuteNonQuery();
                                     }

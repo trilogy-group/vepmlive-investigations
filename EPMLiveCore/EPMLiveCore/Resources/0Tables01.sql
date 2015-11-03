@@ -169,6 +169,7 @@ if not exists (select table_name from INFORMATION_SCHEMA.tables where table_name
 		CREATE TABLE [dbo].[QUEUE](
 			[queueuid] [uniqueidentifier] NOT NULL DEFAULT (newid()),
 			[timerjobuid] [uniqueidentifier] NULL,
+			[QueueServer] [varchar](255) NULL,
 			[percentComplete] [int] NOT NULL,
 			[status] [int] NOT NULL DEFAULT ((0)),
 			[dtcreated] [datetime] NULL DEFAULT (getdate()),
@@ -182,9 +183,15 @@ else
 		Print 'Updating Table QUEUE'
 		if not exists (select column_name FROM INFORMATION_SCHEMA.COLUMNS where table_name = 'QUEUE' and column_name = 'userid')
 		begin
-			Print '     Add Column workhours'
+			Print '     Add Column userid'
 			ALTER TABLE QUEUE
 			ADD [userid] [int] NULL
+		end
+		if not exists (select column_name FROM INFORMATION_SCHEMA.COLUMNS where table_name = 'QUEUE' and column_name = 'QueueServer')
+		begin
+			Print '     Add Column QueueServer'
+			ALTER TABLE QUEUE
+			ADD [QueueServer] [varchar](255) NULL
 		end
 				
 	end
@@ -342,6 +349,7 @@ begin
 	[ListID] [uniqueidentifier] NULL,
 	[ItemID] [int] NULL,
 	[Emailed] [bit] NULL DEFAULT ((0)),
+	[QueueServer] [varchar](255) NULL,
 	CONSTRAINT [PK_NOTIFICATIONS] PRIMARY KEY CLUSTERED 
 	(
 		[ID] ASC
@@ -351,6 +359,12 @@ end
 else
 begin
 	print 'Updating Table NOTIFICATIONS'
+	if not exists (select column_name FROM INFORMATION_SCHEMA.COLUMNS where table_name = 'NOTIFICATIONS' and column_name = 'QueueServer')
+	begin
+		Print '     Add Column QueueServer'
+		ALTER TABLE NOTIFICATIONS
+		ADD [QueueServer] [varchar](255) NULL
+	end
 end
 
 

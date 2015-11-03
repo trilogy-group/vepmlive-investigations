@@ -510,8 +510,12 @@ namespace TimerService
                                         cmd1.ExecuteNonQuery();
                                     }
 
-                                    using (SqlCommand cmd2 = new SqlCommand("select * from vwNReadyEmails order by siteid", cn))
+                                    //using (SqlCommand cmd2 = new SqlCommand("select * from vwNReadyEmails order by siteid", cn))
+                                    using (var cmd2 = new SqlCommand("spNotificationGetQueue", cn))
                                     {
+                                        cmd2.CommandType = CommandType.StoredProcedure;
+                                        cmd2.Parameters.AddWithValue("@servername", System.Environment.MachineName);
+
                                         using (SqlDataAdapter da = new SqlDataAdapter(cmd2))
                                         {
                                             da.Fill(ds);

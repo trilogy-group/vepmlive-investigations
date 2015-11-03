@@ -113,7 +113,7 @@ exec(@createoralter + ' VIEW dbo.vwNReadyEmails
 AS
 SELECT     dbo.PERSONALIZATIONS.UserId, dbo.PERSONALIZATIONS.SiteId, dbo.PERSONALIZATIONS.WebId, dbo.PERSONALIZATIONS.ListId, dbo.PERSONALIZATIONS.ItemId, 
                       dbo.NOTIFICATIONS.Title, dbo.NOTIFICATIONS.Message, dbo.NOTIFICATIONS.SiteCreationDate, dbo.NOTIFICATIONS.CreatedBy, dbo.NOTIFICATIONS.CreatedAt, 
-                      dbo.PERSONALIZATIONS.FK
+                      dbo.PERSONALIZATIONS.FK, dbo.NOTIFICATIONS.QueueServer
 FROM         dbo.NOTIFICATIONS INNER JOIN
                       dbo.PERSONALIZATIONS ON dbo.NOTIFICATIONS.ID = dbo.PERSONALIZATIONS.FK
 WHERE     (dbo.NOTIFICATIONS.Emailed = 0) AND (SUBSTRING(dbo.PERSONALIZATIONS.Value, 1, 1) = 0) AND (dbo.PERSONALIZATIONS.[Key] = ''Notifications'')
@@ -202,7 +202,7 @@ begin
 end
 exec(@createoralter + ' VIEW dbo.vwQueueTimer
 AS
-SELECT     dbo.QUEUE.queueuid, dbo.QUEUE.percentComplete, dbo.QUEUE.status, dbo.QUEUE.dtstarted, dbo.QUEUE.dtfinished, dbo.QUEUE.dtcreated, 
+SELECT     dbo.QUEUE.queueuid, dbo.QUEUE.percentComplete, dbo.QUEUE.QueueServer, dbo.QUEUE.status, dbo.QUEUE.dtstarted, dbo.QUEUE.dtfinished, dbo.QUEUE.dtcreated, 
                       dbo.TIMERJOBS.timerjobuid, dbo.TIMERJOBS.jobname, dbo.TIMERJOBS.siteguid, dbo.TIMERJOBS.webguid, dbo.TIMERJOBS.listguid, dbo.TIMERJOBS.jobtype, 
                       dbo.TIMERJOBS.enabled, dbo.TIMERJOBS.runtime, dbo.TIMERJOBS.scheduletype, dbo.TIMERJOBS.days, dbo.TIMERJOBS.jobdata, dbo.TIMERJOBS.lastqueuecheck, 
                       dbo.TIMERJOBS.parentjobuid, dbo.QUEUE.userid, dbo.TIMERJOBTYPES.NetAssembly, dbo.TIMERJOBTYPES.NetClass, dbo.TIMERJOBTYPES.Title, 
