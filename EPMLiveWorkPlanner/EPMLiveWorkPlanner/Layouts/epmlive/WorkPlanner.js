@@ -3113,6 +3113,12 @@ function getHTML(grid, row, col, val) {
             else if (col == "Predecessors" || col == "Descendants") {
                 var ValidChars = "0123456789";
 
+                try {
+                    grid.ActionCalcOff();
+                    setWBSAndTaskID(grid.GetRowById('0'), true);
+                    grid.ActionCalcOn();
+                } catch (e) { }
+
                 var newval = "";
                 var sVals = val.toString().split(';');
 

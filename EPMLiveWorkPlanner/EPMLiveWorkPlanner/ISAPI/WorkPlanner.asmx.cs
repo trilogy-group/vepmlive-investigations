@@ -515,7 +515,7 @@ namespace EPMLiveWorkPlanner
                     }
                 }
 
-                int curtaskuid = 1;
+                int curtaskuid = 0;
 
                 foreach (XmlNode ndT in docPlan.SelectNodes("//I"))
                 {
