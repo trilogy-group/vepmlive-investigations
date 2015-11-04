@@ -193,7 +193,7 @@ function MyWorkOnReady(grid, start) {
             } else {
                 document.getElementById('MWG_Loader_' + myWorkWebPartId).style.display = 'none';
             }
-        }        
+        }
 
         if (MyWorkGrid.showingCompletedItems) {
             for (var rowId in grid.Rows) {
@@ -265,10 +265,10 @@ function MyWorkOnRenderFinish(grid) {
                         enumvals.push("|" + col);
                     }
                 }
-            }            
+            }
             grid.SetAttribute(grid.GetRowById("Filter"), null, enumcols[i] + 'Enum', enumvals.join(""), 1);
             enumvals = "";
-        }        
+        }
     }
 };
 
@@ -1457,111 +1457,122 @@ var MyWorkGrid = {
     },
 
     loadViews: function () {
-        EPMLiveCore.WorkEngineAPI.Execute("GetMyWorkGridViews", '', function (response) {
-            response = parseJson(response);
+        var $$$ = window.epmLive;
+        $.ajax({
+            type: 'POST',
+            url: $$$.currentWebUrl + '/_vti_bin/WorkEngine.asmx/Execute',
+            async: false,
+            data: "{ Function: 'GetMyWorkGridViews', Dataxml: '' }",
+            contentType: 'application/json; charset=utf-8',
+            dataType: 'json',
+            success: function (response) {
+                response = parseJson(response.d);
+                if (responseIsSuccess(response)) {
 
-            if (responseIsSuccess(response)) {
+                    if (response.Result.MyWork.Views !== null) {
+                        var views = response.Result.MyWork.Views.View;
 
-                if (response.Result.MyWork.Views !== null) {
-                    var views = response.Result.MyWork.Views.View;
+                        if (views.length > 0 || views["@ID"] !== undefined) {
 
-                    if (views.length > 0 || views["@ID"] !== undefined) {
-
-                        if (views["@ID"] !== undefined) {
-                            var v = views;
-                            views = new Array();
-                            Array.add(views, v);
-                        }
-
-                        for (var v in views) {
-                            var view = views[v];
-
-                            MyWorkGrid.views[view["@ID"]] = new Object();
-
-                            var viewName = view["@Name"];
-                            var viewId = view["@ID"];
-                            var isPersonal = false;
-                            var isDefault = false;
-
-                            if (view["@Type"] === 'Personal') {
-                                isPersonal = true;
-                            }
-                            if (view["@Default"] === "true") {
-                                isDefault = true;
+                            if (views["@ID"] !== undefined) {
+                                var v = views;
+                                views = new Array();
+                                Array.add(views, v);
                             }
 
-                            MyWorkGrid.views[viewId] = {
-                                id: viewId,
-                                name: viewName,
-                                isDefault: isDefault,
-                                isPersonal: isPersonal,
-                                leftCols: view["@LeftCols"],
-                                cols: view["@Cols"],
-                                rightCols: view["@RightCols"],
-                                filters: view["@Filters"],
-                                grouping: view["@Grouping"],
-                                sorting: view["@Sorting"]
-                            };
-                        }
+                            for (var v in views) {
+                                var view = views[v];
 
-                        if (requestedView !== '') {
-                            requestedView = Base64.decode(requestedView).toLowerCase();
+                                MyWorkGrid.views[view["@ID"]] = new Object();
 
-                            if (requestedViewType === '') {
-                                requestedViewType = 'global';
-                            } else {
-                                requestedViewType = Base64.decode(requestedViewType).toLowerCase();
-                                if (requestedViewType !== 'personal') {
+                                var viewName = view["@Name"];
+                                var viewId = view["@ID"];
+                                var isPersonal = false;
+                                var isDefault = false;
+
+                                if (view["@Type"] === 'Personal') {
+                                    isPersonal = true;
+                                }
+                                if (view["@Default"] === "true") {
+                                    isDefault = true;
+                                }
+
+                                MyWorkGrid.views[viewId] = {
+                                    id: viewId,
+                                    name: viewName,
+                                    isDefault: isDefault,
+                                    isPersonal: isPersonal,
+                                    leftCols: view["@LeftCols"],
+                                    cols: view["@Cols"],
+                                    rightCols: view["@RightCols"],
+                                    filters: view["@Filters"],
+                                    grouping: view["@Grouping"],
+                                    sorting: view["@Sorting"]
+                                };
+                            }
+
+                            if (requestedView !== '') {
+                                requestedView = Base64.decode(requestedView).toLowerCase();
+
+                                if (requestedViewType === '') {
                                     requestedViewType = 'global';
-                                }
-                            }
-
-                            for (var vw in MyWorkGrid.views) {
-                                var theView = MyWorkGrid.views[vw];
-
-                                if (theView.name.toLowerCase() === requestedView) {
-                                    if (theView.isPersonal === (requestedViewType === 'personal')) {
-                                        masterView = theView.id;
+                                } else {
+                                    requestedViewType = Base64.decode(requestedViewType).toLowerCase();
+                                    if (requestedViewType !== 'personal') {
+                                        requestedViewType = 'global';
                                     }
                                 }
-                            }
-                        }
 
-                        if (masterView === '') {
-                            var defaultPersonalView = '';
-                            var defaultGlobalView = 'dv';
+                                for (var vw in MyWorkGrid.views) {
+                                    var theView = MyWorkGrid.views[vw];
 
-                            for (var v in MyWorkGrid.views) {
-                                var view = MyWorkGrid.views[v];
-
-                                if (view.isDefault && MyWorkGrid.defaultViewId !== view.id) {                                    
-                                    if (view.isPersonal) {
-                                        defaultPersonalView = view.id;
-                                        if (defaultPersonalView !== '') {
-                                            MyWorkGrid.applyView(defaultPersonalView);
-                                            break;
-                                        }
-                                    } else {
-                                        defaultGlobalView = view.id;
-                                        if (defaultGlobalView !== '') {
-                                            MyWorkGrid.applyView(defaultGlobalView);
-                                            break;
+                                    if (theView.name.toLowerCase() === requestedView) {
+                                        if (theView.isPersonal === (requestedViewType === 'personal')) {
+                                            masterView = theView.id;
                                         }
                                     }
                                 }
                             }
-                            
 
-                        } else {
-                            MyWorkGrid.applyView(masterView);
+                            if (masterView === '') {
+                                var defaultPersonalView = '';
+                                var defaultGlobalView = 'dv';
+
+                                for (var v in MyWorkGrid.views) {
+                                    var view = MyWorkGrid.views[v];
+
+                                    if (view.isDefault && MyWorkGrid.defaultViewId !== view.id) {
+                                        if (view.isPersonal) {
+                                            defaultPersonalView = view.id;
+                                            if (defaultPersonalView !== '') {
+                                                MyWorkGrid.applyView(defaultPersonalView);
+                                                break;
+                                            }
+                                        } else {
+                                            defaultGlobalView = view.id;
+                                            if (defaultGlobalView !== '') {
+                                                MyWorkGrid.applyView(defaultGlobalView);
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
+
+
+                            } else {
+                                MyWorkGrid.applyView(masterView);
+                            }
+
                         }
-
                     }
+
+                    MyWorkGrid.viewsLoaded = true;
+
+                    RefreshCommandUI();
                 }
-
-                MyWorkGrid.viewsLoaded = true;
-
-                RefreshCommandUI();
+            },
+            error: function (error) {
+                $$$.log(error);
             }
         });
     },
@@ -1818,7 +1829,7 @@ var MyWorkGrid = {
         viewDiv.innerHTML = document.getElementById('MWG_SaveView').innerHTML;
         if (isFromSaveViewClose == false || isFromSaveViewClose == undefined)
             viewDiv.children[0].children[0].value = MyWorkGrid.defaultView;
-        
+
         if (MyWorkGrid.views[MyWorkGrid.defaultViewId].isDefault) {
             viewDiv.children[0].children[2].checked = true;
         }
@@ -1827,7 +1838,7 @@ var MyWorkGrid = {
             viewDiv.children[0].children[4].checked = true;
         else
             viewDiv.children[0].children[4].checked = false;
-       
+
         //if (MyWorkGrid.isDefaultViewPersonal) {
         //    var personalCheckBox = viewDiv.children[0].children[4];
         //    if (!personalCheckBox.disabled) {
@@ -1835,7 +1846,7 @@ var MyWorkGrid = {
         //    }
         //}
 
-        var options = {html: viewDiv,width: 250,height: 125,title: "Save View",dialogReturnValueCallback: MyWorkGrid.onSaveViewClose};
+        var options = { html: viewDiv, width: 250, height: 125, title: "Save View", dialogReturnValueCallback: MyWorkGrid.onSaveViewClose };
         SP.UI.ModalDialog.showModalDialog(options);
 
         if (isFromSaveViewClose == true)
@@ -1843,7 +1854,7 @@ var MyWorkGrid = {
 
     },
 
-   
+
     onSaveViewClose: function (dialogResult, returnValue) {
         if (dialogResult !== SP.UI.DialogResult.OK) return;
 
@@ -1950,7 +1961,7 @@ var MyWorkGrid = {
             var dataXml = '<MyWork><View ID="' + viewId + '" Name="' + viewName + '" Default="'
                 + isViewDefault + '" Personal="' + isViewPersonal + '" LeftCols="' + leftCols + '" Cols="' + cols + '" RightCols="'
                 + rightCols + '" Filters="' + filters + '" Grouping="' + grouping + '" Sorting="' + sorting + '"/></MyWork>';
-            
+
             EPMLiveCore.WorkEngineAPI.Execute("SaveMyWorkGridView", dataXml, function (response) {
                 response = parseJson(response);
 
@@ -1996,7 +2007,7 @@ var MyWorkGrid = {
     },
 
     renameView: function (isFromRenameViewClose) {
-        if (MyWorkGrid.defaultViewId === "dv") {        
+        if (MyWorkGrid.defaultViewId === "dv") {
             alert('The default view cannot be renamed. If you want to create a new view that will act as the default for all users, select the Default View and click "Save View" - this will let you create a new view from the Default View schema.');
             return;
         }
@@ -2023,7 +2034,7 @@ var MyWorkGrid = {
 
         var bValidateRename = true;
         if (returnValue == false) {
-            bValidateRename = false; 
+            bValidateRename = false;
         }
         else {
             var vals = returnValue.split("|");
@@ -2079,7 +2090,7 @@ var MyWorkGrid = {
     },
 
     deleteView: function () {
-        if (MyWorkGrid.defaultViewId === "dv") {        
+        if (MyWorkGrid.defaultViewId === "dv") {
             alert('You cannot delete the Default View');
             return;
         }
@@ -2091,8 +2102,8 @@ var MyWorkGrid = {
                 response = parseJson(response);
 
                 if (responseIsSuccess(response)) {
-                    delete MyWorkGrid.views[MyWorkGrid.defaultViewId];                                       
-                    MyWorkGrid.applyView('dv');                    
+                    delete MyWorkGrid.views[MyWorkGrid.defaultViewId];
+                    MyWorkGrid.applyView('dv');
                 }
             });
         }
@@ -2116,7 +2127,7 @@ var MyWorkGrid = {
         var grid = Grids[MyWorkGrid.gridId];
 
         MyWorkGrid.filtersOn = true;
-        grid.ShowRow(grid.GetRowById("Filter"));        
+        grid.ShowRow(grid.GetRowById("Filter"));
     },
 
     hideFilters: function () {
@@ -3264,7 +3275,7 @@ var MyWorkGrid = {
                             {
                                 $(document.getElementById('Ribbon_MyWork_WorkFilter_DueAgoDays')).val("");
                             }
-                            
+
                             if (wf.daysAfter == '') {
                                 $(document.getElementById('Ribbon_MyWork_WorkFilter_DueAfterDays')).val("");
                             }
