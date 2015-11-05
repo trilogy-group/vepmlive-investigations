@@ -1009,14 +1009,14 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
                     var numRows = $('#grouping-wrapper' + customCtrlId).children('.grouping-row').length;
                     if (numRows == 0) {
                         divGroupingWrapperEmptyText.text('No Grouping Added');
-                        $('#aGroupBySave').attr('class', 'disabledLink');
+                        $('#aGroupBySave'+customCtrlId).attr('class', 'disabledLink');
                     }
                     else if (numRows > 0 && numRows < 5) {
-                        $('#aGroupBySave').removeAttr('class');
+                        $('#aGroupBySave'+customCtrlId).removeAttr('class');
                         $('#aAddGrouping').removeAttr('class');
                     }
                     else if (numRows > 0 && numRows == 4) {
-                        $('#aGroupBySave').removeAttr('class');
+                        $('#aGroupBySave'+customCtrlId).removeAttr('class');
                         $('#aAddGrouping').attr('class', 'disabledLink');
                     }
                     //EPML-5286 - show above selected value into rest of ddl
@@ -1116,14 +1116,14 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
                         var numRows = $('#grouping-wrapper' + customCtrlId).children('.grouping-row').length;
                         if (numRows == 0) {
                             divGroupingWrapperEmptyText.text('No Grouping Added');
-                            $('#aGroupBySave').attr('class', 'disabledLink');
+                            $('#aGroupBySave' + customCtrlId).attr('class', 'disabledLink');
                         }
                         else if (numRows > 0 && numRows < 5) {
-                            $('#aGroupBySave').removeAttr('class');
+                            $('#aGroupBySave' + customCtrlId).removeAttr('class');
                             $('#aAddGrouping').removeAttr('class');
                         }
                         else if (numRows > 0 && numRows == 4) {
-                            $('#aGroupBySave').removeAttr('class');
+                            $('#aGroupBySave' + customCtrlId).removeAttr('class');
                             $('#aAddGrouping').attr('class', 'disabledLink');
                         }
 
@@ -1154,7 +1154,7 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
                     divGroupingRow.append(divGroupingDelete);
                     divGroupingWrapper.append(divGroupingRow);
 
-                    $('#aGroupBySave').removeAttr('class');
+                    $('#aGroupBySave'+customCtrlId).removeAttr('class');
                 }
                 //EPML-5286 -- here, default selected option in newly created ddl must be invisible in reset of ddl 
                 var keyVals = [];
@@ -1170,7 +1170,7 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
             var divFooterSave = $(document.createElement('div'));
             divFooterSave.addClass('grouping-save');
             var aFooterSave = $(document.createElement('a'));
-            aFooterSave.attr('id', 'aGroupBySave');
+            aFooterSave.attr('id', 'aGroupBySave'+customCtrlId);
             aFooterSave.attr('href', 'javascript:void(0)');
 
             aFooterSave.text('Apply');
