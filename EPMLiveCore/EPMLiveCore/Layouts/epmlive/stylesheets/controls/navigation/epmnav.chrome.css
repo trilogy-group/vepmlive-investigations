@@ -22,7 +22,7 @@
   margin-top: 2px;
 }
 .epm-nav-sub .epm-menu-btn span {
-  left: -1px;
+  /*left:-1px;*/
 }
 .epm-nav-sub li.epm-nav-node.epm-nav-trans a {
   top: 0px;
