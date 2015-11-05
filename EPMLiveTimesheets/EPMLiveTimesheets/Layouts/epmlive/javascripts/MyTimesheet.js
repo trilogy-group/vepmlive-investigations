@@ -234,10 +234,12 @@ function TSGridClick(grid, row, col, x, y, event) {
 }
 
 function TSGridOnAfterValueChanged(grid, row, col, val) {
-    if (grid.Cols[col].Sec == 0)
-        TimesheetItemEdited = true;
-    else
-        TimesheetHoursEdited = true;
+    if (grid.Cols[col] != null && grid.Cols[col] != undefined) {
+        if (grid.Cols[col].Sec == 0)
+            TimesheetItemEdited = true;
+        else
+            TimesheetHoursEdited = true;
+    }
 }
 
 function StopEditCols(grid, row) {
@@ -2032,7 +2034,7 @@ function MYTSOnGetHtmlValue(grid, row, col, val) {
         }
     }
     if (val == "")
-        return "";
+        return null;
 
     return null;
 }
