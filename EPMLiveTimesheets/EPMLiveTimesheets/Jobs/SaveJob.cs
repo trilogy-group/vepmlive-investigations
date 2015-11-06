@@ -348,9 +348,18 @@ namespace TimeSheets
                                                 string projectlist = "";
                                                 try
                                                 {
-                                                    SPFieldLookupValue lv = new SPFieldLookupValue(li[list.Fields.GetFieldByInternalName("Project").Id].ToString());
-                                                    projectid = lv.LookupId;
-                                                    project = lv.LookupValue;
+                                                    // Added the check to fix for EPML-5618
+                                                    if (list.Fields.ContainsField("Project"))
+                                                    {
+                                                        SPFieldLookupValue lv = new SPFieldLookupValue(li[list.Fields.GetFieldByInternalName("Project").Id].ToString());
+                                                        projectid = lv.LookupId;
+                                                        project = lv.LookupValue;
+                                                    }
+                                                    else
+                                                    {
+                                                        projectid = li.ID;
+                                                        project = li.Title;
+                                                    }
                                                 }
                                                 catch { }
 
