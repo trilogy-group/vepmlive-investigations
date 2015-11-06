@@ -291,6 +291,7 @@
                     epmLiveResourceGrid.ListId='<%=_reqListId%>';
                     epmLiveResourceGrid.ItemId='<%=_reqId%>';
                     epmLiveResourceGrid.LaunchInForm=<%=LaunchInForm.ToString().ToLower()%>;
+                    epmLiveResourceGrid.UserHasManageListsPermission = <%= CurrentUserHasManageListsPermission.ToString(CultureInfo.InvariantCulture).ToLower() %>;
 
                     window.TreeGrid('<treegrid data_url="<%= WebUrl %>/_vti_bin/WorkEngine.asmx" data_timeout="0" data_method="Soap" data_function="Execute" data_namespace="workengine.com" data_param_function="GetResourcePoolDataGrid" data_param_dataxml="<%= DataXml %>" layout_url="<%= WebUrl %>/_vti_bin/WorkEngine.asmx" layout_timeout="0" layout_method="Soap" layout_function="Execute" layout_namespace="workengine.com" layout_param_function="GetResourcePoolLayoutGrid" layout_param_dataxml="<%= LayoutXml %>" suppressmessage="3" <%= DebugTag %>></treegrid>', 'EPMResourceGrid');
                 }, true);

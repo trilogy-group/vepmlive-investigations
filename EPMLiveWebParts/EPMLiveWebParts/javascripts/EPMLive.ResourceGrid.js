@@ -25,6 +25,7 @@ function registerEpmLiveResourceGridScript() {
         $$.ListId = null;
         $$.ItemId = null;
         $$.LaunchInForm = false;
+        $$.UserHasManageListsPermission = true;
 
         $$.reports = {
             wcReportId: null,
@@ -159,7 +160,7 @@ function registerEpmLiveResourceGridScript() {
 
         $$.grid = {
             grids: window.Grids,
-
+            
             filteringOn: true,
             groupingOn: true,
 
@@ -1425,7 +1426,7 @@ function registerEpmLiveResourceGridScript() {
                 }
             },
 
-            loadResourcePlanner: function () {                    
+            loadResourcePlanner: function () {
 
                 var isResImportRunning = window.epmLiveNavigation.isImportResourceRunning();
                 if (!isResImportRunning) {
@@ -1464,7 +1465,7 @@ function registerEpmLiveResourceGridScript() {
                     $$.actions.displayPopUp(url, 'Assignment Planner', true, true, null, null, 1000, 700);
                 }
             },
-            
+
 
             deleteResource: function () {
                 var grid = $$.grid.g();
@@ -2030,8 +2031,6 @@ function registerEpmLiveResourceGridScript() {
                         //    }
                         //]
 
-
-
                         var cfgs = [
                             { 'id': 'resourcePoolToolBar' },
                             {
@@ -2500,6 +2499,14 @@ function registerEpmLiveResourceGridScript() {
                         ];
 
                         window.epmLiveGenericToolBar.generateToolBar(divId, cfgs);
+
+                        if ($$.UserHasManageListsPermission) {
+                            $("#resourcePoolToolBar li:nth-child(1)").show();
+                        }
+                        else {
+                            $("#resourcePoolToolBar li:nth-child(1)").hide();
+                            $("#resourcePoolToolBar li:nth-child(2)").css("paddingLeft", "15px");
+                        }
                     }
                     else {
                         setTimeout(wait, 500);

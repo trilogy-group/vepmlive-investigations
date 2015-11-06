@@ -17,7 +17,7 @@ namespace EPMLiveWebParts
 {
     public partial class ResourceGridUserControl : UserControl
     {
-        #region Fields (9) 
+        #region Fields (9)
 
         private const string LAYOUT_PATH = "/_layouts/15/epmlive/";
         protected string WcReportId = "Resource Work vs. Capacity".Md5();
@@ -31,9 +31,9 @@ namespace EPMLiveWebParts
 
         public bool LaunchInForm;
 
-        #endregion Fields 
+        #endregion Fields
 
-        #region Properties (12) 
+        #region Properties (12)
 
         /// <summary>
         ///     Gets or sets a value indicating whether [auto focus].
@@ -62,6 +62,25 @@ namespace EPMLiveWebParts
                 {
                     return configWeb.DoesUserHavePermissions(theWeb.CurrentUser.LoginName,
                         SPBasePermissions.AddAndCustomizePages);
+                }
+            }
+        }
+
+        protected bool CurrentUserHasManageListsPermission
+        {
+            get
+            {
+                SPWeb currentWeb = SPContext.Current.Web;
+                Guid lockedWeb = CoreFunctions.getLockedWeb(currentWeb);
+
+                using (SPWeb configWeb = (currentWeb.ID != lockedWeb
+                    ? currentWeb.Site.OpenWeb(lockedWeb)
+                    : currentWeb.Site.OpenWeb(currentWeb.ID)))
+                {
+                    if (configWeb.DoesUserHavePermissions(currentWeb.CurrentUser.LoginName, SPBasePermissions.ManageLists))
+                        return true;
+                    else
+                        return false;
                 }
             }
         }
@@ -265,9 +284,9 @@ namespace EPMLiveWebParts
         /// </value>
         public string WebPartQualifier { get; set; }
 
-        #endregion Properties 
+        #endregion Properties
 
-        #region Methods (4) 
+        #region Methods (4)
 
         // Protected Methods (2) 
 
@@ -295,7 +314,7 @@ namespace EPMLiveWebParts
 
             if (resourcesList != null)
             {
-                foreach (string style in new[] {"libraries/jquery-ui"})
+                foreach (string style in new[] { "libraries/jquery-ui" })
                 {
                     SPPageContentManager.RegisterStyleFile(LAYOUT_PATH + "stylesheets/" + style + ".css");
                 }
@@ -319,6 +338,15 @@ namespace EPMLiveWebParts
                 RibbonBehavior = 0;
             else
                 RibbonBehavior = Convert.ToInt16(gSettings.RibbonBehavior);
+            
+            if (!CurrentUserHasManageListsPermission)
+            {
+                SPRibbon spRibbon = SPRibbon.GetCurrent(Page);
+                if (spRibbon != null)
+                {
+                    spRibbon.TrimById("Ribbon.ResourceGrid.New.NewItem", "false");
+                }
+            }
         }
 
         /// <summary>
@@ -340,7 +368,7 @@ namespace EPMLiveWebParts
                 if (list != null)
                 {
                     // Launches form in full page or in pop up dialog
-                    LaunchInForm = list.NavigateForFormsPages; 
+                    LaunchInForm = list.NavigateForFormsPages;
                 }
             }
 
@@ -349,8 +377,8 @@ namespace EPMLiveWebParts
 
             if (!inDebugMode) return;
 
-            var keywords = new[] {"Error", "Problem", "Info", "Check", "IOError", "IO", "Cookie", "Page", "Event"};
-            var info = new List<string> {"Error", "Problem"};
+            var keywords = new[] { "Error", "Problem", "Info", "Check", "IOError", "IO", "Cookie", "Page", "Event" };
+            var info = new List<string> { "Error", "Problem" };
 
             foreach (string keyword in epmDebug.Split(',').Select(k => k.ToLower()))
             {
@@ -380,6 +408,6 @@ namespace EPMLiveWebParts
             return !string.IsNullOrEmpty(epmDebug);
         }
 
-        #endregion Methods 
+        #endregion Methods
     }
 }
