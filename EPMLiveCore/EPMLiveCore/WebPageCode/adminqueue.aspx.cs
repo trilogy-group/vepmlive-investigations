@@ -28,6 +28,7 @@ namespace EPMLiveCore
         protected TextBox txtThreads;
         protected TextBox txtInterval;
         protected TextBox txtSecurityThreads;
+        protected TextBox txtRollupQueueThreads;
 
         protected WebApplicationSelector WebApplicationSelector1;
 
@@ -55,6 +56,7 @@ namespace EPMLiveCore
                 txtInterval.Text = CoreFunctions.getFarmSetting("PollingInterval");
                 txtThreads.Text = CoreFunctions.getFarmSetting("QueueThreads");
                 txtSecurityThreads.Text = CoreFunctions.getFarmSetting("SecQueueThreads");
+                txtRollupQueueThreads.Text = CoreFunctions.getFarmSetting("RollupQueueThreads");
             }
         }
 
@@ -121,11 +123,12 @@ namespace EPMLiveCore
             catch { }
         }
 
-        protected void Button1_Click(object sender, EventArgs e)
+        protected void Button1_OnClick(object sender, EventArgs e)
         {
             CoreFunctions.setFarmSetting("PollingInterval", txtInterval.Text);
             CoreFunctions.setFarmSetting("QueueThreads", txtThreads.Text);
             CoreFunctions.setFarmSetting("SecQueueThreads", txtSecurityThreads.Text);
+            CoreFunctions.setFarmSetting("RollupQueueThreads", txtRollupQueueThreads.Text);
         }
 
         protected string showtime(int seconds)

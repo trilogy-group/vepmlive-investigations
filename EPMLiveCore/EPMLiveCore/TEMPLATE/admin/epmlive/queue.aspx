@@ -73,10 +73,25 @@
     </Template_InputFormControls>
 </wssuc:InputFormSection>
 
+    <wssuc:InputFormSection Title="Rollup Queue Thread Count"
+    Description=""
+    runat="server">
+    <Template_Description>
+        This specifies the number of concurrent rollup threads the queueing system will run.
+    </Template_Description>
+    <Template_InputFormControls>
+        <wssuc:InputFormControl LabelText="Rollup Queue" runat="server">
+             <Template_Control>
+                <asp:TextBox ID="txtRollupQueueThreads" runat="server" ></asp:TextBox>
+             </Template_Control>
+        </wssuc:InputFormControl>
+    </Template_InputFormControls>
+</wssuc:InputFormSection>
+
 <wssuc:ButtonSection runat="server">
     <Template_Buttons>
         <asp:PlaceHolder ID="PlaceHolder1" runat="server">
-            <asp:Button UseSubmitBehavior="false" runat="server" class="ms-ButtonHeightWidth" OnClick="Button1_Click" Text="Save" id="Button1" accesskey="" Width="150"/>
+            <asp:Button UseSubmitBehavior="false" runat="server" class="ms-ButtonHeightWidth" OnClick="Button1_OnClick" Text="Save" id="Button1" accesskey="" Width="150"/>
         </asp:PlaceHolder>
     </Template_Buttons>
 </wssuc:ButtonSection>
