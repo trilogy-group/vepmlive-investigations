@@ -164,6 +164,7 @@ namespace TimerService
                                             {
                                                 using (SqlCommand cmd1 = new SqlCommand("UPDATE ROLLUPQUEUE set status=2 where eventid=@id", cn))
                                                 {
+                                                    cmd1.Parameters.Clear();
                                                     cmd1.Parameters.AddWithValue("@id", dr["eventid"].ToString());
                                                     cmd1.ExecuteNonQuery();
                                                 }

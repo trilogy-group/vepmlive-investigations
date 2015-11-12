@@ -180,6 +180,7 @@ namespace TimerService
                                             {
                                                 using (SqlCommand cmd1 = new SqlCommand("UPDATE queue set status=1, dtstarted = GETDATE() where queueuid=@id", cn))
                                                 {
+                                                    cmd1.Parameters.Clear();
                                                     cmd1.Parameters.AddWithValue("@id", dr["queueuid"].ToString());
                                                     cmd1.ExecuteNonQuery();
                                                 }

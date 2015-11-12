@@ -185,6 +185,7 @@ namespace TimerService
                                                 {
                                                     using (var cmd1 = new SqlCommand("UPDATE ITEMSEC set status=2 where ITEM_SEC_ID=@id", cn))
                                                     {
+                                                        cmd1.Parameters.Clear();
                                                         cmd1.Parameters.AddWithValue("@id", dr["ITEM_SEC_ID"].ToString());
                                                         cmd1.ExecuteNonQuery();
                                                     }
