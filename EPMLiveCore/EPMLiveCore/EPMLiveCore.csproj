@@ -3436,6 +3436,7 @@ net start "WETimer"</PostDeploymentCommand>
     <Content Include="Layouts\epmlive\images\left.GIF" />
     <Content Include="Layouts\epmlive\images\link.GIF" />
     <Content Include="Layouts\epmlive\images\linkeditems.gif" />
+    <Content Include="Layouts\epmlive\images\loader-epmlive.GIF" />
     <Content Include="Layouts\epmlive\images\LoadingBar.gif" />
     <Content Include="Layouts\epmlive\images\lttask.png" />
     <Content Include="Layouts\epmlive\images\menuganttview.gif" />
