@@ -88,6 +88,21 @@
     </Template_InputFormControls>
 </wssuc:InputFormSection>
 
+<wssuc:InputFormSection Title="High priority Queue Thread Count"
+    Description=""
+    runat="server">
+    <Template_Description>
+        This specifies the number of concurrent high priority threads the queueing system will run.
+    </Template_Description>
+    <Template_InputFormControls>
+        <wssuc:InputFormControl LabelText="High Priority Queue" runat="server">
+             <Template_Control>
+                <asp:TextBox ID="txtHighPriorityQueueThreads" runat="server" ></asp:TextBox>
+             </Template_Control>
+        </wssuc:InputFormControl>
+    </Template_InputFormControls>
+</wssuc:InputFormSection>
+
 <wssuc:ButtonSection runat="server">
     <Template_Buttons>
         <asp:PlaceHolder ID="PlaceHolder1" runat="server">
