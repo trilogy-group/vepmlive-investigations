@@ -85,7 +85,10 @@ namespace TimerService
             {
                 maxThreads = int.Parse(EPMLiveCore.CoreFunctions.getFarmSetting("RollupQueueThreads"));
             }
-            catch { }
+            catch (Exception e)
+            {
+                logMessage("INIT", "GTERR", e.Message);
+            }
             workingThreads = new WorkerThreads(maxThreads);
 
             logMessage("INIT", "STMR", "Setting threads to: " + maxThreads);

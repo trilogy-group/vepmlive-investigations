@@ -100,7 +100,10 @@ namespace TimerService
             {
                 maxThreads = int.Parse(EPMLiveCore.CoreFunctions.getFarmSetting("SecQueueThreads"));
             }
-            catch { }
+            catch (Exception e)
+            {
+                logMessage("INIT", "GTERR", e.Message);
+            }
             workingThreads = new WorkerThreads(maxThreads);
 
             logMessage("INIT", "STMR", "Setting Security Threads to: " + maxThreads);

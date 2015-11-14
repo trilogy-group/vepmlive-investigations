@@ -29,6 +29,7 @@ namespace EPMLiveCore
         protected TextBox txtInterval;
         protected TextBox txtSecurityThreads;
         protected TextBox txtRollupQueueThreads;
+        protected TextBox txtHighPriorityQueueThreads;
 
         protected WebApplicationSelector WebApplicationSelector1;
 
@@ -57,6 +58,7 @@ namespace EPMLiveCore
                 txtThreads.Text = CoreFunctions.getFarmSetting("QueueThreads");
                 txtSecurityThreads.Text = CoreFunctions.getFarmSetting("SecQueueThreads");
                 txtRollupQueueThreads.Text = CoreFunctions.getFarmSetting("RollupQueueThreads");
+                txtHighPriorityQueueThreads.Text = CoreFunctions.getFarmSetting("HighQueueThreads");
             }
         }
 
@@ -129,6 +131,7 @@ namespace EPMLiveCore
             CoreFunctions.setFarmSetting("QueueThreads", txtThreads.Text);
             CoreFunctions.setFarmSetting("SecQueueThreads", txtSecurityThreads.Text);
             CoreFunctions.setFarmSetting("RollupQueueThreads", txtRollupQueueThreads.Text);
+            CoreFunctions.setFarmSetting("HighQueueThreads", txtHighPriorityQueueThreads.Text);
         }
 
         protected string showtime(int seconds)
