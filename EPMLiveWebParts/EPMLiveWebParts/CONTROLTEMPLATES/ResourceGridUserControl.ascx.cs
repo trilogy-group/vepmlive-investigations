@@ -66,10 +66,15 @@ namespace EPMLiveWebParts
             }
         }
 
-        protected bool CurrentUserHasManageListsPermission
+        protected bool CurrentUserHasTeamMembersPermission
         {
+            
             get
             {
+
+
+
+                string[] groupPermissions = new string[] { "Administrators", "Executives", "Portfolio Managers", "Project Managers", "Report Writers", "Resource Managers" };
                 SPWeb currentWeb = SPContext.Current.Web;
                 Guid lockedWeb = CoreFunctions.getLockedWeb(currentWeb);
 
@@ -77,10 +82,18 @@ namespace EPMLiveWebParts
                     ? currentWeb.Site.OpenWeb(lockedWeb)
                     : currentWeb.Site.OpenWeb(currentWeb.ID)))
                 {
-                    if (configWeb.DoesUserHavePermissions(currentWeb.CurrentUser.LoginName, SPBasePermissions.ManageLists))
+                    if (currentWeb.CurrentUser.IsSiteAdmin)
                         return true;
-                    else
-                        return false;
+
+                    SPGroupCollection userGroups = currentWeb.CurrentUser.Groups;
+                    foreach (SPGroup grp in userGroups)
+                    {
+                        if (groupPermissions.Contains(grp.Name))
+                            return true;
+                        else if (grp.Name.ToLower().Equals("team members", StringComparison.CurrentCultureIgnoreCase))
+                            return false;
+                    }
+                    return true;
                 }
             }
         }
@@ -338,8 +351,8 @@ namespace EPMLiveWebParts
                 RibbonBehavior = 0;
             else
                 RibbonBehavior = Convert.ToInt16(gSettings.RibbonBehavior);
-            
-            if (!CurrentUserHasManageListsPermission)
+
+            if (!CurrentUserHasTeamMembersPermission)
             {
                 SPRibbon spRibbon = SPRibbon.GetCurrent(Page);
                 if (spRibbon != null)

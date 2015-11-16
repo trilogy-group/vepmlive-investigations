@@ -25,7 +25,7 @@ function registerEpmLiveResourceGridScript() {
         $$.ListId = null;
         $$.ItemId = null;
         $$.LaunchInForm = false;
-        $$.UserHasManageListsPermission = true;
+        $$.UserHasTeamMembersPermission = true;
 
         $$.reports = {
             wcReportId: null,
@@ -1907,8 +1907,10 @@ function registerEpmLiveResourceGridScript() {
 
                         var aAvailableCols = {};
                         var aViewCols = [];
-                        for (var c in $$.views.currentView.cols) {
-                            aViewCols.push($$.views.currentView.cols[c].name)
+                        if ($$.views.currentView.cols != null && $$.views.currentView.cols != undefined) {
+                            for (var c in $$.views.currentView.cols) {
+                                aViewCols.push($$.views.currentView.cols[c].name)
+                            }
                         }
                         var i = 1;
                         for (var c in orderedCols) {
@@ -2500,7 +2502,7 @@ function registerEpmLiveResourceGridScript() {
 
                         window.epmLiveGenericToolBar.generateToolBar(divId, cfgs);
 
-                        if ($$.UserHasManageListsPermission) {
+                        if ($$.UserHasTeamMembersPermission) {
                             $("#resourcePoolToolBar li:nth-child(1)").show();
                         }
                         else {
