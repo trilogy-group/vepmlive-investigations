@@ -35,7 +35,7 @@ namespace TimerService
 
                 bw.RunWorkerAsync();
 
-
+                Thread.Sleep(1000);
 
                 //=========================Run High Priority Queue
                 bw = new BackgroundWorker();
@@ -46,6 +46,7 @@ namespace TimerService
 
                 bw.RunWorkerAsync();
 
+                Thread.Sleep(1000);
 
                 //=========================Run TS Queue
                 bw = new BackgroundWorker();
@@ -58,6 +59,7 @@ namespace TimerService
 
                 bw.RunWorkerAsync();
 
+                Thread.Sleep(1000);
 
                 //=========================Run Sec Queue
                 bwSec = new BackgroundWorker();
@@ -81,7 +83,6 @@ namespace TimerService
 
                 bwTimerJobs.RunWorkerAsync();
 
-
                 //================Run Notifications
                 bwNotificationsJobs = new BackgroundWorker();
                 bwNotificationsJobs.WorkerReportsProgress = true;
@@ -104,7 +105,7 @@ namespace TimerService
 
                 //bwActivity.RunWorkerAsync();
 
-
+                Thread.Sleep(1000);
                 //=========================Run Rollup Queue
                 bwSec = new BackgroundWorker();
                 bwSec.WorkerReportsProgress = true;
@@ -124,7 +125,6 @@ namespace TimerService
                 bwIntegrationJobs.DoWork += bwIntegrationJobs_DoWork;
 
                 bwIntegrationJobs.RunWorkerAsync();
-
 
                 return true;
             }
@@ -575,7 +575,7 @@ namespace TimerService
                                                 }
                                             }
                                         }
-                                       
+
                                     }
                                     cn.Close();
                                 }
