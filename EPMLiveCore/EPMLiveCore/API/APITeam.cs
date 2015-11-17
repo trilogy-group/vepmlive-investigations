@@ -1821,9 +1821,20 @@ namespace EPMLiveCore.API
 
                     attr = doc.CreateAttribute("Visible");
                     if (listid == null || listid == Guid.Empty)
-                        attr.Value = "1";
+                    {
+                        if (tWeb.HasUniqueRoleAssignments)
+                            attr.Value = "1"; //Permissions column visible in case of Private workspace (Unique Permissions)
+                        else
+                            attr.Value = "0"; //Permissions column Hide in case of Open workspace (Inherit Permissions)
+                    }
                     else
-                        attr.Value = bIsTeamSecurityEnabled ? "1" : "0";
+                    {
+                        //Item level permissions
+                        if (oLi != null && oLi.HasUniqueRoleAssignments)
+                            attr.Value = "1";
+                        else
+                            attr.Value = "0";
+                    }
                     ndNew.Attributes.Append(attr);
 
                     attr = doc.CreateAttribute("CanHide");

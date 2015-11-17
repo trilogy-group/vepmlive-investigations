@@ -1053,7 +1053,7 @@ namespace EPMLiveCore.API
 
         public void ActivateFeature()
         {
-            if (_isStandAlone && UniquePermission)
+            if (_isStandAlone)
             {
                 using (var s = new SPSite(SiteId))
                 {
