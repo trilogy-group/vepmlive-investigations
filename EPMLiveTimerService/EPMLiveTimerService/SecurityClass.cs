@@ -102,7 +102,7 @@ namespace TimerService
             }
             catch (Exception e)
             {
-                logMessage("INIT", "GTERR", "Unable to read thread value from Farm Settings");
+                logMessage("INIT", "GTERR", "Unable to read default thread value from Farm Settings");
                 //logMessage("INIT", "GTERR", e.Message);
             }
             workingThreads = new WorkerThreads(maxThreads);
