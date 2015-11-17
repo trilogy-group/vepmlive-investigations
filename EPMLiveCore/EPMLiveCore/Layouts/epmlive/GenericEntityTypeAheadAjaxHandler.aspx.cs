@@ -180,6 +180,8 @@ namespace EPMLiveCore
 
                             if (dt != null)
                             {
+                                dt.DefaultView.Sort = _field;
+                                dt = dt.DefaultView.ToTable();
                                 foreach (DataRow r in dt.Rows)
                                 {
                                     _sbResult.Append(r["ID"].ToString() + "^^" + r[_field].ToString() + "^^" + (!string.IsNullOrEmpty(r[_field].ToString()) ? r[_field].ToString() : string.Empty) + ";#");
@@ -199,6 +201,8 @@ namespace EPMLiveCore
 
                     if (dt != null)
                     {
+                        dt.DefaultView.Sort = _field;
+                        dt = dt.DefaultView.ToTable();
                         DataRow[] results = dt.Select("", _field + " ASC");
                         foreach (DataRow r in results)
                         {
