@@ -88,7 +88,7 @@
     </Template_InputFormControls>
 </wssuc:InputFormSection>
 
-<wssuc:InputFormSection Title="High priority Queue Thread Count"
+<wssuc:InputFormSection Title="High Priority Queue Thread Count"
     Description=""
     runat="server">
     <Template_Description>
