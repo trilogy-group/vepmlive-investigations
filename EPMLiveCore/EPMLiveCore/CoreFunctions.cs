@@ -1488,6 +1488,18 @@ namespace EPMLiveCore
                     case "secqueuethreads":
                         cn = "5";
                         break;
+                    case "rollupqueuethreads":
+                        cn = "5";
+                        break;
+                    case "highqueuethreads":
+                        cn = "5";
+                        break;
+                    case "tsqueuethreads":
+                        cn = "5";
+                        break;
+                    case "intqueuethreads":
+                        cn = "5";
+                        break;
                     case "workenginestore":
                         cn = "https://store.workengine.com/";
                         break;
