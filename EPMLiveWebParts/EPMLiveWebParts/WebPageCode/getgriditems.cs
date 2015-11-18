@@ -3520,7 +3520,14 @@ namespace EPMLiveWebParts
                                 firstsort += "&p_" + sort + "=";
                                 try
                                 {
-                                    firstsort += HttpUtility.UrlEncode(li[sort].ToString());
+                                    SPField f = li.Fields.GetFieldByInternalName(sort);
+                                    string val = li[f.Id].ToString();
+                                    if (f.Type == SPFieldType.Lookup)
+                                    {
+                                        val = val.Replace(";#", "\n").Split('\n')[1];
+                                    }
+
+                                    firstsort += HttpUtility.UrlEncode(val);
                                 }
                                 catch { }
                             }
@@ -3664,7 +3671,14 @@ namespace EPMLiveWebParts
                         lastsort += "&p_" + sort + "=";
                         try
                         {
-                            lastsort += HttpUtility.UrlEncode(lastLi[sort].ToString());
+                            SPField f = lastLi.Fields.GetFieldByInternalName(sort);
+                            string val = lastLi[f.Id].ToString();
+                            if (f.Type == SPFieldType.Lookup)
+                            {
+                                val = val.Replace(";#", "\n").Split('\n')[1];
+                            }
+
+                            lastsort += HttpUtility.UrlEncode(val);
                         }
                         catch { }
                     }
@@ -5603,7 +5617,7 @@ namespace EPMLiveWebParts
                 catch { }
 
                 SPList tempList = null;
-               
+
                 SPSecurity.RunWithElevatedPrivileges(delegate()
                 {
                     using (SPSite s = new SPSite(curWeb.Url))
@@ -5618,7 +5632,7 @@ namespace EPMLiveWebParts
 
                 list = curWeb.Lists[tempList.ID];
                 view = list.Views[strview];
-                                
+
                 try
                 {
                     inEditMode = bool.Parse(Request["edit"]);
