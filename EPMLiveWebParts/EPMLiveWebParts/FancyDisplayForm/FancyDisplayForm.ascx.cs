@@ -34,7 +34,7 @@ namespace EPMLiveWebParts
         int narrativeDetailsFieldsCount = 0;
         int peopleDetailsFieldsCount = 0;
         int datesDetailsFieldsCount = 0;
-        int itemId = 0;
+        string itemId = string.Empty;
 
         StringBuilder sbQuickDetailsContent = new StringBuilder();
         StringBuilder sbQuickDetailsShowAllRegion = new StringBuilder();
@@ -127,9 +127,9 @@ namespace EPMLiveWebParts
         protected void Page_Load(object sender, EventArgs e)
         {
             StringBuilder FancyDispFormDataxml = new StringBuilder();
-            itemId = Convert.ToInt32(Page.Request["ID"]);
+            itemId = Page.Request["ID"];
 
-            if (itemId > 0)
+            if (!string.IsNullOrEmpty(itemId))
             {
                 try
                 {
@@ -209,7 +209,13 @@ namespace EPMLiveWebParts
                     {
                         try
                         {
-                            if ((!field.Hidden && "title" != field.InternalName.ToString().ToLower() && !field.InternalName.ToLower().Equals("contenttype") && field.Type != SPFieldType.Attachments))
+                            if ((!field.Hidden && field.Type != SPFieldType.Invalid &&
+                                field.Id != SPBuiltInFieldId.ContentType &&
+                                field.Id != SPBuiltInFieldId.ContentTypeId &&
+                                field.Id != SPBuiltInFieldId.Title &&
+                                field.Id != SPBuiltInFieldId.LinkTitle &&
+                                field.Id != SPBuiltInFieldId.LinkTitleNoMenu &&
+                                field.Type != SPFieldType.Attachments))
                             {
                                 string display = fieldProperties[field.InternalName]["Display"];
                                 display = display.Split(";".ToCharArray())[0].ToLower(); //always;;;;;
@@ -281,7 +287,7 @@ namespace EPMLiveWebParts
                         }
                         catch (KeyNotFoundException)
                         {
-                            if (!field.Hidden && !field.ReadOnlyField)
+                            if (!field.Hidden && !field.ReadOnlyField && field.Type != SPFieldType.Invalid)
                             {
                                 switch (field.Type)
                                 {
@@ -310,7 +316,7 @@ namespace EPMLiveWebParts
                 {
                     foreach (SPField field in list.Fields)
                     {
-                        if (!field.Hidden)
+                        if (!field.Hidden && field.Type != SPFieldType.Invalid)
                         {
                             switch (field.Type)
                             {
