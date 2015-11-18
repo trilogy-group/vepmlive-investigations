@@ -409,7 +409,8 @@ namespace EPMLiveReportsAdmin
 
                 case SPFieldType.MultiChoice:
                     param.SqlDbType = SqlDbType.NVarChar;
-                    param.Size = 256;
+                    //param.Size = 256;
+                    param.Size = 8001;
                     param.Direction = ParameterDirection.Input;
                     break;
 

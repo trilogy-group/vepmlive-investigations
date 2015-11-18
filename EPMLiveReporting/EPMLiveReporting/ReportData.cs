@@ -1995,7 +1995,7 @@ namespace EPMLiveReportsAdmin
                     else
                     {
                         param.SqlDbType = SqlDbType.NVarChar;
-                        param.Size = 256;
+                        param.Size = -1;
                     }
 
                     param.Direction = ParameterDirection.Input;
@@ -2034,7 +2034,7 @@ namespace EPMLiveReportsAdmin
                     else
                     {
                         param.SqlDbType = SqlDbType.NVarChar;
-                        param.Size = 256;
+                        param.Size = -1;
                     }
 
                     param.Direction = ParameterDirection.Input;
