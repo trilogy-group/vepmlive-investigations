@@ -68,12 +68,8 @@ namespace EPMLiveWebParts
 
         protected bool CurrentUserHasTeamMembersPermission
         {
-            
             get
             {
-
-
-
                 string[] groupPermissions = new string[] { "Administrators", "Executives", "Portfolio Managers", "Project Managers", "Report Writers", "Resource Managers" };
                 SPWeb currentWeb = SPContext.Current.Web;
                 Guid lockedWeb = CoreFunctions.getLockedWeb(currentWeb);
@@ -358,6 +354,9 @@ namespace EPMLiveWebParts
                 if (spRibbon != null)
                 {
                     spRibbon.TrimById("Ribbon.ResourceGrid.New.NewItem", "false");
+                    spRibbon.TrimById("Ribbon.ResourceGrid.Manage.EditItem", "false");
+                    spRibbon.TrimById("Ribbon.ResourceGrid.Manage.DeleteItem", "false");
+                    spRibbon.TrimById("Ribbon.ResourceGrid.Manage.ItemPermissions", "false");
                 }
             }
         }

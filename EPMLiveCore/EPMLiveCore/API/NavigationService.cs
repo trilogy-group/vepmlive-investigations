@@ -15,7 +15,7 @@ namespace EPMLiveCore.API
 {
     public class NavigationService
     {
-        #region Fields (5) 
+        #region Fields (5)
 
         private static readonly object Locker1 = new Object();
         private static readonly object Locker2 = new Object();
@@ -23,9 +23,9 @@ namespace EPMLiveCore.API
         private readonly Dictionary<string, PropertyInfo> _navLinkProperties;
         private readonly SPWeb _spWeb;
 
-        #endregion Fields 
+        #endregion Fields
 
-        #region Constructors (3) 
+        #region Constructors (3)
 
         public NavigationService(IEnumerable<string> providers, SPWeb spWeb)
         {
@@ -42,16 +42,16 @@ namespace EPMLiveCore.API
                     IEnumerable<Type> types = AssemblyManager.Current.GetTypes();
                     Parallel.ForEach(providers, provider => LoadProvider(provider, types));
                 });
-                 
+
                 tasks.Add(t1);
 
                 Task t2 = Task.Factory.StartNew(() =>
                 {
-                    Parallel.ForEach(typeof (SPNavLink).GetProperties(), property =>
+                    Parallel.ForEach(typeof(SPNavLink).GetProperties(), property =>
                     {
                         lock (Locker2)
                         {
-                            _navLinkProperties.Add(property.Name, typeof (SPNavLink).GetProperty(property.Name));
+                            _navLinkProperties.Add(property.Name, typeof(SPNavLink).GetProperty(property.Name));
                         }
                     });
                 });
@@ -86,16 +86,16 @@ namespace EPMLiveCore.API
             }
         }
 
-        public NavigationService(string provider, SPWeb spWeb) : this(new[] {provider}, spWeb) { }
+        public NavigationService(string provider, SPWeb spWeb) : this(new[] { provider }, spWeb) { }
 
         public NavigationService(SPWeb spWeb)
         {
             _spWeb = spWeb;
         }
 
-        #endregion Constructors 
+        #endregion Constructors
 
-        #region Methods (13) 
+        #region Methods (13)
 
         // Public Methods (5) 
 
@@ -177,7 +177,7 @@ namespace EPMLiveCore.API
                         try
                         {
                             Thread.Sleep(1000);
-                            ((NavLinkProvider) linkProvider).ClearCache();
+                            ((NavLinkProvider)linkProvider).ClearCache();
                             GetNavigationLinks(linkProvider, links);
                         }
                         catch { }
@@ -233,10 +233,10 @@ namespace EPMLiveCore.API
 
             var dataTable = new DataTable();
 
-            dataTable.Columns.Add("Title", typeof (string));
-            dataTable.Columns.Add("Command", typeof (string));
-            dataTable.Columns.Add("ImageUrl", typeof (string));
-            dataTable.Columns.Add("Kind", typeof (string));
+            dataTable.Columns.Add("Title", typeof(string));
+            dataTable.Columns.Add("Command", typeof(string));
+            dataTable.Columns.Add("ImageUrl", typeof(string));
+            dataTable.Columns.Add("Kind", typeof(string));
 
             SPSecurity.RunWithElevatedPrivileges(() =>
             {
@@ -256,7 +256,7 @@ namespace EPMLiveCore.API
                         {
                             Dictionary<string, string> di;
 
-                            var result = new Tuple<string, string, string, string, bool>[] {};
+                            var result = new Tuple<string, string, string, string, bool>[] { };
 
                             try
                             {
@@ -272,17 +272,17 @@ namespace EPMLiveCore.API
                             }
                             catch (Exception e)
                             {
-                                di = new Dictionary<string, string> {{"General Actions Exception", e.Message}};
+                                di = new Dictionary<string, string> { { "General Actions Exception", e.Message } };
                             }
 
-                            return new object[] {result, di};
+                            return new object[] { result, di };
                         });
 
                         Task<object[]> t2 = Task.Factory.StartNew(() =>
                         {
                             Dictionary<string, string> di;
 
-                            var result = new Tuple<string, string, string, string, bool>[] {};
+                            var result = new Tuple<string, string, string, string, bool>[] { };
 
                             try
                             {
@@ -297,17 +297,17 @@ namespace EPMLiveCore.API
                             }
                             catch (Exception e)
                             {
-                                di = new Dictionary<string, string> {{"Planner Actions Exception", e.Message}};
+                                di = new Dictionary<string, string> { { "Planner Actions Exception", e.Message } };
                             }
 
-                            return new object[] {result, di};
+                            return new object[] { result, di };
                         });
 
                         Task<object[]> t3 = Task.Factory.StartNew(() =>
                         {
                             Dictionary<string, string> di;
 
-                            var result = new Tuple<string, string, string, string, bool>[] {};
+                            var result = new Tuple<string, string, string, string, bool>[] { };
 
                             try
                             {
@@ -324,17 +324,17 @@ namespace EPMLiveCore.API
                             }
                             catch (Exception e)
                             {
-                                di = new Dictionary<string, string> {{"Social Actions Exception", e.Message}};
+                                di = new Dictionary<string, string> { { "Social Actions Exception", e.Message } };
                             }
 
-                            return new object[] {result, di};
+                            return new object[] { result, di };
                         });
 
                         Task<object[]> t4 = Task.Factory.StartNew(() =>
                         {
                             Dictionary<string, string> di;
 
-                            var result = new Tuple<string, string, string, string, bool>[] {};
+                            var result = new Tuple<string, string, string, string, bool>[] { };
 
                             try
                             {
@@ -351,17 +351,17 @@ namespace EPMLiveCore.API
                             }
                             catch (Exception e)
                             {
-                                di = new Dictionary<string, string> {{"Workspace Actions Exception", e.Message}};
+                                di = new Dictionary<string, string> { { "Workspace Actions Exception", e.Message } };
                             }
 
-                            return new object[] {result, di};
+                            return new object[] { result, di };
                         });
 
                         Task<object[]> t5 = Task.Factory.StartNew(() =>
                         {
                             Dictionary<string, string> di;
 
-                            var result = new Tuple<string, string, string, string, bool>[] {};
+                            var result = new Tuple<string, string, string, string, bool>[] { };
 
                             try
                             {
@@ -376,20 +376,20 @@ namespace EPMLiveCore.API
                             }
                             catch (Exception e)
                             {
-                                di = new Dictionary<string, string> {{"PFE Actions Exception", e.Message}};
+                                di = new Dictionary<string, string> { { "PFE Actions Exception", e.Message } };
                             }
 
-                            return new object[] {result, di};
+                            return new object[] { result, di };
                         });
 
                         var actions = new List<Tuple<string, string, string, string, bool>>();
 
-                        foreach (var t in new[] {t1, t2, t3, t4, t5})
+                        foreach (var t in new[] { t1, t2, t3, t4, t5 })
                         {
                             object[] result = t.Result;
 
                             var et = new Tuple<string, string, string, string, bool>(null, null, null, null, false);
-                            var tuples = (Tuple<string, string, string, string, bool>[]) (result[0] ?? new[] {et});
+                            var tuples = (Tuple<string, string, string, string, bool>[])(result[0] ?? new[] { et });
 
                             actions.AddRange(tuples);
 
@@ -658,11 +658,11 @@ namespace EPMLiveCore.API
             string un = _spWeb.CurrentUser.LoginName;
 
             object navProvider = (from type in types
-                where type.GetInterfaces().Contains(typeof (INavLinkProvider))
-                from NavLinkProviderInfoAttribute attribute in
-                    type.GetCustomAttributes(typeof (NavLinkProviderInfoAttribute), false)
-                where attribute.Name.ToUpper().Equals(key)
-                select Activator.CreateInstance(type, new object[] {sId, wId, un})).FirstOrDefault();
+                                  where type.GetInterfaces().Contains(typeof(INavLinkProvider))
+                                  from NavLinkProviderInfoAttribute attribute in
+                                      type.GetCustomAttributes(typeof(NavLinkProviderInfoAttribute), false)
+                                  where attribute.Name.ToUpper().Equals(key)
+                                  select Activator.CreateInstance(type, new object[] { sId, wId, un })).FirstOrDefault();
 
             if (navProvider == null) return;
 
@@ -677,13 +677,13 @@ namespace EPMLiveCore.API
             return list.DoesUserHavePermissions(spBasePermissions);
         }
 
-        #endregion Methods 
+        #endregion Methods
 
         private Tuple<string, string, string, string, bool>[] GetPFEActions(SPList list,
             out Dictionary<string, string> di)
         {
             bool success = true;
-            di = new Dictionary<string, string> {{"PFE Actions", true.ToString()}};
+            di = new Dictionary<string, string> { { "PFE Actions", true.ToString() } };
 
             var actions = new List<Tuple<string, string, string, string, bool>>();
 
@@ -756,9 +756,9 @@ namespace EPMLiveCore.API
             GridGanttSettings settings, out Dictionary<string, string> di)
         {
             bool success = true;
-            di = new Dictionary<string, string> {{"Social Actions", true.ToString()}};
+            di = new Dictionary<string, string> { { "Social Actions", true.ToString() } };
 
-            var actions = new Tuple<string, string, string, string, bool>[] {};
+            var actions = new Tuple<string, string, string, string, bool>[] { };
 
             try
             {
@@ -785,7 +785,7 @@ namespace EPMLiveCore.API
             out Dictionary<string, string> di)
         {
             bool success = true;
-            di = new Dictionary<string, string> {{"Workspace Actions", true.ToString()}};
+            di = new Dictionary<string, string> { { "Workspace Actions", true.ToString() } };
 
             var actions = new List<Tuple<string, string, string, string, bool>>();
 
@@ -829,32 +829,97 @@ namespace EPMLiveCore.API
             return actions.ToArray();
         }
 
+        private static bool CurrentUserHasTeamMembersPermission(SPWeb web)
+        {
+            string[] groupPermissions = new string[] { "Administrators", "Executives", "Portfolio Managers", "Project Managers", "Report Writers", "Resource Managers" };
+            //SPWeb currentWeb = list.ParentWeb;
+            Guid lockedWeb = CoreFunctions.getLockedWeb(web);
+
+            using (SPWeb configWeb = (web.ID != lockedWeb
+                ? web.Site.OpenWeb(lockedWeb)
+                : web.Site.OpenWeb(web.ID)))
+            {
+                if (web.CurrentUser.IsSiteAdmin)
+                    return true;
+
+                SPGroupCollection userGroups = web.CurrentUser.Groups;
+                foreach (SPGroup grp in userGroups)
+                {
+                    if (groupPermissions.Contains(grp.Name))
+                        return true;
+                    else if (grp.Name.ToLower().Equals("team members", StringComparison.CurrentCultureIgnoreCase))
+                        return false;
+                }
+                return true;
+            }
+        }
+
         private static Tuple<string, string, string, string, bool>[] GetGeneralActions(bool usePopup, SPList list, bool bfancyforms, out Dictionary<string, string> di)
         {
             bool success = true;
 
-            di = new Dictionary<string, string> {{"Item Actions", true.ToString()}};
+            di = new Dictionary<string, string> { { "Item Actions", true.ToString() } };
 
-            var actions = new Tuple<string, string, string, string, bool>[] {};
+            var actions = new Tuple<string, string, string, string, bool>[] { };
 
             try
             {
-                actions = new[]
+                if (list.Title == "Resources")
                 {
-                    AT("View Item", "view", "/_layouts/images/blank.gif", LP(list, SPBasePermissions.ViewListItems), usePopup ? (bfancyforms ? "6" : "5") : "1"),
-                    AT("Edit Item", "edit", "/_layouts/images/edititem.gif", LP(list, SPBasePermissions.EditListItems), usePopup ? (bfancyforms ? "6" : "5") : "1"),
-                    AT("--SEP--", null, null, true),
-                    AT("Approve Item", "approve", "/_layouts/images/apprj.gif", list.EnableModeration && LP(list, SPBasePermissions.ApproveItems)),
-                    AT("Workflows", "workflows", "/_layouts/images/workflows.gif", list.WorkflowAssociations.Count > 0,
-                        "1"),
-                    AT("--SEP--", null, null, true),
-                    AT("Permissions", "perms", "/_layouts/images/permissions16.png",
-                        LP(list, SPBasePermissions.ManagePermissions), "0"),
-                    AT("Delete Item", "delete", "/_layouts/images/delitem.gif",
-                        LP(list, SPBasePermissions.DeleteListItems),
-                        "99"),
-                    AT("--SEP--", null, null, true)
-                };
+                    if (CurrentUserHasTeamMembersPermission(list.ParentWeb))
+                    {
+                        actions = new[]
+                        {
+                            AT("View Item", "view", "/_layouts/images/blank.gif", LP(list, SPBasePermissions.ViewListItems), usePopup ? (bfancyforms ? "6" : "5") : "1"),
+                            AT("Edit Item", "edit", "/_layouts/images/edititem.gif", LP(list, SPBasePermissions.EditListItems), usePopup ? (bfancyforms ? "6" : "5") : "1"),
+                            AT("--SEP--", null, null, true),
+                            AT("Approve Item", "approve", "/_layouts/images/apprj.gif", list.EnableModeration && LP(list, SPBasePermissions.ApproveItems)),
+                            AT("Workflows", "workflows", "/_layouts/images/workflows.gif", list.WorkflowAssociations.Count > 0,
+                                "1"),
+                            AT("--SEP--", null, null, true),
+                            AT("Permissions", "perms", "/_layouts/images/permissions16.png",
+                                LP(list, SPBasePermissions.ManagePermissions), "0"),
+                            AT("Delete Item", "delete", "/_layouts/images/delitem.gif",
+                                LP(list, SPBasePermissions.DeleteListItems),
+                                "99"),
+                            AT("--SEP--", null, null, true)
+                        };
+                    }
+                    else
+                    {
+                        actions = new[]
+                        {
+                            AT("View Item", "view", "/_layouts/images/blank.gif", LP(list, SPBasePermissions.ViewListItems), usePopup ? (bfancyforms ? "6" : "5") : "1"),
+                            AT("--SEP--", null, null, true),
+                            AT("Approve Item", "approve", "/_layouts/images/apprj.gif", list.EnableModeration && LP(list, SPBasePermissions.ApproveItems)),
+                            AT("Workflows", "workflows", "/_layouts/images/workflows.gif", list.WorkflowAssociations.Count > 0,
+                                "1"),
+                            AT("--SEP--", null, null, true),
+                            AT("Permissions", "perms", "/_layouts/images/permissions16.png",
+                                LP(list, SPBasePermissions.ManagePermissions), "0"),
+                            AT("--SEP--", null, null, true)
+                        };
+                    }
+                }
+                else
+                {
+                    actions = new[]
+                    {
+                        AT("View Item", "view", "/_layouts/images/blank.gif", LP(list, SPBasePermissions.ViewListItems), usePopup ? (bfancyforms ? "6" : "5") : "1"),
+                        AT("Edit Item", "edit", "/_layouts/images/edititem.gif", LP(list, SPBasePermissions.EditListItems), usePopup ? (bfancyforms ? "6" : "5") : "1"),
+                        AT("--SEP--", null, null, true),
+                        AT("Approve Item", "approve", "/_layouts/images/apprj.gif", list.EnableModeration && LP(list, SPBasePermissions.ApproveItems)),
+                        AT("Workflows", "workflows", "/_layouts/images/workflows.gif", list.WorkflowAssociations.Count > 0,
+                            "1"),
+                        AT("--SEP--", null, null, true),
+                        AT("Permissions", "perms", "/_layouts/images/permissions16.png",
+                            LP(list, SPBasePermissions.ManagePermissions), "0"),
+                        AT("Delete Item", "delete", "/_layouts/images/delitem.gif",
+                            LP(list, SPBasePermissions.DeleteListItems),
+                            "99"),
+                        AT("--SEP--", null, null, true)
+                    };
+                }
             }
             catch (Exception e)
             {
@@ -871,9 +936,9 @@ namespace EPMLiveCore.API
             out Dictionary<string, string> di)
         {
             bool success = true;
-            di = new Dictionary<string, string> {{"Planner Actions", true.ToString()}};
+            di = new Dictionary<string, string> { { "Planner Actions", true.ToString() } };
 
-            var actions = new Tuple<string, string, string, string, bool>[] {};
+            var actions = new Tuple<string, string, string, string, bool>[] { };
 
             try
             {
