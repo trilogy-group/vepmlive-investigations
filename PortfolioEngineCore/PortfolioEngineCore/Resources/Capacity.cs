@@ -2113,7 +2113,7 @@ namespace PortfolioEngineCore
                                 oResAvail = new ResourceValues.clsResAvail();
                                 oResAvail.WResID = lWresId;
                                 oResAvail.PeriodID = availability.Key;
-                                oResAvail.Hours = availability.Value - offHours;
+                                oResAvail.Hours = availability.Value;
                                 ResourceValues.clsResCap oResData;
                                 if (RVClass.Resources.TryGetValue(oResAvail.WResID, out oResData))
                                 {
