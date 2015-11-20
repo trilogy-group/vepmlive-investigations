@@ -25,7 +25,6 @@ function registerEpmLiveResourceGridScript() {
         $$.ListId = null;
         $$.ItemId = null;
         $$.LaunchInForm = false;
-        $$.UserHasTeamMembersPermission = true;
 
         $$.reports = {
             wcReportId: null,
@@ -2501,14 +2500,6 @@ function registerEpmLiveResourceGridScript() {
                         ];
 
                         window.epmLiveGenericToolBar.generateToolBar(divId, cfgs);
-
-                        if ($$.UserHasTeamMembersPermission) {
-                            $("#resourcePoolToolBar li:nth-child(1)").show();
-                        }
-                        else {
-                            $("#resourcePoolToolBar li:nth-child(1)").hide();
-                            $("#resourcePoolToolBar li:nth-child(2)").css("paddingLeft", "15px");
-                        }
                     }
                     else {
                         setTimeout(wait, 500);

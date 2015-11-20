@@ -66,38 +66,6 @@ namespace EPMLiveWebParts
             }
         }
 
-        protected bool CurrentUserHasTeamMembersPermission
-        {
-            
-            get
-            {
-
-
-
-                string[] groupPermissions = new string[] { "Administrators", "Executives", "Portfolio Managers", "Project Managers", "Report Writers", "Resource Managers" };
-                SPWeb currentWeb = SPContext.Current.Web;
-                Guid lockedWeb = CoreFunctions.getLockedWeb(currentWeb);
-
-                using (SPWeb configWeb = (currentWeb.ID != lockedWeb
-                    ? currentWeb.Site.OpenWeb(lockedWeb)
-                    : currentWeb.Site.OpenWeb(currentWeb.ID)))
-                {
-                    if (currentWeb.CurrentUser.IsSiteAdmin)
-                        return true;
-
-                    SPGroupCollection userGroups = currentWeb.CurrentUser.Groups;
-                    foreach (SPGroup grp in userGroups)
-                    {
-                        if (groupPermissions.Contains(grp.Name))
-                            return true;
-                        else if (grp.Name.ToLower().Equals("team members", StringComparison.CurrentCultureIgnoreCase))
-                            return false;
-                    }
-                    return true;
-                }
-            }
-        }
-
         /// <summary>
         ///     Gets the data XML.
         /// </summary>
@@ -351,15 +319,6 @@ namespace EPMLiveWebParts
                 RibbonBehavior = 0;
             else
                 RibbonBehavior = Convert.ToInt16(gSettings.RibbonBehavior);
-
-            if (!CurrentUserHasTeamMembersPermission)
-            {
-                SPRibbon spRibbon = SPRibbon.GetCurrent(Page);
-                if (spRibbon != null)
-                {
-                    spRibbon.TrimById("Ribbon.ResourceGrid.New.NewItem", "false");
-                }
-            }
         }
 
         /// <summary>
