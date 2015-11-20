@@ -86,7 +86,7 @@ namespace EPMLiveWebParts
                     {
                         if (groupPermissions.Contains(grp.Name))
                             return true;
-                        else if (grp.Name.ToLower().Equals("team members", StringComparison.CurrentCultureIgnoreCase))
+                        else if (grp.Name.ToLower().Equals("team members", StringComparison.CurrentCultureIgnoreCase) || grp.Name.ToLower().Equals("visitors", StringComparison.CurrentCultureIgnoreCase))
                             return false;
                     }
                     return true;
