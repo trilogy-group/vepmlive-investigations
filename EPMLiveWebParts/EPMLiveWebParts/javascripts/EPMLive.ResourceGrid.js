@@ -25,7 +25,7 @@ function registerEpmLiveResourceGridScript() {
         $$.ListId = null;
         $$.ItemId = null;
         $$.LaunchInForm = false;
-        $$.UserHasTeamMembersPermission = true;
+        $$.UserHaveResourceCenterPermission = true;
 
         $$.reports = {
             wcReportId: null,
@@ -2502,7 +2502,7 @@ function registerEpmLiveResourceGridScript() {
 
                         window.epmLiveGenericToolBar.generateToolBar(divId, cfgs);
 
-                        if ($$.UserHasTeamMembersPermission) {
+                        if ($$.UserHaveResourceCenterPermission) {
                             $("#resourcePoolToolBar li:nth-child(1)").show();
                         }
                         else {

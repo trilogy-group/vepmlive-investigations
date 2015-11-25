@@ -15,7 +15,7 @@ namespace WorkEnginePPM.Core.ResourceManagement
 {
     public static class Utilities
     {
-        #region Methods (11)
+        #region Methods (12)
 
         // Public Methods (6) 
 
@@ -643,7 +643,8 @@ namespace WorkEnginePPM.Core.ResourceManagement
                                         {
                                             value = Convert.ToString(spListItem["EXTID"]);
                                         }
-                                        else {
+                                        else
+                                        {
                                             value = Convert.ToString(spListItem["Title"]);
                                         }
                                     }
@@ -882,6 +883,37 @@ namespace WorkEnginePPM.Core.ResourceManagement
                 pfeResourceField = 0;
                 return false;
             }
+        }
+
+        /// <summary>
+        /// Check whether user has Edit Resource Permissions.
+        /// </summary>
+        /// <param name="web">Current Web</param>
+        /// <param name="lWResID">Resource Id</param>
+        /// <param name="hasPFEResourceCenterPermissions">Returns True, If user has 01-Resource Center checked under Portfolio Permissions. False, otherwise</param>
+        /// <returns></returns>
+        public static bool CheckPFEResourceCenterPermission(SPWeb web, int lWResID, out bool hasPFEResourceCenterPermissions)
+        {
+            PortfolioEngineCore.DBAccess dba = null;
+            try
+            {
+                hasPFEResourceCenterPermissions = true;
+                string sBaseInfo = WebAdmin.BuildBaseInfo(System.Web.HttpContext.Current, web);
+                PortfolioEngineCore.DataAccess da = new PortfolioEngineCore.DataAccess(sBaseInfo, PortfolioEngineCore.SecurityLevels.EditResources);
+                dba = da.dba;
+                if (dba.Open() == PortfolioEngineCore.StatusEnum.rsSuccess)
+                {
+                    if (PortfolioEngineCore.dbaGeneral.CheckUserGlobalPermission(dba, PortfolioEngineCore.GlobalPermissionsEnum.gpCapCenter) == false)
+                        hasPFEResourceCenterPermissions = false;
+                    else
+                        hasPFEResourceCenterPermissions = true;
+                }
+            }
+            catch (PortfolioEngineCore.PFEException)
+            {
+                hasPFEResourceCenterPermissions = false;
+            }
+            return hasPFEResourceCenterPermissions;
         }
 
         #endregion Methods

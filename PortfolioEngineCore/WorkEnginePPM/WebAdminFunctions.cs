@@ -27,6 +27,46 @@ namespace WorkEnginePPM
             }
         }
 
+        public static void CapturePFEBaseInfo(SPWeb web, out string basepath, out string username, out string ppmId, out string ppmCompany, out string ppmDbConn, out SecurityLevels secLevel)
+        {
+            secLevel = SecurityLevels.Base;
+            using (var site = new SPSite(web.Site.ID))
+            {
+                //using (SPWeb rootWeb = site.RootWeb)
+                SPWeb rootWeb = site.RootWeb;
+                {
+
+                    basepath = CoreFunctions.getConfigSetting(rootWeb, "epkbasepath");
+                    ppmId = CoreFunctions.getConfigSetting(rootWeb, "ppmpid");
+                    ppmCompany = CoreFunctions.getConfigSetting(rootWeb, "ppmcompany");
+                    ppmDbConn = CoreFunctions.getConfigSetting(rootWeb, "ppmdbconn");
+                    username = ConfigFunctions.GetCleanUsername(rootWeb);
+                }
+            }
+        }
+
+        public static string BuildBaseInfo(HttpContext context, SPWeb web)
+        {
+            string basePath, username, pid, company, dbcnstring;
+            SecurityLevels secLevel;
+            CapturePFEBaseInfo(web, out basePath, out username, out pid, out company, out dbcnstring, out secLevel);
+
+            CStruct xEPKServer = new CStruct();
+            xEPKServer.Initialize("BaseInfo");
+            xEPKServer.CreateString("basepath", basePath);
+            xEPKServer.CreateString("username", username);
+            xEPKServer.CreateString("pid", pid);
+            xEPKServer.CreateString("company", company);
+            xEPKServer.CreateString("dbcnstring", dbcnstring);
+            if (context != null)
+            {
+                xEPKServer.CreateInt("port", context.Request.Url.Port);
+                xEPKServer.CreateString("session", GetSPSessionString(context, "SessionInfo"));
+            }
+            return xEPKServer.XML();
+        }
+
+
         public static string BuildBaseInfo(HttpContext context)
         {
             string basePath, username, pid, company, dbcnstring;

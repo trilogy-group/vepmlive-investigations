@@ -12,6 +12,7 @@ using EPMLiveWebParts.Properties;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.WebControls;
 using EPMLiveCore.API;
+using System.Reflection;
 
 namespace EPMLiveWebParts
 {
@@ -66,11 +67,33 @@ namespace EPMLiveWebParts
             }
         }
 
-        protected bool CurrentUserHasTeamMembersPermission
+        /// <summary>
+        /// Verifying whether user has 01-Resource Center permissions.
+        /// </summary>
+        /// <returns></returns>
+        private bool CheckPFEResourceCenterPermission()
+        {
+            bool hasPFEResourceCenterPermissions = true;
+            try
+            {
+                var args = new object[] { SPContext.Current.Web, SPContext.Current.Web.CurrentUser.ID, hasPFEResourceCenterPermissions };
+                Assembly assembly = Assembly.Load("WorkEnginePPM, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5");
+                Type type = assembly.GetType("WorkEnginePPM.Core.ResourceManagement.Utilities", true, true);
+                type.GetMethod("CheckPFEResourceCenterPermission", BindingFlags.Public | BindingFlags.Static).Invoke(null, args);
+                hasPFEResourceCenterPermissions = Convert.ToBoolean(args[2]);
+            }
+            catch 
+            {
+                //No need to handle this exception because If PFE is not configured on Share Point site then also It should show Invite button.
+                //Hence, Rather then setting hasPFEResourceCenterPermissions = false; Keeping this exception block blank.
+            }
+            return hasPFEResourceCenterPermissions;
+        }
+
+        protected bool CurrentUserHaveResourceCenterPermission
         {
             get
             {
-                string[] groupPermissions = new string[] { "Administrators", "Executives", "Portfolio Managers", "Project Managers", "Report Writers", "Resource Managers" };
                 SPWeb currentWeb = SPContext.Current.Web;
                 Guid lockedWeb = CoreFunctions.getLockedWeb(currentWeb);
 
@@ -78,19 +101,20 @@ namespace EPMLiveWebParts
                     ? currentWeb.Site.OpenWeb(lockedWeb)
                     : currentWeb.Site.OpenWeb(currentWeb.ID)))
                 {
-                    if (currentWeb.CurrentUser.IsSiteAdmin)
-                        return true;
 
-                    SPGroupCollection userGroups = currentWeb.CurrentUser.Groups;
-                    foreach (SPGroup grp in userGroups)
+                    SPList resourceList = configWeb.Lists.TryGetList("Resources");
+                    if (resourceList != null)
                     {
-                        if (groupPermissions.Contains(grp.Name))
-                            return true;
-                        else if (grp.Name.ToLower().Equals("team members", StringComparison.CurrentCultureIgnoreCase) || grp.Name.ToLower().Equals("visitors", StringComparison.CurrentCultureIgnoreCase))
+                        if (resourceList.DoesUserHavePermissions(SPBasePermissions.AddListItems))
+                        {
+                            if (CheckPFEResourceCenterPermission())
+                                return true;
                             return false;
+                        }
+                        return false;
                     }
-                    return true;
                 }
+                return true;
             }
         }
 
@@ -348,7 +372,7 @@ namespace EPMLiveWebParts
             else
                 RibbonBehavior = Convert.ToInt16(gSettings.RibbonBehavior);
 
-            if (!CurrentUserHasTeamMembersPermission)
+            if (!CurrentUserHaveResourceCenterPermission)
             {
                 SPRibbon spRibbon = SPRibbon.GetCurrent(Page);
                 if (spRibbon != null)
