@@ -178,7 +178,7 @@
 
         function loadProject()
         {
-            var surl = "openmpp.aspx?Planner=<%=sPlannerID%>&ProjectName=<%=sProjectName%>&listid=<%=sProjectListId%>&isdlg=1&Source=<%=System.Web.HttpUtility.UrlEncode(Request["Source"]) %>";
+            var surl = "<%=sWebUrl %>/_layouts/epmlive/openmpp.aspx?Planner=<%=sPlannerID%>&ProjectName=<%=sProjectName%>&listid=<%=sProjectListId%>&isdlg=1&Source=<%=System.Web.HttpUtility.UrlEncode(Request["Source"]) %>";
 
             var options = { url: surl, width: 350, height: 120, title: "Open project" };
 
