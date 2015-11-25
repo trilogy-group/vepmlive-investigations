@@ -595,11 +595,32 @@
                                         if (url.indexOf(lnk) !== -1) {
                                             $link.parents('table').addClass(selectedClass);
                                             selected = true;
+                                            
+                                            var index = -1;
+
+                                            var parent = $link.parents('div')[0];
+                                            var $siblings = $(parent).siblings('div');
+
+                                            if ($siblings) {
+                                                var $nodes = getLinkNodes($($siblings[0]).parent().parent().attr('id'));
+
+                                                for (var i = 0; i < $nodes.length; i++) {
+                                                    var s = $nodes[i];
+                                                    if (s.id === parent.id) {
+                                                        index = i;
+                                                    }
+                                                }
+                                            }
+
+                                            $.cookie(selectedLinkCookie, JSON.stringify({ index: index, uri: $link.attr('href') }), cookieOptions);
+                                            link = $.parseJSON($.cookie(selectedLinkCookie));
                                         }
                                     }
                                 });
                             }
                         });
+
+                       
 
                         if (!selected) {
                             $('#epm-nav-sub-workplace').find('a').each(function () {
@@ -615,6 +636,26 @@
                             });
                         }
                     }
+
+                    if (!selected) {
+                        url = escape(unescape(link.uri)).toLowerCase();
+                        $('td.epm-nav-node').each(function () {
+                            if (!selected) {
+                                $(this).find('a').each(function () {
+                                    if (!selected) {
+                                        var $link = $(this);
+                                        var lnk = escape(unescape($link.get(0).href)).toLowerCase();
+
+                                        if (lnk.indexOf(url) !== -1) {
+                                            $link.parents('table').addClass(selectedClass);
+                                            selected = true;
+                                        }
+                                    }
+                                });
+                            }
+                        });
+                    }
+                    
                 }
 
                 function saveLinkState($nav) {
