@@ -35,7 +35,13 @@ namespace EPMLiveReportsAdmin
 
         public override void FieldAdded(SPListEventProperties properties)
         {
-            _stCurrentContext.Session["ViewSession"] = null;
+            try
+            {
+                _stCurrentContext.Session["ViewSession"] = null;
+            }
+            catch {
+            }
+           
             if (properties.Field.InternalName.ToLower() == "today")
             {
                 return;
