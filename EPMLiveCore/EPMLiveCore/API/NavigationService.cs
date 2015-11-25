@@ -840,15 +840,21 @@ namespace EPMLiveCore.API
                 : web.Site.OpenWeb(web.ID)))
             {
                 if (web.CurrentUser.IsSiteAdmin)
+                {
                     return true;
+                }
 
                 SPGroupCollection userGroups = web.CurrentUser.Groups;
                 foreach (SPGroup grp in userGroups)
                 {
                     if (groupPermissions.Contains(grp.Name))
+                    {
                         return true;
-                    else if (grp.Name.ToLower().Equals("team members", StringComparison.CurrentCultureIgnoreCase))
+                    }
+                    if (grp.Name.ToLower().Equals("team members", StringComparison.CurrentCultureIgnoreCase))
+                    {
                         return false;
+                    }
                 }
                 return true;
             }
