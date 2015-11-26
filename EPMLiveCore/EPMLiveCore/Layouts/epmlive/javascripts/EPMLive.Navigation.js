@@ -637,6 +637,10 @@
                         }
                     }
 
+                    $('a.rtIn').live('click', function () {
+                        $.cookie('resetlink', '1');
+                    });
+
                     if (!selected) {
                         url = escape(unescape(link.uri)).toLowerCase();
                         $('td.epm-nav-node').each(function () {
@@ -645,15 +649,20 @@
                                     if (!selected) {
                                         var $link = $(this);
                                         var lnk = escape(unescape($link.get(0).href)).toLowerCase();
-
                                         if (lnk.indexOf(url) !== -1) {
-                                            $link.parents('table').addClass(selectedClass);
-                                            selected = true;
+                                            if ($.cookie('resetlink') == "0") {
+                                                $link.parents('table').addClass(selectedClass);
+                                                selected = true;
+                                            }
                                         }
                                     }
                                 });
                             }
                         });
+                    }
+                    else
+                    {
+                        $.cookie('resetlink', '0');
                     }
                     
                 }
