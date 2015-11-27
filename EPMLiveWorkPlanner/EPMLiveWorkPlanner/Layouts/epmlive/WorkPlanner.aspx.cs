@@ -900,7 +900,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
         protected void GetResourceList(SPWeb web)
         {
             tb.AddTimer();
-            sResourceList = PlannerCore.getResourceList("<Team ListId='" + sProjectListId + "' ItemId='" + sItemID + "'><Columns>Title</Columns></Team>", web);
+            sResourceList = PlannerCore.getResourceList("<Team ListId='" + sProjectListId + "' ItemId='" + sItemID + "'><Columns>Title,StandardRate</Columns></Team>", web);
             tb.StopTimer();
         }
 
