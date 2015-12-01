@@ -68,57 +68,6 @@ namespace EPMLiveWebParts
         }
 
         /// <summary>
-        /// Verifying whether user has 01-Resource Center permissions.
-        /// </summary>
-        /// <returns></returns>
-        private bool CheckPFEResourceCenterPermission()
-        {
-            bool hasPFEResourceCenterPermissions = true;
-            try
-            {
-                var args = new object[] { SPContext.Current.Web, SPContext.Current.Web.CurrentUser.ID, hasPFEResourceCenterPermissions };
-                Assembly assembly = Assembly.Load("WorkEnginePPM, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5");
-                Type type = assembly.GetType("WorkEnginePPM.Core.ResourceManagement.Utilities", true, true);
-                type.GetMethod("CheckPFEResourceCenterPermission", BindingFlags.Public | BindingFlags.Static).Invoke(null, args);
-                hasPFEResourceCenterPermissions = Convert.ToBoolean(args[2]);
-            }
-            catch 
-            {
-                //No need to handle this exception because If PFE is not configured on Share Point site then also It should show Invite button.
-                //Hence, Rather then setting hasPFEResourceCenterPermissions = false; Keeping this exception block blank.
-            }
-            return hasPFEResourceCenterPermissions;
-        }
-
-        protected bool CurrentUserHaveResourceCenterPermission
-        {
-            get
-            {
-                SPWeb currentWeb = SPContext.Current.Web;
-                Guid lockedWeb = CoreFunctions.getLockedWeb(currentWeb);
-
-                using (SPWeb configWeb = (currentWeb.ID != lockedWeb
-                    ? currentWeb.Site.OpenWeb(lockedWeb)
-                    : currentWeb.Site.OpenWeb(currentWeb.ID)))
-                {
-
-                    SPList resourceList = configWeb.Lists.TryGetList("Resources");
-                    if (resourceList != null)
-                    {
-                        if (resourceList.DoesUserHavePermissions(SPBasePermissions.AddListItems))
-                        {
-                            if (CheckPFEResourceCenterPermission())
-                                return true;
-                            return false;
-                        }
-                        return false;
-                    }
-                }
-                return true;
-            }
-        }
-
-        /// <summary>
         ///     Gets the data XML.
         /// </summary>
         protected string DataXml
@@ -319,9 +268,42 @@ namespace EPMLiveWebParts
 
         #endregion Properties
 
-        #region Methods (4)
+        #region Methods (5)
 
-        // Protected Methods (2) 
+        protected bool CurrentUserHaveResourceCenterPermission()
+        {
+            SPWeb currentWeb = SPContext.Current.Web;
+            Guid lockedWeb = CoreFunctions.getLockedWeb(currentWeb);
+            bool hasPFEResourceCenterPermissions = true;
+
+            try
+            {
+                using (SPWeb configWeb = (currentWeb.ID != lockedWeb
+                    ? currentWeb.Site.OpenWeb(lockedWeb)
+                    : currentWeb.Site.OpenWeb(currentWeb.ID)))
+                {
+
+                    SPList resourceList = configWeb.Lists.TryGetList("Resources");
+                    if (resourceList != null)
+                    {
+                        if (resourceList.DoesUserHavePermissions(SPBasePermissions.AddListItems))
+                        {
+                            if (WorkEnginePPM.Core.ResourceManagement.Utilities.CheckPFEResourceCenterPermission(currentWeb, SPContext.Current.Web.CurrentUser.ID, out hasPFEResourceCenterPermissions))
+                                return hasPFEResourceCenterPermissions;
+                            return false;
+                        }
+                        return false;
+                    }
+                }
+            }
+            catch
+            {
+                //No need to handle this exception because If PFE is not configured on Share Point site then also It should show Invite button.
+                //Hence, Rather then setting hasPFEResourceCenterPermissions = false; Keeping this exception block blank.
+                return true;
+            }
+            return true;
+        }
 
         /// <summary>
         ///     Raises the <see cref="E:System.Web.UI.Control.PreRender" /> event.
@@ -372,7 +354,7 @@ namespace EPMLiveWebParts
             else
                 RibbonBehavior = Convert.ToInt16(gSettings.RibbonBehavior);
 
-            if (!CurrentUserHaveResourceCenterPermission)
+            if (!CurrentUserHaveResourceCenterPermission())
             {
                 SPRibbon spRibbon = SPRibbon.GetCurrent(Page);
                 if (spRibbon != null)
@@ -443,6 +425,8 @@ namespace EPMLiveWebParts
             epmDebug = Page.Request.Params["epmdebug"];
             return !string.IsNullOrEmpty(epmDebug);
         }
+
+       
 
         #endregion Methods
     }
