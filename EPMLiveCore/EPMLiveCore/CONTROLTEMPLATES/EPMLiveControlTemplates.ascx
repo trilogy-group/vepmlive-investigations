@@ -65,3 +65,41 @@
 		<SharePoint:AttachmentUpload runat="server"/>
 	</Template>
 </SharePoint:RenderingTemplate>
+<SharePoint:RenderingTemplate ID="TaskForm" runat="server" >
+	<Template>
+		<SPAN id='part1'>
+			<SharePoint:InformationBar ID="InformationBar1" runat="server"/>
+			<wssuc:ToolBar CssClass="ms-formtoolbar" id="toolBarTbltop" RightButtonSeparator="&nbsp;" runat="server">
+					<Template_RightButtons>
+						<SharePoint:NextPageButton runat="server"/>
+						<SharePoint:SaveButton runat="server"/>
+						<SharePoint:GoBackButton runat="server"/>
+					</Template_RightButtons>
+			</wssuc:ToolBar>
+			<SharePoint:FormToolBar ID="FormToolBar1" runat="server"/>
+			<TABLE class="ms-formtable" style="margin-top: 8px;" border=0 cellpadding=0 cellspacing=0 width=100%>
+			<SharePoint:ChangeContentType ID="ChangeContentType1" runat="server"/>
+			<SharePoint:FolderFormFields ID="FolderFormFields1" runat="server"/>
+			<EPMLive:ListDisplaySettingIterator ID="ListDisplaySettingIterator1" runat="server"/>
+			<SharePoint:ApprovalStatus ID="ApprovalStatus1" runat="server"/>
+			<SharePoint:FormComponent ID="FormComponent1" TemplateName="AttachmentRows" runat="server"/>
+			</TABLE>
+			<table cellpadding=0 cellspacing=0 width=100%><tr><td class="ms-formline"><IMG SRC="/_layouts/images/blank.gif" width=1 height=1 alt=""></td></tr></table>
+			<TABLE cellpadding=0 cellspacing=0 width=100% style="padding-top: 7px"><tr><td width=100%>
+			<SharePoint:ItemHiddenVersion ID="ItemHiddenVersion1" runat="server"/>
+			<SharePoint:ParentInformationField ID="ParentInformationField1" runat="server"/>
+			<SharePoint:InitContentType ID="InitContentType1" runat="server"/>
+			<wssuc:ToolBar CssClass="ms-formtoolbar" id="toolBarTbl" RightButtonSeparator="&nbsp;" runat="server">
+					<Template_Buttons>
+						<SharePoint:CreatedModifiedInfo runat="server"/>
+					</Template_Buttons>
+					<Template_RightButtons>
+						<SharePoint:SaveButton runat="server"/>
+						<SharePoint:GoBackButton runat="server"/>
+					</Template_RightButtons>
+			</wssuc:ToolBar>
+			</td></tr></TABLE>
+		</SPAN>
+		<SharePoint:AttachmentUpload ID="AttachmentUpload1" runat="server"/>
+	</Template>
+</SharePoint:RenderingTemplate>
