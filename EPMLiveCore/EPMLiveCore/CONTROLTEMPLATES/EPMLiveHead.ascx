@@ -66,7 +66,7 @@
     window.epmLive.currentItemID = '<%= ItemId %>';
     window.epmLive.currentItemTitle = '<%= ItemTitle %>';
     window.epmLive.currentUserId = '<%= CurrentUserId %>';
-    window.epmLive.currentUserLoginName = '<%= CurrentUserLoginName %>';
+    <%--window.epmLive.currentUserLoginName = '<%= Convert.ToString(CurrentUserLoginName).Replace("\\","\\\\") %>';--%>
     window.epmLive.currentUserName = '<%= CurrentUserName %>';
     window.epmLive.currentUrl = '<%= CurrentUrl %>';
     window.epmLive.fileVersion = '<%= EPMLiveVersion %>';
