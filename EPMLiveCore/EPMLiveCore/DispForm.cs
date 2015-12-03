@@ -49,30 +49,6 @@ namespace EPMLiveCore
             SPList List = SPContext.Current.List;
             SPListItem ListItem = SPContext.Current.ListItem;
 
-            try
-            {
-                if (List.Title.Equals("Resources"))
-                {
-                    if (List.Fields.ContainsField("EXTID"))
-                    {
-                        string basePath = CoreFunctions.getConfigSetting(Web.Site.RootWeb, "EPKBasepath").Replace("/", "").Replace("\\", "");
-                        int EXTID = Convert.ToInt32(ListItem["EXTID"]);
-                        decimal rate = 0;
-                        if (!string.IsNullOrEmpty(basePath))
-                        {
-                            string pfeConnection = Utilities.GetPFEDBConnectionString(basePath);
-                            if (!string.IsNullOrEmpty(pfeConnection))
-                            {
-                                rate = Utilities.CalcResourceRate(EXTID, pfeConnection);
-                            }
-                        }
-                        if (List.Fields.ContainsField("StandardRate") && rate != 0)
-                            ListItem["StandardRate"] =rate;
-                    }
-                }
-            }
-            catch { }
-
             CssRegistration.Register("/_layouts/epmlive/modal/modal.css");
             ScriptLink.Register(Page, "/_layouts/epmlive/modal/modal.js", false);
 

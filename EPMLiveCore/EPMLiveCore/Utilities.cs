@@ -1,5 +1,4 @@
-﻿using Microsoft.SharePoint;
-using Microsoft.Win32;
+﻿using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
@@ -187,111 +186,6 @@ namespace EPMLiveCore
             return key;
         }
 
-        public static decimal CalcResourceRate(int resourceId, string pfeConnection)
-        {
-            if ((!string.IsNullOrEmpty(pfeConnection)) && pfeConnection.StartsWith("provider", StringComparison.InvariantCultureIgnoreCase))
-            {
-                // Removing "Provider" part from connection string
-                pfeConnection = pfeConnection.Substring(pfeConnection.IndexOf(';') + 1);
-            }
-            SqlCommand oCommand;
-            SqlDataReader reader;
-            string sCommand = "";
-            decimal dRate = 0;
-            try
-            {
-                using (SqlConnection pfeConn = new SqlConnection(pfeConnection))
-                {
-                    SPSecurity.RunWithElevatedPrivileges(delegate()
-                    {
-                        pfeConn.Open();
-                    });
-                    // read the resource named rate and if necessary cost category
-                    int lBC_UID = 0;
-                    int lRT_UID = 0;
-                    sCommand = "Select RT_UID From EPGP_COST_RATES  Where TB_UID=0 And WRES_ID=@WresId";
-                    oCommand = new SqlCommand(sCommand, pfeConn);
-                    oCommand.Parameters.AddWithValue("@WresId", resourceId);
-                    reader = oCommand.ExecuteReader();
-                    if (reader.Read())
-                    {
-                        lRT_UID = Convert.ToInt32(reader["RT_UID"]);
-                    }
-                    reader.Close();
-
-                    if (lRT_UID > 0)
-                    {
-                        sCommand = "Select RT_RATE From EPG_RATE_VALUES Where RT_EFFECTIVE_DATE<=GETDATE() And RT_UID=@RT_UID Order By RT_EFFECTIVE_DATE";
-                        oCommand = new SqlCommand(sCommand, pfeConn);
-                        oCommand.Parameters.AddWithValue("@RT_UID", lRT_UID);
-                        reader = oCommand.ExecuteReader();
-                        while (reader.Read())
-                        {
-                            dRate = (decimal)(Convert.ToDouble(reader["RT_RATE"]));
-                        }
-                        reader.Close();
-                    }
-                    else
-                    {
-                        sCommand = "Select BC_UID From EPGP_COST_XREF  Where WRES_ID=@WresId";
-                        oCommand = new SqlCommand(sCommand, pfeConn);
-                        oCommand.Parameters.AddWithValue("@WresId", resourceId);
-                        reader = oCommand.ExecuteReader();
-                        if (reader.Read())
-                        {
-                            lBC_UID = Convert.ToInt32(reader["BC_UID"]);
-                        }
-                        reader.Close();
-                        if (lBC_UID > 0)
-                        {
-                            //  Get Resource Planning Calendar which we will use for Category Rates
-                            int lFiscal = -99;
-                            sCommand = "SELECT ADM_PORT_COMMITMENTS_CB_ID FROM EPG_ADMIN";
-                            oCommand = new SqlCommand(sCommand, pfeConn);
-                            reader = oCommand.ExecuteReader();
-                            {
-                                if (reader.Read())
-                                {
-                                    if (reader["ADM_PORT_COMMITMENTS_CB_ID"].Equals(System.DBNull.Value))
-                                        lFiscal = -99;
-                                    else
-                                        lFiscal = Convert.ToInt32(reader["ADM_PORT_COMMITMENTS_CB_ID"]);
-                                }
-                                reader.Close();
-                            }
-                            if (lFiscal >= 0)
-                            {
-                                // read the rate for the period containing TODAY but also read Period 1 in case calendar starts in the future
-                                sCommand = "Select BA_RATE" +
-                                            " From EPGP_COST_BREAKDOWN_ATTRIBS a" +
-                                            " Join EPG_PERIODS p On p.CB_ID=a.CB_ID And p.PRD_ID=a.BA_PRD_ID" +
-                                            " Join EPGP_CATEGORIES c On c.CA_UID=a.BA_BC_UID" +
-                                            " Where a.CB_ID=@CBId And BA_BC_UID=@BC_UID" +
-                                            " And BA_RATETYPE_UID=0 And ((PRD_START_DATE<=GETDATE() And PRD_FINISH_DATE>GETDATE()) Or PRD_ID=1)" +
-                                            "Order by PRD_ID";
-                                oCommand = new SqlCommand(sCommand, pfeConn);
-                                oCommand.Parameters.AddWithValue("@CBId", lFiscal);
-                                oCommand.Parameters.AddWithValue("@BC_UID", lBC_UID);
-                                reader = oCommand.ExecuteReader();
-                                {
-                                    while (reader.Read())
-                                    {
-                                        dRate = (decimal)(Convert.ToDouble(reader["BA_RATE"]));
-                                    }
-                                    reader.Close();
-                                }
-                            }
-                        }
-                    }
-                }
-                return dRate;
-            }
-            catch (Exception ex)
-            {
-                // do something
-                throw ex;
-            }
-        }
         #endregion Methods
     }
 }
