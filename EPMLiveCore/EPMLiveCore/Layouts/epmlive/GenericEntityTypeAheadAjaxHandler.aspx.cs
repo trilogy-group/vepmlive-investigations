@@ -119,6 +119,8 @@ namespace EPMLiveCore
                 {
                     query.ViewFields = "<FieldRef Name='" + _field + "' /><FieldRef Name='" + _parentListField + "' /><FieldRef Name='ID' /><FieldRef Name='Title' />";
                 }
+                query.Query += "<OrderBy><FieldRef Name='" + _field + "' Ascending='True' /></OrderBy>";
+
                 query.ViewFieldsOnly = true;
                 SPListItemCollection items = list.GetItems(query);
                 if (items.Count > 0)
@@ -175,13 +177,11 @@ namespace EPMLiveCore
                         if (!string.IsNullOrEmpty(tableName))
                         {
                             isEmptyTableName = false;
-                            DataTable dt = ReportingData.GetReportingData(SPContext.Current.Web, list.Title, false, string.Empty, string.Empty);
+                            DataTable dt = ReportingData.GetReportingData(SPContext.Current.Web, list.Title, false, string.Empty, _field);
                             _sbResult = new StringBuilder();
 
                             if (dt != null)
                             {
-                                dt.DefaultView.Sort = _field;
-                                dt = dt.DefaultView.ToTable();
                                 foreach (DataRow r in dt.Rows)
                                 {
                                     _sbResult.Append(r["ID"].ToString() + "^^" + r[_field].ToString() + "^^" + (!string.IsNullOrEmpty(r[_field].ToString()) ? r[_field].ToString() : string.Empty) + ";#");
@@ -194,6 +194,7 @@ namespace EPMLiveCore
                 
                 if(!list.EnableThrottling || isEmptyTableName)
                 {
+                    query.Query += "<OrderBy><FieldRef Name='" + _field + "' Ascending='True' /></OrderBy>";
                     query.ViewFieldsOnly = true;
                     SPListItemCollection items = list.GetItems(query);
                     DataTable dt = items.GetDataTable();
@@ -201,8 +202,8 @@ namespace EPMLiveCore
 
                     if (dt != null)
                     {
-                        dt.DefaultView.Sort = _field;
-                        dt = dt.DefaultView.ToTable();
+                        //dt.DefaultView.Sort = _field;
+                        //dt = dt.DefaultView.ToTable();
                         DataRow[] results = dt.Select("", _field + " ASC");
                         foreach (DataRow r in results)
                         {
