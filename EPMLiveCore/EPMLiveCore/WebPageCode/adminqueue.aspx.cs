@@ -25,11 +25,12 @@ namespace EPMLiveCore
         protected Label lblMaxQueue;
         protected Label lblMaxJob;
 
-        protected TextBox txtThreads;
+        protected TextBox txtMainThreads;
         protected TextBox txtInterval;
         protected TextBox txtSecurityThreads;
         protected TextBox txtRollupQueueThreads;
         protected TextBox txtHighPriorityQueueThreads;
+        protected TextBox txtTimesheetThreads;
 
         protected WebApplicationSelector WebApplicationSelector1;
 
@@ -55,10 +56,11 @@ namespace EPMLiveCore
             if(!IsPostBack)
             {
                 txtInterval.Text = CoreFunctions.getFarmSetting("PollingInterval");
-                txtThreads.Text = CoreFunctions.getFarmSetting("QueueThreads");
+                txtMainThreads.Text = CoreFunctions.getFarmSetting("QueueThreads");
                 txtSecurityThreads.Text = CoreFunctions.getFarmSetting("SecQueueThreads");
                 txtRollupQueueThreads.Text = CoreFunctions.getFarmSetting("RollupQueueThreads");
                 txtHighPriorityQueueThreads.Text = CoreFunctions.getFarmSetting("HighQueueThreads");
+                txtTimesheetThreads.Text = CoreFunctions.getFarmSetting("TSQueueThreads");
             }
         }
 
@@ -128,10 +130,11 @@ namespace EPMLiveCore
         protected void Button1_OnClick(object sender, EventArgs e)
         {
             CoreFunctions.setFarmSetting("PollingInterval", txtInterval.Text);
-            CoreFunctions.setFarmSetting("QueueThreads", txtThreads.Text);
+            CoreFunctions.setFarmSetting("QueueThreads", txtMainThreads.Text);
             CoreFunctions.setFarmSetting("SecQueueThreads", txtSecurityThreads.Text);
             CoreFunctions.setFarmSetting("RollupQueueThreads", txtRollupQueueThreads.Text);
             CoreFunctions.setFarmSetting("HighQueueThreads", txtHighPriorityQueueThreads.Text);
+            CoreFunctions.setFarmSetting("TSQueueThreads", txtTimesheetThreads.Text);
         }
 
         protected string showtime(int seconds)

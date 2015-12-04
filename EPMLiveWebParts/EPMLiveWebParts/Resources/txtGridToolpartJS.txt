@@ -5,7 +5,7 @@
 		
 		var ddlList = document.getElementById("ddlList#tpid#");
 		var strList = ddlList.options[ddlList.selectedIndex].value;
-		
+
 		dhtmlxAjax.post(webUrl + "/_layouts/epmlive/getListInfo.aspx", "listurl=" + strList, changeListResponse);	
 	}
 	
@@ -49,9 +49,11 @@
 
 	function newOpt(text, val, sel)
 	{
-		var elOptNew = document.createElement('option');
-		elOptNew.text = text;
-        elOptNew.value = val;
+		var elOptNew = document.createElement('option');		
+		// Decodes string which is encoded while rendering
+		var str = unescape(text);		
+        elOptNew.text = str;
+		elOptNew.value = val;
 		elOptNew.selected = sel;
 		return elOptNew;
 	}

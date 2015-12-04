@@ -92,14 +92,15 @@ namespace TimerService
 
             logMessage("INIT", "STMR", "Starting Timer Service");
 
-            int maxThreads = 5;
+            int maxThreads = 0;
             try
             {
                 maxThreads = int.Parse(EPMLiveCore.CoreFunctions.getFarmSetting("HighQueueThreads"));
             }
             catch (Exception e)
             {
-                logMessage("INIT", "GTERR", e.Message);
+                logMessage("INIT", "GTERR", "Unable to read default thread value from Farm Settings");
+                //logMessage("INIT", "GTERR", e.Message);
             }
             workingThreads = new WorkerThreads(maxThreads);
 

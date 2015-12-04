@@ -43,22 +43,22 @@
         </wssuc:InputFormControl>
     </Template_InputFormControls>
 </wssuc:InputFormSection>
-<wssuc:InputFormSection Title="Thread Count"
+<wssuc:InputFormSection Title="Main Queue Thread Count"
     Description=""
     runat="server">
     <Template_Description>
-        This specifies the number of concurrent threads the queueing system will run.
+        This specifies the number of concurrent main threads the queueing system will run.
     </Template_Description>
     <Template_InputFormControls>
-        <wssuc:InputFormControl LabelText="Threads" runat="server">
+        <wssuc:InputFormControl LabelText="Main Threads" runat="server">
              <Template_Control>
-                <asp:TextBox ID="txtThreads" runat="server" ></asp:TextBox>
+                <asp:TextBox ID="txtMainThreads" runat="server" ></asp:TextBox>
              </Template_Control>
         </wssuc:InputFormControl>
     </Template_InputFormControls>
 </wssuc:InputFormSection>
 
-<wssuc:InputFormSection Title="Security Thread Count"
+<wssuc:InputFormSection Title="Security Queue Thread Count"
     Description=""
     runat="server">
     <Template_Description>
@@ -80,7 +80,7 @@
         This specifies the number of concurrent rollup threads the queueing system will run.
     </Template_Description>
     <Template_InputFormControls>
-        <wssuc:InputFormControl LabelText="Rollup Queue" runat="server">
+        <wssuc:InputFormControl LabelText="Rollup Threads" runat="server">
              <Template_Control>
                 <asp:TextBox ID="txtRollupQueueThreads" runat="server" ></asp:TextBox>
              </Template_Control>
@@ -88,16 +88,31 @@
     </Template_InputFormControls>
 </wssuc:InputFormSection>
 
-<wssuc:InputFormSection Title="High priority Queue Thread Count"
+<wssuc:InputFormSection Title="High Priority Queue Thread Count"
     Description=""
     runat="server">
     <Template_Description>
         This specifies the number of concurrent high priority threads the queueing system will run.
     </Template_Description>
     <Template_InputFormControls>
-        <wssuc:InputFormControl LabelText="High Priority Queue" runat="server">
+        <wssuc:InputFormControl LabelText="High Priority Threads" runat="server">
              <Template_Control>
                 <asp:TextBox ID="txtHighPriorityQueueThreads" runat="server" ></asp:TextBox>
+             </Template_Control>
+        </wssuc:InputFormControl>
+    </Template_InputFormControls>
+</wssuc:InputFormSection>
+
+<wssuc:InputFormSection Title="Timesheet Queue Thread Count"
+    Description=""
+    runat="server">
+    <Template_Description>
+        This specifies the number of concurrent timesheet threads the queueing system will run.
+    </Template_Description>
+    <Template_InputFormControls>
+        <wssuc:InputFormControl LabelText="Timesheet Threads" runat="server">
+             <Template_Control>
+                <asp:TextBox ID="txtTimesheetThreads" runat="server" ></asp:TextBox>
              </Template_Control>
         </wssuc:InputFormControl>
     </Template_InputFormControls>
