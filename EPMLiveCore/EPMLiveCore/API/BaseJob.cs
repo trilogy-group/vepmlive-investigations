@@ -91,8 +91,6 @@ namespace EPMLiveCore.API
 
             cn.Close();
 
-            if (cn != null)
-                cn.Dispose();
         }
 
         protected void updateProgress(float newCount)
