@@ -1009,7 +1009,6 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
                     var numRows = $('#grouping-wrapper' + customCtrlId).children('.grouping-row').length;
                     if (numRows == 0) {
                         divGroupingWrapperEmptyText.text('No Grouping Added');
-                        $('#aGroupBySave'+customCtrlId).attr('class', 'disabledLink');
                     }
                     else if (numRows > 0 && numRows < 5) {
                         $('#aGroupBySave'+customCtrlId).removeAttr('class');
@@ -1116,7 +1115,6 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
                         var numRows = $('#grouping-wrapper' + customCtrlId).children('.grouping-row').length;
                         if (numRows == 0) {
                             divGroupingWrapperEmptyText.text('No Grouping Added');
-                            $('#aGroupBySave' + customCtrlId).attr('class', 'disabledLink');
                         }
                         else if (numRows > 0 && numRows < 5) {
                             $('#aGroupBySave' + customCtrlId).removeAttr('class');
@@ -1176,16 +1174,14 @@ function OpenIntegrationPage(controlFull, listid, itemid) {
             aFooterSave.text('Apply');
             aFooterSave.bind('click', function () {
                 var numGroups = $('#grouping-wrapper' + customCtrlId).children('.grouping-row').length;
-                if (numGroups > 0) {
-                    var keyVals = [];
-                    $('#grouping-wrapper' + customCtrlId).children('.grouping-row').each(function () {
-                        var txt = $(this).find('.grouping-select').find('select option:selected').text();
-                        var val = $(this).find('.grouping-select').find('select option:selected').val();
-                        var objTemp = { 'key': txt, 'value': val };
-                        keyVals.push(objTemp);
-                    });
-                    cfg['saveFunction'](keyVals);
-                }
+                var keyVals = [];
+                $('#grouping-wrapper' + customCtrlId).children('.grouping-row').each(function () {
+                    var txt = $(this).find('.grouping-select').find('select option:selected').text();
+                    var val = $(this).find('.grouping-select').find('select option:selected').val();
+                    var objTemp = { 'key': txt, 'value': val };
+                    keyVals.push(objTemp);
+                });
+                cfg['saveFunction'](keyVals);
 
                 //$(this).parent('.grouping-dropdown-menu').toggle();
                 //$('.grouping-dropdown-menu').toggle();

@@ -54,6 +54,7 @@ namespace EPMLiveWebParts
         protected int iPage = 0;
         protected string DifferentColumns = "";
         protected string DifferentGroups = "";
+        protected string GroupBy_Fromtoolbar = "0";
         protected ArrayList aViewFields = new ArrayList();
         protected ArrayList aHiddenViewFields = new ArrayList();
         protected bool bWorkspaceUrl = false;
@@ -269,6 +270,12 @@ namespace EPMLiveWebParts
                     }
                 }
                 catch { }
+
+                if (GroupBy_Fromtoolbar == "1")
+                {
+                    hasGroups = false;
+                }
+
                 if (view.AggregationsStatus == "On")
                 {
                     XmlDocument docAgg = new XmlDocument();
@@ -4526,7 +4533,10 @@ namespace EPMLiveWebParts
             if (string.IsNullOrEmpty(DifferentGroups))
             {
                 XmlNode ndGroupBy = querydoc.SelectSingleNode("//GroupBy");
-
+                if (GroupBy_Fromtoolbar == "1")
+                {
+                    ndGroupBy = null;
+                }
                 if (ndGroupBy != null)
                 {
                     foreach (XmlNode nd in ndGroupBy.ChildNodes)
@@ -4541,7 +4551,15 @@ namespace EPMLiveWebParts
                         arrTempGroups.Add(additionalgroup);
                 }
 
-                ndGroupBy = xmlQuery.SelectSingleNode("//GroupBy");
+                if (GroupBy_Fromtoolbar == "1")
+                {
+                    ndGroupBy = null;
+                }
+                else
+                {
+                    ndGroupBy = xmlQuery.SelectSingleNode("//GroupBy");
+                }
+
                 if (ndGroupBy != null)
                 {
                     xmlQuery.ChildNodes[0].RemoveChild(ndGroupBy);
@@ -5708,8 +5726,12 @@ namespace EPMLiveWebParts
                 try
                 {
                     DifferentGroups = Request["GB"].ToString();
+                    GroupBy_Fromtoolbar = "1";
                 }
-                catch { }
+                catch
+                {
+                    GroupBy_Fromtoolbar = "0";
+                }
                 try
                 {
                     if (string.IsNullOrEmpty(DifferentGroups))
