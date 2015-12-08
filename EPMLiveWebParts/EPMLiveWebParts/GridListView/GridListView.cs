@@ -5294,7 +5294,7 @@ namespace EPMLiveWebParts
             sbExcel.Append(System.IO.Path.GetDirectoryName(view.ServerRelativeUrl).Replace(@"\", @"\u00252F"));
             sbExcel.Append(@"\u0026CacheControl=1");
 
-            output.WriteLine("mygrid" + sFullGridId + "._excell = '" + sbExcel + "';");
+            output.WriteLine("mygrid" + sFullGridId + "._excell = '" + HttpUtility.UrlDecode(sbExcel.ToString()) + "';");
 
             output.WriteLine("mygrid" + sFullGridId + "._gridid = '" + sFullGridId + "';");
             StringBuilder sbForms = new StringBuilder();
