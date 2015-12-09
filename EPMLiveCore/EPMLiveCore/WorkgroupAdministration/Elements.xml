@@ -3,8 +3,8 @@
   <CustomActionGroup
 			  Id="EPMLive.Workgroup.CentralAdmin"
 			  Location="Microsoft.SharePoint.Administration.GeneralApplicationSettings"
-			  Title="WorkEngine Administration"
-			  Sequence="100" ImageUrl="/_layouts/images/epmlivelogo.gif"/>
+			  Title="EPM Live Administration"
+			  Sequence="100" ImageUrl="/_layouts/images/epmlive-thumb-32.png"/>
 
   <CustomAction 
 		Id="EPMLive.Workgroup.CentralAdmin.Features"
