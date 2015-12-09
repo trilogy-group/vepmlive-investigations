@@ -12,6 +12,7 @@ using System.IO;
 using System.Resources;
 using Microsoft.Win32;
 using System.Web.Configuration;
+using System.Linq;
 
 namespace EPMLiveEnterprise
 {
@@ -247,6 +248,7 @@ namespace EPMLiveEnterprise
                             if (projectId != 0)
                             {
                                 publishTasks(projectId, pubType, newTransUid, lastTransUid);
+                                AssignGroupsToTasks(projectId, pubType, pDs);
                             }
 
                             ProcessPFEWork(projectId);
@@ -605,7 +607,7 @@ namespace EPMLiveEnterprise
                     {
                         if (listItem["IsProjectServer"].ToString() != "True")
                         {
-                            return 0;
+                            return 0;                            
                         }
                     }catch{}
                 }
@@ -700,6 +702,87 @@ namespace EPMLiveEnterprise
             {
                 //Need to change event number accordingly.
                 myLog.WriteEntry("Error in ProcessPFEWork " + ex.Message + ex.StackTrace, EventLogEntryType.Error, 305);
+            }
+        }
+
+        private void AssignGroupsToTasks(int projectId, int pubType, WebSvcProject.ProjectDataSet pDs)
+        {
+            SPGroup addMemGrp = null; SPGroup addVisitGrp = null;            
+            string strProjAssignTo = string.Empty;
+
+            try
+            {
+
+                mySiteToPublish.AllowUnsafeUpdates = true;
+                SPList lstPC = mySiteToPublish.Lists["Project Center"];
+                SPListItem lstPCItem;
+                SPQuery query = new SPQuery();                
+                query.Query = "<Where><Eq><FieldRef Name='ID'/><Value Type='Int'>" + projectId + "</Value></Eq></Where>";
+                lstPCItem = lstPC.GetItems(query)[0];
+
+                strProjAssignTo = (Convert.ToString(lstPCItem["AssignedTo"]) != string.Empty ? Convert.ToString(lstPCItem["AssignedTo"]) : "");
+
+                if (lstPCItem != null && lstPCItem.HasUniqueRoleAssignments == true)
+                {
+                    foreach (SPRoleAssignment role in lstPCItem.RoleAssignments)
+                    {
+                        try
+                        {
+                            if (role.Member.GetType() == typeof(SPGroup))
+                            {
+                                SPGroup tempGrp = (SPGroup)role.Member;
+
+                                if (tempGrp.Name.Contains("Member"))
+                                {
+                                    addMemGrp = (SPGroup)role.Member;
+                                }
+
+                                if (tempGrp.Name.Contains("Visitor"))
+                                {
+                                    addVisitGrp = (SPGroup)role.Member;
+                                }
+                            }
+                        }
+                        catch { }
+                    }    
+                    foreach (WebSvcProject.ProjectDataSet.ProjectResourceRow pr in pDs.ProjectResource)
+                    {
+                        try
+                        {                                
+                            if (!pr.IsWRES_ACCOUNTNull())
+                            {
+                                string email = "";
+                                try
+                                {
+                                    email = pr.WRES_EMAIL;
+                                }
+                                catch { }
+
+                                var assignRes = from assgRow in pDs.Assignment.AsEnumerable()
+                                                where assgRow.Field<Guid>("Res_UID") == pr.RES_UID
+                                                select assgRow;
+
+                                if (assignRes.Count() > 0)
+                                    addMemGrp.AddUser(pr.WRES_ACCOUNT, email, pr.RES_NAME, "");                                        
+                                else
+                                    addVisitGrp.AddUser(pr.WRES_ACCOUNT, email, pr.RES_NAME, "");
+
+                                if (!strProjAssignTo.Contains(";#" + (mySiteToPublish.AllUsers[pr.WRES_ACCOUNT].ID + ";#" + getResourceName(pr.RES_UID, pDs))))
+                                    strProjAssignTo += ";#" + (mySiteToPublish.AllUsers[pr.WRES_ACCOUNT].ID + ";#" + getResourceName(pr.RES_UID, pDs));
+                                                                         
+                            }                                
+                        }
+                        catch { }
+                    }                    
+                    addVisitGrp.Update();
+                    addMemGrp.Update();
+                    lstPCItem["AssignedTo"] = strProjAssignTo;
+                    lstPCItem.Update();
+                }
+            }
+            catch (Exception ex)
+            {
+                myLog.WriteEntry("Error in AssignGroupsToTasks " + ex.Message + ex.StackTrace, EventLogEntryType.Error, 305);
             }
         }
 
