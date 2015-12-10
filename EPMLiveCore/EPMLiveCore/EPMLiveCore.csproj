@@ -2386,6 +2386,7 @@ net start "WETimer"</PostDeploymentCommand>
     <Content Include="Images\completed.png" />
     <Content Include="Images\deferred.gif" />
     <Content Include="Images\deferred.png" />
+   <Content Include="Images\epmlive-thumb-32.png" />
     <Content Include="Images\EPMLive.ico" />
     <Content Include="Images\epmlivegantt.gif" />
     <Content Include="Images\EPMLiveHome.png" />
