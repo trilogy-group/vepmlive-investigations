@@ -54,7 +54,7 @@ namespace EPMLiveWebParts
         protected int iPage = 0;
         protected string DifferentColumns = "";
         protected string DifferentGroups = "";
-        protected string GroupBy_Fromtoolbar = "0";
+        protected bool GroupByFromToolbar = false;
         protected ArrayList aViewFields = new ArrayList();
         protected ArrayList aHiddenViewFields = new ArrayList();
         protected bool bWorkspaceUrl = false;
@@ -271,7 +271,7 @@ namespace EPMLiveWebParts
                 }
                 catch { }
 
-                if (GroupBy_Fromtoolbar == "1")
+                if (GroupByFromToolbar == true)
                 {
                     hasGroups = false;
                 }
@@ -4533,7 +4533,7 @@ namespace EPMLiveWebParts
             if (string.IsNullOrEmpty(DifferentGroups))
             {
                 XmlNode ndGroupBy = querydoc.SelectSingleNode("//GroupBy");
-                if (GroupBy_Fromtoolbar == "1")
+                if (GroupByFromToolbar == true)
                 {
                     ndGroupBy = null;
                 }
@@ -4551,7 +4551,7 @@ namespace EPMLiveWebParts
                         arrTempGroups.Add(additionalgroup);
                 }
 
-                if (GroupBy_Fromtoolbar == "1")
+                if (GroupByFromToolbar == true)
                 {
                     ndGroupBy = null;
                 }
@@ -5726,11 +5726,11 @@ namespace EPMLiveWebParts
                 try
                 {
                     DifferentGroups = Request["GB"].ToString();
-                    GroupBy_Fromtoolbar = "1";
+                    GroupByFromToolbar = true;
                 }
                 catch
                 {
-                    GroupBy_Fromtoolbar = "0";
+                    GroupByFromToolbar = false;
                 }
                 try
                 {
