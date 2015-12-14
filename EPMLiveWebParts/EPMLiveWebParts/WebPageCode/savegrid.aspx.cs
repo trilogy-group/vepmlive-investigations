@@ -121,10 +121,10 @@ namespace EPMLiveWebParts
         }
         */
 
-        //public override void populateGroups(string query, SortedList arrGTemp, SPWeb curWeb)
-        //{
+        public override void populateGroups(string query, SortedList arrGTemp, SPWeb curWeb)
+        {
 
-        //}
+        }
 
         private void processItem(string gr_id, SPWeb web, SPList list)
         {
@@ -321,8 +321,8 @@ namespace EPMLiveWebParts
                     {
 
                         li.Update();
-                        //arrItems.Add(li.ParentList.ParentWeb.ID + "." + li.ParentList.ID + "." + li.ID, new string[1] { null });
-                        //queueAllItems.Enqueue(li);
+                        arrItems.Add(li.ParentList.ParentWeb.ID + "." + li.ParentList.ID + "." + li.ID, new string[1] { null });
+                        queueAllItems.Enqueue(li);
                         hshSaveGroups.Add(li.ParentList.ParentWeb.ID + "." + li.ParentList.ID + "." + li.ID + ".1", gr_id);
 
                         gr_id = HttpUtility.UrlEncode(gr_id);
@@ -447,15 +447,21 @@ namespace EPMLiveWebParts
         }
         protected override void outputXml()
         {
-            XmlNodeList ndRows = docXml.SelectNodes("//row");
-            XmlDocument docXmlNew = new XmlDocument();
-            XmlNode ndData = docXmlNew.CreateNode(XmlNodeType.Element, "data", docXmlNew.NamespaceURI);
+            XmlNode ndRows = docXml.SelectSingleNode("//rows");
+            XmlNode ndHead = ndRows.SelectSingleNode("head");
+            ndRows.RemoveChild(ndHead);
+            docXml.RemoveChild(ndRows);
+
+            XmlNode ndData = docXml.CreateNode(XmlNodeType.Element, "data", docXml.NamespaceURI);
             ndData.InnerXml = output;
-            docXmlNew.AppendChild(ndData);
-            XmlNode ndAllData = docXmlNew.CreateNode(XmlNodeType.Element, "action", docXmlNew.NamespaceURI);
-            XmlAttribute attrType = docXmlNew.CreateAttribute("type");
+            docXml.AppendChild(ndData);
+            XmlNode ndAllData = docXml.CreateNode(XmlNodeType.Element, "action", docXml.NamespaceURI);
+            XmlAttribute attrType = docXml.CreateAttribute("type");
             attrType.Value = "alldatareturned";
             ndAllData.Attributes.Append(attrType);
+            ndAllData.AppendChild(ndRows);
+
+            ndData.AppendChild(ndAllData);
 
             foreach (XmlNode ndRow in ndRows)
             {
@@ -466,15 +472,8 @@ namespace EPMLiveWebParts
                 }
             }
 
-            foreach (XmlNode ndRow in ndRows)
-            {
-                XmlNode newNode = docXmlNew.ImportNode(ndRow, true);
-                ndAllData.AppendChild(newNode);
-            }
-            ndData.AppendChild(ndAllData);
-
             //base.outputXml();
-            data = docXmlNew.OuterXml;
+            data = docXml.OuterXml;
         }
     }
 }

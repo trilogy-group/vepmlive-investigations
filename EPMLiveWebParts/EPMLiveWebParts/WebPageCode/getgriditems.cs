@@ -1942,9 +1942,17 @@ namespace EPMLiveWebParts
                 {
                     //EPML-5193 : to fix multiple user grouping issue on PM Approval page
                     if (!String.IsNullOrEmpty(groupname) && (hasGroups || hshItemNodes.Count > 0))
+                    {
                         ndGroup = (XmlNode)hshItemNodes[groupname];
+                        if (ndGroup == null)
+                        {
+                            ndGroup = ndMainParent;
+                        }
+                    }
                     else
+                    {
                         ndGroup = ndMainParent;
+                    }
 
                     if (ndGroup == null)
                         return;
@@ -3145,9 +3153,17 @@ namespace EPMLiveWebParts
                 {
                     //EPML-5193 : to fix multiple user grouping issue on PM Approval page
                     if (!String.IsNullOrEmpty(groupname) && (hasGroups || hshItemNodes.Count > 0))
+                    {
                         ndGroup = (XmlNode)hshItemNodes[groupname];
+                        if (ndGroup == null)
+                        {
+                            ndGroup = ndMainParent;
+                        }
+                    }
                     else
+                    {
                         ndGroup = ndMainParent;
+                    }
 
                     if (ndGroup == null)
                         return;
