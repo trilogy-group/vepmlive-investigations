@@ -176,8 +176,7 @@ namespace WorkEnginePPM.Jobs
                         cn.Open();
                 });
 
-                string lastApproved = EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPKTSLastTSApprove");
-                lastApproved = "";
+                string lastApproved = EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPKTSLastTSApprove");                
 
                 arrLists = new ArrayList(EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPKLists").Split(','));
 
