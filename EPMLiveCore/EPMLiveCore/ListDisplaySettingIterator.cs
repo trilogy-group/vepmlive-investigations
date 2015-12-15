@@ -67,7 +67,7 @@ namespace EPMLiveCore
         private bool bUseTeam = false;
 
         private int ActivationType = 0;
-
+        
         private void FindSaveButtons(Control Parent, ref ArrayList Controls)
         {
             foreach (Control child in Parent.Controls)
@@ -83,7 +83,7 @@ namespace EPMLiveCore
 
         protected void CustomHandler(object sender, EventArgs e)
         {
-            if (SaveButton.SaveItem(SPContext.Current, false, ""))
+            if (SaveButton.SaveItem(SPContext.Current, this.list.BaseTemplate == SPListTemplateType.DocumentLibrary, ""))
             {
                 string sUrl = (List.ParentWeb.ServerRelativeUrl == "/") ? "" : List.ParentWeb.ServerRelativeUrl;
 
@@ -111,7 +111,7 @@ namespace EPMLiveCore
 
         protected void HandleNewItemRecent(object sender, EventArgs e)
         {
-            if (SaveButton.SaveItem(SPContext.Current, false, ""))
+            if (SaveButton.SaveItem(SPContext.Current, this.list.BaseTemplate == SPListTemplateType.DocumentLibrary, ""))
             {
                 ProcessNewItemRecent(SPContext.Current.ListItem);
 
