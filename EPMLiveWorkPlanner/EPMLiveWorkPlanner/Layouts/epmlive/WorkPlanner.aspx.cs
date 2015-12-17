@@ -56,6 +56,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
         //protected string sEditorID;
 
         protected bool bAgile = false;
+        protected bool bStartSoon = false;
 
         protected string sRollUp = "";
         protected string sRollDown = "";
@@ -1063,6 +1064,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                     bEnableLink = props.bEnableLinking;
                     bCalcCost = props.bCalcCost;
                     bCalcWork = props.bCalcWork;
+                    bStartSoon = props.bStartSoon;
 
                     iWorkHours = props.iWorkHours[3] / 60 - props.iWorkHours[0] / 60 - (props.iWorkHours[2] - props.iWorkHours[1]);
 
