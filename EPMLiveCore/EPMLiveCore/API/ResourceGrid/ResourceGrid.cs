@@ -210,10 +210,13 @@ namespace EPMLiveCore.API
             if (type.Equals("Lookup"))
             {
                 var sVal = string.Empty;
+                var lookupVal = string.Empty;
                 try
                 {
                     sVal = new SPFieldLookupValue(dataElement.Value).LookupId.ToString();
-                    if (sVal == "0")
+                    lookupVal = Convert.ToString(new SPFieldLookupValue(dataElement.Value).LookupValue);
+
+                    if (sVal == "0" || string.IsNullOrEmpty(lookupVal))
                     {
                         sVal = "";
                     }
@@ -630,20 +633,21 @@ namespace EPMLiveCore.API
                             sEnumKey += (lookupVal.LookupId.ToString() + ";");
                         }
                     }
-
+                    bool found = false;
                     if (!string.IsNullOrEmpty(sEnum.Trim()))
                     {
                         sEnum = sEnum.TrimEnd(new[] { ';' });
-                        if (!lEnum.Contains(sEnum))
+                        if (!lEnum.Contains(sEnum) && !string.IsNullOrEmpty(sEnum.Trim()))
                         {
                             lEnum.Add(sEnum);
+                            found = true;
                         }
                     }
 
                     if (!string.IsNullOrEmpty(sEnumKey.Trim()))
                     {
                         sEnumKey = sEnumKey.TrimEnd(new[] { ';' });
-                        if (!lEnumKeys.Contains(sEnumKey))
+                        if (!lEnumKeys.Contains(sEnumKey) && found)
                         {
                             lEnumKeys.Add(sEnumKey);
                         }
