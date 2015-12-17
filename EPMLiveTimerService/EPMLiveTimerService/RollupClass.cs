@@ -98,15 +98,21 @@ namespace TimerService
 
             foreach(SPWebApplication webApp in SPWebService.ContentService.WebApplications)
             {
-                string sConn = EPMLiveCore.CoreFunctions.getConnectionString(webApp.Id);
+                var sConn = EPMLiveCore.CoreFunctions.getConnectionString(webApp.Id);
                 if(sConn != "")
                 {
-                    using (SqlConnection cn = new SqlConnection(sConn))
+                    using (var cn = new SqlConnection(sConn))
                     {
                         cn.Open();
-                        using (SqlCommand cmd = new SqlCommand("update rollupqueue set status = 0,queueserver=NULL  where status = 1 OR STATUS = 2", cn))
+                        using (var cmd = new SqlCommand("update rollupqueue set status = 0, queueserver=NULL  where DATEDIFF(HH,EVENTTIME,getdate()) > 24 and (status = 1 OR STATUS = 2)", cn))
                         {
                             cmd.ExecuteNonQuery();
+                        }
+                        using (var cmd1 = new SqlCommand("update rollupqueue set status = 0, queueserver=NULL  where queueserver=@servername and (status = 1 OR STATUS = 2)", cn))
+                        {
+                            cmd1.Parameters.Clear();
+                            cmd1.Parameters.AddWithValue("@servername", System.Environment.MachineName);
+                            cmd1.ExecuteNonQuery();
                         }
                         cn.Close();
                     }
