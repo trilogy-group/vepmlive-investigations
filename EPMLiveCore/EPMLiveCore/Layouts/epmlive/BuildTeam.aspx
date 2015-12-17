@@ -110,6 +110,7 @@
         var sDefaultGroup = "<%=sDefaultGroup %>";
         var sListId = "<%=Request["listid"] %>";
         var sItemId = "<%=Request["id"] %>";
+        var scrollTimeout;
 
         function Close()
         {
@@ -316,6 +317,25 @@
                 } catch (e) { }
             }
         }
+        Grids.OnScroll = function (grid) {            
+            try
+            {                
+                if (scrollTimeout) {                    
+                    clearTimeout(scrollTimeout);
+                    scrollTimeout = null;
+                }
+                scrollTimeout = setTimeout(scrollHandler(grid), 500);
+            }
+            catch(e)
+            {
+                alert(e);
+                clearTimeout(scrollTimeout);
+            }
+        }        
+
+        scrollHandler = function (grid) {
+            grid.UpdateHeights(2);            
+        };
 
     </script>
 
