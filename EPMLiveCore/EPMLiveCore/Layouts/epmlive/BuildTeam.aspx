@@ -319,12 +319,14 @@
         }
         Grids.OnScroll = function (grid) {            
             try
-            {                
-                if (scrollTimeout) {                    
-                    clearTimeout(scrollTimeout);
-                    scrollTimeout = null;
+            {   
+                if(grid.id == "TeamGrid"){
+                    if (scrollTimeout) {                    
+                        clearTimeout(scrollTimeout);
+                        scrollTimeout = null;
+                    }
+                    scrollTimeout = setTimeout(scrollHandler(grid), 500);
                 }
-                scrollTimeout = setTimeout(scrollHandler(grid), 500);
             }
             catch(e)
             {
