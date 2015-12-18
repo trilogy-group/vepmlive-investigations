@@ -1204,7 +1204,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                     {
                         try
                         {
-                            sBaselineDate = ((DateTime)liProject[sPlannerID + "BD"]).ToString("o") + "Z";
+                            sBaselineDate = ((DateTime)liProject[sPlannerID + "BD"]).ToString("o");
                         }
                         catch { }
 
