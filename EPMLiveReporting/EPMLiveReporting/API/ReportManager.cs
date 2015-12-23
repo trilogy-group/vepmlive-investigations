@@ -99,8 +99,7 @@ namespace EPMLiveReportsAdmin.API
                 SPDocumentLibrary spDocumentLibrary;
                 try
                 {
-                    spDocumentLibrary = (SPDocumentLibrary)Web.Lists["Report Library"];
-
+                    spDocumentLibrary = (SPDocumentLibrary)Web.Site.RootWeb.Lists["Report Library"];
                     SPFolder spFolder = (from SPListItem spListItem in spDocumentLibrary.Folders where spListItem.Folder.Url.Equals(folderName) select spListItem.Folder).FirstOrDefault();
 
                     if (spFolder != null)
@@ -261,7 +260,7 @@ namespace EPMLiveReportsAdmin.API
                         var web = SPContext.Current.Web.Site.RootWeb;
                         var sServerReelativeUrl = (web.ServerRelativeUrl == "/") ? "" : web.ServerRelativeUrl;
 
-                        url = sServerReelativeUrl + "/_layouts/epmlive/SSRSReportRedirect.aspx?weburl=" + HttpUtility.UrlEncode(Web.Url) +
+                        url = sServerReelativeUrl + "/_layouts/epmlive/SSRSReportRedirect.aspx?weburl=" + HttpUtility.UrlEncode(Web.Site.RootWeb.Url) +
                              "&itemurl=" + HttpUtility.UrlEncode(spListItem.Url);
                     }
                     catch (Exception ex) { }
