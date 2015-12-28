@@ -270,7 +270,7 @@ namespace EPMLiveWebParts
 
         #region Methods (5)
 
-        protected bool CurrentUserHaveResourceCenterPermission()
+        protected bool CurrentUserHaveResourceCenterPermission(SPBasePermissions itemPermission)
         {
             SPWeb currentWeb = SPContext.Current.Web;
             Guid lockedWeb = CoreFunctions.getLockedWeb(currentWeb);
@@ -286,12 +286,32 @@ namespace EPMLiveWebParts
                     SPList resourceList = configWeb.Lists.TryGetList("Resources");
                     if (resourceList != null)
                     {
-                        if (resourceList.DoesUserHavePermissions(SPBasePermissions.AddListItems))
+                        switch (itemPermission)
                         {
-                            if (WorkEnginePPM.Core.ResourceManagement.Utilities.CheckPFEResourceCenterPermission(currentWeb, SPContext.Current.Web.CurrentUser.ID, out hasPFEResourceCenterPermissions))
-                                return hasPFEResourceCenterPermissions;
-                            return false;
+                            case SPBasePermissions.AddListItems:
+                            case SPBasePermissions.EditListItems:
+                                {
+                                    if (resourceList.DoesUserHavePermissions(SPBasePermissions.AddListItems) || resourceList.DoesUserHavePermissions(SPBasePermissions.EditListItems))
+                                    {
+                                        if (WorkEnginePPM.Core.ResourceManagement.Utilities.CheckPFEResourceCenterPermission(currentWeb, SPContext.Current.Web.CurrentUser.ID, false, out hasPFEResourceCenterPermissions))
+                                            return hasPFEResourceCenterPermissions;
+                                        return false;
+                                    }
+                                }
+                                break;
+                            case SPBasePermissions.DeleteListItems:
+                                {
+                                    if (resourceList.DoesUserHavePermissions(SPBasePermissions.DeleteListItems))
+                                    {
+                                        if (WorkEnginePPM.Core.ResourceManagement.Utilities.CheckPFEResourceCenterPermission(currentWeb, SPContext.Current.Web.CurrentUser.ID, true, out hasPFEResourceCenterPermissions))
+                                            return hasPFEResourceCenterPermissions;
+                                        return false;
+                                    }
+                                }
+                                break;
                         }
+
+
                         return false;
                     }
                 }
@@ -354,15 +374,20 @@ namespace EPMLiveWebParts
             else
                 RibbonBehavior = Convert.ToInt16(gSettings.RibbonBehavior);
 
-            if (!CurrentUserHaveResourceCenterPermission())
+            SPRibbon spRibbon = SPRibbon.GetCurrent(Page);
+            if (spRibbon != null)
             {
-                SPRibbon spRibbon = SPRibbon.GetCurrent(Page);
-                if (spRibbon != null)
+                if (!CurrentUserHaveResourceCenterPermission(SPBasePermissions.AddListItems))
                 {
                     spRibbon.TrimById("Ribbon.ResourceGrid.New.NewItem", "false");
+                }
+                if (!CurrentUserHaveResourceCenterPermission(SPBasePermissions.EditListItems))
+                {
                     spRibbon.TrimById("Ribbon.ResourceGrid.Manage.EditItem", "false");
+                }
+                if (!CurrentUserHaveResourceCenterPermission(SPBasePermissions.DeleteListItems))
+                {
                     spRibbon.TrimById("Ribbon.ResourceGrid.Manage.DeleteItem", "false");
-                    spRibbon.TrimById("Ribbon.ResourceGrid.Manage.ItemPermissions", "false");
                 }
             }
         }
@@ -426,7 +451,7 @@ namespace EPMLiveWebParts
             return !string.IsNullOrEmpty(epmDebug);
         }
 
-       
+
 
         #endregion Methods
     }

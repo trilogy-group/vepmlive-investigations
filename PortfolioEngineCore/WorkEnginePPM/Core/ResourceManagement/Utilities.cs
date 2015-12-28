@@ -892,7 +892,7 @@ namespace WorkEnginePPM.Core.ResourceManagement
         /// <param name="lWResID">Resource Id</param>
         /// <param name="hasPFEResourceCenterPermissions">Returns True, If user has 01-Resource Center checked under Portfolio Permissions. False, otherwise</param>
         /// <returns></returns>
-        public static bool CheckPFEResourceCenterPermission(SPWeb web, int lWResID, out bool hasPFEResourceCenterPermissions)
+        public static bool CheckPFEResourceCenterPermission(SPWeb web, int lWResID, bool hasDeletePermission, out bool hasPFEResourceCenterPermissions)
         {
             PortfolioEngineCore.DBAccess dba = null;
             try
@@ -903,10 +903,20 @@ namespace WorkEnginePPM.Core.ResourceManagement
                 dba = da.dba;
                 if (dba.Open() == PortfolioEngineCore.StatusEnum.rsSuccess)
                 {
-                    if (PortfolioEngineCore.dbaGeneral.CheckUserGlobalPermission(dba, PortfolioEngineCore.GlobalPermissionsEnum.gpCapCenter) == false)
-                        hasPFEResourceCenterPermissions = false;
+                    if (hasDeletePermission)
+                    {
+                        if (PortfolioEngineCore.dbaGeneral.CheckUserGlobalPermission(dba, PortfolioEngineCore.GlobalPermissionsEnum.gpDBA) == false)
+                            hasPFEResourceCenterPermissions = false;
+                        else
+                            hasPFEResourceCenterPermissions = true;
+                    }
                     else
-                        hasPFEResourceCenterPermissions = true;
+                    {
+                        if (PortfolioEngineCore.dbaGeneral.CheckUserGlobalPermission(dba, PortfolioEngineCore.GlobalPermissionsEnum.gpCapCenter) == false)
+                            hasPFEResourceCenterPermissions = false;
+                        else
+                            hasPFEResourceCenterPermissions = true;
+                    }
                 }
             }
             catch (PortfolioEngineCore.PFEException)

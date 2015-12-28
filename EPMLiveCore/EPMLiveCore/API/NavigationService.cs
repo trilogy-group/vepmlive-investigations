@@ -677,6 +677,64 @@ namespace EPMLiveCore.API
             return list.DoesUserHavePermissions(spBasePermissions);
         }
 
+        private static bool LPPFEPermissionCheck(SPList list, SPBasePermissions spBasePermissions)
+        {
+            bool hasPFEResourceCenterPermissions = true;
+            try
+            {
+                if (list != null)
+                {
+                    switch (spBasePermissions)
+                    {
+                        case SPBasePermissions.AddListItems:
+                        case SPBasePermissions.EditListItems:
+                            {
+                                if (list.DoesUserHavePermissions(SPBasePermissions.AddListItems) || list.DoesUserHavePermissions(SPBasePermissions.EditListItems))
+                                {
+                                    //WorkEnginePPM.Core.ResourceManagement.Utilities.CheckPFEResourceCenterPermission((currentWeb, SPContext.Current.Web.CurrentUser.ID, false, out hasPFEResourceCenterPermissions)
+                                    var args = new object[] { list.ParentWeb, list.ParentWeb.CurrentUser.ID, false, hasPFEResourceCenterPermissions };
+                                    Assembly assembly = Assembly.Load("WorkEnginePPM, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5");
+                                    Type type = assembly.GetType("WorkEnginePPM.Core.ResourceManagement.Utilities", true, true);
+                                    type.GetMethod("CheckPFEResourceCenterPermission", BindingFlags.Public | BindingFlags.Static).Invoke(null, args);
+
+                                    hasPFEResourceCenterPermissions = Convert.ToBoolean(args[3]);
+                                    //if (WorkEnginePPM.Core.ResourceManagement.Utilities.CheckPFEResourceCenterPermission(currentWeb, SPContext.Current.Web.CurrentUser.ID, out hasPFEResourceCenterPermissions, PortfolioEngineCore.GlobalPermissionsEnum.gpCapCenter))
+                                    //    return hasPFEResourceCenterPermissions;
+                                    return hasPFEResourceCenterPermissions;
+                                }
+                            }
+                            break;
+                        case SPBasePermissions.DeleteListItems:
+                            {
+                                if (list.DoesUserHavePermissions(SPBasePermissions.DeleteListItems))
+                                {
+                                    var args = new object[] { list.ParentWeb, list.ParentWeb.CurrentUser.ID, true, hasPFEResourceCenterPermissions };
+                                    Assembly assembly = Assembly.Load("WorkEnginePPM, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5");
+                                    Type type = assembly.GetType("WorkEnginePPM.Core.ResourceManagement.Utilities", true, true);
+                                    type.GetMethod("CheckPFEResourceCenterPermission", BindingFlags.Public | BindingFlags.Static).Invoke(null, args);
+
+                                    hasPFEResourceCenterPermissions = Convert.ToBoolean(args[3]);
+
+                                    return hasPFEResourceCenterPermissions;
+                                }
+                            }
+                            break;
+                    }
+
+
+                    return false;
+                }
+            }
+            catch
+            {
+                //No need to handle this exception because If PFE is not configured on Share Point site then also It should show Invite button.
+                //Hence, Rather then setting hasPFEResourceCenterPermissions = false; Keeping this exception block blank.
+                return true;
+            }
+            return true;
+            return list.DoesUserHavePermissions(spBasePermissions);
+        }
+
         #endregion Methods
 
         private Tuple<string, string, string, string, bool>[] GetPFEActions(SPList list,
@@ -829,36 +887,6 @@ namespace EPMLiveCore.API
             return actions.ToArray();
         }
 
-        private static bool CurrentUserHasTeamMembersPermission(SPWeb web)
-        {
-            string[] groupPermissions = new string[] { "Administrators", "Executives", "Portfolio Managers", "Project Managers", "Report Writers", "Resource Managers" };
-            //SPWeb currentWeb = list.ParentWeb;
-            Guid lockedWeb = CoreFunctions.getLockedWeb(web);
-
-            using (SPWeb configWeb = (web.ID != lockedWeb
-                ? web.Site.OpenWeb(lockedWeb)
-                : web.Site.OpenWeb(web.ID)))
-            {
-                if (web.CurrentUser.IsSiteAdmin)
-                {
-                    return true;
-                }
-
-                SPGroupCollection userGroups = web.CurrentUser.Groups;
-                foreach (SPGroup grp in userGroups)
-                {
-                    if (groupPermissions.Contains(grp.Name))
-                    {
-                        return true;
-                    }
-                    if (grp.Name.ToLower().Equals("team members", StringComparison.CurrentCultureIgnoreCase))
-                    {
-                        return false;
-                    }
-                }
-                return true;
-            }
-        }
 
         private static Tuple<string, string, string, string, bool>[] GetGeneralActions(bool usePopup, SPList list, bool bfancyforms, out Dictionary<string, string> di)
         {
@@ -872,12 +900,10 @@ namespace EPMLiveCore.API
             {
                 if (list.Title == "Resources")
                 {
-                    if (CurrentUserHasTeamMembersPermission(list.ParentWeb))
-                    {
-                        actions = new[]
+                    actions = new[]
                         {
                             AT("View Item", "view", "/_layouts/images/blank.gif", LP(list, SPBasePermissions.ViewListItems), usePopup ? (bfancyforms ? "6" : "5") : "1"),
-                            AT("Edit Item", "edit", "/_layouts/images/edititem.gif", LP(list, SPBasePermissions.EditListItems), usePopup ? (bfancyforms ? "6" : "5") : "1"),
+                            AT("Edit Item", "edit", "/_layouts/images/edititem.gif", LPPFEPermissionCheck(list, SPBasePermissions.EditListItems), usePopup ? (bfancyforms ? "6" : "5") : "1"),
                             AT("--SEP--", null, null, true),
                             AT("Approve Item", "approve", "/_layouts/images/apprj.gif", list.EnableModeration && LP(list, SPBasePermissions.ApproveItems)),
                             AT("Workflows", "workflows", "/_layouts/images/workflows.gif", list.WorkflowAssociations.Count > 0,
@@ -886,26 +912,10 @@ namespace EPMLiveCore.API
                             AT("Permissions", "perms", "/_layouts/images/permissions16.png",
                                 LP(list, SPBasePermissions.ManagePermissions), "0"),
                             AT("Delete Item", "delete", "/_layouts/images/delitem.gif",
-                                LP(list, SPBasePermissions.DeleteListItems),
+                                LPPFEPermissionCheck(list, SPBasePermissions.DeleteListItems),
                                 "99"),
                             AT("--SEP--", null, null, true)
                         };
-                    }
-                    else
-                    {
-                        actions = new[]
-                        {
-                            AT("View Item", "view", "/_layouts/images/blank.gif", LP(list, SPBasePermissions.ViewListItems), usePopup ? (bfancyforms ? "6" : "5") : "1"),
-                            AT("--SEP--", null, null, true),
-                            AT("Approve Item", "approve", "/_layouts/images/apprj.gif", list.EnableModeration && LP(list, SPBasePermissions.ApproveItems)),
-                            AT("Workflows", "workflows", "/_layouts/images/workflows.gif", list.WorkflowAssociations.Count > 0,
-                                "1"),
-                            AT("--SEP--", null, null, true),
-                            AT("Permissions", "perms", "/_layouts/images/permissions16.png",
-                                LP(list, SPBasePermissions.ManagePermissions), "0"),
-                            AT("--SEP--", null, null, true)
-                        };
-                    }
                 }
                 else
                 {

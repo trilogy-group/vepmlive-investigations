@@ -30,19 +30,13 @@ namespace WorkEnginePPM
         public static void CapturePFEBaseInfo(SPWeb web, out string basepath, out string username, out string ppmId, out string ppmCompany, out string ppmDbConn, out SecurityLevels secLevel)
         {
             secLevel = SecurityLevels.Base;
-            using (var site = new SPSite(web.Site.ID))
-            {
-                //using (SPWeb rootWeb = site.RootWeb)
-                SPWeb rootWeb = site.RootWeb;
-                {
+            SPWeb rootWeb = web.Site.RootWeb
 
-                    basepath = CoreFunctions.getConfigSetting(rootWeb, "epkbasepath");
-                    ppmId = CoreFunctions.getConfigSetting(rootWeb, "ppmpid");
-                    ppmCompany = CoreFunctions.getConfigSetting(rootWeb, "ppmcompany");
-                    ppmDbConn = CoreFunctions.getConfigSetting(rootWeb, "ppmdbconn");
-                    username = ConfigFunctions.GetCleanUsername(rootWeb);
-                }
-            }
+                basepath = CoreFunctions.getConfigSetting(rootWeb, "epkbasepath");
+                ppmId = CoreFunctions.getConfigSetting(rootWeb, "ppmpid");
+                ppmCompany = CoreFunctions.getConfigSetting(rootWeb, "ppmcompany");
+                ppmDbConn = CoreFunctions.getConfigSetting(rootWeb, "ppmdbconn");
+                username = ConfigFunctions.GetCleanUsername(rootWeb);
         }
 
         public static string BuildBaseInfo(HttpContext context, SPWeb web)
@@ -72,7 +66,7 @@ namespace WorkEnginePPM
             string basePath, username, pid, company, dbcnstring;
             SecurityLevels secLevel;
             CapturePFEBaseInfo(out basePath, out username, out pid, out company, out dbcnstring, out secLevel);
-            
+
             CStruct xEPKServer = new CStruct();
             xEPKServer.Initialize("BaseInfo");
             xEPKServer.CreateString("basepath", basePath);
@@ -122,7 +116,7 @@ namespace WorkEnginePPM
         {
             const string sRoot = "SOFTWARE\\Wow6432Node\\EPMLive\\PortfolioEngine\\";
             if (basePath.Length > 0)
-                return  sRoot + basePath;
+                return sRoot + basePath;
             else
                 return sRoot;
         }
@@ -182,7 +176,7 @@ namespace WorkEnginePPM
                         SetSPSessionString(Context, basePath, "SessionInfo", Guid.NewGuid().ToString().ToUpper());
                 }
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 sStage += " Exception=" + e.Message;
                 bAuthenticated = false;
