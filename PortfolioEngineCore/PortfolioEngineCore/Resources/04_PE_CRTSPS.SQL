@@ -9295,8 +9295,8 @@ update #CustomPortfolioItems
 set Value = EPG_VW_PortfolioCustomFields.Value
 from #CustomPortfolioItems
 join EPG_VW_PortfolioCustomFields on EPG_VW_PortfolioCustomFields.ProjectID = @ProjectId
-									  and EPG_VW_PortfolioCustomFields.TableName = #CustomPortfolioItems.TableName
-									  and EPG_VW_PortfolioCustomFields.ColumnName = #CustomPortfolioItems.FieldName
+									  and EPG_VW_PortfolioCustomFields.TableName COLLATE DATABASE_DEFAULT = #CustomPortfolioItems.TableName COLLATE DATABASE_DEFAULT 
+									  and EPG_VW_PortfolioCustomFields.ColumnName COLLATE DATABASE_DEFAULT = #CustomPortfolioItems.FieldName COLLATE DATABASE_DEFAULT 
 
 select Name as FieldName, Value from #CustomPortfolioItems
 
