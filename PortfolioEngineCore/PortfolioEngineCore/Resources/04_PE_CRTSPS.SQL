@@ -9258,7 +9258,7 @@ end
 exec(@createoralter + ' PROCEDURE [dbo].[EPG_SP_GetPortfolioCustomFieldsAndValues]
   @ProjectID int
 AS
-create table #CustomPortfolioItems (TableName varchar(100), Name varchar(255), FieldName varchar(6), Value varchar(500))
+create table #CustomPortfolioItems (TableName varchar(100) COLLATE DATABASE_DEFAULT , Name varchar(255) COLLATE DATABASE_DEFAULT , FieldName varchar(6) COLLATE DATABASE_DEFAULT , Value varchar(500) COLLATE DATABASE_DEFAULT)
 
 insert into #CustomPortfolioItems (TableName, Name, FieldName)
 SELECT
@@ -9295,8 +9295,8 @@ update #CustomPortfolioItems
 set Value = EPG_VW_PortfolioCustomFields.Value
 from #CustomPortfolioItems
 join EPG_VW_PortfolioCustomFields on EPG_VW_PortfolioCustomFields.ProjectID = @ProjectId
-									  and EPG_VW_PortfolioCustomFields.TableName COLLATE DATABASE_DEFAULT = #CustomPortfolioItems.TableName COLLATE DATABASE_DEFAULT 
-									  and EPG_VW_PortfolioCustomFields.ColumnName COLLATE DATABASE_DEFAULT = #CustomPortfolioItems.FieldName COLLATE DATABASE_DEFAULT 
+									  and EPG_VW_PortfolioCustomFields.TableName = #CustomPortfolioItems.TableName 
+									  and EPG_VW_PortfolioCustomFields.ColumnName = #CustomPortfolioItems.FieldName 
 
 select Name as FieldName, Value from #CustomPortfolioItems
 
