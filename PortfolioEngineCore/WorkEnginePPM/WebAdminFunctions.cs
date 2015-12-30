@@ -30,13 +30,13 @@ namespace WorkEnginePPM
         public static void CapturePFEBaseInfo(SPWeb web, out string basepath, out string username, out string ppmId, out string ppmCompany, out string ppmDbConn, out SecurityLevels secLevel)
         {
             secLevel = SecurityLevels.Base;
-            SPWeb rootWeb = web.Site.RootWeb
+            SPWeb rootWeb = web.Site.RootWeb;
 
-                basepath = CoreFunctions.getConfigSetting(rootWeb, "epkbasepath");
-                ppmId = CoreFunctions.getConfigSetting(rootWeb, "ppmpid");
-                ppmCompany = CoreFunctions.getConfigSetting(rootWeb, "ppmcompany");
-                ppmDbConn = CoreFunctions.getConfigSetting(rootWeb, "ppmdbconn");
-                username = ConfigFunctions.GetCleanUsername(rootWeb);
+            basepath = CoreFunctions.getConfigSetting(rootWeb, "epkbasepath");
+            ppmId = CoreFunctions.getConfigSetting(rootWeb, "ppmpid");
+            ppmCompany = CoreFunctions.getConfigSetting(rootWeb, "ppmcompany");
+            ppmDbConn = CoreFunctions.getConfigSetting(rootWeb, "ppmdbconn");
+            username = ConfigFunctions.GetCleanUsername(rootWeb);
         }
 
         public static string BuildBaseInfo(HttpContext context, SPWeb web)
