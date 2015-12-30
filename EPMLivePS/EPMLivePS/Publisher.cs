@@ -607,7 +607,7 @@ namespace EPMLiveEnterprise
                     {
                         if (listItem["IsProjectServer"].ToString() != "True")
                         {
-                            return 0;                            
+                            return 0;                                                        
                         }
                     }catch{}
                 }
@@ -715,10 +715,8 @@ namespace EPMLiveEnterprise
 
                 mySiteToPublish.AllowUnsafeUpdates = true;
                 SPList lstPC = mySiteToPublish.Lists["Project Center"];
-                SPListItem lstPCItem;
-                SPQuery query = new SPQuery();                
-                query.Query = "<Where><Eq><FieldRef Name='ID'/><Value Type='Int'>" + projectId + "</Value></Eq></Where>";
-                lstPCItem = lstPC.GetItems(query)[0];
+                SPListItem lstPCItem;                
+                lstPCItem = lstPC.GetItemById(projectId);
 
                 strProjAssignTo = (Convert.ToString(lstPCItem["AssignedTo"]) != string.Empty ? Convert.ToString(lstPCItem["AssignedTo"]) : "");
 
