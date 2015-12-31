@@ -66,6 +66,20 @@ namespace WorkEnginePPM.ControlTemplates.WorkEnginePPM
             set { m_sIsDlg = value; }
         }
 
+        private string m_sDecimalSeparator = string.Empty;
+        public string DecimalSeparator
+        {
+            get { return m_sDecimalSeparator; }
+            set { m_sDecimalSeparator = value; }
+        }
+
+        private string m_sGroupSeparator = string.Empty;
+        public string GroupSeparator
+        {
+            get { return m_sGroupSeparator; }
+            set { m_sGroupSeparator = value; }
+        }
+
         public string Webservice
         {
             get

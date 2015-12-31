@@ -40,6 +40,10 @@ namespace WorkEnginePPM
                 ctl.ViewUID = 0;
                 ctl.WEPID = "";
                 ctl.IsDlg = Request["IsDlg"];
+                // Sets based on site's current culture
+                ctl.DecimalSeparator = Web.Locale.NumberFormat.NumberDecimalSeparator;
+                ctl.GroupSeparator = Web.Locale.NumberFormat.NumberGroupSeparator;
+
                 PlaceHolder1.Controls.Add(ctl);
             }
             else
@@ -78,6 +82,10 @@ namespace WorkEnginePPM
                     }
                     ctl.WEPID = Request["itemid"];
                     ctl.IsDlg = Request["IsDlg"];
+                    // Sets based on site's current culture
+                    ctl.DecimalSeparator = Web.Locale.NumberFormat.NumberDecimalSeparator;
+                    ctl.GroupSeparator = Web.Locale.NumberFormat.NumberGroupSeparator;
+
                     PlaceHolder1.Controls.Add(ctl);
                 }
             }

@@ -207,5 +207,7 @@
     params.URL = '<%=URL%>';
     params.Webservice = '<%=Webservice%>';
     params.IsDlg = "<%=IsDlg%>";
+    params.DecimalSeparator = "<%=DecimalSeparator%>";
+    params.GroupSeparator = "<%=GroupSeparator%>";
     editcosts = new EditCosts('editcosts', params);
 </script>

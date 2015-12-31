@@ -42,13 +42,17 @@
             Grids.OnAfterColResize = GridsOnAfterColResizeDelegate;
             Grids.OnGetDefaultColor = GridsOnGetDefaultColorDelegate;
             Grids.OnGetHtmlValue = GridsOnGetHtmlValueDelegate;
-
+            Grids.OnLoaded = GridsOnLoadedDelegate;
             WorkEnginePPM.EditCosts.set_path(this.params.Webservice);
             WorkEnginePPM.EditCosts.CheckStatus("", CheckStatusCompleteDelegate);
         }
         catch (e) {
             alert("catch");
         }
+    };
+    EditCosts.prototype.GridsOnLoaded = function (grid) {
+        grid.Lang.Format.DecimalSeparator = this.params.DecimalSeparator;
+        grid.Lang.Format.GroupSeparator = this.params.GroupSeparator;
     };
     EditCosts.prototype.ShowWorkingPopup = function (divid) {
         var div = $('#' + divid);
@@ -1904,7 +1908,7 @@
         this.showCostDPs = false;
         this.selectedCostTypes = null;
 
-        var loadDelegate = MakeDelegate(this, this.OnLoad);
+        var loadDelegate = MakeDelegate(this, this.OnLoad);        
         var resizeDelegate = MakeDelegate(this, this.OnResizeInternal);
         var CheckStatusCompleteDelegate = MakeDelegate(this, this.OnCheckStatusComplete);
         var unloadDelegate = MakeDelegate(this, this.OnUnload);
@@ -1926,6 +1930,7 @@
         var GridsOnFocusDelegate = MakeDelegate(this, this.GridsOnFocus);
         var GridsOnAfterColResizeDelegate = MakeDelegate(this, this.OnAfterColResize);
         var GridsOnGetHtmlValueDelegate = MakeDelegate(this, this.GridsOnGetHtmlValue);
+        var GridsOnLoadedDelegate = MakeDelegate(this, this.GridsOnLoaded);
 
         if (document.addEventListener != null) { // e.g. Firefox
             window.addEventListener("load", loadDelegate, true);

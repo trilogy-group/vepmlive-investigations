@@ -4,6 +4,7 @@ using System.Data;
 using System.Web.Services;
 using System.Xml;
 using PortfolioEngineCore;
+using System.Globalization;
 
 namespace WorkEnginePPM
 {
@@ -944,7 +945,7 @@ Status_Error:
 
             List<PeriodRate> periodRates;
             if (GetPeriodRates(dba, nCalendarID, out periodRates) != StatusEnum.rsSuccess) goto Status_Error;
-
+            
             // Get the period costs and values
             List<PeriodCostValue> periodCostValues = new List<PeriodCostValue>();
             {
@@ -1708,7 +1709,13 @@ Status_Error:
                                             string sC = "C" + period.Id.ToString("0");
 
                                             double dblQuantity = xI.GetDoubleAttr(sQ, out bQuantityTagFound);
-                                            double dblCost = xI.GetDoubleAttr(sC, out bCostTagFound);
+                                            double dblCost = 0;
+                                            string costString = xI.GetStringAttr(sC, string.Empty, out bCostTagFound);
+                                            if (bCostTagFound && !string.IsNullOrEmpty(costString))
+                                            {
+                                                dblCost = double.Parse(costString, CultureInfo.InvariantCulture);
+                                            }
+                                            
                                             if ((bQuantityTagFound == true && dblQuantity != 0) || (bCostTagFound == true && dblCost != 0))
                                             {
                                                 dt.Rows.Add(new object[] { id, seq, period.Id, dblQuantity, dblCost });
@@ -2324,6 +2331,7 @@ Exit_Function:
 
             public void AddCostCategory(CostCategory costCategory, List<CostCustomField> costCustomFields, int nRowId)
             {
+                System.Globalization.CultureInfo cInfo = new System.Globalization.CultureInfo(1033);                
                 CStruct xIParent = m_xLevels[costCategory.Level - 1];
                 CStruct xI = xIParent.CreateSubStruct("I");
                 m_xLevels[costCategory.Level] = xI;
@@ -2402,7 +2410,7 @@ Exit_Function:
                         xI.CreateStringAttr("Q" + periodCostValue.PeriodId.ToString("0"), periodCostValue.Quantity.ToString());
                     if (periodCostValue.Cost != double.MinValue)
                     {
-                        xI.CreateStringAttr("C" + periodCostValue.PeriodId.ToString("0"), periodCostValue.Cost.ToString());
+                        xI.CreateStringAttr("C" + periodCostValue.PeriodId.ToString("0"), periodCostValue.Cost.ToString(cInfo.NumberFormat));
                         //xI.CreateIntAttr("Calculated", 1);
                     }
                 }
