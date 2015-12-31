@@ -1988,6 +1988,10 @@ function MYTSOnGetHtmlValue(grid, row, col, val) {
                 else
                     return "";
             }
+            else if (TSCols[col] || col == "TSTotals") {
+                if (val == "0" || val == "")
+                    return "";
+            }
         }
         else if (row.Def.Name == "R") {
             if (col == "StopWatch") {

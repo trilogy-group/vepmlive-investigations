@@ -2219,6 +2219,12 @@ namespace TimeSheets
                         attr1.Value = drDayHour[0]["Hours"].ToString();
                         ndRow.Attributes.Append(attr1);
                     }
+                    else
+                    {
+                        attr1 = docData.CreateAttribute("P" + dtStart.Ticks);
+                        attr1.Value = "0";
+                        ndRow.Attributes.Append(attr1);
+                    }
                 }
 
             }
