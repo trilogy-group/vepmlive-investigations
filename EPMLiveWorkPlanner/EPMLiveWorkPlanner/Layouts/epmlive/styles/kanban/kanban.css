@@ -196,7 +196,7 @@
     display: none;
     list-style: none;
     cursor: pointer;
-    position: absolute;
+    position: relative;
 }
 
 .sortable-item .associateditemscontextmenu .icon-ellipsis-horizontal:after {
