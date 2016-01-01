@@ -339,6 +339,10 @@
             grid.UpdateHeights(2);            
         };
 
+        Grids.OnSortFinish = function(grid){            
+            grid.UpdateHeights(1);
+        }
+
     </script>
 
     <div id="dlgLoading" class="dialog">

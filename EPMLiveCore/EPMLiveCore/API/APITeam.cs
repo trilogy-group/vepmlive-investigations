@@ -1634,7 +1634,7 @@ namespace EPMLiveCore.API
                             {
                                 if (!field.Hidden && field.Reorderable)
                                 {
-                                    if (field.InternalName != "Title" && field.InternalName != "Permissions")
+                                    if (field.InternalName != "Title" && field.InternalName != "Permissions")                                    
                                     {
                                         ndNew = docOut.CreateNode(XmlNodeType.Element, "C", docOut.NamespaceURI);
                                         attr = docOut.CreateAttribute("Name");
@@ -1795,6 +1795,7 @@ namespace EPMLiveCore.API
                     catch { }
 
                     XmlNode ndRightCols = doc.SelectSingleNode("//Cols");
+                    XmlNode ndLeftCols = doc.SelectSingleNode("//LeftCols");
                     XmlNode ndHeader = doc.SelectSingleNode("//Header");
 
                     XmlNode ndNew = doc.CreateNode(XmlNodeType.Element, "C", doc.NamespaceURI);
@@ -1854,13 +1855,13 @@ namespace EPMLiveCore.API
                     nd = doc.SelectSingleNode("//C[@Name='Role']");
                     if (nd != null)
                     {
-                        nd.Attributes["Visible"].Value = "1";
+                        nd.Attributes["Visible"].Value = "1";                        
                     }
 
                     nd = doc.SelectSingleNode("//C[@Name='Email']");
                     if (nd != null)
                     {
-                        nd.Attributes["Visible"].Value = "1";
+                        nd.Attributes["Visible"].Value = "1";                        
                     }
 
                     string enums = "";
@@ -1989,6 +1990,7 @@ namespace EPMLiveCore.API
                     ndNew.Attributes.Append(attr);
 
                     ndRightCols.AppendChild(ndNew);
+                    ndLeftCols.AppendChild(ndRightCols);
                 }
             });
 
