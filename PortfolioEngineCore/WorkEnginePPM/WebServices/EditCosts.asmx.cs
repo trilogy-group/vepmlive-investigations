@@ -2331,7 +2331,7 @@ Exit_Function:
 
             public void AddCostCategory(CostCategory costCategory, List<CostCustomField> costCustomFields, int nRowId)
             {
-                System.Globalization.CultureInfo cInfo = new System.Globalization.CultureInfo(1033);                
+                CultureInfo cInfo = new CultureInfo(1033);
                 CStruct xIParent = m_xLevels[costCategory.Level - 1];
                 CStruct xI = xIParent.CreateSubStruct("I");
                 m_xLevels[costCategory.Level] = xI;
