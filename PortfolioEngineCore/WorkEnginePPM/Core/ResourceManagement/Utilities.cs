@@ -899,7 +899,11 @@ namespace WorkEnginePPM.Core.ResourceManagement
             {
                 hasPFEResourceCenterPermissions = true;
                 string sBaseInfo = WebAdmin.BuildBaseInfo(System.Web.HttpContext.Current, web);
-                PortfolioEngineCore.DataAccess da = new PortfolioEngineCore.DataAccess(sBaseInfo, PortfolioEngineCore.SecurityLevels.EditResources);
+                PortfolioEngineCore.DataAccess da = null;
+                if (hasDeletePermission)
+                    da = new PortfolioEngineCore.DataAccess(sBaseInfo, PortfolioEngineCore.SecurityLevels.DBAUtil);
+                else
+                    da = new PortfolioEngineCore.DataAccess(sBaseInfo, PortfolioEngineCore.SecurityLevels.EditResources);
                 dba = da.dba;
                 if (dba.Open() == PortfolioEngineCore.StatusEnum.rsSuccess)
                 {
