@@ -289,9 +289,18 @@ namespace EPMLiveWebParts
                         switch (itemPermission)
                         {
                             case SPBasePermissions.AddListItems:
+                                {
+                                    if (resourceList.DoesUserHavePermissions(SPBasePermissions.AddListItems))
+                                    {
+                                        if (WorkEnginePPM.Core.ResourceManagement.Utilities.CheckPFEResourceCenterPermission(currentWeb, SPContext.Current.Web.CurrentUser.ID, false, out hasPFEResourceCenterPermissions))
+                                            return hasPFEResourceCenterPermissions;
+                                        return false;
+                                    }
+                                }
+                                break;
                             case SPBasePermissions.EditListItems:
                                 {
-                                    if (resourceList.DoesUserHavePermissions(SPBasePermissions.AddListItems) || resourceList.DoesUserHavePermissions(SPBasePermissions.EditListItems))
+                                    if (resourceList.DoesUserHavePermissions(SPBasePermissions.EditListItems))
                                     {
                                         if (WorkEnginePPM.Core.ResourceManagement.Utilities.CheckPFEResourceCenterPermission(currentWeb, SPContext.Current.Web.CurrentUser.ID, false, out hasPFEResourceCenterPermissions))
                                             return hasPFEResourceCenterPermissions;
@@ -310,7 +319,6 @@ namespace EPMLiveWebParts
                                 }
                                 break;
                         }
-
 
                         return false;
                     }

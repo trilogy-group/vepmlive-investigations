@@ -687,19 +687,29 @@ namespace EPMLiveCore.API
                     switch (spBasePermissions)
                     {
                         case SPBasePermissions.AddListItems:
-                        case SPBasePermissions.EditListItems:
                             {
-                                if (list.DoesUserHavePermissions(SPBasePermissions.AddListItems) || list.DoesUserHavePermissions(SPBasePermissions.EditListItems))
+                                if (list.DoesUserHavePermissions(SPBasePermissions.AddListItems))
                                 {
-                                    //WorkEnginePPM.Core.ResourceManagement.Utilities.CheckPFEResourceCenterPermission((currentWeb, SPContext.Current.Web.CurrentUser.ID, false, out hasPFEResourceCenterPermissions)
                                     var args = new object[] { list.ParentWeb, list.ParentWeb.CurrentUser.ID, false, hasPFEResourceCenterPermissions };
                                     Assembly assembly = Assembly.Load("WorkEnginePPM, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5");
                                     Type type = assembly.GetType("WorkEnginePPM.Core.ResourceManagement.Utilities", true, true);
                                     type.GetMethod("CheckPFEResourceCenterPermission", BindingFlags.Public | BindingFlags.Static).Invoke(null, args);
 
                                     hasPFEResourceCenterPermissions = Convert.ToBoolean(args[3]);
-                                    //if (WorkEnginePPM.Core.ResourceManagement.Utilities.CheckPFEResourceCenterPermission(currentWeb, SPContext.Current.Web.CurrentUser.ID, out hasPFEResourceCenterPermissions, PortfolioEngineCore.GlobalPermissionsEnum.gpCapCenter))
-                                    //    return hasPFEResourceCenterPermissions;
+                                    return hasPFEResourceCenterPermissions;
+                                }
+                            }
+                            break;
+                        case SPBasePermissions.EditListItems:
+                            {
+                                if (list.DoesUserHavePermissions(SPBasePermissions.EditListItems))
+                                {
+                                    var args = new object[] { list.ParentWeb, list.ParentWeb.CurrentUser.ID, false, hasPFEResourceCenterPermissions };
+                                    Assembly assembly = Assembly.Load("WorkEnginePPM, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5");
+                                    Type type = assembly.GetType("WorkEnginePPM.Core.ResourceManagement.Utilities", true, true);
+                                    type.GetMethod("CheckPFEResourceCenterPermission", BindingFlags.Public | BindingFlags.Static).Invoke(null, args);
+
+                                    hasPFEResourceCenterPermissions = Convert.ToBoolean(args[3]);
                                     return hasPFEResourceCenterPermissions;
                                 }
                             }
