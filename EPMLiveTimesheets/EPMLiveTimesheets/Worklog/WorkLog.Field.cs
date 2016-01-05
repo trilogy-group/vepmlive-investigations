@@ -5,6 +5,7 @@ using System.Security.Permissions;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.WebControls;
 using Microsoft.SharePoint.Security;
+using System.Security;
 
 namespace TimeSheets
 {
@@ -21,7 +22,7 @@ namespace TimeSheets
             : base(fields, typeName, displayName)
         {
         }
-        
+
         public override string GetFieldValueAsHtml(object value)
         {
             //return string.Format(
@@ -32,7 +33,7 @@ namespace TimeSheets
 
         public override BaseFieldControl FieldRenderingControl
         {
-            [SharePointPermission(SecurityAction.LinkDemand, ObjectModel = true)]
+            [SecurityCritical]
             get
             {
                 BaseFieldControl fieldControl = new WorkLogFieldControl();

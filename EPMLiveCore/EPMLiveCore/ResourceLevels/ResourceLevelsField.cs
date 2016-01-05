@@ -6,6 +6,7 @@ using System.Security.Permissions;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.WebControls;
 using Microsoft.SharePoint.Security;
+using System.Security;
 
 namespace EPMLiveCore
 {
@@ -36,7 +37,7 @@ namespace EPMLiveCore
 
         public override BaseFieldControl FieldRenderingControl
         {
-            [SharePointPermission(SecurityAction.LinkDemand, ObjectModel = true)]
+            [SecurityCritical]
             get
             {
                 BaseFieldControl fieldControl = new ResourceLevelsFieldControl();
@@ -48,5 +49,5 @@ namespace EPMLiveCore
 
     }
 
-    
+
 }

@@ -4,13 +4,14 @@ using System.Security.Permissions;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.Security;
 using Microsoft.SharePoint.WebControls;
+using System.Security;
 
 namespace EPMLiveCore.SPFields
 {
     [Guid("CE53ED15-50F5-410C-80E0-CC4160034104")]
     public class DaysHoursBreakdownField : SPFieldText
     {
-        #region Fields (9) 
+        #region Fields (9)
 
         private static readonly Dictionary<int, Properties> PropertyDictionary = new Dictionary<int, Properties>();
         private int _contextId;
@@ -22,9 +23,9 @@ namespace EPMLiveCore.SPFields
         private string _startDateField;
         private string _workHoursList;
 
-        #endregion Fields 
+        #endregion Fields
 
-        #region Constructors (2) 
+        #region Constructors (2)
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DaysHoursBreakdownField"/> class.
@@ -43,14 +44,15 @@ namespace EPMLiveCore.SPFields
         /// </summary>
         /// <param name="fields">The fields.</param>
         /// <param name="fieldName">Name of the field.</param>
-        public DaysHoursBreakdownField(SPFieldCollection fields, string fieldName) : base(fields, fieldName)
+        public DaysHoursBreakdownField(SPFieldCollection fields, string fieldName)
+            : base(fields, fieldName)
         {
             Initialize();
         }
 
-        #endregion Constructors 
+        #endregion Constructors
 
-        #region Properties (9) 
+        #region Properties (9)
 
         protected int ContextId
         {
@@ -74,8 +76,8 @@ namespace EPMLiveCore.SPFields
         /// <returns>A <see cref="T:Microsoft.SharePoint.WebControls.BaseFieldControl"/> object that represents the control.</returns>
         public override BaseFieldControl FieldRenderingControl
         {
-            [SharePointPermission(SecurityAction.LinkDemand, ObjectModel = true)]
-            get { return new DaysHoursBreakdownFieldControl {FieldName = InternalName}; }
+            [SecurityCritical]
+            get { return new DaysHoursBreakdownFieldControl { FieldName = InternalName }; }
         }
 
         public string FinishDateField
@@ -155,9 +157,9 @@ namespace EPMLiveCore.SPFields
             set { _workHoursList = value; }
         }
 
-        #endregion Properties 
+        #endregion Properties
 
-        #region Methods (5) 
+        #region Methods (5)
 
         // Public Methods (4) 
 
@@ -193,32 +195,32 @@ namespace EPMLiveCore.SPFields
                 SetCustomProperty("StartDateField", StartDateField);
             }
 
-            if(FinishDateField != null && !string.IsNullOrEmpty(FinishDateField))
+            if (FinishDateField != null && !string.IsNullOrEmpty(FinishDateField))
             {
                 SetCustomProperty("FinishDateField", FinishDateField);
             }
 
-            if(HoursField != null && !string.IsNullOrEmpty(HoursField))
+            if (HoursField != null && !string.IsNullOrEmpty(HoursField))
             {
                 SetCustomProperty("HoursField", HoursField);
             }
 
-            if(HolidaySchedulesField != null && !string.IsNullOrEmpty(HolidaySchedulesField))
+            if (HolidaySchedulesField != null && !string.IsNullOrEmpty(HolidaySchedulesField))
             {
                 SetCustomProperty("HolidaySchedulesField", HolidaySchedulesField);
             }
 
-            if(ResourcePoolList != null && !string.IsNullOrEmpty(ResourcePoolList))
+            if (ResourcePoolList != null && !string.IsNullOrEmpty(ResourcePoolList))
             {
                 SetCustomProperty("ResourcePoolList", ResourcePoolList);
             }
 
-            if(WorkHoursList != null && !string.IsNullOrEmpty(WorkHoursList))
+            if (WorkHoursList != null && !string.IsNullOrEmpty(WorkHoursList))
             {
                 SetCustomProperty("WorkHoursList", WorkHoursList);
             }
 
-            if(HolidaysList != null && !string.IsNullOrEmpty(HolidaysList))
+            if (HolidaysList != null && !string.IsNullOrEmpty(HolidaysList))
             {
                 SetCustomProperty("HolidaysList", HolidaysList);
             }
@@ -278,21 +280,21 @@ namespace EPMLiveCore.SPFields
         /// </summary>
         private void Initialize()
         {
-            _startDateField = (string) (GetCustomProperty("StartDateField") ?? string.Empty);
-            _finishDateField = (string) (GetCustomProperty("FinishDateField") ?? string.Empty);
-            _hoursField = (string) (GetCustomProperty("HoursField") ?? string.Empty);
-            _holidaySchedulesField = (string) (GetCustomProperty("HolidaySchedulesField") ?? string.Empty);
-            _resourcePoolList = (string) (GetCustomProperty("ResourcePoolList") ?? string.Empty);
-            _workHoursList = (string) (GetCustomProperty("WorkHoursList") ?? string.Empty);
-            _holidaysList = (string) (GetCustomProperty("HolidaysList") ?? string.Empty);
+            _startDateField = (string)(GetCustomProperty("StartDateField") ?? string.Empty);
+            _finishDateField = (string)(GetCustomProperty("FinishDateField") ?? string.Empty);
+            _hoursField = (string)(GetCustomProperty("HoursField") ?? string.Empty);
+            _holidaySchedulesField = (string)(GetCustomProperty("HolidaySchedulesField") ?? string.Empty);
+            _resourcePoolList = (string)(GetCustomProperty("ResourcePoolList") ?? string.Empty);
+            _workHoursList = (string)(GetCustomProperty("WorkHoursList") ?? string.Empty);
+            _holidaysList = (string)(GetCustomProperty("HolidaysList") ?? string.Empty);
 
-            if(SPContext.Current == null)
+            if (SPContext.Current == null)
             {
                 _contextId = System.Guid.NewGuid().GetHashCode();
             }
         }
 
-        #endregion Methods 
+        #endregion Methods
 
         #region Nested type: Properties
 

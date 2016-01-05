@@ -7,6 +7,7 @@ using Microsoft.SharePoint.WebControls;
 using Microsoft.SharePoint.Security;
 
 using System.Collections.Generic;
+using System.Security;
 
 namespace EPMLiveCore
 {
@@ -18,7 +19,7 @@ namespace EPMLiveCore
         private static Dictionary<int, string> updatedTotalSettings = new Dictionary<int, string>();
         private static Dictionary<int, string> updatedEnableResourcePlan = new Dictionary<int, string>();
         private static Dictionary<int, string> updatedDisplaySettings = new Dictionary<int, string>();
-        
+
         private string generalSettings;
         private string totalSettings;
         private string enableResourcePlan;
@@ -29,10 +30,10 @@ namespace EPMLiveCore
         public EPMLiveConfigField(SPFieldCollection fields, string fieldName)
             : base(fields, fieldName)
         {
-            
+
             Init();
         }
-        
+
         public EPMLiveConfigField(SPFieldCollection fields, string typeName, string displayName)
             : base(fields, typeName, displayName)
         {
@@ -165,7 +166,7 @@ namespace EPMLiveCore
 
         public override BaseFieldControl FieldRenderingControl
         {
-            [SharePointPermission(SecurityAction.LinkDemand, ObjectModel = true)]
+            [SecurityCritical]
             get
             {
                 BaseFieldControl fieldControl = new EPMLiveConfigFieldControl();

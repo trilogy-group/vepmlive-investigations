@@ -2,12 +2,13 @@
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.Security;
 using Microsoft.SharePoint.WebControls;
+using System.Security;
 
 namespace WorkEnginePPM.SPFields
 {
     public class PFEResourcePermissionsField : SPFieldMultiLineText
     {
-        #region Constructors (2) 
+        #region Constructors (2)
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PFEResourcePermissionsField"/> class.
@@ -25,13 +26,14 @@ namespace WorkEnginePPM.SPFields
         /// </summary>
         /// <param name="fields">The fields.</param>
         /// <param name="fieldName">Name of the field.</param>
-        public PFEResourcePermissionsField(SPFieldCollection fields, string fieldName) : base(fields, fieldName)
+        public PFEResourcePermissionsField(SPFieldCollection fields, string fieldName)
+            : base(fields, fieldName)
         {
         }
 
-        #endregion Constructors 
+        #endregion Constructors
 
-        #region Properties (1) 
+        #region Properties (1)
 
         /// <summary>
         /// Gets the field type control that is used to render the field.
@@ -39,13 +41,13 @@ namespace WorkEnginePPM.SPFields
         /// <returns>A <see cref="T:Microsoft.SharePoint.WebControls.BaseFieldControl"/> object that represents the control.</returns>
         public override BaseFieldControl FieldRenderingControl
         {
-            [SharePointPermission(SecurityAction.LinkDemand, ObjectModel = true)]
-            get { return new PFEResourcePermissionsFieldControl {FieldName = InternalName}; }
+            [SecurityCritical]
+            get { return new PFEResourcePermissionsFieldControl { FieldName = InternalName }; }
         }
 
-        #endregion Properties 
+        #endregion Properties
 
-        #region Methods (1) 
+        #region Methods (1)
 
         // Public Methods (1) 
 
@@ -63,6 +65,6 @@ namespace WorkEnginePPM.SPFields
             return base.GetFieldValueAsHtml(value);
         }
 
-        #endregion Methods 
+        #endregion Methods
     }
 }

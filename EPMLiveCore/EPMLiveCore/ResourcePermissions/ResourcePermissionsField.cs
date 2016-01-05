@@ -2,16 +2,17 @@
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.Security;
 using Microsoft.SharePoint.WebControls;
+using System.Security;
 
 namespace EPMLiveCore
 {
     internal class ResourcePermissionsField : SPFieldMultiLineText
     {
-        #region Properties (1) 
+        #region Properties (1)
 
         public override BaseFieldControl FieldRenderingControl
         {
-            [SharePointPermission(SecurityAction.LinkDemand, ObjectModel = true)]
+            [SecurityCritical]
             get
             {
                 BaseFieldControl fieldControl = new ResourcePermissionsFieldControl();
@@ -21,7 +22,7 @@ namespace EPMLiveCore
             }
         }
 
-        #endregion Properties 
+        #endregion Properties
 
         #region constructors
 
