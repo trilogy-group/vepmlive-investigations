@@ -975,7 +975,7 @@ namespace WorkEnginePPM.Core.ResourceManagement
             }
             catch (Exception e)
             {
-                throw new Exception("Cost planner file to be imported should contain date in " + calendarOrderType + " format. Please contact administrator.");
+                throw new Exception(String.Format("Cost planner file to be imported should contain date in " + calendarOrderType + " format. Please contact administrator."));
             }
             return sDate;
         }
