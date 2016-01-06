@@ -9,6 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Xml;
+using Utilities=WorkEnginePPM.Core.ResourceManagement.Utilities;
 
 namespace WorkEnginePPM.DataServiceModules
 {
@@ -53,6 +54,11 @@ namespace WorkEnginePPM.DataServiceModules
         private DataView _dvCostBreakdownAttribs;
 
         private Int32 _totalRecords = 0, _successRecords = 0, _failedRecords = 0, _processedRecords = 0;
+
+        private SPContext context;
+        private SPRegionalSettings spRegionalSettings;
+        private string dateSeparator;
+        private SPCalendarOrderType calendarOrderType;
 
         #endregion
 
@@ -108,7 +114,10 @@ namespace WorkEnginePPM.DataServiceModules
             _dtInsertCostData.Columns.Add("rowerror", typeof(String));
             _dtInsertCostData.Columns.Add("isdefault", typeof(Boolean));
 
-
+            context = SPContext.GetContext(_spWeb);
+            spRegionalSettings = _spWeb.CurrentUser.RegionalSettings ?? context.RegionalSettings;
+            dateSeparator = spRegionalSettings.DateSeparator;
+            calendarOrderType = (SPCalendarOrderType)spRegionalSettings.DateFormat;
         }
 
         public void ImportData()
@@ -705,6 +714,8 @@ namespace WorkEnginePPM.DataServiceModules
                     break;
                 case colPeriod:
                     _dvPeriods.RowFilter = String.Empty;
+                    columnValue = Utilities.GetValidDateInFormat(calendarOrderType, columnValue, dateSeparator);
+
                     _dvPeriods.RowFilter = string.Format("cb_id={0} and prd_start_date='{1}'", foreignKeyId, columnValue);
                     if (_dvPeriods.Count > 0)
                     {

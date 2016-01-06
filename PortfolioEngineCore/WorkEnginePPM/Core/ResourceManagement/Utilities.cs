@@ -930,6 +930,55 @@ namespace WorkEnginePPM.Core.ResourceManagement
             return hasPFEResourceCenterPermissions;
         }
 
+        /// <summary>
+        /// Convert date into proper format based on regional setting
+        /// </summary>
+        /// <param name="calendarOrderType">Date Format</param>
+        /// <param name="columnValue">Date Value</param>
+        /// <param name="dateSeparator">date seperator</param>
+        /// <returns></returns>
+        public static string GetValidDateInFormat(SPCalendarOrderType calendarOrderType, string columnValue, string dateSeparator)
+        {
+            string[] date;
+            Int32 day = 0, month = 0, year = 0;
+            string sDate = "";
+            DateTime dt;
+            try
+            {
+                switch (calendarOrderType)
+                {
+                    case SPCalendarOrderType.MDY:
+                        date = columnValue.Split(dateSeparator.ToCharArray());
+                        day = Convert.ToInt32(date[1]);
+                        month = Convert.ToInt32(date[0]);
+                        year = Convert.ToInt32(date[2]);
+                        dt = new DateTime(year, month, day);
+                        sDate = dt.ToString();
+                        break;
+                    case SPCalendarOrderType.DMY:
+                        date = columnValue.Split(dateSeparator.ToCharArray());
+                        day = Convert.ToInt32(date[0]);
+                        month = Convert.ToInt32(date[1]);
+                        year = Convert.ToInt32(date[2]);
+                        dt = new DateTime(year, month, day);
+                        sDate = dt.ToString();
+                        break;
+                    case SPCalendarOrderType.YMD:
+                        date = columnValue.Split(dateSeparator.ToCharArray());
+                        day = Convert.ToInt32(date[2]);
+                        month = Convert.ToInt32(date[1]);
+                        year = Convert.ToInt32(date[0]);
+                        dt = new DateTime(year, month, day);
+                        sDate = dt.ToString();
+                        break;
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception("Cost planner file to be imported should contain date in " + calendarOrderType + " format. Please contact administrator.");
+            }
+            return sDate;
+        }
         #endregion Methods
     }
 }
