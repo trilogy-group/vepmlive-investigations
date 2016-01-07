@@ -736,7 +736,7 @@ function ChangeGroups(gridid, data) {
         sGroups = sGroups.substr(1);
 
     eval("mygrid" + gridid + ".Groups='" + sGroups + "'");
-    ReloadGridWithNewParams(gridid);
+    ReloadGridWithNewParams(gridid, "FromGroupBy");
     return true;
 }
 
@@ -762,11 +762,17 @@ function ChangeColumns(gridid, data) {
     return true;
 }
 
-function ReloadGridWithNewParams(gridid) {
+function ReloadGridWithNewParams(gridid, Source) {
     EPM.UI.Loader.current().startLoading({ id: 'WebPart' + eval("mygrid" + gridid + ".Qualifier") });
 
     var dataurl = eval("DataUrl" + gridid);
-    Grids["GanttGrid" + gridid].Data.Data.Url = dataurl + '&Page=' + eval("mygrid" + gridid + ".CurPage") + "&Cols=" + eval("mygrid" + gridid + ".Cols") + "&GB=" + eval("mygrid" + gridid + ".Groups") + "&NP=" + eval("mygrid" + gridid + ".NoPage") + eval("mygrid" + gridid + ".Searcher");
+    if (Source == "FromGroupBy") {
+        Grids["GanttGrid" + gridid].Data.Data.Url = dataurl + '&FromGroupBy=1&Page=' + eval("mygrid" + gridid + ".CurPage") + "&Cols=" + eval("mygrid" + gridid + ".Cols") + "&GB=" + eval("mygrid" + gridid + ".Groups") + "&NP=" + eval("mygrid" + gridid + ".NoPage") + eval("mygrid" + gridid + ".Searcher");
+    } else {
+        Grids["GanttGrid" + gridid].Data.Data.Url = dataurl + '&Page=' + eval("mygrid" + gridid + ".CurPage") + "&Cols=" + eval("mygrid" + gridid + ".Cols") + "&GB=" + eval("mygrid" + gridid + ".Groups") + "&NP=" + eval("mygrid" + gridid + ".NoPage") + eval("mygrid" + gridid + ".Searcher");
+    }
+
+
     Grids["GanttGrid" + gridid].Data.Export.Url = GetWebUrl() + '/_layouts/15/epmlive/getgriditemsexport.aspx';
 
     Grids["GanttGrid" + gridid].Reload();

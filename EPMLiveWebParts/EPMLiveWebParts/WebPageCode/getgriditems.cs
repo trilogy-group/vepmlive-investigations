@@ -54,6 +54,7 @@ namespace EPMLiveWebParts
         protected int iPage = 0;
         protected string DifferentColumns = "";
         protected string DifferentGroups = "";
+        protected string FromGroupBy = "";
         protected bool GroupByFromToolbar = false;
         protected ArrayList aViewFields = new ArrayList();
         protected ArrayList aHiddenViewFields = new ArrayList();
@@ -5738,15 +5739,29 @@ namespace EPMLiveWebParts
                 }
                 catch { }
 
+                try
+                {
+                    FromGroupBy = Request["FromGroupBy"].ToString();
+                }
+                catch { }
 
                 try
                 {
                     DifferentGroups = Request["GB"].ToString();
-                    GroupByFromToolbar = true;
+
+                    if (FromGroupBy == "1")
+                    {
+                        Session["FromGroupBy"] = "1";
+                    }
+
+                    if (Convert.ToString(Session["FromGroupBy"]).Equals("1") && DifferentGroups == "")
+                    {
+                        GroupByFromToolbar = true;
+                    }
                 }
                 catch
                 {
-                    GroupByFromToolbar = false;
+                    Session["FromGroupBy"] = "0";
                 }
                 try
                 {
