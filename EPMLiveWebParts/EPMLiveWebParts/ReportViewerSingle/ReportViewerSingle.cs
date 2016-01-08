@@ -169,8 +169,11 @@ namespace EPMLiveWebParts
                 ReportingServicesURL = PropSRSUrl;
                 Integrated = IsIntegratedMode;
             }
-
-            if (ReportingServicesURL == null || ReportingServicesURL == "")
+            if (string.IsNullOrEmpty(PropReportPath))
+            {
+                error = "Report Path has not been set. Please configure the Report Path.";
+            }
+            else if (ReportingServicesURL == null || ReportingServicesURL == "")
             {
                 error = "ReportingServicesURL has not been set.";
             }
