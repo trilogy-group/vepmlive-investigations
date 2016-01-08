@@ -185,7 +185,7 @@ namespace EPMLiveWebParts
                     rv.ProcessingMode = Microsoft.Reporting.WebForms.ProcessingMode.Remote;
                     rv.ServerReport.ReportServerUrl = new Uri(ReportingServicesURL);
                     if(Integrated)
-                        rv.ServerReport.ReportPath = SPContext.Current.Web.Url + "/Report Library" + PropReportPath + ".rdl";
+                        rv.ServerReport.ReportPath = SPContext.Current.Web.Site.RootWeb.Url + "/Report Library" + PropReportPath + ".rdl";
                     else
                         rv.ServerReport.ReportPath = PropReportPath;
                     rv.ShowToolBar = true;
