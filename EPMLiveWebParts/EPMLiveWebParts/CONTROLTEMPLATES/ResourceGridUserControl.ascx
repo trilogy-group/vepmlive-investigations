@@ -289,6 +289,7 @@
                     epmLiveResourceGrid.IsRootWeb = <%= SPContext.Current.Web.IsRootWeb.ToString().ToLower() %>;
                     epmLiveResourceGrid.WebId='<%=_reqWebId%>';
                     epmLiveResourceGrid.ListId='<%=_reqListId%>';
+                    epmLiveResourceGrid.ResListId='<%=_resListId%>';
                     epmLiveResourceGrid.ItemId='<%=_reqId%>';
                     epmLiveResourceGrid.LaunchInForm=<%=LaunchInForm.ToString().ToLower()%>;
                     epmLiveResourceGrid.UserHaveResourceCenterPermission = <%= CurrentUserHaveResourceCenterPermission(SPBasePermissions.AddListItems).ToString(CultureInfo.InvariantCulture).ToLower() %>;

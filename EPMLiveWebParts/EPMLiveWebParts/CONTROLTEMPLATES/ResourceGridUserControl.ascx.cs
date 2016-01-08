@@ -27,6 +27,7 @@ namespace EPMLiveWebParts
         private string _debugTag;
         public string _reqId;
         public string _reqListId;
+        public string _resListId;
         public string _reqWebId;
         private string _webPartHeight;
 
@@ -418,7 +419,12 @@ namespace EPMLiveWebParts
                 SPList list = web.Lists.TryGetList("Resources");
                 if (list != null)
                 {
-                    // Launches form in full page or in pop up dialog
+                    try
+                    {
+                        _resListId = list.ID.ToString();
+                    }
+                    catch { }
+                    //Launches form in full page or in pop up dialog
                     LaunchInForm = list.NavigateForFormsPages;
                 }
             }

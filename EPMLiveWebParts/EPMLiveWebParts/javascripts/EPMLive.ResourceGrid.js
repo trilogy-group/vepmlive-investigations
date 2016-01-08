@@ -23,6 +23,7 @@ function registerEpmLiveResourceGridScript() {
         $$.IsRootWeb = false;
         $$.WebId = null;
         $$.ListId = null;
+        $$.ResListId = null;
         $$.ItemId = null;
         $$.LaunchInForm = false;
         $$.UserHaveResourceCenterPermission = true;
@@ -160,7 +161,7 @@ function registerEpmLiveResourceGridScript() {
 
         $$.grid = {
             grids: window.Grids,
-            
+
             filteringOn: true,
             groupingOn: true,
 
@@ -1336,7 +1337,10 @@ function registerEpmLiveResourceGridScript() {
 
                 window.SP.UI.ModalDialog.showModalDialog(options);
             },
-
+            RefreshItems: function () {
+                var $v_H = $$$.currentWebUrl + '/_layouts/epmlive/refreshind.aspx?ListId=' + SP.Utilities.HttpUtility.urlKeyValueEncode($$.ResListId.toString('B').toUpperCase()) + '&Source=' + document.location.href;
+                SP.Utilities.HttpUtility.navigateTo($v_H);
+            },
             analyzeResources: function () {
 
                 var isResImportRunning = window.epmLiveNavigation.isImportResourceRunning();
@@ -2188,20 +2192,21 @@ function registerEpmLiveResourceGridScript() {
                                                 }
                                             ]
                                         },
-                                        // Non Header section
+                                        //Admin Section
+                                        //Visible to only SCAs.
                                         {
-                                            'heading': 'none',
+                                            'heading': 'Admin',
                                             'divider': 'yes',
                                             'options': [
                                                 {
-                                                    'iconClass': 'icon-envelop icon-dropdown',
-                                                    'text': 'Send Notification',
+                                                    'iconClass': 'icon-download-6 icon-dropdown',
+                                                    'text': 'Import Excel',
                                                     'events': [
                                                         {
                                                             'eventName': 'click',
                                                             'function': function () {
                                                                 $('.dropdown-menu').hide();
-                                                                $$.actions.redirect('sendnotification');
+                                                                $$.actions.importResources();
                                                             }
                                                         }
                                                     ]
@@ -2220,18 +2225,37 @@ function registerEpmLiveResourceGridScript() {
                                                     ]
                                                 },
                                                 {
-                                                    'iconClass': 'icon-download-6 icon-dropdown',
-                                                    'text': 'Import Excel',
+                                                    'iconClass': 'icon-loop-2 icon-dropdown',
+                                                    'text': 'Refresh',
+                                                    'events': [
+                                                        {
+                                                            'eventName': 'click',
+                                                            'function': function () { $$.actions.RefreshItems(); }
+                                                        }
+                                                    ]
+                                                }
+                                            ]
+                                        },
+                                        
+                                        // Non Header section
+                                        {
+                                            'heading': 'none',
+                                            'divider': 'yes',
+                                            'options': [
+                                                {
+                                                    'iconClass': 'icon-envelop icon-dropdown',
+                                                    'text': 'Send Notification',
                                                     'events': [
                                                         {
                                                             'eventName': 'click',
                                                             'function': function () {
                                                                 $('.dropdown-menu').hide();
-                                                                $$.actions.importResources();
+                                                                $$.actions.redirect('sendnotification');
                                                             }
                                                         }
                                                     ]
                                                 }
+
                                             ]
                                         }
                                     ]
@@ -2501,6 +2525,22 @@ function registerEpmLiveResourceGridScript() {
                         ];
 
                         window.epmLiveGenericToolBar.generateToolBar(divId, cfgs);
+
+                        //Hide Admin section for Non-SCA users
+                        if ($$.userIsSiteAdmin) {
+                            $("#ddlTools_ul_menu li:nth-of-type(8)").show();
+                            $("#ddlTools_ul_menu li:nth-of-type(9)").show();
+                            $("#ddlTools_ul_menu li:nth-of-type(10)").show();
+                            $("#ddlTools_ul_menu li:nth-of-type(11)").show();
+                            $("#ddlTools_ul_menu li:nth-of-type(12)").show();
+                        }
+                        else {
+                            $("#ddlTools_ul_menu li:nth-of-type(8)").hide();
+                            $("#ddlTools_ul_menu li:nth-of-type(9)").hide();
+                            $("#ddlTools_ul_menu li:nth-of-type(10)").hide();
+                            $("#ddlTools_ul_menu li:nth-of-type(11)").hide();
+                            $("#ddlTools_ul_menu li:nth-of-type(12)").hide();
+                        }
 
                         if ($$.UserHaveResourceCenterPermission) {
                             $("#resourcePoolToolBar li:nth-child(1)").show();
