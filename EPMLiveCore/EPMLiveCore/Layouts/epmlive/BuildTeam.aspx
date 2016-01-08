@@ -237,6 +237,10 @@
                 document.getElementById("tdPctFull").style.display = "";
                 document.getElementById("tdPctFull").style.width = parseInt(pct) + "%";
             }
+
+            if(grid.id == "TeamGrid"){
+                grid.UpdateHeights(1);
+            }
         }
 
         Grids.OnCreateGroup = function(grid, group, col, val) 
