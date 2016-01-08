@@ -288,7 +288,7 @@ namespace WorkEnginePPM.WebServices.Core
                 var dataElement = new XElement("Data");
 
                 DataTable requestedResources = GetRequestedResources(data);
-                Resources resourceCore = GetResourceCore(SecurityLevels.EditResources);
+                Resources resourceCore = GetResourceCore(SecurityLevels.DBAUtil);
 
                 BuildResourcesTable(data, ref requestedResources);
 
@@ -348,7 +348,7 @@ namespace WorkEnginePPM.WebServices.Core
                 var dataElement = new XElement("Data");
 
                 DataTable requestedResources = GetRequestedResources(data);
-                Resources resourceCore = GetResourceCore(SecurityLevels.EditResources);
+                Resources resourceCore = GetResourceCore(SecurityLevels.DBAUtil);
 
                 BuildResourcesTable(data, ref requestedResources);
 

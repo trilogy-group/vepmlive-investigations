@@ -981,7 +981,8 @@ namespace EPMLiveCore
             string deleteResourceCheckMessage = string.Empty;
             string deleteResourceCheckStatus = string.Empty;
 
-            if (CoreFunctions.DoesCurrentUserHaveFullControl(properties.Web))
+            //With EPML-5913 - we have changed the approach as If user has DeleteListItems permission then they should able to delete resource(s).
+            if (properties.List.DoesUserHavePermissions(SPBasePermissions.DeleteListItems))
             {
                 SPSecurity.RunWithElevatedPrivileges(delegate()
                 {
