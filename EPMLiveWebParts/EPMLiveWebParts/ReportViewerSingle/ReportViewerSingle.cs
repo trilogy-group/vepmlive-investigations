@@ -153,7 +153,7 @@ namespace EPMLiveWebParts
         {
             
             rv = new Microsoft.Reporting.WebForms.ReportViewer();
-
+            SPWeb rootWeb = SPContext.Current.Site.RootWeb;
             if (UseDefaults)
             {
                 ReportingServicesURL = EPMLiveCore.CoreFunctions.getWebAppSetting(SPContext.Current.Site.WebApplication.Id, "ReportingServicesURL");
@@ -168,7 +168,7 @@ namespace EPMLiveWebParts
             {
                 ReportingServicesURL = PropSRSUrl;
                 Integrated = IsIntegratedMode;
-            }
+            }             
             if (string.IsNullOrEmpty(PropReportPath))
             {
                 error = "Report Path has not been set. Please configure the Report Path.";
@@ -177,15 +177,18 @@ namespace EPMLiveWebParts
             {
                 error = "ReportingServicesURL has not been set.";
             }
+            else if (Integrated && !(rootWeb.GetFile(rootWeb.Url + "/Report Library" + PropReportPath + ".rdl").Exists))
+            {
+                error = "Please configure the correct Report Path.";
+            }
             else
             {
-
-                try
+               try
                 {
                     rv.ProcessingMode = Microsoft.Reporting.WebForms.ProcessingMode.Remote;
                     rv.ServerReport.ReportServerUrl = new Uri(ReportingServicesURL);
                     if(Integrated)
-                        rv.ServerReport.ReportPath = SPContext.Current.Web.Site.RootWeb.Url + "/Report Library" + PropReportPath + ".rdl";
+                        rv.ServerReport.ReportPath = rootWeb.Url + "/Report Library" + PropReportPath + ".rdl";
                     else
                         rv.ServerReport.ReportPath = PropReportPath;
                     rv.ShowToolBar = true;
