@@ -311,7 +311,7 @@ namespace EPMLiveWebParts
                                 break;
                             case SPBasePermissions.DeleteListItems:
                                 {
-                                    if (resourceList.DoesUserHavePermissions(SPBasePermissions.DeleteListItems))
+                                    if (CoreFunctions.DoesCurrentUserHaveFullControl(resourceList.ParentWeb))
                                     {
                                         if (WorkEnginePPM.Core.ResourceManagement.Utilities.CheckPFEResourceCenterPermission(currentWeb, SPContext.Current.Web.CurrentUser.ID, true, out hasPFEResourceCenterPermissions))
                                             return hasPFEResourceCenterPermissions;

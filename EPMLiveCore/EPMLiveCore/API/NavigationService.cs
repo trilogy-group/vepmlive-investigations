@@ -716,7 +716,7 @@ namespace EPMLiveCore.API
                             break;
                         case SPBasePermissions.DeleteListItems:
                             {
-                                if (list.DoesUserHavePermissions(SPBasePermissions.DeleteListItems))
+                                if (CoreFunctions.DoesCurrentUserHaveFullControl(list.ParentWeb))
                                 {
                                     var args = new object[] { list.ParentWeb, list.ParentWeb.CurrentUser.ID, true, hasPFEResourceCenterPermissions };
                                     Assembly assembly = Assembly.Load("WorkEnginePPM, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5");
