@@ -2019,13 +2019,19 @@ CREATE TABLE dbo.EPGP_COST_CATEGORIES
 	BC_ROLE int,
 	BC_UOM nvarchar(255),
 	MC_UID int NOT NULL Default 0,
-	CA_UID int NOT NULL Default 0
+	CA_UID int NOT NULL Default 0,
+	CONSTRAINT PK_EPGP_COST_CATEGORIES PRIMARY KEY ([MC_UID],[CA_UID],[BC_UID])
 )
 
                 end
 else
                 begin
                                 Print 'Updating Table EPGP_COST_CATEGORIES'
+								IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE  CONSTRAINT_TYPE = 'PRIMARY KEY' AND TABLE_NAME = 'EPGP_COST_CATEGORIES')
+								BEGIN
+										ALTER TABLE [dbo].[EPGP_COST_CATEGORIES]
+										ADD CONSTRAINT PK_EPGP_COST_CATEGORIES PRIMARY KEY ([MC_UID],[CA_UID],[BC_UID]) 
+								END
                 end
 
 if not exists (select table_name from INFORMATION_SCHEMA.tables where table_name = 'EPGP_COST_BREAKDOWNS')
@@ -2084,13 +2090,19 @@ CREATE TABLE dbo.EPGP_COST_TYPES
 	CT_EDIT_MODE int,
 	INITIAL_LEVEL int,
 	CT_CB_ID int NULL,
-	CT_ALLOW_NAMED_RATES tinyint NOT NULL Default 0
+	CT_ALLOW_NAMED_RATES tinyint NOT NULL Default 0,
+	CONSTRAINT PK_EPGP_COST_TYPES PRIMARY KEY  ([CT_ID])
 )
 
                 end
 else
                 begin
                                 Print 'Updating Table EPGP_COST_TYPES'
+								IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE  CONSTRAINT_TYPE = 'PRIMARY KEY' AND TABLE_NAME = 'EPGP_COST_TYPES')
+								BEGIN
+										ALTER TABLE [dbo].[EPGP_COST_TYPES]
+										ADD CONSTRAINT PK_EPGP_COST_TYPES PRIMARY KEY NONCLUSTERED([CT_ID]) 
+								END
                 end
 
 if not exists (select table_name from INFORMATION_SCHEMA.tables where table_name = 'EPGP_AVAIL_CATEGORIES')
@@ -2219,6 +2231,7 @@ if not exists (select table_name from INFORMATION_SCHEMA.tables where table_name
 
 CREATE TABLE dbo.EPGP_COST_VALUES
 (
+	ID int NOT NULL IDENTITY (1, 1),
 	CB_ID int NOT NULL,
 	CT_ID int NOT NULL,
 	PROJECT_ID int NOT NULL,
@@ -2227,13 +2240,23 @@ CREATE TABLE dbo.EPGP_COST_VALUES
 	BD_VALUE decimal(25,6),
 	BD_COST decimal(25,6),
 	BD_IS_SUMMARY tinyint,
-	BD_BATCH nvarchar(255)
+	BD_BATCH nvarchar(255),
+	CONSTRAINT PK_EPGP_COST_VALUES PRIMARY KEY  ([CB_ID] ,[CT_ID],ID)
 )
 
                 end
 else
                 begin
                                 Print 'Updating Table EPGP_COST_VALUES'
+								IF NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE  CONSTRAINT_TYPE = 'PRIMARY KEY' AND TABLE_NAME = 'EPGP_COST_VALUES')
+								BEGIN
+										ALTER TABLE [dbo].[EPGP_COST_VALUES]
+										ADD ID INT NOT NULL IDENTITY (1, 1) 
+										
+										ALTER TABLE [dbo].[EPGP_COST_VALUES]
+										ADD CONSTRAINT PK_EPGP_COST_VALUES PRIMARY KEY  ([CB_ID] ,[CT_ID],ID)
+
+								END
                 end
 
 if not exists (select table_name from INFORMATION_SCHEMA.tables where table_name = 'EPGP_COST_DETAILS')

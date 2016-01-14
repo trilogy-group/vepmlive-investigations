@@ -8499,8 +8499,29 @@ end
 exec(@createoralter + ' PROC [dbo].[EPG_SP_RPT_GetCost]
 
 AS
-
-select * from EPG_VW_RPT_Cost
+	SET NOCOUNT ON
+	SELECT  p.PROJECT_NAME AS [Project Name]
+        ,ct.CT_NAME AS [Cost Type]
+		,cc.BC_NAME [Cost Category]
+		,cfn.[Cost Category Full Name]
+		,cv.BD_VALUE AS Qty
+		,cv.BD_COST AS Cost
+		,cv.CB_ID AS CalendarID
+		,cv.BD_PERIOD AS PeriodID
+		,cv.CB_ID * 1000  + cv.BD_PERIOD  AS PeriodUID
+		,cv.PROJECT_ID AS ProjectID
+		,cv.CT_ID AS CostTypeID
+		,cv.BC_UID AS CostCategoryUID
+		,cv.BD_IS_SUMMARY AS IsSummary
+	FROM dbo.EPGP_COST_VALUES AS cv 
+	LEFT OUTER JOIN dbo.EPGP_COST_CATEGORIES AS cc 
+		ON cv.BC_UID = cc.BC_UID
+	LEFT OUTER JOIN dbo.EPGP_PROJECTS AS p 
+		ON cv.PROJECT_ID = p.PROJECT_ID 
+	LEFT OUTER JOIN dbo.EPGP_COST_TYPES AS ct 
+		ON cv.CT_ID = ct.CT_ID
+	OUTER APPLY [dbo].[EPG_FN_RPT_GetCostCategoryFullNameTable](cc.BC_ID, cc.BC_NAME) cfn
+	ORDER BY ProjectID, [Cost Type]
 
 ')
  
@@ -9370,3 +9391,59 @@ WHERE
 ORDER BY 1
 ')
  
+ if not exists (select routine_name from INFORMATION_SCHEMA.routines where routine_name = 'EPG_FN_RPT_GetCostCategoryFullNameTable')
+begin
+    Print 'Creating Function EPG_FN_RPT_GetCostCategoryFullNameTable'
+    SET @createoralter = 'CREATE'
+end
+else
+begin
+    Print 'Updating Function EPG_FN_RPT_GetCostCategoryFullNameTable'
+    SET @createoralter = 'ALTER'
+end
+exec(@createoralter + ' function dbo.EPG_FN_RPT_GetCostCategoryFullNameTable (@InBC_ID int, @InName varchar(255))
+RETURNS @res TABLE
+(
+  [Cost Category Full Name] varchar(1000)
+)
+AS
+BEGIN
+	declare @Level_BC_ID int
+	declare @Level_BC_ID_Temp int
+	declare @FullName varchar(max)
+	declare @FullNameTemp varchar(max)
+
+	declare @LevelID int
+	declare @LevelIDTemp int
+
+	set @FullName = @InName
+
+	set @LevelIDTemp = 0
+	set @LevelID = (select BC_LEVEL from dbo.EPGP_COST_CATEGORIES where BC_ID = @InBC_ID)
+	
+	if (@LevelID>1)
+		set @LevelIDTemp = @LevelID - 1
+	else
+		set @LevelIDTemp = 1
+				
+	while (@LevelID - @LevelIDTemp > 0)
+	begin	
+		set @Level_BC_ID = (select max(bc_id) from dbo.EPGP_COST_CATEGORIES where bc_level = @LevelIDTemp and bc_ID<=@InBC_ID)	
+		set @FullNameTemp = (select bc_name from dbo.EPGP_COST_CATEGORIES where BC_ID = @Level_BC_ID)	
+		-- build full name
+		set @FullName = @FullNameTemp + ''.'' + @FullName
+		
+		-- move one level up	
+		set @LevelID = @LevelIDTemp
+		if (@LevelIDTemp>1)
+			set @LevelIDTemp = @LevelIDTemp - 1
+	 
+	 end
+	 
+	 INSERT INTO @res ([Cost Category Full Name])
+	 VALUES( @FullName)
+     
+	 RETURN 
+ 
+END
+')
