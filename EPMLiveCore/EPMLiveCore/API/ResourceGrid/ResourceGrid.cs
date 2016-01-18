@@ -62,7 +62,8 @@ namespace EPMLiveCore.API
             CantFindIdAttr,
             CantFindResultRoot,
             GetResourcePoolDataGridChanges,
-            ExportResources
+            ExportResources,
+            RefreshResources
         }
 
         #endregion Enums
@@ -910,7 +911,7 @@ namespace EPMLiveCore.API
                     {
                         // this might seem strange, but we need this as we check from where 
                         // the "Delete" is being executed in the ItemDeleting event.
-                        
+
                         //Pre check..
                         SPListItem listItem = resourceManager.GetCurrentResource(resourceId);
                         string deleteResourceCheckMessage = string.Empty;
@@ -938,7 +939,7 @@ namespace EPMLiveCore.API
 
                             if (!string.IsNullOrEmpty(deleteResourceCheckStatus) && deleteResourceCheckStatus.ToLower().Equals("no"))
                             {
-                                throw new Exception(deleteResourceCheckStatus.ToUpper() + "|||" +  deleteResourceCheckMessage);
+                                throw new Exception(deleteResourceCheckStatus.ToUpper() + "|||" + deleteResourceCheckMessage);
                             }
                         });
 
@@ -1410,6 +1411,28 @@ namespace EPMLiveCore.API
             }
         }
 
+        /// <summary>
+        /// Refresh Resource Grid
+        /// </summary>
+        /// <param name="spWeb">Web Object</param>
+        /// <returns></returns>
+        internal static string RefreshResources(SPWeb spWeb)
+        {
+            try
+            {
+                Guid tJob = API.Timer.AddTimerJob(spWeb.Site.ID, spWeb.ID, "Today Fix/Res Plan", 2, "", "", -1, 2, "");
+                API.Timer.Enqueue(tJob, 0, spWeb.Site);
+                return string.Format(@"<RefreshResources Success=""0"" />");
+            }
+            catch (APIException)
+            {
+                throw;
+            }
+            catch (Exception e)
+            {
+                throw new APIException((int)Errors.RefreshResources, e.Message);
+            }
+        }
         #endregion Methods
     }
 }

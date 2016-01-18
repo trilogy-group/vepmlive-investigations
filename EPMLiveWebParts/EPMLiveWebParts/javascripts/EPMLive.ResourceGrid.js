@@ -1338,8 +1338,55 @@ function registerEpmLiveResourceGridScript() {
                 window.SP.UI.ModalDialog.showModalDialog(options);
             },
             RefreshItems: function () {
-                var $v_H = $$$.currentWebUrl + '/_layouts/epmlive/refreshind.aspx?ListId=' + SP.Utilities.HttpUtility.urlKeyValueEncode($$.ResListId.toString('B').toUpperCase()) + '&Source=' + document.location.href;
-                SP.Utilities.HttpUtility.navigateTo($v_H);
+
+                toastr.options = {
+                    "closeButton": false,
+                    "debug": false,
+                    "positionClass": "toast-top-right",
+                    "onclick": null,
+                    "showDuration": "3000",
+                    "hideDuration": "1000",
+                    "timeOut": "5000",
+                    "extendedTimeOut": "1000",
+                    "showEasing": "swing",
+                    "hideEasing": "linear",
+                    "showMethod": "fadeIn",
+                    "hideMethod": "fadeOut"
+                };
+                window.RefreshCommandUI();
+
+                $.ajax({
+                    type: 'POST',
+                    url: $$$.currentWebUrl + '/_vti_bin/WorkEngine.asmx/Execute',
+                    data: "{ Function: 'RefreshResources', Dataxml: '<RefreshResources/>' }",
+                    contentType: 'application/json; charset=utf-8',
+                    dataType: 'json',
+
+                    success: function (resp) {
+                        if (resp.d) {
+                            var responseJson = $$$.parseJson(resp.d);
+                            var result = responseJson.Result;
+
+                            if ($$$.responseIsSuccess(result)) {
+                                var refreshResources = result.RefreshResources;
+                                if (refreshResources['@Success'] === '0') {
+                                    window.parent.toastr.success("Refresh job started successfully. Status Can be viewed on the Work Queue page within Settings.");
+                                } else {
+                                    window.parent.toastr.error("Unable to start Refresh Job. There was some error.");
+                                }
+                            } else {
+                                window.parent.toastr.error("Unable to start Refresh Job. There was some error.");
+                            }
+                        } else {
+                            window.parent.toastr.error("Unable to start Refresh Job. There was no response from the server.");
+                        }
+                        window.RefreshCommandUI();
+                    },
+                    error: function (err) {
+                        window.parent.toastr.error('Unable to start Refresh Job. The response was: (' + err.status + ') ' + err.statusText);
+                        window.RefreshCommandUI();
+                    }
+                });
             },
             analyzeResources: function () {
 
@@ -2230,13 +2277,16 @@ function registerEpmLiveResourceGridScript() {
                                                     'events': [
                                                         {
                                                             'eventName': 'click',
-                                                            'function': function () { $$.actions.RefreshItems(); }
+                                                            'function': function () {
+                                                                $('.dropdown-menu').hide();
+                                                                $$.actions.RefreshItems();
+                                                            }
                                                         }
                                                     ]
                                                 }
                                             ]
                                         },
-                                        
+
                                         // Non Header section
                                         {
                                             'heading': 'none',

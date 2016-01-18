@@ -1415,7 +1415,7 @@ namespace EPMLiveCore
         {
             try
             {
-                return Response.Success(Timer.IsImportResourceAlreadyRunning(oWeb));                
+                return Response.Success(Timer.IsImportResourceAlreadyRunning(oWeb));
             }
             catch (APIException ex)
             {
@@ -1429,7 +1429,7 @@ namespace EPMLiveCore
         /// <param name="SPWeb">Web</param>
         /// <returns></returns>
         public static string CancelTimerJob(string data, SPWeb oWeb)
-        {            
+        {
             try
             {
                 Guid jobUid = Guid.Empty;
@@ -1444,7 +1444,7 @@ namespace EPMLiveCore
                         }
                     }
                 }
-                Timer.CancelTimerJob(oWeb, jobUid);                
+                Timer.CancelTimerJob(oWeb, jobUid);
                 return Response.Success(string.Format(@"<ResourceImporter Success=""{0}"" />", true));
             }
             catch (APIException ex)
@@ -1453,6 +1453,23 @@ namespace EPMLiveCore
             }
         }
 
+        /// <summary>
+        /// Refresh Resource Grid
+        /// </summary>
+        /// <param name="data">The Data</param>
+        /// <param name="oWeb">Web object</param>
+        /// <returns></returns>
+        public static string RefreshResources(string data, SPWeb oWeb)
+        {
+            try
+            {
+                return Response.Success(ResourceGrid.RefreshResources(oWeb));
+            }
+            catch (APIException ex)
+            {
+                return Response.Failure(ex.ExceptionNumber, string.Format("Error: {0}", ex.Message));
+            }
+        }
         #endregion
 
         #region Resource Management Methods
@@ -1918,25 +1935,25 @@ namespace EPMLiveCore
         public static string IsSecurityJobAlreadyRunning(string data, SPWeb oWeb)
         {
             try
-            {                
-                Guid oListID = Guid.Empty;                
-                int itemId=0;
+            {
+                Guid oListID = Guid.Empty;
+                int itemId = 0;
                 XDocument xDoc = XDocument.Parse(data);
                 if (xDoc != null)
                 {
                     foreach (XElement current in xDoc.Root.Elements())
-                    {                        
+                    {
                         if (current.Attribute("key").Value.Equals("ListID"))
                         {
                             oListID = new Guid(current.Value);
-                        }                     
+                        }
                         else if (current.Attribute("key").Value.Equals("itemId"))
                         {
                             itemId = Convert.ToInt32(current.Value);
                         }
                     }
                 }
-                return Response.Success(Timer.IsSecurityJobAlreadyRunning(oWeb,oListID,itemId));
+                return Response.Success(Timer.IsSecurityJobAlreadyRunning(oWeb, oListID, itemId));
             }
             catch (APIException ex)
             {
