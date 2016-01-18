@@ -158,11 +158,13 @@ function ShowResGrid() {
 
 function ShowBacklog() {
     if (isQueryShowBacklog()) {
+        StyleToggleButton("Ribbon.WorkPlanner.InsertGroup.ShowBacklog-Medium", null);
         try {
             dhxLayout.cells(agileCell).collapse();
         } catch (e) { }
     }
     else {
+        StyleToggleButton("Ribbon.WorkPlanner.InsertGroup.ShowBacklog-Medium", "");
         try {
             dhxLayout.cells(agileCell).expand();
         } catch (e) { }
@@ -1443,11 +1445,14 @@ function CopySummaryField(Col, Val) {
 function ShowBaseline() {
     var grid = Grids.WorkPlannerGrid;
     var col = grid.Cols["G"];
-    if (col.GanttFlow == "")
+    if (col.GanttFlow == "") {
+        StyleToggleButton("Ribbon.WorkViews.GanttGroup.ShowBaseline-Medium", null);
         col.GanttFlow = "BaselineDateRange";
-    else
+    }
+    else {
+        StyleToggleButton("Ribbon.WorkViews.GanttGroup.ShowBaseline-Medium", "");
         col.GanttFlow = "";
-
+    }
     grid.RefreshGantt(1, null);
 
     RefreshCommandUI();
@@ -1882,9 +1887,15 @@ function ShowFilters() {
     var row = grid.GetRowById("Filter");
     try {
         if (row.Visible)
+        {
+            StyleToggleButton("Ribbon.WorkViews.WorkViewsGroup.ShowFilters-Medium", null);
             grid.HideRow(row);
+        }    
         else
+        {
+            StyleToggleButton("Ribbon.WorkViews.WorkViewsGroup.ShowFilters-Medium","");
             grid.ShowRow(row);
+        }    
     } catch (e) { }
 }
 
@@ -2124,9 +2135,12 @@ function ZoomOut() {
 
 function ShowHideGantt() {
     var grid = Grids.WorkPlannerGrid;
-    if (grid.Cols.G.Visible)
+    if (grid.Cols.G.Visible){
+        StyleToggleButton("Ribbon.WorkViews.GanttGroup.ShowHideGantt-Medium", null);
         grid.HideCol("G");
+    }
     else {
+        StyleToggleButton("Ribbon.WorkViews.GanttGroup.ShowHideGantt-Medium", "");
         grid.ShowCol("G");
     }
     ResizeGantt(grid, Grids.AllocationGrid);
@@ -2458,16 +2472,15 @@ function UpdateDependencies(grid) {
 
 function ShowAssignments() {
     if (oShowAssignments) {
+        StyleToggleButton("Ribbon.WorkViews.WorkViewsGroup.ShowAssignments-Medium", null);
         oShowAssignments = false;
         Grids.WorkPlannerGrid.Def["Assignment"].Visible = "0";
     }
     else {
+        StyleToggleButton("Ribbon.WorkViews.WorkViewsGroup.ShowAssignments-Medium", "");
         oShowAssignments = true;
         Grids.WorkPlannerGrid.Def["Assignment"].Visible = "1";
     }
-
-
-
     HideShowAssignments();
 }
 
@@ -3635,10 +3648,12 @@ function IsRespectLinks() {
 
 function RespectLinks() {
     if (Grids.WorkPlannerGrid.Cols["G"].GanttCorrectDependencies == 1) {
+        StyleToggleButton("Ribbon.Project.ScheduleGroup.RespectLinks-Medium", null);
         ShowTDialog("Disabling Links...");
         dhtmlxAjax.post("WorkPlannerAction.aspx", "Action=SetProperty&ID=" + sItemID + "&PlannerID=" + sPlannerID + "&Property=FRL&Value=0", RespectLinksClose);
     }
     else {
+        StyleToggleButton("Ribbon.Project.ScheduleGroup.RespectLinks-Medium", "");
         ShowTDialog("Enabling Links...");
         dhtmlxAjax.post("WorkPlannerAction.aspx", "Action=SetProperty&ID=" + sItemID + "&PlannerID=" + sPlannerID + "&Property=FRL&Value=1", RespectLinksClose);
     }
@@ -4009,7 +4024,7 @@ function RefreshNotifications(row) {
 function ShowTDialog(text) {
 
     sm("dlgNormal", 150, 50);
-    document.getElementById("dlgNormalText").innerText = text;
+    document.getElementById("dlgNormalText").innerHTML = text;
 }
 
 function ShowNotes() {
@@ -4035,10 +4050,12 @@ function HideTDialog() {
 
 function SummaryRollup() {
     if (bSummaryRollup) {
+        StyleToggleButton("Ribbon.Project.ScheduleGroup.SummaryRollup-Medium", null);
         ShowTDialog("Disabling Summary...");
         dhtmlxAjax.post("WorkPlannerAction.aspx", "Action=SetProperty&ID=" + sItemID + "&PlannerID=" + sPlannerID + "&Property=FSC&Value=0", SummaryRollupClose);
     }
     else {
+        StyleToggleButton("Ribbon.Project.ScheduleGroup.SummaryRollup-Medium", "");
         ShowTDialog("Enabling Summary...");
         dhtmlxAjax.post("WorkPlannerAction.aspx", "Action=SetProperty&ID=" + sItemID + "&PlannerID=" + sPlannerID + "&Property=FSC&Value=1", SummaryRollupClose);
     }
@@ -4864,6 +4881,15 @@ function ShowBacklogRows(grid, row) {
         }
         grid.RefreshRow(child);
         child = child.nextSibling;
+    }
+}
+
+function StyleToggleButton(id, isStyle)
+{
+    if (isStyle == null) {
+        document.getElementById(id).style.backgroundColor = null;
+    } else {
+        document.getElementById(id).style.backgroundColor = "#cde6f7";
     }
 }
 
