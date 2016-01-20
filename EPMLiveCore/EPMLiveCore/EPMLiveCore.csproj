@@ -4023,9 +4023,7 @@
     <Content Include="SocialEngine\Events\WebEventReceiver\Elements.xml" />
     <Content Include="TaskCenterListToolbars\Elements.xml" />
     <Content Include="TEMPLATE\1033\XML\WEBTEMPWE.XML" />
-    <Content Include="TEMPLATE\admin\admin.sitemap.epmlive.xml">
-      <SubType>Designer</SubType>
-    </Content>
+    <Content Include="TEMPLATE\admin\admin.sitemap.epmlive.xml" />
     <Content Include="TEMPLATE\admin\epmlive\addkey.aspx" />
     <Content Include="TEMPLATE\admin\epmlive\createdatabase.aspx" />
     <Content Include="TEMPLATE\admin\epmlive\createsite.aspx" />
@@ -4071,9 +4069,7 @@
     <Content Include="WorkEngineMasterWorkspace\Elements.xml" />
     <Content Include="WorkEngineResourcePool\Elements.xml" />
     <Content Include="WorkEngineResourcePool\Schema.xml" />
-    <Content Include="WorkgroupAdministration\Elements.xml">
-      <SubType>Designer</SubType>
-    </Content>
+    <Content Include="WorkgroupAdministration\Elements.xml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Layouts\EPMLiveCore\" />
