@@ -20,12 +20,12 @@
     <SccAuxPath>SAK</SccAuxPath>
     <SccProvider>SAK</SccProvider>
     <PostDeploymentCommand>"C:\Workspace\Upland\EPM Live\EPM Live Utilities\SPSolutionManager\SPSolutionManager\bin\Debug\SPSolutionManager.exe" -a Install -s EPMLiveCore -p "C:\Workspace\Upland\EPM Live\EPMLive2013\EPMLiveCore\EPMLiveCore\bin\Debug\"
-"C:\Program Files %28x86%29\Microsoft SDKs\Windows\v8.0A\Bin\NETFX 4.0 Tools\x64\gacutil.exe" /i "C:\Workspace\Upland\EPM Live\EPMLive2013\EPMLiveCore\EPMLiveCore\bin\Debug\EPM Live Core.dll" /f
-iisreset
-net stop "WETimer"
-net start "WETimer"</PostDeploymentCommand>
+      "C:\Program Files %28x86%29\Microsoft SDKs\Windows\v8.0A\Bin\NETFX 4.0 Tools\x64\gacutil.exe" /i "C:\Workspace\Upland\EPM Live\EPMLive2013\EPMLiveCore\EPMLiveCore\bin\Debug\EPM Live Core.dll" /f
+      iisreset
+      net stop "WETimer"
+      net start "WETimer"</PostDeploymentCommand>
     <PreDeploymentCommand>"C:\Workspace\Upland\EPM Live\EPM Live Utilities\SPSolutionManager\SPSolutionManager\bin\Debug\SPSolutionManager.exe" -a Uninstall -s EPMLiveCore
-"C:\Program Files %28x86%29\Microsoft SDKs\Windows\v8.0A\Bin\NETFX 4.0 Tools\x64\gacutil.exe" /u "EPM Live Core" /f</PreDeploymentCommand>
+      "C:\Program Files %28x86%29\Microsoft SDKs\Windows\v8.0A\Bin\NETFX 4.0 Tools\x64\gacutil.exe" /u "EPM Live Core" /f</PreDeploymentCommand>
     <ProjectMode>SharePointCustomization</ProjectMode>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
@@ -1439,6 +1439,9 @@ net start "WETimer"</PostDeploymentCommand>
     <Compile Include="WebPageCode\adminfeatures.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
+    <Compile Include="WebPageCode\PropertiesBag.aspx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <Compile Include="WebPageCode\adminqueue.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
@@ -2386,7 +2389,7 @@ net start "WETimer"</PostDeploymentCommand>
     <Content Include="Images\completed.png" />
     <Content Include="Images\deferred.gif" />
     <Content Include="Images\deferred.png" />
-   <Content Include="Images\epmlive-thumb-32.png" />
+    <Content Include="Images\epmlive-thumb-32.png" />
     <Content Include="Images\EPMLive.ico" />
     <Content Include="Images\epmlivegantt.gif" />
     <Content Include="Images\EPMLiveHome.png" />
@@ -4020,7 +4023,9 @@ net start "WETimer"</PostDeploymentCommand>
     <Content Include="SocialEngine\Events\WebEventReceiver\Elements.xml" />
     <Content Include="TaskCenterListToolbars\Elements.xml" />
     <Content Include="TEMPLATE\1033\XML\WEBTEMPWE.XML" />
-    <Content Include="TEMPLATE\admin\admin.sitemap.epmlive.xml" />
+    <Content Include="TEMPLATE\admin\admin.sitemap.epmlive.xml">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="TEMPLATE\admin\epmlive\addkey.aspx" />
     <Content Include="TEMPLATE\admin\epmlive\createdatabase.aspx" />
     <Content Include="TEMPLATE\admin\epmlive\createsite.aspx" />
@@ -4028,6 +4033,7 @@ net start "WETimer"</PostDeploymentCommand>
     <Content Include="TEMPLATE\admin\epmlive\features.aspx" />
     <Content Include="TEMPLATE\admin\epmlive\InstallSolutions.aspx" />
     <Content Include="TEMPLATE\admin\epmlive\preview.aspx" />
+    <Content Include="TEMPLATE\admin\epmlive\PropertiesBag.aspx" />
     <Content Include="TEMPLATE\admin\epmlive\queue.aspx" />
     <Content Include="TEMPLATE\admin\epmlive\removesolutions.aspx" />
     <Content Include="TEMPLATE\admin\epmlive\servers.aspx" />
@@ -4065,7 +4071,9 @@ net start "WETimer"</PostDeploymentCommand>
     <Content Include="WorkEngineMasterWorkspace\Elements.xml" />
     <Content Include="WorkEngineResourcePool\Elements.xml" />
     <Content Include="WorkEngineResourcePool\Schema.xml" />
-    <Content Include="WorkgroupAdministration\Elements.xml" />
+    <Content Include="WorkgroupAdministration\Elements.xml">
+      <SubType>Designer</SubType>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Layouts\EPMLiveCore\" />

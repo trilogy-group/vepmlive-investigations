@@ -1759,6 +1759,28 @@ namespace EPMLiveCore
                 return Response.Failure(ex.ExceptionNumber, string.Format("Error: {0}", ex.Message));
             }
         }
+        
+        public static string SetPropertiesBagSettings(string data, SPWeb spWeb)
+        {
+            string webAppId;            
+            try
+            {
+                string param = GetPropertiesBagParams(data, out webAppId);
+                if (string.IsNullOrEmpty(webAppId))
+                {
+                    CoreFunctions.setFarmSetting("UplandAnalyticsURL", param);
+                }
+                else
+                {
+                    CoreFunctions.setWebAppSetting(new Guid(webAppId), "EPMLiveAPIURL", param);
+                }                
+                return Response.Success(param);
+            }
+            catch (Exception ex)
+            {
+                return Response.Failure(21021, string.Format("[UAandEpmlAPIService-SetPropertiesBagSettings] {0}", ex.Message));
+            }            
+        }
 
         #endregion
 
@@ -1783,6 +1805,56 @@ namespace EPMLiveCore
                 new XElement("DiagnosticsInfo",
                     new XElement("ProcessTime", watch.ElapsedMilliseconds, new XAttribute("Unit", "Milliseconds")))
                     .ToString();
+        }
+
+        private static string GetPropertiesBagParams(string xml, out string webAppId)
+        {
+            string param = string.Empty;
+            string appId = string.Empty;
+            try
+            {
+                XmlDocument xDoc = new XmlDocument();
+                xDoc.LoadXml(xml);
+
+                XmlNodeList nodes = xDoc.SelectNodes("Data/Param[@key='PropType']");
+                if (nodes.Count > 0)
+                {
+                    switch (nodes[0].InnerText)
+                    {
+                        case "farm":
+                            {
+                                XmlNode node = xDoc.SelectSingleNode("Data/Param[@key='UplandAnalyticsURL']");
+                                if (node != null)
+                                {
+                                    param = node.InnerText;
+                                }
+                                break;
+                            }
+                        case "webapp":
+                            {
+                                XmlNode webAppNode = xDoc.SelectSingleNode("Data/Param[@key='WebAppId']");
+                                if (webAppNode != null)
+                                {
+                                    appId = webAppNode.InnerText;
+                                    XmlNode node = xDoc.SelectSingleNode("Data/Param[@key='EPMLiveAPIURL']");
+                                    if (node != null)
+                                    {
+                                        param = node.InnerText;
+                                    }
+                                }
+                                break;
+                            }
+                        default:
+                            break;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            webAppId = appId;
+            return param;
         }
 
         #endregion

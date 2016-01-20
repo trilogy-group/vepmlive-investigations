@@ -27,4 +27,7 @@
   <siteMapNode url="/_admin/epmlive/wcsettings.aspx" 
       parentUrl="/_admin/applications.aspx" title="WorkCenter Settings"/>
 
+  <siteMapNode url="/_admin/epmlive/PropertiesBag.aspx"
+  parentUrl="/_admin/applications.aspx" title="WorkCenter Properties"/>
+  
 </siteMap>
