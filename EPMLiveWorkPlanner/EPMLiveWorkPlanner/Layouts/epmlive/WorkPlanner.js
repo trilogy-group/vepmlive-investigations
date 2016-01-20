@@ -158,13 +158,13 @@ function ShowResGrid() {
 
 function ShowBacklog() {
     if (isQueryShowBacklog()) {
-        StyleToggleButton("Ribbon.WorkPlanner.InsertGroup.ShowBacklog-Medium", null);
+        setButtonStateOff("Ribbon.WorkPlanner.InsertGroup.ShowBacklog-Medium");
         try {
             dhxLayout.cells(agileCell).collapse();
         } catch (e) { }
     }
     else {
-        StyleToggleButton("Ribbon.WorkPlanner.InsertGroup.ShowBacklog-Medium", "");
+        setButtonStateOn("Ribbon.WorkPlanner.InsertGroup.ShowBacklog-Medium");
         try {
             dhxLayout.cells(agileCell).expand();
         } catch (e) { }
@@ -1446,11 +1446,11 @@ function ShowBaseline() {
     var grid = Grids.WorkPlannerGrid;
     var col = grid.Cols["G"];
     if (col.GanttFlow == "") {
-        StyleToggleButton("Ribbon.WorkViews.GanttGroup.ShowBaseline-Medium", null);
+        setButtonStateOn("Ribbon.WorkViews.GanttGroup.ShowBaseline-Medium");
         col.GanttFlow = "BaselineDateRange";
     }
     else {
-        StyleToggleButton("Ribbon.WorkViews.GanttGroup.ShowBaseline-Medium", "");
+        setButtonStateOff("Ribbon.WorkViews.GanttGroup.ShowBaseline-Medium");
         col.GanttFlow = "";
     }
     grid.RefreshGantt(1, null);
@@ -1550,10 +1550,14 @@ function iChangeView(view, bHide) {
     //grid.ChangeColsVisibility(allCols, "", 0);
 
     try {
-        if (viewObject[view]["gantt"] == "1")
+        if (viewObject[view]["gantt"] == "1"){
             grid.ShowCol("G");
-        else if (grid.Cols["G"].Visible)
+            setButtonStateOn("Ribbon.WorkViews.GanttGroup.ShowHideGantt-Medium");
+        }
+        else if (grid.Cols["G"].Visible) {
             grid.HideCol("G");
+            setButtonStateOff("Ribbon.WorkViews.GanttGroup.ShowHideGantt-Medium");
+        }
     } catch (e) { }
     //if (viewObject[view]["folders"] == "true" && bUseFolders)
     //    dhxLayout.cells(folderCell).expand();
@@ -1580,10 +1584,14 @@ function iChangeView(view, bHide) {
     else {
         var filters = viewObject[view]["filters"].split("^");
         try {
-            if (filters[0] == "1" || filters[0] == "true")
+            if (filters[0] == "1" || filters[0] == "true"){
                 grid.ShowRow(grid.GetRowById("Filter"));
-            else
+                setButtonStateOn("Ribbon.WorkViews.WorkViewsGroup.ShowFilters-Medium");
+            }
+            else {
                 grid.HideRow(grid.GetRowById("Filter"));
+                setButtonStateOff("Ribbon.WorkViews.WorkViewsGroup.ShowFilters-Medium");
+            }
         } catch (e) { }
         if (filters[0] == "1")
             grid.ChangeFilter(filters[1], filters[2], filters[3], 0, 0, null);
@@ -1608,7 +1616,6 @@ function iChangeView(view, bHide) {
         grid.DoGrouping(grouping[1]);
     }
 
-
     /*
     try
     {
@@ -1630,14 +1637,25 @@ function iChangeView(view, bHide) {
         Grids.AgileGrid.ShowCol("id");
         HideBacklogRows(grid, grid.GetRowById("BacklogRow"));
         grid.HideRow(grid.GetRowById("BacklogRow"));
+        try {
+            if (isQueryShowBacklog()) {
+                setButtonStateOn("Ribbon.WorkPlanner.InsertGroup.ShowBacklog-Medium");
+            }
+            else {
+                setButtonStateOff("Ribbon.WorkPlanner.InsertGroup.ShowBacklog-Medium");
+            }
+        } catch (e) { }
     }
 
     try {
-        if (viewObject[view]["assignments"] == "true" || viewObject[view]["assignments"] == "1")
+        if (viewObject[view]["assignments"] == "true" || viewObject[view]["assignments"] == "1"){
             oShowAssignments = true;
-        else
+            setButtonStateOn("Ribbon.WorkViews.WorkViewsGroup.ShowAssignments-Medium");
+        }
+        else {
             oShowAssignments = false;
-
+            setButtonStateOff("Ribbon.WorkViews.WorkViewsGroup.ShowAssignments-Medium");
+        }
         HideShowAssignments();
     } catch (e) { }
 
@@ -1876,6 +1894,7 @@ function isShowFilters() {
     try {
         var grid = Grids.WorkPlannerGrid;
         var row = grid.GetRowById("Filter");
+        setStyleonPageLoadViewTab();
         return row.Visible;
     } catch (e)
     { }
@@ -1888,12 +1907,12 @@ function ShowFilters() {
     try {
         if (row.Visible)
         {
-            StyleToggleButton("Ribbon.WorkViews.WorkViewsGroup.ShowFilters-Medium", null);
+            setButtonStateOff("Ribbon.WorkViews.WorkViewsGroup.ShowFilters-Medium");
             grid.HideRow(row);
         }    
         else
         {
-            StyleToggleButton("Ribbon.WorkViews.WorkViewsGroup.ShowFilters-Medium","");
+            setButtonStateOn("Ribbon.WorkViews.WorkViewsGroup.ShowFilters-Medium");
             grid.ShowRow(row);
         }    
     } catch (e) { }
@@ -2135,12 +2154,12 @@ function ZoomOut() {
 
 function ShowHideGantt() {
     var grid = Grids.WorkPlannerGrid;
-    if (grid.Cols.G.Visible){
-        StyleToggleButton("Ribbon.WorkViews.GanttGroup.ShowHideGantt-Medium", null);
+    if (grid.Cols.G.Visible) {
+        setButtonStateOff("Ribbon.WorkViews.GanttGroup.ShowHideGantt-Medium");
         grid.HideCol("G");
     }
     else {
-        StyleToggleButton("Ribbon.WorkViews.GanttGroup.ShowHideGantt-Medium", "");
+        setButtonStateOn("Ribbon.WorkViews.GanttGroup.ShowHideGantt-Medium");
         grid.ShowCol("G");
     }
     ResizeGantt(grid, Grids.AllocationGrid);
@@ -2472,12 +2491,12 @@ function UpdateDependencies(grid) {
 
 function ShowAssignments() {
     if (oShowAssignments) {
-        StyleToggleButton("Ribbon.WorkViews.WorkViewsGroup.ShowAssignments-Medium", null);
+        setButtonStateOff("Ribbon.WorkViews.WorkViewsGroup.ShowAssignments-Medium");
         oShowAssignments = false;
         Grids.WorkPlannerGrid.Def["Assignment"].Visible = "0";
     }
     else {
-        StyleToggleButton("Ribbon.WorkViews.WorkViewsGroup.ShowAssignments-Medium", "");
+        setButtonStateOn("Ribbon.WorkViews.WorkViewsGroup.ShowAssignments-Medium");
         oShowAssignments = true;
         Grids.WorkPlannerGrid.Def["Assignment"].Visible = "1";
     }
@@ -3638,24 +3657,39 @@ function IsCalcEnabled() {
 
 function IsRespectLinks() {
     try {
-        if (Grids.WorkPlannerGrid.Cols["G"].GanttCorrectDependencies == 1)
+        styleToggleUpdateProjectTab()
+        if (Grids.WorkPlannerGrid.Cols["G"].GanttCorrectDependencies == 1) {
+            setButtonStateOn("Ribbon.Project.ScheduleGroup.RespectLinks-Medium");
             return true;
-        else
+        }
+        else {
+            setButtonStateOff("Ribbon.Project.ScheduleGroup.RespectLinks-Medium");
             return false;
+        }
     } catch (e) { }
     return false;
 }
 
-function RespectLinks() {
-    if (Grids.WorkPlannerGrid.Cols["G"].GanttCorrectDependencies == 1) {
-        StyleToggleButton("Ribbon.Project.ScheduleGroup.RespectLinks-Medium", null);
-        ShowTDialog("Disabling Links...");
-        dhtmlxAjax.post("WorkPlannerAction.aspx", "Action=SetProperty&ID=" + sItemID + "&PlannerID=" + sPlannerID + "&Property=FRL&Value=0", RespectLinksClose);
+function styleToggleUpdateProjectTab() {
+    if (bSummaryRollup) {
+        setButtonStateOn("Ribbon.Project.ScheduleGroup.SummaryRollup-Medium");
     }
     else {
-        StyleToggleButton("Ribbon.Project.ScheduleGroup.RespectLinks-Medium", "");
+        setButtonStateOff("Ribbon.Project.ScheduleGroup.SummaryRollup-Medium");
+    }
+}
+
+
+function RespectLinks() {
+    if (Grids.WorkPlannerGrid.Cols["G"].GanttCorrectDependencies == 1) {
+        ShowTDialog("Disabling Links...");
+        dhtmlxAjax.post("WorkPlannerAction.aspx", "Action=SetProperty&ID=" + sItemID + "&PlannerID=" + sPlannerID + "&Property=FRL&Value=0", RespectLinksClose);
+        setButtonStateOff("Ribbon.Project.ScheduleGroup.RespectLinks-Medium");
+    }
+    else {
         ShowTDialog("Enabling Links...");
         dhtmlxAjax.post("WorkPlannerAction.aspx", "Action=SetProperty&ID=" + sItemID + "&PlannerID=" + sPlannerID + "&Property=FRL&Value=1", RespectLinksClose);
+        setButtonStateOn("Ribbon.Project.ScheduleGroup.RespectLinks-Medium");
     }
 }
 
@@ -4050,12 +4084,12 @@ function HideTDialog() {
 
 function SummaryRollup() {
     if (bSummaryRollup) {
-        StyleToggleButton("Ribbon.Project.ScheduleGroup.SummaryRollup-Medium", null);
+        setButtonStateOff("Ribbon.Project.ScheduleGroup.SummaryRollup-Medium");
         ShowTDialog("Disabling Summary...");
         dhtmlxAjax.post("WorkPlannerAction.aspx", "Action=SetProperty&ID=" + sItemID + "&PlannerID=" + sPlannerID + "&Property=FSC&Value=0", SummaryRollupClose);
     }
     else {
-        StyleToggleButton("Ribbon.Project.ScheduleGroup.SummaryRollup-Medium", "");
+        setButtonStateOn("Ribbon.Project.ScheduleGroup.SummaryRollup-Medium");
         ShowTDialog("Enabling Summary...");
         dhtmlxAjax.post("WorkPlannerAction.aspx", "Action=SetProperty&ID=" + sItemID + "&PlannerID=" + sPlannerID + "&Property=FSC&Value=1", SummaryRollupClose);
     }
@@ -4884,12 +4918,79 @@ function ShowBacklogRows(grid, row) {
     }
 }
 
-function StyleToggleButton(id, isStyle)
-{
-    if (isStyle == null) {
-        document.getElementById(id).style.backgroundColor = null;
-    } else {
-        document.getElementById(id).style.backgroundColor = "#cde6f7";
+function setButtonStateOff(id) {
+    var item = document.getElementById(id);
+    if (item != null) {
+        item.stateOn = false;
+        if (document.getElementById) {
+            try {
+                if (item.classList.contains("ms-cui-ctl-on")) {
+                    item.classList.remove("ms-cui-ctl-on");
+                }
+                document.getElementById(id).className = item.className;
+            }
+            catch(e) { }
+        }
     }
+};
+
+function setButtonStateOn(id) {
+    var item = document.getElementById(id);
+    if (item != null) {
+        item.stateOn = true;
+        if (document.getElementById) {
+            document.getElementById(id).className = item.className + " ms-cui-ctl-on";
+        }
+    }
+};
+
+function setStyleonPageLoadViewTab() {
+    var grid = Grids.WorkPlannerGrid;
+    var col = grid.Cols["G"];
+
+    // Show Filter
+    try {
+        if (grid.GetRowById("Filter").Visible) {
+            setButtonStateOn("Ribbon.WorkViews.WorkViewsGroup.ShowFilters-Medium");
+        }
+    }catch(e){ }
+
+    // Show Gantt
+    try{
+        if (col.Visible) {
+            setButtonStateOn("Ribbon.WorkViews.GanttGroup.ShowHideGantt-Medium");
+        }
+    } catch (e) { }
+
+    // Show BaseLine
+    try {
+        if (col.GanttFlow == "BaselineDateRange") {
+            setButtonStateOn("Ribbon.WorkViews.GanttGroup.ShowBaseline-Medium");
+        }
+        else {
+            setButtonStateOff("Ribbon.WorkViews.GanttGroup.ShowBaseline-Medium");
+        }
+    } catch (e) { }
+
+    // Show Backlog
+    try{
+        if (bAgile) {
+            if (isQueryShowBacklog()) {
+                setButtonStateOn("Ribbon.WorkPlanner.InsertGroup.ShowBacklog-Medium");
+            }
+            else {
+                setButtonStateOff("Ribbon.WorkPlanner.InsertGroup.ShowBacklog-Medium");
+            }
+        }
+    } catch (e) { }
+
+    // Show Assignment
+    try{
+        if (oShowAssignments) {
+            setButtonStateOn("Ribbon.WorkViews.WorkViewsGroup.ShowAssignments-Medium");
+        }
+    } catch (e) { }
 }
+
+
 
