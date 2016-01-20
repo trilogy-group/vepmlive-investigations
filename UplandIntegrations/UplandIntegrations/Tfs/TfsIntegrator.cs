@@ -48,7 +48,7 @@ namespace UplandIntegrations.Tfs
             {
                 Message = "Error: " + ex.Message;
                 Log.LogMessage("Remove integration. " + ex.Message, IntegrationLogType.Error);
-                return false;
+                return true;
             }
             return true;
         }
@@ -108,7 +108,21 @@ namespace UplandIntegrations.Tfs
                 using (TfsService tfsService = new TfsService(WebProps.Properties["ServerUrl"].ToString(), WebProps.Properties["Username"].ToString(), WebProps.Properties["Password"].ToString(), Convert.ToBoolean(WebProps.Properties["UseBasicAuthentication"].ToString())))
                 {
                     DataTable collection = new DataTable();
-                    tfsService.GetWorkItemTypes((string)WebProps.Properties["TeamProjectCollection"], collection, false);
+                    String teamProjectCollection = Convert.ToString(WebProps.Properties["TeamProjectCollection"]);
+                    if (string.IsNullOrEmpty(teamProjectCollection))
+                    {
+                        DataTable projectCollection = new DataTable();
+                        tfsService.GetTeamProjectCollections(projectCollection, false);
+                        if (projectCollection.Rows.Count > 0)
+                        {
+                            teamProjectCollection = Convert.ToString(projectCollection.Rows[0]["DisplayName"]);
+                        }
+                        else
+                        {
+                            throw new Exception("Please provide the project collection.");
+                        }
+                    }
+                    tfsService.GetWorkItemTypes(teamProjectCollection, collection, false);
                     foreach (DataRow dataRow in collection.Rows)
                     {
                         props.Add(Convert.ToString(dataRow["Name"]), Convert.ToString(dataRow["Name"]));

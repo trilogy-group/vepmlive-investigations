@@ -196,10 +196,6 @@ namespace UplandIntegrations.Tfs
 
         public void GetWorkItemTypes(string projectCollection, DataTable items, Boolean isOnlyColumns)
         {
-            if (string.IsNullOrEmpty(projectCollection))
-            {
-                projectCollection = "DefaultCollection";
-            }
             using (TfsTeamProjectCollection tfsTeamProjectCollection = new TfsTeamProjectCollection(new Uri(string.Format("{0}/{1}", tfsConfigurationServer.Uri.AbsoluteUri, projectCollection)), tfsCred))
             {
                 tfsTeamProjectCollection.Authenticate();
