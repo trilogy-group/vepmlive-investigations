@@ -125,7 +125,7 @@
 
 	
     <%-- Farm Properties --%>    
-    <table border="0" cellpadding="10" cellspacing="0" width="100%">
+    <table border="0" cellpadding="10" cellspacing="0" width="800px">
         <tr>
             <td colspan="2">                
                 <h3 class="h3style">Farm Properties</h3>                
@@ -133,7 +133,7 @@
         </tr>
         <tr>
             <td>
-                <table class="ms-listviewtable" cellspacing="0" width="600px" cellpadding="2" style="padding-left: 3px; padding-right: 5px;">            
+                <table class="ms-listviewtable" cellspacing="0" width="100%" cellpadding="2" style="padding-left: 3px; padding-right: 5px;">            
                     <tr>
                         <td class="ms-viewheadertr" width="200px">Property</td>
                         <td class="ms-viewheadertr" width="300px">Value</td>
@@ -143,7 +143,7 @@
                     <tr>
                         <td width="200px">UplandAnalyticsURL</td>
                         <td width="300px">
-                            <input type="text" id="txtAnalyticsURL" disabled="true" value="<%= analyticsUrl %>" />
+                            <input type="text" id="txtAnalyticsURL" style="width:275px" disabled="true" value="<%= analyticsUrl %>" />
                         </td>
                         <td width="100px">
                             <div id="farmPropEditDiv">          
@@ -164,7 +164,7 @@
     <br/><br/><br/> 
 
     <%-- Web Application Properties --%>
-    <table border="0" cellpadding="10" cellspacing="0" width="100%">	
+    <table border="0" cellpadding="10" cellspacing="0" width="800px">	
         <tr>
             <td colspan="2">
                 <h3 class="h3style">Web Application Properties</h3>                
@@ -189,7 +189,7 @@
 		</tr>
         <tr>
             <td>
-                <table class="ms-listviewtable" cellspacing="0" cellpadding="2" width="600px"tyle="padding-left: 3px; padding-right: 5px;">         
+                <table class="ms-listviewtable" cellspacing="0" cellpadding="2" width="100%" style="padding-left: 3px; padding-right: 5px;">         
                     <tr>
                         <td class="ms-viewheadertr" width="200px">Property</td>
                         <td class="ms-viewheadertr" width="300px">Value</td>
@@ -199,7 +199,7 @@
                     <tr>
                         <td width="200px">EPMLiveAPIURL</td>
                         <td width="300px">
-                            <input type="text" id="txtEPMLApiURL" disabled="true" value="<%= epmlApiUrl %>" />
+                            <input type="text" id="txtEPMLApiURL" style="width:275px" disabled="true" value="<%= epmlApiUrl %>" />
                         </td>
                         <td width="100px">
                             <div id="webappPropEditDiv">
