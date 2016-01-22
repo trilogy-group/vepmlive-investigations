@@ -608,7 +608,6 @@
     <script language="javascript">    
 
         bAgile = <%=bAgile.ToString().ToLower() %>;
-        bStartSoon = <%=bStartSoon.ToString().ToLower() %>;
 
         var parentDiv = document.getElementById("parentId");
 
@@ -948,12 +947,9 @@
             {
                 if(d1 < grid.Cols["G"].GanttBase)
                 {
-                    if (bStartSoon)
+                    if(confirm("You are trying to set the Task Start Date earlier than the Project Start Date. Would you like to modify the Project Start Date"))
                     {
-                        if(confirm("You are trying to set the Task Start Date earlier than the Project Start Date. Would you like to modify the Project Start Date"))
-                        {
-                            MoveProject();
-                        }
+                        MoveProject();
                     }
                 }
             }
