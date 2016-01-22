@@ -123,9 +123,8 @@
 
     </script>
 
-	
-    <%-- Farm Properties --%>    
-    <table border="0" cellpadding="10" cellspacing="0" width="800px">
+	<%-- Farm Properties --%>    
+    <table border="0" cellpadding="10" cellspacing="0" width="700px">
         <tr>
             <td colspan="2">                
                 <h3 class="h3style">Farm Properties</h3>                
@@ -135,23 +134,23 @@
             <td>
                 <table class="ms-listviewtable" cellspacing="0" width="100%" cellpadding="2" style="padding-left: 3px; padding-right: 5px;">            
                     <tr>
-                        <td class="ms-viewheadertr" width="200px">Property</td>
-                        <td class="ms-viewheadertr" width="300px">Value</td>
+                        <td class="ms-viewheadertr" width="150px">Property</td>
+                        <td class="ms-viewheadertr" width="350px">Value</td>
                         <td class="ms-viewheadertr" width="100px">Action</td>
                     </tr>
 
                     <tr>
-                        <td width="200px">UplandAnalyticsURL</td>
-                        <td width="300px">
-                            <input type="text" id="txtAnalyticsURL" style="width:275px" disabled="true" value="<%= analyticsUrl %>" />
+                        <td width="150px">UplandAnalyticsURL</td>
+                        <td width="350px">
+                            <input type="text" id="txtAnalyticsURL" style="width:325px" disabled="true" value="<%= analyticsUrl %>" />
                         </td>
                         <td width="100px">
-                            <div id="farmPropEditDiv">          
+                            <div id="farmPropEditDiv">
                                 <a href="#" onclick="javascript:EditProperty('farm')">Edit</a>
                             </div>                    
                             <div id="farmPropSaveDiv" style="display:none;">
-                                <a href="#" onclick="javascript:SaveProperty('farm')">Save</a>
-                                <a href="#" onclick="javascript:CancelProperty('farm')">Cancel</a>
+                                <a href="#" onclick="javascript:SaveProperty('farm')" style="padding-right:8px">Save</a>
+                                <a href="#" onclick="javascript:CancelProperty('farm')" style="padding-left:8px">Cancel</a>
                             </div>
                         </td>
                     </tr>                    
@@ -159,55 +158,59 @@
             </td>
         </tr>
         
-    </table>
-    
+    </table>    
+        
     <br/><br/><br/> 
-
+        
     <%-- Web Application Properties --%>
-    <table border="0" cellpadding="10" cellspacing="0" width="800px">	
+    <table border="0" cellpadding="10" cellspacing="0" width="700px">	
         <tr>
             <td colspan="2">
                 <h3 class="h3style">Web Application Properties</h3>                
             </td>
         </tr>
         <tr>
-			<td>
+			<td>				
 				<table>
-					<wssuc:inputformsection title="Web Application"
-						description="Select Web Application to set property."
-						runat="server" width="500px">
-					<Template_InputFormControls>
-						<wssuc:InputFormControl LabelText="" runat="server">
-							 <Template_Control>
-								<SharePoint:WebApplicationSelector ID="WebApplicationSelector1" runat="server" AllowChange="true" OnContextChange="WebApplicationSelector1_ContextChange" />
-							 </Template_Control>
-						</wssuc:InputFormControl>
-					</Template_InputFormControls>
-					</wssuc:inputformsection>
-				</table>
+                    <tr>
+                        <td width="100%">
+				            <wssuc:inputformsection title="Web Application"
+					            description="Select Web Application to set property."
+					            runat="server">
+				            <Template_InputFormControls>
+					            <wssuc:InputFormControl LabelText="" runat="server">
+							            <Template_Control>
+							            <SharePoint:WebApplicationSelector ID="WebApplicationSelector1" runat="server" AllowChange="true" OnContextChange="WebApplicationSelector1_ContextChange" />
+							            </Template_Control>
+					            </wssuc:InputFormControl>
+				            </Template_InputFormControls>
+				            </wssuc:inputformsection>
+                        </td>
+                    </tr>
+			    </table>				
 			</td>
 		</tr>
         <tr>
             <td>
                 <table class="ms-listviewtable" cellspacing="0" cellpadding="2" width="100%" style="padding-left: 3px; padding-right: 5px;">         
                     <tr>
-                        <td class="ms-viewheadertr" width="200px">Property</td>
-                        <td class="ms-viewheadertr" width="300px">Value</td>
+                        <td class="ms-viewheadertr" width="150px">Property</td>
+                        <td class="ms-viewheadertr" width="350px">Value</td>
                         <td class="ms-viewheadertr" width="100px">Action</td>
                     </tr>
 
                     <tr>
-                        <td width="200px">EPMLiveAPIURL</td>
-                        <td width="300px">
-                            <input type="text" id="txtEPMLApiURL" style="width:275px" disabled="true" value="<%= epmlApiUrl %>" />
+                        <td width="150px">EPMLiveAPIURL</td>
+                        <td width="350px">
+                            <input type="text" id="txtEPMLApiURL" style="width:325px" disabled="true" value="<%= epmlApiUrl %>" />
                         </td>
                         <td width="100px">
                             <div id="webappPropEditDiv">
                                 <a href="#" onclick="javascript:EditProperty('webapp')">Edit</a>
                             </div>
                             <div id="webappPropSaveDiv" style="display:none;">
-                                <a href="#" onclick="javascript:SaveProperty('webapp')" >Save</a>
-                                <a href="#" onclick="javascript:CancelProperty('webapp')" >Cancel</a>
+                                <a href="#" onclick="javascript:SaveProperty('webapp')" style="padding-right:8px">Save</a>
+                                <a href="#" onclick="javascript:CancelProperty('webapp')" style="padding-left:8px">Cancel</a>
                             </div>
                         </td>
                     </tr>                    
