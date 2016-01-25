@@ -128,7 +128,7 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
                         
                         LogMessage("Resources value removed from property bag", MessageKind.SUCCESS, 4);
                     }
-                    else //If property bag setting doesn't contain "Resources" then, disable Timer job for JobType=2 (EPMLiveCore.Jobs.TimerFix)
+                    else //If property bag setting doesn't contain "Resources" then, disable Timer job for JobType=203 (EPMLiveCore.Jobs.TimerFix)
                     {
                         LogMessage("Connect to database to find the Timer job", 2);
 
@@ -139,8 +139,8 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
                             {
                                 sqlConnection.Open();
                                 //Guid timerjobguid;
-                                //=======================Timer Job (EPMLiveCore.Jobs.TimerFix, JobType = 2) ==========================
-                                using (SqlCommand cmd = new SqlCommand("select timerjobuid, runtime from timerjobs where siteguid=@siteguid and jobtype=2", sqlConnection))
+                                //=======================Timer Job (EPMLiveCore.Jobs.TimerFix, JobType = 203) ==========================
+                                using (SqlCommand cmd = new SqlCommand("select timerjobuid, runtime from timerjobs where siteguid=@siteguid and jobtype=203", sqlConnection))
                                 {
                                     cmd.Parameters.AddWithValue("@siteguid", Web.Site.ID.ToString());
                                     using (SqlDataReader dr = cmd.ExecuteReader())
@@ -157,7 +157,7 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
                                             }
                                             else
                                             {
-                                                using (SqlCommand cmd1 = new SqlCommand("UPDATE TIMERJOBS set runtime = @runtime, scheduletype = -1 where siteguid=@siteguid and jobtype=2", sqlConnection))
+                                                using (SqlCommand cmd1 = new SqlCommand("UPDATE TIMERJOBS set runtime = @runtime, scheduletype = -1 where siteguid=@siteguid and jobtype=203", sqlConnection))
                                                 {
                                                     cmd1.Parameters.AddWithValue("@siteguid", Web.Site.ID.ToString());
                                                     cmd1.Parameters.AddWithValue("@runtime", "-1");

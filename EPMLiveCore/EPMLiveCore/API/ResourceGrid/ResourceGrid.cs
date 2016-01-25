@@ -1396,7 +1396,7 @@ namespace EPMLiveCore.API
                         }
                     }
                 }
-
+                 
                 ClearCache(web);
 
                 return "<ResourcePoolViews/>";
@@ -1420,7 +1420,7 @@ namespace EPMLiveCore.API
         {
             try
             {
-                Guid tJob = API.Timer.AddTimerJob(spWeb.Site.ID, spWeb.ID, "Today Fix/Res Plan", 2, "", "", -1, 2, "");
+                Guid tJob = API.Timer.AddTimerJob(spWeb.Site.ID, spWeb.ID, "Today Fix/Res Plan", 203, "", "", -1, 2, "");
                 API.Timer.Enqueue(tJob, 0, spWeb.Site);
                 return string.Format(@"<RefreshResources Success=""0"" />");
             }

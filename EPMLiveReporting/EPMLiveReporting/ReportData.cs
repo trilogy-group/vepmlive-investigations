@@ -2852,6 +2852,29 @@ namespace EPMLiveReportsAdmin
             return fieldType;
         }
 
+        public void UpdateItem(Guid listId, SPListItem item, string tableName)
+        {
+            string sSQL = string.Empty;
+            ArrayList _arrayList_defaultColumns = new ArrayList();
+            _arrayList_defaultColumns = new ArrayList();
+            _arrayList_defaultColumns.Add("siteid");
+            _arrayList_defaultColumns.Add("webid");
+            _arrayList_defaultColumns.Add("listid");
+            _arrayList_defaultColumns.Add("itemid");
+            _arrayList_defaultColumns.Add("weburl");
+
+            ArrayList _mandatoryHiddenFlds = new ArrayList();
+            _mandatoryHiddenFlds.Add("commenters");
+            _mandatoryHiddenFlds.Add("commentersread");
+            _mandatoryHiddenFlds.Add("commentcount");
+            _mandatoryHiddenFlds.Add("workspaceurl");
+
+            sSQL = UpdateSQL(tableName.Replace("'", ""), GetListColumns(listId), item, _arrayList_defaultColumns,
+                        _mandatoryHiddenFlds);
+
+            UpdateListItem(sSQL);
+        }
+
         // -- END
     }
 }

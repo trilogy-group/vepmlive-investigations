@@ -1111,6 +1111,13 @@
     <Compile Include="Layouts\epmlive\resourcecapacity.aspx.designer.cs">
       <DependentUpon>resourcecapacity.aspx.cs</DependentUpon>
     </Compile>
+    <Compile Include="Layouts\epmlive\resourcelistupdater.aspx.cs">
+      <DependentUpon>resourcelistupdater.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\resourcelistupdater.aspx.designer.cs">
+      <DependentUpon>resourcelistupdater.aspx.cs</DependentUpon>
+    </Compile>
     <Compile Include="Layouts\epmlive\SaveCurrentSiteAsTemplate.aspx.cs">
       <DependentUpon>SaveCurrentSiteAsTemplate.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -3622,6 +3629,7 @@
     <Content Include="Layouts\epmlive\reporting\landing.aspx" />
     <Content Include="Layouts\epmlive\requestworkspace.aspx" />
     <Content Include="Layouts\epmlive\resourcecapacity.aspx" />
+    <Content Include="Layouts\epmlive\resourcelistupdater.aspx" />
     <Content Include="Layouts\epmlive\resourcetools.js" />
     <Content Include="Layouts\epmlive\rollupexport.aspx" />
     <Content Include="Layouts\epmlive\runtimer.aspx" />

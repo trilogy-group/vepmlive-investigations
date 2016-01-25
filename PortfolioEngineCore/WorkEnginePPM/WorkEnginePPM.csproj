@@ -153,6 +153,7 @@ iisreset</PostDeploymentCommand>
     <Compile Include="HelperFunctions.cs" />
     <Compile Include="Jobs\Cleanup.cs" />
     <Compile Include="Jobs\DataServicePlatform.cs" />
+    <Compile Include="Jobs\EffectiveRateJob.cs" />
     <Compile Include="Jobs\InstallWorkEvents.cs" />
     <Compile Include="Jobs\PublishWorkPlannerWork.cs" />
     <Compile Include="Jobs\Setup.cs" />

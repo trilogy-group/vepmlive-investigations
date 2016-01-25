@@ -40,11 +40,11 @@ begin
 end
 if not exists (select jobtype_id from TIMERJOBTYPES where jobtype_id = 2)
 begin
-    INSERT INTO TIMERJOBTYPES (jobtype_id,NetAssembly,NetClass,[Title],priority) VALUES (2,'EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5','EPMLiveCore.Jobs.TimerFix','Rollup and Calculated Fields',99)
+    INSERT INTO TIMERJOBTYPES (jobtype_id,NetAssembly,NetClass,[Title],priority) VALUES (2,'WorkEnginePPM, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5','WorkEnginePPM.Jobs.EffectiveRateJob','Effective Rate',99)
 end
 else
 begin
-    UPDATE TIMERJOBTYPES SET NetAssembly='EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5', NetClass='EPMLiveCore.Jobs.TimerFix', [Title]='Rollup and Calculated Fields', Priority=99 where jobtype_id=2
+    UPDATE TIMERJOBTYPES SET NetAssembly='WorkEnginePPM, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5', NetClass='WorkEnginePPM.Jobs.EffectiveRateJob', [Title]='Effective Rate', Priority=99 where jobtype_id=2
 end
 if not exists (select jobtype_id from TIMERJOBTYPES where jobtype_id = 1)
 begin
@@ -221,6 +221,14 @@ end
 else
 begin
     UPDATE TIMERJOBTYPES SET NetAssembly='EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5', NetClass='EPMLiveCore.Jobs.Upgrades.OptInUpgradeJob', [Title]='Opt-In Upgrade', Priority=5 where jobtype_id=202
+end
+if not exists (select jobtype_id from TIMERJOBTYPES where jobtype_id = 203)
+begin
+    INSERT INTO TIMERJOBTYPES (jobtype_id,NetAssembly,NetClass,[Title],priority) VALUES (203,'EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5','EPMLiveCore.Jobs.TimerFix','Rollup and Calculated Fields',99)
+end
+else
+begin
+    UPDATE TIMERJOBTYPES SET NetAssembly='EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5', NetClass='EPMLiveCore.Jobs.TimerFix', [Title]='Rollup and Calculated Fields', Priority=99 where jobtype_id=203
 end
 if not exists (select jobtype_id from TIMERJOBTYPES where jobtype_id = 32)
 begin
