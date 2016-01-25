@@ -176,7 +176,7 @@
                 </tr>
                 <tr>
                     <td colspan="2" align="right">
-                        <asp:Button UseSubmitBehavior="false" runat="server" class="ms-ButtonHeightWidth" OnClick="btnRunNow_Click" Text="Run Timer Now" id="btnRunNow" accesskey="" Width="150"/>
+                        <asp:Button UseSubmitBehavior="false" runat="server" class="ms-ButtonHeightWidth" OnClick="btnRunNow_Click" Text="Run Job Now" id="btnRunNow" accesskey="" Width="150"/>
                     </td>
                 </tr>
             </table>

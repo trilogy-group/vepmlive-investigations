@@ -12,7 +12,7 @@
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <TargetOfficeVersion>15.0</TargetOfficeVersion>
     <FileAlignment>512</FileAlignment>
-    <ProjectTypeGuids>{BB1F664B-9266-4fd6-B973-E1E44974B511};{14822709-B5A1-4724-98CA-57A101D1B079};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <ProjectTypeGuids>{C1CDDADD-2546-481F-9697-4EA41081F2FC};{14822709-B5A1-4724-98CA-57A101D1B079};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <ActiveDeploymentConfiguration>Default</ActiveDeploymentConfiguration>
     <SandboxedSolution>False</SandboxedSolution>
     <SccProjectName>SAK</SccProjectName>
@@ -1110,13 +1110,6 @@
     </Compile>
     <Compile Include="Layouts\epmlive\resourcecapacity.aspx.designer.cs">
       <DependentUpon>resourcecapacity.aspx.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Layouts\epmlive\resourcelistupdater.aspx.cs">
-      <DependentUpon>resourcelistupdater.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Layouts\epmlive\resourcelistupdater.aspx.designer.cs">
-      <DependentUpon>resourcelistupdater.aspx.cs</DependentUpon>
     </Compile>
     <Compile Include="Layouts\epmlive\SaveCurrentSiteAsTemplate.aspx.cs">
       <DependentUpon>SaveCurrentSiteAsTemplate.aspx</DependentUpon>
@@ -3629,7 +3622,6 @@
     <Content Include="Layouts\epmlive\reporting\landing.aspx" />
     <Content Include="Layouts\epmlive\requestworkspace.aspx" />
     <Content Include="Layouts\epmlive\resourcecapacity.aspx" />
-    <Content Include="Layouts\epmlive\resourcelistupdater.aspx" />
     <Content Include="Layouts\epmlive\resourcetools.js" />
     <Content Include="Layouts\epmlive\rollupexport.aspx" />
     <Content Include="Layouts\epmlive\runtimer.aspx" />
