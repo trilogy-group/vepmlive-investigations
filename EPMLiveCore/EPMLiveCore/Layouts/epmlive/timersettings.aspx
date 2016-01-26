@@ -53,10 +53,10 @@
     <asp:Label ID="lblNotEnabled" Visible="False" runat="server" Text="The Timer Service Feature has not been activated on this web application. You must activate the feature in Central Admin before the timer is able to run." Font-Bold="true" ForeColor="red"></asp:Label>
 
     <asp:Panel ID="pnlAdmin" runat="server">
-        <fieldset>
-            <legend>
-                <b>Total Rollup Lists </b>
-            </legend>
+        
+            
+                <h3 style="padding-bottom:10px;">Total Rollup Lists </h3>
+           
             <table border="0" cellpadding="0" cellspacing="0" width="100%">
                 <colgroup>
                     <col style="width: 60%" />
@@ -98,28 +98,33 @@
                     </td>
                 </tr>
             </table>
-        </fieldset>
+       
     </asp:Panel>
     <br />
 
     <asp:Panel ID="pnlMain" runat="server" Visible="true" Width="100%">
-        <fieldset>
-            <legend>
-                <b>Resource List Cleanup </b>
-            </legend>
+        
+            
+                <h3 style="padding-bottom:10px;">Resource Pool Rate Update Job</h3>
+            
             <table border="0" cellpadding="0" cellspacing="0" width="100%">
                 <colgroup>
                     <col style="width: 60%" />
                     <col style="width: 40%" />
                 </colgroup>
                 <tr>
+					<td class="ms-descriptiontext ms-inputformdescription">This scheduled job will update the Resource Pool with the latest resource rates. All rate updates are effective immediately within Resource Planner and Resource Analayzer, so this job is not necessary unless rates from the Resource Pool are being used in Timesheet or custom reports. </td>
+					<td>
+                        <img width="8" height="1" alt="" src="/_layouts/images/blank.gif">
+					</td>
+				</tr>
+                <tr>
                     <td>
                         <wssuc:InputFormSection Title="Choose time to run:"
                             Description=""
                             runat="server">
                             <template_description>
-		    Choose a time when the EPM Live Timer Service should update your site.
-		    This time should be set to a time when your system will be idle or close to idle.
+		   It is recommended that this job run when activity on this site is idle or close to idle. 
 		</template_description>
                             <template_inputformcontrols>
 			<wssuc:InputFormControl LabelText="Time" runat="server" width="100%">
@@ -175,7 +180,9 @@
                     </td>
                 </tr>
                 <tr>
-                    <td colspan="2" align="right">
+
+                    <td></td>
+                    <td align="left">
                         <asp:Button UseSubmitBehavior="false" runat="server" class="ms-ButtonHeightWidth" OnClick="btnRunNow_Click" Text="Run Job Now" id="btnRunNow" accesskey="" Width="150"/>
                     </td>
                 </tr>
