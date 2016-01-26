@@ -197,7 +197,7 @@
             <template_description>
             Enter the lists for which you would like to collect data.
 		</template_description>
-            <template_inputformcontrols>
+            <template_inputformcontrols> 
 			<wssuc:InputFormControl LabelText="Enter list(s) separated by a line break:" runat="server" width="100%">
 				 <Template_Control>
 				            <asp:TextBox ID="txtResPlannerLists" runat="server" Height="100" Width ="200" TextMode="MultiLine"></asp:TextBox>	                        
