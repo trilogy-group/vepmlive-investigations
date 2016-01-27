@@ -2592,12 +2592,12 @@ function registerEpmLiveResourceGridScript() {
                             $("#ddlTools_ul_menu li:nth-of-type(12)").hide();
                         }
 
-                        if ($$.UserHaveResourceCenterPermission) {
-                            $("#resourcePoolToolBar li:nth-child(1)").show();
+                        if ($$.UserHaveResourceCenterPermission) {                            
+                            $("#resourcePoolToolBar ul:first li:first").show();                            
                         }
-                        else {
-                            $("#resourcePoolToolBar li:nth-child(1)").hide();
-                            $("#resourcePoolToolBar li:nth-child(2)").css("paddingLeft", "15px");
+                        else {                            
+                            $("#resourcePoolToolBar ul:first li:first").hide();
+                            $("#resourcePoolToolBar ul:first li:first").next().css("paddingLeft", "15px");                            
                         }
                     }
                     else {
