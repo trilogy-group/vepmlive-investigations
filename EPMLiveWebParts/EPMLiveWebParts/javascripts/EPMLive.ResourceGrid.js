@@ -1369,7 +1369,7 @@ function registerEpmLiveResourceGridScript() {
 
                             if ($$$.responseIsSuccess(result)) {
                                 var refreshResources = result.RefreshResources;
-                                if (refreshResources['@Success'] === '0') {
+                                if (refreshResources['@Success'] === '0') {  
                                     window.parent.toastr.success("Refresh job started successfully. Status can be viewed on the Work Queue page within Settings.");
                                 } else {
                                     window.parent.toastr.error("Unable to start Refresh Job. There was some error.");
