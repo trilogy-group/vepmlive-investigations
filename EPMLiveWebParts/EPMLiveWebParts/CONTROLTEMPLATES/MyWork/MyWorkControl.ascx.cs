@@ -64,6 +64,7 @@ namespace EPMLiveWebParts.CONTROLTEMPLATES.MyWork
             {
                 var from = new DateTime(1900, 1, 1, 0, 0, 0);
                 var to = new DateTime(9998, 12, 31, 23, 59, 59);
+                
                 DateTime today = DateTime.Now.Date;
 
                 if (DaysAgoEnabled)
@@ -74,6 +75,14 @@ namespace EPMLiveWebParts.CONTROLTEMPLATES.MyWork
                 if (DaysAfterEnabled)
                 {
                     to = today.AddDays(DaysAfter).AddHours(23).AddMinutes(59).AddSeconds(59);
+                }
+
+                if (DaysAgoEnabled || DaysAfterEnabled)
+                {
+                    if (DaysAfterEnabled && !DaysAgoEnabled && from != today)
+                        from = today;
+                    if (DaysAgoEnabled && !DaysAfterEnabled && to != today)
+                        to = today;
                 }
 
                 string query =
