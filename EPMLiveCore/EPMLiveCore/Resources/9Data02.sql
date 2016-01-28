@@ -40,11 +40,11 @@ begin
 end
 if not exists (select jobtype_id from TIMERJOBTYPES where jobtype_id = 2)
 begin
-    INSERT INTO TIMERJOBTYPES (jobtype_id,NetAssembly,NetClass,[Title],priority) VALUES (2,'WorkEnginePPM, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5','WorkEnginePPM.Jobs.EffectiveRateJob','Effective Rate',99)
+    INSERT INTO TIMERJOBTYPES (jobtype_id,NetAssembly,NetClass,[Title],priority) VALUES (2,'WorkEnginePPM, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5','WorkEnginePPM.Jobs.EffectiveRateJob','Resource Pool Rate Update',99)
 end
 else
 begin
-    UPDATE TIMERJOBTYPES SET NetAssembly='WorkEnginePPM, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5', NetClass='WorkEnginePPM.Jobs.EffectiveRateJob', [Title]='Effective Rate', Priority=99 where jobtype_id=2
+    UPDATE TIMERJOBTYPES SET NetAssembly='WorkEnginePPM, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5', NetClass='WorkEnginePPM.Jobs.EffectiveRateJob', [Title]='Resource Pool Rate Update', Priority=99 where jobtype_id=2
 end
 if not exists (select jobtype_id from TIMERJOBTYPES where jobtype_id = 1)
 begin

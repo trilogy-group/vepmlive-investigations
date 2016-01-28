@@ -371,7 +371,7 @@ namespace EPMLiveCore
                 {
                     timerjobguid = Guid.NewGuid();
                     dr.Close();
-                    cmd = new SqlCommand("INSERT INTO TIMERJOBS (timerjobuid, siteguid, jobtype, jobname, runtime, scheduletype, webguid) VALUES (@timerjobuid, @siteguid, 2, 'Effective Rate', @runtime, 2, @webguid)", cn);
+                    cmd = new SqlCommand("INSERT INTO TIMERJOBS (timerjobuid, siteguid, jobtype, jobname, runtime, scheduletype, webguid) VALUES (@timerjobuid, @siteguid, 2, 'Resource Pool Rate Update', @runtime, 2, @webguid)", cn);
                     cmd.Parameters.AddWithValue("@siteguid", currWeb.Site.ID.ToString());
                     cmd.Parameters.AddWithValue("@timerjobuid", timerjobguid);
                     cmd.Parameters.AddWithValue("@webguid", currWeb.ID.ToString());
