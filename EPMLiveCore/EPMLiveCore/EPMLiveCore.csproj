@@ -1439,7 +1439,7 @@
     <Compile Include="WebPageCode\adminfeatures.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="WebPageCode\PropertiesBag.aspx.cs">
+    <Compile Include="WebPageCode\EPMLiveProperties.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="WebPageCode\adminqueue.aspx.cs">
@@ -4031,7 +4031,7 @@
     <Content Include="TEMPLATE\admin\epmlive\features.aspx" />
     <Content Include="TEMPLATE\admin\epmlive\InstallSolutions.aspx" />
     <Content Include="TEMPLATE\admin\epmlive\preview.aspx" />
-    <Content Include="TEMPLATE\admin\epmlive\PropertiesBag.aspx" />
+    <Content Include="TEMPLATE\admin\epmlive\EPMLiveProperties.aspx" />
     <Content Include="TEMPLATE\admin\epmlive\queue.aspx" />
     <Content Include="TEMPLATE\admin\epmlive\removesolutions.aspx" />
     <Content Include="TEMPLATE\admin\epmlive\servers.aspx" />

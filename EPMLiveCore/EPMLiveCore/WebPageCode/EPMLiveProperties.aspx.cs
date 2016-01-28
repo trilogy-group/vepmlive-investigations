@@ -14,7 +14,7 @@ using Microsoft.SharePoint.Utilities;
 
 namespace EPMLiveCore
 {
-    public partial class PropertiesBag : System.Web.UI.Page
+    public partial class EPMLiveProperties : System.Web.UI.Page
     {
         protected string currentWebUrl = string.Empty;
         protected string analyticsUrl = string.Empty;

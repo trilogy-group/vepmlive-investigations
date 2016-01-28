@@ -1,5 +1,5 @@
 ﻿<%@ Assembly Name="EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5" %>
-<%@ Page Language="C#" Inherits="EPMLiveCore.PropertiesBag" CodeBehind="EPMLiveCore.PropertiesBag.aspx.cs" MasterPageFile="~/_admin/admin.master" %>    
+<%@ Page Language="C#" Inherits="EPMLiveCore.EPMLiveProperties" CodeBehind="EPMLiveCore.EPMLiveProperties.aspx.cs" MasterPageFile="~/_admin/admin.master" %>    
 
 <%@ Register TagPrefix="wssuc" TagName="InputFormControl" src="~/_controltemplates/InputFormControl.ascx" %>
 <%@ Register TagPrefix="wssuc" TagName="InputFormSection" src="~/_controltemplates/InputFormSection.ascx" %>

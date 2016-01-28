@@ -79,12 +79,12 @@
 	</CustomAction>
 
   <CustomAction
-		Id="EPMLive.Workgroup.CentralAdmin.PropertiesBag"
+		Id="EPMLive.Workgroup.CentralAdmin.EPMLiveProperties"
 		GroupId="EPMLive.Workgroup.CentralAdmin"
 		Location="Microsoft.SharePoint.Administration.GeneralApplicationSettings"
 		Sequence="16"
 		Title="Properties">
-    <UrlAction Url="_admin/epmlive/PropertiesBag.aspx" />
+    <UrlAction Url="_admin/epmlive/EPMLiveProperties.aspx" />
   </CustomAction>
   
 </Elements>
