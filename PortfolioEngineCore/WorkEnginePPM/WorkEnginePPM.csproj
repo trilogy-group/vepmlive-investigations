@@ -159,18 +159,21 @@ iisreset</PostDeploymentCommand>
     <Compile Include="Jobs\Setup.cs" />
     <Compile Include="Layouts\ppm\AddList.aspx.cs">
       <DependentUpon>AddList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\ppm\AddList.aspx.designer.cs">
       <DependentUpon>AddList.aspx.cs</DependentUpon>
     </Compile>
     <Compile Include="Layouts\ppm\Admin\InstallDataSyncEvents.aspx.cs">
       <DependentUpon>InstallDataSyncEvents.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\ppm\Admin\InstallDataSyncEvents.aspx.designer.cs">
       <DependentUpon>InstallDataSyncEvents.aspx.cs</DependentUpon>
     </Compile>
     <Compile Include="Layouts\ppm\calendarform.aspx.cs">
       <DependentUpon>calendarform.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\ppm\calendarform.aspx.designer.cs">
       <DependentUpon>calendarform.aspx.cs</DependentUpon>
@@ -180,12 +183,14 @@ iisreset</PostDeploymentCommand>
     </Compile>
     <Compile Include="Layouts\ppm\Calendars.aspx.cs">
       <DependentUpon>Calendars.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\ppm\Calendars.aspx.designer.cs">
       <DependentUpon>Calendars.aspx.cs</DependentUpon>
     </Compile>
     <Compile Include="Layouts\ppm\Calendars_NAX.aspx.cs">
       <DependentUpon>Calendars_NAX.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\ppm\Calendars_NAX.aspx.designer.cs">
       <DependentUpon>Calendars_NAX.aspx.cs</DependentUpon>
@@ -206,6 +211,7 @@ iisreset</PostDeploymentCommand>
     </Compile>
     <Compile Include="Layouts\ppm\costanalyzer.aspx.cs">
       <DependentUpon>costanalyzer.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\ppm\costanalyzer.aspx.designer.cs">
       <DependentUpon>costanalyzer.aspx.cs</DependentUpon>
@@ -215,24 +221,28 @@ iisreset</PostDeploymentCommand>
     </Compile>
     <Compile Include="Layouts\ppm\CostCategories.aspx.cs">
       <DependentUpon>CostCategories.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\ppm\CostCategories.aspx.designer.cs">
       <DependentUpon>CostCategories.aspx.cs</DependentUpon>
     </Compile>
     <Compile Include="Layouts\ppm\CostCategories_NAX.aspx.cs">
       <DependentUpon>CostCategories_NAX.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\ppm\CostCategories_NAX.aspx.designer.cs">
       <DependentUpon>CostCategories_NAX.aspx.cs</DependentUpon>
     </Compile>
     <Compile Include="Layouts\ppm\CostCategoryRoles.aspx.cs">
       <DependentUpon>CostCategoryRoles.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\ppm\CostCategoryRoles.aspx.designer.cs">
       <DependentUpon>CostCategoryRoles.aspx.cs</DependentUpon>
     </Compile>
     <Compile Include="Layouts\ppm\costs.aspx.cs">
       <DependentUpon>costs.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\ppm\costs.aspx.designer.cs">
       <DependentUpon>costs.aspx.cs</DependentUpon>
@@ -242,6 +252,7 @@ iisreset</PostDeploymentCommand>
     </Compile>
     <Compile Include="Layouts\ppm\CostTypeCustomFields.aspx.cs">
       <DependentUpon>CostTypeCustomFields.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\ppm\CostTypeCustomFields.aspx.designer.cs">
       <DependentUpon>CostTypeCustomFields.aspx.cs</DependentUpon>
@@ -251,12 +262,14 @@ iisreset</PostDeploymentCommand>
     </Compile>
     <Compile Include="Layouts\ppm\Costtypes.aspx.cs">
       <DependentUpon>Costtypes.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\ppm\Costtypes.aspx.designer.cs">
       <DependentUpon>Costtypes.aspx.cs</DependentUpon>
     </Compile>
     <Compile Include="Layouts\ppm\CostTypes_NAX.aspx.cs">
       <DependentUpon>CostTypes_NAX.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\ppm\CostTypes_NAX.aspx.designer.cs">
       <DependentUpon>CostTypes_NAX.aspx.cs</DependentUpon>
@@ -266,18 +279,21 @@ iisreset</PostDeploymentCommand>
     </Compile>
     <Compile Include="Layouts\ppm\Costviews.aspx.cs">
       <DependentUpon>Costviews.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\ppm\Costviews.aspx.designer.cs">
       <DependentUpon>Costviews.aspx.cs</DependentUpon>
     </Compile>
     <Compile Include="Layouts\ppm\Costviews_NAX.aspx.cs">
       <DependentUpon>Costviews_NAX.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\ppm\Costviews_NAX.aspx.designer.cs">
       <DependentUpon>Costviews_NAX.aspx.cs</DependentUpon>
     </Compile>
     <Compile Include="Layouts\ppm\CustomFieldForm.aspx.cs">
       <DependentUpon>CustomFieldForm.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\ppm\CustomFieldForm.aspx.designer.cs">
       <DependentUpon>CustomFieldForm.aspx.cs</DependentUpon>
@@ -287,18 +303,21 @@ iisreset</PostDeploymentCommand>
     </Compile>
     <Compile Include="Layouts\ppm\Customfields.aspx.cs">
       <DependentUpon>Customfields.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\ppm\Customfields.aspx.designer.cs">
       <DependentUpon>Customfields.aspx.cs</DependentUpon>
     </Compile>
     <Compile Include="Layouts\ppm\Customfields_NAX.aspx.cs">
       <DependentUpon>Customfields_NAX.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\ppm\Customfields_NAX.aspx.designer.cs">
       <DependentUpon>Customfields_NAX.aspx.cs</DependentUpon>
     </Compile>
     <Compile Include="Layouts\ppm\CVAdmin.aspx.cs">
       <DependentUpon>CVAdmin.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\ppm\CVAdmin.aspx.designer.cs">
       <DependentUpon>CVAdmin.aspx.cs</DependentUpon>
@@ -308,24 +327,28 @@ iisreset</PostDeploymentCommand>
     </Compile>
     <Compile Include="Layouts\ppm\DBAdmin.aspx.cs">
       <DependentUpon>DBAdmin.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\ppm\DBAdmin.aspx.designer.cs">
       <DependentUpon>DBAdmin.aspx.cs</DependentUpon>
     </Compile>
     <Compile Include="Layouts\ppm\DBAdmin_NAX.aspx.cs">
       <DependentUpon>DBAdmin_NAX.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\ppm\DBAdmin_NAX.aspx.designer.cs">
       <DependentUpon>DBAdmin_NAX.aspx.cs</DependentUpon>
     </Compile>
     <Compile Include="Layouts\ppm\DBALog.aspx.cs">
       <DependentUpon>DBALog.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\ppm\DBALog.aspx.designer.cs">
       <DependentUpon>DBALog.aspx.cs</DependentUpon>
     </Compile>
     <Compile Include="Layouts\ppm\DBAPIs.aspx.cs">
       <DependentUpon>DBAPIs.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\ppm\DBAPIs.aspx.designer.cs">
       <DependentUpon>DBAPIs.aspx.cs</DependentUpon>
@@ -335,18 +358,21 @@ iisreset</PostDeploymentCommand>
     </Compile>
     <Compile Include="Layouts\ppm\DBAResources.aspx.cs">
       <DependentUpon>DBAResources.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\ppm\DBAResources.aspx.designer.cs">
       <DependentUpon>DBAResources.aspx.cs</DependentUpon>
     </Compile>
     <Compile Include="Layouts\ppm\DBATables.aspx.cs">
       <DependentUpon>DBATables.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\ppm\DBATables.aspx.designer.cs">
       <DependentUpon>DBATables.aspx.cs</DependentUpon>
     </Compile>
     <Compile Include="Layouts\ppm\details.aspx.cs">
       <DependentUpon>details.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\ppm\details.aspx.designer.cs">
       <DependentUpon>details.aspx.cs</DependentUpon>
@@ -367,6 +393,7 @@ iisreset</PostDeploymentCommand>
     </Compile>
     <Compile Include="Layouts\ppm\EditList.aspx.cs">
       <DependentUpon>EditList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\ppm\EditList.aspx.designer.cs">
       <DependentUpon>EditList.aspx.cs</DependentUpon>
@@ -379,6 +406,7 @@ iisreset</PostDeploymentCommand>
     </Compile>
     <Compile Include="Layouts\ppm\gotopage.aspx.cs">
       <DependentUpon>gotopage.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\ppm\gotopage.aspx.designer.cs">
       <DependentUpon>gotopage.aspx.cs</DependentUpon>
@@ -392,6 +420,7 @@ iisreset</PostDeploymentCommand>
     </Compile>
     <Compile Include="Layouts\ppm\grouppermissionform.aspx.cs">
       <DependentUpon>grouppermissionform.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\ppm\grouppermissionform.aspx.designer.cs">
       <DependentUpon>grouppermissionform.aspx.cs</DependentUpon>
@@ -401,12 +430,14 @@ iisreset</PostDeploymentCommand>
     </Compile>
     <Compile Include="Layouts\ppm\Grouppermissions.aspx.cs">
       <DependentUpon>Grouppermissions.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\ppm\Grouppermissions.aspx.designer.cs">
       <DependentUpon>Grouppermissions.aspx.cs</DependentUpon>
     </Compile>
     <Compile Include="Layouts\ppm\grouppermissions_NAX.aspx.cs">
       <DependentUpon>grouppermissions_NAX.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\ppm\grouppermissions_NAX.aspx.designer.cs">
       <DependentUpon>grouppermissions_NAX.aspx.cs</DependentUpon>
@@ -416,18 +447,21 @@ iisreset</PostDeploymentCommand>
     </Compile>
     <Compile Include="Layouts\ppm\Lookups.aspx.cs">
       <DependentUpon>Lookups.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\ppm\Lookups.aspx.designer.cs">
       <DependentUpon>Lookups.aspx.cs</DependentUpon>
     </Compile>
     <Compile Include="Layouts\ppm\Lookups_NAX.aspx.cs">
       <DependentUpon>Lookups_NAX.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\ppm\Lookups_NAX.aspx.designer.cs">
       <DependentUpon>Lookups_NAX.aspx.cs</DependentUpon>
     </Compile>
     <Compile Include="Layouts\ppm\ManageLists.aspx.cs">
       <DependentUpon>ManageLists.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\ppm\ManageLists.aspx.designer.cs">
       <DependentUpon>ManageLists.aspx.cs</DependentUpon>
@@ -441,12 +475,14 @@ iisreset</PostDeploymentCommand>
     </Compile>
     <Compile Include="Layouts\ppm\modeler.aspx.cs">
       <DependentUpon>modeler.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\ppm\modeler.aspx.designer.cs">
       <DependentUpon>modeler.aspx.cs</DependentUpon>
     </Compile>
     <Compile Include="Layouts\ppm\Modelgrouping.aspx.cs">
       <DependentUpon>Modelgrouping.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\ppm\Modelgrouping.aspx.designer.cs">
       <DependentUpon>Modelgrouping.aspx.cs</DependentUpon>
@@ -456,18 +492,21 @@ iisreset</PostDeploymentCommand>
     </Compile>
     <Compile Include="Layouts\ppm\Models.aspx.cs">
       <DependentUpon>Models.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\ppm\Models.aspx.designer.cs">
       <DependentUpon>Models.aspx.cs</DependentUpon>
     </Compile>
     <Compile Include="Layouts\ppm\Models_NAX.aspx.cs">
       <DependentUpon>Models_NAX.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\ppm\Models_NAX.aspx.designer.cs">
       <DependentUpon>Models_NAX.aspx.cs</DependentUpon>
     </Compile>
     <Compile Include="Layouts\ppm\NoPerm.aspx.cs">
       <DependentUpon>NoPerm.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\ppm\NoPerm.aspx.designer.cs">
       <DependentUpon>NoPerm.aspx.cs</DependentUpon>
@@ -481,6 +520,7 @@ iisreset</PostDeploymentCommand>
     </Compile>
     <Compile Include="Layouts\ppm\optimizer.aspx.cs">
       <DependentUpon>optimizer.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\ppm\optimizer.aspx.designer.cs">
       <DependentUpon>optimizer.aspx.cs</DependentUpon>
@@ -490,18 +530,21 @@ iisreset</PostDeploymentCommand>
     </Compile>
     <Compile Include="Layouts\ppm\PFEFileImport.aspx.cs">
       <DependentUpon>PFEFileImport.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\ppm\PFEFileImport.aspx.designer.cs">
       <DependentUpon>PFEFileImport.aspx.cs</DependentUpon>
     </Compile>
     <Compile Include="Layouts\ppm\PFEFileImportStatus.aspx.cs">
       <DependentUpon>PFEFileImportStatus.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\ppm\PFEFileImportStatus.aspx.designer.cs">
       <DependentUpon>PFEFileImportStatus.aspx.cs</DependentUpon>
     </Compile>
     <Compile Include="Layouts\ppm\Postcostoptions.aspx.cs">
       <DependentUpon>Postcostoptions.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\ppm\Postcostoptions.aspx.designer.cs">
       <DependentUpon>Postcostoptions.aspx.cs</DependentUpon>
@@ -511,24 +554,28 @@ iisreset</PostDeploymentCommand>
     </Compile>
     <Compile Include="Layouts\ppm\Postcostvalues.aspx.cs">
       <DependentUpon>Postcostvalues.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\ppm\Postcostvalues.aspx.designer.cs">
       <DependentUpon>Postcostvalues.aspx.cs</DependentUpon>
     </Compile>
     <Compile Include="Layouts\ppm\PostCostValues_NAX.aspx.cs">
       <DependentUpon>PostCostValues_NAX.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\ppm\PostCostValues_NAX.aspx.designer.cs">
       <DependentUpon>PostCostValues_NAX.aspx.cs</DependentUpon>
     </Compile>
     <Compile Include="Layouts\ppm\Prioritization.aspx.cs">
       <DependentUpon>Prioritization.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\ppm\Prioritization.aspx.designer.cs">
       <DependentUpon>Prioritization.aspx.cs</DependentUpon>
     </Compile>
     <Compile Include="Layouts\ppm\prioritize.aspx.cs">
       <DependentUpon>prioritize.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\ppm\prioritize.aspx.designer.cs">
       <DependentUpon>prioritize.aspx.cs</DependentUpon>
@@ -538,18 +585,21 @@ iisreset</PostDeploymentCommand>
     </Compile>
     <Compile Include="Layouts\ppm\Queuemanager.aspx.cs">
       <DependentUpon>Queuemanager.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\ppm\Queuemanager.aspx.designer.cs">
       <DependentUpon>Queuemanager.aspx.cs</DependentUpon>
     </Compile>
     <Compile Include="Layouts\ppm\Queuemanager_NAX.aspx.cs">
       <DependentUpon>Queuemanager_NAX.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\ppm\Queuemanager_NAX.aspx.designer.cs">
       <DependentUpon>Queuemanager_NAX.aspx.cs</DependentUpon>
     </Compile>
     <Compile Include="Layouts\ppm\Ratelist.aspx.cs">
       <DependentUpon>Ratelist.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\ppm\Ratelist.aspx.designer.cs">
       <DependentUpon>Ratelist.aspx.cs</DependentUpon>
@@ -559,12 +609,14 @@ iisreset</PostDeploymentCommand>
     </Compile>
     <Compile Include="Layouts\ppm\Rates_NAX.aspx.cs">
       <DependentUpon>Rates_NAX.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\ppm\Rates_NAX.aspx.designer.cs">
       <DependentUpon>Rates_NAX.aspx.cs</DependentUpon>
     </Compile>
     <Compile Include="Layouts\ppm\Resourcerates.aspx.cs">
       <DependentUpon>Resourcerates.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\ppm\Resourcerates.aspx.designer.cs">
       <DependentUpon>Resourcerates.aspx.cs</DependentUpon>
@@ -578,18 +630,21 @@ iisreset</PostDeploymentCommand>
     </Compile>
     <Compile Include="Layouts\ppm\RPAdmin.aspx.cs">
       <DependentUpon>RPAdmin.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\ppm\RPAdmin.aspx.designer.cs">
       <DependentUpon>RPAdmin.aspx.cs</DependentUpon>
     </Compile>
     <Compile Include="Layouts\ppm\RPAdmin_NAX.aspx.cs">
       <DependentUpon>RPAdmin_NAX.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\ppm\RPAdmin_NAX.aspx.designer.cs">
       <DependentUpon>RPAdmin_NAX.aspx.cs</DependentUpon>
     </Compile>
     <Compile Include="Layouts\ppm\rpanalyzer.aspx.cs">
       <DependentUpon>rpanalyzer.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\ppm\rpanalyzer.aspx.designer.cs">
       <DependentUpon>rpanalyzer.aspx.cs</DependentUpon>
@@ -599,12 +654,14 @@ iisreset</PostDeploymentCommand>
     </Compile>
     <Compile Include="Layouts\ppm\RPCustomfields.aspx.cs">
       <DependentUpon>RPCustomfields.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\ppm\RPCustomfields.aspx.designer.cs">
       <DependentUpon>RPCustomfields.aspx.cs</DependentUpon>
     </Compile>
     <Compile Include="Layouts\ppm\RPCustomFields_NAX.aspx.cs">
       <DependentUpon>RPCustomFields_NAX.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\ppm\RPCustomFields_NAX.aspx.designer.cs">
       <DependentUpon>RPCustomFields_NAX.aspx.cs</DependentUpon>
@@ -618,72 +675,84 @@ iisreset</PostDeploymentCommand>
     </Compile>
     <Compile Include="Layouts\ppm\rpeditor.aspx.cs">
       <DependentUpon>rpeditor.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\ppm\rpeditor.aspx.designer.cs">
       <DependentUpon>rpeditor.aspx.cs</DependentUpon>
     </Compile>
     <Compile Include="Layouts\ppm\RPTestData.aspx.cs">
       <DependentUpon>RPTestData.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\ppm\RPTestData.aspx.designer.cs">
       <DependentUpon>RPTestData.aspx.cs</DependentUpon>
     </Compile>
     <Compile Include="Layouts\ppm\RPView.aspx.cs">
       <DependentUpon>RPView.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\ppm\RPView.aspx.designer.cs">
       <DependentUpon>RPView.aspx.cs</DependentUpon>
     </Compile>
     <Compile Include="Layouts\ppm\savesession.aspx.cs">
       <DependentUpon>savesession.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\ppm\savesession.aspx.designer.cs">
       <DependentUpon>savesession.aspx.cs</DependentUpon>
     </Compile>
     <Compile Include="Layouts\ppm\settings.aspx.cs">
       <DependentUpon>settings.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\ppm\settings.aspx.designer.cs">
       <DependentUpon>settings.aspx.cs</DependentUpon>
     </Compile>
     <Compile Include="Layouts\ppm\SetupPPM.aspx.cs">
       <DependentUpon>SetupPPM.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\ppm\SetupPPM.aspx.designer.cs">
       <DependentUpon>SetupPPM.aspx.cs</DependentUpon>
     </Compile>
     <Compile Include="Layouts\ppm\setupstatus.aspx.cs">
       <DependentUpon>setupstatus.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\ppm\setupstatus.aspx.designer.cs">
       <DependentUpon>setupstatus.aspx.cs</DependentUpon>
     </Compile>
     <Compile Include="Layouts\ppm\SPResourceFieldMapping.aspx.cs">
       <DependentUpon>SPResourceFieldMapping.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\ppm\SPResourceFieldMapping.aspx.designer.cs">
       <DependentUpon>SPResourceFieldMapping.aspx.cs</DependentUpon>
     </Compile>
     <Compile Include="Layouts\ppm\SPTimerStatus.aspx.cs">
       <DependentUpon>SPTimerStatus.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\ppm\SPTimerStatus.aspx.designer.cs">
       <DependentUpon>SPTimerStatus.aspx.cs</DependentUpon>
     </Compile>
     <Compile Include="Layouts\ppm\SPViewLog.aspx.cs">
       <DependentUpon>SPViewLog.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\ppm\SPViewLog.aspx.designer.cs">
       <DependentUpon>SPViewLog.aspx.cs</DependentUpon>
     </Compile>
     <Compile Include="Layouts\ppm\TestPage.aspx.cs">
       <DependentUpon>TestPage.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\ppm\TestPage.aspx.designer.cs">
       <DependentUpon>TestPage.aspx.cs</DependentUpon>
     </Compile>
     <Compile Include="Layouts\ppm\TestSingleSite.aspx.cs">
       <DependentUpon>TestSingleSite.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\ppm\TestSingleSite.aspx.designer.cs">
       <DependentUpon>TestSingleSite.aspx.cs</DependentUpon>
@@ -718,12 +787,14 @@ iisreset</PostDeploymentCommand>
     </Compile>
     <Compile Include="Layouts\ppm\upgradedb.aspx.cs">
       <DependentUpon>upgradedb.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\ppm\upgradedb.aspx.designer.cs">
       <DependentUpon>upgradedb.aspx.cs</DependentUpon>
     </Compile>
     <Compile Include="Layouts\ppm\workitems.aspx.cs">
       <DependentUpon>workitems.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\ppm\workitems.aspx.designer.cs">
       <DependentUpon>workitems.aspx.cs</DependentUpon>

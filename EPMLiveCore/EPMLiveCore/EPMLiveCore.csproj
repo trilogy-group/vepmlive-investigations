@@ -3433,6 +3433,7 @@
     <Content Include="Layouts\epmlive\images\integration\status2.gif" />
     <Content Include="Layouts\epmlive\images\integration\status3.gif" />
     <Content Include="Layouts\epmlive\images\integration\tenrox.png" />
+    <Content Include="Layouts\epmlive\images\integration\TFS.png" />
     <Content Include="Layouts\epmlive\images\iReportsLibrary.png" />
     <Content Include="Layouts\epmlive\images\itemworkspace.png" />
     <Content Include="Layouts\epmlive\images\ittask.png" />
