@@ -210,7 +210,7 @@ namespace PortfolioEngineCore
                         {
                             int bcuid = DBAccess.ReadIntValue(row["BA_BC_UID"]);
                             int prdid = DBAccess.ReadIntValue(row["BA_PRD_ID"]);
-                            double oldrate = DBAccess.ReadIntValue(row["BA_RATE"]);
+                            double oldrate = DBAccess.ReadDoubleValue(row["BA_RATE"]);
 
                             if (periodrates.ContainsKey(prdid))
                             {
