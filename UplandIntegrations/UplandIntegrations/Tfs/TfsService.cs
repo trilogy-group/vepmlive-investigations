@@ -315,17 +315,8 @@ namespace UplandIntegrations.Tfs
                         case WebServiceLevel.Tfs2010:
                             return string.Format("{0}/web/UI/Pages/WorkItems/WorkItemEdit.aspx?id={1}", tfsConfigurationServer.Uri.AbsoluteUri, id);
                             break;
-                        case WebServiceLevel.Tfs2012:
-                        case WebServiceLevel.Tfs2012_1:
-                        case WebServiceLevel.Tfs2012_2:
-                        case WebServiceLevel.Tfs2012_3:
-                            return string.Format("{0}/{1}/{2}/_workItems#id={3}", tfsConfigurationServer.Uri.AbsoluteUri, projectCollection, workItems[0].Project.Name, id);
-                            break;
-                        case WebServiceLevel.Unknown:
-                            return "";
-                            break;
                         default:
-                            return "";
+                            return string.Format("{0}/{1}/{2}/_workItems#id={3}", tfsConfigurationServer.Uri.AbsoluteUri, projectCollection, workItems[0].Project.Name, id);
                             break;
                     }
                 }
