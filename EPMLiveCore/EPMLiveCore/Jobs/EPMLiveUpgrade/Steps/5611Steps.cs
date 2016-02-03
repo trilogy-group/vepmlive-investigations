@@ -51,12 +51,13 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
                                         using (
                                             var cmd1 =
                                                 new SqlCommand(
-                                                    "DELETE intm FROM INT_MODULES intm LEFT JOIN  dbo.INT_LISTS intl on intl.MODULE_ID = intm.MODULE_ID WHERE intl.INT_LIST_ID is null AND intm.MODULE_ID <> 'B0950B9B-3525-40B8-A456-6403156DC003'",
+                                                    "DELETE intm FROM INT_MODULES intm LEFT JOIN  dbo.INT_LISTS intl on intl.MODULE_ID = intm.MODULE_ID WHERE intl.INT_LIST_ID is null AND intm.MODULE_ID <> @module_Id;DELETE FROM INT_CATEGORY where INT_CAT_ID <> '7B2EE2FD-9A59-4CCA-B3AD-1E8A3017DC60'",
                                                     sqlConnection))
                                         {
+                                            cmd1.Parameters.AddWithValue("@module_Id", moduleId);
                                             cmd1.ExecuteNonQuery();
                                             LogMessage(
-                                                "Integrations other than TFS removed successfully.",
+                                                "Unused Integrations removed successfully.",
                                                 MessageKind.SUCCESS, 4);
                                         }
                                     }

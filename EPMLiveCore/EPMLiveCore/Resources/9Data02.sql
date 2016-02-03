@@ -386,6 +386,7 @@ begin
     UPDATE INT_MODULES SET NetAssembly='UplandIntegrations, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5', NetClass='UplandIntegrations.Tfs.TfsIntegrator', [Title]='TFS', Description='Connect to Team Foundation Server', Icon='tfs.png', CustomProps='<Properties><Connection><Input Type="Text" Property="ServerUrl" Title="Tfs Server Url" /><Input Type="Text" Property="Username" Title="Username" /><Input Type="Password" Property="Password" Title="Password" /><Input Type="Checkbox" Property="UseBasicAuthentication" Title="Use Basic Authentication" /></Connection><General><Input Type="Select" Property="TeamProjectCollection" Title="Project Collection" /><Input Type="Select" Property="Object" Title="Object" /></General></Properties>', AvailableOnline='True',INT_CAT_ID='7b2ee2fd-9a59-4cca-b3ad-1e8a3017dc60' where MODULE_ID='b0950b9b-3525-40b8-a456-6403156dc003'
 end
 
+/*
 if not exists (select INT_CAT_ID from INT_CATEGORY where INT_CAT_ID = '599c89b2-6330-4e54-aea5-00185f20cce0')
 begin
     INSERT INTO INT_CATEGORY (INT_CAT_ID,CATEGORY,ICON,ORDERBY) VALUES ('599c89b2-6330-4e54-aea5-00185f20cce0','Upland','upland.png','1')
@@ -394,6 +395,8 @@ else
 begin
     UPDATE INT_CATEGORY SET CATEGORY='Upland', ICON='upland.png', ORDERBY='1' where INT_CAT_ID='599c89b2-6330-4e54-aea5-00185f20cce0'
 end
+*/
+
 if not exists (select INT_CAT_ID from INT_CATEGORY where INT_CAT_ID = '7b2ee2fd-9a59-4cca-b3ad-1e8a3017dc60')
 begin
     INSERT INTO INT_CATEGORY (INT_CAT_ID,CATEGORY,ICON,ORDERBY) VALUES ('7b2ee2fd-9a59-4cca-b3ad-1e8a3017dc60','3rd Party','','2')
@@ -402,6 +405,8 @@ else
 begin
     UPDATE INT_CATEGORY SET CATEGORY='3rd Party', ICON='', ORDERBY='2' where INT_CAT_ID='7b2ee2fd-9a59-4cca-b3ad-1e8a3017dc60'
 end
+
+/*
 if not exists (select INT_CAT_ID from INT_CATEGORY where INT_CAT_ID = '960be444-30f5-4a97-8721-5a210b286dad')
 begin
     INSERT INTO INT_CATEGORY (INT_CAT_ID,CATEGORY,ICON,ORDERBY) VALUES ('960be444-30f5-4a97-8721-5a210b286dad','Generic','','3')
@@ -410,6 +415,7 @@ else
 begin
     UPDATE INT_CATEGORY SET CATEGORY='Generic', ICON='', ORDERBY='3' where INT_CAT_ID='960be444-30f5-4a97-8721-5a210b286dad'
 end
+*/
 
 if not exists (select jobtype_id from TIMERJOBTYPES where jobtype_id = 25) 
 begin 
