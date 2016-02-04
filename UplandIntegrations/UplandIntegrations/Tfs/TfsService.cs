@@ -315,17 +315,8 @@ namespace UplandIntegrations.Tfs
                         case WebServiceLevel.Tfs2010:
                             return string.Format("{0}/web/UI/Pages/WorkItems/WorkItemEdit.aspx?id={1}", tfsConfigurationServer.Uri.AbsoluteUri, id);
                             break;
-                        case WebServiceLevel.Tfs2012:
-                        case WebServiceLevel.Tfs2012_1:
-                        case WebServiceLevel.Tfs2012_2:
-                        case WebServiceLevel.Tfs2012_3:
-                            return string.Format("{0}/{1}/{2}/_workItems#id={3}", tfsConfigurationServer.Uri.AbsoluteUri, projectCollection, workItems[0].Project.Name, id);
-                            break;
-                        case WebServiceLevel.Unknown:
-                            return "";
-                            break;
                         default:
-                            return "";
+                            return string.Format("{0}/{1}/{2}/_workItems#id={3}", tfsConfigurationServer.Uri.AbsoluteUri, projectCollection, workItems[0].Project.Name, id);
                             break;
                     }
                 }
@@ -392,6 +383,17 @@ namespace UplandIntegrations.Tfs
                 {
                     workItems[0].Open();
                     FillWorkItemFromDataRow(workItems[0], item, dataColumns);
+                    ArrayList fields = workItems[0].Validate();
+                    if (fields.Count > 0)
+                    {
+                        StringBuilder error = new StringBuilder();
+                        error.Append(string.Format("{0} {1}", "The value(s) assigned to the following field(s) are not valid:", Environment.NewLine));
+                        foreach (Field field in fields)
+                        {
+                            error.Append(string.Format("[{0}] {1} ", field.Name, Environment.NewLine));
+                        }
+                        throw new Exception(error.ToString());
+                    }
                     workItems[0].Save();
                 }
             }
