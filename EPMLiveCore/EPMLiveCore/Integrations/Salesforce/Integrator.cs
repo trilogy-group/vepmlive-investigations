@@ -215,7 +215,6 @@ namespace EPMLiveCore.Integrations.Salesforce
             catch (Exception e)
             {
                 message = e.Message;
-                return true;
             }
 
             return true;
