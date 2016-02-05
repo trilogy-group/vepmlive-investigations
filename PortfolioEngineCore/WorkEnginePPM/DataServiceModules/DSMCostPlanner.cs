@@ -948,7 +948,7 @@ namespace WorkEnginePPM.DataServiceModules
         {
 
             Int32 percentage = (_processedRecords == 0 ? 0 : (_processedRecords * 100) / _totalRecords);
-            _dSMResult.CurrentProcess = (percentage == 100 ? "Import Completed. Check the log for more details." : currentProcess);
+            _dSMResult.CurrentProcess = (percentage == 100 ? "Import completed. Check the log for more details." : currentProcess);
             _dSMResult.TotalRecords = _totalRecords;
             _dSMResult.ProcessedRecords = _processedRecords;
             _dSMResult.SuccessRecords = _successRecords;
@@ -959,7 +959,7 @@ namespace WorkEnginePPM.DataServiceModules
 
         private void RaiseDSMCompletedEvent(Exception exception)
         {
-            _dSMResult.CurrentProcess = String.Format("Import Completed{0}. Check the log for more details.", exception == null ? "" : " with errors");
+            _dSMResult.CurrentProcess = String.Format("Import completed{0}. Check the log for more details.", exception == null ? "" : " with errors");
             _dSMResult.TotalRecords = _totalRecords;
             _dSMResult.ProcessedRecords = _processedRecords;
             _dSMResult.SuccessRecords = _successRecords;
