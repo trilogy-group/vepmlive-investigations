@@ -139,7 +139,7 @@ namespace EPMLiveWebParts
                     SPField oField = null;
                     try
                     {
-                        if(sCol == "FState")
+                        if (sCol == "FState")
                             oField = list.Fields.GetFieldByInternalName("State");
                         else
                             oField = list.Fields.GetFieldByInternalName(sCol);
@@ -240,7 +240,7 @@ namespace EPMLiveWebParts
                 SPField oField = null;
                 try
                 {
-                    if(nd.Attributes["Name"].Value == "FState")
+                    if (nd.Attributes["Name"].Value == "FState")
                         oField = list.Fields.GetFieldByInternalName("State");
                     else
                         oField = list.Fields.GetFieldByInternalName(nd.Attributes["Name"].Value);
@@ -394,7 +394,7 @@ namespace EPMLiveWebParts
                     SPField oField = null;
                     try
                     {
-                        if(sCol == "FState")
+                        if (sCol == "FState")
                             oField = list.Fields.GetFieldByInternalName("State");
                         else
                             oField = list.Fields.GetFieldByInternalName(sCol);
@@ -434,7 +434,7 @@ namespace EPMLiveWebParts
                                 attr = doc.CreateAttribute(sCol + "Format");
                                 attr.Value = sFormat;
                                 nd.Attributes.Append(attr);
-                            }                            
+                            }
                             if (sRange != "")
                             {
                                 attr = doc.CreateAttribute(sCol + "Range");
@@ -480,7 +480,15 @@ namespace EPMLiveWebParts
                             string.Format(",0.{0}", new string('0', numberFormatInfo.CurrencyDecimalDigits)));
                     return "Float";
                 case SPFieldType.Note:
-                    return "Lines";
+                    SPFieldMultiLineText field = (SPFieldMultiLineText)oField;
+                    if (field.RichText)
+                    {
+                        return "Html";
+                    }
+                    else
+                    {
+                        return "Lines";
+                    }
                 case SPFieldType.Number:
                     string percentageSign = string.Empty;
 

@@ -275,7 +275,7 @@ namespace EPMLiveWebParts
                                                 FillPeopleDetailsSection(field.Title, Convert.ToString(item[field.InternalName]));
                                                 break;
                                             case SPFieldType.Note:
-                                                FillNarrativeDetailsSection(field.Title, field.GetFieldValueAsText(item[field.InternalName]));
+                                                FillNarrativeDetailsSection(field.Title, field.GetFieldValueAsHtml(item[field.InternalName]));
                                                 break;
                                             default:
                                                 FillQuickDetailsSection(field, item);
@@ -301,7 +301,7 @@ namespace EPMLiveWebParts
                                         FillPeopleDetailsSection(field.Title, Convert.ToString(item[field.InternalName]));
                                         break;
                                     case SPFieldType.Note:
-                                        FillNarrativeDetailsSection(field.Title, field.GetFieldValueAsText(item[field.InternalName]));
+                                        FillNarrativeDetailsSection(field.Title, field.GetFieldValueAsHtml(item[field.InternalName]));
                                         break;
                                     default:
                                         FillQuickDetailsSection(field, item);

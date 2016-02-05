@@ -7,6 +7,7 @@ using Microsoft.SharePoint;
 using System.Collections;
 using System.Text.RegularExpressions;
 using System.Globalization;
+using System.Web;
 
 namespace EPMLiveWebParts
 {
@@ -168,7 +169,7 @@ namespace EPMLiveWebParts
                                 attr.Value = sFormat.Replace(nInfo.CurrencySymbol, string.Empty);
                                 ndNew.Attributes.Append(attr);
                             }
-                        }                        
+                        }
                         else
                         {
                             attr = doc.CreateAttribute("EditFormat");
@@ -176,7 +177,7 @@ namespace EPMLiveWebParts
                             ndNew.Attributes.Append(attr);
                         }
 
-                        
+
                     }
 
                     if (oField.InternalName == "Edit")
@@ -257,7 +258,7 @@ namespace EPMLiveWebParts
                                     attr.Value = "Right";
                                     sTitleAlign = "Right";
                                     ndNew.Attributes.Append(attr);
-                                    if(oFC.OutputType == SPFieldType.DateTime)
+                                    if (oFC.OutputType == SPFieldType.DateTime)
                                         sType = "Date";
                                     else
                                         sType = "Float";
@@ -649,6 +650,8 @@ namespace EPMLiveWebParts
                         if (value.ToLower() == "true")
                             return "1";
                         return "0";
+                    case SPFieldType.Note:
+                        return HttpUtility.HtmlDecode(value);
                     default:
                         switch (oField.TypeAsString)
                         {
