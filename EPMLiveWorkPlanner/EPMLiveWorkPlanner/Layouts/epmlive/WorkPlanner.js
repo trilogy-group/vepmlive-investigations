@@ -267,6 +267,7 @@ function RollupSummaryField(Col) {
                         newCol = "Finish";
 
                     Grids.ProjectInfo.SetValue(Grids.ProjectInfo.GetRowById(newCol), "V", Grids.WorkPlannerGrid.GetValue(Grids.WorkPlannerGrid.GetRowById("0"), Col), 1);
+                    Grids.ProjectInfo.SetValue(Grids.ProjectInfo.GetRowById("Start"), "V", Grids.WorkPlannerGrid.GetValue(Grids.WorkPlannerGrid.GetRowById("0"), "StartDate"), 1);
                 } catch (e) { }
             }
         }
