@@ -2430,7 +2430,7 @@ function LinkDown(type, lag) {
     var row = null;
 
     for (var i = rows.length - 1; i >= 0; i--) {
-        if (rows[i].Def.Name != "Assignment" && rows[i].Def.Name != "Summary") {
+        if (rows[i].Def.Name != "Assignment" || rows[i].Def.Name != "Summary") {
             if (parent == null) {
                 parent = rows[i];
             }
