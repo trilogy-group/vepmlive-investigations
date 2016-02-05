@@ -175,14 +175,13 @@ namespace EPMLiveCore.Integrations.Salesforce
                                              bool.Parse((string) webProps.Properties["AllowAddList"]),
                                              bool.Parse((string) webProps.Properties["AllowDeleteInt"]));
 
-                return true;
             }
             catch (Exception e)
             {
                 message = e.Message;
+                return false;
             }
-
-            return false;
+            return true;
         }
 
         public DataTable PullData(WebProperties webProps, IntegrationLog log, DataTable items, DateTime lastSynch)
@@ -212,14 +211,14 @@ namespace EPMLiveCore.Integrations.Salesforce
                 SfService sfService = GetSfService(webProps);
                 sfService.UninstallIntegration(integrationKey, webProps.Properties["Object"].ToString());
 
-                return true;
             }
             catch (Exception e)
             {
                 message = e.Message;
+                return true;
             }
 
-            return false;
+            return true;
         }
 
         public bool TestConnection(WebProperties webProps, IntegrationLog log, out string message)
