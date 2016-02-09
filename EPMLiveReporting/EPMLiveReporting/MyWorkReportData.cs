@@ -158,30 +158,19 @@ namespace EPMLiveReportsAdmin
                     allUsers.AddRange(spFieldUserValueCollection.Select(userValue => userValue.User.Name));
                 }
                 catch { }
+                                
+                SPListItem item = spListItem;
+                //item["AssignedTo"] = string.Format("-99;#{0}", string.Join(", ", allUsers.Distinct()));
+                item["AssignedTo"] = "-99;#";
 
-                var isAssignment = false;
+                string allValues =
+                    AddColumnValues(item, columns, defaultColumns, mandatoryHiddenFlds, "insert", string.Join(", ", allUsers.Distinct()))
+                        .Replace("'", string.Empty);
 
-                try
-                {
-                    isAssignment = (bool)spListItem["IsAssignment"];
-                }
-                catch { }
+                AddMetaInfoCols(listName, item, ref allCols, ref allValues);
 
-                if (!isAssignment)
-                {
-                    SPListItem item = spListItem;
-                    //item["AssignedTo"] = string.Format("-99;#{0}", string.Join(", ", allUsers.Distinct()));
-                    item["AssignedTo"] = "-99;#";
-
-                    string allValues =
-                        AddColumnValues(item, columns, defaultColumns, mandatoryHiddenFlds, "insert", string.Join(", ", allUsers.Distinct()))
-                            .Replace("'", string.Empty);
-
-                    AddMetaInfoCols(listName, item, ref allCols, ref allValues);
-
-                    stringBuilder.AppendLine(string.Format(@"INSERT INTO {0} {1} {2}", tableName, allCols, allValues));
-                }
-
+                stringBuilder.AppendLine(string.Format(@"INSERT INTO {0} {1} {2}", tableName, allCols, allValues));
+                
                 spListItem["AssignedTo"] = spFieldUserValueCollection;
 
                 if (totalAssignedToUsers > 0 && spFieldCollection.ContainsFieldWithInternalName("Work"))
