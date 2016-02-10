@@ -1181,7 +1181,7 @@ namespace WorkEnginePPM
 
             WebAdmin.CapturePFEBaseInfo(out basePath, out username, out ppmId, out ppmCompany, out ppmDbConn,
                                         out securityLevel);
-            string sBaseInfo = WebAdmin.BuildBaseInfo(Context);
+            string sBaseInfo = WebAdmin.BuildBaseInfo(Context);          
             try
             {
                 PortfolioEngineCore.Capacity capacity = new PortfolioEngineCore.Capacity(sBaseInfo);
@@ -1191,7 +1191,8 @@ namespace WorkEnginePPM
                 string sReplyMessage = "";
                 int StartID = 1;
                 int CalID = 1;
-
+                string sDispMode = RAData.GetDisplayMode();                
+                
                 capacity.GetRVInfo(sParmXML, out sReplyXML, out sReplyMessage);
 
                 clsResourceValues resValues = new clsResourceValues();
@@ -1208,6 +1209,8 @@ namespace WorkEnginePPM
                     newRPA.GrabRAData(resValues, "", resValues.ResExamView, StartID, CalID, sParmXML, out sReplyMessage);
 
                     newRPA.SetCalledFromResources(RAData.GetCalledFromResources());
+
+                    string setDispMode = SetRAWorkDisplayMode(this.Context, sDispMode, newRPA);
 
                     string rpkey = GetRPSessionKey();
 
