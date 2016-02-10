@@ -179,7 +179,8 @@ namespace EPMLiveCore
 
                             DataTable dt = web.GetSiteData(query);
 
-                            lstListDataToDelete.Add(list.Title, dt);
+                            if (dt != null && dt.Rows.Count > 0)
+                                lstListDataToDelete.Add(list.Title, dt);
                         }
                     }
                     if (fieldname != "")
