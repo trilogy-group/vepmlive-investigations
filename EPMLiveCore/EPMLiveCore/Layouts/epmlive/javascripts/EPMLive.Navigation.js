@@ -1590,10 +1590,22 @@
                     };
 
                     var $wsMenu = $('#epm-nav-sub-workspaces');
-
+                    var isHovered = false;
                     $('#EPMNavWorkspacesTree').hover(function () {
+                        isHovered = true;
                         if (!window.epmLiveNavigation.wsTreeExpanded) {
                             expandWorkspaceMenu();
+                        }
+                    }, function () {
+                        collapseWorkspaceTree();
+                    });
+
+                    $sb.hover(function () {
+                        if (!window.epmLiveNavigation.wsTreeExpanded) {
+                            if (isHovered) {
+                                expandWorkspaceMenu();
+                                isHovered = false;
+                            }
                         }
                     }, function () {
                         collapseWorkspaceTree();
