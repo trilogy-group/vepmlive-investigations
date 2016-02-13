@@ -765,25 +765,25 @@
             dhxTabbar.setImagePath("dhtml/xtab/imgs/");
             dhxTabbar.setSkin("dhx_skyblue");
 
-            dhxTabbar.addTab("t1", "<img src='/_layouts/epmlive/images/details16.gif' alt='Details'/>", "30px");
+            dhxTabbar.addTab("t1", "<span class='task-detail-icons icon-pencil-5'></span>", "30px");
             dhxTabbar.setContent("t1", "detailDiv");
 
             document.getElementById("assignmentsDiv").style.display="";
 
-            dhxTabbar.addTab("t2", "<img src='/_layouts/epmlive/images/showassignments.gif' alt='Assignments'/>", "30px");
+            dhxTabbar.addTab("t2", "<span class='task-detail-icons icon-users-4'></span>", "30px");
             dhxTabbar.setContent("t2", "assignmentsDiv");
 
             document.getElementById("linksDiv").style.display="";
 
-            dhxTabbar.addTab("t3", "<img src='/_layouts/epmlive/images/link.gif' alt='Task Successors'/>", "30px");
+            dhxTabbar.addTab("t3", "<span class='task-detail-icons icon-link-2'></span>", "30px");
             dhxTabbar.setContent("t3", "linksDiv");
 
             document.getElementById("notesDiv").style.display="";
 
-            dhxTabbar.addTab("t5", "<img src='/_layouts/epmlive/images/notes16.png' alt='Task Notes'/>", "30px");
+            dhxTabbar.addTab("t5", "<span class='task-detail-icons icon-file-2'></span>", "30px");
             dhxTabbar.setContent("t5", "notesDiv");
 
-            dhxTabbar.addTab("t4", "<img src='/_layouts/images/ENTITYPICKER.png' alt='Project Information'/>", "30px");
+            dhxTabbar.addTab("t4", "<span class='task-detail-icons icon-notebook'></span>", "30px");
             dhxTabbar.setContent("t4", "projectMainDiv");
 
             dhxTabbar.setTabActive("t4");
