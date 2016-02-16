@@ -113,7 +113,14 @@ namespace EPMLiveWebParts
             output.Write("</td></tr><tr><td>");
 
             output.Write("Default Control:<br>");
-            output.Write("<select id=\"ddlDefaultControl" + this.ID + "\" name=\"ddlDefaultControl" + this.ID + "\"><option value=\"Grid\">Grid</option><option value=\"Gantt\">Gantt</option></select>");
+            if (myWP.PropDefaultControl.ToLower() == "gantt")
+            {
+                output.Write("<select id=\"ddlDefaultControl" + this.ID + "\" name=\"ddlDefaultControl" + this.ID + "\"><option value=\"Grid\">Grid</option><option value=\"Gantt\" selected=\"selected\">Gantt</option></select>");
+            }
+            else
+            {
+                output.Write("<select id=\"ddlDefaultControl" + this.ID + "\" name=\"ddlDefaultControl" + this.ID + "\"><option value=\"Grid\" selected=\"selected\">Grid</option><option value=\"Gantt\">Gantt</option></select>");
+            }
             output.Write("</td></tr><tr><td>");
             output.Write("<input type=\"checkbox\" name=\"chkUseDefaults" + this.ID + "\" id=\"chkUseDefaults" + this.ID + "\"");
             if (myWP.PropUseDefaults.Value)
