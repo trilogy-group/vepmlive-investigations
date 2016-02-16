@@ -12,6 +12,7 @@ using System.Security.Cryptography.X509Certificates;
 using Microsoft.SharePoint.Navigation;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
+using System.IO;
 
 namespace EPMLiveCore.API
 {
@@ -691,9 +692,6 @@ namespace EPMLiveCore.API
 
         public static void GenerateQuickLaunchFromApp(SPWeb web)
         {
-            //SPQuery query = new SPQuery();
-            //query.Query = "<Where><Eq><FieldRef Name='Visible'/><Value Type=\"Boolean\">1</Value></Eq></Where>";
-
             SPList list = web.Lists.TryGetList("Installed Applications");
 
             if (list != null)
@@ -734,39 +732,58 @@ namespace EPMLiveCore.API
 
                     if (hshQuickLaunch.Count > 0)
                     {
-                        ClearNav(web.Navigation.QuickLaunch);
-
                         foreach (DictionaryEntry de in hshQuickLaunch)
                         {
-                            string IDs = "";
-                            SPListItem li = list.GetItemById(int.Parse(de.Key.ToString()));
+                            SPListItem li = list.GetItemById(int.Parse(Convert.ToString(de.Key)));
+                            List<String> ids = new List<String>();
+                            XmlDocument xmlDoc = new XmlDocument();
+                            xmlDoc.LoadXml(Convert.ToString(de.Value));
 
-                            XmlDocument doc = new XmlDocument();
-                            doc.LoadXml(de.Value.ToString());
+                            XmlNodeList xnList = xmlDoc.SelectNodes("/QuickLaunch/Nav");
 
-                            BuildNav(web.Navigation.QuickLaunch, doc.FirstChild, ref IDs, web);
+                            foreach (XmlNode xn in xnList)
+                            {
+                                foreach (SPNavigationNode nd in web.Navigation.QuickLaunch)
+                                {
+                                    if (nd.Title == xn.Attributes["name"].Value && Path.GetFileName(nd.Url) == Path.GetFileName(xn.Attributes["url"].Value))
+                                    {
+                                        string appid = getAttribute(xn, "AppId");
+                                        ids.Add(nd.Id + ((appid != "") ? ":" + appid : ""));
+                                        break;
+                                    }
+                                }
+                            }
 
-                            li["QuickLaunch"] = IDs.Trim(',');
+                            li["QuickLaunch"] = String.Join(",", ids.ToArray());
                             li.Update();
                         }
-
                     }
 
                     if (hshTopNav.Count > 0)
                     {
-                        ClearNav(web.Navigation.TopNavigationBar);
-
-                        foreach (DictionaryEntry de in hshQuickLaunch)
+                        foreach (DictionaryEntry de in hshTopNav)
                         {
-                            string IDs = "";
-                            SPListItem li = list.GetItemById(int.Parse(de.Key.ToString()));
+                            SPListItem li = list.GetItemById(int.Parse(Convert.ToString(de.Key)));
+                            List<String> ids = new List<String>();
+                            XmlDocument xmlDoc = new XmlDocument();
+                            xmlDoc.LoadXml(Convert.ToString(de.Value));
 
-                            XmlDocument doc = new XmlDocument();
-                            doc.LoadXml(de.Value.ToString());
+                            XmlNodeList xnList = xmlDoc.SelectNodes("/TopNav/Nav");
 
-                            BuildNav(web.Navigation.TopNavigationBar, doc.FirstChild, ref IDs, web);
+                            foreach (XmlNode xn in xnList)
+                            {
+                                foreach (SPNavigationNode nd in web.Navigation.QuickLaunch)
+                                {
+                                    if (nd.Title == xn.Attributes["name"].Value && Path.GetFileName(nd.Url) == Path.GetFileName(xn.Attributes["url"].Value))
+                                    {
+                                        string appid = getAttribute(xn, "AppId");
+                                        ids.Add(nd.Id + ((appid != "") ? ":" + appid : ""));
+                                        break;
+                                    }
+                                }
+                            }
 
-                            li["TopNav"] = IDs.Trim(',');
+                            li["TopNav"] = String.Join(",", ids.ToArray());
                             li.Update();
                         }
                     }
