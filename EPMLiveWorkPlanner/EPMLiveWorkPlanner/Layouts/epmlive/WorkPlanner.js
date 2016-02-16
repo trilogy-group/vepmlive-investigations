@@ -697,7 +697,10 @@ function RollupAssignments(Row, Col, Type) {
                 if (def == "Assignment") {
 
                     try {
-                        sum += grid.GetValue(oChild, Col);
+                         var work = grid.GetValue(oChild, Col);
+                         if (work != "") {
+                             sum += parseFloat(work);
+                         }
                     } catch (e) { }
                 }
 
