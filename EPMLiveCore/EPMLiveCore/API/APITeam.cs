@@ -929,42 +929,59 @@ namespace EPMLiveCore.API
                     }
                 }
 
-                foreach (SPRoleAssignment role in li.RoleAssignments)
+                SPSecurity.RunWithElevatedPrivileges(delegate()
                 {
-                    try
+                    using (SPSite spSite = new SPSite(web.Site.ID))
                     {
-                        if (role.Member.GetType() == typeof(SPGroup))
+                        using (SPWeb spWeb = spSite.OpenWeb(web.ID))
                         {
-                            SPGroup group = (SPGroup)role.Member;
-                            SPUser tempuser = null;
-
-                            if (!additionalPermissions.Contains(Convert.ToString(group.ID)))
+                            spWeb.AllowUnsafeUpdates = true;
+                            SPUser spUser = spWeb.EnsureUser(uv.User.LoginName);
+                            if (spUser != null)
                             {
-                                if (lookupsSecurityGroups != null && lookupsSecurityGroups.Contains(group.Name))
-                                {
-                                    continue;
-                                }
-                                else
+                                foreach (SPRoleAssignment role in li.RoleAssignments)
                                 {
                                     try
                                     {
-                                        tempuser = group.Users.GetByID(uv.LookupId);
+                                        if (role.Member.GetType() == typeof(SPGroup))
+                                        {
+                                            SPGroup group = spWeb.Groups.GetByID(role.Member.ID);
+                                            SPUser tempuser = null;
+
+                                            if (group != null)
+                                            {
+                                                if (!additionalPermissions.Contains(Convert.ToString(group.ID)))
+                                                {
+                                                    if (lookupsSecurityGroups != null && lookupsSecurityGroups.Contains(group.Name))
+                                                    {
+                                                        continue;
+                                                    }
+                                                    else
+                                                    {
+                                                        try
+                                                        {
+                                                            tempuser = group.Users.GetByID(spUser.ID);
+                                                        }
+                                                        catch { }
+                                                        if (tempuser == null && arr.Contains(group.ID.ToString()))
+                                                        {
+                                                            group.AddUser(spUser);
+                                                        }
+                                                        if (tempuser != null && !arr.Contains(group.ID.ToString()) && bIsTeamSecurityEnabled)
+                                                        {
+                                                            group.RemoveUser(spUser);
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
                                     }
                                     catch { }
-                                    if (tempuser == null && arr.Contains(group.ID.ToString()))
-                                    {
-                                        group.AddUser(uv.User);
-                                    }
-                                    if (tempuser != null && !arr.Contains(group.ID.ToString()) && bIsTeamSecurityEnabled)
-                                    {
-                                        group.RemoveUser(uv.User);
-                                    }
                                 }
                             }
                         }
                     }
-                    catch { }
-                }
+                });
 
                 //foreach(SPGroup group in web.Groups)
                 //{
@@ -1634,7 +1651,7 @@ namespace EPMLiveCore.API
                             {
                                 if (!field.Hidden && field.Reorderable)
                                 {
-                                    if (field.InternalName != "Title" && field.InternalName != "Permissions")                                    
+                                    if (field.InternalName != "Title" && field.InternalName != "Permissions")
                                     {
                                         ndNew = docOut.CreateNode(XmlNodeType.Element, "C", docOut.NamespaceURI);
                                         attr = docOut.CreateAttribute("Name");
@@ -1855,13 +1872,13 @@ namespace EPMLiveCore.API
                     nd = doc.SelectSingleNode("//C[@Name='Role']");
                     if (nd != null)
                     {
-                        nd.Attributes["Visible"].Value = "1";                        
+                        nd.Attributes["Visible"].Value = "1";
                     }
 
                     nd = doc.SelectSingleNode("//C[@Name='Email']");
                     if (nd != null)
                     {
-                        nd.Attributes["Visible"].Value = "1";                        
+                        nd.Attributes["Visible"].Value = "1";
                     }
 
                     string enums = "";

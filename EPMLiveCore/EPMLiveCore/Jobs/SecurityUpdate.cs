@@ -464,6 +464,37 @@ namespace EPMLiveCore.Jobs
                             SPRoleAssignment assign = new SPRoleAssignment(g);
                             assign.RoleDefinitionBindings.Add(r);
                             AddNewItemLvlPerm(eI, ew, assign);
+
+                            //Adding users with Full Control permission levels to Owners group.
+                            if (r.Type == SPRoleType.Administrator) //Full Control Permission Level
+                            {
+                                //Add users to Owners group.
+                                SPUserCollection groupUsers = g.Users;
+
+                                foreach (SPRoleAssignment role in eI.RoleAssignments)
+                                {
+                                    try
+                                    {
+                                        if (role.Member.GetType() == typeof(SPGroup))
+                                        {
+                                            SPGroup group = (SPGroup)role.Member;
+                                            if (group.Name.EndsWith("Owner"))
+                                            {
+                                                try
+                                                {
+                                                    foreach (SPUser user in groupUsers)
+                                                    {
+                                                        group.AddUser(user);
+                                                    }
+                                                    group.Update();
+                                                }
+                                                catch { }
+                                            }
+                                        }
+                                    }
+                                    catch { }
+                                }
+                            }
                         }
                         else
                         {
