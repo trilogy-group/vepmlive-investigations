@@ -6,8 +6,8 @@
 	Location="Microsoft.SharePoint.SiteSettings"
 	Sequence="10"
 	Title="Build Team">
-		<UrlAction Url="_layouts/epmlive/People.aspx" />
-	</CustomAction>
+    <UrlAction Url="SitePages/Resource Pool.aspx" />
+  </CustomAction>
 
 	<!--<CustomAction
 		  Id="EPMLive.ResourceTools"
