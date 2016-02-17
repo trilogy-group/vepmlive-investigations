@@ -44,6 +44,35 @@ namespace PortfolioEngineCore
             }
             return bRet;
         }
+
+        public static string CheckUserPermissionForProject(DBAccess dba, int ProjectID, out string sStatus)
+        {
+            sStatus = string.Empty;
+            bool bSuperPIM = Security.CheckUserGlobalPermission(dba, dba.UserWResID, GlobalPermissionsEnum.gpSuperPIM);
+            if (bSuperPIM == false) 
+            {
+                int nValidCount = 0;
+                string sCommand = "SELECT PROJECT_ID, PROJECT_EXT_UID, PROJECT_NAME FROM EPGP_PROJECTS" +
+                 " LEFT JOIN EPG_DELEGATES SU ON SURR_CONTEXT = 4 AND SURR_CONTEXT_VALUE = PROJECT_ID" +
+                 " WHERE PROJECT_MARKED_DELETION = 0 AND (PROJECT_MANAGER = " + dba.UserWResID.ToString("0") + " OR SU.SURR_WRES_ID = " + dba.UserWResID.ToString("0") + ")" +
+                 " AND PROJECT_ID = " + ProjectID + "  ORDER BY PROJECT_NAME";
+
+                SqlCommand oCommand = new SqlCommand(sCommand, dba.Connection, dba.Transaction);
+                SqlDataReader reader = null;
+                reader = oCommand.ExecuteReader();
+                while (reader.Read())
+                {
+                    nValidCount++;
+                }
+                reader.Close();
+                if (nValidCount == 0)
+                {
+                    sStatus = "You do not have permission to view the selected project(s)";
+                }
+            }
+            return sStatus;
+        }
+
         public static string CreateTicket(DBAccess dba, string sData)
         {
             try

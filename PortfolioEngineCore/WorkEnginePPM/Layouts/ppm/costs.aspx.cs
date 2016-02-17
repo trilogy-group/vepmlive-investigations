@@ -48,7 +48,9 @@ namespace WorkEnginePPM
             }
             else
             {
+                Session["itemid"] = null;
                 sTitle = "Cost Planner - " + HelperFunctions.getProjectNameFromUID(Request["itemid"]);
+                Session["itemid"] = Request["itemid"];
 
                 SPList list = Web.Lists[new Guid(sListId)];
 

@@ -60,6 +60,22 @@ namespace WorkEnginePPM
                 {
                     sStatus = "You do not have permission to view cost plan";
                 }
+                string sMessage = string.Empty;
+                int ProjectID = 0;
+                string sWEPID = string.Empty;
+                try
+                {
+                    sWEPID = Convert.ToString(Session["itemid"]);
+                    dbaEditCosts.SelectProjectIDByExtUID(dba, sWEPID, out ProjectID);
+                    if (ProjectID > 0)
+                    {
+                        if (dbaGeneral.CheckUserPermissionForProject(dba, ProjectID, out sMessage) != "")
+                        {
+                            sStatus = sMessage;
+                        }
+                    }
+                }
+                catch { }
                 dba.Close();
             }
             else
@@ -426,7 +442,8 @@ Exit_Function:
                     dba.StatusText = "Project not found for WEPID " + Wepid;
                     goto Status_Error;
                 }
-
+                
+                
                 DateTime dtStart;
                 DateTime dtFinish;
                 if (dbaEditCosts.GetProjectInfo(dba, Projectid, out dtStart, out dtFinish) != StatusEnum.rsSuccess) goto Status_Error;
@@ -490,6 +507,7 @@ Exit_Function:
                 oGrid.FinalizeGridLayout();
                 string sXML = oGrid.GetString();
                 dba.Close();
+                Session["itemid"] = null;
                 return sXML;
             }
             else
