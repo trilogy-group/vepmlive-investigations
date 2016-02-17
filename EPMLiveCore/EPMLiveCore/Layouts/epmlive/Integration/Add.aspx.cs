@@ -30,11 +30,17 @@ namespace EPMLiveCore.Layouts.epmlive.Integration
                 {
                     sb.Append("<div class=\"header-wrapper\">");
                     sb.Append("<h4>" + drCat["CATEGORY"].ToString() + "</h4>");
-                    sb.Append("</div>");
-                    sb.Append("<div style=\"width:100%;overflow: hidden;\">");
+                    sb.Append("</div>"); 
+                    sb.Append("<div style=\"width:100%;overflow: hidden;padding-bottom:30px;\">");
                     
 
                     DataTable dtMods = dsIntegrations.Tables[drCat["INT_CAT_ID"].ToString()];
+
+                    if (dtMods.Rows.Count == 0)
+                    {
+                        sb.Append("<div style=\"text-align:left;\">No integration modules available</div>");
+                    }
+                    
                     foreach(DataRow dr in dtMods.Rows)
                     {
                         sb.Append("<div style=\"width:270px;float:left;padding-right:20px\">");

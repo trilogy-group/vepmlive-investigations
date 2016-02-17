@@ -31,9 +31,9 @@
             <TBODY>
                 <TR>
                     <%if(Request["ret"] == "Manage"){ %>
-                    <TD style="PADDING-BOTTOM: 3px" class=ms-addnew><A id=A2 class=ms-addnew href="manage.aspx">Cancel</A> </TD>
+                    <TD style="PADDING-BOTTOM: 3px;text-align:right;" class=ms-addnew><A id=A2 class=ms-addnew href="manage.aspx">Cancel</A> </TD>
                     <%}else{ %>
-                    <TD style="PADDING-BOTTOM: 3px" class=ms-addnew><A id=A1 class=ms-addnew href="integrationlist.aspx?LIST=<%=Request["LIST"] %>">Cancel</A> </TD>
+                    <TD style="PADDING-BOTTOM: 3px;text-align:right;" class=ms-addnew><A id=A1 class=ms-addnew href="integrationlist.aspx?LIST=<%=Request["LIST"] %>">Cancel</A> </TD>
                     <%} %>
                 </TR>
             </TBODY>
