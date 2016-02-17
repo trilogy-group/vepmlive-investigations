@@ -1874,9 +1874,6 @@
     };
     RPEditor.prototype.GridsOnAfterValueChanged = function (grid, row, col, val) {
         if (grid.id == "g_RPE") {
-            var tipMain = "";
-            var tipPM = "";
-            var tipRM = "";
             var sType = col.substring(0, 1);
             if (sType == "Q") {
                 var status = grid.GetAttribute(row, null, "Status");
@@ -1889,31 +1886,22 @@
                     if (resuid == null) resuid = grid.GetAttribute(row, null, "Res_UID");
                     var resrow = this.FindResourceRow(resuid);
                     var periodid = col.substring(1);
-
+                    this.CalculateResourceRowPeriodCommitted(resuid, resrow, periodid, true, row);
+                    var reqrow = this.GetParentRequirement(row);
+                    if (reqrow != null) {
+                        this.CalculateRequirementCellValue(reqrow, periodid, 0);
+                        var s = this.GetFormattedPeriodCell(grid, reqrow, col, true, false);
+                        grid.SetAttribute(reqrow, null, col, s, 1, 0);
+                        grid.SetAttribute(reqrow, null, "Changed", 1, 0, 0);
+                    }
                     this.SetStatusAfterValueChanged(grid, row, false);
-                    if (this.NegotiationMode == true) {
-                        tipMain = this.plangrid.GetAttribute(row, null, "RowStatusTip");
-                        tipPM = this.plangrid.GetAttribute(row, null, "RowPMStatusTip");
-                        tipRM = this.plangrid.GetAttribute(row, null, "RowRMStatusTip");
-                    }
-
-                    if ((tipMain == "" || tipMain == "Active Commitment") || (tipPM == "Accepted" && tipRM == "Accepted") || (tipPM == "Rejected" && tipRM == "Rejected")) {
-                        this.CalculateResourceRowPeriodCommitted(resuid, resrow, periodid, true, row);
-                        var reqrow = this.GetParentRequirement(row);
-                        if (reqrow != null) {
-                            this.CalculateRequirementCellValue(reqrow, periodid, 0);
-                            var s = this.GetFormattedPeriodCell(grid, reqrow, col, true, false);
-                            grid.SetAttribute(reqrow, null, col, s, 1, 0);
-                            grid.SetAttribute(reqrow, null, "Changed", 1, 0, 0);
-                        }
-                    }
-
                 }
             }
         }
 
         this.UpdateButtonsAsync();
     };
+
     RPEditor.prototype.SetStatusAfterValueChanged = function (grid, row, bNewRow) {
         var rowPrivate = grid.GetAttribute(row, null, "Private");
         if (rowPrivate != 1) {
@@ -4951,20 +4939,6 @@
                 this.HandleRowEvent(row, "PMStatusRejected");
                 break;
         }
-        var tipMain = "";
-        var tipPM = "";
-        var tipRM = "";
-        if (this.NegotiationMode == true) {
-            tipMain = this.plangrid.GetAttribute(row, null, "RowStatusTip");
-            tipPM = this.plangrid.GetAttribute(row, null, "RowPMStatusTip");
-            tipRM = this.plangrid.GetAttribute(row, null, "RowRMStatusTip");
-        }
-        if ((tipMain == "" || tipMain == "Active Commitment") || (tipPM == "Accepted" && tipRM == "Accepted") || (tipPM == "Rejected" && tipRM == "Rejected")) {
-            var resuid = this.plangrid.GetAttribute(row, null, "PendingRes_UID");
-            if (resuid == null) resuid = this.plangrid.GetAttribute(row, null, "Res_UID");
-            var resrow = this.FindResourceRow(resuid);
-            this.CalculateResourceRowCommitted(resuid, resrow, true);
-        }
         return true;
     };
     RPEditor.prototype.SetPMStatusColumn = function (grid, row, changed0Or1) {
@@ -5018,20 +4992,6 @@
             case 2:
                 this.HandleRowEvent(row, "RMStatusRejected");
                 break;
-        }
-        var tipMain = "";
-        var tipPM = "";
-        var tipRM = "";
-        if (this.NegotiationMode == true) {
-            tipMain = this.plangrid.GetAttribute(row, null, "RowStatusTip");
-            tipPM = this.plangrid.GetAttribute(row, null, "RowPMStatusTip");
-            tipRM = this.plangrid.GetAttribute(row, null, "RowRMStatusTip");
-        }
-        if ((tipMain == "" || tipMain == "Active Commitment") || (tipPM == "Accepted" && tipRM == "Accepted") || (tipPM == "Rejected" && tipRM == "Rejected")) {
-            var resuid = this.plangrid.GetAttribute(row, null, "PendingRes_UID");
-            if (resuid == null) resuid = this.plangrid.GetAttribute(row, null, "Res_UID");
-            var resrow = this.FindResourceRow(resuid);
-            this.CalculateResourceRowCommitted(resuid, resrow, true);
         }
         return true;
     };
@@ -5328,14 +5288,6 @@
             var planresuid = plangrid.GetAttribute(row, null, "PendingRes_UID");
             if (planresuid == null) planresuid = plangrid.GetAttribute(row, null, "Res_UID");
             if (resuid == planresuid) {
-                var tipMain = "";
-                var tipPM = "";
-                var tipRM = "";
-                if (this.NegotiationMode == true) {
-                    tipMain = this.plangrid.GetAttribute(row, null, "RowStatusTip");
-                    tipPM = this.plangrid.GetAttribute(row, null, "RowPMStatusTip");
-                    tipRM = this.plangrid.GetAttribute(row, null, "RowRMStatusTip");
-                }
                 var lHours = this.GetIntValue(plangrid.GetAttribute(row, null, "H" + periodid), 0);
                 var deleted = plangrid.GetAttribute(row, null, "Deleted");
                 if (deleted == 1) {
@@ -5343,11 +5295,8 @@
                         deltaC -= this.GetIntValue(this.GetPeriodHoursSpecial(plangrid, row, "H" + periodid), 0);
                     else
                         deltaC -= lHours;
-                }
-                else {
-                    if ((tipMain == "" || tipMain == "Active Commitment") || (tipPM == "Accepted" && tipRM == "Accepted")) {
-                        deltaC += this.GetIntValue(this.GetPeriodHoursSpecial(plangrid, row, "H" + periodid), 0) - lHours;
-                    }
+                } else {
+                    deltaC += this.GetIntValue(this.GetPeriodHoursSpecial(plangrid, row, "H" + periodid), 0) - lHours;
                 }
             }
             row = plangrid.GetNext(row);
