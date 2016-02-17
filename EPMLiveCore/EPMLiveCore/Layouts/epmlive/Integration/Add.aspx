@@ -21,7 +21,7 @@
 
 <asp:Content ID="Main" ContentPlaceHolderID="PlaceHolderMain" runat="server">
 
-<table align="center" id="integrations-table">
+<table align="left" id="integrations-table">
     <tr>
         <td>
             
