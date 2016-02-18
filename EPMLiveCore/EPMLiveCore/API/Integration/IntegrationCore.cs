@@ -269,10 +269,11 @@ namespace EPMLiveCore.API.Integration
             OpenConnection();
 
             string sql = "";
-            if (bOnline)
+            //if (bOnline)
+            //    sql = "SELECT * FROM INT_MODULES WHERE AvailableOnline = 1 AND INT_CAT_ID=@cat";
+            //else
+            //    sql = "SELECT * FROM INT_MODULES WHERE INT_CAT_ID=@cat";
                 sql = "SELECT * FROM INT_MODULES WHERE AvailableOnline = 1 AND INT_CAT_ID=@cat";
-            else
-                sql = "SELECT * FROM INT_MODULES WHERE INT_CAT_ID=@cat";
 
             DataSet dsCats = new DataSet();
             SqlCommand cmd = new SqlCommand("SELECT * FROM INT_CATEGORY ORDER BY ORDERBY", cn);
