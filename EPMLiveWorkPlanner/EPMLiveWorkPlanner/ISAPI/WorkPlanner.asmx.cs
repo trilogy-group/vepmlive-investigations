@@ -4566,7 +4566,7 @@ namespace EPMLiveWorkPlanner
                 case SPFieldType.DateTime:
                     try
                     {
-                        format = System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.ShortDatePattern;                        
+                        format = System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.ShortDatePattern;
                     }
                     catch { }
                     EditFormat = format + " HH:mm";
@@ -5158,8 +5158,12 @@ namespace EPMLiveWorkPlanner
 
                 try
                 {
-                    SPList holidaySchedulesList = web.Lists["Holiday Schedules"];
-                    SPList holidaysList = web.Lists["Holidays"];
+                    SPList holidaySchedulesList = web.Lists.TryGetList("Holiday Schedules");
+                    if (holidaySchedulesList == null)
+                        holidaySchedulesList = web.Site.RootWeb.Lists["Holiday Schedules"];
+                    SPList holidaysList = web.Lists.TryGetList("Holidays");
+                    if (holidaysList == null)
+                        holidaysList = web.Site.RootWeb.Lists["Holidays"];
 
                     SPQuery spQueryHolidaySchedulesList = new SPQuery();
                     SPListItemCollection defaultHolidaySchedules = null;
@@ -5255,8 +5259,12 @@ namespace EPMLiveWorkPlanner
 
                         try
                         {
-                            SPList holidaySchedulesList = web.Lists["Holiday Schedules"];
-                            SPList holidaysList = web.Lists["Holidays"];
+                            SPList holidaySchedulesList = web.Lists.TryGetList("Holiday Schedules");
+                            if (holidaySchedulesList == null)
+                                holidaySchedulesList = site.RootWeb.Lists["Holiday Schedules"];
+                            SPList holidaysList = web.Lists.TryGetList("Holidays");
+                            if (holidaysList == null)
+                                holidaysList = site.RootWeb.Lists["Holidays"];
 
                             SPQuery spQueryHolidaySchedulesList = new SPQuery();
                             SPListItemCollection defaultHolidaySchedules = null;
