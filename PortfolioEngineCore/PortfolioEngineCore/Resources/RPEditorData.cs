@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Xml;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace PortfolioEngineCore
 {
@@ -316,7 +317,7 @@ namespace PortfolioEngineCore
                         sColIDName = xField.GetStringAttr("Title");
                         if (!string.IsNullOrEmpty(sColIDName))
                         {
-                            sColIDName = sColIDName.Replace(" ", "_");
+                            sColIDName = Regex.Replace(sColIDName, "[^a-zA-Z]+", "_"); 
                         }
                         break;
                     default:
@@ -471,7 +472,7 @@ namespace PortfolioEngineCore
                                     if (portfolioFieldsForProject.ContainsKey(sColIDName))
                                     {
                                         var sValue = portfolioFieldsForProject[sColIDName];
-                                        var sColIdNameWithouSpace = sColIDName.Replace(" ", "_");
+                                        var sColIdNameWithouSpace = Regex.Replace(sColIDName, "[^a-zA-Z]+", "_");
                                         xI.CreateStringAttr(sColIdNameWithouSpace, sValue);
                                     }
                                 }
