@@ -33,7 +33,7 @@ function setupPage(records, UseReporting, PageSize, grid, startpage) {
 
 
     if (UseReporting) {
-        if (pages > 1) {
+        if (pages >= 1) {
             if (!grid.bPageSetup) {
                 grid.bPageSetup = true;
 
@@ -57,8 +57,8 @@ function setupPage(records, UseReporting, PageSize, grid, startpage) {
                 });
 
             }
-            viewalldiv.style.display = "";
-            pagetable.style.display = "";
+                viewalldiv.style.display = "";
+                pagetable.style.display = "";
         }
         else {
             viewalldiv.style.display = "none";
