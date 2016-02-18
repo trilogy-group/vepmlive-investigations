@@ -1647,7 +1647,7 @@ namespace EPMLiveEnterprise
                 }
                 else
                 {
-                    return rDs.Resources[0].RES_NAME;
+                    return Convert.ToString(drRes[0]["RES_NAME"]);
                 }
             }
             else
