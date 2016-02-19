@@ -9,7 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Xml;
-using Utilities=WorkEnginePPM.Core.ResourceManagement.Utilities;
+using Utilities = WorkEnginePPM.Core.ResourceManagement.Utilities;
 
 namespace WorkEnginePPM.DataServiceModules
 {
@@ -400,7 +400,8 @@ namespace WorkEnginePPM.DataServiceModules
 
                     if (calendarId == 0 || projectId == 0 || costTypeId == 0)
                     {
-                        DataRow[] invalidRows = _dtInsertCostData.Select(string.Format("calendarid={0} and calendarname='{1}' and projectid={2} and projectname='{3}' and costtypeid={4} and costtypename='{5}'", calendarId, calendarValue, projectId, projectValue, costTypeId, costTypeValue));
+                        DataRow[] invalidRows = (from dr in _dtInsertCostData.AsEnumerable() where dr.Field<Int32>("calendarid") == calendarId && dr.Field<string>("calendarname") == calendarValue && dr.Field<Int32>("projectid") == projectId && dr.Field<string>("projectname") == projectValue && dr.Field<Int32>("costtypeid") == costTypeId && dr.Field<string>("costtypename") == costTypeValue select dr).ToArray();
+
                         if (invalidRows != null && invalidRows.Count() > 0)
                         {
                             _processedRecords = _processedRecords + invalidRows.Count();
@@ -658,7 +659,7 @@ namespace WorkEnginePPM.DataServiceModules
                     break;
                 case colProject:
                     _dvProjects.RowFilter = String.Empty;
-                    _dvProjects.RowFilter = string.Format("project_ext_uid like ('{0}.{1}%') and project_name='{2}'", _spWeb.ID, foreignKeyId, columnValue);
+                    _dvProjects.RowFilter = string.Format("project_ext_uid like ('{0}.{1}%') and project_name='{2}'", _spWeb.ID, foreignKeyId, columnValue.Replace("'", "''"));
                     if (_dvProjects.Count > 0)
                     {
                         returnValue = Convert.ToInt32(_dvProjects[0]["project_id"]);
