@@ -77,6 +77,17 @@ namespace EPMLiveCore
                                 }
                             }catch{}
 
+                            try
+                            {
+                                SPFieldUserValueCollection uvc = new SPFieldUserValueCollection(properties.Web, li["Project Manager"].ToString());
+                                foreach (SPFieldUserValue u in uvc)
+                                {
+                                    if (!arr.Contains(u.LookupId))
+                                        arr.Add(u.LookupId);
+                                }
+                            }
+                            catch { }
+
                             Hashtable hshProps = new Hashtable();
                             hshProps.Add("ProjectName", li.Title);
                             hshProps.Add("ListId", list.ID.ToString());
