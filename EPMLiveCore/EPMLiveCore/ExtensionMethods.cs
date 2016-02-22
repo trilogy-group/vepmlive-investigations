@@ -576,37 +576,40 @@ namespace EPMLiveCore
 
             int days = now.Day - dateTime.Day;
 
+            string dateFormatPattern = System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.ShortDatePattern;
+            string timeFormatPattern = System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.LongTimePattern;
+
             switch (days)
             {
                 case 1:
-                    friendlyDate = "Yesterday at " + new DateTime(dateTime.TimeOfDay.Ticks).ToString("hh:mm:ss tt");
+                    friendlyDate = "Yesterday at " + new DateTime(dateTime.TimeOfDay.Ticks).ToString(timeFormatPattern);
                     break;
                 case 0:
-                    friendlyDate = "Today at " + new DateTime(dateTime.TimeOfDay.Ticks).ToString("hh:mm:ss tt");
+                    friendlyDate = "Today at " + new DateTime(dateTime.TimeOfDay.Ticks).ToString(timeFormatPattern);
                     break;
                 case -1:
-                    friendlyDate = "Tomorrow at " + new DateTime(dateTime.TimeOfDay.Ticks).ToString("hh:mm:ss tt");
+                    friendlyDate = "Tomorrow at " + new DateTime(dateTime.TimeOfDay.Ticks).ToString(timeFormatPattern);
                     break;
                 default:
                 {
                     TimeSpan lastWeekTimeSpan = lastWeek - dateTime;
 
                     if (lastWeekTimeSpan.Days > 0)
-                        friendlyDate = dateTime.ToString("M/dd/yyyy") + " at " + dateTime.ToString("hh:mm:ss tt");
+                        friendlyDate = dateTime.ToString(dateFormatPattern) + " at " + dateTime.ToString(timeFormatPattern);
                     else
                     {
                         TimeSpan thisWeekTimeSpan = thisWeek - dateTime;
-
+                        
                         if (lastWeekTimeSpan.Days <= 0 && thisWeekTimeSpan.Days > 0)
                             friendlyDate = "Last " + dateTime.DayOfWeek + " at " +
-                                           new DateTime(dateTime.TimeOfDay.Ticks).ToString("hh:mm:ss tt");
+                                           new DateTime(dateTime.TimeOfDay.Ticks).ToString(timeFormatPattern);
                         else
                         {
                             TimeSpan nowTimeSpan = now - dateTime;
 
                             if (nowTimeSpan.Days > 0 && thisWeekTimeSpan.Days <= 0)
                                 friendlyDate = dateTime.DayOfWeek + " at " +
-                                               new DateTime(dateTime.TimeOfDay.Ticks).ToString("hh:mm:ss tt");
+                                               new DateTime(dateTime.TimeOfDay.Ticks).ToString(timeFormatPattern);
                             else
                             {
                                 TimeSpan nextWeekTimeSpan = nextWeek - dateTime;
@@ -614,13 +617,13 @@ namespace EPMLiveCore
                                 //if (nowTimeSpan.Days < 0 && nextWeekTimeSpan.Days > 0)
                                 if (dateTime > now && dateTime <= now.AddDays(7))
                                     friendlyDate = "This " + dateTime.DayOfWeek + " at " +
-                                                   new DateTime(dateTime.TimeOfDay.Ticks).ToString("hh:mm:ss tt");
+                                                   new DateTime(dateTime.TimeOfDay.Ticks).ToString(timeFormatPattern);
                                 else if (nextWeekTimeSpan.Days <= 0 && (nextWeek.AddDays(7) - dateTime).Days > 0)
                                     friendlyDate = "Next " + dateTime.DayOfWeek + " at " +
-                                                   new DateTime(dateTime.TimeOfDay.Ticks).ToString("hh:mm:ss tt");
+                                                   new DateTime(dateTime.TimeOfDay.Ticks).ToString(timeFormatPattern);
                                 else
-                                    friendlyDate = dateTime.ToString("M/dd/yyyy") + " at " +
-                                                   dateTime.ToString("hh:mm:ss tt");
+                                    friendlyDate = dateTime.ToString(dateFormatPattern) + " at " +
+                                                   dateTime.ToString(timeFormatPattern);
                             }
                         }
                     }
