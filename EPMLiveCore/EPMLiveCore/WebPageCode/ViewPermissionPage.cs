@@ -5,6 +5,7 @@ using System.Web.UI.WebControls;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.WebControls;
 using System.Web;
+using EPMLiveCore.Infrastructure;
 
 namespace EPMLiveCore
 {
@@ -222,6 +223,8 @@ namespace EPMLiveCore
 
             this.CurrentList.ParentWeb.Properties.Update();
 
+            CacheStore.Current.RemoveSafely(SPContext.Current.Web.Url, new CacheStoreCategory(SPContext.Current.Web).Navigation);
+
             Microsoft.SharePoint.Utilities.SPUtility.Redirect("listedit.aspx?List=" + this.CurrentList.ID.ToString(), Microsoft.SharePoint.Utilities.SPRedirectFlags.RelativeToLayoutsPage, HttpContext.Current);
         }
 
@@ -246,6 +249,8 @@ namespace EPMLiveCore
                 this.CurrentList.ParentWeb.Properties[String.Format("ViewPermissions{0}", this.CurrentList.ID.ToString())] = valueGlobal;
 
             this.CurrentList.ParentWeb.Properties.Update();
+                        
+            CacheStore.Current.RemoveSafely(SPContext.Current.Web.Url, new CacheStoreCategory(SPContext.Current.Web).Navigation);            
 
             Microsoft.SharePoint.Utilities.SPUtility.Redirect("listedit.aspx?List=" + this.CurrentList.ID.ToString(), Microsoft.SharePoint.Utilities.SPRedirectFlags.RelativeToLayoutsPage, HttpContext.Current);
         }
