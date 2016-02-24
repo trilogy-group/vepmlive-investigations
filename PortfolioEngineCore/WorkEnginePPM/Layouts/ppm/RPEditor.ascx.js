@@ -1860,6 +1860,10 @@
         return val;
     };
     RPEditor.prototype.GridsOnSetInputValue = function (grid, row, col, val) {
+        try
+        {
+            val = this.GetRoundofValue(val);
+        } catch (e) { }
         this.valChanged = false;
         if (grid.id == "g_RPE") {
             var sType = col.substring(0, 1);
@@ -5130,6 +5134,9 @@
             var sType = col.substring(0, 1);
             if (sType == "Q") {
                 var sValue = this.GetFormattedPeriodCell(grid, row, col, bFulfillmentMode, false);
+                try{
+                    sValue = this.GetRoundofValue(sValue);
+                }catch(e){ }
                 grid.SetAttribute(row, null, col, sValue, 0, 0);
             }
         }
@@ -5412,6 +5419,10 @@
 
         if (fValue == 0 && fAvailable == 0)
             fValue = "";
+
+        try{
+            fValue = this.GetRoundofValue(fValue.toString());
+        } catch(e){ }
         grid.SetAttribute(row, null, "Q" + periodid, fValue, bRefreshCell, 0);
     };
     RPEditor.prototype.RefreshResourceRowPeriods = function (grid, row, bRefresh, bRefreshAllColumns) {
@@ -6081,6 +6092,35 @@
                 row = plangrid.GetNext(row);
             }
         }
+    };
+    RPEditor.prototype.GetRoundofValue = function (oValue) {
+        var nValue = oValue;
+        try{
+            if (nValue != "" && nValue != null) {
+                if (nValue.indexOf('(') > -1) {
+                    nValue = nValue.split('(');
+                    if (nValue[0].indexOf('%') > -1) {
+                        nValue = nValue[0].split('%');
+                        nValue = Number(Math.round(nValue[0] + 'e' + 2) + 'e-' + 2) + '%';
+                    }
+                    else {
+                        nValue = Number(Math.round(nValue[0] + 'e' + 2) + 'e-' + 2);
+                    }
+                }
+                else if (nValue.indexOf('%') > -1) {
+                    nValue = nValue.split('%');
+                    nValue = Number(Math.round(nValue[0] + 'e' + 2) + 'e-' + 2) + '%';
+                }
+                else {
+                    nValue = Number(Math.round(nValue + 'e' + 2) + 'e-' + 2);
+                }
+            }
+        } catch (e) {
+            nValue = oValue;
+        }
+        if (isNaN(nValue))
+            return oValue;
+        return nValue;
     };
     RPEditor.prototype.SetPlanRowEditStatus = function (row) {
         var plangrid = this.plangrid;
