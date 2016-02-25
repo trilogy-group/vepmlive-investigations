@@ -3020,6 +3020,11 @@ function NewTask(isSummary, isMilestone, isAbove, bAgileGrid, bIsExternal, bForc
     if (!bAgileGrid)
         grid.Focus(newrow, 'Title');
 
+    var projectinfoGrid = Grids.ProjectInfo;
+    try{
+        projectinfoGrid.SetValue(projectinfoGrid.GetRowById("Finish"), "V", grid.GetValue(grid.GetRowById("0"), "DueDate"), 1);
+    }catch(e){ }
+    
     return newrow.id;
 }
 
