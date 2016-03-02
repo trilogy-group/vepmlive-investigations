@@ -693,6 +693,7 @@
 
         var bLoading = true;
         var bRendering = true;
+        var disabledTab = false;
 
         var CanLinkExternal = <%=CanLinkExternal %>;
 
@@ -767,27 +768,28 @@
 
             dhxTabbar.addTab("t1", "<span class='task-detail-icons icon-pencil-5'></span>", "30px");
             dhxTabbar.setContent("t1", "detailDiv");
+            dhxTabbar.disableTab("t1");
 
             document.getElementById("assignmentsDiv").style.display="";
 
             dhxTabbar.addTab("t2", "<span class='task-detail-icons icon-users-4'></span>", "30px");
             dhxTabbar.setContent("t2", "assignmentsDiv");
-
+            dhxTabbar.disableTab("t2");
             document.getElementById("linksDiv").style.display="";
 
             dhxTabbar.addTab("t3", "<span class='task-detail-icons icon-link-2'></span>", "30px");
             dhxTabbar.setContent("t3", "linksDiv");
-
+            dhxTabbar.disableTab("t3");
             document.getElementById("notesDiv").style.display="";
 
             dhxTabbar.addTab("t5", "<span class='task-detail-icons icon-file-2'></span>", "30px");
             dhxTabbar.setContent("t5", "notesDiv");
-
+            dhxTabbar.disableTab("t5");
             dhxTabbar.addTab("t4", "<span class='task-detail-icons icon-notebook'></span>", "30px");
             dhxTabbar.setContent("t4", "projectMainDiv");
 
             dhxTabbar.setTabActive("t4");
-    
+            disabledTab = true;
             setHeight();
 
             try{
@@ -1195,7 +1197,15 @@
 
     Grids.OnSelect = function(grid, row, deselect)
     {
-
+        if(disabledTab == true)
+        {
+            dhxTabbar.enableTab("t1");
+            dhxTabbar.enableTab("t2");
+            dhxTabbar.enableTab("t3");
+            dhxTabbar.enableTab("t5");
+            dhxTabbar.enableTab("t1");
+            disabledTab = false;
+        }
         if(deselect && grid.FRow && grid.FRow.id == row.id)
         {
             return false;

@@ -4716,7 +4716,7 @@ function InitGantt() {
     }
     //dhxLayout.cells("c").collapse();
 
-    dhxTabbar.setTabActive("t1");
+    dhxTabbar.setTabActive("t4");
 
     SetSplashText("Checking Structure...");
     setTimeout("InitStructure()", 100);
