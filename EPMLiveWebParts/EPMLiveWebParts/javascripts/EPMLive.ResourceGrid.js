@@ -1369,7 +1369,7 @@ function registerEpmLiveResourceGridScript() {
 
                             if ($$$.responseIsSuccess(result)) {
                                 var refreshResources = result.RefreshResources;
-                                if (refreshResources['@Success'] === '0') {  
+                                if (refreshResources['@Success'] === '0') {
                                     window.parent.toastr.success("Refresh job started successfully. Status can be viewed on the Work Queue page within Settings.");
                                 } else {
                                     window.parent.toastr.error("Unable to start Refresh Job. There was some error.");
@@ -1964,15 +1964,16 @@ function registerEpmLiveResourceGridScript() {
                             }
                         }
                         var i = 1;
-                        for (var c in orderedCols) {
-                            if (grid.Header[orderedCols[c].Name].trim()) {
-                                aAvailableCols[orderedCols[c].Name] = {
-                                    'value': grid.Header[orderedCols[c].Name],
-                                    'checked': ($.inArray(orderedCols[c].Name, aViewCols) != -1)
-                                };
-                            }
+                        
+                        var splitReOrderCols = sAvailableFlds.split(',');
+                        for (var i = 0; i < splitReOrderCols.length; i++) {
+                            var sptIndValue = splitReOrderCols[i].split('|');
+                            aAvailableCols[sptIndValue[1].trim()] = {
+                                'value': sptIndValue[0].trim(),
+                                'checked': ($.inArray(sptIndValue[1].trim().toString(), aViewCols) != -1)
+                            };
                         }
-
+                       
                         var viewSectionTemplate = {
                             'heading': 'none',
                             'divider': 'no',
@@ -2592,12 +2593,12 @@ function registerEpmLiveResourceGridScript() {
                             $("#ddlTools_ul_menu li:nth-of-type(12)").hide();
                         }
 
-                        if ($$.UserHaveResourceCenterPermission) {                            
-                            $("#resourcePoolToolBar ul:first li:first").show();                            
+                        if ($$.UserHaveResourceCenterPermission) {
+                            $("#resourcePoolToolBar ul:first li:first").show();
                         }
-                        else {                            
+                        else {
                             $("#resourcePoolToolBar ul:first li:first").hide();
-                            $("#resourcePoolToolBar ul:first li:first").next().css("paddingLeft", "15px");                            
+                            $("#resourcePoolToolBar ul:first li:first").next().css("paddingLeft", "15px");
                         }
                     }
                     else {
