@@ -33,9 +33,12 @@ function setupPage(records, UseReporting, PageSize, grid, startpage) {
 
 
     if (UseReporting) {
-        if (pages >= 1) {
+        if (pages > 1) {
             if (!grid.bPageSetup) {
                 grid.bPageSetup = true;
+
+                viewalldiv.style.display = "block";
+                pagetable.style.display = "block";
 
                 var p = $("#pagediv" + gridid).parent();
                 $("#pagediv" + gridid).remove();
@@ -57,8 +60,6 @@ function setupPage(records, UseReporting, PageSize, grid, startpage) {
                 });
 
             }
-                viewalldiv.style.display = "";
-                pagetable.style.display = "";
         }
         else {
             viewalldiv.style.display = "none";
@@ -308,7 +309,7 @@ function GridOnRenderFinish(grid) {
             }
         }
 
-        if (ArrGantts.indexOf(grid.id) > -1 && grid.PagInfo)
+        if (ArrGantts.indexOf(grid.id) > -1)
             setupPage(grid.PagInfo, eval("mygrid" + gridid + ".UseReporting"), grid.PagSize, grid, eval("mygrid" + gridid + ".CurPage"));
 
         SetGridSize(grid);
