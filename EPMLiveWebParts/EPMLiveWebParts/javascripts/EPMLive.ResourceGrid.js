@@ -1947,9 +1947,9 @@ function registerEpmLiveResourceGridScript() {
                         }
 
                         function compareGrpVals(a, b) {
-                            if (a.split('|')[0] < b.split('|')[0])
+                            if (a.split('|')[0].toLowerCase() < b.split('|')[0].toLowerCase())
                                 return -1;
-                            if (a.split('|')[0] > b.split('|')[0])
+                            if (a.split('|')[0].toLowerCase() > b.split('|')[0].toLowerCase())
                                 return 1;
                             return 0;
                         }
