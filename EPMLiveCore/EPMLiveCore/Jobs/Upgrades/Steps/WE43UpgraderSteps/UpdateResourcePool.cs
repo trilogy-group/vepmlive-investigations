@@ -558,7 +558,7 @@ namespace EPMLiveCore.Jobs.Upgrades.Steps.WE43UpgraderSteps
 
                     string sField =
                         oResourcePool.Fields.AddFieldAsXml(
-                            @"<Field Type=""ResourceLevels"" DisplayName=""ResourceLevel"" Required=""FALSE"" EnforceUniqueValues=""FALSE"" StaticName=""ResourceLevel"" Name=""ResourceLevel"" AllowDeletion=""FALSE"" Description=""Choose the license type that this resource will require within EPM Live.  The license type selected will determine the features available to this resource.""/>");
+                            @"<Field Type=""ResourceLevels"" DisplayName=""ResourceLevel"" Required=""FALSE"" EnforceUniqueValues=""FALSE"" StaticName=""ResourceLevel"" Name=""ResourceLevel"" AllowDeletion=""FALSE"" Description=""Choose the license type that this resource will require within EPM Live.  The licence type selected will determine the features available to this resource.""/>");
                     SPField oField = oResourcePool.Fields.GetFieldByInternalName("ResourceLevel");
                     oField.Title = "License Type";
                     oField.Sealed = true;
