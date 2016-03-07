@@ -464,7 +464,7 @@ namespace EPMLiveCore
                 if (string.IsNullOrEmpty(listAndFields)) continue;
                 string[] lf = listAndFields.Split(':');
 
-                if (string.IsNullOrEmpty(lf[0]) || string.IsNullOrEmpty(lf[1])) continue;
+                if ((string.IsNullOrEmpty(lf[0]) || string.IsNullOrEmpty(lf[1])) && DoesListExist(Convert.ToString(lf[0]))) continue;
                 List<string> fields = lf[1].Split(',').Where(field => !string.IsNullOrEmpty(field)).ToList();
 
                 allListsAndFields.Add(lf[0], fields);
@@ -490,7 +490,7 @@ namespace EPMLiveCore
                 if (string.IsNullOrEmpty(listAndFields)) continue;
                 string[] lf = listAndFields.Split(':');
 
-                if (string.IsNullOrEmpty(lf[0]) || string.IsNullOrEmpty(lf[1])) continue;
+                if ((string.IsNullOrEmpty(lf[0]) || string.IsNullOrEmpty(lf[1])) && DoesListExist(Convert.ToString(lf[0]))) continue;
                 List<string> fields = lf[1].Split(',').Where(field => !string.IsNullOrEmpty(field)).ToList();
 
                 allListsAndFields.Add(lf[0], fields);
@@ -565,8 +565,13 @@ namespace EPMLiveCore
 
                     foreach (MWList myWorkList in MyWorkLists)
                     {
-                        if (!selectedMyWorkLists.Contains(myWorkList.Name)) excludedLists.Add(myWorkList.Name);
-                        else includedLists.Add(myWorkList.Name);
+                        if (DoesListExist(myWorkList.Name))
+                        {
+                            if (!selectedMyWorkLists.Contains(myWorkList.Name))
+                                excludedLists.Add(myWorkList.Name);
+                            else
+                                includedLists.Add(myWorkList.Name);
+                        }
                     }
 
                     CoreFunctions.setConfigSetting(_web, GeneralSettingsExcludedMyWorkLists,
@@ -589,27 +594,38 @@ namespace EPMLiveCore
 
             foreach (MWList myWorkList in MyWorkLists)
             {
-                var listItem = new ListItem(myWorkList.Name, myWorkList.Id);
+                if (DoesListExist(myWorkList.Name))
+                {
+                    var listItem = new ListItem(myWorkList.Name, myWorkList.Id);
 
-                if (excludedMyWorkLists.Contains(myWorkList.Name))
-                {
-                    lstExcludedMyWorkLists.Items.Add(listItem);
-                }
-                else
-                {
-                    lstIncludedMyWorkLists.Items.Add(listItem);
+                    if (excludedMyWorkLists.Contains(myWorkList.Name))
+                    {
+                        lstExcludedMyWorkLists.Items.Add(listItem);
+                    }
+                    else
+                    {
+                        lstIncludedMyWorkLists.Items.Add(listItem);
+                    }
                 }
             }
 
             List<string> selectedLists =
                 CoreFunctions.getConfigSetting(_web, GeneralSettingsSelectedLists).Split(new[] {','}).ToList();
+            List<string> listSelected = new List<string>();
             selectedLists.RemoveAll(string.IsNullOrEmpty);
 
             foreach (string selectedList in selectedLists)
             {
-                tbSelectedLists.Text += selectedList + Environment.NewLine;
+                if (DoesListExist(selectedList))
+                {
+                    listSelected.Add(selectedList);
+                    tbSelectedLists.Text += selectedList + Environment.NewLine;
+                }
             }
-
+            CoreFunctions.setConfigSetting(_web, GeneralSettingsSelectedLists,
+                                           listSelected.Count > 0
+                                               ? string.Join(",", listSelected.ToArray())
+                                               : string.Empty);
             #endregion
 
             #region Selected Fields
@@ -617,13 +633,32 @@ namespace EPMLiveCore
             List<string> selectedFields =
                 CoreFunctions.getConfigSetting(_web, GeneralSettingsSelectedFields).Split(new[] {','}).ToList();
 
-            lstSelectedFields.DataSource = (from selectedField in selectedFields
-                                            where !string.IsNullOrEmpty(selectedField)
-                                            let theField = selectedField
-                                            select new ListItem(theField.ToPrettierName(_web), selectedField)).ToList();
+            var sFields = new List<ListItem>();
+
+            sFields.AddRange((selectedLists.Count > 0
+                                          ? (from selectedList in selectedLists
+                                             where listsAndFields.ContainsKey(selectedList)
+                                             from field in listsAndFields[selectedList]
+                                             where selectedFields.Exists(f => f.Equals(field))
+                                             let theField = field
+                                             select new ListItem(theField.ToPrettierName(_web), field))
+                                          : (from listAndFields in listsAndFields
+                                             from field in listAndFields.Value
+                                             where selectedFields.Exists(f => f.Equals(field))
+                                             let theField = field
+                                             select new ListItem(theField.ToPrettierName(_web), field))));
+
+            sFields.AddRange(from myWorkListsAndField in myWorkListsAndFields
+                                     from field in myWorkListsAndField.Value
+                                     where selectedFields.Contains(field)
+                                     select new ListItem(field.ToPrettierName(_web), field));
+
+            lstSelectedFields.DataSource = sFields.Distinct().ToList();
+            
             lstSelectedFields.DataTextField = "Text";
             lstSelectedFields.DataValueField = "Value";
             lstSelectedFields.DataBind();
+            lstSelectedFields.Sort();
 
             #endregion
 
@@ -897,6 +932,12 @@ namespace EPMLiveCore
 
             CoreFunctions.setConfigSetting(_web, GeneralSettingsMyWorkListsAndFields,
                                            serializedMyWorkListsAndFields.Compress());
+        }
+
+        private bool DoesListExist(string name)
+        {
+            SPList list = _web.Lists.TryGetList(name);
+            return list != null;
         }
 
         #endregion Methods 
