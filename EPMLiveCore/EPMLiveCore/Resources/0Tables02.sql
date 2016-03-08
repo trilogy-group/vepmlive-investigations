@@ -229,7 +229,7 @@ if not exists (select table_name from INFORMATION_SCHEMA.tables where table_name
 		CREATE TABLE [dbo].[TSRESMETA](
 			[RES_META_ID] [uniqueidentifier] NOT NULL CONSTRAINT [DF_TSRESMETA_RES_META_ID]  DEFAULT (newid()),
 			[TS_UID] [uniqueidentifier] NOT NULL,
-			[Username] [nvarchar](50) NOT NULL,
+			[Username] [nvarchar](255) NOT NULL,
 			[ColumnName] [varchar](255) NOT NULL,
 			[DisplayName] [varchar](255) NOT NULL,
 			[ColumnValue] [varchar](255) NOT NULL,
@@ -242,6 +242,8 @@ if not exists (select table_name from INFORMATION_SCHEMA.tables where table_name
 else
 	begin
 		Print 'Updating Table TSRESMETA'
+		ALTER TABLE TSRESMETA
+		ALTER COLUMN Username varchar(255)
 	end
 
 ------------------TABLE: TSTYPE---------------------------------
