@@ -107,7 +107,7 @@ namespace EPMLiveCore.API
                                                          .Replace("##listName##", currentItem.ParentList.Title)
                                                          .Replace("##itemId##", currentItem.ID.ToString())
                                                          .Replace("##itemTitle##", currentItem.Title)
-                                                         .Replace("##createdDate##", ((DateTime)currentItem["Created"]).ToFriendlyDateAndTime())
+                                                         .Replace("##createdDate##", ((DateTime)currentItem["Created"]).ToFriendlyDateAndTime(cWeb))
                                                          .Replace("##comment##", GetXMLSafeVersion((string)(comment))));
                 sbResult.Append(XML_RESPONSE_COMMENT_ITEM_CLOSE);
                 sbResult.Append(XML_RESPONSE_COMMENT_SECTION_FOOTER);
@@ -389,7 +389,7 @@ namespace EPMLiveCore.API
                                                          .Replace("##listName##", currentItem.ParentList.Title)
                                                          .Replace("##itemId##", currentItem.ID.ToString())
                                                          .Replace("##itemTitle##", currentItem.Title)
-                                                         .Replace("##createdDate##", ((DateTime)currentItem["Created"]).ToFriendlyDateAndTime())
+                                                         .Replace("##createdDate##", ((DateTime)currentItem["Created"]).ToFriendlyDateAndTime(cWeb))
                                                          .Replace("##comment##", GetXMLSafeVersion((string)(HttpUtility.HtmlDecode(comment ?? string.Empty)))));
                 sbResult.Append(XML_RESPONSE_COMMENT_ITEM_CLOSE);
                 sbResult.Append(XML_RESPONSE_COMMENT_SECTION_FOOTER);
@@ -1377,7 +1377,7 @@ namespace EPMLiveCore.API
                                                                  .Replace("##listUrl##", realItem.ParentList.DefaultViewUrl)
                                                                  .Replace("##itemId##", sItemId.ToString())
                                                                  .Replace("##itemTitle##", realItem.Title.Replace('\"', '\''))
-                                                                 .Replace("##createdDate##", dCreated.ToFriendlyDateAndTime())
+                                                                 .Replace("##createdDate##", dCreated.ToFriendlyDateAndTime(cWeb))
                                                                  .Replace("##comment##", GetXMLSafeVersion((string)(HttpUtility.HtmlDecode(soriginComment ?? string.Empty)))));
                         // get user object 
                         SPFieldUser author = (SPFieldUser)originalComment.Fields[SPBuiltInFieldId.Author];
@@ -1487,7 +1487,7 @@ namespace EPMLiveCore.API
                                                                          .Replace("##listUrl##", realItem.ParentList.DefaultViewUrl)
                                                                          .Replace("##itemId##", sItemId2.ToString())
                                                                          .Replace("##itemTitle##", realItem.Title.Replace('\"', '\''))
-                                                                         .Replace("##createdDate##", dCreated2.ToFriendlyDateAndTime())
+                                                                         .Replace("##createdDate##", dCreated2.ToFriendlyDateAndTime(cWeb))
                                                                          .Replace("##comment##", GetXMLSafeVersion((string)(HttpUtility.HtmlDecode(soriginComment2 ?? string.Empty)))));
 
                                 sbResult.Append(XML_USER_INFO_SECTION.Replace("##username##", userObject.Name)

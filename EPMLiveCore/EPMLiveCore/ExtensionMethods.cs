@@ -410,19 +410,19 @@ namespace EPMLiveCore
         public static IEnumerable<SPList> GetListByTemplateId(this SPWeb spWeb, int templateId)
         {
             IEnumerable<SPList> spLists =
-                spWeb.Lists.Cast<SPList>().Where(spList => spList.BaseTemplate == (SPListTemplateType) templateId);
+                spWeb.Lists.Cast<SPList>().Where(spList => spList.BaseTemplate == (SPListTemplateType)templateId);
 
             if (spLists.Any()) return spLists;
 
             try
             {
-                MemberInfo[] memberInfos = typeof (EPMLiveLists).GetMember(((EPMLiveLists) templateId).ToString());
-                object[] customAttributes = memberInfos[0].GetCustomAttributes(typeof (ListAttribute), false);
-                string listName = ((ListAttribute) customAttributes[0]).Name;
+                MemberInfo[] memberInfos = typeof(EPMLiveLists).GetMember(((EPMLiveLists)templateId).ToString());
+                object[] customAttributes = memberInfos[0].GetCustomAttributes(typeof(ListAttribute), false);
+                string listName = ((ListAttribute)customAttributes[0]).Name;
 
                 SPList spList = spWeb.Lists.TryGetList(listName);
 
-                return spList != null ? new List<SPList> {spList} : null;
+                return spList != null ? new List<SPList> { spList } : null;
             }
             catch (Exception)
             {
@@ -523,36 +523,36 @@ namespace EPMLiveCore
                     friendlyDate = "Tomorrow";
                     break;
                 default:
-                {
-                    TimeSpan lastWeekTimeSpan = lastWeek - dateTime;
-
-                    if (lastWeekTimeSpan.Days > 0) friendlyDate = dateTime.ToString("MMM d");
-                    else
                     {
-                        TimeSpan thisWeekTimeSpan = thisWeek - dateTime;
+                        TimeSpan lastWeekTimeSpan = lastWeek - dateTime;
 
-                        if (lastWeekTimeSpan.Days <= 0 && thisWeekTimeSpan.Days > 0)
-                            friendlyDate = "Last " + dateTime.DayOfWeek;
+                        if (lastWeekTimeSpan.Days > 0) friendlyDate = dateTime.ToString("MMM d");
                         else
                         {
-                            TimeSpan nowTimeSpan = now - dateTime;
+                            TimeSpan thisWeekTimeSpan = thisWeek - dateTime;
 
-                            if (nowTimeSpan.Days > 0 && thisWeekTimeSpan.Days <= 0)
-                                friendlyDate = dateTime.DayOfWeek.ToString();
+                            if (lastWeekTimeSpan.Days <= 0 && thisWeekTimeSpan.Days > 0)
+                                friendlyDate = "Last " + dateTime.DayOfWeek;
                             else
                             {
-                                TimeSpan nextWeekTimeSpan = nextWeek - dateTime;
+                                TimeSpan nowTimeSpan = now - dateTime;
 
-                                //if (nowTimeSpan.Days < 0 && nextWeekTimeSpan.Days > 0)
-                                if (dateTime > now && dateTime <= now.AddDays(7))
-                                    friendlyDate = "This " + dateTime.DayOfWeek;
-                                else if (nextWeekTimeSpan.Days <= 0 && (nextWeek.AddDays(7) - dateTime).Days > 0)
-                                    friendlyDate = "Next " + dateTime.DayOfWeek;
-                                else friendlyDate = dateTime.ToString("MMM d");
+                                if (nowTimeSpan.Days > 0 && thisWeekTimeSpan.Days <= 0)
+                                    friendlyDate = dateTime.DayOfWeek.ToString();
+                                else
+                                {
+                                    TimeSpan nextWeekTimeSpan = nextWeek - dateTime;
+
+                                    //if (nowTimeSpan.Days < 0 && nextWeekTimeSpan.Days > 0)
+                                    if (dateTime > now && dateTime <= now.AddDays(7))
+                                        friendlyDate = "This " + dateTime.DayOfWeek;
+                                    else if (nextWeekTimeSpan.Days <= 0 && (nextWeek.AddDays(7) - dateTime).Days > 0)
+                                        friendlyDate = "Next " + dateTime.DayOfWeek;
+                                    else friendlyDate = dateTime.ToString("MMM d");
+                                }
                             }
                         }
                     }
-                }
                     break;
             }
 
@@ -576,8 +576,76 @@ namespace EPMLiveCore
 
             int days = now.Day - dateTime.Day;
 
-            string dateFormatPattern = System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.ShortDatePattern;
-            string timeFormatPattern = System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.LongTimePattern;
+            switch (days)
+            {
+                case 1:
+                    friendlyDate = "Yesterday at " + new DateTime(dateTime.TimeOfDay.Ticks).ToString("hh:mm:ss tt");
+                    break;
+                case 0:
+                    friendlyDate = "Today at " + new DateTime(dateTime.TimeOfDay.Ticks).ToString("hh:mm:ss tt");
+                    break;
+                case -1:
+                    friendlyDate = "Tomorrow at " + new DateTime(dateTime.TimeOfDay.Ticks).ToString("hh:mm:ss tt");
+                    break;
+                default:
+                    {
+                        TimeSpan lastWeekTimeSpan = lastWeek - dateTime;
+
+                        if (lastWeekTimeSpan.Days > 0)
+                            friendlyDate = dateTime.ToString("M/dd/yyyy") + " at " + dateTime.ToString("hh:mm:ss tt");
+                        else
+                        {
+                            TimeSpan thisWeekTimeSpan = thisWeek - dateTime;
+
+                            if (lastWeekTimeSpan.Days <= 0 && thisWeekTimeSpan.Days > 0)
+                                friendlyDate = "Last " + dateTime.DayOfWeek + " at " +
+                                               new DateTime(dateTime.TimeOfDay.Ticks).ToString("hh:mm:ss tt");
+                            else
+                            {
+                                TimeSpan nowTimeSpan = now - dateTime;
+
+                                if (nowTimeSpan.Days > 0 && thisWeekTimeSpan.Days <= 0)
+                                    friendlyDate = dateTime.DayOfWeek + " at " +
+                                                   new DateTime(dateTime.TimeOfDay.Ticks).ToString("hh:mm:ss tt");
+                                else
+                                {
+                                    TimeSpan nextWeekTimeSpan = nextWeek - dateTime;
+
+                                    //if (nowTimeSpan.Days < 0 && nextWeekTimeSpan.Days > 0)
+                                    if (dateTime > now && dateTime <= now.AddDays(7))
+                                        friendlyDate = "This " + dateTime.DayOfWeek + " at " +
+                                                       new DateTime(dateTime.TimeOfDay.Ticks).ToString("hh:mm:ss tt");
+                                    else if (nextWeekTimeSpan.Days <= 0 && (nextWeek.AddDays(7) - dateTime).Days > 0)
+                                        friendlyDate = "Next " + dateTime.DayOfWeek + " at " +
+                                                       new DateTime(dateTime.TimeOfDay.Ticks).ToString("hh:mm:ss tt");
+                                    else
+                                        friendlyDate = dateTime.ToString("M/dd/yyyy") + " at " +
+                                                       dateTime.ToString("hh:mm:ss tt");
+                                }
+                            }
+                        }
+                    }
+                    break;
+            }
+
+            return friendlyDate;
+        }
+
+        public static string ToFriendlyDateAndTime(this DateTime dateTime, SPWeb web)
+        {
+            string friendlyDate;
+            DateTime now = DateTime.Today;
+
+            DateTime thisWeek = now.StartOfWeek();
+            DateTime lastWeek = thisWeek.AddDays(-7);
+            DateTime nextWeek = thisWeek.AddDays(7);
+
+            int days = now.Day - dateTime.Day;
+
+            SPRegionalSettings spRegionalSettings = web.CurrentUser.RegionalSettings ?? web.RegionalSettings;
+
+            string dateFormatPattern = dateFormatPattern = System.Globalization.CultureInfo.GetCultureInfo(Convert.ToInt32(spRegionalSettings.LocaleId)).DateTimeFormat.ShortDatePattern;
+            string timeFormatPattern = timeFormatPattern = System.Globalization.CultureInfo.GetCultureInfo(Convert.ToInt32(spRegionalSettings.LocaleId)).DateTimeFormat.LongTimePattern;
 
             switch (days)
             {
@@ -591,49 +659,48 @@ namespace EPMLiveCore
                     friendlyDate = "Tomorrow at " + new DateTime(dateTime.TimeOfDay.Ticks).ToString(timeFormatPattern);
                     break;
                 default:
-                {
-                    TimeSpan lastWeekTimeSpan = lastWeek - dateTime;
-
-                    if (lastWeekTimeSpan.Days > 0)
-                        friendlyDate = dateTime.ToString(dateFormatPattern) + " at " + dateTime.ToString(timeFormatPattern);
-                    else
                     {
-                        TimeSpan thisWeekTimeSpan = thisWeek - dateTime;
-                        
-                        if (lastWeekTimeSpan.Days <= 0 && thisWeekTimeSpan.Days > 0)
-                            friendlyDate = "Last " + dateTime.DayOfWeek + " at " +
-                                           new DateTime(dateTime.TimeOfDay.Ticks).ToString(timeFormatPattern);
+                        TimeSpan lastWeekTimeSpan = lastWeek - dateTime;
+
+                        if (lastWeekTimeSpan.Days > 0)
+                            friendlyDate = dateTime.ToString(dateFormatPattern) + " at " + dateTime.ToString(timeFormatPattern);
                         else
                         {
-                            TimeSpan nowTimeSpan = now - dateTime;
+                            TimeSpan thisWeekTimeSpan = thisWeek - dateTime;
 
-                            if (nowTimeSpan.Days > 0 && thisWeekTimeSpan.Days <= 0)
-                                friendlyDate = dateTime.DayOfWeek + " at " +
+                            if (lastWeekTimeSpan.Days <= 0 && thisWeekTimeSpan.Days > 0)
+                                friendlyDate = "Last " + dateTime.DayOfWeek + " at " +
                                                new DateTime(dateTime.TimeOfDay.Ticks).ToString(timeFormatPattern);
                             else
                             {
-                                TimeSpan nextWeekTimeSpan = nextWeek - dateTime;
+                                TimeSpan nowTimeSpan = now - dateTime;
 
-                                //if (nowTimeSpan.Days < 0 && nextWeekTimeSpan.Days > 0)
-                                if (dateTime > now && dateTime <= now.AddDays(7))
-                                    friendlyDate = "This " + dateTime.DayOfWeek + " at " +
-                                                   new DateTime(dateTime.TimeOfDay.Ticks).ToString(timeFormatPattern);
-                                else if (nextWeekTimeSpan.Days <= 0 && (nextWeek.AddDays(7) - dateTime).Days > 0)
-                                    friendlyDate = "Next " + dateTime.DayOfWeek + " at " +
+                                if (nowTimeSpan.Days > 0 && thisWeekTimeSpan.Days <= 0)
+                                    friendlyDate = dateTime.DayOfWeek + " at " +
                                                    new DateTime(dateTime.TimeOfDay.Ticks).ToString(timeFormatPattern);
                                 else
-                                    friendlyDate = dateTime.ToString(dateFormatPattern) + " at " +
-                                                   dateTime.ToString(timeFormatPattern);
+                                {
+                                    TimeSpan nextWeekTimeSpan = nextWeek - dateTime;
+
+                                    //if (nowTimeSpan.Days < 0 && nextWeekTimeSpan.Days > 0)
+                                    if (dateTime > now && dateTime <= now.AddDays(7))
+                                        friendlyDate = "This " + dateTime.DayOfWeek + " at " +
+                                                       new DateTime(dateTime.TimeOfDay.Ticks).ToString(timeFormatPattern);
+                                    else if (nextWeekTimeSpan.Days <= 0 && (nextWeek.AddDays(7) - dateTime).Days > 0)
+                                        friendlyDate = "Next " + dateTime.DayOfWeek + " at " +
+                                                       new DateTime(dateTime.TimeOfDay.Ticks).ToString(timeFormatPattern);
+                                    else
+                                        friendlyDate = dateTime.ToString(dateFormatPattern) + " at " +
+                                                       dateTime.ToString(timeFormatPattern);
+                                }
                             }
                         }
                     }
-                }
                     break;
             }
 
             return friendlyDate;
         }
-
         /// <summary>
         ///     Toes the regional date time.
         /// </summary>
@@ -652,7 +719,7 @@ namespace EPMLiveCore
 
                     return dateTime != DateTime.MinValue
                         ? spRegionalSettings.TimeZone.UTCToLocalTime(dateTime.ToUniversalTime()).ToString(
-                            new CultureInfo((int) spRegionalSettings.LocaleId))
+                            new CultureInfo((int)spRegionalSettings.LocaleId))
                         : String.Empty;
                 }
             }
@@ -825,7 +892,7 @@ namespace EPMLiveCore
         /// <param name="stringToSeparate">The string to separate.</param>
         public static void PopulateFromCommaSeparatedString(this List<string> list, string stringToSeparate)
         {
-            string[] separatedString = stringToSeparate.Split(new[] {','});
+            string[] separatedString = stringToSeparate.Split(new[] { ',' });
             list.AddRange(separatedString);
         }
 
@@ -935,7 +1002,7 @@ namespace EPMLiveCore
 
             public int Compare(object x, object y)
             {
-                return String.CompareOrdinal(((TreeNode) x).Text, ((TreeNode) y).Text);
+                return String.CompareOrdinal(((TreeNode)x).Text, ((TreeNode)y).Text);
             }
 
             #endregion
@@ -972,7 +1039,7 @@ namespace EPMLiveCore
                 }
                 else if (typeName.Equals("System.String"))
                 {
-                    size += obj.ToString().Length*sizeof (Char);
+                    size += obj.ToString().Length * sizeof(Char);
                 }
                 else if (typeName.Equals("System.DateTime"))
                 {
@@ -984,7 +1051,7 @@ namespace EPMLiveCore
                 }
                 else if (typeName.StartsWith("System.Collections.Generic.Dictionary"))
                 {
-                    var dict = (IDictionary) obj;
+                    var dict = (IDictionary)obj;
 
                     size += dict.Keys.Cast<object>().Sum(key => GetSize(key));
 
@@ -992,7 +1059,7 @@ namespace EPMLiveCore
                 }
                 else if (typeName.StartsWith("System.Collections.Generic.List"))
                 {
-                    var list = (IList) obj;
+                    var list = (IList)obj;
 
                     size += list.Cast<object>().Sum(o => GetSize(o));
                 }
@@ -1001,11 +1068,11 @@ namespace EPMLiveCore
                     IEnumerable<FieldInfo> fields = GetFields(t);
 
                     size += (from fieldInfo in fields
-                        select fieldInfo.GetValue(obj)
-                        into subObj
-                        where subObj != obj
-                        where subObj != null
-                        select GetSize(subObj)).Sum();
+                             select fieldInfo.GetValue(obj)
+                                 into subObj
+                                 where subObj != obj
+                                 where subObj != null
+                                 select GetSize(subObj)).Sum();
                 }
 
                 return size;
@@ -1037,31 +1104,31 @@ namespace EPMLiveCore
             switch (typeName)
             {
                 case "System.Double[]":
-                    return sizeof (Double)*((Double[]) objValue).Length;
+                    return sizeof(Double) * ((Double[])objValue).Length;
                 case "System.Single[]":
-                    return sizeof (Single)*((Single[]) objValue).Length;
+                    return sizeof(Single) * ((Single[])objValue).Length;
                 case "System.Char[]":
-                    return sizeof (Char)*((Char[]) objValue).Length;
+                    return sizeof(Char) * ((Char[])objValue).Length;
                 case "System.Int16[]":
-                    return sizeof (Int16)*((Int16[]) objValue).Length;
+                    return sizeof(Int16) * ((Int16[])objValue).Length;
                 case "System.Int32[]":
-                    return sizeof (Int32)*((Int32[]) objValue).Length;
+                    return sizeof(Int32) * ((Int32[])objValue).Length;
                 case "System.Int64[]":
-                    return sizeof (Int64)*((Int64[]) objValue).Length;
+                    return sizeof(Int64) * ((Int64[])objValue).Length;
                 case "System.UInt16[]":
-                    return sizeof (UInt16)*((UInt16[]) objValue).Length;
+                    return sizeof(UInt16) * ((UInt16[])objValue).Length;
                 case "System.UInt32[]":
-                    return sizeof (UInt32)*((UInt32[]) objValue).Length;
+                    return sizeof(UInt32) * ((UInt32[])objValue).Length;
                 case "System.UInt64[]":
-                    return sizeof (UInt64)*((UInt64[]) objValue).Length;
+                    return sizeof(UInt64) * ((UInt64[])objValue).Length;
                 case "System.Decimal[]":
-                    return sizeof (Decimal)*((Decimal[]) objValue).Length;
+                    return sizeof(Decimal) * ((Decimal[])objValue).Length;
                 case "System.Byte[]":
-                    return sizeof (Byte)*((Byte[]) objValue).Length;
+                    return sizeof(Byte) * ((Byte[])objValue).Length;
                 case "System.SByte[]":
-                    return sizeof (SByte)*((SByte[]) objValue).Length;
+                    return sizeof(SByte) * ((SByte[])objValue).Length;
                 case "System.Boolean":
-                    return sizeof (Boolean)*((Boolean[]) objValue).Length;
+                    return sizeof(Boolean) * ((Boolean[])objValue).Length;
                 default:
                     var enumerable = objValue as IEnumerable;
                     return enumerable == null ? 0L : (from object obj in enumerable where obj != null select obj.GetSize()).Sum();
@@ -1073,31 +1140,31 @@ namespace EPMLiveCore
             switch (typeName)
             {
                 case "System.Double":
-                    return sizeof (Double);
+                    return sizeof(Double);
                 case "System.Single":
-                    return sizeof (Single);
+                    return sizeof(Single);
                 case "System.Char":
-                    return sizeof (Char);
+                    return sizeof(Char);
                 case "System.Int16":
-                    return sizeof (Int16);
+                    return sizeof(Int16);
                 case "System.Int32":
-                    return sizeof (Int32);
+                    return sizeof(Int32);
                 case "System.Int64":
-                    return sizeof (Int64);
+                    return sizeof(Int64);
                 case "System.UInt16":
-                    return sizeof (UInt16);
+                    return sizeof(UInt16);
                 case "System.UInt32":
-                    return sizeof (UInt32);
+                    return sizeof(UInt32);
                 case "System.UInt64":
-                    return sizeof (UInt64);
+                    return sizeof(UInt64);
                 case "System.Decimal":
-                    return sizeof (Decimal);
+                    return sizeof(Decimal);
                 case "System.Byte":
-                    return sizeof (Byte);
+                    return sizeof(Byte);
                 case "System.SByte":
-                    return sizeof (SByte);
+                    return sizeof(SByte);
                 case "System.Boolean":
-                    return sizeof (Boolean);
+                    return sizeof(Boolean);
                 default:
                     return 0;
             }
@@ -1136,7 +1203,7 @@ namespace EPMLiveCore
         {
             try
             {
-                return (((int) (object) type & (int) (object) value) == (int) (object) value);
+                return (((int)(object)type & (int)(object)value) == (int)(object)value);
             }
             catch
             {
@@ -1149,7 +1216,7 @@ namespace EPMLiveCore
         {
             try
             {
-                return (int) (object) type == (int) (object) value;
+                return (int)(object)type == (int)(object)value;
             }
             catch
             {
@@ -1162,12 +1229,12 @@ namespace EPMLiveCore
         {
             try
             {
-                return (T) (object) (((int) (object) type | (int) (object) value));
+                return (T)(object)(((int)(object)type | (int)(object)value));
             }
             catch (Exception ex)
             {
                 throw new ArgumentException(
-                    string.Format("Could not append value from enumerated type '{0}'.", typeof (T).Name), ex);
+                    string.Format("Could not append value from enumerated type '{0}'.", typeof(T).Name), ex);
             }
         }
 
@@ -1176,12 +1243,12 @@ namespace EPMLiveCore
         {
             try
             {
-                return (T) (object) (((int) (object) type & ~(int) (object) value));
+                return (T)(object)(((int)(object)type & ~(int)(object)value));
             }
             catch (Exception ex)
             {
                 throw new ArgumentException(
-                    string.Format("Could not remove value from enumerated type '{0}'.", typeof (T).Name), ex);
+                    string.Format("Could not remove value from enumerated type '{0}'.", typeof(T).Name), ex);
             }
         }
 
