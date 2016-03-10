@@ -19,24 +19,35 @@ namespace EPMLiveCore
         private Dictionary<int, string> defaultViews = null;
         private List<int> hiddenFields = new List<int>();
         private StringBuilder computeFieldsScript = new StringBuilder();
-
+        
+        private List<string> viewsNotInAnyGroup = new List<string>();
+        private int[] groupIds = null;
+        private StringBuilder checkPermissionScript = new StringBuilder();
+        
         protected Button OK = new Button();
         protected Button Cancel = new Button();
 
         protected override void OnLoad(EventArgs e)
         {
             this.Title = "View Permission Settings";
+            checkPermissionScript.AppendLine("var viewUrls = new Array;");
             foreach (SPView view in this.CurrentList.Views)
             {
                 if ((!view.Hidden) && (!view.PersonalView))
+                {
                     views.Add(view);
+                    // Populate list view urls in script for client side validation on save
+                    checkPermissionScript.Append("viewUrls.push('" + view.Url + "');");                    
+                }
             }
-
+            
             if (this.CurrentList.ParentWeb.Properties.ContainsKey(String.Format("ViewPermissions{0}", this.CurrentList.ID.ToString())))
             {
                 roleProperties = new Dictionary<int, Dictionary<string, bool>>();
                 defaultViews = new Dictionary<int, string>();
                 ViewPermissionUtil.ConvertFromStringForPage(ref roleProperties, ref defaultViews, this.CurrentList.ParentWeb.Properties[String.Format("ViewPermissions{0}", this.CurrentList.ID.ToString())], this.CurrentList);
+                // Grab collection of view which are not part of any group
+                GetViewsNotInAnyGroup();
             }
             else
             {
@@ -64,7 +75,7 @@ namespace EPMLiveCore
                 }
 
                 // Retrieve views from current list
-                
+
 
                 foreach (SPGroup group in groups)
                 {
@@ -73,12 +84,22 @@ namespace EPMLiveCore
                     foreach (SPView view in views)
                         roleProperties[group.ID].Add(view.Url, true);
                 }
-            }
+            }            
 
             pageRender = this.PrepareRenderPage();
+            // Populate permission group ids in script for client side validation on save
+            groupIds = new int[roleProperties.Keys.Count];
+            roleProperties.Keys.CopyTo(groupIds, 0);
+            checkPermissionScript.AppendLine("var grpIds = new Array;");
+            foreach (int id in groupIds)
+            {
+                checkPermissionScript.Append("grpIds.push('"+id+"');");
+            }
+
             RegisterScript();
 
             this.Cancel.PostBackUrl = SPContext.Current.Web.Url + "/_layouts/listedit.aspx?List=" + this.CurrentList.ID.ToString();
+            
         }
 
         protected string RenderPage()
@@ -168,8 +189,8 @@ namespace EPMLiveCore
                     {
                         //if (this.CurrentList.Views[viewId] != null)
                         //{
-                            string viewName = view.Title;
-                            result.Append(String.Format("<option {0}value=\"{1}\">{2}</option>", viewId.Equals(defaultView) ? "selected=\"selected\" " : "", viewId, viewName));
+                        string viewName = view.Title;
+                        result.Append(String.Format("<option {0}value=\"{1}\">{2}</option>", viewId.Equals(defaultView) ? "selected=\"selected\" " : "", viewId, viewName));
                         //}
                     }
                 }
@@ -191,7 +212,7 @@ namespace EPMLiveCore
             {
                 if ((!view.Hidden) && (!view.PersonalView))
                 {
-                    if ((roleProperties[groupId].ContainsKey(view.Url)) && (roleProperties[groupId][view.Url] == true))
+                    if (((roleProperties[groupId].ContainsKey(view.Url)) && (roleProperties[groupId][view.Url] == true)) || viewsNotInAnyGroup.Contains(view.Url))
                         result.Append(string.Format("<input id=\"Chk{0}{1}\" title=\"{2}\" type=\"checkbox\" value=\"{1}\" onclick=\"javascript:OptionChange('{0}','chk{0}{1}');\" checked=\"checked\"/> {2}<br/>", groupId, view.Url, view.Title));
                     else
                         result.Append(string.Format("<input id=\"Chk{0}{1}\" title=\"{2}\" type=\"checkbox\" value=\"{1}\" onclick=\"javascript:OptionChange('{0}','chk{0}{1}');\" /> {2}<br/>", groupId, view.Url, view.Title));
@@ -249,8 +270,8 @@ namespace EPMLiveCore
                 this.CurrentList.ParentWeb.Properties[String.Format("ViewPermissions{0}", this.CurrentList.ID.ToString())] = valueGlobal;
 
             this.CurrentList.ParentWeb.Properties.Update();
-                        
-            CacheStore.Current.RemoveSafely(SPContext.Current.Web.Url, new CacheStoreCategory(SPContext.Current.Web).Navigation);            
+
+            CacheStore.Current.RemoveSafely(SPContext.Current.Web.Url, new CacheStoreCategory(SPContext.Current.Web).Navigation);
 
             Microsoft.SharePoint.Utilities.SPUtility.Redirect("listedit.aspx?List=" + this.CurrentList.ID.ToString(), Microsoft.SharePoint.Utilities.SPRedirectFlags.RelativeToLayoutsPage, HttpContext.Current);
         }
@@ -332,6 +353,54 @@ namespace EPMLiveCore
                                             hidden.value = groupId + '#' + defaultView + '#' + views;
                                         }";
             this.Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "ComputeHidden", ComputeHiddenScript, true);
+            
+            checkPermissionScript.AppendLine(@"function CheckPermission()
+                                    {            
+                                        for(var i = 0; i < viewUrls.length; i++)
+                                        {
+                                            var isViewExist = false;
+                                            var url = viewUrls[i];
+                                            for(index = 0; index < grpIds.length; index++)
+                                            {
+                                                var hidden = document.getElementById('Hidden' + grpIds[index]);
+                                                if(hidden.value.contains(url))
+                                                {
+                                                    isViewExist = true;
+                                                    break;
+                                                }                                                
+                                            }
+                                            if(isViewExist == false)
+                                            {
+                                                alert('Each view must be associated with at least one permissions group.');
+                                                return false;
+                                            }
+                                        }
+                                        return true;
+                                    }");
+            this.Page.ClientScript.RegisterClientScriptBlock(this.GetType(), "CheckPermission", checkPermissionScript.ToString(), true);
+        }
+
+        private void GetViewsNotInAnyGroup()
+        {
+            string[] groups = this.CurrentList.ParentWeb.Properties[String.Format("ViewPermissions{0}", this.CurrentList.ID.ToString())].Split("|".ToCharArray());
+
+            foreach (SPView currentView in views)
+            {
+                bool isViewExist = false;
+                string viewUrl = currentView.Url;
+                foreach (string grp in groups)
+                {
+                    if (grp.Contains(viewUrl))
+                    {
+                        isViewExist = true;
+                        break;
+                    }
+                }
+                if (!isViewExist)
+                {
+                    viewsNotInAnyGroup.Add(viewUrl);
+                }
+            }
         }
     }
 }

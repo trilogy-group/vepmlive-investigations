@@ -19,7 +19,7 @@
     <%= RenderPage() %>
     <div style="float:right;margin-top:10px;">
         <asp:Button ID="btnClearAll" runat="server" Text="Clear All" OnClick="ClearAll" CssClass="ms-ButtonHeightWidth" />
-        <asp:Button ID="OK" runat="server" Text="OK" OnClick="SaveCustomPermission" CssClass="ms-ButtonHeightWidth" />
-        <asp:Button ID="Cancel" runat="server" Text="Cancel" CssClass="ms-ButtonHeightWidth" />
+        <asp:Button ID="OK" runat="server" Text="OK" OnClientClick="javascript:return CheckPermission();" OnClick="SaveCustomPermission" CssClass="ms-ButtonHeightWidth" />
+        <asp:Button ID="Cancel" runat="server" Text="Cancel" CssClass="ms-ButtonHeightWidth" />        
     </div>    
 </asp:Content>

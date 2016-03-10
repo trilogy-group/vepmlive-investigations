@@ -2946,6 +2946,11 @@ namespace EPMLiveWebParts
             bool hasDefaultViewURL = false;
             string defaultViewURL = string.Empty;
             JavaScriptSerializer oSerializer = new JavaScriptSerializer();
+            bool viewExistsInBagSettings = false;
+
+            string requestUrl = Convert.ToString(Page.Request.Url);
+            // Get current view url
+            string currentViewUrl = requestUrl.Substring(requestUrl.IndexOf("/Lists")).TrimStart("/".ToCharArray());
 
             try
             {
@@ -2974,8 +2979,16 @@ namespace EPMLiveWebParts
                     arrGroup = SPContext.Current.Web.CurrentUser.Groups;
                 }
 
+                #region Add views from Property Bage settings
                 foreach (var bagData in propBagData)
                 {
+                    if (!viewExistsInBagSettings)
+                    {
+                        // If current view is not in property bag settings and still user can access it 
+                        // that means the view is newly created
+                        viewExistsInBagSettings = bagData.Value.Contains(currentViewUrl);
+                    }
+
                     foreach (SPGroup grp in arrGroup)
                     {
                         if (grp.ID == bagData.Key)
@@ -2996,7 +3009,35 @@ namespace EPMLiveWebParts
                             }
                         }
                     }
+                } 
+                #endregion
+
+                #region Add new view which is just created
+                // Include current view in drop down since it is a new view and is not part of property bag settings at this stage
+                if (!viewExistsInBagSettings && !splitViewcollection.Contains(currentViewUrl) && lstListViewURL.Contains(currentViewUrl))
+                {
+                    splitViewcollection.Add(currentViewUrl);
+                } 
+                #endregion
+
+                #region Add list views which are not in Property Bag Settings
+                
+                bool isViewExist = false;
+                foreach (string viewUrl in lstListViewURL)
+                {
+                    foreach (var bagData in propBagData)
+                    {
+                        isViewExist = bagData.Value.Contains(viewUrl);
+                        if (isViewExist)
+                            break;
+                    }
+                    if (!isViewExist && !splitViewcollection.Contains(viewUrl))
+                    {
+                        splitViewcollection.Add(viewUrl);
+                    }
                 }
+
+                #endregion
 
                 // Adding distinct Views
                 foreach (var tmpView in splitViewcollection)
@@ -3043,7 +3084,7 @@ namespace EPMLiveWebParts
             }
 
             return sb.ToString().Trim(',');
-        }
+        }        
 
         private Dictionary<int, string> ConvertFromString(string value, SPList currentList)
         {
