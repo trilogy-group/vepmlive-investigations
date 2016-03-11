@@ -363,7 +363,7 @@ namespace EPMLiveCore
                                             for(index = 0; index < grpIds.length; index++)
                                             {
                                                 var hidden = document.getElementById('Hidden' + grpIds[index]);
-                                                if(hidden.value.contains(url))
+                                                if(hidden.value.indexOf(url) != -1)
                                                 {
                                                     isViewExist = true;
                                                     break;
