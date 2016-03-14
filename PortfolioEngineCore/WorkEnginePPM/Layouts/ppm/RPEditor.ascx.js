@@ -1854,14 +1854,14 @@
                     bFulfillmentMode = true;
                 this.originalval = val;
                 val = this.GetFormattedPeriodCell(grid, row, col, bFulfillmentMode, true);
+                val = this.GetRoundofValue(val);
                 this.newval = val;
             }
         }
         return val;
     };
     RPEditor.prototype.GridsOnSetInputValue = function (grid, row, col, val) {
-        try
-        {
+        try {
             val = this.GetRoundofValue(val);
         } catch (e) { }
         this.valChanged = false;
@@ -2053,7 +2053,13 @@
                 case 0: /* Hours mode - so calc FTE */
                     grid.SetAttribute(row, null, h + sId, dbl, 0, 0);
                     grid.SetAttribute(row, null, h + sId + "Changed", 1, 0, 0);
-                    if (dbl == null) value = null; else value = parseInt((dbl * 10000) / fteconv);
+                    if (dbl == null) {
+                        value = null;
+                    }
+                    else {
+                        value = parseFloat((dbl * 10000) / fteconv);
+                        value = this.GetRoundofValue(value);
+                    } 
                     grid.SetAttribute(row, null, f + sId, value, 0, 0);
                     grid.SetAttribute(row, null, "m" + sId, 0, 0, 0);
                     break;
@@ -2062,7 +2068,13 @@
                     origvalue = (value * fteconv) / 10000;
                     grid.SetAttribute(row, null, f + sId, dbl, 0, 0);
                     grid.SetAttribute(row, null, f + sId + "Changed", 1, 0, 0);
-                    if (dbl == null) value = null; else value = parseInt((dbl * fteconv) / 10000);
+                    if (dbl == null) {
+                        value = null;
+                    }
+                    else {
+                        value = parseFloat((dbl * fteconv) / 10000);
+                        value = this.GetRoundofValue(value);
+                    } 
                     grid.SetAttribute(row, null, h + sId, value, 0, 0);
                     grid.SetAttribute(row, null, "m" + sId, 1, 0, 0);
                     break;
@@ -2089,7 +2101,7 @@
         }
         var lHours = 0;
         var Hours = grid.GetAttribute(row, "H" + sId);
-        if (Hours != null) lHours = parseInt(Hours) / 100;
+        if (Hours != null) lHours = parseFloat(Hours) / 100;
         var hours = grid.GetAttribute(row, "h" + sId);
         if (hours == null) {
             if (Hours != null && lHours != 0) {
@@ -2097,7 +2109,7 @@
             }
         }
         else {
-            var lhours = parseInt(hours) / 100;
+            var lhours = parseFloat(hours) / 100;
             sValue = NumberToString(lhours, const_HoursFormat);
             if (bEditMode != true && hours != null && lhours != lHours && bFulfillmentMode != true) {
                 var activeCommitment = grid.GetAttribute(row, null, "ActiveCommitment");
@@ -2126,7 +2138,7 @@
         }
         var lFte = 0;
         var Fte = grid.GetAttribute(row, "F" + sId);
-        if (Fte != null) lFte = parseInt(Fte) / 10000;
+        if (Fte != null) lFte = parseFloat(Fte) / 10000;
         var fte = grid.GetAttribute(row, "f" + sId);
         if (fte == null) {
             if (Fte != null && lFte != 0) {
@@ -2134,7 +2146,7 @@
             }
         }
         else {
-            var lfte = parseInt(fte) / 10000;
+            var lfte = parseFloat(fte) / 10000;
             sValue = NumberToString(lfte, const_FTEFormat);
             if (bEditMode != true && fte != null && lfte != lFte && bFulfillmentMode != true) {
                 var activeCommitment = grid.GetAttribute(row, null, "ActiveCommitment");
@@ -2257,10 +2269,10 @@
                         var mpy = 100;
                         switch (this.displayMode) {
                             case 0: /* Hours */
-                                jValue = ValidateStringAsNumber(val, 10, 2, false, "");
+                                jValue = ValidateStringAsNumber(val, 10, 3, false, "");
                                 break;
                             case 1: /* FTE */
-                                jValue = ValidateStringAsNumber(val, 5, 2, false, "");
+                                jValue = ValidateStringAsNumber(val, 5, 3, false, "");
                                 mpy = 10000;
                                 break;
                             case 2: /* FTE %*/
@@ -2272,8 +2284,9 @@
                                 jValue.value = "0";
                             }
                             var thisval = parseFloat(jValue.value);
-                            var dblValue = parseFloat(thisval.toFixed(2));
-                            dblValue = parseInt(this.round(dblValue * mpy, 0));
+                            var dblValue = this.GetRoundofValue(thisval);
+                            var total = dblValue * mpy;
+                            dblValue = this.GetRoundofValue(total);
                             this.SetPeriodValue(grid, row, col, dblValue);
                             snewVal = this.GetFormattedPeriodCell(grid, row, col, false, false);
                         }
@@ -4181,10 +4194,10 @@
             var mpy = 100;
             switch (this.displayMode) {
                 case 0: /* Hours */
-                    jValue = ValidateStringAsNumber(val, 10, 2, false, "");
+                    jValue = ValidateStringAsNumber(val, 10, 3, false, "");
                     break;
                 case 1: /* FTE */
-                    jValue = ValidateStringAsNumber(val, 5, 2, false, "");
+                    jValue = ValidateStringAsNumber(val, 5, 3, false, "");
                     mpy = 10000;
                     break;
                 case 2: /* FTE %*/
@@ -4857,9 +4870,9 @@
         switch (this.displayMode) {
             case 0: /* Hours */
                 if (this.showHeatmap != true) {
-                    sValue = "0.##;<span style='color:red;'>-0.##</span>;0";
+                    sValue = "0.###;<span style='color:red;'>-0.###</span>;0";
                 } else {
-                    sValue = "0.##;<div style='background-color:red;height:inherit;vertical-align:middle;padding:1px !important;'>-0.##</div>;0";
+                    sValue = "0.###;<div style='background-color:red;height:inherit;vertical-align:middle;padding:1px !important;'>-0.###</div>;0";
                 }
                 break;
             case 1: /* FTE */
@@ -5134,9 +5147,9 @@
             var sType = col.substring(0, 1);
             if (sType == "Q") {
                 var sValue = this.GetFormattedPeriodCell(grid, row, col, bFulfillmentMode, false);
-                try{
+                try {
                     sValue = this.GetRoundofValue(sValue);
-                }catch(e){ }
+                } catch (e) { }
                 grid.SetAttribute(row, null, col, sValue, 0, 0);
             }
         }
@@ -5355,19 +5368,19 @@
 
         var available = grid.GetAttribute(row, null, "A" + periodid);
         var fAvailable = 0;
-        var fA = parseInt(available);
+        var fA = parseFloat(available);
         if (isNaN(fA) == false)
             fAvailable = fA;
 
         var committed = grid.GetAttribute(row, null, "C" + periodid);
         var fCommitted = 0;
-        var fC = parseInt(committed);
+        var fC = parseFloat(committed);
         if (isNaN(fC) == false)
             fCommitted = fC;
 
         var deltaC = grid.GetAttribute(row, null, "D" + periodid);
         var fDeltaC = 0;
-        var fD = parseInt(deltaC);
+        var fD = parseFloat(deltaC);
         if (isNaN(fD) == false)
             fDeltaC = fD;
 
@@ -5420,9 +5433,9 @@
         if (fValue == 0 && fAvailable == 0)
             fValue = "";
 
-        try{
+        try {
             fValue = this.GetRoundofValue(fValue.toString());
-        } catch(e){ }
+        } catch (e) { }
         grid.SetAttribute(row, null, "Q" + periodid, fValue, bRefreshCell, 0);
     };
     RPEditor.prototype.RefreshResourceRowPeriods = function (grid, row, bRefresh, bRefreshAllColumns) {
@@ -6095,28 +6108,32 @@
     };
     RPEditor.prototype.GetRoundofValue = function (oValue) {
         var nValue = oValue;
-        try{
+        try {
             if (nValue != "" && nValue != null) {
                 if (nValue.indexOf('(') > -1) {
                     nValue = nValue.split('(');
                     if (nValue[0].indexOf('%') > -1) {
                         nValue = nValue[0].split('%');
-                        nValue = Number(Math.round(nValue[0] + 'e' + 2) + 'e-' + 2) + '%';
+                        nValue = Number(Math.round(nValue[0] + 'e' + 3) + 'e-' + 3) + '%';
                     }
                     else {
-                        nValue = Number(Math.round(nValue[0] + 'e' + 2) + 'e-' + 2);
+                        nValue = Number(Math.round(nValue[0] + 'e' + 3) + 'e-' + 3);
                     }
                 }
                 else if (nValue.indexOf('%') > -1) {
                     nValue = nValue.split('%');
-                    nValue = Number(Math.round(nValue[0] + 'e' + 2) + 'e-' + 2) + '%';
+                    nValue = Number(Math.round(nValue[0] + 'e' + 3) + 'e-' + 3) + '%';
                 }
                 else {
-                    nValue = Number(Math.round(nValue + 'e' + 2) + 'e-' + 2);
+                    nValue = Number(Math.round(nValue + 'e' + 3) + 'e-' + 3);
                 }
             }
         } catch (e) {
-            nValue = oValue;
+            try {
+                nValue = Number(Math.round(nValue + 'e' + 3) + 'e-' + 3);
+            } catch (e) {
+                nValue = oValue;
+            }
         }
         if (isNaN(nValue))
             return oValue;
@@ -6235,7 +6252,7 @@
         this.includePending = true;
         this.saveConflict = false;
 
-        var const_HoursFormat = "0.##";
+        var const_HoursFormat = "0.###";
         var const_FTEFormat = "0.####";
         var const_FTEPctFormat = "0.##%";
         var const_Project = 0;

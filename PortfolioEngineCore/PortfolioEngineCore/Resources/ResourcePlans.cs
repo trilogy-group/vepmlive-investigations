@@ -1460,8 +1460,7 @@ namespace PortfolioEngineCore
                                                             "0"));
                             double dblHours = DBAccess.ReadDoubleValue(reader["BD_VALUE"]);
                             xCostValue.CreateStringAttr("hours",
-                                                        ((Int32)(dblHours * 100)).ToString(
-                                                            "0"));
+                                                        ((Double)(dblHours * 100)).ToString());
                         }
                         else
                         {
@@ -1470,7 +1469,7 @@ namespace PortfolioEngineCore
                                                     "0");
                             double dblHours = DBAccess.ReadDoubleValue(reader["BD_VALUE"]);
                             string sHours = xCostValue.GetStringAttr("hours") + "," +
-                                            ((Int32)(dblHours * 100)).ToString("0");
+                                            ((Double)(dblHours * 100)).ToString();
                             xCostValue.SetStringAttr("periods", sPeriods);
                             xCostValue.SetStringAttr("hours", sHours);
                         }
@@ -2173,8 +2172,8 @@ namespace PortfolioEngineCore
                             }
                         }
                         sPeriods = Common.AppendItemToList(sPeriods, lPeriodID.ToString("0"));
-                        sHours = Common.AppendItemToList(sHours, dblHours.ToString("0"));
-                        sFTEs = Common.AppendItemToList(sFTEs, lFTEs.ToString("0"));
+                        sHours = Common.AppendItemToList(sHours, dblHours.ToString());
+                        sFTEs = Common.AppendItemToList(sFTEs, lFTEs.ToString());
                         sModes = Common.AppendItemToList(sModes, nMode.ToString("0"));
                         sRevenues = Common.AppendDoubleToList(sRevenues, dblRevenue);
                         sEnteredBys = Common.AppendItemToList(sEnteredBys, lEnteredBy.ToString("0"));
@@ -2692,7 +2691,7 @@ namespace PortfolioEngineCore
                                 if (bFoundH || bFoundF || bFoundM)
                                 {
                                     double dblHours = double.Parse(sHours, CultureInfo.InvariantCulture);
-                                    int lFTEs = Convert.ToInt32(sFTE);
+                                    double lFTEs = Convert.ToDouble(sFTE);
                                     int lMode = Convert.ToInt32(sMode);
                                     if (dblHours != 0 || lFTEs != 0)
                                     {
@@ -2715,7 +2714,7 @@ namespace PortfolioEngineCore
                                     if (bFoundH || bFoundF || bFoundM)
                                     {
                                         double dblHours = double.Parse(sHours, CultureInfo.InvariantCulture);
-                                        int lFTEs = Convert.ToInt32(sFTE);
+                                        double lFTEs = Convert.ToDouble(sFTE);
                                         int lMode = Convert.ToInt32(sMode);
 
                                         pCMT_UID.Value = lUID;

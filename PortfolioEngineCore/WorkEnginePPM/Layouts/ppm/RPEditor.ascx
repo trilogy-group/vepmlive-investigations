@@ -365,6 +365,12 @@
                 $(this).val(value);
             }
         });
+        $("#idSpreadAmount").blur(function () {
+            if (!isNaN(this.value)) {
+                var amt = parseFloat(this.value);
+                $(this).val(Number(Math.round(amt + 'e' + 3) + 'e-' + 3));
+            }
+        });
     }
 
 </script>
