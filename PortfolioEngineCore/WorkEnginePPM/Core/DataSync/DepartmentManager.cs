@@ -214,14 +214,14 @@ namespace WorkEnginePPM.Core.DataSync
                 {
                     SPWeb web = properties.Web;
                     SPQuery query = new SPQuery();
-                    query.Query = "<Where><Eq><FieldRef Name='Department' LookupId='TRUE'/><Value Type='Lookup'>" + properties.ListItem.ID + "</Value></Eq></Where>";
+                    query.Query = "<Where><Eq><FieldRef Name='Department' LookupId='TRUE'/><Value Type='Lookup'>" + properties.ListItemId + "</Value></Eq></Where>";
 
-                    SPList lstDept = web.Lists["Resources"];
-                    if (lstDept != null)
+                    SPList lstResourceList = web.Lists.TryGetList("Resources");
+                    if (lstResourceList != null)
                     {
-                        SPListItemCollection ResourcesListItems = lstDept.GetItems(query);
+                        SPListItemCollection spResourcesListItems = lstResourceList.GetItems(query);
 
-                        if (ResourcesListItems.Count > 0)                        
+                        if (spResourcesListItems.Count > 0)                        
                             IsDeptDel = false;
                     }
 
