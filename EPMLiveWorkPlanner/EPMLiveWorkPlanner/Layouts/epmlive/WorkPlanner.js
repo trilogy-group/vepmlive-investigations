@@ -4715,7 +4715,7 @@ function InitGantt() {
         //AGrid.ChangeZoom("z6");
     }
     //dhxLayout.cells("c").collapse();
-
+    dhxTabbar.setTabActive("t1");
     dhxTabbar.setTabActive("t4");
 
     SetSplashText("Checking Structure...");
