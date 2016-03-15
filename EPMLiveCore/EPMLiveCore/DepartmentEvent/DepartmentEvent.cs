@@ -30,6 +30,42 @@ namespace EPMLiveCore
 
            processItem(properties);
 
+       }       
+
+       /// <summary>
+       /// An item is being Deleted.
+       /// </summary>
+       public override void ItemDeleted(SPItemEventProperties properties)
+       {
+           try
+           {
+               if (properties.List.Fields.ContainsFieldWithInternalName("DisplayName") && properties.List.Fields.ContainsFieldWithInternalName("RBS"))
+               {
+                   SPWeb web = properties.Web;
+                   SPList lstDept = web.Lists.TryGetList(properties.ListTitle);
+                   SPQuery deptquery = new SPQuery();
+                   deptquery.Query = "<Where><Eq><FieldRef Name='RBS' LookupId='TRUE'/><Value Type='Lookup'>" + properties.ListItemId + "</Value></Eq></Where>";                   
+                   SPListItemCollection DepartmentListItems = lstDept.GetItems(deptquery);
+
+                   foreach (SPListItem deptItem in DepartmentListItems)
+                   {
+                       try
+                       {
+                           deptItem["RBS"] = null;
+                           deptItem["Managers"] = new SPFieldLookupValue(Convert.ToString(deptItem["Managers"]));
+                           deptItem["Title"] = deptItem.Title;
+                           deptItem.Update();
+                       }
+                       catch { }
+                   }
+               }
+           }
+           catch (Exception ex)
+           {
+               properties.Cancel = true;
+               properties.ErrorMessage = ex.Message;
+               properties.Status = SPEventReceiverStatus.CancelWithError;
+           }
        }
 
 

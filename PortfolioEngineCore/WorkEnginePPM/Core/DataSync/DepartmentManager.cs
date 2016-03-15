@@ -162,7 +162,7 @@ namespace WorkEnginePPM.Core.DataSync
             query.Query = string.Empty;
             query.ViewFields = "<FieldRef Name='ID'/><FieldRef Name='Title'/><FieldRef Name='EXTID'/>";
             ResourcesListItems = Web.Lists["Resources"].GetItems(query).Cast<SPListItem>().ToList();
-            
+
             BuildRequest(0, dataTable, ref dataElement);
 
             using (var portfolioEngineAPI = new PortfolioEngineAPI(Web))
@@ -183,21 +183,56 @@ namespace WorkEnginePPM.Core.DataSync
                                                       d.Attribute("DataId").Value.Equals(dataRow["UniqueId"].ToString())
                                                   select d).FirstOrDefault();
 
-                    XElement resElement = departmentElement.Element("Result");
-                    if (resElement != null)
+                    if (departmentElement != null)
                     {
-                        XAttribute statusEle = resElement.Attribute("Status");
-                        if (statusEle != null && statusEle.Value.Equals("1"))
+                        XElement resElement = departmentElement.Element("Result");
+                        if (resElement != null)
                         {
-                            throw new Exception(resElement.Value);
+                            XAttribute statusEle = resElement.Attribute("Status");
+                            if (statusEle != null && statusEle.Value.Equals("1"))
+                            {
+                                throw new Exception(resElement.Value);
+                            }
                         }
-                    }
 
-                    dataRow["ExtId"] = departmentElement.Attribute("Id").Value;
+                        dataRow["ExtId"] = departmentElement.Attribute("Id").Value;
+                    }
                 }
             }
 
             return dataTable;
+        }
+
+        // check if department associate with any Resource then restrict the delete opration
+        public bool PerformDepartmentDeleteCheck(SPItemEventProperties properties, out string Errmsg)
+        {
+            bool IsDeptDel = true;
+            Errmsg = string.Empty;
+            try
+            {
+                if (properties.List.Fields.ContainsFieldWithStaticName("DisplayName") && properties.List.Fields.ContainsFieldWithStaticName("RBS"))
+                {
+                    SPWeb web = properties.Web;
+                    SPQuery query = new SPQuery();
+                    query.Query = "<Where><Eq><FieldRef Name='Department' LookupId='TRUE'/><Value Type='Lookup'>" + properties.ListItem.ID + "</Value></Eq></Where>";
+
+                    SPList lstDept = web.Lists["Resources"];
+                    if (lstDept != null)
+                    {
+                        SPListItemCollection ResourcesListItems = lstDept.GetItems(query);
+
+                        if (ResourcesListItems.Count > 0)                        
+                            IsDeptDel = false;
+                    }
+
+                }
+            }
+            catch (Exception ex)
+            {
+                IsDeptDel = false;
+                Errmsg = ex.Message;
+            }            
+            return IsDeptDel;
         }
 
         // Private Methods (3) 

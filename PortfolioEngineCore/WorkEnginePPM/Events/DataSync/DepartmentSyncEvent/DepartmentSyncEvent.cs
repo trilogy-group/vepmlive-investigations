@@ -181,12 +181,24 @@ namespace WorkEnginePPM.Events.DataSync
         public override void ItemDeleting(SPItemEventProperties properties)
         {
             if (!ValidateRequest(properties)) return;
-
+            string Errmsg;
+            
             try
-            {
+            {                
                 using (var departmentManager = new DepartmentManager(properties.Web))
                 {
-                    departmentManager.Delete(properties.ListItem.ID, (string) properties.ListItem["EXTID"]);
+                    bool Isdel = departmentManager.PerformDepartmentDeleteCheck(properties, out Errmsg);
+                    if (Isdel)
+                    {
+                        departmentManager.Delete(properties.ListItem.ID, (string)properties.ListItem["EXTID"]);                        
+                    }
+                    else
+                    {
+                        base.EventFiringEnabled = false;
+                        properties.Cancel = true;
+                        properties.ErrorMessage = Errmsg != string.Empty ? Errmsg : "There are resources related to this department. Please remove related resources from this Department before deleting.";
+                        properties.Status = SPEventReceiverStatus.CancelWithError;                        
+                    }
                 }
             }
             catch (Exception exception)

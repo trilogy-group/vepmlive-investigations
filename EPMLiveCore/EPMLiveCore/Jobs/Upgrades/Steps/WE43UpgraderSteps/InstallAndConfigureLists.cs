@@ -370,6 +370,7 @@ namespace EPMLiveCore.Jobs.Upgrades.Steps.WE43UpgraderSteps
             {
                 bool badding = false;
                 bool bupdating = false;
+                bool bdeleted = false;
 
                 string sClass = "EPMLiveCore.DepartmentEvent";
                 string sAssembly = "EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5";
@@ -382,6 +383,8 @@ namespace EPMLiveCore.Jobs.Upgrades.Steps.WE43UpgraderSteps
                             badding = true;
                         else if(e.Type == SPEventReceiverType.ItemUpdating)
                             bupdating = true;
+                        else if (e.Type == SPEventReceiverType.ItemDeleted)
+                            bdeleted = true;
                     }
                 }
 
@@ -395,6 +398,11 @@ namespace EPMLiveCore.Jobs.Upgrades.Steps.WE43UpgraderSteps
                 {
                     oDepartments.EventReceivers.Add(SPEventReceiverType.ItemUpdating, sAssembly, sClass);
                     oDepartments.Update();
+                }
+                if (!bdeleted)
+                {
+                    oDepartments.EventReceivers.Add(SPEventReceiverType.ItemDeleted, sAssembly, sClass);
+                    oDepartments.Delete();
                 }
             }
             catch(Exception ex)
