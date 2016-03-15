@@ -471,7 +471,7 @@
             <div style="width:100%;height:24px">
                 <div class="wetoolbar">
                     <ul>
-                        <li><a href="#" onclick="Javascript:AddNewLink();"><img src="images/newlink.gif" border="0"/></a></li>
+                        <%--<li><a href="#" onclick="Javascript:AddNewLink();"><img src="images/newlink.gif" border="0"/></a></li>--%>
                         <li><a href="#" onclick="Javascript:DeleteNewLink();"><img src="images/deletelink.gif" border="0"/></a></li>
                     </ul>
                 </div>
@@ -482,20 +482,6 @@
                 Layout_Url="../../_vti_bin/WorkPlanner.asmx" Layout_Method="Soap" Layout_Function="Execute" Layout_Namespace="workengine.com" Layout_Param_Functionname="GetLinksLayout" Layout_Param_Dataxml="<%=sPlannerLayoutParam %>"
                 >
             </treegrid>--><br />
-           </div>
-           <div style="width:100%;height:20px;background:#D0E5FF;padding:0px" >
-               Link Type:
-                <select name="slctAddLinkType" id="Select1">
-                    <option value="FS">FS (Finish-to-Start)</option>
-                    <option value="FF">FF (Finish-to-Finish)</option>
-                    <option value="SS">SS (Start-to-Start)</option>
-                    <option value="SF">SF (Start-to-Finish)</option>
-                </select><br /><br />
-
-                Lag Time (Days): <input type="text" class="ms-input" name="txtAddLinkLag" id="Text1" onkeydown="CancelBubbling(this, event);" onkeypress="CancelBubbling(this, event);" />
-                <br /><br />
-                <input type="button" value="Add Link" onclick="SP.UI.ModalDialog.commonModalDialogClose(SP.UI.DialogResult.OK, document.getElementById('viewname').value + '|' + document.getElementById('chkViewDefault').checked); return false;" class="ms-ButtonHeightWidth" style="width:100px" target="_self" /> &nbsp;
-                <input type="button" value="Cancel" onclick="SP.UI.ModalDialog.commonModalDialogClose(SP.UI.DialogResult.cancel, 'Cancel clicked'); return false;" class="ms-ButtonHeightWidth" style="width:100px" target="_self" />  
            </div>
        </div>
        <div id="linksDivInnerMulti" style="width:100%;height:100%;display:none;background-color:White">
@@ -1528,7 +1514,8 @@
         {
             UpdateDependencies(grid);
         }
-    }   
+    }  
+        
     
     Grids.OnRowFilter = function(grid, row, show)
     {
