@@ -509,13 +509,14 @@
             filters = filters.substr(1);
         }
 
-
-
         filters = showFilter + '|' + filters;
+        this.selectedView[gridId].Filters = filters;
 
         var grouping = showGrouping + '|' + grid.Group;
+        this.selectedView[gridId].Grouping = grouping;
 
         var sorting = grid.Sort;
+        this.selectedView[gridId].Sorting = sorting;
 
         var dataXml = '<' + XMLValue(gridId) + ' LeftCols="' + XMLValue(leftCols) + '" Cols="' + XMLValue(cols) + '" RightCols="'
 					+ XMLValue(rightCols) + '" Filters="' + XMLValue(filters) + '" Grouping="' + grouping + '" Sorting="' + sorting + '" RibbonExpanded="' + rexpanded + '"/>';
@@ -837,13 +838,7 @@
                 }
             }
             catch (e) { }
-
-
-            try {
-                grid.ChangeSort(gridView['Sorting']);
-            }
-            catch (e) { }
-
+            
 
             if (gridView['Grouping'] === '') {
                 try {
@@ -861,6 +856,11 @@
 
                 try { grid.DoGrouping(grouping[1]); } catch (e) { };
             }
+
+            try {
+                grid.ChangeSort(gridView['Sorting']);
+            }
+            catch (e) { }
 
             try {
                 if (bRender)
@@ -8564,5 +8564,5 @@
     catch (e) {
         alert("Resource Plan Analyzer Initialization error");
     }
-    
+
 }
