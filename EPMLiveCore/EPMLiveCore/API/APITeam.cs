@@ -78,11 +78,11 @@ namespace EPMLiveCore.API
             }
 
 
-            var rb = new EPMLiveReportsAdmin.ReportBiz(web.Site.ID);
+            var rb = new ReportHelper.ReportBiz(web.Site.ID);
 
             if (rb.SiteExists())
             {
-                EPMLiveReportsAdmin.EPMData data = new EPMLiveReportsAdmin.EPMData(web.Site.ID);
+                ReportHelper.EPMData data = new ReportHelper.EPMData(web.Site.ID);
 
                 SqlConnection cn = data.GetClientReportingConnection;
 
@@ -2366,7 +2366,7 @@ namespace EPMLiveCore.API
 
             try
             {
-                EPMLiveReportsAdmin.EPMData data = new EPMLiveReportsAdmin.EPMData(web.Site.ID);
+                ReportHelper.EPMData data = new ReportHelper.EPMData(web.Site.ID);
 
                 SqlConnection cn = data.GetClientReportingConnection;
                 SqlCommand cmd = new SqlCommand("SELECT ItemId, ItemListId, WebId FROM RPTWeb WHERE WebId = '" + web.ID.ToString() + "'", cn);

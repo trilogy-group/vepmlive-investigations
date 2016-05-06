@@ -15,13 +15,13 @@ namespace EPMLiveCore
         public static DataSet GetReportingData(SPWeb web, string list, bool bRollup, string query, string orderby, int page, int pagesize)
         {
 
-            var rb = new EPMLiveReportsAdmin.ReportBiz(web.Site.ID);
+            var rb = new ReportHelper.ReportBiz(web.Site.ID);
 
             if (rb.SiteExists())
             {
                 SPList oList = web.Lists[list];
 
-                EPMLiveReportsAdmin.EPMData data = new EPMLiveReportsAdmin.EPMData(web.Site.ID);
+                ReportHelper.EPMData data = new ReportHelper.EPMData(web.Site.ID);
 
                 SqlConnection cn = data.GetClientReportingConnection;
 

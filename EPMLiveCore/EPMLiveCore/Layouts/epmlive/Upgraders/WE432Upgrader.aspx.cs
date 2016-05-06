@@ -6,9 +6,8 @@ using System.Web.UI;
 using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls.WebParts;
 using EPMLiveCore.API;
-using EPMLiveReportsAdmin;
-using EPMLiveReportsAdmin.Layouts.EPMLive;
-using EPMLiveWebParts;
+using EPMLiveCore.ReportHelper;
+using EPMLiveCore.WebPartsHelper;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.WebControls;
 using Microsoft.SharePoint.WebPartPages;
@@ -61,7 +60,7 @@ namespace EPMLiveCore.Layouts.epmlive.Upgraders
 
                 LogHeader("Reporting Database Upgrade");
 
-                foreach (HtmlGenericControl htmlGenericControl in new UpgradeReportingDB().Upgrade())
+                foreach (HtmlGenericControl htmlGenericControl in new UpgradeReportingDBHelper().Upgrade())
                 {
                     _messages.Add(htmlGenericControl);
                 }
@@ -214,10 +213,11 @@ namespace EPMLiveCore.Layouts.epmlive.Upgraders
                 SPLimitedWebPartManager webPartManager = spWeb.GetLimitedWebPartManager("MyWork.aspx",
                     PersonalizationScope.Shared))
             {
-                foreach (
-                    object webPart in webPartManager.WebParts.Cast<object>().Where(webPart => webPart is MyWorkWebPart))
+                //foreach (object webPart in webPartManager.WebParts.Cast<object>().Where(webPart => webPart is MyWorkWebPart))
+                foreach (object webPart in webPartManager.WebParts.Cast<object>().Where(webPart => WebPartsReflector.IsWebpartMyWorkWebPart(webPart)))
                 {
-                    ((MyWorkWebPart) webPart).Height = string.Empty;
+                    //((MyWorkWebPart) webPart).Height = string.Empty;
+                    WebPartsReflector.SetWebPartProperty(webPart, "Height", string.Empty);
                     webPartManager.SaveChanges((WebPart) webPart);
                 }
             }

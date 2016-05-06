@@ -12,12 +12,11 @@ using System.Collections;
 using System.Xml;
 using System.Text.RegularExpressions;
 using System.Net;
-using Microsoft.SharePoint.WebControls;
 using Microsoft.SharePoint.WebPartPages;
 using System.Data.SqlClient;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
-using ReportFiltering;
+using EPMLiveCore.WebPartsHelper;
 using WebPart = Microsoft.SharePoint.WebPartPages.WebPart;
 
 namespace EPMLiveCore.API
@@ -1738,7 +1737,9 @@ namespace EPMLiveCore.API
 
                                 if (!bHasGrid)
                                 {
-                                    EPMLiveWebParts.GridListView gv = new EPMLiveWebParts.GridListView();
+                                    //EPMLiveWebParts.GridListView gv = new EPMLiveWebParts.GridListView();
+                                    //oViewWebManager.AddWebPart(gv, "Main", 0);
+                                    var gv = WebPartsReflector.CreateGridListViewWebPart();
                                     oViewWebManager.AddWebPart(gv, "Main", 0);
                                 }
                             }
@@ -2419,8 +2420,8 @@ namespace EPMLiveCore.API
                                         }
                                         catch{}
 
-                                        var rb = new EPMLiveReportsAdmin.ReportBiz(oList.ParentWeb.Site.ID, oList.ParentWeb.ID, reportingV2Enabled);
-                                        EPMLiveReportsAdmin.ListBiz lb = rb.GetListBiz(oList.ID);
+                                        var rb = new ReportHelper.ReportBiz(oList.ParentWeb.Site.ID, oList.ParentWeb.ID, reportingV2Enabled);
+                                        ReportHelper.ListBiz lb = rb.GetListBiz(oList.ID);
 
                                         if (string.IsNullOrEmpty(lb.ListName))
                                         {

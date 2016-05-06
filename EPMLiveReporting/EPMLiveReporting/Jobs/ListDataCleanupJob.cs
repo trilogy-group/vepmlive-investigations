@@ -5,6 +5,7 @@ using System.Data.SqlClient;
 using EPMLiveCore.API;
 using Microsoft.SharePoint;
 using System.Text;
+using EPMLiveCore.ReportHelper;
 
 namespace EPMLiveReportsAdmin.Jobs
 {

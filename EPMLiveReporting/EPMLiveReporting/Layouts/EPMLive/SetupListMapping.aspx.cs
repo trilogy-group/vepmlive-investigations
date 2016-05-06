@@ -52,7 +52,7 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
         {
             SPSite site = SPContext.Current.Site;
 
-            var rb = new ReportBiz(site.ID);
+            var rb = new EPMLiveCore.ReportHelper.ReportBiz(site.ID);
             //Collection<string> existingLists = rb.GetMappedLists();
             Collection<string> existingLists = rb.GetMappedListsIds();
 
@@ -113,11 +113,11 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
                         fields.Add(resourceField);
                 }
 
-            var rb = new ReportBiz(SPContext.Current.Site.ID);
+            var rb = new EPMLiveCore.ReportHelper.ReportBiz(SPContext.Current.Site.ID);
 
             if (_existing)
             {
-                ListBiz lb = rb.GetListBiz(_existingListId);
+                EPMLiveCore.ReportHelper.ListBiz lb = rb.GetListBiz(_existingListId);
                 lb.UpdateListMapping(fields);
             }
             else
@@ -129,7 +129,7 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
             try
             {
                 //FOREIGN IMPLEMENTATION -- START
-                var DAO = new EPMData(SPContext.Current.Site.ID);
+                var DAO = new EPMLiveCore.ReportHelper.EPMData(SPContext.Current.Site.ID);
                 rb.UpdateForeignKeys(DAO);
                 DAO.Dispose();
                 // -- END
@@ -201,16 +201,16 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
             // Get existing mappings if they exist
             if (_existing)
             {
-                var rb = new ReportBiz(SPContext.Current.Site.ID);
-                ListBiz list = rb.GetListBiz(_existingListId);
+                var rb = new EPMLiveCore.ReportHelper.ReportBiz(SPContext.Current.Site.ID);
+                EPMLiveCore.ReportHelper.ListBiz list = rb.GetListBiz(_existingListId);
                 mappedFields = list.GetMappedFieldsStrings();
                 resList = list.ResourceList;
                 chkResource.Checked = list.ResourceList;
                 chkResource.Enabled = true;
             }
 
-            Collection<string> required = ListBiz.RequiredResourceFields;
-            Collection<string> automatic = ListBiz.AutomaticFields;
+            Collection<string> required = EPMLiveCore.ReportHelper.ListBiz.RequiredResourceFields;
+            Collection<string> automatic = EPMLiveCore.ReportHelper.ListBiz.AutomaticFields;
 
             // Get all fields in List - and sort them
             var fields = new List<SPField>();

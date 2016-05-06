@@ -2136,18 +2136,23 @@ namespace EPMLiveCore
                                 {
                                     try
                                     {
-                                        assemblyInstance = Assembly.Load(EPMLiveReportingAssembly);
-                                        thisClass = assemblyInstance.GetType("EPMLiveReportsAdmin.EPMData", true, true);
-                                        m = thisClass.GetMethod("SetListIcon", BindingFlags.Public | BindingFlags.Instance);
-                                        apiClass = Activator.CreateInstance(thisClass, new object[] { true, s.ID, w.ID });
+                                        //assemblyInstance = Assembly.Load(EPMLiveReportingAssembly);
+                                        //thisClass = assemblyInstance.GetType("EPMLiveReportsAdmin.EPMData", true, true);
+                                        //m = thisClass.GetMethod("SetListIcon", BindingFlags.Public | BindingFlags.Instance);
+                                        //apiClass = Activator.CreateInstance(thisClass, new object[] { true, s.ID, w.ID });
 
-                                        if (m != null &&
-                                            assemblyInstance != null &&
-                                            thisClass != null &&
-                                            apiClass != null)
-                                        {
-                                            m.Invoke(apiClass, new object[] { listIconsToBeSet });
-                                        }
+                                        //if (m != null &&
+                                        //    assemblyInstance != null &&
+                                        //    thisClass != null &&
+                                        //    apiClass != null)
+                                        //{
+                                        //    m.Invoke(apiClass, new object[] { listIconsToBeSet });
+                                        //}
+
+                                        ReportHelper.EPMData epmData = new ReportHelper.EPMData(s.ID, w.ID);
+
+                                        epmData.SetListIcon(listIconsToBeSet);
+
                                     }
                                     catch { }
                                 }
@@ -2155,20 +2160,24 @@ namespace EPMLiveCore
                                 // use reflection to map list
                                 try
                                 {
-                                    assemblyInstance = Assembly.Load(EPMLiveReportingAssembly);
-                                    thisClass = assemblyInstance.GetType("EPMLiveReportsAdmin.EPMData", true, true);
-                                    m = thisClass.GetMethod("MapLists", BindingFlags.Public | BindingFlags.Instance);
-                                    apiClass = Activator.CreateInstance(thisClass, new object[] { true, s.ID, w.ID });
+                                    //assemblyInstance = Assembly.Load(EPMLiveReportingAssembly);
+                                    //thisClass = assemblyInstance.GetType("EPMLiveReportsAdmin.EPMData", true, true);
+                                    //m = thisClass.GetMethod("MapLists", BindingFlags.Public | BindingFlags.Instance);
+                                    //apiClass = Activator.CreateInstance(thisClass, new object[] { true, s.ID, w.ID });
+
+                                    //if (m != null &&
+                                    //    assemblyInstance != null &&
+                                    //    thisClass != null &&
+                                    //    apiClass != null)
+                                    //{
+                                    //    m.Invoke(apiClass, new object[] { listsToBeMapped, w.ID });
+                                    //}
+
+                                    ReportHelper.EPMData epmData = new ReportHelper.EPMData(s.ID, w.ID);
+
+                                    epmData.MapLists(listsToBeMapped,w.ID);
                                 }
                                 catch { }
-
-                                if (m != null &&
-                                    assemblyInstance != null &&
-                                    thisClass != null &&
-                                    apiClass != null)
-                                {
-                                    m.Invoke(apiClass, new object[] { listsToBeMapped, w.ID });
-                                }
                             }
                         }
                     });
@@ -2353,38 +2362,43 @@ namespace EPMLiveCore
                             {
                                 try
                                 {
-                                    assemblyInstance = Assembly.Load(EPMLiveReportingAssembly);
-                                    thisClass = assemblyInstance.GetType("EPMLiveReportsAdmin.EPMData", true, true);
-                                    m = thisClass.GetMethod("SetListIcon", BindingFlags.Public | BindingFlags.Instance);
-                                    apiClass = Activator.CreateInstance(thisClass, new object[] { true, ss.ID, sw.ID });
+                                    //assemblyInstance = Assembly.Load(EPMLiveReportingAssembly);
+                                    //thisClass = assemblyInstance.GetType("EPMLiveReportsAdmin.EPMData", true, true);
+                                    //m = thisClass.GetMethod("SetListIcon", BindingFlags.Public | BindingFlags.Instance);
+                                    //apiClass = Activator.CreateInstance(thisClass, new object[] { true, ss.ID, sw.ID });
 
-                                    if (m != null &&
-                                        assemblyInstance != null &&
-                                        thisClass != null &&
-                                        apiClass != null)
-                                    {
-                                        m.Invoke(apiClass, new object[] { listIconsToBeSet });
-                                    }
+                                    //if (m != null &&
+                                    //    assemblyInstance != null &&
+                                    //    thisClass != null &&
+                                    //    apiClass != null)
+                                    //{
+                                    //    m.Invoke(apiClass, new object[] { listIconsToBeSet });
+                                    //}
+                                    ReportHelper.EPMData epmData = new ReportHelper.EPMData(ss.ID, sw.ID);
+
+                                    epmData.SetListIcon(listIconsToBeSet);
                                 }
                                 catch { }
                             }
                             try
                             {
-                                assemblyInstance = Assembly.Load(EPMLiveReportingAssembly);
-                                thisClass = assemblyInstance.GetType("EPMLiveReportsAdmin.EPMData", true, true);
-                                m = thisClass.GetMethod("MapLists", BindingFlags.Public | BindingFlags.Instance);
-                                apiClass = Activator.CreateInstance(thisClass, new object[] { true, ss.ID, sw.ID });
+                                //assemblyInstance = Assembly.Load(EPMLiveReportingAssembly);
+                                //thisClass = assemblyInstance.GetType("EPMLiveReportsAdmin.EPMData", true, true);
+                                //m = thisClass.GetMethod("MapLists", BindingFlags.Public | BindingFlags.Instance);
+                                //apiClass = Activator.CreateInstance(thisClass, new object[] { true, ss.ID, sw.ID });
+
+                                //if (m != null &&
+                                //    assemblyInstance != null &&
+                                //    thisClass != null &&
+                                //    apiClass != null)
+                                //{
+                                //    m.Invoke(apiClass, new object[] { listsToBeMapped, sw.ID });
+                                //}
+                                ReportHelper.EPMData epmData = new ReportHelper.EPMData(ss.ID, sw.ID);
+
+                                epmData.MapLists(listsToBeMapped,sw.ID);
                             }
                             catch { }
-
-                            if (m != null &&
-                                assemblyInstance != null &&
-                                thisClass != null &&
-                                apiClass != null)
-                            {
-                                m.Invoke(apiClass, new object[] { listsToBeMapped, sw.ID });
-                            }
-
                         }
                     }
 

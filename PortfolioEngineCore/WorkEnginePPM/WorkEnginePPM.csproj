@@ -78,10 +78,6 @@ iisreset</PostDeploymentCommand>
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\EPMLiveCore\EPMLiveCore\bin\Debug\EPM Live Core.dll</HintPath>
     </Reference>
-    <Reference Include="EPMLiveReportsAdmin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b90e532f481cf050, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\EPMLiveReporting\EPMLiveReporting\bin\Debug\EPMLiveReportsAdmin.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.SharePoint.Security, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\Program Files\Common Files\Microsoft Shared\Web Server Extensions\15\ISAPI\Microsoft.SharePoint.Security.dll</HintPath>
@@ -766,7 +762,6 @@ iisreset</PostDeploymentCommand>
     </Compile>
     <Compile Include="Layouts\ppm\Tools\DGrid.ascx.cs">
       <DependentUpon>DGrid.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\ppm\Tools\DGrid.ascx.designer.cs">
       <DependentUpon>DGrid.ascx.cs</DependentUpon>
@@ -780,7 +775,6 @@ iisreset</PostDeploymentCommand>
     </Compile>
     <Compile Include="Layouts\ppm\Tools\TGrid.ascx.cs">
       <DependentUpon>TGrid.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\ppm\Tools\TGrid.ascx.designer.cs">
       <DependentUpon>TGrid.ascx.cs</DependentUpon>

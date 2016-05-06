@@ -5,6 +5,7 @@ using System.Data.SqlClient;
 using System.Linq;
 using Microsoft.SharePoint;
 using EPMLiveCore;
+using EPMLiveCore.ReportHelper;
 
 namespace EPMLiveReportsAdmin
 {

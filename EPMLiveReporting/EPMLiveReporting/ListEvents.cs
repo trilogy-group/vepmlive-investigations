@@ -6,6 +6,7 @@ using System.Diagnostics;
 using EPMLiveCore.API;
 using Microsoft.SharePoint;
 using EPMLiveCore;
+using EPMLiveCore.ReportHelper;
 
 namespace EPMLiveReportsAdmin
 {

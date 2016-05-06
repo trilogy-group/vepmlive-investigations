@@ -226,13 +226,13 @@ namespace EPMLiveCore.Layouts.EPMLiveCore
             SPSecurity.RunWithElevatedPrivileges(delegate()
             {
 
-                var reportData = new EPMLiveReportsAdmin.ReportData(
+                var reportData = new ReportHelper.ReportData(
                 new Guid(site.ID.ToString()),
                 txtDatabaseName.Text,
-                txtDatabaseServer.Text, sacccount.Checked, username.Text, EPMLiveReportsAdmin.EPMData.Encrypt(password.Text));
+                txtDatabaseServer.Text, sacccount.Checked, username.Text, ReportHelper.EPMData.Encrypt(password.Text));
                 bool found = reportData.DatabaseExists();
 
-                EPMLiveReportsAdmin.EPMData epmdata = new EPMLiveReportsAdmin.EPMData(site.ID);
+                ReportHelper.EPMData epmdata = new ReportHelper.EPMData(site.ID);
 
                 bool reportingdone = epmdata.MapDataBase(site.ID, site.WebApplication.Id, txtDatabaseServer.Text, txtDatabaseName.Text, username.Text, password.Text, sacccount.Checked, found, out errors);
 

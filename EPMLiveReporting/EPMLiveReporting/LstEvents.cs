@@ -4,6 +4,7 @@ using System.Diagnostics;
 using Microsoft.SharePoint;
 using System.Web;
 using System.Xml;
+using EPMLiveCore.ReportHelper;
 
 
 namespace EPMLiveReportsAdmin

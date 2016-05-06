@@ -462,8 +462,8 @@ namespace EPMLiveCore.API
                                     {
                                         try
                                         {
-                                            var reportBiz = new EPMLiveReportsAdmin.ReportBiz(oList.ParentWeb.Site.ID);
-                                            EPMLiveReportsAdmin.EPMData _DAO = new EPMLiveReportsAdmin.EPMData(oList.ParentWeb.Site.ID);
+                                            var reportBiz = new ReportHelper.ReportBiz(oList.ParentWeb.Site.ID);
+                                            ReportHelper.EPMData _DAO = new ReportHelper.EPMData(oList.ParentWeb.Site.ID);
                                             _DAO.Command = "SELECT TableName FROM RPTList WHERE RPTListID=@RPTListID";
                                             _DAO.AddParam("@RPTListID", oList.ID);
                                             string sTableName = _DAO.ExecuteScalar(_DAO.GetClientReportingConnection).ToString();

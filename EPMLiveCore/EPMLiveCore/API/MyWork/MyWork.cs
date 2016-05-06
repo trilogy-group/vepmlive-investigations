@@ -72,7 +72,7 @@ using System.Xml.Linq;
 using System.Xml.Serialization;
 using EPMLiveCore.Properties;
 using EPMLiveCore.ReportingProxy;
-using EPMLiveReportsAdmin;
+using EPMLiveCore.ReportHelper;
 using Microsoft.SharePoint;
 
 namespace EPMLiveCore.API

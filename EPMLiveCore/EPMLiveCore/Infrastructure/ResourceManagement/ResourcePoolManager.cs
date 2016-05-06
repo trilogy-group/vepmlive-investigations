@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using EPMLiveCore.API;
 using EPMLiveCore.ReportingProxy;
-using EPMLiveReportsAdmin;
+using EPMLiveCore.ReportHelper;
 using Microsoft.SharePoint;
 
 namespace EPMLiveCore.Infrastructure

@@ -96,11 +96,8 @@ net start "WETimer"</PostDeploymentCommand>
     </Compile>
     <Compile Include="API\DataManager.cs" />
     <Compile Include="API\Errors.cs" />
-    <Compile Include="API\ReportingScope.cs" />
     <Compile Include="API\ReportManager.cs" />
     <Compile Include="DataScrubber.cs" />
-    <Compile Include="DbFactory.cs" />
-    <Compile Include="EPMData.cs" />
     <Compile Include="epmlive\ReportDatabases.aspx.cs">
       <DependentUpon>ReportDatabases.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -204,12 +201,10 @@ net start "WETimer"</PostDeploymentCommand>
     <Compile Include="Layouts\EPMLive\ViewLogDetail.aspx.designer.cs">
       <DependentUpon>ViewLogDetail.aspx.cs</DependentUpon>
     </Compile>
-    <Compile Include="ListBiz.cs" />
     <Compile Include="ListEvents.cs" />
     <Compile Include="ListRefresh.cs" />
     <Compile Include="LstEvents.cs" />
     <Compile Include="MyWorkListEvents.cs" />
-    <Compile Include="MyWorkReportData.cs" />
     <Compile Include="ParentItemUpdate.cs" />
     <Compile Include="ProcessSecurity.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -218,8 +213,6 @@ net start "WETimer"</PostDeploymentCommand>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="ReportBiz.cs" />
-    <Compile Include="ReportData.cs" />
     <Compile Include="ReportingAPI.cs" />
     <Compile Include="SocialEngineEvents.cs" />
   </ItemGroup>
@@ -269,8 +262,6 @@ net start "WETimer"</PostDeploymentCommand>
     <Content Include="Layouts\EPMLive\ViewLogDetail.aspx" />
     <Content Include="Resources\CheckReqSP.sql" />
     <Content Include="Resources\CheckSchema.sql" />
-    <None Include="Resources\InitDatabaseCreateTables.sql" />
-    <None Include="Resources\InitDatabaseCreateProcedures.sql" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">

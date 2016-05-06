@@ -2,31 +2,19 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Configuration;
 using System.Data;
-using System.Data.SqlClient;
-using System.IO;
 using System.Linq;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web;
-using System.Web.Security;
-using System.Web.UI;
-using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
 using System.Web.UI.WebControls.WebParts;
-using System.Xml;
 using System.Xml.Linq;
-using EPMLiveCore.ListDefinitions;
 using EPMLiveCore.ReportingProxy;
-using EPMLiveWebParts;
 using Microsoft.SharePoint;
-using Microsoft.SharePoint.Administration;
 using Microsoft.SharePoint.WebControls;
 using Microsoft.SharePoint.WebPartPages;
-using System.Net;
-using EPMLiveReportsAdmin;
+using EPMLiveCore.ReportHelper;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using EPMLiveCore.Infrastructure;
@@ -528,7 +516,8 @@ namespace EPMLiveCore.Layouts.epmlive
 
                         foreach (System.Web.UI.WebControls.WebParts.WebPart wp in wpMgr.WebParts)
                         {
-                            if (wp.GetType().Equals(typeof(GridListView)))
+                            //if (wp.GetType().Equals(typeof(GridListView)))
+                            if (WebPartsHelper.WebPartsReflector.IsWebPartGridListView(wp))
                             {
                                 wpAlreadyExists = true;
                                 break;
@@ -537,7 +526,8 @@ namespace EPMLiveCore.Layouts.epmlive
 
                         if (!wpAlreadyExists)
                         {
-                            GridListView wpGridListView = new GridListView();
+                            var wpGridListView = WebPartsHelper.WebPartsReflector.CreateGridListViewWebPart();
+                            //GridListView wpGridListView = new GridListView();
                             wpMgr.AddWebPart(wpGridListView, "Main", 0);
                             wpMgr.SaveChanges(wpGridListView);
                             Web.Update();
@@ -1567,7 +1557,8 @@ namespace EPMLiveCore.Layouts.epmlive
                     {
                         var wpm = dispForm.GetLimitedWebPartManager(System.Web.UI.WebControls.WebParts.PersonalizationScope.Shared);
 
-                        EPMLiveWebParts.FancyDisplayForm fancyDispFormWebPart = new EPMLiveWebParts.FancyDisplayForm();
+                        //EPMLiveWebParts.FancyDisplayForm fancyDispFormWebPart = new EPMLiveWebParts.FancyDisplayForm();
+                        var fancyDispFormWebPart = WebPartsHelper.WebPartsReflector.CreateFancyDisplayFormWebPart();
                         fancyDispFormWebPart.Title = "Fancy Display Form";
                         fancyDispFormWebPart.ChromeState = System.Web.UI.WebControls.WebParts.PartChromeState.Normal;
                         fancyDispFormWebPart.ChromeType = System.Web.UI.WebControls.WebParts.PartChromeType.None;
@@ -1644,7 +1635,8 @@ namespace EPMLiveCore.Layouts.epmlive
                     {
                         var wpm = dispForm.GetLimitedWebPartManager(System.Web.UI.WebControls.WebParts.PersonalizationScope.Shared);
 
-                        EPMLiveWebParts.FancyDisplayForm fancyDispFormWebPart = new EPMLiveWebParts.FancyDisplayForm();
+                        //EPMLiveWebParts.FancyDisplayForm fancyDispFormWebPart = new EPMLiveWebParts.FancyDisplayForm();
+                        var fancyDispFormWebPart = WebPartsHelper.WebPartsReflector.CreateFancyDisplayFormWebPart();
                         fancyDispFormWebPart.Title = "Fancy Display Form";
                         fancyDispFormWebPart.ChromeState = System.Web.UI.WebControls.WebParts.PartChromeState.Normal;
                         fancyDispFormWebPart.ChromeType = System.Web.UI.WebControls.WebParts.PartChromeType.None;

@@ -5,7 +5,7 @@ using System.Text;
 using Microsoft.SharePoint;
 using System.Threading;
 using System.Data.SqlClient;
-using EPMLiveReportsAdmin;
+using EPMLiveCore.ReportHelper;
 using System.Collections;
 
 namespace EPMLiveCore

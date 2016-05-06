@@ -11,6 +11,7 @@ using Microsoft.SharePoint;
 using Microsoft.SharePoint.Utilities;
 using Microsoft.SharePoint.WebControls;
 using Image = System.Web.UI.WebControls.Image;
+using EPMLiveCore.ReportHelper;
 
 namespace EPMLiveReportsAdmin.Layouts.EPMLive
 {
@@ -71,8 +72,8 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
 
                                 // remove event first to avoid duplicates
                                 List<SPEventReceiverDefinition> evts = GetListEvents(spList,
-                                    Resources.Assembly,
-                                    Resources.ClassName,
+                                    EPMLiveCore.Properties.Resources.ReportingAssembly,
+                                    EPMLiveCore.Properties.Resources.ReportingClassName,
                                     new List<SPEventReceiverType>
                                     {
                                         SPEventReceiverType.ItemAdded,
@@ -85,17 +86,17 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
                                     e.Delete();
                                 }
 
-                                spList.EventReceivers.Add(SPEventReceiverType.ItemAdded, Resources.Assembly,
-                                    Resources.ClassName);
-                                spList.EventReceivers.Add(SPEventReceiverType.ItemUpdated, Resources.Assembly,
-                                    Resources.ClassName);
-                                spList.EventReceivers.Add(SPEventReceiverType.ItemDeleting, Resources.Assembly,
-                                    Resources.ClassName);
+                                spList.EventReceivers.Add(SPEventReceiverType.ItemAdded, EPMLiveCore.Properties.Resources.ReportingAssembly,
+                                    EPMLiveCore.Properties.Resources.ReportingClassName);
+                                spList.EventReceivers.Add(SPEventReceiverType.ItemUpdated, EPMLiveCore.Properties.Resources.ReportingAssembly,
+                                    EPMLiveCore.Properties.Resources.ReportingClassName);
+                                spList.EventReceivers.Add(SPEventReceiverType.ItemDeleting, EPMLiveCore.Properties.Resources.ReportingAssembly,
+                                    EPMLiveCore.Properties.Resources.ReportingClassName);
 
 
                                 List<SPEventReceiverDefinition> newEvts = GetListEvents(spList,
-                                    Resources.Assembly,
-                                    Resources.ClassName,
+                                    EPMLiveCore.Properties.Resources.ReportingAssembly,
+                                    EPMLiveCore.Properties.Resources.ReportingClassName,
                                     new List<SPEventReceiverType>
                                     {
                                         SPEventReceiverType.ItemAdded,
@@ -112,7 +113,7 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
                                 if (sWebUrl.ToLower() == spSite.RootWeb.Url.ToLower())
                                 {
                                     List<SPEventReceiverDefinition> delEvts = GetListEvents(spList,
-                                        Resources.Assembly,
+                                        EPMLiveCore.Properties.Resources.ReportingAssembly,
                                         "EPMLiveReportsAdmin.LstEvents",
                                         new List<SPEventReceiverType>
                                         {
@@ -128,19 +129,19 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
                                         e.Delete();
                                     }
 
-                                    spList.EventReceivers.Add(SPEventReceiverType.FieldAdding, Resources.Assembly,
+                                    spList.EventReceivers.Add(SPEventReceiverType.FieldAdding, EPMLiveCore.Properties.Resources.ReportingAssembly,
                                       "EPMLiveReportsAdmin.LstEvents");
-                                    spList.EventReceivers.Add(SPEventReceiverType.ListDeleting, Resources.Assembly,
+                                    spList.EventReceivers.Add(SPEventReceiverType.ListDeleting, EPMLiveCore.Properties.Resources.ReportingAssembly,
                                         "EPMLiveReportsAdmin.LstEvents");
-                                    spList.EventReceivers.Add(SPEventReceiverType.FieldAdded, Resources.Assembly,
+                                    spList.EventReceivers.Add(SPEventReceiverType.FieldAdded, EPMLiveCore.Properties.Resources.ReportingAssembly,
                                         "EPMLiveReportsAdmin.LstEvents");
-                                    spList.EventReceivers.Add(SPEventReceiverType.FieldUpdated, Resources.Assembly,
+                                    spList.EventReceivers.Add(SPEventReceiverType.FieldUpdated, EPMLiveCore.Properties.Resources.ReportingAssembly,
                                         "EPMLiveReportsAdmin.LstEvents");
-                                    spList.EventReceivers.Add(SPEventReceiverType.FieldDeleting, Resources.Assembly,
+                                    spList.EventReceivers.Add(SPEventReceiverType.FieldDeleting, EPMLiveCore.Properties.Resources.ReportingAssembly,
                                         "EPMLiveReportsAdmin.LstEvents");
 
                                     List<SPEventReceiverDefinition> newEvts2 = GetListEvents(spList,
-                                        Resources.Assembly,
+                                        EPMLiveCore.Properties.Resources.ReportingAssembly,
                                         "EPMLiveReportsAdmin.LstEvents",
                                         new List<SPEventReceiverType>
                                         {
@@ -253,19 +254,19 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
                                     foreach (SPEventReceiverDefinition spEventDef in spList.EventReceivers)
                                     {
                                         if (spEventDef.Type == SPEventReceiverType.ItemAdded &&
-                                            spEventDef.Class.ToLower() == Resources.ClassName.ToLower())
+                                            spEventDef.Class.ToLower() == EPMLiveCore.Properties.Resources.ReportingClassName.ToLower())
                                         {
                                             blnAddEvent = true;
                                         }
 
                                         if (spEventDef.Type == SPEventReceiverType.ItemUpdated &&
-                                            spEventDef.Class.ToLower() == Resources.ClassName.ToLower())
+                                            spEventDef.Class.ToLower() == EPMLiveCore.Properties.Resources.ReportingClassName.ToLower())
                                         {
                                             blnUpdateEvent = true;
                                         }
 
                                         if (spEventDef.Type == SPEventReceiverType.ItemDeleting &&
-                                            spEventDef.Class.ToLower() == Resources.ClassName.ToLower())
+                                            spEventDef.Class.ToLower() == EPMLiveCore.Properties.Resources.ReportingClassName.ToLower())
                                         {
                                             blnDeleteEvent = true;
                                         }

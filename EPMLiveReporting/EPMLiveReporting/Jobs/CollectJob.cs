@@ -9,6 +9,7 @@ using EPMLiveCore.Infrastructure;
 using EPMLiveReportsAdmin.Properties;
 using Microsoft.SharePoint;
 using System.Text;
+using EPMLiveCore.ReportHelper;
 
 namespace EPMLiveReportsAdmin.Jobs
 {

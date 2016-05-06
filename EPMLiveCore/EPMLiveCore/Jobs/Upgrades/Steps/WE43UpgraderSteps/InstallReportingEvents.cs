@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Data;
 using System.Linq;
-using EPMLiveReportsAdmin;
+using EPMLiveCore.ReportHelper;
 using Microsoft.SharePoint;
 
 namespace EPMLiveCore.Jobs.Upgrades.Steps.WE43UpgraderSteps

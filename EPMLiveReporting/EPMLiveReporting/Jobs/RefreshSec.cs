@@ -1,5 +1,6 @@
 ﻿using EPMLiveCore.API;
 using Microsoft.SharePoint;
+using EPMLiveCore.ReportHelper;
 
 namespace EPMLiveReportsAdmin.Jobs
 {

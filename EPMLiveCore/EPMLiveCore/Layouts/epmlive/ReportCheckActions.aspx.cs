@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.WebControls;
-using EPMLiveReportsAdmin;
+using EPMLiveCore.ReportHelper;
 using System.Data;
 
 namespace EPMLiveCore

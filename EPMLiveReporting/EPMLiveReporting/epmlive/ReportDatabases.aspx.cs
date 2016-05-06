@@ -5,6 +5,7 @@ using EPMLiveCore;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.Administration;
 using Microsoft.SharePoint.WebControls;
+using EPMLiveCore.ReportHelper;
 
 namespace EPMLiveReportsAdmin.Layouts.EPMLive
 {

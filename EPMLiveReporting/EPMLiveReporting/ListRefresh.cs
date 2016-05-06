@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Data;
 using EPMLiveCore;
 using Microsoft.SharePoint;
+using EPMLiveCore.ReportHelper;
 
 namespace EPMLiveReportsAdmin
 {

@@ -34,9 +34,11 @@ namespace EPMLiveCore.Infrastructure
         /// <returns></returns>
         protected object GetEpmDataClass()
         {
-            Type type = ReportingAssembly.GetType("EPMLiveReportsAdmin.EPMData", true, true);
-            ConstructorInfo constructorInfo = type.GetConstructor(new[] {typeof (Guid)});
-            return constructorInfo != null ? constructorInfo.Invoke(new object[] {Web.Site.ID}) : null;
+            //Type type = ReportingAssembly.GetType("EPMLiveReportsAdmin.EPMData", true, true);
+            //ConstructorInfo constructorInfo = type.GetConstructor(new[] { typeof(Guid) });
+            //return constructorInfo != null ? constructorInfo.Invoke(new object[] { Web.Site.ID }) : null;
+
+            return new ReportHelper.EPMData(Web.Site.ID);
         }
 
         /// <summary>
@@ -64,16 +66,20 @@ namespace EPMLiveCore.Infrastructure
 
         protected object GetReportBizClass()
         {
-            Type type = ReportingAssembly.GetType("EPMLiveReportsAdmin.ReportBiz", true, true);
-            ConstructorInfo constructorInfo = type.GetConstructor(new[] {typeof (Guid)});
-            return constructorInfo != null ? constructorInfo.Invoke(new object[] {Web.Site.ID}) : null;
+            //Type type = ReportingAssembly.GetType("EPMLiveReportsAdmin.ReportBiz", true, true);
+            //ConstructorInfo constructorInfo = type.GetConstructor(new[] {typeof (Guid)});
+            //return constructorInfo != null ? constructorInfo.Invoke(new object[] {Web.Site.ID}) : null;
+
+            return new ReportHelper.ReportBiz(Web.Site.ID);
         }
 
         protected object GetReportDataClass()
         {
-            Type type = ReportingAssembly.GetType("EPMLiveReportsAdmin.ReportData", true, true);
-            ConstructorInfo constructorInfo = type.GetConstructor(new[] {typeof (Guid)});
-            return constructorInfo != null ? constructorInfo.Invoke(new object[] {Web.Site.ID}) : null;
+            //Type type = ReportingAssembly.GetType("EPMLiveReportsAdmin.ReportData", true, true);
+            //ConstructorInfo constructorInfo = type.GetConstructor(new[] {typeof (Guid)});
+            //return constructorInfo != null ? constructorInfo.Invoke(new object[] {Web.Site.ID}) : null;
+
+            return new ReportHelper.ReportData(Web.Site.ID);
         }
 
         /// <summary>

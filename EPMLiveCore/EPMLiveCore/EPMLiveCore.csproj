@@ -86,14 +86,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\EPMLiveIntegration\EPMLiveIntegration\bin\Debug\EPMLiveIntegration.dll</HintPath>
     </Reference>
-    <Reference Include="EPMLiveReportsAdmin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b90e532f481cf050, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Debug\EPMLiveReportsAdmin.dll</HintPath>
-    </Reference>
-    <Reference Include="EPMLiveWebParts, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Debug\EPMLiveWebParts.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Microsoft.SharePoint.Client, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -438,6 +430,7 @@
     <Compile Include="Jobs\EPMLiveUpgrade\Steps\569Steps.cs" />
     <Compile Include="Jobs\EPMLiveUpgrade\Steps\GenericSteps.cs" />
     <Compile Include="Jobs\EPMLiveUpgrade\Steps\OptIn\55Steps.cs" />
+    <Compile Include="Jobs\EPMLiveUpgrade\Steps\OptIn\56Steps.cs" />
     <Compile Include="Jobs\EPMLiveUpgrade\Upgrader.cs" />
     <Compile Include="Jobs\Integration.cs" />
     <Compile Include="Jobs\Notifications.cs" />
@@ -1274,6 +1267,14 @@
     </Compile>
     <Compile Include="ReflectionMethods.cs" />
     <Compile Include="ReportAuth.cs" />
+    <Compile Include="ReportHelper\DbFactory.cs" />
+    <Compile Include="ReportHelper\EPMData.cs" />
+    <Compile Include="ReportHelper\ListBiz.cs" />
+    <Compile Include="ReportHelper\MyWorkReportData.cs" />
+    <Compile Include="ReportHelper\ReportBiz.cs" />
+    <Compile Include="ReportHelper\ReportData.cs" />
+    <Compile Include="ReportHelper\ReportingScope.cs" />
+    <Compile Include="ReportHelper\UpgradeReportingDBHelper.cs" />
     <Compile Include="ReportingData.cs" />
     <Compile Include="ReportingProxy\QueryExecutor.cs" />
     <Compile Include="ReportingProxy\ReportingLogger.cs" />
@@ -1545,6 +1546,8 @@
     <Compile Include="WebPageCode\viewrollup.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
+    <Compile Include="WebPartsHelper\IReportID.cs" />
+    <Compile Include="WebPartsHelper\WebPartsReflector.cs" />
     <Compile Include="WebServiceInstaller.cs" />
     <Compile Include="WEPeopleEditor.cs" />
     <Compile Include="WEPeopleQuery.cs" />

@@ -7,7 +7,7 @@ using Microsoft.SharePoint;
 using System.Security.Principal;
 using System.Data;
 using System.Data.SqlClient;
-using EPMLiveReportsAdmin;
+using EPMLiveCore.ReportHelper;
 
 namespace EPMLiveCore
 {

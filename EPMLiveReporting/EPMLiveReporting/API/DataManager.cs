@@ -9,6 +9,7 @@ using EPMLiveCore.API;
 using EPMLiveCore.Infrastructure;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.Utilities;
+using EPMLiveCore.ReportHelper;
 
 namespace EPMLiveReportsAdmin.API
 {

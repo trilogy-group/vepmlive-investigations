@@ -42,8 +42,8 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
         private void FillData()
         {
             Guid siteId = SPContext.Current.Site.ID;
-            var rb = new ReportBiz(siteId);
-            ListBiz list = rb.GetListBiz(_listId);
+            var rb = new EPMLiveCore.ReportHelper.ReportBiz(siteId);
+            EPMLiveCore.ReportHelper.ListBiz list = rb.GetListBiz(_listId);
             DataTable dt = list.GetLog(0);
             DataView errors = dt.DefaultView;
             if (_logType != "")
@@ -55,8 +55,8 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
         protected void btnClear_Click(object sender, EventArgs e)
         {
             Guid siteId = SPContext.Current.Site.ID;
-            var rb = new ReportBiz(siteId);
-            ListBiz list = rb.GetListBiz(_listId);
+            var rb = new EPMLiveCore.ReportHelper.ReportBiz(siteId);
+            EPMLiveCore.ReportHelper.ListBiz list = rb.GetListBiz(_listId);
             list.ClearLog(_logType);
 
             FillData();

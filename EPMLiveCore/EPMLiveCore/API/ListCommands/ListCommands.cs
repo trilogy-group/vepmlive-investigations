@@ -448,7 +448,8 @@ namespace EPMLiveCore.API
 
                         if (!bHasGrid)
                         {
-                            EPMLiveWebParts.GridListView gv = new EPMLiveWebParts.GridListView();
+                            //EPMLiveWebParts.GridListView gv = new EPMLiveWebParts.GridListView();
+                            var gv = WebPartsHelper.WebPartsReflector.CreateGridListViewWebPart();
                             oViewWebManager.AddWebPart(gv, "Main", 0);
                         }
                     }
@@ -466,8 +467,8 @@ namespace EPMLiveCore.API
             }
             catch { }
 
-            var rb = new EPMLiveReportsAdmin.ReportBiz(oList.ParentWeb.Site.ID, oList.ParentWeb.ID, reportingV2Enabled);
-            EPMLiveReportsAdmin.ListBiz lb = rb.GetListBiz(oList.ID);
+            var rb = new ReportHelper.ReportBiz(oList.ParentWeb.Site.ID, oList.ParentWeb.ID, reportingV2Enabled);
+            ReportHelper.ListBiz lb = rb.GetListBiz(oList.ID);
 
             if (string.IsNullOrEmpty(lb.ListName))
             {
@@ -547,7 +548,8 @@ namespace EPMLiveCore.API
 
                 wpm = dispForm.GetLimitedWebPartManager(System.Web.UI.WebControls.WebParts.PersonalizationScope.Shared);
 
-                var fancyDispFormWebPart = new EPMLiveWebParts.FancyDisplayForm();
+                //var fancyDispFormWebPart = new EPMLiveWebParts.FancyDisplayForm();
+                var fancyDispFormWebPart = WebPartsHelper.WebPartsReflector.CreateFancyDisplayFormWebPart();
                 fancyDispFormWebPart.Title = "Fancy Display Form";
                 fancyDispFormWebPart.ChromeState = System.Web.UI.WebControls.WebParts.PartChromeState.Normal;
                 fancyDispFormWebPart.ChromeType = System.Web.UI.WebControls.WebParts.PartChromeType.None;

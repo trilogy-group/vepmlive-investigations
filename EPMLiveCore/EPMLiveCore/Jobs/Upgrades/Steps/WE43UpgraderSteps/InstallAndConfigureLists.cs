@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Text;
-using EPMLiveReportsAdmin;
+using EPMLiveCore.ReportHelper;
 using Microsoft.SharePoint;
 using System.Net;
 using System.Security.Cryptography;
