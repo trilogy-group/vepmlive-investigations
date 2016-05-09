@@ -78,9 +78,9 @@
     <AssemblyOriginatorKeyFile>EPMLiveLists.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="DocumentFormat.OpenXml, Version=2.0.5022.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\Program Files (x86)\Open XML SDK\V2.0\lib\DocumentFormat.OpenXml.dll</HintPath>
+    <Reference Include="DocumentFormat.OpenXml, Version=2.5.5631.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\DocumentFormat.OpenXml.2.5\lib\DocumentFormat.OpenXml.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="EPMLiveIntegration, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -1558,6 +1558,7 @@
     <Compile Include="XmlDataManager.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="AppsListEvents\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{a0b8e287-cd4e-45c4-b77c-6ec4dfe05a4a}</SharePointProjectItemId>
     </None>
@@ -1835,6 +1836,9 @@
     </None>
     <None Include="OutlookSynch\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{070fec7e-4a62-44d8-b44c-a7c5811ab1e1}</SharePointProjectItemId>
+    </None>
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
     </None>
     <None Include="Package\Package.package">
       <PackageId>{64ede3b7-292b-4f08-b56f-1452b1834805}</PackageId>
