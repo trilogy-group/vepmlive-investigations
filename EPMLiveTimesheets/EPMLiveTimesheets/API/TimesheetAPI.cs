@@ -2037,7 +2037,7 @@ namespace TimeSheets
             XmlDocument docOut = new XmlDocument();
             docOut.LoadXml("<Grid><Body><B id=\"" + tsuid + "\"/></Body></Grid>");
             ndB = docOut.FirstChild.SelectSingleNode("//B");
-            EPMLiveReportsAdmin.MyWorkReportData rptData = new EPMLiveReportsAdmin.MyWorkReportData(web.Site.ID);
+            EPMLiveCore.ReportHelper.MyWorkReportData rptData = new EPMLiveCore.ReportHelper.MyWorkReportData(web.Site.ID);
 
             DataSet dsTS = iiGetTSData(cn, web, sPeriod, new Guid(tsuid), rptData);
             TimesheetSettings settings = new TimesheetSettings(web);
@@ -2086,7 +2086,7 @@ namespace TimeSheets
 
                 TimesheetSettings settings = new TimesheetSettings(web);
 
-                EPMLiveReportsAdmin.MyWorkReportData rptData = new EPMLiveReportsAdmin.MyWorkReportData(web.Site.ID);
+                EPMLiveCore.ReportHelper.MyWorkReportData rptData = new EPMLiveCore.ReportHelper.MyWorkReportData(web.Site.ID);
 
                 string sql = string.Format(@"SELECT * FROM dbo.LSTResourcePool WHERE (',' + TimesheetManagerID + ',' LIKE '%,{0},%') and Generic=0 ANd (Disabled=0 or Disabled is NULL)", web.CurrentUser.ID);
                 DataTable dtMyResources = rptData.ExecuteSql(sql);
@@ -2802,7 +2802,7 @@ namespace TimeSheets
 
             if (!submitted)
             {
-                EPMLiveReportsAdmin.MyWorkReportData rptData = new EPMLiveReportsAdmin.MyWorkReportData(oWeb.Site.ID);
+                EPMLiveCore.ReportHelper.MyWorkReportData rptData = new EPMLiveCore.ReportHelper.MyWorkReportData(oWeb.Site.ID);
 
                 ArrayList arrRows = new ArrayList();
                 try
@@ -2933,7 +2933,7 @@ namespace TimeSheets
         private static DataSet iGetTSData(SqlConnection cn, SPWeb web, SPUser user, string sPeriod)
         {
 
-            EPMLiveReportsAdmin.MyWorkReportData rptData = new EPMLiveReportsAdmin.MyWorkReportData(web.Site.ID);
+            EPMLiveCore.ReportHelper.MyWorkReportData rptData = new EPMLiveCore.ReportHelper.MyWorkReportData(web.Site.ID);
 
             SqlCommand cmd = new SqlCommand("select TOP 1 TS_UID from TSTIMESHEET where SITE_UID = @siteid and PERIOD_ID = @period and USERNAME = @username", cn);
             cmd.Parameters.AddWithValue("@siteid", web.Site.ID);
@@ -2981,7 +2981,7 @@ namespace TimeSheets
             return iiGetTSData(cn, web, sPeriod, tsuid, rptData);
         }
 
-        private static DataSet iiGetTSData(SqlConnection cn, SPWeb web, string sPeriod, Guid tsuid, EPMLiveReportsAdmin.MyWorkReportData rptData)
+        private static DataSet iiGetTSData(SqlConnection cn, SPWeb web, string sPeriod, Guid tsuid, EPMLiveCore.ReportHelper.MyWorkReportData rptData)
         {
             SqlCommand cmd = new SqlCommand("spTSGetTimesheet", cn);
             cmd.CommandType = CommandType.StoredProcedure;
@@ -3034,7 +3034,7 @@ namespace TimeSheets
             return ds;
         }
 
-        private static Guid iGenerateTSFromPast(SqlConnection cn, SPWeb web, SPUser user, string period, EPMLiveReportsAdmin.MyWorkReportData rptData)
+        private static Guid iGenerateTSFromPast(SqlConnection cn, SPWeb web, SPUser user, string period, EPMLiveCore.ReportHelper.MyWorkReportData rptData)
         {
             Guid tsuid = Guid.NewGuid();
 
@@ -3428,7 +3428,7 @@ namespace TimeSheets
 
         private static DataTable GetWorkDT(SPWeb oWeb, bool bOtherWork, bool bNonWork, string userid, TimesheetSettings settings, string SearchField, string SearchText)
         {
-            EPMLiveReportsAdmin.MyWorkReportData rptData = new EPMLiveReportsAdmin.MyWorkReportData(oWeb.Site.ID);
+            EPMLiveCore.ReportHelper.MyWorkReportData rptData = new EPMLiveCore.ReportHelper.MyWorkReportData(oWeb.Site.ID);
 
             string sql = "";
 
@@ -3575,7 +3575,7 @@ namespace TimeSheets
                     cn.Open();
                 });
 
-                EPMLiveReportsAdmin.MyWorkReportData rptData = new EPMLiveReportsAdmin.MyWorkReportData(oWeb.Site.ID);
+                EPMLiveCore.ReportHelper.MyWorkReportData rptData = new EPMLiveCore.ReportHelper.MyWorkReportData(oWeb.Site.ID);
 
                 string[] sItems = docTimesheet.FirstChild.InnerText.Split(',');
 

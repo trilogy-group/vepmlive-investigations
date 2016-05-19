@@ -46,9 +46,9 @@
     <AssemblyOriginatorKeyFile>EPMLiveLists.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="DocumentFormat.OpenXml, Version=2.0.5022.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\Program Files (x86)\Open XML SDK\V2.0\lib\DocumentFormat.OpenXml.dll</HintPath>
+    <Reference Include="DocumentFormat.OpenXml, Version=2.5.5631.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\DocumentFormat.OpenXml.2.5\lib\DocumentFormat.OpenXml.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -101,12 +101,14 @@
     </Compile>
     <Compile Include="Layouts\epmlive\ImportCsv.aspx.cs">
       <DependentUpon>ImportCsv.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\epmlive\ImportCsv.aspx.designer.cs">
       <DependentUpon>ImportCsv.aspx.cs</DependentUpon>
     </Compile>
     <Compile Include="Layouts\epmlive\ImportExcel.aspx.cs">
       <DependentUpon>ImportExcel.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\epmlive\ImportExcel.aspx.designer.cs">
       <DependentUpon>ImportExcel.aspx.cs</DependentUpon>
@@ -120,6 +122,7 @@
     </Compile>
     <Compile Include="Layouts\epmlive\ImportList.aspx.cs">
       <DependentUpon>ImportList.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\epmlive\ImportList.aspx.designer.cs">
       <DependentUpon>ImportList.aspx.cs</DependentUpon>
@@ -161,6 +164,7 @@
     </Compile>
     <Compile Include="Layouts\epmlive\PlannerUpdates.aspx.cs">
       <DependentUpon>PlannerUpdates.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\epmlive\PlannerUpdates.aspx.designer.cs">
       <DependentUpon>PlannerUpdates.aspx.cs</DependentUpon>
@@ -209,6 +213,7 @@
     </Compile>
     <Compile Include="Layouts\epmlive\tasks.aspx.cs">
       <DependentUpon>tasks.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\epmlive\tasks.aspx.designer.cs">
       <DependentUpon>tasks.aspx.cs</DependentUpon>
@@ -222,6 +227,7 @@
     </Compile>
     <Compile Include="Layouts\epmlive\WorkPlanner.aspx.cs">
       <DependentUpon>WorkPlanner.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Layouts\epmlive\WorkPlanner.aspx.designer.cs">
       <DependentUpon>WorkPlanner.aspx.cs</DependentUpon>
@@ -294,6 +300,7 @@
     <None Include="Layouts\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{51021b6f-4911-4c89-986d-0d6182309123}</SharePointProjectItemId>
     </None>
+    <None Include="packages.config" />
     <None Include="Package\Package.package">
       <PackageId>{6d504b47-8bc2-439f-bcf7-bdb95c349aa7}</PackageId>
     </None>

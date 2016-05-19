@@ -78,8 +78,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="DocumentFormat.OpenXml, Version=2.5.5631.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Windows\Microsoft.NET\assembly\GAC_MSIL\DocumentFormat.OpenXml\v4.0_2.5.5631.0__31bf3856ad364e35\DocumentFormat.OpenXml.dll</HintPath>
+      <HintPath>..\..\packages\DocumentFormat.OpenXml.2.5\lib\DocumentFormat.OpenXml.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -613,6 +613,7 @@
     <None Include="MyWorkWebPart\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{a813e037-fbe5-4b04-a99c-73817d833cfe}</SharePointProjectItemId>
     </None>
+    <None Include="packages.config" />
     <None Include="Package\Package.package">
       <PackageId>{63be2884-bd6d-488f-8262-10956685a873}</PackageId>
     </None>

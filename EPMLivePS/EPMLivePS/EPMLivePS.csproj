@@ -55,21 +55,31 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\EPMLiveCore\EPMLiveCore\bin\Debug\EPM Live Core.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.Office.Project.Schema, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.Office.Project.Server.1.0.2\lib\net40\Microsoft.Office.Project.Schema.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Office.Project.Server.Administration, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.Office.Project.Server.1.0.2\lib\net40\Microsoft.Office.Project.Server.Administration.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Microsoft.Office.Project.Server.Events.Receivers">
-      <HintPath>..\..\..\Users\Administrator\Desktop\CODE\WorkEngineForProjectServer\WorkEngineForProjectServer\bin\Debug\Microsoft.Office.Project.Server.Events.Receivers.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\Microsoft SDKs\Project 2013\REDIST\Microsoft.Office.Project.Server.Events.Receivers.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Office.Project.Server.Library">
-      <HintPath>..\..\..\Users\Administrator\Desktop\CODE\WorkEngineForProjectServer\WorkEngineForProjectServer\bin\Debug\Microsoft.Office.Project.Server.Library.dll</HintPath>
+    <Reference Include="Microsoft.Office.Project.Server.Library, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.Office.Project.Server.1.0.2\lib\net40\Microsoft.Office.Project.Server.Library.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="Microsoft.Office.Project.Server.PWA">
-      <HintPath>..\..\..\Users\Administrator\Desktop\CODE\WorkEngineForProjectServer\WorkEngineForProjectServer\bin\Debug\Microsoft.Office.Project.Server.PWA.dll</HintPath>
+    <Reference Include="Microsoft.Office.Project.Server.PWA, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.Office.Project.Server.1.0.2\lib\net40\Microsoft.Office.Project.Server.PWA.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="Microsoft.Office.Project.Shared">
-      <HintPath>..\..\..\Users\Administrator\Desktop\CODE\WorkEngineForProjectServer\WorkEngineForProjectServer\bin\Debug\Microsoft.Office.Project.Shared.dll</HintPath>
+    <Reference Include="Microsoft.Office.Project.Shared, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.Office.Project.Server.1.0.2\lib\net40\Microsoft.Office.Project.Shared.dll</HintPath>
+      <Private>True</Private>
     </Reference>
-    <Reference Include="Microsoft.ProjectServer.Client, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\Windows\Microsoft.NET\assembly\GAC_MSIL\Microsoft.ProjectServer.Client\v4.0_15.0.0.0__71e9bce111e9429c\Microsoft.ProjectServer.Client.dll</HintPath>
+    <Reference Include="Microsoft.ProjectServer.Client">
+      <HintPath>C:\Program Files (x86)\Microsoft SDKs\Project 2013\REDIST\Microsoft.ProjectServer.Client.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.SharePoint.Security, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -259,6 +269,7 @@
     <None Include="Menus\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{d20b99a2-1db2-4bdd-ae8a-8c2e939b0213}</SharePointProjectItemId>
     </None>
+    <None Include="packages.config" />
     <None Include="Package\Package.package">
       <PackageId>{cb4d31e9-c1f4-4426-98e5-24b26a32c391}</PackageId>
     </None>
