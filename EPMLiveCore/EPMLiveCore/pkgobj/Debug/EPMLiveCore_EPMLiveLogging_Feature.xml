@@ -1,0 +1,2 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Feature xmlns="http://schemas.microsoft.com/sharepoint/" Title="EPM Live Logging" AlwaysForceInstall="TRUE" AutoActivateInCentralAdmin="TRUE" Description="Used for Logging purpose throughout EPMLive." Id="b7c26a4e-5657-4faa-ac50-c3e8f4c02b26" ReceiverAssembly="EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5" ReceiverClass="$SharePoint.Type.05da5882-664c-4633-91a5-c68db8190169.FullName$" Scope="Web"></Feature>
