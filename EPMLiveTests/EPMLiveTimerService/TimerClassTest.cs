@@ -9,7 +9,6 @@ using System.Linq;
 using System.Threading;
 using TimerService;
 using System.Collections.Generic;
-using System.Configuration;
 
 namespace EPMLiveTests.EPMLiveTimerService
 {
@@ -24,16 +23,6 @@ namespace EPMLiveTests.EPMLiveTimerService
         private static string _connStr = null;
         private const int MaxTrials = 10;
         private static List<Guid> _lstJobs = null;
-
-        public static string ConfiguredWebAppId
-        {
-            get { return ConfigurationManager.AppSettings["WebAppId"]; }
-        }
-
-        public static string ConfiguredSiteId
-        {
-            get { return ConfigurationManager.AppSettings["SiteId"]; }
-        }
 
         /// <summary>
         /// Initite global variables
