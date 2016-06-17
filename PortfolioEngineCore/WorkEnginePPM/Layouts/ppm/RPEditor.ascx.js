@@ -2235,6 +2235,16 @@
         return sValue;
     };
     RPEditor.prototype.GridsOnValueChanged = function (grid, row, col, val) {
+
+        if (!$.isNumeric(val)) {
+            val = "0";
+        }
+        else if ($.isNumeric(val) && val.indexOf('.') != -1) {
+            var floatvalue = parseFloat(val);
+            floatvalue = parseFloat(floatvalue.toFixed(2));
+            val = floatvalue.toString();
+        }
+
         var snewVal = val;
         if (grid.id == "g_RPE") {
             if (grid.Cols[col] != null) {
