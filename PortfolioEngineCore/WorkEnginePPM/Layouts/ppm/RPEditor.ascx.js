@@ -2059,7 +2059,7 @@
                     else {
                         value = parseFloat((dbl * 10000) / fteconv);
                         value = this.GetRoundofValue(value);
-                    } 
+                    }
                     grid.SetAttribute(row, null, f + sId, value, 0, 0);
                     grid.SetAttribute(row, null, "m" + sId, 0, 0, 0);
                     break;
@@ -2074,7 +2074,7 @@
                     else {
                         value = parseFloat((dbl * fteconv) / 10000);
                         value = this.GetRoundofValue(value);
-                    } 
+                    }
                     grid.SetAttribute(row, null, h + sId, value, 0, 0);
                     grid.SetAttribute(row, null, "m" + sId, 1, 0, 0);
                     break;
@@ -2163,6 +2163,7 @@
         return sValue;
     };
     RPEditor.prototype.FormatFTEPct = function (grid, row, col, bFulfillmentMode, bEditMode) {
+        
         var sId = col.substring(1);
         var sValue = "";
         var sTotal = "";
@@ -2235,16 +2236,6 @@
         return sValue;
     };
     RPEditor.prototype.GridsOnValueChanged = function (grid, row, col, val) {
-
-        if (!$.isNumeric(val)) {
-            val = "";
-        }
-        else if ($.isNumeric(val) && val.indexOf('.') != -1) {
-            var floatvalue = parseFloat(val);
-            floatvalue = parseFloat(floatvalue.toFixed(2));
-            val = floatvalue.toString();
-        }
-
         var snewVal = val;
         if (grid.id == "g_RPE") {
             if (grid.Cols[col] != null) {
@@ -4880,16 +4871,16 @@
         switch (this.displayMode) {
             case 0: /* Hours */
                 if (this.showHeatmap != true) {
-                    sValue = "0.###;<span style='color:red;'>-0.###</span>;0";
+                    sValue = "0.##;<span style='color:red;'>-0.##</span>;0";
                 } else {
-                    sValue = "0.###;<div style='background-color:red;height:inherit;vertical-align:middle;padding:1px !important;'>-0.###</div>;0";
+                    sValue = "0.##;<div style='background-color:red;height:inherit;vertical-align:middle;padding:1px !important;'>-0.##</div>;0";
                 }
                 break;
             case 1: /* FTE */
                 if (this.showHeatmap != true) {
-                    sValue = "0.####;<span style='color:red;'>-0.####</span>;0";
+                    sValue = "0.##;<span style='color:red;'>-0.##</span>;0";
                 } else {
-                    sValue = "0.####;<div style='background-color:red;height:inherit;vertical-align:middle;padding::1px !important;'>-0.####</div>;0";
+                    sValue = "0.##;<div style='background-color:red;height:inherit;vertical-align:middle;padding::1px !important;'>-0.##</div>;0";
                 }
                 break;
             case 2: /* FTE% */
@@ -6262,8 +6253,8 @@
         this.includePending = true;
         this.saveConflict = false;
 
-        var const_HoursFormat = "0.###";
-        var const_FTEFormat = "0.####";
+        var const_HoursFormat = "0.##";
+        var const_FTEFormat = "0.##";
         var const_FTEPctFormat = "0.##%";
         var const_Project = 0;
         var const_Requirement = 1;
