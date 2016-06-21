@@ -2237,7 +2237,7 @@
     RPEditor.prototype.GridsOnValueChanged = function (grid, row, col, val) {
 
         if (!$.isNumeric(val)) {
-            val = "0";
+            val = "";
         }
         else if ($.isNumeric(val) && val.indexOf('.') != -1) {
             var floatvalue = parseFloat(val);
