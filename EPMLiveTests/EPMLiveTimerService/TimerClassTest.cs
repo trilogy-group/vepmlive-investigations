@@ -23,6 +23,7 @@ namespace EPMLiveTests.EPMLiveTimerService
         private static string _connStr = null;
         private const int MaxTrials = 10;
         private static List<Guid> _lstJobs = null;
+        private static bool _offline = false;
 
         /// <summary>
         /// Initite global variables
@@ -31,13 +32,30 @@ namespace EPMLiveTests.EPMLiveTimerService
         [ClassInitialize()]
         public static void ClassInitialize(TestContext context)
         {
-            var webApp = SPWebService.ContentService.WebApplications.ToList()[0];
-            _connStr = EPMLiveCore.CoreFunctions.getConnectionString(webApp.Id);
-
-            _siteid = webApp.Sites[0].ID;
-            _webid = webApp.Sites[0].AllWebs[0].ID;
-
             _lstJobs = new List<Guid>();
+
+            //make sure that SP is connected
+            if (SPWebService.ContentService != null &&
+                SPWebService.ContentService.WebApplications != null &&
+                SPWebService.ContentService.WebApplications.Count > 0)
+            {
+                var webApp = SPWebService.ContentService.WebApplications.ToList()[0];
+                _connStr = EPMLiveCore.CoreFunctions.getConnectionString(webApp.Id);
+
+                if (webApp.Sites.Count > 0)
+                {
+                    _siteid = webApp.Sites[0].ID;
+
+                    if (webApp.Sites[0].AllWebs.Count > 0)
+                    {
+                        _webid = webApp.Sites[0].AllWebs[0].ID;
+                        return;
+                    }
+                }
+            }
+
+            //will execute in disconnected mode
+            _offline = true;
         }
 
         /// <summary>
@@ -46,6 +64,9 @@ namespace EPMLiveTests.EPMLiveTimerService
         [ClassCleanup()]
         public static void ClassCleanup()
         {
+            if(_offline)
+                return;
+
             //now concat them as a comma seperated string
             var idCommaList = string.Join("', '", _lstJobs);
 
@@ -82,6 +103,9 @@ namespace EPMLiveTests.EPMLiveTimerService
         [TestMethod]
         public void TestConnectivity()
         {
+            if (_offline)
+                return;
+
             Assert.IsTrue(_connStr.Length > 0);
         }
 
@@ -91,6 +115,9 @@ namespace EPMLiveTests.EPMLiveTimerService
         [TestMethod]
         public void TestOneJob()
         {
+            if (_offline)
+                return;
+
             //insert test queue and job into DB
             InsertTestJob();
 
@@ -128,6 +155,9 @@ namespace EPMLiveTests.EPMLiveTimerService
         [TestMethod]
         public void TestMaxThreadedJobs()
         {
+            if (_offline)
+                return;
+
             int numOfJobs = int.Parse(EPMLiveCore.CoreFunctions.getFarmSetting("QueueThreads")); ;
             DateTime dtStart = DateTime.Now;
 
@@ -179,6 +209,9 @@ namespace EPMLiveTests.EPMLiveTimerService
         //[TestMethod]
         public void TestOnlyProcessingMaxThreadedJobs()
         {
+            if (_offline)
+                return;
+
             const int additionalJobs = 3;
             int numOfJobs = int.Parse(EPMLiveCore.CoreFunctions.getFarmSetting("QueueThreads"));
             DateTime dtCreated = DateTime.Now;
@@ -211,6 +244,9 @@ namespace EPMLiveTests.EPMLiveTimerService
         [TestMethod]
         public void TestRecentJobAlreadyWithAnotherServer()
         {
+            if (_offline)
+                return;
+
             //insert test queue and job into DB with job assigned to dummy server
             InsertTestJob(true, false);
 
@@ -248,6 +284,9 @@ namespace EPMLiveTests.EPMLiveTimerService
         [TestMethod]
         public void TestOldJobAlreadyWithAnotherServer()
         {
+            if (_offline)
+                return;
+
             //insert test queue and job into DB with job assigne to dummy server with old date
             InsertTestJob(true, true);
 
