@@ -52,6 +52,10 @@ namespace EPMLiveCore.Features.EPMLiveLogging
                         RegisterKey(baseKey, LoggingService.Area.EPMLiveProjectServer);
                         RegisterKey(baseKey, LoggingService.Area.EPMLiveTimesheets);
                         RegisterKey(baseKey, LoggingService.Area.EPMLiveIntegrationService);
+                        RegisterKey(baseKey, LoggingService.Area.EPMLiveWorkEnginePPM);
+                        RegisterKey(baseKey, LoggingService.Area.EPMLiveDashboards);
+                        RegisterKey(baseKey, LoggingService.Area.EPMLiveSynch);
+                        RegisterKey(baseKey, LoggingService.Area.EPMLiveUplandIntegrations);
                     }
                 }
             });
@@ -98,6 +102,10 @@ namespace EPMLiveCore.Features.EPMLiveLogging
                         DeRegisterKey(baseKey, LoggingService.Area.EPMLiveProjectServer);
                         DeRegisterKey(baseKey, LoggingService.Area.EPMLiveTimesheets);
                         DeRegisterKey(baseKey, LoggingService.Area.EPMLiveIntegrationService);
+                        DeRegisterKey(baseKey, LoggingService.Area.EPMLiveWorkEnginePPM);
+                        DeRegisterKey(baseKey, LoggingService.Area.EPMLiveDashboards);
+                        DeRegisterKey(baseKey, LoggingService.Area.EPMLiveSynch);
+                        DeRegisterKey(baseKey, LoggingService.Area.EPMLiveUplandIntegrations);
                     }
                 }
             });
