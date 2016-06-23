@@ -642,6 +642,8 @@
                     });
 
                     if (!selected) {
+                        if (link === null)
+                            link = $(this);
                         url = escape(unescape(link.uri)).toLowerCase();
                         $('td.epm-nav-node').each(function () {
                             if (!selected) {
