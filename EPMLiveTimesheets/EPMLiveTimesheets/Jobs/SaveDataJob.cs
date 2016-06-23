@@ -345,7 +345,31 @@ namespace TimeSheets
                                                 //}
 
                                                 if (liveHours)
+                                                {
                                                     processLiveHours(li, list.ID);
+                                                    if (li.Fields.ContainsFieldWithInternalName("PercentComplete") && li.Fields.ContainsFieldWithInternalName("Status"))
+                                                    {
+                                                        SPField percentCompleteField = li.Fields.GetFieldByInternalName("PercentComplete");
+                                                        SPField statusField = li.Fields.GetFieldByInternalName("Status");
+                                                        if (percentCompleteField != null && statusField != null)
+                                                        {
+                                                            Double value = Convert.ToDouble(li[percentCompleteField.InternalName]);
+                                                            if (value == 0)
+                                                            {
+                                                                li[statusField.InternalName] = "Not Started";
+                                                            }
+                                                            else if (value > 0 & value < 1)
+                                                            {
+                                                                li[statusField.InternalName] = "In Progress";
+                                                            }
+                                                            else if (value == 1)
+                                                            {
+                                                                li[statusField.InternalName] = "Completed";
+                                                            }
+                                                        }
+
+                                                    }
+                                                }
 
                                                 li.Update();
 
