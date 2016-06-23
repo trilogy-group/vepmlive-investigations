@@ -8,11 +8,10 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace EPMLiveCore.Properties
-{
+namespace EPMLiveCore.Properties {
     using System;
-
-
+    
+    
     /// <summary>
     ///   A strongly-typed resource class, for looking up localized strings, etc.
     /// </summary>
@@ -23,52 +22,44 @@ namespace EPMLiveCore.Properties
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    public class Resources
-    {
-
+    public class Resources {
+        
         private static global::System.Resources.ResourceManager resourceMan;
-
+        
         private static global::System.Globalization.CultureInfo resourceCulture;
-
+        
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal Resources()
-        {
+        internal Resources() {
         }
-
+        
         /// <summary>
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        public static global::System.Resources.ResourceManager ResourceManager
-        {
-            get
-            {
-                if (object.ReferenceEquals(resourceMan, null))
-                {
+        public static global::System.Resources.ResourceManager ResourceManager {
+            get {
+                if (object.ReferenceEquals(resourceMan, null)) {
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("EPMLiveCore.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
             }
         }
-
+        
         /// <summary>
         ///   Overrides the current thread's CurrentUICulture property for all
         ///   resource lookups using this strongly typed resource class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        public static global::System.Globalization.CultureInfo Culture
-        {
-            get
-            {
+        public static global::System.Globalization.CultureInfo Culture {
+            get {
                 return resourceCulture;
             }
-            set
-            {
+            set {
                 resourceCulture = value;
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to 
         ///---------------TABLE: EPMLive_Log----------------------
@@ -88,14 +79,12 @@ namespace EPMLiveCore.Properties
         ///	begin
         ///		print &apos;Creating  [rest of string was truncated]&quot;;.
         /// </summary>
-        public static string _0Tables01
-        {
-            get
-            {
+        public static string _0Tables01 {
+            get {
                 return ResourceManager.GetString("_0Tables01", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to ---------------TABLE: TSUSER----------------------
         ///
@@ -118,14 +107,12 @@ namespace EPMLiveCore.Properties
         ///	end
         ///------------ [rest of string was truncated]&quot;;.
         /// </summary>
-        public static string _0Tables02
-        {
-            get
-            {
+        public static string _0Tables02 {
+            get {
                 return ResourceManager.GetString("_0Tables02", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to declare @createoralter varchar(10)
         ///------------------------------View: vwMeta---------------------------
@@ -143,14 +130,12 @@ namespace EPMLiveCore.Properties
         ///AS
         ///SELECT     dbo.TSTIMESHEET.USERNAME AS Username, dbo.TSTIMESHEET.RESOURCENAME AS [Resource Name], d [rest of string was truncated]&quot;;.
         /// </summary>
-        public static string _1Views01
-        {
-            get
-            {
+        public static string _1Views01 {
+            get {
                 return ResourceManager.GetString("_1Views01", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to declare @createoralter varchar(10)
         ///if not exists (select routine_name from INFORMATION_SCHEMA.routines where routine_name = &apos;Split&apos;)
@@ -173,14 +158,12 @@ namespace EPMLiveCore.Properties
         ///BEGIN
         ///DECLARE @tempItemList  [rest of string was truncated]&quot;;.
         /// </summary>
-        public static string _2SPs01
-        {
-            get
-            {
+        public static string _2SPs01 {
+            get {
                 return ResourceManager.GetString("_2SPs01", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to if not exists (select emailid from EMAILTEMPLATES where emailid = 2)
         ///begin
@@ -190,14 +173,12 @@ namespace EPMLiveCore.Properties
         ///&lt;tr&gt;
         ///&lt;td style=&quot;font-size:20px;color:#666666;font-family:Lucida Grande,Arial Unicode MS,sans-serif&quot;&gt;{CurUser_Name} has granted you access to the &lt;u&gt;&lt;a href=&quot;{SiteUrl}&quot; style=&quot;font-size:20px;color:#3366CC;&quot;&gt;{SiteName}&lt;/a&gt;&lt;/u [rest of string was truncated]&quot;;.
         /// </summary>
-        public static string _9Data01
-        {
-            get
-            {
+        public static string _9Data01 {
+            get {
                 return ResourceManager.GetString("_9Data01", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to if not exists (select jobtype_id from TIMERJOBTYPES where jobtype_id = 52)
         ///begin
@@ -207,14 +188,12 @@ namespace EPMLiveCore.Properties
         ///begin
         ///    UPDATE TIMERJOBTYPES SET NetAssembly=&apos;EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5&apos;, NetClass=&apos;EPMLiveCore.Jobs.Applications.U [rest of string was truncated]&quot;;.
         /// </summary>
-        public static string _9Data02
-        {
-            get
-            {
+        public static string _9Data02 {
+            get {
                 return ResourceManager.GetString("_9Data02", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to &lt;Grid&gt;
         ///	&lt;Cfg Code=&quot;GTACCNPSQEBSLC&quot; Version=&quot;4.3.1&quot; /&gt;
@@ -224,14 +203,12 @@ namespace EPMLiveCore.Properties
         ///    &lt;Cfg Sort=&quot;StartDate&quot;/&gt; &lt;!-- Default sort is by StartDate --&gt;
         ///    &lt;Cfg Group=&quot;AssignedToText&quot;/&gt; &lt;!-- The grid is grouped by [rest of string was truncated]&quot;;.
         /// </summary>
-        public static string AssignmentPlannerGridLayout
-        {
-            get
-            {
+        public static string AssignmentPlannerGridLayout {
+            get {
                 return ResourceManager.GetString("AssignmentPlannerGridLayout", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to &lt;Grid&gt;
         ///	&lt;Cfg Code=&apos;GTACCNPSQEBSLC&apos; Version=&apos;4.3.2.120412&apos; /&gt;
@@ -250,14 +227,12 @@ namespace EPMLiveCore.Properties
         ///		&lt;D Name=&quot;R&quot; HoverCell=&quot;Color&quot; HoverRow=&quot;Color&quot; FocusCell=&quot;Background&quot; FocusRow=&quot;Background&quot; /&gt;
         ///	&lt;/Def&gt;        /// [rest of string was truncated]&quot;;.
         /// </summary>
-        public static string ChartWizardDataSourceGridLayout
-        {
-            get
-            {
+        public static string ChartWizardDataSourceGridLayout {
+            get {
                 return ResourceManager.GetString("ChartWizardDataSourceGridLayout", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to &lt;Navs&gt;
         ///&lt;QuickLaunch&gt;
@@ -271,14 +246,12 @@ namespace EPMLiveCore.Properties
         ///&lt;/TopNav&gt;
         ///&lt;/Navs&gt;.
         /// </summary>
-        public static string DefaultCommunityNavs
-        {
-            get
-            {
+        public static string DefaultCommunityNavs {
+            get {
                 return ResourceManager.GetString("DefaultCommunityNavs", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to &lt;script language=&apos;javascript&apos; type=&apos;text/javascript&apos;&gt;
         ///
@@ -308,14 +281,12 @@ namespace EPMLiveCore.Properties
         /// {
         /// alert [rest of string was truncated]&quot;;.
         /// </summary>
-        public static string Javascript
-        {
-            get
-            {
+        public static string Javascript {
+            get {
                 return ResourceManager.GetString("Javascript", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to &lt;Grid&gt;
         ///	&lt;Cfg Code=&quot;GTACCNPSQEBSLC&quot; Version=&quot;4.4.0.32713&quot; /&gt;
@@ -330,197 +301,138 @@ namespace EPMLiveCore.Properties
         ///	&lt;Cfg NoTreeLines=&quot;1&quot; DetailOn=&quot;0&quot; MinRowHeight=&quot;20&quot; MaxRowHeight=&quot;20&quot; MidWidth=&quot;300&quot; MenuColumnsSort=&quot;1&quot; StandardFilter=&quot;2&quot; /&gt;
         /// [rest of string was truncated]&quot;;.
         /// </summary>
-        public static string MyWorkGridLayout
-        {
-            get
-            {
+        public static string MyWorkGridLayout {
+            get {
                 return ResourceManager.GetString("MyWorkGridLayout", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to EPMLiveReportsAdmin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b90e532f481cf050.
         /// </summary>
-        public static string ReportingAssembly
-        {
-            get
-            {
+        public static string ReportingAssembly {
+            get {
                 return ResourceManager.GetString("ReportingAssembly", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to EPMLiveReportsAdmin.ListEvents.
         /// </summary>
-        public static string ReportingClassName
-        {
-            get
-            {
+        public static string ReportingClassName {
+            get {
                 return ResourceManager.GetString("ReportingClassName", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to RPTColumn.
         /// </summary>
-        public static string ReportingColumnTable
-        {
-            get
-            {
+        public static string ReportingColumnTable {
+            get {
                 return ResourceManager.GetString("ReportingColumnTable", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to RPTDatabases.
         /// </summary>
-        public static string ReportingDatabaseTable
-        {
-            get
-            {
+        public static string ReportingDatabaseTable {
+            get {
                 return ResourceManager.GetString("ReportingDatabaseTable", resourceCulture);
             }
         }
-
+        
         /// <summary>
-        ///   Looks up a localized string similar to IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N&apos;[dbo].[spRPTBusinessDays]&apos;) AND type in (N&apos;P&apos;, N&apos;PC&apos;))
-        ///BEGIN
-        ///	PRINT &apos;--------------------------------------------------&apos;
-        ///    PRINT &apos;Dropping: spRPTBusinessDays&apos;
-        ///	DROP PROCEDURE [dbo].[spRPTBusinessDays]
-        ///END
-        ///
-        ///IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N&apos;[dbo].[spRPTWork2]&apos;) AND type in (N&apos;P&apos;, N&apos;PC&apos;))
-        ///BEGIN
-        ///	PRINT &apos;--------------------------------------------------&apos;
-        ///	PRINT &apos;Dropping: spRPTWork2&apos;
-        ///	DROP PROCEDU [rest of string was truncated]&quot;;.
+        ///   Looks up a localized string similar to InitDatabaseCreateProcedures.sql.
         /// </summary>
-        public static string ReportingInitDatabaseCreateProcedures
-        {
-            get
-            {
+        public static string ReportingInitDatabaseCreateProcedures {
+            get {
                 return ResourceManager.GetString("ReportingInitDatabaseCreateProcedures", resourceCulture);
             }
         }
-
+        
         /// <summary>
-        ///   Looks up a localized string similar to 
-        ///if not exists (select table_name from INFORMATION_SCHEMA.tables where table_name = &apos;RPTGROUPUSER&apos;)
-        ///	begin
-        ///		
-        ///		print &apos;Creating Table RPTGROUPUSER&apos;
-        ///
-        ///		CREATE TABLE [dbo].[RPTGROUPUSER](
-        ///		[RPTGROUPUSERID] [uniqueidentifier] NULL,
-        ///		[SITEID] [uniqueidentifier] NULL,
-        ///		[GROUPID] [int] NULL,
-        ///		[USERID] [int] NULL
-        ///		) ON [PRIMARY]
-        ///
-        ///		ALTER TABLE [dbo].[RPTGROUPUSER] ADD  CONSTRAINT [DF_RPTGROUPUSER_RPTGROUPUSERID]  DEFAULT (newid()) FOR [RPTGROUPUSERID]
-        ///	end
-        ///else
-        ///	begin
-        ///
-        ///		print &apos;Updating Tabl [rest of string was truncated]&quot;;.
+        ///   Looks up a localized string similar to InitDatabaseCreateTables.sql.
         /// </summary>
-        public static string ReportingInitDatabaseCreateTables
-        {
-            get
-            {
+        public static string ReportingInitDatabaseCreateTables {
+            get {
                 return ResourceManager.GetString("ReportingInitDatabaseCreateTables", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to LST.
         /// </summary>
-        public static string ReportingListPrefix
-        {
-            get
-            {
+        public static string ReportingListPrefix {
+            get {
                 return ResourceManager.GetString("ReportingListPrefix", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to VWRPTListSummary.
         /// </summary>
-        public static string ReportingListSummaryView
-        {
-            get
-            {
+        public static string ReportingListSummaryView {
+            get {
                 return ResourceManager.GetString("ReportingListSummaryView", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to RPTList.
         /// </summary>
-        public static string ReportingListTable
-        {
-            get
-            {
+        public static string ReportingListTable {
+            get {
                 return ResourceManager.GetString("ReportingListTable", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to RPTLog.
         /// </summary>
-        public static string ReportingLogTable
-        {
-            get
-            {
+        public static string ReportingLogTable {
+            get {
                 return ResourceManager.GetString("ReportingLogTable", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to RPTSettings.
         /// </summary>
-        public static string ReportingSettingsTable
-        {
-            get
-            {
+        public static string ReportingSettingsTable {
+            get {
                 return ResourceManager.GetString("ReportingSettingsTable", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Snapshot.
         /// </summary>
-        public static string ReportingSnapshotTableSuffix
-        {
-            get
-            {
+        public static string ReportingSnapshotTableSuffix {
+            get {
                 return ResourceManager.GetString("ReportingSnapshotTableSuffix", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to RPTTSData.
         /// </summary>
-        public static string ReportingTimesheetTable
-        {
-            get
-            {
+        public static string ReportingTimesheetTable {
+            get {
                 return ResourceManager.GetString("ReportingTimesheetTable", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to RPTWork.
         /// </summary>
-        public static string ReportingWorkTable
-        {
-            get
-            {
+        public static string ReportingWorkTable {
+            get {
                 return ResourceManager.GetString("ReportingWorkTable", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to &lt;/td&gt;
         ///	    &lt;/tr&gt;
@@ -537,14 +449,12 @@ namespace EPMLiveCore.Properties
         ///
         ///                &lt;menu type=&apos;ServerMenu&apos; id=&apos;EPMLive [rest of string was truncated]&quot;;.
         /// </summary>
-        public static string ResourceDDLBottom
-        {
-            get
-            {
+        public static string ResourceDDLBottom {
+            get {
                 return ResourceManager.GetString("ResourceDDLBottom", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to &lt;table class=&apos;ms-menutoolbar&apos; cellpadding=&apos;2&apos; cellspacing=&apos;0&apos; border=&apos;0&apos; width=&apos;100%&apos;&gt;
         ///&lt;tr height=&apos;23&apos;&gt;
@@ -553,36 +463,30 @@ namespace EPMLiveCore.Properties
         ///        &lt;tr&gt;
         ///        &lt;td valign=&apos;center&apos;&gt;.
         /// </summary>
-        public static string ResourceDDLTop
-        {
-            get
-            {
+        public static string ResourceDDLTop {
+            get {
                 return ResourceManager.GetString("ResourceDDLTop", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to 0M8R4KGxGuEAAAAAAAAAAAAAAAAAAAAAPgADAP7/CQAGAAAAAAAAAAAAAAACAAAA2gAAAAAAAAAAEAAAAgAAAAQAAAD+////AAAAANcAAADWAAAA//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// [rest of string was truncated]&quot;;.
         /// </summary>
-        public static string ResourceExporterVBA
-        {
-            get
-            {
+        public static string ResourceExporterVBA {
+            get {
                 return ResourceManager.GetString("ResourceExporterVBA", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to 3.
         /// </summary>
-        public static string ResourceGridDefaultGlobalViewVersion
-        {
-            get
-            {
+        public static string ResourceGridDefaultGlobalViewVersion {
+            get {
                 return ResourceManager.GetString("ResourceGridDefaultGlobalViewVersion", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to &lt;Grid&gt;
         ///	&lt;Cfg Code=&quot;GTACCNPSQEBSLC&quot; Version=&quot;4.3.2.120412&quot; /&gt;
@@ -596,14 +500,12 @@ namespace EPMLiveCore.Properties
         ///	&lt;Cfg NoTreeLines=&quot;1&quot; DetailOn=&quot;0&quot; MinRowHeight=&quot;20&quot; MaxRowHeight=&quot;25&quot; MidWidth=&quot;300&quot; MenuColumnsSort=&quot;1&quot; StandardFilter=&quot;2&quot; /&gt;
         ///	&lt;Cfg P [rest of string was truncated]&quot;;.
         /// </summary>
-        public static string ResourceGridLayout
-        {
-            get
-            {
+        public static string ResourceGridLayout {
+            get {
                 return ResourceManager.GetString("ResourceGridLayout", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to /* This trigger has been created by the EPM Live Integration adapter on {TIMESTAMP} */
         ///
@@ -611,14 +513,12 @@ namespace EPMLiveCore.Properties
         ///	{APP_NAMESPACE}.GlobalTriggerDispatcher.DispatchTrigger(&apos;{TRIGGER_OBJECT}&apos;, Trigger.isInsert, Trigger.isUpdate, Trigger.isDelete, Trigger.isBefore, Trigger.isAfter, Trigger.isExecuting, Trigger.new, Trigger.newMap, Trigger.old, Trigger.oldMap);
         ///}.
         /// </summary>
-        public static string SFIntTrigger
-        {
-            get
-            {
+        public static string SFIntTrigger {
+            get {
                 return ResourceManager.GetString("SFIntTrigger", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to &lt;td width=&quot;50&quot; valign=&quot;top&quot; style=&quot;padding:10px;&quot;&gt;
         ///&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;&lt;br&gt;
@@ -632,14 +532,12 @@ namespace EPMLiveCore.Properties
         /// 		    &lt;li&gt;
         ///			    &lt;a href=&quot;javascript:void(0);&quot; onclick=&quot;AddResourcePoo [rest of string was truncated]&quot;;.
         /// </summary>
-        public static string txtBuildTeamResPool
-        {
-            get
-            {
+        public static string txtBuildTeamResPool {
+            get {
                 return ResourceManager.GetString("txtBuildTeamResPool", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to &lt;GroupTemplate Id=&quot;Ribbon.Templates.StandardGroup&quot;&gt;
         ///	&lt;Layout Title=&quot;OneLargeTwoMedium&quot; LayoutTitle=&quot;OneLargeTwoMedium&quot;&gt;
@@ -653,14 +551,12 @@ namespace EPMLiveCore.Properties
         ///		&lt;OverflowSection Type=&quot;ThreeRow&quot; TemplateAlias=&quot;oM&quot; DisplayMode=&quot;Medium&quot;/&gt;
         ///		&lt;OverflowSection Type=&quot;ThreeRow&quot; Temp [rest of string was truncated]&quot;;.
         /// </summary>
-        public static string txtBuildTeamRibbonTemplate
-        {
-            get
-            {
+        public static string txtBuildTeamRibbonTemplate {
+            get {
                 return ResourceManager.GetString("txtBuildTeamRibbonTemplate", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to &lt;Tab Id=&quot;Ribbon.BuildTeam&quot; Title=&quot;Build Team&quot; Description=&quot;Build Team&quot; Sequence=&quot;1105&quot;&gt;
         ///    &lt;Scaling Id=&quot;Ribbon.BuildTeam.Scaling&quot;&gt;
@@ -670,14 +566,12 @@ namespace EPMLiveCore.Properties
         ///
         ///		&lt;MaxSize Id=&quot;Ribbon.BuildTeam.TeamGroup.MaxSize&quot; GroupId=&quot;Ribbon.BuildTeam.TeamGroup&quot; Size=&quot;OneL [rest of string was truncated]&quot;;.
         /// </summary>
-        public static string txtBuildTeamTab
-        {
-            get
-            {
+        public static string txtBuildTeamTab {
+            get {
                 return ResourceManager.GetString("txtBuildTeamTab", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to function findacontrol(FieldName) {   
         ///	var arr = document.getElementsByTagName(&quot;!&quot;);
@@ -703,14 +597,12 @@ namespace EPMLiveCore.Properties
         ///		{
         ///			userField = resTable.nextSibling.firstChild.id.replace(&quot;HiddenUse [rest of string was truncated]&quot;;.
         /// </summary>
-        public static string txtCheckResourceJS
-        {
-            get
-            {
+        public static string txtCheckResourceJS {
+            get {
                 return ResourceManager.GetString("txtCheckResourceJS", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to &lt;table width=&quot;100%&quot; border=&quot;0&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot;&gt;
         ///    &lt;tr id=&quot;idWorkspaceArea&quot;&gt;
@@ -722,14 +614,12 @@ namespace EPMLiveCore.Properties
         ///            &lt;div id=&quot;EPKDisplayDiv&quot;&gt;
         ///                &lt;object classid=&quot;CLSID:7393552F-C4E6-49F0-8B01-52819BB9A0BC&quot; type=&quot;application/x-oleobject&quot; [rest of string was truncated]&quot;;.
         /// </summary>
-        public static string txtEPKWebpart
-        {
-            get
-            {
+        public static string txtEPKWebpart {
+            get {
                 return ResourceManager.GetString("txtEPKWebpart", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to Overdue Tasks`Task Center`Title|Name
         ///StartDate|Start
@@ -740,14 +630,12 @@ namespace EPMLiveCore.Properties
         ///DueDate|Finish
         ///Project`&lt;And&gt;&lt;And&gt;&lt;Eq&gt;&lt;FieldRef Name=&quot;AssignedTo&quot;/&gt;&lt;Value Typ [rest of string was truncated]&quot;;.
         /// </summary>
-        public static string txtFileDefaultSections
-        {
-            get
-            {
+        public static string txtFileDefaultSections {
+            get {
                 return ResourceManager.GetString("txtFileDefaultSections", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to &lt;Grid&gt;
         ///	&lt;Cfg id=&apos;TeamGrid&apos; SuppressCfg=&apos;0&apos;/&gt; &lt;!-- Configuration is not saved to cookies --&gt;
@@ -759,58 +647,48 @@ namespace EPMLiveCore.Properties
         ///	&lt;Cfg StaticCursor=&apos;1&apos; Dragging=&apos;0&apos; SelectingCells=&apos;1&apos; ShowDeleted=&apos;0&apos; SelectClass=&apos;0&apos; Hover=&apos;0&apos;/&gt;
         ///	&lt;Cfg Paging=&quot;2&quot; AllPages=&quot;1&quot; PageLength=&quot;25&quot; [rest of string was truncated]&quot;;.
         /// </summary>
-        public static string txtTeamGridLayout
-        {
-            get
-            {
+        public static string txtTeamGridLayout {
+            get {
                 return ResourceManager.GetString("txtTeamGridLayout", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to EPMLiveWebParts, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5.
         /// </summary>
-        public static string WebPartsAssembly
-        {
-            get
-            {
+        public static string WebPartsAssembly {
+            get {
                 return ResourceManager.GetString("WebPartsAssembly", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to FancyDisplayForm.
         /// </summary>
-        public static string WebPartsFancyDisplayForm
-        {
-            get
-            {
+        public static string WebPartsFancyDisplayForm {
+            get {
                 return ResourceManager.GetString("WebPartsFancyDisplayForm", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to GridListView.
         /// </summary>
-        public static string WebPartsGridListView
-        {
-            get
-            {
+        public static string WebPartsGridListView {
+            get {
                 return ResourceManager.GetString("WebPartsGridListView", resourceCulture);
             }
         }
-
+        
         /// <summary>
-        ///   Looks up a localized string similar to MyWorkWebPart.
+        ///   Looks up a localized string similar to MyWork.
         /// </summary>
-        public static string WebPartsMyWork
-        {
-            get
-            {
+        public static string WebPartsMyWork {
+            get {
                 return ResourceManager.GetString("WebPartsMyWork", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to &lt;Grid&gt;
         ///	&lt;Cfg Code=&quot;GTACCNPSQEBSLC&quot; Version=&quot;4.0&quot; /&gt;
@@ -824,14 +702,12 @@ namespace EPMLiveCore.Properties
         ///	&lt;Def&gt;
         ///		&lt;D Name=&quot;R&quot; HoverCell=&quot;Color&quot; HoverRow=&quot;Color&quot; FocusCell=&quot;&quot; FocusR [rest of string was truncated]&quot;;.
         /// </summary>
-        public static string WorkingOnGridLayout
-        {
-            get
-            {
+        public static string WorkingOnGridLayout {
+            get {
                 return ResourceManager.GetString("WorkingOnGridLayout", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to &lt;Grid&gt;
         ///&lt;Cfg id=&quot;gridWorkSpaceCenter&quot;/&gt;
@@ -846,10 +722,8 @@ namespace EPMLiveCore.Properties
         ///  &lt;Cfg StaticCursor=&quot;1&quot; Dragging=&quot;0&quot; SelectingCells=&quot;1&quot; SelectClass=&quot;0&quot; /&gt;
         ///  &lt;Cfg NoTreeLines=&quot;1&quot; DetailOn= [rest of string was truncated]&quot;;.
         /// </summary>
-        public static string WorkSpaceCenterLayout
-        {
-            get
-            {
+        public static string WorkSpaceCenterLayout {
+            get {
                 return ResourceManager.GetString("WorkSpaceCenterLayout", resourceCulture);
             }
         }

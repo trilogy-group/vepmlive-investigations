@@ -196,4 +196,60 @@
   <data name="WorkSpaceCenterLayout" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\WorkSpaceCenterLayout.txt;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
+  <data name="ReportingAssembly" xml:space="preserve">
+    <value>EPMLiveReportsAdmin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b90e532f481cf050</value>
+    <comment>Must self reference this assembly</comment>
+  </data>
+  <data name="ReportingClassName" xml:space="preserve">
+    <value>EPMLiveReportsAdmin.ListEvents</value>
+    <comment>Must self reference the ListEvents class</comment>
+  </data>
+  <data name="ReportingColumnTable" xml:space="preserve">
+    <value>RPTColumn</value>
+  </data>
+  <data name="ReportingDatabaseTable" xml:space="preserve">
+    <value>RPTDatabases</value>
+  </data>
+  <data name="ReportingInitDatabaseCreateProcedures" xml:space="preserve">
+    <value>InitDatabaseCreateProcedures.sql</value>
+  </data>
+  <data name="ReportingInitDatabaseCreateTables" xml:space="preserve">
+    <value>InitDatabaseCreateTables.sql</value>
+  </data>
+  <data name="ReportingListPrefix" xml:space="preserve">
+    <value>LST</value>
+  </data>
+  <data name="ReportingListSummaryView" xml:space="preserve">
+    <value>VWRPTListSummary</value>
+  </data>
+  <data name="ReportingListTable" xml:space="preserve">
+    <value>RPTList</value>
+  </data>
+  <data name="ReportingLogTable" xml:space="preserve">
+    <value>RPTLog</value>
+  </data>
+  <data name="ReportingSettingsTable" xml:space="preserve">
+    <value>RPTSettings</value>
+  </data>
+  <data name="ReportingSnapshotTableSuffix" xml:space="preserve">
+    <value>Snapshot</value>
+  </data>
+  <data name="ReportingTimesheetTable" xml:space="preserve">
+    <value>RPTTSData</value>
+  </data>
+  <data name="ReportingWorkTable" xml:space="preserve">
+    <value>RPTWork</value>
+  </data>
+  <data name="WebPartsAssembly" xml:space="preserve">
+    <value>EPMLiveWebParts, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5</value>
+  </data>
+  <data name="WebPartsFancyDisplayForm" xml:space="preserve">
+    <value>FancyDisplayForm</value>
+  </data>
+  <data name="WebPartsGridListView" xml:space="preserve">
+    <value>GridListView</value>
+  </data>
+  <data name="WebPartsMyWork" xml:space="preserve">
+    <value>MyWork</value>
+  </data>
 </root>
