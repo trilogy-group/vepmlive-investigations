@@ -278,9 +278,5 @@ Get-ChildItem -Path ($LibrariesDirectory + "\*")  -Include "UplandIntegrations.d
 Get-ChildItem -Path ($BinariesDirectory + "\*")  -Include "EPMLiveTimerService.exe" | Copy-Item -Destination $ProductOutput -Force  
 Get-ChildItem -Path ($ProductOutput + "\*")  -Include "EPMLiveTimerService.exe" | Rename-Item -NewName {$_.name -replace ‘EPMLiveTimerService’,’TimerService’ }
 
-#Move file over to InstallShield Build dependencies folder consumed by Installshield
-$InstallShieldOutput = "C:\opt\dfinstaller\InstallShield\Build Dependencies"
-Get-ChildItem -Path ($ProductOutput + "\*")  -Include "*.*"  | Copy-Item -Destination $InstallShieldOutput -Force 
-
 #Run Installshield project to generate product .exe
-& "C:\Program Files (x86)\InstallShield\2015\System\IsCmdBld.exe" -p "C:\opt\dfinstaller\InstallShield\WorkEngine5\WorkEngine5.ism"
+& "C:\Program Files (x86)\InstallShield\2015\System\IsCmdBld.exe" -p "C:\InstallShield\WorkEngine5\WorkEngine5.ism" -y "5.6.12.500"
