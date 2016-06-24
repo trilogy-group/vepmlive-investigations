@@ -279,4 +279,4 @@ Get-ChildItem -Path ($BinariesDirectory + "\*")  -Include "EPMLiveTimerService.e
 Get-ChildItem -Path ($ProductOutput + "\*")  -Include "EPMLiveTimerService.exe" | Rename-Item -NewName {$_.name -replace ‘EPMLiveTimerService’,’TimerService’ }
 
 #Run Installshield project to generate product .exe
-& "C:\Program Files (x86)\InstallShield\2015\System\IsCmdBld.exe" -p "C:\opt\dfinstaller\InstallShield\WorkEngine5\WorkEngine5.ism" -y "5.6.12"
+& "C:\Program Files (x86)\InstallShield\2015\System\IsCmdBld.exe" -p "C:\InstallShield\WorkEngine5\WorkEngine5.ism" -y "5.6.12.500"
