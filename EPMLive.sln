@@ -90,6 +90,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EPMLiveCore", "EPMLiveCore\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EPMLiveTests", "EPMLiveTests\EPMLiveTests.csproj", "{D2101EA6-CEF5-4502-92CD-852D635B263C}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "aline-build", "aline-build", "{0FFEE7A4-7B3D-4614-A864-028D41CB7F2F}"
+	ProjectSection(SolutionItems) = preProject
+		aline-build\RefsLocate.ps1 = aline-build\RefsLocate.ps1
+		aline-build\tl_build_v3.ps1 = aline-build\tl_build_v3.ps1
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
