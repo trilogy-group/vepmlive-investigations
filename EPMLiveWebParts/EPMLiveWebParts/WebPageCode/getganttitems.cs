@@ -658,7 +658,7 @@ namespace EPMLiveWebParts
                             case "TotalRollup":
                                 return oField.GetFieldValueAsText(value);
                             default:
-                                return value;
+                                return HttpUtility.HtmlDecode(value);
                         }
                 }
             }
