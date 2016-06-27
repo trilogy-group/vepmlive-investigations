@@ -3699,8 +3699,10 @@
                 document.getElementById("id_SaveView_Name").value = selectedItem.text;
                 document.getElementById("id_SaveView_Guid").value = selectedItem.value;
                 var bDefault = false;
-                if (view.Default != 0)
+                if (view.Default != 0) {
                     bDefault = true;
+                    objDefault.disabled = true;
+                }
                 objDefault.checked = bDefault;
                 var bPersonal = false;
                 if (view.Personal != 0)
