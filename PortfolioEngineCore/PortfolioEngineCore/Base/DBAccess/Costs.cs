@@ -157,7 +157,7 @@ namespace PortfolioEngineCore
                     + "LV1.LV_FULLVALUE as LVF_01, LV2.LV_FULLVALUE as LVF_02, LV3.LV_FULLVALUE as LVF_03, LV4.LV_FULLVALUE as LVF_04, LV5.LV_FULLVALUE as LVF_05,"
                     + "OC_01,OC_02,OC_03,OC_04,OC_05,TEXT_01,TEXT_02,TEXT_03,TEXT_04,TEXT_05 "
                     + "FROM EPGP_COST_CATEGORIES BC "
-                    + "inner JOIN EPGP_AVAIL_CATEGORIES AC ON (BC.BC_UID = AC.BC_UID AND AC.CT_ID = @p1) "
+                    + "left JOIN EPGP_AVAIL_CATEGORIES AC ON (BC.BC_UID = AC.BC_UID AND AC.CT_ID = @p1) "
                     + "left JOIN EPGP_COST_DETAILS CD ON (BC.BC_UID = CD.BC_UID AND CD.CT_ID = @p2 AND CD.PROJECT_ID = @p3 AND CD.CB_ID = @p4) "
                     + "left JOIN EPG_RATES R ON (R.RT_UID = CD.RT_UID) "
                     + "left JOIN EPGP_LOOKUP_VALUES LV1 ON (LV1.LV_UID = OC_01) "
