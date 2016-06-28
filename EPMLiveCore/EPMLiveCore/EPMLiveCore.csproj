@@ -344,6 +344,9 @@
     </Compile>
     <Compile Include="Events\ClearCacheEvent.cs" />
     <Compile Include="ExtensionMethods.cs" />
+    <Compile Include="Features\EPMLiveLogging\EPMLiveLogging.EventReceiver.cs">
+      <DependentUpon>EPMLiveLogging.feature</DependentUpon>
+    </Compile>
     <Compile Include="FilteredLookup\FilteredLookupField.cs" />
     <Compile Include="FilteredLookup\FilteredLookupFieldControl.cs" />
     <Compile Include="FilteredLookup\FilteredLookupFieldEditor.cs">
@@ -378,6 +381,7 @@
     <Compile Include="Infrastructure\Interfaces\ILogger.cs" />
     <Compile Include="Infrastructure\Interfaces\ISPListItemManager.cs" />
     <Compile Include="Infrastructure\Logging\Logger.cs" />
+    <Compile Include="Infrastructure\Logging\LoggingService.cs" />
     <Compile Include="Infrastructure\Logging\LogKind.cs" />
     <Compile Include="Infrastructure\Navigation\INavLinkProvider.cs" />
     <Compile Include="Infrastructure\Navigation\INavObject.cs" />
@@ -1698,6 +1702,9 @@
     <None Include="Features\EPMLiveWorkspaceMenus\EPMLiveWorkspaceMenus.feature">
       <FeatureId>{bd45b455-49f0-4bee-989c-867626214618}</FeatureId>
     </None>
+    <None Include="Features\EPMLiveLogging\EPMLiveLogging.feature">
+      <FeatureId>{767ccedc-be93-4210-be70-c7a7fa7db0e9}</FeatureId>
+    </None>
     <None Include="Features\SocialStream\SocialStream.feature">
       <FeatureId>{41772821-ddd2-4ea4-9150-bb95eae4f875}</FeatureId>
     </None>
@@ -2311,6 +2318,9 @@
     </Content>
     <Content Include="Features\EPMLiveWorkspaceMenus\EPMLiveWorkspaceMenus.Template.xml">
       <DependentUpon>EPMLiveWorkspaceMenus.feature</DependentUpon>
+    </Content>
+    <Content Include="Features\EPMLiveLogging\EPMLiveLogging.Template.xml">
+      <DependentUpon>EPMLiveLogging.feature</DependentUpon>
     </Content>
     <Content Include="Features\SocialStream\SocialStream.Template.xml">
       <DependentUpon>SocialStream.feature</DependentUpon>
