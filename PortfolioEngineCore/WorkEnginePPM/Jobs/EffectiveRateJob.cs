@@ -1,6 +1,8 @@
 ﻿using EPMLiveCore;
+using EPMLiveCore.Infrastructure.Logging;
 using EPMLiveCore.ReportHelper;
 using Microsoft.SharePoint;
+using Microsoft.SharePoint.Administration;
 using PortfolioEngineCore;
 using System;
 using System.Collections.Generic;
@@ -10,6 +12,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
+using static EPMLiveCore.Infrastructure.Logging.LoggingService;
 
 namespace WorkEnginePPM.Jobs
 {
@@ -31,6 +34,8 @@ namespace WorkEnginePPM.Jobs
             string tableName = null;
             try
             {
+                LoggingService.WriteTrace(Area.EPMLiveWorkEnginePPM, Categories.EPMLiveWorkEnginePPM.TimerJob, TraceSeverity.Monitorable, "Effective Rate Job Started");
+
                 //Refer root web to get pfe details
                 rootWeb = site.RootWeb;
                 username = site.WebApplication.ApplicationPool.Username;
@@ -69,7 +74,10 @@ namespace WorkEnginePPM.Jobs
                                     reportData.UpdateItem(resourceList.ID, item, tableName);
                                 }
                             }
-                            catch { }
+                            catch (Exception ex)
+                            {
+                                LoggingService.WriteTrace(Area.EPMLiveWorkEnginePPM, Categories.EPMLiveWorkEnginePPM.TimerJob, TraceSeverity.High, String.Format("StackTrace-{0}{1}Message-{2}", ex.StackTrace, Environment.NewLine, ex.Message));
+                            }
                         }
                     }
                 }
@@ -77,6 +85,7 @@ namespace WorkEnginePPM.Jobs
             }
             catch (Exception ex)
             {
+                LoggingService.WriteTrace(Area.EPMLiveWorkEnginePPM, Categories.EPMLiveWorkEnginePPM.TimerJob, TraceSeverity.High, String.Format("StackTrace-{0}{1}Message-{2}", ex.StackTrace, Environment.NewLine, ex.Message));
                 sErrors = "Error: " + ex.Message;
             }
             finally
@@ -100,6 +109,7 @@ namespace WorkEnginePPM.Jobs
                 ppmId = null;
                 ppmCompany = null;
                 ppmDbConn = null;
+                LoggingService.WriteTrace(Area.EPMLiveWorkEnginePPM, Categories.EPMLiveWorkEnginePPM.TimerJob, TraceSeverity.Monitorable, "Effective Rate Job Completed");
             }
         }
     }

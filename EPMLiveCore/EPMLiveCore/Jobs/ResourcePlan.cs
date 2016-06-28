@@ -5,6 +5,9 @@ using System.Text;
 using Microsoft.SharePoint;
 using System.Data.SqlClient;
 using System.Data;
+using EPMLiveCore.Infrastructure.Logging;
+using static EPMLiveCore.Infrastructure.Logging.LoggingService;
+using Microsoft.SharePoint.Administration;
 
 namespace EPMLiveCore.Jobs
 {
@@ -23,13 +26,15 @@ namespace EPMLiveCore.Jobs
                 if (!initJob(site))
                     return;
 
+                LoggingService.WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.TimerJob, TraceSeverity.Monitorable, "Resource Plan Job Started");
+
                 string resPlanLists = EPMLiveCore.CoreFunctions.getConfigSetting(site.RootWeb, "EPMLiveResPlannerLists");
                 if (resPlanLists.Trim() != "")
                 {
 
                     string sFixLists = EPMLiveCore.CoreFunctions.getConfigSetting(site.RootWeb, "EPMLiveFixLists");
 
-                    SPSecurity.RunWithElevatedPrivileges(delegate()
+                    SPSecurity.RunWithElevatedPrivileges(delegate ()
                     {
                         cn.Open();
                     });
@@ -53,7 +58,7 @@ namespace EPMLiveCore.Jobs
 
                     int hours = 0;
                     string workdays = " ";
-                    SPSecurity.RunWithElevatedPrivileges(delegate()
+                    SPSecurity.RunWithElevatedPrivileges(delegate ()
                     {
                         int startHour = site.RootWeb.RegionalSettings.WorkDayStartHour / 60;
                         int endHour = site.RootWeb.RegionalSettings.WorkDayEndHour / 60;
@@ -80,14 +85,17 @@ namespace EPMLiveCore.Jobs
                             processResPlan(w, resPlanLists, site.ID, hours, workdays);
 
                         }
-                        catch { }
+                        catch (Exception ex)
+                        {
+                            LoggingService.WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.TimerJob, TraceSeverity.High, String.Format("StackTrace-{0}{1}Message-{2}", ex.StackTrace, Environment.NewLine, ex.Message));
+                        }
                         w.Close();
                         w.Dispose();
 
                         updateProgress(webCount++);
                     }
 
-                    SPSecurity.RunWithElevatedPrivileges(delegate()
+                    SPSecurity.RunWithElevatedPrivileges(delegate ()
                     {
                         cn.Open();
                     });
@@ -97,6 +105,7 @@ namespace EPMLiveCore.Jobs
             }
             catch (Exception ex)
             {
+                LoggingService.WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.TimerJob, TraceSeverity.High, String.Format("StackTrace-{0}{1}Message-{2}", ex.StackTrace, Environment.NewLine, ex.Message));
                 throw ex;
             }
             finally
@@ -113,6 +122,7 @@ namespace EPMLiveCore.Jobs
                 if (site != null)
                     site.Dispose();
                 data = null;
+                LoggingService.WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.TimerJob, TraceSeverity.Monitorable, "Resource Plan Job Completed");
             }
         }
 
@@ -177,6 +187,7 @@ namespace EPMLiveCore.Jobs
                             }
                             catch (Exception ex)
                             {
+                                LoggingService.WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.TimerJob, TraceSeverity.High, String.Format("StackTrace-{0}{1}Message-{2}", ex.StackTrace, Environment.NewLine, ex.Message));
                                 if (ex.Message != "Value does not fall within the expected range.")
                                 {
                                     bErrors = true;
@@ -262,7 +273,10 @@ namespace EPMLiveCore.Jobs
                 System.Uri u = new Uri(resUrl);
                 resUrl = u.AbsolutePath;
             }
-            catch { }
+            catch (Exception ex)
+            {
+                LoggingService.WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.TimerJob, TraceSeverity.High, String.Format("StackTrace-{0}{1}Message-{2}", ex.StackTrace, Environment.NewLine, ex.Message));
+            }
 
             return resUrl;
         }
