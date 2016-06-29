@@ -134,7 +134,7 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
                             using (
                                 var sqlCommand =
                                     new SqlCommand(
-                                        "update tsitem set assignedtoid = @assignedtoid where web_uid = @web_uid and list_uid = @list_uid and item_id = @item_id and project_id = @project_id",
+                                        "update tsitem set assignedtoid = @assignedtoid where web_uid = @web_uid and list_uid = @list_uid and item_id = @item_id and project_id = @project_id and assignedtoid is null",
                                         sqlConnection))
                             {
                                 sqlCommand.CommandType = CommandType.Text;
