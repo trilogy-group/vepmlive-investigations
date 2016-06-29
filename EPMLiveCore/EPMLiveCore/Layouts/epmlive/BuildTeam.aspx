@@ -251,6 +251,7 @@
 
         Grids.OnGetHtmlValue = function(grid, row, col, val)    
         {
+            
             if(row.Kind == "Data" && row.Def.Name != "Group")
             {
                 if(col == "Title")
@@ -259,7 +260,7 @@
                 }
                 if(col == "Permissions")
                 {
-                    if(val == "" && row.Generic != "Yes")
+                    if((val == undefined || val == "") && row.Generic != "Yes")
                         return "--Select Permissions--";
                 }
             }
