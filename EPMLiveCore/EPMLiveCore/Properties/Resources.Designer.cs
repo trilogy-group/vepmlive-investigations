@@ -342,7 +342,7 @@ namespace EPMLiveCore.Properties {
                 return ResourceManager.GetString("ReportingDatabaseTable", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to InitDatabaseCreateProcedures.sql.
         /// </summary>
@@ -351,7 +351,7 @@ namespace EPMLiveCore.Properties {
                 return ResourceManager.GetString("ReportingInitDatabaseCreateProcedures", resourceCulture);
             }
         }
-        
+
         /// <summary>
         ///   Looks up a localized string similar to InitDatabaseCreateTables.sql.
         /// </summary>
@@ -681,7 +681,7 @@ namespace EPMLiveCore.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to MyWork.
+        ///   Looks up a localized string similar to MyWorkWebPart.
         /// </summary>
         public static string WebPartsMyWork {
             get {

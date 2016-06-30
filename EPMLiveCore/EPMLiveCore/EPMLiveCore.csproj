@@ -2193,7 +2193,8 @@
     <EmbeddedResource Include="GlobalResources\MultiAppNavigationResources.resx" />
     <EmbeddedResource Include="GlobalResources\WorkEngineLookupPickerResources.resx" />
     <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <SubType>Designer</SubType>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
@@ -4035,6 +4036,8 @@
     <Content Include="Resources\9Data01.sql" />
     <Content Include="Resources\9Data02.sql" />
     <Content Include="Resources\EPMLiveNavigation.txt" />
+    <Content Include="Resources\InitDatabaseCreateProcedures.sql" />
+    <Content Include="Resources\InitDatabaseCreateTables.sql" />
     <Content Include="Resources\WorkSpaceCenterLayout.txt" />
     <Content Include="Services\SocialEngine.svc" />
     <Content Include="SocialEngine\Events\ListEventReceiver\Elements.xml" />
