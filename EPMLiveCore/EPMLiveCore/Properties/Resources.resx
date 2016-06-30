@@ -210,11 +210,11 @@
   <data name="ReportingDatabaseTable" xml:space="preserve">
     <value>RPTDatabases</value>
   </data>
-  <data name="ReportingInitDatabaseCreateProcedures" xml:space="preserve">
-    <value>InitDatabaseCreateProcedures.sql</value>
+  <data name="ReportingInitDatabaseCreateProcedures"  type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\InitDatabaseCreateProcedures.sql;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
   </data>
-  <data name="ReportingInitDatabaseCreateTables" xml:space="preserve">
-    <value>InitDatabaseCreateTables.sql</value>
+  <data name="ReportingInitDatabaseCreateTables"  type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\InitDatabaseCreateTables.sql;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
   </data>
   <data name="ReportingListPrefix" xml:space="preserve">
     <value>LST</value>
@@ -250,6 +250,6 @@
     <value>GridListView</value>
   </data>
   <data name="WebPartsMyWork" xml:space="preserve">
-    <value>MyWork</value>
+    <value>MyWorkWebPart</value>
   </data>
 </root>
