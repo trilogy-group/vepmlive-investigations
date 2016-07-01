@@ -766,7 +766,7 @@ Status_Error:
         /// <param name="Trycheckout"></param>
         /// <returns></returns>
         [WebMethod(EnableSession = true)]
-        public string GetEditCostsData(int Projectid, int Costtypeid, string Viewuid, int Ftemode, string Wepid, int Trycheckout)
+        public string GetEditCostsData(int Projectid, int Costtypeid, string Viewuid, int Ftemode, string Wepid, int Trycheckout, bool LoadAllCostCategories)
         {
             int nProjectID = Projectid;
             int nCostTypeID = Costtypeid;
@@ -895,7 +895,7 @@ Status_Error:
                 int nRowId = 0;
                 foreach (CostCategory costCategory in costCategories)
                 {
-                    if (bNoRows)
+                    if (bNoRows || LoadAllCostCategories)
                         costCategory.HasData = true;
                     oGridData.AddCostCategory(costCategory, costCustomFields, nRowId++);
                 }
