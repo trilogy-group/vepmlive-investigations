@@ -45,7 +45,7 @@ namespace WorkEnginePPM
                 // Sets based on site's current culture
                 ctl.DecimalSeparator = Web.Locale.NumberFormat.NumberDecimalSeparator;
                 ctl.GroupSeparator = Web.Locale.NumberFormat.NumberGroupSeparator;
-                ctl.LoadAllCostCategories = string.IsNullOrEmpty(sLoadAllCategory) ? false : Convert.ToBoolean(sLoadAllCategory);
+                ctl.Loadallcostcategories = string.IsNullOrEmpty(sLoadAllCategory) ? false : Convert.ToBoolean(sLoadAllCategory);
                 PlaceHolder1.Controls.Add(ctl);
             }
             else
@@ -89,7 +89,7 @@ namespace WorkEnginePPM
                     // Sets based on site's current culture
                     ctl.DecimalSeparator = Web.Locale.NumberFormat.NumberDecimalSeparator;
                     ctl.GroupSeparator = Web.Locale.NumberFormat.NumberGroupSeparator;
-                    ctl.LoadAllCostCategories = string.IsNullOrEmpty(sLoadAllCategory) ? false : Convert.ToBoolean(sLoadAllCategory);
+                    ctl.Loadallcostcategories = string.IsNullOrEmpty(sLoadAllCategory) ? false : Convert.ToBoolean(sLoadAllCategory);
                     PlaceHolder1.Controls.Add(ctl);
                 }
             }

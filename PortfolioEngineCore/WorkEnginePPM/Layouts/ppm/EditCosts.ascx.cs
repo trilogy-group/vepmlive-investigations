@@ -51,16 +51,16 @@ namespace WorkEnginePPM.ControlTemplates.WorkEnginePPM
             }
         }
 
-        private bool m_nLoadAllCostCategories = false;
-        public bool LoadAllCostCategories
+        private bool m_nLoadallcostcategories;
+        public bool Loadallcostcategories
         {
             get
             {
-                return m_nLoadAllCostCategories;
+                return m_nLoadallcostcategories;
             }
             set
             {
-                m_nLoadAllCostCategories = value;
+                m_nLoadallcostcategories = value;
             }
         }
 
