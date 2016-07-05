@@ -906,7 +906,7 @@ namespace EPMLiveWebParts
 
                             function _registerCustomPageComponent()
                             {
-                                SP.SOD.registerSod(""GridViewContextualTabPageComponent.js"", ""\/_layouts\/epmlive\/gridlistribbon.aspx"");
+                                SP.SOD.registerSod(""GridViewContextualTabPageComponent.js"", "" " + SPContext.Current.Web.Url + @"\/_layouts\/epmlive\/gridlistribbon.aspx"");
                                 SP.SOD.executeFunc(""GridViewContextualTabPageComponent.js"", ""ContextualWebPart.CustomPageComponent"", _addCustomPageComponent);
                             }
 
