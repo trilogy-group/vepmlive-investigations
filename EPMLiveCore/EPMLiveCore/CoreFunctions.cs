@@ -2149,7 +2149,7 @@ namespace EPMLiveCore
                                         //    m.Invoke(apiClass, new object[] { listIconsToBeSet });
                                         //}
 
-                                        ReportHelper.EPMData epmData = new ReportHelper.EPMData(s.ID, w.ID);
+                                        ReportHelper.EPMData epmData = new ReportHelper.EPMData(true, s.ID, w.ID);
 
                                         epmData.SetListIcon(listIconsToBeSet);
 
@@ -2173,7 +2173,7 @@ namespace EPMLiveCore
                                     //    m.Invoke(apiClass, new object[] { listsToBeMapped, w.ID });
                                     //}
 
-                                    ReportHelper.EPMData epmData = new ReportHelper.EPMData(s.ID, w.ID);
+                                    ReportHelper.EPMData epmData = new ReportHelper.EPMData(true, s.ID, w.ID);
 
                                     epmData.MapLists(listsToBeMapped,w.ID);
                                 }
@@ -2207,6 +2207,73 @@ namespace EPMLiveCore
                 }
                 else
                 {
+                    SPSecurity.RunWithElevatedPrivileges(() =>
+                    {
+                        using (SPSite s = new SPSite(web.Url))
+                        {
+                            using (SPWeb w = s.OpenWeb())
+                            {
+                                List<SPEventReceiverDefinition> evts = null;
+                                List<Guid> listsToBeMapped = new List<Guid>();
+                                Dictionary<String, String> listIconsToBeSet = new Dictionary<string, string>();
+                                string EPMLiveReportingAssembly =
+                                    "EPMLiveReportsAdmin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b90e532f481cf050";
+
+                                MethodInfo m = null;
+                                string listIcon = string.Empty;
+
+                                foreach (SPList l in w.Lists)
+                                {
+                                    string sClass = "EPMLiveReportsAdmin.ListEvents";
+
+                                    evts = CoreFunctions.GetListEvents(l,
+                                        EPMLiveReportingAssembly,
+                                        sClass,
+                                        new List<SPEventReceiverType>
+                                        {
+                                            SPEventReceiverType.ItemAdded,
+                                            SPEventReceiverType.ItemUpdated,
+                                            SPEventReceiverType.ItemDeleting
+                                        });
+
+                                    if (evts.Count > 0 &&
+                                        !listsToBeMapped.Contains(l.ID))
+                                    {
+                                        listsToBeMapped.Add(l.ID);
+
+                                        try
+                                        {
+                                            //Set List Icon
+                                            var gSettings = new GridGanttSettings(l);
+                                            listIcon = gSettings.ListIcon;
+                                            listIconsToBeSet.Add(l.ID.ToString(), listIcon);
+                                        }
+                                        catch { }
+
+                                        continue;
+                                    }
+                                }
+
+                                if (listsToBeMapped.Count > 0)
+                                {
+                                    try
+                                    {
+                                        ReportHelper.EPMData epmData = new ReportHelper.EPMData(true, s.ID, w.ID);
+                                        epmData.SetListIcon(listIconsToBeSet);
+                                    }
+                                    catch { }
+                                }
+
+                                try
+                                {
+                                    ReportHelper.EPMData epmData = new ReportHelper.EPMData(true, s.ID, w.ID);
+                                    epmData.MapLists(listsToBeMapped, w.ID);
+                                }
+                                catch { }
+                            }
+                        }
+                    });
+
                     var ownerByCreation = web.AllUsers[user];
 
                     SPSecurity.RunWithElevatedPrivileges(delegate
@@ -2374,7 +2441,7 @@ namespace EPMLiveCore
                                     //{
                                     //    m.Invoke(apiClass, new object[] { listIconsToBeSet });
                                     //}
-                                    ReportHelper.EPMData epmData = new ReportHelper.EPMData(ss.ID, sw.ID);
+                                    ReportHelper.EPMData epmData = new ReportHelper.EPMData(true, ss.ID, sw.ID);
 
                                     epmData.SetListIcon(listIconsToBeSet);
                                 }
@@ -2394,7 +2461,7 @@ namespace EPMLiveCore
                                 //{
                                 //    m.Invoke(apiClass, new object[] { listsToBeMapped, sw.ID });
                                 //}
-                                ReportHelper.EPMData epmData = new ReportHelper.EPMData(ss.ID, sw.ID);
+                                ReportHelper.EPMData epmData = new ReportHelper.EPMData(true, ss.ID, sw.ID);
 
                                 epmData.MapLists(listsToBeMapped,sw.ID);
                             }

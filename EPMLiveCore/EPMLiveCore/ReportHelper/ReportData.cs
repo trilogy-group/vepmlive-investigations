@@ -418,7 +418,7 @@ namespace EPMLiveCore.ReportHelper
             {
                 if (_isReportingV2Enabled && !_isRootWeb)
                 {
-                    tblName = webTitle + "_" +  tableName + "_" + _webId.ToString().Replace("-", "");
+                    tblName = webTitle + "_" + tableName + "_" + _webId.ToString().Replace("-", "");
                     tableName = tblName;
                 }
             }
@@ -813,7 +813,7 @@ namespace EPMLiveCore.ReportHelper
             //string sVersion = "''" + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString() + "''";
             FileVersionInfo fvi = FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location);
             string sVersion = "''" + fvi.FileVersion + "''";
-            
+
             //_DAO.AddParam("@version", sVersion);
             _DAO.Command = Resources.ReportingInitDatabaseCreateTables.Replace("@version", sVersion);
             success = _DAO.ExecuteNonQuery(_DAO.GetClientReportingConnection);
@@ -915,7 +915,10 @@ namespace EPMLiveCore.ReportHelper
             SPWeb web = null;
             try
             {
-                web = SPContext.Current.Site.OpenWeb();
+                if (_isReportingV2Enabled)
+                    web = SPContext.Current.Site.OpenWeb();
+                else
+                    web = SPContext.Current.Site.RootWeb;
             }
             catch { }
 
@@ -2034,7 +2037,7 @@ namespace EPMLiveCore.ReportHelper
                     else
                     {
                         param.SqlDbType = SqlDbType.NVarChar;
-                        param.Size =8001;
+                        param.Size = 8001;
                     }
 
                     param.Direction = ParameterDirection.Input;
@@ -2607,7 +2610,7 @@ namespace EPMLiveCore.ReportHelper
                                         if (column["SharepointType"].ToString().ToLower() == "lookup" ||
                                             column["SharepointType"].ToString().ToLower() == "user")
                                         {
-                                            if(column["ColumnName"].ToString().ToLower() == "assignedtotext")
+                                            if (column["ColumnName"].ToString().ToLower() == "assignedtotext")
                                             {
                                                 itemRow[column["ColumnName"].ToString()] = string.Join(", ", allUsers.Distinct());
                                             }
