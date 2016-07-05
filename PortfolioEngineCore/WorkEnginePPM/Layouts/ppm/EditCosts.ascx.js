@@ -606,7 +606,7 @@
             var sb = new StringBuilder();
             sb.append("<treegrid SuppressMessage='3' debug='0' sync='0' ");
             sb.append(" layout_url='" + this.params.Webservice + "' layout_method='Soap' layout_function='GetEditCostsLayout' layout_namespace='WorkEnginePPM' layout_param_Projectid='" + this.params.ProjectID + "' layout_param_Costtypeid='" + rootid + "' layout_param_Viewuid='" + this.params.ViewUID + "' layout_param_Ftemode='" + this.FTEMode + "' layout_param_Wepid='" + this.params.WEPID + "' layout_param_Trycheckout='1'");
-            sb.append(" data_url='" + this.params.Webservice + "' data_method='Soap' data_function='GetEditCostsData' data_namespace='WorkEnginePPM' data_param_Projectid='" + this.params.ProjectID + "' data_param_Costtypeid='" + rootid + "' data_param_Viewuid='" + this.params.ViewUID + "' data_param_Ftemode='" + this.FTEMode + "' data_param_Wepid='" + this.params.WEPID + "' data_param_Trycheckout='1'");
+            sb.append(" data_url='" + this.params.Webservice + "' data_method='Soap' data_function='GetEditCostsData' data_namespace='WorkEnginePPM' data_param_Projectid='" + this.params.ProjectID + "' data_param_Costtypeid='" + rootid + "' data_param_Viewuid='" + this.params.ViewUID + "' data_param_Ftemode='" + this.FTEMode + "' data_param_Wepid='" + this.params.WEPID + "' data_param_Trycheckout='1' data_param_Loadallcostcategories='" + this.params.Loadallcostcategories + "' ");
             sb.append(" upload_url='" + this.params.Webservice + "' upload_type='Body' upload_method='Soap' upload_function='SaveEditCostsData' upload_namespace='WorkEnginePPM' upload_data='sData' upload_param_Projectid='" + this.params.ProjectID + "' upload_param_Costtypeid='" + rootid + "' upload_param_Viewuid='" + this.params.ViewUID + "' upload_param_Wepid='" + this.params.WEPID + "' >");
             sb.append("</treegrid>");
 
@@ -623,7 +623,7 @@
             var sb = new StringBuilder();
             sb.append("<treegrid SuppressMessage='3' debug='0' sync='0' ");
             sb.append(" layout_url='" + this.params.Webservice + "' layout_method='Soap' layout_function='GetEditCostsLayout' layout_namespace='WorkEnginePPM' layout_param_Projectid='" + this.params.ProjectID + "' layout_param_Costtypeid='" + rootid + "' layout_param_Viewuid='" + this.params.ViewUID + "' layout_param_Ftemode='" + this.FTEMode + "' layout_param_Wepid='" + this.params.WEPID + "' layout_param_Trycheckout='0'");
-            sb.append(" data_url='" + this.params.Webservice + "' data_method='Soap' data_function='GetEditCostsData' data_namespace='WorkEnginePPM' data_param_Projectid='" + this.params.ProjectID + "' data_param_Costtypeid='" + rootid + "' data_param_Viewuid='" + this.params.ViewUID + "' data_param_Ftemode='" + this.FTEMode + "' data_param_Wepid='" + this.params.WEPID + "' data_param_Trycheckout='0' >");
+            sb.append(" data_url='" + this.params.Webservice + "' data_method='Soap' data_function='GetEditCostsData' data_namespace='WorkEnginePPM' data_param_Projectid='" + this.params.ProjectID + "' data_param_Costtypeid='" + rootid + "' data_param_Viewuid='" + this.params.ViewUID + "' data_param_Ftemode='" + this.FTEMode + "' data_param_Wepid='" + this.params.WEPID + "' data_param_Trycheckout='0'  data_param_Loadallcostcategories='" + this.params.Loadallcostcategories + "' >");
             sb.append("</treegrid>");
             TreeGrid(sb.toString(), "bottomgridDiv_" + rootid, "bottomg_" + rootid);
             this.ShowWorkingPopup("divLoading");
@@ -1908,7 +1908,7 @@
         this.showCostDPs = false;
         this.selectedCostTypes = null;
 
-        var loadDelegate = MakeDelegate(this, this.OnLoad);        
+        var loadDelegate = MakeDelegate(this, this.OnLoad);
         var resizeDelegate = MakeDelegate(this, this.OnResizeInternal);
         var CheckStatusCompleteDelegate = MakeDelegate(this, this.OnCheckStatusComplete);
         var unloadDelegate = MakeDelegate(this, this.OnUnload);

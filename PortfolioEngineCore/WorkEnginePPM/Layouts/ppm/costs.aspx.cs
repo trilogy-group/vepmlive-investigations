@@ -24,7 +24,7 @@ namespace WorkEnginePPM
             }
 
             string sListId = "";
-            if(!string.IsNullOrEmpty(Request["listid"]))
+            if (!string.IsNullOrEmpty(Request["listid"]))
             {
                 sListId = Request["listid"];
             }
@@ -32,6 +32,8 @@ namespace WorkEnginePPM
             {
                 sListId = Request["itemid"].Split('.')[1];
             }
+
+            string sLoadAllCategory = EPMLiveCore.CoreFunctions.getConfigSetting(Web.Site.RootWeb, "EPKLoadAllCostCategories");
 
             if (sListId == "")
             {
@@ -43,7 +45,7 @@ namespace WorkEnginePPM
                 // Sets based on site's current culture
                 ctl.DecimalSeparator = Web.Locale.NumberFormat.NumberDecimalSeparator;
                 ctl.GroupSeparator = Web.Locale.NumberFormat.NumberGroupSeparator;
-
+                ctl.Loadallcostcategories = string.IsNullOrEmpty(sLoadAllCategory) ? false : Convert.ToBoolean(sLoadAllCategory);
                 PlaceHolder1.Controls.Add(ctl);
             }
             else
@@ -87,7 +89,7 @@ namespace WorkEnginePPM
                     // Sets based on site's current culture
                     ctl.DecimalSeparator = Web.Locale.NumberFormat.NumberDecimalSeparator;
                     ctl.GroupSeparator = Web.Locale.NumberFormat.NumberGroupSeparator;
-
+                    ctl.Loadallcostcategories = string.IsNullOrEmpty(sLoadAllCategory) ? false : Convert.ToBoolean(sLoadAllCategory);
                     PlaceHolder1.Controls.Add(ctl);
                 }
             }

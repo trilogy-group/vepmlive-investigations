@@ -209,5 +209,6 @@
     params.IsDlg = "<%=IsDlg%>";
     params.DecimalSeparator = "<%=DecimalSeparator%>";
     params.GroupSeparator = "<%=GroupSeparator%>";
+    params.Loadallcostcategories = "<%=Convert.ToString(Loadallcostcategories).ToLower()%>";
     editcosts = new EditCosts('editcosts', params);
 </script>

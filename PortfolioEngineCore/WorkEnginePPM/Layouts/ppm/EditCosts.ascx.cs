@@ -41,43 +41,92 @@ namespace WorkEnginePPM.ControlTemplates.WorkEnginePPM
         private int m_nProjectID = 0;
         public int ProjectID
         {
-            get { return m_nProjectID; }
-            set { m_nProjectID = value; }
+            get
+            {
+                return m_nProjectID;
+            }
+            set
+            {
+                m_nProjectID = value;
+            }
+        }
+
+        private bool m_nLoadallcostcategories;
+        public bool Loadallcostcategories
+        {
+            get
+            {
+                return m_nLoadallcostcategories;
+            }
+            set
+            {
+                m_nLoadallcostcategories = value;
+            }
         }
 
         private string m_sWEPID = "";
         public string WEPID
         {
-            get { return m_sWEPID; }
-            set { m_sWEPID = value; }
+            get
+            {
+                return m_sWEPID;
+            }
+            set
+            {
+                m_sWEPID = value;
+            }
         }
 
         private int m_nViewUID = 0;
         public int ViewUID
         {
-            get { return m_nViewUID; }
-            set { m_nViewUID = value; }
+            get
+            {
+                return m_nViewUID;
+            }
+            set
+            {
+                m_nViewUID = value;
+            }
         }
 
         private string m_sIsDlg = "";
         public string IsDlg
         {
-            get { return m_sIsDlg; }
-            set { m_sIsDlg = value; }
+            get
+            {
+                return m_sIsDlg;
+            }
+            set
+            {
+                m_sIsDlg = value;
+            }
         }
 
         private string m_sDecimalSeparator = string.Empty;
         public string DecimalSeparator
         {
-            get { return m_sDecimalSeparator; }
-            set { m_sDecimalSeparator = value; }
+            get
+            {
+                return m_sDecimalSeparator;
+            }
+            set
+            {
+                m_sDecimalSeparator = value;
+            }
         }
 
         private string m_sGroupSeparator = string.Empty;
         public string GroupSeparator
         {
-            get { return m_sGroupSeparator; }
-            set { m_sGroupSeparator = value; }
+            get
+            {
+                return m_sGroupSeparator;
+            }
+            set
+            {
+                m_sGroupSeparator = value;
+            }
         }
 
         public string Webservice
@@ -88,7 +137,10 @@ namespace WorkEnginePPM.ControlTemplates.WorkEnginePPM
                     m_sWebservice = "~" + WebserviceSuffix;
                 return m_sWebservice;
             }
-            set { m_sWebservice = value.Trim(); }
+            set
+            {
+                m_sWebservice = value.Trim();
+            }
         }
 
         protected void Page_Load(object sender, EventArgs e)
