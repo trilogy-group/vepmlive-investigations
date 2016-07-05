@@ -2441,7 +2441,7 @@ namespace EPMLiveCore
                                     //{
                                     //    m.Invoke(apiClass, new object[] { listIconsToBeSet });
                                     //}
-                                    ReportHelper.EPMData epmData = new ReportHelper.EPMData(ss.ID, sw.ID);
+                                    ReportHelper.EPMData epmData = new ReportHelper.EPMData(true, ss.ID, sw.ID);
 
                                     epmData.SetListIcon(listIconsToBeSet);
                                 }
@@ -2461,7 +2461,7 @@ namespace EPMLiveCore
                                 //{
                                 //    m.Invoke(apiClass, new object[] { listsToBeMapped, sw.ID });
                                 //}
-                                ReportHelper.EPMData epmData = new ReportHelper.EPMData(ss.ID, sw.ID);
+                                ReportHelper.EPMData epmData = new ReportHelper.EPMData(true, ss.ID, sw.ID);
 
                                 epmData.MapLists(listsToBeMapped,sw.ID);
                             }
