@@ -119,7 +119,7 @@ namespace EPMLiveCore.Features.EPMLiveLogging
                 if (eventLogKey != null)
                 {
                     RegistryKey loggingServiceKey = eventLogKey.OpenSubKey(key);
-                    if (loggingServiceKey == null)
+                    if (loggingServiceKey != null)
                     {
                         eventLogKey.DeleteSubKey(key);
                     }
