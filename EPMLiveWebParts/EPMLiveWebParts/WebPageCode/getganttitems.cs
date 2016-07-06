@@ -801,6 +801,7 @@ namespace EPMLiveWebParts
                             string newval = "";
                             if (val != "")
                             {
+                                val = HttpUtility.HtmlDecode(val);
                                 SPFieldLookupValueCollection lvc = new SPFieldLookupValueCollection(val);
 
                                 foreach (SPFieldLookupValue lv in lvc)
