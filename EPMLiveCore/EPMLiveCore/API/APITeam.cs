@@ -649,7 +649,7 @@ namespace EPMLiveCore.API
                         uvc = new SPFieldUserValueCollection();
 
                     DataTable dtResourcePool = null;
-                    SPSecurity.RunWithElevatedPrivileges(delegate()
+                    SPSecurity.RunWithElevatedPrivileges(delegate ()
                     {
                         dtResourcePool = GetResourcePoolForSave(sdoc, oWeb, docTeam.SelectNodes("//Team/Member"));
                     });
@@ -719,7 +719,7 @@ namespace EPMLiveCore.API
                     DataTable dt = list.Items.GetDataTable();
 
                     DataTable dtResourcePool = null;
-                    SPSecurity.RunWithElevatedPrivileges(delegate()
+                    SPSecurity.RunWithElevatedPrivileges(delegate ()
                     {
                         dtResourcePool = GetResourcePool(sdoc, oWeb);
                     });
@@ -791,7 +791,7 @@ namespace EPMLiveCore.API
 
                     if (dt != null)
                     {
-                        SPSecurity.RunWithElevatedPrivileges(delegate()
+                        SPSecurity.RunWithElevatedPrivileges(delegate ()
                         {
                             using (SPSite oSite = new SPSite(oWeb.Site.ID))
                             {
@@ -852,9 +852,6 @@ namespace EPMLiveCore.API
 
         private static void setItemPermissions(SPWeb web, string user, string perms, SPListItem li)
         {
-            //bool isCurrentlyInGroup = false;
-            //bool isAdded = false;
-
             try
             {
                 GridGanttSettings gSettings = ListCommands.GetGridGanttSettings(li.ParentList);
@@ -929,7 +926,7 @@ namespace EPMLiveCore.API
                     }
                 }
 
-                SPSecurity.RunWithElevatedPrivileges(delegate()
+                SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
                     using (SPSite spSite = new SPSite(web.Site.ID))
                     {
@@ -950,27 +947,27 @@ namespace EPMLiveCore.API
 
                                             if (group != null)
                                             {
-                                                if (!additionalPermissions.Contains(Convert.ToString(group.ID)))
+                                                if (lookupsSecurityGroups != null && lookupsSecurityGroups.Contains(group.Name))
                                                 {
-                                                    if (lookupsSecurityGroups != null && lookupsSecurityGroups.Contains(group.Name))
+                                                    continue;
+                                                }
+                                                else
+                                                {
+                                                    try
                                                     {
-                                                        continue;
+                                                        tempuser = group.Users.GetByID(spUser.ID);
                                                     }
-                                                    else
+                                                    catch { }
+                                                    if (tempuser == null && arr.Contains(group.ID.ToString()))
                                                     {
-                                                        try
-                                                        {
-                                                            tempuser = group.Users.GetByID(spUser.ID);
-                                                        }
-                                                        catch { }
-                                                        if (tempuser == null && arr.Contains(group.ID.ToString()))
-                                                        {
-                                                            group.AddUser(spUser);
-                                                        }
-                                                        if (tempuser != null && !arr.Contains(group.ID.ToString()) && bIsTeamSecurityEnabled)
-                                                        {
+                                                        group.AddUser(spUser);
+                                                    }
+                                                    if (tempuser != null && !arr.Contains(group.ID.ToString()) && li.HasUniqueRoleAssignments)
+                                                    {
+                                                        if (additionalPermissions.Contains(Convert.ToString(group.ID)))
+                                                            continue;
+                                                        else
                                                             group.RemoveUser(spUser);
-                                                        }
                                                     }
                                                 }
                                             }
@@ -1264,7 +1261,7 @@ namespace EPMLiveCore.API
 
                 string resUrl = "";
 
-                SPSecurity.RunWithElevatedPrivileges(delegate()
+                SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
                     using (SPSite site = new SPSite(web.Site.ID))
                     {
@@ -1291,7 +1288,7 @@ namespace EPMLiveCore.API
                 {
                     if (ex.Message.ToLower().Contains("access is denied"))
                     {
-                        SPSecurity.RunWithElevatedPrivileges(delegate()
+                        SPSecurity.RunWithElevatedPrivileges(delegate ()
                         {
                             using (SPSite rsite = new SPSite(resUrl))
                             {
@@ -1340,7 +1337,7 @@ namespace EPMLiveCore.API
             try
             {
                 SPListItem li = null;
-                SPSecurity.RunWithElevatedPrivileges(delegate()
+                SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
                     using (SPSite tSite = new SPSite(web.Site.ID))
                     {
@@ -1349,20 +1346,26 @@ namespace EPMLiveCore.API
                             SPList list = tWeb.Lists[ListId];
                             li = list.GetItemById(ItemId);
 
+                            string resUrl = CoreFunctions.getConfigSetting(tWeb, "EPMLiveResourceURL", true, false);
 
+                            GridGanttSettings gSettings = ListCommands.GetGridGanttSettings(li.ParentList);
+                            List<string> additionalPermissions = new List<string>();
+                            string[] permissionsString = gSettings.BuildTeamPermissions.Split('|');
 
-                            string resUrl = "";
-
-                            //SPSecurity.RunWithElevatedPrivileges(delegate()
-                            //{
-                            //using(SPSite site = new SPSite(web.Site.ID))
-                            //{
-                            //using(SPWeb aweb = site.OpenWeb(web.ID))
-                            //{
-                            resUrl = CoreFunctions.getConfigSetting(tWeb, "EPMLiveResourceURL", true, false);
-                            //}
-                            //}
-                            //});
+                            for (int i = 0; i < permissionsString.Length; i++)
+                            {
+                                if (i % 2 == 0)
+                                {
+                                    string[] strIds = permissionsString[i].Split('~');
+                                    for (int j = 0; j < strIds.Length; j++)
+                                    {
+                                        if (j % 2 == 0)
+                                        {
+                                            additionalPermissions.Add(strIds[j]);
+                                        }
+                                    }
+                                }
+                            }
 
                             DataTable dtResources = null;
 
@@ -1380,14 +1383,11 @@ namespace EPMLiveCore.API
                             {
                                 if (ex.Message.ToLower().Contains("access is denied"))
                                 {
-                                    SPSecurity.RunWithElevatedPrivileges(delegate()
+                                    SPSecurity.RunWithElevatedPrivileges(delegate ()
                                     {
-                                        //using(SPSite rsite = new SPSite(resUrl))
+                                        using (SPWeb rweb = tSite.OpenWeb())
                                         {
-                                            using (SPWeb rweb = tSite.OpenWeb())
-                                            {
-                                                dtResources = getResources(rweb, filterfield, filterval, false, arrColumns, li, null);
-                                            }
+                                            dtResources = getResources(rweb, filterfield, filterval, false, arrColumns, li, null);
                                         }
                                     });
                                 }
@@ -1412,27 +1412,14 @@ namespace EPMLiveCore.API
                                         foreach (DataColumn dc in dtResources.Columns)
                                             addAttribute(ref ndNew, doc, drs[0], dc.ColumnName);
 
-                                        //doc.FirstChild.AppendChild(ndNew);
-
                                         string perms = "";
                                         try
                                         {
-                                            //foreach (SPRoleAssignment role in li.RoleAssignments)
-                                            //{
-                                            //    try
-                                            //    {
-                                            //        if (role.Member.GetType() == typeof(SPGroup))
-                                            //        {
-                                            //            SPGroup group = (SPGroup)role.Member;
-                                            //            if (group.Users.GetByID(uv.LookupId) != null)
-                                            //            {
-                                            //                perms += ";" + group.ID;
-                                            //            }
-                                            //        }
-                                            //    }
-                                            //    catch { }
-                                            //}
                                             perms = Convert.ToString(drs[0]["Groups"]);
+
+                                            if (additionalPermissions.Contains(perms))
+                                                perms = "";
+
                                         }
                                         catch { }
 
@@ -1503,7 +1490,7 @@ namespace EPMLiveCore.API
             doc.LoadXml("<Team/>");
             string resUrl = "";
 
-            SPSecurity.RunWithElevatedPrivileges(delegate()
+            SPSecurity.RunWithElevatedPrivileges(delegate ()
             {
                 using (SPSite site = new SPSite(web.Site.ID))
                 {
@@ -1531,7 +1518,7 @@ namespace EPMLiveCore.API
             {
                 if (ex.Message.ToLower().Contains("access is denied"))
                 {
-                    SPSecurity.RunWithElevatedPrivileges(delegate()
+                    SPSecurity.RunWithElevatedPrivileges(delegate ()
                     {
                         using (SPSite rsite = new SPSite(resUrl))
                         {
@@ -1752,7 +1739,7 @@ namespace EPMLiveCore.API
         {
             XmlDocument doc = GetGenericResourceGrid("TeamGrid", oWeb);
 
-            SPSecurity.RunWithElevatedPrivileges(delegate()
+            SPSecurity.RunWithElevatedPrivileges(delegate ()
             {
                 using (SPSite tSite = new SPSite(oWeb.Site.ID))
                 {
@@ -2197,7 +2184,7 @@ namespace EPMLiveCore.API
             }
             catch { }
 
-            SPSecurity.RunWithElevatedPrivileges(delegate()
+            SPSecurity.RunWithElevatedPrivileges(delegate ()
             {
                 using (SPSite site = new SPSite(oWeb.Site.ID))
                 {
@@ -2225,7 +2212,7 @@ namespace EPMLiveCore.API
             {
                 if (ex.Message.ToLower().Contains("access is denied"))
                 {
-                    SPSecurity.RunWithElevatedPrivileges(delegate()
+                    SPSecurity.RunWithElevatedPrivileges(delegate ()
                     {
                         using (SPSite rsite = new SPSite(resUrl))
                         {
@@ -2286,7 +2273,7 @@ namespace EPMLiveCore.API
             }
             catch { }
 
-            SPSecurity.RunWithElevatedPrivileges(delegate()
+            SPSecurity.RunWithElevatedPrivileges(delegate ()
             {
                 using (SPSite site = new SPSite(oWeb.Site.ID))
                 {
@@ -2314,7 +2301,7 @@ namespace EPMLiveCore.API
             {
                 if (ex.Message.ToLower().Contains("access is denied"))
                 {
-                    SPSecurity.RunWithElevatedPrivileges(delegate()
+                    SPSecurity.RunWithElevatedPrivileges(delegate ()
                     {
                         using (SPSite rsite = new SPSite(resUrl))
                         {
