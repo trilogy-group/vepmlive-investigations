@@ -2366,9 +2366,9 @@ Exit_Function:
                     xI.CreateStringAttr("Def", "Summary");
                 else
                     xI.CreateStringAttr("Def", "R");
-                //Code Commented W.R.T  EPMCID-6313
-                //if (costCategory.HasData == false)
-                //    xI.CreateBooleanAttr("Visible", false);
+                
+                if (costCategory.HasData == false)
+                    xI.CreateBooleanAttr("Visible", false);
 
                 if (costCategory.NamedRateUID > 0)
                 {
