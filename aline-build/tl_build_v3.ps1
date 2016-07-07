@@ -3,6 +3,7 @@
 
 # ### Define user adjustable parameters
 
+
 param (
     # MSBuild - which configuration to build
     [string]$ConfigurationToBuild = "Release",
@@ -15,11 +16,14 @@ param (
     # should build cleanup be performed before making build
     [string]$CleanBuild = $true
 );
+
+
 $projectsToBePackaged = @("EPMLiveCore","EPMLiveDashboards","EPMLiveIntegrationService",
                             "EPMLivePS","EPMLiveReporting","EPMLiveSynch",
                             "EPMLiveTimeSheets","EPMLiveWebParts","EPMLiveWorkPlanner","WorkEnginePPM")
 
-$projectsToBeBuild = @("EPMLiveTimerService")
+$projectsToBeBuildAsEXE = @("EPMLiveTimerService")
+$projectsToBeBuildAsDLL = @("PortfolioEngineCore","UplandIntegrations")
 
 $projectTypeIdTobeReplaced = "C1CDDADD-2546-481F-9697-4EA41081F2FC"
 $projectTypeIdTobeReplacedWith = "BB1F664B-9266-4fd6-B973-E1E44974B511"
@@ -52,6 +56,42 @@ function Log-Message($msg) {
 	Write-Host $msg
 }
 
+#
+# This script will increment the build number in an AssemblyInfo.cs file
+#
+function UpdateCommonAssemblyInfo($SourcesDirectoryPath) {
+
+    $assemblyInfoPath = Join-Path $SourcesDirectoryPath "CommonAssemblyInfo.cs"
+
+    $contents = [System.IO.File]::ReadAllText($assemblyInfoPath)
+
+    $versionString = [RegEx]::Match($contents,"(AssemblyFileVersion\("")(?:\d+\.\d+\.\d+\.\d+)(""\))")
+    Write-Host ("AssemblyFileVersion: " + $versionString)
+
+    $releaseversionString = [RegEx]::Match($contents,"((?:\d+\.\d+\.\d+\.\d+))")
+    Write-Host ("Release Version: " + $releaseversionString)
+
+    #Parse out the current build number from the AssemblyFileVersion
+    $currentBuild = [RegEx]::Match($versionString,"(\.)(\d+)(""\))").Groups[2]
+    Write-Host ("Current Build: " + $currentBuild.Value)
+
+    #Increment the build number
+    $newBuild= [int]$currentBuild.Value +  1
+    Write-Host ("New Build: " + $newBuild)
+
+
+    $NewReleaseNumber = [RegEx]::Replace($releaseversionString, "(\d+\.\d+\.\d+\.)(?:\d+)", ("`${1}" + $newBuild.ToString()))
+    Write-Host ("New Release Number: " + $NewReleaseNumber)
+
+    #update AssemblyFileVersion, then write to file
+    Write-Host ("Setting version in assembly info file ")
+    $contents = [RegEx]::Replace($contents, "(AssemblyFileVersion\(""\d+\.\d+\.\d+\.)(?:\d+)(""\))", ("`${1}" + $newBuild.ToString() + "`${2}"))
+    Write-Host $contents
+    [System.IO.File]::WriteAllText($assemblyInfoPath, $contents)
+
+    return $NewReleaseNumber
+}
+
 
 
 $BuildDirectory = "$ScriptDir\..\..\"
@@ -67,6 +107,9 @@ $MSBuildExec = "C:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe"
 $VSTestExec = "C:\Program Files (x86)\Microsoft Visual Studio 11.0\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe"
 # Initialize Sources Directory
 $SourcesDirectory = "$BuildDirectory\Source"
+
+#Update the CommonAssemblyInfo.cs file with latest build number
+$NewReleaseNumber = UpdateCommonAssemblyInfo($SourcesDirectory)
 
 # Directory for outputs
 $OutputDirectory = "$BuildDirectory\output"
@@ -223,11 +266,11 @@ foreach($projectToBePackaged in $projectsToBePackaged){
 }
 
 Log-Section "Building Windows Services Projects . . ."
-foreach($projectToBeBuild in $projectsToBeBuild){
+foreach($projectToBeBuildAsEXE in $projectsToBeBuildAsEXE){
     
-    $projectPath = Get-ChildItem -Path ($SourcesDirectory + "\*") -Include ($projectToBeBuild + ".*proj") -Recurse
+    $projectPath = Get-ChildItem -Path ($SourcesDirectory + "\*") -Include ($projectToBeBuildAsEXE + ".*proj") -Recurse
 
-    Log-SubSection "Building '$projectToBeBuild'..."
+    Log-SubSection "Building '$projectToBeBuildAsEXE'..."
 	Log-SubSection "projectPath: '$projectPath'...."
     
    & $MSBuildExec $projectPath `
@@ -236,7 +279,7 @@ foreach($projectToBeBuild in $projectsToBeBuild){
    /p:PreBuildEvent= `
    /p:PostBuildEvent= `
    /p:Configuration="$ConfigurationToBuild" `
-   /p:Platform="x64" `
+   /p:Platform="$PlatformToBuild" `
     /p:langversion="$langversion" `
    /p:GenerateSerializationAssemblies="Off" `
    /p:ReferencePath="C:\Program Files (x86)\Microsoft SDKs\Project 2013\REDIST" `
@@ -250,6 +293,33 @@ foreach($projectToBeBuild in $projectsToBeBuild){
     }
 }
 
+Log-Section "Building DLL Services Projects . . ."
+foreach($projectToBeBuildAsDLL in $projectsToBeBuildAsDLL){
+    
+    $projectPath = Get-ChildItem -Path ($SourcesDirectory + "\*") -Include ($projectToBeBuildAsDLL + ".*proj") -Recurse
+
+    Log-SubSection "Building '$projectToBeBuildAsDLL'..."
+	Log-SubSection "projectPath: '$projectPath'...."
+    
+   & $MSBuildExec $projectPath `
+   /t:build `
+   /p:OutputPath="$BinariesDirectory" `
+   /p:PreBuildEvent= `
+   /p:PostBuildEvent= `
+   /p:Configuration="$ConfigurationToBuild" `
+   /p:Platform="$PlatformToBuild" `
+    /p:langversion="$langversion" `
+   /p:GenerateSerializationAssemblies="Off" `
+   /p:ReferencePath="C:\Program Files (x86)\Microsoft SDKs\Project 2013\REDIST" `
+    /fl /flp:"$loggerArgs" `
+    /m:4 `
+    $ToolsVersion `
+	$DfMsBuildArgs `
+ 	$MsBuildArguments  
+    if ($LastExitCode -ne 0) {
+        throw "Project build failed with exit code: $LastExitCode."
+    }
+}
 
 Log-Section "Copying Files..."
 
@@ -279,4 +349,5 @@ Get-ChildItem -Path ($BinariesDirectory + "\*")  -Include "EPMLiveTimerService.e
 Get-ChildItem -Path ($ProductOutput + "\*")  -Include "EPMLiveTimerService.exe" | Rename-Item -NewName {$_.name -replace ‘EPMLiveTimerService’,’TimerService’ }
 
 #Run Installshield project to generate product .exe
-& "C:\Program Files (x86)\InstallShield\2015\System\IsCmdBld.exe" -p "C:\InstallShield\WorkEngine5\WorkEngine5.ism" -y "5.6.12.500"
+& "C:\Program Files (x86)\InstallShield\2015\System\IsCmdBld.exe" -p "C:\InstallShield\WorkEngine5\WorkEngine5.ism" -y $NewReleaseNumber -a "Product Configuration 1" -r "PrimaryRelease"
+Rename-Item 'C:\InstallShield\WorkEngine5\Product Configuration 1\PrimaryRelease\DiskImages\DISK1\Setup.exe' "WorkEngine$NewReleaseNumber.exe"
