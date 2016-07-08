@@ -389,7 +389,7 @@ namespace PortfolioEngineCore
                 xC = xPeriodCols.CreateSubStruct("C");
                 xC.CreateStringAttr("Name", "Q" + sId);
                 xC.CreateStringAttr("Type", "Text");
-                xC.CreateStringAttr("Format", ",#.##");
+                xC.CreateStringAttr("Format", ",#.###");
                 xC.CreateIntAttr("CanMove", 0);
                 xC.CreateIntAttr("CanEdit", 0);
                 xC.CreateIntAttr("CanHide", 0);
