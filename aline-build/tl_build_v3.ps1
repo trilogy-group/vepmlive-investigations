@@ -327,13 +327,22 @@ Get-ChildItem -Path ($SourcesDirectory + "\*")  -Include "*.pdb"  -Recurse | Cop
 Get-ChildItem -Path ($SourcesDirectory + "\*")  -Include "*.dll"  -Recurse | Copy-Item -Destination $LibrariesDirectory -Force
 
 # Extend the script to copy the Dll, wsp, .exe file to InstallShield build dependencies folder in order to run final installer
-
 $ProductOutput = "$OutputDirectory\ProductOutput"
 
 if (Test-Path $ProductOutput) {
 	Remove-Item -Recurse -Force $ProductOutput
 }
 New-Item -ItemType directory -Force -Path $ProductOutput
+
+#Copy the template file from EPM Live Solution to Output\Template folder which will then be picked up by InstallShield build definition
+$TemplateFolder = "$ProductOutput\Template"
+
+if (Test-Path $TemplateFolder) {
+	Remove-Item -Recurse -Force $TemplateFolder
+}
+New-Item -ItemType directory -Force -Path $TemplateFolder
+#Copy Template file
+Get-ChildItem -Path ($SourcesDirectory + "\Template\*")  -Include "*.wsp"  -Recurse | Copy-Item -Destination $TemplateFolder -Force
 
 #Move file over to ProductOut directory to be consumed by Installshield
 Get-ChildItem -Path ($BinariesDirectory + "\*")  -Include "*.wsp"  | Copy-Item -Destination $ProductOutput -Force 
