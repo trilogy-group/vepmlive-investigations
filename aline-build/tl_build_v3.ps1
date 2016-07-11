@@ -279,7 +279,7 @@ foreach($projectToBeBuildAsEXE in $projectsToBeBuildAsEXE){
    /p:PreBuildEvent= `
    /p:PostBuildEvent= `
    /p:Configuration="$ConfigurationToBuild" `
-   /p:Platform="$PlatformToBuild" `
+   /p:Platform="x64" `
     /p:langversion="$langversion" `
    /p:GenerateSerializationAssemblies="Off" `
    /p:ReferencePath="C:\Program Files (x86)\Microsoft SDKs\Project 2013\REDIST" `
