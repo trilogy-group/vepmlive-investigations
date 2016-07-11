@@ -4873,16 +4873,16 @@
         switch (this.displayMode) {
             case 0: /* Hours */
                 if (this.showHeatmap != true) {
-                    sValue = "0.##;<span style='color:red;'>-0.##</span>;0";
+                    sValue = "0.###;<span style='color:red;'>-0.###</span>;0";
                 } else {
-                    sValue = "0.##;<div style='background-color:red;height:inherit;vertical-align:middle;padding:1px !important;'>-0.##</div>;0";
+                    sValue = "0.###;<div style='background-color:red;height:inherit;vertical-align:middle;padding:1px !important;'>-0.###</div>;0";
                 }
                 break;
             case 1: /* FTE */
                 if (this.showHeatmap != true) {
-                    sValue = "0.##;<span style='color:red;'>-0.##</span>;0";
+                    sValue = "0.###;<span style='color:red;'>-0.###</span>;0";
                 } else {
-                    sValue = "0.##;<div style='background-color:red;height:inherit;vertical-align:middle;padding::1px !important;'>-0.##</div>;0";
+                    sValue = "0.###;<div style='background-color:red;height:inherit;vertical-align:middle;padding::1px !important;'>-0.###</div>;0";
                 }
                 break;
             case 2: /* FTE% */
@@ -6255,8 +6255,8 @@
         this.includePending = true;
         this.saveConflict = false;
 
-        var const_HoursFormat = "0.##";
-        var const_FTEFormat = "0.##";
+        var const_HoursFormat = "0.###";
+        var const_FTEFormat = "0.###";
         var const_FTEPctFormat = "0.##%";
         var const_Project = 0;
         var const_Requirement = 1;
