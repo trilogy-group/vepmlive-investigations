@@ -12,7 +12,7 @@
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <TargetOfficeVersion>15.0</TargetOfficeVersion>
     <FileAlignment>512</FileAlignment>
-    <ProjectTypeGuids>{BB1F664B-9266-4fd6-B973-E1E44974B511};{14822709-B5A1-4724-98CA-57A101D1B079};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <ProjectTypeGuids>{C1CDDADD-2546-481F-9697-4EA41081F2FC};{14822709-B5A1-4724-98CA-57A101D1B079};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <ActiveDeploymentConfiguration>Default</ActiveDeploymentConfiguration>
     <SandboxedSolution>False</SandboxedSolution>
     <SccProjectName>SAK</SccProjectName>
@@ -78,12 +78,14 @@ net start "WETimer"</PostDeploymentCommand>
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\EPMLiveCore\EPMLiveCore\bin\Debug\EPM Live Core.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.SharePoint.WorkflowActions, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Web" />
+    <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Web.Services" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />

@@ -1,0 +1,27 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/EPK_QueueMgr/EPK_QueueMgr/bin/Debug
+/EPK_QueueMgr/EPK_QueueMgr/obj/Debug
+/EPMLiveCore/EPMLiveCore/obj/Debug
+/EPMLiveDashboards/EPMLiveDashboards/obj/Debug
+/EPMLiveIntegration/EPMLiveIntegration/obj/Debug
+/.vs
+/EPMLiveIntegrationService/EPMLiveIntegrationService/bin
+/EPMLiveIntegrationService/EPMLiveIntegrationService/obj/Debug
+/EPMLivePS/EPMLivePS/obj/Debug
+/EPMLiveReporting/EPMLiveReporting/obj/Debug
+/EPMLiveSynch/EPMLiveSynch/obj/Debug
+/EPMLiveSynch/EPMLiveSynch/EPMLiveSynch.csproj.user
+/EPMLiveTests/obj/Debug
+/EPMLiveTimerService/EPMLiveTimerService/obj/Debug
+/EPMLiveTimerService/TimerServiceTester/obj/Debug
+/EPMLiveTimesheets/EPMLiveTimesheets/obj/Debug
+/EPMLiveTimesheets/EPMLiveTimesheets/EPMLiveTimesheets.csproj.user
+/EPMLiveWebParts/EPMLiveWebParts/obj/Debug
+/EPMLiveWorkPlanner/EPMLiveWorkPlanner/obj/Debug
+*.user
+/PortfolioEngineCore/PortfolioEngineCore/obj/Debug
+/PortfolioEngineCore/WorkEnginePPM/obj/Debug
+/UplandIntegrations/UplandIntegrations/obj/Debug

@@ -8,11 +8,10 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace EPMLiveReportsAdmin.Properties
-{
+namespace EPMLiveReportsAdmin.Properties {
     using System;
-
-
+    
+    
     /// <summary>
     ///   A strongly-typed resource class, for looking up localized strings, etc.
     /// </summary>
@@ -23,52 +22,53 @@ namespace EPMLiveReportsAdmin.Properties
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class Resources
-    {
-
+    internal class Resources {
+        
         private static global::System.Resources.ResourceManager resourceMan;
-
+        
         private static global::System.Globalization.CultureInfo resourceCulture;
-
+        
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal Resources()
-        {
+        internal Resources() {
         }
-
+        
         /// <summary>
         ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Resources.ResourceManager ResourceManager
-        {
-            get
-            {
-                if (object.ReferenceEquals(resourceMan, null))
-                {
+        internal static global::System.Resources.ResourceManager ResourceManager {
+            get {
+                if (object.ReferenceEquals(resourceMan, null)) {
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("EPMLiveReportsAdmin.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
             }
         }
-
+        
         /// <summary>
         ///   Overrides the current thread's CurrentUICulture property for all
         ///   resource lookups using this strongly typed resource class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
-        internal static global::System.Globalization.CultureInfo Culture
-        {
-            get
-            {
+        internal static global::System.Globalization.CultureInfo Culture {
+            get {
                 return resourceCulture;
             }
-            set
-            {
+            set {
                 resourceCulture = value;
             }
         }
-
+        
+        /// <summary>
+        ///   Looks up a localized string similar to EPMLiveReportsAdmin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b90e532f481cf050.
+        /// </summary>
+        internal static string Assembly {
+            get {
+                return ResourceManager.GetString("Assembly", resourceCulture);
+            }
+        }
+        
         /// <summary>
         ///   Looks up a localized string similar to DECLARE @creatoralter varchar(10)
         ///IF NOT EXISTS (SELECT routine_name FROM INFORMATION_SCHEMA.routines WHERE routine_name = &apos;spGetWebs&apos;)
@@ -88,14 +88,12 @@ namespace EPMLiveReportsAdmin.Properties
         ///AS
         ///BEGIN        /// [rest of string was truncated]&quot;;.
         /// </summary>
-        internal static string CheckReqSP
-        {
-            get
-            {
+        internal static string CheckReqSP {
+            get {
                 return ResourceManager.GetString("CheckReqSP", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to ---------------TABLE: ReportListIds----------------------
         ///IF NOT EXISTS (SELECT TABLE_NAME FROM INFORMATION_SCHEMA.tables WHERE TABLE_NAME = &apos;ReportListIds&apos;)
@@ -110,58 +108,176 @@ namespace EPMLiveReportsAdmin.Properties
         ///	ALTER TABLE [dbo].[ReportListIds]
         ///	ADD [ListIcon] [NVARCHAR](100)  [rest of string was truncated]&quot;;.
         /// </summary>
-        internal static string CheckSchema
-        {
-            get
-            {
+        internal static string CheckSchema {
+            get {
                 return ResourceManager.GetString("CheckSchema", resourceCulture);
             }
         }
-
+        
+        /// <summary>
+        ///   Looks up a localized string similar to EPMLiveReportsAdmin.ListEvents.
+        /// </summary>
+        internal static string ClassName {
+            get {
+                return ResourceManager.GetString("ClassName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to RPTColumn.
+        /// </summary>
+        internal static string ColumnTable {
+            get {
+                return ResourceManager.GetString("ColumnTable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to RPTDatabases.
+        /// </summary>
+        internal static string DatabaseTable {
+            get {
+                return ResourceManager.GetString("DatabaseTable", resourceCulture);
+            }
+        }
+        
         /// <summary>
         ///   Looks up a localized string similar to EPMLIVE.
         /// </summary>
-        internal static string EpmliveConnectionStringReference
-        {
-            get
-            {
+        internal static string EpmliveConnectionStringReference {
+            get {
                 return ResourceManager.GetString("EpmliveConnectionStringReference", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to EPMLiveReportsAdmin.ListFieldAdded.
         /// </summary>
-        internal static string FieldAddedEvent
-        {
-            get
-            {
+        internal static string FieldAddedEvent {
+            get {
                 return ResourceManager.GetString("FieldAddedEvent", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to EPMLiveReportsAdmin.ListFieldAdding.
         /// </summary>
-        internal static string FieldAddingEvent
-        {
-            get
-            {
+        internal static string FieldAddingEvent {
+            get {
                 return ResourceManager.GetString("FieldAddingEvent", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to EPMLiveReportsAdmin.ListFieldUpdated.
         /// </summary>
-        internal static string FieldUpdatedEvent
-        {
-            get
-            {
+        internal static string FieldUpdatedEvent {
+            get {
                 return ResourceManager.GetString("FieldUpdatedEvent", resourceCulture);
             }
         }
-
+        
+        /// <summary>
+        ///   Looks up a localized string similar to IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N&apos;[dbo].[spRPTBusinessDays]&apos;) AND type in (N&apos;P&apos;, N&apos;PC&apos;))
+        ///BEGIN
+        ///	PRINT &apos;--------------------------------------------------&apos;
+        ///    PRINT &apos;Dropping: spRPTBusinessDays&apos;
+        ///	DROP PROCEDURE [dbo].[spRPTBusinessDays]
+        ///END
+        ///
+        ///IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N&apos;[dbo].[spRPTWork2]&apos;) AND type in (N&apos;P&apos;, N&apos;PC&apos;))
+        ///BEGIN
+        ///	PRINT &apos;--------------------------------------------------&apos;
+        ///	PRINT &apos;Dropping: spRPTWork2&apos;
+        ///	DROP PROCEDU [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string InitDatabaseCreateProcedures {
+            get {
+                return ResourceManager.GetString("InitDatabaseCreateProcedures", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 
+        ///if not exists (select table_name from INFORMATION_SCHEMA.tables where table_name = &apos;RPTGROUPUSER&apos;)
+        ///	begin
+        ///		
+        ///		print &apos;Creating Table RPTGROUPUSER&apos;
+        ///
+        ///		CREATE TABLE [dbo].[RPTGROUPUSER](
+        ///		[RPTGROUPUSERID] [uniqueidentifier] NULL,
+        ///		[SITEID] [uniqueidentifier] NULL,
+        ///		[GROUPID] [int] NULL,
+        ///		[USERID] [int] NULL
+        ///		) ON [PRIMARY]
+        ///
+        ///		ALTER TABLE [dbo].[RPTGROUPUSER] ADD  CONSTRAINT [DF_RPTGROUPUSER_RPTGROUPUSERID]  DEFAULT (newid()) FOR [RPTGROUPUSERID]
+        ///	end
+        ///else
+        ///	begin
+        ///
+        ///		print &apos;Updating Tabl [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string InitDatabaseCreateTables {
+            get {
+                return ResourceManager.GetString("InitDatabaseCreateTables", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to LST.
+        /// </summary>
+        internal static string ListPrefix {
+            get {
+                return ResourceManager.GetString("ListPrefix", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to VWRPTListSummary.
+        /// </summary>
+        internal static string ListSummaryView {
+            get {
+                return ResourceManager.GetString("ListSummaryView", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to RPTList.
+        /// </summary>
+        internal static string ListTable {
+            get {
+                return ResourceManager.GetString("ListTable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to RPTLog.
+        /// </summary>
+        internal static string LogTable {
+            get {
+                return ResourceManager.GetString("LogTable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to RPTSettings.
+        /// </summary>
+        internal static string SettingsTable {
+            get {
+                return ResourceManager.GetString("SettingsTable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Snapshot.
+        /// </summary>
+        internal static string SnapshotTableSuffix {
+            get {
+                return ResourceManager.GetString("SnapshotTableSuffix", resourceCulture);
+            }
+        }
+        
         /// <summary>
         ///   Looks up a localized string similar to declare @createoralter varchar(10)
         ///if not exists (select routine_name from INFORMATION_SCHEMA.routines where routine_name = &apos;spGetReportListData&apos;)
@@ -182,14 +298,12 @@ namespace EPMLiveReportsAdmin.Properties
         ///@userid	int,
         ///@rollu [rest of string was truncated]&quot;;.
         /// </summary>
-        internal static string spGetReportListData
-        {
-            get
-            {
+        internal static string spGetReportListData {
+            get {
                 return ResourceManager.GetString("spGetReportListData", resourceCulture);
             }
         }
-
+        
         /// <summary>
         ///   Looks up a localized string similar to CREATE PROCEDURE spUpdateStatusFields
         ///
@@ -211,11 +325,27 @@ namespace EPMLiveReportsAdmin.Properties
         ///      if exists (select column_name FROM INFORMATION_SCHEMA.COLUMNS where table_name = @listtable and column_name = &apos;DaysOverdue&apos;)
         ///      begin [rest of string was truncated]&quot;;.
         /// </summary>
-        internal static string spUpdateStatusFields
-        {
-            get
-            {
+        internal static string spUpdateStatusFields {
+            get {
                 return ResourceManager.GetString("spUpdateStatusFields", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to RPTTSData.
+        /// </summary>
+        internal static string TimesheetTable {
+            get {
+                return ResourceManager.GetString("TimesheetTable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to RPTWork.
+        /// </summary>
+        internal static string WorkTable {
+            get {
+                return ResourceManager.GetString("WorkTable", resourceCulture);
             }
         }
     }

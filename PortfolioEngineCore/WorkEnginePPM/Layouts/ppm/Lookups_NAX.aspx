@@ -1,7 +1,7 @@
 ﻿<%@ Assembly Name="$SharePoint.Project.AssemblyFullName$" %>
 <%@ Register src="Tools/DGrid.ascx" tagname="DGridUserControl" tagprefix="dg1" %>
 <%@ Register src="Tools/TGrid.ascx" tagname="TGridUserControl" tagprefix="tg1" %>
-<%@ Assembly Name="Microsoft.Web.CommandUI, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
+<%@ Assembly Name="Microsoft.Web.CommandUI, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
 <%@ Page Language="C#" AutoEventWireup="true" CodeBehind="Lookups_NAX.aspx.cs" Inherits="WorkEnginePPM.Lookups_NAX" DynamicMasterPageFile="~masterurl/default.master" %>
 <%@ Reference Control="/_layouts/ppm/tools/DGrid.ascx" %>
 <%@ Reference Control="/_layouts/ppm/tools/TGrid.ascx" %>
