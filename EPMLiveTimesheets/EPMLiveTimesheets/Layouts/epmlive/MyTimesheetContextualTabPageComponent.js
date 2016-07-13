@@ -7,7 +7,7 @@ ContextualTabWebPart.CustomPageComponent = function ContextualTabWebPart_CustomP
     this._webPartPageComponentId = webPartPcId;
 
     this.tsObject = tsObject;
-
+    this.tsObject.CurrentView = unescape(this.tsObject.CurrentView);
     ContextualTabWebPart.CustomPageComponent.initializeBase(this);
 };
 
@@ -373,7 +373,7 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
 
             viewNameDiv.firstChild.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling.style.display = "none";
 
-            var isDefault = checkDefaultView(grid,this.tsObject.CurrentView);
+            var isDefault = checkDefaultView(grid, this.tsObject.CurrentView);
 
             if (isDefault != null && isDefault.toLowerCase() == "true") {
                 viewNameDiv.firstChild.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling.firstChild.checked = true;
@@ -391,7 +391,7 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
             var grid = Grids["TS" + this.tsObject.id];
 
             viewNameDiv.style.display = "";
-            
+
             viewNameDiv.firstChild.nextSibling.nextSibling.nextSibling.value = this.tsObject.CurrentView;
 
 
@@ -402,7 +402,7 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
             if (isDefault != null && isDefault.toLowerCase() == "true") {
                 viewNameDiv.firstChild.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling.firstChild.checked = true;
             }
-            else                
+            else
                 viewNameDiv.firstChild.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling.nextSibling.firstChild.checked = false;
 
             curGrid = grid;
@@ -487,7 +487,7 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
     onRenameViewClose: function (dialogResult, returnValue) {
         if (dialogResult == "1") {
             var retval = returnValue.split('|');
-            
+
             RenameView(curGrid, cView, retval);
         }
 
@@ -505,7 +505,7 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
 
             var oView = this.tsObject.Views[v];
 
-            sb.append('<Button Id=\'Ribbon.MyTimesheet.ChangeView\' Command=\'Ribbon.MyTimesheet.ChangeView\' CommandValueId=\'' + v + '\' LabelText=\'' + oView.Name + '\' />');
+            sb.append('<Button Id=\'Ribbon.MyTimesheet.ChangeView\' Command=\'Ribbon.MyTimesheet.ChangeView\' CommandValueId=\'' + v + '\' LabelText=\'' + unescape(oView.Name).replace("&", "&amp;") + '\' />');
         }
 
         sb.append('</Controls>');
