@@ -13,7 +13,7 @@ end
 exec(@createoralter + ' VIEW dbo.vwMeta
 AS
 SELECT     dbo.TSTIMESHEET.USERNAME AS Username, dbo.TSTIMESHEET.RESOURCENAME AS [Resource Name], dbo.TSITEM.LIST_UID, dbo.TSITEM.ITEM_ID, dbo.TSITEM.TS_ITEM_UID AS [Item UID], 
-                      dbo.TSITEM.TITLE AS [Item Name], dbo.TSITEM.PROJECT AS Project, COALESCE (dbo.TSMETA.ListName + ''_'' + dbo.TSMETA.ColumnName, ''TempColumn'') 
+                      dbo.TSITEM.TITLE AS [Item Name], dbo.TSITEM.PROJECT AS Project, dbo.TSITEM.PROJECT_ID AS ProjectID, COALESCE (dbo.TSMETA.ListName + ''_'' + dbo.TSMETA.ColumnName, ''TempColumn'') 
                       AS ColumnName, dbo.TSMETA.DisplayName, dbo.TSMETA.ColumnValue, dbo.TSITEM.ITEM_TYPE AS [Item Type], dbo.TSITEM.TS_UID AS [Timesheet UID], 
                       dbo.TSPERIOD.PERIOD_ID AS [Period Id], dbo.TSPERIOD.SITE_ID, dbo.TSITEM.LIST AS List, dbo.TSITEMHOURS.TS_ITEM_DATE AS Date, 
                       dbo.TSITEMHOURS.TS_ITEM_HOURS AS Hours, dbo.TSITEMHOURS.TS_ITEM_TYPE_ID AS [Type Id], dbo.TSTYPE.TSTYPE_NAME AS [Type Name], 
@@ -33,7 +33,7 @@ FROM         dbo.TSITEM INNER JOIN
                       dbo.TSTYPE ON dbo.TSTIMESHEET.SITE_UID = dbo.TSTYPE.SITE_UID AND dbo.TSITEMHOURS.TS_ITEM_TYPE_ID = dbo.TSTYPE.TSTYPE_ID
 UNION
 SELECT     dbo.TSTIMESHEET.USERNAME AS Username, dbo.TSTIMESHEET.RESOURCENAME AS [Resource Name], dbo.TSITEM.LIST_UID, dbo.TSITEM.ITEM_ID, dbo.TSITEM.TS_ITEM_UID AS [Item UID], 
-                      dbo.TSITEM.TITLE AS [Item Name], dbo.TSITEM.PROJECT AS Project, COALESCE (dbo.TSMETA.ColumnName, ''TempColumn'') AS ColumnName, 
+                      dbo.TSITEM.TITLE AS [Item Name], dbo.TSITEM.PROJECT AS Project, dbo.TSITEM.PROJECT_ID AS ProjectID, COALESCE (dbo.TSMETA.ColumnName, ''TempColumn'') AS ColumnName, 
                       dbo.TSMETA.DisplayName, dbo.TSMETA.ColumnValue, dbo.TSITEM.ITEM_TYPE AS [Item Type], dbo.TSITEM.TS_UID AS [Timesheet UID], 
                       dbo.TSPERIOD.PERIOD_ID AS [Period Id], dbo.TSPERIOD.SITE_ID, dbo.TSITEM.LIST AS List, dbo.TSITEMHOURS.TS_ITEM_DATE AS Date, 
                       dbo.TSITEMHOURS.TS_ITEM_HOURS AS Hours, dbo.TSITEMHOURS.TS_ITEM_TYPE_ID AS [Type Id], dbo.TSTYPE.TSTYPE_NAME AS [Type Name], 
@@ -53,7 +53,7 @@ FROM         dbo.TSITEM INNER JOIN
                       dbo.TSTYPE ON dbo.TSTIMESHEET.SITE_UID = dbo.TSTYPE.SITE_UID AND dbo.TSITEMHOURS.TS_ITEM_TYPE_ID = dbo.TSTYPE.TSTYPE_ID
 UNION
 SELECT     TSTIMESHEET_1.USERNAME, TSTIMESHEET_1.RESOURCENAME AS [Resource Name], TSITEM_1.LIST_UID, TSITEM_1.ITEM_ID, TSITEM_1.TS_ITEM_UID, TSITEM_1.TITLE, TSITEM_1.PROJECT, 
-                      ''Resource_'' + dbo.TSRESMETA.ColumnName AS listcolumnname, dbo.TSRESMETA.DisplayName, dbo.TSRESMETA.ColumnValue, TSITEM_1.ITEM_TYPE, 
+                      TSITEM_1.PROJECT_ID, ''Resource_'' + dbo.TSRESMETA.ColumnName AS listcolumnname, dbo.TSRESMETA.DisplayName, dbo.TSRESMETA.ColumnValue, TSITEM_1.ITEM_TYPE, 
                       TSITEM_1.TS_UID, TSTIMESHEET_1.PERIOD_ID, TSTIMESHEET_1.SITE_UID, TSITEM_1.LIST, TSITEMHOURS_1.TS_ITEM_DATE, 
                       TSITEMHOURS_1.TS_ITEM_HOURS, TSITEMHOURS_1.TS_ITEM_TYPE_ID, TSTYPE_1.TSTYPE_NAME, TSPERIOD_1.PERIOD_START AS Start, 
                       TSPERIOD_1.PERIOD_END AS [End], CASE TSTIMESHEET_1.SUBMITTED WHEN 0 THEN ''No'' WHEN 1 THEN ''Yes'' END AS Submitted, 
