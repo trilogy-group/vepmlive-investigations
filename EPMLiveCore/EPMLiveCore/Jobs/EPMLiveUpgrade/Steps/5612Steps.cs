@@ -44,11 +44,15 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
                                                                                       new List<SPEventReceiverType> { SPEventReceiverType.ItemAdding,
                                                                                                               SPEventReceiverType.ItemUpdating,
                                                                                                               SPEventReceiverType.ItemDeleted });
+                        LogMessage("Department Events Deleting", MessageKind.SUCCESS, 4);
 
                         foreach (SPEventReceiverDefinition e in evts)
                         {
                             e.Delete();
                         }
+                        LogMessage("Department Events Deleted Successfully", MessageKind.SUCCESS, 4);
+
+                        LogMessage("Department Events Adding.", MessageKind.SUCCESS, 4);
 
                         deptList.EventReceivers.Add(SPEventReceiverType.ItemAdding, assemblyName, className);
                         deptList.EventReceivers.Add(SPEventReceiverType.ItemUpdating, assemblyName, className);
@@ -63,13 +67,13 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
 
                         foreach (SPEventReceiverDefinition e in newEvts)
                         {
-                            e.SequenceNumber = 11000;
+                            e.SequenceNumber = 10000;
                             e.Update();
                         }
 
                         deptList.Update();
 
-                        LogMessage("Department Events processed", MessageKind.SUCCESS, 4);
+                        LogMessage("Department Events Added Successfully.", MessageKind.SUCCESS, 4);
 
                     }
                 }
