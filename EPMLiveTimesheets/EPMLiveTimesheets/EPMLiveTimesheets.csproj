@@ -52,15 +52,6 @@
     <AssemblyOriginatorKeyFile>EPMLiveLists.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="EPM Live Core">
-      <HintPath>..\..\EPMLiveCore\EPMLiveCore\bin\Debug\EPM Live Core.dll</HintPath>
-    </Reference>
-    <Reference Include="EPMLiveReportsAdmin">
-      <HintPath>..\..\EPMLiveReporting\EPMLiveReporting\bin\Debug\EPMLiveReportsAdmin.dll</HintPath>
-    </Reference>
-    <Reference Include="EPMLiveWebParts">
-      <HintPath>..\..\EPMLiveWebParts\EPMLiveWebParts\bin\Debug\EPMLiveWebParts.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.SharePoint.Security, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\Program Files\Common Files\Microsoft Shared\Web Server Extensions\15\ISAPI\Microsoft.SharePoint.Security.dll</HintPath>
@@ -238,7 +229,20 @@
     </None>
     <None Include="Timesheet\TimeSheet.dwp" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\..\EPMLiveCore\EPMLiveCore\EPMLiveCore.csproj">
+      <Project>{c773ae44-f066-446a-9cbd-d24afa794e34}</Project>
+      <Name>EPMLiveCore</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\EPMLiveReporting\EPMLiveReporting\EPMLiveReporting.csproj">
+      <Project>{b56160fe-490c-462a-bc9a-feffd2f1487c}</Project>
+      <Name>EPMLiveReporting</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\EPMLiveWebParts\EPMLiveWebParts\EPMLiveWebParts.csproj">
+      <Project>{a7f83fd4-be8b-49ab-be24-39209e8fabc2}</Project>
+      <Name>EPMLiveWebParts</Name>
+    </ProjectReference>
+  </ItemGroup>
   <ItemGroup>
     <Content Include="CONTROLTEMPLATES\timesheetviewtoolbar.ascx" />
     <Content Include="CONTROLTEMPLATES\WorkLogFieldControl.ascx" />

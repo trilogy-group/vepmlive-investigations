@@ -23,7 +23,7 @@ $projectsToBePackaged = @("EPMLiveCore","EPMLiveDashboards","EPMLiveIntegrationS
                             "EPMLiveTimeSheets","EPMLiveWebParts","EPMLiveWorkPlanner","WorkEnginePPM")
 
 $projectsToBeBuildAsEXE = @("EPMLiveTimerService")
-$projectsToBeBuildAsDLL = @("PortfolioEngineCore","UplandIntegrations")
+$projectsToBeBuildAsDLL = @("PortfolioEngineCore","UplandIntegrations","EPMLiveIntegration")
 
 $projectTypeIdTobeReplaced = "C1CDDADD-2546-481F-9697-4EA41081F2FC"
 $projectTypeIdTobeReplacedWith = "BB1F664B-9266-4fd6-B973-E1E44974B511"
@@ -230,8 +230,8 @@ if (!(Test-Path -Path $BinariesDirectory)){
     New-Item $BinariesDirectory -ItemType Directory
 }
 
-Log-Section "Removing Backup directory that is checked into SCM"
-Remove-Item C:\opt\dfinstaller\Source\Backup -recurse
+#Log-Section "Removing Backup directory that is checked into SCM"
+#Remove-Item C:\opt\dfinstaller\Source\Backup -recurse
 
 Log-Section "Packaging Projects . . ."
 foreach($projectToBePackaged in $projectsToBePackaged){
