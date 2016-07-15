@@ -73,10 +73,12 @@ namespace WE_QueueMgr
                 if (basepaths != "")
                 {
                     m_bFirstTick = true;
-                    MessageHandler("Start", "Built 28AUG2013. Any CPU. Foundation 4.5.\nOnStart\nUser : " + sNTUserName,  "active basePaths :\n" + basepaths.Replace(',', '\n'));
+                    MessageHandler("Start", "Built 28AUG2013. Any CPU. Foundation 4.5.\nOnStart\nUser : " + sNTUserName, "active basePaths :\n" + basepaths.Replace(',', '\n'));
                     m_lExceptionCount = 0;
                     foreach (QMSite site in sites)
                     {
+                        string sXML = BuildProductInfoString(site);
+                        new LogService(sXML).TraceLog("OnStart", (StatusEnum)999, "Service Started for : " + site.basePath);
                         try
                         {
                             if (site.basePath != string.Empty && site.connection != string.Empty)
@@ -254,6 +256,8 @@ namespace WE_QueueMgr
                     {
                         foreach (QMSite site in sites)
                         {
+                            string sXML = BuildProductInfoString(site);
+                            new LogService(sXML).TraceLog("ServiceTimer_Tick", (StatusEnum)999, "");
                             try
                             {
                                 {
@@ -288,12 +292,14 @@ namespace WE_QueueMgr
         {
             if (site.basePath != string.Empty)
             {
+                string sXML = BuildProductInfoString(site);
                 try
                 {
+
                     Type comObjectType = Type.GetTypeFromProgID("WE_WSSAdmin.WSSAdmin");
                     object comObject = Activator.CreateInstance(comObjectType);
                     object[] myparams = new object[] { "ManageTimerJobs", site.basePath };
-                    string s = (string) comObjectType.InvokeMember("RSVPRequest",
+                    string s = (string)comObjectType.InvokeMember("RSVPRequest",
                                                             BindingFlags.InvokeMethod,
                                                             null,
                                                             comObject,
@@ -304,11 +310,15 @@ namespace WE_QueueMgr
                     string slc = s.ToLower();
                     if (slc.Contains("<error") == true || slc.Contains("<status>0</status>") == false)
                     {
+
+                        new LogService(sXML).TraceStatusError("ManageTimerJobs", (StatusEnum)999, "PfE Queue Manager (FA3) - ManageTimerJobs Error basePath : " + site.basePath + "\nReply : " + s);
                         EventLog.WriteEntry("PfE Queue Manager (FA3) - ManageTimerJobs Error", "basePath : " + site.basePath + "\nReply : " + s, EventLogEntryType.Error);
                     }
                 }
                 catch (Exception ex)
                 {
+
+                    new LogService(sXML).TraceStatusError("ManageTimerJobs - " + site.basePath, (StatusEnum)999, ex);
                     ExceptionHandler("ManageTimerJobs - " + site.basePath, ex);
                 }
             }
@@ -324,15 +334,16 @@ namespace WE_QueueMgr
                     PortfolioEngineCore.QueueManager qm = new QueueManager(sXML);
                     if (qm.ReadNextQueuedItem() == true)
                     {
+                        new LogService(sXML).TraceLog("ManageQueue", (StatusEnum)999, "Queue Manager Next item found for  site : " + site.basePath);
                         // we have a queued item - try to handle it in portfolioenginecore first
                         if (qm.ManageQueue() == false) // false means not handled
                         {
                             switch (qm.Context)
                             {
                                 case 200:
-                                //////PortfolioEngineAPI pFeAPI = new PortfolioEngineAPI();
-                                //////pFeAPI.Execute("RefreshRoles", "");
-                                //////pFeAPI.Dispose();
+                                    //////PortfolioEngineAPI pFeAPI = new PortfolioEngineAPI();
+                                    //////pFeAPI.Execute("RefreshRoles", "");
+                                    //////pFeAPI.Dispose();
                                     qm.SetJobCompleted();
                                     ErrorHandler("ManageQueue Case 200", 98765);
                                     break;
@@ -350,16 +361,19 @@ namespace WE_QueueMgr
                                     comObject = null;
                                     if (s.Contains("<Error"))
                                     {
+                                        new LogService(sXML).TraceStatusError("ManageQueue", (StatusEnum)999, "PfE Queue Manager (FA3) - ManageQueue Error basePath : " + site.basePath + "\nReply : " + s);
                                         EventLog.WriteEntry("PfE Queue Manager (FA3) - ManageQueue Error", "basePath : " + site.basePath + "\nReply : " + s, EventLogEntryType.Error);
                                     }
                                     break;
                             }
                         }
                         qm = null;
-                    }   
+                    }
                 }
                 catch (Exception ex)
                 {
+                    string sXML = BuildProductInfoString(site);
+                    new LogService(sXML).TraceStatusError("ManageQueue exception thrown for " + site.basePath, (StatusEnum)999, ex);
                     ExceptionHandler("ManageQueue - " + site.basePath, ex);
                 }
             }
