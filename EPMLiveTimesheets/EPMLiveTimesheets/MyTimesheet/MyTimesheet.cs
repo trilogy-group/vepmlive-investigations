@@ -641,7 +641,7 @@ namespace TimeSheets
                                     TSObject" + sFullGridId + @".Status = '" + sStatus + @"';
                                     TSObject" + sFullGridId + @".Locked = " + bTsLocked.ToString().ToLower() + @";
                                     TSObject" + sFullGridId + @".DisableApprovals = " + settings.DisableApprovals.ToString().ToLower() + @";
-                                    TSObject" + sFullGridId + @".Delegates = '" + sDelegates + @"';
+                                    TSObject" + sFullGridId + @".Delegates = '" + sDelegates.Replace("'", @"`") + @"';
                                     TSObject" + sFullGridId + @".DelegateId = '" + Page.Request["Delegate"] + @"';
                                     TSObject" + sFullGridId + @".Views = " + views.ToJSON() + @";
                                     TSObject" + sFullGridId + @".CurrentView = '" + sCurrentView + @"';
