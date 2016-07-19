@@ -700,17 +700,17 @@
             //========================
             folderCell = "a";
             plannerCell = "b";
-            allocCell = "c";
+            //allocCell = "c";
 
         <% if(bAgile){%>
-            dhxLayout = new dhtmlXLayoutObject("parentId", "5H", "dhx_blue"); 
-            agileCell = "d";
-            detailsCell = "e";
+            dhxLayout = new dhtmlXLayoutObject("parentId", "4H", "dhx_blue"); 
+            agileCell = "c";
+            detailsCell = "d";
         <%}else{%>
         
-            dhxLayout = new dhtmlXLayoutObject("parentId", "4H", "dhx_blue"); 
+            dhxLayout = new dhtmlXLayoutObject("parentId", "3W", "dhx_blue"); 
             agileCell = "";
-            detailsCell = "d";
+            detailsCell = "c";
 
             //dhxLayout = new dhtmlXLayoutObject("parentId", "3W", "dhx_blue"); 
             //detailsCell = "c";
@@ -735,9 +735,8 @@
             
         <%} %>
             
-            dhxLayout.cells(allocCell).attachObject("allocDiv");
-            dhxLayout.cells(allocCell).setText("Resource Allocation");
-        
+            //dhxLayout.cells(allocCell).attachObject("allocDiv");
+            //dhxLayout.cells(allocCell).setText("Resource Allocation");
 
         <%if(!bUseFolders){ %>
             //dhxLayout.cells("a").collapse();
@@ -816,7 +815,7 @@
 
         function CreateTrees()
         {
-            TreeGrid( { Data:{ Url:"../../_vti_bin/WorkPlanner.asmx", Method:"Soap",Function:"Execute",Namespace:"workengine.com",Param:{Functionname:"GetAllocationLayout",Dataxml:"<%=sPlannerDataParam %>" } }, SuppressMessage:2, Debug:""}, "allocDiv" ); 
+            <%--TreeGrid( { Data:{ Url:"../../_vti_bin/WorkPlanner.asmx", Method:"Soap",Function:"Execute",Namespace:"workengine.com",Param:{Functionname:"GetAllocationLayout",Dataxml:"<%=sPlannerDataParam %>" } }, SuppressMessage:2, Debug:""}, "allocDiv" ); --%>
         
         CreateBasicTree("GetAddLinksLayout","addLinkTableDivTree");
         CreateBasicTree("GetDetailLayout","detailTree");
@@ -864,14 +863,14 @@
                     var gHeight = (getHeight() - getTop(document.getElementById("parentId")) - 20) / 3;
 
                     dhxLayout.cells("b").setHeight(gHeight);
-                    dhxLayout.cells("c").setHeight(gHeight);
+                    //dhxLayout.cells("c").setHeight(gHeight);
                 }
                 else
                 {
                     var gHeight = (getHeight() - getTop(document.getElementById("parentId")) - 20) / 2;
 
                     dhxLayout.cells("b").setHeight(gHeight);
-                    dhxLayout.cells("c").setHeight(gHeight);
+                    //dhxLayout.cells("c").setHeight(gHeight);
                 }
 
                 dhxLayout.setSizes();
@@ -997,7 +996,7 @@
         if(grid.id == "WorkPlannerGrid" && grid.id==MouseDownGrid)
         {
             var left = grid.GetScrollLeft(2);
-            Grids.AllocationGrid.SetScrollLeft(left, 2);
+            //Grids.AllocationGrid.SetScrollLeft(left, 2);
 
             
         }
@@ -1114,9 +1113,9 @@
         if(grid.id == "WorkPlannerGrid" && !bRendering)
         {
 
-            var N = Grids.AllocationGrid;
-            N.ZoomTo(FirstDate,LastDate,grid.Cols.G.Width);
-            setTimeout(function(){N.SetScrollLeft(grid.GetScrollLeft(2),2);},100);
+            //var N = Grids.AllocationGrid;
+            //N.ZoomTo(FirstDate,LastDate,grid.Cols.G.Width);
+            //setTimeout(function(){N.SetScrollLeft(grid.GetScrollLeft(2),2);},100);
 
         }
     }
@@ -1540,7 +1539,7 @@
     
     Grids.OnAfterSectionResize = function(grid, section)  
     {
-        ResizeGantt(Grids.WorkPlannerGrid, Grids.AllocationGrid);
+        //ResizeGantt(Grids.WorkPlannerGrid, Grids.AllocationGrid);
     }
     
     var viewNameDiv = document.getElementById("viewNameDiv");
