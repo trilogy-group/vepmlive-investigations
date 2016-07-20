@@ -152,8 +152,8 @@
                         var listInfo = ticket.split('|');
 
                         var viewSiteContentUrl = listInfo[0] + "/_layouts/epmlive/gridaction.aspx?action=FancyDispForm&list=" + listInfo[3] + "&field=" + listInfo[1] + "&LookupFieldList=" + listInfo[2] + "&Source=" + document.location.href;
-                        //var options = { url: viewSiteContentUrl, showMaximized: true };
-                        //SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
+                        var options = { url: viewSiteContentUrl, showMaximized: true };
+                        SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
                         FancyDispFormClient.FillAssociatedItemSection();
                     }
                     else {

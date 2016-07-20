@@ -901,40 +901,40 @@ namespace EPMLiveWebParts {
                     "o = ticket.split(\'|\');\r\n\r\n                        var viewSiteContentUrl = listI" +
                     "nfo[0] + \"/_layouts/epmlive/gridaction.aspx?action=FancyDispForm&list=\" + listIn" +
                     "fo[3] + \"&field=\" + listInfo[1] + \"&LookupFieldList=\" + listInfo[2] + \"&Source=\"" +
-                    " + document.location.href;\r\n                        //var options = { url: viewS" +
-                    "iteContentUrl, showMaximized: true };\r\n                        //SP.SOD.execute(" +
-                    "\'SP.UI.Dialog.js\', \'SP.UI.ModalDialog.showModalDialog\', options);\r\n             " +
-                    "           FancyDispFormClient.FillAssociatedItemSection();\r\n                   " +
-                    " }\r\n                    else {\r\n                        alert(ticket);\r\n        " +
-                    "            }\r\n                }\r\n            });\r\n        },\r\n\r\n        showNew" +
-                    "Form: function (weburl) {\r\n            var options = { url: weburl, showMaximize" +
-                    "d: true, dialogReturnValueCallback: function (dialogResult) { if (dialogResult =" +
-                    "= 1) { FancyDispFormClient.FillAssociatedItemSection(); } } };\r\n            SP.S" +
-                    "OD.execute(\'SP.UI.Dialog.js\', \'SP.UI.ModalDialog.showModalDialog\', options);\r\n  " +
-                    "      },\r\n\r\n        showItemPopup: function (siteurl, webid, listid, itemid) {\r\n" +
-                    "            showSharePointPopup(siteurl + \'/_layouts/epmlive/gridaction.aspx?act" +
-                    "ion=getcontextmenus&webid=\' + webid +\r\n                \'&listid=\' + listid + \'&I" +
-                    "D=\' + itemid, null, false, true, null, {\r\n                    gridId: \"myDiv\",\r\n" +
-                    "                    rowId: \"myDiv\",\r\n                    col: \"myDiv\"\r\n         " +
-                    "       }, 300, 400);\r\n        },\r\n\r\n        emptyFunction: function () {\r\n      " +
-                    "  },\r\n\r\n        showSharePointPopup: function (url, title, allowMaximize, showCl" +
-                    "ose, func, funcParams, width, height) {\r\n            if (allowMaximize == null) " +
-                    "allowMaximize = true;\r\n            if (showClose == null) showClose = true;\r\n   " +
-                    "         if (func == null) func = emptyFunction;\r\n\r\n            var options;\r\n\r\n" +
-                    "            if (width !== undefined && height !== undefined) {\r\n                " +
-                    "options = {\r\n                    title: title,\r\n                    allowMaximiz" +
-                    "e: allowMaximize,\r\n                    showClose: showClose,\r\n                  " +
-                    "  url: url,\r\n                    dialogReturnValueCallback: Function.createCallb" +
-                    "ack(Function.createDelegate(null, func), funcParams),\r\n                    width" +
-                    ": width,\r\n                    height: height\r\n                };\r\n            } " +
-                    "else {\r\n                options = { title: title, allowMaximize: allowMaximize, " +
-                    "showClose: showClose, url: url, dialogReturnValueCallback: Function.createCallba" +
-                    "ck(Function.createDelegate(null, func), funcParams) };\r\n            }\r\n\r\n       " +
-                    "     SP.UI.ModalDialog.showModalDialog(options);\r\n        },\r\n\r\n        FillAtta" +
-                    "chmentSection: function () {\r\n            window.setTimeout(\'FancyDispFormClient" +
-                    ".LoadItemAttachments()\', 1000);\r\n        },\r\n\r\n        LoadItemAttachments: func" +
-                    "tion () {\r\n            $.ajax({\r\n                type: \"POST\",\r\n                " +
-                    "url: \"");
+                    " + document.location.href;\r\n                        var options = { url: viewSit" +
+                    "eContentUrl, showMaximized: true };\r\n                        SP.SOD.execute(\'SP." +
+                    "UI.Dialog.js\', \'SP.UI.ModalDialog.showModalDialog\', options);\r\n                 " +
+                    "       FancyDispFormClient.FillAssociatedItemSection();\r\n                    }\r\n" +
+                    "                    else {\r\n                        alert(ticket);\r\n            " +
+                    "        }\r\n                }\r\n            });\r\n        },\r\n\r\n        showNewForm" +
+                    ": function (weburl) {\r\n            var options = { url: weburl, showMaximized: t" +
+                    "rue, dialogReturnValueCallback: function (dialogResult) { if (dialogResult == 1)" +
+                    " { FancyDispFormClient.FillAssociatedItemSection(); } } };\r\n            SP.SOD.e" +
+                    "xecute(\'SP.UI.Dialog.js\', \'SP.UI.ModalDialog.showModalDialog\', options);\r\n      " +
+                    "  },\r\n\r\n        showItemPopup: function (siteurl, webid, listid, itemid) {\r\n    " +
+                    "        showSharePointPopup(siteurl + \'/_layouts/epmlive/gridaction.aspx?action=" +
+                    "getcontextmenus&webid=\' + webid +\r\n                \'&listid=\' + listid + \'&ID=\' " +
+                    "+ itemid, null, false, true, null, {\r\n                    gridId: \"myDiv\",\r\n    " +
+                    "                rowId: \"myDiv\",\r\n                    col: \"myDiv\"\r\n             " +
+                    "   }, 300, 400);\r\n        },\r\n\r\n        emptyFunction: function () {\r\n        }," +
+                    "\r\n\r\n        showSharePointPopup: function (url, title, allowMaximize, showClose," +
+                    " func, funcParams, width, height) {\r\n            if (allowMaximize == null) allo" +
+                    "wMaximize = true;\r\n            if (showClose == null) showClose = true;\r\n       " +
+                    "     if (func == null) func = emptyFunction;\r\n\r\n            var options;\r\n\r\n    " +
+                    "        if (width !== undefined && height !== undefined) {\r\n                opti" +
+                    "ons = {\r\n                    title: title,\r\n                    allowMaximize: a" +
+                    "llowMaximize,\r\n                    showClose: showClose,\r\n                    ur" +
+                    "l: url,\r\n                    dialogReturnValueCallback: Function.createCallback(" +
+                    "Function.createDelegate(null, func), funcParams),\r\n                    width: wi" +
+                    "dth,\r\n                    height: height\r\n                };\r\n            } else" +
+                    " {\r\n                options = { title: title, allowMaximize: allowMaximize, show" +
+                    "Close: showClose, url: url, dialogReturnValueCallback: Function.createCallback(F" +
+                    "unction.createDelegate(null, func), funcParams) };\r\n            }\r\n\r\n           " +
+                    " SP.UI.ModalDialog.showModalDialog(options);\r\n        },\r\n\r\n        FillAttachme" +
+                    "ntSection: function () {\r\n            window.setTimeout(\'FancyDispFormClient.Loa" +
+                    "dItemAttachments()\', 1000);\r\n        },\r\n\r\n        LoadItemAttachments: function" +
+                    " () {\r\n            $.ajax({\r\n                type: \"POST\",\r\n                url:" +
+                    " \"");
               @__w.Write(SPContext.Current.Web.Url);
 
             @__w.Write("/_vti_bin/WorkEngine.asmx/Execute\",\r\n                data: \"{Function : \'GetFancy" +
