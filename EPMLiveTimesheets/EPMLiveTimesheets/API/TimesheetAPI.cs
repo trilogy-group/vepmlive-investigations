@@ -833,8 +833,8 @@ namespace TimeSheets
                     DateTime dtNowRounded = new DateTime(dtNow.Year, dtNow.Month, dtNow.Day, 0, 0, 0);
 
                     DateTime dtStartRounded = new DateTime(dtStart.Year, dtStart.Month, dtStart.Day, 0, 0, 0);
-                    DateTime dtCounter = new DateTime(dtStart.Year, dtStart.Month, dtStart.Day, 0, 0, 0); ;
-
+                    DateTime dtCounter = new DateTime(dtStart.Year, dtStart.Month, dtStart.Day, 0, 0, 0);
+                    
                     string output = "";
 
                     while (dtCounter <= dtNowRounded)
@@ -2835,7 +2835,7 @@ namespace TimeSheets
 
                 SPUser user = GetUser(oWeb, sUserId);
 
-                DataTable dtWork = rptData.ExecuteSql("SELECT * FROM lstmywork where Timesheet=1 and StartDate < '" + fn.ToString("s") + "' AND DueDate > '" + st.ToString("s") + "' AND AssignedToID='" + user.ID + "'");
+                DataTable dtWork = rptData.ExecuteSql("SELECT * FROM lstmywork where Complete != 1 and Status != 'Completed' and Timesheet=1 and StartDate < '" + fn.ToString("s") + "' AND DueDate > '" + st.ToString("s") + "' AND AssignedToID='" + user.ID + "'");
 
                 foreach (DataRow drWork in dtWork.Rows)
                 {
@@ -3078,7 +3078,7 @@ namespace TimeSheets
                 {
                     try
                     {
-                        string sql = string.Format(@"SELECT * FROM dbo.LSTMyWork WHERE [AssignedToID] = -99 AND [SiteId] = N'{0}' AND LISTID = N'{1}' AND ITEMID=N'{2}'", web.Site.ID, drItem["LIST_UID"].ToString(), drItem["ITEM_ID"].ToString());
+                        string sql = string.Format(@"SELECT * FROM dbo.LSTMyWork WHERE Complete != 1 and Status != 'Completed' AND [AssignedToID] = -99 AND [SiteId] = N'{0}' AND LISTID = N'{1}' AND ITEMID=N'{2}'", web.Site.ID, drItem["LIST_UID"].ToString(), drItem["ITEM_ID"].ToString());
                         DataTable myWorkDataTable = rptData.ExecuteSql(sql);
 
                         if (myWorkDataTable.Rows.Count > 0)
@@ -3438,7 +3438,7 @@ namespace TimeSheets
             }
             else if (bOtherWork)
             {
-                sql = string.Format(@"SELECT * FROM dbo.LSTMyWork WHERE [AssignedToID] = -99 AND [SiteId] = N'{1}' AND Timesheet=1 AND IsAssignment = 0", userid, oWeb.Site.ID);                
+                sql = string.Format(@"SELECT * FROM dbo.LSTMyWork WHERE [AssignedToID] = -99 AND [SiteId] = N'{1}' AND Timesheet=1 AND IsAssignment = 0", userid, oWeb.Site.ID);
             }
             else if (bNonWork)
             {
