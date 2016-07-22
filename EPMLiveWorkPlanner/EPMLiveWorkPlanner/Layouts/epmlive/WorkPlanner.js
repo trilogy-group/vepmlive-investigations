@@ -3851,6 +3851,7 @@ function SetPlannerFieldValue(row, col, val, setVal) {
 
         CheckMilestone(row.id);
         CalculateAssignmentCosts(grid, row);
+        SetTaskAssignments(row);
 
         //if (bAgile) {
         //    RollDown(row, "DueDate");
@@ -3865,6 +3866,7 @@ function SetPlannerFieldValue(row, col, val, setVal) {
         DoAssignmentRollDown(grid, row, 0, "Duration");
         Grids.WorkPlannerGrid.CorrectDependencies(row, "G");
         CalculateAssignmentCosts(grid, row);
+        SetTaskAssignments(row);
         grid.RefreshCell(row, "ScheduleStatus");
         //if (bAgile) {
         //    RollDown(row, "DueDate");
@@ -3876,6 +3878,7 @@ function SetPlannerFieldValue(row, col, val, setVal) {
         RollupSummaryField("DueDate");
         DoAssignmentRollDown(grid, row, 0, "DueDate");
         CalculateAssignmentCosts(grid, row);
+        SetTaskAssignments(row);
         grid.RefreshCell(row, "ScheduleStatus");
         //if (bAgile) {
         //    RollDown(row, "StartDate");

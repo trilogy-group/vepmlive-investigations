@@ -1024,6 +1024,7 @@
             }
 
             CalculateAssignmentCosts(grid, row);
+            SetTaskAssignments(row);
         }
     }
 
@@ -1407,6 +1408,7 @@
 
                 Grids.WorkPlannerGrid.CheckGantt(Grids.WorkPlannerGrid.FRow, "Duration", val);
                 Grids.WorkPlannerGrid.CorrectDependencies(Grids.WorkPlannerGrid.FRow, "G");
+                SetTaskAssignments(Grids.WorkPlannerGrid.FRow);
                 
                 grid.SetValue(grid.GetRowById("DueDate"), "V", Grids.WorkPlannerGrid.GetValue(Grids.WorkPlannerGrid.FRow, "DueDate"), 1, 0);
 
@@ -1415,6 +1417,7 @@
             {
                 RollupSummaryField("Duration");
                 DoAssignmentRollDown(grid, Grids.WorkPlannerGrid.FRow, 0, "Duration");
+                SetTaskAssignments(Grids.WorkPlannerGrid.FRow);
 
                 Grids.WorkPlannerGrid.SetValue(Grids.WorkPlannerGrid.FRow, "Duration", Grids.WorkPlannerGrid.DiffGanttDate(Grids.WorkPlannerGrid.FRow.StartDate, Grids.WorkPlannerGrid.FRow.DueDate, "d", null, null), 1, 0);
                 grid.SetValue(grid.GetRowById("Duration"), "V", Grids.WorkPlannerGrid.GetValue(Grids.WorkPlannerGrid.FRow, "Duration"), 1, 0);
@@ -1452,19 +1455,23 @@
                 DoAssignmentRollDown(grid, Grids.WorkPlannerGrid.FRow, 0, "DueDate");
                 //CopySummaryField("DueDate");
                 CheckMilestone(Grids.WorkPlannerGrid.FRow.id);
+                SetTaskAssignments(Grids.WorkPlannerGrid.FRow);
             }
             else if(row.id == "DueDate")
             {
                 RollupSummaryField("Duration");
                 DoAssignmentRollDown(grid, Grids.WorkPlannerGrid.FRow, 0, "Duration");
+                SetTaskAssignments(Grids.WorkPlannerGrid.FRow);
 
                 Grids.WorkPlannerGrid.SetValue(Grids.WorkPlannerGrid.FRow, "Duration", Grids.WorkPlannerGrid.DiffGanttDate(Grids.WorkPlannerGrid.FRow.StartDate, Grids.WorkPlannerGrid.FRow.DueDate, "d", null, null), 1, 0);
                 grid.SetValue(grid.GetRowById("Duration"), "V", Grids.WorkPlannerGrid.GetValue(Grids.WorkPlannerGrid.FRow, "Duration"), 1, 0);
+                SetTaskAssignments(Grids.WorkPlannerGrid.FRow);
             }
             else if(row.id == "StartDate")
             {
                 RollupSummaryField("DueDate");
                 DoAssignmentRollDown(grid, Grids.WorkPlannerGrid.FRow, 0, "DueDate");
+                SetTaskAssignments(Grids.WorkPlannerGrid.FRow);
             }
             else if(row.id == "Work")
             {
