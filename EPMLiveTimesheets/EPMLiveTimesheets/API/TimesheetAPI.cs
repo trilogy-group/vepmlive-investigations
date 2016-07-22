@@ -2835,7 +2835,7 @@ namespace TimeSheets
 
                 SPUser user = GetUser(oWeb, sUserId);
 
-                DataTable dtWork = rptData.ExecuteSql("SELECT * FROM lstmywork where Complete != 1 and Status != 'Completed' and Timesheet=1 and StartDate < '" + fn.ToString("s") + "' AND DueDate > '" + st.ToString("s") + "' AND AssignedToID='" + user.ID + "'");
+                DataTable dtWork = rptData.ExecuteSql("SELECT * FROM lstmywork where Timesheet=1 and StartDate < '" + fn.ToString("s") + "' AND DueDate > '" + st.ToString("s") + "' AND AssignedToID='" + user.ID + "'");
 
                 foreach (DataRow drWork in dtWork.Rows)
                 {
