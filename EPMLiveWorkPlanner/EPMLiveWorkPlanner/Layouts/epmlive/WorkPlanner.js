@@ -20,7 +20,7 @@ var folderCell = "a";
 var plannerCell = "b";
 var agileCell = "";
 var detailsCell = "d";
-var allocCell = "c";
+//var allocCell = "c";
 var oResourceList;
 
 var bUseTeam = false;
@@ -142,19 +142,19 @@ function getLeft(obj) {
     return posY;
 }
 
-function ShowResGrid() {
-    if (isQueryShowResGrid()) {
-        try {
-            dhxLayout.cells(allocCell).collapse();
-        } catch (e) { }
-    }
-    else {
-        try {
-            dhxLayout.cells(allocCell).expand();
-        } catch (e) { }
-    }
-    RefreshCommandUI();
-}
+//function ShowResGrid() {
+//    if (isQueryShowResGrid()) {
+//        try {
+//            dhxLayout.cells(allocCell).collapse();
+//        } catch (e) { }
+//    }
+//    else {
+//        try {
+//            dhxLayout.cells(allocCell).expand();
+//        } catch (e) { }
+//    }
+//    RefreshCommandUI();
+//}
 
 function ShowBacklog() {
     if (isQueryShowBacklog()) {
@@ -185,9 +185,9 @@ function RollupSummaryForce(Col) {
     return false;
 }
 
-function isQueryShowResGrid() {
-    return !dhxLayout.cells(allocCell).isCollapsed();
-}
+//function isQueryShowResGrid() {
+//    return !dhxLayout.cells(allocCell).isCollapsed();
+//}
 
 function OpenLocation(sLocation, sTitle) {
     var grid = Grids.WorkPlannerGrid;
@@ -697,10 +697,10 @@ function RollupAssignments(Row, Col, Type) {
                 if (def == "Assignment") {
 
                     try {
-                         var work = grid.GetValue(oChild, Col);
-                         if (work != "") {
-                             sum += parseFloat(work);
-                         }
+                        var work = grid.GetValue(oChild, Col);
+                        if (work != "") {
+                            sum += parseFloat(work);
+                        }
                     } catch (e) { }
                 }
 
@@ -881,9 +881,9 @@ function SelectColumns() {
     Grids.WorkPlannerGrid.ActionShowColumns();
 }
 
-function SelectResColumns() {
-    Grids.AllocationGrid.ActionShowColumns();
-}
+//function SelectResColumns() {
+//    Grids.AllocationGrid.ActionShowColumns();
+//}
 
 function DeleteView() {
 
@@ -1130,7 +1130,7 @@ function SetTaskAssignments(Row) {
                 } else {
                     newrow = grid.GetRowById(Row.id + "." + oAssn);
                 }
-                
+
                 //newrow = grid.CopyRow(Row, Row, null, false, false);
                 grid.ChangeDef(newrow, "Assignment", oShowAssignments, 0);
                 if (!oShowAssignments)
@@ -1155,12 +1155,12 @@ function SetTaskAssignments(Row) {
                         try {
                             fWork = parseFloat(Row.Work);
                         } catch (e) { }
-                            var st = grid.GetValue(Row, "StartDate")
-                            var en = grid.GetValue(Row, "DueDate")
-                            var diff = grid.DiffGanttDate(st, en, "h");
-                            // SetPlannerFieldValue(Row, "Work", diff, true);
-                            grid.SetValue(Row, "Work", diff * assignmentcount, 1);
-                        
+                        var st = grid.GetValue(Row, "StartDate")
+                        var en = grid.GetValue(Row, "DueDate")
+                        var diff = grid.DiffGanttDate(st, en, "h");
+                        // SetPlannerFieldValue(Row, "Work", diff, true);
+                        grid.SetValue(Row, "Work", diff * assignmentcount, 1);
+
                     }
                 }
                 else {
@@ -1485,7 +1485,7 @@ function ResizeGantt(fromgrid, togrid) {
     togrid.SetWidth("NAME", dx);
     togrid.Rerender();
 
-    Grids.AllocationGrid.ChangeZoom(Grids.WorkPlannerGrid.Cols["G"].GanttZoom);
+    //Grids.AllocationGrid.ChangeZoom(Grids.WorkPlannerGrid.Cols["G"].GanttZoom);
 }
 
 function iChangeView(view, bHide) {
@@ -1554,7 +1554,7 @@ function iChangeView(view, bHide) {
     //grid.ChangeColsVisibility(allCols, "", 0);
 
     try {
-        if (viewObject[view]["gantt"] == "1"){
+        if (viewObject[view]["gantt"] == "1") {
             grid.ShowCol("G");
             setButtonStateOn("Ribbon.WorkViews.GanttGroup.ShowHideGantt-Medium");
         }
@@ -1573,12 +1573,12 @@ function iChangeView(view, bHide) {
     else
         dhxLayout.cells(detailsCell).collapse();
 
-    try {
-        if (viewObject[view]["allocation"] == "true")
-            dhxLayout.cells(allocCell).expand();
-        else
-            dhxLayout.cells(allocCell).collapse();
-    } catch (e) { }
+    //try {
+    //    if (viewObject[view]["allocation"] == "true")
+    //        dhxLayout.cells(allocCell).expand();
+    //    else
+    //        dhxLayout.cells(allocCell).collapse();
+    //} catch (e) { }
 
     //================Filters================
     if (viewObject[view]["filters"] == "") {
@@ -1588,7 +1588,7 @@ function iChangeView(view, bHide) {
     else {
         var filters = viewObject[view]["filters"].split("^");
         try {
-            if (filters[0] == "1" || filters[0] == "true"){
+            if (filters[0] == "1" || filters[0] == "true") {
                 grid.ShowRow(grid.GetRowById("Filter"));
                 setButtonStateOn("Ribbon.WorkViews.WorkViewsGroup.ShowFilters-Medium");
             }
@@ -1652,7 +1652,7 @@ function iChangeView(view, bHide) {
     }
 
     try {
-        if (viewObject[view]["assignments"] == "true" || viewObject[view]["assignments"] == "1"){
+        if (viewObject[view]["assignments"] == "true" || viewObject[view]["assignments"] == "1") {
             oShowAssignments = true;
             setButtonStateOn("Ribbon.WorkViews.WorkViewsGroup.ShowAssignments-Medium");
         }
@@ -1781,7 +1781,7 @@ function onSaveViewClose(dialogResult, returnValue) {
             //===========Detail===========
             var details = !dhxLayout.cells(detailsCell).isCollapsed();
             //==========Allocation=========
-            var allocation = !dhxLayout.cells(allocCell).isCollapsed();
+            //var allocation = !dhxLayout.cells(allocCell).isCollapsed();
             //============Summary=========
             var summary = grid.GetRowById("0").Visible.toString();
             //============Assignedments=====
@@ -1909,16 +1909,14 @@ function ShowFilters() {
     var grid = Grids.WorkPlannerGrid;
     var row = grid.GetRowById("Filter");
     try {
-        if (row.Visible)
-        {
+        if (row.Visible) {
             setButtonStateOff("Ribbon.WorkViews.WorkViewsGroup.ShowFilters-Medium");
             grid.HideRow(row);
-        }    
-        else
-        {
+        }
+        else {
             setButtonStateOn("Ribbon.WorkViews.WorkViewsGroup.ShowFilters-Medium");
             grid.ShowRow(row);
-        }    
+        }
     } catch (e) { }
 }
 
@@ -2166,13 +2164,13 @@ function ShowHideGantt() {
         setButtonStateOn("Ribbon.WorkViews.GanttGroup.ShowHideGantt-Medium");
         grid.ShowCol("G");
     }
-    ResizeGantt(grid, Grids.AllocationGrid);
+    //ResizeGantt(grid, Grids.AllocationGrid);
 }
 
 function ZoomFit() {
 
     Grids.WorkPlannerGrid.ActionZoomFit();
-    Grids.AllocationGrid.ActionZoomFit();
+    //Grids.AllocationGrid.ActionZoomFit();
 
     RefreshCommandUI();
 
@@ -2676,7 +2674,7 @@ function PublishWorkPlan() {
     sm("divPublish", 130, 50);
 
     dhtmlxAjax.post("WorkPlannerAction.aspx", "Action=Publish&ID=" + sItemID + "&PlannerID=" + sPlannerID, onPublishClose);
-    
+
 }
 
 function CheckUpdates() {
@@ -3021,10 +3019,10 @@ function NewTask(isSummary, isMilestone, isAbove, bAgileGrid, bIsExternal, bForc
         grid.Focus(newrow, 'Title');
 
     var projectinfoGrid = Grids.ProjectInfo;
-    try{
+    try {
         projectinfoGrid.SetValue(projectinfoGrid.GetRowById("Finish"), "V", grid.GetValue(grid.GetRowById("0"), "DueDate"), 1);
-    }catch(e){ }
-    
+    } catch (e) { }
+
     return newrow.id;
 }
 
@@ -3566,7 +3564,7 @@ function RefreshTeamClose(loader) {
         else {
             oResourceList = eval("({" + loader.xmlDoc.responseText.trim() + "})");
 
-            RefreshResourceObject();            
+            RefreshResourceObject();
         }
     }
 }
@@ -4530,10 +4528,10 @@ function RefreshResourceUsage(rowid) {
             grid.Resources[row.ResourceNames].Availability = iWorkHours;
             grid.Resources[row.ResourceNames].Type = 1;
 
-            var newrow = Grids.AllocationGrid.AddRow(null, null, true, row.Title, null);
-            Grids.AllocationGrid.SetValue(newrow, "NAME", row.Title, 1);
-            Grids.AllocationGrid.SetValue(newrow, "MAX", iWorkHours, 1);
-            Grids.AllocationGrid.SetValue(newrow, "TYPE", 1, 1);
+            //var newrow = Grids.AllocationGrid.AddRow(null, null, true, row.Title, null);
+            //Grids.AllocationGrid.SetValue(newrow, "NAME", row.Title, 1);
+            //Grids.AllocationGrid.SetValue(newrow, "MAX", iWorkHours, 1);
+            //Grids.AllocationGrid.SetValue(newrow, "TYPE", 1, 1);
         }
     }
 }
@@ -4690,7 +4688,7 @@ function InitGantt() {
 
     var WGrid = Grids.WorkPlannerGrid;
     var AGrid = Grids.AgileGrid;
-    var RGrid = Grids.AllocationGrid;
+    //var RGrid = Grids.AllocationGrid;
 
     WGrid.SetValue(WGrid.GetRowById("0"), "Title", sProjectName, 1, 0);
 
@@ -4698,16 +4696,16 @@ function InitGantt() {
     WGrid.ChangeZoom("z6");
 
 
-    try {
-        var date = new Date(Grids.WorkPlannerGrid.Cols["G"].GanttBase);
-        RGrid.ScrollToDate(date, "left");
-    } catch (e) { }
+    //try {
+    //    var date = new Date(Grids.WorkPlannerGrid.Cols["G"].GanttBase);
+    //    RGrid.ScrollToDate(date, "left");
+    //} catch (e) { }
 
 
-    try {
-        RGrid.ActionZoomFit();
-        //RGrid.ChangeZoom("z6");
-    } catch (e) { }
+    //try {
+    //    RGrid.ActionZoomFit();
+    //    //RGrid.ChangeZoom("z6");
+    //} catch (e) { }
     //WGrid.HideCol("G");
 
 
@@ -4748,12 +4746,12 @@ function InitView() {
         else
             dhxLayout.cells(detailsCell).collapse();
 
-        try {
-            if (viewObject[view]["allocation"] == "true")
-                dhxLayout.cells(allocCell).expand();
-            else
-                dhxLayout.cells(allocCell).collapse();
-        } catch (e) { }
+        //try {
+        //    if (viewObject[view]["allocation"] == "true")
+        //        dhxLayout.cells(allocCell).expand();
+        //    else
+        //        dhxLayout.cells(allocCell).collapse();
+        //} catch (e) { }
 
         try {
             if (viewObject[view]["backlog"] == "true")
@@ -4838,26 +4836,26 @@ function InitResources() {
     //RefreshResourceObject();
 
     try {
-        var grid = Grids.WorkPlannerGrid;
-        Grids.AllocationGrid.ActionCalcOff();
-        for (var r in grid.Rows) {
-            var row = grid.Rows[r];
-            if (row.Def && row.Def.Name == "Assignment") {
-                if (!grid.Resources[row.Title]) {
-                    grid.Resources[row.Title] = new Object();
-                    grid.Resources[row.Title].Name = row.Title;
-                    grid.Resources[row.Title].Availability = iWorkHours;
-                    grid.Resources[row.Title].Type = 1;
+        //var grid = Grids.WorkPlannerGrid;
+        //Grids.AllocationGrid.ActionCalcOff();
+        //for (var r in grid.Rows) {
+        //    var row = grid.Rows[r];
+        //    if (row.Def && row.Def.Name == "Assignment") {
+        //        if (!grid.Resources[row.Title]) {
+        //            grid.Resources[row.Title] = new Object();
+        //            grid.Resources[row.Title].Name = row.Title;
+        //            grid.Resources[row.Title].Availability = iWorkHours;
+        //            grid.Resources[row.Title].Type = 1;
 
-                    var newrow = Grids.AllocationGrid.AddRow(null, null, true, row.Title, null);
-                    Grids.AllocationGrid.SetValue(newrow, "NAME", row.Title, 1);
-                    Grids.AllocationGrid.SetValue(newrow, "MAX", iWorkHours, 1);
-                    Grids.AllocationGrid.SetValue(newrow, "TYPE", 1, 1);
-                }
-            }
-        }
-        Grids.AllocationGrid.ActionCalcOn();
-        ResizeGantt(grid, Grids.AllocationGrid);
+        //            var newrow = Grids.AllocationGrid.AddRow(null, null, true, row.Title, null);
+        //            Grids.AllocationGrid.SetValue(newrow, "NAME", row.Title, 1);
+        //            Grids.AllocationGrid.SetValue(newrow, "MAX", iWorkHours, 1);
+        //            Grids.AllocationGrid.SetValue(newrow, "TYPE", 1, 1);
+        //        }
+        //    }
+        //}
+        //Grids.AllocationGrid.ActionCalcOn();
+        //ResizeGantt(grid, Grids.AllocationGrid);
     } catch (e) { }
 
     SetSplashText("Loading View...");
@@ -4941,7 +4939,7 @@ function setButtonStateOff(id) {
                 }
                 document.getElementById(id).className = item.className;
             }
-            catch(e) { }
+            catch (e) { }
         }
     }
 };
@@ -4965,10 +4963,10 @@ function setStyleonPageLoadViewTab() {
         if (grid.GetRowById("Filter").Visible) {
             setButtonStateOn("Ribbon.WorkViews.WorkViewsGroup.ShowFilters-Medium");
         }
-    }catch(e){ }
+    } catch (e) { }
 
     // Show Gantt
-    try{
+    try {
         if (col.Visible) {
             setButtonStateOn("Ribbon.WorkViews.GanttGroup.ShowHideGantt-Medium");
         }
@@ -4985,7 +4983,7 @@ function setStyleonPageLoadViewTab() {
     } catch (e) { }
 
     // Show Backlog
-    try{
+    try {
         if (bAgile) {
             if (isQueryShowBacklog()) {
                 setButtonStateOn("Ribbon.WorkPlanner.InsertGroup.ShowBacklog-Medium");
@@ -4997,7 +4995,7 @@ function setStyleonPageLoadViewTab() {
     } catch (e) { }
 
     // Show Assignment
-    try{
+    try {
         if (oShowAssignments) {
             setButtonStateOn("Ribbon.WorkViews.WorkViewsGroup.ShowAssignments-Medium");
         }
