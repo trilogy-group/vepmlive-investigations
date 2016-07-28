@@ -2748,9 +2748,10 @@ namespace RPADataCache
                         {
                             ++xIi;
 
-                            oGrid.AddPIRow(odt, m_totdispcln, m_cResVals, m_cResVals.TargetColors, i * 10000000 + xIi, m_DispMode, m_use_role, TotSelectedOrder, m_use_heatmap, m_use_heatmapID, m_use_role, m_use_heatmapColour);
+                            if (string.IsNullOrEmpty(odt.ProjectName))
+                                odt.ProjectName = ResolvePIName(odt.ProjectID);
 
-
+                            oGrid.AddPIRow(oRFull, odt, m_totdispcln, m_cResVals, m_cResVals.TargetColors, i * 10000000 + xIi, m_DispMode, m_use_role, TotSelectedOrder, m_use_heatmap, m_use_heatmapID, m_use_role, m_use_heatmapColour, xIi -1, odt.ProjectID);
                         }
                     }
 
