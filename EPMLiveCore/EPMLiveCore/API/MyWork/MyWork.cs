@@ -814,8 +814,8 @@ namespace EPMLiveCore.API
                         l => string.Format(@"N'{0}'", l)).
                         ToArray());
 
-                    SPUser currentUser = spWeb.CurrentUser;
-                
+                SPUser currentUser = spWeb.CurrentUser;
+
                 string sql = "";
                 if (listIdQuery == Guid.Empty)
                 {
@@ -1073,7 +1073,8 @@ namespace EPMLiveCore.API
                     }
 
                     eventWaitHandle.Set();
-                }) { Name = theSelectedList, IsBackground = true };
+                })
+                { Name = theSelectedList, IsBackground = true };
 
                 thread.Start();
             }
@@ -1186,7 +1187,7 @@ namespace EPMLiveCore.API
                 {
                     if (!string.IsNullOrEmpty(value))
                     {
-                        var cultureInfo = new CultureInfo((int) SPContext.Current.RegionalSettings.LocaleId);
+                        var cultureInfo = new CultureInfo((int)SPContext.Current.RegionalSettings.LocaleId);
 
                         if (format.EndsWith("%"))
                         {
@@ -1686,7 +1687,7 @@ namespace EPMLiveCore.API
 
                     if (!fieldsSupplied)
                         selectedFields.AddRange(
-                            CoreFunctions.getConfigSetting(configWeb, GENERAL_SETTINGS_SELECTED_FIELDS).Split(new[] { ',' }));
+                            CoreFunctions.getConfigSetting(configWeb, GENERAL_SETTINGS_SELECTED_FIELDS).Split(new[] { ',' }).Distinct());
 
                     if (!siteUrlsSupplied)
                     {
@@ -2291,7 +2292,7 @@ namespace EPMLiveCore.API
 
 
                 if (isViewPersonal) DeletePersonalView(viewId, GetPersonalViews(configWeb), configWeb);
-                else DeleteGlobalView(viewId, isViewDefault,GetGlobalViews(configWeb), configWeb);
+                else DeleteGlobalView(viewId, isViewDefault, GetGlobalViews(configWeb), configWeb);
 
                 return result.ToString();
             }
@@ -2801,7 +2802,7 @@ namespace EPMLiveCore.API
 
                 foreach (string field in selectedFields.Where(field => !fields.Exists(f => f.Name.Equals(field))))
                 {
-                    fields.Add(new MyWorkField { Name = field, DisplayName = field.ToPrettierName(spWeb) });
+                    fields.Add(new MyWorkField { Name = field, DisplayName = field.ToPrettierName(selectedLists,spWeb) });
                 }
 
                 XDocument result = XDocument.Parse(Resources.MyWorkGridLayout);
@@ -2842,9 +2843,9 @@ namespace EPMLiveCore.API
 
                     var c = new XElement("C");
                     c.Add(new XAttribute("Name", Utils.ToGridSafeFieldName(internalName)));
-                    
+
                     c.Add(new XAttribute("Type", type));
-                                        
+
                     if (!string.IsNullOrEmpty(format))
                     {
                         string relatedGridFormat = GetRelatedGridFormat(type, format, fieldTypes[internalName], spWeb);
