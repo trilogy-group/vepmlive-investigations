@@ -2391,9 +2391,21 @@ namespace TimeSheets
             //attr1.Value = @"<img id='MTG_Processing_" + dr["ITEM_ID"].ToString() + "' style='display:none;' src='/_layouts/epmlive/images/mywork/loading16.gif'></img>";
             //ndCol.Attributes.Append(attr1);
 
-            attr1 = docData.CreateAttribute("Title");
-            attr1.Value = dr["Title"].ToString();
-            ndCol.Attributes.Append(attr1);
+            if (result != null)
+            {
+                if (Convert.ToBoolean(result["IsDeleted"]))
+                {
+                    attr1 = docData.CreateAttribute("Title");
+                    attr1.Value = "<span style=\"text-decoration:line-through\" >" + dr["Title"].ToString() + "</span>";
+                    ndCol.Attributes.Append(attr1);
+                }
+                else
+                {
+                    attr1 = docData.CreateAttribute("Title");
+                    attr1.Value = dr["Title"].ToString();
+                    ndCol.Attributes.Append(attr1);
+                }
+            }
 
             attr1 = docData.CreateAttribute("Comments");
             attr1.Value = string.Format("<img class='TS_Comments' src='/_layouts/epmlive/images/mywork/comment.png' alt='Click here to add comments'/>");
@@ -2983,6 +2995,7 @@ namespace TimeSheets
 
         private static DataSet iiGetTSData(SqlConnection cn, SPWeb web, string sPeriod, Guid tsuid, EPMLiveCore.ReportHelper.MyWorkReportData rptData)
         {
+            int cnt = 0;
             SqlCommand cmd = new SqlCommand("spTSGetTimesheet", cn);
             cmd.CommandType = CommandType.StoredProcedure;
             cmd.Parameters.AddWithValue("@tsuid", tsuid);
@@ -2999,6 +3012,11 @@ namespace TimeSheets
             ds.Tables.Add(myWorkDataTable);
             ArrayList drAdded = new ArrayList();
 
+            DataColumn dc = new DataColumn("IsDeleted");
+            dc.DataType = typeof(bool);
+            dc.ReadOnly = false;
+            dc.DefaultValue = Convert.ToBoolean(false);
+            ds.Tables[myworktableid].Columns.Add(dc);
 
             foreach (DataRow drItem in ds.Tables[2].Rows)
             {
@@ -3010,8 +3028,33 @@ namespace TimeSheets
 
                     if (myWorkDataTable.Rows.Count > 0)
                         ds.Tables[myworktableid].Rows.Add(myWorkDataTable.Rows[0].ItemArray);
+                    else
+                    {
+                        DataTable dtTSItem = new DataTable();
+
+                        SqlCommand cmdTSItem = new SqlCommand("select itm.WEB_UID,itm.LIST_UID, tm.SITE_UID, itm.ASSIGNEDTOID, itm.ITEM_ID, itm.PROJECT,itm.PROJECT_ID from TSITEM itm inner join TSTIMESHEET tm on tm.TS_UID = itm.TS_UID where itm.ITEM_ID=@ItemID", cn);
+                        cmdTSItem.Parameters.AddWithValue("@ItemID", Convert.ToString(drItem["ITEM_ID"]));
+
+                        SqlDataAdapter daTSItem = new SqlDataAdapter(cmdTSItem);
+                        daTSItem.Fill(dtTSItem);
+                        
+                        if (dtTSItem != null)
+                        {
+                            sql = string.Format(@"select '" + Convert.ToString(dtTSItem.Rows[0]["SITE_UID"]) + "' SiteId,'" + Convert.ToString(dtTSItem.Rows[0]["WEB_UID"]) + "' WebId,'" + Convert.ToString(dtTSItem.Rows[0]["LIST_UID"]) + "' ListId," + Convert.ToString(dtTSItem.Rows[0]["ITEM_ID"]) + " ItemId,null WebUrl,null Commenters,null CommentersRead,null CommentCount,null WorkspaceUrl,null ID,null Title,null _UIVersionString,null Attachments,null ItemChildCountID,null ItemChildCountText,null FolderChildCountID,null FolderChildCountText,null AppAuthorID,null AppAuthorText,null AppEditorID,null AppEditorText," + Convert.ToString(dtTSItem.Rows[0]["PROJECT_ID"]) + " ProjectID, '" + Convert.ToString(dtTSItem.Rows[0]["PROJECT"]) + "' ProjectText,null AssignedToID,null AssignedToText,null OwnerID,null OwnerText,null Status,null Priority,null Body,null ScheduleStatus,null PercentComplete,null Due,null StartDate,null ActualStart,null DueDate,null ActualFinish,null Work,null ActualWork,null RemainingWork,null TimesheetHours,null RemainingHours,null WorkPercentSpent,null WorkStatus,null taskorder,null TaskHierarchy,null Site,null DaysOverdue,null Complete,null Timesheet,null ContentType,null Modified,null Created,null AuthorID,null AuthorText,null EditorID,null EditorText,'Task Center' WorkType, null DataSource");
+                            myWorkDataTable = rptData.ExecuteSql(sql);
+
+                            if (myWorkDataTable.Rows.Count > 0)
+                            {
+                                ds.Tables[myworktableid].Rows.Add(myWorkDataTable.Rows[0].ItemArray);                                
+                                DataTable dt = ds.Tables[myworktableid];
+                                DataRow dr = dt.Rows[cnt];
+                                dr["IsDeleted"] = Convert.ToBoolean(true);
+                            }
+                        }
+                    }
 
                     drAdded.Add(drItem["LIST_UID"].ToString() + "." + drItem["ITEM_ID"].ToString());
+                    cnt++;
                 }
             }
 
