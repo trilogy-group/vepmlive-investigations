@@ -368,7 +368,7 @@ function TSOnMouseOverRow(grid, row, col, event) {
     if (grid.CurHoverRow != row.id) {
         grid.CurHoverRow = row.id;
         CurrentGrid = grid;
-        if (grid.GetValue(row, "ItemID") != "") {
+        if (grid.GetValue(row, "ItemID") != "" && grid.Rows[row.id].IsDeleted != "True") {
             grid.SetAttribute(row, "Title", "ButtonText", '<div class="gridmenuspan" style="position:absolute;overflow:visible" id=\"' + row.id + '\"><a data-itemid="' + grid.GetValue(row, "ItemID") + '" data-listid="' + grid.GetValue(row, "ListID") + '" data-webid="' + grid.GetValue(row, "WebID") + '" data-siteid="' + grid.GetValue(row, "SiteID") + '" ></a></div>', 1);
             window.epmLiveNavigation.addContextualMenu($('#' + row.id), [], false, true, { "delete": "GridGanttDeleteRow" });
         }
@@ -383,7 +383,7 @@ function TSDoubleClick(grid, row, col, x, y, event) {
     var newgridid = grid.id.substr(2);
     var newobj = eval("TSObject" + newgridid);
 
-    if (newobj.Status == "Unsubmitted")
+    if (newobj.Status == "Unsubmitted" && grid.Rows[row.id].IsDeleted != "True")
         EditGridRow(grid, row, col);
 }
 
