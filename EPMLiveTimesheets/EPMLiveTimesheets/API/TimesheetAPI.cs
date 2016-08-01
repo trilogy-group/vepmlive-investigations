@@ -2396,7 +2396,7 @@ namespace TimeSheets
                 if (Convert.ToBoolean(result["IsDeleted"]))
                 {
                     attr1 = docData.CreateAttribute("Title");
-                    attr1.Value = attr1.Value = "<span style=\"text-decoration:line-through\" >" + dr["Title"].ToString() + "</span>";
+                    attr1.Value = "<span style=\"text-decoration:line-through\" >" + dr["Title"].ToString() + "</span>";
                     ndCol.Attributes.Append(attr1);
                 }
                 else
