@@ -1443,7 +1443,7 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
             else {
 				weburl = weburl + "/_layouts/epmlive/gridaction.aspx?action=BuildTeam&webid=" + webid + "&ListId=" + listid + "&id=" + itemid + "&Source=" + document.location.href;
 
-				var options = { url: weburl, showMaximized: true, showClose: true, showClose: false };
+				var options = { url: weburl, showMaximized: true, showClose: false };
 
 				SP.UI.ModalDialog.showModalDialog(options);
             }
