@@ -730,9 +730,9 @@ u.GMDateRight,u.GMDefaultsRight,u.GMDefaultsSpaceRight { padding-right:0px; padd
 .GMDefaultsRight { background-position:right 0px; }
 .GMDefaultsSpaceLeft { background-position:left 0px; }
 .GMDefaultsSpaceRight { background-position:right 0px; }
-.GMEnumLeft { background-position:left -500px; padding-left:17px; }
-.GMEnumRight { background-position:right -500px; padding-right:17px; }
-u.GMEnumRight { padding-right:0px; padding-left:17px; }
+.GMEnumLeft { background-position:left -500px; padding-left:17px; background-image:url(Button.gif); background-repeat:no-repeat; }
+.GMEnumRight { background-position:right -500px; padding-right:17px; background-image:url(Button.gif); background-repeat:no-repeat; }
+u.GMEnumRight { padding-right:0px; padding-left:17px; background-image:url(Button.gif); background-repeat:no-repeat; }
 
 .GMRadio0Left,.GMRadio1Left,.GMRadio2Left,.GMRadio3Left { padding-left:17px; padding-top:2px; padding-right:3px; line-height:17px; }
 .GMRadio0Right,.GMRadio1Right,.GMRadio2Right,.GMRadio3Right { padding-right:17px; padding-top:2px; padding-left:3px; line-height:17px; }

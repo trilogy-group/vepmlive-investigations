@@ -216,7 +216,7 @@ WEDispFormPageComponent.PageComponent.prototype = {
                 alert("The team cannot be edited because the security queue job has not completed. This should be completed in less than a minute or so - please try again.");
             }
             else {
-                var options = { url: WEWebUrl + "/_layouts/epmlive/buildteam.aspx?listid=" + WEListId + "&id=" + WEItemId, title: "Build Team", showMaximized: true, dialogReturnValueCallback: this.NewItemCallback };
+                var options = { url: WEWebUrl + "/_layouts/epmlive/buildteam.aspx?listid=" + WEListId + "&id=" + WEItemId, title: "Build Team", showMaximized: true, showClose: false, dialogReturnValueCallback: this.NewItemCallback };
 
                 SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
             }

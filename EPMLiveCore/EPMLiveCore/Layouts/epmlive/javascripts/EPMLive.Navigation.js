@@ -1080,9 +1080,9 @@
 
                             if (!isResImportRunning && !isSecRunning) {
                                 if (callBackFunction != '')
-                                    SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', { url: redirectUrl, showMaximized: true, dialogReturnValueCallback: eval(callBackFunction) });
+                                    SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', { url: redirectUrl, showMaximized: true, showClose: false, dialogReturnValueCallback: eval(callBackFunction) });
                                 else
-                                    SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', { url: redirectUrl, showMaximized: true });
+                                    SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', { url: redirectUrl, showMaximized: true, showClose: false });
                                 return true;
                             }
                             else {

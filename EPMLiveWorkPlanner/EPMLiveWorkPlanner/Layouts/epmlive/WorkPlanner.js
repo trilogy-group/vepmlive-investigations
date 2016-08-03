@@ -3437,7 +3437,7 @@ function BuildTeam() {
         alert("The team cannot be edited because the security queue job has not completed. This should be completed in less than a minute or so - please try again.");
     }
     else {
-        var options = { url: "buildteam.aspx?listid=" + sProjectListId + "&id=" + sItemID, title: "Build Team", showMaximized: true, dialogReturnValueCallback: RefreshTeam };
+        var options = { url: "buildteam.aspx?listid=" + sProjectListId + "&id=" + sItemID, title: "Build Team", showMaximized: true, showClose: false, dialogReturnValueCallback: RefreshTeam };
 
         //var options = { url: "buildteam.aspx?useteam=" + bUseTeam + "&listid=" + sProjectListId + "&id=" + sItemID + "&nosave=true&currentteam=1", title: "Build Team", showMaximized: true, dialogReturnValueCallback: RefreshTeam };
 

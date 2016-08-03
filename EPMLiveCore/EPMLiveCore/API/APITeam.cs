@@ -1821,7 +1821,7 @@ namespace EPMLiveCore.API
                     //ndNew.Attributes.Append(attr);
 
                     attr = doc.CreateAttribute("Width");
-                    attr.Value = "150";
+                    attr.Value = "250";
                     ndNew.Attributes.Append(attr);
 
                     attr = doc.CreateAttribute("Visible");
@@ -1856,17 +1856,17 @@ namespace EPMLiveCore.API
                         nd.Attributes["Visible"].Value = "1";
                     }
 
-                    nd = doc.SelectSingleNode("//C[@Name='Role']");
-                    if (nd != null)
-                    {
-                        nd.Attributes["Visible"].Value = "1";
-                    }
+                    //nd = doc.SelectSingleNode("//C[@Name='Role']");
+                    //if (nd != null)
+                    //{
+                    //    nd.Attributes["Visible"].Value = "1";
+                    //}
 
-                    nd = doc.SelectSingleNode("//C[@Name='Email']");
-                    if (nd != null)
-                    {
-                        nd.Attributes["Visible"].Value = "1";
-                    }
+                    //nd = doc.SelectSingleNode("//C[@Name='Email']");
+                    //if (nd != null)
+                    //{
+                    //    nd.Attributes["Visible"].Value = "1";
+                    //}
 
                     string enums = "";
                     string enumkeys = "";
