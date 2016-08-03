@@ -95,6 +95,7 @@ namespace EPMLiveWebParts
             ScriptLink.Register(Page, "/_layouts/epmlive/DHTML/xgrid/dhtmlxgrid.js", false);
             ScriptLink.Register(Page, "/_layouts/epmlive/DHTML/xgrid/dhtmlxgridcell.js", false);
             ScriptLink.Register(Page, "/_layouts/epmlive/DHTML/xtreegrid/dhtmlxtreegrid.js", false);
+            ScriptLink.Register(Page, "/_layouts/epmlive/javascripts/BtnChangeApp.js", false);
         }
 
         protected override void RenderWebPart(HtmlTextWriter output)
@@ -112,7 +113,7 @@ namespace EPMLiveWebParts
                     output.Write("<table height=\"100%\" border=\"0\" width=\"95\" cellspacing=\"0\" onmouseover=\"MMU_EcbTableMouseOverOut(this, true)\" hoverActive=\"ms-splitbuttonhover\" hoverInactive=\"ms-splitbutton\" downArrowTitle=\"Add Workspace\">");
                     output.Write("<tr>");
                     output.Write("<td valign=\"middle\" class=\"ms-splitbuttontext\">");
-                    SPList pcList = cWeb.Lists.TryGetList("Project Center");
+                    SPList pcList = cWeb.Lists.TryGetList("Template Gallery");
                     string createNewWorkspaceUrl = cWeb.ServerRelativeUrl + "/_layouts/epmlive/createnewworkspace.aspx?list=" + pcList.ID.ToString("B") + "&type=site&source=" + HttpContext.Current.Request.Url.AbsoluteUri;
                     string href = "javascript:var options = { url:'" + createNewWorkspaceUrl + "', width: 800, height:600, title: 'Create', dialogReturnValueCallback : Function.createDelegate(null, HandleCreateNewWorkspaceCreate) }; SP.UI.ModalDialog.showModalDialog(options); return false;";
                     output.Write("<a href=\"#\" onclick = \"" + href + "\">New Workspace</a>");
