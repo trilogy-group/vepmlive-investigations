@@ -1687,6 +1687,7 @@ namespace RPADataCache
                         rFull.actual.AddRange(orfull.actual);
                         rFull.personel.AddRange(orfull.personel);
                         rFull.scheduled.AddRange(orfull.scheduled);
+                        rFull.proposal.AddRange(orfull.proposal);
                     }
 
                     if (m_rolelist.TryGetValue(orfull.resavail.RoleID, out rFull) == false && orfull.resavail.RoleID != 0)    // first for the role
@@ -1706,6 +1707,7 @@ namespace RPADataCache
                         rFull.actual.AddRange(orfull.actual);
                         rFull.personel.AddRange(orfull.personel);
                         rFull.scheduled.AddRange(orfull.scheduled);
+                        rFull.proposal.AddRange(orfull.proposal);
                     }
                 }
             }

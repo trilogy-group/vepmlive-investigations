@@ -1943,7 +1943,6 @@ namespace RPADataCache
 
                         xI.CreateStringAttr("P" + oPer.PeriodID.ToString() + "H", cellval);
                     }
-
                     cnt = 0;
                     foreach (RPATGRow ot in disp)
                     {
@@ -2114,7 +2113,6 @@ namespace RPADataCache
                         if (ot.fid <= 0)
                         {
                             xval = GetPIDataValue(oRFull, oDet, iMode, i, ot.fid, xLi, bUseHeatmap, iHeatMapID, projectId, by_role);
-                            //xval = GetDataValue(oRFull, ot.fid, iMode, i, true, iHeatMapID);
                             cellval = "";
 
                             if (iMode == 0)
@@ -2180,7 +2178,6 @@ namespace RPADataCache
             double vval = 0;
             double fval = 0;
 
-
             if (fid == 0)
             {
                 vval = oDet.tot_Totals.getvarr(i);
@@ -2213,12 +2210,14 @@ namespace RPADataCache
             }
             else if (fid == -6)
             {
-                vval = oDet.tot_avail.getvarr(i);
-                fval = oDet.tot_avail.getftarr(i);
+                for (int idx = 0; idx < oDet.PIList.Count; idx++)
+                {
+                    vval += oDet.tot_avail.getvarr(i);
+                    fval += oDet.tot_avail.getftarr(i);
+                }
             }
             else if (fid == -7)
             {
-
                 if (bForHeatmap)
                 {
                     vval = oDet.tot_Totals.getvarr(i);
@@ -2226,8 +2225,13 @@ namespace RPADataCache
                 }
                 else
                 {
-                    vval = oDet.tot_avail.getvarr(i) - oDet.tot_Totals.getvarr(i);
-                    fval = oDet.tot_avail.getftarr(i) - oDet.tot_Totals.getftarr(i);
+                    for (int idx = 0; idx < oDet.PIList.Count; idx++)
+                    {
+                        vval += oDet.tot_avail.getvarr(i);
+                        fval += oDet.tot_avail.getftarr(i);
+                    }
+                    vval -= oDet.tot_Totals.getvarr(i);
+                    fval -= oDet.tot_Totals.getftarr(i);
                 }
             }
             else if (fid == -8)
@@ -2285,14 +2289,11 @@ namespace RPADataCache
                     fval = oDet.CapScen[iHeatmapID - 1].getftarr(i) - oDet.tot_Totals.getftarr(i);
                 }
             }
-
-
             else if (fid > 0 && fid <= oDet.CapScen.Count)
             {
                 vval = oDet.CapScen[fid - 1].getvarr(i);
                 fval = oDet.CapScen[fid - 1].getftarr(i);
-            };
-
+            }
 
             if (iMode == 3)
             {
@@ -2305,8 +2306,6 @@ namespace RPADataCache
                 retval = vval;
             else
                 retval = fval;
-
-
 
             if (iMode == 1)
                 retval /= 100;
@@ -2352,69 +2351,63 @@ namespace RPADataCache
             double vval = 0;
             double fval = 0;
 
-            //if (byRole)
-            //{
-            //    retval = GetDataValue(oFullData, fid, iMode, i, bUseHeatmap, iHeatMapID);
-            //}
-            //else
+            try
             {
-                try
+                if (fid == 0)
                 {
-                    if (fid == 0)
+                    vval = oDet.getvarr(i);
+                    fval = oDet.getftarr(i);
+                }
+                else if (fid == -1)
+                {
+                    //Actual Work equals Timesheet Actuals entered.
+                    if (oFullData.actual.Count > 0)
                     {
-                        vval = oDet.getvarr(i);
-                        fval = oDet.getftarr(i);
-                    }
-                    else if (fid == -1)
-                    {
-                        //Actual Work equals Timesheet Actuals entered.
-
-                        if (oFullData.actual.Count > 0)
+                        idx = -1;
+                        if (byRole)
                         {
-                            idx = -1;
-                            if (byRole)
+                            for (int counter = 0; counter < oFullData.actual.Count; counter++)
                             {
-                                for (int counter = 0; counter < oFullData.actual.Count; counter++)
+                                if (oFullData.actual[counter].ProjectID == projectId)
                                 {
-                                    if (oFullData.actual[counter].ProjectID == projectId)
-                                    {
-                                        idx = counter;
-                                        vval += Convert.ToDouble(oFullData.actual[idx].WrkHours[i]);
-                                        fval += Convert.ToDouble(oFullData.actual[idx].FTEVals[i]);
-                                    }
+                                    idx = counter;
+                                    vval += Convert.ToDouble(oFullData.actual[idx].WrkHours[i]);
+                                    fval += Convert.ToDouble(oFullData.actual[idx].FTEVals[i]);
                                 }
-                                if (idx == -1)
+                            }
+                            if (idx == -1)
+                            {
+                                vval = fval = 0;
+                            }
+                        }
+                        else
+                        {
+                            for (int counter = 0; counter < oFullData.actual.Count; counter++)
+                            {
+                                if (oFullData.actual[counter].ProjectID == projectId)
                                 {
-                                    vval = fval = 0;
+                                    idx = counter;
+                                    break;
                                 }
+                            }
+                            if (idx == -1)
+                            {
+                                vval = fval = 0;
                             }
                             else
                             {
-                                for (int counter = 0; counter < oFullData.actual.Count; counter++)
-                                {
-                                    if (oFullData.actual[counter].ProjectID == projectId)
-                                    {
-                                        idx = counter;
-                                        break;
-                                    }
-                                }
-                                if (idx == -1)
-                                {
-                                    vval = fval = 0;
-                                }
-                                else
-                                {
-                                    vval = Convert.ToDouble(oFullData.actual[idx].WrkHours[i]);
-                                    fval = Convert.ToDouble(oFullData.actual[idx].FTEVals[i]);
-                                }
+                                vval = Convert.ToDouble(oFullData.actual[idx].WrkHours[i]);
+                                fval = Convert.ToDouble(oFullData.actual[idx].FTEVals[i]);
                             }
-
-                           
                         }
                     }
-                    else if (fid == -2)
+                }
+                else if (fid == -2)
+                {
+                    //Proposed Work equals resource planned work that has not yet been committed.
+                    if (oFullData.proposal.Count > 0)
                     {
-                        //Proposed Work equals resource planned work that has not yet been committed.
+                        idx = -1;
                         if (byRole)
                         {
                             for (int counter = 0; counter < oFullData.proposal.Count; counter++)
@@ -2433,211 +2426,185 @@ namespace RPADataCache
                         }
                         else
                         {
-                            if (oFullData.proposal.Count > 0)
+                            for (int counter = 0; counter < oFullData.proposal.Count; counter++)
                             {
-                                idx = -1;
-                                for (int counter = 0; counter < oFullData.proposal.Count; counter++)
+                                if (oFullData.proposal[counter].ProjectID == projectId)
                                 {
-                                    if (oFullData.proposal[counter].ProjectID == projectId)
-                                    {
-                                        idx = counter;
-                                        break;
-                                    }
+                                    idx = counter;
+                                    break;
                                 }
-                                if (idx == -1)
-                                {
-                                    vval = fval = 0;
-                                }
-                                else
-                                {
-                                    vval = Convert.ToDouble(oFullData.proposal[idx].WrkHours[i]);
-                                    fval = Convert.ToDouble(oFullData.proposal[idx].FTEVals[i]);
-                                }
+                            }
+                            if (idx == -1)
+                            {
+                                vval = fval = 0;
+                            }
+                            else
+                            {
+                                vval = Convert.ToDouble(oFullData.proposal[idx].WrkHours[i]);
+                                fval = Convert.ToDouble(oFullData.proposal[idx].FTEVals[i]);
                             }
                         }
                     }
-                    else if (fid == -3)
+                }
+                else if (fid == -3)
+                {
+                    //Scheduled Work equals the work allocation pulled in from the designated work lists, such as Task Center, Issues, Risks, etc..
+                    if (byRole)
                     {
-                        //Scheduled Work equals the work allocation pulled in from the designated work lists, such as Task Center, Issues, Risks, etc..
-                        if (byRole)
+                        for (int counter = 0; counter < oFullData.scheduled.Count; counter++)
                         {
+                            if (oFullData.scheduled[counter].ProjectID == projectId)
+                            {
+                                idx = counter;
+                                vval += Convert.ToDouble(oFullData.scheduled[idx].WrkHours[i]);
+                                fval += Convert.ToDouble(oFullData.scheduled[idx].FTEVals[i]);
+                            }
+                        }
+                        if (idx == -1)
+                        {
+                            vval = fval = 0;
+                        }
+                    }
+                    else
+                    {
+                        if (oFullData.scheduled.Count > 0)
+                        {
+                            idx = -1;
                             for (int counter = 0; counter < oFullData.scheduled.Count; counter++)
                             {
                                 if (oFullData.scheduled[counter].ProjectID == projectId)
                                 {
                                     idx = counter;
-                                    vval += Convert.ToDouble(oFullData.scheduled[idx].WrkHours[i]);
-                                    fval += Convert.ToDouble(oFullData.scheduled[idx].FTEVals[i]);
+                                    break;
                                 }
                             }
                             if (idx == -1)
                             {
                                 vval = fval = 0;
                             }
-                        }
-                        else
-                        {
-                            if (oFullData.scheduled.Count > 0)
+                            else
                             {
-                                idx = -1;
-                                for (int counter = 0; counter < oFullData.scheduled.Count; counter++)
-                                {
-                                    if (oFullData.scheduled[counter].ProjectID == projectId)
-                                    {
-                                        idx = counter;
-                                        break;
-                                    }
-                                }
-                                if (idx == -1)
-                                {
-                                    vval = fval = 0;
-                                }
-                                else
-                                {
-                                    vval = Convert.ToDouble(oFullData.scheduled[idx].WrkHours[i]);
-                                    fval = Convert.ToDouble(oFullData.scheduled[idx].FTEVals[i]);
-                                }
+                                vval = Convert.ToDouble(oFullData.scheduled[idx].WrkHours[i]);
+                                fval = Convert.ToDouble(oFullData.scheduled[idx].FTEVals[i]);
                             }
                         }
                     }
-                    else if (fid == -4)
+                }
+                else if (fid == -4)
+                {
+                    //Committed Work equals the hours in resource plans that have been committed.
+                    if (byRole)
                     {
-                        //Committed Work equals the hours in resource plans that have been committed.
-                        //vval = Convert.ToDouble(oFullData.committed[idx].WrkHours[i]);
-                        //fval = Convert.ToDouble(oFullData.committed[idx].FTEVals[i]);
-                        if (byRole)
+                        for (int counter = 0; counter < oFullData.committed.Count; counter++)
                         {
+                            if (oFullData.committed[counter].ProjectID == projectId)
+                            {
+                                idx = counter;
+                                vval += Convert.ToDouble(oFullData.committed[idx].WrkHours[i]);
+                                fval += Convert.ToDouble(oFullData.committed[idx].FTEVals[i]);
+                            }
+                        }
+                        if (idx == -1)
+                        {
+                            vval = fval = 0;
+                        }
+                    }
+                    else
+                    {
+                        if (oFullData.committed.Count > 0)
+                        {
+                            idx = -1;
                             for (int counter = 0; counter < oFullData.committed.Count; counter++)
                             {
                                 if (oFullData.committed[counter].ProjectID == projectId)
                                 {
                                     idx = counter;
-                                    vval += Convert.ToDouble(oFullData.committed[idx].WrkHours[i]);
-                                    fval += Convert.ToDouble(oFullData.committed[idx].FTEVals[i]);
+                                    break;
                                 }
                             }
                             if (idx == -1)
                             {
                                 vval = fval = 0;
                             }
-                        }
-                        else
-                        {
-                            if (oFullData.committed.Count > 0)
+                            else
                             {
-                                idx = -1;
-                                for (int counter = 0; counter < oFullData.committed.Count; counter++)
-                                {
-                                    if (oFullData.committed[counter].ProjectID == projectId)
-                                    {
-                                        idx = counter;
-                                        break;
-                                    }
-                                }
-                                if (idx == -1)
-                                {
-                                    vval = fval = 0;
-                                }
-                                else
-                                {
-                                    vval = Convert.ToDouble(oFullData.committed[idx].WrkHours[i]);
-                                    fval = Convert.ToDouble(oFullData.committed[idx].FTEVals[i]);
-                                }
+                                vval = Convert.ToDouble(oFullData.committed[idx].WrkHours[i]);
+                                fval = Convert.ToDouble(oFullData.committed[idx].FTEVals[i]);
                             }
                         }
                     }
-                    else if (fid == -5)
+                }
+                else if (fid == -5)
+                {
+                    //Personal Time Off pulls in the hours entered into the Time Off Requests.
+                    if (byRole)
                     {
-                        //Personal Time Off pulls in the hours entered into the Time Off Requests.
-                        //vval = Convert.ToDouble(oFullData.personel[idx].WrkHours[i]);
-                        //fval = Convert.ToDouble(oFullData.personel[idx].FTEVals[i]);
-                        if (byRole)
+                        for (int counter = 0; counter < oFullData.personel.Count; counter++)
                         {
+                            if (oFullData.personel[counter].ProjectID == projectId)
+                            {
+                                idx = counter;
+                                vval += Convert.ToDouble(oFullData.personel[idx].WrkHours[i]);
+                                fval += Convert.ToDouble(oFullData.personel[idx].FTEVals[i]);
+                            }
+                        }
+                        if (idx == -1)
+                        {
+                            vval = fval = 0;
+                        }
+                    }
+                    else
+                    {
+                        if (oFullData.personel.Count > 0)
+                        {
+                            idx = -1;
                             for (int counter = 0; counter < oFullData.personel.Count; counter++)
                             {
                                 if (oFullData.personel[counter].ProjectID == projectId)
                                 {
                                     idx = counter;
-                                    vval += Convert.ToDouble(oFullData.personel[idx].WrkHours[i]);
-                                    fval += Convert.ToDouble(oFullData.personel[idx].FTEVals[i]);
+                                    break;
                                 }
                             }
                             if (idx == -1)
                             {
                                 vval = fval = 0;
                             }
-                        }
-                        else
-                        {
-                            if (oFullData.personel.Count > 0)
+                            else
                             {
-                                idx = -1;
-                                for (int counter = 0; counter < oFullData.personel.Count; counter++)
-                                {
-                                    if (oFullData.personel[counter].ProjectID == projectId)
-                                    {
-                                        idx = counter;
-                                        break;
-                                    }
-                                }
-                                if (idx == -1)
-                                {
-                                    vval = fval = 0;
-                                }
-                                else
-                                {
-                                    vval = Convert.ToDouble(oFullData.personel[idx].WrkHours[i]);
-                                    fval = Convert.ToDouble(oFullData.personel[idx].FTEVals[i]);
-                                }
+                                vval = Convert.ToDouble(oFullData.personel[idx].WrkHours[i]);
+                                fval = Convert.ToDouble(oFullData.personel[idx].FTEVals[i]);
                             }
                         }
                     }
-                    else if (fid == -6)
-                    {
-                        //Availability equals the number of work hours each resource is available for each calendar period (monthly/weekly/quarterly/etc.). 
-                        //It is important to note that this is resource specific based on each resource’s work hours schedule.
-                        //vval = Convert.ToDouble(oFullData.avail[idx].WrkHours[i]);
-                        //fval = Convert.ToDouble(oFullData.avail[idx].FTEVals[i]);
-                        vval = oFullData.tot_avail.getvarr(i);
-                        fval = oFullData.tot_avail.getftarr(i);
-                        //if (oFullData.avail.Count > 0)
-                        //{
-                        //    idx = -1;
-                        //    for (int counter = 0; counter < oFullData.avail.Count; counter++)
-                        //    {
-                        //        if (oFullData.avail[counter].ProjectID == projectId)
-                        //        {
-                        //            idx = counter;
-                        //            break;
-                        //        }
-                        //    }
-                        //    if (idx == -1)
-                        //    {
-                        //        vval = fval = 0;
-                        //    }
-                        //    else
-                        //    {
-                        //        vval = Convert.ToDouble(oFullData.avail[idx].WrkHours[i]);
-                        //        fval = Convert.ToDouble(oFullData.avail[idx].FTEVals[i]);
-                        //    }
-                        //}
+                }
+                else if (fid == -6)
+                {
+                    //Availability equals the number of work hours each resource is available for each calendar period (monthly/weekly/quarterly/etc.). 
+                    //It is important to note that this is resource specific based on each resource’s work hours schedule.
+                    vval = oFullData.tot_avail.getvarr(i);
+                    fval = oFullData.tot_avail.getftarr(i);
+                }
+                else if (fid == -7)
+                {
+                    //Remaining Availability equals Availability minus any committed and scheduled work.
+                    double totWrkHrs = 0, totFTEHrs = 0;
+                    double avlWrkHrs = 0, avlFTEHrs = 0;
 
-                    }
-                    else if (fid == -7)
+                    if (oDet.ProjectID == projectId)
                     {
-                        //Remaining Availability equals Availability minus any committed and scheduled work.
-                        double cmtdWrkHrs = 0, cmtdFTEHrs = 0;
-                        double schdlWrkHrs = 0, schdFTEHrs = 0;
-                        double avlWrkHrs = 0, avlFTEHrs = 0;
-
-                        if (oDet.ProjectID == projectId)
+                        if (byRole)
+                        {
+                            avlWrkHrs = oFullData.tot_avail.getvarr(i);
+                            avlFTEHrs = oFullData.tot_avail.getftarr(i);
+                        }
+                        else
                         {
                             if (oFullData.avail.Count > 0)
                             {
                                 idx = 0;
                                 for (int counter = 0; counter < oFullData.avail.Count; counter++)
                                 {
-                                    double temp = oFullData.resavail.getvarr(i);
                                     if (oFullData.avail[counter].ProjectID == projectId)
                                     {
                                         idx = counter;
@@ -2654,83 +2621,42 @@ namespace RPADataCache
                                     avlFTEHrs = Convert.ToDouble(oFullData.avail[idx].FTEVals[i]);
                                 }
                             }
-                            if (oFullData.committed.Count > 0)
-                            {
-                                idx = -1;
-                                for (int counter = 0; counter < oFullData.committed.Count; counter++)
-                                {
-                                    if (oFullData.committed[counter].ProjectID == projectId)
-                                    {
-                                        idx = counter;
-                                        break;
-                                    }
-                                }
-                                if (idx == -1)
-                                {
-                                    cmtdWrkHrs = cmtdFTEHrs = 0;
-                                }
-                                else
-                                {
-                                    cmtdWrkHrs = Convert.ToDouble(oFullData.committed[idx].WrkHours[i]);
-                                    cmtdFTEHrs = Convert.ToDouble(oFullData.committed[idx].FTEVals[i]);
-                                }
-                            }
-                            if (oFullData.scheduled.Count > 0)
-                            {
-                                idx = -1;
-                                for (int counter = 0; counter < oFullData.scheduled.Count; counter++)
-                                {
-                                    if (oFullData.scheduled[counter].ProjectID == projectId)
-                                    {
-                                        idx = counter;
-                                        break;
-                                    }
-                                }
-                                if (idx == -1)
-                                {
-                                    schdlWrkHrs = schdFTEHrs = 0;
-                                }
-                                else
-                                {
-                                    schdlWrkHrs = Convert.ToDouble(oFullData.scheduled[idx].WrkHours[i]);
-                                    schdFTEHrs = Convert.ToDouble(oFullData.scheduled[idx].FTEVals[i]);
-                                }
-                            }
-                            vval = avlWrkHrs - (cmtdWrkHrs + schdlWrkHrs);
-                            fval = avlFTEHrs - (cmtdFTEHrs + schdFTEHrs);
-                            //vval = (Convert.ToDouble(oFullData.avail[idx].WrkHours[i]) - (Convert.ToDouble(oFullData.committed[idx].WrkHours[i]) + Convert.ToDouble(oFullData.scheduled[idx].WrkHours[i])));
-                            //fval = (Convert.ToDouble(oFullData.avail[idx].FTEVals[i]) - (Convert.ToDouble(oFullData.committed[idx].FTEVals[i]) + Convert.ToDouble(oFullData.scheduled[idx].FTEVals[i])));
                         }
-                    }
-                    else if (fid > 0 && fid <= oFullData.CapScen.Count)
-                    {
-                        vval = oFullData.CapScen[fid - 1].getvarr(i);
-                        fval = oFullData.CapScen[fid - 1].getftarr(i);
-                    }
 
-                    if (iMode == 3)
-                    {
-                        if (fval == 0)
-                            retval = 0;
-                        else
-                            retval = (vval * 100) / fval;
+                        totWrkHrs = oDet.getvarr(i);
+                        totFTEHrs = oDet.getftarr(i);
+
+                        vval = avlWrkHrs - totWrkHrs;
+                        fval = avlFTEHrs - totFTEHrs;
                     }
-                    else if (iMode == 0)
-                        retval = vval;
-                    else
-                        retval = fval;
-
-                    if (iMode == 1)
-                        retval /= 100;
-
-                    return retval;
                 }
-                catch { return 0; }
-            }
-            return retval;
-        }
+                else if (fid > 0 && fid <= oFullData.CapScen.Count)
+                {
+                    vval = oFullData.CapScen[fid - 1].getvarr(i);
+                    fval = oFullData.CapScen[fid - 1].getftarr(i);
+                }
 
+                if (iMode == 3)
+                {
+                    if (fval == 0)
+                        retval = 0;
+                    else
+                        retval = (vval * 100) / fval;
+                }
+                else if (iMode == 0)
+                    retval = vval;
+                else
+                    retval = fval;
+
+                if (iMode == 1)
+                    retval /= 100;
+
+                return retval;
+            }
+            catch { return 0; }
+        }
     }
+
     internal class RPATargetGrid
     {
         private CStruct xGrid;
