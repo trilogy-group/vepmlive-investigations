@@ -78,7 +78,7 @@ namespace WE_QueueMgr
                     foreach (QMSite site in sites)
                     {
                         string sXML = BuildProductInfoString(site);
-                        new LogService(sXML).TraceLog("OnStart", (StatusEnum)999, "Service Started for : " + site.basePath);
+                        new LogService(sXML).TraceLog("OnStart", (StatusEnum)0, "Service Started for : " + site.basePath);
                         try
                         {
                             if (site.basePath != string.Empty && site.connection != string.Empty)
@@ -257,7 +257,7 @@ namespace WE_QueueMgr
                         foreach (QMSite site in sites)
                         {
                             string sXML = BuildProductInfoString(site);
-                            new LogService(sXML).TraceLog("ServiceTimer_Tick", (StatusEnum)999, "");
+                            new LogService(sXML).TraceLog("ServiceTimer_Tick", (StatusEnum)0, "");
                             try
                             {
                                 {
@@ -311,14 +311,14 @@ namespace WE_QueueMgr
                     if (slc.Contains("<error") == true || slc.Contains("<status>0</status>") == false)
                     {
 
-                        new LogService(sXML).TraceStatusError("ManageTimerJobs", (StatusEnum)999, "PfE Queue Manager (FA3) - ManageTimerJobs Error basePath : " + site.basePath + "\nReply : " + s);
+                        new LogService(sXML).TraceStatusError("ManageTimerJobs", (StatusEnum)100, "PfE Queue Manager (FA3) - ManageTimerJobs Error basePath : " + site.basePath + "\nReply : " + s);
                         EventLog.WriteEntry("PfE Queue Manager (FA3) - ManageTimerJobs Error", "basePath : " + site.basePath + "\nReply : " + s, EventLogEntryType.Error);
                     }
                 }
                 catch (Exception ex)
                 {
 
-                    new LogService(sXML).TraceStatusError("ManageTimerJobs - " + site.basePath, (StatusEnum)999, ex);
+                    new LogService(sXML).TraceStatusError("ManageTimerJobs - " + site.basePath, (StatusEnum)100, ex);
                     ExceptionHandler("ManageTimerJobs - " + site.basePath, ex);
                 }
             }
@@ -334,7 +334,7 @@ namespace WE_QueueMgr
                     PortfolioEngineCore.QueueManager qm = new QueueManager(sXML);
                     if (qm.ReadNextQueuedItem() == true)
                     {
-                        new LogService(sXML).TraceLog("ManageQueue", (StatusEnum)999, "Queue Manager Next item found for  site : " + site.basePath);
+                        new LogService(sXML).TraceLog("ManageQueue", (StatusEnum)0, "Queue Manager Next item found for  site : " + site.basePath);
                         // we have a queued item - try to handle it in portfolioenginecore first
                         if (qm.ManageQueue() == false) // false means not handled
                         {
@@ -361,7 +361,7 @@ namespace WE_QueueMgr
                                     comObject = null;
                                     if (s.Contains("<Error"))
                                     {
-                                        new LogService(sXML).TraceStatusError("ManageQueue", (StatusEnum)999, "PfE Queue Manager (FA3) - ManageQueue Error basePath : " + site.basePath + "\nReply : " + s);
+                                        new LogService(sXML).TraceStatusError("ManageQueue", (StatusEnum)99, "PfE Queue Manager (FA3) - ManageQueue Error basePath : " + site.basePath + "\nReply : " + s);
                                         EventLog.WriteEntry("PfE Queue Manager (FA3) - ManageQueue Error", "basePath : " + site.basePath + "\nReply : " + s, EventLogEntryType.Error);
                                     }
                                     break;
@@ -373,7 +373,7 @@ namespace WE_QueueMgr
                 catch (Exception ex)
                 {
                     string sXML = BuildProductInfoString(site);
-                    new LogService(sXML).TraceStatusError("ManageQueue exception thrown for " + site.basePath, (StatusEnum)999, ex);
+                    new LogService(sXML).TraceStatusError("ManageQueue exception thrown for " + site.basePath, (StatusEnum)99, ex);
                     ExceptionHandler("ManageQueue - " + site.basePath, ex);
                 }
             }
