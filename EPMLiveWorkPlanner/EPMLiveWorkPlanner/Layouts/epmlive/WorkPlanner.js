@@ -3900,7 +3900,6 @@ function SetPlannerFieldValue(row, col, val, setVal) {
         DoAssignmentRollDown(grid, row, 0, "PercentComplete");
         DoAssignmentRollDown(grid, row, 0, "Complete");
         grid.RefreshCell(row, "ScheduleStatus");
-        RollupSummaryStatus(row);
     }
 
     if (col == "PercentComplete") {
@@ -3908,7 +3907,6 @@ function SetPlannerFieldValue(row, col, val, setVal) {
         DoAssignmentRollDown(grid, row, 0, "Status");
         DoAssignmentRollDown(grid, row, 0, "Complete");
         grid.RefreshCell(row, "ScheduleStatus");
-        RollupSummaryStatus(row);
     }
 
     if (col == "Complete") {
@@ -3944,20 +3942,6 @@ function SetPlannerFieldValue(row, col, val, setVal) {
                     RollupAssignments(row.parentNode, "DueDate", oRollUp["DueDate"]);
             }
         }
-    }
-}
-
-function RollupSummaryStatus(row) {
-    var grid = Grids.WorkPlannerGrid;
-    while (row.parentNode != null && row.parentNode.PercentComplete != null) {
-        if (row.parentNode.PercentComplete == 100)
-            grid.SetValue(row.parentNode, "Status", "Completed", 1, 0);
-        else if (row.parentNode.PercentComplete == 0)
-            grid.SetValue(row.parentNode, "Status", "Not Started", 1, 0);
-        else if (row.parentNode.PercentComplete > 0 && row.parentNode.PercentComplete < 100)
-            grid.SetValue(row.parentNode, "Status", "In Progress", 1, 0);
-        grid.RefreshCell(row, "ScheduleStatus");
-        row = row.parentNode;
     }
 }
 
