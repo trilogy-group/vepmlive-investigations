@@ -19,7 +19,7 @@ namespace PortfolioEngineCore
 {
     public class AllWorkhours
     {
-        
+
         private Dictionary<int, Dictionary<DayOfWeek, double>> m_WorkHours;
         private Dictionary<int, Dictionary<int, double>> m_HolidayHours;
         private double[] work;
@@ -65,10 +65,12 @@ namespace PortfolioEngineCore
                         holidays = new Dictionary<int, double>();
                     }
                     // hit a problem here when (in error) we had more than one holidy specification for the same date
-                    if (!holidays.ContainsKey(days)) holidays.Add(days, dHours);  // using (days since 1900) as the index into the holiday hours - seemed like fun and better than a date
+                    if (!holidays.ContainsKey(days))
+                        holidays.Add(days, dHours);  // using (days since 1900) as the index into the holiday hours - seemed like fun and better than a date
                     prevgroupid = groupid;
                 }
-                if (prevgroupid > 0) m_HolidayHours.Add(prevgroupid, holidays);
+                if (prevgroupid > 0)
+                    m_HolidayHours.Add(prevgroupid, holidays);
             }
         }
 
@@ -92,7 +94,8 @@ namespace PortfolioEngineCore
         {
             TimeSpan span = finishdate.Date.Subtract(startdate.Date);
             int days = span.Days + 1;
-            if (days <= 0) return false;
+            if (days <= 0)
+                return false;
 
             //work = null;
             work = new double[days];
@@ -119,7 +122,8 @@ namespace PortfolioEngineCore
                 if (haveholidays)
                 {
                     work[index] = work[index] - GetHolidayHours(l_HolidayHours, thisDate);
-                    if (work[index] < 0) work[index] = 0;
+                    if (work[index] < 0)
+                        work[index] = 0;
                 }
                 totalhours += work[index];
                 thisDate = thisDate.AddDays(1);
@@ -137,7 +141,8 @@ namespace PortfolioEngineCore
             double remainder = (hours * 100) - totalhours;
             for (int i = 0; i < work.Length; i++)
             {
-                if (remainder == 0) break;
+                if (remainder == 0)
+                    break;
                 if (work[i] > 0)
                 {
                     work[i] += remainder;
@@ -161,19 +166,22 @@ namespace PortfolioEngineCore
         public bool Getwork(int index, out double hours)
         {
             hours = 0;
-            if (work.Length <= 0) return false;
-            if (!(index < work.Length)) return false;
+            if (work.Length <= 0)
+                return false;
+            if (!(index < work.Length))
+                return false;
 
             hours = work[index];
             return true;
         }
 
         // figure working hours for a target range
-        public double workhours(int workhourgroup, int holidaygroup, DateTime startdate, DateTime finishdate)
+        public double workhours(int workhourgroup, int holidaygroup, DateTime startdate, DateTime finishdate, bool deductHolidays = true)
         {
             TimeSpan span = finishdate.Date.Subtract(startdate.Date);
             int days = span.Days + 1;
-            if (days <= 0) return 0;
+            if (days <= 0)
+                return 0;
 
             Dictionary<DayOfWeek, double> l_workHours = null;
             if (workhourgroup < 0 || !m_WorkHours.TryGetValue(workhourgroup, out l_workHours))
@@ -194,10 +202,11 @@ namespace PortfolioEngineCore
             while (thisDate <= finishdate)
             {
                 hours = l_workHours[thisDate.DayOfWeek];
-                if (hours > 0 && haveholidays)
+                if (hours > 0 && haveholidays && deductHolidays)
                 {
                     hours = hours - GetHolidayHours(l_HolidayHours, thisDate);
-                    if (hours < 0) hours = 0;
+                    if (hours < 0)
+                        hours = 0;
                 }
                 totalhours += hours;
                 thisDate = thisDate.AddDays(1);
@@ -209,7 +218,8 @@ namespace PortfolioEngineCore
         {
             TimeSpan span = finishdate.Date.Subtract(startdate.Date);
             int days = span.Days + 1;
-            if (days <= 0) return 0;
+            if (days <= 0)
+                return 0;
 
             Dictionary<DayOfWeek, double> l_workHours = null;
             if (workhourgroup < 0 || !m_WorkHours.TryGetValue(workhourgroup, out l_workHours))
@@ -232,7 +242,8 @@ namespace PortfolioEngineCore
                 if (haveholidays)
                 {
                     hours = GetHolidayHours(l_HolidayHours, thisDate);
-                    if (hours < 0) hours = 0;
+                    if (hours < 0)
+                        hours = 0;
                 }
                 totalhours += hours;
                 thisDate = thisDate.AddDays(1);
