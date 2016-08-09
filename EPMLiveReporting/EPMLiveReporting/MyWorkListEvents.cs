@@ -136,7 +136,8 @@ namespace EPMLiveReportsAdmin
             }
             catch { }
 
-            if (dt.Rows.Count <= 1) return res;
+            if (dt.Rows.Count <= 1)
+                return res;
 
             string sIds = dt.Rows.Cast<DataRow>().Aggregate("", (current, r) => current + (r["AssignedToID"] + ","));
 
@@ -194,7 +195,8 @@ namespace EPMLiveReportsAdmin
             {
                 _listName = properties.ListTitle;
 
-                if (_listName.Equals("My Work")) return false;
+                if (_listName.Equals("My Work"))
+                    return false;
 
                 _siteId = properties.SiteId;
                 _listId = properties.ListId;
@@ -207,9 +209,10 @@ namespace EPMLiveReportsAdmin
 
                 _currentValues = GetItemFieldValueFromDB(properties.ListId.ToString(), properties.ListItemId.ToString());
 
-                if (!populateColumns) return true;
+                if (!populateColumns)
+                    return true;
 
-                _defaultColumns = new ArrayList {"siteid", "webid", "listid", "itemid", "weburl"};
+                _defaultColumns = new ArrayList { "siteid", "webid", "listid", "itemid", "weburl" };
                 _mandatoryHiddenFlds = new ArrayList
                 {
                     "commenters",
@@ -221,7 +224,7 @@ namespace EPMLiveReportsAdmin
                 _listColumns = _myWorkReportData.GetListColumns("My Work");
                 _listColumns = _listColumns.DefaultView.ToTable(true,
                     (from DataColumn dataColumn in _listColumns.Columns
-                        select dataColumn.ColumnName).ToArray());
+                     select dataColumn.ColumnName).ToArray());
 
                 return true;
             }
@@ -238,11 +241,12 @@ namespace EPMLiveReportsAdmin
         {
             string sql = GetSql("INSERT");
 
-            if (string.IsNullOrEmpty(sql)) return;
+            if (string.IsNullOrEmpty(sql))
+                return;
 
             foreach (
                 string stmt in
-                    sql.Split(new[] {"!-x-x-x-x-x-!"}, StringSplitOptions.None)
+                    sql.Split(new[] { "!-x-x-x-x-x-!" }, StringSplitOptions.None)
                         .Where(stmt => !_myWorkReportData.InsertListItem(stmt)))
             {
                 _myWorkReportData.LogStatus(_myWorkReportData.GetListId(_listName), _listName.Replace("'", string.Empty),
@@ -262,7 +266,7 @@ namespace EPMLiveReportsAdmin
             string result = string.Empty;
             try
             {
-                result = i[fldName].ToString();
+                result = Convert.ToString(i[fldName]);
             }
             catch { }
 
@@ -277,9 +281,10 @@ namespace EPMLiveReportsAdmin
         /// <param name="eventSource">The event source.</param>
         private void LogEvent(Exception exception, int eventId, string eventSource)
         {
-            if (!EventLog.SourceExists(eventSource)) EventLog.CreateEventSource(eventSource, "EPM Live");
+            if (!EventLog.SourceExists(eventSource))
+                EventLog.CreateEventSource(eventSource, "EPM Live");
 
-            var eventLog = new EventLog("EPM Live", ".", eventSource) {MaximumKilobytes = 32768};
+            var eventLog = new EventLog("EPM Live", ".", eventSource) { MaximumKilobytes = 32768 };
 
             eventLog.WriteEntry(
                 string.Format("Name: {0} Url: {1} ID: {2} : {3} {4}", _siteName, _siteUrl, _siteId, exception.Message,
@@ -292,6 +297,10 @@ namespace EPMLiveReportsAdmin
             bool bHasChangedAssignedTo = false;
             bool bHasChangedStartDate = false;
             bool bHasChangedDueDate = false;
+
+            Guid siteId = _siteId;
+            Guid listId = _listItem.ParentList.ID;
+            string listTitle = _listItem.ParentList.Title;
 
             try
             {
@@ -350,14 +359,17 @@ namespace EPMLiveReportsAdmin
                                     List<int> lIdsAfter = lookupValAfter.Select(v => v.LookupId).ToList();
 
                                     bool execute = false;
-                                    if (lIdsBefore.Count() != lIdsAfter.Count()) execute = true;
+                                    if (lIdsBefore.Count() != lIdsAfter.Count())
+                                        execute = true;
                                     else
                                     {
                                         bool containsAll = lIdsBefore.All(lIdsAfter.Contains);
-                                        if (!containsAll) execute = true;
+                                        if (!containsAll)
+                                            execute = true;
                                     }
 
-                                    if (execute) bHasChangedAssignedTo = true;
+                                    if (execute)
+                                        bHasChangedAssignedTo = true;
                                 }
                                 break;
                         }
@@ -389,7 +401,8 @@ namespace EPMLiveReportsAdmin
                                             .ToUniversalTime()
                                             .Date;
 
-                                    if (dateBefore != dateAfter) bHasChangedStartDate = true;
+                                    if (dateBefore != dateAfter)
+                                        bHasChangedStartDate = true;
                                 }
                                 break;
                         }
@@ -419,7 +432,8 @@ namespace EPMLiveReportsAdmin
                                             .ToUniversalTime()
                                             .Date;
 
-                                    if (dueDateBefore != dueDateAfter) bHasChangedDueDate = true;
+                                    if (dueDateBefore != dueDateAfter)
+                                        bHasChangedDueDate = true;
                                 }
                                 break;
                         }
@@ -427,22 +441,23 @@ namespace EPMLiveReportsAdmin
                     catch { }
                 }
 
-                Guid siteId = _siteId;
-                Guid listId = _listItem.ParentList.ID;
 
-                if (!bHasChangedWork && !bHasChangedAssignedTo && !bHasChangedStartDate && !bHasChangedDueDate) return;
+
+                if (!bHasChangedWork && !bHasChangedAssignedTo && !bHasChangedStartDate && !bHasChangedDueDate)
+                    return;
 
                 if (_myWorkReportData.ProcessAssignments(sWork.Replace("'", ""), sAssignedTo, startDate, dueDate,
-                    listId, siteId, _listItem.ID, _listItem.ParentList.Title)) return;
+                    listId, siteId, _listItem.ID, listTitle))
+                    return;
 
-                _myWorkReportData.LogStatus(string.Empty, string.Empty, "SaveWork() failed.",
+                _myWorkReportData.LogStatus(Convert.ToString(listId), listTitle, "SaveWork() failed.",
                     _myWorkReportData.GetError().Replace("'", ""), 2, 3, string.Empty);
             }
             catch (Exception ex)
             {
-                _myWorkReportData.LogStatus(string.Empty, string.Empty,
-                    "SaveWork() failed. Web: " + _listItem.ParentList.ParentWeb.Title + ". List: " +
-                    _listItem.ParentList.Title + ". Item: " + _listItem.Title + ".", ex.Message.Replace("'", ""), 2, 3,
+                _myWorkReportData.LogStatus(Convert.ToString(listId), listTitle,
+                    string.Format("SaveWork() failed. Web: {0} List: {1} Item: {2} ", _listItem.ParentList.ParentWeb.Title,
+                    listTitle, _listItem.Title, ex.Message.Replace("'", "")), ex.StackTrace.Replace("'", ""), 2, 3,
                     string.Empty);
             }
         }

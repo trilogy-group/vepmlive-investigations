@@ -47,7 +47,7 @@ namespace EPMLiveCore.ReportHelper
         public EPMData(Guid siteID)
         {
             _siteID = siteID;
-            SPSecurity.RunWithElevatedPrivileges(delegate()
+            SPSecurity.RunWithElevatedPrivileges(delegate ()
             {
                 using (var spSite = new SPSite(siteID))
                 {
@@ -73,7 +73,7 @@ namespace EPMLiveCore.ReportHelper
         public EPMData(bool tmp, Guid siteID, Guid webId)
         {
             _siteID = siteID;
-            SPSecurity.RunWithElevatedPrivileges(delegate()
+            SPSecurity.RunWithElevatedPrivileges(delegate ()
             {
                 using (var spSite = new SPSite(siteID))
                 {
@@ -144,7 +144,7 @@ namespace EPMLiveCore.ReportHelper
             _username = username;
             _password = password;
 
-            SPSecurity.RunWithElevatedPrivileges(delegate()
+            SPSecurity.RunWithElevatedPrivileges(delegate ()
             {
                 using (var spSite = new SPSite(siteID))
                 {
@@ -162,68 +162,122 @@ namespace EPMLiveCore.ReportHelper
 
         public string UserName
         {
-            get { return _username; }
-            set { _username = value; }
+            get
+            {
+                return _username;
+            }
+            set
+            {
+                _username = value;
+            }
         }
 
         public string Password
         {
-            get { return _password; }
-            set { _password = value; }
+            get
+            {
+                return _password;
+            }
+            set
+            {
+                _password = value;
+            }
         }
 
         public bool UseSqlAccount
         {
-            get { return _useSAccount; }
-            set { _useSAccount = value; }
+            get
+            {
+                return _useSAccount;
+            }
+            set
+            {
+                _useSAccount = value;
+            }
         }
 
         public Guid SiteId
         {
-            get { return _siteID; }
+            get
+            {
+                return _siteID;
+            }
         }
 
         public string Command
         {
-            get { return _command; }
-            set { _command = value; }
+            get
+            {
+                return _command;
+            }
+            set
+            {
+                _command = value;
+            }
         }
 
         public bool EPMLiveConOpen
         {
-            get { return _epmLiveConOpen; }
+            get
+            {
+                return _epmLiveConOpen;
+            }
         }
 
         public CommandType CommandType
         {
-            get { return _commandType; }
-            set { _commandType = value; }
+            get
+            {
+                return _commandType;
+            }
+            set
+            {
+                _commandType = value;
+            }
         }
 
         public List<SqlParameter> Params
         {
-            get { return _params; }
-            set { _params = value; }
+            get
+            {
+                return _params;
+            }
+            set
+            {
+                _params = value;
+            }
         }
 
         public string SqlError
         {
-            get { return _sqlError; }
+            get
+            {
+                return _sqlError;
+            }
         }
 
         public bool SqlErrorOccurred
         {
-            get { return _sqlErrorOccurred; }
+            get
+            {
+                return _sqlErrorOccurred;
+            }
         }
 
         public string SiteName
         {
-            get { return _siteName; }
+            get
+            {
+                return _siteName;
+            }
         }
 
         public string SiteUrl
         {
-            get { return _siteUrl; }
+            get
+            {
+                return _siteUrl;
+            }
         }
 
         /// <summary>
@@ -242,7 +296,7 @@ namespace EPMLiveCore.ReportHelper
                 catch (Exception ex)
                 {
                     _epmLiveConOpen = false;
-                    SPSecurity.RunWithElevatedPrivileges(delegate()
+                    SPSecurity.RunWithElevatedPrivileges(delegate ()
                     {
                         if (!EventLog.SourceExists("EPMLive Reporting - GetEPMLiveConnection"))
                             EventLog.CreateEventSource("EPMLive Reporting - GetEPMLiveConnection", "EPM Live");
@@ -272,7 +326,7 @@ namespace EPMLiveCore.ReportHelper
                 }
                 catch (Exception ex)
                 {
-                    SPSecurity.RunWithElevatedPrivileges(delegate()
+                    SPSecurity.RunWithElevatedPrivileges(delegate ()
                     {
                         if (!EventLog.SourceExists("EPMLive Reporting - GetClientReportingConnection"))
                             EventLog.CreateEventSource("EPMLive Reporting - GetClientReportingConnection", "EPM Live");
@@ -303,7 +357,7 @@ namespace EPMLiveCore.ReportHelper
                 catch (Exception ex)
                 {
                     _sqlError = ex.Message;
-                    SPSecurity.RunWithElevatedPrivileges(delegate()
+                    SPSecurity.RunWithElevatedPrivileges(delegate ()
                     {
                         if (!EventLog.SourceExists("EPMLive Reporting - GetMasterDbConnection"))
                             EventLog.CreateEventSource("EPMLive Reporting - GetMasterDbConnection", "EPM Live");
@@ -340,7 +394,7 @@ namespace EPMLiveCore.ReportHelper
                 catch (Exception ex)
                 {
                     _epmLiveConOpen = false;
-                    SPSecurity.RunWithElevatedPrivileges(delegate()
+                    SPSecurity.RunWithElevatedPrivileges(delegate ()
                     {
                         if (!EventLog.SourceExists("EPMLive Reporting - OpenEPMLiveConnection"))
                             EventLog.CreateEventSource("EPMLive Reporting - OpenEPMLiveConnection", "EPM Live");
@@ -389,7 +443,7 @@ namespace EPMLiveCore.ReportHelper
                 {
                     if (_databaseName != null && _databaseName != string.Empty)
                     {
-                        SPSecurity.RunWithElevatedPrivileges(delegate()
+                        SPSecurity.RunWithElevatedPrivileges(delegate ()
                         {
                             if (!EventLog.SourceExists("EPMLive Reporting - OpenClientReportingConnection"))
                                 EventLog.CreateEventSource("EPMLive Reporting - OpenClientReportingConnection",
@@ -438,7 +492,7 @@ namespace EPMLiveCore.ReportHelper
                     _sqlError = ex.Message;
                     if (_masterCs != null && _masterCs != string.Empty)
                     {
-                        SPSecurity.RunWithElevatedPrivileges(delegate()
+                        SPSecurity.RunWithElevatedPrivileges(delegate ()
                         {
                             if (!EventLog.SourceExists("EPMLive Reporting - OpenMasterDbConnection"))
                                 EventLog.CreateEventSource("EPMLive Reporting - OpenMasterDbConnection", "EPM Live");
@@ -458,28 +512,40 @@ namespace EPMLiveCore.ReportHelper
         /// </summary>
         public string remoteCs
         {
-            get { return _remoteCs; }
+            get
+            {
+                return _remoteCs;
+            }
         }
 
         /// <summary>
         /// </summary>
         public string masterCs
         {
-            get { return _masterCs; }
+            get
+            {
+                return _masterCs;
+            }
         }
 
         /// <summary>
         /// </summary>
         public string remoteDbName
         {
-            get { return _databaseName; }
+            get
+            {
+                return _databaseName;
+            }
         }
 
         /// <summary>
         /// </summary>
         public string remoteServerName
         {
-            get { return _databaseServer; }
+            get
+            {
+                return _databaseServer;
+            }
         }
 
         #region IDisposable Members
@@ -684,7 +750,7 @@ namespace EPMLiveCore.ReportHelper
             }
             catch (Exception ex)
             {
-                SPSecurity.RunWithElevatedPrivileges(delegate()
+                SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
                     if (!EventLog.SourceExists("EPMLive Reporting - UpdateForeignKeys"))
                         EventLog.CreateEventSource("EPMLive Reporting - UpdateForeignKeys", "EPM Live");
@@ -749,7 +815,7 @@ namespace EPMLiveCore.ReportHelper
             }
             catch (Exception ex)
             {
-                SPSecurity.RunWithElevatedPrivileges(delegate()
+                SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
                     if (!EventLog.SourceExists("EPMLive Reporting - UpdateForeignKeys"))
                         EventLog.CreateEventSource("EPMLive Reporting - UpdateForeignKeys", "EPM Live");
@@ -981,7 +1047,7 @@ namespace EPMLiveCore.ReportHelper
             }
             catch (SqlException ex)
             {
-                SPSecurity.RunWithElevatedPrivileges(delegate()
+                SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
                     if (!EventLog.SourceExists("EPMLive Reporting - ExecuteScalar"))
                         EventLog.CreateEventSource("EPMLive Reporting - ExecuteScalar", "EPM Live");
@@ -1039,7 +1105,7 @@ namespace EPMLiveCore.ReportHelper
             }
             catch (SqlException ex)
             {
-                SPSecurity.RunWithElevatedPrivileges(delegate()
+                SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
                     if (!EventLog.SourceExists("EPMLive Reporting - ExecuteNonQuery"))
                         EventLog.CreateEventSource("EPMLive Reporting - ExecuteNonQuery", "EPM Live");
@@ -1088,10 +1154,10 @@ namespace EPMLiveCore.ReportHelper
 
                 //EPML-4329 : Added check for document type and if title is null then title will be same as file name.
                 try
-                {                    
+                {
                     if (Convert.ToString(command.Parameters["@ContentType"].Value).ToLower().Equals("document"))
                     {
-                        if(string.IsNullOrEmpty(Convert.ToString(command.Parameters["@Title"].Value)))
+                        if (string.IsNullOrEmpty(Convert.ToString(command.Parameters["@Title"].Value)))
                             command.Parameters["@Title"].Value = command.Parameters["@FileLeafRef"].Value;
                         isDocumenttypeProcessing = true;
                     }
@@ -1128,7 +1194,7 @@ namespace EPMLiveCore.ReportHelper
             catch (SqlException ex)
             {
                 //Add Error Handling HERE
-                SPSecurity.RunWithElevatedPrivileges(delegate()
+                SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
                     if (!EventLog.SourceExists("EPMLive Reporting - ExecuteNonQuery"))
                         EventLog.CreateEventSource("EPMLive Reporting - ExecuteNonQuery", "EPM Live");
@@ -1200,7 +1266,7 @@ namespace EPMLiveCore.ReportHelper
             }
             catch (SqlException ex)
             {
-                SPSecurity.RunWithElevatedPrivileges(delegate()
+                SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
                     if (!EventLog.SourceExists("EPMLive Reporting - GetTable"))
                         EventLog.CreateEventSource("EPMLive Reporting - GetTable", "EPM Live");
@@ -1631,8 +1697,7 @@ namespace EPMLiveCore.ReportHelper
                         {
                             tx.Dispose();
                             //Log status
-                            LogStatus(string.Empty, string.Empty,
-                                "Refresh not completed due errors." + ex.Message.Replace("'", ""),
+                            LogStatus(string.Empty, string.Empty, string.Format("Bulk Insert {0} Refresh not completed due errors. {1} ", dtList.TableName, ex.Message.Replace("'", "")),
                                 ex.StackTrace.Replace("'", ""), 2, 3, string.Empty);
                             // - CAT.NET false-positive: All single quotes are escaped/removed.
                         }
@@ -1703,8 +1768,7 @@ namespace EPMLiveCore.ReportHelper
                         catch (Exception ex)
                         {
                             tx.Dispose();
-                            LogStatus(string.Empty, string.Empty,
-                                "Refresh not completed due errors." + ex.Message.Replace("'", ""),
+                            LogStatus(string.Empty, string.Empty, string.Format("Bulk Insert {0} Refresh not completed due errors. {1} ", dtList.TableName, ex.Message.Replace("'", "")),
                                 ex.StackTrace.Replace("'", ""), 2, 3, timerjobguid.ToString());
                             // - CAT.NET false-positive: All single quotes are escaped/removed.
                         }
@@ -1721,7 +1785,7 @@ namespace EPMLiveCore.ReportHelper
                     tx.Dispose();
                 }
                 catch (Exception ex1) { }
-                LogStatus(string.Empty, string.Empty, "Refresh not completed due errors." + ex.Message.Replace("'", ""),
+                LogStatus(string.Empty, string.Empty, string.Format("Bulk Insert Refresh not completed due errors. {0} ", ex.Message.Replace("'", "")),
                     ex.StackTrace.Replace("'", ""), 2, 3, timerjobguid.ToString());
                 // - CAT.NET false-positive: All single quotes are escaped/removed.
             }
@@ -2045,7 +2109,7 @@ namespace EPMLiveCore.ReportHelper
             }
             catch (Exception ex)
             {
-                SPSecurity.RunWithElevatedPrivileges(delegate()
+                SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
                     if (!EventLog.SourceExists("EPMLive Reporting - GetClientReportingConnection(Guid siteId)"))
                         EventLog.CreateEventSource("EPMLive Reporting - GetClientReportingConnection(Guid siteId)",
@@ -2421,53 +2485,39 @@ namespace EPMLiveCore.ReportHelper
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
-        public bool SaveWork(SPListItem item, bool forceAdd = true)
+        public bool SaveWork(SPListItem item)
         {
             bool blnWorkSaved = true;
             bool hasWork = false, hasAssignedTo = false, hasStartDate = false, hasDueDate = false;
-
             try
             {
-                string sWork = item["Work"].ToString();
-
                 if (ItemHasValue(item, "Work"))
                 {
                     hasWork = true;
                 }
-
-                string sAssignedTo = ReportData.AddLookUpFieldValues(item["AssignedTo"].ToString(), "id");
 
                 if (ItemHasValue(item, "AssignedTo"))
                 {
                     hasAssignedTo = true;
                 }
 
-                object startDate = DateTime.Parse(item["StartDate"].ToString());
-
                 if (ItemHasValue(item, "StartDate"))
                 {
-                    try
-                    {
-                        hasStartDate = true;
-                    }
-                    catch (Exception ex) { }
+                    hasStartDate = true;
                 }
-
-                object dueDate = DateTime.Parse(item["DueDate"].ToString());
 
                 if (ItemHasValue(item, "DueDate"))
                 {
-                    try
-                    {
-                        hasDueDate = true;
-                    }
-                    catch (Exception ex) { }
+                    hasDueDate = true;
                 }
 
-                Guid listId = item.ParentList.ID;
-
-                if (forceAdd || (hasWork && hasAssignedTo && hasStartDate && hasDueDate))
+                if (hasWork && hasAssignedTo && hasStartDate && hasDueDate)
                 {
+                    Guid listId = item.ParentList.ID;
+                    string sWork = Convert.ToString(item["Work"]);
+                    string sAssignedTo = ReportData.AddLookUpFieldValues(Convert.ToString(item["AssignedTo"]), "id");
+                    object startDate = DateTime.Parse(Convert.ToString(item["StartDate"]));
+                    object dueDate = DateTime.Parse(Convert.ToString(item["DueDate"]));
                     if (!ProcessAssignments(sWork, sAssignedTo, startDate, dueDate, listId, _siteID, item.ID,
                             item.ParentList.Title))
                     {
@@ -2711,7 +2761,7 @@ namespace EPMLiveCore.ReportHelper
         private bool GrantUserDbAccess()
         {
             string un = string.Empty;
-            SPSecurity.RunWithElevatedPrivileges(delegate()
+            SPSecurity.RunWithElevatedPrivileges(delegate ()
             {
                 using (var site = new SPSite(_siteID))
                 {
@@ -2917,7 +2967,7 @@ namespace EPMLiveCore.ReportHelper
             string test = string.Empty;
             try
             {
-                test = item[fldName].ToString();
+                test = Convert.ToString(item[fldName]);
             }
             catch { }
 

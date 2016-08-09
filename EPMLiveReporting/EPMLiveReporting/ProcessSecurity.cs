@@ -30,13 +30,13 @@ namespace EPMLiveReportsAdmin
             }
 
             var dt = new DataTable();
-            var dc = new DataColumn("RPTGROUPUSERID") {DataType = Type.GetType("System.Guid")};
+            var dc = new DataColumn("RPTGROUPUSERID") { DataType = Type.GetType("System.Guid") };
             dt.Columns.Add(dc);
-            dc = new DataColumn("SITEID") {DataType = Type.GetType("System.Guid")};
+            dc = new DataColumn("SITEID") { DataType = Type.GetType("System.Guid") };
             dt.Columns.Add(dc);
-            dc = new DataColumn("GROUPID") {DataType = Type.GetType("System.Int32")};
+            dc = new DataColumn("GROUPID") { DataType = Type.GetType("System.Int32") };
             dt.Columns.Add(dc);
-            dc = new DataColumn("USERID") {DataType = Type.GetType("System.Int32")};
+            dc = new DataColumn("USERID") { DataType = Type.GetType("System.Int32") };
             dt.Columns.Add(dc);
 
             if (users != "")
@@ -69,13 +69,13 @@ namespace EPMLiveReportsAdmin
                 {
                     foreach (SPUser u in group.Users)
                     {
-                        dt.Rows.Add(new object[] {Guid.NewGuid(), site.ID, group.ID, u.ID});
+                        dt.Rows.Add(new object[] { Guid.NewGuid(), site.ID, group.ID, u.ID });
                     }
                 }
 
                 foreach (SPUser u in from SPUser u in site.RootWeb.SiteUsers where u.IsSiteAdmin select u)
                 {
-                    dt.Rows.Add(new object[] {Guid.NewGuid(), site.ID, 999999, u.ID});
+                    dt.Rows.Add(new object[] { Guid.NewGuid(), site.ID, 999999, u.ID });
                 }
             }
 
@@ -96,17 +96,17 @@ namespace EPMLiveReportsAdmin
             }
 
             var dt = new DataTable();
-            var dc = new DataColumn("RPTIEMGROUPID") {DataType = Type.GetType("System.Guid")};
+            var dc = new DataColumn("RPTIEMGROUPID") { DataType = Type.GetType("System.Guid") };
             dt.Columns.Add(dc);
-            dc = new DataColumn("SITEID") {DataType = Type.GetType("System.Guid")};
+            dc = new DataColumn("SITEID") { DataType = Type.GetType("System.Guid") };
             dt.Columns.Add(dc);
-            dc = new DataColumn("LISTID") {DataType = Type.GetType("System.Guid")};
+            dc = new DataColumn("LISTID") { DataType = Type.GetType("System.Guid") };
             dt.Columns.Add(dc);
-            dc = new DataColumn("ITEMID") {DataType = Type.GetType("System.Int32")};
+            dc = new DataColumn("ITEMID") { DataType = Type.GetType("System.Int32") };
             dt.Columns.Add(dc);
-            dc = new DataColumn("GROUPID") {DataType = Type.GetType("System.Int32")};
+            dc = new DataColumn("GROUPID") { DataType = Type.GetType("System.Int32") };
             dt.Columns.Add(dc);
-            dc = new DataColumn("SECTYPE") {DataType = Type.GetType("System.Int32")};
+            dc = new DataColumn("SECTYPE") { DataType = Type.GetType("System.Int32") };
             dt.Columns.Add(dc);
 
             SPSecurity.RunWithElevatedPrivileges(delegate
@@ -122,24 +122,28 @@ namespace EPMLiveReportsAdmin
 
                     foreach (SPListItem li in liCol)
                     {
-                        foreach (SPRoleAssignment ra in from SPRoleAssignment ra in li.RoleAssignments
-                            let found =
-                                ra.RoleDefinitionBindings.Cast<SPRoleDefinition>()
-                                    .Any(
-                                        def =>
-                                            (def.BasePermissions & SPBasePermissions.ViewListItems) ==
-                                            SPBasePermissions.ViewListItems)
-                            where found
-                            select ra)
+                        try
                         {
-                            dt.Rows.Add(new object[]
+                            foreach (SPRoleAssignment ra in from SPRoleAssignment ra in li.RoleAssignments
+                                                            let found =
+                                                                ra.RoleDefinitionBindings.Cast<SPRoleDefinition>()
+                                                                    .Any(
+                                                                        def =>
+                                                                            (def.BasePermissions & SPBasePermissions.ViewListItems) ==
+                                                                            SPBasePermissions.ViewListItems)
+                                                            where found
+                                                            select ra)
                             {
+                                dt.Rows.Add(new object[]
+                                {
                                 Guid.NewGuid(), site.ID, list.ID, li.ID,
                                 ra.Member.ID, ((ra.Member is SPGroup) ? 1 : 0)
-                            });
-                        }
+                                });
+                            }
 
-                        dt.Rows.Add(new object[] {Guid.NewGuid(), site.ID, list.ID, li.ID, 999999, 1});
+                            dt.Rows.Add(new object[] { Guid.NewGuid(), site.ID, list.ID, li.ID, 999999, 1 });
+                        }
+                        catch { }
                     }
 
                     using (var bulkCopy = new SqlBulkCopy(cn))

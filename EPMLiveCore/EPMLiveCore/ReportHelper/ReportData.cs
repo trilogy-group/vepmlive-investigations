@@ -2831,7 +2831,7 @@ namespace EPMLiveCore.ReportHelper
             string test = string.Empty;
             try
             {
-                test = item[colName].ToString();
+                test = Convert.ToString(item[colName]);
             }
             catch { }
 

@@ -1471,7 +1471,7 @@ namespace EPMLiveCore
                 try
                 {
                     SPFarm farm = SPFarm.Local;
-                    cn = farm.Properties[setting].ToString();
+                    cn = Convert.ToString(farm.Properties[setting]);
                 }
                 catch { }
             });
