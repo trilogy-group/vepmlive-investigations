@@ -3205,13 +3205,13 @@ function getHTML(grid, row, col, val) {
 }
 
 function EnterButton(grid) {
+
+    if (bFilter)
+        grid.ActionFilterOn();
+    else
+        grid.ActionFilterOff();
+
     if (grid.FRow.id != 'Filter') {
-
-        if (bFilter)
-            grid.ActionFilterOn();
-        else
-            grid.ActionFilterOff();
-
         var row = grid.FRow;
         if (row != null) {
             grid.EndEdit(true);
@@ -3231,13 +3231,7 @@ function EnterButton(grid) {
                 grid.Focus(newtask, grid.FCol, null, 1);
             }
         }
-    }
-    else {
-        if (bFilter)
-            grid.ActionFilterOn();
-        else
-            grid.ActionFilterOff();
-    }
+    }    
 }
 
 function SetRowRollDowns(grid, row) {
