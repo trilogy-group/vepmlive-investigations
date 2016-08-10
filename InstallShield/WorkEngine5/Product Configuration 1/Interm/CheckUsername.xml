@@ -1,1 +1,0 @@
-<EntryPoint Assembly="UserNameChecker" Resource="4097" Type="UserNameChecker" Method="CheckUsername" Return="VALIDPWD"><Param>[PUSERNAME]</Param><Param>[PPASSWORD]</Param></EntryPoint>
