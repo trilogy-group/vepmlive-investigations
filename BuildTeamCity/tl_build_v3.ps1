@@ -3,7 +3,6 @@
 
 # ### Define user adjustable parameters
 
-
 param (
     # MSBuild - which configuration to build
     [string]$ConfigurationToBuild = "Release",
@@ -16,7 +15,6 @@ param (
     # should build cleanup be performed before making build
     [string]$CleanBuild = $true
 );
-
 
 $projectsToBePackaged = @("EPMLiveCore","EPMLiveDashboards","EPMLiveIntegrationService",
                             "EPMLivePS","EPMLiveReporting","EPMLiveSynch",
@@ -96,11 +94,11 @@ function UpdateCommonAssemblyInfo($SourcesDirectoryPath) {
 function ZipFiles( $zipfilename, $sourcedir )
 {
    Log-SubSection "Zipping $sourcedir to $zipfilename"
-
-   Add-Type -Assembly System.IO.Compression.FileSystem
+   
+   If(Test-path $zipfilename) {Remove-item $zipfilename}
    $compressionLevel = [System.IO.Compression.CompressionLevel]::Optimal
-   [System.IO.Compression.ZipFile]::CreateFromDirectory($sourcedir,
-        $zipfilename, $compressionLevel, $false)
+   Add-Type -Assembly System.IO.Compression.FileSystem
+   [System.IO.Compression.ZipFile]::CreateFromDirectory($sourcedir,  $zipfilename, $compressionLevel,  $true)
 }
 
 $BuildDirectory = "$ScriptDir\..\..\"
@@ -372,7 +370,7 @@ Get-ChildItem -Path ($ProductOutput + "\*")  -Include "EPMLiveTimerService.exe" 
 
 Log-Section "Zipping"
 Rename-Item -Path "$BinariesDirectory\_PublishedWebsites\EPMLiveIntegrationService" -NewName "api"
-ZipFiles("$SourcesDirectory\InstallShield\Build Dependencies\api.zip", "$BinariesDirectory\_PublishedWebsites\api")
+ZipFiles "$SourcesDirectory\InstallShield\Build Dependencies\api.zip"  "$BinariesDirectory\_PublishedWebsites\api"
 
 Log-Section "Install Shield"
 
