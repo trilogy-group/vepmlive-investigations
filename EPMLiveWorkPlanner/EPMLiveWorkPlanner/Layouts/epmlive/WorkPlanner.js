@@ -3205,8 +3205,13 @@ function getHTML(grid, row, col, val) {
 }
 
 function EnterButton(grid) {
-    if (!bFilter) {
-        grid.ActionFilterOff();
+    if (grid.FRow.id != 'Filter') {
+
+        if (bFilter)
+            grid.ActionFilterOn();
+        else
+            grid.ActionFilterOff();
+
         var row = grid.FRow;
         if (row != null) {
             grid.EndEdit(true);
@@ -3228,7 +3233,10 @@ function EnterButton(grid) {
         }
     }
     else {
-        grid.ActionFilterOn();
+        if (bFilter)
+            grid.ActionFilterOn();
+        else
+            grid.ActionFilterOff();
     }
 }
 
