@@ -3130,10 +3130,10 @@ function getHTML(grid, row, col, val) {
                     if (row.id == "NewTask" || row.id == "0")
                         return "";
 
-                    if (grid.GetValue(row, "Status") == "Completed") {
+                    if (grid.GetValue(row, "Status").trim() == "Completed") {
                         val = "<img src='/_layouts/images/checkmark.gif' alt='Completed'>";
                     }
-                    else if (grid.GetValue(row, "Status") == "Deferred") {
+                    else if (grid.GetValue(row, "Status").trim() == "Deferred") {
                         val = "<img src='/_layouts/images/green.gif' alt='On Schedule'>";
                     }
                     else {
@@ -3412,6 +3412,8 @@ function SetPercent(percent) {
         row = grid.GetRowById(row.id);
         try {
             grid.SetValue(row, "PercentComplete", percent, 1);
+            WEStatusCalculatePercentComplete(grid, row, percent);            
+            grid.RefreshCell(row, "ScheduleStatus");
         } catch (e) { }
     }
 }
@@ -3897,7 +3899,7 @@ function SetPlannerFieldValue(row, col, val, setVal) {
         RollDown(row, col);
 
     if (col == "Status") {
-        WEStatusCalculateStatus(grid, row, val);
+        WEStatusCalculateStatus(grid, row, val.trim());
         DoAssignmentRollDown(grid, row, 0, "PercentComplete");
         DoAssignmentRollDown(grid, row, 0, "Complete");
         grid.RefreshCell(row, "ScheduleStatus");
@@ -3989,7 +3991,7 @@ function WEStatusCalculateComplete(grid, row, val) {
 
 function WEStatusCalculatePercentComplete(grid, row, val) {
     _WEStatus_PercentComplete = val;
-    _WEStatus_Status = grid.GetValue(row, "Status");
+    _WEStatus_Status = grid.GetValue(row, "Status").trim();
     ProcessPercentComplete();
     try {
         grid.SetValue(row, "Complete", _WEStatus_Complete, 1, 0);
