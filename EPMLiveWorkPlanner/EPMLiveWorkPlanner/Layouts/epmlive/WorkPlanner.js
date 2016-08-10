@@ -30,6 +30,7 @@ var bCalcWork = false;
 var iWorkHours = 8;
 
 var canShowDetails = false;
+var bFilter = false;
 
 var divsaveTemplateDiv;
 
@@ -1591,14 +1592,16 @@ function iChangeView(view, bHide) {
             if (filters[0] == "1" || filters[0] == "true") {
                 grid.ShowRow(grid.GetRowById("Filter"));
                 setButtonStateOn("Ribbon.WorkViews.WorkViewsGroup.ShowFilters-Medium");
+                bFilter = true;
             }
             else {
                 grid.HideRow(grid.GetRowById("Filter"));
                 setButtonStateOff("Ribbon.WorkViews.WorkViewsGroup.ShowFilters-Medium");
+                bFilter = false;
             }
         } catch (e) { }
         if (filters[0] == "1")
-            grid.ChangeFilter(filters[1], filters[2], filters[3], 0, 0, null);
+            grid.ChangeFilter(filters[1], filters[2], filters[3], 0, 0, null);        
         else
             grid.ActionFilterOff();
     }
@@ -1781,7 +1784,7 @@ function onSaveViewClose(dialogResult, returnValue) {
             //===========Detail===========
             var details = !dhxLayout.cells(detailsCell).isCollapsed();
             //==========Allocation=========
-            //var allocation = !dhxLayout.cells(allocCell).isCollapsed();
+            var allocation = false;
             //============Summary=========
             var summary = grid.GetRowById("0").Visible.toString();
             //============Assignedments=====
@@ -1912,10 +1915,12 @@ function ShowFilters() {
         if (row.Visible) {
             setButtonStateOff("Ribbon.WorkViews.WorkViewsGroup.ShowFilters-Medium");
             grid.HideRow(row);
+            bFilter = false;
         }
         else {
             setButtonStateOn("Ribbon.WorkViews.WorkViewsGroup.ShowFilters-Medium");
             grid.ShowRow(row);
+            bFilter = true;
         }
     } catch (e) { }
 }
@@ -3200,24 +3205,30 @@ function getHTML(grid, row, col, val) {
 }
 
 function EnterButton(grid) {
-    var row = grid.FRow;
-    if (row != null) {
-        grid.EndEdit(true);
-        var cRow = grid.GetNext(row);
-        while (cRow && !cRow.Visible) {
-            cRow = grid.GetNext(cRow);
-        }
-        if (cRow && cRow.Def.Name == "Folder")
-            cRow = null;
+    if (!bFilter) {
+        grid.ActionFilterOff();
+        var row = grid.FRow;
+        if (row != null) {
+            grid.EndEdit(true);
+            var cRow = grid.GetNext(row);
+            while (cRow && !cRow.Visible) {
+                cRow = grid.GetNext(cRow);
+            }
+            if (cRow && cRow.Def.Name == "Folder")
+                cRow = null;
 
-        if (cRow) {
-            grid.Focus(cRow, grid.FCol, null, 1);
-        }
-        else {
-            var newtask = grid.GetRowById(NewTask());
+            if (cRow) {
+                grid.Focus(cRow, grid.FCol, null, 1);
+            }
+            else {
+                var newtask = grid.GetRowById(NewTask());
 
-            grid.Focus(newtask, grid.FCol, null, 1);
+                grid.Focus(newtask, grid.FCol, null, 1);
+            }
         }
+    }
+    else {
+        grid.ActionFilterOn();
     }
 }
 

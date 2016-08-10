@@ -1512,6 +1512,13 @@
             //CopySummaryField(col);
 
             //grid.DoFilter();
+            
+            if(bFilter){
+                grid.ActionFilterOn();                
+            }
+            else{
+                grid.ActionFilterOff();
+            }	
 
             RefreshCommandUI();
         }
