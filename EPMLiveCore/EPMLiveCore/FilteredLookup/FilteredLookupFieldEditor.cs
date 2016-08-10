@@ -109,8 +109,8 @@ namespace EPMLiveCore {
       string referrer = this.Request.Url.AbsoluteUri;
       
       if (!string.IsNullOrEmpty(referrer)) {
-        if (referrer.IndexOf("_layouts/fldNew.aspx") > -1
-          || referrer.IndexOf("_layouts/FldNewEx.aspx") > -1) // adding new field
+        if (referrer.IndexOf("fldNew.aspx") > -1
+          || referrer.IndexOf("FldNewEx.aspx") > -1) // adding new field
         {
           lblTargetList.Visible = false;
           lblTargetWeb.Visible = false;
