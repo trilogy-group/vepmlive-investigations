@@ -132,12 +132,12 @@ namespace EPMLiveCore
                 {
                     if (newComplete == "1" || newComplete.ToLower() == "true")
                         newPercent = "1";
-                    else if (newStatus != null)
+                    else if (!string.IsNullOrEmpty(newStatus))
                         newPercent = getPercentFromStatus(newStatus, oldPercent);
                     else
                         newPercent = "0";
                 }
-                else if (newStatus != null)
+                else if (!string.IsNullOrEmpty(newStatus))
                 {
                     newPercent = getPercentFromStatus(newStatus, oldPercent);
                 }
@@ -151,7 +151,7 @@ namespace EPMLiveCore
                 }
             }
 
-            if (newStatus == null)
+            if (string.IsNullOrEmpty(newStatus))
             {
                 if (newComplete != null)
                 {
@@ -178,7 +178,7 @@ namespace EPMLiveCore
 
             if (newComplete == null)
             {
-                if (newStatus != null)
+                if (!string.IsNullOrEmpty(newStatus))
                 {
                     if (newStatus == "Completed")
                         newComplete = "1";
