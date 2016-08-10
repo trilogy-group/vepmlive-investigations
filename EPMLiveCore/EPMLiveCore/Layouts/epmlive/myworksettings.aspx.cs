@@ -106,11 +106,11 @@ namespace EPMLiveCore
                         if (!lists.Exists(l => l.Name.Equals(listName)))
                         {
                             lists.Add(new MWList
-                                          {
-                                              Id = listId,
-                                              Name = listName,
-                                              Webs = new List<string> {listWeb}
-                                          });
+                            {
+                                Id = listId,
+                                Name = listName,
+                                Webs = new List<string> { listWeb }
+                            });
                         }
                         else
                         {
@@ -238,13 +238,13 @@ namespace EPMLiveCore
                                          let theField = field
                                          where
                                              !lstSelectedFields.Items.Contains(
-                                                 new ListItem(theField.ToPrettierName(_web), field))
-                                         select new ListItem(theField.ToPrettierName(_web), field));
+                                                 new ListItem(theField.ToPrettierName(list, _web), field))
+                                         select new ListItem(theField.ToPrettierName(list, _web), field));
             }
 
             availableFields.AddRange(from myWorkListsAndField in myWorkListsAndFields
                                      from field in myWorkListsAndField.Value
-                                     let fieldInternalName = field.ToPrettierName(_web)
+                                     let fieldInternalName = field.ToPrettierName(myWorkListsAndField.Key, _web)
                                      where !lstSelectedFields.Items.Contains(new ListItem(fieldInternalName, field))
                                      select new ListItem(fieldInternalName, field));
 
@@ -526,7 +526,7 @@ namespace EPMLiveCore
                     && fld.Type != SPFieldType.Attachments && fld.InternalName != "Order" &&
                     fld.Type != SPFieldType.File && fld.InternalName != "MetaInfo")
                 {
-                    dt.Rows.Add(new[] {fld.Title, fld.TypeShortDescription, fld.InternalName});
+                    dt.Rows.Add(new[] { fld.Title, fld.TypeShortDescription, fld.InternalName });
                 }
             }
 
@@ -557,7 +557,7 @@ namespace EPMLiveCore
                 if (!IncludeFixApplied())
                 {
                     List<string> selectedMyWorkLists =
-                        CoreFunctions.getConfigSetting(_web, GeneralSettingsSelectedMyWorkLists).Split(new[] {','}).
+                        CoreFunctions.getConfigSetting(_web, GeneralSettingsSelectedMyWorkLists).Split(new[] { ',' }).
                                       ToList();
 
                     var excludedLists = new List<string>();
@@ -590,7 +590,7 @@ namespace EPMLiveCore
             }
 
             List<string> excludedMyWorkLists =
-                CoreFunctions.getConfigSetting(_web, GeneralSettingsExcludedMyWorkLists).Split(new[] {','}).ToList();
+                CoreFunctions.getConfigSetting(_web, GeneralSettingsExcludedMyWorkLists).Split(new[] { ',' }).ToList();
 
             foreach (MWList myWorkList in MyWorkLists)
             {
@@ -610,7 +610,7 @@ namespace EPMLiveCore
             }
 
             List<string> selectedLists =
-                CoreFunctions.getConfigSetting(_web, GeneralSettingsSelectedLists).Split(new[] {','}).ToList();
+                CoreFunctions.getConfigSetting(_web, GeneralSettingsSelectedLists).Split(new[] { ',' }).ToList();
             List<string> listSelected = new List<string>();
             selectedLists.RemoveAll(string.IsNullOrEmpty);
 
@@ -631,7 +631,7 @@ namespace EPMLiveCore
             #region Selected Fields
 
             List<string> selectedFields =
-                CoreFunctions.getConfigSetting(_web, GeneralSettingsSelectedFields).Split(new[] {','}).ToList();
+                CoreFunctions.getConfigSetting(_web, GeneralSettingsSelectedFields).Split(new[] { ',' }).ToList();
 
             var sFields = new List<ListItem>();
 
@@ -641,20 +641,20 @@ namespace EPMLiveCore
                                              from field in listsAndFields[selectedList]
                                              where selectedFields.Exists(f => f.Equals(field))
                                              let theField = field
-                                             select new ListItem(theField.ToPrettierName(_web), field))
+                                             select new ListItem(theField.ToPrettierName(selectedList, _web), field))
                                           : (from listAndFields in listsAndFields
                                              from field in listAndFields.Value
                                              where selectedFields.Exists(f => f.Equals(field))
                                              let theField = field
-                                             select new ListItem(theField.ToPrettierName(_web), field))));
+                                             select new ListItem(theField.ToPrettierName(listAndFields.Key, _web), field))));
 
             sFields.AddRange(from myWorkListsAndField in myWorkListsAndFields
-                                     from field in myWorkListsAndField.Value
-                                     where selectedFields.Contains(field)
-                                     select new ListItem(field.ToPrettierName(_web), field));
+                             from field in myWorkListsAndField.Value
+                             where selectedFields.Contains(field)
+                             select new ListItem(field.ToPrettierName(myWorkListsAndField.Key, _web), field));
 
             lstSelectedFields.DataSource = sFields.Distinct().ToList();
-            
+
             lstSelectedFields.DataTextField = "Text";
             lstSelectedFields.DataValueField = "Value";
             lstSelectedFields.DataBind();
@@ -672,17 +672,17 @@ namespace EPMLiveCore
                                              from field in listsAndFields[selectedList]
                                              where !selectedFields.Exists(f => f.Equals(field))
                                              let theField = field
-                                             select new ListItem(theField.ToPrettierName(_web), field))
+                                             select new ListItem(theField.ToPrettierName(selectedList, _web), field))
                                           : (from listAndFields in listsAndFields
                                              from field in listAndFields.Value
                                              where !selectedFields.Exists(f => f.Equals(field))
                                              let theField = field
-                                             select new ListItem(theField.ToPrettierName(_web), field))));
+                                             select new ListItem(theField.ToPrettierName(listAndFields.Key, _web), field))));
 
             availableFields.AddRange(from myWorkListsAndField in myWorkListsAndFields
                                      from field in myWorkListsAndField.Value
                                      where !selectedFields.Contains(field)
-                                     select new ListItem(field.ToPrettierName(_web), field));
+                                     select new ListItem(field.ToPrettierName(myWorkListsAndField.Key, _web), field));
 
             lstAllFields.DataTextField = "Text";
             lstAllFields.DataValueField = "Value";
@@ -775,9 +775,9 @@ namespace EPMLiveCore
         private bool NewSetup()
         {
             List<string> includedMyWorkLists =
-                CoreFunctions.getConfigSetting(_web, GeneralSettingsSelectedMyWorkLists).Split(new[] {','}).ToList();
+                CoreFunctions.getConfigSetting(_web, GeneralSettingsSelectedMyWorkLists).Split(new[] { ',' }).ToList();
             List<string> excludedMyWorkLists =
-                CoreFunctions.getConfigSetting(_web, GeneralSettingsExcludedMyWorkLists).Split(new[] {','}).ToList();
+                CoreFunctions.getConfigSetting(_web, GeneralSettingsExcludedMyWorkLists).Split(new[] { ',' }).ToList();
 
             return includedMyWorkLists.Count == 1 && string.IsNullOrEmpty(includedMyWorkLists[0]) &&
                    excludedMyWorkLists.Count == 1 && string.IsNullOrEmpty(excludedMyWorkLists[0]);

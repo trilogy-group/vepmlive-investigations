@@ -273,6 +273,59 @@ namespace EPMLiveCore
         }
 
         /// <summary>
+        ///     Toes the name of the prettier.
+        /// </summary>
+        /// <param name="internalName">Name of the internal.</param>
+        /// <param name="selectedLists">The lists.</param>
+        /// <param name="spWeb">The sp web.</param>
+        /// <returns></returns>
+        public static string ToPrettierName(this string internalName, List<string> selectedLists, SPWeb spWeb)
+        {
+            SPList spList = null;
+            
+            foreach (string list in selectedLists)
+            {
+                spList = spWeb.Site.RootWeb.Lists.TryGetList(list);
+
+                if (spList != null)
+                {
+                    if (spList.Fields.ContainsFieldWithInternalName(internalName)) {
+                        return spList.Fields.GetFieldByInternalName(internalName).Title;
+                    }
+            
+                }
+            }
+            return ToPrettierName(internalName);
+        }
+
+
+
+        /// <summary>
+        ///     Toes the name of the prettier.
+        /// </summary>
+        /// <param name="internalName">Name of the internal.</param>
+        /// <param name="listName">Name of the listName.</param>
+        /// <param name="spWeb">The sp web.</param>
+        /// <returns></returns>
+        public static string ToPrettierName(this string internalName, string listName, SPWeb spWeb)
+        {
+            SPList spList = null;
+            if (!string.IsNullOrEmpty(listName))
+            {
+                spList = spWeb.Site.RootWeb.Lists.TryGetList(listName);
+            }
+
+            if (spList != null)
+            {
+                return spList.Fields.ContainsFieldWithInternalName(internalName)
+                    ? spList.Fields.GetFieldByInternalName(internalName).Title
+                    : ToPrettierName(internalName);
+            }
+
+            return ToPrettierName(internalName);
+        }
+
+        /// <summary>
         ///     Returns the left part of a string.
         /// </summary>
         /// <param name="param">The string to get the Left of.</param>
@@ -1070,9 +1123,9 @@ namespace EPMLiveCore
                     size += (from fieldInfo in fields
                              select fieldInfo.GetValue(obj)
                                  into subObj
-                                 where subObj != obj
-                                 where subObj != null
-                                 select GetSize(subObj)).Sum();
+                             where subObj != obj
+                             where subObj != null
+                             select GetSize(subObj)).Sum();
                 }
 
                 return size;
