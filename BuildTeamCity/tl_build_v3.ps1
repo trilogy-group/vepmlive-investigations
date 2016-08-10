@@ -93,7 +93,15 @@ function UpdateCommonAssemblyInfo($SourcesDirectoryPath) {
     return $NewReleaseNumber
 }
 
+function ZipFiles( $zipfilename, $sourcedir )
+{
+   Log-SubSection "Zipping $sourcedir to $zipfilename"
 
+   Add-Type -Assembly System.IO.Compression.FileSystem
+   $compressionLevel = [System.IO.Compression.CompressionLevel]::Optimal
+   [System.IO.Compression.ZipFile]::CreateFromDirectory($sourcedir,
+        $zipfilename, $compressionLevel, $false)
+}
 
 $BuildDirectory = "$ScriptDir\..\..\"
 
@@ -360,6 +368,13 @@ Get-ChildItem -Path ($LibrariesDirectory + "\*")  -Include "UplandIntegrations.d
 #Copy EPMLiveTimerService to output folder and Rename EPMLiveTimerService.exe -> TimerService.exe
 Get-ChildItem -Path ($BinariesDirectory + "\*")  -Include "EPMLiveTimerService.exe" | Copy-Item -Destination $ProductOutput -Force  
 Get-ChildItem -Path ($ProductOutput + "\*")  -Include "EPMLiveTimerService.exe" | Rename-Item -NewName {$_.name -replace ‘EPMLiveTimerService’,’TimerService’ }
+
+
+Log-Section "Zipping"
+Rename-Item -Path "$BinariesDirectory\_PublishedWebsites\EPMLiveIntegrationService" -NewName "api"
+ZipFiles("$SourcesDirectory\InstallShield\Build Dependencies\api.zip", "$BinariesDirectory\_PublishedWebsites\api")
+
+Log-Section "Install Shield"
 
 $BuildDependenciesFolder = Join-Path $SourcesDirectory "InstallShield\Build Dependencies"
 
