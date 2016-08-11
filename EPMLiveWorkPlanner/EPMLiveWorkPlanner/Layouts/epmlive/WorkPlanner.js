@@ -1074,7 +1074,10 @@ function SetTaskAssignments(Row) {
 
     Row = grid.GetRowById(Row.id);
 
-    var assignments = Row.AssignedTo.toString();
+    var assignments;
+
+    if (Row.AssignedTo != null)
+        assignments = Row.AssignedTo.toString();
     var assignmentsstring = grid.GetString(Row, "AssignedTo");
 
     grid.SetValue(Row, "ResourceNames", assignmentsstring, 1, 0);
