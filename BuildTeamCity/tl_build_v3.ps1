@@ -20,7 +20,7 @@ $projectsToBePackaged = @("EPMLiveCore","EPMLiveDashboards","EPMLiveIntegrationS
                             "EPMLivePS","EPMLiveReporting","EPMLiveSynch",
                             "EPMLiveTimeSheets","EPMLiveWebParts","EPMLiveWorkPlanner","WorkEnginePPM")
 
-$projectsToBeBuildAsEXE = @("EPMLiveTimerService")
+$projectsToBeBuildAsEXE = @("EPMLiveTimerService", "EPK_QueueMgr")
 $projectsToBeBuildAsDLL = @("PortfolioEngineCore","UplandIntegrations","EPMLiveIntegration")
 
 $projectTypeIdTobeReplaced = "C1CDDADD-2546-481F-9697-4EA41081F2FC"
@@ -375,6 +375,13 @@ ZipFiles "$SourcesDirectory\InstallShield\Build Dependencies\api.zip"  "$Binarie
 Log-Section "Install Shield"
 
 $BuildDependenciesFolder = Join-Path $SourcesDirectory "InstallShield\Build Dependencies"
+
+Copy-Item $LibrariesDirectory\RestSharp.dll $BuildDependenciesFolder -Force  
+Copy-Item $LibrariesDirectory\Newtonsoft.Json.dll $BuildDependenciesFolder -Force  
+Copy-Item $SourcesDirectory\packages\DocumentFormat.OpenXml.2.5\lib\DocumentFormat.OpenXml.dll $BuildDependenciesFolder -Force  
+Copy-Item $BinariesDirectory\WE_QueueMgr.exe $BuildDependenciesFolder\ServerFiles -Force  
+Copy-Item $BinariesDirectory\WE_QueueMgr.exe $BuildDependenciesFolder -Force  
+
 
 #Run Installshield project to generate product .exe
 & "C:\Program Files (x86)\InstallShield\2015\System\IsCmdBld.exe" -p "$SourcesDirectory\InstallShield\WorkEngine5\WorkEngine5.ism" -y $NewReleaseNumber -a "Product Configuration 1" -r "PrimaryRelease" -l PATH_TO_BUILDDDEPENDENC_FILES="$BuildDependenciesFolder" -l PATH_TO_PRODUCTOUTPUT_FILES="$ProductOutput"
