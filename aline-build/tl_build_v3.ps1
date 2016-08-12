@@ -94,7 +94,7 @@ function UpdateCommonAssemblyInfo($SourcesDirectoryPath) {
 
 
 
-$BuildDirectory = "$ScriptDir\..\..\"
+$BuildDirectory = "$ScriptDir\..\"
 
 # additional parameters to msbuild
 if (Test-Path env:\DF_MSBUILD_BUILD_STATS_OPTS) {
