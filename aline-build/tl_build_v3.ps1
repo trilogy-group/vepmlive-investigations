@@ -106,7 +106,8 @@ $MSBuildExec = "C:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe"
 # VSTest executable
 $VSTestExec = "C:\Program Files (x86)\Microsoft Visual Studio 11.0\Common7\IDE\CommonExtensions\Microsoft\TestWindow\vstest.console.exe"
 # Initialize Sources Directory
-$SourcesDirectory = "$BuildDirectory\Source"
+//$SourcesDirectory = "$BuildDirectory\Source"
+$SourcesDirectory = "$BuildDirectory"
 
 #Update the CommonAssemblyInfo.cs file with latest build number
 $NewReleaseNumber = UpdateCommonAssemblyInfo($SourcesDirectory)
