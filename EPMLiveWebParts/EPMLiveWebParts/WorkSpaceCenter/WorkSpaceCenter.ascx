@@ -105,7 +105,7 @@
                     {
                         'controlId': 'myWorkSpace_Search1',
                         'controlType': 'search',
-                        'custom': 'no',
+                        'custom': 'yes',
                         'events': [{
                             'eventName': 'keyup',
                             'function': function (e) {
