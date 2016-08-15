@@ -1687,6 +1687,7 @@ namespace RPADataCache
                         rFull.actual.AddRange(orfull.actual);
                         rFull.personel.AddRange(orfull.personel);
                         rFull.scheduled.AddRange(orfull.scheduled);
+                        rFull.proposal.AddRange(orfull.proposal);
                     }
 
                     if (m_rolelist.TryGetValue(orfull.resavail.RoleID, out rFull) == false && orfull.resavail.RoleID != 0)    // first for the role
@@ -1706,6 +1707,7 @@ namespace RPADataCache
                         rFull.actual.AddRange(orfull.actual);
                         rFull.personel.AddRange(orfull.personel);
                         rFull.scheduled.AddRange(orfull.scheduled);
+                        rFull.proposal.AddRange(orfull.proposal);
                     }
                 }
             }
@@ -2748,9 +2750,10 @@ namespace RPADataCache
                         {
                             ++xIi;
 
-                            oGrid.AddPIRow(odt, m_totdispcln, m_cResVals, m_cResVals.TargetColors, i * 10000000 + xIi, m_DispMode, m_use_role, TotSelectedOrder, m_use_heatmap, m_use_heatmapID, m_use_role, m_use_heatmapColour);
+                            if (string.IsNullOrEmpty(odt.ProjectName))
+                                odt.ProjectName = ResolvePIName(odt.ProjectID);
 
-
+                            oGrid.AddPIRow(oRFull, odt, m_totdispcln, m_cResVals, m_cResVals.TargetColors, i * 10000000 + xIi, m_DispMode, m_use_role, TotSelectedOrder, m_use_heatmap, m_use_heatmapID, m_use_role, m_use_heatmapColour, xIi -1, odt.ProjectID);
                         }
                     }
 

@@ -18,7 +18,7 @@ namespace RPADataCache
 
 
 
-            targetlevel = 0;            
+            targetlevel = 0;
 
             string sRet = "RGB(217, 255, 255)";
 
@@ -73,8 +73,8 @@ namespace RPADataCache
                 double percnt;
 
                 if (heatmapColour == 2)
-                     percnt = (Pdbl / Tdbl) * 100;
-                else 
+                    percnt = (Pdbl / Tdbl) * 100;
+                else
                     percnt = (Tdbl / Pdbl) * 100;
 
                 foreach (clsViewTargetColours oT in TargetColours.Values)
@@ -115,7 +115,6 @@ namespace RPADataCache
         private CStruct[] m_xLevels = new CStruct[64];
         private int m_nLevel = 0;
 
-
         public bool InitializeGridLayout(List<clsRXDisp> Cols, int gpPMOAdmin, string sXML)
         {
             var currentViewResult = GetResourceAnalyzerView(sXML);
@@ -141,14 +140,14 @@ namespace RPADataCache
 
             CStruct xCfg = xGrid.CreateSubStruct("Cfg");
             xCfg.CreateStringAttr("MainCol", "PortfolioItem");
-                   
+
             xCfg.CreateStringAttr("Code", "GTACCNPSQEBSLC");
             xCfg.CreateIntAttr("SuppressCfg", 3);
             xCfg.CreateIntAttr("SuppressMessage", 3);
             xCfg.CreateIntAttr("PrintCols", 0);
-                
 
- 
+
+
             xCfg.CreateIntAttr("Dragging", gpPMOAdmin);
             xCfg.CreateIntAttr("Sorting", 1);
             xCfg.CreateIntAttr("ColsMoving", 1);
@@ -161,21 +160,21 @@ namespace RPADataCache
             xCfg.CreateIntAttr("LeftWidth", 150);
             xCfg.CreateIntAttr("Width", 400);
             xCfg.CreateIntAttr("RightWidth", 800);
-            xCfg.CreateIntAttr("MinMidWidth",50);
+            xCfg.CreateIntAttr("MinMidWidth", 50);
             xCfg.CreateIntAttr("MinRightWidth", 400);
             xCfg.CreateIntAttr("LeftCanResize", 0);
             xCfg.CreateIntAttr("RightCanResize", 1);
             xCfg.CreateIntAttr("FocusWholeRow", 1);
-            
+
 
 
             xCfg.CreateIntAttr("MaxHeight", 0);
             xCfg.CreateIntAttr("ShowDeleted", 0);
             xCfg.CreateBooleanAttr("DateStrings", true);
-       //     xCfg.CreateIntAttr("MinRowHeight",26);
+            //     xCfg.CreateIntAttr("MinRowHeight",26);
             xCfg.CreateIntAttr("MaxWidth", 1);
             xCfg.CreateIntAttr("MaxSort", 2);
-       //     xCfg.CreateStringAttr("DefaultSort", "PortfolioItem");
+            //     xCfg.CreateStringAttr("DefaultSort", "PortfolioItem");
             xCfg.CreateIntAttr("AppendId", 0);
             xCfg.CreateIntAttr("FullId", 0);
             xCfg.CreateStringAttr("IdChars", "0123456789");
@@ -189,7 +188,7 @@ namespace RPADataCache
             xCfg.CreateIntAttr("GroupSortMain", 1);
             xCfg.CreateIntAttr("GroupRestoreSort", 1);
 
-  
+
             xCfg.CreateIntAttr("NoTreeLines", 1);
             xCfg.CreateIntAttr("ShowVScroll", 1);
 
@@ -259,7 +258,7 @@ namespace RPADataCache
             xC.CreateStringAttr("Width", "20");
             xC.CreateStringAttr("Color", "rgb(223, 227, 232)");
             xC.CreateIntAttr("CanHide", 0);
-            xC.CreateIntAttr("CanSelect", 0);            
+            xC.CreateIntAttr("CanSelect", 0);
             m_xHeader1.CreateStringAttr("RowSel", " ");
 
 
@@ -270,8 +269,8 @@ namespace RPADataCache
             xC.CreateIntAttr("CanExport", 0);
             xC.CreateIntAttr("ShowHint", 0);
             xC.CreateIntAttr("CanSort", 0);
-            xC.CreateIntAttr("CanFilter", 0); 
-            xC.CreateIntAttr("CanResize", 0); 
+            xC.CreateIntAttr("CanFilter", 0);
+            xC.CreateIntAttr("CanResize", 0);
             xC.CreateIntAttr("Visible", 0);
 
             xC.CreateIntAttr("CanHide", 0);
@@ -303,7 +302,7 @@ namespace RPADataCache
             xC.CreateIntAttr("ShowHint", 0);
             xC.CreateIntAttr("CanSort", 0);
             xC.CreateIntAttr("CanFilter", 0);
-            xC.CreateIntAttr("CanExport", 0); 
+            xC.CreateIntAttr("CanExport", 0);
             xC.CreateStringAttr("Width", "20");
             m_xHeader1.CreateStringAttr("ChangedIcon", " ");
 
@@ -313,7 +312,7 @@ namespace RPADataCache
             xC = xLeftCols.CreateSubStruct("C");
             xC.CreateStringAttr("Name", "RowDraggable");
             xC.CreateStringAttr("Type", "Bool");
-            xC.CreateIntAttr("CanResize", 0); 
+            xC.CreateIntAttr("CanResize", 0);
             xC.CreateBooleanAttr("CanEdit", false);
             xC.CreateIntAttr("CanMove", 0);
             xC.CreateIntAttr("CanFilter", 0);
@@ -333,19 +332,19 @@ namespace RPADataCache
             xC.CreateIntAttr("CanFilter", 0);
             xC.CreateIntAttr("ShowHint", 0);
             xC.CreateIntAttr("CanSort", 0);
-            xC.CreateIntAttr("CanExport", 0); 
+            xC.CreateIntAttr("CanExport", 0);
             xC.CreateIntAttr("Visible", 0);
 
             xC.CreateIntAttr("CanHide", 0);
             xC.CreateIntAttr("CanSelect", 0);
 
-            
+
 
 
             m_xDefTree.CreateBooleanAttr("SelectCanEdit", true);
             m_xDefTree.CreateStringAttr("rowid", "");
-   
-    
+
+
             CStruct xSolid = xGrid.CreateSubStruct("Solid");
             CStruct xGroup = xSolid.CreateSubStruct("Group");
 
@@ -381,10 +380,10 @@ namespace RPADataCache
                         xC.CreateStringAttr("OnDragCell", "Focus,DragCell");
 
                         if (SelViewCols == null)
-                            xC.CreateIntAttr("Visible", 0); 
+                            xC.CreateIntAttr("Visible", 0);
 
                         m_xDefTree.CreateIntAttr(sn + "CanDrag", 0);
-                        
+
                         m_xDefTree.CreateStringAttr(sn + "HtmlPrefix", "<B>");
                         m_xDefTree.CreateStringAttr(sn + "HtmlPostfix", "</B>");
 
@@ -405,14 +404,15 @@ namespace RPADataCache
                                 string sminFunc = "(Row.id == 'Filter' ? '' : min())";
                                 m_xDefTree.CreateStringAttr(sn + "Formula", sminFunc);
                             }
-                            else if (col.m_id == RPConstants.TGRID_FDATE) {
+                            else if (col.m_id == RPConstants.TGRID_FDATE)
+                            {
                                 xC.CreateStringAttr("Type", "Date");
 
                                 string smaxFunc = "(Row.id == 'Filter' ? '' : max())";
                                 m_xDefTree.CreateStringAttr(sn + "Formula", smaxFunc);
                             }
-                         //   xC.CreateStringAttr("Type", "Date");
-                         //                          xC.CreateStringAttr("Format", "MM/dd/yyyy");
+                            //   xC.CreateStringAttr("Type", "Date");
+                            //                          xC.CreateStringAttr("Format", "MM/dd/yyyy");
                         }
                         else if (col.m_type == 3)
                         {
@@ -494,9 +494,9 @@ namespace RPADataCache
                         m_xDefNode.CreateIntAttr("xinterenalPeriodMax" + "CanDrag", 0);
                         m_xDefTree.CreateIntAttr("xinterenalPeriodMax" + "CanDrag", 0);
                     }
-                    catch(Exception ex)
+                    catch (Exception ex)
                     {
-                        
+
                     }
 
                 }
@@ -529,7 +529,7 @@ namespace RPADataCache
             //}
             //else
             //{
-                m_xHeader1.CreateStringAttr("P" + sId + "C1", sName);
+            m_xHeader1.CreateStringAttr("P" + sId + "C1", sName);
 
             //}
 
@@ -538,7 +538,8 @@ namespace RPADataCache
 
             foreach (RPATGRow ot in disp)
             {
-                try{
+                try
+                {
                     if (ot.bUse)
                     {
                         ++cnt;
@@ -558,10 +559,10 @@ namespace RPADataCache
                         xC.CreateIntAttr("CanSort", 0);
                         xC.CreateIntAttr("CanMove", 0);
                         xC.CreateIntAttr("CanDrag", gpPMOAdmin);
-                        xC.CreateIntAttr("CanHide", 0); 
+                        xC.CreateIntAttr("CanHide", 0);
                         xC.CreateIntAttr("CanSelect", 0);
 
- 
+
                         if (gpPMOAdmin != 0)
                             xC.CreateStringAttr("OnDragCell", "Focus,DragCell");
 
@@ -571,7 +572,7 @@ namespace RPADataCache
                         {
                             string sFunc = "(Row.id == 'Filter' ? '' : sum())";
                             m_xDefTree.CreateStringAttr("P" + sId + "C" + cnt.ToString() + "Formula", sFunc);
-                                //"sum()");
+                            //"sum()");
                             if (iMode == 1)
                                 m_xDefTree.CreateStringAttr("P" + sId + "C" + cnt.ToString() + "Format", ",0.###");
                             else
@@ -595,14 +596,14 @@ namespace RPADataCache
                         xC.CreateIntAttr("MinWidth", 45);
                         xC.CreateIntAttr("Width", 65);
 
- 
+
                     }
 
                     //   m_xHeader2.CreateStringAttr("P" + sId + "C" + cnt.ToString(), ot.Name);
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
-                    
+
                 }
             }
         }
@@ -615,13 +616,13 @@ namespace RPADataCache
         }
         public bool InitializeGridData()
         {
- 
+
             CStruct xBody = xGrid.CreateSubStruct("Body");
             CStruct xB = xBody.CreateSubStruct("B");
             CStruct xI = xBody.CreateSubStruct("I");
             xI.CreateStringAttr("Grouping", "Totals");
             xI.CreateBooleanAttr("CanEdit", false);
-   //         xI.CreateStringAttr("Def", "Summary");
+            //         xI.CreateStringAttr("Def", "Summary");
             m_nLevel = 0;
             m_xLevels[m_nLevel] = xI;
             return true;
@@ -640,7 +641,7 @@ namespace RPADataCache
             xI.CreateStringAttr("id", rID.ToString());
             xI.CreateStringAttr("Color", "white");
             xI.CreateStringAttr("Def", "Leaf");
-    //       xI.CreateStringAttr("Calculated", "0");
+            //       xI.CreateStringAttr("Calculated", "0");
 
 
             xI.CreateIntAttr("NoColorState", 1);
@@ -746,7 +747,7 @@ namespace RPADataCache
                             if (oPIData != null)
                             {
                                 if (oPIData.start != DateTime.MinValue)
-                                  xI.CreateStringAttr(sn, oPIData.start.ToShortDateString());
+                                    xI.CreateStringAttr(sn, oPIData.start.ToShortDateString());
                             }
                             break;
                         case RPConstants.TGRID_FDATE:
@@ -896,9 +897,9 @@ namespace RPADataCache
                     }
 
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
-                    
+
                 }
 
 
@@ -907,7 +908,7 @@ namespace RPADataCache
             double xval;
             int i;
             string cellval;
-    
+
 
             i = 0;
             int cnt = 0;
@@ -976,7 +977,7 @@ namespace RPADataCache
             xI.CreateIntAttr("xinterenalPeriodMin", fp);
             xI.CreateIntAttr("xinterenalPeriodMax", lp);
             xI.CreateIntAttr("xinterenalPeriodTotal", o_cResVals.Periods.Values.Count());
-            
+
 
             i = 0;
 
@@ -1017,14 +1018,14 @@ namespace RPADataCache
                             xI.CreateStringAttr(sCName + "ClassInner", "");
                             xI.CreateStringAttr(sCName + "HtmlPostfix", "");
                             xI.CreateStringAttr(sCName + "HtmlPrefix", "");
-                            
-  
+
+
                         }
                     }
                 }
                 catch (Exception ex)
                 {
-                    
+
                 }
 
             }
@@ -1080,17 +1081,17 @@ namespace RPADataCache
 
                             vl /= oDet.getftarr(i);
 
-      //                      vl = vl*100;
+                            //                      vl = vl*100;
 
-                            int ivl = (int) vl;
+                            int ivl = (int)vl;
                             vl = ivl;
 
-      //                      vl /= 100;
+                            //                      vl /= 100;
 
                             retval = vl; // (oDet.getvarr(i) * 100) / oDet.getftarr(i);
                         }
                     }
-                    catch 
+                    catch
                     {
                         retval = 0;
                     }
@@ -1113,7 +1114,7 @@ namespace RPADataCache
                 }
 
             }
-  
+
 
             if (iMode == 1)
                 retval /= 100;
@@ -1196,7 +1197,7 @@ namespace RPADataCache
     {
         private CStruct xGrid;
         private CStruct m_xPeriodCols;
-        private CStruct m_xHeader1; 
+        private CStruct m_xHeader1;
         private CStruct m_xHeader2;
         private CStruct m_xDef;
         private CStruct m_xDefTree;
@@ -1212,7 +1213,7 @@ namespace RPADataCache
 
         public bool InitializeGridLayout(List<clsRXDisp> Cols, bool by_role, string sResRolHeader)
         {
- 
+
             xGrid = new CStruct();
             xGrid.Initialize("Grid");
 
@@ -1241,18 +1242,18 @@ namespace RPADataCache
             xCfg.CreateIntAttr("ColsLap", 1);
             xCfg.CreateIntAttr("VisibleLap", 1);
             xCfg.CreateIntAttr("SectionWidthLap", 1);
-            xCfg.CreateIntAttr("GroupLap", 1); 
+            xCfg.CreateIntAttr("GroupLap", 1);
             xCfg.CreateIntAttr("WideHScroll", 0);
             xCfg.CreateIntAttr("LeftWidth", 400);
             xCfg.CreateIntAttr("Width", 400);
             xCfg.CreateIntAttr("RightWidth", 400);
             xCfg.CreateIntAttr("MaxHeight", 0);
-   //         xCfg.CreateIntAttr("MinRowHeight", 26); 
+            //         xCfg.CreateIntAttr("MinRowHeight", 26); 
             xCfg.CreateIntAttr("ShowDeleted", 0);
             xCfg.CreateBooleanAttr("DateStrings", true);
             xCfg.CreateIntAttr("MaxWidth", 1);
             xCfg.CreateIntAttr("MaxSort", 2);
-    //        xCfg.CreateStringAttr("DefaultSort", "rowid"); 
+            //        xCfg.CreateStringAttr("DefaultSort", "rowid"); 
             xCfg.CreateIntAttr("AppendId", 0);
             xCfg.CreateIntAttr("FullId", 0);
             xCfg.CreateStringAttr("IdChars", "0123456789");
@@ -1290,7 +1291,7 @@ namespace RPADataCache
             m_xDefTree.CreateStringAttr("OnFocus", "ClearSelection+Grid.SelectRow(Row,!Row.Selected)");
             m_xDefTree.CreateIntAttr("NoColorState", 1);
 
- 
+
             m_xDefNode = m_xDef.CreateSubStruct("D");
             m_xDefNode.CreateStringAttr("Name", "Leaf");
             m_xDefNode.CreateStringAttr("Calculated", "0");
@@ -1314,10 +1315,10 @@ namespace RPADataCache
             m_xDefPI.CreateIntAttr("NoColorState", 1);
 
             CStruct xHead = xGrid.CreateSubStruct("Head");
- //           xHead.CreateIntAttr("Visible", 0);
- 
- 
-    //        m_xHeader1 = xGrid.CreateSubStruct("Header");
+            //           xHead.CreateIntAttr("Visible", 0);
+
+
+            //        m_xHeader1 = xGrid.CreateSubStruct("Header");
             m_xHeader1 = xGrid.CreateSubStruct("Header");
             m_xHeader2 = xHead.CreateSubStruct("Header");
             m_xHeader1.CreateIntAttr("PortfolioItemVisible", 1);
@@ -1338,29 +1339,29 @@ namespace RPADataCache
             CStruct xFilter = xHead.CreateSubStruct("Filter");
             xFilter.CreateStringAttr("id", "Filter");
 
-           CStruct xC = xLeftCols.CreateSubStruct("C");
-            
+            CStruct xC = xLeftCols.CreateSubStruct("C");
 
 
-           xC = xLeftCols.CreateSubStruct("C");
-           xC.CreateStringAttr("Name", "RowSel");
-           xC.CreateStringAttr("Type", "Icon");
-           xC.CreateBooleanAttr("CanEdit", false);
-           xC.CreateIntAttr("CanMove", 0);
-           xC.CreateIntAttr("CanExport", 0);
-           xC.CreateIntAttr("CanResize", 0);
-           xC.CreateIntAttr("CanFilter", 0);
-           xC.CreateIntAttr("ShowHint", 0);
-           xC.CreateStringAttr("Width", "20");
-           xC.CreateIntAttr("CanSort", 0);
-           xC.CreateStringAttr("Color", "rgb(223, 227, 232)");
-           m_xHeader1.CreateStringAttr("RowSel", " ");
-           m_xHeader2.CreateStringAttr("RowSel", " ");
 
-           xC.CreateIntAttr("CanHide", 0);
-           xC.CreateIntAttr("CanSelect", 0);
+            xC = xLeftCols.CreateSubStruct("C");
+            xC.CreateStringAttr("Name", "RowSel");
+            xC.CreateStringAttr("Type", "Icon");
+            xC.CreateBooleanAttr("CanEdit", false);
+            xC.CreateIntAttr("CanMove", 0);
+            xC.CreateIntAttr("CanExport", 0);
+            xC.CreateIntAttr("CanResize", 0);
+            xC.CreateIntAttr("CanFilter", 0);
+            xC.CreateIntAttr("ShowHint", 0);
+            xC.CreateStringAttr("Width", "20");
+            xC.CreateIntAttr("CanSort", 0);
+            xC.CreateStringAttr("Color", "rgb(223, 227, 232)");
+            m_xHeader1.CreateStringAttr("RowSel", " ");
+            m_xHeader2.CreateStringAttr("RowSel", " ");
 
-           xC = xLeftCols.CreateSubStruct("C");
+            xC.CreateIntAttr("CanHide", 0);
+            xC.CreateIntAttr("CanSelect", 0);
+
+            xC = xLeftCols.CreateSubStruct("C");
             xC.CreateStringAttr("Name", "rowid");
             xC.CreateStringAttr("Type", "Int");
             xC.CreateIntAttr("CanExport", 0);
@@ -1414,9 +1415,9 @@ namespace RPADataCache
             xC.CreateIntAttr("CanSelect", 0);
 
             m_xDefTree.CreateBooleanAttr("rtSelectCanEdit", true);
-    //         m_xDefTree.CreateStringAttr("IconFlag", "/_layouts/ppm/images/Green.gif");   //"sum()");
+            //         m_xDefTree.CreateStringAttr("IconFlag", "/_layouts/ppm/images/Green.gif");   //"sum()");
             m_xDefNode.CreateStringAttr("IconFlag", "/_layouts/ppm/images/Nogif.gif");   //"sum()");
-  
+
             CStruct xSolid = xGrid.CreateSubStruct("Solid");
             CStruct xGroup = xSolid.CreateSubStruct("Group");
 
@@ -1451,10 +1452,10 @@ namespace RPADataCache
                         if (col.m_id == RPConstants.TGRID_TOTRESRES_ID)
                         {
                             snv = sResRolHeader;
-                             sn = "ResOrRole";
-                       }
+                            sn = "ResOrRole";
+                        }
 
-                       
+
 
                         xC = xCols.CreateSubStruct("C");
 
@@ -1505,7 +1506,7 @@ namespace RPADataCache
                 }
                 catch (Exception ex)
                 {
-                    
+
                 }
             }
 
@@ -1517,10 +1518,10 @@ namespace RPADataCache
 
 
             CStruct xC = null;
-    
+
             int cnt = disp.Count;
-                    ++cnt;
-     
+            ++cnt;
+
             if (cnt == 0)
                 return;
 
@@ -1528,7 +1529,7 @@ namespace RPADataCache
             string sMaxFunc = "(Row.id == 'Filter' ? '' : max())";
             string sMinFunc = "(Row.id == 'Filter' ? '' : min())";
             //       string sIconFunc = "/_layouts/ppm/images/Nogif.gif"; // "/_layouts/ppm/images/Red.gif";     //"(Row.id == 'Filter' ? '' : '/_layouts/ppm/images/Red.gif')";
-  
+
 
             cnt = 0;
             var spnncnt = disp.Count;
@@ -1547,7 +1548,7 @@ namespace RPADataCache
                 xC.CreateStringAttr("Align", "Right");
                 xC.CreateIntAttr("CanSelect", 0);
                 xC.CreateIntAttr("CanHide", 0);
-               if (iMode != 3)
+                if (iMode != 3)
                 {
                     m_xDefTree.CreateStringAttr("P" + sId + "H" + "Formula", sSumFunc);   //"sum()");
                     m_xDefTree.CreateStringAttr("P" + sId + "H" + "Format", ",#.##");
@@ -1558,14 +1559,15 @@ namespace RPADataCache
 
                 xC.CreateIntAttr("MinWidth", 45);
                 xC.CreateIntAttr("Width", 65);
-                spnncnt *=  2;
+                spnncnt *= 2;
             }
 
 
-            
+
             foreach (RPATGRow ot in disp)
             {
-                try {
+                try
+                {
                     ++cnt;
 
 
@@ -1583,7 +1585,7 @@ namespace RPADataCache
 
                     m_xHeader2.CreateStringAttr("P" + sId + "C" + cnt.ToString(), ot.Name);
                     m_xHeader2.CreateStringAttr("P" + sId + "C" + cnt.ToString() + "SortIcons", "0");
-         
+
 
                     xC = m_xPeriodCols.CreateSubStruct("C");
                     xC.CreateStringAttr("Name", "P" + sId + "C" + cnt.ToString());
@@ -1596,7 +1598,7 @@ namespace RPADataCache
                     xC.CreateIntAttr("CanSelect", 0);
                     xC.CreateIntAttr("CanHide", 0);
                     xC.CreateStringAttr("Align", "Right");
-       //             xC.CreateStringAttr("Icon", "/_layouts/ppm/images/Green.gif");
+                    //             xC.CreateStringAttr("Icon", "/_layouts/ppm/images/Green.gif");
 
                     xC.CreateIntAttr("CanSelect", 0);
 
@@ -1635,11 +1637,11 @@ namespace RPADataCache
                         xC.CreateIntAttr("CanHide", 0);
                     }
 
-                
+
 
                     if (iMode != 3)
                     {
-                         if (bUseHeatmap)
+                        if (bUseHeatmap)
                         {
                             m_xDefTree.CreateStringAttr("X" + sId + "C" + cnt.ToString() + "Format", "##");
                             m_xDefTree.CreateStringAttr("X" + sId + "C" + cnt.ToString() + "Formula", sMaxFunc);   //"sum()");
@@ -1652,10 +1654,10 @@ namespace RPADataCache
 
                         }
 
-                         m_xDefTree.CreateStringAttr("P" + sId + "C" + cnt.ToString() + "Format", ",0.##");
-                         m_xDefTree.CreateStringAttr("P" + sId + "C" + cnt.ToString() + "Formula", sSumFunc);   //"sum()");
-                   //     m_xDefTree.CreateStringAttr("P" + sId + "C" + cnt.ToString() + "Formula", "sum()");
-                      }
+                        m_xDefTree.CreateStringAttr("P" + sId + "C" + cnt.ToString() + "Format", ",0.##");
+                        m_xDefTree.CreateStringAttr("P" + sId + "C" + cnt.ToString() + "Formula", sSumFunc);   //"sum()");
+                                                                                                               //     m_xDefTree.CreateStringAttr("P" + sId + "C" + cnt.ToString() + "Formula", "sum()");
+                    }
 
                     if (bUseHeatmap)
                     {
@@ -1676,8 +1678,8 @@ namespace RPADataCache
                 {
 
                 }
- 
-             }
+
+            }
         }
         public void FinalizeGridLayout()
         {
@@ -1765,7 +1767,7 @@ namespace RPADataCache
             if (bDoIt == false)
                 return;
 
-            
+
             CStruct xIParent = m_xLevels[0];
             CStruct xI = xIParent.CreateSubStruct("I");
             clsEPKItem oItem;
@@ -1779,7 +1781,7 @@ namespace RPADataCache
             xI.CreateStringAttr("id", rID.ToString());
             xI.CreateStringAttr("Color", "white");
             xI.CreateStringAttr("Def", "Leaf");
-  
+
             xI.CreateBooleanAttr("CanEdit", false);
             xI.CreateIntAttr("NoColorState", 1);
             xI.CreateIntAttr("rowid", rID);
@@ -1790,14 +1792,14 @@ namespace RPADataCache
             xI.CreateStringAttr("rtSelect", (oDet.bSelected ? "1" : "0"));
             xI.CreateBooleanAttr("rtSelectCanEdit", true);
 
-    
+
             foreach (clsRXDisp col in Cols)
             {
                 try
                 {
 
 
-                    if ( (col.m_id == RPConstants.TGRID_TOTITEM_ID) || (!((by_role == true && col.m_id > 100) || (by_role == true && col.m_id == RPConstants.TGRID_TOTDEPT_ID) )))
+                    if ((col.m_id == RPConstants.TGRID_TOTITEM_ID) || (!((by_role == true && col.m_id > 100) || (by_role == true && col.m_id == RPConstants.TGRID_TOTDEPT_ID))))
                     {
                         string sn = col.m_realname.Replace("/n", "");
                         sn = sn.Replace(" ", "");
@@ -1807,7 +1809,7 @@ namespace RPADataCache
 
                         if (col.m_id == RPConstants.TGRID_TOTRESRES_ID)
                             sn = "ResOrRole";
-                   
+
 
                         switch (col.m_id)
                         {
@@ -1826,7 +1828,7 @@ namespace RPADataCache
 
                             case RPConstants.TGRID_TOTRESRES_ID:
                                 xI.CreateStringAttr(sn, oDet.ResOrRole);
-  
+
                                 break;
 
                             case RPConstants.TGRID_TOTROLE_ID:
@@ -1941,7 +1943,6 @@ namespace RPADataCache
 
                         xI.CreateStringAttr("P" + oPer.PeriodID.ToString() + "H", cellval);
                     }
-
                     cnt = 0;
                     foreach (RPATGRow ot in disp)
                     {
@@ -1958,7 +1959,7 @@ namespace RPADataCache
                             cellval = xval.ToString(providerEn);
                         else
                             cellval = xval.ToString(providerEn);
-                 
+
 
                         xI.CreateStringAttr(sCName, cellval);
 
@@ -1981,26 +1982,23 @@ namespace RPADataCache
                             }
                         }
                     }
-                                    }
+                }
                 catch (Exception ex)
                 {
-                    
+
                 }
 
             }
         }
 
-        public void AddPIRow(clsResXData oDet, List<clsRXDisp> Cols, clsResourceValues o_cResVals, Dictionary<int, clsViewTargetColours> TargetColors, int rID, int iMode, bool by_role, List<RPATGRow> disp, bool bUseHeatmap, int iHeatMapID, bool bDoZeroRowCleverStuff, int HeatFieldColour)
+        public void AddPIRow(clsResFullDAta oRFull, clsResXData oDet, List<clsRXDisp> Cols, clsResourceValues o_cResVals, Dictionary<int, clsViewTargetColours> TargetColors, int rID, int iMode, bool by_role, List<RPATGRow> disp, bool bUseHeatmap, int iHeatMapID, bool bDoZeroRowCleverStuff, int HeatFieldColour, int xLi, int projectId)
         {
-
             int tarlev;
-
             double xval;
             double cval;
             int i;
             string cellval;
             int cnt = 0;
-
             bool bDoIt = true;
 
             if (bDoZeroRowCleverStuff)
@@ -2011,25 +2009,18 @@ namespace RPADataCache
 
                 if (cnt != 0)
                 {
-
                     foreach (CPeriod oPer in o_cResVals.Periods.Values)
                     {
                         if (bDoIt)
                             break;
-
                         try
                         {
-
                             ++i;
-
-
                             cnt = 0;
                             foreach (RPATGRow ot in disp)
                             {
                                 ++cnt;
-
                                 xval = GetPIDataValue(oDet, iMode, i);
-
                                 if (xval != 0)
                                 {
                                     bDoIt = true;
@@ -2037,19 +2028,13 @@ namespace RPADataCache
                                 }
                             }
                         }
-                        catch (Exception ex)
-                        {
-
-                        }
+                        catch (Exception ex) { }
                     }
-
-
                 }
             }
 
             if (bDoIt == false)
                 return;
-
 
             CStruct xIParent = m_xLevels[0];
             CStruct xI = m_lastnode.CreateSubStruct("I");
@@ -2068,76 +2053,42 @@ namespace RPADataCache
             xI.CreateIntAttr("rowid", rID);
             xI.CreateBooleanAttr("rowidCanEdit", false);
 
-
             xI.CreateStringAttr("rtSelectType", "Text");
             xI.CreateStringAttr("rtSelect", " ");
             xI.CreateBooleanAttr("rtSelectCanEdit", false);
-
 
             foreach (clsRXDisp col in Cols)
             {
                 try
                 {
-
-
                     if ((col.m_id == RPConstants.TGRID_TOTITEM_ID) || (!((by_role == true && col.m_id > 100) || (by_role == true && col.m_id == RPConstants.TGRID_TOTDEPT_ID))))
                     {
                         string sn = col.m_realname.Replace("/n", "");
                         sn = sn.Replace(" ", "");
-
                         sn = sn.Replace("\r", "");
                         sn = sn.Replace("\n", "");
 
                         if (col.m_id == RPConstants.TGRID_TOTRESRES_ID)
                             sn = "ResOrRole";
 
-
                         switch (col.m_id)
                         {
-
                             case RPConstants.TGRID_TOTDEPT_ID:
-                                 break;
-
                             case RPConstants.TGRID_TOTRESRES_ID:
-
-                                break;
-
                             case RPConstants.TGRID_TOTROLE_ID:
+                            case RPConstants.TGRID_TOTCC_ID:
+                            case RPConstants.TGRID_TOTCCFULL_ID:
                                 break;
-
-
                             case RPConstants.TGRID_TOTITEM_ID:
-
-
                                 xI.CreateStringAttr(sn, oDet.ProjectName);
                                 break;
-
-                            case RPConstants.TGRID_TOTCC_ID:
-
-                                break;
-
-                            case RPConstants.TGRID_TOTCCFULL_ID:
-
-                                break;
-
-
-
                             default:
-
                                 break;
                         }
                     }
                 }
-                catch (Exception ex)
-                {
-
-                }
-
-
+                catch (Exception ex) { }
             }
-
-
-
 
             i = 0;
             cnt = disp.Count;
@@ -2149,23 +2100,20 @@ namespace RPADataCache
             {
                 try
                 {
-
                     string sCName;
                     ++i;
                     cval = 0;
-
                     cnt = 0;
+
                     foreach (RPATGRow ot in disp)
                     {
                         ++cnt;
                         sCName = "P" + oPer.PeriodID.ToString() + "C" + cnt.ToString();
 
-                        if (ot.fid == 0) 
+                        if (ot.fid <= 0)
                         {
-
-                            xval = GetPIDataValue(oDet, iMode, i);
+                            xval = GetPIDataValue(oRFull, oDet, iMode, i, ot.fid, xLi, bUseHeatmap, iHeatMapID, projectId, by_role);
                             cellval = "";
-
 
                             if (iMode == 0)
                                 cellval = xval.ToString("0.##");
@@ -2174,20 +2122,31 @@ namespace RPADataCache
                             else
                                 cellval = xval.ToString("0.###");
 
-
                             xI.CreateStringAttr(sCName, cellval);
 
+                            if (bUseHeatmap && ot.fid <= 0)
+                            {
+                                string rgb = RPAGridHelper.TargetBackground(xval, xval, TargetColors, out tarlev, HeatFieldColour);
+                                xI.CreateIntAttr("X" + oPer.PeriodID.ToString() + "C" + cnt.ToString(), tarlev);
+
+                                if (tarlev <= 0)
+                                    tarlev = 0;
+
+                                xI.CreateIntAttr("Y" + oPer.PeriodID.ToString() + "C" + cnt.ToString(), tarlev);
+
+                                if (rgb != "" && iHeatMapID != ot.fid)
+                                {
+                                    xI.CreateStringAttr(sCName + "Color", rgb);
+                                    xI.CreateStringAttr(sCName + "ExportStyle", "background-color: " + rgb);
+                                }
+                            }
                         }
                     }
                 }
-                catch (Exception ex)
-                {
-
-                }
-
+                catch (Exception ex) { }
             }
         }
-        
+
         private string GetStatusText(int stat)
         {
 
@@ -2218,7 +2177,6 @@ namespace RPADataCache
             double retval = 0;
             double vval = 0;
             double fval = 0;
-
 
             if (fid == 0)
             {
@@ -2252,12 +2210,14 @@ namespace RPADataCache
             }
             else if (fid == -6)
             {
-                vval = oDet.tot_avail.getvarr(i);
-                fval = oDet.tot_avail.getftarr(i);
+                for (int idx = 0; idx < oDet.PIList.Count; idx++)
+                {
+                    vval += oDet.tot_avail.getvarr(i);
+                    fval += oDet.tot_avail.getftarr(i);
+                }
             }
             else if (fid == -7)
             {
-
                 if (bForHeatmap)
                 {
                     vval = oDet.tot_Totals.getvarr(i);
@@ -2265,8 +2225,13 @@ namespace RPADataCache
                 }
                 else
                 {
-                    vval = oDet.tot_avail.getvarr(i) - oDet.tot_Totals.getvarr(i);
-                    fval = oDet.tot_avail.getftarr(i) - oDet.tot_Totals.getftarr(i);
+                    for (int idx = 0; idx < oDet.PIList.Count; idx++)
+                    {
+                        vval += oDet.tot_avail.getvarr(i);
+                        fval += oDet.tot_avail.getftarr(i);
+                    }
+                    vval -= oDet.tot_Totals.getvarr(i);
+                    fval -= oDet.tot_Totals.getftarr(i);
                 }
             }
             else if (fid == -8)
@@ -2274,7 +2239,7 @@ namespace RPADataCache
                 if (iHeatmapID == 0 || iHeatmapID > oDet.CapScen.Count)
                 {
                     vval = -oDet.tot_Totals.getvarr(i);
-                    fval = -oDet.tot_Totals.getftarr(i);                   
+                    fval = -oDet.tot_Totals.getftarr(i);
                 }
                 else if (iHeatmapID <= -1 && iHeatmapID >= -6)
                 {
@@ -2318,35 +2283,30 @@ namespace RPADataCache
                     vval = oDet.tot_Totals.getvarr(i);
                     fval = oDet.tot_Totals.getftarr(i);
                 }
-                else 
+                else
                 {
                     vval = oDet.CapScen[iHeatmapID - 1].getvarr(i) - oDet.tot_Totals.getvarr(i);
                     fval = oDet.CapScen[iHeatmapID - 1].getftarr(i) - oDet.tot_Totals.getftarr(i);
                 }
             }
-
-
             else if (fid > 0 && fid <= oDet.CapScen.Count)
             {
                 vval = oDet.CapScen[fid - 1].getvarr(i);
                 fval = oDet.CapScen[fid - 1].getftarr(i);
-            };
-
+            }
 
             if (iMode == 3)
             {
-                    if (fval == 0)
-                        retval = 0;
-                    else
-                        retval = (vval * 100) / fval;
+                if (fval == 0)
+                    retval = 0;
+                else
+                    retval = (vval * 100) / fval;
             }
             else if (iMode == 0)
                 retval = vval;
             else
                 retval = fval;
 
-
- 
             if (iMode == 1)
                 retval /= 100;
 
@@ -2362,7 +2322,7 @@ namespace RPADataCache
 
             vval = oDet.getvarr(i);
             fval = oDet.getftarr(i);
- 
+
             if (iMode == 3)
             {
                 if (fval == 0)
@@ -2383,9 +2343,319 @@ namespace RPADataCache
             return retval;
         }
 
+        private double GetPIDataValue(clsResFullDAta oFullData, clsResXData oDet, int iMode, int i, int fid, int idx, bool bUseHeatmap, int iHeatMapID, int projectId, bool byRole)
+        {
+            //All the calculation performd for Show Totals section is based on following link:
+            //https://upland.screenstepslive.com/s/EPMLive2013/m/UserGuide/l/147531-how-do-i-use-the-total-column-feature-within-the-resource-analyzer
+            double retval = 0;
+            double vval = 0;
+            double fval = 0;
 
+            try
+            {
+                if (fid == 0)
+                {
+                    vval = oDet.getvarr(i);
+                    fval = oDet.getftarr(i);
+                }
+                else if (fid == -1)
+                {
+                    //Actual Work equals Timesheet Actuals entered.
+                    if (oFullData.actual.Count > 0)
+                    {
+                        idx = -1;
+                        if (byRole)
+                        {
+                            for (int counter = 0; counter < oFullData.actual.Count; counter++)
+                            {
+                                if (oFullData.actual[counter].ProjectID == projectId)
+                                {
+                                    idx = counter;
+                                    vval += Convert.ToDouble(oFullData.actual[idx].WrkHours[i]);
+                                    fval += Convert.ToDouble(oFullData.actual[idx].FTEVals[i]);
+                                }
+                            }
+                            if (idx == -1)
+                            {
+                                vval = fval = 0;
+                            }
+                        }
+                        else
+                        {
+                            for (int counter = 0; counter < oFullData.actual.Count; counter++)
+                            {
+                                if (oFullData.actual[counter].ProjectID == projectId)
+                                {
+                                    idx = counter;
+                                    break;
+                                }
+                            }
+                            if (idx == -1)
+                            {
+                                vval = fval = 0;
+                            }
+                            else
+                            {
+                                vval = Convert.ToDouble(oFullData.actual[idx].WrkHours[i]);
+                                fval = Convert.ToDouble(oFullData.actual[idx].FTEVals[i]);
+                            }
+                        }
+                    }
+                }
+                else if (fid == -2)
+                {
+                    //Proposed Work equals resource planned work that has not yet been committed.
+                    if (oFullData.proposal.Count > 0)
+                    {
+                        idx = -1;
+                        if (byRole)
+                        {
+                            for (int counter = 0; counter < oFullData.proposal.Count; counter++)
+                            {
+                                if (oFullData.proposal[counter].ProjectID == projectId)
+                                {
+                                    idx = counter;
+                                    vval += Convert.ToDouble(oFullData.proposal[idx].WrkHours[i]);
+                                    fval += Convert.ToDouble(oFullData.proposal[idx].FTEVals[i]);
+                                }
+                            }
+                            if (idx == -1)
+                            {
+                                vval = fval = 0;
+                            }
+                        }
+                        else
+                        {
+                            for (int counter = 0; counter < oFullData.proposal.Count; counter++)
+                            {
+                                if (oFullData.proposal[counter].ProjectID == projectId)
+                                {
+                                    idx = counter;
+                                    break;
+                                }
+                            }
+                            if (idx == -1)
+                            {
+                                vval = fval = 0;
+                            }
+                            else
+                            {
+                                vval = Convert.ToDouble(oFullData.proposal[idx].WrkHours[i]);
+                                fval = Convert.ToDouble(oFullData.proposal[idx].FTEVals[i]);
+                            }
+                        }
+                    }
+                }
+                else if (fid == -3)
+                {
+                    //Scheduled Work equals the work allocation pulled in from the designated work lists, such as Task Center, Issues, Risks, etc..
+                    if (byRole)
+                    {
+                        for (int counter = 0; counter < oFullData.scheduled.Count; counter++)
+                        {
+                            if (oFullData.scheduled[counter].ProjectID == projectId)
+                            {
+                                idx = counter;
+                                vval += Convert.ToDouble(oFullData.scheduled[idx].WrkHours[i]);
+                                fval += Convert.ToDouble(oFullData.scheduled[idx].FTEVals[i]);
+                            }
+                        }
+                        if (idx == -1)
+                        {
+                            vval = fval = 0;
+                        }
+                    }
+                    else
+                    {
+                        if (oFullData.scheduled.Count > 0)
+                        {
+                            idx = -1;
+                            for (int counter = 0; counter < oFullData.scheduled.Count; counter++)
+                            {
+                                if (oFullData.scheduled[counter].ProjectID == projectId)
+                                {
+                                    idx = counter;
+                                    break;
+                                }
+                            }
+                            if (idx == -1)
+                            {
+                                vval = fval = 0;
+                            }
+                            else
+                            {
+                                vval = Convert.ToDouble(oFullData.scheduled[idx].WrkHours[i]);
+                                fval = Convert.ToDouble(oFullData.scheduled[idx].FTEVals[i]);
+                            }
+                        }
+                    }
+                }
+                else if (fid == -4)
+                {
+                    //Committed Work equals the hours in resource plans that have been committed.
+                    if (byRole)
+                    {
+                        for (int counter = 0; counter < oFullData.committed.Count; counter++)
+                        {
+                            if (oFullData.committed[counter].ProjectID == projectId)
+                            {
+                                idx = counter;
+                                vval += Convert.ToDouble(oFullData.committed[idx].WrkHours[i]);
+                                fval += Convert.ToDouble(oFullData.committed[idx].FTEVals[i]);
+                            }
+                        }
+                        if (idx == -1)
+                        {
+                            vval = fval = 0;
+                        }
+                    }
+                    else
+                    {
+                        if (oFullData.committed.Count > 0)
+                        {
+                            idx = -1;
+                            for (int counter = 0; counter < oFullData.committed.Count; counter++)
+                            {
+                                if (oFullData.committed[counter].ProjectID == projectId)
+                                {
+                                    idx = counter;
+                                    break;
+                                }
+                            }
+                            if (idx == -1)
+                            {
+                                vval = fval = 0;
+                            }
+                            else
+                            {
+                                vval = Convert.ToDouble(oFullData.committed[idx].WrkHours[i]);
+                                fval = Convert.ToDouble(oFullData.committed[idx].FTEVals[i]);
+                            }
+                        }
+                    }
+                }
+                else if (fid == -5)
+                {
+                    //Personal Time Off pulls in the hours entered into the Time Off Requests.
+                    if (byRole)
+                    {
+                        for (int counter = 0; counter < oFullData.personel.Count; counter++)
+                        {
+                            if (oFullData.personel[counter].ProjectID == projectId)
+                            {
+                                idx = counter;
+                                vval += Convert.ToDouble(oFullData.personel[idx].WrkHours[i]);
+                                fval += Convert.ToDouble(oFullData.personel[idx].FTEVals[i]);
+                            }
+                        }
+                        if (idx == -1)
+                        {
+                            vval = fval = 0;
+                        }
+                    }
+                    else
+                    {
+                        if (oFullData.personel.Count > 0)
+                        {
+                            idx = -1;
+                            for (int counter = 0; counter < oFullData.personel.Count; counter++)
+                            {
+                                if (oFullData.personel[counter].ProjectID == projectId)
+                                {
+                                    idx = counter;
+                                    break;
+                                }
+                            }
+                            if (idx == -1)
+                            {
+                                vval = fval = 0;
+                            }
+                            else
+                            {
+                                vval = Convert.ToDouble(oFullData.personel[idx].WrkHours[i]);
+                                fval = Convert.ToDouble(oFullData.personel[idx].FTEVals[i]);
+                            }
+                        }
+                    }
+                }
+                else if (fid == -6)
+                {
+                    //Availability equals the number of work hours each resource is available for each calendar period (monthly/weekly/quarterly/etc.). 
+                    //It is important to note that this is resource specific based on each resource’s work hours schedule.
+                    vval = oFullData.tot_avail.getvarr(i);
+                    fval = oFullData.tot_avail.getftarr(i);
+                }
+                else if (fid == -7)
+                {
+                    //Remaining Availability equals Availability minus any committed and scheduled work.
+                    double totWrkHrs = 0, totFTEHrs = 0;
+                    double avlWrkHrs = 0, avlFTEHrs = 0;
+
+                    if (oDet.ProjectID == projectId)
+                    {
+                        if (byRole)
+                        {
+                            avlWrkHrs = oFullData.tot_avail.getvarr(i);
+                            avlFTEHrs = oFullData.tot_avail.getftarr(i);
+                        }
+                        else
+                        {
+                            if (oFullData.avail.Count > 0)
+                            {
+                                idx = 0;
+                                for (int counter = 0; counter < oFullData.avail.Count; counter++)
+                                {
+                                    if (oFullData.avail[counter].ProjectID == projectId)
+                                    {
+                                        idx = counter;
+                                        break;
+                                    }
+                                }
+                                if (idx == -1)
+                                {
+                                    avlWrkHrs = avlFTEHrs = 0;
+                                }
+                                else
+                                {
+                                    avlWrkHrs = Convert.ToDouble(oFullData.avail[idx].WrkHours[i]);
+                                    avlFTEHrs = Convert.ToDouble(oFullData.avail[idx].FTEVals[i]);
+                                }
+                            }
+                        }
+
+                        totWrkHrs = oDet.getvarr(i);
+                        totFTEHrs = oDet.getftarr(i);
+
+                        vval = avlWrkHrs - totWrkHrs;
+                        fval = avlFTEHrs - totFTEHrs;
+                    }
+                }
+                else if (fid > 0 && fid <= oFullData.CapScen.Count)
+                {
+                    vval = oFullData.CapScen[fid - 1].getvarr(i);
+                    fval = oFullData.CapScen[fid - 1].getftarr(i);
+                }
+
+                if (iMode == 3)
+                {
+                    if (fval == 0)
+                        retval = 0;
+                    else
+                        retval = (vval * 100) / fval;
+                }
+                else if (iMode == 0)
+                    retval = vval;
+                else
+                    retval = fval;
+
+                if (iMode == 1)
+                    retval /= 100;
+
+                return retval;
+            }
+            catch { return 0; }
+        }
     }
-
 
     internal class RPATargetGrid
     {
@@ -2420,7 +2690,7 @@ namespace RPADataCache
             xCfg.CreateStringAttr("Code", "GTACCNPSQEBSLC");
             xCfg.CreateIntAttr("SuppressCfg", 3);
             xCfg.CreateIntAttr("SuppressMessage", 3);
-  
+
             xCfg.CreateIntAttr("ShowDeleted", 0);
             xCfg.CreateIntAttr("Deleting", 0);
             xCfg.CreateIntAttr("Selecting", 0);
@@ -2431,7 +2701,7 @@ namespace RPADataCache
             xCfg.CreateBooleanAttr("DateStrings", true);
             xCfg.CreateBooleanAttr("NoTreeLines", true);
 
-         //   xCfg.CreateIntAttr("MaxHeight", 300);
+            //   xCfg.CreateIntAttr("MaxHeight", 300);
             xCfg.CreateIntAttr("MaxWidth", 1);
 
             xCfg.CreateIntAttr("AppendId", 0);
@@ -2459,7 +2729,7 @@ namespace RPADataCache
 
 
 
-             xCfg.CreateIntAttr("Sorting", 0);
+            xCfg.CreateIntAttr("Sorting", 0);
 
 
             CStruct xLeftCols = xGrid.CreateSubStruct("LeftCols");
@@ -2491,28 +2761,28 @@ namespace RPADataCache
 
             m_xHeader1.CreateStringAttr("P" + sId + "V", sName);
 
-   
+
             xC = m_xPeriodCols.CreateSubStruct("C");
             xC.CreateStringAttr("Name", "P" + sId + "V");
             xC.CreateStringAttr("Type", "Float");
             xC.CreateIntAttr("CanMove", 0);
             xC.CreateStringAttr("Format", "0.###");
 
-  
+
         }
         public void FinalizeGridLayout()
         {
-  
+
         }
         public string GetString()
         {
             return xGrid.XML();
         }
-        
+
 
         public bool InitializeGridData()
         {
-              
+
 
             CStruct xBody = xGrid.CreateSubStruct("Body");
             CStruct xB = xBody.CreateSubStruct("B");
@@ -2538,7 +2808,7 @@ namespace RPADataCache
 
             xI.CreateStringAttr("Color", "white");
             xI.CreateStringAttr("CostCategory", sPad + oRA.Name);
-    
+
             xI.CreateIntAttr("NoColorState", 1);
 
             for (int i = 1; i <= maxp; i++)
@@ -2552,9 +2822,9 @@ namespace RPADataCache
                     xI.CreateDoubleAttr("P" + i.ToString() + "V", oRA.getvarr(i));
                 }
 
-  
+
                 xI.CreateIntAttr("P" + i.ToString() + "VCanEdit", 1);
-              }
+            }
         }
     }
 
@@ -2593,7 +2863,7 @@ namespace RPADataCache
             xCfg.CreateIntAttr("DragEdit", 0);
             xCfg.CreateIntAttr("MaxWidth", 1);
             xCfg.CreateIntAttr("HideHScroll", 1);
-                
+
 
             //xCfg.CreateIntAttr("ExactSize", 0);
             xCfg.CreateIntAttr("SelectingCells", 1);
@@ -2647,7 +2917,7 @@ namespace RPADataCache
         {
             return xGrid.XML();
         }
-   
+
         public void AddRow(string Name, string srgb)
         {
 
