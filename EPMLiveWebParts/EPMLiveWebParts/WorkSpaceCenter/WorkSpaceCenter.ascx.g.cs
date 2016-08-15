@@ -100,47 +100,47 @@ namespace EPMLiveWebParts.WorkSpaceCenter {
                     "is).val();\r\n                                var count = GetGrids();\r\n           " +
                     "                     var grid = Grids[\"gridWorkSpaceCenter\"];\r\n                 " +
                     "               if (query.length > 0) {\r\n                                    grid" +
-                    ".ChangeFilter(\'WorkSpace\', query.toLowerCase(), 11, 0, 1, null);\r\n              " +
-                    "                  }\r\n                                else {\r\n                   " +
-                    "                 grid.ChangeFilter(\'WorkSpace\', query.toLowerCase(), 12, 0, 1, n" +
-                    "ull);\r\n                                }\r\n                                grid.U" +
-                    "pdate();\r\n                                grid.Render();\r\n                      " +
-                    "      }\r\n                        }\r\n                        ]\r\n                 " +
-                    "   },\r\n                    //view control\r\n                    {\r\n              " +
-                    "          \'controlId\': \'ddWorkspaceCenterView1\',\r\n                        \'contr" +
-                    "olType\': \'dropdown\',\r\n                        \'title\': \'View:\',\r\n               " +
-                    "         \'value\': \'All Items\',\r\n                        \'iconClass\': \'none\',\r\n  " +
-                    "                      \'sections\': [\r\n                            {\r\n            " +
-                    "                    \'heading\': \'none\',\r\n                                \'divider" +
-                    "\': \'yes\',\r\n                                \'options\': [\r\n                       " +
-                    "             {\r\n                                        \'iconClass\': \'none\',\r\n  " +
-                    "                                      \'text\': \'All Items\',\r\n                    " +
-                    "                    \'events\': [\r\n                                            {\r\n" +
-                    "                                                \'eventName\': \'click\',\r\n         " +
-                    "                                       \'function\': function () { changeView(\"All" +
-                    "Items\"); }\r\n                                            }\r\n                     " +
-                    "                   ]\r\n\r\n                                    },\r\n                " +
-                    "                    {\r\n                                        \'iconClass\': \'non" +
-                    "e\',\r\n                                        \'text\': \'My Workspace\',\r\n          " +
-                    "                              \'events\': [\r\n                                     " +
-                    "       {\r\n                                                \'eventName\': \'click\',\r" +
-                    "\n                                                \'function\': function () { chang" +
-                    "eView(\"MyWorkspace\"); }\r\n                                            }\r\n        " +
-                    "                                ]\r\n                                    },\r\n     " +
-                    "                               {\r\n                                        \'iconC" +
-                    "lass\': \'none\',\r\n                                        \'text\': \'My Favorite\',\r\n" +
-                    "                                        \'events\': [\r\n                           " +
-                    "                 {\r\n                                                \'eventName\':" +
-                    " \'click\',\r\n                                                \'function\': function " +
-                    "() { changeView(\"MyFavorite\"); }\r\n                                            }\r" +
-                    "\n                                        ]\r\n                                    " +
-                    "}\r\n\r\n                                ]\r\n                            }\r\n         " +
-                    "               ]\r\n                    }\r\n                    ]\r\n                " +
-                    "}\r\n            ];\r\n            epmLiveGenericToolBar.generateToolBar(\'WorkSpacec" +
-                    "enterToolbarMenu\', cfgs);\r\n        };\r\n\r\n        var changeView = function (curr" +
-                    "entView) {\r\n            EPM.UI.Loader.current().startLoading({ id: \'EPMWorkspace" +
-                    "CenterLoadingDiv\' });\r\n            var source = Grids[\"gridWorkSpaceCenter\"].Sou" +
-                    "rce;\r\n            source.Data.url = \'");
+                    ".ChangeFilter(\'WorkSpace\', query, 11, 0, 1, null);\r\n                            " +
+                    "    }\r\n                                else {\r\n                                 " +
+                    "   grid.ChangeFilter(\'WorkSpace\', query, 12, 0, 1, null);\r\n                     " +
+                    "           }\r\n                                grid.Update();\r\n                  " +
+                    "              grid.Render();\r\n                            }\r\n                   " +
+                    "     }\r\n                        ]\r\n                    },\r\n                    /" +
+                    "/view control\r\n                    {\r\n                        \'controlId\': \'ddWo" +
+                    "rkspaceCenterView1\',\r\n                        \'controlType\': \'dropdown\',\r\n      " +
+                    "                  \'title\': \'View:\',\r\n                        \'value\': \'All Items" +
+                    "\',\r\n                        \'iconClass\': \'none\',\r\n                        \'secti" +
+                    "ons\': [\r\n                            {\r\n                                \'heading" +
+                    "\': \'none\',\r\n                                \'divider\': \'yes\',\r\n                 " +
+                    "               \'options\': [\r\n                                    {\r\n            " +
+                    "                            \'iconClass\': \'none\',\r\n                              " +
+                    "          \'text\': \'All Items\',\r\n                                        \'events\'" +
+                    ": [\r\n                                            {\r\n                            " +
+                    "                    \'eventName\': \'click\',\r\n                                     " +
+                    "           \'function\': function () { changeView(\"AllItems\"); }\r\n                " +
+                    "                            }\r\n                                        ]\r\n\r\n    " +
+                    "                                },\r\n                                    {\r\n     " +
+                    "                                   \'iconClass\': \'none\',\r\n                       " +
+                    "                 \'text\': \'My Workspace\',\r\n                                      " +
+                    "  \'events\': [\r\n                                            {\r\n                  " +
+                    "                              \'eventName\': \'click\',\r\n                           " +
+                    "                     \'function\': function () { changeView(\"MyWorkspace\"); }\r\n   " +
+                    "                                         }\r\n                                    " +
+                    "    ]\r\n                                    },\r\n                                 " +
+                    "   {\r\n                                        \'iconClass\': \'none\',\r\n            " +
+                    "                            \'text\': \'My Favorite\',\r\n                            " +
+                    "            \'events\': [\r\n                                            {\r\n        " +
+                    "                                        \'eventName\': \'click\',\r\n                 " +
+                    "                               \'function\': function () { changeView(\"MyFavorite\"" +
+                    "); }\r\n                                            }\r\n                           " +
+                    "             ]\r\n                                    }\r\n\r\n                       " +
+                    "         ]\r\n                            }\r\n                        ]\r\n          " +
+                    "          }\r\n                    ]\r\n                }\r\n            ];\r\n         " +
+                    "   epmLiveGenericToolBar.generateToolBar(\'WorkSpacecenterToolbarMenu\', cfgs);\r\n " +
+                    "       };\r\n\r\n        var changeView = function (currentView) {\r\n            EPM." +
+                    "UI.Loader.current().startLoading({ id: \'EPMWorkspaceCenterLoadingDiv\' });\r\n     " +
+                    "       var source = Grids[\"gridWorkSpaceCenter\"].Source;\r\n            source.Dat" +
+                    "a.url = \'");
                        @__w.Write( WebUrl );
 
             @__w.Write(@"/_vti_bin/WorkEngine.asmx';

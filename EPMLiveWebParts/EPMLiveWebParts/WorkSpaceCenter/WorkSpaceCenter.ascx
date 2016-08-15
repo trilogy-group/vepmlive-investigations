@@ -113,10 +113,10 @@
                                 var count = GetGrids();
                                 var grid = Grids["gridWorkSpaceCenter"];
                                 if (query.length > 0) {
-                                    grid.ChangeFilter('WorkSpace', query.toLowerCase(), 11, 0, 1, null);
+                                    grid.ChangeFilter('WorkSpace', query, 11, 0, 1, null);
                                 }
                                 else {
-                                    grid.ChangeFilter('WorkSpace', query.toLowerCase(), 12, 0, 1, null);
+                                    grid.ChangeFilter('WorkSpace', query, 12, 0, 1, null);
                                 }
                                 grid.Update();
                                 grid.Render();
