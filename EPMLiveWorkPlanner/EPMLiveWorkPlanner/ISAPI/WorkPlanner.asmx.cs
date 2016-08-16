@@ -89,8 +89,8 @@ namespace EPMLiveWorkPlanner
             }
             catch (Exception ex)
             {
-                return "<Result Status=\"1\">Error executing function: " + ex.Message + "</Result>";
-            }
+                return "<Result Status=\"1\">Error executing function: " + ex.Message + "</Result>";//<Error ID=\"1000\">
+			}
 
         }
 
@@ -459,16 +459,16 @@ namespace EPMLiveWorkPlanner
 
             if (sUID == "" && !bAllowDuplicates)
             {
-                return "<Result Status=\"1\">UID Column not specified and allow duplicated is on. You must either specify UID column or you must allow duplicates.</Result>";
-            }
+                return "<Result Status=\"1\">UID Column not specified and allow duplicated is on. You must either specify UID column or you must allow duplicates.</Result>";////<Error ID=\"7001\">
+			}
             else if (sID == "")
             {
-                return "<Result Status=\"1\">ID Not Specified</Result>";
-            }
+                return "<Result Status=\"1\">ID Not Specified</Result>";//<Error ID=\"7002\">
+			}
             else if (sPlanner == "")
             {
-                return "<Result Status=\"1\">Planner Not Specified</Result>";
-            }
+                return "<Result Status=\"1\">Planner Not Specified</Result>";//<Error ID=\"7003\">
+			}
             else
             {
 
@@ -567,9 +567,9 @@ namespace EPMLiveWorkPlanner
                     attr.Value = "1";
                     ndNewRet.Attributes.Append(attr);
 
-                    ndNewRet.InnerXml = "" + ex.Message + "";
+                    ndNewRet.InnerXml =  ex.Message ;//<Error ID=\"7010\">
 
-                    docRet.FirstChild.AppendChild(ndNewRet);
+					docRet.FirstChild.AppendChild(ndNewRet);
 
                     docRet.FirstChild.Attributes["Status"].Value = "1";
                 }
@@ -720,9 +720,9 @@ namespace EPMLiveWorkPlanner
                     attr.Value = "1";
                     ndNewRet.Attributes.Append(attr);
 
-                    ndNewRet.InnerXml = "" + ex.Message + "";
+                    ndNewRet.InnerXml =  ex.Message;//<Error ID=\"7009\">
 
-                    docRet.FirstChild.AppendChild(ndNewRet);
+					docRet.FirstChild.AppendChild(ndNewRet);
                 }
 
             }
@@ -1117,8 +1117,8 @@ namespace EPMLiveWorkPlanner
             }
             catch (Exception ex)
             {
-                return "<Result Status=\"1\">Error executing function: " + ex.Message + "</Result>";
-            }
+                return "<Result Status=\"1\">Error executing function: " + ex.Message + "</Result>";//< Error ID =\"1110\">
+			}
         }
 
         public static string SaveAgilePlan(XmlDocument data, SPWeb oWeb)
@@ -1512,8 +1512,8 @@ namespace EPMLiveWorkPlanner
             }
             else
             {
-                return "<Result Status=\"1\">Planner Templates Library Missing</Result>";
-            }
+                return "<Result Status=\"1\">Planner Templates Library Missing</Result>";//<Error ID=\"6701\">
+			}
         }
 
         public static string SaveTemplate(XmlDocument data, SPWeb oWeb)
@@ -1549,18 +1549,18 @@ namespace EPMLiveWorkPlanner
                     }
                     else
                     {
-                        return "<Result Status=\"1\">Template Name Not Specified</Result>";
-                    }
+                        return "<Result Status=\"1\">Template Name Not Specified</Result>";//<Error ID=\"6702\">
+					}
                 }
                 else
                 {
-                    return "<Result Status=\"1\">Planner Not Specified</Result>";
-                }
+                    return "<Result Status=\"1\">Planner Not Specified</Result>";//<Error ID=\"6700\">
+				}
             }
             catch (Exception ex)
             {
-                return "<Result Status=\"1\">" + ex.Message + "</Result>";
-            }
+                return "<Result Status=\"1\">" + ex.Message + "</Result>";//<Error ID=\"6799\">
+			}
         }
 
         public static DataTable GetTemplates(SPWeb web, string planner, string type)
@@ -5098,8 +5098,8 @@ namespace EPMLiveWorkPlanner
             }
             catch (Exception ex)
             {
-                return "<Result Status=\"1\">Error: " + ex.Message + "</Result>";
-            }
+                return "<Result Status=\"1\">Error: " + ex.Message + "</Result>";//<Error ID=\"1001\">
+			}
         }
 
         public static PlannerProps getSettings(SPWeb web, string planner)
