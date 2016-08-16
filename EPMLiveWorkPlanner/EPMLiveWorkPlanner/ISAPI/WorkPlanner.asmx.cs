@@ -89,7 +89,7 @@ namespace EPMLiveWorkPlanner
             }
             catch (Exception ex)
             {
-                return "<Result Status=\"1\"><Error ID=\"1000\">Error executing function: " + ex.Message + "</Error></Result>";
+                return "<Result Status=\"1\">Error executing function: " + ex.Message + "</Result>";
             }
 
         }
@@ -459,15 +459,15 @@ namespace EPMLiveWorkPlanner
 
             if (sUID == "" && !bAllowDuplicates)
             {
-                return "<Result Status=\"1\"><Error ID=\"7001\">UID Column not specified and allow duplicated is on. You must either specify UID column or you must allow duplicates.</Error></Result>";
+                return "<Result Status=\"1\">UID Column not specified and allow duplicated is on. You must either specify UID column or you must allow duplicates.</Result>";
             }
             else if (sID == "")
             {
-                return "<Result Status=\"1\"><Error ID=\"7002\">ID Not Specified</Error></Result>";
+                return "<Result Status=\"1\">ID Not Specified</Result>";
             }
             else if (sPlanner == "")
             {
-                return "<Result Status=\"1\"><Error ID=\"7003\">Planner Not Specified</Error></Result>";
+                return "<Result Status=\"1\">Planner Not Specified</Result>";
             }
             else
             {
@@ -567,7 +567,7 @@ namespace EPMLiveWorkPlanner
                     attr.Value = "1";
                     ndNewRet.Attributes.Append(attr);
 
-                    ndNewRet.InnerXml = "<Error ID=\"7010\">" + ex.Message + "</Error>";
+                    ndNewRet.InnerXml = "" + ex.Message + "";
 
                     docRet.FirstChild.AppendChild(ndNewRet);
 
@@ -720,7 +720,7 @@ namespace EPMLiveWorkPlanner
                     attr.Value = "1";
                     ndNewRet.Attributes.Append(attr);
 
-                    ndNewRet.InnerXml = "<Error ID=\"7009\">" + ex.Message + "</Error>";
+                    ndNewRet.InnerXml = "" + ex.Message + "";
 
                     docRet.FirstChild.AppendChild(ndNewRet);
                 }
@@ -1117,7 +1117,7 @@ namespace EPMLiveWorkPlanner
             }
             catch (Exception ex)
             {
-                return "<Result Status=\"1\"><Error ID=\"1110\">Error executing function: " + ex.Message + "</Error></Result>";
+                return "<Result Status=\"1\">Error executing function: " + ex.Message + "</Result>";
             }
         }
 
@@ -1512,7 +1512,7 @@ namespace EPMLiveWorkPlanner
             }
             else
             {
-                return "<Result Status=\"1\"><Error ID=\"6701\">Planner Templates Library Missing</Error></Result>";
+                return "<Result Status=\"1\">Planner Templates Library Missing</Result>";
             }
         }
 
@@ -1549,17 +1549,17 @@ namespace EPMLiveWorkPlanner
                     }
                     else
                     {
-                        return "<Result Status=\"1\"><Error ID=\"6702\">Template Name Not Specified</Error></Result>";
+                        return "<Result Status=\"1\">Template Name Not Specified</Result>";
                     }
                 }
                 else
                 {
-                    return "<Result Status=\"1\"><Error ID=\"6700\">Planner Not Specified</Error></Result>";
+                    return "<Result Status=\"1\">Planner Not Specified</Result>";
                 }
             }
             catch (Exception ex)
             {
-                return "<Result Status=\"1\"><Error ID=\"6799\">" + ex.Message + "</Error></Result>";
+                return "<Result Status=\"1\">" + ex.Message + "</Result>";
             }
         }
 
@@ -5098,7 +5098,7 @@ namespace EPMLiveWorkPlanner
             }
             catch (Exception ex)
             {
-                return "<Result Status=\"1\"><Error ID=\"1001\">Error: " + ex.Message + "</Error></Result>";
+                return "<Result Status=\"1\">Error: " + ex.Message + "</Result>";
             }
         }
 
