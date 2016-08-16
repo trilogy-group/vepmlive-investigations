@@ -1,0 +1,57 @@
+REGEDIT4
+
+[HKEY_CLASSES_ROOT\WE_WEI.Session]
+@="WE_WEI.Session"
+
+[HKEY_CLASSES_ROOT\WE_WEI.Session\CLSID]
+@="{6CB9C005-1F9F-48E1-8727-4DE033F628E8}"
+
+[HKEY_CLASSES_ROOT\CLSID\{6CB9C005-1F9F-48E1-8727-4DE033F628E8}]
+@="WE_WEI.Session"
+
+[HKEY_CLASSES_ROOT\CLSID\{6CB9C005-1F9F-48E1-8727-4DE033F628E8}\InprocServer32]
+@="mscoree.dll"
+"ThreadingModel"="Both"
+"Class"="WE_WEI.Session"
+"Assembly"="WE_WEI, Version=43.2.0.600, Culture=neutral, PublicKeyToken=6fd317e214c91195"
+"RuntimeVersion"="v2.0.50727"
+"CodeBase"="file:///C:/EPMLive/PortfolioEngine/ServerFiles/WE_WEI.dll"
+
+[HKEY_CLASSES_ROOT\CLSID\{6CB9C005-1F9F-48E1-8727-4DE033F628E8}\InprocServer32\43.2.0.600]
+"Class"="WE_WEI.Session"
+"Assembly"="WE_WEI, Version=43.2.0.600, Culture=neutral, PublicKeyToken=6fd317e214c91195"
+"RuntimeVersion"="v2.0.50727"
+"CodeBase"="file:///C:/EPMLive/PortfolioEngine/ServerFiles/WE_WEI.dll"
+
+[HKEY_CLASSES_ROOT\CLSID\{6CB9C005-1F9F-48E1-8727-4DE033F628E8}\ProgId]
+@="WE_WEI.Session"
+
+[HKEY_CLASSES_ROOT\CLSID\{6CB9C005-1F9F-48E1-8727-4DE033F628E8}\Implemented Categories\{62C8FE65-4EBB-45E7-B440-6E39B2CDBF29}]
+
+[HKEY_CLASSES_ROOT\WE_WEI.WebSvcLMR.Integration]
+@="WE_WEI.WebSvcLMR.Integration"
+
+[HKEY_CLASSES_ROOT\WE_WEI.WebSvcLMR.Integration\CLSID]
+@="{5D89A667-DE9F-3B13-A3CB-33A05181635F}"
+
+[HKEY_CLASSES_ROOT\CLSID\{5D89A667-DE9F-3B13-A3CB-33A05181635F}]
+@="WE_WEI.WebSvcLMR.Integration"
+
+[HKEY_CLASSES_ROOT\CLSID\{5D89A667-DE9F-3B13-A3CB-33A05181635F}\InprocServer32]
+@="mscoree.dll"
+"ThreadingModel"="Both"
+"Class"="WE_WEI.WebSvcLMR.Integration"
+"Assembly"="WE_WEI, Version=43.2.0.600, Culture=neutral, PublicKeyToken=6fd317e214c91195"
+"RuntimeVersion"="v2.0.50727"
+"CodeBase"="file:///C:/EPMLive/PortfolioEngine/ServerFiles/WE_WEI.dll"
+
+[HKEY_CLASSES_ROOT\CLSID\{5D89A667-DE9F-3B13-A3CB-33A05181635F}\InprocServer32\43.2.0.600]
+"Class"="WE_WEI.WebSvcLMR.Integration"
+"Assembly"="WE_WEI, Version=43.2.0.600, Culture=neutral, PublicKeyToken=6fd317e214c91195"
+"RuntimeVersion"="v2.0.50727"
+"CodeBase"="file:///C:/EPMLive/PortfolioEngine/ServerFiles/WE_WEI.dll"
+
+[HKEY_CLASSES_ROOT\CLSID\{5D89A667-DE9F-3B13-A3CB-33A05181635F}\ProgId]
+@="WE_WEI.WebSvcLMR.Integration"
+
+[HKEY_CLASSES_ROOT\CLSID\{5D89A667-DE9F-3B13-A3CB-33A05181635F}\Implemented Categories\{62C8FE65-4EBB-45E7-B440-6E39B2CDBF29}]
