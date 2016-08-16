@@ -19,6 +19,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{07F5419B-D4F0-4EB0-A4B1-E4D96E248B2B}"
 	ProjectSection(SolutionItems) = preProject
 		Template\PortfolioEngine.wsp = Template\PortfolioEngine.wsp
+		Template\WorkEngineForms.wsp = Template\WorkEngineForms.wsp
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EPK_QueueMgr", "EPK_QueueMgr\EPK_QueueMgr\EPK_QueueMgr.csproj", "{28A384F1-0CC8-4DF0-BF25-8D82E0C423A7}"
