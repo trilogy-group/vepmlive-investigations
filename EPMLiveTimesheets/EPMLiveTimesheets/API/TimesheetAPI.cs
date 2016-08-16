@@ -55,7 +55,7 @@ namespace TimeSheets
                 catch { }
 
                 SqlConnection cn = null;
-                SPSecurity.RunWithElevatedPrivileges(delegate()
+                SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
                     cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id));
                     cn.Open();
@@ -139,7 +139,7 @@ namespace TimeSheets
                 docTimesheet.LoadXml(data);
 
                 SqlConnection cn = null;
-                SPSecurity.RunWithElevatedPrivileges(delegate()
+                SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
                     cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id));
                     cn.Open();
@@ -364,7 +364,7 @@ namespace TimeSheets
                 string tsuid = docTimesheet.FirstChild.Attributes["ID"].Value;
 
                 SqlConnection cn = null;
-                SPSecurity.RunWithElevatedPrivileges(delegate()
+                SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
                     cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id));
                     cn.Open();
@@ -455,7 +455,7 @@ namespace TimeSheets
                 string tsuid = docTimesheet.FirstChild.Attributes["ID"].Value;
 
                 SqlConnection cn = null;
-                SPSecurity.RunWithElevatedPrivileges(delegate()
+                SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
                     cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id));
                     cn.Open();
@@ -526,7 +526,7 @@ namespace TimeSheets
                 string tsuid = docTimesheet.FirstChild.Attributes["TSUID"].Value;
 
                 SqlConnection cn = null;
-                SPSecurity.RunWithElevatedPrivileges(delegate()
+                SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
                     cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id));
                     cn.Open();
@@ -610,7 +610,7 @@ namespace TimeSheets
                 catch { }
 
                 SqlConnection cn = null;
-                SPSecurity.RunWithElevatedPrivileges(delegate()
+                SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
                     cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id));
                     cn.Open();
@@ -676,7 +676,7 @@ namespace TimeSheets
                 string tsuid = doc.FirstChild.Attributes["ID"].Value;
 
                 SqlConnection cn = null;
-                SPSecurity.RunWithElevatedPrivileges(delegate()
+                SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
                     cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id));
                     cn.Open();
@@ -727,7 +727,7 @@ namespace TimeSheets
                 string tsuid = doc.FirstChild.Attributes["ID"].Value;
 
                 SqlConnection cn = null;
-                SPSecurity.RunWithElevatedPrivileges(delegate()
+                SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
                     cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id));
                     cn.Open();
@@ -795,7 +795,7 @@ namespace TimeSheets
                 catch { }
 
                 SqlConnection cn = null;
-                SPSecurity.RunWithElevatedPrivileges(delegate()
+                SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
                     cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id));
                     cn.Open();
@@ -834,7 +834,7 @@ namespace TimeSheets
 
                     DateTime dtStartRounded = new DateTime(dtStart.Year, dtStart.Month, dtStart.Day, 0, 0, 0);
                     DateTime dtCounter = new DateTime(dtStart.Year, dtStart.Month, dtStart.Day, 0, 0, 0);
-                    
+
                     string output = "";
 
                     while (dtCounter <= dtNowRounded)
@@ -915,7 +915,7 @@ namespace TimeSheets
                     String userIDs;
                     bIsTimeSheetManager = "True";
 
-                    SPSecurity.RunWithElevatedPrivileges(delegate()
+                    SPSecurity.RunWithElevatedPrivileges(delegate ()
                     {
                         cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id));
                         cn.Open();
@@ -1012,7 +1012,7 @@ namespace TimeSheets
                     //EPMLiveCore.CoreFunctions.enqueue(tJob, 0);
 
                     SqlConnection cn = null;
-                    SPSecurity.RunWithElevatedPrivileges(delegate()
+                    SPSecurity.RunWithElevatedPrivileges(delegate ()
                     {
                         cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id));
                         cn.Open();
@@ -1198,7 +1198,7 @@ namespace TimeSheets
                     catch { }
                 }
 
-                SPSecurity.RunWithElevatedPrivileges(delegate()
+                SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
                     SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(web.Site.WebApplication.Id));
                     cn.Open();
@@ -2023,7 +2023,7 @@ namespace TimeSheets
 
 
             SqlConnection cn = null;
-            SPSecurity.RunWithElevatedPrivileges(delegate()
+            SPSecurity.RunWithElevatedPrivileges(delegate ()
             {
                 cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(SPContext.Current.Web.Site.WebApplication.Id));
                 cn.Open();
@@ -2100,7 +2100,7 @@ namespace TimeSheets
                 sResList = sResList.Trim(';').Trim('#');
 
                 SqlConnection cn = null;
-                SPSecurity.RunWithElevatedPrivileges(delegate()
+                SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
                     cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(web.Site.WebApplication.Id));
                     cn.Open();
@@ -2310,7 +2310,7 @@ namespace TimeSheets
             try
             {
                 SqlConnection cn = null;
-                SPSecurity.RunWithElevatedPrivileges(delegate()
+                SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
                     cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(web.Site.WebApplication.Id));
                     cn.Open();
@@ -2770,7 +2770,7 @@ namespace TimeSheets
             string tsuid = docTimesheet.FirstChild.Attributes["ID"].Value;
 
             SqlConnection cn = null;
-            SPSecurity.RunWithElevatedPrivileges(delegate()
+            SPSecurity.RunWithElevatedPrivileges(delegate ()
             {
                 cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id));
                 cn.Open();
@@ -2923,7 +2923,7 @@ namespace TimeSheets
             sUserId = user.ID.ToString();
 
             SqlConnection cn = null;
-            SPSecurity.RunWithElevatedPrivileges(delegate()
+            SPSecurity.RunWithElevatedPrivileges(delegate ()
             {
                 cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(web.Site.WebApplication.Id));
                 cn.Open();
@@ -3018,11 +3018,24 @@ namespace TimeSheets
             dc.DefaultValue = Convert.ToBoolean(false);
             ds.Tables[myworktableid].Columns.Add(dc);
 
+            string assignedToId = "-99";
+
             foreach (DataRow drItem in ds.Tables[2].Rows)
             {
                 if (!drAdded.Contains(drItem["LIST_UID"].ToString() + "." + drItem["ITEM_ID"].ToString()))
                 {
-                    sql = string.Format(@"SELECT * FROM dbo.LSTMyWork WHERE [AssignedToID] = {0} AND [SiteId] = N'{1}' AND LISTID = N'{2}' AND ITEMID=N'{3}'", Convert.ToString(drItem["ASSIGNEDTOID"]) == "" ? "-99" : Convert.ToString(drItem["ASSIGNEDTOID"]), web.Site.ID, drItem["LIST_UID"].ToString(), drItem["ITEM_ID"].ToString());
+                    if (string.IsNullOrEmpty(Convert.ToString(drItem["ASSIGNEDTOID"])))
+                    {
+                        if (web.CurrentUser == null)
+                            assignedToId = "-99";
+                        else
+                            assignedToId = web.CurrentUser.ID.ToString();
+                    }
+                    else
+                    {
+                        assignedToId = Convert.ToString(drItem["ASSIGNEDTOID"]);
+                    }
+                    sql = string.Format(@"SELECT * FROM dbo.LSTMyWork WHERE [AssignedToID] = {0} AND [SiteId] = N'{1}' AND LISTID = N'{2}' AND ITEMID=N'{3}'", assignedToId, web.Site.ID, drItem["LIST_UID"].ToString(), drItem["ITEM_ID"].ToString());
                     myWorkDataTable = rptData.ExecuteSql(sql);
 
 
@@ -3037,7 +3050,7 @@ namespace TimeSheets
 
                         SqlDataAdapter daTSItem = new SqlDataAdapter(cmdTSItem);
                         daTSItem.Fill(dtTSItem);
-                        
+
                         if (dtTSItem != null)
                         {
                             sql = string.Format(@"select '" + Convert.ToString(dtTSItem.Rows[0]["SITE_UID"]) + "' SiteId,'" + Convert.ToString(dtTSItem.Rows[0]["WEB_UID"]) + "' WebId,'" + Convert.ToString(dtTSItem.Rows[0]["LIST_UID"]) + "' ListId," + Convert.ToString(dtTSItem.Rows[0]["ITEM_ID"]) + " ItemId,null WebUrl,null Commenters,null CommentersRead,null CommentCount,null WorkspaceUrl,null ID,null Title,null _UIVersionString,null Attachments,null ItemChildCountID,null ItemChildCountText,null FolderChildCountID,null FolderChildCountText,null AppAuthorID,null AppAuthorText,null AppEditorID,null AppEditorText," + Convert.ToString(dtTSItem.Rows[0]["PROJECT_ID"]) + " ProjectID, '" + Convert.ToString(dtTSItem.Rows[0]["PROJECT"]) + "' ProjectText,null AssignedToID,null AssignedToText,null OwnerID,null OwnerText,null Status,null Priority,null Body,null ScheduleStatus,null PercentComplete,null Due,null StartDate,null ActualStart,null DueDate,null ActualFinish,null Work,null ActualWork,null RemainingWork,null TimesheetHours,null RemainingHours,null WorkPercentSpent,null WorkStatus,null taskorder,null TaskHierarchy,null Site,null DaysOverdue,null Complete,null Timesheet,0 IsAssignment,null ContentType,null Modified,null Created,null AuthorID,null AuthorText,null EditorID,null EditorText,'Task Center' WorkType, null DataSource");
@@ -3045,7 +3058,7 @@ namespace TimeSheets
 
                             if (myWorkDataTable.Rows.Count > 0)
                             {
-                                ds.Tables[myworktableid].Rows.Add(myWorkDataTable.Rows[0].ItemArray);                                
+                                ds.Tables[myworktableid].Rows.Add(myWorkDataTable.Rows[0].ItemArray);
                                 DataTable dt = ds.Tables[myworktableid];
                                 DataRow dr = dt.Rows[cnt];
                                 dr["IsDeleted"] = Convert.ToBoolean(true);
@@ -3260,11 +3273,11 @@ namespace TimeSheets
 
                 DataSet dsCur = new DataSet();
 
-                SPSecurity.RunWithElevatedPrivileges(delegate()
+                SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
 
                     SqlConnection cn = null;
-                    SPSecurity.RunWithElevatedPrivileges(delegate()
+                    SPSecurity.RunWithElevatedPrivileges(delegate ()
                     {
                         cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id));
                         cn.Open();
@@ -3612,7 +3625,7 @@ namespace TimeSheets
                 Guid id = Guid.NewGuid();
 
                 SqlConnection cn = null;
-                SPSecurity.RunWithElevatedPrivileges(delegate()
+                SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
                     cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id));
                     cn.Open();
