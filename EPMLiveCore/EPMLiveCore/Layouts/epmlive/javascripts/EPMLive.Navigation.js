@@ -3056,7 +3056,35 @@
     function onJqueryLoaded() {
         ExecuteOrDelayUntilScriptLoaded(initializeNavigation, 'EPMLiveNavigation');
     }
+    window.showModalDialog = window.showModalDialog || function (url, arg, opt) {
+    	document.body.innerHTML += "<dialog id='myDialog'><div id='myDialogBody'><textarea id='myDialogtxtarea' rows='4' cols='50'></textarea></div><div style='float: right;margin: 20px;'><button id='myDialogOk'>Ok</button><button id='myDialogClose'>Close</button></div></dialog>";
+    	var dialog = document.getElementById('myDialog');
+    	var width = 430;
+    	var height = 230;
+    	var value = arg.value;
+    	var domelement = opt.split(";");
+    	for (var i = 0; i < domelement.length; i++) {
+    		if (domelement[i].indexOf("Height") != -1) {
+    			height = domelement[i].split(":")[1];
+    		}
+    		else if (domelement[i].indexOf("Width") != -1) {
+    			width = domelement[i].split(":")[1];
+    		}
+    	}
 
+    	dialog.showModal();
+    	$("textarea#myDialogtxtarea").val(arg.value);
+    	document.getElementById('myDialogClose').onclick = function () {
+    		dialog.close();
+    		dialog.remove();
+    	};
+    	document.getElementById('myDialogOk').onclick = function () {
+    		$("#" + arg.id).val($("textarea#myDialogtxtarea").val())
+    		dialog.close();
+    		dialog.remove();
+    	}
+    	return arg.value;
+    };
     ExecuteOrDelayUntilScriptLoaded(onJqueryLoaded, 'jquery.min.js');
 })();
 
