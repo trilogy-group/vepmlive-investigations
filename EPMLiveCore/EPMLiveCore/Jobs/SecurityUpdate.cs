@@ -414,6 +414,7 @@ namespace EPMLiveCore.Jobs
                         rType = SPRoleType.Administrator;
                         finalGrp.Owner = owner;
                         finalGrp.AddUser(owner);
+                        finalGrp.AllowMembersEditMembership = true;
                         finalGrp.Update();
                         ew.Update();
                         break;
