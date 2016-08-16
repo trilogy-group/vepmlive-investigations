@@ -1596,6 +1596,7 @@ function iChangeView(view, bHide) {
                 grid.ShowRow(grid.GetRowById("Filter"));
                 setButtonStateOn("Ribbon.WorkViews.WorkViewsGroup.ShowFilters-Medium");
                 bFilter = true;
+                grid.ActionFilterOn();
             }
             else {
                 grid.HideRow(grid.GetRowById("Filter"));
