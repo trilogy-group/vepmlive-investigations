@@ -905,7 +905,7 @@ function registerEpmLiveResourceGridScript() {
                                                     for (var fp in theFilter) {
                                                         if (theFilter.hasOwnProperty(fp)) {
                                                             var keyVal = fp.replace(/@/, '').toLowerCase();
-                                                            if (keyVal.toLowerCase() === 'value') {
+                                                            if (keyVal === 'value') {
                                                                 filter[keyVal] = theFilter[fp];
                                                             } else {
                                                                 filter[keyVal] = getCleanValue(theFilter[fp]);
