@@ -273,3 +273,4 @@ paket-files/
 
 # CodeRush
 .cr/
+/InstallShield/Build Dependencies/UserNameChecker.dll
