@@ -10,12 +10,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{7EC3F3
 		.nuget\NuGet.targets = .nuget\NuGet.targets
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "aline-build", "aline-build", "{0FFEE7A4-7B3D-4614-A864-028D41CB7F2F}"
-	ProjectSection(SolutionItems) = preProject
-		aline-build\RefsLocate.ps1 = aline-build\RefsLocate.ps1
-		aline-build\tl_build_v3.ps1 = aline-build\tl_build_v3.ps1
-	EndProjectSection
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{07F5419B-D4F0-4EB0-A4B1-E4D96E248B2B}"
 	ProjectSection(SolutionItems) = preProject
 		Template\PortfolioEngine.wsp = Template\PortfolioEngine.wsp
@@ -102,7 +96,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EPMLiveCore", "EPMLiveCore\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EPMLiveTests", "EPMLiveTests\EPMLiveTests.csproj", "{D2101EA6-CEF5-4502-92CD-852D635B263C}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BuildRelease", "BuildRelease", "{D6CE31B1-62E8-4947-9B7A-40F2DD62ECCB}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Installer Items", "Installer Items", "{D6CE31B1-62E8-4947-9B7A-40F2DD62ECCB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UserNameChecker", "BuildTeamCity\UserNameChecker\UserNameChecker.csproj", "{53C4D722-3B56-4013-AE6B-9E11559C1BB7}"
 EndProject
