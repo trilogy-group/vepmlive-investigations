@@ -332,47 +332,47 @@ namespace WE_QueueMgr
 				{
 					// check the queue for .net items before using RSVP
 					string sXML = BuildProductInfoString(site);
-					PortfolioEngineCore.QueueManager qm = new QueueManager(sXML);
-					if (qm.ReadNextQueuedItem())
+					using (PortfolioEngineCore.QueueManager qm = new QueueManager(sXML))
 					{
-						new LogService(sXML).TraceLog("ManageQueue", (StatusEnum)0, "Queue Manager Next item found for  site : " + site.basePath);
-						// we have a queued item - try to handle it in portfolioenginecore first
-						if (!qm.ManageQueue()) // false means not handled
+						if (qm.ReadNextQueuedItem())
 						{
-							switch (qm.Context)
+							new LogService(sXML).TraceLog("ManageQueue", (StatusEnum)0, "Queue Manager Next item found for  site : " + site.basePath);
+							// we have a queued item - try to handle it in portfolioenginecore first
+							if (!qm.ManageQueue()) // false means not handled
 							{
-								case 200:
-									//////PortfolioEngineAPI pFeAPI = new PortfolioEngineAPI();
-									//////pFeAPI.Execute("RefreshRoles", "");
-									//////pFeAPI.Dispose();
-									qm.SetJobCompleted();
-									ErrorHandler("ManageQueue Case 200", 98765);
-									break;
-								default:
-									Type comObjectType = Type.GetTypeFromProgID("WE_WSSAdmin.WSSAdmin");
-									object comObject = Activator.CreateInstance(comObjectType);
-									object[] myparams = new object[] { "ManageQueue", site.basePath };
-									string s = (string)comObjectType.InvokeMember("RSVPRequest",
-																BindingFlags.
-																	InvokeMethod,
-																null,
-																comObject,
-																myparams);
+								switch (qm.Context)
+								{
+									case 200:
+										//////PortfolioEngineAPI pFeAPI = new PortfolioEngineAPI();
+										//////pFeAPI.Execute("RefreshRoles", "");
+										//////pFeAPI.Dispose();
+										qm.SetJobCompleted();
+										ErrorHandler("ManageQueue Case 200", 98765);
+										break;
+									default:
+										Type comObjectType = Type.GetTypeFromProgID("WE_WSSAdmin.WSSAdmin");
+										object comObject = Activator.CreateInstance(comObjectType);
+										object[] myparams = new object[] { "ManageQueue", site.basePath };
+										string s = (string)comObjectType.InvokeMember("RSVPRequest",
+																	BindingFlags.
+																		InvokeMethod,
+																	null,
+																	comObject,
+																	myparams);
 
-									comObject = null;
-									if (s.Contains("<Error"))
-									{
-										new LogService(sXML).TraceStatusError("ManageQueue", (StatusEnum)99, "PfE Queue Manager (FA3) - ManageQueue Error basePath : " + site.basePath + "\nReply : " + s);
-										EventLog.WriteEntry("PfE Queue Manager (FA3) - ManageQueue Error", "basePath : " + site.basePath + "\nReply : " + s, EventLogEntryType.Error);
-									}
-									break;
+										comObject = null;
+										if (s.Contains("<Error"))
+										{
+											new LogService(sXML).TraceStatusError("ManageQueue", (StatusEnum)99, "PfE Queue Manager (FA3) - ManageQueue Error basePath : " + site.basePath + "\nReply : " + s);
+											EventLog.WriteEntry("PfE Queue Manager (FA3) - ManageQueue Error", "basePath : " + site.basePath + "\nReply : " + s, EventLogEntryType.Error);
+										}
+										break;
+								}
 							}
+
 						}
-						qm.Dispose();
-						qm = null;
 					}
-					if (qm != null)
-						qm.Dispose();
+
 				}
 				catch (Exception ex)
 				{
