@@ -138,8 +138,10 @@ namespace PortfolioEngineCore.WEIntegration
             if (xTimesheets == null) xTimesheets = xData;
 
             List<CStruct> listTSs = xTimesheets.GetList("Timesheet");
-            if (listTSs == null || listTSs.Count == 0)
+            if (listTSs == null)
             {
+                //Only throw this exception in case of listTSs object is returning Null value.
+                //If listTSs object is not null then continue execution of EPKSynch job as per usual.
                 throw new PFEException((int)PFEError.PostTimesheetData, "No Timesheet information");
             }
 
