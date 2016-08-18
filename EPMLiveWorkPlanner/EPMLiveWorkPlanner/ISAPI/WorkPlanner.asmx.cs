@@ -4653,6 +4653,11 @@ namespace EPMLiveWorkPlanner
                         return true;
                     else
                         return false;
+                case "StartDate":
+                    if (p.bStartSoon)
+                        return true;
+                    else
+                        return false;
             }
             return false;
         }

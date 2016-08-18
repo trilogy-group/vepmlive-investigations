@@ -1349,6 +1349,20 @@
 
             if(col == "Work")
                 oldWork = grid.GetValue(row, col);
+
+            if(row.id == "StartDate"){
+                if(row.nextSibling.V != '' && val > row.nextSibling.V){
+                    alert("The end date cannot be less than start date!");
+                    return grid.GetValue(row, col);
+                }
+            }
+
+            if(row.id == "DueDate"){
+                if(row.previousSibling.V != '' && val < row.previousSibling.V){
+                    alert("The end date cannot be less than start date!");
+                    return grid.GetValue(row, col);
+                }
+            }
         }
 
         if (grid.id == "WorkPlannerGrid") 
