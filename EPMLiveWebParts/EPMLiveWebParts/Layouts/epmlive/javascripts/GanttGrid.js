@@ -561,6 +561,7 @@ function GridNewItem(gridid, newid) {
     grid.SetAttribute(row, "Title", "HtmlPrefix", "<img src='/_layouts/15/epmlive/images/mywork/loading16.gif'>", 1);
     grid.SetAttribute(row, "Title", "ButtonText", " ", 1);
     GetRowData(grid, row);
+    grid.Reload();
 }
 
 function StopEditGridRow(grid, row) {
