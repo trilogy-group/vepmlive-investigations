@@ -838,7 +838,7 @@
                 }
             }
             catch (e) { }
-            
+
 
             if (gridView['Grouping'] === '') {
                 try {
@@ -3796,9 +3796,9 @@
                 this.GrpColValSet = true;
                 this.GrpColVal = rowv;
             }
-            else if (this.GrpColVal != rowv)
+            else if (this.GrpColVal != rowv || !row.Visible) {
                 return false;
-
+            }
         }
 
         while (children != null) {
