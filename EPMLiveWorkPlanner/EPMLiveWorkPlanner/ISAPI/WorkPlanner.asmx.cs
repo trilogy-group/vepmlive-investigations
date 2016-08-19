@@ -4649,15 +4649,9 @@ namespace EPMLiveWorkPlanner
                     return true;
                 case "Cost":
                 case "ActualCost":
-                    if (p.bCalcCost)
-                        return true;
-                    else
-                        return false;
+                    return p.bCalcCost;
                 case "StartDate":
-                    if (p.bStartSoon)
-                        return true;
-                    else
-                        return false;
+                    return p.bStartSoon;
             }
             return false;
         }
