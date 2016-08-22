@@ -92,7 +92,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
         private string GetPlannerTable(string plannerid, string plannername, SPWeb lWeb)
         {
 
-            string icon = EPMLiveCore.CoreFunctions.getConfigSetting(lWeb, "EPMLivePlanner" + sPlannerID + "Fields");
+            string icon = EPMLiveCore.CoreFunctions.getConfigSetting(lWeb, "EPMLivePlanner" + plannerid + "Icon");
             if (icon == "")
                 icon = "/_layouts/epmlive/images/planner_online.png";
             string desc = EPMLiveCore.CoreFunctions.getConfigSetting(lWeb, "EPMLivePlanner" + plannerid + "Description");
