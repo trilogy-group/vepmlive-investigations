@@ -3459,30 +3459,22 @@ namespace TimeSheets
                                 attr = docOut.CreateAttribute(GoodFieldname);
                                 if (GoodFieldname == "PercentComplete")
                                 {
-                                    try
-                                    {
-                                        attr.Value = Convert.ToString(Convert.ToDouble(dr[dc.ColumnName]) * 100, currenvyCultureInfo.NumberFormat);
-                                    }
-                                    catch { attr.Value = "0"; }
+                                    attr.Value = Convert.ToString(Convert.ToDouble(dr[dc.ColumnName]) * 100, currenvyCultureInfo.NumberFormat);
                                 }
                                 else
                                 {
-                                    try
+                                    if (dc.DataType == typeof(Double))
                                     {
-                                        if (dc.DataType == typeof(Double))
-                                        {
-                                            attr.Value = Convert.ToString(Convert.ToDouble(dr[dc.ColumnName]), currenvyCultureInfo.NumberFormat);
-                                        }
-                                        else if (dc.DataType == typeof(DateTime))
-                                        {
-                                            attr.Value = DateTime.Parse(Convert.ToString(dr[dc.ColumnName])).ToString("u");
-                                        }
-                                        else
-                                        {
-                                            attr.Value = Convert.ToString(dr[dc.ColumnName]);
-                                        }
+                                        attr.Value = Convert.ToString(Convert.ToDouble(dr[dc.ColumnName]), currenvyCultureInfo.NumberFormat);
                                     }
-                                    catch { }
+                                    else if (dc.DataType == typeof(DateTime) && !String.IsNullOrEmpty(Convert.ToString(dr[dc.ColumnName])))
+                                    {
+                                        attr.Value = DateTime.Parse(Convert.ToString(dr[dc.ColumnName])).ToString("u");
+                                    }
+                                    else
+                                    {
+                                        attr.Value = Convert.ToString(dr[dc.ColumnName]);
+                                    }
                                 }
                                 ndRow.Attributes.Append(attr);
                             }
