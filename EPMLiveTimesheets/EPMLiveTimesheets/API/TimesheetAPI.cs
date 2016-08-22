@@ -3194,6 +3194,7 @@ namespace TimeSheets
         {
             XmlDocument docOut = new XmlDocument();
             docOut.LoadXml(Properties.Resources.txtMyTimesheetWork_GridLayout);
+            var currenvyCultureInfo = new CultureInfo(1033);
 
             try
             {
@@ -3456,7 +3457,25 @@ namespace TimeSheets
                             if (isValidMyWorkColumn(GoodFieldname))
                             {
                                 attr = docOut.CreateAttribute(GoodFieldname);
-                                attr.Value = dr[dc].ToString();
+                                if (GoodFieldname == "PercentComplete")
+                                {
+                                    attr.Value = Convert.ToString(Convert.ToDouble(dr[dc.ColumnName]) * 100, currenvyCultureInfo.NumberFormat);
+                                }
+                                else
+                                {
+                                    if (dc.DataType == typeof(Double))
+                                    {
+                                        attr.Value = Convert.ToString(Convert.ToDouble(dr[dc.ColumnName]), currenvyCultureInfo.NumberFormat);
+                                    }
+                                    else if (dc.DataType == typeof(DateTime) && !String.IsNullOrEmpty(Convert.ToString(dr[dc.ColumnName])))
+                                    {
+                                        attr.Value = DateTime.Parse(Convert.ToString(dr[dc.ColumnName])).ToString("u");
+                                    }
+                                    else
+                                    {
+                                        attr.Value = Convert.ToString(dr[dc.ColumnName]);
+                                    }
+                                }
                                 ndRow.Attributes.Append(attr);
                             }
                         }
