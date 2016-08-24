@@ -838,7 +838,8 @@ namespace EPMLiveCore
 			string status = "";
 			if (ListItem.Fields.ContainsField("Status"))
 			{
-				status = ListItem["Status"].ToString();
+				if (ListItem["Status"] != null)
+					status = ListItem["Status"].ToString();
 			}
 			if (status != "Completed")
 			{
