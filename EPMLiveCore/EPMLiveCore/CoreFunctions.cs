@@ -836,31 +836,21 @@ namespace EPMLiveCore
 		{
 			string ss = "";
 			string status = "";
-			int yellow = 0;
-			int red = 30;
-
-			try
+			if (ListItem.Fields.ContainsField("Status"))
 			{
-				try
-				{
-					status = ListItem["Status"].ToString();
-				}
-				catch { }
-
-				if (status != "Completed")
-				{
-					#region new code
-					ss = ListItem["ScheduleStatus"].ToString();
-					ss = ss.Substring(ss.IndexOf(";#") + 2);
-					#endregion
-				}
-				else
-				{
-					ss = "checkmark.gif";
-				}
-
+				status = ListItem["Status"].ToString();
 			}
-			catch { }
+			if (status != "Completed")
+			{
+				if (ListItem.Fields.ContainsField("ScheduleStatus"))
+					ss = ListItem["ScheduleStatus"].ToString();
+				if (!string.IsNullOrEmpty(ss) && ss.IndexOf(";#") != -1)
+					ss = ss.Substring(ss.IndexOf(";#") + 2);
+			}
+			else
+			{
+				ss = "checkmark.gif";
+			}
 
 			return ss;
 		}
