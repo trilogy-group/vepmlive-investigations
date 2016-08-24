@@ -849,38 +849,6 @@ namespace EPMLiveCore
 
 				if (status != "Completed")
 				{
-					#region old code we not using formula here that's why there is inconsistency in List and display form 
-					//SPField oField = null;
-					//               try
-					//               {
-					//                   oField = ListItem.ParentList.Fields.GetFieldByInternalName("DueDate");
-					//               }
-					//               catch { }
-					//               if (oField != null)
-					//               {
-					//                   ss = "green.gif";
-					//                   DateTime duedate = DateTime.Parse(ListItem[oField.Id].ToString());
-					//                   DateTime today = DateTime.Now;
-					//                   today = new DateTime(today.Year, today.Month, today.Day, 0, 0, 0);
-					//                   duedate = new DateTime(duedate.Year, duedate.Month, duedate.Day, 0, 0, 0);
-
-					//                   TimeSpan ts = today - duedate;
-
-					//                   if (ts.TotalDays > red)
-					//                   {
-					//                       ss = "red.gif";
-					//                   }
-					//                   else if (ts.TotalDays > yellow)
-					//                   {
-					//                       ss = "yellow.gif";
-					//                   }
-					//               }
-					//               else
-					//               {
-					//                   ss = ListItem["ScheduleStatus"].ToString();
-					//                   ss = ss.Substring(ss.IndexOf(";#") + 2);
-					//               }
-					#endregion
 					#region new code
 					ss = ListItem["ScheduleStatus"].ToString();
 					ss = ss.Substring(ss.IndexOf(";#") + 2);
