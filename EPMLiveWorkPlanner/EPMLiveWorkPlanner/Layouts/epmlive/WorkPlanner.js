@@ -8,6 +8,7 @@ var sLookupList = "";
 
 var publishStatusBox;
 var canPublish = false;
+var publishInProgres = false;
 var updateStatusBox;
 var processUpdatesBox;
 var taskorder;
@@ -458,6 +459,10 @@ function CopySummaryField(col, c) {
             Grids.ProjectInfo.GetRowById(col).CanEdit = 1;
     } catch (e) { }
     Grids.ProjectInfo.RefreshRow(Grids.ProjectInfo.GetRowById(col));
+}
+
+function CanSave() {
+    return !publishInProgres;
 }
 
 function GridHasChanges() {
@@ -2815,12 +2820,17 @@ function CheckPublishStatusClose(loader) {
 
         if (sPublishStatus[0] == "true")
             canPublish = true;
-        else
+        else {
             canPublish = false;
+            publishInProgres = true;
+        }
 
         if (loader.xmlDoc.responseText.trim() != "No Status") {
             var status = sPublishStatus[2];
             if (status.indexOf('Processing') === 0 || status.indexOf('Queued') === 0) status += ' - feel free to leave this page while publishing';
+
+            if (status.indexOf('Processing') < 0)
+                publishInProgres = false;
 
             $('#we-planner-publish-status-body').html(status);
             setTimeout("CheckPublishStatus()", 10000);

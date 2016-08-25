@@ -1496,7 +1496,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
             var commands = new List<IRibbonCommand>();
 
             // register the command at the ribbon. Include the callback to the server     // to generate the xml
-            commands.Add(new SPRibbonCommand("Ribbon.WorkPlanner.SaveButton", "SaveWorkPlan();", "true"));
+            commands.Add(new SPRibbonCommand("Ribbon.WorkPlanner.SaveButton", "SaveWorkPlan();", "CanSave()"));
             commands.Add(new SPRibbonCommand("Ribbon.WorkPlanner.PublishButton", "PublishWorkPlan();", "GridHasChanges()"));
             commands.Add(new SPRibbonCommand("Ribbon.WorkPlanner.PrintButton", "PrintPlan();", "true"));
             commands.Add(new SPRibbonCommand("Ribbon.WorkPlanner.CloseButton", "Close();", "true"));
