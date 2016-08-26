@@ -470,7 +470,7 @@ function TSRenderFinish(grid) {
                     setTimeout("SetLoadView('" + grid.id + "','" + v + "')", 100);
                 }
             }
-            
+
         }
         //ChangeView(grid, "V0", "0");
     }
@@ -486,8 +486,7 @@ function TSRenderFinish(grid) {
 }
 
 
-function SetLoadView(gridid, viewid)
-{
+function SetLoadView(gridid, viewid) {
     var grid = Grids[gridid];
     ChangeView(grid, viewid, "0");
 }
@@ -1103,7 +1102,7 @@ function ChangeView(grid, view, isren) {
     //===========================================
     if (isren == "1" || isren == undefined) {
         newobj.CurrentViewId = view;
-        newobj.CurrentView = oView.Name;
+        newobj.CurrentView = unescape(oView.Name);
 
         RefreshCommandUI();
 
@@ -1116,7 +1115,9 @@ function DeleteView(grid, view) {
     var cnt = 0;
     ShowMessage(grid.id, "Deleting View...", 150, 50);
 
-    EPMLiveCore.WorkEngineAPI.ExecuteJSON("timesheet_DeleteView", "<View Name=\"" + view + "\"/>", function (response) {
+    var dataXml = "<View Name=\"" + escape(view) + "\"/>";
+
+    EPMLiveCore.WorkEngineAPI.ExecuteJSON("timesheet_DeleteView", dataXml, function (response) {
         var oResponse = eval("(" + response + ")");
         grid.StaticCursor = 1;
 
@@ -1139,7 +1140,7 @@ function DeleteView(grid, view) {
                 //}
             }
 
-            if (newobj.Views[view] != "" || newobj.Views[view] != undefined || newobj.Views[view] != null) {                
+            if (newobj.Views[view] != "" || newobj.Views[view] != undefined || newobj.Views[view] != null) {
                 if (cnt != 0) {
                     ChangeView(grid, view, "1");
                 }
@@ -1160,15 +1161,13 @@ function DeleteView(grid, view) {
     });
 }
 
-function checkDefaultView(grid,viewName)
-{
+function checkDefaultView(grid, viewName) {
     var newgridid = grid.id.substr(2);
     var newobj = eval("TSObject" + newgridid);
 
-    for (var view in newobj.Views) {        
+    for (var view in newobj.Views) {
         var oView = newobj.Views[view];
-        if (oView.Name == viewName)
-        {
+        if (unescape(oView.Name) == unescape(viewName)) {
             return oView.Default;
         }
     }
@@ -1178,7 +1177,9 @@ function RenameView(grid, view, retval) {
 
     ShowMessage(grid.id, "Renaming View...", 150, 50);
 
-    EPMLiveCore.WorkEngineAPI.ExecuteJSON("timesheet_RenameView", "<View Name=\"" + view + "\" NewName=\"" + retval[0] + "\" Default=\"" + retval[1] + "\"/>", function (response) {
+    var dataXml = "<View Name=\"" + escape(view) + "\" NewName=\"" + escape(retval[0]) + "\" Default=\"" + retval[1] + "\"/>";
+
+    EPMLiveCore.WorkEngineAPI.ExecuteJSON("timesheet_RenameView", dataXml, function (response) {
         var oResponse = eval("(" + response + ")");
         grid.StaticCursor = 1;
 
@@ -1194,8 +1195,8 @@ function RenameView(grid, view, retval) {
             for (var view in newobj.Views) {
                 var oView = newobj.Views[view];
 
-                if (oView.Name == retval[0]) {
-                    newobj.CurrentView = retval[0];
+                if (unespace(oView.Name) == unescape(retval[0])) {
+                    newobj.CurrentView = unescape(retval[0]);
                     newobj.CurrentViewId = view;
                     break;
                 }
@@ -1264,7 +1265,8 @@ function SaveView(grid, retval) {
 
     sCols = sCols.substr(1);
 
-    EPMLiveCore.WorkEngineAPI.ExecuteJSON("timesheet_SaveView", "<View Name=\"" + retval[0] + "\" Default=\"" + retval[1] + "\" Filters=\"" + filters + "\" Group=\"" + grid.Group + "\" Sort=\"" + grid.Sort + "\" Cols=\"" + sCols + "\" Expand=\"\" />", function (response) {
+    var dataXml = "<View Name=\"" + escape(retval[0]) + "\" Default=\"" + retval[1] + "\" Filters=\"" + filters + "\" Group=\"" + grid.Group + "\" Sort=\"" + grid.Sort + "\" Cols=\"" + sCols + "\" Expand=\"\" />";
+    EPMLiveCore.WorkEngineAPI.ExecuteJSON("timesheet_SaveView", dataXml, function (response) {
         var oResponse = eval("(" + response + ")");
         grid.StaticCursor = 1;
 
@@ -1280,8 +1282,8 @@ function SaveView(grid, retval) {
             for (var view in newobj.Views) {
                 var oView = newobj.Views[view];
 
-                if (oView.Name == retval[0]) {
-                    newobj.CurrentView = retval[0];
+                if (unescape(oView.Name) == unescape(retval[0])) {
+                    newobj.CurrentView = unescape(retval[0]);
                     newobj.CurrentViewId = view;
                     break;
                 }
@@ -1301,7 +1303,7 @@ function CheckApproveStatus(gridid) {
 
     EPMLiveCore.WorkEngineAPI.ExecuteJSON("timesheet_CheckApproveStatus", "<Timesheet ID=\"" + grid.TimesheetUID + "\" />", function (response) {
         var oResponse = eval("(" + response + ")");
-        
+
         if (oResponse.ApproveStatus.Result == "0") {
 
             var status = "";
@@ -2183,8 +2185,7 @@ function SaveTypes(event) {
         else if (fTotal < min || ((cTotal - oldVal) + fTotal) < min) {
             alert("You must enter atleast time of " + min + " hours");
         }
-        else
-        {
+        else {
             if (TSNotes) {
                 newTypeVal += ",Notes: \"" + escape(document.getElementById("txtTNotes").value.replace(/\r\n/g, "<br>")) + "\"";
             }
