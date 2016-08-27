@@ -7,6 +7,7 @@ using Microsoft.SharePoint;
 using Microsoft.SharePoint.Utilities;
 using Microsoft.SharePoint.WebControls;
 using EPMLiveCore.ReportHelper;
+using System.Data;
 
 namespace EPMLiveReportsAdmin.Layouts.EPMLive
 {
@@ -124,9 +125,27 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
                                 cn);
                         cmd.Parameters.AddWithValue("@siteguid", SPContext.Current.Site.ID.ToString());
                         SqlDataReader dr = cmd.ExecuteReader();
-                        if (dr.Read())
+
+                        int numberOfJobs = 0;
+                        using (var dt = new DataTable())
                         {
+                            dt.Load(dr);
+                            numberOfJobs = dt.Rows.Count;
                             dr.Close();
+                        }
+
+                        if (numberOfJobs > 1)
+                        {
+                            var deleteCmd =
+                           new SqlCommand(
+                               "delete from timerjobs where siteguid=@siteguid and listguid is null and jobtype=5 and scheduletype = 2",
+                               cn);
+                            deleteCmd.Parameters.AddWithValue("@siteguid", SPContext.Current.Site.ID.ToString());
+                            deleteCmd.ExecuteNonQuery();
+                        }
+
+                        if (numberOfJobs == 1)
+                        {
                             cmd =
                                 new SqlCommand(
                                     "UPDATE TIMERJOBS set runtime = @runtime where siteguid=@siteguid and listguid is null and jobtype=5 and scheduletype = 2",
@@ -137,7 +156,6 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
                         }
                         else
                         {
-                            dr.Close();
                             cmd =
                                 new SqlCommand(
                                     "INSERT INTO TIMERJOBS (siteguid, jobtype, jobname, scheduletype, webguid, runtime) VALUES (@siteguid, 5, 'Reporting Refresh All', 2, @webguid, @runtime)",
