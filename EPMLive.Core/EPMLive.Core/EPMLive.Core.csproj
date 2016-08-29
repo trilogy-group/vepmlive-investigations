@@ -2196,7 +2196,7 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\..\EPMLiveIntegration\EPMLiveIntegration\bin\Debug\EPMLiveIntegration.dll">
+    <Content Include="..\..\EPMLive.Integration\bin\Debug\EPMLiveIntegration.dll">
       <Link>EPMLiveIntegration.dll</Link>
     </Content>
     <Content Include="AppsListEvents\Elements.xml" />
