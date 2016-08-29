@@ -638,8 +638,6 @@ namespace EPMLiveWebParts
 								"</span><a class=\"ms-subtleLink\" onclick=\"GoToLinkOrDialogNewWindow(this); return false;\" href=" + SPContext.Current.Web.Url + "/_layouts/15/userdisp.aspx?ID" + item.Versions[i].CreatedBy.LookupId + ">" + item.Versions[i].CreatedBy.User.Name + "</a></span></span> (" + item.Versions[i].Created + "): " + item.Versions[i][fieldName] + "</div>");
 
 
-
-							sbNarrativeDetailsContent.Append("</div>");
 						}
 						sbNarrativeDetailsContent.Append("</div>");
 					}
