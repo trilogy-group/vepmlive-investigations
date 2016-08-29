@@ -1,8 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Elements xmlns="http://schemas.microsoft.com/sharepoint/" >
-  <Module Name="ResourceCapacityDemand" List="113" Url="_catalogs/wp">
-    <File Path="ResourceCapacityDemand\ResourceCapacityDemand.webpart" Url="ResourceCapacityDemand.webpart" Type="GhostableInLibrary">
-		<Property Name="Group" Value ="PortfolioEngine"/>
-    </File>
-  </Module>
-</Elements>

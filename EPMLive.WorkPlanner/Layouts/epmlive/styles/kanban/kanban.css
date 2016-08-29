@@ -1,0 +1,223 @@
+﻿#section1 {
+    width: auto;
+}
+
+.epmliveToolBar {
+    border-bottom: none;
+}
+
+#section2 {
+}
+
+#kanbanToolbar {
+    height: 40px;
+}
+
+    #kanbanToolbar .navbar-nav:first-child li:first-child a {
+        padding-right: 40px;
+    }
+
+#mainContainer {
+}
+
+    #mainContainer table {
+        width: 100%;
+        border-spacing: 0;
+    }
+
+        #mainContainer table td {
+            text-align: left;
+            vertical-align: top;
+            padding: 0;
+            border-right: 1px solid #eeeeee;
+        }
+
+            #mainContainer table td:last-child {
+                border-right: none;
+            }
+
+.kanbanLabels {
+    font-weight: bold;
+    vertical-align: top;
+}
+
+#loadingDiv {
+    width: 100%;
+    height: 100%;
+    left: 0;
+    top: 0;
+    position: absolute;
+    text-align: center;
+    vertical-align: middle;
+    background: white;
+    padding-top: 300px;
+    -moz-opacity: 0.75;
+    opacity: 0.75;
+    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha"(Opacity=75);
+}
+
+#kanbanloadingdiv {
+    display: inline-block;
+    min-height: 500px;
+    position: relative;
+    visibility: visible;
+    width: 100%;
+}
+
+#splitter {
+    background-color: #EEEEEE;
+    border-bottom: 1px solid #DDDDDD;
+    color: #BBBBBB;
+    cursor: pointer;
+    display: inline-block;
+    float: left;
+    font-size: 12px;
+    font-weight: bold;
+    height: 31px;
+    line-height: 33px;
+    padding-left: 1px;
+    position: absolute;
+    width: 15px;
+}
+
+.clear {
+    clear: both;
+}
+
+
+
+.itemContainerTitle,
+.stageContainerTitle {
+    font-size: 1.2em;
+    padding: 5px;
+    border-bottom: 1px solid #dddddd;
+    text-align: center;
+    font-weight: 300;
+    background-color: #eeeeee;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.itemContainer .sortable-list,
+.stageContainer .sortable-list {
+    margin: 0;
+    float: left;
+    width: 100%;
+    min-height: 650px;
+}
+
+.itemContainer .sortable-item,
+.stageContainer .sortable-item {
+    background-color: #D8F4FF;
+    border-left: 5px solid #0090CA;
+    cursor: move;
+    display: block;
+    float: left;
+    font-size: 12px;
+    margin-right: 5px;
+    margin-top: 5px;
+    min-height: 48px;
+    padding: 4px 5px 6px 6px;
+    text-align: left;
+    width: 90%;
+}
+
+    .itemContainer .sortable-item:hover,
+    .stageContainer .sortable-item:hover {
+        background-color: #9BE4FF;
+    }
+
+    .itemContainer .sortable-item div:nth-child(2),
+    .stageContainer .sortable-item div:nth-child(2) {
+        font-weight: 600;
+    }
+
+.sortable-item div {
+    padding-bottom: 2px;
+}
+
+    .sortable-item div:first-child, .sortable-item div:last-child {
+        padding-bottom: 0px;
+    }
+
+
+.sortable-item .double {
+    max-height: 40px;
+    min-width: 10px;
+    white-space: normal;
+    overflow: hidden;
+}
+
+.sortable-item .single {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    width: 10px;
+    color: #777777;
+}
+
+.placeholder {
+    background-color: #D8F4FF;
+    border-left: 5px solid #0090CA;
+    cursor: move;
+    display: block;
+    float: left;
+    font-size: 12px;
+    margin-right: 5px;
+    margin-top: 5px;
+    min-height: 48px;
+    padding: 4px 5px 6px 6px;
+    text-align: left;
+    width: 90%;
+    opacity: .4;
+    border: 2px dashed #0090CA;
+}
+
+.ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default {
+    background: none !important;
+    color: none !important;
+}
+
+#lnkNewItem {
+    padding: 15px 40px 15px 10px !important;
+}
+
+    #lnkNewItem:hover {
+        text-decoration: none;
+    }
+
+    #lnkNewItem span {
+        font-size: .8em;
+    }
+
+
+.associateditemscontextmenu {
+    display: none;
+    list-style: none;
+    cursor: pointer;
+    position: relative;
+}
+
+.sortable-item .associateditemscontextmenu .icon-ellipsis-horizontal:after {
+    content: '...';
+    position: relative;
+    top: -20px;
+    left: 0px;
+}
+
+.associateditemscontextmenu .epm-menu-btn span {
+    font-size: 2em;
+    color: #0090CA;
+    opacity: .6;
+}
+
+    .associateditemscontextmenu .epm-menu-btn span:hover {
+        opacity: 1;
+    }
+
+#dlgBacklogStatus {
+    display: none;
+    height: 50px !important;
+    min-height: 50px !important;
+}

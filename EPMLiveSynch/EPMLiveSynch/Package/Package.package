@@ -1,6 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<package xmlns:dm0="http://schemas.microsoft.com/VisualStudio/2008/DslTools/Core" dslVersion="1.0.0.0" Id="9297db1d-9a99-4b3d-a05d-14543a3fcb43" solutionId="9297db1d-9a99-4b3d-a05d-14543a3fcb43" resetWebServer="false" sharePointProductVersion="15.0" name="EPMLiveSynch" xmlns="http://schemas.microsoft.com/VisualStudio/2008/SharePointTools/PackageModel">
-  <projectItems>
-    <projectItemReference itemId="0ae8fc19-0c65-4152-8930-f4a9e5a78e5b" />
-  </projectItems>
-</package>

@@ -1,8 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Elements xmlns="http://schemas.microsoft.com/sharepoint/" >
-  <Module Name="FancyDisplayForm" List="113" Url="_catalogs/wp">
-    <File Path="FancyDisplayForm\FancyDisplayForm.webpart" Url="EPMLiveWebParts_FancyDisplayForm.webpart" Type="GhostableInLibrary" >
-      <Property Name="Group" Value="EPM Live" />
-    </File>
-  </Module>
-</Elements>

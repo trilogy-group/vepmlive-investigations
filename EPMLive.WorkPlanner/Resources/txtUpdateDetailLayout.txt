@@ -1,0 +1,21 @@
+<Grid>
+  <Cfg id='UpdateDetail' Style='Standard'
+    VarHeight='0' Dragging='0' Adding='0' 
+    Deleting='0' Selecting='0' Sorting='0' MaxVScroll='1000'/>
+	<Toolbar Visible='0'></Toolbar>
+	<Cfg Code="GTACCNPSQEBSLC"/>
+  <Cols>
+    <C Name='N' Type='Text' CanEdit='0' RelWidth='100'/>
+    <C Name='V' Type='Text' Width='150' NoEscape='1'/>
+	<C Name='O' Type='Text' Width='150' NoEscape='1'/>
+  </Cols>
+  <Header N='Field' V='New Value' O='Old Value'/>
+  <Def>
+	<D Name='R'/>
+  </Def>
+  <Body>
+    <B>
+      <I id='Title' NoColor='1' NoColorState='1' NoUpload='1'/>
+    </B>
+  </Body>
+</Grid>

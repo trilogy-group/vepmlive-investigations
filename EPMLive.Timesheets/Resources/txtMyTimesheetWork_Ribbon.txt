@@ -1,0 +1,70 @@
+	<Tab Id="Ribbon.MyTimesheetWorkTab" Title="Work" Sequence="400">
+		<Scaling Id="Ribbon.MyTimesheetWork.Scaling">
+			<MaxSize Id="Ribbon.MyTimesheetWork.ActionsGroup.MaxSize" GroupId="Ribbon.MyTimesheetWork.ActionsGroup" Size="LargeMediumSmall"/>
+			<Scale Id="Ribbon.MyTimesheetWork.ActionsGroup.Scaling.CustomTabScaling" GroupId="Ribbon.MyTimesheetWork.ActionsGroup" Size="LargeMediumSmall" />
+
+			<MaxSize Id="Ribbon.MyTimesheetWork.ViewPeriodGroup.MaxSize" GroupId="Ribbon.MyTimesheetWork.ViewPeriodGroup" Size="LargeMediumSmall"/>
+			<Scale Id="Ribbon.MyTimesheetWork.ViewPeriodGroup.Scaling.CustomTabScaling" GroupId="Ribbon.MyTimesheetWork.ViewPeriodGroup" Size="LargeMediumSmall" />
+
+		</Scaling>
+		<Groups Id="Ribbon.MyTimesheetWork.Groups">
+			<Group Id="Ribbon.MyTimesheetWork.ActionsGroup" Title="Actions" Sequence="10" Template="Ribbon.Templates.MyTimesheetTemplate">
+				<Controls Id="Ribbon.MyTimesheetWork.ActionsGroup.Controls">
+				
+					<Button
+					Id="Ribbon.MyTimesheetWork.ActionsGroup.AddWork"
+					Sequence="10"
+					Command="Ribbon.MyTimesheetWork.AddWork"
+					Image32by32="/_layouts/epmlive/images/mytsadditem.png"
+					LabelText="Add"
+					TemplateAlias="oL"/>
+
+					<Button 
+						Id="Ribbon.MyTimesheetWork.ActionsGroup.Search" 
+						Command="Ribbon.MyTimesheetWork.Search" 
+						Sequence="11" 
+						LabelText="Search"
+						Image32by32="/_layouts/epmlive/images/tssearch.gif" 
+						TemplateAlias="oL"/>
+
+				</Controls>
+			</Group>
+
+			<Group Id="Ribbon.MyTimesheetWork.ViewPeriodGroup" Title="View" Sequence="20" Template="Ribbon.Templates.MyTimesheetTemplate">
+				<Controls Id="Ribbon.MyTimesheetWork.ViewPeriodGroup.Controls">
+				
+					<ToggleButton Id="Ribbon.MyTimesheetWorkViews.AllWork"
+					Command="Ribbon.MyTimesheetWork.AllWork"
+					QueryCommand="Ribbon.MyTimesheetWork.AllWork.Query"
+					Description="Show All Work"
+					LabelText="Show All Work"
+					TemplateAlias="oM"
+					Image32by32="/_layouts/epmlive/images/mywork/ribbon/showhidefilters-32.png"
+					Image16by16="/_layouts/epmlive/images/mywork/ribbon/showhidefilters-16.png" />
+
+					<Label
+						Id="Ribbon.Timesheet.ViewPeriodGroup.CurrentViewLabel"
+						Sequence="20"
+						Command="Ribbon.MyTimesheetWork.CurrentViewLabel"
+						LabelText="Current View:"
+						TemplateAlias="oM"
+						/> 
+
+					<DropDown
+						Id="Ribbon.Timesheet.ViewPeriodGroup.DisplayView"
+						Sequence="21"
+						Command="Ribbon.MyTimesheetWork.ChangeView"
+						PopulateDynamically="true"
+						PopulateOnlyOnce="false"
+						PopulateQueryCommand="Ribbon.MyTimesheetWork.PopulateViewDropDown"
+						QueryCommand="Ribbon.MyTimesheetWork.QueryCurrentView"
+						Width="180px"
+						TemplateAlias="oM">
+					</DropDown> 
+
+				</Controls>
+			</Group>
+			
+
+		</Groups>
+	</Tab>

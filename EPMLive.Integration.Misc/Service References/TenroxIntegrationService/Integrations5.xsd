@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:tns="http://schemas.datacontract.org/2004/07/Tenrox.Application.SDK" elementFormDefault="qualified" targetNamespace="http://schemas.datacontract.org/2004/07/Tenrox.Application.SDK" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:import schemaLocation="http://srv-dev-epm.federation.com/TWebService/sdk/Integrations.svc?xsd=xsd6" namespace="http://schemas.datacontract.org/2004/07/System.Data" />
+  <xs:complexType name="ArrayOfIntegration">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="Integration" nillable="true" type="tns:Integration" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfIntegration" nillable="true" type="tns:ArrayOfIntegration" />
+  <xs:complexType name="Integration">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="ID01" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="ID02" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="ID03" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="ID04" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="ID05" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="ID06" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="ID07" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="ID08" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="ID09" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="ID10" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="ID11" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="ID12" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="ID13" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="ID14" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="ID15" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="ID16" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="ID17" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="ID18" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="ID19" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="ID20" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="ID21" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="ID22" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="ID23" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="ID24" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="ID25" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="ObjectId" type="xs:int" />
+      <xs:element minOccurs="0" name="ObjectType" type="xs:int" />
+      <xs:element xmlns:q1="http://schemas.datacontract.org/2004/07/System.Data" minOccurs="0" name="System.Data.Objects.DataClasses.IEntityWithKey.EntityKey" nillable="true" type="q1:EntityKey" />
+      <xs:element minOccurs="0" name="UniqueId" type="xs:int" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="Integration" nillable="true" type="tns:Integration" />
+</xs:schema>

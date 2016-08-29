@@ -1,0 +1,20 @@
+﻿.epmlive-loader {
+    background: url('/_layouts/15/epmlive/images/progress_ring.gif') no-repeat scroll center center transparent;
+    display: none;
+    height: 50px;
+    width: 100%;
+}
+
+#contentBox {
+                margin-left:20px;
+}
+
+.ms-dialog #contentBox {
+                margin-left:0px;
+}
+#ctl00_site_share_button {
+                display:none !important;
+}
+.ms-core-needIEFilter #suiteBarLeft {
+    filter: none !important;
+}

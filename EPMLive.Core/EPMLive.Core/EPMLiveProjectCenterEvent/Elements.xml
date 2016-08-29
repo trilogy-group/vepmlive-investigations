@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Elements xmlns="http://schemas.microsoft.com/sharepoint/">
+	<Receivers ListTemplateId="10701">
+		<Receiver>
+			<Name>EPMLiveProjectCenterEventItemDeleting</Name>
+			<Type>ItemDeleting</Type>
+			<Assembly>$SharePoint.Project.AssemblyFullName$</Assembly>
+			<Class>EPMLiveCore.EPMLiveProjectCenterEvent</Class>
+			<SequenceNumber>10000</SequenceNumber>
+		</Receiver>
+		<Receiver>
+			<Name>EPMLiveProjectCenterEventItemAdding</Name>
+			<Type>ItemAdding</Type>
+			<Assembly>$SharePoint.Project.AssemblyFullName$</Assembly>
+			<Class>EPMLiveCore.EPMLiveProjectCenterEvent</Class>
+			<SequenceNumber>10000</SequenceNumber>
+		</Receiver>
+		<Receiver>
+			<Name>EPMLiveProjectCenterEventItemUpdating</Name>
+			<Type>ItemUpdating</Type>
+			<Assembly>$SharePoint.Project.AssemblyFullName$</Assembly>
+			<Class>EPMLiveCore.EPMLiveProjectCenterEvent</Class>
+			<SequenceNumber>10000</SequenceNumber>
+		</Receiver>
+		<Receiver>
+			<Name>EPMLiveProjectCenterSyncEventItemUpdating</Name>
+			<Type>ItemUpdating</Type>
+			<Assembly>$SharePoint.Project.AssemblyFullName$</Assembly>
+			<Class>EPMLiveCore.ChildParentSync</Class>
+			<SequenceNumber>10001</SequenceNumber>
+		</Receiver>
+	</Receivers>
+</Elements>

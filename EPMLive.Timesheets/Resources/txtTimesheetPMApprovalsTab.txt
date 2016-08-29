@@ -1,0 +1,71 @@
+<Tab Id="Ribbon.TimesheetPMApprovals" Title="Timesheets" Description="" Command="EnableTimesheetTab" Sequence="501">
+		<Scaling Id="Ribbon.Timesheet.Scaling">
+	    	<MaxSize Id="Ribbon.Timesheet.Scaling.Main.MaxSize" Sequence="10" GroupId="Ribbon.Timesheet.Main" Size="LargeLarge" />
+			<MaxSize Id="Ribbon.Timesheet.Scaling.Data.MaxSize" Sequence="10" GroupId="Ribbon.Timesheet.Data" Size="LargeLarge" />
+	    </Scaling>
+		<Groups Id="TimesheetGroups">
+			<Group Id="Ribbon.Timesheet.Main" Title="Timesheet" Command="EnableTimesheetMain" Sequence="10" Template="Ribbon.Templates.Timesheet.Status">
+				<Controls Id="Ribbon.Timesheet.Main.Controls">
+					<Label
+						Id="Ribbon.Timesheet.Main.StatusLabel"
+						Sequence="50"
+						Command="TimesheetStatusLabel"
+						LabelText="Status:"
+						TemplateAlias="row1control"
+						/>             
+	               	<Label
+						Id="Ribbon.Timesheet.Main.Status"
+						Sequence="50"
+						Command="TimesheetStatus"
+						TemplateAlias="row2control"
+						QueryCommand="QueryStatus"
+						/>
+					<Button
+						Id="Ribbon.Timesheet.Main.PreviousPeriod"
+						Sequence="70"
+						Command="PreviousPeriod"
+						Image16by16="/_layouts/#language#/images/formatmap16x16.png" Image16by16Top="-128" Image16by16Left="-176"
+						LabelText="Previous Period"
+						TemplateAlias="previousPage"
+						/>
+					<DropDown
+						Id="Ribbon.List.CustomViews.DisplayView"
+						Sequence="80"
+						Command="CurrentPeriod"
+						PopulateDynamically="true"
+						PopulateOnlyOnce="true"
+						PopulateQueryCommand="PopulatePeriodDropDown"
+						QueryCommand="QueryCurrentPeriod"
+						Width="100px"
+						TemplateAlias="currentPage">
+					</DropDown> 
+					<Button
+						Id="Ribbon.List.CustomViews.NextPage"
+						Sequence="90"
+						Command="NextPeriod"
+						Image16by16="/_layouts/#language#/images/formatmap16x16.png" Image16by16Top="-32" Image16by16Left="-160"
+						LabelText="Next Period"
+						TemplateAlias="nextPage"
+						/>             
+				</Controls>
+			</Group>
+			<Group Id="Ribbon.Timesheet.Data" Title="Data" Command="EnableTimesheetApprovals" Sequence="11" Template="Ribbon.Templates.Flexible2">
+				<Controls Id="Ribbon.Timesheet.Data.Controls">
+					<Button 
+						Id="Ribbon.Timesheet.Approvals.Approve" 
+						Command="TimesheetApprove" 
+						Sequence="10" 
+						LabelText="Approve/Lock"
+						Image32by32="_layouts/epmlive/images/approvetime.gif" 
+						TemplateAlias="o1"/>
+					<Button 
+						Id="Ribbon.Timesheet.Approvals.Reject" 
+						Command="TimesheetReject" 
+						Sequence="12" 
+						LabelText="Reject"
+						Image32by32="_layouts/epmlive/images/rejecttime.gif" 
+						TemplateAlias="o1"/>
+	            </Controls>
+			</Group>
+		</Groups>
+	</Tab>

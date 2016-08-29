@@ -1,0 +1,144 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{BD45273D-42C6-4691-BED6-52279D8E489C}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Dashboard</RootNamespace>
+    <AssemblyName>Dashboard</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetOfficeVersion>15.0</TargetOfficeVersion>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{C1CDDADD-2546-481F-9697-4EA41081F2FC};{14822709-B5A1-4724-98CA-57A101D1B079};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <ActiveDeploymentConfiguration>Default</ActiveDeploymentConfiguration>
+    <SandboxedSolution>False</SandboxedSolution>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+    <ProjectMode>SharePointCustomization</ProjectMode>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <OldToolsVersion>4.0</OldToolsVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>EPMLiveLists.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.SharePoint.WorkflowActions, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL" />
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="Microsoft.SharePoint" />
+    <Reference Include="Microsoft.SharePoint.Client.ServerRuntime" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\CommonAssemblyInfo.cs">
+      <Link>CommonAssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="Dashboard\Dashboard.cs" />
+    <Compile Include="IssueSummary\IssueSummary.cs" />
+    <Compile Include="Milestone_Summary\Milestone_Summary.cs" />
+    <Compile Include="ProjectData.cs" />
+    <Compile Include="Project_Summary\Project_Summary.cs" />
+    <Compile Include="Project_Summary_Small\Project_Summary_Small.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Risk_Summary\Risk_Summary.cs" />
+    <Compile Include="Task_Summary\Task_Summary.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Dashboard\Dashboard.dwp" />
+    <None Include="Dashboard\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{a6d354d2-c777-4fab-a923-0a217cf0ef95}</SharePointProjectItemId>
+    </None>
+    <None Include="EPMLiveLists.snk" />
+    <None Include="Features\Feature1\Feature1.feature">
+      <FeatureId>{4e8f5c33-a391-422e-9bc9-914cba82cff2}</FeatureId>
+    </None>
+    <None Include="IssueSummary\IssueSummary.dwp" />
+    <None Include="IssueSummary\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{d614311d-ab97-4200-a669-f9379c1983f4}</SharePointProjectItemId>
+    </None>
+    <None Include="Milestone_Summary\Milestone_Summary.dwp" />
+    <None Include="Milestone_Summary\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{0b5c459c-d789-4c0c-9bc6-989445b4eb29}</SharePointProjectItemId>
+    </None>
+    <None Include="Package\Package.package">
+      <PackageId>{8f916fa9-1c2d-4416-8036-4a272256e23d}</PackageId>
+    </None>
+    <None Include="Package\Package.Template.xml">
+      <DependentUpon>Package.package</DependentUpon>
+    </None>
+    <None Include="Project_Summary\Project_Summary.dwp" />
+    <None Include="Project_Summary\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{9489f62c-a3dc-4e53-95c4-8fd1686ec1cd}</SharePointProjectItemId>
+    </None>
+    <None Include="Project_Summary_Small\Project_Summary_Small.dwp" />
+    <None Include="Project_Summary_Small\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{fa9481c5-5d0b-460b-985c-c0d9e38e04fc}</SharePointProjectItemId>
+    </None>
+    <None Include="Risk_Summary\Risk_Summary.dwp" />
+    <None Include="Risk_Summary\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{a6cc9338-14e0-4b44-aee5-79d0a04682af}</SharePointProjectItemId>
+    </None>
+    <None Include="Task_Summary\SharePointProjectItem.spdata">
+      <SharePointProjectItemId>{f84cec6a-bcfa-4b06-975f-0a23787c1f8d}</SharePointProjectItemId>
+    </None>
+    <None Include="Task_Summary\TaskSummary.dwp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\EPMLive.Core\EPMLive.Core\EPMLive.Core.csproj">
+      <Project>{c773ae44-f066-446a-9cbd-d24afa794e34}</Project>
+      <Name>EPMLive.Core</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Dashboard\Elements.xml" />
+    <Content Include="Features\Feature1\Feature1.Template.xml">
+      <DependentUpon>Feature1.feature</DependentUpon>
+    </Content>
+    <Content Include="IssueSummary\Elements.xml" />
+    <Content Include="Milestone_Summary\Elements.xml" />
+    <Content Include="Project_Summary\Elements.xml" />
+    <Content Include="Project_Summary_Small\Elements.xml" />
+    <Content Include="Risk_Summary\Elements.xml" />
+    <Content Include="Task_Summary\Elements.xml" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+  </PropertyGroup>
+  <Import Project="$(VSToolsPath)\SharePointTools\Microsoft.VisualStudio.SharePoint.targets" Condition="'$(VSToolsPath)' != ''" />
+</Project>

@@ -1,0 +1,11 @@
+<MyWork>
+  <Query>
+    <Where>
+      <Eq>
+        <FieldRef Name='Complete' />
+        <Value Type='Boolean'>1</Value>
+      </Eq>
+    </Where>
+  </Query>
+  <CompleteItemsQuery>True</CompleteItemsQuery>
+</MyWork>

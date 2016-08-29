@@ -1,0 +1,225 @@
+<script language="javascript">
+function GanttZoomIn()
+{
+	var G2antt1#gridid# = document.getElementById("G2antt1#gridid#");
+	switch(G2antt1#gridid#.Chart.UnitScale)
+	{
+		case 2:
+			G2antt1#gridid#.Chart.UnitScale = 16;
+			G2antt1#gridid#.Chart.UnitWidth = 18;
+			G2antt1#gridid#.Chart.Level(1).Label = "<%m1%>";
+            G2antt1#gridid#.Chart.Level(0).Label = "<%yyyy%>";
+			break;
+		case 16:
+			G2antt1#gridid#.Chart.UnitScale = 256;
+			G2antt1#gridid#.Chart.UnitWidth = 18;
+			G2antt1#gridid#.Chart.Level(1).Label = "<%dd%>";
+			G2antt1#gridid#.Chart.Level(1).Unit = 256
+            G2antt1#gridid#.Chart.Level(0).Label = "<%m3%> <%yyyy%>";
+			break;
+		case 256:
+			G2antt1#gridid#.Chart.UnitScale = 4096;
+			G2antt1#gridid#.Chart.UnitWidth = 18;
+			G2antt1#gridid#.Chart.Level(0).Label = "<%m3%> <%d%>, <%yyyy%>";
+			G2antt1#gridid#.Chart.Level(0).Unit = 256;
+			G2antt1#gridid#.Chart.Level(1).Unit = 4096;
+			G2antt1#gridid#.Chart.Level(1).Label = "<%d1%>";
+			break;
+		case 4096:
+			G2antt1#gridid#.Chart.UnitScale = 65536;
+			G2antt1#gridid#.Chart.UnitWidth = 18;
+            G2antt1#gridid#.Chart.Level(1).Label = "<%hh%>";
+            G2antt1#gridid#.Chart.Level(0).Label = "<%dddd%>, <%mmmm%> <%d%>, <%yyyy%>";
+			break;
+	};
+}
+function GanttZoomOut()
+{
+	var G2antt1 = document.getElementById("G2antt1");
+	switch(G2antt1#gridid#.Chart.UnitScale)
+	{
+		case 65536:
+			G2antt1#gridid#.Chart.UnitScale = 4096;
+			G2antt1#gridid#.Chart.UnitWidth = 18;
+			G2antt1#gridid#.Chart.Level(0).Label = "<%m3%> <%d%>, <%yyyy%>";
+			G2antt1#gridid#.Chart.Level(0).Unit = 256;
+			G2antt1#gridid#.Chart.Level(1).Unit = 4096;
+			G2antt1#gridid#.Chart.Level(1).Label = "<%d1%>";
+			break;
+		case 4096:
+			G2antt1#gridid#.Chart.UnitScale = 256;
+			G2antt1#gridid#.Chart.UnitWidth = 18;
+			G2antt1#gridid#.Chart.Level(1).Label = "<%dd%>";
+			G2antt1#gridid#.Chart.Level(1).Unit = 256
+            G2antt1#gridid#.Chart.Level(0).Label = "<%m3%> <%yyyy%>";
+			break;
+		case 256:
+			G2antt1#gridid#.Chart.UnitScale = 16;
+			G2antt1#gridid#.Chart.UnitWidth = 18;
+			G2antt1#gridid#.Chart.Level(1).Label = "<%m1%>";
+            G2antt1#gridid#.Chart.Level(0).Label = "<%yyyy%>";
+			break;
+		case 16:
+			G2antt1#gridid#.Chart.UnitScale = 2;
+			G2antt1#gridid#.Chart.UnitWidth = 26;
+			G2antt1#gridid#.Chart.Level(1).Label = "Q <%q%>";
+            G2antt1#gridid#.Chart.Level(0).Label = "<%yyyy%>";
+			break;
+		
+	};
+}
+
+function joinSubTasks(summary)
+{
+	var child = G2antt1#gridid#.Items.ItemChild(summary);
+	while(child != 0)
+	{
+		G2antt1#gridid#.Items.DefineSummaryBars(summary,"",child,"");	
+		var child = G2antt1#gridid#.Items.NextSiblingItem(child);
+	}
+}
+
+function doSummaryTasks()
+{
+	if(G2antt1#gridid#.Items.ItemCount == 0)
+	{
+		document.getElementById("noitems#gridid#").style.display="";
+		document.getElementById("G2antt1#gridid#").style.display="none";
+	}
+	else
+	{
+		for(var i = 0;i<G2antt1#gridid#.Items.ItemCount;i++)
+		{
+			var item = G2antt1#gridid#.Items(i);
+			G2antt1#gridid#.Items.CellState(item, 0) = 1;
+			if(G2antt1#gridid#.Items.ItemChild(item) != 0)
+			{
+				joinSubTasks(item);
+			}
+			
+		}
+	}
+}
+function loadPlanXml(url)
+{
+
+    G2antt1#gridid#.LoadXML(url);
+    
+    doSummaryTasks();
+    
+    hm('boxDialog');
+}
+
+function doSave(url, title)
+{
+    var xmlDoc = new ActiveXObject("Microsoft.XMLDOM"); 
+    G2antt1#gridid#.SaveXML(xmlDoc);
+
+    var encDoc = urlEncode(encode64(xmlDoc.documentElement.xml));
+    
+    dhtmlxAjax.post(url + "/_layouts/epmlive/saveresplan.aspx","title=" + title + "&data=" + encDoc,savePlanResponse);
+	
+}
+
+
+function getPlanResponse(loader)
+{
+    if(loader.xmlDoc.responseText!=null)
+	{
+		if(loader.xmlDoc.responseText.substring(0,5) != "Error")
+		{
+            var strPlan = loader.xmlDoc.responseText;
+            
+            G2antt1#gridid#.LoadXML(strPlan);
+        
+            hm('boxDialog');
+		}
+		else
+		{
+            alert(loader.xmlDoc.responseText);
+            hm('boxDialog');
+		}
+	}
+	else
+	{
+		alert("Response contains no XML");
+		hm('boxDialog');
+	}
+}
+
+
+
+function printGantt2#gridid#()
+{
+	try
+	{
+	
+		var s;
+		s = "CreateObject(`Exontrol.Print`)\r\n";
+		s = s + "{\r\n";
+		s = s + "PrintExt = Me\r\n";
+		s = s + "Preview\r\n";
+		s = s + "}\r\n";
+		G2antt1#gridid#.ExecuteTemplate(s);
+	}
+	catch(e)
+	{
+		alert('Error: ' + e);
+	}
+}
+
+function fireEvent(element,event){
+    if (document.createEventObject){
+        // dispatch for IE
+        var evt = document.createEventObject();
+        return element.fireEvent('on'+event,evt)
+    }
+    else{
+        // dispatch for firefox + others
+        var evt = document.createEvent("HTMLEvents");
+        evt.initEvent(event, true, true ); // event type,bubbling,cancelable
+        return !element.dispatchEvent(evt);
+    }
+}
+
+function viewItem(itemid, listid, webid, siteid, siteurl, mode)
+{
+	var wurl = siteurl + "/_layouts/epmlive/gridaction.aspx?action=view&ListId=" + listid + "&ID=" + itemid + "&Mode=" + mode + "&gridid=#gridid#&siteid=" + siteid + "&webid=" + webid;
+    
+    function myCallback(dialogResult, returnValue)
+	{
+		document.getElementById("G2antt1#gridid#").style.display = "";	
+	}
+
+	document.getElementById("G2antt1#gridid#").style.display = "none";
+
+	var options = { url: wurl, width: 700, dialogReturnValueCallback:myCallback };
+
+	SP.UI.ModalDialog.showModalDialog(options);
+
+
+}
+
+function scrollTo()
+{
+	try
+	{
+		if(GcurItem != 0)
+		{
+			var d = new Date(G2antt1#gridid#.Items.ItemBar(GcurItem,"",1));
+			if(d != "NaN")
+			{
+				G2antt1#gridid#.Chart.ScrollTo(getDate(d));
+			}
+		}
+	}catch(e){}
+}
+function getDate(dt)
+{
+    var dtRet = "M/d/yyyy";
+    dtRet = dtRet.replace('M',dt.getMonth() + 1);
+    dtRet = dtRet.replace('d',dt.getDate());
+    dtRet = dtRet.replace('yyyy',dt.getYear());
+    return dtRet;
+}
+</script>

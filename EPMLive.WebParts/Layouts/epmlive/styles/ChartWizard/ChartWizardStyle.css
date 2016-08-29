@@ -1,0 +1,292 @@
+﻿.wizardWrapper
+{
+    width: 400px;
+    height: 250px;
+}
+
+.epmliveinput
+{
+    padding: 2px 5px;
+    background-color: #F0F0F0;
+    border: 1px solid #ABABAB;
+    color: #444444;
+    color: inherit;
+    font-family: "Segoe UI" , "Segoe" ,Tahoma,Helvetica,Arial,sans-serif;
+    font-size: 13px;
+    vertical-align: middle;
+    outline: none;
+    width: 300px;
+}
+
+.wizardFooter
+{
+    width: 100%;
+    height: 33px;
+    margin-top: 30px;
+}
+
+.selectButton
+{
+    min-width: 45px;
+    padding-bottom: 3px;
+    border: 1px solid #ABABAB;
+    background-color: #FDFDFD;
+    background-color: #FDFDFD;
+    font-family: "Segoe UI" , "Segoe" ,Tahoma,Helvetica,Arial,sans-serif;
+    font-size: 11px;
+    color: #444444;
+    height: 23px;
+}
+
+.wizardButton
+{
+    min-width: 45px;
+    padding: 7px 10px;
+    border: 1px solid #ABABAB;
+    background-color: #FDFDFD;
+    background-color: #FDFDFD;
+    font-family: "Segoe UI" , "Segoe" ,Tahoma,Helvetica,Arial,sans-serif;
+    font-size: 11px;
+    color: #444;
+}
+
+.wizardButton:hover
+{
+    border-color: #92C0E0;
+    background-color: #E6F2FA;
+    cursor: pointer;
+}
+
+.wizardButton:active
+{
+    border-color: #2A8DD4;
+    background-color: #92C0E0;
+    cursor: pointer;
+}
+
+.selectButton:hover
+{
+    border-color: #92C0E0;
+    background-color: #E6F2FA;
+    cursor: pointer;
+}
+
+.selectButton:active
+{
+    border-color: #2A8DD4;
+    background-color: #92C0E0;
+    cursor: pointer;
+}
+
+#step2LeftCol
+{
+    float: left;
+    width: 250px;
+}
+
+#step2MidCol
+{
+    float: left;
+}
+
+#step2RightCol
+{
+    width: 170px;
+    float: left;
+    padding-left: 10px;
+    padding-top: 10px;
+    text-align: left;
+}
+
+#wizardWrapper
+{
+    width: 840px;
+    height: 250px;
+}
+
+#thumbTable
+{
+}
+
+.chartDetailsWrapper
+{
+    /*float:right;     width:570px;*/
+}
+
+.chartDetailsWrapper span
+{
+    font-family: "Segoe UI" ,Segoe,Tahoma,Helvetica,Arial,sans-serif;
+    font-size: 14px;
+    padding-left: 10px;
+    padding-right: 0px;
+    color: #444444;
+}
+
+.chartThumbWrapper
+{
+    float: left;
+    width: 260px;
+    overflow: auto;
+    border-right: 1px solid #EFEFEF;
+    height: 500px;
+}
+
+.thumbLabel
+{
+    font-family: "Segoe UI" ,Segoe,Tahoma,Helvetica,Arial,sans-serif;
+    font-size: 16px;
+    padding-left: 10px;
+    padding-right: 5px;
+    color: #444444;
+}
+
+.thumbImg
+{
+    text-align: center;
+    padding-right: 10px;
+}
+
+.wizardLabel
+{
+    font-family: "Segoe UI Light" , "Segoe UI" ,Segoe,Tahoma,Helvetica,Arial,sans-serif;
+    font-size: 24px;
+    font-weight: 300;
+    color: #444444;
+    margin-bottom: 15px;
+    height: 30px;
+}
+
+.loadingText
+{
+    font-family: "Segoe UI Light" , "Segoe UI" ,Segoe,Tahoma,Helvetica,Arial,sans-serif;
+    font-size: 14px;
+    color: #444444;
+}
+
+.imagedropshadow
+{
+    border: solid 1px #EFEFEF;
+    height: 50px;
+    margin-top: 0px;
+}
+
+.thumbRow
+{
+    cursor: pointer;
+    text-align: left;
+    height: 55px;
+}
+
+.thumbRowSelected
+{
+    background-color: #2A8DD4 !important;
+    color: #ffffff !important;
+}
+
+.thumbRowHover
+{
+    background-color: #dfedfa;
+}
+
+
+.rotate
+{
+    top: 180px;
+    margin-left: -10px;
+    position: absolute;
+    font-family: "Segoe UI Light" , "Segoe UI" ,Segoe,Tahoma,Helvetica,Arial,sans-serif;
+    font-size: 15px;
+    color: #444444; /* Safari */
+    -webkit-transform: rotate(-90deg); /* Firefox */
+    -moz-transform: rotate(-90deg); /* IE */
+    -ms-transform: rotate(-90deg); /* Opera */
+    -o-transform: rotate(-90deg); /* Internet Explorer */
+    filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=3);
+}
+
+.topDdl
+{
+    width: 162px;
+    float: left;
+    padding-right: 3px;
+}
+
+.epmliveButton
+{
+    min-width: 45px;
+    padding: 7px 10px;
+    border: 1px solid #ABABAB;
+    background-color: #FDFDFD;
+    background-color: #FDFDFD;
+    font-family: "Segoe UI" , "Segoe" ,Tahoma,Helvetica,Arial,sans-serif;
+    font-size: 12px;
+    color: #444;
+}
+
+.epmliveButton-disabled
+{
+    background-color: #FDFDFD !important;
+    border-color: #E1E1E1 !important;
+    color: #B1B1B1 !important;
+    cursor: default !important;
+}
+
+.epmliveButton:hover
+{
+    border-color: #92C0E0;
+    background-color: #E6F2FA;
+    cursor: pointer;
+}
+
+.epmliveButton:active
+{
+    border-color: #2A8DD4;
+    background-color: #92C0E0;
+    cursor: pointer;
+}
+
+.epmliveButton-emphasize
+{
+    border-color: #0067B0 !important;
+    background-color: #0072C6 !important;
+    color: white !important;
+}
+
+.epmliveButton-emphasize:hover
+{
+    background-color: #0067B0 !important;
+    border-color: #004D85 !important;
+}
+
+
+.epmliveButtonDisabled
+{
+    background-color: #FDFDFD;
+    border-color: #E1E1E1;
+    color: #B1B1B1;
+    cursor: default;
+    min-width: 45px;
+    padding: 7px 10px;
+    border: 1px solid #ABABAB;
+    margin-left: 10px;
+    font-family: "Segoe UI" , "Segoe" ,Tahoma,Helvetica,Arial,sans-serif;
+    font-size: 12px;
+    border-color: #E1E1E1;
+}
+
+.StepContainer
+{
+    text-align:left;
+    padding: 10px;
+}
+
+.floatLeft
+{
+    float:left;
+}
+
+.chartWizardTxt
+{
+    font-family: "Segoe UI Light" , "Segoe UI" , Segoe, Tahoma, Helvetica, Arial, sans-serif;
+    font-size: 14px;
+}

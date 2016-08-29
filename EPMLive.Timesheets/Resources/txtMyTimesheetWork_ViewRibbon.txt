@@ -1,0 +1,86 @@
+<Tab Id="Ribbon.MyTimesheetWorkViewsTab" Title="Views" Sequence="410">
+		<Scaling Id="Ribbon.MyTimesheetWorkViews.Scaling">
+			<MaxSize Id="Ribbon.MyTimesheetWork.MyTimesheetWorkViewsGroup.MaxSize" GroupId="Ribbon.MyTimesheetWork.MyTimesheetWorkViewsGroup" Size="LargeMediumSmall"/>
+			<Scale Id="Ribbon.MyTimesheetWork.MyTimesheetWorkViewsGroup.Scaling.CustomTabScaling" GroupId="Ribbon.MyTimesheetWork.MyTimesheetWorkViewsGroup" Size="LargeMediumSmall" />
+		</Scaling>
+		<Groups Id="Ribbon.MyTimesheetWorkViews.Groups">
+			<Group Id="Ribbon.MyTimesheetWork.MyTimesheetWorkViewsGroup" Title="View" Sequence="10" Template="Ribbon.Templates.MyTimesheetTemplate">
+				<Controls Id="Ribbon.MyTimesheetWork.MyTimesheetWorkViewsGroup.Controls">
+
+					<Button Id="Ribbon.MyTimesheetWorkViews.SaveView"
+							  Command="Ribbon.MyTimesheetWork.SaveView"
+							  Description="Save View"
+							  LabelText="Save View"
+							  TemplateAlias="oM"
+							  Image32by32="/_layouts/epmlive/images/mywork/ribbon/saveview-32.png"
+							  Image16by16="/_layouts/epmlive/images/mywork/ribbon/saveview-16.png" />
+
+					  <Button Id="Ribbon.MyTimesheetWorkViews.RenameView"
+							  Command="Ribbon.MyTimesheetWork.RenameView"
+							  Description="Rename View"
+							  LabelText="Rename View"
+							  TemplateAlias="oM"
+							  Image32by32="/_layouts/epmlive/images/mywork/ribbon/renameview-32.png"
+							  Image16by16="/_layouts/epmlive/images/mywork/ribbon/renameview-16.png" />
+
+					  <Button Id="Ribbon.MyTimesheetWorkViews.DeleteView"
+							  Command="Ribbon.MyTimesheetWork.DeleteView"
+							  Description="Delete View"
+							  LabelText="Delete View"
+							  TemplateAlias="oM"
+							  Image32by32="/_layouts/epmlive/images/mywork/ribbon/deleteview-32.png"
+							  Image16by16="/_layouts/epmlive/images/mywork/ribbon/deleteview-16.png" />
+
+					  <Button Id="Ribbon.MyTimesheetWorkViews.SelectColumns"
+							  Command="Ribbon.MyTimesheetWork.SelectColumns"
+							  Description="Select Columns"
+							  LabelText="Select Columns"
+							  TemplateAlias="oM"
+							  Image32by32="/_layouts/epmlive/images/mywork/ribbon/selectcoloumns-32.png"
+							  Image16by16="/_layouts/epmlive/images/mywork/ribbon/selectcoloumns-16.png" />
+
+					  <ToggleButton Id="Ribbon.MyTimesheetWorkViews.ShowHideFilters"
+							  Command="Ribbon.MyTimesheetWork.ShowHideFilters"
+							  QueryCommand="Ribbon.MyTimesheetWork.ShowHideFilters.Query"
+							  Description="Show Filters"
+							  LabelText="Show Filters"
+							  TemplateAlias="oM"
+							  Image32by32="/_layouts/epmlive/images/mywork/ribbon/showhidefilters-32.png"
+							  Image16by16="/_layouts/epmlive/images/mywork/ribbon/showhidefilters-16.png" />
+
+					  <ToggleButton Id="Ribbon.MyTimesheetWorkViews.ShowHideGrouping"
+							  Command="Ribbon.MyTimesheetWork.ShowHideGrouping"
+							  QueryCommand="Ribbon.MyTimesheetWork.ShowHideGrouping.Query"
+							  Description="Show Grouping"
+							  LabelText="Show Grouping"
+							  TemplateAlias="oM"
+							  Image32by32="/_layouts/epmlive/images/mywork/ribbon/showhidegrouping-32.png"
+							  Image16by16="/_layouts/epmlive/images/grouping.gif" />
+
+					  <Button Id="Ribbon.MyTimesheetWorkViews.ClearSort"
+							  Command="Ribbon.MyTimesheetWork.ClearSort"
+							  Description="Removes Sorting"
+							  LabelText="Remove Sorting"
+							  TemplateAlias="oM"
+							  Sequence="30"
+							  Image32by32="/_layouts/epmlive/images/mywork/ribbon/sort-32.png"
+							  Image16by16="/_layouts/epmlive/images/mywork/ribbon/sort-16.png" />
+
+					<Label Id="Ribbon.MyTimesheetWorkViews.CurrentViewLabel"
+							 LabelText="Current View:"
+							 ForId="Ribbon.MyTimesheetWorkViews.CurrentViewDropDown"
+							 TemplateAlias="oM" />
+
+					  <DropDown Id="Ribbon.MyTimesheetWorkViews.CurrentViewDropDown"
+								Command="Ribbon.MyTimesheetWork.ChangeView"
+								PopulateDynamically="true"
+								PopulateQueryCommand="Ribbon.MyTimesheetWork.PopulateViewDropDown"
+								PopulateOnlyOnce="false"
+								QueryCommand="Ribbon.MyTimesheetWork.QueryCurrentView"
+								Width="75px"
+								TemplateAlias="oM" />
+
+				</Controls>
+			</Group>
+		</Groups>
+	</Tab>

@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Elements Id="8d3c5a6c-7759-4000-b80d-3d30d37c9656" xmlns="http://schemas.microsoft.com/sharepoint/">
+  <ListTemplate Name="EPMLiveProjectCenter"
+				  DisplayName="EPMLiveProjectCenter"
+				  Description=""
+				  BaseType="0"
+				  Type="10701"
+				  OnQuickLaunch="TRUE"
+				  SecurityBits="11"
+				  Sequence="360"
+				  Hidden ="FALSE"/>
+</Elements>

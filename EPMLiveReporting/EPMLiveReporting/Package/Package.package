@@ -1,8 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<package xmlns:dm0="http://schemas.microsoft.com/VisualStudio/2008/DslTools/Core" dslVersion="1.0.0.0" Id="823cf7cc-3c12-47a3-9f0a-6b69c391b915" solutionId="823cf7cc-3c12-47a3-9f0a-6b69c391b915" resetWebServer="false" sharePointProductVersion="15.0" name="EPMLiveReporting" xmlns="http://schemas.microsoft.com/VisualStudio/2008/SharePointTools/PackageModel">
-  <projectItems>
-    <projectItemReference itemId="73ab6fbc-92b9-4ed6-9d9e-bbf8b1ee8c62" />
-    <projectItemReference itemId="805e2070-4cdf-4f20-9a9a-296da0e466a4" />
-    <projectItemReference itemId="01102227-0b21-4654-b05c-cdbc85df434e" />
-  </projectItems>
-</package>

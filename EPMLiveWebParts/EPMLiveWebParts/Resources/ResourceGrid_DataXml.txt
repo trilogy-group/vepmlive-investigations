@@ -1,3 +1,0 @@
-<ResourceGridDataGrid>
-	<IncludeReadOnly>true</IncludeReadOnly>
-</ResourceGridDataGrid>

@@ -1,8 +1,0 @@
-<LI id=mp1_0_5 class="ms-core-menu-item" type=option text="Shared With" onClick="#gridfunc#" iconSrc="#image#" type="option" iconAltText sequence="1160" CUICommand="">
-
-<A id=mp1_0_5_Anchor class=ms-core-menu-link title="#title#" onclick="return false;" href="javascript:;">
-<DIV class=ms-hide><IMG id=mp1_0_5_ICON title="" alt="" src="#image#" width=16 height=16></DIV>
-<DIV id=ID_MngPerms class=ms-core-menu-label><SPAN class=ms-core-menu-title>#title#</SPAN><SPAN></SPAN></DIV><SPAN class=ms-accessible></SPAN>
-<DIV></DIV>
-</A>
-</LI> 

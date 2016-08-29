@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Elements xmlns="http://schemas.microsoft.com/sharepoint/">
+<Receivers>
+<Receiver>
+<Name>TimeOffSyncEventItemAdded</Name>
+<Type>ItemAdded</Type>
+<Assembly>$SharePoint.Project.AssemblyFullName$</Assembly>
+<Class>WorkEnginePPM.Events.DataSync.TimeOffSyncEvent</Class>
+<SequenceNumber>1000</SequenceNumber>
+</Receiver>
+<Receiver>
+<Name>TimeOffSyncEventItemUpdated</Name>
+<Type>ItemUpdated</Type>
+<Assembly>$SharePoint.Project.AssemblyFullName$</Assembly>
+<Class>WorkEnginePPM.Events.DataSync.TimeOffSyncEvent</Class>
+<SequenceNumber>1000</SequenceNumber>
+</Receiver>
+<Receiver>
+<Name>TimeOffSyncEventItemDeleting</Name>
+<Type>ItemDeleting</Type>
+<Assembly>$SharePoint.Project.AssemblyFullName$</Assembly>
+<Class>WorkEnginePPM.Events.DataSync.TimeOffSyncEvent</Class>
+<SequenceNumber>1000</SequenceNumber>
+</Receiver>
+</Receivers>
+</Elements>

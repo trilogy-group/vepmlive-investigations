@@ -1,8 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Elements xmlns="http://schemas.microsoft.com/sharepoint/">
-	<Module Name="WorkEngineMasterWorkspaceTopNav" Url="_catalogs/MasterPage">
-		<File Path="WorkEngineMasterWorkspaceTopNav\WEWorkspaceTopNav.master" Url="WEWorkspaceTopNav.master" Type="GhostableInLibrary" IgnoreIfAlreadyExists="True">
-			<Property Name="ContentType"  Value="$Resources:cmscore,contenttype_masterpage_name;" />
-		</File>
-	</Module>
-</Elements>

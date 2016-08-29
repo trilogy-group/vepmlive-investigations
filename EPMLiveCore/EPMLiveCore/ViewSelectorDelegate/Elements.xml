@@ -1,8 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Elements xmlns="http://schemas.microsoft.com/sharepoint/">
-	<Control  Id="ViewSelectorMenuDelegate"
-			  Sequence="25"
-			  ControlClass="EPMLiveCore.ViewSelectorDelegate"
-			  ControlAssembly="EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5">
-	</Control>
-</Elements>

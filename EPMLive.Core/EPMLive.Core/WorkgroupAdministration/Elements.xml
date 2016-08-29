@@ -1,0 +1,90 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Elements xmlns="http://schemas.microsoft.com/sharepoint/">
+  <CustomActionGroup
+			  Id="EPMLive.Workgroup.CentralAdmin"
+			  Location="Microsoft.SharePoint.Administration.GeneralApplicationSettings"
+			  Title="EPM Live Administration"
+			  Sequence="100" ImageUrl="/_layouts/images/epmlive-thumb-32.png"/>
+
+  <CustomAction 
+		Id="EPMLive.Workgroup.CentralAdmin.Features"
+		GroupId="EPMLive.Workgroup.CentralAdmin"
+		Location="Microsoft.SharePoint.Administration.GeneralApplicationSettings"
+		Sequence="1"
+		Title="Feature Keys">
+    <UrlAction Url="_admin/epmlive/features.aspx" />
+  </CustomAction>
+
+  <CustomAction
+  Id="EPMLive.Workgroup.CentralAdmin.ReportingAdmin"
+  GroupId="EPMLive.Workgroup.CentralAdmin"
+  Location="Microsoft.SharePoint.Administration.GeneralApplicationSettings"
+  Sequence="2"
+  Title="Reporting Configuration">
+    <UrlAction Url="_admin/epmlive/ReportDatabases.aspx" />
+  </CustomAction>
+
+  <CustomAction
+		Id="EPMLive.Workgroup.CentralAdmin.Queue"
+		GroupId="EPMLive.Workgroup.CentralAdmin"
+		Location="Microsoft.SharePoint.Administration.GeneralApplicationSettings"
+		Sequence="10"
+		Title="Queue">
+    <UrlAction Url="_admin/epmlive/queue.aspx" />
+  </CustomAction>  
+  
+  <CustomAction
+		Id="EPMLive.Workgroup.CentralAdmin.Conns"
+		GroupId="EPMLive.Workgroup.CentralAdmin"
+		Location="Microsoft.SharePoint.Administration.GeneralApplicationSettings"
+		Sequence="11"
+		Title="Application Settings">
+    <UrlAction Url="_admin/epmlive/wcsettings.aspx" />
+  </CustomAction>
+
+  <CustomAction
+  Id="EPMLive.Workgroup.CentralAdmin.Servers"
+  GroupId="EPMLive.Workgroup.CentralAdmin"
+  Location="Microsoft.SharePoint.Administration.GeneralApplicationSettings"
+  Sequence="12"
+  Title="Active Servers">
+    <UrlAction Url="_admin/epmlive/servers.aspx" />
+  </CustomAction>
+
+  <CustomAction
+  Id="EPMLive.Workgroup.CentralAdmin.Versions"
+  GroupId="EPMLive.Workgroup.CentralAdmin"
+  Location="Microsoft.SharePoint.Administration.GeneralApplicationSettings"
+  Sequence="13"
+  Title="Solution File Versions">
+    <UrlAction Url="_admin/epmlive/versions.aspx" />
+  </CustomAction>
+
+	<CustomAction
+  Id="EPMLive.Workgroup.CentralAdmin.CreateSite"
+  GroupId="EPMLive.Workgroup.CentralAdmin"
+  Location="Microsoft.SharePoint.Administration.GeneralApplicationSettings"
+  Sequence="14"
+  Title="Create Site Collection">
+		<UrlAction Url="_admin/epmlive/createsite.aspx" />
+	</CustomAction>
+
+	<CustomAction
+  Id="EPMLive.Workgroup.CentralAdmin.CreateSite"
+  GroupId="EPMLive.Workgroup.CentralAdmin"
+  Location="Microsoft.SharePoint.Administration.GeneralApplicationSettings"
+  Sequence="15"
+  Title="Manage Email Templates">
+		<UrlAction Url="_admin/epmlive/emailmanager.aspx" />
+	</CustomAction>
+
+  <CustomAction
+		Id="EPMLive.Workgroup.CentralAdmin.EPMLiveProperties"
+		GroupId="EPMLive.Workgroup.CentralAdmin"
+		Location="Microsoft.SharePoint.Administration.GeneralApplicationSettings"
+		Sequence="16"
+		Title="Properties">
+    <UrlAction Url="_admin/epmlive/EPMLiveProperties.aspx" />
+  </CustomAction>
+  
+</Elements>

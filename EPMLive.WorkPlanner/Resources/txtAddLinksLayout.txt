@@ -1,0 +1,22 @@
+<Grid>
+  <Cfg id='WorkPlannerAddLinks' Style='Standard'
+    VarHeight='0' Dragging='0' Adding='0' 
+    Deleting='0' Selecting='0' Sorting='0' MainCol='Title' NameCol='Title' StaticCursor='1' MaxVScroll='2000'/>
+	<Toolbar Visible='0'></Toolbar>
+	<Cfg Code="GTACCNPSQEBSLC"/>
+  <Cols>
+    <C Name='id' Type='Text' CanEdit='0' Visible='0'/>
+	<C Name='Title' Type='Text' CanEdit='0' RelWidth='100'/>
+  </Cols>
+  <Header Title='Task Name'/>
+  <Def>
+	<D Name='R' CanFocus='1'/>
+	<D Name='Folder' CanFocus='0'/>
+	<D Name='Task' CanFocus='1'/>
+  </Def>
+  <Body>
+    <B>
+      
+    </B>
+  </Body>
+</Grid>

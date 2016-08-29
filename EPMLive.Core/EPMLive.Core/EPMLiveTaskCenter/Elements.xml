@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Elements Id="4b34bd92-9e33-4bb1-bd2d-b8760ab57a61" xmlns="http://schemas.microsoft.com/sharepoint/">
+  <ListTemplate Name="EPMLiveTaskCenter"
+                DisplayName="EPM Live Task Center"
+                Description=""
+                BaseType="0"
+                Type="10702"
+                OnQuickLaunch="TRUE"
+                SecurityBits="11"
+                Sequence="360"
+                Image="/_layouts/epmlive/images/ittask.png" />
+</Elements>

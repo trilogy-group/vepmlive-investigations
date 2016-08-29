@@ -1,0 +1,41 @@
+<Grid>
+	<Cfg Code='GTACCNPSQEBSLC' Version='4.3.2.120412' />
+	<Cfg SuppressCfg='1' />
+	<Cfg MainCol='Title' NameCol='Title' />
+	<Cfg ConstWidth='0' />
+	<Cfg Undo='0' />
+	<Cfg Searching='0' Selecting="1" Deleting='0' />
+	<Cfg StaticCursor='1' Dragging='0' />
+	<Cfg NoTreeLines='1' />
+	<Cfg Editing='0' />
+	<Cfg NoVScroll='1' />
+	<Def>
+		<D Name='C' Width='320' />
+		<D Name="R" Height="30" />
+		<D Name="R" HoverCell="Color" HoverRow="Color" FocusCell="Background" FocusRow="Background" />
+	</Def>
+	<Toolbar Visible='0' />
+	<Panel Visible='0' />
+	<Header Visible='0' />
+	<Head>
+		<Filter Visible='0' CanEdit='1' HoverRow='' HoverCell='' FocusRow='' FocusCell='' />
+	</Head>
+	<Solid>
+		<Group Visible='0'/>
+		<I id='NoData' Html='No data source found.' />
+	</Solid>
+	<Lang>
+		<Text StartErr='Fatal error! &lt;br/&gt;Resource grid cannot render' />
+	</Lang>
+	<LeftCols>
+		<C Name='Title' CanGroup='0' CanHide='0' />
+		<C Name='Guid' Visible='0' CanFilter='0' CanGroup='0' CanSort='0' />
+		<C Name='ParentListTitle' Visible='0' CanFilter='0' CanGroup='0' CanSort='0' />
+		<C Name='ParentListGuid' Visible='0' CanFilter='0' CanGroup='0' CanSort='0' />
+		<C Name='Query' Visible='0' Type='Html' CanFilter='0' CanGroup='0' CanSort='0' VarHeight='1' />
+	</LeftCols>
+	<Cols />
+	<RightCols />
+	<Header Title='Display Name' />
+	<Cfg id='cwdatagrid' CSS='/sites/debugging/_layouts/epmlive/treegrid/chartwizard/grid.css' Style='GS' />
+</Grid>

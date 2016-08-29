@@ -1,0 +1,73 @@
+<script language="javascript" type="text/javascript">
+            function GanttZoomIn()
+            {
+	            var G2antt1 = document.getElementById("G2antt1");
+	            switch(G2antt1.Chart.UnitScale)
+	            {
+		            case 2:
+			            G2antt1.Chart.UnitScale = 16;
+			            G2antt1.Chart.UnitWidth = 18;
+			            G2antt1.Chart.Level(1).Label = "<%m1%>";
+                        G2antt1.Chart.Level(0).Label = "<%yyyy%>";
+			            break;
+		            case 16:
+			            G2antt1.Chart.UnitScale = 256;
+			            G2antt1.Chart.UnitWidth = 18;
+			            G2antt1.Chart.Level(1).Label = "<%dd%>";
+			            G2antt1.Chart.Level(1).Unit = 256
+                        G2antt1.Chart.Level(0).Label = "<%m3%> <%yyyy%>";
+			            break;
+		            case 256:
+			            G2antt1.Chart.UnitScale = 4096;
+			            G2antt1.Chart.UnitWidth = 18;
+			            G2antt1.Chart.Level(0).Label = "<%m3%> <%d%>, <%yyyy%>";
+			            G2antt1.Chart.Level(0).Unit = 256;
+			            G2antt1.Chart.Level(1).Unit = 4096;
+			            G2antt1.Chart.Level(1).Label = "<%d1%>";
+			            break;
+		            case 4096:
+			            G2antt1.Chart.UnitScale = 65536;
+			            G2antt1.Chart.UnitWidth = 18;
+                        G2antt1.Chart.Level(1).Label = "<%hh%>";
+                        G2antt1.Chart.Level(0).Label = "<%dddd%>, <%mmmm%> <%d%>, <%yyyy%>";
+			            break;
+	            };
+            }
+            function GanttZoomOut()
+            {
+	            var G2antt1 = document.getElementById("G2antt1");
+	            switch(G2antt1.Chart.UnitScale)
+	            {
+		            case 65536:
+			            G2antt1.Chart.UnitScale = 4096;
+			            G2antt1.Chart.UnitWidth = 18;
+			            G2antt1.Chart.Level(0).Label = "<%m3%> <%d%>, <%yyyy%>";
+			            G2antt1.Chart.Level(0).Unit = 256;
+			            G2antt1.Chart.Level(1).Unit = 4096;
+			            G2antt1.Chart.Level(1).Label = "<%d1%>";
+			            break;
+		            case 4096:
+			            G2antt1.Chart.UnitScale = 256;
+			            G2antt1.Chart.UnitWidth = 18;
+			            G2antt1.Chart.Level(1).Label = "<%dd%>";
+			            G2antt1.Chart.Level(1).Unit = 256
+                        G2antt1.Chart.Level(0).Label = "<%m3%> <%yyyy%>";
+			            break;
+		            case 256:
+			            G2antt1.Chart.UnitScale = 16;
+			            G2antt1.Chart.UnitWidth = 18;
+			            G2antt1.Chart.Level(1).Label = "<%m1%>";
+                        G2antt1.Chart.Level(0).Label = "<%yyyy%>";
+			            break;
+		            case 16:
+			            G2antt1.Chart.UnitScale = 2;
+			            G2antt1.Chart.UnitWidth = 26;
+			            G2antt1.Chart.Level(1).Label = "Q <%q%>";
+                        G2antt1.Chart.Level(0).Label = "<%yyyy%>";
+			            break;
+            		
+	            };
+            }
+            
+          
+            </script>

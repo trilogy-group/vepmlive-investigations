@@ -1,0 +1,20 @@
+<Grid>
+	<Cfg id='UpdateGrid' ConstHeight='1' ConstWidth='1' Style='Standard' SortIcons='0'/>
+	<Toolbar Visible='0'/>
+	<Panel Visible='0'/>
+	<Cfg AutoIdPrefix='NT'/>
+	<Cfg Code="GTACCNPSQEBSLC" NoColorState='1'/>
+	<LeftCols>
+		<C Name='Accept' Width='40' Type='Bool'/>
+		<C Name='Reject' Width='40' Type='Bool'/>
+		<C CanEdit='0' Name='Title' RelWidth='1'/>
+	</LeftCols>
+	<Cols></Cols>
+	<RightCols>
+		<C Type='Text' Name='ApprovalNotes' Width='150'/>
+	</RightCols>
+	<Body>
+		<B></B>
+	</Body>
+	<Header ApprovalNotes='Approval Notes' NoEscape='1' Accept='&lt;img src=&quot;images/accept.gif&quot;&gt; &lt;input type=&quot;checkbox&quot; onclick=&quot;SelectAllAccept(this);CancelBubbling(this, event);&quot;&gt;' Reject='&lt;img src=&quot;images/reject.gif&quot;&gt; &lt;input type=&quot;checkbox&quot; onclick=&quot;SelectAllReject(this);CancelBubbling(this, event);&quot;&gt;'/>
+</Grid>
