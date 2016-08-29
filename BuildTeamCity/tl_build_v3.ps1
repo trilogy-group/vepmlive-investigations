@@ -369,7 +369,7 @@ Get-ChildItem -Path ($ProductOutput + "\*")  -Include "EPMLiveTimerService.exe" 
 
 
 Log-Section "Zipping"
-Rename-Item -Path "$BinariesDirectory\_PublishedWebsites\EPMLiveIntegrationService" -NewName "api"
+Rename-Item -Path "$BinariesDirectory\_PublishedWebsites\EPMLive.IntegrationService" -NewName "api"
 ZipFiles "$SourcesDirectory\InstallShield\Build Dependencies\api.zip"  "$BinariesDirectory\_PublishedWebsites\api"
 
 Log-Section "Install Shield"
