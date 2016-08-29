@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Elements xmlns="http://schemas.microsoft.com/sharepoint/">
+	
+
+	<CustomAction
+	Id="EPMLive.PortfolioEngineSettings"
+	RegistrationType="List"
+	GroupId="GeneralSettings"
+	Location="Microsoft.SharePoint.ListEdit"
+	Sequence="2001"
+	Title="PortfolioEngine Settings (EPM Live)" >
+		<UrlAction Url="~site/_layouts/ppm/editlist.aspx?List={ListId}"/>
+	</CustomAction>
+</Elements>

@@ -1,0 +1,90 @@
+<Grid>
+	<Cfg id='AgileGrid' SuppressCfg='1'  DateStrings='2'  /> <!-- Configuration is not saved to cookies -->
+	<Cfg MainCol='Title' NameCol='Title' Style='Standard'/>
+	<Cfg ConstHeight='0'/><!-- Grid will always fill its main tag -->
+	<Cfg Undo='1'/><!-- Undo / redo is supported, Ctrl+Z / Ctrl+Y -->
+	<!--<Cfg SuppressMessage='2'/> Grid produces no informational message -->
+	<Cfg ExportType='Expanded,Outline'/><!-- Export setting, all rows will be exported expanded and will be used Excel outline -->
+	<Cfg ChildParts='0'/><!-- Rendering children on background is disabled -->
+	<!-- <Cfg CalculateSelected='1'/>Recalculates rows after selection changed -->
+	<Cfg PrintCols='1'/><!-- Let a user to choose which columns will be printed -->
+	<Cfg ExportCols='1'/><!-- Let a user to choose which columns will be exported -->
+	<Cfg ShowDeleted='0'/>
+	<Cfg NumberId='1' FullId='0' IdChars='1234567890' AddFocusCol='Title' AutoIdPrefix='AR'/>
+	<Cfg SelectingCells='0'/>
+	<Cfg Searching='1'/>
+	<Cfg StaticCursor='1' MinTagHeight="200"/>
+	<Toolbar Visible='0'></Toolbar>
+	<Panel Visible='1' Delete='0' Move='1' Select='0' NoFormatEscape='1' CanHide='0'/>
+	<Actions OnShiftDragCell='FillCells'/>
+	<Cfg NoTreeLines='1' DetailOn='0' MinRowHeight='20' MidWidth='300' MenuColumnsSort='1' StandardFilter='2'/>
+	<Cfg Code="GTACCNPSQEBSLC"/>
+	<LeftCols>
+		<C Name="Notifications" Width="40" CanHide="0" Type="Html" CanMove="0" Visible="1" CanSort="0" NoColor="1"/>
+	</LeftCols>
+	<Cols>
+		
+	</Cols>
+	<RightCols>
+		
+		<C Name="G" Type="Gantt" GanttStart="StartDate" GanttStrict="0" GanttEnd="DueDate" GanttFlags="Deadline" GanttComplete="PercentComplete" GanttDuration="Duration" GanttAncestors="Predecessors" GanttDescendants="Descendants" GanttChartRound="w" GanttEdit="Main,Dependency" GanttRight="1" GanttSlack="Slack" GanttHeader1="w#dddddd MMMM yyyy" GanttHeader2="d#ddddd" /> 
+		<C Name="G" GanttCorrectDependenciesFixed="1"  GanttCorrectDependencies="1" GanttIncorrectDependencies="1"/> 
+		<C Name="G" GanttMin="1990-1-1" GanttMax="2100-1-1" GanttZoom="weeks and days" GanttDataUnits="28800000" GanttEndLast="0" Width="200" /> 
+		<C Name="G" GanttFlow="BaselineDateRange" CanExport="0"/>
+
+	</RightCols>
+	<Def>
+
+		<D Name='Folder' TitleHtmlPrefix='&lt;img src="/_layouts/epmlive/images/folder.gif"&gt;' CanDrag='0' Class='BoldCell' Calculated="1" CanFilter='1'/>
+		<D Name="Folder" GGanttClass="GanttG" GGanttIcons="1" GGanttEdit="0" GGanttHover="0" CanExpand="0"/>
+		<D Name="Folder" PercentCompleteFormula="ganttpercent('StartDate','DueDate','d')" DurationFormula="ganttduration('G')"/>
+		<D Name="Folder" Class="SummaryTask" CanSelect='0'/>
+
+		<D Name="Summary" Expanded="1" Calculated="1"/> 
+		<D Name="Summary" PercentCompleteFormula="ganttpercent('StartDate','DueDate','d')" /> 
+		<D Name="Summary" GGanttIcons="1" GGanttClass="GanttG" GGanttEdit="0" GGanttHover="0" AcceptDef="Task,Summary" DurationFormula="ganttduration('G')" Class="SummaryTask"/> 
+
+		<D Name="Milestone" Calculated="1" DurationCanEdit="0" StartDateCanEdit="0"/>
+
+		<D Name="Task" Calculated='0' DurationFormula="ganttduration('G')"/>
+
+		<D Name="Assignment" Class="Assignment" CanFilter="0" TaskTypeCanEdit="0" CanDrag='0' CanSelect='0' DurationFormula="ganttduration('G')" AcceptDef="Assignment"/>
+		
+		<D Name='Group' Calculated='1'/>
+ 
+	</Def>
+	<Solid>
+		<Group Visible='0' id='GroupRow'/> 
+
+		<Space Height="20" ID="AgileToolBar" Space="0" Kind="Test" Cells="AddItem,DeleteItem,AOutdent,AIndent,VCOLS,AShowFilters,AShowGantt,AScrollTo,AZoomIn,AZoomOut" 
+		AddItemType="Button" AddItemIcon="/_layouts/epmlive/images/newtask16.gif" AddItemOnClick="AgileAddItem();" AddItemTip="Add Task"
+		DeleteItemType="Button" DeleteItemIcon="/_layouts/epmlive/images/deletetask.png" DeleteItemOnClick="AgileDeleteItem();" DeleteTip="Delete Task"
+		AOutdentType="Button" AOutdentIcon="/_layouts/epmlive/images/left.gif" AOutdentOnClick="AgileOutdent();return false;" AOutdentTip="Outdent"
+		AIndentType="Button" AIndentIcon="/_layouts/epmlive/images/right.gif" AIndentOnClick="AgileIndent();return false;" AIndentTip="Indent"
+		VCOLSType="Button" VCOLSIcon="/_layouts/epmlive/images/selectcolumn.gif" VCOLSOnClick="AgileSelectColumns()" VCOLSTip="View Columns"
+		AShowFiltersType="Button" AShowFiltersIcon="/_layouts/epmlive/images/filter.png" AShowFiltersOnClick="AgileShowFilters();return false;" AShowFiltersTip="Show Filters"
+		AShowGanttType="Button" AShowGanttIcon="/_layouts/epmlive/images/showgantt.gif" AShowGanttOnClick="AgileShowGantt();return false;" AShowGanttTip="Show/Hide Gantt"
+		AScrollToType="Button" AScrollToIcon="/_layouts/epmlive/images/scrollto.gif" AScrollToOnClick="AgileScrollTo();return false;" AScrollToTip="Scroll To"
+		AZoomInType="Button" AZoomInIcon="/_layouts/epmlive/images/zoomin16.gif" AZoomInOnClick="AgileZoomIn();return false;" AZoomInTip="Zoom In"
+		AZoomOutType="Button" AZoomOutIcon="/_layouts/epmlive/images/zoomout16.gif" AZoomOutOnClick="AgileZoomOut();return false;" AZoomOutTip="Zoom Out"
+		/>
+	</Solid>
+	<Header Visible='1' Title='Task Name' G='Gantt' GNoColor='0' Notifications=""/>
+
+	<Zoom>
+
+		<Z Name="z1" GanttUnits="M6" GanttChartRound="y" GanttWidth="18" GanttWidthEx="76" GanttBackground=";y#1/1/2008" GanttHeader1="y#yyyy" GanttHeader2="M6#MMMMMM" /> 
+		<Z Name="z2" GanttUnits="M3" GanttChartRound="y" GanttWidth="24" GanttWidthEx="101" GanttBackground=";y#1/1/2008" GanttHeader1="y#yyyy" GanttHeader2="M3#MMMMM" /> 
+		<Z Name="z3" GanttUnits="M" GanttChartRound="y" GanttWidth="18" GanttWidthEx="76" GanttBackground=";M6#1/1/2008" GanttHeader1="M6#MMMMMM. yyyy" GanttHeader2="M#MM" /> 
+		<Z Name="z4" GanttUnits="M" GanttChartRound="M6" GanttWidth="28" GanttWidthEx="118" GanttBackground=";M3#1/1/2008" GanttHeader1="M3#MMMMM. yyyy" GanttHeader2="M#MMM" /> 
+		<Z Name="z5" GanttUnits="d" GanttChartRound="M" GanttWidth="3" GanttWidthEx="12.6" GanttBackground=";M#1/1/2008" GanttHeader1="M#MMM yyyy" GanttHeader2="w#d." /> 
+		<Z Name="z6" GanttUnits="d" GanttChartRound="w" GanttWidth="18" GanttWidthEx="76" GanttHeader1="w#'week 'ddddddd' ' MMMM yyyy" GanttHeader2="d#%d" GanttHeader3="d#ddddd" /> 
+		<Z Name="days and hours" GanttUnits="h" GanttChartRound="d" GanttWidth="18" GanttWidthEx="76" GanttHeader1="d#dddd dddddd MMMM yyyy" GanttHeader2="h#HH"/>
+	</Zoom>
+	<Head>
+		<I Kind='Filter'  Visible='0'/>
+	</Head>
+	<Foot>
+		<I Kind='Data' CanEdit='1' id='NewTask3' Background="#FFFFFF" Title='New Item' Visible='1' Def="NewTaskBack" Class='NewRowBack' NoColor='1' NoUpload='1' NoColorState='1' LeftHtml="&lt;input type='text' style='width:100%' class='newclassinput' onkeypress='newtaskkeypress(this, event, true); CancelBubbling(this, event);' onkeydown='CancelBubbling(this, event);' onkeyup='CancelBubbling(this, event);' onclick='CancelBubbling(this, event);' value='New Task' onfocus='newtaskfocus(this)' onblur='newtaskblur(this);' id='txtNewTask2'&gt;" MidHtml="" RightHtml=""   CanMove="0" CanDrag="0" CanSelect="0" CanExport="0"/>
+	</Foot>
+</Grid>

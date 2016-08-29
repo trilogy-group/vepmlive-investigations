@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--<webParts>
+  <webPart xmlns="http://schemas.microsoft.com/WebPart/v3">
+    <metaData>
+      <type name="EPMLiveWebParts.ActivityStream.ActivityStream, $SharePoint.Project.AssemblyFullName$" />
+      <importErrorMessage>$Resources:core,ImportErrorMessage;</importErrorMessage>
+    </metaData>
+    <data>
+      <properties>
+        <property name="Title" type="string">ActivityStream</property>
+        <property name="Description" type="string">My WebPart</property>
+      </properties>
+    </data>
+  </webPart>
+</webParts>-->
+
+<WebPart xmlns="http://schemas.microsoft.com/WebPart/v2">
+  <Assembly>EPMLiveWebParts, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5</Assembly>
+  <TypeName>EPMLiveWebParts.Comments.Comments, $SharePoint.Project.AssemblyFullName$</TypeName>
+  <Title>Comment Stream</Title>
+  <Description></Description>
+  <PartImageLarge>/_layouts/images/wpepmlive.gif</PartImageLarge>
+  <NumThreads xmlns="Comments">8</NumThreads>
+  <MaxComments xmlns="Comments">2</MaxComments>
+  <DefaultHeight xmlns="Comments">600</DefaultHeight>
+</WebPart>

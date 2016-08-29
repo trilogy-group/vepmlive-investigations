@@ -1,5 +1,0 @@
-/* This trigger has been created by the EPM Live Integration adapter on {TIMESTAMP} */
-
-trigger {TRIGGER_NAME} on {TRIGGER_OBJECT} bulk (after insert, after update, after delete) {
-	{APP_NAMESPACE}.GlobalTriggerDispatcher.DispatchTrigger('{TRIGGER_OBJECT}', Trigger.isInsert, Trigger.isUpdate, Trigger.isDelete, Trigger.isBefore, Trigger.isAfter, Trigger.isExecuting, Trigger.new, Trigger.newMap, Trigger.old, Trigger.oldMap);
-}

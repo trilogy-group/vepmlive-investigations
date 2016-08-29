@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Elements xmlns="http://schemas.microsoft.com/sharepoint/">
+  
+
+
+  <CustomAction
+			Id="EditFormToolbar.2"
+			RegistrationType="List"
+			RegistrationId="10701"
+			Location="EditControlBlock"
+			Sequence="220"
+			Title="Manage Work Plan"
+			ImageUrl="{SiteUrl}/_layouts/images/ALLMEET.GIF"
+		>
+    <UrlAction Url="{SiteUrl}/_layouts/epmlive/tasks.aspx?ID={ItemId}"/>
+  </CustomAction>
+
+  <CustomAction Id="ActionEditInProject"
+	RegistrationType="List"
+	RegistrationId="10701"
+	GroupId="ActionsMenu"
+	Location="Microsoft.SharePoint.StandardMenu"
+	Sequence="10"
+	Title="Edit In Project"
+	ControlAssembly="EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5"
+	ControlClass="EPMLiveCore.EditIn"/>
+
+  <CustomAction Id="RefreshWorkspaceCenter"
+	RegistrationType="List"
+	RegistrationId="10302"
+	GroupId=""
+	Location="ViewToolbar"
+	Sequence="101"
+	Title="Refresh"
+	ImageUrl="{SiteUrl}/_layouts/images/REFRESH.GIF">
+    <UrlAction Url="{SiteUrl}/_layouts/epmlive/refreshwc.aspx?ListId={ListId}"/>
+  </CustomAction>
+</Elements>

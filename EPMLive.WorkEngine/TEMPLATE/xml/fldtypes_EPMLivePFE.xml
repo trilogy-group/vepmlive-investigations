@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<FieldTypes>
+	<FieldType>
+		<Field Name="TypeName">PFEResourcePermissions</Field>
+		<Field Name="TypeDisplayName">PFE Resource Permissions</Field>
+		<Field Name="TypeShortDescription">PortfolioEngine Resource Permissions</Field>
+		<Field Name="ParentType">Text</Field>
+		<Field Name="UserCreatable">FALSE</Field>
+		<Field Name="FieldTypeClass">
+			WorkEnginePPM.SPFields.PFEResourcePermissionsField, WorkEnginePPM, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5
+		</Field>
+		<RenderPattern Name="DisplayPattern">
+			<RenderPattern Name="DisplayPattern">
+				<Switch>
+					<Expr>
+						<Column />
+					</Expr>
+					<Case Value="" />
+					<Default>
+						<HTML><![CDATA[]]></HTML>
+						<Column HTMLEncode="TRUE" />
+					</Default>
+				</Switch>
+			</RenderPattern>
+		</RenderPattern>
+	</FieldType>
+</FieldTypes>

@@ -1,0 +1,810 @@
+function fireEvent(element,event){
+    if (document.createEventObject){
+        // dispatch for IE
+        var evt = document.createEventObject();
+        return element.fireEvent('on'+event,evt)
+    }
+    else{
+        // dispatch for firefox + others
+        var evt = document.createEvent("HTMLEvents");
+        evt.initEvent(event, true, true ); // event type,bubbling,cancelable
+        return !element.dispatchEvent(evt);
+    }
+}
+
+//=========================notes========================
+function eXcell_tsnotes(cell){                                    //excell name is defined here
+    if (cell){                                                     //default pattern, just copy it
+        this.cell = cell;
+        this.grid = this.cell.parentNode.grid;
+        if(!this.grid._grid_notes)
+        {
+			var z=document.getElementById("tsnotes" + cell.parentNode.grid.entBox.id);
+			z.onclick=function(e){ (e||event).cancelBubble=true; }
+			
+			if (_isIE) { 
+				z.style.position="absolute"
+				z.style.top="0px"
+			}
+			document.body.insertBefore(z,document.body.firstChild);
+ 
+			this.grid._grid_notes = z;
+		}
+    }
+    this.setValue=function(val){
+		this.cell._notes = val;
+		if(val != "")
+			this.setCValue("<img src='/_layouts/images/ICDISC.GIF'>");
+		else
+			this.setCValue("&nbsp;");
+			
+    }
+    this.getValue=function(){
+		return this.cell._notes;
+    }
+    this.edit=function(){
+			
+		document.getElementById("tsnotes#gridid#").value = this.getValue();
+
+		var arPos = this.grid.getPosition(this.cell);
+
+		if(arPos[0] + 200 > document.body.clientWidth)
+			this.grid._grid_notes.style.left=document.body.clientWidth - 210;
+		else
+			this.grid._grid_notes.style.left=arPos[0];
+		
+		if((arPos[1] + 100) > (document.body.clientHeight + document.body.scrollTop))
+			this.grid._grid_notes.style.top=document.body.clientHeight + document.body.scrollTop - 105;
+		else
+			this.grid._grid_notes.style.top=arPos[1];
+
+		this.grid._grid_notes.style.display="";
+		this.grid._grid_notes.style.position="absolute";
+		this.grid._grid_notes.style.zIndex=99;
+    }
+    this.detach=function(){
+		
+		var oldValue = this.getValue();
+		
+        this.setValue(document.getElementById("tsnotes#gridid#").value); 
+
+		this.grid._grid_notes.style.display="none";
+
+        return oldValue != this.getValue();
+		
+    }
+}
+eXcell_tsnotes.prototype = new eXcell;
+//=========================Percent Work========================
+function eXcell_percentwork(cell){                                    //excell name is defined here
+    if (cell){													//default pattern, just copy it
+        this.cell = cell;
+        this.grid = this.cell.parentNode.grid;
+    }
+    this.setValue=function(val){
+		this.cell._innerhtml = true;
+
+		if(val == "&nbsp;")
+		{
+			this.setCValue(val);
+		}
+		else
+		{
+			if(val.toString().indexOf("|") > 0)
+			{
+				var pipe = val.toString().indexOf("|");
+				this.cell._work = val.substring(0,pipe);
+				this.cell._actualwork = val.substring(pipe + 1);
+				val = 0;
+			}
+
+			if(this.cell._work == "0" || this.cell._work == null)
+			{
+				this.setCValue("&nbsp;");
+			}
+			else
+			{
+				
+				var newVal = parseFloat(val);
+				var work = parseFloat(this.cell._work);
+				var actualwork = parseFloat(this.cell._actualwork);
+				
+				var totalawork = newVal + actualwork;
+				
+				var pct = parseInt(totalawork / work * 100);
+				
+				var sTable = "";
+				
+				if(pct > 100)
+					sTable = "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" class=\"noborder\"><tr class=\"noborder\"><td width=\"100%\" class=\"noborder\"><table border=\"0\" width=\"80\" cellpadding=\"0\" cellspacing=\"0\" class=\"statustable\"><tr class=\"noborder\"><td background=\"_layouts/epmlive/images/tsstatusred.gif\" class=\"noborder\"><img src=\"/_layouts/epmlive/blank.gif\" height=\"1\" width=\"1\"></td></tr></table></td><td style=\"padding: 0px\" class=\"noborder\" class=\"noborder\">" + pct + "%</td></tr></table>";
+				else if(pct == 100)
+					sTable = "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" class=\"noborder\"><tr class=\"noborder\"><td width=\"100%\" class=\"noborder\"><table border=\"0\" width=\"80\" cellpadding=\"0\" cellspacing=\"0\" class=\"statustable\"><tr class=\"noborder\"><td background=\"_layouts/epmlive/images/tsstatus.gif\" class=\"noborder\"><img src=\"/_layouts/epmlive/blank.gif\" height=\"1\" width=\"1\"></td></tr></table></td><td style=\"padding: 0px\" class=\"noborder\" class=\"noborder\">" + pct + "%</td></tr></table>";
+				else if(pct == 0)
+					sTable = "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" class=\"noborder\"><tr class=\"noborder\"><td width=\"100%\" class=\"noborder\"><table border=\"0\" width=\"80\" cellpadding=\"0\" cellspacing=\"0\" class=\"statustable\"><tr class=\"noborder\"><td class=\"noborder\"><img src=\"/_layouts/epmlive/blank.gif\" height=\"1\" width=\"1\"></td></tr></table></td><td style=\"padding: 0px\" class=\"noborder\" class=\"noborder\">" + pct + "%</td></tr></table>";
+				else
+					sTable = "<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" class=\"noborder\"><tr class=\"noborder\"><td width=\"100%\" class=\"noborder\"><table border=\"0\" width=\"80\" cellpadding=\"0\" cellspacing=\"0\" class=\"statustable\"><tr class=\"noborder\"><td width=\"" + pct + "%\" background=\"_layouts/epmlive/images/tsstatus.gif\" class=\"noborder\"><img src=\"/_layouts/epmlive/blank.gif\" height=\"1\" width=\"1\"></td><td class=\"noborder\"><img src=\"/_layouts/epmlive/blank.gif\" height=\"1\" width=\"1\"></td></tr></table></td><td style=\"padding: 0px\" class=\"noborder\" class=\"noborder\">" + pct + "%</td></tr></table>";	
+
+				this.setCValue(sTable);
+			}
+		}
+    }
+    this.edit=function(){}
+    
+    this.getValue=function(){
+		if(this.cell._work != null)
+			return this.cell._work + "|" + this.cell._actualwork;
+		else
+			return "";
+    }
+}
+eXcell_percentwork.prototype = new eXcell;
+
+//=========================Calendar===========================
+eXcell_dhxCalendarA.prototype.edit = function(){
+	
+    var top;
+    var left;
+    
+    var arPos = this.grid.getPosition(this.cell);
+
+	if(arPos[0] + this.cell.offsetWidth + 180 > document.body.clientWidth)
+		left = arPos[0] - 185;
+	else
+		left=arPos[0] + this.cell.offsetWidth;
+	
+	if((arPos[1] + 170) > (document.body.clientHeight + document.body.scrollTop))
+		top=document.body.clientHeight + document.body.scrollTop - 180;
+	else
+		top=arPos[1];
+    
+    this.grid._grid_calendarA.setPosition(top,left);
+    
+        this.grid._grid_calendarA.show();
+        this.grid._grid_calendarA._last_operation_calendar=false;
+	//var arPos = this.grid.getPosition(this.cell);
+    //var pval=this._date2str2(this.cell.val||new Date());
+    //window._grid_calendar.render(arPos[0],arPos[1]+this.cell.offsetHeight,this,pval);
+    this.cell._cediton=true;
+    this.val=this.cell.val;
+    //this.val=this.getValue();
+    this._val=this.cell.innerHTML;
+   // alert(this.cell.val);
+   	this.grid._grid_calendarA.setDateFormat((this.grid._dtmask||"%d/%m/%Y"));
+    this.grid._grid_calendarA.setDate(this.val);
+    this.grid._grid_calendarA.draw();
+    
+
+	this.cell.atag=((!this.grid.multiLine)&&(_isKHTML||_isMacOS||_isFF))?"INPUT":"TEXTAREA";
+	
+	this.obj = document.createElement(this.cell.atag);
+	this.obj.style.height = (this.cell.offsetHeight-(_isIE?4:2))+"px";
+    this.obj.className="dhx_combo_edit";
+   	this.obj.wrap = "soft";
+	this.obj.style.textAlign = this.cell.align;
+	this.obj.onclick = function(e){(e||event).cancelBubble = true}
+	this.obj.onmousedown = function(e){(e||event).cancelBubble = true}
+	this.obj.value = this.getValue();
+	this.cell.innerHTML = "";
+	this.cell.appendChild(this.obj);
+  	if (_isFF) {
+		this.obj.style.overflow="visible";
+		if ((this.grid.multiLine)&&(this.obj.offsetHeight>=18)&&(this.obj.offsetHeight<40)){
+			this.obj.style.height="36px";
+			this.obj.style.overflow="scroll";
+		}
+	}
+    this.obj.onselectstart=function(e){  if (!e) e=event; e.cancelBubble=true; return true;  };
+	this.obj.focus()
+	this.obj.focus()
+                    
+}
+
+
+dhtmlXGridObject.prototype.alert#gridid#=function(msg){
+    document.getElementById("errordiv#gridid#").innerHTML = "Error: " + msg;
+};
+
+//======================Multi User=====================
+
+function changeUser#gridid#(chkVal)
+{
+
+	document.getElementById("#pesid#_downlevelTextBox").value = "";
+	document.getElementById("#pesid#_upLevelDiv").innerHTML = "";
+		
+	if(document.getElementById("#pesid#_upLevelDiv").firstChild == null)
+	{
+		var oTN=document.createTextNode("");
+		document.getElementById("#pesid#_upLevelDiv").appendChild(oTN);
+	}
+
+	document.getElementById("#pesid#_upLevelDiv").firstChild.nodeValue = "";
+	//chkVal.options[chkVal.selectedIndex].value;
+}
+
+function eXcell_usereditorm(cell){                                    //excell name is defined here
+    if (cell){                                                     //default pattern, just copy it
+        this.cell = cell;
+        this.grid = this.cell.parentNode.grid;
+        if(!this.grid._grid_pe)
+        {
+			//var z=document.getElementById("people" + cell.parentNode.grid.entBox.id);
+			var z=document.getElementById("people#gridid#");
+			z.onclick=function(e){ (e||event).cancelBubble=true; }
+			
+			if (_isIE) { 
+				z.style.position="absolute"
+				z.style.top="0px"
+			}
+			document.body.insertBefore(z,document.body.firstChild);
+
+			
+ 
+			this.grid._grid_pe = z;
+		}
+    }
+    this.setValue=function(val){
+
+		var strVal = "&nbsp;";
+		var strVals = val.split('\t')[0].split('\n');
+		for(var i = 1;i<strVals.length;i=i+2)
+		{
+			strVal += "; " + strVals[i];
+		}
+		if(strVal != "&nbsp;")
+			strVal = strVal.substring(7);
+			
+        this.setCValue(strVal);   
+        
+        this.cell._displayValue = strVal;
+        this.cell._users = val.split('\t')[0];                                   
+        this.cell._Allusers = val.split('\t')[1];         
+		this.cell._innerhtml = true;                          
+    }
+    this.getAllUsers=function()
+    {
+		return this.cell._users + "\t" + this.cell._Allusers;
+    }
+    this.getValue=function(){
+       return this.cell._users; // get value
+    }
+    this.edit=function(){
+    
+		this.val=this.getValue();
+    
+		document.getElementById("#peid#_downlevelTextBox").value = "";
+		document.getElementById("#peid#_upLevelDiv").innerHTML = "";
+		copyUplevelToHidden('#peid#');
+		updateControlValue('#peid#');
+		var arg=getUplevel('#peid#');
+		var ctx='#peid#';
+		EntityEditorSetWaitCursor(ctx);
+		WebForm_DoCallback('#peuid#',arg,EntityEditorHandleCheckNameResult,ctx,EntityEditorHandleCheckNameError,true);
+		
+        var pp = document.getElementById("divPe#gridid#");
+        var ppi = document.getElementById("peoplecheckimg#gridid#");
+        pp.style.display = "none";
+        ppi.src = "_layouts/images/TPMAX1.GIF";
+        
+            
+		var strVal = "";
+		var strAllUserChecks = "";
+		var strVals = this.cell._users.split('\n');
+		var strAllUsers = this.cell._Allusers.split('\n');
+		var strUserNames = '\t';
+		
+		for(var i = 0;i<strVals.length;i=i+2)
+		{
+			strUserNames += strVals[i].toLowerCase() + '\t';
+			strVal += "; " + strVals[i];
+		}
+		if(strVal.length > 1)
+			strVal = strVal.substring(1);
+			
+		for(var i = 0;i<strAllUsers.length;i++)
+		{
+			var isChecked = "";
+			var userInfo = strAllUsers[i].split(';#');
+			
+			if(strUserNames.indexOf('\t' + userInfo[0].toLowerCase() + '\t') > -1)
+				isChecked = "checked";
+				
+			strAllUserChecks += "<br><input type=\"checkbox\" name=\"chkUsers#gridid#\" value=\"" + userInfo[0] + "\" " + isChecked + ">" + userInfo[1];
+		}
+		if(strAllUserChecks.length > 1)
+			strAllUserChecks = strAllUserChecks.substring(4);
+			
+		document.getElementById("peoplecheck#gridid#").innerHTML = strAllUserChecks;
+	
+		var arPos = this.grid.getPosition(this.cell);
+
+		if(arPos[0] + 200 > document.body.clientWidth)
+			this.grid._grid_pe.style.left=document.body.clientWidth - 210;
+		else
+			this.grid._grid_pe.style.left=arPos[0];
+		
+		if((arPos[1] + 100) > (document.body.clientHeight + document.body.scrollTop))
+			this.grid._grid_pe.style.top=document.body.clientHeight + document.body.scrollTop - 105;
+		else
+			this.grid._grid_pe.style.top=arPos[1];
+
+		this.grid._grid_pe.style.display="";
+    }
+    this.detach=function(){
+		this.grid._grid_pe.style.display="none";
+		
+		var strUsers = "";
+
+		var divChecks = document.getElementById("peoplecheck#gridid#");
+		var divChildChecks = divChecks.firstChild;
+		while(divChildChecks != null)
+		{
+			if(divChildChecks.nodeName == "INPUT")
+			{
+				if(divChildChecks.checked)
+				{
+					strUsers += '\n' + divChildChecks.value;
+					strUsers += '\n' + divChildChecks.nextSibling.nodeValue;
+				}
+			}
+			divChildChecks = divChildChecks.nextSibling;
+		}
+
+		for(var i = 0;i<document.getElementById("#peid#_upLevelDiv").childNodes.length;i=i+2)
+		{
+			if(document.getElementById("#peid#_upLevelDiv").childNodes[i].firstChild != null)
+			{
+				strUsers += '\n' + document.getElementById("#peid#_upLevelDiv").childNodes[i].title;
+				strUsers += '\n' + document.getElementById("#peid#_upLevelDiv").childNodes[i].firstChild.nextSibling.innerText;
+			}
+		}
+		if(strUsers.length > 1)
+			strUsers = strUsers.substring(1);
+		
+		var oldValue = this.getValue();
+			
+        this.setValue(strUsers + '\t' + this.cell._Allusers); 
+
+        return oldValue != this.getValue();
+    }
+}
+eXcell_usereditorm.prototype = new eXcell;
+
+//================================User Single=================
+
+function eXcell_usereditor(cell){                                    //excell name is defined here
+    if (cell){
+        this.cell = cell;
+        this.grid = this.cell.parentNode.grid;
+        if(!this.grid._grid_pes)
+        {
+			//var z=document.getElementById("peoplesingle" + cell.parentNode.grid.entBox.id);
+			var z=document.getElementById("peoplesingle#gridid#");
+			z.onclick=function(e){ (e||event).cancelBubble=true; }
+			
+			if (_isIE) { 
+				z.style.position="absolute"
+				z.style.top="0px"
+			}
+			document.body.insertBefore(z,document.body.firstChild);
+
+			
+ 
+			this.grid._grid_pes = z;
+		}
+    }
+    this.setValue=function(val){
+
+		var strVal = "&nbsp;";
+		var strVals = val.split('\t')[0].split('\n');
+		for(var i = 1;i<strVals.length;i=i+2)
+		{
+			strVal += "; " + strVals[i];
+		}
+		if(strVal != "&nbsp;")
+			strVal = strVal.substring(7);
+			
+        this.setCValue(strVal);   
+        
+        this.cell._displayValue = strVal;
+        this.cell._users = val.split('\t')[0];                                   
+        this.cell._Allusers = val.split('\t')[1];
+		this.cell._innerhtml = true;
+    }
+    this.getAllUsers=function()
+    {
+		return this.cell._users + "\t" + this.cell._Allusers;
+    }
+    this.getValue=function()
+    {
+       return this.cell._users; // get value
+    }
+    this.edit=function(){
+		this.val=this.getValue();
+        var pp = document.getElementById("divPes#gridid#");
+        var ppi = document.getElementById("peoplechecksingleimg#gridid#");
+        pp.style.display = "none";
+        ppi.src = "_layouts/images/TPMAX1.GIF";
+
+		var strVal = "";
+		var strAllUserChecks = "";
+		var strVals = this.cell._users.split('\n');
+		var strAllUsers = this.cell._Allusers.split('\n');
+		var strUserNames = '\t';
+
+		for(var i = 0;i<strVals.length;i=i+2)
+		{
+			strUserNames += strVals[i].toLowerCase() + '\t';
+			strVal += "; " + strVals[i];
+		}
+		if(strVal.length > 1)
+			strVal = strVal.substring(1);
+
+		var slct = document.getElementById("peoplecheckselect#gridid#");
+		slct.options.length=0;
+		var oSelected = -1;
+		var oCounter = 0;
+		for(var i = 0;i<strAllUsers.length;i++)
+		{
+			var isChecked = false;
+			var userInfo = strAllUsers[i].split(';#');
+			
+			if(strUserNames.indexOf('\t' + userInfo[0].toLowerCase() + '\t') > -1)
+				oSelected = oCounter;
+				
+			slct.add(new Option(userInfo[1], userInfo[0], false, isChecked));
+
+			oCounter++;
+
+		}
+		
+		slct.selectedIndex = oSelected;
+		
+		document.getElementById("#pesid#_downlevelTextBox").value = "";
+		document.getElementById("#pesid#_upLevelDiv").innerHTML = "";
+		/*
+		if(document.getElementById("#pesid#_upLevelDiv").firstChild == null)
+		{
+			var oTN=document.createTextNode("");
+			document.getElementById("#pesid#_upLevelDiv").appendChild(oTN);
+		}
+
+		document.getElementById("#pesid#_upLevelDiv").firstChild.nodeValue = strVal;
+		*/
+
+		copyUplevelToHidden('#pesid#');
+		updateControlValue('#pesid#');
+		var arg=getUplevel('#pesid#');
+		var ctx='#pesid#';
+		
+		EntityEditorSetWaitCursor(ctx);
+		WebForm_DoCallback('#pesuid#',arg,EntityEditorHandleCheckNameResult,ctx,EntityEditorHandleCheckNameError,true);
+		
+		
+		var arPos = this.grid.getPosition(this.cell);
+
+		if(arPos[0] + 200 > document.body.clientWidth)
+			this.grid._grid_pes.style.left=document.body.clientWidth - 210;
+		else
+			this.grid._grid_pes.style.left=arPos[0];
+		
+		if((arPos[1] + 100) > (document.body.clientHeight + document.body.scrollTop))
+			this.grid._grid_pes.style.top=document.body.clientHeight + document.body.scrollTop - 105;
+		else
+			this.grid._grid_pes.style.top=arPos[1];
+
+		this.grid._grid_pes.style.display="";
+    }
+    this.detach=function(){
+		this.grid._grid_pes.style.display="none";
+		
+		var strUsers = "";
+
+		for(var i = 0;i<document.getElementById("#pesid#_upLevelDiv").childNodes.length;i=i+2)
+		{
+			if(document.getElementById("#pesid#_upLevelDiv").childNodes[i].firstChild != null)
+			{
+				strUsers += '\n' + document.getElementById("#pesid#_upLevelDiv").childNodes[i].title;
+				strUsers += '\n' + document.getElementById("#pesid#_upLevelDiv").childNodes[i].firstChild.nextSibling.innerText;
+			}
+		}
+
+		if(strUsers == "")
+		{
+			var chkVal = document.getElementById("peoplecheckselect#gridid#");
+			if(chkVal.selectedIndex > -1)
+			{
+				strUsers += '\n' + chkVal.options[chkVal.selectedIndex].value;
+				strUsers += '\n' + chkVal.options[chkVal.selectedIndex].text;
+			}
+		}
+		
+		if(strUsers.length > 1)
+			strUsers = strUsers.substring(1);
+		
+		var oldValue = this.getValue();
+			
+        this.setValue(strUsers + '\t' + this.cell._Allusers); 
+
+        return oldValue != this.getValue();
+    }
+}
+eXcell_usereditor.prototype = new eXcell;
+
+
+//=========================multichoice========================
+function eXcell_mchoice(cell){                                    //excell name is defined here
+    if (cell){                                                     //default pattern, just copy it
+        this.cell = cell;
+        this.grid = this.cell.parentNode.grid;
+        if(!this.grid._grid_mc)
+        {
+			var z=document.getElementById("multichoice" + cell.parentNode.grid.entBox.id);
+			z.onclick=function(e){ (e||event).cancelBubble=true; }
+			
+			if (_isIE) { 
+				z.style.position="absolute"
+				z.style.top="0px"
+			}
+			document.body.insertBefore(z,document.body.firstChild);
+ 
+			this.grid._grid_mc = z;
+		}
+    }
+    this.setValue=function(val){
+
+		var strVal = "&nbsp;";
+		
+		if(val.split('\t')[0] != "")
+		{
+			var strVals = val.split('\t')[0].split('\n');
+
+			for(var i = 0;i<strVals.length;i++)
+			{
+				var valInfo = strVals[i].split(';#');
+				strVal += ", " + valInfo[1];
+			}
+			if(strVal != "&nbsp;")
+				strVal = strVal.substring(7);
+		}
+        this.setCValue(strVal);
+        
+        this.cell._displayValue = strVal;
+        this.cell._values = val.split('\t')[0];                                   
+        this.cell._allvalues = val.split('\t')[1];                                   
+		this.cell._innerhtml = true;
+    }
+    this.getValue=function(){
+
+		return this.cell._values;
+    }
+    this.edit=function(){
+		this.val=this.getValue();
+		var strAllValueChecks = "";
+		var strVals = this.cell._values.split('\n');
+		var strAllValues = this.cell._allvalues.split('\n');
+		var strValues = '\t';
+		
+		for(var i = 0;i<strVals.length;i++)
+		{
+			var valInfo = strVals[i].split(';#');		
+			strValues += valInfo[0].toLowerCase() + '\t';
+		}
+
+		for(var i = 0;i<strAllValues.length;i++)
+		{
+			var isChecked = "";
+			var valInfo = strAllValues[i].split(';#');
+			
+			if(strValues.indexOf('\t' + valInfo[0].toLowerCase() + '\t') > -1)
+				isChecked = "checked";
+
+			strAllValueChecks += "<br><input type=\"checkbox\" name=\"chkValues#gridid#\" value=\"" + valInfo[0] + "\" " + isChecked + ">" + valInfo[1];
+		}
+		if(strAllValueChecks.length > 1)
+			strAllValueChecks = strAllValueChecks.substring(4);
+			
+		document.getElementById("multichoiceinner#gridid#").innerHTML = strAllValueChecks;
+
+		var arPos = this.grid.getPosition(this.cell);
+
+		if(arPos[0] + 200 > document.body.clientWidth)
+			this.grid._grid_mc.style.left=document.body.clientWidth - 210;
+		else
+			this.grid._grid_mc.style.left=arPos[0];
+		
+		if((arPos[1] + 100) > (document.body.clientHeight + document.body.scrollTop))
+			this.grid._grid_mc.style.top=document.body.clientHeight + document.body.scrollTop - 105;
+		else
+			this.grid._grid_mc.style.top=arPos[1];
+
+		this.grid._grid_mc.style.display="";
+    }
+    this.detach=function(){
+		
+		this.grid._grid_mc.style.display="none";
+		
+		var child = document.getElementById("multichoiceinner#gridid#").firstChild;
+		var val1 = "";
+
+		while(child != null)
+		{
+			if(child.nodeName == "INPUT")
+			{
+				if(child.checked)
+				{
+					val1 += '\n' + child.value + ";#" + child.nextSibling.nodeValue;
+				}
+			}
+			child = child.nextSibling;
+		}
+
+		if(val1.length > 1)
+			val1 = val1.substring(1);
+					
+		var oldValue = this.getValue();
+		
+		this.cell._values = val1;
+			
+        this.setValue(val1 + '\t' + this.cell._allvalues); 
+
+        return oldValue != this.getValue();
+		
+    }
+}
+eXcell_mchoice.prototype = new eXcell;
+
+//=========================choice========================
+function eXcell_choice(cell){                                    //excell name is defined here
+    if (cell){													//default pattern, just copy it
+        this.cell = cell;
+        this.grid = this.cell.parentNode.grid;
+    }
+    this.setValue=function(val){
+
+		var strVal = "";
+		var dispVal = "&nbsp;";
+		if(val == ";#")
+			val = "";
+			
+		val = val.replace(/&amp;/g,"&");
+		
+		if(val.split('\t')[0] != "")
+		{
+			strVal = val.split('\t')[0];
+			dispVal = strVal.split(';#')[1].replace(/&/g,"&amp;");
+		}
+        this.setCValue(dispVal);
+        this.cell._value = strVal;
+        if(val.split('\t').length > 1)
+			this.cell._allvalues = val.split('\t')[1];
+		this.cell._innerhtml = true;
+    }
+    this.getValue=function(){
+
+		return this.cell._value;
+    }
+    this.edit=function(){
+		this.val=this.getValue();
+		var arPos = this.grid.getPosition(this.cell) //,this.grid.objBox)
+
+		var allvals = this.cell._allvalues;
+
+		this.obj=document.createElement("TEXTAREA");
+		this.obj.className="dhx_combo_edit";
+		this.obj.style.height=(this.cell.offsetHeight-4)+"px";
+
+		this.obj.wrap="soft";
+		this.obj.style.textAlign=this.cell.align;
+		this.obj.onclick=function(e){
+			(e||event).cancelBubble=true
+		}
+		this.obj.value=this.text
+		this.obj.onselectstart=function(e){
+			if (!e)
+				e=event;
+			e.cancelBubble=true;
+			return true;
+		};
+		var editor_obj = this;
+		this.obj.onkeyup=function(e){
+			var val = this.readonly ? String.fromCharCode((e||event).keyCode) : this.value;
+			var c = editor_obj.list.options;
+
+			for (var i = 0; i < c.length; i++)
+				if (c[i].text.indexOf(val) == 0)
+					return c[i].selected=true;
+		}
+		this.list=document.createElement("SELECT");
+
+		this.list.className='dhx_combo_select';
+		this.list.style.width=this.cell.offsetWidth+"px";
+		this.list.style.left=arPos[0]+"px";                       //arPos[0]
+		this.list.style.top=arPos[1]+this.cell.offsetHeight+"px"; //arPos[1]+this.cell.offsetHeight;
+		this.list.onclick=function(e){
+			var ev = e||window.event;
+			var cell = ev.target||ev.srcElement
+
+			//tbl.editor_obj.val=cell.combo_val;
+			if (cell.tagName == "OPTION")
+				cell=cell.parentNode;
+			editor_obj.setValue(cell.value + ";#" + cell.text);
+			editor_obj.editable=false;
+			editor_obj.grid.editStop();
+		}
+		var comboKeys = this.cell._allvalues.split('\n');
+		var fl = false;
+		var selOptId = 0;
+
+		for (var i = 0; i < comboKeys.length; i++){
+			var val = comboKeys[i].split(';#');
+			this.list.options[this.list.options.length]=new Option(val[1], val[0]);
+
+			if (comboKeys[i] == this.val){
+				selOptId=this.list.options.length-1;
+				fl=true;
+			}
+		}
+
+		if (fl == false){ //if no such value in combo list
+			this.list.options[this.list.options.length]=new Option(this.text, this.val === null ? "" : this.val);
+			selOptId=this.list.options.length-1;
+		}
+		document.body.appendChild(this.list) //nb:this.grid.objBox.appendChild(this.listBox);
+		this.list.size="6";
+		this.cstate=1;
+
+		if (this.editable){
+			this.cell.innerHTML="";
+		}
+		else {
+			this.obj.style.width="1px";
+			this.obj.style.height="1px";
+		}
+		this.cell.appendChild(this.obj);
+		this.list.options[selOptId].selected=true;
+    }
+    this.detach=function(){
+		
+		if (this.val != this.getValue())
+		{
+			this.cell.wasChanged=true;
+		}
+
+		var curVal = this.getValue();
+		var newVal = this.list.options[this.list.selectedIndex].value + ";#" + this.list.options[this.list.selectedIndex].text;
+		if(newVal == ";#")
+			newVal = "";
+		
+		this.setValue(newVal);
+		
+		
+
+		/*if (this.list.parentNode != null)
+		{
+				if (this.obj.value._dhx_trim() != this.text){
+					if (this.list.selectedIndex&&this.list.options[this.list.selectedIndex].text == this.obj.value)
+						this.setValue(this.list.value + '\t' + this.cell._allvalues)
+					else
+						this.setValue(this.obj.value + '\t' + this.cell._allvalues)
+				} else {
+					this.setValue(this.val + '\t' + this.cell._allvalues)
+				}
+		}*/
+
+		if (this.list.parentNode)
+			this.list.parentNode.removeChild(this.list);
+
+		if (this.obj.parentNode)
+			this.obj.parentNode.removeChild(this.obj);
+
+		return newVal != curVal;
+		
+    }
+}
+eXcell_choice.prototype = new eXcell;
+
+
+dhtmlXGridObject.prototype.alerterror=function(msg){
+    document.getElementById("errordiv" + this._gridid).innerHTML = "Error: " + msg;
+};

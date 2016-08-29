@@ -1,0 +1,20 @@
+<Grid>
+  <Cfg id='ProjectInfo' Style='Standard'
+     ConstHeight='1' Dragging='0' Adding='0' DateStrings='2' 
+    Deleting='0' Selecting='0' Sorting='0'/>
+	<Toolbar Visible='0'></Toolbar>
+	<Cfg Code="GTACCNPSQEBSLC"/>
+  <Cols>
+    <C Name='N' Type='Text' CanEdit='0' Width='100'/>
+    <C Name='V' Type='Text' RelWidth='100'/>
+  </Cols>
+  <Header N='Item' V='Value'/>
+  <Def>
+	<D Name='R'/>
+  </Def>
+  <Body>
+    <B>
+      
+    </B>
+  </Body>
+</Grid>

@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Elements xmlns="http://schemas.microsoft.com/sharepoint/">
+  <CustomAction Id="ActionEditInProject"
+	RegistrationType="List"
+	RegistrationId="10702"
+	GroupId="ActionsMenu"
+	Location="Microsoft.SharePoint.StandardMenu"
+	Sequence="10"
+	Title="Edit In Project"
+	ControlAssembly="EPM Live Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5"
+	ControlClass="EPMLiveCore.EditIn"/>
+</Elements>

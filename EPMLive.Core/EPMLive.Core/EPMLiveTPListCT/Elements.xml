@@ -1,0 +1,128 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Elements Id="2a420c27-4ad9-4672-8b35-a2be84f4dd27" xmlns="http://schemas.microsoft.com/sharepoint/">
+  <ContentType ID="0x0100d7db06b3acd948aca75ce1d1e54f2594"
+               Name="EPMLiveTPListCT"
+               Group="EPMLive"
+               Description="EPM Live Periods Content Type"
+               Version="0" >
+    <FieldRefs>
+      <FieldRef ID="{79D976AE-EB4C-4125-BB07-E9DD1307A79D}" Name="StartDate" Required="TRUE" Sealed ="TRUE"/>
+      <FieldRef ID="{3FEC8721-31B5-4585-B402-BB537AD1934D}" Name="EndDate"  Required="TRUE" Sealed ="TRUE"/>
+      <FieldRef ID="{CE3D1EE1-8D4F-4501-BF9E-9183EF7191E3}" Name="OutlineCodeType"  Required="TRUE" Sealed ="TRUE"/>
+      <FieldRef ID="{DD80EF56-5754-4063-A9CF-4C42401FE8C3}" Name="Task"  Required="TRUE" Sealed ="TRUE"/>
+      <FieldRef ID="{F622308D-62DF-41b3-A467-3EBCCB57FEA8}" Name ="WBS"/>
+      <FieldRef ID="{212AD2A4-9320-467a-956F-134F85DA5CD2}" Name="Resource" Required="TRUE" Sealed ="TRUE"/>
+      <FieldRef ID="{433EB8DA-A75D-4d9e-96FB-3BAB6AF7D02B}" Name="URL" Required="TRUE" Sealed ="TRUE"/>
+      <FieldRef ID="{32CDECC8-A366-4f4e-AAA0-8A5E3F64356F}" Name="ValueType" Required="TRUE" Sealed ="TRUE"/>
+      <FieldRef ID="{A9E8295A-54DA-40e4-88B6-3CE600EA563D}" Name="DisplayName" Required="TRUE" Sealed ="TRUE"/>
+      <FieldRef ID="{5E1EBF32-7AF6-4a6e-A863-50375F31F044}" Name="TimePhasedType"/>
+      <FieldRef ID="{22D9BC0A-8E18-4c5b-8A0A-F49577B52751}" Name="Capacity"/>
+      <FieldRef ID="{01C9D614-3082-43a0-ACAC-D1E1E6BFC22A}" Name="Calculation"/>
+    </FieldRefs>
+  </ContentType>
+
+
+  <Field ID="{79D976AE-EB4C-4125-BB07-E9DD1307A79D}"
+		Type="DateTime"
+		Name="StartDate"
+		DisplayName="Start Date"
+		StaticName="StartDate"
+		Hidden="FALSE"
+		Required="FALSE"
+		Sealed="TRUE" Format="DateOnly" />
+  <Field ID="{3FEC8721-31B5-4585-B402-BB537AD1934D}"
+		Type="DateTime"
+		Name="EndDate"
+		DisplayName="End Date"
+		StaticName="EndDate"
+		Hidden="FALSE"
+		Required="FALSE"
+		Sealed="TRUE" Format="DateOnly" />
+  <Field ID="{CE3D1EE1-8D4F-4501-BF9E-9183EF7191E3}"
+		Type="Choice"
+		Name="OutlineCodeType"
+		DisplayName="Outline Code Type"
+		StaticName="OutlineCodeType"
+		Hidden="FALSE"
+		Required="FALSE"
+		Sealed="TRUE">
+    <CHOICES>
+      <CHOICE>Project</CHOICE>
+      <CHOICE>Task</CHOICE>
+    </CHOICES>
+  </Field>
+
+  <Field ID="{A9E8295A-54DA-40e4-88B6-3CE600EA563D}"
+		Type="Text"
+		Name="DisplayName"
+		DisplayName="Display Name"
+		StaticName="DisplayName"
+		Hidden="FALSE"
+		Required="FALSE"
+		Sealed="TRUE" />
+
+  <Field ID="{DD80EF56-5754-4063-A9CF-4C42401FE8C3}"
+		Type="Text"
+		Name="Task"
+		DisplayName="Task"
+		StaticName="Task"
+		Hidden="FALSE"
+		Required="FALSE"
+		Sealed="TRUE" />
+  <Field ID="{F622308D-62DF-41b3-A467-3EBCCB57FEA8}"
+					Type="Text"
+					Name="WBS"
+					DisplayName="WBS"
+					StaticName="WBS"
+					Hidden="FALSE"
+					Required="FALSE"
+					Sealed="TRUE" />
+  <Field ID="{212AD2A4-9320-467a-956F-134F85DA5CD2}"
+		Type="Text"
+		Name="Resource"
+		DisplayName="Resource"
+		StaticName="Resource"
+		Hidden="FALSE"
+		Required="FALSE"
+		Sealed="TRUE" />
+  <Field ID="{433EB8DA-A75D-4d9e-96FB-3BAB6AF7D02B}"
+		Type="Text"
+		Name="URL"
+		DisplayName="URL"
+		StaticName="URL"
+		Hidden="FALSE"
+		Required="FALSE"
+		Sealed="TRUE" />
+  <Field ID="{32CDECC8-A366-4f4e-AAA0-8A5E3F64356F}"
+		Type="Text"
+		Name="ValueType"
+		DisplayName="ValueType"
+		StaticName="ValueType"
+		Hidden="FALSE"
+		Required="FALSE"
+		Sealed="TRUE" />
+  <Field ID="{5E1EBF32-7AF6-4a6e-A863-50375F31F044}"
+		Type="Number"
+		Name="TimePhasedType"
+		DisplayName="TimePhasedType"
+		StaticName="TimePhasedType"
+		Hidden="FALSE"
+		Required="FALSE"
+		Sealed="TRUE" />
+  <Field ID="{22D9BC0A-8E18-4c5b-8A0A-F49577B52751}"
+		Type="Number"
+		Name="Capacity"
+		DisplayName="Capacity"
+		StaticName="Capacity"
+		Hidden="FALSE"
+		Required="FALSE"
+		Sealed="TRUE" />
+  <Field ID="{01C9D614-3082-43a0-ACAC-D1E1E6BFC22A}"
+		Type="Text"
+		Name="Calculation"
+		DisplayName="Calculation"
+		StaticName="Calculation"
+		Hidden="FALSE"
+		Required="FALSE"
+		Sealed="TRUE" />
+</Elements>

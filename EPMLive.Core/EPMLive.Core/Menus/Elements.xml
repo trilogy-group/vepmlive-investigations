@@ -1,0 +1,215 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Elements xmlns="http://schemas.microsoft.com/sharepoint/">
+  <CustomActionGroup
+			Id="EPMLive.Workgroup.Admin"
+			Location="Microsoft.SharePoint.SiteSettings"
+			Title="WorkEngine Administration"
+			Sequence="200" ImageUrl="/_layouts/images/epmlivelogo.gif"/>
+
+
+
+  <CustomAction
+	Id="EPMLive.ViewPermissionSetting"
+	RegistrationType="List"
+	GroupId="Permissions"
+	Location="Microsoft.SharePoint.ListEdit"
+	Sequence="2000"
+	Title="View Permission Settings (EPM Live)" >
+    <UrlAction Url="~site/_layouts/epmlive/ViewSecurity.aspx?List={ListId}"/>
+  </CustomAction>
+
+  <CustomAction
+	Id="EPMLive.ManageEditableFields"
+	RegistrationType="List"
+	GroupId="GeneralSettings"
+	Location="Microsoft.SharePoint.ListEdit"
+	Sequence="2001"
+	Title="Manage Editable Fields (EPM Live)" >
+    <UrlAction Url="~site/_layouts/epmlive/EditableFields.aspx?List={ListId}"/>
+  </CustomAction>
+
+  <CustomAction
+	Id="EPMLive.CalcFields"
+	RegistrationType="List"
+	GroupId="GeneralSettings"
+	Location="Microsoft.SharePoint.ListEdit"
+	Sequence="2003"
+	Title="Total Field Settings (EPM Live)">
+    <UrlAction Url="~site/_layouts/epmlive/totalfields.aspx?List={ListId}"/>
+  </CustomAction>
+
+  <CustomAction
+	Id="EPMLive.GridGanttSettings"
+	RegistrationType="List"
+	GroupId="GeneralSettings"
+	Location="Microsoft.SharePoint.ListEdit"
+	Sequence="2004"
+	Title="General Settings (EPM Live)">
+    <UrlAction Url="~site/_layouts/epmlive/gridganttsettings.aspx?List={ListId}"/>
+  </CustomAction>
+
+	
+	<CustomAction
+	Id="EPMLive.ListLookupConfig"
+	RegistrationType="List"
+	GroupId="GeneralSettings"
+	Location="Microsoft.SharePoint.ListEdit"
+	Sequence="2005"
+	Title="Lookup Settings (EPM Live)">
+		<UrlAction Url="~site/_layouts/epmlive/ListLookupConfig.aspx?List={ListId}"/>
+	</CustomAction>
+
+	<CustomAction
+   Id="EPMLive.Integration"
+   RegistrationType="List"
+   GroupId="GeneralSettings"
+   Location="Microsoft.SharePoint.ListEdit"
+   Sequence="2006"
+   Title="Integration (EPM Live)">
+		<UrlAction Url="~site/_layouts/epmlive/integration/integrationlist.aspx?List={ListId}"/>
+	</CustomAction>
+
+	<CustomAction
+	Id="EPMLive.CalcFields"
+	RegistrationType="List"
+	GroupId="GeneralSettings"
+	Location="Microsoft.SharePoint.ListEdit"
+	Sequence="2007"
+	Title="Create Dashboard (EPM Live)">
+		<UrlAction Url="~site/_layouts/epmlive/ReportFilterViewCreator.aspx?List={ListId}"/>
+
+	</CustomAction>
+  <CustomAction
+        Id="EPMLive.Workgroup.Admin.Notifications"
+        GroupId="PersonalActions"
+        Location="Microsoft.SharePoint.StandardMenu"
+        Sequence="100"
+        Title="My Notifications"
+		Description="Modify your notification settings.">
+    <UrlAction Url="~site/_layouts/epmlive/notifications.aspx" />
+  </CustomAction>
+
+
+  <!-- ===================Resource Tools===================== -->
+  	
+	<CustomAction
+		  Id="EPMLive.ResourceTools"
+		  Location="CommandUI.Ribbon"
+		  Title="Resource Tools"
+		  Sequence="102">
+		<CommandUIExtension>
+			<CommandUIDefinitions>
+				<CommandUIDefinition Location="Ribbon.ListForm.Edit.Scaling._children">
+					<MaxSize Id="Ribbon.List.EPMLive.ResourceTools.MaxSize" Sequence="15"  GroupId="Ribbon.List.EPMLive.ResourceTools" Size="Large" />
+				</CommandUIDefinition>
+				<CommandUIDefinition Location ="Ribbon.ListForm.Edit.Groups._children">
+					<Group Id ="Ribbon.List.EPMLive.ResourceTools" Sequence="30" Title="Resource Tools" Template="Ribbon.Templates.Flexible">
+						<Controls Id ="Ribbon.List.EPMLive.ResourceTools.Controls">
+							<Button Command ="FindResources" Id ="Ribbon.List.EPMLive.ResourceTools.FindResources" LabelText="Find Resources" Image32by32="/_layouts/images/epmlive_rt_find.gif" TemplateAlias="o1"/>
+							<Button Command ="CheckResources" Id ="Ribbon.List.EPMLive.ResourceTools.CheckResources" LabelText="Check Resources" Image32by32="/_layouts/images/epmlive_rt_check.gif" TemplateAlias="o1"/>
+						</Controls>
+					</Group>
+				</CommandUIDefinition>
+			</CommandUIDefinitions>
+			<CommandUIHandlers>
+				<CommandUIHandler Command="FindResources" CommandAction="javascript:findResource();" EnabledScript="javascript:getResToolsEnabled();"></CommandUIHandler>
+				<CommandUIHandler Command="CheckResources" CommandAction="javascript:checkResource();" EnabledScript="javascript:getResToolsEnabled();"></CommandUIHandler>
+			</CommandUIHandlers>
+			
+		</CommandUIExtension>
+		
+	</CustomAction>
+
+	<CustomAction
+      ScriptSrc="epmlive/resourcetools.js"
+      Location="ScriptLink"
+      Sequence="100"
+      >
+	</CustomAction>
+	<CustomAction
+		  ScriptSrc="epmlive/dhtml/xgrid/dhtmlxcommon.js"
+		  Location="ScriptLink"
+		  Sequence="100"
+      >
+	</CustomAction>
+  <!-- ===================Resource Tools New===================== -->
+	<CustomAction
+			Id="EPMLive.ResourceTools"
+			Location="CommandUI.Ribbon"
+			Title="Resource Tools"
+			Sequence="102">
+		<CommandUIExtension>
+			<CommandUIDefinitions>
+				<CommandUIDefinition Location="Ribbon.ListForm.New.Scaling._children">
+					<MaxSize Id="Ribbon.List.EPMLive.ResourceTools.MaxSize" Sequence="15"  GroupId="Ribbon.List.EPMLive.ResourceTools" Size="Large" />
+				</CommandUIDefinition>
+				<CommandUIDefinition Location ="Ribbon.ListForm.New.Groups._children">
+					<Group Id ="Ribbon.List.EPMLive.ResourceTools" Sequence="30" Title="Resource Tools" Template="Ribbon.Templates.Flexible">
+						<Controls Id ="Ribbon.List.EPMLive.ResourceTools.Controls">
+							<Button Command ="FindResources" Id ="Ribbon.List.EPMLive.ResourceTools.FindResources" LabelText="Find Resources" Image32by32="/_layouts/images/epmlive_rt_find.gif" TemplateAlias="o1"/>
+							<Button Command ="CheckResources" Id ="Ribbon.List.EPMLive.ResourceTools.CheckResources" LabelText="Check Resources" Image32by32="/_layouts/images/epmlive_rt_check.gif" TemplateAlias="o1"/>
+						</Controls>
+					</Group>
+				</CommandUIDefinition>
+			</CommandUIDefinitions>
+			<CommandUIHandlers>
+				<CommandUIHandler Command="FindResources" CommandAction="javascript:findResource();" EnabledScript="javascript:getResToolsEnabled();"></CommandUIHandler>
+				<CommandUIHandler Command="CheckResources" CommandAction="javascript:checkResource();" EnabledScript="javascript:getResToolsEnabled();"></CommandUIHandler>
+			</CommandUIHandlers>
+
+		</CommandUIExtension>
+
+	</CustomAction>
+  <!-- ====================================================== -->
+	<!-- ===================Comments Tools New===================== -->
+	<CustomAction
+	  Id="WECommentsTools"
+	  Location="CommandUI.Ribbon"
+		Title="Comment Tools"
+		Sequence="102">
+		<CommandUIExtension>
+			<CommandUIDefinitions>
+				<CommandUIDefinition
+				 Location="Ribbon.ListForm.Display.Manage.Controls._children">
+					<Button
+					 Id="Ribbon.Documents.New.Controls.DemoHelloWorldButton"
+					 Alt="Comments"
+					 Sequence="11"
+					 Image32by32="/_layouts/epmlive/images/comments32.png"
+					 Command="WE_Comments"
+					 LabelText="Comments"
+					 TemplateAlias="o1"/>
+				</CommandUIDefinition>
+			</CommandUIDefinitions>
+			<CommandUIHandlers>
+				<CommandUIHandler
+				 Command="WE_Comments"
+				 CommandAction="javascript:OpenCommentDialog();" />
+			</CommandUIHandlers>
+		</CommandUIExtension>
+	</CustomAction>
+	
+	<CustomAction Id="AddDocument.Script"             
+				  Location ="ScriptLink"              
+				  ScriptBlock="function OpenCommentDialog() {
+					var listid = SP.PageContextInfo.get_pageListId();
+					var itemid = getRequestParam('ID');
+					
+					var weburl = SP.Utilities.Utility.getLayoutsPageUrl('epmlive/comments.aspx?ListId=' + listid + '&amp;itemid=' + itemid);
+
+				  
+					var options = { url: weburl, width: 600, height: 500 };
+					SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
+				  
+				  }
+				  
+				  
+				  "/>
+	<!--<CustomAction
+      ScriptSrc="epmlive/commentstools.js"
+      Location="ScriptLink"
+      Sequence="100"
+      >
+	</CustomAction>-->
+	<!-- ====================================================== -->
+</Elements>

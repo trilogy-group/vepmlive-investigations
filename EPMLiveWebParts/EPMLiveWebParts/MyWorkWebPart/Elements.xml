@@ -1,8 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Elements xmlns="http://schemas.microsoft.com/sharepoint/" >
-  <Module Name="MyWorkWebPart" List="113" Url="_catalogs/wp">
-    <File Path="MyWorkWebPart\MyWorkWebPart.dwp" Url ="MyWorkWebPart.dwp" Type="GhostableInLibrary">
-      <Property Name="Group" Value ="EPM Live"/>
-    </File>
-  </Module>
-</Elements>

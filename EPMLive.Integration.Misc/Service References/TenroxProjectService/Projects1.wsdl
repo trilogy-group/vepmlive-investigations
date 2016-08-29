@@ -1,0 +1,277 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:wsap="http://schemas.xmlsoap.org/ws/2004/08/addressing/policy" xmlns:wsa10="http://www.w3.org/2005/08/addressing" xmlns:tns="Tenrox.Application.SDK" xmlns:msc="http://schemas.microsoft.com/ws/2005/12/wsdl/contract" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:wsx="http://schemas.xmlsoap.org/ws/2004/09/mex" xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata" xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="Tenrox.Application.SDK" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <xsd:schema targetNamespace="Tenrox.Application.SDK/Imports">
+      <xsd:import schemaLocation="http://srv-dev-epm.federation.com/TWebService/sdk/Projects.svc?xsd=xsd0" namespace="Tenrox.Application.SDK.ServiceContracts" />
+      <xsd:import schemaLocation="http://srv-dev-epm.federation.com/TWebService/sdk/Projects.svc?xsd=xsd1" namespace="http://schemas.microsoft.com/2003/10/Serialization/" />
+      <xsd:import schemaLocation="http://srv-dev-epm.federation.com/TWebService/sdk/Projects.svc?xsd=xsd2" namespace="http://schemas.datacontract.org/2004/07/Tenrox.Shared.Utilities" />
+      <xsd:import schemaLocation="http://srv-dev-epm.federation.com/TWebService/sdk/Projects.svc?xsd=xsd3" namespace="http://schemas.microsoft.com/2003/10/Serialization/Arrays" />
+      <xsd:import schemaLocation="http://srv-dev-epm.federation.com/TWebService/sdk/Projects.svc?xsd=xsd4" namespace="Tenrox.Application.SDK" />
+      <xsd:import schemaLocation="http://srv-dev-epm.federation.com/TWebService/sdk/Projects.svc?xsd=xsd5" namespace="http://schemas.datacontract.org/2004/07/Tenrox.Application.SDK" />
+      <xsd:import schemaLocation="http://srv-dev-epm.federation.com/TWebService/sdk/Projects.svc?xsd=xsd6" namespace="http://schemas.datacontract.org/2004/07/System.Data" />
+      <xsd:import schemaLocation="http://srv-dev-epm.federation.com/TWebService/sdk/Projects.svc?xsd=xsd7" namespace="http://Tenrox.Server.Framework.WebServices.FaultContracts" />
+    </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="IProjects_QueryByAllSerialized_InputMessage">
+    <wsdl:part xmlns:q1="Tenrox.Application.SDK.ServiceContracts" name="parameters" element="q1:QueryByAllSerialized" />
+  </wsdl:message>
+  <wsdl:message name="IProjects_QueryByAllSerialized_OutputMessage">
+    <wsdl:part xmlns:q2="Tenrox.Application.SDK.ServiceContracts" name="parameters" element="q2:QueryByAllSerializedResponse" />
+  </wsdl:message>
+  <wsdl:message name="IProjects_QueryByUniqueIdSerialized_InputMessage">
+    <wsdl:part xmlns:q3="Tenrox.Application.SDK.ServiceContracts" name="parameters" element="q3:QueryByUniqueIdSerialized" />
+  </wsdl:message>
+  <wsdl:message name="IProjects_QueryByUniqueIdSerialized_OutputMessage">
+    <wsdl:part xmlns:q4="Tenrox.Application.SDK.ServiceContracts" name="parameters" element="q4:QueryByUniqueIdSerializedResponse" />
+  </wsdl:message>
+  <wsdl:message name="IProjects_QueryByIdSerialized_InputMessage">
+    <wsdl:part xmlns:q5="Tenrox.Application.SDK.ServiceContracts" name="parameters" element="q5:QueryByIdSerialized" />
+  </wsdl:message>
+  <wsdl:message name="IProjects_QueryByIdSerialized_OutputMessage">
+    <wsdl:part xmlns:q6="Tenrox.Application.SDK.ServiceContracts" name="parameters" element="q6:QueryByIdSerializedResponse" />
+  </wsdl:message>
+  <wsdl:message name="IProjects_QueryByNameSerialized_InputMessage">
+    <wsdl:part xmlns:q7="Tenrox.Application.SDK.ServiceContracts" name="parameters" element="q7:QueryByNameSerialized" />
+  </wsdl:message>
+  <wsdl:message name="IProjects_QueryByNameSerialized_OutputMessage">
+    <wsdl:part xmlns:q8="Tenrox.Application.SDK.ServiceContracts" name="parameters" element="q8:QueryByNameSerializedResponse" />
+  </wsdl:message>
+  <wsdl:message name="IProjects_DeleteSerialized_InputMessage">
+    <wsdl:part xmlns:q9="Tenrox.Application.SDK.ServiceContracts" name="parameters" element="q9:DeleteSerialized" />
+  </wsdl:message>
+  <wsdl:message name="IProjects_DeleteSerialized_OutputMessage">
+    <wsdl:part xmlns:q10="Tenrox.Application.SDK.ServiceContracts" name="parameters" element="q10:DeleteSerializedResponse" />
+  </wsdl:message>
+  <wsdl:message name="IProjects_Delete_InputMessage">
+    <wsdl:part xmlns:q11="Tenrox.Application.SDK.ServiceContracts" name="parameters" element="q11:Delete" />
+  </wsdl:message>
+  <wsdl:message name="IProjects_Delete_OutputMessage">
+    <wsdl:part xmlns:q12="Tenrox.Application.SDK.ServiceContracts" name="parameters" element="q12:DeleteResponse" />
+  </wsdl:message>
+  <wsdl:message name="IProjects_BulkDeleteSerialized_InputMessage">
+    <wsdl:part xmlns:q13="Tenrox.Application.SDK.ServiceContracts" name="parameters" element="q13:BulkDeleteSerialized" />
+  </wsdl:message>
+  <wsdl:message name="IProjects_BulkDeleteSerialized_OutputMessage">
+    <wsdl:part xmlns:q14="Tenrox.Application.SDK.ServiceContracts" name="parameters" element="q14:BulkDeleteSerializedResponse" />
+  </wsdl:message>
+  <wsdl:message name="IProjects_BulkDelete_InputMessage">
+    <wsdl:part xmlns:q15="Tenrox.Application.SDK.ServiceContracts" name="parameters" element="q15:BulkDelete" />
+  </wsdl:message>
+  <wsdl:message name="IProjects_BulkDelete_OutputMessage">
+    <wsdl:part xmlns:q16="Tenrox.Application.SDK.ServiceContracts" name="parameters" element="q16:BulkDeleteResponse" />
+  </wsdl:message>
+  <wsdl:message name="IProjects_QueryBy_InputMessage">
+    <wsdl:part name="parameters" element="tns:QueryBy" />
+  </wsdl:message>
+  <wsdl:message name="IProjects_QueryBy_OutputMessage">
+    <wsdl:part name="parameters" element="tns:QueryByResponse" />
+  </wsdl:message>
+  <wsdl:message name="IProjects_QueryByAll_InputMessage">
+    <wsdl:part name="parameters" element="tns:QueryByAll" />
+  </wsdl:message>
+  <wsdl:message name="IProjects_QueryByAll_OutputMessage">
+    <wsdl:part name="parameters" element="tns:QueryByAllResponse" />
+  </wsdl:message>
+  <wsdl:message name="IProjects_QueryByUniqueId_InputMessage">
+    <wsdl:part name="parameters" element="tns:QueryByUniqueId" />
+  </wsdl:message>
+  <wsdl:message name="IProjects_QueryByUniqueId_OutputMessage">
+    <wsdl:part name="parameters" element="tns:QueryByUniqueIdResponse" />
+  </wsdl:message>
+  <wsdl:message name="IProjects_QueryById_InputMessage">
+    <wsdl:part name="parameters" element="tns:QueryById" />
+  </wsdl:message>
+  <wsdl:message name="IProjects_QueryById_OutputMessage">
+    <wsdl:part name="parameters" element="tns:QueryByIdResponse" />
+  </wsdl:message>
+  <wsdl:message name="IProjects_QueryByName_InputMessage">
+    <wsdl:part name="parameters" element="tns:QueryByName" />
+  </wsdl:message>
+  <wsdl:message name="IProjects_QueryByName_OutputMessage">
+    <wsdl:part name="parameters" element="tns:QueryByNameResponse" />
+  </wsdl:message>
+  <wsdl:message name="IProjects_QueryByParentId_InputMessage">
+    <wsdl:part name="parameters" element="tns:QueryByParentId" />
+  </wsdl:message>
+  <wsdl:message name="IProjects_QueryByParentId_OutputMessage">
+    <wsdl:part name="parameters" element="tns:QueryByParentIdResponse" />
+  </wsdl:message>
+  <wsdl:message name="IProjects_QueryByEndDate_InputMessage">
+    <wsdl:part name="parameters" element="tns:QueryByEndDate" />
+  </wsdl:message>
+  <wsdl:message name="IProjects_QueryByEndDate_OutputMessage">
+    <wsdl:part name="parameters" element="tns:QueryByEndDateResponse" />
+  </wsdl:message>
+  <wsdl:message name="IProjects_QueryByBudgetExceeded_InputMessage">
+    <wsdl:part name="parameters" element="tns:QueryByBudgetExceeded" />
+  </wsdl:message>
+  <wsdl:message name="IProjects_QueryByBudgetExceeded_OutputMessage">
+    <wsdl:part name="parameters" element="tns:QueryByBudgetExceededResponse" />
+  </wsdl:message>
+  <wsdl:message name="IProjects_Save_InputMessage">
+    <wsdl:part name="parameters" element="tns:Save" />
+  </wsdl:message>
+  <wsdl:message name="IProjects_Save_OutputMessage">
+    <wsdl:part name="parameters" element="tns:SaveResponse" />
+  </wsdl:message>
+  <wsdl:message name="IProjects_SaveAll_InputMessage">
+    <wsdl:part name="parameters" element="tns:SaveAll" />
+  </wsdl:message>
+  <wsdl:message name="IProjects_SaveAll_OutputMessage">
+    <wsdl:part name="parameters" element="tns:SaveAllResponse" />
+  </wsdl:message>
+  <wsdl:message name="IProjects_CreateNew_InputMessage">
+    <wsdl:part name="parameters" element="tns:CreateNew" />
+  </wsdl:message>
+  <wsdl:message name="IProjects_CreateNew_OutputMessage">
+    <wsdl:part name="parameters" element="tns:CreateNewResponse" />
+  </wsdl:message>
+  <wsdl:message name="IProjects_CreateNew_TenroxFaultContractFault_FaultMessage">
+    <wsdl:part xmlns:q17="http://Tenrox.Server.Framework.WebServices.FaultContracts" name="detail" element="q17:TenroxFaultContract" />
+  </wsdl:message>
+  <wsdl:message name="IProjects_OptomisticSave_InputMessage">
+    <wsdl:part name="parameters" element="tns:OptomisticSave" />
+  </wsdl:message>
+  <wsdl:message name="IProjects_OptomisticSave_OutputMessage">
+    <wsdl:part name="parameters" element="tns:OptomisticSaveResponse" />
+  </wsdl:message>
+  <wsdl:message name="IProjects_UpdateSegmentEntries_InputMessage">
+    <wsdl:part name="parameters" element="tns:UpdateSegmentEntries" />
+  </wsdl:message>
+  <wsdl:message name="IProjects_UpdateSegmentEntries_OutputMessage">
+    <wsdl:part name="parameters" element="tns:UpdateSegmentEntriesResponse" />
+  </wsdl:message>
+  <wsdl:message name="IProjects_UpdateSegmentEntries_TenroxFaultContractFault_FaultMessage">
+    <wsdl:part xmlns:q18="http://Tenrox.Server.Framework.WebServices.FaultContracts" name="detail" element="q18:TenroxFaultContract" />
+  </wsdl:message>
+  <wsdl:message name="IProjects_AddBusinessUnits_InputMessage">
+    <wsdl:part name="parameters" element="tns:AddBusinessUnits" />
+  </wsdl:message>
+  <wsdl:message name="IProjects_AddBusinessUnits_OutputMessage">
+    <wsdl:part name="parameters" element="tns:AddBusinessUnitsResponse" />
+  </wsdl:message>
+  <wsdl:message name="IProjects_AddBusinessUnits_TenroxFaultContractFault_FaultMessage">
+    <wsdl:part xmlns:q19="http://Tenrox.Server.Framework.WebServices.FaultContracts" name="detail" element="q19:TenroxFaultContract" />
+  </wsdl:message>
+  <wsdl:message name="IProjects_RemoveBusinessUnits_InputMessage">
+    <wsdl:part name="parameters" element="tns:RemoveBusinessUnits" />
+  </wsdl:message>
+  <wsdl:message name="IProjects_RemoveBusinessUnits_OutputMessage">
+    <wsdl:part name="parameters" element="tns:RemoveBusinessUnitsResponse" />
+  </wsdl:message>
+  <wsdl:message name="IProjects_RemoveBusinessUnits_TenroxFaultContractFault_FaultMessage">
+    <wsdl:part xmlns:q20="http://Tenrox.Server.Framework.WebServices.FaultContracts" name="detail" element="q20:TenroxFaultContract" />
+  </wsdl:message>
+  <wsdl:message name="IProjects_CreateBillingRule_InputMessage">
+    <wsdl:part name="parameters" element="tns:CreateBillingRule" />
+  </wsdl:message>
+  <wsdl:message name="IProjects_CreateBillingRule_OutputMessage">
+    <wsdl:part name="parameters" element="tns:CreateBillingRuleResponse" />
+  </wsdl:message>
+  <wsdl:message name="IProjects_CreateBillingRule_TenroxFaultContractFault_FaultMessage">
+    <wsdl:part xmlns:q21="http://Tenrox.Server.Framework.WebServices.FaultContracts" name="detail" element="q21:TenroxFaultContract" />
+  </wsdl:message>
+  <wsdl:portType name="IProjects">
+    <wsdl:operation name="QueryByAllSerialized">
+      <wsdl:input wsaw:Action="QueryByAllSerialized" message="tns:IProjects_QueryByAllSerialized_InputMessage" />
+      <wsdl:output wsaw:Action="Tenrox.Application.SDK.ServiceContracts/ITenroxService/QueryByAllSerializedResponse" message="tns:IProjects_QueryByAllSerialized_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="QueryByUniqueIdSerialized">
+      <wsdl:input wsaw:Action="QueryByUniqueIdSerialized" message="tns:IProjects_QueryByUniqueIdSerialized_InputMessage" />
+      <wsdl:output wsaw:Action="Tenrox.Application.SDK.ServiceContracts/ITenroxService/QueryByUniqueIdSerializedResponse" message="tns:IProjects_QueryByUniqueIdSerialized_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="QueryByIdSerialized">
+      <wsdl:input wsaw:Action="QueryByIdSerialized" message="tns:IProjects_QueryByIdSerialized_InputMessage" />
+      <wsdl:output wsaw:Action="Tenrox.Application.SDK.ServiceContracts/ITenroxService/QueryByIdSerializedResponse" message="tns:IProjects_QueryByIdSerialized_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="QueryByNameSerialized">
+      <wsdl:input wsaw:Action="QueryByNameSerialized" message="tns:IProjects_QueryByNameSerialized_InputMessage" />
+      <wsdl:output wsaw:Action="Tenrox.Application.SDK.ServiceContracts/ITenroxService/QueryByNameSerializedResponse" message="tns:IProjects_QueryByNameSerialized_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="DeleteSerialized">
+      <wsdl:input wsaw:Action="DeleteSerialized" message="tns:IProjects_DeleteSerialized_InputMessage" />
+      <wsdl:output wsaw:Action="Tenrox.Application.SDK.ServiceContracts/ITenroxService/DeleteSerializedResponse" message="tns:IProjects_DeleteSerialized_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="Delete">
+      <wsdl:input wsaw:Action="Delete" message="tns:IProjects_Delete_InputMessage" />
+      <wsdl:output wsaw:Action="Tenrox.Application.SDK.ServiceContracts/ITenroxService/DeleteResponse" message="tns:IProjects_Delete_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="BulkDeleteSerialized">
+      <wsdl:input wsaw:Action="BulkDeleteSerialized" message="tns:IProjects_BulkDeleteSerialized_InputMessage" />
+      <wsdl:output wsaw:Action="Tenrox.Application.SDK.ServiceContracts/ITenroxService/BulkDeleteSerializedResponse" message="tns:IProjects_BulkDeleteSerialized_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="BulkDelete">
+      <wsdl:input wsaw:Action="BulkDelete" message="tns:IProjects_BulkDelete_InputMessage" />
+      <wsdl:output wsaw:Action="Tenrox.Application.SDK.ServiceContracts/ITenroxService/BulkDeleteResponse" message="tns:IProjects_BulkDelete_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="QueryBy">
+      <wsdl:input wsaw:Action="QueryBy" message="tns:IProjects_QueryBy_InputMessage" />
+      <wsdl:output wsaw:Action="Tenrox.Application.SDK/IProjects/QueryByResponse" message="tns:IProjects_QueryBy_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="QueryByAll">
+      <wsdl:input wsaw:Action="QueryByAll" message="tns:IProjects_QueryByAll_InputMessage" />
+      <wsdl:output wsaw:Action="Tenrox.Application.SDK/IProjects/QueryByAllResponse" message="tns:IProjects_QueryByAll_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="QueryByUniqueId">
+      <wsdl:input wsaw:Action="QueryByUniqueId" message="tns:IProjects_QueryByUniqueId_InputMessage" />
+      <wsdl:output wsaw:Action="Tenrox.Application.SDK/IProjects/QueryByUniqueIdResponse" message="tns:IProjects_QueryByUniqueId_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="QueryById">
+      <wsdl:input wsaw:Action="QueryById" message="tns:IProjects_QueryById_InputMessage" />
+      <wsdl:output wsaw:Action="Tenrox.Application.SDK/IProjects/QueryByIdResponse" message="tns:IProjects_QueryById_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="QueryByName">
+      <wsdl:input wsaw:Action="QueryByName" message="tns:IProjects_QueryByName_InputMessage" />
+      <wsdl:output wsaw:Action="Tenrox.Application.SDK/IProjects/QueryByNameResponse" message="tns:IProjects_QueryByName_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="QueryByParentId">
+      <wsdl:input wsaw:Action="QueryByParentId" message="tns:IProjects_QueryByParentId_InputMessage" />
+      <wsdl:output wsaw:Action="Tenrox.Application.SDK/IProjects/QueryByParentIdResponse" message="tns:IProjects_QueryByParentId_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="QueryByEndDate">
+      <wsdl:input wsaw:Action="QueryByEndDate" message="tns:IProjects_QueryByEndDate_InputMessage" />
+      <wsdl:output wsaw:Action="Tenrox.Application.SDK/IProjects/QueryByEndDateResponse" message="tns:IProjects_QueryByEndDate_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="QueryByBudgetExceeded">
+      <wsdl:input wsaw:Action="QueryByBudgetExceeded" message="tns:IProjects_QueryByBudgetExceeded_InputMessage" />
+      <wsdl:output wsaw:Action="Tenrox.Application.SDK/IProjects/QueryByBudgetExceededResponse" message="tns:IProjects_QueryByBudgetExceeded_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="Save">
+      <wsdl:input wsaw:Action="Save" message="tns:IProjects_Save_InputMessage" />
+      <wsdl:output wsaw:Action="Tenrox.Application.SDK/IProjects/SaveResponse" message="tns:IProjects_Save_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="SaveAll">
+      <wsdl:input wsaw:Action="SaveAll" message="tns:IProjects_SaveAll_InputMessage" />
+      <wsdl:output wsaw:Action="Tenrox.Application.SDK/IProjects/SaveAllResponse" message="tns:IProjects_SaveAll_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="CreateNew">
+      <wsdl:input wsaw:Action="CreateNew" message="tns:IProjects_CreateNew_InputMessage" />
+      <wsdl:output wsaw:Action="Tenrox.Application.SDK/IProjects/CreateNewResponse" message="tns:IProjects_CreateNew_OutputMessage" />
+      <wsdl:fault wsaw:Action="Tenrox.Application.SDK/IProjects/CreateNewTenroxFaultContractFault" name="TenroxFaultContractFault" message="tns:IProjects_CreateNew_TenroxFaultContractFault_FaultMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="OptomisticSave">
+      <wsdl:input wsaw:Action="OptomisticSave" message="tns:IProjects_OptomisticSave_InputMessage" />
+      <wsdl:output wsaw:Action="Tenrox.Application.SDK/IProjects/OptomisticSaveResponse" message="tns:IProjects_OptomisticSave_OutputMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="UpdateSegmentEntries">
+      <wsdl:input wsaw:Action="UpdateSegmentEntries" message="tns:IProjects_UpdateSegmentEntries_InputMessage" />
+      <wsdl:output wsaw:Action="Tenrox.Application.SDK/IProjects/UpdateSegmentEntriesResponse" message="tns:IProjects_UpdateSegmentEntries_OutputMessage" />
+      <wsdl:fault wsaw:Action="Tenrox.Application.SDK/IProjects/UpdateSegmentEntriesTenroxFaultContractFault" name="TenroxFaultContractFault" message="tns:IProjects_UpdateSegmentEntries_TenroxFaultContractFault_FaultMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="AddBusinessUnits">
+      <wsdl:input wsaw:Action="AddBusinessUnits" message="tns:IProjects_AddBusinessUnits_InputMessage" />
+      <wsdl:output wsaw:Action="Tenrox.Application.SDK/IProjects/AddBusinessUnitsResponse" message="tns:IProjects_AddBusinessUnits_OutputMessage" />
+      <wsdl:fault wsaw:Action="Tenrox.Application.SDK/IProjects/AddBusinessUnitsTenroxFaultContractFault" name="TenroxFaultContractFault" message="tns:IProjects_AddBusinessUnits_TenroxFaultContractFault_FaultMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="RemoveBusinessUnits">
+      <wsdl:input wsaw:Action="RemoveBusinessUnits" message="tns:IProjects_RemoveBusinessUnits_InputMessage" />
+      <wsdl:output wsaw:Action="Tenrox.Application.SDK/IProjects/RemoveBusinessUnitsResponse" message="tns:IProjects_RemoveBusinessUnits_OutputMessage" />
+      <wsdl:fault wsaw:Action="Tenrox.Application.SDK/IProjects/RemoveBusinessUnitsTenroxFaultContractFault" name="TenroxFaultContractFault" message="tns:IProjects_RemoveBusinessUnits_TenroxFaultContractFault_FaultMessage" />
+    </wsdl:operation>
+    <wsdl:operation name="CreateBillingRule">
+      <wsdl:input wsaw:Action="CreateBillingRule" message="tns:IProjects_CreateBillingRule_InputMessage" />
+      <wsdl:output wsaw:Action="Tenrox.Application.SDK/IProjects/CreateBillingRuleResponse" message="tns:IProjects_CreateBillingRule_OutputMessage" />
+      <wsdl:fault wsaw:Action="Tenrox.Application.SDK/IProjects/CreateBillingRuleTenroxFaultContractFault" name="TenroxFaultContractFault" message="tns:IProjects_CreateBillingRule_TenroxFaultContractFault_FaultMessage" />
+    </wsdl:operation>
+  </wsdl:portType>
+</wsdl:definitions>

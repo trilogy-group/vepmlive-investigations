@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<WebPart xmlns="http://schemas.microsoft.com/WebPart/v2">
+	<Assembly>TimeSheets, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5</Assembly>
+	<TypeName>TimeSheets.PMApprovals</TypeName>
+	<Title>Timesheet PM Approvals</Title>
+	<Description>This WebPart is used to give project managers the ability to approve their timesheet items.</Description>
+	<PartImageLarge>/_layouts/images/wpepmlive.gif</PartImageLarge>
+</WebPart>

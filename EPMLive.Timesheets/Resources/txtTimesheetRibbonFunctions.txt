@@ -1,0 +1,251 @@
+mygrid#gridid#.addFocusedCommands = function($arr)
+{
+	
+	Array.add($arr, 'EnableTimesheetTab');
+	
+	Array.add($arr, 'EnableTimesheetMain');
+	Array.add($arr, 'TimesheetStatusLabel');
+	Array.add($arr, 'TimesheetStatus');
+	Array.add($arr, 'PreviousPeriod');
+	Array.add($arr, 'CurrentPeriod');
+	Array.add($arr, 'NextPeriod');
+	Array.add($arr, 'ChangePeriod');
+	
+	Array.add($arr, 'EnableTimesheetData');
+	Array.add($arr, 'TimesheetSave');
+	Array.add($arr, 'TimesheetSubmit');
+	Array.add($arr, 'TimesheetUnsubmit');
+
+	Array.add($arr, 'EnableTimesheetItems');
+	Array.add($arr, 'TimesheetItemAdd');
+	Array.add($arr, 'TimesheetItemRemove');
+	Array.add($arr, 'TimesheetItemAddMyWork');
+	Array.add($arr, 'TimesheetItemAddNonWork');
+	Array.add($arr, 'TimesheetItemAddSearchWork');
+	Array.add($arr, 'TimesheetItemAddAutoWork');
+
+	Array.add($arr, 'EnableTimesheetDelegates');
+	Array.add($arr, 'TimesheetDelegateMy');
+	Array.add($arr, 'TimesheetDelegateOther');
+	Array.add($arr, 'ChangeDelegate');
+	
+	return $arr;
+}
+
+mygrid#gridid#.getGlobalCommands = function($arr)
+{
+
+	Array.add($arr, 'PopulateTimesheetItemAdd');
+	Array.add($arr, 'TimesheetItemsAddOpen');
+	Array.add($arr, 'PopulateTimesheetDelegateOther');
+	Array.add($arr, 'TimesheetDelegateOtherOpen');
+	Array.add($arr, 'QueryStatus');
+	Array.add($arr, 'QueryCurrentPeriod');
+	Array.add($arr, 'PopulatePeriodDropDown');
+	return $arr;
+}
+
+mygrid#gridid#.canHandleCommand = function($Grid, commandId)
+{
+	switch(commandId)
+	{
+		
+		case 'EnableTimesheetTab':
+			return true;
+		case 'EnableTimesheetMain':
+		case 'TimesheetStatusLabel':
+		case 'TimesheetStatus':
+		case 'CurrentPeriod':
+		case 'QueryStatus':
+		case 'QueryCurrentPeriod':
+		case 'PopulatePeriodDropDown':
+		case 'EnableTimesheetData':
+		case 'ChangePeriod':
+			return true;
+		case 'PreviousPeriod':
+			return ($Grid._previousperiod != '');
+		case 'NextPeriod':
+			return ($Grid._nextperiod != '');
+		case 'TimesheetUnsubmit':
+			return ($Grid._lockedts && !$Grid._lockunsubmit);
+		case 'TimesheetItemsAddOpen':
+		case 'PopulateTimesheetItemAdd':
+		case 'TimesheetSave':
+		case 'TimesheetSubmit':
+		case 'EnableTimesheetItems':
+		case 'TimesheetItemAdd':
+		case 'TimesheetItemRemove':
+		case 'TimesheetItemAddMyWork':
+		case 'TimesheetItemAddNonWork':
+		case 'TimesheetItemAddSearchWork':
+		case 'TimesheetItemAddAutoWork':
+			return !$Grid._lockedts;
+		case 'ChangeDelegate':
+		case 'EnableTimesheetDelegates':
+		case 'TimesheetDelegateOther':
+		case 'PopulateTimesheetDelegateOther':
+		case 'TimesheetDelegateOtherOpen':
+		case 'TimesheetDelegateMy':
+			return ($Grid._delegates != "");
+		default:
+			return false;	
+	}
+}
+
+mygrid#gridid#.handleCommand = function($Grid, commandId, properties)
+{
+	
+	if(commandId === 'PopulateTimesheetItemAdd')
+	{
+		properties.PopulationXML = getTimesheetAddItems($Grid._additems);
+	}
+	else if(commandId === 'PopulateTimesheetDelegateOther')
+	{
+		properties.PopulationXML = getDelegates($Grid._delegates);
+	}
+	else if(commandId === 'PopulatePeriodDropDown')
+	{
+		properties.PopulationXML = getPeriods($Grid._allperiods);
+	}
+	else if(commandId === 'QueryStatus')
+	{
+		properties['Value'] = $Grid._timesheetstatus;
+	}
+	else if(commandId === 'QueryCurrentPeriod')
+	{
+		properties['Value'] = $Grid._timesheetperiod;
+	}
+	else if(commandId === 'TimesheetItemAddMyWork')
+	{
+		getWorkGrid#gridid#(myworkpost#gridid#,'Work');
+	}
+	else if(commandId === 'TimesheetItemAddNonWork')
+	{
+		getWorkGrid#gridid#(nonworkpost#gridid#,'Non-Work')
+	}
+	else if(commandId === 'TimesheetItemAddSearchWork')
+	{
+		searchWork#gridid#();
+	}
+	else if(commandId === 'TimesheetItemAddAutoWork')
+	{
+		autoAdd#gridid#();
+	}
+	else if(commandId === 'TimesheetSave')
+	{
+		saveData#gridid#();
+	}
+	else if(commandId === 'TimesheetSubmit')
+	{
+		submit#gridid#();
+	}
+	else if(commandId === 'TimesheetUnsubmit')
+	{
+		unsubmit#gridid#();
+	}
+	else if(commandId === 'TimesheetItemRemove')
+	{
+		deleteItem#gridid#();
+	}
+	else if(commandId === 'ChangePeriod')
+	{
+		changePeriod(properties['CommandValueId'], $Grid);
+	}
+	else if(commandId === 'TimesheetDelegateMy')
+	{
+		location.href=$Grid._cururl;
+	}
+	else if(commandId === 'ChangeDelegate')
+	{
+		var $v_1 = new Sys.StringBuilder();
+	    $v_1.append($Grid._cururl);
+	    $v_1.append('?duser=');
+	    $v_1.append(properties['CommandValueId']);
+		
+		location.href=$v_1;
+	}
+	else if(commandId === 'NextPeriod')
+	{
+		changePeriod($Grid._nextperiod, $Grid);
+	}
+	else if(commandId === 'PreviousPeriod')
+	{
+		changePeriod($Grid._previousperiod, $Grid);
+	}
+	else
+	{
+		//alert(commandId);
+	}
+	return properties;
+}
+
+function changePeriod(period, $Grid)
+{
+	var $v_1 = new Sys.StringBuilder();
+    $v_1.append($Grid._cururl);
+    $v_1.append('?NewPeriod=');
+    $v_1.append(period);
+	
+	location.href=$v_1;
+
+	//SP.Utilities.HttpUtility.navigateTo($v_1);
+}
+
+function getDelegates(menus)
+{
+    var sb = new Sys.StringBuilder();    
+    sb.append('<Menu Id=\'COB.SharePoint.Ribbon.WithPageComponent.PCNotificationGroup.Dropdown.Menu\'>');    
+    sb.append('<MenuSection DisplayMode=\'Menu32\' Id=\'COB.SharePoint.Ribbon.WithPageComponent.PCNotificationGroup.Dropdown.Menu.Manage\'>');    
+    sb.append('<Controls Id=\'COB.SharePoint.Ribbon.WithPageComponent.PCNotificationGroup.Dropdown.Menu.Manage.Controls\'>');
+    
+	var arrDelegates = menus.split(',');
+	for(var i = 0;i<arrDelegates.length;i++)
+	{
+		var arrDelegate = arrDelegates[i].split('|');
+		if(arrDelegate[1] == "")
+			sb.append('<Button Id=\'Ribbon.Timesheet.Periods.ChangeDelegate\' Command=\'ChangeDelegate\' CommandValueId=\'' + arrDelegate[2] + '\' LabelText=\'' + arrDelegate[0] + '\' />');
+		else
+			sb.append('<Button Id=\'Ribbon.Timesheet.Periods.ChangeDelegate\' Command=\'ChangeDelegate\' CommandValueId=\'' + arrDelegate[2] + '\' LabelText=\'' + arrDelegate[0] + '\' Description=\'Real Name: ' + arrDelegate[1] + '\' />');
+	}
+
+    sb.append('</Controls>');
+    sb.append('</MenuSection>');    
+    sb.append('</Menu>');    
+    return sb.toString();
+}
+
+function getPeriods(menus)
+{
+    var sb = new Sys.StringBuilder();    
+    sb.append('<Menu Id=\'COB.SharePoint.Ribbon.WithPageComponent.PCNotificationGroup.Dropdown.Menu\'>');    
+    sb.append('<MenuSection DisplayMode=\'Menu\' Id=\'COB.SharePoint.Ribbon.WithPageComponent.PCNotificationGroup.Dropdown.Menu.Manage\'>');    
+    sb.append('<Controls Id=\'COB.SharePoint.Ribbon.WithPageComponent.PCNotificationGroup.Dropdown.Menu.Manage.Controls\'>');
+
+	var arrPeriods = menus.split(',');
+	for(var i = 0;i<arrPeriods.length;i++)
+	{
+		var arrPeriod = arrPeriods[i].split('|');
+		sb.append('<Button Id=\'Ribbon.Timesheet.Periods.ChangePeriod\' Command=\'ChangePeriod\' CommandValueId=\'' + arrPeriod[1] + '\' LabelText=\'' + arrPeriod[0] + '\' />');
+	}
+    
+	sb.append('</Controls>');
+    sb.append('</MenuSection>');    
+    sb.append('</Menu>');    
+    return sb.toString();
+}
+
+function getTimesheetAddItems(menus)
+{
+    var sb = new Sys.StringBuilder();    
+    sb.append('<Menu Id=\'COB.SharePoint.Ribbon.WithPageComponent.PCNotificationGroup.Dropdown.Menu\'>');    
+    sb.append('<MenuSection DisplayMode=\'Menu32\' Id=\'COB.SharePoint.Ribbon.WithPageComponent.PCNotificationGroup.Dropdown.Menu.Manage\'>');    
+    sb.append('<Controls Id=\'COB.SharePoint.Ribbon.WithPageComponent.PCNotificationGroup.Dropdown.Menu.Manage.Controls\'>');
+    sb.append('<Button Id=\'Ribbon.Timesheet.Items.Add.MyWork\' Command=\'TimesheetItemAddMyWork\' CommandValueId=\'\' LabelText=\'My Work\' Description=\'Add work from your sites\' Image32by32=\'_layouts/epmlive/images/tswork.gif\'/>');
+	sb.append('<Button Id=\'Ribbon.Timesheet.Items.Add.NonWork\' Command=\'TimesheetItemAddNonWork\' CommandValueId=\'\' LabelText=\'Non Work\' Description=\'Add other non work\' Image32by32=\'_layouts/images/menudatasheet.gif\'/>');
+	sb.append('<Button Id=\'Ribbon.Timesheet.Items.Add.SearchWork\' Command=\'TimesheetItemAddSearchWork\' CommandValueId=\'\' LabelText=\'Search For Work\' Description=\'Search for work from your sites\' Image32by32=\'_layouts/epmlive/images/tssearch.gif\'/>');
+	sb.append('<Button Id=\'Ribbon.Timesheet.Items.Add.AutoWork\' Command=\'TimesheetItemAddAutoWork\' CommandValueId=\'\' LabelText=\'Auto-Add Work\' Description=\'Add work to timesheet that you are assigned and is currently in progress.\' Image32by32=\'_layouts/epmlive/images/tsauto.gif\'/>');
+    sb.append('</Controls>');
+    sb.append('</MenuSection>');    
+    sb.append('</Menu>');    
+    return sb.toString();
+}

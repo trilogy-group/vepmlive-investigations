@@ -1,0 +1,934 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{DF0FEF98-25C9-40DD-9893-FF7BED79AC4B}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>UplandIntegrations</RootNamespace>
+    <AssemblyName>UplandIntegrations</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <UseVSHostingProcess>true</UseVSHostingProcess>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>EPMLiveLists.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.TeamFoundation.Client, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.TeamFoundation.All.12.0.30723.2\lib\net45\Microsoft.TeamFoundation.Client.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.Common, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.TeamFoundation.All.12.0.30723.2\lib\net45\Microsoft.TeamFoundation.Common.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.Controls, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.TeamFoundation.All.12.0.30723.2\lib\net45\Microsoft.TeamFoundation.Controls.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.DeleteTeamProject, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.TeamFoundation.All.12.0.30723.2\lib\net45\Microsoft.TeamFoundation.DeleteTeamProject.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.Diff, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.TeamFoundation.All.12.0.30723.2\lib\net45\Microsoft.TeamFoundation.Diff.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.ProjectManagement, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.TeamFoundation.All.12.0.30723.2\lib\net45\Microsoft.TeamFoundation.ProjectManagement.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.VersionControl.Client, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.TeamFoundation.VersionControl.All.12.0.30723.2\lib\net45\Microsoft.TeamFoundation.VersionControl.Client.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.VersionControl.Common, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.TeamFoundation.VersionControl.All.12.0.30723.2\lib\net45\Microsoft.TeamFoundation.VersionControl.Common.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.VersionControl.Common.Integration, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.TeamFoundation.VersionControl.All.12.0.30723.2\lib\net45\Microsoft.TeamFoundation.VersionControl.Common.Integration.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.VersionControl.ControlAdapter, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.TeamFoundation.VersionControl.All.12.0.30723.2\lib\net45\Microsoft.TeamFoundation.VersionControl.ControlAdapter.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.VersionControl.Controls, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.TeamFoundation.VersionControl.All.12.0.30723.2\lib\net45\Microsoft.TeamFoundation.VersionControl.Controls.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.VersionControl.Controls.Common, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.TeamFoundation.VersionControl.All.12.0.30723.2\lib\net45\Microsoft.TeamFoundation.VersionControl.Controls.Common.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.VersionControl.UIFeatures, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.TeamFoundation.VersionControl.All.12.0.30723.2\lib\net45\Microsoft.TeamFoundation.VersionControl.UIFeatures.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.WorkItemTracking.Client, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.TeamFoundation.WorkItemTracking.All.12.0.30723.2\lib\net45\Microsoft.TeamFoundation.WorkItemTracking.Client.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.WorkItemTracking.Client.QueryLanguage, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.TeamFoundation.WorkItemTracking.All.12.0.30723.2\lib\net45\Microsoft.TeamFoundation.WorkItemTracking.Client.QueryLanguage.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.WorkItemTracking.Common, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.TeamFoundation.WorkItemTracking.All.12.0.30723.2\lib\net45\Microsoft.TeamFoundation.WorkItemTracking.Common.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.WorkItemTracking.Controls, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.TeamFoundation.WorkItemTracking.All.12.0.30723.2\lib\net45\Microsoft.TeamFoundation.WorkItemTracking.Controls.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.WorkItemTracking.ControlsCore, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.TeamFoundation.WorkItemTracking.All.12.0.30723.2\lib\net45\Microsoft.TeamFoundation.WorkItemTracking.ControlsCore.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.TeamFoundation.WorkItemTracking.Proxy, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.TeamFoundation.WorkItemTracking.All.12.0.30723.2\lib\net45\Microsoft.TeamFoundation.WorkItemTracking.Proxy.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.Services.Common, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.VisualStudio.Services.Client.14.95.3\lib\net45\Microsoft.VisualStudio.Services.Common.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.Services.WebApi, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.VisualStudio.Services.Client.14.95.3\lib\net45\Microsoft.VisualStudio.Services.WebApi.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Newtonsoft.Json.6.0.8\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="RestSharp, Version=104.1.0.0, Culture=neutral, PublicKeyToken=a7d016d7dd2b4dca, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\Libraries\RestSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Net.Http.Formatting, Version=5.2.2.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.AspNet.WebApi.Client.5.2.2\lib\net45\System.Net.Http.Formatting.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.EnterpriseServices" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Web.Helpers, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.Helpers.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Web.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.AspNet.Razor.3.2.3\lib\net45\System.Web.Razor.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Web.Services" />
+    <Reference Include="System.Web.WebPages, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.WebPages.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Web.WebPages.Deployment, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.WebPages.Deployment.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Web.WebPages.Razor, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Microsoft.AspNet.WebPages.3.2.3\lib\net45\System.Web.WebPages.Razor.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\CommonAssemblyInfo.cs">
+      <Link>CommonAssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="Extensions.cs" />
+    <Compile Include="FileBound\FBConnection.cs" />
+    <Compile Include="FileBound\FileBound.cs" />
+    <Compile Include="FileBound\FileBoundSystem.cs" />
+    <Compile Include="Infrastructure\IntObject.cs" />
+    <Compile Include="Infrastructure\IntTransactionResult.cs" />
+    <Compile Include="Jira\JiraIntegrator.cs" />
+    <Compile Include="Jira\JiraService.cs" />
+    <Compile Include="Jira\JiraType.cs" />
+    <Compile Include="PowerSteering\Entities\Entity.cs" />
+    <Compile Include="PowerSteering\Entities\Field.cs" />
+    <Compile Include="PowerSteering\Infrastructure\ObjectManager.cs" />
+    <Compile Include="PowerSteering\Infrastructure\ObjectManagerFactory.cs" />
+    <Compile Include="PowerSteering\Integrator.cs" />
+    <Compile Include="Infrastructure\IObjectManager.cs" />
+    <Compile Include="PowerSteering\Managers\OrganizationManager.cs" />
+    <Compile Include="PowerSteering\Managers\ProjectManager.cs" />
+    <Compile Include="PowerSteering\Managers\TaskManager.cs" />
+    <Compile Include="PowerSteering\Managers\UserManager.cs" />
+    <Compile Include="PowerSteering\Services\PowerSteeringService.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Resources.Designer.cs" />
+    <Compile Include="Properties\Settings.Designer.cs" />
+    <Compile Include="Service References\TenroxAssignmentService\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </Compile>
+    <Compile Include="Service References\TenroxAuthService\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </Compile>
+    <Compile Include="Service References\TenroxClientService\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </Compile>
+    <Compile Include="Service References\TenroxDataService\Reference.cs" />
+    <Compile Include="Service References\TenroxDataService\Reference1.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </Compile>
+    <Compile Include="Service References\TenroxIntegrationService\Reference.cs" />
+    <Compile Include="ServiceNow\ServiceNowIntegrator.cs" />
+    <Compile Include="ServiceNow\ServiceNowService.cs" />
+    <Compile Include="Tenrox\Managers\UserManager.cs" />
+    <Compile Include="Tfs\TfsIntegrator.cs" />
+    <Compile Include="Tfs\TfsService.cs" />
+    <Compile Include="Tfs\TfsType.cs" />
+    <Compile Include="Utils\CustomJsonConverter.cs" />
+    <Compile Include="Web References\IntegrationAPI\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </Compile>
+    <Compile Include="Service References\TenroxProjectService\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </Compile>
+    <Compile Include="Service References\TenroxTaskService\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </Compile>
+    <Compile Include="Service References\TenroxUserService\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </Compile>
+    <Compile Include="Tenrox\Integrator.cs" />
+    <Compile Include="Tenrox\Managers\ClientManager.cs" />
+    <Compile Include="Tenrox\Infrastructure\IObjectManager.cs" />
+    <Compile Include="Tenrox\Infrastructure\ObjectManager.cs" />
+    <Compile Include="Tenrox\Infrastructure\ObjectManagerFactory.cs" />
+    <Compile Include="Tenrox\Managers\TaskManager.cs" />
+    <Compile Include="Tenrox\Infrastructure\TenroxObject.cs" />
+    <Compile Include="Tenrox\Managers\ProjectManager.cs" />
+    <Compile Include="Tenrox\Services\TenroxService.cs" />
+    <Compile Include="Tenrox\Infrastructure\TenroxTransactionResult.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="EPMLiveLists.snk" />
+    <None Include="packages.config" />
+    <None Include="Properties\Settings.settings" />
+    <None Include="Service References\TenroxAssignmentService\Arrays.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxAssignmentService\service.wsdl" />
+    <None Include="Service References\TenroxAssignmentService\service.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxAssignmentService\System.Data.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxAssignmentService\Tenrox.Application.SDK.ServiceContracts.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxAssignmentService\Tenrox.Application.SDK.wsdl" />
+    <None Include="Service References\TenroxAssignmentService\Tenrox.Application.SDK.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxAssignmentService\Tenrox.Application.SDK1.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxAssignmentService\Tenrox.Server.Framework.WebServices.FaultContracts.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxAssignmentService\Tenrox.Shared.Utilities.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxAssignmentService\UplandIntegrations.TenroxAssignmentService.Assignment.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TenroxAssignmentService\UplandIntegrations.TenroxAssignmentService.BulkDeleteResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TenroxAssignmentService\UplandIntegrations.TenroxAssignmentService.BulkDeleteSerializedResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TenroxAssignmentService\UplandIntegrations.TenroxAssignmentService.DeleteResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TenroxAssignmentService\UplandIntegrations.TenroxAssignmentService.DeleteSerializedResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TenroxAssignmentService\UplandIntegrations.TenroxAssignmentService.QueryByAllSerializedResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TenroxAssignmentService\UplandIntegrations.TenroxAssignmentService.QueryByIdSerializedResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TenroxAssignmentService\UplandIntegrations.TenroxAssignmentService.QueryByNameSerializedResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TenroxAssignmentService\UplandIntegrations.TenroxAssignmentService.QueryByUniqueIdSerializedResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TenroxAuthService\LogonAs.wsdl" />
+    <None Include="Service References\TenroxAuthService\LogonAs.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxAuthService\LogonAs1.wsdl" />
+    <None Include="Service References\TenroxAuthService\LogonAs1.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxAuthService\LogonAs2.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxAuthService\LogonAs3.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxAuthService\UplandIntegrations.TenroxAuthService.UserToken.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TenroxClientService\Clients.wsdl" />
+    <None Include="Service References\TenroxClientService\Clients.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxClientService\Clients1.wsdl" />
+    <None Include="Service References\TenroxClientService\Clients1.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxClientService\Clients2.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxClientService\Clients3.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxClientService\Clients4.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxClientService\Clients5.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxClientService\Clients6.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxClientService\Clients7.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxClientService\UplandIntegrations.TenroxClientService.BulkDeleteResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TenroxClientService\UplandIntegrations.TenroxClientService.BulkDeleteSerializedResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TenroxClientService\UplandIntegrations.TenroxClientService.Client.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TenroxClientService\UplandIntegrations.TenroxClientService.ClientInvoiceOption.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TenroxClientService\UplandIntegrations.TenroxClientService.DeleteResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TenroxClientService\UplandIntegrations.TenroxClientService.DeleteSerializedResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TenroxClientService\UplandIntegrations.TenroxClientService.QueryByAllSerializedResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TenroxClientService\UplandIntegrations.TenroxClientService.QueryByIdSerializedResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TenroxClientService\UplandIntegrations.TenroxClientService.QueryByNameSerializedResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TenroxClientService\UplandIntegrations.TenroxClientService.QueryByUniqueIdSerializedResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TenroxDataService\Arrays.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxDataService\service.wsdl" />
+    <None Include="Service References\TenroxDataService\service.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxDataService\service1.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxDataService\System.Data.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxDataService\Tenrox.Application.SDK.wsdl" />
+    <None Include="Service References\TenroxDataService\Tenrox.Application.SDK.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxDataService\Tenrox.Server.Framework.WebServices.FaultContracts.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxDataService\Tenrox.Shared.Utilities.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxIntegrationService\Integrations.wsdl" />
+    <None Include="Service References\TenroxIntegrationService\Integrations.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxIntegrationService\Integrations1.wsdl" />
+    <None Include="Service References\TenroxIntegrationService\Integrations1.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxIntegrationService\Integrations2.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxIntegrationService\Integrations3.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxIntegrationService\Integrations4.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxIntegrationService\Integrations5.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxIntegrationService\Integrations6.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxIntegrationService\UplandIntegrations.TenroxIntegrationService.BulkDeleteResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TenroxIntegrationService\UplandIntegrations.TenroxIntegrationService.BulkDeleteSerializedResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TenroxIntegrationService\UplandIntegrations.TenroxIntegrationService.DeleteResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TenroxIntegrationService\UplandIntegrations.TenroxIntegrationService.DeleteSerializedResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TenroxIntegrationService\UplandIntegrations.TenroxIntegrationService.Integration.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TenroxIntegrationService\UplandIntegrations.TenroxIntegrationService.QueryByAllSerializedResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TenroxIntegrationService\UplandIntegrations.TenroxIntegrationService.QueryByIdSerializedResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TenroxIntegrationService\UplandIntegrations.TenroxIntegrationService.QueryByNameSerializedResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TenroxIntegrationService\UplandIntegrations.TenroxIntegrationService.QueryByUniqueIdSerializedResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TenroxProjectService\Projects.wsdl" />
+    <None Include="Service References\TenroxProjectService\Projects.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxProjectService\Projects1.wsdl" />
+    <None Include="Service References\TenroxProjectService\Projects1.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxProjectService\Projects2.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxProjectService\Projects3.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxProjectService\Projects4.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxProjectService\Projects5.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxProjectService\Projects6.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxProjectService\Projects7.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxProjectService\UplandIntegrations.TenroxProjectService.BulkDeleteResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TenroxProjectService\UplandIntegrations.TenroxProjectService.BulkDeleteSerializedResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TenroxProjectService\UplandIntegrations.TenroxProjectService.DeleteResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TenroxProjectService\UplandIntegrations.TenroxProjectService.DeleteSerializedResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TenroxProjectService\UplandIntegrations.TenroxProjectService.Project.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TenroxProjectService\UplandIntegrations.TenroxProjectService.QueryByAllSerializedResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TenroxProjectService\UplandIntegrations.TenroxProjectService.QueryByIdSerializedResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TenroxProjectService\UplandIntegrations.TenroxProjectService.QueryByNameSerializedResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TenroxProjectService\UplandIntegrations.TenroxProjectService.QueryByUniqueIdSerializedResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TenroxTaskService\Tasks.wsdl" />
+    <None Include="Service References\TenroxTaskService\Tasks.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxTaskService\Tasks1.wsdl" />
+    <None Include="Service References\TenroxTaskService\Tasks1.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxTaskService\Tasks2.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxTaskService\Tasks3.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxTaskService\Tasks4.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxTaskService\Tasks5.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxTaskService\Tasks6.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxTaskService\Tasks7.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxTaskService\UplandIntegrations.TenroxTaskService.BulkDeleteResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TenroxTaskService\UplandIntegrations.TenroxTaskService.BulkDeleteSerializedResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TenroxTaskService\UplandIntegrations.TenroxTaskService.DeleteResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TenroxTaskService\UplandIntegrations.TenroxTaskService.DeleteSerializedResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TenroxTaskService\UplandIntegrations.TenroxTaskService.QueryByAllSerializedResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TenroxTaskService\UplandIntegrations.TenroxTaskService.QueryByIdSerializedResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TenroxTaskService\UplandIntegrations.TenroxTaskService.QueryByNameSerializedResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TenroxTaskService\UplandIntegrations.TenroxTaskService.QueryByUniqueIdSerializedResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TenroxTaskService\UplandIntegrations.TenroxTaskService.Task.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TenroxUserService\UplandIntegrations.TenroxUserService.BulkDeleteResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TenroxUserService\UplandIntegrations.TenroxUserService.BulkDeleteSerializedResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TenroxUserService\UplandIntegrations.TenroxUserService.DeleteResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TenroxUserService\UplandIntegrations.TenroxUserService.DeleteSerializedResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TenroxUserService\UplandIntegrations.TenroxUserService.DXSelectedUser.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TenroxUserService\UplandIntegrations.TenroxUserService.FindSimpleUsersByEmailResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TenroxUserService\UplandIntegrations.TenroxUserService.FindSimpleUsersByNameResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TenroxUserService\UplandIntegrations.TenroxUserService.GetAllSimpleUsersResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TenroxUserService\UplandIntegrations.TenroxUserService.QueryByAllSerializedResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TenroxUserService\UplandIntegrations.TenroxUserService.QueryByIdSerializedResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TenroxUserService\UplandIntegrations.TenroxUserService.QueryByNameSerializedResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TenroxUserService\UplandIntegrations.TenroxUserService.QueryByUniqueIdSerializedResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TenroxUserService\UplandIntegrations.TenroxUserService.Skill.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TenroxUserService\UplandIntegrations.TenroxUserService.User.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TenroxUserService\UplandIntegrations.TenroxUserService.UserSimple.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\TenroxUserService\Users.wsdl" />
+    <None Include="Service References\TenroxUserService\Users.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxUserService\Users1.wsdl" />
+    <None Include="Service References\TenroxUserService\Users1.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxUserService\Users2.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxUserService\Users3.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxUserService\Users4.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxUserService\Users5.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxUserService\Users6.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxUserService\Users7.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxAuthService\LogonAs.wsdl" />
+    <None Include="Service References\TenroxAuthService\LogonAs.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxAuthService\LogonAs1.wsdl" />
+    <None Include="Service References\TenroxAuthService\LogonAs1.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxAuthService\LogonAs2.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxAuthService\LogonAs3.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxAuthService\UplandIntegrations.TenroxAuthService.UserToken.datasource" />
+    <None Include="Service References\TenroxClientService\Clients.wsdl" />
+    <None Include="Service References\TenroxClientService\Clients.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxClientService\Clients1.wsdl" />
+    <None Include="Service References\TenroxClientService\Clients1.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxClientService\Clients2.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxClientService\Clients3.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxClientService\Clients4.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxClientService\Clients5.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxClientService\Clients6.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxClientService\Clients7.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxClientService\UplandIntegrations.TenroxClientService.BulkDeleteResponse.datasource" />
+    <None Include="Service References\TenroxClientService\UplandIntegrations.TenroxClientService.BulkDeleteSerializedResponse.datasource" />
+    <None Include="Service References\TenroxClientService\UplandIntegrations.TenroxClientService.Client.datasource" />
+    <None Include="Service References\TenroxClientService\UplandIntegrations.TenroxClientService.ClientInvoiceOption.datasource" />
+    <None Include="Service References\TenroxClientService\UplandIntegrations.TenroxClientService.DeleteResponse.datasource" />
+    <None Include="Service References\TenroxClientService\UplandIntegrations.TenroxClientService.DeleteSerializedResponse.datasource" />
+    <None Include="Service References\TenroxClientService\UplandIntegrations.TenroxClientService.QueryByAllSerializedResponse.datasource" />
+    <None Include="Service References\TenroxClientService\UplandIntegrations.TenroxClientService.QueryByIdSerializedResponse.datasource" />
+    <None Include="Service References\TenroxClientService\UplandIntegrations.TenroxClientService.QueryByNameSerializedResponse.datasource" />
+    <None Include="Service References\TenroxClientService\UplandIntegrations.TenroxClientService.QueryByUniqueIdSerializedResponse.datasource" />
+    <None Include="Service References\TenroxIntegrationService\Integrations.wsdl" />
+    <None Include="Service References\TenroxIntegrationService\Integrations.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxIntegrationService\Integrations1.wsdl" />
+    <None Include="Service References\TenroxIntegrationService\Integrations1.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxIntegrationService\Integrations2.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxIntegrationService\Integrations3.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxIntegrationService\Integrations4.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxIntegrationService\Integrations5.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxIntegrationService\Integrations6.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxIntegrationService\UplandIntegrations.TenroxIntegrationService.BulkDeleteResponse.datasource" />
+    <None Include="Service References\TenroxIntegrationService\UplandIntegrations.TenroxIntegrationService.BulkDeleteSerializedResponse.datasource" />
+    <None Include="Service References\TenroxIntegrationService\UplandIntegrations.TenroxIntegrationService.DeleteResponse.datasource" />
+    <None Include="Service References\TenroxIntegrationService\UplandIntegrations.TenroxIntegrationService.DeleteSerializedResponse.datasource" />
+    <None Include="Service References\TenroxIntegrationService\UplandIntegrations.TenroxIntegrationService.Integration.datasource" />
+    <None Include="Service References\TenroxIntegrationService\UplandIntegrations.TenroxIntegrationService.QueryByAllSerializedResponse.datasource" />
+    <None Include="Service References\TenroxIntegrationService\UplandIntegrations.TenroxIntegrationService.QueryByIdSerializedResponse.datasource" />
+    <None Include="Service References\TenroxIntegrationService\UplandIntegrations.TenroxIntegrationService.QueryByNameSerializedResponse.datasource" />
+    <None Include="Service References\TenroxIntegrationService\UplandIntegrations.TenroxIntegrationService.QueryByUniqueIdSerializedResponse.datasource" />
+    <None Include="Service References\TenroxProjectService\Projects.wsdl" />
+    <None Include="Service References\TenroxProjectService\Projects.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxProjectService\Projects1.wsdl" />
+    <None Include="Service References\TenroxProjectService\Projects1.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxProjectService\Projects2.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxProjectService\Projects3.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxProjectService\Projects4.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxProjectService\Projects5.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxProjectService\Projects6.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxProjectService\Projects7.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxProjectService\UplandIntegrations.TenroxProjectService.BulkDeleteResponse.datasource" />
+    <None Include="Service References\TenroxProjectService\UplandIntegrations.TenroxProjectService.BulkDeleteSerializedResponse.datasource" />
+    <None Include="Service References\TenroxProjectService\UplandIntegrations.TenroxProjectService.DeleteResponse.datasource" />
+    <None Include="Service References\TenroxProjectService\UplandIntegrations.TenroxProjectService.DeleteSerializedResponse.datasource" />
+    <None Include="Service References\TenroxProjectService\UplandIntegrations.TenroxProjectService.Project.datasource" />
+    <None Include="Service References\TenroxProjectService\UplandIntegrations.TenroxProjectService.QueryByAllSerializedResponse.datasource" />
+    <None Include="Service References\TenroxProjectService\UplandIntegrations.TenroxProjectService.QueryByIdSerializedResponse.datasource" />
+    <None Include="Service References\TenroxProjectService\UplandIntegrations.TenroxProjectService.QueryByNameSerializedResponse.datasource" />
+    <None Include="Service References\TenroxProjectService\UplandIntegrations.TenroxProjectService.QueryByUniqueIdSerializedResponse.datasource" />
+    <None Include="Service References\TenroxTaskService\Tasks.wsdl" />
+    <None Include="Service References\TenroxTaskService\Tasks.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxTaskService\Tasks1.wsdl" />
+    <None Include="Service References\TenroxTaskService\Tasks1.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxTaskService\Tasks2.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxTaskService\Tasks3.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxTaskService\Tasks4.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxTaskService\Tasks5.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxTaskService\Tasks6.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxTaskService\Tasks7.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxTaskService\UplandIntegrations.TenroxTaskService.BulkDeleteResponse.datasource" />
+    <None Include="Service References\TenroxTaskService\UplandIntegrations.TenroxTaskService.BulkDeleteSerializedResponse.datasource" />
+    <None Include="Service References\TenroxTaskService\UplandIntegrations.TenroxTaskService.DeleteResponse.datasource" />
+    <None Include="Service References\TenroxTaskService\UplandIntegrations.TenroxTaskService.DeleteSerializedResponse.datasource" />
+    <None Include="Service References\TenroxTaskService\UplandIntegrations.TenroxTaskService.QueryByAllSerializedResponse.datasource" />
+    <None Include="Service References\TenroxTaskService\UplandIntegrations.TenroxTaskService.QueryByIdSerializedResponse.datasource" />
+    <None Include="Service References\TenroxTaskService\UplandIntegrations.TenroxTaskService.QueryByNameSerializedResponse.datasource" />
+    <None Include="Service References\TenroxTaskService\UplandIntegrations.TenroxTaskService.QueryByUniqueIdSerializedResponse.datasource" />
+    <None Include="Service References\TenroxTaskService\UplandIntegrations.TenroxTaskService.Task.datasource" />
+    <None Include="Service References\TenroxUserService\UplandIntegrations.TenroxUserService.BulkDeleteResponse.datasource" />
+    <None Include="Service References\TenroxUserService\UplandIntegrations.TenroxUserService.BulkDeleteSerializedResponse.datasource" />
+    <None Include="Service References\TenroxUserService\UplandIntegrations.TenroxUserService.DeleteResponse.datasource" />
+    <None Include="Service References\TenroxUserService\UplandIntegrations.TenroxUserService.DeleteSerializedResponse.datasource" />
+    <None Include="Service References\TenroxUserService\UplandIntegrations.TenroxUserService.DXSelectedUser.datasource" />
+    <None Include="Service References\TenroxUserService\UplandIntegrations.TenroxUserService.FindSimpleUsersByEmailResponse.datasource" />
+    <None Include="Service References\TenroxUserService\UplandIntegrations.TenroxUserService.FindSimpleUsersByNameResponse.datasource" />
+    <None Include="Service References\TenroxUserService\UplandIntegrations.TenroxUserService.GetAllSimpleUsersResponse.datasource" />
+    <None Include="Service References\TenroxUserService\UplandIntegrations.TenroxUserService.QueryByAllSerializedResponse.datasource" />
+    <None Include="Service References\TenroxUserService\UplandIntegrations.TenroxUserService.QueryByIdSerializedResponse.datasource" />
+    <None Include="Service References\TenroxUserService\UplandIntegrations.TenroxUserService.QueryByNameSerializedResponse.datasource" />
+    <None Include="Service References\TenroxUserService\UplandIntegrations.TenroxUserService.QueryByUniqueIdSerializedResponse.datasource" />
+    <None Include="Service References\TenroxUserService\UplandIntegrations.TenroxUserService.Skill.datasource" />
+    <None Include="Service References\TenroxUserService\UplandIntegrations.TenroxUserService.User.datasource" />
+    <None Include="Service References\TenroxUserService\UplandIntegrations.TenroxUserService.UserSimple.datasource" />
+    <None Include="Service References\TenroxUserService\Users.wsdl" />
+    <None Include="Service References\TenroxUserService\Users.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxUserService\Users1.wsdl" />
+    <None Include="Service References\TenroxUserService\Users1.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxUserService\Users2.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxUserService\Users3.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxUserService\Users4.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxUserService\Users5.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxUserService\Users6.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\TenroxUserService\Users7.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Web References\IntegrationAPI\integration.wsdl" />
+    <None Include="Web References\IntegrationAPI\Reference.map" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Resources\txtFBWorkFlow.txt" />
+    <Content Include="Resources\txtFBWorkflowAssignment.txt" />
+    <None Include="Service References\TenroxTaskService\configuration91.svcinfo" />
+    <None Include="Service References\TenroxTaskService\configuration.svcinfo" />
+    <None Include="Service References\TenroxTaskService\Reference.svcmap">
+      <Generator>WCF Proxy Generator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
+    <None Include="Service References\TenroxClientService\configuration91.svcinfo" />
+    <None Include="Service References\TenroxClientService\configuration.svcinfo" />
+    <None Include="Service References\TenroxClientService\Reference.svcmap">
+      <Generator>WCF Proxy Generator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
+    <None Include="Service References\TenroxUserService\configuration91.svcinfo" />
+    <None Include="Service References\TenroxUserService\configuration.svcinfo" />
+    <None Include="Service References\TenroxUserService\Reference.svcmap">
+      <Generator>WCF Proxy Generator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
+    <None Include="Service References\TenroxAssignmentService\configuration91.svcinfo" />
+    <None Include="Service References\TenroxAssignmentService\configuration.svcinfo" />
+    <None Include="Service References\TenroxAssignmentService\Reference.svcmap">
+      <Generator>WCF Proxy Generator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
+    <Content Include="Service References\TenroxDataService\configuration.svcinfo" />
+    <Content Include="Service References\TenroxDataService\configuration91.svcinfo" />
+    <Content Include="Service References\TenroxDataService\Reference.svcmap">
+      <Generator>WCF Proxy Generator</Generator>
+      <LastGenOutput>Reference1.cs</LastGenOutput>
+    </Content>
+    <Content Include="Web References\IntegrationAPI\integration.disco" />
+    <None Include="Service References\TenroxAuthService\Reference.svcmap">
+      <Generator>WCF Proxy Generator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
+    <None Include="Service References\TenroxAuthService\configuration.svcinfo" />
+    <None Include="Service References\TenroxAuthService\configuration91.svcinfo" />
+    <None Include="Service References\TenroxProjectService\Reference.svcmap">
+      <Generator>WCF Proxy Generator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
+    <None Include="Service References\TenroxProjectService\configuration.svcinfo" />
+    <None Include="Service References\TenroxProjectService\configuration91.svcinfo" />
+    <None Include="Service References\TenroxIntegrationService\Reference.svcmap">
+      <Generator>WCF Proxy Generator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
+    <None Include="Service References\TenroxIntegrationService\configuration.svcinfo" />
+    <None Include="Service References\TenroxIntegrationService\configuration91.svcinfo" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\Resources.resx" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadataStorage Include="Service References\TenroxAssignmentService\" />
+    <WCFMetadataStorage Include="Service References\TenroxAuthService\" />
+    <WCFMetadataStorage Include="Service References\TenroxClientService\" />
+    <WCFMetadataStorage Include="Service References\TenroxIntegrationService\" />
+    <WCFMetadataStorage Include="Service References\TenroxProjectService\" />
+    <WCFMetadataStorage Include="Service References\TenroxTaskService\" />
+    <WCFMetadataStorage Include="Service References\TenroxUserService\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\EPMLive.Integration\EPMLive.Integration.csproj">
+      <Project>{4c63f23f-463c-409b-89ad-adc2e138b8e3}</Project>
+      <Name>EPMLive.Integration</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PreBuildEvent>
+    </PreBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

@@ -1,0 +1,10 @@
+<MyWork>
+  <Query>
+    <Where>
+      <Neq>
+        <FieldRef Name='Complete' />
+        <Value Type='Boolean'>1</Value>
+      </Neq>
+    </Where>
+  </Query>
+</MyWork>

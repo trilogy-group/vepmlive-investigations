@@ -1,8 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Elements xmlns="http://schemas.microsoft.com/sharepoint/" >
-  <Module Name="ReportViewer" List="113" Url="_catalogs/wp">
-    <File Path="ReportViewer\WorkEngineReportViewer.dwp" Url="WorkEngineReportViewer.dwp" Type="GhostableInLibrary">
-      <Property Name="Group" Value="EPM Live" />
-    </File>
-  </Module>
-</Elements>

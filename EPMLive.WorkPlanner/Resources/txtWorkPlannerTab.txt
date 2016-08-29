@@ -1,0 +1,366 @@
+<Tab Id="Ribbon.WorkPlanner" Title="Tasks" Description="Tasks" Sequence="1105">
+    <Scaling Id="Ribbon.WorkPlanner.Scaling">
+
+        <MaxSize Id="Ribbon.WorkPlanner.StandardGroup.MaxSize" GroupId="Ribbon.WorkPlanner.StandardGroup" Size="OneLargeTwoMedium"/>
+        <Scale Id="Ribbon.WorkPlanner.StandardGroup.Scaling.CustomTabScaling" GroupId="Ribbon.WorkPlanner.StandardGroup" Size="SmallSmall" />
+
+		<MaxSize Id="Ribbon.WorkPlanner.InsertGroup.MaxSize" GroupId="Ribbon.WorkPlanner.InsertGroup" Size="OneLargeTwoMedium"/>
+        <Scale Id="Ribbon.WorkPlanner.InsertGroup.Scaling.CustomTabScaling" GroupId="Ribbon.WorkPlanner.InsertGroup" Size="SmallSmall" />
+
+		<MaxSize Id="Ribbon.WorkPlanner.ClipGroup.MaxSize" GroupId="Ribbon.WorkPlanner.ClipGroup" Size="OneLargeTwoMedium"/>
+        <Scale Id="Ribbon.WorkPlanner.ClipGroup.Scaling.CustomTabScaling" GroupId="Ribbon.WorkPlanner.ClipGroup" Size="SmallSmall" />
+
+		<MaxSize Id="Ribbon.WorkPlanner.ScheduleGroup.MaxSize" GroupId="Ribbon.WorkPlanner.ScheduleGroup" Size="Schedule"/>
+        <Scale Id="Ribbon.WorkPlanner.ScheduleGroup.Scaling.CustomTabScaling" GroupId="Ribbon.WorkPlanner.ScheduleGroup" Size="Schedule" />
+
+		<MaxSize Id="Ribbon.WorkPlanner.ResourcesGroup.MaxSize" GroupId="Ribbon.WorkPlanner.ResourcesGroup" Size="OneLargeTwoMedium"/>
+        <Scale Id="Ribbon.WorkPlanner.ResourcesGroup.Scaling.CustomTabScaling" GroupId="Ribbon.WorkPlanner.ResourcesGroup" Size="SmallSmall" />
+
+		<MaxSize Id="Ribbon.WorkPlanner.PropertiesGroup.MaxSize" GroupId="Ribbon.WorkPlanner.PropertiesGroup" Size="OneLargeTwoMedium"/>
+        <Scale Id="Ribbon.WorkPlanner.PropertiesGroup.Scaling.CustomTabScaling" GroupId="Ribbon.WorkPlanner.PropertiesGroup" Size="SmallSmall" />
+
+
+    </Scaling>
+    <Groups Id="Ribbon.WorkPlanner.Groups">
+
+        <Group Id="Ribbon.WorkPlanner.StandardGroup" Title="Share" Sequence="10" Template="Ribbon.Templates.StandardGroup">
+			<Controls Id="Ribbon.WorkPlanner.StandardGroup.Controls">
+
+				<Button
+				Id="Ribbon.WorkPlanner.StandardGroup.SaveButton"
+				Sequence="10"
+				Description="Opens a modal dialog box"
+				Command="Ribbon.WorkPlanner.SaveButton"
+				Image32by32="/_layouts/ppm/images/save32x32.png"
+				LabelText="Save"
+				TemplateAlias="cust1"/>
+
+				<Button
+				Id="Ribbon.WorkPlanner.StandardGroup.PublishButton"
+				Sequence="20"
+				Image32by32="/_layouts/ppm/images/publish.PNG"
+				Description="Simple alert button"
+				Command="Ribbon.WorkPlanner.PublishButton"
+				LabelText="Publish"
+				TemplateAlias="cust2"/>
+
+				<Button
+				Id="Ribbon.WorkPlanner.StandardGroup.CloseButton"
+				Sequence="30"
+				Image32by32="/_layouts/ppm/images/close32.gif"
+				Description="Simple alert button"
+				Command="Ribbon.WorkPlanner.CloseButton"
+				LabelText="Close"
+				TemplateAlias="o3"/>
+
+				<Button
+				Id="Ribbon.WorkPlanner.StandardGroup.PrintButton"
+				Sequence="40"
+				Image16by16="/_layouts/epmlive/images/print16.png"
+				Command="Ribbon.WorkPlanner.PrintButton"
+				LabelText="Print"
+				TemplateAlias="oM"/>
+
+				<Button
+				Id="Ribbon.WorkPlanner.StandardGroup.ExcelButton"
+				Sequence="50"
+				Image16by16="/_layouts/epmlive/images/excel16.png"
+				Command="Ribbon.WorkPlanner.ExcelButton"
+				LabelText="Export Excel"
+				TemplateAlias="oM"/>
+
+			</Controls>
+        </Group>
+
+		<Group Id="Ribbon.WorkPlanner.InsertGroup" Title="Manage" Sequence="20" Template="Ribbon.Templates.StandardGroup">
+			<Controls Id="Ribbon.WorkPlanner.InsertGroup.Controls">
+				
+				<Button
+					Id="Ribbon.WorkPlanner.InsertGroup.AddTask"
+					Sequence="10"
+					Description="Add a new task to the plan"
+					Command="Ribbon.WorkPlanner.NewTask"
+					Image32by32="/_layouts/epmlive/images/newtask.gif"
+					LabelText="Task"
+					TemplateAlias="cust1"/>
+				
+				<Button
+					Id="Ribbon.WorkPlanner.InsertGroup.NewIteration"
+					Sequence="20"
+					Image16by16="/_layouts/epmlive/images/addsummary.gif"
+					Command="Ribbon.WorkPlanner.NewIteration"
+					LabelText="Iteration"
+					TemplateAlias="oM"/>
+
+				<Button
+					Id="Ribbon.WorkPlanner.InsertGroup.NewSummary"
+					Sequence="20"
+					Image16by16="/_layouts/epmlive/images/addsummary.gif"
+					Command="Ribbon.WorkPlanner.NewSummary"
+					LabelText="Summary"
+					TemplateAlias="oM"/>
+
+				<Button
+					Id="Ribbon.WorkPlanner.InsertGroup.NewMilestone"
+					Sequence="30"
+					Image16by16="/_layouts/epmlive/images/addmilestone.gif"
+					Command="Ribbon.WorkPlanner.NewMilestone"
+					LabelText="Milestone"
+					TemplateAlias="oM"/>
+
+				<Button
+					Id="Ribbon.WorkPlanner.InsertGroup.DeleteTask"
+					Sequence="30"
+					Image16by16="/_layouts/epmlive/images/deletetask.png"
+					Command="Ribbon.WorkPlanner.DeleteTasks"
+					LabelText="Delete"
+					TemplateAlias="oM"/>
+
+				<Button
+					Id="Ribbon.WorkPlanner.InsertGroup.LinkExternalTask"
+					Sequence="30"
+					Image16by16="/_layouts/epmlive/images/externallink.png"
+					Command="Ribbon.WorkPlanner.LinkExternalTask"
+					LabelText="External Task"
+					TemplateAlias="oM"/>
+
+				
+
+			</Controls>
+		</Group>
+
+		
+
+		<Group Id="Ribbon.WorkPlanner.ClipGroup" Title="Clipboard" Sequence="40" Template="Ribbon.Templates.StandardGroup">
+			<Controls Id="Ribbon.WorkPlanner.ClipGroup.Controls">
+
+				<Button
+				Id="Ribbon.WorkPlanner.ClipGroup.Copy"
+				Sequence="10"
+				Image16by16="/_layouts/epmlive/images/copy.gif"
+				Command="Ribbon.WorkPlanner.Copy"
+				LabelText="Copy"
+				TemplateAlias="oM"/>
+
+				<Button
+				Id="Ribbon.WorkPlanner.ClipGroup.Paste"
+				Sequence="20"
+				Image16by16="/_layouts/epmlive/images/paste.png"
+				Command="Ribbon.WorkPlanner.Paste"
+				LabelText="Paste"
+				TemplateAlias="oM"/>
+
+				<Button
+				Id="Ribbon.WorkPlanner.ClipGroup.Undo"
+				Sequence="30"
+				Image16by16="/_layouts/epmlive/images/undo.gif"
+				Command="Ribbon.WorkPlanner.Undo"
+				LabelText="Undo"
+				TemplateAlias="oM"/>
+				
+				<Button
+				Id="Ribbon.WorkPlanner.ClipGroup.Redo"
+				Sequence="40"
+				Image16by16="/_layouts/epmlive/images/redo.gif"
+				Command="Ribbon.WorkPlanner.Redo"
+				LabelText="Redo"
+				TemplateAlias="oM"/>
+
+			</Controls>
+        </Group>
+
+		<Group Id="Ribbon.WorkPlanner.ScheduleGroup" Title="Tasks" Sequence="50" Template="Ribbon.Templates.StandardGroup">
+			<Controls Id="Ribbon.WorkPlanner.ScheduleGroup.Controls">
+
+				<Button
+				Id="Ribbon.WorkPlanner.ScheduleGroup.Percent0"
+				Sequence="10"
+				Image16by16="/_layouts/epmlive/images/percent0.gif"
+				Command="Ribbon.WorkPlanner.Percent0"
+				LabelText="Not Started"
+				TemplateAlias="percent0"/>
+
+				<Button
+				Id="Ribbon.WorkPlanner.ScheduleGroup.Percent50"
+				Sequence="20"
+				Image16by16="/_layouts/epmlive/images/percent50.gif"
+				Command="Ribbon.WorkPlanner.Percent50"
+				LabelText="In Progress"
+				TemplateAlias="percent50"/>
+
+				<Button
+				Id="Ribbon.WorkPlanner.ScheduleGroup.Percent100"
+				Sequence="30"
+				Image16by16="/_layouts/epmlive/images/percent100.gif"
+				Command="Ribbon.WorkPlanner.Percent100"
+				LabelText="Complete"
+				TemplateAlias="percent100"/>
+
+				<Button
+				Id="Ribbon.WorkPlanner.ScheduleGroup.LinkDown"
+				Sequence="40"
+				Image16by16="/_layouts/epmlive/images/linkdown.gif"
+				Command="Ribbon.WorkPlanner.LinkDown"
+				LabelText="Link Down"
+				TemplateAlias="linkdown"/>
+
+				<Button
+				Id="Ribbon.WorkPlanner.ScheduleGroup.LinkUp"
+				Sequence="50"
+				Image16by16="/_layouts/epmlive/images/linkup.gif"
+				Command="Ribbon.WorkPlanner.LinkUp"
+				LabelText="Link Up"
+				TemplateAlias="linkup"/>
+
+				<Button
+				Id="Ribbon.WorkPlanner.ScheduleGroup.Unlink"
+				Sequence="60"
+				Image16by16="/_layouts/epmlive/images/unlink.gif"
+				Command="Ribbon.WorkPlanner.Unlink"
+				LabelText="Unlink"
+				TemplateAlias="unlink"/>
+
+
+				<Button
+				Id="Ribbon.WorkPlanner.ScheduleGroup.Indent"
+				Sequence="20"
+				Image16by16="/_layouts/epmlive/images/right16.gif"
+				Command="Ribbon.WorkPlanner.Indent"
+				LabelText="Indent"
+				TemplateAlias="indent"/>
+
+				<Button
+				Id="Ribbon.WorkPlanner.ScheduleGroup.Outdent"
+				Sequence="30"
+				Image16by16="/_layouts/epmlive/images/left16.gif"
+				Command="Ribbon.WorkPlanner.Outdent"
+				LabelText="Outdent"
+				TemplateAlias="outdent"/>
+
+			</Controls>
+        </Group>
+
+		<Group Id="Ribbon.WorkPlanner.ResourcesGroup" Title="Resources" Sequence="60" Template="Ribbon.Templates.StandardGroup">
+			<Controls Id="Ribbon.WorkPlanner.ResourcesGroup.Controls">
+				<Button
+					Id="Ribbon.WorkPlanner.ResourcesGroup.AssignResources"
+					Sequence="10"
+					Description=""
+					Command="Ribbon.WorkPlanner.AssignResources"
+					Image32by32="/_layouts/epmlive/images/resources.png"
+					LabelText="Assign Resources"
+					TemplateAlias="cust1"/>
+
+				<Button
+					Id="Ribbon.WorkPlanner.ResourcesGroup.EditTeam"
+					Sequence="20"
+					Image16by16="/_layouts/epmlive/images/editteam.gif"
+					Command="Ribbon.WorkPlanner.EditTeam"
+					LabelText="Edit Team"
+					TemplateAlias="oM"/>
+
+				<Button
+					Id="Ribbon.WorkPlanner.ResourcesGroup.ResourceInformation"
+					Sequence="30"
+					Image16by16="/_layouts/epmlive/images/resinfo.gif"
+					Command="Ribbon.WorkPlanner.ResourceInformation"
+					LabelText="Resource Information"
+					TemplateAlias="oM"/>
+
+				
+
+			</Controls>
+		</Group>
+
+		<Group Id="Ribbon.WorkPlanner.PropertiesGroup" Title="Properties" Sequence="99" Template="Ribbon.Templates.StandardGroup">
+			<Controls Id="Ribbon.WorkPlanner.PropertiesGroup.Controls">
+					
+				<Button
+					Id="Ribbon.WorkPlanner.PropertiesGroup.Details"
+					Sequence="10"
+					Image16by16="/_layouts/epmlive/images/details16.gif"
+					Command="Ribbon.WorkPlanner.Details"
+					LabelText="Details"
+					TemplateAlias="oM"/>
+
+				<Button
+					Id="Ribbon.WorkPlanner.PropertiesGroup.Notes"
+					Sequence="20"
+					Image16by16="/_layouts/epmlive/images/notes16.png"
+					Command="Ribbon.WorkPlanner.Notes"
+					LabelText="Notes"
+					TemplateAlias="oM"/>
+
+				<Button
+					Id="Ribbon.WorkPlanner.PropertiesGroup.Links"
+					Sequence="30"
+					Image16by16="/_layouts/epmlive/images/link.gif"
+					Command="Ribbon.WorkPlanner.Links"
+					LabelText="Successors"
+					TemplateAlias="oM"/>
+
+				<Button
+					Id="Ribbon.WorkPlanner.PropertiesGroup.Comments"
+					Sequence="40"
+					Image16by16="/_layouts/epmlive/images/comments16.gif"
+					Command="Ribbon.WorkPlanner.Comments"
+					LabelText="Comments"
+					TemplateAlias="oM"/>
+
+				<Button
+					Id="Ribbon.WorkPlanner.PropertiesGroup.Alerts"
+					Sequence="50"
+					Image16by16="/_layouts/epmlive/images/planner-sprite16.png"
+					Image16by16Left="-20"
+					Image16by16Top="-295"
+					Command="Ribbon.WorkPlanner.Alerts"
+					LabelText="Alert Me"
+					TemplateAlias="oM"/>
+
+				<Button
+					Id="Ribbon.WorkPlanner.PropertiesGroup.History"
+					Sequence="60"
+					Image16by16="/_layouts/epmlive/images/planner-sprite16.png"
+					Image16by16Left="-55"
+					Image16by16Top="-99"
+					Command="Ribbon.WorkPlanner.History"
+					LabelText="Version History"
+					TemplateAlias="oM"/>
+
+				<Button
+					Id="Ribbon.WorkPlanner.PropertiesGroup.Permissions"
+					Sequence="60"
+					Image16by16="/_layouts/epmlive/images/planner-sprite16.png"
+					Image16by16Left="-72"
+					Image16by16Top="-145"
+					Command="Ribbon.WorkPlanner.Permissions"
+					LabelText="Permissions"
+					TemplateAlias="oM"/>
+
+				<Button
+					Id="Ribbon.WorkPlanner.PropertiesGroup.Workflows"
+					Sequence="60"
+					Image16by16="/_layouts/epmlive/images/planner-sprite16.png"
+					Image16by16Left="-295"
+					Image16by16Top="-55"
+					Command="Ribbon.WorkPlanner.Workflows"
+					LabelText="Workflows"
+					TemplateAlias="oM"/>
+
+				<Button
+					Id="Ribbon.WorkPlanner.PropertiesGroup.Attachments"
+					Sequence="60"
+					Image16by16="/_layouts/epmlive/images/planner-sprite16.png"
+					Image16by16Left="-234"
+					Image16by16Top="-234"
+					Command="Ribbon.WorkPlanner.Attachments"
+					LabelText="Attachments"
+					TemplateAlias="oM"/>
+
+			</Controls>
+		</Group>
+
+		
+
+    </Groups>
+    </Tab>

@@ -1,0 +1,22 @@
+<script type="text/javascript">
+//<![CDATA[
+	function _addCustomPageComponent() {
+		var _customPageComponent = new ContextualTabWebPart.CustomPageComponent('{webPartPageComponentId}','{gridId}');
+
+		var ribbonPageManager = SP.Ribbon.PageManager.get_instance();
+		ribbonPageManager.addPageComponent(_customPageComponent);
+		ribbonPageManager.get_focusManager().requestFocusForComponent(_customPageComponent);
+	}
+
+	function _registerCustomPageComponent() {
+		SP.SOD.registerSod("EPMLive.AssignmentPlanner.ContextualTabPageComponent.js", "/_layouts/epmlive/javascripts/EPMLive.AssignmentPlanner.ContextualTabPageComponent.js");
+		SP.SOD.executeFunc("EPMLive.AssignmentPlanner.ContextualTabPageComponent.js", "ContextualWebPart.CustomPageComponent", _addCustomPageComponent);
+	}
+
+	function _registerAssignmentPlannerRibbon() {
+		SP.SOD.executeOrDelayUntilScriptLoaded(_registerCustomPageComponent, "sp.ribbon.js");
+	}
+
+	SP.SOD.executeOrDelayUntilScriptLoaded(_registerAssignmentPlannerRibbon, "EPMLive.AssignmentPlanner.js");
+//]]>
+</script>

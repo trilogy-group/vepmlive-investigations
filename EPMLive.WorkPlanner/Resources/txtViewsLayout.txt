@@ -1,0 +1,20 @@
+<Grid>
+  <Cfg id='WorkPlannerViews' Style='Standard'
+    VarHeight='1' Dragging='0' Adding='0' 
+    Deleting='0' Selecting='0' Sorting='0' StaticCursor='1'/>
+  <Toolbar Visible='0'/>
+  <Cfg Code="GTACCNPSQEBSLC"/>
+  <Cols>
+    <C Name='N' Type='Text' CanEdit='0' RelWidth='100'/>
+  </Cols>
+  <Header Visible='0'/>
+  <Def>
+	<D Name='R'/>
+  </Def>
+  <Body>
+    <B>
+      <I N='Default View' Background='#FFFFFF'/>
+	  <I N='Custom Views' Background='#F4F4F4' CanSelect='0' CanFocus='0'/>
+    </B>
+  </Body>
+</Grid>

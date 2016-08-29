@@ -1,0 +1,85 @@
+﻿table.grid 
+{
+    width:100%;
+    border: 1px solid #B0B8C0;
+    background-color: #E1DDD9;
+    border-collapse: collapse;
+    font-family: Verdana, Arial, Helvetica;
+    font-size:10px;
+}
+table.grid tr
+{
+    text-align:left;
+    border: 1px solid #B0B8C0;
+    font-family: Verdana, Arial, Helvetica;
+    font-size:10px;
+    color: windowtext;
+    background-color: white;
+}
+table.grid th
+{
+    text-align:left;
+    border: 1px solid #B0B8C0;
+    font-family: Verdana, Arial, Helvetica;
+    font-size:10px;
+    font-weight:normal;
+    color: windowtext;
+    height: 25px;
+    padding: 5px;
+    background-color: #E1DDD9;
+}
+table.grid td 
+{
+    padding: 5px;
+    border: 1px solid #B0B8C0;
+    white-space: nowrap;
+    /*min-height: 1.5em;
+    max-height: 1.5em;
+*/    line-height: 1.5em;
+}
+
+.cellSpacer, .cellSpacer_over, .cellSpacer_selected
+{
+	width:15px;
+	background-color: #E1DDD9;
+}
+
+.rowTerminator
+{
+	background-color: white;
+}
+
+.rowTerminator_over
+{
+	background-color: #ECECEC;
+}
+
+.rowTerminator_selected
+{
+	background-color: #9AC2E5;
+}
+
+.cellDefault
+{
+	background-color: white;
+}
+
+.cellDefault_over
+{
+	background-color: #ECECEC;
+}
+
+.cellDefault_selected
+{
+	background-color: #9AC2E5;
+}
+    
+.cell_onmouseover {
+  color: #1F497D;
+  background-color : #0072BC;
+}
+    
+.cell_onmouseout {
+  color: windowtext;
+  background-color: white;
+}

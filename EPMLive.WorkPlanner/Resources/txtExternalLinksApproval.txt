@@ -1,0 +1,28 @@
+<Grid>
+  <Cfg id='WorkPlannerExternalLinks' Style='Standard' MaxVScroll="600"
+    VarHeight='1' Dragging='0' Adding='0' 
+    Deleting='0' Selecting='0' Sorting='0' StaticCursor='1' />
+	<Toolbar Visible='0'></Toolbar>
+	<Cfg Code="GTACCNPSQEBSLC"/>
+  <Cols>
+    <C Name='ID' Type='Text' CanEdit='0' Visible='0' WidthLap='1'/>
+	<C Name='puid' Type='Text' Visible='0' />
+	<C Name='Reject' Type='Bool' CanEdit='1' Width='40' CanFocus='0' WidthLap='1'/>
+	<C Name='Action' Type='Text' CanEdit='0' Width='50' CanFocus='0' WidthLap='1'/>
+	<C Name='Title' Type='Text' CanEdit='0' RelWidth='100' CanFocus='0' WidthLap='1'/>
+    <C Name='StartDate' Type='Date' Width='80' CanFocus='0' Format="d" WidthLap='1'/>
+	<C Name='OldStartDate' Type='Date' Width='80' CanFocus='0' Format="d" WidthLap='1'/>
+	<C Name='DueDate' Type='Date' Width='80' CanFocus='0' Format="d" WidthLap='1'/>
+	<C Name='OldDueDate' Type='Date' Width='80' CanFocus='0' Format="d" WidthLap='1'/>
+	<C Name='taskorder' Type='Int' Width='50' Visible="0"/>
+  </Cols>
+  <Header N='Task' T='Type' L='Lag'/>
+  <Def>
+	<D Name='Task' CanEdit='0' StartDateCanEdit="0" NoColor='1' NoColorState='1' Class="NewTaskBack"/>
+  </Def>
+  <Body>
+    <B>
+      
+    </B>
+  </Body>
+</Grid>

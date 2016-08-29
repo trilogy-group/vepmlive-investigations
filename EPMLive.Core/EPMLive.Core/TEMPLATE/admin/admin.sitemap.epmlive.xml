@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<siteMap enableLocalization="true"> 
+	<siteMapNode url="/_admin/epmlive/features.aspx" 
+    parentUrl="/_admin/applications.aspx" title="WorkCenter Features"/>
+  
+	<siteMapNode url="/_admin/epmlive/users.aspx" 
+    parentUrl="/_admin/applications.aspx" title="WorkCenter Feature Users"/>
+  
+	<siteMapNode url="/_admin/epmlive/versions.aspx" 
+    parentUrl="/_admin/applications.aspx" title="WorkCenter Solution Versions"/>
+
+  <siteMapNode url="/_admin/epmlive/servers.aspx" 
+    parentUrl="/_admin/applications.aspx" title="WorkCenter Servers"/>
+
+  <siteMapNode url="/_admin/epmlive/queue.aspx" 
+  parentUrl="/_admin/applications.aspx" title="WorkCenter Queue"/>
+  
+  <siteMapNode url="/_admin/epmlive/viewqueue.aspx" 
+    parentUrl="/_admin/epmlive/queue.aspx" title="WorkCenter Queue Details"/>
+  
+  <siteMapNode url="/_admin/epmlive/ReportDatabases.aspx" 
+      parentUrl="/_admin/applications.aspx" title="WorkCenter Reporting"/>
+
+    <siteMapNode url="/_admin/epmlive/SetupReportDatabase.aspx" 
+      parentUrl="/_admin/epmlive/ReportDatabases.aspx" title="WorkCenter Reporting"/>
+  
+  <siteMapNode url="/_admin/epmlive/wcsettings.aspx" 
+      parentUrl="/_admin/applications.aspx" title="WorkCenter Settings"/>
+
+  <siteMapNode url="/_admin/epmlive/EPMLiveProperties.aspx"
+  parentUrl="/_admin/applications.aspx" title="WorkCenter Properties"/>
+  
+</siteMap>

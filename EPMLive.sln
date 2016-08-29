@@ -16,53 +16,53 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Template\WorkEngineForms.wsp = Template\WorkEngineForms.wsp
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EPMLive.QueueManager", "EPK_QueueMgr\EPK_QueueMgr\EPMLive.QueueManager.csproj", "{28A384F1-0CC8-4DF0-BF25-8D82E0C423A7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EPMLive.QueueManager", "EPMLive.QueueManager\EPMLive.QueueManager.csproj", "{28A384F1-0CC8-4DF0-BF25-8D82E0C423A7}"
 	ProjectSection(ProjectDependencies) = postProject
 		{BB86B09C-CB35-4888-8639-C047A40A9C0C} = {BB86B09C-CB35-4888-8639-C047A40A9C0C}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EPMLive.Dashboards", "EPMLiveDashboards\EPMLiveDashboards\EPMLive.Dashboards.csproj", "{BD45273D-42C6-4691-BED6-52279D8E489C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EPMLive.Dashboards", "EPMLive.Dashboards\EPMLive.Dashboards.csproj", "{BD45273D-42C6-4691-BED6-52279D8E489C}"
 	ProjectSection(ProjectDependencies) = postProject
 		{C773AE44-F066-446A-9CBD-D24AFA794E34} = {C773AE44-F066-446A-9CBD-D24AFA794E34}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EPMLive.Integration", "EPMLiveIntegration\EPMLiveIntegration\EPMLive.Integration.csproj", "{4C63F23F-463C-409B-89AD-ADC2E138B8E3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EPMLive.Integration", "EPMLive.Integration\EPMLive.Integration.csproj", "{4C63F23F-463C-409B-89AD-ADC2E138B8E3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EPMLive.IntegrationService", "EPMLiveIntegrationService\EPMLiveIntegrationService\EPMLive.IntegrationService.csproj", "{E7043F73-7633-4476-B33D-222EC3AC1C8B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EPMLive.IntegrationService", "EPMLive.IntegrationService\EPMLive.IntegrationService.csproj", "{E7043F73-7633-4476-B33D-222EC3AC1C8B}"
 	ProjectSection(ProjectDependencies) = postProject
 		{C773AE44-F066-446A-9CBD-D24AFA794E34} = {C773AE44-F066-446A-9CBD-D24AFA794E34}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EPMLive.ProjectServer", "EPMLivePS\EPMLivePS\EPMLive.ProjectServer.csproj", "{1121D2FF-7EAA-4532-A1CE-473DE551DD70}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EPMLive.ProjectServer", "EPMLive.ProjectServer\EPMLive.ProjectServer.csproj", "{1121D2FF-7EAA-4532-A1CE-473DE551DD70}"
 	ProjectSection(ProjectDependencies) = postProject
 		{C773AE44-F066-446A-9CBD-D24AFA794E34} = {C773AE44-F066-446A-9CBD-D24AFA794E34}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EPMLive.Reporting", "EPMLiveReporting\EPMLiveReporting\EPMLive.Reporting.csproj", "{B56160FE-490C-462A-BC9A-FEFFD2F1487C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EPMLive.Reporting", "EPMLive.Reporting\EPMLive.Reporting.csproj", "{B56160FE-490C-462A-BC9A-FEFFD2F1487C}"
 	ProjectSection(ProjectDependencies) = postProject
 		{C773AE44-F066-446A-9CBD-D24AFA794E34} = {C773AE44-F066-446A-9CBD-D24AFA794E34}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EPMLive.Synch", "EPMLiveSynch\EPMLiveSynch\EPMLive.Synch.csproj", "{63795CDC-7D29-4620-94E1-60262FB6133B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EPMLive.Synch", "EPMLive.Synch\EPMLive.Synch.csproj", "{63795CDC-7D29-4620-94E1-60262FB6133B}"
 	ProjectSection(ProjectDependencies) = postProject
 		{C773AE44-F066-446A-9CBD-D24AFA794E34} = {C773AE44-F066-446A-9CBD-D24AFA794E34}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EPMLive.TimerService", "EPMLiveTimerService\EPMLiveTimerService\EPMLive.TimerService.csproj", "{6C2BE0DE-AF49-4F4D-BAB8-AE256F1CBDD7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EPMLive.TimerService", "EPMLive.TimerService\EPMLive.TimerService.csproj", "{6C2BE0DE-AF49-4F4D-BAB8-AE256F1CBDD7}"
 	ProjectSection(ProjectDependencies) = postProject
 		{C773AE44-F066-446A-9CBD-D24AFA794E34} = {C773AE44-F066-446A-9CBD-D24AFA794E34}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EPMLive.TimerService.Tester", "EPMLiveTimerService\TimerServiceTester\EPMLive.TimerService.Tester.csproj", "{06FE2C24-2A9D-4F72-B0B8-78B978E1ACBA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EPMLive.TimerService.Tester", "EPMLive.TimerService.Tester\EPMLive.TimerService.Tester.csproj", "{06FE2C24-2A9D-4F72-B0B8-78B978E1ACBA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EPMLive.Timesheets", "EPMLiveTimesheets\EPMLiveTimesheets\EPMLive.Timesheets.csproj", "{FD812BF8-05A3-4D77-B9BC-6AD4991B8049}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EPMLive.Timesheets", "EPMLive.Timesheets\EPMLive.Timesheets.csproj", "{FD812BF8-05A3-4D77-B9BC-6AD4991B8049}"
 	ProjectSection(ProjectDependencies) = postProject
 		{C773AE44-F066-446A-9CBD-D24AFA794E34} = {C773AE44-F066-446A-9CBD-D24AFA794E34}
 		{A7F83FD4-BE8B-49AB-BE24-39209E8FABC2} = {A7F83FD4-BE8B-49AB-BE24-39209E8FABC2}
 		{B56160FE-490C-462A-BC9A-FEFFD2F1487C} = {B56160FE-490C-462A-BC9A-FEFFD2F1487C}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EPMLive.WebParts", "EPMLiveWebParts\EPMLiveWebParts\EPMLive.WebParts.csproj", "{A7F83FD4-BE8B-49AB-BE24-39209E8FABC2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EPMLive.WebParts", "EPMLive.WebParts\EPMLive.WebParts.csproj", "{A7F83FD4-BE8B-49AB-BE24-39209E8FABC2}"
 	ProjectSection(ProjectDependencies) = postProject
 		{51CAF42A-31AF-4B74-853F-24B672C185C2} = {51CAF42A-31AF-4B74-853F-24B672C185C2}
 		{4C63F23F-463C-409B-89AD-ADC2E138B8E3} = {4C63F23F-463C-409B-89AD-ADC2E138B8E3}
@@ -70,35 +70,35 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EPMLive.WebParts", "EPMLive
 		{BB86B09C-CB35-4888-8639-C047A40A9C0C} = {BB86B09C-CB35-4888-8639-C047A40A9C0C}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EPMLive.WorkPlanner", "EPMLiveWorkPlanner\EPMLiveWorkPlanner\EPMLive.WorkPlanner.csproj", "{FCF0C151-0A3F-4B9F-9327-3BBBF109D776}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EPMLive.WorkPlanner", "EPMLive.WorkPlanner\EPMLive.WorkPlanner.csproj", "{FCF0C151-0A3F-4B9F-9327-3BBBF109D776}"
 	ProjectSection(ProjectDependencies) = postProject
 		{C773AE44-F066-446A-9CBD-D24AFA794E34} = {C773AE44-F066-446A-9CBD-D24AFA794E34}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EPMLive.PortfolioEngine", "PortfolioEngineCore\PortfolioEngineCore\EPMLive.PortfolioEngine.csproj", "{BB86B09C-CB35-4888-8639-C047A40A9C0C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EPMLive.PortfolioEngine", "EPMLive.PortfolioEngine\EPMLive.PortfolioEngine.csproj", "{BB86B09C-CB35-4888-8639-C047A40A9C0C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EPMLive.WorkEngine", "PortfolioEngineCore\WorkEnginePPM\EPMLive.WorkEngine.csproj", "{51CAF42A-31AF-4B74-853F-24B672C185C2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EPMLive.WorkEngine", "EPMLive.WorkEngine\EPMLive.WorkEngine.csproj", "{51CAF42A-31AF-4B74-853F-24B672C185C2}"
 	ProjectSection(ProjectDependencies) = postProject
 		{C773AE44-F066-446A-9CBD-D24AFA794E34} = {C773AE44-F066-446A-9CBD-D24AFA794E34}
 		{BB86B09C-CB35-4888-8639-C047A40A9C0C} = {BB86B09C-CB35-4888-8639-C047A40A9C0C}
 		{B56160FE-490C-462A-BC9A-FEFFD2F1487C} = {B56160FE-490C-462A-BC9A-FEFFD2F1487C}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EPMLive.Integration.Misc", "UplandIntegrations\UplandIntegrations\EPMLive.Integration.Misc.csproj", "{DF0FEF98-25C9-40DD-9893-FF7BED79AC4B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EPMLive.Integration.Misc", "EPMLive.Integration.Misc\EPMLive.Integration.Misc.csproj", "{DF0FEF98-25C9-40DD-9893-FF7BED79AC4B}"
 	ProjectSection(ProjectDependencies) = postProject
 		{4C63F23F-463C-409B-89AD-ADC2E138B8E3} = {4C63F23F-463C-409B-89AD-ADC2E138B8E3}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EPMLive.Core", "EPMLiveCore\EPMLiveCore\EPMLive.Core.csproj", "{C773AE44-F066-446A-9CBD-D24AFA794E34}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EPMLive.Core", "EPMLive.Core\EPMLive.Core\EPMLive.Core.csproj", "{C773AE44-F066-446A-9CBD-D24AFA794E34}"
 	ProjectSection(ProjectDependencies) = postProject
 		{4C63F23F-463C-409B-89AD-ADC2E138B8E3} = {4C63F23F-463C-409B-89AD-ADC2E138B8E3}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EPMLive.Tests", "EPMLiveTests\EPMLive.Tests.csproj", "{D2101EA6-CEF5-4502-92CD-852D635B263C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EPMLive.Tests", "EPMLive.Tests\EPMLive.Tests.csproj", "{D2101EA6-CEF5-4502-92CD-852D635B263C}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Installer Items", "Installer Items", "{D6CE31B1-62E8-4947-9B7A-40F2DD62ECCB}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Installer", "Installer", "{D6CE31B1-62E8-4947-9B7A-40F2DD62ECCB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EPMLive.Installer.UserNameChecker", "BuildTeamCity\UserNameChecker\EPMLive.Installer.UserNameChecker.csproj", "{53C4D722-3B56-4013-AE6B-9E11559C1BB7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EPMLive.Installer.UserNameChecker", "BuildTeamCity\EPMLive.Installer.UserNameChecker\EPMLive.Installer.UserNameChecker.csproj", "{53C4D722-3B56-4013-AE6B-9E11559C1BB7}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{FF28998F-B43F-490F-8A69-0842433DFE82}"
 EndProject

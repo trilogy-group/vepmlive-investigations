@@ -1,8 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Elements xmlns="http://schemas.microsoft.com/sharepoint/" >
-  <Module Name="MyTasks" List="113" Url="_catalogs/wp">
-    <File Path="MyTasks\MyTasks.webpart" Url="MyTasks.webpart" Type="GhostableInLibrary">
-		<Property Name="Group" Value ="PortfolioEngine"/>
-    </File>
-  </Module>
-</Elements>

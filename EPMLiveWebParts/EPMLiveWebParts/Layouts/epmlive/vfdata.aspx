@@ -1,2 +1,0 @@
-﻿<%@ Assembly Name="$SharePoint.Project.AssemblyFullName$" %>
-<%@ Page Language="C#" ContentType="text/html" ResponseEncoding="iso-8859-1" CodeBehind="vfdata.aspx.cs" Inherits="EPMLiveWebParts.VfData" %>

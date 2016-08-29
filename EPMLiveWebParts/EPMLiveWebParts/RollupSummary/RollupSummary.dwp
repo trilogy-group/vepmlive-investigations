@@ -1,8 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<WebPart xmlns="http://schemas.microsoft.com/WebPart/v2">
-	<Assembly>EPMLiveWebParts, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5</Assembly>
-	<TypeName>EPMLiveWebParts.RollupSummary.RollupSummary</TypeName>
-	<Title>My Reminders</Title>
-	<Description>Provides a rollup summary of any list items in your site collection.</Description>
-	<PartImageLarge>/_layouts/images/wpepmlive.gif</PartImageLarge>
-</WebPart>

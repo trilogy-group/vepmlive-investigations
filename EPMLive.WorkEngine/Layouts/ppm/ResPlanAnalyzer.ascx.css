@@ -1,0 +1,130 @@
+﻿body 
+{
+    font-family: Verdana, Arial, Helvetica;
+    font-size:11px;
+    padding: 0;
+    border: 0;
+    margin: 0;
+}
+.actionRadio
+{
+    width:20px;
+    vertical-align:top;
+}
+table.picklist 
+{
+    width:100%;
+    border: 1px solid #B0B8C0;
+    border-collapse: collapse;
+}
+table.picklist td 
+{
+    padding: 0px;
+    width: 114px;
+}
+.datacol
+{
+    width: 210px;
+}
+.buttoncol
+{
+    width: 10px;
+    vertical-align: top;
+}
+.controlcell
+{
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 12px;
+    vertical-align: top;
+    border-bottom: 1px solid silver;
+    padding: 5px;
+    border-bottom-color: #CCCCCC;
+                background-color: #F5F5F5;
+                width:500px;
+}
+.buttoncell
+{
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 12px;
+    vertical-align: top;
+    border-top: 1px solid silver;
+    padding: 5px;
+    border-top-color: #CCCCCC;
+    text-align:right;
+}
+
+
+div.rpa_ribbon{
+  background-color: #F0F0F0;
+  border: none; /*1px solid #DBDDED;*/
+  color: black;/*windowtext*/;
+  /*margin-bottom: 4px;
+  margin-top: 6px;*/
+  padding-bottom: 2px;
+  padding-left: 2px;
+  padding-right: 0px;
+  padding-top: 3px;
+  width: 100%;
+}
+table.rpa_ribbon {
+  color: black;/*#0072BC;*/
+  font-family: Calibri, Arial, Trebuchet MS;
+  font-size: 9pt;
+  vertical-align:top;
+}
+
+table.rpa_ribbon td {
+	border-right: none; /*1px solid #DBDDED;*/
+}
+table.rpa_ribbon td.sb {
+	width: 12em;
+}
+table.rpa_ribbon td.lb {
+	width: 40px;
+	vertical-align:top;
+	text-align:center;
+}
+table.rpa_ribbon input
+{
+    color: black;
+  font-family: Calibri, Arial, Trebuchet MS;
+	font-size: 9pt;
+	text-decoration: none;
+	vertical-align:middle;
+	cursor:default;
+}
+.bb_button {
+  color: windowtext;
+  font-family: Calibri, Arial, Trebuchet MS;
+  font-size: 9pt;
+  text-decoration: none;
+  background-color: transparent;
+}
+
+.bb_buttonimage 
+{
+	vertical-align:middle;
+}
+.rpa_ribbon_text
+{
+    color: black;
+  font-family: Calibri, Arial, Trebuchet MS;
+	font-size: 9pt;
+	text-decoration: none;
+	vertical-align:middle;
+	cursor:default;
+}
+#veil {
+display:none;
+position:absolute;
+left:0px;
+top:0px;
+width:100%;
+height:100%;
+filter:alpha(opacity=80);
+opacity:0.9;
+-moz-opacity:0.9;
+-khtml-opacity:0.9;
+z-index:997;
+background-color:#ffffff;
+}

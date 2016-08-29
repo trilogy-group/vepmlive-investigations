@@ -1,0 +1,53 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Elements xmlns="http://schemas.microsoft.com/sharepoint/">
+
+	<CustomAction
+		 Id="EPMLive.Workgroup.Admin.Wizard"
+		 GroupId="EPMLive.Workgroup.Admin"
+		 Location="Microsoft.SharePoint.SiteSettings"
+		 Sequence="1"
+		 RequireSiteAdministrator="TRUE"
+		 Title="Setup Wizard">
+		<UrlAction Url="_layouts/epmlive/tlwizard.aspx" />
+	</CustomAction>
+	
+  <CustomAction
+		Id="EPMLive.Workgroup.Admin.TodayTimeFix"
+		GroupId="EPMLive.Workgroup.Admin"
+		Location="Microsoft.SharePoint.SiteSettings"
+		Sequence="2006"
+		Title="Timer Settings">
+    <UrlAction Url="_layouts/epmlive/timersettings.aspx" />
+  </CustomAction>
+
+  <CustomAction
+		  Id="EPMLive.Workgroup.Admin.Notifications"
+		  GroupId="EPMLive.Workgroup.Admin"
+		  Location="Microsoft.SharePoint.SiteSettings"
+		  Sequence="2007"
+		  RequireSiteAdministrator="TRUE"
+		  Title="Notification Settings">
+    <UrlAction Url="_layouts/epmlive/notificationsadmin.aspx" />
+  </CustomAction>
+
+  <CustomAction
+		  Id="EPMLive.Workgroup.Admin.Reporting"
+		  GroupId="EPMLive.Workgroup.Admin"
+		  Location="Microsoft.SharePoint.SiteSettings"
+		  Sequence="2008"
+		  RequireSiteAdministrator="TRUE"
+		  Title="Reporting Settings">
+    <UrlAction Url="_layouts/epmlive/listmappings.aspx" />
+  </CustomAction>
+
+	<CustomAction
+		  Id="EPMLive.Workgroup.Admin.ADSynch"
+		  GroupId="EPMLive.Workgroup.Admin"
+		  Location="Microsoft.SharePoint.SiteSettings"
+		  Sequence="2009"
+		  RequireSiteAdministrator="TRUE"
+		  Title="Active Directory Synch">
+		<UrlAction Url="_layouts/epmlive/adsyncadmin.aspx" />
+	</CustomAction>
+	
+</Elements>

@@ -1,0 +1,184 @@
+﻿#EPMLiveNotificationCounter {
+    color: white;
+    width: 22px;
+    height: 22px;
+    line-height: 22px;
+    text-align: center;
+    position: relative !important;
+    -ms-border-radius: 3px;
+    -moz-border-radius: 3px; 
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-family: Arial;
+    font-size: 10px;
+}
+
+#EPMLiveNotificationCounterScreen {
+    position: relative !important;
+    z-index: 1200;
+    cursor: pointer;
+}
+
+#EPMLiveNotificationsWrap {
+    width: 450px;
+    display: none;
+    position: absolute;
+    z-index: 1199;
+    background: #fff;
+    -webkit-box-shadow: 0 2px 10px #BEBEBE;
+    -moz-box-shadow: 0 2px 10px #BEBEBE;
+    -ms-box-shadow: 0 2px 10px #BEBEBE;
+    box-shadow: 0 2px 10px #BEBEBE;
+    border: #BEBEBE 1px solid;
+    border-top: none;
+    font-family: Arial;
+    font-size: 13px;
+    top: 27px !important;
+}
+
+.EPMLiveNotificationsHeader {
+    min-height: 50px;
+    line-height: 50px;
+    padding: 5px 10px;
+    overflow: hidden;
+}
+
+.EPMLiveNotificationsHeader h2 {
+    color: #000;
+    font-size: 15px;
+    margin: 0;
+    padding: 0;
+}
+
+.EPMLiveNotificationsHeader h6 {
+    font-size: 12px;
+    font-style: italic;
+    font-weight: normal;
+    color: #666;
+    margin: 0;
+    padding: 0;
+}
+
+.EPMLiveNotificationsHeaderWrap {
+    line-height: 20px;
+    float: left;
+    width: 362px;
+}
+
+.EPMLiveNotificationsH20 {
+    font-size: 20px;
+}
+
+.EPMLiveNotificationDescFooterLink {
+    cursor: pointer;
+    color: #333;
+}
+
+.EPMLiveNotificationDescFooterLink:hover {
+    color: #666;
+}
+
+.EPMLiveNotificationDescFooterLink span {
+    margin-left: 1px;
+    margin-right: 1px;
+}
+
+.EPMLiveNotificationDescFooter {
+    height: 25px;
+    line-height: 25px;
+    background: #EEF0F9;
+    width: 430px;
+}
+
+.EPMLiveNotificationMessage, .EPMLiveNotification-NewMessage {
+    min-height: 45px;
+    border-top: #DDDFE7 1px solid;
+    padding: 5px 15px 5px 7.5px;
+    color: #666;
+    cursor: pointer;
+    background: #F9F9F9;
+    overflow: hidden;
+}
+
+.EPMLiveNotification-NewMessage {
+    background: #EEF0F9;
+}
+
+.EPMLiveNotificationMessage div, .EPMLiveNotification-NewMessage div {
+    line-height: 20px;
+}
+
+.EPMLiveNotificationMessage abbr, .EPMLiveNotification-NewMessage abbr {
+    line-height: 15px;
+    float: left;
+    font-style: italic;
+    font-size: 11px;
+}
+
+.EPMLiveNotificationThumbnail {
+    float: left;
+    margin-right: 7.5px;
+}
+
+.EPMLiveNotificationDetails {
+    float: left;
+    width: 374.5px;
+}
+
+.EPMLiveNotificationThumbnail img {
+    position: relative;
+}
+
+.EPMLiveNotificationTitle {
+    float: left;
+    width: 343px;
+    line-height: 20px;
+    font-weight: bold;
+    font-size: 13px;
+}
+
+.EPMLiveNotificationType {
+    float: right;
+    width: 25px;
+    height: 25px;
+    background-repeat: no-repeat;
+    background-position: center center;
+    margin-top: 10px;
+}
+
+.EPMLiveNotificationStrong {
+    font-weight: bold;
+}
+
+.EPMLiveNotificationDesc, .EPMLiveNotificationDescFooter {
+    border-top: #DDDFE7 1px solid;
+    padding: 5px 10px;
+    color: #666;
+}
+
+.EPMLiveNotificationDescFooter span {
+    font-size: 12px;
+    float: left;
+}
+
+.EPMLiveNotificationTopBorder {
+    border-top: #DDDFE7 1px solid;
+}
+
+.EPMLiveNotificationFixed {
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.EPMLiveNotificationCreatorLink, .EPMLiveNotificationCreatorLink:link, .EPMLiveNotificationCreatorLink:active, .EPMLiveNotificationCreatorLink:visited, .EPMLiveNotificationCreatorLink:hover {
+    color: #0072BC;
+}
+
+.EPMLiveNotificationCreatorLink:hover {
+    text-decoration: underline;
+}
+
+.EPMLiveNotificationsH30 {
+    color: #666 !important;
+}

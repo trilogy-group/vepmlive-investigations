@@ -1,0 +1,14 @@
+<GroupTemplate Id="Ribbon.Templates.AssignmentPlannerTemplate">
+  <Layout Title="AssignmentPlannerLayout" LayoutTitle="AssignmentPlannerLayout">
+    <OverflowSection Type="OneRow" DisplayMode="Large" TemplateAlias="ONERW" />
+	<OverflowSection Type="OneRow" DisplayMode="Large" TemplateAlias="ONERWFIXED" />
+    <OverflowSection Type="ThreeRow" DisplayMode="Medium" TemplateAlias="THRRW" />
+	<OverflowSection Type="ThreeRow" DisplayMode="Medium" TemplateAlias="THRRWFIXED" />
+  </Layout>
+  <Layout Title="AssignmentPlannerLayoutSmall" LayoutTitle="AssignmentPlannerLayoutSmall">
+    <OverflowSection Type="ThreeRow" DisplayMode="Medium" TemplateAlias="ONERW" />
+	<OverflowSection Type="OneRow" DisplayMode="Large" TemplateAlias="ONERWFIXED" />
+    <OverflowSection Type="ThreeRow" DisplayMode="Small" TemplateAlias="THRRW" />
+	<OverflowSection Type="ThreeRow" DisplayMode="Medium" TemplateAlias="THRRWFIXED" />
+  </Layout>
+</GroupTemplate>
