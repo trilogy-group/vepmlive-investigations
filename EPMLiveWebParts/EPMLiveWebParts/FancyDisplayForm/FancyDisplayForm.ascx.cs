@@ -605,7 +605,6 @@ namespace EPMLiveWebParts
 
 		private void FillNarrativeDetailsSection(string fieldName, string fieldValue, SPListItem item, bool appendOnly)
 		{
-			string UserName = string.Empty;
 
 			if (narrativeDetailsFieldsCount == 0)
 			{
