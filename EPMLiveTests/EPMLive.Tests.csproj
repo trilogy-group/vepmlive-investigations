@@ -59,13 +59,13 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\EPMLiveCore\EPMLiveCore\EPMLiveCore.csproj">
+    <ProjectReference Include="..\EPMLiveCore\EPMLiveCore\EPMLive.Core.csproj">
       <Project>{c773ae44-f066-446a-9cbd-d24afa794e34}</Project>
-      <Name>EPMLiveCore</Name>
+      <Name>EPMLive.Core</Name>
     </ProjectReference>
-    <ProjectReference Include="..\EPMLiveTimerService\EPMLiveTimerService\EPMLiveTimerService.csproj">
+    <ProjectReference Include="..\EPMLiveTimerService\EPMLiveTimerService\EPMLive.TimerService.csproj">
       <Project>{6c2be0de-af49-4f4d-bab8-ae256f1cbdd7}</Project>
-      <Name>EPMLiveTimerService</Name>
+      <Name>EPMLive.TimerService</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
