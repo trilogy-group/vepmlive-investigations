@@ -16,12 +16,12 @@ param (
     [string]$CleanBuild = $true
 );
 
-$projectsToBePackaged = @("EPMLiveCore","EPMLiveDashboards","EPMLiveIntegrationService",
-                            "EPMLivePS","EPMLiveReporting","EPMLiveSynch",
-                            "EPMLiveTimeSheets","EPMLiveWebParts","EPMLiveWorkPlanner","WorkEnginePPM")
+$projectsToBePackaged = @("EPMLive.Core","EPMLive.Dashboards","EPMLive.IntegrationService",
+                            "EPMLive.ProjectServer","EPMLive.Reporting","EPMLive.Synch",
+                            "EPMLive.TimeSheets","EPMLive.WebParts","EPMLive.WorkPlanner","EPMLive.WorkEngine")
 
-$projectsToBeBuildAsEXE = @("EPMLiveTimerService", "EPK_QueueMgr")
-$projectsToBeBuildAsDLL = @("PortfolioEngineCore","UplandIntegrations","EPMLiveIntegration", "UserNameChecker")
+$projectsToBeBuildAsEXE = @("EPMLive.TimerService", "EPMLive.QueueManager")
+$projectsToBeBuildAsDLL = @("EPMLive.PortfolioEngine","EPMLive.Integration.Misc","EPMLive.Integration", "EPMLive.Installer.UserNameChecker")
 
 $projectTypeIdTobeReplaced = "C1CDDADD-2546-481F-9697-4EA41081F2FC"
 $projectTypeIdTobeReplacedWith = "BB1F664B-9266-4fd6-B973-E1E44974B511"
@@ -245,7 +245,7 @@ if (!(Test-Path -Path $BinariesDirectory)){
 Log-Section "Packaging Projects . . ."
 foreach($projectToBePackaged in $projectsToBePackaged){
     
-    $projectPath = Get-ChildItem -Path ($SourcesDirectory + "\*") -Include ($projectToBePackaged + ".*proj") -Recurse
+    $projectPath = Get-ChildItem -Path ($SourcesDirectory + "\*") -Include ($projectToBePackaged + ".csproj") -Recurse
 
     #Log-SubSection "Patching Project Type GUID '$projectToBePackaged'...."
     
@@ -278,7 +278,7 @@ foreach($projectToBePackaged in $projectsToBePackaged){
 Log-Section "Building Windows Services Projects . . ."
 foreach($projectToBeBuildAsEXE in $projectsToBeBuildAsEXE){
     
-    $projectPath = Get-ChildItem -Path ($SourcesDirectory + "\*") -Include ($projectToBeBuildAsEXE + ".*proj") -Recurse
+    $projectPath = Get-ChildItem -Path ($SourcesDirectory + "\*") -Include ($projectToBeBuildAsEXE + ".csproj") -Recurse
 
     Log-SubSection "Building '$projectToBeBuildAsEXE'..."
 	Log-SubSection "projectPath: '$projectPath'...."
@@ -306,7 +306,7 @@ foreach($projectToBeBuildAsEXE in $projectsToBeBuildAsEXE){
 Log-Section "Building DLL Services Projects . . ."
 foreach($projectToBeBuildAsDLL in $projectsToBeBuildAsDLL){
     
-    $projectPath = Get-ChildItem -Path ($SourcesDirectory + "\*") -Include ($projectToBeBuildAsDLL + ".*proj") -Recurse
+    $projectPath = Get-ChildItem -Path ($SourcesDirectory + "\*") -Include ($projectToBeBuildAsDLL + ".csproj") -Recurse
 
     Log-SubSection "Building '$projectToBeBuildAsDLL'..."
 	Log-SubSection "projectPath: '$projectPath'...."

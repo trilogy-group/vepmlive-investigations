@@ -107,11 +107,11 @@
     <Reference Include="Microsoft.SharePoint.Client.ServerRuntime" />
     <Reference Include="Telerik.Web.UI, Version=2013.1.220.35, Culture=neutral, PublicKeyToken=121fae78165ba3d4, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Telerik.Web.UI.dll</HintPath>
+      <HintPath>..\Telerik.Web.UI.dll</HintPath>
     </Reference>
     <Reference Include="Telerik.Web.UI.Skins, Version=2013.1.220.35, Culture=neutral, PublicKeyToken=121fae78165ba3d4, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\Telerik.Web.UI.Skins.dll</HintPath>
+      <HintPath>..\Telerik.Web.UI.Skins.dll</HintPath>
     </Reference>
     <Reference Include="WindowsBase" />
   </ItemGroup>
@@ -862,10 +862,10 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\..\Telerik.Web.UI.dll">
+    <Content Include="..\Telerik.Web.UI.dll">
       <Link>Telerik.Web.UI.dll</Link>
     </Content>
-    <Content Include="..\..\Telerik.Web.UI.Skins.dll">
+    <Content Include="..\Telerik.Web.UI.Skins.dll">
       <Link>Telerik.Web.UI.Skins.dll</Link>
     </Content>
     <Content Include="ActionBar\Elements.xml" />
