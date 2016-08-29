@@ -336,9 +336,8 @@ function GridOnGetHtmlValue(grid, row, col, val) {
                 val = val + "&nbsp;<a href=\"javascript:GridComments('" + grid.id + "','" + row.id + "');return false;\"><img src=\"/_layouts/15/epmlive/images/mywork/commentsnew-small.png\" border=\"0\"></a>";
             }
 
-
             if (grid.GetValue(row, "wsurl") != "") {
-                val = val + "&nbsp;<a href=\"javascript:GridWorkspace('" + grid.id + "','" + row.id + "');return false;\"><img src=\"/_layouts/15/epmlive/images/itemworkspace.png\" border=\"0\"></a>";
+                val = val + "&nbsp;<a href=\"javascript:GridWorkspace('" + grid.id + "','" + row.id + "');\"><img src=\"/_layouts/15/epmlive/images/itemworkspace.png\" border=\"0\"></a>";
             }
             return val;
         }
@@ -430,7 +429,7 @@ function GridOnMouseOverRow(grid, row, col, event) {
         grid.CurHoverRow = row.id;
         CurrentGrid = grid;
         if (grid.GetValue(row, "itemid") != "") {
-            grid.SetAttribute(row, "Title", "ButtonText", '<div class="gridmenuspan" style="position:absolute;overflow:visible;margin-right:5px" id=\"' + row.id + '\"><a data-itemid="' + grid.GetValue(row, "itemid") + '" data-listid="' + grid.GetValue(row, "listid") + '" data-webid="' + grid.GetValue(row, "webid") + '" data-siteid="' + grid.GetValue(row, "siteid") + '" ></a></div>', 1);
+            grid.SetAttribute(row, "Title", "ButtonText", '<div style="position:absolute;overflow:visible;margin-right:5px" id=\"' + row.id + '\"><a data-itemid="' + grid.GetValue(row, "itemid") + '" data-listid="' + grid.GetValue(row, "listid") + '" data-webid="' + grid.GetValue(row, "webid") + '" data-siteid="' + grid.GetValue(row, "siteid") + '" ></a></div>', 1);
             CurrentGrid = grid;
             CurrentRow = row;
             window.epmLiveNavigation.addContextualMenu($('#' + row.id), [], null, null, { "delete": "GridGanttDeleteRow", "comments": "GridCommentsCallBack", "edit": "GridCommentsCallBack" });
