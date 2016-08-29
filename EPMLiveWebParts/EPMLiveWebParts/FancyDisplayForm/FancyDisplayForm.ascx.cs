@@ -652,7 +652,7 @@ namespace EPMLiveWebParts
 			else
 			{
 				sbNarrativeDetailsShowAllRegion.Append("<tr>");
-
+				sbNarrativeDetailsShowAllRegion.Append("<td>" + fieldName + "</td>");
 				if (appendOnly)
 				{
 					sbNarrativeDetailsShowAllRegion.Append("<td>");
