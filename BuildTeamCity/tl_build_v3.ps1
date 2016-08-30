@@ -55,42 +55,6 @@ function Log-Message($msg) {
 	Write-Host $msg
 }
 
-#
-# This script will increment the build number in an AssemblyInfo.cs file
-#
-function UpdateCommonAssemblyInfo($SourcesDirectoryPath) {
-
-    $assemblyInfoPath = Join-Path $SourcesDirectoryPath "CommonAssemblyInfo.cs"
-
-    $contents = [System.IO.File]::ReadAllText($assemblyInfoPath)
-
-    $versionString = [RegEx]::Match($contents,"(AssemblyFileVersion\("")(?:\d+\.\d+\.\d+\.\d+)(""\))")
-    Write-Host ("AssemblyFileVersion: " + $versionString)
-
-    $releaseversionString = [RegEx]::Match($contents,"((?:\d+\.\d+\.\d+\.\d+))")
-    Write-Host ("Release Version: " + $releaseversionString)
-
-    #Parse out the current build number from the AssemblyFileVersion
-    $currentBuild = [RegEx]::Match($versionString,"(\.)(\d+)(""\))").Groups[2]
-    Write-Host ("Current Build: " + $currentBuild.Value)
-
-    #Increment the build number
-    $newBuild= [int]$currentBuild.Value +  1
-    Write-Host ("New Build: " + $newBuild)
-
-
-    $NewReleaseNumber = [RegEx]::Replace($releaseversionString, "(\d+\.\d+\.\d+\.)(?:\d+)", ("`${1}" + $newBuild.ToString()))
-    Write-Host ("New Release Number: " + $NewReleaseNumber)
-
-    #update AssemblyFileVersion, then write to file
-    Write-Host ("Setting version in assembly info file ")
-    $contents = [RegEx]::Replace($contents, "(AssemblyFileVersion\(""\d+\.\d+\.\d+\.)(?:\d+)(""\))", ("`${1}" + $newBuild.ToString() + "`${2}"))
-    Write-Host $contents
-    [System.IO.File]::WriteAllText($assemblyInfoPath, $contents)
-
-    return $NewReleaseNumber
-}
-
 function ZipFiles( $zipfilename, $sourcedir )
 {
    Log-SubSection "Zipping $sourcedir to $zipfilename"
@@ -115,8 +79,10 @@ $VSTestExec = "C:\Program Files (x86)\Microsoft Visual Studio 11.0\Common7\IDE\C
 # Initialize Sources Directory
 $SourcesDirectory = "$ScriptDir\..\"
 
-#Update the CommonAssemblyInfo.cs file with latest build number
-$NewReleaseNumber = UpdateCommonAssemblyInfo($SourcesDirectory)
+$NewReleaseNumber = "1.0.0.0"
+if (Test-Path env:\build_number){
+    $NewReleaseNumber = $env:build_number
+}
 
 # Directory for outputs
 $OutputDirectory = Join-Path $BuildDirectory "output"
