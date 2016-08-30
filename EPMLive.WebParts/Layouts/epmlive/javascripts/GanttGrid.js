@@ -330,10 +330,10 @@ function GridOnGetHtmlValue(grid, row, col, val) {
                 val = "<a href=\"javascript:GridGoToItem('" + grid.id + "','" + row.id + "');\">" + val + "</a>";
 
             if (grid.GetValue(row, "HasComments") == "1") {
-                val = val + "&nbsp;<a href=\"javascript:GridComments('" + grid.id + "','" + row.id + "');return false;\"><img src=\"/_layouts/15/epmlive/images/mywork/comment-small.png\" border=\"0\"></a>";
+                val = val + "&nbsp;<a href=\"javascript:GridComments('" + grid.id + "','" + row.id + "');\"><img src=\"/_layouts/15/epmlive/images/mywork/comment-small.png\" border=\"0\"></a>";
             }
             else if (grid.GetValue(row, "HasComments") == "2") {
-                val = val + "&nbsp;<a href=\"javascript:GridComments('" + grid.id + "','" + row.id + "');return false;\"><img src=\"/_layouts/15/epmlive/images/mywork/commentsnew-small.png\" border=\"0\"></a>";
+                val = val + "&nbsp;<a href=\"javascript:GridComments('" + grid.id + "','" + row.id + "');\"><img src=\"/_layouts/15/epmlive/images/mywork/commentsnew-small.png\" border=\"0\"></a>";
             }
 
             if (grid.GetValue(row, "wsurl") != "") {
