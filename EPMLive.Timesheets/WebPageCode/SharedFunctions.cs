@@ -498,7 +498,7 @@ namespace TimeSheets
             if (editEvents != "true")
                 disabled = "disabled=\"true\"";
 
-            sb.Append("<div id=\"timeeditorgrid" + sFullGridId + "\" style=\"display:none; border: 1px solid #808080; padding: 3px; background-color: #F9F9F9; width:200px; Z-Index:99;\">");
+            sb.Append("<div id=\"timeeditorgrid" + sFullGridId + "\" style=\"display:none; border: 1px solid #808080; padding: 3px; background-color: #F9F9F9; width:215px; Z-Index:99;\">");
             sb.Append("<Table>");
             sb.Append("<tr><td class=\"ms-descriptiontext\"><b><div id=\"timeeditortitle" + sFullGridId + "\" class=\"ms-descriptiontext\"></div></td></tr>");
             sb.Append("<tr><td class=\"ms-descriptiontext\"><b><div id=\"timeeditordate" + sFullGridId + "\" class=\"ms-descriptiontext\"></div></td></tr>");

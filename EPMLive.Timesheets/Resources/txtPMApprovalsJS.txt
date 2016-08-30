@@ -230,7 +230,9 @@ function eXcell_timeeditor(cell)
         {
 			if(mygrid#gridid#.getColumnId(i) == "<![CDATA[Title]]>")
 			{
-				document.getElementById("timeeditortitle#gridid#").innerHTML = mygrid#gridid#.cells(sRow,i).getValue();
+				var taskTitle = mygrid#gridid#.cells(sRow,i).cell.innerText;
+				if(taskTitle != "" || taskTitle != null)
+					document.getElementById("timeeditortitle#gridid#").innerHTML = taskTitle;
 			}
         }
 		
