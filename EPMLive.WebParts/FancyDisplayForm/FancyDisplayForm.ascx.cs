@@ -867,7 +867,16 @@ namespace EPMLiveWebParts
 		{
 
 			sbItemDetailsContent.Append("<table style='width:100%'>");
-			sbItemDetailsContent.Append("<tr colspan='2'>");
+            if (item.ParentList.EnableVersioning)
+            {
+                sbItemDetailsContent.Append("<tr colspan='2'>");
+                if (SPContext.Current.ListItemVersion == null)
+                    sbItemDetailsContent.Append("<td>Version: " + item.Versions[0].VersionLabel.ToString() + "</td>");
+                else
+                    sbItemDetailsContent.Append("<td>Version: " + SPContext.Current.ListItemVersion.VersionLabel.ToString() + "</td>");
+                sbItemDetailsContent.Append("</tr>");
+            }
+            sbItemDetailsContent.Append("<tr colspan='2'>");
 			sbItemDetailsContent.Append("<td>Created " + GetFormattedDateTime((DateTime)(item[SPBuiltInFieldId.Created])) + " by " + ((SPField)item.Fields[SPBuiltInFieldId.Author]).GetFieldValueAsHtml(item[SPBuiltInFieldId.Author]) + "</td>");
 			sbItemDetailsContent.Append("</tr>");
 			sbItemDetailsContent.Append("<tr colspan='2'>");
