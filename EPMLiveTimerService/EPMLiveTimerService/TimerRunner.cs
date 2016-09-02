@@ -14,37 +14,39 @@ namespace TimerService
     public class TimerRunner
     {
         private static BackgroundWorker bw;
+        private static BackgroundWorker bw1;
+        private static BackgroundWorker bw2;
         private static BackgroundWorker bwSec;
         private static BackgroundWorker bwTimerJobs;
         private static BackgroundWorker bwNotificationsJobs;
         private static BackgroundWorker bwIntegrationJobs;
-        private static BackgroundWorker bwActivity;
+        //private static BackgroundWorker bwActivity;  //Not in Use
 
         public bool startTimer()
         {
             try
             {
                 //=========================Run Main Queue
-                bw = new BackgroundWorker();
-                bw.WorkerReportsProgress = true;
-                bw.WorkerSupportsCancellation = true;
+                bw1 = new BackgroundWorker();
+                bw1.WorkerReportsProgress = true;
+                bw1.WorkerSupportsCancellation = true;
 
-                bw.DoWork += bw_DoWork;
+                bw1.DoWork += bw_DoWork;
                 //bw.ProgressChanged += bw_ProgressChanged;
-                bw.RunWorkerCompleted += bw_RunWorkerCompleted;
+                bw1.RunWorkerCompleted += bw_RunWorkerCompleted;
 
-                bw.RunWorkerAsync();
+                bw1.RunWorkerAsync();
 
                 Thread.Sleep(1000);
 
                 //=========================Run High Priority Queue
-                bw = new BackgroundWorker();
-                bw.WorkerReportsProgress = true;
-                bw.WorkerSupportsCancellation = true;
+                bw2 = new BackgroundWorker();
+                bw2.WorkerReportsProgress = true;
+                bw2.WorkerSupportsCancellation = true;
 
-                bw.DoWork += bw_HighDoWork;
+                bw2.DoWork += bw_HighDoWork;
 
-                bw.RunWorkerAsync();
+                bw2.RunWorkerAsync();
 
                 Thread.Sleep(1000);
 
@@ -174,6 +176,12 @@ namespace TimerService
             try
             {
                 bw.CancelAsync();
+                bw1.CancelAsync();
+                bw2.CancelAsync();
+                bwSec.CancelAsync();
+                bwTimerJobs.CancelAsync();
+                bwNotificationsJobs.CancelAsync();
+                bwIntegrationJobs.CancelAsync();
                 return true;
             }
             catch (Exception)
@@ -190,7 +198,7 @@ namespace TimerService
                 while (true)
                 {
                     mc.runTimer();
-                    if (bw.CancellationPending)
+                    if (bw1.CancellationPending)
                     {
                         mc.stopTimer();
                         e.Cancel = true;
@@ -220,7 +228,7 @@ namespace TimerService
                 while (true)
                 {
                     mc.runTimer();
-                    if (bw.CancellationPending)
+                    if (bw2.CancellationPending)
                     {
                         mc.stopTimer();
                         e.Cancel = true;
