@@ -1362,8 +1362,21 @@ function DeleteTasks() {
         if (selRows.length > 0) {
             if (confirm("Are you sure you want to delete those task(s)?")) {
                 var delRows = [];
+
                 for (var i = 0; i < selRows.length; i++) {
+                    var sDs = grid.GetValue(selRows[i], "Predecessors").toString().split(';');
+
+                    if (sDs == "")
+                        var sDs = grid.GetValue(selRows[i], "PredecessorsOrig").toString().split(';');
+
+                    for (var sD in sDs) {
+                        var rId = sDs[sD];
+                        var iRow = grid.GetRowById(parseFloat(rId));
+                        if (iRow)
+                            grid.SetValue(iRow, "Descendants", RemoveDescen(selRows[i].id, iRow), 1);
+                    }
                     delRows.push(selRows[i].id);
+                    grid.SetValue(selRows[i], "Predecessors", "", 1);
                 }
 
                 for (var i = 0; i < delRows.length; i++) {
@@ -1376,11 +1389,32 @@ function DeleteTasks() {
                         grid.RemoveRow(row);
                     } catch (e) { }
                 }
+                grid.ActionCorrectAllDependencies();
             }
 
         }
     }
 }
+
+function RemoveDescen(parentid, row) {
+    var grid = Grids.WorkPlannerGrid;
+
+    var pId = row.Descendants.toString();
+    var pIds = pId.split(";");
+    pId = "";
+
+    pId = pIds.filter(function (val) {
+        var dep = getDependencyArray(val)[0];
+        if (dep != parentid.toString())
+            return val;
+    }).join(';');
+
+    if (pId != "")
+        return pId;
+    else
+        return "";
+}
+
 function EditView() {
     Grids.WorkPlannerGrid.ActionBlur();
 
