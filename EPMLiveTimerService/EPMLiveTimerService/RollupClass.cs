@@ -11,7 +11,6 @@ using System.Data;
 using System.IO;
 using System.Reflection;
 using System.Xml;
-using System.Web.Script.Serialization;
 
 namespace TimerService
 {
@@ -193,7 +192,7 @@ namespace TimerService
             }
             catch (Exception ex)
             {
-                logMessage("ERR", "RUNT", new JavaScriptSerializer().Serialize(ex));
+                logMessage("ERR", "RUNT", ex.ToString());
             }
         }
 
