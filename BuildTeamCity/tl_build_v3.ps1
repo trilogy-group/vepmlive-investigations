@@ -16,12 +16,12 @@ param (
     [string]$CleanBuild = $true
 );
 
-$projectsToBePackaged = @("EPMLive.Core","EPMLive.Dashboards","EPMLive.IntegrationService",
-                            "EPMLive.ProjectServer","EPMLive.Reporting","EPMLive.Synch",
-                            "EPMLive.TimeSheets","EPMLive.WebParts","EPMLive.WorkPlanner","EPMLive.WorkEngine")
+$projectsToBePackaged = @("EPMLiveCore","EPMLiveDashboards","EPMLiveIntegrationService",
+                            "EPMLivePS","EPMLiveReporting","EPMLiveSynch",
+                            "EPMLiveTimeSheets","EPMLiveWebParts","EPMLiveWorkPlanner","WorkEnginePPM")
 
-$projectsToBeBuildAsEXE = @("EPMLive.TimerService", "EPMLive.QueueManager")
-$projectsToBeBuildAsDLL = @("EPMLive.PortfolioEngine","EPMLive.Integration.Misc","EPMLive.Integration", "EPMLive.Installer.UserNameChecker")
+$projectsToBeBuildAsEXE = @("EPMLiveTimerService", "EPK_QueueMgr")
+$projectsToBeBuildAsDLL = @("PortfolioEngineCore","UplandIntegrations","EPMLiveIntegration", "UserNameChecker")
 
 $projectTypeIdTobeReplaced = "C1CDDADD-2546-481F-9697-4EA41081F2FC"
 $projectTypeIdTobeReplacedWith = "BB1F664B-9266-4fd6-B973-E1E44974B511"
@@ -55,6 +55,42 @@ function Log-Message($msg) {
 	Write-Host $msg
 }
 
+#
+# This script will increment the build number in an AssemblyInfo.cs file
+#
+function UpdateCommonAssemblyInfo($SourcesDirectoryPath) {
+
+    $assemblyInfoPath = Join-Path $SourcesDirectoryPath "CommonAssemblyInfo.cs"
+
+    $contents = [System.IO.File]::ReadAllText($assemblyInfoPath)
+
+    $versionString = [RegEx]::Match($contents,"(AssemblyFileVersion\("")(?:\d+\.\d+\.\d+\.\d+)(""\))")
+    Write-Host ("AssemblyFileVersion: " + $versionString)
+
+    $releaseversionString = [RegEx]::Match($contents,"((?:\d+\.\d+\.\d+\.\d+))")
+    Write-Host ("Release Version: " + $releaseversionString)
+
+    #Parse out the current build number from the AssemblyFileVersion
+    $currentBuild = [RegEx]::Match($versionString,"(\.)(\d+)(""\))").Groups[2]
+    Write-Host ("Current Build: " + $currentBuild.Value)
+
+    #Increment the build number
+    $newBuild= [int]$currentBuild.Value +  1
+    Write-Host ("New Build: " + $newBuild)
+
+
+    $NewReleaseNumber = [RegEx]::Replace($releaseversionString, "(\d+\.\d+\.\d+\.)(?:\d+)", ("`${1}" + $newBuild.ToString()))
+    Write-Host ("New Release Number: " + $NewReleaseNumber)
+
+    #update AssemblyFileVersion, then write to file
+    Write-Host ("Setting version in assembly info file ")
+    $contents = [RegEx]::Replace($contents, "(AssemblyFileVersion\(""\d+\.\d+\.\d+\.)(?:\d+)(""\))", ("`${1}" + $newBuild.ToString() + "`${2}"))
+    Write-Host $contents
+    [System.IO.File]::WriteAllText($assemblyInfoPath, $contents)
+
+    return $NewReleaseNumber
+}
+
 function ZipFiles( $zipfilename, $sourcedir )
 {
    Log-SubSection "Zipping $sourcedir to $zipfilename"
@@ -79,10 +115,8 @@ $VSTestExec = "C:\Program Files (x86)\Microsoft Visual Studio 11.0\Common7\IDE\C
 # Initialize Sources Directory
 $SourcesDirectory = "$ScriptDir\..\"
 
-$NewReleaseNumber = "1.0.0.0"
-if (Test-Path env:\build_number){
-    $NewReleaseNumber = $env:build_number
-}
+#Update the CommonAssemblyInfo.cs file with latest build number
+$NewReleaseNumber = UpdateCommonAssemblyInfo($SourcesDirectory)
 
 # Directory for outputs
 $OutputDirectory = Join-Path $BuildDirectory "output"
@@ -211,7 +245,7 @@ if (!(Test-Path -Path $BinariesDirectory)){
 Log-Section "Packaging Projects . . ."
 foreach($projectToBePackaged in $projectsToBePackaged){
     
-    $projectPath = Get-ChildItem -Path ($SourcesDirectory + "\*") -Include ($projectToBePackaged + ".csproj") -Recurse
+    $projectPath = Get-ChildItem -Path ($SourcesDirectory + "\*") -Include ($projectToBePackaged + ".*proj") -Recurse
 
     #Log-SubSection "Patching Project Type GUID '$projectToBePackaged'...."
     
@@ -244,7 +278,7 @@ foreach($projectToBePackaged in $projectsToBePackaged){
 Log-Section "Building Windows Services Projects . . ."
 foreach($projectToBeBuildAsEXE in $projectsToBeBuildAsEXE){
     
-    $projectPath = Get-ChildItem -Path ($SourcesDirectory + "\*") -Include ($projectToBeBuildAsEXE + ".csproj") -Recurse
+    $projectPath = Get-ChildItem -Path ($SourcesDirectory + "\*") -Include ($projectToBeBuildAsEXE + ".*proj") -Recurse
 
     Log-SubSection "Building '$projectToBeBuildAsEXE'..."
 	Log-SubSection "projectPath: '$projectPath'...."
@@ -272,7 +306,7 @@ foreach($projectToBeBuildAsEXE in $projectsToBeBuildAsEXE){
 Log-Section "Building DLL Services Projects . . ."
 foreach($projectToBeBuildAsDLL in $projectsToBeBuildAsDLL){
     
-    $projectPath = Get-ChildItem -Path ($SourcesDirectory + "\*") -Include ($projectToBeBuildAsDLL + ".csproj") -Recurse
+    $projectPath = Get-ChildItem -Path ($SourcesDirectory + "\*") -Include ($projectToBeBuildAsDLL + ".*proj") -Recurse
 
     Log-SubSection "Building '$projectToBeBuildAsDLL'..."
 	Log-SubSection "projectPath: '$projectPath'...."
@@ -335,7 +369,7 @@ Get-ChildItem -Path ($ProductOutput + "\*")  -Include "EPMLiveTimerService.exe" 
 
 
 Log-Section "Zipping"
-Rename-Item -Path "$BinariesDirectory\_PublishedWebsites\EPMLive.IntegrationService" -NewName "api"
+Rename-Item -Path "$BinariesDirectory\_PublishedWebsites\EPMLiveIntegrationService" -NewName "api"
 ZipFiles "$SourcesDirectory\InstallShield\Build Dependencies\api.zip"  "$BinariesDirectory\_PublishedWebsites\api"
 
 Log-Section "Install Shield"
