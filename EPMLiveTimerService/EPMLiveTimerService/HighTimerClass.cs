@@ -37,7 +37,7 @@ namespace TimerService
 
             public bool add(BackgroundWorker newBw)
             {
-                for (int i = 0; i < _maxThreads;i++ )
+                for (int i = 0; i < _maxThreads; i++)
                 {
                     if (_arrWorkers[i] == null)
                     {
@@ -108,7 +108,7 @@ namespace TimerService
 
             logMessage("INIT", "STMR", "Clearing Queue");
 
-            foreach(SPWebApplication webApp in SPWebService.ContentService.WebApplications)
+            foreach (SPWebApplication webApp in SPWebService.ContentService.WebApplications)
             {
                 var sConn = EPMLiveCore.CoreFunctions.getConnectionString(webApp.Id);
                 if (sConn != "")
@@ -206,7 +206,7 @@ namespace TimerService
             }
             catch (Exception ex)
             {
-                logMessage("ERR", "RUNT", ex.Message);
+                logMessage("ERR", "RUNT", ex.ToString());
             }
         }
 
@@ -271,71 +271,71 @@ namespace TimerService
         {
             //try
             //{
-                using(SPSite site = new SPSite(new Guid(dr["siteguid"].ToString())))
+            using (SPSite site = new SPSite(new Guid(dr["siteguid"].ToString())))
+            {
+                using (SPWeb web = site.OpenWeb(new Guid(dr["webguid"].ToString())))
                 {
-                    using(SPWeb web = site.OpenWeb(new Guid(dr["webguid"].ToString())))
+                    MethodInfo m;
+
+                    Assembly assemblyInstance = Assembly.Load(dr["NetAssembly"].ToString());
+                    Type thisClass = assemblyInstance.GetType(dr["NetClass"].ToString());
+                    object classObject = Activator.CreateInstance(thisClass);
+
+                    thisClass.GetField("JobUid").SetValue(classObject, new Guid(dr["timerjobuid"].ToString()));
+                    thisClass.GetField("QueueUid").SetValue(classObject, new Guid(dr["queueuid"].ToString()));
+                    thisClass.GetField("queuetype").SetValue(classObject, int.Parse(dr["jobtype"].ToString()));
+                    try
                     {
-                        MethodInfo m;
 
-                        Assembly assemblyInstance = Assembly.Load(dr["NetAssembly"].ToString());
-                        Type thisClass = assemblyInstance.GetType(dr["NetClass"].ToString());
-                        object classObject = Activator.CreateInstance(thisClass);
-
-                        thisClass.GetField("JobUid").SetValue(classObject, new Guid(dr["timerjobuid"].ToString()));
-                        thisClass.GetField("QueueUid").SetValue(classObject, new Guid(dr["queueuid"].ToString()));
-                        thisClass.GetField("queuetype").SetValue(classObject, int.Parse(dr["jobtype"].ToString()));
-                        try
-                        {
-
-                            thisClass.GetField("ListUid").SetValue(classObject, new Guid(dr["listguid"].ToString()));
-                        }
-                        catch { }
-                        try
-                        {
-                            thisClass.GetField("ItemID").SetValue(classObject, int.Parse(dr["itemid"].ToString()));
-                        }
-                        catch { }
-
-                        try
-                        {
-                            thisClass.GetField("userid").SetValue(classObject, int.Parse(dr["userid"].ToString()));
-                        }
-                        catch { } 
-                        
-                        try
-                        {
-                            thisClass.GetField("key").SetValue(classObject, dr["key"].ToString());
-                        }
-                        catch { }
-
-                        try
-                        {
-                            XmlDocument doc = new XmlDocument();
-                            doc.LoadXml(dr["jobdata"].ToString());
-                            thisClass.GetField("DocData").SetValue(classObject, doc);
-                        }
-                        catch { }
-
-                        m = thisClass.GetMethod("initJob");
-                        bool bInit = (bool)m.Invoke(classObject, new object[] { site });
-
-                        try
-                        {
-
-                            m = thisClass.GetMethod("execute");
-                            m.Invoke(classObject, new object[] { site, web, dr["jobdata"].ToString() });
-
-                        }
-                        catch(Exception ex)
-                        {
-                            thisClass.GetField("bErrors").SetValue(classObject, true);
-                            thisClass.GetField("sErrors").SetValue(classObject, "General Error: " + ex.Message);
-                        }
-
-                        m = thisClass.GetMethod("finishJob");
-                        m.Invoke(classObject, new object[] { });
+                        thisClass.GetField("ListUid").SetValue(classObject, new Guid(dr["listguid"].ToString()));
                     }
+                    catch { }
+                    try
+                    {
+                        thisClass.GetField("ItemID").SetValue(classObject, int.Parse(dr["itemid"].ToString()));
+                    }
+                    catch { }
+
+                    try
+                    {
+                        thisClass.GetField("userid").SetValue(classObject, int.Parse(dr["userid"].ToString()));
+                    }
+                    catch { }
+
+                    try
+                    {
+                        thisClass.GetField("key").SetValue(classObject, dr["key"].ToString());
+                    }
+                    catch { }
+
+                    try
+                    {
+                        XmlDocument doc = new XmlDocument();
+                        doc.LoadXml(dr["jobdata"].ToString());
+                        thisClass.GetField("DocData").SetValue(classObject, doc);
+                    }
+                    catch { }
+
+                    m = thisClass.GetMethod("initJob");
+                    bool bInit = (bool)m.Invoke(classObject, new object[] { site });
+
+                    try
+                    {
+
+                        m = thisClass.GetMethod("execute");
+                        m.Invoke(classObject, new object[] { site, web, dr["jobdata"].ToString() });
+
+                    }
+                    catch (Exception ex)
+                    {
+                        thisClass.GetField("bErrors").SetValue(classObject, true);
+                        thisClass.GetField("sErrors").SetValue(classObject, "General Error: " + ex.Message);
+                    }
+
+                    m = thisClass.GetMethod("finishJob");
+                    m.Invoke(classObject, new object[] { });
                 }
+            }
             //}
             //catch(Exception ex)
             //{

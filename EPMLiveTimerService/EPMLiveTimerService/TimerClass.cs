@@ -212,7 +212,7 @@ namespace TimerService
             }
             catch (Exception ex)
             {
-                logMessage("ERR", "RUNT", ex.Message);
+                logMessage("ERR", "RUNT", ex.ToString());
             }
         }
 
