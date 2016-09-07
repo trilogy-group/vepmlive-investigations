@@ -3391,14 +3391,14 @@ var MyWorkGrid = {
             //    }, 500);
             //}
 
-            var tabGroup = document.getElementById('Ribbon.MyWorkContextualTabGroup');
-            if (!tabGroup) window.SelectRibbonTab('Ribbon.MyWorkTab', true);
-            else {
-                var $manageTab = $(document.getElementById('Ribbon.MyWorkTab-title'));
-                var $viewsTab = $(document.getElementById('Ribbon.MyWorkViewsTab-title'));
+            //var tabGroup = document.getElementById('Ribbon.MyWorkContextualTabGroup');
+            //if (!tabGroup) window.SelectRibbonTab('Ribbon.MyWorkTab', true);
+            //else {
+            //    var $manageTab = $(document.getElementById('Ribbon.MyWorkTab-title'));
+            //    var $viewsTab = $(document.getElementById('Ribbon.MyWorkViewsTab-title'));
 
-                if ($manageTab.attr('aria-selected') === 'false' && $viewsTab.attr('aria-selected') === 'false') window.SelectRibbonTab('Ribbon.MyWorkTab', true);
-            }
+            //    if ($manageTab.attr('aria-selected') === 'false' && $viewsTab.attr('aria-selected') === 'false') window.SelectRibbonTab('Ribbon.MyWorkTab', true);
+            //}
 
         }, 'sp.ribbon.js');
     }
