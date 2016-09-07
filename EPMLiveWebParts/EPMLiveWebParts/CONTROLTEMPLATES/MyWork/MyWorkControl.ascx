@@ -6,7 +6,30 @@
 <%@ Import Namespace="Microsoft.SharePoint" %>
 <%@ Register TagPrefix="WebPartPages" Namespace="Microsoft.SharePoint.WebPartPages" Assembly="Microsoft.SharePoint, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
 <%@ Control Language="C#" AutoEventWireup="true" CodeBehind="MyWorkControl.ascx.cs" Inherits="EPMLiveWebParts.CONTROLTEMPLATES.MyWork.MyWorkControl" %>
+<script>
+    setTimeout(function () {
+        var element = document.getElementById('Ribbon.Read-title').firstChild;
+        fireEvent(element, "click")
+    }, 1000)
 
+    function fireEvent(element, event) {
+        if (document.createEventObject) {
+            // dispatch for IE
+            var evt = document.createEventObject();
+            element.fireEvent('on' + event, evt)
+        }
+        else {
+            // dispatch for firefox + others
+            var evt = document.createEvent("HTMLEvents");
+            evt.initEvent(event, true, true); // event type,bubbling,cancelable
+            !element.dispatchEvent(evt);
+        }
+        setTimeout(function () {
+            window.SelectRibbonTab('Ribbon.MyWorkTab', true);
+        }, 3000);
+    }
+
+</script>
 <div id="EPMAllWork">
     <div id="MWG_Loader_<%= WebPartId %>" class="epmlive-loader"></div>
 
