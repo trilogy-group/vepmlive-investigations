@@ -441,7 +441,7 @@ namespace EPMLiveCore
                     {
                         extraParams += "&isDlg=" + Page.Request["IsDlg"];
                     }
-                    
+
                     writer.WriteLine("<script language=\"javascript\">");
                     //writer.WriteLine("WETitle = \"" + base.ListItem.Title.Replace("\"", "&quot;") + "\";");
                     writer.WriteLine("WETitle = \"" + HttpUtility.JavaScriptStringEncode(base.ListItem.Title) + "\";");
@@ -1170,6 +1170,23 @@ namespace EPMLiveCore
                             });
                         });
                          </script>");
+                    }
+                }
+                else
+                {
+                    if (this.list.BaseTemplate == SPListTemplateType.DocumentLibrary && base.ControlMode == SPControlMode.New)
+                    {
+                        writer.WriteLine(@"<script>
+
+                        $(document).ready(function() {
+                           if($('input[id$=SaveItem]').length > 1){                        
+                                $('.ms-formline').hide();
+                                $('input[id$=SaveItem]').last().hide();
+                                $('input[id$=GoBack]').last().hide();
+                            }
+                         });
+                         </script>");
+
                     }
                 }
             }
