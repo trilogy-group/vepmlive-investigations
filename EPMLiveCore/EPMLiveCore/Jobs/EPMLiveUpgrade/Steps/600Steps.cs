@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using EPMLiveCore.Jobs.EPMLiveUpgrade.Infrastructure;
+﻿using EPMLiveCore.Jobs.EPMLiveUpgrade.Infrastructure;
 using Microsoft.SharePoint;
-using System.Data.SqlClient;
+using System;
 using System.Data;
+using System.Data.SqlClient;
 
 namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
 {
@@ -69,26 +65,14 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
                             }
                             catch (Exception e)
                             {
-                                string message = e.InnerException != null
-                                    ? e.InnerException.Message
-                                    : e.Message;
-
-                                LogMessage(message, MessageKind.FAILURE, 4);
-                            }
-                            finally
-                            {
-                                sqlConnection.Close();
+                                LogMessage(e.ToString(), MessageKind.FAILURE, 4);
                             }
                         }
                     }
                 }
                 catch (Exception exception)
                 {
-                    string message = exception.InnerException != null
-                        ? exception.InnerException.Message
-                        : exception.Message;
-
-                    LogMessage(message, MessageKind.FAILURE, 4);
+                    LogMessage(exception.ToString(), MessageKind.FAILURE, 4);
                 }
             });
             return true;
