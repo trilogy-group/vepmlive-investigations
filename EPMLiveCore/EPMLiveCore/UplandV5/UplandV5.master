@@ -203,9 +203,9 @@
                             <div id="zendesk-container" class="epm-global-button-right">
                                 <a id="epm-support-link" href="https://community.uplandsoftware.com" target="_blank" data-toggle="tooltip" data-placement="bottom" data-delay="100" title="Help"><span class="fui-question"></span></a>
                             </div>
-                            <div id="uv-container" class="epm-global-button-right">
+                            <%--<div id="uv-container" class="epm-global-button-right">
                                 <a href="http://ideas.epmlive.com" title="Provide Feedback" data-toggle="tooltip" data-placement="bottom" data-delay="100" target="_blank"><span class="icon-bullhorn"></span></a>
-                            </div>
+                            </div>--%>
                             <!-- Notification Counter -->
                             <div id="EPMLiveNCWrap" class="ms-tableCell ms-verticalAlignMiddle">
                                 <epm:NotificationCounterV2 runat="server"></epm:NotificationCounterV2>

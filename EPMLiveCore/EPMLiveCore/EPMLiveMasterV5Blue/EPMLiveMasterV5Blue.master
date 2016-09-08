@@ -242,7 +242,7 @@
                                     AccessKey=""
                                     ToolTip="Support Community" />
                             </span>
-                            <span id="ms-helpFeedback">
+                           <%-- <span id="ms-helpFeedback">
                                 <SharePoint:ThemedClusteredHoverImage
                                     runat="server"
                                     ID="TopHelpLinkFeedback"
@@ -267,7 +267,7 @@
                                     AlternateText=""
                                     AccessKey=""
                                     ToolTip="Provide Feedback" />
-                            </span>
+                            </span>--%>
                             <span id="ms-myworkspace">
                                 <epm:SiteNavigationRibbonButton
                                     runat="server"
