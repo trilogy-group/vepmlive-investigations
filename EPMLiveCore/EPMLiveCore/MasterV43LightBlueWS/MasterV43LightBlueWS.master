@@ -605,7 +605,7 @@ top: -1px !important;
  ​
 				<div class="s4-trc-container-menu" id="searchicon"><a href="#" rel="tooltipbottom" title="Search"><img src="/_layouts/epmlive/images/search.png" style="padding-right:5px;border:none;padding-top:1px;" /></a></div>
 				<div class="s4-trc-container-menu"><a href="http://support.epmlive.com" target="_blank" rel="tooltipbottom" title="Support Community"><img src="/_layouts/epmlive/images/Question.png" style="padding-right:3px;border:none;" /></a></div>
-                <div class="s4-trc-container-menu"><a href="javascript:UserVoice.showPopupWidget();" title="Provide Feedback" rel="tooltipbottom"><img src="/_layouts/epmlive/images/Bullhorn.png" style="padding-top:3px;border:none;padding-right:4px;" /></a></div>
+                <%--<div class="s4-trc-container-menu"><a href="javascript:UserVoice.showPopupWidget();" title="Provide Feedback" rel="tooltipbottom"><img src="/_layouts/epmlive/images/Bullhorn.png" style="padding-top:3px;border:none;padding-right:4px;" /></a></div>--%>
 
 				<div class="s4-trc-container-menu">
 				<epm:SiteNavigationRibbonButton runat="server"></epm:SiteNavigationRibbonButton>
