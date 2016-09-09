@@ -30,14 +30,13 @@ namespace EPMLiveWebParts.Layouts.epmlive
                             {
                                 SPAttachmentCollection attach = thisItem.Attachments;
                                 HttpFileCollection uploadedFiles = Request.Files;
-                                Byte[] attachmentContent;
                                 for (int i = 0; i < uploadedFiles.Count; i++)
                                 {
                                     HttpPostedFile userPostedFile = uploadedFiles[i];
                                     String fileName = userPostedFile.FileName;
                                     using (Stream attachmentStream = userPostedFile.InputStream)
                                     {
-                                        attachmentContent = new Byte[attachmentStream.Length];
+                                        Byte[] attachmentContent = new Byte[attachmentStream.Length];
                                         attachmentStream.Read(attachmentContent, 0, (int)attachmentStream.Length);
                                         attach.Add(fileName, attachmentContent);
                                     }
