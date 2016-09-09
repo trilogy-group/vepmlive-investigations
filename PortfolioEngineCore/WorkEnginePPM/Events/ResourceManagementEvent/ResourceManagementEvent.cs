@@ -34,6 +34,7 @@ namespace WorkEnginePPM.Events
                                             out rate, false);
 
                 CalculateResourceAvailabilities(properties.ListItem["EXTID"].ToString(), spWeb);
+                UpdateUser(properties);
             }
             catch (Exception exception)
             {
@@ -190,6 +191,7 @@ namespace WorkEnginePPM.Events
             try
             {
                 CalculateResourceAvailabilities(properties.ListItem["EXTID"].ToString(), properties.Web);
+                UpdateUser(properties);
             }
             catch (Exception exception)
             {
@@ -218,6 +220,58 @@ namespace WorkEnginePPM.Events
             }
         }
 
+        public static void UpdateUser(SPItemEventProperties properties)
+        {
+            using (SPWeb spWeb = properties.OpenWeb())
+            {
+                SPFieldUserValue user = new SPFieldUserValue(spWeb, properties.ListItem["SharePointAccount"].ToString());
+                if (user.LookupId == spWeb.Site.SystemAccount.ID)
+                    return;
+                SPList myList = spWeb.Lists["Resources"];
+
+                SPQuery curQry = new SPQuery();
+                //Get resource with Sp Account Id       					
+                string query = string.Format(@"<Where><Eq><FieldRef Name='SharePointAccount' LookupId='TRUE'/><Value Type='Integer'>{0}</Value></Eq></Where>", user.LookupId);
+                curQry.Query = query;
+                string UserName = string.Empty;
+                if (myList != null && myList.ItemCount > 0)
+                {
+                    if (myList.Fields.ContainsField("UserHasPermission"))
+                    {
+                        SPListItemCollection myItems = myList.GetItems(curQry);
+                        foreach (SPListItem item in myItems)
+                        {
+                            if (Convert.ToString(item["Generic"]).ToUpper() == "YES")
+                            {
+                                return;
+                            }
+
+                            int ResourceLevel = Convert.ToInt32(item["ResourceLevel"]);
+                            bool ResourceLevelPermission = false;
+                            if (ResourceLevel == 2 || ResourceLevel == 3 || item["ResourceLevel"] == null)//null and 2 for full permission 3 for project Manger and null for Developemnt
+                                ResourceLevelPermission = true;
+
+                            if (user.User.LoginName.IndexOf("|") != -1)
+                            {
+                                UserName = user.User.LoginName.Split('|')[1];
+                            }
+                            else
+                            {
+                                UserName = user.User.LoginName;
+                            }
+                            string basePath = CoreFunctions.getConfigSetting(spWeb, "epkbasepath");
+                            bool ResourcePlanPermission = EPMLiveCore.Utilities.CheckEditResourcePlanPermission(basePath, UserName) && ResourceLevelPermission;
+                            var newitem = EPMLiveCore.Utilities.ReloadListItem(item);
+                            newitem["UserHasPermission"] = ResourcePlanPermission;
+                            using (var scope = new DisabledItemEventScope())
+                            {
+                                newitem.SystemUpdate(false);// false will prevent to update version number and save conflict
+                            }
+                        }
+                    }
+                }
+            }
+        }
         #endregion Methods
     }
 }

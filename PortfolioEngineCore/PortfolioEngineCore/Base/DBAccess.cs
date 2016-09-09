@@ -15,7 +15,7 @@ namespace PortfolioEngineCore
 
     }
 
-    public class SqlDb
+    public class SqlDb : IDisposable
     {
         private string m_sConnect = string.Empty;
         private string m_sEPKUID = string.Empty;
@@ -59,7 +59,7 @@ namespace PortfolioEngineCore
                     var dbConnectionStringBuilder = new DbConnectionStringBuilder { ConnectionString = m_sConnect };
                     dbConnectionStringBuilder.Remove("Provider");
                     //if (m_sEPKUID == "")
-                        m_oConnection.ConnectionString = dbConnectionStringBuilder.ToString() + ";Application Name=PortfolioEngine";
+                    m_oConnection.ConnectionString = dbConnectionStringBuilder.ToString() + ";Application Name=PortfolioEngine";
                     //else
                     //    m_oConnection.ConnectionString = dbConnectionStringBuilder.ToString() + ";UID=" + m_sEPKUID + ";PWD=" + m_sEPKPWD + ";Application Name=PortfolioEngine";
 
@@ -675,7 +675,7 @@ namespace PortfolioEngineCore
         {
             if (!obj.Equals(System.DBNull.Value))
             {
-                 try { return Convert.ToInt32(obj); } catch{return 0;}
+                try { return Convert.ToInt32(obj); } catch { return 0; }
             }
             return 0;
         }
@@ -729,6 +729,11 @@ namespace PortfolioEngineCore
             xReply.CreateString("message", message);
             xReply.CreateString("trace", trace);
             return xReply.XML();
+        }
+
+        public void Dispose()
+        {
+            Close();
         }
     }
 }

@@ -1,9 +1,11 @@
-﻿using Microsoft.Win32;
+﻿using Microsoft.SharePoint;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 using System.Web;
@@ -185,7 +187,27 @@ namespace EPMLiveCore
             }
             return key;
         }
+        public static bool CheckEditResourcePlanPermission(string basepath, string username)
+        {
+            var args = new object[] { basepath, username };
+            Assembly assembly =
+            Assembly.Load("PortfolioEngineCore, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5");
+            Type type = assembly.GetType("PortfolioEngineCore.Utilities", true, true);
+            return (bool)type.GetMethod("CheckEditResourcePlanPermission", BindingFlags.Public | BindingFlags.Static).Invoke(null, args);
 
+        }
+        /// <summary>
+        /// To Resolve Save Conflict
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
+        public static SPListItem ReloadListItem(SPListItem item)
+        {
+            if (item == null)
+                return null;
+
+            return item.ParentList.GetItemByUniqueId(item.UniqueId);
+        }
         #endregion Methods
     }
 }

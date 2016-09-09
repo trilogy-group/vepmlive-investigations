@@ -194,7 +194,19 @@ namespace PortfolioEngineCore
             return connectionString;
         }
         //End EPML-4761
+        //Start EPML-4757
+        public static bool CheckEditResourcePlanPermission(string basepath, string username)
+        {
+            string ConnectionString = Utilities.GetConnectionString(basepath);
+            using (DBAccess dba = new DBAccess(ConnectionString))
+            {
+                dba.Open();
+                int resId = Utilities.ResolveNTNameintoWResID(dba.Connection, username);
+                return Security.CheckUserGlobalPermission(dba, resId, GlobalPermissionsEnum.gpResourcePlan);
+            }
 
+        }
+        //End EPML-4757
         #endregion Methods
     }
 }

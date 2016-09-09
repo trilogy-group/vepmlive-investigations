@@ -1947,7 +1947,24 @@ namespace EPMLiveCore.API
                             if (assn.Member.GetType() == typeof(Microsoft.SharePoint.SPGroup))
                             {
                                 SPGroup group = (SPGroup)assn.Member;
-
+                                bool UserHasPermission = false;
+                                string basePath = CoreFunctions.getConfigSetting(oWeb, "epkbasepath");
+                                SPList myList = oWeb.Lists["Resources"];
+                                SPQuery curQry = new SPQuery();
+                                //Get resource with Sp Account Id       					
+                                string query = string.Format(@"<Where><Eq><FieldRef Name='SharePointAccount' LookupId='TRUE'/><Value Type='Integer'>{0}</Value></Eq></Where>", oWeb.CurrentUser.ID);
+                                curQry.Query = query;
+                                if (myList != null && myList.ItemCount > 0)
+                                {
+                                    SPListItemCollection myItems = myList.GetItems(curQry);
+                                    if (myItems.Count > 0)
+                                    {
+                                        if (myItems.Fields.ContainsField("UserHasPermission"))
+                                            UserHasPermission = Convert.ToBoolean(myItems[0]["UserHasPermission"]);
+                                        else
+                                            UserHasPermission = true;
+                                    }
+                                }
                                 if (group.CanCurrentUserEditMembership)
                                 {
                                     if (!idArrays.Contains(Convert.ToString(group.ID)))
@@ -1958,8 +1975,20 @@ namespace EPMLiveCore.API
                                         }
                                         else
                                         {
-                                            enums += "|" + group.Name;
-                                            enumkeys += "|" + group.ID;
+                                            if (group.Name.ToUpper().Contains("OWNER"))
+                                            {
+                                                if (UserHasPermission || group.Owner.ID == oWeb.CurrentUser.ID || oWeb.CurrentUser.IsSiteAdmin)
+                                                {
+                                                    enums += "|" + group.Name;
+                                                    enumkeys += "|" + group.ID;
+                                                }
+                                            }
+                                            else
+                                            {
+
+                                                enums += "|" + group.Name;
+                                                enumkeys += "|" + group.ID;
+                                            }
                                         }
                                     }
                                 }
