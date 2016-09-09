@@ -73,7 +73,7 @@
     function openDialog() {
         var options =
         {
-            url: $("#<%= hiddenWebUrl.ClientID %>").val() + "/_layouts/AttachFile.aspx?ListId=" + $("#<%= hiddenListId.ClientID %>").val() + "&ItemId=" + $("#<%= hiddenItemId.ClientID %>").val() + "&isdlg=1&Source=" + $("#<%= hiddenSourceUrl.ClientID %>").val(),
+            url: $("#<%= hiddenWebUrl.ClientID %>").val() + "/_layouts/epmlive/AttachFileMulti.aspx?ListId=" + $("#<%= hiddenListId.ClientID %>").val() + "&ItemId=" + $("#<%= hiddenItemId.ClientID %>").val() + "&isdlg=1&Source=" + $("#<%= hiddenSourceUrl.ClientID %>").val(),
             width: 325,
             height: 155,
             title: "Attach File",

@@ -250,6 +250,13 @@
     <Compile Include="Layouts\epmlive\AssignmentPlanner.aspx.designer.cs">
       <DependentUpon>AssignmentPlanner.aspx.cs</DependentUpon>
     </Compile>
+    <Compile Include="Layouts\epmlive\AttachFileMulti.aspx.cs">
+      <DependentUpon>AttachFileMulti.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Layouts\epmlive\AttachFileMulti.aspx.designer.cs">
+      <DependentUpon>AttachFileMulti.aspx.cs</DependentUpon>
+    </Compile>
     <Compile Include="Layouts\epmlive\Calendar.aspx.cs">
       <DependentUpon>Calendar.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -900,6 +907,7 @@
     <Content Include="javascripts\libraries\moment-timezone.min.js" />
     <Content Include="javascripts\libraries\moment.min.js" />
     <Content Include="Layouts\epmlive\Admin\SSLogs.aspx" />
+    <Content Include="Layouts\epmlive\AttachFileMulti.aspx" />
     <Content Include="Layouts\epmlive\getgriditemsexport.aspx" />
     <Content Include="Layouts\epmlive\images\blank.gif" />
     <Content Include="Layouts\epmlive\images\default-avatar.png" />

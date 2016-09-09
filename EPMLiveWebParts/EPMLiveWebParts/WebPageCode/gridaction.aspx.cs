@@ -772,7 +772,7 @@ namespace EPMLiveWebParts
                         case "attachfile":
                             w = GetWeb(site);
                             {
-                                url = ((w.ServerRelativeUrl == "/") ? "" : w.ServerRelativeUrl) + "/_layouts/attachfile.aspx?ListId=" + Request["listid"] + "&ItemId=" + Request["ID"];
+                                url = ((w.ServerRelativeUrl == "/") ? "" : w.ServerRelativeUrl) + "/_layouts/epmlive/attachfilemulti.aspx?ListId=" + Request["listid"] + "&ItemId=" + Request["ID"];
                             }
                             w.Close();
                             break;

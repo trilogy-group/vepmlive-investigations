@@ -126,7 +126,7 @@ namespace EPMLiveWebParts.Layouts.epmlive
                         {
                             SPList spList = spWeb.Lists[listName];
                             redirectUrl = string.Format(
-                                @"{0}/_layouts/AttachFile.aspx?ListId={1}&ItemId={2}&IsDlg={3}", safeServerRelativeUrl,
+                                @"{0}/_layouts/epmlive/AttachFileMulti.aspx?ListId={1}&ItemId={2}&IsDlg={3}", safeServerRelativeUrl,
                                 spList.ID, id, isDlg);
                         }
                         break;

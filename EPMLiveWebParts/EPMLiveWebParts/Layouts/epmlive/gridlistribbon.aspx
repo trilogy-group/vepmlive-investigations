@@ -1550,6 +1550,16 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
         {
             window.open(weburl + "&IsDlg=1",'',config='toolbar=no, menubar=no, scrollbars=yes, resizable=yes,location=no, directories=no, status=yes');
         }
+        else if(action == "attachfile"){
+            var options =
+            {
+                url: weburl,
+                width: 325,
+                height: 155,
+                title: "Attach File(s)"
+            };
+            SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
+        }
         else
         {
             if( (action != "edit" && action != "view") || this.$Grid._usepopup)
