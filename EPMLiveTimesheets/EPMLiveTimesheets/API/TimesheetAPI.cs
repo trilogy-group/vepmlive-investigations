@@ -2039,7 +2039,7 @@ namespace TimeSheets
             ndB = docOut.FirstChild.SelectSingleNode("//B");
             EPMLiveCore.ReportHelper.MyWorkReportData rptData = new EPMLiveCore.ReportHelper.MyWorkReportData(web.Site.ID);
 
-            DataSet dsTS = iiGetTSData(cn, web, sPeriod, new Guid(tsuid), rptData);
+            DataSet dsTS = iiGetTSData(cn, web, sPeriod, new Guid(tsuid), rptData, string.Empty);
             TimesheetSettings settings = new TimesheetSettings(web);
             ArrayList arrPeriods = GetPeriodDaysArray(cn, settings, web, sPeriod);
             ArrayList arrLookups = new ArrayList();
@@ -2987,10 +2987,10 @@ namespace TimeSheets
             cmd.Parameters.AddWithValue("@uid", userid);
             cmd.ExecuteNonQuery();
 
-            return iiGetTSData(cn, web, sPeriod, tsuid, rptData);
+            return iiGetTSData(cn, web, sPeriod, tsuid, rptData, Convert.ToString(user.ID));
         }
 
-        private static DataSet iiGetTSData(SqlConnection cn, SPWeb web, string sPeriod, Guid tsuid, EPMLiveCore.ReportHelper.MyWorkReportData rptData)
+        private static DataSet iiGetTSData(SqlConnection cn, SPWeb web, string sPeriod, Guid tsuid, EPMLiveCore.ReportHelper.MyWorkReportData rptData, string userId)
         {            
             SqlCommand cmd = new SqlCommand("spTSGetTimesheet", cn);
             cmd.CommandType = CommandType.StoredProcedure;
@@ -3022,10 +3022,10 @@ namespace TimeSheets
                 {
                     if (string.IsNullOrEmpty(Convert.ToString(drItem["ASSIGNEDTOID"])))
                     {
-                        if (web.CurrentUser == null)
+                        if (string.IsNullOrEmpty(userId))
                             assignedToId = "-99";
                         else
-                            assignedToId = web.CurrentUser.ID.ToString();
+                            assignedToId = userId;
                     }
                     else
                     {
