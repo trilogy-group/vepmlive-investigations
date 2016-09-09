@@ -80,4 +80,131 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
 
         #endregion
     }
+    [UpgradeStep(Version = EPMLiveVersion.V600, Order = 1.0, Description = "Updating Resource table")]
+    internal class AddUpdateResourcePoolColumn : UpgradeStep
+    {
+        #region Constructors (1) 
+
+        public AddUpdateResourcePoolColumn(SPWeb spWeb, bool isPfeSite) : base(spWeb, isPfeSite) { }
+        private const string const_subKey = "SOFTWARE\\Wow6432Node\\EPMLive\\PortfolioEngine\\";
+
+        #endregion Constructors 
+
+        #region Overrides of UpgradeStep
+
+        public override bool Perform()
+        {
+            Guid webAppId = Web.Site.WebApplication.Id;
+
+            SPSecurity.RunWithElevatedPrivileges(() =>
+            {
+                try
+                {
+                    LogMessage("Connecting to the database . . .", 2);
+
+                    string connectionString = CoreFunctions.getReportingConnectionString(Web.Site.WebApplication.Id, Web.Site.ID);
+
+                    if (!CheckColumn())
+                    {
+                        AddColumn();
+                        LogMessage("UserHasPermission column added", MessageKind.SUCCESS, 4);
+                    }
+                    else
+                    {
+                        LogMessage("UserHasPermission column already exists", MessageKind.SKIPPED, 4);
+                    }
+                    LogMessage("Updating value to the database . . .", 2);
+                    PopulateColumn(CoreFunctions.getReportingConnectionString(webAppId, Web.Site.ID));
+                    //LogMessage("ASSIGNEDTOID column populated", MessageKind.SUCCESS, 4);
+                }
+                catch (Exception exception)
+                {
+                    LogMessage(exception.ToString(), MessageKind.FAILURE, 4);
+                }
+            });
+
+            return true;
+        }
+
+        private void AddColumn()
+        {
+            using (SPSite eleSite = new SPSite(Web.Url))
+            {
+                eleSite.AllowUnsafeUpdates = true;
+                using (SPWeb eleWeb = eleSite.OpenWeb())
+                {
+                    eleWeb.AllowUnsafeUpdates = true;
+                    SPList list = eleWeb.Lists["Resources"];
+
+                    string id = list.Fields.Add("UserHasPermission", SPFieldType.Boolean, false);
+                    SPField spfield = (SPField)list.Fields.GetField(id);
+
+                    spfield.Hidden = true;
+
+                    spfield.Update();
+                    SPView view = list.DefaultView;
+                    view.ViewFields.Add("UserHasPermission");
+
+                    view.Update();
+                    eleWeb.AllowUnsafeUpdates = false;
+                }
+                eleSite.AllowUnsafeUpdates = false;
+            }
+
+        }
+
+        private void PopulateColumn(string reportingCn)
+        {
+
+            using (SPWeb mySite = Web.Site.OpenWeb())
+            {
+                string basePath = CoreFunctions.getConfigSetting(mySite, "epkbasepath");
+                bool ResourceLevelPermision = false;
+                SPList myList = mySite.Lists["Resources"];
+                SPListItemCollection myItems = myList.GetItems();
+                foreach (SPListItem item in myItems)
+                {
+                    int ResourceLevel = Convert.ToInt32(item["ResourceLevel"]);
+                    string Title = Convert.ToString(item["Title"]);
+                    string UserName = string.Empty;
+
+                    if (ResourceLevel == 2 || ResourceLevel == 3 || item["ResourceLevel"] == null)//null and 2 for full permission 3 for project Manger and null for Developemnt
+                        ResourceLevelPermision = true;
+
+                    SPFieldUserValue SpFieldUser = new SPFieldUserValue(item.Web, item["SharePointAccount"].ToString());
+                    SPUser user = mySite.AllUsers.GetByID(int.Parse(SpFieldUser.LookupId.ToString()));
+                    if (user.LoginName.IndexOf("|") != -1)
+                    {
+                        UserName = user.LoginName.Split('|')[1];
+                    }
+                    else
+                    {
+                        UserName = user.LoginName;
+                    }
+                    bool ResourcePlanPermission = Utilities.CheckEditResourcePlanPermission(basePath, UserName) && ResourceLevelPermision;
+                    var newitem = Utilities.ReloadListItem(item);
+                    newitem["UserHasPermission"] = ResourcePlanPermission;
+                    using (var scope = new DisabledItemEventScope())
+                    {
+                        newitem.SystemUpdate(false);// false will prevent to update version number and save conflict
+                    }
+                    LogMessage(string.Format("Updating value for {0}", UserName), 2);
+                }
+            }
+
+        }
+
+        private bool CheckColumn()
+        {
+            using (SPWeb mySite = Web.Site.OpenWeb())
+            {
+                var list = mySite.Lists["Resources"];
+                return list.Fields.ContainsField("UserHasPermission");
+            }
+
+        }
+
+        #endregion
+
+    }
 }
