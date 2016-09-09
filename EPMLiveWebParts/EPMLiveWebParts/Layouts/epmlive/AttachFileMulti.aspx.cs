@@ -30,18 +30,17 @@ namespace EPMLiveWebParts.Layouts.epmlive
                             {
                                 SPAttachmentCollection attach = thisItem.Attachments;
                                 HttpFileCollection uploadedFiles = Request.Files;
-                                Stream attachmentStream;
                                 Byte[] attachmentContent;
                                 for (int i = 0; i < uploadedFiles.Count; i++)
                                 {
                                     HttpPostedFile userPostedFile = uploadedFiles[i];
                                     String fileName = userPostedFile.FileName;
-                                    attachmentStream = userPostedFile.InputStream;
-                                    attachmentContent = new Byte[attachmentStream.Length];
-                                    attachmentStream.Read(attachmentContent, 0, (int)attachmentStream.Length);
-                                    attachmentStream.Close();
-                                    attachmentStream.Dispose();
-                                    attach.Add(fileName, attachmentContent);
+                                    using (Stream attachmentStream = userPostedFile.InputStream)
+                                    {
+                                        attachmentContent = new Byte[attachmentStream.Length];
+                                        attachmentStream.Read(attachmentContent, 0, (int)attachmentStream.Length);
+                                        attach.Add(fileName, attachmentContent);
+                                    }
                                 }
                                 thisItem.Update();
                                 Page.ClientScript.RegisterStartupScript(this.GetType(), "CallClosePopup", "closePopup(1);", true);
