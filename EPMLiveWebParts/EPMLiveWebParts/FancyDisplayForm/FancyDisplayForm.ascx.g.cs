@@ -847,14 +847,14 @@ namespace EPMLiveWebParts {
                     ": $(\"#");
              @__w.Write( hiddenWebUrl.ClientID );
 
-            @__w.Write("\").val() + \"/_layouts/AttachFile.aspx?ListId=\" + $(\"#");
-                                                                                              @__w.Write( hiddenListId.ClientID );
+            @__w.Write("\").val() + \"/_layouts/epmlive/AttachFileMulti.aspx?ListId=\" + $(\"#");
+                                                                                                           @__w.Write( hiddenListId.ClientID );
 
             @__w.Write("\").val() + \"&ItemId=\" + $(\"#");
-                                                                                                                                                      @__w.Write( hiddenItemId.ClientID );
+                                                                                                                                                                   @__w.Write( hiddenItemId.ClientID );
 
             @__w.Write("\").val() + \"&isdlg=1&Source=\" + $(\"#");
-                                                                                                                                                                                                                      @__w.Write( hiddenSourceUrl.ClientID );
+                                                                                                                                                                                                                                   @__w.Write( hiddenSourceUrl.ClientID );
 
             @__w.Write("\").val(),\r\n            width: 325,\r\n            height: 155,\r\n            title: " +
                     "\"Attach File\",\r\n            dialogReturnValueCallback: function (dialogResult) {" +
