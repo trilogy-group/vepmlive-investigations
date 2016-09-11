@@ -243,6 +243,10 @@
                 });
             };
 
+            $(document).ready(function () {
+                LoadSodByKey("sp.js", function () { });
+            });
+
             epmLiveTemplateVersoning.promptSaveTemplate = function () {
                 var element = document.createElement('div');
                 element.innerHTML = $('#EPMLiveTemplateVersoningSavePrompt').html();
