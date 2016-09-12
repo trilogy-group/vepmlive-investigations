@@ -41,6 +41,7 @@ namespace EPMLiveIntegrationService
             string ret = "";
             XmlDocument xmlDocument;
             XmlNode xmlNode;
+            XmlNode xmlNodeToCheckDelete;
             try
             {
                 if (!string.IsNullOrEmpty(eventXml))
@@ -52,16 +53,23 @@ namespace EPMLiveIntegrationService
                     {
                         case "WorkItemChangedEvent":
                             xmlNode = xmlDocument.SelectSingleNode("WorkItemChangedEvent/CoreFields/IntegerFields/Field");
+                            xmlNodeToCheckDelete = xmlDocument.SelectSingleNode("WorkItemChangedEvent/CoreFields/BooleanFields/Field");
                             Int64 ID;
+                            Boolean isDeleted = false;
                             if (xmlNode != null && Int64.TryParse(xmlNode.SelectSingleNode("NewValue").InnerText, out ID) && !string.IsNullOrEmpty(Convert.ToString(HttpContext.Current.Request["IntegrationKey"])))
                             {
+                                if (xmlNodeToCheckDelete != null)
+                                {
+                                    Boolean.TryParse(xmlNodeToCheckDelete.SelectSingleNode("NewValue").InnerText, out isDeleted);
+                                }
+
                                 SPFarm farm = SPFarm.Local;
                                 SPWebService service = farm.Services.GetValue<SPWebService>("");
                                 foreach (SPWebApplication webapp in service.WebApplications)
                                 {
                                     if (webapp.Name == System.Configuration.ConfigurationManager.AppSettings["WebApplication"])
                                     {
-                                        ret = iPostSimple(webapp, Convert.ToString(HttpContext.Current.Request["IntegrationKey"]), Convert.ToString(ID));
+                                        ret = iPostSimple(webapp, Convert.ToString(HttpContext.Current.Request["IntegrationKey"]), Convert.ToString(ID), isDeleted ? "2" : "1");
                                         break;
                                     }
                                 }
@@ -128,7 +136,7 @@ namespace EPMLiveIntegrationService
                 {
                     if (webapp.Name == System.Configuration.ConfigurationManager.AppSettings["WebApplication"])
                     {
-                        ret = iPostSimple(webapp, IntegrationKey, ID);
+                        ret = iPostSimple(webapp, IntegrationKey, ID, "1");
                         break;
                     }
                 }
@@ -400,7 +408,7 @@ namespace EPMLiveIntegrationService
             return ret;
         }
 
-        private string iPostSimple(SPWebApplication webapp, string IntegrationKey, string ID)
+        private string iPostSimple(SPWebApplication webapp, string IntegrationKey, string ID, string type)
         {
             string ret = "";
             try
@@ -412,10 +420,11 @@ namespace EPMLiveIntegrationService
 
                 if (iAuthenticate(IntegrationKey, out ret, out dsIntegration, cn))
                 {
-                    SqlCommand cmd = new SqlCommand("INSERT INTO INT_EVENTS (LIST_ID, INTITEM_ID, COL_ID, STATUS, DIRECTION, TYPE) VALUES (@listid, @intitemid, @colid, 0, 2, 1)", cn);
+                    SqlCommand cmd = new SqlCommand("INSERT INTO INT_EVENTS (LIST_ID, INTITEM_ID, COL_ID, STATUS, DIRECTION, TYPE) VALUES (@listid, @intitemid, @colid, 0, 2, @type)", cn);
                     cmd.Parameters.AddWithValue("@listid", dsIntegration.Tables[0].Rows[0]["LIST_ID"].ToString());
                     cmd.Parameters.AddWithValue("@intitemid", ID);
                     cmd.Parameters.AddWithValue("@colid", dsIntegration.Tables[0].Rows[0]["INT_COLID"].ToString());
+                    cmd.Parameters.AddWithValue("@type", type);
                     cmd.ExecuteNonQuery();
 
                     ret = "<Success/>";
