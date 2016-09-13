@@ -225,12 +225,7 @@ namespace EPMLiveCore
                         }
                         catch { }
                     }
-
-                    //EPML-5446: Totango Implementation
-                    var usageTracking = CoreFunctions.getConfigSetting(web, "EPMLiveEnableUsageTracking");
-                    chkEnableUsageTracking.Checked = !String.IsNullOrEmpty(usageTracking) && bool.Parse(usageTracking);
-                    //EPML-5446
-
+                    
                     //SPList oList;
                     //oList = web.Lists["Master Page Gallery"] as SPList;
                     //if (oList != null)
@@ -455,11 +450,7 @@ namespace EPMLiveCore
             CoreFunctions.setConfigSetting(web, "EPMLiveNewProjectRoleVisitors", ddlRoleVisitors.SelectedValue);
             CoreFunctions.setConfigSetting(web, "EPMLiveUseWEPeoplePicker", chkUsePE.Checked.ToString());
             CoreFunctions.setConfigSetting(web, "EPMLiveUseLiveTemplates", chkLiveTemplates.Checked.ToString());
-
-            //EPML-5446: Totango Implementation
-            CoreFunctions.setConfigSetting(web, "EPMLiveEnableUsageTracking", chkEnableUsageTracking.Checked.ToString().ToLower());
-            //EPML-5446
-
+            
             string validtemplates = "";
 
             foreach (ListItem li in lstSelectedTemplates.Items)

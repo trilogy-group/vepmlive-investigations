@@ -400,33 +400,6 @@ namespace EPMLiveCore {
         protected global::System.Web.UI.WebControls.Button btnGrpPermAdd;
         
         /// <summary>
-        /// InputFormSectionEnableTotango control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.UserControl InputFormSectionEnableTotango;
-        
-        /// <summary>
-        /// InputFormControlEnableUsageTracking control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.UserControl InputFormControlEnableUsageTracking;
-        
-        /// <summary>
-        /// chkEnableUsageTracking control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.CheckBox chkEnableUsageTracking;
-        
-        /// <summary>
         /// ButtonSection1 control.
         /// </summary>
         /// <remarks>
