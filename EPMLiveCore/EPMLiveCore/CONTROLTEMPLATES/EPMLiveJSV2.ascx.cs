@@ -2,7 +2,6 @@
 using System.Configuration;
 using System.Web.UI;
 using EPMLiveCore.Infrastructure;
-using EPMLiveCore.UsageTracking;
 using Microsoft.SharePoint;
 using Microsoft.Web.Hosting.Administration;
 using System.Web;
@@ -19,19 +18,6 @@ namespace EPMLiveCore.CONTROLTEMPLATES
         ////EPML-5445
         //protected bool SupportIntegration;
         ////EPML-5445
-        
-        //EPML-5446: Totango Implementation
-        protected bool EnableUsageTracking = false;
-        protected string SiteGuid;
-        protected string SiteName;
-        protected string UserEmail;
-        protected string UserName;
-        protected string Version;
-        protected string PageTitle;
-        protected string ToolKitOrderNumber;
-        protected string TrackingUrl = string.Empty;
-
-        //EPML-5446
         
         protected string WebUrl;
         private SPWeb _spWeb;
@@ -79,44 +65,7 @@ namespace EPMLiveCore.CONTROLTEMPLATES
             _spWeb = spContext.Web;
 
             WebUrl = _spWeb.SafeServerRelativeUrl();
-
-            try
-            {
-                ////EPML-5445
-                //var configValue = CoreFunctions.getConfigSetting(_spWeb, "SupportIntegration");
-                //SupportIntegration = !string.IsNullOrEmpty(configValue) && Convert.ToBoolean(configValue);
-                ////EPML-5445
-
-                //EPML-5446: Enable Totango
-                var configValue = CoreFunctions.getConfigSetting(_spWeb, "EPMLiveEnableUsageTracking");
-                EnableUsageTracking = !string.IsNullOrEmpty(configValue) && Convert.ToBoolean(configValue);
-
-                var configValue1 = CoreFunctions.getConfigSetting(_spWeb, "ToolKitOrderNumber");
-                ToolKitOrderNumber = (!String.IsNullOrEmpty(configValue1))
-                    ? Convert.ToString(configValue1)
-                    : string.Empty;
-
-                //Get Site parameters
-                SiteGuid = _spWeb.Site.ID.ToString();
-                SiteName = _spWeb.Title;
-                SPUser currentUser = SPContext.Current.Web.CurrentUser;
-                UserEmail = currentUser.Email;
-                UserName =HttpUtility.UrlEncode(currentUser.Name);
-                Version = CoreFunctions.GetFullAssemblyVersion();
-
-                //Get Totango service URL
-                if (ConfigurationManager.AppSettings["trackingUrl"] != null)
-                {
-                    TrackingUrl = ConfigurationManager.AppSettings["trackingUrl"];
-                }
-
-                //EPML-5445
-            }
-            catch (Exception ex)
-            {
-                //TODO handle exception
-            }
-
+            
             try
             {
                 UplandInsightId = CoreFunctions.getConfigSetting(_spWeb.Site.RootWeb, "UplandInsightId");

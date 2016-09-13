@@ -362,20 +362,7 @@
 				                     </Template_Control>
 			                    </wssuc:InputFormControl>
 		                    </template_inputformcontrols>
-                        </wssuc:InputFormSection>
-                        <wssuc:InputFormSection ID="InputFormSectionEnableTotango" Title="Enable Usage Tracking"
-		                    Description=""
-		                    runat="server">
-		                    <Template_Description>		                        
-		                    </Template_Description>
-		                    <Template_InputFormControls>
-			                    <wssuc:InputFormControl ID="InputFormControlEnableUsageTracking" LabelText="" runat="server">
-				                     <Template_Control>
-				                        <asp:CheckBox id="chkEnableUsageTracking" runat="server"></asp:CheckBox> Enable Usage Tracking
-				                     </Template_Control>
-			                    </wssuc:InputFormControl>
-		                    </Template_InputFormControls>
-	                    </wssuc:InputFormSection>
+                        </wssuc:InputFormSection>                       
 
 	                    <wssuc:ButtonSection ID="ButtonSection1" runat="server">
 		                    <Template_Buttons>
