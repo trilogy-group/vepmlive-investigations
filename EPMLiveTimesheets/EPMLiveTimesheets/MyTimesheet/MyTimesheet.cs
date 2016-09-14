@@ -347,6 +347,8 @@ namespace TimeSheets
 
             function loadMenu" + sFullGridId + @"()
             {
+                    if(!LoadGenericMenu)
+                        return;            
                     var cfgs = 
                     [
                         {

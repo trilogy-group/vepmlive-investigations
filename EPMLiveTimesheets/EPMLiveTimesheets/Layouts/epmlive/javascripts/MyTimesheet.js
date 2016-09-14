@@ -28,12 +28,12 @@ var spnMsg = null;
 var bSaveAndSubmit = false;
 var updateStatusBox;
 var NotesOut = false;
-
+var LoadGenericMenu = true;
 var TimesheetHoursEdited = false;
 var TimesheetItemEdited = false;
 var rendered = false;
 var bIsTimeSheetManager = false;
-
+var DataXML = null;
 function TSOnLoaded(grid) {
     var newgridid = grid.id.substr(2);
     var newobj = eval("TSObject" + newgridid);
@@ -61,23 +61,28 @@ Grids.OnRenderStart = function (grid) {
                 }
             }
         }
-
+        
+        if (DataXML == null)
+            DataXML = grid.Source.Data.Param.Dataxml
         EPMLiveCore.WorkEngineAPI.set_path(siteUrl + '/_vti_bin/WorkEngine.asmx');
     }
 }
 
 function TMFilter(gridid, filter) {
-
-    var grid = Grids["TS" + gridid];
-
-    if (filter == 1)
-        grid.ChangeFilter("", "", "");
-    else if (filter == 2)
-        grid.ChangeFilter("Submitted", "1", "2", 0, 0);
-    else if (filter == 3)
-        grid.ChangeFilter("Submitted,Approved", "1,1", "1,2", 0, 0);
-
+    
     $('#ddlFilterControl_ul_menu').toggle();
+    var grid = Grids["TS" + gridid];
+    var source = grid.Source;
+    LoadGenericMenu = false;
+    if (filter == 1) {
+        source.Data.Param.Dataxml = DataXML
+        grid.Reload(source, null, null);
+    }
+    else {
+        source.Data.Param.Dataxml = DataXML.replace('/&gt', ' Filter=&quot;' + filter + '&quot;/&gt');
+        grid.Source.Data.Param.Filter = filter
+        grid.Reload(source, null, null);
+    }
 }
 
 function EmailTSA(gridid) {

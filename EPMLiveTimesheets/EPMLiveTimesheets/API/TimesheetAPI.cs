@@ -2075,10 +2075,13 @@ namespace TimeSheets
             {
                 XmlDocument doc = new XmlDocument();
                 doc.LoadXml(data);
-
+                string Filter = string.Empty;
                 string sPeriod = doc.FirstChild.Attributes["Period"].Value;
                 string sGridId = doc.FirstChild.Attributes["GridId"].Value;
-
+                if (doc.FirstChild.Attributes["Filter"] != null)
+                {
+                    Filter = doc.FirstChild.Attributes["Filter"].Value;
+                }
                 XmlDocument docData = new XmlDocument();
                 docData.LoadXml("<Grid><Cfg TimesheetUID=\"\"/><Body><B></B></Body></Grid>");
 
@@ -2133,8 +2136,27 @@ namespace TimeSheets
                         drTimesheet = drTimesheets[0];
                         tsuid = drTimesheet["TS_UID"].ToString();
                     }
-
-                    iGetApprovalRow(dr, drTimesheet, ds.Tables[1], ref docData, ndB, arrPeriods, tsuid);
+                    if (Filter == "2")
+                    {
+                        if (drTimesheet == null)
+                        {
+                                iGetApprovalRow(dr, drTimesheet, ds.Tables[1], ref docData, ndB, arrPeriods, tsuid);
+                        }
+                    }
+                    else if (Filter == "3")
+                    {
+                        if (drTimesheet != null)
+                        {
+                            if (drTimesheet["SUBMITTED"].ToString().ToLower() == "true" && drTimesheet["APPROVAL_STATUS"].ToString() == "0")
+                            {
+                                iGetApprovalRow(dr, drTimesheet, ds.Tables[1], ref docData, ndB, arrPeriods, tsuid);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        iGetApprovalRow(dr, drTimesheet, ds.Tables[1], ref docData, ndB, arrPeriods, tsuid);
+                    }
                 }
 
                 return docData.OuterXml;
@@ -2392,7 +2414,7 @@ namespace TimeSheets
             //ndCol.Attributes.Append(attr1);
 
             if (result != null && Convert.ToBoolean(result["IsDeleted"]))
-            {                
+            {
                 attr1 = docData.CreateAttribute("Title");
                 attr1.Value = "<span style=\"text-decoration:line-through\" >" + dr["Title"].ToString() + "</span>";
                 ndCol.Attributes.Append(attr1);
@@ -2402,7 +2424,7 @@ namespace TimeSheets
                 attr1 = docData.CreateAttribute("Title");
                 attr1.Value = dr["Title"].ToString();
                 ndCol.Attributes.Append(attr1);
-            }            
+            }
 
             attr1 = docData.CreateAttribute("Comments");
             attr1.Value = string.Format("<img class='TS_Comments' src='/_layouts/epmlive/images/mywork/comment.png' alt='Click here to add comments'/>");
@@ -2991,11 +3013,11 @@ namespace TimeSheets
         }
 
         private static DataSet iiGetTSData(SqlConnection cn, SPWeb web, string sPeriod, Guid tsuid, EPMLiveCore.ReportHelper.MyWorkReportData rptData, string userId)
-        {            
+        {
             SqlCommand cmd = new SqlCommand("spTSGetTimesheet", cn);
             cmd.CommandType = CommandType.StoredProcedure;
             cmd.Parameters.AddWithValue("@tsuid", tsuid);
-                        
+
             DataSet ds = new DataSet();
             SqlDataAdapter da = new SqlDataAdapter(cmd);
             da.Fill(ds);
@@ -3037,7 +3059,7 @@ namespace TimeSheets
 
                     if (myWorkDataTable.Rows.Count > 0)
                         ds.Tables[myworktableid].Rows.Add(myWorkDataTable.Rows[0].ItemArray);
-                    else if(Convert.ToString(drItem["List"]) != "Non Work")
+                    else if (Convert.ToString(drItem["List"]) != "Non Work")
                     {
                         DataTable dtTSItem = new DataTable();
 
@@ -3055,12 +3077,12 @@ namespace TimeSheets
 
                             if (myWorkDataTable.Rows.Count > 0)
                             {
-                                ds.Tables[myworktableid].Rows.Add(myWorkDataTable.Rows[0].ItemArray);                                                             
+                                ds.Tables[myworktableid].Rows.Add(myWorkDataTable.Rows[0].ItemArray);
                             }
                         }
                     }
 
-                    drAdded.Add(drItem["LIST_UID"].ToString() + "." + drItem["ITEM_ID"].ToString());                    
+                    drAdded.Add(drItem["LIST_UID"].ToString() + "." + drItem["ITEM_ID"].ToString());
                 }
             }
 
