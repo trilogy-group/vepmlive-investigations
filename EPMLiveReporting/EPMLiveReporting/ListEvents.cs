@@ -117,7 +117,21 @@ namespace EPMLiveReportsAdmin
                 if (Initialize(true, properties))
                 {
                     //DeleteItem
-                    DeleteItem();
+                    if (DeleteItem())
+                    {
+                        //EPMLCID-6274: Delete RPTITEMGROUPS Security Groups Of Deleted Item.
+                        SPSecurity.RunWithElevatedPrivileges(delegate
+                        {
+                            var cmd =
+                                        new SqlCommand(
+                                            "DELETE RPTITEMGROUPS where siteid=@siteid and listid=@listid and itemid=@itemid",
+                                             _DAO.GetClientReportingConnection());
+                            cmd.Parameters.AddWithValue("@siteid", properties.SiteId);
+                            cmd.Parameters.AddWithValue("@listid", properties.ListId);
+                            cmd.Parameters.AddWithValue("@itemid", properties.ListItemId);
+                            cmd.ExecuteNonQuery();
+                        });
+                    }
 
                     ////Check IF list reports work
                     //if (_DAO.ListReportsWork(_TableName))
@@ -195,7 +209,7 @@ namespace EPMLiveReportsAdmin
                             foreach (SPRoleAssignment ra in li.RoleAssignments)
                             {
                                 int type = 0;
-                                if (ra.Member.GetType() == typeof (SPGroup))
+                                if (ra.Member.GetType() == typeof(SPGroup))
                                 {
                                     type = 1;
                                 }
@@ -259,9 +273,9 @@ namespace EPMLiveReportsAdmin
             }
         }
 
-        private void DeleteItem()
+        private bool DeleteItem()
         {
-            _DAO.DeleteListItem(GetSql("delete"));
+            return _DAO.DeleteListItem(GetSql("delete"));
         }
 
         // -- HELPER FUNCTIONS -- START
@@ -328,7 +342,7 @@ namespace EPMLiveReportsAdmin
         {
             //_dtColumns = _DAO.GetListColumns(_ListName.Replace("'", ""));
             _dtColumns = _DAO.GetListColumns(_ListID);
-                // - CAT.NET false-positive: All single quotes are escaped/removed.
+            // - CAT.NET false-positive: All single quotes are escaped/removed.
         }
 
         private string GetSql(string sAction)
@@ -348,7 +362,7 @@ namespace EPMLiveReportsAdmin
 
                 case "delete":
                     sSQL = _DAO.DeleteSQL(_TableName.Replace("'", ""), _ListID, _item.ID);
-                        // - CAT.NET false-positive: All single quotes are escaped/removed.
+                    // - CAT.NET false-positive: All single quotes are escaped/removed.
                     break;
             }
             return sSQL;
