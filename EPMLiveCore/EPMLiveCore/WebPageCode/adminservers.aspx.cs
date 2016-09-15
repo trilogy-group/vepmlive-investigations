@@ -20,7 +20,7 @@ namespace EPMLiveCore
 
         protected void btnCancel_Click(object sender, EventArgs e)
         {
-            Response.Redirect("/_admin/applications.aspx");
+            Response.Redirect("/generalapplicationsettings.aspx");
         }
 
         protected void btnSave_Click(object sender, EventArgs e)
@@ -51,7 +51,7 @@ namespace EPMLiveCore
                 }
             });
 
-            Response.Redirect("/_admin/applications.aspx");
+            Response.Redirect("/generalapplicationsettings.aspx");
         }
 
         protected void GvItems_RowDataBound(object sender, GridViewRowEventArgs e)
