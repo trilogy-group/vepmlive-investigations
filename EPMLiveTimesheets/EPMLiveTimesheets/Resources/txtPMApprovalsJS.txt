@@ -50,7 +50,7 @@ function viewItem(url)
 function viewItem#gridid#(link, action)
 {
 
-    var rowIdFull = link.parentNode.parentNode.parentNode.parentNode.idd;
+    var rowIdFull = link.parentNode.parentNode.parentNode.parentNode.parentNode.idd;
     var weburl = mygrid#gridid#.getUserData(rowIdFull,"SiteUrl");
     var listId = mygrid#gridid#.getUserData(rowIdFull,"listid");
     var webid = mygrid#gridid#.getUserData(rowIdFull,"webid");
