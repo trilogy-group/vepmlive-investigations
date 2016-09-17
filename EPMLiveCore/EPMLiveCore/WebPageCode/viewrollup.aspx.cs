@@ -12,6 +12,9 @@ using System.Web.UI.HtmlControls;
 using Microsoft.SharePoint;
 using System.Text;
 using System.Xml;
+using EPMLiveCore.Infrastructure.Logging;
+using static EPMLiveCore.Infrastructure.Logging.LoggingService;
+using Microsoft.SharePoint.Administration;
 
 namespace EPMLiveCore
 {
@@ -32,7 +35,7 @@ namespace EPMLiveCore
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            
+
             if (!Page.IsPostBack)
             {
                 curWeb = SPContext.Current.Web;
@@ -42,10 +45,10 @@ namespace EPMLiveCore
                 //HttpContext.Current.Session["ViewGUID"] = Request["View"];
                 view = list.Views[new Guid(Request["View"])];
 
-                string []tLists = Request["Lists"].Split(';');
+                string[] tLists = Request["Lists"].Split(';');
                 lists = new string[tLists.Length];
 
-                for(int i = 0;i<lists.Length;i++)
+                for (int i = 0; i < lists.Length; i++)
                 {
                     lists[i] = tLists[i].Split(',')[0];
                 }
@@ -100,7 +103,7 @@ namespace EPMLiveCore
                 //    dtRollup.Columns.Add(f.InternalName);
                 //    arrFields.Add(nd.InnerText);
                 //}
-                
+
                 listGrid.DataSource = dtRollup;
                 listGrid.DataBind();
 
@@ -174,8 +177,12 @@ namespace EPMLiveCore
                 {
                     processSite(w, spquery);
                 }
-                catch { }
-                w.Close();
+                catch (Exception ex) { LoggingService.WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.Medium, ex.ToString()); }
+                finally
+                {
+                    if (w != null)
+                        w.Dispose();
+                }
             }
         }
         private SPField getRealField(SPField field)

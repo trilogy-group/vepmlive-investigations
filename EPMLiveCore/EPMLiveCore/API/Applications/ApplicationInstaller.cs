@@ -52,7 +52,7 @@ namespace EPMLiveCore.API
             _id = id;
             _cn = cn;
             _configJob = configJob;
-            
+
             _dtMessages.Columns.Add(new DataColumn("ID", typeof(int)));
             _dtMessages.Columns.Add(new DataColumn("ParentID", typeof(int)));
             _dtMessages.Columns.Add(new DataColumn("ErrorLevel", typeof(int)));
@@ -207,37 +207,33 @@ namespace EPMLiveCore.API
 
         private void InstallOnRootWeb()
         {
-            SPSecurity.RunWithElevatedPrivileges(delegate()
+            SPSecurity.RunWithElevatedPrivileges(delegate ()
             {
                 using (SPSite site = new SPSite(oWeb.Site.ID))
                 {
-                    using (SPWeb web = site.RootWeb)
+                    SPList list = Applications.GetApplicationList(site.RootWeb);
+                    if (list != null)
                     {
-                        SPList list = Applications.GetApplicationList(web);
 
+                        SPListItem li = list.Items.Add();
+                        li["Title"] = appDef.Title;
+                        li["EXTID"] = appDef.Id;
+                        li["AppVersion"] = appDef.Version;
+                        li["Icon"] = appDef.Icon;
+                        li["Status"] = "Not Installed";
+                        li["InstallXML"] = appDef.ApplicationXml.OuterXml;
+                        li["AppUrl"] = appDef.fullurl;
 
-                        if (list != null)
-                        {
-
-                            SPListItem li = list.Items.Add();
-                            li["Title"] = appDef.Title;
-                            li["EXTID"] = appDef.Id;
-                            li["AppVersion"] = appDef.Version;
-                            li["Icon"] = appDef.Icon;
-                            li["Status"] = "Not Installed";
-                            li["InstallXML"] = appDef.ApplicationXml.OuterXml;
-                            li["AppUrl"] = appDef.fullurl;
-
-                            li.Update();
-                        }
+                        li.Update();
                     }
+
                 }
             });
         }
 
         private bool CheckInstalledRoot()
         {
-            SPSecurity.RunWithElevatedPrivileges(delegate()
+            SPSecurity.RunWithElevatedPrivileges(delegate ()
             {
                 using (SPSite site = new SPSite(oWeb.Site.ID))
                 {
@@ -359,7 +355,7 @@ namespace EPMLiveCore.API
                 Dictionary<Guid, SPFeatureDefinition> ArrInstalledSiteFeatures15 = new Dictionary<Guid, SPFeatureDefinition>();
                 Dictionary<Guid, SPFeatureDefinition> ArrInstalledFarmFeatures15 = new Dictionary<Guid, SPFeatureDefinition>();
 
-                SPSecurity.RunWithElevatedPrivileges(delegate()
+                SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
                     using (SPSite site = new SPSite(oWeb.Site.ID))
                     {
@@ -1659,97 +1655,105 @@ namespace EPMLiveCore.API
                 }
                 else
                 {
-                    SPLimitedWebPartManager oViewWebManager = oViewFile.GetLimitedWebPartManager(System.Web.UI.WebControls.WebParts.PersonalizationScope.Shared);
-
-                    if (bHasViewFile)
+                    using (SPLimitedWebPartManager oViewWebManager = oViewFile.GetLimitedWebPartManager(System.Web.UI.WebControls.WebParts.PersonalizationScope.Shared))
                     {
-                        SPFile oTempFile = null;
-                        try
+                        if (bHasViewFile)
                         {
-
-                            oTempFile = oWeb.GetFile("TempViewStorage/" + oView.Title + ".aspx");
-                            var tempFileContents = oTempFile.GetContents();
-                            oViewFile.UpdateContentsAndSave(tempFileContents);
-
-                            SPLimitedWebPartManager oTempFileWebManager = oTempFile.GetLimitedWebPartManager(System.Web.UI.WebControls.WebParts.PersonalizationScope.Shared);
-
-                            ArrayList arrWebParts = new ArrayList();
-
-                            foreach (WebPart wp in oViewWebManager.WebParts)
+                            SPFile oTempFile = null;
+                            try
                             {
-                                if (wp is XsltListViewWebPart)
-                                {
-                                    wp.Hidden = true;
-                                    oViewWebManager.SaveChanges(wp);
-                                }
 
-                                if (wp.GetType().ToString() != "Microsoft.SharePoint.WebPartPages.ErrorWebPart" && !(wp is XsltListViewWebPart))
-                                {
-                                    arrWebParts.Add(wp);
-                                }
-                            }
+                                oTempFile = oWeb.GetFile("TempViewStorage/" + oView.Title + ".aspx");
+                                var tempFileContents = oTempFile.GetContents();
+                                oViewFile.UpdateContentsAndSave(tempFileContents);
 
-                            foreach (WebPart wp in arrWebParts)
-                            {
-                                oViewWebManager.DeleteWebPart(wp);
-                            }
+                                SPLimitedWebPartManager oTempFileWebManager = oTempFile.GetLimitedWebPartManager(System.Web.UI.WebControls.WebParts.PersonalizationScope.Shared);
 
-                            foreach (WebPart wp in oTempFileWebManager.WebParts)
-                            {
-                                if (wp.GetType().ToString() != "Microsoft.SharePoint.WebPartPages.ErrorWebPart" && !(wp is XsltListViewWebPart))
-                                {
-                                    oViewWebManager.AddWebPart(wp, wp.ZoneID, wp.ZoneIndex);
-                                }
-                            }
+                                ArrayList arrWebParts = new ArrayList();
 
-
-                            ConnectWebPartConsumersToReportFilter(oViewWebManager);
-
-
-                            addMessage(0, oView.Title, "", ParentMessageId);
-                        }
-                        catch (Exception ex)
-                        {
-                            addMessage(ErrorLevels.Error, oView.Title, "Error: " + ex.Message, ParentMessageId);
-                        }
-                        finally
-                        {
-                            if (oTempFile != null) oTempFile.Delete();
-                            oViewWebManager.Dispose();
-                        }
-                    }
-                    else
-                    {
-                        bool bHasGrid = false;
-
-                        try
-                        {
-                            if (bInstallGrid)
-                            {
                                 foreach (WebPart wp in oViewWebManager.WebParts)
                                 {
-                                    if (wp.GetType().ToString() == "EPMLiveWebParts.GridListView")
+                                    if (wp is XsltListViewWebPart)
                                     {
-                                        bHasGrid = true;
-                                        break;
+                                        wp.Hidden = true;
+                                        oViewWebManager.SaveChanges(wp);
+                                    }
+
+                                    if (wp.GetType().ToString() != "Microsoft.SharePoint.WebPartPages.ErrorWebPart" && !(wp is XsltListViewWebPart))
+                                    {
+                                        arrWebParts.Add(wp);
                                     }
                                 }
 
-                                if (!bHasGrid)
+                                foreach (WebPart wp in arrWebParts)
                                 {
-                                    //EPMLiveWebParts.GridListView gv = new EPMLiveWebParts.GridListView();
-                                    //oViewWebManager.AddWebPart(gv, "Main", 0);
-                                    var gv = WebPartsReflector.CreateGridListViewWebPart();
-                                    oViewWebManager.AddWebPart(gv, "Main", 0);
+                                    oViewWebManager.DeleteWebPart(wp);
                                 }
+
+                                foreach (WebPart wp in oTempFileWebManager.WebParts)
+                                {
+                                    if (wp.GetType().ToString() != "Microsoft.SharePoint.WebPartPages.ErrorWebPart" && !(wp is XsltListViewWebPart))
+                                    {
+                                        oViewWebManager.AddWebPart(wp, wp.ZoneID, wp.ZoneIndex);
+                                    }
+                                }
+
+
+                                ConnectWebPartConsumersToReportFilter(oViewWebManager);
+
+
+                                addMessage(0, oView.Title, "", ParentMessageId);
                             }
-                            addMessage(0, oView.Title, "", ParentMessageId);
+                            catch (Exception ex)
+                            {
+                                addMessage(ErrorLevels.Error, oView.Title, "Error: " + ex.Message, ParentMessageId);
+                            }
+                            finally
+                            {
+                                if (oTempFile != null) oTempFile.Delete();
+                                oViewWebManager.Web.Dispose();
+                            }
                         }
-                        catch (Exception ex)
+                        else
                         {
-                            addMessage(ErrorLevels.Error, oView.Title, "Error: " + ex.Message, ParentMessageId);
+                            bool bHasGrid = false;
+
+                            try
+                            {
+                                if (bInstallGrid)
+                                {
+                                    foreach (WebPart wp in oViewWebManager.WebParts)
+                                    {
+                                        if (wp.GetType().ToString() == "EPMLiveWebParts.GridListView")
+                                        {
+                                            bHasGrid = true;
+                                            break;
+                                        }
+                                    }
+
+                                    if (!bHasGrid)
+                                    {
+                                        //EPMLiveWebParts.GridListView gv = new EPMLiveWebParts.GridListView();
+                                        //oViewWebManager.AddWebPart(gv, "Main", 0);
+                                        var gv = WebPartsReflector.CreateGridListViewWebPart();
+                                        oViewWebManager.AddWebPart(gv, "Main", 0);
+                                    }
+                                }
+                                addMessage(0, oView.Title, "", ParentMessageId);
+                            }
+                            catch (Exception ex)
+                            {
+                                addMessage(ErrorLevels.Error, oView.Title, "Error: " + ex.Message, ParentMessageId);
+                            }
+                            finally
+                            {
+                                if (oViewWebManager != null)
+                                    oViewWebManager.Web.Dispose();
+                            }
                         }
                     }
+
+
                 }
             }
         }
@@ -1800,7 +1804,7 @@ namespace EPMLiveCore.API
                 string storeurl = CoreFunctions.getFarmSetting("workenginestore");
 
                 ServicePointManager.ServerCertificateValidationCallback +=
-                delegate(
+                delegate (
                     object sender,
                     X509Certificate certificate,
                     X509Chain chain,
@@ -2418,7 +2422,7 @@ namespace EPMLiveCore.API
                                             reportingV2Enabled =
                                                 Convert.ToBoolean(CoreFunctions.getConfigSetting(SPContext.Current.Site.RootWeb, "reportingV2"));
                                         }
-                                        catch{}
+                                        catch { }
 
                                         var rb = new ReportHelper.ReportBiz(oList.ParentWeb.Site.ID, oList.ParentWeb.ID, reportingV2Enabled);
                                         ReportHelper.ListBiz lb = rb.GetListBiz(oList.ID);
@@ -2578,7 +2582,7 @@ namespace EPMLiveCore.API
                     using (WebClient webClient = new WebClient())
                     {
                         ServicePointManager.ServerCertificateValidationCallback +=
-                        delegate(
+                        delegate (
                             object sender,
                             X509Certificate certificate,
                             X509Chain chain,
@@ -2669,7 +2673,7 @@ namespace EPMLiveCore.API
                         using (WebClient webClient = new WebClient())
                         {
                             ServicePointManager.ServerCertificateValidationCallback +=
-                            delegate(
+                            delegate (
                                 object sender,
                                 X509Certificate certificate,
                                 X509Chain chain,
@@ -2912,7 +2916,7 @@ namespace EPMLiveCore.API
                 string storeurl = CoreFunctions.getFarmSetting("workenginestore");
 
                 ServicePointManager.ServerCertificateValidationCallback +=
-                delegate(
+                delegate (
                     object sender,
                     X509Certificate certificate,
                     X509Chain chain,
@@ -3079,7 +3083,7 @@ namespace EPMLiveCore.API
                     using (WebClient webClient = new WebClient())
                     {
                         ServicePointManager.ServerCertificateValidationCallback +=
-                        delegate(
+                        delegate (
                             object sender,
                             X509Certificate certificate,
                             X509Chain chain,

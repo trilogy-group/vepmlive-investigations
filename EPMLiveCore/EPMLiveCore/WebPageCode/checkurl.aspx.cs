@@ -13,6 +13,8 @@ using System.Xml;
 using System.Data.SqlClient;
 using System.Collections;
 using System.Text.RegularExpressions;
+using EPMLiveCore.Infrastructure.Logging;
+using static EPMLiveCore.Infrastructure.Logging.LoggingService;
 
 namespace EPMLiveCore
 {
@@ -33,14 +35,15 @@ namespace EPMLiveCore
             data = "1";
             try
             {
-                SPWeb w = web.Webs[Request["URL"]];
-                string title = w.Title;
-                data = "0";
-                w.Close();
+                using (SPWeb w = web.Webs[Request["URL"]])
+                {
+                    string title = w.Title;
+                    data = "0";
+                }
             }
-            catch { }
+            catch(Exception ex) { LoggingService.WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.Medium, ex.ToString()); }
 
         }
-            
+
     }
 }

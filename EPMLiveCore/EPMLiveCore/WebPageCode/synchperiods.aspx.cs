@@ -9,6 +9,9 @@ using System.Web.UI.WebControls;
 using System.Web.UI.WebControls.WebParts;
 using System.Web.UI.HtmlControls;
 using Microsoft.SharePoint;
+using EPMLiveCore.Infrastructure.Logging;
+using static EPMLiveCore.Infrastructure.Logging.LoggingService;
+using Microsoft.SharePoint.Administration;
 
 namespace EPMLiveCore
 {
@@ -92,8 +95,8 @@ namespace EPMLiveCore
                 {
                     addWebPeriods(w, periods, url);
                 }
-                catch { }
-                w.Close();
+                catch(Exception ex) { LoggingService.WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.Medium, ex.ToString()); }
+                finally { if (w != null) w.Dispose(); }
             }
         }
 

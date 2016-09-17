@@ -15,7 +15,8 @@ using Microsoft.SharePoint.Administration;
 using System.Drawing;
 using System.IO;
 using System.Text;
-
+using EPMLiveCore.Infrastructure.Logging;
+using static EPMLiveCore.Infrastructure.Logging.LoggingService;
 namespace EPMLiveCore
 {
     public partial class fieldaudit : System.Web.UI.Page
@@ -120,8 +121,8 @@ namespace EPMLiveCore
                 {
                     processWeb(w, spaces + "&nbsp;&nbsp;&nbsp;&nbsp;");
                 }
-                catch { }
-                w.Close();
+                catch (Exception ex) { LoggingService.WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.Medium, ex.ToString()); }
+                finally { if (w != null) w.Dispose(); }
             }
         }
         

@@ -175,7 +175,7 @@ namespace EPMLiveCore.API.SPAdmin
                                     {EPMLiveLists.HolidaySchedules, "HolidayScheduleSyncEvent"},
                                 };
 
-            using (var spSite = new SPSite(Web.Site.ID))
+            using (SPSite spSite = new SPSite(Web.Site.ID))
             {
                 spSite.AllowUnsafeUpdates = true;
 

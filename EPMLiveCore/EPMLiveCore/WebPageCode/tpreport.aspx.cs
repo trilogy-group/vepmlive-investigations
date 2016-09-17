@@ -10,6 +10,9 @@ using System.Web.UI.WebControls.WebParts;
 using System.Web.UI.HtmlControls;
 using Microsoft.SharePoint;
 using System.IO;
+using EPMLiveCore.Infrastructure.Logging;
+using static EPMLiveCore.Infrastructure.Logging.LoggingService;
+using Microsoft.SharePoint.Administration;
 
 namespace EPMLiveCore
 {
@@ -46,30 +49,32 @@ namespace EPMLiveCore
                 string url = CoreFunctions.getConfigSetting(web, "EPMLiveResourceURL").ToLower();
                 try
                 {
-                    if(url != "")
+                    if (url != "")
                     {
-                        if(url.StartsWith("/"))
+                        if (url.StartsWith("/"))
                         {
                             resWeb = site.OpenWeb(url);
                         }
                         else
                         {
-                            SPSite s = new SPSite(url);
-                            url = s.ServerRelativeUrl + url.Replace(s.Url, "");
-                            resWeb = s.OpenWeb(url);
-                            s.Close();
+                            using (SPSite s = new SPSite(url))
+                            {
+                                url = s.ServerRelativeUrl + url.Replace(s.Url, "");
+                                resWeb = s.OpenWeb(url);
+                            }
                         }
                     }
+                    if (resWeb != null)
+                    {
+                        buildColumns(resWeb);
+                        processData(web, resWeb);
+                    }
                 }
-                catch { }
-
-                if (resWeb != null)
+                catch (Exception ex) { LoggingService.WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.Medium, ex.ToString()); }
+                finally
                 {
-                    buildColumns(resWeb);
-
-                    processData(web, resWeb);
-
-                    resWeb.Close();
+                    if (resWeb != null)
+                        resWeb.Dispose();
                 }
 
                 Gridview1.DataSource = dt;
@@ -114,7 +119,7 @@ namespace EPMLiveCore
                     dt.Rows.Add(arrDtRow);
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 logError(ex.Message + ex.StackTrace);
             }
@@ -128,17 +133,17 @@ namespace EPMLiveCore
                         {
                             processData(w, resWeb);
                         }
-                        catch { }
-                        w.Close();
+                        catch (Exception ex) { LoggingService.WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Others, TraceSeverity.Medium, ex.ToString()); }
+                        finally { if (w != null) w.Dispose(); }
                     }
                 }
             }
-            catch { }
+            catch (Exception ex) { LoggingService.WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Others, TraceSeverity.Medium, ex.ToString()); }
         }
 
         private void logError(string error)
         {
-            SPSecurity.RunWithElevatedPrivileges(delegate()
+            SPSecurity.RunWithElevatedPrivileges(delegate ()
             {
                 StreamWriter sw = new StreamWriter("C:\\tpreportlog.txt");
                 sw.WriteLine(error);
@@ -221,7 +226,7 @@ namespace EPMLiveCore
                     }
                     hshResourceOC.Add(resource, vals);
                 }
-                
+
             }
             if (hshResourceOC.Contains(resource))
             {
@@ -271,7 +276,7 @@ namespace EPMLiveCore
                     counter++;
                 }
             };
-                
+
 
         }
 
@@ -290,7 +295,7 @@ namespace EPMLiveCore
                 if (list.GetItems(query).Count > 0)
                 {
                     SPListItem li = list.GetItems(query)[0];
-                    foreach(string s in arrProjectOC)
+                    foreach (string s in arrProjectOC)
                     {
                         try
                         {
@@ -395,7 +400,7 @@ namespace EPMLiveCore
 
                 list = web.Lists[CoreFunctions.getConfigSetting(web, "EPMLiveResourcePool")];
 
-                foreach(SPField f in list.Fields)
+                foreach (SPField f in list.Fields)
                 {
                     if (!f.Hidden && !f.ReadOnlyField && f.Type != SPFieldType.Attachments && f.InternalName != "Title" && f.InternalName != "SharePointAccount")
                     {
@@ -408,7 +413,7 @@ namespace EPMLiveCore
 
                 list = web.Lists["EPMLivePeriods"];
 
-                
+
 
                 foreach (SPListItem li in list.Items)
                 {

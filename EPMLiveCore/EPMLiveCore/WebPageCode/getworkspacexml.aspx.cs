@@ -13,6 +13,8 @@ using System.Xml;
 using System.Data.SqlClient;
 using System.Collections;
 using System.Text.RegularExpressions;
+using EPMLiveCore.Infrastructure.Logging;
+using static EPMLiveCore.Infrastructure.Logging.LoggingService;
 
 namespace EPMLiveCore
 {
@@ -169,8 +171,14 @@ namespace EPMLiveCore
             {
                 foreach (SPWeb w in web.Webs)
                 {
-                    addWebs(w, newNode);
-                    w.Close();
+                    try
+                    {
+                        addWebs(w, newNode);
+                    }
+                    catch (Exception ex) { LoggingService.WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.Medium, ex.ToString()); }
+                    finally { if(w!=null) w.Dispose(); }
+                    
+                    
                 }
                 
             }

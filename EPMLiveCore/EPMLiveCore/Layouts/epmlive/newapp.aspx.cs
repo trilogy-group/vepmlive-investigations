@@ -14,6 +14,8 @@ using System.Xml;
 using System.Data.SqlClient;
 using System.Collections;
 using System.Text.RegularExpressions;
+using EPMLiveCore.Infrastructure.Logging;
+using static EPMLiveCore.Infrastructure.Logging.LoggingService;
 
 namespace EPMLiveCore
 {
@@ -321,73 +323,73 @@ namespace EPMLiveCore
                                     string listUrl = workspacelist.Forms[PAGETYPE.PAGE_EDITFORM].ServerRelativeUrl;
                                 }
                                 catch { }
-                                SPWeb w = mySite.Webs[url];
-
-                                //==========
-                                SPList list = null;
-
-                                try
+                                using (SPWeb w = mySite.Webs[url])
                                 {
-                                    list = w.Lists[curList.Title];
-                                }
-                                catch { }
-                                if (list != null)
-                                {
-                                    SPField f = null;
+                                    //==========
+                                    SPList list = null;
+
                                     try
                                     {
-                                        f = list.Fields.GetFieldByInternalName("EPMLiveListConfig");
+                                        list = w.Lists[curList.Title];
                                     }
-                                    catch { }
-                                    if (f == null)
+                                    catch (Exception ex) { LoggingService.WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.Medium, ex.ToString()); }
+                                    if (list != null)
                                     {
-                                        if (list.DoesUserHavePermissions(SPBasePermissions.ManageLists))
+                                        SPField f = null;
+                                        try
                                         {
-                                            try
-                                            {
-                                                list.ParentWeb.AllowUnsafeUpdates = true;
-                                                f = new SPField(list.Fields, "EPMLiveConfigField", "EPMLiveListConfig");
-                                                f.Hidden = true;
-                                                list.Fields.Add(f);
-                                                f.Update();
-                                                list.Update();
-                                            }
-                                            catch { }
+                                            f = list.Fields.GetFieldByInternalName("EPMLiveListConfig");
                                         }
+                                        catch (Exception ex) { LoggingService.WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.Medium, ex.ToString()); }
+                                        if (f == null)
+                                        {
+                                            if (list.DoesUserHavePermissions(SPBasePermissions.ManageLists))
+                                            {
+                                                try
+                                                {
+                                                    list.ParentWeb.AllowUnsafeUpdates = true;
+                                                    f = new SPField(list.Fields, "EPMLiveConfigField", "EPMLiveListConfig");
+                                                    f.Hidden = true;
+                                                    list.Fields.Add(f);
+                                                    f.Update();
+                                                    list.Update();
+                                                }
+                                                catch (Exception ex) { LoggingService.WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.Medium, ex.ToString()); }
+                                            }
+                                        }
+
+                                        SPQuery query = new SPQuery();
+                                        query.Query = "<Where><Eq><FieldRef Name='Title'/><Value Type='Text'>Template</Value></Eq></Where>";
+
+                                        li = null;
+
+                                        foreach (SPListItem l in list.GetItems(query))
+                                        {
+                                            li = l;
+                                            l["Title"] = txtTitle.Text;
+                                            l.SystemUpdate();
+                                            break;
+                                        }
+
+                                        if (li == null)
+                                        {
+                                            li = list.Items.Add();
+                                            li["Title"] = txtTitle.Text;
+                                            li.Update();
+                                        }
+
+                                        retURL = list.Forms[PAGETYPE.PAGE_EDITFORM].ServerRelativeUrl + "?ID=" + li.ID + "&rnd=" + Guid.NewGuid();
+
+                                        //Response.Redirect(listUrl + "?ID=" + workspaceID + "&Source=" + retURL);
+                                        //Response.Redirect(retURL);
+                                        Microsoft.SharePoint.Utilities.SPUtility.Redirect(retURL, Microsoft.SharePoint.Utilities.SPRedirectFlags.Default, HttpContext.Current);
                                     }
-
-                                    SPQuery query = new SPQuery();
-                                    query.Query = "<Where><Eq><FieldRef Name='Title'/><Value Type='Text'>Template</Value></Eq></Where>";
-
-                                    li = null;
-
-                                    foreach (SPListItem l in list.GetItems(query))
+                                    else
                                     {
-                                        li = l;
-                                        l["Title"] = txtTitle.Text;
-                                        l.SystemUpdate();
-                                        break;
+                                        label1.Text = "Error: The list " + curList.Title + " does not exist";
+                                        Panel2.Visible = true;
                                     }
-
-                                    if (li == null)
-                                    {
-                                        li = list.Items.Add();
-                                        li["Title"] = txtTitle.Text;
-                                        li.Update();
-                                    }
-
-                                    retURL = list.Forms[PAGETYPE.PAGE_EDITFORM].ServerRelativeUrl + "?ID=" + li.ID + "&rnd=" + Guid.NewGuid();
-
-                                    //Response.Redirect(listUrl + "?ID=" + workspaceID + "&Source=" + retURL);
-                                    //Response.Redirect(retURL);
-                                    Microsoft.SharePoint.Utilities.SPUtility.Redirect(retURL, Microsoft.SharePoint.Utilities.SPRedirectFlags.Default, HttpContext.Current);
                                 }
-                                else
-                                {
-                                    label1.Text = "Error: The list " + curList.Title + " does not exist";
-                                    Panel2.Visible = true;
-                                }
-
                                 //w.Close();
 
                             }

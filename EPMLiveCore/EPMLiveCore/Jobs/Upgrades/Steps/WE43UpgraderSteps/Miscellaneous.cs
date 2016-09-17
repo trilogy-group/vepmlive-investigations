@@ -30,47 +30,53 @@ namespace EPMLiveCore.Jobs.Upgrades.Steps.WE43UpgraderSteps
 
                 foreach (SPWeb spWeb in SPWeb.Site.AllWebs)
                 {
-                    bool isLocked;
-                    bool.TryParse(CoreFunctions.getConfigSetting(spWeb, "EPMLiveLockConfig"), out isLocked);
-
-                    if (!isLocked) continue;
-
-                    LogMessage("\tWeb: " + spWeb.ServerRelativeUrl);
-
-                    LogMessage("\tAdding the Planner Templates library...");
-
-                    SPList spList = spWeb.Lists.TryGetList("Planner Templates");
-
-                    if (spList == null)
+                    try
                     {
-                        try
+                        bool isLocked;
+                        bool.TryParse(CoreFunctions.getConfigSetting(spWeb, "EPMLiveLockConfig"), out isLocked);
+
+                        if (!isLocked) continue;
+
+                        LogMessage("\tWeb: " + spWeb.ServerRelativeUrl);
+
+                        LogMessage("\tAdding the Planner Templates library...");
+
+                        SPList spList = spWeb.Lists.TryGetList("Planner Templates");
+
+                        if (spList == null)
                         {
-                            Guid libId = spWeb.Lists.Add("Planner Templates",
-                                                         "Use this library to manage planner templates.",
-                                                         SPListTemplateType.DocumentLibrary);
+                            try
+                            {
+                                Guid libId = spWeb.Lists.Add("Planner Templates",
+                                                             "Use this library to manage planner templates.",
+                                                             SPListTemplateType.DocumentLibrary);
 
-                            SPList list = spWeb.Lists.GetList(libId, true);
-                            list.Fields.Add("Description", SPFieldType.Note, false);
-                            list.Update();
+                                SPList list = spWeb.Lists.GetList(libId, true);
+                                list.Fields.Add("Description", SPFieldType.Note, false);
+                                list.Update();
 
-                            LogMessage("\t", "Added.", 1);
+                                LogMessage("\t", "Added.", 1);
+                            }
+                            catch (Exception e)
+                            {
+                                LogMessage("\t", e.ToString(), 3);
+                            }
                         }
-                        catch (Exception e)
+                        else
                         {
-                            LogMessage("\t", e.Message, 3);
+                            LogMessage("\t", "Library already exists.", 2);
                         }
-                    }
-                    else
-                    {
-                        LogMessage("\t", "Library already exists.", 2);
-                    }
 
-                    SetProperty("UseOldEditInProject", true.ToString(), new[] {spWeb}, false);
+                        SetProperty("UseOldEditInProject", true.ToString(), new[] { spWeb }, false);
+                    }
+                    catch (Exception ex) { LogMessage("\t", ex.ToString(), 3); }
+                    finally { if (spWeb != null) spWeb.Dispose(); }
+
                 }
             }
             catch (Exception e)
             {
-                LogMessage("", e.Message, 3);
+                LogMessage("", e.ToString(), 3);
             }
         }
 

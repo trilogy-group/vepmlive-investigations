@@ -9,6 +9,9 @@ using System.Web.UI.WebControls;
 using System.Web.UI.WebControls.WebParts;
 using System.Web.UI.HtmlControls;
 using Microsoft.SharePoint;
+using EPMLiveCore.Infrastructure.Logging;
+using static EPMLiveCore.Infrastructure.Logging.LoggingService;
+using Microsoft.SharePoint.Administration;
 
 namespace EPMLiveCore
 {
@@ -97,7 +100,7 @@ namespace EPMLiveCore
 
             foreach (SPListItem li in list.Items)
             {
-                dt.Rows.Add(new string[] { li.Title, DateTime.Parse(li["StartDate"].ToString()).ToShortDateString(), DateTime.Parse(li["EndDate"].ToString()).ToShortDateString(), li.UniqueId.ToString(), li["Capacity"].ToString()});
+                dt.Rows.Add(new string[] { li.Title, DateTime.Parse(li["StartDate"].ToString()).ToShortDateString(), DateTime.Parse(li["EndDate"].ToString()).ToShortDateString(), li.UniqueId.ToString(), li["Capacity"].ToString() });
             }
 
             GridView2.DataSource = dt;
@@ -137,7 +140,7 @@ namespace EPMLiveCore
 
             SPList list = web.Lists["EPMLiveValueTypes"];
 
-            foreach(SPListItem li in list.Items)
+            foreach (SPListItem li in list.Items)
             {
                 if (arrAvail.Contains(li.Title))
                 {
@@ -284,12 +287,13 @@ namespace EPMLiveCore
                 {
                     deleteWebPeriod(w, period, url);
                 }
-                catch { }
-                w.Close();
+                catch (Exception ex) { LoggingService.WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Others, TraceSeverity.Medium, ex.ToString()); }
+                finally { if (w != null) w.Dispose(); }
+
             }
         }
 
-        
+
 
         protected void GridView1_RowDataBound(object sender, GridViewRowEventArgs e)
         {
