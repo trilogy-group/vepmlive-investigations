@@ -59,7 +59,7 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps.OptIn
         {
             SPWebCollection webCollection;
 
-            using (var spSite = new SPSite(siteId))
+            using (SPSite spSite = new SPSite(siteId))
             {
                 using (SPWeb spWeb = spSite.OpenWeb(webId))
                 {
@@ -105,7 +105,7 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps.OptIn
                         SPList spList = spWeb.Lists.TryGetList("Team");
                         if (spList != null)
                         {
-                            var settings = new GridGanttSettings(spList) {HideNewButton = true};
+                            var settings = new GridGanttSettings(spList) { HideNewButton = true };
                             settings.SaveSettings(spList);
                         }
                     }
@@ -124,7 +124,16 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps.OptIn
 
             foreach (SPWeb spWeb in webCollection)
             {
-                UpdateUI(siteId, spWeb.ID);
+                try
+                {
+                    UpdateUI(siteId, spWeb.ID);
+                }
+                catch (Exception ex)
+                {
+                    LogMessage(ex.Message, MessageKind.FAILURE, 3);
+                }
+                finally {if(spWeb!=null) spWeb.Dispose(); }                
+                
             }
         }
 
@@ -387,7 +396,14 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps.OptIn
 
             foreach (SPWeb spWeb in webCollection)
             {
-                UpdateListIcon(siteId, spWeb.ID);
+                try
+                {
+                    UpdateListIcon(siteId, spWeb.ID);
+                }
+                catch (Exception ex)
+                { LogMessage(ex.ToString(), MessageKind.FAILURE, 2); }
+                finally
+                { if (spWeb != null) spWeb.Dispose(); }
             }
         }
 
@@ -464,12 +480,12 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps.OptIn
 
                             string reason = string.Empty;
 
-                            switch ((int) spList.BaseTemplate)
+                            switch ((int)spList.BaseTemplate)
                             {
-                                case (int) EPMLiveLists.ProjectCenter:
+                                case (int)EPMLiveLists.ProjectCenter:
                                     reason = "List Definition: Project Center.";
                                     break;
-                                case (int) EPMLiveLists.TaskCenter:
+                                case (int)EPMLiveLists.TaskCenter:
                                     reason = "List Definition: Task Center.";
                                     break;
                                 default:
@@ -532,7 +548,7 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps.OptIn
                         {
                             LogTitle(GetListInfo(spList), 2);
 
-                            var settings = new GridGanttSettings(spList) {EnableRequests = true};
+                            var settings = new GridGanttSettings(spList) { EnableRequests = true };
                             settings.SaveSettings(spList);
 
                             LogMessage(string.Empty, MessageKind.SUCCESS, 3);
@@ -645,7 +661,7 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps.OptIn
                                 LogMessage("Downloading new " + LIST_NAME + " list", 2);
 
                                 var catalog =
-                                    (SPDocumentLibrary) Web.Site.GetCatalog(SPListTemplateType.ListTemplateCatalog);
+                                    (SPDocumentLibrary)Web.Site.GetCatalog(SPListTemplateType.ListTemplateCatalog);
 
                                 const string TEMPLATE_NAME = LIST_NAME + " [5.5]";
 

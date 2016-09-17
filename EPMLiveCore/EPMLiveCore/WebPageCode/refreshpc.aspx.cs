@@ -9,6 +9,9 @@ using System.Web.UI.WebControls;
 using System.Web.UI.WebControls.WebParts;
 using System.Web.UI.HtmlControls;
 using Microsoft.SharePoint;
+using EPMLiveCore.Infrastructure.Logging;
+using static EPMLiveCore.Infrastructure.Logging.LoggingService;
+using Microsoft.SharePoint.Administration;
 
 namespace EPMLiveCore
 {
@@ -30,55 +33,55 @@ namespace EPMLiveCore
                 }
                 catch { }
 
-                
-                SPSecurity.RunWithElevatedPrivileges(delegate()
+
+                SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
                     using (SPSite procSite = new SPSite(site.ID))
                     {
-                        SPWeb web = procSite.OpenWeb(oldWeb.ServerRelativeUrl);
-
-                        hCurrentProjectCenter = new Hashtable();
-                        web.AllowUnsafeUpdates = true;
-                        web.Site.CatchAccessDeniedException = false;
-                        try
+                        using (SPWeb web = procSite.OpenWeb(oldWeb.ServerRelativeUrl))
                         {
-                            projectCenter = web.Lists[new Guid(Request["ListId"])];
-
-                            foreach (SPListItem li in projectCenter.Items)
+                            hCurrentProjectCenter = new Hashtable();
+                            web.AllowUnsafeUpdates = true;
+                            web.Site.CatchAccessDeniedException = false;
+                            try
                             {
-                                string url = li[projectCenter.Fields.GetFieldByInternalName("URL").Id].ToString();
-                                url = url.Replace(", ", "\n");
-                                url = url.Split('\n')[0];
-                                try
+                                projectCenter = web.Lists[new Guid(Request["ListId"])];
+
+                                foreach (SPListItem li in projectCenter.Items)
                                 {
-                                    hCurrentProjectCenter.Add(url, li);
+                                    string url = li[projectCenter.Fields.GetFieldByInternalName("URL").Id].ToString();
+                                    url = url.Replace(", ", "\n");
+                                    url = url.Split('\n')[0];
+                                    try
+                                    {
+                                        hCurrentProjectCenter.Add(url, li);
+                                    }
+                                    catch(Exception ex) { LoggingService.WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.Medium, ex.ToString()); }
                                 }
-                                catch { }
+
+                                processWeb(web);
+
+                                foreach (DictionaryEntry entry in hCurrentProjectCenter)
+                                {
+                                    try
+                                    {
+                                        SPListItem li = (SPListItem)entry.Value;
+                                        li.Delete();
+                                    }
+                                    catch (Exception ex) { LoggingService.WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.Medium, ex.ToString()); }
+                                    projectCenter.Update();
+                                }
                             }
-
-                            processWeb(web);
-
-                            foreach (DictionaryEntry entry in hCurrentProjectCenter)
+                            catch (Exception ex)
                             {
-                                try
-                                {
-                                    SPListItem li = (SPListItem)entry.Value;
-                                    li.Delete();
-                                }
-                                catch { }
-                                projectCenter.Update();
+                                Response.Write("Error in Main: " + ex.Message);
                             }
                         }
-                        catch (Exception ex)
-                        {
-                            Response.Write("Error in Main: " + ex.Message);
-                        }
-                        web.Close();
                     }
-                    
+
                 });
             }
-            if(!debug)
+            if (!debug)
                 Response.Redirect(HttpContext.Current.Request.UrlReferrer.ToString());
         }
         private void processWeb(SPWeb web)
@@ -227,9 +230,9 @@ namespace EPMLiveCore
                 try
                 {
                     processWeb(w);
-                    w.Close();
                 }
-                catch { }
+                catch (Exception ex) { LoggingService.WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.Medium, ex.ToString()); }
+                finally { if (w != null) w.Dispose(); }
             }
         }
 

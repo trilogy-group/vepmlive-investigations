@@ -9,6 +9,9 @@ using System.Web.UI.WebControls;
 using System.Web.UI.WebControls.WebParts;
 using System.Web.UI.HtmlControls;
 using Microsoft.SharePoint;
+using EPMLiveCore.Infrastructure.Logging;
+using static EPMLiveCore.Infrastructure.Logging.LoggingService;
+using Microsoft.SharePoint.Administration;
 
 namespace EPMLiveCore
 {
@@ -109,7 +112,7 @@ namespace EPMLiveCore
             try
             {
                 web.AllowUnsafeUpdates = true;
-                
+
                 if (CoreFunctions.getConfigSetting(web, "EPMLiveTimePhasedURL").ToLower() == url.ToLower())
                 {
                     SPList list = web.Lists["EPMLiveTimePhased"];
@@ -134,8 +137,8 @@ namespace EPMLiveCore
                 {
                     addWebPeriods(w, periods, url);
                 }
-                catch { }
-                w.Close();
+                catch (Exception ex) { LoggingService.WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Others, TraceSeverity.Medium, ex.ToString()); }
+                finally { if (w != null) w.Close(); }
             }
         }
 
@@ -245,7 +248,7 @@ namespace EPMLiveCore
                     dt.Rows.Add(new string[] { name, start, end, capacity });
                 }
             }
-            
+
             GridView2.DataSource = dt;
             GridView2.DataBind();
             pnlData.Visible = false;

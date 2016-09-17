@@ -11,6 +11,9 @@ using System.Collections;
 using System.Xml;
 using System.Threading;
 using System.ComponentModel;
+using EPMLiveCore.Infrastructure.Logging;
+using static EPMLiveCore.Infrastructure.Logging.LoggingService;
+using Microsoft.SharePoint.Administration;
 
 namespace EPMLiveCore
 {
@@ -47,63 +50,65 @@ namespace EPMLiveCore
             SPQuery query = new SPQuery();
             query.Query = "<Where><And><Eq><FieldRef Name='TimePhasedType'/><Value Type='Number'>1</Value></Eq><Eq><FieldRef Name='Title'/><Value Type=\"Text\"><![CDATA[" + tsData.Project + "]]></Value></Eq></And></Where>";
 
-            SPSite site = new SPSite(tsData.siteUid);
-            SPWeb web = site.OpenWeb(tsData.webUrl);
-            try
+            using (SPSite site = new SPSite(tsData.siteUid))
             {
-                SPList list = web.Lists["EPMLiveTimePhased"];
-
-                foreach (SPListItem li in list.GetItems(query))
+                using (SPWeb web = site.OpenWeb(tsData.webUrl))
                 {
-                    arr.Add(li);
-                }
-                foreach (SPListItem li in arr)
-                {
-                    li.Delete();
-                }
-
-                XmlDocument doc = new XmlDocument();
-                doc.LoadXml(tsData.Data);
-
-                foreach (XmlNode ndTask in doc.ChildNodes[0].ChildNodes)
-                {
-                    foreach (XmlNode ndResource in ndTask.ChildNodes)
+                    try
                     {
-                        foreach (XmlNode ndValueType in ndResource.ChildNodes)
+                        SPList list = web.Lists["EPMLiveTimePhased"];
+
+                        foreach (SPListItem li in list.GetItems(query))
                         {
-                            try
+                            arr.Add(li);
+                        }
+                        foreach (SPListItem li in arr)
+                        {
+                            li.Delete();
+                        }
+
+                        XmlDocument doc = new XmlDocument();
+                        doc.LoadXml(tsData.Data);
+
+                        foreach (XmlNode ndTask in doc.ChildNodes[0].ChildNodes)
+                        {
+                            foreach (XmlNode ndResource in ndTask.ChildNodes)
                             {
-                                SPListItem li = list.Items.Add();
-                                li["Title"] = tsData.Project;
-                                li["Task"] = ndTask.Attributes["Name"].Value.ToString();
-                                li["WBS"] = ndTask.Attributes["WBS"].Value.ToString();
-                                li["Resource"] = ndResource.Attributes["Name"].Value.ToString();
-                                li["ValueType"] = ndValueType.Attributes["Name"].Value.ToString();
-                                li["TimePhasedType"] = 1;
-                                foreach (XmlNode ndPeriod in ndValueType.ChildNodes)
+                                foreach (XmlNode ndValueType in ndResource.ChildNodes)
                                 {
-                                    string pName = ndPeriod.Attributes["Name"].Value.Trim();
-                                    string pValue = ndPeriod.Attributes["Value"].Value.Trim();
-                                    li[list.Fields.GetFieldByInternalName(pName.Replace(" ", "_x0020_")).Id] = pValue;
+                                    try
+                                    {
+                                        SPListItem li = list.Items.Add();
+                                        li["Title"] = tsData.Project;
+                                        li["Task"] = ndTask.Attributes["Name"].Value.ToString();
+                                        li["WBS"] = ndTask.Attributes["WBS"].Value.ToString();
+                                        li["Resource"] = ndResource.Attributes["Name"].Value.ToString();
+                                        li["ValueType"] = ndValueType.Attributes["Name"].Value.ToString();
+                                        li["TimePhasedType"] = 1;
+                                        foreach (XmlNode ndPeriod in ndValueType.ChildNodes)
+                                        {
+                                            string pName = ndPeriod.Attributes["Name"].Value.Trim();
+                                            string pValue = ndPeriod.Attributes["Value"].Value.Trim();
+                                            li[list.Fields.GetFieldByInternalName(pName.Replace(" ", "_x0020_")).Id] = pValue;
+                                        }
+                                        li.Update();
+                                    }
+                                    catch (Exception ex) { LoggingService.WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Api, TraceSeverity.Medium, ex.ToString()); }
                                 }
-                                li.Update();
                             }
-                            catch { }
                         }
                     }
+                    catch (Exception ex) { LoggingService.WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Api, TraceSeverity.Medium, ex.ToString()); }
                 }
             }
-            catch { }
-            web.Close();
-            site.Close();
         }
         [WebMethod]
         public string getConfigSetting(string setting)
         {
-            string val ="";
+            string val = "";
             SPWeb web = SPContext.Current.Web;
             {
-                if(setting.ToLower().Contains("url"))
+                if (setting.ToLower().Contains("url"))
                     val = EPMLiveCore.CoreFunctions.getLockConfigSetting(web, setting, false);
                 else
                     val = EPMLiveCore.CoreFunctions.getConfigSetting(web, setting);
@@ -114,7 +119,7 @@ namespace EPMLiveCore
         [WebMethod]
         public bool saveTimePhasedData(string sUrl, string sProject, string sData)
         {
-            
+
             SPWeb tsWeb = SPContext.Current.Web;
             bool success = true;
             try
@@ -136,7 +141,7 @@ namespace EPMLiveCore
                 Thread thrDownload = new Thread(new ParameterizedThreadStart(doTSData));
                 thrDownload.IsBackground = true;
                 thrDownload.Start(tsData);
-                
+
             }
             catch
             {
@@ -155,11 +160,11 @@ namespace EPMLiveCore
                 using (SPSite site = new SPSite(sUrl))
                 {
                     sUrl = sUrl.Replace(site.Url, "");
-                    using(SPWeb web = site.OpenWeb(site.RootWeb.ID))
+                    using (SPWeb web = site.OpenWeb(site.RootWeb.ID))
                     {
-                        if(sUrl != "")
+                        if (sUrl != "")
                         {
-                            using(SPWeb rweb = site.OpenWeb(sUrl))
+                            using (SPWeb rweb = site.OpenWeb(sUrl))
                             {
                                 sValues = iGetAllValueTypes(rweb);
                             }
@@ -174,9 +179,9 @@ namespace EPMLiveCore
             return sValues;
         }
 
-        private string []iGetAllValueTypes(SPWeb web)
+        private string[] iGetAllValueTypes(SPWeb web)
         {
-            string []sValues;
+            string[] sValues;
             SPList lstValues = null;
             ArrayList arrValues = new ArrayList();
             try
@@ -185,9 +190,9 @@ namespace EPMLiveCore
             }
             catch { }
 
-            if(lstValues != null)
+            if (lstValues != null)
             {
-                foreach(SPListItem li in lstValues.Items)
+                foreach (SPListItem li in lstValues.Items)
                 {
                     arrValues.Add(li.Title);
                 }
@@ -196,7 +201,7 @@ namespace EPMLiveCore
             sValues = new string[arrValues.Count];
             int counter = 0;
 
-            foreach(string sVal in arrValues)
+            foreach (string sVal in arrValues)
             {
                 sValues[counter++] = sVal;
             }
@@ -213,11 +218,11 @@ namespace EPMLiveCore
                 using (SPSite site = new SPSite(sUrl))
                 {
                     sUrl = sUrl.Replace(site.Url, "");
-                    using(SPWeb web = site.OpenWeb(site.RootWeb.ID))
+                    using (SPWeb web = site.OpenWeb(site.RootWeb.ID))
                     {
-                        if(sUrl != "")
+                        if (sUrl != "")
                         {
-                            using(SPWeb rweb = site.OpenWeb(sUrl))
+                            using (SPWeb rweb = site.OpenWeb(sUrl))
                             {
                                 periods = iGetAllTimePeriods(rweb);
                             }
@@ -245,15 +250,15 @@ namespace EPMLiveCore
                 lstData = tsWeb.Lists["EPMLiveTimePhased"];
             }
             catch { }
-            if(lstPeriods != null && lstData != null)
+            if (lstPeriods != null && lstData != null)
             {
-                foreach(SPListItem li in lstPeriods.Items)
+                foreach (SPListItem li in lstPeriods.Items)
                 {
                     try
                     {
                         string field = li.Title.Replace(" ", "_x0020_");
 
-                        if(lstData.Fields.GetFieldByInternalName(field) != null)
+                        if (lstData.Fields.GetFieldByInternalName(field) != null)
                         {
 
                             Period p = new Period();
@@ -273,7 +278,7 @@ namespace EPMLiveCore
 
             periods = new Period[arrPeriods.Count];
             int counter = 0;
-            foreach(Period p in arrPeriods)
+            foreach (Period p in arrPeriods)
             {
                 periods[counter++] = p;
             }
@@ -285,7 +290,7 @@ namespace EPMLiveCore
         {
             ArrayList arrSettings = new ArrayList();
             string url = SPContext.Current.Web.Url;
-            SPSecurity.RunWithElevatedPrivileges(delegate()
+            SPSecurity.RunWithElevatedPrivileges(delegate ()
             {
                 using (SPSite site = new SPSite(url))
                 {
@@ -297,7 +302,7 @@ namespace EPMLiveCore
 
                         Guid lWeb = CoreFunctions.getLockedWeb(web);
 
-                        if(lWeb != Guid.Empty)
+                        if (lWeb != Guid.Empty)
                         {
                             using (SPWeb web2 = site.OpenWeb(lWeb))
                             {

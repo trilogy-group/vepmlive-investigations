@@ -18,6 +18,9 @@ using EPMLiveCore.ReportHelper;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using EPMLiveCore.Infrastructure;
+using EPMLiveCore.Infrastructure.Logging;
+using static EPMLiveCore.Infrastructure.Logging.LoggingService;
+using Microsoft.SharePoint.Administration;
 
 namespace EPMLiveCore.Layouts.epmlive
 {
@@ -191,7 +194,7 @@ namespace EPMLiveCore.Layouts.epmlive
                         ddlItemLink.Items.Add(new ListItem("Task Center", "tasks"));
                     }
 
-                    SPSecurity.RunWithElevatedPrivileges(delegate()
+                    SPSecurity.RunWithElevatedPrivileges(delegate ()
                     {
                         using (SPSite site = new SPSite(web.Site.ID))
                         {
@@ -414,8 +417,8 @@ namespace EPMLiveCore.Layouts.epmlive
                         List<SPEventReceiverDefinition> evts = GetListEvents(list,
                                                                             "EPMLiveReportsAdmin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b90e532f481cf050",
                                                                             "EPMLiveReportsAdmin.ListEvents",
-                                                                            new List<SPEventReceiverType> { SPEventReceiverType.ItemAdded, 
-                                                                                                            SPEventReceiverType.ItemUpdated, 
+                                                                            new List<SPEventReceiverType> { SPEventReceiverType.ItemAdded,
+                                                                                                            SPEventReceiverType.ItemUpdated,
                                                                                                             SPEventReceiverType.ItemDeleting });
 
                         bool hasEvents = (evts.Count > 0);
@@ -1045,8 +1048,8 @@ namespace EPMLiveCore.Layouts.epmlive
 
             var spEventReceiverTypes = new[]
                                                {
-                                                   SPEventReceiverType.ItemAdded, 
-                                                   SPEventReceiverType.ItemUpdated, 
+                                                   SPEventReceiverType.ItemAdded,
+                                                   SPEventReceiverType.ItemUpdated,
                                                    SPEventReceiverType.ItemDeleting
                                                };
 
@@ -1245,7 +1248,7 @@ namespace EPMLiveCore.Layouts.epmlive
                 evtAdded.Update();
                 list.Update();
             }
-            else if (chkEnableTeam.Checked || chkEnableTeamSecurity.Checked && list.BaseTemplate == SPListTemplateType.DocumentLibrary )
+            else if (chkEnableTeam.Checked || chkEnableTeamSecurity.Checked && list.BaseTemplate == SPListTemplateType.DocumentLibrary)
             {
                 //EPML-4257 : In  document library if you have enable team and enable team security on the library will not load
                 API.ListCommands.EnableTeamFeatures(list);
@@ -1374,7 +1377,7 @@ namespace EPMLiveCore.Layouts.epmlive
                         }
                         catch (Exception ex)
                         {
-                            SPSecurity.RunWithElevatedPrivileges(delegate()
+                            SPSecurity.RunWithElevatedPrivileges(delegate ()
                             {
                                 if (!EventLog.SourceExists("EPMLive Reporting - UpdateForeignKeys"))
                                     EventLog.CreateEventSource("EPMLive Reporting - UpdateForeignKeys", "EPM Live");
@@ -1499,9 +1502,10 @@ namespace EPMLiveCore.Layouts.epmlive
         {
             try
             {
-                SPSecurity.RunWithElevatedPrivileges(delegate()
+                SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
                     SPWeb web = SPContext.Current.Web;
+
                     web.AllowUnsafeUpdates = true;
 
                     bool isFancyFormWPExist = false;
@@ -1513,38 +1517,46 @@ namespace EPMLiveCore.Layouts.epmlive
                     if (dispForm != null)
                     {
                         //Delete webparts from existing list
-                        var wpm = dispForm.GetLimitedWebPartManager(System.Web.UI.WebControls.WebParts.PersonalizationScope.Shared);
-                        if (wpm.WebParts != null)
+                        using (var wpm = dispForm.GetLimitedWebPartManager(System.Web.UI.WebControls.WebParts.PersonalizationScope.Shared))
                         {
-                            for (int i = 0; i < wpm.WebParts.Count; i++)
+                            try
                             {
-                                try
+                                if (wpm.WebParts != null)
                                 {
-                                    if ((!string.IsNullOrEmpty(wpm.WebParts[i].Title)) && (wpm.WebParts[i].Title.Equals("Fancy Display Form", StringComparison.InvariantCultureIgnoreCase)))
+                                    for (int i = 0; i < wpm.WebParts.Count; i++)
                                     {
-                                        isFancyFormWPExist = true;
-                                        //wpm.CloseWebPart(wpm.WebParts[i]);
-                                        //wpm.SaveChanges(wpm.WebParts[i]);
-                                        wpm.WebParts[i].AllowHide = true;
-                                        wpm.WebParts[i].Hidden = true;
-                                        //wpm.WebParts[i].Visible = false;
-                                        wpm.SaveChanges(wpm.WebParts[i]);
-                                    }
-                                    else if (wpm.WebParts[i].ToString() == "Microsoft.SharePoint.WebPartPages.XsltListViewWebPart" ||
-                                        wpm.WebParts[i].ToString() == "Microsoft.SharePoint.WebPartPages.ListFormWebPart" ||
-                                        wpm.WebParts[i].ToString() == "Microsoft.SharePoint.WebPartPages.ListViewWebPart" ||
-                                        wpm.WebParts[i].ToString() == "Microsoft.SharePoint.WebPartPages.DataFormWebPart")
-                                    {
-                                        //wpm.OpenWebPart(wpm.WebParts[i]);
-                                        //wpm.SaveChanges(wpm.WebParts[i]);
-                                        wpm.WebParts[i].AllowHide = false;
-                                        wpm.WebParts[i].Hidden = false;
-                                        //wpm.WebParts[i].Visible = true;
-                                        wpm.SaveChanges(wpm.WebParts[i]);
+                                        try
+                                        {
+                                            if ((!string.IsNullOrEmpty(wpm.WebParts[i].Title)) && (wpm.WebParts[i].Title.Equals("Fancy Display Form", StringComparison.InvariantCultureIgnoreCase)))
+                                            {
+                                                isFancyFormWPExist = true;
+                                                //wpm.CloseWebPart(wpm.WebParts[i]);
+                                                //wpm.SaveChanges(wpm.WebParts[i]);
+                                                wpm.WebParts[i].AllowHide = true;
+                                                wpm.WebParts[i].Hidden = true;
+                                                //wpm.WebParts[i].Visible = false;
+                                                wpm.SaveChanges(wpm.WebParts[i]);
+                                            }
+                                            else if (wpm.WebParts[i].ToString() == "Microsoft.SharePoint.WebPartPages.XsltListViewWebPart" ||
+                                                wpm.WebParts[i].ToString() == "Microsoft.SharePoint.WebPartPages.ListFormWebPart" ||
+                                                wpm.WebParts[i].ToString() == "Microsoft.SharePoint.WebPartPages.ListViewWebPart" ||
+                                                wpm.WebParts[i].ToString() == "Microsoft.SharePoint.WebPartPages.DataFormWebPart")
+                                            {
+                                                //wpm.OpenWebPart(wpm.WebParts[i]);
+                                                //wpm.SaveChanges(wpm.WebParts[i]);
+                                                wpm.WebParts[i].AllowHide = false;
+                                                wpm.WebParts[i].Hidden = false;
+                                                //wpm.WebParts[i].Visible = true;
+                                                wpm.SaveChanges(wpm.WebParts[i]);
+                                            }
+                                        }
+                                        catch (Exception ex) { LoggingService.WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.Medium, ex.ToString()); }
                                     }
                                 }
-                                catch { }
                             }
+                            catch (Exception ex) { LoggingService.WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.Medium, ex.ToString()); }
+                            finally { if (wpm != null) wpm.Web.Dispose(); }
+
                         }
                     }
                     else
@@ -1555,19 +1567,27 @@ namespace EPMLiveCore.Layouts.epmlive
 
                     if (!isFancyFormWPExist)
                     {
-                        var wpm = dispForm.GetLimitedWebPartManager(System.Web.UI.WebControls.WebParts.PersonalizationScope.Shared);
+                        using (var wpm = dispForm.GetLimitedWebPartManager(System.Web.UI.WebControls.WebParts.PersonalizationScope.Shared))
+                        {
+                            try
+                            {
+                                //EPMLiveWebParts.FancyDisplayForm fancyDispFormWebPart = new EPMLiveWebParts.FancyDisplayForm();
+                                var fancyDispFormWebPart = WebPartsHelper.WebPartsReflector.CreateFancyDisplayFormWebPart();
+                                fancyDispFormWebPart.Title = "Fancy Display Form";
+                                fancyDispFormWebPart.ChromeState = System.Web.UI.WebControls.WebParts.PartChromeState.Normal;
+                                fancyDispFormWebPart.ChromeType = System.Web.UI.WebControls.WebParts.PartChromeType.None;
+                                fancyDispFormWebPart.AllowHide = true;
+                                fancyDispFormWebPart.Hidden = true;
+                                //wpm.WebParts[i].Visible = false;
+                                wpm.AddWebPart(fancyDispFormWebPart, "Main", 0);
+                                wpm.SaveChanges(fancyDispFormWebPart);
+                            }
+                            catch (Exception ex) { LoggingService.WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.Medium, ex.ToString()); }
+                            finally { if (wpm != null) wpm.Web.Dispose(); }
 
-                        //EPMLiveWebParts.FancyDisplayForm fancyDispFormWebPart = new EPMLiveWebParts.FancyDisplayForm();
-                        var fancyDispFormWebPart = WebPartsHelper.WebPartsReflector.CreateFancyDisplayFormWebPart();
-                        fancyDispFormWebPart.Title = "Fancy Display Form";
-                        fancyDispFormWebPart.ChromeState = System.Web.UI.WebControls.WebParts.PartChromeState.Normal;
-                        fancyDispFormWebPart.ChromeType = System.Web.UI.WebControls.WebParts.PartChromeType.None;
-                        fancyDispFormWebPart.AllowHide = true;
-                        fancyDispFormWebPart.Hidden = true;
-                        //wpm.WebParts[i].Visible = false;
-                        wpm.AddWebPart(fancyDispFormWebPart, "Main", 0);
-                        wpm.SaveChanges(fancyDispFormWebPart);
+                        }
                     }
+
                 });
             }
             catch { }
@@ -1577,9 +1597,10 @@ namespace EPMLiveCore.Layouts.epmlive
         {
             try
             {
-                SPSecurity.RunWithElevatedPrivileges(delegate()
+                SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
                     SPWeb web = SPContext.Current.Web;
+
                     web.AllowUnsafeUpdates = true;
 
                     bool isFancyFormWPExist = false;
@@ -1591,39 +1612,49 @@ namespace EPMLiveCore.Layouts.epmlive
                     if (dispForm != null)
                     {
                         //Delete webparts from existing list
-                        var wpm = dispForm.GetLimitedWebPartManager(System.Web.UI.WebControls.WebParts.PersonalizationScope.Shared);
-                        if (wpm.WebParts != null)
+                        using (var wpm = dispForm.GetLimitedWebPartManager(System.Web.UI.WebControls.WebParts.PersonalizationScope.Shared))
                         {
-                            for (int i = 0; i < wpm.WebParts.Count; i++)
+
+                            if (wpm.WebParts != null)
                             {
                                 try
                                 {
-                                    if ((!string.IsNullOrEmpty(wpm.WebParts[i].Title)) && (wpm.WebParts[i].Title.Equals("Fancy Display Form", StringComparison.InvariantCultureIgnoreCase)) && !isFancyFormWPExist)
+                                    for (int i = 0; i < wpm.WebParts.Count; i++)
                                     {
-                                        isFancyFormWPExist = true;
-                                        wpm.WebParts[i].AllowHide = false;
-                                        wpm.WebParts[i].Hidden = false;
-                                        //wpm.WebParts[i].Visible = true;
-                                        wpm.SaveChanges(wpm.WebParts[i]);
-                                        //wpm.OpenWebPart(wpm.WebParts[i]);
-                                        //wpm.SaveChanges(wpm.WebParts[i]);
-                                    }
-                                    else if (wpm.WebParts[i].ToString() == "Microsoft.SharePoint.WebPartPages.XsltListViewWebPart" ||
-                                            wpm.WebParts[i].ToString() == "Microsoft.SharePoint.WebPartPages.ListFormWebPart" ||
-                                            wpm.WebParts[i].ToString() == "Microsoft.SharePoint.WebPartPages.ListViewWebPart" ||
-                                            wpm.WebParts[i].ToString() == "Microsoft.SharePoint.WebPartPages.DataFormWebPart")
-                                    {
-                                        wpm.WebParts[i].AllowHide = true;
-                                        wpm.WebParts[i].Hidden = true;
-                                        //wpm.WebParts[i].Visible = false;
-                                        wpm.SaveChanges(wpm.WebParts[i]);
-                                        //wpm.CloseWebPart(wpm.WebParts[i]);
-                                        //wpm.SaveChanges(wpm.WebParts[i]);
+                                        try
+                                        {
+                                            if ((!string.IsNullOrEmpty(wpm.WebParts[i].Title)) && (wpm.WebParts[i].Title.Equals("Fancy Display Form", StringComparison.InvariantCultureIgnoreCase)) && !isFancyFormWPExist)
+                                            {
+                                                isFancyFormWPExist = true;
+                                                wpm.WebParts[i].AllowHide = false;
+                                                wpm.WebParts[i].Hidden = false;
+                                                //wpm.WebParts[i].Visible = true;
+                                                wpm.SaveChanges(wpm.WebParts[i]);
+                                                //wpm.OpenWebPart(wpm.WebParts[i]);
+                                                //wpm.SaveChanges(wpm.WebParts[i]);
+                                            }
+                                            else if (wpm.WebParts[i].ToString() == "Microsoft.SharePoint.WebPartPages.XsltListViewWebPart" ||
+                                                    wpm.WebParts[i].ToString() == "Microsoft.SharePoint.WebPartPages.ListFormWebPart" ||
+                                                    wpm.WebParts[i].ToString() == "Microsoft.SharePoint.WebPartPages.ListViewWebPart" ||
+                                                    wpm.WebParts[i].ToString() == "Microsoft.SharePoint.WebPartPages.DataFormWebPart")
+                                            {
+                                                wpm.WebParts[i].AllowHide = true;
+                                                wpm.WebParts[i].Hidden = true;
+                                                //wpm.WebParts[i].Visible = false;
+                                                wpm.SaveChanges(wpm.WebParts[i]);
+                                                //wpm.CloseWebPart(wpm.WebParts[i]);
+                                                //wpm.SaveChanges(wpm.WebParts[i]);
+                                            }
+                                        }
+                                        catch (Exception ex) { LoggingService.WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.Medium, ex.ToString()); }
                                     }
                                 }
-                                catch { }
+                                catch (Exception ex) { LoggingService.WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.Medium, ex.ToString()); }
+                                finally { if (wpm != null) wpm.Web.Dispose(); }
+
                             }
                         }
+
                     }
                     else
                     {
@@ -1633,19 +1664,26 @@ namespace EPMLiveCore.Layouts.epmlive
 
                     if (!isFancyFormWPExist)
                     {
-                        var wpm = dispForm.GetLimitedWebPartManager(System.Web.UI.WebControls.WebParts.PersonalizationScope.Shared);
+                        using (var wpm = dispForm.GetLimitedWebPartManager(System.Web.UI.WebControls.WebParts.PersonalizationScope.Shared))
+                        {
+                            try
+                            {
+                                //EPMLiveWebParts.FancyDisplayForm fancyDispFormWebPart = new EPMLiveWebParts.FancyDisplayForm();
+                                var fancyDispFormWebPart = WebPartsHelper.WebPartsReflector.CreateFancyDisplayFormWebPart();
+                                fancyDispFormWebPart.Title = "Fancy Display Form";
+                                fancyDispFormWebPart.ChromeState = System.Web.UI.WebControls.WebParts.PartChromeState.Normal;
+                                fancyDispFormWebPart.ChromeType = System.Web.UI.WebControls.WebParts.PartChromeType.None;
+                                fancyDispFormWebPart.AllowHide = false;
+                                fancyDispFormWebPart.Hidden = false;
+                                fancyDispFormWebPart.Visible = true;
 
-                        //EPMLiveWebParts.FancyDisplayForm fancyDispFormWebPart = new EPMLiveWebParts.FancyDisplayForm();
-                        var fancyDispFormWebPart = WebPartsHelper.WebPartsReflector.CreateFancyDisplayFormWebPart();
-                        fancyDispFormWebPart.Title = "Fancy Display Form";
-                        fancyDispFormWebPart.ChromeState = System.Web.UI.WebControls.WebParts.PartChromeState.Normal;
-                        fancyDispFormWebPart.ChromeType = System.Web.UI.WebControls.WebParts.PartChromeType.None;
-                        fancyDispFormWebPart.AllowHide = false;
-                        fancyDispFormWebPart.Hidden = false;
-                        fancyDispFormWebPart.Visible = true;
-
-                        wpm.AddWebPart(fancyDispFormWebPart, "Main", 0);
+                                wpm.AddWebPart(fancyDispFormWebPart, "Main", 0);
+                            }
+                            catch (Exception ex) { LoggingService.WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.Medium, ex.ToString()); }
+                            finally { if (wpm != null) wpm.Web.Dispose(); }
+                        }
                     }
+
                 });
             }
             catch { }
@@ -1661,8 +1699,8 @@ namespace EPMLiveCore.Layouts.epmlive
             List<SPEventReceiverDefinition> evts = GetListEvents(list,
                                                                  sAssembly,
                                                                  sClass,
-                                                                 new List<SPEventReceiverType> { SPEventReceiverType.ItemAdded, 
-                                                                                                                             SPEventReceiverType.ItemUpdated, 
+                                                                 new List<SPEventReceiverType> { SPEventReceiverType.ItemAdded,
+                                                                                                                             SPEventReceiverType.ItemUpdated,
                                                                                                                              SPEventReceiverType.ItemDeleting });
 
             foreach (SPEventReceiverDefinition ev in evts)
@@ -1678,8 +1716,8 @@ namespace EPMLiveCore.Layouts.epmlive
             List<SPEventReceiverDefinition> newEvts = GetListEvents(list,
                                                                 sAssembly,
                                                                 sClass,
-                                                                new List<SPEventReceiverType> { SPEventReceiverType.ItemAdded, 
-                                                                                                                             SPEventReceiverType.ItemUpdated, 
+                                                                new List<SPEventReceiverType> { SPEventReceiverType.ItemAdded,
+                                                                                                                             SPEventReceiverType.ItemUpdated,
                                                                                                                              SPEventReceiverType.ItemDeleting });
             foreach (SPEventReceiverDefinition ev in newEvts)
             {

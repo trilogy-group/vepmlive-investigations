@@ -30,7 +30,7 @@ namespace EPMLiveCore.Layouts.EPMLiveCore
                     }
                 }
                 catch { }
-                if(ddlSolution.Items.Count > 0)
+                if (ddlSolution.Items.Count > 0)
                 {
                     BtnCreateSite.Enabled = true;
                     BtnCreateSiteTop.Enabled = true;
@@ -49,12 +49,12 @@ namespace EPMLiveCore.Layouts.EPMLiveCore
                 {
                     try
                     {
-                        SPSite site = new SPSite(HidVirtualServerUrl.Value + pref.Name);
-                        site.Close();
+                        using (SPSite site = new SPSite(HidVirtualServerUrl.Value + pref.Name))
+                        { }
                     }
                     catch
                     {
-                        DdlWildcardInclusion.Items.Add(new ListItem("/" + pref.Name, "1:/" + pref.Name)); 
+                        DdlWildcardInclusion.Items.Add(new ListItem("/" + pref.Name, "1:/" + pref.Name));
                     }
                 }
                 else
@@ -73,16 +73,17 @@ namespace EPMLiveCore.Layouts.EPMLiveCore
                 if (DdlWildcardInclusion.SelectedValue.Substring(0, 1) == "0")
                 {
                     url = DdlWildcardInclusion.SelectedItem.Text + TxtSiteName.Text;
-                    SPSite site = new SPSite(HidVirtualServerUrl.Value + DdlWildcardInclusion.SelectedItem.Text + TxtSiteName.Text);
-                    sitefound = true;
-                    site.Close();
+                    using (SPSite site = new SPSite(HidVirtualServerUrl.Value + DdlWildcardInclusion.SelectedItem.Text + TxtSiteName.Text))
+                    {
+                        sitefound = true;
+                    }
                 }
                 else
                 {
                     url = DdlWildcardInclusion.SelectedItem.Text;
                 }
             }
-            catch{}
+            catch { }
             if (sitefound)
             {
                 Page.ClientScript.RegisterStartupScript(this.GetType(), "url", "<script language=\"javascript\">alert('That URL is already in use.');</script>");
@@ -92,7 +93,7 @@ namespace EPMLiveCore.Layouts.EPMLiveCore
             {
                 bool databasegood = true;
                 lblErrorDatabase.Visible = false;
-                SPSecurity.RunWithElevatedPrivileges(delegate()
+                SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
                     try
                     {
@@ -130,7 +131,7 @@ namespace EPMLiveCore.Layouts.EPMLiveCore
                             }
                         }
                     }
-                    catch(Exception ex)
+                    catch (Exception ex)
                     {
                         lblErrorDatabase.Text = ex.Message;
                         lblErrorDatabase.Visible = true;
@@ -223,7 +224,7 @@ namespace EPMLiveCore.Layouts.EPMLiveCore
         {
             string errors = "";
 
-            SPSecurity.RunWithElevatedPrivileges(delegate()
+            SPSecurity.RunWithElevatedPrivileges(delegate ()
             {
 
                 var reportData = new ReportHelper.ReportData(
@@ -248,100 +249,109 @@ namespace EPMLiveCore.Layouts.EPMLiveCore
             string errors = "";
             try
             {
-                
+
                 //SPWebService myWebService = SPWebService.ContentService;
 
                 //SPWebApplication spApp = myWebService.WebApplications[System.Configuration.ConfigurationManager.AppSettings["WebApplication"].ToString()];
 
                 SPSite site = app.Sites.Add(url, title, description, 1033, "", user, fullName, email);
+                try
+                {                 //SPSite site = spApp.Sites.Add(bUrl + url, user, email);
 
-                //SPSite site = spApp.Sites.Add(bUrl + url, user, email);
+                    site.AllowUnsafeUpdates = true;
+                    using (SPWeb web = site.OpenWeb())
 
-                site.AllowUnsafeUpdates = true;
-                SPWeb web = site.OpenWeb();
-                web.Title = title;
-                web.AllowUnsafeUpdates = true;
-                web.Site.AllowUnsafeUpdates = true;
-                web.Site.RootWeb.AllowUnsafeUpdates = true;
-                //SPDocumentLibrary solGallery1 = (SPDocumentLibrary)web.Site.RootWeb.Site.GetCatalog(SPListTemplateType.SolutionCatalog);
-
-
-                string[] files = Directory.GetFiles(Environment.GetFolderPath(Environment.SpecialFolder.CommonProgramFiles) + "\\workengine\\templates\\" + template);
-                int counter = 1;
-                foreach (string file in files)
-                {
-                    addfile(Path.GetFileNameWithoutExtension(file), web, file, counter);
-                    counter++;
-                }
-
-                SPWebTemplate webtemplate = null;
-                foreach (SPWebTemplate t in web.GetAvailableWebTemplates((uint)web.Locale.LCID))
-                {
-                    if (t.Title == template)
                     {
-                        webtemplate = t;
-                        break;
+                        web.Title = title;
+                        web.AllowUnsafeUpdates = true;
+                        web.Site.AllowUnsafeUpdates = true;
+                        web.Site.RootWeb.AllowUnsafeUpdates = true;
+                        //SPDocumentLibrary solGallery1 = (SPDocumentLibrary)web.Site.RootWeb.Site.GetCatalog(SPListTemplateType.SolutionCatalog);
+
+
+                        string[] files = Directory.GetFiles(Environment.GetFolderPath(Environment.SpecialFolder.CommonProgramFiles) + "\\workengine\\templates\\" + template);
+                        int counter = 1;
+                        foreach (string file in files)
+                        {
+                            addfile(Path.GetFileNameWithoutExtension(file), web, file, counter);
+                            counter++;
+                        }
+
+                        SPWebTemplate webtemplate = null;
+                        foreach (SPWebTemplate t in web.GetAvailableWebTemplates((uint)web.Locale.LCID))
+                        {
+                            if (t.Title == template)
+                            {
+                                webtemplate = t;
+                                break;
+                            }
+                        }
+
+                        if (webtemplate != null)
+                            web.ApplyWebTemplate(webtemplate);
+
+                        //web.Update();
+
+                        //web.AllUsers.Add(user, email, fullName, "");
+                        ////web.AllUsers.Add(System.Configuration.ConfigurationManager.AppSettings["owner"].ToString(), "", System.Configuration.ConfigurationManager.AppSettings["owner"].ToString(), "");
+                        //web.Users[user].Name = fullName;
+                        //web.Users[user].Update();
+
+                        //web.Update();
+                        SPUser owner = web.AllUsers[user];
+
+
+                        web.SiteGroups.Add("Administrators", owner, owner, "");
+
+                        //web.Update();
+                        web.AssociatedOwnerGroup = GetSiteGroup(web, "Administrators");
+                        SPRole roll = web.Roles["Full Control"];
+                        roll.AddGroup(web.SiteGroups["Administrators"]);
+                        SPMember newOwner = web.SiteGroups["Administrators"];
+
+                        web.SiteGroups.Add("Team Members", newOwner, owner, "");
+                        web.SiteGroups.Add("Visitors", newOwner, owner, "");
+                        web.SiteGroups.Add("Project Managers", newOwner, owner, "");
+                        //web.Update();
+
+                        web.AssociatedVisitorGroup = GetSiteGroup(web, "Visitors");
+                        web.AssociatedOwnerGroup = GetSiteGroup(web, "Administrators");
+                        web.AssociatedMemberGroup = GetSiteGroup(web, "Team Members");
+                        // web.Update();
+
+                        //web.SiteGroups["Administrators"].Users[user].Name = fullName;
+                        //web.SiteGroups["Project Managers"].Users[user].Name = fullName;
+                        //web.SiteGroups["Team Members"].Users[user].Name = fullName;
+                        //web.SiteGroups["Visitors"].Users[user].Name = fullName;
+
+                        web.Roles.Add("Contribute2", "Can view, add, update, delete and manage subwebs", web.Roles["Contribute"].PermissionMask | SPRights.ManageSubwebs);
+
+                        roll = web.Roles["Full Control"];
+                        roll.AddGroup(web.SiteGroups["Administrators"]);
+
+                        roll = web.Roles["Contribute"];
+                        roll.AddGroup(web.SiteGroups["Team Members"]);
+
+                        roll = web.Roles["Read"];
+                        roll.AddGroup(web.SiteGroups["Visitors"]);
+
+                        roll = web.Roles["Contribute2"];
+                        roll.AddGroup(web.SiteGroups["Project Managers"]);
+
+                        siteid = site.ID;
+
+                        if (txtDatabaseServer.Text != "")
+                            errors = mapReports(site);
                     }
                 }
-
-                if (webtemplate != null)
-                    web.ApplyWebTemplate(webtemplate);
-
-                //web.Update();
-
-                //web.AllUsers.Add(user, email, fullName, "");
-                ////web.AllUsers.Add(System.Configuration.ConfigurationManager.AppSettings["owner"].ToString(), "", System.Configuration.ConfigurationManager.AppSettings["owner"].ToString(), "");
-                //web.Users[user].Name = fullName;
-                //web.Users[user].Update();
-
-                //web.Update();
-                SPUser owner = web.AllUsers[user];
+                catch (Exception ex) { errors = ex.ToString(); }
+                finally
+                {
+                    if (site != null)
+                        site.Dispose();
+                }
 
 
-                web.SiteGroups.Add("Administrators", owner, owner, "");
-
-                //web.Update();
-                web.AssociatedOwnerGroup = GetSiteGroup(web, "Administrators");
-                SPRole roll = web.Roles["Full Control"];
-                roll.AddGroup(web.SiteGroups["Administrators"]);
-                SPMember newOwner = web.SiteGroups["Administrators"];
-
-                web.SiteGroups.Add("Team Members", newOwner, owner, "");
-                web.SiteGroups.Add("Visitors", newOwner, owner, "");
-                web.SiteGroups.Add("Project Managers", newOwner, owner, "");
-                //web.Update();
-
-                web.AssociatedVisitorGroup = GetSiteGroup(web, "Visitors");
-                web.AssociatedOwnerGroup = GetSiteGroup(web, "Administrators");
-                web.AssociatedMemberGroup = GetSiteGroup(web, "Team Members");
-                // web.Update();
-
-                //web.SiteGroups["Administrators"].Users[user].Name = fullName;
-                //web.SiteGroups["Project Managers"].Users[user].Name = fullName;
-                //web.SiteGroups["Team Members"].Users[user].Name = fullName;
-                //web.SiteGroups["Visitors"].Users[user].Name = fullName;
-
-                web.Roles.Add("Contribute2", "Can view, add, update, delete and manage subwebs", web.Roles["Contribute"].PermissionMask | SPRights.ManageSubwebs);
-
-                roll = web.Roles["Full Control"];
-                roll.AddGroup(web.SiteGroups["Administrators"]);
-
-                roll = web.Roles["Contribute"];
-                roll.AddGroup(web.SiteGroups["Team Members"]);
-
-                roll = web.Roles["Read"];
-                roll.AddGroup(web.SiteGroups["Visitors"]);
-
-                roll = web.Roles["Contribute2"];
-                roll.AddGroup(web.SiteGroups["Project Managers"]);
-
-                siteid = site.ID;
-
-                if(txtDatabaseServer.Text != "")
-                    errors = mapReports(site);
-
-                web.Close();
-                site.Close();
 
             }
             catch (Exception ex)

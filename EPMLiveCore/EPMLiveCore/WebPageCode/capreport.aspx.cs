@@ -9,7 +9,9 @@ using System.Web.UI.WebControls;
 using System.Web.UI.WebControls.WebParts;
 using System.Web.UI.HtmlControls;
 using Microsoft.SharePoint;
-
+using EPMLiveCore.Infrastructure.Logging;
+using static EPMLiveCore.Infrastructure.Logging.LoggingService;
+using Microsoft.SharePoint.Administration;
 namespace EPMLiveCore
 {
     public partial class capreport : System.Web.UI.Page
@@ -49,41 +51,50 @@ namespace EPMLiveCore
                     string url = CoreFunctions.getConfigSetting(web, "EPMLiveResourceURL").ToLower();
                     try
                     {
-                        if(url != "")
+                        if (url != "")
                         {
-                            if(url.StartsWith("/"))
+                            if (url.StartsWith("/"))
                             {
                                 resWeb = site.OpenWeb(url);
                             }
                             else
                             {
-                                SPSite s = new SPSite(url);
-                                url = s.ServerRelativeUrl + url.Replace(s.Url, "");
-                                resWeb = s.OpenWeb(url);
-                                s.Close();
+                                using (SPSite s = new SPSite(url))
+                                {
+                                    url = s.ServerRelativeUrl + url.Replace(s.Url, "");
+                                    resWeb = s.OpenWeb(url);
+                                }
                             }
+                        }
+                        if (resWeb != null)
+                        {
+                            buildColumns(resWeb);
+                            processResourceInfo(resWeb);
+                            processData(web, resWeb);
+
+                            if (Request["rollup"] != null && Request["rollup"].ToString() == "true")
+                            {
+                                foreach (SPWeb w in web.Webs)
+                                {
+                                    try
+                                    {
+                                        processData(w, resWeb);
+                                    }
+                                    catch (Exception ex) { LoggingService.WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.Medium, ex.ToString()); }
+                                    finally { if (w != null) w.Dispose(); }
+
+                                }
+                            }
+
+                            buildGrid();
+
+
                         }
                     }
-                    catch { }
-
-                    if (resWeb != null)
+                    catch (Exception ex) { LoggingService.WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.Medium, ex.ToString()); }
+                    finally
                     {
-                        buildColumns(resWeb);
-                        processResourceInfo(resWeb);
-                        processData(web, resWeb);
-
-                        if (Request["rollup"] != null && Request["rollup"].ToString() == "true")
-                        {
-                            foreach (SPWeb w in web.Webs)
-                            {
-                                processData(w, resWeb);
-                                w.Close();
-                            }
-                        }
-
-                        buildGrid();
-
-                        resWeb.Close();
+                        if (resWeb != null) { resWeb.Dispose(); }
                     }
 
                 }
@@ -99,7 +110,7 @@ namespace EPMLiveCore
             {
                 object[] arrDtRow = new object[dt.Columns.Count];
 
-                string []resper = de.Key.ToString().Split('\n');
+                string[] resper = de.Key.ToString().Split('\n');
                 int val = int.Parse(de.Value.ToString());
                 string resource = resper[1];
                 PeriodItem pi = (PeriodItem)lstPeriods[resper[0]];
@@ -165,7 +176,7 @@ namespace EPMLiveCore
         {
             string resource = li["Resource"].ToString();
             int periodcount = 1;
-            
+
 
             foreach (PeriodItem period in lstPeriods.Values)
             {
@@ -193,43 +204,43 @@ namespace EPMLiveCore
         {
             SPList list = web.Lists[CoreFunctions.getConfigSetting(web, "EPMLiveResourcePool")];
 
-                
 
-                foreach (SPListItem li in list.Items)
+
+            foreach (SPListItem li in list.Items)
+            {
+                string vals = "";
+                foreach (string s in arrResOC)
                 {
-                    string vals = "";
-                    foreach (string s in arrResOC)
+                    try
                     {
-                        try
+                        SPField f = list.Fields.GetFieldByInternalName(s);
+                        if (f.Type == SPFieldType.Lookup)
                         {
-                            SPField f = list.Fields.GetFieldByInternalName(s);
-                            if (f.Type == SPFieldType.Lookup)
-                            {
-                                string val = li[f.Id].ToString();
-                                val = val.Replace(";#", "\n").Split('\n')[1];
-                                vals = vals + "\n" + val;
-                            }
-                            else
-                            {
-                                vals = vals + "\n" + li[f.Id].ToString();
-                            }
+                            string val = li[f.Id].ToString();
+                            val = val.Replace(";#", "\n").Split('\n')[1];
+                            vals = vals + "\n" + val;
                         }
-                        catch { vals = vals + "\n" + " "; }
+                        else
+                        {
+                            vals = vals + "\n" + li[f.Id].ToString();
+                        }
                     }
-                    if (vals.Length > 1)
-                    {
-                        vals = vals.Substring(1);
-                    }
-                    hshResourceOC.Add(li.Title, vals);
+                    catch { vals = vals + "\n" + " "; }
                 }
-
-                foreach (PeriodItem period in lstPeriods.Values)
+                if (vals.Length > 1)
                 {
-                    foreach (DictionaryEntry de in hshResourceOC)
-                    {
-                        hshResourceWork.Add(period.name + "\n" + de.Key.ToString(), 0);
-                    }
+                    vals = vals.Substring(1);
                 }
+                hshResourceOC.Add(li.Title, vals);
+            }
+
+            foreach (PeriodItem period in lstPeriods.Values)
+            {
+                foreach (DictionaryEntry de in hshResourceOC)
+                {
+                    hshResourceWork.Add(period.name + "\n" + de.Key.ToString(), 0);
+                }
+            }
         }
 
         private void buildResourceCap(SPList list, string field)
@@ -277,7 +288,7 @@ namespace EPMLiveCore
 
                 SPList list = web.Lists[CoreFunctions.getConfigSetting(web, "EPMLiveResourcePool")];
 
-                foreach(SPField f in list.Fields)
+                foreach (SPField f in list.Fields)
                 {
                     if (!f.Hidden && !f.ReadOnlyField && f.Type != SPFieldType.Attachments && f.InternalName != "Title" && f.InternalName != "SharePointAccount")
                     {
@@ -305,7 +316,7 @@ namespace EPMLiveCore
                         pi.capacity = int.Parse(li["Capacity"].ToString());
                     }
                     catch { pi.capacity = 0; }
-                    lstPeriods.Add(pi.name,pi);
+                    lstPeriods.Add(pi.name, pi);
                     counter++;
                 }
 
@@ -313,8 +324,8 @@ namespace EPMLiveCore
             catch { }
         }
 
-        
 
-        
+
+
     }
 }

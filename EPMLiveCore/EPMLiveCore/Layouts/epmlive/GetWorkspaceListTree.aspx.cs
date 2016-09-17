@@ -5,6 +5,9 @@ using System.Web;
 using System.Xml;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.WebControls;
+using EPMLiveCore.Infrastructure.Logging;
+using static EPMLiveCore.Infrastructure.Logging.LoggingService;
+using Microsoft.SharePoint.Administration;
 
 namespace EPMLiveCore
 {
@@ -37,11 +40,11 @@ namespace EPMLiveCore
             if (exec == "true")
             {
                 Guid siteid = SPContext.Current.Site.ID;
-                SPSecurity.RunWithElevatedPrivileges(delegate()
+                SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
                     using (SPSite site = new SPSite(siteid))
                     {
-                        SPWeb web = site.RootWeb;
+                        SPWeb web = site.RootWeb;//No need to dispose
                         if (strSite == "false")
                         {
                             web = site.OpenWeb(SPContext.Current.Web.ID);
@@ -78,14 +81,13 @@ namespace EPMLiveCore
                         doc.InsertBefore(xmlDeclaration, doc.DocumentElement);
 
                         data = doc.OuterXml;
-
                     }
                 });
             }
             else
             {
                 Guid siteid = SPContext.Current.Site.ID;
-                SPSecurity.RunWithElevatedPrivileges(delegate()
+                SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
                     using (SPSite tSite = new SPSite(siteid))
                     {
@@ -143,7 +145,7 @@ namespace EPMLiveCore
             List<XmlNode> childNodeList = new List<XmlNode>();
             List<XmlNode> returnList = new List<XmlNode>();
 
-            SPSecurity.RunWithElevatedPrivileges(delegate()
+            SPSecurity.RunWithElevatedPrivileges(delegate ()
             {
                 using (SPSite tempSite = new SPSite(web.Site.Url))
                 {
@@ -192,8 +194,13 @@ namespace EPMLiveCore
 
                         foreach (SPWeb w in tempWeb.Webs)
                         {
-                            childNodeList.AddRange(addWebs(w, newNode));
-                            w.Close();
+                            try
+                            {
+                                childNodeList.AddRange(addWebs(w, newNode));
+                            }
+                            catch(Exception ex) { LoggingService.WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.Event, TraceSeverity.Medium, ex.ToString()); }
+                            finally { if (w != null) w.Dispose(); }
+
                         }
 
                         if (childNodeList.Count > 0)
