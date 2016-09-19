@@ -349,7 +349,7 @@ function eXcell_usereditorm(cell){                                    //excell n
         
         this.cell._displayValue = strVal;
         this.cell._users = val.split('\t')[0];                                   
-        this.cell._Allusers = val.split('\t')[1];                                   
+        this.cell._Allusers = val === undefined ? [] : val.split('\t')[1];                                   
     }
     this.getValue=function(){
        return this.cell._users; // get value
@@ -376,7 +376,7 @@ function eXcell_usereditorm(cell){                                    //excell n
 		var strVal = "";
 		var strAllUserChecks = "";
 		var strVals = this.cell._users.split('\n');
-		var strAllUsers = this.cell._Allusers.split('\n');
+		var strAllUsers = this.cell._Allusers === undefined ? [] : this.cell._Allusers.split('\n');
 		var strUserNames = '\t';
 		
 		for(var i = 0;i<strVals.length;i=i+2)
@@ -451,7 +451,8 @@ function eXcell_usereditorm(cell){                                    //excell n
 		
 		var oldValue = this.getValue();
 			
-        this.setValue(strUsers + '\t' + this.cell._Allusers); 
+		if(this.cell._Allusers !== undefined)
+			this.setValue(strUsers + '\t' + this.cell._Allusers); 
 
         return oldValue != this.getValue();
     }
@@ -496,7 +497,7 @@ function eXcell_usereditor(cell){                                    //excell na
         
         this.cell._displayValue = strVal;
         this.cell._users = val.split('\t')[0];                                   
-        this.cell._Allusers = val.split('\t')[1];                                   
+        this.cell._Allusers = val === undefined ? [] : val.split('\t')[1];                                   
     }
     this.getValue=function(){
 		
@@ -512,7 +513,7 @@ function eXcell_usereditor(cell){                                    //excell na
 		var strVal = "";
 		var strAllUserChecks = "";
 		var strVals = this.cell._users.split('\n');
-		var strAllUsers = this.cell._Allusers.split('\n');
+		var strAllUsers = this.cell._Allusers === undefined ? [] : this.cell._Allusers.split('\n');
 		var strUserNames = '\t';
 
 		for(var i = 0;i<strVals.length;i=i+2)
@@ -623,7 +624,8 @@ function eXcell_usereditor(cell){                                    //excell na
 		
 		var oldValue = this.getValue();
 			
-        this.setValue(strUsers + '\t' + this.cell._Allusers); 
+		if(this.cell._Allusers !== undefined)
+			this.setValue(strUsers + '\t' + this.cell._Allusers); 
 
         return oldValue != this.getValue();
     }
