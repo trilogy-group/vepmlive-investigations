@@ -100,6 +100,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Installer Items", "Installe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UserNameChecker", "BuildTeamCity\UserNameChecker\UserNameChecker.csproj", "{53C4D722-3B56-4013-AE6B-9E11559C1BB7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EPMLiveCore.Tests", "EPMLiveCore\EPMLiveCore.Tests\EPMLiveCore.Tests.csproj", "{FEF2F33E-4E98-416A-9325-C4449C1CB0FC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -373,6 +375,18 @@ Global
 		{53C4D722-3B56-4013-AE6B-9E11559C1BB7}.Release|x64.Build.0 = Release|Any CPU
 		{53C4D722-3B56-4013-AE6B-9E11559C1BB7}.Release|x86.ActiveCfg = Release|Any CPU
 		{53C4D722-3B56-4013-AE6B-9E11559C1BB7}.Release|x86.Build.0 = Release|Any CPU
+		{FEF2F33E-4E98-416A-9325-C4449C1CB0FC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FEF2F33E-4E98-416A-9325-C4449C1CB0FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FEF2F33E-4E98-416A-9325-C4449C1CB0FC}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{FEF2F33E-4E98-416A-9325-C4449C1CB0FC}.Debug|x64.Build.0 = Debug|Any CPU
+		{FEF2F33E-4E98-416A-9325-C4449C1CB0FC}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{FEF2F33E-4E98-416A-9325-C4449C1CB0FC}.Debug|x86.Build.0 = Debug|Any CPU
+		{FEF2F33E-4E98-416A-9325-C4449C1CB0FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FEF2F33E-4E98-416A-9325-C4449C1CB0FC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FEF2F33E-4E98-416A-9325-C4449C1CB0FC}.Release|x64.ActiveCfg = Release|Any CPU
+		{FEF2F33E-4E98-416A-9325-C4449C1CB0FC}.Release|x64.Build.0 = Release|Any CPU
+		{FEF2F33E-4E98-416A-9325-C4449C1CB0FC}.Release|x86.ActiveCfg = Release|Any CPU
+		{FEF2F33E-4E98-416A-9325-C4449C1CB0FC}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
