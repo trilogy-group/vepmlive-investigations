@@ -90,7 +90,7 @@ namespace EPMLiveWorkPlanner
             catch (Exception ex)
             {
                 return "<Result Status=\"1\">Error executing function: " + ex.Message + "</Result>";//<Error ID=\"1000\">
-			}
+            }
 
         }
 
@@ -112,7 +112,7 @@ namespace EPMLiveWorkPlanner
 
             string sListTaskCenter = "";
 
-            SPSecurity.RunWithElevatedPrivileges(delegate()
+            SPSecurity.RunWithElevatedPrivileges(delegate ()
             {
 
                 using (SPSite site = new SPSite(oWeb.Site.ID))
@@ -343,7 +343,7 @@ namespace EPMLiveWorkPlanner
 
             string PlannerID = getAttribute(data.FirstChild, "PlannerID");
 
-            SPSecurity.RunWithElevatedPrivileges(delegate()
+            SPSecurity.RunWithElevatedPrivileges(delegate ()
             {
 
                 using (SPSite site = new SPSite(oWeb.Site.ID))
@@ -460,15 +460,15 @@ namespace EPMLiveWorkPlanner
             if (sUID == "" && !bAllowDuplicates)
             {
                 return "<Result Status=\"1\">UID Column not specified and allow duplicated is on. You must either specify UID column or you must allow duplicates.</Result>";////<Error ID=\"7001\">
-			}
+            }
             else if (sID == "")
             {
                 return "<Result Status=\"1\">ID Not Specified</Result>";//<Error ID=\"7002\">
-			}
+            }
             else if (sPlanner == "")
             {
                 return "<Result Status=\"1\">Planner Not Specified</Result>";//<Error ID=\"7003\">
-			}
+            }
             else
             {
 
@@ -567,9 +567,9 @@ namespace EPMLiveWorkPlanner
                     attr.Value = "1";
                     ndNewRet.Attributes.Append(attr);
 
-                    ndNewRet.InnerXml =  ex.Message ;//<Error ID=\"7010\">
+                    ndNewRet.InnerXml = ex.Message;//<Error ID=\"7010\">
 
-					docRet.FirstChild.AppendChild(ndNewRet);
+                    docRet.FirstChild.AppendChild(ndNewRet);
 
                     docRet.FirstChild.Attributes["Status"].Value = "1";
                 }
@@ -720,9 +720,9 @@ namespace EPMLiveWorkPlanner
                     attr.Value = "1";
                     ndNewRet.Attributes.Append(attr);
 
-                    ndNewRet.InnerXml =  ex.Message;//<Error ID=\"7009\">
+                    ndNewRet.InnerXml = ex.Message;//<Error ID=\"7009\">
 
-					docRet.FirstChild.AppendChild(ndNewRet);
+                    docRet.FirstChild.AppendChild(ndNewRet);
                 }
 
             }
@@ -764,7 +764,8 @@ namespace EPMLiveWorkPlanner
                 case "taskorder":
                 case "Attachments":
                     return true;
-            } return false;
+            }
+            return false;
         }
 
         private static void ImportTasksFixXmlStructure(ref XmlDocument data, string sUID, string sStructure)
@@ -841,7 +842,7 @@ namespace EPMLiveWorkPlanner
             if (!foundpj && projectList == "Project Center")
             {
 
-                SPSecurity.RunWithElevatedPrivileges(delegate()
+                SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
                     using (SPSite rsite = new SPSite(web.Site.ID))
                     {
@@ -1118,7 +1119,7 @@ namespace EPMLiveWorkPlanner
             catch (Exception ex)
             {
                 return "<Result Status=\"1\">Error executing function: " + ex.Message + "</Result>";//< Error ID =\"1110\">
-			}
+            }
         }
 
         public static string SaveAgilePlan(XmlDocument data, SPWeb oWeb)
@@ -1361,7 +1362,7 @@ namespace EPMLiveWorkPlanner
         public static void ApplyNewTemplate(SPWeb web, string planner, string templateid, string itemid, string type, string projectname)
         {
 
-            SPSecurity.RunWithElevatedPrivileges(delegate()
+            SPSecurity.RunWithElevatedPrivileges(delegate ()
             {
                 using (SPSite site = new SPSite(web.Site.ID))
                 {
@@ -1513,7 +1514,7 @@ namespace EPMLiveWorkPlanner
             else
             {
                 return "<Result Status=\"1\">Planner Templates Library Missing</Result>";//<Error ID=\"6701\">
-			}
+            }
         }
 
         public static string SaveTemplate(XmlDocument data, SPWeb oWeb)
@@ -1550,24 +1551,24 @@ namespace EPMLiveWorkPlanner
                     else
                     {
                         return "<Result Status=\"1\">Template Name Not Specified</Result>";//<Error ID=\"6702\">
-					}
+                    }
                 }
                 else
                 {
                     return "<Result Status=\"1\">Planner Not Specified</Result>";//<Error ID=\"6700\">
-				}
+                }
             }
             catch (Exception ex)
             {
                 return "<Result Status=\"1\">" + ex.Message + "</Result>";//<Error ID=\"6799\">
-			}
+            }
         }
 
         public static DataTable GetTemplates(SPWeb web, string planner, string type)
         {
             DataTable dt = null;
 
-            SPSecurity.RunWithElevatedPrivileges(delegate()
+            SPSecurity.RunWithElevatedPrivileges(delegate ()
             {
                 using (SPSite site = new SPSite(web.Site.ID))
                 {
@@ -1723,7 +1724,7 @@ namespace EPMLiveWorkPlanner
 
                 ProcessTaskXmlFromTaskCenter(doc, p, oWeb, data.FirstChild.Attributes["ID"].Value, out lastid);
 
-                SPSecurity.RunWithElevatedPrivileges(delegate()
+                SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
                     SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(oWeb.Site.WebApplication.Id));
                     cn.Open();
@@ -3241,21 +3242,37 @@ namespace EPMLiveWorkPlanner
 
             StringBuilder sb = new StringBuilder();
             StringBuilder sbBackGround = new StringBuilder();
-
-            sb.Append("d#0:00~");
-            sb.Append(p.iWorkHours[0] / 60);
-            sb.Append(":00#4;");
+            if (p.iWorkHours[0] > p.iWorkHours[3])
+            {
+                sb.Append("d#");
+                sb.Append(p.iWorkHours[0] / 60);
+                sb.Append(":00~24:00#4;");
+            }
+            else
+            {
+                sb.Append("d#0:00~");
+                sb.Append(p.iWorkHours[0] / 60);
+                sb.Append(":00#4;");
+            }
 
             sb.Append("d#");
             sb.Append(p.iWorkHours[1]);
             sb.Append(":00~");
             sb.Append(p.iWorkHours[2]);
             sb.Append(":00#4;");
-
-            sb.Append("d#");
-            sb.Append(p.iWorkHours[3] / 60);
-            sb.Append(":00~24:00#4;");
-
+            if (p.iWorkHours[0] > p.iWorkHours[3])
+            {
+                sb.Append("d#");
+                sb.Append("0:00~");
+                sb.Append(p.iWorkHours[3] / 60);
+                sb.Append(":00#4;");
+            }
+            else
+            {
+                sb.Append("d#");
+                sb.Append(p.iWorkHours[3] / 60);
+                sb.Append(":00~24:00#4;");
+            }
             string[] workdays = p.sWorkDays.Split(',');
 
             for (int i = 0; i < workdays.Length; i++)
@@ -3282,7 +3299,7 @@ namespace EPMLiveWorkPlanner
             }
 
 
-            double hours = 60000 * (p.iWorkHours[3] - p.iWorkHours[0] - (p.iWorkHours[2] - p.iWorkHours[1]) * 60);
+            double hours = Math.Abs(60000 * (p.iWorkHours[3] - p.iWorkHours[0] - (p.iWorkHours[2] - p.iWorkHours[1]) * 60));
 
             XmlNode ndG = docOut.SelectSingleNode("//C[@GanttDataUnits='28800000']");
             ndG.Attributes["GanttDataUnits"].Value = hours.ToString();
@@ -4148,7 +4165,7 @@ namespace EPMLiveWorkPlanner
 
         private static void SetupProjectCenterList(SPList oProjectCenter, string sPlanner)
         {
-            SPSecurity.RunWithElevatedPrivileges(delegate()
+            SPSecurity.RunWithElevatedPrivileges(delegate ()
             {
                 using (SPSite site = new SPSite(oProjectCenter.ParentWeb.Site.ID))
                 {
@@ -4500,7 +4517,7 @@ namespace EPMLiveWorkPlanner
 
             SPList resList = null;
 
-            SPSecurity.RunWithElevatedPrivileges(delegate()
+            SPSecurity.RunWithElevatedPrivileges(delegate ()
             {
                 try
                 {
@@ -5098,7 +5115,7 @@ namespace EPMLiveWorkPlanner
             catch (Exception ex)
             {
                 return "<Result Status=\"1\">Error: " + ex.Message + "</Result>";//<Error ID=\"1001\">
-			}
+            }
         }
 
         public static PlannerProps getSettings(SPWeb web, string planner)
@@ -5157,7 +5174,7 @@ namespace EPMLiveWorkPlanner
 
                 try
                 {
-                    
+
                     SPList holidaySchedulesList = web.Site.RootWeb.Lists["Holiday Schedules"];
                     SPList holidaysList = web.Site.RootWeb.Lists["Holidays"];
 
@@ -5601,7 +5618,7 @@ namespace EPMLiveWorkPlanner
                                 fIntDataColumn.DefaultValue = 9999;
                                 dtSourceListData.Columns.Add(fIntDataColumn);
                                 //Insert/Update Record to FRF list...
-                                SPSecurity.RunWithElevatedPrivileges(delegate()
+                                SPSecurity.RunWithElevatedPrivileges(delegate ()
                                 {
                                     using (SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(spWeb.Site.WebApplication.Id)))
                                     {
@@ -5814,7 +5831,7 @@ namespace EPMLiveWorkPlanner
                         web.AllowUnsafeUpdates = false;
 
                         //Insert/Update Record to FRF list...
-                        SPSecurity.RunWithElevatedPrivileges(delegate()
+                        SPSecurity.RunWithElevatedPrivileges(delegate ()
                         {
                             using (SqlConnection cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(web.Site.WebApplication.Id)))
                             {

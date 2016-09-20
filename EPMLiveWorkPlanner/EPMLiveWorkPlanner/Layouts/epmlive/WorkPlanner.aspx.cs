@@ -299,7 +299,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
             tb.AddTimer();
             try
             {
-                SPSecurity.RunWithElevatedPrivileges(delegate()
+                SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
                     using (SPSite site = new SPSite(web.Site.ID))
                     {
@@ -364,7 +364,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
             bool disable = false;
 
 
-            SPSecurity.RunWithElevatedPrivileges(delegate()
+            SPSecurity.RunWithElevatedPrivileges(delegate ()
             {
                 using (SPSite rsite = new SPSite(web.Site.ID))
                 {
@@ -719,7 +719,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
             {
                 bool check = false;
 
-                SPSecurity.RunWithElevatedPrivileges(delegate()
+                SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
 
                     using (SPSite site = new SPSite(web.Site.ID))
@@ -982,7 +982,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
             }
             else if (Request["Planner"] == "MSProject" || Request["Planner"] == "MPP")
             {
-                SPSecurity.RunWithElevatedPrivileges(delegate()
+                SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
                     using (SPSite site = new SPSite(SPContext.Current.Site.ID))
                     {
@@ -1064,7 +1064,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                     bCalcCost = props.bCalcCost;
                     bCalcWork = props.bCalcWork;
 
-                    iWorkHours = props.iWorkHours[3] / 60 - props.iWorkHours[0] / 60 - (props.iWorkHours[2] - props.iWorkHours[1]);
+                    iWorkHours = Math.Abs(props.iWorkHours[3] / 60 - props.iWorkHours[0] / 60) - (props.iWorkHours[2] - props.iWorkHours[1]);
 
                     SPList lstProjectCenter = web.Lists[sListProjectCenter];
                     SPList lstTaskCenter = web.Lists[sListTaskCenter];
@@ -1336,7 +1336,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
                 {
                     this.AddRibbonTab();
                 }
-                AddTabEvents();                
+                AddTabEvents();
             }
             tb.StopTimer();
 
@@ -1391,7 +1391,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
 
             //if (!bEnableLink)
             //{
-                ribbon.TrimById("Ribbon.WorkPlanner.InsertGroup.LinkExternalTask");
+            ribbon.TrimById("Ribbon.WorkPlanner.InsertGroup.LinkExternalTask");
             //}
 
             if (bAgile)
@@ -1419,7 +1419,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
             ribbon.TrimById("Ribbon.WorkPlanner.ClipGroup.Paste");
 
 
-            ribbon.InitialTabId = initialTabId;            
+            ribbon.InitialTabId = initialTabId;
         }
 
         public static string GetCleanString(string str)
@@ -1445,7 +1445,7 @@ namespace EPMLiveWorkPlanner.Layouts.epmlive
 
                 if (plannerFragmentList == null)
                 {
-                    SPSecurity.RunWithElevatedPrivileges(delegate()
+                    SPSecurity.RunWithElevatedPrivileges(delegate ()
                     {
                         using (SPSite currentSite = new SPSite(site.ID))
                         {
