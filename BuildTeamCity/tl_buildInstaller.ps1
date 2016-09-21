@@ -36,6 +36,8 @@ $env:EnableNuGetPackageRestore = "true"
 # look-up of dependent libs
 . $ScriptDir\RefsLocate.ps1
 
+$SourcesDirectory = "$ScriptDir\..\"
+
 
 # ### Logging helpers
 
