@@ -1,5 +1,5 @@
 ﻿var spnMessage
-
+var renderevent = true;
 function ShowSearch() {
     document.getElementById("divSearch").style.display = "";
 
@@ -73,7 +73,7 @@ function SetChecked(grid, row, col, checked) {
 
             grid.SetValue(child, col, checked, 1, 0);
 
-            child = child.nextSibling;        
+            child = child.nextSibling;
         }
     }
 
@@ -85,10 +85,12 @@ Grids.OnRenderStart = function (grid) {
 
 Grids.OnRenderFinish = function (grid) {
     EPMLiveCore.WorkEngineAPI.set_path(siteUrl + '/_vti_bin/WorkEngine.asmx');
-
     try {
         HideMessage();
     } catch (e) { }
+    if (renderevent) {
+        ChangeView(grid, CurrentViewId);
+    }
 }
 
 Grids.OnClick = function (grid, row, col, x, y, event) {
@@ -130,7 +132,6 @@ Grids.OnClick = function (grid, row, col, x, y, event) {
 }
 
 function ChangeView(grid, view) {
-    
 
     var oView = Views[view];
 
@@ -158,6 +159,9 @@ function ChangeView(grid, view) {
         else
             oVisible[oViewColInfo[0]].Width = "";
 
+        if (grid.Cols[oViewColInfo[0]]) {
+            grid.MoveCol(oViewColInfo[0], 0, 1, 1);
+        }
     }
 
     //Cols
@@ -217,7 +221,7 @@ function ChangeView(grid, view) {
     CurrentView = oView.Name;
 
     RefreshCommandUI();
-
+    renderevent = false;
     grid.Render();
 }
 
