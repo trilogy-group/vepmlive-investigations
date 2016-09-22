@@ -266,16 +266,20 @@ namespace EPMLiveWebParts.Layouts.epmlive
 
                             CoreFunctions.enqueue(TimerJobID, 0);
 
-                            if (Request["isdlg"] == "1")
+                            if (pnlMessage.Visible == false)
                             {
-                                string url = ((web.ServerRelativeUrl == "/") ? "" : web.ServerRelativeUrl);
 
-                                Page.ClientScript.RegisterStartupScript(this.GetType(), "closeWindow",
-                                     "<script language=\"javascript\">window.parent.location.href='" + url +
-                                            "';</script>");
+                                if (Request["isdlg"] == "1")
+                                {
+                                    string url = ((web.ServerRelativeUrl == "/") ? "" : web.ServerRelativeUrl);
+
+                                    Page.ClientScript.RegisterStartupScript(this.GetType(), "closeWindow",
+                                         "<script language=\"javascript\">window.parent.location.href='" + url +
+                                                "';</script>");
+                                }
+                                else
+                                    Response.Redirect(web.ServerRelativeUrl);
                             }
-                            else
-                                Response.Redirect(web.ServerRelativeUrl);                        
                         }
                         finally
                         {
