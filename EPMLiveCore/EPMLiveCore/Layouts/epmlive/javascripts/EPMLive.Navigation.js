@@ -539,6 +539,9 @@
                 function selectLink() {
                     var selected = false;
                     var link = $.parseJSON($.cookie(selectedLinkCookie));
+                    if (link !== null && window.location.href.indexOf(link.url) > 0) {
+                        selected = true;
+                    }
 
                     if (link) {
                         if (link.id) {
@@ -548,7 +551,7 @@
 
                                 var id = $parent.parent().get(0).id;
 
-                                if (id !== 'epm-nav-sub-favorites-static-links' && id !== 'epm-nav-sub-recent-static-links' && id !== 'epm-nav-sub-new-static-links') {
+                                if (window.location.href.indexOf(link.url.replace('_layouts', '_layouts/15')) <= 0 && id !== 'epm-nav-sub-favorites-static-links' && id !== 'epm-nav-sub-recent-static-links' && id !== 'epm-nav-sub-new-static-links') {
                                     $parent.addClass(selectedClass);
                                     selected = true;
                                 }
@@ -577,9 +580,12 @@
                         $node.find('a').each(function () {
                             var lnk = escape(unescape(this.href)).toLowerCase();
 
-                            if (url.indexOf(lnk) === -1) {
+                            lnk = lnk.replace('_layouts', '_layouts/15');
+
+                            if ((url.indexOf(lnk) === 0) && url !== lnk) {
                                 $node.removeClass(selectedClass);
                                 selected = false;
+                                $.cookie(selectedLinkCookie, null);
                             }
                         });
                     }
@@ -595,7 +601,7 @@
                                         if (url.indexOf(lnk) !== -1) {
                                             $link.parents('table').addClass(selectedClass);
                                             selected = true;
-                                            
+
                                             var index = -1;
 
                                             var parent = $link.parents('div')[0];
@@ -612,7 +618,9 @@
                                                 }
                                             }
 
-                                            $.cookie(selectedLinkCookie, JSON.stringify({ index: index, uri: $link.attr('href') }), cookieOptions);
+                                            $.cookie(selectedLinkCookie, JSON.stringify({
+                                                index: index, uri: $link.attr('href')
+                                            }), cookieOptions);
                                             link = $.parseJSON($.cookie(selectedLinkCookie));
                                         }
                                     }
@@ -620,7 +628,7 @@
                             }
                         });
 
-                       
+
 
                         if (!selected) {
                             $('#epm-nav-sub-workplace').find('a').each(function () {
@@ -651,7 +659,7 @@
                                     if (!selected) {
                                         var $link = $(this);
                                         var lnk = escape(unescape($link.get(0).href)).toLowerCase();
-                                        if (lnk.indexOf(url) !== -1) {
+                                        if (url.indexOf(lnk) !== -1) {
                                             if ($.cookie('resetlink') == "0") {
                                                 $link.parents('table').addClass(selectedClass);
                                                 selected = true;
@@ -662,11 +670,10 @@
                             }
                         });
                     }
-                    else
-                    {
+                    else {
                         $.cookie('resetlink', '0');
                     }
-                    
+
                 }
 
                 function saveLinkState($nav) {
@@ -1032,7 +1039,13 @@
                                 }
                             }
                             else {
-                                var options = { url: redirectUrl, showMaximized: false, dialogReturnValueCallback: function (dialogResult) { if (dialogResult == 1) { KanbanClient.loadKanBanPlanners(); } } };
+                                var options = {
+                                    url: redirectUrl, showMaximized: false, dialogReturnValueCallback: function (dialogResult) {
+                                        if (dialogResult == 1) {
+                                            KanbanClient.loadKanBanPlanners();
+                                        }
+                                    }
+                                };
                                 SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
                             }
                             return true;
@@ -1040,15 +1053,17 @@
                             OpenCreateWebPageDialog(redirectUrl);
                             return true;
                         case '1':
-                            if (window.location.href.toLowerCase().toString().indexOf("isdlg") > -1)
-                            {
+                            if (window.location.href.toLowerCase().toString().indexOf("isdlg") > -1) {
                                 if (callBackFunction != '')
-                                    SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', { url: redirectUrl, width: 650, height: 700, dialogReturnValueCallback: eval(callBackFunction) });
+                                    SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', {
+                                        url: redirectUrl, width: 650, height: 700, dialogReturnValueCallback: eval(callBackFunction)
+                                    });
                                 else
-                                    SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', { url: redirectUrl, width: 650, height: 700 });
+                                    SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', {
+                                        url: redirectUrl, width: 650, height: 700
+                                    });
                             }
-                            else
-                            {
+                            else {
                                 location.href = redirectUrl;
                             }
                             return true;
@@ -1060,9 +1075,13 @@
                             return true;
                         case '5':
                             if (callBackFunction != '')
-                                SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', { url: redirectUrl, width: 700, height: 500, dialogReturnValueCallback: eval(callBackFunction) });
+                                SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', {
+                                    url: redirectUrl, width: 700, height: 500, dialogReturnValueCallback: eval(callBackFunction)
+                                });
                             else
-                                SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', { url: redirectUrl, width: 700, height: 500 });
+                                SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', {
+                                    url: redirectUrl, width: 700, height: 500
+                                });
                             return true;
                         case '6':
                             var isResImportRunning = false;
@@ -1080,9 +1099,13 @@
 
                             if (!isResImportRunning && !isSecRunning) {
                                 if (callBackFunction != '')
-                                    SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', { url: redirectUrl, showMaximized: true, showClose: false, dialogReturnValueCallback: eval(callBackFunction) });
+                                    SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', {
+                                        url: redirectUrl, showMaximized: true, showClose: false, dialogReturnValueCallback: eval(callBackFunction)
+                                    });
                                 else
-                                    SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', { url: redirectUrl, showMaximized: true, showClose: false });
+                                    SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', {
+                                        url: redirectUrl, showMaximized: true, showClose: false
+                                    });
                                 return true;
                             }
                             else {
@@ -1274,10 +1297,14 @@
                                 options = { url: redirectUrl, width: 700, dialogReturnValueCallback: Function.createCallback(Function.createDelegate(null, callBackFunction), id) };
                             }
                             else if (command === 'approve') {
-                                options = { url: redirectUrl, width: 700, dialogReturnValueCallback: approveDialogCallback };
+                                options = {
+                                    url: redirectUrl, width: 700, dialogReturnValueCallback: approveDialogCallback
+                                };
                             }
                             else {
-                                options = { url: redirectUrl, width: 700 };
+                                options = {
+                                    url: redirectUrl, width: 700
+                                };
                             }
                             SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
                             break;
@@ -1487,7 +1514,9 @@
                             }
                         }
 
-                        $.cookie(selectedLinkCookie, JSON.stringify({ index: index, uri: $link.attr('href') }), cookieOptions);
+                        $.cookie(selectedLinkCookie, JSON.stringify({
+                            index: index, uri: $link.attr('href')
+                        }), cookieOptions);
                     });
 
                     window.epmLiveNavigation.snWidth = $sn.width();
@@ -1531,7 +1560,9 @@
                         if (snWidth < wsWidth) {
                             newWidth = wsWidth + 5;
 
-                            $sn.stop().animate({ width: newWidth }, 300);
+                            $sn.stop().animate({
+                                width: newWidth
+                            }, 300);
                             $sn.parent().stop().animate({ width: newWidth }, 300);
                         }
 
@@ -2096,7 +2127,9 @@
                                     try {
                                         if ($('#epm-nav-sub-workspaces a').length < 3) {
                                             window.setTimeout(function () {
-                                                window.epmLiveNavigation.registerLink({ kind: 3 });
+                                                window.epmLiveNavigation.registerLink({
+                                                    kind: 3
+                                                });
                                             }, 200);
                                         }
                                     } catch (ex) {
@@ -2111,7 +2144,9 @@
 
                 window.epmLiveNavigation.showAssociatedItems = function (itemInfo) {
                     var displayPopup = function (url) {
-                        SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', { url: url, showMaximized: true });
+                        SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', {
+                            url: url, showMaximized: true
+                        });
                     };
 
                     var showItems = function (info) {
@@ -2147,7 +2182,9 @@
                         name: listName,
                         icon: null
                     };
-                    var options = { url: url, showMaximized: false, dialogReturnValueCallback: function (dialogResult) { if (dialogResult == 1) { if (window.epmLive.SocialStream_SE != undefined || window.epmLive.SocialStream_SE != null) { window.epmLive.SocialStream_SE.toolbarManager.handleCreationAction(dialogResult, null, listInfo); } } } };
+                    var options = {
+                        url: url, showMaximized: false, dialogReturnValueCallback: function (dialogResult) { if (dialogResult == 1) { if (window.epmLive.SocialStream_SE != undefined || window.epmLive.SocialStream_SE != null) { window.epmLive.SocialStream_SE.toolbarManager.handleCreationAction(dialogResult, null, listInfo); } } }
+                    };
                     SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.showModalDialog', options);
                 };
 
@@ -2249,7 +2286,9 @@
                         var liId = liDomId;
 
                         if (commands.length) {
-                            commands.push({ title: '--SEP--' });
+                            commands.push({
+                                title: '--SEP--'
+                            });
                         }
 
                         for (var dc in defaultCommands) {
@@ -2446,7 +2485,9 @@
                                                 if (customOverrideKind) {
                                                     commands.push({ title: item['@Title'], command: item['@Command'], kind: customOverrideKind, imgUrl: item['@ImageUrl'] });
                                                 } else {
-                                                    commands.push({ title: item['@Title'], command: item['@Command'], kind: item['@Kind'], imgUrl: item['@ImageUrl'] });
+                                                    commands.push({
+                                                        title: item['@Title'], command: item['@Command'], kind: item['@Kind'], imgUrl: item['@ImageUrl']
+                                                    });
                                                 }
                                             }
                                         }
@@ -2489,7 +2530,7 @@
                                 }
                             }, 200);
                         });
-                        
+
                     } else {
                         toggleMenu();
                     }
@@ -2768,9 +2809,13 @@
                             });
 
                             if (found) {
-                                commands.push({ title: 'Remove', command: 'nav:removeFavRI', kind: 98 });
+                                commands.push({
+                                    title: 'Remove', command: 'nav:removeFavRI', kind: 98
+                                });
                             } else {
-                                commands.push({ title: 'Add', command: 'nav:addToFav', kind: 98 });
+                                commands.push({
+                                    title: 'Add', command: 'nav:addToFav', kind: 98
+                                });
                             }
 
                             menuManager.setupMenu($li, commands);
@@ -2828,9 +2873,13 @@
                                     });
 
                                     if (found) {
-                                        commands.push({ title: 'Remove', command: 'nav:removeFavWS', kind: 98 });
+                                        commands.push({
+                                            title: 'Remove', command: 'nav:removeFavWS', kind: 98
+                                        });
                                     } else {
-                                        commands.push({ title: 'Add', command: 'nav:addToFav', kind: 98 });
+                                        commands.push({
+                                            title: 'Add', command: 'nav:addToFav', kind: 98
+                                        });
                                     }
 
                                     webId = liId;
@@ -2838,13 +2887,17 @@
                                     proceed = false;
                                 }
                             } else {
-                                commands.push({ title: 'Remove', command: 'nav:removeFavWS', kind: 98 });
+                                commands.push({
+                                    title: 'Remove', command: 'nav:removeFavWS', kind: 98
+                                });
                                 webId = $($li.find('a').get(0)).data('webid');
                             }
 
                             if (proceed) {
                                 if (window.epmLiveNavigation.wsTeamDict[webId] !== 'X' && liId !== window.epmLive.rootWebId) {
-                                    commands.push({ title: 'Edit team', command: 'nav:team', kind: 6 });
+                                    commands.push({
+                                        title: 'Edit team', command: 'nav:team', kind: 6
+                                    });
                                 }
 
                                 menuManager.setupMenu($li, commands);
@@ -3057,33 +3110,33 @@
         ExecuteOrDelayUntilScriptLoaded(initializeNavigation, 'EPMLiveNavigation');
     }
     window.showModalDialog = window.showModalDialog || function (url, arg, opt) {
-    	document.body.innerHTML += "<dialog id='myDialog'><div id='myDialogBody'><textarea id='myDialogtxtarea' rows='4' cols='50'></textarea></div><div style='float: right;margin: 20px;'><button id='myDialogOk'>Ok</button><button id='myDialogClose'>Close</button></div></dialog>";
-    	var dialog = document.getElementById('myDialog');
-    	var width = 430;
-    	var height = 230;
-    	var value = arg.value;
-    	var domelement = opt.split(";");
-    	for (var i = 0; i < domelement.length; i++) {
-    		if (domelement[i].indexOf("Height") != -1) {
-    			height = domelement[i].split(":")[1];
-    		}
-    		else if (domelement[i].indexOf("Width") != -1) {
-    			width = domelement[i].split(":")[1];
-    		}
-    	}
+        document.body.innerHTML += "<dialog id='myDialog'><div id='myDialogBody'><textarea id='myDialogtxtarea' rows='4' cols='50'></textarea></div><div style='float: right;margin: 20px;'><button id='myDialogOk'>Ok</button><button id='myDialogClose'>Close</button></div></dialog>";
+        var dialog = document.getElementById('myDialog');
+        var width = 430;
+        var height = 230;
+        var value = arg.value;
+        var domelement = opt.split(";");
+        for (var i = 0; i < domelement.length; i++) {
+            if (domelement[i].indexOf("Height") != -1) {
+                height = domelement[i].split(":")[1];
+            }
+            else if (domelement[i].indexOf("Width") != -1) {
+                width = domelement[i].split(":")[1];
+            }
+        }
 
-    	dialog.showModal();
-    	$("textarea#myDialogtxtarea").val(arg.value);
-    	document.getElementById('myDialogClose').onclick = function () {
-    		dialog.close();
-    		dialog.remove();
-    	};
-    	document.getElementById('myDialogOk').onclick = function () {
-    		$("#" + arg.id).val($("textarea#myDialogtxtarea").val())
-    		dialog.close();
-    		dialog.remove();
-    	}
-    	return arg.value;
+        dialog.showModal();
+        $("textarea#myDialogtxtarea").val(arg.value);
+        document.getElementById('myDialogClose').onclick = function () {
+            dialog.close();
+            dialog.remove();
+        };
+        document.getElementById('myDialogOk').onclick = function () {
+            $("#" + arg.id).val($("textarea#myDialogtxtarea").val())
+            dialog.close();
+            dialog.remove();
+        }
+        return arg.value;
     };
     ExecuteOrDelayUntilScriptLoaded(onJqueryLoaded, 'jquery.min.js');
 })();
