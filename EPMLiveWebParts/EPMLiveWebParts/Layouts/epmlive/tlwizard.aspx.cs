@@ -220,7 +220,6 @@ namespace EPMLiveWebParts.Layouts.epmlive
         {
             pnlDone.Visible = false;
             pnlProcessing.Visible = true;
-            string url = "";
             SPWeb w = SPContext.Current.Web;
 
             SPSecurity.RunWithElevatedPrivileges(delegate()
@@ -233,20 +232,6 @@ namespace EPMLiveWebParts.Layouts.epmlive
                         {
                             site.AllowUnsafeUpdates = true;
                             web.AllowUnsafeUpdates = true;
-                            try
-                            {
-                                string loc = CoreFunctions.getConfigSetting(web, "epmlivewizardredirect");
-                                if (loc != "")
-                                {
-                                    url = ((web.ServerRelativeUrl == "/") ? "" : web.ServerRelativeUrl) + loc;
-                                }
-                                else
-                                {
-                                    SPList list = web.Lists["Configuration Tasks"];
-                                    url = list.DefaultView.ServerRelativeUrl;
-                                }
-                            }
-                            catch { }
 
                             processQuickLaunch(web);
                             hideWizard(web);
@@ -283,34 +268,17 @@ namespace EPMLiveWebParts.Layouts.epmlive
 
                             if (pnlMessage.Visible == false)
                             {
-                                if (rdoYes.Checked)
+
+                                if (Request["isdlg"] == "1")
                                 {
-                                    if (url != "")
-                                    {
-                                        if (Request["isdlg"] == "1")
-                                            Page.ClientScript.RegisterStartupScript(this.GetType(), "redirect",
-                                                "<script language=\"javascript\">window.parent.location.href='" + url +
+                                    string url = ((web.ServerRelativeUrl == "/") ? "" : web.ServerRelativeUrl);
+
+                                    Page.ClientScript.RegisterStartupScript(this.GetType(), "closeWindow",
+                                         "<script language=\"javascript\">window.parent.location.href='" + url +
                                                 "';</script>");
-                                        else
-                                            Response.Redirect(url);
-                                    }
-                                    else
-                                    {
-                                        if (Request["isdlg"] == "1")
-                                            Page.ClientScript.RegisterStartupScript(this.GetType(), "closeWindow",
-                                                "<script language=\"javascript\">window.parent.location.href = window.parent.location.href;</script>");
-                                        else
-                                            Response.Redirect(web.ServerRelativeUrl + "/_layouts/settings.aspx");
-                                    }
                                 }
                                 else
-                                {
-                                    if (Request["isdlg"] == "1")
-                                        Page.ClientScript.RegisterStartupScript(this.GetType(), "closeWindow",
-                                            "<script language=\"javascript\">window.parent.location.href = window.parent.location.href;</script>");
-                                    else
-                                        Response.Redirect(web.ServerRelativeUrl + "/_layouts/settings.aspx");
-                                }
+                                    Response.Redirect(web.ServerRelativeUrl);
                             }
                         }
                         finally

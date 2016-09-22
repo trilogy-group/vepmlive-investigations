@@ -1,4 +1,5 @@
-﻿using EPMLiveCore.Jobs.EPMLiveUpgrade.Infrastructure;
+﻿using EPMLiveCore.Infrastructure;
+using EPMLiveCore.Jobs.EPMLiveUpgrade.Infrastructure;
 using Microsoft.SharePoint;
 using System;
 using System.Data;
@@ -206,5 +207,79 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
 
         #endregion
 
+    }
+    [UpgradeStep(Version = EPMLiveVersion.V600, Order = 1.0, Description = "Remove Menu item")]
+    internal class RemoveMenuItem : UpgradeStep
+    {
+        private const string SETTINGS_LIST = "EPM Live Settings";
+        private SPWeb _spWeb;
+
+        #region Constructors
+        public RemoveMenuItem(SPWeb spWeb, bool isPfeSite) : base(spWeb, isPfeSite) { _spWeb = spWeb; }
+        #endregion
+
+        #region Overrides of UpgradeStep
+        public override bool Perform()
+        {
+            try
+            {
+                SPSecurity.RunWithElevatedPrivileges(() =>
+                {
+                    using (var spSite = new SPSite(Web.Site.ID))
+                    {
+                        using (SPWeb spWeb = spSite.OpenWeb(Web.ID))
+                        {
+                            if (!spWeb.IsRootWeb)
+                            {
+                                LogMessage(spWeb.Title + " is not a root web.", MessageKind.SKIPPED, 2);
+                                return;
+                            }
+
+                            LogMessage("Getting " + SETTINGS_LIST + " list", 2);
+
+                            SPList list = Web.Lists.TryGetList(SETTINGS_LIST);
+                            if (list != null)
+                            {
+
+                                LogMessage("Remove menu item: Get Started!.", 2);
+
+                                SPQuery jobQueueQuery = new SPQuery();
+                                jobQueueQuery.Query = "<Where><Eq><FieldRef Name='Title'/><Value Type='Text'>Get Started!</Value></Eq></Where>";
+                                SPListItemCollection jobListItems = list.GetItems(jobQueueQuery);
+
+                                if (jobListItems != null && jobListItems.Count > 0)
+                                {
+                                    SPListItem li = jobListItems[0];
+                                    li.Delete();
+
+                                    LogMessage("Get started menu item removed.", MessageKind.SUCCESS, 4);
+                                }
+                                else
+                                {
+                                    LogMessage("Get started menu item not available.", MessageKind.SKIPPED, 2);
+                                }
+
+
+                            }
+                        }
+                    }
+                });
+            }
+            catch (Exception e)
+            {
+                LogMessage(e.Message, MessageKind.FAILURE, 2);
+            }
+            finally
+            {
+                try
+                {
+                    CacheStore.Current.RemoveSafely(Web.Url, new CacheStoreCategory(Web).Navigation);
+                }
+                catch { }
+            }
+            return true;
+        }
+
+        #endregion
     }
 }

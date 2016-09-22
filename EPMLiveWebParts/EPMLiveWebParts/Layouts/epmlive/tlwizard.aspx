@@ -252,11 +252,8 @@
                 <td style="padding-bottom:17px;">
                     <h2 class="wizHeader">The setup wizard is complete.</h2>
                     <p class="wizText">
-                    Would you like to be directed to some additional configuration steps?
+                    Click the Finish button to complete the setup wizard and then be directed to your Home page.
                     </p>
-
-                    <p class="wizText" style="margin-bottom:5px;"><asp:RadioButton ID="rdoYes" runat="server" Checked="true" GroupName="rdoDone" style="margin-right:3px;" /><span style="margin-bottom:4px;">Yes</span</p>
-                    <p class="wizText" style="margin-bottom:0px;"><asp:RadioButton ID="rdoNo" runat="server" GroupName="rdoDone" style="margin-right:3px;"/> No</p>
                 </td>
             </tr>
             <tr>
