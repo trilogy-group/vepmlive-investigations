@@ -31,7 +31,7 @@ var EPM;
                     var offset = $el.offset();
 
                     var leftOffset = 50;
-
+                    $('#epm-nav-sub').show();
                     if ($('#epm-nav-sub').is(':visible')) {
                         leftOffset = 230;
                     }

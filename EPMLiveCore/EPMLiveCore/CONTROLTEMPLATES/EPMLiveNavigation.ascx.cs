@@ -52,7 +52,22 @@ namespace EPMLiveCore.CONTROLTEMPLATES
 
         public string SelectedTlNode
         {
-            get { return _selectedTlNode ?? "epm-nav-top-ql"; }
+            get
+            {
+                if (string.IsNullOrEmpty(_selectedTlNode))
+                {
+                    return "epm-nav-top-ql";
+                }
+                else
+                {
+                    return _selectedTlNode;
+
+                }
+            }
+            set
+            {
+                value = _selectedTlNode;
+            }
         }
 
         public string StaticProviderLinks { get; private set; }
@@ -99,7 +114,7 @@ namespace EPMLiveCore.CONTROLTEMPLATES
         {
             base.OnPreRender(e);
 
-            foreach (string style in new[] {"controls/navigation/epmnav.min"})
+            foreach (string style in new[] { "controls/navigation/epmnav.min" })
             {
                 SPPageContentManager.RegisterStyleFile(LAYOUT_PATH + "stylesheets/" + style + ".css");
             }
@@ -139,7 +154,7 @@ namespace EPMLiveCore.CONTROLTEMPLATES
 
         protected void OnTreeViewPreRender(object sender, EventArgs e)
         {
-            var spTreeView = ((SPTreeView) sender);
+            var spTreeView = ((SPTreeView)sender);
 
             SPContext spContext = SPContext.Current;
 
@@ -174,12 +189,14 @@ namespace EPMLiveCore.CONTROLTEMPLATES
                 HttpCookie selectedTlNodeCookie = Request.Cookies.Get("epmnav-selected-tlnode-u-" + userId);
                 if (selectedTlNodeCookie != null)
                 {
+                    string cookieValue = HttpUtility.UrlDecode(selectedTlNodeCookie.Value);
                     var javaScriptSerializer = new JavaScriptSerializer();
-                    dynamic cookie = javaScriptSerializer.DeserializeObject(HttpUtility.UrlDecode(selectedTlNodeCookie.Value));
+                    Dictionary<string, object> cookie = (javaScriptSerializer.DeserializeObject(cookieValue) as Dictionary<string, object>);
 
-                    if (spWeb.SafeServerRelativeUrl().Equals(cookie["webUrl"]))
+                    var cookieWebUrl = Convert.ToString(cookie["webUrl"]);
+                    if (spWeb.SafeServerRelativeUrl().Equals(cookieWebUrl))
                     {
-                        _selectedTlNode = cookie["id"];
+                        _selectedTlNode = Convert.ToString(cookie["id"]);
                     }
                 }
             }
@@ -225,17 +242,23 @@ namespace EPMLiveCore.CONTROLTEMPLATES
 
         private void LoadSelectedNodeLinks()
         {
+            if (Page.Request.Url.Equals(SPContext.Current.Web.Url + "/" + SPContext.Current.Web.RootFolder.WelcomePage))
+            {
+                SelectedTlNode = "epm-nav-top-ql";
+                return;
+            }
+
             if (SelectedTlNode.Equals("epm-nav-top-ql")) return;
 
             try
             {
                 string nodeId = SelectedTlNode.Replace("epm-nav-top-", string.Empty);
                 string provider = (from node in AllNodes
-                    where !node.Separator
-                    let id = node.Id
-                    where !string.IsNullOrEmpty(id)
-                    where id.Equals(nodeId)
-                    select node.LinkProvider).FirstOrDefault();
+                                   where !node.Separator
+                                   let id = node.Id
+                                   where !string.IsNullOrEmpty(id)
+                                   where id.Equals(nodeId)
+                                   select node.LinkProvider).FirstOrDefault();
 
                 SelectedNode = provider;
 
