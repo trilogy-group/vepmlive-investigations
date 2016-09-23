@@ -396,7 +396,9 @@ namespace RPADataCache
 
                         if (col.m_type == 2)
                         {
-
+                            string format = System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.ShortDatePattern;
+                            xC.CreateStringAttr("Format", format);
+                            xC.CreateStringAttr("EditFormat", format);
                             if (col.m_id == RPConstants.TGRID_SDATE)
                             {
                                 xC.CreateStringAttr("Type", "Date");
@@ -411,8 +413,8 @@ namespace RPADataCache
                                 string smaxFunc = "(Row.id == 'Filter' ? '' : max())";
                                 m_xDefTree.CreateStringAttr(sn + "Formula", smaxFunc);
                             }
-                            //   xC.CreateStringAttr("Type", "Date");
-                            //                          xC.CreateStringAttr("Format", "MM/dd/yyyy");
+
+
                         }
                         else if (col.m_type == 3)
                         {
@@ -747,14 +749,14 @@ namespace RPADataCache
                             if (oPIData != null)
                             {
                                 if (oPIData.start != DateTime.MinValue)
-                                    xI.CreateStringAttr(sn, oPIData.start.ToShortDateString());
+                                    xI.CreateStringAttr(sn, oPIData.start.ToString("yyyy-MM-dd HH:mm:ss"));
                             }
                             break;
                         case RPConstants.TGRID_FDATE:
                             if (oPIData != null)
                             {
                                 if (oPIData.finish != DateTime.MinValue)
-                                    xI.CreateStringAttr(sn, oPIData.finish.ToShortDateString());
+                                    xI.CreateStringAttr(sn, oPIData.finish.ToString("yyyy-MM-dd HH:mm:ss"));
                             }
                             break;
                         case RPConstants.TGRID_OWNER:
