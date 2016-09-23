@@ -4988,6 +4988,7 @@
                 break;
         }
         grid.SetAttribute(row, "RowPMStatus", "Class", sClass, changed0Or1, 0);
+        grid.SetAttribute(row, null, "ExportRowPMStatus", sTip, changed0Or1, 0);
         grid.SetAttribute(row, null, "RowPMStatusTip", sTip, changed0Or1, 0);
     };
     RPEditor.prototype.ChangeRMStatus = function (grid, row, RMStatus) {
@@ -5041,6 +5042,7 @@
                 break;
         }
         grid.SetAttribute(row, "RowRMStatus", "Class", sClass, changed0Or1, 0);
+        grid.SetAttribute(row, null, "ExportRowRMStatus", sTip, changed0Or1, 0);
         grid.SetAttribute(row, null, "RowRMStatusTip", sTip, changed0Or1, 0);
     };
     RPEditor.prototype.SetRowNoteColumn = function (grid, row, changed0Or1) {
@@ -5096,6 +5098,7 @@
         }
         if (sClass != "") {
             grid.SetAttribute(row, "RowStatus", "Class", sClass, changed0Or1, 0);
+            grid.SetAttribute(row, null, "ExportRowStatus", sTip, changed0Or1, 0);
             grid.SetAttribute(row, null, "RowStatusTip", sTip, changed0Or1, 0);
         }
     };
