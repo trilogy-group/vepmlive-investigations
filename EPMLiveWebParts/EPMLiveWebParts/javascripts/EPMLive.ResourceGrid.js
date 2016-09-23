@@ -529,10 +529,12 @@ function registerEpmLiveResourceGridScript() {
                             var responseJson = $$$.parseJson(response.d);
 
                             if ($$$.responseIsSuccess(responseJson.Result)) {
-                                window.SP.UI.Notify.addNotification('The view "{0}" has been saved.'.format(view.name), false);
+                                var notifyId = window.SP.UI.Notify.addNotification('The view "{0}" has been saved.'.format(view.name), false);
 
                                 $$.views.collection[view.id] = view;
                                 $$.views.apply(view.id);
+
+                                setTimeout(function () { SP.UI.Notify.removeNotification(notifyId); }, 1000);
                             } else {
                                 $$$.logFailure(responseJson.Result);
                             }
@@ -1059,11 +1061,13 @@ function registerEpmLiveResourceGridScript() {
                             var responseJson = $$$.parseJson(response.d);
 
                             if ($$$.responseIsSuccess(responseJson.Result)) {
-                                window.SP.UI.Notify.addNotification('The view "{0}" has been deleted.'.format(currentView.name), false);
+                                var notifyId = window.SP.UI.Notify.addNotification('The view "{0}" has been deleted.'.format(currentView.name), false);
 
                                 delete $$.views.collection[currentView.id];
                                 $$.views.totalViews--;
                                 $$.views.apply();
+
+                                setTimeout(function () { SP.UI.Notify.removeNotification(notifyId); }, 1000);
                             } else {
                                 $$$.logFailure(responseJson.Result);
                             }
@@ -1110,12 +1114,13 @@ function registerEpmLiveResourceGridScript() {
                             var responseJson = $$$.parseJson(response.d);
 
                             if ($$$.responseIsSuccess(responseJson.Result)) {
-                                window.SP.UI.Notify.addNotification('The view "{0}" has been renamed to "{1}".'.format(oldName, currentView.name), false);
+                                var notifyId = window.SP.UI.Notify.addNotification('The view "{0}" has been renamed to "{1}".'.format(oldName, currentView.name), false);
 
                                 $$.views.currentView.name = currentView.name;
                                 $$.views.collection[currentView.id].name = currentView.name;
 
                                 window.RefreshCommandUI();
+                                setTimeout(function () { SP.UI.Notify.removeNotification(notifyId); }, 1000);
                             } else {
                                 $$$.logFailure(responseJson.Result);
                             }
