@@ -167,11 +167,27 @@ namespace PortfolioEngineCore
             xC.CreateIntAttr("CanEdit", 0);
             xC.CreateIntAttr("CanMove", 0);
             xC.CreateIntAttr("CanHide", 0);
+            xC.CreateIntAttr("CanExport", 0);
             xC.CreateIntAttr("CanResize", 0);
             xC.CreateIntAttr("CanSort", 0);
             xC.CreateIntAttr("ShowHint", 0);
             xC.CreateIntAttr("Width", 25);
             xHeader1.CreateStringAttr("RowStatus", " ");
+
+            xC = xLeftCols.CreateSubStruct("C");
+            xC.CreateStringAttr("Name", "ExportRowStatus");
+            xC.CreateStringAttr("Align", "Center");
+            xC.CreateStringAttr("Type", "Text");
+            xC.CreateIntAttr("CanEdit", 0);
+            xC.CreateIntAttr("CanMove", 0);
+            xC.CreateIntAttr("CanHide", 0);
+            xC.CreateIntAttr("CanSort", 0);
+            xC.CreateIntAttr("CanExport", 1);
+            xC.CreateIntAttr("CanResize", 0);
+            xC.CreateIntAttr("ShowHint", 0);
+            xC.CreateIntAttr("Width", 30);
+            xHeader1.CreateStringAttr("ExportRowStatus", "Status");
+            xC.CreateIntAttr("Visible", 0);
 
             bool bNegotiationMode = (xPlanData.GetIntAttr("OpMode") == 0);
 
@@ -185,11 +201,27 @@ namespace PortfolioEngineCore
                 xC.CreateIntAttr("CanMove", 0);
                 xC.CreateIntAttr("CanHide", 0);
                 xC.CreateIntAttr("CanSort", 0);
+                xC.CreateIntAttr("CanExport", 0);
                 xC.CreateIntAttr("CanResize", 0);
                 xC.CreateIntAttr("ShowHint", 0);
                 xC.CreateIntAttr("Width", 30);
                 xHeader1.CreateStringAttr("RowPMStatus", "PM");
                 xC.CreateIntAttr("Visible", 1);
+
+                xC = xLeftCols.CreateSubStruct("C");
+                xC.CreateStringAttr("Name", "ExportRowPMStatus");
+                xC.CreateStringAttr("Align", "Center");
+                xC.CreateStringAttr("Type", "Text");
+                xC.CreateIntAttr("CanEdit", 0);
+                xC.CreateIntAttr("CanMove", 0);
+                xC.CreateIntAttr("CanHide", 0);
+                xC.CreateIntAttr("CanSort", 0);
+                xC.CreateIntAttr("CanExport", 1);
+                xC.CreateIntAttr("CanResize", 0);
+                xC.CreateIntAttr("ShowHint", 0);
+                xC.CreateIntAttr("Width", 30);
+                xHeader1.CreateStringAttr("ExportRowPMStatus", "PM");
+                xC.CreateIntAttr("Visible", 0);
 
                 xC = xLeftCols.CreateSubStruct("C");
                 xC.CreateStringAttr("Name", "RowRMStatus");
@@ -199,11 +231,28 @@ namespace PortfolioEngineCore
                 xC.CreateIntAttr("CanMove", 0);
                 xC.CreateIntAttr("CanHide", 0);
                 xC.CreateIntAttr("CanSort", 0);
+                xC.CreateIntAttr("CanExport", 0);
                 xC.CreateIntAttr("CanResize", 0);
                 xC.CreateIntAttr("ShowHint", 0);
                 xC.CreateIntAttr("Width", 30);
                 xHeader1.CreateStringAttr("RowRMStatus", "RM");
                 xC.CreateIntAttr("Visible", 1);
+
+                xC = xLeftCols.CreateSubStruct("C");
+                xC.CreateStringAttr("Name", "ExportRowRMStatus");
+                xC.CreateStringAttr("Align", "Center");
+                xC.CreateStringAttr("Type", "Text");
+                xC.CreateIntAttr("CanEdit", 0);
+                xC.CreateIntAttr("CanMove", 0);
+                xC.CreateIntAttr("CanHide", 0);
+                xC.CreateIntAttr("CanSort", 0);
+                xC.CreateIntAttr("CanExport", 1);
+                xC.CreateIntAttr("CanResize", 0);
+                xC.CreateIntAttr("ShowHint", 0);
+                xC.CreateIntAttr("Width", 30);
+                xHeader1.CreateStringAttr("ExportRowRMStatus", "RM");
+                xC.CreateIntAttr("Visible", 0);
+
             }
 
             //xC = xLeftCols.CreateSubStruct("C");
@@ -317,7 +366,7 @@ namespace PortfolioEngineCore
                         sColIDName = xField.GetStringAttr("Title");
                         if (!string.IsNullOrEmpty(sColIDName))
                         {
-                            sColIDName = Regex.Replace(sColIDName, "[^a-zA-Z]+", "_"); 
+                            sColIDName = Regex.Replace(sColIDName, "[^a-zA-Z]+", "_");
                         }
                         break;
                     default:
