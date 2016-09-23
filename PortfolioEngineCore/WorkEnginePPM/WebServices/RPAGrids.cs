@@ -115,7 +115,7 @@ namespace RPADataCache
         private CStruct[] m_xLevels = new CStruct[64];
         private int m_nLevel = 0;
 
-        public bool InitializeGridLayout(List<clsRXDisp> Cols, int gpPMOAdmin, string sXML)
+        public bool InitializeGridLayout(List<clsRXDisp> Cols, int gpPMOAdmin, string sXML,string format)
         {
             var currentViewResult = GetResourceAnalyzerView(sXML);
 
@@ -396,7 +396,8 @@ namespace RPADataCache
 
                         if (col.m_type == 2)
                         {
-
+                            xC.CreateStringAttr("Format", format);
+                            xC.CreateStringAttr("EditFormat", format);
                             if (col.m_id == RPConstants.TGRID_SDATE)
                             {
                                 xC.CreateStringAttr("Type", "Date");
@@ -411,8 +412,8 @@ namespace RPADataCache
                                 string smaxFunc = "(Row.id == 'Filter' ? '' : max())";
                                 m_xDefTree.CreateStringAttr(sn + "Formula", smaxFunc);
                             }
-                            //   xC.CreateStringAttr("Type", "Date");
-                            //                          xC.CreateStringAttr("Format", "MM/dd/yyyy");
+
+
                         }
                         else if (col.m_type == 3)
                         {
@@ -747,14 +748,14 @@ namespace RPADataCache
                             if (oPIData != null)
                             {
                                 if (oPIData.start != DateTime.MinValue)
-                                    xI.CreateStringAttr(sn, oPIData.start.ToShortDateString());
+                                    xI.CreateStringAttr(sn, oPIData.start.ToString("yyyy-MM-dd HH:mm:ss"));
                             }
                             break;
                         case RPConstants.TGRID_FDATE:
                             if (oPIData != null)
                             {
                                 if (oPIData.finish != DateTime.MinValue)
-                                    xI.CreateStringAttr(sn, oPIData.finish.ToShortDateString());
+                                    xI.CreateStringAttr(sn, oPIData.finish.ToString("yyyy-MM-dd HH:mm:ss"));
                             }
                             break;
                         case RPConstants.TGRID_OWNER:
