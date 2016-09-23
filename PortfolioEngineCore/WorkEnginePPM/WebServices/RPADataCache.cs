@@ -2575,12 +2575,12 @@ namespace RPADataCache
             return periodName;
         }
 
-        public string GetTopGrid(string sXML,string format)
+        public string GetTopGrid(string sXML)
         {
 
             RPATopGrid oGrid = new RPATopGrid();
             string s;
-            oGrid.InitializeGridLayout(m_detdispcln, m_pmo_admin, sXML, format);
+            oGrid.InitializeGridLayout(m_detdispcln, m_pmo_admin, sXML);
             int i = 0;
 
 

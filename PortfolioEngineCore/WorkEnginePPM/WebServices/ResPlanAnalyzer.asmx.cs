@@ -639,28 +639,7 @@ namespace WorkEnginePPM
 
         public static string GetResourceAnalyzerData(HttpContext Context, string sXML, RPAData RAData)
         {
-            string YearLabel = "yyyy";
-            string MonthLabel = "MM";
-            string DayLabel = "dd";
-            string format = string.Empty;
-            SPWeb spWeb = SPContext.Current.Web;
-            SPContext context = SPContext.GetContext(spWeb);
-            SPRegionalSettings spRegionalSettings = context.Web.CurrentUser.RegionalSettings ?? context.RegionalSettings;
-            string dateSeparator = spRegionalSettings.DateSeparator;
-            var calendarOrderType = (SPCalendarOrderType)spRegionalSettings.DateFormat;
-            switch (calendarOrderType)
-            {
-                case SPCalendarOrderType.MDY:
-                    format = MonthLabel + dateSeparator + DayLabel + dateSeparator + YearLabel;
-                    break;
-                case SPCalendarOrderType.DMY:
-                    format = DayLabel + dateSeparator + MonthLabel + dateSeparator + YearLabel;
-                    break;
-                case SPCalendarOrderType.YMD:
-                    format = YearLabel + dateSeparator + MonthLabel + dateSeparator + DayLabel;
-                    break;
-            }
-            string s = RAData.GetTopGrid(sXML, format);
+            string s = RAData.GetTopGrid(sXML);
             return s;
         }
 
