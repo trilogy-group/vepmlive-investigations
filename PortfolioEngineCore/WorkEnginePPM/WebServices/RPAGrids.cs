@@ -115,7 +115,7 @@ namespace RPADataCache
         private CStruct[] m_xLevels = new CStruct[64];
         private int m_nLevel = 0;
 
-        public bool InitializeGridLayout(List<clsRXDisp> Cols, int gpPMOAdmin, string sXML,string format)
+        public bool InitializeGridLayout(List<clsRXDisp> Cols, int gpPMOAdmin, string sXML)
         {
             var currentViewResult = GetResourceAnalyzerView(sXML);
 
@@ -396,6 +396,7 @@ namespace RPADataCache
 
                         if (col.m_type == 2)
                         {
+                            string format = System.Globalization.CultureInfo.CurrentCulture.DateTimeFormat.ShortDatePattern;
                             xC.CreateStringAttr("Format", format);
                             xC.CreateStringAttr("EditFormat", format);
                             if (col.m_id == RPConstants.TGRID_SDATE)
