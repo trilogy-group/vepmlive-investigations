@@ -24,11 +24,11 @@ namespace EPMLiveCore.API
 
         private const char TAB_SEPERATOR = '-';
 
-        private const string VALIDATE_ACCOUNT_QUERY =
-            @"<Where><Eq><FieldRef Name=""SharePointAccount"" LookupId=""true"" /><Value Type=""User"">{0}</Value></Eq></Where>";
+        //private const string VALIDATE_ACCOUNT_QUERY =
+        //    @"<Where><Eq><FieldRef Name=""SharePointAccount"" LookupId=""true"" /><Value Type=""User"">{0}</Value></Eq></Where>";
 
-        private const string VALIDATE_DISPLAY_NAME_QUERY =
-            @"<Where><Eq><FieldRef Name=""Title"" /><Value Type=""Text"">{0}</Value></Eq></Where>";
+        //private const string VALIDATE_DISPLAY_NAME_QUERY =
+        //    @"<Where><Eq><FieldRef Name=""Title"" /><Value Type=""Text"">{0}</Value></Eq></Where>";
 
         private const string VALIDATE_EMAIL_QUERY =
             @"<Where><Eq><FieldRef Name=""Email"" /><Value Type=""Text"">{0}</Value></Eq></Where>";
@@ -735,58 +735,61 @@ namespace EPMLiveCore.API
                 }
             }
 
-            string title = oTitle.ToString();
+            //EPMLCID-4783: can't import a new user with same first and last name as existing user in resource pool
+            //Keep this code as commented reason is that if in future we need to validate user based on SPAccount/Title then we can uncomment this piece of code.
 
-            if (!string.IsNullOrEmpty(title))
-            {
-                SPListItemCollection items =
-                    resourcePool.GetItems(new SPQuery {Query = string.Format(VALIDATE_DISPLAY_NAME_QUERY, title)});
+            //string title = oTitle.ToString();
 
-                if (items.Count > 0)
-                {
-                    if (items[0].ID != id)
-                    {
-                        throw new Exception("Resource with the same name already exists.");
-                    }
-                }
-            }
+            //if (!string.IsNullOrEmpty(title))
+            //{
+            //    SPListItemCollection items =
+            //        resourcePool.GetItems(new SPQuery {Query = string.Format(VALIDATE_DISPLAY_NAME_QUERY, title)});
 
-            string account = oAccount.ToString();
+            //    if (items.Count > 0)
+            //    {
+            //        if (items[0].ID != id)
+            //        {
+            //            throw new Exception("Resource with the same name already exists.");
+            //        }
+            //    }
+            //}
 
-            if (!string.IsNullOrEmpty(account))
-            {
-                SPFieldUserValue spFieldUserValue = null;
+            //string account = oAccount.ToString();
 
-                try
-                {
-                    spFieldUserValue = new SPFieldUserValue(_spWeb, account);
-                }
-                catch { }
+            //if (!string.IsNullOrEmpty(account))
+            //{
+            //    SPFieldUserValue spFieldUserValue = null;
 
-                if (spFieldUserValue != null)
-                {
-                    SPListItemCollection items =
-                        resourcePool.GetItems(new SPQuery
-                        {
-                            Query =
-                                string.Format(VALIDATE_ACCOUNT_QUERY,
-                                    spFieldUserValue.User.ID)
-                        });
+            //    try
+            //    {
+            //        spFieldUserValue = new SPFieldUserValue(_spWeb, account);
+            //    }
+            //    catch { }
 
-                    if (items.Count > 0)
-                    {
-                        SPListItem spListItem = items[0];
-                        if (spListItem.ID != id)
-                        {
-                            string message = string.Format(@"{0} (ID: {1}) has the same SharePoint account.",
-                                spListItem.Title, spListItem.ID);
-                            throw new Exception(message);
-                        }
-                    }
-                }
-            }
+            //    if (spFieldUserValue != null)
+            //    {
+            //        SPListItemCollection items =
+            //            resourcePool.GetItems(new SPQuery
+            //            {
+            //                Query =
+            //                    string.Format(VALIDATE_ACCOUNT_QUERY,
+            //                        spFieldUserValue.User.ID)
+            //            });
+
+            //        if (items.Count > 0)
+            //        {
+            //            SPListItem spListItem = items[0];
+            //            if (spListItem.ID != id)
+            //            {
+            //                string message = string.Format(@"{0} (ID: {1}) has the same SharePoint account.",
+            //                    spListItem.Title, spListItem.ID);
+            //                throw new Exception(message);
+            //            }
+            //        }
+            //    }
+            //}
         }
-        
+
         private void LogImportMessage(string message, Int32 messageType)
         {
             //  0 Info   
