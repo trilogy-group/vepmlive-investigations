@@ -753,7 +753,7 @@
                             if (h == 0) {
                                 alert("There are no categories which can be added under the selected row");
                             } else
-                                this.DisplayDialog(20, 30, 350, 150 + h, "Select the categories to add", "winCategoriesDlg", "idCategoriesDlgObj", true, false);
+                                this.DisplayDialog(20, 30, 350, 150 + h >= 500 ? 500 : 150 + h, "Select the categories to add", "winCategoriesDlg", "idCategoriesDlgObj", true, false);
                         }
                     }
                     break;

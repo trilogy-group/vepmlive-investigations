@@ -58,6 +58,11 @@
     .modalContent {
         margin-top: 0px !important;
     }
+    .modalContentScroll {
+        margin-top: 0px !important;
+        height:85%;
+        overflow:auto;
+    }
 </style>
 
 <!--[if IE 8]>
@@ -99,13 +104,13 @@
 	    </div>
     </div>
 </div>
-<div class="modalContent" id="idCategoriesDlgObj" style="display:none;">
+<div class="modalContentScroll" id="idCategoriesDlgObj" style="display:none;">
 	<div class="modalText" style="margin-top:10px;padding-right:10px;">
  		<div id="idDivCategoriesMessage" style="display:relative;vertical-align:middle;padding-bottom:3px;"></div>
          <div>
             <div id="idDivCategories"></div>
         </div>
-		<div style="width:200px;position:absolute;bottom:5px;right:0px;">
+		<div style="width:200px;position:absolute;bottom:5px;right:0px;left:0px;">
 			<div class="button-container">
         			<a onclick="javascript:categoriesDlg_DialogEvent('Add');" class="button-new green" style="width:75px;">Add</a>
         			<a onclick="javascript:categoriesDlg_DialogEvent('Cancel');" class="button-new silver" style="width:75px;">Cancel</a>
