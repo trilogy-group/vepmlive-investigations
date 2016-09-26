@@ -17,7 +17,7 @@
             font-size: 14px;
             vertical-align: top;
             position: relative;
-        }
+        } 
 
         #attach-wrapper .attach-text {
             color: #555555;
@@ -409,7 +409,7 @@
                 </tr>
             </table>
         </div>
-        <div style="vertical-align: top; display: inline;">
+        <div style="vertical-align: top; display: flex;">
             <table border="0" style="display:-webkit-box;">
                 <tr>
                     <td id="divPeopleDetailsParent" runat="server">

@@ -724,8 +724,8 @@ namespace EPMLiveWebParts {
             @__ctrl5 = this.@__BuildControldivAttachmentDetailsParent();
             @__parser.AddParsedSubObject(@__ctrl5);
             @__parser.AddParsedSubObject(new System.Web.UI.LiteralControl("\r\n                </tr>\r\n            </table>\r\n        </div>\r\n        <div style" +
-                        "=\"vertical-align: top; display: inline;\">\r\n            <table border=\"0\" style=\"" +
-                        "display:-webkit-box;\">\r\n                <tr>\r\n                    "));
+                        "=\"vertical-align: top; display: flex;\">\r\n            <table border=\"0\" style=\"di" +
+                        "splay:-webkit-box;\">\r\n                <tr>\r\n                    "));
             global::System.Web.UI.HtmlControls.HtmlTableCell @__ctrl6;
             @__ctrl6 = this.@__BuildControldivPeopleDetailsParent();
             @__parser.AddParsedSubObject(@__ctrl6);
@@ -827,24 +827,24 @@ namespace EPMLiveWebParts {
             @__w.Write("\r\n\r\n<style type=\"text/css\">\r\n    #attach-wrapper {\r\n    }\r\n\r\n        #attach-wrap" +
                     "per .paperclip {\r\n            color: #999999;\r\n            display: inline-block" +
                     ";\r\n            font-size: 14px;\r\n            vertical-align: top;\r\n            p" +
-                    "osition: relative;\r\n        }\r\n\r\n        #attach-wrapper .attach-text {\r\n       " +
-                    "     color: #555555;\r\n            padding: 4px 4px 0px 4px;\r\n            line-he" +
-                    "ight: 12px;\r\n        }\r\n\r\n        #attach-wrapper #attach-text-wrapper {\r\n      " +
-                    "      display: inline-block;\r\n            width: 95%;\r\n        }\r\n\r\n        #att" +
-                    "ach-wrapper .attach-text .file {\r\n            padding-right: 5px;\r\n            c" +
-                    "olor: #bbbbbb;\r\n        }\r\n\r\n        #attach-wrapper .attach-text .delete {\r\n   " +
-                    "         padding-left: 5px;\r\n            color: #cccccc;\r\n            display: n" +
-                    "one;\r\n        }\r\n\r\n            #attach-wrapper .attach-text .delete:hover {\r\n   " +
-                    "             cursor: pointer;\r\n                color: #0090ca;\r\n            }\r\n\r" +
-                    "\n        #attach-wrapper .attach-text a {\r\n            text-decoration: none;\r\n " +
-                    "           color: #0090ca;\r\n        }\r\n\r\n        #attach-wrapper .attach-text a:" +
-                    "hover {\r\n            color: #0090ca;\r\n            cursor: pointer;\r\n            " +
-                    "text-decoration:underline;\r\n        }\r\n\r\n        .upload-attach {\r\n           co" +
-                    "lor: #aaaaaa !important;\r\n           font-size:12px;\r\n           padding-left:5p" +
-                    "x;\r\n        }\r\n        \r\n        .upload-attach:hover {\r\n           color: #5555" +
-                    "55 !important;\r\n        }\r\n        \r\n</style>\r\n\r\n<script type=\"text/javascript\">" +
-                    "\r\n    function openDialog() {\r\n        var options =\r\n        {\r\n            url" +
-                    ": $(\"#");
+                    "osition: relative;\r\n        } \r\n\r\n        #attach-wrapper .attach-text {\r\n      " +
+                    "      color: #555555;\r\n            padding: 4px 4px 0px 4px;\r\n            line-h" +
+                    "eight: 12px;\r\n        }\r\n\r\n        #attach-wrapper #attach-text-wrapper {\r\n     " +
+                    "       display: inline-block;\r\n            width: 95%;\r\n        }\r\n\r\n        #at" +
+                    "tach-wrapper .attach-text .file {\r\n            padding-right: 5px;\r\n            " +
+                    "color: #bbbbbb;\r\n        }\r\n\r\n        #attach-wrapper .attach-text .delete {\r\n  " +
+                    "          padding-left: 5px;\r\n            color: #cccccc;\r\n            display: " +
+                    "none;\r\n        }\r\n\r\n            #attach-wrapper .attach-text .delete:hover {\r\n  " +
+                    "              cursor: pointer;\r\n                color: #0090ca;\r\n            }\r\n" +
+                    "\r\n        #attach-wrapper .attach-text a {\r\n            text-decoration: none;\r\n" +
+                    "            color: #0090ca;\r\n        }\r\n\r\n        #attach-wrapper .attach-text a" +
+                    ":hover {\r\n            color: #0090ca;\r\n            cursor: pointer;\r\n           " +
+                    " text-decoration:underline;\r\n        }\r\n\r\n        .upload-attach {\r\n           c" +
+                    "olor: #aaaaaa !important;\r\n           font-size:12px;\r\n           padding-left:5" +
+                    "px;\r\n        }\r\n        \r\n        .upload-attach:hover {\r\n           color: #555" +
+                    "555 !important;\r\n        }\r\n        \r\n</style>\r\n\r\n<script type=\"text/javascript\"" +
+                    ">\r\n    function openDialog() {\r\n        var options =\r\n        {\r\n            ur" +
+                    "l: $(\"#");
              @__w.Write( hiddenWebUrl.ClientID );
 
             @__w.Write("\").val() + \"/_layouts/epmlive/AttachFileMulti.aspx?ListId=\" + $(\"#");
