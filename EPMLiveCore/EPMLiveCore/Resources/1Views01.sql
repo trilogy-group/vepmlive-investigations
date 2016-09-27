@@ -22,7 +22,7 @@ SELECT     dbo.TSTIMESHEET.USERNAME AS Username, dbo.TSTIMESHEET.RESOURCENAME AS
                       CASE dbo.TSTIMESHEET.APPROVAL_STATUS WHEN 0 THEN ''Pending'' WHEN 1 THEN ''Approved'' WHEN 2 THEN ''Rejected'' END AS [Approval Status],                       
                       CASE dbo.TSITEM.APPROVAL_STATUS WHEN 0 THEN ''Pending'' WHEN 1 THEN ''Approved'' WHEN 2 THEN ''Rejected'' END AS [PM Approval Status],                       
                       CONVERT(varchar(8000), COALESCE (dbo.TSTIMESHEET.APPROVAL_NOTES, '''')) AS [Approval Notes], dbo.TSTIMESHEET.LASTMODIFIEDBYN, 
-                      CONVERT(varchar(MAX), dbo.TSNOTES.TS_ITEM_NOTES) AS TS_ITEM_NOTES
+                      CONVERT(varchar(MAX), dbo.TSNOTES.TS_ITEM_NOTES) AS TS_ITEM_NOTES, dbo.TSTIMESHEET.APPROVAL_DATE
 FROM         dbo.TSITEM INNER JOIN
                       dbo.TSTIMESHEET ON dbo.TSITEM.TS_UID = dbo.TSTIMESHEET.TS_UID INNER JOIN
                       dbo.TSPERIOD ON dbo.TSTIMESHEET.PERIOD_ID = dbo.TSPERIOD.PERIOD_ID AND dbo.TSTIMESHEET.SITE_UID = dbo.TSPERIOD.SITE_ID INNER JOIN
@@ -42,7 +42,7 @@ SELECT     dbo.TSTIMESHEET.USERNAME AS Username, dbo.TSTIMESHEET.RESOURCENAME AS
                       CASE dbo.TSTIMESHEET.APPROVAL_STATUS WHEN 0 THEN ''Pending'' WHEN 1 THEN ''Approved'' WHEN 2 THEN ''Rejected'' END AS [Approval Status],                       
                       CASE dbo.TSITEM.APPROVAL_STATUS WHEN 0 THEN ''Pending'' WHEN 1 THEN ''Approved'' WHEN 2 THEN ''Rejected'' END AS [PM Approval Status],                       
                       CONVERT(varchar(8000), COALESCE (dbo.TSTIMESHEET.APPROVAL_NOTES, '''')) AS [Approval Notes], dbo.TSTIMESHEET.LASTMODIFIEDBYN, 
-                      CONVERT(varchar(MAX), dbo.TSNOTES.TS_ITEM_NOTES) AS Expr1
+                      CONVERT(varchar(MAX), dbo.TSNOTES.TS_ITEM_NOTES) AS Expr1, dbo.TSTIMESHEET.APPROVAL_DATE
 FROM         dbo.TSITEM INNER JOIN
                       dbo.TSTIMESHEET ON dbo.TSITEM.TS_UID = dbo.TSTIMESHEET.TS_UID INNER JOIN
                       dbo.TSPERIOD ON dbo.TSTIMESHEET.PERIOD_ID = dbo.TSPERIOD.PERIOD_ID AND dbo.TSTIMESHEET.SITE_UID = dbo.TSPERIOD.SITE_ID INNER JOIN
@@ -60,7 +60,7 @@ SELECT     TSTIMESHEET_1.USERNAME, TSTIMESHEET_1.RESOURCENAME AS [Resource Name]
                       CASE TSTIMESHEET_1.APPROVAL_STATUS WHEN 0 THEN ''Pending'' WHEN 1 THEN ''Approved'' WHEN 2 THEN ''Rejected'' END AS [Approval Status],                       
                       CASE TSITEM_1.APPROVAL_STATUS WHEN 0 THEN ''Pending'' WHEN 1 THEN ''Approved'' WHEN 2 THEN ''Rejected'' END AS [PM Approval Status],                       
                       CONVERT(varchar(8000), COALESCE (TSTIMESHEET_1.APPROVAL_NOTES, '''')) AS [Approval Notes], TSTIMESHEET_1.LASTMODIFIEDBYN, CONVERT(varchar(MAX), 
-                      dbo.TSNOTES.TS_ITEM_NOTES) AS TS_ITEM_NOTES
+                      dbo.TSNOTES.TS_ITEM_NOTES) AS TS_ITEM_NOTES, TSTIMESHEET_1.APPROVAL_DATE
 FROM         dbo.TSTIMESHEET AS TSTIMESHEET_1 INNER JOIN
                       dbo.TSRESMETA ON TSTIMESHEET_1.TS_UID = dbo.TSRESMETA.TS_UID INNER JOIN
                       dbo.TSITEM AS TSITEM_1 ON TSTIMESHEET_1.TS_UID = TSITEM_1.TS_UID INNER JOIN
