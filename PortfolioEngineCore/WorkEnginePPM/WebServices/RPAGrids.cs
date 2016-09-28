@@ -425,6 +425,11 @@ namespace RPADataCache
                         else
                             xC.CreateStringAttr("Type", "Text");
 
+                        if (sn.Equals(RPConstants.CONST_PRIORITY))
+                        {
+                            xC.CreateStringAttr("NumberSort", "1");
+                        }
+
                         xC.CreateIntAttr("CanEdit", 0);
                         xC.CreateIntAttr("CanMove", 1);
 
