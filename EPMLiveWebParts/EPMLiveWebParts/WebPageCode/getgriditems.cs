@@ -4539,6 +4539,7 @@ namespace EPMLiveWebParts
         private void addGroups(SPWeb curWeb)
         {
             string query = getQuery();
+            bool isDiscendingOrder = false;
 
             XmlDocument querydoc = new XmlDocument();
             querydoc.LoadXml("<Query>" + query + "</Query>");
@@ -4560,6 +4561,13 @@ namespace EPMLiveWebParts
                     {
                         string groupfield = nd.Attributes["Name"].Value;
                         arrTempGroups.Add(groupfield);
+
+                        try
+                        {
+                            if (!string.IsNullOrEmpty(nd.Attributes["Ascending"].Value))
+                                isDiscendingOrder = !Convert.ToBoolean(nd.Attributes["Ascending"].Value);
+                        }
+                        catch (NullReferenceException) { }
                     }
                 }
                 foreach (string additionalgroup in additionalgroups.Split('|'))
@@ -4605,7 +4613,7 @@ namespace EPMLiveWebParts
             if (arrGroupFields.Count() > 0)
                 arrGroupFields = arrGroupFields.Distinct().ToArray();
 
-            SortedList arrGTemp = new SortedList();
+            SortedList arrGTemp = new SortedList();            
 
             if (arrGroupFields.Length > 0)
             {
@@ -4615,6 +4623,25 @@ namespace EPMLiveWebParts
                 {
                     ndOrderBy = xmlQuery.CreateNode(XmlNodeType.Element, "OrderBy", docXml.NamespaceURI);
                     xmlQuery.FirstChild.AppendChild(ndOrderBy);
+                }
+                else
+                {
+                    try
+                    {
+                        foreach (XmlNode nd in ndOrderBy.SelectNodes("FieldRef"))
+                        {
+                            try
+                            {
+                                if (!isDiscendingOrder && nd.Attributes["Ascending"].Value.ToLower() == "false")
+                                    isDiscendingOrder = true;
+                            }
+                            catch (NullReferenceException)
+                            {
+                                //Sort mechanism was not selected by the user...
+                            }
+                        }
+                    }
+                    catch { }
                 }
                 foreach (string sG in arrGroupFields)
                 {
@@ -4631,12 +4658,23 @@ namespace EPMLiveWebParts
             }
             query = xmlQuery.ChildNodes[0].InnerXml;
 
+            ArrayList groupByArray = new ArrayList();
             populateGroups(query, arrGTemp, curWeb);
 
-            /////////////////////
             foreach (DictionaryEntry e in arrGTemp)
             {
-                string newItem = e.Key.ToString();
+                groupByArray.Add(e.Key);
+            }
+
+            if (isDiscendingOrder)
+            {
+                groupByArray.Reverse();
+            }
+
+            /////////////////////
+            foreach (string val in groupByArray)
+            {
+                string newItem = val;
                 int parentInd = newItem.LastIndexOf("\n");
                 string parent = "";
 
@@ -4646,7 +4684,7 @@ namespace EPMLiveWebParts
                     newItem = newItem.Substring(parentInd + 1);
                 }
 
-                if ((hshItemNodes.Contains(parent) && !hshItemNodes.Contains(e.Key.ToString())) || (parentInd == -1 && !hshItemNodes.Contains(e.Key.ToString())))
+                if ((hshItemNodes.Contains(parent) && !hshItemNodes.Contains(val)) || (parentInd == -1 && !hshItemNodes.Contains(val)))
                 {
                     XmlNode ndParent = null;
                     if (parentInd == -1)
@@ -4658,8 +4696,8 @@ namespace EPMLiveWebParts
                     XmlNode newNode = docXml.CreateNode(XmlNodeType.Element, "row", docXml.NamespaceURI);
                     XmlAttribute attrId = docXml.CreateAttribute("id");
 
-                    if (e.Key.ToString() != "")
-                        attrId.Value = e.Key.ToString();
+                    if (!string.IsNullOrEmpty(val))
+                        attrId.Value = val;
                     else
                         attrId.Value = Guid.NewGuid().ToString();
 
@@ -4668,7 +4706,7 @@ namespace EPMLiveWebParts
                     attrLocked.Value = "1";
                     newNode.Attributes.Append(attrLocked);
 
-                    int indentlevel = e.Key.ToString().Split('\n').Length;
+                    int indentlevel = val.Split('\n').Length;
 
                     if (expandlevel == 0 && expanded == "FALSE")
                     {
@@ -4742,16 +4780,16 @@ namespace EPMLiveWebParts
                     attrBold.Value = "font-weight:bold;";
                     newNode.Attributes.Append(attrBold);
 
-                    hshItemNodes.Add(e.Key.ToString(), newNode);
+                    hshItemNodes.Add(val, newNode);
 
-                    arrGroupMin.Add(e.Key.ToString(), DateTime.MaxValue);
-                    arrGroupMax.Add(e.Key.ToString(), DateTime.MinValue);
+                    arrGroupMin.Add(val, DateTime.MaxValue);
+                    arrGroupMax.Add(val, DateTime.MinValue);
                     //SPViewFieldCollection vfc = view.ViewFields;
                     //for (int i = 0; i < vfc.Count; i++)
                     //{
                     //    arrAggregationVals.Add(e.Key.ToString() + "\n" + vfc[i], "");
                     //}
-                    setInitialAggs(e.Key.ToString());
+                    setInitialAggs(val);
                 }
             }
 
