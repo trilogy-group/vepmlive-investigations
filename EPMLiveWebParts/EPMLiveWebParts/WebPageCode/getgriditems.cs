@@ -544,7 +544,7 @@ namespace EPMLiveWebParts
 
                 bool wp = false;
                 bool ap = false;
-                SPSecurity.RunWithElevatedPrivileges(delegate()
+                SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
                     using (SPSite site = new SPSite(list.ParentWeb.Site.ID))
                     {
@@ -4244,7 +4244,7 @@ namespace EPMLiveWebParts
             {
                 if (executive == "on")
                 {
-                    SPSecurity.RunWithElevatedPrivileges(delegate()
+                    SPSecurity.RunWithElevatedPrivileges(delegate ()
                     {
                         using (SPSite site = new SPSite(curWeb.Site.Url))
                         {
@@ -4311,7 +4311,7 @@ namespace EPMLiveWebParts
             if (!string.IsNullOrEmpty(lookupFilterField) && !String.IsNullOrEmpty(lookupFilterFieldList))
             {
 
-                SPSecurity.RunWithElevatedPrivileges(delegate()
+                SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
                     //using (SPSite s = SPContext.Current.Site)
                     {
@@ -4436,7 +4436,7 @@ namespace EPMLiveWebParts
                 Guid listid = Guid.Empty;
 
 
-                SPSecurity.RunWithElevatedPrivileges(delegate()
+                SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
                     try
                     {
@@ -4562,12 +4562,8 @@ namespace EPMLiveWebParts
                         string groupfield = nd.Attributes["Name"].Value;
                         arrTempGroups.Add(groupfield);
 
-                        try
-                        {
-                            if (!string.IsNullOrEmpty(nd.Attributes["Ascending"].Value))
-                                isDiscendingOrder = !Convert.ToBoolean(nd.Attributes["Ascending"].Value);
-                        }
-                        catch (NullReferenceException) { }
+                        if (nd.Attributes["Ascending"] != null && !string.IsNullOrEmpty(nd.Attributes["Ascending"].Value))
+                            isDiscendingOrder = !Convert.ToBoolean(nd.Attributes["Ascending"].Value);
                     }
                 }
                 foreach (string additionalgroup in additionalgroups.Split('|'))
@@ -4613,7 +4609,7 @@ namespace EPMLiveWebParts
             if (arrGroupFields.Count() > 0)
                 arrGroupFields = arrGroupFields.Distinct().ToArray();
 
-            SortedList arrGTemp = new SortedList();            
+            SortedList arrGTemp = new SortedList();
 
             if (arrGroupFields.Length > 0)
             {
@@ -4626,22 +4622,11 @@ namespace EPMLiveWebParts
                 }
                 else
                 {
-                    try
+                    foreach (XmlNode nd in ndOrderBy.SelectNodes("FieldRef"))
                     {
-                        foreach (XmlNode nd in ndOrderBy.SelectNodes("FieldRef"))
-                        {
-                            try
-                            {
-                                if (!isDiscendingOrder && nd.Attributes["Ascending"].Value.ToLower() == "false")
-                                    isDiscendingOrder = true;
-                            }
-                            catch (NullReferenceException)
-                            {
-                                //Sort mechanism was not selected by the user...
-                            }
-                        }
+                        if (!isDiscendingOrder && nd.Attributes["Ascending"] != null && nd.Attributes["Ascending"].Value.ToLower() == "false")
+                            isDiscendingOrder = true;
                     }
-                    catch { }
                 }
                 foreach (string sG in arrGroupFields)
                 {
@@ -5691,7 +5676,7 @@ namespace EPMLiveWebParts
 
                 SPList tempList = null;
 
-                SPSecurity.RunWithElevatedPrivileges(delegate()
+                SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
                     using (SPSite s = new SPSite(curWeb.Url))
                     {
@@ -6054,7 +6039,7 @@ namespace EPMLiveWebParts
                                 break;
                         };
                         break;
-                    //return formatField(val, spfield.InternalName, spfield.Type == SPFieldType.Calculated,group, li);
+                        //return formatField(val, spfield.InternalName, spfield.Type == SPFieldType.Calculated,group, li);
                 };
 
             }
