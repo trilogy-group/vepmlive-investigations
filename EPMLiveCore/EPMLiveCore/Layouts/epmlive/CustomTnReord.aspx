@@ -234,7 +234,7 @@
                 origUserId: origUserId
             };
 
-            $.post(webUrl + asyncNavActionsUrl, postData, function (data) {
+            $.post(window.epmLive.currentWebUrl + asyncNavActionsUrl, postData, function (data) {
                 if (data.indexOf('success') != -1) {
                     SP.SOD.execute('SP.UI.Dialog.js', 'SP.UI.ModalDialog.commonModalDialogClose', '1', '');
                     return false;
