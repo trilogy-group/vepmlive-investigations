@@ -2018,9 +2018,18 @@ function MYTSOnGetHtmlValue(grid, row, col, val) {
                 }
             }
             else if (TSCols[col] || col == "TSTotals") {
+                var strDivTag = "";
+                if (TSColType == 1) {
+                    if (TSNotes) {
+                        var pVal = grid.GetValue(row, "TS" + col);
+                        if (pVal != "") {
+                            strDivTag = "*";
+                        }
+                    }
+                }
                 if (val == "0" || val == "")
-                    return "";
-                return getFormattedNumber(val.toLocaleString(), grid);
+                    return strDivTag;
+                return getFormattedNumber(val.toLocaleString(), grid) + strDivTag;
             }
             else if (col == "Progress" && row.Def.Name == "R") {
                 try {
