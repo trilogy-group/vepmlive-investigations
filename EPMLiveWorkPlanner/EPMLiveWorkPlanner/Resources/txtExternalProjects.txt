@@ -4,7 +4,7 @@
 	<Cfg Undo='1' Editing='0' Dragging="0"/>
 	<Cfg ExportType='Expanded,Outline'/>
 	<Cfg ChildParts='0'/>
-	<Cfg PrintCols='1'/>
+	<Cfg PrintCols='2'/>
 	<Cfg ExportCols='1'/>
 	<Cfg ShowDeleted='0'/>
 	<Cfg NumberId='1' FullId='0' IdChars='1234567890' AutoIdPrefix=''/>
