@@ -86,7 +86,8 @@ namespace EPMLiveReportsAdmin.Properties {
         ///      @UserId AS INT,
         ///      @SiteId AS UNIQUEIDENTIFIER
         ///AS
-        ///BEGIN        /// [rest of string was truncated]&quot;;.
+        ///BEGIN
+        ///      -- SET NOC [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string CheckReqSP {
             get {
@@ -106,7 +107,10 @@ namespace EPMLiveReportsAdmin.Properties {
         ///BEGIN
         ///	PRINT &apos;Add Column ListIcon&apos;
         ///	ALTER TABLE [dbo].[ReportListIds]
-        ///	ADD [ListIcon] [NVARCHAR](100)  [rest of string was truncated]&quot;;.
+        ///	ADD [ListIcon] [NVARCHAR](100) NULL
+        ///END
+        ///
+        ///- [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string CheckSchema {
             get {
@@ -189,7 +193,7 @@ namespace EPMLiveReportsAdmin.Properties {
         ///BEGIN
         ///	PRINT &apos;--------------------------------------------------&apos;
         ///	PRINT &apos;Dropping: spRPTWork2&apos;
-        ///	DROP PROCEDU [rest of string was truncated]&quot;;.
+        ///	DROP PROCEDURE [dbo].[s [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string InitDatabaseCreateProcedures {
             get {
@@ -216,7 +220,10 @@ namespace EPMLiveReportsAdmin.Properties {
         ///else
         ///	begin
         ///
-        ///		print &apos;Updating Tabl [rest of string was truncated]&quot;;.
+        ///		print &apos;Updating Table RPTGROUPUSER&apos;
+        ///
+        ///
+        /// [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string InitDatabaseCreateTables {
             get {
@@ -296,7 +303,8 @@ namespace EPMLiveReportsAdmin.Properties {
         ///@webid uniqueidentifier,
         ///@weburl varchar(255),
         ///@userid	int,
-        ///@rollu [rest of string was truncated]&quot;;.
+        ///@rollup bit,
+        ///@list varc [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string spGetReportListData {
             get {
@@ -323,7 +331,9 @@ namespace EPMLiveReportsAdmin.Properties {
         ///begin
         ///      ----------------------Days Overdue------------
         ///      if exists (select column_name FROM INFORMATION_SCHEMA.COLUMNS where table_name = @listtable and column_name = &apos;DaysOverdue&apos;)
-        ///      begin [rest of string was truncated]&quot;;.
+        ///      begin
+        ///            
+        ///     [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string spUpdateStatusFields {
             get {

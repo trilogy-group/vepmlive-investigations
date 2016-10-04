@@ -1,5 +1,5 @@
 ﻿<%@ Assembly Name="$SharePoint.Project.AssemblyFullName$" %>
-<%@ Assembly Name="Microsoft.Web.CommandUI, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
+<%@ Assembly Name="Microsoft.Web.CommandUI, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
 <%@ Register TagPrefix="wssuc" TagName="ButtonSection" Src="~/_controltemplates/ButtonSection.ascx" %>
 <%@ Page Language="C#" AutoEventWireup="true" CodeBehind="cleanupwarning.aspx.cs" Inherits="EPMLiveReportsAdmin.Layouts.EPMLive.cleanupwarning" DynamicMasterPageFile="~masterurl/default.master" %>
 

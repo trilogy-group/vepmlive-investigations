@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<package xmlns:dm0="http://schemas.microsoft.com/VisualStudio/2008/DslTools/Core" dslVersion="1.0.0.0" Id="b5eccc41-c0ff-4e99-b404-df45f7e72db6" solutionId="5a3fe24c-2dc5-4a1c-aec1-6ce942825ceb" resetWebServer="false" sharePointProductVersion="15.0" name="WorkEnginePPM" xmlns="http://schemas.microsoft.com/VisualStudio/2008/SharePointTools/PackageModel">
+<package xmlns:dm0="http://schemas.microsoft.com/VisualStudio/2008/DslTools/Core" dslVersion="1.0.0.0" Id="b5eccc41-c0ff-4e99-b404-df45f7e72db6" solutionId="5a3fe24c-2dc5-4a1c-aec1-6ce942825ceb" resetWebServer="false" sharePointProductVersion="16.0" name="WorkEnginePPM" xmlns="http://schemas.microsoft.com/VisualStudio/2008/SharePointTools/PackageModel">
   <features>
     <featureReference itemId="7682a2aa-15ef-4e40-b49e-a6f8581d53c8" />
     <featureReference itemId="df5ad756-d274-40da-b701-05a221521741" />

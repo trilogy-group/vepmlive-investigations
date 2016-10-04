@@ -70,7 +70,7 @@ namespace TimeSheets.Properties {
         ///          &lt;OverflowSection Type=&quot;OneRow&quot; TemplateAlias=&quot;o1&quot; DisplayMode=&quot;Large&quot;/&gt;
         ///          &lt;OverflowSection Type=&quot;ThreeRow&quot; TemplateAlias=&quot;o2&quot; DisplayMode=&quot;Medium&quot;/&gt;
         ///        &lt;/Layout&gt;
-        ///        &lt;Layout [rest of string was truncated]&quot;;.
+        ///        &lt;Layout Title=&quot;L [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string flexible2 {
             get {
@@ -94,7 +94,7 @@ namespace TimeSheets.Properties {
         ///}
         ///
         /////=========================notes========================
-        ///fun [rest of string was truncated]&quot;;.
+        ///function eXcell_ts [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string txtExcels {
             get {
@@ -116,7 +116,7 @@ namespace TimeSheets.Properties {
         ///
         ///	function _registerCustomPageComponent()
         ///	{
-        ///		SP.SOD.registerSod(&quot;MyTimesheetContextu [rest of string was truncated]&quot;;.
+        ///		SP.SOD.registerSod(&quot;MyTimesheetContextualTabPageComp [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string txtMyTimesheet_DelayScript {
             get {
@@ -135,7 +135,7 @@ namespace TimeSheets.Properties {
         ///	&lt;Cfg Searching=&quot;1&quot; /&gt;
         ///	&lt;Cfg StaticCursor=&quot;1&quot; Dragging=&quot;0&quot; SelectingCells=&quot;1&quot; SelectClass=&quot;0&quot; /&gt;
         ///	&lt;Cfg NoTreeLines=&quot;1&quot; DetailOn=&quot;0&quot; MinRowHeight=&quot;20&quot; MaxRowHeight=&quot;20&quot; MidWidth=&quot;300&quot; MenuColumnsSort=&quot;1&quot; StandardFilter=&quot;2&quot; /&gt;
-        ///	&lt;Cfg P [rest of string was truncated]&quot;;.
+        ///	&lt;Cfg Paging=&quot;2&quot;  [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string txtMyTimesheet_GridErrorLayout {
             get {
@@ -153,7 +153,7 @@ namespace TimeSheets.Properties {
         ///	&lt;Cfg NumberId=&quot;1&quot; FullId=&quot;0&quot; IdChars=&quot;1234567890&quot; AddFocusCol=&quot;Title&quot; SortIcons=&quot;1&quot;/&gt;
         ///	&lt;Cfg Searching=&quot;1&quot; /&gt;
         ///	&lt;Cfg StaticCursor=&quot;1&quot; Dragging=&quot;0&quot; SelectingCells=&quot;0&quot; SelectClass=&quot;0&quot; Selecting=&quot;1&quot;/&gt;
-        ///	&lt;Cfg NoTreeLines=&quot;1&quot; DetailOn=&quot;0&quot; MinRowHeight=&quot;25&quot; MaxRowHeight= [rest of string was truncated]&quot;;.
+        ///	&lt;Cfg NoTreeLines=&quot;1&quot; DetailOn=&quot;0&quot; MinRowHeight=&quot;25&quot; MaxRowHeight=&quot;25&quot; Menu [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string txtMyTimesheet_GridLayout {
             get {
@@ -166,7 +166,7 @@ namespace TimeSheets.Properties {
         ///	&lt;Tab Id=&quot;Ribbon.MyTimesheetTab&quot; Title=&quot;My Timesheet&quot; Command=&quot;MyTimesheetContextualTab.EnableMyTimesheetTab&quot; Sequence=&quot;100&quot;&gt;
         ///		&lt;Scaling Id=&quot;Ribbon.MyTimesheet.Scaling&quot;&gt;
         ///			&lt;MaxSize Id=&quot;Ribbon.MyTimesheet.ActionsGroup.MaxSize&quot; GroupId=&quot;Ribbon.MyTimesheet.ActionsGroup&quot; Size=&quot;LargeMediumSmall&quot;/&gt;
-        ///	 [rest of string was truncated]&quot;;.
+        ///			&lt;S [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string txtMyTimesheet_Ribbon {
             get {
@@ -184,7 +184,7 @@ namespace TimeSheets.Properties {
         ///
         ///	&lt;Layout Title=&quot;ThreeRowMedium&quot; LayoutTitle=&quot;ThreeRowMedium&quot;&gt;
         ///		&lt;OverflowSection Type=&quot;ThreeRow&quot; TemplateAlias=&quot;oL&quot; DisplayMode=&quot;Medium&quot;/&gt;
-        ///	 [rest of string was truncated]&quot;;.
+        ///		&lt;Overflo [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string txtMyTimesheet_Template {
             get {
@@ -206,7 +206,7 @@ namespace TimeSheets.Properties {
         ///
         ///	function _registerCustomPageComponent()
         ///	{
-        ///		SP.SOD.registerSod(&quot;MyTimesheetApproval [rest of string was truncated]&quot;;.
+        ///		SP.SOD.registerSod(&quot;MyTimesheetApprovalsContextualTa [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string txtMyTimesheetApprovals_DelayScript {
             get {
@@ -224,7 +224,7 @@ namespace TimeSheets.Properties {
         ///	&lt;Cfg NumberId=&quot;1&quot; FullId=&quot;0&quot; IdChars=&quot;1234567890&quot; AddFocusCol=&quot;Title&quot; SortIcons=&quot;1&quot;/&gt;
         ///	&lt;Cfg Searching=&quot;1&quot; /&gt;
         ///	&lt;Cfg StaticCursor=&quot;1&quot; Dragging=&quot;0&quot; SelectingCells=&quot;1&quot; SelectClass=&quot;0&quot; /&gt;
-        ///	&lt;Cfg NoTreeLines=&quot;1&quot; DetailOn=&quot;0&quot; MinRowHeight=&quot;25&quot; Ma [rest of string was truncated]&quot;;.
+        ///	&lt;Cfg NoTreeLines=&quot;1&quot; DetailOn=&quot;0&quot; MinRowHeight=&quot;25&quot; MaxRowHeigh [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string txtMyTimesheetWork_GridLayout {
             get {
@@ -238,7 +238,7 @@ namespace TimeSheets.Properties {
         ///			&lt;MaxSize Id=&quot;Ribbon.MyTimesheetWork.ActionsGroup.MaxSize&quot; GroupId=&quot;Ribbon.MyTimesheetWork.ActionsGroup&quot; Size=&quot;LargeMediumSmall&quot;/&gt;
         ///			&lt;Scale Id=&quot;Ribbon.MyTimesheetWork.ActionsGroup.Scaling.CustomTabScaling&quot; GroupId=&quot;Ribbon.MyTimesheetWork.ActionsGroup&quot; Size=&quot;LargeMediumSmall&quot; /&gt;
         ///
-        ///			&lt;MaxSize Id=&quot;Ribbon.MyTimesheetWork.ViewPeriodGroup.MaxSize&quot; GroupId=&quot;Ribbon.MyTimesheetWork.ViewPeriodGrou [rest of string was truncated]&quot;;.
+        ///			&lt;MaxSize Id=&quot;Ribbon.MyTimesheetWork.ViewPeriodGroup.MaxSize&quot; GroupId=&quot;Ribbon.MyTimesheetWork.ViewPeriodGroup&quot; Si [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string txtMyTimesheetWork_Ribbon {
             get {
@@ -252,7 +252,7 @@ namespace TimeSheets.Properties {
         ///			&lt;MaxSize Id=&quot;Ribbon.MyTimesheetWork.MyTimesheetWorkViewsGroup.MaxSize&quot; GroupId=&quot;Ribbon.MyTimesheetWork.MyTimesheetWorkViewsGroup&quot; Size=&quot;LargeMediumSmall&quot;/&gt;
         ///			&lt;Scale Id=&quot;Ribbon.MyTimesheetWork.MyTimesheetWorkViewsGroup.Scaling.CustomTabScaling&quot; GroupId=&quot;Ribbon.MyTimesheetWork.MyTimesheetWorkViewsGroup&quot; Size=&quot;LargeMediumSmall&quot; /&gt;
         ///		&lt;/Scaling&gt;
-        ///		&lt;Groups Id=&quot;Ribbon.MyTimesheetWork [rest of string was truncated]&quot;;.
+        ///		&lt;Groups Id=&quot;Ribbon.MyTimesheetWorkViews [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string txtMyTimesheetWork_ViewRibbon {
             get {
@@ -270,7 +270,7 @@ namespace TimeSheets.Properties {
         ///		    var tempval = this.cells(id,index).getValue().toString();        // add row_value
         ///		    if(tempval.split(&apos;|&apos;)[0] != &quot;&quot;)
         ///			{
-        /// [rest of string was truncated]&quot;;.
+        ///				var s [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string txtPMApprovalsJS {
             get {
@@ -295,7 +295,7 @@ namespace TimeSheets.Properties {
         ///	Array.add($arr, &apos;EnableTimesheetApprovals&apos;);
         ///	Array.add($arr, &apos;TimesheetApprove&apos;);
         ///	Array.add($arr, &apos;TimesheetUnlock&apos;);
-        ///	Array.add($arr, &apos;T [rest of string was truncated]&quot;;.
+        ///	Array.add($arr, &apos;TimesheetReject&apos;) [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string txtTimesheetApprovalsRibbonFunctions {
             get {
@@ -308,7 +308,7 @@ namespace TimeSheets.Properties {
         ///		&lt;Scaling Id=&quot;Ribbon.Timesheet.Scaling&quot;&gt;
         ///	    	&lt;MaxSize Id=&quot;Ribbon.Timesheet.Scaling.Main.MaxSize&quot; Sequence=&quot;10&quot; GroupId=&quot;Ribbon.Timesheet.Main&quot; Size=&quot;LargeLarge&quot; /&gt;
         ///			&lt;MaxSize Id=&quot;Ribbon.Timesheet.Scaling.Data.MaxSize&quot; Sequence=&quot;10&quot; GroupId=&quot;Ribbon.Timesheet.Data&quot; Size=&quot;LargeLarge&quot; /&gt;
-        ///			&lt;MaxSize Id=&quot;Ribbon.Timesheet.Scaling.Items.MaxSize&quot; Sequence=&quot;11&quot; GroupId=&quot;Ribbon.Timesheet.Items&quot; S [rest of string was truncated]&quot;;.
+        ///			&lt;MaxSize Id=&quot;Ribbon.Timesheet.Scaling.Items.MaxSize&quot; Sequence=&quot;11&quot; GroupId=&quot;Ribbon.Timesheet.Items&quot; Size= [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string txtTimesheetApprovalsTab {
             get {
@@ -332,7 +332,7 @@ namespace TimeSheets.Properties {
         ///    &lt;table width=&quot;100%&quot;&gt;
         ///        &lt;tr&gt;
         ///            &lt;td align=&quot;center&quot; class=&quot;ms-sectionheader&quot;&gt;
-        ///             [rest of string was truncated]&quot;;.
+        ///                &lt;img src=&quot;/ [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string txtTimesheetBase {
             get {
@@ -357,7 +357,7 @@ namespace TimeSheets.Properties {
         ///	Array.add($arr, &apos;EnableTimesheetApprovals&apos;);
         ///	Array.add($arr, &apos;TimesheetApprove&apos;);
         ///	Array.add($arr, &apos;TimesheetUnlock&apos;);
-        ///	Array.add($arr, &apos;T [rest of string was truncated]&quot;;.
+        ///	Array.add($arr, &apos;TimesheetReject&apos;) [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string txtTimesheetPMApprovalsRibbonFunctions {
             get {
@@ -372,7 +372,7 @@ namespace TimeSheets.Properties {
         ///			&lt;MaxSize Id=&quot;Ribbon.Timesheet.Scaling.Data.MaxSize&quot; Sequence=&quot;10&quot; GroupId=&quot;Ribbon.Timesheet.Data&quot; Size=&quot;LargeLarge&quot; /&gt;
         ///	    &lt;/Scaling&gt;
         ///		&lt;Groups Id=&quot;TimesheetGroups&quot;&gt;
-        ///			&lt;Group Id=&quot;Ribbon.Timesheet.Main&quot; Title=&quot;Timeshee [rest of string was truncated]&quot;;.
+        ///			&lt;Group Id=&quot;Ribbon.Timesheet.Main&quot; Title=&quot;Timesheet&quot; Com [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string txtTimesheetPMApprovalsTab {
             get {
@@ -397,7 +397,9 @@ namespace TimeSheets.Properties {
         ///	Array.add($arr, &apos;EnableTimesheetData&apos;);
         ///	Array.add($arr, &apos;TimesheetSave&apos;);
         ///	Array.add($arr, &apos;TimesheetSubmit&apos;);
-        ///	Array.add($arr, &apos;Timesheet [rest of string was truncated]&quot;;.
+        ///	Array.add($arr, &apos;TimesheetUnsubmit&apos;);
+        ///
+        ///	Ar [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string txtTimesheetRibbonFunctions {
             get {
@@ -410,7 +412,7 @@ namespace TimeSheets.Properties {
         ///		&lt;Scaling Id=&quot;Ribbon.Timesheet.Scaling&quot;&gt;
         ///	    	&lt;MaxSize Id=&quot;Ribbon.Timesheet.Scaling.Main.MaxSize&quot; Sequence=&quot;10&quot; GroupId=&quot;Ribbon.Timesheet.Main&quot; Size=&quot;LargeLarge&quot; /&gt;
         ///			&lt;MaxSize Id=&quot;Ribbon.Timesheet.Scaling.Data.MaxSize&quot; Sequence=&quot;10&quot; GroupId=&quot;Ribbon.Timesheet.Data&quot; Size=&quot;LargeLarge&quot; /&gt;
-        ///			&lt;MaxSize Id=&quot;Ribbon.Timesheet.Scaling.Items.MaxSize&quot; Sequence=&quot;11&quot; GroupId=&quot;Ribbon.Timesheet.Items&quot; Size=&quot;Larg [rest of string was truncated]&quot;;.
+        ///			&lt;MaxSize Id=&quot;Ribbon.Timesheet.Scaling.Items.MaxSize&quot; Sequence=&quot;11&quot; GroupId=&quot;Ribbon.Timesheet.Items&quot; Size=&quot;LargeLar [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string txtTimesheetTab {
             get {
@@ -433,7 +435,7 @@ namespace TimeSheets.Properties {
         ///			&lt;/Row&gt;            
         ///			&lt;Row&gt;
         ///			  &lt;Strip&gt;            
-        ///			    &lt;Control [rest of string was truncated]&quot;;.
+        ///			    &lt;ControlRef TemplateAl [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string txtTimesheetTemplate {
             get {
@@ -453,7 +455,9 @@ namespace TimeSheets.Properties {
         ///                #viewList#
         ///                &lt;/menu&gt;
         ///            
-        ///            &lt; [rest of string was truncated]&quot;;.
+        ///            &lt;/span&gt;
+        ///
+        ///    [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string txtTSApprovalsHeader {
             get {
@@ -473,7 +477,7 @@ namespace TimeSheets.Properties {
         ///    var webid = mygrid#gridid#.getUserData(rowIdFull,&quot;webid&quot;);
         ///    var siteid = mygrid#gridid#.getUserData(rowIdFull,&quot;siteid&quot;);
         ///    var editurl = mygrid#gridid#.getUserData(rowIdFull,&quot;editurl&quot;);
-        ///    var viewurl = mygrid#gridid#. [rest of string was truncated]&quot;;.
+        ///    var viewurl = mygrid#gridid#.getUserData [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string txtTSApprovalsJS {
             get {

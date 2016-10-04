@@ -1,5 +1,5 @@
 ﻿<%@ Assembly Name="$SharePoint.Project.AssemblyFullName$" %>
-<%@ Assembly Name="Microsoft.Web.CommandUI, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
+<%@ Assembly Name="Microsoft.Web.CommandUI, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" %>
 <%@ Control Language="C#" AutoEventWireup="true" CodeBehind="EPMLiveNotificationsV2.ascx.cs" Inherits="EPMLiveCore.ControlTemplates.EPMLiveNotificationsV2" %>
 <%@ Import Namespace="Microsoft.SharePoint" %>
 
