@@ -74,7 +74,8 @@ namespace EPMLiveWorkPlanner.Properties {
         ///  &lt;Header Title=&apos;Task Name&apos;/&gt;
         ///  &lt;Def&gt;
         ///	&lt;D Name=&apos;R&apos; CanFocus=&apos;1&apos;/&gt;
-        ///	&lt;D Name=&apos;Folder&apos; CanFocus= [rest of string was truncated]&quot;;.
+        ///	&lt;D Name=&apos;Folder&apos; CanFocus=&apos;0&apos;/&gt;
+        ///	&lt;D Nam [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string txtAddLinksLayout {
             get {
@@ -98,7 +99,8 @@ namespace EPMLiveWorkPlanner.Properties {
         ///	&lt;Cfg ConstHeight=&apos;0&apos;/&gt;&lt;!-- Grid will always fill its main tag --&gt;
         ///	&lt;Cfg Undo=&apos;1&apos;/&gt;&lt;!-- Undo / redo is supported, Ctrl+Z / Ctrl+Y --&gt;
         ///	&lt;!--&lt;Cfg SuppressMessage=&apos;2&apos;/&gt; Grid produces no informational message --&gt;
-        ///	&lt;Cfg ExportType=&apos;Expanded,Outline&apos;/&gt;&lt;!-- Export setting, all rows will be exported expanded and will be used Excel outline --&gt;        /// [rest of string was truncated]&quot;;.
+        ///	&lt;Cfg ExportType=&apos;Expanded,Outline&apos;/&gt;&lt;!-- Export setting, all rows will be exported expanded and will be used Excel outline --&gt;
+        ///	&lt;Cfg  [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string txtAgileLayout {
             get {
@@ -115,7 +117,7 @@ namespace EPMLiveWorkPlanner.Properties {
         ///   &lt;Panel Visible=&apos;0&apos;/&gt;
         ///
         ///   &lt;LeftCols&gt;
-        ///      &lt;C Nam [rest of string was truncated]&quot;;.
+        ///      &lt;C Name=&quot;NAME&quot; [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string txtAllocationGrid {
             get {
@@ -135,7 +137,8 @@ namespace EPMLiveWorkPlanner.Properties {
         ///	&lt;Cfg ShowDeleted=&apos;0&apos;/&gt;
         ///	&lt;Cfg NumberId=&apos;1&apos; FullId=&apos;0&apos; IdChars=&apos;1234567890&apos; AddFocusCol=&apos;Title&apos; AutoIdPrefix=&apos;&apos;/&gt;
         ///	&lt;Cfg SelectingCells=&apos;0&apos;/&gt;
-        ///	&lt;Cfg Search [rest of string was truncated]&quot;;.
+        ///	&lt;Cfg Searching=&apos;1&apos;/&gt;
+        ///	 [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string txtDefaultConfig {
             get {
@@ -183,7 +186,7 @@ namespace EPMLiveWorkPlanner.Properties {
         ///    &lt;C Name=&apos;ID&apos; Type=&apos;Text&apos; CanEdit=&apos;0&apos; Visible=&apos;0&apos; WidthLap=&apos;1&apos;/&gt;
         ///	&lt;C Name=&apos;puid&apos; Type=&apos;Text&apos; Visible=&apos;0&apos; /&gt;
         ///	&lt;C Name=&apos;Reject&apos; Type=&apos;Bool&apos; CanEdit=&apos;1&apos; Width=&apos;40&apos; CanFocus=&apos;0&apos; WidthLap=&apos;1&apos;/&gt;
-        ///	&lt;C Name=&apos;Action&apos; Type=&apos;Text&apos; CanEdit=&apos;0&apos; Width=&apos;50&apos; C [rest of string was truncated]&quot;;.
+        ///	&lt;C Name=&apos;Action&apos; Type=&apos;Text&apos; CanEdit=&apos;0&apos; Width=&apos;50&apos; CanFocus=&apos;0 [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string txtExternalLinksApproval {
             get {
@@ -204,7 +207,7 @@ namespace EPMLiveWorkPlanner.Properties {
         ///	&lt;Cfg NumberId=&apos;1&apos; FullId=&apos;0&apos; IdChars=&apos;1234567890&apos; AutoIdPrefix=&apos;&apos;/&gt;
         ///	&lt;Cfg FocusWholeRow=&apos;1&apos;/&gt;
         ///	&lt;Cfg Searching=&apos;1&apos;/&gt;
-        ///	&lt;Pager [rest of string was truncated]&quot;;.
+        ///	&lt;Pager Width=&quot;80&quot;  [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string txtExternalProjects {
             get {
@@ -225,7 +228,8 @@ namespace EPMLiveWorkPlanner.Properties {
         ///			            G2antt1.Chart.Level(1).Label = &quot;&lt;%m1%&gt;&quot;;
         ///                        G2antt1.Chart.Level(0).Label = &quot;&lt;%yyyy%&gt;&quot;;
         ///			            break;
-        ///		            cas [rest of string was truncated]&quot;;.
+        ///		            case 16:
+        ///			    [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string txtFileFunctions {
             get {
@@ -243,7 +247,7 @@ namespace EPMLiveWorkPlanner.Properties {
         ///Indent = 24
         ///DefaultItemHeight = 20
         ///
-        ///HTMLPicture(&quot;excel&quot;) = &quot;gAAAABgYAEAgBEChSohIAC0KFEKEEKIEKgkNhQAAkZjkCgkejshkUjkklk0nlEplUrlRofQSADbMhEABwl8xmYAI0KaoPawANgYYwAeIDIIARE3mU0A08n1AoVEo1IBVDYrjo7NrFQoaoqoAK5+IYAXE3N1iAB2tCcfcwQFosswpsCns/fDVmlBobQm4GHVMi0KJQBBcceE3VAscJ3XgADAAucFgWDwt1ADNVa6bgUtoAcxSxeWxuPyMfAGUjhwfkwGmdQ5kxbXAL/f+jyGByeEjhQzrwEJ1OOy2m20uC3SszpvE/A4m40+6TfLOOqmEZS [rest of string was truncated]&quot;;.
+        ///HTMLPicture(&quot;excel&quot;) = &quot;gAAAABgYAEAgBEChSohIAC0KFEKEEKIEKgkNhQAAkZjkCgkejshkUjkklk0nlEplUrlRofQSADbMhEABwl8xmYAI0KaoPawANgYYwAeIDIIARE3mU0A08n1AoVEo1IBVDYrjo7NrFQoaoqoAK5+IYAXE3N1iAB2tCcfcwQFosswpsCns/fDVmlBobQm4GHVMi0KJQBBcceE3VAscJ3XgADAAucFgWDwt1ADNVa6bgUtoAcxSxeWxuPyMfAGUjhwfkwGmdQ5kxbXAL/f+jyGByeEjhQzrwEJ1OOy2m20uC3SszpvE/A4m40+6TfLOOqmEZSBCCYAu80j [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string txtFileTemplate {
             get {
@@ -261,7 +265,7 @@ namespace EPMLiveWorkPlanner.Properties {
         ///	&lt;!--&lt;Cfg SuppressMessage=&apos;2&apos;/&gt; Grid produces no informational message --&gt;
         ///	&lt;Cfg ChildParts=&apos;0&apos;/&gt;&lt;!-- Rendering children on background is disabled --&gt;
         ///	&lt;Cfg SelectingCells=&apos;0&apos; SelectClass=&apos;0&apos; FocusWholeRow=&apos;1&apos;/&gt;
-        ///	&lt;To [rest of string was truncated]&quot;;.
+        ///	&lt;Toolbar Vis [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string txtFolderLayoutConfig {
             get {
@@ -282,7 +286,9 @@ namespace EPMLiveWorkPlanner.Properties {
         ///    &lt;C Name=&apos;T&apos; Type=&apos;Enum&apos; Width=&apos;80&apos; Enum=&apos;|FS|FF|SS|SF&apos;/&gt;
         ///	&lt;C Name=&apos;L&apos; Type=&apos;Text&apos; Width=&apos;50&apos;/&gt;
         ///  &lt;/Cols&gt;
-        ///  &lt;Header N=&apos;Task&apos; T=&apos;Type&apos; L=&apos;Lag [rest of string was truncated]&quot;;.
+        ///  &lt;Header N=&apos;Task&apos; T=&apos;Type&apos; L=&apos;Lag&apos;/&gt;
+        ///  &lt;Def&gt;
+        /// [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string txtLinksLayout {
             get {
@@ -327,7 +333,7 @@ namespace EPMLiveWorkPlanner.Properties {
         ///        &lt;Scale Id=&quot;Ribbon.Project.StandardGroup.Scaling.CustomTabScaling&quot; GroupId=&quot;Ribbon.Project.StandardGroup&quot; Size=&quot;SmallSmall&quot; /&gt;
         ///
         ///		&lt;MaxSize Id=&quot;Ribbon.Project.StatusGroup.MaxSize&quot; GroupId=&quot;Ribbon.Project.StatusGroup&quot; Size=&quot;OneLargeTwoMedium&quot;/&gt;
-        ///        [rest of string was truncated]&quot;;.
+        ///        &lt;Scale [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string txtProjectTab {
             get {
@@ -353,7 +359,8 @@ namespace EPMLiveWorkPlanner.Properties {
         ///  &lt;Body&gt;
         ///    &lt;B&gt;
         ///      
-        /// [rest of string was truncated]&quot;;.
+        ///    &lt;/B&gt;
+        ///  &lt;/Body [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string txtResourcesLayout {
             get {
@@ -378,7 +385,8 @@ namespace EPMLiveWorkPlanner.Properties {
         ///	&lt;D Name=&apos;R&apos;/&gt;
         ///  &lt;/Def&gt;
         ///  &lt;Body&gt;
-        ///     [rest of string was truncated]&quot;;.
+        ///    &lt;B&gt;
+        ///      &lt;I id= [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string txtUpdateDetailLayout {
             get {
@@ -405,7 +413,7 @@ namespace EPMLiveWorkPlanner.Properties {
         ///	&lt;Body&gt;
         ///		&lt;B&gt;&lt;/B&gt;
         ///	&lt;/Body&gt;
-        ///	&lt;H [rest of string was truncated]&quot;;.
+        ///	&lt;Header ApprovalNote [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string txtUpdatesLayout {
             get {
@@ -432,7 +440,9 @@ namespace EPMLiveWorkPlanner.Properties {
         ///      &lt;I N=&apos;Default View&apos; Background=&apos;#FFFFFF&apos;/&gt;
         ///	  &lt;I N=&apos;Custom Views&apos; Background=&apos;#F4F4F4&apos; CanSelect=&apos;0&apos; CanFocus=&apos;0&apos;/&gt;
         ///    &lt;/B&gt;
-        /// [rest of string was truncated]&quot;;.
+        ///  &lt;/Body&gt;
+        ///&lt;/Grid&gt;
+        ///.
         /// </summary>
         internal static string txtViewsLayout {
             get {
@@ -447,7 +457,8 @@ namespace EPMLiveWorkPlanner.Properties {
         ///        &lt;MaxSize Id=&quot;Ribbon.WorkViews.StandardGroup.MaxSize&quot; GroupId=&quot;Ribbon.WorkViews.StandardGroup&quot; Size=&quot;OneLargeTwoMedium&quot;/&gt;
         ///        &lt;Scale Id=&quot;Ribbon.WorkViews.StandardGroup.Scaling.CustomTabScaling&quot; GroupId=&quot;Ribbon.WorkViews.StandardGroup&quot; Size=&quot;SmallSmall&quot; /&gt;
         ///
-        ///		&lt;MaxSize Id=&quot;Ribbon.WorkViews.GanttGroup.MaxSize&quot; GroupId=&quot;Ribbon.WorkViews.GanttGroup&quot; Size=&quot;OneLargeTwoMedium&quot;/ [rest of string was truncated]&quot;;.
+        ///		&lt;MaxSize Id=&quot;Ribbon.WorkViews.GanttGroup.MaxSize&quot; GroupId=&quot;Ribbon.WorkViews.GanttGroup&quot; Size=&quot;OneLargeTwoMedium&quot;/&gt;
+        ///     [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string txtViewsTab {
             get {
@@ -462,7 +473,7 @@ namespace EPMLiveWorkPlanner.Properties {
         ///        &lt;MaxSize Id=&quot;Ribbon.WorkPlanner.StandardGroup.MaxSize&quot; GroupId=&quot;Ribbon.WorkPlanner.StandardGroup&quot; Size=&quot;OneLargeTwoMedium&quot;/&gt;
         ///        &lt;Scale Id=&quot;Ribbon.WorkPlanner.StandardGroup.Scaling.CustomTabScaling&quot; GroupId=&quot;Ribbon.WorkPlanner.StandardGroup&quot; Size=&quot;SmallSmall&quot; /&gt;
         ///
-        ///		&lt;MaxSize Id=&quot;Ribbon.WorkPlanner.InsertGroup.MaxSize&quot; GroupId=&quot;Ribbon.WorkPlanner.InsertGroup&quot; Size=&quot;O [rest of string was truncated]&quot;;.
+        ///		&lt;MaxSize Id=&quot;Ribbon.WorkPlanner.InsertGroup.MaxSize&quot; GroupId=&quot;Ribbon.WorkPlanner.InsertGroup&quot; Size=&quot;OneLarg [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string txtWorkPlannerTab {
             get {
@@ -481,7 +492,7 @@ namespace EPMLiveWorkPlanner.Properties {
         ///		&lt;/Section&gt;
         ///		&lt;OverflowSection Type=&quot;OneRow&quot; TemplateAlias=&quot;o3&quot; DisplayMode=&quot;Large&quot;/&gt;
         ///		&lt;OverflowSection Type=&quot;ThreeRow&quot; TemplateAlias=&quot;oM1&quot; DisplayMode=&quot;Medium&quot;/&gt;
-        ///		&lt;OverflowSection Type=&quot;ThreeRow&quot; Tem [rest of string was truncated]&quot;;.
+        ///		&lt;OverflowSection Type=&quot;ThreeRow&quot; TemplateAlias [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string txtWorkPlannerTabTempalte {
             get {

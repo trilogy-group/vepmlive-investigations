@@ -73,7 +73,9 @@ namespace WorkEnginePPM.Properties {
         ///&lt;script src=&quot;/_layouts/epmlive/DHTML/dhtmlxajax.js&quot;&gt;&lt;/script&gt;
         ///&lt;script type=&quot;text/jscript&quot;&gt;
         ///
-        ///	var sWebUrl = &quot;***WEBURL***&quot;; [rest of string was truncated]&quot;;.
+        ///	var sWebUrl = &quot;***WEBURL***&quot;;
+        ///
+        ///	document. [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string txtEPKWebpart {
             get {
