@@ -7,7 +7,7 @@
 	<Cfg ExportType='Expanded,Outline'/><!-- Export setting, all rows will be exported expanded and will be used Excel outline -->
 	<Cfg ChildParts='0'/><!-- Rendering children on background is disabled -->
 	<!-- <Cfg CalculateSelected='1'/>Recalculates rows after selection changed -->
-	<Cfg PrintCols='1'/><!-- Let a user to choose which columns will be printed -->
+	<Cfg PrintCols='2'/><!-- Let a user to choose which columns will be printed -->
 	<Cfg ExportCols='1'/><!-- Let a user to choose which columns will be exported -->
 	<Cfg ShowDeleted='0'/>
 	<Cfg NumberId='1' FullId='0' IdChars='1234567890' AddFocusCol='Title' AutoIdPrefix='AR'/>
