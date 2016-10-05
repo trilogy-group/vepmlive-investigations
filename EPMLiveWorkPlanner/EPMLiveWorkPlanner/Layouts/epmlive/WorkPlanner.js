@@ -1557,13 +1557,15 @@ function iChangeView(view, bHide) {
     }
 
     for (var i = 0; i < cols.length; i++) {
-        oViews[cols[i]] = new Object();
-        oViews[cols[i]] = 1;
+        if (cols[i] != "G") {
+            oViews[cols[i]] = new Object();
+            oViews[cols[i]] = 1;
 
-        grid.MoveCol(cols[i], 1, 1, 1);
-        try {
-            grid.Cols[cols[i]].Visible = 1;
-        } catch (e) { }
+            grid.MoveCol(cols[i], 1, 1, 1);
+            try {
+                grid.Cols[cols[i]].Visible = 1;
+            } catch (e) { }
+        }
     }
 
 

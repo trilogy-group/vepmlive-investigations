@@ -1048,7 +1048,7 @@
         
         for(var col in cols)
         {
-            if(cols[col])
+            if(cols[col] && col != "G")
             {
                 grid.MoveCol(col, 1, true, 0);
             }
