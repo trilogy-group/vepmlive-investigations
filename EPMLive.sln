@@ -103,6 +103,9 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EPMLiveCore.Tests", "EPMLiveCore\EPMLiveCore.Tests\EPMLiveCore.Tests.csproj", "{FEF2F33E-4E98-416A-9325-C4449C1CB0FC}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{3DC0042A-7620-4CFC-BEB4-379EC7F86D2B}"
+	ProjectSection(SolutionItems) = preProject
+		EPMLive.runsettings = EPMLive.runsettings
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
