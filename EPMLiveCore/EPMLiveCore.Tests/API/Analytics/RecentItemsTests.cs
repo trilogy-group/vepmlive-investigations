@@ -1,5 +1,4 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Microsoft.QualityTools.Testing.Fakes;
 using Microsoft.SharePoint.Fakes;
 using System.Collections.Generic;
 using EPMLiveCore.ReportingProxy.Fakes;
