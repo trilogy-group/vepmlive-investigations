@@ -13,6 +13,7 @@
             <ModulePaths>
               <Exclude>
                 <ModulePath>.*\.Tests\.dll</ModulePath>
+                <ModulePath>spemulators\.dll</ModulePath>
               </Exclude>
             </ModulePaths>
           </CodeCoverage>
