@@ -109,7 +109,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{3DC0042A
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SPEmulators", "Libraries\SPEmulators\SPEmulators.csproj", "{D0A95188-229A-4532-B71D-9B48DB8CF0FD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EPMLiveWebPartsTests", "EPMLiveWebParts\EPMLiveWebPartsTests\EPMLiveWebPartsTests.csproj", "{97B3FE78-4FB0-4369-BD87-30325C8B887C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EPMLiveWebParts.Tests", "EPMLiveWebParts\EPMLiveWebPartsTests\EPMLiveWebParts.Tests.csproj", "{97B3FE78-4FB0-4369-BD87-30325C8B887C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
