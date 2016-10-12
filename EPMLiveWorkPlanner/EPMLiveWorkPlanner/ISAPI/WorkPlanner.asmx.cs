@@ -587,7 +587,7 @@ namespace EPMLiveWorkPlanner
         {
             string extid = getAttribute(ndImportTask, sUID);
             string columnTaskType = "TaskType";
-
+            string columnAssignedTo = "AssignedTo";
             if (extid == "" && sUID != "")
                 return;
 
@@ -612,13 +612,33 @@ namespace EPMLiveWorkPlanner
                     attr = docPlan.CreateAttribute("id");
                     attr.Value = curtaskuid.ToString();
                     ndNew.Attributes.Append(attr);
-
+                    string assn = "";
                     foreach (string sCol in arrCols)
                     {
                         attr = docPlan.CreateAttribute(sCol);
                         if (sCol == columnTaskType)
                         {
                             attr.Value = sTaskType;
+                        }
+                        else if (sCol == columnAssignedTo)
+                        {
+                            try
+                            {
+                                assn = ndImportTask.Attributes["AssignedTo"].Value;
+                            }
+                            catch { assn = string.Empty; }
+                            string AssignedToIds = string.Empty;
+                            string[] sAssns = assn.Split(';');
+                            foreach (string sAssn in sAssns)
+                            {
+                                DataRow[] dr = dsResources.Tables[2].Select(sResField + " = '" + sAssn + "'");
+                                if (dr.Length > 0)
+                                {
+                                    AssignedToIds += dr[0]["ID"] + ";";
+                                }
+                            }
+                            AssignedToIds = AssignedToIds.Trim(';');
+                            attr.Value = AssignedToIds;
                         }
                         else
                         {
@@ -632,7 +652,7 @@ namespace EPMLiveWorkPlanner
                     if (ndParent.Attributes["id"].Value != "0")
                         ndParent.Attributes["Def"].Value = "Summary";
 
-                    string assn = "";
+                  
 
                     try
                     {
@@ -647,7 +667,7 @@ namespace EPMLiveWorkPlanner
 
                         foreach (string sAssn in sAssns)
                         {
-                            DataRow[] dr = dsResources.Tables[2].Select(sResField + " = '" + sAssn + "'");
+                            DataRow[] dr = dsResources.Tables[2].Select("ID = '" + sAssn + "'");
                             if (dr.Length > 0)
                             {
                                 resNames += "," + dr[0]["Title"].ToString();
@@ -668,7 +688,7 @@ namespace EPMLiveWorkPlanner
                                 {
                                     ndAssnNew.Attributes["ResourceNames"].Value = dr[0]["Title"].ToString();
                                 }
-
+                                ndAssnNew.Attributes["AssignedTo"].Value = sAssn;
                                 ndNew.AppendChild(ndAssnNew);
                             }
                         }
