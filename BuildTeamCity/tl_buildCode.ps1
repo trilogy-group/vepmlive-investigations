@@ -268,9 +268,10 @@ foreach($projectToBeBuildAsDLL in $projectsToBeBuildAsDLL){
    /p:OutputPath="$BinariesDirectory" `
    /p:PreBuildEvent= `
    /p:PostBuildEvent= `
+   /p:UseSharedCompilation=false `
    /p:Configuration="$ConfigurationToBuild" `
    /p:Platform="$PlatformToBuild" `
-    /p:langversion="$langversion" `
+   /p:langversion="$langversion" `
    /p:GenerateSerializationAssemblies="Off" `
    /p:ReferencePath="C:\Program Files (x86)\Microsoft SDKs\Project 2013\REDIST" `
     /fl /flp:"$loggerArgs" `
