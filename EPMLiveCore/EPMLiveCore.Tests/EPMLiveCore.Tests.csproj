@@ -83,7 +83,7 @@
       <Name>SPEmulators</Name>
     </ProjectReference>
     <ProjectReference Include="..\EPMLiveCore\EPMLiveCore.csproj">
-      <Project>{C773AE44-F066-446A-9CBD-D24AFA794E34}</Project>
+      <Project>{c773ae44-f066-446a-9cbd-d24afa794e34}</Project>
       <Name>EPMLiveCore</Name>
     </ProjectReference>
   </ItemGroup>
