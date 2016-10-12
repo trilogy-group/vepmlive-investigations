@@ -1,14 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using EPMLiveWorkPlanner;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml;
 using System.Collections;
 using System.Data;
-using System.Data.Fakes;
 
 namespace EPMLiveWorkPlanner.Tests
 {
