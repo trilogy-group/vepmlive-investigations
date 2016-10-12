@@ -21,7 +21,7 @@ $projectsToBePackaged = @("EPMLiveCore", "EPMLiveDashboards","EPMLiveIntegration
                             "EPMLiveTimeSheets","EPMLiveWebParts","EPMLiveWorkPlanner","WorkEnginePPM")
 
 $projectsToBeBuildAsEXE = @("EPMLiveTimerService", "EPK_QueueMgr")
-$projectsToBeBuildAsDLL = @("PortfolioEngineCore","UplandIntegrations","EPMLiveIntegration", "UserNameChecker", ".Tests")
+$projectsToBeBuildAsDLL = @("PortfolioEngineCore","UplandIntegrations","EPMLiveIntegration", "UserNameChecker", "SPEmulators", ".Tests")
 
 $projectTypeIdTobeReplaced = "C1CDDADD-2546-481F-9697-4EA41081F2FC"
 $projectTypeIdTobeReplacedWith = "BB1F664B-9266-4fd6-B973-E1E44974B511"
@@ -270,7 +270,7 @@ foreach($projectToBeBuildAsDLL in $projectsToBeBuildAsDLL){
    /p:PostBuildEvent= `
    /p:Configuration="$ConfigurationToBuild" `
    /p:Platform="$PlatformToBuild" `
-    /p:langversion="$langversion" `
+   /p:langversion="$langversion" `
    /p:GenerateSerializationAssemblies="Off" `
    /p:ReferencePath="C:\Program Files (x86)\Microsoft SDKs\Project 2013\REDIST" `
     /fl /flp:"$loggerArgs" `
