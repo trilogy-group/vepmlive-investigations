@@ -1,22 +1,13 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using EPMLiveWebParts;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Web.UI.Fakes;
 using System.Web.Fakes;
 using Microsoft.SharePoint;
 using Microsoft.SharePoint.Fakes;
 using System.Xml;
-using System.Collections.Specialized;
 using System.Collections;
 using System.Web.Script.Serialization.Fakes;
-using Microsoft.SharePoint.Utilities.Fakes;
 using Microsoft.SharePoint.Utilities;
-using Microsoft.QualityTools.Testing.Fakes.Shims;
-using Microsoft.QualityTools.Testing.Fakes.Instances;
 
 namespace EPMLiveWebParts.Tests
 {
