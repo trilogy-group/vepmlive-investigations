@@ -1189,6 +1189,19 @@ namespace EPMLiveWebParts
                         }
                         else if (field.InternalName == "Title")
                         {
+
+                            string sPlannerID = "ProjectPlanner";
+
+                            SPFile file = GetTaskFile(list.ParentWeb, li.ID.ToString(), sPlannerID);
+                            if (file != null)
+                            {
+                                if (file.Exists)
+                                {
+
+                                    var tVal = "&nbsp;<span class=\"epm-nav-cm-icon fui-ext-project\">&nbsp;</span>";
+                                    val += tVal;
+                                }
+                            }
                             if (bCleanValues)
                                 displayValue = val;
                             else
@@ -6464,6 +6477,15 @@ namespace EPMLiveWebParts
             };
             return val;
         }
+        public static SPFile GetTaskFile(SPWeb web, string id, string planner)
+        {
+            SPDocumentLibrary lib = (SPDocumentLibrary)web.Lists["Project Schedules"];
+            try
+            {
+                return web.GetFile("Project Schedules/" + planner + "/" + id + ".xml");
+            }
 
+            catch { return null; }
+        }
     }
 }
