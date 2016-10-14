@@ -17,7 +17,7 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive
 
         public void RaisePostBackEvent(string snapshotuid)
         {
-            SPUtility.Redirect("epmlive/Snapshot.aspx?uid=" + snapshotuid, SPRedirectFlags.RelativeToLayoutsPage,
+            SPUtility.Redirect("epmlive/ReportSchedule.aspx?uid=" + snapshotuid, SPRedirectFlags.RelativeToLayoutsPage,
                 HttpContext.Current);
         }
 
