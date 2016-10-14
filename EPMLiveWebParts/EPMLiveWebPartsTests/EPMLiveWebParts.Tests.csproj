@@ -93,6 +93,10 @@
     <Compile Include="WebPageCode\getgriditemsTests.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\EPMLive.TestFakes\EPMLive.TestFakes.csproj">
+      <Project>{b408b875-0102-4064-83f6-f85a4070a105}</Project>
+      <Name>EPMLive.TestFakes</Name>
+    </ProjectReference>
     <ProjectReference Include="..\EPMLiveWebParts\EPMLiveWebParts.csproj">
       <Project>{A7F83FD4-BE8B-49AB-BE24-39209E8FABC2}</Project>
       <Name>EPMLiveWebParts</Name>
