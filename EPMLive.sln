@@ -111,7 +111,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SPEmulators", "Libraries\SP
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EPMLiveWebParts.Tests", "EPMLiveWebParts\EPMLiveWebPartsTests\EPMLiveWebParts.Tests.csproj", "{97B3FE78-4FB0-4369-BD87-30325C8B887C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EPMLiveReportingTests", "EPMLiveReporting\EPMLiveReportingTests\EPMLiveReportingTests.csproj", "{6E475641-9116-4C0B-822B-53CD1394B6E2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EPMLiveReporting.Tests", "EPMLiveReporting\EPMLiveReportingTests\EPMLiveReporting.Tests.csproj", "{6E475641-9116-4C0B-822B-53CD1394B6E2}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EPMLiveWorkPlanner.Tests", "EPMLiveWorkPlanner\EPMLiveWorkPlanner.Tests\EPMLiveWorkPlanner.Tests.csproj", "{C5338FC2-A130-425A-A497-29A0F57DF596}"
 EndProject

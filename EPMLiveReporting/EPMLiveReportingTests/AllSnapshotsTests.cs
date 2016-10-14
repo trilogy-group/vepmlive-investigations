@@ -23,21 +23,19 @@ namespace EPMLiveReportsAdmin.Layouts.EPMLive.Tests
                     };
                 }
 
+                string resultUrl = string.Empty;
+
                 ShimSPUtility.RedirectStringSPRedirectFlagsHttpContext = (url, flags, httpContext) =>
                 {
+                    resultUrl = url;
                     return false;
                 };
 
-                try
-                {
-                    AllSnapshots allSnapshotPage = new AllSnapshots();
-                    allSnapshotPage.RaisePostBackEvent(snapshotId);
-                    Assert.IsTrue(true);
-                }
-                catch
-                {
-                    Assert.IsTrue(false);
-                }
+                
+                AllSnapshots allSnapshotPage = new AllSnapshots();
+                allSnapshotPage.RaisePostBackEvent(snapshotId);
+
+                Assert.AreEqual(resultUrl, "epmlive/ReportSchedule.aspx?uid=" + snapshotId);                
             }
         }
     }

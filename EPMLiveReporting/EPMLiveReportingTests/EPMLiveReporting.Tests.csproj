@@ -6,8 +6,8 @@
     <ProjectGuid>{6E475641-9116-4C0B-822B-53CD1394B6E2}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>EPMLiveReportingTests</RootNamespace>
-    <AssemblyName>EPMLiveReportingTests</AssemblyName>
+    <RootNamespace>EPMLiveReporting.Tests</RootNamespace>
+    <AssemblyName>EPMLiveReporting.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -45,9 +45,6 @@
     <Reference Include="Microsoft.SharePoint.16.0.0.0.Fakes">
       <HintPath>FakesAssemblies\Microsoft.SharePoint.16.0.0.0.Fakes.dll</HintPath>
     </Reference>
-    <Reference Include="SPEmulators">
-      <HintPath>..\..\Libraries\SPEmulators\bin\Debug\SPEmulators.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Web" />
     <Reference Include="System.Web.4.0.0.0.Fakes">
@@ -71,6 +68,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Libraries\SPEmulators\SPEmulators.csproj">
+      <Project>{d0a95188-229a-4532-b71d-9b48db8cf0fd}</Project>
+      <Name>SPEmulators</Name>
+    </ProjectReference>
     <ProjectReference Include="..\EPMLiveReporting\EPMLiveReporting.csproj">
       <Project>{B56160FE-490C-462A-BC9A-FEFFD2F1487C}</Project>
       <Name>EPMLiveReporting</Name>
