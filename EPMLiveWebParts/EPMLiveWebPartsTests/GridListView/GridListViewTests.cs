@@ -1,22 +1,16 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using EPMLiveWebParts;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Web.UI.Fakes;
 using System.Web.Fakes;
-using Microsoft.SharePoint;
+//using Microsoft.SharePoint;
 using Microsoft.SharePoint.Fakes;
 using System.Xml;
-using System.Collections.Specialized;
 using System.Collections;
 using System.Web.Script.Serialization.Fakes;
 using Microsoft.SharePoint.Utilities.Fakes;
-using Microsoft.SharePoint.Utilities;
-using Microsoft.QualityTools.Testing.Fakes.Shims;
-using Microsoft.QualityTools.Testing.Fakes.Instances;
+using System.Collections.Specialized.Fakes;
+using System.Collections.Generic;
+using Microsoft.SharePoint;
 
 namespace EPMLiveWebParts.Tests
 {
@@ -41,29 +35,41 @@ namespace EPMLiveWebParts.Tests
 
             doc.LoadXml(xml);
             PrivateObject objToTestPrivateMethod = new PrivateObject(typeof(GridListView));
-            using (new SPEmulators.SPEmulationContext(SPEmulators.IsolationLevel.Fake))
+            using (var context = new SPEmulators.SPEmulationContext(SPEmulators.IsolationLevel.Fake))
             {
-                SPList list = new ShimSPList();
-                ShimSPBaseCollection.AllInstances.GetEnumerator = (a) =>
+                var list = context.GetOrCreateList("Mainlist", Microsoft.SharePoint.SPListTemplateType.GenericList);
+
+                ShimSPList shimList = new ShimSPList(list)
                 {
-                    return new TestEnumerator(list, doc);
+                    IDGet = () =>
+                    {
+                        return Guid.Parse("696F0CD4-2EDB-4B75-8AD4-A64689158803");
+                    },
+                    ParentWebGet = () =>
+                    {
+                        ShimSPWeb web = new ShimSPWeb(context.Web);
+                        web.PropertiesGet = () =>
+                         {
+                             var propertyBag = new ShimSPPropertyBag();
+                             var sd = new ShimStringDictionary(propertyBag);
+                             sd.ItemGetString = (key) =>
+                             {
+                                 return null;
+                             };
+                             return propertyBag;
+                         };
+                        return web;
+                    }
                 };
+
                 ShimJavaScriptSerializer.AllInstances.SerializeObject = (instance, a) =>
                 {
                     return "";
                 };
-                ShimSPView.AllInstances.TitleGet = (instance) =>
-                {
-                    return "Default View";
-                };
+
                 ShimHttpUtility.HtmlDecodeString = (str) =>
                 {
                     return "Default View";
-                };
-                ShimSPList.AllInstances.ViewsGet = (ShimTemplateInstanceAttribute) =>
-                {
-                    ShimSPViewCollection vcollection = new ShimSPViewCollection();
-                    return vcollection;
                 };
 
                 ShimControl.AllInstances.PageGet = (ShimTemplateInstanceAttribute) =>
@@ -82,11 +88,12 @@ namespace EPMLiveWebParts.Tests
                         }
                     };
                 };
+
                 objToTestPrivateMethod.SetField("list", list);
                 string result = Convert.ToString(objToTestPrivateMethod.Invoke("GetViews"));
 
                 Assert.IsTrue(result.Contains("Default View"));
-                Assert.IsTrue(result.Contains("Lists/List_Name/File_Name.aspx"));
+                Assert.IsTrue(result.Contains("/Lists/Mainlist/AllItems.aspx"));
             }
         }
         [TestMethod()]
@@ -108,80 +115,130 @@ namespace EPMLiveWebParts.Tests
 
             doc.LoadXml(xml);
             PrivateObject objToTestPrivateMethod = new PrivateObject(typeof(GridListView));
-            using (new SPEmulators.SPEmulationContext(SPEmulators.IsolationLevel.Fake))
+            using (var context = new SPEmulators.SPEmulationContext(SPEmulators.IsolationLevel.Fake))
             {
-                SPList list = new ShimSPList();
+                //ShimSPList list = new ShimSPList();
+
+                //ShimJavaScriptSerializer.AllInstances.SerializeObject = (instance, a) =>
+                //{
+                //    return "";
+                //};
+                //ShimSPView.AllInstances.TitleGet = (instance) =>
+                //{
+                //    return "Default View";
+                //};
+                //ShimHttpUtility.HtmlDecodeString = (str) =>
+                //{
+                //    return "Default View";
+                //};
+                //ShimSPList.AllInstances.ViewsGet = (ShimTemplateInstanceAttribute) =>
+                //{
+                //    ShimSPViewCollection vcollection = new ShimSPViewCollection();
+                //    return vcollection;
+                //};
+                //ShimSPList.AllInstances.IDGet = (instance) =>
+                //{
+                //    return Guid.Parse(Id);
+                //};
+                ////ShimSPSite site = context.Site;
+                ////ShimSPWeb web = site.OpenWeb();
+                //ShimSPSite.AllInstances.Dispose = (instance) => { };
+                //ShimSPWeb.AllInstances.Dispose = (instance) => { };
+
+                //ShimSPList.AllInstances.ParentWebGet = (instance) =>
+                //{
+                //    return new ShimSPWeb()
+                //    {
+                //        PropertiesGet = () =>
+                //        {
+                //            ShimSPPropertyBag spbag = new ShimSPPropertyBag();
+                //            //spbag.Add(String.Format("ViewPermissions{0}", list.ID.ToString()), "13#Test#http://win-6j09gf4nbp8/sites/600Release/Lists/Project%20Center/Executive%20Summary.aspx|14#testpath#http://win-6j09gf4nbp8/sites/600Release/Lists/Project%20Center/Executive%20Summary.aspx");
+                //            return spbag;
+                //        }
+                //    };
+                //};
+
+
+                //};
+                //ShimSPWeb.AllInstances.GroupsGet = (ShimTemplateInstanceAttribute) =>
+                //{
+                //    ShimSPGroupCollection groupToReturn = new ShimSPGroupCollection();
+
+                //    return groupToReturn;
+
+                //};
+                //ShimSPWeb.AllInstances.UserIsSiteAdminGet = (ShimTemplateInstanceAttribute) =>
+                //{
+                //    return true;
+                //};
+                //ShimSPView.AllInstances.UrlGet = (ShimTemplateInstanceAttribute) =>
+                //{
+                //    return "http://win-6j09gf4nbp8/sites/600Release/Lists/Project%20Center/Executive%20Summary.aspx";
+                //};
+
+                //ShimSPGroup.AllInstances.IDGet = (ShimTemplateInstanceAttribute) => { return 13; };
+                // ShimControl.AllInstances.PageGet = (ShimTemplateInstanceAttribute) =>
+                //{
+                //    return new ShimPage()
+                //    {
+                //        RequestGet = () =>
+                //        {
+                //            return new ShimHttpRequest()
+                //            {
+                //                UrlGet = () =>
+                //                {
+                //                    return new Uri("http://win-6j09gf4nbp8/sites/600Release/Lists/Project%20Center/Executive%20Summary.aspx");
+                //                }
+                //            };
+                //        }
+                //    };
+                //};
+                var list = context.GetOrCreateList("Mainlist", Microsoft.SharePoint.SPListTemplateType.GenericList);
+
+                ShimSPList shimList = new ShimSPList(list)
+                {
+                    IDGet = () =>
+                    {
+                        return Guid.Parse("696F0CD4-2EDB-4B75-8AD4-A64689158803");
+                    },
+                    ParentWebGet = () =>
+                    {
+                        ShimSPWeb web = new ShimSPWeb(context.Web);
+                        web.PropertiesGet = () =>
+                        {
+                            var propertyBag = new ShimSPPropertyBag();
+                            var sd = new ShimStringDictionary(propertyBag);
+                            sd.ItemGetString = (key) =>
+                            {
+                                return "0#YYYY#ViewURL";
+                            };
+                            return propertyBag;
+                        };
+                        return web;
+                    },
+                    ViewsGet = () =>
+                    {
+                        var views = new ShimSPViewCollection();
+                        ShimSPBaseCollection coll = new ShimSPBaseCollection(views);
+                        coll.GetEnumerator = () =>
+                        {
+                            return new TestEnumerator();
+                        };
+                        return views;
+                    }
+                };
 
                 ShimJavaScriptSerializer.AllInstances.SerializeObject = (instance, a) =>
                 {
                     return "";
                 };
-                ShimSPView.AllInstances.TitleGet = (instance) =>
-                {
-                    return "Default View";
-                };
+
                 ShimHttpUtility.HtmlDecodeString = (str) =>
                 {
                     return "Default View";
                 };
-                ShimSPList.AllInstances.ViewsGet = (ShimTemplateInstanceAttribute) =>
-                {
-                    ShimSPViewCollection vcollection = new ShimSPViewCollection();
-                    return vcollection;
-                };
-                ShimSPList.AllInstances.IDGet = (instance) =>
-                {
-                    return Guid.Parse(Id);
-                };
-                SPSite site = new SPSite("http://test");
-                SPWeb web = site.OpenWeb();
-                ShimSPSite.AllInstances.Dispose = (instance) => { };
-                ShimSPWeb.AllInstances.Dispose = (instance) => { };
 
-                ShimSPList.AllInstances.ParentWebGet = (instance) =>
-                {
-                    return new ShimSPWeb()
-                    {
-                        PropertiesGet = () =>
-                        {
-                            SPPropertyBag spbag = web.Properties;
-                            spbag.Add(String.Format("ViewPermissions{0}", list.ID.ToString()), "13#Test#http://win-6j09gf4nbp8/sites/600Release/Lists/Project%20Center/Executive%20Summary.aspx|14#testpath#http://win-6j09gf4nbp8/sites/600Release/Lists/Project%20Center/Executive%20Summary.aspx");
-                            return spbag;
-                        }
-                    };
-                };
-                ShimSPBaseCollection.AllInstances.GetEnumerator = (a) =>
-                {
-                    if (a.GetType() == typeof(SPGroupCollection))
-                    {
-                        return new TestGroupEnumerator(web);
-
-                    }
-                    else
-                    {
-                        return new TestEnumerator(list, doc);
-
-                    }
-
-                };
-                ShimSPWeb.AllInstances.GroupsGet = (ShimTemplateInstanceAttribute) =>
-                {
-                    SPGroupCollection groupToReturn = new ShimSPGroupCollection();
-
-                    return groupToReturn;
-
-                };
-                ShimSPWeb.AllInstances.UserIsSiteAdminGet = (ShimTemplateInstanceAttribute) =>
-                {
-                    return true;
-                };
-                ShimSPView.AllInstances.UrlGet = (ShimTemplateInstanceAttribute) =>
-                {
-                    return "http://win-6j09gf4nbp8/sites/600Release/Lists/Project%20Center/Executive%20Summary.aspx";
-                };
-
-                ShimSPGroup.AllInstances.IDGet = (ShimTemplateInstanceAttribute) => { return 13; };
-                 ShimControl.AllInstances.PageGet = (ShimTemplateInstanceAttribute) =>
+                ShimControl.AllInstances.PageGet = (ShimTemplateInstanceAttribute) =>
                 {
                     return new ShimPage()
                     {
@@ -197,11 +254,60 @@ namespace EPMLiveWebParts.Tests
                         }
                     };
                 };
+
+                ShimSPContext.CurrentGet = () =>
+                {
+                    return new ShimSPContext()
+                    {
+                        WebGet = () =>
+                        {
+                            return new ShimSPWeb()
+                            {
+                                UserIsSiteAdminGet = () =>
+                                {
+                                    return true;
+                                },
+                                GroupsGet = () =>
+                                {
+                                    var groups = new ShimSPGroupCollection();
+                                    ShimSPBaseCollection coll = new ShimSPBaseCollection(groups);
+                                    coll.GetEnumerator = () =>
+                                    {
+                                        return new TestGroupEnumerator();
+                                    };
+                                    return groups;
+                                }
+                            };
+                        }
+                    };
+                };
+
+
+                //ShimSPBaseCollection.AllInstances.GetEnumerator = (a) =>
+                //{
+                //    if (a.GetType() == typeof(ShimSPGroupCollection))
+                //    {
+                //        //ShimSPBaseCollection coll = new ShimSPBaseCollection(a);
+                //        //coll.GetEnumerator
+                //        //var lst = new ArrayList();
+                //        //lst.Add(new ShimSPGroup());
+
+                //        return new TestGroupEnumerator();
+
+                //        //return lst.GetEnumerator();
+                //    }
+                //    else
+                //    {
+                //        return null;
+
+                //    }
+                //};
+
                 objToTestPrivateMethod.SetField("list", list);
                 string result = Convert.ToString(objToTestPrivateMethod.Invoke("GetViews"));
 
-                Assert.IsTrue(result.Contains("Executive%20Summary"));
-               
+                Assert.IsTrue(result.Contains("ViewURL"));
+
             }
         }
     }
@@ -209,10 +315,19 @@ namespace EPMLiveWebParts.Tests
     {
         public SPView[] _spView = new SPView[1];
         int position = -1;
-        public TestEnumerator(SPList list, XmlDocument doc)
+        public TestEnumerator()
         {
-            _spView[0] = new SPView(list, doc);
-            _spView[0].Title = "Default View";
+            _spView[0] = new ShimSPView()
+            {
+                TitleGet = () =>
+                        {
+                            return "Default View";
+                        },
+                UrlGet = () =>
+                {
+                    return "ViewURL";
+                }
+            };
 
         }
 
@@ -241,10 +356,10 @@ namespace EPMLiveWebParts.Tests
     {
         public SPGroup[] _spGroup = new SPGroup[1];
         int position = -1;
-        public TestGroupEnumerator(SPWeb web)
+        public TestGroupEnumerator()
         {
             _spGroup[0] = new ShimSPGroup();
-            
+
         }
 
         public object Current

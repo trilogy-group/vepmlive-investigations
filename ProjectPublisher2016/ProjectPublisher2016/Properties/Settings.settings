@@ -1,0 +1,45 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="ProjectPublisher2016.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="ProjectPublisher2016_EPMLivePublisher_EPMLivePublisher" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">http://jasondev2008/_vti_bin/epmlivepublisher.asmx</Value>
+    </Setting>
+    <Setting Name="ProjectPublisher2016_EPMLiveTimePhased_EPMLiveTimePhased" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">http://jasondev2008/_vti_bin/epmlivetimephased.asmx</Value>
+    </Setting>
+    <Setting Name="ProjectPublisher2016_SPSLists_Lists" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">http://jasondev2008/_vti_bin/lists.asmx</Value>
+    </Setting>
+    <Setting Name="ProjectPublisher2016_SPSSiteData_SiteData" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">http://jasondev2008/_vti_bin/sitedata.asmx</Value>
+    </Setting>
+    <Setting Name="ProjectPublisher2016_SPSUserGroup_UserGroup" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">http://jasondev2008/_vti_bin/usergroup.asmx</Value>
+    </Setting>
+    <Setting Name="ProjectPublisher2016_SPSViews_Views" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">http://jasondev2008/_vti_bin/views.asmx</Value>
+    </Setting>
+    <Setting Name="ProjectPublisher2016_WSactivation_Service" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">http://activation.epmlive.com/activationservice/service.asmx</Value>
+    </Setting>
+    <Setting Name="ProjectPublisher2016_WSSService_Service" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">http://jasondev2008/wssservice/service.asmx</Value>
+    </Setting>
+    <Setting Name="ProjectPublisher2016_EPMLiveIntegration_Integration" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">http://jasondev2008/_vti_bin/integration.asmx</Value>
+    </Setting>
+    <Setting Name="ProjectPublisher2016_EPKWebService_WebService" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">http://jasondev2008:8080/portfolioengine421/services/webservice.asmx</Value>
+    </Setting>
+    <Setting Name="ProjectPublisher2016_SPSAuthentication_Authentication" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">http://jasondev2008/_vti_bin/authentication.asmx</Value>
+    </Setting>
+    <Setting Name="ProjectPublisher2016_EPMLiveWorkEngine_WorkEngineAPI" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">http://jasondev2008/_vti_bin/workengine.asmx</Value>
+    </Setting>
+    <Setting Name="ProjectPublisher2016_EPMLivePortfolioEngine_PortfolioEngineAPI" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">http://jasondev2008/_vti_bin/portfolioengine.asmx</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

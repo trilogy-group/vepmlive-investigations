@@ -52,7 +52,8 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
-    <Reference Include="System.4.0.0.0.Fakes">
+    <Reference Include="System.4.0.0.0.Fakes, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0ae41878053f6703, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>FakesAssemblies\System.4.0.0.0.Fakes.dll</HintPath>
     </Reference>
     <Reference Include="System.Data" />
@@ -82,7 +83,7 @@
       <Name>SPEmulators</Name>
     </ProjectReference>
     <ProjectReference Include="..\EPMLiveCore\EPMLiveCore.csproj">
-      <Project>{C773AE44-F066-446A-9CBD-D24AFA794E34}</Project>
+      <Project>{c773ae44-f066-446a-9cbd-d24afa794e34}</Project>
       <Name>EPMLiveCore</Name>
     </ProjectReference>
   </ItemGroup>
@@ -92,8 +93,8 @@
     <Fakes Include="Fakes\EPM Live Core.fakes">
       <SubType>Designer</SubType>
     </Fakes>
-    <None Include="Fakes\System.fakes" />
-    <None Include="Fakes\System.Web.fakes" />
+    <Fakes Include="Fakes\System.fakes" />
+    <Fakes Include="Fakes\System.Web.fakes" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

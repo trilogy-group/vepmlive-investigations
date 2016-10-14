@@ -2,7 +2,7 @@
 <RunSettings>
   <!-- Configurations that affect the Test Framework -->
   <RunConfiguration>
-    <MaxCpuCount>0</MaxCpuCount>
+    <MaxCpuCount>2</MaxCpuCount>
     <TargetPlatform>x64</TargetPlatform>
   </RunConfiguration>
   <DataCollectionRunSettings>
