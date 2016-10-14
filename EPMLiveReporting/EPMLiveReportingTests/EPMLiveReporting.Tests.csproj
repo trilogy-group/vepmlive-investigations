@@ -77,6 +77,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\EPMLive.TestFakes\EPMLive.TestFakes.csproj">
+      <Project>{b408b875-0102-4064-83f6-f85a4070a105}</Project>
+      <Name>EPMLive.TestFakes</Name>
+    </ProjectReference>
     <ProjectReference Include="..\EPMLiveReporting\EPMLiveReporting.csproj">
       <Project>{B56160FE-490C-462A-BC9A-FEFFD2F1487C}</Project>
       <Name>EPMLiveReporting</Name>
