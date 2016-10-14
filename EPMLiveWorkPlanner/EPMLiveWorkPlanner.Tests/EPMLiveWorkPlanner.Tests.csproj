@@ -35,10 +35,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.SharePoint, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\Program Files\Common Files\microsoft shared\Web Server Extensions\16\ISAPI\Microsoft.SharePoint.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
@@ -60,10 +56,6 @@
     <Compile Include="WorkPlannerAPITests.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Libraries\SPEmulators\SPEmulators.csproj">
-      <Project>{d0a95188-229a-4532-b71d-9b48db8cf0fd}</Project>
-      <Name>SPEmulators</Name>
-    </ProjectReference>
     <ProjectReference Include="..\EPMLiveWorkPlanner\EPMLiveWorkPlanner.csproj">
       <Project>{FCF0C151-0A3F-4B9F-9327-3BBBF109D776}</Project>
       <Name>EPMLiveWorkPlanner</Name>
