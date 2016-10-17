@@ -109,8 +109,11 @@ ContextualTabWebPart.CustomPageComponent.prototype = {
             case 'Ribbon.MyTimesheet.QueryCurrentView':
             case 'Ribbon.MyTimesheet.ShowHideFilters.Query':
             case 'Ribbon.MyTimesheet.Approvals':
-            case 'Ribbon.MyTimesheet.ApprovalsPM':
                 return true;
+            case 'Ribbon.MyTimesheet.ApprovalsPM':
+                if (bIsProjectManager)
+                    return true;
+                return false;
             case 'Ribbon.MyTimesheet.ApprovalsTM':
                 if (bIsTimeSheetManager)
                     return true;

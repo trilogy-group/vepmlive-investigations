@@ -80,6 +80,7 @@
     <Compile Include="..\..\CommonAssemblyInfo.cs">
       <Link>CommonAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="API\SPRoleChecker.cs" />
     <Compile Include="API\TimesheetAPI.cs" />
     <Compile Include="Jobs\ApprovalJob.cs" />
     <Compile Include="Jobs\BaseJob.cs" />
@@ -188,6 +189,7 @@
     <Compile Include="Worklog\WorkLog.FieldControl.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="bundleconfig.json" />
     <None Include="CONTROLTEMPLATES\SharePointProjectItem.spdata">
       <SharePointProjectItemId>{888a2922-b8a3-4660-8197-3c2f40c95f52}</SharePointProjectItemId>
     </None>

@@ -16,6 +16,13 @@ namespace TimeSheets
     {
         private static int myworktableid = 6;
 
+        static TimesheetAPI()
+        {
+            RoleChecker = new SPRoleChecker();
+        }
+
+        public static ISPRoleChecker RoleChecker { get; set; }
+
         public static string GetTimesheetUpdates(string data, SPWeb oWeb)
         {
             try
@@ -900,7 +907,7 @@ namespace TimeSheets
                 DataTable dtUserID = null;
                 int approvalCount = 0;
                 string bIsTimeSheetManager = "";
-
+                string bIsProjectManager = "True";
 
                 sql_getUserIDs = string.Format("select SharePointAccountID from LSTResourcepool WHERE (',' + TimesheetManagerID + ',' LIKE '%,{0},%') and Generic=0 ", user.ID);
 
@@ -953,8 +960,14 @@ namespace TimeSheets
                     bIsTimeSheetManager = "False";
                 }
 
-                return "<ApprovalNotification Status=\"0\" IsTimeSheetManager=\"" + bIsTimeSheetManager + "\">" + approvalCount + "</ApprovalNotification>";
+                // Check if the user is in the role. If not disabled 'Project Managers' options from MyTimesheet page.
+                SPRoleChecker roleChecker = new SPRoleChecker();
+                if (roleChecker.ContainsRole(oWeb, "Contribute2"))
+                {
+                    bIsProjectManager = "False";
+                }
 
+                return "<ApprovalNotification Status=\"0\" IsTimeSheetManager=\"" + bIsTimeSheetManager + "\" IsProjectManager=\"" + bIsProjectManager + "\">" + approvalCount + "</ApprovalNotification>";
             }
             catch (Exception ex)
             {
