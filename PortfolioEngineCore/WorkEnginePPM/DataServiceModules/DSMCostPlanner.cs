@@ -325,19 +325,19 @@ namespace WorkEnginePPM.DataServiceModules
                                         switch (Convert.ToInt32(_dvCostCustomFields[0]["fa_field_id"]))
                                         {
                                             case 11801:
-                                                oc_01Value = Convert.ToInt32(row[col.ColumnName]);
+                                                 try { oc_01Value = Convert.ToInt32(row[col.ColumnName]); } catch { oc_01Value = 0; }
                                                 break;
                                             case 11802:
-                                                oc_02Value = Convert.ToInt32(row[col.ColumnName]);
+                                                try { oc_02Value = Convert.ToInt32(row[col.ColumnName]); } catch { oc_02Value = 0; }
                                                 break;
                                             case 11803:
-                                                oc_03Value = Convert.ToInt32(row[col.ColumnName]);
+                                                try { oc_03Value = Convert.ToInt32(row[col.ColumnName]); } catch { oc_03Value = 0; }
                                                 break;
                                             case 11804:
-                                                oc_04Value = Convert.ToInt32(row[col.ColumnName]);
+                                                try { oc_04Value = Convert.ToInt32(row[col.ColumnName]); } catch { oc_04Value = 0; }
                                                 break;
                                             case 11805:
-                                                oc_05Value = Convert.ToInt32(row[col.ColumnName]);
+                                                try { oc_05Value = Convert.ToInt32(row[col.ColumnName]); } catch { oc_05Value = 0; }
                                                 break;
                                             case 11811:
                                                 text_01Value = Convert.ToString(row[col.ColumnName]);
