@@ -1,11 +1,4 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using WorkEnginePPM.DataServiceModules;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.SharePoint;
 using Microsoft.SharePoint.Fakes;
 using PortfolioEngineCore;
 using PortfolioEngineCore.Fakes;

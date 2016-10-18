@@ -42,32 +42,36 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>C:\Program Files\Common Files\microsoft shared\Web Server Extensions\16\ISAPI\Microsoft.SharePoint.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.SharePoint.16.0.0.0.Fakes">
-      <HintPath>FakesAssemblies\Microsoft.SharePoint.16.0.0.0.Fakes.dll</HintPath>
+    <Reference Include="Microsoft.SharePoint.16.0.0.0.Fakes, Version=16.0.0.0, Culture=neutral, PublicKeyToken=0ae41878053f6703, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\Microsoft.SharePoint.16.0.0.0.Fakes.dll</HintPath>
     </Reference>
     <Reference Include="mscorlib.4.0.0.0.Fakes">
-      <HintPath>FakesAssemblies\mscorlib.4.0.0.0.Fakes.dll</HintPath>
+      <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\mscorlib.4.0.0.0.Fakes.dll</HintPath>
     </Reference>
-    <Reference Include="PortfolioEngineCore.Fakes">
-      <HintPath>FakesAssemblies\PortfolioEngineCore.Fakes.dll</HintPath>
+    <Reference Include="PortfolioEngineCore.Fakes, Version=1.0.0.0, Culture=neutral, PublicKeyToken=0ae41878053f6703, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\PortfolioEngineCore.Fakes.dll</HintPath>
     </Reference>
     <Reference Include="SPEmulators">
       <HintPath>..\..\Libraries\SPEmulators.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.4.0.0.0.Fakes">
-      <HintPath>FakesAssemblies\System.4.0.0.0.Fakes.dll</HintPath>
+      <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\System.4.0.0.0.Fakes.dll</HintPath>
     </Reference>
     <Reference Include="System.Data" />
-    <Reference Include="System.Data.4.0.0.0.Fakes">
-      <HintPath>FakesAssemblies\System.Data.4.0.0.0.Fakes.dll</HintPath>
+    <Reference Include="System.Data.4.0.0.0.Fakes, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0ae41878053f6703, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\System.Data.4.0.0.0.Fakes.dll</HintPath>
     </Reference>
     <Reference Include="System.Web" />
     <Reference Include="System.Web.4.0.0.0.Fakes">
-      <HintPath>FakesAssemblies\System.Web.4.0.0.0.Fakes.dll</HintPath>
+      <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\System.Web.4.0.0.0.Fakes.dll</HintPath>
     </Reference>
-    <Reference Include="WorkEnginePPM.Fakes">
-      <HintPath>FakesAssemblies\WorkEnginePPM.Fakes.dll</HintPath>
+    <Reference Include="WorkEnginePPM.Fakes, Version=1.0.0.0, Culture=neutral, PublicKeyToken=0ae41878053f6703, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\WorkEnginePPM.Fakes.dll</HintPath>
     </Reference>
   </ItemGroup>
   <Choose>
@@ -87,6 +91,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\EPMLive.TestFakes\EPMLive.TestFakes.csproj">
+      <Project>{b408b875-0102-4064-83f6-f85a4070a105}</Project>
+      <Name>EPMLive.TestFakes</Name>
+    </ProjectReference>
     <ProjectReference Include="..\PortfolioEngineCore\PortfolioEngineCore.csproj">
       <Project>{BB86B09C-CB35-4888-8639-C047A40A9C0C}</Project>
       <Name>PortfolioEngineCore</Name>
@@ -95,27 +103,6 @@
       <Project>{51CAF42A-31AF-4B74-853F-24B672C185C2}</Project>
       <Name>WorkEnginePPM</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Fakes Include="Fakes\WorkEnginePPM.fakes" />
-  </ItemGroup>
-  <ItemGroup>
-    <Fakes Include="Fakes\System.Data.fakes" />
-  </ItemGroup>
-  <ItemGroup>
-    <Fakes Include="Fakes\Microsoft.SharePoint.fakes" />
-  </ItemGroup>
-  <ItemGroup>
-    <Fakes Include="Fakes\PortfolioEngineCore.fakes" />
-  </ItemGroup>
-  <ItemGroup>
-    <Fakes Include="Fakes\System.Web.fakes" />
-  </ItemGroup>
-  <ItemGroup>
-    <Fakes Include="Fakes\System.fakes" />
-  </ItemGroup>
-  <ItemGroup>
-    <Fakes Include="Fakes\mscorlib.fakes" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

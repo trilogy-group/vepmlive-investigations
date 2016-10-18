@@ -48,9 +48,16 @@
     <Reference Include="Microsoft.SharePoint.16.0.0.0.Fakes">
       <HintPath>FakesAssemblies\Microsoft.SharePoint.16.0.0.0.Fakes.dll</HintPath>
     </Reference>
+    <Reference Include="mscorlib.4.0.0.0.Fakes">
+      <HintPath>FakesAssemblies\mscorlib.4.0.0.0.Fakes.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.4.0.0.0.Fakes">
       <HintPath>FakesAssemblies\System.4.0.0.0.Fakes.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Data.4.0.0.0.Fakes">
+      <HintPath>FakesAssemblies\System.Data.4.0.0.0.Fakes.dll</HintPath>
     </Reference>
     <Reference Include="System.Web" />
     <Reference Include="System.Web.4.0.0.0.Fakes">
@@ -101,6 +108,14 @@
       <Project>{a7f83fd4-be8b-49ab-be24-39209e8fabc2}</Project>
       <Name>EPMLiveWebParts</Name>
     </ProjectReference>
+    <ProjectReference Include="..\PortfolioEngineCore\PortfolioEngineCore\PortfolioEngineCore.csproj">
+      <Project>{bb86b09c-cb35-4888-8639-c047a40a9c0c}</Project>
+      <Name>PortfolioEngineCore</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PortfolioEngineCore\WorkEnginePPM\WorkEnginePPM.csproj">
+      <Project>{51caf42a-31af-4b74-853f-24b672c185c2}</Project>
+      <Name>WorkEnginePPM</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Fakes Include="Fakes\System.Web.Extensions.fakes" />
@@ -116,6 +131,15 @@
   </ItemGroup>
   <ItemGroup>
     <Fakes Include="Fakes\mscorlib.fakes" />
+  </ItemGroup>
+  <ItemGroup>
+    <Fakes Include="Fakes\System.Data.fakes" />
+  </ItemGroup>
+  <ItemGroup>
+    <Fakes Include="Fakes\PortfolioEngineCore.fakes" />
+  </ItemGroup>
+  <ItemGroup>
+    <Fakes Include="Fakes\WorkEnginePPM.fakes" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
