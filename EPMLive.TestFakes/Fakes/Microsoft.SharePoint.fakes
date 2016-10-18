@@ -63,6 +63,6 @@
     <Add FullName="Microsoft.SharePoint.SPFieldNumber!"/>
     <Add FullName="Microsoft.SharePoint.SPFieldCalculated!"/>
     <Add FullName="Microsoft.SharePoint.SPFieldUserValueCollection!"/>
-    
+    <Add FullName="Microsoft.SharePoint.SPRegionalSettings!"/>
   </ShimGeneration>
 </Fakes>
