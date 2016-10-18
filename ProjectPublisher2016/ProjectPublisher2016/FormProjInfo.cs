@@ -324,7 +324,20 @@ namespace ProjectPublisher2016
                                 case "Currency":
                                     try
                                     {
-                                        float num = float.Parse(txt.Text);
+                                        float num;
+
+                                        if (getAttribute(nd, "Type") == "Number")
+                                        {
+                                            if (nd.Attributes["Percentage"] != null && nd.Attributes["Percentage"].Value.ToLower() == "true" && float.Parse(txt.Text) > 0)
+                                            {
+                                                num = float.Parse(txt.Text) / 100;
+                                            }
+                                            else
+                                                num = float.Parse(txt.Text);
+                                        }
+                                        else
+                                            num = float.Parse(txt.Text);
+
                                         string max = getAttribute(nd, "Max");
                                         string min = getAttribute(nd, "Min");
                                         if (min != "")
