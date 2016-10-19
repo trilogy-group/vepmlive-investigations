@@ -1,86 +1,160 @@
 ﻿using Microsoft.SharePoint;
-using Microsoft.SharePoint.Administration;
+using Microsoft.SharePoint.Fakes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
-using System.IO;
-using System.Net;
+using System.Collections;
+using System.Xml;
 
 namespace TimeSheets.Tests
 {
     [TestClass()]
     public class GetTsTests
     {
-        string webServerUrl = String.Empty;
-        string page = "/_layouts/15/epmlive/viewts.aspx";
-        string sharePointWebApplication = "SharePoint - 80";
-        Boolean useDefaultCredentials = true;
-        string userName = String.Empty;
-        string password = String.Empty;
-
-        [TestInitialize]
-        public void GetTsInitialize()
+        [TestMethod()]
+        public void processListTest_Without_GroupFields()
         {
-            var service = SPFarm.Local.Services.GetValue<SPWebService>(string.Empty);
-            foreach (SPWebApplication webApplication in service.WebApplications)
+            commonTest(false);
+        }
+
+        [TestMethod()]
+        public void processListTest_With_GroupFields()
+        {
+            commonTest(true);
+        }
+
+        private void commonTest(Boolean groups)
+        {
+            try
             {
-                if (webApplication.Name.Contains(sharePointWebApplication))
+                SortedList arrGTemp = new SortedList();
+                PrivateObject objToTestPrivateMethod = new PrivateObject(typeof(getts));
+                XmlDocument docXml = new XmlDocument();
+
+                using (SPEmulators.SPEmulationContext ctx = new SPEmulators.SPEmulationContext(SPEmulators.IsolationLevel.Fake))
                 {
-                    using (SPSite spSite = webApplication.Sites[0])
+                    SPList list = new ShimSPList();
+                    SPWeb spWeb = new ShimSPWeb();
+                   
+                    docXml.LoadXml("<rows></rows>");
+                    objToTestPrivateMethod.SetField("docXml", docXml);
+                    objToTestPrivateMethod.SetField("period", "1");
+                    objToTestPrivateMethod.SetField("ndMainParent", docXml.ChildNodes[0]);
+                    objToTestPrivateMethod.SetField("list", list);
+
+                    if (groups)
                     {
-                        webServerUrl = spSite.Url;
+                        objToTestPrivateMethod.SetField("arrGroupFields", new string[] { "FirstName", "LastName" });
+
+                        ShimSPField.AllInstances.IdGet = (instance) =>
+                        {
+                            return Guid.NewGuid();
+                        };
+
+                        ShimSPList.AllInstances.FieldsGet = (instance) =>
+                        {
+                            ShimSPFieldCollection fcol = new ShimSPFieldCollection();
+                            fcol.GetFieldByInternalNameString = (internalName) =>
+                            {
+                                ShimSPField field = new ShimSPField();
+                                field.IdGet = () =>
+                                {
+                                    return Guid.NewGuid();
+                                };
+                                field.GetFieldValueAsTextObject = (obj) =>
+                                {
+                                    return internalName;
+                                };
+                                return field;
+                            };
+                            return fcol;
+                        };
                     }
-                }
-            }
-        }
 
-        [TestMethod()]
-        public void GetTs_PageLoad_RespondedTest()
-        {
-            string result = GetPage("period_id=1");
-            Assert.IsTrue(result.IndexOf("Delete Timesheet(s)") != -1, "Get Ts responsed.");
-        }
-
-        [TestMethod()]
-        public void GetTs_PageLoad_Failed_Without_QueryStringTest()
-        {
-            string result = GetPage(String.Empty);
-            Assert.IsTrue(result.IndexOf("Delete Timesheet(s)") == -1, "Get Ts didn't responsed.");
-        }
-
-        [TestMethod()]
-        public void GetTs_PageLoad_Failed_With_Unwanted_QueryStringTest()
-        {
-            string result = GetPage("period_id=xyz");
-            Assert.IsTrue(result.IndexOf("Delete Timesheet(s)") == -1, "Get Ts didn't responsed.");
-        }
-
-        private string GetPage(string queryString)
-        {
-            if (string.IsNullOrEmpty(webServerUrl))
-            {
-                Assert.Fail("Sharepoint server or site not found.");
-            }
-            using (WebClient client = new WebClient())
-            {
-                if (useDefaultCredentials)
-                {
-                    client.UseDefaultCredentials = useDefaultCredentials;
-                }
-                else
-                {
-                    if (string.IsNullOrEmpty(userName) || string.IsNullOrEmpty(password))
+                    ShimSPList.AllInstances.GetItemsSPQuery = (instance, a) =>
                     {
-                        Assert.Fail("Please provide username and password if not using default credentials.");
-                    }
-                    client.Credentials = new NetworkCredential(userName, password);
+                        SPListItemEnumerator sPListItemEnumerator = new SPListItemEnumerator();
+                        return new ShimSPListItemCollection()
+                        {
+                            GetEnumerator = () =>
+                            {
+                                return sPListItemEnumerator;
+                            },
+                            CountGet = () =>
+                            {
+                                return sPListItemEnumerator.sPListItems.Length;
+                            }
+                        };
+                    };
+
+                    objToTestPrivateMethod.Invoke("processList", spWeb, arrGTemp);
                 }
-                using (StreamReader reader = new StreamReader(client.OpenRead(string.Format("{0}{1}?{2}", webServerUrl, page, queryString))))
-                {
-                    string result = reader.ReadToEnd();
-                    return result;
-                }
+            }
+            catch (Exception ex)
+            {
+                Assert.Fail(ex.Message);
             }
         }
 
+    }
+
+
+
+    public class SPListItemEnumerator : IEnumerator
+    {
+        public SPListItem[] sPListItems = new SPListItem[2];
+        int position = -1;
+        public SPListItemEnumerator()
+        {
+            sPListItems[0] = new ShimSPListItem()
+            {
+                ItemGetGuid = (guid) =>
+                {
+                    return Guid.NewGuid();
+                },
+                IDGet = () =>
+                {
+                    return 1;
+                },
+                TitleGet = () =>
+                {
+                    return "Adam Bar";
+                }
+            };
+            sPListItems[1] = new ShimSPListItem()
+            {
+                ItemGetGuid = (guid) =>
+                {
+                    return Guid.NewGuid();
+                },
+                IDGet = () =>
+                {
+                    return 2;
+                },
+                TitleGet = () =>
+                {
+                    return "Brandon Baker";
+                }
+            };
+        }
+
+        public object Current
+        {
+            get
+            {
+                return sPListItems[position];
+            }
+        }
+
+        public bool MoveNext()
+        {
+            position++;
+            return (position < sPListItems.Length);
+
+        }
+
+        public void Reset()
+        {
+
+        }
     }
 }
