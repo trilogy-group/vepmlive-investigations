@@ -182,7 +182,7 @@
             <br />
             <input id="MWG_DefaultView" type="checkbox" />
             Default View<br />
-            <input id="MWG_PersonalView" type="checkbox" <%= UserHasDesignerPermission ? string.Empty : @"checked=""checked""" %> <%= UserHasDesignerPermission ? string.Empty : @"disabled=""disabled""" %> />
+            <input id="MWG_PersonalView" type="checkbox" <%= UserHasDesignerPermission ? string.Empty : @"checked=""checked""" %> />
             Personal View<br />
             <br />
             <input type="button" style="float: left; width: 90px; margin-right: 5px;" value="OK" onclick="SP.UI.ModalDialog.commonModalDialogClose(SP.UI.DialogResult.OK, MyWorkGrid.getSavingViewInfo(this)); return false;" class="ms-ButtonHeightWidth" target="_self" />
