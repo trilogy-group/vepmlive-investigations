@@ -296,82 +296,96 @@ namespace ProjectPublisher2016
 		
 		}
 
-		private void button1_Click(object sender, System.EventArgs e)
-		{
-			foreach(Object obj in listView1.Controls)
-			{
-				if(obj.GetType().ToString() == "System.Windows.Forms.TextBox")
-				{
-					try
-					{
-						TextBox txt = (TextBox)obj;
-						ListViewItem li = listView1.Items[int.Parse(txt.Tag.ToString())];
-						XmlNode nd = (XmlNode)li.Tag;
-						if(txt.Text.Trim() == "")
-						{
-							if(getAttribute(nd,"Required").ToUpper() == "TRUE")
-							{
-								MessageBox.Show("You must enter a value for '" + getAttribute(nd,"DisplayName") + "'");
-								return;
-							}
-						}
-						else
-						{
-							switch (getAttribute(nd,"Type"))
-							{
-								case "Number":
-								case "Currency":
-									try
-									{
-										float num = float.Parse(txt.Text);
-										string max = getAttribute(nd,"Max");
-										string min = getAttribute(nd,"Min");
-										if(min != "")
-										{
-											if(num < float.Parse(min))
-											{
-												MessageBox.Show("The value for '" + getAttribute(nd,"DisplayName") + "' must be greater than " + min + ".");
-												return;
-											}
-										}
-										if(max != "")
-										{
-											if(num > float.Parse(max))
-											{
-												MessageBox.Show("The value for '" + getAttribute(nd,"DisplayName") + "' must be less than " + max + ".");
-												return;
-											}
-										}
-									}
-									catch
-									{
-										MessageBox.Show("The value for '" + getAttribute(nd,"DisplayName") + "' is not a valid number.");
-										return;
-									}
-									break;
-							};
-						}
-					}
-					catch{}
-				}
-				if(obj.GetType().ToString() == "System.Windows.Forms.ComboBox")
-				{
-					try
-					{
-						ComboBox cbo = (ComboBox)obj;
-						ListViewItem li = listView1.Items[int.Parse(cbo.Tag.ToString())];
-						XmlNode nd = (XmlNode)li.Tag;
-						if(getAttribute(nd,"Required").ToUpper() == "TRUE")
-						{
-							if(cbo.SelectedIndex == -1)
-							{
-								MessageBox.Show("You must select a value for '" + getAttribute(nd,"DisplayName") + "'");
-								return;
-							}
-						}
-					}
-					catch{}
-				}
+        public void button1Click(object sender, System.EventArgs e)
+        {
+
+            foreach (Object obj in listView1.Controls)
+            {
+                if (obj.GetType().ToString() == "System.Windows.Forms.TextBox")
+                {
+                    try
+                    {
+                        TextBox txt = (TextBox)obj;
+                        ListViewItem li = listView1.Items[int.Parse(txt.Tag.ToString())];
+                        XmlNode nd = (XmlNode)li.Tag;
+                        if (txt.Text.Trim() == "")
+                        {
+                            if (getAttribute(nd, "Required").ToUpper() == "TRUE")
+                            {
+                                MessageBox.Show("You must enter a value for '" + getAttribute(nd, "DisplayName") + "'");
+                                return;
+                            }
+                        }
+                        else
+                        {
+                            switch (getAttribute(nd, "Type"))
+                            {
+                                case "Number":
+                                case "Currency":
+                                    try
+                                    {
+                                        float num;
+
+                                        if (getAttribute(nd, "Type") == "Number")
+                                        {
+                                            if (nd.Attributes["Percentage"] != null && nd.Attributes["Percentage"].Value.ToLower() == "true" && float.Parse(txt.Text) > 0)
+                                            {
+                                                num = float.Parse(txt.Text) / 100;
+                                            }
+                                            else
+                                                num = float.Parse(txt.Text);
+                                        }
+                                        else
+                                            num = float.Parse(txt.Text);
+
+                                        string max = getAttribute(nd, "Max");
+                                        string min = getAttribute(nd, "Min");
+                                        if (min != "")
+                                        {
+                                            if (num < float.Parse(min))
+                                            {
+                                                MessageBox.Show("The value for '" + getAttribute(nd, "DisplayName") + "' must be greater than " + min + ".");
+                                                return;
+                                            }
+                                        }
+                                        if (max != "")
+                                        {
+                                            if (num > float.Parse(max))
+                                            {
+                                                MessageBox.Show("The value for '" + getAttribute(nd, "DisplayName") + "' must be less than " + max + ".");
+                                                return;
+                                            }
+                                        }
+                                    }
+                                    catch
+                                    {
+                                        MessageBox.Show("The value for '" + getAttribute(nd, "DisplayName") + "' is not a valid number.");
+                                        return;
+                                    }
+                                    break;
+                            };
+                        }
+                    }
+                    catch { }
+                }
+                if (obj.GetType().ToString() == "System.Windows.Forms.ComboBox")
+                {
+                    try
+                    {
+                        ComboBox cbo = (ComboBox)obj;
+                        ListViewItem li = listView1.Items[int.Parse(cbo.Tag.ToString())];
+                        XmlNode nd = (XmlNode)li.Tag;
+                        if (getAttribute(nd, "Required").ToUpper() == "TRUE")
+                        {
+                            if (cbo.SelectedIndex == -1)
+                            {
+                                MessageBox.Show("You must select a value for '" + getAttribute(nd, "DisplayName") + "'");
+                                return;
+                            }
+                        }
+                    }
+                    catch { }
+                }
                 if (obj.GetType().ToString() == "System.Windows.Forms.CheckedListBox")
                 {
                     try
@@ -390,11 +404,18 @@ namespace ProjectPublisher2016
                     }
                     catch { }
                 }
-			}          
+            }
 
-			this.DialogResult = DialogResult.OK;
-			this.Hide();
-		}
+            this.DialogResult = DialogResult.OK;
+            this.Hide();
+        }
+
+
+        private void button1_Click(object sender, System.EventArgs e)
+		{
+            button1Click(sender, e);
+        }
+
 		private static string getAttribute(XmlNode nd, string attr)
 		{
 			try

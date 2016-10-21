@@ -49,7 +49,7 @@ namespace TimeSheets
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            
+
             Response.Cache.SetCacheability(HttpCacheability.NoCache);
             Response.Expires = -1;
 
@@ -63,7 +63,7 @@ namespace TimeSheets
 
             SPWeb web = SPContext.Current.Web;
             {
-                SPSecurity.RunWithElevatedPrivileges(delegate()
+                SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
                     try
                     {
@@ -78,7 +78,7 @@ namespace TimeSheets
                 string resUrl = EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPMLiveResourceURL", true, false);
                 SPWeb resWeb = null;
                 if (resUrl != "")
-                { 
+                {
                     if (resUrl.ToLower() != web.Url.ToLower())
                     {
                         SPSite tempSite = new SPSite(resUrl);
@@ -324,7 +324,7 @@ namespace TimeSheets
             SortedList arrGTemp = new SortedList();
 
             processList(curWeb, arrGTemp);
-            
+
             TimeSpan ts = periodEnd - periodStart;
 
             foreach (DictionaryEntry e in arrGTemp)
@@ -386,7 +386,7 @@ namespace TimeSheets
                     else
                         newCell.InnerText = newItem;
                     newNode.AppendChild(newCell);
-   
+
                     XmlAttribute attrBold = docXml.CreateAttribute("style");
                     attrBold.Value = "font-weight:bold;background: #B6C8ED";
                     newNode.Attributes.Append(attrBold);
@@ -437,7 +437,7 @@ namespace TimeSheets
 
 
                         string groupname = "";
-                        if(arrItems[li.ID.ToString()] == null)
+                        if (arrItems[li.ID.ToString()] == null)
                             groupname = uName;
                         else
                             groupname = arrItems[li.ID.ToString()].ToString() + "\n" + uName;
@@ -492,204 +492,140 @@ namespace TimeSheets
                             attrStyle.Value = "background: #DFE7F7; font-weight:bold";
                             newNode.Attributes.Append(attrStyle);
 
-                            
+
                             newCell = docXml.CreateNode(XmlNodeType.Element, "cell", docXml.NamespaceURI);
                             //if (drs.Length > 0)
                             //{
-                                ndNotes.InnerText = drs[0]["approval_notes"].ToString();
+                            ndNotes.InnerText = drs[0]["approval_notes"].ToString();
 
-                                XmlNode ndTSuid = docXml.CreateNode(XmlNodeType.Element, "userdata", docXml.NamespaceURI);
-                                XmlAttribute attrName = docXml.CreateAttribute("name");
-                                attrName.Value = "tsuid";
-                                ndTSuid.InnerText = drs[0]["ts_uid"].ToString();
-                                ndTSuid.Attributes.Append(attrName);
-                                newNode.AppendChild(ndTSuid);
+                            XmlNode ndTSuid = docXml.CreateNode(XmlNodeType.Element, "userdata", docXml.NamespaceURI);
+                            XmlAttribute attrName = docXml.CreateAttribute("name");
+                            attrName.Value = "tsuid";
+                            ndTSuid.InnerText = drs[0]["ts_uid"].ToString();
+                            ndTSuid.Attributes.Append(attrName);
+                            newNode.AppendChild(ndTSuid);
 
-                                if (drs[0]["approval_status"].ToString().ToLower() == "1")
+                            if (drs[0]["approval_status"].ToString().ToLower() == "1")
+                            {
+                                newCell.InnerXml = "<![CDATA[<img src=\"images/tsflaggreen.gif\" alt=\"Approved\">]]>";
+                            }
+                            else if (drs[0]["approval_status"].ToString().ToLower() == "2")
+                            {
+                                newCell.InnerXml = "<![CDATA[<img src=\"images/tsflagred.gif\" alt=\"Rejected\">]]>";
+                            }
+                            else if (drs[0]["submitted"].ToString().ToLower() == "true")
+                            {
+                                newCell.InnerXml = "<![CDATA[<img src=\"images/tsflagyellow.gif\" alt=\"Submitted\">]]>";
+                            }
+                            else
+                            {
+                                newCell.InnerXml = "<![CDATA[<img src=\"images/tsflagblue.gif\" alt=\"Saved\">]]>";
+
+
+
+                                //newNode.SelectSingleNode("cell").InnerText = "1";
+                                //XmlAttribute attrType = docXml.CreateAttribute("type");
+                                //attrType.Value = "ro";
+                                //ndNotes.Attributes.Append(attrType);
+                                //newNode.SelectSingleNode("cell").Attributes.Append(attrType);
+                                //newNode.SelectSingleNode("cell").InnerText = "<![CDATA[<input type='checkbox' disabled='true'>]]>";
+                            }
+                            newNode.AppendChild(newCell);
+
+
+
+                            XmlNode ndStatus = docXml.CreateNode(XmlNodeType.Element, "userdata", docXml.NamespaceURI);
+                            attrName = docXml.CreateAttribute("name");
+                            attrName.Value = "Status";
+                            ndStatus.InnerText = newCell.InnerText;
+                            ndStatus.Attributes.Append(attrName);
+                            newNode.AppendChild(ndStatus);
+
+                            //for (int i = 0; i <= ts.Days; i++)
+                            //{
+                            //    string showday = "";
+                            //    try
+                            //    {
+                            //        showday = dayDefs[((int)periodStart.AddDays(i).DayOfWeek) * 3];
+                            //    }
+                            //    catch { }
+                            //    if (showday == "True")
+                            //    {
+                            //        DataRow[] drTotal = dsTimesheetTotals.Tables[0].Select("ts_uid = '" + drs[0]["ts_uid"].ToString() + "' AND ts_item_date='" + periodStart.AddDays(i).ToString() + "'");
+
+                            //        newCell = docXml.CreateNode(XmlNodeType.Element, "cell", docXml.NamespaceURI);
+                            //        if (drTotal.Length > 0)
+                            //            newCell.InnerText = drTotal[0][0].ToString();
+                            //        else
+                            //            newCell.InnerText = "0";
+                            //        newNode.AppendChild(newCell);
+                            //    }
+                            //}
+
+                            for (int i = 0; i <= ts.Days; i++)
+                            {
+                                string showday = "";
+                                try
                                 {
-                                    newCell.InnerXml = "<![CDATA[<img src=\"images/tsflaggreen.gif\" alt=\"Approved\">]]>";
+                                    showday = dayDefs[((int)periodStart.AddDays(i).DayOfWeek) * 3];
                                 }
-                                else if (drs[0]["approval_status"].ToString().ToLower() == "2")
+                                catch { }
+                                if (showday == "True")
                                 {
-                                    newCell.InnerXml = "<![CDATA[<img src=\"images/tsflagred.gif\" alt=\"Rejected\">]]>";
-                                }
-                                else if (drs[0]["submitted"].ToString().ToLower() == "true")
-                                {
-                                    newCell.InnerXml = "<![CDATA[<img src=\"images/tsflagyellow.gif\" alt=\"Submitted\">]]>";
-                                }
-                                else
-                                {
-                                    newCell.InnerXml = "<![CDATA[<img src=\"images/tsflagblue.gif\" alt=\"Saved\">]]>";
-
-
-
-                                    //newNode.SelectSingleNode("cell").InnerText = "1";
-                                    //XmlAttribute attrType = docXml.CreateAttribute("type");
-                                    //attrType.Value = "ro";
-                                    //ndNotes.Attributes.Append(attrType);
-                                    //newNode.SelectSingleNode("cell").Attributes.Append(attrType);
-                                    //newNode.SelectSingleNode("cell").InnerText = "<![CDATA[<input type='checkbox' disabled='true'>]]>";
-                                }
-                                newNode.AppendChild(newCell);
-
-
-
-                                XmlNode ndStatus = docXml.CreateNode(XmlNodeType.Element, "userdata", docXml.NamespaceURI);
-                                attrName = docXml.CreateAttribute("name");
-                                attrName.Value = "Status";
-                                ndStatus.InnerText = newCell.InnerText;
-                                ndStatus.Attributes.Append(attrName);
-                                newNode.AppendChild(ndStatus);
-                                
-                                //for (int i = 0; i <= ts.Days; i++)
-                                //{
-                                //    string showday = "";
-                                //    try
-                                //    {
-                                //        showday = dayDefs[((int)periodStart.AddDays(i).DayOfWeek) * 3];
-                                //    }
-                                //    catch { }
-                                //    if (showday == "True")
-                                //    {
-                                //        DataRow[] drTotal = dsTimesheetTotals.Tables[0].Select("ts_uid = '" + drs[0]["ts_uid"].ToString() + "' AND ts_item_date='" + periodStart.AddDays(i).ToString() + "'");
-
-                                //        newCell = docXml.CreateNode(XmlNodeType.Element, "cell", docXml.NamespaceURI);
-                                //        if (drTotal.Length > 0)
-                                //            newCell.InnerText = drTotal[0][0].ToString();
-                                //        else
-                                //            newCell.InnerText = "0";
-                                //        newNode.AppendChild(newCell);
-                                //    }
-                                //}
-
-                                for (int i = 0; i <= ts.Days; i++)
-                                {
-                                    string showday = "";
-                                    try
-                                    {
-                                        showday = dayDefs[((int)periodStart.AddDays(i).DayOfWeek) * 3];
-                                    }
-                                    catch { }
-                                    if (showday == "True")
-                                    {
-                                        newCell = docXml.CreateNode(XmlNodeType.Element, "cell", docXml.NamespaceURI);
-                                        newCell.InnerText = "";
-                                        newNode.AppendChild(newCell);
-                                    }
-                                }
-
-                                DataRow[] drTasks = dsTimesheetTasks.Tables[0].Select("ts_uid = '" + drs[0]["ts_uid"].ToString() + "'");
-
-                                XmlNode ndProject = null;
-                                string curProject = "";
-                                Regex regex = new Regex("[^0-9a-zA-Z]+",RegexOptions.Compiled);                                                            
-
-                                foreach (DataRow drTask in drTasks)
-                                {
-                                    if (drTask["project"].ToString() != curProject)
-                                    {
-                                        curProject = drTask["project"].ToString();
-                                        ndProject = docXml.CreateNode(XmlNodeType.Element, "row", docXml.NamespaceURI);
-                                        
-                                        attrId = docXml.CreateAttribute("id");
-                                        attrId.Value = li.ID.ToString() + "." + regex.Replace(curProject, "");
-                                        ndProject.Attributes.Append(attrId);
-
-                                        attrExpand = docXml.CreateAttribute("open");
-                                        attrExpand.Value = "1";
-                                        ndProject.Attributes.Append(attrExpand);
-
-                                        newNode.AppendChild(ndProject);
-
-                                        newCell = docXml.CreateNode(XmlNodeType.Element, "cell", docXml.NamespaceURI);
-                                        XmlAttribute attrType = docXml.CreateAttribute("type");
-                                        attrType.Value = "ro";
-                                        newCell.Attributes.Append(attrType);
-                                        ndProject.AppendChild(newCell);
-
-                                        newCell = docXml.CreateNode(XmlNodeType.Element, "cell", docXml.NamespaceURI);
-                                        attrType = docXml.CreateAttribute("type");
-                                        attrType.Value = "ro";
-                                        newCell.Attributes.Append(attrType);
-                                        ndProject.AppendChild(newCell);
-
-                                        newCell = docXml.CreateNode(XmlNodeType.Element, "cell", docXml.NamespaceURI);
-                                        newCell.InnerText = curProject;
-                                        ndProject.AppendChild(newCell);
-
-                                        newCell = docXml.CreateNode(XmlNodeType.Element, "cell", docXml.NamespaceURI);
-                                        newCell.InnerText = "";
-                                        ndProject.AppendChild(newCell);
-
-                                        newCell = docXml.CreateNode(XmlNodeType.Element, "cell", docXml.NamespaceURI);
-                                        newCell.InnerText = "";
-                                        ndProject.AppendChild(newCell);
-
-                                        
-
-                                        for (int i = 0; i <= ts.Days; i++)
-                                        {
-                                            string showday = "";
-                                            try
-                                            {
-                                                showday = dayDefs[((int)periodStart.AddDays(i).DayOfWeek) * 3];
-                                            }
-                                            catch { }
-                                            if (showday == "True")
-                                            {
-                                                newCell = docXml.CreateNode(XmlNodeType.Element, "cell", docXml.NamespaceURI);
-                                                newCell.InnerText = "";
-                                                ndProject.AppendChild(newCell);
-                                            }
-                                        }
-                                        XmlAttribute attrBold = docXml.CreateAttribute("style");
-                                        attrBold.Value = "font-weight:bold;";
-                                        ndProject.Attributes.Append(attrBold);
-                                        
-                                    }
-
-                                    XmlNode ndTask = docXml.CreateNode(XmlNodeType.Element, "row", docXml.NamespaceURI);
-
-                                    attrId = docXml.CreateAttribute("id");
-                                    attrId.Value = li.ID.ToString() + "." + regex.Replace(curProject,"") + "." + regex.Replace(drTask["title"].ToString(),"");
-                                    ndTask.Attributes.Append(attrId);
-
-                                    newCell = docXml.CreateNode(XmlNodeType.Element, "cell", docXml.NamespaceURI);
-                                    XmlAttribute attrTType = docXml.CreateAttribute("type");
-                                    attrTType.Value = "ro";
-                                    newCell.Attributes.Append(attrTType);
-                                    ndTask.AppendChild(newCell);
-
-                                    newCell = docXml.CreateNode(XmlNodeType.Element, "cell", docXml.NamespaceURI);
-                                    attrTType = docXml.CreateAttribute("type");
-                                    attrTType.Value = "ro";
-                                    newCell.Attributes.Append(attrTType);
-                                    ndTask.AppendChild(newCell);
-
-                                    newCell = docXml.CreateNode(XmlNodeType.Element, "cell", docXml.NamespaceURI);
-                                    newCell.InnerText = drTask["title"].ToString();
-                                    ndTask.AppendChild(newCell);
-                                    
                                     newCell = docXml.CreateNode(XmlNodeType.Element, "cell", docXml.NamespaceURI);
                                     newCell.InnerText = "";
-                                    ndTask.AppendChild(newCell);
+                                    newNode.AppendChild(newCell);
+                                }
+                            }
+
+                            DataRow[] drTasks = dsTimesheetTasks.Tables[0].Select("ts_uid = '" + drs[0]["ts_uid"].ToString() + "'");
+
+                            XmlNode ndProject = null;
+                            string curProject = "";
+                            Regex regex = new Regex("[^0-9a-zA-Z]+", RegexOptions.Compiled);
+
+                            foreach (DataRow drTask in drTasks)
+                            {
+                                if (drTask["project"].ToString() != curProject)
+                                {
+                                    curProject = drTask["project"].ToString();
+                                    ndProject = docXml.CreateNode(XmlNodeType.Element, "row", docXml.NamespaceURI);
+
+                                    attrId = docXml.CreateAttribute("id");
+                                    attrId.Value = li.ID.ToString() + "." + regex.Replace(curProject, "");
+                                    ndProject.Attributes.Append(attrId);
+
+                                    attrExpand = docXml.CreateAttribute("open");
+                                    attrExpand.Value = "1";
+                                    ndProject.Attributes.Append(attrExpand);
+
+                                    newNode.AppendChild(ndProject);
 
                                     newCell = docXml.CreateNode(XmlNodeType.Element, "cell", docXml.NamespaceURI);
-                                    switch (drTask["APPROVAL_STATUS"].ToString())
-                                    {
-                                        case "0":
-                                            newCell.InnerXml = "<![CDATA[<img src=\"images/tsflagwhite.gif\" alt=\"Pending\">]]>";
-                                            break;
-                                        case "1":
-                                            newCell.InnerXml = "<![CDATA[<img src=\"images/tsflaggreen.gif\" alt=\"Approved\">]]>";
-                                            break;
-                                        case "2":
-                                            newCell.InnerXml = "<![CDATA[<img src=\"images/tsflagred.gif\" alt=\"Rejected\">]]>";
-                                            break;
-                                    };
-                                    ndTask.AppendChild(newCell);
+                                    XmlAttribute attrType = docXml.CreateAttribute("type");
+                                    attrType.Value = "ro";
+                                    newCell.Attributes.Append(attrType);
+                                    ndProject.AppendChild(newCell);
 
-                                    double total = 0;
+                                    newCell = docXml.CreateNode(XmlNodeType.Element, "cell", docXml.NamespaceURI);
+                                    attrType = docXml.CreateAttribute("type");
+                                    attrType.Value = "ro";
+                                    newCell.Attributes.Append(attrType);
+                                    ndProject.AppendChild(newCell);
+
+                                    newCell = docXml.CreateNode(XmlNodeType.Element, "cell", docXml.NamespaceURI);
+                                    newCell.InnerText = curProject;
+                                    ndProject.AppendChild(newCell);
+
+                                    newCell = docXml.CreateNode(XmlNodeType.Element, "cell", docXml.NamespaceURI);
+                                    newCell.InnerText = "";
+                                    ndProject.AppendChild(newCell);
+
+                                    newCell = docXml.CreateNode(XmlNodeType.Element, "cell", docXml.NamespaceURI);
+                                    newCell.InnerText = "";
+                                    ndProject.AppendChild(newCell);
+
+
 
                                     for (int i = 0; i <= ts.Days; i++)
                                     {
@@ -701,79 +637,143 @@ namespace TimeSheets
                                         catch { }
                                         if (showday == "True")
                                         {
-
-                                            DataRow[] drTaskTimes = dsTimesheetTaskHours.Tables[0].Select("ts_item_uid='" + drTask["ts_item_uid"].ToString() + "' and ts_item_date = '" + periodStart.AddDays(i).ToString() + "'");
-                                            DataRow[] drTaskNotes = dsTimesheetNotes.Tables[0].Select("ts_item_uid='" + drTask["ts_item_uid"].ToString() + "' and ts_item_date = '" + periodStart.AddDays(i).ToString() + "'");
-
                                             newCell = docXml.CreateNode(XmlNodeType.Element, "cell", docXml.NamespaceURI);
-                                            string hours = "";
-                                            //if (drTaskTimes.Length > 0 || drTaskNotes.Length > 0)
-                                            //{
-                                                if (dsTimesheetTypes.Tables[0].Rows.Count > 0)
-                                                {
-                                                    attrTType = docXml.CreateAttribute("type");
-                                                    attrTType.Value = "timeeditor";
-                                                    newCell.Attributes.Append(attrTType);
-
-                                                    foreach (DataRow drType in dsTimesheetTypes.Tables[0].Rows)
-                                                    {
-                                                        DataRow[] drTaskTypeTime = dsTimesheetTaskHours.Tables[0].Select("ts_item_uid='" + drTask["ts_item_uid"].ToString() + "' and ts_item_date = '" + periodStart.AddDays(i).ToString() + "' and ts_item_type_id=" + drType["tstype_id"].ToString());
-                                                        if (drTaskTypeTime.Length > 0)
-                                                        {
-                                                            hours += "|" + drType["tstype_id"].ToString() + "|" + drTaskTypeTime[0]["hours"].ToString();
-                                                            try
-                                                            {
-                                                                total += double.Parse(drTaskTypeTime[0]["hours"].ToString());
-                                                            }
-                                                            catch { }
-                                                        }
-                                                        else
-                                                            hours += "|" + drType["tstype_id"].ToString() + "|0";
-                                                    }
-                                                    hours = hours.Substring(1);
-                                                    if (drTaskNotes.Length > 0)
-                                                    {
-                                                        hours += "|N|" + drTaskNotes[0]["ts_item_notes"].ToString();
-                                                    }
-                                                }
-                                                else
-                                                {
-                                                    if (drTaskTimes.Length > 0)
-                                                        hours = drTaskTimes[0]["hours"].ToString();
-                                                    else
-                                                        hours = "0";
-
-                                                    try
-                                                    {
-                                                        total += double.Parse(hours);
-                                                    }
-                                                    catch { }
-
-                                                    if (drTaskNotes.Length > 0)
-                                                    {
-                                                        attrTType = docXml.CreateAttribute("type");
-                                                        attrTType.Value = "timeeditor";
-                                                        newCell.Attributes.Append(attrTType);
-                                                        hours = "0|" + hours + "|N|" + drTaskNotes[0]["ts_item_notes"].ToString();
-                                                    }
-                                                }
-                                            //}
-                                            //else
-                                            //{
-                                            //    hours = "0";
-                                            //}
-                                            newCell.InnerText = hours;
-
-                                            ndTask.AppendChild(newCell);
+                                            newCell.InnerText = "";
+                                            ndProject.AppendChild(newCell);
                                         }
                                     }
+                                    XmlAttribute attrBold = docXml.CreateAttribute("style");
+                                    attrBold.Value = "font-weight:bold;";
+                                    ndProject.Attributes.Append(attrBold);
 
-                                    newCell = docXml.CreateNode(XmlNodeType.Element, "cell", docXml.NamespaceURI);
-                                    newCell.InnerText = total.ToString();
-                                    ndTask.AppendChild(newCell);
-
-                                    ndProject.AppendChild(ndTask);
                                 }
+
+                                XmlNode ndTask = docXml.CreateNode(XmlNodeType.Element, "row", docXml.NamespaceURI);
+
+                                attrId = docXml.CreateAttribute("id");
+                                attrId.Value = li.ID.ToString() + "." + regex.Replace(curProject, "") + "." + regex.Replace(drTask["title"].ToString(), "");
+                                ndTask.Attributes.Append(attrId);
+
+                                newCell = docXml.CreateNode(XmlNodeType.Element, "cell", docXml.NamespaceURI);
+                                XmlAttribute attrTType = docXml.CreateAttribute("type");
+                                attrTType.Value = "ro";
+                                newCell.Attributes.Append(attrTType);
+                                ndTask.AppendChild(newCell);
+
+                                newCell = docXml.CreateNode(XmlNodeType.Element, "cell", docXml.NamespaceURI);
+                                attrTType = docXml.CreateAttribute("type");
+                                attrTType.Value = "ro";
+                                newCell.Attributes.Append(attrTType);
+                                ndTask.AppendChild(newCell);
+
+                                newCell = docXml.CreateNode(XmlNodeType.Element, "cell", docXml.NamespaceURI);
+                                newCell.InnerText = drTask["title"].ToString();
+                                ndTask.AppendChild(newCell);
+
+                                newCell = docXml.CreateNode(XmlNodeType.Element, "cell", docXml.NamespaceURI);
+                                newCell.InnerText = "";
+                                ndTask.AppendChild(newCell);
+
+                                newCell = docXml.CreateNode(XmlNodeType.Element, "cell", docXml.NamespaceURI);
+                                switch (drTask["APPROVAL_STATUS"].ToString())
+                                {
+                                    case "0":
+                                        newCell.InnerXml = "<![CDATA[<img src=\"images/tsflagwhite.gif\" alt=\"Pending\">]]>";
+                                        break;
+                                    case "1":
+                                        newCell.InnerXml = "<![CDATA[<img src=\"images/tsflaggreen.gif\" alt=\"Approved\">]]>";
+                                        break;
+                                    case "2":
+                                        newCell.InnerXml = "<![CDATA[<img src=\"images/tsflagred.gif\" alt=\"Rejected\">]]>";
+                                        break;
+                                };
+                                ndTask.AppendChild(newCell);
+
+                                double total = 0;
+
+                                for (int i = 0; i <= ts.Days; i++)
+                                {
+                                    string showday = "";
+                                    try
+                                    {
+                                        showday = dayDefs[((int)periodStart.AddDays(i).DayOfWeek) * 3];
+                                    }
+                                    catch { }
+                                    if (showday == "True")
+                                    {
+
+                                        DataRow[] drTaskTimes = dsTimesheetTaskHours.Tables[0].Select("ts_item_uid='" + drTask["ts_item_uid"].ToString() + "' and ts_item_date = '" + periodStart.AddDays(i).ToString() + "'");
+                                        DataRow[] drTaskNotes = dsTimesheetNotes.Tables[0].Select("ts_item_uid='" + drTask["ts_item_uid"].ToString() + "' and ts_item_date = '" + periodStart.AddDays(i).ToString() + "'");
+
+                                        newCell = docXml.CreateNode(XmlNodeType.Element, "cell", docXml.NamespaceURI);
+                                        string hours = "";
+                                        //if (drTaskTimes.Length > 0 || drTaskNotes.Length > 0)
+                                        //{
+                                        if (dsTimesheetTypes.Tables[0].Rows.Count > 0)
+                                        {
+                                            attrTType = docXml.CreateAttribute("type");
+                                            attrTType.Value = "timeeditor";
+                                            newCell.Attributes.Append(attrTType);
+
+                                            foreach (DataRow drType in dsTimesheetTypes.Tables[0].Rows)
+                                            {
+                                                DataRow[] drTaskTypeTime = dsTimesheetTaskHours.Tables[0].Select("ts_item_uid='" + drTask["ts_item_uid"].ToString() + "' and ts_item_date = '" + periodStart.AddDays(i).ToString() + "' and ts_item_type_id=" + drType["tstype_id"].ToString());
+                                                if (drTaskTypeTime.Length > 0)
+                                                {
+                                                    hours += "|" + drType["tstype_id"].ToString() + "|" + drTaskTypeTime[0]["hours"].ToString();
+                                                    try
+                                                    {
+                                                        total += double.Parse(drTaskTypeTime[0]["hours"].ToString());
+                                                    }
+                                                    catch { }
+                                                }
+                                                else
+                                                    hours += "|" + drType["tstype_id"].ToString() + "|0";
+                                            }
+                                            hours = hours.Substring(1);
+                                            if (drTaskNotes.Length > 0)
+                                            {
+                                                hours += "|N|" + drTaskNotes[0]["ts_item_notes"].ToString();
+                                            }
+                                        }
+                                        else
+                                        {
+                                            if (drTaskTimes.Length > 0)
+                                                hours = drTaskTimes[0]["hours"].ToString();
+                                            else
+                                                hours = "0";
+
+                                            try
+                                            {
+                                                total += double.Parse(hours);
+                                            }
+                                            catch { }
+
+                                            if (drTaskNotes.Length > 0)
+                                            {
+                                                attrTType = docXml.CreateAttribute("type");
+                                                attrTType.Value = "timeeditor";
+                                                newCell.Attributes.Append(attrTType);
+                                                hours = "0|" + hours + "|N|" + drTaskNotes[0]["ts_item_notes"].ToString();
+                                            }
+                                        }
+                                        //}
+                                        //else
+                                        //{
+                                        //    hours = "0";
+                                        //}
+                                        newCell.InnerText = hours;
+
+                                        ndTask.AppendChild(newCell);
+                                    }
+                                }
+
+                                newCell = docXml.CreateNode(XmlNodeType.Element, "cell", docXml.NamespaceURI);
+                                newCell.InnerText = total.ToString();
+                                ndTask.AppendChild(newCell);
+
+                                ndProject.AppendChild(ndTask);
+                            }
                             //}
                             //else
                             //{
@@ -810,9 +810,9 @@ namespace TimeSheets
                             //    newCell.InnerText = "0";
                             //    newNode.AppendChild(newCell);
                             //}
-                            
 
-                            if(!hshItemNodes.Contains(groupname))
+
+                            if (!hshItemNodes.Contains(groupname))
                                 hshItemNodes.Add(groupname, newNode);
 
                             if (!hshResNodes.Contains(uName))
@@ -828,55 +828,39 @@ namespace TimeSheets
         {
             try
             {
-                //string squery = view.Query;
-                //string newquery = "<Contains><FieldRef Name='TimesheetManager'/><Value Type='User'><UserID/></Value></Contains>";
-
-                //XmlDocument querydoc = new XmlDocument();
-                //querydoc.LoadXml("<Query>" + squery + "</Query>");
-
-                //XmlNode ndWhere = querydoc.FirstChild.SelectSingleNode("Where");
-                //if (ndWhere == null)
-                //{
-                //    squery = "<Where>" + newquery + "</Where>" + squery;
-                //}
-                //else
-                //{
-                //    ndWhere.InnerXml = "<And>" + newquery + ndWhere.InnerXml + "</And>";
-                //    squery = querydoc.FirstChild.InnerXml;
-                //}
-
-
-                //SPQuery query = new SPQuery();
-                //query.Query = squery;
-
-                foreach (SPListItem li in list.Items)
+                SPQuery query = new SPQuery();
+                query.Query = "<OrderBy><FieldRef Name = 'FirstName' Ascending = 'True'/><FieldRef Name = 'LastName' Ascending = 'True'/></OrderBy></Query>";
+                SPListItemCollection listItems = list.GetItems(query);
+                if (listItems != null && listItems.Count > 0)
                 {
-                    string group = null;
-                    if (arrGroupFields != null)
+                    foreach (SPListItem li in listItems)
                     {
-                        foreach (string groupby in arrGroupFields)
+                        string group = null;
+                        if (arrGroupFields != null)
                         {
-                            SPField field = list.Fields.GetFieldByInternalName(groupby);
-                            string newgroup = field.GetFieldValueAsText(li[field.Id].ToString());
-                            
-                            if (group == null)
-                                group = newgroup;
-                            else
-                                group += "\n" + newgroup;
-
-                            if (!arrGTemp.Contains(group))
+                            foreach (string groupby in arrGroupFields)
                             {
-                                arrGTemp.Add(group, "");
+                                SPField field = list.Fields.GetFieldByInternalName(groupby);
+                                string newgroup = field.GetFieldValueAsText(li[field.Id].ToString());
+
+                                if (group == null)
+                                    group = newgroup;
+                                else
+                                    group += "\n" + newgroup;
+
+                                if (!arrGTemp.Contains(group))
+                                {
+                                    arrGTemp.Add(group, "");
+                                }
                             }
                         }
-                    }
 
-                    arrItems.Add(li.ID.ToString(), group);
-                    queueAllItems.Enqueue(li);
+                        arrItems.Add(li.ID.ToString(), group);
+                        queueAllItems.Enqueue(li);
+                    }
                 }
             }
             catch { }
-
         }
 
         private SPField getRealField(SPField field)

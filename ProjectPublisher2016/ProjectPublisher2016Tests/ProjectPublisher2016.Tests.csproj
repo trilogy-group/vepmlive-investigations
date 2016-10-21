@@ -3,11 +3,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{B408B875-0102-4064-83F6-F85A4070A105}</ProjectGuid>
+    <ProjectGuid>{22A4F7F2-4178-4708-BEBD-48A6CED801B1}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>EPMLive.TestFakes</RootNamespace>
-    <AssemblyName>EPMLive.TestFakes</AssemblyName>
+    <RootNamespace>ProjectPublisher2016.Tests</RootNamespace>
+    <AssemblyName>ProjectPublisher2016.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -35,42 +35,15 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="EPM Live Core.Fakes">
-      <HintPath>FakesAssemblies\EPM Live Core.Fakes.dll</HintPath>
-    </Reference>
-    <Reference Include="EPMLiveWebParts.Fakes">
-      <HintPath>FakesAssemblies\EPMLiveWebParts.Fakes.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.QualityTools.Testing.Fakes, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
     </Reference>
-    <Reference Include="Microsoft.SharePoint, Version=16.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL" />
-    <Reference Include="Microsoft.SharePoint.16.0.0.0.Fakes">
-      <HintPath>FakesAssemblies\Microsoft.SharePoint.16.0.0.0.Fakes.dll</HintPath>
-    </Reference>
-    <Reference Include="mscorlib.4.0.0.0.Fakes">
-      <HintPath>FakesAssemblies\mscorlib.4.0.0.0.Fakes.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
-    <Reference Include="System.4.0.0.0.Fakes">
-      <HintPath>FakesAssemblies\System.4.0.0.0.Fakes.dll</HintPath>
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Windows.Forms.4.0.0.0.Fakes">
+      <HintPath>FakesAssemblies\System.Windows.Forms.4.0.0.0.Fakes.dll</HintPath>
     </Reference>
-    <Reference Include="System.Data" />
-    <Reference Include="System.Data.4.0.0.0.Fakes">
-      <HintPath>FakesAssemblies\System.Data.4.0.0.0.Fakes.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Web" />
-    <Reference Include="System.Web.4.0.0.0.Fakes">
-      <HintPath>FakesAssemblies\System.Web.4.0.0.0.Fakes.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Web.Extensions" />
-    <Reference Include="System.Web.Extensions.4.0.0.0.Fakes">
-      <HintPath>FakesAssemblies\System.Web.Extensions.4.0.0.0.Fakes.dll</HintPath>
-    </Reference>
-    <Reference Include="System.XML" />
-    <Reference Include="System.XML.4.0.0.0.Fakes">
-      <HintPath>FakesAssemblies\System.XML.4.0.0.0.Fakes.dll</HintPath>
-    </Reference>
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <Choose>
     <When Condition="('$(VisualStudioVersion)' == '10.0' or '$(VisualStudioVersion)' == '') and '$(TargetFrameworkVersion)' == 'v3.5'">
@@ -85,61 +58,17 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="FakeClass.cs" />
+    <Compile Include="FormProjInfoTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Fakes Include="Fakes\EPM Live Core.fakes">
-      <SubType>Designer</SubType>
-    </Fakes>
-  </ItemGroup>
-  <ItemGroup>
-    <Fakes Include="Fakes\Microsoft.SharePoint.fakes" />
-  </ItemGroup>
-  <ItemGroup>
-    <Fakes Include="Fakes\System.Web.fakes" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\EPMLiveCore\EPMLiveCore\EPMLiveCore.csproj">
-      <Project>{c773ae44-f066-446a-9cbd-d24afa794e34}</Project>
-      <Name>EPMLiveCore</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\EPMLiveWebParts\EPMLiveWebParts\EPMLiveWebParts.csproj">
-      <Project>{a7f83fd4-be8b-49ab-be24-39209e8fabc2}</Project>
-      <Name>EPMLiveWebParts</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\PortfolioEngineCore\PortfolioEngineCore\PortfolioEngineCore.csproj">
-      <Project>{bb86b09c-cb35-4888-8639-c047a40a9c0c}</Project>
-      <Name>PortfolioEngineCore</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\PortfolioEngineCore\WorkEnginePPM\WorkEnginePPM.csproj">
-      <Project>{51caf42a-31af-4b74-853f-24b672c185c2}</Project>
-      <Name>WorkEnginePPM</Name>
+    <ProjectReference Include="..\ProjectPublisher2016\ProjectPublisher2016.csproj">
+      <Project>{E265BBB7-2B0A-4E42-9981-FC577172398F}</Project>
+      <Name>ProjectPublisher2016</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Fakes Include="Fakes\System.Web.Extensions.fakes" />
-  </ItemGroup>
-  <ItemGroup>
-    <Fakes Include="Fakes\System.XML.fakes" />
-  </ItemGroup>
-  <ItemGroup>
-    <Fakes Include="Fakes\EPMLiveWebParts.fakes" />
-  </ItemGroup>
-  <ItemGroup>
-    <Fakes Include="Fakes\System.fakes" />
-  </ItemGroup>
-  <ItemGroup>
-    <Fakes Include="Fakes\mscorlib.fakes" />
-  </ItemGroup>
-  <ItemGroup>
-    <Fakes Include="Fakes\System.Data.fakes" />
-  </ItemGroup>
-  <ItemGroup>
-    <Fakes Include="Fakes\PortfolioEngineCore.fakes" />
-  </ItemGroup>
-  <ItemGroup>
-    <Fakes Include="Fakes\WorkEnginePPM.fakes" />
+    <Fakes Include="Fakes\System.Windows.Forms.fakes" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
