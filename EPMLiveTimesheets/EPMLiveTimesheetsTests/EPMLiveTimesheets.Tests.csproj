@@ -35,6 +35,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="EPM Live Core.Fakes">
+      <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\EPM Live Core.Fakes.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.QualityTools.Testing.Fakes, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
     </Reference>
@@ -55,6 +58,10 @@
     <Reference Include="System.4.0.0.0.Fakes">
       <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\System.4.0.0.0.Fakes.dll</HintPath>
     </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Data.4.0.0.0.Fakes">
+      <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\System.Data.4.0.0.0.Fakes.dll</HintPath>
+    </Reference>
     <Reference Include="System.Web" />
     <Reference Include="System.Web.4.0.0.0.Fakes">
       <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\System.Web.4.0.0.0.Fakes.dll</HintPath>
@@ -74,6 +81,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="API\TimesheetAPITests.cs" />
     <Compile Include="GetTsTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -81,6 +89,10 @@
     <ProjectReference Include="..\..\EPMLive.TestFakes\EPMLive.TestFakes.csproj">
       <Project>{b408b875-0102-4064-83f6-f85a4070a105}</Project>
       <Name>EPMLive.TestFakes</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\EPMLiveCore\EPMLiveCore\EPMLiveCore.csproj">
+      <Project>{c773ae44-f066-446a-9cbd-d24afa794e34}</Project>
+      <Name>EPMLiveCore</Name>
     </ProjectReference>
     <ProjectReference Include="..\EPMLiveTimesheets\EPMLiveTimesheets.csproj">
       <Project>{fd812bf8-05a3-4d77-b9bc-6ad4991b8049}</Project>

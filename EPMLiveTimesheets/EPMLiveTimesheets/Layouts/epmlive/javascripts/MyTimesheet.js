@@ -33,6 +33,7 @@ var TimesheetHoursEdited = false;
 var TimesheetItemEdited = false;
 var rendered = false;
 var bIsTimeSheetManager = false;
+var bIsProjectManager = false;
 var DataXML = null;
 function TSOnLoaded(grid) {
     var newgridid = grid.id.substr(2);
@@ -2440,6 +2441,11 @@ function ShowApprovalNotification() {
 
         if (oResp.ApprovalNotification.IsTimeSheetManager == "True") {
             bIsTimeSheetManager = true;
+            RefreshCommandUI();
+        }
+
+        if (oResp.ApprovalNotification.IsProjectManager == "True") {
+            bIsProjectManager = true;
             RefreshCommandUI();
         }
     });

@@ -20,8 +20,8 @@ $projectsToBePackaged = @("EPMLiveCore", "EPMLiveDashboards","EPMLiveIntegration
                             "EPMLivePS","EPMLiveReporting","EPMLiveSynch",
                             "EPMLiveTimeSheets","EPMLiveWebParts","EPMLiveWorkPlanner","WorkEnginePPM")
  
-$projectsToBeBuildAsEXE = @("EPMLiveTimerService", "EPK_QueueMgr")
-$projectsToBeBuildAsDLL = @("PortfolioEngineCore","UplandIntegrations","EPMLiveIntegration", "UserNameChecker", "SPEmulators", ".Tests")
+$projectsToBeBuildAsEXE = @("EPMLiveTimerService", "EPK_QueueMgr", "ProjectPublisher2016")
+$projectsToBeBuildAsDLL = @("PortfolioEngineCore","UplandIntegrations","EPMLiveIntegration", "UserNameChecker", ".Tests")
 
 $projectTypeIdTobeReplaced = "C1CDDADD-2546-481F-9697-4EA41081F2FC"
 $projectTypeIdTobeReplacedWith = "BB1F664B-9266-4fd6-B973-E1E44974B511"
