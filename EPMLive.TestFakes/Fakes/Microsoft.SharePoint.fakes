@@ -64,5 +64,10 @@
     <Add FullName="Microsoft.SharePoint.SPFieldCalculated!"/>
     <Add FullName="Microsoft.SharePoint.SPFieldUserValueCollection!"/>
     <Add FullName="Microsoft.SharePoint.SPRegionalSettings!"/>
+    <Add FullName="Microsoft.SharePoint.SPRoleDefinitionCollection!"/>
+    <Add FullName="Microsoft.SharePoint.SPRoleDefinition!"/>
+    <Add FullName="Microsoft.SharePoint.SPRoleDefinitionBindingCollection!"/>
+    
+
   </ShimGeneration>
 </Fakes>
