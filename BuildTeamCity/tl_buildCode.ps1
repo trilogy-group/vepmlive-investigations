@@ -5,7 +5,7 @@
 
 param (
     # MSBuild - which configuration to build
-    [string]$ConfigurationToBuild = "Release",
+    [string]$ConfigurationToBuild = "Debug",
     # MSBuild - for which platform to make builds
     [string]$PlatformToBuild = "Any CPU",
     # Tools Version to pass to MSBuild
@@ -20,8 +20,8 @@ $projectsToBePackaged = @("EPMLiveCore", "EPMLiveDashboards","EPMLiveIntegration
                             "EPMLivePS","EPMLiveReporting","EPMLiveSynch",
                             "EPMLiveTimeSheets","EPMLiveWebParts","EPMLiveWorkPlanner","WorkEnginePPM")
  
-$projectsToBeBuildAsEXE = @("EPMLiveTimerService", "EPK_QueueMgr", "ProjectPublisher2016")
-$projectsToBeBuildAsDLL = @("PortfolioEngineCore","UplandIntegrations","EPMLiveIntegration", "UserNameChecker", ".Tests")
+$projectsToBeBuildAsEXE = @("EPMLiveTimerService", "EPK_QueueMgr")
+$projectsToBeBuildAsDLL = @("PortfolioEngineCore","UplandIntegrations","EPMLiveIntegration", "UserNameChecker")
 
 $projectTypeIdTobeReplaced = "C1CDDADD-2546-481F-9697-4EA41081F2FC"
 $projectTypeIdTobeReplacedWith = "BB1F664B-9266-4fd6-B973-E1E44974B511"
@@ -89,6 +89,7 @@ if (!(Test-Path -Path $LogsDirectory )){
 }
 
 $projAbsPath = Join-Path $SourcesDirectory "EPMLive.sln"
+$projPublisherAbsPath = Join-Path $SourcesDirectory "\ProjectPublisher2016\ProjectPublisher2016.sln"
 $projDir = Split-Path $projAbsPath -parent
 $projName = [System.IO.Path]::GetFileNameWithoutExtension($projAbsPath) 
 
@@ -122,6 +123,22 @@ If ($CleanBuild -eq $true) {
 	Log-SubSection "Cleaning '$projName'..."
 	    
 	& $MSBuildExec "$projAbsPath"  `
+	    /t:Clean `
+	    /p:SkipInvalidConfigurations=true `
+	    /p:Configuration="$ConfigurationToBuild" `
+	    /p:Platform="$PlatformToBuild" `
+        /m:4 `
+        /p:WarningLevel=0 `
+        $ToolsVersion `
+	    $DfMsBuildArgs `
+	    $MsBuildArguments
+	if ($LastExitCode -ne 0) {
+		throw "Project clean-up failed with exit code: $LastExitCode."
+	}
+
+    Log-SubSection "Cleaning 'Project Publisher"
+	    
+	& $MSBuildExec "$projPublisherAbsPath"  `
 	    /t:Clean `
 	    /p:SkipInvalidConfigurations=true `
 	    /p:Configuration="$ConfigurationToBuild" `
@@ -178,6 +195,29 @@ Log-SubSection "Building '$projName'..."
 if ($LastExitCode -ne 0) {
     throw "Project build failed with exit code: $LastExitCode."
 }
+
+Log-SubSection "Building 'Project Publisher"
+    
+# Run MSBuild
+& $MSBuildExec $projPublisherAbsPath `
+    /p:PreBuildEvent= `
+    /p:PostBuildEvent= `
+    /p:Configuration="$ConfigurationToBuild" `
+    /p:Platform="$PlatformToBuild" `
+	/p:langversion="$langversion" `
+    /p:WarningLevel=0 `
+    /p:GenerateSerializationAssemblies="Off" `
+    /p:ReferencePath="C:\Program Files (x86)\Microsoft SDKs\Project 2013\REDIST" `
+    /fl /flp:"$loggerArgs" `
+    /m:4 `
+    $ToolsVersion `
+	$DfMsBuildArgs `
+	$MsBuildArguments  
+if ($LastExitCode -ne 0) {
+    throw "Project build failed with exit code: $LastExitCode."
+}
+
+exit
 
 Log-Section "Creating Output Folders . . ."
 
