@@ -5,7 +5,7 @@
 
 param (
     # MSBuild - which configuration to build
-    [string]$ConfigurationToBuild = "Release",
+    [string]$ConfigurationToBuild = "Debug",
     # MSBuild - for which platform to make builds
     [string]$PlatformToBuild = "Any CPU",
     # Tools Version to pass to MSBuild
@@ -20,8 +20,8 @@ $projectsToBePackaged = @("EPMLiveCore", "EPMLiveDashboards","EPMLiveIntegration
                             "EPMLivePS","EPMLiveReporting","EPMLiveSynch",
                             "EPMLiveTimeSheets","EPMLiveWebParts","EPMLiveWorkPlanner","WorkEnginePPM")
  
-$projectsToBeBuildAsEXE = @("EPMLiveTimerService", "EPK_QueueMgr", "ProjectPublisher2016")
-$projectsToBeBuildAsDLL = @("PortfolioEngineCore","UplandIntegrations","EPMLiveIntegration", "UserNameChecker", ".Tests")
+$projectsToBeBuildAsEXE = @("EPMLiveTimerService", "EPK_QueueMgr")
+$projectsToBeBuildAsDLL = @("PortfolioEngineCore","UplandIntegrations","EPMLiveIntegration", "UserNameChecker")
 
 $projectTypeIdTobeReplaced = "C1CDDADD-2546-481F-9697-4EA41081F2FC"
 $projectTypeIdTobeReplacedWith = "BB1F664B-9266-4fd6-B973-E1E44974B511"
@@ -89,6 +89,7 @@ if (!(Test-Path -Path $LogsDirectory )){
 }
 
 $projAbsPath = Join-Path $SourcesDirectory "EPMLive.sln"
+$projPublisherAbsPath = Join-Path $SourcesDirectory "\ProjectPublisher2016\ProjectPublisher2016.sln"
 $projDir = Split-Path $projAbsPath -parent
 $projName = [System.IO.Path]::GetFileNameWithoutExtension($projAbsPath) 
 
@@ -122,6 +123,22 @@ If ($CleanBuild -eq $true) {
 	Log-SubSection "Cleaning '$projName'..."
 	    
 	& $MSBuildExec "$projAbsPath"  `
+	    /t:Clean `
+	    /p:SkipInvalidConfigurations=true `
+	    /p:Configuration="$ConfigurationToBuild" `
+	    /p:Platform="$PlatformToBuild" `
+        /m:4 `
+        /p:WarningLevel=0 `
+        $ToolsVersion `
+	    $DfMsBuildArgs `
+	    $MsBuildArguments
+	if ($LastExitCode -ne 0) {
+		throw "Project clean-up failed with exit code: $LastExitCode."
+	}
+
+    Log-SubSection "Cleaning 'Project Publisher"
+	    
+	& $MSBuildExec "$projPublisherAbsPath"  `
 	    /t:Clean `
 	    /p:SkipInvalidConfigurations=true `
 	    /p:Configuration="$ConfigurationToBuild" `
@@ -179,107 +196,26 @@ if ($LastExitCode -ne 0) {
     throw "Project build failed with exit code: $LastExitCode."
 }
 
-Log-Section "Creating Output Folders . . ."
-
-if (!(Test-Path -Path $LibrariesDirectory)){
-    New-Item $LibrariesDirectory -ItemType Directory
-}
-if (!(Test-Path -Path $IntermediatesDirectory)){
-    New-Item $IntermediatesDirectory -ItemType Directory
-}
-if (!(Test-Path -Path $BinariesDirectory)){
-    New-Item $BinariesDirectory -ItemType Directory
-}
-
-#Log-Section "Removing Backup directory that is checked into SCM"
-#Remove-Item C:\opt\dfinstaller\Source\Backup -recurse
-
-Log-Section "Packaging Projects . . ."
-foreach($projectToBePackaged in $projectsToBePackaged){
+Log-SubSection "Building 'Project Publisher"
     
-    $projectPath = Get-ChildItem -Path ($SourcesDirectory + "\*") -Include ($projectToBePackaged + ".csproj") -Recurse
-
-    #Log-SubSection "Patching Project Type GUID '$projectToBePackaged'...."
-    
-    #(Get-Content $projectPath).Replace($projectTypeIdTobeReplaced,$projectTypeIdTobeReplacedWith) | Set-Content $projectPath
-
-    Log-SubSection "Packaging '$projectToBePackaged'..."
-	Log-SubSection "projectPath: '$projectPath'...."
-    
-   & $MSBuildExec $projectPath `
-   /t:Package `
-   /p:OutputPath="$BinariesDirectory" `
-   /p:PreBuildEvent= `
-   /p:PostBuildEvent= `
-   /p:WarningLevel=0 `
-   /p:Configuration="$ConfigurationToBuild" `
-   /p:Platform="$PlatformToBuild" `
-    /p:langversion="$langversion" `
-   /p:GenerateSerializationAssemblies="Off" `
-   /p:ReferencePath="C:\Program Files (x86)\Microsoft SDKs\Project 2013\REDIST" `
+# Run MSBuild
+& $MSBuildExec $projPublisherAbsPath `
+    /p:PreBuildEvent= `
+    /p:PostBuildEvent= `
+    /p:Configuration="$ConfigurationToBuild" `
+    /p:Platform="$PlatformToBuild" `
+	/p:langversion="$langversion" `
+    /p:WarningLevel=0 `
+    /p:GenerateSerializationAssemblies="Off" `
+    /p:ReferencePath="C:\Program Files (x86)\Microsoft SDKs\Project 2013\REDIST" `
     /fl /flp:"$loggerArgs" `
     /m:4 `
     $ToolsVersion `
 	$DfMsBuildArgs `
- 	$MsBuildArguments  
-    if ($LastExitCode -ne 0) {
-        throw "Project build failed with exit code: $LastExitCode."
-    }
+	$MsBuildArguments  
+if ($LastExitCode -ne 0) {
+    throw "Project build failed with exit code: $LastExitCode."
 }
 
-Log-Section "Building Windows Services Projects . . ."
-foreach($projectToBeBuildAsEXE in $projectsToBeBuildAsEXE){
-    
-    $projectPath = Get-ChildItem -Path ($SourcesDirectory + "\*") -Include ($projectToBeBuildAsEXE + ".csproj") -Recurse
 
-    Log-SubSection "Building '$projectToBeBuildAsEXE'..."
-	Log-SubSection "projectPath: '$projectPath'...."
-    
-   & $MSBuildExec $projectPath `
-   /t:build `
-   /p:OutputPath="$BinariesDirectory" `
-   /p:PreBuildEvent= `
-   /p:PostBuildEvent= `
-   /p:Configuration="$ConfigurationToBuild" `
-   /p:Platform="x64" `
-    /p:langversion="$langversion" `
-   /p:GenerateSerializationAssemblies="Off" `
-   /p:ReferencePath="C:\Program Files (x86)\Microsoft SDKs\Project 2013\REDIST" `
-    /fl /flp:"$loggerArgs" `
-    /m:4 `
-    $ToolsVersion `
-	$DfMsBuildArgs `
- 	$MsBuildArguments  
-    if ($LastExitCode -ne 0) {
-        throw "Project build failed with exit code: $LastExitCode."
-    }
-}
-
-Log-Section "Building DLL Services Projects . . ."
-foreach($projectToBeBuildAsDLL in $projectsToBeBuildAsDLL){
-    
-    $projectPath = Get-ChildItem -Path ($SourcesDirectory + "\*") -Include ($projectToBeBuildAsDLL + ".csproj") -Recurse
-
-    Log-SubSection "Building '$projectToBeBuildAsDLL'..."
-	Log-SubSection "projectPath: '$projectPath'...."
-    
-   & $MSBuildExec $projectPath `
-   /t:build `
-   /p:OutputPath="$BinariesDirectory" `
-   /p:PreBuildEvent= `
-   /p:PostBuildEvent= `
-   /p:Configuration="$ConfigurationToBuild" `
-   /p:Platform="$PlatformToBuild" `
-   /p:langversion="$langversion" `
-   /p:GenerateSerializationAssemblies="Off" `
-   /p:ReferencePath="C:\Program Files (x86)\Microsoft SDKs\Project 2013\REDIST" `
-    /fl /flp:"$loggerArgs" `
-    /m:4 `
-    $ToolsVersion `
-	$DfMsBuildArgs `
- 	$MsBuildArguments  
-    if ($LastExitCode -ne 0) {
-        throw "Project build failed with exit code: $LastExitCode."
-    }
-}
 
