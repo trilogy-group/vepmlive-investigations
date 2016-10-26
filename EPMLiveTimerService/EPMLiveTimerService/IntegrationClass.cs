@@ -127,40 +127,52 @@ namespace TimerService
                         {
                             using (SqlConnection cn = new SqlConnection(sConn))
                             {
-                                cn.Open();
-                                using (SqlCommand cmd = new SqlCommand("spINTGetQueue", cn))
+                                try
                                 {
-                                    cmd.CommandType = CommandType.StoredProcedure;
-                                    cmd.Parameters.AddWithValue("@servername", System.Environment.MachineName);
-                                    DataSet ds = new DataSet();
-                                    using (SqlDataAdapter da = new SqlDataAdapter(cmd))
+                                    cn.Open();
+                                    using (SqlCommand cmd = new SqlCommand("spINTGetQueue", cn))
                                     {
-                                        da.Fill(ds);
-
-                                        foreach (DataRow dr in ds.Tables[0].Rows)
+                                        cmd.CommandType = CommandType.StoredProcedure;
+                                        cmd.Parameters.AddWithValue("@servername", System.Environment.MachineName);
+                                        DataSet ds = new DataSet();
+                                        using (SqlDataAdapter da = new SqlDataAdapter(cmd))
                                         {
-                                            RunnerData rd = new RunnerData();
-                                            rd.cn = sConn;
-                                            rd.dr = dr;
-                                            if (startProcess(rd))
+                                            da.Fill(ds);
+
+                                            foreach (DataRow dr in ds.Tables[0].Rows)
                                             {
-                                                using (SqlCommand cmd1 = new SqlCommand("UPDATE INT_EVENTS set status=1 where INT_EVENT_ID=@id", cn))
+                                                RunnerData rd = new RunnerData();
+                                                rd.cn = sConn;
+                                                rd.dr = dr;
+                                                if (startProcess(rd))
                                                 {
-                                                    cmd1.Parameters.Clear();
-                                                    cmd1.Parameters.AddWithValue("@id", dr["INT_EVENT_ID"].ToString());
-                                                    cmd1.ExecuteNonQuery();
+                                                    using (SqlCommand cmd1 = new SqlCommand("UPDATE INT_EVENTS set status=1 where INT_EVENT_ID=@id", cn))
+                                                    {
+                                                        cmd1.Parameters.Clear();
+                                                        cmd1.Parameters.AddWithValue("@id", dr["INT_EVENT_ID"].ToString());
+                                                        cmd1.ExecuteNonQuery();
+                                                    }
                                                 }
                                             }
-                                        }
 
 
-                                        using (SqlCommand cmd2 = new SqlCommand("delete from INT_EVENTS where DateAdd(day, 1, EVENT_TIME) < GETDATE()", cn))
-                                        {
-                                            cmd.ExecuteNonQuery();
+                                            using (SqlCommand cmd2 = new SqlCommand("delete from INT_EVENTS where DateAdd(day, 1, EVENT_TIME) < GETDATE()", cn))
+                                            {
+                                                cmd.ExecuteNonQuery();
+                                            }
                                         }
                                     }
                                 }
-                                cn.Close();
+                                finally
+                                {
+                                    if (cn != null)
+                                    {
+                                        cn.Close();
+                                        cn.Dispose();
+                                    }
+                                }
+
+
                             }
 
                         }
@@ -212,14 +224,26 @@ namespace TimerService
 
                 using (SqlConnection cn = new SqlConnection(rd.cn))
                 {
-                    cn.Open();
-                    using (SqlCommand cmd = new SqlCommand("DELETE FROM INT_EVENTS WHERE INT_EVENT_ID=@id", cn))
+                    try
                     {
-                        cmd.Parameters.AddWithValue("@id", dr["INT_EVENT_ID"].ToString());
-                        cmd.ExecuteNonQuery();
+                        cn.Open();
+                        using (SqlCommand cmd = new SqlCommand("DELETE FROM INT_EVENTS WHERE INT_EVENT_ID=@id", cn))
+                        {
+                            cmd.Parameters.AddWithValue("@id", dr["INT_EVENT_ID"].ToString());
+                            cmd.ExecuteNonQuery();
+                        }
+                        //TODO: Remove line comment above
                     }
-                    //TODO: Remove line comment above
-                    cn.Close();
+                    finally
+                    {
+                        if (cn != null)
+                        {
+                            cn.Close();
+                            cn.Dispose();
+                        }
+                    }
+                   
+                   
                 }
             }
             catch (Exception ex)
@@ -228,13 +252,23 @@ namespace TimerService
                 {
                     using (SqlConnection cn = new SqlConnection(rd.cn))
                     {
-                        cn.Open();
-                        using (SqlCommand cmd = new SqlCommand("DELETE FROM INT_EVENTS WHERE INT_EVENT_ID=@id", cn))
+                        try
                         {
-                            cmd.Parameters.AddWithValue("@id", dr["INT_EVENT_ID"].ToString());
-                            cmd.ExecuteNonQuery();
+                            cn.Open();
+                            using (SqlCommand cmd = new SqlCommand("DELETE FROM INT_EVENTS WHERE INT_EVENT_ID=@id", cn))
+                            {
+                                cmd.Parameters.AddWithValue("@id", dr["INT_EVENT_ID"].ToString());
+                                cmd.ExecuteNonQuery();
+                            }
                         }
-                        cn.Close();
+                        catch
+                        {
+                            if (cn != null)
+                            {
+                                cn.Close();
+                                cn.Dispose();
+                            }
+                        }
                     }
                 }
                 else

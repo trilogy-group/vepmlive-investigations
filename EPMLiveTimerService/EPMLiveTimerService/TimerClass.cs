@@ -121,18 +121,30 @@ namespace TimerService
                 {
                     using (var cn = new SqlConnection(sConn))
                     {
-                        cn.Open();
-                        using (var cmd = new SqlCommand("update queue set status = 0, queueserver=NULL where status = 1 and DATEDIFF(HH,dtstarted,getdate()) > 24", cn))
+                        try
                         {
-                            cmd.ExecuteNonQuery();
+                            cn.Open();
+                            using (var cmd = new SqlCommand("update queue set status = 0, queueserver=NULL where status = 1 and DATEDIFF(HH,dtstarted,getdate()) > 24", cn))
+                            {
+                                cmd.ExecuteNonQuery();
+                            }
+                            using (var cmd1 = new SqlCommand("update queue set status = 0, queueserver=NULL where status = 1 and queueserver=@servername", cn))
+                            {
+                                cmd1.Parameters.Clear();
+                                cmd1.Parameters.AddWithValue("@servername", System.Environment.MachineName);
+                                cmd1.ExecuteNonQuery();
+                            }
                         }
-                        using (var cmd1 = new SqlCommand("update queue set status = 0, queueserver=NULL where status = 1 and queueserver=@servername", cn))
+                        finally
                         {
-                            cmd1.Parameters.Clear();
-                            cmd1.Parameters.AddWithValue("@servername", System.Environment.MachineName);
-                            cmd1.ExecuteNonQuery();
+                            if (cn != null)
+                            {
+                                cn.Close();
+                                cn.Dispose();
+                            }
                         }
-                        cn.Close();
+
+
                     }
                 }
             }
@@ -170,39 +182,51 @@ namespace TimerService
                         {
                             using (SqlConnection cn = new SqlConnection(sConn))
                             {
-                                cn.Open();
-                                //using (SqlCommand cmd = new SqlCommand("SELECT TOP " + maxThreads + " queueuid,timerjobuid,siteguid,webguid,listguid,itemid,jobtype,jobdata,userid,netassembly,netclass,title,[key] from vwQueueTimer where status=0 and priority > 10 order by priority,dtcreated asc", cn))
-                                using (SqlCommand cmd = new SqlCommand("spTimerGetQueue", cn))
+                                try
                                 {
-                                    cmd.CommandType = CommandType.StoredProcedure;
-                                    cmd.Parameters.AddWithValue("@servername", System.Environment.MachineName);
-                                    cmd.Parameters.AddWithValue("@maxthreads", maxThreads);
-                                    cmd.Parameters.AddWithValue("@minPriority", 10);
-                                    cmd.Parameters.AddWithValue("@maxPriority", 99);
-
-                                    DataSet ds = new DataSet();
-                                    using (SqlDataAdapter da = new SqlDataAdapter(cmd))
+                                    cn.Open();
+                                    //using (SqlCommand cmd = new SqlCommand("SELECT TOP " + maxThreads + " queueuid,timerjobuid,siteguid,webguid,listguid,itemid,jobtype,jobdata,userid,netassembly,netclass,title,[key] from vwQueueTimer where status=0 and priority > 10 order by priority,dtcreated asc", cn))
+                                    using (SqlCommand cmd = new SqlCommand("spTimerGetQueue", cn))
                                     {
-                                        da.Fill(ds);
+                                        cmd.CommandType = CommandType.StoredProcedure;
+                                        cmd.Parameters.AddWithValue("@servername", System.Environment.MachineName);
+                                        cmd.Parameters.AddWithValue("@maxthreads", maxThreads);
+                                        cmd.Parameters.AddWithValue("@minPriority", 10);
+                                        cmd.Parameters.AddWithValue("@maxPriority", 99);
 
-                                        foreach (DataRow dr in ds.Tables[0].Rows)
+                                        DataSet ds = new DataSet();
+                                        using (SqlDataAdapter da = new SqlDataAdapter(cmd))
                                         {
-                                            RunnerData rd = new RunnerData();
-                                            rd.cn = sConn;
-                                            rd.dr = dr;
-                                            if (startProcess(rd))
+                                            da.Fill(ds);
+
+                                            foreach (DataRow dr in ds.Tables[0].Rows)
                                             {
-                                                using (SqlCommand cmd1 = new SqlCommand("UPDATE queue set status=1, dtstarted = GETDATE() where queueuid=@id", cn))
+                                                RunnerData rd = new RunnerData();
+                                                rd.cn = sConn;
+                                                rd.dr = dr;
+                                                if (startProcess(rd))
                                                 {
-                                                    cmd1.Parameters.Clear();
-                                                    cmd1.Parameters.AddWithValue("@id", dr["queueuid"].ToString());
-                                                    cmd1.ExecuteNonQuery();
+                                                    using (SqlCommand cmd1 = new SqlCommand("UPDATE queue set status=1, dtstarted = GETDATE() where queueuid=@id", cn))
+                                                    {
+                                                        cmd1.Parameters.Clear();
+                                                        cmd1.Parameters.AddWithValue("@id", dr["queueuid"].ToString());
+                                                        cmd1.ExecuteNonQuery();
+                                                    }
                                                 }
                                             }
                                         }
                                     }
+
                                 }
-                                cn.Close();
+                                finally
+                                {
+                                    if (cn != null)
+                                    {
+                                        cn.Close();
+                                        cn.Dispose();
+                                    }
+                                }
+
                             }
 
                         }
@@ -257,13 +281,25 @@ namespace TimerService
                 {
                     using (SqlConnection cn = new SqlConnection(rd.cn))
                     {
-                        cn.Open();
-                        using (SqlCommand cmd = new SqlCommand("DELETE FROM TIMERJOBS WHERE siteguid=@siteguid", cn))
+                        try
                         {
-                            cmd.Parameters.AddWithValue("@siteguid", dr["siteguid"].ToString());
-                            cmd.ExecuteNonQuery();
+                            cn.Open();
+                            using (SqlCommand cmd = new SqlCommand("DELETE FROM TIMERJOBS WHERE siteguid=@siteguid", cn))
+                            {
+                                cmd.Parameters.AddWithValue("@siteguid", dr["siteguid"].ToString());
+                                cmd.ExecuteNonQuery();
+                            }
                         }
-                        cn.Close();
+                       finally
+                        {
+                            if (cn != null)
+                            {
+                                cn.Close();
+                                cn.Dispose();
+                            }
+                        }
+                      
+                       
                     }
                 }
                 else
