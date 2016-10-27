@@ -60,10 +60,16 @@ namespace EPMLiveReportsAdmin.Jobs
 
         private string getReportingConnection(SPWeb web)
         {
+            if (string.IsNullOrEmpty(strConn))
+            {
+                strConn = strConn = EPMLiveCore.CoreFunctions.getConnectionString(web.Site.WebApplication.Id);
+            }
+            SqlConnection cn = new SqlConnection();
             cn.Open();
             string sCn = "";
             try
             {
+                cn.Open();
                 using (var cmd =
                     new SqlCommand(
                         "SELECT Username, Password, DatabaseServer, DatabaseName from RPTDATABASES where SiteId=@SiteId",
@@ -88,7 +94,10 @@ namespace EPMLiveReportsAdmin.Jobs
                 bErrors = true;
                 sbErrors.Append("<font color=\"red\">Error: " + ex.Message + "</font><br>");
             }
-            cn.Close();
+            finally
+            {
+                cn.Close();
+            }
             return sCn;
         }
 

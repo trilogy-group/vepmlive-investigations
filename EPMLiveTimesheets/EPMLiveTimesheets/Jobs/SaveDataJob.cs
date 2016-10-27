@@ -21,6 +21,7 @@ namespace TimeSheets
         {
             DataTable dtItems = null;
             int userid = 0;
+            SqlConnection cn = null;
             try
             {
                 try
@@ -34,8 +35,8 @@ namespace TimeSheets
 
 
 
-                SqlConnection cn = null;
-                SPSecurity.RunWithElevatedPrivileges(delegate()
+               
+                SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
                     cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(site.WebApplication.Id));
                     cn.Open();
@@ -144,7 +145,7 @@ namespace TimeSheets
                     bErrors = true;
                     sErrors = "Timesheet does not exist";
                 }
-                cn.Close();
+              
 
             }
             catch (Exception ex)
@@ -159,13 +160,20 @@ namespace TimeSheets
                 if (site != null)
                     site.Dispose();
                 data = null;
+                if (cn != null)
+                {
+                    cn.Close();
+                }
             }
         }
 
         private void ProcessItemRow(XmlNode ndRow, ref DataTable dtItems, SqlConnection cn, SPSite site, TimesheetSettings settings, bool liveHours, bool bSkipSP)
         {
             string id = iGetAttribute(ndRow, "UID");
-
+            if (string.IsNullOrEmpty(strConn))
+            {
+                strConn = strConn = EPMLiveCore.CoreFunctions.getConnectionString(site.WebApplication.Id);
+            }
             if (id != "")
             {
                 DataRow[] drItem = dtItems.Select("TS_ITEM_UID='" + id + "'");
@@ -429,12 +437,12 @@ namespace TimeSheets
         {
 
             double hours = 0;
+            SqlConnection cn = new SqlConnection(strConn);
             try
             {
-
+                cn.Open();
                 if (li != null)
                 {
-                    cn.Open();
                     using (SqlCommand cmdHours = new SqlCommand("select cast(sum(hours) as float) from vwTSHoursByTask where list_uid=@listuid and item_id = @itemid", cn))
                     {
                         cmdHours.Parameters.AddWithValue("@listuid", listguid);
@@ -448,10 +456,11 @@ namespace TimeSheets
                         }
                         li["TimesheetHours"] = hours;
                     }
-                    cn.Close();
+
                 }
             }
             catch { }
+            finally { if (cn != null) cn.Close(); }
         }
 
         public static string processProjectWork(SqlConnection cn, string tsuid, SPSite site, bool bApprovalScreen, bool bApproved)

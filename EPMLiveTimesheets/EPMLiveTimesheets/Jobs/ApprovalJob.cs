@@ -13,11 +13,15 @@ namespace TimeSheets
 
         public void execute(SPSite site, string data)
         {
+            if (string.IsNullOrEmpty(strConn))
+            {
+                strConn = strConn = EPMLiveCore.CoreFunctions.getConnectionString(site.WebApplication.Id);
+            }
+            SqlConnection cn = new SqlConnection(strConn);
             try
             {
                 SPSecurity.RunWithElevatedPrivileges(delegate()
                 {
-                    if (cn.State == System.Data.ConnectionState.Closed)
                         cn.Open();
                 });
 
@@ -50,6 +54,8 @@ namespace TimeSheets
                 if (site != null)
                     site.Dispose();
                 data = null;
+                if (cn != null)
+                    cn.Close();
             }
         }
 

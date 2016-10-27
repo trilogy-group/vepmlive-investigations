@@ -43,11 +43,14 @@ namespace EPMLiveReportsAdmin.Jobs
         private string getReportingConnection(SPWeb web)
         {
             string sCn = "";
+            if (string.IsNullOrEmpty(strConn))
+            {
+                strConn = strConn = EPMLiveCore.CoreFunctions.getConnectionString(web.Site.WebApplication.Id);
+            }
+            SqlConnection cn = new SqlConnection(strConn);
             try
             {
                 cn.Open();
-               
-
                 using (var cmd =
                     new SqlCommand(
                         "SELECT Username, Password, DatabaseServer, DatabaseName from RPTDATABASES where SiteId=@SiteId",
@@ -79,6 +82,10 @@ namespace EPMLiveReportsAdmin.Jobs
             Hashtable hshMessages = null;
             EPMData epmdata = null;
             DataTable dtListResults = null;
+            if (string.IsNullOrEmpty(strConn))
+            {
+                strConn = strConn = EPMLiveCore.CoreFunctions.getConnectionString(web.Site.WebApplication.Id);
+            }
             try
             {
                 float webCount = 0;

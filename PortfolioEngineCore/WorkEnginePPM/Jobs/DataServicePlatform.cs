@@ -23,6 +23,10 @@ namespace WorkEnginePPM.Jobs
 
         public void execute(SPSite spSite, SPWeb spWeb, string data)
         {
+            if (string.IsNullOrEmpty(strConn))
+            {
+                strConn = strConn = EPMLiveCore.CoreFunctions.getConnectionString(spSite.WebApplication.Id);
+            }
             SPWeb rootWeb = null;
             try
             {
@@ -91,24 +95,27 @@ namespace WorkEnginePPM.Jobs
 
         private void UpdateProgress(object userState)
         {
+            SqlConnection cn = new SqlConnection(strConn);
             try
             {
+                SPSecurity.RunWithElevatedPrivileges(() => cn.Open());
                 DSMResult dSMResult = (DSMResult)userState;
                 totalCount = dSMResult.TotalRecords == 0 ? 1 : dSMResult.TotalRecords;
                 updateProgress(dSMResult.ProcessedRecords);
-                SPSecurity.RunWithElevatedPrivileges(() => cn.Open());
                 using (var cmd = new SqlCommand(UPDATE_LOG_SQL, cn))
                 {
                     cmd.Parameters.AddWithValue("@ResultText", sErrors);
                     cmd.Parameters.AddWithValue("@TimerJobUId", JobUid);
                     cmd.ExecuteNonQuery();
                 }
-                cn.Close();
-
             }
             catch (Exception ex)
             {
                 throw ex;
+            }
+            finally {
+                
+                cn.Close();
             }
         }
 

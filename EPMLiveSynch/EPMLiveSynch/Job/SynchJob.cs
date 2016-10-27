@@ -50,12 +50,6 @@ namespace EPMLiveSynch
             set { oFromWeb = value; }
         }
 
-        public SqlConnection conn
-        {
-            get { return cn; }
-            set { cn = value; }
-        }
-
         public void execute(SPSite site, SPWeb web, string sListName)
         {
             percentInterval = 1;

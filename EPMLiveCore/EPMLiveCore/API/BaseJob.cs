@@ -12,7 +12,7 @@ namespace EPMLiveCore.API
         public string sErrors = "";
         public bool bErrors = false;
 
-        protected SqlConnection cn;
+
 
         public int queuetype;
 
@@ -28,19 +28,20 @@ namespace EPMLiveCore.API
         public Guid ListUid;
         public int ItemID;
         public string key;
-        public static string strConn = string.Empty;
+        public string strConn = string.Empty;
         public XmlDocument DocData;
 
 
 
         public void finishJob()
         {
+            SqlConnection cn = new SqlConnection(strConn);
             try
             {
                 SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
-                    if (cn.State == System.Data.ConnectionState.Closed)
-                        cn.Open();
+
+                    cn.Open();
                 });
 
                 //SqlCommand cmd = new SqlCommand("select scheduletype from timerjobs where timerjobuid=@timerjobuid", cn);
@@ -97,10 +98,6 @@ namespace EPMLiveCore.API
                     cn.Close();
                 }
             }
-
-
-
-
         }
 
         protected void updateProgress(float newCount)
@@ -108,6 +105,7 @@ namespace EPMLiveCore.API
             float percent = (newCount + 1) / totalCount * 100;
             if (percent + percentInterval >= lastPercent)
             {
+                SqlConnection cn = new SqlConnection(strConn);
                 try
                 {
                     SPSecurity.RunWithElevatedPrivileges(delegate ()
@@ -136,10 +134,10 @@ namespace EPMLiveCore.API
 
         public bool initJob(SPSite site)
         {
+            strConn = EPMLiveCore.CoreFunctions.getConnectionString(site.WebApplication.Id);
+            SqlConnection cn = new SqlConnection(strConn);
             try
             {
-                strConn = EPMLiveCore.CoreFunctions.getConnectionString(site.WebApplication.Id);
-                cn = new SqlConnection(strConn);
 
                 SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {

@@ -17,6 +17,10 @@ namespace WorkEnginePPM.Jobs
         StringBuilder sbErrors = null;
         public void execute(SPSite site, SPWeb web, string data)
         {
+            if (string.IsNullOrEmpty(strConn))
+            {
+                strConn = strConn = EPMLiveCore.CoreFunctions.getConnectionString(site.WebApplication.Id);
+            }
             sbErrors = new StringBuilder();
             SPWeb rootWeb = null;
             PortfolioEngineCore.WEIntegration.WEIntegration we = null;
@@ -95,10 +99,11 @@ namespace WorkEnginePPM.Jobs
 
 
                 sbErrors.Append("Processing Timesheets: <br>");
+
                 try
                 {
-                    if (cn != null)
-                        processTimesheets(site, web, cn, we);
+                    SqlConnection cn = new SqlConnection(strConn);
+                    processTimesheets(site, web, cn, we);
                 }
                 catch (Exception ex)
                 {
@@ -170,13 +175,13 @@ namespace WorkEnginePPM.Jobs
             DataSet ds = new DataSet();
             try
             {
-                SPSecurity.RunWithElevatedPrivileges(delegate()
+                SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
                     if (cn.State == System.Data.ConnectionState.Closed)
                         cn.Open();
                 });
 
-                string lastApproved = EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPKTSLastTSApprove");                
+                string lastApproved = EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPKTSLastTSApprove");
 
                 arrLists = new ArrayList(EPMLiveCore.CoreFunctions.getConfigSetting(web, "EPKLists").Split(','));
 
@@ -194,7 +199,7 @@ namespace WorkEnginePPM.Jobs
                     SqlDataAdapter da = new SqlDataAdapter(cmd);
                     da.Fill(ds);
 
-                    cn.Close();
+
 
                     doc = new XmlDocument();
                     doc.LoadXml("<Timesheets/>");
@@ -325,6 +330,10 @@ namespace WorkEnginePPM.Jobs
             {
                 arrLists = null;
                 doc = null;
+                if (cn != null)
+                {
+                    cn.Close();
+                }
                 docResXml = null;
                 if (ds != null)
                     ds.Dispose();

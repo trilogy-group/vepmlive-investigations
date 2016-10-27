@@ -8,6 +8,7 @@ using EPMLiveCore.Infrastructure;
 using Microsoft.SharePoint;
 using System.Data;
 using System.IO;
+using System.Data.SqlClient;
 
 namespace EPMLiveCore.Jobs.Applications
 {
@@ -15,8 +16,14 @@ namespace EPMLiveCore.Jobs.Applications
     {
         public void execute(SPSite osite, SPWeb oweb, string data)
         {
+            if (string.IsNullOrEmpty(strConn))
+            {
+                strConn = EPMLiveCore.CoreFunctions.getConnectionString(osite.WebApplication.Id);
+            }
+            SqlConnection cn = new SqlConnection(strConn);
             try
             {
+                cn.Open();
                 DataTable dtMessages;
                 int maxErrorLevel;
 
@@ -36,7 +43,7 @@ namespace EPMLiveCore.Jobs.Applications
 
                 base.totalCount = 100;
 
-                API.ApplicationInstaller installer = new API.ApplicationInstaller(oListItem["EXTID"].ToString(), base.cn, this);
+                API.ApplicationInstaller installer = new API.ApplicationInstaller(oListItem["EXTID"].ToString(), cn, this);
                 installer.InstallAndConfigureApp(bVerify, oweb, iCommunityId);
 
                 string retMessage = installer.Message;
@@ -45,7 +52,7 @@ namespace EPMLiveCore.Jobs.Applications
 
                 base.sErrors = installer.XmlMessages.OuterXml;
 
-                if(installer.MaxErrorLevel > 1)
+                if (installer.MaxErrorLevel > 1)
                 {
                     base.bErrors = true;
                 }
@@ -53,10 +60,18 @@ namespace EPMLiveCore.Jobs.Applications
                 // clear nav cache
                 CacheStore.Current.RemoveSafely(oweb.Url, new CacheStoreCategory(oweb).Navigation);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 base.bErrors = true;
                 base.sErrors += "General Failure: " + ex.Message;
+            }
+            finally
+            {
+                if (cn != null)
+                {
+                    cn.Close();
+                }
+
             }
 
         }

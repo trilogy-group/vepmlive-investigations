@@ -38,9 +38,9 @@ namespace EPMLiveCore.Jobs
 
         private void storeResPlanInfo()
         {
-            if (cn.State == ConnectionState.Open)
+            SqlConnection cn = new SqlConnection(strConn);
+            try
             {
-
                 using (SqlBulkCopy sbc = new SqlBulkCopy(cn))
                 {
                     sbc.DestinationTableName = "RESINFO";
@@ -75,145 +75,177 @@ namespace EPMLiveCore.Jobs
 
                 }
             }
+            finally
+            {
+                if (cn != null)
+                {
+                    cn.Close();
+                }
+            }
         }
 
         public void execute(SPSite site, SPWeb web, string data)
         {
             sbErrors = new StringBuilder();
+            if (string.IsNullOrEmpty(strConn))
+            {
+                strConn = strConn = EPMLiveCore.CoreFunctions.getConnectionString(site.WebApplication.Id);
+            }
+            
             try
             {
-            Guid ResJobUid = Guid.Empty;
-            try
-            {
-                queuetype = 2;
-
-                if (!initJob(site))
-                    return;
-
-                //==================Code===================
-
-                string resPlanLists = EPMLiveCore.CoreFunctions.getConfigSetting(site.RootWeb, "EPMLiveResPlannerLists");
-                //string sFixLists = EPMLiveCore.CoreFunctions.getConfigSetting(site.RootWeb, "EPMLiveFixLists");
-                string sFixLists = "Resources";
-
-                SPSecurity.RunWithElevatedPrivileges(delegate()
+                SqlConnection cn = new SqlConnection(strConn);
+                Guid ResJobUid = Guid.Empty;
+                try
                 {
-                    cn.Open();
-                });
+                    queuetype = 2;
 
-                    using (SqlCommand cmd = new SqlCommand("DELETE FROM RESINFO where siteid=@siteid", cn))
-                    {
-                cmd.Parameters.AddWithValue("@siteid", site.ID);
-                cmd.ExecuteNonQuery();
-                    }
+                    if (!initJob(site))
+                        return;
 
-                    using (SqlCommand cmd1 = new SqlCommand("DELETE FROM RESLINK where siteid=@siteid or siteid in (select siteid from reslink where weburl=@weburl)", cn))
-                    {
-                        cmd1.Parameters.AddWithValue("@siteid", site.ID);
-                        cmd1.Parameters.AddWithValue("@weburl", site.ServerRelativeUrl);
-                        cmd1.ExecuteNonQuery();
-                    }
+                    //==================Code===================
 
-                    using (SqlCommand cmd2 = new SqlCommand("select timerjobuid from vwQueueTimer where siteguid=@siteguid and jobtype=1", cn))
-                    {
-                        cmd2.Parameters.AddWithValue("@siteguid", site.ID);
-                        using (SqlDataReader dr = cmd2.ExecuteReader())
-                        {
-                if (dr.Read())
-                {
-                    ResJobUid = dr.GetGuid(0);
-                }
-                dr.Close();
-                        }
-                    }
-                cn.Close();
-
-                buildResPlanInfo();
-
-                int hours = 0;
-                string workdays = " ";
-                SPSecurity.RunWithElevatedPrivileges(delegate()
-                {
-                    int startHour = site.RootWeb.RegionalSettings.WorkDayStartHour / 60;
-                    int endHour = site.RootWeb.RegionalSettings.WorkDayEndHour / 60;
-                    hours = endHour - startHour - 1;
-
-                    int work = site.RootWeb.RegionalSettings.WorkDays;
-                    for (byte x = 0; x < 7; x++)
-                    {
-                        workdays = ((((work >> x) & 0x01) == 0x01) ? "" : "," + (7 - x)) + workdays;
-                    }
-                });
-
-                if (workdays.Length > 1)
-                    workdays = workdays.Substring(1);
-
-                float counter = 0;
-                base.totalCount = site.AllWebs.Count;
-
-                if (sFixLists.Trim().Length > 0)
-                {
-                    string[] arLists = sFixLists.Replace("\r\n", "\n").Split('\n');
-                    base.totalCount = base.totalCount * arLists.Length;
-                }
-
-                foreach (SPWeb w in site.AllWebs)
-                {
+                    string resPlanLists = EPMLiveCore.CoreFunctions.getConfigSetting(site.RootWeb, "EPMLiveResPlannerLists");
+                    //string sFixLists = EPMLiveCore.CoreFunctions.getConfigSetting(site.RootWeb, "EPMLiveFixLists");
+                    string sFixLists = "Resources";
+                   
                     try
                     {
+                        SPSecurity.RunWithElevatedPrivileges(delegate ()
+                        {
+                            cn.Open();
+                        });
+
+                        using (SqlCommand cmd = new SqlCommand("DELETE FROM RESINFO where siteid=@siteid", cn))
+                        {
+                            cmd.Parameters.AddWithValue("@siteid", site.ID);
+                            cmd.ExecuteNonQuery();
+                        }
+
+                        using (SqlCommand cmd1 = new SqlCommand("DELETE FROM RESLINK where siteid=@siteid or siteid in (select siteid from reslink where weburl=@weburl)", cn))
+                        {
+                            cmd1.Parameters.AddWithValue("@siteid", site.ID);
+                            cmd1.Parameters.AddWithValue("@weburl", site.ServerRelativeUrl);
+                            cmd1.ExecuteNonQuery();
+                        }
+
+                        using (SqlCommand cmd2 = new SqlCommand("select timerjobuid from vwQueueTimer where siteguid=@siteguid and jobtype=1", cn))
+                        {
+                            cmd2.Parameters.AddWithValue("@siteguid", site.ID);
+                            using (SqlDataReader dr = cmd2.ExecuteReader())
+                            {
+                                if (dr.Read())
+                                {
+                                    ResJobUid = dr.GetGuid(0);
+                                }
+                                dr.Close();
+                            }
+                        }
+                    }
+                    finally
+                    {
+                        if (cn != null)
+                        {
+                            cn.Close();
+                        }
+                    }
+                    
+                   
+
+                    buildResPlanInfo();
+
+                    int hours = 0;
+                    string workdays = " ";
+                    SPSecurity.RunWithElevatedPrivileges(delegate ()
+                    {
+                        int startHour = site.RootWeb.RegionalSettings.WorkDayStartHour / 60;
+                        int endHour = site.RootWeb.RegionalSettings.WorkDayEndHour / 60;
+                        hours = endHour - startHour - 1;
+
+                        int work = site.RootWeb.RegionalSettings.WorkDays;
+                        for (byte x = 0; x < 7; x++)
+                        {
+                            workdays = ((((work >> x) & 0x01) == 0x01) ? "" : "," + (7 - x)) + workdays;
+                        }
+                    });
+
+                    if (workdays.Length > 1)
+                        workdays = workdays.Substring(1);
+
+                    float counter = 0;
+                    base.totalCount = site.AllWebs.Count;
+
+                    if (sFixLists.Trim().Length > 0)
+                    {
+                        string[] arLists = sFixLists.Replace("\r\n", "\n").Split('\n');
+                        base.totalCount = base.totalCount * arLists.Length;
+                    }
+
+                    foreach (SPWeb w in site.AllWebs)
+                    {
+                        try
+                        {
                             sbErrors.Append("<br>Processing Web: " + w.Title + " (" + w.ServerRelativeUrl + ")");
-                        sResErrors += "<br>Processing Web: " + w.Title + " (" + w.ServerRelativeUrl + ")";
-                        processWeb(w, sFixLists, ref counter);
-                        processResPlan(w, resPlanLists, site.ID, hours, workdays);
+                            sResErrors += "<br>Processing Web: " + w.Title + " (" + w.ServerRelativeUrl + ")";
+                            processWeb(w, sFixLists, ref counter);
+                            processResPlan(w, resPlanLists, site.ID, hours, workdays);
+                        }
+                        catch { }
+                        w.Close();
+                        w.Dispose();
                     }
-                    catch { }
-                    w.Close();
-                    w.Dispose();
+
+                    //=========================================
                 }
-
-                //=========================================
-            }
-            catch (Exception ex)
-            {
-                bErrors = true;
+                catch (Exception ex)
+                {
+                    bErrors = true;
                     sbErrors.Append("Execute Error: " + ex.Message);
+                }
+                finishJob();
+                try
+                {
+                    SPSecurity.RunWithElevatedPrivileges(delegate ()
+                    {
+                        cn.Open();
+                    });
+                    storeResPlanInfo();
+
+                    if (ResJobUid != Guid.Empty)
+                    {
+                        //cmd.ExecuteNonQuery();
+                        using (SqlCommand cmd = new SqlCommand("update queue set status = 2, dtfinished=GETDATE() where timerjobuid=@timerjobuid", cn))
+                        {
+                            cmd.Parameters.AddWithValue("@timerjobuid", ResJobUid);
+                            cmd.ExecuteNonQuery();
+                        }
+
+                        using (SqlCommand cmd1 = new SqlCommand("DELETE FROM EPMLIVE_LOG where timerjobuid=@timerjobuid", cn))
+                        {
+                            cmd1.Parameters.AddWithValue("@timerjobuid", ResJobUid);
+                            cmd1.ExecuteNonQuery();
+                        }
+                        using (SqlCommand cmd2 = new SqlCommand("INSERT INTO EPMLIVE_LOG (timerjobuid,result,resulttext) VALUES (@timerjobuid,@result,@resulttext)", cn))
+                        {
+                            if (bResErrors)
+                                cmd2.Parameters.AddWithValue("@result", "Errors");
+                            else
+                                cmd2.Parameters.AddWithValue("@result", "No Errors");
+                            cmd2.Parameters.AddWithValue("@resulttext", sResErrors);
+                            cmd2.Parameters.AddWithValue("@timerjobuid", ResJobUid);
+                            cmd2.ExecuteNonQuery();
+                        }
+                    }
+                }
+                finally
+                {
+                    if (cn != null)
+                    {
+                        cn.Close();
+                    }
+                }
+                
             }
-            finishJob();
-
-            SPSecurity.RunWithElevatedPrivileges(delegate()
-            {
-                cn.Open();
-            });
-            storeResPlanInfo();
-
-            if (ResJobUid != Guid.Empty)
-            {
-                //cmd.ExecuteNonQuery();
-                    using (SqlCommand cmd = new SqlCommand("update queue set status = 2, dtfinished=GETDATE() where timerjobuid=@timerjobuid", cn))
-                    {
-                cmd.Parameters.AddWithValue("@timerjobuid", ResJobUid);
-                cmd.ExecuteNonQuery();
-                    }
-
-                    using (SqlCommand cmd1 = new SqlCommand("DELETE FROM EPMLIVE_LOG where timerjobuid=@timerjobuid", cn))
-                    {
-                        cmd1.Parameters.AddWithValue("@timerjobuid", ResJobUid);
-                        cmd1.ExecuteNonQuery();
-                    }
-                    using (SqlCommand cmd2 = new SqlCommand("INSERT INTO EPMLIVE_LOG (timerjobuid,result,resulttext) VALUES (@timerjobuid,@result,@resulttext)", cn))
-                    {
-                if (bResErrors)
-                            cmd2.Parameters.AddWithValue("@result", "Errors");
-                else
-                            cmd2.Parameters.AddWithValue("@result", "No Errors");
-                        cmd2.Parameters.AddWithValue("@resulttext", sResErrors);
-                        cmd2.Parameters.AddWithValue("@timerjobuid", ResJobUid);
-                        cmd2.ExecuteNonQuery();
-                    }
-            }
-
-            cn.Close();
-        }
             catch (Exception ex)
             {
                 throw ex;

@@ -18,6 +18,11 @@ namespace EPMLiveCore.Jobs
         StringBuilder sbErrors = null;
         public void execute(SPSite site, SPWeb web, string data)
         {
+            if (string.IsNullOrEmpty(strConn))
+            {
+                strConn = strConn = EPMLiveCore.CoreFunctions.getConnectionString(site.WebApplication.Id);
+            }
+            
             sbErrors = new StringBuilder();
             try
             {
@@ -33,26 +38,34 @@ namespace EPMLiveCore.Jobs
                 {
 
                     string sFixLists = EPMLiveCore.CoreFunctions.getConfigSetting(site.RootWeb, "EPMLiveFixLists");
-
-                    SPSecurity.RunWithElevatedPrivileges(delegate ()
+                    SqlConnection cn = new SqlConnection(strConn);
+                    try
                     {
-                        cn.Open();
-                    });
+                        SPSecurity.RunWithElevatedPrivileges(delegate ()
+                        {
+                            cn.Open();
+                        });
 
-                    using (SqlCommand cmd = new SqlCommand("DELETE FROM RESINFO where siteid=@siteid", cn))
-                    {
-                        cmd.Parameters.AddWithValue("@siteid", site.ID);
-                        cmd.ExecuteNonQuery();
+                        using (SqlCommand cmd = new SqlCommand("DELETE FROM RESINFO where siteid=@siteid", cn))
+                        {
+                            cmd.Parameters.AddWithValue("@siteid", site.ID);
+                            cmd.ExecuteNonQuery();
+                        }
+
+                        using (SqlCommand cmd1 = new SqlCommand("DELETE FROM RESLINK where siteid=@siteid or siteid in (select siteid from reslink where weburl=@weburl)", cn))
+                        {
+                            cmd1.Parameters.AddWithValue("@siteid", site.ID);
+                            cmd1.Parameters.AddWithValue("@weburl", site.ServerRelativeUrl);
+                            cmd1.ExecuteNonQuery();
+                        }
                     }
-
-                    using (SqlCommand cmd1 = new SqlCommand("DELETE FROM RESLINK where siteid=@siteid or siteid in (select siteid from reslink where weburl=@weburl)", cn))
+                    finally
                     {
-                        cmd1.Parameters.AddWithValue("@siteid", site.ID);
-                        cmd1.Parameters.AddWithValue("@weburl", site.ServerRelativeUrl);
-                        cmd1.ExecuteNonQuery();
+                        if (cn != null)
+                        {
+                            cn.Close();
+                        }
                     }
-
-                    cn.Close();
 
                     buildResPlanInfo();
 
@@ -94,13 +107,21 @@ namespace EPMLiveCore.Jobs
 
                         updateProgress(webCount++);
                     }
-
-                    SPSecurity.RunWithElevatedPrivileges(delegate ()
+                    try
                     {
-                        cn.Open();
-                    });
-                    storeResPlanInfo();
-                    cn.Close();
+                        SPSecurity.RunWithElevatedPrivileges(delegate ()
+                        {
+                            cn.Open();
+                        });
+                        storeResPlanInfo();
+                    }
+                    finally
+                    {
+                        if (cn != null)
+                        { cn.Close(); }
+                    }
+                    
+                    
                 }
             }
             catch (Exception ex)
@@ -223,9 +244,10 @@ namespace EPMLiveCore.Jobs
 
         private void storeResPlanInfo()
         {
-            if (cn.State == ConnectionState.Open)
+            SqlConnection cn = new SqlConnection(strConn);
+            try
             {
-
+                cn.Open();
                 using (SqlBulkCopy sbc = new SqlBulkCopy(cn))
                 {
                     sbc.DestinationTableName = "RESINFO";
@@ -258,6 +280,13 @@ namespace EPMLiveCore.Jobs
                     sbc.WriteToServer(dtResLink);
                     sbc.Close();
 
+                }
+            }
+            finally
+            {
+                if (cn != null)
+                {
+                    cn.Close();
                 }
             }
         }
