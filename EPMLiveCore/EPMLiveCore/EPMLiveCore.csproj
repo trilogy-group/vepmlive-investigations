@@ -396,6 +396,7 @@
     <Compile Include="Infrastructure\ResourceManagement\DepartmentManager.cs" />
     <Compile Include="Infrastructure\ResourceManagement\ResourcePoolManager.cs" />
     <Compile Include="Infrastructure\SessionManager.cs" />
+    <Compile Include="Infrastructure\Setup\CreateEPMLiveDB.cs" />
     <Compile Include="Infrastructure\WEFeatures.cs" />
     <Compile Include="IntegrateEvents\IntegrateEvents.cs" />
     <Compile Include="Integrations\Office365\Infrastructure\AESCryptographyService.cs" />
