@@ -134,15 +134,7 @@ namespace TimerService
                                 cmd1.ExecuteNonQuery();
                             }
                         }
-                        finally
-                        {
-                            if (cn != null)
-                            {
-                                cn.Close();
-                                cn.Dispose();
-
-                            }
-                        }
+                        catch (Exception exe) { logMessage("ERR", "Starttimer", exe.Message); }
                     }
                 }
             }
@@ -220,14 +212,7 @@ namespace TimerService
                                         }
                                     }
                                 }
-                                finally
-                                {
-                                    if (cn != null)
-                                    {
-                                        cn.Close();
-                                        cn.Dispose();
-                                    }
-                                }
+                                catch (Exception exe) { logMessage("ERR", "RUN", exe.Message); }
 
 
 
@@ -323,15 +308,7 @@ namespace TimerService
                             cmd.ExecuteNonQuery();
                         }
                     }
-                    finally
-                    {
-                        if (cn != null)
-                        {
-                            cn.Close();
-                            cn.Dispose();
-
-                        }
-                    }
+                    catch (Exception exe) { logMessage("ERR", "RUN", exe.Message); }
 
 
                 }
@@ -350,14 +327,7 @@ namespace TimerService
                             cmd.ExecuteNonQuery();
                         }
                     }
-                    finally
-                    {
-                        if (cn != null)
-                        {
-                            cn.Close();
-                            cn.Dispose();
-                        }
-                    }
+                    catch (Exception exe) { logMessage("ERR", "RUN", exe.Message); }
                 }
             }
 

@@ -379,16 +379,7 @@ namespace TimerService
                                             cmd.ExecuteNonQuery();
                                         }
                                     }
-                                    finally
-                                    {
-                                        if (cn != null)
-                                        {
-                                            cn.Close();
-                                            cn.Dispose();
-                                        }
-                                    }
-
-
+                                    catch { e.Cancel = true; }
                                 }
                             }
                             catch (Exception ex)
@@ -484,16 +475,7 @@ namespace TimerService
                                         }
                                     }
                                 }
-                                finally
-                                {
-                                    if (cn != null)
-                                    {
-                                        cn.Close();
-                                        cn.Dispose();
-                                    }
-                                }
-
-
+                                catch { e.Cancel = true; }
                             }
                         }
                     }
@@ -639,11 +621,6 @@ namespace TimerService
                                     {
                                         web.Close();
                                         site.Close();
-                                    }
-                                    if (cn != null)
-                                    {
-                                        cn.Close();
-                                        cn.Dispose();
                                     }
                                     ds.Dispose();
                                 }

@@ -163,16 +163,10 @@ namespace TimerService
                                         }
                                     }
                                 }
-                                finally
+                                catch (Exception ex)
                                 {
-                                    if (cn != null)
-                                    {
-                                        cn.Close();
-                                        cn.Dispose();
-                                    }
+                                    logMessage("ERR", "RUN", ex.Message);
                                 }
-
-
                             }
 
                         }
@@ -234,14 +228,7 @@ namespace TimerService
                         }
                         //TODO: Remove line comment above
                     }
-                    finally
-                    {
-                        if (cn != null)
-                        {
-                            cn.Close();
-                            cn.Dispose();
-                        }
-                    }
+                    catch (Exception ex) { logMessage("ERR", "PROCINT", ex.Message); }
                    
                    
                 }
@@ -261,14 +248,7 @@ namespace TimerService
                                 cmd.ExecuteNonQuery();
                             }
                         }
-                        catch
-                        {
-                            if (cn != null)
-                            {
-                                cn.Close();
-                                cn.Dispose();
-                            }
-                        }
+                        catch (Exception exe) { logMessage("ERR", "PROCINT", exe.Message); }
                     }
                 }
                 else

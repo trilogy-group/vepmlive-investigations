@@ -35,10 +35,6 @@ namespace EPMLiveCore.Jobs
         /// <param name="data">The data.</param>
         public void execute(SPSite site, SPWeb web, string data)
         {
-            if (string.IsNullOrEmpty(strConn))
-            {
-                strConn = strConn = EPMLiveCore.CoreFunctions.getConnectionString(site.WebApplication.Id);
-            }
             try
             {
                 _done = false;
@@ -105,31 +101,27 @@ namespace EPMLiveCore.Jobs
 
         private void UpdateProgress(object userState)
         {
-            SqlConnection cn = new SqlConnection(strConn);
-            try
+            using (SqlConnection cn = CreateConnection())
             {
-                cn.Open();
-                if (!resourceImporter.IsImportCancelled)
+                try
                 {
-                    IsImportCancelled(JobUid);
+                    cn.Open();
+                    if (!resourceImporter.IsImportCancelled)
+                    {
+                        IsImportCancelled(JobUid);
+                    }
+                    ResourceImportResult dSMResult = (ResourceImportResult)userState;
+                    totalCount = dSMResult.TotalRecords == 0 ? 1 : dSMResult.TotalRecords;
+                    updateProgress(dSMResult.ProcessedRecords);
+                    SPSecurity.RunWithElevatedPrivileges(() => cn.Open());
+                    using (var cmd = new SqlCommand(UPDATE_LOG_SQL, cn))
+                    {
+                        cmd.Parameters.AddWithValue("@ResultText", sErrors);
+                        cmd.Parameters.AddWithValue("@TimerJobUId", JobUid);
+                        cmd.ExecuteNonQuery();
+                    }
                 }
-                ResourceImportResult dSMResult = (ResourceImportResult)userState;
-                totalCount = dSMResult.TotalRecords == 0 ? 1 : dSMResult.TotalRecords;
-                updateProgress(dSMResult.ProcessedRecords);
-                SPSecurity.RunWithElevatedPrivileges(() => cn.Open());
-                using (var cmd = new SqlCommand(UPDATE_LOG_SQL, cn))
-                {
-                    cmd.Parameters.AddWithValue("@ResultText", sErrors);
-                    cmd.Parameters.AddWithValue("@TimerJobUId", JobUid);
-                    cmd.ExecuteNonQuery();
-                }
-            }
-            finally
-            {
-                if (cn != null)
-                {
-                    cn.Close();
-                }
+                catch(Exception ex) { sErrors = ex.Message; }
             }
         }
 
@@ -146,33 +138,29 @@ namespace EPMLiveCore.Jobs
 
         private void IsImportCancelled(Guid jobUid)
         {
-            SqlConnection cn = new SqlConnection(strConn);
-            try
+            using (SqlConnection cn = CreateConnection())
             {
-                SPSecurity.RunWithElevatedPrivileges(() => cn.Open());
-                using (SqlCommand cmd = new SqlCommand(GET_JOBQUEUE_STATUS, cn))
+                try
                 {
-                    cmd.Parameters.AddWithValue("@timerjobuid", JobUid);
-                    using (SqlDataReader dr = cmd.ExecuteReader())
+                    SPSecurity.RunWithElevatedPrivileges(() => cn.Open());
+                    using (SqlCommand cmd = new SqlCommand(GET_JOBQUEUE_STATUS, cn))
                     {
-                        if (dr.Read())
+                        cmd.Parameters.AddWithValue("@timerjobuid", JobUid);
+                        using (SqlDataReader dr = cmd.ExecuteReader())
                         {
-                            if (dr.GetInt32(0) == 2)
+                            if (dr.Read())
                             {
-                                resourceImporter.IsImportCancelled = true;
+                                if (dr.GetInt32(0) == 2)
+                                {
+                                    resourceImporter.IsImportCancelled = true;
+                                }
                             }
+                            dr.Close();
                         }
-                        dr.Close();
-                    }
 
+                    }
                 }
-            }
-            finally
-            {
-                if (cn != null)
-                {
-                    cn.Close();
-                }
+                catch (Exception ex) { sErrors = ex.Message; }
             }
 
         }

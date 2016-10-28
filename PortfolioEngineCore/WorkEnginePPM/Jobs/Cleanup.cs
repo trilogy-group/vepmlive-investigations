@@ -17,10 +17,7 @@ namespace WorkEnginePPM.Jobs
         StringBuilder sbErrors = null;
         public void execute(SPSite site, SPWeb web, string data)
         {
-            if (string.IsNullOrEmpty(strConn))
-            {
-                strConn = strConn = EPMLiveCore.CoreFunctions.getConnectionString(site.WebApplication.Id);
-            }
+            WebAppId = site.WebApplication.Id;
             sbErrors = new StringBuilder();
             SPWeb rootWeb = null;
             PortfolioEngineCore.WEIntegration.WEIntegration we = null;
@@ -102,7 +99,7 @@ namespace WorkEnginePPM.Jobs
 
                 try
                 {
-                    SqlConnection cn = new SqlConnection(strConn);
+                    SqlConnection cn = CreateConnection();
                     processTimesheets(site, web, cn, we);
                 }
                 catch (Exception ex)

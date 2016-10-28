@@ -13,16 +13,14 @@ namespace TimeSheets
 
         public void execute(SPSite site, string data)
         {
-            if (string.IsNullOrEmpty(strConn))
-            {
-                strConn = strConn = EPMLiveCore.CoreFunctions.getConnectionString(site.WebApplication.Id);
-            }
-            SqlConnection cn = new SqlConnection(strConn);
+            WebAppId = site.WebApplication.Id;
+
+            SqlConnection cn = CreateConnection();
             try
             {
-                SPSecurity.RunWithElevatedPrivileges(delegate()
+                SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
-                        cn.Open();
+                    cn.Open();
                 });
 
                 bool liveHours = false;

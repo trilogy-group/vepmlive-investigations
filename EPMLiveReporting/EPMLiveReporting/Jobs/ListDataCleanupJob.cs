@@ -43,36 +43,38 @@ namespace EPMLiveReportsAdmin.Jobs
         private string getReportingConnection(SPWeb web)
         {
             string sCn = "";
-            if (string.IsNullOrEmpty(strConn))
+
+            using (SqlConnection cn = CreateConnection())
             {
-                strConn = strConn = EPMLiveCore.CoreFunctions.getConnectionString(web.Site.WebApplication.Id);
-            }
-            SqlConnection cn = new SqlConnection(strConn);
-            try
-            {
-                cn.Open();
-                using (var cmd =
-                    new SqlCommand(
-                        "SELECT Username, Password, DatabaseServer, DatabaseName from RPTDATABASES where SiteId=@SiteId",
-                        cn))
+                try
                 {
-                    cmd.Parameters.AddWithValue("@SiteId", web.Site.ID);
-                    using (SqlDataReader dr = cmd.ExecuteReader())
+                    cn.Open();
+                    using (var cmd =
+                        new SqlCommand(
+                            "SELECT Username, Password, DatabaseServer, DatabaseName from RPTDATABASES where SiteId=@SiteId",
+                            cn))
                     {
-                        if (dr.Read())
+                        cmd.Parameters.AddWithValue("@SiteId", web.Site.ID);
+                        using (SqlDataReader dr = cmd.ExecuteReader())
                         {
-                            sCn = "Data Source=" + dr.GetString(2) + ";Initial Catalog=" + dr.GetString(3);
-                            if (!dr.IsDBNull(0) && dr.GetString(0) != "")
-                                sCn += ";User ID=" + dr.GetString(0) + ";Password=" + EPMData.Decrypt(dr.GetString(1));
-                            else
-                                sCn += ";Trusted_Connection=True";
+                            if (dr.Read())
+                            {
+                                sCn = "Data Source=" + dr.GetString(2) + ";Initial Catalog=" + dr.GetString(3);
+                                if (!dr.IsDBNull(0) && dr.GetString(0) != "")
+                                    sCn += ";User ID=" + dr.GetString(0) + ";Password=" + EPMData.Decrypt(dr.GetString(1));
+                                else
+                                    sCn += ";Trusted_Connection=True";
+                            }
                         }
                     }
                 }
+                catch (Exception ex)
+                {
+                    bErrors = true;
+                    sErrors = ex.Message;
+                }
+
             }
-            catch { }
-            finally { cn.Close(); }
-            
             return sCn;
         }
 
@@ -82,10 +84,7 @@ namespace EPMLiveReportsAdmin.Jobs
             Hashtable hshMessages = null;
             EPMData epmdata = null;
             DataTable dtListResults = null;
-            if (string.IsNullOrEmpty(strConn))
-            {
-                strConn = strConn = EPMLiveCore.CoreFunctions.getConnectionString(web.Site.WebApplication.Id);
-            }
+            WebAppId = web.Site.WebApplication.Id;
             try
             {
                 float webCount = 0;
@@ -147,7 +146,7 @@ namespace EPMLiveReportsAdmin.Jobs
 
                         //Call Reporting Code
                         var rf = new RefreshLists(w, data);
-                        
+
                         rf.StartRefresh(base.JobUid, out dt, refreshAll);
                         rf.AppendStatus(w.Title, w.ServerRelativeUrl, dtListResults, dt);
 

@@ -35,7 +35,7 @@ namespace TimeSheets
 
 
 
-               
+
                 SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
                     cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(site.WebApplication.Id));
@@ -145,7 +145,7 @@ namespace TimeSheets
                     bErrors = true;
                     sErrors = "Timesheet does not exist";
                 }
-              
+
 
             }
             catch (Exception ex)
@@ -170,10 +170,6 @@ namespace TimeSheets
         private void ProcessItemRow(XmlNode ndRow, ref DataTable dtItems, SqlConnection cn, SPSite site, TimesheetSettings settings, bool liveHours, bool bSkipSP)
         {
             string id = iGetAttribute(ndRow, "UID");
-            if (string.IsNullOrEmpty(strConn))
-            {
-                strConn = strConn = EPMLiveCore.CoreFunctions.getConnectionString(site.WebApplication.Id);
-            }
             if (id != "")
             {
                 DataRow[] drItem = dtItems.Select("TS_ITEM_UID='" + id + "'");
@@ -437,30 +433,31 @@ namespace TimeSheets
         {
 
             double hours = 0;
-            SqlConnection cn = new SqlConnection(strConn);
-            try
+            using (SqlConnection cn = CreateConnection())
             {
-                cn.Open();
-                if (li != null)
+                try
                 {
-                    using (SqlCommand cmdHours = new SqlCommand("select cast(sum(hours) as float) from vwTSHoursByTask where list_uid=@listuid and item_id = @itemid", cn))
+                    cn.Open();
+                    if (li != null)
                     {
-                        cmdHours.Parameters.AddWithValue("@listuid", listguid);
-                        cmdHours.Parameters.AddWithValue("@itemid", li.ID);
-                        using (SqlDataReader dr1 = cmdHours.ExecuteReader())
+                        using (SqlCommand cmdHours = new SqlCommand("select cast(sum(hours) as float) from vwTSHoursByTask where list_uid=@listuid and item_id = @itemid", cn))
                         {
-                            if (dr1.Read())
-                                if (!dr1.IsDBNull(0))
-                                    hours = dr1.GetDouble(0);
-                            dr1.Close();
+                            cmdHours.Parameters.AddWithValue("@listuid", listguid);
+                            cmdHours.Parameters.AddWithValue("@itemid", li.ID);
+                            using (SqlDataReader dr1 = cmdHours.ExecuteReader())
+                            {
+                                if (dr1.Read())
+                                    if (!dr1.IsDBNull(0))
+                                        hours = dr1.GetDouble(0);
+                                dr1.Close();
+                            }
+                            li["TimesheetHours"] = hours;
                         }
-                        li["TimesheetHours"] = hours;
-                    }
 
+                    }
                 }
+                catch { }
             }
-            catch { }
-            finally { if (cn != null) cn.Close(); }
         }
 
         public static string processProjectWork(SqlConnection cn, string tsuid, SPSite site, bool bApprovalScreen, bool bApproved)

@@ -129,15 +129,7 @@ namespace TimerService
                                 cmd1.ExecuteNonQuery();
                             }
                         }
-                        finally
-                        {
-
-                            if (cn != null)
-                            {
-                                cn.Close();
-                                cn.Dispose();
-                            }
-                        }
+                        catch { return false; }
                     }
                 }
             }
@@ -209,13 +201,9 @@ namespace TimerService
                                         }
                                     }
                                 }
-                                finally
+                                catch (Exception ex)
                                 {
-                                    if (cn != null)
-                                    {
-                                        cn.Close();
-                                        cn.Dispose();
-                                    }
+                                    logMessage("ERR", "RUNT", ex.ToString());
                                 }
                                 //using (SqlCommand cmd = new SqlCommand("SELECT TOP " + maxThreads + " queueuid,timerjobuid,siteguid,webguid,listguid,itemid,jobtype,jobdata,userid,netassembly,netclass,title,[key] from vwQueueTimer where status=0 and priority <= 10 order by priority,dtcreated asc", cn))
 
@@ -282,13 +270,9 @@ namespace TimerService
                                 cmd.ExecuteNonQuery();
                             }
                         }
-                        finally
+                        catch (Exception exe)
                         {
-                            if (cn != null)
-                            {
-                                cn.Close();
-                                cn.Dispose();
-                            }
+                            logMessage("ERR", "PROC", exe.Message);
                         }
 
 

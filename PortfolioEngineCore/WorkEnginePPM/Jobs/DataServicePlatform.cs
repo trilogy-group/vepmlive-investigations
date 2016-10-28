@@ -23,10 +23,8 @@ namespace WorkEnginePPM.Jobs
 
         public void execute(SPSite spSite, SPWeb spWeb, string data)
         {
-            if (string.IsNullOrEmpty(strConn))
-            {
-                strConn = strConn = EPMLiveCore.CoreFunctions.getConnectionString(spSite.WebApplication.Id);
-            }
+            WebAppId = spSite.WebApplication.Id;
+
             SPWeb rootWeb = null;
             try
             {
@@ -95,7 +93,8 @@ namespace WorkEnginePPM.Jobs
 
         private void UpdateProgress(object userState)
         {
-            SqlConnection cn = new SqlConnection(strConn);
+            SqlConnection cn = CreateConnection();
+
             try
             {
                 SPSecurity.RunWithElevatedPrivileges(() => cn.Open());
@@ -113,10 +112,14 @@ namespace WorkEnginePPM.Jobs
             {
                 throw ex;
             }
-            finally {
-                
-                cn.Close();
+            finally
+            {
+                if (cn != null)
+                {
+                    cn.Close();
+                }
             }
+
         }
 
         private string BuildResult(object dSMResult)

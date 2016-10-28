@@ -114,16 +114,9 @@ namespace TimerService
                                 cmd1.ExecuteNonQuery();
                             }
                         }
-                        finally
-                        {
-                            if (cn != null)
-                            {
-                                cn.Close();
-                                cn.Dispose();
-                            }
-                        }
-                       
-                        
+                        catch (Exception exe) { logMessage("ERR", "RUN", exe.Message); }
+
+
                     }
                 }
             }
@@ -196,21 +189,12 @@ namespace TimerService
                                         }
                                     }
                                 }
-                                finally
+                                catch (Exception ex)
                                 {
-                                    if (cn != null)
-                                    {
-                                        cn.Close();
-                                        cn.Dispose();
-                                    }
+                                    logMessage("ERR", "RUNT", ex.ToString());
                                 }
-                               
-
-                              
                             }
-
                         }
-                        
                     }
                 }
             }
@@ -271,14 +255,7 @@ namespace TimerService
                                 cmd.ExecuteNonQuery();
                             }
                         }
-                        finally
-                        {
-                            if (cn != null)
-                            {
-                                cn.Close();
-                                cn.Dispose();
-                            }
-                        }
+                        catch (Exception exe) { logMessage("ERR", "PROC", exe.Message); }
                     }
                 }
                 else

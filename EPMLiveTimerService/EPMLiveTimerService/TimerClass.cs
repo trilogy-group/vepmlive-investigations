@@ -135,15 +135,10 @@ namespace TimerService
                                 cmd1.ExecuteNonQuery();
                             }
                         }
-                        finally
+                        catch
                         {
-                            if (cn != null)
-                            {
-                                cn.Close();
-                                cn.Dispose();
-                            }
+                            return false;
                         }
-
 
                     }
                 }
@@ -218,15 +213,11 @@ namespace TimerService
                                     }
 
                                 }
-                                finally
+                                catch (Exception ex)
                                 {
-                                    if (cn != null)
-                                    {
-                                        cn.Close();
-                                        cn.Dispose();
-                                    }
-                                }
+                                    logMessage("ERR", "RUNT", ex.ToString());
 
+                                }
                             }
 
                         }
@@ -290,16 +281,10 @@ namespace TimerService
                                 cmd.ExecuteNonQuery();
                             }
                         }
-                       finally
+                        catch (Exception exe)
                         {
-                            if (cn != null)
-                            {
-                                cn.Close();
-                                cn.Dispose();
-                            }
+                            logMessage("ERR", "PROC", exe.Message);
                         }
-                      
-                       
                     }
                 }
                 else

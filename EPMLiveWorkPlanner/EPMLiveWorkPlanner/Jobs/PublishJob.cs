@@ -20,10 +20,7 @@ namespace EPMLiveWorkPlanner
 
         public void execute(SPSite osite, SPWeb oweb, string data)
         {
-            if (string.IsNullOrEmpty(strConn))
-            {
-                strConn = strConn = EPMLiveCore.CoreFunctions.getConnectionString(osite.WebApplication.Id);
-            }
+            WebAppId = osite.WebApplication.Id;
             string projectName = "";
             XmlDocument doc = null;
             EPMLiveWorkPlanner.WorkPlannerAPI.PlannerProps props = null;
@@ -548,39 +545,39 @@ namespace EPMLiveWorkPlanner
                         catch { }
                     }
                 }
-                SqlConnection cn = new SqlConnection(strConn);
-                try
+                using (SqlConnection cn = CreateConnection())
                 {
-                    cn.Open();
-                    using (SqlCommand cmd = new SqlCommand("delete from plannerlink where plannerid=@plannerid and destprojectid=@projectid", cn))
+                    try
                     {
-                        cmd.Parameters.AddWithValue("@plannerid", plannerid);
-                        cmd.Parameters.AddWithValue("@projectid", projectid);
-                        cmd.ExecuteNonQuery();
-                    }
-                    using (SqlCommand cmd = new SqlCommand("INSERT INTO plannerlink (plannerid,sourceprojectid,sourcetaskid,destprojectid,desttaskid,predecessors,successors,linked) VALUES (@plannerid,@sourceprojectid,@sourcetaskid,@destprojectid,@desttaskid,@predecessors,@successors,@linked", cn))
-                    {
-                        foreach (DictionaryEntry de in hshLinks)
+                        cn.Open();
+                        using (SqlCommand cmd = new SqlCommand("delete from plannerlink where plannerid=@plannerid and destprojectid=@projectid", cn))
                         {
-                            string[] sSource = de.Key.ToString().Split('.');
-                            string[] sDest = de.Value.ToString().Split('.');
                             cmd.Parameters.AddWithValue("@plannerid", plannerid);
-                            cmd.Parameters.AddWithValue("@sourceprojectid", sSource[1]);
-                            cmd.Parameters.AddWithValue("@sourcetaskid", sSource[2]);
-                            cmd.Parameters.AddWithValue("@destprojectid", sDest[0]);
-                            cmd.Parameters.AddWithValue("@desttaskid", sDest[1]);
-                            cmd.Parameters.AddWithValue("@predecessors", sDest[2]);
-                            cmd.Parameters.AddWithValue("@successors", sDest[3]);
-                            cmd.Parameters.AddWithValue("@linked", sDest[4]);
+                            cmd.Parameters.AddWithValue("@projectid", projectid);
                             cmd.ExecuteNonQuery();
                         }
+                        using (SqlCommand cmd = new SqlCommand("INSERT INTO plannerlink (plannerid,sourceprojectid,sourcetaskid,destprojectid,desttaskid,predecessors,successors,linked) VALUES (@plannerid,@sourceprojectid,@sourcetaskid,@destprojectid,@desttaskid,@predecessors,@successors,@linked", cn))
+                        {
+                            foreach (DictionaryEntry de in hshLinks)
+                            {
+                                string[] sSource = de.Key.ToString().Split('.');
+                                string[] sDest = de.Value.ToString().Split('.');
+                                cmd.Parameters.AddWithValue("@plannerid", plannerid);
+                                cmd.Parameters.AddWithValue("@sourceprojectid", sSource[1]);
+                                cmd.Parameters.AddWithValue("@sourcetaskid", sSource[2]);
+                                cmd.Parameters.AddWithValue("@destprojectid", sDest[0]);
+                                cmd.Parameters.AddWithValue("@desttaskid", sDest[1]);
+                                cmd.Parameters.AddWithValue("@predecessors", sDest[2]);
+                                cmd.Parameters.AddWithValue("@successors", sDest[3]);
+                                cmd.Parameters.AddWithValue("@linked", sDest[4]);
+                                cmd.ExecuteNonQuery();
+                            }
+                        }
                     }
-                }
-                finally
-                {
-                    if (cn != null)
+                    catch (Exception ex)
                     {
-                        cn.Close();
+                        bErrors = true;
+                        sErrors = ex.Message;
                     }
                 }
             }
