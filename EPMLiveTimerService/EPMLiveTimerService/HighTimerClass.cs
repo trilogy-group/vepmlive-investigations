@@ -14,7 +14,7 @@ using System.Xml;
 
 namespace TimerService
 {
-    class HighTimerClass
+    public class HighTimerClass
     {
         private Object thisLock = new Object();
 
@@ -107,8 +107,8 @@ namespace TimerService
             logMessage("INIT", "STMR", "Setting threads to: " + maxThreads);
 
             logMessage("INIT", "STMR", "Clearing Queue");
-
-            foreach (SPWebApplication webApp in SPWebService.ContentService.WebApplications)
+            SPWebApplicationCollection _webcolections = TimerRunner.GetWebApplications();
+            foreach (SPWebApplication webApp in _webcolections)
             {
                 var sConn = EPMLiveCore.CoreFunctions.getConnectionString(webApp.Id);
                 if (sConn != "")
@@ -159,8 +159,8 @@ namespace TimerService
                 int maxThreads = workingThreads.remainingThreads();
                 if (maxThreads > 0)
                 {
-
-                    foreach (SPWebApplication webApp in SPWebService.ContentService.WebApplications)
+                    SPWebApplicationCollection _webappcollection = TimerRunner.GetWebApplications();
+                    foreach (SPWebApplication webApp in _webappcollection)
                     {
                         string sConn = EPMLiveCore.CoreFunctions.getConnectionString(webApp.Id);
                         if (sConn != "")
@@ -419,6 +419,8 @@ namespace TimerService
         //        }
         //    }
         //}
+   
+
 
 
         static void bw_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)

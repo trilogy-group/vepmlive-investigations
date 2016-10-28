@@ -92,8 +92,8 @@ namespace TimerService
             workingThreads = new WorkerThreads(maxThreads);
 
             logMessage("INIT", "STMR", "Setting threads to: " + maxThreads);
-
-            foreach (SPWebApplication webApp in SPWebService.ContentService.WebApplications)
+            SPWebApplicationCollection _webcolections = TimerRunner.GetWebApplications();
+            foreach (SPWebApplication webApp in _webcolections)
             {
                 var sConn = EPMLiveCore.CoreFunctions.getConnectionString(webApp.Id);
                 if (sConn != "")
@@ -147,7 +147,8 @@ namespace TimerService
                 if (maxThreads > 0)
                 {
 
-                    foreach (SPWebApplication webApp in SPWebService.ContentService.WebApplications)
+                    SPWebApplicationCollection _webcolections = TimerRunner.GetWebApplications();
+                    foreach (SPWebApplication webApp in _webcolections)
                     {
                         string sConn = EPMLiveCore.CoreFunctions.getConnectionString(webApp.Id);
                         if (sConn != "")

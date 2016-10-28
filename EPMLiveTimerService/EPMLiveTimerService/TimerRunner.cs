@@ -360,7 +360,8 @@ namespace TimerService
             {
                 if (DateTime.Now.Minute == 0)
                 {
-                    foreach (SPWebApplication webApp in SPWebService.ContentService.WebApplications)
+                    SPWebApplicationCollection _webapplications = GetWebApplications();
+                    foreach (SPWebApplication webApp in _webapplications)
                     {
                         string sConn = EPMLiveCore.CoreFunctions.getConnectionString(webApp.Id);
                         if (sConn != "")
@@ -427,6 +428,7 @@ namespace TimerService
             {
                 try
                 {
+                    SPWebApplicationCollection _webapplications = GetWebApplications();
                     foreach (SPWebApplication webApp in SPWebService.ContentService.WebApplications)
                     {
                         string sConn = EPMLiveCore.CoreFunctions.getConnectionString(webApp.Id);
@@ -509,7 +511,8 @@ namespace TimerService
             {
                 try
                 {
-                    foreach (SPWebApplication webApp in SPWebService.ContentService.WebApplications)
+                    SPWebApplicationCollection _webapplication = GetWebApplications();
+                    foreach (SPWebApplication webApp in _webapplication)
                     {
                         SPSite site = null;
                         SPWeb web = null;
@@ -657,7 +660,10 @@ namespace TimerService
             }
 
         }
-
+        public static SPWebApplicationCollection GetWebApplications()
+        {
+            return SPWebService.ContentService.WebApplications;
+        }
         static void bwNotificationsJobs_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
 

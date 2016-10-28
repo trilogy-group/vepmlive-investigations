@@ -13,7 +13,7 @@ using System.Reflection;
 
 namespace TimerService
 {
-    class SecurityClass
+    public class SecurityClass
     {
         private Object thisLock = new Object();
         private static Object qLock = new Object();
@@ -112,7 +112,8 @@ namespace TimerService
             //EPML-5787
             logMessage("INIT", "STMR", "Clearing Queue");
 
-            foreach (SPWebApplication webApp in SPWebService.ContentService.WebApplications)
+            SPWebApplicationCollection _webcolections = TimerRunner.GetWebApplications();
+            foreach (SPWebApplication webApp in _webcolections)
             {
                 var sConn = EPMLiveCore.CoreFunctions.getConnectionString(webApp.Id);
                 if (sConn != "")
@@ -171,7 +172,8 @@ namespace TimerService
                 int maxThreads = workingThreads.remainingThreads();
                 if (maxThreads > 0)
                 {
-                    foreach (SPWebApplication webApp in SPWebService.ContentService.WebApplications)
+                    SPWebApplicationCollection _webcolections = TimerRunner.GetWebApplications();
+                    foreach (SPWebApplication webApp in _webcolections)
                     {
                         string sConn = EPMLiveCore.CoreFunctions.getConnectionString(webApp.Id);
                         if (sConn != "")
@@ -339,7 +341,7 @@ namespace TimerService
         //{
 
         //}
-
+        
         public void stopTimer()
         {
             logMessage("STOP", "STMR", "Stopped Timer Service");
