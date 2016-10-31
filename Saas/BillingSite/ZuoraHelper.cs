@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 
 namespace BillingSite
@@ -15,6 +16,8 @@ namespace BillingSite
             
             zsvc.Url = "https://www.zuora.com/apps/services/a/33.0";
             ZuoraAPI.LoginResult lr = zsvc.login("colo@epmlive.com", "XUVzI5fo8RuegoTqsZ15");
+
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
 
             //zsvc.Url = "https://apisandbox.zuora.com/apps/services/a/33.0";
             //ZuoraAPI.LoginResult lr = zsvc.login("jhughes@epmlive.com", "Internet1");
