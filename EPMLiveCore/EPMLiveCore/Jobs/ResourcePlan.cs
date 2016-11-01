@@ -97,9 +97,11 @@ namespace EPMLiveCore.Jobs
                         {
                             LoggingService.WriteTrace(Area.EPMLiveCore, Categories.EPMLiveCore.TimerJob, TraceSeverity.High, String.Format("StackTrace-{0}{1}Message-{2}", ex.StackTrace, Environment.NewLine, ex.Message));
                         }
-                        w.Close();
-                        w.Dispose();
-
+                        finally
+                        {
+                            if (w != null)
+                                w.Dispose();
+                        }
                         updateProgress(webCount++);
                     }
                     using (SqlConnection conn = CreateConnection())

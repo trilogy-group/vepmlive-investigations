@@ -329,7 +329,7 @@ namespace WorkEnginePPM.Jobs
                 doc = null;
                 if (cn != null)
                 {
-                    cn.Close();
+                    cn.Dispose();
                 }
                 docResXml = null;
                 if (ds != null)

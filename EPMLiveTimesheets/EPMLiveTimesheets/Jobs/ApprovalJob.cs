@@ -53,7 +53,7 @@ namespace TimeSheets
                     site.Dispose();
                 data = null;
                 if (cn != null)
-                    cn.Close();
+                    cn.Dispose();
             }
         }
 

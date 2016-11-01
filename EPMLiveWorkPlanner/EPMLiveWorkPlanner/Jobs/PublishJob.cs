@@ -365,7 +365,6 @@ namespace EPMLiveWorkPlanner
                 }
                 finally
                 {
-                    if (conn != null) conn.Close();
                     transaction.Dispose();
                 }
             }

@@ -35,10 +35,10 @@ namespace TimeSheets
 
 
 
-
+                WebAppId= site.WebApplication.Id;
                 SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
-                    cn = new SqlConnection(EPMLiveCore.CoreFunctions.getConnectionString(site.WebApplication.Id));
+                    cn = CreateConnection();
                     cn.Open();
                 });
 
@@ -51,7 +51,6 @@ namespace TimeSheets
                         {
                             userid = dr.GetInt32(0);
                         }
-                        dr.Close();
                     }
                 }
 

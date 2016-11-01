@@ -116,7 +116,7 @@ namespace WorkEnginePPM.Jobs
             {
                 if (cn != null)
                 {
-                    cn.Close();
+                    cn.Dispose();
                 }
             }
 

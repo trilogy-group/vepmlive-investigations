@@ -183,8 +183,11 @@ namespace EPMLiveCore.Jobs
                             processResPlan(w, resPlanLists, site.ID, hours, workdays);
                         }
                         catch { }
-                        w.Close();
-                        w.Dispose();
+                        finally
+                        {
+                            if (w != null)
+                                w.Dispose();
+                        }
                     }
 
                     //=========================================
