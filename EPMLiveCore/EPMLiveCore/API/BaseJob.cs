@@ -151,16 +151,13 @@ namespace EPMLiveCore.API
                             {
                                 if (dr.GetInt32(0) != 1)
                                 {
-                                    cn.Close();
                                     return false;
                                 }
                             }
                             else
                             {
-                                cn.Close();
                                 return false;
                             }
-                            dr.Close();
                         }
                     }
                     using (SqlCommand cmd1 = new SqlCommand("delete from epmlive_log where timerjobuid=@timerjobuid", cn))
@@ -170,8 +167,10 @@ namespace EPMLiveCore.API
                     }
                     return true;
                 }
-                catch
+                catch(Exception ex)
                 {
+                    bErrors = true;
+                    sErrors = ex.ToString();
                     return false;
                 }
             }

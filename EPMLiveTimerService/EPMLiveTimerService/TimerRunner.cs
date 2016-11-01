@@ -387,11 +387,10 @@ namespace TimerService
                             {
                                 DateTime dt = DateTime.Now;
 
-                                StreamWriter swLog = new StreamWriter(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + "\\LOGS\\TIMERLOG_QUEUE_" + dt.Year + dt.Month + dt.Day + ".log", true);
-
-                                swLog.WriteLine(DateTime.Now.ToString() + "\tERR\tQUEUE\t" + ex.Message);
-
-                                swLog.Close();
+                                using (StreamWriter swLog = new StreamWriter(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + "\\LOGS\\TIMERLOG_QUEUE_" + dt.Year + dt.Month + dt.Day + ".log", true))
+                                {
+                                    swLog.WriteLine(DateTime.Now.ToString() + "\tERR\tQUEUE\t" + ex.Message);
+                                }
                             }
                         }
                     }

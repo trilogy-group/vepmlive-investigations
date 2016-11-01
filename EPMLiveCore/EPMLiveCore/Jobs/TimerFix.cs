@@ -55,8 +55,6 @@ namespace EPMLiveCore.Jobs
                         sbc.BatchSize = iRowCount;
                         sbc.NotifyAfter = dtResInfo.Rows.Count;
                         sbc.WriteToServer(dtResInfo);
-                        sbc.Close();
-
                     }
 
                     using (SqlBulkCopy sbc = new SqlBulkCopy(cn))
@@ -72,14 +70,12 @@ namespace EPMLiveCore.Jobs
                         sbc.BatchSize = iRowCount;
                         sbc.NotifyAfter = dtResLink.Rows.Count;
                         sbc.WriteToServer(dtResLink);
-                        sbc.Close();
-
                     }
                 }
                 catch (Exception ex)
                 {
                     bErrors = true;
-                    sErrors = ex.Message;
+                    sErrors = ex.ToString();
                 }
             }
         }
@@ -138,14 +134,13 @@ namespace EPMLiveCore.Jobs
                                     {
                                         ResJobUid = dr.GetGuid(0);
                                     }
-                                    dr.Close();
                                 }
                             }
                         }
                         catch (Exception ex)
                         {
                             bErrors = true;
-                            sErrors = ex.Message;
+                            sErrors = ex.ToString();
                         }
                     }
 

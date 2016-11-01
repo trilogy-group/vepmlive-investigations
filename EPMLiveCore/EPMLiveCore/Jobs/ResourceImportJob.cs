@@ -121,7 +121,7 @@ namespace EPMLiveCore.Jobs
                         cmd.ExecuteNonQuery();
                     }
                 }
-                catch(Exception ex) { sErrors = ex.Message; }
+                catch(Exception ex) { sErrors = ex.ToString(); }
             }
         }
 
@@ -155,12 +155,11 @@ namespace EPMLiveCore.Jobs
                                     resourceImporter.IsImportCancelled = true;
                                 }
                             }
-                            dr.Close();
                         }
 
                     }
                 }
-                catch (Exception ex) { sErrors = ex.Message; }
+                catch (Exception ex) { sErrors = ex.ToString(); }
             }
 
         }

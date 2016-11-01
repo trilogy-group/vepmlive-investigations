@@ -47,7 +47,7 @@ namespace EPMLiveCore.Jobs.Applications
                 catch (Exception ex)
                 {
                     base.bErrors = true;
-                    base.sErrors += "General Failure: " + ex.Message;
+                    base.sErrors += "General Failure: " + ex.ToString();
                 }
             }
         }
