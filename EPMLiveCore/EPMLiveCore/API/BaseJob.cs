@@ -12,7 +12,7 @@ namespace EPMLiveCore.API
         public string sErrors = "";
         public bool bErrors = false;
 
-        protected SqlConnection cn;
+
 
         public int queuetype;
 
@@ -24,73 +24,79 @@ namespace EPMLiveCore.API
         public Guid JobUid;
         public Guid QueueUid;
         public int userid;
-
+        public Guid WebAppId = Guid.Empty;
         public Guid ListUid;
         public int ItemID;
         public string key;
-
         public XmlDocument DocData;
 
-
+        protected SqlConnection CreateConnection()
+        {
+           string strConn = EPMLiveCore.CoreFunctions.getConnectionString(WebAppId);
+            return new SqlConnection(strConn);
+        }
 
         public void finishJob()
         {
-
-            SPSecurity.RunWithElevatedPrivileges(delegate()
+            using (SqlConnection cn = CreateConnection())
             {
-                if (cn.State == System.Data.ConnectionState.Closed)
-                    cn.Open();
-            });
-
-            //SqlCommand cmd = new SqlCommand("select scheduletype from timerjobs where timerjobuid=@timerjobuid", cn);
-            //cmd.Parameters.AddWithValue("@timerjobuid", JobUid);
-            //SqlDataReader dr = cmd.ExecuteReader();
-            //bool tempJob = false;
-            //if (dr.Read())
-            //{
-            //    tempJob = (dr.GetInt32(0) == 0);
-            //}
-            //dr.Close();
-
-            //if (!tempJob)
-            {
-                using (SqlCommand cmd = new SqlCommand("update queue set status = 2, percentcomplete=100, dtfinished=GETDATE() where queueuid=@queueuid", cn))
+                try
                 {
-                    cmd.Parameters.AddWithValue("@queueuid", QueueUid);
-                    cmd.ExecuteNonQuery();
-                }
+                    SPSecurity.RunWithElevatedPrivileges(delegate ()
+                    {
 
-                using (SqlCommand cmd1 = new SqlCommand("DELETE FROM EPMLIVE_LOG where timerjobuid=@timerjobuid", cn))
-                {
-                    cmd1.Parameters.AddWithValue("@timerjobuid", JobUid);
-                    cmd1.ExecuteNonQuery();
-                }
+                        cn.Open();
+                    });
 
-                using (SqlCommand cmd2 = new SqlCommand("INSERT INTO EPMLIVE_LOG (timerjobuid,result,resulttext) VALUES (@timerjobuid,@result,@resulttext)", cn))
-                {
-                    if (bErrors)
-                        cmd2.Parameters.AddWithValue("@result", "Errors");
-                    else
-                        cmd2.Parameters.AddWithValue("@result", "No Errors");
-                    cmd2.Parameters.AddWithValue("@resulttext", sErrors);
-                    cmd2.Parameters.AddWithValue("@timerjobuid", JobUid);
-                    cmd2.ExecuteNonQuery();
+                    //SqlCommand cmd = new SqlCommand("select scheduletype from timerjobs where timerjobuid=@timerjobuid", cn);
+                    //cmd.Parameters.AddWithValue("@timerjobuid", JobUid);
+                    //SqlDataReader dr = cmd.ExecuteReader();
+                    //bool tempJob = false;
+                    //if (dr.Read())
+                    //{
+                    //    tempJob = (dr.GetInt32(0) == 0);
+                    //}
+                    //dr.Close();
+
+                    //if (!tempJob)
+                    {
+                        using (SqlCommand cmd = new SqlCommand("update queue set status = 2, percentcomplete=100, dtfinished=GETDATE() where queueuid=@queueuid", cn))
+                        {
+                            cmd.Parameters.AddWithValue("@queueuid", QueueUid);
+                            cmd.ExecuteNonQuery();
+                        }
+
+                        using (SqlCommand cmd1 = new SqlCommand("DELETE FROM EPMLIVE_LOG where timerjobuid=@timerjobuid", cn))
+                        {
+                            cmd1.Parameters.AddWithValue("@timerjobuid", JobUid);
+                            cmd1.ExecuteNonQuery();
+                        }
+
+                        using (SqlCommand cmd2 = new SqlCommand("INSERT INTO EPMLIVE_LOG (timerjobuid,result,resulttext) VALUES (@timerjobuid,@result,@resulttext)", cn))
+                        {
+                            if (bErrors)
+                                cmd2.Parameters.AddWithValue("@result", "Errors");
+                            else
+                                cmd2.Parameters.AddWithValue("@result", "No Errors");
+                            cmd2.Parameters.AddWithValue("@resulttext", sErrors);
+                            cmd2.Parameters.AddWithValue("@timerjobuid", JobUid);
+                            cmd2.ExecuteNonQuery();
+                        }
+                        using (SqlCommand cmd3 = new SqlCommand("DELETE FROM TIMERJOBS where timerjobuid=@timerjobuid and scheduletype = 99", cn))
+                        {
+                            cmd3.Parameters.AddWithValue("@timerjobuid", JobUid);
+                            cmd3.ExecuteNonQuery();
+                        }
+                    }
+                    //else
+                    //{
+                    //    cmd = new SqlCommand("DELETE FROM timerjobs where timerjobuid=@timerjobuid", cn);
+                    //    cmd.Parameters.AddWithValue("@timerjobuid", JobUid);
+                    //    cmd.ExecuteNonQuery();
+                    //}
                 }
-                using (SqlCommand cmd3 = new SqlCommand("DELETE FROM TIMERJOBS where timerjobuid=@timerjobuid and scheduletype = 99", cn))
-                {
-                    cmd3.Parameters.AddWithValue("@timerjobuid", JobUid);
-                    cmd3.ExecuteNonQuery();
-                }
+                catch { }
             }
-            //else
-            //{
-            //    cmd = new SqlCommand("DELETE FROM timerjobs where timerjobuid=@timerjobuid", cn);
-            //    cmd.Parameters.AddWithValue("@timerjobuid", JobUid);
-            //    cmd.ExecuteNonQuery();
-            //}
-
-            cn.Close();
-
         }
 
         protected void updateProgress(float newCount)
@@ -98,64 +104,77 @@ namespace EPMLiveCore.API
             float percent = (newCount + 1) / totalCount * 100;
             if (percent + percentInterval >= lastPercent)
             {
-                SPSecurity.RunWithElevatedPrivileges(delegate()
+                using (SqlConnection cn = CreateConnection())
                 {
-                    cn.Open();
-                });
+                    try
+                    {
+                        SPSecurity.RunWithElevatedPrivileges(delegate ()
+                        {
+                            cn.Open();
+                        });
 
-                using (SqlCommand cmd = new SqlCommand("update queue set percentcomplete=@percent where queueuid=@queueuid", cn))
-                {
-                    cmd.Parameters.AddWithValue("@queueuid", QueueUid);
-                    cmd.Parameters.AddWithValue("@percent", percent);
-                    cmd.ExecuteNonQuery();
+                        using (SqlCommand cmd = new SqlCommand("update queue set percentcomplete=@percent where queueuid=@queueuid", cn))
+                        {
+                            cmd.Parameters.AddWithValue("@queueuid", QueueUid);
+                            cmd.Parameters.AddWithValue("@percent", percent);
+                            cmd.ExecuteNonQuery();
+                        }
+
+                        lastPercent = percent;
+                    }
+                    catch
+                    {
+                        lastPercent = percent;
+                    }
                 }
-
-                lastPercent = percent;
-                cn.Close();
             }
         }
 
         public bool initJob(SPSite site)
         {
-            string strConn = EPMLiveCore.CoreFunctions.getConnectionString(site.WebApplication.Id);
-            cn = new SqlConnection(strConn);
-
-            SPSecurity.RunWithElevatedPrivileges(delegate()
+            WebAppId = site.WebApplication.Id;
+            using (SqlConnection cn = CreateConnection())
             {
-                cn.Open();
-            });
-
-            using (SqlCommand cmd = new SqlCommand("select status from queue where queueuid=@queueuid", cn))
-            {
-                cmd.Parameters.AddWithValue("@queueuid", QueueUid);
-                using (SqlDataReader dr = cmd.ExecuteReader())
+                try
                 {
-
-                    if (dr.Read())
+                    SPSecurity.RunWithElevatedPrivileges(delegate ()
                     {
-                        if (dr.GetInt32(0) != 1)
+                        cn.Open();
+                    });
+                    using (SqlCommand cmd = new SqlCommand("select status from queue where queueuid=@queueuid", cn))
+                    {
+                        cmd.Parameters.AddWithValue("@queueuid", QueueUid);
+                        using (SqlDataReader dr = cmd.ExecuteReader())
                         {
-                            cn.Close();
-                            return false;
+
+                            if (dr.Read())
+                            {
+                                if (dr.GetInt32(0) != 1)
+                                {
+                                    cn.Close();
+                                    return false;
+                                }
+                            }
+                            else
+                            {
+                                cn.Close();
+                                return false;
+                            }
+                            dr.Close();
                         }
                     }
-                    else
+                    using (SqlCommand cmd1 = new SqlCommand("delete from epmlive_log where timerjobuid=@timerjobuid", cn))
                     {
-                        cn.Close();
-                        return false;
+                        cmd1.Parameters.AddWithValue("@timerjobuid", JobUid);
+                        cmd1.ExecuteNonQuery();
                     }
-                    dr.Close();
+                    return true;
+                }
+                catch
+                {
+                    return false;
                 }
             }
-
-            using (SqlCommand cmd1 = new SqlCommand("delete from epmlive_log where timerjobuid=@timerjobuid", cn))
-            {
-                cmd1.Parameters.AddWithValue("@timerjobuid", JobUid);
-                cmd1.ExecuteNonQuery();
-            }
-
-            cn.Close();
-            return true;
         }
     }
 }

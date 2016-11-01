@@ -18,6 +18,7 @@ namespace EPMLiveCore.Jobs
         StringBuilder sbErrors = null;
         public void execute(SPSite site, SPWeb web, string data)
         {
+            WebAppId = site.WebApplication.Id;
             sbErrors = new StringBuilder();
             try
             {
@@ -33,27 +34,34 @@ namespace EPMLiveCore.Jobs
                 {
 
                     string sFixLists = EPMLiveCore.CoreFunctions.getConfigSetting(site.RootWeb, "EPMLiveFixLists");
-
-                    SPSecurity.RunWithElevatedPrivileges(delegate ()
+                    using (SqlConnection cn = CreateConnection())
                     {
-                        cn.Open();
-                    });
+                        try
+                        {
+                            SPSecurity.RunWithElevatedPrivileges(delegate ()
+                            {
+                                cn.Open();
+                            });
 
-                    using (SqlCommand cmd = new SqlCommand("DELETE FROM RESINFO where siteid=@siteid", cn))
-                    {
-                        cmd.Parameters.AddWithValue("@siteid", site.ID);
-                        cmd.ExecuteNonQuery();
+                            using (SqlCommand cmd = new SqlCommand("DELETE FROM RESINFO where siteid=@siteid", cn))
+                            {
+                                cmd.Parameters.AddWithValue("@siteid", site.ID);
+                                cmd.ExecuteNonQuery();
+                            }
+
+                            using (SqlCommand cmd1 = new SqlCommand("DELETE FROM RESLINK where siteid=@siteid or siteid in (select siteid from reslink where weburl=@weburl)", cn))
+                            {
+                                cmd1.Parameters.AddWithValue("@siteid", site.ID);
+                                cmd1.Parameters.AddWithValue("@weburl", site.ServerRelativeUrl);
+                                cmd1.ExecuteNonQuery();
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            bErrors = true;
+                            sErrors = ex.Message;
+                        }
                     }
-
-                    using (SqlCommand cmd1 = new SqlCommand("DELETE FROM RESLINK where siteid=@siteid or siteid in (select siteid from reslink where weburl=@weburl)", cn))
-                    {
-                        cmd1.Parameters.AddWithValue("@siteid", site.ID);
-                        cmd1.Parameters.AddWithValue("@weburl", site.ServerRelativeUrl);
-                        cmd1.ExecuteNonQuery();
-                    }
-
-                    cn.Close();
-
                     buildResPlanInfo();
 
                     int hours = 0;
@@ -94,13 +102,23 @@ namespace EPMLiveCore.Jobs
 
                         updateProgress(webCount++);
                     }
-
-                    SPSecurity.RunWithElevatedPrivileges(delegate ()
+                    using (SqlConnection conn = CreateConnection())
                     {
-                        cn.Open();
-                    });
-                    storeResPlanInfo();
-                    cn.Close();
+                        try
+                        {
+                            SPSecurity.RunWithElevatedPrivileges(delegate ()
+                            {
+                                conn.Open();
+                            });
+                            storeResPlanInfo();
+                        }
+                        catch (Exception ex)
+                        {
+                            bErrors = true;
+                            sErrors = ex.Message;
+                        }
+
+                    }
                 }
             }
             catch (Exception ex)
@@ -223,41 +241,49 @@ namespace EPMLiveCore.Jobs
 
         private void storeResPlanInfo()
         {
-            if (cn.State == ConnectionState.Open)
+            using (SqlConnection cn = CreateConnection())
             {
-
-                using (SqlBulkCopy sbc = new SqlBulkCopy(cn))
+                try
                 {
-                    sbc.DestinationTableName = "RESINFO";
-                    // Number Of Records Processed In One Go 
-                    int iRowCount = dtResInfo.Rows.Count;
-                    if (iRowCount > 500)
+                    cn.Open();
+                    using (SqlBulkCopy sbc = new SqlBulkCopy(cn))
                     {
-                        iRowCount = 500;
+                        sbc.DestinationTableName = "RESINFO";
+                        // Number Of Records Processed In One Go 
+                        int iRowCount = dtResInfo.Rows.Count;
+                        if (iRowCount > 500)
+                        {
+                            iRowCount = 500;
+                        }
+
+                        sbc.BatchSize = iRowCount;
+                        sbc.NotifyAfter = dtResInfo.Rows.Count;
+                        sbc.WriteToServer(dtResInfo);
+                        sbc.Close();
+
                     }
 
-                    sbc.BatchSize = iRowCount;
-                    sbc.NotifyAfter = dtResInfo.Rows.Count;
-                    sbc.WriteToServer(dtResInfo);
-                    sbc.Close();
+                    using (SqlBulkCopy sbc = new SqlBulkCopy(cn))
+                    {
+                        sbc.DestinationTableName = "RESLINK";
+                        // Number Of Records Processed In One Go 
+                        int iRowCount = dtResLink.Rows.Count;
+                        if (iRowCount > 500)
+                        {
+                            iRowCount = 500;
+                        }
 
+                        sbc.BatchSize = iRowCount;
+                        sbc.NotifyAfter = dtResLink.Rows.Count;
+                        sbc.WriteToServer(dtResLink);
+                        sbc.Close();
+
+                    }
                 }
-
-                using (SqlBulkCopy sbc = new SqlBulkCopy(cn))
+                catch (Exception ex)
                 {
-                    sbc.DestinationTableName = "RESLINK";
-                    // Number Of Records Processed In One Go 
-                    int iRowCount = dtResLink.Rows.Count;
-                    if (iRowCount > 500)
-                    {
-                        iRowCount = 500;
-                    }
-
-                    sbc.BatchSize = iRowCount;
-                    sbc.NotifyAfter = dtResLink.Rows.Count;
-                    sbc.WriteToServer(dtResLink);
-                    sbc.Close();
-
+                    bErrors = true;
+                    sErrors = ex.Message;
                 }
             }
         }

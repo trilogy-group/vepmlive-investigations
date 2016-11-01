@@ -81,7 +81,7 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
 
         #endregion
     }
-    [UpgradeStep(Version = EPMLiveVersion.V600, Order = 1.0, Description = "Updating Resource table")]
+    [UpgradeStep(Version = EPMLiveVersion.V600, Order = 2.0, Description = "Updating Resource table")]
     internal class AddUpdateResourcePoolColumn : UpgradeStep
     {
         #region Constructors (1) 
@@ -208,7 +208,7 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
         #endregion
 
     }
-    [UpgradeStep(Version = EPMLiveVersion.V600, Order = 1.0, Description = "Remove Menu item")]
+    [UpgradeStep(Version = EPMLiveVersion.V600, Order = 3.0, Description = "Remove Menu item")]
     internal class RemoveMenuItem : UpgradeStep
     {
         private const string SETTINGS_LIST = "EPM Live Settings";
