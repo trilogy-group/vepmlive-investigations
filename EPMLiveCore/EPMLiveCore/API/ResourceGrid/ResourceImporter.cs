@@ -39,7 +39,7 @@ namespace EPMLiveCore.API
         private readonly bool _isOnline;
         private readonly SPWeb _spWeb;
         private string _currentProcess;
-        
+
         private ResourceImportResult _dSMResult;
         private Int32 _totalRecords = 0, _successRecords = 0, _failedRecords = 0, _processedRecords = 0;
 
@@ -89,7 +89,7 @@ namespace EPMLiveCore.API
                 if (!this.IsImportCancelled)
                 {
                     LoadSpreadsheet();
-                    ImportResources(); 
+                    ImportResources();
                 }
             }
             catch (Exception e)
@@ -101,22 +101,22 @@ namespace EPMLiveCore.API
             {
                 string msg = string.Empty;
                 if (!this.IsImportCancelled)
-                { 
+                {
                     msg = String.Format("Import completed {0}!", exception != null ? "with errors" : "successfully");
                 }
                 else
                 {
                     msg = String.Format("Import cancelled!");
                 }
-                
+
                 LogImportMessage(msg, exception != null ? 1 : 0);
                 RaiseImportCompletedEvent(exception);
             }
-        }        
+        }
 
         private void AddNewResource(DataRow row, bool isGeneric)
         {
-            var lockedColumns = new List<string> {"ID", "EXTID"};
+            var lockedColumns = new List<string> { "ID", "EXTID" };
 
             if (isGeneric)
             {
@@ -238,7 +238,11 @@ namespace EPMLiveCore.API
                                             //}
                                             //else
                                             //{
+                                            try
+                                            {
                                                 value = new SPFieldLookupValue(lookupFieldDict[col][val], val);
+                                            }
+                                            catch { throw new Exception(string.Format(" Value : ({0}) does not exists.", val)); }
                                             //}
                                             break;
                                     }
@@ -388,7 +392,7 @@ namespace EPMLiveCore.API
             {
                 try
                 {
-                    usersDict.Add(spListItem["Name"].ToString(), new[] {spListItem["ID"], spListItem["Title"]});
+                    usersDict.Add(spListItem["Name"].ToString(), new[] { spListItem["ID"], spListItem["Title"] });
                 }
                 catch { }
             }
@@ -402,7 +406,7 @@ namespace EPMLiveCore.API
 
             try
             {
-                value = new SPFieldUserValue(_spWeb, (int) usersDict[val][0], val);
+                value = new SPFieldUserValue(_spWeb, (int)usersDict[val][0], val);
             }
             catch
             {
@@ -411,14 +415,14 @@ namespace EPMLiveCore.API
                 foreach (var pair in usersDict.Where(p => p.Value[1].ToString().Equals(val)))
                 {
                     found = true;
-                    value = new SPFieldUserValue(_spWeb, (int) pair.Value[0], pair.Key);
+                    value = new SPFieldUserValue(_spWeb, (int)pair.Value[0], pair.Key);
                     break;
                 }
 
                 if (!found)
                 {
                     SPUser spUser = _spWeb.EnsureUser(val);
-                    usersDict.Add(spUser.LoginName, new object[] {spUser.ID, spUser.Name});
+                    usersDict.Add(spUser.LoginName, new object[] { spUser.ID, spUser.Name });
                     value = new SPFieldUserValue(_spWeb, spUser.ID, spUser.Name);
                 }
             }
@@ -460,7 +464,7 @@ namespace EPMLiveCore.API
                     }
                     catch (Exception e)
                     {
-                        LogImportMessage("FAILURE. Reason: " + e.Message, 2);
+                        LogImportMessage(string.Format("FAILURE. Reason : {0} Please correct data for Resource (Name : {1} ,Id : {2}). ", e.Message, row["Title"], row["ID"]), 2);
                         _failedRecords++;
                         _processedRecords++;
                         RaiseImportProgressChangedEvent(_currentProcess);
@@ -492,7 +496,7 @@ namespace EPMLiveCore.API
                     {
                         if (!this.IsImportCancelled)
                         {
-                            ParseExcelResources(stream); 
+                            ParseExcelResources(stream);
                         }
                     }
 
@@ -501,7 +505,7 @@ namespace EPMLiveCore.API
 
                 if (!this.IsImportCancelled)
                 {
-                    BuildResourceTable(); 
+                    BuildResourceTable();
                 }
 
                 _totalRecords = _dtResources.Rows.Count;
@@ -514,7 +518,7 @@ namespace EPMLiveCore.API
             {
                 IEnumerable<Sheet> sheets = document.WorkbookPart.Workbook.GetFirstChild<Sheets>().Elements<Sheet>();
                 string rId = sheets.First().Id.Value;
-                var worksheetPart = (WorksheetPart) document.WorkbookPart.GetPartById(rId);
+                var worksheetPart = (WorksheetPart)document.WorkbookPart.GetPartById(rId);
                 Worksheet worksheet = worksheetPart.Worksheet;
                 var sheetData = worksheet.GetFirstChild<SheetData>();
                 IEnumerable<Row> rows = sheetData.Descendants<Row>();
@@ -628,7 +632,7 @@ namespace EPMLiveCore.API
 
                 if (isGeneric) spListItem["Title"] = spListItem["Title"];
 
-                spListItem.Update(); 
+                spListItem.Update();
             }
         }
 
@@ -636,7 +640,7 @@ namespace EPMLiveCore.API
         {
             try
             {
-                var lockedColumns = new List<string> {"ID", "EXTID", "Title", "Generic", "SharePointAccount", "Email"};
+                var lockedColumns = new List<string> { "ID", "EXTID", "Title", "Generic", "SharePointAccount", "Email" };
 
                 if (isGeneric)
                 {
@@ -720,7 +724,7 @@ namespace EPMLiveCore.API
             if (!string.IsNullOrEmpty(email))
             {
                 SPListItemCollection items =
-                    resourcePool.GetItems(new SPQuery {Query = string.Format(VALIDATE_EMAIL_QUERY, email)});
+                    resourcePool.GetItems(new SPQuery { Query = string.Format(VALIDATE_EMAIL_QUERY, email) });
 
                 if (items.Count > 0)
                 {
@@ -820,7 +824,7 @@ namespace EPMLiveCore.API
         private void RaiseImportProgressChangedEvent(String currentProcess)
         {
             Int32 percentage = (_processedRecords == 0 ? 0 : (_processedRecords * 100) / _totalRecords);
-            _dSMResult.CurrentProcess = (percentage == 100 ? string.Format("Import {0}. Check the log for more details.", this.IsImportCancelled? "Cancelled" : "Completed") : currentProcess);
+            _dSMResult.CurrentProcess = (percentage == 100 ? string.Format("Import {0}. Check the log for more details.", this.IsImportCancelled ? "Cancelled" : "Completed") : currentProcess);
             _dSMResult.TotalRecords = _totalRecords;
             _dSMResult.ProcessedRecords = _processedRecords;
             _dSMResult.SuccessRecords = _successRecords;
@@ -830,18 +834,18 @@ namespace EPMLiveCore.API
         }
 
         private void RaiseImportCompletedEvent(Exception exception)
-        {            
-            _dSMResult.CurrentProcess = String.Format("Import {0}{1}. Check the log for more details.", this.IsImportCancelled? "Cancelled" : "Completed", exception == null ? "" : " with errors");
+        {
+            _dSMResult.CurrentProcess = String.Format("Import {0}{1}. Check the log for more details.", this.IsImportCancelled ? "Cancelled" : "Completed", exception == null ? "" : " with errors");
             _dSMResult.TotalRecords = _totalRecords;
             _dSMResult.ProcessedRecords = _processedRecords;
             _dSMResult.SuccessRecords = _successRecords;
             _dSMResult.FailedRecords = _failedRecords;
             _dSMResult.PercentComplete = 100;
             ImportCompleted(this, new ImportCompletedEventHandlerArgs(exception, false, _dSMResult));
-        }        
+        }
 
         #endregion Methods
-    }    
+    }
 
     public delegate void ImportProgressChangedEventHandler(object sender, ImportProgressChangedEventHandlerArgs args);
 
@@ -884,9 +888,9 @@ namespace EPMLiveCore.API
         /// <param name="resources">The resources.</param>
         public ImportCompletedEventHandlerArgs(Exception error, bool cancelled, object userState)
             : base(error, cancelled, userState)
-        {            
+        {
         }
 
         #endregion Constructors         
-    }    
+    }
 }

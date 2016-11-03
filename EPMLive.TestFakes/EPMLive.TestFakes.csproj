@@ -51,6 +51,9 @@
     <Reference Include="mscorlib.4.0.0.0.Fakes">
       <HintPath>FakesAssemblies\mscorlib.4.0.0.0.Fakes.dll</HintPath>
     </Reference>
+    <Reference Include="PortfolioEngineCore.Fakes">
+      <HintPath>FakesAssemblies\PortfolioEngineCore.Fakes.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.4.0.0.0.Fakes">
       <HintPath>FakesAssemblies\System.4.0.0.0.Fakes.dll</HintPath>
@@ -70,6 +73,9 @@
     <Reference Include="System.XML" />
     <Reference Include="System.XML.4.0.0.0.Fakes">
       <HintPath>FakesAssemblies\System.XML.4.0.0.0.Fakes.dll</HintPath>
+    </Reference>
+    <Reference Include="WorkEnginePPM.Fakes">
+      <HintPath>FakesAssemblies\WorkEnginePPM.Fakes.dll</HintPath>
     </Reference>
   </ItemGroup>
   <Choose>
