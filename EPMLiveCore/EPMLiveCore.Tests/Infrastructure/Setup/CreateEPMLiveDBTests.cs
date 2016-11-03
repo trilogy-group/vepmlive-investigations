@@ -9,6 +9,7 @@ using Microsoft.SharePoint.Administration.Fakes;
 using System.Data.SqlClient.Fakes;
 using EPMLiveCore.Fakes;
 using EPMLiveCore.Infrastructure.Setup.Fakes;
+using System.Data.SqlClient;
 
 namespace EPMLiveCore.Infrastructure.Setup.Tests
 {
@@ -44,18 +45,35 @@ namespace EPMLiveCore.Infrastructure.Setup.Tests
                     return new ShimSPWebApplication();
                 };
 
-                ShimSqlCommand.AllInstances.ExecuteNonQuery = (instance) =>
+                ShimSqlConnection.ConstructorString = (instance, connString) =>
+                 {
+                     var connection = new ShimSqlConnection(instance);
+                     connection.Open = () => { };
+                     connection.Close = () => { };
+                 };
+
+                ShimSqlCommand.ConstructorStringSqlConnection = (instance, cmdText, sqlConnection) =>
                 {
-                    return 1;
+                    ShimSqlCommand sqlCommand = new ShimSqlCommand(instance);
+                    sqlCommand.ParametersGet = () =>
+                    {
+                        var realSqlCommand = new SqlCommand();
+                        return realSqlCommand.Parameters;
+                    };
+                    ShimSqlCommand.AllInstances.ExecuteNonQuery = (instance1) =>
+                   {
+                       return 1;
+                   };
                 };
+
 
                 ShimCoreFunctions.setConnectionStringGuidStringStringOut = (Guid gWebApp, string cn, out string sError) =>
-                {
-                    sError = "";
-                    return true;
-                };
-
-                Assert.AreEqual(createEPMLiveDB.CreateEPMLiveDatabase(webApplicationId, "win-6j09gf4nbp8", "EPMLive1", "", ""), "Sucess");
+                   {
+                       sError = "";
+                       return true;
+                   };
+                string error = "";
+                Assert.IsTrue(createEPMLiveDB.CreateEPMLiveDatabase(webApplicationId, "win-6j09gf4nbp8", "EPMLive2", "", "", out error));
             }
         }
 
@@ -79,7 +97,7 @@ namespace EPMLiveCore.Infrastructure.Setup.Tests
 
                 ShimSPProcessIdentity.AllInstances.UsernameGet = (instance) =>
                 {
-                    return "epmldev\farmadmin";
+                    return "";
                 };
 
                 ShimCreateEPMLiveDB.AllInstances.GetWebApplicationGuid = (instance, a) =>
@@ -98,7 +116,8 @@ namespace EPMLiveCore.Infrastructure.Setup.Tests
                     return false;
                 };
 
-                Assert.AreEqual(Convert.ToString(createEPMLiveDB.CreateEPMLiveDatabase(webApplicationId, "win-6j09gf4nbp8", "EPMLive1", "", "")), "Error Setting String: Error");             
+                string error = "";
+                Assert.IsFalse(createEPMLiveDB.CreateEPMLiveDatabase(webApplicationId, "win-6j09gf4nbp8", "EPMLive2", "", "", out error));
             }
         }
     }
