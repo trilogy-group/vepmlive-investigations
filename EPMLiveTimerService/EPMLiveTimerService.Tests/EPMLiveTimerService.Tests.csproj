@@ -85,6 +85,10 @@
     <Compile Include="TimerRunnerTests.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\EPMLive.TestFakes\EPMLive.TestFakes.csproj">
+      <Project>{b408b875-0102-4064-83f6-f85a4070a105}</Project>
+      <Name>EPMLive.TestFakes</Name>
+    </ProjectReference>
     <ProjectReference Include="..\EPMLiveTimerService\EPMLiveTimerService.csproj">
       <Project>{6C2BE0DE-AF49-4F4D-BAB8-AE256F1CBDD7}</Project>
       <Name>EPMLiveTimerService</Name>
