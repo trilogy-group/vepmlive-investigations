@@ -45,11 +45,14 @@ namespace EPMLiveCore.Infrastructure.Setup.Tests
                     return new ShimSPWebApplication();
                 };
 
+                var openedConnections = 0;
+                var closedConnections = 0;
+
                 ShimSqlConnection.ConstructorString = (instance, connString) =>
                  {
                      var connection = new ShimSqlConnection(instance);
-                     connection.Open = () => { };
-                     connection.Close = () => { };
+                     connection.Open = () => { openedConnections++; };
+                     connection.Close = () => { closedConnections++; };
                  };
 
                 ShimSqlCommand.ConstructorStringSqlConnection = (instance, cmdText, sqlConnection) =>
@@ -74,6 +77,7 @@ namespace EPMLiveCore.Infrastructure.Setup.Tests
                    };
                 string error = "";
                 Assert.IsTrue(createEPMLiveDB.CreateEPMLiveDatabase(webApplicationId, "win-6j09gf4nbp8", "EPMLive2", "", "", out error));
+                Assert.AreEqual(openedConnections, closedConnections);
             }
         }
 
