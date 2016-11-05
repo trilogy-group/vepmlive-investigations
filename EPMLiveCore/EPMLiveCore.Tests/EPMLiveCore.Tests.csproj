@@ -84,6 +84,7 @@
     <Compile Include="API\Analytics\FRFQueryFactoryTests.cs" />
     <Compile Include="API\Analytics\RecentItemsTests.cs" />
     <Compile Include="Infrastructure\Setup\CreateEPMLiveDBTests.cs" />
+    <Compile Include="Infrastructure\Setup\ActivateFeatureKeyTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
