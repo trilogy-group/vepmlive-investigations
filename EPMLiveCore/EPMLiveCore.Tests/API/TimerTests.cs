@@ -1,10 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using EPMLiveCore.API;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Data.SqlClient.Fakes;
 using Microsoft.SharePoint.Fakes;
 using EPMLiveCore.Infrastructure.Logging.Fakes;
@@ -60,8 +55,43 @@ namespace EPMLiveCore.API.Tests
                 {
 
                 };
+                bool read = false;
                 ShimCoreFunctions.getConnectionStringGuid = (instance) => { return ""; };
-
+                ShimSqlCommand.AllInstances.ExecuteReader = (instance) =>
+                {
+                    return new ShimSqlDataReader()
+                    {
+                        Read = () =>
+                        {
+                            return !read;
+                        },
+                        GetSqlInt32Int32 = (_int) =>
+                        {
+                            read = true;
+                            return 20;
+                        },
+                        GetGuidInt32 = (_int) =>
+                        {
+                            read = true;
+                            return Guid.NewGuid();
+                        },
+                        GetDateTimeInt32 = (_int) =>
+                        {
+                            read = true;
+                            return DateTime.Now;
+                        },
+                        GetStringInt32 = (_int) =>
+                        {
+                            read = true;
+                            return "";
+                        },
+                        IsDBNullInt32 = (_int) =>
+                        {
+                            read = true;
+                            return false;
+                        },
+                    };
+                };
                 Timer.GetTimerJobStatus(spweb, jobid);
                 Timer.GetTimerJobStatus(siteid, webid, 0, true);
                 Timer.GetTimerJobStatus(siteid, webid, listid, 0, 0);
