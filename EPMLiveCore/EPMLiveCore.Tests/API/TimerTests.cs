@@ -55,7 +55,7 @@ namespace EPMLiveCore.API.Tests
                 {
 
                 };
-                bool read = false;
+                bool read = true;
                 ShimCoreFunctions.getConnectionStringGuid = (instance) => { return ""; };
                 ShimSqlCommand.AllInstances.ExecuteReader = (instance) =>
                 {
@@ -63,43 +63,51 @@ namespace EPMLiveCore.API.Tests
                     {
                         Read = () =>
                         {
-                            return !read;
+                            return read;
                         },
                         GetSqlInt32Int32 = (_int) =>
                         {
-                            read = true;
+                            read = false;
                             return 20;
                         },
                         GetGuidInt32 = (_int) =>
                         {
-                            read = true;
+                            read = false;
                             return Guid.NewGuid();
                         },
                         GetDateTimeInt32 = (_int) =>
                         {
-                            read = true;
+                            read = false;
                             return DateTime.Now;
                         },
                         GetStringInt32 = (_int) =>
                         {
-                            read = true;
+                            read = false;
                             return "";
                         },
                         IsDBNullInt32 = (_int) =>
                         {
-                            read = true;
+                            read = false;
                             return false;
                         },
                     };
                 };
                 Timer.GetTimerJobStatus(spweb, jobid);
+                read = true;
                 Timer.GetTimerJobStatus(siteid, webid, 0, true);
+                read = true;
                 Timer.GetTimerJobStatus(siteid, webid, listid, 0, 0);
+                read = true;
                 Timer.AddTimerJob(siteid, webid, listid, 1, "", 1, "", "", 1, 0, "");
+                read = true;
                 Timer.AddTimerJob(siteid, webid, listid, "", 1, "", "", 5, 2, "");
+                read = true;
                 Timer.AddTimerJob(siteid, webid, "", 1, "", "", 5, 3, "");
+                read = true;
                 Timer.CancelTimerJob(spweb, jobid);
+                read = true;
                 Timer.IsImportResourceAlreadyRunning(spweb);
+                read = false;
                 Timer.IsSecurityJobAlreadyRunning(spweb, listid, 5);
 
 
