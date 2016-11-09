@@ -1648,152 +1648,145 @@ namespace EPMLiveCore.ReportHelper
             }
         }
 
-        public bool BulkInsert(DataSet dsLists, SqlConnection con, bool blnLogStatus)
+        public bool BulkInsert(DataSet dsLists, bool blnLogStatus, out string message)
         {
             var sbcOptions = new SqlBulkCopyOptions();
             bool blnSuccess = false;
-            ;
             string sListName = string.Empty;
             SqlTransaction tx = null;
-
-            try
+            message = string.Empty;
+            using (SqlConnection cn = new SqlConnection(_remoteCs))
             {
-                foreach (DataTable dtList in dsLists.Tables)
+                try
                 {
-                    tx = con.BeginTransaction();
-                    using (var sbc = new SqlBulkCopy(con, sbcOptions, tx))
+                    cn.Open();
+                    foreach (DataTable dtList in dsLists.Tables)
                     {
-                        try
+                        tx = cn.BeginTransaction();
+                        using (var sbc = new SqlBulkCopy(cn, sbcOptions, tx))
                         {
-                            //Clear list name
-                            sListName = string.Empty;
-
-                            //Init. list name
-                            sListName = dtList.TableName.ToLower().Replace("lst", "");
-
-                            //Datatable name MUST be the SAME as the sqltable name.
-                            sbc.DestinationTableName = dtList.TableName;
-
-                            //Recommended MAX batchsize is 500 to avoid timeout issues.
-                            sbc.BatchSize = 500;
-
-                            //Mapping columns
-                            foreach (DataColumn column in dtList.Columns)
+                            try
                             {
-                                sbc.ColumnMappings.Add(column.ColumnName, column.ColumnName);
+                                //Clear list name
+                                sListName = string.Empty;
+
+                                //Init. list name
+                                sListName = dtList.TableName.ToLower().Replace("lst", "");
+
+                                //Datatable name MUST be the SAME as the sqltable name.
+                                sbc.DestinationTableName = dtList.TableName;
+
+                                //Recommended MAX batchsize is 500 to avoid timeout issues.
+                                sbc.BatchSize = 500;
+
+                                //Mapping columns
+                                foreach (DataColumn column in dtList.Columns)
+                                {
+                                    sbc.ColumnMappings.Add(column.ColumnName, column.ColumnName);
+                                }
+
+                                // Number of records after which client has to be notified about its status                
+                                sbc.NotifyAfter = dtList.Rows.Count;
+
+                                // Finally write to server                
+                                sbc.WriteToServer(dtList);
+                                tx.Commit();
+                                blnSuccess = true;
                             }
-
-                            // Number of records after which client has to be notified about its status                
-                            sbc.NotifyAfter = dtList.Rows.Count;
-
-                            // Finally write to server                
-                            sbc.WriteToServer(dtList);
-                            sbc.Close();
-
-                            tx.Commit();
-                            tx.Dispose();
-                        }
-                        catch (Exception ex)
-                        {
-                            tx.Dispose();
-                            //Log status
-                            LogStatus(string.Empty, string.Empty, string.Format("Bulk Insert {0} Refresh not completed due errors. {1} ", dtList.TableName, ex.Message.Replace("'", "")),
-                                ex.StackTrace.Replace("'", ""), 2, 3, string.Empty);
-                            // - CAT.NET false-positive: All single quotes are escaped/removed.
+                            catch (Exception ex)
+                            {
+                                blnSuccess = false;
+                                tx.Rollback();
+                                message = string.Format("Bulk Insert {0} Refresh not completed due errors. {1} ", dtList.TableName, ex.Message.ToString());
+                                //Log status
+                                LogStatus(string.Empty, string.Empty, message,
+                                    ex.ToString().Replace("'", ""), 2, 3, string.Empty);
+                                // - CAT.NET false-positive: All single quotes are escaped/removed.
+                            }
+                            finally
+                            {
+                                if (tx != null)
+                                    tx.Dispose();
+                                if (sbc != null)
+                                    sbc.Close(); 
+                            }
                         }
                     }
                 }
-                blnSuccess = true;
-            }
-            catch (Exception ex)
-            {
-                //tx can be null on error
-                try
+                catch (Exception ex)
                 {
-                    tx.Rollback();
-                    tx.Dispose();
+                    blnSuccess = false;
+                    message = string.Format("Bulk Insert Refresh not completed due errors. {0} ", ex.Message.Replace("'", ""));
+                    LogStatus(string.Empty, string.Empty, message,
+                                      ex.ToString().Replace("'", ""), 2, 3, string.Empty);
                 }
-                catch (Exception ex1) { }
-            }
-
-            if (con.State == ConnectionState.Open)
-            {
-                con.Close();
-                con.Dispose();
             }
             return blnSuccess;
         }
 
-        public bool BulkInsert(DataSet dsLists, SqlConnection con, Guid timerjobguid)
+        public bool BulkInsert(DataSet dsLists, Guid timerjobguid)
         {
             var sbcOptions = new SqlBulkCopyOptions();
             bool blnSuccess = false;
-            ;
             string sListName = string.Empty;
-
             SqlTransaction tx = null;
-
-            try
+            using (SqlConnection cn = new SqlConnection(_remoteCs))
             {
-                foreach (DataTable dtList in dsLists.Tables)
+                try
                 {
-                    tx = con.BeginTransaction();
-                    using (var sbc = new SqlBulkCopy(con, sbcOptions, tx))
+                    cn.Open();
+                    foreach (DataTable dtList in dsLists.Tables)
                     {
-                        try
+                        tx = cn.BeginTransaction();
+                        using (var sbc = new SqlBulkCopy(cn, sbcOptions, tx))
                         {
-
-                            //Datatable name MUST be the SAME as the sqltable name.
-                            sbc.DestinationTableName = "[" + dtList.TableName + "]";
-
-                            //Recommended MAX batchsize is 500 to avoid timeout issues.
-                            sbc.BatchSize = 500;
-
-                            //Mapping columns
-                            foreach (DataColumn column in dtList.Columns)
+                            try
                             {
-                                sbc.ColumnMappings.Add(column.ColumnName, column.ColumnName);
+                                //Datatable name MUST be the SAME as the sqltable name.
+                                sbc.DestinationTableName = "[" + dtList.TableName + "]";
+                                //Recommended MAX batchsize is 500 to avoid timeout issues.
+                                sbc.BatchSize = 500;
+
+                                //Mapping columns
+                                foreach (DataColumn column in dtList.Columns)
+                                {
+                                    sbc.ColumnMappings.Add(column.ColumnName, column.ColumnName);
+                                }
+
+                                // Number of records after which client has to be notified about its status                
+                                sbc.NotifyAfter = dtList.Rows.Count;
+
+                                // Finally write to server                
+                                sbc.WriteToServer(dtList);
+                                tx.Commit();
+                                blnSuccess = true;
                             }
-
-                            // Number of records after which client has to be notified about its status                
-                            sbc.NotifyAfter = dtList.Rows.Count;
-
-                            // Finally write to server                
-                            sbc.WriteToServer(dtList);
-                            sbc.Close();
-
-                            tx.Commit();
-                            tx.Dispose();
-                        }
-                        catch (Exception ex)
-                        {
-                            tx.Dispose();
-                            LogStatus(string.Empty, string.Empty, string.Format("Bulk Insert {0} Refresh not completed due errors. {1} ", dtList.TableName, ex.Message.Replace("'", "")),
-                                ex.StackTrace.Replace("'", ""), 2, 3, timerjobguid.ToString());
-                            // - CAT.NET false-positive: All single quotes are escaped/removed.
+                            catch (Exception ex)
+                            {
+                                blnSuccess = false;
+                                tx.Rollback();
+                                LogStatus(string.Empty, string.Empty, string.Format("Bulk Insert {0} Refresh not completed due errors. {1} ", dtList.TableName, ex.Message.Replace("'", "")),
+                                    ex.ToString().Replace("'", ""), 2, 3, timerjobguid.ToString());
+                                // - CAT.NET false-positive: All single quotes are escaped/removed.
+                            }
+                            finally
+                            {
+                                if (tx != null)
+                                    tx.Dispose();
+                                if (sbc != null)
+                                    sbc.Close();
+                            }
                         }
                     }
                 }
-                blnSuccess = true;
-            }
-            catch (Exception ex)
-            {
-                //tx can be null on error
-                try
+                catch (Exception ex)
                 {
-                    tx.Rollback();
-                    tx.Dispose();
-                }
-                catch (Exception ex1) { }
-                LogStatus(string.Empty, string.Empty, string.Format("Bulk Insert Refresh not completed due errors. {0} ", ex.Message.Replace("'", "")),
-                    ex.StackTrace.Replace("'", ""), 2, 3, timerjobguid.ToString());
-                // - CAT.NET false-positive: All single quotes are escaped/removed.
-            }
+                    blnSuccess = false;
 
-            if (con.State == ConnectionState.Open)
-            {
-                con.Close();
-                con.Dispose();
+                    LogStatus(string.Empty, string.Empty, string.Format("Bulk Insert  Refresh not completed due errors. {0} ", ex.Message.Replace("'", "")),
+                                    ex.ToString().Replace("'", ""), 2, 3, timerjobguid.ToString());
+
+                }
             }
             return blnSuccess;
         }
