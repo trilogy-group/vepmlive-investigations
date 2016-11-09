@@ -87,6 +87,7 @@
     <Compile Include="Infrastructure\Setup\CreateEPMLiveDBTests.cs" />
     <Compile Include="Infrastructure\Setup\ActivateFeatureKeyTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ReportHelper\EPMDataTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\EPMLive.TestFakes\EPMLive.TestFakes.csproj">
