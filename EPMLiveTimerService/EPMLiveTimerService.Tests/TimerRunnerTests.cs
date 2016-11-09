@@ -12,10 +12,10 @@ using Microsoft.SharePoint.Administration.Fakes;
 
 namespace TimerService.Tests
 {
-    [TestClass()]
+   // [TestClass()]
     public class TimerRunnerTests
     {
-        [TestMethod()]
+        //[TestMethod()]
         public void startTimerTest()
         {
             using (SPEmulators.SPEmulationContext ctx = new SPEmulators.SPEmulationContext(SPEmulators.IsolationLevel.Fake))

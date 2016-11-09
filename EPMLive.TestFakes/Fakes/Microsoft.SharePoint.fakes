@@ -67,7 +67,7 @@
     <Add FullName="Microsoft.SharePoint.SPRoleDefinitionCollection!"/>
     <Add FullName="Microsoft.SharePoint.SPRoleDefinition!"/>
     <Add FullName="Microsoft.SharePoint.SPRoleDefinitionBindingCollection!"/>
-    
-
+    <Add FullName="Microsoft.SharePoint.Administration.SPProcessIdentity!"/>
+    <Add FullName="Microsoft.SharePoint.Administration.SPApplicationPool!"/>
   </ShimGeneration>
 </Fakes>

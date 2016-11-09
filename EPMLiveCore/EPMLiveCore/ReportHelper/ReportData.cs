@@ -14,7 +14,7 @@ using Microsoft.SharePoint;
 
 namespace EPMLiveCore.ReportHelper
 {
-    public class ReportData
+    public class ReportData : IDisposable
     {
         protected readonly string _epmLiveCs;
         protected readonly Guid _siteId;
@@ -1172,9 +1172,10 @@ namespace EPMLiveCore.ReportHelper
             var ds = new DataSet();
             table.TableName = Resources.ReportingTimesheetTable;
             ds.Tables.Add(table);
-            _DAO.BulkInsert(ds, _DAO.GetClientReportingConnection, false);
-            message = "Success assumed";
-            return true;
+            _DAO.BulkInsert(ds, false, out message);
+            if (string.IsNullOrEmpty(message))
+                return true;
+            return false;
         }
 
         //Modules created by XJH -- START
@@ -1295,9 +1296,9 @@ namespace EPMLiveCore.ReportHelper
             _DAO.Dispose();
         }
 
-        public bool BulkInsert(DataSet dsLists, SqlConnection con, Guid timerjobguid)
+        public bool BulkInsert(DataSet dsLists, Guid timerjobguid)
         {
-            return _DAO.BulkInsert(dsLists, con, timerjobguid);
+            return _DAO.BulkInsert(dsLists, timerjobguid);
         }
 
         public void ReportError(Guid listid, string sListName, string sErrMsg, string sSection, int iErrType)
@@ -2128,7 +2129,7 @@ namespace EPMLiveCore.ReportHelper
 
         public bool InsertAllItemsDB(DataSet dsLists, Guid timerjobguid)
         {
-            bool blnPassed = _DAO.BulkInsert(dsLists, _DAO.GetClientReportingConnection, timerjobguid);
+            bool blnPassed = _DAO.BulkInsert(dsLists, timerjobguid);
             return blnPassed;
         }
 

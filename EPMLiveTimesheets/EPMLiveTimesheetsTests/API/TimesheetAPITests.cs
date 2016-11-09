@@ -15,7 +15,6 @@ namespace TimeSheets.Tests
     [TestClass()]
     public class TimesheetAPITests
     {
-        [TestClass()]
         private class TestRoleChecker : ISPRoleChecker
         {
             public bool ContainsRole(SPWeb web, string roleName)
