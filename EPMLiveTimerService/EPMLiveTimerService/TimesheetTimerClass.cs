@@ -92,26 +92,31 @@ namespace TimerService
             workingThreads = new WorkerThreads(maxThreads);
 
             logMessage("INIT", "STMR", "Setting threads to: " + maxThreads);
-
-            foreach (SPWebApplication webApp in SPWebService.ContentService.WebApplications)
+            SPWebApplicationCollection _webcolections = TimerRunner.GetWebApplications();
+            foreach (SPWebApplication webApp in _webcolections)
             {
                 var sConn = EPMLiveCore.CoreFunctions.getConnectionString(webApp.Id);
                 if (sConn != "")
                 {
                     using (var cn = new SqlConnection(sConn))
                     {
-                        cn.Open();
-                        using (var cmd = new SqlCommand("update TSqueue set status = 0, queue = NULL where DATEDIFF(HH,DTSTARTED,getdate()) > 24 and (status = 1 OR STATUS = 2)", cn))
+                        try
                         {
-                            cmd.ExecuteNonQuery();
+                            cn.Open();
+                            using (var cmd = new SqlCommand("update TSqueue set status = 0, queue = NULL where DATEDIFF(HH,DTSTARTED,getdate()) > 24 and (status = 1 OR STATUS = 2)", cn))
+                            {
+                                cmd.ExecuteNonQuery();
+                            }
+                            using (var cmd1 = new SqlCommand("update TSqueue set status = 0, queue = NULL where queue=@servername and (status = 1 OR STATUS = 2)", cn))
+                            {
+                                cmd1.Parameters.Clear();
+                                cmd1.Parameters.AddWithValue("@servername", System.Environment.MachineName);
+                                cmd1.ExecuteNonQuery();
+                            }
                         }
-                        using (var cmd1 = new SqlCommand("update TSqueue set status = 0, queue = NULL where queue=@servername and (status = 1 OR STATUS = 2)", cn))
-                        {
-                            cmd1.Parameters.Clear();
-                            cmd1.Parameters.AddWithValue("@servername", System.Environment.MachineName);
-                            cmd1.ExecuteNonQuery();
-                        }
-                        cn.Close();
+                        catch (Exception exe) { logMessage("ERR", "RUN", exe.Message); }
+
+
                     }
                 }
             }
@@ -142,51 +147,55 @@ namespace TimerService
                 if (maxThreads > 0)
                 {
 
-                    foreach (SPWebApplication webApp in SPWebService.ContentService.WebApplications)
+                    SPWebApplicationCollection _webcolections = TimerRunner.GetWebApplications();
+                    foreach (SPWebApplication webApp in _webcolections)
                     {
                         string sConn = EPMLiveCore.CoreFunctions.getConnectionString(webApp.Id);
                         if (sConn != "")
                         {
                             using (SqlConnection cn = new SqlConnection(sConn))
                             {
-                                cn.Open();
-
-                                using (SqlCommand cmd = new SqlCommand("spTSGetQueue", cn))
+                                try
                                 {
-                                    cmd.CommandType = CommandType.StoredProcedure;
-                                    cmd.Parameters.AddWithValue("@servername", System.Environment.MachineName);
-                                    cmd.Parameters.AddWithValue("@maxthreads", maxThreads);
+                                    cn.Open();
 
-                                    DataSet ds = new DataSet();
-                                    using (SqlDataAdapter da = new SqlDataAdapter(cmd))
+                                    using (SqlCommand cmd = new SqlCommand("spTSGetQueue", cn))
                                     {
-                                        da.Fill(ds);
+                                        cmd.CommandType = CommandType.StoredProcedure;
+                                        cmd.Parameters.AddWithValue("@servername", System.Environment.MachineName);
+                                        cmd.Parameters.AddWithValue("@maxthreads", maxThreads);
 
-                                        foreach (DataRow dr in ds.Tables[0].Rows)
+                                        DataSet ds = new DataSet();
+                                        using (SqlDataAdapter da = new SqlDataAdapter(cmd))
                                         {
-                                            var rd = new RunnerData {cn = sConn, dr = dr};
-                                            if (startProcess(rd))
+                                            da.Fill(ds);
+
+                                            foreach (DataRow dr in ds.Tables[0].Rows)
                                             {
-                                                using (var cmd1 = new SqlCommand("UPDATE TSqueue set status=2, dtstarted = GETDATE() where tsqueue_id=@id", cn))
+                                                var rd = new RunnerData { cn = sConn, dr = dr };
+                                                if (startProcess(rd))
                                                 {
-                                                    cmd1.Parameters.AddWithValue("@id", dr["tsqueue_id"].ToString());
-                                                    cmd1.ExecuteNonQuery();
+                                                    using (var cmd1 = new SqlCommand("UPDATE TSqueue set status=2, dtstarted = GETDATE() where tsqueue_id=@id", cn))
+                                                    {
+                                                        cmd1.Parameters.AddWithValue("@id", dr["tsqueue_id"].ToString());
+                                                        cmd1.ExecuteNonQuery();
+                                                    }
                                                 }
                                             }
                                         }
-                                    }
 
-                                    using (var cmd1 = new SqlCommand("delete from TSqueue where DateAdd(day, 1, dtfinished) < GETDATE()", cn))
-                                    {
-                                        cmd1.ExecuteNonQuery();
+                                        using (var cmd1 = new SqlCommand("delete from TSqueue where DateAdd(day, 1, dtfinished) < GETDATE()", cn))
+                                        {
+                                            cmd1.ExecuteNonQuery();
+                                        }
                                     }
                                 }
-
-                                cn.Close();
+                                catch (Exception ex)
+                                {
+                                    logMessage("ERR", "RUNT", ex.ToString());
+                                }
                             }
-
                         }
-                        
                     }
                 }
             }
@@ -238,13 +247,16 @@ namespace TimerService
                 {
                     using (SqlConnection cn = new SqlConnection(rd.cn))
                     {
-                        cn.Open();
-                        using (SqlCommand cmd = new SqlCommand("DELETE FROM TSQUEUE WHERE TSQUEUE_ID=@id", cn))
+                        try
                         {
-                            cmd.Parameters.AddWithValue("@id", dr["TSQUEUE_ID"].ToString());
-                            cmd.ExecuteNonQuery();
+                            cn.Open();
+                            using (SqlCommand cmd = new SqlCommand("DELETE FROM TSQUEUE WHERE TSQUEUE_ID=@id", cn))
+                            {
+                                cmd.Parameters.AddWithValue("@id", dr["TSQUEUE_ID"].ToString());
+                                cmd.ExecuteNonQuery();
+                            }
                         }
-                        cn.Close();
+                        catch (Exception exe) { logMessage("ERR", "PROC", exe.Message); }
                     }
                 }
                 else

@@ -20,6 +20,7 @@ namespace EPMLiveWorkPlanner
 
         public void execute(SPSite osite, SPWeb oweb, string data)
         {
+            WebAppId = osite.WebApplication.Id;
             string projectName = "";
             XmlDocument doc = null;
             EPMLiveWorkPlanner.WorkPlannerAPI.PlannerProps props = null;
@@ -81,7 +82,7 @@ namespace EPMLiveWorkPlanner
 
                     if (!key.Equals("msproject", StringComparison.InvariantCultureIgnoreCase))
                     {
-                        sData = project[0] + "." + project[1] + "." + project[2]; 
+                        sData = project[0] + "." + project[1] + "." + project[2];
                     }
 
                     if (userid != 0)
@@ -123,7 +124,7 @@ namespace EPMLiveWorkPlanner
                             if (key.Equals("msproject", StringComparison.InvariantCultureIgnoreCase))
                             {
                                 // Prepares PFE work job xml to comply with Performance = False scenario
-                                sData = FormatPFEWorkJobXml(doc); 
+                                sData = FormatPFEWorkJobXml(doc);
                             }
                             if (!string.IsNullOrEmpty(sData))
                             {
@@ -135,7 +136,7 @@ namespace EPMLiveWorkPlanner
                                 throw new Exception(string.Format("Publish Work job data is empty for '{0}' project.", projectName));
                             }
                         }
-                    }                    
+                    }
                 }
             }
             catch (Exception ex)
@@ -163,7 +164,7 @@ namespace EPMLiveWorkPlanner
                 if (osite != null)
                     osite.Dispose();
                 data = null;
-        }
+            }
         }
 
         private string FormatPFEWorkJobXml(XmlDocument doc)
@@ -174,7 +175,7 @@ namespace EPMLiveWorkPlanner
                 XmlNode dataNode = doc.SelectSingleNode("/Project/UpdateScheduledWork");
                 if (dataNode != null)
                 {
-                    resultXml = dataNode.OuterXml; 
+                    resultXml = dataNode.OuterXml;
                 }
             }
             catch (Exception ex)
@@ -243,12 +244,12 @@ namespace EPMLiveWorkPlanner
                     fldTaskUid.Required = false;
                     list.Fields.Add(fldTaskUid);
                     fldTaskUid.Update();
-                list.Update();
-            }
+                    list.Update();
+                }
             }
             catch { }
-            
-            if(!list.Fields.ContainsField("taskorder"))
+
+            if (!list.Fields.ContainsField("taskorder"))
             {
                 list.Fields.Add("taskorder", SPFieldType.Number, false);
                 SPField f = list.Fields["taskorder"];
@@ -320,15 +321,15 @@ namespace EPMLiveWorkPlanner
                 {
                     using (SqlCommand command = conn.CreateCommand())
                     {
-                    command.Transaction = transaction;
-                    command.CommandText = "update AllUserData set tp_ParentId = @tp_ParentId where tp_ListId = @ListId and tp_ID = @ItemId;";
-                    command.Parameters.Add("@tp_ParentId", System.Data.SqlDbType.UniqueIdentifier);
-                    command.Parameters["@tp_ParentId"].Value = destinationFolder.UniqueId;
-                    command.Parameters.Add("@ListId", System.Data.SqlDbType.UniqueIdentifier);
-                    command.Parameters["@ListId"].Value = item.ParentList.ID;
-                    command.Parameters.Add("@ItemId", System.Data.SqlDbType.Int);
-                    command.Parameters["@ItemId"].Value = item.ID;
-                    command.ExecuteNonQuery();
+                        command.Transaction = transaction;
+                        command.CommandText = "update AllUserData set tp_ParentId = @tp_ParentId where tp_ListId = @ListId and tp_ID = @ItemId;";
+                        command.Parameters.Add("@tp_ParentId", System.Data.SqlDbType.UniqueIdentifier);
+                        command.Parameters["@tp_ParentId"].Value = destinationFolder.UniqueId;
+                        command.Parameters.Add("@ListId", System.Data.SqlDbType.UniqueIdentifier);
+                        command.Parameters["@ListId"].Value = item.ParentList.ID;
+                        command.Parameters.Add("@ItemId", System.Data.SqlDbType.Int);
+                        command.Parameters["@ItemId"].Value = item.ID;
+                        command.ExecuteNonQuery();
                     }
                     //string leafName;
                     //using(SqlDataReader reader = command.ExecuteReader())
@@ -376,202 +377,209 @@ namespace EPMLiveWorkPlanner
             try
             {
                 query = new SPSiteDataQuery();
-            query.Lists = "<Lists><List ID=\"" + list.ID.ToString() + "\"/></Lists>";
-            query.Query = "<Where><Eq><FieldRef Name=\"" + taskCenterProjectField + "\" LookupId=\"True\"/><Value Type=\"Lookup\">" + projectid + "</Value></Eq></Where>";
-            query.ViewFields = "<FieldRef Name=\"Title\"/><FieldRef Name=\"taskuid\"/><FieldRef Name=\"IsPublished\"/>";
+                query.Lists = "<Lists><List ID=\"" + list.ID.ToString() + "\"/></Lists>";
+                query.Query = "<Where><Eq><FieldRef Name=\"" + taskCenterProjectField + "\" LookupId=\"True\"/><Value Type=\"Lookup\">" + projectid + "</Value></Eq></Where>";
+                query.ViewFields = "<FieldRef Name=\"Title\"/><FieldRef Name=\"taskuid\"/><FieldRef Name=\"IsPublished\"/>";
                 dt = new DataTable();
                 dt = list.ParentWeb.GetSiteData(query);
 
-            float taskCount = 0;
+                float taskCount = 0;
 
-            SPContentType ctIteration = null;
+                SPContentType ctIteration = null;
 
-            try
-            {
-                    foreach (SPContentType ct in list.ContentTypes)
-                {
-                        if (ct.Name == props.sIterationCT)
-                    {
-                        ctIteration = ct;
-                    }
-                }
-            }
-            catch { }
-
-                foreach (XmlNode ndTask in doc.FirstChild.SelectNodes("Task"))
-            {
-                string taskuid = ndTask.Attributes["UID"].Value;
-                string spid = "";
                 try
                 {
-                    spid = ndTask.Attributes["SPID"].Value;
+                    foreach (SPContentType ct in list.ContentTypes)
+                    {
+                        if (ct.Name == props.sIterationCT)
+                        {
+                            ctIteration = ct;
+                        }
+                    }
                 }
                 catch { }
-                    if (taskuid != "0")
+
+                foreach (XmlNode ndTask in doc.FirstChild.SelectNodes("Task"))
                 {
+                    string taskuid = ndTask.Attributes["UID"].Value;
+                    string spid = "";
                     try
                     {
-                        DataRow[] dr = null;
+                        spid = ndTask.Attributes["SPID"].Value;
+                    }
+                    catch { }
+                    if (taskuid != "0")
+                    {
                         try
                         {
-                            dr = dt.Select("taskuid='" + taskuid + "'");
-                        }
-                        catch { }
-                            if (dr == null || dr.Length == 0)
-                        {
+                            DataRow[] dr = null;
                             try
                             {
-                                dr = dt.Select("ID='" + spid + "'");
+                                dr = dt.Select("taskuid='" + taskuid + "'");
                             }
                             catch { }
-                        }
-                        SPListItem liTask = null;
+                            if (dr == null || dr.Length == 0)
+                            {
+                                try
+                                {
+                                    dr = dt.Select("ID='" + spid + "'");
+                                }
+                                catch { }
+                            }
+                            SPListItem liTask = null;
 
-                        bool IsPublished = false;
-                        bool newtask = false;
-                        string TaskFolder = "";
-                        try
-                        {
-                            TaskFolder = ndTask.Attributes["Folder"].Value;
-                        }
-                        catch { }
+                            bool IsPublished = false;
+                            bool newtask = false;
+                            string TaskFolder = "";
+                            try
+                            {
+                                TaskFolder = ndTask.Attributes["Folder"].Value;
+                            }
+                            catch { }
 
-                        string fullFolder = System.IO.Path.GetDirectoryName(list.DefaultViewUrl).Replace("\\", "/") + TaskFolder;
+                            string fullFolder = System.IO.Path.GetDirectoryName(list.DefaultViewUrl).Replace("\\", "/") + TaskFolder;
                             if (TaskFolder != "")
-                            ensureFolder(list, TaskFolder);
+                                ensureFolder(list, TaskFolder);
 
                             if (dr != null && dr.Length > 0)
-                        {
-                            liTask = list.GetItemById(int.Parse(dr[0]["ID"].ToString()));
-                            try
                             {
-                                IsPublished = (dr[0]["IsPublished"].ToString() == "1") ? true : false;
-                            }
-                            catch { }
-                            XmlAttribute attr = doc.CreateAttribute("SPUID");
-                            attr.Value = liTask.ID.ToString();
-                            ndTask.Attributes.Append(attr);
-                        }
-                        else
-                        {
-                            newtask = true;
-
-                                if (TaskFolder == "")
-                                liTask = list.AddItem();
-                            else
-                                liTask = list.AddItem(fullFolder, SPFileSystemObjectType.File, ndTask.SelectSingleNode("Title").InnerText);
-
-                        }
-
-                            if (IsPublished || newtask)
-                        {
-                            liTask["Title"] = ndTask.SelectSingleNode("Title").InnerText;
-                            liTask[list.Fields.GetFieldByInternalName("IsPublished").Id] = "1";
-                            liTask[list.Fields.GetFieldByInternalName("Project").Id] = projectid;
-                            liTask[list.Fields.GetFieldByInternalName("taskuid").Id] = taskuid;
-                            liTask[list.Fields.GetFieldByInternalName("taskorder").Id] = ndTask.Attributes["ID"].Value;
-
-                                if (props.bAgile)
-                            {
-                                    if (ndTask.Attributes["Iteration"] != null && ndTask.Attributes["Iteration"].Value == "1" && ctIteration != null)
-                                    liTask["ContentTypeId"] = ctIteration.Id;
-
-                                    if (list.Fields.ContainsField("CT" + props.sIterationCT))
+                                liTask = list.GetItemById(int.Parse(dr[0]["ID"].ToString()));
+                                try
                                 {
-                                    string iteration = "";
-                                    try
-                                    {
-                                        iteration = doc.SelectSingleNode("//Task[@UID='" + ndTask.SelectSingleNode("Field[@Name='CT" + props.sIterationCT + "']").InnerText + "']").Attributes["SPUID"].Value;
-
-                                            if (iteration != "")
-                                        {
-                                            liTask[list.Fields.GetFieldByInternalName("CT" + props.sIterationCT).Id] = iteration;
-                                        }
-                                    }
-                                    catch { }
-                                    try
-                                    {
-                                        ndTask.RemoveChild(ndTask.SelectSingleNode("Field[@Name='CT" + props.sIterationCT + "']"));
-                                    }
-                                    catch { }
+                                    IsPublished = (dr[0]["IsPublished"].ToString() == "1") ? true : false;
                                 }
-
-
-                            }
-
-                                if (!newtask)
-                            {
-                                string curFolder = Microsoft.SharePoint.Utilities.SPUrlUtility.CombineUrl(list.ParentWeb.ServerRelativeUrl, Microsoft.SharePoint.Utilities.SPUtility.GetUrlDirectory(liTask.Url));
-
-                                    if (fullFolder != curFolder)
-                                    MoveListItemToFolder(liTask, list.ParentWeb.GetFolder(fullFolder));
-                            }
-                            processTask(ndTask, liTask, taskFields, list.ParentWeb, sPrefix, projectid);
-                                if (newtask)
-                            {
+                                catch { }
                                 XmlAttribute attr = doc.CreateAttribute("SPUID");
                                 attr.Value = liTask.ID.ToString();
                                 ndTask.Attributes.Append(attr);
                             }
-                        }
-                        else
-                        {
-                            sErrors += "Task (" + ndTask.SelectSingleNode("Title").InnerText + ") skipped because it is waiting for update.<br>";
-                        }
+                            else
+                            {
+                                newtask = true;
+
+                                if (TaskFolder == "")
+                                    liTask = list.AddItem();
+                                else
+                                    liTask = list.AddItem(fullFolder, SPFileSystemObjectType.File, ndTask.SelectSingleNode("Title").InnerText);
+
+                            }
+
+                            if (IsPublished || newtask)
+                            {
+                                liTask["Title"] = ndTask.SelectSingleNode("Title").InnerText;
+                                liTask[list.Fields.GetFieldByInternalName("IsPublished").Id] = "1";
+                                liTask[list.Fields.GetFieldByInternalName("Project").Id] = projectid;
+                                liTask[list.Fields.GetFieldByInternalName("taskuid").Id] = taskuid;
+                                liTask[list.Fields.GetFieldByInternalName("taskorder").Id] = ndTask.Attributes["ID"].Value;
+
+                                if (props.bAgile)
+                                {
+                                    if (ndTask.Attributes["Iteration"] != null && ndTask.Attributes["Iteration"].Value == "1" && ctIteration != null)
+                                        liTask["ContentTypeId"] = ctIteration.Id;
+
+                                    if (list.Fields.ContainsField("CT" + props.sIterationCT))
+                                    {
+                                        string iteration = "";
+                                        try
+                                        {
+                                            iteration = doc.SelectSingleNode("//Task[@UID='" + ndTask.SelectSingleNode("Field[@Name='CT" + props.sIterationCT + "']").InnerText + "']").Attributes["SPUID"].Value;
+
+                                            if (iteration != "")
+                                            {
+                                                liTask[list.Fields.GetFieldByInternalName("CT" + props.sIterationCT).Id] = iteration;
+                                            }
+                                        }
+                                        catch { }
+                                        try
+                                        {
+                                            ndTask.RemoveChild(ndTask.SelectSingleNode("Field[@Name='CT" + props.sIterationCT + "']"));
+                                        }
+                                        catch { }
+                                    }
+
+
+                                }
+
+                                if (!newtask)
+                                {
+                                    string curFolder = Microsoft.SharePoint.Utilities.SPUrlUtility.CombineUrl(list.ParentWeb.ServerRelativeUrl, Microsoft.SharePoint.Utilities.SPUtility.GetUrlDirectory(liTask.Url));
+
+                                    if (fullFolder != curFolder)
+                                        MoveListItemToFolder(liTask, list.ParentWeb.GetFolder(fullFolder));
+                                }
+                                processTask(ndTask, liTask, taskFields, list.ParentWeb, sPrefix, projectid);
+                                if (newtask)
+                                {
+                                    XmlAttribute attr = doc.CreateAttribute("SPUID");
+                                    attr.Value = liTask.ID.ToString();
+                                    ndTask.Attributes.Append(attr);
+                                }
+                            }
+                            else
+                            {
+                                sErrors += "Task (" + ndTask.SelectSingleNode("Title").InnerText + ") skipped because it is waiting for update.<br>";
+                            }
                             if (dr != null && dr.Length > 0)
-                        {
-                            dt.Rows.Remove(dr[0]);
+                            {
+                                dt.Rows.Remove(dr[0]);
+                            }
                         }
-                    }
                         catch (Exception ex)
-                    {
-                        bErrors = true;
-                        sErrors += "Error Task UID(" + taskuid + ") Error: " + ex.Message + "<br>";
+                        {
+                            bErrors = true;
+                            sErrors += "Error Task UID(" + taskuid + ") Error: " + ex.Message + "<br>";
+                        }
+                        updateProgress(taskCount++);
                     }
-                    updateProgress(taskCount++);
                 }
-            }
                 if (dt.Rows.Count > 0)
-            {
+                {
                     foreach (DataRow dr in dt.Select("taskuid <> ''"))
+                    {
+                        try
+                        {
+                            SPListItem l = list.GetItemById(int.Parse(dr["id"].ToString()));
+                            l.Recycle();
+                        }
+                        catch { }
+                    }
+                }
+                using (SqlConnection cn = CreateConnection())
                 {
                     try
                     {
-                        SPListItem l = list.GetItemById(int.Parse(dr["id"].ToString()));
-                        l.Recycle();
+                        cn.Open();
+                        using (SqlCommand cmd = new SqlCommand("delete from plannerlink where plannerid=@plannerid and destprojectid=@projectid", cn))
+                        {
+                            cmd.Parameters.AddWithValue("@plannerid", plannerid);
+                            cmd.Parameters.AddWithValue("@projectid", projectid);
+                            cmd.ExecuteNonQuery();
+                        }
+                        using (SqlCommand cmd = new SqlCommand("INSERT INTO plannerlink (plannerid,sourceprojectid,sourcetaskid,destprojectid,desttaskid,predecessors,successors,linked) VALUES (@plannerid,@sourceprojectid,@sourcetaskid,@destprojectid,@desttaskid,@predecessors,@successors,@linked", cn))
+                        {
+                            foreach (DictionaryEntry de in hshLinks)
+                            {
+                                string[] sSource = de.Key.ToString().Split('.');
+                                string[] sDest = de.Value.ToString().Split('.');
+                                cmd.Parameters.AddWithValue("@plannerid", plannerid);
+                                cmd.Parameters.AddWithValue("@sourceprojectid", sSource[1]);
+                                cmd.Parameters.AddWithValue("@sourcetaskid", sSource[2]);
+                                cmd.Parameters.AddWithValue("@destprojectid", sDest[0]);
+                                cmd.Parameters.AddWithValue("@desttaskid", sDest[1]);
+                                cmd.Parameters.AddWithValue("@predecessors", sDest[2]);
+                                cmd.Parameters.AddWithValue("@successors", sDest[3]);
+                                cmd.Parameters.AddWithValue("@linked", sDest[4]);
+                                cmd.ExecuteNonQuery();
+                            }
+                        }
                     }
-                    catch { }
+                    catch (Exception ex)
+                    {
+                        bErrors = true;
+                        sErrors = ex.Message;
+                    }
                 }
             }
-
-                if (cn.State != ConnectionState.Open)
-                cn.Open();
-
-                using (SqlCommand cmd = new SqlCommand("delete from plannerlink where plannerid=@plannerid and destprojectid=@projectid", cn))
-                {
-            cmd.Parameters.AddWithValue("@plannerid", plannerid);
-            cmd.Parameters.AddWithValue("@projectid", projectid);
-            cmd.ExecuteNonQuery();
-                }
-                using (SqlCommand cmd = new SqlCommand("INSERT INTO plannerlink (plannerid,sourceprojectid,sourcetaskid,destprojectid,desttaskid,predecessors,successors,linked) VALUES (@plannerid,@sourceprojectid,@sourcetaskid,@destprojectid,@desttaskid,@predecessors,@successors,@linked", cn))
-                {
-                    foreach (DictionaryEntry de in hshLinks)
-            {
-                string[] sSource = de.Key.ToString().Split('.');
-                string[] sDest = de.Value.ToString().Split('.');
-                cmd.Parameters.AddWithValue("@plannerid", plannerid);
-                cmd.Parameters.AddWithValue("@sourceprojectid", sSource[1]);
-                cmd.Parameters.AddWithValue("@sourcetaskid", sSource[2]);
-                cmd.Parameters.AddWithValue("@destprojectid", sDest[0]);
-                cmd.Parameters.AddWithValue("@desttaskid", sDest[1]);
-                cmd.Parameters.AddWithValue("@predecessors", sDest[2]);
-                cmd.Parameters.AddWithValue("@successors", sDest[3]);
-                cmd.Parameters.AddWithValue("@linked", sDest[4]);
-                cmd.ExecuteNonQuery();
-            }
-                }
-            cn.Close();
-        }
             finally
             {
                 if (dt != null)
@@ -587,139 +595,139 @@ namespace EPMLiveWorkPlanner
             SPField f = null;
             try
             {
-            try
-            {
-                XmlNode ndExternal = ndTask.SelectSingleNode("Field[@Name='IsExternal']");
-                XmlNode ndExternalLink = ndTask.SelectSingleNode("Field[@Name='ExternalLink']");
-
-                string preds = "";
                 try
                 {
-                    preds = ndTask.SelectSingleNode("Field[@Name='Predecessors']").InnerText;
+                    XmlNode ndExternal = ndTask.SelectSingleNode("Field[@Name='IsExternal']");
+                    XmlNode ndExternalLink = ndTask.SelectSingleNode("Field[@Name='ExternalLink']");
 
-                    string[] sPreds = preds.Split(';');
+                    string preds = "";
+                    try
+                    {
+                        preds = ndTask.SelectSingleNode("Field[@Name='Predecessors']").InnerText;
 
-                    preds = "";
+                        string[] sPreds = preds.Split(';');
+
+                        preds = "";
 
                         foreach (string sPred in sPreds)
-                    {
-                        try
                         {
-                            preds += "," + ndTask.OwnerDocument.FirstChild.SelectSingleNode("//Task[@ID='" + sPred + "']").Attributes["UID"].Value;
+                            try
+                            {
+                                preds += "," + ndTask.OwnerDocument.FirstChild.SelectSingleNode("//Task[@ID='" + sPred + "']").Attributes["UID"].Value;
+                            }
+                            catch { }
                         }
-                        catch { }
-                    }
-                    preds = preds.Trim(',');
+                        preds = preds.Trim(',');
 
                     }
                     catch { }
 
-                string succ = "";
-                try
-                {
-                    succ = ndTask.SelectSingleNode("Field[@Name='Descendants']").InnerText;
+                    string succ = "";
+                    try
+                    {
+                        succ = ndTask.SelectSingleNode("Field[@Name='Descendants']").InnerText;
                     }
                     catch { }
 
-                string linked = "";
-                try
-                {
-                    linked = ndTask.SelectSingleNode("Field[@Name='LinkedTask']").InnerText;
+                    string linked = "";
+                    try
+                    {
+                        linked = ndTask.SelectSingleNode("Field[@Name='LinkedTask']").InnerText;
+                    }
+                    catch { }
+
+                    if (ndExternal.InnerText == "1" && ndExternalLink.InnerText != "")
+                    {
+                        hshLinks.Add(ndExternalLink.InnerText, projectid + "." + ndTask.Attributes["UID"].Value + "." + preds + "." + succ + "." + linked);
+                    }
                 }
                 catch { }
 
-                    if (ndExternal.InnerText == "1" && ndExternalLink.InnerText != "")
-                {
-                    hshLinks.Add(ndExternalLink.InnerText, projectid + "." + ndTask.Attributes["UID"].Value + "." + preds + "." + succ + "." + linked);
-                }
-            }
-            catch { }
-
                 foreach (XmlNode ndField in ndTask.SelectNodes("Field"))
-            {
-                string ndFieldName = ndField.Attributes["Name"].Value;
-                string val = ndField.InnerText;
-                    if (ndFieldName != "Project")
                 {
+                    string ndFieldName = ndField.Attributes["Name"].Value;
+                    string val = ndField.InnerText;
+                    if (ndFieldName != "Project")
+                    {
                         if (taskFields.Contains(ndFieldName))
-                    {
+                        {
                             f = null;
-                        try
-                        {
-                            f = liTask.ParentList.Fields.GetFieldByInternalName(taskFields[ndFieldName].ToString());
-                        }
-                        catch { }
+                            try
+                            {
+                                f = liTask.ParentList.Fields.GetFieldByInternalName(taskFields[ndFieldName].ToString());
+                            }
+                            catch { }
                             if (f != null)
-                        {
+                            {
                                 if (val == "")
-                            {
-                                liTask[f.Id] = null;
-                            }
-                                else if (f.Type == SPFieldType.User && !val.Contains(";#") && val != "")
-                            {
-                                liTask[f.Id] = EPMLiveCore.CoreFunctions.getUserString(val, web, sPrefix);
-                            }
-                            else
-                            {
-                                liTask[f.Id] = val;
-                            }
-                        }
-                    }
-                    else
-                    {
-                            f = null;
-                        try
-                        {
-                            f = liTask.ParentList.Fields.GetFieldByInternalName(ndFieldName);
-                        }
-                        catch { }
-                            if (f != null)
-                        {
-                                if (!f.ReadOnlyField)
-                            {
-                                bool isMS = false;
-
-                                    if (f.InternalName == "DueDate")
                                 {
-                                    try
-                                    {
-                                            if (liTask["Duration"].ToString() == "0")
-                                            isMS = true;
-                                    }
-                                    catch { }
+                                    liTask[f.Id] = null;
                                 }
-
-                                    if (isMS)
+                                else if (f.Type == SPFieldType.User && !val.Contains(";#") && val != "")
                                 {
-                                    try
-                                    {
-                                        liTask[f.Id] = liTask[liTask.ParentList.Fields.GetFieldByInternalName("StartDate").Id];
-                                    }
-                                    catch { }
+                                    liTask[f.Id] = EPMLiveCore.CoreFunctions.getUserString(val, web, sPrefix);
                                 }
                                 else
                                 {
-                                        if (val == "" || val == "NaN")
+                                    liTask[f.Id] = val;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            f = null;
+                            try
+                            {
+                                f = liTask.ParentList.Fields.GetFieldByInternalName(ndFieldName);
+                            }
+                            catch { }
+                            if (f != null)
+                            {
+                                if (!f.ReadOnlyField)
+                                {
+                                    bool isMS = false;
+
+                                    if (f.InternalName == "DueDate")
                                     {
-                                        liTask[f.Id] = null;
+                                        try
+                                        {
+                                            if (liTask["Duration"].ToString() == "0")
+                                                isMS = true;
+                                        }
+                                        catch { }
                                     }
-                                        else if (f.Type == SPFieldType.User && !val.Contains(";#") && val != "")
+
+                                    if (isMS)
                                     {
-                                        liTask[f.Id] = EPMLiveCore.CoreFunctions.getUserString(val, web, sPrefix);
+                                        try
+                                        {
+                                            liTask[f.Id] = liTask[liTask.ParentList.Fields.GetFieldByInternalName("StartDate").Id];
+                                        }
+                                        catch { }
                                     }
                                     else
                                     {
-                                        liTask[f.Id] = val;
+                                        if (val == "" || val == "NaN")
+                                        {
+                                            liTask[f.Id] = null;
+                                        }
+                                        else if (f.Type == SPFieldType.User && !val.Contains(";#") && val != "")
+                                        {
+                                            liTask[f.Id] = EPMLiveCore.CoreFunctions.getUserString(val, web, sPrefix);
+                                        }
+                                        else
+                                        {
+                                            liTask[f.Id] = val;
+                                        }
                                     }
                                 }
                             }
                         }
                     }
                 }
-            }
 
-            liTask.Update();
-        }
+                liTask.Update();
+            }
             finally
             {
                 f = null;

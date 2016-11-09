@@ -13,12 +13,14 @@ namespace TimeSheets
 
         public void execute(SPSite site, string data)
         {
+            WebAppId = site.WebApplication.Id;
+
+            SqlConnection cn = CreateConnection();
             try
             {
-                SPSecurity.RunWithElevatedPrivileges(delegate()
+                SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
-                    if (cn.State == System.Data.ConnectionState.Closed)
-                        cn.Open();
+                    cn.Open();
                 });
 
                 bool liveHours = false;
@@ -50,6 +52,8 @@ namespace TimeSheets
                 if (site != null)
                     site.Dispose();
                 data = null;
+                if (cn != null)
+                    cn.Dispose();
             }
         }
 

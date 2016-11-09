@@ -101,29 +101,27 @@ namespace EPMLiveCore.Jobs
 
         private void UpdateProgress(object userState)
         {
-            try
+            using (SqlConnection cn = CreateConnection())
             {
-                if (!resourceImporter.IsImportCancelled)
+                try
                 {
-                    IsImportCancelled(JobUid);
+                    cn.Open();
+                    if (!resourceImporter.IsImportCancelled)
+                    {
+                        IsImportCancelled(JobUid);
+                    }
+                    ResourceImportResult dSMResult = (ResourceImportResult)userState;
+                    totalCount = dSMResult.TotalRecords == 0 ? 1 : dSMResult.TotalRecords;
+                    updateProgress(dSMResult.ProcessedRecords);
+                    SPSecurity.RunWithElevatedPrivileges(() => cn.Open());
+                    using (var cmd = new SqlCommand(UPDATE_LOG_SQL, cn))
+                    {
+                        cmd.Parameters.AddWithValue("@ResultText", sErrors);
+                        cmd.Parameters.AddWithValue("@TimerJobUId", JobUid);
+                        cmd.ExecuteNonQuery();
+                    }
                 }
-
-                ResourceImportResult dSMResult = (ResourceImportResult)userState;
-                totalCount = dSMResult.TotalRecords == 0 ? 1 : dSMResult.TotalRecords;
-                updateProgress(dSMResult.ProcessedRecords);
-                SPSecurity.RunWithElevatedPrivileges(() => cn.Open());
-                using (var cmd = new SqlCommand(UPDATE_LOG_SQL, cn))
-                {
-                    cmd.Parameters.AddWithValue("@ResultText", sErrors);
-                    cmd.Parameters.AddWithValue("@TimerJobUId", JobUid);
-                    cmd.ExecuteNonQuery();
-                }
-                cn.Close();
-
-            }
-            catch (Exception ex)
-            {
-                throw ex;
+                catch(Exception ex) { sErrors = ex.ToString(); }
             }
         }
 
@@ -140,23 +138,30 @@ namespace EPMLiveCore.Jobs
 
         private void IsImportCancelled(Guid jobUid)
         {
-            SPSecurity.RunWithElevatedPrivileges(() => cn.Open());
-            using (SqlCommand cmd = new SqlCommand(GET_JOBQUEUE_STATUS, cn))
+            using (SqlConnection cn = CreateConnection())
             {
-                cmd.Parameters.AddWithValue("@timerjobuid", JobUid);
-                using (SqlDataReader dr = cmd.ExecuteReader())
+                try
                 {
-                    if (dr.Read())
+                    SPSecurity.RunWithElevatedPrivileges(() => cn.Open());
+                    using (SqlCommand cmd = new SqlCommand(GET_JOBQUEUE_STATUS, cn))
                     {
-                        if (dr.GetInt32(0) == 2)
+                        cmd.Parameters.AddWithValue("@timerjobuid", JobUid);
+                        using (SqlDataReader dr = cmd.ExecuteReader())
                         {
-                            resourceImporter.IsImportCancelled = true;
+                            if (dr.Read())
+                            {
+                                if (dr.GetInt32(0) == 2)
+                                {
+                                    resourceImporter.IsImportCancelled = true;
+                                }
+                            }
                         }
+
                     }
-                    dr.Close();
                 }
-                cn.Close();
+                catch (Exception ex) { sErrors = ex.ToString(); }
             }
+
         }
 
         #endregion

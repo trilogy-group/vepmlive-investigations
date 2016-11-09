@@ -20,12 +20,14 @@ namespace TimerService
         private static BackgroundWorker bwTimerJobs;
         private static BackgroundWorker bwNotificationsJobs;
         private static BackgroundWorker bwIntegrationJobs;
+        private static AutoResetEvent _autoResetEvent;
         //private static BackgroundWorker bwActivity;  //Not in Use
 
         public bool startTimer()
         {
             try
             {
+                _autoResetEvent = new AutoResetEvent(false);
                 //=========================Run Main Queue
                 bw1 = new BackgroundWorker();
                 bw1.WorkerReportsProgress = true;
@@ -36,7 +38,7 @@ namespace TimerService
                 bw1.RunWorkerCompleted += bw_RunWorkerCompleted;
 
                 bw1.RunWorkerAsync();
-
+                _autoResetEvent.Set();
                 Thread.Sleep(1000);
 
                 //=========================Run High Priority Queue
@@ -47,7 +49,7 @@ namespace TimerService
                 bw2.DoWork += bw_HighDoWork;
 
                 bw2.RunWorkerAsync();
-
+                _autoResetEvent.Set();
                 Thread.Sleep(1000);
 
                 //=========================Run TS Queue
@@ -60,7 +62,7 @@ namespace TimerService
                 //bw.RunWorkerCompleted += bw_RunWorkerCompleted;
 
                 bw.RunWorkerAsync();
-
+                _autoResetEvent.Set();
                 Thread.Sleep(1000);
 
                 //=========================Run Sec Queue
@@ -106,7 +108,7 @@ namespace TimerService
                 ////bwActivity.RunWorkerCompleted += bwNotificationsJobs_RunWorkerCompleted;
 
                 //bwActivity.RunWorkerAsync();
-
+                _autoResetEvent.Set();
                 Thread.Sleep(1000);
                 //=========================Run Rollup Queue
                 bwSec = new BackgroundWorker();
@@ -157,6 +159,7 @@ namespace TimerService
                         poll = int.Parse(EPMLiveCore.CoreFunctions.getFarmSetting("PollingInterval"));
                     }
                     catch { }
+                    _autoResetEvent.Set();
                     Thread.Sleep(poll * 1000);
                 }
             }
@@ -211,6 +214,7 @@ namespace TimerService
                         poll = int.Parse(EPMLiveCore.CoreFunctions.getFarmSetting("PollingInterval"));
                     }
                     catch { }
+                    _autoResetEvent.Set();
                     Thread.Sleep(poll * 1000);
                 }
             }
@@ -241,6 +245,7 @@ namespace TimerService
                         poll = int.Parse(EPMLiveCore.CoreFunctions.getFarmSetting("PollingInterval"));
                     }
                     catch { }
+                    _autoResetEvent.Set();
                     Thread.Sleep(poll * 1000);
                 }
             }
@@ -271,6 +276,7 @@ namespace TimerService
                         poll = int.Parse(EPMLiveCore.CoreFunctions.getFarmSetting("PollingInterval"));
                     }
                     catch { }
+                    _autoResetEvent.Set();
                     Thread.Sleep(poll * 1000);
                 }
             }
@@ -301,6 +307,7 @@ namespace TimerService
                         poll = int.Parse(EPMLiveCore.CoreFunctions.getFarmSetting("PollingInterval"));
                     }
                     catch { }
+                    _autoResetEvent.Set();
                     Thread.Sleep(poll * 1000);
                 }
             }
@@ -331,6 +338,7 @@ namespace TimerService
                         poll = int.Parse(EPMLiveCore.CoreFunctions.getFarmSetting("PollingInterval"));
                     }
                     catch { }
+                    _autoResetEvent.Set();
                     Thread.Sleep(poll * 1000);
                 }
             }
@@ -352,7 +360,8 @@ namespace TimerService
             {
                 if (DateTime.Now.Minute == 0)
                 {
-                    foreach (SPWebApplication webApp in SPWebService.ContentService.WebApplications)
+                    SPWebApplicationCollection _webapplications = GetWebApplications();
+                    foreach (SPWebApplication webApp in _webapplications)
                     {
                         string sConn = EPMLiveCore.CoreFunctions.getConnectionString(webApp.Id);
                         if (sConn != "")
@@ -361,25 +370,27 @@ namespace TimerService
                             {
                                 using (SqlConnection cn = new SqlConnection(sConn))
                                 {
-                                    cn.Open();
-
-                                    using (SqlCommand cmd = new SqlCommand("spQueueTimerJobs", cn))
+                                    try
                                     {
-                                        cmd.CommandType = System.Data.CommandType.StoredProcedure;
-                                        cmd.ExecuteNonQuery();
+                                        cn.Open();
+
+                                        using (SqlCommand cmd = new SqlCommand("spQueueTimerJobs", cn))
+                                        {
+                                            cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                                            cmd.ExecuteNonQuery();
+                                        }
                                     }
-                                    cn.Close();
+                                    catch { e.Cancel = true; }
                                 }
                             }
                             catch (Exception ex)
                             {
                                 DateTime dt = DateTime.Now;
 
-                                StreamWriter swLog = new StreamWriter(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + "\\LOGS\\TIMERLOG_QUEUE_" + dt.Year + dt.Month + dt.Day + ".log", true);
-
-                                swLog.WriteLine(DateTime.Now.ToString() + "\tERR\tQUEUE\t" + ex.Message);
-
-                                swLog.Close();
+                                using (StreamWriter swLog = new StreamWriter(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + "\\LOGS\\TIMERLOG_QUEUE_" + dt.Year + dt.Month + dt.Day + ".log", true))
+                                {
+                                    swLog.WriteLine(DateTime.Now.ToString() + "\tERR\tQUEUE\t" + ex.Message);
+                                }
                             }
                         }
                     }
@@ -390,6 +401,7 @@ namespace TimerService
                     return;
                 }
                 GC.Collect();
+                _autoResetEvent.Set();
                 Thread.Sleep(60000);
             }
         }
@@ -405,16 +417,15 @@ namespace TimerService
 
             DateTime dt = DateTime.Now;
 
-            StreamWriter swLog = new StreamWriter(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + "\\LOGS\\ACTIVITY_" + dt.Year + dt.Month + dt.Day + ".log", true);
-
-            swLog.WriteLine(DateTime.Now.ToString() + "\tINFO\tACTIVITY\tSTARTED");
-
-            swLog.Close();
-
+            using (StreamWriter swLog = new StreamWriter(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + "\\LOGS\\ACTIVITY_" + dt.Year + dt.Month + dt.Day + ".log", true))
+            {
+                swLog.WriteLine(DateTime.Now.ToString() + "\tINFO\tACTIVITY\tSTARTED");
+            }
             while (true)
             {
                 try
                 {
+                    SPWebApplicationCollection _webapplications = GetWebApplications();
                     foreach (SPWebApplication webApp in SPWebService.ContentService.WebApplications)
                     {
                         string sConn = EPMLiveCore.CoreFunctions.getConnectionString(webApp.Id);
@@ -422,45 +433,48 @@ namespace TimerService
                         {
                             using (SqlConnection cn = new SqlConnection(sConn))
                             {
-                                cn.Open();
-
-                                using (SqlCommand cmd = new SqlCommand(@"select * from ActivityQueue where DATEDIFF(s, PostTime, GETDATE ()) > 10", cn))
+                                try
                                 {
-                                    DataSet ds = new DataSet();
-                                    using (SqlDataAdapter da = new SqlDataAdapter(cmd))
+                                    cn.Open();
+
+                                    using (SqlCommand cmd = new SqlCommand(@"select * from ActivityQueue where DATEDIFF(s, PostTime, GETDATE ()) > 10", cn))
                                     {
-                                        da.Fill(ds);
-
-                                        foreach (DataRow dr in ds.Tables[0].Rows)
+                                        DataSet ds = new DataSet();
+                                        using (SqlDataAdapter da = new SqlDataAdapter(cmd))
                                         {
-                                            try
+                                            da.Fill(ds);
+
+                                            foreach (DataRow dr in ds.Tables[0].Rows)
                                             {
-                                                using (SPSite site = new SPSite(new Guid(dr["SiteId"].ToString())))
+                                                try
                                                 {
-                                                    using (SPWeb web = site.OpenWeb(new Guid(dr["WebId"].ToString())))
+                                                    using (SPSite site = new SPSite(new Guid(dr["SiteId"].ToString())))
                                                     {
+                                                        using (SPWeb web = site.OpenWeb(new Guid(dr["WebId"].ToString())))
+                                                        {
 
-                                                        SPList list = web.Lists[new Guid(dr["ListId"].ToString())];
+                                                            SPList list = web.Lists[new Guid(dr["ListId"].ToString())];
 
-                                                        //Call Activity Add
+                                                            //Call Activity Add
 
+                                                        }
                                                     }
                                                 }
-                                            }
-                                            catch (Exception ex)
-                                            {
-                                                dt = DateTime.Now;
+                                                catch (Exception ex)
+                                                {
+                                                    dt = DateTime.Now;
 
-                                                swLog = new StreamWriter(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + "\\LOGS\\ACTIVITY_" + dt.Year + dt.Month + dt.Day + ".log", true);
+                                                    using (StreamWriter swLog = new StreamWriter(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + "\\LOGS\\ACTIVITY_" + dt.Year + dt.Month + dt.Day + ".log", true))
+                                                    {
 
-                                                swLog.WriteLine(DateTime.Now.ToString() + "\tERRO\tACTIVITY\t" + ex.Message);
-
-                                                swLog.Close();
+                                                        swLog.WriteLine(DateTime.Now.ToString() + "\tERRO\tACTIVITY\t" + ex.Message);
+                                                    }
+                                                }
                                             }
                                         }
                                     }
                                 }
-                                cn.Close();
+                                catch { e.Cancel = true; }
                             }
                         }
                     }
@@ -471,18 +485,18 @@ namespace TimerService
                         return;
                     }
                     GC.Collect();
-
+                    _autoResetEvent.Set();
                     Thread.Sleep(10000);
                 }
                 catch (Exception ex)
                 {
                     dt = DateTime.Now;
 
-                    swLog = new StreamWriter(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + "\\LOGS\\ACTIVITY_" + dt.Year + dt.Month + dt.Day + ".log", true);
-
-                    swLog.WriteLine(DateTime.Now.ToString() + "\tERRO\tACTIVITY\t" + ex.Message);
-
-                    swLog.Close();
+                    using (StreamWriter swLog = new StreamWriter(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + "\\LOGS\\ACTIVITY_" + dt.Year + dt.Month + dt.Day + ".log", true))
+                    {
+                        swLog.WriteLine(DateTime.Now.ToString() + "\tERRO\tACTIVITY\t" + ex.Message);
+                    }
+                    
                 }
 
             }
@@ -494,7 +508,8 @@ namespace TimerService
             {
                 try
                 {
-                    foreach (SPWebApplication webApp in SPWebService.ContentService.WebApplications)
+                    SPWebApplicationCollection _webapplication = GetWebApplications();
+                    foreach (SPWebApplication webApp in _webapplication)
                     {
                         SPSite site = null;
                         SPWeb web = null;
@@ -502,10 +517,11 @@ namespace TimerService
                         string sConn = EPMLiveCore.CoreFunctions.getConnectionString(webApp.Id);
                         if (sConn != "")
                         {
-                            try
+                            using (SqlConnection cn = new SqlConnection(sConn))
                             {
-                                using (SqlConnection cn = new SqlConnection(sConn))
+                                try
                                 {
+
                                     cn.Open();
 
                                     using (SqlCommand cmd = new SqlCommand("delete from PERSONALIZATIONS where FK in (select ID from NOTIFICATIONS where DATEADD(mm, 1, CreatedAt) < GETDATE())", cn))
@@ -565,11 +581,11 @@ namespace TimerService
                                                 {
                                                     DateTime dt = DateTime.Now;
 
-                                                    StreamWriter swLog = new StreamWriter(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + "\\LOGS\\TIMERLOG_NOTIFICATIONS_" + dt.Year + dt.Month + dt.Day + ".log", true);
+                                                    using (StreamWriter swLog = new StreamWriter(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + "\\LOGS\\TIMERLOG_NOTIFICATIONS_" + dt.Year + dt.Month + dt.Day + ".log", true))
+                                                    {
 
-                                                    swLog.WriteLine(DateTime.Now.ToString() + "\tERR\tNOTIFICATIONS\t" + ex.Message);
-
-                                                    swLog.Close();
+                                                        swLog.WriteLine(DateTime.Now.ToString() + "\tERR\tNOTIFICATIONS\t" + ex.Message);
+                                                    }
                                                 }
 
                                                 using (SqlCommand cmd3 = new SqlCommand("spNSetBit", cn))
@@ -585,28 +601,29 @@ namespace TimerService
                                         }
 
                                     }
-                                    cn.Close();
+
+
+
                                 }
-
-                            }
-                            catch (Exception ex)
-                            {
-                                DateTime dt = DateTime.Now;
-
-                                StreamWriter swLog = new StreamWriter(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + "\\LOGS\\TIMERLOG_NOTIFICATIONS_" + dt.Year + dt.Month + dt.Day + ".log", true);
-
-                                swLog.WriteLine(DateTime.Now.ToString() + "\tERRM\tNOTIFICATIONS\t" + ex.Message);
-
-                                swLog.Close();
-                            }
-                            finally
-                            {
-                                if (site != null)
+                                catch (Exception ex)
                                 {
-                                    web.Close();
-                                    site.Close();
+                                    DateTime dt = DateTime.Now;
+
+                                    using (StreamWriter swLog = new StreamWriter(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + "\\LOGS\\TIMERLOG_NOTIFICATIONS_" + dt.Year + dt.Month + dt.Day + ".log", true))
+                                    {
+
+                                        swLog.WriteLine(DateTime.Now.ToString() + "\tERRM\tNOTIFICATIONS\t" + ex.Message);
+                                    }
                                 }
-                                ds.Dispose();
+                                finally
+                                {
+                                    if (site != null)
+                                    {
+                                        web.Close();
+                                        site.Close();
+                                    }
+                                    ds.Dispose();
+                                }
                             }
                         }
 
@@ -624,22 +641,26 @@ namespace TimerService
                         poll = int.Parse(EPMLiveCore.CoreFunctions.getFarmSetting("NotificationInterval"));
                     }
                     catch { }
+                    _autoResetEvent.Set();
                     Thread.Sleep(poll * 60000);
                 }
                 catch (Exception ex)
                 {
                     DateTime dt = DateTime.Now;
 
-                    StreamWriter swLog = new StreamWriter(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + "\\LOGS\\TIMERLOG_NOTIFICATIONS_" + dt.Year + dt.Month + dt.Day + ".log", true);
+                    using (StreamWriter swLog = new StreamWriter(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + "\\LOGS\\TIMERLOG_NOTIFICATIONS_" + dt.Year + dt.Month + dt.Day + ".log", true))
+                    {
 
-                    swLog.WriteLine(DateTime.Now.ToString() + "\tERRO\tNOTIFICATIONS\t" + ex.Message);
-
-                    swLog.Close();
+                        swLog.WriteLine(DateTime.Now.ToString() + "\tERRO\tNOTIFICATIONS\t" + ex.Message);
+                    }
                 }
             }
 
         }
-
+        public static SPWebApplicationCollection GetWebApplications()
+        {
+            return SPWebService.ContentService.WebApplications;
+        }
         static void bwNotificationsJobs_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
 

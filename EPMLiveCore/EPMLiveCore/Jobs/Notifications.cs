@@ -24,7 +24,7 @@ using System.Collections.Generic;
 
 namespace EPMLiveCore.Jobs
 {
-    public class Notifications: API.BaseJob
+    public class Notifications : API.BaseJob
     {
         //private SPWeb currWeb;
         private SPList list;
@@ -116,88 +116,89 @@ namespace EPMLiveCore.Jobs
                     {
                         if ((web.Properties["EPMLiveNotificationLists"] != null && web.Properties["EPMLiveNotificationLists"].Trim() != ""))
                         {
-                            dsSectionTables = new DataSet();
-
-                            string sNotificationLists = web.Properties["EPMLiveNotificationLists"];
-                            createSectionTables(sNotificationLists); // create tables that will be re-used per user loop to minimize memory overhead
-
-
-                            if (web.Properties.ContainsKey("EPMLiveNotificationEmail"))
+                            using (dsSectionTables = new DataSet())
                             {
-                                sFromEmail = web.Properties["EPMLiveNotificationEmail"];
-                            }
 
-                            // override the default subject line
-                            if (web.Properties.ContainsKey("EPMLiveNotificationEmailSubject"))
-                            {
-                                sSubject = web.Properties["EPMLiveNotificationEmailSubject"];
-                            }
+                                string sNotificationLists = web.Properties["EPMLiveNotificationLists"];
+                                createSectionTables(sNotificationLists); // create tables that will be re-used per user loop to minimize memory overhead
 
-                            if (web.Properties.ContainsKey("EPMLiveNotificationNote"))
-                            {
-                                sNote = web.Properties["EPMLiveNotificationNote"];
-                            }
 
-                            //-- EPML 1901
-                            if (web.Properties.ContainsKey("EPMLiveLogDetailedErrors"))
-                            {
-                                if (web.Properties["EPMLiveLogDetailedErrors"].ToUpper() == "TRUE")
-                                    bLogDetailedErrors = true;
-                                else
-                                    bLogDetailedErrors = false;
-                            }
-
-                            if (sFromEmail != "")
-                            {
-                                StringBuilder sNotificationUserList = new StringBuilder(string.Empty);
-                                
-                                //Loop through all site users
-                                foreach (SPUser siteUser in site.RootWeb.SiteUsers)
+                                if (web.Properties.ContainsKey("EPMLiveNotificationEmail"))
                                 {
-                                    if (siteUser.Name.ToLower() != "system account")
+                                    sFromEmail = web.Properties["EPMLiveNotificationEmail"];
+                                }
+
+                                // override the default subject line
+                                if (web.Properties.ContainsKey("EPMLiveNotificationEmailSubject"))
+                                {
+                                    sSubject = web.Properties["EPMLiveNotificationEmailSubject"];
+                                }
+
+                                if (web.Properties.ContainsKey("EPMLiveNotificationNote"))
+                                {
+                                    sNote = web.Properties["EPMLiveNotificationNote"];
+                                }
+
+                                //-- EPML 1901
+                                if (web.Properties.ContainsKey("EPMLiveLogDetailedErrors"))
+                                {
+                                    if (web.Properties["EPMLiveLogDetailedErrors"].ToUpper() == "TRUE")
+                                        bLogDetailedErrors = true;
+                                    else
+                                        bLogDetailedErrors = false;
+                                }
+
+                                if (sFromEmail != "")
+                                {
+                                    StringBuilder sNotificationUserList = new StringBuilder(string.Empty);
+
+                                    //Loop through all site users
+                                    foreach (SPUser siteUser in site.RootWeb.SiteUsers)
                                     {
-                                        bool bFound = false;
-                                        //Get all OptedOut users
-                                        string sOptedOutUsers = web.Properties["EPMLiveNotificationOptedOutUsers"];
-                                        if (sOptedOutUsers != null && sOptedOutUsers.Trim() != string.Empty)
+                                        if (siteUser.Name.ToLower() != "system account")
                                         {
-                                            string[] arrOptedOutUsers = sOptedOutUsers.Split('|');
-                                            bFound = false; 
-                                            foreach (string sUser in arrOptedOutUsers)
+                                            bool bFound = false;
+                                            //Get all OptedOut users
+                                            string sOptedOutUsers = web.Properties["EPMLiveNotificationOptedOutUsers"];
+                                            if (sOptedOutUsers != null && sOptedOutUsers.Trim() != string.Empty)
                                             {
-                                                if (sUser.Trim().Length > 0)
+                                                string[] arrOptedOutUsers = sOptedOutUsers.Split('|');
+                                                bFound = false;
+                                                foreach (string sUser in arrOptedOutUsers)
                                                 {
-                                                    string[] sUserIDNameSplit = sUser.Replace("#", "").Split(';');
-                                                    try
+                                                    if (sUser.Trim().Length > 0)
                                                     {
-                                                        if (siteUser.ID.ToString().Trim() == sUserIDNameSplit[0].Trim())
+                                                        string[] sUserIDNameSplit = sUser.Replace("#", "").Split(';');
+                                                        try
                                                         {
-                                                            bFound = true;
-                                                            break;
+                                                            if (siteUser.ID.ToString().Trim() == sUserIDNameSplit[0].Trim())
+                                                            {
+                                                                bFound = true;
+                                                                break;
+                                                            }
                                                         }
-                                                    }
-                                                    catch (Exception ex)
-                                                    {
-                                                        throw ex; //TODO anything else to do here??
+                                                        catch (Exception ex)
+                                                        {
+                                                            throw ex; //TODO anything else to do here??
+                                                        }
                                                     }
                                                 }
                                             }
-                                        }
-                                        //If the Site user is NOT present in the OptedOut list then send notification to the user
-                                        if (!bFound)
-                                        {
-                                            //sNotificationOptedOutUsers += li.Value + ";#" + li.Text + "|";
-                                            sNotificationUserList.Append(siteUser.ID.ToString());
-                                            sNotificationUserList.Append(";#");
-                                            sNotificationUserList.Append((siteUser.Email != string.Empty) ? siteUser.Name + " (" + siteUser.Email + ")" : siteUser.Name);
-                                            sNotificationUserList.Append("|");
+                                            //If the Site user is NOT present in the OptedOut list then send notification to the user
+                                            if (!bFound)
+                                            {
+                                                //sNotificationOptedOutUsers += li.Value + ";#" + li.Text + "|";
+                                                sNotificationUserList.Append(siteUser.ID.ToString());
+                                                sNotificationUserList.Append(";#");
+                                                sNotificationUserList.Append((siteUser.Email != string.Empty) ? siteUser.Name + " (" + siteUser.Email + ")" : siteUser.Name);
+                                                sNotificationUserList.Append("|");
+                                            }
                                         }
                                     }
-                                }
 
-                                //Process Notification
-                                //try
-                                //{
+                                    //Process Notification
+                                    //try
+                                    //{
                                     float processedUsers = 0;
                                     //Get all users to send notification                                    
                                     if (sNotificationUserList != null)
@@ -233,15 +234,15 @@ namespace EPMLiveCore.Jobs
                                         }
 
                                     }
-                                //}
-                                //catch (Exception exc)
-                                //{
+                                    //}
+                                    //catch (Exception exc)
+                                    //{
                                     //logException("NotificationListsJob.ExecuteJob", exc.Message, "User: " + siteUser.ID.ToString() + siteUser.Name);
-                                //}
+                                    //}
 
-                                //-- End EPML 1901 --
+                                    //-- End EPML 1901 --
+                                }
                             }
-                            dsSectionTables.Dispose();
                         }
                     }
                 }
@@ -264,7 +265,7 @@ namespace EPMLiveCore.Jobs
 
             try
             {
-                
+
                 if (sToEmail.Trim() != "") // only send if has email address
                 {
                     // get the data
@@ -300,7 +301,7 @@ namespace EPMLiveCore.Jobs
             string sMailSvr = "";
             try
             {
-                SPSecurity.RunWithElevatedPrivileges(delegate()
+                SPSecurity.RunWithElevatedPrivileges(delegate ()
                 {
                     SPAdministrationWebApplication spWebAdmin = Microsoft.SharePoint.Administration.SPAdministrationWebApplication.Local;
                     sMailSvr = spWebAdmin.OutboundMailServiceInstance.Server.Name;
@@ -316,7 +317,7 @@ namespace EPMLiveCore.Jobs
 
                     // Configure the mail server
                     SmtpClient smtpClient = new SmtpClient();
-                    
+
                     smtpClient.Host = sMailSvr;
                     //smtpClient.UseDefaultCredentials = true;
                     //smtpClient.Credentials = CredentialCache.DefaultNetworkCredentials;
@@ -346,8 +347,8 @@ namespace EPMLiveCore.Jobs
 
             //if (!bLockNotify)
             //{
-                // write the msg footer
-                htmlWriter.Write("<div style=\"border-top:1px solid #eee;margin-top:40px;text-align:center;font-family:Segoe UI, Helvetica,Arial;color:#CBD7D7;font-size:12px;display:inline-block;width:100%;padding-bottom:40px;\"><br /><p style=\"padding:0px;margin:0px;\">You are receiving this email because this email address is assigned work within an EPM Live system. <br>Click <a href=\"" + sMainURL + "/_layouts/epmlive/notifications.aspx\" style=\"text-decoration:none;color:#CBD7D7;\">here</a> if you want to unsubscribe from this email.</p></div>");
+            // write the msg footer
+            htmlWriter.Write("<div style=\"border-top:1px solid #eee;margin-top:40px;text-align:center;font-family:Segoe UI, Helvetica,Arial;color:#CBD7D7;font-size:12px;display:inline-block;width:100%;padding-bottom:40px;\"><br /><p style=\"padding:0px;margin:0px;\">You are receiving this email because this email address is assigned work within an EPM Live system. <br>Click <a href=\"" + sMainURL + "/_layouts/epmlive/notifications.aspx\" style=\"text-decoration:none;color:#CBD7D7;\">here</a> if you want to unsubscribe from this email.</p></div>");
             //}
 
             return System.Web.HttpUtility.HtmlDecode(stringWriter.ToString());
@@ -455,7 +456,7 @@ namespace EPMLiveCore.Jobs
                                 //    e.Row.Cells[cnt].Width = 150;
                                 //}
                             }
-                            e.Row.Cells[cnt].Style.Add("border","none");
+                            e.Row.Cells[cnt].Style.Add("border", "none");
                             e.Row.Cells[cnt].Style.Add("font-size", "14px");
                             e.Row.Cells[cnt].Style.Add("text-align", "left");
                             e.Row.Cells[cnt].Style.Add("padding", "8px");
@@ -477,7 +478,7 @@ namespace EPMLiveCore.Jobs
                         cell.Style.Add("font-size", "14px");
                     }
                 }
-                
+
             }
             catch { }
         }
@@ -494,15 +495,15 @@ namespace EPMLiveCore.Jobs
                 gvSection.Width = Unit.Percentage(100);
                 gvSection.ForeColor = System.Drawing.ColorTranslator.FromHtml("#555555");
                 gvSection.Style.Add("font-family", sFontName);
-                gvSection.Style.Add("border","none");
-                
+                gvSection.Style.Add("border", "none");
+
                 // header row styles
                 gvSection.HeaderStyle.Font.Bold = false;
                 //gvSection.HeaderStyle.Font.Size = FontUnit.Point(12);
                 gvSection.HeaderStyle.HorizontalAlign = HorizontalAlign.Left;
                 gvSection.HeaderStyle.ForeColor = System.Drawing.ColorTranslator.FromHtml("#555555");
-                
-                
+
+
                 // convert the dataset data into html
                 foreach (string sSectionName in arrSectionNames)
                 {
@@ -556,7 +557,7 @@ namespace EPMLiveCore.Jobs
             string sLists = "";
             string sCols = "";
             string sQuery = "";
-            
+
             try
             {
                 // loop thru the sections in this site
@@ -600,7 +601,7 @@ namespace EPMLiveCore.Jobs
                     logException("NotificationListsJob.processSiteRecursive", exc.Message, "Section data malformed - Section Data: " + sSectionData);
                 }
             }
-            
+
             //try
             //{
 
@@ -648,13 +649,17 @@ namespace EPMLiveCore.Jobs
 
             foreach (SPWeb w in web.Webs)
             {
-               try
-               {
-                   processSiteRecursive(w, sUser, iUserID, arrSections);
-               }
-               catch { }
-               w.Close();
-               w.Dispose();
+                try
+                {
+                    processSiteRecursive(w, sUser, iUserID, arrSections);
+                }
+                catch { }
+                finally
+                {
+                    if (w != null)
+                        w.Dispose();
+                }
+
             }
         }
 
@@ -663,7 +668,7 @@ namespace EPMLiveCore.Jobs
             string val = "";
             try
             {
-                switch(field.Type)
+                switch (field.Type)
                 {
                     case SPFieldType.DateTime:
                         DateTime dt = DateTime.Parse(li[field.Id].ToString());
@@ -671,7 +676,7 @@ namespace EPMLiveCore.Jobs
                         System.Globalization.CultureInfo cInfo = new System.Globalization.CultureInfo(web.Locale.LCID);
                         IFormatProvider culture = new System.Globalization.CultureInfo(cInfo.Name, true);
 
-                        if(getFieldSchemaAttribValue(field.SchemaXml, "Format").ToUpper() == "DATEONLY")
+                        if (getFieldSchemaAttribValue(field.SchemaXml, "Format").ToUpper() == "DATEONLY")
                         {
                             val = dt.ToUniversalTime().GetDateTimeFormats(culture)[0]; //dt.ToShortDateString();
                         }
@@ -685,7 +690,7 @@ namespace EPMLiveCore.Jobs
                         try
                         {
                             val = li[field.Id].ToString();
-                            if(((SPFieldNumber)field).ShowAsPercentage)
+                            if (((SPFieldNumber)field).ShowAsPercentage)
                             {
                                 val = (double.Parse(val) * 100).ToString() + "%";
                             }
@@ -693,7 +698,8 @@ namespace EPMLiveCore.Jobs
                             {
                                 val = field.GetFieldValueAsText(val);
                             }
-                        }catch{}
+                        }
+                        catch { }
                         break;
                     default:
                         val = field.GetFieldValueAsText(val);

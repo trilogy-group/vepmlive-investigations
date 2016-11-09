@@ -5,6 +5,7 @@ using System.Text;
 using Microsoft.SharePoint;
 using System.Data;
 using System.IO;
+using System.Data.SqlClient;
 
 namespace EPMLiveCore.Jobs.Applications
 {
@@ -12,38 +13,42 @@ namespace EPMLiveCore.Jobs.Applications
     {
         public void execute(SPSite osite, SPWeb oweb, string data)
         {
-            try
+            using (SqlConnection cn = CreateConnection())
             {
-                DataTable dtMessages;
-                int maxErrorLevel;
+                try
+                {
+                    cn.Open();
+                    DataTable dtMessages;
+                    int maxErrorLevel;
 
-                bool bVerify = false;
-                bool.TryParse(data, out bVerify);
+                    bool bVerify = false;
+                    bool.TryParse(data, out bVerify);
 
-                SPList oList = oweb.Lists[base.ListUid];
-                SPListItem oListItem = oList.GetItemById(base.ItemID);
+                    SPList oList = oweb.Lists[base.ListUid];
+                    SPListItem oListItem = oList.GetItemById(base.ItemID);
 
-                base.totalCount = 100;
+                    base.totalCount = 100;
 
-                API.ApplicationUninstaller installer = new API.ApplicationUninstaller(oListItem["EXTID"].ToString(), base.cn, this);
-                installer.UninstallApp(bVerify, oweb);
+                    API.ApplicationUninstaller installer = new API.ApplicationUninstaller(oListItem["EXTID"].ToString(), cn, this);
+                    installer.UninstallApp(bVerify, oweb);
 
-                string retMessage = installer.Message;
-                maxErrorLevel = installer.MaxErrorLevel;
-                dtMessages = installer.DtMessagesHTML;
+                    string retMessage = installer.Message;
+                    maxErrorLevel = installer.MaxErrorLevel;
+                    dtMessages = installer.DtMessagesHTML;
 
 
-                base.sErrors = installer.XmlMessages.OuterXml;
+                    base.sErrors = installer.XmlMessages.OuterXml;
 
-                if(installer.MaxErrorLevel > 1)
+                    if (installer.MaxErrorLevel > 1)
+                    {
+                        base.bErrors = true;
+                    }
+                }
+                catch (Exception ex)
                 {
                     base.bErrors = true;
+                    base.sErrors += "General Failure: " + ex.ToString();
                 }
-            }
-            catch(Exception ex)
-            {
-                base.bErrors = true;
-                base.sErrors += "General Failure: " + ex.Message;
             }
         }
 
