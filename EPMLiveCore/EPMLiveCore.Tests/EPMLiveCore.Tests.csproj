@@ -61,8 +61,7 @@
       <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\System.4.0.0.0.Fakes.dll</HintPath>
     </Reference>
     <Reference Include="System.Data" />
-    <Reference Include="System.Data.4.0.0.0.Fakes, Version=4.0.0.0, Culture=neutral, PublicKeyToken=0ae41878053f6703, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="System.Data.4.0.0.0.Fakes">
       <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\System.Data.4.0.0.0.Fakes.dll</HintPath>
     </Reference>
     <Reference Include="System.Web" />
@@ -70,6 +69,7 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\System.Web.4.0.0.0.Fakes.dll</HintPath>
     </Reference>
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <Choose>
     <When Condition="('$(VisualStudioVersion)' == '10.0' or '$(VisualStudioVersion)' == '') and '$(TargetFrameworkVersion)' == 'v3.5'">
@@ -83,6 +83,7 @@
     <Compile Include="API\Analytics\AnalyticsDataTests.cs" />
     <Compile Include="API\Analytics\FRFQueryFactoryTests.cs" />
     <Compile Include="API\Analytics\RecentItemsTests.cs" />
+    <Compile Include="API\TimerTests.cs" />
     <Compile Include="Infrastructure\Setup\CreateEPMLiveDBTests.cs" />
     <Compile Include="Infrastructure\Setup\ActivateFeatureKeyTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
