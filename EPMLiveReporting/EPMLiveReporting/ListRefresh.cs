@@ -264,7 +264,7 @@ namespace EPMLiveReportsAdmin
                             #region refresh all
 
                             var allLists =
-                                new List<string>(_sListNames.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries));
+                                new List<string>(_sListNames.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries));
                             var allSpLists = new List<SPList>();
                             foreach (string l in allLists)
                             {
@@ -801,7 +801,7 @@ namespace EPMLiveReportsAdmin
 
             foreach (DataRow row in dtResults.Rows)
             {
-                int iLevel = GetLevel((string) row["ResultText"]);
+                int iLevel = GetLevel((string)row["ResultText"]);
                 string shortMessage = string.Empty;
                 if (iLevel == 2)
                 {
@@ -830,7 +830,7 @@ namespace EPMLiveReportsAdmin
             var ds = new DataSet();
             dtResultsFinal.TableName = "RPTLog";
             ds.Tables.Add(dtResultsFinal);
-            _DAO.BulkInsert(ds, _DAO.GetClientReportingConnection(), timerjobguid);
+            _DAO.BulkInsert(ds, timerjobguid);
             _DAO.Dispose();
             return true;
         }
@@ -863,7 +863,7 @@ namespace EPMLiveReportsAdmin
                 }
                 else //Single list
                 {
-                    arrayListNames = new List<string> {sListNames};
+                    arrayListNames = new List<string> { sListNames };
                 }
             }
 
