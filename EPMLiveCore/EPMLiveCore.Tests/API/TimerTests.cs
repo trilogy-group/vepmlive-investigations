@@ -6,7 +6,7 @@ using EPMLiveCore.Infrastructure.Logging.Fakes;
 using Microsoft.SharePoint.Administration.Fakes;
 using EPMLiveCore.Fakes;
 using System.Web.Fakes;
-
+using System.Xml;
 namespace EPMLiveCore.API.Tests
 {
     [TestClass()]
@@ -47,7 +47,7 @@ namespace EPMLiveCore.API.Tests
                     var persistedObject = new ShimSPPersistedObject(webApp);
                     persistedObject.IdGet = () =>
                     {
-                        return Guid.Parse("D4A8A5A3-5C26-45D0-876C-AC2B4FB86DAA");
+                        return jobid;
                     };
                     return webApp;
                 };
@@ -74,12 +74,12 @@ namespace EPMLiveCore.API.Tests
                         GetGuidInt32 = (_int) =>
                         {
                             read = false;
-                            return Guid.NewGuid();
+                            return jobid;
                         },
                         GetDateTimeInt32 = (_int) =>
                         {
                             read = false;
-                            return DateTime.Now;
+                            return DateTime.MinValue;
                         },
                         GetStringInt32 = (_int) =>
                         {
@@ -95,18 +95,60 @@ namespace EPMLiveCore.API.Tests
                 };
 
                 ShimHttpUtility.HtmlEncodeString = (a) => { return a; };
+                //Act
+                XmlNode ndStatus = Timer.GetTimerJobStatus(spweb, jobid);
+                //Assert
+                string expectedresult = "<TimerJobStatus ID=\"" + jobid + "\" Status=\"0\" PercentComplete=\"0\" Finished=\"1/1/0001 8:00:00 AM\" Result=\"\"><![CDATA[]]></TimerJobStatus>";
+                Assert.AreEqual("TimerJobStatus", ndStatus.Name);
+                Assert.AreEqual(expectedresult, ndStatus.OuterXml);
+                Assert.AreEqual(openconnection, closeconnetcion);
 
-                Timer.GetTimerJobStatus(spweb, jobid);
+                //Act
                 read = true;
-                Timer.GetTimerJobStatus(siteid, webid, 0, true);
+                ndStatus = Timer.GetTimerJobStatus(siteid, webid, 0, true);
+
+                //Assert
+                expectedresult = "<TimerJobStatus ID=\"" + jobid + "\" Status=\"0\" PercentComplete=\"0\" Finished=\"1/1/0001 8:00:00 AM\">&lt;![CDATA[]]&gt;</TimerJobStatus>";
+                Assert.AreEqual("TimerJobStatus", ndStatus.Name);
+                Assert.AreEqual(expectedresult, ndStatus.OuterXml);
+                Assert.AreEqual(openconnection, closeconnetcion);
+
+                //Act
                 read = true;
                 Timer.GetTimerJobStatus(siteid, webid, listid, 0, 0);
+
+                //Assert
+                Assert.AreEqual("TimerJobStatus", ndStatus.Name);
+                Assert.AreEqual(expectedresult, ndStatus.OuterXml);
+                Assert.AreEqual(openconnection, closeconnetcion);
+
+                //Act
                 read = true;
-                Timer.AddTimerJob(siteid, webid, listid, 1, "", 1, "", "", 1, 0, "");
+                Guid result = Timer.AddTimerJob(siteid, webid, listid, 1, "", 1, "", "", 1, 0, "");
+
+                //Assert
+                Assert.AreNotEqual(Guid.Empty, result);
+                Assert.AreEqual(openconnection, closeconnetcion);
+
+                //Act
                 read = true;
                 Timer.AddTimerJob(siteid, webid, listid, "", 1, "", "", 5, 2, "");
+
+
+                //Assert
+                Assert.AreNotEqual(Guid.Empty, result);
+                Assert.AreEqual(openconnection, closeconnetcion);
+
+                //Act
                 read = true;
                 Timer.AddTimerJob(siteid, webid, "", 1, "", "", 5, 3, "");
+
+
+                //Assert
+                Assert.AreNotEqual(Guid.Empty, result);
+                Assert.AreEqual(openconnection, closeconnetcion);
+
+                //Act
                 read = true;
                 Timer.CancelTimerJob(spweb, jobid);
                 read = true;
@@ -114,9 +156,8 @@ namespace EPMLiveCore.API.Tests
                 read = false;
                 Timer.IsSecurityJobAlreadyRunning(spweb, listid, 5);
 
-
+                //Assert
                 Assert.AreEqual(openconnection, closeconnetcion);
-
             }
         }
     }
