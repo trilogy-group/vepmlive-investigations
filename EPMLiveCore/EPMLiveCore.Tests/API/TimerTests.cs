@@ -115,7 +115,7 @@ namespace EPMLiveCore.API.Tests
 
                 //Act
                 read = true;
-                Timer.GetTimerJobStatus(siteid, webid, listid, 0, 0);
+                ndStatus = Timer.GetTimerJobStatus(siteid, webid, listid, 0, 0);
 
                 //Assert
                 Assert.AreEqual("TimerJobStatus", ndStatus.Name);
@@ -132,7 +132,7 @@ namespace EPMLiveCore.API.Tests
 
                 //Act
                 read = true;
-                Timer.AddTimerJob(siteid, webid, listid, "", 1, "", "", 5, 2, "");
+                result = Timer.AddTimerJob(siteid, webid, listid, "", 1, "", "", 5, 2, "");
 
 
                 //Assert
@@ -141,7 +141,7 @@ namespace EPMLiveCore.API.Tests
 
                 //Act
                 read = true;
-                Timer.AddTimerJob(siteid, webid, "", 1, "", "", 5, 3, "");
+                result = Timer.AddTimerJob(siteid, webid, "", 1, "", "", 5, 3, "");
 
 
                 //Assert
@@ -150,13 +150,28 @@ namespace EPMLiveCore.API.Tests
 
                 //Act
                 read = true;
+                //Void
                 Timer.CancelTimerJob(spweb, jobid);
-                read = true;
-                Timer.IsImportResourceAlreadyRunning(spweb);
-                read = false;
-                Timer.IsSecurityJobAlreadyRunning(spweb, listid, 5);
 
                 //Assert
+                Assert.AreEqual(openconnection, closeconnetcion);
+
+                //Act
+                read = true;
+                string _strresult = Timer.IsImportResourceAlreadyRunning(spweb);
+
+                //Assert
+                expectedresult = "<ResourceImporter Success=\"True\" JobUid=\"" + jobid + "\" PercentComplete=\"0\" />";
+                Assert.AreEqual(expectedresult, _strresult);
+                Assert.AreEqual(openconnection, closeconnetcion);
+                //Act
+                read = false;
+                _strresult = Timer.IsSecurityJobAlreadyRunning(spweb, listid, 5);
+
+
+                //Assert
+                expectedresult = "<SecurityJob Success=\"False\" />";
+                Assert.AreEqual(expectedresult, _strresult);
                 Assert.AreEqual(openconnection, closeconnetcion);
             }
         }
