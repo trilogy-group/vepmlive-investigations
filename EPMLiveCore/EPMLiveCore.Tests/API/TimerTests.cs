@@ -5,6 +5,7 @@ using Microsoft.SharePoint.Fakes;
 using EPMLiveCore.Infrastructure.Logging.Fakes;
 using Microsoft.SharePoint.Administration.Fakes;
 using EPMLiveCore.Fakes;
+using System.Web.Fakes;
 
 namespace EPMLiveCore.API.Tests
 {
@@ -92,6 +93,9 @@ namespace EPMLiveCore.API.Tests
                         },
                     };
                 };
+
+                ShimHttpUtility.HtmlEncodeString = (a) => { return a; };
+
                 Timer.GetTimerJobStatus(spweb, jobid);
                 read = true;
                 Timer.GetTimerJobStatus(siteid, webid, 0, true);
