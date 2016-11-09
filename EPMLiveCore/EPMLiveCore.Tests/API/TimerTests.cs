@@ -127,7 +127,7 @@ namespace EPMLiveCore.API.Tests
                 Guid result = Timer.AddTimerJob(siteid, webid, listid, 1, "", 1, "", "", 1, 0, "");
 
                 //Assert
-                Assert.AreNotEqual(Guid.Empty, result);
+                Assert.AreEqual(jobid, result);
                 Assert.AreEqual(openconnection, closeconnetcion);
 
                 //Act
@@ -136,7 +136,7 @@ namespace EPMLiveCore.API.Tests
 
 
                 //Assert
-                Assert.AreNotEqual(Guid.Empty, result);
+                Assert.AreEqual(jobid, result);
                 Assert.AreEqual(openconnection, closeconnetcion);
 
                 //Act
@@ -145,7 +145,7 @@ namespace EPMLiveCore.API.Tests
 
 
                 //Assert
-                Assert.AreNotEqual(Guid.Empty, result);
+                Assert.AreEqual(jobid, result);
                 Assert.AreEqual(openconnection, closeconnetcion);
 
                 //Act
