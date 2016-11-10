@@ -42,44 +42,50 @@ var ImportResourceStatusClient = (function () {
                         url: window.epmLive.currentWebFullUrl + '/_layouts/epmlive/importresourcestatus.aspx?jobid=' + window.epmLive.jobId + '&format=json&token=' + new Date().getTime(),
                         type: 'GET',
                         success: function (data) {
-                            if (!data.warmingUp) {
-                                if (!data.error) {
-                                    status.TotalRecords(data.TotalRecords);
-                                    status.PercentComplete(data.PercentComplete);
-                                    status.ProcessedRecords(data.ProcessedRecords);
-                                    status.SuccessRecords(data.SuccessRecords);
-                                    status.FailedRecords(data.FailedRecords);
-                                    status.CurrentProcess(data.CurrentProcess);
-                                    status.infoCount(data.Log.InfoCount);
-                                    status.warningCount(data.Log.WarningCount);
-                                    status.errorCount(data.Log.ErrorCount);
-                                    status.log(data.Log.Messages);
+                            try {
+                                if (!data.warmingUp) {
+                                    if (!data.error) {
+                                        status.TotalRecords(data.TotalRecords);
+                                        status.PercentComplete(data.PercentComplete);
+                                        status.ProcessedRecords(data.ProcessedRecords);
+                                        status.SuccessRecords(data.SuccessRecords);
+                                        status.FailedRecords(data.FailedRecords);
+                                        status.CurrentProcess(data.CurrentProcess);
+                                        status.infoCount(data.Log.InfoCount);
+                                        status.warningCount(data.Log.WarningCount);
+                                        status.errorCount(data.Log.ErrorCount);
+                                        status.log(data.Log.Messages);
 
-                                    if (status.log().length > 0) {
-                                        $("#lnkall").show();
-                                        $("#lnkall").text("All (" + status.log().length + ")");
+                                        if (status.log().length > 0) {
+                                            $("#lnkall").show();
+                                            $("#lnkall").text("All (" + status.log().length + ")");
+                                        }
+                                        if (status.infoCount() > 0) {
+                                            $("#lnkinfo").show();
+                                            $("#lnkinfo").text("Info (" + status.infoCount() + ")");
+                                        }
+                                        if (status.warningCount() > 0) {
+                                            $("#lnkwarning").show();
+                                            $("#lnkwarning").text("Warning (" + status.warningCount() + ")");
+                                        }
+                                        if (status.errorCount() > 0) {
+                                            $("#lnkerror").show();
+                                            $("#lnkerror").text("Error (" + status.errorCount() + ")");
+                                        }
                                     }
-                                    if (status.infoCount() > 0) {
-                                        $("#lnkinfo").show();
-                                        $("#lnkinfo").text("Info (" + status.infoCount() + ")");
-                                    }
-                                    if (status.warningCount() > 0) {
-                                        $("#lnkwarning").show();
-                                        $("#lnkwarning").text("Warning (" + status.warningCount() + ")");
-                                    }
-                                    if (status.errorCount() > 0) {
-                                        $("#lnkerror").show();
-                                        $("#lnkerror").text("Error (" + status.errorCount() + ")");
+                                    else {
+                                        status.PercentComplete(100);
                                     }
                                 }
-                                else {
-                                    status.PercentComplete(100);
-                                }
+                            } catch (e) {
+                                console.log(e);
                             }
+
                             window.setTimeout(getStatus, 500);
                         },
                         error: function (data) {
                             window.setTimeout(getStatus, 500);
+                            location.reload();
                         }
                     });
                 }
@@ -105,7 +111,7 @@ var ImportResourceStatusClient = (function () {
         waitForKo: waitForKo,
         filterLogByStatus: filterLogByStatus
     };
-    
+
 })();
 
 var cancelImportResourceJob = function () {
