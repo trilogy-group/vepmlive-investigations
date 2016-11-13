@@ -79,7 +79,7 @@ namespace EPMLiveCore.API.Tests
                         GetDateTimeInt32 = (_int) =>
                         {
                             read = false;
-                            return DateTime.MinValue;
+                            return DateTime.MinValue.ToUniversalTime();
                         },
                         GetStringInt32 = (_int) =>
                         {
@@ -98,7 +98,7 @@ namespace EPMLiveCore.API.Tests
                 //Act
                 XmlNode ndStatus = Timer.GetTimerJobStatus(spweb, jobid);
                 //Assert
-                string expectedresult = "<TimerJobStatus ID=\"" + jobid + "\" Status=\"0\" PercentComplete=\"0\" Finished=\"1/1/0001 8:00:00 AM\" Result=\"\"><![CDATA[]]></TimerJobStatus>";
+                string expectedresult = "<TimerJobStatus ID=\"" + jobid + "\" Status=\"0\" PercentComplete=\"0\" Finished=\"" + DateTime.MinValue.ToUniversalTime() + "\" Result=\"\"><![CDATA[]]></TimerJobStatus>";
                 Assert.AreEqual("TimerJobStatus", ndStatus.Name);
                 Assert.AreEqual(expectedresult, ndStatus.OuterXml);
                 Assert.AreEqual(openconnection, closeconnetcion);
@@ -108,7 +108,7 @@ namespace EPMLiveCore.API.Tests
                 ndStatus = Timer.GetTimerJobStatus(siteid, webid, 0, true);
 
                 //Assert
-                expectedresult = "<TimerJobStatus ID=\"" + jobid + "\" Status=\"0\" PercentComplete=\"0\" Finished=\"1/1/0001 8:00:00 AM\">&lt;![CDATA[]]&gt;</TimerJobStatus>";
+                expectedresult = "<TimerJobStatus ID=\"" + jobid + "\" Status=\"0\" PercentComplete=\"0\" Finished=\"" + DateTime.MinValue.ToUniversalTime() + "\">&lt;![CDATA[]]&gt;</TimerJobStatus>";
                 Assert.AreEqual("TimerJobStatus", ndStatus.Name);
                 Assert.AreEqual(expectedresult, ndStatus.OuterXml);
                 Assert.AreEqual(openconnection, closeconnetcion);

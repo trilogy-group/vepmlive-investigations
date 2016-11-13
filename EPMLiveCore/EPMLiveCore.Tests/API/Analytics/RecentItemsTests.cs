@@ -10,17 +10,17 @@ namespace EPMLiveCore.API.Tests
     [TestClass()]
     public class RecentItemsTests
     {
-        [TestMethod()]
-        public void Create_SPSiteFailed_Test()
-        {
-            var testParams = "<Data>" +
-                "<Param key=\"SiteId\">7F316E11-C842-4440-9918-39A8F1C12DA9</Param>" +
-                        "<Param key=\"WebId\">1A8F7946-CCA1-4A24-8785-CE8E32D012BE</Param>" +
-                "<Param key=\"ListId\">5D592B57-C072-4B36-8809-11262120484D</Param>" +
-              "</Data>";
+        //[TestMethod()]
+        //public void Create_SPSiteFailed_Test()
+        //{
+        //    var testParams = "<Data>" +
+        //        "<Param key=\"SiteId\">7F316E11-C842-4440-9918-39A8F1C12DA9</Param>" +
+        //                "<Param key=\"WebId\">1A8F7946-CCA1-4A24-8785-CE8E32D012BE</Param>" +
+        //        "<Param key=\"ListId\">5D592B57-C072-4B36-8809-11262120484D</Param>" +
+        //      "</Data>";
 
-            Assert.IsTrue(string.IsNullOrEmpty(RecentItems.Create(testParams)));
-        }
+        //    Assert.IsTrue(string.IsNullOrEmpty(RecentItems.Create(testParams)));
+        //}
 
         [TestMethod()]
         public void Create_ValidList_Test()
