@@ -79,6 +79,7 @@
 
             SP.SOD.executeOrDelayUntilScriptLoaded(initializeEPMLoader, 'jquery.min.js');
         }
+     var permission = '<%=UserHasDesignerPermission %>'; 
     </SharePoint:ScriptBlock>
 
     <div id="MWG_Header" style="overflow: hidden; display: <%= ShowToolbar ? "block" : "none" %>">
@@ -182,10 +183,10 @@
             <br />
             <input id="MWG_DefaultView" type="checkbox" />
             Default View<br />
-            <input id="MWG_PersonalView" type="checkbox" <%= UserHasDesignerPermission ? string.Empty : @"checked=""checked""" %>  />
+             <input id="MWG_PersonalView" type="checkbox" <%= UserHasDesignerPermission ? string.Empty : @"checked=""checked""" %> />
             Personal View<br />
             <br />
-            <input type="button" style="float: left; width: 90px; margin-right: 5px;" value="OK" onclick="SP.UI.ModalDialog.commonModalDialogClose(SP.UI.DialogResult.OK, MyWorkGrid.getSavingViewInfo(this)); return false;" class="ms-ButtonHeightWidth" target="_self" />
+            <input type="button" style="float: left; width: 90px; margin-right: 5px;" value="OK" onclick="SP.UI.ModalDialog.commonModalDialogClose(SP.UI.DialogResult.OK, MyWorkGrid.getSavingViewInfo(this, permission)); return false;" class="ms-ButtonHeightWidth" target="_self" />
             <input type="button" style="float: left; width: 90px;" value="Cancel" onclick="SP.UI.ModalDialog.commonModalDialogClose(SP.UI.DialogResult.cancel, 'Cancel clicked'); return false;" class="ms-ButtonHeightWidth" target="_self" />
         </div>
     </div>

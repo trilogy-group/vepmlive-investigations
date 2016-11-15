@@ -27,6 +27,8 @@ namespace EPMLiveCore.API
 
         public string Sorting { get; set; }
 
+        public bool HasPermission { get; set; }
+
         #endregion Properties 
     }
 }

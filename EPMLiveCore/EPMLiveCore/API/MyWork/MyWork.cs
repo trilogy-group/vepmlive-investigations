@@ -1400,7 +1400,8 @@ namespace EPMLiveCore.API
                 RightCols = viewElement.Attribute("RightCols").Value,
                 Filters = viewElement.Attribute("Filters").Value,
                 Grouping = viewElement.Attribute("Grouping").Value,
-                Sorting = viewElement.Attribute("Sorting").Value
+                Sorting = viewElement.Attribute("Sorting").Value,
+                HasPermission = Convert.ToBoolean(viewElement.Attribute("HasPermission").Value)
             };
         }
 
@@ -3334,24 +3335,27 @@ namespace EPMLiveCore.API
 
                 MyWorkGridView myWorkGridView = GetMyWorkGridView(xDocument);
 
+                List<MyWorkGridView> myWorkGridViews = GetPersonalViews(configWeb).ToList();
+
+                myWorkGridViews.RemoveAll(v => v.Id.Equals(myWorkGridView.Id));
+
+                if (myWorkGridView.Default)
+                {
+                    foreach (MyWorkGridView gridView in myWorkGridViews)
+                    {
+                        gridView.Default = false;
+                    }
+                }
+
                 if (myWorkGridView.Personal)
                 {
-                    List<MyWorkGridView> myWorkGridViews = GetPersonalViews(configWeb).ToList();
-                    myWorkGridViews.RemoveAll(v => v.Id.Equals(myWorkGridView.Id));
-
-                    if (myWorkGridView.Default)
-                    {
-                        foreach (MyWorkGridView gridView in myWorkGridViews)
-                        {
-                            gridView.Default = false;
-                        }
-                    }
-
                     myWorkGridViews.Add(myWorkGridView);
-
-                    SavePersonalViews(myWorkGridViews, configWeb);
                 }
-                else
+
+                SavePersonalViews(myWorkGridViews, configWeb);
+
+
+                if (myWorkGridView.HasPermission)
                 {
                     SaveGlobalViews(myWorkGridView, configWeb);
                 }
