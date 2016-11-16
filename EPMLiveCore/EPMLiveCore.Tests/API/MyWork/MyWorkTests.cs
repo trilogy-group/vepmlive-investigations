@@ -125,13 +125,7 @@ namespace EPMLiveCore.Tests.API.MyWork
                     }
 
                 };
-                fakespweb.Dispose = () => { };
-                fakespweb.UsersGet = () =>
-                {
-                    ShimSPUserCollection users = new ShimSPUserCollection();
-                    users.CountGet = () => 0;
-                    return users;
-                };
+                fakespweb.Dispose = () => { };               
 
                 ShimSPSite.ConstructorString = (instance, url) =>
                 {
@@ -188,23 +182,7 @@ namespace EPMLiveCore.Tests.API.MyWork
                         }
                     };
                 };
-
-                ShimQueryExecutor.ConstructorSPWeb = (instance, spweb) =>
-                {
-                    ShimQueryExecutor moledInstance = new ShimQueryExecutor(instance);
-                    moledInstance.ExecuteReportingDBQueryStringIDictionaryOfStringObject =
-                    (str1, dict) =>
-                    {
-                        DataTable dt = new DataTable();
-                        DataRow newRow = dt.NewRow();
-                        DataColumn newColumn = new DataColumn("SharePointAccountID");
-                        dt.Columns.Add(newColumn);
-                        newRow["SharePointAccountID"] = "1073741823";
-
-                        dt.Rows.Add(newRow);
-                        return dt;
-                    };
-                };
+               
 
                 ShimSPSecurity.RunWithElevatedPrivilegesSPSecurityCodeToRunElevated = (w) =>
                 {
@@ -215,12 +193,15 @@ namespace EPMLiveCore.Tests.API.MyWork
                 {
                     return "Server=myServerAddress;Database=myDataBase;Trusted_Connection=True;";
                 };
+              
+                var openedConnections = 0;
+                var closedConnections = 0;
 
-                ShimSqlConnection.ConstructorStringSqlCredential = (instance, connString, conn) =>
+                ShimSqlConnection.ConstructorString = (instance, connString) =>
                 {
                     var connection = new ShimSqlConnection(instance);
-                    connection.Open = () => { };
-                    connection.Close = () => { };
+                    connection.Open = () => { openedConnections++; };
+                    connection.Close = () => { closedConnections++; };
                 };
 
 
@@ -244,10 +225,14 @@ namespace EPMLiveCore.Tests.API.MyWork
                     };
                 };
 
-                string result = "";
                 var data = "<MyWork><View ID=\"73c18c59a39b18382081ec00bb456d43\" Name=\"gg\" Default=\"true\" Personal=\"false\" HasPermission=\""+ hasPermission.ToString() +"\" LeftCols=\"Complete:25,CommentCount:36,Priority:25,Title:570\" Cols=\"\" RightCols=\"Flag:30,Work0000Type:125,Project:90,DueDate:100,WorkingOn:87\" Filters=\"0|\" Grouping=\"0|\" Sorting=\"DueDate\"/></MyWork>";
 
-                return result = objToTestPrivateMethod.InvokeStatic("SaveMyWorkGridView", data) as string;
+                string result = "";
+                result = objToTestPrivateMethod.InvokeStatic("SaveMyWorkGridView", data) as string;
+
+                Assert.AreEqual(openedConnections, closedConnections);
+
+                return result;
             }
         }
     }
