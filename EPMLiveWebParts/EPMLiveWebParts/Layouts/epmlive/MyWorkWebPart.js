@@ -376,11 +376,9 @@ function MyWorkGoToItem(gridid, rowid) {
     CurrentRow = row;
     gridid = GetGridId(grid);
 
-    for (var l in newItemLists)
-    {
+    for (var l in newItemLists) {
         var listID = newItemLists[l]["ListID"];
-        if (row.ListID.toLowerCase() == listID.toLowerCase())
-        {
+        if (row.ListID.toLowerCase() == listID.toLowerCase()) {
             var usePopUp = newItemLists[l]["UsePopUp"];
             break;
         }
@@ -865,9 +863,9 @@ function changeCompleteStatus(grid, row, col) {
                             $(row.r1).fadeOut(800);
                             $(row.r2).fadeOut(800);
                         } else {
-                            $(row.r0).find("td").fadeOut(800, function() { $(this).parent().remove(); });
-                            $(row.r1).find("td").fadeOut(800, function() { $(this).parent().remove(); });
-                            $(row.r2).find("td").fadeOut(800, function() { $(this).parent().remove(); });
+                            $(row.r0).find("td").fadeOut(800, function () { $(this).parent().remove(); });
+                            $(row.r1).find("td").fadeOut(800, function () { $(this).parent().remove(); });
+                            $(row.r2).find("td").fadeOut(800, function () { $(this).parent().remove(); });
                         }
                     } else if (!completed && MyWorkGrid.showingCompletedItems) {
                         if (!$.browser.msie) {
@@ -875,9 +873,9 @@ function changeCompleteStatus(grid, row, col) {
                             $(row.r1).fadeOut(800);
                             $(row.r2).fadeOut(800);
                         } else {
-                            $(row.r0).find("td").fadeOut(800, function() { $(this).parent().remove(); });
-                            $(row.r1).find("td").fadeOut(800, function() { $(this).parent().remove(); });
-                            $(row.r2).find("td").fadeOut(800, function() { $(this).parent().remove(); });
+                            $(row.r0).find("td").fadeOut(800, function () { $(this).parent().remove(); });
+                            $(row.r1).find("td").fadeOut(800, function () { $(this).parent().remove(); });
+                            $(row.r2).find("td").fadeOut(800, function () { $(this).parent().remove(); });
                         }
                     }
                 } catch (e) {
@@ -1502,6 +1500,7 @@ var MyWorkGrid = {
                                     name: viewName,
                                     isDefault: isDefault,
                                     isPersonal: isPersonal,
+                                    hasPermission: true,
                                     leftCols: view["@LeftCols"],
                                     cols: view["@Cols"],
                                     rightCols: view["@RightCols"],
@@ -1883,6 +1882,7 @@ var MyWorkGrid = {
         }
         var isViewDefault = vals[1];
         var isViewPersonal = vals[2];
+        var hasPermission = vals[3];
 
         var grid = Grids[MyWorkGrid.gridId];
         grid.StaticCursor = 1;
@@ -1959,7 +1959,7 @@ var MyWorkGrid = {
             var sorting = grid.Sort;
 
             var dataXml = '<MyWork><View ID="' + viewId + '" Name="' + viewName + '" Default="'
-                + isViewDefault + '" Personal="' + isViewPersonal + '" LeftCols="' + leftCols + '" Cols="' + cols + '" RightCols="'
+                + isViewDefault + '" Personal="' + isViewPersonal + '" HasPermission="' + hasPermission + '" LeftCols="' + leftCols + '" Cols="' + cols + '" RightCols="'
                 + rightCols + '" Filters="' + filters + '" Grouping="' + grouping + '" Sorting="' + sorting + '"/></MyWork>';
 
             EPMLiveCore.WorkEngineAPI.Execute("SaveMyWorkGridView", dataXml, function (response) {
@@ -1975,6 +1975,7 @@ var MyWorkGrid = {
                         name: viewName,
                         isDefault: isViewDefault === 'true' ? true : false,
                         isPersonal: isViewPersonal === 'true' ? true : false,
+                        hasPermission: hasPermission === 'true' ? true : false,
                         leftCols: leftCols,
                         cols: cols,
                         rightCols: rightCols,
@@ -1997,9 +1998,9 @@ var MyWorkGrid = {
         return true;
     },
 
-    getSavingViewInfo: function (element) {
+    getSavingViewInfo: function (element, hasPermission) {
         if (element.parentNode.children[0].value) {
-            return element.parentNode.children[0].value + '|' + element.parentNode.children[2].checked + '|' + element.parentNode.children[4].checked;
+            return element.parentNode.children[0].value + '|' + element.parentNode.children[2].checked + '|' + element.parentNode.children[4].checked + '|' + hasPermission;
         }
         else {
             return false;
@@ -3271,8 +3272,7 @@ var MyWorkGrid = {
                         if (!(action == 'ago' && (value == true || value == false) && $(document.getElementById('Ribbon_MyWork_WorkFilter_DueAgoDays')).val() == '') &&
                             !(action == 'after' && (value == true || value == false) && $(document.getElementById('Ribbon_MyWork_WorkFilter_DueAfterDays')).val() == '')) {
 
-                            if (wf.daysAgo == '')
-                            {
+                            if (wf.daysAgo == '') {
                                 $(document.getElementById('Ribbon_MyWork_WorkFilter_DueAgoDays')).val("");
                             }
 
@@ -3391,14 +3391,14 @@ var MyWorkGrid = {
             //    }, 500);
             //}
 
-            //var tabGroup = document.getElementById('Ribbon.MyWorkContextualTabGroup');
-            //if (!tabGroup) window.SelectRibbonTab('Ribbon.MyWorkTab', true);
-            //else {
-            //    var $manageTab = $(document.getElementById('Ribbon.MyWorkTab-title'));
-            //    var $viewsTab = $(document.getElementById('Ribbon.MyWorkViewsTab-title'));
+            var tabGroup = document.getElementById('Ribbon.MyWorkContextualTabGroup');
+            if (!tabGroup) window.SelectRibbonTab('Ribbon.MyWorkTab', true);
+            else {
+                var $manageTab = $(document.getElementById('Ribbon.MyWorkTab-title'));
+                var $viewsTab = $(document.getElementById('Ribbon.MyWorkViewsTab-title'));
 
-            //    if ($manageTab.attr('aria-selected') === 'false' && $viewsTab.attr('aria-selected') === 'false') window.SelectRibbonTab('Ribbon.MyWorkTab', true);
-            //}
+                if ($manageTab.attr('aria-selected') === 'false' && $viewsTab.attr('aria-selected') === 'false') window.SelectRibbonTab('Ribbon.MyWorkTab', true);
+            }
 
         }, 'sp.ribbon.js');
     }
