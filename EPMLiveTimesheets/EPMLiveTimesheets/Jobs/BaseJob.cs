@@ -11,45 +11,59 @@ namespace TimeSheets
     {
         public Guid QueueUid;
         public Guid TSUID;
-        protected SqlConnection cn;
+
         public int jobtype;
 
         public string sErrors = "";
         public bool bErrors = false;
 
         public int userid;
-
+        public Guid WebAppId = Guid.Empty;
+        protected SqlConnection CreateConnection()
+        {
+            string strConn = EPMLiveCore.CoreFunctions.getConnectionString(WebAppId);
+            return new SqlConnection(strConn);
+        }
         public bool initJob(SPSite site)
         {
-            string strConn = EPMLiveCore.CoreFunctions.getConnectionString(site.WebApplication.Id);
-            cn = new SqlConnection(strConn);
-            SPSecurity.RunWithElevatedPrivileges(delegate()
+            WebAppId = site.WebApplication.Id;
+            using (SqlConnection cn = CreateConnection())
             {
-                cn.Open();
-            });
-
-            using (SqlCommand cmd = new SqlCommand("select status from TSQUEUE where TSQUEUE_ID=@QueueUid", cn))
-            {
-                cmd.Parameters.AddWithValue("@queueuid", QueueUid);
-                using (SqlDataReader dr = cmd.ExecuteReader())
+                try
                 {
-                    if (dr.Read())
+                    SPSecurity.RunWithElevatedPrivileges(delegate ()
                     {
-                        if (dr.GetInt32(0) != 1)
+                        cn.Open();
+                    });
+
+                    using (SqlCommand cmd = new SqlCommand("select status from TSQUEUE where TSQUEUE_ID=@QueueUid", cn))
+                    {
+                        cmd.Parameters.AddWithValue("@queueuid", QueueUid);
+                        using (SqlDataReader dr = cmd.ExecuteReader())
                         {
-                            cn.Close();
-                            return false;
+                            if (dr.Read())
+                            {
+                                if (dr.GetInt32(0) != 1)
+                                {
+                                    cn.Close();
+                                    return false;
+                                }
+                            }
+                            else
+                            {
+
+                                return false;
+                            }
+                            dr.Close();
                         }
                     }
-                    else
-                    {
-                        cn.Close();
-                        return false;
-                    }
-                    dr.Close();
+                }
+                catch (Exception ex)
+                {
+                    bErrors = true;
+                    sErrors = ex.Message;
                 }
             }
-            cn.Close();
             return true;
         }
 
@@ -57,44 +71,54 @@ namespace TimeSheets
         public void finishJob()
         {
 
-            SPSecurity.RunWithElevatedPrivileges(delegate()
+            using (SqlConnection cn = CreateConnection())
             {
-                if (cn.State == System.Data.ConnectionState.Closed)
-                    cn.Open();
-            });
-
-            //SqlCommand cmd = new SqlCommand("select scheduletype from timerjobs where timerjobuid=@timerjobuid", cn);
-            //cmd.Parameters.AddWithValue("@timerjobuid", JobUid);
-            //SqlDataReader dr = cmd.ExecuteReader();
-            //bool tempJob = false;
-            //if (dr.Read())
-            //{
-            //    tempJob = (dr.GetInt32(0) == 0);
-            //}
-            //dr.Close();
-
-            //if (!tempJob)
-            {
-                using (SqlCommand cmd = new SqlCommand("update TSQUEUE set status =  3, PERCENTCOMPLETE = 100, dtfinished=GETDATE(),result=@result,resulttext=@resulttext where TSQUEUE_ID=@queueuid", cn))
+                try
                 {
-                    cmd.Parameters.AddWithValue("@queueuid", QueueUid);
-                    if (bErrors)
-                        cmd.Parameters.AddWithValue("@result", "Errors");
-                    else
-                        cmd.Parameters.AddWithValue("@result", "No Errors");
-                    cmd.Parameters.AddWithValue("@resulttext", sErrors);
-                    cmd.ExecuteNonQuery();
+                    SPSecurity.RunWithElevatedPrivileges(delegate ()
+                    {
+                        cn.Open();
+                    });
+
+                    //SqlCommand cmd = new SqlCommand("select scheduletype from timerjobs where timerjobuid=@timerjobuid", cn);
+                    //cmd.Parameters.AddWithValue("@timerjobuid", JobUid);
+                    //SqlDataReader dr = cmd.ExecuteReader();
+                    //bool tempJob = false;
+                    //if (dr.Read())
+                    //{
+                    //    tempJob = (dr.GetInt32(0) == 0);
+                    //}
+                    //dr.Close();
+
+                    //if (!tempJob)
+                    {
+                        using (SqlCommand cmd = new SqlCommand("update TSQUEUE set status =  3, PERCENTCOMPLETE = 100, dtfinished=GETDATE(),result=@result,resulttext=@resulttext where TSQUEUE_ID=@queueuid", cn))
+                        {
+                            cmd.Parameters.AddWithValue("@queueuid", QueueUid);
+                            if (bErrors)
+                                cmd.Parameters.AddWithValue("@result", "Errors");
+                            else
+                                cmd.Parameters.AddWithValue("@result", "No Errors");
+                            cmd.Parameters.AddWithValue("@resulttext", sErrors);
+                            cmd.ExecuteNonQuery();
+                        }
+
+                    }
+                    //else
+                    //{
+                    //    cmd = new SqlCommand("DELETE FROM timerjobs where timerjobuid=@timerjobuid", cn);
+                    //    cmd.Parameters.AddWithValue("@timerjobuid", JobUid);
+                    //    cmd.ExecuteNonQuery();
+                    //}
+                }
+                catch(Exception ex)
+                {
+                    bErrors = true;
+                    sErrors = ex.Message;
                 }
 
             }
-            //else
-            //{
-            //    cmd = new SqlCommand("DELETE FROM timerjobs where timerjobuid=@timerjobuid", cn);
-            //    cmd.Parameters.AddWithValue("@timerjobuid", JobUid);
-            //    cmd.ExecuteNonQuery();
-            //}
 
-            cn.Close();
         }
     }
 }
