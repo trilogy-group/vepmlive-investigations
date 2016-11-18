@@ -1,0 +1,110 @@
+<%@ Master Language="C#" AutoEventWireup="true" CodeFile="Admin.master.cs" Inherits="MasterPage" %>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head runat="server">
+    <title>EPM Live Administration</title>
+    <link rel="stylesheet" type="text/css" href="style/style.css" />
+</head>
+<body>
+<div id="overdiv">
+    <form id="form1" runat="server" style="height:100%;">
+    <div id="main">
+       <div id="logo"></div>
+        <div id="menubar">
+            <div style="float: left; padding-left:10px"><h3>Administration Site</h3></div>
+          <div style="float: right; padding-right:10px">
+            <h3>Logged in as: <%=strCurrentUser %></h3>
+          </div>
+        </div>
+        <div id="site_content">
+          <div class="sidebar">
+            <div class="sidebaritem">
+            <!-- rounded corners - top **** -->
+            <div class="rtop"><div class="r1"></div><div class="r2"></div><div class="r3"></div><div class="r4"></div></div>
+              <h3>EPM Live Online</h3>
+              <ul>
+                <li><a class="<%=strMenus[0] %>" href="default.aspx" title="Home">Accounts</a></li>
+                <li><a class="<%=strMenus[1] %>" href="createaccount.aspx" title="">Create Account</a></li>
+                <li><a class="<%=strMenus[2] %>" href="users.aspx" title="">Users</a></li>
+                <li><a class="<%=strMenus[11] %>" href="sites.aspx" title="">Sites</a></li>
+                <li><a class="<%=strMenus[14] %>" href="signups.aspx" title="">Trial Signups</a></li>
+                <li><a class="<%=strMenus[3] %>" href="oldsignups.aspx" title="">OLD Trial Signups</a></li>
+              </ul>
+            <!-- rounded corners - bottom **** -->
+            <div class="rbottom"><div class="r4"></div><div class="r3"></div><div class="r2"></div><div class="r1"></div></div>
+            </div>
+            <div class="sidebaritem">
+            <!-- rounded corners - top **** -->
+            <div class="rtop"><div class="r1"></div><div class="r2"></div><div class="r3"></div><div class="r4"></div></div>
+              <h3>EPM Live Onsite</h3>
+              <ul>
+                <li><a  class="<%=strMenus[4] %>"href="customers.aspx" title="">Customers</a></li>
+                <li><a  class="<%=strMenus[12] %>"href="addcustomer.aspx" title="">Add Customer</a></li>
+                <li><a  class="<%=strMenus[13] %>"href="fullfill.aspx" title="">Fill Invoice</a></li>
+                <li><a  class="<%=strMenus[5] %>"href="versions.aspx" title="">Installer Versions</a></li>
+              </ul>
+            <!-- rounded corners - bottom **** -->
+            <div class="rbottom"><div class="r4"></div><div class="r3"></div><div class="r2"></div><div class="r1"></div></div>
+            </div>
+            <div class="sidebaritem">
+            <!-- rounded corners - top **** -->
+            <div class="rtop"><div class="r1"></div><div class="r2"></div><div class="r3"></div><div class="r4"></div></div>
+              <h3>Partners</h3>
+              <ul>
+                <li><a class="<%=strMenus[6] %>" href="partnerrequests.aspx" title="">Requests</a></li>
+                <li><a class="<%=strMenus[7] %>" href="activepartners.aspx" title="">Active</a></li>
+              </ul>
+            <!-- rounded corners - bottom **** -->
+            <div class="rbottom"><div class="r4"></div><div class="r3"></div><div class="r2"></div><div class="r1"></div></div>
+            </div>
+            
+            <div class="sidebaritem">
+            <!-- rounded corners - top **** -->
+            <div class="rtop"><div class="r1"></div><div class="r2"></div><div class="r3"></div><div class="r4"></div></div>
+              <h3>Config</h3>
+              <ul>
+                <li><a class="<%=strMenus[8] %>" href="perms.aspx" title="">Permissions</a></li>
+                <li><a class="<%=strMenus[9] %>" href="emailtemplates.aspx" title="">Email</a></li>
+              </ul>
+            <!-- rounded corners - bottom **** -->
+            <div class="rbottom"><div class="r4"></div><div class="r3"></div><div class="r2"></div><div class="r1"></div></div>
+            </div>
+            
+            
+            <div class="sidebaritem">
+            <!-- rounded corners - top **** -->
+            <div class="rtop"><div class="r1"></div><div class="r2"></div><div class="r3"></div><div class="r4"></div></div>
+              <h3>Reports</h3>
+              <ul>
+                <li><a class="<%=strMenus[10] %>" href="reports.aspx" title="" target="_blank">User Reports</a></li>
+              </ul>
+            <!-- rounded corners - bottom **** -->
+            <div class="rbottom"><div class="r4"></div><div class="r3"></div><div class="r2"></div><div class="r1"></div></div>
+            </div>
+            
+          </div>
+          <div id="content_container">
+            <!-- rounded corners - top **** -->
+            <div class="rtop"><div class="r1"></div><div class="r2"></div><div class="r3"></div><div class="r4"></div></div>
+            <div id="content">
+                <asp:contentplaceholder id="ContentPlaceHolderMain" runat="server">
+                </asp:contentplaceholder>
+             
+            </div>
+            <!-- rounded corners - bottom **** -->
+            <div class="rbottom"><div class="r4"></div><div class="r3"></div><div class="r2"></div><div class="r1"></div></div>
+          </div>
+        </div>
+        <div id="footer">
+          Copyright &copy; 2009 EPM Live
+        </div>
+
+        
+    </div>
+    
+    </form>
+    </div>
+</body>
+</html>

@@ -1,0 +1,18 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="AdminSite.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="AdminSite_accountsSvc_Service" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">https://my.epmlive.com/_vti_bin/epmlive/accounts/service.asmx</Value>
+    </Setting>
+    <Setting Name="AdminSite_emailservice_Service" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">https://my.epmlive.com/_vti_bin/epmlive/emailservice/service.asmx</Value>
+    </Setting>
+    <Setting Name="AdminSite_MSCRM_CrmService" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">http://epmlivehelp1/MSCrmServices/2007/CrmService.asmx</Value>
+    </Setting>
+    <Setting Name="AdminSite_ZuoraAPI_ZuoraService" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">https://apisandbox.zuora.com/apps/services/a/33.0</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>
