@@ -131,11 +131,12 @@ namespace TimerService
             {
                 DateTime dt = DateTime.Now;
 
-                StreamWriter swLog = new StreamWriter(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + "\\LOGS\\ROLLUPLOG_" + dt.Year + dt.Month + dt.Day + ".log", true);
+                using (StreamWriter swLog = new StreamWriter(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + "\\LOGS\\ROLLUPLOG_" + dt.Year + dt.Month + dt.Day + ".log", true))
+                {
+                    swLog.WriteLine(DateTime.Now.ToString() + "\t" + type + "\t" + module + "\t" + message);
+                }
+                
 
-                swLog.WriteLine(DateTime.Now.ToString() + "\t" + type + "\t" + module + "\t" + message);
-
-                swLog.Close();
             }
         }
 

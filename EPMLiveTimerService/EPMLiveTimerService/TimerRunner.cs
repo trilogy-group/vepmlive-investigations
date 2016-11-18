@@ -417,12 +417,10 @@ namespace TimerService
 
             DateTime dt = DateTime.Now;
 
-            StreamWriter swLog = new StreamWriter(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + "\\LOGS\\ACTIVITY_" + dt.Year + dt.Month + dt.Day + ".log", true);
-
-            swLog.WriteLine(DateTime.Now.ToString() + "\tINFO\tACTIVITY\tSTARTED");
-
-            swLog.Close();
-
+            using (StreamWriter swLog = new StreamWriter(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + "\\LOGS\\ACTIVITY_" + dt.Year + dt.Month + dt.Day + ".log", true))
+            {
+                swLog.WriteLine(DateTime.Now.ToString() + "\tINFO\tACTIVITY\tSTARTED");
+            }
             while (true)
             {
                 try
@@ -466,11 +464,11 @@ namespace TimerService
                                                 {
                                                     dt = DateTime.Now;
 
-                                                    swLog = new StreamWriter(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + "\\LOGS\\ACTIVITY_" + dt.Year + dt.Month + dt.Day + ".log", true);
+                                                    using (StreamWriter swLog = new StreamWriter(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + "\\LOGS\\ACTIVITY_" + dt.Year + dt.Month + dt.Day + ".log", true))
+                                                    {
 
-                                                    swLog.WriteLine(DateTime.Now.ToString() + "\tERRO\tACTIVITY\t" + ex.Message);
-
-                                                    swLog.Close();
+                                                        swLog.WriteLine(DateTime.Now.ToString() + "\tERRO\tACTIVITY\t" + ex.Message);
+                                                    }
                                                 }
                                             }
                                         }
@@ -494,11 +492,11 @@ namespace TimerService
                 {
                     dt = DateTime.Now;
 
-                    swLog = new StreamWriter(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + "\\LOGS\\ACTIVITY_" + dt.Year + dt.Month + dt.Day + ".log", true);
-
-                    swLog.WriteLine(DateTime.Now.ToString() + "\tERRO\tACTIVITY\t" + ex.Message);
-
-                    swLog.Close();
+                    using (StreamWriter swLog = new StreamWriter(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + "\\LOGS\\ACTIVITY_" + dt.Year + dt.Month + dt.Day + ".log", true))
+                    {
+                        swLog.WriteLine(DateTime.Now.ToString() + "\tERRO\tACTIVITY\t" + ex.Message);
+                    }
+                    
                 }
 
             }
@@ -583,11 +581,11 @@ namespace TimerService
                                                 {
                                                     DateTime dt = DateTime.Now;
 
-                                                    StreamWriter swLog = new StreamWriter(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + "\\LOGS\\TIMERLOG_NOTIFICATIONS_" + dt.Year + dt.Month + dt.Day + ".log", true);
+                                                    using (StreamWriter swLog = new StreamWriter(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + "\\LOGS\\TIMERLOG_NOTIFICATIONS_" + dt.Year + dt.Month + dt.Day + ".log", true))
+                                                    {
 
-                                                    swLog.WriteLine(DateTime.Now.ToString() + "\tERR\tNOTIFICATIONS\t" + ex.Message);
-
-                                                    swLog.Close();
+                                                        swLog.WriteLine(DateTime.Now.ToString() + "\tERR\tNOTIFICATIONS\t" + ex.Message);
+                                                    }
                                                 }
 
                                                 using (SqlCommand cmd3 = new SqlCommand("spNSetBit", cn))
@@ -611,11 +609,11 @@ namespace TimerService
                                 {
                                     DateTime dt = DateTime.Now;
 
-                                    StreamWriter swLog = new StreamWriter(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + "\\LOGS\\TIMERLOG_NOTIFICATIONS_" + dt.Year + dt.Month + dt.Day + ".log", true);
+                                    using (StreamWriter swLog = new StreamWriter(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + "\\LOGS\\TIMERLOG_NOTIFICATIONS_" + dt.Year + dt.Month + dt.Day + ".log", true))
+                                    {
 
-                                    swLog.WriteLine(DateTime.Now.ToString() + "\tERRM\tNOTIFICATIONS\t" + ex.Message);
-
-                                    swLog.Close();
+                                        swLog.WriteLine(DateTime.Now.ToString() + "\tERRM\tNOTIFICATIONS\t" + ex.Message);
+                                    }
                                 }
                                 finally
                                 {
@@ -650,11 +648,11 @@ namespace TimerService
                 {
                     DateTime dt = DateTime.Now;
 
-                    StreamWriter swLog = new StreamWriter(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + "\\LOGS\\TIMERLOG_NOTIFICATIONS_" + dt.Year + dt.Month + dt.Day + ".log", true);
+                    using (StreamWriter swLog = new StreamWriter(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + "\\LOGS\\TIMERLOG_NOTIFICATIONS_" + dt.Year + dt.Month + dt.Day + ".log", true))
+                    {
 
-                    swLog.WriteLine(DateTime.Now.ToString() + "\tERRO\tNOTIFICATIONS\t" + ex.Message);
-
-                    swLog.Close();
+                        swLog.WriteLine(DateTime.Now.ToString() + "\tERRO\tNOTIFICATIONS\t" + ex.Message);
+                    }
                 }
             }
 
