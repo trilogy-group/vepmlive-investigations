@@ -5771,13 +5771,15 @@
 
             try {
                 if (this.selectedView.ViewSettings.PerInc == "1") {
-                    var perf = this.selectedView.ViewSettings.FinishPeriod;
+                    //var perf = this.selectedView.ViewSettings.FinishPeriod;
+                    var perf = this.UsingPeriods.Period.length;
                     var pers = this.UsingPeriods.CurrentPeriod.Value;
 
-                    if (perf < pers)
-                        perf = pers;
-                    else if (perf > this.UsingPeriods.Period.length)
-                        perf = this.UsingPeriods.Period.length
+                    //It is used for selecting only one period
+                    //if (perf < pers)
+                    //    perf = pers;
+                    //else if (perf > this.UsingPeriods.Period.length)
+                    //perf = this.UsingPeriods.Period.length
 
                     this.PerStart = pers;
                     this.PerEnd = perf;
