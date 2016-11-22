@@ -408,8 +408,9 @@ namespace WorkEnginePPM
                 prepareItemList(list);
 
                 SPListItem li = list.GetItemById(int.Parse(itemid));
+                bool updated = false;
 
-                foreach(DataRow dr in fields)
+                foreach (DataRow dr in fields)
                 {
                     string fname = dr["ID"].ToString();
                     string val = dr["Value"].ToString();
@@ -418,7 +419,16 @@ namespace WorkEnginePPM
                     {
                         try
                         {
-                            DataTable dtRes = EPMLiveCore.API.APITeam.GetResourcePool("<Data><Columns>EXTID</Columns></Data>", web);
+                            DataTable dtRes = null;
+                            if (HttpContext.Current.Session["ResPoolDt"] == null)
+                            {
+                                dtRes = EPMLiveCore.API.APITeam.GetResourcePool("<Data><Columns>EXTID</Columns></Data>", web);
+                                HttpContext.Current.Session["ResPoolDt"] = dtRes;
+                            }
+                            else
+                            {
+                                dtRes = HttpContext.Current.Session["ResPoolDt"] as DataTable;
+                            }
 
                             string[] sTeams = val.Split(',');
 
@@ -436,15 +446,20 @@ namespace WorkEnginePPM
                                 try
                                 {
                                     SPFieldUserValue uv = new SPFieldUserValue(web, u.ID, u.Name);
-                                    if(!uvc.Contains(uv))
+                                    if (!uvc.Any(l => l.LookupId == uv.LookupId))
+                                    {
                                         uvc.Add(uv);
+                                        updated = true;
+                                    }
                                 }
                                 catch { }
                             }
 
                             li["AssignedTo"] = uvc;
                         }
-                        catch { }
+                        catch(Exception ex)
+                        {
+                        }
                     }
                     else if(hshFields.Contains(fname))
                     {
@@ -456,14 +471,20 @@ namespace WorkEnginePPM
                     }
                 }
 
-                li["ExternalID"] = externalid;
+                if (li["ExternalID"].ToString() != externalid)
+                {
+                    li["ExternalID"] = externalid;
+                    updated = true;
+                }
+
                 //using (SPWeb web = SPContext.Current.Web)
                 {
                     web.AllowUnsafeUpdates = true;
 
                     SPSecurity.RunWithElevatedPrivileges(delegate()
                     {
-                        li.SystemUpdate();
+                        if(updated)
+                            li.SystemUpdate();
                     });
                 }
 

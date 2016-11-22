@@ -35,6 +35,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="EPM Live Core.Fakes">
+      <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\EPM Live Core.Fakes.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.QualityTools.Testing.Fakes, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
     </Reference>
@@ -67,7 +70,14 @@
     </Reference>
     <Reference Include="System.Web" />
     <Reference Include="System.Web.4.0.0.0.Fakes">
-      <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\System.Web.4.0.0.0.Fakes.dll</HintPath>
+      <HintPath>FakesAssemblies\System.Web.4.0.0.0.Fakes.dll</HintPath>
+    </Reference>
+    <Reference Include="System.XML.4.0.0.0.Fakes">
+      <HintPath>..\..\EPMLive.TestFakes\FakesAssemblies\System.XML.4.0.0.0.Fakes.dll</HintPath>
+    </Reference>
+    <Reference Include="WorkEnginePPM, Version=1.0.0.0, Culture=neutral, PublicKeyToken=9f4da00116c38ec5, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\WorkEnginePPM\bin\Debug\WorkEnginePPM.dll</HintPath>
     </Reference>
     <Reference Include="WorkEnginePPM.Fakes, Version=1.0.0.0, Culture=neutral, PublicKeyToken=0ae41878053f6703, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -82,13 +92,16 @@
     </When>
     <Otherwise>
       <ItemGroup>
-        <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework" />
+        <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework">
+          <Private>False</Private>
+        </Reference>
       </ItemGroup>
     </Otherwise>
   </Choose>
   <ItemGroup>
     <Compile Include="DataServiceModules\DSMCostPlannerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="HelperFunctionsTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\EPMLive.TestFakes\EPMLive.TestFakes.csproj">
@@ -99,10 +112,9 @@
       <Project>{BB86B09C-CB35-4888-8639-C047A40A9C0C}</Project>
       <Name>PortfolioEngineCore</Name>
     </ProjectReference>
-    <ProjectReference Include="..\WorkEnginePPM\WorkEnginePPM.csproj">
-      <Project>{51CAF42A-31AF-4B74-853F-24B672C185C2}</Project>
-      <Name>WorkEnginePPM</Name>
-    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Fakes Include="Fakes\System.Web.fakes" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
