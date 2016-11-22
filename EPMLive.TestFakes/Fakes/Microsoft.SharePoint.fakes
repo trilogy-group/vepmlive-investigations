@@ -63,6 +63,7 @@
     <Add FullName="Microsoft.SharePoint.SPFieldNumber!"/>
     <Add FullName="Microsoft.SharePoint.SPFieldCalculated!"/>
     <Add FullName="Microsoft.SharePoint.SPFieldUserValueCollection!"/>
+    <Add FullName="Microsoft.SharePoint.SPFieldUserValue!"/>
     <Add FullName="Microsoft.SharePoint.SPRegionalSettings!"/>
     <Add FullName="Microsoft.SharePoint.SPRoleDefinitionCollection!"/>
     <Add FullName="Microsoft.SharePoint.SPRoleDefinition!"/>

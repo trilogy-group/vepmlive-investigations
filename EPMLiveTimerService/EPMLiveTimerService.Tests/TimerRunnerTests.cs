@@ -13,6 +13,7 @@ using Microsoft.SharePoint.Administration.Fakes;
 namespace TimerService.Tests
 {
    // [TestClass()]
+   //TODO: Change test
     public class TimerRunnerTests
     {
         //[TestMethod()]

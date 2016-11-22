@@ -13,6 +13,10 @@ using System.Xml.Fakes;
 using System.Collections.Generic;
 using System.Collections;
 using System.Web.SessionState.Fakes;
+using System.Diagnostics;
+using Microsoft.QualityTools.Testing.Fakes.Shims;
+using Microsoft.QualityTools.Testing.Fakes;
+using System.Collections.Generic.Fakes;
 
 namespace WorkEnginePPM.Tests
 {
@@ -323,21 +327,36 @@ namespace WorkEnginePPM.Tests
                     return new string[] { };
                 };
 
-                /* CODE HAVING THE ISSUE
+                // CODE HAVING THE ISSUE
                 ShimSPFieldUserValueCollection uvc = new ShimSPFieldUserValueCollection();
-                ShimSPFieldUserValueCollection.AllInstances.item
-                SPFieldUserValueCollection collection = new SPFieldUserValueCollection(fakespweb, "");
-                SPFieldUserValue fielduservalue = new SPFieldUserValue();
-                fielduservalue.LookupId = 0;
+                //ShimSPFieldUserValueCollection.AllInstances.item
+                //SPFieldUserValueCollection collection = new SPFieldUserValueCollection(fakespweb, "");
+                ShimSPFieldUserValue.AllInstances.LookupValueGet = (instance) =>
+                {
+                    return "0";
+                };
+
+                ShimSPFieldUserValueCollection. Constructor = (instance) =>
+                {
+
+                };
+
                 ShimSPFieldUserValueCollection.ConstructorSPWebString = (instance, web, s) =>
                 {
-                    ShimSPFieldUserValue
-                   // instance = new ShimSPFieldUserValueCollection();
-                    instance.Add(fielduservalue);
-                };
-                */
-               
+                    //var lst = new ShimExSPFieldUserValueCollection(instance);
+                    //lst.AddSPFieldUserValue = (value) =>
+                    //{
 
+                    //};
+                    //ShimSPFieldUserValue
+                    // instance = new ShimSPFieldUserValueCollection();
+                    //instance.Add (fielduservalue);
+                    
+                    //System.Collections.Generic.Fakes.StubList<SPFieldUserValue> lst = new System.Collections.Generic.Fakes.StubList<SPFieldUserValue>(instance);
+                    //lst.Add = () = { };
+                };
+
+                ShimSPFieldUserValueCollection.BehaveAsCurrent();
                 ShimHttpUtility.HtmlEncodeString = (a) => { return a; };
                 ShimSPFieldCollection.AllInstances.ContainsFieldWithStaticNameString = (instance, b) =>
                 {
@@ -351,5 +370,6 @@ namespace WorkEnginePPM.Tests
         }
     }
 
- 
+   
 }
+
