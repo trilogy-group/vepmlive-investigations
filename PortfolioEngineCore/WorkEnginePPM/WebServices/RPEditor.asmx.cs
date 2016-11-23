@@ -269,6 +269,11 @@ namespace WorkEnginePPM
             {
                 sReply = HandleException("GeneralFunctions9", 99999, ex);
             }
+            finally
+            {
+                if (HttpContext.Current.Session["ResPoolDt"] != null)
+                    HttpContext.Current.Session.Remove("res");
+            }
             return sReply;
         }
 
