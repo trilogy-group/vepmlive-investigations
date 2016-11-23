@@ -23,38 +23,10 @@ namespace WorkEnginePPM.Tests
     [TestClass]
     public class HelperFunctionsTests
     {
-        [TestMethod]
-        public void processPortfolioItemTest_NoUpdateNeeded()
-        {
-
-
-            var tblInput = new DataTable();
-            tblInput.Columns.Add("ID", typeof(string));
-            tblInput.Columns.Add("Value", typeof(string));
-            tblInput.Columns.Add("PortfolioItem_Id", typeof(int));
-
-            tblInput.Rows.Add("Team", "1", "1");
-            tblInput.Rows.Add("Team1", "2", "2");
-
-            var tblResult = new DataTable();
-            tblResult.Columns.Add("EXTID", typeof(string));
-            tblResult.Columns.Add("SPID", typeof(string));
-
-            tblResult.Rows.Add("1", "1");
-            tblResult.Rows.Add("2", "2");
-
-            bool wasUpdated = false;
-            string result = ProcessCommonData(tblInput, tblResult, false, out wasUpdated);
-
-            Assert.IsTrue(result == "<Item ID=\"555\" Error=\"0\"/>");
-            Assert.IsTrue(!wasUpdated);
-        }
 
         [TestMethod]
         public void processPortfolioItemTest_UpdateNeeded()
         {
-
-
             var tblInput = new DataTable();
             tblInput.Columns.Add("ID", typeof(string));
             tblInput.Columns.Add("Value", typeof(string));
@@ -77,6 +49,15 @@ namespace WorkEnginePPM.Tests
             Assert.IsTrue(wasUpdated);
 
         }
+
+        //[TestMethod]
+        //public void processPortfolioItemTest_NoUpdateNeeded()
+        //{
+
+
+        //    Assert.IsTrue(result == "<Item ID=\"555\" Error=\"0\"/>");
+        //    Assert.IsTrue(!wasUpdated);
+        //}
 
         private static string ProcessCommonData(DataTable tblInput, DataTable tblResult, bool shouldUpdate, out bool wasUpdated)
         {
@@ -336,27 +317,27 @@ namespace WorkEnginePPM.Tests
                     return "0";
                 };
 
-                ShimSPFieldUserValueCollection. Constructor = (instance) =>
-                {
+                //ShimSPFieldUserValueCollection. Constructor = (instance) =>
+                //{
 
-                };
+                //};
 
                 ShimSPFieldUserValueCollection.ConstructorSPWebString = (instance, web, s) =>
                 {
-                    //var lst = new ShimExSPFieldUserValueCollection(instance);
+                    //var lst = new ShimSPFieldUserValueCollection(instance);
                     //lst.AddSPFieldUserValue = (value) =>
                     //{
 
                     //};
                     //ShimSPFieldUserValue
-                    // instance = new ShimSPFieldUserValueCollection();
-                    //instance.Add (fielduservalue);
-                    
+                    //instance = new ShimSPFieldUserValueCollection();
+                    //instance.Add(new ShimSPFieldUserValue());
+
                     //System.Collections.Generic.Fakes.StubList<SPFieldUserValue> lst = new System.Collections.Generic.Fakes.StubList<SPFieldUserValue>(instance);
                     //lst.Add = () = { };
                 };
 
-                ShimSPFieldUserValueCollection.BehaveAsCurrent();
+                //ShimSPFieldUserValueCollection.BehaveAsCurrent();
                 ShimHttpUtility.HtmlEncodeString = (a) => { return a; };
                 ShimSPFieldCollection.AllInstances.ContainsFieldWithStaticNameString = (instance, b) =>
                 {
@@ -364,8 +345,10 @@ namespace WorkEnginePPM.Tests
                 };
 
                 bool errors = false;
+                string message = HelperFunctions.processPortfolioItem(fakespweb, new ShimSPList(), "555", tblInput.Select(), "1", out errors);
                 wasUpdated = updated;
-                return HelperFunctions.processPortfolioItem(fakespweb, new ShimSPList(), "555", tblInput.Select(), "1", out errors);
+
+                return message;
             }
         }
     }
