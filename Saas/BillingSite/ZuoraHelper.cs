@@ -2,6 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Net.Security;
+using System.Security.Cryptography.X509Certificates;
+using System.Security.Authentication;
+using System.Net;
+using System.Configuration;
 
 namespace BillingSite
 {
@@ -11,13 +16,22 @@ namespace BillingSite
 
         public ZuoraHelper()
         {
-            zsvc = new ZuoraAPI.ZuoraService();
-            
-            zsvc.Url = "https://www.zuora.com/apps/services/a/33.0";
-            ZuoraAPI.LoginResult lr = zsvc.login("colo@epmlive.com", "XUVzI5fo8RuegoTqsZ15");
+            ServicePointManager.Expect100Continue = true;
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
 
-            //zsvc.Url = "https://apisandbox.zuora.com/apps/services/a/33.0";
-            //ZuoraAPI.LoginResult lr = zsvc.login("jhughes@epmlive.com", "Internet1");
+            ServicePointManager.ServerCertificateValidationCallback +=
+            delegate (
+                object sender,
+                X509Certificate certificate,
+                X509Chain chain,
+                SslPolicyErrors sslPolicyErrors)
+            {
+                return true;
+            };
+
+            zsvc = new ZuoraAPI.ZuoraService();
+            zsvc.Url = ConfigurationManager.AppSettings["ServiceURL"];
+            ZuoraAPI.LoginResult lr = zsvc.login(ConfigurationManager.AppSettings["ZuoraUserName"], ConfigurationManager.AppSettings["ZuoraPassword"]);
 
             zsvc.SessionHeaderValue = new ZuoraAPI.SessionHeader();
             zsvc.SessionHeaderValue.session = lr.Session;

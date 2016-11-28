@@ -6,6 +6,7 @@ using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Authentication;
 using System.Net;
+using System.Configuration;
 
 namespace AdminSite
 {
@@ -51,10 +52,9 @@ namespace AdminSite
             };
 
             zsvc = new ZuoraAPI.ZuoraService();
-            zsvc.Url = "https://www.zuora.com/apps/services/a/33.0";
-            ZuoraAPI.LoginResult lr = zsvc.login("colo@epmlive.com", "XUVzI5fo8RuegoTqsZ15");
-            //zsvc.Url = "https://apisandbox.zuora.com/apps/services/a/33.0";
-            //ZuoraAPI.LoginResult lr = zsvc.login("jhughes@epmlive.com", "Internet1");
+            zsvc.Url = ConfigurationManager.AppSettings["ServiceURL"];
+            ZuoraAPI.LoginResult lr = zsvc.login(ConfigurationManager.AppSettings["ZuoraUserName"], ConfigurationManager.AppSettings["ZuoraPassword"]);
+            
 
             zsvc.SessionHeaderValue = new ZuoraAPI.SessionHeader();
             zsvc.SessionHeaderValue.session = lr.Session;
