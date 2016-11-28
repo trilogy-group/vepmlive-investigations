@@ -241,7 +241,7 @@ namespace BillingSite
                     string accountref = acct.AccountRef__c;
                     string accountid = acct.Id;
 
-                    qr = zuora.RunQuery("SELECT InvoiceId from InvoicePayment where Paymentid='" + Request["PaymentId"] + "'");
+                    qr = zuora.RunQuery("SELECT InvoiceId from InvoicePayment where Paymentid='" + Request["PaymentID"] + "'");
 
                     if(qr.records.Length > 0 && qr.records[0] != null)
                     {

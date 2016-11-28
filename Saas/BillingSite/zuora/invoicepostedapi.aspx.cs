@@ -21,17 +21,17 @@ namespace BillingSite.zuora
 
             decimal storage = 10;
 
-            foreach(ProductRatePlanCharge rpC in qr.records)
+            foreach (ProductRatePlanCharge rpC in qr.records)
             {
-                if(rpC != null)
+                if (rpC != null)
                 {
                     qr = zuora.RunQuery("select EndingUnit from ProductRatePlanChargeTier where ProductRatePlanChargeId = '" + rpC.Id + "'");
                     ProductRatePlanChargeTier tier = (ProductRatePlanChargeTier)qr.records[0];
                     decimal qty = tier.EndingUnit.Value;
-                    if(qty == 1000000)
+                    if (qty == 1000000)
                         qty = -1;
 
-                    switch(rpC.Name)
+                    switch (rpC.Name)
                     {
                         case "Storage":
                             storage = qty;
@@ -43,16 +43,16 @@ namespace BillingSite.zuora
             qr = zuora.RunQuery("select Quantity,IsLastSegment from RatePlanCharge where RatePlanId = '" + rate.Id + "' and ChargeType = 'Recurring' And Name = 'Users'");
             RatePlanCharge rpc = null;
 
-            foreach(RatePlanCharge rpCTemp in qr.records)
+            foreach (RatePlanCharge rpCTemp in qr.records)
             {
-                if(rpCTemp.IsLastSegment.Value)
+                if (rpCTemp.IsLastSegment.Value)
                 {
                     rpc = rpCTemp;
                     break;
                 }
             }
 
-            if(rpc != null)
+            if (rpc != null)
             {
                 SqlConnection cn = new SqlConnection(System.Configuration.ConfigurationManager.ConnectionStrings["epmliveaccounts"].ConnectionString);
                 cn.Open();
@@ -80,11 +80,11 @@ namespace BillingSite.zuora
         {
             bProcessed = true;
             QueryResult qr = zuora.RunQuery("SELECT ProductId, ContractId__c from ProductRatePlan where Id='" + rate.ProductRatePlanId + "'");
-            if(qr.records.Length > 0 && qr.records[0] != null)
+            if (qr.records.Length > 0 && qr.records[0] != null)
             {
                 ProductRatePlan prp = (ProductRatePlan)qr.records[0];
 
-                if(!string.IsNullOrEmpty(prp.ContractId__c))
+                if (!string.IsNullOrEmpty(prp.ContractId__c))
                 {
                     SqlConnection cn = new SqlConnection(System.Configuration.ConfigurationManager.ConnectionStrings["epmliveaccounts"].ConnectionString);
                     cn.Open();
@@ -110,17 +110,17 @@ namespace BillingSite.zuora
 
                     qr = zuora.RunQuery("select Quantity,IsLastSegment,ProductRatePlanChargeId from RatePlanCharge where RatePlanId = '" + rate.Id + "' and ChargeType = 'Recurring'");
 
-                    foreach(RatePlanCharge rpCTemp in qr.records)
+                    foreach (RatePlanCharge rpCTemp in qr.records)
                     {
-                        if(rpCTemp.IsLastSegment.Value)
+                        if (rpCTemp.IsLastSegment.Value)
                         {
                             QueryResult qr2 = zuora.RunQuery("select DetailId__c from ProductRatePlanCharge where Id = '" + rpCTemp.ProductRatePlanChargeId + "'");
 
-                            if(qr2.records.Length > 0 && qr2.records[0] != null)
+                            if (qr2.records.Length > 0 && qr2.records[0] != null)
                             {
                                 ProductRatePlanCharge prpc = (ProductRatePlanCharge)qr2.records[0];
 
-                                if(rpCTemp.Quantity.HasValue && !string.IsNullOrEmpty(prpc.DetailId__c))
+                                if (rpCTemp.Quantity.HasValue && !string.IsNullOrEmpty(prpc.DetailId__c))
                                 {
                                     cmd = new SqlCommand("INSERT INTO ORDERDETAIL (order_id, detail_type_id, quantity) VALUES (@order_id, @detailid, @quantity)", cn);
                                     cmd.Parameters.AddWithValue("@order_id", orderid);
@@ -145,85 +145,109 @@ namespace BillingSite.zuora
             ZuoraHelper zuora = new ZuoraHelper();
 
             QueryResult qr = zuora.RunQuery("select AutoPay, AccountRef__c from account where id = '" + Request["AccountID"] + "'");
-
-            if(qr.records.Length > 0 && qr.records[0] != null)
+            if (qr.records != null)
             {
-                 Account acct = (Account)qr.records[0];
+                if (qr.records.Length > 0 && qr.records[0] != null)
+                {
+                    Account acct = (Account)qr.records[0];
 
-                 string accountref = acct.AccountRef__c;
-                 string accountid = acct.Id;
+                    string accountref = acct.AccountRef__c;
+                    string accountid = acct.Id;
 
-                 if(!acct.AutoPay.Value)
-                 {
-                     qr = zuora.RunQuery("SELECT SubscriptionId,Id,ServiceEndDate,ProductId,ProductName,ChargeName,ChargeNumber,RatePlanChargeId from InvoiceItem where InvoiceId='" + Request["InvoiceId"] + "'");
-                     
-                     foreach(InvoiceItem item in qr.records)
-                     {
-                         
-                         DateTime expdate = item.ServiceEndDate.Value.AddDays(2);
-                         string subscriptionid = item.SubscriptionId;
-
-                         //qr = zuora.RunQuery("SELECT OriginalId,Id from subscription where Id='" + subscriptionid + "'");
-
-                         //Subscription tSub = (Subscription)qr.records[0];
-                         
-                         //qr = zuora.RunQuery("SELECT ProductRatePlanId, Id from RatePlan where SubscriptionId='" + subscriptionid + "'");
-
-                         ////if(qr.records.Length > 0 && qr.records[0] != null)
-                         //foreach(RatePlan rate in qr.records )
-                         //{
-                         //    //RatePlan rate = (RatePlan)qr.records[0];
-                         QueryResult qr2 = zuora.RunQuery("SELECT Name, Id, IsLastSegment,RatePlanId from RatePlanCharge where Id='" + item.RatePlanChargeId + "'");
-
-                        foreach(RatePlanCharge rpc in qr2.records)
+                    if (acct.AutoPay.HasValue)
+                    {
+                        if (!acct.AutoPay.Value)
                         {
-                            if(rpc.IsLastSegment.Value)
+
+                            qr = zuora.RunQuery("SELECT SubscriptionId,Id,ServiceEndDate,ProductId,ProductName,ChargeName,ChargeNumber,RatePlanChargeId from InvoiceItem where InvoiceId='" + Request["InvoiceID"] + "'");
+                            if (qr.records != null)
                             {
-                                qr = zuora.RunQuery("SELECT ProductRatePlanId, Id from RatePlan where Id='" + rpc.RatePlanId + "'");
-                                if(qr.records.Length > 0 && qr.records[0] != null)
+                                foreach (InvoiceItem item in qr.records)
                                 {
-                                    RatePlan rate = (RatePlan)qr.records[0];
 
-                                    qr = zuora.RunQuery("SELECT ProductId from ProductRatePlan where Id='" + rate.ProductRatePlanId + "'");
-                                    if(qr.records.Length > 0 && qr.records[0] != null)
+                                    DateTime expdate = item.ServiceEndDate.Value;
+                                    string subscriptionid = item.SubscriptionId;
+
+                                    //qr = zuora.RunQuery("SELECT OriginalId,Id from subscription where Id='" + subscriptionid + "'");
+
+                                    //Subscription tSub = (Subscription)qr.records[0];
+
+                                    //qr = zuora.RunQuery("SELECT ProductRatePlanId, Id from RatePlan where SubscriptionId='" + subscriptionid + "'");
+
+                                    ////if(qr.records.Length > 0 && qr.records[0] != null)
+                                    //foreach(RatePlan rate in qr.records )
+                                    //{
+                                    //    //RatePlan rate = (RatePlan)qr.records[0];
+                                    QueryResult qr2 = zuora.RunQuery("SELECT Name, Id, IsLastSegment,RatePlanId from RatePlanCharge where Id='" + item.RatePlanChargeId + "'");
+                                    if (qr2.records != null)
                                     {
-                                        ProductRatePlan prp = (ProductRatePlan)qr.records[0];
-                                        qr = zuora.RunQuery("SELECT SKU from Product where Id='" + prp.ProductId + "'");
 
-                                        if(qr.records.Length > 0 && qr.records[0] != null)
+                                        foreach (RatePlanCharge rpc in qr2.records)
                                         {
-                                            Product product = (Product)qr.records[0];
-
-                                            switch(product.SKU)
+                                            if (rpc.IsLastSegment.HasValue)
                                             {
-                                                case "SKU-40000000":
-                                                    if(rpc.Name == "Users")
-                                                        processWE(zuora, rate, subscriptionid, expdate, accountref, "555666777");
-                                                    break;
-                                                case "SKU-20000000":
-                                                    if(rpc.Name == "Users")
-                                                        processWE(zuora, rate, subscriptionid, expdate, accountref, "222333444");
-                                                    break;
-                                                case "SKU-10000000":
-                                                    if(rpc.Name == "Users")
-                                                        processWE(zuora, rate, subscriptionid, expdate, accountref, "111222333");
-                                                    break;
-                                                case "SKU-00000002":
-                                                    //processPE(zuora, rate, subscriptionid, expdate, accountref);
-                                                    break;
-                                                case "SKU-00000020":
-                                                    processEPMLive(zuora, rate, subscriptionid, expdate, accountref);
-                                                    break;
+                                                if (rpc.IsLastSegment.Value)
+                                                {
+
+                                                    qr = zuora.RunQuery("SELECT ProductRatePlanId, Id from RatePlan where Id='" + rpc.RatePlanId + "'");
+                                                    if (qr.records != null)
+                                                    {
+                                                        if (qr.records.Length > 0)
+                                                        {
+                                                            RatePlan rate = new RatePlan();
+                                                            rate = qr.records[0] != null ? (RatePlan)qr.records[0] : new RatePlan();
+
+                                                            qr = zuora.RunQuery("SELECT ProductId from ProductRatePlan where Id='" + rate.ProductRatePlanId + "'");
+                                                            if (qr != null)
+                                                            {
+                                                                if (qr.records.Length > 0 && qr.records[0] != null)
+                                                                {
+                                                                    ProductRatePlan prp = (ProductRatePlan)qr.records[0];
+                                                                    qr = zuora.RunQuery("SELECT SKU from Product where Id='" + prp.ProductId + "'");
+                                                                    if (qr != null)
+                                                                    {
+                                                                        if (qr.records.Length > 0 && qr.records[0] != null)
+                                                                        {
+                                                                            Product product = (Product)qr.records[0];
+
+                                                                            switch (product.SKU)
+                                                                            {
+                                                                                case "SKU-40000000":
+                                                                                    if (rpc.Name == "Users")
+                                                                                        processWE(zuora, rate, subscriptionid, expdate, accountref, "555666777");
+                                                                                    break;
+                                                                                case "SKU-20000000":
+                                                                                    if (rpc.Name == "Users")
+                                                                                        processWE(zuora, rate, subscriptionid, expdate, accountref, "222333444");
+                                                                                    break;
+                                                                                case "SKU-10000000":
+                                                                                    if (rpc.Name == "Users")
+                                                                                        processWE(zuora, rate, subscriptionid, expdate, accountref, "111222333");
+                                                                                    break;
+                                                                                case "SKU-00000002":
+                                                                                    //processPE(zuora, rate, subscriptionid, expdate, accountref);
+                                                                                    break;
+                                                                                case "SKU-00000020":
+                                                                                    processEPMLive(zuora, rate, subscriptionid, expdate, accountref);
+                                                                                    break;
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
                                             }
+                                            if (bProcessed)
+                                                break;
                                         }
                                     }
+                                    if (bProcessed)
+                                        break;
                                 }
                             }
-                            if(bProcessed)
-                                break;
-                        }                             
-                        if(bProcessed)
-                            break;
+                        }
                     }
                 }
             }

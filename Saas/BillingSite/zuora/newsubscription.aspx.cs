@@ -119,7 +119,7 @@ namespace BillingSite.zuora
             string sTitle = "";
             string accountnumber = "";
 
-            QueryResult qrSub = zuora.RunQuery("select AccountId, Version, ContractEffectiveDate from Subscription where id = '" + Request["SubscriptionId"] + "'");
+            QueryResult qrSub = zuora.RunQuery("select AccountId, Version, ContractEffectiveDate from Subscription where id = '" + Request["SubscriptionID"] + "'");
 
             if(qrSub.records.Length > 0 && qrSub.records[0] != null)
             {
@@ -141,9 +141,9 @@ namespace BillingSite.zuora
                         accountnumber = acc.AccountRef__c;
                     }
 
-                    ZuoraUrl = "https://www.zuora.com/apps/Subscription.do?method=view&id=" + Request["SubscriptionId"];
+                    ZuoraUrl = "https://www.zuora.com/apps/Subscription.do?method=view&id=" + Request["SubscriptionID"];
 
-                    QueryResult qrRP = zuora.RunQuery("select Name,ProductRatePlanId from RatePlan where SubscriptionId = '" + Request["SubscriptionId"] + "'");
+                    QueryResult qrRP = zuora.RunQuery("select Name,ProductRatePlanId from RatePlan where SubscriptionId = '" + Request["SubscriptionID"] + "'");
 
                     for(int i = 0; i < qrRP.records.Length; i++)
                     {
