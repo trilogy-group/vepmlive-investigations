@@ -24,7 +24,7 @@ namespace WorkEnginePPM.Jobs.Tests
             int opencon = 0;
             int closecon = 0;
             PrivateObject objToTestPrivateMethod = new PrivateObject(typeof(Cleanup));
-            SqlCommand cmd = new SqlCommand();
+           
             string project_list_uid = string.Empty; ;
             //cmd.Parameters.AddWithValue("@siteguid",Guid.NewGuid());
             using (var context = new SPEmulators.SPEmulationContext(SPEmulators.IsolationLevel.Fake))
@@ -57,14 +57,14 @@ namespace WorkEnginePPM.Jobs.Tests
                     }
                 };
 
-                SqlConnection cn = new ShimSqlConnection() { Open = () => { opencon++; }, DisposeBoolean = (_bool) => { closecon++; } };
+                SqlConnection cn = new ShimSqlConnection() { Open = () => { opencon++; }, Close = () => { closecon++; } };
                 WEIntegration we = new ShimWEIntegration()
                 {
 
                     PostTimesheetDataString = (_str) => { return "<timesheet Status=\"1\"></timesheet>"; }
                 };
                 ShimHttpUtility.HtmlEncodeString = (_str) => { return ""; };
-                SqlDataAdapter adp = new SqlDataAdapter();
+                
                 ShimCleanup.AllInstances.GetDatasetDataSetSqlCommand = (instance, sds, scmd) =>
                 {
                     DataTable dt = new DataTable();

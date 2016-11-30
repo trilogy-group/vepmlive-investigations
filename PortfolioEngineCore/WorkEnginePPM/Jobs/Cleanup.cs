@@ -332,7 +332,7 @@ namespace WorkEnginePPM.Jobs
                 doc = null;
                 if (cn != null)
                 {
-                    cn.Dispose();
+                    cn.Close();
                 }
                 docResXml = null;
                 if (ds != null)
@@ -342,9 +342,11 @@ namespace WorkEnginePPM.Jobs
 
         private DataSet GetDataset(DataSet ds, SqlCommand cmd)
         {
-            SqlDataAdapter da = new SqlDataAdapter(cmd);
-            da.Fill(ds);
-            return ds;
+            using (SqlDataAdapter da = new SqlDataAdapter(cmd))
+            {
+                da.Fill(ds);
+                return ds;
+            }
         }
 
         private void processItems(SPSite site, SPWeb web, DataView dv, DataSet ds, PortfolioEngineCore.PortfolioItems.PortfolioItems pe)
