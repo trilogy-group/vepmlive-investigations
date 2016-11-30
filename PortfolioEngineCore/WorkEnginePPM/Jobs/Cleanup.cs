@@ -188,15 +188,18 @@ namespace WorkEnginePPM.Jobs
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Parameters.AddWithValue("@siteguid", site.ID);
-                    if (lastApproved == "")
+                    if (string.IsNullOrEmpty(lastApproved))
+                    {
                         cmd.Parameters.AddWithValue("@dtapproved", "1/1/1900");
+                    }
                     else
-                        cmd.Parameters.AddWithValue("@dtapproved", lastApproved);
+                    {
+                        DateTime dt;
+                        DateTime.TryParse(lastApproved, out dt);
+                        cmd.Parameters.AddWithValue("@dtapproved", dt.ToString("MM/dd/yyyy"));
+                    }
 
-                    SqlDataAdapter da = new SqlDataAdapter(cmd);
-                    da.Fill(ds);
-
-
+                    ds = GetDataset(ds, cmd);
 
                     doc = new XmlDocument();
                     doc.LoadXml("<Timesheets/>");
@@ -204,7 +207,7 @@ namespace WorkEnginePPM.Jobs
                     {
                         string sUsername = ConfigFunctions.GetCleanUsername(web, dr["username"].ToString());
 
-                        XmlNode ndTimesheet = doc.FirstChild.SelectSingleNode("Timesheet[@Resource='" + sUsername + "' and @period_start='" + ((DateTime)dr["period_start"]).ToString("s") + "'  and @period_end='" + ((DateTime)dr["period_end"]).ToString("s") + "']");
+                        XmlNode ndTimesheet = doc.FirstChild.SelectSingleNode("Timesheet[@Resource='" + sUsername + "' and @period_start='" + DateTime.Parse(dr["period_start"].ToString()).ToString("s") + "'  and @period_end='" + DateTime.Parse(dr["period_end"].ToString()).ToString("s") + "']");
                         if (ndTimesheet == null)
                         {
                             ndTimesheet = doc.CreateNode(XmlNodeType.Element, "Timesheet", doc.NamespaceURI);
@@ -214,11 +217,11 @@ namespace WorkEnginePPM.Jobs
                             ndTimesheet.Attributes.Append(attrResource);
 
                             XmlAttribute attrStart = doc.CreateAttribute("period_start");
-                            attrStart.Value = ((DateTime)dr["period_start"]).ToString("s");
+                            attrStart.Value = DateTime.Parse(dr["period_start"].ToString()).ToString("s");
                             ndTimesheet.Attributes.Append(attrStart);
 
                             XmlAttribute attrEnd = doc.CreateAttribute("period_end");
-                            attrEnd.Value = ((DateTime)dr["period_end"]).ToString("s");
+                            attrEnd.Value = DateTime.Parse(dr["period_end"].ToString()).ToString("s");
                             ndTimesheet.Attributes.Append(attrEnd);
 
                             doc.FirstChild.AppendChild(ndTimesheet);
@@ -252,7 +255,7 @@ namespace WorkEnginePPM.Jobs
                             ndProject.Attributes.Append(attrProject);
 
                             XmlAttribute attrDate = doc.CreateAttribute("Date");
-                            attrDate.Value = ((DateTime)dr["ts_item_date"]).ToString("s");
+                            attrDate.Value = DateTime.Parse(dr["ts_item_date"].ToString()).ToString("s");
                             ndProject.Attributes.Append(attrDate);
 
                             XmlAttribute attrHours = doc.CreateAttribute("Hours");
@@ -281,7 +284,7 @@ namespace WorkEnginePPM.Jobs
                             ndProject.Attributes.Append(attrProject);
 
                             XmlAttribute attrDate = doc.CreateAttribute("Date");
-                            attrDate.Value = ((DateTime)dr["ts_item_date"]).ToString("s");
+                            attrDate.Value = DateTime.Parse(dr["ts_item_date"].ToString()).ToString("s");
                             ndProject.Attributes.Append(attrDate);
 
                             XmlAttribute attrHours = doc.CreateAttribute("Hours");
@@ -329,11 +332,20 @@ namespace WorkEnginePPM.Jobs
                 doc = null;
                 if (cn != null)
                 {
-                    cn.Dispose();
+                    cn.Close();
                 }
                 docResXml = null;
                 if (ds != null)
                     ds.Dispose();
+            }
+        }
+
+        private DataSet GetDataset(DataSet ds, SqlCommand cmd)
+        {
+            using (SqlDataAdapter da = new SqlDataAdapter(cmd))
+            {
+                da.Fill(ds);
+                return ds;
             }
         }
 
