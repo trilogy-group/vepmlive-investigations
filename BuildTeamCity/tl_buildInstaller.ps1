@@ -304,7 +304,7 @@ Rename-Item -Path "$BinariesDirectory\_PublishedWebsites\EPMLiveIntegrationServi
 ZipFiles "$SourcesDirectory\InstallShield\Build Dependencies\api.zip"  "$BinariesDirectory\_PublishedWebsites\api"
 ZipFiles2 "$SourcesDirectory\InstallShield\Build Dependencies\PublisherSetup2016x64_$NewReleaseNumber.zip"  "$SourcesDirectory\ProjectPublisher2016\PublisherSetup2016x64\Release\"
 ZipFiles2 "$SourcesDirectory\InstallShield\Build Dependencies\PublisherSetup2016x86_$NewReleaseNumber.zip"  "$SourcesDirectory\ProjectPublisher2016\PublisherSetup2016x86\Release\"
-exit
+
 Log-Section "Install Shield"
 
 $BuildDependenciesFolder = Join-Path $SourcesDirectory "InstallShield\Build Dependencies"
