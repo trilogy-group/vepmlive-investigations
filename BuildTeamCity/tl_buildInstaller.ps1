@@ -1,5 +1,4 @@
 # Build script for EPMLive
-# 2016.02.24 - Made changes to work with the build post-removal of circular dependencies
 
 # ### Define user adjustable parameters
 
@@ -16,20 +15,23 @@ param (
     [string]$CleanBuild = $true
 );
 
-$projectsToBePackaged = @("EPMLiveCore","EPMLiveDashboards","EPMLiveIntegrationService",
+$projectsToBePackaged = @(
+							"EPMLiveCore","EPMLiveDashboards","EPMLiveIntegrationService",
                             "EPMLivePS","EPMLiveReporting","EPMLiveSynch",
                             "EPMLiveTimeSheets","EPMLiveWebParts","EPMLiveWorkPlanner",
 							"WorkEnginePPM",
-                            "AdminSite","BillingSite")
+                            "AdminSite","BillingSite"
+                            )
 
 $projectsToBeBuildAsEXE = @(
                             "EPMLiveTimerService", "EPK_QueueMgr"
                             )
+
 $projectsToBeBuildAsDLL = @(
                             "PortfolioEngineCore","UplandIntegrations",
                             "EPMLiveIntegration", "UserNameChecker"
                             )
-
+							
 $projectTypeIdTobeReplaced = "C1CDDADD-2546-481F-9697-4EA41081F2FC"
 $projectTypeIdTobeReplacedWith = "BB1F664B-9266-4fd6-B973-E1E44974B511"
 
@@ -74,6 +76,16 @@ function ZipFiles( $zipfilename, $sourcedir )
    [System.IO.Compression.ZipFile]::CreateFromDirectory($sourcedir,  $zipfilename, $compressionLevel,  $true)
 }
 
+function ZipFiles2( $zipfilename, $sourcedir )
+{
+   Log-SubSection "Zipping $sourcedir to $zipfilename"
+   
+   If(Test-path $zipfilename) {Remove-item $zipfilename}
+   $compressionLevel = [System.IO.Compression.CompressionLevel]::Optimal
+   Add-Type -Assembly System.IO.Compression.FileSystem
+   [System.IO.Compression.ZipFile]::CreateFromDirectory($sourcedir,  $zipfilename, $compressionLevel,  $false)
+}
+
 # additional parameters to msbuild
 if (Test-Path env:\DF_MSBUILD_BUILD_STATS_OPTS) {
 	$DfMsBuildArgs = Get-Childitem env:DF_MSBUILD_BUILD_STATS_OPTS | % { $_.Value }
@@ -81,7 +93,7 @@ if (Test-Path env:\DF_MSBUILD_BUILD_STATS_OPTS) {
 
 
 $MSBuildExec = "C:\Program Files (x86)\MSBuild\14.0\Bin\MSBuild.exe"
-
+$VSExec = "C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\IDE\devenv.com"
 
 $BuildDirectory = "$ScriptDir\..\..\"
 
@@ -223,6 +235,32 @@ foreach($projectToBeBuildAsDLL in $projectsToBeBuildAsDLL){
     }
 }
 
+Log-Section "Building VD Projects . . ."
+#set registry value for building VDPROJ setup projects
+Set-ItemProperty -Path HKCU:\Software\Microsoft\VisualStudio\14.0_Config\MSBuild -Name EnableOutOfProcBuild -Value 0
+
+    
+    $projectPath = Get-ChildItem -Path ($SourcesDirectory + "\*") -Include ("PublisherSetup2016x64.vdproj") -Recurse
+
+    Log-SubSection "Building 'PublisherSetup2016x64.vdproj'..."
+	Log-SubSection "projectPath: '$projectPath'...."
+    
+   & $VSExec $projectPath /build "Release|Any CPU"
+
+    if ($LastExitCode -ne 0) {
+        throw "Project build failed with exit code: $LastExitCode."
+    }
+
+    $projectPath = Get-ChildItem -Path ($SourcesDirectory + "\*") -Include ("PublisherSetup2016x86.vdproj") -Recurse
+
+    Log-SubSection "Building 'PublisherSetup2016x86.vdproj'..."
+	Log-SubSection "projectPath: '$projectPath'...."
+    
+   & $VSExec $projectPath /build "Release|x86"
+    if ($LastExitCode -ne 0) {
+        throw "Project build failed with exit code: $LastExitCode."
+    }
+
 
 Log-Section "Copying Files..."
 
@@ -264,7 +302,9 @@ Get-ChildItem -Path ($ProductOutput + "\*")  -Include "EPMLiveTimerService.exe" 
 Log-Section "Zipping"
 Rename-Item -Path "$BinariesDirectory\_PublishedWebsites\EPMLiveIntegrationService" -NewName "api"
 ZipFiles "$SourcesDirectory\InstallShield\Build Dependencies\api.zip"  "$BinariesDirectory\_PublishedWebsites\api"
-
+ZipFiles2 "$SourcesDirectory\InstallShield\Build Dependencies\PublisherSetup2016x64_$NewReleaseNumber.zip"  "$SourcesDirectory\ProjectPublisher2016\PublisherSetup2016x64\Release\"
+ZipFiles2 "$SourcesDirectory\InstallShield\Build Dependencies\PublisherSetup2016x86_$NewReleaseNumber.zip"  "$SourcesDirectory\ProjectPublisher2016\PublisherSetup2016x86\Release\"
+exit
 Log-Section "Install Shield"
 
 $BuildDependenciesFolder = Join-Path $SourcesDirectory "InstallShield\Build Dependencies"

@@ -171,7 +171,7 @@
         "DisplayName" = "8:Debug"
         "IsDebugOnly" = "11:TRUE"
         "IsReleaseOnly" = "11:FALSE"
-        "OutputFilename" = "8:Debug\\PublisherSetup2010x64.msi"
+        "OutputFilename" = "8:Debug\\PublisherSetup2016x64.msi"
         "PackageFilesAs" = "3:2"
         "PackageFileSize" = "3:-2147483648"
         "CabType" = "3:1"
@@ -208,7 +208,7 @@
         "DisplayName" = "8:Release"
         "IsDebugOnly" = "11:FALSE"
         "IsReleaseOnly" = "11:TRUE"
-        "OutputFilename" = "8:Release\\PublisherSetup2010.msi"
+        "OutputFilename" = "8:Release\\PublisherSetup2016x64.msi"
         "PackageFilesAs" = "3:2"
         "PackageFileSize" = "3:-2147483648"
         "CabType" = "3:1"
@@ -677,7 +677,7 @@
         "Product"
         {
         "Name" = "8:Microsoft Visual Studio"
-        "ProductName" = "8:Project Publisher 2010"
+        "ProductName" = "8:Project Publisher 2016"
         "ProductCode" = "8:{0F6B37FD-8646-4721-8F72-8884C335A3AF}"
         "PackageCode" = "8:{BCB0FF85-24D4-4F45-B860-4E9BEE9B28E5}"
         "UpgradeCode" = "8:{555A36A7-8558-4CC2-9A65-6013F4316C84}"
@@ -690,7 +690,7 @@
         "Manufacturer" = "8:EPM Live"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"
-        "Title" = "8:Project Publisher 2010"
+        "Title" = "8:Project Publisher 2016"
         "Subject" = "8:"
         "ARPCONTACT" = "8:EPM Live"
         "Keywords" = "8:"
@@ -774,7 +774,7 @@
                                                                     "Condition" = "8:"
                                                                     "Transitive" = "11:FALSE"
                                                                     "ValueTypes" = "3:1"
-                                                                    "Value" = "8:Project Publisher 2010"
+                                                                    "Value" = "8:Project Publisher 2016"
                                                                     }
                                                                     "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_88203978C2CC46959FB6D6E77FD355A5"
                                                                     {
@@ -782,7 +782,7 @@
                                                                     "Condition" = "8:"
                                                                     "Transitive" = "11:FALSE"
                                                                     "ValueTypes" = "3:1"
-                                                                    "Value" = "8:Project Publisher 2010"
+                                                                    "Value" = "8:Project Publisher 2016"
                                                                     }
                                                                     "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_8E7162C33FFC4D0CA0017D892E69C348"
                                                                     {
