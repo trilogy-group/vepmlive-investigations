@@ -471,7 +471,8 @@ namespace WorkEnginePPM
                     }
                 }
 
-                if (li["ExternalID"].ToString() != externalid)
+                if ((li["ExternalID"] == null && externalid != null)
+                    || (li["ExternalID"] != null && li["ExternalID"].ToString() != externalid))
                 {
                     li["ExternalID"] = externalid;
                     updated = true;
