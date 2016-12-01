@@ -164,9 +164,15 @@
                     var uRow = grid.GetRowById(r);
                     if (uRow.Kind == "Data") {
                         for (var c in grid.Cols) {
+                            var skip = false;
                             try {
                                 var val = grid.GetValue(uRow, c);
                                 var oFromRow = parent.Grids.WorkPlannerGrid.GetRowById(uRow.id);
+
+                                if (grid.GetValue(uRow, "PercentComplete") == "0") {
+                                    grid.SetValue(uRow, "PercentComplete", grid.GetValue(oFromRow, "PercentComplete"), 1, 0);
+                                    skip = true;
+                                }
 
                                 grid.SetAttribute(uRow, c, "Type", parent.Grids.WorkPlannerGrid.Cols[c].Type);
                                 if (c == "Title") {
@@ -232,7 +238,7 @@
                                     if (oFromRow) {
                                         var oVal = parent.Grids.WorkPlannerGrid.GetValue(oFromRow, c);
 
-                                        if (grid.GetValue(uRow, c) != oVal && c != "Title") {
+                                        if (grid.GetValue(uRow, c) != oVal && c != "Title" && !skip) {
                                             grid.SetAttribute(uRow, c, "Background", "#FFFC00 !important");
                                             grid.SetAttribute(uRow, c, "Color", "#FFFC00 !important");
                                         }
