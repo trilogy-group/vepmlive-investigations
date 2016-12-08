@@ -416,9 +416,9 @@ namespace EPMLiveCore.Jobs
                         finalGrp.AddUser(owner);
                         finalGrp.AllowMembersEditMembership = true;
                         finalGrp.Update();
-                        if (eI.Fields.ContainsField("Project Manager"))
-                        {
-                            eI["Project Manager"] = finalGrp;
+                        if (eI.Fields.ContainsFieldWithInternalName("ProjectManagers"))
+                        {                            
+                            eI[eI.Fields.GetFieldByInternalName("ProjectManagers").Id] = finalGrp;
                             eI.Update();
                         }
                         ew.Update();
