@@ -585,7 +585,7 @@ namespace EPMLiveWebParts
             //Fetches FieldValue From Latest SPListItem Version
             if (isLatestVersion)
             {
-                fieldValue = field.GetFieldValueAsHtml(Convert.ToString(item[field.InternalName]));
+                fieldValue = field.GetFieldValueAsHtml(item[field.InternalName]);
             }
             else
             {
@@ -594,7 +594,7 @@ namespace EPMLiveWebParts
                 {
                     if (itemVersion.VersionId == SPContext.Current.ListItemVersion.VersionId)
                     {
-                        fieldValue = field.GetFieldValueAsHtml(Convert.ToString(itemVersion[field.InternalName]));
+                        fieldValue = field.GetFieldValueAsHtml(itemVersion[field.InternalName]);
                     }
                 }
             }
