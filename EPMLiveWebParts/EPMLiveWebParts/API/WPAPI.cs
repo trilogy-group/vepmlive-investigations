@@ -733,7 +733,7 @@ namespace EPMLiveWebParts
                         if (bEditMode)
                             val = li[oField.Id].ToString();
                         else
-                            val = oField.GetFieldValueAsText(li[oField.Id].ToString());
+                            val = oField.GetFieldValueAsText(li[oField.Id]);
                         break;
                 }
 
