@@ -3485,13 +3485,13 @@ namespace TimeSheets
                             if (isValidMyWorkColumn(GoodFieldname))
                             {
                                 attr = docOut.CreateAttribute(GoodFieldname);
-                                if (GoodFieldname == "PercentComplete")
+                                if (GoodFieldname == "PercentComplete" && dr[dc.ColumnName] != DBNull.Value)
                                 {
                                     attr.Value = Convert.ToString(Convert.ToDouble(dr[dc.ColumnName]) * 100, currenvyCultureInfo.NumberFormat);
                                 }
                                 else
                                 {
-                                    if (dc.DataType == typeof(Double))
+                                    if (dc.DataType == typeof(Double) && dr[dc.ColumnName] != DBNull.Value)
                                     {
                                         attr.Value = Convert.ToString(Convert.ToDouble(dr[dc.ColumnName]), currenvyCultureInfo.NumberFormat);
                                     }
