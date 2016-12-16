@@ -43,7 +43,7 @@ namespace EPMLiveCore.API.Tests
                         {
                             ShimSPList list = new ShimSPList();
                             //list.TitleGet = () => { return listTitle; };
-                            
+
                             list.GetItemByIdInt32 = (_int) => { return new ShimSPListItem() { HasUniqueRoleAssignmentsGet = () => { return true; } }; };
                             return list;
                         };
@@ -66,10 +66,14 @@ namespace EPMLiveCore.API.Tests
                 {
                     return spweb;
                 };
-                
-               
+
+
                 ShimSPSite.AllInstances.Dispose = (instance) => { };
-                APITeam.GetTeamGridLayout(XML, spweb);
+                string result = APITeam.GetTeamGridLayout(XML, spweb);
+
+                Assert.IsNotNull(result);
+                Assert.IsTrue(result.Contains("TeamGrid"));
+                Assert.IsTrue(result.Contains("<!-- Configuration is not saved to cookies -->"));
             }
 
         }
