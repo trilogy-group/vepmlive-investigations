@@ -173,23 +173,22 @@ namespace EPMLiveCore.Jobs.EPMLiveUpgrade.Steps
                         ResourceLevelPermision = true;
 
                     SPFieldUserValue SpFieldUser = new SPFieldUserValue(item.Web, item["SharePointAccount"].ToString());
-                    SPUser user = mySite.AllUsers.GetByID(int.Parse(SpFieldUser.LookupId.ToString()));
-                    if (user.LoginName.IndexOf("|") != -1)
+                    try
                     {
-                        UserName = user.LoginName.Split('|')[1];
+                        UserName = CoreFunctions.GetRealUserName(SpFieldUser.User.LoginName);
+                        bool ResourcePlanPermission = Utilities.CheckEditResourcePlanPermission(basePath, UserName) && ResourceLevelPermision;
+                        var newitem = Utilities.ReloadListItem(item);
+                        newitem["UserHasPermission"] = ResourcePlanPermission;
+                        using (var scope = new DisabledItemEventScope())
+                        {
+                            newitem.SystemUpdate(false);// false will prevent to update version number and save conflict
+                        }
+                        LogMessage(string.Format("Updating value for {0}", UserName), 2);
                     }
-                    else
+                    catch (Exception ex)
                     {
-                        UserName = user.LoginName;
+                        LogMessage(ex.ToString(), MessageKind.FAILURE, 4);
                     }
-                    bool ResourcePlanPermission = Utilities.CheckEditResourcePlanPermission(basePath, UserName) && ResourceLevelPermision;
-                    var newitem = Utilities.ReloadListItem(item);
-                    newitem["UserHasPermission"] = ResourcePlanPermission;
-                    using (var scope = new DisabledItemEventScope())
-                    {
-                        newitem.SystemUpdate(false);// false will prevent to update version number and save conflict
-                    }
-                    LogMessage(string.Format("Updating value for {0}", UserName), 2);
                 }
             }
 

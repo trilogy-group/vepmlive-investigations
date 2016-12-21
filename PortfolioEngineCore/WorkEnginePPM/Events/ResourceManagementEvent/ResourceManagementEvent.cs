@@ -95,11 +95,11 @@ namespace WorkEnginePPM.Events
                     if ((from stackFrame in stackFrames
                          select stackFrame.GetMethod()
                              into methodBase
-                             where methodBase.Name.Equals("ConfirmDelete")
-                             select methodBase.DeclaringType
+                         where methodBase.Name.Equals("ConfirmDelete")
+                         select methodBase.DeclaringType
                                  into declaringType
-                                 where declaringType != null
-                                 select declaringType.FullName)
+                         where declaringType != null
+                         select declaringType.FullName)
                         .Any(fullName => fullName != null && fullName.Equals("EPMLiveCore.API.ResourceGrid")))
                     {
                         confirmDelete = true;
@@ -250,15 +250,7 @@ namespace WorkEnginePPM.Events
                             bool ResourceLevelPermission = false;
                             if (ResourceLevel == 2 || ResourceLevel == 3 || item["ResourceLevel"] == null)//null and 2 for full permission 3 for project Manger and null for Developemnt
                                 ResourceLevelPermission = true;
-
-                            if (user.User.LoginName.IndexOf("|") != -1)
-                            {
-                                UserName = user.User.LoginName.Split('|')[1];
-                            }
-                            else
-                            {
-                                UserName = user.User.LoginName;
-                            }
+                            UserName = CoreFunctions.GetRealUserName(user.User.LoginName);
                             string basePath = CoreFunctions.getConfigSetting(spWeb, "epkbasepath");
                             bool ResourcePlanPermission = EPMLiveCore.Utilities.CheckEditResourcePlanPermission(basePath, UserName) && ResourceLevelPermission;
                             var newitem = EPMLiveCore.Utilities.ReloadListItem(item);
