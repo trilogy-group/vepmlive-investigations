@@ -962,7 +962,7 @@ namespace TimeSheets
 
                 // Check if the user is in the role. If not disabled 'Project Managers' options from MyTimesheet page.
                 SPRoleChecker roleChecker = new SPRoleChecker();
-                if (roleChecker.ContainsRole(oWeb, "Contribute2"))
+                if (!roleChecker.ContainsRole(oWeb, "Contribute2"))
                 {
                     bIsProjectManager = "False";
                 }
