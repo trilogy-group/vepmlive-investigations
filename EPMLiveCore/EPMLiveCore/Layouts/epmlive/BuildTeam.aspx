@@ -194,7 +194,8 @@
 
         var renderCount = 0;
         var updatedGridCount = 0;
-
+        var CurrentUserHasPermission="";
+        var OwnerPerId="";
 
         function gridsloaded()
         {
@@ -215,7 +216,7 @@
 
         Grids.OnRenderFinish = function (grid) {
             renderCount++;
-
+            
             if (renderCount == Grids.length) {
                 setTimeout("gridsloaded()", 200);
 
@@ -239,6 +240,8 @@
             }
 
             if(grid.id == "TeamGrid"){
+                CurrentUserHasPermission=grid.Cols["Permissions"].CurrentUserHasPermissionToChangeOwner;
+                OwnerPerId=grid.Cols["Permissions"].EnumKeys.split(grid.Cols["Permissions"].EnumKeys[0])[0];
                 grid.UpdateHeights(1);
             }
         }
@@ -302,6 +305,26 @@
         {
             if(col == "Permissions")
             {
+                if(CurrentUserHasPermission!="True")
+                {
+                    
+                    if(row.PermissionsOrig.toString().indexOf(OwnerPerId)!=-1)
+                    {
+                        if(val.toString().indexOf(OwnerPerId)==-1)
+                        {   
+                            alert("You are not authorized to unassign owner group permission.")
+                            row.Permissions=row.PermissionsOrig;
+                        }
+                    }
+                    else{
+                        if(val.toString().indexOf(OwnerPerId)!=-1)
+                        {   
+                            alert("You are not authorized to assign owner group permission.")
+                            row.Permissions=row.PermissionsOrig;
+                        }
+                    }
+                    
+                }
                 isDirty = true;
                 EnableDisableSaveButton();
                 gridsloaded();

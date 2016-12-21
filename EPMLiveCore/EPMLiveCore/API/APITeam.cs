@@ -1883,7 +1883,7 @@ namespace EPMLiveCore.API
                         string enumkeys = "";
                         List<string> idArrays = new List<string>();
                         List<string> lookupsSecurityGroups = new List<string>();
-
+                        bool CurrentUserHasPermissionToChangeOwner = true;
                         //Get second level permissions: find lookups that has security enabled
                         if (oLi != null && oLi.HasUniqueRoleAssignments)
                         {
@@ -1958,7 +1958,7 @@ namespace EPMLiveCore.API
                                 if (assn.Member.GetType() == typeof(Microsoft.SharePoint.SPGroup))
                                 {
                                     SPGroup group = (SPGroup)assn.Member;
-                                    bool UserHasPermission = false;
+                                   
                                     string basePath = CoreFunctions.getConfigSetting(oWeb, "epkbasepath");
                                     SPList myList = oWeb.Lists["Resources"];
                                     SPQuery curQry = new SPQuery();
@@ -1971,9 +1971,9 @@ namespace EPMLiveCore.API
                                         if (myItems.Count > 0)
                                         {
                                             if (myItems.Fields.ContainsField("UserHasPermission"))
-                                                UserHasPermission = Convert.ToBoolean(myItems[0]["UserHasPermission"]);
+                                                CurrentUserHasPermissionToChangeOwner = Convert.ToBoolean(myItems[0]["UserHasPermission"]);
                                             else
-                                                UserHasPermission = true;
+                                                CurrentUserHasPermissionToChangeOwner = true;
                                         }
                                     }
                                     if (group.CanCurrentUserEditMembership)
@@ -1986,20 +1986,8 @@ namespace EPMLiveCore.API
                                             }
                                             else
                                             {
-                                                if (group.Name.ToUpper().Contains("OWNER"))
-                                                {
-                                                    if (UserHasPermission || group.Owner.ID == oWeb.CurrentUser.ID || oWeb.CurrentUser.IsSiteAdmin)
-                                                    {
-                                                        enums += "|" + group.Name;
-                                                        enumkeys += "|" + group.ID;
-                                                    }
-                                                }
-                                                else
-                                                {
-
-                                                    enums += "|" + group.Name;
-                                                    enumkeys += "|" + group.ID;
-                                                }
+                                                enums += "|" + group.Name;
+                                                enumkeys += "|" + group.ID;
                                             }
                                         }
                                     }
@@ -2031,6 +2019,10 @@ namespace EPMLiveCore.API
 
                         attr = doc.CreateAttribute("EnumKeys");
                         attr.Value = enumkeys;
+                        ndNew.Attributes.Append(attr);
+
+                        attr = doc.CreateAttribute("CurrentUserHasPermissionToChangeOwner");
+                        attr.Value = Convert.ToString(CurrentUserHasPermissionToChangeOwner);
                         ndNew.Attributes.Append(attr);
 
                         ndRightCols.AppendChild(ndNew);
