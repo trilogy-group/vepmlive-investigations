@@ -100,6 +100,7 @@
   </Choose>
   <ItemGroup>
     <Compile Include="DataServiceModules\DSMCostPlannerTests.cs" />
+    <Compile Include="Events\ResourceManagementEvent\ResourceManagementEventTests.cs" />
     <Compile Include="Jobs\CleanupTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="HelperFunctionsTests.cs" />
