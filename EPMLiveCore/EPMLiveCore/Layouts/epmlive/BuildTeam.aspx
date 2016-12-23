@@ -241,7 +241,7 @@
 
             if(grid.id == "TeamGrid"){
                 CurrentUserHasPermission=grid.Cols["Permissions"].CurrentUserHasPermissionToChangeOwner;
-                OwnerPerId=grid.Cols["Permissions"].EnumKeys.split(grid.Cols["Permissions"].EnumKeys[0])[0];
+                OwnerPerId=grid.Cols["Permissions"].EnumKeys.split(grid.Cols["Permissions"].EnumKeys[0])[1];
                 grid.UpdateHeights(1);
             }
         }
