@@ -99,6 +99,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="Admininfos\AllWorkhoursTests.cs" />
     <Compile Include="DataServiceModules\DSMCostPlannerTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="HelperFunctionsTests.cs" />
