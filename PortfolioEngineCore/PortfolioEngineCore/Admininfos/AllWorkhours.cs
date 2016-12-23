@@ -59,14 +59,18 @@ namespace PortfolioEngineCore
                     DateTime dt1900 = DateTime.Parse("1900-01-01");
                     TimeSpan span = hDate.Subtract(dt1900);
                     int days = span.Days;
-                    if (prevgroupid > 0 && prevgroupid != groupid)
+                    DayOfWeek dayofweek = hDate.DayOfWeek;
+                    if (dayofweek != DayOfWeek.Saturday && dayofweek != DayOfWeek.Sunday)
                     {
-                        m_HolidayHours.Add(prevgroupid, holidays);
-                        holidays = new Dictionary<int, double>();
+                        if (prevgroupid > 0 && prevgroupid != groupid)
+                        {
+                            m_HolidayHours.Add(prevgroupid, holidays);
+                            holidays = new Dictionary<int, double>();
+                        }
+                        // hit a problem here when (in error) we had more than one holidy specification for the same date
+                        if (!holidays.ContainsKey(days))
+                            holidays.Add(days, dHours);  // using (days since 1900) as the index into the holiday hours - seemed like fun and better than a date
                     }
-                    // hit a problem here when (in error) we had more than one holidy specification for the same date
-                    if (!holidays.ContainsKey(days))
-                        holidays.Add(days, dHours);  // using (days since 1900) as the index into the holiday hours - seemed like fun and better than a date
                     prevgroupid = groupid;
                 }
                 if (prevgroupid > 0)

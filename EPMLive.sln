@@ -117,6 +117,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorkEnginePPM.Tests", "Port
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EPMLiveTimerService.Tests", "EPMLiveTimerService\EPMLiveTimerService.Tests\EPMLiveTimerService.Tests.csproj", "{B592D4F3-D80A-465D-A23F-1D6EAA22DFDA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PortfolioEngineCore.Tests", "PortfolioEngineCore\PortfolioEngineCore.Tests\PortfolioEngineCore.Tests.csproj", "{5166C5BC-FD8B-4E0E-AE81-C187B4154915}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -469,6 +471,18 @@ Global
 		{B592D4F3-D80A-465D-A23F-1D6EAA22DFDA}.Release|x64.Build.0 = Release|Any CPU
 		{B592D4F3-D80A-465D-A23F-1D6EAA22DFDA}.Release|x86.ActiveCfg = Release|Any CPU
 		{B592D4F3-D80A-465D-A23F-1D6EAA22DFDA}.Release|x86.Build.0 = Release|Any CPU
+		{5166C5BC-FD8B-4E0E-AE81-C187B4154915}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5166C5BC-FD8B-4E0E-AE81-C187B4154915}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5166C5BC-FD8B-4E0E-AE81-C187B4154915}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{5166C5BC-FD8B-4E0E-AE81-C187B4154915}.Debug|x64.Build.0 = Debug|Any CPU
+		{5166C5BC-FD8B-4E0E-AE81-C187B4154915}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{5166C5BC-FD8B-4E0E-AE81-C187B4154915}.Debug|x86.Build.0 = Debug|Any CPU
+		{5166C5BC-FD8B-4E0E-AE81-C187B4154915}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5166C5BC-FD8B-4E0E-AE81-C187B4154915}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5166C5BC-FD8B-4E0E-AE81-C187B4154915}.Release|x64.ActiveCfg = Release|Any CPU
+		{5166C5BC-FD8B-4E0E-AE81-C187B4154915}.Release|x64.Build.0 = Release|Any CPU
+		{5166C5BC-FD8B-4E0E-AE81-C187B4154915}.Release|x86.ActiveCfg = Release|Any CPU
+		{5166C5BC-FD8B-4E0E-AE81-C187B4154915}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -483,5 +497,6 @@ Global
 		{F204C5F9-95B0-4D94-AB27-C506E814A26F} = {3DC0042A-7620-4CFC-BEB4-379EC7F86D2B}
 		{6866137C-F260-49A6-9BE8-0A1F5D09DEE6} = {3DC0042A-7620-4CFC-BEB4-379EC7F86D2B}
 		{B592D4F3-D80A-465D-A23F-1D6EAA22DFDA} = {3DC0042A-7620-4CFC-BEB4-379EC7F86D2B}
+		{5166C5BC-FD8B-4E0E-AE81-C187B4154915} = {3DC0042A-7620-4CFC-BEB4-379EC7F86D2B}
 	EndGlobalSection
 EndGlobal
