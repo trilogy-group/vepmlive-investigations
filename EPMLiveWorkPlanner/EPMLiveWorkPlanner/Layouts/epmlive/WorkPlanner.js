@@ -39,6 +39,8 @@ var oLinkedTasks;
 
 var newtasktext = "Add New Task";
 
+const colsWidthsKey = "colsWidths";
+
 function SetSplashText(text) {
 
     document.getElementById("divSplashInfo").innerHTML = text;
@@ -1545,6 +1547,8 @@ function iChangeView(view, bHide) {
     var oViews = {};
     var lViews = {};
 
+    const defaultColWidth = 100;
+
     for (var i = 0; i < leftCols.length; i++) {
         lViews[leftCols[i]] = new Object();
         lViews[leftCols[i]] = 0;
@@ -1552,6 +1556,7 @@ function iChangeView(view, bHide) {
             grid.MoveCol(leftCols[i], 0, 1, 1);
             try {
                 grid.Cols[leftCols[i]].Visible = 1;
+                grid.Cols[leftCols[i]].Width = defaultColWidth;
             } catch (e) { }
         }
     }
@@ -1564,6 +1569,7 @@ function iChangeView(view, bHide) {
             grid.MoveCol(cols[i], 1, 1, 1);
             try {
                 grid.Cols[cols[i]].Visible = 1;
+                grid.Cols[cols[i]].Width = defaultColWidth;
             } catch (e) { }
         }
     }
@@ -1575,6 +1581,35 @@ function iChangeView(view, bHide) {
             oViews[c] = new Object();
             oViews[c] = 0;
         }
+    }
+
+    // set width of columns which is stored in viewObject. Format: 'colname1:width1,colname2:width2...'
+    if (viewObject[view][colsWidthsKey] !== undefined) {
+
+        function splitColsWidths(widths) {
+            let cols = widths.split(",");
+            let ret = {};
+            for (let i = 0; i < cols.length; i++) {
+                var parts = cols[i].split(":");
+                ret[parts[0]] = parseInt(parts[1]);
+            }
+            return ret;
+        }
+
+        var cols = splitColsWidths(viewObject[view][colsWidthsKey]);
+        console.trace(colsWidthsKey + " is: " + cols);
+        for (let i = 0; i < allCols.length; i++) {
+            try {
+                let colName = allCols[i];
+                if (cols.hasOwnProperty(colName) && cols[colName] > 0) {
+                    grid.Cols[colName].Width = cols[colName];
+                }
+            } catch (e) { }
+        }
+    } else {
+        // this property can be undefined for views which was saved before this abbility was added
+
+        console.warn(colsWidthsKey + " property is undefined for this view: " + view);
     }
 
     var mainCols = [];
@@ -1765,9 +1800,13 @@ function onSaveViewClose(dialogResult, returnValue) {
 
             var vCols = grid.GetCols("Visible");
 
+            var colsWidths = "";
             for (var i = 0; i < vCols.length; i++) {
 
                 var vCol = grid.Cols[vCols[i]];
+
+                // store widths of columns in format: 'colName1:width1,colName2:width2...'
+                colsWidths += "," + vCols[i] + ":" + vCol.Width;
 
                 if (vCol.Sec == 0)
                     leftCols += "," + vCols[i];
@@ -1775,9 +1814,17 @@ function onSaveViewClose(dialogResult, returnValue) {
                     cols += "," + vCols[i];
             }
 
+            // remove leading ','
+            try {
+                colsWidths = colsWidths.substr(1);
+            } catch (e) { }
+
+            // remove leading ','
             try {
                 cols = cols.substr(1);
             } catch (e) { }
+
+            // remove leading ','
             try {
                 leftCols = leftCols.substr(1);
             } catch (e) { }
@@ -1847,6 +1894,7 @@ function onSaveViewClose(dialogResult, returnValue) {
             viewObject[key]["summary"] = summary;
             viewObject[key]["assignments"] = assignments;
             viewObject[key]["allocation"] = allocation;
+            viewObject[key][colsWidthsKey] = colsWidths;
 
             curView = vals[0];
 
@@ -1854,7 +1902,25 @@ function onSaveViewClose(dialogResult, returnValue) {
 
             sm("dlgSavingView", 130, 50);
 
-            dhtmlxAjax.post("WorkPlannerAction.aspx", "Action=SaveView&title=" + vals[0] + "&assignments=" + assignments + "&summary=" + summary + "&leftcols=" + leftCols + "&cols=" + cols + "&default=" + vals[1] + "&gantt=" + gantt + "&details=" + details + "&folders=" + folders + "&filters=" + filters + "&sorting=" + sorting + "&grouping=" + grouping + "&allocation=" + allocation + "&PlannerID=" + sPlannerID + GetAgileViewParam(key), onSaveViewCloseResponse);
+            dhtmlxAjax.post("WorkPlannerAction.aspx",
+                "Action=SaveView"
+                    + "&title=" + vals[0]
+                    + "&assignments=" + assignments
+                    + "&summary=" + summary
+                    + "&leftcols=" + leftCols
+                    + "&cols=" + cols
+                    + "&default=" + vals[1]
+                    + "&gantt=" + gantt
+                    + "&details=" + details
+                    + "&folders=" + folders
+                    + "&filters=" + filters
+                    + "&sorting=" + sorting
+                    + "&grouping=" + grouping
+                    + "&allocation=" + allocation
+                    + "&PlannerID=" + sPlannerID
+                    + "&colsWidths=" + colsWidths
+                    + GetAgileViewParam(key),
+                onSaveViewCloseResponse);
 
         }
     }
