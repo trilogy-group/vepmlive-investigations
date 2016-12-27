@@ -105,7 +105,6 @@ namespace EPMLiveCore.Jobs
             {
                 try
                 {
-                    cn.Open();
                     if (!resourceImporter.IsImportCancelled)
                     {
                         IsImportCancelled(JobUid);
