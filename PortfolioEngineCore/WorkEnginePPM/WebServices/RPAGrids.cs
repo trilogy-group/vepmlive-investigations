@@ -2217,11 +2217,8 @@ namespace RPADataCache
             }
             else if (fid == -6)
             {
-                for (int idx = 0; idx < oDet.PIList.Count; idx++)
-                {
-                    vval += oDet.tot_avail.getvarr(i);
-                    fval += oDet.tot_avail.getftarr(i);
-                }
+                vval = oDet.tot_avail.getvarr(i);
+                fval = oDet.tot_avail.getftarr(i);
             }
             else if (fid == -7)
             {
@@ -2232,13 +2229,8 @@ namespace RPADataCache
                 }
                 else
                 {
-                    for (int idx = 0; idx < oDet.PIList.Count; idx++)
-                    {
-                        vval += oDet.tot_avail.getvarr(i);
-                        fval += oDet.tot_avail.getftarr(i);
-                    }
-                    vval -= oDet.tot_Totals.getvarr(i);
-                    fval -= oDet.tot_Totals.getftarr(i);
+                    vval = oDet.tot_avail.getvarr(i) - oDet.tot_Totals.getvarr(i);
+                    fval = oDet.tot_avail.getftarr(i) - oDet.tot_Totals.getftarr(i);
                 }
             }
             else if (fid == -8)
