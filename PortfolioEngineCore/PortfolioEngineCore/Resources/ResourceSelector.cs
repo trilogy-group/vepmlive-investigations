@@ -868,7 +868,7 @@ namespace PortfolioEngineCore
 
                     break;
             }
-        Exit_Function:
+            Exit_Function:
             return s;
         }
 
@@ -934,7 +934,7 @@ namespace PortfolioEngineCore
                 _dba.HandleException("GetPIResourcesXML", (StatusEnum)9503, ex);
 
             }
-        Exit_Function:
+            Exit_Function:
             return (_dba.Status == StatusEnum.rsSuccess);
         }
 
@@ -1074,7 +1074,7 @@ namespace PortfolioEngineCore
             {
                 eStatus = dba.HandleException("GetResourceDisplayFields", (StatusEnum)99999, ex);
             }
-        Exit_Function:
+            Exit_Function:
             return eStatus;
         }
 
@@ -1234,8 +1234,10 @@ namespace PortfolioEngineCore
 
 
                         // save resource in a keyed collection for easy access
-                        dicResources.Add(lWResID.ToString(), xResource);
-
+                        if (!dicResources.ContainsKey(lWResID.ToString()))
+                        {
+                            dicResources.Add(lWResID.ToString(), xResource);
+                        }
                         if (clnDisplayFields != null)
                         {
                             foreach (CStruct xItem in clnDisplayFields)
@@ -1732,7 +1734,7 @@ namespace PortfolioEngineCore
             {
                 eStatus = dba.HandleException("GetPIResourcesStruct : " + sPos, (StatusEnum)8791, ex);
             }
-        Exit_Function:
+            Exit_Function:
             xReply = xPIResources;
             return eStatus;
         }
@@ -1898,7 +1900,7 @@ namespace PortfolioEngineCore
             if (sWResIDs != "")
                 sFrom += " INNER JOIN dbo.EPG_FN_ConvertListToTable(N'" + sWResIDs + "') LT on WR.WRES_ID=LT.TokenVal ";
 
-        Exit_Function:
+            Exit_Function:
             return sSelect + sFrom + sWhere + " ORDER BY RES_NAME";
         }
 
@@ -1983,8 +1985,18 @@ namespace PortfolioEngineCore
                         sName = DBAccess.ReadStringValue(reader["BC_NAME"]);
                     xCostCategoryRole.CreateStringAttr("Name", sName);
                     if (bAdd)
-                        dic.Add(lCostCategoryUID.ToString(), xCostCategoryRole);
-                    if (list.Count == 0) list.Add(xCostCategoryRole); else list.Insert(0, xCostCategoryRole);
+                    {
+                        if (!dic.ContainsKey(lCostCategoryUID.ToString()))
+                            dic.Add(lCostCategoryUID.ToString(), xCostCategoryRole);
+                    }
+                    if (list.Count == 0)
+                    {
+                        list.Add(xCostCategoryRole);
+                    }
+                    else
+                    {
+                        list.Insert(0, xCostCategoryRole);
+                    }
 
                 }
                 reader.Close();
