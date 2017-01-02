@@ -275,3 +275,4 @@ paket-files/
 .cr/
 /InstallShield/Build Dependencies/UserNameChecker.dll
 /InstallShield/Build Dependencies/EPMLiveIntegration.dll
+/CoverageReports

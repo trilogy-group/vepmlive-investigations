@@ -3,10 +3,12 @@ function PublishArtifact($artifactPath) {
     Write-Host "##teamcity[publishArtifacts '$artifactPath']"
 }
 
-$coverageFile = $(get-ChildItem -Path %system.teamcity.build.workingDir%\TestResults -Recurse -Include *coverage)[0]
-$xmlCoverageFile = "%system.teamcity.build.workingDir%\TestResults\vstest.coveragexml"
-$reportPath = "%system.teamcity.build.workingDir%\CoverageReports"
-$artifactsDir = "%system.teamcity.build.workingDir%\Artifacts"
+$ScriptDir = split-path -parent $MyInvocation.MyCommand.Definition
+$ScriptDir = (get-item $ScriptDir).parent.FullName 
+$coverageFile = $(get-ChildItem -Path "$ScriptDir\TestResults" -Recurse -Include *coverage)[0]
+$xmlCoverageFile = "$ScriptDir\TestResults\vstest.coveragexml"
+$reportPath = "$ScriptDir\CoverageReports"
+$artifactsDir = "$ScriptDir\Artifacts"
 
 New-Item -ItemType Directory -Force -Path $reportPath
 New-Item -ItemType Directory -Force -Path $artifactsDir
@@ -21,7 +23,7 @@ $data = $info.BuildDataSet()
 
 $data.WriteXml($xmlCoverageFile)
 
-$RepGenPath = "C:\CodeCoverage\ReportGenerator\bin\ReportGenerator.exe"
+$RepGenPath = "$ScriptDir\packages\ReportGenerator.2.5.2\tools\ReportGenerator.exe"
 
 &$RepGenPath -reports:$xmlCoverageFile -targetdir:$reportPath -reportTypes:"HtmlSummary;XMLSummary"
 
