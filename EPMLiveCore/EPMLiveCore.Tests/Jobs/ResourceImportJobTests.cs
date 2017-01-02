@@ -9,6 +9,7 @@ using System.Data.SqlClient.Fakes;
 using EPMLiveCore.Jobs.Fakes;
 using EPMLiveCore.API.Fakes;
 using EPMLiveCore.API;
+using EPMLive.TestFakes;
 
 namespace EPMLiveCore.Jobs.Tests
 {
@@ -20,51 +21,40 @@ namespace EPMLiveCore.Jobs.Tests
         {
             using (new SPEmulators.SPEmulationContext(SPEmulators.IsolationLevel.Fake))
             {
-                //Arrange
-                int Openconnection = 0;
-                int Closeconnection = 0;
                 ResourceImportJob resourceimportjob = new ResourceImportJob();
-              
-                ShimSqlConnection.ConstructorString = (instance, _string) => { };
-                
-                ShimResourceImportJob.AllInstances.IsImportCancelledGuid = (ins, gid) => { };
-                ShimSqlConnection.AllInstances.Open = (instance) => { Openconnection++; };
-                ShimSqlConnection.AllInstances.DisposeBoolean = (instance, _bool) => { Closeconnection++; };
-                ShimSqlCommand.AllInstances.ExecuteNonQuery = (instance) => { return 0; };
-                ResourceImportResult res = new ResourceImportResult();
-                res.TotalRecords = 0;
-                ResourceImporter resimp = new ShimResourceImporter();
-                new PrivateObject(resourceimportjob).SetField("resourceImporter", resimp);
 
-                //Act
-                new PrivateObject(resourceimportjob).Invoke("UpdateProgress", res);
+                using (TestCheck.OpenCloseConnections)
+                {
 
-                //Assert
-                Assert.AreEqual(Openconnection, Closeconnection);
+                    ShimResourceImportJob.AllInstances.IsImportCancelledGuid = (ins, gid) => { };
+                    ShimSqlCommand.AllInstances.ExecuteNonQuery = (instance) => { return 0; };
+                    ResourceImportResult res = new ResourceImportResult();
+                    res.TotalRecords = 0;
+                    ResourceImporter resimp = new ShimResourceImporter();
+                    new PrivateObject(resourceimportjob).SetField("resourceImporter", resimp);
+
+                    //Act
+                    new PrivateObject(resourceimportjob).Invoke("UpdateProgress", res);
+                }
             }
         }
 
+       
         [TestMethod()]
         public void UpdateProgressTest_Run_Catch_When_resourceImporter_Isnull()
         {
             using (new SPEmulators.SPEmulationContext(SPEmulators.IsolationLevel.Fake))
             {
-                //Arrange
-                int Openconnection = 0;
-                int Closeconnection = 0;
                 ResourceImportJob resourceimportjob = new ResourceImportJob();
 
-                ShimSqlConnection.ConstructorString = (instance, _string) => { };
-                ShimSqlConnection.AllInstances.DisposeBoolean = (instance, _bool) => { Closeconnection++; };
-                ResourceImportResult res = new ResourceImportResult();
-                res.TotalRecords = 1;
-                
-                //Act
-                new PrivateObject(resourceimportjob).Invoke("UpdateProgress", res);
+                using (TestCheck.OpenCloseConnections)
+                {
+                    ResourceImportResult res = new ResourceImportResult();
+                    res.TotalRecords = 1;
 
-                //Assert
-                //Connection open will not call exception will raise before this code
-                Assert.AreNotEqual(Openconnection, Closeconnection);
+                    //Act
+                    new PrivateObject(resourceimportjob).Invoke("UpdateProgress", res);                   
+                }
             }
         }
     }

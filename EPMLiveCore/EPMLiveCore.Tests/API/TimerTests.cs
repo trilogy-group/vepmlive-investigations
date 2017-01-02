@@ -7,6 +7,8 @@ using Microsoft.SharePoint.Administration.Fakes;
 using EPMLiveCore.Fakes;
 using System.Web.Fakes;
 using System.Xml;
+using EPMLive.TestFakes;
+
 namespace EPMLiveCore.API.Tests
 {
     [TestClass()]
@@ -21,19 +23,8 @@ namespace EPMLiveCore.API.Tests
                 Guid siteid = jobid;
                 Guid webid = jobid;
                 Guid listid = jobid;
-                int openconnection = 0;
-                int closeconnetcion = 0;
-                ShimSqlConnection con = new ShimSqlConnection();
-                ShimSqlConnection.AllInstances.Open = (instance) =>
-                {
 
-                    openconnection++;
-                };
-                ShimSqlConnection.AllInstances.DisposeBoolean = (instance, _bool) =>
-                {
-
-                    closeconnetcion++;
-                };
+                 
 
                 ShimSPWeb spweb = new ShimSPWeb() { SiteGet = () => { return new ShimSPSite() { IDGet = () => { return jobid; } }; }, IDGet = () => { return jobid; } };
                 ShimSPSite.ConstructorGuid = (instance, _guid) =>
@@ -95,84 +86,104 @@ namespace EPMLiveCore.API.Tests
                 };
 
                 ShimHttpUtility.HtmlEncodeString = (a) => { return a; };
-                //Act
-                XmlNode ndStatus = Timer.GetTimerJobStatus(spweb, jobid);
-                //Assert
-                string expectedresult = "<TimerJobStatus ID=\"" + jobid + "\" Status=\"0\" PercentComplete=\"0\" Finished=\"" + DateTime.MinValue.ToUniversalTime() + "\" Result=\"\"><![CDATA[]]></TimerJobStatus>";
-                Assert.AreEqual("TimerJobStatus", ndStatus.Name);
-                Assert.AreEqual(expectedresult, ndStatus.OuterXml);
-                Assert.AreEqual(openconnection, closeconnetcion);
 
-                //Act
-                read = true;
-                ndStatus = Timer.GetTimerJobStatus(siteid, webid, 0, true);
+                using (TestCheck.OpenCloseConnections)
+                {
+                    //Act
+                    XmlNode ndStatus = Timer.GetTimerJobStatus(spweb, jobid);
+                    //Assert
+                    string expectedresult = "<TimerJobStatus ID=\"" + jobid + "\" Status=\"0\" PercentComplete=\"0\" Finished=\"" + DateTime.MinValue.ToUniversalTime() + "\" Result=\"\"><![CDATA[]]></TimerJobStatus>";
+                    Assert.AreEqual("TimerJobStatus", ndStatus.Name);
+                    Assert.AreEqual(expectedresult, ndStatus.OuterXml);
+                }
 
-                //Assert
-                expectedresult = "<TimerJobStatus ID=\"" + jobid + "\" Status=\"0\" PercentComplete=\"0\" Finished=\"" + DateTime.MinValue.ToUniversalTime() + "\">&lt;![CDATA[]]&gt;</TimerJobStatus>";
-                Assert.AreEqual("TimerJobStatus", ndStatus.Name);
-                Assert.AreEqual(expectedresult, ndStatus.OuterXml);
-                Assert.AreEqual(openconnection, closeconnetcion);
+                using (TestCheck.OpenCloseConnections)
+                {
+                    //Act
+                    read = true;
+                    XmlNode ndStatus = Timer.GetTimerJobStatus(siteid, webid, 0, true);
 
-                //Act
-                read = true;
-                ndStatus = Timer.GetTimerJobStatus(siteid, webid, listid, 0, 0);
-
-                //Assert
-                Assert.AreEqual("TimerJobStatus", ndStatus.Name);
-                Assert.AreEqual(expectedresult, ndStatus.OuterXml);
-                Assert.AreEqual(openconnection, closeconnetcion);
-
-                //Act
-                read = true;
-                Guid result = Timer.AddTimerJob(siteid, webid, listid, 1, "", 1, "", "", 1, 0, "");
-
-                //Assert
-                Assert.AreEqual(jobid, result);
-                Assert.AreEqual(openconnection, closeconnetcion);
-
-                //Act
-                read = true;
-                result = Timer.AddTimerJob(siteid, webid, listid, "", 1, "", "", 5, 2, "");
+                    //Assert
+                    string expectedresult = "<TimerJobStatus ID=\"" + jobid + "\" Status=\"0\" PercentComplete=\"0\" Finished=\"" + DateTime.MinValue.ToUniversalTime() + "\">&lt;![CDATA[]]&gt;</TimerJobStatus>";
+                    Assert.AreEqual("TimerJobStatus", ndStatus.Name);
+                    Assert.AreEqual(expectedresult, ndStatus.OuterXml);
+                }
 
 
-                //Assert
-                Assert.AreEqual(jobid, result);
-                Assert.AreEqual(openconnection, closeconnetcion);
+                using (TestCheck.OpenCloseConnections)
+                {
+                    //Act
+                    read = true;
+                    XmlNode ndStatus = Timer.GetTimerJobStatus(siteid, webid, listid, 0, 0);
 
-                //Act
-                read = true;
-                result = Timer.AddTimerJob(siteid, webid, "", 1, "", "", 5, 3, "");
+                    string expectedresult = "<TimerJobStatus ID=\"" + jobid + "\" Status=\"0\" PercentComplete=\"0\" Finished=\"" + DateTime.MinValue.ToUniversalTime() + "\">&lt;![CDATA[]]&gt;</TimerJobStatus>";
+                    //Assert
+                    Assert.AreEqual("TimerJobStatus", ndStatus.Name);
+                    Assert.AreEqual(expectedresult, ndStatus.OuterXml);
+                }
 
+                using (TestCheck.OpenCloseConnections)
+                {
+                    //Act
+                    read = true;
+                    Guid result = Timer.AddTimerJob(siteid, webid, listid, 1, "", 1, "", "", 1, 0, "");
 
-                //Assert
-                Assert.AreEqual(jobid, result);
-                Assert.AreEqual(openconnection, closeconnetcion);
+                    //Assert
+                    Assert.AreEqual(jobid, result);
+                }
 
-                //Act
-                read = true;
-                //Void
-                Timer.CancelTimerJob(spweb, jobid);
-
-                //Assert
-                Assert.AreEqual(openconnection, closeconnetcion);
-
-                //Act
-                read = true;
-                string _strresult = Timer.IsImportResourceAlreadyRunning(spweb);
-
-                //Assert
-                expectedresult = "<ResourceImporter Success=\"True\" JobUid=\"" + jobid + "\" PercentComplete=\"0\" />";
-                Assert.AreEqual(expectedresult, _strresult);
-                Assert.AreEqual(openconnection, closeconnetcion);
-                //Act
-                read = false;
-                _strresult = Timer.IsSecurityJobAlreadyRunning(spweb, listid, 5);
+                using (TestCheck.OpenCloseConnections)
+                {
+                    //Act
+                    read = true;
+                    Guid result = Timer.AddTimerJob(siteid, webid, listid, "", 1, "", "", 5, 2, "");
 
 
-                //Assert
-                expectedresult = "<SecurityJob Success=\"False\" />";
-                Assert.AreEqual(expectedresult, _strresult);
-                Assert.AreEqual(openconnection, closeconnetcion);
+                    //Assert
+                    Assert.AreEqual(jobid, result);
+                }
+
+                using (TestCheck.OpenCloseConnections)
+                {
+                    //Act
+                    read = true;
+                    Guid result = Timer.AddTimerJob(siteid, webid, "", 1, "", "", 5, 3, "");
+
+
+                    //Assert
+                    Assert.AreEqual(jobid, result);
+                }
+
+                using (TestCheck.OpenCloseConnections)
+                {
+                    //Act
+                    read = true;
+                    //Void
+                    Timer.CancelTimerJob(spweb, jobid);
+                }
+
+                using (TestCheck.OpenCloseConnections)
+                {
+                    //Act
+                    read = true;
+                    string _strresult = Timer.IsImportResourceAlreadyRunning(spweb);
+
+                    //Assert
+                    string expectedresult = "<ResourceImporter Success=\"True\" JobUid=\"" + jobid + "\" PercentComplete=\"0\" />";
+                    Assert.AreEqual(expectedresult, _strresult);
+                }
+
+                using (TestCheck.OpenCloseConnections)
+                {
+                    //Act
+                    read = false;
+                    string _strresult = Timer.IsSecurityJobAlreadyRunning(spweb, listid, 5);
+
+
+                    //Assert
+                    string expectedresult = "<SecurityJob Success=\"False\" />";
+                    Assert.AreEqual(expectedresult, _strresult);
+                }
             }
         }
     }

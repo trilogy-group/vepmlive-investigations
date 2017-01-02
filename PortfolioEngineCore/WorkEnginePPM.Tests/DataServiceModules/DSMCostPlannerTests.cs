@@ -12,6 +12,7 @@ namespace WorkEnginePPM.DataServiceModules.Tests
     [TestClass()]
     public class DSMCostPlannerTests
     {
+        [TestCategory("DataServiceModules")]
         [TestMethod()]
         public void ImportDataTest_WhenCostType_0()
         {
@@ -97,6 +98,7 @@ namespace WorkEnginePPM.DataServiceModules.Tests
             }
         }
 
+        [TestCategory("DataServiceModules")]
         [TestMethod()]
         public void ImportDataTest_WhenCostType_1()
         {
@@ -230,6 +232,8 @@ namespace WorkEnginePPM.DataServiceModules.Tests
                 Assert.AreEqual(_listId, listId);
             }
         }
+
+        [TestCategory("DataServiceModules")]
         [TestMethod()]
         public void ImportDataTest()
         {
@@ -315,6 +319,7 @@ namespace WorkEnginePPM.DataServiceModules.Tests
             }
         }
 
+        [TestCategory("DataServiceModules")]
         [TestMethod()]
         public void ImportDataTest_Execute_Catch_Block()
         {
