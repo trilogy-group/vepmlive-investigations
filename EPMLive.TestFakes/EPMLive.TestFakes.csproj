@@ -92,7 +92,6 @@
   </Choose>
   <ItemGroup>
     <Compile Include="CheckOpenCloseConnections.cs" />
-    <Compile Include="FakeClass.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestCheck.cs" />
   </ItemGroup>
