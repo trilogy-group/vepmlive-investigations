@@ -325,6 +325,25 @@
                     }
                     
                 }
+                var anyrowhasowner = false;
+                for (var Row in grid.Rows) {
+                    try {
+                        var oRow = grid.GetRowById(Row);
+                        if (oRow != null) {
+                            if (oRow.Kind == "Data") {
+                                if(oRow.Permissions.toString().indexOf(OwnerPerId)!=-1)
+                                {
+                                    anyrowhasowner = true;
+                                }
+                            }
+                        }
+                    } catch (e) { }
+                }
+                if(anyrowhasowner==false)
+                {
+                    alert("At least one team member should be owner.");
+                    row.Permissions=row.PermissionsOrig;
+                }
                 isDirty = true;
                 EnableDisableSaveButton();
                 gridsloaded();
