@@ -308,16 +308,16 @@
                 if(CurrentUserHasPermission!="True")
                 {
                     
-                    if(row.PermissionsOrig.toString().indexOf(OwnerPerId)!=-1)
+                    if(row.PermissionsOrig.toString().split(';').indexOf(OwnerPerId)!=-1)
                     {
-                        if(val.toString().indexOf(OwnerPerId)==-1)
+                        if(val.toString().split(';').indexOf(OwnerPerId)==-1)
                         {   
                             alert("You are not authorized to unassign owner group permission.")
                             row.Permissions=row.PermissionsOrig;
                         }
                     }
                     else{
-                        if(val.toString().indexOf(OwnerPerId)!=-1)
+                        if(val.toString().split(';').indexOf(OwnerPerId)!=-1)
                         {   
                             alert("You are not authorized to assign owner group permission.")
                             row.Permissions=row.PermissionsOrig;
@@ -331,15 +331,16 @@
                         var oRow = grid.GetRowById(Row);
                         if (oRow != null) {
                             if (oRow.Kind == "Data") {
-                                if(oRow.Permissions.toString().indexOf(OwnerPerId)!=-1)
+                                if(oRow.Permissions.toString().split(';').indexOf(OwnerPerId)!=-1)
                                 {
                                     anyrowhasowner = true;
+                                    break;
                                 }
                             }
                         }
-                    } catch (e) { }
+                    } catch (e) {console.log(e)}
                 }
-                if(anyrowhasowner==false)
+                if(!anyrowhasowner)
                 {
                     alert("At least one team member should be owner.");
                     row.Permissions=row.PermissionsOrig;
