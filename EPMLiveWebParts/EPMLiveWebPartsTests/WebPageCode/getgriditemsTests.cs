@@ -537,8 +537,224 @@ namespace EPMLiveWebParts.Tests
             }
         }
 
+        [TestMethod()]
+        public void formatFieldTest()
+        {
+            PrivateObject objToTestPrivateMethod = new PrivateObject(typeof(getgriditems));
+            using (SPEmulators.SPEmulationContext ctx = new SPEmulators.SPEmulationContext(SPEmulators.IsolationLevel.Fake))
+            {
+                SPList list = new ShimSPList();
+                SPFieldType fieldtype = SPFieldType.User;
+
+                string val = "Test";
+                string fieldname = "ProjectManagers";
+                DataTable dt = new DataTable();
+                dt.Columns.Add("ProjectManagersID");
+                dt.Columns.Add("SiteUrl");
+                DataRow dr = dt.NewRow();
+                dr["ProjectManagersID"] = "40,452";
+                dr["SiteUrl"] = "TestUrl";
+                bool group = true;
+                ShimSPField spfield = new ShimSPField()
+                {
+                    IdGet = () =>
+                    {
+                        return Guid.Parse("fdc3b2ed-5bf2-4835-a4bc-b885f3396a61");
+                    },
+                    InternalNameGet = () => { return fieldname; },
+                    TypeGet = () =>
+                    {
+                        return fieldtype;
+                    },
+                    TypeAsStringGet = () =>
+                    {
+
+                        return fieldname;
+                    },
+                    SchemaXmlGet = () =>
+                    {
+                        return "<CHOICES><CHOICE Value = \"Text\" ></CHOICE> <CHOICE Value = \"Text\" ></CHOICE></CHOICES>";
+
+                    },
+                    GetFieldValueString = (obj) =>
+                    {
+                        SPFieldUserValueCollection collection = new SPFieldUserValueCollection(list.ParentWeb, "");
+                        SPFieldUserValue fielduservalue = new SPFieldUserValue();
+                        fielduservalue.LookupId = 0;
+                        collection.Add(fielduservalue);
+                        return collection;
+                    },
+                    GetFieldValueAsTextObject = (obj) => { return val; }
+                };
+                list = new ShimSPList()
+                {
+                    ParentWebGet = () =>
+                    {
+
+                        return new ShimSPWeb();
+                    },
+                    FieldsGet = () =>
+                    {
+                        ShimSPFieldCollection fcol = new ShimSPFieldCollection();
+                        fcol.ItemGetGuid = (fid) => { return spfield; };
+                        
+                        fcol.GetFieldByInternalNameString = (a) =>
+                        {
 
 
+                            if (fieldtype == SPFieldType.Number)
+                            {
+                                ShimSPFieldNumber field = new ShimSPFieldNumber();
+                                SPField sfield = (SPField)field;
+
+                                field.ShowAsPercentageGet = () =>
+                                {
+                                    return false;
+                                };
+
+                                return field;
+                            }
+                            else if (fieldtype == SPFieldType.Calculated)
+                            {
+                                ShimSPFieldCalculated field = new ShimSPFieldCalculated();
+                                SPField sfield = (SPField)field;
+
+                                field.ShowAsPercentageGet = () =>
+                                {
+                                    return false;
+                                };
+
+                                return field;
+                            }
+                            {
+                                ShimSPField field = new ShimSPField();
+                                field.IdGet = () =>
+                                {
+                                    return Guid.Parse("fdc3b2ed-5bf2-4835-a4bc-b885f3396a61");
+                                };
+                                field.InternalNameGet = () => { return fieldname; };
+                                field.TypeGet = () =>
+                                {
+                                    return fieldtype;
+                                };
+                                field.TypeAsStringGet = () =>
+                                {
+
+                                    return fieldname;
+                                };
+                                field.SchemaXmlGet = () =>
+                                {
+                                    return "<CHOICES><CHOICE Value = \"Text\" ></CHOICE> <CHOICE Value = \"Text\" ></CHOICE></CHOICES>";
+
+                                };
+                                field.GetFieldValueString = (obj) =>
+                                {
+                                    return "";
+                                };
+                                return field;
+                            }
+                        };
+                        return fcol;
+                    }
+                };
+
+
+                ShimSPContext.CurrentGet = () =>
+                {
+                    return new ShimSPContext()
+                    {
+                        WebGet = () =>
+                           {
+                               return new ShimSPWeb()
+                               {
+                                   AllUsersGet = () =>
+                                     {
+                                         return new ShimSPUserCollection()
+                                         {
+                                             GetByIDInt32 = (id) =>
+                                             {
+                                                 return new ShimSPUser
+                                                 {
+                                                     NameGet = () =>
+                                                     {
+                                                         return "Test User";
+                                                     }
+                                                 };
+                                             }
+                                         };
+                                     }
+                               };
+                           }
+                    };
+                };
+                Shimgetgriditems.AllInstances.getRealFieldSPField = (instance, field) => { return spfield; };
+                objToTestPrivateMethod.SetField("list", list);
+
+
+                //Arrange when FieldType User and bUseReporting true
+                fieldtype = SPFieldType.User;
+                objToTestPrivateMethod.SetField("bUseReporting", true);
+                //Act
+                var result = objToTestPrivateMethod.Invoke("formatField", val, fieldname, dr, group);
+                //Assert
+                Assert.AreEqual(result, "Test User\nTest User");
+
+
+                //Arrange when FieldType User and bUseReporting false
+                fieldtype = SPFieldType.User;
+                objToTestPrivateMethod.SetField("bUseReporting", false);
+                //Act
+                result = objToTestPrivateMethod.Invoke("formatField", val, fieldname, dr, group);
+                //Assert
+                Assert.AreEqual(result, "<a href=\"TestUrl/_layouts/userdisp.aspx?ID=0\"></a>");
+
+                //Arrange when FieldType DateTime
+                fieldtype = SPFieldType.DateTime;
+                val = DateTime.Now.ToString();
+                //Act
+                result = objToTestPrivateMethod.Invoke("formatField", val, fieldname, dr, group);
+                //Assert
+                Assert.AreEqual(result, val);
+
+
+                //Arrange when FieldType Currency
+                fieldtype = SPFieldType.Currency;
+                val = "Test";
+                //Act
+                result = objToTestPrivateMethod.Invoke("formatField", val, fieldname, dr, group);
+                //Assert
+                Assert.AreEqual(result, val);
+
+
+                //Arrange when FieldType Boolean and Value True
+                fieldtype = SPFieldType.Boolean;
+                val = "True";
+                //Act
+                result = objToTestPrivateMethod.Invoke("formatField", val, fieldname, dr, group);
+                //Assert
+                Assert.AreEqual(result.ToString().ToLower(), "yes");
+
+
+                //Arrange when FieldType Boolean and Value False
+                fieldtype = SPFieldType.Boolean;
+                val = "False";
+                //Act
+                result = objToTestPrivateMethod.Invoke("formatField", val, fieldname, dr, group);
+                //Assert
+                Assert.AreEqual(result.ToString().ToLower(), "no");
+
+                //Arrange when FieldType Lookup
+                fieldtype = SPFieldType.Lookup;
+                val = "False";
+                //Act
+                result = objToTestPrivateMethod.Invoke("formatField", val, fieldname, dr, group);
+                //Assert
+                Assert.AreEqual(result, "0");
+
+                
+            }
+
+        }
     }
 
 }
