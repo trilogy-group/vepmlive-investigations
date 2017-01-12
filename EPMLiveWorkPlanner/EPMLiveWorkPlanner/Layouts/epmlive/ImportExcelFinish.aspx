@@ -18,8 +18,36 @@
     <input type="button" value="Close" id="close" onclick="window.frameElement.commitPopup();" disabled="true"></button>
 
     <script language="javascript">
-        function CheckStatus() {
+         function CheckStatus() {
             dhtmlxAjax.post("WorkPlannerAction.aspx", "Action=GetImportStatus&jobuid=<%=Request["jobuid"] %>", CheckStatusClose);
+            setTimeout(ResizePopop, 2000)
+        }
+       
+        function ResizePopop() {
+            var pWh, wpd, dlgBorder, ribbonH, dlgOuterFrame, dlgInnerFrame, dlgContent, formH, top;
+            pWh = $(window.parent.document).height() - 172;
+            wpd = $(window.parent.document);
+            dlgBorder = wpd.find("div.ms-dlgBorder");
+            ribbonH = $("#s4-ribbonrow").height() + 80;
+            dlgInnerFrame = wpd.find("iframe[id^='DlgFrame']");
+            dlgContent = dlgInnerFrame.parent().parent().parent();
+            dlgOuterFrame = dlgContent.prev();
+
+            if (dlgContent.attr('DragBehavior') !== null && dlgContent.css('left') !== '10px') {
+                formH = dlgInnerFrame.height();
+                top = (pWh - formH) / 2;
+                if (top < 0) {
+                    top = 10;
+                }
+                var dlgOuterFrametop = dlgOuterFrame.css("top");
+                var dlgContenttop = dlgContent.css("top");
+                dlgBorder.css({ height: formH + 'px' });
+                dlgOuterFrame.css({ position: 'absolute', top: top + "px", });
+                dlgContent.css({ position: 'absolute', top: top + "px", });
+                dlgOuterFrame.css({ position: 'absolute', top: dlgOuterFrame.css("top"), });
+                dlgContent.css({ position: 'absolute', top: dlgContent.css("top"), });
+                dlgInnerFrame.css({ height: (formH) + 'px' });
+            }
         }
 
         function CheckStatusClose(loader) {
