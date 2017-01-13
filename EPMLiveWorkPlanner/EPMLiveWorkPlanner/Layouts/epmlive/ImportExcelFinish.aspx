@@ -46,7 +46,7 @@
                 dlgContent.css({ position: 'absolute', top: top + "px", });
                 dlgOuterFrame.css({ position: 'absolute', top: dlgOuterFrame.css("top"), });
                 dlgContent.css({ position: 'absolute', top: dlgContent.css("top"), });
-                dlgInnerFrame.css({ height: (formH) + 'px' });
+                dlgInnerFrame.css({ height: (formH+1) + 'px' });
             }
         }
 
