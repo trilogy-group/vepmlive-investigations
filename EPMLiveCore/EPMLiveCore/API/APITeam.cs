@@ -169,10 +169,33 @@ namespace EPMLiveCore.API
                     if (role.Member.GetType() == typeof(SPGroup))
                     {
                         SPGroup group = (SPGroup)role.Member;
-
-                        foreach (SPUser user in group.Users)
+                        GridGanttSettings gSettings = new GridGanttSettings(list);
+                        List<string> gridSettingPermissions = new List<string>();
+                        if (gSettings.BuildTeamPermissions.Length > 1)
                         {
-                            liItemSPGroups.Add(string.Format("{0}-{1}", group.ID, user.ID), user.ID);
+
+                            string[] strOuter = gSettings.BuildTeamPermissions.Split(new string[] { "|~|" }, StringSplitOptions.None);
+                            foreach (string strInner in strOuter)
+                            {
+                                string[] strInnerMost = strInner.Split('~');
+                                SPGroup g = null;
+                                try
+                                {
+                                    g = web.SiteGroups.GetByID(Convert.ToInt32(strInnerMost[0]));
+                                }
+                                catch { g = null; }
+                                if (g != null)
+                                {
+                                    gridSettingPermissions.Add(g.Name);
+                                }
+                            }
+                        }
+                        if (!gridSettingPermissions.Contains(group.Name))
+                        {
+                            foreach (SPUser user in group.Users)
+                            {
+                                liItemSPGroups.Add(string.Format("{0}-{1}", group.ID, user.ID), user.ID);
+                            }
                         }
                     }
                 }
@@ -942,7 +965,9 @@ namespace EPMLiveCore.API
                             SPUser spUser = spWeb.EnsureUser(uv.User.LoginName);
                             if (spUser != null)
                             {
-                                foreach (SPRoleAssignment role in li.RoleAssignments)
+                                // Re-opening the item with the system account
+                                SPListItem adminItem = spWeb.Lists[li.ParentList.ID].GetItemByUniqueId(li.UniqueId);
+                                foreach (SPRoleAssignment role in adminItem.RoleAssignments)
                                 {
                                     try
                                     {
@@ -1023,7 +1048,7 @@ namespace EPMLiveCore.API
                 //    APIEmail.sendEmail(2, uv.LookupId, new Hashtable());
                 //}
             }
-            catch { }
+            catch(Exception ex) { throw ex; }
 
         }
 
@@ -1078,8 +1103,7 @@ namespace EPMLiveCore.API
                     APIEmail.sendEmail(2, uv.LookupId, new Hashtable());
                 }
             }
-            catch { }
-
+            catch (Exception ex) { throw ex; }
         }
 
         public static string GetTeam(string queryDoc, SPWeb oWeb)
@@ -1961,7 +1985,7 @@ namespace EPMLiveCore.API
                                 if (assn.Member.GetType() == typeof(Microsoft.SharePoint.SPGroup))
                                 {
                                     SPGroup group = (SPGroup)assn.Member;
-                                   
+
                                     string basePath = CoreFunctions.getConfigSetting(oWeb, "epkbasepath");
                                     SPList myList = oWeb.Lists["Resources"];
                                     SPQuery curQry = new SPQuery();
