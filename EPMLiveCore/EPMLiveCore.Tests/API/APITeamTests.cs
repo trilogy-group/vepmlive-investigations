@@ -153,7 +153,38 @@ namespace EPMLiveCore.API.Tests
             using (new SPEmulators.SPEmulationContext(SPEmulators.IsolationLevel.Fake))
             {
 
-                SPListItem item = new ShimSPListItem() { ParentListGet = () => { return new ShimSPList(); }, HasUniqueRoleAssignmentsGet = () => { return true; } };
+                SPListItem item = new ShimSPListItem()
+                {
+                    ParentListGet = () =>
+                    {
+                        return new ShimSPList()
+                        {
+                            FieldsGet = () =>
+                            {
+                                return new ShimSPFieldCollection()
+                                {
+                                    GetFieldByInternalNameString = (s) =>
+                                    {
+                                        return new ShimSPFieldLookup()
+                                        {
+                                            LookupListGet = () => { return Guid.NewGuid().ToString(); }
+                                        };
+                                    },
+                                    ItemGetGuid = (guid) =>
+                                    {
+                                        return new ShimSPField()
+                                        {
+                                            IdGet = () => { return Guid.NewGuid(); }
+                                        };
+                                    }
+                                };
+                            },
+                        };
+                    },
+                    HasUniqueRoleAssignmentsGet = () => { return true; },
+
+
+                };
                 SPWeb spweb = new ShimSPWeb()
                 {
                     SiteGet = () =>
@@ -225,6 +256,7 @@ namespace EPMLiveCore.API.Tests
                     lststr.Add("Field5");
                     return lststr;
                 };
+                ShimGridGanttSettings.ConstructorSPList = (instance,slist) => { };
                 method.Invoke("setItemPermissions", new object[] { spweb, "", "", item });
             }
         }
