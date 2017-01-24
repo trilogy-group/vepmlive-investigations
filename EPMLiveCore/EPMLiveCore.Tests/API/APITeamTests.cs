@@ -144,10 +144,11 @@ namespace EPMLiveCore.API.Tests
             }
         }
         [TestMethod()]
-        [ExpectedException(typeof(System.Reflection.TargetInvocationException))]
+        
         public void setItemPermissions()
         {
             Guid jobid = Guid.NewGuid();
+            int fieldcount=0;
             string XML = "<Grid WebId=\"0f681e6a-0113-4abc-a5b3-4d1f7e42ac41\" ListId=\"5bb9f6de-8444-4f17-b142-68b6f05a1221\" ItemId=\"4\" />";
             var method = typeof(APITeam).GetMethod("setItemPermissions", BindingFlags.Static | BindingFlags.NonPublic);
             using (new SPEmulators.SPEmulationContext(SPEmulators.IsolationLevel.Fake))
@@ -182,7 +183,11 @@ namespace EPMLiveCore.API.Tests
                         };
                     },
                     HasUniqueRoleAssignmentsGet = () => { return true; },
-
+                    ItemGetString = (guid2) =>
+                    {
+                        fieldcount++;
+                        return "0";
+                    }
 
                 };
                 SPWeb spweb = new ShimSPWeb()
@@ -213,14 +218,33 @@ namespace EPMLiveCore.API.Tests
                         ShimSPListCollection lists = new ShimSPListCollection();
                         lists.ItemGetGuid = (guid2) =>
                         {
-                            ShimSPList list = new ShimSPList();
+                            ShimSPList list = new ShimSPList()
+                            {
+                                GetItemByIdInt32 = (_int) =>
+                                {
+
+                                    return new ShimSPListItem()
+                                    {
+                                        HasUniqueRoleAssignmentsGet = () => { return false; },
+
+                                    };
+                                }
+                            };
                             //list.TitleGet = () => { return listTitle; };
 
-                            list.GetItemByIdInt32 = (_int) => { return new ShimSPListItem() { HasUniqueRoleAssignmentsGet = () => { return true; } }; };
+
                             return list;
                         };
                         return lists;
+                    },
+                    AllowUnsafeUpdatesSetBoolean = (bl) => { },
+                    AllowUnsafeUpdatesGet = () => {
+                        return false;
+                    },
+                    EnsureUserString = (_str) => {
+                        return null;
                     }
+                    
                 };
 
                 ShimAPITeam.GetGenericResourceGridStringSPWeb = (str, web) =>
@@ -243,21 +267,34 @@ namespace EPMLiveCore.API.Tests
                     stng.BuildTeamPermissions = "6|~|1758263";
                     return stng;
                 };
-
+                List<string> lststr = new List<string>();
+                lststr.Add("Field1");
+                lststr.Add("Field2");
+                lststr.Add("Field3");
+                lststr.Add("Field4");
+                lststr.Add("Field5");
                 ShimSPSite.AllInstances.Dispose = (instance) => { };
                 ShimEnhancedLookupConfigValuesHelper.ConstructorString = (instance, _str) => { };
                 ShimEnhancedLookupConfigValuesHelper.AllInstances.GetSecuredFields = (instance) =>
                 {
-                    List<string> lststr = new List<string>();
-                    lststr.Add("Field1");
-                    lststr.Add("Field2");
-                    lststr.Add("Field3");
-                    lststr.Add("Field4");
-                    lststr.Add("Field5");
+                   
                     return lststr;
                 };
-                ShimGridGanttSettings.ConstructorSPList = (instance,slist) => { };
+                ShimSPFieldUserValue.AllInstances.UserGet = (instance) =>
+                {
+                    return new ShimSPUser()
+                    {
+                        LoginNameGet = () => { return "test/test"; }
+                    };
+                };
+                ShimSPSecurity.RunWithElevatedPrivilegesSPSecurityCodeToRunElevated = (w) =>
+                {
+                    w();
+                };
+               
+                ShimGridGanttSettings.ConstructorSPList = (instance, slist) => { };
                 method.Invoke("setItemPermissions", new object[] { spweb, "", "", item });
+                Assert.AreEqual(lststr.Count, fieldcount);
             }
         }
 
