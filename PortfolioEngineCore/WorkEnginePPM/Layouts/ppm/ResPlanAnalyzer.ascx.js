@@ -8106,7 +8106,7 @@
 
                     for (var i = StartID - 1; i < FinishID; i++) {
                         ob.data.push(Number(rd.Tot[i]));
-                        avail[i - StartID] += Number(rd.Avail[i]);
+                        avail[i] += Number(rd.Avail[i]);
                     }
 
                 }
